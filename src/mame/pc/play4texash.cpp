@@ -56,7 +56,7 @@ INPUT_PORTS_END
 
 void play4texash_state::play4texash(machine_config &config)
 {
-	PENTIUM4(config, m_maincpu, 100'000'000); // Intel Atom N270 SLB73, 1.6 GHz / 512 / 533 
+	PENTIUM4(config, m_maincpu, 100'000'000); // Intel Atom N270 SLB73, 1.6 GHz / 512 / 533
 	m_maincpu->set_addrmap(AS_PROGRAM, &play4texash_state::play4texash_map);
 	m_maincpu->set_addrmap(AS_IO, &play4texash_state::play4texash_io);
 
@@ -76,9 +76,9 @@ ROM_START(play4texash)
 	ROM_LOAD("56.21_pic16lf747.u13", 0x0000, 0x1000, NO_DUMP)
 	ROM_LOAD("a5_pic16f54.u28",      0x0000, 0x0800, CRC(2901d211) SHA1(9b4bc7c490b073e95e748ae7cdf6e8e07025da02))
 
-	ROM_REGION(0x30000, "plds", 0)
+	ROM_REGION(0x50000, "plds", 0)
 	ROM_LOAD("15-02_lc4256v.u4.jed", 0x00000, 0x2d182, CRC(954e2812) SHA1(573b17d85058512ace9a50cfee510580e6bf7d23)) // Lattice ispMACH LC4256V. Not converted to BIN because jedutil does not support it
-	ROM_LOAD("81-lc4384v.u31",       0x00000, 0x00100, NO_DUMP) // Lattice ispMACH LC4384V
+	ROM_LOAD("81-lc4384v.u31.jed",   0x00000, 0x4be4d, CRC(c4ded582) SHA1(d24e10301338207f8342963b9330820994fb05de)) // Lattice ispMACH LC4384V. Not converted to BIN because jedutil does not support it
 
 	DISK_REGION("ide:0:hdd")
 	DISK_IMAGE("sleic_play_4_texas_holdem_v2.1.4_12-00314", 0, SHA1(6cbf515ee80a68c98a13be02b17c9d306f4e1445)) // Transcend CompactFlash 133x 1GB

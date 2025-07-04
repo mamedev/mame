@@ -151,7 +151,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	std::unique_ptr<bitmap_ind16> m_screen_bitmap[2]; // 0 left screen, 1 right screen
+	bitmap_ind16 m_screen_bitmap[2]; // 0 left screen, 1 right screen
 	required_shared_ptr_array<uint16_t, 2> m_spriteram;
 	required_shared_ptr_array<uint16_t, 4> m_tilemap;
 	uint16_t *m_k053247_ram;
@@ -212,11 +212,8 @@ void xmen6p_state::video_start()
 {
 	m_k053246->k053247_get_ram(&m_k053247_ram);
 
-	m_screen_bitmap[0] = std::make_unique<bitmap_ind16>(64 * 8, 32 * 8);
-	m_screen_bitmap[1] = std::make_unique<bitmap_ind16>(64 * 8, 32 * 8);
-
-	save_item(NAME(*m_screen_bitmap[0]));
-	save_item(NAME(*m_screen_bitmap[1]));
+	m_screen->register_screen_bitmap(m_screen_bitmap[0]);
+	m_screen->register_screen_bitmap(m_screen_bitmap[1]);
 }
 
 
@@ -271,12 +268,12 @@ uint32_t xmen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 template <uint8_t Which>
 uint32_t xmen6p_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 32 * 8; y++)
+	for (int y = 0; y < m_screen->height(); y++)
 	{
 		uint16_t *const line_dest = &bitmap.pix(y);
-		uint16_t const *const line_src = &m_screen_bitmap[Which]->pix(y);
+		uint16_t const *const line_src = &m_screen_bitmap[Which].pix(y);
 
-		for (int x = 12 * 8; x < 52 * 8; x++)
+		for (int x = 0; x < m_screen->width(); x++)
 			line_dest[x] = line_src[x];
 	}
 
@@ -289,14 +286,9 @@ void xmen6p_state::screen_vblank(int state)
 	// rising edge
 	if (state)
 	{
-		rectangle cliprect;
-
-		// const rectangle *visarea = m_screen->visible_area();
-		// cliprect = *visarea;
-		cliprect.set(0, 64 * 8 - 1, 2 * 8, 30 * 8 - 1);
-
 		int index = m_screen->frame_number() & 1;
-		bitmap_ind16 *renderbitmap = m_screen_bitmap[index].get();
+		bitmap_ind16 &renderbitmap = m_screen_bitmap[index];
+		rectangle cliprect = m_screen->cliprect();
 
 		// copy the desired spritelist to the chip
 		memcpy(m_k053247_ram, m_spriteram[index], 0x1000);
@@ -340,14 +332,14 @@ void xmen6p_state::screen_vblank(int state)
 
 		m_screen->priority().fill(0, cliprect);
 		// note the '+1' in the background color!!!
-		renderbitmap->fill(16 * bg_colorbase + 1, cliprect);
-		m_k052109->tilemap_draw(*m_screen, *renderbitmap, cliprect, layer[0], 0, 1);
-		m_k052109->tilemap_draw(*m_screen, *renderbitmap, cliprect, layer[1], 0, 2);
-		m_k052109->tilemap_draw(*m_screen, *renderbitmap, cliprect, layer[2], 0, 4);
+		renderbitmap.fill(16 * bg_colorbase + 1, cliprect);
+		m_k052109->tilemap_draw(*m_screen, renderbitmap, cliprect, layer[0], 0, 1);
+		m_k052109->tilemap_draw(*m_screen, renderbitmap, cliprect, layer[1], 0, 2);
+		m_k052109->tilemap_draw(*m_screen, renderbitmap, cliprect, layer[2], 0, 4);
 
 		/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
 		pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
-		m_k053246->k053247_sprites_draw(*renderbitmap, cliprect);
+		m_k053246->k053247_sprites_draw(renderbitmap, cliprect);
 	}
 }
 
@@ -419,7 +411,7 @@ void xmen_state::base_main_map(address_map &map)
 	map(0x10a002, 0x10a003).portr("P1_P3");
 	map(0x10a004, 0x10a005).portr("EEPROM");
 	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_r));
-	map(0x110000, 0x113fff).ram();     // main RAM
+	map(0x110000, 0x113fff).ram();
 	map(0x18c000, 0x197fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write)).umask16(0x00ff);
 	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::_18fa00_w));
 }
@@ -658,7 +650,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::scanline)
 
 void xmen_state::sound_hardware(machine_config &config)
 {
-	Z80(config, m_audiocpu, XTAL(16'000'000) / 2); // verified on PCB
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 2); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &xmen_state::sound_map);
 
 	// sound hardware
@@ -666,9 +658,11 @@ void xmen_state::sound_hardware(machine_config &config)
 
 	K054321(config, "k054321", "speaker");
 
-	YM2151(config, "ymsnd", XTAL(16'000'000) / 4).add_route(0, "speaker", 0.20, 1).add_route(1, "speaker", 0.20, 0);  // verified on PCB
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4)); // verified on PCB
+	ymsnd.add_route(0, "speaker", 0.20, 1);
+	ymsnd.add_route(1, "speaker", 0.20, 0);
 
-	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
+	k054539_device &k054539(K054539(config, "k054539", 18.432_MHz_XTAL));
 	k054539.add_route(0, "speaker", 1.00, 1);
 	k054539.add_route(1, "speaker", 1.00, 0);
 }
@@ -686,7 +680,7 @@ void xmen_state::bootleg_sound_hardware(machine_config &config)
 void xmen_state::base(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(16'000'000)); // verified on PCB
+	M68000(config, m_maincpu, 16_MHz_XTAL); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &xmen_state::main_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(xmen_state::scanline), "screen", 0, 1);
@@ -697,23 +691,20 @@ void xmen_state::base(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(59.17);   // verified on PCB
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1 );   // correct, same issue of tmnt2
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240); // correct, same issue as tmnt2
 	m_screen->set_screen_update(FUNC(xmen_state::screen_update));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen(m_screen);
 	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback));
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246, 24_MHz_XTAL);
 	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback));
-	m_k053246->set_config(NORMAL_PLANE_ORDER, 53, -2);
+	m_k053246->set_config(NORMAL_PLANE_ORDER, -43, -2);
 	m_k053246->set_palette("palette");
 
 	K053251(config, m_k053251, 0);
@@ -745,22 +736,11 @@ void xmen6p_state::xmen6p(machine_config &config)
 	// video hardware
 	config.set_default_layout(layout_dualhsxs);
 
-	// TODO: why doesn't just changing m_screen parameters work? nor config.replace()?
-	config.device_remove("screen");
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(12*8, 48*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 320-32, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(xmen6p_state::screen_update<0>));
-	m_screen->set_palette("palette");
 
 	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
-	screen2.set_refresh_hz(60);
-	screen2.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen2.set_size(64*8, 32*8);
-	screen2.set_visarea(16*8, 52*8-1, 2*8, 30*8-1);
+	screen2.set_raw(24_MHz_XTAL / 4, 384, 0+32, 320, 264, 16, 240);
 	screen2.set_screen_update(FUNC(xmen6p_state::screen_update<1>));
 	screen2.screen_vblank().set(FUNC(xmen6p_state::screen_vblank));
 	screen2.set_palette("palette");

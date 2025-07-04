@@ -10,27 +10,27 @@
     MAME driver by R. Belmont, Olivier Galibert, ElSemi and Angelo Salese.
 
     TODO:
-    - color gamma and Mip Mapping still needs to be properly sorted in the renderer;
+    - Mip Mapping still needs to be properly sorted in the renderer;
     - sound comms still needs some work (sometimes m68k doesn't get some commands or play them with a delay);
     - outputs and artwork (for gearbox indicators);
     - clean-ups;
 
     TODO (per-game issues)
-    - daytona: car glasses doesn't get loaded during gameplay;
     - doa, doaa: corrupted sound, eventually becomes silent;
     - dynamcopc: corrupts palette for 2d;
-    - fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
-    - hpyagu98: stops with 'Error #1' message during boot. Also writes to the 0x600000-0x62ffff range in main CPU program map
+    - fvipers: enables timers, but then irq register is empty, hence it crashes with an
+      "interrupt halt" at POST (regression, worked around);
+    - hpyagu98: stops with 'Error #1' message during boot.
+	  Also writes to the 0x600000-0x62ffff range in main CPU program map;
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
     - lastbrnx: has wrong graphics, uses several SHARC opcodes that needs to be double checked
                 (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
     - manxtt: no escape from "active motion slider" tutorial (needs analog inputs),
               bypass it by entering then exiting service mode;
-    - sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
-    - srallyc: some 3d elements doesn't show up properly (tree models, last hill in course 1 is often black colored);
+    - sgt24h: has input analog issues, steering doesn't center when neutral,
+	  gas and brake pedals pulses instead of being fixed;
     - stcc: no collision detection with enemy cars, sometimes enemy cars glitch out and disappear altogether;
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
-    - vstriker: stadium ads have terrible colors (they uses the wrong color table, @see video/model2rd.hxx)
 
     Notes:
     - some analog games can be calibrated in service mode via volume control item ...
@@ -2204,6 +2204,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sgt24h )
 	PORT_INCLUDE(indy500)
 
+	PORT_MODIFY("ACCEL")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL)  PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Gas Pedal") PORT_REVERSE
+
+	PORT_MODIFY("BRAKE")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Brake Pedal") PORT_REVERSE
+
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("View 1")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -2228,9 +2234,17 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( overrev )
 	PORT_INCLUDE(indy500)
 
+	// NOTE: game can actually handle which way the pedals activates (either 0 -> 0xff or 0xff -> 0).
+	// With no NVRAM game expects the "invert" mode.
+	PORT_MODIFY("ACCEL")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL)  PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Gas Pedal") PORT_REVERSE
+
+	PORT_MODIFY("BRAKE")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Brake Pedal") PORT_REVERSE
+
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("View 1")
-	// optional, enableable when hardware type isn't in "normal (2in1)" mode (overrev)
+	// optional, settable when hardware type isn't in "normal (2in1)" mode
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("View 2")
 INPUT_PORTS_END
 
@@ -2937,8 +2951,8 @@ void model2b_state::overrev2b(machine_config &config)
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
 	io.an_port_callback<0>().set_ioport("STEER");
-	io.an_port_callback<1>().set_ioport("BRAKE");
-	io.an_port_callback<2>().set_ioport("ACCEL");
+	io.an_port_callback<1>().set_ioport("ACCEL");
+	io.an_port_callback<2>().set_ioport("BRAKE");
 }
 
 void model2b_state::powsled(machine_config &config)
@@ -3118,8 +3132,8 @@ void model2c_state::overrev2c(machine_config &config)
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
 	io.an_port_callback<0>().set_ioport("STEER");
-	io.an_port_callback<1>().set_ioport("BRAKE");
-	io.an_port_callback<2>().set_ioport("ACCEL");
+	io.an_port_callback<1>().set_ioport("ACCEL");
+	io.an_port_callback<2>().set_ioport("BRAKE");
 }
 
 void model2c_state::segawski(machine_config &config)
@@ -7500,26 +7514,26 @@ ROM_END
 
 void model2_state::init_pltkids()
 {
-	// fix bug in program: it destroys the interrupt table and never fixes it
+	// HACK: fix bug in program: it destroys the interrupt table and never fixes it
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 	ROM[0x730/4] = 0x08000004;
 }
 
 void model2_state::init_zerogun()
 {
-	// fix bug in program: it destroys the interrupt table and never fixes it
+	// HACK: fix bug in program: it destroys the interrupt table and never fixes it
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 	ROM[0x700/4] = 0x08000004;
 }
 
 void model2_state::init_sgt24h()
 {
-	u32 *ROM = (u32 *)memregion("maincpu")->base();
-	ROM[0x56578/4] = 0x08000004;
+//	u32 *ROM = (u32 *)memregion("maincpu")->base();
+//	ROM[0x56578/4] = 0x08000004;
 	//ROM[0x5b3e8/4] = 0x08000004;
 }
 
-void model2_state::init_powsledm ()
+void model2_state::init_powsledm()
 {
 	u8 *ROM = (u8 *)memregion("maincpu")->base();
 	ROM[0x1571C] = 0x01; // Main mode

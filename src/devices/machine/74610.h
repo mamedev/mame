@@ -2,8 +2,8 @@
 // copyright-holders:Michael Zapf
 /*****************************************************************************
 
-    74610: Memory mappers 
-    
+    74610: Memory mappers
+
     Variant   Output       Type
     ----------------------------------------
     74610     latched      tristate
@@ -13,7 +13,7 @@
 
     Michael Zapf
     June 2025
-    
+
 **********************************************************************/
 
 #ifndef MAME_MACHINE_74610_H
@@ -22,7 +22,7 @@
 #pragma once
 
 /*
-	Overall base class
+    Overall base class
 */
 class ttl7461x_device : public device_t
 {
@@ -31,13 +31,13 @@ public:
 
 	void set_register(int num, uint16_t value);
 	uint16_t get_register(int num);
-	
+
 	void mapper_output_rz(uint8_t num, uint16_t& value);
 	uint16_t get_mapper_output(uint8_t num);
-	
+
 	void map_mode_w(int mapping);
 	void map_enable_w(int enable);
-	
+
 protected:
 	ttl7461x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -53,14 +53,14 @@ protected:
 };
 
 /*
-	Base class for the latched variants
+    Base class for the latched variants
 */
 class ttl7461x_latched_device : public ttl7461x_device
 {
 public:
 	void set_map_address(uint8_t num);
 	uint16_t get_mapper_output();
-	void mapper_output_rz(uint16_t& value);	
+	void mapper_output_rz(uint16_t& value);
 	void latch_enable_w(int enable);
 
 protected:
@@ -68,13 +68,13 @@ protected:
 
 	bool m_latch_enabled;
 	uint16_t m_latched_output;
-	
+
 	virtual void device_start() override ATTR_COLD;
 };
 
 
 /*
-	Variants
+    Variants
 */
 class ttl74610_device : public ttl7461x_latched_device
 {

@@ -205,13 +205,13 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 	{
 		// clear interrupts
 		if (BIT(~data & m_ctrlram[7], 1))
-			m_irq_cb(0);
+			m_irq_cb(CLEAR_LINE);
 
 		if (BIT(~data & m_ctrlram[7], 2))
-			m_firq_cb(0);
+			m_firq_cb(CLEAR_LINE);
 
 		if (BIT(~data & m_ctrlram[7], 0))
-			m_nmi_cb(0);
+			m_nmi_cb(CLEAR_LINE);
 
 		// flipscreen
 		if (BIT(data ^ m_ctrlram[7], 3))
@@ -432,20 +432,22 @@ TIMER_CALLBACK_MEMBER(k007121_device::scanline)
 	// NMI 8 or 4 times per frame
 	const uint8_t nmi_mask = 0x10 << BIT(m_ctrlram[7], 4);
 	if (BIT(m_ctrlram[7], 0) && (scanline & ((nmi_mask << 1) - 1)) == nmi_mask)
-		m_nmi_cb(1);
+		m_nmi_cb(ASSERT_LINE);
 
 	// vblank
 	if (scanline == 240)
 	{
-		if (BIT(m_ctrlram[7], 2))
-			m_firq_cb(1);
+		// FIRQ once every other frame
+		if (BIT(m_ctrlram[7], 1) && screen().frame_number() & 1)
+			m_firq_cb(ASSERT_LINE);
 
 		if (BIT(m_ctrlram[7], 1))
-			m_irq_cb(1);
+			m_irq_cb(ASSERT_LINE);
 
 		sprites_buffer();
 	}
 
+	// wait for next line
 	scanline += 16;
 	if (scanline >= screen().height())
 		scanline = 0;

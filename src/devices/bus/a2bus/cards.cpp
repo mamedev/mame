@@ -239,7 +239,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("superdrive", A2BUS_SUPERDRIVE);         // Apple II 3.5" Disk Controller
 	device.option_add("vistaa800", A2BUS_VISTAA800);           // Vista A800 8" Disk Controller Card
 	device.option_add("wicotrackball", A2BUS_WICOTRACKBALL);   // Wico Trackball
-	device.option_add("ieee488", A2BUS_IEEE488);			   // Apple II IEEE-488 Interface Card
+	device.option_add("ieee488", A2BUS_IEEE488);               // Apple II IEEE-488 Interface Card
 }
 
 void apple2gs_cards(device_slot_interface &device)
@@ -315,7 +315,7 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("pdromdrive", A2BUS_PRODOSROMDRIVE);     // ProDOS ROM Drive
 	device.option_add("superdrive", A2BUS_SUPERDRIVE);         // Apple II 3.5" Disk Controller
 	device.option_add("wicotrackball", A2BUS_WICOTRACKBALL);   // Wico Trackball
-	device.option_add("ieee488", A2BUS_IEEE488);			   // Apple II IEEE-488 Interface Card
+	device.option_add("ieee488", A2BUS_IEEE488);               // Apple II IEEE-488 Interface Card
 }
 
 void apple3_cards(device_slot_interface &device)

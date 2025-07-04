@@ -3,25 +3,29 @@
 
 #include "emu.h"
 #include "aeffect.h"
-#include "filter.h"
+
 #include "compressor.h"
-#include "reverb.h"
 #include "eq.h"
+#include "filter.h"
+#include "reverb.h"
+
+#include "util/language.h"
+
 
 const char *const audio_effect::effect_names[COUNT] = {
-	"Filters",
-	"Compressor",
-	"Reverb",
-	"Equalizer"
+	N_p("audio-effect", "Filters"),
+	N_p("audio-effect", "Compressor"),
+	N_p("audio-effect", "Reverb"),
+	N_p("audio-effect", "Equalizer")
 };
 
-audio_effect *audio_effect::create(int type, speaker_device *speaker, u32 sample_rate, audio_effect *def)
+std::unique_ptr<audio_effect> audio_effect::create(int type, speaker_device *speaker, u32 sample_rate, audio_effect *def)
 {
 	switch(type) {
-	case FILTER:     return new audio_effect_filter    (speaker, sample_rate, def);
-	case COMPRESSOR: return new audio_effect_compressor(speaker, sample_rate, def);
-	case REVERB:     return new audio_effect_reverb    (speaker, sample_rate, def);
-	case EQ:         return new audio_effect_eq        (speaker, sample_rate, def);
+	case FILTER:     return std::make_unique<audio_effect_filter    >(speaker, sample_rate, def);
+	case COMPRESSOR: return std::make_unique<audio_effect_compressor>(speaker, sample_rate, def);
+	case REVERB:     return std::make_unique<audio_effect_reverb    >(speaker, sample_rate, def);
+	case EQ:         return std::make_unique<audio_effect_eq        >(speaker, sample_rate, def);
 	}
 	return nullptr;
 }

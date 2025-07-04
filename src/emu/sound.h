@@ -68,6 +68,12 @@
 #include "wavwrite.h"
 #include "interface/audio.h"
 
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 #ifndef SOUND_DISABLE_THREADING
 #include <mutex>
 #include <thread>
@@ -82,7 +88,7 @@
 // special sample-rate values
 constexpr u32 SAMPLE_RATE_INPUT_ADAPTIVE = 0xffffffff;
 constexpr u32 SAMPLE_RATE_OUTPUT_ADAPTIVE = 0xfffffffe;
-constexpr u32 SAMPLE_RATE_ADAPTIVE  = 0xfffffffd;
+constexpr u32 SAMPLE_RATE_ADAPTIVE = 0xfffffffd;
 
 
 using stream_update_delegate = delegate<void (sound_stream &stream)>;
@@ -185,7 +191,7 @@ public:
 
 	// simple getters
 	device_t &device() const { return m_device; }
-	std::string name() const { return m_name; }
+	const std::string &name() const { return m_name; }
 	bool input_adaptive() const { return m_input_adaptive; }
 	bool output_adaptive() const { return m_output_adaptive; }
 	bool synchronous() const { return m_synchronous; }
@@ -243,7 +249,7 @@ public:
 	void put_int_clamp(s32 output, s32 index, s32 sample, s32 maxclamp) { put_int(output, index, std::clamp(sample, -maxclamp, maxclamp-1), maxclamp); }
 
 	// safely add a sample to the buffer
-	void add(s32 output, s32 index, sample_t sample)  { *m_output_buffer.ptrw(output, index) += sample; }
+	void add(s32 output, s32 index, sample_t sample) { *m_output_buffer.ptrw(output, index) += sample; }
 
 	// add a sample to the buffer, converting from an integer with the given maximum
 	void add_int(s32 output, s32 index, s32 sample, s32 max) { add(output, index, double(sample)/max); }
@@ -417,17 +423,17 @@ public:
 	u32 outputs_count() const { return m_outputs_count; }
 
 	// manage the sound_io mapping and volume configuration
-	void config_add_sound_io_connection_node(sound_io_device *dev, std::string name, float db);
+	void config_add_sound_io_connection_node(sound_io_device *dev, std::string_view name, float db);
 	void config_add_sound_io_connection_default(sound_io_device *dev, float db);
-	void config_remove_sound_io_connection_node(sound_io_device *dev, std::string name);
+	void config_remove_sound_io_connection_node(sound_io_device *dev, std::string_view name);
 	void config_remove_sound_io_connection_default(sound_io_device *dev);
-	void config_set_volume_sound_io_connection_node(sound_io_device *dev, std::string name, float db);
+	void config_set_volume_sound_io_connection_node(sound_io_device *dev, std::string_view name, float db);
 	void config_set_volume_sound_io_connection_default(sound_io_device *dev, float db);
-	void config_add_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string name, u32 node_channel, float db);
+	void config_add_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel, float db);
 	void config_add_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel, float db);
-	void config_remove_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string name, u32 node_channel);
+	void config_remove_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel);
 	void config_remove_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel);
-	void config_set_volume_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string name, u32 node_channel, float db);
+	void config_set_volume_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel, float db);
 	void config_set_volume_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel, float db);
 
 	// mute sound for one of various independent reasons
@@ -525,10 +531,10 @@ private:
 		std::vector<float> m_volumes;
 		const audio_resampler *m_resampler;
 
-		osd_stream(u32 node, std::string node_name, u32 channels, u32 rate, bool is_system_default, sound_io_device *dev) :
+		osd_stream(u32 node, std::string &&node_name, u32 channels, u32 rate, bool is_system_default, sound_io_device *dev) :
 			m_id(0),
 			m_node(node),
-			m_node_name(node_name),
+			m_node_name(std::move(node_name)),
 			m_channels(channels),
 			m_rate(rate),
 			m_unused_channels_mask(util::make_bitmask<u32>(channels)),
@@ -541,8 +547,8 @@ private:
 
 	struct osd_input_stream : public osd_stream {
 		emu::detail::output_buffer_interleaved<s16> m_buffer;
-		osd_input_stream(u32 node, std::string node_name, u32 channels, u32 rate, bool is_system_default, sound_io_device *dev) :
-			osd_stream(node, node_name, channels, rate, is_system_default, dev),
+		osd_input_stream(u32 node, std::string &&node_name, u32 channels, u32 rate, bool is_system_default, sound_io_device *dev) :
+			osd_stream(node, std::move(node_name), channels, rate, is_system_default, dev),
 			m_buffer(rate, channels)
 		{ }
 	};
@@ -550,8 +556,8 @@ private:
 	struct osd_output_stream : public osd_stream {
 		u32 m_samples;
 		std::vector<s16> m_buffer;
-		osd_output_stream(u32 node, std::string node_name, u32 channels, u32 rate, bool is_system_default, sound_io_device *dev) :
-			osd_stream(node, node_name, channels, rate, is_system_default, dev),
+		osd_output_stream(u32 node, std::string &&node_name, u32 channels, u32 rate, bool is_system_default, sound_io_device *dev) :
+			osd_stream(node, std::move(node_name), channels, rate, is_system_default, dev),
 			m_samples(0),
 			m_buffer(channels*rate, 0)
 		{ }
@@ -582,7 +588,7 @@ private:
 	void update(s32);
 
 	// handle mixing mapping update if needed
-	static std::vector<u32> find_channel_mapping(const osd::channel_position  &pos, const osd::audio_info::node_info *node);
+	static std::vector<u32> find_channel_mapping(const osd::channel_position &pos, const osd::audio_info::node_info *node);
 	void startup_cleanups();
 	void streams_update();
 	template<bool is_output, typename S> void apply_osd_changes(std::vector<S> &streams);
@@ -602,19 +608,18 @@ private:
 	// but don't change generation because we're in the update process
 
 	config_mapping &config_get_sound_io(sound_io_device *dev);
-	void internal_config_add_sound_io_connection_node(sound_io_device *dev, std::string name, float db);
+	void internal_config_add_sound_io_connection_node(sound_io_device *dev, std::string_view name, float db);
 	void internal_config_add_sound_io_connection_default(sound_io_device *dev, float db);
-	void internal_config_remove_sound_io_connection_node(sound_io_device *dev, std::string name);
+	void internal_config_remove_sound_io_connection_node(sound_io_device *dev, std::string_view name);
 	void internal_config_remove_sound_io_connection_default(sound_io_device *dev);
-	void internal_config_set_volume_sound_io_connection_node(sound_io_device *dev, std::string name, float db);
+	void internal_config_set_volume_sound_io_connection_node(sound_io_device *dev, std::string_view name, float db);
 	void internal_config_set_volume_sound_io_connection_default(sound_io_device *dev, float db);
-	void internal_config_add_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string name, u32 node_channel, float db);
+	void internal_config_add_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel, float db);
 	void internal_config_add_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel, float db);
-	void internal_config_remove_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string name, u32 node_channel);
+	void internal_config_remove_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel);
 	void internal_config_remove_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel);
-	void internal_config_set_volume_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string name, u32 node_channel, float db);
+	void internal_config_set_volume_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel, float db);
 	void internal_config_set_volume_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel, float db);
-
 
 	// internal state
 	running_machine &m_machine;            // reference to the running machine

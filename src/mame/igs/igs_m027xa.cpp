@@ -858,7 +858,6 @@ void igs_m027xa_state::init_tripfev()
 void igs_m027xa_state::init_wldfruit()
 {
 	wldfruit_decrypt(machine());
-	//qlgs_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 

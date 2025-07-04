@@ -124,17 +124,21 @@ K051960_CB_MEMBER(gradius3_state::sprite_callback)
 {
 	enum { sprite_colorbase = 256 / 16 };
 
-	#define L0 GFX_PMASK_1
-	#define L1 GFX_PMASK_2
-	#define L2 GFX_PMASK_4
 	static const int primask[2][4] =
 	{
-		{ L0|L2, L0, L0|L2, L0|L1|L2 },
-		{ L1|L2, L2, 0,     L0|L1|L2 }
+		{
+			GFX_PMASK_1 | GFX_PMASK_4,
+			GFX_PMASK_1,
+			GFX_PMASK_1 | GFX_PMASK_4,
+			GFX_PMASK_1 | GFX_PMASK_2 | GFX_PMASK_4
+		},
+		{
+			GFX_PMASK_2 | GFX_PMASK_4,
+			GFX_PMASK_4,
+			0,
+			GFX_PMASK_1 | GFX_PMASK_2 | GFX_PMASK_4
+		}
 	};
-	#undef L0
-	#undef L1
-	#undef L2
 
 	int pri = ((*color & 0x60) >> 5);
 
@@ -282,7 +286,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gradius3_state::gradius3_sub_scanline)
 	if(scanline == 240 && m_irqBmask & 1) // vblank-out irq
 		m_subcpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline ==  16 && m_irqBmask & 2) // sprite end DMA irq
+	if(scanline == 16 && m_irqBmask & 2) // sprite end DMA irq
 		m_subcpu->set_input_line(2, HOLD_LINE);
 }
 
@@ -455,22 +459,21 @@ void gradius3_state::machine_reset()
 	m_irqAen = 0;
 	m_irqBmask = 0;
 	m_priority = 0;
-
 }
 
 void gradius3_state::gradius3(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(10'000'000));
+	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gradius3_state::gradius3_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gradius3_state::cpuA_interrupt));
 
-	M68000(config, m_subcpu, XTAL(10'000'000));
+	M68000(config, m_subcpu, 10_MHz_XTAL);
 	m_subcpu->set_addrmap(AS_PROGRAM, &gradius3_state::gradius3_map2);
 	TIMER(config, "scantimer").configure_scanline(FUNC(gradius3_state::gradius3_sub_scanline), "screen", 0, 1);
 	/* 4 is triggered by cpu A, the others are unknown but required for the game to run. */
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gradius3_state::gradius3_s_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -479,22 +482,19 @@ void gradius3_state::gradius3(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
 	screen.set_screen_update(FUNC(gradius3_state::screen_update_gradius3));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 2048).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(gradius3_state::tile_callback));
 	m_k052109->set_char_ram(true);
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(gradius3_state::sprite_callback));
@@ -505,9 +505,11 @@ void gradius3_state::gradius3(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "speaker", 1.0, 0).add_route(0, "speaker", 1.0, 1);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(1, "speaker", 1.0, 1);
 
-	K007232(config, m_k007232, 3579545);
+	K007232(config, m_k007232, 3.579545_MHz_XTAL);
 	m_k007232->port_write().set(FUNC(gradius3_state::volume_callback));
 	m_k007232->add_route(0, "speaker", 0.20, 0);
 	m_k007232->add_route(0, "speaker", 0.20, 1);

@@ -32,10 +32,6 @@ class va_rc_eg_device : public device_t, public device_sound_interface
 public:
 	va_rc_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
-	// Skip creating a sound stream. Useful when using this device for RC
-	// emulation other than sound.
-	va_rc_eg_device &disable_streaming();
-
 	// These setters can be used during both: configuration and normal operation.
 	// `r` and `c` must be > 0. To instantly set the capacitor's voltage to
 	// a specific value, use set_instant_v().
@@ -65,7 +61,6 @@ private:
 	void snapshot();
 
 	sound_stream *m_stream;
-	bool m_streaming;
 
 	float m_r;
 	float m_c;

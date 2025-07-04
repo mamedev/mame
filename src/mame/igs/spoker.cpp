@@ -2618,5 +2618,5 @@ GAME( 1995,  huluw2,        0,        jinhulu2, huluw2,   jinhulu2_state, init_h
 GAME( 1995,  hsheng2,       0,        jinhulu2, jinhulu2, jinhulu2_state, init_hsheng2,       ROT0,  "IGS",       "Hua Shen II (v120DI)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
 GAME( 1995,  dafuwng3,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_dafuwng3,      ROT0,  "IGS",       "Da Fu Weng III (V130LI)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
 GAME( 1996,  zuanshiw,      0,        jinhulu2, zuanshiw, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Zuanshi Wutai (V110II)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
-GAME( 2002,  jinhuang,      0,        jinhuang, jinhuang, jinhulu2_state, init_jinhuang,      ROT0,  "IGS",       "Jin Huang Guan",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map
+GAME( 2002,  jinhuang,      0,        jinhuang, jinhuang, jinhulu2_state, init_jinhuang,      ROT0,  "IGS",       "Jin Huangguan",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map
 GAME( 1998,  sleyuan2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_sleyuan2,      ROT0,  "IGS",       "Shuiguo Leyuan II (V150UI)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper

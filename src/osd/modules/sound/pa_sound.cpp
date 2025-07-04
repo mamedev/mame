@@ -102,16 +102,16 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 	static const char *const posname[10] = { "FL", "FR", "FC", "LFE", "BL", "BR", "BC", "SL", "SR", "AUX" };
 
 	static const osd::channel_position pos3d[10] = {
-		osd::channel_position::FL,
-		osd::channel_position::FR,
-		osd::channel_position::FC,
-		osd::channel_position::LFE,
-		osd::channel_position::RL,
-		osd::channel_position::RR,
-		osd::channel_position::RC,
+		osd::channel_position::FL(),
+		osd::channel_position::FR(),
+		osd::channel_position::FC(),
+		osd::channel_position::LFE(),
+		osd::channel_position::RL(),
+		osd::channel_position::RR(),
+		osd::channel_position::RC(),
 		osd::channel_position(-0.2,  0.0,  0.0),
 		osd::channel_position( 0.2,  0.0,  0.0),
-		osd::channel_position::ONREQ
+		osd::channel_position::ONREQ()
 	};
 
 	static const uint32_t positions[9][9] = {
@@ -134,18 +134,43 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 
 	m_info.m_generation = 1;
 	m_info.m_nodes.resize(Pa_GetDeviceCount());
+	osd_printf_verbose("PortAudio: Found %d devices:\n", Pa_GetDeviceCount());
+
+	auto dc = [](PaDeviceIndex dev) -> int { return dev == paNoDevice ? 0 : dev+1; };
+	m_info.m_default_sink = dc(Pa_GetDefaultOutputDevice());
+	m_info.m_default_source = dc(Pa_GetDefaultInputDevice());
+
+	std::unordered_map<std::string, int> namecount;
+
 	for(PaDeviceIndex dev = 0; dev != Pa_GetDeviceCount(); dev++) {
 		const PaDeviceInfo *di = Pa_GetDeviceInfo(dev);
 		const PaHostApiInfo *ai = Pa_GetHostApiInfo(di->hostApi);
 		auto &node = m_info.m_nodes[dev];
-		node.m_name = util::string_format("%s: %s", ai->name, di->name);
-		node.m_display_name = util::string_format("%s: %s", ai->name, di->name);
 		node.m_id = dev + 1;
 		node.m_rate.m_default_rate = node.m_rate.m_min_rate = node.m_rate.m_max_rate = di->defaultSampleRate;
 		node.m_sinks = di->maxOutputChannels;
 		node.m_sources = di->maxInputChannels;
 
-		int channels = std::max(di->maxInputChannels, di->maxOutputChannels);
+		// remove enters from possibly buggy device string
+		node.m_name = util::string_format("%s: %s", ai->name, di->name);
+		node.m_name.erase(std::remove_if(node.m_name.begin(), node.m_name.end(), [](char c) {
+			return c == '\r' || c == '\n';
+		}), node.m_name.end());
+
+		// append number to identical names
+		namecount[node.m_name]++;
+		if(namecount[node.m_name] > 1)
+			node.m_name += " (" + std::to_string(namecount[node.m_name]) + ")";
+		node.m_display_name = node.m_name;
+
+		osd_printf_verbose("PortAudio: #%d: %s%s(%d inputs, %d outputs)\n",
+				node.m_id,
+				node.m_name,
+				(node.m_id == m_info.m_default_sink || node.m_id == m_info.m_default_source) ? " (default) " : " ",
+				node.m_sources,
+				node.m_sinks);
+
+		int channels = std::max(node.m_sinks, node.m_sources);
 		int index = std::min(channels, 9) - 1;
 		for(uint32_t port = 0; port != channels; port++) {
 			uint32_t pos = positions[index][std::min(8U, port)];
@@ -153,10 +178,6 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 			node.m_port_positions.push_back(pos3d[pos]);
 		}
 	}
-
-	auto dc = [](PaDeviceIndex dev) -> int { return dev == paNoDevice ? 0 : dev+1; };
-	m_info.m_default_sink = dc(Pa_GetDefaultOutputDevice());
-	m_info.m_default_source = dc(Pa_GetDefaultInputDevice());
 
 	m_stream_id = 1;
 	m_audio_latency = options.audio_latency() * 20e-3;
@@ -204,7 +225,7 @@ uint32_t sound_pa::stream_sink_open(uint32_t node, std::string name, uint32_t ra
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
 	if(err) {
-		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
+		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_display_name, Pa_GetErrorText(err));
 		lock.unlock();
 		stream_close(id);
 		return 0;
@@ -234,7 +255,7 @@ uint32_t sound_pa::stream_source_open(uint32_t node, std::string name, uint32_t 
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
 	if(err) {
-		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
+		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_display_name, Pa_GetErrorText(err));
 		lock.unlock();
 		stream_close(id);
 		return 0;

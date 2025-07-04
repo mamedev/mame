@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <array>
 #include <cmath>
 #include <cstdint>
 #include <string>
@@ -20,51 +19,41 @@ struct channel_position {
 	// Special positions
 
 	// Position is unknown, placed in the middle
-	static const struct channel_position UNKNOWN;
+	static constexpr channel_position UNKNOWN() { return channel_position(0.0, 0.0, 0.0); }
 
 	// This channel should only be mapped explicitely through a channel mapping (on request)
-	static const struct channel_position ONREQ;
+	static constexpr channel_position ONREQ() { return channel_position(0.0, 0.0, 10.0); }
 
 	// This channel is a LFE
-	static const struct channel_position LFE;
-
+	static constexpr channel_position LFE() { return channel_position(0.0, 0.0, 11.0); }
 
 	// Standard positions
-	static const struct channel_position FC;
-	static const struct channel_position FL;
-	static const struct channel_position FR;
-	static const struct channel_position RC;
-	static const struct channel_position RL;
-	static const struct channel_position RR;
-	static const struct channel_position HC;
-	static const struct channel_position HL;
-	static const struct channel_position HR;
-	static const struct channel_position BACKREST;
+	static constexpr channel_position FC()       { return channel_position( 0.0, 0.0, 1.0); }
+	static constexpr channel_position FL()       { return channel_position(-0.2, 0.0, 1.0); }
+	static constexpr channel_position FR()       { return channel_position( 0.2, 0.0, 1.0); }
+	static constexpr channel_position RC()       { return channel_position( 0.0, 0.0,-0.5); }
+	static constexpr channel_position RL()       { return channel_position(-0.2, 0.0,-0.5); }
+	static constexpr channel_position RR()       { return channel_position( 0.2, 0.0,-0.5); }
+	static constexpr channel_position HC()       { return channel_position( 0.0, 0.0,-0.1); }
+	static constexpr channel_position HL()       { return channel_position(-0.1, 0.0,-0.1); }
+	static constexpr channel_position HR()       { return channel_position( 0.1, 0.0,-0.1); }
+	static constexpr channel_position BACKREST() { return channel_position( 0.0,-0.2, 0.1); }
 
 	double m_x, m_y, m_z;
 
-	bool is_lfe() const;
-	bool is_onreq() const;
-	bool is_unknown() const;
+	constexpr channel_position() : channel_position(UNKNOWN()) {}
+	constexpr channel_position(double x, double y, double z) : m_x(x), m_y(y), m_z(z) {}
+	constexpr channel_position(const channel_position &pos) : m_x(pos.m_x), m_y(pos.m_y), m_z(pos.m_z) {}
 
-	channel_position() : channel_position(UNKNOWN) {}
-	channel_position(double x, double y, double z) : m_x(x), m_y(y), m_z(z) {}
-	channel_position(const channel_position &pos) : m_x(pos.m_x), m_y(pos.m_y), m_z(pos.m_z) {}
-
-	bool operator == (const channel_position &pos) const {
-		return pos.m_x == m_x && pos.m_y == m_y && pos.m_z == m_z;
+	constexpr bool operator==(const channel_position &pos) const {
+		return (pos.m_x == m_x) && (pos.m_y == m_y) && (pos.m_z == m_z);
 	}
 
+	constexpr bool is_lfe() const { return *this == LFE(); }
+	constexpr bool is_onreq() const { return *this == ONREQ(); }
+	constexpr bool is_unknown() const { return *this == UNKNOWN(); }
+
 	std::string name() const;
-};
-
-namespace detail {
-struct position_name_mapping {
-	struct channel_position m_pos;
-	const char *m_name;
-};
-
-extern const position_name_mapping position_name_mappings[];
 };
 
 struct audio_rate_range {

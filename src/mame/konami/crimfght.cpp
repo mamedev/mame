@@ -111,15 +111,16 @@ K051960_CB_MEMBER(crimfght_state::sprite_callback)
 	// priority over text but not on one or both of the other two planes.
 	switch (*color & 0x70)
 	{
-		case 0x10: *priority = 0x00; break;            // over ABF
-		case 0x00: *priority = GFX_PMASK_4          ; break;  // over AB, not F
-		case 0x40: *priority = GFX_PMASK_4|GFX_PMASK_2     ; break;  // over A, not BF
+		case 0x10: *priority = 0x00; break;                                    // over ABF
+		case 0x00: *priority = GFX_PMASK_4; break;                             // over AB, not F
+		case 0x40: *priority = GFX_PMASK_4 | GFX_PMASK_2; break;               // over A, not BF
 		case 0x20:
-		case 0x60: *priority = GFX_PMASK_4|GFX_PMASK_2|GFX_PMASK_1; break;  // over -, not ABF
-		case 0x50: *priority = GFX_PMASK_2     ; break;  // over AF, not B
+		case 0x60: *priority = GFX_PMASK_4 | GFX_PMASK_2 | GFX_PMASK_1; break; // over -, not ABF
+		case 0x50: *priority = GFX_PMASK_2; break;                             // over AF, not B
 		case 0x30:
-		case 0x70: *priority = GFX_PMASK_2|GFX_PMASK_1; break;  // over F, not AB
+		case 0x70: *priority = GFX_PMASK_2 | GFX_PMASK_1; break;               // over F, not AB
 	}
+
 	// bit 7 is on in the "Game Over" sprites, meaning unknown
 	// in Aliens it is the top bit of the code, but that's not needed here
 	*color = sprite_colorbase + (*color & 0x0f);
@@ -282,10 +283,10 @@ static INPUT_PORTS_START( crimfght )
 	// defaults confirmed from World manual
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
-		PORT_DIPSETTING(    0x03, "1" )
-		PORT_DIPSETTING(    0x02, "2" )
-		PORT_DIPSETTING(    0x01, "3" )
-		PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "SW2:3")
 	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "SW2:4")
 	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW2:5")
@@ -335,38 +336,38 @@ static INPUT_PORTS_START( crimfghtu )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME(0xf0, 0x00, "Coin B (Unused)") PORT_DIPLOCATION("SW1:5,6,7,8")
-		PORT_DIPSETTING(   0x20, DEF_STR( 4C_1C ))
-		PORT_DIPSETTING(   0x50, DEF_STR( 3C_1C ))
-		PORT_DIPSETTING(   0x80, DEF_STR( 2C_1C ))
-		PORT_DIPSETTING(   0x40, DEF_STR( 3C_2C ))
-		PORT_DIPSETTING(   0x10, DEF_STR( 4C_3C ))
-		PORT_DIPSETTING(   0xf0, DEF_STR( 1C_1C ))
-		PORT_DIPSETTING(   0x30, DEF_STR( 3C_4C ))
-		PORT_DIPSETTING(   0x70, DEF_STR( 2C_3C ))
-		PORT_DIPSETTING(   0xe0, DEF_STR( 1C_2C ))
-		PORT_DIPSETTING(   0x60, DEF_STR( 2C_5C ))
-		PORT_DIPSETTING(   0xd0, DEF_STR( 1C_3C ))
-		PORT_DIPSETTING(   0xc0, DEF_STR( 1C_4C ))
-		PORT_DIPSETTING(   0xb0, DEF_STR( 1C_5C ))
-		PORT_DIPSETTING(   0xa0, DEF_STR( 1C_6C ))
-		PORT_DIPSETTING(   0x90, DEF_STR( 1C_7C ))
-		PORT_DIPSETTING(   0x00, DEF_STR( Unused ))
+	PORT_DIPSETTING(   0x20, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(   0x50, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(   0x80, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(   0x40, DEF_STR( 3C_2C ))
+	PORT_DIPSETTING(   0x10, DEF_STR( 4C_3C ))
+	PORT_DIPSETTING(   0xf0, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(   0x30, DEF_STR( 3C_4C ))
+	PORT_DIPSETTING(   0x70, DEF_STR( 2C_3C ))
+	PORT_DIPSETTING(   0xe0, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(   0x60, DEF_STR( 2C_5C ))
+	PORT_DIPSETTING(   0xd0, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(   0xc0, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(   0xb0, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(   0xa0, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(   0x90, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(   0x00, DEF_STR( Unused ))
 
 	PORT_MODIFY("DSW2")
-		PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "SW2:1")
-		PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW2:2")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "SW2:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW2:2")
 
-		PORT_MODIFY("P1")
-		KONAMI8_B12_UNK(1)
+	PORT_MODIFY("P1")
+	KONAMI8_B12_UNK(1)
 
-		PORT_MODIFY("P2")
-		KONAMI8_B12_UNK(2)
+	PORT_MODIFY("P2")
+	KONAMI8_B12_UNK(2)
 
-		PORT_MODIFY("P3")
-		KONAMI8_B12_UNK(3)
+	PORT_MODIFY("P3")
+	KONAMI8_B12_UNK(3)
 
-		PORT_MODIFY("P4")
-		KONAMI8_B12_UNK(4)
+	PORT_MODIFY("P4")
+	KONAMI8_B12_UNK(4)
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -432,11 +433,11 @@ ioport_value crimfght_state::system_r()
 void crimfght_state::crimfght(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); // 052001 (verified on pcb)
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 052001 (verified on pcb)
 	m_maincpu->set_addrmap(AS_PROGRAM, &crimfght_state::main_map);
 	m_maincpu->line().set(FUNC(crimfght_state::banking_callback));
 
-	Z80(config, m_audiocpu, XTAL(3'579'545)); // verified on pcb
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &crimfght_state::sound_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(crimfght_state::audiocpu_irq_ack));
 
@@ -444,21 +445,20 @@ void crimfght_state::crimfght(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000)/3, 528, 96, 416, 256, 16, 240); // measured 59.17
-//  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // measured 59.17
 	screen.set_screen_update(FUNC(crimfght_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 512);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(crimfght_state::tile_callback));
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(crimfght_state::sprite_callback));
@@ -469,12 +469,12 @@ void crimfght_state::crimfght(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));  // verified on pcb
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL)); // verified on pcb
 	ymsnd.port_write_handler().set(FUNC(crimfght_state::ym2151_ct_w));
 	ymsnd.add_route(0, "speaker", 1.0, 0);
 	ymsnd.add_route(1, "speaker", 1.0, 1);
 
-	K007232(config, m_k007232, XTAL(3'579'545)); // verified on pcb
+	K007232(config, m_k007232, 3.579545_MHz_XTAL); // verified on pcb
 	m_k007232->port_write().set(FUNC(crimfght_state::volume_callback));
 	m_k007232->add_route(0, "speaker", 0.20, 0);
 	m_k007232->add_route(0, "speaker", 0.20, 1);
@@ -555,6 +555,7 @@ ROM_START( crimfghtu )
 ROM_END
 
 } // anonymous namespace
+
 
 /***************************************************************************
 

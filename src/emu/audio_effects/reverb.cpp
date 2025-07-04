@@ -3,7 +3,9 @@
 
 #include "emu.h"
 #include "reverb.h"
-#include "xmlfile.h"
+
+#include "util/language.h"
+#include "util/xmlfile.h"
 
 #include <cmath>
 
@@ -20,41 +22,41 @@
 //
 
 const audio_effect_reverb::preset audio_effect_reverb::presets[] = {
-	{ "Custom",                 0,     0,   0,  0,  0, 0,    0,   0,     0,  0,  0,    0,  0,  0,  0 },
-	{ "Echo Chamber",           0, 12000, 100, 30, 30, 2,   80,  20,  9000, 10,  4,   90, 10, 30, 20 },
-	{ "Large Room",             0,  8000,  90, 45, 45, 0.5, 40,  64,  8000, 12,  1.2, 90, 10, 30, 20 },
-	{ "Large Room Bright",      0, 16000,  90, 45, 45, 0.5, 40,  59, 16000, 12,  1.2, 90, 10, 30, 20 },
-	{ "Large Room Dark",        0,  3600,  90, 45, 45, 1,   20,  70,  3600, 12,  1.4, 90, 10, 30, 20 },
-	{ "Large Room Drum",        0,  6500,  90, 35, 35, 1,   20,  30,  6500, 16,  1.2, 85, 10, 25, 25 },
-	{ "Large Room Tiled",       0,  8500,  90, 15, 70, 2,    0,  10,  8500, 12,  1.2, 90, 10, 30, 20 },
-	{ "Large Room Vocal",       0,  5500,  90, 45, 45, 2,    0,  80,  5500,  4,  1.5, 90, 10, 30, 20 },
-	{ "Large Room Wooden",      0,  9000,  90, 55, 35, 1,   20, 100,  9000, 12,  1.2, 90, 10, 30, 20 },
-	{ "Live",                   0, 12000,  90, 20, 20, 2,   80,  25,  9000, 25,  1.5, 90, 30, 15, 60 },
-	{ "Long Reverb 12s",        0, 16000, 100, 25, 25, 1,   20,  80, 10000,  0, 12,   90, 10, 30, 20 },
-	{ "Long Reverb 30s",        0, 16000, 100, 25, 25, 1,   20,  80,  9000,  0, 30,   90, 10, 30, 20 },
-	{ "Medium Room",            0,  8000,  80, 30, 30, 0.5, 40,  57,  8000,  8,  0.6, 90, 10, 30, 20 },
-	{ "Medium Room Bright",     0, 16000,  80, 30, 30, 0.5, 40,  52, 16000,  8,  0.6, 90, 10, 30, 20 },
-	{ "Medium Room Dark",       0,  3600,  80, 30, 30, 1,   20,  65,  3600,  8,  0.8, 90, 10, 30, 20 },
-	{ "Medium Room Drum",       0,  6500,  80, 25, 25, 1,   20,  25,  6500, 12,  0.6, 85, 10, 25, 25 },
-	{ "Medium Room Tiled",      0,  8500,  80, 10, 65, 2,    0,  10,  8500,  8,  0.6, 90, 10, 30, 20 },
-	{ "Medium Room Vocal",      0,  5500,  80, 30, 30, 2,    0,  75,  5500,  2,  0.9, 90, 10, 30, 20 },
-	{ "Medium Room Wooden",     0,  9000,  80, 40, 20, 1,   20, 100,  9000,  8,  0.6, 90, 10, 30, 20 },
-	{ "Shimmer",                0,  8000, 100, 15, 15, 0.5, 40,  50,  8000,  0,  6,  100,  5,  5, 20 },
-	{ "Small Room",             0,  8000,  70, 15, 15, 0.5, 40,  50,  8000,  4,  0.3, 90, 10, 30, 20 },
-	{ "Small Room Bright",      0, 16000,  70, 15, 15, 0.5, 40,  45, 16000,  4,  0.3, 90, 10, 30, 20 },
-	{ "Small Room Dark",        0,  3600,  70, 15, 15, 1,   20,  60,  3600,  4,  0.5, 90, 10, 30, 20 },
-	{ "Small Room Drum",        0,  6500,  70, 15, 15, 1,   20,  20,  6500,  8,  0.3, 85, 10, 25, 25 },
-	{ "Small Room Tiled",       0,  8500,  70,  5, 60, 2,    0,  10,  8500,  4,  0.3, 90, 10, 30, 20 },
-	{ "Small Room Vocal",       0,  5500,  70, 15, 15, 2,    0,  70,  5500,  0,  0.6, 90, 10, 30, 20 },
-	{ "Small Room Wooden",      0,  9000,  70, 25,  5, 1,   20, 100,  9000,  4,  0.3, 90, 10, 30, 20 },
-	{ "Tunnel",                 0,  8000,  50, 65, 65, 0.5, 10,  80,  6000,  0,  8,   90, 10, 30, 20 },
-	{ "Very Large Room",        0,  8000, 100, 60, 60, 0.5, 40,  70,  8000, 16,  2.0, 90, 10, 30, 20 },
-	{ "Very Large Room Bright", 0, 16000, 100, 60, 60, 0.5, 40,  65, 16000, 16,  2.0, 90, 10, 30, 20 },
-	{ "Very Large Room Dark",   0,  3600, 100, 60, 60, 1,   20,  75,  3600, 16,  2.2, 90, 10, 30, 20 },
-	{ "Very Large Room Drum",   0,  6500, 100, 45, 45, 1,   20,  35,  6500, 20,  2.0, 85, 10, 25, 25 },
-	{ "Very Large Room Tiled",  0,  8500, 100, 20, 75, 2,    0,  10,  8500, 16,  2.0, 90, 10, 30, 20 },
-	{ "Very Large Room Vocal",  0,  5500, 100, 60, 60, 2,    0,  85,  5500,  6,  2.3, 90, 10, 30, 20 },
-	{ "Very Large Room Wooden", 0,  9000, 100, 70, 50, 1,   20, 100,  9000, 16,  2.0, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Custom"),                 0,     0,   0,  0,  0, 0,    0,   0,     0,  0,  0,    0,  0,  0,  0 },
+	{ N_p("audio-reverb-preset", "Echo Chamber"),           0, 12000, 100, 30, 30, 2,   80,  20,  9000, 10,  4,   90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Large Room"),             0,  8000,  90, 45, 45, 0.5, 40,  64,  8000, 12,  1.2, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Large Room Bright"),      0, 16000,  90, 45, 45, 0.5, 40,  59, 16000, 12,  1.2, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Large Room Dark"),        0,  3600,  90, 45, 45, 1,   20,  70,  3600, 12,  1.4, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Large Room Drum"),        0,  6500,  90, 35, 35, 1,   20,  30,  6500, 16,  1.2, 85, 10, 25, 25 },
+	{ N_p("audio-reverb-preset", "Large Room Tiled"),       0,  8500,  90, 15, 70, 2,    0,  10,  8500, 12,  1.2, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Large Room Vocal"),       0,  5500,  90, 45, 45, 2,    0,  80,  5500,  4,  1.5, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Large Room Wooden"),      0,  9000,  90, 55, 35, 1,   20, 100,  9000, 12,  1.2, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Live"),                   0, 12000,  90, 20, 20, 2,   80,  25,  9000, 25,  1.5, 90, 30, 15, 60 },
+	{ N_p("audio-reverb-preset", "Long Reverb 12s"),        0, 16000, 100, 25, 25, 1,   20,  80, 10000,  0, 12,   90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Long Reverb 30s"),        0, 16000, 100, 25, 25, 1,   20,  80,  9000,  0, 30,   90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Medium Room"),            0,  8000,  80, 30, 30, 0.5, 40,  57,  8000,  8,  0.6, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Medium Room Bright"),     0, 16000,  80, 30, 30, 0.5, 40,  52, 16000,  8,  0.6, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Medium Room Dark"),       0,  3600,  80, 30, 30, 1,   20,  65,  3600,  8,  0.8, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Medium Room Drum"),       0,  6500,  80, 25, 25, 1,   20,  25,  6500, 12,  0.6, 85, 10, 25, 25 },
+	{ N_p("audio-reverb-preset", "Medium Room Tiled"),      0,  8500,  80, 10, 65, 2,    0,  10,  8500,  8,  0.6, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Medium Room Vocal"),      0,  5500,  80, 30, 30, 2,    0,  75,  5500,  2,  0.9, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Medium Room Wooden"),     0,  9000,  80, 40, 20, 1,   20, 100,  9000,  8,  0.6, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Shimmer"),                0,  8000, 100, 15, 15, 0.5, 40,  50,  8000,  0,  6,  100,  5,  5, 20 },
+	{ N_p("audio-reverb-preset", "Small Room"),             0,  8000,  70, 15, 15, 0.5, 40,  50,  8000,  4,  0.3, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Small Room Bright"),      0, 16000,  70, 15, 15, 0.5, 40,  45, 16000,  4,  0.3, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Small Room Dark"),        0,  3600,  70, 15, 15, 1,   20,  60,  3600,  4,  0.5, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Small Room Drum"),        0,  6500,  70, 15, 15, 1,   20,  20,  6500,  8,  0.3, 85, 10, 25, 25 },
+	{ N_p("audio-reverb-preset", "Small Room Tiled"),       0,  8500,  70,  5, 60, 2,    0,  10,  8500,  4,  0.3, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Small Room Vocal"),       0,  5500,  70, 15, 15, 2,    0,  70,  5500,  0,  0.6, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Small Room Wooden"),      0,  9000,  70, 25,  5, 1,   20, 100,  9000,  4,  0.3, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Tunnel"),                 0,  8000,  50, 65, 65, 0.5, 10,  80,  6000,  0,  8,   90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Very Large Room"),        0,  8000, 100, 60, 60, 0.5, 40,  70,  8000, 16,  2.0, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Very Large Room Bright"), 0, 16000, 100, 60, 60, 0.5, 40,  65, 16000, 16,  2.0, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Very Large Room Dark"),   0,  3600, 100, 60, 60, 1,   20,  75,  3600, 16,  2.2, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Very Large Room Drum"),   0,  6500, 100, 45, 45, 1,   20,  35,  6500, 20,  2.0, 85, 10, 25, 25 },
+	{ N_p("audio-reverb-preset", "Very Large Room Tiled"),  0,  8500, 100, 20, 75, 2,    0,  10,  8500, 16,  2.0, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Very Large Room Vocal"),  0,  5500, 100, 60, 60, 2,    0,  85,  5500,  6,  2.3, 90, 10, 30, 20 },
+	{ N_p("audio-reverb-preset", "Very Large Room Wooden"), 0,  9000, 100, 70, 50, 1,   20, 100,  9000, 16,  2.0, 90, 10, 30, 20 },
 };
 
 const audio_effect_reverb::early_reverb_tap_map audio_effect_reverb::tap_maps[15] = {
@@ -329,11 +331,11 @@ audio_effect_reverb::audio_effect_reverb(speaker_device *speaker, u32 sample_rat
 	set_late_diffusion_2(0.312);
 	set_late_diffusion_3(0.406);
 	set_late_diffusion_4(0.250);
-    set_late_decay_0(0.237);
-    set_late_decay_1(0.938);
-    set_late_decay_2(0.844);
-    set_late_decay_3(0.906);
-    set_late_decay_f(1.000);
+	set_late_decay_0(0.237);
+	set_late_decay_1(0.938);
+	set_late_decay_2(0.844);
+	set_late_decay_3(0.906);
+	set_late_decay_f(1.000);
 	m_late_crossfeed = 0.4;
 	set_late_bass_allpass(150, 4);
 	set_late_damping_2(500, 2);

@@ -17,12 +17,12 @@
     SYSTEM 2: (sound) 1 x EPROM, Z8400BB1, 28 MHz xtal, 16 MHz xtal, 1 x OKI5205, 384 kHz osc,
               1 x GAL16V8, 1 x GAL20V8, 1 x YM3812.
 
-	quite similar to splash_ms.cpp but without the extra bitmap layer and CPU driving it
+    quite similar to splash_ms.cpp but without the extra bitmap layer and CPU driving it
 
-	TODO:
-	 - service mode colours are broken (probably due to being a prototype?)
-	 - do the higher attribute bits in the 16x16 layer have meaning? (probably not)
-	 - what determines sound NMI frequency on these Modular boards as it's different to splash?
+    TODO:
+     - service mode colours are broken (probably due to being a prototype?)
+     - do the higher attribute bits in the 16x16 layer have meaning? (probably not)
+     - what determines sound NMI frequency on these Modular boards as it's different to splash?
 
 ***************************************************************************************************/
 
@@ -196,7 +196,7 @@ TILE_GET_INFO_MEMBER(xorworld_ms_state::get_tile_info_tilemap_8x8mg)
 {
 	int tile = m_videoram_8x8_mg[tile_index * 2];
 	int attr = m_videoram_8x8_mg[(tile_index * 2) + 1] & 0x1f;
-	//	int fx = (m_videoram_8x8_mg[(tile_index*2)+1] & 0xc0)>>6;
+	//  int fx = (m_videoram_8x8_mg[(tile_index*2)+1] & 0xc0)>>6;
 
 	tileinfo.set(2, tile, attr, 0); // must be region 2 for the score display tiles
 }
@@ -211,7 +211,7 @@ TILE_GET_INFO_MEMBER(xorworld_ms_state::get_tile_info_tilemap_8x8fg)
 {
 	int tile = m_videoram_8x8_mg_8x8_fg[tile_index * 2];
 	int attr = m_videoram_8x8_mg_8x8_fg[(tile_index * 2) + 1] & 0x1f;
-	//	int fx = (m_videoram_8x8_mg[(tile_index*2)+1] & 0xc0)>>6;
+	//  int fx = (m_videoram_8x8_mg[(tile_index*2)+1] & 0xc0)>>6;
 
 	tileinfo.set(1, tile, attr, 0); // assume region 1 as other tilemap is region 2
 }
@@ -293,7 +293,7 @@ static INPUT_PORTS_START( xorworld_ms )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Button 3 / P1 Start")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("IN1") 
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)

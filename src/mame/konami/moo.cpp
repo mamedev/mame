@@ -735,7 +735,7 @@ void moo_state::moo(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
@@ -785,7 +785,7 @@ void moo_state::moobl(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 

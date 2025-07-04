@@ -134,8 +134,8 @@ void eurocube_state::eurocube_map(address_map &map)
 	m_view[4](0xe000, 0xffff).rom().region("m0", 0);   // M0
 	m_view[4](0xe000, 0xe7ff).ram();                   // M1
 	//m_view[4](0xe000, 0xefff).lrw8(                    // I/O Block
-	//	NAME([this](offs_t offset) { return m_bus->read(offset | 0xe800); }),
-	//	NAME([this](offs_t offset, uint8_t data) { m_bus->write(offset | 0xe800, data); })
+	//  NAME([this](offs_t offset) { return m_bus->read(offset | 0xe800); }),
+	//  NAME([this](offs_t offset, uint8_t data) { m_bus->write(offset | 0xe800, data); })
 	//);
 	m_view[4](0xee00, 0xeeff).lrw8(                    // I/O Page
 		NAME([this](offs_t offset) { return m_bus->read(offset | 0xee00); }),
@@ -148,8 +148,8 @@ void eurocube_state::eurocube_map(address_map &map)
 	m_view[5](0xe000, 0xffff).rom().region("m0", 0);   // M0
 	m_view[5](0xe000, 0xe7ff).ram();                   // M1
 	//m_view[5](0xe000, 0xefff).lrw8(                    // I/O Block
-	//	NAME([this](offs_t offset) { return m_bus->read(offset | 0xe800); }),
-	//	NAME([this](offs_t offset, uint8_t data) { m_bus->write(offset | 0xe800, data); })
+	//  NAME([this](offs_t offset) { return m_bus->read(offset | 0xe800); }),
+	//  NAME([this](offs_t offset, uint8_t data) { m_bus->write(offset | 0xe800, data); })
 	//);
 	m_view[5](0xee00, 0xeeff).lrw8(                    // I/O Page
 		NAME([this](offs_t offset) { return m_bus->read(offset | 0xee00); }),

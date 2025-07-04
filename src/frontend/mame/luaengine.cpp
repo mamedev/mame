@@ -1669,7 +1669,7 @@ void lua_engine::initialize()
 	dipalette_type["black_pen"] = sol::property(&device_palette_interface::black_pen);
 	dipalette_type["white_pen"] = sol::property(&device_palette_interface::white_pen);
 	dipalette_type["shadows_enabled"] = sol::property(&device_palette_interface::shadows_enabled);
-	dipalette_type["highlights_enabled"] = sol::property(&device_palette_interface::hilights_enabled);
+	dipalette_type["highlights_enabled"] = sol::property(&device_palette_interface::highlights_enabled);
 	dipalette_type["device"] = sol::property(static_cast<device_t & (device_palette_interface::*)()>(&device_palette_interface::device));
 
 

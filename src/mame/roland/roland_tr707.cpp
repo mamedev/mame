@@ -238,8 +238,6 @@ constexpr const component_config TR727_COMPONENTS =
 	.C231 = CAP_U(0.0022),
 };
 
-}  // anonymous namespace
-
 
 class tr707_audio_device : public device_t
 {
@@ -260,9 +258,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	static constexpr const double VCC = 5;  // Volts.
-	static constexpr const double VBE = 0.6;  // BJT base-emitter voltage drop.
-	static constexpr const u16 MAX_CYMBAL_COUNTER = 0x8000;
+	static inline constexpr double VCC = 5;  // Volts.
+	static inline constexpr double VBE = 0.6;  // BJT base-emitter voltage drop.
+	static inline constexpr u16 MAX_CYMBAL_COUNTER = 0x8000;
 
 	static filter_biquad_device::biquad_params rc_bpf(double r1, double r2, double c1, double c2, bool crrc);
 	static double mux_dac_v(double v_eg, u8 data);
@@ -312,7 +310,10 @@ private:
 	std::array<u16, CV_COUNT> m_cymbal_counter = {MAX_CYMBAL_COUNTER, MAX_CYMBAL_COUNTER};  // TC404 (IC18, IC23), TC4520 (IC20a, IC20b).
 };
 
-DEFINE_DEVICE_TYPE(TR707_AUDIO, tr707_audio_device, "tr707_audio_device", "TR-707 audio circuits");
+}  // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE(TR707_AUDIO, tr707_audio_device, "tr707_audio", "TR-707 audio circuits");
 
 tr707_audio_device::tr707_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const component_config &components)
 	: device_t(mconfig, TR707_AUDIO, tag, owner, 0)
@@ -363,7 +364,7 @@ void tr707_audio_device::voice_select_w(u8 data)
 	update_hat_eg();
 
 	LOGMASKED(LOG_TRIGGER, "Voice selected: %02x. Bass: %d, snare: %d, rim/cow: %d, hcp/tamb: %d, hat closed: %d\n",
-	          data, m_bass_variation, m_snare_variation, m_rimshot_cowbell, m_handclap_tambourine, m_hat_is_closed);
+			  data, m_bass_variation, m_snare_variation, m_rimshot_cowbell, m_handclap_tambourine, m_hat_is_closed);
 }
 
 void tr707_audio_device::voice_trigger_w(u16 data)
@@ -444,7 +445,7 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 
 	// Larger DAC data values result in more negative voltages. So the maximum
 	// voltage is produced when data = 0, and the minimum one when data = 0xff.
-	constexpr const double MAX_MUX_EG_V = VCC;
+	constexpr double MAX_MUX_EG_V = VCC;
 	const double mux_dac_vpp = mux_dac_v(MAX_MUX_EG_V, 0) - mux_dac_v(MAX_MUX_EG_V, 0xff);
 	const double mux_dac_scale = -(mux_dac_vpp / 2.0) / MAX_MUX_EG_V;
 
@@ -455,7 +456,7 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	{
 		VA_RC_EG(config, m_mux_eg[i]).set_r(MUX_EG_R[i]).set_c(CAP_U(0.047));  // [C48, C52-55, C57-58]
 		DAC08(config, m_mux_dac[i]);
-		VA_VCA(config, m_mux_vca[i]).configure_streaming_cv(true);
+		VA_VCA(config, m_mux_vca[i]);
 		m_mux_dac[i]->add_route(0, m_mux_vca[i], 1.0, 0);
 		m_mux_eg[i]->add_route(0, m_mux_vca[i], mux_dac_scale, 1);
 	}
@@ -470,16 +471,16 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	// the open and closed hi-hat sounds, respectively. For more info on the hat
 	// EG, see update_hat_eg().
 
-	constexpr const double HAT_HPF_SCALE = RES_VOLTAGE_DIVIDER(RES_K(10), RES_R(220));  // R125, R121
-	constexpr const double HAT_VCA_V2I_SCALE = 0.0084;  // Converts from input voltage to output current.
-	constexpr const double HAT_VCA_SCALE = -HAT_VCA_V2I_SCALE * RES_K(4.7);  // R120, inverting op-amp.
+	constexpr double HAT_HPF_SCALE = RES_VOLTAGE_DIVIDER(RES_K(10), RES_R(220));  // R125, R121
+	constexpr double HAT_VCA_V2I_SCALE = 0.0084;  // Converts from input voltage to output current.
+	constexpr double HAT_VCA_SCALE = -HAT_VCA_V2I_SCALE * RES_K(4.7);  // R120, inverting op-amp.
 
 	auto &hat_hpf = FILTER_RC(config, "hat_hpf");
 	hat_hpf.set_rc(filter_rc_device::HIGHPASS, RES_R(220), 0, 0, CAP_U(1));  // ~723 Hz, R121, C69
 	m_mux_vca[MV_HI_HAT]->add_route(0, hat_hpf, HAT_HPF_SCALE, 0);
 
 	VA_RC_EG(config, m_hat_eg).set_c(CAP_U(1));  // C71
-	auto &hat_vca = VA_VCA(config, "hat_vca").configure_streaming_cv(true);  // 2SD1469R, Q32
+	auto &hat_vca = VA_VCA(config, "hat_vca");  // 2SD1469R, Q32
 	hat_hpf.add_route(0, hat_vca, HAT_VCA_SCALE, 0);
 	m_hat_eg->add_route(0, hat_vca, 1.0 / VCC, 1);
 
@@ -489,9 +490,9 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	// Two voices, each with their own ROM, address counter, 6-bit DAC, HPF,
 	// single-transistor VCA, and amplitude EG.
 
-	constexpr const double CYMBAL_HPF_SCALE = RES_VOLTAGE_DIVIDER(RES_K(22), RES_R(470));  // [R59, R60], [R63, R64]
-	constexpr const double CYMBAL_VCA_V2I_SCALE = 0.0043;  // Converts from input voltage to output current.
-	constexpr const double CYMBAL_VCA_SCALE = -CYMBAL_VCA_V2I_SCALE * RES_K(10);  // [R62, R65], inverting op-amp.
+	constexpr double CYMBAL_HPF_SCALE = RES_VOLTAGE_DIVIDER(RES_K(22), RES_R(470));  // [R59, R60], [R63, R64]
+	constexpr double CYMBAL_VCA_V2I_SCALE = 0.0043;  // Converts from input voltage to output current.
+	constexpr double CYMBAL_VCA_SCALE = -CYMBAL_VCA_V2I_SCALE * RES_K(10);  // [R62, R65], inverting op-amp.
 
 	const std::array<double, CV_COUNT> CYMBAL_EG_R =
 	{
@@ -509,7 +510,7 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 		m_cymbal_dac[i]->add_route(0, m_cymbal_hpf[i], CYMBAL_HPF_SCALE);
 
 		VA_RC_EG(config, m_cymbal_eg[i]).set_r(CYMBAL_EG_R[i]).set_c(CAP_U(1));  // [C50, C49]
-		VA_VCA(config, m_cymbal_vca[i]).configure_streaming_cv(true);   // 2SD1469R [Q14, Q15]
+		VA_VCA(config, m_cymbal_vca[i]);  // 2SD1469R [Q14, Q15]
 		// V2I converter is based on an op-amp in inverting configuration.
 		m_cymbal_hpf[i]->add_route(0, m_cymbal_vca[i], CYMBAL_VCA_SCALE, 0);
 		m_cymbal_eg[i]->add_route(0, m_cymbal_vca[i], 1.0 / VCC, 1);
@@ -527,8 +528,8 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	// output is connected, the voice won't be mixed into the left and right
 	// channels.
 
-	constexpr const double R_MAX_MASTER_VOLUME = RES_K(50);  // VR212a, VR212b
-	constexpr const double R_MAX_CHANNEL_VOLUME = RES_K(50);  // VR202-VR211
+	constexpr double R_MAX_MASTER_VOLUME = RES_K(50);  // VR212a, VR212b
+	constexpr double R_MAX_CHANNEL_VOLUME = RES_K(50);  // VR202-VR211
 
 	const std::array<double, MC_COUNT> r_mix_left =
 	{
@@ -626,7 +627,7 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	m_left_mixer->add_route(0, left_bpf, 1.0);
 	m_right_mixer->add_route(0, right_bpf, 1.0);
 
-	constexpr const double VOLTAGE_TO_AUDIO_SCALE = 0.2;
+	constexpr double VOLTAGE_TO_AUDIO_SCALE = 0.2;
 	SPEAKER(config, "speaker", 2).front();
 	left_bpf.add_route(0, "speaker", VOLTAGE_TO_AUDIO_SCALE, 0);
 	right_bpf.add_route(0, "speaker", VOLTAGE_TO_AUDIO_SCALE, 1);
@@ -704,10 +705,10 @@ double tr707_audio_device::mux_dac_v(double v_eg, u8 data)
 	// These equations use a simplified model of BJTs: constant Vbe, no current
 	// flowing into the base. These simplifications do not make e meaningful
 	// difference in this particular case.
-	constexpr const double R156 = RES_K(12);
-	constexpr const double R153 = RES_K(2.2);
-	constexpr const double R147 = RES_K(2.2);
-	constexpr const double R148 = RES_K(2.2);
+	constexpr double R156 = RES_K(12);
+	constexpr double R153 = RES_K(2.2);
+	constexpr double R147 = RES_K(2.2);
+	constexpr double R148 = RES_K(2.2);
 
 	// Compute reference current into the DAC.
 	const double v_in = v_eg - VBE;  // VBE of Q44.
@@ -1353,7 +1354,7 @@ void roland_tr707_state::update_internal_tempo_timer(bool cap_reset)
 
 	m_tempo_timer->adjust(attotime::from_double(remaining), 0, attotime::from_double(period));
 	LOGMASKED(LOG_TEMPO, "Update tempo timer. R: %f, T: %f, Rem: %f, F: %f, BPM: %f\n",
-	          r, period, remaining, 1.0 / period, 60.0 / period / 24 / 2);
+			  r, period, remaining, 1.0 / period, 60.0 / period / 24 / 2);
 }
 
 void roland_tr707_state::internal_tempo_clock_cb(int state)
@@ -1437,7 +1438,7 @@ void roland_tr707_state::update_accent_adc()
 	m_maincpu->set_input_line(HD6301_IRQ2_LINE, irq2);
 
 	LOGMASKED(LOG_ACCENT, "Update accent ADC - R: %f, V: %f, dt: %f, irq2: %d\n",
-	          r, target_v, dt.as_double(), irq2);
+			  r, target_v, dt.as_double(), irq2);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(roland_tr707_state::accent_adc_timer_tick)
@@ -1631,7 +1632,7 @@ void roland_tr707_state::tr_707_727_common(machine_config &config)
 	TTL7474(config, m_tempo_ff, 0);  // 4013, IC4a.
 	m_tempo_ff->comp_output_cb().set(FUNC(roland_tr707_state::internal_tempo_clock_cb));
 
-	VA_RC_EG(config, m_accent_adc_rc).disable_streaming().set_c(CAP_U(0.27));  // C15.
+	VA_RC_EG(config, m_accent_adc_rc).set_c(CAP_U(0.27));  // C15.
 	TIMER(config, m_accent_adc_timer).configure_generic(FUNC(roland_tr707_state::accent_adc_timer_tick));
 	TTL7474(config, m_accent_adc_ff, 0);  // 4013, IC4b.
 	m_accent_adc_ff->d_w(1);  // D tied to VCC.

@@ -21,12 +21,6 @@
         * FIRQ: not used.
         * NMI: not used.
 
-    Notes:
-        * The protection is not fully understood(Konami 051733). The
-        game is playable, but is not 100% accurate.
-        * Missing samples.
-        (both issues above are outdated?)
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -450,8 +444,6 @@ void bladestl_state::bladestl(machine_config &config)
 	k051733.set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// sound hardware
-	/* the initialization order is important, the port callbacks being
-	   called at initialization time */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);

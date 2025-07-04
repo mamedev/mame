@@ -2452,7 +2452,7 @@ void igs017_state::starzan_io(address_map &map)
 	map(0x9000, 0x9000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
-// cpoker2, happyksl, starzan
+// cpoker2, happyskl, starzan
 void igs017_state::starzan_counter_w(u8 data)
 {
 	//                                        BIT(data, 0)   // always on in cpoker2/happyskl?
@@ -2496,7 +2496,7 @@ void igs017_state::starzan_mux_map(address_map &map)
 }
 
 
-// happyksl
+// happyskl
 
 void igs017_state::happyskl_map(address_map &map)
 {
@@ -4675,7 +4675,7 @@ void igs017_state::tarzan(machine_config &config)
 	base_machine_oki(config, 16_MHz_XTAL / 16);
 
 	HD64180RP(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::iqblocka_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::happyskl_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::tarzan_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &igs017_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
@@ -4710,7 +4710,7 @@ void igs017_state::starzan(machine_config &config)
 	base_machine_oki(config, 16_MHz_XTAL / 16);
 
 	HD64180RP(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::iqblocka_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::happyskl_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::starzan_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &igs017_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
@@ -6550,7 +6550,7 @@ GAME ( 1998,  lhzb2b,      lhzb2,    lhzb2,      lhzb2,       igs017_state, init
 GAME ( 1998,  lhzb2c,      lhzb2,    lhzb2a,     lhzb2a,      igs017_state, init_lhzb2c,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS220M)",                                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME ( 1998,  slqz2,       0,        slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J, set 1)",                  MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
 GAME ( 1998,  slqz2a,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, unknown version)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
-GAME ( 1998,  slqz2b,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2b,     ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J, set 2)",                  MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
+GAME ( 1998,  slqz2b,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2b,     ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J, set 2)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
 GAME ( 1999,  tarzanc,     0,        tarzan,     tarzan,      igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                      0 ) // 泰山闯天关
 GAME ( 1999,  tarzan,      tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzan,     ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                      MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
 GAME ( 1999,  tarzana,     tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzana,    ROT0, "IGS", "Tarzan (V107)",                                                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom

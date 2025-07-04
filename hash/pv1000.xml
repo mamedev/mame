@@ -359,4 +359,26 @@ Undumped carts:
 		</part>
 	</software>
 
+	<software name="mieyen">
+		<description>Mieyen</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="mieyen.rom" size="0x4000" crc="c5fbd695" sha1="96f41e9c5447f78b3003dd6a92088ea02d9ef7fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazy2">
+		<description>Mazy2</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="mazy2.rom" size="0x4000" crc="6e6f9694" sha1="c8c678aec84c181ca7f2dfa155fc211f51832e15"/>
+			</dataarea>
+		</part>
+	</software>	
+
 </softwarelist>

@@ -122,15 +122,15 @@ private:
 // Try to more or less map to speaker.h positions
 
 const sound_pulse::position_info sound_pulse::position_infos[] = {
-	{ PA_CHANNEL_POSITION_MONO,         osd::channel_position::FC },
-	{ PA_CHANNEL_POSITION_FRONT_LEFT,   osd::channel_position::FL },
-	{ PA_CHANNEL_POSITION_FRONT_RIGHT,  osd::channel_position::FR },
-	{ PA_CHANNEL_POSITION_FRONT_CENTER, osd::channel_position::FC },
-	{ PA_CHANNEL_POSITION_LFE,          osd::channel_position::LFE },
-	{ PA_CHANNEL_POSITION_REAR_LEFT,    osd::channel_position::RL },
-	{ PA_CHANNEL_POSITION_REAR_RIGHT,   osd::channel_position::RR },
-	{ PA_CHANNEL_POSITION_REAR_CENTER,  osd::channel_position::RC },
-	{ PA_CHANNEL_POSITION_MAX,          osd::channel_position::ONREQ },
+	{ PA_CHANNEL_POSITION_MONO,         osd::channel_position::FC() },
+	{ PA_CHANNEL_POSITION_FRONT_LEFT,   osd::channel_position::FL() },
+	{ PA_CHANNEL_POSITION_FRONT_RIGHT,  osd::channel_position::FR() },
+	{ PA_CHANNEL_POSITION_FRONT_CENTER, osd::channel_position::FC() },
+	{ PA_CHANNEL_POSITION_LFE,          osd::channel_position::LFE() },
+	{ PA_CHANNEL_POSITION_REAR_LEFT,    osd::channel_position::RL() },
+	{ PA_CHANNEL_POSITION_REAR_RIGHT,   osd::channel_position::RR() },
+	{ PA_CHANNEL_POSITION_REAR_CENTER,  osd::channel_position::RC() },
+	{ PA_CHANNEL_POSITION_MAX,          osd::channel_position::ONREQ() },
 };
 
 

@@ -24,14 +24,14 @@
 
     TODO:
     - Sound implementation may not be totally correct (although regular Modular sound seems
-	  completely unused)
+      completely unused)
     - Wheel support
-	- Dipswitches
-	- Identify unimplemented video registers
-	- What is the point in the 'overlay' ROM? it contains a valid boot vector, unlike the
-	  main program ROMs, but otherwise doesn't work with this hardware setup.  A similar
-	  program exists on the glass prototype (probably to communicate with the dev hardware)
-	  but that had RAM instead of program ROM for the rest of the game.
+    - Dipswitches
+    - Identify unimplemented video registers
+    - What is the point in the 'overlay' ROM? it contains a valid boot vector, unlike the
+      main program ROMs, but otherwise doesn't work with this hardware setup.  A similar
+      program exists on the glass prototype (probably to communicate with the dev hardware)
+      but that had RAM instead of program ROM for the rest of the game.
 
 ***************************************************************************************************/
 
@@ -220,7 +220,7 @@ void wrally_ms_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 		else
 			pri_mask = 0x00;
 
-		gfx->prio_transpen(bitmap, cliprect, tile, col, flipx, flipy, xpos - 16 - X_EXTRA_OFFSET, ypos - 16, screen.priority(),	pri_mask, 15);
+		gfx->prio_transpen(bitmap, cliprect, tile, col, flipx, flipy, xpos - 16 - X_EXTRA_OFFSET, ypos - 16, screen.priority(), pri_mask, 15);
 	}
 }
 
