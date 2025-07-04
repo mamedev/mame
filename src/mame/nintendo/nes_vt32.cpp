@@ -597,7 +597,7 @@ ROM_START( g9_666 )
 	ROM_LOAD( "666in1.u1", 0x00000, 0x1000000, CRC(e3a98465) SHA1(dfec3e74e36aef9bfa57ec530c37642015569dc5) )
 ROM_END
 
-ROM_START( q5_500in1 )
+ROM_START( g5_500 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl128.u1", 0x00000, 0x1000000, CRC(de779dd7) SHA1(ac6d3fa6f18ceb795532ba9e85edffc040d74347) )
 ROM_END
@@ -733,7 +733,7 @@ CONS( 201?, rfcp168,  0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, init_
 CONS( 202?, g9_666,   0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // same bitswap as above, lots of accesses to $42xx
-CONS( 201?, q5_500in1, 0, 0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, init_g9_666, "<unknown>", "Q5 500 in 1 Handheld", MACHINE_NOT_WORKING )
+CONS( 201?, g5_500,   0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, init_g9_666, "<unknown>", "G5 500 in 1 Handheld", MACHINE_NOT_WORKING )
 
 // lots of accesses to $42xx, highly scrambled
 CONS( 201?, hhgc319,  0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, init_hhgc319, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

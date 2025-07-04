@@ -31060,10 +31060,12 @@ rbspm
 sball2k1
 sc2in1
 smatch03
+smwc
 ssanguoj
 sscs
 sscs0118
 super555
+tbss
 yyhm
 
 @source:misc/goldngam.cpp
@@ -35438,6 +35440,7 @@ dgunl3201
 dgunl3202
 fapocket
 fcpocket
+g5_500
 g9_666
 gbox2019
 gprnrs1
@@ -35455,7 +35458,6 @@ mc_9x6ss
 mc_hh210
 myaasa
 myaass
-q5_500in1
 retro400
 rfcp168
 rminitv
@@ -35466,6 +35468,7 @@ rminitv
 240in1ar
 denv150
 dgun2561
+dgun2572
 dgun2577
 dgun2593
 dvnimbus
@@ -35758,9 +35761,6 @@ wowwg
 xing48
 zone7in1
 zone7in1p
-
-@source:nintendo/vt_unknown.cpp
-dgun2572
 
 @source:nix/fitfight.cpp
 bbprot
@@ -43335,6 +43335,7 @@ lggp40
 
 @source:skeleton/lgtz80.cpp
 arthurkn
+arthurkn100
 fruitcat
 
 @source:skeleton/lilith.cpp

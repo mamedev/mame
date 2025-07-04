@@ -100,13 +100,11 @@ probably applies to tilemap writes.
                     1 = 64 (actually 40) columns
            ---xx--- layer B row scroll
            --x----- layer B column scroll
-           suratk sets this register to 0x70 during the second boss to produce a rotating star field,
-           using X and Y scroll at the same time. In MAME, the corners don't scroll, but on the PCB,
-           the effect definitely applies there (at least seen under the 2nd N of P2 INSERT COIN). The
-           game only modifies Y scroll 0x23-0x32, no columns after that. Maybe bit 6 has a meaning?
+           suratk sets this register to 0x70 during the second boss to produce a rotating
+           star field, using X and Y scroll at the same time. Bit 6 probably has no meaning.
            glfgreat sets it to 0x30 when showing the leader board
-           mariorou sets it to 0x36 when ingame, while actually does per-row scroll for layer A and
-           per-column scroll for layer B.
+           mariorou sets it to 0x36 when ingame, while actually does per-row scroll for layer A
+           and per-column scroll for layer B.
 1d00     : bit 0 = NMI enable/acknowledge
          : bit 1 = FIRQ enable/acknowledge
          : bit 2 = IRQ enable/acknowledge
@@ -266,6 +264,9 @@ void k052109_device::device_start()
 	m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k052109_device::get_tile_info0)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k052109_device::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k052109_device::get_tile_info2)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_tilemap[1]->set_blitter(tilemap_blitter_delegate(*this, FUNC(k052109_device::tile_blitter)));
+	m_tilemap[2]->set_blitter(tilemap_blitter_delegate(*this, FUNC(k052109_device::tile_blitter)));
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
@@ -460,17 +461,13 @@ void k052109_device::write(offs_t offset, u8 data)
 		else if (offset == 0x1e80)
 		{
 			//if ((data & 0xfe)) logerror("%s: 052109 register 1e80 = %02x\n",machine().describe_context(),data);
-			m_tilemap[0]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_tilemap[1]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_tilemap[2]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			if (m_tileflip_enable != ((data & 0x06) >> 1))
+			if ((m_tileflip_enable & 0x06) != (data & 0x06))
 			{
-				m_tileflip_enable = ((data & 0x06) >> 1);
-
-				m_tilemap[0]->mark_all_dirty();
-				m_tilemap[1]->mark_all_dirty();
-				m_tilemap[2]->mark_all_dirty();
+				for (int i = 0; i < 3; i++)
+					m_tilemap[i]->mark_all_dirty();
 			}
+			m_tileflip_enable = data & 0x07;
+			tileflip_reset();
 		}
 		else if (offset == 0x1f00)
 		{
@@ -599,7 +596,7 @@ void k052109_device::tilemap_update()
 			}
 		}
 
-		// mixed scroll
+		// mixed scroll (handled in tile_blitter)
 		else
 		{
 			m_tilemap[t]->set_scroll_rows(rows);
@@ -632,6 +629,13 @@ void k052109_device::mark_tilemap_dirty(uint8_t tmap_num)
 	m_tilemap[tmap_num]->mark_all_dirty();
 }
 
+void k052109_device::tileflip_reset()
+{
+	u32 flip = BIT(m_tileflip_enable, 0) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0;
+	for (int i = 0; i < 3; i++)
+		m_tilemap[i]->set_flip(flip);
+}
+
 
 /***************************************************************************
 
@@ -658,7 +662,7 @@ void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int laye
 	int flags = 0;
 	int priority = 0;
 	int bank = m_charrombank[(color & 0x0c) >> 2];
-	if (!BIT(m_addrmap,6))
+	if (!BIT(m_addrmap, 6))
 	{
 		color = (color & 0xf3) | ((bank & 0x03) << 2);
 	}
@@ -670,11 +674,11 @@ void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int laye
 	m_k052109_cb(layer, bank, &code, &color, &flags, &priority);
 
 	/* if the callback set flip X but it is not enabled, turn it off */
-	if (!(m_tileflip_enable & 1))
+	if (!BIT(m_tileflip_enable, 1))
 		flags &= ~TILE_FLIPX;
 
 	/* if flip Y is enabled and the attribute but is set, turn it on */
-	if (flipy && (m_tileflip_enable & 2))
+	if (flipy && BIT(m_tileflip_enable, 2))
 		flags |= TILE_FLIPY;
 
 	tileinfo.set(0, code, color, flags);
@@ -697,11 +701,45 @@ TILE_GET_INFO_MEMBER(k052109_device::get_tile_info2)
 }
 
 
-void k052109_device::tileflip_reset()
+// blitter callback for mixed col+rowscroll
+
+TILE_BLITTER_MEMBER(k052109_device::tile_blitter)
 {
-	int data = m_ram[0x1e80];
-	m_tilemap[0]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	m_tilemap[1]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	m_tilemap[2]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	m_tileflip_enable = ((data & 0x06) >> 1);
+	// standard scrolling
+	if (tilemap.scroll_rows() == 1 || tilemap.scroll_cols() == 1)
+		return false;
+
+	assert(tilemap.scroll_cols() == 0x40);
+
+	int rowheight = tilemap.height() / tilemap.scroll_rows();
+	rectangle rect;
+
+	// iterate over rows in the tilemap
+	for (int currow = 0; currow < tilemap.height(); currow += rowheight)
+	{
+		s32 scrollx = rowscroll[currow / rowheight];
+
+		u32 scrollxi = tilemap.scrollx(currow / rowheight) & ~7;
+		if (~tilemap.flip() & TILEMAP_FLIPX)
+			scrollxi = -scrollxi;
+
+		// iterate over columns in the tilemap
+		for (int curcol = 0; curcol < tilemap.width(); curcol += 8)
+		{
+			s32 scrolly = colscroll[(scrollxi + curcol) >> 3 & 0x3f];
+
+			// iterate to handle wraparound
+			for (int xpos = scrollx - tilemap.width(); xpos <= cliprect.right(); xpos += tilemap.width())
+			{
+				for (int ypos = scrolly - tilemap.height(); ypos <= cliprect.bottom(); ypos += tilemap.height())
+				{
+					// update the cliprect just for this block
+					rect.set(curcol + xpos, curcol + xpos + 7, currow, currow + rowheight - 1);
+					blit(rect, xpos, ypos);
+				}
+			}
+		}
+	}
+
+	return true;
 }

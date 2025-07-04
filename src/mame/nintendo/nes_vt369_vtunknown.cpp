@@ -23,6 +23,8 @@
 #include "emu.h"
 #include "nes_vt369_vtunknown_soc.h"
 
+#include "multibyte.h"
+
 namespace {
 
 class vt369_base_state : public driver_device
@@ -94,6 +96,7 @@ public:
 	void vt_external_space_map_512kbyte(address_map &map) ATTR_COLD;
 
 	void init_lxcmcypp();
+	void init_dgun2572();
 
 protected:
 	u8 vt_rom_banked_r(offs_t offset);
@@ -450,7 +453,7 @@ void vt36x_state::vt36x_vibesswap_16mb(machine_config &config)
 
 	VT369_SOC_INTROM_VIBESSWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
+	//m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
 }
@@ -1028,6 +1031,11 @@ ROM_START( jl2050 )
 	ROM_LOAD( "jl2050.u5", 0x00000, 0x1000000, CRC(f96c5c02) SHA1(c7d0b57c2622b5213d3c7e6532495d9da74d4b01) )
 ROM_END
 
+ROM_START( dgun2572 )
+	ROM_REGION( 0x2000000, "mainrom", 0 ) // extra pins on subboard not marked
+	ROM_LOAD( "dreamgearwgun.bin", 0x00000, 0x2000000, CRC(92b55c75) SHA1(c7b2319e304a4bf480b5dcd4f24af2e6ba834d0d) )
+ROM_END
+
 
 void vt369_state::init_lxcmcypp()
 {
@@ -1037,6 +1045,20 @@ void vt369_state::init_lxcmcypp()
 	for (int i = 0; i < size; i++)
 	{
 		ROM[i] = bitswap<16>(ROM[i], 4, 5, 6, 7, 0, 1, 2, 3, 12, 13, 14, 15, 8, 9, 10, 11);
+	}
+}
+
+void vt369_state::init_dgun2572()
+{
+	u8 *rom = memregion("mainrom")->base();
+	for (offs_t base = 0; base < 0x2000000; base += 0x200)
+	{
+		std::vector<u8> orig(&rom[base], &rom[base + 0x200]);
+		for (offs_t offset = 0; offset < 0x200; offset += 2)
+		{
+			u16 data = get_u16le(&orig[bitswap<8>(offset, 6, 1, 8, 3, 4, 5, 2, 7) << 1]);
+			put_u16le(&rom[base + offset], bitswap<16>(data, 15, 14, 13, 12, 11, 10, 1, 8, 7, 6, 5, 4, 0, 2, 9, 3));
+		}
 	}
 }
 
@@ -1136,6 +1158,8 @@ CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, em
 CONS( 200?, zonefusn,  0,         0,  vt36x_16mb,     vt369, vt36x_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_NOT_WORKING )
 // same as above but without Jungle's Soft boot logo? model number taken from cover of manual
 CONS( 200?, sealvt,    zonefusn,  0,  vt36x_16mb,     vt369, vt36x_state, empty_init, "Lexibook / Sit Up Limited / Jungle's Soft", "Seal 30-in-1 (VT based, Model FN098134)",  MACHINE_NOT_WORKING )
+
+CONS( 201?, dgun2572, 0,  0,  vt36x_32mb, vt369, vt36x_state, init_dgun2572, "dreamGEAR", "My Arcade Wireless Video Game Station 200-in-1 (DGUN-2572)", MACHINE_NOT_WORKING )
 
 // NOT SPI roms, altswap sets code starts with '6a'
 

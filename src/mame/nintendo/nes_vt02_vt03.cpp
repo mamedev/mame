@@ -103,7 +103,6 @@ public:
 
 	void init_protpp() ATTR_COLD;
 	void init_gamezn2() ATTR_COLD;
-	void init_hs36in1() ATTR_COLD;
 
 protected:
 	required_device<nes_vt02_vt03_soc_device> m_soc;
@@ -151,6 +150,8 @@ public:
 	void nes_vt_waixing_512kb(machine_config& config) ATTR_COLD;
 	void nes_vt_waixing_512kb_rasterhack(machine_config& config) ATTR_COLD;
 	void nes_vt_waixing_2mb(machine_config& config) ATTR_COLD;
+
+	void init_hs36in1() ATTR_COLD;
 };
 
 class nes_vt_waixing_alt_state : public nes_vt_waixing_state
@@ -1361,7 +1362,7 @@ void nes_vt_state::init_gamezn2()
 	}
 }
 
-void nes_vt_state::init_hs36in1()
+void nes_vt_waixing_state::init_hs36in1()
 {
 	u8 *src = memregion("mainrom")->base();
 	int len = memregion("mainrom")->bytes();
@@ -1429,7 +1430,7 @@ CONS( 200?, sudo6in1,  0,  0,  nes_vt_pal_1mb,    nes_vt, nes_vt_state, empty_in
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
 CONS( 200?, sudopptv,  0, 0,  nes_vt_waixing_512kb_rasterhack,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
+CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites just like standalone cart (nes:happybiqa)
 
 // 060303 date code on PCB
 CONS( 2006, ablmini,   0, 0,  nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
@@ -1510,8 +1511,8 @@ CONS( 2006, dbdancem,   0,        0,  nes_vt_2mb, dbdancem, nes_vt_state, empty_
 CONS( 2009, sen101,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "Senario", "101 Games in 1 (Senario, NES/Famicom bootlegs)", MACHINE_IMPERFECT_GRAPHICS )
 
 // possibly designed by wellminds (M350 etc.)
-CONS( 2010, hs36red,  0,        0,  nes_vt_2mb,    nes_vt, nes_vt_state, init_hs36in1, "HengSheng", "HengSheng 36-in-1 (Red pad)", MACHINE_NOT_WORKING )
-CONS( 2010, hs36blk,  0,        0,  nes_vt_2mb,    nes_vt, nes_vt_state, init_hs36in1, "HengSheng", "HengSheng 36-in-1 (Black pad)", MACHINE_NOT_WORKING )
+CONS( 2010, hs36red,  0,        0,  nes_vt_waixing_2mb, nes_vt, nes_vt_waixing_state, init_hs36in1, "HengSheng", "HengSheng 36-in-1 (Red pad)", MACHINE_NOT_WORKING )
+CONS( 2010, hs36blk,  0,        0,  nes_vt_waixing_2mb, nes_vt, nes_vt_waixing_state, init_hs36in1, "HengSheng", "HengSheng 36-in-1 (Black pad)", MACHINE_NOT_WORKING )
 
 // unsorted, these were all in nes.xml listed as ONE BUS systems
 CONS( 200?, mc_dg101,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?

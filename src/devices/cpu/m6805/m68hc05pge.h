@@ -109,6 +109,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(cpi_tick);
 	TIMER_CALLBACK_MEMBER(spi_tick);
 	TIMER_CALLBACK_MEMBER(adb_tick);
+	TIMER_CALLBACK_MEMBER(keyscan_tick);
 
 	required_shared_ptr<u8> m_internal_ram;
 
@@ -140,7 +141,8 @@ protected:
 	u8 m_pwmacr, m_pwma0, m_pwma1;
 	u8 m_pwmbcr, m_pwmb0, m_pwmb1;
 	u8 m_plmcr, m_plmt1, m_plmt2;
-	emu_timer *m_seconds_timer, *m_cpi_timer, *m_spi_timer, *m_adb_timer;
+	u8 m_kcsr;
+	emu_timer *m_seconds_timer, *m_cpi_timer, *m_spi_timer, *m_adb_timer, *m_keyscan_timer;
 	u32 m_rtc;
 	u8 m_sram[0x8000];
 };
