@@ -81,11 +81,11 @@ private:
 	void output_digit(u8 i, u8 data);
 	u8 m_kbd_sl = 0x00;
 
-	/*
+	
 	void sounddev(offs_t offset, u8 data) ATTR_COLD;
 	void makesound(uint8_t channel, uint8_t length);
 	int soundfreq(uint8_t channel);
-*/
+
 };
 
 void stella8085_state::machine_start()
@@ -114,9 +114,12 @@ void stella8085_state::excellent_program_map(address_map &map)
 
 void stella8085_state::rtc62421_io_map(address_map &map)
 {
-	map(0x00, 0x0f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x70, 0x73).w(FUNC(stella8085_state::sounddev));
+	// EXROM??
+	map(0x90, 0x9f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
+	
 }
 
 void stella8085_state::mc146818_io_map(address_map &map)
@@ -124,7 +127,7 @@ void stella8085_state::mc146818_io_map(address_map &map)
 	// TODO: map RTC
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
-	//map(0x70, 0x73).w(FUNC(stella8085_state::makesound));
+	map(0x70, 0x73).w(FUNC(stella8085_state::sounddev));
 }
 
 /*********************************************
@@ -135,17 +138,17 @@ void stella8085_state::mc146818_io_map(address_map &map)
 void stella8085_state::kbd_sl_w(u8 data)
 {
 	m_kbd_sl = data;// & 0x07;
-	LOG("I8279: Scan Line: %02X\n", m_kbd_sl);
+	//LOG("I8279: Scan Line: %02X\n", m_kbd_sl);
 }
 
 u8 stella8085_state::kbd_rl_r()
 {
 //  Keyboard read (only scan line 0 is used)
 	u8 ret = 0xff;
-	LOG("I8279: Read Line: %02X\n", m_kbd_sl);
-	if(m_kbd_sl == 15)
+	//LOG("I8279: Read Line: %02X\n", m_kbd_sl);
+	if(m_kbd_sl == 14)
 		ret = ioport("SERVICE1")->read();
-	else if(m_kbd_sl == 16)
+	else if(m_kbd_sl == 15)
 		ret = ioport("SERVICE2")->read();
 	return ret;
 }
@@ -155,8 +158,8 @@ void stella8085_state::disp_w(u8 data)
 // 0x02, 0x04 gestört
 
 //  Display data
-	if (data!=0)
-		LOG("I8279: Data Display: %02X\n", data);
+	//if (data!=0)
+	//	LOG("I8279: Data Display: %02X\n", data);
 	output_digit(m_kbd_sl, data);
 }
 
@@ -174,9 +177,10 @@ void stella8085_state::rst65_w(u8 state)
 	LOG("I8279: irq state: %s - state:%02x time:%s\n", state ? "Assert Line":"Clear Line", state, machine().time().as_string());
 }
 
-/*
+
 void stella8085_state::sounddev(offs_t offset, u8 data)
 {
+	LOG("beep beep at %02x data %02x\n", offset, data);
 	makesound(offset & 0x0F,data & 0xF0);
 }
 
@@ -232,7 +236,7 @@ int stella8085_state::soundfreq(uint8_t channel)
 			return 0;
 	}
 }
-*/
+
 
 static INPUT_PORTS_START( dicemstr )
 	PORT_START("DSW")
