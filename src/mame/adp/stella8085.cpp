@@ -142,23 +142,28 @@ u8 stella8085_state::kbd_rl_r()
 {
 //  Keyboard read (only scan line 0 is used)
 	u8 ret = 0xff;
-	if((m_kbd_sl & 0x07) == 6)
-		;//ret = ioport("SERVICE0")->read();
-	else if((m_kbd_sl & 0x07) == 7)
-		;//ret = ioport("SERVICE1")->read();
+	LOG("I8279: Read Line: %02X\n", m_kbd_sl);
+	if(m_kbd_sl == 15)
+		ret = ioport("SERVICE1")->read();
+	else if(m_kbd_sl == 16)
+		ret = ioport("SERVICE2")->read();
 	return ret;
 }
 
 void stella8085_state::disp_w(u8 data)
 {
+// 0x02, 0x04 gestört
+
 //  Display data
-	LOG("I8279: Data Display: %02X\n", data);
+	if (data!=0)
+		LOG("I8279: Data Display: %02X\n", data);
 	output_digit(m_kbd_sl, data);
 }
 
 void stella8085_state::output_digit(u8 i, u8 data)
 {
-    ;//m_digits[i] = data;
+    if (i < 8)
+		m_digits[i] = data;
 }
 
 void stella8085_state::rst65_w(u8 state)
