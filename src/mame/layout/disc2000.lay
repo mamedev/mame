@@ -71,6 +71,9 @@ license:CC0-1.0
 			<bounds x="140" y="10" width="10" height="10" />
 		</element>
 
+
+<!-- lamp_ZEILE_SPALTE -->
+
 <!-- left panel -->
 		<!-- Leiter II -->
 
@@ -94,46 +97,46 @@ license:CC0-1.0
             <bounds x="10" y="120" width="20" height="10" />
 	    </element>
 
-        <element name="lamp__" ref="ladder">
+        <element name="lamp__4" ref="ladder">
             <bounds x="10" y="140" width="20" height="10" />
 	    </element>
 
-        <element name="lamp__" ref="ladder">
+        <element name="lamp_6_3" ref="ladder">
             <bounds x="10" y="160" width="20" height="10" />
 	    </element>
 
-        <element name="lamp__" ref="ladder">
+        <element name="lamp_6_2" ref="ladder">
             <bounds x="10" y="180" width="20" height="10" />
 	    </element>
 
-        <element name="lamp__" ref="ladder">
+        <element name="lamp_6_1" ref="ladder">
             <bounds x="10" y="200" width="20" height="10" />
 	    </element>
 
-        <element name="lamp__" ref="ladder">
+        <element name="lamp__0" ref="ladder">
             <bounds x="10" y="220" width="20" height="10" />
 	    </element>
 
 <!-- right panel -->
 		<!-- Leiter I -->
 
-        <element name="lamp__" ref="ladder">
+        <element name="lamp_4_5" ref="ladder">
             <bounds x="170" y="40" width="20" height="10" />
 	    </element>
 
-        <element name="lamp__" ref="ladder">
+        <element name="lamp_4_" ref="ladder">
             <bounds x="170" y="60" width="20" height="10" />
 	    </element>
 
-        <element name="lamp__" ref="ladder">
+        <element name="lamp_4_" ref="ladder">
             <bounds x="170" y="80" width="20" height="10" />
 	    </element>
 
-        <element name="lamp__" ref="ladder">
+        <element name="lamp_4_" ref="ladder">
             <bounds x="170" y="100" width="20" height="10" />
 	    </element>
 
-        <element name="lamp__" ref="ladder">
+        <element name="lamp_4_0" ref="ladder">
             <bounds x="170" y="120" width="20" height="10" />
 	    </element>
 
