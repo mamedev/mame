@@ -100,11 +100,22 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 
 	// Capture is not implemented in SDL2, and the enumeration
 	// interface is different in SDL3
-	int dev_count = SDL_GetNumAudioDevices(0);
+	const int dev_count = SDL_GetNumAudioDevices(0);
 	for(int i=0; i != dev_count; i++) {
 		SDL_AudioSpec spec;
-		const char *name = SDL_GetAudioDeviceName(i, 0);
-		int err = SDL_GetAudioDeviceSpec(i, 0, &spec);
+		const char *const name = SDL_GetAudioDeviceName(i, 0);
+#if SDL_VERSION_ATLEAST(2, 0, 16)
+		const int err = SDL_GetAudioDeviceSpec(i, 0, &spec);
+		// the ALSA backend in SDL2 doesn't return the number of channels, just fall back to a safe value
+		if (spec.channels == 0) {
+			spec.channels = 2;
+		}
+#else
+		// seems to be no way to get the device's native format before SDL 2.0.16, just fall back to 48kHz stereo
+		const int err = 0;
+		spec.freq = 48'000;
+		spec.channels = 2;
+#endif
 		if(!err)
 			m_devices.emplace_back(name, spec.freq, spec.channels);
 	}
@@ -141,17 +152,17 @@ osd::audio_info sound_sdl::get_information()
 	enum { FL, FR, FC, LFE, BL, BR, BC, SL, SR, AUX };
 	static const char *const posname[10] = { "FL", "FR", "FC", "LFE", "BL", "BR", "BC", "SL", "SR", "AUX" };
 
-	static std::array<double, 3> pos3d[10] = {
-		{ -0.2,  0.0,  1.0 },
-		{  0.2,  0.0,  1.0 },
-		{  0.0,  0.0,  1.0 },
-		{  0.0, -0.5,  1.0 },
-		{ -0.2,  0.0, -0.5 },
-		{  0.2,  0.0, -0.5 },
-		{  0.0,  0.0, -0.5 },
-		{ -0.2,  0.0,  0.0 },
-		{  0.2,  0.0,  0.0 },
-		{  0.0,  0.0, 10.0 },
+	static const osd::channel_position pos3d[10] = {
+		osd::channel_position::FL(),
+		osd::channel_position::FR(),
+		osd::channel_position::FC(),
+		osd::channel_position::LFE(),
+		osd::channel_position::RL(),
+		osd::channel_position::RR(),
+		osd::channel_position::RC(),
+		osd::channel_position(-0.2,  0.0,  0.0),
+		osd::channel_position( 0.2,  0.0,  0.0),
+		osd::channel_position::ONREQ()
 	};
 
 	static const uint32_t positions[8][9] = {

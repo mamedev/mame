@@ -12,8 +12,8 @@
 #include "ui/mainmenu.h"
 
 #include "ui/about.h"
-#include "ui/audiomix.h"
 #include "ui/audioeffects.h"
+#include "ui/audiomix.h"
 #include "ui/barcode.h"
 #include "ui/cheatopt.h"
 #include "ui/confswitch.h"
@@ -168,6 +168,7 @@ void menu_main::populate()
 		item_append(_("menu-main", "Audio Effects"), 0, (void *)AUDIO_EFFECTS);
 	}
 
+	// FIXME: should also check for OSD sliders (same for tilde menu)
 	if (!ui().get_slider_list().empty())
 		item_append(_("menu-main", "Slider Controls"), 0, (void *)SLIDERS);
 
@@ -201,7 +202,7 @@ void menu_main::populate()
 
 	item_append(menu_item_type::SEPARATOR);
 
-//  item_append(_("menu-main", "Quit from System"), 0, (void *)QUIT_GAME);
+//  item_append(_("menu-main", "Quit From System"), 0, (void *)QUIT_GAME);
 
 	if (machine_phase::INIT == m_phase)
 	{

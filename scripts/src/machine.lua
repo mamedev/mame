@@ -583,6 +583,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/74610.h,MACHINES["TTL74610"] = true
+---------------------------------------------------
+
+if (MACHINES["TTL74610"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/74610.cpp",
+		MAME_DIR .. "src/devices/machine/74610.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/7474.h,MACHINES["TTL7474"] = true
 ---------------------------------------------------
 
@@ -890,6 +902,18 @@ if (MACHINES["AY31015"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ay31015.cpp",
 		MAME_DIR .. "src/devices/machine/ay31015.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ay34592.h,MACHINES["AY34592"] = true
+---------------------------------------------------
+
+if (MACHINES["AY34592"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ay34592.cpp",
+		MAME_DIR .. "src/devices/machine/ay34592.h",
 	}
 end
 
@@ -1688,6 +1712,18 @@ if (MACHINES["IBM21S850"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ibm21s850.cpp",
 		MAME_DIR .. "src/devices/machine/ibm21s850.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/icd2053b.h,MACHINES["ICD2053B"] = true
+---------------------------------------------------
+
+if (MACHINES["ICD2053B"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/icd2053b.cpp",
+		MAME_DIR .. "src/devices/machine/icd2053b.h",
 	}
 end
 

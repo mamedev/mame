@@ -10,6 +10,7 @@ Games supported:
 
 Year   Game                PCB                       NOTES
 ------------------------------------------------------------------------
+1990   Xor World           ?                         Prototype
 1991   Big Karnak          REF 901112-1              Unprotected
 1992   Maniac Square       REF 922804/2              Prototype
 1992   Squash              REF 922804/2 or 922804/1  Encrypted Video RAM
@@ -95,6 +96,7 @@ Year   Game                PCB                       NOTES
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
 
@@ -202,6 +204,28 @@ void gaelco_state::maniacsq_map(address_map &map)
 	map(0xff0000, 0xffffff).ram();                                                                // Work RAM
 }
 
+void xorwflat_state::xorwflat_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x101fff).ram().w(FUNC(xorwflat_state::vram_w)).share(m_videoram);
+	map(0x102000, 0x103fff).ram();
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x440000, 0x440fff).ram().share(m_spriteram);
+	map(0x441000, 0x441007).ram();  // writes a few things to 0x44100x on startup
+
+	map(0x700000, 0x700001).portr("DSW1");
+	map(0x700002, 0x700003).portr("DSW2");
+	map(0x700004, 0x700005).portr("P1");
+	map(0x700006, 0x700007).portr("P2");
+
+	map(0x700010, 0x700017).ram().share(m_vregs);
+	map(0x70001b, 0x70001b).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x70001c, 0x70001d).nopr().w(FUNC(xorwflat_state::irqack_w));
+
+	map(0xff0000, 0xffffff).ram();
+}
+
+
 void squash_state::squash_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                               // ROM
@@ -221,13 +245,13 @@ void squash_state::squash_map(address_map &map)
 	map(0xff0000, 0xffffff).ram();                                                                // Work RAM
 }
 
-void squash_state::thoop_map(address_map &map)
+void thoop_state::thoop_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                 // ROM
-	map(0x100000, 0x101fff).ram().w(FUNC(squash_state::vram_encrypted_w)).share(m_videoram); // Video RAM
-	map(0x102000, 0x103fff).ram().w(FUNC(squash_state::encrypted_w)).share(m_screenram);     // Screen RAM
+	map(0x100000, 0x101fff).ram().w(FUNC(thoop_state::vram_encrypted_w)).share(m_videoram); // Video RAM
+	map(0x102000, 0x103fff).ram().w(FUNC(thoop_state::encrypted_w)).share(m_screenram);     // Screen RAM
 	map(0x108000, 0x108007).writeonly().share(m_vregs);                                            // Video Registers
-	map(0x10800c, 0x10800d).w(FUNC(squash_state::irqack_w));                                       // INT 6 ACK/Watchdog timer
+	map(0x10800c, 0x10800d).w(FUNC(thoop_state::irqack_w));                                       // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x440000, 0x440fff).ram().share(m_spriteram);                                              // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
@@ -235,7 +259,7 @@ void squash_state::thoop_map(address_map &map)
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
 	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
-	map(0x70000d, 0x70000d).w(FUNC(squash_state::oki_bankswitch_w));
+	map(0x70000d, 0x70000d).w(FUNC(thoop_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI6295 status register
 	map(0xff0000, 0xffffff).ram();                                                                 // Work RAM
 }
@@ -247,6 +271,20 @@ void gaelco_state::oki_map(address_map &map)
 	map(0x30000, 0x3ffff).bankr(m_okibank);
 }
 
+void xorwflat_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xf800, 0xffff).ram();
+}
+
+void xorwflat_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+
+	map(0x88, 0x89).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0xc0, 0xc0).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 /*************************************
  *
@@ -363,6 +401,62 @@ static INPUT_PORTS_START( maniacsq )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( xorwflat )
+	PORT_INCLUDE( gaelco )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:8,7,6")
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_8C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,4,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off) ) // it emits the coin in sound, but it doesn't coin up
+	PORT_DIPSETTING(    0x08, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 2C_1C ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:1" )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( sltpcycld )
 	PORT_START("DSW1")
@@ -780,8 +874,6 @@ void bigkarnk_state::bigkarnk(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
-	MCFG_VIDEO_START_OVERRIDE(bigkarnk_state,bigkarnk)
-
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
@@ -812,14 +904,43 @@ void gaelco_state::maniacsq(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
-
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); // pin 7 not verified
 	oki.set_addrmap(0, &gaelco_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void xorwflat_state::xorwflat(machine_config &config)
+{
+	// Basic machine hardware - guessed, no PCB available
+	M68000(config, m_maincpu, 12'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xorwflat_state::xorwflat_map);
+	m_maincpu->set_vblank_int("screen", FUNC(xorwflat_state::irq6_line_assert));
+
+	Z80(config, m_audiocpu, 4'000'000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &xorwflat_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &xorwflat_state::sound_io_map);
+
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline("audiocpu", 0);
+
+	// Video hardware - guessed, no PCB available
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(FRAMERATE_922804);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*16, 32*16);
+	screen.set_visarea(0, 256-1, 16, 256-1);
+	screen.set_screen_update(FUNC(xorwflat_state::screen_update_maniacsq));
+	screen.set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+
+	// Sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	YM3812(config, "ymsnd", 4'000'000).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void squash_state::squash(machine_config &config)
@@ -847,13 +968,11 @@ void squash_state::squash(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
-	screen.set_screen_update(FUNC(squash_state::screen_update_thoop));
+	screen.set_screen_update(FUNC(squash_state::screen_update_squash));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
-
-	MCFG_VIDEO_START_OVERRIDE(squash_state,squash)
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -863,12 +982,12 @@ void squash_state::squash(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void squash_state::thoop(machine_config &config)
+void thoop_state::thoop(machine_config &config)
 {
 	// Basic machine hardware
 	M68000(config, m_maincpu, XTAL(24'000'000)/2); // Verified on PCB
-	m_maincpu->set_addrmap(AS_PROGRAM, &squash_state::thoop_map);
-	m_maincpu->set_vblank_int("screen", FUNC(squash_state::irq6_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &thoop_state::thoop_map);
+	m_maincpu->set_vblank_int("screen", FUNC(thoop_state::irq6_line_assert));
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -876,10 +995,10 @@ void squash_state::thoop(machine_config &config)
 	m_vramcrypt->set_params(0x0e, 0x4228);
 
 	LS259(config, m_outlatch); // B8
-	m_outlatch->q_out_cb<0>().set(FUNC(squash_state::coin_lockout_w<0>)); // not inverted
-	m_outlatch->q_out_cb<1>().set(FUNC(squash_state::coin_lockout_w<1>)); // not inverted
-	m_outlatch->q_out_cb<2>().set(FUNC(squash_state::coin_counter_w<0>));
-	m_outlatch->q_out_cb<3>().set(FUNC(squash_state::coin_counter_w<1>));
+	m_outlatch->q_out_cb<0>().set(FUNC(thoop_state::coin_lockout_w<0>)); // not inverted
+	m_outlatch->q_out_cb<1>().set(FUNC(thoop_state::coin_lockout_w<1>)); // not inverted
+	m_outlatch->q_out_cb<2>().set(FUNC(thoop_state::coin_counter_w<0>));
+	m_outlatch->q_out_cb<3>().set(FUNC(thoop_state::coin_counter_w<1>));
 	m_outlatch->q_out_cb<4>().set_nop(); // used
 
 	// Video hardware
@@ -888,19 +1007,17 @@ void squash_state::thoop(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
-	screen.set_screen_update(FUNC(squash_state::screen_update_thoop));
+	screen.set_screen_update(FUNC(thoop_state::screen_update_squash));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
-	MCFG_VIDEO_START_OVERRIDE(squash_state,bigkarnk)
-
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); // pin 7 not verified
-	oki.set_addrmap(0, &squash_state::oki_map);
+	oki.set_addrmap(0, &thoop_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -1658,6 +1775,39 @@ ROM_START( sltpstepd )
 	// unclear if the PCB had a sound chip or not (if it was a conversion of another PCB it may have) but the machine doesn't attempt to use any sounds anyway
 ROM_END
 
+ROM_START( xorwflat )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "x_p1_27c010.bin", 0x000000, 0x020000, CRC(70a4d3cf) SHA1(3913567c2325dec53ababb8b7a3b99809a2650b2) )
+	ROM_LOAD16_BYTE( "x_p2_27c010.bin", 0x000001, 0x020000, CRC(9ecbd93c) SHA1(14f4f26fc30e58e5a600d39ced94ac38baf71bbb) )
+
+	ROM_REGION( 0x80000, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "x_f4_27c010.bin", 0x000000, 0x020000, CRC(c71087b3) SHA1(447560f0ee510e46d8f92ec56f85a07cb0e6d533) )
+	ROM_LOAD( "x_f3_27c010.bin", 0x020000, 0x020000, CRC(e1f9ad2f) SHA1(6598deba095afa48784726bd120d0b9ea6deec15) )
+	ROM_LOAD( "x_f2_27c010.bin", 0x040000, 0x020000, CRC(5cae5ada) SHA1(276bdbd79a0e8f134dee5527a44d1261df658f1d) )
+	ROM_LOAD( "x_f1_27c010.bin", 0x060000, 0x020000, CRC(3cd4101e) SHA1(e8ed0394afb2e682185fca6433409023dc41a9d6) )
+
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASE00 ) // Z80 code
+	ROM_LOAD( "x_s1_27c512.bin", 0x000000, 0x10000, CRC(46f66072) SHA1(f7eb20222f48f5e5dc1b5c5fb609105a3e1c79c1) )
+
+	// no samples?
+ROM_END
+
+ROM_START( xorwflata )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "x_0_14-11_27c1001.bin", 0x000000, 0x020000, CRC(f3fad238) SHA1(10b76bce8e8114ecf3ba4705eb064fe91fcb654f) )
+	ROM_LOAD16_BYTE( "x_1_14-11_27c1001.bin", 0x000001, 0x020000, CRC(977f1225) SHA1(a84e7a5873e4f07fdefb2d2ba716fd636c2c89d6) )
+
+	ROM_REGION( 0x80000, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "x_f4_27c010.bin", 0x000000, 0x020000, CRC(c71087b3) SHA1(447560f0ee510e46d8f92ec56f85a07cb0e6d533) )
+	ROM_LOAD( "x_f3_27c010.bin", 0x020000, 0x020000, CRC(e1f9ad2f) SHA1(6598deba095afa48784726bd120d0b9ea6deec15) )
+	ROM_LOAD( "x_f2_27c010.bin", 0x040000, 0x020000, CRC(5cae5ada) SHA1(276bdbd79a0e8f134dee5527a44d1261df658f1d) )
+	ROM_LOAD( "x_f1_27c010.bin", 0x060000, 0x020000, CRC(3cd4101e) SHA1(e8ed0394afb2e682185fca6433409023dc41a9d6) )
+
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASE00 ) // Z80 code
+	ROM_LOAD( "x_s1_27c512.bin", 0x000000, 0x10000, CRC(46f66072) SHA1(f7eb20222f48f5e5dc1b5c5fb609105a3e1c79c1) )
+
+	// no samples?
+ROM_END
 
 
 /*************************************
@@ -1683,12 +1833,12 @@ GAME( 1995, lastkma,   lastkm,   maniacsq, lastkm,   gaelco_state,   empty_init,
 GAME( 1992, squash,    0,        squash,   squash,   squash_state,   empty_init, ROT0, "Gaelco",        "Squash (World, ver. 1.0, checksum 015aef61)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1992, squasha,   squash,   squash,   squash,   squash_state,   empty_init, ROT0, "Gaelco",        "Squash (USA, ver. 1.1, checksum 015b6f8a)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 199?, squashb,   squash,   squash,   squash,   squash_state,   empty_init, ROT0, "Gaelco",        "Squash (newer PCB)",                                                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Missing one program ROM
-GAME( 1992, thoop,     0,        thoop,    thoop,    squash_state,   empty_init, ROT0, "Gaelco",        "Thunder Hoop (ver. 1, checksum 02a09f7d)",                           MACHINE_SUPPORTS_SAVE ) // 24/Aug/1992, Europe
-GAME( 1992, thoopa,    thoop,    thoop,    thoop,    squash_state,   empty_init, ROT0, "Gaelco",        "Thunder Hoop (ver. 1, checksum 02a09fcd)",                           MACHINE_SUPPORTS_SAVE ) // 22/Jul/1992, Europe
-GAME( 1992, thoopb,    thoop,    thoop,    thoop,    squash_state,   empty_init, ROT0, "Gaelco",        "Thunder Hoop (ver. X, checksum 00000020, without title)",            MACHINE_SUPPORTS_SAVE ) // 02/Jul/1992
-GAME( 1992, thoopna,   thoop,    thoop,    thoop,    squash_state,   empty_init, ROT0, "Gaelco",        "Thunder Hoop (North America, ver. C4, checksum 02A0A008)",           MACHINE_SUPPORTS_SAVE ) // 24/Aug/1992, America, test
-GAME( 1992, thoopnna,  thoop,    thoop,    thoop,    squash_state,   empty_init, ROT0, "Gaelco",        "Thunder Hoop (non North America, ver. X, checksum 00000020, set 1)", MACHINE_SUPPORTS_SAVE ) // 09/Jun/1992
-GAME( 1992, thoopnnaa, thoop,    thoop,    thoop,    squash_state,   empty_init, ROT0, "Gaelco",        "Thunder Hoop (non North America, ver. X, checksum 00000020, set 2)", MACHINE_SUPPORTS_SAVE ) // Non North America but with FBI screen ??
+GAME( 1992, thoop,     0,        thoop,    thoop,    thoop_state,    empty_init, ROT0, "Gaelco",        "Thunder Hoop (ver. 1, checksum 02a09f7d)",                           MACHINE_SUPPORTS_SAVE ) // 24/Aug/1992, Europe
+GAME( 1992, thoopa,    thoop,    thoop,    thoop,    thoop_state,    empty_init, ROT0, "Gaelco",        "Thunder Hoop (ver. 1, checksum 02a09fcd)",                           MACHINE_SUPPORTS_SAVE ) // 22/Jul/1992, Europe
+GAME( 1992, thoopb,    thoop,    thoop,    thoop,    thoop_state,    empty_init, ROT0, "Gaelco",        "Thunder Hoop (ver. X, checksum 00000020, without title)",            MACHINE_SUPPORTS_SAVE ) // 02/Jul/1992
+GAME( 1992, thoopna,   thoop,    thoop,    thoop,    thoop_state,    empty_init, ROT0, "Gaelco",        "Thunder Hoop (North America, ver. C4, checksum 02A0A008)",           MACHINE_SUPPORTS_SAVE ) // 24/Aug/1992, America, test
+GAME( 1992, thoopnna,  thoop,    thoop,    thoop,    thoop_state,    empty_init, ROT0, "Gaelco",        "Thunder Hoop (non North America, ver. X, checksum 00000020, set 1)", MACHINE_SUPPORTS_SAVE ) // 09/Jun/1992
+GAME( 1992, thoopnnaa, thoop,    thoop,    thoop,    thoop_state,    empty_init, ROT0, "Gaelco",        "Thunder Hoop (non North America, ver. X, checksum 00000020, set 2)", MACHINE_SUPPORTS_SAVE ) // Non North America but with FBI screen ??
 
 GAME( 199?, sltpcycld, sltpcycl, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, ver. 1.0, checksum BAE7)",      MACHINE_NOT_WORKING )
 GAME( 199?, sltpcycle, sltpcycl, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, ver. 1.0, checksum 5678)",      MACHINE_NOT_WORKING )
@@ -1696,5 +1846,10 @@ GAME( 199?, sltpcyclf, sltpcycl, maniacsq, sltpcycld, gaelco_state,  empty_init,
 
 GAME( 199?, sltpstepb, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 8E5A)", MACHINE_NOT_WORKING )
 GAME( 199?, sltpstepc, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 8BF3)", MACHINE_NOT_WORKING )
-GAME( 1996, sltpstepd, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 6D94)", MACHINE_NOT_WORKING ) // 2/Jul/1996	.
+GAME( 1996, sltpstepd, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 6D94)", MACHINE_NOT_WORKING ) // 2/Jul/1996  .
 
+/* Not 100% sure it belongs here, but fairly close. Boots at least but video regs seem incorrect, and sound hardware is different.
+   Set was being marked as from a 'flat' PCB, which is how the gaelco.cpp family of boards is referred to.
+   Intentionally not set as a clone due to it being a significantly different codebase / hardware type. */
+GAME( 1990, xorwflat,  0,        xorwflat, xorwflat, xorwflat_state, empty_init, ROT0, "Gaelco", "Xor World (different hardware, ver 1.1, checksum 3333BA, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, xorwflata, xorwflat, xorwflat, xorwflat, xorwflat_state, empty_init, ROT0, "Gaelco", "Xor World (different hardware, ver 1.1, checksum 333462, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 14/Nov/1990

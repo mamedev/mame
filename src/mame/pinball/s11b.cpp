@@ -394,7 +394,7 @@ void s11b_state::s11b_jokerz(machine_config &config)
 	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_ps88, (0.25*4.0), 1);
 	m_pia34->ca2_handler().set(m_ps88, FUNC(pinsnd88_device::resetq_w));
 	m_ps88->syncq_cb().set(m_pia34, FUNC(pia6821_device::ca1_w)); // the sync connection comes from sound connector pin 16 to MCA1, not the usual pin 12 to MCB1
-	SPEAKER(config, "cabinet").front_floor(); // the cabinet speaker is aimed down underneath the pinball table itself
+	SPEAKER(config, "cabinet").set_position(0, 0.0, -0.5, 1.0); // the cabinet speaker is aimed down underneath the pinball table itself
 	SPEAKER(config, "backbox").front_center(); // the backbox speakers are roughly level with the user, but farther in front of them than the cabinet
 	m_ps88->add_route(0, "cabinet", 1.0);
 	m_ps88->add_route(1, "backbox", 1.0);
@@ -451,6 +451,28 @@ ROM_START(bcats_g4)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cats_u26.l5",  0x4000, 0x4000, CRC(32246d12) SHA1(b8aa89d197a6b992501904f5072a10ab1a31db87))
 	ROM_LOAD("cats_u27.lg4", 0x8000, 0x8000, CRC(6af8cc3b) SHA1(ac9908dc3fbe1d3b1821c2976aaa5bbffbf24cda))
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("cats_u21.l1", 0x8000, 0x8000, CRC(04110d08) SHA1(4b44b26983cb5d14a93c16a19dc2bdbaa665dc69))
+	ROM_LOAD("cats_u22.l1", 0x0000, 0x8000, CRC(7e152c78) SHA1(b4ab770fdd9420a5d35e55bf8fb84c99ac544b8b))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("cats_u4.l1", 0x00000, 0x8000, CRC(18c62813) SHA1(a4fb69cfedd0b92c22b599913df3cdf8b3eef42c))
+	ROM_RELOAD(0x08000,0x8000)
+	ROM_RELOAD(0x10000,0x8000)
+	ROM_RELOAD(0x18000,0x8000)
+	ROM_LOAD("cats_u19.l1", 0x20000, 0x8000, CRC(f2fea68b) SHA1(9a41823e71342b7a162420378f122bba34ce0636))
+	ROM_RELOAD(0x28000,0x8000)
+	ROM_RELOAD(0x30000,0x8000)
+	ROM_RELOAD(0x38000,0x8000)
+	ROM_LOAD("cats_u20.l1", 0x40000, 0x8000, CRC(bf4dc35a) SHA1(9920ce90d93fb6ecf98792c35bb6eb8862a969f3))
+	ROM_RELOAD(0x48000,0x8000)
+	ROM_RELOAD(0x50000,0x8000)
+	ROM_RELOAD(0x58000,0x8000)
+ROM_END
+
+ROM_START(bcats_f1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("cats_u26.lf1", 0x4000, 0x4000, CRC(e7f3552b) SHA1(fbef003e62b624c80b6f6705599ad6982c901834))
+	ROM_LOAD("cats_u27.lf1", 0x8000, 0x8000, CRC(73f50ce7) SHA1(b13eff5c9ca5a3565c47eb7de2a525a291c00303))
 	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("cats_u21.l1", 0x8000, 0x8000, CRC(04110d08) SHA1(4b44b26983cb5d14a93c16a19dc2bdbaa665dc69))
 	ROM_LOAD("cats_u22.l1", 0x0000, 0x8000, CRC(7e152c78) SHA1(b4ab770fdd9420a5d35e55bf8fb84c99ac544b8b))
@@ -1701,6 +1723,7 @@ ROM_END
 GAME(1989,  bcats_l5,       0,          s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Bad Cats (L-5)",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  bcats_l2,       bcats_l5,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Bad Cats (LA-2)",                              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  bcats_g4,       bcats_l5,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Bad Cats (LG-4)",                              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  bcats_f1,       bcats_l5,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Bad Cats (LF-1)",                              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988,  bnzai_l3,       0,          s11b,   s11b, s11b_state, init_s11bn7, ROT0, "Williams", "Banzai Run (L-3)",                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988,  bnzai_g3,       bnzai_l3,   s11b,   s11b, s11b_state, init_s11bn7, ROT0, "Williams", "Banzai Run (L-3) Germany",                     MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988,  bnzai_l1,       bnzai_l3,   s11b,   s11b, s11b_state, init_s11bn7, ROT0, "Williams", "Banzai Run (L-1)",                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

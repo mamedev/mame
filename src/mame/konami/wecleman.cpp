@@ -1097,14 +1097,12 @@ INTERRUPT_GEN_MEMBER(hotchase_state::hotchase_sound_timer)
 
 void hotchase_state::machine_reset()
 {
-	int i;
-
 	/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
 	         For now let's fill everything with white colors until we have better info about it */
-	for(i=0;i<0x2000/2;i++)
+	for (int i = 0; i < 0x2000/2; i++)
 	{
 		m_generic_paletteram_16[i] = 0xffff;
-		m_palette->set_pen_color(i,0xff,0xff,0xff);
+		m_palette->set_pen_color(i, 0xff, 0xff, 0xff);
 	}
 }
 
@@ -1142,13 +1140,13 @@ void hotchase_state::hotchase(machine_config &config)
 
 	K051316(config, m_k051316[0], 0);
 	m_k051316[0]->set_palette(m_palette);
-	m_k051316[0]->set_offsets(-0xb0 / 2, -16);
+	m_k051316[0]->set_offsets(8, -16);
 	m_k051316[0]->set_wrap(1);
 	m_k051316[0]->set_zoom_callback(FUNC(hotchase_state::hotchase_zoom_callback_1));
 
 	K051316(config, m_k051316[1], 0);
 	m_k051316[1]->set_palette(m_palette);
-	m_k051316[1]->set_offsets(-0xb0 / 2, -16);
+	m_k051316[1]->set_offsets(8, -16);
 	m_k051316[1]->set_zoom_callback(FUNC(hotchase_state::hotchase_zoom_callback_2));
 
 	/* sound hardware */

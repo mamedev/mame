@@ -345,8 +345,8 @@ void exedexes_state::sound_map(address_map &map)
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8001).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x8002, 0x8002).w("sn1", FUNC(sn76489_device::write));
-	map(0x8003, 0x8003).w("sn2", FUNC(sn76489_device::write));
+	map(0x8002, 0x8002).w("sn1", FUNC(sn76489a_device::write));
+	map(0x8003, 0x8003).w("sn2", FUNC(sn76489a_device::write));
 }
 
 
@@ -524,8 +524,8 @@ void exedexes_state::exedexes(machine_config &config)
 
 	AY8910(config, "aysnd", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.10); // 1.5 MHz, verified on PCB
 
-	SN76489(config, "sn1", 12_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.36); // 3 MHz, verified on PCB
-	SN76489(config, "sn2", 12_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.36); // 3 MHz, verified on PCB
+	SN76489A(config, "sn1", 12_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.36); // 3 MHz, verified on PCB
+	SN76489A(config, "sn2", 12_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.36); // 3 MHz, verified on PCB
 }
 
 

@@ -107,7 +107,7 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 	, m_entries(0)
 	, m_indirect_entries(0)
 	, m_enable_shadows(0)
-	, m_enable_hilights(0)
+	, m_enable_highlights(0)
 	, m_membits(0)
 	, m_membits_supplied(false)
 	, m_endianness()

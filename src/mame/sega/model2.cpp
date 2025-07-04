@@ -10,28 +10,27 @@
     MAME driver by R. Belmont, Olivier Galibert, ElSemi and Angelo Salese.
 
     TODO:
-    - color gamma and Mip Mapping still needs to be properly sorted in the renderer;
+    - Mip Mapping still needs to be properly sorted in the renderer;
     - sound comms still needs some work (sometimes m68k doesn't get some commands or play them with a delay);
     - outputs and artwork (for gearbox indicators);
     - clean-ups;
 
     TODO (per-game issues)
-    - daytona: car glasses doesn't get loaded during gameplay;
     - doa, doaa: corrupted sound, eventually becomes silent;
-    - dynamcopc: corrupts palette for 2d (most likely unrelated with the lack of DSP);
-    - fvipers, schamp: rasterizer has issues displaying some characters @see video/model2.cpp
-    - fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
-    - hpyagu98: stops with 'Error #1' message during boot. Also writes to the 0x600000-0x62ffff range in main CPU program map
+    - dynamcopc: corrupts palette for 2d;
+    - fvipers: enables timers, but then irq register is empty, hence it crashes with an
+      "interrupt halt" at POST (regression, worked around);
+    - hpyagu98: stops with 'Error #1' message during boot.
+	  Also writes to the 0x600000-0x62ffff range in main CPU program map;
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
     - lastbrnx: has wrong graphics, uses several SHARC opcodes that needs to be double checked
                 (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
     - manxtt: no escape from "active motion slider" tutorial (needs analog inputs),
               bypass it by entering then exiting service mode;
-    - sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
-    - srallyc: some 3d elements doesn't show up properly (tree models, last hill in course 1 is often black colored);
-	- stcc: no collision detection with enemy cars, sometimes enemy cars glitch out and disappear altogether;
+    - sgt24h: has input analog issues, steering doesn't center when neutral,
+	  gas and brake pedals pulses instead of being fixed;
+    - stcc: no collision detection with enemy cars, sometimes enemy cars glitch out and disappear altogether;
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
-    - vstriker: stadium ads have terrible colors (they uses the wrong color table, @see video/model2rd.hxx)
 
     Notes:
     - some analog games can be calibrated in service mode via volume control item ...
@@ -495,8 +494,8 @@ u32 model2_tgp_state::copro_sincos_r(offs_t offset)
 {
 	offs_t ang = m_copro_sincos_base + offset * 0x4000;
 	offs_t index = ang & 0x3fff;
-	if(ang & 0x4000)
-		index ^= 0x3fff;
+	if (ang & 0x4000)
+		index = std::min(0x4000 - (int)index, 0x3fff);
 	u32 result = m_copro_tgp_tables[index];
 	if(ang & 0x8000)
 		result ^= 0x80000000;
@@ -965,41 +964,20 @@ void model2_state::model2_check_irqack_state(u32 data)
 	}
 }
 
-/* TODO: rewrite this part. It's a 8251-compatible chip */
-u32 model2_state::model2_serial_r(offs_t offset, u32 mem_mask)
+u8 model2_state::model2_serial_r(offs_t offset)
 {
-	if (offset == 0)
-	{
-		u32 result = 0;
-		if (ACCESSING_BITS_0_7 && (offset == 0))
-			result |= m_uart->data_r();
-		if (ACCESSING_BITS_16_23 && (offset == 0))
-			result |= m_uart->status_r() << 16;
-		return result;
-	}
-
-	return 0xffffffff;
+	return m_uart->data_r();
 }
 
 
-void model2_state::model2_serial_w(offs_t offset, u32 data, u32 mem_mask)
+void model2_state::model2_serial_w(offs_t offset, u8 data)
 {
-	if (ACCESSING_BITS_0_7 && (offset == 0))
-	{
-		m_uart->data_w(data & 0xff);
+	m_uart->data_w(data);
 
-		if (m_scsp.found())
-		{
-			m_scsp->midi_in(data&0xff);
-
-			// give the 68k time to notice
-			// TODO: 40 usecs is too much for Sky Target
-			m_maincpu->spin_until_time(attotime::from_usec(10));
-		}
-	}
-	if (ACCESSING_BITS_16_23 && (offset == 0))
+	if (m_scsp.found())
 	{
-		m_uart->control_w((data >> 16) & 0xff);
+		// TODO: make the SCSP receive the data via the USART device
+		m_scsp->midi_in(data);
 	}
 }
 
@@ -1287,7 +1265,6 @@ void model2_tgp_state::model2_tgp_mem(address_map &map)
 
 	map(0x00980000, 0x00980003).rw(FUNC(model2_tgp_state::copro_ctl1_r), FUNC(model2_tgp_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2_tgp_state::geo_ctl1_w));
-	map(0x009c0000, 0x009cffff).rw(FUNC(model2_tgp_state::model2_serial_r), FUNC(model2_tgp_state::model2_serial_w));
 
 	map(0x12000000, 0x121fffff).ram().w(FUNC(model2o_state::tex0_w)).mirror(0x200000).share("textureram0").flags(i960_cpu_device::BURST);   // texture RAM 0
 	map(0x12400000, 0x125fffff).ram().w(FUNC(model2o_state::tex1_w)).mirror(0x200000).share("textureram1").flags(i960_cpu_device::BURST);   // texture RAM 1
@@ -1302,7 +1279,7 @@ void model2o_state::model2o_mem(address_map &map)
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000).flags(i960_cpu_device::BURST);
 	map(0x00980004, 0x00980007).r(FUNC(model2o_state::fifo_control_2o_r));
 	map(0x01c00000, 0x01c00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
-	map(0x01c80000, 0x01c80003).rw(FUNC(model2o_state::model2_serial_r), FUNC(model2o_state::model2_serial_w));
+	map(0x01c80000, 0x01c80003).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
 
 /* Daytona "To The MAXX" PIC protection simulation */
@@ -1390,7 +1367,8 @@ void model2a_state::model2a_crx_mem(address_map &map)
 	map(0x00200000, 0x0023ffff).ram().flags(i960_cpu_device::BURST);
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c00040, 0x01c00043).nopw();
-	map(0x01c80000, 0x01c80003).rw(FUNC(model2a_state::model2_serial_r), FUNC(model2a_state::model2_serial_w));
+	map(0x01c80000, 0x01c80001).rw(FUNC(model2a_state::model2_serial_r), FUNC(model2a_state::model2_serial_w)).umask16(0x00ff);
+	map(0x01c80002, 0x01c80003).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0x00ff);
 }
 
 void model2a_state::model2a_5881_mem(address_map &map)
@@ -1423,9 +1401,10 @@ void model2b_state::model2b_crx_mem(address_map &map)
 	map(0x00980000, 0x00980003).rw(FUNC(model2b_state::copro_ctl1_r), FUNC(model2b_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2b_state::geo_ctl1_w));
 	map(0x00980014, 0x00980017).r(FUNC(model2b_state::copro_status_r));
-	//map(0x00980008, 0x0098000b).w(FUNC(model2b_state::geo_sharc_ctl1_w));
+	map(0x00980020, 0x00980023).noprw();    // bank control reg - used during SHARC program upload, all games just set this to 0
 
-	map(0x009c0000, 0x009cffff).rw(FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w));
+	map(0x009c0000, 0x009c0003).rw(FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w)).umask32(0x000000ff);
+	map(0x009c0004, 0x009c0007).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask32(0x000000ff);
 
 	map(0x11000000, 0x110fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
 	map(0x11100000, 0x111fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
@@ -1436,7 +1415,6 @@ void model2b_state::model2b_crx_mem(address_map &map)
 
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c00040, 0x01c00043).nopw();
-	map(0x01c80000, 0x01c80003).rw(FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w));
 }
 
 void model2b_state::model2b_5881_mem(address_map &map)
@@ -1465,7 +1443,6 @@ void model2c_state::model2c_crx_mem(address_map &map)
 	map(0x00980000, 0x00980003).rw(FUNC(model2c_state::copro_ctl1_r), FUNC(model2c_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2c_state::geo_ctl1_w));
 	map(0x00980014, 0x00980017).r(FUNC(model2c_state::copro_status_r));
-	map(0x009c0000, 0x009cffff).rw(FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w));
 
 	map(0x11000000, 0x111fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
 	map(0x11200000, 0x113fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
@@ -1473,7 +1450,8 @@ void model2c_state::model2c_crx_mem(address_map &map)
 	map(0x12800000, 0x1281ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).umask32(0x0000ffff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
 
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
-	map(0x01c80000, 0x01c80003).rw(FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w));
+	map(0x01c80000, 0x01c80001).rw(FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w)).umask16(0x00ff);
+	map(0x01c80002, 0x01c80003).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0x00ff);
 }
 
 void model2c_state::model2c_5881_mem(address_map &map)
@@ -2226,6 +2204,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sgt24h )
 	PORT_INCLUDE(indy500)
 
+	PORT_MODIFY("ACCEL")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL)  PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Gas Pedal") PORT_REVERSE
+
+	PORT_MODIFY("BRAKE")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Brake Pedal") PORT_REVERSE
+
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("View 1")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -2250,9 +2234,17 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( overrev )
 	PORT_INCLUDE(indy500)
 
+	// NOTE: game can actually handle which way the pedals activates (either 0 -> 0xff or 0xff -> 0).
+	// With no NVRAM game expects the "invert" mode.
+	PORT_MODIFY("ACCEL")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL)  PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Gas Pedal") PORT_REVERSE
+
+	PORT_MODIFY("BRAKE")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Brake Pedal") PORT_REVERSE
+
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("View 1")
-	// optional, enableable when hardware type isn't in "normal (2in1)" mode (overrev)
+	// optional, settable when hardware type isn't in "normal (2in1)" mode
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("View 2")
 INPUT_PORTS_END
 
@@ -2596,7 +2588,7 @@ void model2_state::model2_scsp(machine_config &config)
 /* original Model 2 */
 void model2o_state::model2o(machine_config &config)
 {
-	I960(config, m_maincpu, 50_MHz_XTAL / 2);
+	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2o_state::model2o_mem);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
@@ -2747,7 +2739,7 @@ void model2o_state::vcop(machine_config &config)
 /* 2A-CRX */
 void model2a_state::model2a(machine_config &config)
 {
-	I960(config, m_maincpu, 50_MHz_XTAL / 2);
+	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_crx_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
@@ -2883,7 +2875,7 @@ void model2a_state::zeroguna(machine_config &config)
 /* 2B-CRX */
 void model2b_state::model2b(machine_config &config)
 {
-	I960(config, m_maincpu, 50_MHz_XTAL / 2);
+	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2b_state::model2b_crx_mem);
 
 	TIMER(config, "scantimer", 0).configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
@@ -2959,8 +2951,8 @@ void model2b_state::overrev2b(machine_config &config)
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
 	io.an_port_callback<0>().set_ioport("STEER");
-	io.an_port_callback<1>().set_ioport("BRAKE");
-	io.an_port_callback<2>().set_ioport("ACCEL");
+	io.an_port_callback<1>().set_ioport("ACCEL");
+	io.an_port_callback<2>().set_ioport("BRAKE");
 }
 
 void model2b_state::powsled(machine_config &config)
@@ -3038,7 +3030,7 @@ void model2b_state::zerogun(machine_config &config)
 /* 2C-CRX */
 void model2c_state::model2c(machine_config &config)
 {
-	I960(config, m_maincpu, 50_MHz_XTAL / 2);
+	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2c_state::model2c_crx_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2c_state::model2c_interrupt), "screen", 0, 1);
 
@@ -3140,8 +3132,8 @@ void model2c_state::overrev2c(machine_config &config)
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
 	io.an_port_callback<0>().set_ioport("STEER");
-	io.an_port_callback<1>().set_ioport("BRAKE");
-	io.an_port_callback<2>().set_ioport("ACCEL");
+	io.an_port_callback<1>().set_ioport("ACCEL");
+	io.an_port_callback<2>().set_ioport("BRAKE");
 }
 
 void model2c_state::segawski(machine_config &config)
@@ -5739,6 +5731,9 @@ ROM_START( overrev ) /* Over Rev Revision A, Model 2C, Sega game ID# 836-13277 O
 	ROM_LOAD32_WORD( "mpr-20001.27",  0x000000, 0x200000, CRC(6ca236aa) SHA1(b3cb89fadb42afed13be4f229d7158dee487978a) )
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
 
+	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
+	ROM_LOAD16_WORD_SWAP( "epr-18643.7",  0x000000, 0x020000, CRC(7166fca7) SHA1(f5d02906b64bb2fd1af8e3772c1b01a4e006c060) )
+
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
 
@@ -5755,11 +5750,13 @@ The set below has been found labeled as:
 Main board ID# 837-10854-02-91
  Sega Game ID# 836-12788
  ROM board ID# 836-12789
+COMM board ID# 836-12344
 
 As well as:
 Main board ID# 837-10854-02-91
  Sega Game ID# 836-13274 OVER REV
  ROM board ID# 836-13275
+COMM board ID# 836-12344
 
 These ID numbers have been verified on multiple board sets for both revision A and revision B program ROMs
 */
@@ -5783,6 +5780,9 @@ ROM_START( overrevb ) /* Over Rev Revision B, Model 2B */
 	ROM_REGION( 0x400000, "textures", 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-20001.27",  0x000000, 0x200000, CRC(6ca236aa) SHA1(b3cb89fadb42afed13be4f229d7158dee487978a) )
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
+
+	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
+	ROM_LOAD16_WORD_SWAP( "epr-18643.7",  0x000000, 0x020000, CRC(7166fca7) SHA1(f5d02906b64bb2fd1af8e3772c1b01a4e006c060) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
@@ -5812,6 +5812,9 @@ ROM_START( overrevba ) /* Over Rev Revision A, Model 2B */
 	ROM_REGION( 0x400000, "textures", 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-20001.27",  0x000000, 0x200000, CRC(6ca236aa) SHA1(b3cb89fadb42afed13be4f229d7158dee487978a) )
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
+
+	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
+	ROM_LOAD16_WORD_SWAP( "epr-18643.7",  0x000000, 0x020000, CRC(7166fca7) SHA1(f5d02906b64bb2fd1af8e3772c1b01a4e006c060) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
@@ -7511,26 +7514,26 @@ ROM_END
 
 void model2_state::init_pltkids()
 {
-	// fix bug in program: it destroys the interrupt table and never fixes it
+	// HACK: fix bug in program: it destroys the interrupt table and never fixes it
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 	ROM[0x730/4] = 0x08000004;
 }
 
 void model2_state::init_zerogun()
 {
-	// fix bug in program: it destroys the interrupt table and never fixes it
+	// HACK: fix bug in program: it destroys the interrupt table and never fixes it
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 	ROM[0x700/4] = 0x08000004;
 }
 
 void model2_state::init_sgt24h()
 {
-	u32 *ROM = (u32 *)memregion("maincpu")->base();
-	ROM[0x56578/4] = 0x08000004;
+//	u32 *ROM = (u32 *)memregion("maincpu")->base();
+//	ROM[0x56578/4] = 0x08000004;
 	//ROM[0x5b3e8/4] = 0x08000004;
 }
 
-void model2_state::init_powsledm ()
+void model2_state::init_powsledm()
 {
 	u8 *ROM = (u8 *)memregion("maincpu")->base();
 	ROM[0x1571C] = 0x01; // Main mode

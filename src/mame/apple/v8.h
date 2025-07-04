@@ -11,7 +11,7 @@
 #include "machine/pseudovia.h"
 #include "machine/swim2.h"
 #include "sound/asc.h"
-#include "emupal.h"
+#include "video/ariel.h"
 #include "screen.h"
 
 // ======================> v8_device
@@ -46,7 +46,7 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	required_device<ariel_device> m_ariel;
 	required_device<asc_device> m_asc;
 	required_device<pseudovia_device> m_pseudovia;
 
@@ -79,9 +79,8 @@ private:
 
 	sound_stream *m_stream;
 	emu_timer *m_6015_timer;
+	u8 m_config;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
-	u8 m_pal_address, m_pal_idx, m_pal_control, m_pal_colkey, m_config;
-
 	bool m_baseIs4M;
 
 	u32 rom_switch_r(offs_t offset);
@@ -108,8 +107,6 @@ private:
 
 	u32 vram_r(offs_t offset);
 	void vram_w(offs_t offset, u32 data, u32 mem_mask);
-	u8 dac_r(offs_t offset);
-	void dac_w(offs_t offset, u8 data);
 
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

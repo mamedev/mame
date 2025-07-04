@@ -1102,6 +1102,7 @@ configuration { "asmjs" }
 	}
 	defines {
 		"ASIO_HAS_PTHREADS",
+		"SOUND_DISABLE_THREADING",
 	}
 	linkoptions {
 		"-Wl,--start-group",

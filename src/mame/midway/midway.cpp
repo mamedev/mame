@@ -62,7 +62,7 @@ midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char
 	std::fill(std::begin(m_overall), std::end(m_overall), 0);
 	for (auto &duty_cycle : m_duty_cycle)
 		std::fill(std::begin(duty_cycle), std::end(duty_cycle), 0);
-	std::fill(std::begin(m_ayvolume_lookup), std::end(m_ayvolume_lookup), 0);
+	std::fill(std::begin(m_ayvolume_lookup), std::end(m_ayvolume_lookup), 0.0f);
 }
 
 
@@ -126,7 +126,7 @@ uint8_t midway_ssio_device::ioport_read(offs_t offset)
 	uint8_t result = m_ports[offset].read_safe(0xff);
 	if (!m_custom_input[offset].isnull())
 		result = (result & ~m_custom_input_mask[offset]) |
-					(m_custom_input[offset]() & m_custom_input_mask[offset]);
+				(m_custom_input[offset]() & m_custom_input_mask[offset]);
 	return result;
 }
 
@@ -206,7 +206,7 @@ void midway_ssio_device::compute_ay8910_modulation()
 		}
 
 		// treat the duty cycle as a volume
-		m_ayvolume_lookup[15 - volval] = curclock * 100 / 160;
+		m_ayvolume_lookup[15 - volval] = curclock / 160.0f;
 	}
 }
 
@@ -330,12 +330,12 @@ void midway_ssio_device::portb1_w(uint8_t data)
 
 void midway_ssio_device::update_volumes()
 {
-	m_ay0->set_volume(0, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][0]]);
-	m_ay0->set_volume(1, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][1]]);
-	m_ay0->set_volume(2, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][2]]);
-	m_ay1->set_volume(0, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][0]]);
-	m_ay1->set_volume(1, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][1]]);
-	m_ay1->set_volume(2, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][2]]);
+	m_ay0->set_output_gain(0, m_mute ? 0.0 : m_ayvolume_lookup[m_duty_cycle[0][0]]);
+	m_ay0->set_output_gain(1, m_mute ? 0.0 : m_ayvolume_lookup[m_duty_cycle[0][1]]);
+	m_ay0->set_output_gain(2, m_mute ? 0.0 : m_ayvolume_lookup[m_duty_cycle[0][2]]);
+	m_ay1->set_output_gain(0, m_mute ? 0.0 : m_ayvolume_lookup[m_duty_cycle[1][0]]);
+	m_ay1->set_output_gain(1, m_mute ? 0.0 : m_ayvolume_lookup[m_duty_cycle[1][1]]);
+	m_ay1->set_output_gain(2, m_mute ? 0.0 : m_ayvolume_lookup[m_duty_cycle[1][2]]);
 }
 
 //-------------------------------------------------
@@ -481,13 +481,13 @@ TIMER_CALLBACK_MEMBER(midway_ssio_device::synced_write)
 
 midway_sounds_good_device::midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIDWAY_SOUNDS_GOOD, tag, owner, clock)
-		, device_mixer_interface(mconfig, *this)
-		, m_cpu(*this, "cpu")
-		, m_pia(*this, "pia")
-		, m_dac(*this, "dac")
-		, m_dac_filter(*this, "dac_filter%u", 0U)
-		, m_status(0)
-		, m_dacval(0)
+	, device_mixer_interface(mconfig, *this)
+	, m_cpu(*this, "cpu")
+	, m_pia(*this, "pia")
+	, m_dac(*this, "dac")
+	, m_dac_filter(*this, "dac_filter%u", 0U)
+	, m_status(0)
+	, m_dacval(0)
 {
 }
 
@@ -519,7 +519,7 @@ void midway_sounds_good_device::write(uint8_t data)
 
 void midway_sounds_good_device::reset_write(int state)
 {
-//if (state) osd_printf_debug("SG Reset\n");
+	//if (state) osd_printf_debug("SG Reset\n");
 	m_cpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -676,13 +676,13 @@ TIMER_CALLBACK_MEMBER(midway_sounds_good_device::synced_write)
 
 midway_turbo_cheap_squeak_device::midway_turbo_cheap_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIDWAY_TURBO_CHEAP_SQUEAK, tag, owner, clock)
-		, device_mixer_interface(mconfig, *this)
-		, m_cpu(*this, "cpu")
-		, m_pia(*this, "pia")
-		, m_dac(*this, "dac")
-		, m_dac_filter(*this, "dac_filter%u", 0U)
-		, m_status(0)
-		, m_dacval(0)
+	, device_mixer_interface(mconfig, *this)
+	, m_cpu(*this, "cpu")
+	, m_pia(*this, "pia")
+	, m_dac(*this, "dac")
+	, m_dac_filter(*this, "dac_filter%u", 0U)
+	, m_status(0)
+	, m_dacval(0)
 {
 }
 

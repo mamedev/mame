@@ -655,7 +655,7 @@ void namcofl_state::machine_reset()
 
 void namcofl_state::namcofl(machine_config &config)
 {
-	I960(config, m_maincpu, 80_MHz_XTAL / 4); // i80960KA-20 == 20 MHz part
+	I80960KA(config, m_maincpu, 80_MHz_XTAL / 4); // i80960KA-20 == 20 MHz part
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcofl_state::main_map);
 
 	NAMCO_C75(config, m_mcu, 48.384_MHz_XTAL / 3);

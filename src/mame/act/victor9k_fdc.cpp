@@ -26,21 +26,11 @@
 */
 
 /*
-
-    TODO:
-
-    - write protect
-    - separate read/write methods
-    - communication error with SCP after loading boot sector
-        - bp ff1a8
-        - patch ff1ab=c3
-    - 8048 spindle speed control
-
+    TODO: write protect
 */
 
 #include "emu.h"
 #include "victor9k_fdc.h"
-
 
 //**************************************************************************
 //  LOGGING
@@ -82,12 +72,8 @@
 // Tandon TM-100 spindle @ 300RPM, measured TACH 12VAC 256Hz
 // TACH = RPM / 60 * SPINDLE RATIO * MOTOR POLES
 // 256 = 300 / 60 * 6.4 * 8
-#define SPINDLE_RATIO   6.4
+#define SPINDLE_RATIO   6.4     // Motor RPM divided by Disk RPM
 #define MOTOR_POLES     8.0
-
-// TODO wrong values here! motor speed is controlled by an LM2917, with help from the spindle TACH and a DAC0808 whose value is set by the SCP 8048
-const int victor_9000_fdc_device::rpm[] = { 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 254, 255, 257, 259, 260, 262, 264, 266, 267, 269, 271, 273, 275, 276, 278, 280, 282, 284, 286, 288, 290, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 318, 320, 322, 324, 326, 328, 330, 333, 335, 337, 339, 342, 344, 346, 348, 351, 353, 355, 358, 360, 362, 365, 367, 370, 372, 375, 377, 380, 382, 385, 387, 390, 392, 395, 398, 400, 403, 406, 408, 411, 414, 416, 419, 422, 425, 428, 430, 433, 436, 439, 442, 445, 448, 451, 454, 457, 460, 463, 466, 469, 472, 475, 478, 482, 485, 488, 491, 494, 498, 501, 504, 508, 511, 514, 518, 521, 525, 528, 532, 535, 539, 542, 546, 550, 553, 557, 561, 564, 568, 572, 576, 579, 583, 587, 591, 595, 599, 603, 607, 611, 615, 619, 623, 627, 631, 636, 640, 644, 648, 653, 657, 661, 666, 670, 674, 679, 683, 688, 693, 697, 702, 706, 711, 716, 721, 725, 730, 735, 740, 745, 750, 755, 760, 765, 770, 775, 780, 785, 790, 796, 801, 806, 812, 817, 822, 828, 833, 839, 844, 850, 856, 861, 867, 873, 878, 884 };
-
 
 
 //**************************************************************************
@@ -193,6 +179,7 @@ void victor_9000_fdc_device::device_add_mconfig(machine_config &config)
 		connector->option_add("525qd", FLOPPY_525_QD); // Tandon TM100-4 with custom electronics
 		connector->set_default_option("525qd");
 		connector->set_formats(floppy_formats);
+		connector->enable_sound(true);
 	}
 }
 
@@ -217,13 +204,12 @@ victor_9000_fdc_device::victor_9000_fdc_device(const machine_config &mconfig, co
 	m_floppy(*this, I8048_TAG":%u", 0U),
 	m_gcr_rom(*this, "gcr"),
 	m_leds(*this, "led%u", 0U),
-	m_data(0),
 	m_da{0, 0},
 	m_start{1, 1},
 	m_stop{1, 1},
 	m_sel{0, 0},
 	m_tach{0, 0},
-	m_rdy{0, 0},
+	m_tach_hz{0, 0},
 	m_scp_rdy0(0),
 	m_scp_rdy1(0),
 	m_via_rdy0(1),
@@ -261,13 +247,12 @@ void victor_9000_fdc_device::device_start()
 	t_tach[1] = timer_alloc(FUNC(victor_9000_fdc_device::tach1_tick), this);
 
 	// state saving
-	save_item(NAME(m_data));
 	save_item(NAME(m_da));
 	save_item(NAME(m_start));
 	save_item(NAME(m_stop));
 	save_item(NAME(m_sel));
 	save_item(NAME(m_tach));
-	save_item(NAME(m_rdy));
+	save_item(NAME(m_tach_hz));
 	save_item(NAME(m_scp_rdy0));
 	save_item(NAME(m_scp_rdy1));
 	save_item(NAME(m_via_rdy0));
@@ -294,6 +279,8 @@ void victor_9000_fdc_device::device_start()
 
 void victor_9000_fdc_device::device_reset()
 {
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
 	live_abort();
 
 	// reset devices
@@ -330,12 +317,16 @@ TIMER_CALLBACK_MEMBER(victor_9000_fdc_device::tach0_tick)
 {
 	m_tach[0] = !m_tach[0];
 	LOGSCP("%s TACH0 %u\n", machine().time().as_string(), m_tach[0]);
+
+	t_tach[0]->adjust(attotime::from_hz(m_tach_hz[0]*2));
 }
 
 TIMER_CALLBACK_MEMBER(victor_9000_fdc_device::tach1_tick)
 {
 	m_tach[1] = !m_tach[1];
 	LOGSCP("%s TACH1 %u\n", machine().time().as_string(), m_tach[1]);
+
+	t_tach[1]->adjust(attotime::from_hz(m_tach_hz[1]*2));
 }
 
 
@@ -467,7 +458,7 @@ void victor_9000_fdc_device::floppy_p2_w(uint8_t data)
 	m_scp_rdy1 = BIT(data, 7);
 	update_rdy();
 
-	LOGSCP("%s %s START0/STOP0/SEL0/RDY0 %u/%u/%u/%u START1/STOP1/SEL1/RDY1 %u/%u/%u/%u\n", machine().time().as_string(), machine().describe_context(), start0, stop0, sel0, m_rdy[0], start1, stop1, sel1, m_rdy[1]);
+	LOGSCP("%s %s START0/STOP0/SEL0/RDY0 %u/%u/%u/%u START1/STOP1/SEL1/RDY1 %u/%u/%u/%u\n", machine().time().as_string(), machine().describe_context(), start0, stop0, sel0, m_scp_rdy0, start1, stop1, sel1, m_scp_rdy1);
 
 	if (sync)
 	{
@@ -476,14 +467,14 @@ void victor_9000_fdc_device::floppy_p2_w(uint8_t data)
 		m_start[0] = start0;
 		m_stop[0] = stop0;
 		m_sel[0] = sel0;
-		update_spindle_motor(m_floppy[0]->get_device(), t_tach[0], m_start[0], m_stop[0], m_sel[0], m_da[0]);
-		update_rpm(m_floppy[0]->get_device(), t_tach[0], m_sel[0], m_da[0]);
+		update_rpm(m_floppy[0]->get_device(), t_tach[0], m_sel[0], m_da[0], m_tach_hz[0]);
+		update_spindle_motor(m_floppy[0]->get_device(), t_tach[0], m_start[0], m_stop[0], m_sel[0], m_tach_hz[0]);
 
 		m_start[1] = start1;
 		m_stop[1] = stop1;
 		m_sel[1] = sel1;
-		update_spindle_motor(m_floppy[1]->get_device(), t_tach[1], m_start[1], m_stop[1], m_sel[1], m_da[1]);
-		update_rpm(m_floppy[1]->get_device(), t_tach[1], m_sel[1], m_da[1]);
+		update_rpm(m_floppy[1]->get_device(), t_tach[1], m_sel[1], m_da[1], m_tach_hz[1]);
+		update_spindle_motor(m_floppy[1]->get_device(), t_tach[1], m_start[1], m_stop[1], m_sel[1], m_tach_hz[1]);
 
 		checkpoint();
 
@@ -556,13 +547,13 @@ void victor_9000_fdc_device::update_stepper_motor(floppy_image_device *floppy, i
 	floppy->set_rpm(victor9k_format::get_rpm(m_side, floppy->get_cyl()));
 }
 
-void victor_9000_fdc_device::update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, uint8_t &da)
+void victor_9000_fdc_device::update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, float tach_hz)
 {
-#ifdef USE_SCP
 	if (start && !stop && floppy->mon_r())
 	{
 		LOGSCP("%s: motor start\n", floppy->tag());
 		floppy->mon_w(0);
+		t_tach->adjust(attotime::from_hz(tach_hz));
 		t_tach->enable(true);
 	}
 	else if (stop && !floppy->mon_r())
@@ -571,33 +562,32 @@ void victor_9000_fdc_device::update_spindle_motor(floppy_image_device *floppy, e
 		floppy->mon_w(1);
 		t_tach->enable(false);
 	}
-#endif
 }
 
-void victor_9000_fdc_device::update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, uint8_t &da)
+void victor_9000_fdc_device::update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, uint8_t dacval, float &tach_hz)
 {
-#ifdef USE_SCP
 	if (sel)
 	{
-		da = m_data;
+		// Map DAC value to RPM, using the range of RPMs for zones 0 to 8,
+		// and adding some margin.  The SCP will adjust the DAC value
+		// until it measures the desired frequency at the tach inputs.
+		const float rpm_min = 240, rpm_max = 430;
+		float rpm = rpm_min + ((255-dacval)/255.0f) * (rpm_max-rpm_min);
 
-		float tach = rpm[da] / 60.0 * SPINDLE_RATIO * MOTOR_POLES;
+		tach_hz = rpm / 60.0 * SPINDLE_RATIO * MOTOR_POLES;
 
-		LOGSCP("%s: motor speed %u rpm / tach %0.1f hz %0.9f s (DA %02x)\n", floppy->tag(), rpm[da], (double) tach, 1.0/(double)tach, da);
-
-		floppy->set_rpm(rpm[da]);
-
-		bool enabled = t_tach->enabled();
-		t_tach->adjust(attotime::from_hz(tach*2), 0, attotime::from_hz(tach*2));
-		t_tach->enable(enabled);
+		LOGSCP("%s: motor speed %u rpm / tach %0.1f hz %0.9f s (DAC %02x)\n", floppy->tag(), rpm, (double)tach_hz, 1.0/(double)tach_hz, dacval);
 	}
-#endif
 }
 
 void victor_9000_fdc_device::update_rdy()
 {
-	m_via5->write_ca2((m_via_rdy0 && m_via_rdy1) ? m_rdy[0] : m_scp_rdy0);
-	m_via5->write_cb2((m_via_rdy0 && m_via_rdy1) ? m_rdy[1] : m_scp_rdy1);
+	uint8_t output_mask = m_via6->read(via6522_device::VIA_DDRB);
+
+	// The SCP and VIA chips can both output the RDY0/RDY1 (and L0MS/L1MS)
+	// signals.  When the VIA chip is configured to output the signal, it wins.
+	m_via5->write_ca2((output_mask & 1) ? m_via_rdy0 : m_scp_rdy0);
+	m_via5->write_cb2((output_mask & 2) ? m_via_rdy1 : m_scp_rdy1);
 }
 
 
@@ -610,9 +600,16 @@ void victor_9000_fdc_device::da_w(uint8_t data)
 	LOGSCP("%s %s DA %02x SEL0 %u SEL1 %u\n", machine().time().as_string(), machine().describe_context(), data, m_sel[0], m_sel[1]);
 
 	live_sync();
-	m_data = data;
-	if (m_floppy[0]->get_device()) update_rpm(m_floppy[0]->get_device(), t_tach[0], m_sel[0], m_da[0]);
-	if (m_floppy[1]->get_device()) update_rpm(m_floppy[1]->get_device(), t_tach[1], m_sel[1], m_da[1]);
+	if (m_sel[0])
+	{
+		m_da[0] = data;
+	}
+	if (m_sel[1])
+	{
+		m_da[1] = data;
+	}
+	if (m_floppy[0]->get_device()) update_rpm(m_floppy[0]->get_device(), t_tach[0], m_sel[0], m_da[0], m_tach_hz[0]);
+	if (m_floppy[1]->get_device()) update_rpm(m_floppy[1]->get_device(), t_tach[1], m_sel[1], m_da[1], m_tach_hz[1]);
 	checkpoint();
 	live_run();
 }
@@ -634,7 +631,9 @@ uint8_t victor_9000_fdc_device::via4_pa_r()
 
 	*/
 
-	return m_scp_l0ms;
+	uint8_t output_mask = m_via4->read(via6522_device::VIA_DDRA);
+
+	return (m_via_l0ms & output_mask) | (m_scp_l0ms & ~output_mask);
 }
 
 void victor_9000_fdc_device::via4_pa_w(uint8_t data)
@@ -655,17 +654,6 @@ void victor_9000_fdc_device::via4_pa_w(uint8_t data)
 	*/
 
 	m_via_l0ms = data & 0x0f;
-
-#ifndef USE_SCP
-	// HACK to bypass SCP
-	if (m_floppy[0]->get_device())
-	{
-		m_floppy[0]->get_device()->mon_w((m_via_l0ms == 0xf) ? 1 : 0);
-		m_floppy[0]->get_device()->set_rpm(victor9k_format::get_rpm(m_side, m_floppy[0]->get_device()->get_cyl()));
-	}
-	m_rdy[0] = (m_via_l0ms == 0xf) ? 0 : 1;
-	update_rdy();
-#endif
 
 	uint8_t st0 = data >> 4;
 
@@ -698,7 +686,9 @@ uint8_t victor_9000_fdc_device::via4_pb_r()
 
 	*/
 
-	return m_scp_l1ms;
+	uint8_t output_mask = m_via4->read(via6522_device::VIA_DDRB);
+
+	return (m_via_l1ms & output_mask) | (m_scp_l1ms & ~output_mask);
 }
 
 void victor_9000_fdc_device::via4_pb_w(uint8_t data)
@@ -719,17 +709,6 @@ void victor_9000_fdc_device::via4_pb_w(uint8_t data)
 	*/
 
 	m_via_l1ms = data & 0x0f;
-
-#ifndef USE_SCP
-	// HACK to bypass SCP
-	if (m_floppy[1]->get_device())
-	{
-		m_floppy[1]->get_device()->mon_w((m_via_l1ms == 0xf) ? 1 : 0);
-		m_floppy[1]->get_device()->set_rpm(victor9k_format::get_rpm(m_side, m_floppy[1]->get_device()->get_cyl()));
-	}
-	m_rdy[1] = (m_via_l1ms == 0xf) ? 0 : 1;
-	update_rdy();
-#endif
 
 	uint8_t st1 = data >> 4;
 
@@ -898,12 +877,25 @@ void victor_9000_fdc_device::via6_pa_w(uint8_t data)
 	{
 		live_sync();
 
-		m_side = side;
-		cur_live.side = side;
-		if (m_floppy[0]->get_device())
-			m_floppy[0]->get_device()->ss_w(side);
-		if (m_floppy[1]->get_device())
-			m_floppy[1]->get_device()->ss_w(side);
+		if (side != m_side)
+		{
+			m_side = side;
+			cur_live.side = side;
+
+			for (int i = 0; i < 2; i++)
+			{
+				floppy_image_device *floppy = m_floppy[i]->get_device();
+				if (floppy)
+				{
+					floppy->ss_w(side);
+
+					// RPM may have changed since the zones are different for
+					// the upper and lower heads.
+					floppy->set_rpm(victor9k_format::get_rpm(side, floppy->get_cyl()));
+				}
+			}
+		}
+
 
 		m_drive = drive;
 		cur_live.drive = drive;
@@ -934,11 +926,13 @@ uint8_t victor_9000_fdc_device::via6_pb_r()
 
 	uint8_t data = 0;
 
+	uint8_t output_mask = m_via6->read(via6522_device::VIA_DDRB);
+
 	// motor speed status, drive A
-	data |= (m_via_rdy0 && m_via_rdy1) ? m_rdy[0] : m_scp_rdy0;
+	data |= (output_mask & 1) ? m_via_rdy0 : m_scp_rdy0;
 
 	// motor speed status, drive B
-	data |= ((m_via_rdy0 && m_via_rdy1) ? m_rdy[1] : m_scp_rdy1) << 1;
+	data |= ((output_mask & 2) ? m_via_rdy1 : m_scp_rdy1) << 1;
 
 	// door B sense
 	data |= ((m_floppy[1]->get_device() && m_floppy[1]->get_device()->exists()) ? 0 : 1) << 3;
@@ -958,8 +952,11 @@ void victor_9000_fdc_device::via6_pb_w(uint8_t data)
 
 	    bit     description
 
-	    PB0     RDY0 to SCP    Motor speed status, drive A
-	    PB1     RDY1 to SCP    Motor speed status, drive B
+	    PB0     Data Ready     Handshake signal during speed table download
+	    PB1     Data Ack       Handshake signal during speed table download
+
+	    PB0     RDY0 from SCP  In Normal Operation: drive A speed converged
+	    PB1     RDY1 from SCP  In Normal Operation: drive B speed converged
 	    PB2     _SCRESET       Motor speed controller (8048) reset, output
 	    PB3     DS1            Door B sense, input       ->order is correct, leads with B
 	    PB4     DSO            Door A sense, input
@@ -969,13 +966,25 @@ void victor_9000_fdc_device::via6_pb_w(uint8_t data)
 
 	*/
 
+	uint8_t output_mask = m_via6->read(via6522_device::VIA_DDRB);
+
 	m_via_rdy0 = BIT(data, 0);
 	m_via_rdy1 = BIT(data, 1);
 	update_rdy();
 
-	// motor speed controller reset
-	if (!BIT(data, 2))
-		m_maincpu->reset();
+	// _SCRESET in the schematic is misnamed.  There's an inverter between this
+	// signal and the _RESET pin of the 8048, so the reset signal is actually
+	// active high.
+	//
+	// Hold the 8048 in reset, unless the reset signal is actively driven low.
+	if (BIT(output_mask, 2) && !BIT(data, 2))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
+	else
+	{
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
 
 	bool sync = false;
 
@@ -1015,16 +1024,16 @@ void victor_9000_fdc_device::drw_w(int state)
 	{
 		live_sync();
 		m_drw = cur_live.drw = state;
-		checkpoint();
 		LOGVIA("%s %s DRW %u\n", machine().time().as_string(), machine().describe_context(), state);
 		if (state)
 		{
-			pll_stop_writing(get_floppy(), machine().time());
+			pll_stop_writing(get_floppy(), cur_live.tm);
 		}
 		else
 		{
-			pll_start_writing(machine().time());
+			pll_start_writing(cur_live.tm);
 		}
+		checkpoint();
 		live_run();
 	}
 }
@@ -1105,8 +1114,8 @@ void victor_9000_fdc_device::pll_reset(const attotime &when)
 
 void victor_9000_fdc_device::pll_start_writing(const attotime &tm)
 {
-	cur_pll.start_writing(tm);
 	pll_reset(cur_live.tm);
+	cur_pll.start_writing(tm);
 }
 
 void victor_9000_fdc_device::pll_commit(floppy_image_device *floppy, const attotime &tm)

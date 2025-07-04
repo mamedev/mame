@@ -24,6 +24,8 @@ public:
 	auto writemsc_handler() { return m_out_msc_handler.bind(); }
 	auto irq_callback() { return m_write_irq.bind(); }
 
+	void set_is_aiv3() { m_pseudovia_aiv3 = true; }
+
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
@@ -32,6 +34,7 @@ public:
 	void scc_irq_w(int state);
 	void asc_irq_w(int state);
 	void scsi_irq_w(int state);
+	void scsi_drq_w(int state);
 
 protected:
 	// device-level overrides
@@ -44,6 +47,8 @@ private:
 	devcb_write8 m_out_a_handler, m_out_b_handler, m_out_config_handler, m_out_video_handler, m_out_msc_handler;
 
 	uint8_t m_pseudovia_regs[256], m_pseudovia_ier, m_pseudovia_ifr;
+
+	bool m_pseudovia_aiv3;  // is this the pure pseudovia in the DuoDocks without the VIA-compatible IER/IFR?
 
 	void pseudovia_recalc_irqs();
 };

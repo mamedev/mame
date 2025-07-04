@@ -15,18 +15,11 @@ va_vca_device::va_vca_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, VA_VCA, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
-	, m_has_cv_stream(false)
 	, m_min_cv(-DEFAULT_MAX_VPP)
 	, m_max_cv(DEFAULT_MAX_VPP)
 	, m_cv_scale(1.0F)
 	, m_fixed_gain(1.0F)
 {
-}
-
-va_vca_device &va_vca_device::configure_streaming_cv(bool use_streaming_cv)
-{
-	m_has_cv_stream = use_streaming_cv;
-	return *this;
 }
 
 va_vca_device &va_vca_device::configure_cem3360_linear_cv()
@@ -50,14 +43,14 @@ void va_vca_device::set_fixed_cv(float cv)
 
 void va_vca_device::device_start()
 {
-	const int input_count = m_has_cv_stream ? 2 : 1;
-	m_stream = stream_alloc(input_count, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+	assert(get_sound_requested_inputs_mask() == 0x01 || get_sound_requested_inputs_mask() == 0x03);
+	m_stream = stream_alloc(get_sound_requested_inputs(), 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 	save_item(NAME(m_fixed_gain));
 }
 
 void va_vca_device::sound_stream_update(sound_stream &stream)
 {
-	if (m_has_cv_stream)
+	if (get_sound_requested_inputs() > 1)
 	{
 		for (int i = 0; i < stream.samples(); i++)
 			stream.put(0, i, stream.get(0, i) * cv_to_gain(stream.get(1, i)));

@@ -137,7 +137,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(bbd_tick);
 	void bbd_setup_next_tick();
-	
+
 	emu_timer *m_bbd_timer;
 
 	u16 m_key_select;
@@ -287,7 +287,8 @@ void ct8000_state::ctfk1(machine_config &config)
 //**************************************************************************
 void ct8000_state::driver_start()
 {
-	m_bbd_timer = timer_alloc(FUNC(ct8000_state::bbd_tick), this);
+	if (m_bbd)
+		m_bbd_timer = timer_alloc(FUNC(ct8000_state::bbd_tick), this);
 
 	m_bank->configure_entries(0, 2, memregion("bankrom")->base(), 0x800);
 
@@ -313,7 +314,8 @@ void ct8000_state::driver_start()
 
 void ct8000_state::driver_reset()
 {
-	bbd_setup_next_tick();	
+	if (m_bbd)
+		bbd_setup_next_tick();
 }
 
 //**************************************************************************
@@ -432,7 +434,6 @@ void ct8000_state::p7b_w(u8 data)
 	// mute is applied to mixed/filtered 931 output before the stereo chorus
 	const double gain = BIT(data, 3) ? 1.0 : 0.0;
 	m_mixer->set_input_gain(0, gain);
-	m_mixer->set_input_gain(1, gain);
 }
 
 //**************************************************************************

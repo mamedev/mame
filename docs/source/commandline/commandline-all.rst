@@ -1936,10 +1936,8 @@ Core Performance Options
     run the system at its normal speed, a *<factor>* of ``0.5`` means run at
     half speed, and a *<factor>* of 2.0 means run at double speed.  Note that
     changing this value affects sound playback as well, which will scale in
-    pitch accordingly.  A very low speed will introduce sound glitches, this
-    can be prevented by increasing the :ref:`audio latency
-    <mame-commandline-audiolatency>`.  The internal precision of the fraction is
-    two decimal places, so a *<factor>* of ``1.002`` is rounded to ``1.00``.
+    pitch accordingly.  The internal precision of the fraction is two decimal
+    places, so a *<factor>* of ``1.002`` is rounded to ``1.00``.
 
     The default is ``1.0`` (normal speed).
 
@@ -2986,7 +2984,7 @@ Core Sound Options
     depend on the operating system.  On Windows, it may be necessary to set
     ``SDL_AUDIODRIVER=directsound`` if no sound output is produced by default.
 
-    The default is ``wasapi`` on Windows. On Mac, ``coreaudio`` is the default.
+    The default is ``wasapi`` on Windows.  On Mac, ``coreaudio`` is the default.
     On all other platforms, ``sdl`` is the default.
 
     Example:
@@ -3038,7 +3036,7 @@ Core Sound Options
       - All [#SoundWinSDL]_
       - No
       - No
-      - Yes
+      - Yes [#SoundSDLMultiChannel]_
       - No
     * - ``portaudio``
       - All
@@ -3057,6 +3055,9 @@ Core Sound Options
 
 ..  [#SoundWinSDL] While SDL is not a supported option on official MAME builds
     for Windows, you can compile MAME with SDL support on Windows.
+
+..  [#SoundSDLMultiChannel] MAME requires SDL 2.0.16 or later for multi-channel
+    sound support.
 
 ..  [#SoundPortAudioMonitoring] PortAudio support for output monitoring depends
     on the platform and sound API.

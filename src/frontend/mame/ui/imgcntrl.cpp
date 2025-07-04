@@ -24,7 +24,6 @@
 #include "drivenum.h"
 #include "emuopts.h"
 #include "image.h"
-#include "mame.h"
 #include "softlist_dev.h"
 
 #include "util/zippath.h"
@@ -198,8 +197,7 @@ void menu_control_device_image::load_software_part()
 	}
 	else
 	{
-		machine().popmessage(_("The software selected is missing one or more required ROM or CHD images.\nPlease acquire the correct file(s) applicable to %1$s %2$s, or select a different one."),
-				emulator_info::get_appname(), bare_build_version);
+		machine().popmessage(_("Files required for the selected software are missing or incorrect."));
 		m_state = SELECT_SOFTLIST;
 		menu_activated();
 	}

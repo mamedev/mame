@@ -665,7 +665,7 @@ void rungun_state::rng(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	K053936(config, m_k053936, 0);
 	m_k053936->set_offsets(34, 9);
@@ -682,7 +682,7 @@ void rungun_state::rng(machine_config &config)
 
 	PALETTE(config, m_palette2).set_format(palette_device::xBGR_555, 1024);
 	m_palette2->enable_shadows();
-	m_palette2->enable_hilights();
+	m_palette2->enable_highlights();
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();

@@ -1228,7 +1228,13 @@ bool screen_device::update_partial(int scanline)
 			}
 			else
 			{
-				flags = m_svg->render(*this, m_bitmap[m_curbitmap].as_rgb32(), clip);
+				// optional screen_update callback before rendering svg (eg. for preparing outputs used by the svg)
+				// bitmap can be considered read-only, as it gets overwritten later
+				if (!m_screen_update_rgb32.isnull())
+					flags = m_screen_update_rgb32(*this, m_bitmap[m_curbitmap].as_rgb32(), clip);
+
+				if (~flags & UPDATE_HAS_NOT_CHANGED)
+					flags = m_svg->render(*this, m_bitmap[m_curbitmap].as_rgb32(), clip);
 			}
 			m_partial_updates_this_frame++;
 		}

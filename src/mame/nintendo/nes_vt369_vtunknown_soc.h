@@ -5,20 +5,12 @@
 
 #pragma once
 
-#include "nes_vt09_soc.h"
+#include "nes_vt_soc.h"
 #include "vt369_adpcm.h"
 
-#include "cpu/m6502/rp2a03.h"
-#include "cpu/m6502/vt3xx_spu.h"
 #include "sound/dac.h"
-#include "sound/nes_apu_vt.h"
-#include "m6502_swap_op_d5_d6.h"
-#include "video/ppu2c0x_vt.h"
 
-#include "screen.h"
-#include "speaker.h"
-
-class vt3xx_soc_base_device : public nes_vt09_soc_device
+class vt3xx_soc_base_device : public nes_vt02_vt03_soc_device
 {
 public:
 	vt3xx_soc_base_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
@@ -26,7 +18,7 @@ public:
 protected:
 	vt3xx_soc_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
 
-	virtual void device_add_mconfig(machine_config& config) override;
+	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;
 
@@ -54,11 +46,11 @@ protected:
 
 	void highres_sprite_dma_w(u8 data);
 
-	void vt369_soundcpu_control_w(offs_t offset, u8 data);
-	void vt369_4112_bank6000_select_w(offs_t offset, u8 data);
-	void vt369_411c_bank6000_enable_w(offs_t offset, u8 data);
-	void vt369_411d_w(offs_t offset, u8 data);
-	void vt369_411e_w(offs_t offset, u8 data);
+	void vt369_soundcpu_control_w(u8 data);
+	void vt369_4112_bank6000_select_w(u8 data);
+	void vt369_411c_bank6000_enable_w(u8 data);
+	void vt369_411d_w(u8 data);
+	void vt369_411e_w(u8 data);
 	void vt369_relative_w(offs_t offset, u8 data);
 
 	u8 read_internal(offs_t offset);
@@ -120,19 +112,6 @@ private:
 	required_device<dac_16bit_r2r_twos_complement_device> m_rightdac;
 };
 
-class vt3xx_soc_unk_bt_device : public vt3xx_soc_base_device
-{
-public:
-	vt3xx_soc_unk_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config& config) override;
-
-	void nes_vt_bt_map(address_map &map) ATTR_COLD;
-
-	void vt03_412c_extbank_w(u8 data);
-};
-
 class vt369_soc_introm_noswap_device : public vt3xx_soc_base_device
 {
 public:
@@ -141,8 +120,8 @@ public:
 protected:
 	vt369_soc_introm_noswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config& config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
 
 	void vt369_introm_map(address_map &map) ATTR_COLD;
 
@@ -176,7 +155,24 @@ public:
 	vt369_soc_introm_vibesswap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
+	vt369_soc_introm_vibesswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
+
+	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	void vibes_411c_w(u8 data);
+
+	void nes_vt_vibes_map(address_map &map) ATTR_COLD;
+};
+
+class vt369_soc_introm_gbox2020_device : public vt369_soc_introm_vibesswap_device
+{
+public:
+	vt369_soc_introm_gbox2020_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
 };
 
 class vt3xx_soc_unk_dg_device : public vt3xx_soc_base_device
@@ -194,22 +190,6 @@ protected:
 	void vt03_411c_w(u8 data);
 };
 
-class vt3xx_soc_unk_fa_device : public vt3xx_soc_unk_dg_device
-{
-public:
-	vt3xx_soc_unk_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
-
-protected:
-
-	virtual void device_add_mconfig(machine_config& config) override;
-
-	void nes_vt_fa_map(address_map &map) ATTR_COLD;
-
-	u8 vtfa_412c_r();
-	void vtfa_412c_extbank_w(u8 data);
-	void vtfp_4242_w(u8 data);
-};
-
 
 DECLARE_DEVICE_TYPE(VT3XX_SOC, vt3xx_soc_base_device)
 
@@ -217,10 +197,8 @@ DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_NOSWAP, vt369_soc_introm_noswap_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_SWAP,   vt369_soc_introm_swap_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_ALTSWAP,   vt369_soc_introm_altswap_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_VIBESSWAP,   vt369_soc_introm_vibesswap_device)
-
-DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_BT, vt3xx_soc_unk_bt_device)
+DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_GBOX2020,   vt369_soc_introm_gbox2020_device)
 
 DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_DG, vt3xx_soc_unk_dg_device)
-DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_FA, vt3xx_soc_unk_fa_device)
 
 #endif // MAME_NINTENDO_NES_VT369_VTUNKNOWN_SOC_H

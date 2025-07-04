@@ -671,6 +671,33 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				return HANDLER_CANCEL;
 			}
 
+			ui_event event;
+			while (machine().ui_input().pop_event(&event))
+			{
+				if (event.target)
+				{
+					switch (event.event_type)
+					{
+					case ui_event::type::NONE:
+					case ui_event::type::WINDOW_FOCUS:
+					case ui_event::type::WINDOW_DEFOCUS:
+					case ui_event::type::MOUSE_WHEEL:
+						break;
+
+					case ui_event::type::POINTER_UPDATE:
+						// exit on primary button down
+						if (BIT(event.pointer_pressed, 0) && (1 == event.pointer_clicks))
+							return HANDLER_CANCEL;
+						break;
+
+					case ui_event::type::POINTER_LEAVE:
+					case ui_event::type::POINTER_ABORT:
+					case ui_event::type::IME_CHAR:
+						break;
+					}
+				}
+			}
+
 			return 0;
 		};
 	set_handler(ui_callback_type::GENERAL, handler_callback_func(&mame_ui_manager::handler_ingame, this));
@@ -799,6 +826,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		// clear the input memory and wait for all keys to be released
 		poller.reset();
 		while (poller.poll() != INPUT_CODE_INVALID) { }
+		machine().ui_input().reset();
 
 		if (m_handler_callback_type == ui_callback_type::MODAL)
 		{
@@ -1443,7 +1471,7 @@ void mame_ui_manager::draw_fps_counter(render_container &container)
 			machine().video().speed_text(),
 			0.0f, 0.0f, 1.0f,
 			ui::text_layout::text_justify::RIGHT, ui::text_layout::word_wrapping::WORD,
-			OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
+			OPAQUE_, colors().text_color(), colors().background_color(), nullptr, nullptr);
 }
 
 
@@ -1459,7 +1487,7 @@ void mame_ui_manager::draw_profiler(render_container &container)
 			text,
 			0.0f, 0.0f, 1.0f,
 			ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping::WORD,
-			OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
+			OPAQUE_, colors().text_color(), colors().background_color(), nullptr, nullptr);
 }
 
 
@@ -1870,10 +1898,10 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		if (m_sliders.empty())
 			slider_alloc(_("Master Volume"), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_volume, this, _1, _2));
 
-		slider_alloc(util::string_format(_("%1$s volume"), snd.device().tag()), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_devvol, this, &snd, _1, _2));
+		slider_alloc(util::string_format(_("%1$s Volume"), snd.device().tag()), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_devvol, this, &snd, _1, _2));
 		if (snd.outputs() != 1)
 			for (int channel = 0; channel != snd.outputs(); channel ++)
-				slider_alloc(util::string_format(_("%1$s channel %d volume"), snd.device().tag(), channel), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_devvol_chan, this, &snd, channel, _1, _2));
+				slider_alloc(util::string_format(_("%1$s Channel %d Volume"), snd.device().tag(), channel), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_devvol_chan, this, &snd, channel, _1, _2));
 	}
 
 	// add analog adjusters
@@ -1891,7 +1919,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	// add speed and CPU overclocking (cheat only)
 	if (machine.options().cheat())
 	{
-		slider_alloc(_("Speed Factor"), 100, 1000, 10000, 10, std::bind(&mame_ui_manager::slider_speed, this, _1, _2));
+		slider_alloc(_("Global Speed"), 100, 1000, 10000, 10, std::bind(&mame_ui_manager::slider_speed, this, _1, _2));
 
 		for (device_execute_interface &exec : execute_interface_enumerator(machine.root_device()))
 		{
@@ -1923,7 +1951,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		if (machine.options().cheat())
 		{
 			std::string str = string_format(_("%1$s Refresh Rate"), screen_desc);
-			slider_alloc(std::move(str), -10000, 0, 10000, 1000, std::bind(&mame_ui_manager::slider_refresh, this, std::ref(screen), _1, _2));
+			slider_alloc(std::move(str), -10000, 0, 10000, 100, std::bind(&mame_ui_manager::slider_refresh, this, std::ref(screen), _1, _2));
 		}
 
 		// add standard brightness/contrast/gamma controls per-screen
@@ -2159,7 +2187,6 @@ int32_t mame_ui_manager::slider_overclock(device_t &device, std::string *str, in
 int32_t mame_ui_manager::slider_refresh(screen_device &screen, std::string *str, int32_t newval)
 {
 	double defrefresh = ATTOSECONDS_TO_HZ(screen.refresh_attoseconds());
-	double refresh;
 
 	if (newval != SLIDER_NOCHANGE)
 	{
@@ -2171,7 +2198,7 @@ int32_t mame_ui_manager::slider_refresh(screen_device &screen, std::string *str,
 
 	if (str)
 		*str = string_format(_(u8"%1$.3f\u00a0Hz"), screen.frame_period().as_hz());
-	refresh = screen.frame_period().as_hz();
+	double refresh = screen.frame_period().as_hz();
 	return floor((refresh - defrefresh) * 1000.0 + 0.5);
 }
 

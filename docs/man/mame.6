@@ -916,14 +916,14 @@ Specifies which sound subsystem to use for audio output:
 \fBportaudio\fR  uses the PortAudio library which supports low-latency
 output and multiple audio APIs.
 .br
-\fBcoreaudio\fR  uses the Core Audio API which supports low-latency
-output and AudioUnit effects (only available on macOS).
+\fBcoreaudio\fR  uses the CoreAudio API (supports AudioUnit effects, only
+available on macOS).
 .br
 \fBwasapi\fR  uses the Windows Audio Session API (WASAPI) (only available
 on Windows).
 .br
-\fBxaudio2\fR  uses the XAudio2 API which supports low-latency output
-(only available on Windows).
+\fBxaudio2\fR  uses the XAudio2 API (does not support sound input, only
+available on Windows).
 .br
 \fBnone\fR  produces no audio output.
 .br

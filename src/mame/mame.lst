@@ -357,6 +357,16 @@ torchh
 torch301
 torch725
 
+@source:acorn/belatra.cpp
+fairyl2
+fairyl2a
+fairyl2b
+fairyl2bl
+ldrink
+ldrinka
+merryjn
+unkbel
+
 @source:acorn/cms.cpp
 cms6502
 
@@ -373,6 +383,14 @@ ertictaca
 ertictacb
 poizone
 
+@source:acorn/eurocube.cpp
+eurobeeb1
+eurobeeb2
+eurobeeb3m
+eurobeeb3c
+eurocube09
+eurocube65
+
 @source:acorn/riscpc.cpp
 a7000
 a7000p
@@ -385,19 +403,6 @@ sarpc_j233
 ppcar
 ssfindo
 tetfight
-
-@source:acorn/z88.cpp
-z88
-z88ch
-z88de
-z88dk
-z88es
-z88fi
-z88fr
-z88it
-z88no
-z88se
-z88tr
 
 @source:act/apricot.cpp
 apricot
@@ -438,6 +443,8 @@ fashiong
 fashiong2
 fstation
 funlddlx
+funlddlx2
+funlddlx4
 quickjac
 skattv
 skattva
@@ -459,10 +466,19 @@ glucksstern
 juwel
 karoas
 kniffi
+supermultib
 
 @source:adp/stellafr.cpp
+action
+allfred
+grandhand
+kleopatra
+multimulti
 st_ohla
 st_vulkn
+sunny
+taipan
+turbosun
 
 @source:agat/agat.cpp
 agat7
@@ -1471,7 +1487,9 @@ dinodino
 gostopac
 hacher
 hapfarm
+hapfarma
 luckycoin
+lwitch
 magibomb
 magibomba
 magibombb
@@ -1487,11 +1505,13 @@ magibombk
 magibombl
 magibombm
 magibombn
+magibombo
 monkeyl
 monkeyla
 monkeylb
 monkeylc
 monkeyld
+monkeyle
 showhanc
 showhand
 skilldrp
@@ -1505,6 +1525,7 @@ winbingo
 winbingoa
 wwitch
 zoo
+zulu
 
 @source:astrocorp/astropc.cpp
 blackbd
@@ -1897,6 +1918,7 @@ cmmb103
 cops
 copsuk
 revlatns
+visnqust
 
 @source:atari/copsnrob.cpp
 copsnrob
@@ -17615,6 +17637,7 @@ polluxn
 popbingo
 primella
 rshark
+rsharka
 sadari
 superx
 superxm
@@ -17678,7 +17701,9 @@ mjmywrldt
 mjreach1
 mjreach1a
 mjschuka
+mjswacad
 mjtenho
+mjxysl
 mmpanic
 momotaro
 nettoqc
@@ -18652,6 +18677,8 @@ thoopb
 thoopna
 thoopnna
 thoopnnaa
+xorwflat
+xorwflata
 
 @source:gaelco/gaelco2.cpp
 aligator
@@ -18670,7 +18697,8 @@ jungleani
 lizardhunt
 maniacsq
 maniacsqa
-maniacsqu
+maniacsqb
+maniacsqc
 maniacsqs
 play2000
 play2000_40i
@@ -18705,12 +18733,19 @@ footbpow12
 footbpow14
 radikalb
 radikalba
+radikalbp
 speedup
 speedup10
 speedup12
+speedup20
+speedup20a
+speedup21
 surfplnt
+surfplnt10
+surfplnt12
 surfplnt20
 surfplnt30
+surfplnt31
 surfplnt40
 
 @source:gaelco/gaelcof3.cpp
@@ -18731,8 +18766,16 @@ tuningrc
 glass
 glass10
 glass10a
+glass10b
+glass10c
+glass10d
+glassa
+glassat
 glasskr
+glasskra
 glassp
+ssplash
+ssplash10
 
 @source:gaelco/goldart.cpp
 goldart
@@ -18751,16 +18794,19 @@ lotoplay
 lotoplaya
 lotoplayb
 lotoplayc
+lotoplayp
 
 @source:gaelco/mastboy.cpp
 mastboy
 mastboya
 mastboyb
 mastboyc
+mastboyd
 mastboyi
 mastboyia
 mastboyib
 mastboyic
+mastboyid
 mastboyiol
 mastboyitst
 mastboyiv2
@@ -18788,6 +18834,8 @@ rollext
 
 @source:gaelco/splash.cpp
 funystrp
+nsplashkr
+nsplashkra
 paintlad
 puckpepl
 rebus
@@ -18795,10 +18843,15 @@ roldfrog
 roldfroga
 splash
 splash10
+splash11
+splash12
+splashkr
+splashna
 ringball
 
 @source:gaelco/splash_ms.cpp
 splashms
+splashmsa
 
 @source:gaelco/targeth.cpp
 quickshts
@@ -18831,9 +18884,11 @@ wrallymp
 
 @source:gaelco/xorworld.cpp
 xorworld
+xorworlda
 
 @source:gaelco/xorworld_ms.cpp
-xorworldm
+xorwldms
+xorwldmsa
 
 @source:galaxian/dambustr.cpp
 dambustr
@@ -19972,6 +20027,7 @@ port32
 port32a
 port32b
 lyon16
+lyon16a
 lyon32
 van16
 van32
@@ -20379,6 +20435,8 @@ animalhsa
 animalhsb
 animalhsc
 animalw
+animalwa
+animalwbl
 aplan
 bingowng
 bingownga
@@ -20645,6 +20703,7 @@ happyskl
 iqblocka
 iqblockf
 jking103a
+jking105us
 jking200pr
 jking302us
 lhzb
@@ -20652,6 +20711,7 @@ lhzba
 lhzb2
 lhzb2a
 lhzb2b
+lhzb2c
 mgcs
 mgcsa
 mgcsb
@@ -20668,6 +20728,7 @@ spkrform
 starzan
 tarzan
 tarzan103m
+tarzan106fa
 tarzan202fa
 tarzana
 tarzanb
@@ -20706,6 +20767,7 @@ extradrw
 fruitpar
 fruitpar206us
 gonefsh2
+jhg3d
 jking02
 klxyj102cn
 klxyj104cn
@@ -20732,6 +20794,8 @@ sdwx
 slqz3
 tct2p
 tripslot
+tshs
+tswxp
 xypdk
 zhongguo
 
@@ -20763,12 +20827,16 @@ tripfev108us
 wldfruit
 
 @source:igs/igs_m036.cpp
+cjbq
 cjddzsp
 cjdh2
 cjdh2a
 cjdh2b
 cjdh2c
 cjdh2d
+cjgdy
+dahuaxy
+huoqilin
 igsm312
 jhzb
 jxry
@@ -20777,11 +20845,13 @@ lhtb
 lhzb3in1
 lhzbgqb
 mghammer
+mjzhizun
 qhzb
 slqzsp
 super70s
 sydh
 xyddz
+xydn
 
 @source:igs/igspoker.cpp
 chleague
@@ -20910,6 +20980,7 @@ kov2p200
 kov2p202
 kov2p203
 kov2p204
+kovbl
 kovgsyx
 kovlsjb
 kovlsjba
@@ -20917,6 +20988,7 @@ kovlsqh
 kovlsqh2
 kovplus
 kovplusa
+kovplusbl
 kovqhsgs
 kovsgqyz
 kovsgqyza
@@ -21033,6 +21105,7 @@ spk201ua
 spk203us
 spk205us
 spk306us
+xjinhuang
 zuanshiw
 
 @source:igt/drw80pkr.cpp
@@ -22445,6 +22518,7 @@ rockn3
 rockn4
 rockna
 rocknms
+rocknms10
 step3
 stepstag
 tetrisp2
@@ -25534,6 +25608,11 @@ korgm1p1
 korgm1r
 korgm1rex
 
+@source:korg/korgtriton.cpp
+korgtriton
+korgtritona
+korgtritonb
+
 @source:korg/korgws.cpp
 korgwsad
 korgwsex
@@ -28101,6 +28180,7 @@ yosakdona
 
 @source:midw8080/mw8080bw.cpp
 280zzzap
+280zzzapa
 blueshrk
 blueshrkmr
 blueshrkmr2
@@ -29309,6 +29389,7 @@ draw88pkr
 @source:misc/amuzy.cpp
 amhbattl
 boobood
+cbkids
 docchift
 dojokkot
 fishbatl
@@ -29584,16 +29665,6 @@ ctainv
 @source:misc/beezer.cpp
 beezer
 beezer1
-
-@source:misc/belatra.cpp
-fairyl2
-fairyl2a
-fairyl2b
-fairyl2bl
-ldrink
-ldrinka
-merryjn
-unkbel
 
 @source:misc/bingoman.cpp
 bingoman
@@ -30877,7 +30948,6 @@ geimulti
 gepoker
 gepoker1
 gepoker2
-gepoker2a
 gepoker3
 gs4002
 gs4002a
@@ -30989,8 +31059,11 @@ rbmk
 rbspm
 sball2k1
 sc2in1
+smatch03
+smwc
 ssanguoj
 sscs
+sscs0118
 super555
 yyhm
 
@@ -31055,6 +31128,7 @@ goodluck
 icproul
 jkrbonus
 jokercar
+kmhpan
 lespendu
 lespenduj
 maverik
@@ -31427,6 +31501,7 @@ lependu
 
 @source:misc/limenko.cpp
 dynabomb
+hrthouse
 legendoh
 sb2003
 sb2003a
@@ -31553,6 +31628,7 @@ menghong
 menghonga
 pljh2
 sandayi
+wakeng
 
 @source:misc/meyc8080.cpp
 casbjack
@@ -32392,7 +32468,6 @@ psattack
 bazooka
 bazookabr
 dpatrol
-dpatrola
 gametree
 knightar
 
@@ -32788,6 +32863,9 @@ supertr3
 tripdraw
 trivquiz
 
+@source:misc/stc3910.cpp
+executel
+
 @source:misc/stop.cpp
 stop
 
@@ -32906,7 +32984,7 @@ twinbskt
 saiyukip
 umipoker
 umipokera
-vparadis
+vparadis2
 
 @source:misc/unkgolf.cpp
 unkgolf
@@ -33560,6 +33638,12 @@ sspanic
 @source:namco/dkmb.cpp
 dkmb
 
+@source:namco/ds5000.cpp
+ds5000
+
+@source:namco/ds6000.cpp
+ds6000
+
 @source:namco/gal3.cpp
 gal3
 
@@ -33988,6 +34072,7 @@ tekken3b
 tekken3c
 tekken3d
 tekken3ja
+tekken3jd
 tekken3je1
 tekken3ua
 tekken3ud
@@ -35218,8 +35303,6 @@ croaky
 dancexpt
 digezlg
 dnce2000
-hs36blk
-hs36red
 nytsudo
 papsudok
 pjoypj001
@@ -35269,25 +35352,15 @@ dgun851
 dgun853
 fccomp88
 gamezn2
-gprnrs1
-gprnrs16
-gujtv108
+hs36blk
+hs36red
 joysti30
 lxnoddy
 majgnc
 majkon
 mc_105te
-mc_110cb
-mc_138cb
-mc_7x6ss
-mc_89in1
 mc_8x6cb
-mc_8x6ss
-mc_9x6sa
-mc_9x6ss
 mc_aa2
-mc_dcat8
-mc_dcat8a
 mc_dg101
 mc_dgear
 mc_sam60
@@ -35301,8 +35374,6 @@ pjoys60
 polmega
 ppgc200g
 protpp
-pumpactv
-rfcp168
 sen101
 senwld
 silv35
@@ -35313,7 +35384,6 @@ sporzpp
 sporztn
 sudo6in1
 sudopptv
-techni4
 timetp36
 timetp7
 tvmjfc
@@ -35335,8 +35405,10 @@ zudugo
 @source:nintendo/nes_vt09.cpp
 cybar120
 dturbogt
-jl2050
+gujtv108
 joypad65
+mc_dcat8
+mc_dcat8a
 msiwwe
 msiwwea
 msidd
@@ -35345,8 +35417,10 @@ msimm2
 msinamco
 msisinv
 msifrog
+pumpactv
 rcapnp
 senario25
+techni4
 timetp25
 ventur25
 vgtablet
@@ -35356,34 +35430,52 @@ vsmaxtx2
 wfmotor
 
 @source:nintendo/nes_vt32.cpp
+bittboy
 dgun2573
 dgun2573a
 dgunl3201
 dgunl3202
+fapocket
 fcpocket
+g5_500
+g9_666
+gbox2019
+gprnrs1
+gprnrs16
+hhgc319
+lxpcli
 lxpcsp
 matet100
 matet220
 matet300
+mc_7x6ss
+mc_8x6ss
+mc_9x6sa
+mc_9x6ss
+mc_hh210
 myaasa
 myaass
+retro400
+rfcp168
 rminitv
 
 @source:nintendo/nes_vt369_vtunknown.cpp
+36pcase
+168pcase
 240in1ar
-bittboy
 denv150
 dgun2561
+dgun2572
 dgun2577
 dgun2593
 dvnimbus
 egame150
-fapocket
+gbox2020
 gcs2mgp
 gtct885
-hhgc319
 hkb502
 hkb502a
+jl2050
 lexi30
 lpgm240
 lxcap
@@ -35393,29 +35485,34 @@ lxccplan
 lxcmc250
 lxcmcy
 lxcmcyba
+lxcmcybt
 lxcmcycr
 lxcmcydp
+lxcmcydpn
 lxcmcyfz
 lxcmcypj
 lxcmcypp
 lxcmcysp
+lxcmcyspn
 lxcmcysw
 lxcyber
+lxcypkdp
+lxcypksp
 matet10
 matetsl
+mc_110cb
+mc_138cb
+mc_89in1
 mc_cb280
-mc_hh210
 mog_m320
 myarccn
 nesvt270
 nubsupmf
 otrail
 pactin
-q5_500in1
 rbbrite
 rd5_240
 red5mam
-retro400
 rtvgc300
 rtvgc300fz
 sealvt
@@ -35424,8 +35521,6 @@ sy889
 tetrtin
 tup240
 unk128vt
-unk2019hh
-unk2020hh
 unkra200
 vibes240
 zonefusn
@@ -35639,6 +35734,7 @@ wrecking
 
 @source:nintendo/vt1682.cpp
 110dance
+anpncpc
 cmpmx10
 cmpmx11
 dance555
@@ -35662,9 +35758,6 @@ wowwg
 xing48
 zone7in1
 zone7in1p
-
-@source:nintendo/vt_unknown.cpp
-dgun2572
 
 @source:nix/fitfight.cpp
 bbprot
@@ -37583,6 +37676,7 @@ smbpa
 smbpb
 smbpc
 smbpv
+smbpva
 snspares
 snspares1
 snspares2
@@ -38069,6 +38163,7 @@ pb_l5
 pb_p4
 
 @source:pinball/s11b.cpp
+bcats_f1
 bcats_g4
 bcats_l2
 bcats_l5
@@ -40115,6 +40210,7 @@ genesis_tmss
 laseract
 laseractj
 mahg156
+mdhh100
 megacd
 megacd2
 megacd2j
@@ -40157,6 +40253,8 @@ mdtvp1j
 mdtvp2j
 mdtvp3j
 msi_sf2
+mympac
+mypac
 ra145
 rad_gen1
 rad_gen2
@@ -42748,6 +42846,19 @@ zx97
 @source:sinclair/specnext.cpp
 tbblue
 
+@source:sinclair/z88.cpp
+z88
+z88ch
+z88de
+z88dk
+z88es
+z88fi
+z88fr
+z88it
+z88no
+z88se
+z88tr
+
 @source:skeleton/600cat.cpp
 600cat
 
@@ -42899,6 +43010,9 @@ ckz80
 dmndhrt
 dmndhrtn
 honeybee
+
+@source:skeleton/clownmgc.cpp
+clownmgc
 
 @source:skeleton/clxvme186.cpp
 clxvme186
@@ -43218,6 +43332,7 @@ lggp40
 
 @source:skeleton/lgtz80.cpp
 arthurkn
+arthurkn100
 fruitcat
 
 @source:skeleton/lilith.cpp
@@ -45107,6 +45222,7 @@ contcircu
 contcircua
 dblaxle
 dblaxleu
+dblaxleua
 dblaxleul
 enforce
 enforcej
@@ -45226,7 +45342,6 @@ dendego3
 landhigh
 landhigha
 pwrshovl
-pwrshovla
 raizpin
 raizpinj
 styphp
@@ -46268,6 +46383,9 @@ emma2
 @source:trainer/instruct.cpp
 instruct
 
+@source:trainer/mac3.cpp
+mac3
+
 @source:trainer/mcg85.cpp
 mcg85
 
@@ -46486,6 +46604,7 @@ imgame
 jak_bj
 jak_prr
 jak_spmm
+jak_tpir
 myac220
 smartfp
 smartfpf
@@ -46493,16 +46612,17 @@ smartfps
 tkmag220
 
 @source:tvgames/generalplus_gpl16250_romram.cpp
-paccon
-lazertag
+jak_pf
+jak_prft
 jak_s500
 jak_sinv
 jak_smwm
-jak_pf
-jak_prft
+jak_swcl
+jak_ths
 jak_tink
 jak_totm
-jak_ths
+lazertag
+paccon
 tomycar
 wrlshunt
 
@@ -46511,6 +46631,7 @@ anpanbd
 anpanm15
 bk139in1
 bkrankp
+lxcyrace
 prailpls
 
 @source:tvgames/generalplus_gpl16250_spi_direct.cpp
@@ -46521,6 +46642,7 @@ bfmpac
 bfpacman
 bfspyhnt
 bftetris
+punirune
 siddr
 wiwcs
 
@@ -46579,12 +46701,18 @@ conyping
 conyteni
 easports
 easportsu
+jak_blue
 jak_bobb
+jak_bobbo
 jak_capb
 jak_diso
+jak_dood
 jak_sbdd
 jak_spdmo
 jak_spdmoa
+jak_ssmo
+jak_thom
+jak_thomp
 jak_wpt
 sstarkar
 
@@ -46592,6 +46720,7 @@ sstarkar
 hyprscan
 jak_bbh
 jak_bbsf
+prail07
 zonefamf
 
 @source:tvgames/spg29x_lexibook_jg7425.cpp
@@ -46606,8 +46735,11 @@ zone3d
 ablkickb
 abltenni
 anpantv
+backybbs
 ban_krkk
 ban_tam2
+barbpet
+carled99
 comil
 ddr33v
 decathln
@@ -46629,24 +46761,30 @@ guitarfv
 guitarss
 guitarssa
 hotwhl2p
+hotwhls
 itvphone
 jeuint
 jjstrip
 jouet
 knd
 lexiart
+lpetshop
 lxairjet
 lxspidaj
 mattelcs
+mylpony
 ordentv
 pballpup
 prail
 rad_crik
 rad_fb2
+rad_jib
 rad_skat
 rad_skatp
+rocksock
 senspeed
 senwfit
+smartcyc
 swclone
 tiktokmm
 tmntbftc
@@ -46659,6 +46797,7 @@ vtechtvsgr
 vtechtvssp
 wfart
 wfcentro
+whacmole
 wordlnch
 
 @source:tvgames/spg2xx_digimake.cpp
@@ -46674,16 +46813,22 @@ icanguit
 icanpian
 
 @source:tvgames/spg2xx_jakks.cpp
+jak_1vs
+jak_5thg
+jak_avtr
 jak_batm
 jak_cind
 jak_ctah
 jak_dond
 jak_dpma
 jak_dwa
+jak_dwmn
+jak_dwmno
 jak_gdg
 jak_hm1m
 jak_hmbb
 jak_hsm
+jak_jpdy
 jak_marv
 jak_mk
 jak_mpaco
@@ -46705,6 +46850,8 @@ jak_spdv
 jak_supm
 jak_wall
 jak_wof2
+jak_xmen
+jak_xmenp
 
 @source:tvgames/spg2xx_jakks_gkr.cpp
 jak_capc
@@ -46716,8 +46863,6 @@ jak_dora
 jak_dorr
 jak_dpr
 jak_dprs
-jak_dwmn
-jak_dwmno
 jak_fan4
 jak_just
 jak_mpac
@@ -46731,7 +46876,6 @@ jak_spdm
 jak_swot
 jak_wof
 jak_wwe
-jak_xmenp
 
 @source:tvgames/spg2xx_jakks_sharp.cpp
 jsc_dora
@@ -46751,6 +46895,7 @@ arcade3d
 lexizeus
 lexiseal
 discpal
+disppal
 vgcaplet
 vgcap35
 vsplus
@@ -46762,13 +46907,15 @@ mysptqvc
 mgt20in1
 
 @source:tvgames/spg2xx_pdc.cpp
-pdc100
-pdc50
-pdc200
-pdc40t
-pdc150t
-tmntpdc
 dorapdc
+ouipdc
+pdc30p
+pdc40t
+pdc50
+pdc100
+pdc150t
+pdc200
+tmntpdc
 vjpp2
 
 @source:tvgames/spg2xx_playvision.cpp
@@ -46854,6 +47001,7 @@ dphh8630
 mc_cb203
 pg118
 ragc153
+retro150
 rhhc152
 supreme
 toumapet
@@ -46987,6 +47135,7 @@ domfitad
 dombikec
 epo_dabj
 epo_dtcj
+epo_sskj
 
 @source:tvgames/xavix_2000.cpp
 ban_omt
@@ -47013,18 +47162,20 @@ anpanmdx
 apmj2009
 ban_bkgj
 ban_dn1j
+ban_gkrj
 ban_kksj
+ban_ordj
 ban_ult
 ban_utmj
-epo_ntpj
-epo_rgfj
-ban_ordj
+ban_um2j
 domdance
 domfitch
 domfitex
 domstepc
 doradraw
 epo_doka
+epo_ntpj
+epo_rgfj
 epo_tfit
 maxheart
 mrangbat
@@ -47042,8 +47193,10 @@ xavbassf
 xavbowl
 xavbowlj
 xavbox
+xavcheck
 xavjmat
 xavmusic
+xavpkjr
 xavtenni
 
 @source:ultimachine/rambo.cpp
@@ -47727,6 +47880,7 @@ snotec
 snotecex
 snotecu
 snotecug
+snotecut
 
 @source:vtech/primusex.cpp
 primusex

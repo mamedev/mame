@@ -75,23 +75,23 @@ public:
 		m_soc(*this, "soc")
 	{ }
 
-	void nes_vt_pal_1mb(machine_config& config);
-	void nes_vt_pal_2mb(machine_config& config);
-	void nes_vt_pal_4mb(machine_config& config);
-	void nes_vt_pal_8mb(machine_config& config);
-	void nes_vt_pal_16mb(machine_config& config);
+	void nes_vt_pal_1mb(machine_config& config) ATTR_COLD;
+	void nes_vt_pal_2mb(machine_config& config) ATTR_COLD;
+	void nes_vt_pal_4mb(machine_config& config) ATTR_COLD;
+	void nes_vt_pal_8mb(machine_config& config) ATTR_COLD;
+	void nes_vt_pal_16mb(machine_config& config) ATTR_COLD;
 
-	void nes_vt_512kb(machine_config& config);
-	void nes_vt_1mb(machine_config& config);
-	void nes_vt_2mb(machine_config& config);
-	void nes_vt_4mb(machine_config& config);
-	void nes_vt_8mb(machine_config& config);
-	void nes_vt_16mb(machine_config& config);
-	void nes_vt_32mb(machine_config& config);
+	void nes_vt_512kb(machine_config& config) ATTR_COLD;
+	void nes_vt_1mb(machine_config& config) ATTR_COLD;
+	void nes_vt_2mb(machine_config& config) ATTR_COLD;
+	void nes_vt_4mb(machine_config& config) ATTR_COLD;
+	void nes_vt_8mb(machine_config& config) ATTR_COLD;
+	void nes_vt_16mb(machine_config& config) ATTR_COLD;
+	[[maybe_unused]] void nes_vt_32mb(machine_config& config) ATTR_COLD;
 
-	void nes_vt_1mb_majkon(machine_config& config);
+	void nes_vt_1mb_majkon(machine_config& config) ATTR_COLD;
 
-	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
+	[[maybe_unused]] void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_8mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_4mbyte(address_map &map) ATTR_COLD;
@@ -101,8 +101,8 @@ public:
 
 	void vt_external_space_map_1mbyte_majkon(address_map &map) ATTR_COLD;
 
-	void init_protpp();
-	void init_gamezn2();
+	void init_protpp() ATTR_COLD;
+	void init_gamezn2() ATTR_COLD;
 
 protected:
 	required_device<nes_vt02_vt03_soc_device> m_soc;
@@ -116,15 +116,15 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_vh2009(machine_config& config);
-	void nes_vt_vh2009_pal(machine_config& config);
-	void nes_vt_vh2009_1mb(machine_config& config);
-	void nes_vt_vh2009_2mb(machine_config& config);
-	void nes_vt_vh2009_pal_2mb(machine_config& config);
-	void nes_vt_vh2009_4mb(machine_config& config);
-	void nes_vt_vh2009_8mb(machine_config& config);
+	void nes_vt_vh2009(machine_config& config) ATTR_COLD;
+	void nes_vt_vh2009_pal(machine_config& config) ATTR_COLD;
+	void nes_vt_vh2009_1mb(machine_config& config) ATTR_COLD;
+	void nes_vt_vh2009_2mb(machine_config& config) ATTR_COLD;
+	void nes_vt_vh2009_pal_2mb(machine_config& config) ATTR_COLD;
+	void nes_vt_vh2009_4mb(machine_config& config) ATTR_COLD;
+	void nes_vt_vh2009_8mb(machine_config& config) ATTR_COLD;
 
-	void nes_vt_senwld_512kb(machine_config& config);
+	void nes_vt_senwld_512kb(machine_config& config) ATTR_COLD;
 
 protected:
 	void vt_external_space_map_senwld_512kbyte(address_map &map) ATTR_COLD;
@@ -137,7 +137,7 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_pjoy_4mb(machine_config& config);
+	void nes_vt_pjoy_4mb(machine_config& config) ATTR_COLD;
 };
 
 class nes_vt_waixing_state : public nes_vt_state
@@ -147,9 +147,11 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_waixing_512kb(machine_config& config);
-	void nes_vt_waixing_512kb_rasterhack(machine_config& config);
-	void nes_vt_waixing_2mb(machine_config& config);
+	void nes_vt_waixing_512kb(machine_config& config) ATTR_COLD;
+	void nes_vt_waixing_512kb_rasterhack(machine_config& config) ATTR_COLD;
+	void nes_vt_waixing_2mb(machine_config& config) ATTR_COLD;
+
+	void init_hs36in1() ATTR_COLD;
 };
 
 class nes_vt_waixing_alt_state : public nes_vt_waixing_state
@@ -159,8 +161,8 @@ public:
 		nes_vt_waixing_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_waixing_alt_4mb(machine_config& config);
-	void nes_vt_waixing_alt_pal_8mb(machine_config& config);
+	void nes_vt_waixing_alt_4mb(machine_config& config) ATTR_COLD;
+	void nes_vt_waixing_alt_pal_8mb(machine_config& config) ATTR_COLD;
 };
 
 class nes_vt_waixing_alt_sporzpp_state : public nes_vt_waixing_alt_state
@@ -170,8 +172,8 @@ public:
 		nes_vt_waixing_alt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config);
-	void nes_vt_pal_4mb_sporzbxa(machine_config& config);
+	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config) ATTR_COLD;
+	void nes_vt_pal_4mb_sporzbxa(machine_config& config) ATTR_COLD;
 
 private:
 	uint8_t in1_r() override
@@ -213,8 +215,8 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_hummer_2mb(machine_config& config);
-	void nes_vt_hummer_4mb(machine_config& config);
+	void nes_vt_hummer_2mb(machine_config& config) ATTR_COLD;
+	void nes_vt_hummer_4mb(machine_config& config) ATTR_COLD;
 };
 
 class nes_vt_sp69_state : public nes_vt_state
@@ -224,7 +226,7 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_4mb_sp69(machine_config& config);
+	void nes_vt_4mb_sp69(machine_config& config) ATTR_COLD;
 };
 
 class nes_vt_ablping_state : public nes_vt_state
@@ -234,8 +236,8 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_2mb_ablping(machine_config& config);
-	void nes_vt_2mb_vfootbal(machine_config& config);
+	void nes_vt_2mb_ablping(machine_config& config) ATTR_COLD;
+	void nes_vt_2mb_vfootbal(machine_config& config) ATTR_COLD;
 
 private:
 	uint8_t ablping_extraio_r();
@@ -252,7 +254,7 @@ public:
 		m_plunger(*this, "PLUNGER")
 	{ }
 
-	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config);
+	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -1056,6 +1058,16 @@ ROM_START( sen101 )
 	ROM_LOAD( "101n1.bin", 0x00000, 0x400000, CRC(b03e1824) SHA1(c9ac4e16220414c1aa679133191140ced9986e9c) )
 ROM_END
 
+ROM_START( hs36red )
+	ROM_REGION( 0x200000, "mainrom", 0 ) // address and data lines swapped
+	ROM_LOAD( "mx29lv160cb.u3", 0x00000, 0x200000, CRC(318a81bb) SHA1(8b207e6a5fca53cbf383b79ff570fcdb89639fa3) )
+ROM_END
+
+ROM_START( hs36blk )
+	ROM_REGION( 0x200000, "mainrom", 0 ) // address and data lines swapped
+	ROM_LOAD( "mx29lv160cbtc.u3", 0x00000, 0x200000, CRC(b5cf91a0) SHA1(399f015fb0580c90928e7f3d73810cc4b6cc70d9) )
+ROM_END
+
 ROM_START( mc_dg101 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "dreamgear 101-in-1.prg", 0x00000, 0x400000, CRC(6a7cd8f4) SHA1(9a5ceb8e5e38eb93699dbb14c2c36f3a501d9c45) )
@@ -1179,39 +1191,6 @@ ROM_START( mc_8x6cb )
 	ROM_LOAD( "888888-in-1,coolboy aef-390 8bit console, b8vpcbver03 20130703 0401e2015897a.prg", 0x00000, 0x400000, CRC(ca4bd948) SHA1(cfd6c0b03bb432de43d070100031b223c9ee7496) )
 ROM_END
 
-ROM_START( mc_110cb )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "29w320dt.bin", 0x00000, 0x400000, CRC(a4bed7eb) SHA1(f1aa89916264ba781d3f1390a2336ef42129b607) )
-ROM_END
-
-ROM_START( mc_138cb )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "138-in-1 coolbaby, coolboy rs-5, pcb060-10009011v1.3.bin", 0x00000, 0x400000, CRC(6b5b1a1a) SHA1(2df0cd717bd0de0b0c973ac356426ddbb0d736fa) )
-ROM_END
-
-ROM_START( mc_7x6ss )
-	ROM_REGION( 0x100000, "mainrom", 0 )
-	ROM_LOAD( "777777-in-1, 8 bit slim station, newpxp-dvt22-a pcb.bin", 0x00000, 0x100000, CRC(7790c21a) SHA1(f320f3dd18b88ae5f65bb51f58d4cb869997bab3) )
-ROM_END
-
-ROM_START( mc_8x6ss )
-	ROM_REGION( 0x100000, "mainrom", 0 ) // odd size rom, does it need stripping?
-	ROM_LOAD( "888888-in-1, 8 bit slim station, newpxp-dvt22-a pcb.bin", 0x00000, 0x100000, CRC(47149d0b) SHA1(5a8733886b550e3235dd90fb415b5a602e967f91) )
-	ROM_IGNORE(0xce1)
-ROM_END
-
-// PXP2 8Bit Slim Station
-ROM_START( mc_9x6ss )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "s29gl032.u3", 0x00000, 0x400000, CRC(9f4194e8) SHA1(bd2a356aea56188ea78169095cbbe603d00e0063) )
-ROM_END
-
-// same machine as above? is one of these bad?
-ROM_START( mc_9x6sa )
-	ROM_REGION( 0x200000, "mainrom", 0 )
-	ROM_LOAD( "999999-in-1, 8 bit slim station, newpxp-dvt22-a pcb.bin", 0x00000, 0x200000, CRC(6a47c6a0) SHA1(b4dd376167a57dbee3dea70eb16f1a38e16bcdaa) )
-ROM_END
-
 ROM_START( fccomp88 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "m29dw323db.u3", 0x00000, 0x400000, CRC(77664c7e) SHA1(2499cbabf74951ea99e71546e54d37b8b18bb1f3) )
@@ -1220,26 +1199,6 @@ ROM_END
 ROM_START( mc_sam60 )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "29lv160b.bin", 0x00000, 0x200000, CRC(7dac8efe) SHA1(ffb27ebb4299d5b9a4b976c418fcc7695200060c) )
-ROM_END
-
-ROM_START( mc_dcat8 )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "100-in-1, d-cat8 8bit console, v5.01.11-frd, bl 20041217.prg", 0x00000, 0x800000, CRC(97d20611) SHA1(d49796e66d7b1dff0ee2781cb0e48b777969d83f) )
-ROM_END
-
-ROM_START( mc_dcat8a )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "s29gl064.u6", 0x00000, 0x800000, CRC(e28b1ef8) SHA1(4a6f107d2189cbe1bb0b86b3738d0af58e24e0f7) )
-ROM_END
-
-ROM_START( gprnrs1 )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "gprnrs1.bin", 0x00000, 0x800000, CRC(c3ffcec8) SHA1(313a790fb51d0b155257f9de84726ed67da43a8f) )
-ROM_END
-
-ROM_START( gprnrs16 )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "gprnrs16.bin", 0x00000, 0x2000000, CRC(bdffa40a) SHA1(3d01907211f18e8415171dfc6c1d23cf5952e7bb) )
 ROM_END
 
 ROM_START( ddrdismx )
@@ -1287,11 +1246,6 @@ ROM_START( vt25in1 )
 	ROM_LOAD( "25in1.bin", 0x00000, 0x100000, CRC(1038b5ec) SHA1(e7d1ccafe0edcfa44c11412d2aa771f4ba96b5b8) )
 ROM_END
 
-ROM_START( pumpactv )
-	ROM_REGION( 0x100000, "mainrom", ROMREGION_ERASEFF )
-	ROM_LOAD( "pumpactive.bin", 0x00000, 0x100000, CRC(e3c07561) SHA1(2bfff426d72d481ba0647e9110f942d142a4625f) )
-ROM_END
-
 ROM_START( zudugo )
 	ROM_REGION( 0x400000, "mainrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "zudugo.bin", 0x00000, 0x400000, CRC(0fa9d9ad) SHA1(7533eaf51785d8fcced900ea0498281b0cf49dbf) )
@@ -1302,19 +1256,9 @@ ROM_START( ablping )
 	ROM_LOAD( "abl_pingpong.bin", 0x00000, 0x200000, CRC(b31de1fb) SHA1(94e8afb2315ba1fa0892191c8e1832391e401c70) )
 ROM_END
 
-ROM_START( mc_89in1 )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "89in1.bin", 0x00000, 0x400000, CRC(b97f8ce5) SHA1(1a8e67f2b58a671ceec2b0ed18ec5954a71ae63a) )
-ROM_END
-
 ROM_START( cbrs8 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "rs-8.bin", 0x00000, 0x1000000, BAD_DUMP CRC(10b2bed0) SHA1(0453a1e6769818ccf25dcf22b2c6198a5688a1d4) )
-ROM_END
-
-ROM_START( rfcp168 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "winbond_w29gl128c.bin", 0x00000, 0x1000000, CRC(d11caf71) SHA1(64b269cee30a51549a2d0491bbeed07751771559) )
+	ROM_LOAD( "rs-8.bin", 0x00000, 0x1000000, BAD_DUMP CRC(10b2bed0) SHA1(0453a1e6769818ccf25dcf22b2c6198a5688a1d4) ) // BADADDRxxxxxxxxxxxxxxxxxxxxxxx-
 ROM_END
 
 ROM_START( mc_tv200 )
@@ -1330,11 +1274,6 @@ ROM_END
 ROM_START( ablmini )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "ablmini.bin", 0x00000, 0x800000, CRC(e65a2c3a) SHA1(9b4811e5b50b67d74b9602471767b8bcd24dd59b) )
-ROM_END
-
-ROM_START( techni4 )
-	ROM_REGION( 0x200000, "mainrom", 0 )
-	ROM_LOAD( "technigame.bin", 0x00000, 0x200000, CRC(3c96b1b1) SHA1(1acc81b26e740327bd6d9faa5a96ab027a48dd77) )
 ROM_END
 
 ROM_START( protpp )
@@ -1389,11 +1328,6 @@ ROM_START( tvmjfc )
 	ROM_LOAD( "s29al016m90tfir2_tsop48.bin", 0x00000, 0x200000, CRC(28ef6219) SHA1(7ac2592f2a88532f537629660074ebae08efab82) )
 ROM_END
 
-ROM_START( gujtv108 )
-	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
-	ROM_LOAD( "29lv320.u1", 0x00000, 0x400000, CRC(56df0a09) SHA1(03aa6ad71ab283c99608a6dfa55c96148841bd10) )
-ROM_END
-
 
 void nes_vt_state::init_protpp()
 {
@@ -1424,6 +1358,29 @@ void nes_vt_state::init_gamezn2()
 			buffer[i] = bitswap<8>(src[i],7,6,5,4,3,2,0,1); // bottom 2 bits are swapped?
 		}
 
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
+	}
+}
+
+void nes_vt_waixing_state::init_hs36in1()
+{
+	u8 *src = memregion("mainrom")->base();
+	int len = memregion("mainrom")->bytes();
+
+	std::vector<u8> buffer(len);
+	{
+		for (int i = 0; i < len; i++)
+		{
+			// TODO: check if uppermost address lines shouldn't be swapped
+			// A16-A7 swap should be OK for hs36red, but is it also good for hs36blk?
+			int newaddr = bitswap<21>(i, 20, 19, 18, 17, 16,
+				15, 7, 9, 10,
+				11, 12, 8, 13,
+				14, 6, 5, 4,
+				3, 2, 1, 0);
+
+			buffer[i] = bitswap<8>(src[newaddr], 7, 6, 4, 5, 3, 1, 2, 0);
+		}
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 }
@@ -1470,12 +1427,10 @@ CONS( 200?, mc_dgear,  0,  0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, 
 
 CONS( 200?, sudo6in1,  0,  0,  nes_vt_pal_1mb,    nes_vt, nes_vt_state, empty_init, "Nice Code", "6-in-1 Sudoku Plug & Play", MACHINE_IMPERFECT_GRAPHICS ) // no manufacturer info on packaging, games seem to be from Nice Code, although this isn't certain
 
-CONS( 200?, gujtv108,  0,  0,  nes_vt_4mb,        nes_vt, nes_vt_state, empty_init, "YSN",    "GameU Joint TV Bank 108-in-1 (model AH9069)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
 CONS( 200?, sudopptv,  0, 0,  nes_vt_waixing_512kb_rasterhack,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
+CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites just like standalone cart (nes:happybiqa)
 
 // 060303 date code on PCB
 CONS( 2006, ablmini,   0, 0,  nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
@@ -1496,9 +1451,6 @@ CONS( 200?, majgnc,    0, 0,  nes_vt_1mb, majgnc, nes_vt_state,  empty_init, "Ma
 
 CONS( 2004, vt25in1,   0, 0,  nes_vt_1mb, nes_vt, nes_vt_state,  empty_init, "<unknown>", "unknown VT02 based 25-in-1 handheld", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// might be a later VT type, 'pump' control is mapped on extra IO address that I don't think is present on 02/03
-CONS( 200?, pumpactv,  0, 0,  nes_vt_1mb, nes_vt, nes_vt_state,  empty_init, "Giggle", "TV Pump Active", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
 CONS( 2004, vsmaxx17,  0,  0,  nes_vt_vh2009_2mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx 17-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // from a Green unit, '17 Classic & Racing Game'
 CONS( 200?, vsmax25v,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx 25-in-1 (VT03 hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -1515,9 +1467,6 @@ CONS( 2005, lxnoddy,   0,  0,  nes_vt_vh2009_pal_2mb,        lxnoddy, nes_vt_swa
 
 // mostly bootleg NES games, but also has Frogger, Scramble and Asteroids in it
 CONS( 200?, gamezn2,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, init_gamezn2, "<unknown>", "Game Zone II 128-in-1", MACHINE_IMPERFECT_GRAPHICS ) // was this PAL? (lots of raster splits are broken at the moment either way)
-
-// die is marked as VH2009, as above, but no scrambled opcodes here
-CONS( 201?, techni4,   0,  0,  nes_vt_pal_2mb,           nes_vt, nes_vt_state,               empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2005, senwld,   0,          0,  nes_vt_senwld_512kb,    nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Win, Lose or Draw (Senario)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // needs RAM in banked space, Alpha display emulating, Touchpad emulating etc.
 
@@ -1543,17 +1492,9 @@ CONS( 200?, zdog,      0,  0,  nes_vt_hummer_4mb,    nes_vt, nes_vt_hum_state, e
 CONS( 200?, pjoyn50,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, pjoys30,    0,        0,  nes_vt_pjoy_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 30 in 1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, pjoys60,    0,        0,  nes_vt_pjoy_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 60 in 1", MACHINE_IMPERFECT_GRAPHICS )
-// both offer chinese or english menus
-CONS( 200?, mc_110cb,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "110 in 1 CoolBaby (CoolBoy RS-1S)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_138cb,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_IMPERFECT_GRAPHICS )
 
 // doesn't boot, bad dump
 CONS( 201?, cbrs8,      0,        0,  nes_vt_16mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "CoolBoy RS-8 168 in 1", MACHINE_NOT_WORKING )
-
-CONS( 201?, rfcp168,    0,        0,  nes_vt_16mb,    nes_vt, nes_vt_state, empty_init, "<unknown>",   "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"  (doesn't boot, ends up in weeds after jumping to bank with no code, dump not verified)
-
-CONS( 200?, gprnrs1,    0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, gprnrs16,   0,        0,  nes_vt_32mb,   nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
 
 // Notes about the DDR games:
 // * Missing PCM sounds (unsupported in NES VT APU code right now)
@@ -1569,21 +1510,16 @@ CONS( 2006, dbdancem,   0,        0,  nes_vt_2mb, dbdancem, nes_vt_state, empty_
 // Senario had another 101 unit with different games (not JungleTac or NES bootlegs) it might be the same as the dreamGEAR 101 below
 CONS( 2009, sen101,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "Senario", "101 Games in 1 (Senario, NES/Famicom bootlegs)", MACHINE_IMPERFECT_GRAPHICS )
 
+// possibly designed by wellminds (M350 etc.)
+CONS( 2010, hs36red,  0,        0,  nes_vt_waixing_2mb, nes_vt, nes_vt_waixing_state, init_hs36in1, "HengSheng", "HengSheng 36-in-1 (Red pad)", MACHINE_NOT_WORKING )
+CONS( 2010, hs36blk,  0,        0,  nes_vt_waixing_2mb, nes_vt, nes_vt_waixing_state, init_hs36in1, "HengSheng", "HengSheng 36-in-1 (Black pad)", MACHINE_NOT_WORKING )
+
 // unsorted, these were all in nes.xml listed as ONE BUS systems
 CONS( 200?, mc_dg101,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?
 CONS( 200?, mc_aa2,     0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 Arcade Action II (AT-103)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_105te,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "2011 Super HiK 105 in 1 Turbo Edition", MACHINE_NOT_WORKING )
 CONS( 200?, mc_8x6cb,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy",   "888888 in 1 (Coolboy AEF-390)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, mc_9x6ss,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "999999 in 1 (PXP2 Slim Station)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_9x6sa,   mc_9x6ss, 0,  nes_vt_2mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_7x6ss,   0,        0,  nes_vt_1mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "777777 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_8x6ss,   0,        0,  nes_vt_1mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2004, mc_dcat8,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 201?, fccomp88,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "Columbus Circle", "FC Compact 88-in-1 (CC-SFFC-WT) (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-
-// Runs well, all games seem to work
-CONS( 201?, mc_89in1,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "89 in 1 Mini Game Console (060-92023011V1.0)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Works fine, uses ony VT02 features
 CONS( 201?, mc_tv200,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "Thumbs Up", "200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
@@ -1608,4 +1544,4 @@ CONS( 201?, dgun2869,  0,         0,  nes_vt_16mb,     nes_vt, nes_vt_state, emp
 CONS( 201?, dgun2959,  0,         0,  nes_vt_pal_16mb, nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Plug And Play 220 Game Retro Controller (DGUN-2959)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // needs inputs - unit is a Mahjong controller.  This is said to be a hack(?) of a Famicom game (unless it was licensed by the original developer)
-CONS( 200?, tvmjfc,    0,        0,  nes_vt_2mb,    nes_vt, nes_vt_state, empty_init, "bootleg?", "TV Mahjong Game (VTxx hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, tvmjfc,    0,        0,  nes_vt_2mb,    nes_vt, nes_vt_state, empty_init, "bootleg?", "TV Mahjong Game (VTxx hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )	

@@ -30,8 +30,8 @@ protected:
 	virtual void menu_activated() override;
 	virtual void menu_deactivated() override;
 
-private:	
-	enum { RS_TYPE, RS_LATENCY, RS_LENGTH, RS_PHASES };
+private:
+	enum { RS_TYPE = 0x1000, RS_LATENCY, RS_LENGTH, RS_PHASES };
 
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;

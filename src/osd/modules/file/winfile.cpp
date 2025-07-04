@@ -107,8 +107,20 @@ public:
 
 	virtual std::error_condition flush() noexcept override
 	{
-		// shouldn't be any userspace buffers on the file handle
+		// The file handle buffers data which the OS flushes to disk cache
+		// periodically.  The trouble with calling FlushFileBuffers here is that
+		// it also forces the data and metadata caches to be flushed to storage,
+		// which can cause performance issues.  The real solution would be to
+		// rewrite this class to use FILE_FLAG_NO_BUFFERING, which would require
+		// it to do its own buffering and only perform sector-aligned I/O.
+#if 0
+		if (!FlushFileBuffers(m_handle))
+			return win_error_to_error_condition(GetLastError());
+		else
+			return std::error_condition();
+#else
 		return std::error_condition();
+#endif
 	}
 
 private:
@@ -359,7 +371,7 @@ bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, 
 //  osd_stat
 //============================================================
 
-std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
+osd::directory::entry::ptr osd_stat(const std::string &path)
 {
 	// convert the path to TCHARs
 	osd::text::tstring t_path;
@@ -401,7 +413,7 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 	result->size = find_data.nFileSizeLow | ((uint64_t) find_data.nFileSizeHigh << 32);
 	result->last_modified = win_time_point_from_filetime(&find_data.ftLastWriteTime);
 
-	return std::unique_ptr<osd::directory::entry>(result);
+	return osd::directory::entry::ptr(result);
 }
 
 

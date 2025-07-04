@@ -222,9 +222,6 @@ static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, poly_vertex *v
 		nextin = (nextdot >= clip_plane.distance) ? 1 : 0;
 
 		/* Add a clipped vertex if one end of the current edge is inside the plane and the other is outside */
-		// TODO: displaying Honey in Fighting Vipers and Bean in Sonic the Fighters somehow causes a NaN dot product here,
-		//       causing MAME to hardlock in the renderer routine. They are also causing lots of invalid polygon renders
-		//       which might be related.
 		if ( curin != nextin && std::isnan(curdot) == false && std::isnan(nextdot) == false )
 		{
 			scale = (clip_plane.distance - curdot) / (nextdot - curdot);
@@ -637,10 +634,10 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, u32 attr )
 	/* update the address */
 	raster->command_buffer[1] += tho * 4;
 
-	/* set the luma value of this quad */
+	/* set the luma value of this triangle */
 	object.luma = (raster->command_buffer[9] >> 15) & 0xff;
 
-	/* determine whether we can cull this quad */
+	/* determine whether we can cull this triangle */
 	cull = check_culling(raster,attr,min_z,max_z);
 
 	/* set the object's z value */
@@ -804,18 +801,18 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 	vp &= cliprect;
 
 	extra.state = &m_state;
-	extra.lumabase = ((tri->texheader[1] & 0xff) << 7) + ((tri->luma >> 5) ^ 0x7);
+	extra.lumabase = (tri->texheader[1] & 0xff) << 7;
 	extra.colorbase = (tri->texheader[3] >> 6) & 0x3ff;
+	extra.luma = tri->luma;
 
 	if (renderer & 2)
 	{
 		extra.texwidth = 32 << ((tri->texheader[0] >> 0) & 0x7);
 		extra.texheight = 32 << ((tri->texheader[0] >> 3) & 0x7);
-		extra.texx = 32 * ((tri->texheader[2] >> 0) & 0x1f);
-		extra.texy = 32 * (((tri->texheader[2] >> 6) & 0x1f) + ( tri->texheader[2] & 0x20 ));
-		/* TODO: Virtua Striker contradicts with this. */
-		extra.texmirrorx = 0;//(tri->texheader[0] >> 9) & 1;
-		extra.texmirrory = 0;//(tri->texheader[0] >> 8) & 1;
+		extra.texx = 32 * ((tri->texheader[2] >> 0) & 0x3f);
+		extra.texy = 32 * ((tri->texheader[2] >> 6) & 0x1f);
+		extra.texmirrorx = (tri->texheader[0] >> 8) & 1;
+		extra.texmirrory = (tri->texheader[0] >> 9) & 1;
 		extra.texsheet = (tri->texheader[2] & 0x1000) ? m_state.m_textureram1 : m_state.m_textureram0;
 
 		tri->v[0].pz = 1.0f / (tri->v[0].pz + std::numeric_limits<float>::min());
@@ -906,7 +903,7 @@ inline void model2_state::model2_3d_project( triangle *tri )
 }
 
 /* 3D Rasterizer frame start: Resets frame variables */
-void model2_state::model2_3d_frame_start( void )
+void model2_state::model2_3d_frame_start()
 {
 	raster_state *raster = m_raster.get();
 
@@ -1092,7 +1089,7 @@ void model2_state::model2_3d_push( raster_state *raster, u32 input )
 				for( i = 0; i < 4; i++ )
 				{
 					/* center x */
-					raster->center[i][0] = (raster->command_buffer[2+i] >> 12) & 0xffF;
+					raster->center[i][0] = (raster->command_buffer[2+i] >> 12) & 0xfff;
 
 					if ( raster->center[i][0] & 0x800 )
 						raster->center[i][0] = -( 0x800 - (raster->center[i][0] & 0x7ff) );
@@ -1324,10 +1321,9 @@ void model2_state::geo_parse_np_ns( geo_state *geo, u32 *input, u32 count )
 			else luminance = fabs( dotl );
 
 			luminance = (luminance * texparam->diffuse) + texparam->ambient;
-			luma = (int32_t)luminance;
+			luminance = std::clamp(luminance, 0.0f, 255.0f);
 
-			if ( luma > 255 ) luma = 255;
-			if ( luma < 0 ) luma = 0;
+			luma = (int32_t)luminance;
 
 			/* add the face bit to the luma */
 			luma += face;
@@ -1481,10 +1477,9 @@ void model2_state::geo_parse_np_s( geo_state *geo, u32 *input, u32 count )
 			specular *= texparam->specular_scale;
 
 			luminance = (luminance * texparam->diffuse) + texparam->ambient + specular;
-			luma = (int32_t)luminance;
+			luminance = std::clamp(luminance, 0.0f, 255.0f);
 
-			if ( luma > 255 ) luma = 255;
-			if ( luma < 0 ) luma = 0;
+			luma = (int32_t)luminance;
 
 			/* add the face bit to the luma */
 			luma += face;
@@ -1639,10 +1634,9 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, u32 *input, u32 count )
 			else luminance = fabs( dotl );
 
 			luminance = (luminance * texparam->diffuse) + texparam->ambient;
-			luma = (int32_t)luminance;
+			luminance = std::clamp(luminance, 0.0f, 255.0f);
 
-			if ( luma > 255 ) luma = 255;
-			if ( luma < 0 ) luma = 0;
+			luma = (int32_t)luminance;
 
 			/* add the face bit to the luma */
 			luma += face;
@@ -1839,10 +1833,9 @@ void model2_state::geo_parse_nn_s( geo_state *geo, u32 *input, u32 count )
 			specular *= texparam->specular_scale;
 
 			luminance = (luminance * texparam->diffuse) + texparam->ambient + specular;
-			luma = (int32_t)luminance;
+			luminance = std::clamp(luminance, 0.0f, 255.0f);
 
-			if ( luma > 255 ) luma = 255;
-			if ( luma < 0 ) luma = 0;
+			luma = (int32_t)luminance;
 
 			/* add the face bit to the luma */
 			luma += face;
@@ -2558,7 +2551,7 @@ u32 *model2_state::geo_process_command( geo_state *geo, u32 opcode, u32 *input, 
 	return input;
 }
 
-void model2_state::geo_parse( void )
+void model2_state::geo_parse()
 {
 	u32  address = (m_geo_read_start_address & 0x1ffff)/4;
 	u32 *input = &m_bufferram[address];
@@ -2615,12 +2608,12 @@ void model2_state::video_start()
 	m_fbvramA = make_unique_clear<u16[]>(0x80000/2);
 	m_fbvramB = make_unique_clear<u16[]>(0x80000/2);
 
-	// convert (supposedly) 3d sRGB color space into linear
-	// TODO: might be slightly different algorithm (Daytona USA road/cars, VF2 character skins)
+	// convert color space; this works OK for most games
+	// real cabinets probably have their monitors calibrated depending on the game
+	// optimal settings for vf2, fvipers and schamp are bias 64, gain 51
 	for(int i=0;i<256;i++)
 	{
-		double raw_value;
-		raw_value = 255.0 * pow((double)(i) / 255.0,2.2);
+		double raw_value = std::max(((double)i - 64.0) * 255.0 / 191.0, 0.0);
 		m_gamma_table[i] = (u8)raw_value;
 //      printf("%02x: %02x %lf\n",i,m_gamma_table[i],raw_value);
 	}
@@ -2701,5 +2694,4 @@ void model2_state::tri_list_dump(FILE *dst)
 	fprintf( dst, "min_z = %04x, max_z = %04x\n", m_raster->min_z, m_raster->max_z );
 
 	fclose( dst );
-
 }

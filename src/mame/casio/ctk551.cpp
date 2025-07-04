@@ -294,7 +294,7 @@ private:
 	uint8_t m_lcd_data{};
 	uint32_t m_dsp_data{};
 
-	void render_w(int state);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 INPUT_CHANGED_MEMBER(ctk551_state::switch_w)
@@ -375,11 +375,8 @@ void ctk551_state::apo_w(int state)
 }
 
 
-void ctk551_state::render_w(int state)
+u32 ctk551_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if(!state)
-		return;
-
 	const u8 *render = m_lcdc->render();
 	for(int x=0; x != 64; x++) {
 		for(int y=0; y != 8; y++) {
@@ -389,6 +386,8 @@ void ctk551_state::render_w(int state)
 		}
 		render += 8;
 	}
+
+	return 0;
 }
 
 
@@ -574,7 +573,7 @@ void ctk551_state::ctk601(machine_config& config)
 	screen.set_refresh_hz(60);
 	screen.set_size(1000, 424);
 	screen.set_visarea_full();
-	screen.screen_vblank().set(FUNC(ctk551_state::render_w));
+	screen.set_screen_update(FUNC(ctk551_state::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
 
@@ -615,7 +614,7 @@ void ctk551_state::ctk551(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(1000, 737);
 	screen.set_visarea_full();
-	screen.screen_vblank().set(FUNC(ctk551_state::render_w));
+	screen.set_screen_update(FUNC(ctk551_state::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
 
