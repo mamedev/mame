@@ -77,6 +77,7 @@ TODO:
 - hookup MCU and YM2151 / YM3812 sound for the mahjong games
 - hookup PIC16F84 for rbspm
 - emulate protection devices correctly instead of patching
+- inputs and layout for tbss (takes a long time to enable tilemaps)
 - work out remaining magslot lamps and add layout
 - work out remaining jinpaish lamps and update layout
 - work out remaining sball2k1 I/O and update layout
@@ -176,6 +177,7 @@ public:
 	void init_sscs() ATTR_COLD;
 	void init_sscs0118() ATTR_COLD;
 	void init_super555() ATTR_COLD;
+	void init_tbss() ATTR_COLD;
 
 	template <unsigned Shift> ioport_value keyboard_r();
 	template <unsigned N> void counter_w(int state);
@@ -3234,6 +3236,22 @@ ROM_START( smwc )
 	ROM_LOAD( "rmj-t1-t05.u39", 0x80000, 0x80000, CRC(30638e20) SHA1(8082b7616ef759823be4265e902b503d15916197) )
 ROM_END
 
+ROM_START( tbss )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD( "u64", 0x00000, 0x80000, CRC(98467613) SHA1(80e7db0dfacf48f3b4a4ec675b501f527def660e) )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "bj-s1-s02.u83", 0x00000, 0x80000, CRC(831b021d) SHA1(ee2f13a4eb8e17a7d8328fa916d1c0bc0888384f) )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "bj-a1-a06.u41", 0x000000, 0x100000, CRC(f758d95e) SHA1(d1da16f3ef618a8c1118784bdc39dd93acf86aff) )
+	ROM_LOAD( "9168a-m3.u19",  0x100000, 0x080000, CRC(34e651e1) SHA1(c4ca69f6b85d30a1f703c20b2b165a821d5d494c) )
+
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00)
+	// u29 not populated
+	ROM_LOAD( "u39", 0x80000, 0x80000, CRC(4be91081) SHA1(0a3691bb2c7b5ba7fb5617cb16aacecb2fa93519) )
+ROM_END
+
 
 // Possibly to be moved to separate driver.
 // Usual standard components but much bigger GFX ROMs. 1 bank of 8 switches.
@@ -3457,6 +3475,20 @@ void gms_2layers_state::init_hgly()
 	rom[0x13994 / 2] = 0x6000; // U64 ERROR
 }
 
+void gms_2layers_state::init_tbss()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	rom[0x11b8 / 2] = 0x6000;
+	rom[0x12c2 / 2] = 0x6000;
+	rom[0x1634 / 2] = 0x6000;
+	rom[0x164e / 2] = 0x6000;
+	rom[0x1b56 / 2] = 0x6000;
+	rom[0x1ea8 / 2] = 0x6000;
+	rom[0x1ec2 / 2] = 0x6000;
+	rom[0x96f8 / 2] = 0x6000;
+}
+
 } // anonymous namespace
 
 
@@ -3469,6 +3501,7 @@ GAME( 1999, cjdlz,    0,    super555, cjdlz,    gms_2layers_state, init_cjdlz,  
 GAME( 2005, yyhm,     0,    magslot,  yyhm,     gms_3layers_state, init_yyhm,     ROT0,  "GMS", "Yuanyang Hudie Meng (Version 8.8A 2005-09-25)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now.
 
 // card games
+GAME( 1998, tbss,     0,    super555, super555, gms_2layers_state, init_tbss,     ROT0,  "GMS", "Tieben Shensuan (Mainland version 2.0)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface doesn't quite work.
 GAME( 1999, super555, 0,    super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now.
 GAME( 1999, sscs,     0,    super555, sscs,     gms_2layers_state, init_sscs,     ROT0,  "GMS", "San Se Caishen (Version 0502)",                         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface isn't fully understood.
 GAME( 1999, sscs0118, sscs, super555, sscs,     gms_2layers_state, init_sscs0118, ROT0,  "GMS", "San Se Caishen (Version 0118)",                         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface isn't fully understood.

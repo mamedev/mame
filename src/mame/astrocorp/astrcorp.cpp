@@ -73,7 +73,7 @@ TODO:
 - Fix mirror ROM checksum / ROM overlay without code patches (in games with heavier encryption).
 - Find source of level 2 interrupt (sprite DMA end?).
 - magibomba, westvent: need a redump of one of the program ROMs.
-- magibombm, hacher: need a redump of the sprite ROMs.
+- hacher: need a redump of the sprite ROMs.
 - astoneag, dinodino, magibombd, magibombg: exiting from test menu goes haywire (requires a soft-reset with F3).
 - magibombg,m: need RE of the CPU code and correct EEPROM.
 - gostopac: stops with 'S4' message during boot. Needs RE of the CPU code and emulation of its peculiarities.
@@ -2153,7 +2153,7 @@ ROM_START( magibombm )
 	ROM_FILL(                             0x20000, 0x20000, 0xff )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "gfx", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not correct for this set
+	ROM_LOAD16_WORD_SWAP( "mx29f1610mc.u130", 0x000000, 0x200000, CRC(b983c1c1) SHA1(a372f90b5908be639b22169c57962059b4122540) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "5_m._b._e1.0.u44", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )

@@ -86,6 +86,9 @@ public:
 	void init_spectrum();
 
 protected:
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
+
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;

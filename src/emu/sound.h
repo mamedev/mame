@@ -468,12 +468,17 @@ public:
 	const char *resampler_type_names(u32 type) const;
 
 	u32 resampler_type() const { return m_resampler_type; }
-	double resampler_hq_latency() const { return m_resampler_hq_latency; }
+	float resampler_hq_latency() const { return m_resampler_hq_latency; }
 	u32 resampler_hq_length() const { return m_resampler_hq_length; }
 	u32 resampler_hq_phases() const { return m_resampler_hq_phases; }
 
+	u32 default_resampler_type() const;
+	float default_resampler_hq_latency() const;
+	u32 default_resampler_hq_length() const;
+	u32 default_resampler_hq_phases() const;
+
 	void set_resampler_type(u32 type);
-	void set_resampler_hq_latency(double latency);
+	void set_resampler_hq_latency(float latency);
 	void set_resampler_hq_length(u32 length);
 	void set_resampler_hq_phases(u32 phases);
 
@@ -664,7 +669,7 @@ private:
 
 	// resampler data
 	u32 m_resampler_type;
-	double m_resampler_hq_latency;
+	float m_resampler_hq_latency;
 	u32 m_resampler_hq_length, m_resampler_hq_phases;
 };
 

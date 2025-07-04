@@ -36,13 +36,13 @@ menu_audio_effects::~menu_audio_effects()
 {
 }
 
-double menu_audio_effects::change_f(const double *table, double value, int change)
+float menu_audio_effects::change_f(const float *table, float value, int change)
 {
 	u32 bi = 0;
-	double dt = 1e300;
+	float dt = 1e30;
 	u32 index;
 	for(index = 0; table[index]; index++) {
-		double d1 = value - table[index];
+		float d1 = value - table[index];
 		if(d1 < 0)
 			d1 = -d1;
 		if(d1 < dt) {
@@ -76,8 +76,8 @@ u32 menu_audio_effects::change_u32(const u32 *table, u32 value, int change)
 
 bool menu_audio_effects::handle(event const *ev)
 {
-	static const double latencies[] = {
-		0.0005, 0.0010, 0.0025, 0.0050, 0.0100, 0.0250, 0.0500, 0
+	static const float latencies[] = {
+		0.0005f, 0.0010f, 0.0025f, 0.0050f, 0.0100f, 0.0250f, 0.0500f, 0
 	};
 
 	static const u32 lengths[] = {
@@ -121,24 +121,24 @@ bool menu_audio_effects::handle(event const *ev)
 	case IPT_UI_CLEAR: {
 		switch(uintptr_t(ev->itemref)) {
 		case RS_TYPE:
-			machine().sound().set_resampler_type(sound_manager::RESAMPLER_LOFI);
+			machine().sound().set_resampler_type(machine().sound().default_resampler_type());
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 
 		case RS_LATENCY:
-			machine().sound().set_resampler_hq_latency(0.005);
+			machine().sound().set_resampler_hq_latency(machine().sound().default_resampler_hq_latency());
 			ev->item->set_subtext(format_lat(machine().sound().resampler_hq_latency()));
 			ev->item->set_flags(flag_lat());
 			return true;
 
 		case RS_LENGTH:
-			machine().sound().set_resampler_hq_length(400);
+			machine().sound().set_resampler_hq_length(machine().sound().default_resampler_hq_length());
 			ev->item->set_subtext(format_u32(machine().sound().resampler_hq_length()));
 			ev->item->set_flags(flag_length());
 			return true;
 
 		case RS_PHASES:
-			machine().sound().set_resampler_hq_phases(200);
+			machine().sound().set_resampler_hq_phases(machine().sound().default_resampler_hq_phases());
 			ev->item->set_subtext(format_u32(machine().sound().resampler_hq_phases()));
 			ev->item->set_flags(flag_phases());
 			return true;
@@ -207,7 +207,7 @@ bool menu_audio_effects::handle(event const *ev)
 }
 
 
-std::string menu_audio_effects::format_lat(double latency)
+std::string menu_audio_effects::format_lat(float latency)
 {
 	return util::string_format(_("menu-aeffect", "%1$3.1f ms"), 1000 * latency);
 }
@@ -231,10 +231,10 @@ u32 menu_audio_effects::flag_type() const
 u32 menu_audio_effects::flag_lat() const
 {
 	u32 flag = 0;
-	double latency = machine().sound().resampler_hq_latency();
-	if(latency > 0.0005)
+	float latency = machine().sound().resampler_hq_latency();
+	if(latency > 0.0005f)
 		flag |= FLAG_LEFT_ARROW;
-	if(latency < 0.0500)
+	if(latency < 0.0500f)
 		flag |= FLAG_RIGHT_ARROW;
 	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
 		flag |= FLAG_INVERT | FLAG_DISABLE;
@@ -244,10 +244,10 @@ u32 menu_audio_effects::flag_lat() const
 u32 menu_audio_effects::flag_length() const
 {
 	u32 flag = 0;
-	double latency = machine().sound().resampler_hq_length();
-	if(latency > 10)
+	u32 length = machine().sound().resampler_hq_length();
+	if(length > 10)
 		flag |= FLAG_LEFT_ARROW;
-	if(latency < 500)
+	if(length < 500)
 		flag |= FLAG_RIGHT_ARROW;
 	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
 		flag |= FLAG_INVERT | FLAG_DISABLE;
@@ -257,10 +257,10 @@ u32 menu_audio_effects::flag_length() const
 u32 menu_audio_effects::flag_phases() const
 {
 	u32 flag = 0;
-	double latency = machine().sound().resampler_hq_phases();
-	if(latency > 10)
+	u32 phases = machine().sound().resampler_hq_phases();
+	if(phases > 10)
 		flag |= FLAG_LEFT_ARROW;
-	if(latency < 1000)
+	if(phases < 1000)
 		flag |= FLAG_RIGHT_ARROW;
 	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
 		flag |= FLAG_INVERT | FLAG_DISABLE;

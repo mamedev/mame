@@ -278,6 +278,7 @@ SamRam
 #include "emu.h"
 #include "spectrum.h"
 
+#include "bus/spectrum/dma/slot.h"
 #include "cpu/z80/z80.h"
 #include "spec_snqk.h"
 
@@ -685,6 +686,9 @@ void spectrum_state::machine_start()
 {
 	save_item(NAME(m_port_fe_data));
 	save_item(NAME(m_int_at));
+
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
+	m_maincpu->space(AS_IO).specific(m_io);
 }
 
 void spectrum_state::machine_reset()
@@ -741,6 +745,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_maincpu->set_io_map(&spectrum_state::spectrum_io);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
 	m_maincpu->nomreq_cb().set(FUNC(spectrum_state::spectrum_nomreq));
+	m_maincpu->busack_cb().set("dma", FUNC(dma_slot_device::bai_w));
 
 	ADDRESS_MAP_BANK(config, m_specmem).set_map(&spectrum_state::spectrum_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x10000);
 
@@ -773,6 +778,15 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->fb_r_handler().set(FUNC(spectrum_state::floating_bus_r));
+
+	dma_slot_device &dma(DMA_SLOT(config, "dma", X1 / 4, default_dma_slot_devices, nullptr));
+	dma.set_io_space(m_maincpu, AS_IO);
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dma.in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
+	dma.out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
+	dma.in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
+	dma.out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 
 	/* devices */
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,spg,z80,zx"));

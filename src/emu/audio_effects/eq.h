@@ -52,7 +52,7 @@ public:
 	void reset_all();
 
 private:
-	static constexpr float DEFAULT_Q = 0.7071068f;
+	static constexpr float DEFAULT_Q = 0.7071067f;
 
 	struct history {
 		float m_v0, m_v1, m_v2;
