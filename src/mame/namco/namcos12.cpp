@@ -3096,7 +3096,7 @@ ROM_START( tekken3 )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1vere.11s", 0x0000000, 0x080000, CRC(c92b98d1) SHA1(8ae6fba8c5b6b9a2ab9541eac8553b282f35750d) ) // No label but newer then tet1verd.11s, internally dated 1997-05-28
+	ROM_LOAD16_WORD_SWAP( "tet1vere.11s", 0x0000000, 0x080000, CRC(c92b98d1) SHA1(8ae6fba8c5b6b9a2ab9541eac8553b282f35750d) ) // No label but newer then tet1verb.11s, internally dated 1997-05-28
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3142,7 +3142,7 @@ ROM_START( tekken3jd )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1verd.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but verified for up to VER.D sets, internally dated 1997-03-17
+	ROM_LOAD16_WORD_SWAP( "tet1verb.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but verified for up to VER.D sets, internally dated 1997-03-17
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3165,7 +3165,7 @@ ROM_START( tekken3je1 )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1vere.11s", 0x0000000, 0x080000, CRC(c92b98d1) SHA1(8ae6fba8c5b6b9a2ab9541eac8553b282f35750d) ) // No label but newer then tet1verd.11s, internally dated 1997-05-28
+	ROM_LOAD16_WORD_SWAP( "tet1vere.11s", 0x0000000, 0x080000, CRC(c92b98d1) SHA1(8ae6fba8c5b6b9a2ab9541eac8553b282f35750d) ) // No label but newer then tet1verb.11s, internally dated 1997-05-28
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3211,7 +3211,7 @@ ROM_START( tekken3ud )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1verd.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but verified for up to VER.D sets, internally dated 1997-03-17
+	ROM_LOAD16_WORD_SWAP( "tet1verb.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but verified for up to VER.D sets, internally dated 1997-03-17
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3257,7 +3257,7 @@ ROM_START( tekken3b )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1verd.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but verified for up to VER.D sets, internally dated 1997-03-17
+	ROM_LOAD16_WORD_SWAP( "tet1verb.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but verified for up to VER.D sets, internally dated 1997-03-17
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3280,7 +3280,7 @@ ROM_START( tekken3c )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1verd.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but verified for up to VER.D sets, internally dated 1997-03-17
+	ROM_LOAD16_WORD_SWAP( "tet1verb.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but verified for up to VER.D sets, internally dated 1997-03-17
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3303,7 +3303,7 @@ ROM_START( tekken3d )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1verd.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but verified for up to VER.D sets, internally dated 1997-03-17
+	ROM_LOAD16_WORD_SWAP( "tet1verb.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but verified for up to VER.D sets, internally dated 1997-03-17
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
