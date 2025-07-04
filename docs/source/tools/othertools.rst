@@ -58,6 +58,12 @@ romcmp
 This tool is used to perform basic data comparisons and integrity checks on binary dumps. With the -h switch, it can also be used to calculate hash functions.
 
 
+romcopy
+-------
+
+This tool is used to interleave and bitswap binary data files.
+
+
 unidasm
 -------
 
