@@ -5,20 +5,12 @@
 
 #pragma once
 
-#include "nes_vt09_soc.h"
+#include "nes_vt_soc.h"
 #include "vt369_adpcm.h"
 
-#include "cpu/m6502/rp2a03.h"
-#include "cpu/m6502/vt3xx_spu.h"
 #include "sound/dac.h"
-#include "sound/nes_apu_vt.h"
-#include "m6502_swap_op_d5_d6.h"
-#include "video/ppu2c0x_vt.h"
 
-#include "screen.h"
-#include "speaker.h"
-
-class vt3xx_soc_base_device : public nes_vt09_soc_device
+class vt3xx_soc_base_device : public nes_vt02_vt03_soc_device
 {
 public:
 	vt3xx_soc_base_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
@@ -163,6 +155,8 @@ public:
 	vt369_soc_introm_vibesswap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 
 protected:
+	vt369_soc_introm_vibesswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
+
 	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
@@ -170,6 +164,15 @@ private:
 	void vibes_411c_w(u8 data);
 
 	void nes_vt_vibes_map(address_map &map) ATTR_COLD;
+};
+
+class vt369_soc_introm_gbox2020_device : public vt369_soc_introm_vibesswap_device
+{
+public:
+	vt369_soc_introm_gbox2020_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
 };
 
 class vt3xx_soc_unk_dg_device : public vt3xx_soc_base_device
@@ -194,6 +197,7 @@ DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_NOSWAP, vt369_soc_introm_noswap_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_SWAP,   vt369_soc_introm_swap_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_ALTSWAP,   vt369_soc_introm_altswap_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_VIBESSWAP,   vt369_soc_introm_vibesswap_device)
+DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_GBOX2020,   vt369_soc_introm_gbox2020_device)
 
 DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_DG, vt3xx_soc_unk_dg_device)
 

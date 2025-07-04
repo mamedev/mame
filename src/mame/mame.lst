@@ -28180,6 +28180,7 @@ yosakdona
 
 @source:midw8080/mw8080bw.cpp
 280zzzap
+280zzzapa
 blueshrk
 blueshrkmr
 blueshrkmr2
@@ -30948,7 +30949,6 @@ geimulti
 gepoker
 gepoker1
 gepoker2
-gepoker2a
 gepoker3
 gs4002
 gs4002a
@@ -31061,9 +31061,12 @@ rbspm
 sball2k1
 sc2in1
 smatch03
+smwc
 ssanguoj
 sscs
+sscs0118
 super555
+tbss
 yyhm
 
 @source:misc/goldngam.cpp
@@ -31127,6 +31130,7 @@ goodluck
 icproul
 jkrbonus
 jokercar
+kmhpan
 lespendu
 lespenduj
 maverik
@@ -31499,6 +31503,7 @@ lependu
 
 @source:misc/limenko.cpp
 dynabomb
+hrthouse
 legendoh
 sb2003
 sb2003a
@@ -35349,9 +35354,6 @@ dgun851
 dgun853
 fccomp88
 gamezn2
-gprnrs1
-gprnrs16
-gujtv108
 hs36blk
 hs36red
 joysti30
@@ -35359,17 +35361,8 @@ lxnoddy
 majgnc
 majkon
 mc_105te
-mc_110cb
-mc_138cb
-mc_7x6ss
-mc_89in1
 mc_8x6cb
-mc_8x6ss
-mc_9x6sa
-mc_9x6ss
 mc_aa2
-mc_dcat8
-mc_dcat8a
 mc_dg101
 mc_dgear
 mc_sam60
@@ -35383,7 +35376,6 @@ pjoys60
 polmega
 ppgc200g
 protpp
-pumpactv
 sen101
 senwld
 silv35
@@ -35394,7 +35386,6 @@ sporzpp
 sporztn
 sudo6in1
 sudopptv
-techni4
 timetp36
 timetp7
 tvmjfc
@@ -35416,8 +35407,10 @@ zudugo
 @source:nintendo/nes_vt09.cpp
 cybar120
 dturbogt
-jl2050
+gujtv108
 joypad65
+mc_dcat8
+mc_dcat8a
 msiwwe
 msiwwea
 msidd
@@ -35426,8 +35419,10 @@ msimm2
 msinamco
 msisinv
 msifrog
+pumpactv
 rcapnp
 senario25
+techni4
 timetp25
 ventur25
 vgtablet
@@ -35444,22 +35439,27 @@ dgunl3201
 dgunl3202
 fapocket
 fcpocket
+g5_500
 g9_666
+gbox2019
+gprnrs1
+gprnrs16
 hhgc319
 lxpcli
 lxpcsp
 matet100
 matet220
 matet300
+mc_7x6ss
+mc_8x6ss
+mc_9x6sa
+mc_9x6ss
 mc_hh210
 myaasa
 myaass
-q5_500in1
 retro400
 rfcp168
 rminitv
-unk2019hh
-unk2020hh
 
 @source:nintendo/nes_vt369_vtunknown.cpp
 36pcase
@@ -35467,14 +35467,17 @@ unk2020hh
 240in1ar
 denv150
 dgun2561
+dgun2572
 dgun2577
 dgun2593
 dvnimbus
 egame150
+gbox2020
 gcs2mgp
 gtct885
 hkb502
 hkb502a
+jl2050
 lexi30
 lpgm240
 lxcap
@@ -35499,6 +35502,9 @@ lxcypkdp
 lxcypksp
 matet10
 matetsl
+mc_110cb
+mc_138cb
+mc_89in1
 mc_cb280
 mog_m320
 myarccn
@@ -35754,9 +35760,6 @@ wowwg
 xing48
 zone7in1
 zone7in1p
-
-@source:nintendo/vt_unknown.cpp
-dgun2572
 
 @source:nix/fitfight.cpp
 bbprot
@@ -41964,6 +41967,9 @@ tvdenwad
 tvdenwam
 tvdenwat
 
+@source:seibu/banprestomsz80.cpp
+dnjsenso
+
 @source:seibu/bloodbro.cpp
 bloodbro
 bloodbroj
@@ -43331,6 +43337,7 @@ lggp40
 
 @source:skeleton/lgtz80.cpp
 arthurkn
+arthurkn100
 fruitcat
 
 @source:skeleton/lilith.cpp

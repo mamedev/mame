@@ -6,6 +6,8 @@
 #include "emu.h"
 #include "nes_vt32_soc.h"
 
+#include "m6502_swap_op_d5_d6.h"
+
 // these have RGB12 output mode
 DEFINE_DEVICE_TYPE(NES_VT32_SOC,     nes_vt32_soc_device,     "nes_vt32_soc", "VT32 series System on a Chip (FP) (NTSC)")
 DEFINE_DEVICE_TYPE(NES_VT32_SOC_PAL, nes_vt32_soc_pal_device, "nes_vt32_soc_pal", "VT32 series System on a Chip (FP) (PAL)")

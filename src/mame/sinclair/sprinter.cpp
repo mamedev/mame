@@ -1596,6 +1596,12 @@ static void sprinter_ata_devices(device_slot_interface &device)
 	device.option_add("dvdrom", ATAPI_DVDROM);
 }
 
+static void cdrom_config(device_t *device)
+{
+	device->subdevice<cdda_device>("cdda")->add_route(0, "^^speakers", 0.5, 0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, "^^speakers", 0.5, 1);
+}
+
 u8 sprinter_state::kbd_fe_r(offs_t offset)
 {
 	u8 data = 0xff;
@@ -1873,6 +1879,8 @@ void sprinter_state::sprinter(machine_config &config)
 {
 	spectrum_128(config);
 	config.device_remove("palette");
+	config.device_remove("exp");
+	config.device_remove("dma");
 	config.set_default_layout(layout_sprinter);
 
 	m_ram->set_default_size("64M");
@@ -1889,7 +1897,8 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->irqack_cb().append(m_irqs, FUNC(input_merger_any_high_device::in_clear<0>));
 
 	DS12885(config, m_rtc, XTAL(32'768)); // should be DS12887A
-	ATA_INTERFACE(config, m_ata[0]).options(sprinter_ata_devices, "hdd", "hdd", false);
+	ATA_INTERFACE(config, m_ata[0]).options(sprinter_ata_devices, "hdd", "cdrom", false);
+	m_ata[0]->slot(1).set_option_machine_config("cdrom", cdrom_config);
 	ATA_INTERFACE(config, m_ata[1]).options(sprinter_ata_devices, "hdd", "hdd", false);
 
 	BETA_DISK(config, m_beta, 0);
