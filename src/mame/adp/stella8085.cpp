@@ -158,7 +158,7 @@ void stella8085_state::disp_w(u8 data)
 
 void stella8085_state::output_digit(u8 i, u8 data)
 {
-    m_digits[i] = data;
+    ;//m_digits[i] = data;
 }
 
 void stella8085_state::rst65_w(u8 state)
@@ -309,7 +309,7 @@ void stella8085_state::doppelpot(machine_config &config)
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));  // scan SL lines
 	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));  // display A&B
-	//m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));   // kbd RL lines
+	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));   // kbd RL lines
 	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));  // irq line
 
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
