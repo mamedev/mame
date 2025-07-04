@@ -42940,6 +42940,9 @@ biortmfp
 bitgrpha
 bitgrphb
 
+@source:skeleton/blaucds32.cpp
+blaucds32
+
 @source:skeleton/bolsaint.cpp
 bolsaint
 
@@ -43658,7 +43661,6 @@ t4490
 @source:skeleton/terminal.cpp
 7951om
 alcat258
-blaucds32
 loewe715
 loewed
 teleguide
