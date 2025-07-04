@@ -548,7 +548,10 @@ ROM_START( myaasa )
 	ROM_LOAD( "mx29gl256el.u2", 0x00000, 0x2000000, CRC(1882264c) SHA1(e594b5cea634fadc4aac217b6d651be72a3024c0) )
 ROM_END
 
-
+ROM_START( goretrop )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "goretroportable.bin", 0x00000, 0x2000000, CRC(e7279dd3) SHA1(5f096ce22e46f112c2cc6588cb1c527f4f0430b5) )
+ROM_END
 
 ROM_START( fcpocket )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
@@ -763,6 +766,8 @@ CONS( 200?, mc_9x6sa, mc_9x6ss, 0, nes_vt32_2mb, nes_vt32, nes_vt32_unk_state, e
 CONS( 200?, mc_7x6ss, 0,        0, nes_vt32_1mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "777777 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_8x6ss, 0,        0, nes_vt32_1mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
 
+// there's also a 250+ version of the unit below at least
+CONS( 2018, goretrop,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
 
 // Some games (eg F22) are scrambled like in myaass
 // These use a 16x16x8bpp packed tile mode for the main menu which seems more like a VT3xx feature, but VT3xx extended video regs not written?
