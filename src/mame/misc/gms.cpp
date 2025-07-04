@@ -81,6 +81,7 @@ TODO:
 - work out remaining jinpaish lamps and update layout
 - work out remaining sball2k1 I/O and update layout
 - verify if sscs0118 uses the same I/O as the parent (seems so)
+- verify if smwc uses the same I/O as cjdlz (code base is extremely similar)
 - use real values for reel tilemaps offsets instead of hardcoded ones (would fix
   magslot)
 - game logic seems broken in mahjong games (Reach permitted when it shouldn't
@@ -170,6 +171,7 @@ public:
 	void init_hgly() ATTR_COLD;
 	void init_rbspm() ATTR_COLD;
 	void init_sball2k1() ATTR_COLD;
+	void init_smwc() ATTR_COLD;
 	void init_ssanguoj() ATTR_COLD;
 	void init_sscs() ATTR_COLD;
 	void init_sscs0118() ATTR_COLD;
@@ -3216,6 +3218,22 @@ ROM_START( cjdlz )
 	ROM_LOAD16_WORD_SWAP( "93c46.u136", 0x00, 0x080, CRC(28d0db8c) SHA1(fb214d10f1c3a1f2e38cb22c620dcc314896ee54) )
 ROM_END
 
+// 實戰 麻將王朝 (Shízhàn Májiàng Wángcháo)
+ROM_START( smwc )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD( "u64", 0x00000, 0x80000, CRC(460f98fc) SHA1(6e5017ce3ea425a4c88aa7ac1c58dbd69f3e7971) )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "mj-s1-s03.u83", 0x00000, 0x80000, CRC(27cf4e44) SHA1(ee7f3fbc0c9cc777cc4f5ef730c30b952ad61fbf) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "mj-a1-a07.u41", 0x000000, 0x100000, CRC(868a9599) SHA1(53fc6d0169ee83e7f911f64b447e4fe7c9fe1f9d) )
+
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00)
+	ROM_LOAD( "u29",            0x00000, 0x20000, CRC(eecacec9) SHA1(006818d53ca941b6d57270d0279f689d76dd1a85) )
+	ROM_LOAD( "rmj-t1-t05.u39", 0x80000, 0x80000, CRC(30638e20) SHA1(8082b7616ef759823be4265e902b503d15916197) )
+ROM_END
+
 
 // Possibly to be moved to separate driver.
 // Usual standard components but much bigger GFX ROMs. 1 bank of 8 switches.
@@ -3413,6 +3431,22 @@ void gms_2layers_state::init_cjdlz()
 	rom[0x38980 / 2] = 0x6000; // 0xD REPAIR
 }
 
+void gms_2layers_state::init_smwc()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	rom[0x00518 / 2] = 0x4e71; // 0xD REPAIR
+	rom[0x0a348 / 2] = 0x6000; // 0x99 REPAIR
+	rom[0x0a610 / 2] = 0x4e71; // loop
+	rom[0x0a72a / 2] = 0x6000; // 0xA REPAIR
+	rom[0x0a74e / 2] = 0x4e71; // 0xC REPAIR
+	rom[0x0a7b0 / 2] = 0x6000; // 0xB REPAIR
+	rom[0x2078c / 2] = 0x4e71; // 0x13 REPAIR
+	rom[0x207a4 / 2] = 0x6000; // 0x13 REPAIR
+	rom[0x2c322 / 2] = 0x6000; // 0xD REPAIR
+	rom[0x2c53c / 2] = 0x6000; // 0xD REPAIR
+}
+
 void gms_2layers_state::init_hgly()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
@@ -3430,6 +3464,7 @@ void gms_2layers_state::init_hgly()
 GAME( 1998, rbmk,     0,    rbmk,     rbmk,     gms_2layers_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // misses YM2151 hookup
 GAME( 1998, rbspm,    0,    rbspm,    rbspm,    gms_2layers_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Misses YM2151 hookup
 GAME( 1998, ssanguoj, 0,    ssanguoj, ssanguoj, gms_2layers_state, init_ssanguoj, ROT0,  "GMS", "Shizhan Sanguo Ji Jiaqiang Ban (Version 8.9 980413)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. YM3812 isn't hooked up (goes through undumped MCU).
+GAME( 1998, smwc,     0,    super555, cjdlz,    gms_2layers_state, init_smwc,     ROT0,  "GMS", "Shizhan Majiang Wangchao (Version 2.0)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. EEPROM interface doesn't quite work.
 GAME( 1999, cjdlz,    0,    super555, cjdlz,    gms_2layers_state, init_cjdlz,    ROT0,  "GMS", "Chaoji Da Lianzhuang (Version 1.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. EEPROM interface doesn't quite work.
 GAME( 2005, yyhm,     0,    magslot,  yyhm,     gms_3layers_state, init_yyhm,     ROT0,  "GMS", "Yuanyang Hudie Meng (Version 8.8A 2005-09-25)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now.
 
