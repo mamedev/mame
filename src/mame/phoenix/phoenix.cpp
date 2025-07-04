@@ -1252,8 +1252,31 @@ ROM_START( avefenixl )
 	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
-// PCB is marked: "003 LATO A" on component side and "003 LATO B" on solder side. (In Italian "lato" means "side")
+ROM_START( fenixexpl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "fe1.a1",    0x0000, 0x0800, BAD_DUMP CRC(b04260e9) SHA1(a275ba596e620b1e4dd73792cc9b11fbc55723cc) ) // ROM damaged on this set
+	ROM_LOAD( "fe2.a2",    0x0800, 0x0800, CRC(25a2e4bd) SHA1(a1188c4d1d059852b59ccfe16dd9a305d7b26299) )
+	ROM_LOAD( "fe3.a3",    0x1000, 0x0800, BAD_DUMP CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) ) // ROM damaged on this set
+	ROM_LOAD( "fe4.a4",    0x1800, 0x0800, CRC(d4b6b69f) SHA1(31e20833777bedf65a66bfae0e72c98e190ed539) )
+	ROM_LOAD( "fe5.a5",    0x2000, 0x0800, CRC(74b1cf66) SHA1(38f9915b239c30f45567e165e9320558f1197ff9) )
+	ROM_LOAD( "fe6.a6",    0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "fe7.a7",    0x3000, 0x0800, BAD_DUMP CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) ) // ROM damaged on this set
+	ROM_LOAD( "fe8.a8",    0x3800, 0x0800, CRC(f15c439d) SHA1(6b80276b4ddc9989adb2981f018d5c9c55b06430) )
 
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "ic23.d3",   0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "ic24.d4",   0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "ic39.b3",   0x0000, 0x0800, BAD_DUMP CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) ) // ROM damaged on this set
+	ROM_LOAD( "ic40.b4",   0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+ROM_END
+
+// PCB is marked: "003 LATO A" on component side and "003 LATO B" on solder side. (In Italian "lato" means "side")
 ROM_START( griffon )  // verified single PCB, single PROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "griffon0.a5",  0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
@@ -1278,9 +1301,8 @@ ROM_START( griffon )  // verified single PCB, single PROM
 	ROM_LOAD( "sn74s471n.bin",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
 ROM_END
 
-/*There is no MN6221AA Melody-Alarm Generator, it is substituted by a small piggyback sound PCB with some 74xx logic
-  and 2x PROM 63S140N main PCB is marked: "003 LATO A" and "003 LATO B" sound PCB is marked: "LC" and "NW"*/
-
+/* There is no MN6221AA Melody-Alarm Generator, it is substituted by a small piggyback sound PCB with some 74xx logic
+   and 2x PROM 63S140N main PCB is marked: "003 LATO A" and "003 LATO B" sound PCB is marked: "LC" and "NW" */
 ROM_START( griffono )  // verified single PCB with piggyback sound PCB instead of MM6221AA, single PROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "griffon00.5a",    0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
@@ -1327,17 +1349,16 @@ ROM_START( nextfase )
 	ROM_LOAD( "7910cg", 0x000, 0x800, NO_DUMP ) // actual size unknown, needs decapping
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "nf11.bin",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "nf12.bin",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "nf11.bin",   0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "nf12.bin",   0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
 	ROM_LOAD( "nf09.bin",   0x0000, 0x0800, CRC(bacbfa88) SHA1(bf378a729726db01448f2cc4820f06e17659d674) )
 	ROM_LOAD( "nf10.bin",   0x0800, 0x0800, CRC(3143a9ee) SHA1(371bb314dc9e4ec6ed469eb81391061296c547ec) )
 
-	// PROMs were missing from this dump, these might not be correct
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "nf.ic40",    0x0000, 0x0100, CRC(725747be) SHA1(c8a4cc47149230ac859c19a24d2860d7d58885f2) )  // palette low bits
+	ROM_LOAD( "nf.ic41",    0x0100, 0x0100, CRC(a91055ab) SHA1(14273bde9e05b7e2e14e77cac400ffda0ce7e71f) )  // palette high bits
 ROM_END
 
 ROM_START( phoenixs )
@@ -1781,6 +1802,7 @@ GAME( 1981, phoenixass, phoenix, phoenix,  phoenix,  phoenix_state, empty_init, 
 GAME( 1980, avefenix,   phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Video Game)",                   "Ave Fenix (Electrogame, Spanish bootleg of Phoenix)",        MACHINE_SUPPORTS_SAVE ) // Electrogame (Barcelona) made the dedicated cabinet. Ingame shows 'Video Game', as Electrogame changed its name to Video Game S.A.
 GAME( 1980, avefenixrf, phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Recreativos Franco S.A.)",      "Ave Fenix (Recreativos Franco, Spanish bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, avefenixl,  phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Laguna)",                       "Ave Fenix (Laguna, Spanish bootleg of Phoenix)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1980, fenixexpl,  phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Explomatic)",                   "Fenix (Explomatic, Spanish bootleg of Phoenix)",             MACHINE_SUPPORTS_SAVE )
 
   /*** Pleiads (& clones) ***/
 GAME( 1981, pleiads,    0,       pleiads,  pleiads,  phoenix_state, empty_init,           ROT90, "Tehkan",                                 "Pleiads (Tehkan)",                                           MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

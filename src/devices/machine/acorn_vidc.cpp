@@ -65,8 +65,7 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, m_sound_mode(false)
 	, m_dac(*this, "dac%u", 0)
 	, m_dac_type(dac_type)
-	, m_lspeaker(*this, "lspeaker")
-	, m_rspeaker(*this, "rspeaker")
+	, m_speaker(*this, "speaker")
 	, m_vblank_cb(*this)
 	, m_sound_drq_cb(*this)
 	, m_pixel_clock(0)
@@ -110,12 +109,11 @@ device_memory_interface::space_config_vector acorn_vidc10_device::memory_space_c
 
 void acorn_vidc10_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, m_lspeaker).front_left();
-	SPEAKER(config, m_rspeaker).front_right();
+	SPEAKER(config, m_speaker, 2).front();
 	for (int i = 0; i < m_sound_max_channels; i++)
 	{
 		// custom DAC
-		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, m_lspeaker, m_sound_input_gain).add_route(0, m_rspeaker, m_sound_input_gain);
+		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, m_speaker, m_sound_input_gain, 0).add_route(0, m_speaker, m_sound_input_gain, 1);
 	}
 }
 
@@ -336,7 +334,7 @@ void acorn_vidc10_device::control_w(u32 data)
 	//m_composite_sync = BIT(data, 7);
 	//m_test_mode = (data & 0xc100) != 0xc100;
 
-	//todo: vga/svga modes sets 0x1000?
+	// TODO: vga/svga modes sets 0x1000?
 	m_crtc_regs[CRTC_HDSR] = convert_crtc_hdisplay(0);
 	m_crtc_regs[CRTC_HDER] = convert_crtc_hdisplay(1);
 	screen_vblank_line_update();
@@ -405,9 +403,8 @@ inline void acorn_vidc10_device::refresh_stereo_image(u8 channel)
 	const float left_gain[8] = { 1.0f, 2.0f, 1.66f, 1.34f, 1.0f, 0.66f, 0.34f, 0.0f };
 	const float right_gain[8] = { 1.0f, 0.0f, 0.34f, 0.66f, 1.0f, 1.34f, 1.66f, 2.0f };
 
-	m_lspeaker->set_input_gain(channel, left_gain[m_stereo_image[channel]] * m_sound_input_gain);
-	m_rspeaker->set_input_gain(channel, right_gain[m_stereo_image[channel]] * m_sound_input_gain);
-	//printf("%d %f %f\n",channel,m_lspeaker->input(channel).gain(),m_rspeaker->input(channel).gain());
+	m_speaker->set_input_gain(0, left_gain[m_stereo_image[channel]] * m_sound_input_gain);
+	m_speaker->set_input_gain(1, right_gain[m_stereo_image[channel]] * m_sound_input_gain);
 }
 
 
@@ -562,6 +559,8 @@ void arm_vidc20_device::regs_map(address_map &map)
 
 arm_vidc20_device::arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: acorn_vidc10_device(mconfig, ARM_VIDC20, tag, owner, clock, 2)
+	, m_pixel_source(0)
+	, m_pixel_rate(0)
 	, m_dac32(*this, "serial_dac_%u", 0)
 {
 	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(arm_vidc20_device::regs_map), this));
@@ -580,14 +579,14 @@ void arm_vidc20_device::device_add_mconfig(machine_config &config)
 	for (int i = 0; i < m_sound_max_channels; i++)
 	{
 		m_dac[i]->reset_routes();
-		m_dac[i]->add_route(0, m_lspeaker, 0.0);
-		m_dac[i]->add_route(0, m_rspeaker, 0.0);
+		m_dac[i]->add_route(0, m_speaker, 0.0, 0);
+		m_dac[i]->add_route(0, m_speaker, 0.0, 1);
 	}
 
 	// For simplicity we separate DACs for 32-bit mode
 	// TODO: how stereo image copes with this if at all?
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[0], 0).add_route(ALL_OUTPUTS, m_lspeaker, 0.25);
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[1], 0).add_route(ALL_OUTPUTS, m_rspeaker, 0.25);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[0], 0).add_route(ALL_OUTPUTS, m_speaker, 0.25, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[1], 0).add_route(ALL_OUTPUTS, m_speaker, 0.25, 1);
 }
 
 void arm_vidc20_device::device_config_complete()

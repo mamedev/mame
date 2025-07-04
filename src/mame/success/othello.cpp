@@ -303,11 +303,11 @@ uint8_t othello_state::upd7751_command_r()
 
 void othello_state::upd7751_p2_w(uint8_t data)
 {
-	/* write to P2; low 4 bits go to 8243 */
+	// write to P2; low 4 bits go to 8243
 	m_i8243->p2_w(data & 0x0f);
 
-	/* output of bit $80 indicates we are ready (1) or busy (0) */
-	/* no other outputs are used */
+	// output of bit $80 indicates we are ready (1) or busy (0)
+	// no other outputs are used
 	m_upd7751_busy = data & 0x80;
 }
 
@@ -325,11 +325,11 @@ static INPUT_PORTS_START( othello )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )     PORT_DIPLOCATION("SW1:5") /* stored at $fd1e */
-	PORT_DIPNAME( 0x60, 0x60, "Timer (seconds)" )   PORT_DIPLOCATION("SW1:6,7")
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPSETTING(    0x20, "6" )
-	PORT_DIPSETTING(    0x40, "8" )
-	PORT_DIPSETTING(    0x60, "10" )
+	PORT_DIPNAME( 0x60, 0x00, "Timer (seconds)" )   PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x60, "4" )
+	PORT_DIPSETTING(    0x40, "6" )
+	PORT_DIPSETTING(    0x20, "8" )
+	PORT_DIPSETTING(    0x00, "10" )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
@@ -378,17 +378,17 @@ void othello_state::machine_reset()
 
 void othello_state::othello(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	// basic machine hardware
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &othello_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &othello_state::main_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(othello_state::irq0_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(3'579'545)));
+	z80_device &audiocpu(Z80(config, "audiocpu", 3.579545_MHz_XTAL / 2));
 	audiocpu.set_addrmap(AS_PROGRAM, &othello_state::audio_map);
 	audiocpu.set_addrmap(AS_IO, &othello_state::audio_portmap);
 
-	UPD7751(config, m_upd7751, XTAL(6'000'000));
+	UPD7751(config, m_upd7751, 6_MHz_XTAL);
 	m_upd7751->t1_in_cb().set_constant(0); // labelled as "TEST", connected to ground
 	m_upd7751->p2_in_cb().set(FUNC(othello_state::upd7751_command_r));
 	m_upd7751->bus_in_cb().set(FUNC(othello_state::upd7751_rom_r));
@@ -404,7 +404,7 @@ void othello_state::othello(machine_config &config)
 	m_i8243->p6_out_cb().set(FUNC(othello_state::upd7751_rom_addr_w<8>));
 	m_i8243->p7_out_cb().set(FUNC(othello_state::upd7751_rom_select_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -414,19 +414,19 @@ void othello_state::othello(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(othello_state::othello_palette), 0x10);
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", 1000000 /* ? MHz */));   /* HD46505SP @ CPU clock */
+	hd6845s_device &crtc(HD6845S(config, "crtc", 1000000 /* ? MHz */)); // HD46505SP @ CPU clock
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(TILE_WIDTH);
 	crtc.set_update_row_callback(FUNC(othello_state::crtc_update_row));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, m_ay[0], 2000000).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	AY8910(config, m_ay[1], 2000000).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	AY8910(config, m_ay[0], 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	AY8910(config, m_ay[1], 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
@@ -438,10 +438,10 @@ ROM_START( othello )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "3.ic32",   0x0000, 0x2000, CRC(2bb4f75d) SHA1(29a659031acf0d50f374f440b8d353bcf98145a0))
 
-	ROM_REGION( 0x1000, "upd7751", 0 ) /* 1k for 7751 onboard ROM */
+	ROM_REGION( 0x1000, "upd7751", 0 ) // 1k for 7751 onboard ROM
 	ROM_LOAD( "7751.bin", 0x0000, 0x0400, CRC(6a9534fc) SHA1(67ad94674db5c2aab75785668f610f6f4eccd158) )
 
-	ROM_REGION( 0x4000, "upd7751data", 0 ) /* 7751 sound data */
+	ROM_REGION( 0x4000, "upd7751data", 0 ) // 7751 sound data
 	ROM_LOAD( "1.ic48",   0x0000, 0x2000, CRC(c3807dea) SHA1(d6339380e1239f3e20bcca2fbc673ad72e9ca608))
 	ROM_LOAD( "2.ic49",   0x2000, 0x2000, CRC(a945f3e7) SHA1(ea18efc18fda63ce1747287bbe2a9704b08daff8))
 

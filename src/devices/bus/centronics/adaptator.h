@@ -34,7 +34,7 @@ protected:
 private:
 	required_device_array<vcs_control_port_device, 2> m_joy;
 
-    u8 m_ddr;
+	u8 m_ddr;
 };
 
 // device type definition

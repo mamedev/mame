@@ -527,7 +527,7 @@ void mm1_state::common(machine_config &config)
 	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mm1_map);
 	m_maincpu->in_sid_func().set(FUNC(mm1_state::dsra_r));
-	m_maincpu->out_sod_func().set(KB_TAG, FUNC(mm1_keyboard_device::bell_w));
+	m_maincpu->out_sod_func().set(KB_TAG, FUNC(mm1_keyboard_device::bell_w)).invert();
 
 	config.set_perfect_quantum(m_maincpu);
 

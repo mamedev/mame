@@ -745,8 +745,8 @@ void mtech_state::megatech(machine_config &config)
 	m_vdp1->set_screen("menu");
 	m_vdp1->set_is_pal(false);
 	m_vdp1->n_int().set_inputline(m_bioscpu, 0);
-	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_vdp1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_vdp1->add_route(ALL_OUTPUTS, "speaker", 0.25);
+	m_vdp1->add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

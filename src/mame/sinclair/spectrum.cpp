@@ -278,6 +278,7 @@ SamRam
 #include "emu.h"
 #include "spectrum.h"
 
+#include "bus/spectrum/dma/slot.h"
 #include "cpu/z80/z80.h"
 #include "spec_snqk.h"
 
@@ -300,7 +301,7 @@ uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 	   enable paged ROM and then fetches at 0700 to disable it
 	*/
 	m_exp->pre_opcode_fetch(offset);
-	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
+	uint8_t retval = m_specmem->read8(offset);
 	m_exp->post_opcode_fetch(offset);
 	return retval;
 }
@@ -310,7 +311,7 @@ uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 	if (is_contended(offset)) content_early();
 
 	m_exp->pre_data_fetch(offset);
-	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
+	uint8_t retval = m_specmem->read8(offset);
 	m_exp->post_data_fetch(offset);
 	return retval;
 }
@@ -320,7 +321,7 @@ void spectrum_state::spectrum_data_w(offs_t offset, uint8_t data)
 	if (is_contended(offset)) content_early();
 	if (is_vram_write(offset)) m_screen->update_now();
 
-	m_specmem->space(AS_PROGRAM).write_byte(offset,data);
+	m_specmem->write8(offset,data);
 }
 
 void spectrum_state::spectrum_rom_w(offs_t offset, uint8_t data)
@@ -332,7 +333,7 @@ uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
 {
 	return m_exp->romcs()
 		? m_exp->mreq_r(offset)
-		: memregion("maincpu")->base()[offset];
+		: m_rom[offset];
 }
 
 /*
@@ -580,25 +581,7 @@ void spectrum_state::spectrum_clone_io(address_map &map)
 
 /* Input ports */
 
-/****************************************************************************************************/
-
-static INPUT_PORTS_START( spec_plus_joys )
-	PORT_START("JOY2") /* 0xF7FE */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(2) PORT_CODE(JOYCODE_X_LEFT_SWITCH)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(2) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(2) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(2) PORT_CODE(JOYCODE_Y_UP_SWITCH)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON1)
-
-	PORT_START("JOY1") /* 0xEFFE */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(1) PORT_CODE(JOYCODE_Y_UP_SWITCH)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(1) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(1) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(1) PORT_CODE(JOYCODE_X_LEFT_SWITCH)
-INPUT_PORTS_END
-
-/*
+/****************************************************************************************************
 Spectrum keyboard is quite complicate to emulate. Each key can have 5 or 6 different functions, depending on which input mode we are in:
 
 -------------------------------------------------------------------------------------------------------------------
@@ -693,48 +676,6 @@ INPUT_PORTS_START( spectrum )
 	PORT_BIT(0x7f, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-/* These keys need not to be mapped in natural mode because Spectrum+ supports both these and the Spectrum sequences above.
-   Hence, we can simply keep using such sequences in natural keyboard emulation */
-INPUT_PORTS_START( spec128 )
-	PORT_INCLUDE( spectrum )
-
-	PORT_START("PLUS0") /* Spectrum+ Keys (Same as CAPS + 1-5) */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EDIT") PORT_CODE(KEYCODE_INSERT)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TRUE VID") PORT_CODE(KEYCODE_HOME)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INV VID") PORT_CODE(KEYCODE_END)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Left") PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("PLUS1") /* Spectrum+ Keys (Same as CAPS + 6-0) */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_LALT)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Right") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Up") PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Down") PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("PLUS2") /* Spectrum+ Keys (Same as CAPS + SPACE and CAPS + SYMBOL) */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_PAUSE)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXT MODE") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("PLUS3") /* Spectrum+ Keys (Same as SYMBOL SHIFT + O/P) */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\"") PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
-	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("PLUS4") /* Spectrum+ Keys (Same as SYMBOL SHIFT + N/M) */
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT(0xf3, IP_ACTIVE_LOW, IPT_UNUSED)
-INPUT_PORTS_END
-
-INPUT_PORTS_START( spec_plus )
-	PORT_INCLUDE( spec128 )
-	PORT_INCLUDE( spec_plus_joys )
-INPUT_PORTS_END
-
 /* Machine initialization */
 void spectrum_state::init_spectrum()
 {
@@ -745,6 +686,9 @@ void spectrum_state::machine_start()
 {
 	save_item(NAME(m_port_fe_data));
 	save_item(NAME(m_int_at));
+
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
+	m_maincpu->space(AS_IO).specific(m_io);
 }
 
 void spectrum_state::machine_reset()
@@ -801,6 +745,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_maincpu->set_io_map(&spectrum_state::spectrum_io);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
 	m_maincpu->nomreq_cb().set(FUNC(spectrum_state::spectrum_nomreq));
+	m_maincpu->busack_cb().set("dma", FUNC(dma_slot_device::bai_w));
 
 	ADDRESS_MAP_BANK(config, m_specmem).set_map(&spectrum_state::spectrum_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x10000);
 
@@ -834,7 +779,15 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->fb_r_handler().set(FUNC(spectrum_state::floating_bus_r));
 
-	/* devices */
+	dma_slot_device &dma(DMA_SLOT(config, "dma", X1 / 4, default_dma_slot_devices, nullptr));
+	dma.set_io_space(m_maincpu, AS_IO);
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dma.in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
+	dma.out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
+	dma.in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
+	dma.out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
+
 	SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx").set_load_callback(FUNC(spectrum_state::snapshot_cb));
 	QUICKLOAD(config, "quickload", "raw,scr", attotime::from_seconds(2)).set_load_callback(FUNC(spectrum_state::quickload_cb)); // The delay prevents the screen from being cleared by the RAM test at boot
 

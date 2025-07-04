@@ -39,7 +39,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
@@ -126,7 +126,7 @@ private:
 	u16 r16(u32 addr);
 	[[maybe_unused]] void TimersAddTicks(int ticks);
 	s32 UpdateSlot(AICA_SLOT *slot);
-	void DoMasterSamples(std::vector<read_stream_view> const &inputs, write_stream_view &bufl, write_stream_view &bufr);
+	void DoMasterSamples(sound_stream &stream);
 	void exec_dma();
 
 

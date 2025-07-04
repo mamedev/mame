@@ -32,7 +32,6 @@
 // device type definition
 DEFINE_DEVICE_TYPE(MB63H114, mb63h114_device, "mb63h114", "Roland MB63H114 Multiple Address Counter")
 
-
 //**************************************************************************
 //  DEVICE IMPLEMENTATION
 //**************************************************************************
@@ -43,7 +42,29 @@ DEFINE_DEVICE_TYPE(MB63H114, mb63h114_device, "mb63h114", "Roland MB63H114 Multi
 
 mb63h114_device::mb63h114_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MB63H114, tag, owner, clock)
+	, m_counter_func(*this)
+	, m_timer(nullptr)
+	, m_xst(0)
+	, m_xck(0)
+	, m_active_counter(0)
+	, m_d(0)
 {
+	std::fill(m_counters.begin(), m_counters.end(), MAX_COUNT);
+}
+
+
+//-------------------------------------------------
+//  timer tick
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(mb63h114_device::timer_tick)
+{
+	const u8 dcba_output = (m_d << 3) | m_active_counter;
+	m_counter_func(dcba_output, m_counters[m_active_counter]);
+
+	const u8 next_output = dcba_output + 1;
+	m_active_counter = next_output & 0x07;
+	m_d = BIT(next_output, 3);
 }
 
 
@@ -53,6 +74,15 @@ mb63h114_device::mb63h114_device(const machine_config &mconfig, const char *tag,
 
 void mb63h114_device::device_start()
 {
+	save_item(NAME(m_xst));
+	save_item(NAME(m_xck));
+	save_item(NAME(m_active_counter));
+	save_item(NAME(m_d));
+	save_item(NAME(m_counters));
+
+	m_timer = timer_alloc(FUNC(mb63h114_device::timer_tick), this);
+	const attotime period = attotime::from_hz(clock() / 8.0);
+	m_timer->adjust(period, 0, period);
 }
 
 
@@ -62,6 +92,11 @@ void mb63h114_device::device_start()
 
 void mb63h114_device::device_reset()
 {
+	m_xst = 0;
+	m_xck = 0;
+	m_active_counter = 0;
+	m_d = 0;
+	std::fill(m_counters.begin(), m_counters.end(), MAX_COUNT);
 }
 
 
@@ -71,5 +106,23 @@ void mb63h114_device::device_reset()
 
 void mb63h114_device::xst_w(u8 data)
 {
-	logerror("%s: XST = %02X\n", machine().describe_context(), data);
+	for (int i = 0; i < COUNTERS; ++i)
+		// Not sure if level- or edge-triggered. Treating as negative edge-triggered.
+		if (BIT(m_xst, i) && !BIT(data, i))
+			m_counters[i] = 0;
+	m_xst = data;
+}
+
+
+//-------------------------------------------------
+//  xck_w -  write clock inputs for the counters
+//-------------------------------------------------
+
+void mb63h114_device::xck_w(u8 data)
+{
+	for (int i = 0; i < COUNTERS; ++i)
+		if (BIT(m_xck, i) && !BIT(data, i))  // Negative edge-triggered.
+			if (m_counters[i] < MAX_COUNT)
+				++m_counters[i];
+	m_xck = data;
 }

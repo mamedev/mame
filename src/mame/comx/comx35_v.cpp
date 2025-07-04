@@ -5,10 +5,9 @@
 
 #include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
+
 #include "screen.h"
-#include "speaker.h"
 
 void comx35_state::cdp1869_w(offs_t offset, uint8_t data)
 {
@@ -88,9 +87,6 @@ void comx35_state::video_start()
 
 void comx35_state::comx35_pal_video(machine_config &config)
 {
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
 	CDP1869(config, m_vis, cdp1869_device::DOT_CLK_PAL, &comx35_state::cdp1869_page_ram);
 	m_vis->add_pal_screen(config, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL);
 	m_vis->set_color_clock(cdp1869_device::COLOR_CLK_PAL);
@@ -101,15 +97,10 @@ void comx35_state::comx35_pal_video(machine_config &config)
 	m_vis->prd_callback().set(FUNC(comx35_state::prd_w));
 	m_vis->set_screen(SCREEN_TAG);
 	m_vis->add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void comx35_state::comx35_ntsc_video(machine_config &config)
 {
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
 	CDP1869(config, m_vis, cdp1869_device::DOT_CLK_NTSC, &comx35_state::cdp1869_page_ram);
 	m_vis->add_ntsc_screen(config, SCREEN_TAG, cdp1869_device::DOT_CLK_NTSC);
 	m_vis->set_color_clock(cdp1869_device::COLOR_CLK_NTSC);
@@ -120,6 +111,4 @@ void comx35_state::comx35_ntsc_video(machine_config &config)
 	m_vis->prd_callback().set(FUNC(comx35_state::prd_w));
 	m_vis->set_screen(SCREEN_TAG);
 	m_vis->add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 }

@@ -108,7 +108,7 @@ private:
 	uint8_t m_mute;
 	uint8_t m_overall[2];
 	uint8_t m_duty_cycle[2][3];
-	uint8_t m_ayvolume_lookup[16];
+	float m_ayvolume_lookup[16];
 
 	// I/O port overrides
 	uint8_t m_custom_input_mask[5];

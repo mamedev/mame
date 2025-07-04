@@ -57,6 +57,7 @@ intended as an educational tool. There is no attempt to emulate audio.
 */
 
 #include "emu.h"
+
 #include "bus/midi/midi.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6850acia.h"
@@ -68,6 +69,9 @@ intended as an educational tool. There is no attempt to emulate audio.
 #include "machine/rescap.h"
 #include "machine/timer.h"
 #include "video/pwm.h"
+
+#include <algorithm>
+#include <array>
 
 #include "oberheim_xpander.lh"
 
@@ -94,7 +98,6 @@ constexpr const char NVRAM_A_TAG[] = "nvram_a";
 constexpr const char NVRAM_B_TAG[] = "nvram_b";
 constexpr const char VOICERAM_TAG[] = "voiceram";
 
-constexpr const int NUM_ENCODERS = 6;
 constexpr const int NUM_ENCODER_POSITIONS = 30;
 
 class xpander_state : public driver_device
@@ -114,33 +117,26 @@ public:
 		, m_cv_io(*this, "cv_in_%d", 1U)
 		, m_pedal_io(*this, "pedal_%d", 1U)
 		, m_vfd_devices(*this, "vfd_%d", 0U)
-		, m_vfd_outputs()
+		, m_vfd_outputs(*this, "vfd_%u_char_%u", 1U, 1U)
 		, m_cassmute(*this, "cassmute")
 		, m_voicecpu(*this, VOICECPU_TAG)
 		, m_voicepit(*this, "voice_pit_8253")
 		, m_voiceram(*this, VOICERAM_TAG)
-		, m_fm_mdac(*this, "voice_%d_fm_mdac", 1U)
-		, m_filter_mode(*this, "voice_%d_filter_mode", 1U)
-		, m_noise(*this, "voice_%d_noise", 1U)
-		, m_pan(*this, "voice_%d_pan", 1U)
-		, m_saw1(*this, "voice_%d_saw1", 1U)
-		, m_saw2(*this, "voice_%d_saw2", 1U)
-		, m_tri1(*this, "voice_%d_tri1", 1U)
-		, m_tri2(*this, "voice_%d_tri2", 1U)
-		, m_vcofm(*this, "voice_%d_vcofm", 1U)
-		, m_sync(*this, "voice_%d_sync", 1U)
-		, m_haltreq(4, false)
-		, m_encoder_dir(NUM_ENCODERS, false)
-		, m_encoder_changed(NUM_ENCODERS, false)
-		, m_vfd_anode_masks(3, 0)
-		, m_cv(NUM_VOICES, std::vector<float>(NUM_CVS, -1))
-		, m_fast(NUM_VOICES, std::vector<bool>(NUM_CVS - 1, false))  // `-1` because RES does not support fast updates.
+		, m_fm_mdac(*this, "voice_%u_fm_mdac", 1U)
+		, m_filter_mode(*this, "voice_%u_filter_mode", 1U)
+		, m_noise(*this, "voice_%u_noise", 1U)
+		, m_pan(*this, "voice_%u_pan", 1U)
+		, m_saw1(*this, "voice_%u_saw1", 1U)
+		, m_saw2(*this, "voice_%u_saw2", 1U)
+		, m_tri1(*this, "voice_%u_tri1", 1U)
+		, m_tri2(*this, "voice_%u_tri2", 1U)
+		, m_vcofm(*this, "voice_%u_vcofm", 1U)
+		, m_sync(*this, "voice_%u_sync", 1U)
 	{
-		for (int i = 0; i < m_vfd_devices.size(); ++i)
-		{
-			std::string format = "vfd_" + std::to_string(i + 1) + "_char_%d";
-			m_vfd_outputs.push_back(output_finder<40>(*this, std::move(format), 1U));
-		}
+		for (auto &cv : m_cv)
+			std::fill(cv.begin(), cv.end(), 0.0F);
+		for (auto &fast : m_fast)
+			std::fill(fast.begin(), fast.end(), false);
 	}
 
 	void xpander(machine_config &config) ATTR_COLD;
@@ -214,7 +210,7 @@ private:
 	required_ioport_array<6> m_cv_io;
 	required_ioport_array<2> m_pedal_io;
 	required_device_array<pwm_display_device, 3> m_vfd_devices;
-	std::vector<output_finder<40>> m_vfd_outputs;
+	output_finder<3, 40> m_vfd_outputs;
 	output_finder<> m_cassmute;
 
 	// Voice computer.
@@ -240,10 +236,10 @@ private:
 	u8 m_firq_timer_preset = 0xff;  // Preset for 40103 timer. Pulled high.
 	u8 m_selected_cv_in = 0x07;  // MUX A-C inputs. Pulled high.
 	bool m_inhibit_cv_in = true;  // MUX INHibit input. Pulled high.
-	std::vector<bool> m_haltreq;  // Halt request to the voice board (HALTREQ).
-	std::vector<bool> m_encoder_dir;
-	std::vector<bool> m_encoder_changed;
-	std::vector<u64> m_vfd_anode_masks;
+	std::array<bool, 4> m_haltreq = { false, false, false, false };  // Halt request to the voice board (HALTREQ).
+	std::array<bool, 6> m_encoder_dir = { false, false, false, false, false, false };
+	std::array<bool, 6> m_encoder_changed = { false, false, false, false, false, false };
+	std::array<u64, 3> m_vfd_anode_masks = { 0, 0, 0 };
 
 	// Voice computer state.
 	bool m_haltdis = 0;  // Halt disable (HALTDS).
@@ -253,8 +249,8 @@ private:
 	float m_dac_fine_v = 0;
 	float m_dac_vref = 4.865F;  // Sampled in C806 and buffered and scaled by U815.
 	bool m_allow_fast = false;
-	std::vector<std::vector<float>> m_cv;
-	std::vector<std::vector<bool>> m_fast;
+	std::array<std::array<float, NUM_CVS>, NUM_VOICES> m_cv;
+	std::array<std::array<bool, NUM_CVS - 1>, NUM_VOICES> m_fast;  // `-1` because RES does not support fast updates.
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(xpander_state::firq_timer_elapsed)
@@ -292,7 +288,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(xpander_state::firq_timer_elapsed)
 		// board). This also clears the grid mask as a side effect. See
 		// display_w() for more info.
 		for (int i = 0; i < m_vfd_devices.size(); ++i)
-			m_vfd_devices[i]->matrix(0, m_vfd_anode_masks[i]);
+			m_vfd_devices[i]->write_my(0);
 	}
 }
 
@@ -344,11 +340,10 @@ u8 xpander_state::switch_r(offs_t offset)
 	return data;
 }
 
-static u8 byte_from_vector(const std::vector<bool> &v)
+static u8 byte_from_array(const std::array<bool, 6> &v)
 {
-	assert(v.size() <= 8);
 	u8 data = 0;
-	for (int i = 0; i < v.size(); ++i)
+	for (int i = 0; i < 6; ++i)
 		if (v[i])
 			data |= 1U << i;
 	return data;
@@ -358,17 +353,16 @@ u8 xpander_state::encoder_dir_r()
 {
 	// The DIR* signal also resets encoder change detection flip-flops when
 	// active (low).
-	for (int i = 0; i < m_encoder_changed.size(); ++i)
-		m_encoder_changed[i] = false;
+	std::fill(m_encoder_changed.begin(), m_encoder_changed.end(), false);
 
-	const u8 data = byte_from_vector(m_encoder_dir);
+	const u8 data = byte_from_array(m_encoder_dir);
 	LOGMASKED(LOG_ENCODERS, "Encoder dir_r: %02x\n", data);
 	return data;
 }
 
 u8 xpander_state::encoder_sw_r()
 {
-	const u8 data = byte_from_vector(m_encoder_changed);
+	const u8 data = byte_from_array(m_encoder_changed);
 	if (data != 0)
 		LOGMASKED(LOG_ENCODERS, "Encoder sw_r: %02x\n", data);
 	return data;
@@ -459,7 +453,7 @@ void xpander_state::haltset_w(u8 data)
 
 	// Bit 4: RES* (voice cpu reset).
 	const bool reset_voice = !BIT(data, 4);  // Active low.
-	const bool voice_resetting = (m_voicecpu->input_state(INPUT_LINE_RESET) == ASSERT_LINE);
+	const bool voice_resetting = (m_voicecpu->input_line_state(INPUT_LINE_RESET) == ASSERT_LINE);
 	if (reset_voice != voice_resetting)
 	{
 		m_voicecpu->set_input_line(INPUT_LINE_RESET, reset_voice ? ASSERT_LINE : CLEAR_LINE);
@@ -496,6 +490,7 @@ void xpander_state::display_w(offs_t offset, u8 data)
 			m_vfd_anode_masks[display] = (u16(data) << 8) | (m_vfd_anode_masks[display] & 0x00ff);
 		else
 			m_vfd_anode_masks[display] = (m_vfd_anode_masks[display] & 0xff00) | data;
+		m_vfd_devices[display]->write_mx(m_vfd_anode_masks[display]);
 	}
 
 	// An 74LS42 (U9), combined with 5 x 4028 (U2, U6, U8, U14, U18) form a
@@ -507,14 +502,9 @@ void xpander_state::display_w(offs_t offset, u8 data)
 	if (grid_enabled && grid_offset < 40)  // There are 40 grid signals.
 		grid_mask = u64(1) << grid_offset;
 
-	// Refresh VFD devices with the latest state.
+	// Refresh VFD devices with the latest grid mask.
 	for (int i = 0; i < m_vfd_devices.size(); ++i)
-		m_vfd_devices[i]->matrix(grid_mask, m_vfd_anode_masks[i]);
-
-	// Note that the output of U12 (anode select decoder), the grid mask, and
-	// the address driving it (A3-A8, U11, 74LS174) are latched until the next
-	// write, or until FIRQ is invoked. But there is no need to store state
-	// for these, the "matrix()" call above achieves the same, implicitly.
+		m_vfd_devices[i]->write_my(grid_mask);
 }
 
 void xpander_state::display_output_w(int display, offs_t offset, u32 data)
@@ -601,7 +591,7 @@ void xpander_state::voice_update_cv(u8 voice, u8 cv_index, float cv, bool fast)
 	m_cv[voice][cv_index] = cv;
 	m_fast[voice][cv_index] = fast;
 	LOGMASKED(LOG_DAC, "Voice %d - CV %s: %f, fast: %d\n",
-	          voice, CV_NAMES[cv_index], cv, fast);
+			voice, CV_NAMES[cv_index], cv, fast);
 }
 
 void xpander_state::voice_update_resonance_cv(u8 voice, float cv)
@@ -613,7 +603,7 @@ void xpander_state::voice_update_resonance_cv(u8 voice, float cv)
 
 	m_cv[voice][RES_CV_INDEX] = cv;
 	LOGMASKED(LOG_DAC, "Voice %d - CV %s: %f\n",
-	          voice, CV_NAMES[RES_CV_INDEX], cv);
+			voice, CV_NAMES[RES_CV_INDEX], cv);
 }
 
 void xpander_state::voice_dac_enable_w(offs_t offset, u8 data)
@@ -624,7 +614,7 @@ void xpander_state::voice_dac_enable_w(offs_t offset, u8 data)
 	// Generated by D805, R856, R857, R854, U815.
 	static constexpr const float V_REF_U815 = 4;
 	static constexpr const float DEFAULT_UNSCALED_VREF =
-		V_REF_U815 * RES_VOLTAGE_DIVIDER(RES_K(18.2), RES_K(10));
+			V_REF_U815 * RES_VOLTAGE_DIVIDER(RES_K(18.2), RES_K(10));
 	static constexpr const float VREF_SCALER = 1 + RES_K(2.43) / RES_K(1);  // U815, R851, R852.
 	static constexpr const float DEFAULT_VREF = DEFAULT_UNSCALED_VREF * VREF_SCALER;
 	static constexpr const float CEM3374_NOMINAL_TEMPCO_V = 2.5;
@@ -680,7 +670,7 @@ void xpander_state::voice_dac_enable_w(offs_t offset, u8 data)
 	if (is_hres)  // Turns on U814.
 	{
 		dac_v += -RES_K(10) / RES_K(30.1) * m_dac_fine_v
-		         -RES_K(10) / RES_K(17.4) * m_dac_vref;
+				 -RES_K(10) / RES_K(17.4) * m_dac_vref;
 	}
 
 	const u8 sh_address = (offset >> 1) & 0x07;  // A1-A3.
@@ -723,7 +713,7 @@ void xpander_state::voice_dac_clear_w(u8 data)
 	m_dac_data = ((data & LOW7_MASK) << 7) | (m_dac_data & LOW7_MASK);
 	m_allow_fast = BIT(data, 7);
 	LOGMASKED(LOG_DAC_VERBOSE, "DAC clear %02x: %04x - %d\n",
-	          data, m_dac_data, m_allow_fast);
+				data, m_dac_data, m_allow_fast);
 }
 
 void xpander_state::voice_dac_w(offs_t offset, u8 data)
@@ -835,9 +825,7 @@ void xpander_state::machine_start()
 	firq_timer_elapsed(*m_firq_timer, m_firq_timer_preset);  // Reset the timer.
 
 	m_cassmute.resolve();
-	for (output_finder<40> &vfd_char_output : m_vfd_outputs)
-		vfd_char_output.resolve();
-
+	m_vfd_outputs.resolve();
 	m_fm_mdac.resolve();
 	m_filter_mode.resolve();
 	m_noise.resolve();
@@ -848,6 +836,23 @@ void xpander_state::machine_start()
 	m_tri2.resolve();
 	m_vcofm.resolve();
 	m_sync.resolve();
+
+	save_item(NAME(m_firq_timer_preset));
+	save_item(NAME(m_selected_cv_in));
+	save_item(NAME(m_inhibit_cv_in));
+	save_item(NAME(m_haltreq));
+	save_item(NAME(m_encoder_dir));
+	save_item(NAME(m_encoder_changed));
+	save_item(NAME(m_vfd_anode_masks));
+	save_item(NAME(m_haltdis));
+	save_item(NAME(m_haltack));
+	save_item(NAME(m_autodone));
+	save_item(NAME(m_dac_data));
+	save_item(NAME(m_dac_fine_v));
+	save_item(NAME(m_dac_vref));
+	save_item(NAME(m_allow_fast));
+	save_item(NAME(m_cv));
+	save_item(NAME(m_fast));
 }
 
 void xpander_state::xpander(machine_config &config)
@@ -881,7 +886,7 @@ void xpander_state::xpander(machine_config &config)
 	{
 		PWM_DISPLAY(config, m_vfd_devices[i]).set_size(40, 16);  // 40 x 16-segment display.
 		m_vfd_devices[i]->set_segmask(0xffffffffff, 0xffff);
-		m_vfd_devices[i]->output_digit().set([this, i](offs_t offset, u32 data) { display_output_w(i, offset, data); });
+		m_vfd_devices[i]->output_digit().set([this, i] (offs_t offset, u32 data) { display_output_w(i, offset, data); });
 	}
 
 	config.set_default_layout(layout_oberheim_xpander);
@@ -945,13 +950,13 @@ DECLARE_INPUT_CHANGED_MEMBER(xpander_state::encoder_moved)
 
 	static constexpr const int WRAP_BUFFER = 3;
 	const bool overflowed = newval <= WRAP_BUFFER &&
-	           oldval >= NUM_ENCODER_POSITIONS - WRAP_BUFFER;
+			oldval >= NUM_ENCODER_POSITIONS - WRAP_BUFFER;
 	const bool underflowed = newval >= NUM_ENCODER_POSITIONS - WRAP_BUFFER &&
-	           oldval <= WRAP_BUFFER;
+			oldval <= WRAP_BUFFER;
 	m_encoder_dir[encoder] = ((newval > oldval) || overflowed) && !underflowed;
 
 	LOGMASKED(LOG_ENCODERS, "Encoder %d changed from: %d to: %d (o: %d, u: %d), dir: %d\n",
-	          encoder, oldval, newval, overflowed, underflowed, bool(m_encoder_dir[encoder]));
+			encoder, oldval, newval, overflowed, underflowed, m_encoder_dir[encoder]);
 }
 
 DECLARE_INPUT_CHANGED_MEMBER(xpander_state::memory_protect_changed)
@@ -1144,4 +1149,4 @@ ROM_END
 }  // anonymous namespace
 
 // In production from 1984 to 1988.
-SYST(1984, xpander, 0, 0, xpander, xpander, xpander_state, empty_init, "Oberheim", "Xpander", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(1984, xpander, 0, 0, xpander, xpander, xpander_state, empty_init, "Oberheim", "Xpander", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -510,8 +510,7 @@ void pluto6_state::pluto6(machine_config &config){
 	PLUTO6_EXPANSION_SLOT(config, m_exp1, 0);
 	m_exp1->set_default_option(nullptr);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	HEBER_PLUTO6_FPGA(config, m_fpga);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pluto6_state::pluto6_map);

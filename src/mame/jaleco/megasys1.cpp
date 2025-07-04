@@ -1917,24 +1917,23 @@ void megasys1_state::system_base(machine_config &config)
 	m_tmap[2]->set_screen_tag(m_screen);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_16(config, m_soundlatch[0]);
 	GENERIC_LATCH_16(config, m_soundlatch[1]);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CPU_CLOCK/2)); /* 3.5MHz (7MHz / 2) verified */
 	ymsnd.irq_handler().set(FUNC(megasys1_state::sound_irq));
-	ymsnd.add_route(0, "lspeaker", 0.80);
-	ymsnd.add_route(1, "rspeaker", 0.80);
+	ymsnd.add_route(0, "speaker", 0.80, 0);
+	ymsnd.add_route(1, "speaker", 0.80, 1);
 
 	OKIM6295(config, m_oki[0], OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH); /* 4MHz verified */
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 
 	OKIM6295(config, m_oki[1], OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH); /* 4MHz verified */
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 }
 
 void megasys1_typea_state::system_A(machine_config &config)
@@ -2002,8 +2001,8 @@ void megasys1_typea_state::system_A_kickoffb(machine_config &config)
 
 	ym2203_device &ymsnd(YM2203(config.replace(), "ymsnd", SOUND_CPU_CLOCK / 2));
 	ymsnd.irq_handler().set(FUNC(megasys1_typea_state::sound_irq));
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 void megasys1_typea_state::system_A_p47bl(machine_config &config)
@@ -2027,13 +2026,13 @@ void megasys1_typea_state::system_A_p47bl(machine_config &config)
 	// OKI M5205
 	MSM5205(config, m_p47bl_adpcm[0], 384000);
 	m_p47bl_adpcm[0]->set_prescaler_selector(msm5205_device::SEX_4B);
-	m_p47bl_adpcm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_p47bl_adpcm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_p47bl_adpcm[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_p47bl_adpcm[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	MSM5205(config, m_p47bl_adpcm[1], 384000);
 	m_p47bl_adpcm[1]->set_prescaler_selector(msm5205_device::SEX_4B);
-	m_p47bl_adpcm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_p47bl_adpcm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_p47bl_adpcm[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_p47bl_adpcm[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 void megasys1_state::system_B(machine_config &config)
@@ -2115,13 +2114,12 @@ void megasys1_state::system_Bbl(machine_config &config)
 	m_tmap[2]->set_screen_tag(m_screen);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	/* just the one OKI, used for sound and music */
 	OKIM6295(config, m_oki[0], OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 }
 
 void megasys1_bc_iosim_state::system_B_hayaosi1(machine_config &config)
@@ -2131,12 +2129,12 @@ void megasys1_bc_iosim_state::system_B_hayaosi1(machine_config &config)
 	/* basic machine hardware */
 
 	OKIM6295(config.replace(), m_oki[0], 2000000, okim6295_device::PIN7_HIGH); /* correct speed, but unknown OSC + divider combo */
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 
 	OKIM6295(config.replace(), m_oki[1], 2000000, okim6295_device::PIN7_HIGH); /* correct speed, but unknown OSC + divider combo */
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 }
 
 void megasys1_state::system_C(machine_config &config)

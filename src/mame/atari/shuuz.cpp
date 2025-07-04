@@ -156,48 +156,53 @@ uint32_t shuuz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
 			{
-				if (mo[x] != 0xffff)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified from the GALs on the real PCB; equations follow
-					 *
-					 *      --- O13 is 1 if (PFS7-4 == 0xf)
-					 *      O13=PFS6*PFS7*(PFS5&PFS4)
-					 *
-					 *      --- PF/M is 1 if MOs have priority, or 0 if playfield has priority
-					 *      MO/PF=!PFS7*!(LBD7&LBD6)*!M1*!O13
-					 *         +!PFS7*!(LBD7&LBD6)*!M2*!O13
-					 *         +!PFS7*!(LBD7&LBD6)*!M3*!O13
-					 *         +PFS7*(LBD7&LBD6)*!M1*!O13
-					 *         +PFS7*(LBD7&LBD6)*!M2*!O13
-					 *         +PFS7*(LBD7&LBD6)*!M3*!O13
-					 *
-					 */
-
-					// This is based on observations, and not verified against schematics and GAL equations.
-					// TODO:
-					// * Locate schematics for (or trace out) video mixing section.
-					// * Obtain equations for video mixing GALs.
-					bool const o13 = (pf[x] & 0xf0) == 0xf0;
-					bool const mopf = ((pf[x] & 0x80) ? ((mo[x] & 0xc0) == 0xc0) : ((mo[x] & 0xc0) != 0xc0)) && !o13;
-
-					// if MO/PF is asserted, we draw the MO
-					if (mopf)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						if (mo[x] & 0x0e)       // solid colors
-							pf[x] = mo[x];
-						else if (mo[x] & 0x01)  // shadows
-							pf[x] |= 0x200;
+						if (mo[x] != 0xffff)
+						{
+							/* verified from the GALs on the real PCB; equations follow
+							 *
+							 *      --- O13 is 1 if (PFS7-4 == 0xf)
+							 *      O13=PFS6*PFS7*(PFS5&PFS4)
+							 *
+							 *      --- PF/M is 1 if MOs have priority, or 0 if playfield has priority
+							 *      MO/PF=!PFS7*!(LBD7&LBD6)*!M1*!O13
+							 *         +!PFS7*!(LBD7&LBD6)*!M2*!O13
+							 *         +!PFS7*!(LBD7&LBD6)*!M3*!O13
+							 *         +PFS7*(LBD7&LBD6)*!M1*!O13
+							 *         +PFS7*(LBD7&LBD6)*!M2*!O13
+							 *         +PFS7*(LBD7&LBD6)*!M3*!O13
+							 *
+							 */
+
+							// This is based on observations, and not verified against schematics and GAL equations.
+							// TODO:
+							// * Locate schematics for (or trace out) video mixing section.
+							// * Obtain equations for video mixing GALs.
+							bool const o13 = (pf[x] & 0xf0) == 0xf0;
+							bool const mopf = ((pf[x] & 0x80) ? ((mo[x] & 0xc0) == 0xc0) : ((mo[x] & 0xc0) != 0xc0)) && !o13;
+
+							// if MO/PF is asserted, we draw the MO
+							if (mopf)
+							{
+								if (mo[x] & 0x0e)       // solid colors
+									pf[x] = mo[x];
+								else if (mo[x] & 0x01)  // shadows
+									pf[x] |= 0x200;
+							}
+						}
 					}
 				}
-			}
-		}
+			});
+
 	return 0;
 }
 

@@ -1057,27 +1057,26 @@ void namcos1_state::ns1(machine_config &config)
 	m_c123tmap->set_tmap3_half_height();
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
-	ymsnd.add_route(0, "lspeaker", 0.50);
-	ymsnd.add_route(1, "rspeaker", 0.50);
+	ymsnd.add_route(0, "speaker", 0.50, 0);
+	ymsnd.add_route(1, "speaker", 0.50, 1);
 
 	namco_cus30_device &cus30(NAMCO_CUS30(config, "namco", XTAL(49'152'000)/2048/2));
 	cus30.set_voices(8);
 	cus30.set_stereo(1);
-	cus30.add_route(0, "lspeaker", 0.50);
-	cus30.add_route(1, "rspeaker", 0.50);
+	cus30.add_route(0, "speaker", 0.50, 0);
+	cus30.add_route(1, "speaker", 0.50, 1);
 
 	DAC_8BIT_R2R(config, m_dac[0], 0); // 10-pin 1Kx8R SIP with HC374 latch
-	m_dac[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_dac[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_dac[0]->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_dac[0]->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 
 	DAC_8BIT_R2R(config, m_dac[1], 0); // 10-pin 1Kx8R SIP with HC374 latch
-	m_dac[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_dac[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_dac[1]->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_dac[1]->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 }
 
 void quester_state::quester(machine_config &config)

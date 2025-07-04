@@ -190,6 +190,8 @@ void device_serial_interface::set_data_frame(int start_bit_count, int data_bit_c
 	{
 		m_rcv_bit_count++;
 	}
+
+	receive_register_reset();
 }
 
 void device_serial_interface::receive_register_reset()

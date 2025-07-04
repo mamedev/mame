@@ -6,7 +6,9 @@
 #                      \___/_/\_\ .__/ \__,_|\__|
 #                               |_| XML parser
 #
-# Copyright (c) 2017 Expat development team
+# Copyright (c) 2017-2024 Sebastian Pipping <sebastian@pipping.org>
+# Copyright (c) 2017      Tomasz Kłoczko <kloczek@fedoraproject.org>
+# Copyright (c) 2019      David Loffredo <loffredo@steptools.com>
 # Licensed under the MIT license:
 #
 # Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -34,9 +36,13 @@ include_HEADERS = \
     expat_external.h
 
 lib_LTLIBRARIES = libexpat.la
+if WITH_TESTS
+noinst_LTLIBRARIES = libtestpat.la
+endif
 
 libexpat_la_LDFLAGS = \
     @AM_LDFLAGS@ \
+    @LIBM@ \
     -no-undefined \
     -version-info @LIBCURRENT@:@LIBREVISION@:@LIBAGE@
 
@@ -44,6 +50,12 @@ libexpat_la_SOURCES = \
     xmlparse.c \
     xmltok.c \
     xmlrole.c
+
+if WITH_TESTS
+libtestpat_la_CPPFLAGS = -DXML_TESTING
+
+libtestpat_la_SOURCES = $(libexpat_la_SOURCES)
+endif
 
 doc_DATA = \
     ../AUTHORS \
@@ -63,8 +75,7 @@ EXTRA_DIST = \
     iasciitab.h \
     internal.h \
     latin1tab.h \
-    libexpat.def \
-    libexpatw.def \
+    libexpat.def.cmake \
     nametab.h \
     siphash.h \
     utf8tab.h \

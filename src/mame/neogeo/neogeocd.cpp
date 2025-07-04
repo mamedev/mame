@@ -1109,7 +1109,7 @@ void ngcd_state::neocd_ntsc(machine_config &config)
 	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_controls, "joy", false);
 	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_controls, "joy", false);
 
-	CDROM(config, "cdrom").set_interface("neocd_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("neocd");
 
 	m_ym->set_addrmap(0, &ngcd_state::neocd_ym_map);

@@ -1687,7 +1687,7 @@ static INPUT_PORTS_START( mjctrl2 )
 	PORT_INCLUDE( mjctrl1 )
 
 	PORT_MODIFY("KEY0")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -5998,7 +5998,7 @@ HSync - 15.510kHz
 
 ROM_START( ichiban ) // TODO: how does the banking work?
 	ROM_REGION( 0x60000, "maincpu", 0 ) // opcodes in first half are mixed with pseudo-random garbage
-	ROM_LOAD( "3.u15", 0x00000, 0x20000, CRC(76240568) SHA1(cf055d1eaae25661a49ec4722a2c7caca862e66a) )
+	ROM_LOAD( "3.u15", 0x00000, 0x20000, CRC(76240568) SHA1(cf055d1eaae25661a49ec4722a2c7caca862e66a) ) // at 0x10008 ICHI-BAN-JYAN Ver3.05 1993/02/07 by OCT
 	ROM_LOAD( "1.u28", 0x20000, 0x08000, CRC(2caa4d3f) SHA1(5e5af164880140b764c097a65388c22ba5ea572b) ) // bank 2 (title screen)
 	ROM_IGNORE(0x18000)
 	ROM_LOAD( "2.u14", 0x30000, 0x08000, CRC(b4834d8e) SHA1(836ddf7586dc5440faf88f5ec50a32265e9a0ec8) ) // bank 4 (mahjong tiles)
@@ -6018,7 +6018,21 @@ ROM_START( ichiban ) // TODO: how does the banking work?
 
 
 	ROM_REGION( 0x600, "proms", 0 )
-	ROM_LOAD( "mjr.u36", 0x000, 0x200, CRC(31cd7a90) SHA1(1525ad19d748561a52626e4ab13df67d9bedf3b8) )
+	ROM_LOAD( "mjr.u36", 0x000, 0x200, CRC(31cd7a90) SHA1(1525ad19d748561a52626e4ab13df67d9bedf3b8) ) // all 3 BPROMs are AM27S13 or compatible
+	ROM_LOAD( "mjg.u37", 0x200, 0x200, CRC(5b3562aa) SHA1(ada60d2a5a5a657d7b209d18a23b685305d9ff7b) )
+	ROM_LOAD( "mjb.u38", 0x400, 0x200, CRC(0ef881cb) SHA1(44b61a443d683f5cb2d1b1a4f74d8a8f41021de5) )
+ROM_END
+
+ROM_START( ichiban235 ) // TODO: how does the banking work?
+	ROM_REGION( 0x60000, "maincpu", 0 ) // opcodes in first half are mixed with pseudo-random garbage
+	ROM_LOAD( "a3.u15", 0x00000, 0x20000, CRC(28e2b636) SHA1(8e813fe1b589f31a3535662b8bfe577b3f862b8c) ) // at 0x10008 ICHI-BAN-JYAN Ver2.35 1992/11/30 by OCT
+	ROM_LOAD( "a1.u28", 0x20000, 0x08000, CRC(2caa4d3f) SHA1(5e5af164880140b764c097a65388c22ba5ea572b) ) // == 1 above, bank 2 (title screen)
+	ROM_IGNORE(0x18000)
+	ROM_LOAD( "a2.u14", 0x30000, 0x08000, CRC(b4834d8e) SHA1(836ddf7586dc5440faf88f5ec50a32265e9a0ec8) ) // == 2 above, bank 4 (mahjong tiles)
+	ROM_IGNORE(0x18000)
+
+	ROM_REGION( 0x600, "proms", 0 )
+	ROM_LOAD( "mjr.u36", 0x000, 0x200, CRC(31cd7a90) SHA1(1525ad19d748561a52626e4ab13df67d9bedf3b8) ) // all 3 BPROMs are AM27S13 or compatible
 	ROM_LOAD( "mjg.u37", 0x200, 0x200, CRC(5b3562aa) SHA1(ada60d2a5a5a657d7b209d18a23b685305d9ff7b) )
 	ROM_LOAD( "mjb.u38", 0x400, 0x200, CRC(0ef881cb) SHA1(44b61a443d683f5cb2d1b1a4f74d8a8f41021de5) )
 ROM_END
@@ -6312,7 +6326,8 @@ GAME( 1991,  mjvegas,     mjvegasa, mjvegas,  mjvegasa, royalmah_prgbank_state, 
 GAME( 1992,  cafetime,    0,        cafetime, cafetime, royalmah_prgbank_state, init_cafetime, ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
 GAME( 1993,  cafedoll,    0,        cafedoll, cafedoll, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan, Ver. 1.00)",  MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
 GAME( 1993,  cafedollg,   cafedoll, cafedoll, cafedoll, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll Great (Japan, Ver. 1.00)", MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
-GAME( 1993,  ichiban,     0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // ROM banking is wrong, causing several GFX problems
+GAME( 1993,  ichiban,     0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan (Ver 3.05)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // ROM banking is wrong, causing several GFX problems
+GAME( 1993,  ichiban235,  ichiban,  ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan (Ver 2.35)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // ROM banking is wrong, causing several GFX problems
 GAME( 1993,  dragonmj,    0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "OCT",                        "Dragon Mahjong (Ver 1.20)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // " - DRAGON Ver1.20 1993/11/09
 GAME( 1993,  dragonmj103, dragonmj, ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "OCT",                        "Dragon Mahjong (Ver 1.03)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // " - DRAGON Ver1.03 1993/10/16
 GAME( 1995,  mjtensin,    0,        mjtensin, mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             MACHINE_NOT_WORKING )

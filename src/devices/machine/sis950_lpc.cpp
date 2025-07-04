@@ -447,7 +447,9 @@ void sis950_lpc_device::io_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) { m_dmac_slave->write( offset / 2, data ); })
 	);
 
-	map(0x00e0, 0x00ef).noprw();
+	// map(0x00e0, 0x00ef) MCA bus (cfr. Bochs) or PnP
+	map(0x00eb, 0x00eb).lw8(NAME([] (offs_t offset, u8 data) { }));
+
 	// map(0x00f0, 0x00f0) COPRO error
 	// map(0x0480, 0x048f) DMA high page registers
 	// map(0x04d0, 0x04d1) IRQ edge/level control registers
@@ -478,6 +480,8 @@ void sis950_lpc_device::io_map(address_map &map)
 
 	// map(0x0278, 0x027f) parallel port 2 & PnP
 	// map(0x02e8, 0x02ef) serial 3
+	// unmap high: beos5 keeps PnP here for a COM3 that doesn't exist in shutms11
+	map(0x02e8, 0x02ef).lr8(NAME([] () { return 0xff; }));
 	// map(0x02f8, 0x02ff) serial 1
 
 	// map(0x0300, 0x0301) - MIDI ($330 as shutms11 default)

@@ -856,21 +856,20 @@ void suna16_state::bssoccer(machine_config &config)
 	PALETTE(config, m_palette).set_entries(512);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 	GENERIC_LATCH_8(config, "soundlatch3");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4));  /* 3.579545MHz */
-	ymsnd.add_route(0, "lspeaker", 0.2);
-	ymsnd.add_route(1, "rspeaker", 0.2);
+	ymsnd.add_route(0, "speaker", 0.2, 0);
+	ymsnd.add_route(1, "speaker", 0.2, 1);
 
-	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.2); // unknown DAC
-	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
-	DAC_4BIT_R2R(config, "ldac2", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.2); // unknown DAC
-	DAC_4BIT_R2R(config, "rdac2", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
+	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 0.2, 0); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 0.2, 1); // unknown DAC
+	DAC_4BIT_R2R(config, "ldac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.2, 0); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.2, 1); // unknown DAC
 }
 
 
@@ -912,18 +911,17 @@ void suna16_state::uballoon(machine_config &config)
 	PALETTE(config, m_palette).set_entries(512);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4));  /* 3.579545MHz */
-	ymsnd.add_route(0, "lspeaker", 0.50);
-	ymsnd.add_route(1, "rspeaker", 0.50);
+	ymsnd.add_route(0, "speaker", 0.50, 0);
+	ymsnd.add_route(1, "speaker", 0.50, 1);
 
-	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
-	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 0); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1); // unknown DAC
 }
 
 
@@ -964,18 +962,17 @@ void suna16_state::sunaq(machine_config &config)
 	PALETTE(config, m_palette).set_entries(512);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4));  /* 3.579545MHz */
-	ymsnd.add_route(0, "lspeaker", 0.50);
-	ymsnd.add_route(1, "rspeaker", 0.50);
+	ymsnd.add_route(0, "speaker", 0.50, 0);
+	ymsnd.add_route(1, "speaker", 0.50, 1);
 
-	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
-	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 0); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1); // unknown DAC
 }
 
 
@@ -1021,26 +1018,25 @@ void suna16_state::bestbest(machine_config &config)
 	PALETTE(config, m_palette).set_entries(256*8);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(24'000'000)/16));  /* 1.5MHz */
 	aysnd.port_a_write_callback().set(FUNC(suna16_state::bestbest_ay8910_port_a_w));
-	aysnd.add_route(0, "lspeaker", 1.0);
-	aysnd.add_route(1, "rspeaker", 1.0);
+	aysnd.add_route(0, "speaker", 1.0, 0);
+	aysnd.add_route(1, "speaker", 1.0, 1);
 
 	ym3526_device &ymsnd(YM3526(config, "ymsnd", XTAL(24'000'000)/8));   /* 3MHz */
 	ymsnd.irq_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.2); // unknown DAC
-	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
-	DAC_4BIT_R2R(config, "ldac2", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.2); // unknown DAC
-	DAC_4BIT_R2R(config, "rdac2", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
+	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 0.2, 0); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 0.2, 1); // unknown DAC
+	DAC_4BIT_R2R(config, "ldac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.2, 0); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.2, 1); // unknown DAC
 }
 
 /***************************************************************************

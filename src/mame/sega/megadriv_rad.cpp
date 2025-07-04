@@ -36,19 +36,19 @@ public:
 	{ }
 
 protected:
-	uint16_t read(offs_t offset);
+	virtual uint16_t read(offs_t offset);
 	uint16_t read_a13(offs_t offset);
 
-	void megadriv_radica_map(address_map &map) ATTR_COLD;
+	virtual void megadriv_radica_map(address_map &map) ATTR_COLD;
 
 	void radica_base_map(address_map &map) ATTR_COLD;
 
 	int m_bank;
 	int m_romsize;
 
-private:
 	required_region_ptr<uint16_t> m_rom;
 };
+
 
 
 class megadriv_radica_state : public megadriv_radica_state_base
@@ -67,6 +67,28 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+};
+
+class megadriv_b010xx_select_state : public megadriv_radica_state
+{
+public:
+	megadriv_b010xx_select_state(const machine_config& mconfig, device_type type, const char* tag) :
+		megadriv_radica_state(mconfig, type, tag)
+	{ }
+	void init_atgame40();
+
+private:
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual uint16_t read(offs_t offset) override;
+
+	virtual void megadriv_radica_map(address_map &map) override ATTR_COLD;
+
+	void bank_high_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void bank_low_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void bank_upper_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	void b01036_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 };
 
 
@@ -91,7 +113,7 @@ private:
 	uint16_t read_a16302(offs_t offset, uint16_t mem_mask);
 	virtual void write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask);
 
-	void megadriv_dgunl_map(address_map &map) ATTR_COLD;
+	virtual void megadriv_radica_map(address_map &map) override ATTR_COLD;
 };
 
 
@@ -333,8 +355,55 @@ void megadriv_ra145_state::write_a1630a(offs_t offset, uint16_t data, uint16_t m
 	m_bank = m_bank / 0x10000;
 }
 
+uint16_t megadriv_b010xx_select_state::read(offs_t offset)
+{
+	return m_rom[((m_bank >> 1) + offset) & (m_romsize - 1)];
+}
 
-void megadriv_dgunl_state::megadriv_dgunl_map(address_map &map)
+void megadriv_b010xx_select_state::bank_high_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	data &= 0x7f;
+	mem_mask &= 0x7f;
+
+	m_bank = (m_bank & 0xff80ffff) | (data & mem_mask) << 16;
+	logerror("%s: bank_high_w bank is now %08x\n", machine().describe_context(), m_bank);
+}
+
+void megadriv_b010xx_select_state::bank_low_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_bank = (m_bank & 0xffff0000) | (data & mem_mask);
+	logerror("%s: bank_low_w bank is now %08x\n", machine().describe_context(), m_bank);
+}
+
+void megadriv_b010xx_select_state::bank_upper_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// this is handled differently to the other writes, probably some external logic
+	// rather than the same banking
+	// written before bank_high and bank_low
+	m_bank |= 0x800000;
+	logerror("%s: bank_upper_w (%04x %04x) bank is now %08x\n", machine().describe_context(), data, mem_mask, m_bank);
+}
+
+void megadriv_b010xx_select_state::b01036_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// all games in atgame40 that fail to display anything write 0x0001 here
+	// could be coincidence, but could also be enabling the alt display mode?
+	logerror("%s: b01036_w %04x %04x (for games with no display?)\n", machine().describe_context(), data, mem_mask);
+}
+
+void megadriv_b010xx_select_state::megadriv_radica_map(address_map &map)
+{
+	radica_base_map(map);
+
+	map(0xa10104, 0xa10105).w(FUNC(megadriv_b010xx_select_state::bank_upper_w)); // read and written
+
+	map(0xb01028, 0xb01029).w(FUNC(megadriv_b010xx_select_state::bank_low_w));
+	map(0xb0102a, 0xb0102b).w(FUNC(megadriv_b010xx_select_state::bank_high_w));
+
+	map(0xb01036, 0xb01037).w(FUNC(megadriv_b010xx_select_state::b01036_w));
+}
+
+void megadriv_dgunl_state::megadriv_radica_map(address_map &map)
 {
 	radica_base_map(map);
 
@@ -426,6 +495,21 @@ static INPUT_PORTS_START( dgunl_1player )
 	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( mympac )
+	PORT_START("PAD1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Coin Button 1") // not coin slots
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Coin Button 2")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PAD2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
 void megadriv_radica_state::machine_start()
 {
@@ -458,6 +542,11 @@ void megadriv_radica_state::machine_reset()
 	megadriv_radica_state_base::machine_reset();
 }
 
+void megadriv_b010xx_select_state::machine_reset()
+{
+	m_bank = 0;
+	megadriv_radica_state_base::machine_reset();
+}
 
 void megadriv_radica_state::megadriv_radica_3button_ntsc(machine_config &config)
 {
@@ -502,7 +591,7 @@ void megadriv_dgunl_state::megadriv_dgunl_ntsc(machine_config &config)
 	ctrl1_3button(config);
 	ctrl2_3button(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_dgunl_state::megadriv_dgunl_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_dgunl_state::megadriv_radica_map);
 }
 
 void megadriv_ra145_state::megadriv_ra145_ntsc(machine_config &config)
@@ -617,12 +706,76 @@ ROM_START( dgunl3227a )
 	ROM_LOAD16_WORD_SWAP( "myarcadepacman_s99jl032hbt1_9991227e_as_s29jl032h55tai01.bin", 0x000000, 0x400000, CRC(ecead966) SHA1(971e8da6eb720f670f4148c7e07922e4f24eb609) )
 ROM_END
 
-ROM_START( atgame40 )
-	ROM_REGION( 0x1000000, "rom", 0 )
-	ROM_LOAD16_WORD_SWAP( "40bonusgamesin1.bin", 0x000000, 0x1000000, CRC(4eba6e83) SHA1(b8edf1b6ecb70a136b551f1454ba8afa45bd8bc1) )
+ROM_START( matet )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "tetrismyarcade_s29gl032n90tfi04_0001227e.bin", 0x000000, 0x400000, CRC(09b5af89) SHA1(85e506923fd803f05cc8f579f37331b608fea744) )
+	ROM_IGNORE(0x100)
+ROM_END
 
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_COPY( "rom", 0x800000, 0, 0x400000 )
+ROM_START( mypac )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "en29lb160bb.bin", 0x000000, 0x200000, CRC(d741a601) SHA1(a8d89034458b14c5cea83980be5400b82081b274) )
+ROM_END
+
+ROM_START( mympac )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "m29w640ft.bin", 0x000000, 0x800000, CRC(d6ceda9e) SHA1(c897f8d5661fea0c030daf9c5e92524eb4e71d52) )
+ROM_END
+
+
+/*
+
+As the atgame40 is not running on standard MegaDrive hardware quite a few of these games rely
+on an unsupported video mode (they still play sounds and resond to inputs / do colour fades)
+
+00 Menu                             located at 00800000  WORKS
+--
+01 Air Hockey                       located at 0000c800  WORKS
+02 Black Sheep                      located at 0002935a  BOOTS - NO DISPLAY
+03 Bomber                           located at 000b6f5a  WORKS
+04 Bottle Taps Race                 located at 000d6f5a  WORKS
+05 Brain Switch                     located at 000ec760  BOOTS - NO DISPLAY
+06 Bulls and Cows                   located at 00800000  BOOTS - NO DISPLAY
+07 Cannon                           located at 0013e360  WORKS
+08 Checker                          located at 0016301e  WORKS
+09 Chess                            located at 001aa232  WORKS
+10 Colour Puzzle                    located at 001f0a32  BOOTS - NO DISPLAY
+11 Cross The Road                   located at 008a2800  BOOTS - NO DISPLAY
+12 Curling 2010                     located at 00953486  BOOTS - NO DISPLAY
+13 Fight or Lose                    located at 009f002e  WORKS
+14 Fire Fly Glow                    located at 00a09ede  BOOTS - NO DISPLAY
+15 Fish Story                       located at 00aa2ede  BOOTS - NO DISPLAY
+16 Flash Memory                     located at 00285632  BOOTS - NO DISPLAY
+17 Formula Challenge                located at 00310232  BOOTS - NO DISPLAY
+18 Hexagons                         located at 00394a32  WORKS
+19 Jacks Pea                        located at 003b4a32  BOOTS - NO DISPLAY
+20 Jewel Magic                      located at 00b4a874  BOOTS - NO DISPLAY
+21 Logic Dial                       located at 0040b4ac  BOOTS - NO DISPLAY
+22 Table Magic                      located at 00be8f8c  BOOTS - NO DISPLAY
+23 Mahjong                          located at 0049e8ac  WORKS
+24 Match Eleven                     located at 004ae8ac  BOOTS - NO DISPLAY
+25 Mega Brain Switch                located at 005390ac  BOOTS - NO DISPLAY
+26 Memory                           located at 0058a0ac  WORKS
+27 Memory Match                     located at 00c8538c  BOOTS - NO DISPLAY
+28 Mirror Mirror                    located at 00d2178c  BOOTS - NO DISPLAY
+29 Mr Balls                         located at 0059a0ac  WORKS
+30 Navel Power                      located at 005c0a08  WORKS
+31 Panic Lift                       located at 00d86f8c  BOOTS - NO DISPLAY
+32 Reaction Match                   located at 00e2038c  BOOTS - NO DISPLAY
+33 Snake                            located at 005dbbd4  WORKS
+34 Space Hunter                     located at 005ebbd4  BOOTS - NO DISPLAY
+35 Spider                           located at 006817d4  WORKS
+36 Sudoku Quiz                      located at 0069efb4  BOOTS - NO DISPLAY
+37 Treasure Hunt                    located at 00eb9b8c  BOOTS - NO DISPLAY
+38 UFO Sighting                     located at 00f5938c  BOOTS - NO DISPLAY
+39 Warehouse Keeper                 located at 00730fb4  WORKS
+40 Whack a Wolf                     located at 00740fb4  BOOTS - NO DISPLAY
+*/
+
+ROM_START( atgame40 )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "40bonusgamesin1.bin", 0x800000, 0x800000, CRC(4eba6e83) SHA1(b8edf1b6ecb70a136b551f1454ba8afa45bd8bc1) )
+	ROM_CONTINUE(0x000000, 0x800000)
 ROM_END
 
 
@@ -648,7 +801,16 @@ ROM_START( ra145 )
 	ROM_LOAD16_WORD_SWAP( "ra145.bin", 0x000000, 0x8000000, BAD_DUMP CRC(30583950) SHA1(855eae232e3830a505f9bc1a26edb3a7d15ce4d1) )
 ROM_END
 
+ROM_START( banmrid )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "b75909a.u10", 0x000000, 0x400000, CRC(b439e06e) SHA1(3a87fc16186b7042dd92c7cf68c4284cd86f9175) )
+ROM_END
 
+void megadriv_b010xx_select_state::init_atgame40()
+{
+	m_romsize = 0x1000000;
+	init_megadrie();
+}
 
 void megadriv_dgunl_state::init_dgunl3227()
 {
@@ -771,6 +933,8 @@ CONS( 2004, rad_orun,  0,        0, megadriv_radica_3button_pal,  radica_3button
 // this has been verified as identical to the 6-in-1 cartridge that came with the Menacer gun for the MD
 CONS( 2004, rad_mncr,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Menacer (Radica Plug & Play)", MACHINE_NOT_WORKING )
 
+// 仮面ライダー龍騎 サバイバルファイト
+CONS( 2002, banmrid,    0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Bandai",                     "Kamen Rider Ryuki: Survival Fight (Japan)", MACHINE_NOT_WORKING )
 
 // From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
 // TODO: move out of here eventually once the enhanced MD part is emulated rather than bypassed (it's probably the same as the 145-in-1 multigame unit, but modified to only include this single game)
@@ -788,7 +952,12 @@ CONS( 2018, msi_sf2,   0,        0, megadriv_radica_6button_ntsc, msi_6button,  
 CONS( 2018, dgunl3227,  0,        0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227)", 0 )
 CONS( 2018, dgunl3227a, dgunl3227,0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227, older)", 0 )
 
+
 CONS( 2018, ra145,     0,        0, megadriv_ra145_ntsc, msi_6button,           megadriv_ra145_state, init_ra145,        "<unknown>",            "Retro Arcade 16 Bits Classic Edition Mini TV Game Console - 145 Classic Games - TV Arcade Plug and Play (Mega Drive bootlegs)", MACHINE_NOT_WORKING )
+
+
+// Games below have a device at b0102x which appears to either be able to select ROM base on a byte boundary
+// OR maybe are running from RAM instead of ROM (with an auto-copy at the start?) with that being a DMA operation.
 
 // Technically this is a MD type cartridge, but it doesn't seem to be designed for use with a standard MD as it contains
 // nothing but the 16Mbyte ROM and a 5v to 3.3v converter yet the code clearly requires some extensive banking logic.
@@ -796,4 +965,14 @@ CONS( 2018, ra145,     0,        0, megadriv_ra145_ntsc, msi_6button,           
 //
 // We don't seem to emulate the system it's designed for, so for now just treat it as its own thing (which may become
 // the basis of a driver for that console)
-CONS( 2012, atgame40,  0,        0, megadriv_radica_3button_pal,  radica_3button, megadriv_radica_state, init_megadrie, "AtGames",               "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)
+//
+// due to differences in the SoC compared to real MD hardware (including sound + new video modes) these have been left
+// as NOT WORKING for now although some games run to a degree
+
+CONS( 2021, mypac,     0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Pac-Man (DGUNL-4198, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+
+CONS( 2021, mympac,    0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Ms. Pac-Man (DGUNL-7010, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+
+CONS( 2012, atgame40,  0,        0, megadriv_radica_3button_pal,  radica_3button, megadriv_b010xx_select_state, init_atgame40, "AtGames",               "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)
+
+CONS( 2021, matet,      0,        0, megadriv_radica_3button_ntsc,  radica_3button, megadriv_b010xx_select_state, init_megadriv, "dreamGEAR",            "My Arcade Tetris (DGUNL-7028, Pocket Player Pro)", MACHINE_NOT_WORKING)

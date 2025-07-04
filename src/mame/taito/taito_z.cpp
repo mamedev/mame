@@ -254,7 +254,7 @@ M4300099A CHASE HQ DX (sticker for DX cabinet)
 |                                          |TC0100SCN|      43256        |-|
 |             16MHz                        |         |                   |
 |                           TMM2063        |---------|      43256        |
-|          TC0050DCA                   |---------|                       |-|
+|          TC0060DCA                   |---------|                       |-|
 |            Y3016-F        TMM2063    |TAITO    | |------|              | |
 |                                      |TC0170ABT| |TAITO |              | |
 |        TL074 TL074                   |         | |TC0110|   B52-01.IC7 | |
@@ -1547,7 +1547,6 @@ void nightstr_state::nightstr_motor_w(offs_t offset, u16 data)
 		m_motor_debug = data;
 		break;
 	}
-
 }
 
 void nightstr_state::nightstr_lamps_w(u8 data)
@@ -3222,11 +3221,11 @@ void contcirc_state::contcirc(machine_config &config) //OSC: 26.686, 24.000, 16.
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
 	SPEAKER(config, "rear").rear_center();
-	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this speaker located?
+	SPEAKER(config, "subwoofer").lfe();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "subwoofer", 0.20);
+	ymsnd.add_route(0, "subwoofer", 0.60);
 	ymsnd.add_route(1, "2610.1.l", 2.0);
 	ymsnd.add_route(1, "2610.1.r", 2.0);
 	ymsnd.add_route(2, "2610.2.l", 2.0);
@@ -3281,11 +3280,11 @@ void chasehq_state::chasehq(machine_config &config) //OSC: 26.686, 24.000, 16.00
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
 	SPEAKER(config, "rear").rear_center();
-	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this speaker located?
+	SPEAKER(config, "subwoofer").lfe();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "subwoofer", 0.20);
+	ymsnd.add_route(0, "subwoofer", 0.60);
 	ymsnd.add_route(1, "2610.1.l", 1.0);
 	ymsnd.add_route(1, "2610.1.r", 1.0);
 	ymsnd.add_route(2, "2610.2.l", 1.0);
@@ -3341,22 +3340,21 @@ void contcirc_state::enforce(machine_config &config)
 	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 20.0);
 	ymsnd.add_route(1, "2610.1.r", 20.0);
 	ymsnd.add_route(2, "2610.2.l", 20.0);
 	ymsnd.add_route(2, "2610.2.r", 20.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -3397,22 +3395,21 @@ void taitoz_state::bshark_base(machine_config &config)
 	TC0150ROD(config, m_tc0150rod, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	//ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // DG: this is probably specific to Z80 and wrong?
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 28.0);
 	ymsnd.add_route(1, "2610.1.r", 28.0);
 	ymsnd.add_route(2, "2610.2.l", 28.0);
 	ymsnd.add_route(2, "2610.2.r", 28.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 }
 
 void taitoz_state::bshark(machine_config &config)
@@ -3472,22 +3469,21 @@ void sci_state::sci(machine_config &config)
 	TC0150ROD(config, m_tc0150rod, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 2.0);
 	ymsnd.add_route(1, "2610.1.r", 2.0);
 	ymsnd.add_route(2, "2610.2.l", 2.0);
 	ymsnd.add_route(2, "2610.2.r", 2.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -3543,11 +3539,11 @@ void nightstr_state::nightstr(machine_config &config) //OSC: 26.686, 24.000, 16.
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
 	SPEAKER(config, "rear").rear_center();
-	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this located in the cabinet?
+	SPEAKER(config, "subwoofer").lfe();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "subwoofer", 0.20);
+	ymsnd.add_route(0, "subwoofer", 0.60);
 	ymsnd.add_route(1, "2610.1.l", 2.0);
 	ymsnd.add_route(1, "2610.1.r", 2.0);
 	ymsnd.add_route(2, "2610.2.l", 2.0);
@@ -3602,22 +3598,21 @@ void taitoz_z80_sound_state::aquajack(machine_config &config) //OSC: 26.686, 24.
 	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 2.0);
 	ymsnd.add_route(1, "2610.1.r", 2.0);
 	ymsnd.add_route(2, "2610.2.l", 2.0);
 	ymsnd.add_route(2, "2610.2.r", 2.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -3669,22 +3664,21 @@ void spacegun_state::spacegun(machine_config &config) //OSC: 26.686, 24.000, 16.
 	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	//ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // DG: this is probably specific to Z80 and wrong?
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 8.0);
 	ymsnd.add_route(1, "2610.1.r", 8.0);
 	ymsnd.add_route(2, "2610.2.l", 8.0);
 	ymsnd.add_route(2, "2610.2.r", 8.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 }
 
 void taitoz_z80_sound_state::dblaxle(machine_config &config)
@@ -3727,22 +3721,21 @@ void taitoz_z80_sound_state::dblaxle(machine_config &config)
 	TC0150ROD(config, m_tc0150rod, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));   // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 8.0);
 	ymsnd.add_route(1, "2610.1.r", 8.0);
 	ymsnd.add_route(2, "2610.2.l", 8.0);
 	ymsnd.add_route(2, "2610.2.r", 8.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -3788,22 +3781,21 @@ void sci_state::racingb(machine_config &config)
 	TC0150ROD(config, m_tc0150rod, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));   // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 8.0);
 	ymsnd.add_route(1, "2610.1.r", 8.0);
 	ymsnd.add_route(2, "2610.2.l", 8.0);
 	ymsnd.add_route(2, "2610.2.r", 8.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -4475,8 +4467,19 @@ ROM_START( bshark )
 	ROM_LOAD( "c34_20.89", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
 	ROM_LOAD( "c34_21.7",  0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) )
 	ROM_LOAD( "c34_22.8",  0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) )
+
+	ROM_REGION( 0xc00, "pld", ROMREGION_ERASE00 )
+	ROM_LOAD( "c34-23.ic27", 0x000, 0x104, CRC(82942887) SHA1(6405a43f459c8fbdc3aec0d91ecf8eb2652f597d) ) // PAL16L8
+	ROM_LOAD( "c34-24.ic65", 0x200, 0x104, CRC(be080005) SHA1(1a721b300b0d4cb12b55429849154143aec4fa3a) ) // PAL16L8
+	ROM_LOAD( "c34-25.ic66", 0x400, 0x144, CRC(d0ee97ee) SHA1(3d88e44d9bb5824a9a513c020b254a0ff82cf871) ) // PAL20L8
+	ROM_LOAD( "c34-26.ic67", 0x600, 0x144, CRC(022ee90f) SHA1(a9f7d25a8fd74ae2305bf2286f8807fa4c51d018) ) // PAL20L8
+	ROM_LOAD( "c34-27.ic94", 0x800, 0x144, CRC(a503352a) SHA1(5cc92eab18685dadf912d0f52457bc091b6446cd) ) // PAL20L8
+	ROM_LOAD( "c34-28.ic95", 0xa00, 0x144, CRC(bf7c2a41) SHA1(59fe561e9ff509c72e8ae8f22a75b6911d150de0) ) // PAL20L8
 ROM_END
 
+
+// Battle Shark PCB# - Z SYSTEM K1100540A J1100223A
+// Sticker - K1100541A
 ROM_START( bsharku )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "c34_71.98", 0x00000, 0x20000, CRC(df1fa629) SHA1(6cb207e577fac85da654f3dc56e2f9f25c38a76d) )
@@ -4517,6 +4520,14 @@ ROM_START( bsharku )
 	ROM_LOAD( "c34_20.89", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
 	ROM_LOAD( "c34_21.7",  0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) )
 	ROM_LOAD( "c34_22.8",  0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) )
+
+	ROM_REGION( 0xc00, "pld", ROMREGION_ERASE00 )
+	ROM_LOAD( "c34-23.ic27", 0x000, 0x104, CRC(82942887) SHA1(6405a43f459c8fbdc3aec0d91ecf8eb2652f597d) ) // PAL16L8
+	ROM_LOAD( "c34-24.ic65", 0x200, 0x104, CRC(be080005) SHA1(1a721b300b0d4cb12b55429849154143aec4fa3a) ) // PAL16L8
+	ROM_LOAD( "c34-25.ic66", 0x400, 0x144, CRC(d0ee97ee) SHA1(3d88e44d9bb5824a9a513c020b254a0ff82cf871) ) // PAL20L8
+	ROM_LOAD( "c34-26.ic67", 0x600, 0x144, CRC(022ee90f) SHA1(a9f7d25a8fd74ae2305bf2286f8807fa4c51d018) ) // PAL20L8
+	ROM_LOAD( "c34-27.ic94", 0x800, 0x144, CRC(a503352a) SHA1(5cc92eab18685dadf912d0f52457bc091b6446cd) ) // PAL20L8
+	ROM_LOAD( "c34-28.ic95", 0xa00, 0x144, CRC(bf7c2a41) SHA1(59fe561e9ff509c72e8ae8f22a75b6911d150de0) ) // PAL20L8
 ROM_END
 
 ROM_START( bsharkj )
@@ -4559,6 +4570,14 @@ ROM_START( bsharkj )
 	ROM_LOAD( "c34_20.89", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
 	ROM_LOAD( "c34_21.7",  0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) )
 	ROM_LOAD( "c34_22.8",  0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) )
+
+	ROM_REGION( 0xc00, "pld", ROMREGION_ERASE00 )
+	ROM_LOAD( "c34-23.ic27", 0x000, 0x104, CRC(82942887) SHA1(6405a43f459c8fbdc3aec0d91ecf8eb2652f597d) ) // PAL16L8
+	ROM_LOAD( "c34-24.ic65", 0x200, 0x104, CRC(be080005) SHA1(1a721b300b0d4cb12b55429849154143aec4fa3a) ) // PAL16L8
+	ROM_LOAD( "c34-25.ic66", 0x400, 0x144, CRC(d0ee97ee) SHA1(3d88e44d9bb5824a9a513c020b254a0ff82cf871) ) // PAL20L8
+	ROM_LOAD( "c34-26.ic67", 0x600, 0x144, CRC(022ee90f) SHA1(a9f7d25a8fd74ae2305bf2286f8807fa4c51d018) ) // PAL20L8
+	ROM_LOAD( "c34-27.ic94", 0x800, 0x144, CRC(a503352a) SHA1(5cc92eab18685dadf912d0f52457bc091b6446cd) ) // PAL20L8
+	ROM_LOAD( "c34-28.ic95", 0xa00, 0x144, CRC(bf7c2a41) SHA1(59fe561e9ff509c72e8ae8f22a75b6911d150de0) ) // PAL20L8
 ROM_END
 
 ROM_START( bsharkjjs )
@@ -4601,6 +4620,14 @@ ROM_START( bsharkjjs )
 	ROM_LOAD( "c34_20.89", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
 	ROM_LOAD( "c34_21.7",  0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) )
 	ROM_LOAD( "c34_22.8",  0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) )
+
+	ROM_REGION( 0xc00, "pld", ROMREGION_ERASE00 )
+	ROM_LOAD( "c34-23.ic27", 0x000, 0x104, CRC(82942887) SHA1(6405a43f459c8fbdc3aec0d91ecf8eb2652f597d) ) // PAL16L8
+	ROM_LOAD( "c34-24.ic65", 0x200, 0x104, CRC(be080005) SHA1(1a721b300b0d4cb12b55429849154143aec4fa3a) ) // PAL16L8
+	ROM_LOAD( "c34-25.ic66", 0x400, 0x144, CRC(d0ee97ee) SHA1(3d88e44d9bb5824a9a513c020b254a0ff82cf871) ) // PAL20L8
+	ROM_LOAD( "c34-26.ic67", 0x600, 0x144, CRC(022ee90f) SHA1(a9f7d25a8fd74ae2305bf2286f8807fa4c51d018) ) // PAL20L8
+	ROM_LOAD( "c34-27.ic94", 0x800, 0x144, CRC(a503352a) SHA1(5cc92eab18685dadf912d0f52457bc091b6446cd) ) // PAL20L8
+	ROM_LOAD( "c34-28.ic95", 0xa00, 0x144, CRC(bf7c2a41) SHA1(59fe561e9ff509c72e8ae8f22a75b6911d150de0) ) // PAL20L8
 ROM_END
 
 ROM_START( sci )
@@ -5272,7 +5299,7 @@ ROM_START( dblaxle ) /* Manual refers to this version as the "Version Without Co
 	ROM_LOAD16_BYTE( "c78-31-1.36", 0x00001, 0x20000, CRC(67ce23e8) SHA1(983e998a79e3d4376b005c92ded050be236d37cc) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c78-34.c42",         0x00000, 0x20000, CRC(f2186943) SHA1(2e9aed39fddf3aa1db7e20f8a709b6b82cc3e7df) )
+	ROM_LOAD( "c78-34.42",          0x00000, 0x20000, CRC(f2186943) SHA1(2e9aed39fddf3aa1db7e20f8a709b6b82cc3e7df) )
 
 	ROM_REGION( 0x100000, "tc0480scp", 0 )
 	ROM_LOAD32_WORD( "c78-10.12", 0x00000, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 16x16 */
@@ -5283,8 +5310,8 @@ ROM_START( dblaxle ) /* Manual refers to this version as the "Version Without Co
 	ROM_LOAD64_WORD_SWAP( "c78-07.33", 0x000002, 0x100000, CRC(9da00d5b) SHA1(f6b664c7495b936ce1b99852da45ec92cb37062a) )
 	ROM_LOAD64_WORD_SWAP( "c78-06.23", 0x000004, 0x100000, CRC(8309e91b) SHA1(3f27557bc82bf42cc77e3c7e363b51a0b119144d) )
 	ROM_LOAD64_WORD_SWAP( "c78-05.31", 0x000006, 0x100000, CRC(90001f68) SHA1(5c08dfe6a2e12e6ca84035815563f38fc2c2c029) )
-//  ROM_LOAD64_BYTE(      "c78-05l.1", 0x000007, 0x080000, CRC(f24bf972) )
-//  ROM_LOAD64_BYTE(      "c78-05h.2", 0x000006, 0x080000, CRC(c01039b5) )
+//  ROM_LOAD64_BYTE(      "c78-05h_3f99.2", 0x000006, 0x080000, CRC(c01039b5) SHA1(66ff1b108f99ec5a450ba3c211079c58dc12ea6c) ) // these 2 ROMs known to come split on a Taito ROM 16 PCBOARD
+//  ROM_LOAD64_BYTE(      "c78-05l_6503.1", 0x000007, 0x080000, CRC(f24bf972) SHA1(5bb76898b964a2cb4209e39a43cccaa528f8339e) ) // these 2 ROMs known to come split on a Taito ROM 16 PCBOARD
 
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c78-09.12", 0x000000, 0x80000, CRC(0dbde6f5) SHA1(4049271e3738b54e0c56d191889b1aea5664d49f) )    /* ROD, road lines */
@@ -5315,11 +5342,58 @@ ROM_START( dblaxleu ) /* Manual refers to this version as the "Version Without C
 	ROM_LOAD16_BYTE( "c78_53+.5",  0x40001, 0x20000, CRC(62f910d4) SHA1(3d952ffcb30a264751b4b282ae8c26ecea09c05c) ) /* Actual label is C78 53* */
 
 	ROM_REGION( 0x40000, "sub", 0 ) /* 256K for 68000 code (CPU B) */
-	ROM_LOAD16_BYTE( "c78-30+.35", 0x00000, 0x20000, CRC(f73b3ce1) SHA1(1794d1c74599d58302c6dbfabcc1b3110d19b1fb) ) /* Label missing, it's either C78 30 or C78 30* */
-	ROM_LOAD16_BYTE( "c78-31+.36", 0x00001, 0x20000, CRC(4639adee) SHA1(24569dd4801c622758e60d3e526480ac6b5f85d2) ) /* Label missing, it's either C78 31 or C78 31* */
+	ROM_LOAD16_BYTE( "c78-30.35", 0x00000, 0x20000, CRC(f73b3ce1) SHA1(1794d1c74599d58302c6dbfabcc1b3110d19b1fb) )
+	ROM_LOAD16_BYTE( "c78-31.36", 0x00001, 0x20000, CRC(4639adee) SHA1(24569dd4801c622758e60d3e526480ac6b5f85d2) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c78-34.c42",        0x00000, 0x20000, CRC(f2186943) SHA1(2e9aed39fddf3aa1db7e20f8a709b6b82cc3e7df) )
+	ROM_LOAD( "c78-34.42",         0x00000, 0x20000, CRC(f2186943) SHA1(2e9aed39fddf3aa1db7e20f8a709b6b82cc3e7df) )
+
+	ROM_REGION( 0x100000, "tc0480scp", 0 )
+	ROM_LOAD32_WORD( "c78-10.12", 0x00000, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 16x16 */
+	ROM_LOAD32_WORD( "c78-11.11", 0x00002, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "c78-08.25",      0x000000, 0x100000, CRC(6c725211) SHA1(3c1765f44fe57b496d305e994516674f71bd4c3c) )    /* OBJ 16x8 */
+	ROM_LOAD64_WORD_SWAP( "c78-07.33",      0x000002, 0x100000, CRC(9da00d5b) SHA1(f6b664c7495b936ce1b99852da45ec92cb37062a) )
+	ROM_LOAD64_WORD_SWAP( "c78-06.23",      0x000004, 0x100000, CRC(8309e91b) SHA1(3f27557bc82bf42cc77e3c7e363b51a0b119144d) )
+	// although very common, the split C78 05 ROMs were not on every board, some had the standard mask ROM - however they are preserved here
+	ROM_LOAD64_BYTE(      "c78-05h_3f99.2", 0x000006, 0x080000, CRC(c01039b5) SHA1(66ff1b108f99ec5a450ba3c211079c58dc12ea6c) ) // these 2 ROMs known to come split on a Taito ROM 16 PCBOARD
+	ROM_LOAD64_BYTE(      "c78-05l_6503.1", 0x000007, 0x080000, CRC(f24bf972) SHA1(5bb76898b964a2cb4209e39a43cccaa528f8339e) ) // these 2 ROMs known to come split on a Taito ROM 16 PCBOARD
+
+	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
+	ROM_LOAD16_WORD( "c78-09.12", 0x000000, 0x80000, CRC(0dbde6f5) SHA1(4049271e3738b54e0c56d191889b1aea5664d49f) )    /* ROD, road lines */
+
+	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
+	ROM_LOAD16_WORD( "c78-04.3", 0x00000, 0x80000, CRC(cc1aa37c) SHA1(cfa2eb338dc81c98c637c2f0b14d2baea8b115f5) )   /* STY spritemap */
+
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
+	ROM_LOAD( "c78-12.33", 0x000000, 0x100000, CRC(b0267404) SHA1(ffd337336ff9b096e3725f733364762f6e6d3fab) )
+	ROM_LOAD( "c78-13.46", 0x100000, 0x080000, CRC(1b363aa2) SHA1(0aae3988024654e98cc0c784307b1c329c8f0783) )
+
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
+	ROM_LOAD( "c78-14.31",  0x00000, 0x80000, CRC(9cad4dfb) SHA1(9187ef827a3f1bc9233d0e45e72c72c0956c5912) )
+
+	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
+	ROM_LOAD( "c78-25.15",  0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )    // 98% compression
+	ROM_LOAD( "c78-15.22",  0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) )    // road A/B internal priority
+	ROM_LOAD( "c78-21.74",  0x00000, 0x00100, CRC(2926bf27) SHA1(bfbbe6c71bb29a05959f3de0d940816139f9ebfe) )    // road/sprite priority and palette select
+	ROM_LOAD( "c84-10.16",  0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) )
+	ROM_LOAD( "c84-11.17",  0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) )
+ROM_END
+
+ROM_START( dblaxleua ) /* Manual refers to this version as the "Version Without Communication" */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code (CPU A) */
+	ROM_LOAD16_BYTE( "c78_36-1.2", 0x00000, 0x20000, CRC(3bb0344a) SHA1(dad031033838bf65c83fb3715a9727f2d165909b) )
+	ROM_LOAD16_BYTE( "c78_38-1.4", 0x00001, 0x20000, CRC(918176cb) SHA1(b78bce351e240b447fbb9a1f44c8efa3e6b98cbe) )
+	ROM_LOAD16_BYTE( "c78_37-1.3", 0x40000, 0x20000, CRC(5a12e2bb) SHA1(53a91cc8fcf42934aa282f5a1bb286461dc2a421) )
+	ROM_LOAD16_BYTE( "c78_39-1.5", 0x40001, 0x20000, CRC(62f910d4) SHA1(3d952ffcb30a264751b4b282ae8c26ecea09c05c) )
+
+	ROM_REGION( 0x40000, "sub", 0 ) /* 256K for 68000 code (CPU B) */
+	ROM_LOAD16_BYTE( "c78-30.35",  0x00000, 0x20000, CRC(f73b3ce1) SHA1(1794d1c74599d58302c6dbfabcc1b3110d19b1fb) )
+	ROM_LOAD16_BYTE( "c78-31.36",  0x00001, 0x20000, CRC(4639adee) SHA1(24569dd4801c622758e60d3e526480ac6b5f85d2) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c78-34.42",         0x00000, 0x20000, CRC(f2186943) SHA1(2e9aed39fddf3aa1db7e20f8a709b6b82cc3e7df) )
 
 	ROM_REGION( 0x100000, "tc0480scp", 0 )
 	ROM_LOAD32_WORD( "c78-10.12", 0x00000, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 16x16 */
@@ -5330,8 +5404,8 @@ ROM_START( dblaxleu ) /* Manual refers to this version as the "Version Without C
 	ROM_LOAD64_WORD_SWAP( "c78-07.33", 0x000002, 0x100000, CRC(9da00d5b) SHA1(f6b664c7495b936ce1b99852da45ec92cb37062a) )
 	ROM_LOAD64_WORD_SWAP( "c78-06.23", 0x000004, 0x100000, CRC(8309e91b) SHA1(3f27557bc82bf42cc77e3c7e363b51a0b119144d) )
 	ROM_LOAD64_WORD_SWAP( "c78-05.31", 0x000006, 0x100000, CRC(90001f68) SHA1(5c08dfe6a2e12e6ca84035815563f38fc2c2c029) )
-//  ROM_LOAD64_BYTE(      "c78-05l.1", 0x000007, 0x080000, CRC(f24bf972) )
-//  ROM_LOAD64_BYTE(      "c78-05h.2", 0x000006, 0x080000, CRC(c01039b5) )
+//  ROM_LOAD64_BYTE(      "c78-05h_3f99.2", 0x000006, 0x080000, CRC(c01039b5) SHA1(66ff1b108f99ec5a450ba3c211079c58dc12ea6c) ) // these 2 ROMs known to come split on a Taito ROM 16 PCBOARD
+//  ROM_LOAD64_BYTE(      "c78-05l_6503.1", 0x000007, 0x080000, CRC(f24bf972) SHA1(5bb76898b964a2cb4209e39a43cccaa528f8339e) ) // these 2 ROMs known to come split on a Taito ROM 16 PCBOARD
 
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c78-09.12", 0x000000, 0x80000, CRC(0dbde6f5) SHA1(4049271e3738b54e0c56d191889b1aea5664d49f) )    /* ROD, road lines */
@@ -5366,7 +5440,7 @@ ROM_START( dblaxleul ) /* Side by side linkable version */
 	ROM_LOAD16_BYTE( "c78-31-1.36", 0x00001, 0x20000, CRC(67ce23e8) SHA1(983e998a79e3d4376b005c92ded050be236d37cc) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c78-34.c42",         0x00000, 0x20000, CRC(f2186943) SHA1(2e9aed39fddf3aa1db7e20f8a709b6b82cc3e7df) )
+	ROM_LOAD( "c78-34.42",          0x00000, 0x20000, CRC(f2186943) SHA1(2e9aed39fddf3aa1db7e20f8a709b6b82cc3e7df) )
 
 	ROM_REGION( 0x100000, "tc0480scp", 0 )
 	ROM_LOAD32_WORD( "c78-10.12", 0x00000, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 16x16 */
@@ -5377,8 +5451,8 @@ ROM_START( dblaxleul ) /* Side by side linkable version */
 	ROM_LOAD64_WORD_SWAP( "c78-07.33", 0x000002, 0x100000, CRC(9da00d5b) SHA1(f6b664c7495b936ce1b99852da45ec92cb37062a) )
 	ROM_LOAD64_WORD_SWAP( "c78-06.23", 0x000004, 0x100000, CRC(8309e91b) SHA1(3f27557bc82bf42cc77e3c7e363b51a0b119144d) )
 	ROM_LOAD64_WORD_SWAP( "c78-05.31", 0x000006, 0x100000, CRC(90001f68) SHA1(5c08dfe6a2e12e6ca84035815563f38fc2c2c029) )
-//  ROM_LOAD64_BYTE(      "c78-05l.1", 0x000007, 0x080000, CRC(f24bf972) )
-//  ROM_LOAD64_BYTE(      "c78-05h.2", 0x000006, 0x080000, CRC(c01039b5) )
+//  ROM_LOAD64_BYTE(      "c78-05h_3f99.2", 0x000006, 0x080000, CRC(c01039b5) SHA1(66ff1b108f99ec5a450ba3c211079c58dc12ea6c) ) // these 2 ROMs known to come split on a Taito ROM 16 PCBOARD
+//  ROM_LOAD64_BYTE(      "c78-05l_6503.1", 0x000007, 0x080000, CRC(f24bf972) SHA1(5bb76898b964a2cb4209e39a43cccaa528f8339e) ) // these 2 ROMs known to come split on a Taito ROM 16 PCBOARD
 
 	ROM_REGION16_LE( 0x80000, "tc0150rod", 0 )
 	ROM_LOAD16_WORD( "c78-09.12", 0x000000, 0x80000, CRC(0dbde6f5) SHA1(4049271e3738b54e0c56d191889b1aea5664d49f) )    /* ROD, road lines */
@@ -5574,7 +5648,8 @@ GAME( 1990, spacegun,   0,        spacegun,  spacegun,  spacegun_state,         
 GAME( 1990, spacegunj,  spacegun, spacegun,  spacegnj,  spacegun_state,         empty_init,  ORIENTATION_FLIP_X, "Taito Corporation",         "Space Gun (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, spacegunu,  spacegun, spacegun,  spacegnu,  spacegun_state,         empty_init,  ORIENTATION_FLIP_X, "Taito America Corporation", "Space Gun (US)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1991, dblaxle,    0,        dblaxle,   dblaxles,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxle,    0,        dblaxle,   dblaxles,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxleua,  dblaxle,  dblaxle,   dblaxles,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
 GAMEL(1991, dblaxleu,   dblaxle,  dblaxle,   dblaxles,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
 GAMEL(1991, dblaxleul,  dblaxle,  dblaxle,   dblaxle,   taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )
 GAMEL(1991, pwheelsj,   dblaxle,  dblaxle,   pwheelsj,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito Corporation",         "Power Wheels (Japan, Rev 2, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )

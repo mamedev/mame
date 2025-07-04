@@ -184,8 +184,7 @@ void generalplus_gpl32612_game_state::gpl32612(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(generalplus_gpl32612_game_state::screen_update_gpl32612));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void generalplus_zippity_game_state::machine_start()
@@ -224,8 +223,7 @@ void generalplus_zippity_game_state::zippity(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(generalplus_zippity_game_state::screen_update_gpl32612));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_zippity_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -294,9 +292,14 @@ ROM_START( pocketmr )
 	ROM_LOAD( "tc58nvg0s3hta00_withspare.u6", 0x0000, 0x8800000, CRC(ec839dde) SHA1(18b77c7e1cf3c66787ccfde9f450671e3d1b0e36) )
 ROM_END
 
-ROM_START( sanxpet )
-	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD( "25l64.u1", 0x0000, 0x800000, CRC(f28b9fd3) SHA1(8ed4668f271cbe01065bc0836e49ce70faf10834) )
+ROM_START( dmnslayg )
+	ROM_REGION(  0x8800000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg0s3hta00_with_spare.u3", 0x0000, 0x8800000, CRC(a9402fdb) SHA1(0809a8da176f65efc2926131ba0259278d3c644d) )
+ROM_END
+
+ROM_START( anpanm19 )
+	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25l1280.u3", 0x0000, 0x1000000, CRC(7932fb3e) SHA1(a381eeba5357fe71e4d6081b9b91b57e5705f7f1) )
 ROM_END
 
 
@@ -368,6 +371,10 @@ CONS( 201?, kidizmb,         0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 2019, pocketmp,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters PC",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters Rotom Tablet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-// uses GP327902, might not fit here, 2019 date from case
-// すみっコぐらし すみっコさがし
-CONS( 2019, sanxpet,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// uses GPL32610 - 「それいけ！アンパンマン」スポーツ育脳マット
+CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "JoyPalette",        "Anpanman: Sports Ikunou Mat (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now
+// ROM has 'GPNandTag2' header rather than the usual
+// 鬼滅の刃 全集中パッド（グリーン)
+CONS( 2021, dmnslayg,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Bandai",        "Demon Slayer: Kimetsu no Yaiba Zenshuuchuu Pad (green ver.) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

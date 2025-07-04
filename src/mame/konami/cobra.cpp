@@ -2978,17 +2978,16 @@ void cobra_state::cobra(machine_config &config)
 	m_screen->set_screen_update(FUNC(cobra_state::screen_update_cobra));
 	PALETTE(config, m_palette).set_entries(65536);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(16'934'400)));
 	rfsnd.set_addrmap(0, &cobra_state::rf5c400_map);
-	rfsnd.add_route(0, "lspeaker", 1.0);
-	rfsnd.add_route(1, "rspeaker", 1.0);
+	rfsnd.add_route(0, "speaker", 1.0, 0);
+	rfsnd.add_route(1, "speaker", 1.0, 1);
 
-	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	M48T58(config, "m48t58", 0);
 

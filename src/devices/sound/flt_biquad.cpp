@@ -474,22 +474,19 @@ void filter_biquad_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void filter_biquad_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void filter_biquad_device::sound_stream_update(sound_stream &stream)
 {
-	auto &src = inputs[0];
-	auto &dst = outputs[0];
-
-	if (m_last_sample_rate != m_stream->sample_rate())
+	if (m_last_sample_rate != stream.sample_rate())
 	{
 		recalc();
-		m_last_sample_rate = m_stream->sample_rate();
+		m_last_sample_rate = stream.sample_rate();
 	}
 
-	for (int sampindex = 0; sampindex < dst.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
-		m_input = src.get(sampindex);
+		m_input = stream.get(0, sampindex);
 		step();
-		dst.put(sampindex, m_output);
+		stream.put(0, sampindex, m_output);
 	}
 }
 
@@ -527,6 +524,7 @@ void filter_biquad_device::recalc()
 				break;
 			// For highpass and friends, block the entire signal.
 			case biquad_type::HIGHPASS1P:
+			case biquad_type::HIGHPASS1P1Z:
 			case biquad_type::HIGHPASS:
 			case biquad_type::BANDPASS:
 			case biquad_type::PEAK:
@@ -562,6 +560,13 @@ void filter_biquad_device::recalc()
 				m_b0 = 1.0 + m_a1;
 				m_a1 = -m_a1;
 				m_b1 = m_b2 = m_a2 = 0.0;
+				break;
+			case biquad_type::HIGHPASS1P1Z:
+				normal = 1.0 / (K + 1.0);
+				m_b0 = normal;
+				m_b1 = -normal;
+				m_a1 = (K - 1.0) * normal;
+				m_b2 = m_a2 = 0.0;
 				break;
 			case biquad_type::LOWPASS:
 				m_b0 = Ksquared * normal;

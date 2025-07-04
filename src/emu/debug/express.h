@@ -171,11 +171,21 @@ public:
 		READ_WRITE
 	};
 
+	// Identifies the type of symbols stored in this table.  These help symlist create
+	// useful output
+	enum table_type
+	{
+		CPU_STATE,         // CPU registers, etc.
+		BUILTIN_GLOBALS,   // Built-in MAME global symbols (e.g., beamx, beamy, frame, etc.)
+						   // (also used for tables outside debugger: lua scripts, cheat engine)
+	};
+
 	// construction/destruction
-	symbol_table(running_machine &machine, symbol_table *parent = nullptr, device_t *device = nullptr);
+	symbol_table(running_machine &machine, table_type type, symbol_table *parent = nullptr, device_t *device = nullptr);
 
 	// getters
 	const std::unordered_map<std::string, std::unique_ptr<symbol_entry>> &entries() const { return m_symlist; }
+	table_type type() const { return m_type; }
 	symbol_table *parent() const { return m_parent; }
 	running_machine &machine() { return m_machine; }
 
@@ -212,6 +222,7 @@ private:
 
 	// internal state
 	running_machine &       m_machine;          // reference to the machine
+	table_type              m_type;             // kind of symbols stored in this table
 	symbol_table *          m_parent;           // pointer to the parent symbol table
 	std::unordered_map<std::string,std::unique_ptr<symbol_entry>> m_symlist;        // list of symbols
 	device_memory_interface *const m_memintf;   // pointer to the local memory interface (if any)

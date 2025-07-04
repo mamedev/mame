@@ -342,14 +342,13 @@ void arcadia_amiga_state::arcadia(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(arcadia_amiga_state,amiga)
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	PAULA_8364(config, m_paula, amiga_state::CLK_C1_NTSC);
-	m_paula->add_route(0, "lspeaker", 0.50);
-	m_paula->add_route(1, "rspeaker", 0.50);
-	m_paula->add_route(2, "rspeaker", 0.50);
-	m_paula->add_route(3, "lspeaker", 0.50);
+	m_paula->add_route(0, "speaker", 0.50, 0);
+	m_paula->add_route(1, "speaker", 0.50, 1);
+	m_paula->add_route(2, "speaker", 0.50, 1);
+	m_paula->add_route(3, "speaker", 0.50, 0);
 	m_paula->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 

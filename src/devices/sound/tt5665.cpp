@@ -88,24 +88,24 @@
 DEFINE_DEVICE_TYPE(TT5665, tt5665_device, "tt5665", "Tontek TT5665 ADPCM Voice Synthesis LSI")
 
 // same as MSM6295
-const stream_buffer::sample_t tt5665_device::s_volume_table[16] =
+const sound_stream::sample_t tt5665_device::s_volume_table[16] =
 {
-	stream_buffer::sample_t(0x20) / stream_buffer::sample_t(0x20),   //   0 dB
-	stream_buffer::sample_t(0x16) / stream_buffer::sample_t(0x20),   //  -3.2 dB
-	stream_buffer::sample_t(0x10) / stream_buffer::sample_t(0x20),   //  -6.0 dB
-	stream_buffer::sample_t(0x0b) / stream_buffer::sample_t(0x20),   //  -9.2 dB
-	stream_buffer::sample_t(0x08) / stream_buffer::sample_t(0x20),   // -12.0 dB
-	stream_buffer::sample_t(0x06) / stream_buffer::sample_t(0x20),   // -14.5 dB
-	stream_buffer::sample_t(0x04) / stream_buffer::sample_t(0x20),   // -18.0 dB
-	stream_buffer::sample_t(0x03) / stream_buffer::sample_t(0x20),   // -20.5 dB
-	stream_buffer::sample_t(0x02) / stream_buffer::sample_t(0x20),   // -24.0 dB
-	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
-	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
-	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
-	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
-	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
-	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
-	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
+	sound_stream::sample_t(0x20) / sound_stream::sample_t(0x20),   //   0 dB
+	sound_stream::sample_t(0x16) / sound_stream::sample_t(0x20),   //  -3.2 dB
+	sound_stream::sample_t(0x10) / sound_stream::sample_t(0x20),   //  -6.0 dB
+	sound_stream::sample_t(0x0b) / sound_stream::sample_t(0x20),   //  -9.2 dB
+	sound_stream::sample_t(0x08) / sound_stream::sample_t(0x20),   // -12.0 dB
+	sound_stream::sample_t(0x06) / sound_stream::sample_t(0x20),   // -14.5 dB
+	sound_stream::sample_t(0x04) / sound_stream::sample_t(0x20),   // -18.0 dB
+	sound_stream::sample_t(0x03) / sound_stream::sample_t(0x20),   // -20.5 dB
+	sound_stream::sample_t(0x02) / sound_stream::sample_t(0x20),   // -24.0 dB
+	sound_stream::sample_t(0x00) / sound_stream::sample_t(0x20),
+	sound_stream::sample_t(0x00) / sound_stream::sample_t(0x20),
+	sound_stream::sample_t(0x00) / sound_stream::sample_t(0x20),
+	sound_stream::sample_t(0x00) / sound_stream::sample_t(0x20),
+	sound_stream::sample_t(0x00) / sound_stream::sample_t(0x20),
+	sound_stream::sample_t(0x00) / sound_stream::sample_t(0x20),
+	sound_stream::sample_t(0x00) / sound_stream::sample_t(0x20),
 };
 
 
@@ -210,16 +210,13 @@ void tt5665_device::device_clock_changed()
 //  our sound stream
 //-------------------------------------------------
 
-void tt5665_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void tt5665_device::sound_stream_update(sound_stream &stream)
 {
-	// reset the output stream
-	outputs[0].fill(0);
-	outputs[1].fill(0);
 	bool update_daol = false;
 
 	// iterate over voices and accumulate sample data
 	// loop while we still have samples to generate
-	for (int s = 0; s < outputs[0].samples(); s++)
+	for (int s = 0; s < stream.samples(); s++)
 	{
 		// adjust DAOL clock timing
 		m_daol_timing--;
@@ -239,8 +236,8 @@ void tt5665_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			// refresh DAOR output
 			m_voice[b + 4].generate_adpcm(*this, &daor_output);
 		}
-		outputs[0].put_int(s, m_daol_output, 2048);
-		outputs[1].put_int(s, daor_output, 2048);
+		stream.put_int(0, s, m_daol_output, 2048);
+		stream.put_int(1, s, daor_output, 2048);
 		if (update_daol)
 		{
 			update_daol = false;

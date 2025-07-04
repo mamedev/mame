@@ -117,6 +117,10 @@ protected:
 	u16 m_count;
 	u16 m_byte_counter;
 
+	u8  m_num_follow;
+	u8  m_regs_follow[5];
+	u8  m_read_num_follow;
+
 private:
 	// device_z80daisy_interface implementation
 	virtual int z80daisy_irq_state() override;
@@ -139,10 +143,7 @@ private:
 	emu_timer *m_timer;
 
 	u16  m_regs[(6 << 3) + 1 + 1];
-	u8   m_num_follow;
 	u8   m_cur_follow;
-	u8   m_regs_follow[5];
-	u8   m_read_num_follow;
 	u8   m_read_cur_follow;
 	u8   m_read_regs_follow[7];
 	u8   m_status;
@@ -164,8 +165,19 @@ private:
 	u8  m_vector;               // interrupt vector
 };
 
+// ======================> ua858d_device
+
+class ua858d_device : public z80dma_device
+{
+public:
+	ua858d_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write(u8 data) override;
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(Z80DMA, z80dma_device)
+DECLARE_DEVICE_TYPE(UA858D, ua858d_device)
 
 #endif // MAME_MACHINE_Z80DMA_H

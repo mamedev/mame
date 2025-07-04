@@ -439,12 +439,11 @@ TIMER_CALLBACK_MEMBER(mos7360_device::timer_expired)
 //  our sound stream
 //-------------------------------------------------
 
-void mos7360_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void mos7360_device::sound_stream_update(sound_stream &stream)
 {
 	int i, v, a;
-	auto &buffer = outputs[0];
 
-	for (i = 0; i < buffer.samples(); i++)
+	for (i = 0; i < stream.samples(); i++)
 	{
 		v = 0;
 
@@ -487,7 +486,7 @@ void mos7360_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 		v = v * a;
 
-		buffer.put_int(i, v, 32768);
+		stream.put_int(0, i, v, 32768);
 	}
 }
 

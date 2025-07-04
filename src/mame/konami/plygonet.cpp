@@ -1077,15 +1077,14 @@ void polygonet_state::plygonet(machine_config &config)
 	m_k053936->set_wrap(true);
 
 	// Sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	K054321(config, m_k054321, "lspeaker", "rspeaker");
+	K054321(config, m_k054321, "speaker");
 
 	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
 	k054539.timer_handler().set(FUNC(polygonet_state::k054539_nmi_gen));
-	k054539.add_route(0, "lspeaker", 0.75);
-	k054539.add_route(1, "rspeaker", 0.75);
+	k054539.add_route(0, "speaker", 0.75, 0);
+	k054539.add_route(1, "speaker", 0.75, 1);
 }
 
 

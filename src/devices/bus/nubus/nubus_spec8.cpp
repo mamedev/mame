@@ -51,6 +51,7 @@
 #include "supermac.h"
 
 #include "layout/generic.h"
+#include "video/bt47x.h"
 #include "screen.h"
 
 #include <algorithm>
@@ -74,15 +75,14 @@ namespace {
 class nubus_spec8s3_device :
 		public device_t,
 		public device_nubus_card_interface,
-		public device_video_interface,
-		public device_palette_interface
+		public device_video_interface
 {
 public:
 	// construction/destruction
-	nubus_spec8s3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_spec8s3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	nubus_spec8s3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nubus_spec8s3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -93,36 +93,34 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	// palette implementation
-	virtual uint32_t palette_entries() const noexcept override;
-
 	TIMER_CALLBACK_MEMBER(vbl_tick);
 
 private:
-	uint32_t spec8s3_r(offs_t offset, uint32_t mem_mask = ~0);
-	void spec8s3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t vram_r(offs_t offset, uint32_t mem_mask = ~0);
-	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	u32 spec8s3_r(offs_t offset, u32 mem_mask = ~0);
+	void spec8s3_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 vram_r(offs_t offset, u32 mem_mask = ~0);
+	void vram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void update_crtc();
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	required_device<bt478_device> m_ramdac;
 	required_ioport m_userosc;
 	emu_timer *m_timer;
 
 	supermac_spec_crtc m_crtc;
 	supermac_spec_shift_reg m_shiftreg;
 
-	std::vector<uint32_t> m_vram;
-	uint32_t m_mode, m_vbl_disable;
-	uint32_t m_colors[3], m_count, m_clutoffs;
+	std::vector<u32> m_vram;
+	u32 m_mode, m_vbl_disable;
+	u32 m_count, m_clutoffs;
 
-	uint8_t m_osc;
+	u8 m_osc;
 	bool m_interlace;
 
-	uint16_t m_hpan, m_vpan;
-	uint8_t m_zoom;
+	u16 m_hpan, m_vpan;
+	u8 m_zoom;
 
 	bool m_vbl_pending;
 };
@@ -160,6 +158,8 @@ void nubus_spec8s3_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(FUNC(nubus_spec8s3_device::screen_update));
 	screen.set_raw(80.000_MHz_XTAL, 332*4, 64*4, 320*4, 804, 33, 801);
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
+
+	BT478(config, m_ramdac, 0);
 }
 
 //-------------------------------------------------
@@ -181,33 +181,19 @@ ioport_constructor nubus_spec8s3_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  palette_entries - entries in color palette
-//-------------------------------------------------
-
-uint32_t nubus_spec8s3_device::palette_entries() const noexcept
-{
-	return 256;
-}
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
 //  nubus_spec8s3_device - constructor
 //-------------------------------------------------
 
-nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	nubus_spec8s3_device(mconfig, NUBUS_SPEC8S3, tag, owner, clock)
 {
 }
 
-nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	device_palette_interface(mconfig, *this),
+	m_ramdac(*this, "bt478"),
 	m_userosc(*this, "USEROSC"),
 	m_timer(nullptr),
 	m_mode(0), m_vbl_disable(0),
@@ -225,10 +211,10 @@ void nubus_spec8s3_device::device_start()
 {
 	install_declaration_rom(SPEC8S3_ROM_REGION);
 
-	uint32_t const slotspace = get_slotspace();
+	u32 const slotspace = get_slotspace();
 	LOG("[SPEC8S3 %p] slotspace = %x\n", this, slotspace);
 
-	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
+	m_vram.resize(VRAM_SIZE / sizeof(u32));
 	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_spec8s3_device::vram_r)), write32s_delegate(*this, FUNC(nubus_spec8s3_device::vram_w)));
 	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32s_delegate(*this, FUNC(nubus_spec8s3_device::vram_r)), write32s_delegate(*this, FUNC(nubus_spec8s3_device::vram_w)));
 	nubus().install_device(slotspace+0xd0000, slotspace+0xfffff, read32s_delegate(*this, FUNC(nubus_spec8s3_device::spec8s3_r)), write32s_delegate(*this, FUNC(nubus_spec8s3_device::spec8s3_w)));
@@ -241,7 +227,6 @@ void nubus_spec8s3_device::device_start()
 	save_item(NAME(m_vram));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_vbl_disable));
-	save_item(NAME(m_colors));
 	save_item(NAME(m_count));
 	save_item(NAME(m_clutoffs));
 	save_item(NAME(m_osc));
@@ -264,7 +249,6 @@ void nubus_spec8s3_device::device_reset()
 	std::fill(m_vram.begin(), m_vram.end(), 0);
 	m_mode = 0;
 	m_vbl_disable = 1;
-	std::fill(std::begin(m_colors), std::end(m_colors), 0);
 	m_count = 0;
 	m_clutoffs = 0;
 	m_osc = 0;
@@ -355,9 +339,9 @@ void nubus_spec8s3_device::update_crtc()
 	}
 }
 
-uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	auto const screenbase = util::big_endian_cast<uint8_t const>(&m_vram[0]) + (m_vpan * 2048) + 0x400;
+	auto const screenbase = util::big_endian_cast<u8 const>(&m_vram[0]) + (m_vpan * 2048) + 0x400;
 
 	int const hstart = m_crtc.h_start(4);
 	int const width = m_crtc.h_active(4);
@@ -370,19 +354,19 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 		case 0: // 1 bpp
 			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y, hstart);
+				u32 *scanline = &bitmap.pix(y, hstart);
 				if ((y >= vstart) && (y < vend))
 				{
 					auto const rowbase = screenbase + (((y - vstart) >> (m_zoom ? 1 : 0)) * 512);
 					for (int x = 0; x < (pixels / 2); x++)
 					{
-						uint8_t const bits = rowbase[(x + m_hpan) / 4];
-						*scanline++ = pen_color((bits << ((((x + m_hpan) & 0x03) << 1) + 0)) & 0x80);
+						u8 const bits = rowbase[(x + m_hpan) / 4];
+						*scanline++ = m_ramdac->pen_color((bits << ((((x + m_hpan) & 0x03) << 1) + 0)) & 0x80);
 						if (m_zoom)
-							*scanline++ = pen_color((bits << ((((x + m_hpan) & 0x03) << 1) + 0)) & 0x80);
-						*scanline++ = pen_color((bits << ((((x + m_hpan) & 0x03) << 1) + 1)) & 0x80);
+							*scanline++ = m_ramdac->pen_color((bits << ((((x + m_hpan) & 0x03) << 1) + 0)) & 0x80);
+						*scanline++ = m_ramdac->pen_color((bits << ((((x + m_hpan) & 0x03) << 1) + 1)) & 0x80);
 						if (m_zoom)
-							*scanline++ = pen_color((bits << ((((x + m_hpan) & 0x03) << 1) + 1)) & 0x80);
+							*scanline++ = m_ramdac->pen_color((bits << ((((x + m_hpan) & 0x03) << 1) + 1)) & 0x80);
 					}
 				}
 				else
@@ -395,16 +379,16 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 		case 1: // 2 bpp
 			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y, hstart);
+				u32 *scanline = &bitmap.pix(y, hstart);
 				if ((y >= vstart) && (y < vend))
 				{
 					auto const rowbase = screenbase + (((y - vstart) >> (m_zoom ? 1 : 0)) * 512);
 					for (int x = 0; x < pixels; x++)
 					{
-						uint8_t const bits = rowbase[(x + m_hpan) / 4];
-						*scanline++ = pen_color((bits << (((x + m_hpan) & 0x03) << 1)) & 0xc0);
+						u8 const bits = rowbase[(x + m_hpan) / 4];
+						*scanline++ = m_ramdac->pen_color((bits << (((x + m_hpan) & 0x03) << 1)) & 0xc0);
 						if (m_zoom)
-							*scanline++ = pen_color((bits << (((x + m_hpan) & 0x03) << 1)) & 0xc0);
+							*scanline++ = m_ramdac->pen_color((bits << (((x + m_hpan) & 0x03) << 1)) & 0xc0);
 					}
 				}
 				else
@@ -417,16 +401,16 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 		case 2: // 4 bpp
 			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y, hstart);
+				u32 *scanline = &bitmap.pix(y, hstart);
 				if ((y >= vstart) && (y < vend))
 				{
 					auto const rowbase = screenbase + (((y - vstart) >> (m_zoom ? 1 : 0)) * 512);
 					for (int x = 0; x < pixels; x++)
 					{
-						uint8_t const bits = rowbase[(x + (m_hpan / 2)) / 2];
-						*scanline++ = pen_color((bits << (((x + (m_hpan / 2)) & 0x01) << 2)) & 0xf0);
+						u8 const bits = rowbase[(x + (m_hpan / 2)) / 2];
+						*scanline++ = m_ramdac->pen_color((bits << (((x + (m_hpan / 2)) & 0x01) << 2)) & 0xf0);
 						if (m_zoom)
-							*scanline++ = pen_color((bits << (((x + (m_hpan / 2)) & 0x01) << 2)) & 0xf0);
+							*scanline++ = m_ramdac->pen_color((bits << (((x + (m_hpan / 2)) & 0x01) << 2)) & 0xf0);
 					}
 				}
 				else
@@ -439,16 +423,16 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 		case 3: // 8 bpp
 			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y, hstart);
+				u32 *scanline = &bitmap.pix(y, hstart);
 				if ((y >= vstart) && (y < vend))
 				{
 					auto const rowbase = screenbase + (((y - vstart) >> (m_zoom ? 1 : 0)) * 1024);
 					for (int x = 0; x < pixels; x++)
 					{
-						uint8_t const bits = rowbase[x + (m_hpan / 4)];
-						*scanline++ = pen_color(bits);
+						u8 const bits = rowbase[x + (m_hpan / 4)];
+						*scanline++ = m_ramdac->pen_color(bits);
 						if (m_zoom)
-							*scanline++ = pen_color(bits);
+							*scanline++ = m_ramdac->pen_color(bits);
 					}
 				}
 				else
@@ -464,7 +448,7 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-void nubus_spec8s3_device::spec8s3_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void nubus_spec8s3_device::spec8s3_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if ((offset >= 0x3800) && (offset <= 0x382a))
 	{
@@ -512,15 +496,19 @@ void nubus_spec8s3_device::spec8s3_w(offs_t offset, uint32_t data, uint32_t mem_
 
 		case 0x3a01:
 			LOG("%08x to color (%08x invert)\n", data, data ^ 0xffffffff);
-			m_colors[m_count++] = ~data & 0xff;
+			// This rearrangement probably is actually in the scanout in the real
+			// hardware given the boards have a stock Bt478, but it's more performant
+			// for us to do it here.
+			if (m_count == 0)
+			{
+				m_ramdac->write(0, bitswap<8>(m_clutoffs, 0, 1, 2, 3, 4, 5, 6, 7));
+			}
+			m_ramdac->write(1, ~data & 0xff);
 
+			m_count++;
 			if (m_count == 3)
 			{
-				const int actual_color = bitswap<8>(m_clutoffs, 0, 1, 2, 3, 4, 5, 6, 7);
-
-				LOG("RAMDAC: color %d = %02x %02x %02x %s\n", actual_color, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
-				set_pen_color(actual_color, rgb_t(m_colors[0], m_colors[1], m_colors[2]));
-				m_clutoffs = (m_clutoffs + 1) & 0xff;
+				m_clutoffs++;
 				m_count = 0;
 			}
 			break;
@@ -567,7 +555,7 @@ void nubus_spec8s3_device::spec8s3_w(offs_t offset, uint32_t data, uint32_t mem_
 	}
 }
 
-uint32_t nubus_spec8s3_device::spec8s3_r(offs_t offset, uint32_t mem_mask)
+u32 nubus_spec8s3_device::spec8s3_r(offs_t offset, u32 mem_mask)
 {
 	switch (offset)
 	{
@@ -613,13 +601,13 @@ uint32_t nubus_spec8s3_device::spec8s3_r(offs_t offset, uint32_t mem_mask)
 	return 0;
 }
 
-void nubus_spec8s3_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void nubus_spec8s3_device::vram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	data ^= 0xffffffff;
 	COMBINE_DATA(&m_vram[offset]);
 }
 
-uint32_t nubus_spec8s3_device::vram_r(offs_t offset, uint32_t mem_mask)
+u32 nubus_spec8s3_device::vram_r(offs_t offset, u32 mem_mask)
 {
 	return m_vram[offset] ^ 0xffffffff;
 }

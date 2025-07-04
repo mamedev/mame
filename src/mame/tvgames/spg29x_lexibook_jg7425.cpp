@@ -201,6 +201,21 @@ ROM_START( zone3d )
 	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
 ROM_END
 
+
+
+ROM_START( ubox30 )
+	ROM_REGION( 0x200000, "extrom", 0 ) // SPI ROM in this case
+	ROM_LOAD("ubox_xm25qe16bzig_204015.bin", 0x000000, 0x200000, CRC(f8135947) SHA1(f2a075ae2b0bae186202f1019b566ffc411742bb) )
+	ROM_IGNORE(0x300)
+
+	DISK_REGION( "cfcard" )
+	DISK_IMAGE( "ubox_sd_512", 0, SHA1(99f2f1437d644a5e1fe48ce1445acf48fb8b0359) )
+
+	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
+	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
+ROM_END
+
+
 } // anonymous namespace
 
 CONS( 2015, fundr200,    0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Funderdome", "Funderdome Video Game Entertainment System 200+ Games (FUN-GAME32-1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // FUN-GAME32-1 on manual
@@ -210,3 +225,12 @@ CONS( 2016, lx_frozen,   0,         0,     lexibook_jg7425,   lexibook_jg7425, l
 
 // slightly different, but same basic structure of the external ROM
 COMP( 201?, zone3d,      0,         0,      lexibook_jg7425,  lexibook_jg7425, lexibook_jg7425_state, empty_init,"Zone", "Zone 3D", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// Unknown hardware, HDMI dongle with wireless pads.
+// Uses standard chips, not globs, but surface details on CPU/SoC have been erased.
+//
+// It has the GPspispi header, so is definitely a GeneralPlus / SunPlus chip, and it has a mix of '32-bit' games
+// as well as some 8-bit NES/FC games presumably running on an emulator like the above units, but the code in the
+// SPI ROM does not seem to disassemble to anything meaningful, maybe compressed?
+// Front and back have slightly different product names, unknown if NubSup is the manufacturer or part of the product name
+COMP( 201?, ubox30,      0,         0,      lexibook_jg7425,  lexibook_jg7425, lexibook_jg7425_state, empty_init,"<unknown>", "NubSup TV Interactive Extreme u-box / Extreme u-box Game Station 32Bit Interactive System - New 30", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

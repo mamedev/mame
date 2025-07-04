@@ -229,30 +229,35 @@ uint32_t atarisy2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			uint8_t const *const pri = &priority_bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &priority_bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-
-					// high priority PF?
-					if ((mopriority + pri[x]) & 2)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					uint8_t const *const pri = &priority_bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						// only gets priority if PF pen is less than 8
-						if (!(pf[x] & 0x08))
-							pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+						if (mo[x] != 0xffff)
+						{
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+							if ((mopriority + pri[x]) & 2)
+							{
+								// high priority PF - only gets priority if PF pen is less than 8
+								if (!(pf[x] & 0x08))
+									pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+							}
+							else
+							{
+								// low priority
+								pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+							}
+						}
 					}
-
-					// low priority
-					else
-						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
 				}
-		}
+			});
 
 	// add the alpha on top
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);

@@ -3478,18 +3478,17 @@ void blzntrnd_state::blzntrnd(machine_config &config)
 
 	// sound hardware
 	// HUM-002 PCB Configuration : Stereo output with second speaker connector
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	ym2610_device &ymsnd(YM2610(config, m_ymsnd, 16_MHz_XTAL/2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 void blzntrnd_state::gstrik2(machine_config &config)
@@ -3504,15 +3503,14 @@ void blzntrnd_state::gstrik2(machine_config &config)
 	m_vdp2->set_tmap_xoffsets(0,8,0);
 
 	// HUM-003 PCB Configuration : Mono output only
-	config.device_remove("lspeaker");
-	config.device_remove("rspeaker");
+	config.device_remove("speaker");
 	SPEAKER(config, "mono").front_center();
 
 	ym2610_device &ymsnd(YM2610(config.replace(), m_ymsnd, 16_MHz_XTAL/2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "mono", 0.5);
-	ymsnd.add_route(1, "mono", 0.5);
-	ymsnd.add_route(2, "mono", 0.5);
+	ymsnd.add_route(0, "mono", 0.75);
+	ymsnd.add_route(1, "mono", 0.25);
+	ymsnd.add_route(2, "mono", 0.25);
 }
 
 

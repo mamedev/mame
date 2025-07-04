@@ -658,6 +658,110 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="freedos14_120" cloneof="freedos14_144">
+		<description>FreeDOS 1.4 (Floppy-Only Edition, 5.25" 1.2MB)</description>
+		<year>2025</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.4" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Installer" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86BOOT.img" size="1228800" crc="23ce30f4" sha1="d29345d413cfed8a27cef1f17a12220ec0bdad84" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK01.img" size="1228800" crc="ac6cb8f2" sha1="465cdaaba287fe42cd5f452d7c8cce80c81074a2" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK02.img" size="1228800" crc="73ccbaaf" sha1="717c8a5e226280cd867f7a776b0e9c5efb432733" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK03.img" size="1228800" crc="226d3a99" sha1="24bf874f604ce76e8c74bd55edef2ef0c5191114" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK04.img" size="1228800" crc="43dc6593" sha1="b5ba6d9b17800389deeb3551fbba2e05bb8ab415" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK05.img" size="1228800" crc="f61c24ca" sha1="d19f63b25bb0829b8d3034fe119603ed745bf7e7" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK06.img" size="1228800" crc="c23d16c4" sha1="5ff7fb1f64d314b420e458696bd0b47f78e1d948" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK07.img" size="1228800" crc="77f14264" sha1="a8b0e86d11ef7230e5714f5585ee67c23d2e58a6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos14_144">
+		<description>FreeDOS 1.4 (Floppy-Only Edition, 3.5" 1.44MB)</description>
+		<year>2025</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.4" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installer" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86BOOT.img" size="1474560" crc="96f2cbaf" sha1="58627e80e30598f806a11342af4d6b0c36400a3f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK01.img" size="1474560" crc="58e308b8" sha1="5d2379cbe8ddacf9619098d801df8e9ea70bed10" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK02.img" size="1474560" crc="6c02d6d8" sha1="23d276e84549c2d6dadf96a3b870a868de35c73f" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK03.img" size="1474560" crc="6627dc0c" sha1="50c6962128d23b4c0729dfe7d8ece02b623ae29a" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK04.img" size="1474560" crc="0892e7a4" sha1="5c7b4345cde968aa502e4dedf2bd1e31d153fcde" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK05.img" size="1474560" crc="c1a96bd7" sha1="eec0d289a14db3c3c43c9b630bf53480d0fc2a2a" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK06.img" size="1474560" crc="c2094b10" sha1="b155ee091752fac2b2ae219343c51d58359ea036" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gem11">
 		<description>GEM Desktop 1.1</description>
 		<year>1985</year>
@@ -8915,6 +9019,101 @@ Missing [modem] features, assume requiring a connection to a Reuters device such
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="moneynet disk3.img" size="1474560" crc="dcfc9b90" sha1="3968bdc94bf594d00fd966a531cf919380fd7aae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmagic">
+		<description>PartitionMagic 8.05 (English)</description>
+		<year>2004</year>
+		<publisher>Symantec</publisher>
+		<info name="release" value="20040505" />
+		<info name="language" value="English" />
+		<info name="version" value="8.05" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="en partitionmagic 8.05 disk 1.img" size="1474560" crc="209cc49e" sha1="67a3783bb719ad9d57c5fc58b7be454fd0faa07f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="en partitionmagic 8.05 disk 2.img" size="1474560" crc="bccdbe9d" sha1="fcdc2d0654d16bed4b30ca01462bf367ce781899" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmagicfr" cloneof="pmagic">
+		<description>PartitionMagic 8.05 (French)</description>
+		<year>2004</year>
+		<publisher>Symantec</publisher>
+		<info name="release" value="20040505" />
+		<info name="language" value="French" />
+		<info name="version" value="8.05" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="fr partitionmagic 8.05 disk 1.img" size="1474560" crc="7599f223" sha1="fa5b78586d716115e17c11379cab7b983c26f62e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="fr partitionmagic 8.05 disk 2.img" size="1474560" crc="9441481e" sha1="164220d9ddf20fbf63d69514bfaac1707c0b00d8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmagicde" cloneof="pmagic">
+		<description>PartitionMagic 8.05 (German)</description>
+		<year>2004</year>
+		<publisher>Symantec</publisher>
+		<info name="release" value="20040505" />
+		<info name="language" value="German" />
+		<info name="version" value="8.05" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="de partitionmagic 8.05 disk 1.img" size="1474560" crc="3f628f48" sha1="4af2afd5cb1f5bc8fd341e3560be8475d2dfed7d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="de partitionmagic 8.05 disk 2.img" size="1474560" crc="393fcbc5" sha1="395e052239331f608ef74934f5f0a00eb0886e9c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmagicit" cloneof="pmagic">
+		<description>PartitionMagic 8.05 (Italian)</description>
+		<year>2004</year>
+		<publisher>Symantec</publisher>
+		<info name="release" value="20040505" />
+		<info name="language" value="Italian" />
+		<info name="version" value="8.05" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="it partitionmagic 8.05 disk 1.img" size="1474560" crc="6188d6b8" sha1="9fe4ced7e9306f04a60b20f43a0e6e21b7cc83bb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="it partitionmagic 8.05 disk 2.img" size="1474560" crc="88e8db75" sha1="94cec9d7d483e86c7238e7c61e7c7fa8e6a44c08" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmagices" cloneof="pmagic">
+		<description>PartitionMagic 8.05 (Spanish)</description>
+		<year>2004</year>
+		<publisher>Symantec</publisher>
+		<info name="release" value="20040505" />
+		<info name="language" value="Spanish" />
+		<info name="version" value="8.05" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="es partitionmagic 8.05 disk 1.img" size="1474560" crc="fc9c205a" sha1="928c719d815a71a8d3e00501b99030d7541f5f6c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="es partitionmagic 8.05 disk 2.img" size="1474560" crc="91ccb6fa" sha1="7b9d7a942ef7fd091a36ac8c8a8b1f2c0f87dd84" />
 			</dataarea>
 		</part>
 	</software>

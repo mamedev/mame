@@ -124,8 +124,7 @@ void hideseek_state::hideseek(machine_config &config)
 	PALETTE(config, "palette", FUNC(hideseek_state::hideseek_palette), 0x10000);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_hideseek);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	/* sound : M9810 */
 }

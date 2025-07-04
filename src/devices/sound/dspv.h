@@ -28,7 +28,7 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	address_space_config m_prg1_config, m_prg2_config, m_data_config;

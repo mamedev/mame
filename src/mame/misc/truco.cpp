@@ -42,7 +42,7 @@
   mask that hides them. Once activated, a supervisor key appears, providing two new inputs for adding and removing credits,
   functioning as key-in and key-out.
 
-  The gambling mode features a selectable risk level, allowing players to multiply their winnings but at the cost of 
+  The gambling mode features a selectable risk level, allowing players to multiply their winnings but at the cost of
   increasing the amount of credits at risk.
 
   Another hidden mode, likely used during development for debugging, enables the player to set their cards in the game,
@@ -293,17 +293,17 @@
 
 
   Game harcoded switches:
-  
-  9Eh:  1 = No timeout   /  0 = Game Timeout 
+
+  9Eh:  1 = No timeout   /  0 = Game Timeout
   ACh:  1 = Gamble Mode  /  2 = Arcade Mode
-  88h:  0 = Normal       /  1 = Choose Cards  
+  88h:  0 = Normal       /  1 = Choose Cards
   ABh:  0 = Input P0 No Masked / 1 = Masked (Default): Enables Service/Books key that show the counters.
 
 
 *****************************************************************************************************************
 
   TODO:
-  
+
   - Find the function of the P1-4 input line.
   - Find the function of the JP2-2 from PIA PB0
 
@@ -365,8 +365,8 @@ private:
 
 	void pia_ca2_w(int state);
 	void portb_w(uint8_t data);
-	uint8_t	pia_ca1_r();
-	uint8_t	pia_cb1_r();
+	uint8_t pia_ca1_r();
+	uint8_t pia_cb1_r();
 
 	void palette(palette_device &palette) const;
 
@@ -417,19 +417,19 @@ uint32_t truco_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		videoram += 0x80;
 	}
 	return 0;
-}	
+}
 
 
 /*******************************************
 *           Read/Write Handlers            *
 *******************************************/
 
-uint8_t	truco_state::pia_ca1_r()
+uint8_t truco_state::pia_ca1_r()
 {
 	return m_coin->read() & 1;
 }
 
-uint8_t	truco_state::pia_cb1_r()
+uint8_t truco_state::pia_cb1_r()
 {
 	return m_coin->read() & 1;
 }
@@ -445,14 +445,14 @@ void truco_state::pia_ca2_w(int state)
     setting 1.6 seconds as WD timeout.
 */
 	m_watchdog->watchdog_reset();
-	
+
 
 /*  Game harcoded switches:
-  
-	9Eh:  1 = No timeout   /  0 = Game Timeout 
-	ACh:  1 = Gamble Mode  /  2 = Arcade Mode
-	88h:  0 = Normal       /  1 = Choose Cards 
-	ABh:  0 = Input P0 No Masked / 1 = Masked (Default)
+
+    9Eh:  1 = No timeout   /  0 = Game Timeout
+    ACh:  1 = Gamble Mode  /  2 = Arcade Mode
+    88h:  0 = Normal       /  1 = Choose Cards
+    ABh:  0 = Input P0 No Masked / 1 = Masked (Default)
 */
 	m_ram->write(0x88, BIT(m_settings->read(), 1) & 1);
 	m_ram->write(0x9e, BIT(m_settings->read(), 2) & 1);
@@ -500,7 +500,7 @@ static INPUT_PORTS_START( truco )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )  PORT_NAME("Keyout enable Key")         // Connected to JAMMA S17 (P2 START)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                            // Connected to JAMMA S14 (SERVICE SW)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )         PORT_NAME("P1-4")PORT_CODE(KEYCODE_D)  // still not clear... Connected to JAMMA C26 (P2 SELECT)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN)                                            // Connected to JAMMA S16 (COIN2) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN)                                            // Connected to JAMMA S16 (COIN2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT )            PORT_NAME("Tilt / Keyout")             // 'tilt' line. once turned the key behaves as keyout.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                                                // Connected to JAMMA C22 (P1 BUTTON1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )                                            // Connected to JAMMA C18/21 (JOY UP & JOY RIGHT)
@@ -575,7 +575,7 @@ void truco_state::truco(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1600));  // 1.6 seconds
 
 	RAM(config, m_ram).set_default_size("32K");
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);	
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
 	pia6821_device &pia(PIA6821(config, "pia0"));
 	pia.readpa_handler().set_ioport("P1");
@@ -586,7 +586,7 @@ void truco_state::truco(machine_config &config)
 	pia.readcb1_handler().set(FUNC(truco_state::pia_cb1_r));
 	pia.irqa_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	pia.irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
-	
+
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

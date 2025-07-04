@@ -352,8 +352,8 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME         PARENT   MACHINE           INPUT      CLASS                  INIT        ROT   COMPANY   FULLNAME                                    FLAGS
-GAME( 1991, cbully,      0,       falgasm89_simple, falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Coche Bully",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 19??, fantcar,     0,       falgasm89,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (M89 hardware)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1991, cbully,      0,       falgasm89_simple, falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Coche Bully",                              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 19??, fantcar,     0,       falgasm89,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (M89 hardware)",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1988, fantcar87,   fantcar, falgasm87,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (Micro-87 hardware, newer)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1987, fantcar87a,  fantcar, falgasm87,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (Micro-87 hardware, older)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1991, rmontecarlo, 0,       falgasm89_video,  falgasm89, falgasm89_video_state, empty_init, ROT0, "Falgas", "Rally Montecarlo",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1991, rmontecarlo, 0,       falgasm89_video,  falgasm89, falgasm89_video_state, empty_init, ROT0, "Falgas", "Rally Montecarlo",                         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

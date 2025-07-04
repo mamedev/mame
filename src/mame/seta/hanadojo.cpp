@@ -4,17 +4,19 @@
 
 花道場 (Hana Doujou) - Alba 1984
 AAJ-11 PCB
+Test Mode tests a "N-Board I/O"
 
 TODO:
-- Resets itself in attract sequence, NVRAM thrash protection?
+- Uses a form of NVRAM thrash protection, not completely understood:
 \- bp b6e sub-routine: loops with ld hl,$8f14 de,$0005 expecting all values to be 0x55 or 0xaa;
 \- writes a 0 to $8f28 the 3rd time around, expecting one of the IOX to prevent that;
 \- some code uploaded in RAM at $8c00, including an IOX data_w 0x60;
 \- wpset 0x8f00,0x100,r,PC!=0xb91
 \- program and I/O accesses to $b8xx / $bcxx areas;
-\- second reset: bp 1a3,1,{a=4;g} for gameplay and attract;
+- Resets itself at the end of first attract hand & coin-in sequences
+\- bp 1a3,1,{a=4;g} to bypass;
 - Hookup NMI for coin chutes;
-- Eventually uses hopper;
+- Hopper plus other bits and bobs ("noise detection" antenna?);
 - CRTC processes params as 1088x224 with char width 8;
 - hanadojoa: slightly more protected, keeps resetting at IOX tests;
 
@@ -35,6 +37,11 @@ unknown 40-pin chip (stickered AN-002)
 unknown 40-pin chip (stickered AN-003)
 2x AX-014 epoxy covered chips
 AX-013 epoxy covered chip
+
+===================================================================================================
+
+CN1 connects to hopper drive NS-01
+CN2/CN3 connects to 1P/2P control panels
 
 **************************************************************************************************/
 
@@ -63,6 +70,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_iox(*this, "iox_%u", 1U)
+		, m_nvram(*this, "nvram")
 		, m_dswb(*this, "DSWB")
 		, m_dswc(*this, "DSWC")
 		, m_patsw(*this, "PATSW")
@@ -75,10 +83,13 @@ public:
 
 protected:
 	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<iox_hle_device, 2> m_iox;
+	required_device<nvram_device> m_nvram;
 	required_ioport m_dswb;
 	required_ioport m_dswc;
 	required_ioport m_patsw;
@@ -92,6 +103,9 @@ private:
 
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
+
+	bool m_nvram_lock;
+	std::unique_ptr<uint8_t[]> m_nvram_ptr;
 };
 
 void hanadojo_state::palette_init(palette_device &palette) const
@@ -162,8 +176,15 @@ void hanadojo_state::program_map(address_map &map)
 {
 	// ldir 0-0x1ff at POST
 	map(0x0000, 0x7fff).rom().nopw();
-	map(0x8800, 0x8fff).ram();
-	map(0x8f28, 0x8f28).lr8(NAME([] (offs_t offset) { return 0x55; }));
+	map(0x8800, 0x8eff).ram();
+	map(0x8f00, 0x8fff).lrw8(
+		NAME([this] (offs_t offset) { return m_nvram_ptr[offset]; }),
+		NAME([this] (offs_t offset, u8 data) {
+			// NOTE: not all of it, would otherwise never decrease coin counter in-game
+			if (!m_nvram_lock || (offset & 0x28) != 0x28)
+				m_nvram_ptr[offset] = data;
+		})
+	);
 	map(0x9000, 0x97ff).ram().share(m_videoram);
 }
 
@@ -197,6 +218,7 @@ void hanadojo_state::io_map(address_map &map)
 }
 
 
+// TODO: may make more sense to just use IPT_POKER_HOLD* instead.
 static INPUT_PORTS_START( hanadojo )
 	PORT_START("P1_KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -228,7 +250,7 @@ static INPUT_PORTS_START( hanadojo )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2) PORT_NAME("P2 Cancel")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_PLAYER(2) PORT_NAME("P2 Cancel")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2)
 
@@ -283,18 +305,14 @@ static INPUT_PORTS_START( hanadojo )
 	// NOTE: DSWD is 4 bit banks, near AY on board.
 	// Game has no clear bank display compared to the others, assume one is SW2 nearby.
 	PORT_START("DSWD")
-	PORT_DIPNAME( 0x01, 0x00, "ARS" )
+	PORT_DIPNAME( 0x01, 0x00, "ARS" ) // Credit Clear
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "RES" ) // RST?
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "M M" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "CLR" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) // "M M" -> Memory Mode
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) // "CLR"
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYIN )
 	PORT_DIPNAME( 0x20, 0x00, "MDL" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -311,6 +329,21 @@ static GFXDECODE_START( gfx_hanadojo )
 	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x3_planar, 0, 32 * 2 )
 GFXDECODE_END
 
+void hanadojo_state::machine_start()
+{
+	save_item(NAME(m_nvram_lock));
+
+	const u32 nvram_size = 0x100;
+	m_nvram_ptr = std::make_unique<uint8_t[]>(nvram_size);
+	m_nvram->set_base(m_nvram_ptr.get(), nvram_size);
+
+	save_pointer(NAME(m_nvram_ptr), nvram_size);
+}
+
+void hanadojo_state::machine_reset()
+{
+	m_nvram_lock = false;
+}
 
 void hanadojo_state::hanadojo(machine_config &config)
 {
@@ -330,6 +363,8 @@ void hanadojo_state::hanadojo(machine_config &config)
 	m_iox[1]->p1_direct_input_cb().set_ioport("DSWD");
 	// TODO: looks latch inverted compared to the $a0-$a1 version
 	m_iox[1]->p2_direct_input_cb().set([this] () { return (m_dswb->read() & 0x3f) ^ 0x3f; });
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", 12_MHz_XTAL / 4)); // divider guessed
 	crtc.set_screen("screen");
@@ -353,7 +388,14 @@ void hanadojo_state::hanadojo(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	ay8910_device &ay(AY8910(config, "ay", 12_MHz_XTAL / 16)); // divider guessed
-//  ay.port_a_read_callback()
+	ay.port_a_write_callback().set([this] (u8 data) {
+		// avoid locking the NVRAM on device startup
+		if (data == 0xff)
+			return;
+		m_nvram_lock = !!BIT(data, 7);
+		// bit 5 is flip screen, others unknown
+		logerror("AY Port A: %02x\n", data);
+	});
 	ay.port_b_read_callback().set_ioport("DSWA");
 	ay.add_route(ALL_OUTPUTS, "speaker", 0.33);
 }
