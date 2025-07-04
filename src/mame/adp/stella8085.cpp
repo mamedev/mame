@@ -170,7 +170,7 @@ void stella8085_state::rst65_w(u8 state)
 {
 //  KBD Interrupt
 
-	//m_maincpu->set_input_line(I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 	LOG("I8279: irq state: %s - state:%02x time:%s\n", state ? "Assert Line":"Clear Line", state, machine().time().as_string());
 }
 
@@ -288,10 +288,10 @@ void stella8085_state::dicemstr(machine_config &config)
 	I8256(config, "muart", 10.240_MHz_XTAL / 2); // divider not verified
 
 	I8279(config, m_kdc, 10.240_MHz_XTAL / 4); // divider not verified
-	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));  // scan SL lines
-	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));  // display A&B
-	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));   // kbd RL lines
-	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));  // irq line
+	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
+	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));
+	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));
+	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
 
 	/* video hardware */
 	config.set_default_layout(layout_stellafr);
@@ -312,10 +312,10 @@ void stella8085_state::doppelpot(machine_config &config)
 	I8256(config, "muart", 6.144_MHz_XTAL / 2);
 
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
-	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));  // scan SL lines
-	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));  // display A&B
-	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));   // kbd RL lines
-	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));  // irq line
+	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
+	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));
+	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));
+	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
 
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 
