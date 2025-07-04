@@ -50,6 +50,7 @@ public:
 	banprestomsz80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "crtc"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_hopper(*this, "hopper"),
@@ -65,6 +66,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<seibu_crtc_device> m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<hopper_device> m_hopper;
@@ -76,11 +78,17 @@ private:
 	tilemap_t *m_char_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
 
+	uint8_t m_crtc_upper_data = 0;
+
 	void output_w(uint8_t data);
 	void output2_w(uint8_t data);
+	void output3_w(uint8_t data);
 
 	void charram_w(offs_t offset, uint8_t data);
 	void bgram_w(offs_t offset, uint8_t data);
+
+	void crtc_upper_data_w(uint8_t data);
+	void crtc_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_char_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -99,6 +107,8 @@ void banprestomsz80_state::video_start()
 
 	m_char_tilemap->set_transparent_pen(0x0f);
 	m_bg_tilemap->set_transparent_pen(0x0f);
+
+	save_item(NAME(m_crtc_upper_data));
 }
 
 
@@ -138,6 +148,16 @@ uint32_t banprestomsz80_state::screen_update(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
+void banprestomsz80_state::crtc_upper_data_w(uint8_t data)
+{
+	m_crtc_upper_data = data;
+}
+
+void banprestomsz80_state::crtc_w(offs_t offset, uint8_t data)
+{
+	m_crtc->write(offset, (m_crtc_upper_data & 0xe0) << 3 | data);
+}
+
 void banprestomsz80_state::output_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, BIT(data, 0)); // 10 Yen
@@ -159,6 +179,12 @@ void banprestomsz80_state::output2_w(uint8_t data)
 
 	if (data & 0xfc)
 		logerror("%s output2_w bits 2-7 set: %02x\n", machine().describe_context(), data);
+}
+
+void banprestomsz80_state::output3_w(uint8_t data)
+{
+	if (data)
+		logerror("%s output3_w bits 0-7 set: %02x\n", machine().describe_context(), data);
 }
 
 void banprestomsz80_state::program_map(address_map &map)
@@ -183,9 +209,13 @@ void banprestomsz80_state::io_map(address_map &map)
 	map(0x42, 0x42).portr("IN0");
 	map(0x43, 0x43).portr("IN1");
 	map(0x44, 0x44).portr("IN2");
+	map(0x60, 0x60).nopw(); // sprite buffering trigger?
 	map(0x61, 0x61).w(FUNC(banprestomsz80_state::output_w));
 	map(0x62, 0x62).w(FUNC(banprestomsz80_state::output2_w));
+	map(0x63, 0x63).w(FUNC(banprestomsz80_state::output3_w));
+	map(0x67, 0x67).w(FUNC(banprestomsz80_state::crtc_upper_data_w));
 	map(0x80, 0x80).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa0, 0xbf).w(FUNC(banprestomsz80_state::crtc_w));
 }
 
 
@@ -325,6 +355,8 @@ void banprestomsz80_state::banprestomsz80(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(banprestomsz80_state::screen_update));
 	screen.set_palette(m_palette);
+
+	SEIBU_CRTC(config, m_crtc, 0);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
