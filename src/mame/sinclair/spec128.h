@@ -28,8 +28,6 @@ public:
 protected:
 	memory_bank_array_creator<1> m_bank_rom;
 	memory_bank_array_creator<4> m_bank_ram;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	virtual void video_start() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;

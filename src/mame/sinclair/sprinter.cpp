@@ -1879,6 +1879,8 @@ void sprinter_state::sprinter(machine_config &config)
 {
 	spectrum_128(config);
 	config.device_remove("palette");
+	config.device_remove("exp");
+	config.device_remove("dma");
 	config.set_default_layout(layout_sprinter);
 
 	m_ram->set_default_size("64M");
