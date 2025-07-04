@@ -10,14 +10,17 @@
 
 #include "emu.h"
 #include "ui/audio_effect_eq.h"
-#include "audio_effects/aeffect.h"
-#include "audio_effects/eq.h"
 
 #include "ui/ui.h"
 
+#include "audio_effects/aeffect.h"
+#include "audio_effects/eq.h"
+
 namespace ui {
 
-const u32 menu_audio_effect_eq::freq_limits[5][2] = {
+namespace {
+
+constexpr u32 FREQ_LIMITS[5][2] = {
 	{ 20, 2000 },
 	{ 100, 10000 },
 	{ 100, 10000 },
@@ -25,15 +28,18 @@ const u32 menu_audio_effect_eq::freq_limits[5][2] = {
 	{ 500, 16000 }
 };
 
+} // anonymous namespace
+
 menu_audio_effect_eq::menu_audio_effect_eq(mame_ui_manager &mui, render_container &container, u16 chain, u16 entry, audio_effect *effect)
 	: menu(mui, container)
 {
 	m_chain = chain;
 	m_entry = entry;
-	m_effect = static_cast<audio_effect_eq *>(effect);
-	set_heading(util::string_format("%s (%s)",
-			_(audio_effect::effect_names[audio_effect::EQ]),
-			chain == 0xffff ? _("Default") : machine().sound().effect_chain_tag(chain)));
+	m_effect = dynamic_cast<audio_effect_eq *>(effect);
+	set_heading(util::string_format(
+			(chain == 0xffff) ? _("menu-aeffect-heading", "%1$s (default)") : _("menu-aeffect-heading", "%1$s (%2$s)"),
+			_("audio-effect", audio_effect::effect_names[audio_effect::EQ]),
+			(chain == 0xffff) ? "" : machine().sound().effect_chain_tag(chain)));
 	set_process_flags(PROCESS_LR_REPEAT);
 }
 
@@ -44,7 +50,7 @@ menu_audio_effect_eq::~menu_audio_effect_eq()
 u32 menu_audio_effect_eq::decrement_f(u32 band, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
 {
 	if(!shift_pressed && alt_pressed)
-		return freq_limits[band][0];
+		return FREQ_LIMITS[band][0];
 
 	u32 f = m_effect->f(band);
 
@@ -76,13 +82,13 @@ u32 menu_audio_effect_eq::decrement_f(u32 band, bool alt_pressed, bool ctrl_pres
 		f += incval - f % incval;
 
 	f -= incval;
-	return std::clamp(f, freq_limits[band][0], freq_limits[band][1]);
+	return std::clamp(f, FREQ_LIMITS[band][0], FREQ_LIMITS[band][1]);
 }
 
 u32 menu_audio_effect_eq::increment_f(u32 band, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
 {
 	if(!shift_pressed && alt_pressed)
-		return freq_limits[band][1];
+		return FREQ_LIMITS[band][1];
 
 	u32 f = m_effect->f(band);
 
@@ -114,7 +120,7 @@ u32 menu_audio_effect_eq::increment_f(u32 band, bool alt_pressed, bool ctrl_pres
 		f -= f % incval;
 
 	f += incval;
-	return std::clamp(f, freq_limits[band][0], freq_limits[band][1]);
+	return std::clamp(f, FREQ_LIMITS[band][0], FREQ_LIMITS[band][1]);
 }
 
 float menu_audio_effect_eq::change_q(u32 band, bool inc, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
@@ -187,7 +193,8 @@ bool menu_audio_effect_eq::handle(event const *ev)
 			m_effect->set_f(band, f);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_f(m_effect->f(band)));
+			ev->item->set_flags(flag_f(band));
 			return true;
 		}
 
@@ -196,7 +203,8 @@ bool menu_audio_effect_eq::handle(event const *ev)
 			m_effect->set_q(band, q);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_q(m_effect->q(band)));
+			ev->item->set_flags(flag_q(band));
 			return true;
 		}
 
@@ -205,7 +213,8 @@ bool menu_audio_effect_eq::handle(event const *ev)
 			m_effect->set_db(band, db);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_db(m_effect->db(band)));
+			ev->item->set_flags(flag_db(band));
 			return true;
 		}
 		}
@@ -236,7 +245,8 @@ bool menu_audio_effect_eq::handle(event const *ev)
 			m_effect->set_f(band, f);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_f(m_effect->f(band)));
+			ev->item->set_flags(flag_f(band));
 			return true;
 		}
 
@@ -245,7 +255,8 @@ bool menu_audio_effect_eq::handle(event const *ev)
 			m_effect->set_q(band, q);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_q(m_effect->q(band)));
+			ev->item->set_flags(flag_q(band));
 			return true;
 		}
 
@@ -254,12 +265,14 @@ bool menu_audio_effect_eq::handle(event const *ev)
 			m_effect->set_db(band, db);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_db(m_effect->db(band)));
+			ev->item->set_flags(flag_db(band));
 			return true;
 		}
 		}
 		break;
 	}
+
 	case IPT_UI_CLEAR: {
 		switch(entry) {
 		case MODE:
@@ -281,14 +294,16 @@ bool menu_audio_effect_eq::handle(event const *ev)
 
 		case F:
 			m_effect->reset_f(band);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_f(m_effect->f(band)));
+			ev->item->set_flags(flag_f(band));
 			return true;
 
 		case Q: {
 			m_effect->reset_q(band);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_q(m_effect->q(band)));
+			ev->item->set_flags(flag_q(band));
 			return true;
 		}
 
@@ -296,29 +311,56 @@ bool menu_audio_effect_eq::handle(event const *ev)
 			m_effect->reset_db(band);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_db(m_effect->db(band)));
+			ev->item->set_flags(flag_db(band));
 			return true;
 		}
 		}
 		break;
 	}
+
+	case IPT_UI_PREV_GROUP:
+		switch (entry)
+		{
+		case SHELF:
+		case F:
+		case Q:
+		case DB:
+			if(band > 0)
+				set_selection((void *)uintptr_t(((band - 1) << 16) | ((band == 1) ? SHELF : F)));
+			break;
+		}
+		break;
+
+	case IPT_UI_NEXT_GROUP:
+		switch (entry)
+		{
+		case SHELF:
+		case F:
+		case Q:
+		case DB:
+			if(band < 4)
+				set_selection((void *)uintptr_t(((band + 1) << 16) | ((band == 3) ? SHELF : F)));
+			break;
+		}
+		break;
 	}
 	return false;
 }
 
 std::string menu_audio_effect_eq::format_f(u32 f)
 {
-	return util::string_format("%d Hz", f);
+	return util::string_format(_("menu-aeffect-eq", "%1$d Hz"), f);
 }
 
 std::string menu_audio_effect_eq::format_q(float q)
 {
-	return util::string_format("%.2f", q);
+	return util::string_format(_("menu-aeffect-eq", "%1$.2f"), q);
 }
 
 std::string menu_audio_effect_eq::format_db(float db)
 {
-	return util::string_format("%g dB", db);
+	return util::string_format(_("menu-aeffect-eq", "%1$+g dB"), db);
 }
 
 u32 menu_audio_effect_eq::flag_mode() const
@@ -363,9 +405,9 @@ u32 menu_audio_effect_eq::flag_f(u32 band) const
 	if(!m_effect->isset_f(band))
 		flag |= FLAG_INVERT;
 	u32 f = m_effect->f(band);
-	if(f > freq_limits[band][0])
+	if(f > FREQ_LIMITS[band][0])
 		flag |= FLAG_LEFT_ARROW;
-	if(f < freq_limits[band][1])
+	if(f < FREQ_LIMITS[band][1])
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }
@@ -398,48 +440,77 @@ u32 menu_audio_effect_eq::flag_db(u32 band) const
 
 void menu_audio_effect_eq::populate()
 {
-	item_append(_("Mode"), m_effect->mode() ? _("Active") : _("Bypass"), flag_mode(), (void *)MODE);
+	item_append(
+			_("menu-aeffect-eq", "Mode"),
+			m_effect->mode() ? _("menu-aeffect-eq", "Active") : _("menu-aeffect-eq", "Bypass"),
+			flag_mode(),
+			(void *)MODE);
 
-	item_append(_("Low Band"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
-	item_append(_("Mode"), m_effect->low_shelf() ? _("Shelf") : _("Peak"), flag_low_shelf(), (void *)uintptr_t(SHELF | (0 << 16)));
-	item_append(_("Frequency"), format_f(m_effect->f(0)), flag_f(0), (void *)uintptr_t(F | (0 << 16)));
-	if(!m_effect->low_shelf())
-		item_append(_("Q factor"), format_q(m_effect->q(0)), flag_q(0), (void *)uintptr_t(Q | (0 << 16)));
-	item_append(_("Gain"), format_db(m_effect->db(0)), flag_db(0), (void *)uintptr_t(DB | (0 << 16)));
+	auto const add_band_controls =
+			[this] (u32 band, bool need_q)
+			{
+				item_append(
+						_("menu-aeffect-eq", "Frequency"),
+						format_f(m_effect->f(band)),
+						flag_f(band),
+						(void *)uintptr_t(F | (band << 16)));
+				if(need_q)
+				{
+					item_append(
+							_("menu-aeffect-eq", "Q factor"),
+							format_q(m_effect->q(band)),
+							flag_q(band),
+							(void *)uintptr_t(Q | (band << 16)));
+				}
+				item_append(
+						_("menu-aeffect-mode", "Gain"),
+						format_db(m_effect->db(band)),
+						flag_db(band),
+						(void *)uintptr_t(DB | (band << 16)));
+			};
 
-	item_append(_("Low Mid Band"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
-	item_append(_("Frequency"), format_f(m_effect->f(1)), flag_f(1), (void *)uintptr_t(F | (1 << 16)));
-	item_append(_("Q factor"), format_q(m_effect->q(1)), flag_q(1), (void *)uintptr_t(Q | (1 << 16)));
-	item_append(_("Gain"), format_db(m_effect->db(1)), flag_db(1), (void *)uintptr_t(DB | (1 << 16)));
+	item_append(
+			_("menu-aeffect-eq", "Low Band"),
+			FLAG_UI_HEADING | FLAG_DISABLE,
+			nullptr);
+	item_append(
+			_("menu-aeffect-eq", "Mode"),
+			m_effect->low_shelf() ? _("menu-aeffect-eq", "Shelf") : _("menu-aeffect-eq", "Peak"),
+			flag_low_shelf(),
+			(void *)uintptr_t(SHELF | (0 << 16)));
+	add_band_controls(0, !m_effect->low_shelf());
 
-	item_append(_("Mid Band"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
-	item_append(_("Frequency"), format_f(m_effect->f(2)), flag_f(2), (void *)uintptr_t(F | (2 << 16)));
-	item_append(_("Q factor"), format_q(m_effect->q(2)), flag_q(2), (void *)uintptr_t(Q | (2 << 16)));
-	item_append(_("Gain"), format_db(m_effect->db(2)), flag_db(2), (void *)uintptr_t(DB | (2 << 16)));
+	item_append(
+			_("menu-aeffect-eq", "Low Mid Band"),
+			FLAG_UI_HEADING | FLAG_DISABLE,
+			nullptr);
+	add_band_controls(1, true);
 
-	item_append(_("High Mid Band"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
-	item_append(_("Frequency"), format_f(m_effect->f(3)), flag_f(3), (void *)uintptr_t(F | (3 << 16)));
-	item_append(_("Q factor"), format_q(m_effect->q(3)), flag_q(3), (void *)uintptr_t(Q | (3 << 16)));
-	item_append(_("Gain"), format_db(m_effect->db(3)), flag_db(3), (void *)uintptr_t(DB | (3 << 16)));
+	item_append(
+			_("menu-aeffect-eq", "Mid Band"),
+			FLAG_UI_HEADING | FLAG_DISABLE,
+			nullptr);
+	add_band_controls(2, true);
 
-	item_append(_("High Band"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
-	item_append(_("Mode"), m_effect->high_shelf() ? _("Shelf") : _("Peak"), flag_high_shelf(), (void *)uintptr_t(SHELF | (4 << 16)));
-	item_append(_("Frequency"), format_f(m_effect->f(4)), flag_f(4), (void *)uintptr_t(F | (4 << 16)));
-	if(!m_effect->high_shelf())
-		item_append(_("Q factor"), format_q(m_effect->q(4)), flag_q(4), (void *)uintptr_t(Q | (4 << 16)));
-	item_append(_("Gain"), format_db(m_effect->db(4)), flag_db(4), (void *)uintptr_t(DB | (4 << 16)));
+	item_append(
+			_("menu-aeffect-eq", "High Mid Band"),
+			FLAG_UI_HEADING | FLAG_DISABLE,
+			nullptr);
+	add_band_controls(3, true);
+
+	item_append(
+			_("menu-aeffect-eq", "High Band"),
+			FLAG_UI_HEADING | FLAG_DISABLE,
+			nullptr);
+	item_append(
+			_("menu-aeffect-eq", "Mode"),
+			m_effect->high_shelf() ? _("menu-aeffect-eq", "Shelf") : _("menu-aeffect-eq", "Peak"),
+			flag_high_shelf(),
+			(void *)uintptr_t(SHELF | (4 << 16)));
+	add_band_controls(4, !m_effect->high_shelf());
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset All"), 0, (void *)RESET_ALL);
-}
-
-void menu_audio_effect_eq::recompute_metrics(uint32_t width, uint32_t height, float aspect)
-{
-	menu::recompute_metrics(width, height, aspect);
-}
-
-void menu_audio_effect_eq::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
-{
+	item_append(_("menu-aeffect-eq", "Reset All"), 0, (void *)RESET_ALL);
 }
 
 void menu_audio_effect_eq::menu_activated()
@@ -452,4 +523,4 @@ void menu_audio_effect_eq::menu_deactivated()
 {
 }
 
-}
+} // namespace ui

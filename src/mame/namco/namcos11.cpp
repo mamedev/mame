@@ -20,7 +20,7 @@
   Notes:
    - pocketrc long samples and drum loops go out of sync, it sounds better when
      the C352 is underclocked to match the one in namcos22. It's a BTANB, however,
-	 since current C352 frequency is the same as Tekken/Tekken 2 real PCB.
+     since current C352 frequency is the same as Tekken/Tekken 2 real PCB.
 
 Known Dumps
 -----------

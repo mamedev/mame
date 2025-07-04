@@ -411,7 +411,7 @@ void asterix_state::asterix(machine_config &config)
 
 	K053244(config, m_k053244, 0);
 	m_k053244->set_palette("palette");
-	m_k053244->set_offsets(-3, -1);
+	m_k053244->set_offsets(93, -1);
 	m_k053244->set_sprite_callback(FUNC(asterix_state::sprite_callback));
 
 	K053251(config, m_k053251, 0);

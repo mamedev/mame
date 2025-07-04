@@ -299,8 +299,8 @@ void k051316_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, con
 	startx -= (16 + m_dy) * incyx;
 	starty -= (16 + m_dy) * incyy;
 
-	startx -= (89 + m_dx) * incxx;
-	starty -= (89 + m_dx) * incxy;
+	startx -= (-7 + m_dx) * incxx;
+	starty -= (-7 + m_dx) * incxy;
 
 	m_tmap->draw_roz(screen, bitmap, cliprect, startx << 5, starty << 5,
 			incxx << 5, incxy << 5, incyx << 5, incyy << 5,

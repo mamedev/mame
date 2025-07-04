@@ -1667,10 +1667,10 @@ ROM_START( footbpow ) // Version 4.6
 
 	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
 	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
-           Oscillator =  High Speed
-           Watchdog Timer = Enabled
-           Power-Up Timer = Disabled
-           Brown Out = Enabled */
+	       Oscillator =  High Speed
+	       Watchdog Timer = Enabled
+	       Power-Up Timer = Disabled
+	       Brown Out = Enabled */
 	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
@@ -1712,10 +1712,10 @@ ROM_START( footbpow14 ) // Version 1.4
 
 	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
 	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
-           Oscillator =  High Speed
-           Watchdog Timer = Enabled
-           Power-Up Timer = Disabled
-           Brown Out = Enabled */
+	       Oscillator =  High Speed
+	       Watchdog Timer = Enabled
+	       Power-Up Timer = Disabled
+	       Brown Out = Enabled */
 	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
@@ -1757,10 +1757,10 @@ ROM_START( footbpow12 ) // Version 1.2 - REF. 000208 ROM board
 
 	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
 	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
-           Oscillator =  High Speed
-           Watchdog Timer = Enabled
-           Power-Up Timer = Disabled
-           Brown Out = Enabled */
+	       Oscillator =  High Speed
+	       Watchdog Timer = Enabled
+	       Power-Up Timer = Disabled
+	       Brown Out = Enabled */
 	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
@@ -1802,10 +1802,10 @@ ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
 
 	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
 	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
-           Oscillator =  High Speed
-           Watchdog Timer = Enabled
-           Power-Up Timer = Disabled
-           Brown Out = Enabled */
+	       Oscillator =  High Speed
+	       Watchdog Timer = Enabled
+	       Power-Up Timer = Disabled
+	       Brown Out = Enabled */
 	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )

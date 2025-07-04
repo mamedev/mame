@@ -106,6 +106,10 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 		const char *const name = SDL_GetAudioDeviceName(i, 0);
 #if SDL_VERSION_ATLEAST(2, 0, 16)
 		const int err = SDL_GetAudioDeviceSpec(i, 0, &spec);
+		// the ALSA backend in SDL2 doesn't return the number of channels, just fall back to a safe value
+		if (spec.channels == 0) {
+			spec.channels = 2;
+		}
 #else
 		// seems to be no way to get the device's native format before SDL 2.0.16, just fall back to 48kHz stereo
 		const int err = 0;
@@ -149,16 +153,16 @@ osd::audio_info sound_sdl::get_information()
 	static const char *const posname[10] = { "FL", "FR", "FC", "LFE", "BL", "BR", "BC", "SL", "SR", "AUX" };
 
 	static const osd::channel_position pos3d[10] = {
-		osd::channel_position::FL,
-		osd::channel_position::FR,
-		osd::channel_position::FC,
-		osd::channel_position::LFE,
-		osd::channel_position::RL,
-		osd::channel_position::RR,
-		osd::channel_position::RC,
+		osd::channel_position::FL(),
+		osd::channel_position::FR(),
+		osd::channel_position::FC(),
+		osd::channel_position::LFE(),
+		osd::channel_position::RL(),
+		osd::channel_position::RR(),
+		osd::channel_position::RC(),
 		osd::channel_position(-0.2,  0.0,  0.0),
 		osd::channel_position( 0.2,  0.0,  0.0),
-		osd::channel_position::ONREQ
+		osd::channel_position::ONREQ()
 	};
 
 	static const uint32_t positions[8][9] = {

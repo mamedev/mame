@@ -28,7 +28,7 @@ namespace {
 
 using mm_endpoint_ptr = Microsoft::WRL::ComPtr<IMMEndpoint>;
 
-char const *const f_speaker_names[] ={
+char const *const f_speaker_names[] = {
 		"FL",       // SPEAKER_FRONT_LEFT
 		"FR",       // SPEAKER_FRONT_RIGHT
 		"FC",       // SPEAKER_FRONT_CENTER
@@ -48,25 +48,25 @@ char const *const f_speaker_names[] ={
 		"TBC",      // SPEAKER_TOP_BACK_CENTER
 		"TBR" };    // SPEAKER_TOP_BACK_RIGHT
 
-osd::channel_position const f_speaker_positions[] = {
-		osd::channel_position::FL,                   // SPEAKER_FRONT_LEFT
-		osd::channel_position::FR,                   // SPEAKER_FRONT_RIGHT
-		osd::channel_position::FC,                   // SPEAKER_FRONT_CENTER
-		osd::channel_position::LFE,                  // SPEAKER_LOW_FREQUENCY
-		osd::channel_position::RL,                   // SPEAKER_BACK_LEFT
-		osd::channel_position::RR,                   // SPEAKER_BACK_RIGHT
-		osd::channel_position( -0.1,  0.0,  1.0 ),   // SPEAKER_FRONT_LEFT_OF_CENTER
-		osd::channel_position(  0.1,  0.0,  1.0 ),   // SPEAKER_FRONT_RIGHT_OF_CENTER
-		osd::channel_position::RC,                   // SPEAKER_BACK_CENTER
-		osd::channel_position( -0.2,  0.0,  0.0 ),   // SPEAKER_SIDE_LEFT
-		osd::channel_position(  0.2,  0.0,  0.0 ),   // SPEAKER_SIDE_RIGHT
-		osd::channel_position(  0.0,  0.5,  0.0 ),   // SPEAKER_TOP_CENTER
-		osd::channel_position( -0.2,  0.5,  1.0 ),   // SPEAKER_TOP_FRONT_LEFT
-		osd::channel_position(  0.0,  0.5,  1.0 ),   // SPEAKER_TOP_FRONT_CENTER
-		osd::channel_position(  0.2,  0.5,  1.0 ),   // SPEAKER_TOP_FRONT_RIGHT
-		osd::channel_position( -0.2,  0.5, -0.5 ),   // SPEAKER_TOP_BACK_LEFT
-		osd::channel_position(  0.0,  0.5, -0.5 ),   // SPEAKER_TOP_BACK_CENTER
-		osd::channel_position(  0.2,  0.5, -0.5 ) }; // SPEAKER_TOP_BACK_RIGHT
+channel_position const f_speaker_positions[] = {
+		channel_position::FL(),                 // SPEAKER_FRONT_LEFT
+		channel_position::FR(),                 // SPEAKER_FRONT_RIGHT
+		channel_position::FC(),                 // SPEAKER_FRONT_CENTER
+		channel_position::LFE(),                // SPEAKER_LOW_FREQUENCY
+		channel_position::RL(),                 // SPEAKER_BACK_LEFT
+		channel_position::RR(),                 // SPEAKER_BACK_RIGHT
+		channel_position( -0.1,  0.0,  1.0 ),   // SPEAKER_FRONT_LEFT_OF_CENTER
+		channel_position(  0.1,  0.0,  1.0 ),   // SPEAKER_FRONT_RIGHT_OF_CENTER
+		channel_position::RC(),                 // SPEAKER_BACK_CENTER
+		channel_position( -0.2,  0.0,  0.0 ),   // SPEAKER_SIDE_LEFT
+		channel_position(  0.2,  0.0,  0.0 ),   // SPEAKER_SIDE_RIGHT
+		channel_position(  0.0,  0.5,  0.0 ),   // SPEAKER_TOP_CENTER
+		channel_position( -0.2,  0.5,  1.0 ),   // SPEAKER_TOP_FRONT_LEFT
+		channel_position(  0.0,  0.5,  1.0 ),   // SPEAKER_TOP_FRONT_CENTER
+		channel_position(  0.2,  0.5,  1.0 ),   // SPEAKER_TOP_FRONT_RIGHT
+		channel_position( -0.2,  0.5, -0.5 ),   // SPEAKER_TOP_BACK_LEFT
+		channel_position(  0.0,  0.5, -0.5 ),   // SPEAKER_TOP_BACK_CENTER
+		channel_position(  0.2,  0.5, -0.5 ) }; // SPEAKER_TOP_BACK_RIGHT
 
 } // anonymous namespace
 
@@ -235,7 +235,7 @@ HRESULT populate_audio_node_info(
 
 	// set up channel info
 	std::vector<std::string> channel_names;
-	std::vector<osd::channel_position> channel_positions;
+	std::vector<channel_position> channel_positions;
 	try
 	{
 		channel_names.reserve(format->nChannels);
@@ -261,7 +261,7 @@ HRESULT populate_audio_node_info(
 			channel_names.emplace_back(util::string_format("Channel %u", i + 1));
 			++i;
 		}
-		channel_positions.resize(format->nChannels, osd::channel_position::UNKNOWN);
+		channel_positions.resize(format->nChannels, channel_position::UNKNOWN());
 	}
 	catch (std::bad_alloc const &)
 	{

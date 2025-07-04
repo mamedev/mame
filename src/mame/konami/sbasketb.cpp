@@ -101,7 +101,7 @@ private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<sn76489_device> m_sn;
+	required_device<sn76489a_device> m_sn;
 	required_device<vlm5030_device> m_vlm;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -112,7 +112,7 @@ private:
 	bool m_spriteram_select = false;
 
 	bool m_irq_mask = false;
-	uint8_t m_sn76496_latch = 0;
+	uint8_t m_sn76489a_latch = 0;
 
 	void sh_irqtrigger_w(uint8_t data);
 	template <uint8_t Which> void coin_counter_w(int state);
@@ -120,8 +120,8 @@ private:
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	void spriteram_select_w(int state);
-	void konami_sn76496_latch_w(uint8_t data) { m_sn76496_latch = data; }
-	void konami_sn76496_w(uint8_t data) { m_sn->write(m_sn76496_latch); }
+	void konami_sn76489a_latch_w(uint8_t data) { m_sn76489a_latch = data; }
+	void konami_sn76489a_w(uint8_t data) { m_sn->write(m_sn76489a_latch); }
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -244,7 +244,7 @@ void sbasketb_state::video_start()
 
 	save_item(NAME(m_spriteram_select));
 	save_item(NAME(m_irq_mask));
-	save_item(NAME(m_sn76496_latch));
+	save_item(NAME(m_sn76489a_latch));
 }
 
 void sbasketb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -340,8 +340,8 @@ void sbasketb_state::sound_map(address_map &map)
 	map(0xa000, 0xa000).w(m_vlm, FUNC(vlm5030_device::data_w)); // speech
 	map(0xc000, 0xdfff).w("soundbrd", FUNC(trackfld_audio_device::hyperspt_sound_w));     // speech and output control
 	map(0xe000, 0xe000).w("dac", FUNC(dac_byte_interface::data_w));
-	map(0xe001, 0xe001).w(FUNC(sbasketb_state::konami_sn76496_latch_w));  // Loads the snd command into the snd latch
-	map(0xe002, 0xe002).w(FUNC(sbasketb_state::konami_sn76496_w));      // This address triggers the SN chip to read the data port.
+	map(0xe001, 0xe001).w(FUNC(sbasketb_state::konami_sn76489a_latch_w));  // Loads the snd command into the snd latch
+	map(0xe002, 0xe002).w(FUNC(sbasketb_state::konami_sn76489a_w));      // This address triggers the SN chip to read the data port.
 }
 
 
@@ -439,7 +439,7 @@ void sbasketb_state::sbasketb(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 
-	SN76489(config, m_sn, 14.318181_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SN76489A(config, m_sn, 14.318181_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	VLM5030(config, m_vlm, 3.579545_MHz_XTAL); // Schematics say 3.58MHz, but board uses 3.579545MHz xtal
 	m_vlm->add_route(ALL_OUTPUTS, "speaker", 1.0);

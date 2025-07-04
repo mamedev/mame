@@ -104,7 +104,7 @@ private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device_array<sn76496_device, 2> m_sn;
+	required_device_array<sn76489a_device, 2> m_sn;
 	required_device<dac_byte_interface> m_dac;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -645,8 +645,9 @@ void circusc_state::circusc(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	SN76496(config, m_sn[0], 14.318181_MHz_XTAL / 8).add_route(0, "fltdisc", 1.0, 0);
-	SN76496(config, m_sn[1], 14.318181_MHz_XTAL / 8).add_route(0, "fltdisc", 1.0, 1);
+	// According to the schematics, part numbers scratched off
+	SN76489A(config, m_sn[0], 14.318181_MHz_XTAL / 8).add_route(0, "fltdisc", 1.0, 0);
+	SN76489A(config, m_sn[1], 14.318181_MHz_XTAL / 8).add_route(0, "fltdisc", 1.0, 1);
 
 	// ls374.7g + r44+r45+r47+r48+r50+r56+r57+r58+r59 (20k) + r46+r49+r51+r52+r53+r54+r55 (10k) + upc324.3h
 	DAC_8BIT_R2R(config, "dac", 0).set_output_range(0, 1).add_route(0, "fltdisc", 1.0, 2);

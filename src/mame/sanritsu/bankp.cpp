@@ -29,23 +29,23 @@
 |                             EPR-10910  PR-10901  EPR-10905   SW1      W|
 |                                                                       A|
 |                                                                       Y|
-|                             EPR-10911  2016      EPR-10906   SN76489   |
+|                             EPR-10911  2016      EPR-10906   SN76489AN |
 |                                                                        |
-|                                                              SN76489   |
+|                                                              SN76489AN |
 |                             EPR-10912                                  |
-|                                                              SN76489   |
+|                                                              SN76489AN |
 |             2016            EPR-10913             Z80                  |
 |                                                               VOL      |
 |15.468MHz                    EPR-10914             555   358     HA1377A|
 |------------------------------------------------------------------------|
 
     Notes:
-          2016          - 2kx8 SRAM
-          Z80 clock     - 2.578MHz [15.468/6]
-          SN76489 clock - 2.578MHz [15.468/6]
-          VSync         - 60Hz
-          HSync         - 15.36kHz
-          SW1           - 8-position DIP switch
+          2016            - 2kx8 SRAM
+          Z80 clock       - 2.578MHz [15.468/6]
+          SN76489AN clock - 2.578MHz [15.468/6]
+          VSync           - 60Hz
+          HSync           - 15.36kHz
+          SW1             - 8-position DIP switch
 
           ROMs
           ----
@@ -78,9 +78,9 @@
     04  DSW
 
     write:
-    00  SN76496 #1
-    01  SN76496 #2
-    02  SN76496 #3
+    00  SN76489A #1
+    01  SN76489A #2
+    02  SN76489A #3
     05  horizontal scroll
     07  video control
 
@@ -374,9 +374,9 @@ void bankp_state::prg_map(address_map &map)
 void bankp_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w("sn1", FUNC(sn76489_device::write));
-	map(0x01, 0x01).portr("IN1").w("sn2", FUNC(sn76489_device::write));
-	map(0x02, 0x02).portr("IN2").w("sn3", FUNC(sn76489_device::write));
+	map(0x00, 0x00).portr("IN0").w("sn1", FUNC(sn76489a_device::write));
+	map(0x01, 0x01).portr("IN1").w("sn2", FUNC(sn76489a_device::write));
+	map(0x02, 0x02).portr("IN2").w("sn3", FUNC(sn76489a_device::write));
 	map(0x04, 0x04).portr("DSW1");
 	map(0x05, 0x05).w(FUNC(bankp_state::scroll_w));
 	map(0x07, 0x07).w(FUNC(bankp_state::video_control_w));
@@ -526,12 +526,10 @@ INTERRUPT_GEN_MEMBER(bankp_state::vblank_interrupt)
 
 void bankp_state::bankp(machine_config &config)
 {
-	static constexpr XTAL MASTER_CLOCK = XTAL(15'468'480);
-
 	// Video timing
 	// PCB measured: H = 15.61khz V = 60.99hz, +/- 0.01hz
 	// --> VTOTAL should be OK, HTOTAL not 100% certain
-	static constexpr XTAL PIXEL_CLOCK = MASTER_CLOCK / 3;
+	static constexpr XTAL PIXEL_CLOCK = 15.46848_MHz_XTAL / 3;
 
 	static constexpr int HTOTAL  = 330;
 	static constexpr int HBEND   = 0 + 3 * 8;
@@ -542,7 +540,7 @@ void bankp_state::bankp(machine_config &config)
 	static constexpr int VBSTART = 224 + 2 * 8;
 
 	// basic machine hardware
-	Z80(config, m_maincpu, MASTER_CLOCK / 6);
+	Z80(config, m_maincpu, 15.46848_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bankp_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &bankp_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bankp_state::vblank_interrupt));
@@ -559,9 +557,9 @@ void bankp_state::bankp(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76489(config, "sn1", MASTER_CLOCK / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn2", MASTER_CLOCK / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn3", MASTER_CLOCK / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489A(config, "sn1", 15.46848_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489A(config, "sn2", 15.46848_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489A(config, "sn3", 15.46848_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

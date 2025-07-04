@@ -194,8 +194,8 @@ protected:
 	void irq_ack_w(u32 data);
 	u32 irq_enable_r();
 	void irq_enable_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 model2_serial_r(offs_t offset, u32 mem_mask = ~0);
-	void model2_serial_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u8 model2_serial_r(offs_t offset);
+	void model2_serial_w(offs_t offset, u8 data);
 	void horizontal_sync_w(u16 data);
 	void vertical_sync_w(u16 data);
 	u32 doa_prot_r(offs_t offset, u32 mem_mask = ~0);
@@ -230,8 +230,8 @@ protected:
 	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	void scsp_irq(offs_t offset, u8 data);
 
-	void model2_3d_frame_start( void );
-	void geo_parse( void );
+	void model2_3d_frame_start();
+	void geo_parse();
 	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect );
 
@@ -629,6 +629,7 @@ struct m2_poly_extra_data
 	u32      texx, texy;
 	u8       texmirrorx;
 	u8       texmirrory;
+	u8       luma;
 };
 
 

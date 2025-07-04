@@ -296,31 +296,29 @@ void aliens_state::machine_start()
 void aliens_state::aliens(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2); // 052001 (verified on PCB)
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 052001 (verified on PCB)
 	m_maincpu->set_addrmap(AS_PROGRAM, &aliens_state::main_map);
 	m_maincpu->line().set_membank(m_rombank).mask(0x1f);
 
-	Z80(config, m_audiocpu, XTAL(3'579'545)); // verified on PCB
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &aliens_state::sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000) / 3, 528, 112, 400, 256, 16, 240); // measured 59.17
-//  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  screen.set_raw(XTAL(24'000'000) / 4, 396, hbend, hbstart, 256, 16, 240);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240); // measured 59.17
 	screen.set_screen_update(FUNC(aliens_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(aliens_state::tile_callback));
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(aliens_state::sprite_callback));
@@ -331,12 +329,12 @@ void aliens_state::aliens(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));  // verified on PCB
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL)); // verified on PCB
 	ymsnd.port_write_handler().set(FUNC(aliens_state::snd_bankswitch_w));
 	ymsnd.add_route(0, "mono", 0.60);
 	ymsnd.add_route(1, "mono", 0.60);
 
-	K007232(config, m_k007232, XTAL(3'579'545));    // verified on PCB
+	K007232(config, m_k007232, 3.579545_MHz_XTAL); // verified on PCB
 	m_k007232->port_write().set(FUNC(aliens_state::volume_callback));
 	m_k007232->add_route(0, "mono", 0.20);
 	m_k007232->add_route(1, "mono", 0.20);

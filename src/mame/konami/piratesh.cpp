@@ -623,7 +623,7 @@ void piratesh_state::piratesh(machine_config &config)
 	screen.set_visarea(24, 24+288-1, 16, 16+224-1);
 	screen.set_screen_update(FUNC(piratesh_state::screen_update_piratesh));
 
-	PALETTE(config, "palette").set_format(palette_device::BGRx_888, 2048).enable_shadows().enable_hilights();
+	PALETTE(config, "palette").set_format(palette_device::BGRx_888, 2048).enable_shadows().enable_highlights();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(piratesh_state::piratesh_tile_callback));

@@ -5,8 +5,17 @@ license:CC0-1.0
 
 BASIC-M25 caveats (needed for Dust Box and unk* disks):
 - files is the equivalent of DIR in DOS env
-- chdir swaps current directory (not cd), going back one level is chdir ".."
+- chdir swaps current directory (not cd), going back one level is chdir "..
 - BTX files are executables
+
+Hold HELP key during basicv1 / basicv2 bootstrap to select S25 BASIC mode.
+
+Dust Box: double click with space key to startup any item, later versions allows starting up with
+mouse by holding right button then press left.
+
+TODO:
+- [Missing] Hashire! Skyline / 走れ!スカイライン: heavy GFX artifacts;
+- [Missing] Orrbit 3 / オービット3: floppy issue makes it to throw a game over as soon as you start a game;
 
 -->
 
@@ -161,6 +170,7 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		<description>Kitahei</description>
 		<year>198?</year>
 		<publisher>SPS</publisher>
+		<info name="alt_title" value="棋太平" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -169,10 +179,14 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="laydock">
-		<description>LayDock</description>
+	<software name="laydock" supported="no">
+		<description>Laydock</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Incorrect layout on track 4 head 0, expected_size=100000, current_size=135872
+Old note: hangs at title screen due of a PIT bug (timer irq dies)
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="731856">
@@ -181,10 +195,14 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="macadam">
+	<software name="macadam" supported="no">
 		<description>Macadam</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<notes><![CDATA[
+Fails to autoboot, needs to explicitly be loaded by IPL selection (verify)
+Hangs on "Please wait" screen (regression?)
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -196,7 +214,7 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 	<software name="mappy">
 		<description>Mappy</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="692928">
@@ -205,10 +223,14 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="marchen">
+	<software name="marchen" supported="no">
 		<description>Märchen Veil I</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>システムサコム (System Sacom)</publisher>
+		<notes><![CDATA[
+Incorrect layout on track 1 head 0, expected_size=100000, current_size=135872
+Old note: doesn't load if you try to run it directly, it does if you load another game first then perform a soft reset
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="805728">
@@ -217,10 +239,16 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="moonchld">
+	<software name="moonchld" supported="no">
 		<description>Moonchild</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Uses mixed 3+3bpp [TVRAM] support, kludged for now (not a real test case)
+Suspicious window masking on main menu
+[FDC] disk error when trying to create an user disk
+Has optional [Modem] and [Data Link] features
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -229,10 +257,14 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="murdclub">
+	<software name="murdclub" supported="no">
 		<description>J.B. Harold no Jikenbo #1: Murder Club</description>
 		<year>1986</year>
-		<publisher>Riverhill Soft</publisher>
+		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
+		<notes><![CDATA[
+Incorrect layout on track 0 head 0, expected_size=100000, current_size=135872
+Old note: has lots of CG artifacts, FDC issue?
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="767968">
@@ -260,10 +292,13 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="mugen2">
+	<software name="mugen2" supported="no">
 		<description>Mugen no Shinzou II</description>
 		<year>198?</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<notes><![CDATA[
+Incorrect layout on track 1 head 0, expected_size=100000, current_size=135872
+]]></notes>
 		<info name="alt_title" value="夢幻の心臓Ⅱ"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -303,10 +338,13 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="penguinw">
+	<software name="penguinw" supported="partial">
 		<description>Penguin-kun Wars</description>
 		<year>198?</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+"Push space or trigger" window cutoff at bottom
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697424">
@@ -341,10 +379,13 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="relics">
+	<software name="relics" supported="partial">
 		<description>Relics</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>ボーステック (Bothtec)</publisher>
+		<notes><![CDATA[
+Cuts off top of player jumps with first capture (verify)
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="692928">
@@ -353,10 +394,13 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="soundgal">
+	<software name="soundgal" supported="no">
 		<description>Sound Gal Music Editor (v1.0A)</description>
 		<year>1986</year>
 		<publisher>EA-Z Communication</publisher>
+		<notes><![CDATA[
+Moans about missing Master Disk after title screen
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="544560">
@@ -392,7 +436,7 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 	<software name="xevious">
 		<description>Xevious</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -420,7 +464,7 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 	</software>
 
 
-	<!-- Demo disks &amp; Diskmag disks -->
+<!-- Demo disks &amp; Diskmag disks -->
 
 	<software name="kaleidos">
 		<description>Kaleidoscope Demo</description>
@@ -449,7 +493,7 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 	<software name="mzdemo1">
 		<description>Super MZ Demo 1</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>SPS?</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -458,22 +502,38 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx01">
+	<!-- NOTE: using left to right for listing in notes -->
+
+	<software name="dustbx01" supported="partial">
 		<description>Dust Box Vol. 1 - '90/4</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1990</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Columns: missing pointer on main menu, uses reverse on [PCG]
+Vector: doesn't upload [PCG] if run first (works by loading Columns first), missing stars [GVRAM] layer, seems too fast
+Free Basket Ball:
+Chack N Kun no Koubou:
+]]></notes>
+
+		<info name="usage" value="Incompatible with MZ-1E30 bios 0 (crashes at startup)" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
-				<rom name="dust box vol 1.d88" size="697008" crc="170fc283" sha1="d67798df7b07ff69afa6d58872d315d1ab7eaab8"/>
+				<rom name="dust box vol 1.d88" size="697008" crc="170fc283" sha1="d67798df7b07ff69afa6d58872d315d1ab7eaab8" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dustbx02">
+	<software name="dustbx02" supported="partial">
 		<description>Dust Box Vol. 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1990</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Ball Race: requires an analog joystick, [XE-1AP] doesn't detect any input even if should be supported
+Knight of Legend:
+Atatepon!:
+]]></notes>
+		<info name="usage" value="Incompatible with MZ-1E30 bios 0 (crashes at startup)" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -482,34 +542,38 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx03">
-		<description>Dust Box Vol. 3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dustbx03" supported="partial">
+		<description>Dust Box Vol. 3 - '90/9</description>
+		<year>1990</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Versus ??? Tetris: doesn't load [PCG] when run from dashboard
+Reader ??? Tetris:
+Return of Columns: uses Basic default for [PCG]
+???:
+Pit Gal Plus: crashes if attempted to load or save
+Abstract World:
+]]></notes>
+		<info name="usage" value="Incompatible with MZ-1E30 bios 0 (crashes at startup)" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
-				<rom name="dust box vol 3.d88" size="697008" crc="84e61343" sha1="721d2369a268ddef97a363f35ed7bbb4974ae79b"/>
+				<rom name="dust box vol 3.d88" size="697008" crc="84e61343" sha1="721d2369a268ddef97a363f35ed7bbb4974ae79b" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dustbx91" supported="no">
-		<description>Dust Box '91 Special</description>
+	<software name="dustbx04" supported="partial">
+		<description>Dust Box Vol. 4 - '90/11</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="697008">
-				<rom name="dust_box_91_special.d88" size="697008" crc="aaec667d" sha1="0adaf4e0b306ac8389bd202ce0a1b11c29ffa52c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dustbx04">
-		<description>Dust Box Vol. 4</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Buggy window clip transition on title screen
+Solitaire:
+Rock'N Bomb!:
+Dot Race:
+???:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -518,10 +582,19 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx05">
-		<description>Dust Box Vol. 5</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<!-- Start using kanji for months -->
+	<!-- TODO: confirm them all -->
+
+	<software name="dustbx05" supported="partial">
+		<description>Dust Box Vol. 5 - July '91</description>
+		<year>1991</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+First SW that tests [MZ-1E35] ADPCM ports
+???:
+???:
+???:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -530,10 +603,35 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx06">
-		<description>Dust Box Vol. 6</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dustbx91" supported="partial">
+		<description>Dust Box '91 Special - August '91</description>
+		<year>1991</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Demo section
+???: uses unimplemented [CG] mode 0x93
+Basic 3 ???:
+DNA Modoki:
+???:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust_box_91_special.d88" size="697008" crc="aaec667d" sha1="0adaf4e0b306ac8389bd202ce0a1b11c29ffa52c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx06" supported="partial">
+		<description>Dust Box Vol. 6 - December '91</description>
+		<year>1991</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+???:
+Bean Ball:
+???:
+???:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -542,10 +640,16 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx07">
-		<description>Dust Box Vol. 7</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dustbx07" supported="partial">
+		<description>Dust Box Vol. 7 - April '92</description>
+		<year>1992</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Zeldis:
+??? Smow:
+Bara-Noia II:
+Blue Ribbon:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -554,10 +658,19 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx08">
-		<description>Dust Box Vol. 8</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dustbx08" supported="partial">
+		<description>Dust Box Vol. 8 - August '92</description>
+		<year>1992</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Bound Ball:
+Funny Ball:
+Kuruper:
+???:
+???:
+Diamond is Forever:
+C??? K and R:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -566,10 +679,18 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx09">
-		<description>Dust Box Vol. 9</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dustbx09" supported="partial">
+		<description>Dust Box Vol. 9 - June '93</description>
+		<year>1993</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+???:
+Super Angel:
+Block:
+Sigma's:
+6x6:
+???:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -578,10 +699,20 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx10">
-		<description>Dust Box Vol. 10</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dustbx10" supported="partial">
+		<description>Dust Box Vol. 10 - August '93</description>
+		<year>1993</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Parabolic Ball:
+Nantekotai ??? 99:
+3-D ???:
+Fighters II:
+???:
+Loopasser:
+Toshi Jong:
+Nekkoro:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="784048">
@@ -590,10 +721,20 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx11">
-		<description>Dust Box Vol. 11</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dustbx11" supported="partial">
+		<description>Dust Box Vol. 11 - December '93</description>
+		<year>1993</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Space Bluster FX:
+???:
+Invader (MZ80):
+??? (MZ80):
+Zalion (MZ80):
+Batting (MZ80):
+The Chanbara (MZ80):
+???:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="784048">
@@ -602,10 +743,17 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx12">
-		<description>Dust Box Vol. 12</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dustbx12" supported="partial">
+		<description>Dust Box Vol. 12 - May '94</description>
+		<year>1994</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+??? ver.3.0:
+Border:
+Bakea:
+Titlis:
+Kurukuru:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -614,10 +762,18 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx13">
-		<description>Dust Box Vol. 13</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dustbx13" supported="partial">
+		<description>Dust Box Vol. 13 - August '94</description>
+		<year>1994</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Gernion:
+Othello:
+??? ver3.1:
+Tama:
+???:
+Cosmic Cruiser II:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -626,10 +782,16 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx14">
-		<description>Dust Box Vol. 14</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dustbx14" supported="partial">
+		<description>Dust Box Vol. 14 - December '94</description>
+		<year>1994</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Illegal Mission:
+???:
+Car:
+???:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -638,10 +800,19 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx15">
-		<description>Dust Box Vol. 15</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dustbx15" supported="partial">
+		<description>Dust Box Vol. 15 - August '95</description>
+		<year>1995</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+??? Quarth:
+???:
+??? Heptas:
+???:
+3-D ???:
+Monster Road:
+Card Game Uno:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -650,10 +821,18 @@ BASIC-M25 caveats (needed for Dust Box and unk* disks):
 		</part>
 	</software>
 
-	<software name="dustbx16">
-		<description>Dust Box Vol. 16</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<!-- Back to numerical format ... -->
+
+	<software name="dustbx16" supported="partial">
+		<description>Dust Box Vol. 16 - 1996/10 (Pre-Release ver.)</description>
+		<year>1996</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+vs ???:
+Super Mahjong:
+Zones ???:
+???:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -707,10 +886,13 @@ Various utilities, not extensively tested
 		</part>
 	</software>
 
-	<software name="multplan">
+	<software name="multplan" supported="no">
 		<description>Multiplan v1.07</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+Hangs randomly after you set date and time, sometimes it loads properly
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="759808">
@@ -735,6 +917,9 @@ Various utilities, not extensively tested
 		<description>Telephone Soft (6Z006) V1.1A</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Requires [MZ-1E26] modem
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -747,6 +932,9 @@ Various utilities, not extensively tested
 		<description>Telephone Soft (6Z006) V2.0B</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Requires [MZ-1E26] modem
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -755,11 +943,15 @@ Various utilities, not extensively tested
 		</part>
 	</software>
 
-	<software name="yukark2">
+	<software name="yukark2" supported="no">
 		<!-- Original filanames: テ「テ・テシ[テ「Jテ「ティK2 xxxx, with xxx our current names -->
 		<description>Yukar K2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Black screen (regression)
+Old note: "please put the system disk back to normal", disk write-protected?
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -779,6 +971,7 @@ Various utilities, not extensively tested
 			</dataarea>
 		</part>
 
+		<!-- TODO: standalone data disk? -->
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
 				<rom name="turbokit.d88" size="697008" crc="b28ac39b" sha1="78291ad03e107c92e9a64bd8e8a57cb02264a49d"/>

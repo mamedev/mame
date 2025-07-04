@@ -303,7 +303,7 @@ void surpratk_state::banking_callback(uint8_t data)
 void surpratk_state::surpratk(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2); // 053248, the clock input is 12MHz, and internal CPU divider of 4
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 053248, the clock input is 12MHz, and internal CPU divider of 4
 	m_maincpu->set_addrmap(AS_PROGRAM, &surpratk_state::main_map);
 	m_maincpu->line().set(FUNC(surpratk_state::banking_callback));
 
@@ -313,23 +313,20 @@ void surpratk_state::surpratk(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
 	screen.set_screen_update(FUNC(surpratk_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(surpratk_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	K053244(config, m_k053244, 0);
+	K053244(config, m_k053244, 24_MHz_XTAL);
 	m_k053244->set_palette(m_palette);
 	m_k053244->set_sprite_callback(FUNC(surpratk_state::sprite_callback));
 
@@ -338,7 +335,7 @@ void surpratk_state::surpratk(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline(m_maincpu, KONAMI_FIRQ_LINE);
 	ymsnd.add_route(0, "speaker", 1.0, 0);
 	ymsnd.add_route(1, "speaker", 1.0, 1);
@@ -351,7 +348,6 @@ void surpratk_state::surpratk(machine_config &config)
   Game ROMs
 
 ***************************************************************************/
-
 
 ROM_START( suratk )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // code + banked roms

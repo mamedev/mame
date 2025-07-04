@@ -4913,9 +4913,9 @@ ROM_START( comg079b )
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "du_6502_u23.u23",  0x0000, 0x0800, CRC(ccfe2548) SHA1(5d4cab918a241e4f39df4255f403f558cee3c379) )
-	ROM_IGNORE(                           0x7800) 
+	ROM_IGNORE(                           0x7800)
 	ROM_LOAD( "du_6502_u22.u22",  0x0800, 0x0800, CRC(5a96ce64) SHA1(fe18cea01d6bef5b4efcbf930469a3f1104d06d2) )
-	ROM_IGNORE(                           0x7800) 
+	ROM_IGNORE(                           0x7800)
 	// From COMG079 Romset
 	ROM_LOAD( "pkcga.u68",  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )
 

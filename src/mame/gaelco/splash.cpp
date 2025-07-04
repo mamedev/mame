@@ -1446,7 +1446,7 @@ ROM_START( paintlad )
 ROM_END
 
 ROM_START( nsplashkr )
-	ROM_REGION( 0x400000, "maincpu", 0 )	// 68000 code + gfx
+	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code + gfx
 	ROM_LOAD16_BYTE( "new_splash_cor_2_27c010.bin", 0x000000, 0x020000, CRC(eadf12dd) SHA1(e029e8c87d566ab4337d50936b97913043f62c82) )
 	ROM_LOAD16_BYTE( "new_splash_cor_6_27c010.bin", 0x000001, 0x020000, CRC(5a70d95b) SHA1(4117c156cda6bd4638b097f807e0d7d2e2d02b2a) )
 	ROM_LOAD16_BYTE( "new_splash_cor_4_27c040.bin", 0x200000, 0x080000, CRC(0f71b5c5) SHA1(605bafa0f5382ee197971cd4a615d507742d7123) )
@@ -1465,7 +1465,7 @@ ROM_START( nsplashkr )
 ROM_END
 
 ROM_START( nsplashkra )
-	ROM_REGION( 0x400000, "maincpu", 0 )	// 68000 code + gfx
+	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code + gfx
 	ROM_LOAD16_BYTE( "demo_2_set_1_27c010.bin",     0x000000, 0x020000, CRC(9f2d1cd5) SHA1(c75f8ca8fb862ee820b326ba0091cf8a864bb0b5) )
 	ROM_LOAD16_BYTE( "demo_6_set_1_27c010.bin",     0x000001, 0x020000, CRC(8faf055e) SHA1(cae095d268f6410a82270927bcad755063ca43f8) )
 	ROM_LOAD16_BYTE( "new_splash_cor_4_27c040.bin", 0x200000, 0x080000, CRC(0f71b5c5) SHA1(605bafa0f5382ee197971cd4a615d507742d7123) )

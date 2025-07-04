@@ -605,10 +605,10 @@ MC6847_GET_CHARROM_MEMBER(phc25_state::char_rom_r)
 
 void phc25_state::fsync_irq_w(int state)
 {
-    if (state == 0)
-    {
+	if (state == 0)
+	{
 		m_maincpu->pulse_input_line(INPUT_LINE_IRQ0, attotime::from_usec(100));
-    }
+	}
 }
 
 void phc25_state::machine_reset()

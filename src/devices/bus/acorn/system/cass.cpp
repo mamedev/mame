@@ -81,7 +81,7 @@ void acorn_cass_device::device_start()
 
 //void acorn_cass_device::cass_w(int state)
 //{
-//	m_cass_state = state;
+//  m_cass_state = state;
 //}
 
 TIMER_DEVICE_CALLBACK_MEMBER(acorn_cass_device::cass_c)

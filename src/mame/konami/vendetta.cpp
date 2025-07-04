@@ -609,11 +609,11 @@ void vendetta_state::banking_callback(uint8_t data)
 void vendetta_state::vendetta(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2); // 052001 (verified on PCB)
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 052001 (verified on PCB)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vendetta_state::main_map);
 	m_maincpu->line().set(FUNC(vendetta_state::banking_callback));
 
-	Z80(config, m_audiocpu, XTAL(3'579'545)); // verified with PCB
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // verified with PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &vendetta_state::sound_map); // interrupts are triggered by the main CPU
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
@@ -622,10 +622,8 @@ void vendetta_state::vendetta(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.17); // measured on PCB
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240); // measured 59.17
 	screen.set_screen_update(FUNC(vendetta_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(vendetta_state::vblank_irq));
@@ -633,13 +631,14 @@ void vendetta_state::vendetta(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(vendetta_state::vendetta_tile_callback));
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246, 24_MHz_XTAL);
 	m_k053246->set_sprite_callback(FUNC(vendetta_state::sprite_callback));
-	m_k053246->set_config(NORMAL_PLANE_ORDER, 53, 6);
+	m_k053246->set_config(NORMAL_PLANE_ORDER, -43, 6);
 	m_k053246->set_palette(m_palette);
 
 	K053251(config, m_k053251, 0);
@@ -648,9 +647,11 @@ void vendetta_state::vendetta(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "speaker", 0.5, 0).add_route(1, "speaker", 0.5, 1); // verified with PCB
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL)); // verified with PCB
+	ymsnd.add_route(0, "speaker", 0.50, 0);
+	ymsnd.add_route(1, "speaker", 0.50, 1);
 
-	k053260_device &k053260(K053260(config, "k053260", XTAL(3'579'545))); // verified with PCB
+	k053260_device &k053260(K053260(config, "k053260", 3.579545_MHz_XTAL)); // verified with PCB
 	k053260.add_route(0, "speaker", 0.75, 0);
 	k053260.add_route(1, "speaker", 0.75, 1);
 	k053260.sh1_cb().set(FUNC(vendetta_state::z80_nmi_w));
@@ -663,19 +664,15 @@ void vendetta_state::esckids(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &vendetta_state::esckids_map);
 
-	//subdevice<screen_device>("screen")->set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1); // black areas on the edges
-	subdevice<screen_device>("screen")->set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	//subdevice<screen_device>("screen")->set_visarea(1*8, 39*8-1, 2*8, 30*8-1); // black areas on the edges
+	subdevice<screen_device>("screen")->set_visarea(2*8, 38*8-1, 2*8, 30*8-1);
 
 	config.device_remove("k054000");
-	config.device_remove("k052109");
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
 	m_k052109->set_tile_callback(FUNC(vendetta_state::esckids_tile_callback));
+	m_k053246->set_config(NORMAL_PLANE_ORDER, 5, 6);
 
-	m_k053246->set_config(NORMAL_PLANE_ORDER, 101, 6);
-
-	K053252(config, "k053252", XTAL(24'000'000) / 4).set_offsets(12*8, 1*8);
+	K053252(config, "k053252", 24_MHz_XTAL / 4).set_offsets(0, 8);
 }
 
 

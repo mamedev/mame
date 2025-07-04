@@ -32,12 +32,15 @@ protected:
 
 	void nes_vt32_soc_map(address_map &map) ATTR_COLD;
 
+	virtual void update_banks() override;
+
 	virtual void scrambled_8000_w(u16 offset, u8 data) override;
 
 	u8 read_onespace_bus(offs_t offset);
 
 	u8 vtfp_4119_r();
 	void vtfp_411e_encryption_state_w(u8 data);
+	u8 vtfp_412c_r();
 	void vtfp_412c_extbank_w(u8 data);
 	u8 vtfp_412d_r();
 	void vtfp_4242_w(u8 data);
@@ -52,6 +55,9 @@ private:
 	void vt32_palette_w(offs_t offset, u8 data);
 
 	int m_ppu_chr_data_scramble;
+	u8 m_mmc1_shift_reg;
+	u8 m_mmc1_control;
+	u8 m_mmc1_prg_bank;
 };
 
 class nes_vt32_soc_pal_device : public nes_vt32_soc_device
@@ -65,8 +71,18 @@ protected:
 	virtual void do_pal_timings_and_ppu_replacement(machine_config& config) override;
 };
 
+class nes_vt32_soc_unk_device : public nes_vt32_soc_device
+{
+public:
+	nes_vt32_soc_unk_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+};
+
 
 DECLARE_DEVICE_TYPE(NES_VT32_SOC, nes_vt32_soc_device)
 DECLARE_DEVICE_TYPE(NES_VT32_SOC_PAL, nes_vt32_soc_pal_device)
+DECLARE_DEVICE_TYPE(NES_VT32_SOC_UNK, nes_vt32_soc_unk_device)
 
 #endif // MAME_NINTENDO_NES_VT32_SOC_H

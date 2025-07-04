@@ -15,6 +15,9 @@
 
 #include "ui/menu.h"
 
+#include <string>
+#include <vector>
+
 
 namespace ui {
 
@@ -25,47 +28,46 @@ public:
 	virtual ~menu_audio_mixer() override;
 
 protected:
-	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual void menu_activated() override;
 	virtual void menu_deactivated() override;
 
 private:
-	enum {
-		MT_UNDEFINED, // At startup
-		MT_NONE,      // [no mapping]
-		MT_FULL,      // Full mapping to node
-		MT_CHANNEL,   // Channel-to-channel mapping
-		MT_INTERNAL   // Go back to previous menu or other non-mapping entry
-	};
-
-	enum {
-		GRP_GUEST_CHANNEL,
-		GRP_NODE,
-		GRP_NODE_CHANNEL,
-		GRP_DB
-	};
-
 	struct select_entry {
-		u32 m_maptype;
+		uint32_t m_maptype;
 		sound_io_device *m_dev;
-		u32 m_guest_channel;
-		u32 m_node;
-		u32 m_node_channel;
+		uint32_t m_guest_channel;
+		uint32_t m_node;
+		uint32_t m_node_channel;
 		float m_db;
 
-		inline bool operator ==(const select_entry &sel) {
-			return sel.m_maptype == m_maptype && sel.m_dev == m_dev && sel.m_guest_channel == m_guest_channel && sel.m_node == m_node && sel.m_node_channel == m_node_channel;
+		bool operator==(const select_entry &sel) const {
+			return
+					(sel.m_maptype == m_maptype) &&
+					(sel.m_dev == m_dev) &&
+					(sel.m_guest_channel == m_guest_channel) &&
+					(sel.m_node == m_node) &&
+					(sel.m_node_channel == m_node_channel);
 		}
 	};
 
 	uint32_t m_generation;
-	select_entry m_current_selection;
-	uint32_t m_current_group;
+	select_entry m_reset_selection;
+	uint32_t m_reset_item;
 	std::vector<select_entry> m_selections;
 
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
+
+	bool add_full(select_entry &current_selection);
+	bool add_channel(select_entry &current_selection);
+	bool remove_route(uint32_t cursel_index, select_entry &current_selection);
+	bool set_prev_guest_channel(select_entry &current_selection);
+	bool set_next_guest_channel(select_entry &current_selection);
+	bool set_prev_node(select_entry &current_selection);
+	bool set_next_node(select_entry &current_selection);
+	bool set_prev_node_channel(select_entry &current_selection);
+	bool set_next_node_channel(select_entry &current_selection);
+	bool set_route_volume(menu_item &item, select_entry &current_selection);
 
 	uint32_t find_node_index(uint32_t node) const;
 	std::string find_node_name(uint32_t node) const;

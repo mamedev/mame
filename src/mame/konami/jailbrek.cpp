@@ -81,7 +81,6 @@ Notes:
 ****************************************************************************
 
     TODO:
-
     - various unknown writes (NOPed out in the memory map)
 
 ***************************************************************************/
@@ -226,7 +225,7 @@ void jailbrek_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	for (int i = 0; i < m_spriteram.bytes(); i += 4)
 	{
-		int const attr = m_spriteram[i + 1];    // attributes = ?tyxcccc
+		int const attr = m_spriteram[i + 1]; // attributes = ?tyxcccc
 		int const code = m_spriteram[i] + ((attr & 0x40) << 2);
 		int const color = attr & 0x0f;
 		int flipx = attr & 0x10;

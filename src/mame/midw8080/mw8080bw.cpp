@@ -2636,7 +2636,7 @@ void invaders_state::io_map_noshift(address_map &map)
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
 
-	map(0x02, 0x02).nopw(); // galmonst has residual writes to this port
+	map(0x02, 0x02).nopw(); // galmonst has vestigial writes to this port
 	map(0x03, 0x03).w("soundboard", FUNC(invaders_audio_device::p1_w));
 	map(0x05, 0x05).w("soundboard", FUNC(invaders_audio_device::p2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
@@ -2988,6 +2988,14 @@ ROM_START( 280zzzap )
 ROM_END
 
 
+ROM_START( 280zzzapa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "h", 0x0000, 0x0800, CRC(cb56e0f8) SHA1(4e490bff71b9c3ba6c84b7f9879acfcfa336d0f8) )
+	ROM_LOAD( "g", 0x0800, 0x0800, CRC(f30dd025) SHA1(2ddacc7912487f36d88e7b924477816702460881) )
+	ROM_LOAD( "f", 0x1000, 0x0800, CRC(8d51ec2d) SHA1(37c744c5bf4a330e26f85377871c637a478dd278) )
+ROM_END
+
+
 ROM_START( maze )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "maze.h",     0x0000, 0x0800, CRC(f2860cff) SHA1(62b3fd3d04bf9c5dd9b50964374fb884dc0ab79c) )
@@ -3262,7 +3270,8 @@ ROM_END
 /* 597 */ GAMEL( 1975, gunfighto,  gunfight, gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_SUPPORTS_SAVE, layout_gunfight )
 /* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME(  1976, tornbase,   0,        tornbase, tornbase, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    zzzap_state,    empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
+/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    zzzap_state,    empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP (set 1)", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
+/* 610 */ GAMEL( 1976, 280zzzapa,  280zzzap, zzzap,    zzzap,    zzzap_state,    empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP (set 2)", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
 /* 611 */ GAMEL( 1976, maze,       0,        maze,     maze,     mw8080bw_state, empty_init, ROT0,   "Midway", "Amazing Maze", MACHINE_SUPPORTS_SAVE, layout_maze )
 /* 612 */ GAME(  1977, boothill,   0,        boothill, boothill, boothill_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", MACHINE_SUPPORTS_SAVE )
 /* 615 */ GAME(  1977, checkmat,   0,        checkmat, checkmat, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -485,6 +485,31 @@ static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuri
 	PORT_DIPSETTING(      0x8000, "8000" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( smartcyc )
+	PORT_START("P1")
+	// lower bits are related to steering position?
+	PORT_BIT( 0x007f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(spg2xx_game_smartcycle_state::unknown_random_r))
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) // needs to be held for test mode
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Top Left")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Top Right")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bottom Left") // needs to be held for test mode
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Bottom Middle")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bottom Right") // needs to be held for test mode
+
+	PORT_START("P2")
+	// maybe unused
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(spg2xx_game_smartcycle_state::unknown_random_r))
+
+	PORT_START("P3")
+	// maybe unused
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(spg2xx_game_smartcycle_state::unknown_random_r))
+
+	// A / B in test mode coming from elsewhere?
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( lpetshop )
 	PORT_START("P1")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2502,6 +2527,45 @@ void epo_tetr_game_state::epo_tetr(machine_config& config)
 }
 
 
+void spg2xx_game_smartcycle_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
+
+	// if there's a cart, override the standard banking
+	if (m_cart && m_cart->exists())
+	{
+		std::string region_tag;
+		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_bank->configure_entries(0, (m_cart_region->bytes() + 0x7fffff) / 0x800000, m_cart_region->base(), 0x800000);
+		m_bank->set_entry(0);
+	}
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(spg2xx_game_smartcycle_state::cart_load)
+{
+	uint32_t const size = m_cart->common_get_size("rom");
+
+	if (size > 0x80'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be no more than 8M)");
+
+	m_cart->rom_alloc(0x800000, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+void spg2xx_game_smartcycle_state::smartcycle(machine_config &config)
+{
+	spg2xx(config);
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "smartcycle_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(spg2xx_game_smartcycle_state::cart_load));
+	m_cart->set_must_be_loaded(true);
+
+	SOFTWARE_LIST(config, "smartcycle_cart").set_original("smartcycle_cart");
+}
+
 
 void spg2xx_game_ddr33v_state::init_ddr33v()
 {
@@ -2874,6 +2938,10 @@ ROM_START( wordlnch )
 	ROM_FILL(                      0x95bc9, 1, 0x40 )
 ROM_END
 
+ROM_START( smartcyc )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	/* no system ROM, all game data is on cartridges */
+ROM_END
 
 void spg2xx_game_state::init_crc()
 {
@@ -3101,3 +3169,4 @@ CONS( 2007, lpetshop,   0,        0, lpetshop,  lpetshop,  spg2xx_game_lpetshop_
 
 CONS( 2005, barbpet,    0,        0, spg2xx,    barbpet,   spg2xx_game_state,               empty_init, "Mattel",                                              "Barbie: I Love Pets - Pet Rescue", MACHINE_IMPERFECT_SOUND )
 
+CONS( 200?, smartcyc,   0,        0, smartcycle, smartcyc, spg2xx_game_smartcycle_state,    empty_init, "Fisher Price",                                        "Smart Cycle", MACHINE_NOT_WORKING )

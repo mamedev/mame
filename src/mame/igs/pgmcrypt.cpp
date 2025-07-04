@@ -1915,3 +1915,26 @@ void mjzb_decrypt(running_machine &machine)
 		src[i] ^= x;
 	}
 }
+
+void tswxp_decrypt(running_machine &machine)
+{
+	memory_region *const region = machine.root_device().memregion("user1");
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
+	auto const rom_size = region->bytes();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		uint16_t x = 0;
+
+		IGS27_CRYPT1
+		IGS27_CRYPT2_ALT
+		IGS27_CRYPT3_ALT2
+		IGS27_CRYPT4
+		IGS27_CRYPT5_ALT
+		IGS27_CRYPT6
+		IGS27_CRYPT7
+		IGS27_CRYPT8
+
+		src[i] ^= x;
+	}
+}

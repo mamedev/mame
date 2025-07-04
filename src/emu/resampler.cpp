@@ -310,7 +310,7 @@ void audio_resampler_hq::apply_copy(const emu::detail::output_buffer_flat<sample
 		const float *filter = m_coefficients[phase >> m_phase_shift].data();
 		for(u32 k = 0; k != m_order_per_lane; k++)
 			acc += *filter++ * *s1--;
-		*d = acc * gain;
+		*d = std::clamp(int(acc * gain), -32768, 32767);
 		d += dchannels;
 		phase += m_delta;
 		s += m_skip;
@@ -339,7 +339,7 @@ void audio_resampler_hq::apply_add(const emu::detail::output_buffer_flat<sample_
 		const float *filter = m_coefficients[phase >> m_phase_shift].data();
 		for(u32 k = 0; k != m_order_per_lane; k++)
 			acc += *filter++ * *s1--;
-		*d += acc * gain;
+		*d = std::clamp(*d + int(acc * gain), -32768, 32767);
 		d += dchannels;
 		phase += m_delta;
 		s += m_skip;
@@ -551,7 +551,7 @@ void audio_resampler_lofi::apply_copy(const emu::detail::output_buffer_flat<samp
 	s16 *d = dest.data() + destc;
 	for(u32 sample = 0; sample != samples; sample++) {
 		u32 cphase = phase >> 12;
-		*d = gain * (- s0 * interpolation_table[0][0x1000-cphase] + s1 * interpolation_table[1][0x1000-cphase] + s2 * interpolation_table[1][cphase] - s3 * interpolation_table[0][cphase]);
+		*d = std::clamp(int(gain * (- s0 * interpolation_table[0][0x1000-cphase] + s1 * interpolation_table[1][0x1000-cphase] + s2 * interpolation_table[1][cphase] - s3 * interpolation_table[0][cphase])), -32768, 32767);
 		d += dchannels;
 
 		phase += m_step;
@@ -602,7 +602,7 @@ void audio_resampler_lofi::apply_add(const emu::detail::output_buffer_flat<sampl
 	s16 *d = dest.data() + destc;
 	for(u32 sample = 0; sample != samples; sample++) {
 		u32 cphase = phase >> 12;
-		*d += gain * (- s0 * interpolation_table[0][0x1000-cphase] + s1 * interpolation_table[1][0x1000-cphase] + s2 * interpolation_table[1][cphase] - s3 * interpolation_table[0][cphase]);
+		*d = std::clamp(*d + int(gain * (- s0 * interpolation_table[0][0x1000-cphase] + s1 * interpolation_table[1][0x1000-cphase] + s2 * interpolation_table[1][cphase] - s3 * interpolation_table[0][cphase])), -32768, 32767);
 		d += dchannels;
 
 		phase += m_step;

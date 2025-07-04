@@ -445,7 +445,7 @@ void labyrunr_state::labyrunr(machine_config &config)
 	m_k007121->set_flipscreen_cb().set(FUNC(labyrunr_state::flipscreen_w));
 	m_k007121->set_dirtytiles_cb(FUNC(labyrunr_state::dirtytiles));
 
-	K051733(config, "k051733", 0);
+	K051733(config, "k051733", 24_MHz_XTAL / 2);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

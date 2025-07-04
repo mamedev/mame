@@ -111,7 +111,11 @@ attotime va_rc_eg_device::get_dt(float v) const
 
 void va_rc_eg_device::device_start()
 {
-	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+	if (get_sound_requested_outputs() > 0)
+		m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+	else
+		m_stream = nullptr;
+
 	save_item(NAME(m_r));
 	save_item(NAME(m_c));
 	save_item(NAME(m_rc_inv));

@@ -12,27 +12,11 @@ TODO:
   (check Back to the Future);
 - Add remaining missing peripherals, SIO, HDD and w1300a network;
 - reverse / blanking tvram attributes;
-- Crashes with IPLPRO disabled, why?
 - Implement backward compatibility with MZ-2000/MZ-80B;
 - Implement expansion box unit;
-
-TODO per-game/program specific (move to mz2500_flop):
-- Dust Box vol. 1-3: they die with text garbage, might be bad dumps;
-- Dust Box vol. 4: window effect transition is bugged;
-- Dust Box vol. n: three items returns "purple" text, presumably HW failures (DFJustin: joystick
-"digital", mouse "not installed", HDD "not installed");
-- LayDock: hangs at title screen due of a PIT bug (timer irq dies for whatever reason);
-- Moon Child: needs mixed 3+3bpp tvram supported, kludged for now (not a real test case);
-- Moon Child: window masking doesn't mask bottom part of the screen?
-- Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME framework;
-- Marchen Veil I: doesn't load if you try to run it directly, it does if you load another game first (for example Mappy) then do a soft reset;
-- Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
-- Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
-- Murder Club: has lots of CG artifacts, FDC issue?
-- Orrbit 3: floppy issue makes it to throw a game over as soon as you start a game;
-- Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
-- Sound Gal Music Editor: wants a "master disk", that apparently isn't available;
-- Yukar K2 (normal version): moans about something, DFJustin: "please put the system disk back to normal", disk write-protected?
+- Remaining SIO ports (DA-25 and DE-9);
+- mouse: missing select line from OPN Port A;
+- dustbx**: cannot detect mouse reliably from bootstrap, works in main menu regardless;
 
 **************************************************************************************************/
 
@@ -495,7 +479,7 @@ void mz2500_state::draw_cg_screen(bitmap_ind16 &bitmap,const rectangle &cliprect
 			draw_cg16_screen(bitmap,cliprect,2,640,pri);
 			break;
 		default:
-			popmessage("Unsupported CG mode %02x, contact MAME dev",m_cg_reg[0x0e]);
+			popmessage("Unsupported CG mode %02x",m_cg_reg[0x0e]);
 			break;
 	}
 }
@@ -639,6 +623,11 @@ void mz2500_state::bank_data_w(u8 data)
 
 	m_bank_addr++;
 	m_bank_addr&=7;
+}
+
+void mz2500_state::bank_mode_w(u8 data)
+{
+	// TODO: controls memory banking for MZ-2000/MZ-80B compatibility
 }
 
 void mz2500_state::kanji_bank_w(u8 data)
@@ -928,23 +917,6 @@ u8 mz2500_state::dict_rom_r(offs_t offset)
 	return m_dic_rom[(offset & 0x1fff) + ((m_dic_bank & 0x1f)*0x2000)];
 }
 
-u8 mz2500_state::rom_r(offs_t offset)
-{
-	m_lrom_index = (offset >> 8) & 0xff;
-
-	m_rom_index = (m_rom_index & 0xffff00) | (m_lrom_index & 0xff);
-
-	return m_iplpro_rom[m_rom_index];
-}
-
-void mz2500_state::rom_w(offs_t offset, u8 data)
-{
-	m_hrom_index = (offset >> 8) & 0xff;
-
-	m_rom_index = (data << 8) | (m_rom_index & 0x0000ff) | ((m_hrom_index & 0xff)<<16);
-	//logerror("%02x\n",data);
-}
-
 /* sets 16 color entries out of 4096 possible combinations */
 void mz2500_state::palette4096_io_w(offs_t offset, u8 data)
 {
@@ -1160,40 +1132,36 @@ void mz2500_state::rp5c15_8_w(offs_t offset, u8 data)
 	m_rtc->write(rtc_index, data);
 }
 
-
-u8 mz2500_state::emm_data_r(offs_t offset)
+template <unsigned N> u8 mz2500_state::sio_access_r(address_space &space, offs_t offset)
 {
-	u8 emm_lo_index;
-
-	emm_lo_index = (offset >> 8) & 0xff;
-
-	m_emm_offset = (m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
-
-	if(m_emm_offset < 0x100000) //emm max size
-		return m_emm_ram[m_emm_offset];
-
-	return 0xff;
+	if (N != m_sio_access_bit)
+		return space.unmap();
+	return m_sio->ba_cd_r(offset);
 }
 
-void mz2500_state::emm_address_w(offs_t offset, u8 data)
+template <unsigned N> void mz2500_state::sio_access_w(address_space &space, offs_t offset, u8 data)
 {
-	u8 emm_hi_index;
-
-	emm_hi_index = (offset >> 8) & 0xff;
-
-	m_emm_offset = ((emm_hi_index & 0xff) << 16) | ((data & 0xff) << 8) | (m_emm_offset & 0xff);
+	if (N == m_sio_access_bit)
+		m_sio->ba_cd_w(offset, data);
 }
 
-void mz2500_state::emm_data_w(offs_t offset, u8 data)
+/*
+ * x--- ---- Select SIO port (0) $a0-$a3 (1) $b0-$b3
+ * --xx x--- Baud rate for Ch. A
+ * ---- -xxx Baud rate for Ch. B
+ * ---- -000 307'000 Hz / 19200 bps
+ * ...
+ * ---- -111 2400 Hz / 150 bps
+ */
+void mz2500_state::sio_setup_w(u8 data)
 {
-	u8 emm_lo_index;
+	m_sio_access_bit = !!(BIT(data, 7));
 
-	emm_lo_index = (offset >> 8) & 0xff;
+	attotime serial_clock_a = attotime::from_hz((4'000'000 / 13) / (1 << ((data >> 3) & 7)));
+	attotime serial_clock_b = attotime::from_hz((4'000'000 / 13) / (1 << ((data >> 0) & 7)));
 
-	m_emm_offset = (m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
-
-	if(m_emm_offset < 0x100000) //emm max size
-		m_emm_ram[m_emm_offset] = data;
+	m_sio_timer[0]->adjust(serial_clock_a, 0, serial_clock_a);
+	m_sio_timer[1]->adjust(serial_clock_b, 0, serial_clock_b);
 }
 
 void mz2500_state::z80_map(address_map &map)
@@ -1225,27 +1193,28 @@ void mz2500_state::bank_window_map(address_map &map)
 	// 0x3a
 	map(0x74000, 0x75fff).r(FUNC(mz2500_state::dict_rom_r));
 	// 0x3b
-//	map(0x76000, 0x77fff).noprw();
+//  map(0x76000, 0x77fff).noprw();
 	// 0x3c-0x3f
 	map(0x78000, 0x7ffff).rom().region("phone", 0);
 }
 
 void mz2500_state::z80_io(address_map &map)
 {
+	map.unmap_value_high();
 //  map(0x60, 0x63).mirror(0xff00).w(FUNC(mz2500_state::w3100a_w));
 //  map(0x63, 0x63).mirror(0xff00).r(FUNC(mz2500_state::w3100a_r));
-//  map(0x98, 0x99) ADPCM, unknown type, custom from expansion unit?
-	map(0xa0, 0xa3).mirror(0xff00).rw("z80sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-//  map(0xa4, 0xa5).rw(FUNC(mz2500_state::sasi_r), FUNC(mz2500_state::sasi_w));
-	map(0xa8, 0xa8).select(0xff00).w(FUNC(mz2500_state::rom_w));
-	map(0xa9, 0xa9).select(0xff00).r(FUNC(mz2500_state::rom_r));
-	map(0xac, 0xac).select(0xff00).w(FUNC(mz2500_state::emm_address_w));
-	map(0xad, 0xad).select(0xff00).r(FUNC(mz2500_state::emm_data_r)).w(FUNC(mz2500_state::emm_data_w));
+//  map(0x98, 0x99) MZ-1E35 ADPCM
+	map(0xa0, 0xa3).mirror(0xff00).rw(FUNC(mz2500_state::sio_access_r<0>), FUNC(mz2500_state::sio_access_w<0>));
+	map(0xb0, 0xb3).mirror(0xff00).rw(FUNC(mz2500_state::sio_access_r<1>), FUNC(mz2500_state::sio_access_w<1>));
+//  map(0xa4, 0xa5) MZ-1E30 SASI
+//  map(0xa8, 0xa9) ^
+//  map(0xac, 0xac) MZ-1R37 EMM
+//  map(0xad, 0xad) ^
 	map(0xae, 0xae).select(0xff00).w(FUNC(mz2500_state::palette4096_io_w));
 //  map(0xb0, 0xb3).rw(FUNC(mz2500_state::sio_r), FUNC(mz2500_state::sio_w));
 	map(0xb4, 0xb4).mirror(0xff00).rw(FUNC(mz2500_state::bank_addr_r), FUNC(mz2500_state::bank_addr_w));
 	map(0xb5, 0xb5).mirror(0xff00).rw(FUNC(mz2500_state::bank_data_r), FUNC(mz2500_state::bank_data_w));
-	map(0xb7, 0xb7).mirror(0xff00).nopw();
+	map(0xb7, 0xb7).mirror(0xff00).w(FUNC(mz2500_state::bank_mode_w));
 	map(0xb8, 0xb9).mirror(0xff00).rw(FUNC(mz2500_state::kanji_r), FUNC(mz2500_state::kanji_w));
 	map(0xbc, 0xbc).mirror(0xff00).r(FUNC(mz2500_state::bplane_latch_r)).w(FUNC(mz2500_state::cg_addr_w));
 	map(0xbd, 0xbd).mirror(0xff00).r(FUNC(mz2500_state::rplane_latch_r)).w(FUNC(mz2500_state::cg_data_w));
@@ -1255,7 +1224,10 @@ void mz2500_state::z80_io(address_map &map)
 	map(0xc7, 0xc7).mirror(0xff00).w(FUNC(mz2500_state::irq_data_w));
 	map(0xc8, 0xc9).mirror(0xff00).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 //  map(0xca, 0xca).mirror(0xff00).rw(FUNC(mz2500_state::voice_r), FUNC(mz2500_state::voice_w));
+	// MZ-1E26
+	map(0xca, 0xca).mirror(0xff00).lr8(NAME([] () { return 0x30; }));
 	map(0xcc, 0xcc).select(0xff00).rw(FUNC(mz2500_state::rp5c15_8_r), FUNC(mz2500_state::rp5c15_8_w));
+	map(0xcd, 0xcd).mirror(0xff00).w(FUNC(mz2500_state::sio_setup_w));
 	map(0xce, 0xce).mirror(0xff00).w(FUNC(mz2500_state::dictionary_bank_w));
 	map(0xcf, 0xcf).mirror(0xff00).w(FUNC(mz2500_state::kanji_bank_w));
 	map(0xd8, 0xdb).mirror(0xff00).rw(m_fdc, FUNC(mb8876_device::read), FUNC(mb8876_device::write));
@@ -1269,12 +1241,34 @@ void mz2500_state::z80_io(address_map &map)
 	map(0xf0, 0xf3).mirror(0xff00).w(FUNC(mz2500_state::timer_w));
 	map(0xf4, 0xf7).mirror(0xff00).r(FUNC(mz2500_state::crtc_hvblank_r)).w(FUNC(mz2500_state::tv_crtc_w));
 //  map(0xf8, 0xf9).?(0xff00).rw(FUNC(mz2500_state::extrom_r), FUNC(mz2500_state::extrom_w));
-//	map(0xfe, 0xff).mirror(0xff00) printer
+//  map(0xfe, 0xff).mirror(0xff00) printer
 }
 
 
-// TODO: generalize in device (mostly same as other MZ machines)
+INPUT_CHANGED_MEMBER(mz2500_state::boot_reset_cb)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+INPUT_CHANGED_MEMBER(mz2500_state::ipl_reset_cb)
+{
+	machine().schedule_soft_reset();
+}
+
+TIMER_CALLBACK_MEMBER(mz2500_state::ipl_timer_reset_cb)
+{
+	logerror("IPL reset kicked in\n");
+	machine().schedule_soft_reset();
+}
+
 static INPUT_PORTS_START( mz2500 )
+	// section 8 of schematics
+	// CN1 switches 8-9
+	PORT_START("FRONT_PANEL")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mz2500_state::boot_reset_cb), 0) PORT_NAME("Boot Reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mz2500_state::ipl_reset_cb), 0) PORT_NAME("IPL Reset")
+
+	// TODO: generalize keyboard in device (mostly same as other MZ machines)
 	PORT_START("KEY0")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
@@ -1442,25 +1436,25 @@ void mz2500_state::reset_banks(u8 type)
 	}
 }
 
-static const gfx_layout mz2500_pcg_layout_1bpp =
+static const gfx_layout pcg_layout_1bpp =
 {
 	8, 8,
 	0x100,
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
 	8 * 8
 };
 
-static const gfx_layout mz2500_pcg_layout_3bpp =
+static const gfx_layout pcg_layout_3bpp =
 {
 	8, 8,
 	0x100,
 	3,
 	{ 0x1800*8, 0x1000*8, 0x800*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
 	8 * 8
 };
 
@@ -1470,92 +1464,87 @@ void mz2500_state::machine_start()
 	m_ipl_rom = memregion("ipl")->base();
 	m_kanji_rom = memregion("kanji")->base();
 	m_kanji2_rom = memregion("kanji2")->base();
-	m_emm_ram = make_unique_clear<u8[]>(0x100000);
 	m_dic_rom = memregion("dictionary")->base();
 	m_phone_rom = memregion("phone")->base();
-	m_iplpro_rom = memregion("iplpro")->base();
 
 	save_pointer(NAME(m_pcg_ram), 0x2000);
-	save_pointer(NAME(m_emm_ram), 0x100000);
 
-	/* TODO: gfx[4] crashes as per now */
-	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, mz2500_pcg_layout_1bpp, m_pcg_ram.get(), 0, 0x10, 0));
-	m_gfxdecode->set_gfx(4, std::make_unique<gfx_element>(m_palette, mz2500_pcg_layout_3bpp, m_pcg_ram.get(), 0, 4, 0));
-}
+	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, pcg_layout_1bpp, m_pcg_ram.get(), 0, 0x10, 0));
+	m_gfxdecode->set_gfx(4, std::make_unique<gfx_element>(m_palette, pcg_layout_3bpp, m_pcg_ram.get(), 0, 4, 0));
 
-void mz2500_state::machine_reset()
-{
-	uint32_t i;
-
-	reset_banks(IPL_RESET);
-
-	//m_irq_vector[0] = 0xef; /* RST 28h - vblank */
+	std::fill(std::begin(m_cgram), std::end(m_cgram), 0x00);
+	std::fill(std::begin(m_irq_pending), std::end(m_irq_pending), 0);
+	std::fill(std::begin(m_irq_mask), std::end(m_irq_mask), 0);
 
 	m_text_col_size = 0;
 	m_text_font_reg = 0;
 
-	/* clear CG RAM */
-	for(i=0;i<0x20000;i++)
-		m_cgram[i] = 0x00;
-
-	/* disable IRQ */
-	for(i=0;i<4;i++)
-	{
-		m_irq_mask[i] = 0;
-		m_irq_pending[i] = 0;
-	}
 	m_kanji_bank = 0;
 
 	m_cg_clear_flag = 0;
 
-	m_beeper->set_state(0);
+	m_ipl_reset_timer = timer_alloc(FUNC(mz2500_state::ipl_timer_reset_cb), this);
+
+	m_sio_timer[0] = timer_alloc(FUNC(mz2500_state::sio_clock_cb<0>), this);
+	m_sio_timer[1] = timer_alloc(FUNC(mz2500_state::sio_clock_cb<1>), this);
+}
+
+void mz2500_state::machine_reset()
+{
+	m_bank_addr = 0;
+	reset_banks(IPL_RESET);
+
+	m_ipl_reset_timer->adjust(attotime::never);
+
+	m_sio_access_bit = false;
+	m_dac1bit->level_w(0);
 
 //  m_monitor_type = ioport("DSW1")->read() & 0x40 ? 1 : 0;
 
 	joystick_w(0x3f); // LS273 reset
 }
 
-static const gfx_layout mz2500_cg_layout =
+static const gfx_layout kanji_cg_layout =
 {
-	8, 8,       /* 8 x 8 graphics */
-	RGN_FRAC(1,1),      /* 512 codes */
-	1,      /* 1 bit per pixel */
-	{ 0 },      /* no bitplanes */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8 * 8       /* code takes 8 times 8 bits */
+	8, 8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	8 * 8
 };
 
 /* gfx1 is mostly 16x16, but there are some 8x8 characters */
-static const gfx_layout mz2500_8_layout =
+static const gfx_layout kanji_8_layout =
 {
-	8, 8,       /* 8 x 8 graphics */
-	1920,       /* 1920 codes */
-	1,      /* 1 bit per pixel */
-	{ 0 },      /* no bitplanes */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8 * 8       /* code takes 8 times 8 bits */
+	8, 8,
+	1920,
+	1,
+	{ 0 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	8 * 8
 };
 
-static const gfx_layout mz2500_16_layout =
+static const gfx_layout kanji_16_layout =
 {
-	16, 16,     /* 16 x 16 graphics */
-	RGN_FRAC(1,1),      /* 8192 codes */
-	1,      /* 1 bit per pixel */
-	{ 0 },      /* no bitplanes */
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 128, 129, 130, 131, 132, 133, 134, 135 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	16 * 16     /* code takes 16 times 16 bits */
+	16, 16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP8(0, 1), STEP8(128, 1) },
+	{ STEP16(0, 8) },
+	16 * 16
 };
 
 /* these are just for viewer sake, actually they aren't used in drawing routines */
 static GFXDECODE_START( gfx_mz2500 )
-	GFXDECODE_ENTRY("kanji", 0, mz2500_cg_layout, 0, 256)
-	GFXDECODE_ENTRY("kanji", 0x4400, mz2500_8_layout, 0, 256)
-	GFXDECODE_ENTRY("kanji", 0, mz2500_16_layout, 0, 256)
-//  GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_1bpp, 0, 0x10)
-//  GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_3bpp, 0, 4)
+	GFXDECODE_ENTRY("kanji", 0, kanji_cg_layout, 0, 256)
+	GFXDECODE_ENTRY("kanji", 0x4400, kanji_8_layout, 0, 256)
+	GFXDECODE_ENTRY("kanji", 0, kanji_16_layout, 0, 256)
+//  GFXDECODE_ENTRY("pcg", 0, pcg_layout_1bpp, 0, 0x10)
+//  GFXDECODE_ENTRY("pcg", 0, pcg_layout_3bpp, 0, 4)
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(mz2500_state::vblank_cb)
@@ -1625,23 +1614,23 @@ void mz2500_state::ppi_portc_w(u8 data)
 	---- ---x screen mask
 	*/
 
-	/* work RAM reset */
-	if((m_old_portc & 0x02) == 0x00 && (data & 0x02))
+	if(BIT(m_old_portc, 3) != BIT(data, 3))
 	{
+		logerror("PIO PC: IPL reset %s\n", BIT(data, 3) ? "stopped" : "started");
+		// TODO: timing
+		m_ipl_reset_timer->adjust(!BIT(data, 3) ? attotime::from_hz(100) : attotime::never);
+	}
+
+	if(!BIT(m_old_portc, 1) && BIT(data, 1))
+	{
+		logerror("PIO PC: Work RAM reset\n");
 		reset_banks(WRAM_RESET);
-		/* correct? */
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
-	/* bit 2 is speaker */
-
-	/* IPL reset */
-	if((m_old_portc & 0x08) == 0x00 && (data & 0x08))
-		reset_banks(IPL_RESET);
-
 	m_old_portc = data;
 
-	m_beeper->set_state(data & 0x04);
+	m_dac1bit->level_w(BIT(data, 2));
 
 	m_screen_enable = data & 1;
 
@@ -1766,9 +1755,39 @@ static void mz2500_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
+static void mouse_devices(device_slot_interface &device)
+{
+	device.option_add("x68k", X68K_MOUSE);
+}
+
+template <unsigned N> TIMER_CALLBACK_MEMBER(mz2500_state::sio_clock_cb)
+{
+	if (N)
+	{
+		m_sio->rxtxcb_w(0);
+		m_sio->rxtxcb_w(1);
+	}
+	else
+	{
+		m_sio->rxca_w(0);
+		m_sio->rxca_w(1);
+		m_sio->txca_w(0);
+		m_sio->txca_w(1);
+	}
+}
+
+
+static const z80_daisy_config daisy_chain[] =
+{
+//  { "pio" },
+	{ "sio" },
+	{ nullptr }
+};
+
 void mz2500_state::mz2500(machine_config &config)
 {
 	Z80(config, m_maincpu, 24_MHz_XTAL / 4);
+	m_maincpu->set_daisy_config(daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz2500_state::z80_map);
 	m_maincpu->set_addrmap(AS_IO, &mz2500_state::z80_io);
 	m_maincpu->set_vblank_int("screen", FUNC(mz2500_state::vblank_cb));
@@ -1792,7 +1811,7 @@ void mz2500_state::mz2500(machine_config &config)
 	pio.out_pa_callback().set(FUNC(mz2500_state::pio_porta_w));
 	pio.in_pb_callback().set(FUNC(mz2500_state::pio_porta_r));
 
-	Z80SIO(config, "z80sio", 24_MHz_XTAL / 4);
+	Z80SIO(config, m_sio, 24_MHz_XTAL / 4);
 
 	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->alarm().set(FUNC(mz2500_state::rtc_alarm_irq));
@@ -1808,13 +1827,14 @@ void mz2500_state::mz2500(machine_config &config)
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[0], msx_general_purpose_port_devices, "joystick");
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");
 
+	rs232_port_device &mouse(RS232_PORT(config, "mouse_port", mouse_devices, "x68k"));
+	mouse.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
+	m_sio->out_dtrb_callback().set(mouse, FUNC(rs232_port_device::write_rts));
+
 	FLOPPY_CONNECTOR(config, "fdc:0", mz2500_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", mz2500_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", mz2500_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", mz2500_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-
-	SOFTWARE_LIST(config, "flop_list").set_original("mz2500_flop");
-	SOFTWARE_LIST(config, "flop_list2").set_compatible("mz2000_flop");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(42.954545_MHz_XTAL / 2, 640+108, 0, 640, 480, 0, 200); //unknown clock / divider
@@ -1836,7 +1856,17 @@ void mz2500_state::mz2500(machine_config &config)
 	ym.add_route(2, "mono", 0.50);
 	ym.add_route(3, "mono", 0.50);
 
-	BEEP(config, m_beeper, 4096).add_route(ALL_OUTPUTS,"mono",0.50);
+	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	// MZ-1U09, built-in 2 slots
+	for (unsigned i = 0; i < 2; i++)
+	{
+		MZ80_EXP_SLOT(config, m_exp[i], mz2500_exp_devices, nullptr);
+		m_exp[i]->set_iospace(m_maincpu, AS_IO);
+	}
+
+	SOFTWARE_LIST(config, "flop_list").set_original("mz2500_flop");
+	SOFTWARE_LIST(config, "flop_list2").set_compatible("mz2000_flop");
 }
 
 
@@ -1858,9 +1888,6 @@ ROM_START( mz2500 )
 	ROM_REGION( 0x40000, "dictionary", 0 )
 	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
 
-	ROM_REGION( 0x8000, "iplpro", ROMREGION_ERASEFF )
-	ROM_LOAD( "sasi.rom", 0x00000, 0x8000, CRC(a7bf39ce) SHA1(3f4a237fc4f34bac6fe2bbda4ce4d16d42400081) )
-
 	ROM_REGION( 0x8000, "phone", ROMREGION_ERASEFF )
 	ROM_LOAD( "phone.rom", 0x00000, 0x4000, CRC(8e49e4dc) SHA1(2589f0c95028037a41ca32a8fd799c5f085dab51) )
 ROM_END
@@ -1881,9 +1908,6 @@ ROM_START( mz2520 )
 
 	ROM_REGION( 0x40000, "dictionary", 0 )
 	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
-
-	ROM_REGION( 0x8000, "iplpro", ROMREGION_ERASEFF )
-	ROM_LOAD( "sasi.rom", 0x00000, 0x8000, CRC(a7bf39ce) SHA1(3f4a237fc4f34bac6fe2bbda4ce4d16d42400081) )
 
 	ROM_REGION( 0x8000, "phone", ROMREGION_ERASEFF )
 	ROM_LOAD( "phone.rom", 0x00000, 0x4000, CRC(8e49e4dc) SHA1(2589f0c95028037a41ca32a8fd799c5f085dab51) )

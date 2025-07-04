@@ -2810,6 +2810,6 @@ GAME( 1994, superx,    0,        superx,   superx,   rshark_state,             e
 GAME( 1994, superxm,   superx,   superx,   superx,   rshark_state,             empty_init, ROT270, "Dooyong (Mitchell license)",    "Super-X (Mitchell)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1995, rshark,    0,        rshark,   rshark,   rshark_state,             empty_init, ROT270, "Dooyong",                       "R-Shark (set 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, rsharka,   0,        rshark,   rshark,   rshark_state,             empty_init, ROT270, "Dooyong",                       "R-Shark (set 2)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, rsharka,   rshark,   rshark,   rshark,   rshark_state,             empty_init, ROT270, "Dooyong",                       "R-Shark (set 2)",      MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, popbingo,  0,        popbingo, popbingo, popbingo_state,           empty_init, ROT0,   "Dooyong",                       "Pop Bingo",            MACHINE_SUPPORTS_SAVE )

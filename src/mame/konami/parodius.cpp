@@ -358,11 +358,11 @@ void parodius_state::banking_callback(uint8_t data)
 void parodius_state::parodius(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, 12000000); // 053248
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 053248
 	m_maincpu->set_addrmap(AS_PROGRAM, &parodius_state::main_map);
 	m_maincpu->line().set(FUNC(parodius_state::banking_callback));
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &parodius_state::sound_map); // NMIs are triggered by the 053260
 
 	ADDRESS_MAP_BANK(config, "bank0000").set_map(&parodius_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
@@ -371,22 +371,19 @@ void parodius_state::parodius(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	screen.set_screen_update(FUNC(parodius_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(parodius_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245, 24_MHz_XTAL);
 	m_k053245->set_palette("palette");
 	m_k053245->set_sprite_callback(FUNC(parodius_state::sprite_callback));
 
@@ -395,9 +392,11 @@ void parodius_state::parodius(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(1, "speaker", 1.0, 1);
 
-	k053260_device &k053260(K053260(config, "k053260", 3579545));
+	k053260_device &k053260(K053260(config, "k053260", 3.579545_MHz_XTAL));
 	k053260.add_route(0, "speaker", 0.70, 0);
 	k053260.add_route(1, "speaker", 0.70, 1);
 	k053260.sh1_cb().set(FUNC(parodius_state::z80_nmi_w));

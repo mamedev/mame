@@ -1754,7 +1754,7 @@ void konamigx_state::konamigx(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(konamigx_state::type2_tile_callback));
@@ -1941,7 +1941,7 @@ void konamigx_state::gxtype3(machine_config &config)
 
 	PALETTE(config.replace(), m_palette).set_entries(16384);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
 	m_screen->set_size(1024, 1024);
@@ -1979,7 +1979,7 @@ void konamigx_state::gxtype4(machine_config &config)
 
 	PALETTE(config.replace(), m_palette).set_entries(8192);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_type4);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4)
@@ -2059,7 +2059,7 @@ void konamigx_state::sexyparoebl(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(konamigx_state::alpha_tile_callback));

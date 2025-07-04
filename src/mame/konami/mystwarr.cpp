@@ -976,7 +976,7 @@ void mystwarr_state::mystwarr(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(mystwarr_state::mystwarr_tile_callback));

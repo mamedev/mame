@@ -3101,22 +3101,22 @@ For reference the one that was not is "1938: 18 <-> 9B" (part of a data table)
 
 A little less obvious is why the older dump had the following startup code, which appears to have been partially patched out
 
-	    0200: mov   sp,#$70
-	    0203: mov   a,pcon
-	    0205: anl   a,#$20
-	    0207: jnz   $0203
-	    0209: nop
-	    020A: nop
-	    020B: nop
-	    020C: mov   dptr,#$FC01
+        0200: mov   sp,#$70
+        0203: mov   a,pcon
+        0205: anl   a,#$20
+        0207: jnz   $0203
+        0209: nop
+        020A: nop
+        020B: nop
+        020C: mov   dptr,#$FC01
 
-	   while the newer dump has this
+       while the newer dump has this
 
-	    0200: mov   sp,#$70
-	    0203: mov   mcon,#$68
-	    0206: mov   i2cfg,#$00
-	    0209: mov   crcr,#$80
-	    020C: mov   dptr,#$FC01
+        0200: mov   sp,#$70
+        0203: mov   mcon,#$68
+        0206: mov   i2cfg,#$00
+        0209: mov   crcr,#$80
+        020C: mov   dptr,#$FC01
 
 Either way the 2nd dump is in much better state, so we're using that.
 

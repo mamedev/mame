@@ -15,6 +15,8 @@ public:
 	// construction/destruction
 	sega_315_6154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto irq1_callback() { return irq1_cb.bind(); }
+
 	u32 registers_r(offs_t offset);
 	void registers_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffff);
 	template<int Aperture>
@@ -43,6 +45,7 @@ private:
 	address_space_config m_configuration_config;
 	address_space_config m_memory_config;
 	address_space *m_configuration = nullptr;
+	devcb_write_line irq1_cb;
 
 	u32 m_registers[0x100 / 4];
 	u32 m_bases[4 * 3];
@@ -50,6 +53,7 @@ private:
 	bool m_useconfig_14x;
 	bool m_useconfig_18x;
 
+	void irq_update();
 };
 
 #endif // MAME_SEGA_315_6154_H

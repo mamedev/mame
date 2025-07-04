@@ -29,8 +29,8 @@
         * Not all features are fully hooked up
         * Still step back and forth in Time Traveler glitches
           - (level select doesn't stay in place)
-		* resizing, positioning of OSD bitmaps is not optimal
-		  - 16x16 is supported, but native size and location may be wrong
+        * resizing, positioning of OSD bitmaps is not optimal
+          - 16x16 is supported, but native size and location may be wrong
 *************************************************************************/
 
 #include "emu.h"
@@ -111,7 +111,6 @@ static const u16 text_bitmap[0x60][0x10] =
 	{ 0 },
 	{ 0 },
 	{ 0 },
-	{ 0 }, 
 	{ 0 },
 	{ 0 },
 	{ 0 },
@@ -136,7 +135,8 @@ static const u16 text_bitmap[0x60][0x10] =
 	{ 0 },
 	{ 0 },
 	{ 0 },
-	{ 0 },																	  									    // <space>
+	{ 0 },
+	{ 0 },                                                                                                          // <space>
 	{0x0000,0x0000,0x00c0,0x00c0,0x00c0,0x00c0,0x00c0,0x00c0,0x00c0,0x00c0,0x00c0,0x00c0,0x0000,0x0000,0x00c0,0x00c0},// !
 	{ 0 },
 	{ 0 },
@@ -163,12 +163,12 @@ static const u16 text_bitmap[0x60][0x10] =
 	{0x0000,0x0000,0x0ff0,0x1ff8,0x381c,0x300c,0x300c,0x381c,0x1ff8,0x1ff8,0x381c,0x300c,0x300c,0x381c,0x1ff8,0x0ff0}, // 8
 	{0x0000,0x0000,0x0ff0,0x1ff8,0x381c,0x300c,0x300c,0x301c,0x3ff8,0x3ff0,0x3000,0x3000,0x300c,0x381c,0x1ff8,0x0ff0}, // 9
 	{0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0180,0x0180,0x0000,0x0000,0x0180,0x0180,0x0000,0x0000,0x0000,0x0000}, // :
-	{ 0 },                                  
-	{ 0 },                                  
+	{ 0 },
+	{ 0 },
 	{0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x1ff8,0x1ff8,0x0000,0x1ff8,0x1ff8,0x0000,0x0000,0x0000,0x0000}, // =
-	{ 0 },                                  
+	{ 0 },
 	{0x0000,0x0000,0x0ff0,0x1ff8,0x381c,0x300c,0x3000,0x3800,0x1c00,0x0e00,0x0700,0x0300,0x0000,0x0000,0x0300,0x0300}, // ?
-	{ 0 },                                  
+	{ 0 },
 	{0x0000,0x0000,0x03c0,0x07e0,0x0e70,0x1c38,0x381c,0x300c,0x300c,0x300c,0x3ffc,0x3ffc,0x300c,0x300c,0x300c,0x300c}, // A
 	{0x0000,0x0000,0x1ffe,0x3ffe,0x7018,0x6018,0x6018,0x7018,0x3ff8,0x3ff8,0x7018,0x6018,0x6018,0x7018,0x3ffe,0x1ffe}, // B
 	{0x0000,0x0000,0x3fc0,0x7fe0,0xe070,0xc030,0x0030,0x0030,0x0030,0x0030,0x0030,0x0030,0xc030,0xe070,0x7fe0,0x3fc0}, // C
@@ -195,10 +195,10 @@ static const u16 text_bitmap[0x60][0x10] =
 	{0x0000,0x0000,0x6006,0x700e,0x381c,0x1c38,0x0e70,0x07e0,0x03c0,0x03c0,0x07e0,0x0e70,0x1c38,0x381c,0x700e,0x6006}, // X
 	{0x0000,0x0000,0x6006,0x700e,0x381c,0x1c38,0x0e70,0x07e0,0x03c0,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180}, // Y
 	{0x0000,0x0000,0x3ffc,0x3ffc,0x1c00,0x0e00,0x0700,0x0380,0x01c0,0x00e0,0x0070,0x0038,0x001c,0x000c,0x3ffc,0x3ffc}, // Z
-	{ 0 },                                  // 
-	{ 0 },                                  // 
-	{ 0 },                                  // 
-	{ 0 },                                  // 
+	{ 0 },                                  //
+	{ 0 },                                  //
+	{ 0 },                                  //
+	{ 0 },                                  //
 	{0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x1ff8,0x1ff8,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000}, // -
 };
 
@@ -282,7 +282,7 @@ void sony_ldp1450hle_device::overlay_draw_group(bitmap_yuy16 &bitmap, const uint
 			}
 		}
 	}
-}	
+}
 
 
 //-------------------------------------------------
@@ -293,11 +293,11 @@ void sony_ldp1450hle_device::overlay_draw_group(bitmap_yuy16 &bitmap, const uint
 void sony_ldp1450hle_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, float xstart, int ystart, int char_width, int char_height)
 {
 
-	// m_user_index_mode >> 5 & 0x04: 0,2 = normal, 1 = 1px shadow, 3 = grey box 
+	// m_user_index_mode >> 5 & 0x04: 0,2 = normal, 1 = 1px shadow, 3 = grey box
 	uint16_t black = 0x0080;
 
-	u8 modeval= (m_user_index_mode >> 5) & 0x04;
-	
+	u8 modeval = (m_user_index_mode >> 5) & 0x04;
+
 	for (u32 y = 0; y < char_height; y++)
 	{
 		for (u8 x = 0; x < char_width; x++)
@@ -308,13 +308,14 @@ void sony_ldp1450hle_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch,
 
 				for (u32 xx = 0; xx < OVERLAY_PIXEL_WIDTH; xx++)
 				{
-					if (modeval==0x03)
+					if (modeval == 0x03)
 					{
-						//fill with grey	
+						// FIXME: this is unreachable because modeval is masked with 0x04 above
+						//fill with grey
 					}
 
 					if (m_osd_font[ch].pix(y,x) != black)
-					{	
+					{
 						bitmap.pix(ystart + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin+xx) = m_osd_font[ch].pix(y,x);
 					}
 				}
@@ -327,7 +328,7 @@ void sony_ldp1450hle_device::player_overlay(bitmap_yuy16 &bitmap)
 {
 	if (m_user_index_flag)
 	{
-		overlay_draw_group(bitmap, m_user_index_chars, m_user_index_window_idx, m_user_index_x, m_user_index_y, m_user_index_mode);		
+		overlay_draw_group(bitmap, m_user_index_chars, m_user_index_window_idx, m_user_index_x, m_user_index_y, m_user_index_mode);
 	}
 }
 
@@ -415,7 +416,7 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 		}
 		case SUBMODE_USER_INDEX_MODE_1:
 		{
-			m_user_index_x = (command & 0x3f);
+			m_user_index_x = command & 0x3f;
 
 			LOGMASKED(LOG_COMMANDS, "User Index X: %02x\n", m_user_index_x);
 
@@ -425,7 +426,7 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 		}
 		case SUBMODE_USER_INDEX_MODE_2:
 		{
-			m_user_index_y = (command & 0x3f);
+			m_user_index_y = command & 0x3f;
 			LOGMASKED(LOG_COMMANDS, "User Index Y: %02x\n", m_user_index_y);
 			m_submode = SUBMODE_USER_INDEX_MODE_3;
 			queue_reply(0x0a, 4.3);
@@ -441,7 +442,7 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 		}
 		case SUBMODE_USER_INDEX_STRING_1:
 		{
-			m_user_index_char_idx = (command & 0x1f);
+			m_user_index_char_idx = command & 0x1f;
 			LOGMASKED(LOG_COMMANDS, "User Index Charpos: %02x\n", m_user_index_char_idx);
 			m_submode = SUBMODE_USER_INDEX_STRING_2;
 			queue_reply(0x0a, 4.3);
@@ -469,7 +470,7 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 		}
 		case SUBMODE_USER_INDEX_WINDOW:
 		{
-			m_user_index_window_idx = (command & 0x1f);
+			m_user_index_window_idx = command & 0x1f;
 			LOGMASKED(LOG_COMMANDS, "User Index Window idx: %02x\n", m_user_index_window_idx);
 			m_submode = SUBMODE_NORMAL;
 			queue_reply(0x0a, 4.3);
@@ -718,7 +719,7 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 				m_speed = m_base_speed;
 				m_submode = SUBMODE_NORMAL;
 				m_mode = MODE_PLAY;
-				queue_reply(0x0a, 5.5);	
+				queue_reply(0x0a, 5.5);
 				break;
 
 			case CMD_CH1_ON:
@@ -980,7 +981,7 @@ void sony_ldp1450hle_device::device_start()
 	for (u8 chr_idx = 0; chr_idx < 96; chr_idx ++)
 	{
 		m_osd_font[chr_idx] = osd_char_gen(chr_idx);
-	}	
+	}
 
 }
 
@@ -1054,10 +1055,10 @@ TIMER_CALLBACK_MEMBER(sony_ldp1450hle_device::process_vbi_data)
 			m_curr_frame = bcd_to_literal(line & 0x7ffff);
 
 		LOGMASKED(LOG_FRAMES, "Current frame is %d (VBI 16: %06x, VBI 17: %06x, VBI 18: %06x, VBI 1718: %06x\n", m_curr_frame,
-			get_field_code(LASERDISC_CODE_LINE16, false),
-			get_field_code(LASERDISC_CODE_LINE17, false),
-			get_field_code(LASERDISC_CODE_LINE18, false),
-			line);
+				get_field_code(LASERDISC_CODE_LINE16, false),
+				get_field_code(LASERDISC_CODE_LINE17, false),
+				get_field_code(LASERDISC_CODE_LINE18, false),
+				line);
 
 		if (m_mode != MODE_STILL && m_mode != MODE_PAUSE)
 		{

@@ -377,13 +377,16 @@ void msc_device::pmu_reset_w(int state)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 }
 
-void msc_device::cb1_int_hack(int state)
+void msc_device::pmu_int(int state)
 {
-	if (state)
-	{
-		m_via1->cb1_int_hack(ASSERT_LINE);
-	}
+	m_via1->pmu_int(state);
 }
+
+void msc_device::write_cb1(int state)
+{
+	m_via1->write_cb1_noint(state);
+}
+
 
 void msc_device::field_interrupts()
 {

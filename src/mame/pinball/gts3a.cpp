@@ -1189,7 +1189,7 @@ ROM_START(smbpv)
 ROM_END
 
 /* Earlier than 'smbpv'. Lacks adjustments #57 and #58. It also defaults to 24 max. credits in German and Spanish setting.
-   Has Spanish instead of French texts, and shows "VIFICO" instead of "GAME OVER" in attract mode. */ 
+   Has Spanish instead of French texts, and shows "VIFICO" instead of "GAME OVER" in attract mode. */
 ROM_START(smbpva)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom_27c512.u2", 0x0000, 0x10000, CRC(d2db2f09) SHA1(6327812d352fecde3a4e63b36fea923c4586da74)) // Same as "smbp" but changing the string 'LES GAGNANTS DISENT "NON" A LA DROGUE' to 'SERVICIO TECNICO DE VIFICO 95/2238827'

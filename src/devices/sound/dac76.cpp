@@ -38,7 +38,6 @@ dac76_device::dac76_device(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, DAC76, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr),
-	m_streaming_iref(false),
 	m_voltage_output(false),
 	m_r_pos(1.0F),
 	m_r_neg(1.0F),
@@ -47,11 +46,6 @@ dac76_device::dac76_device(const machine_config &mconfig, const char *tag, devic
 	m_sb(false),
 	m_fixed_iref(1.0F)
 {
-}
-
-void dac76_device::configure_streaming_iref(bool streaming_iref)
-{
-	m_streaming_iref = streaming_iref;
 }
 
 void dac76_device::configure_voltage_output(float i2v_r_pos, float i2v_r_neg)
@@ -77,8 +71,8 @@ void dac76_device::set_fixed_iref(float iref)
 void dac76_device::device_start()
 {
 	// create sound stream
-	const int input_count = m_streaming_iref ? 1 : 0;
-	m_stream = stream_alloc(input_count, 1, machine().sample_rate() * 8);
+	assert(get_sound_requested_inputs_mask() == 0x00 || get_sound_requested_inputs_mask() == 0x01);
+	m_stream = stream_alloc(get_sound_requested_inputs(), 1, machine().sample_rate() * 8);
 
 	// register for save states
 	save_item(NAME(m_chord));
@@ -121,7 +115,7 @@ void dac76_device::sound_stream_update(sound_stream &stream)
 		y *= ((y >= 0) ? m_r_pos : m_r_neg) * FULL_SCALE_MULT;
 	}
 
-	if (m_streaming_iref)
+	if (get_sound_requested_inputs() > 0)
 	{
 		const int n = stream.samples();
 		for (int i = 0; i < n; ++i)

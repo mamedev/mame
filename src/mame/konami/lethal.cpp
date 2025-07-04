@@ -685,7 +685,7 @@ void lethal_state::lethalen(machine_config &config)
 	K053244(config, m_k053244, 0);
 	m_k053244->set_palette(m_palette);
 	m_k053244->set_bpp(6);
-	m_k053244->set_offsets(95, 0);
+	m_k053244->set_offsets(191, 0);
 	m_k053244->set_sprite_callback(FUNC(lethal_state::sprite_callback));
 
 	K054000(config, "k054000", 0);
@@ -707,7 +707,7 @@ void lethal_state::lethalej(machine_config &config)
 
 	subdevice<screen_device>("screen")->set_visarea(224, 512-1, 16, 240-1);
 
-	m_k053244->set_offsets(-105, 0);
+	m_k053244->set_offsets(-9, 0);
 }
 
 ROM_START( lethalen )   // US version UAE
