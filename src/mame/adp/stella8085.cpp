@@ -51,6 +51,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_kdc(*this, "kdc"),
 		m_digits(*this, "digit%u", 0U),
+		m_lamps(*this, "lamp%u", 0U),
 		m_beep(*this, "beeper")
 	{ }
 
@@ -63,6 +64,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8279_device> m_kdc;
 	output_finder<8> m_digits;
+	output_finder<64> m_lamps;
 	required_device<beep_device> m_beep;
 
 	void machine_start() override ATTR_COLD;
@@ -91,6 +93,7 @@ private:
 void stella8085_state::machine_start()
 {
 	m_digits.resolve();
+	m_lamps.resolve();
 	save_item(NAME(m_digit));
 }
 
@@ -158,8 +161,8 @@ void stella8085_state::disp_w(u8 data)
 // 0x02, 0x04 gestört
 
 //  Display data
-	//if (data!=0)
-	//	LOG("I8279: Data Display: %02X\n", data);
+	if (m_kbd_sl==2 && data==0x40)
+		m_lamps[42] = 1;
 	output_digit(m_kbd_sl, data);
 }
 
