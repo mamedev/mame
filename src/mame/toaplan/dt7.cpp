@@ -446,18 +446,17 @@ void dt7_state::dt7(machine_config &config)
 	GFXDECODE(config, m_gfxdecode[1], m_palette[1], gfx_textrom_double_1);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 
 	OKIM6295(config, m_oki[0], 27_MHz_XTAL / 24, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 
-	YM2151(config, "ymsnd2", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	YM2151(config, "ymsnd2", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 
 	OKIM6295(config, m_oki[1], 27_MHz_XTAL/24, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 }
 
 

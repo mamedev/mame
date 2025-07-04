@@ -14,7 +14,7 @@ public:
 	specnext_tiles_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	specnext_tiles_device &set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h - (OVER_BORDER << 1); m_offset_v = offset_v - OVER_BORDER; return *this; }
-	specnext_tiles_device &set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; return *this; }
+	specnext_tiles_device &set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; tilemap_update(); return *this; }
 	specnext_tiles_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);
 	void tilemap_update();
 

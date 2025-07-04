@@ -78,7 +78,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
@@ -151,7 +151,7 @@ private:
 	u8 m_MaxChn = 0x1f; // Max Channels - 1
 	u8 m_ChnClkNum = 0; // Clock Number per Channel
 	u16 m_Ctrl = 0; // 0x602 Control Functions
-	void VR0_RenderAudio(write_stream_view &l, write_stream_view &r);
+	void VR0_RenderAudio(sound_stream &stream);
 };
 
 DECLARE_DEVICE_TYPE(SOUND_VRENDER0, vr0sound_device)

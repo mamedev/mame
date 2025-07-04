@@ -1700,7 +1700,7 @@ void sn76477_device::state_save_register()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void sn76477_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void sn76477_device::sound_stream_update(sound_stream &stream)
 {
 	double one_shot_cap_charging_step;
 	double one_shot_cap_discharging_step;
@@ -1718,8 +1718,6 @@ void sn76477_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	int    attack_decay_cap_charging;
 	double voltage_out;
 	double center_to_peak_voltage_out;
-
-	auto &buffer = outputs[0];
 
 	/* compute charging values, doing it here ensures that we always use the latest values */
 	one_shot_cap_charging_step = compute_one_shot_cap_charging_rate() / m_our_sample_rate;
@@ -1743,7 +1741,7 @@ void sn76477_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 
 	/* process 'samples' number of samples */
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		/* update the one-shot cap voltage */
 		if (!m_one_shot_cap_voltage_ext)
@@ -1995,7 +1993,7 @@ void sn76477_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		    sample = |  ----------- - 1 |
 		              \ Vcen - Vmin    /
 		 */
-		buffer.put(sampindex, ((voltage_out - OUT_LOW_CLIP_THRESHOLD) / (OUT_CENTER_LEVEL_VOLTAGE - OUT_LOW_CLIP_THRESHOLD)) - 1);
+		stream.put(0, sampindex, ((voltage_out - OUT_LOW_CLIP_THRESHOLD) / (OUT_CENTER_LEVEL_VOLTAGE - OUT_LOW_CLIP_THRESHOLD)) - 1);
 
 		if (LOG_WAV && (!m_enable || !LOG_WAV_ENABLED_ONLY))
 		{

@@ -26,19 +26,8 @@ public:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo8);
 	DECLARE_GFXDECODE_MEMBER(gfxinfo4_ram);
 
-	// configuration
-	template <typename... T> void set_zoom_callback(T &&... args) { m_k051316_cb.set(std::forward<T>(args)...); }
-	void set_wrap(int wrap) { m_wrap = wrap; }
-	void set_bpp(int bpp);
-	void set_layermask(int mask) { m_layermask = mask; }
-	void set_offsets(int x_offset, int y_offset)
-	{
-		m_dx = x_offset;
-		m_dy = y_offset;
-	}
-
 	/*
-	The callback is passed:
+	The zoom callback is passed:
 	- code (range 00-FF, contents of the first tilemap RAM byte)
 	- color (range 00-FF, contents of the first tilemap RAM byte). Note that bit 6
 	  seems to be hardcoded as flip X.
@@ -48,6 +37,13 @@ public:
 	  structure (e.g. TILE_FLIPX)
 	*/
 
+	template <typename... T> void set_zoom_callback(T &&... args) { m_k051316_cb.set(std::forward<T>(args)...); }
+	void set_wrap(int wrap) { m_wrap = wrap; }
+	void set_bpp(int bpp);
+	void set_layermask(int mask) { m_layermask = mask; }
+	void set_offsets(int dx, int dy) { m_dx = dx; m_dy = dy; }
+
+	// public interface
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 	u8 rom_r(offs_t offset);

@@ -124,15 +124,14 @@ void stereo_fx_device::device_add_mconfig(machine_config &config)
 	m_cpu->port_in_cb<3>().set(FUNC(stereo_fx_device::p3_r));
 	m_cpu->port_out_cb<3>().set(FUNC(stereo_fx_device::p3_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	ym3812_device &ym3812(YM3812(config, "ym3812", XTAL(3'579'545)));
-	ym3812.add_route(ALL_OUTPUTS, "lspeaker", 1.00);
-	ym3812.add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+	ym3812.add_route(ALL_OUTPUTS, "speaker", 1.00, 0);
+	ym3812.add_route(ALL_OUTPUTS, "speaker", 1.00, 1);
 	/* no CM/S support (empty sockets) */
 
-	DAC_8BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0); // unknown DAC
+	DAC_8BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1); // unknown DAC
 
 	PC_JOY(config, m_joy);
 }

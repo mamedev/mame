@@ -225,8 +225,8 @@ void quadra800_state::macqd800(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^iosb:lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^iosb:rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^iosb:speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^iosb:speaker", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);

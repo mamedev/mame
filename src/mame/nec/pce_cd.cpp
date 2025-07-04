@@ -82,7 +82,7 @@ void pce_cd_device::regs_map(address_map &map)
 pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PCE_CD, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_space_config("io", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(pce_cd_device::regs_map), this))
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_irq_cb(*this)
@@ -263,14 +263,14 @@ void pce_cd_device::device_add_mconfig(machine_config &config)
 	MSM5205(config, m_msm, PCE_CD_CLOCK / 6);
 	m_msm->vck_legacy_callback().set(FUNC(pce_cd_device::msm5205_int)); /* interrupt function */
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 1/48 prescaler, 4bit data */
-	m_msm->add_route(ALL_OUTPUTS, *this, 0.50, AUTO_ALLOC_INPUT, 0);
-	m_msm->add_route(ALL_OUTPUTS, *this, 0.50, AUTO_ALLOC_INPUT, 1);
+	m_msm->add_route(ALL_OUTPUTS, *this, 0.50, 0);
+	m_msm->add_route(ALL_OUTPUTS, *this, 0.50, 1);
 
 	CDDA(config, m_cdda);
 	m_cdda->set_cdrom_tag(m_cdrom);
 	m_cdda->audio_end_cb().set(FUNC(pce_cd_device::cdda_end_mark_cb));
-	m_cdda->add_route(0, *this, 1.00, AUTO_ALLOC_INPUT, 0);
-	m_cdda->add_route(1, *this, 1.00, AUTO_ALLOC_INPUT, 1);
+	m_cdda->add_route(0, *this, 1.00, 0);
+	m_cdda->add_route(1, *this, 1.00, 1);
 }
 
 void pce_cd_device::adpcm_stop(uint8_t irq_flag)

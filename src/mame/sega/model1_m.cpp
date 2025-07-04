@@ -183,8 +183,8 @@ u32 model1_state::copro_sincos_r(offs_t offset)
 {
 	offs_t ang = m_copro_sincos_base + offset * 0x4000;
 	offs_t index = ang & 0x3fff;
-	if(ang & 0x4000)
-		index ^= 0x3fff;
+	if (ang & 0x4000)
+		index = std::min(0x4000 - (int)index, 0x3fff);
 	u32 result = m_copro_tables[index];
 	if(ang & 0x8000)
 		result ^= 0x80000000;

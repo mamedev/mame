@@ -58,8 +58,8 @@ protected:
 	static DWORD const  DEBUG_WINDOW_STYLE = (WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN) & (~WS_MINIMIZEBOX & ~WS_MAXIMIZEBOX);
 	static DWORD const  DEBUG_WINDOW_STYLE_EX = 0;
 
-	static int const    MAX_VIEWS = 4;
 	static int const    EDGE_WIDTH = 3;
+	static int const    MAX_VIEWS = 4;
 
 	enum
 	{

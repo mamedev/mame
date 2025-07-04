@@ -14,12 +14,12 @@
    Copyright (c) 2000      Clark Cooper <coopercc@users.sourceforge.net>
    Copyright (c) 2000-2004 Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
    Copyright (c) 2002-2012 Karl Waclawek <karl@waclawek.net>
-   Copyright (c) 2017-2024 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2017-2025 Sebastian Pipping <sebastian@pipping.org>
    Copyright (c) 2017      Jakub Wilk <jwilk@jwilk.net>
    Copyright (c) 2021      Tomas Korbar <tkorbar@redhat.com>
    Copyright (c) 2021      Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
    Copyright (c) 2022      Thijs Schreijer <thijs@thijsschreijer.nl>
-   Copyright (c) 2023      Hanno Böck <hanno@gentoo.org>
+   Copyright (c) 2023      Hanno BÃ¶ck <hanno@gentoo.org>
    Copyright (c) 2023      Sony Corporation / Snild Dolkow <snild@sony.com>
    Licensed under the MIT license:
 
@@ -52,7 +52,7 @@
   <div>
     <h1>
       The Expat XML Parser
-      <small>Release 2.6.4</small>
+      <small>Release 2.7.1</small>
     </h1>
   </div>
 <div class="content">
@@ -1267,6 +1267,11 @@ call-backs, except when parsing an external parameter entity and
 <code>XML_STATUS_ERROR</code> otherwise.  The possible error codes
 are:</p>
 <dl>
+  <dt><code>XML_ERROR_NOT_STARTED</code></dt>
+  <dd>
+    when stopping or suspending a parser before it has started,
+    added in Expat 2.6.4.
+  </dd>
   <dt><code>XML_ERROR_SUSPENDED</code></dt>
   <dd>when suspending an already suspended parser.</dd>
   <dt><code>XML_ERROR_FINISHED</code></dt>

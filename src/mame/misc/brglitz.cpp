@@ -142,16 +142,15 @@ void brglitz_state::brglitz(machine_config &config)
 	PIC16C55(config, m_soundcpu,   8_MHz_XTAL); // Divider unknown, ZTA 8.00MT resonator
 	PIC16C55(config, m_soundcpu_2, 8_MHz_XTAL); // Divider unknown, ZTA 8.00MT resonator
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	msm6585_device &oki1(MSM6585(config, "oki1", 640_kHz_XTAL)); // CSB 640 P resonator
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.45); // Guess
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.45); // Guess
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.45, 0); // Guess
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.45, 1); // Guess
 
 	msm6585_device &oki2(MSM6585(config, "oki2", 640_kHz_XTAL)); // CSB 640 P resonator
-	oki2.add_route(ALL_OUTPUTS, "lspeaker", 0.45); // Guess
-	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.45); // Guess
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.45, 0); // Guess
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.45, 1); // Guess
 }
 
 ROM_START(brglitz)

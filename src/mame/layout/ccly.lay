@@ -1,0 +1,415 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Vas Crabb
+
+Chong Chong Leyuan control panel
+May or may not match arrangement/colour of real control panel
+-->
+<mamelayout version="2">
+
+	<element name="blank">
+		<rect />
+	</element>
+
+	<element name="warning">
+		<rect>
+			<color red="0" green="0" blue="0" />
+		</rect>
+		<text string="Please set the view to match the Operation Mode DIP switch setting">
+			<bounds x="0.01" y="0.05" width="0.98" height="0.9" />
+		</text>
+	</element>
+
+	<element name="bet" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.15" blue="0.15" />
+		</rect>
+		<text string="BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="bet_dup">
+		<rect>
+			<color red="0.0" green="1.0" blue="1.0" />
+		</rect>
+		<text string="BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="DOUBLE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="start" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.15" blue="0.0" />
+		</rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="TAKE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="start_take">
+		<rect>
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="TAKE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="dup" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.075" blue="0.0" />
+		</rect>
+		<text string="DOUBLE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="take" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.075" blue="0.0" />
+		</rect>
+		<text string="TAKE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="big" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.075" blue="0.0" />
+		</rect>
+		<text string="BIG">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="DOUBLE×2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="bigb">
+		<rect>
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<text string="BIG">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="DOUBLE×2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="small" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.075" blue="0.0" />
+		</rect>
+		<text string="SMALL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="DOUBLE×½">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="smallb">
+		<rect>
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<text string="SMALL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="DOUBLE×½">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="stop1">
+		<rect>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="STOP 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="stop2">
+		<rect>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="STOP 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="stop3">
+		<rect>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="STOP 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="bet_b" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.7" blue="0.7" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.1" blue="0.1" />
+		</rect>
+	</element>
+
+	<element name="bet_dup_b">
+		<rect>
+			<color red="0.0" green="0.7" blue="0.7" />
+		</rect>
+	</element>
+
+	<element name="start_b" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.7" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.1" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="start_take_b">
+		<rect>
+			<color red="0.0" green="0.7" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="dup_b" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.35" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.05" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="big_b">
+		<rect>
+			<color red="0.7" green="0.35" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="stop_b">
+		<rect>
+			<color red="0.7" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<group name="cpanel">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<element ref="blank">
+			<bounds left="0" right="4" top="3" bottom="3.40" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</element>
+		<element ref="blank">
+			<bounds left="0" right="4" top="3.01" bottom="3.39" />
+			<color red="0.20" green="0.20" blue="0.20" />
+		</element>
+		<element ref="blank">
+			<bounds left="0" right="4" top="3.02" bottom="3.38" />
+			<color red="0.15" green="0.15" blue="0.15" />
+		</element>
+		<element ref="blank">
+			<bounds left="0" right="4" top="3.03" bottom="3.37" />
+			<color red="0.10" green="0.10" blue="0.10" />
+		</element>
+		<element ref="blank">
+			<bounds left="0" right="4" top="3.04" bottom="3.36" />
+			<color red="0.05" green="0.05" blue="0.05" />
+		</element>
+		<element ref="blank">
+			<bounds left="0" right="4" top="3.05" bottom="3.35" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</element>
+	</group>
+
+	<view name="Amusement">
+		<group ref="cpanel" />
+
+		<element ref="bet_dup_b" inputtag="PORTC" inputmask="0x04">
+			<bounds x="0.025" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element ref="bet_dup" inputtag="PORTC" inputmask="0x04">
+			<bounds x="0.045" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element ref="stop_b" inputtag="PLAYER" inputmask="0x00004">
+			<bounds x="0.625" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element ref="stop1" inputtag="PLAYER" inputmask="0x00004">
+			<bounds x="0.645" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element ref="stop_b" inputtag="PORTB" inputmask="0x02">
+			<bounds x="1.175" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element ref="stop2" inputtag="PORTB" inputmask="0x02">
+			<bounds x="1.195" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element ref="stop_b" inputtag="PLAYER" inputmask="0x00002">
+			<bounds x="1.725" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element ref="stop3" inputtag="PLAYER" inputmask="0x00002">
+			<bounds x="1.745" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element ref="big_b" inputtag="PORTC" inputmask="0x08">
+			<bounds x="2.325" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element ref="bigb" inputtag="PORTC" inputmask="0x08">
+			<bounds x="2.345" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element ref="big_b" inputtag="PORTB" inputmask="0x80">
+			<bounds x="2.875" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element ref="smallb" inputtag="PORTB" inputmask="0x80">
+			<bounds x="2.895" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element ref="start_take_b" inputtag="PORTC" inputmask="0x10">
+			<bounds x="3.475" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element ref="start_take" inputtag="PORTC" inputmask="0x10">
+			<bounds x="3.495" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element ref="warning">
+			<bounds left="0" right="4" top="3.05" bottom="3.35" />
+			<animate inputtag="DSW2" mask="0x01" />
+			<color state="0" alpha="1" />
+			<color state="1" alpha="0" />
+		</element>
+	</view>
+
+	<view name="Fruit Machine">
+		<group ref="cpanel" />
+
+		<element ref="bet_b" name="lamp3" inputtag="PORTB" inputmask="0x02">
+			<bounds x="0.00" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element ref="bet" name="lamp3" inputtag="PORTB" inputmask="0x02">
+			<bounds x="0.02" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element ref="stop_b" inputtag="PLAYER" inputmask="0x00001">
+			<bounds x="0.45" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element ref="stop1" inputtag="PLAYER" inputmask="0x00001">
+			<bounds x="0.47" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element ref="stop_b" inputtag="PLAYER" inputmask="0x00002">
+			<bounds x="0.90" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element ref="stop2" inputtag="PLAYER" inputmask="0x00002">
+			<bounds x="0.92" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element ref="stop_b" inputtag="PLAYER" inputmask="0x00004">
+			<bounds x="1.35" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element ref="stop3" inputtag="PLAYER" inputmask="0x00004">
+			<bounds x="1.37" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element ref="dup_b" name="lamp5" inputtag="PLAYER" inputmask="0x00020">
+			<bounds x="1.80" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element ref="dup" name="lamp5" inputtag="PLAYER" inputmask="0x00020">
+			<bounds x="1.82" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element ref="dup_b" name="lamp4" inputtag="PLAYER" inputmask="0x00010">
+			<bounds x="2.25" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element ref="take" name="lamp4" inputtag="PLAYER" inputmask="0x00010">
+			<bounds x="2.27" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element ref="dup_b" name="lamp6" inputtag="PORTB" inputmask="0x80">
+			<bounds x="2.70" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element ref="big" name="lamp6" inputtag="PORTB" inputmask="0x80">
+			<bounds x="2.72" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element ref="dup_b" name="lamp2" inputtag="PLAYER" inputmask="0x00008">
+			<bounds x="3.15" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element ref="small" name="lamp2" inputtag="PLAYER" inputmask="0x00008">
+			<bounds x="3.17" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element ref="start_b" name="lamp1" inputtag="PORTC" inputmask="0x04">
+			<bounds x="3.60" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element ref="start" name="lamp1" inputtag="PORTC" inputmask="0x04">
+			<bounds x="3.62" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element ref="warning">
+			<bounds left="0" right="4" top="3.05" bottom="3.35" />
+			<animate inputtag="DSW2" mask="0x01" />
+			<color state="0" alpha="0" />
+			<color state="1" alpha="1" />
+		</element>
+	</view>
+</mamelayout>

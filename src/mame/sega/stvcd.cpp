@@ -101,7 +101,7 @@ DEFINE_DEVICE_TYPE(STVCD, stvcd_device, "stvcd", "Sega Saturn/ST-V CD Block HLE"
 
 stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, STVCD, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("regs", ENDIANNESS_LITTLE, 32, 20, 0, address_map_constructor(FUNC(stvcd_device::io_regs), this))
 	, m_cdrom_image(*this, "cdrom")
@@ -120,8 +120,8 @@ void stvcd_device::device_add_mconfig(machine_config &config)
 	TIMER(config, m_sh1_timer).configure_generic(FUNC(stvcd_device::stv_sh1_sim));
 
 	CDDA(config, m_cdda);
-	m_cdda->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_cdda->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_cdda->add_route(0, *this, 1.0, 0);
+	m_cdda->add_route(1, *this, 1.0, 1);
 	m_cdda->set_cdrom_tag("cdrom");
 }
 

@@ -288,6 +288,11 @@ ROM_START( pdc100 )
 	ROM_IGNORE(0x4000000)
 ROM_END
 
+ROM_START( pdc30p )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "pdc_pink.u2", 0x000000, 0x1000000, CRC(cd12c6c3) SHA1(5b423d589358dd53a2e5765bcb94da2d44200e56) )
+ROM_END
+
 ROM_START( pdc50 )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "pdc50_7050.u3", 0x000000, 0x1000000, CRC(9b4eb348) SHA1(81d2ff5af7b6dc5e1f9277b45f259762e7d24cce) )
@@ -311,6 +316,10 @@ ROM_START( pdc150t )
 	ROM_LOAD16_WORD_SWAP( "pdc5070.bin", 0x000000, 0x8000000, CRC(b10e9f29) SHA1(551d62a9ffc18159f7ace12e4363223e0c5cf3c8) )
 ROM_END
 
+ROM_START( ouipdc )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "pdc_ouioui.u2", 0x000000, 0x1000000, CRC(ddcd03ab) SHA1(de0695c240fdc2edc67694ceacaed093e6693767) )
+ROM_END
 
 ROM_START( tmntpdc )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -340,19 +349,25 @@ ROM_END
 // + more
 
 // This was dumped from an Anncia branded unit, although there's no ingame branding, so ROM is probably the same for all PDC100 units
-CONS( 2008, pdc100,  0,         0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / Anncia",   "PDC100 - Pocket Dream Console (Anncia, US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, pdc100,  0,         0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / Anncia",   "PDC100 - Pocket Dream Console (Anncia, US)", MACHINE_IMPERFECT_SOUND )
+
+// there seem to be at least 3 different pink PDC30 units, possibly with different games / software revisions
+// design differences can be seen in the packaging and d-pad style at least
+CONS( 2008, pdc30p,  0,         0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "PDC30 - Pocket Dream Console (Pink version) (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
 
 // interestingly this is newer than the PDC100 above, despite containing fewer games
-CONS( 2010, pdc50,    0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "PDC50 - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, pdc50,    0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "PDC50 - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2012, pdc200,   0,        0, pdc100,      pdc100,       spg2xx_pdc200_game_state,  init_pdc150t, "Conny / VideoJet", "PDC200 - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, pdc200,   0,        0, pdc100,      pdc100,       spg2xx_pdc200_game_state,  init_pdc150t, "Conny / VideoJet", "PDC200 - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2011, pdc40t,   0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc_game_state,     init_pdc40t,  "Conny / VideoJet", "PDC40 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs touch input
+CONS( 2011, pdc40t,   0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc_game_state,     init_pdc40t,  "Conny / VideoJet", "PDC40 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2011, pdc150t,  0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc150t_game_state, init_pdc150t, "Conny / VideoJet", "PDC150 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs touch input
+CONS( 2011, pdc150t,  0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc150t_game_state, init_pdc150t, "Conny / VideoJet", "PDC150 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2013, tmntpdc,  0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Teenage Mutant Ninja Turtles - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, ouipdc,   0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Oui-Oui - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2013, dorapdc,  0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Dora l'exploratrice - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2013, tmntpdc,  0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Teenage Mutant Ninja Turtles - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, vjpp2,    0,        0, pdc100,      vjpp2,        spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Plug Play TV Games 2 (4-in-1) (VideoJet, France)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2013, dorapdc,  0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Dora l'exploratrice - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 200?, vjpp2,    0,        0, pdc100,      vjpp2,        spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Plug Play TV Games 2 (4-in-1) (VideoJet, France)", MACHINE_IMPERFECT_SOUND )

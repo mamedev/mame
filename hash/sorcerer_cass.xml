@@ -1171,6 +1171,7 @@ Compiled by Robbbert
 		<description>Wilderness</description>
 		<year>1980</year>
 		<publisher>Dick Smith Electronics</publisher>
+		<info name="developer" value="Robert Cox and John Connor"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="16216806">

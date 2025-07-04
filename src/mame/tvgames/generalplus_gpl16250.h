@@ -30,6 +30,7 @@ public:
 	}
 
 	void base(machine_config &config);
+	void base_alt_irq(machine_config &config);
 
 	void cs_map_base(address_map &map) ATTR_COLD;
 

@@ -437,7 +437,7 @@ void spg110_video_device::update_video_irqs()
 
 
 void spg110_video_device::vcomp_val_201c_w(uint16_t data) { LOG("%s: vcomp_val_201c_w: %04x\n", machine().describe_context(), data); } // during startup text only
-void spg110_video_device::segment_202x_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_tilebase[offset]); LOG("%s: segment/tilebase write: %02x %04x\n", machine().describe_context(), offset, data); } // confirmed as tile base, seems to apply to both layers and sprites, unlike spg2xx which has separate registers
+void spg110_video_device::segment_202x_w(offs_t offset, uint16_t data) { m_tilebase[offset] = data; LOG("%s: segment/tilebase write: %02x %04x\n", machine().describe_context(), offset, data); } // confirmed as tile base, seems to apply to both layers and sprites, unlike spg2xx which has separate registers
 
 void spg110_video_device::adr_mode_2028_w(uint16_t data) { LOG("%s: adr_mode_2028_w: %04x\n", machine().describe_context(), data); } // startup
 uint16_t spg110_video_device::adr_mode_2028_r() { return 0x0000; }
@@ -507,19 +507,19 @@ void spg110_video_device::spg110_2045_w(uint16_t data)
 	LOG("%s: spg110_2045_w: %04x\n", machine().describe_context(), data);
 }
 
-void spg110_video_device::transparent_color_205x_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void spg110_video_device::transparent_color_205x_w(offs_t offset, uint16_t data)
 {
-	COMBINE_DATA(&m_palctrlram[offset]);
+	m_palctrlram[offset] = data;
 }
 
-void spg110_video_device::dma_dst_seg_2061_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst_seg); }
-void spg110_video_device::dma_dst_step_2064_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst_step); }
-void spg110_video_device::dma_source_seg_2067_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src_seg); }
-void spg110_video_device::dma_src_step_2068_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src_step); }
-uint16_t spg110_video_device::dma_src_step_2068_r(offs_t offset, uint16_t mem_mask) { return m_dma_src_step; }
+void spg110_video_device::dma_dst_seg_2061_w(offs_t offset, uint16_t data) { m_dma_dst_seg = data; }
+void spg110_video_device::dma_dst_step_2064_w(offs_t offset, uint16_t data) { m_dma_dst_step = data; }
+void spg110_video_device::dma_source_seg_2067_w(offs_t offset, uint16_t data) { m_dma_src_seg = data; }
+void spg110_video_device::dma_src_step_2068_w(offs_t offset, uint16_t data) { m_dma_src_step = data; }
+uint16_t spg110_video_device::dma_src_step_2068_r(offs_t offset) { return m_dma_src_step; }
 
-void spg110_video_device::dma_dst_2060_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst); }
-void spg110_video_device::dma_source_2066_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src); }
+void spg110_video_device::dma_dst_2060_w(offs_t offset, uint16_t data) { m_dma_dst = data; }
+void spg110_video_device::dma_source_2066_w(offs_t offset, uint16_t data) { m_dma_src = data; }
 
 void spg110_video_device::dma_len_trigger_2062_w(uint16_t data)
 {
@@ -886,7 +886,7 @@ TIMER_CALLBACK_MEMBER(spg110_video_device::screenpos_hit)
 	m_screenpos_timer->adjust(m_screen->time_until_pos(m_tm_v_2036, m_tm_h_2037));
 }
 
-void spg110_video_device::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void spg110_video_device::palette_w(offs_t offset, uint16_t data)
 {
 	auto rgb = hsl_to_rgb(data);
 	m_palette->set_pen_color(offset, std::get<0>(rgb), std::get<1>(rgb), std::get<2>(rgb));

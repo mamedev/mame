@@ -91,7 +91,7 @@ void mmc5_sound_device::device_start()
 	*/
 	for (int i = 0; i < 31; i++)
 	{
-		stream_buffer::sample_t pulse_out = (i == 0) ? 0.0 : 95.88 / ((8128.0 / i) + 100.0);
+		sound_stream::sample_t pulse_out = (i == 0) ? 0.0 : 95.88 / ((8128.0 / i) + 100.0);
 		m_square_lut[i] = pulse_out;
 	}
 
@@ -297,19 +297,18 @@ void mmc5_sound_device::pcm_w(u8 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void mmc5_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void mmc5_sound_device::sound_stream_update(sound_stream &stream)
 {
-	stream_buffer::sample_t accum = 0.0;
-	auto &output = outputs[0];
+	sound_stream::sample_t accum = 0.0;
 
-	for (int sampindex = 0; sampindex < output.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		tick_square(m_core.squ[0]);
 		tick_square(m_core.squ[1]);
 
 		accum = m_square_lut[m_core.squ[0].output + m_core.squ[1].output];
-		accum += stream_buffer::sample_t(m_core.pcm.output) / 255.0f;
+		accum += sound_stream::sample_t(m_core.pcm.output) / 255.0f;
 
-		output.put(sampindex, -accum);
+		stream.put(0, sampindex, -accum);
 	}
 }

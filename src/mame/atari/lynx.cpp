@@ -118,12 +118,11 @@ void lynx_state::lynx2(machine_config &config)
 
 	/* sound hardware */
 	config.device_remove("mono");
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	LYNX2_SND(config.replace(), m_sound, XTAL(16'000'000));
 	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb));
-	m_sound->add_route(0, "lspeaker", 0.50);
-	m_sound->add_route(1, "rspeaker", 0.50);
+	m_sound->add_route(0, "speaker", 0.50, 0);
+	m_sound->add_route(1, "speaker", 0.50, 1);
 }
 #endif
 

@@ -23,14 +23,13 @@ public:
 	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k052109_device() {}
 
+	// configuration
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto firq_handler() { return m_firq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
-	template <typename... T> void set_tile_callback(T &&... args) { m_k052109_cb.set(std::forward<T>(args)...); }
-	void set_char_ram(bool ram);
 
 	/*
-	The callback is passed:
+	The tile callback is passed:
 	- layer number (0 = FIX, 1 = A, 2 = B)
 	- bank (range 0-3, output of the pins CAB1 and CAB2)
 	- code (range 00-FF, output of the pins VC3-VC10)
@@ -44,24 +43,24 @@ public:
 	chip so it must not be set by the callback.
 	*/
 
+	template <typename... T> void set_tile_callback(T &&... args) { m_k052109_cb.set(std::forward<T>(args)...); }
+	void set_char_ram(bool ram) { set_info(ram ? gfxinfo_ram : gfxinfo); }
+
+	// public interface
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
-	void set_rmrd_line(int state);
-	int get_rmrd_line();
+	void set_rmrd_line(int state) { m_rmrd_line = state; }
+	int get_rmrd_line() { return m_rmrd_line; }
 	void tilemap_update();
-	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags = 0, uint8_t priority = 0, uint8_t priority_mask = 0xff);
 	void mark_tilemap_dirty(uint8_t tmap_num);
-
-	void vblank_callback(screen_device &screen, bool state);
-
-	void set_xy_offset(int dx, int dy);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_post_load() override;
+	virtual void device_post_load() override { tileflip_reset(); }
 
 private:
 	// internal state
@@ -82,10 +81,8 @@ private:
 	uint8_t    m_charrombank_2[4];
 	uint8_t    m_has_extra_video_ram;
 	int32_t    m_rmrd_line;
-	uint8_t    m_irq_enabled;
+	uint8_t    m_irq_control;
 	uint8_t    m_romsubbank, m_scrollctrl, m_addrmap;
-
-	int        m_dx, m_dy;
 
 	optional_region_ptr<uint8_t> m_char_rom;
 
@@ -95,12 +92,20 @@ private:
 	devcb_write_line m_firq_handler;
 	devcb_write_line m_nmi_handler;
 
+	emu_timer *m_firq_scanline;
+	emu_timer *m_nmi_scanline;
+
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
+	TILE_BLITTER_MEMBER(tile_blitter);
 
-	void get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2 );
+	void get_tile_info(tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2);
 	void tileflip_reset();
+
+	void vblank_callback(screen_device &screen, bool state);
+	TIMER_CALLBACK_MEMBER(firq_scanline);
+	TIMER_CALLBACK_MEMBER(nmi_scanline);
 };
 
 DECLARE_DEVICE_TYPE(K052109, k052109_device)

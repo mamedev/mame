@@ -48,7 +48,7 @@ void a800_rom_telelink2_device::device_reset()
 void a800_rom_telelink2_device::cart_map(address_map &map)
 {
 	// 4-bit NVRAM
-	map(0x1000, 0x10ff).lrw8(
+	map(0x1000, 0x10ff).mirror(0xf00).lrw8(
 		NAME([this](offs_t offset) { return m_nvram_ptr[offset & 0xff]; }),
 		NAME([this](offs_t offset, u8 data) { m_nvram_ptr[offset & 0xff] = data | 0xf0; })
 	);

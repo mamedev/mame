@@ -1951,15 +1951,14 @@ void segas24_state::system24(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(8192*2);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
 	ymsnd.irq_handler().set(FUNC(segas24_state::irq_ym));
-	ymsnd.add_route(0, "lspeaker", 0.50);
-	ymsnd.add_route(1, "rspeaker", 0.50);
+	ymsnd.add_route(0, "speaker", 0.50, 0);
+	ymsnd.add_route(1, "speaker", 0.50, 1);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1); // unknown DAC
 }
 
 void segas24_state::system24_rom(machine_config &config)

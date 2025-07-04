@@ -364,6 +364,15 @@ ROM_START(mahg156)
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
 
+ROM_START(mdhh100)
+	ROM_REGION(0x8000000, "mainrom", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "s29gl01gp11tfir1.u13", 0x0000,  0x8000000, CRC(564ab33a) SHA1(e455aaa9ed6f302d1ebe55b5202f983af612c415) )
+
+	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_COPY( "mainrom", 0x7800000, 0x00000, 0x200000) // DMC RedKid (Menu, requires unusual rendering mode?)
+
+	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
+ROM_END
 
 ROM_START(megajet)
 	ROM_REGION(MD_CPU_REGION_SIZE, "maincpu", ROMREGION_ERASEFF)
@@ -510,21 +519,21 @@ void md_cons_state::genesis_32x(machine_config &config)
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
 	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback));
 	m_vdp->reset_routes();
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.50)/2);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.50)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", (0.50)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", (0.50)/2);
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_screen("megadriv");
-	m_32x->add_route(0, "lspeaker", 1.00);
-	m_32x->add_route(1, "rspeaker", 1.00);
+	m_32x->add_route(0, "speaker", 1.00);
+	m_32x->add_route(1, "speaker", 1.00);
 
 	m_screen->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the YM because the balance is different
 	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
-	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
-	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
+	m_ymsnd->add_route(0, "speaker", (0.50)/2);
+	m_ymsnd->add_route(1, "speaker", (0.50)/2);
 
 	md_ctrl_ports(config);
 	md_exp_port(config);
@@ -545,21 +554,21 @@ void md_cons_state::mdj_32x(machine_config &config)
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
 	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback));
 	m_vdp->reset_routes();
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.50)/2);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.50)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", (0.50)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", (0.50)/2);
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_screen("megadriv");
-	m_32x->add_route(0, "lspeaker", 1.00);
-	m_32x->add_route(1, "rspeaker", 1.00);
+	m_32x->add_route(0, "speaker", 1.00);
+	m_32x->add_route(1, "speaker", 1.00);
 
 	m_screen->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
-	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
-	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
+	m_ymsnd->add_route(0, "speaker", (0.50)/2);
+	m_ymsnd->add_route(1, "speaker", (0.50)/2);
 
 	md_ctrl_ports(config);
 	md_exp_port(config);
@@ -580,21 +589,21 @@ void md_cons_state::md_32x(machine_config &config)
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
 	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback));
 	m_vdp->reset_routes();
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.50)/2);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.50)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", (0.50)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", (0.50)/2);
 
 	SEGA_32X_PAL(config, m_32x, (MASTER_CLOCK_PAL * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_screen("megadriv");
-	m_32x->add_route(0, "lspeaker", 1.00);
-	m_32x->add_route(1, "rspeaker", 1.00);
+	m_32x->add_route(0, "speaker", 1.00);
+	m_32x->add_route(1, "speaker", 1.00);
 
 	m_screen->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
-	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
-	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
+	m_ymsnd->add_route(0, "speaker", (0.50)/2);
+	m_ymsnd->add_route(1, "speaker", (0.50)/2);
 
 	md_ctrl_ports(config);
 	md_exp_port(config);
@@ -1083,7 +1092,11 @@ CONS( 1993, laseract,     0,        0,      genesis_scd,     md,       md_cons_c
 CONS( 1993, laseractj,    laseract, 0,      mdj_scd,         md,       md_cons_cd_state, init_md_jpn,  "Pioneer / Sega","LaserActive with Mega Drive Pack PAC-S1 (Japan, NTSC)", MACHINE_NOT_WORKING )
 //TODO: it has also PC Engine Pack(PAC-N1)/TG16 Pack(PAC-N10) for plays PC Engine/TG16 Cartridge, (Super/Arcade) CD-ROM2/TurboGrafx-CD, LD-ROM2 stuffs, but not emulated.
 
+// these might be better placed in megadriv_rad.cpp (which contains some other clone hardware)
+
 /* clone hardware - not sure if this hardware is running some kind of emulator, or enhanced MD clone, or just custom banking */
 CONS( 200?, dcat16,       0,        0,      dcat16_megadriv, md,       md_cons_slot_state, init_genesis, "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )
 // seems to be based on the AT games units, requires custom mode for menu?
 CONS( 201?, mahg156,      0,        0,      dcat16_megadriv, md,       md_cons_slot_state, init_genesis, "<unknown>",   "Mini Arcade Handheld Game Console 2.8 Inch Screen Built in 156 Retro Games (Mega Drive handheld)",  MACHINE_NOT_WORKING )
+// game-boy like handheld, pink in colour, 6 button controller (+ home select, start, vol buttons)
+CONS( 201?, mdhh100,      0,        0,      dcat16_megadriv, md,       md_cons_slot_state, init_genesis, "<unknown>",   "unknown 100-in-1 handheld (Mega Drive based)",  MACHINE_NOT_WORKING )

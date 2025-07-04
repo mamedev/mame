@@ -33,7 +33,7 @@
     to poke: p, input data (dec), enter  (repeats)
     to quit: q, enter
 
-    normal saves are useable independant of the interface,
+    normal saves are useable independent of the interface,
     "turbo" saves need the interface present, must use l or L options to load.
 
     Lots of info including schematic and rom disassembly:

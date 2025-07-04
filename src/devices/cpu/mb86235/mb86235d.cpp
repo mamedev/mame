@@ -98,19 +98,19 @@ void mb86235_disassembler::dasm_ea(std::ostream &stream, int md, int arx, int ar
 		case 0x0: util::stream_format(stream, "@AR%d", arx); break;
 		case 0x1: util::stream_format(stream, "@AR%d++", arx); break;
 		case 0x2: util::stream_format(stream, "@AR%d--", arx); break;
-		case 0x3: util::stream_format(stream, "@AR%d++%04X", arx, disp); break;
+		case 0x3: util::stream_format(stream, "@AR%d++%XH", arx, disp); break;
 		case 0x4: util::stream_format(stream, "@AR%d+AR%d", arx, ary); break;
 		case 0x5: util::stream_format(stream, "@AR%d+AR%d++", arx, ary); break;
 		case 0x6: util::stream_format(stream, "@AR%d+AR%d--", arx, ary); break;
-		case 0x7: util::stream_format(stream, "@AR%d+AR%d++%04X", arx, ary, disp); break;
+		case 0x7: util::stream_format(stream, "@AR%d+AR%d++%XH", arx, ary, disp); break;
 		case 0x8: util::stream_format(stream, "@AR%d+AR%dU", arx, ary); break;
 		case 0x9: util::stream_format(stream, "@AR%d+AR%dL", arx, ary); break;
-		case 0xa: util::stream_format(stream, "@AR%d+%04X", arx, disp); break;
-		case 0xb: util::stream_format(stream, "@AR%d+AR%d+%04X", arx, ary, disp); break;
-		case 0xc: util::stream_format(stream, "%04X", disp); break;
+		case 0xa: util::stream_format(stream, "@AR%d+%XH", arx, disp); break;
+		case 0xb: util::stream_format(stream, "@AR%d+AR%d+%XH", arx, ary, disp); break;
+		case 0xc: util::stream_format(stream, "%XH", disp); break;
 		case 0xd: util::stream_format(stream, "@AR%d+[AR%d++]", arx, ary); break;
 		case 0xe: util::stream_format(stream, "@AR%d+[AR%d--]", arx, ary); break;
-		case 0xf: util::stream_format(stream, "@AR%d+[AR%d++%04X]", arx, ary, disp); break;
+		case 0xf: util::stream_format(stream, "@AR%d+[AR%d++%XH]", arx, ary, disp); break;
 	}
 
 	stream << ')';
@@ -145,9 +145,9 @@ void mb86235_disassembler::dasm_alu_mul(std::ostream &stream, uint64_t opcode, b
 				break;
 			case 0x07: stream << "NOP";
 				break;
-			case 0x08: util::stream_format(stream, "FEA %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
+			case 0x08: util::stream_format(stream, "FEA %s, #%XH, %s", ai1_field[i1], i2, mo_field[o]);
 				break;
-			case 0x09: util::stream_format(stream, "FES %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
+			case 0x09: util::stream_format(stream, "FES %s, #%XH, %s", ai1_field[i1], i2, mo_field[o]);
 				break;
 			case 0x0a: util::stream_format(stream, "FRCP %s, %s", ai1_field[i1], mo_field[o]);
 				break;
@@ -185,13 +185,13 @@ void mb86235_disassembler::dasm_alu_mul(std::ostream &stream, uint64_t opcode, b
 				break;
 			case 0x1b: util::stream_format(stream, "NOT %s, %s", ai1_field[i1], mo_field[o]);
 				break;
-			case 0x1c: util::stream_format(stream, "LSR %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
+			case 0x1c: util::stream_format(stream, "LSR %s, #%XH, %s", ai1_field[i1], i2, mo_field[o]);
 				break;
-			case 0x1d: util::stream_format(stream, "LSL %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
+			case 0x1d: util::stream_format(stream, "LSL %s, #%XH, %s", ai1_field[i1], i2, mo_field[o]);
 				break;
-			case 0x1e: util::stream_format(stream, "ASR %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
+			case 0x1e: util::stream_format(stream, "ASR %s, #%XH, %s", ai1_field[i1], i2, mo_field[o]);
 				break;
-			case 0x1f: util::stream_format(stream, "ASL %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
+			case 0x1f: util::stream_format(stream, "ASL %s, #%XH, %s", ai1_field[i1], i2, mo_field[o]);
 				break;
 		}
 	}
@@ -236,13 +236,13 @@ offs_t mb86235_disassembler::dasm_control(std::ostream &stream, uint32_t pc, uin
 			break;
 		case 0x01:
 			if (ef1 == 0)
-				util::stream_format(stream, "REP #%04X", ef2);
+				util::stream_format(stream, "REP #%04XH", ef2);
 			else
 				util::stream_format(stream, "REP AR%d", (ef2 >> 12) & 7);
 			break;
 		case 0x02:
 			if (ef1 == 0)
-				util::stream_format(stream, "SETL #%04X", ef2);
+				util::stream_format(stream, "SETL #%04XH", ef2);
 			else
 				util::stream_format(stream, "SETL AR%d", (ef2 >> 12) & 7);
 			break;
@@ -261,32 +261,32 @@ offs_t mb86235_disassembler::dasm_control(std::ostream &stream, uint32_t pc, uin
 			util::stream_format(stream, "POP %s", regname[(ef2 >> 6) & 0x3f]);
 			break;
 		case 0x08:
-			util::stream_format(stream, "SETM #%04X", ef2);
+			util::stream_format(stream, "SETM #%04XH", ef2);
 			break;
 		case 0x09:
-			util::stream_format(stream, "SETM #%01X, CBSA", (ef2 >> 12) & 7);
+			util::stream_format(stream, "SETM #%Xh, CBSA", (ef2 >> 12) & 7);
 			break;
 		case 0x0a:
-			util::stream_format(stream, "SETM #%01X, CBSB", (ef2 >> 8) & 7);
+			util::stream_format(stream, "SETM #%Xh, CBSB", (ef2 >> 8) & 7);
 			break;
 		case 0x0b:
-			util::stream_format(stream, "SETM #%d, RF", (ef2 >> 7) & 1);
+			util::stream_format(stream, "SETM #%Xh, RF", (ef2 >> 7) & 1);
 			break;
 		case 0x0c:
-			util::stream_format(stream, "SETM #%d, RDY", (ef2 >> 4) & 1);
+			util::stream_format(stream, "SETM #%Xh, RDY", (ef2 >> 4) & 1);
 			break;
 		case 0x0d:
-			util::stream_format(stream, "SETM #%01X, WAIT", ef2 & 7);
+			util::stream_format(stream, "SETM #%Xh, WAIT", ef2 & 7);
 			break;
 		case 0x13:
-			util::stream_format(stream, "DBLP %04X", pc + rel12);
+			util::stream_format(stream, "DBLP %03X", pc + rel12);
 			break;
 		case 0x14:
-			util::stream_format(stream, "DBBC AR%d:%d, %04X", (uint32_t)((opcode >> 13) & 7), (uint32_t)((opcode >> 16) & 0xf), pc + rel12);
+			util::stream_format(stream, "DBBC AR%d:%d, %03X", (uint32_t)((opcode >> 13) & 7), (uint32_t)((opcode >> 16) & 0xf), pc + rel12);
 			flags = STEP_COND | step_over_extra(1);
 			break;
 		case 0x15:
-			util::stream_format(stream, "DBBS AR%d:%d, %04X", (uint32_t)((opcode >> 13) & 7), (uint32_t)((opcode >> 16) & 0xf), pc + rel12);
+			util::stream_format(stream, "DBBS AR%d:%d, %03X", (uint32_t)((opcode >> 13) & 7), (uint32_t)((opcode >> 16) & 0xf), pc + rel12);
 			flags = STEP_COND | step_over_extra(1);
 			break;
 		case 0x1b:
@@ -332,7 +332,7 @@ offs_t mb86235_disassembler::dasm_control(std::ostream &stream, uint32_t pc, uin
 			switch ((opcode >> 12) & 0xf)
 			{
 				case 0x0: util::stream_format(stream, "%03X", ef2 & 0xfff); break;
-				case 0x1: util::stream_format(stream, "%04X", pc + rel12); break;
+				case 0x1: util::stream_format(stream, "%03X", pc + rel12); break;
 				case 0x2: util::stream_format(stream, "%s", regname[(ef2 >> 6) & 0x3f]); break;
 				case 0x3: util::stream_format(stream, "+%s", regname[(ef2 >> 6) & 0x3f]); break;
 				case 0x4: util::stream_format(stream, "%s", regname[(ef2 >> 6) & 0x3f]); break;
@@ -450,7 +450,7 @@ void mb86235_disassembler::dasm_xfer1(std::ostream &stream, uint64_t opcode)
 	{
 		if (sr == 0x58)
 		{
-			util::stream_format(stream, "#%03X, %s", (uint32_t)(opcode & 0xfff), regname[dr]);
+			util::stream_format(stream, "#%XH, %s", (uint32_t)(opcode & 0xfff), regname[dr]);
 		}
 		else
 		{
@@ -476,11 +476,17 @@ void mb86235_disassembler::dasm_xfer1(std::ostream &stream, uint64_t opcode)
 			else
 				dasm_ea(stream, md, dr, ary, disp5);
 
-			util::stream_format(stream, "E(@EB+EO++%02X)", sr);
+			if (sr & 0x20)
+				util::stream_format(stream, "E(@EB+EO++-%XH)", 0x40 - (sr & 0x3f));
+			else
+				util::stream_format(stream, "E(@EB+EO++%XH)", sr & 0x3f);
 		}
 		else
 		{
-			util::stream_format(stream, "E(@EB+EO++%02X), ", sr);
+			if (sr & 0x20)
+				util::stream_format(stream, "E(@EB+EO++-%XH), ", 0x40 - (sr & 0x3f));
+			else
+				util::stream_format(stream, "E(@EB+EO++%XH), ", sr & 0x3f);
 
 			if ((dr & 0x40) == 0)
 				stream << regname[dr];
@@ -580,22 +586,22 @@ void mb86235_disassembler::dasm_double_xfer2(std::ostream &stream, uint64_t opco
 
 		switch (bmd)
 		{
-			case 0x0: util::stream_format(stream, "B(@BAR%d)", barx); break;
-			case 0x1: util::stream_format(stream, "B(@BAR%d++)", barx); break;
-			case 0x2: util::stream_format(stream, "B(@BAR%d--)", barx); break;
-			case 0x3: util::stream_format(stream, "B(@BAR%d++%02X)", barx, disp3); break;
-			case 0x4: util::stream_format(stream, "B(@BAR%d+BAR%d)", barx, bary); break;
-			case 0x5: util::stream_format(stream, "B(@BAR%d+BAR%d++)", barx, bary); break;
-			case 0x6: util::stream_format(stream, "B(@BAR%d+BAR%d--)", barx, bary); break;
-			case 0x7: util::stream_format(stream, "B(@BAR%d+BAR%d++%02X)", barx, bary, disp3); break;
-			case 0x8: util::stream_format(stream, "B(@BAR%d+BAR%dU)", barx, bary); break;
-			case 0x9: util::stream_format(stream, "B(@BAR%d+BAR%dL)", barx, bary); break;
-			case 0xa: util::stream_format(stream, "B(@BAR%d+%02X)", barx, disp3); break;
-			case 0xb: util::stream_format(stream, "B(@BAR%d+BAR%d+%02X)", barx, bary, disp3); break;
+			case 0x0: util::stream_format(stream, "B(@AR%d)", barx); break;
+			case 0x1: util::stream_format(stream, "B(@AR%d++)", barx); break;
+			case 0x2: util::stream_format(stream, "B(@AR%d--)", barx); break;
+			case 0x3: util::stream_format(stream, "B(@AR%d++%XH)", barx, disp3); break;
+			case 0x4: util::stream_format(stream, "B(@AR%d+AR%d)", barx, bary); break;
+			case 0x5: util::stream_format(stream, "B(@AR%d+AR%d++)", barx, bary); break;
+			case 0x6: util::stream_format(stream, "B(@AR%d+AR%d--)", barx, bary); break;
+			case 0x7: util::stream_format(stream, "B(@AR%d+AR%d++%XH)", barx, bary, disp3); break;
+			case 0x8: util::stream_format(stream, "B(@AR%d+AR%dU)", barx, bary); break;
+			case 0x9: util::stream_format(stream, "B(@AR%d+AR%dL)", barx, bary); break;
+			case 0xa: util::stream_format(stream, "B(@AR%d+%XH)", barx, disp3); break;
+			case 0xb: util::stream_format(stream, "B(@AR%d+AR%d+%XH)", barx, bary, disp3); break;
 			case 0xc: stream << "???"; break;
-			case 0xd: util::stream_format(stream, "B(@BAR%d+[BAR%d++])", barx, bary); break;
-			case 0xe: util::stream_format(stream, "B(@BAR%d+[BAR%d--])", barx, bary); break;
-			case 0xf: util::stream_format(stream, "B(@BAR%d+[BAR%d++%02X])", barx, bary, disp3); break;
+			case 0xd: util::stream_format(stream, "B(@AR%d+[AR%d++])", barx, bary); break;
+			case 0xe: util::stream_format(stream, "B(@AR%d+[AR%d--])", barx, bary); break;
+			case 0xf: util::stream_format(stream, "B(@AR%d+[AR%d++%XH])", barx, bary, disp3); break;
 		}
 
 		util::stream_format(stream, ", I(@AR%d++)", arx);
@@ -628,7 +634,7 @@ void mb86235_disassembler::dasm_xfer2(std::ostream &stream, uint64_t opcode)
 		{
 			if (sr == 0x58)
 			{
-				util::stream_format(stream, "#%06X, %s", (uint32_t)(opcode & 0xffffff), regname[dr]);
+				util::stream_format(stream, "#%06XH, %s", (uint32_t)(opcode & 0xffffff), regname[dr]);
 			}
 			else
 			{
@@ -648,9 +654,29 @@ void mb86235_disassembler::dasm_xfer2(std::ostream &stream, uint64_t opcode)
 		else
 		{
 			if (dir == 0)
-				util::stream_format(stream, "%s, E(@EB+EO++%02X)", regname[dr], sr);
+			{
+				if (dr & 0x40)
+					dasm_ea(stream, md, dr, ary, disp14);
+				else
+					stream << regname[dr];
+
+				if (sr & 0x20)
+					util::stream_format(stream, ", E(@EB+EO++-%XH)", 0x40 - (sr & 0x3f));
+				else
+					util::stream_format(stream, ", E(@EB+EO++%XH)", sr & 0x3f);
+			}
 			else
-				util::stream_format(stream, "E(@EB+EO++%02X), %s", sr, regname[dr]);
+			{
+				if (sr & 0x20)
+					util::stream_format(stream, "E(@EB+EO++-%XH), ", 0x40 - (sr & 0x3f));
+				else
+					util::stream_format(stream, "E(@EB+EO++%XH), ", sr & 0x3f);
+
+				if (dr & 0x40)
+					dasm_ea(stream, md, dr, ary, disp14);
+				else
+					stream << regname[dr];
+			}
 		}
 	}
 	else if (op == 2)
@@ -662,7 +688,7 @@ void mb86235_disassembler::dasm_xfer2(std::ostream &stream, uint64_t opcode)
 			if ((sr & 0x40) == 0)
 				stream << regname[sr];
 			else if (sr == 0x58)
-				util::stream_format(stream, "#%06X", (uint32_t)(opcode & 0xffffff));
+				util::stream_format(stream, "#%06XH", (uint32_t)(opcode & 0xffffff));
 			else
 				dasm_ea(stream, md, sr, ary, disp14);
 
@@ -671,9 +697,19 @@ void mb86235_disassembler::dasm_xfer2(std::ostream &stream, uint64_t opcode)
 		else
 		{
 			if (dir == 0)
-				util::stream_format(stream, "ICDTR%d, E(@EB+EO++%02X)", dr & 7, sr);
+			{
+				if (sr & 0x20)
+					util::stream_format(stream, "ICDTR%d, E(@EB+EO++-%XH)", dr & 7, 0x40 - (sr & 0x3f));
+				else
+					util::stream_format(stream, "ICDTR%d, E(@EB+EO++%XH)", dr & 7, sr & 0x3f);
+			}
 			else
-				util::stream_format(stream, "E(@EB+EO++%02X), ICDTR%d", sr, dr & 7);
+			{
+				if (sr & 0x20)
+					util::stream_format(stream, "E(@EB+EO++-%XH), ICDTR%d", 0x40 - (sr & 0x3f), dr & 7);
+				else
+					util::stream_format(stream, "E(@EB+EO++%XH), ICDTR%d", sr & 0x3f, dr & 7);
+			}
 		}
 	}
 }
@@ -704,7 +740,7 @@ offs_t mb86235_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			stream << " : ";
 			dasm_double_xfer1(stream, opcode);
 			break;
-		case 1:     // ALU / MYL / transfer (type 1)
+		case 1:     // ALU / MUL / transfer (type 1)
 			dasm_alu_mul(stream, opcode, true);
 			stream << " : ";
 			dasm_xfer1(stream, opcode);

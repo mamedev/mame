@@ -11,16 +11,23 @@
 !! The following topics need *additional skilled C developers* to progress   !!
 !! in a timely manner or at all (loosely ordered by descending priority):    !!
 !!                                                                           !!
-!! - <blink>fixing a complex non-public security issue</blink>,              !!
 !! - teaming up on researching and fixing future security reports and        !!
 !!   ClusterFuzz findings with few-days-max response times in communication  !!
 !!   in order to (1) have a sound fix ready before the end of a 90 days      !!
 !!   grace period and (2) in a sustainable manner,                           !!
+!! - helping CPython Expat bindings with supporting Expat's billion laughs   !!
+!!   attack protection API (https://github.com/python/cpython/issues/90949): !!
+!!   - XML_SetBillionLaughsAttackProtectionActivationThreshold               !!
+!!   - XML_SetBillionLaughsAttackProtectionMaximumAmplification              !!
+!! - helping Perl's XML::Parser Expat bindings with supporting Expat's       !!
+!!   security API (https://github.com/cpan-authors/XML-Parser/issues/102):   !!
+!!   - XML_SetBillionLaughsAttackProtectionActivationThreshold               !!
+!!   - XML_SetBillionLaughsAttackProtectionMaximumAmplification              !!
+!!   - XML_SetReparseDeferralEnabled                                         !!
 !! - implementing and auto-testing XML 1.0r5 support                         !!
 !!   (needs discussion before pull requests),                                !!
 !! - smart ideas on fixing the Autotools CMake files generation issue        !!
 !!   without breaking CI (needs discussion before pull requests),            !!
-!! - the Windows binaries topic (needs requirements engineering first),      !!
 !! - pushing migration from `int` to `size_t` further                        !!
 !!   including edge-cases test coverage (needs discussion before anything).  !!
 !!                                                                           !!
@@ -29,6 +36,116 @@
 !!                                                                           !!
 !! THANK YOU!                        Sebastian Pipping -- Berlin, 2024-03-09 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Release 2.7.1 Thu March 27 2025
+        Bug fixes:
+       #980 #989  Restore event pointer behavior from Expat 2.6.4
+                    (that the fix to CVE-2024-8176 changed in 2.7.0);
+                    affected API functions are:
+                    - XML_GetCurrentByteCount
+                    - XML_GetCurrentByteIndex
+                    - XML_GetCurrentColumnNumber
+                    - XML_GetCurrentLineNumber
+                    - XML_GetInputContext
+
+        Other changes:
+       #976 #977  Autotools: Integrate files "fuzz/xml_lpm_fuzzer.{cpp,proto}"
+                    with Automake that were missing from 2.7.0 release tarballs
+       #983 #984  Fix printf format specifiers for 32bit Emscripten
+            #992  docs: Promote OpenSSF Best Practices self-certification
+            #978  tests/benchmark: Resolve mistaken double close
+            #986  Address compiler warnings
+       #990 #993  Version info bumped from 11:1:10 (libexpat*.so.1.10.1)
+                    to 11:2:10 (libexpat*.so.1.10.2); see https://verbump.de/
+                    for what these numbers do
+
+        Infrastructure:
+            #982  CI: Start running Perl XML::Parser integration tests
+            #987  CI: Enforce Clang Static Analyzer clean code
+            #991  CI: Re-enable warning clang-analyzer-valist.Uninitialized
+                    for clang-tidy
+            #981  CI: Cover compilation with musl
+       #983 #984  CI: Cover compilation with 32bit Emscripten
+       #976 #977  CI: Protect against fuzzer files missing from future
+                    release archives
+
+        Special thanks to:
+            Berkay Eren Ürün
+            Matthew Fernandez
+                 and
+            Perl XML::Parser
+
+Release 2.7.0 Thu March 13 2025
+        Security fixes:
+       #893 #973  CVE-2024-8176 -- Fix crash from chaining a large number
+                    of entities caused by stack overflow by resolving use of
+                    recursion, for all three uses of entities:
+                    - general entities in character data ("<e>&g1;</e>")
+                    - general entities in attribute values ("<e k1='&g1;'/>")
+                    - parameter entities ("%p1;")
+                    Known impact is (reliable and easy) denial of service:
+                    CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:H/RL:O/RC:C
+                    (Base Score: 7.5, Temporal Score: 7.2)
+                    Please note that a layer of compression around XML can
+                    significantly reduce the minimum attack payload size.
+
+        Other changes:
+       #935 #937  Autotools: Make generated CMake files look for
+                    libexpat.@SO_MAJOR@.dylib on macOS
+            #925  Autotools: Sync CMake templates with CMake 3.29
+  #945 #962 #966  CMake: Drop support for CMake <3.13
+            #942  CMake: Small fuzzing related improvements
+            #921  docs: Add missing documentation of error code
+                    XML_ERROR_NOT_STARTED that was introduced with 2.6.4
+            #941  docs: Document need for C++11 compiler for use from C++
+            #959  tests/benchmark: Fix a (harmless) TOCTTOU
+            #944  Windows: Fix installer target location of file xmlwf.xml
+                    for CMake
+            #953  Windows: Address warning -Wunknown-warning-option
+                    about -Wno-pedantic-ms-format from LLVM MinGW
+            #971  Address Cppcheck warnings
+       #969 #970  Mass-migrate links from http:// to https://
+    #947 #958 ..
+       #974 #975  Document changes since the previous release
+       #974 #975  Version info bumped from 11:0:10 (libexpat*.so.1.10.0)
+                    to 11:1:10 (libexpat*.so.1.10.1); see https://verbump.de/
+                    for what these numbers do
+
+        Infrastructure:
+            #926  tests: Increase robustness
+    #927 #932 ..
+       #930 #933  tests: Increase test coverage
+    #617 #950 ..
+    #951 #952 ..
+    #954 #955 ..  Fuzzing: Add new fuzzer "xml_lpm_fuzzer" based on
+            #961    Google's libprotobuf-mutator ("LPM")
+            #957  Fuzzing|CI: Start producing fuzzing code coverage reports
+            #936  CI: Pass -q -q for LCOV >=2.1 in coverage.sh
+            #942  CI: Small fuzzing related improvements
+    #139 #203 ..
+       #791 #946  CI: Make GitHub Actions build using MSVC on Windows and
+                      produce 32bit and 64bit Windows binaries
+            #956  CI: Get off of about-to-be-removed Ubuntu 20.04
+       #960 #964  CI: Start uploading to Coverity Scan for static analysis
+            #972  CI: Stop loading DTD from the internet to address flaky CI
+            #971  CI: Adapt to breaking changes in Cppcheck
+
+        Special thanks to:
+            Alexander Gieringer
+            Berkay Eren Ürün
+            Hanno Böck
+            Jann Horn
+            Mark Brand
+            Sebastian Andrzej Siewior
+            Snild Dolkow
+            Thomas Pröll
+            Tomas Korbar
+            valord577
+                 and
+            Google Project Zero
+            Linutronix
+            Red Hat
+            Siemens
 
 Release 2.6.4 Wed November 6 2024
         Security fixes:
@@ -46,6 +163,8 @@ Release 2.6.4 Wed November 6 2024
             #904  tests: Resolve duplicate handler
        #317 #918  tests: Improve tests on doctype closing (ex CVE-2019-15903)
             #914  Fix signedness of format strings
+            #915  For use from C++, expat.h started requiring C++11 due to
+                    use of C99 features
        #919 #920  Version info bumped from 10:3:9 (libexpat*.so.1.9.3)
                     to 11:0:10 (libexpat*.so.1.10.0); see https://verbump.de/
                     for what these numbers do

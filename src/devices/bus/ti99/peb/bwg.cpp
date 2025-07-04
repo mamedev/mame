@@ -45,6 +45,7 @@
 #include "emu.h"
 #include "bwg.h"
 #include "formats/ti99_dsk.h"
+#include "formats/hxchfe_dsk.h"
 #include "machine/rescap.h"
 
 // ----------------------------------
@@ -583,6 +584,7 @@ void snug_bwg_device::floppy_formats(format_registration &fr)
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_TI99_SDF_FORMAT);
 	fr.add(FLOPPY_TI99_TDF_FORMAT);
+	fr.add(FLOPPY_HFE_FORMAT);
 }
 
 static void bwg_floppies(device_slot_interface &device)

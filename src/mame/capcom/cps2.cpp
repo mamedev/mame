@@ -630,10 +630,8 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 #include "cps2comm.h"
 #include "cps2crypt.h"
 
-#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/okim6295.h"
 #include "sound/qsound.h"
 
 #include "speaker.h"
@@ -1903,12 +1901,11 @@ void cps2_state::cps2(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	// Sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	QSOUND(config, m_qsound);
-	m_qsound->add_route(0, "lspeaker", 1.0);
-	m_qsound->add_route(1, "rspeaker", 1.0);
+	m_qsound->add_route(0, "speaker", 1.0, 0);
+	m_qsound->add_route(1, "speaker", 1.0, 1);
 }
 
 void cps2_state::cps2comm(machine_config &config)
@@ -1945,8 +1942,8 @@ void cps2_state::gigaman2(machine_config &config)
 	config.device_remove("qsound");
 
 	OKIM6295(config, m_oki, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
 }
 
 /*************************************
@@ -2890,6 +2887,30 @@ ROM_START( choko )
 
 	ROM_REGION( 0x20, "key", 0 )
 	ROM_LOAD( "choko.key",    0x000000, 0x000014, CRC(08505e8b) SHA1(5c481ffaa93faec57d0b80b678c8c0cca1a699c0) )
+ROM_END
+
+ROM_START( chokop )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "tkojp_03.bin", 0x000000, 0x80000, CRC(4d857f39) SHA1(bc941e8333889345da58f20370e758d4a15f587f) )
+	ROM_LOAD16_WORD_SWAP( "tkojp_04.bin", 0x080000, 0x80000, CRC(137afb29) SHA1(a020b5f2d8cdcd9d6c8302f1535a3502297a55c2) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_FILL(              0x000000, 0x800000, 0x00 )
+	ROM_LOAD64_WORD( "tko_14.bin",  0x800000, 0x200000, CRC(336e8aa2) SHA1(bebe4f56bcd96d573a4fa0e887b8b9aaabff58eb) )
+	ROM_LOAD64_WORD( "tko_16.bin",  0x800002, 0x200000, CRC(e8429b54) SHA1(9833db4c6378f1f04d1747a0daa268503bc7cc5e) )
+	ROM_LOAD64_WORD( "tko_18.bin",  0x800004, 0x200000, CRC(62092fbd) SHA1(293abb3ab4f43323ea4b11a1786532549bcac8e1) )
+	ROM_LOAD64_WORD( "tko_20.bin",  0x800006, 0x200000, CRC(b468a666) SHA1(86c228152ae778ab8459e813a80c67e7e1eee80e) )
+
+	ROM_REGION(QSOUND_SIZE, "audiocpu", 0 ) // 64k for the audio CPU (+banks)
+	ROM_LOAD( "tko_01.bin",   0x00000, 0x08000, CRC(6eda50c2) SHA1(7e67c104094a3ced8b3fdd81f52ee42483b30fc5) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+
+	ROM_REGION( 0x300000, "qsound", 0 ) // QSound samples
+	ROM_LOAD16_WORD_SWAP( "tko_11.bin",   0x000000, 0x200000, CRC(ca7179b1) SHA1(98d0c9d8766843b289d49ccae7083b262adfc83a) )
+	ROM_LOAD16_WORD_SWAP( "tko_12.bin",   0x200000, 0x100000, CRC(83a4e635) SHA1(933d02264ce922fb12a2c08b8c06167c75fe2241) )
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "phoenix.key",  0x000000, 0x000014, CRC(2cf772b0) SHA1(eff33c65a4f3862c231f9e4d6fefa7b34398dbf2) )
 ROM_END
 
 ROM_START( csclub )
@@ -6690,6 +6711,35 @@ ROM_START( pzloop2jr1 )
 
 	ROM_REGION( 0x20, "key", 0 )
 	ROM_LOAD( "pzloop2.key",  0x000000, 0x000014, CRC(ae13be78) SHA1(5c715f0ef1e0664027faa6c2a7f0f878462cb7ae) )
+ROM_END
+
+ROM_START( pzloop2jp )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "pl2j_03.bin", 0x000000, 0x80000, CRC(e9f904c3) SHA1(544fdcf9ca121d34b20108b459ab2aba6f225210) )
+	ROM_LOAD16_WORD_SWAP( "pl2j_04.bin", 0x080000, 0x80000, CRC(61c7c18f) SHA1(45c889ca68357604cec5426bb76ca83c72c3a381) )
+	ROM_LOAD16_WORD_SWAP( "pl2j_05.bin", 0x100000, 0x80000, CRC(ee6da97c) SHA1(ac098327b58b5d84d6df61d076d1030ae4cf492d) )
+	ROM_LOAD16_WORD_SWAP( "pl2j_06.bin", 0x180000, 0x80000, CRC(97e1c3ac) SHA1(70e590e6897a6e3eabaf2190c178da5f72439b0f) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD64_WORD( "pl2-13m.bin",   0x0000000, 0x200000, CRC(5f3b5f91) SHA1(ad2a27bbbf5a903df6e2e583e5b374baa19ae891) )
+	ROM_LOAD64_WORD( "pl2-15m.bin",   0x0000002, 0x200000, CRC(3702f309) SHA1(72b95a87405c04f322afbe24d1f32b5714e0c2b3) )
+	ROM_LOAD64_WORD( "pl2-17m.bin",   0x0000004, 0x200000, CRC(62d3fce9) SHA1(b80e0c4ad6c889cecdfa6166b5eb0f432614f37b) )
+	ROM_LOAD64_WORD( "pl2-19m.bin",   0x0000006, 0x200000, CRC(6dcbd8ce) SHA1(eddb5638f159d3d77262ffb1367ddbe9ee2c447b) )
+	ROM_LOAD64_WORD( "pl2-14m.bin",   0x0800000, 0x200000, CRC(2e22e71a) SHA1(6cc1b72d4323eccc8cdf2deee3668c38e1b356c4) )
+	ROM_LOAD64_WORD( "pl2-16m.bin",   0x0800002, 0x200000, CRC(38090022) SHA1(4db7ea3f75da31d32e1c94f512d89ce51c90a122) )
+	ROM_LOAD64_WORD( "pl2-18m.bin",   0x0800004, 0x200000, CRC(33afdd44) SHA1(1ea971bc2551dcdfe2849c44a373bcad6915d02d) )
+	ROM_LOAD64_WORD( "pl2-20m.bin",   0x0800006, 0x200000, CRC(d4ae0278) SHA1(f25fd5b6f079194b0bffabd3d9e63f023bca59b3) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) // 64k for the audio CPU (+banks)
+	ROM_LOAD( "pl2_01.bin",   0x00000, 0x08000, CRC(35697569) SHA1(13718923cffb9ec53cef9e22d8875370b5f3dd74) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) // QSound samples
+	ROM_LOAD16_WORD_SWAP( "pl2-11m.bin",   0x000000, 0x200000, CRC(85d8fbe8) SHA1(c19d5e9084d07e610379b6e1b6be7bdf0b9b7f7f) ) // ROM on a SIMM
+	ROM_LOAD16_WORD_SWAP( "pl2-12m.bin",   0x200000, 0x200000, CRC(1ed62584) SHA1(28411f610f48cca6424a2d53e2a4ac691e826317) ) // ROM on a SIMM
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "phoenix.key",  0x000000, 0x000014, CRC(2cf772b0) SHA1(eff33c65a4f3862c231f9e4d6fefa7b34398dbf2) )
 ROM_END
 
 ROM_START( qndream )
@@ -12841,15 +12891,17 @@ GAME( 2000, mmatrixj,   mmatrix,  cps2, cps2_2p1b, cps2_state, init_cps2,     RO
 
 // Games released on CPS-2 hardware by Mitchell
 
-GAME( 2000, mpang,      0,        cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Europe 001010)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mpangr1,    mpang,    cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Europe 000925)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mpangu,     mpang,    cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (USA 001010)",            MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mpangj,     mpang,    cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Japan 001011)",          MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mpanga,     mpang,    cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Asia 001010)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2001, pzloop2,    0,        cps2, pzloop2,   cps2_state, init_pzloop2,  ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Europe 010302)",          MACHINE_SUPPORTS_SAVE )
-GAME( 2001, pzloop2j,   pzloop2,  cps2, pzloop2,   cps2_state, init_pzloop2,  ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010226)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2001, pzloop2jr1, pzloop2,  cps2, pzloop2,   cps2_state, init_pzloop2,  ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010205)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2001, choko,      0,        cps2, choko,     cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Janpai Puzzle Choukou (Japan 010820)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mpang,      0,       cps2,      cps2_2p1b, cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Europe 001010)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mpangr1,    mpang,   cps2,      cps2_2p1b, cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Europe 000925)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mpangu,     mpang,   cps2,      cps2_2p1b, cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (USA 001010)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mpangj,     mpang,   cps2,      cps2_2p1b, cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Japan 001011)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mpanga,     mpang,   cps2,      cps2_2p1b, cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Asia 001010)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pzloop2,    0,       cps2,      pzloop2,   cps2_state, init_pzloop2, ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Europe 010302)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pzloop2j,   pzloop2, cps2,      pzloop2,   cps2_state, init_pzloop2, ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010226)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pzloop2jr1, pzloop2, cps2,      pzloop2,   cps2_state, init_pzloop2, ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010205)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pzloop2jp,  pzloop2, dead_cps2, pzloop2,   cps2_state, init_pzloop2, ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010201 Publicity)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2001, choko,      0,       cps2,      choko,     cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Janpai Puzzle Choukou (Japan 010820)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2001, chokop,     choko,   dead_cps2, choko,     cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Janpai Puzzle Choukou (Japan 010820 Publicity)", MACHINE_SUPPORTS_SAVE )
 
 // Games released on CPS-2 hardware by Eighting/Raizing
 

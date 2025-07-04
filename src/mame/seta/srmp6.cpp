@@ -703,13 +703,12 @@ void srmp6_state::srmp6(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_sprram);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// matches video, needs to verified; playback rate: (42.9545Mhz / 7) / 160 or (42.9545Mhz / 5) / 224 or (42.9545Mhz / 4) / 280?
 	nile_sound_device &nile(NILE_SOUND(config, "nile", XTAL(42'954'545) / 7));
-	nile.add_route(0, "lspeaker", 1.0);
-	nile.add_route(1, "rspeaker", 1.0);
+	nile.add_route(0, "speaker", 1.0, 0);
+	nile.add_route(1, "speaker", 1.0, 1);
 }
 
 

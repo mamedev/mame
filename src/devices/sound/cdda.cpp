@@ -15,9 +15,9 @@ static constexpr int MAX_SCAN_SECTORS = 2;
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void cdda_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void cdda_device::sound_stream_update(sound_stream &stream)
 {
-	get_audio_data(outputs[0], outputs[1]);
+	get_audio_data(stream);
 }
 
 //-------------------------------------------------
@@ -199,12 +199,11 @@ int cdda_device::audio_ended()
     converts it to 2 16-bit 44.1 kHz streams
 -------------------------------------------------*/
 
-void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &bufR)
+void cdda_device::get_audio_data(sound_stream &stream)
 {
-	int i;
 	int16_t *audio_cache = (int16_t *) m_audio_cache.get();
 
-	for (int sampindex = 0; sampindex < bufL.samples(); )
+	for (int sampindex = 0; sampindex < stream.samples(); )
 	{
 		/* if no file, audio not playing, audio paused, or out of disc data,
 		   just zero fill */
@@ -219,25 +218,23 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 
 			m_sequence_counter = m_disc->sequence_counter();
 			m_audio_data[0] = m_audio_data[1] = 0;
-			bufL.fill(0, sampindex);
-			bufR.fill(0, sampindex);
 			return;
 		}
 
-		int samples = bufL.samples() - sampindex;
+		int samples = stream.samples() - sampindex;
 		if (samples > m_audio_samples)
 		{
 			samples = m_audio_samples;
 		}
 
-		for (i = 0; i < samples; i++)
+		for (int i = 0; i < samples; i++)
 		{
 			/* CD-DA data on the disc is big-endian */
 			m_audio_data[0] = s16(big_endianize_int16( audio_cache[ m_audio_bptr ] ));
-			bufL.put_int(sampindex + i, m_audio_data[0], 32768);
+			stream.put_int(0, sampindex + i, m_audio_data[0], 32768);
 			m_audio_bptr++;
 			m_audio_data[1] = s16(big_endianize_int16( audio_cache[ m_audio_bptr ] ));
-			bufR.put_int(sampindex + i, m_audio_data[1], 32768);
+			stream.put_int(1, sampindex + i, m_audio_data[1], 32768);
 			m_audio_bptr++;
 		}
 
@@ -252,7 +249,7 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 				sectors = MAX_SECTORS;
 			}
 
-			for (i = 0; i < sectors; i++)
+			for (int i = 0; i < sectors; i++)
 			{
 				const auto adr_control = m_disc->get_adr_control(m_disc->get_track(m_audio_lba));
 

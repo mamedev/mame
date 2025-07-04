@@ -20,7 +20,7 @@ The 6809 NMI is used for sound timing.
                     bit 3 - coin counter A
                     bit 4 - coin counter B
 4800         W  sound latch write
-4900         W  copy sound latch to SN76496
+4900         W  copy sound latch to SN76489A
 4a00         W  VLM5030 control
 4b00         W  VLM5030 data
 4c00        R   DSW #0
@@ -158,14 +158,14 @@ private:
 	uint8_t m_nmi_enable = 0;
 	uint8_t m_irq_enable = 0;
 
-	uint8_t m_sn76496_latch = 0;
+	uint8_t m_sn76489a_latch = 0;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void control_w(uint8_t data);
 	uint8_t speech_r();
 	void vlm5030_control_w(uint8_t data);
-	void konami_sn76496_latch_w(uint8_t data) { m_sn76496_latch = data; }
-	void konami_sn76496_w(uint8_t data) { m_sn->write(m_sn76496_latch); }
+	void konami_sn76489a_latch_w(uint8_t data) { m_sn76489a_latch = data; }
+	void konami_sn76489a_w(uint8_t data) { m_sn->write(m_sn76489a_latch); }
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -341,8 +341,8 @@ void yiear_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0000).r(FUNC(yiear_state::speech_r));
 	map(0x4000, 0x4000).w(FUNC(yiear_state::control_w));
-	map(0x4800, 0x4800).w(FUNC(yiear_state::konami_sn76496_latch_w));
-	map(0x4900, 0x4900).w(FUNC(yiear_state::konami_sn76496_w));
+	map(0x4800, 0x4800).w(FUNC(yiear_state::konami_sn76489a_latch_w));
+	map(0x4900, 0x4900).w(FUNC(yiear_state::konami_sn76489a_w));
 	map(0x4a00, 0x4a00).w(FUNC(yiear_state::vlm5030_control_w));
 	map(0x4b00, 0x4b00).w(m_vlm, FUNC(vlm5030_device::data_w));
 	map(0x4c00, 0x4c00).portr("DSW2");
@@ -507,7 +507,7 @@ void yiear_state::yiear(machine_config &config)
 
 	TRACKFLD_AUDIO(config, m_audio, 0, finder_base::DUMMY_TAG, m_vlm);
 
-	SN76489A(config, m_sn, XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "mono", 1.0);   // verified on PCB
+	SN76489A(config, m_sn, XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "mono", 1.0); // clock verified on PCB
 
 	VLM5030(config, m_vlm, XTAL(3'579'545));   // verified on PCB
 	m_vlm->set_addrmap(0, &yiear_state::vlm_map);

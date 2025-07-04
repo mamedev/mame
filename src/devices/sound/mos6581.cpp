@@ -235,9 +235,9 @@ void mos6581_device::device_post_load()
 //  our sound stream
 //-------------------------------------------------
 
-void mos6581_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void mos6581_device::sound_stream_update(sound_stream &stream)
 {
-	m_token->fill_buffer(outputs[0]);
+	m_token->fill_buffer(stream);
 }
 
 

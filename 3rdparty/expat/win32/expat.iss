@@ -14,7 +14,7 @@
 ; Copyright (c) 2001      Tim Peters <tim.peters@gmail.com>
 ; Copyright (c) 2001-2005 Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
 ; Copyright (c) 2006-2017 Karl Waclawek <karl@waclawek.net>
-; Copyright (c) 2007-2024 Sebastian Pipping <sebastian@pipping.org>
+; Copyright (c) 2007-2025 Sebastian Pipping <sebastian@pipping.org>
 ; Copyright (c) 2022      Johnny Jazeix <jazeix@gmail.com>
 ; Copyright (c) 2024      Dag-Erling Smørgrav <des@des.dev>
 ; Licensed under the MIT license:
@@ -38,14 +38,14 @@
 ; OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 ; USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#define expatVer "2.6.4"
+#define expatVer "2.7.1"
 
 [Setup]
 AppName=Expat
 AppId=expat
 AppVersion={#expatVer}
 AppVerName=Expat {#expatVer}
-AppCopyright=Copyright © 1997-2022 Thai Open Source Software Center, Clark Cooper, and the Expat maintainers
+AppCopyright=Copyright © 1997-2025 Thai Open Source Software Center, Clark Cooper, and the Expat maintainers
 AppPublisher=The Expat Developers
 AppPublisherURL=https://libexpat.github.io/
 AppSupportURL=https://libexpat.github.io/
@@ -75,7 +75,7 @@ Flags: ignoreversion; Source: COPYING;                      DestDir: "{app}"; De
 Flags: ignoreversion; Source: README.md;                    DestDir: "{app}"; DestName: README.txt
 Flags: ignoreversion; Source: doc\*.html;                   DestDir: "{app}\Doc"
 Flags: ignoreversion; Source: doc\*.css;                    DestDir: "{app}\Doc"
-Flags: ignoreversion; Source: doc\*.xml;                    DestDir: "{app}\Doc"
+Flags: ignoreversion; Source: doc\*.xml;                    DestDir: "{app}\Source\doc"
 Flags: ignoreversion; Source: win32\bin\Release\*.dll;      DestDir: "{app}\Bin"
 Flags: ignoreversion; Source: win32\bin\Release\*.lib;      DestDir: "{app}\Bin"
 Flags: ignoreversion; Source: win32\version.rc.cmake;       DestDir: "{app}\Source\win32"

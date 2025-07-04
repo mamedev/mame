@@ -662,12 +662,11 @@ void konmedal68k_state::kzaurus(machine_config &config)
 	K055555(config, m_k055555, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YMZ280B(config, m_ymz, XTAL(33'868'800)/2); // 33.8688 MHz xtal verified on PCB
-	m_ymz->add_route(0, "lspeaker", 0.75);
-	m_ymz->add_route(1, "rspeaker", 0.75);
+	m_ymz->add_route(0, "speaker", 0.75, 0);
+	m_ymz->add_route(1, "speaker", 0.75, 1);
 }
 
 void konmedal68k_state::koropens(machine_config &config)

@@ -16,6 +16,8 @@
 class ti990_10_device : public cpu_device
 {
 public:
+	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
+
 	ti990_10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~ti990_10_device();
 

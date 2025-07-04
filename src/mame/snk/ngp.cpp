@@ -865,15 +865,14 @@ void ngp_state::ngp_common(machine_config &config)
 	m_screen->set_raw(6.144_MHz_XTAL, 515, 0, 160 /*480*/, 199, 0, 152);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	T6W28(config, m_t6w28, 6.144_MHz_XTAL/2);
-	m_t6w28->add_route(0, "lspeaker", 0.50);
-	m_t6w28->add_route(1, "rspeaker", 0.50);
+	m_t6w28->add_route(0, "speaker", 0.50, 0);
+	m_t6w28->add_route(1, "speaker", 0.50, 1);
 
-	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
-	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 0); // unknown DAC
+	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1); // unknown DAC
 }
 
 

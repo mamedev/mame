@@ -13,8 +13,11 @@
 #define FREQ_HZ 8000
 #define SAMPLEN 0x1000
 
-SAMPLES_START_CB_MEMBER(suna8_state::sh_start)
+void suna8_state::sound_start()
 {
+	if (!m_samples)
+		return;
+
 	int len = memregion("samples")->bytes() * 2;  // 2 samples per byte
 	uint8_t *rom = memregion("samples")->base();
 

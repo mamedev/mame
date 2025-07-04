@@ -9,7 +9,7 @@
    Copyright (c) 2001      Scott Bronson <bronson@rinspin.com>
    Copyright (c) 2002-2003 Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
    Copyright (c) 2009      Karl Waclawek <karl@waclawek.net>
-   Copyright (c) 2016-2024 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2016-2025 Sebastian Pipping <sebastian@pipping.org>
    Copyright (c) 2016      Ardo van Rangelrooij <ardo@debian.org>
    Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
    Copyright (c) 2020      Joe Orton <jorton@redhat.com>
@@ -21,7 +21,7 @@
           "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
   <!ENTITY dhfirstname "<firstname>Scott</firstname>">
   <!ENTITY dhsurname   "<surname>Bronson</surname>">
-  <!ENTITY dhdate      "<date>November 6, 2024</date>">
+  <!ENTITY dhdate      "<date>March 27, 2025</date>">
   <!-- Please adjust this^^ date whenever cutting a new release. -->
   <!ENTITY dhsection   "<manvolnum>1</manvolnum>">
   <!ENTITY dhemail     "<email>bronson@rinspin.com</email>">

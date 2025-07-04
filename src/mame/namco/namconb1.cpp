@@ -1012,14 +1012,13 @@ void namconb1_state::namconb1(machine_config &config)
 	NAMCO_C116(config, m_c116);
 	m_c116->enable_shadows();
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	c352_device &c352(C352(config, "c352", XTAL(48'384'000) / 2, 288));
-	c352.add_route(0, "lspeaker", 1.00);
-	c352.add_route(1, "rspeaker", 1.00);
-	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
-	//c352.add_route(3, "rspeaker", 1.00);
+	c352.add_route(0, "speaker", 1.00, 0);
+	c352.add_route(1, "speaker", 1.00, 1);
+	//c352.add_route(2, "speaker", 1.00); // Second DAC not present.
+	//c352.add_route(3, "speaker", 1.00);
 }
 
 void gunbulet_state::gunbulet(machine_config &config)

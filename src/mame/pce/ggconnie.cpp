@@ -406,8 +406,8 @@ void ggconnie_state::ggconnie(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ggconnie_state::sgx_io);
 	m_maincpu->port_in_cb().set_ioport("IN0");
 	m_maincpu->port_out_cb().set(FUNC(ggconnie_state::lamp_w));
-	m_maincpu->add_route(0, "lspeaker", 1.00);
-	m_maincpu->add_route(1, "rspeaker", 1.00);
+	m_maincpu->add_route(0, "speaker", 1.00, 0);
+	m_maincpu->add_route(1, "speaker", 1.00, 1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -447,13 +447,12 @@ void ggconnie_state::ggconnie(machine_config &config)
 
 	MSM6242(config, m_rtc, XTAL(32'768));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM6295(config, m_oki, 2_MHz_XTAL, okim6295_device::PIN7_HIGH); // 2MHz resonator, pin 7 verified
 	m_oki->set_addrmap(0, &ggconnie_state::oki_map);
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.00, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.00, 1);
 }
 
 ROM_START(ggconnie)

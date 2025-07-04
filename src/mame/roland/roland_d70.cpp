@@ -514,13 +514,12 @@ void roland_d70_state::d70(machine_config &config) {
 	maincpu.ach3_cb().set(FUNC(roland_d70_state::ach3_r));
 	maincpu.ach4_cb().set(FUNC(roland_d70_state::ach4_r));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	MB87419_MB87420(config, m_pcm, 32.768_MHz_XTAL);
 	m_pcm->int_callback().set_inputline(m_cpu, i8x9x_device::EXTINT_LINE);
-	m_pcm->add_route(0, "lspeaker", 1.0);
-	m_pcm->add_route(1, "rspeaker", 1.0);
+	m_pcm->add_route(0, "speaker", 1.0, 0);
+	m_pcm->add_route(1, "speaker", 1.0, 1);
 
 	T6963C(config, m_lcd, 0);
 	m_lcd->set_addrmap(0, &roland_d70_state::lcd_map);

@@ -99,6 +99,12 @@ emu.add_machine_post_load_notifier(callback)
     Add a callback to receive notification after the emulated system is restored
     to a previously saved state.  Returns a
     :ref:`notifier subscription <luascript-ref-notifiersub>`.
+emu.register_sound_update(callback)
+    Add a callback to receive new samples that have been created.  The samples
+    are coming from the sound devices for which the hook property has been set
+    to true.  The callback gets one parameter which is a hash with device tag
+    as key and a (channel-sized) vector of (buffer-sized) vector of samples
+    in the -1..1 range.
 emu.print_error(message)
     Print an error message.
 emu.print_warning(message)

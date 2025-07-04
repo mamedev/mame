@@ -67,8 +67,8 @@ void plg100_vl_device::device_add_mconfig(machine_config &config)
 	m_cpu->write_sci_tx<1>().set([this] (int state) { m_connector->do_midi_tx(state); });
 
 	DSPV(config, m_dspv, 22.5792_MHz_XTAL);
-	m_dspv->add_route(0, DEVICE_SELF_OWNER, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_dspv->add_route(1, DEVICE_SELF_OWNER, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_dspv->add_route(0, DEVICE_SELF_OWNER, 1.0, 0);
+	m_dspv->add_route(1, DEVICE_SELF_OWNER, 1.0, 1);
 }
 
 ROM_START( plg100_vl )

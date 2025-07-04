@@ -32,7 +32,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 public:
 	// Set the voltage going to a particular parameter
@@ -51,7 +51,7 @@ public:
 
 private:
 	double compute_db(double voltage);
-	stream_buffer::sample_t compute_db_volume(double voltage);
+	sound_stream::sample_t compute_db_volume(double voltage);
 
 private:
 	double filter(double input, double cutoff);

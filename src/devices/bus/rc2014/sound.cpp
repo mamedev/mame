@@ -158,14 +158,13 @@ void rc2014_ym2149_device::device_reset()
 
 void rc2014_ym2149_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2149(config, m_psg, 0);
-	m_psg->add_route(0, "rspeaker", 0.25);
-	m_psg->add_route(2, "rspeaker", 0.25);
-	m_psg->add_route(1, "lspeaker", 0.25);
-	m_psg->add_route(2, "lspeaker", 0.25);
+	m_psg->add_route(0, "speaker", 0.25, 1);
+	m_psg->add_route(2, "speaker", 0.25, 1);
+	m_psg->add_route(1, "speaker", 0.25, 0);
+	m_psg->add_route(2, "speaker", 0.25, 0);
 }
 
 //**************************************************************************
@@ -190,14 +189,13 @@ rc2014_ay8190_device::rc2014_ay8190_device(const machine_config &mconfig, const 
 
 void rc2014_ay8190_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	AY8910(config, m_psg, 0);
-	m_psg->add_route(0, "rspeaker", 0.25);
-	m_psg->add_route(2, "rspeaker", 0.25);
-	m_psg->add_route(1, "lspeaker", 0.25);
-	m_psg->add_route(2, "lspeaker", 0.25);
+	m_psg->add_route(0, "speaker", 0.25, 1);
+	m_psg->add_route(2, "speaker", 0.25, 1);
+	m_psg->add_route(1, "speaker", 0.25, 0);
+	m_psg->add_route(2, "speaker", 0.25, 0);
 }
 
 }

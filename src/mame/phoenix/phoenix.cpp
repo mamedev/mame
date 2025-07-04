@@ -1349,17 +1349,16 @@ ROM_START( nextfase )
 	ROM_LOAD( "7910cg", 0x000, 0x800, NO_DUMP ) // actual size unknown, needs decapping
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "nf11.bin",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "nf12.bin",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "nf11.bin",   0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "nf12.bin",   0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
 	ROM_LOAD( "nf09.bin",   0x0000, 0x0800, CRC(bacbfa88) SHA1(bf378a729726db01448f2cc4820f06e17659d674) )
 	ROM_LOAD( "nf10.bin",   0x0800, 0x0800, CRC(3143a9ee) SHA1(371bb314dc9e4ec6ed469eb81391061296c547ec) )
 
-	// PROMs were missing from this dump, these might not be correct
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "nf.ic40",    0x0000, 0x0100, CRC(725747be) SHA1(c8a4cc47149230ac859c19a24d2860d7d58885f2) )  // palette low bits
+	ROM_LOAD( "nf.ic41",    0x0100, 0x0100, CRC(a91055ab) SHA1(14273bde9e05b7e2e14e77cac400ffda0ce7e71f) )  // palette high bits
 ROM_END
 
 ROM_START( phoenixs )

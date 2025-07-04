@@ -363,6 +363,11 @@ ROM_START( discpal )
 	ROM_LOAD16_WORD_SWAP( "disneyhh.bin", 0x0000, 0x400000, CRC(5fb7f32e) SHA1(795c992826ad4ac66d5438207f1c9b48f9fadc44) )
 ROM_END
 
+ROM_START( disppal )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "vgpocketdisney.u3", 0x0000, 0x400000, CRC(051bd073) SHA1(e453677437206e11fb50b8b86853e466978338a2) )
+ROM_END
+
 /*
 
 VG Caplet ROM pinout from Sean Riddle (2 ROMs in single package)
@@ -436,8 +441,8 @@ CONS( 200?, vsplus,      0,     0,        vsplus,     vsplus, spg2xx_vsplus_game
 CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited / JungleTac", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
 // There are versions of the Seal 50-in-1 that actually show Lexibook on the boot screen rather than it just being on the unit.  The Seal name was also used for some VT systems
 
-CONS( 200?, discpal,     0,     0,        lexizeus,     lexiseal, spg2xx_lexizeus_game_state, init_zeus, "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Classic Pals",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-// There was also a Game It! Princess Pals
+CONS( 2006, discpal,     0,     0,        lexizeus,     lexiseal, spg2xx_lexizeus_game_state, init_zeus, "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Classic Pals",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, disppal,     0,     0,        lexizeus,     lexiseal, spg2xx_lexizeus_game_state, init_zeus, "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Princess Pals",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, vgcaplet,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Performance Designed Products (licensed by Taito / Data East) / JungleTac", "VG Pocket Caplet Fast Acting 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

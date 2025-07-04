@@ -14,22 +14,11 @@
 
 #if BX_CRT_NONE
 #	include "crt0.h"
-#elif  BX_PLATFORM_ANDROID \
-	|| BX_PLATFORM_BSD     \
-	|| BX_PLATFORM_HAIKU   \
-	|| BX_PLATFORM_LINUX   \
-	|| BX_PLATFORM_IOS     \
-	|| BX_PLATFORM_OSX     \
-	|| BX_PLATFORM_PS4     \
-	|| BX_PLATFORM_RPI     \
-	|| BX_PLATFORM_NX
+#elif  BX_PLATFORM_POSIX
 #	include <pthread.h>
 #	if BX_PLATFORM_BSD
 #		include <pthread_np.h>
 #	endif // BX_PLATFORM_BSD
-#	if BX_PLATFORM_LINUX && (BX_CRT_GLIBC < 21200)
-#		include <sys/prctl.h>
-#	endif // BX_PLATFORM_
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE \
@@ -250,7 +239,7 @@ namespace bx
 #elif  BX_PLATFORM_OSX \
 	|| BX_PLATFORM_IOS
 		pthread_setname_np(_name);
-#elif (BX_CRT_GLIBC >= 21200) && ! BX_PLATFORM_HURD
+#elif BX_CRT_GLIBC && ! BX_PLATFORM_HURD
 		pthread_setname_np(ti->m_handle, _name);
 #elif BX_PLATFORM_LINUX
 		prctl(PR_SET_NAME,_name, 0, 0, 0);

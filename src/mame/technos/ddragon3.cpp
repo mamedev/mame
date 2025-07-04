@@ -842,20 +842,19 @@ void ddragon3_state::ddragon3(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	ym2151_device &ym2151(YM2151(config, "ym2151", XTAL(3'579'545)));
 	ym2151.irq_handler().set_inputline(m_audiocpu, 0);
-	ym2151.add_route(0, "lspeaker", 0.50);
-	ym2151.add_route(1, "rspeaker", 0.50);
+	ym2151.add_route(0, "speaker", 0.50, 0);
+	ym2151.add_route(1, "speaker", 0.50, 1);
 
 	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH);
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 1.50);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.50);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.50, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.50, 1);
 }
 
 void ddragon3_state::ddragon3b(machine_config &config)
@@ -882,12 +881,12 @@ void ddragon3_state::ctribe(machine_config &config)
 
 	ym2151_device &ym2151(*subdevice<ym2151_device>("ym2151"));
 	ym2151.reset_routes();
-	ym2151.add_route(0, "lspeaker", 1.20);
-	ym2151.add_route(1, "rspeaker", 1.20);
+	ym2151.add_route(0, "speaker", 1.20, 0);
+	ym2151.add_route(1, "speaker", 1.20, 1);
 
 	m_oki->reset_routes();
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 

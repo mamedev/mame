@@ -880,16 +880,15 @@ void md_base_state::md_ntsc(machine_config &config)
 	megadriv_ioports(config);
 
 	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
-	m_ymsnd->add_route(0, "lspeaker", 0.50);
-	m_ymsnd->add_route(1, "rspeaker", 0.50);
+	m_ymsnd->add_route(0, "speaker", 0.50, 0);
+	m_ymsnd->add_route(1, "speaker", 0.50, 1);
 }
 
 void md_base_state::md2_ntsc(machine_config &config)
@@ -898,8 +897,8 @@ void md_base_state::md2_ntsc(machine_config &config)
 
 	// Internalized YM3438 in VDP ASIC
 	YM3438(config.replace(), m_ymsnd, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
-	m_ymsnd->add_route(0, "lspeaker", 0.50);
-	m_ymsnd->add_route(1, "rspeaker", 0.50);
+	m_ymsnd->add_route(0, "speaker", 0.50, 0);
+	m_ymsnd->add_route(1, "speaker", 0.50, 1);
 }
 
 /************ PAL hardware has a different master clock *************/
@@ -919,16 +918,15 @@ void md_base_state::md_pal(machine_config &config)
 	megadriv_ioports(config);
 
 	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2612(config, m_ymsnd, MASTER_CLOCK_PAL / 7); // 7.67 MHz
-	m_ymsnd->add_route(0, "lspeaker", 0.50);
-	m_ymsnd->add_route(1, "rspeaker", 0.50);
+	m_ymsnd->add_route(0, "speaker", 0.50, 0);
+	m_ymsnd->add_route(1, "speaker", 0.50, 1);
 }
 
 void md_base_state::md2_pal(machine_config &config)
@@ -937,8 +935,8 @@ void md_base_state::md2_pal(machine_config &config)
 
 	// Internalized YM3438 in VDP ASIC
 	YM3438(config.replace(), m_ymsnd, MASTER_CLOCK_PAL / 7); /* 7.67 MHz */
-	m_ymsnd->add_route(0, "lspeaker", 0.50);
-	m_ymsnd->add_route(1, "rspeaker", 0.50);
+	m_ymsnd->add_route(0, "speaker", 0.50, 0);
+	m_ymsnd->add_route(1, "speaker", 0.50, 1);
 }
 
 

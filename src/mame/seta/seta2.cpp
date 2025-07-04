@@ -2498,12 +2498,11 @@ void funcube_state::funcube(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM9810(config, m_oki, XTAL(4'096'000));
-	m_oki->add_route(0, "lspeaker", 0.80);
-	m_oki->add_route(1, "rspeaker", 0.80);
+	m_oki->add_route(0, "speaker", 0.80, 0);
+	m_oki->add_route(1, "speaker", 0.80, 1);
 }
 
 
@@ -2542,12 +2541,11 @@ void seta2_state::namcostr(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM9810(config, m_oki, XTAL(4'096'000));
-	m_oki->add_route(0, "lspeaker", 0.80);
-	m_oki->add_route(1, "rspeaker", 0.80);
+	m_oki->add_route(0, "speaker", 0.80, 0);
+	m_oki->add_route(1, "speaker", 0.80, 1);
 }
 
 

@@ -158,6 +158,7 @@ eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconf
 	m_command_address_bits(0),
 	m_streaming_enabled(bool(enable_streaming)),
 	m_output_on_falling_clock_enabled(false),
+	m_do_tristate(ASSERT_LINE),
 	m_do_cb(*this),
 	m_state(STATE_IN_RESET),
 	m_cs_state(CLEAR_LINE),
@@ -284,7 +285,9 @@ int eeprom_serial_base_device::base_do_read()
 	// in most states, the output is tristated, and generally connected to a pull up
 	// to send back a 1 value; the only exception is if reading data and the current output
 	// bit is a 0
-	int result = (m_state == STATE_READING_DATA && ((m_shift_register & 0x80000000) == 0)) ? CLEAR_LINE : ASSERT_LINE;
+	int result = m_do_tristate;
+	if (m_state == STATE_READING_DATA)
+		result = (m_shift_register & 0x80000000) != 0 ? ASSERT_LINE : CLEAR_LINE;
 	LOG3("  do_read(%d)\n", result);
 	return result;
 }
@@ -652,7 +655,7 @@ void eeprom_serial_93cxx_device::parse_command_and_address()
 //  do_read - read handlers
 //-------------------------------------------------
 
-int eeprom_serial_93cxx_device::do_read() { return base_do_read() & ((m_state == STATE_WAIT_FOR_START_BIT) ? base_ready_read() : 1); }
+int eeprom_serial_93cxx_device::do_read() { return (m_state == STATE_WAIT_FOR_START_BIT) ? base_ready_read() : base_do_read(); }
 
 
 //-------------------------------------------------

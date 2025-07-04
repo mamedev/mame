@@ -303,13 +303,12 @@ void segafruit_state::segafruit(machine_config & config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);//.data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	RF5C68(config, m_rf5c68, 16_MHz_XTAL / 2); // divider not verified;
 	m_rf5c68->set_addrmap(0, &segafruit_state::pcm_map);
-	m_rf5c68->add_route(0, "lspeaker", 0.40);
-	m_rf5c68->add_route(1, "rspeaker", 0.40);
+	m_rf5c68->add_route(0, "speaker", 0.40, 0);
+	m_rf5c68->add_route(1, "speaker", 0.40, 1);
 }
 
 ROM_START(m4001)

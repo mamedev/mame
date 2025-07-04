@@ -256,14 +256,13 @@ void roland_r8_base_state::r8_common(machine_config &config)
 	//bu3904s_device &fsk(BU3904S(config, "fsk", 12_MHz_XTAL));
 	//fsk.xint_callback().set_inputline(m_maincpu, upd78k2_device::INTP0_LINE);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	MB87419_MB87420(config, m_pcm, 33.8688_MHz_XTAL);
 	//m_pcm->int_callback().set_inputline(m_maincpu, upd78k2_device::INTP1_LINE);
 	m_pcm->set_device_rom_tag("pcm");
-	m_pcm->add_route(0, "lspeaker", 1.0);
-	m_pcm->add_route(1, "rspeaker", 1.0);
+	m_pcm->add_route(0, "speaker", 1.0, 0);
+	m_pcm->add_route(1, "speaker", 1.0, 1);
 }
 
 void roland_r8_state::r8(machine_config &config)
@@ -306,14 +305,13 @@ void roland_r8mk2_state::r8mk2(machine_config &config)
 	//bu3904s_device &fsk(BU3904S(config, "fsk", 12_MHz_XTAL));
 	//fsk.xint_callback().set_inputline(m_maincpu, upd78k2_device::INTP0_LINE);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	MB87419_MB87420(config, m_pcm, 33.8688_MHz_XTAL);
 	//m_pcm->int_callback().set_inputline(m_maincpu, upd78k2_device::INTP1_LINE);
 	m_pcm->set_device_rom_tag("pcm");
-	m_pcm->add_route(0, "lspeaker", 1.0);
-	m_pcm->add_route(1, "rspeaker", 1.0);
+	m_pcm->add_route(0, "speaker", 1.0, 0);
+	m_pcm->add_route(1, "speaker", 1.0, 1);
 
 	GENERIC_CARTSLOT(config, m_pcmcard, generic_romram_plain_slot, "r8_card", "bin");
 	m_pcmcard->set_device_load(FUNC(roland_r8mk2_state::pcmcard_load));

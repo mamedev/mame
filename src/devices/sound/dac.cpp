@@ -25,11 +25,11 @@ DEFINE_DEVICE_TYPE(_dac_type, _dac_class, _dac_shortname, _dac_description)
 //  the given number of bits to a sample value
 //-------------------------------------------------
 
-stream_buffer::sample_t dac_mapper_unsigned(u32 input, u8 bits)
+sound_stream::sample_t dac_mapper_unsigned(u32 input, u8 bits)
 {
-	stream_buffer::sample_t scale = 1.0 / stream_buffer::sample_t((bits > 1) ? (1 << bits) : 1);
+	sound_stream::sample_t scale = 1.0 / sound_stream::sample_t((bits > 1) ? (1 << bits) : 1);
 	input &= (1 << bits) - 1;
-	return stream_buffer::sample_t(input) * scale;
+	return sound_stream::sample_t(input) * scale;
 }
 
 
@@ -38,7 +38,7 @@ stream_buffer::sample_t dac_mapper_unsigned(u32 input, u8 bits)
 //  value of the given number of bits to a sample value
 //-------------------------------------------------
 
-stream_buffer::sample_t dac_mapper_signed(u32 input, u8 bits)
+sound_stream::sample_t dac_mapper_signed(u32 input, u8 bits)
 {
 	return dac_mapper_unsigned(input ^ (1 << (bits - 1)), bits);
 }
@@ -50,7 +50,7 @@ stream_buffer::sample_t dac_mapper_signed(u32 input, u8 bits)
 //  treated as a negative 1s complement
 //-------------------------------------------------
 
-stream_buffer::sample_t dac_mapper_ones_complement(u32 input, u8 bits)
+sound_stream::sample_t dac_mapper_ones_complement(u32 input, u8 bits)
 {
 	// this mapping assumes symmetric reference voltages,
 	// which is true for all existing cases
@@ -65,7 +65,7 @@ stream_buffer::sample_t dac_mapper_ones_complement(u32 input, u8 bits)
 //  dac_device_base - constructor
 //-------------------------------------------------
 
-dac_device_base::dac_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
+dac_device_base::dac_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 bits, dac_mapper_callback mapper, sound_stream::sample_t gain) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr),
@@ -91,7 +91,7 @@ void dac_device_base::device_start()
 		m_value_map[code] = m_mapper(code, m_bits) * m_gain;
 
 	// determine the number of inputs
-	int inputs = (m_specified_inputs_mask == 0) ? 0 : 2;
+	int inputs = (get_sound_requested_inputs_mask() == 0) ? 0 : 2;
 
 	// large stream buffer to favour emu/sound.cpp resample quality
 	m_stream = stream_alloc(inputs, 1, 48000 * 32);
@@ -105,38 +105,33 @@ void dac_device_base::device_start()
 //  sound_stream_update - stream updates
 //-------------------------------------------------
 
-void dac_device_base::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void dac_device_base::sound_stream_update(sound_stream &stream)
 {
-	auto &out = outputs[0];
-
 	// rails are constant
-	if (inputs.size() == 0)
+	if (stream.input_count() == 0)
 	{
-		out.fill(m_range_min + m_curval * (m_range_max - m_range_min));
+		stream.fill(0, m_range_min + m_curval * (m_range_max - m_range_min));
 		return;
 	}
 
-	auto &hi = inputs[DAC_INPUT_RANGE_HI];
-	auto &lo = inputs[DAC_INPUT_RANGE_LO];
-
 	// constant lo, streaming hi
-	if (!BIT(m_specified_inputs_mask, DAC_INPUT_RANGE_LO))
+	if (!BIT(get_sound_requested_inputs_mask(), DAC_INPUT_RANGE_LO))
 	{
-		for (int sampindex = 0; sampindex < out.samples(); sampindex++)
-			out.put(sampindex, m_range_min + m_curval * (hi.get(sampindex) - m_range_min));
+		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
+			stream.put(0, sampindex, m_range_min + m_curval * (stream.get(DAC_INPUT_RANGE_HI, sampindex) - m_range_min));
 	}
 
 	// constant hi, streaming lo
-	else if (!BIT(m_specified_inputs_mask, DAC_INPUT_RANGE_HI))
+	else if (!BIT(get_sound_requested_inputs_mask(), DAC_INPUT_RANGE_HI))
 	{
-		for (int sampindex = 0; sampindex < out.samples(); sampindex++)
-			out.put(sampindex, lo.get(sampindex) + m_curval * (m_range_max - lo.get(sampindex)));
+		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
+			stream.put(0, sampindex, stream.get(DAC_INPUT_RANGE_LO, sampindex) + m_curval * (m_range_max - stream.get(DAC_INPUT_RANGE_LO, sampindex)));
 	}
 
 	// both streams provided
 	else
 	{
-		for (int sampindex = 0; sampindex < out.samples(); sampindex++)
-			out.put(sampindex, lo.get(sampindex) + m_curval * (hi.get(sampindex) - lo.get(sampindex)));
+		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
+			stream.put(0, sampindex, stream.get(DAC_INPUT_RANGE_LO, sampindex) + m_curval * (stream.get(DAC_INPUT_RANGE_HI, sampindex) - stream.get(DAC_INPUT_RANGE_LO, sampindex)));
 	}
 }

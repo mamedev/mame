@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SPECTRUM_USLOT, spectrum_uslot_device, "spectrum_uslot", "Spectrum Currah \xC2\xB5Slot")
+DEFINE_DEVICE_TYPE(SPECTRUM_USLOT, spectrum_uslot_device, "spectrum_uslot", u8"Spectrum Currah µSlot")
 
 
 //-------------------------------------------------

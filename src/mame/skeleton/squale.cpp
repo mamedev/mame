@@ -75,7 +75,6 @@ TODO
 - Cassette
 - ACIA
 
-
 ****************************************************************************/
 
 #include "emu.h"
@@ -95,35 +94,38 @@ TODO
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "utf8.h"
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 namespace {
-
-#define MAIN_CLOCK           14_MHz_XTAL
-#define AY_CLOCK             MAIN_CLOCK / 8     /* 1.75 Mhz */
-#define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
-#define CPU_CLOCK            MAIN_CLOCK / 4     /* 3.50 Mhz */
 
 class squale_state : public driver_device
 {
 public:
 	squale_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_acia(*this,  "ef6850")
-		, m_ay8910(*this,  "ay8910")
+		, m_acia(*this, "ef6850")
+		, m_ay8910(*this, "ay8910")
 		, m_pia_u72(*this, "pia_u72")
 		, m_pia_u75(*this, "pia_u75")
 		, m_ef9365(*this, "ef9365")
 		, m_maincpu(*this, "maincpu")
+		, m_rom_bank(*this, "rom_bank")
+		, m_kbd(*this, "X%u", 0U)
+		, m_ay_keys(*this, "ay_keys")
+		, m_ay_joy(*this, "ay_joy_%u", 1U)
 		, m_fdc(*this, "wd1770")
-		, m_floppy0(*this, "wd1770:0")
-		, m_floppy1(*this, "wd1770:1")
-		, m_floppy(nullptr)
+		, m_floppy(*this, "wd1770:%u", 0U)
 		, m_cart(*this, "cartslot")
 	{ }
 
 	void squale(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void ctrl_w(uint8_t data);
@@ -140,12 +142,9 @@ private:
 	void pia_u72_porta_w(uint8_t data);
 	void pia_u72_portb_w(uint8_t data);
 	void pia_u75_porta_w(uint8_t data);
-	void pia_u75_portb_w(uint8_t data);
 
 	uint8_t ay_porta_r();
 	uint8_t ay_portb_r();
-	void ay_porta_w(uint8_t data);
-	void ay_portb_w(uint8_t data);
 
 	void pia_u72_ca2_w(int state);
 	void pia_u72_cb2_w(int state);
@@ -153,8 +152,6 @@ private:
 	void pia_u75_cb2_w(int state);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t keyboard_line = 0U;
 	uint8_t fdc_sel0 = 0U;
@@ -174,13 +171,13 @@ private:
 	required_device<pia6821_device> m_pia_u75;
 	required_device<ef9365_device> m_ef9365;
 	required_device<cpu_device> m_maincpu;
+	memory_bank_creator m_rom_bank;
+	required_ioport_array<8> m_kbd;
+	required_ioport m_ay_keys;
+	required_ioport_array<2> m_ay_joy;
 	required_device<wd1770_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	floppy_image_device *m_floppy;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<generic_slot_device> m_cart;
-
-	memory_region *m_cart_rom = nullptr;
 };
 
 /*****************************************
@@ -189,26 +186,21 @@ private:
 
 void squale_state::ctrl_w(uint8_t data)
 {
-	#ifdef DBGMODE
-	printf("write ctrl reg : 0x%X\n",data);
-	#endif
+	LOG("write ctrl reg : 0x%2X\n",data);
 
-	membank("rom_bank")->set_entry(data >> 7);
+	m_rom_bank->set_entry(BIT(data, 7));
 
-	m_ef9365->set_color_filler(data & 0xF);
+	m_ef9365->set_color_filler(data & 0xf);
 }
 
 uint8_t  squale_state::video_ram_read_reg1()
 {
-	uint8_t data;
-	int p;
+	uint8_t data = 0x00;
 
 	//D7             D0
 	//I2R2G2B2 I3R3G3B3
 
-	data = 0x00;
-
-	for(p = 0; p < 4 ; p++)
+	for(int p = 0; p < 4 ; p++)
 	{
 		if( m_ef9365->get_last_readback_word(p, nullptr) & 8 )
 		{
@@ -216,9 +208,9 @@ uint8_t  squale_state::video_ram_read_reg1()
 		}
 	}
 
-	data = data << 4;
+	data <<= 4;
 
-	for(p = 0; p < 4 ; p++)
+	for(int p = 0; p < 4 ; p++)
 	{
 		if( m_ef9365->get_last_readback_word(p, nullptr) & 4 )
 		{
@@ -226,24 +218,19 @@ uint8_t  squale_state::video_ram_read_reg1()
 		}
 	}
 
-	#ifdef DBGMODE
-	printf("read video_ram_read_reg1 reg : 0x%X\n",data);
-	#endif
+	LOG("read video_ram_read_reg1 reg : 0x%X\n",data);
 
 	return data;
 }
 
 uint8_t squale_state::video_ram_read_reg2()
 {
-	uint8_t data;
-	int p;
+	uint8_t data = 0x00;
 
 	//D7             D0
 	//I0R0G0B0 I1R1G1B1
 
-	data = 0x00;
-
-	for(p = 0; p < 4 ; p++)
+	for(int p = 0; p < 4 ; p++)
 	{
 		if( m_ef9365->get_last_readback_word(p, nullptr) & 2 )
 		{
@@ -251,9 +238,9 @@ uint8_t squale_state::video_ram_read_reg2()
 		}
 	}
 
-	data = data << 4;
+	data <<= 4;
 
-	for(p = 0; p < 4 ; p++)
+	for(int p = 0; p < 4 ; p++)
 	{
 		if( m_ef9365->get_last_readback_word(p, nullptr) & 1 )
 		{
@@ -261,9 +248,7 @@ uint8_t squale_state::video_ram_read_reg2()
 		}
 	}
 
-	#ifdef DBGMODE
-	printf("read video_ram_read_reg2 reg : 0x%X\n",data);
-	#endif
+	LOG("read video_ram_read_reg2 reg : 0x%X\n",data);
 
 	return data;
 }
@@ -274,39 +259,27 @@ uint8_t squale_state::video_ram_read_reg2()
 
 void squale_state::fdc_sel0_w(uint8_t data)
 {
-	floppy_image_device *floppy = 0;
+	floppy_image_device *floppy = nullptr;
 
-	#ifdef DBGMODE
-	printf("%s: write fdc_sel0_w reg : 0x%X\n",machine().describe_context().c_str(),data);
-	#endif
+	LOG("%s: write fdc_sel0_w reg : 0x%X\n",machine().describe_context(),data);
 
 	fdc_sel0 = data;
 
 	if( BIT(data, 3) ) // Drive 0
 	{
-		floppy = m_floppy0->get_device();
-		if(!floppy)
-			fdc_sel0 = fdc_sel0 & ~(0x08);
-		else
+		floppy = m_floppy[0]->get_device();
+		if(!floppy || !floppy->dskchg_r())
 		{
-			if(!floppy->dskchg_r())
-			{
-				fdc_sel0 = fdc_sel0 & ~(0x08);
-			}
+			fdc_sel0 &= ~(0x08);
 		}
 	}
 
 	if( BIT(data, 2) ) // Drive 1
 	{
-		floppy = m_floppy1->get_device();
-		if(!floppy)
-			fdc_sel0 = fdc_sel0 & ~(0x04);
-		else
+		floppy = m_floppy[1]->get_device();
+		if(!floppy || !floppy->dskchg_r())
 		{
-			if(!floppy->dskchg_r())
-			{
-				fdc_sel0 = fdc_sel0 & ~(0x04);
-			}
+			fdc_sel0 &= ~(0x04);
 		}
 	}
 
@@ -322,35 +295,25 @@ void squale_state::fdc_sel0_w(uint8_t data)
 
 void squale_state::fdc_sel1_w(uint8_t data)
 {
-	#ifdef DBGMODE
-	printf("%s: write fdc_sel1_w reg : 0x%X\n",machine().describe_context().c_str(),data);
-	#endif
+	LOG("%s: write fdc_sel1_w reg : 0x%X\n",machine().describe_context(),data);
 
 	fdc_sel1 = data;
 }
 
 uint8_t squale_state::fdc_sel0_r()
 {
-	uint8_t data;
+	uint8_t data = fdc_sel0;
 
-	data = fdc_sel0;
-
-	#ifdef DBGMODE
-	printf("%s: read fdc_sel0_r 0x%.2X\n",machine().describe_context().c_str(),data);
-	#endif
+	LOG("%s: read fdc_sel0_r 0x%.2X\n",machine().describe_context(),data);
 
 	return data;
 }
 
 uint8_t squale_state::fdc_sel1_r()
 {
-	uint8_t data;
+	uint8_t data = fdc_sel1;
 
-	data = fdc_sel1;
-
-	#ifdef DBGMODE
-	printf("%s: read fdc_sel1_r 0x%.2X\n",machine().describe_context().c_str(),data);
-	#endif
+	LOG("%s: read fdc_sel1_r 0x%.2X\n",machine().describe_context(),data);
 
 	return data;
 }
@@ -362,47 +325,33 @@ uint8_t squale_state::fdc_sel1_r()
 void squale_state::pia_u75_porta_w(uint8_t data)
 {
 	// U75 PIA Port A : Keyboard rows output
-	#ifdef DBGMODE
-	printf("%s: write pia_u75_porta_w : 0x%.2X\n",machine().describe_context().c_str(),data);
-	#endif
+	LOG("%s: write pia_u75_porta_w : 0x%.2X\n",machine().describe_context(),data);
+
 	keyboard_line = data;
-	return;
 }
 
 uint8_t squale_state::pia_u75_porta_r()
 {
 	// U75 PIA Port A : Keyboard rows output
-	uint8_t data;
+	uint8_t data = keyboard_line;
 
-	#ifdef DBGMODE
-	printf("%s: read pia_u75_porta_r\n",machine().describe_context().c_str());
-	#endif
+	LOG("%s: read pia_u75_porta_r\n",machine().describe_context());
 
-	data = keyboard_line;
 	return data;
 }
 
 uint8_t squale_state::pia_u75_portb_r()
 {
 	// U75 PIA Port B : Keyboard column input
-	char kbdrow[3];
-	unsigned char kbdrow_state;
-	uint8_t data = 0xFF;
-
-	kbdrow[0] = 'X';
-	kbdrow[1] = '0';
-	kbdrow[2] = 0;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 	{
-		kbdrow[1] = '0' + i;
-		kbdrow_state = ioport(kbdrow)->read();
-
 		for( int j = 0; j < 8 ; j++)
 		{
-			if( !(keyboard_line & (0x01<<j)) )
+			if( !BIT(keyboard_line, j) )
 			{
-				if ( kbdrow_state & (0x01<<j) )
+				if ( BIT(m_kbd[i]->read(), j) )
 				{
 					data &= ~( 0x01 << i);
 				}
@@ -410,20 +359,9 @@ uint8_t squale_state::pia_u75_portb_r()
 		}
 	}
 
-	#ifdef DBGMODE
-	printf("%s: read pia_u75_portb_r : 0x%.2X\n",machine().describe_context().c_str(),data);
-	#endif
+	LOG("%s: read pia_u75_portb_r : 0x%.2X\n",machine().describe_context(),data);
 
 	return data;
-}
-
-void squale_state::pia_u75_portb_w(uint8_t data)
-{
-	// U75 PIA Port B : Keyboard column input
-	#ifdef DBGMODE
-	printf("%s: write pia_u75_portb_w : 0x%.2X\n",machine().describe_context().c_str(),data);
-	#endif
-	return;
 }
 
 /***********************************
@@ -445,12 +383,10 @@ uint8_t squale_state::ay_portb_r()
 
 	uint8_t data;
 
-	data =  ( ioport("ay_keys")->read() ) & 0x70;
-	data |= ( ioport("ay_joy_2")->read() ) & 0x8F;
+	data =  m_ay_keys->read() & 0x70;
+	data |= m_ay_joy[1]->read() & 0x8f;
 
-	#ifdef DBGMODE
-	printf("%s: read ay_portb_r : 0x%.2X\n",machine().describe_context().c_str(),data);
-	#endif
+	LOG("%s: read ay_portb_r : 0x%.2X\n",machine().describe_context(),data);
 
 	return data;
 }
@@ -467,51 +403,9 @@ uint8_t squale_state::ay_porta_r()
 	// B1 : Joystick 1 - Left
 	// B0 : Joystick 1 - Right
 
-	uint8_t data;
+	LOG("%s: read ay_porta_r\n",machine().describe_context());
 
-	#ifdef DBGMODE
-	printf("%s: read ay_porta_r\n",machine().describe_context().c_str());
-	#endif
-
-	data =  ( ioport("ay_joy_2")->read() ) & 0x8F;
-
-	return data;
-}
-
-void squale_state::ay_porta_w(uint8_t data)
-{
-	// AY-8910 Port A : Joystick 1, light pen
-	// B7 : Joystick 1 - Fire
-	// B6 : -
-	// B5 : Light pen Int.
-	// B4 : -
-	// B3 : Joystick 1 - Up
-	// B2 : Joystick 1 - Down
-	// B1 : Joystick 1 - Left
-	// B0 : Joystick 1 - Right
-
-	#ifdef DBGMODE
-	printf("%s: write ay_porta_w : 0x%.2X\n",machine().describe_context().c_str(),data);
-	#endif
-	return;
-}
-
-void squale_state::ay_portb_w(uint8_t data)
-{
-	// AY-8910 Port B : Joystick 2, Shift, Shift Lock, Ctrl Keys
-	// B7 : Joystick 2 - Fire
-	// B6 : Keyboard   - Control
-	// B5 : Keyboard   - Shift
-	// B4 : Keyboard   - Shift Lock
-	// B3 : Joystick 2 - Up
-	// B2 : Joystick 2 - Down
-	// B1 : Joystick 2 - Left
-	// B0 : Joystick 2 - Right
-
-	#ifdef DBGMODE
-	printf("%s: write ay_portb_w : 0x%.2X\n",machine().describe_context().c_str(),data);
-	#endif
-	return;
+	return m_ay_joy[0]->read() & 0x8f;
 }
 
 /***********************************
@@ -521,16 +415,12 @@ void squale_state::ay_portb_w(uint8_t data)
 uint8_t squale_state::pia_u72_porta_r()
 {
 	// U72 PIA Port A : Cartridge data bus
-	uint8_t data;
+	uint8_t data = 0xff;
 
-	#ifdef DBGMODE
-	printf("%s: read pia_u72_porta_r\n",machine().describe_context().c_str());
-	#endif
+	LOG("%s: read pia_u72_porta_r\n",machine().describe_context());
 
-	if( m_cart_rom && m_cart_rom->bytes() )
-		data = m_cart_rom->as_u8( cart_addr_counter % m_cart_rom->bytes() );
-	else
-		data = 0xFF;
+	if( m_cart->exists() )
+		data = m_cart->read_rom( cart_addr_counter % m_cart->get_rom_size() );
 
 	return data;
 }
@@ -539,20 +429,14 @@ void squale_state::pia_u72_porta_w(uint8_t data)
 {
 	// U72 PIA Port A : Cartridge data bus
 
-	#ifdef DBGMODE
-	printf("%s: write pia_u72_porta_w : 0x%.2X\n",machine().describe_context().c_str(),data);
-	#endif
-
-	return;
+	LOG("%s: write pia_u72_porta_w : 0x%.2X\n",machine().describe_context(),data);
 }
 
 void squale_state::pia_u72_ca2_w(int state)
 {
 	// U72 PIA CA2 : Cartridge address control
 
-	#ifdef DBGMODE
-	printf("%s: U72 PIA Port CA2 Set to %2x\n", machine().describe_context().c_str(),state);
-	#endif
+	LOG("%s: U72 PIA Port CA2 Set to %d\n", machine().describe_context(),state);
 
 	if( state )
 	{
@@ -574,9 +458,7 @@ void squale_state::pia_u75_cb2_w(int state)
 {
 	// U75 PIA CB2 : Cartridge address reset
 
-	#ifdef DBGMODE
-	printf("%s: U75 PIA Port CB2 Set to %2x\n", machine().describe_context().c_str(),state);
-	#endif
+	LOG("%s: U75 PIA Port CB2 Set to %d\n", machine().describe_context(),state);
 
 	if( state )
 	{
@@ -598,11 +480,9 @@ uint8_t squale_state::pia_u72_portb_r()
 {
 	// U72 PIA Port B : Printer data bus
 
-	uint8_t data = 0xFF;
+	uint8_t data = 0xff;
 
-	#ifdef DBGMODE
-	printf("%s: read pia_u72_portb_r\n",machine().describe_context().c_str());
-	#endif
+	LOG("%s: read pia_u72_portb_r\n",machine().describe_context());
 
 	return data;
 }
@@ -611,27 +491,21 @@ void squale_state::pia_u72_portb_w(uint8_t data)
 {
 	// U72 PIA Port B : Printer data bus
 
-	#ifdef DBGMODE
-	printf("%s: write pia_u72_portb_w : 0x%.2X\n",machine().describe_context().c_str(),data);
-	#endif
-
-	return;
+	LOG("%s: write pia_u72_portb_w : 0x%.2X\n",machine().describe_context(),data);
 }
 
 void squale_state::pia_u72_cb2_w(int state)
 {
 	// U72 PIA CB2 : Printer Data Strobe line
 
-	#ifdef DBGMODE
-	printf("%s: U72 PIA Port CB2 Set to %2x\n", machine().describe_context().c_str(),state);
-	#endif
+	LOG("%s: U72 PIA Port CB2 Set to %d\n", machine().describe_context(),state);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( squale_state::cart_load )
 {
 	uint32_t const size = m_cart->common_get_size("rom");
 
-	if (!size || size > 0x1'0000)
+	if (!size || size > 0x10000)
 		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be more than 64K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -649,6 +523,7 @@ void squale_state::squale_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xefff).ram();
+	map(0xf000, 0xffff).bankr("rom_bank");
 	map(0xf000, 0xf00f).rw(m_ef9365, FUNC(ef9365_device::data_r), FUNC(ef9365_device::data_w));
 	map(0xf010, 0xf01f).w(FUNC(squale_state::ctrl_w));
 	map(0xf020, 0xf02f).r(FUNC(squale_state::video_ram_read_reg1));
@@ -660,8 +535,6 @@ void squale_state::squale_mem(address_map &map)
 	map(0xf080, 0xf083).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0xf08a, 0xf08a).rw(FUNC(squale_state::fdc_sel0_r), FUNC(squale_state::fdc_sel0_w));
 	map(0xf08b, 0xf08b).rw(FUNC(squale_state::fdc_sel1_r), FUNC(squale_state::fdc_sel1_w));
-	map(0xf100, 0xffff).bankr("rom_bank");
-
 }
 
 /* Input ports */
@@ -674,7 +547,7 @@ static INPUT_PORTS_START( squale )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))  // 0x0b
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2191") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) // U+2191 = ↑
 
 	PORT_START("X1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -724,7 +597,7 @@ static INPUT_PORTS_START( squale )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) // 0x08
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2190") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) // U+2190 = ←
 
 	PORT_START("X6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -734,7 +607,7 @@ static INPUT_PORTS_START( squale )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) // 0x09
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2192") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) // U+2192 = →
 
 	PORT_START("X7")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -744,7 +617,7 @@ static INPUT_PORTS_START( squale )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) // 0x0a
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2193") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) // U+2193 = ↓
 
 	PORT_START("ay_keys")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Lock") PORT_CODE(KEYCODE_LALT)
@@ -764,7 +637,6 @@ static INPUT_PORTS_START( squale )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(2)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1)        PORT_PLAYER(2)
-
 INPUT_PORTS_END
 
 static void squale_floppies(device_slot_interface &device)
@@ -774,29 +646,21 @@ static void squale_floppies(device_slot_interface &device)
 
 void squale_state::machine_start()
 {
-	int i;
-	std::string region_tag;
-
-	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-
 	fdc_sel0 = 0x00;
 	fdc_sel1 = 0x00;
-	m_floppy = nullptr;
 
 	cart_addr_counter_reset = 0;
 	cart_addr_counter = 0x0000;
 
-	membank("rom_bank")->configure_entry(0, memregion("maincpu")->base() + 0x100);
-	membank("rom_bank")->configure_entry(1, memregion("maincpu")->base() + 0x1100);
-	membank("rom_bank")->set_entry( 0 );
+	m_rom_bank->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
 
 	// Generate Squale hardware palette
-	for(i=0;i<8;i++)
+	for(int i=0;i<8;i++)
 	{
 		m_ef9365->set_color_entry(i,(((i&4)>>2)^1) * 255,(((i&2)>>1)^1) * 255, ((i&1)^1) * 255 );
 	}
 
-	for(i=0;i<8;i++)
+	for(int i=0;i<8;i++)
 	{
 		m_ef9365->set_color_entry(i + 8,(((i&4)>>2)^1) * 127,(((i&2)>>1)^1) * 127, ((i&1)^1) * 127 );
 	}
@@ -804,12 +668,13 @@ void squale_state::machine_start()
 
 void squale_state::machine_reset()
 {
+	m_rom_bank->set_entry( 0 );
 }
 
 void squale_state::squale(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809(config, m_maincpu, CPU_CLOCK);
+	MC6809(config, m_maincpu, 14_MHz_XTAL/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &squale_state::squale_mem);
 
 	/* Cartridge pia */
@@ -826,17 +691,14 @@ void squale_state::squale(machine_config &config)
 	m_pia_u75->readpa_handler().set(FUNC(squale_state::pia_u75_porta_r));
 	m_pia_u75->readpb_handler().set(FUNC(squale_state::pia_u75_portb_r));
 	m_pia_u75->writepa_handler().set(FUNC(squale_state::pia_u75_porta_w));
-	m_pia_u75->writepb_handler().set(FUNC(squale_state::pia_u75_portb_w));
 	m_pia_u75->cb2_handler().set(FUNC(squale_state::pia_u75_cb2_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, m_ay8910, AY_CLOCK);
+	AY8910(config, m_ay8910, 14_MHz_XTAL/8);
 	// TODO : Add port I/O handler
 	m_ay8910->port_a_read_callback().set(FUNC(squale_state::ay_porta_r));
 	m_ay8910->port_b_read_callback().set(FUNC(squale_state::ay_portb_r));
-	m_ay8910->port_a_write_callback().set(FUNC(squale_state::ay_porta_w));
-	m_ay8910->port_b_write_callback().set(FUNC(squale_state::ay_portb_w));
 	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	ACIA6850(config, m_acia, 0);
@@ -850,7 +712,7 @@ void squale_state::squale(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(16);
 
-	EF9365(config, m_ef9365, VIDEO_CLOCK);
+	EF9365(config, m_ef9365, 14_MHz_XTAL/8);
 	m_ef9365->set_palette_tag("palette");
 	m_ef9365->set_nb_bitplanes(4);
 	m_ef9365->set_display_mode(ef9365_device::DISPLAY_MODE_256x256);
@@ -882,8 +744,6 @@ ROM_END
 
 } // anonymous namespace
 
-
-/* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY     FULLNAME  FLAGS
 COMP( 1984, squale, 0,      0,      squale,  squale, squale_state, empty_init, "Apollo 7", "Squale", 0 )

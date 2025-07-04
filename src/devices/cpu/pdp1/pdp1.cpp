@@ -494,7 +494,38 @@ void pdp1_device::execute_set_input(int irqline, int state)
 
 void pdp1_device::device_start()
 {
-	int i;
+	/* save states */
+	save_item(NAME(m_pc));
+	save_item(NAME(m_ir));
+	save_item(NAME(m_mb));
+	save_item(NAME(m_ma));
+	save_item(NAME(m_ac));
+	save_item(NAME(m_io));
+	save_item(NAME(m_pf));
+
+	save_item(NAME(m_run));
+	save_item(NAME(m_cycle));
+	save_item(NAME(m_defer));
+	save_item(NAME(m_brk_ctr));
+	save_item(NAME(m_ov));
+	save_item(NAME(m_rim));
+	save_item(NAME(m_sbm));
+	save_item(NAME(m_exd));
+	save_item(NAME(m_exc));
+	save_item(NAME(m_ioc));
+	save_item(NAME(m_ioh));
+	save_item(NAME(m_ios));
+
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_b1));
+	save_item(NAME(m_b2));
+	save_item(NAME(m_b4));
+
+	save_item(NAME(m_rim_step));
+	save_item(NAME(m_sbs_request));
+	save_item(NAME(m_sbs_level));
+	save_item(NAME(m_sbs_restore));
+	save_item(NAME(m_no_sequence_break));
 
 	/* clean-up */
 	m_pc = 0;
@@ -536,7 +567,7 @@ void pdp1_device::device_start()
 	m_program = &space(AS_PROGRAM);
 
 	/* set up params and callbacks */
-	for (i=0; i<64; i++)
+	for (int i=0; i<64; i++)
 	{
 		m_extern_iot[i].resolve();
 		if (m_extern_iot[i].isnull())

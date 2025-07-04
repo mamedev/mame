@@ -412,6 +412,9 @@ public:
 	/* return the number of warnings we generated */
 	int warnings() const { return m_warnings; }
 
+	/* return the number of present but bad ROMs */
+	int presentbad() const { return m_presentbad; }
+
 	std::string& software_load_warnings_message() { return m_softwarningstring; }
 
 	/* return the number of BAD_DUMP/NO_DUMP warnings we generated */
@@ -488,6 +491,7 @@ private:
 	running_machine &   m_machine;            // reference to our machine
 
 	int                 m_warnings;           // warning count during processing
+	int                 m_presentbad;         // ROM files that are present bad have the wrong content
 	int                 m_knownbad;           // BAD_DUMP/NO_DUMP count during processing
 	int                 m_errors;             // error count during processing
 

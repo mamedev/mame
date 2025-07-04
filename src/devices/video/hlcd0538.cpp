@@ -2,16 +2,17 @@
 // copyright-holders:hap
 /*
 
-Hughes HLCD 0538(A)/0539(A) LCD Driver
+Hughes HLCD 0538(A)/0539(A)/0607(A) LCD Driver
 
 0538: 8 rows, 26 columns
 0539: 0 rows, 34 columns
+0607: 4 rows, 30 columns
 
 "LCD" pin can be used in 2 modes, either direct drive, or as an oscillator.
 In latter case, output frequency is approximately 1/RC.
 
 TODO:
-- the only difference between 0538/0539 is row pins voltage levels?
+- the only difference between 0538/0607 and 0539 is row pins voltage levels?
 
 */
 
@@ -21,6 +22,7 @@ TODO:
 
 DEFINE_DEVICE_TYPE(HLCD0538, hlcd0538_device, "hlcd0538", "Hughes HLCD 0538 LCD Driver")
 DEFINE_DEVICE_TYPE(HLCD0539, hlcd0539_device, "hlcd0539", "Hughes HLCD 0539 LCD Driver")
+DEFINE_DEVICE_TYPE(HLCD0607, hlcd0607_device, "hlcd0607", "Hughes HLCD 0607 LCD Driver")
 
 //-------------------------------------------------
 //  constructor
@@ -37,6 +39,10 @@ hlcd0538_device::hlcd0538_device(const machine_config &mconfig, const char *tag,
 
 hlcd0539_device::hlcd0539_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	hlcd0538_device(mconfig, HLCD0539, tag, owner, clock)
+{ }
+
+hlcd0607_device::hlcd0607_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hlcd0538_device(mconfig, HLCD0607, tag, owner, clock)
 { }
 
 

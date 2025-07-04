@@ -294,10 +294,9 @@ void mogura_state::mogura(machine_config &config)
 	PALETTE(config, "palette", FUNC(mogura_state::palette), 32);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_4BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	DAC_4BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	SPEAKER(config, "speaker", 2).front();
+	DAC_4BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
+	DAC_4BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 }
 
 

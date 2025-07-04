@@ -521,7 +521,7 @@ US games also show the ROM checksum on the label.
 
 Game EPROMs are M27V322 (4MB), system/setchip EPROMs are M27V800 (1MB) or M27V160 (2MB). All three types have 42 pins.
 
-Currently there are no dumps of the SPC (serial protocol converter) boards.
+SPC stands for serial protocol converter.
 On the SPC2 PCB there is a 32-pin EPROM located at U3.
 On SPC2.5 boards (both original and type II), the chip is a 32-pin PLCC rather than DIP, and is located at U19.
 
@@ -538,6 +538,7 @@ SPC2:
 Also:
     GAMBS2M 01.06.12   U3   V. 01.06.12   P244 / BB6D / 00DFBB6D   Copyright © 2011 Aristocrat Technologies Inc.
     GAMBS2M 01.06.03   U3   V. 01.06.03   35HH / AD8D / 00DDAD8D   Copyright © 2009 Aristocrat Technologies Inc.
+    GAMBS2M 01.05.07   U3   V. 01.05.07   2674 / 26C5 / 00DD26C5   Copyright © 2008 Aristocrat Technologies Inc.
 
 SPC2.5:
 U19 (program chip)
@@ -723,8 +724,10 @@ typically at around 0x3100-0x3200, 0x3600-0x3700 for Left/Right BIOS dumps (2 fi
 	ROM_LOAD32_WORD_BIOS( 43, "06.02.20_left.u70",  0x0000002, 0x0100000, CRC(199ed3b9) SHA1(e3ee81ffd713f09e35a10c38e4f59282e2c5cd30) ) \
 	ROM_SYSTEM_BIOS( 44, "set-us4",   "Aristocrat MK6 Set Chips (06.02.04, US)" ) \
 	ROM_LOAD32_WORD_BIOS( 44, "06.02.04_right.u2", 0x0000000, 0x0100000, CRC(1cf5a853) SHA1(64d17efcce702df7a0b0e151293199478e25226d) ) \
-	ROM_LOAD32_WORD_BIOS( 44, "06.02.04_left.u3",  0x0000002, 0x0100000, CRC(117b75f2) SHA1(2129286853d3c50b8a943b71334d4ef6b98adc05) )
-
+	ROM_LOAD32_WORD_BIOS( 44, "06.02.04_left.u3",  0x0000002, 0x0100000, CRC(117b75f2) SHA1(2129286853d3c50b8a943b71334d4ef6b98adc05) ) \
+	\
+	ROM_REGION32_LE( 0x20000, "spc2", 0 ) \
+	ROM_LOAD( "gambs2m_01.05.07.u3", 0x00000, 0x20000, CRC(58730ed3) SHA1(6e9c9d7960fe0ef083ff824287a99d9c0b9f5e6a) ) // I386 code
 
 ROM_START( aristmk6 )
 	ARISTMK6_BIOS

@@ -17,6 +17,16 @@
 // - Start decay:           rc_eg.set_r(decay_r).set_target_v(sustain_v);
 // - Start release:         rc_eg.set_r(release_r).set_target_v(0);
 //
+// The set_*() methods expect a monotonically increasing machine time, and will
+// assert()-fail if that's not the case.
+// If a single instance is used by multiple CPUs, this requirement can be met by
+// calling set_*() from within timer callbacks invoked with:
+// machine().scheduler().synchronize(timer_expired_delegate(...)).
+// See src/mame/moog/source.cpp for examples.
+//
+// Depending on the details of the multi-CPU system being emulated, additional
+// synchronization mitigations may be warranted, such as add_quantum(),
+// set_perfect_quantum(), etc.
 class va_rc_eg_device : public device_t, public device_sound_interface
 {
 public:
@@ -37,9 +47,14 @@ public:
 	float get_v(const attotime &t) const;
 	float get_v() const;  // Get voltage at the machine's current time.
 
+	// Returns the remaining time required to reach voltage `v`.
+	// Returns attotime::never if `v` was reached in the past, or if it is
+	// impossible to reach.
+	attotime get_dt(float v) const;
+
 protected:
 	void device_start() override ATTR_COLD;
-	void sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
+	void sound_stream_update(sound_stream &stream) override;
 
 private:
 	// Takes a snapshot of the current voltage into m_v_start and m_t_start.

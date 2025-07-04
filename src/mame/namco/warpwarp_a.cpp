@@ -168,13 +168,11 @@ void warpwarp_sound_device::music2_w(u8 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void warpwarp_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void warpwarp_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
-
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
-		buffer.put_int(sampindex, m_sound_signal + m_music_signal, 32768 * 2);
+		stream.put_int(0, sampindex, m_sound_signal + m_music_signal, 32768 * 2);
 
 		/*
 		 * The music signal is selected at a rate of 2H (1.536MHz) from the

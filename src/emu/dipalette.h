@@ -23,7 +23,7 @@
 //**************************************************************************
 
 constexpr float PALETTE_DEFAULT_SHADOW_FACTOR = 0.6f;
-constexpr float PALETTE_DEFAULT_HIGHLIGHT_FACTOR = 1.0f/PALETTE_DEFAULT_SHADOW_FACTOR;
+constexpr float PALETTE_DEFAULT_HIGHLIGHT_FACTOR = 1.0f / PALETTE_DEFAULT_SHADOW_FACTOR;
 
 
 //**************************************************************************
@@ -54,7 +54,7 @@ public:
 	pen_t black_pen() const { return m_black_pen; }
 	pen_t white_pen() const { return m_white_pen; }
 	bool shadows_enabled() const noexcept { return palette_shadows_enabled(); }
-	bool hilights_enabled() const noexcept { return palette_hilights_enabled(); }
+	bool highlights_enabled() const noexcept { return palette_highlights_enabled(); }
 
 	// setters
 	void set_pen_color(pen_t pen, rgb_t rgb) { m_palette->entry_set_color(pen, rgb); }
@@ -64,7 +64,7 @@ public:
 	void set_pen_color(pen_t pen, u8 r, u8 g, u8 b) { m_palette->entry_set_color(pen, rgb_t(r, g, b)); }
 	void set_pen_colors(pen_t color_base, const rgb_t *colors, int color_count) { while (color_count--) set_pen_color(color_base++, *colors++); }
 	template <size_t N> void set_pen_colors(pen_t color_base, const rgb_t (&colors)[N]) { set_pen_colors(color_base, colors, N); }
-	void set_pen_colors(pen_t color_base, const std::vector<rgb_t> &colors) { for (unsigned int i=0; i != colors.size(); i++) set_pen_color(color_base+i, colors[i]); }
+	void set_pen_colors(pen_t color_base, const std::vector<rgb_t> &colors) { for (unsigned int i = 0; i != colors.size(); i++) set_pen_color(color_base + i, colors[i]); }
 	void set_pen_contrast(pen_t pen, double bright) { m_palette->entry_set_contrast(pen, bright); }
 
 	// indirection (aka colortables)
@@ -75,9 +75,13 @@ public:
 	u32 transpen_mask(gfx_element &gfx, u32 color, indirect_pen_t transcolor) const;
 
 	// shadow config
-	void set_shadow_factor(double factor) { assert(m_shadow_group != 0); m_palette->group_set_contrast(m_shadow_group, factor); }
-	void set_highlight_factor(double factor) { assert(m_hilight_group != 0); m_palette->group_set_contrast(m_hilight_group, factor); }
-	void set_shadow_mode(int mode) { assert(mode >= 0 && mode < MAX_SHADOW_PRESETS); m_shadow_table = m_shadow_tables[mode].base; }
+	double shadow_factor() const { return m_shadow_factor; }
+	double highlight_factor() const { return m_highlight_factor; }
+	u32 shadow_mode() const { return m_shadow_mode; }
+	void set_shadow_factor(double factor) { assert(m_shadow_group != 0); m_shadow_factor = factor; m_palette->group_set_contrast(m_shadow_group, factor); }
+	void set_highlight_factor(double factor) { assert(m_highlight_group != 0); m_highlight_factor = factor; m_palette->group_set_contrast(m_highlight_group, factor); }
+	void set_shadow_mode(u32 mode) { assert(mode < MAX_SHADOW_PRESETS); m_shadow_mode = mode; m_shadow_table = m_shadow_tables[mode].base; }
+	void set_shadow_dRGB32(u32 mode, int dr, int dg, int db, bool noclip); // needed by konamigx
 
 protected:
 	// construction/destruction
@@ -95,48 +99,48 @@ protected:
 	virtual u32 palette_entries() const noexcept = 0;
 	virtual u32 palette_indirect_entries() const noexcept { return 0; }
 	virtual bool palette_shadows_enabled() const noexcept { return false; }
-	virtual bool palette_hilights_enabled() const noexcept { return false; }
+	virtual bool palette_highlights_enabled() const noexcept { return false; }
 
 private:
 	// internal helpers
 	void allocate_palette(u32 numentries);
 	void allocate_color_tables();
 	void allocate_shadow_tables();
-public: // needed by konamigx
-	void set_shadow_dRGB32(int mode, int dr, int dg, int db, bool noclip);
-private:
-	void configure_rgb_shadows(int mode, float factor);
+	void configure_rgb_shadows(u32 mode, float factor);
 
 	// internal state
-	palette_t *         m_palette;              // the palette itself
-	const pen_t *       m_pens;                 // remapped palette pen numbers
-	bitmap_format       m_format;               // format assumed for palette data
-	pen_t *             m_shadow_table;         // table for looking up a shadowed pen
-	u32                 m_shadow_group;         // index of the shadow group, or 0 if none
-	u32                 m_hilight_group;        // index of the hilight group, or 0 if none
-	pen_t               m_white_pen;            // precomputed white pen value
-	pen_t               m_black_pen;            // precomputed black pen value
+	palette_t *        m_palette;                // the palette itself
+	const pen_t *      m_pens;                   // remapped palette pen numbers
+	bitmap_format      m_format;                 // format assumed for palette data
+	pen_t *            m_shadow_table;           // table for looking up a shadowed pen
+	u32                m_shadow_mode;            // index of current shadow table
+	u32                m_shadow_group;           // index of the shadow group, or 0 if none
+	u32                m_highlight_group;        // index of the highlight group, or 0 if none
+	double             m_shadow_factor;          // current shadow contrast factor
+	double             m_highlight_factor;       // current highlight contrast factor
+	pen_t              m_white_pen;              // precomputed white pen value
+	pen_t              m_black_pen;              // precomputed black pen value
 
 	// indirection state
-	std::vector<rgb_t> m_indirect_colors;          // actual colors set for indirection
-	std::vector<indirect_pen_t> m_indirect_pens;   // indirection values
+	std::vector<rgb_t> m_indirect_colors;        // actual colors set for indirection
+	std::vector<indirect_pen_t> m_indirect_pens; // indirection values
 
 	struct shadow_table_data
 	{
-		pen_t *            base;               // pointer to the base of the table
-		s16                dr;                 // delta red value
-		s16                dg;                 // delta green value
-		s16                db;                 // delta blue value
-		bool               noclip;             // clip?
+		pen_t *        base;                     // pointer to the base of the table
+		s16            dr;                       // delta red value
+		s16            dg;                       // delta green value
+		s16            db;                       // delta blue value
+		bool           noclip;                   // clip?
 	};
-	shadow_table_data   m_shadow_tables[MAX_SHADOW_PRESETS]; // array of shadow table data
+	shadow_table_data  m_shadow_tables[MAX_SHADOW_PRESETS]; // array of shadow table data
 
-	std::vector<pen_t> m_save_pen;           // pens for save/restore
-	std::vector<float> m_save_contrast;      // brightness for save/restore
+	std::vector<pen_t> m_save_pen;               // pens for save/restore
+	std::vector<float> m_save_contrast;          // brightness for save/restore
 
 	std::vector<pen_t> m_pen_array;
 	std::vector<pen_t> m_shadow_array;
-	std::vector<pen_t> m_hilight_array;
+	std::vector<pen_t> m_highlight_array;
 };
 
 // interface type iterator

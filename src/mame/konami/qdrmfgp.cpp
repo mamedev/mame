@@ -697,14 +697,13 @@ void qdrmfgp_state::qdrmfgp(machine_config &config)
 	m_k053252->set_offsets(40, 16);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	k054539_device &k054539(K054539(config, m_k054539, XTAL(18'432'000)));
 	k054539.set_addrmap(0, &qdrmfgp_state::qdrmfgp_k054539_map);
 	k054539.timer_handler().set(FUNC(qdrmfgp_state::k054539_irq1_gen));
-	k054539.add_route(0, "lspeaker", 1.0);
-	k054539.add_route(1, "rspeaker", 1.0);
+	k054539.add_route(0, "speaker", 1.0, 0);
+	k054539.add_route(1, "speaker", 1.0, 1);
 }
 
 void qdrmfgp_state::qdrmfgp2(machine_config &config)
@@ -742,13 +741,12 @@ void qdrmfgp_state::qdrmfgp2(machine_config &config)
 	m_k053252->set_offsets(40, 16);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
 	k054539.set_addrmap(0, &qdrmfgp_state::qdrmfgp_k054539_map);
-	k054539.add_route(0, "lspeaker", 1.0);
-	k054539.add_route(1, "rspeaker", 1.0);
+	k054539.add_route(0, "speaker", 1.0, 0);
+	k054539.add_route(1, "speaker", 1.0, 1);
 }
 
 

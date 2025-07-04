@@ -55,15 +55,15 @@ public:
 		m_int_enable(true)
 	{ }
 
-	void blueshrk(machine_config &config);
-	void checkmat(machine_config &config);
-	void dogpatch(machine_config &config);
-	void invad2ct(machine_config &config);
-	void maze(machine_config &config);
-	void mw8080bw_root(machine_config &config);
-	void phantom2(machine_config &config);
-	void shuffle(machine_config &config);
-	void tornbase(machine_config &config);
+	void blueshrk(machine_config &config) ATTR_COLD;
+	void checkmat(machine_config &config) ATTR_COLD;
+	void dogpatch(machine_config &config) ATTR_COLD;
+	void invad2ct(machine_config &config) ATTR_COLD;
+	void maze(machine_config &config) ATTR_COLD;
+	void mw8080bw_root(machine_config &config) ATTR_COLD;
+	void phantom2(machine_config &config) ATTR_COLD;
+	void shuffle(machine_config &config) ATTR_COLD;
+	void tornbase(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(direct_coin_count);
 
@@ -163,7 +163,7 @@ public:
 	{
 	}
 
-	void seawolf(machine_config &config);
+	void seawolf(machine_config &config) ATTR_COLD;
 
 	ioport_value erase_input_r();
 
@@ -194,7 +194,7 @@ public:
 	{
 	}
 
-	void gunfight(machine_config &config);
+	void gunfight(machine_config &config) ATTR_COLD;
 
 private:
 	void io_w(offs_t offset, u8 data);
@@ -213,9 +213,9 @@ public:
 	{
 	}
 
-	void boothill(machine_config &config);
-	void gmissile(machine_config &config);
-	void m4(machine_config &config);
+	void boothill(machine_config &config) ATTR_COLD;
+	void gmissile(machine_config &config) ATTR_COLD;
+	void m4(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -248,7 +248,7 @@ public:
 	{
 	}
 
-	void desertgu(machine_config &config);
+	void desertgu(machine_config &config) ATTR_COLD;
 
 	ioport_value gun_input_r();
 	ioport_value dip_sw_0_1_r();
@@ -280,7 +280,7 @@ public:
 	{
 	}
 
-	void dplay(machine_config &config);
+	void dplay(machine_config &config) ATTR_COLD;
 
 	ioport_value dplay_pitch_left_input_r();
 	ioport_value dplay_pitch_right_input_r();
@@ -303,8 +303,8 @@ public:
 	{
 	}
 
-	void clowns(machine_config &config);
-	void spacwalk(machine_config &config);
+	void clowns(machine_config &config) ATTR_COLD;
+	void spacwalk(machine_config &config) ATTR_COLD;
 
 	ioport_value controller_r();
 
@@ -329,7 +329,7 @@ public:
 	{
 	}
 
-	void spcenctr(machine_config &config);
+	void spcenctr(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -358,12 +358,12 @@ public:
 	{
 	}
 
-	void zzzap(machine_config &config);
+	void zzzap(machine_config &config) ATTR_COLD;
 
-	void lagunar(machine_config &config);
+	void lagunar(machine_config &config) ATTR_COLD;
 
 protected:
-	void zzzap_common(machine_config &config);
+	void zzzap_common(machine_config &config) ATTR_COLD;
 
 private:
 	void io_map(address_map &map) ATTR_COLD;
@@ -386,8 +386,9 @@ public:
 	{
 	}
 
-	void invaders(machine_config &config);
-	void invnomb(machine_config &config);
+	void invaders(machine_config &config) ATTR_COLD;
+	void invnomb(machine_config &config) ATTR_COLD;
+	void cosmicbat(machine_config &config) ATTR_COLD;
 
 	ioport_value invaders_sw6_sw7_r();
 	ioport_value invaders_sw5_r();
@@ -434,7 +435,7 @@ public:
 	{
 	}
 
-	void bowler(machine_config &config);
+	void bowler(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

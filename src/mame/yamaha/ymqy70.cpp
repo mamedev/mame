@@ -180,8 +180,7 @@ void qy70_state::qy70(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(qy70_state::lcd_palette), 2);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);

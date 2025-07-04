@@ -61,7 +61,7 @@ protected:
 	uint8_t     m_data;
 	uint8_t     m_duty;
 
-	std::unique_ptr<uint8_t[]>  m_ddr;
+	std::unique_ptr<uint8_t[]> m_ddr;
 };
 
 

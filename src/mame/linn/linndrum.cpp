@@ -272,8 +272,7 @@ private:
 	required_device<filter_biquad_device> m_click_bpf;
 	required_device<mixer_device> m_left_mixer;  // 4558 op-amp (U1A).
 	required_device<mixer_device> m_right_mixer;  // 4558 op-amp (U1B).
-	required_device<speaker_device> m_left_out;  // 4558 op-amp (U2A).
-	required_device<speaker_device> m_right_out;  // 4558 op-amp (U2B).
+	required_device<speaker_device> m_out;        // 4558 op-amp (U2A, U2B).
 
 	static constexpr const float MIXER_R_PRE_FADER[NUM_MIXER_CHANNELS] =
 	{
@@ -383,8 +382,7 @@ linndrum_audio_device::linndrum_audio_device(const machine_config &mconfig, cons
 	, m_click_bpf(*this, "click_bpf")
 	, m_left_mixer(*this, "lmixer")
 	, m_right_mixer(*this, "rmixer")
-	, m_left_out(*this, "lspeaker")
-	, m_right_out(*this, "rspeaker")
+	, m_out(*this, "speaker")
 {
 }
 
@@ -578,9 +576,9 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 
 	TIMER(config, m_hat_trigger_timer).configure_generic(FUNC(linndrum_audio_device::hat_trigger_timer_tick));  // LM556 (U37B).
 	VA_RC_EG(config, m_hat_eg).set_c(HAT_C22);
-	VA_VCA(config, m_hat_vca).configure_streaming_cv(true).configure_cem3360_linear_cv();
-	m_mux_volume[MV_HAT]->add_route(0, m_hat_vca, 1.0);
-	m_hat_eg->add_route(0, m_hat_vca, HAT_EG2CV_SCALER);
+	VA_VCA(config, m_hat_vca).configure_cem3360_linear_cv();
+	m_mux_volume[MV_HAT]->add_route(0, m_hat_vca, 1.0, 0);
+	m_hat_eg->add_route(0, m_hat_vca, HAT_EG2CV_SCALER, 1);
 
 	// *** Snare / sidestick section.
 
@@ -676,11 +674,10 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	m_left_mixer->add_route(0, left_rc, 1.0);
 	m_right_mixer->add_route(0, right_rc, 1.0);
 
-	SPEAKER(config, m_left_out).front_left();
-	SPEAKER(config, m_right_out).front_right();
+	SPEAKER(config, m_out, 2).front();
 	// Gain will be set in update_master_volume().
-	left_rc.add_route(0, m_left_out, 1.0);
-	right_rc.add_route(0, m_right_out, 1.0);
+	left_rc.add_route(0, m_out, 1.0, 0);
+	right_rc.add_route(0, m_out, 1.0, 1);
 }
 
 void linndrum_audio_device::device_start()
@@ -902,9 +899,15 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 		gain_left = v_input_left * MIXER_R_FEEDBACK / R4;
 	}
 
+	device_sound_interface *mixer_input = nullptr;
+	if (channel == MIX_CLICK)
+		mixer_input = m_click_bpf;
+	else
+		mixer_input = m_voice_hpf[channel];
+
 	// Using -gain_*, because the summing op-amps are inverting.
-	m_left_mixer->set_input_gain(channel, -gain_left);
-	m_right_mixer->set_input_gain(channel, -gain_right);
+	mixer_input->set_route_gain(0, m_left_mixer, 0, -gain_left);
+	mixer_input->set_route_gain(0, m_right_mixer, 0, -gain_right);
 
 	if (channel == MIX_CLICK)
 	{
@@ -996,8 +999,8 @@ void linndrum_audio_device::update_master_volume()
 	const float final_gain = gain * VOLTAGE_TO_SOUND_SCALER;
 
 	// Using -final_gain, because the output opamps (U2A, U2B) are inverting.
-	m_left_out->set_input_gain(0, -final_gain);
-	m_right_out->set_input_gain(0, -final_gain);
+	m_out->set_input_gain(0, -final_gain);
+	m_out->set_input_gain(1, -final_gain);
 
 	LOGMASKED(LOG_MIX, "Master volume updated. Gain: %f, final gain: %f\n", gain, final_gain);
 }

@@ -7,7 +7,7 @@ REMOTE=$(git rev-parse @{u})
 BASE=$(git merge-base @ @{u})
 
 if [ $LOCAL = $REMOTE ]; then
-    echo "Up-to-date"
+    /bin/true
 elif [ $LOCAL = $BASE ]; then
     echo "Need to pull"
     git pull

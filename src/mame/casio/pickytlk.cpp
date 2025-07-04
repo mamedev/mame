@@ -570,6 +570,13 @@ ROM_START(jd364)
 	ROM_LOAD("d23c8000lwgx-c12.lsi5", 0x00000, 0x100000, CRC(c023b709) SHA1(0c081a62f00d0fbee496a5c9067fb145cb79c8cd))
 ROM_END
 
+ROM_START(jd366)
+	CPU_ROM_MULTICOLOR
+
+	ROM_REGION(0x100000, "mask_rom", 0)
+	ROM_LOAD("d23c8000xgx-c15.lsi5", 0x00000, 0x100000, CRC(d8a84c6a) SHA1(6a64dff0070c0016457c69fc0518df57da9c1b75))
+ROM_END
+
 ROM_START(jd368)
 	CPU_ROM_MULTICOLOR
 
@@ -609,6 +616,9 @@ COMP(1995?, pickydis, 0, 0, pickytlk_monocolor, pickytlk, pickytlk_monocolor_sta
 
 // Release date 1995-10 from "Casio Game Perfect Catalogue"
 COMP(1995, jd364, 0, 0, pickytlk_multicolor, pickytlk, pickytlk_multicolor_state, empty_init, "Casio", "Color Picky Talk - Super Denshi Techou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// ROM date 9635K7021
+COMP(1996?, jd366, 0, 0, pickytlk_multicolor, pickytlk, pickytlk_multicolor_state, empty_init, "Casio", "Super Picky Talk - My room fantasy", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // ROM date 9737K7041
 COMP(1997?, jd368, 0, 0, pickytlk_multicolor, pickytlk, pickytlk_multicolor_state, empty_init, "Casio", "Super Picky Talk - Access Pet", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

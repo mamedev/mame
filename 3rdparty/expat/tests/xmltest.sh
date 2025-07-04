@@ -2,8 +2,8 @@
 # EXPAT TEST SCRIPT FOR W3C XML TEST SUITE
 #
 # This script can be used to exercise Expat against the
-# w3c.org xml test suite, available from
-# http://www.w3.org/XML/Test/xmlts20020606.zip.
+# w3c.org xml test suite, available from:
+# https://www.w3.org/XML/Test/xmlts20020606.zip
 #
 # To run this script, first set XMLWF below so that xmlwf can be
 # found, then set the output directory with OUTPUT.
@@ -30,6 +30,7 @@
 # Copyright (c) 2002      Karl Waclawek <karl@waclawek.net>
 # Copyright (c) 2008-2019 Sebastian Pipping <sebastian@pipping.org>
 # Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
+# Copyright (c) 2025      Hanno Böck <hanno@gentoo.org>
 # Licensed under the MIT license:
 #
 # Permission is  hereby granted,  free of charge,  to any  person obtaining

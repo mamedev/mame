@@ -58,6 +58,7 @@
 #include "hfdc.h"
 #include "formats/mfm_hd.h"
 #include "formats/ti99_dsk.h"       // Format
+#include "formats/hxchfe_dsk.h"
 
 #define LOG_WARN        (1U << 1)   // Warnings
 #define LOG_EMU         (1U << 2)
@@ -1024,6 +1025,7 @@ void myarc_hfdc_device::floppy_formats(format_registration &fr)
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_TI99_SDF_FORMAT);
 	fr.add(FLOPPY_TI99_TDF_FORMAT);
+	fr.add(FLOPPY_HFE_FORMAT);
 }
 
 static void hfdc_floppies(device_slot_interface &device)

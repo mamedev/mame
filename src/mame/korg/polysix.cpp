@@ -40,7 +40,7 @@ public:
 
 	u8 get_control_low();
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -358,9 +358,9 @@ u8 polysix_sound_block::get_control_low()
 }
 
 // #*#*#*#*#*#*#*#
-void polysix_sound_block::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void polysix_sound_block::sound_stream_update(sound_stream &stream)
 {
-	for(int sample=0; sample != outputs[0].samples(); sample++) {
+	for(int sample=0; sample != stream.samples(); sample++) {
 		//      u8 trigger = m_gates & ~m_current_gates;
 		float out = 0;
 
@@ -416,7 +416,7 @@ void polysix_sound_block::sound_stream_update(sound_stream &stream, std::vector<
 		}
 
 		m_current_gates = m_gates;
-		outputs[0].put_clamp(sample, out/2);
+		stream.put(0, sample, out/2);
 	}
 }
 

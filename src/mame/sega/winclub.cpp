@@ -101,12 +101,11 @@ void winclub_state::winclub(machine_config &config)
 	screen.set_screen_update(FUNC(winclub_state::screen_update));
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz770_device &ymz770(YMZ770(config, "ymz", 16'384'000)); // internal clock?
-	ymz770.add_route(0, "lspeaker", 1.0);
-	ymz770.add_route(1, "rspeaker", 1.0);
+	ymz770.add_route(0, "speaker", 1.0, 0);
+	ymz770.add_route(1, "speaker", 1.0, 1);
 }
 
 

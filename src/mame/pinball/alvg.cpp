@@ -559,13 +559,12 @@ void alvg_state::pca008(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &alvg_state::pca008_map);
 	m_via1->writepa_handler().set(FUNC(alvg_state::via1_pa_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	BSMT2000(config, m_bsmt, XTAL(24'000'000));
 	m_bsmt->set_ready_callback(FUNC(alvg_state::bsmt_ready_w));
-	m_bsmt->add_route(0, "lspeaker", 1.2);
-	m_bsmt->add_route(1, "rspeaker", 1.2);
+	m_bsmt->add_route(0, "speaker", 1.2, 0);
+	m_bsmt->add_route(1, "speaker", 1.2, 1);
 
 	CLOCK(config, "fclock", 2'000'000 / 4096).signal_handler().set_inputline(m_audiocpu, 1);
 }

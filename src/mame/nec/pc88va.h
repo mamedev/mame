@@ -65,8 +65,7 @@ public:
 		, m_cbus(*this, "cbus%d", 0)
 		, m_mouse_port(*this, "mouseport") // labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
 		, m_opna(*this, "opna")
-		, m_lspeaker(*this, "lspeaker")
-		, m_rspeaker(*this, "rspeaker")
+		, m_speaker(*this, "speaker")
 		, m_palram(*this, "palram")
 		, m_sysbank(*this, "sysbank")
 		, m_workram(*this, "workram")
@@ -136,8 +135,7 @@ private:
 	required_device_array<pc9801_slot_device, 2> m_cbus;
 	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<ym2608_device> m_opna;
-	required_device<speaker_device> m_lspeaker;
-	required_device<speaker_device> m_rspeaker;
+	required_device<speaker_device> m_speaker;
 	required_shared_ptr<uint16_t> m_palram;
 	required_device<address_map_bank_device> m_sysbank;
 	required_shared_ptr<uint16_t> m_workram;

@@ -325,6 +325,7 @@ extern int XMLCALL external_entity_devaluer(XML_Parser parser,
 typedef struct ext_hdlr_data {
   const char *parse_text;
   XML_ExternalEntityRefHandler handler;
+  CharData *storage;
 } ExtHdlrData;
 
 extern int XMLCALL external_entity_oneshot_loader(XML_Parser parser,
@@ -557,6 +558,10 @@ extern void XMLCALL suspending_comment_handler(void *userData,
 extern void XMLCALL element_decl_suspender(void *userData, const XML_Char *name,
                                            XML_Content *model);
 
+extern void XMLCALL suspend_after_element_declaration(void *userData,
+                                                      const XML_Char *name,
+                                                      XML_Content *model);
+
 extern void XMLCALL accumulate_pi_characters(void *userData,
                                              const XML_Char *target,
                                              const XML_Char *data);
@@ -568,6 +573,10 @@ extern void XMLCALL accumulate_entity_decl(
     const XML_Char *value, int value_length, const XML_Char *base,
     const XML_Char *systemId, const XML_Char *publicId,
     const XML_Char *notationName);
+
+extern void XMLCALL accumulate_char_data_and_suspend(void *userData,
+                                                     const XML_Char *s,
+                                                     int len);
 
 extern void XMLCALL accumulate_start_element(void *userData,
                                              const XML_Char *name,

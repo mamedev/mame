@@ -75,36 +75,53 @@ void gaelco_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(gaelco_state,bigkarnk)
+void gaelco_state::create_tilemaps(bool split)
 {
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaelco_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaelco_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	m_tilemap[0]->set_transmask(0, 0xff01, 0x00ff); // pens 1-7 opaque, pens 0, 8-15 transparent
-	m_tilemap[1]->set_transmask(0, 0xff01, 0x00ff); // pens 1-7 opaque, pens 0, 8-15 transparent
+	if (split)
+	{
+		m_tilemap[0]->set_transmask(0, 0xff01, 0x00ff); // pens 1-7 opaque, pens 0, 8-15 transparent
+		m_tilemap[1]->set_transmask(0, 0xff01, 0x00ff); // pens 1-7 opaque, pens 0, 8-15 transparent
+	}
 }
 
-VIDEO_START_MEMBER(squash_state,squash)
+void bigkarnk_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(squash_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(squash_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	create_tilemaps(true);
+}
 
-	m_tilemap[0]->set_transmask(0, 0xff01, 0x00ff); // pens 1-7 opaque, pens 0, 8-15 transparent
-	m_tilemap[1]->set_transmask(0, 0xff01, 0x00ff); // pens 1-7 opaque, pens 0, 8-15 transparent
+void thoop_state::video_start()
+{
+	create_tilemaps(true);
+}
 
+void squash_state::video_start()
+{
+	create_tilemaps(true);
 	m_sprite_palette_force_high = 0x3c;
 }
 
-VIDEO_START_MEMBER(gaelco_state,maniacsq)
+void gaelco_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaelco_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaelco_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	create_tilemaps(false);
 
 	// it is possible Maniac Square hardware also has more complex priority handling, but does not use it
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
 }
 
+void xorwflat_state::video_start()
+{
+	gaelco_state::video_start();
+	// or use of scroll regs is different because sprites/backgrounds seem 1 pixel off (or you lose a column of tilemap in some scenes)
+	m_tilemap[0]->set_scrolldx(-208, 0);
+	m_tilemap[1]->set_scrolldx(-208, 0);
+
+	m_tilemap[0]->set_scrolldy(8, 0);
+	m_tilemap[1]->set_scrolldy(8, 0);
+}
 
 /***************************************************************************
 
@@ -190,7 +207,7 @@ void gaelco_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 						number + x_offset[ex] + y_offset[ey],
 						color,
 						xflip, yflip,
-						sx - 0x0f + x * 8, sy + y * 8,
+						m_spritexoffset + (sx - 0x0f + x * 8), m_spriteyoffset + (sy + y * 8),
 						screen.priority(), pri_mask, 0);
 			}
 		}
@@ -205,7 +222,7 @@ void gaelco_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 
 u32 gaelco_state::screen_update_maniacsq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* set scroll registers */
+	// set scroll registers
 	m_tilemap[0]->set_scrolly(0, m_vregs[0]);
 	m_tilemap[0]->set_scrollx(0, m_vregs[1] + 4);
 	m_tilemap[1]->set_scrolly(0, m_vregs[2]);
@@ -230,9 +247,9 @@ u32 gaelco_state::screen_update_maniacsq(screen_device &screen, bitmap_ind16 &bi
 	return 0;
 }
 
-u32 squash_state::screen_update_thoop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 squash_state::screen_update_squash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* set scroll registers */
+	// set scroll registers
 	m_tilemap[0]->set_scrolly(0, m_vregs[0]);
 	m_tilemap[0]->set_scrollx(0, m_vregs[1] + 4);
 	m_tilemap[1]->set_scrolly(0, m_vregs[2]);
@@ -276,7 +293,7 @@ u32 squash_state::screen_update_thoop(screen_device &screen, bitmap_ind16 &bitma
 
 u32 bigkarnk_state::screen_update_bigkarnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* set scroll registers */
+	// set scroll registers
 	m_tilemap[0]->set_scrolly(0, m_vregs[0]);
 	m_tilemap[0]->set_scrollx(0, m_vregs[1] + 4);
 	m_tilemap[1]->set_scrolly(0, m_vregs[2]);

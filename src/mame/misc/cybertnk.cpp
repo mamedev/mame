@@ -860,16 +860,15 @@ void cybertnk_state::cybertnk(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x4000);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
 	// Split output per chip
-	Y8950(config, "ym1", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	Y8950(config, "ym1", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	Y8950(config, "ym2", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	Y8950(config, "ym2", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 /***************************************************************************

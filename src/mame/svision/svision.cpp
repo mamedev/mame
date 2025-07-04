@@ -693,12 +693,11 @@ void svision_state::svision_base(machine_config &config)
 {
 	config.set_default_layout(layout_svision);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SVISION_SND(config, m_sound, 4'000'000, m_maincpu, m_bank[0]);
-	m_sound->add_route(0, "lspeaker", 0.50);
-	m_sound->add_route(1, "rspeaker", 0.50);
+	m_sound->add_route(0, "speaker", 0.50, 0);
+	m_sound->add_route(1, "speaker", 0.50, 1);
 	m_sound->irq_cb().set(FUNC(svision_state::sound_irq_w));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "svision_cart", "bin,ws,sv");

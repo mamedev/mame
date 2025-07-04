@@ -118,6 +118,8 @@ void tmpz84c015_device::device_reset()
 
 void tmpz84c015_device::device_post_load()
 {
+	z80_device::device_post_load();
+
 	// reinit irq priority
 	uint8_t prio = m_irq_priority;
 	m_irq_priority = -1;

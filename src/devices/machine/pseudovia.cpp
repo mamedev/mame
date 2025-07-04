@@ -11,7 +11,11 @@
     This first appeared in the Mac IIci's RBV chip, and also showed
     up in V8/Eagle/Spice/Tinker Bell, Sonora/Ardbeg, and VASP.
 
-    Quadras used a fairly different pseudo-VIA that acts
+    A variant called the AIV3 ("Apple Integrated VIA 3") is used in the
+    VSC and JET ASICs in the Duo Dock and Duo Dock II, respectively.
+    This is a pure pseudo-VIA with no 6522 compatibility registers.
+
+    Quadras used a quite different pseudo-VIA that acts
     much closer to a "real" VIA.  (And a real 6522 in the
     Quadra 700/900/950).
 */
@@ -40,7 +44,8 @@ pseudovia_device::pseudovia_device(const machine_config &mconfig, const char *ta
 	m_out_video_handler(*this),
 	m_out_msc_handler(*this),
 	m_pseudovia_ier(0),
-	m_pseudovia_ifr(0)
+	m_pseudovia_ifr(0),
+	m_pseudovia_aiv3(false)
 {
 	std::fill_n(m_pseudovia_regs, 256, 0);
 }
@@ -61,15 +66,14 @@ void pseudovia_device::vbl_irq_w(int state)
 {
 	if (!state)
 	{
-		return;
+		m_pseudovia_regs[2] |= 0x40;    // clear vblank signal
 	}
-
-	m_pseudovia_regs[2] &= ~0x40; // set vblank signal
-
-	if (m_pseudovia_regs[0x12] & 0x40)
+	else
 	{
-		pseudovia_recalc_irqs();
+		m_pseudovia_regs[2] &= ~0x40;   // set vblank signal
 	}
+
+	pseudovia_recalc_irqs();
 }
 
 template <u8 mask>
@@ -123,6 +127,20 @@ void pseudovia_device::scsi_irq_w(int state)
 	}
 }
 
+void pseudovia_device::scsi_drq_w(int state)
+{
+	if (state == ASSERT_LINE)
+	{
+		m_pseudovia_regs[3] |= 0x01;
+		pseudovia_recalc_irqs();
+	}
+	else
+	{
+		m_pseudovia_regs[3] &= ~0x01;
+		pseudovia_recalc_irqs();
+	}
+}
+
 void pseudovia_device::pseudovia_recalc_irqs()
 {
 	// check slot interrupts and bubble them down to IFR
@@ -138,9 +156,18 @@ void pseudovia_device::pseudovia_recalc_irqs()
 		m_pseudovia_regs[3] &= ~2; // any slot
 	}
 
-	uint8_t ifr = (m_pseudovia_regs[3] & m_pseudovia_ier) & 0x1b;
+	uint8_t ifr = m_pseudovia_regs[3];
+	// AIV3 does not have the legacy 6522 IER/IFR registers
+	if (m_pseudovia_aiv3)
+	{
+		ifr = ifr & m_pseudovia_regs[0x13] & 0x1b;
+	}
+	else
+	{
+		ifr = ifr & m_pseudovia_ier & 0x1b;
+	}
 
-	LOGMASKED(LOG_IRQ, "%s: slot_irqs %02x IFR %02x\n", slot_irqs, ifr);
+	LOGMASKED(LOG_IRQ, "%s: slot_irqs %02x IFR %02x (AIV3 %d, 0x13 %02x IER %02x)\n", tag(), slot_irqs, ifr, m_pseudovia_aiv3, m_pseudovia_regs[0x13], m_pseudovia_ier);
 
 	if (ifr != 0)
 	{

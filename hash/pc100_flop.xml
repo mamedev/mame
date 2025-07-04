@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="pc100_flop" description="NEC PC-100 disk images">
+
+<!-- !Inufuto -->
+
+	<software name="aerial" supported="no">
+		<description>Aerial</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="aerial.d88" size="348848" crc="c0aa46f4" sha1="a1c0264422d2cb87af1d40a170a1992d0af42e65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lift" supported="no">
+		<description>Lift</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="lift.d88" size="348848" crc="602e95a8" sha1="7969554926177798fd4af909ec7d207004316536"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mieyen" supported="no">
+		<description>Mieyen</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mieyen.d88" size="348848" crc="64c68859" sha1="85fefbb39a4557765dc967352f1c12921d302a4d"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

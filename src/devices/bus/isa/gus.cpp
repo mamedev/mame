@@ -242,26 +242,19 @@ TIMER_CALLBACK_MEMBER(gf1_device::dma_tick)
 	m_drq1_handler(1);
 }
 
-void gf1_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void gf1_device::sound_stream_update(sound_stream &stream)
 {
 	int x;
-	//uint32_t count;
-
-	auto &outputl = outputs[0];
-	auto &outputr = outputs[1];
-
-	outputl.fill(0);
-	outputr.fill(0);
 
 	for(x=0;x<32;x++)  // for each voice
 	{
 		uint16_t vol = (m_volume_table[(m_voice[x].current_vol & 0xfff0) >> 4]);
-		for (int sampindex = 0; sampindex < outputl.samples(); sampindex++)
+		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 		{
 			uint32_t current = m_voice[x].current_addr >> 9;
 			// TODO: implement proper panning
-			outputl.add_int(sampindex, m_voice[x].sample * vol, 32768 * 8192);
-			outputr.add_int(sampindex, m_voice[x].sample * vol, 32768 * 8192);
+			stream.add_int(0, sampindex, m_voice[x].sample * vol, 32768 * 8192);
+			stream.add_int(1, sampindex, m_voice[x].sample * vol, 32768 * 8192);
 			if((!(m_voice[x].voice_ctrl & 0x40)) && (m_voice[x].current_addr >= m_voice[x].end_addr) && !m_voice[x].rollover && !(m_voice[x].voice_ctrl & 0x01))
 			{
 				if(m_voice[x].vol_ramp_ctrl & 0x04)
@@ -1238,11 +1231,10 @@ INPUT_PORTS_END
 
 void isa16_gus_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	GGF1(config, m_gf1, GF1_CLOCK);
-	m_gf1->add_route(0, "lspeaker", 0.50);
-	m_gf1->add_route(1, "rspeaker", 0.50);
+	m_gf1->add_route(0, "speaker", 0.50, 0);
+	m_gf1->add_route(1, "speaker", 0.50, 1);
 
 	m_gf1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_gf1->txirq_handler().set(FUNC(isa16_gus_device::midi_txirq));

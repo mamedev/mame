@@ -34,17 +34,17 @@ enum screen_type_enum
 };
 
 // screen_update callback flags
-constexpr u32 UPDATE_HAS_NOT_CHANGED = 0x0001;   // the video has not changed
+constexpr u32 UPDATE_HAS_NOT_CHANGED = 0x0001; // the video has not changed
 
 /*!
  @defgroup flags for video_attributes
  @{
  @def VIDEO_UPDATE_BEFORE_VBLANK
- update_video called at the start of the VBLANK period
+ update_video called at the start of the VBLANK period, this is the default
  @todo hack, remove me
 
  @def VIDEO_UPDATE_AFTER_VBLANK
- update_video called at the end of the VBLANK period
+ update_video called at the end of the VBLANK period (in other words: before active display)
  @todo hack, remove me
 
  @def VIDEO_SELF_RENDER

@@ -2144,6 +2144,49 @@ void validity_checker::validate_driver(device_t &root)
 		osd_printf_error("Driver cannot have features that are both unemulated and imperfect (0x%08X)\n", util::underlying_value(unemulated & imperfect));
 	if ((m_current_driver->flags & machine_flags::NO_SOUND_HW) && ((unemulated | imperfect) & device_t::feature::SOUND))
 		osd_printf_error("Machine without sound hardware cannot have unemulated/imperfect sound\n");
+
+	// catch systems marked as supporting save states that contain devices that don't support save states
+	if (!(m_current_driver->type.emulation_flags() & device_t::flags::SAVE_UNSUPPORTED))
+	{
+		std::set<std::add_pointer_t<device_type> > nosave;
+		device_enumerator iter(root);
+		std::string_view cardtag;
+		for (auto &device : iter)
+		{
+			// ignore any children of a slot card
+			if (!cardtag.empty())
+			{
+				std::string_view tag(device.tag());
+				if ((tag.length() > cardtag.length()) && (tag.substr(0, cardtag.length()) == cardtag) && tag[cardtag.length()] == ':')
+					continue;
+				else
+					cardtag = std::string_view();
+			}
+
+			// check to see if this is a slot card
+			device_t *const parent(device.owner());
+			if (parent)
+			{
+				device_slot_interface *slot;
+				parent->interface(slot);
+				if (slot && (slot->get_card_device() == &device))
+				{
+					cardtag = device.tag();
+					continue;
+				}
+			}
+
+			if (device.type().emulation_flags() & device_t::flags::SAVE_UNSUPPORTED)
+				nosave.emplace(&device.type());
+		}
+		if (!nosave.empty())
+		{
+			std::ostringstream buf;
+			for (auto const &devtype : nosave)
+				util::stream_format(buf, "%s(%s) %s\n", core_filename_extract_base(devtype->source()), devtype->shortname(), devtype->fullname());
+			osd_printf_error("Machine is marked as supporting save states but uses devices that lack save state support:\n%s", std::move(buf).str());
+		}
+	}
 }
 
 
@@ -2601,8 +2644,8 @@ void validity_checker::validate_inputs(device_t &root)
 						{
 							osd_printf_error("Field '%s' has non-character U+%04X in PORT_CHAR(%d)\n",
 									name,
-									(unsigned)code,
-									(int)code);
+									uint32_t(code),
+									int32_t(code));
 						}
 					}
 				}
@@ -2610,6 +2653,34 @@ void validity_checker::validate_inputs(device_t &root)
 
 			// done with this port
 			m_current_ioport = nullptr;
+		}
+
+		// validate the default settings
+		const input_device_default *def = device.input_ports_defaults();
+		if (def != nullptr)
+		{
+			for ( ; def->tag; def++)
+			{
+				if (def->defvalue & ~def->mask)
+					osd_printf_error("Default value 0x%x for field of port '%s' lies outside mask 0x%x\n", def->defvalue, def->mask);
+
+				const auto it = portlist.find(device.subtag(def->tag));
+				if (portlist.end() == it)
+				{
+					osd_printf_error("Default specified for nonexistent port '%s'\n", def->tag);
+				}
+				else
+				{
+					const auto &fields = it->second->fields();
+					if (fields.end() == std::find_if(fields.begin(), fields.end(), [def] (const ioport_field &field) { return field.mask() == def->mask; }))
+					{
+						osd_printf_error(
+								"Default value specified for field with mask 0x%x in port '%s' but no corresponding field found\n",
+								def->mask,
+								def->tag);
+					}
+				}
+			}
 		}
 
 		// done with this device
@@ -2672,9 +2743,12 @@ void validity_checker::validate_devices(machine_config &config)
 					const char *const def_bios = option.second->default_bios();
 					if (def_bios)
 						card->set_default_bios_tag(def_bios);
-					auto additions = option.second->machine_config();
+					auto const &additions = option.second->machine_config();
 					if (additions)
 						additions(card);
+					input_device_default const *input_def = option.second->input_device_defaults();
+					if (input_def)
+						card->set_input_default(input_def);
 				}
 
 				for (device_slot_interface &subslot : slot_interface_enumerator(*card))
@@ -2700,6 +2774,7 @@ void validity_checker::validate_devices(machine_config &config)
 				for (device_t &card_dev : device_enumerator(*card))
 					card_dev.config_complete();
 				validate_roms(*card);
+				validate_inputs(*card);
 
 				for (device_t &card_dev : device_enumerator(*card))
 				{

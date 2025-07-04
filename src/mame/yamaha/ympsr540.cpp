@@ -68,14 +68,11 @@ private:
 
 	void lcd_data_w(u8 data);
 	void led_data_w(offs_t, u16 data, u16 mem_mask);
-	void render_w(int state);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-void psr540_state::render_w(int state)
+u32 psr540_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if(!state)
-		return;
-
 	const u8 *render = m_lcdc->render();
 	for(int yy=0; yy != 8; yy++)
 		for(int x=0; x != 80; x++) {
@@ -83,6 +80,8 @@ void psr540_state::render_w(int state)
 			for(int xx=0; xx != 5; xx++)
 				m_outputs[x][yy][xx] = (v >> xx) & 1;
 		}
+
+	return 0;
 }
 
 void psr540_state::machine_start()
@@ -135,8 +134,8 @@ void psr540_state::psr540(machine_config &config)
 	m_maincpu->read_portf().set(FUNC(psr540_state::pf_r));
 
 	SWX00_SOUND(config, m_swx00);
-	m_swx00->add_route(0, "lspeaker", 1.0);
-	m_swx00->add_route(1, "rspeaker", 1.0);
+	m_swx00->add_route(0, "speaker", 1.0, 0);
+	m_swx00->add_route(1, "speaker", 1.0, 1);
 
 	MKS3(config, m_mks3);
 	m_mks3->write_da().set(m_maincpu, FUNC(sh7042_device::sci_rx_w<1>));
@@ -162,10 +161,9 @@ void psr540_state::psr540(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(1080, 360);
 	screen.set_visarea_full();
-	screen.screen_vblank().set(FUNC(psr540_state::render_w));
+	screen.set_screen_update(FUNC(psr540_state::screen_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);

@@ -59,8 +59,8 @@ void f108_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^^primetimeii:lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^^primetimeii:rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^^primetimeii:speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^^primetimeii:speaker", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);

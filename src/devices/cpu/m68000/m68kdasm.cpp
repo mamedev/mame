@@ -193,8 +193,7 @@ std::string m68k_disassembler::get_ea_mode_str(u16 instruction, u32 size)
 		{
 		/* program counter with displacement */
 			u16 temp_value = read_imm_16();
-			return util::string_format("(%s,PC) ; ($%x)", make_signed_hex_str_16(temp_value),
-									   (make_int_16(temp_value) + m_cpu_pc-2) & 0xffffffff);
+			return util::string_format("($%x,PC)", (make_int_16(temp_value) + m_cpu_pc-2) & 0xffffffff);
 		}
 		case 0x3b:
 		{

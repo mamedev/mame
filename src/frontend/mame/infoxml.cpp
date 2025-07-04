@@ -143,7 +143,7 @@ void output_input(std::ostream &out, const ioport_list &portlist);
 void output_switches(std::ostream &out, const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *loctag, const char *innertag);
 void output_ports(std::ostream &out, const ioport_list &portlist);
 void output_adjusters(std::ostream &out, const ioport_list &portlist);
-void output_driver(std::ostream &out, game_driver const &driver, device_t::feature_type unemulated, device_t::feature_type imperfect);
+void output_driver(std::ostream &out, game_driver const &driver, device_t::flags_type flags, device_t::feature_type unemulated, device_t::feature_type imperfect);
 void output_features(std::ostream &out, device_type type, device_t::feature_type unemulated, device_t::feature_type imperfect);
 void output_images(std::ostream &out, device_t &device, const char *root_tag);
 void output_slots(std::ostream &out, machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes);
@@ -699,6 +699,7 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 
 	// allocate input ports and build overall emulation status
 	ioport_list portlist;
+	device_t::flags_type overall_flags(driver.type.emulation_flags());
 	device_t::feature_type overall_unemulated(driver.type.unemulated_features());
 	device_t::feature_type overall_imperfect(driver.type.imperfect_features());
 	{
@@ -706,6 +707,7 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 		for (device_t &device : iter)
 		{
 			portlist.append(device, errors);
+			overall_flags |= device.type().emulation_flags() & ~device_t::flags::NOT_WORKING;
 			overall_unemulated |= device.type().unemulated_features();
 			overall_imperfect |= device.type().imperfect_features();
 
@@ -791,7 +793,7 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	output_switches(out, portlist, "", IPT_CONFIG, "configuration", "conflocation", "confsetting");
 	output_ports(out, portlist);
 	output_adjusters(out, portlist);
-	output_driver(out, driver, overall_unemulated, overall_imperfect);
+	output_driver(out, driver, overall_flags, overall_unemulated, overall_imperfect);
 	output_features(out, driver.type, overall_unemulated, overall_imperfect);
 	output_images(out, config.root_device(), "");
 	output_slots(out, config, config.root_device(), "", devtypes);
@@ -1257,7 +1259,7 @@ void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 	// iterate over sound devices
 	for (device_sound_interface &sound : sound_interface_enumerator(device))
 	{
-		if (strcmp(sound.device().tag(), device.tag()) != 0 && sound.issound())
+		if (strcmp(sound.device().tag(), device.tag()) != 0)
 		{
 			std::string newtag(sound.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -1998,7 +2000,12 @@ void output_adjusters(std::ostream &out, const ioport_list &portlist)
 //  output_driver - print driver status
 //-------------------------------------------------
 
-void output_driver(std::ostream &out, game_driver const &driver, device_t::feature_type unemulated, device_t::feature_type imperfect)
+void output_driver(
+		std::ostream &out,
+		game_driver const &driver,
+		device_t::flags_type flags,
+		device_t::feature_type unemulated,
+		device_t::feature_type imperfect)
 {
 	out << "\t\t<driver";
 
@@ -2011,8 +2018,9 @@ void output_driver(std::ostream &out, game_driver const &driver, device_t::featu
 	emulation problems.
 	*/
 
-	u32 const flags = driver.flags;
-	bool const machine_preliminary(flags & (machine_flags::NOT_WORKING | machine_flags::MECHANICAL));
+	u32 const driver_flags = driver.flags;
+	bool const not_working(driver.type.emulation_flags() & device_t::flags::NOT_WORKING);
+	bool const machine_preliminary(not_working || (driver_flags & machine_flags::MECHANICAL));
 	bool const unemulated_preliminary(unemulated & (device_t::feature::PALETTE | device_t::feature::GRAPHICS | device_t::feature::SOUND | device_t::feature::KEYBOARD));
 	bool const imperfect_preliminary((unemulated | imperfect) & device_t::feature::PROTECTION);
 
@@ -2023,29 +2031,29 @@ void output_driver(std::ostream &out, game_driver const &driver, device_t::featu
 	else
 		out << " status=\"good\"";
 
-	if (flags & machine_flags::NOT_WORKING)
+	if (not_working)
 		out << " emulation=\"preliminary\"";
 	else
 		out << " emulation=\"good\"";
 
-	if (flags & machine_flags::NO_COCKTAIL)
+	if (driver_flags & machine_flags::NO_COCKTAIL)
 		out << " cocktail=\"preliminary\"";
 
-	if (flags & machine_flags::SUPPORTS_SAVE)
-		out << " savestate=\"supported\"";
-	else
+	if (flags & device_t::flags::SAVE_UNSUPPORTED)
 		out << " savestate=\"unsupported\"";
+	else
+		out << " savestate=\"supported\"";
 
-	if (flags & machine_flags::REQUIRES_ARTWORK)
+	if (driver_flags & machine_flags::REQUIRES_ARTWORK)
 		out << " requiresartwork=\"yes\"";
 
-	if (flags & machine_flags::UNOFFICIAL)
+	if (driver_flags & machine_flags::UNOFFICIAL)
 		out << " unofficial=\"yes\"";
 
-	if (flags & machine_flags::NO_SOUND_HW)
+	if (driver_flags & machine_flags::NO_SOUND_HW)
 		out << " nosoundhardware=\"yes\"";
 
-	if (flags & machine_flags::IS_INCOMPLETE)
+	if (driver_flags & machine_flags::IS_INCOMPLETE)
 		out << " incomplete=\"yes\"";
 
 	out << "/>\n";

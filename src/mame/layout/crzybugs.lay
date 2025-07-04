@@ -76,7 +76,6 @@ May or may not match arrangement/colour of real control panel
 		</text>
 	</element>
 
-
 	<element name="stop3" defstate="0">
 		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />

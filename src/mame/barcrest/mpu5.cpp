@@ -441,7 +441,6 @@ void mpu5_state::mpu5(machine_config &config)
 
 	config.set_default_layout(layout_mpu5);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	/* unknown sound */
 }

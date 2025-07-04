@@ -78,21 +78,22 @@ Blitter source graphics
 
 ***************************************************************************/
 
-
 #include "emu.h"
+
 #include "tutankhm.h"
 #include "konamipt.h"
+#include "konami1.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
-#include "konami1.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -136,9 +137,9 @@ private:
 	required_device_array<filter_rc_device, 3> m_filter;
 	required_region_ptr<uint8_t> m_blitrom;
 
-	uint8_t  m_blitterdata[4]{};
-	uint8_t  m_i8039_status = 0;
-	uint8_t  m_last_irq = 0;
+	uint8_t m_blitterdata[4]{};
+	uint8_t m_i8039_status = 0;
+	uint8_t m_last_irq = 0;
 };
 
 
@@ -388,13 +389,13 @@ void junofrst_state::_30hz_irq(int state)
 void junofrst_state::junofrst(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI1(config, m_maincpu, 1500000);         /* 1.5 MHz ??? */
+	KONAMI1(config, m_maincpu, 18.432_MHz_XTAL / 12); // 1.536 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &junofrst_state::main_map);
 
-	Z80(config, m_audiocpu, 14318000/8);    /* 1.78975 MHz */
+	Z80(config, m_audiocpu, 14.318181_MHz_XTAL / 8); // 1.78975 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &junofrst_state::audio_map);
 
-	I8039(config, m_i8039, 8000000);  /* 8MHz crystal */
+	I8039(config, m_i8039, 8_MHz_XTAL);
 	m_i8039->set_addrmap(AS_PROGRAM, &junofrst_state::mcu_map);
 	m_i8039->set_addrmap(AS_IO, &junofrst_state::mcu_io_map);
 	m_i8039->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
@@ -424,7 +425,7 @@ void junofrst_state::junofrst(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 14318000/8));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 14.318181_MHz_XTAL / 8));
 	aysnd.port_a_read_callback().set(FUNC(junofrst_state::portA_r));
 	aysnd.port_b_write_callback().set(FUNC(junofrst_state::portB_w));
 	aysnd.add_route(0, "filter.0.0", 0.30);

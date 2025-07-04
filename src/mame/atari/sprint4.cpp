@@ -583,8 +583,7 @@ void sprint4_state::sprint4(machine_config &config)
 	PALETTE(config, m_palette, FUNC(sprint4_state::palette_init), 10, 6);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	f9334_device &latch(F9334(config, "latch")); // at E11
 	latch.q_out_cb<0>().set_output("led0"); // START LAMP 1
@@ -597,8 +596,8 @@ void sprint4_state::sprint4(machine_config &config)
 	latch.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<SPRINT4_SCREECH_EN_4>));
 
 	DISCRETE(config, m_discrete, sprint4_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
+	m_discrete->add_route(0, "speaker", 1.0, 0);
+	m_discrete->add_route(1, "speaker", 1.0, 1);
 }
 
  // NOTE:  SPRINT 4 A008716 PCB can accept both 8bit ROMs and 4bit BPROMs or combination thereof

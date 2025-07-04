@@ -34,7 +34,7 @@ protected:
 	// internals
 	inline s8 get_sample(u16 addr);
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_163, namco_163_sound_device)

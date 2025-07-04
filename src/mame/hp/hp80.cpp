@@ -275,8 +275,8 @@ void hp80_base_state::hp80_base(machine_config &config)
 
 	// Beeper
 	SPEAKER(config, "mono").front_center();
-	DAC_1BIT(config, m_dac , 0).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
-	BEEP(config, m_beep, CPU_CLOCK / 512).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
+	DAC_1BIT(config, m_dac , 0).add_route(ALL_OUTPUTS, "mono", 0.5, 0);
+	BEEP(config, m_beep, CPU_CLOCK / 512).add_route(ALL_OUTPUTS, "mono", 0.5, 0);
 
 	// Optional ROMs
 	for (auto& finder : m_rom_drawers) {

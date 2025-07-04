@@ -99,13 +99,11 @@ void geebee_sound_device::sound_w(u8 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void geebee_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void geebee_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
-
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
-		buffer.put_int(sampindex, m_sound_signal, 32768);
+		stream.put_int(0, sampindex, m_sound_signal, 32768);
 
 		// 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz
 		m_vcount++;

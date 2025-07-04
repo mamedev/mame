@@ -107,7 +107,7 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 	, m_entries(0)
 	, m_indirect_entries(0)
 	, m_enable_shadows(0)
-	, m_enable_hilights(0)
+	, m_enable_highlights(0)
 	, m_membits(0)
 	, m_membits_supplied(false)
 	, m_endianness()
@@ -192,6 +192,11 @@ palette_device &palette_device::set_format(xbrg_444_t, u32 entries)
 	return *this;
 }
 
+palette_device &palette_device::set_format(xgrb_444_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 4,8,0>, entries);
+	return *this;
+}
 palette_device &palette_device::set_format(xbgr_444_t, u32 entries)
 {
 	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 0,4,8>, entries);

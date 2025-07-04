@@ -127,11 +127,15 @@ u8 applepic_device::host_r(offs_t offset)
 	if (BIT(offset, 4))
 	{
 		if (BIT(m_scc_control, 0))
+		{
 			return m_prd_callback(offset & 0x0f);
+		}
 		else
 		{
 			if (!machine().side_effects_disabled())
+			{
 				logerror("%s: Read from device register $%X in non-bypass mode\n", machine().describe_context(), offset & 0x0f);
+			}
 			return 0;
 		}
 	}
@@ -140,7 +144,9 @@ u8 applepic_device::host_r(offs_t offset)
 		// Shared RAM read access
 		u8 data = m_iopcpu->space(AS_PROGRAM).read_byte(m_ram_address);
 		if (BIT(m_status_reg, 1) && !machine().side_effects_disabled())
+		{
 			++m_ram_address;
+		}
 		return data;
 	}
 	else if (BIT(offset, 1))
@@ -149,9 +155,13 @@ u8 applepic_device::host_r(offs_t offset)
 		return BIT(m_scc_control, 0) ? m_status_reg | 0x01 : (m_status_reg & 0x3f) | 0x80;
 	}
 	else if (BIT(offset, 0))
+	{
 		return m_ram_address & 0x00ff;
+	}
 	else
+	{
 		return (m_ram_address & 0xff00) >> 8;
+	}
 }
 
 void applepic_device::host_w(offs_t offset, u8 data)
@@ -159,16 +169,22 @@ void applepic_device::host_w(offs_t offset, u8 data)
 	if (BIT(offset, 4))
 	{
 		if (BIT(m_scc_control, 0))
+		{
 			m_pwr_callback(offset & 0x0f, data);
+		}
 		else
+		{
 			logerror("%s: Write $%02X to device register $%X in non-bypass mode\n", machine().describe_context(), data, offset & 0x0f);
+		}
 	}
 	else if (BIT(offset, 2))
 	{
 		// Shared RAM write access
 		m_iopcpu->space(AS_PROGRAM).write_byte(m_ram_address, data);
 		if (BIT(m_status_reg, 1))
+		{
 			++m_ram_address;
+		}
 	}
 	else if (BIT(offset, 1))
 	{
@@ -191,9 +207,13 @@ void applepic_device::host_w(offs_t offset, u8 data)
 		m_status_reg = (data & 0x06) | (m_status_reg & 0xf0);
 	}
 	else if (BIT(offset, 0))
+	{
 		m_ram_address = (m_ram_address & 0xff00) | data;
+	}
 	else
+	{
 		m_ram_address = u16(data) << 8 | (m_ram_address & 0x00ff);
+	}
 }
 
 void applepic_device::pint_w(int state)
@@ -202,13 +222,17 @@ void applepic_device::pint_w(int state)
 	{
 		m_status_reg |= 0x40;
 		if (!BIT(m_scc_control, 0))
+		{
 			set_interrupt(IRQ_PERIPHERAL);
+		}
 	}
 	else
 	{
 		m_status_reg &= 0xbf;
 		if (!BIT(m_scc_control, 0))
+		{
 			reset_interrupt(IRQ_PERIPHERAL);
+		}
 	}
 }
 
@@ -242,11 +266,15 @@ u8 applepic_device::timer_r(offs_t offset)
 {
 	u16 reg = BIT(offset, 1) ? m_timer_latch : get_timer_count();
 	if (BIT(offset, 0))
+	{
 		return (reg & 0xff00) >> 8;
+	}
 	else
 	{
 		if (offset == 0 && !machine().side_effects_disabled())
+		{
 			reset_interrupt(IRQ_TIMER);
+		}
 		return reg & 0x00ff;
 	}
 }
@@ -263,24 +291,34 @@ void applepic_device::timer_w(offs_t offset, u8 data)
 		}
 	}
 	else
+	{
 		m_timer_latch = (m_timer_latch & 0xff00) | data;
+	}
 }
 
 u16 applepic_device::get_timer_count() const
 {
 	if (m_timer1->enabled())
+	{
 		return u16((attotime_to_clocks(m_timer1->remaining()) - 4) / 8);
+	}
 	else
+	{
 		return 0xffff - u16((attotime_to_clocks(machine().time() - m_timer_last_expired) + 4) / 8);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(applepic_device::timer1_callback)
 {
 	set_interrupt(IRQ_TIMER);
 	if (BIT(m_timer_dpll_control, 0))
+	{
 		m_timer1->adjust(clocks_to_attotime((m_timer_latch + 2) * 8));
+	}
 	else
+	{
 		m_timer_last_expired = machine().time();
+	}
 }
 
 u8 applepic_device::dma_channel_r(offs_t offset)
@@ -306,7 +344,9 @@ u8 applepic_device::dma_channel_r(offs_t offset)
 
 	default:
 		if (!machine().side_effects_disabled())
+		{
 			logerror("%s: Read from undefined DMA register $%02X\n", machine().describe_context(), 0x20 + offset);
+		}
 		return 0;
 	}
 }
@@ -390,9 +430,13 @@ void applepic_device::scc_control_w(u8 data)
 {
 	m_scc_control = data;
 	if (!BIT(data, 0) && BIT(m_status_reg, 6))
+	{
 		set_interrupt(IRQ_PERIPHERAL);
+	}
 	else
+	{
 		reset_interrupt(IRQ_PERIPHERAL);
+	}
 	m_gpout_callback[1](BIT(data, 7));
 }
 
@@ -425,16 +469,22 @@ u8 applepic_device::int_mask_r()
 void applepic_device::int_mask_w(u8 data)
 {
 	for (int which = 1; which <= 5; which++)
+	{
 		if (BIT(m_int_mask, which) != BIT(data, which))
+		{
 			LOG("%s: %sabling %s interrupt\n", machine().describe_context(), BIT(data, which) ? "En" : "Dis", s_interrupt_names[which]);
+		}
+	}
 
 	m_int_mask = data & 0x3e;
+	LOG("%s: flag %02x new mask %02x\n", machine().describe_context(), m_int_reg, m_int_mask);
 	m_iopcpu->set_input_line(r65c02_device::IRQ_LINE, (m_int_mask & m_int_reg) != 0 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 u8 applepic_device::int_reg_r()
 {
-	return m_int_reg;
+	// mask the return value or the 6502 program will get confused and try to service interrupts that are not enabled
+	return m_int_reg & m_int_mask;
 }
 
 void applepic_device::int_reg_w(u8 data)
@@ -444,7 +494,7 @@ void applepic_device::int_reg_w(u8 data)
 		m_int_reg &= ~data;
 		if ((m_int_mask & m_int_reg) == 0)
 		{
-			LOG("%s: 6502 interrupts acknowledged\n", machine().describe_context());
+			LOG("%s: All 6502 interrupts acknowledged\n", machine().describe_context());
 			m_iopcpu->set_input_line(r65c02_device::IRQ_LINE, CLEAR_LINE);
 		}
 	}
@@ -454,10 +504,16 @@ void applepic_device::set_interrupt(int which)
 {
 	if (!BIT(m_int_reg, which))
 	{
-		LOG("%s: Setting %s interrupt\n", machine().describe_context(), s_interrupt_names[which]);
 		m_int_reg |= (1 << which);
+		if (which != IRQ_TIMER)
+		{
+			LOG("%s: Setting %s interrupt, new flag %02x mask %02x\n", machine().describe_context(), s_interrupt_names[which], m_int_reg, m_int_mask);
+		}
+
 		if ((m_int_reg & m_int_mask) == (1 << which))
+		{
 			m_iopcpu->set_input_line(r65c02_device::IRQ_LINE, ASSERT_LINE);
+		}
 	}
 }
 
@@ -465,10 +521,16 @@ void applepic_device::reset_interrupt(int which)
 {
 	if (BIT(m_int_reg, which))
 	{
-		LOG("%s: Resetting %s interrupt\n", machine().describe_context(), s_interrupt_names[which]);
 		if ((m_int_reg & m_int_mask) == (1 << which))
+		{
 			m_iopcpu->set_input_line(r65c02_device::IRQ_LINE, CLEAR_LINE);
+		}
+
 		m_int_reg &= ~(1 << which);
+		if (which != IRQ_TIMER)
+		{
+			LOG("%s: Resetting %s interrupt, new flag %02x mask %02x\n", machine().describe_context(), s_interrupt_names[which], m_int_reg, m_int_mask);
+		}
 	}
 }
 
@@ -482,7 +544,9 @@ void applepic_device::host_reg_w(u8 data)
 	LOG("%s: INTHST0 %srequested, INTHST1 %srequested\n", machine().describe_context(), BIT(data, 2) ? "" : "not ", BIT(data, 3) ? "" : "not ");
 	m_status_reg |= (data & 0x0c) << 2;
 	if ((data & 0x0c) != 0)
+	{
 		m_hint_callback(ASSERT_LINE);
+	}
 }
 
 u8 applepic_device::device_reg_r(offs_t offset)
@@ -490,17 +554,25 @@ u8 applepic_device::device_reg_r(offs_t offset)
 	if (BIT(m_scc_control, 0))
 	{
 		if (!machine().side_effects_disabled())
+		{
 			logerror("%s: Read from device register $%X in bypass mode\n", machine().describe_context(), offset & 0x0f);
+		}
 		return 0;
 	}
 	else
+	{
 		return m_prd_callback(offset & 0x0f);
+	}
 }
 
 void applepic_device::device_reg_w(offs_t offset, u8 data)
 {
 	if (BIT(m_scc_control, 0))
+	{
 		logerror("%s: Read from device register $%X in bypass mode\n", machine().describe_context(), offset & 0x0f);
+	}
 	else
+	{
 		m_pwr_callback(offset & 0x0f, data);
+	}
 }

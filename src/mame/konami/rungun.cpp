@@ -665,7 +665,7 @@ void rungun_state::rng(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	K053936(config, m_k053936, 0);
 	m_k053936->set_offsets(34, 9);
@@ -682,26 +682,25 @@ void rungun_state::rng(machine_config &config)
 
 	PALETTE(config, m_palette2).set_format(palette_device::xBGR_555, 1024);
 	m_palette2->enable_shadows();
-	m_palette2->enable_hilights();
+	m_palette2->enable_highlights();
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	K054321(config, m_k054321, "lspeaker", "rspeaker");
+	K054321(config, m_k054321, "speaker");
 
 	// SFX
 	K054539(config, m_k054539[0], 18.432_MHz_XTAL);
 	m_k054539[0]->set_device_rom_tag("k054539");
 	m_k054539[0]->timer_handler().set(FUNC(rungun_state::k054539_nmi_gen));
-	m_k054539[0]->add_route(0, "rspeaker", 1.0);
-	m_k054539[0]->add_route(1, "lspeaker", 1.0);
+	m_k054539[0]->add_route(0, "speaker", 1.0, 1);
+	m_k054539[0]->add_route(1, "speaker", 1.0, 0);
 
 	// BGM, volumes handtuned to make SFXs audible (still not 100% right tho)
 	K054539(config, m_k054539[1], 18.432_MHz_XTAL);
 	m_k054539[1]->set_device_rom_tag("k054539");
-	m_k054539[1]->add_route(0, "rspeaker", 0.6);
-	m_k054539[1]->add_route(1, "lspeaker", 0.6);
+	m_k054539[1]->add_route(0, "speaker", 0.6, 0);
+	m_k054539[1]->add_route(1, "speaker", 0.6, 1);
 }
 
 // for dual-screen output Run and Gun requires the video de-multiplexer board connected to the Jamma output, this gives you 2 Jamma connectors, one for each screen.

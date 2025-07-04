@@ -1713,8 +1713,7 @@ void namcos2_state::configure_common_standard(machine_config &config)
 	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
 	m_screen->set_palette(m_c116);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
 	m_c140->set_addrmap(0, &namcos2_state::c140_default_am);
@@ -1820,10 +1819,10 @@ void namcos2_state::base_noio(machine_config &config)
 	configure_c123tmap_standard(config);
 	configure_namcos2_roz_standard(config);
 
-	m_c140->add_route(0, "lspeaker", 0.75);
-	m_c140->add_route(1, "rspeaker", 0.75);
+	m_c140->add_route(0, "speaker", 0.75, 0);
+	m_c140->add_route(1, "speaker", 0.75, 1);
 
-	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
 
@@ -1844,8 +1843,8 @@ void namcos2_state::base2(machine_config &config)
 	base(config);
 
 	m_c140->reset_routes();
-	m_c140->add_route(0, "lspeaker", 1.0);
-	m_c140->add_route(1, "rspeaker", 1.0);
+	m_c140->add_route(0, "speaker", 1.0, 0);
+	m_c140->add_route(1, "speaker", 1.0, 1);
 }
 
 void namcos2_state::assaultp(machine_config &config)
@@ -1860,10 +1859,10 @@ void namcos2_state::base3(machine_config &config)
 	base(config);
 
 	m_c140->reset_routes();
-	m_c140->add_route(0, "lspeaker", 0.45);
-	m_c140->add_route(1, "rspeaker", 0.45);
+	m_c140->add_route(0, "speaker", 0.45, 0);
+	m_c140->add_route(1, "speaker", 0.45, 1);
 
-	YM2151(config.replace(), "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); /* 3.579545MHz */
+	YM2151(config.replace(), "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1); /* 3.579545MHz */
 }
 
 
@@ -1887,10 +1886,10 @@ void namcos2_state::finallap_noio(machine_config &config)
 	configure_c123tmap_standard(config);
 	configure_c45road_standard(config);
 
-	m_c140->add_route(0, "lspeaker", 0.75);
-	m_c140->add_route(1, "rspeaker", 0.75);
+	m_c140->add_route(0, "speaker", 0.75, 0);
+	m_c140->add_route(1, "speaker", 0.75, 1);
 
-	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
 void namcos2_state::base_fl(machine_config &config)
@@ -1954,10 +1953,10 @@ void namcos2_state::sgunner(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
-	m_c140->add_route(0, "lspeaker", 0.75);
-	m_c140->add_route(1, "rspeaker", 0.75);
+	m_c140->add_route(0, "speaker", 0.75, 0);
+	m_c140->add_route(1, "speaker", 0.75, 1);
 
-	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
 void namcos2_state::sgunner2(machine_config &config)
@@ -1983,10 +1982,10 @@ void namcos2_state::sgunner2(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
-	m_c140->add_route(0, "lspeaker", 0.75);
-	m_c140->add_route(1, "rspeaker", 0.75);
+	m_c140->add_route(0, "speaker", 0.75, 0);
+	m_c140->add_route(1, "speaker", 0.75, 1);
 
-	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
 void namcos2_state::suzuka8h(machine_config &config)
@@ -2016,10 +2015,10 @@ void namcos2_state::suzuka8h(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
 
-	m_c140->add_route(0, "lspeaker", 0.75);
-	m_c140->add_route(1, "rspeaker", 0.75);
+	m_c140->add_route(0, "speaker", 0.75, 0);
+	m_c140->add_route(1, "speaker", 0.75, 1);
 
-	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
 void namcos2_state::luckywld(machine_config &config)
@@ -2061,10 +2060,10 @@ void namcos2_state::metlhawk(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)
 
-	m_c140->add_route(0, "lspeaker", 1.0);
-	m_c140->add_route(1, "rspeaker", 1.0);
+	m_c140->add_route(0, "speaker", 1.0, 0);
+	m_c140->add_route(1, "speaker", 1.0, 1);
 
-	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 //  ymsnd.irq_handler().set_inputline("audiocpu", 1);
 }
 

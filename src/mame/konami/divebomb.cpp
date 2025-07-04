@@ -658,17 +658,15 @@ GFXDECODE_END
 
 void divebomb_state::divebomb(machine_config &config)
 {
-	static constexpr XTAL XTAL1 = XTAL(24'000'000);
-
-	Z80(config, m_fgcpu, XTAL1 / 4); // ?
+	Z80(config, m_fgcpu, 24_MHz_XTAL / 4); // ?
 	m_fgcpu->set_addrmap(AS_PROGRAM, &divebomb_state::fgcpu_map);
 	m_fgcpu->set_addrmap(AS_IO, &divebomb_state::fgcpu_iomap);
 
-	Z80(config, m_spritecpu, XTAL1 / 4); // ?
+	Z80(config, m_spritecpu, 24_MHz_XTAL / 4); // ?
 	m_spritecpu->set_addrmap(AS_PROGRAM, &divebomb_state::spritecpu_map);
 	m_spritecpu->set_addrmap(AS_IO, &divebomb_state::spritecpu_iomap);
 
-	Z80(config, m_rozcpu, XTAL1 / 4); // ?
+	Z80(config, m_rozcpu, 24_MHz_XTAL / 4); // ?
 	m_rozcpu->set_addrmap(AS_PROGRAM, &divebomb_state::rozcpu_map);
 	m_rozcpu->set_addrmap(AS_IO, &divebomb_state::rozcpu_iomap);
 
@@ -686,18 +684,18 @@ void divebomb_state::divebomb(machine_config &config)
 	GENERIC_LATCH_8(config, m_roz2fg_latch);
 	m_roz2fg_latch->data_pending_callback().set(m_fgcpu_irq, FUNC(input_merger_any_high_device::in_w<1>));
 
-	K051316(config, m_k051316[0], 0);
+	K051316(config, m_k051316[0], 24_MHz_XTAL / 2);
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_bpp(8);
 	m_k051316[0]->set_wrap(0);
-	m_k051316[0]->set_offsets(-88, -16);
+	m_k051316[0]->set_offsets(8, -16);
 	m_k051316[0]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_1));
 
-	K051316(config, m_k051316[1], 0);
+	K051316(config, m_k051316[1], 24_MHz_XTAL / 2);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_bpp(8);
 	m_k051316[1]->set_wrap(0);
-	m_k051316[1]->set_offsets(-88, -16);
+	m_k051316[1]->set_offsets(8, -16);
 	m_k051316[1]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_2));
 
 	// video hardware
@@ -719,12 +717,12 @@ void divebomb_state::divebomb(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	// All frequencies unverified
-	SN76489(config, "sn0", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn1", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn2", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn3", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn4", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn5", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn0", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn1", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn2", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn3", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn4", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn5", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
 

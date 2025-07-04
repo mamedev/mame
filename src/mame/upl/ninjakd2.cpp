@@ -172,13 +172,8 @@ TODO:
 #define NE555_FREQUENCY 16300   // measured on PCB
 //#define NE555_FREQUENCY   (1.0f / (0.693 * (560 + 2*51) * 0.1e-6))    // theoretical: this gives 21.8kHz which is too high
 
-SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
+void ninjakd2_state::ninjakd2_init_samples()
 {
-	if (m_pcm_region == nullptr)
-	{
-		return;
-	}
-
 	const uint8_t* const rom = m_pcm_region->base();
 	const int length = m_pcm_region->bytes();
 	m_sampledata = std::make_unique<int16_t[]>(length);
@@ -192,12 +187,6 @@ SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
 
 void ninjakd2_state::ninjakd2_pcm_play_w(uint8_t data)
 {
-	// only Ninja Kid II uses this
-	if (m_pcm_region == nullptr)
-	{
-		return;
-	}
-
 	const uint8_t* const rom = m_pcm_region->base();
 	const int length = m_pcm_region->bytes();
 	const int start = data << 8;
@@ -500,22 +489,18 @@ void omegaf_state::omegaf_main_cpu(address_map &map)
 }
 
 
-void ninjakd2_state::ninjakd2_sound_cpu(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).rom();
-	map(0xc000, 0xc7ff).ram();
-	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xf000, 0xf000).w(FUNC(ninjakd2_state::ninjakd2_pcm_play_w));
-}
-
 void ninjakd2_state::ninjakid_nopcm_sound_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xf000, 0xf000).noprw();
+}
+
+void ninjakd2_state::ninjakd2_sound_cpu(address_map &map)
+{
+	ninjakid_nopcm_sound_cpu(map);
+	map(0xf000, 0xf000).w(FUNC(ninjakd2_state::ninjakd2_pcm_play_w));
 }
 
 void ninjakd2_state::decrypted_opcodes_map(address_map &map)
@@ -977,7 +962,6 @@ void ninjakd2_state::ninjakd2_core(machine_config &config)
 
 	SAMPLES(config, m_pcm);
 	m_pcm->set_channels(1);
-	m_pcm->set_samples_start_callback(FUNC(ninjakd2_state::ninjakd2_init_samples));
 	m_pcm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
@@ -1026,11 +1010,10 @@ void robokid_state::robokid(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &robokid_state::robokid_main_cpu);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &robokid_state::ninjakid_nopcm_sound_cpu);
 
 	// video hardware
 	m_gfxdecode->set_info(gfx_robokid);
-	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 0x400);  // RAM is this large, but still only 0x300 colors used
+	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 0x400); // RAM is this large, but still only 0x300 colors used
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(robokid_state,robokid)
@@ -1624,6 +1607,7 @@ void ninjakd2_state::init_ninjakd2()
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_decrypted_opcodes, 0x8000);
 
 	gfx_unscramble();
+	ninjakd2_init_samples();
 }
 
 void ninjakd2_state::init_bootleg()
@@ -1631,6 +1615,7 @@ void ninjakd2_state::init_bootleg()
 	memcpy(m_decrypted_opcodes, memregion("soundcpu")->base() + 0x10000, 0x8000);
 
 	gfx_unscramble();
+	ninjakd2_init_samples();
 }
 
 void mnight_state::init_mnight()

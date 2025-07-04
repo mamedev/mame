@@ -63,12 +63,11 @@ DEFINE_DEVICE_TYPE(BBC_M87,   bbc_m87_device,   "bbc_m87",   "Peartree Music 87 
 
 void bbc_m500_device::add_common_devices(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	HTMUSIC(config, m_hybrid, 12_MHz_XTAL / 2);
-	m_hybrid->add_route(0, "lspeaker", 1.0);
-	m_hybrid->add_route(1, "rspeaker", 1.0);
+	m_hybrid->add_route(0, "speaker", 1.0, 0);
+	m_hybrid->add_route(1, "speaker", 1.0, 1);
 
 	BBC_1MHZBUS_SLOT(config, m_1mhzbus, DERIVED_CLOCK(1, 1), bbc_1mhzbus_devices, nullptr);
 	m_1mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
@@ -417,19 +416,15 @@ TIMER_CALLBACK_MEMBER(htmusic_device::dsp_tick)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void htmusic_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void htmusic_device::sound_stream_update(sound_stream &stream)
 {
-	// reset the output streams
-	outputs[0].fill(0);
-	outputs[1].fill(0);
-
 	// iterate over channels and accumulate sample data
 	for (int channel = 0; channel < 16; channel++)
 	{
-		for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
+		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 		{
-			outputs[0].add_int(sampindex, m_sam_l[channel], 8031 * 16);
-			outputs[1].add_int(sampindex, m_sam_r[channel], 8031 * 16);
+			stream.add_int(0, sampindex, m_sam_l[channel], 8031 * 16);
+			stream.add_int(1, sampindex, m_sam_r[channel], 8031 * 16);
 		}
 	}
 }

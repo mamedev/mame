@@ -1383,12 +1383,11 @@ void hornet_state::hornet(machine_config &config)
 	K056800(config, m_k056800, XTAL(16'934'400));
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	RF5C400(config, "rfsnd", XTAL(16'934'400))  // value from Guru readme, gives 44100 Hz sample rate
-		.add_route(0, "lspeaker", 1.0)
-		.add_route(1, "rspeaker", 1.0);
+		.add_route(0, "speaker", 1.0, 0)
+		.add_route(1, "speaker", 1.0, 1);
 
 	M48T58(config, "m48t58", 0);
 

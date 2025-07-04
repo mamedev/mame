@@ -34,6 +34,7 @@
 # NO_USE_MIDI = 1
 # NO_USE_PORTAUDIO = 1
 # NO_USE_PULSEAUDIO = 1
+# NO_USE_PIPEWIRE = 1
 # USE_TAPTUN = 1
 # USE_PCAP = 1
 # USE_QTDEBUG = 1
@@ -732,6 +733,10 @@ endif
 
 ifdef NO_USE_PULSEAUDIO
 PARAMS += --NO_USE_PULSEAUDIO='$(NO_USE_PULSEAUDIO)'
+endif
+
+ifdef NO_USE_PIPEWIRE
+PARAMS += --NO_USE_PIPEWIRE='$(NO_USE_PIPEWIRE)'
 endif
 
 ifdef USE_QTDEBUG
@@ -1523,7 +1528,7 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.276"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.278"' > $@
 	@echo '#define BARE_VCS_REVISION "$(NEW_GIT_VERSION)"' >> $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char bare_vcs_revision[];' >> $@
@@ -1533,7 +1538,7 @@ $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " (" BARE_VCS_REVISION ")";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.276" > $@
+	@echo #define BARE_BUILD_VERSION "0.278" > $@
 	@echo #define BARE_VCS_REVISION "$(NEW_GIT_VERSION)" >> $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char bare_vcs_revision[]; >> $@

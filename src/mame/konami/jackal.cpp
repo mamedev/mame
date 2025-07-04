@@ -599,10 +599,9 @@ void jackal_state::jackal(machine_config &config)
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50); // verified on PCB
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "speaker", 0.50, 0).add_route(1, "speaker", 0.50, 1); // verified on PCB
 }
 
 /*************************************

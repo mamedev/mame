@@ -7,7 +7,7 @@
  * See didact.cpp
  *
  * The Esselte 100 was an original design with a CRT and a full Keyboard that also had a BASIC interpreter
- * extended with commands suitable for educational experiments using the exapansion bus and its built in
+ * extended with commands suitable for educational experiments using the expansion bus and its built in
  * io control capabilities.
  *
  * The Esselte 1000 was an educational package based on Apple II plus software and literature but the relation
@@ -29,17 +29,18 @@
  ****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/m6800/m6800.h"
+#include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/74145.h"
 #include "machine/timer.h"
 
-// Features
-#include "imagedev/cassette.h"
-#include "bus/rs232/rs232.h"
-#include "speaker.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -69,8 +70,6 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-#define PIA1_TAG "pia1"
-#define PIA2_TAG "pia2"
 
 /*  __________________________________________________________________________________________________________________________________________
  * | The Didact Esselte 100 CPU board rev1, 14/8 1980                                                                          in-PCB coil     +----
@@ -98,7 +97,7 @@
  * |___________________________________________________________________________________________________________+----+__+----+__+----+_____+----
  *
  * rev2 board had 4Kb more ROM memory, 2 x 2764 instead of the 6 x 2716 (note the rev1 piggyback on rightmost 2716) with funny address decoding.
- * Once we get a rom dump for rev 1 the driver need to accomodate another keymap too so probably needs to be splitted somehow.
+ * Once we get a rom dump for rev 1 the driver need to accommodate another keymap too so probably needs to be split somehow.
  *  __________________________________________________________________________________________________________________________________________
  * | The Didact Esselte 100 CPU board rev2, 15/4 1983                                                                     in-PCB coil     +----
  * |           +--+     +--+     +--+     +--+     +--+     +--+                                                            +--------+    |VHF
@@ -128,37 +127,30 @@
  */
 
 
- namespace {
+namespace {
 
-/* Esselte 100 driver class */
 class e100_state : public driver_device
 {
 public:
 	e100_state(const machine_config &mconfig, device_type type, const char * tag)
 		: driver_device(mconfig, type, tag)
-		,m_maincpu(*this, "maincpu")
-		,m_kbd_74145(*this, "kbd_74145")
-		,m_vram(*this, "vram")
-		,m_cassette(*this, "cassette")
-		,m_rs232(*this, "rs232")
-		,m_chargen(*this, "chargen")
-		,m_io_line0(*this, "LINE0")
-		,m_io_line1(*this, "LINE1")
-		,m_io_line2(*this, "LINE2")
-		,m_io_line3(*this, "LINE3")
-		,m_io_line4(*this, "LINE4")
-		,m_io_line5(*this, "LINE5")
-		,m_io_line6(*this, "LINE6")
-		,m_io_line7(*this, "LINE7")
-		,m_io_line8(*this, "LINE8")
-		,m_io_line9(*this, "LINE9")
-		,m_pia1(*this, PIA1_TAG)
-		,m_pia2(*this, PIA2_TAG)
-		,m_pia1_B(0)
-		,m_50hz(0)
-		{ }
+		, m_maincpu(*this, "maincpu")
+		, m_kbd_74145(*this, "kbd_74145")
+		, m_vram(*this, "vram")
+		, m_cassette(*this, "cassette")
+		, m_rs232(*this, "rs232")
+		, m_chargen(*this, "chargen")
+		, m_io_line(*this, "LINE%u", 0)
+		, m_pia(*this, "pia%u", 1)
+		, m_pia1_B(0)
+		, m_50hz(0)
+	{ }
 
 	void e100(machine_config &config);
+
+protected:
+	virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<m6802_cpu_device> m_maincpu;
@@ -167,9 +159,11 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	optional_device<rs232_port_device> m_rs232;
 	required_region_ptr<uint8_t> m_chargen;
+	required_ioport_array<10> m_io_line;
+	required_device_array<pia6821_device, 2> m_pia;
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
-	virtual void machine_start() override ATTR_COLD;
+
 	uint8_t pia_r(offs_t offset);
 	void pia_w(offs_t offset, uint8_t data);
 	uint8_t pia1_kbA_r();
@@ -178,28 +172,18 @@ private:
 	void pia1_kbB_w(uint8_t data);
 	void pia1_ca2_w(int state);
 	void pia1_cb2_w(int state);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_w);
+
 	void e100_map(address_map &map) ATTR_COLD;
 
-	required_ioport m_io_line0;
-	required_ioport m_io_line1;
-	required_ioport m_io_line2;
-	required_ioport m_io_line3;
-	required_ioport m_io_line4;
-	required_ioport m_io_line5;
-	required_ioport m_io_line6;
-	required_ioport m_io_line7;
-	required_ioport m_io_line8;
-	required_ioport m_io_line9;
-	required_device<pia6821_device> m_pia1;
-	required_device<pia6821_device> m_pia2;
 	uint8_t m_pia1_B;
 	uint8_t m_50hz;
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(e100_state::rtc_w)
 {
-	m_pia2->ca1_w((m_50hz++ & 1));
+	m_pia[1]->ca1_w(m_50hz++ & 1);
 }
 
 void e100_state::machine_start()
@@ -213,37 +197,20 @@ void e100_state::machine_start()
 
 uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-	int vramad;
-	uint8_t *chardata;
-	uint8_t charcode;
-
 	LOGSCREEN("%s()\n", FUNCNAME);
-	vramad = 0;
-	for (int row = 0; row < 32 * 8; row += 8)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int col = 0; col < 32 * 8; col += 8)
-		{
-			/* look up the character data */
-			charcode = m_vram[vramad];
-			if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n %c at X=%d Y=%d: ", charcode, col, row);
-			chardata = &m_chargen[(charcode * 8)];
-			/* plot the character */
-			for (y = 0; y < 8; y++)
-			{
-				if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n  %02x: ", *chardata);
-				for (x = 0; x < 8; x++)
-				{
-					if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(" %02x: ", *chardata);
-					bitmap.pix(row + y, col + x) = (*chardata & (1 << x)) ? 1 : 0;
-				}
-				chardata++;
-			}
-			vramad++;
-		}
-		if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n");
-	}
+		uint16_t vram_addr = (y >> 3) * 32;
 
+		for (int col = 0; col < 32 * 6; col += 6)
+		{
+			for (int x = 0; x < 6; x++)
+			{
+				bitmap.pix(y, col + x) = BIT(m_chargen[(m_vram[vram_addr] << 3) | (y & 7)], x);
+			}
+			vram_addr++;
+		}
+	}
 	return 0;
 }
 
@@ -254,12 +221,12 @@ void e100_state::pia_w(offs_t offset, uint8_t data)
 	if ((offset & 0x08) == 0x08)
 	{
 		LOG("- PIA1\n");
-		m_pia1->write(offset, data);
+		m_pia[0]->write(offset, data);
 	}
 	if ((offset & 0x10) == 0x10)
 	{
 		LOG("- PIA2\n");
-		m_pia2->write(offset, data);
+		m_pia[1]->write(offset, data);
 	}
 	if (VERBOSE && (offset & 0x18) == 0x18)
 	{
@@ -280,23 +247,24 @@ uint8_t e100_state::pia_r(offs_t offset)
 	{
 	case 0x18: // read PIA1 and PIA2 at the same time, should really only happen for writes...
 		{
-			uint8_t data1 =  m_pia1->read(offset);
-			uint8_t data2 =  m_pia2->read(offset);
+			uint8_t data1 = m_pia[0]->read(offset);
+			uint8_t data2 = m_pia[1]->read(offset);
 			logerror("%s: Dual device read may have caused unpredictable results on real hardware\n", FUNCNAME);
 			data = data1 & data2; // We assume that the stable behaviour is that data lines with a low level by either device succeeds
-			LOGCS("%s %s[%02x] %02x & %02x -> %02x Dual device read!!\n", PIA1_TAG "/" PIA2_TAG, FUNCNAME, offset, data1, data2, data);
+			LOGCS("%s %s[%02x] %02x & %02x -> %02x Dual device read!!\n", "pia1/pia2", FUNCNAME, offset, data1, data2, data);
 		}
 		break;
 	case 0x08: // PIA1
-		data = m_pia1->read(offset);
-		LOGCS("%s %s(%02x)\n", PIA1_TAG, FUNCNAME, data);
+		data = m_pia[0]->read(offset);
+		LOGCS("%s %s(%02x)\n", "pia1", FUNCNAME, data);
 		break;
 	case 0x10: // PIA2
-		data = m_pia2->read(offset);
-		LOGCS("%s %s(%02x)\n", PIA2_TAG, FUNCNAME, data);
+		data = m_pia[1]->read(offset);
+		LOGCS("%s %s(%02x)\n", "pia2", FUNCNAME, data);
 		break;
 	default: // None of the devices are selected
 		logerror("%s: Funny read at offset %02x\n", FUNCNAME, offset);
+		break;
 	}
 	return data;
 }
@@ -308,31 +276,24 @@ void e100_state::pia1_kbA_w(uint8_t data)
 
 uint8_t e100_state::pia1_kbA_r()
 {
-	int ls145;
-	uint8_t pa = 0x00;
+	uint16_t ls145;
+	uint8_t pa = 0xff;
 
 	// Read out the selected column
 	ls145 = m_kbd_74145->read() & 0x3ff;
 
-	// read out the artwork
-	switch (ls145)
+	// read out the keyboard
+	for (int i = 0; i < 10; i++)
 	{
-	case 0: pa = 0x00; break;
-	case 1 << 0: pa = (~m_io_line0->read()) & 0xff; break;
-	case 1 << 1: pa = (~m_io_line1->read()) & 0xff; break;
-	case 1 << 2: pa = (~m_io_line2->read()) & 0xff; break;
-	case 1 << 3: pa = (~m_io_line3->read()) & 0xff; break;
-	case 1 << 4: pa = (~m_io_line4->read()) & 0xff; break;
-	case 1 << 5: pa = (~m_io_line5->read()) & 0xff; break;
-	case 1 << 6: pa = (~m_io_line6->read()) & 0xff; break;
-	case 1 << 7: pa = (~m_io_line7->read()) & 0xff; break;
-	case 1 << 8: pa = (~m_io_line8->read()) & 0xff; break;
-	case 1 << 9: pa = (~m_io_line9->read()) & 0xff; break;
-	default: logerror("Keyboard is misconfigured, please report!: %04x", ls145); break;
+		if (BIT(ls145, i))
+		{
+			pa = (m_io_line[i]->read()) & 0xff;
+			break;
+		}
 	}
 	if (VERBOSE && ls145 && pa) LOGSCAN("%s  [%03x]%04x\n", FUNCNAME, ls145, pa);
 
-	return ~pa;
+	return pa;
 }
 
 /*
@@ -343,7 +304,7 @@ uint8_t e100_state::pia1_kbA_r()
   The serial bitbanging performs unreliably atm, can be poor original code or inexact CPU timing.
   Best results is achieved with 8 bit at 9600 baud as follows:
 
-    mame e100 -window -rs232 null_modem -bitbngr socket.127.0.0.1:4321
+    mame e100 -rs232 null_modem -bitbngr socket.127.0.0.1:4321
 
   Start the favourite Telnet client towards the 4321 port and exit the startup screen of MAME.
   At the "Esselte 100 #" prompt change to 8 bit communication and start the terminal mode:
@@ -356,7 +317,7 @@ uint8_t e100_state::pia1_kbA_r()
   it receives a carriage return from the terminal at which point it will start sending again.
 
   TODO:
-  - Fix key mapping of the Ctl-PI exit sequence to get out of the TERM mode.
+  - Fix key mapping of the Ctrl-PI exit sequence to get out of the TERM mode.
   - Fix timing issues for the PIA bit banging, could be related to that the CPU emulation is not
     cycle exact or the ROM code is buggy
 */
@@ -367,13 +328,10 @@ uint8_t e100_state::pia1_kbA_r()
 #define CASS_IN    0x80
 void e100_state::pia1_kbB_w(uint8_t data)
 {
-	uint8_t col;
-
 	// Keyboard
 	//  if (VERBOSE && data != m_pia1_B) LOGSCAN("%s(%02x)\n", FUNCNAME, data);
 	m_pia1_B = data;
-	col = data & 0x0f;
-	m_kbd_74145->write( col );
+	m_kbd_74145->write(data & 0x0f);
 
 	// Cassette
 	m_cassette->output(data & CASS_OUT ? 1.0 : -1.0);
@@ -395,7 +353,7 @@ uint8_t e100_state::pia1_kbB_r()
 
 void e100_state::pia1_ca2_w(int state)
 {
-	// TODO: Make this a slot device to trigger time meassurements
+	// TODO: Make this a slot device to trigger time measurements
 }
 
 void e100_state::pia1_cb2_w(int state)
@@ -403,13 +361,13 @@ void e100_state::pia1_cb2_w(int state)
 	m_rs232->write_txd(!state);
 }
 
-// This map is derived from info in "TEMAL 100 - teknisk manual Esselte 100"
+// This map is derived from info in "TEMAL 100 - Teknisk manual Esselte 100"
 void e100_state::e100_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x8000, 0x87ff).rom().region("roms", 0);
 	map(0xc000, 0xc3ff).ram().share(m_vram);
-	map(0xc800, 0xc81f).rw(FUNC(e100_state::pia_r), FUNC(e100_state::pia_w)).mirror(0x07e0);
+	map(0xc800, 0xc81f).mirror(0x07e0).rw(FUNC(e100_state::pia_r), FUNC(e100_state::pia_w));
 	map(0xd000, 0xffff).rom().region("roms", 0x1000);
 }
 
@@ -417,18 +375,18 @@ void e100_state::e100_map(address_map &map)
  * Four e100 keys are not mapped yet,
  * - The redundant '*' on the keyboard together with the '\'' single quote, both on same e100 key
  * - The 'E' key on the keypad, presumably used for calculator applications to remove the last entered number
- * - The 'Break' key on rev2 will be mapped to NMI at some point, a recomended modification of the rev1 mother board
+ * - The 'Break' key on rev2 will be mapped to NMI at some point, a recommended modification of the rev1 mother board
  * - The 'REPT' key has a so far unknown function
  */
 static INPUT_PORTS_START( e100 )
-/*  Bits read on PIA1 A when issueing line number on PIA1 B bits 0-3 through a 74145 demultiplexer */
+/*  Bits read on PIA1 A when issuing line number on PIA1 B bits 0-3 through a 74145 demultiplexer */
 	PORT_START("LINE0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
 	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_LSHIFT)       PORT_CODE(KEYCODE_RSHIFT)       PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_LCONTROL)     PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)   PORT_NAME("REPT") /* Not mapped yet */
+	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)   PORT_NAME("REPT")           PORT_CODE(KEYCODE_TAB)
 	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_UNUSED)
 
@@ -453,43 +411,43 @@ static INPUT_PORTS_START( e100 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_ASTERISK)     PORT_CHAR('*')
 
 	PORT_START("LINE3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_COLON)        PORT_CHAR(0xF6) PORT_CHAR(0xD6)
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_COLON)        PORT_CHAR(U'ö') PORT_CHAR(U'Ö')
 	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.')  PORT_CHAR(':')
 	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_L)            PORT_CHAR('l')  PORT_CHAR('L')
 	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_O)            PORT_CHAR('o')  PORT_CHAR('O')
-	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_9)            PORT_CHAR(')')  PORT_CHAR('9')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_9)            PORT_CHAR('9')  PORT_CHAR(')')
 	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_P)            PORT_CHAR('p')  PORT_CHAR('P')
 	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_0)            PORT_CHAR('0')  PORT_CHAR('=')
 
 	PORT_START("LINE4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(0xE4) PORT_CHAR(0xC4)
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(U'ä') PORT_CHAR(U'Ä')
 	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('-')  PORT_CHAR('_')
 	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',')  PORT_CHAR(';')
 	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_K)            PORT_CHAR('k')  PORT_CHAR('K')
 	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_I)            PORT_CHAR('i')  PORT_CHAR('I')
 	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_8)            PORT_CHAR('8')  PORT_CHAR('(')
-	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR(0xE5) PORT_CHAR(0xC5)
+	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR(U'å') PORT_CHAR(U'Å')
 	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('+')  PORT_CHAR('?')
 
 	PORT_START("LINE5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD) PORT_NAME("'/*") /* No good mapping */
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('\'')  PORT_CHAR('*')
 	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_M)            PORT_CHAR('m')  PORT_CHAR('M')
 	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_J)            PORT_CHAR('j')  PORT_CHAR('J')
 	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_U)            PORT_CHAR('u')  PORT_CHAR('U')
 	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_7)            PORT_CHAR('7')  PORT_CHAR('/')
 	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR('^')
-	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD) PORT_NAME("PI")               PORT_CODE(KEYCODE_ESC)          PORT_CHAR(0x27)
+	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD) PORT_NAME(u8"π")              PORT_CODE(KEYCODE_ESC)          PORT_CHAR(27)
 
 	PORT_START("LINE6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))  PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD) PORT_NAME(u8"\u2190 \u2191")  PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))  PORT_CHAR(UCHAR_MAMEKEY(UP))  // U+2190 = ←, U+2191 = ↑
+	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_KEYBOARD) PORT_NAME(u8"\u2192 \u2193")  PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(DOWN))// U+2192 = →, U+2193 = ↓
 	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_N)            PORT_CHAR('n')  PORT_CHAR('N')
 	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_H)            PORT_CHAR('h')  PORT_CHAR('H')
 	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_Y)            PORT_CHAR('y')  PORT_CHAR('Y')
-	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_6)            PORT_CHAR('&')  PORT_CHAR('6')
-	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_ENTER)        PORT_CHAR('\r')
+	PORT_BIT(0x20, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_6)            PORT_CHAR('6')  PORT_CHAR('&')
+	PORT_BIT(0x40, IP_ACTIVE_LOW,   IPT_KEYBOARD) PORT_NAME("Return")           PORT_CODE(KEYCODE_ENTER)        PORT_CHAR('\r')
 	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_BACKSLASH2)   PORT_CHAR('<')  PORT_CHAR('>')
 
 	PORT_START("LINE7")
@@ -504,7 +462,7 @@ static INPUT_PORTS_START( e100 )
 
 	PORT_START("LINE8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_2_PAD)        PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_DEL_PAD)      PORT_CHAR(UCHAR_MAMEKEY(STOP))
+	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_KEYBOARD) PORT_NAME("Keypad .")         PORT_CODE(KEYCODE_DEL_PAD)      PORT_CHAR(UCHAR_MAMEKEY(STOP))
 	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_V)            PORT_CHAR('v')  PORT_CHAR('V')
 	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_F)            PORT_CHAR('f')  PORT_CHAR('F')
 	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_R)            PORT_CHAR('r')  PORT_CHAR('R')
@@ -513,8 +471,8 @@ static INPUT_PORTS_START( e100 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_8_PAD)        PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 
 	PORT_START("LINE9")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_KEYBOARD) PORT_NAME("Keypad E") /* No good mapping */
+	PORT_BIT(0x01, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_3_PAD)        PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x02, IP_ACTIVE_LOW,   IPT_KEYBOARD) PORT_NAME("Keypad E")         PORT_CODE(KEYCODE_ENTER_PAD)    PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 	PORT_BIT(0x04, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_C)            PORT_CHAR('c')  PORT_CHAR('C')
 	PORT_BIT(0x08, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_D)            PORT_CHAR('d')  PORT_CHAR('D')
 	PORT_BIT(0x10, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_E)            PORT_CHAR('e')  PORT_CHAR('E')
@@ -525,7 +483,7 @@ INPUT_PORTS_END
 
 void e100_state::e100(machine_config &config)
 {
-	M6802(config, m_maincpu, XTAL(4'000'000));
+	M6802(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_ram_enable(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &e100_state::e100_map);
 
@@ -547,26 +505,26 @@ void e100_state::e100(machine_config &config)
 	/* 0xF894 0xC818 (PIA2 Control A) = 0x34 - CA2 is low and lock DDRA */
 	/* 0xF896 0xC818 (PIA1 Control B) = 0x34 - CB2 is low and lock DDRB */
 	/* 0xF896 0xC818 (PIA2 Control B) = 0x34 - CB2 is low and lock DDRB */
-	PIA6821(config, m_pia1);
-	m_pia1->writepa_handler().set(FUNC(e100_state::pia1_kbA_w));
-	m_pia1->readpa_handler().set(FUNC(e100_state::pia1_kbA_r));
-	m_pia1->writepb_handler().set(FUNC(e100_state::pia1_kbB_w));
-	m_pia1->readpb_handler().set(FUNC(e100_state::pia1_kbB_r));
-	m_pia1->ca1_w(ASSERT_LINE); // TODO: Make this a slot device for time meassurements. Default is handshake for serial port TODO: Fix RS 232 handshake as default
-	m_pia1->ca2_handler().set(FUNC(e100_state::pia1_ca2_w));
-	m_pia1->cb2_handler().set(FUNC(e100_state::pia1_cb2_w));
+	PIA6821(config, m_pia[0]);
+	m_pia[0]->writepa_handler().set(FUNC(e100_state::pia1_kbA_w));
+	m_pia[0]->readpa_handler().set(FUNC(e100_state::pia1_kbA_r));
+	m_pia[0]->writepb_handler().set(FUNC(e100_state::pia1_kbB_w));
+	m_pia[0]->readpb_handler().set(FUNC(e100_state::pia1_kbB_r));
+	m_pia[0]->ca1_w(ASSERT_LINE); // TODO: Make this a slot device for time measurements. Default is handshake for serial port TODO: Fix RS232 handshake as default
+	m_pia[0]->ca2_handler().set(FUNC(e100_state::pia1_ca2_w));
+	m_pia[0]->cb2_handler().set(FUNC(e100_state::pia1_cb2_w));
 
 	/* The optional second PIA enables the expansion port on CA1 and a software RTC with 50Hz resolution */
-	PIA6821(config, m_pia2);
-	m_pia2->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	PIA6821(config, m_pia[1]);
+	m_pia[1]->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	/* Serial port support */
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set(m_pia1, FUNC(pia6821_device::cb1_w));
+	m_rs232->rxd_handler().set(m_pia[0], FUNC(pia6821_device::cb1_w));
 
 	SPEAKER(config, "mono").front_center();
 	/* Cassette support - E100 uses 300 baud Kansas City Standard with 1200/2400 Hz modulation */
-	/* NOTE on usage: mame e100 -window -cass <wav file> -ui_active
+	/* NOTE on usage: mame e100 -cass <wav file>
 	 * Once running enable/disable internal UI by pressing Scroll Lock in case it interferes with target keys
 	 * Open the internal UI by pressing TAB and then select 'Tape Control' or use F2/Shift F2 for PLAY/PAUSE
 	 * In order to use a wav file it has first to be created using TAB and select the 'File manager'
@@ -579,7 +537,7 @@ void e100_state::e100(machine_config &config)
 
 	/* screen TODO: simplify the screen config, look at zx.cpp */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(4'000'000)/2, 265, 0, 265, 265, 0, 265);
+	screen.set_raw(4_MHz_XTAL, 265, 0, 256, 265, 0, 256);
 	screen.set_screen_update(FUNC(e100_state::screen_update));
 	screen.set_palette("palette");
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -602,7 +560,7 @@ ROM_START( e100 )
 	ROMX_LOAD( "e100r1u205.bin", 0x3000, 0x0800, NO_DUMP, ROM_BIOS(0) )
 	ROMX_LOAD( "e100r1u206.bin", 0x3800, 0x0800, NO_DUMP, ROM_BIOS(0) )
 
-	/* This is a prototype ROM, commercial relase not verified. The prototype also have different keyboard and supports
+	/* This is a prototype ROM, commercial release not verified. The prototype also have different keyboard and supports
 	   more ram so might need to be split out as a clone later */
 	ROM_SYSTEM_BIOS(1, "rev2-basic", "Esselte 100 rev2 BASIC")
 	ROMX_LOAD( "e100r2u201.bin", 0x0000, 0x2000, CRC(53513b67) SHA1(a91c5c32aead82dcc87db5d818ff286a7fc6a5c8), ROM_BIOS(1) )

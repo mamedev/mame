@@ -64,7 +64,7 @@ private:
 	u8 pad_r();
 	void txd_w(u8 data);
 
-	void render_w(int state);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u8 m_matrixsel = 0U;
 };
@@ -123,11 +123,8 @@ void psr340_state::machine_reset()
 {
 }
 
-void psr340_state::render_w(int state)
+u32 psr340_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if(!state)
-		return;
-
 	const u8 *render = m_lcdc->render();
 	for(int yy=0; yy != 8; yy++)
 		for(int x=0; x != 80; x++) {
@@ -135,6 +132,8 @@ void psr340_state::render_w(int state)
 			for(int xx=0; xx != 5; xx++)
 				m_outputs[x][yy][xx] = (v >> xx) & 1;
 		}
+
+	return 0;
 }
 
 
@@ -219,8 +218,8 @@ void psr340_state::psr340(machine_config &config)
 	m_maincpu->read_pad().set(FUNC(psr340_state::pad_r));
 	m_maincpu->write_txd().set(FUNC(psr340_state::txd_w));
 
-	m_maincpu->add_route(0, "lspeaker", 1.0);
-	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "speaker", 1.0, 0);
+	m_maincpu->add_route(1, "speaker", 1.0, 1);
 
 	// mks3 is connected to sclki, sync comms on sci1
 	// something generates 500K for sci0, probably internal to the swx00
@@ -241,15 +240,14 @@ void psr340_state::psr340(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(800, 384);
 	screen.set_visarea_full();
-	screen.screen_vblank().set(FUNC(psr340_state::render_w));
+	screen.set_screen_update(FUNC(psr340_state::screen_update));
 
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_maincpu, FUNC(swx00_device::sci_rx_w<0>));
 
 	auto &mdout(MIDI_PORT(config, "mdout", midiout_slot, "midiout"));
 	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 ROM_START( psr340 )

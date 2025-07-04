@@ -264,12 +264,8 @@ void roland_sa_device::write(offs_t offset, u8 data)
 	m_ctrl_mem[offset] = data;
 }
 
-void roland_sa_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void roland_sa_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].fill(0);
-
-	std::unique_ptr<int32_t []> int_buffer = make_unique_clear<int32_t []>(outputs[0].samples());
-
 	for (size_t voiceI = 0; voiceI < NUM_VOICES; voiceI++)
 	{
 		for (size_t partI = 0; partI < PARTS_PER_VOICE; partI++)
@@ -393,7 +389,7 @@ void roland_sa_device::sound_stream_update(sound_stream &stream, std::vector<rea
 						exp_val2 = exp_val2 - 0x8000;
 					int32_t exp_val = exp_val1 + exp_val2;
 
-					int_buffer[i] += exp_val;
+					stream.add_int(0, i, exp_val, 0x10000);
 				}
 			}
 
@@ -405,7 +401,4 @@ void roland_sa_device::sound_stream_update(sound_stream &stream, std::vector<rea
 			}
 		}
 	}
-
-	for (size_t i = 0; i < outputs[0].samples(); i++)
-		outputs[0].put_int(i, int_buffer[i], 0xffff);
 }

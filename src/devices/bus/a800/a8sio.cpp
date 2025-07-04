@@ -34,6 +34,7 @@
 #include "a8sio.h"
 #include "atari810.h"
 #include "atari1050.h"
+#include "atarifdc.h"
 #include "cassette.h"
 
 
@@ -202,4 +203,5 @@ void a8sio_cards(device_slot_interface &device)
 	device.option_add("a810", ATARI810);
 	device.option_add("a1050", ATARI1050);
 	device.option_add("cassette", A8SIO_CASSETTE);
+	device.option_add("fdc", ATARI_FDC);
 }

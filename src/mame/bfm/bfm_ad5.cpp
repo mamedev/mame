@@ -187,7 +187,6 @@ void adder5_state::bfm_ad5(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(adder5_state::ad5_fake_timer_int), attotime::from_hz(1000));
 	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	/* unknown sound */
 }

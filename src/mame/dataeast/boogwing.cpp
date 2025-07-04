@@ -723,8 +723,8 @@ void boogwing_state::boogwing(machine_config &config)
 
 	H6280(config, m_audiocpu, SOUND_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &boogwing_state::audio_map);
-	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
+	m_audiocpu->add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -775,23 +775,22 @@ void boogwing_state::boogwing(machine_config &config)
 	m_deco104->set_interface_scramble_reverse();
 	m_deco104->set_use_magic_read_address_xor(true);
 
-	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	/* sound hardware */
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_XTAL / 9));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); // IRQ2
 	ymsnd.port_write_handler().set(FUNC(boogwing_state::sound_bankswitch_w));
-	ymsnd.add_route(0, "lspeaker", 0.32);
-	ymsnd.add_route(1, "rspeaker", 0.32);
+	ymsnd.add_route(0, "speaker", 0.32, 0);
+	ymsnd.add_route(1, "speaker", 0.32, 1);
 
 	OKIM6295(config, m_oki[0], SOUND_XTAL / 32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.56);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.56);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.56, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.56, 1);
 
 	OKIM6295(config, m_oki[1], SOUND_XTAL / 16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.12);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.12);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.12, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.12, 1);
 }
 
 /**********************************************************************************/

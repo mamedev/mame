@@ -210,7 +210,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	struct filter {
@@ -341,7 +341,7 @@ void esq1_filters::device_start()
 		recalc_filter(elem);
 }
 
-void esq1_filters::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void esq1_filters::sound_stream_update(sound_stream &stream)
 {
 /*  if(0) {
         for(int i=0; i<8; i++)
@@ -353,11 +353,11 @@ void esq1_filters::sound_stream_update(sound_stream &stream, std::vector<read_st
         fprintf(stderr, "\n");
     }*/
 
-	for(int i=0; i<outputs[0].samples(); i++) {
+	for(int i=0; i<stream.samples(); i++) {
 		double l=0, r=0;
 		for(int j=0; j<8; j++) {
 			filter &f = filters[j];
-			double x = inputs[j].get(i);
+			double x = stream.get(j, i);
 			double y = (x*f.a[0]
 						+ f.x[0]*f.a[1] + f.x[1]*f.a[2] + f.x[2]*f.a[3] + f.x[3]*f.a[4]
 						- f.y[0]*f.b[1] - f.y[1]*f.b[2] - f.y[2]*f.b[3] - f.y[3]*f.b[4]) / f.b[0];
@@ -379,8 +379,8 @@ void esq1_filters::sound_stream_update(sound_stream &stream, std::vector<read_st
 //      r *= 6553;
 		l *= 2;
 		r *= 2;
-		outputs[0].put_clamp(i, l, 1.0);
-		outputs[1].put_clamp(i, r, 1.0);
+		stream.put_clamp(0, i, l, 1.0);
+		stream.put_clamp(1, i, r, 1.0);
 	}
 }
 
@@ -631,12 +631,11 @@ void esq1_state::esq1(machine_config &config)
 
 	midiout_slot(MIDI_PORT(config, "mdout"));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ESQ1_FILTERS(config, m_filters);
-	m_filters->add_route(0, "lspeaker", 1.0);
-	m_filters->add_route(1, "rspeaker", 1.0);
+	m_filters->add_route(0, "speaker", 1.0, 0);
+	m_filters->add_route(1, "speaker", 1.0, 1);
 
 	ES5503(config, m_es5503, 8_MHz_XTAL);
 	m_es5503->set_channels(8);

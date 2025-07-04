@@ -44,10 +44,10 @@ void gsx8800_device::device_add_mconfig(machine_config &config)
 	// it's just known that one goes to the left and the other to the right
 	// cfr. http://mydocuments.g2.xrea.com/html/p8/soundinfo.html
 	YM2149(config, m_psg[0], psg_x1_clock);
-	m_psg[0]->add_route(ALL_OUTPUTS, "^^lspeaker", 0.50);
+	m_psg[0]->add_route(ALL_OUTPUTS, "^^speaker", 0.50, 0);
 
 	YM2149(config, m_psg[1], psg_x1_clock);
-	m_psg[1]->add_route(ALL_OUTPUTS, "^^rspeaker", 0.50);
+	m_psg[1]->add_route(ALL_OUTPUTS, "^^speaker", 0.50, 1);
 
 
 // ...->irq_handler().set(FUNC(gsx8800_device::int3_w));

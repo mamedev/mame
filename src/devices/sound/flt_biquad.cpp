@@ -474,22 +474,19 @@ void filter_biquad_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void filter_biquad_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void filter_biquad_device::sound_stream_update(sound_stream &stream)
 {
-	auto &src = inputs[0];
-	auto &dst = outputs[0];
-
-	if (m_last_sample_rate != m_stream->sample_rate())
+	if (m_last_sample_rate != stream.sample_rate())
 	{
 		recalc();
-		m_last_sample_rate = m_stream->sample_rate();
+		m_last_sample_rate = stream.sample_rate();
 	}
 
-	for (int sampindex = 0; sampindex < dst.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
-		m_input = src.get(sampindex);
+		m_input = stream.get(0, sampindex);
 		step();
-		dst.put(sampindex, m_output);
+		stream.put(0, sampindex, m_output);
 	}
 }
 

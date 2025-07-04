@@ -127,7 +127,10 @@
 #include "emu.h"
 #include "tatsumi.h"
 
+#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/cxd1095.h"
+#include "machine/gen_latch.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -139,6 +142,7 @@ class cyclwarr_state : public tatsumi_state
 public:
 	cyclwarr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tatsumi_state(mconfig, type, tag)
+		, m_subcpu(*this, "sub")
 		, m_soundlatch(*this, "soundlatch")
 		, m_master_ram(*this, "master_ram")
 		, m_slave_ram(*this, "slave_ram")
@@ -185,6 +189,7 @@ private:
 	void slave_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 
+	required_device<cpu_device> m_subcpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint16_t> m_master_ram;
@@ -974,20 +979,19 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 //  m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	YM2151(config, m_ym2151, cyclwarr_state::CLOCK_1 / 4);
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
-	m_ym2151->add_route(0, "lspeaker", 0.45);
-	m_ym2151->add_route(1, "rspeaker", 0.45);
+	m_ym2151->add_route(0, "speaker", 0.45, 0);
+	m_ym2151->add_route(1, "speaker", 0.45, 1);
 
 	OKIM6295(config, m_oki, cyclwarr_state::CLOCK_1 / 8, okim6295_device::PIN7_HIGH);
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.75, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.75, 1);
 }
 
 void bigfight_state::bigfight(machine_config &config)

@@ -975,8 +975,7 @@ void gamegear_state::gamegear(machine_config &config)
 	m_main_scr->set_screen_update(FUNC(gamegear_state::screen_update_gamegear));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	/* VDP chip of the Gamegear 2 ASIC version */
 	SEGA315_5377(config, m_vdp, MASTER_CLOCK_GG/3);
@@ -984,8 +983,8 @@ void gamegear_state::gamegear(machine_config &config)
 	m_vdp->set_is_pal(false);
 	m_vdp->n_int().set_inputline(m_maincpu, 0);
 	m_vdp->vblank().set(FUNC(gamegear_state::gg_pause_callback));
-	m_vdp->add_route(0, "lspeaker", 1.00);
-	m_vdp->add_route(1, "rspeaker", 1.00);
+	m_vdp->add_route(0, "speaker", 1.00, 0);
+	m_vdp->add_route(1, "speaker", 1.00, 1);
 
 	/* cartridge */
 	GAMEGEAR_CART_SLOT(config, "slot", gg_cart, nullptr).set_must_be_loaded(true);

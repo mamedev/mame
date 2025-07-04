@@ -40,15 +40,13 @@ struct machine_flags
 		ROT180              = FLIP_X | FLIP_Y,
 		ROT270              = FLIP_Y | SWAP_XY,
 
-		NOT_WORKING         = 0x0000'0040,
-		SUPPORTS_SAVE       = 0x0000'0080,  // system supports save states
-		NO_COCKTAIL         = 0x0000'0100,  // screen flip support is missing
-		IS_BIOS_ROOT        = 0x0000'0200,  // this driver entry is a BIOS root
-		REQUIRES_ARTWORK    = 0x0000'0400,  // requires external artwork for key game elements
-		UNOFFICIAL          = 0x0000'0800,  // unofficial hardware modification
-		NO_SOUND_HW         = 0x0000'1000,  // system has no sound output
-		MECHANICAL          = 0x0000'2000,  // contains mechanical parts (pinball, redemption games, ...)
-		IS_INCOMPLETE       = 0x0000'4000   // official system with blatantly incomplete hardware/software
+		NO_COCKTAIL         = 0x0000'0040,  // screen flip support is missing
+		IS_BIOS_ROOT        = 0x0000'0080,  // this driver entry is a BIOS root
+		REQUIRES_ARTWORK    = 0x0000'0100,  // requires external artwork for key game elements
+		UNOFFICIAL          = 0x0000'0200,  // unofficial hardware modification
+		NO_SOUND_HW         = 0x0000'0400,  // system has no sound output
+		MECHANICAL          = 0x0000'0800,  // contains mechanical parts (pinball, redemption games, ...)
+		IS_INCOMPLETE       = 0x0000'1000   // official system with blatantly incomplete hardware/software
 	};
 };
 
@@ -65,8 +63,6 @@ DECLARE_ENUM_BITWISE_OPERATORS(machine_flags::type);
 /// \{
 
 // flags for machine drivers
-constexpr u64 MACHINE_NOT_WORKING               = machine_flags::NOT_WORKING;               ///< Imperfect emulation prevents using the system as intended
-constexpr u64 MACHINE_SUPPORTS_SAVE             = machine_flags::SUPPORTS_SAVE;             ///< All devices in the system supports save states (enables auto save feature, and won't show a warning on using save states)
 constexpr u64 MACHINE_NO_COCKTAIL               = machine_flags::NO_COCKTAIL;               ///< The system supports screen flipping for use in a cocktail cabinet, but this feature is not properly emulated
 constexpr u64 MACHINE_IS_BIOS_ROOT              = machine_flags::IS_BIOS_ROOT;              ///< The system represents an empty system board of some kind - clones are treated as separate systems rather than variants
 constexpr u64 MACHINE_REQUIRES_ARTWORK          = machine_flags::REQUIRES_ARTWORK;          ///< The system requires external artwork for key functionality
@@ -75,18 +71,20 @@ constexpr u64 MACHINE_NO_SOUND_HW               = machine_flags::NO_SOUND_HW;   
 constexpr u64 MACHINE_MECHANICAL                = machine_flags::MECHANICAL;                ///< The system depends on mechanical features for key functionality
 constexpr u64 MACHINE_IS_INCOMPLETE             = machine_flags::IS_INCOMPLETE;             ///< The system represents an incomplete prototype
 
-// flags that map to device feature flags
-constexpr u64 MACHINE_UNEMULATED_PROTECTION     = 0x00000001'00000000;                      ///< Some form of protection is imperfectly emulated (e.g. copy protection or anti-tampering)
-constexpr u64 MACHINE_WRONG_COLORS              = 0x00000002'00000000;                      ///< Colours are completely wrong
-constexpr u64 MACHINE_IMPERFECT_COLORS          = 0x00000004'00000000;                      ///< Colours are close but not completely accurate
-constexpr u64 MACHINE_IMPERFECT_GRAPHICS        = 0x00000008'00000000;                      ///< Graphics are emulated incorrectly for the system
-constexpr u64 MACHINE_NO_SOUND                  = 0x00000010'00000000;                      ///< The system has sound output, but it is not emulated
-constexpr u64 MACHINE_IMPERFECT_SOUND           = 0x00000020'00000000;                      ///< Sound is known to be imperfectly emulated for the system
-constexpr u64 MACHINE_IMPERFECT_CONTROLS        = 0x00000040'00000000;                      ///< Controls or inputs are emulated imperfectly for the system
-constexpr u64 MACHINE_NODEVICE_MICROPHONE       = 0x00000080'00000000;                      ///< The system has unemulated audio capture functionality
-constexpr u64 MACHINE_NODEVICE_PRINTER          = 0x00000100'00000000;                      ///< The system has unemulated printer functionality
-constexpr u64 MACHINE_NODEVICE_LAN              = 0x00000200'00000000;                      ///< The system has unemulated local area networking
-constexpr u64 MACHINE_IMPERFECT_TIMING          = 0x00000400'00000000;                      ///< Timing is known to be imperfectly emulated for the system
+// flags that map to device emulation and feature flags
+constexpr u64 MACHINE_NOT_WORKING               = 0x00000001'00000000;                      ///< Imperfect emulation prevents using the system as intended
+constexpr u64 MACHINE_SUPPORTS_SAVE             = 0x00000002'00000000;                      ///< All devices in the system supports save states (enables auto save feature, and won't show a warning on using save states)
+constexpr u64 MACHINE_UNEMULATED_PROTECTION     = 0x00000004'00000000;                      ///< Some form of protection is imperfectly emulated (e.g. copy protection or anti-tampering)
+constexpr u64 MACHINE_WRONG_COLORS              = 0x00000008'00000000;                      ///< Colours are completely wrong
+constexpr u64 MACHINE_IMPERFECT_COLORS          = 0x00000010'00000000;                      ///< Colours are close but not completely accurate
+constexpr u64 MACHINE_IMPERFECT_GRAPHICS        = 0x00000020'00000000;                      ///< Graphics are emulated incorrectly for the system
+constexpr u64 MACHINE_NO_SOUND                  = 0x00000040'00000000;                      ///< The system has sound output, but it is not emulated
+constexpr u64 MACHINE_IMPERFECT_SOUND           = 0x00000080'00000000;                      ///< Sound is known to be imperfectly emulated for the system
+constexpr u64 MACHINE_IMPERFECT_CONTROLS        = 0x00000100'00000000;                      ///< Controls or inputs are emulated imperfectly for the system
+constexpr u64 MACHINE_NODEVICE_MICROPHONE       = 0x00000200'00000000;                      ///< The system has unemulated audio capture functionality
+constexpr u64 MACHINE_NODEVICE_PRINTER          = 0x00000400'00000000;                      ///< The system has unemulated printer functionality
+constexpr u64 MACHINE_NODEVICE_LAN              = 0x00000800'00000000;                      ///< The system has unemulated local area networking
+constexpr u64 MACHINE_IMPERFECT_TIMING          = 0x00001000'00000000;                      ///< Timing is known to be imperfectly emulated for the system
 
 /// \}
 /// \}
@@ -106,6 +104,20 @@ class game_driver
 public:
 	typedef void (*machine_creator_wrapper)(machine_config &, device_t &);
 	typedef void (*driver_init_wrapper)(device_t &);
+
+	/// \brief Get emulation flags
+	///
+	/// Converts system flags corresponding to device emulation flags to
+	/// a device flags type bit field.
+	/// \param [in] flags A system flags bit field.
+	/// \return A device flags type bit field corresponding to emulation
+	///   flags declared in the \p flags argument.
+	static constexpr device_t::flags_type emulation_flags(u64 flags)
+	{
+		return
+				((flags & MACHINE_NOT_WORKING)              ? device_t::flags::NOT_WORKING  : device_t::flags::NONE) |
+				((flags & MACHINE_SUPPORTS_SAVE)            ? device_t::flags::NONE         : device_t::flags::SAVE_UNSUPPORTED);
+	}
 
 	/// \brief Get unemulated system features
 	///
@@ -169,18 +181,19 @@ public:
 
 // static game traits
 #define GAME_DRIVER_TRAITS(NAME, FULLNAME) \
-namespace { \
-	struct GAME_TRAITS_NAME(NAME) { static constexpr char const shortname[] = #NAME, fullname[] = FULLNAME, source[] = __FILE__; }; \
-	constexpr char const GAME_TRAITS_NAME(NAME)::shortname[], GAME_TRAITS_NAME(NAME)::fullname[], GAME_TRAITS_NAME(NAME)::source[]; \
-}
+		namespace { \
+			struct GAME_TRAITS_NAME(NAME) { static constexpr char const shortname[] = #NAME, fullname[] = FULLNAME, source[] = __FILE__; }; \
+			constexpr char const GAME_TRAITS_NAME(NAME)::shortname[], GAME_TRAITS_NAME(NAME)::fullname[], GAME_TRAITS_NAME(NAME)::source[]; \
+		}
 #define GAME_DRIVER_TYPE(NAME, CLASS, FLAGS) \
-driver_device_creator< \
-		CLASS, \
-		(GAME_TRAITS_NAME(NAME)::shortname), \
-		(GAME_TRAITS_NAME(NAME)::fullname), \
-		(GAME_TRAITS_NAME(NAME)::source), \
-		game_driver::unemulated_features(FLAGS), \
-		game_driver::imperfect_features(FLAGS)>
+		emu::detail::driver_tag_struct< \
+				CLASS, \
+				(GAME_TRAITS_NAME(NAME)::shortname), \
+				(GAME_TRAITS_NAME(NAME)::fullname), \
+				(GAME_TRAITS_NAME(NAME)::source), \
+				game_driver::emulation_flags(FLAGS), \
+				game_driver::unemulated_features(FLAGS), \
+				game_driver::imperfect_features(FLAGS)>{ }
 
 
 /// \addtogroup machinedef

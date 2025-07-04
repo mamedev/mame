@@ -308,6 +308,10 @@
 #include "fsd_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_FZ1_DSK
+#include "fz1_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_G64_DSK
 #include "g64_dsk.h"
 #endif
@@ -1538,5 +1542,10 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Heath");
 #ifdef HAS_FORMATS_H17D_DSK
 	en.add(FLOPPY_H17D_FORMAT); // h17disk.h
+#endif
+
+	en.category("Casio");
+#ifdef HAS_FORMATS_FZ1_DSK
+	en.add(FLOPPY_FZ1_FORMAT); // fz1_dsk.h
 #endif
 }

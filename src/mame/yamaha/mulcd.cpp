@@ -61,11 +61,8 @@ void mulcd_device::set_leds(u16 leds)
 		m_led_outputs[x] = (leds >> x) & 1;
 }
 
-void mulcd_device::render_w(int state)
+u32 mulcd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if(!state)
-		return;
-
 	const u8 *render = m_lcd->render();
 	for(int x=0; x != 64; x++) {
 		for(int y=0; y != 8; y++) {
@@ -75,6 +72,8 @@ void mulcd_device::render_w(int state)
 		}
 		render += 8;
 	}
+
+	return 0;
 }
 
 void mulcd_device::device_add_mconfig(machine_config &config)
@@ -86,7 +85,7 @@ void mulcd_device::device_add_mconfig(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/1.5, 580/1.5);
 	screen.set_visarea_full();
-	screen.screen_vblank().set(FUNC(mulcd_device::render_w));
+	screen.set_screen_update(FUNC(mulcd_device::screen_update));
 
 	config.set_default_layout(layout_mulcd);
 }

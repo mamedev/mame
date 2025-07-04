@@ -33,7 +33,7 @@ public:
 	void vblank(int state);
 
 	void vcomp_val_201c_w(uint16_t data);
-	void segment_202x_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void segment_202x_w(offs_t offset, uint16_t data);
 
 	void adr_mode_2028_w(uint16_t data);
 	void ext_bus_2029_w(uint16_t data);
@@ -57,21 +57,21 @@ public:
 
 	void spg110_2045_w(uint16_t data);
 
-	void transparent_color_205x_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void transparent_color_205x_w(offs_t offset, uint16_t data);
 
 
 	uint16_t irq_tm_h_2037_r();
 	uint16_t sp_control_2042_r();
 
-	void dma_dst_2060_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dma_dst_seg_2061_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_dst_2060_w(offs_t offset, uint16_t data);
+	void dma_dst_seg_2061_w(offs_t offset, uint16_t data);
 	void dma_len_trigger_2062_w(uint16_t data);
 	void spg110_2063_w(uint16_t data);
-	void dma_dst_step_2064_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dma_source_2066_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dma_source_seg_2067_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dma_src_step_2068_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t dma_src_step_2068_r(offs_t offset, uint16_t mem_mask);
+	void dma_dst_step_2064_w(offs_t offset, uint16_t data);
+	void dma_source_2066_w(offs_t offset, uint16_t data);
+	void dma_source_seg_2067_w(offs_t offset, uint16_t data);
+	void dma_src_step_2068_w(offs_t offset, uint16_t data);
+	uint16_t dma_src_step_2068_r(offs_t offset);
 
 	uint16_t dma_len_status_2062_r();
 	uint16_t spg110_2063_r();
@@ -130,7 +130,7 @@ private:
 	static uint16_t rgb_to_hsl(uint8_t r, uint8_t g, uint8_t b);
 	static std::tuple<uint8_t, uint8_t, uint8_t> hsl_to_rgb(uint16_t hsl);
 
-	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void palette_w(offs_t offset, uint16_t data);
 
 	uint16_t tmap0_regs[0x6];
 	uint16_t tmap1_regs[0x6];

@@ -78,7 +78,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dac_8bit_r2r_device> m_dac;
-	required_device<sn76496_device> m_sn;
+	required_device<sn76489a_device> m_sn;
 	required_device<trackfld_audio_device> m_soundbrd;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -88,10 +88,10 @@ protected:
 	tilemap_t *m_bg_tilemap = nullptr;
 
 private:
-	uint8_t m_sn76496_latch = 0U;
+	uint8_t m_sn76489a_latch = 0U;
 
-	void konami_sn76496_latch_w(uint8_t data) { m_sn76496_latch = data; }
-	void konami_sn76496_w(uint8_t data) { m_sn->write(m_sn76496_latch); }
+	void konami_sn76489a_latch_w(uint8_t data) { m_sn76489a_latch = data; }
+	void konami_sn76489a_w(uint8_t data) { m_sn->write(m_sn76489a_latch); }
 
 	uint8_t m_irq_mask = 0U;
 	template <uint8_t Which> void coin_counter_w(int state);
@@ -328,7 +328,7 @@ void roadf_state::video_start()
 void base_state::machine_start()
 {
 	save_item(NAME(m_irq_mask));
-	save_item(NAME(m_sn76496_latch));
+	save_item(NAME(m_sn76489a_latch));
 }
 
 template <uint8_t Which>
@@ -382,8 +382,8 @@ void base_state::common_sound_map(address_map &map)
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8000).r(m_soundbrd, FUNC(trackfld_audio_device::hyperspt_sh_timer_r));
 	map(0xe000, 0xe000).w(m_dac, FUNC(dac_byte_interface::data_w));
-	map(0xe001, 0xe001).w(FUNC(hyperspt_state::konami_sn76496_latch_w));  // Loads the snd command into the snd latch
-	map(0xe002, 0xe002).w(FUNC(hyperspt_state::konami_sn76496_w));  // This address triggers the SN chip to read the data port.
+	map(0xe001, 0xe001).w(FUNC(hyperspt_state::konami_sn76489a_latch_w));  // Loads the snd command into the snd latch
+	map(0xe002, 0xe002).w(FUNC(hyperspt_state::konami_sn76489a_w));  // This address triggers the SN chip to read the data port.
 }
 
 void hyperspt_state::sound_map(address_map &map)
@@ -651,8 +651,8 @@ void base_state::base(machine_config &config)
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 
-	SN76496(config, m_sn, XTAL(14'318'181)/8);  // verified on PCB
-	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	// According to the schematics, part number scratched off
+	SN76489A(config, m_sn, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 1.0);  // clock verified on PCB
 }
 
 void hyperspt_state::hyperspt(machine_config &config)

@@ -850,9 +850,6 @@ discrete_device::~discrete_device()
 
 void discrete_device::device_start()
 {
-	// create the stream
-	//m_stream = stream_alloc(0, 2, 22257);
-
 	const discrete_block *intf_start = m_intf;
 
 	/* If a clock is specified we will use it, otherwise run at the audio sample rate. */
@@ -861,7 +858,7 @@ void discrete_device::device_start()
 	else
 		m_sample_rate = this->machine().sample_rate();
 	m_sample_time = 1.0 / m_sample_rate;
-	m_neg_sample_time = - m_sample_time;
+	m_neg_sample_time = -m_sample_time;
 
 	m_total_samples = 0;
 	m_total_stream_updates = 0;
@@ -984,8 +981,6 @@ void discrete_sound_device::device_start()
 	{
 		node->stream_start();
 	}
-
-
 }
 
 //-------------------------------------------------
@@ -1050,26 +1045,28 @@ void discrete_device::process(int samples)
 //  our sound stream
 //-------------------------------------------------
 
-void discrete_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void discrete_sound_device::sound_stream_update(sound_stream &stream)
 {
 	int outputnum = 0;
 
 	/* Setup any output streams */
 	for (discrete_sound_output_interface *node : m_output_list)
 	{
-		node->set_output_ptr(outputs[outputnum]);
+		node->set_output_ptr(stream, outputnum);
 		outputnum++;
 	}
+
+	int inputnum = 0;
 
 	/* Setup any input streams */
 	for (discrete_dss_input_stream_node *node : m_input_stream_list)
 	{
-		node->m_inview = &inputs[node->m_stream_in_number];
-		node->m_inview_sample = 0;
+		node->set_input_ptr(stream, inputnum);
+		inputnum++;
 	}
 
 	/* just process it */
-	process(outputs[0].samples());
+	process(stream.samples());
 }
 
 //-------------------------------------------------

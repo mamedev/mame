@@ -444,8 +444,7 @@ void aquarium_state::aquarium(machine_config &config)
 	m_sprgen->set_colpri_callback(FUNC(aquarium_state::aquarium_colpri_cb));
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -453,12 +452,12 @@ void aquarium_state::aquarium(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181) / 4)); // clock not verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.45);
-	ymsnd.add_route(1, "rspeaker", 0.45);
+	ymsnd.add_route(0, "speaker", 0.45, 0);
+	ymsnd.add_route(1, "speaker", 0.45, 1);
 
 	OKIM6295(config, m_oki, XTAL(1'056'000), okim6295_device::PIN7_HIGH); // pin 7 not verified
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
 }
 
 ROM_START( aquarium )

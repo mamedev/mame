@@ -80,6 +80,7 @@ i8251_device::i8251_device(const machine_config &mconfig, const char *tag, devic
 
 v5x_scu_device::v5x_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8251_device(mconfig, V5X_SCU, tag, owner, clock)
+	, m_sint_handler(*this)
 {
 }
 
@@ -126,15 +127,14 @@ void i8251_device::device_start()
 
 void i8251_device::update_rx_ready()
 {
-	int state = m_status & I8251_STATUS_RX_READY;
-
-	// masked?
-	if (!BIT(m_command, 2))
-		state = 0;
-
-	m_rxrdy_handler(state != 0);
+	m_rxrdy_handler(rxrdy_r());
 }
 
+void v5x_scu_device::update_rx_ready()
+{
+	i8251_device::update_rx_ready();
+	sint_bit_w<0>(rxrdy_r());
+}
 
 
 /*-------------------------------------------------
@@ -376,21 +376,20 @@ void i8251_device::transmit_clock()
 
 void i8251_device::update_tx_ready()
 {
-	/* clear tx ready state */
-	int tx_ready;
-
 	/* tx ready output is set if:
 	    DB Buffer Empty &
 	    CTS is set &
 	    Transmit enable is 1
 	*/
 
-	tx_ready = is_tx_enabled() && (m_status & I8251_STATUS_TX_READY) != 0;
-
-	m_txrdy_handler(tx_ready);
+	m_txrdy_handler(txrdy_r());
 }
 
-
+void v5x_scu_device::update_tx_ready()
+{
+	i8251_device::update_tx_ready();
+	sint_bit_w<1>(txrdy_r());
+}
 
 /*-------------------------------------------------
     update_tx_empty
@@ -875,10 +874,22 @@ int i8251_device::txrdy_r()
 	return is_tx_enabled() && (m_status & I8251_STATUS_TX_READY) != 0;
 }
 
+int i8251_device::rxrdy_r()
+{
+	// masked?
+	if (!BIT(m_command, 2))
+		return 0;
+
+	return (m_status & I8251_STATUS_RX_READY) != 0;
+}
+
 void v5x_scu_device::device_start()
 {
 	i8251_device::device_start();
 
+	m_sint = 0;
+
+	save_item(NAME(m_sint));
 	save_item(NAME(m_simk));
 }
 
@@ -888,6 +899,11 @@ void v5x_scu_device::device_reset()
 	m_simk = 0x03;
 
 	i8251_device::device_reset();
+}
+
+void v5x_scu_device::update_sint()
+{
+	m_sint_handler((m_sint & ~m_simk) != 0);
 }
 
 u8 v5x_scu_device::read(offs_t offset)

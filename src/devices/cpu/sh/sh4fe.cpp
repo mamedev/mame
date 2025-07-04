@@ -28,7 +28,8 @@ uint16_t sh4_frontend::read_word(opcode_desc &desc)
 	if (desc.physpc >= 0xe0000000)
 		return m_sh->m_pr16(desc.physpc);
 
-	return m_sh->m_pr16(desc.physpc & SH34_AM);
+	desc.physpc &= SH34_AM; // TODO: mmu translate
+	return m_sh->m_pr16(desc.physpc);
 }
 
 

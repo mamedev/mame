@@ -794,9 +794,9 @@ CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, i
 CONS( 200?, bb6578,      0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "DaiDaiXing Electronics", "TV Games Baseball (SH6578 hardware)", MACHINE_NOT_WORKING )
 
 // these don't boot much further than the timetop logo and a splash screen
-// "Super Knowledge Monopoly" is an English translation of the title
-CONS( 200?, 6578cjz1,     0,         0,  nes_sh6578,     nes_sh6578, nes_sh6578_cjz_state, init_nes_sh6578, "TimeTop", u8"Chāo Jí Zhī Shi Dà Fù Wēng (vol. 1)", MACHINE_NOT_WORKING )
-CONS( 200?, 6578cjz2,     6578cjz1,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_cjz_state, init_nes_sh6578, "TimeTop", u8"Chāo Jí Zhī Shi Dà Fù Wēng (vol. 2)", MACHINE_NOT_WORKING )
+// 超级知识大富翁 (Chāojí Zhīshì Dà Fùwēng)
+CONS( 200?, 6578cjz1,     0,         0,  nes_sh6578,     nes_sh6578, nes_sh6578_cjz_state, init_nes_sh6578, "TimeTop", "Chaoji Zhishi Da Fuweng 1", MACHINE_NOT_WORKING )
+CONS( 200?, 6578cjz2,     0,         0,  nes_sh6578,     nes_sh6578, nes_sh6578_cjz_state, init_nes_sh6578, "TimeTop", "Chaoji Zhishi Da Fuweng 2", MACHINE_NOT_WORKING )
 
 // Super Moto 3 https://youtu.be/DR5Y_r6C_qk - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games
 

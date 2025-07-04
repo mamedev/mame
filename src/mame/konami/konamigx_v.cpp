@@ -249,7 +249,7 @@ void konamigx_state::wipezbuf(int noshadow)
 
 void konamigx_state::set_brightness(int layer)
 {
-	const uint8_t bri_mode = (m_k055555->K055555_read_register(K55_VBRI) >> layer * 2) & 0b11;
+	const uint8_t bri_mode = (m_k055555->K055555_read_register(K55_VBRI) >> layer * 2) & 0x03;
 	const uint8_t new_brightness = bri_mode ? m_brightness[bri_mode - 1] : 0xff;
 
 	if (m_current_brightness != new_brightness)
@@ -438,8 +438,9 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		{
 			if (layerpri[j] <= layerpri[i])
 			{
-				std::swap(layerpri[j], layerpri[i]);
-				std::swap(layerid[j], layerid[i]);
+				using std::swap;
+				swap(layerpri[j], layerpri[i]);
+				swap(layerid[j], layerid[i]);
 			}
 		}
 	}
@@ -480,7 +481,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		{
 			const uint32_t order = layerpri[i] << 24;
 			const int color = 0;
-			objpool.push_back(GX_OBJ{order, offs, code, color});
+			objpool.emplace_back(GX_OBJ{ order, offs, code, color });
 		}
 	}
 
@@ -583,46 +584,45 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		/*
 		    default sort order:
-		    fedcba9876543210fedcba9876543210
-		    xxxxxxxx------------------------ (priority)
-		    --------xxxxxxxx---------------- (zcode)
-		    ----------------xxxxxxxx-------- (offset)
-		    ------------------------xxxx---- (shadow mode)
-		    ----------------------------xxxx (shadow code)
+		    fedcba98 76543210 fedcba98 76543210
+		    xxxxxxxx -------- -------- -------- (priority)
+		    -------- xxxxxxxx -------- -------- (zcode)
+		    -------- -------- xxxxxxxx -------- (offset)
+		    -------- -------- -------- xxxx---- (shadow mode)
+		    -------- -------- -------- ------xx (shadow code)
 		*/
 		if (add_solid)
 		{
 			// add objects with solid or alpha pens
 			uint32_t order = pri << 24 | zcode << 16 | offs << (8 - 3) | solid_draw_mode << 4;
-			objpool.push_back(GX_OBJ{order, offs, code, color});
+			objpool.emplace_back(GX_OBJ{ order, offs, code, color });
 		}
 
 		if (add_shadow && !(color & K055555_SKIPSHADOW) && !(mixerflags & GXMIX_NOSHADOW))
 		{
 			// add objects with shadows if enabled
 			uint32_t order = spri << 24 | zcode << 16 | offs << (8 - 3) | shadow_draw_mode << 4 | shadow;
-			objpool.push_back(GX_OBJ{ order, offs, code, color});
+			objpool.emplace_back(GX_OBJ{ order, offs, code, color });
 		}
 	}
 
 	// sort objects in descending order (SLOW)
 	// reverse objpool to retain order in case of ties
 	std::reverse(objpool.begin(), objpool.end());
-	std::stable_sort(objpool.begin(), objpool.end(), [](const GX_OBJ &a, const GX_OBJ &b){
-		return a.order > b.order;
-	});
+	std::stable_sort(
+			objpool.begin(),
+			objpool.end(),
+			[] (const GX_OBJ &a, const GX_OBJ &b) { return a.order > b.order; });
 
 	konamigx_mixer_draw(screen, bitmap, cliprect, sub1, sub1flags, sub2, sub2flags, mixerflags, extra_bitmap, rushingheroes_hack, objpool);
 }
 
-void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
-					tilemap_t *sub1, int sub1flags,
-					tilemap_t *sub2, int sub2flags,
-					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
-
-					/* passed from above function */
-					const std::vector<GX_OBJ> &objpool
-					)
+void konamigx_state::konamigx_mixer_draw(
+		screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
+		tilemap_t *sub1, int sub1flags,
+		tilemap_t *sub2, int sub2flags,
+		int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
+		const std::vector<GX_OBJ> &objpool) /* passed from above function */
 {
 	// traverse draw list
 	const uint8_t disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
@@ -653,7 +653,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 			}
 			color &= K055555_COLORMASK;
 
-			if (drawmode >= 4) m_palette->set_shadow_mode(order & 0x0f);
+			if (drawmode >= 4) m_palette->set_shadow_mode(order & 0x03);
 
 			if (!(mixerflags & GXMIX_NOZBUF))
 			{
@@ -662,11 +662,10 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 			}
 
 			m_k055673->k053247_draw_single_sprite_gxcore(bitmap, cliprect,
-				m_gx_objzbuf, m_gx_shdzbuf.get(), code, m_gx_spriteram, offs,
-				color, alpha, drawmode, zcode, pri,
-				/* non-gx only */
-				0, 0, nullptr, nullptr, 0
-				);
+					m_gx_objzbuf, m_gx_shdzbuf.get(), code, m_gx_spriteram, offs,
+					color, alpha, drawmode, zcode, pri,
+					/* non-gx only */
+					0, 0, nullptr, nullptr, 0);
 		}
 		/* the rest are tilemaps of various kinda */
 		else
@@ -699,17 +698,18 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 		set_brightness(layer);
 
 		const uint8_t layer2 = layer << 1;
-		const uint8_t j = mixerflags >> layer2 & 0b11;
+		const uint8_t j = mixerflags >> layer2 & 3;
 
 		// keep internal and external mix codes separated, so the external mix code can be applied to category 1 tiles
 		uint8_t mix_mode_internal = 0;
 		uint8_t mix_mode_external = 0;
 
-		if (j == GXMIX_BLEND_FORCE) mix_mode_internal = mixerflags >> (layer2 + 16) & 0b11; // hack
+		if (j == GXMIX_BLEND_FORCE)
+			mix_mode_internal = mixerflags >> (layer2 + 16) & 3; // hack
 		else
 		{
-			const uint8_t v_inmix_on_layer = m_vmixon >> layer2 & 0b11;
-			const uint8_t v_inmix_layer = m_vinmix >> layer2 & 0b11;
+			const uint8_t v_inmix_on_layer = m_vmixon >> layer2 & 3;
+			const uint8_t v_inmix_layer = m_vinmix >> layer2 & 3;
 			const uint8_t tile_mix_code = uint32_t(mixerflags) >> 30;
 
 			mix_mode_internal = v_inmix_layer & v_inmix_on_layer;
@@ -725,6 +725,7 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 			flags2 |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
 		}
 
+		// FIXME: implement mixpri and additive
 		// hack: mask out mixpri bit. if additive bit set, mask it out and invert alpha.
 		// this makes additive alpha effects look OK until they are properly handled.
 		int alpha = m_k054338->set_alpha_level(mix_mode_internal) & 0x1ff;
@@ -1039,7 +1040,7 @@ K056832_CB_MEMBER(konamigx_state::type2_tile_callback)
 
 K056832_CB_MEMBER(konamigx_state::salmndr2_tile_callback)
 {
-	const uint8_t mix_code = attr >> 4 & 0b11;
+	const uint8_t mix_code = attr >> 4 & 3;
 	if (mix_code)
 	{
 		*priority = 1;
@@ -1054,7 +1055,7 @@ K056832_CB_MEMBER(konamigx_state::salmndr2_tile_callback)
 
 K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 {
-	const uint8_t mix_code = attr >> 6 & 0b11;
+	const uint8_t mix_code = attr >> 6 & 3;
 	if (mix_code)
 	{
 		*priority = 1;

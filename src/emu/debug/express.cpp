@@ -363,8 +363,9 @@ symbol_entry::~symbol_entry()
 //  symbol_table - constructor
 //-------------------------------------------------
 
-symbol_table::symbol_table(running_machine &machine, symbol_table *parent, device_t *device)
+symbol_table::symbol_table(running_machine &machine, table_type type, symbol_table *parent, device_t *device)
 	: m_machine(machine)
+	, m_type(type)
 	, m_parent(parent)
 	, m_memintf(dynamic_cast<device_memory_interface *>(device))
 	, m_memory_modified(nullptr)

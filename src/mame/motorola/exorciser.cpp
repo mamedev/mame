@@ -621,17 +621,8 @@ void exorciser_state::machine_start()
 	m_trace_timer = timer_alloc(FUNC(exorciser_state::assert_trace), this);
 }
 
-static DEVICE_INPUT_DEFAULTS_START(exorterm)
-	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
-	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
-	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
-	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
-	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
-DEVICE_INPUT_DEFAULTS_END
-
 static DEVICE_INPUT_DEFAULTS_START(printer)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
-	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
@@ -674,7 +665,6 @@ void exorciser_state::exorciser(machine_config &config)
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", exorciser_state::exorciser_rs232_devices, "exorterm155"));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
-	rs232.set_option_device_input_defaults("exorterm155", DEVICE_INPUT_DEFAULTS_NAME(exorterm));
 
 	PIA6821(config, m_pia_dbg);
 	m_pia_dbg->writepa_handler().set(FUNC(exorciser_state::pia_dbg_pa_w));

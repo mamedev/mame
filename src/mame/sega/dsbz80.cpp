@@ -267,12 +267,9 @@ void dsbz80_device::mpeg_stereo_w(uint8_t data)
 	m_mp_pan = data & 3;  // 0 = stereo, 1 = left on both channels, 2 = right on both channels
 }
 
-void dsbz80_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void dsbz80_device::sound_stream_update(sound_stream &stream)
 {
-	auto &out_l = outputs[0];
-	auto &out_r = outputs[1];
-
-	int samples = out_l.samples();
+	int samples = stream.samples();
 	int sampindex = 0;
 	for (;;)
 	{
@@ -281,20 +278,20 @@ void dsbz80_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			switch (m_mp_pan)
 			{
 				case 0: // stereo
-					out_l.put_int(sampindex, m_audio_buf[m_audio_pos*2] * m_mp_vol, 32768 * 128);
-					out_r.put_int(sampindex, m_audio_buf[m_audio_pos*2+1] * m_mp_vol, 32768 * 128);
+					stream.put_int(0, sampindex, m_audio_buf[m_audio_pos*2] * m_mp_vol, 32768 * 128);
+					stream.put_int(1, sampindex, m_audio_buf[m_audio_pos*2+1] * m_mp_vol, 32768 * 128);
 					sampindex++;
 					break;
 
 				case 1: // left only
-					out_l.put_int(sampindex, m_audio_buf[m_audio_pos*2] * m_mp_vol, 32768 * 128);
-					out_r.put_int(sampindex, m_audio_buf[m_audio_pos*2] * m_mp_vol, 32768 * 128);
+					stream.put_int(0, sampindex, m_audio_buf[m_audio_pos*2] * m_mp_vol, 32768 * 128);
+					stream.put_int(1, sampindex, m_audio_buf[m_audio_pos*2] * m_mp_vol, 32768 * 128);
 					sampindex++;
 					break;
 
 				case 2: // right only
-					out_l.put_int(sampindex, m_audio_buf[m_audio_pos*2+1] * m_mp_vol, 32768 * 128);
-					out_r.put_int(sampindex, m_audio_buf[m_audio_pos*2+1] * m_mp_vol, 32768 * 128);
+					stream.put_int(0, sampindex, m_audio_buf[m_audio_pos*2+1] * m_mp_vol, 32768 * 128);
+					stream.put_int(1, sampindex, m_audio_buf[m_audio_pos*2+1] * m_mp_vol, 32768 * 128);
 					sampindex++;
 					break;
 			}
@@ -309,8 +306,6 @@ void dsbz80_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 		if (m_mp_state == 0)
 		{
-			out_l.fill(0, sampindex);
-			out_r.fill(0, sampindex);
 			break;
 
 		}

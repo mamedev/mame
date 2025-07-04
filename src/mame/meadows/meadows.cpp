@@ -150,8 +150,8 @@ namespace {
 class meadows_state : public driver_device
 {
 public:
-	meadows_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	meadows_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_dac(*this, "dac"),
@@ -175,6 +175,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { sh_init(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -189,9 +190,7 @@ private:
 	optional_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	uint8_t m_channel = 0; // TODO: always 0?
-	uint32_t m_freq1 = 0;
-	uint32_t m_freq2 = 0;
+	uint32_t m_freq[2] = { };
 	uint8_t m_latched_0c01 = 0;
 	uint8_t m_latched_0c02 = 0;
 	uint8_t m_latched_0c03 = 0;
@@ -203,6 +202,10 @@ private:
 	uint8_t m_0c03 = 0;
 
 	tilemap_t *m_bg_tilemap = nullptr;
+
+	void sh_init();
+	void sh_update();
+
 	uint8_t hsync_chain_r();
 	uint8_t vsync_chain_hi_r();
 	uint8_t vsync_chain_lo_r();
@@ -217,8 +220,7 @@ private:
 	void minferno_vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(audio_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip);
-	void sh_update();
-	SAMPLES_START_CB_MEMBER(sh_start);
+
 	void audio_map(address_map &map) ATTR_COLD;
 	void bowl3d_main_map(address_map &map) ATTR_COLD;
 	void meadows_main_map(address_map &map) ATTR_COLD;
@@ -226,6 +228,12 @@ private:
 	void minferno_main_map(address_map &map) ATTR_COLD;
 };
 
+
+/*************************************
+ *
+ *  Sound handler
+ *
+ *************************************/
 
 static constexpr uint32_t BASE_CTR1 = (5'000'000 / 256);
 static constexpr uint32_t BASE_CTR2 = (5'000'000 / 32);
@@ -237,25 +245,19 @@ static constexpr uint8_t ENABLE_CTR1 = 0x08;
 
 static const int16_t waveform[2] = { -120*256, 120*256 };
 
-/************************************/
-/* Sound handler start              */
-/************************************/
-SAMPLES_START_CB_MEMBER(meadows_state::sh_start)
+void meadows_state::sh_init()
 {
-	m_0c00 = m_0c01 = m_0c02 = m_0c03 = 0;
-	m_channel = 0;
-	m_freq1 = m_freq2 = 1000;
-	m_latched_0c01 = m_latched_0c02 = m_latched_0c03 = 0;
+	// initialized after samples_device::device_reset
+	for (int i = 0; i < 2; i++)
+		if (!m_samples->playing(i))
+		{
+			m_freq[i] = machine().sample_rate();
 
-	m_samples->set_volume(0, 0);
-	m_samples->start_raw(0, waveform, std::size(waveform), m_freq1, true);
-	m_samples->set_volume(1, 0);
-	m_samples->start_raw(1, waveform, std::size(waveform), m_freq2, true);
+			m_samples->set_volume(i, 0);
+			m_samples->start_raw(i, waveform, std::size(waveform), m_freq[i], true);
+		}
 }
 
-/************************************/
-/* Sound handler update             */
-/************************************/
 void meadows_state::sh_update()
 {
 	if (m_latched_0c01 != m_0c01 || m_latched_0c03 != m_0c03)
@@ -269,10 +271,10 @@ void meadows_state::sh_update()
 		   bit 0..3 of 0c01 are ctr preset */
 		int const preset = (m_0c01 & 15) ^ 15;
 		if (preset)
-			m_freq1 = BASE_CTR1 / (preset + 1);
+			m_freq[0] = BASE_CTR1 / (preset + 1);
 		else amp = 0;
-		LOGAUDIO("meadows ctr1 channel #%d preset:%3d freq:%5d amp:%d\n", m_channel, preset, m_freq1, amp);
-		m_samples->set_frequency(0, m_freq1 * sizeof(waveform) / 2);
+		LOGAUDIO("meadows ctr1 channel #0 preset:%3d freq:%5d amp:%d\n", preset, m_freq[0], amp);
+		m_samples->set_frequency(0, m_freq[0] * sizeof(waveform) / 2);
 		m_samples->set_volume(0, amp / 255.0);
 	}
 
@@ -284,13 +286,13 @@ void meadows_state::sh_update()
 		int const preset = m_0c02 ^ 0xff;
 		if (preset)
 		{
-			m_freq2 = BASE_CTR2 / (preset + 1) / 2;
+			m_freq[1] = BASE_CTR2 / (preset + 1) / 2;
 			if ((m_0c03 & DIV2OR4_CTR2) == 0)
-				m_freq2 >>= 1;
+				m_freq[1] >>= 1;
 		}
 		else amp = 0;
-		LOGAUDIO("meadows ctr2 channel #%d preset:%3d freq:%5d amp:%d\n", m_channel + 1, preset, m_freq2, amp);
-		m_samples->set_frequency(1, m_freq2 * sizeof(waveform));
+		LOGAUDIO("meadows ctr2 channel #1 preset:%3d freq:%5d amp:%d\n", preset, m_freq[1], amp);
+		m_samples->set_frequency(1, m_freq[1] * sizeof(waveform));
 		m_samples->set_volume(1, amp / 255.0);
 	}
 
@@ -304,10 +306,6 @@ void meadows_state::sh_update()
 	m_latched_0c03 = m_0c03;
 }
 
-
-// some constants to make life easier
-static constexpr int8_t SPR_ADJUST_X = -18;
-static constexpr int8_t SPR_ADJUST_Y = -14;
 
 
 /*************************************
@@ -375,8 +373,8 @@ void meadows_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip)
 {
 	for (int i = 0; i < 4; i++)
 	{
-		int const x = m_spriteram[i + 0] + SPR_ADJUST_X;
-		int const y = m_spriteram[i + 4] + SPR_ADJUST_Y;
+		int const x = m_spriteram[i + 0] - 18;
+		int const y = m_spriteram[i + 4] - 14;
 		int const code = m_spriteram[i + 8] & 0x0f;       // bit #0 .. #3 select sprite
 //      int const bank = (m_spriteram[i + 8] >> 4) & 1;      bit #4 selects PROM ???
 		int const bank = i;                               // that fixes it for now :-/
@@ -409,9 +407,7 @@ void meadows_state::machine_start()
 {
 	m_main_sense_state = 0;
 
-	// save_item(NAME(m_channel)); // commented out as it's always 0 right now
-	save_item(NAME(m_freq1));
-	save_item(NAME(m_freq2));
+	save_item(NAME(m_freq));
 	save_item(NAME(m_latched_0c01));
 	save_item(NAME(m_latched_0c02));
 	save_item(NAME(m_latched_0c03));
@@ -421,7 +417,6 @@ void meadows_state::machine_start()
 	save_item(NAME(m_0c01));
 	save_item(NAME(m_0c02));
 	save_item(NAME(m_0c03));
-
 }
 
 
@@ -939,11 +934,10 @@ void meadows_state::meadows(machine_config &config)
 
 	// audio hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(2);
-	m_samples->set_samples_start_callback(FUNC(meadows_state::sh_start));
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 

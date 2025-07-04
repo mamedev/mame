@@ -2,7 +2,7 @@
 // copyright-holders:
 
 /*
-Janken Man 2
+Ganso Janken Man 2
 'S9405021 CPU-DM-NEW' PCB
 
 Z0840004PSC
@@ -164,4 +164,4 @@ ROM_END
 } // anonymous namespace
 
 // title machine translated from auction, not verified
-GAME( 199?, jankmg2, 0, jankmg2, jankmg2, jankmg2_state, empty_init, ROT0, "Sunwise", "Janken Man Ganso 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, jankmg2, 0, jankmg2, jankmg2, jankmg2_state, empty_init, ROT0, "Sunwise", "Ganso Janken Man 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

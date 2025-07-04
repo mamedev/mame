@@ -2137,6 +2137,23 @@ ROM_START( sstar97a )
 	ROM_LOAD16_BYTE( "105.u22", 0x40001, 0x20000, CRC(ca17a632) SHA1(d491310ccdbe9b59a1e607f9254646f20700d79d) )
 ROM_END
 
+ROM_START( sstar97b )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "09", 0x0000, 0x8000, CRC(003e4b2a) SHA1(d7c095ce15edc88a6e71ec9b7eb41e311d8bf1bc) )
+	ROM_LOAD( "10", 0xc000, 0x4000, CRC(39df04c6) SHA1(1056b1ecb60f69fa1d4bcf1629913d21f5ce6f50) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) // actually a MX29L1611MC-90 on this PCB (contents should probably match, but BAD_DUMP to be sure)
+	ROM_LOAD16_BYTE( "bor_dun_4.u23", 0x00000, 0x20000, BAD_DUMP CRC(d0d0ead1) SHA1(00bfe691cb9020c5d7e21d80a1e059ea2155aad8) )
+	ROM_LOAD16_BYTE( "bor_dun_2.u25", 0x00001, 0x20000, BAD_DUMP CRC(2b0f07b5) SHA1(9bcde623e53697c4b68d2f083f6254596aee64eb) )
+	ROM_LOAD16_BYTE( "bor_dun_3.u24", 0x40000, 0x20000, BAD_DUMP CRC(3c7da3f1) SHA1(8098b33a779fb697984b97f2d7edb9874e6e19d9) )
+	ROM_LOAD16_BYTE( "bor_dun_1.u26", 0x40001, 0x20000, BAD_DUMP CRC(36efdca6) SHA1(e614fbba77e5c7a1e7a1d2970b4f945ee0468196) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) // actually a MX29L1611MC-90 on this PCB (contents should probably match, but BAD_DUMP to be sure)
+	ROM_LOAD16_BYTE( "bor_dun_8.u19", 0x00000, 0x20000, BAD_DUMP CRC(adf0b7ce) SHA1(41d9fb16eb20e1fd2960117b7e4ea23a97b88961) )
+	ROM_LOAD16_BYTE( "bor_dun_6.u21", 0x00001, 0x20000, BAD_DUMP CRC(37be2cbe) SHA1(78acda58aab605cb992c3b9fbaf18d38f768ed1a) )
+	ROM_LOAD16_BYTE( "bor_dun_7.u20", 0x40000, 0x20000, BAD_DUMP CRC(43908665) SHA1(41b9cee0723d9da6934ab7934012fb1625a8f080) )
+	ROM_LOAD16_BYTE( "bor_dun_5.u22", 0x40001, 0x20000, BAD_DUMP CRC(ca17a632) SHA1(d491310ccdbe9b59a1e607f9254646f20700d79d) )
+ROM_END
 
 // PCB has a Z84C0008PEC, 2x 82C55AC-2, AT89C2051 MCU, 2x ATF1508AS EEPLD, 24C04AN, JFC 95101 (AY-8910 clone), Altera EPM7032LC44-15
 ROM_START( sstar97jb )
@@ -2633,6 +2650,7 @@ GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  init_miacti
 GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction,  ROT0, "bootleg",              "Tiger (slot)",                                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE  )
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
 GAME( 199?, sstar97a,  sstar97,  sstar97,  sstar97,  skylncr_state,  init_sstar97a,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V168A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, sstar97b,  sstar97,  sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153A)",   MACHINE_SUPPORTS_SAVE )
 GAME( 199?, sstar97jb, sstar97,  sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 Jianan Ban",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
 GAME( 199?, hongmayi,  0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "bootleg",              "Hong Mayi",                                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
 GAME( 199?, dbsha,     0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "bootleg",              "Da Bai Sha",                                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption

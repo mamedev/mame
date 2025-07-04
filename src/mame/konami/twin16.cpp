@@ -677,23 +677,22 @@ void twin16_state::twin16(machine_config &config)
 	m_palette->enable_shadows();
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
 
 	K007232(config, m_k007232, XTAL(3'579'545));
 	m_k007232->port_write().set(FUNC(twin16_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.12); // estimated with gradius2 OST
-	m_k007232->add_route(0, "rspeaker", 0.12);
-	m_k007232->add_route(1, "lspeaker", 0.12);
-	m_k007232->add_route(1, "rspeaker", 0.12);
+	m_k007232->add_route(0, "speaker", 0.12, 0); // estimated with gradius2 OST
+	m_k007232->add_route(0, "speaker", 0.12, 1);
+	m_k007232->add_route(1, "speaker", 0.12, 0);
+	m_k007232->add_route(1, "speaker", 0.12, 1);
 
 	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.20);
-	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.20);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.20, 0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.20, 1);
 }
 
 void twin16_state::devilw(machine_config &config)
@@ -731,23 +730,22 @@ void fround_state::fround(machine_config &config)
 	m_palette->enable_shadows();
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
 
 	K007232(config, m_k007232, XTAL(3'579'545));
 	m_k007232->port_write().set(FUNC(twin16_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.12);
-	m_k007232->add_route(0, "rspeaker", 0.12);
-	m_k007232->add_route(1, "lspeaker", 0.12);
-	m_k007232->add_route(1, "rspeaker", 0.12);
+	m_k007232->add_route(0, "speaker", 0.12, 0);
+	m_k007232->add_route(0, "speaker", 0.12, 1);
+	m_k007232->add_route(1, "speaker", 0.12, 0);
+	m_k007232->add_route(1, "speaker", 0.12, 1);
 
 	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.20);
-	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.20);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.20, 0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.20, 1);
 }
 
 void twin16_state::miaj(machine_config &config)

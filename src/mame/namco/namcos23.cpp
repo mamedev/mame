@@ -6177,14 +6177,13 @@ void gorgon_state::gorgon(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gorgon);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	c352_device &c352(C352(config, "c352", C352CLOCK, C352DIV));
-	c352.add_route(0, "lspeaker", 1.00);
-	c352.add_route(1, "rspeaker", 1.00);
-	c352.add_route(2, "lspeaker", 1.00);
-	c352.add_route(3, "rspeaker", 1.00);
+	c352.add_route(0, "speaker", 1.00, 0);
+	c352.add_route(1, "speaker", 1.00, 1);
+	c352.add_route(2, "speaker", 1.00, 0);
+	c352.add_route(3, "speaker", 1.00, 1);
 
 	JVS_PORT(config, m_jvs, jvs_port_devices, nullptr);
 	m_jvs->rxd().set(m_subcpu, FUNC(h8_device::sci_rx_w<0>));
@@ -6254,14 +6253,13 @@ void namcos23_state::s23(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos23);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	c352_device &c352(C352(config, "c352", C352CLOCK, C352DIV));
-	c352.add_route(0, "lspeaker", 1.00);
-	c352.add_route(1, "rspeaker", 1.00);
-	c352.add_route(2, "lspeaker", 1.00);
-	c352.add_route(3, "rspeaker", 1.00);
+	c352.add_route(0, "speaker", 1.00, 0);
+	c352.add_route(1, "speaker", 1.00, 1);
+	c352.add_route(2, "speaker", 1.00, 0);
+	c352.add_route(3, "speaker", 1.00, 1);
 
 	JVS_PORT(config, m_jvs, jvs_port_devices, nullptr);
 	m_jvs->rxd().set(m_subcpu, FUNC(h8_device::sci_rx_w<0>));

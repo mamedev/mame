@@ -1857,15 +1857,14 @@ void kaneko16_blazeon_state::blazeon(machine_config &config)
 	// there is actually a 2nd sprite chip! looks like our device emulation handles both at once
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	YM2151(config, m_ymsnd, 4000000);
-	m_ymsnd->add_route(0, "lspeaker", 1.0);
-	m_ymsnd->add_route(1, "rspeaker", 1.0);
+	m_ymsnd->add_route(0, "speaker", 1.0, 0);
+	m_ymsnd->add_route(1, "speaker", 1.0, 1);
 }
 
 

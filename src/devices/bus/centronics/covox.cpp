@@ -92,10 +92,9 @@ centronics_covox_stereo_device::centronics_covox_stereo_device(const machine_con
 void centronics_covox_stereo_device::device_add_mconfig(machine_config &config)
 {
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	SPEAKER(config, "speaker", 2).front();
+	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0); // unknown DAC
+	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1); // unknown DAC
 }
 
 void centronics_covox_stereo_device::device_start()

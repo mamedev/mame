@@ -718,8 +718,8 @@ void atarisy1_state::add_speech(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &atarisy1_state::sound_ext_map);
 
 	TMS5220C(config, m_tms, 14.318181_MHz_XTAL/2/11);
-	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 0.6);
-	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 0.6);
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.6, 0);
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.6, 1);
 
 	MOS6522(config, m_via, 14.318181_MHz_XTAL/8);
 	m_via->readpa_handler().set(m_tms, FUNC(tms5220_device::status_r));
@@ -773,8 +773,7 @@ void atarisy1_state::atarisy1(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, m6502_device::NMI_LINE);
@@ -785,12 +784,12 @@ void atarisy1_state::atarisy1(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 14.318181_MHz_XTAL/4));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
-	ymsnd.add_route(0, "lspeaker", 0.48);
-	ymsnd.add_route(1, "rspeaker", 0.48);
+	ymsnd.add_route(0, "speaker", 0.48, 0);
+	ymsnd.add_route(1, "speaker", 0.48, 1);
 
 	pokey_device &pokey(POKEY(config, "pokey", 14.318181_MHz_XTAL/8));
-	pokey.add_route(ALL_OUTPUTS, "lspeaker", 0.24);
-	pokey.add_route(ALL_OUTPUTS, "rspeaker", 0.24);
+	pokey.add_route(ALL_OUTPUTS, "speaker", 0.24, 0);
+	pokey.add_route(ALL_OUTPUTS, "speaker", 0.24, 1);
 }
 
 void atarisy1_state::marble(machine_config &config)

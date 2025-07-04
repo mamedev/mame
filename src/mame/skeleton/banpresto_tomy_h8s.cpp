@@ -116,12 +116,11 @@ void banpresto_tomy_h8s_state::base(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(65536); // TODO
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	okim9810_device &oki(OKIM9810(config, "oki", 4.096_MHz_XTAL)); // M9810B or M9811
-	oki.add_route(0, "lspeaker", 0.80);
-	oki.add_route(1, "rspeaker", 0.80);
+	oki.add_route(0, "speaker", 0.80, 0);
+	oki.add_route(1, "speaker", 0.80, 1);
 }
 
 

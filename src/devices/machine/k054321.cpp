@@ -59,8 +59,7 @@ void k054321_device::sound_map(address_map &map)
 
 k054321_device::k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, K054321, tag, owner, clock),
-	m_left(*this, finder_base::DUMMY_TAG),
-	m_right(*this, finder_base::DUMMY_TAG),
+	m_speaker(*this, finder_base::DUMMY_TAG),
 	m_soundlatch(*this, "soundlatch%u", 0)
 {
 }
@@ -68,17 +67,12 @@ k054321_device::k054321_device(const machine_config &mconfig, const char *tag, d
 void k054321_device::device_start()
 {
 	// make sure that device_sound_interface is configured
-	if (!m_left->inputs() && !m_right->inputs())
+	if (!m_speaker->inputs())
 		throw device_missing_dependencies();
 
 	// remember initial input gains
-	m_left_gains = std::make_unique<float[]>(m_left->inputs());
-	m_right_gains = std::make_unique<float[]>(m_right->inputs());
-
-	for (int i = 0; i < m_left->inputs(); i++)
-		m_left_gains[i] = m_left->input_gain(i);
-	for (int i = 0; i < m_right->inputs(); i++)
-		m_right_gains[i] = m_right->input_gain(i);
+	m_left_gain  = m_speaker->input_gain(0);
+	m_right_gain = m_speaker->input_gain(1);
 
 	// register for savestates
 	save_item(NAME(m_volume));
@@ -133,8 +127,6 @@ void k054321_device::propagate_volume()
 {
 	double vol = pow(2, (m_volume - 40)/10.0);
 
-	for (int i = 0; i < m_left->inputs(); i++)
-		m_left->set_input_gain(i, m_active & 2 ? vol * m_left_gains[i] : 0.0);
-	for (int i = 0; i < m_right->inputs(); i++)
-		m_right->set_input_gain(i, m_active & 1 ? vol * m_right_gains[i] : 0.0);
+	m_speaker->set_input_gain(0, m_active & 2 ? vol * m_left_gain : 0.0);
+	m_speaker->set_input_gain(1, m_active & 1 ? vol * m_right_gain : 0.0);
 }

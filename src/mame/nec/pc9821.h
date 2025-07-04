@@ -177,13 +177,13 @@ public:
 //class pc9821_valuestar_state : public pc9821_mate_x_state
 //{
 //public:
-//	pc9821_valuestar_state(const machine_config &mconfig, device_type type, const char *tag)
-//		: pc9821_mate_x_state(mconfig, type, tag)
-//	{
-//	}
+//  pc9821_valuestar_state(const machine_config &mconfig, device_type type, const char *tag)
+//      : pc9821_mate_x_state(mconfig, type, tag)
+//  {
+//  }
 //
-//	void pc9821v13(machine_config &config);
-//	void pc9821v20(machine_config &config);
+//  void pc9821v13(machine_config &config);
+//  void pc9821v20(machine_config &config);
 //};
 
 // 9821NOTE
@@ -193,19 +193,19 @@ public:
 //class pc9821_note_state : public pc9821_state
 //{
 //public:
-//	pc9821_note_state(const machine_config &mconfig, device_type type, const char *tag)
-//		: pc9821_state(mconfig, type, tag)
-//		, m_pmc(*this, "pmc")
-//	{
-//	}
+//  pc9821_note_state(const machine_config &mconfig, device_type type, const char *tag)
+//      : pc9821_state(mconfig, type, tag)
+//      , m_pmc(*this, "pmc")
+//  {
+//  }
 //
-//	void pc9821ne(machine_config &config);
+//  void pc9821ne(machine_config &config);
 //
 //protected:
-//	void pc9821ne_io(address_map &map) ATTR_COLD;
+//  void pc9821ne_io(address_map &map) ATTR_COLD;
 //
 //private:
-//	required_device<redwood1_device> m_pmc;
+//  required_device<redwood1_device> m_pmc;
 //};
 
 class pc9821_note_lavie_state : public pc9821_state

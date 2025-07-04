@@ -68,16 +68,15 @@ void a2bus_scsi_device::device_add_mconfig(machine_config &config)
 {
 	// These machines were strictly external CD-ROMs so sound didn't route back into them; the AppleCD SC had
 	// RCA jacks for connection to speakers/a stereo.
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	NSCSI_BUS(config, m_scsibus);
 	NSCSI_CONNECTOR(config, "scsibus:0", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:1").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsibus:2", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:3", default_scsi_devices, nullptr, false);

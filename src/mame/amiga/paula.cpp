@@ -273,7 +273,7 @@ std::string paula_device::print_audio_state()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void paula_device::sound_stream_update(sound_stream &stream)
 {
 	int channum, sampoffs = 0;
 
@@ -284,14 +284,10 @@ void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		m_channel[1].dma_enabled =
 		m_channel[2].dma_enabled =
 		m_channel[3].dma_enabled = false;
-
-		// clear the sample data to 0
-		for (channum = 0; channum < 4; channum++)
-			outputs[channum].fill(0);
 		return;
 	}
 
-	int samples = outputs[0].samples() * CLOCK_DIVIDER;
+	int samples = stream.samples() * CLOCK_DIVIDER;
 
 	if (LIVE_AUDIO_VIEW)
 		popmessage(print_audio_state());
@@ -351,7 +347,7 @@ void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 
 			// fill the buffer with the sample
 			for (i = 0; i < ticks; i += CLOCK_DIVIDER)
-				outputs[channum].put_int_clamp((sampoffs + i) / CLOCK_DIVIDER, sample, 32768);
+				stream.put_int_clamp(channum, (sampoffs + i) / CLOCK_DIVIDER, sample, 32768);
 
 			// account for the ticks; if we hit 0, advance
 			chan->curticks -= ticks;

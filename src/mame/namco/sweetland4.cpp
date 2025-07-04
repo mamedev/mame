@@ -134,24 +134,22 @@ void sweetland4_state::sweetland4(machine_config &config)
 
 	RTC72423(config, "rtc", 32'768); // no evident XTAL on PCB
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	okim9810_device &oki(OKIM9810(config, "oki", 4'096'000)); // no evident XTAL on PCB
-	oki.add_route(0, "lspeaker", 1.00);
-	oki.add_route(1, "rspeaker", 1.00);
+	oki.add_route(0, "speaker", 1.00, 0);
+	oki.add_route(1, "speaker", 1.00, 1);
 }
 
 void sweetland4_state::tairyodk(machine_config &config)
 {
 	H83002(config, m_maincpu, 14.746_MHz_XTAL); // H8/3002 6413002F17
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	okim9810_device &oki(OKIM9810(config, "oki", 4.096_MHz_XTAL));
-	oki.add_route(0, "lspeaker", 1.00);
-	oki.add_route(1, "rspeaker", 1.00);
+	oki.add_route(0, "speaker", 1.00, 0);
+	oki.add_route(1, "speaker", 1.00, 1);
 }
 
 

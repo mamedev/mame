@@ -727,7 +727,7 @@ void video_manager::update_throttle(attotime emutime)
 		// between 0 and 1/10th of a second ... anything outside of this range is obviously
 		// wrong and requires a resync
 		attoseconds_t emu_delta_attoseconds = (emutime - m_throttle_emutime).as_attoseconds();
-		if (emu_delta_attoseconds < 0 || emu_delta_attoseconds > ATTOSECONDS_PER_SECOND / 10)
+		if (emu_delta_attoseconds < 0 || emu_delta_attoseconds >= (ATTOSECONDS_PER_SECOND / (m_speed ? m_speed : 1000)) * 100)
 		{
 			if (LOG_THROTTLE)
 				machine().logerror("Resync due to weird emutime delta: %s\n", attotime(0, emu_delta_attoseconds).as_string(18));

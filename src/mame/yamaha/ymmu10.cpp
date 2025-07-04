@@ -138,12 +138,11 @@ void mu10_state::mu10(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SWP00(config, m_swp00);
-	m_swp00->add_route(0, "lspeaker", 1.0);
-	m_swp00->add_route(1, "rspeaker", 1.0);
+	m_swp00->add_route(0, "speaker", 1.0, 0);
+	m_swp00->add_route(1, "speaker", 1.0, 1);
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);

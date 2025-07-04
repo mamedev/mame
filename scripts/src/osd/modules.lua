@@ -52,6 +52,8 @@ function osdmodulesbuild()
 	files {
 		MAME_DIR .. "src/osd/watchdog.cpp",
 		MAME_DIR .. "src/osd/watchdog.h",
+		MAME_DIR .. "src/osd/interface/audio.cpp",
+		MAME_DIR .. "src/osd/interface/audio.h",
 		MAME_DIR .. "src/osd/interface/inputcode.h",
 		MAME_DIR .. "src/osd/interface/inputdev.h",
 		MAME_DIR .. "src/osd/interface/inputfwd.h",
@@ -129,13 +131,17 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/drawsdl.cpp",
 		MAME_DIR .. "src/osd/modules/render/render_module.h",
 		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.cpp",
-		MAME_DIR .. "src/osd/modules/sound/direct_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/js_sound.cpp",
+		MAME_DIR .. "src/osd/modules/sound/mmdevice_helpers.cpp",
+		MAME_DIR .. "src/osd/modules/sound/mmdevice_helpers.h",
 		MAME_DIR .. "src/osd/modules/sound/none.cpp",
 		MAME_DIR .. "src/osd/modules/sound/pa_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/pulse_sound.cpp",
+		MAME_DIR .. "src/osd/modules/sound/pipewire_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.cpp",
+		MAME_DIR .. "src/osd/modules/sound/sound_module.cpp",
 		MAME_DIR .. "src/osd/modules/sound/sound_module.h",
+		MAME_DIR .. "src/osd/modules/sound/wasapi_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/xaudio2_sound.cpp",
 	}
 	includedirs {
@@ -299,6 +305,23 @@ function osdmodulesbuild()
 	if _OPTIONS["NO_USE_PULSEAUDIO"]=="1" then
 		defines {
 			"NO_USE_PULSEAUDIO",
+		}
+	end
+
+	if _OPTIONS["NO_USE_PIPEWIRE"]=="0" then
+		err = os.execute(pkgconfigcmd() .. " --exists libpipewire-0.3")
+		if not err then
+			_OPTIONS["NO_USE_PIPEWIRE"] = "1"
+		end
+	end
+
+	if _OPTIONS["NO_USE_PIPEWIRE"]=="1" then
+		defines {
+			"NO_USE_PIPEWIRE",
+		}
+	 else
+		buildoptions {
+			backtick(pkgconfigcmd() .. " --cflags libpipewire-0.3"),
 		}
 	end
 
@@ -564,6 +587,12 @@ function osdmodulestargetconf()
 			ext_lib("pulse"),
 		}
 	end
+
+	if _OPTIONS["NO_USE_PIPEWIRE"]=="0" then
+		local str = backtick(pkgconfigcmd() .. " --libs libpipewire-0.3")
+		addlibfromstring(str)
+		addoptionsfromstring(str)
+	end
 end
 
 
@@ -663,6 +692,23 @@ if not _OPTIONS["NO_USE_PULSEAUDIO"] then
 		_OPTIONS["NO_USE_PULSEAUDIO"] = "0"
 	else
 		_OPTIONS["NO_USE_PULSEAUDIO"] = "1"
+	end
+end
+
+newoption {
+	trigger = "NO_USE_PIPEWIRE",
+	description = "Disable Pipewire interface",
+	allowed = {
+		{ "0",  "Enable Pipewire"  },
+		{ "1",  "Disable Pipewire" },
+	},
+}
+
+if not _OPTIONS["NO_USE_PIPEWIRE"] then
+	if _OPTIONS["targetos"]=="linux" then
+		_OPTIONS["NO_USE_PIPEWIRE"] = "0"
+	else
+		_OPTIONS["NO_USE_PIPEWIRE"] = "1"
 	end
 end
 

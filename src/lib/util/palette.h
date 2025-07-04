@@ -215,7 +215,7 @@ private:
 	std::vector<float> m_group_bright;          // brightness value for each group
 	std::vector<float> m_group_contrast;        // contrast value for each group
 
-	palette_client *m_client_list;                // list of clients for this palette
+	palette_client *m_client_list;              // list of clients for this palette
 };
 
 

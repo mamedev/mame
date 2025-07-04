@@ -1862,7 +1862,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="barrybox" supported="no">
+	<software name="barrybox">
 		<description>Barry-Box</description>
 		<year>1986</year>
 		<publisher>BML Electronics</publisher>
@@ -2146,6 +2146,17 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="BeebROM-1.00.rom" size="8192" crc="cee8b36d" sha1="8c8651cec509b59b0c5d3be09577963fbefd6e5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebscan130" cloneof="beebscan" supported="no">
+		<description>BeebScan 1.30</description>
+		<year>1988</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="BeebScan-1.30.rom" size="16384" crc="fcf39f57" sha1="23cb3d50b9b8595ba1eb02cb4a2049a6823765ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2581,6 +2592,17 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="ColourDump.rom" size="8192" crc="1fb37592" sha1="869f56cb66982c9d99f28a86c32f9bb38513573f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colourjet">
+		<description>Colourjet Driver 1.0</description>
+		<year>1988</year>
+		<publisher>Integrex</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Colourjet-1.0.rom" size="8192" crc="81438e7e" sha1="7b4be5eb8f5773412147620c978f04286e1d921e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7162,13 +7184,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="megarom">
+	<software name="megarom101" cloneof="megarom">
 		<description>Mega-ROM 1.01</description>
 		<year>1985</year>
 		<publisher>Chalice</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Mega-ROM-1.01.rom" size="16384" crc="5a9fdac5" sha1="a075bba98d526d8cb667cc5b67b5ccf6caf8f494"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megarom">
+		<description>Mega-ROM 1.03</description>
+		<year>1985</year>
+		<publisher>Chalice</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Mega-ROM-1.03.rom" size="16384" crc="ad8af0bb" sha1="ea9f6580e60b97fbed7c7cb384e7bcdb9b91ad25"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11476,7 +11509,7 @@ license:CC0-1.0
 		<publisher>Acorn</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="TFS-1.03.rom" size="16384" crc="db2cd3ab" sha1="b076c9c6aecc3dc0683d6810ca5329062eafe3f2"/>
+				<rom name="TFS-1.03.rom" size="16384" crc="a4340bf7" sha1="3a93d0e5530485904ae88bad0281458f8c8abfa2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13268,6 +13301,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wordwiseb20" cloneof="wordwise">
+		<description>Wordwise-B20 1.20</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="WordwiseB20-1.20.rom" size="8192" crc="c028d741" sha1="c613a449eb5b186b912ade7f4e0cd9d47d6e4cf2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wordwise">
 		<description>Wordwise 1.20</description>
 		<year>1984</year>
@@ -13544,6 +13588,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="xobmps">
+		<description>XOB Multi Print Server 2.03</description>
+		<year>1988</year>
+		<publisher>XOB</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="XOB_Printer_Server-2.03.rom" size="8192" crc="fedf21a9" sha1="6f92f5eb9e5ee4e5e01a0606d868c3416f8ecaf7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="xr65c02">
 		<description>Crossware 65C02XR</description>
 		<year>1985</year>
@@ -13645,6 +13700,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="gr_chuckie">
+		<description>GameROM: Chuckie Egg 1.10</description>
+		<year>201?</year>
+		<publisher>G-ROMS</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="G-ROM_ChuckieEgg-1.10.rom" size="16384" crc="7aeb2d90" sha1="5f52714ce0a995b3b6249fe0b9fe64a7664a09f6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gr_hopper">
 		<description>GameROM: Hopper 1.10</description>
 		<year>201?</year>
@@ -13656,6 +13722,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="gr_missile">
+		<description>GameROM: Missile Control 1.10</description>
+		<year>201?</year>
+		<publisher>G-ROMS</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="G-ROM_MissileControl-1.10.rom" size="16384" crc="20478ef3" sha1="116c08a469d10d2fbbeffe29f8bac7c392728774"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gr_rocketra">
 		<description>GameROM: Rocket Raid 1.10</description>
 		<year>201?</year>
@@ -13663,6 +13740,17 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="G-ROM_RocketRaid-1.10.rom" size="16384" crc="31fa38f9" sha1="dc1b44fea90dc7a725e6c17c9d3c5a1b3a03e76d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gr_snapper110" cloneof="gr_snapper">
+		<description>GameROM: Snapper 1.10</description>
+		<year>2015</year>
+		<publisher>G-ROMS</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="G-ROM_Snapper-1.10.rom" size="16384" crc="ddbdc823" sha1="5aed55547ee97eeadb8a7c77eaf7726875df15df"/>
 			</dataarea>
 		</part>
 	</software>

@@ -159,9 +159,9 @@ void upd931_device::device_clock_changed()
 }
 
 /**************************************************************************/
-void upd931_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void upd931_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		s32 sample = 0;
 		for (voice_t &voice : m_voice)
@@ -172,7 +172,7 @@ void upd931_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			sample += voice.m_wave_out[0] * (voice.m_env_level[0] >> VOLUME_SHIFT);
 			sample += voice.m_wave_out[1] * (voice.m_env_level[1] >> VOLUME_SHIFT);
 		}
-		outputs[0].put_int_clamp(i, sample, 1 << 16);
+		stream.put_int_clamp(0, i, sample, 1 << 16);
 	}
 }
 

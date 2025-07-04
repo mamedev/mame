@@ -27,8 +27,9 @@ public:
 	virtual ~mb86235_device() override;
 
 	template <typename T> void set_fifoin_tag(T &&fifo_tag) { m_fifoin.set_tag(std::forward<T>(fifo_tag)); }
-	template <typename T> void set_fifoout0_tag(T &&fifo_tag) { m_fifoout0.set_tag(std::forward<T>(fifo_tag)); }
-	template <typename T> void set_fifoout1_tag(T &&fifo_tag) { m_fifoout1.set_tag(std::forward<T>(fifo_tag)); }
+	template <typename T> void set_fifoout_tag(T &&fifo_tag) { m_fifoout.set_tag(std::forward<T>(fifo_tag)); }
+
+	void stall() { m_core->cur_fifo_state.has_stalled = true; }
 
 	void unimplemented_op();
 	void unimplemented_alu();
@@ -164,8 +165,7 @@ private:
 	address_space_config m_dataa_config;
 	address_space_config m_datab_config;
 	optional_device<generic_fifo_u32_device> m_fifoin;
-	optional_device<generic_fifo_u32_device> m_fifoout0;
-	optional_device<generic_fifo_u32_device> m_fifoout1;
+	optional_device<generic_fifo_u32_device> m_fifoout;
 
 	drc_cache m_cache;
 	std::unique_ptr<drcuml_state> m_drcuml;
@@ -226,25 +226,22 @@ private:
 	u32 m_cur_value;
 
 	static void clear_fifoin(void *param);
-	static void clear_fifoout0(void *param);
-	static void clear_fifoout1(void *param);
+	static void clear_fifoout(void *param);
 	static void read_fifoin(void *param);
-	static void write_fifoout0(void *param);
-	static void write_fifoout1(void *param);
+	static void write_fifoout(void *param);
 	static void empty_fifoin(void *param);
-	static void full_fifoout0(void *param);
-	static void full_fifoout1(void *param);
+	static void full_fifoout(void *param);
 
 	// interpreter
-	void execute_op(uint32_t h, uint32_t l);
-	void do_alu1(uint32_t h, uint32_t l);
-	void do_alu2(uint32_t h, uint32_t l);
-	void do_trans2_1(uint32_t h, uint32_t l);
-	void do_trans1_1(uint32_t h, uint32_t l);
-	void do_trans2_2(uint32_t h, uint32_t l);
-	void do_trans1_2(uint32_t h, uint32_t l);
-	void do_trans1_3(uint32_t h, uint32_t l);
-	void do_control(uint32_t h, uint32_t l);
+	void execute_op(uint64_t op);
+	void do_alu1(uint64_t op);
+	void do_alu2(uint64_t op);
+	void do_alu2_trans2_1(uint64_t op);
+	void do_alu2_trans1_1(uint64_t op);
+	void do_alu1_trans2_2(uint64_t op);
+	void do_alu1_trans1_2(uint64_t op);
+	void do_trans1_3(uint64_t op);
+	void do_alu_control(uint64_t op);
 	inline uint32_t get_prx(uint8_t which);
 	inline uint32_t get_constfloat(uint8_t which);
 	inline uint32_t get_constint(uint8_t which);
@@ -254,7 +251,7 @@ private:
 	inline void decode_aluop(uint8_t opcode, uint32_t src1, uint32_t src2, uint8_t imm, uint8_t dst_which);
 	inline void decode_mulop(bool isfmul, uint32_t src1, uint32_t src2, uint8_t dst_which);
 	inline bool decode_branch_jump(uint8_t which);
-	inline uint32_t do_control_dst(uint32_t l);
+	inline uint32_t do_control_dst(uint64_t op);
 	inline void push_pc(uint32_t pcval);
 	inline uint32_t pop_pc();
 	inline void set_mod(uint16_t mod1, uint16_t mod2);
@@ -268,7 +265,7 @@ private:
 	inline void decrement_prp();
 	inline void zero_prp();
 	inline void set_alu_flagsd(uint32_t val);
-	inline void set_alu_flagsf(double val);
+	inline void set_alu_flagsf(float val);
 	inline void set_alu_flagsi(int val);
 	inline bool get_alu_second_src(uint8_t which);
 	void handle_single_step_execution();

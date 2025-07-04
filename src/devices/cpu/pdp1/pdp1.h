@@ -111,18 +111,18 @@ private:
 	address_space_config m_program_config;
 
 	/* processor registers */
-	uint32_t m_pc;      /* program counter (12, 15 or 16 bits) */
-	int m_ir;         /* basic operation code of current instruction (5 bits) */
-	int m_mb;         /* memory buffer (used for holding the current instruction only) (18 bits) */
-	int m_ma;         /* memory address (12, 15 or 16 bits) */
-	int m_ac;         /* accumulator (18 bits) */
-	int m_io;         /* i/o register (18 bits) */
-	int m_pf;         /* program flag register (6 bits) */
+	uint32_t m_pc;            /* program counter (12, 15 or 16 bits) */
+	int m_ir;                 /* basic operation code of current instruction (5 bits) */
+	int m_mb;                 /* memory buffer (used for holding the current instruction only) (18 bits) */
+	int m_ma;                 /* memory address (12, 15 or 16 bits) */
+	int m_ac;                 /* accumulator (18 bits) */
+	int m_io;                 /* i/o register (18 bits) */
+	int m_pf;                 /* program flag register (6 bits) */
 
 	/* operator panel switches */
-	int m_ta;         /* current state of the 12 or 16 address switches */
-	int m_tw;         /* current state of the 18 test word switches */
-	int m_ss;         /* current state of the 6 sense switches on the operator panel (6 bits) */
+	int m_ta;                 /* current state of the 12 or 16 address switches */
+	int m_tw;                 /* current state of the 18 test word switches */
+	int m_ss;                 /* current state of the 6 sense switches on the operator panel (6 bits) */
 	unsigned int m_sngl_step; /* stop every memory cycle */
 	unsigned int m_sngl_inst; /* stop every instruction */
 	unsigned int m_extend_sw; /* extend switch (loaded into the extend flip-flop on start/read-in) */
@@ -132,23 +132,23 @@ private:
 	unsigned int m_cycle;     /* processor is in the midst of an instruction */
 	unsigned int m_defer;     /* processor is handling deferred (i.e. indirect) addressing */
 	unsigned int m_brk_ctr;   /* break counter */
-	unsigned int m_ov;            /* overflow flip-flop */
+	unsigned int m_ov;        /* overflow flip-flop */
 	unsigned int m_rim;       /* processor is in read-in mode */
 
 	unsigned int m_sbm;       /* processor is in sequence break mode (i.e. interrupts are enabled) */
 
 	unsigned int m_exd;       /* extend mode: processor is in extend mode */
-	unsigned int m_exc : 1;       /* extend-mode cycle: current instruction cycle is done in extend mode */
+	unsigned int m_exc;       /* extend-mode cycle: current instruction cycle is done in extend mode */
 	unsigned int m_ioc;       /* i-o commands: seems to be equivalent to (! ioh) */
 	unsigned int m_ioh;       /* i-o halt: processor is executing an Input-Output Transfer wait */
 	unsigned int m_ios;       /* i-o synchronizer: set on i-o operation completion */
 
 	/* sequence break system */
-	uint16_t m_irq_state;    /* mirrors the state of the interrupt pins */
-	uint16_t m_b1;           /* interrupt enable */
-	uint16_t m_b2;           /* interrupt pulse request pending - asynchronous with computer operation (set by pulses on irq_state, cleared when interrupt is taken) */
-	/*uint16_t m_b3;*/           /* interrupt request pending - synchronous with computer operation (logical or of irq_state and b2???) */
-	uint16_t m_b4;           /* interrupt in progress */
+	uint16_t m_irq_state;     /* mirrors the state of the interrupt pins */
+	uint16_t m_b1;            /* interrupt enable */
+	uint16_t m_b2;            /* interrupt pulse request pending - asynchronous with computer operation (set by pulses on irq_state, cleared when interrupt is taken) */
+	/*uint16_t m_b3;*/        /* interrupt request pending - synchronous with computer operation (logical or of irq_state and b2???) */
+	uint16_t m_b4;            /* interrupt in progress */
 
 	/* additional emulator state variables */
 	int m_rim_step;           /* current step in rim execution */

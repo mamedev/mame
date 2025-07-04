@@ -196,7 +196,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface-level overrides
-	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	void sound_stream_update(sound_stream &stream) override;
 
 private:
 	enum {
@@ -220,7 +220,7 @@ private:
 
 firebeat_extend_spectrum_analyzer_device::firebeat_extend_spectrum_analyzer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER, tag, owner, clock),
-	device_mixer_interface(mconfig, *this, 2)
+	device_mixer_interface(mconfig, *this)
 {
 }
 
@@ -245,15 +245,15 @@ void firebeat_extend_spectrum_analyzer_device::device_reset()
 	m_audio_fill_index = 0;
 }
 
-void firebeat_extend_spectrum_analyzer_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void firebeat_extend_spectrum_analyzer_device::sound_stream_update(sound_stream &stream)
 {
-	device_mixer_interface::sound_stream_update(stream, inputs, outputs);
+	device_mixer_interface::sound_stream_update(stream);
 
-	for (int pos = 0; pos < outputs[0].samples(); pos++)
+	for (int pos = 0; pos < stream.samples(); pos++)
 	{
-		for (int ch = 0; ch < outputs.size(); ch++)
+		for (int ch = 0; ch < stream.output_count(); ch++)
 		{
-			const float sample = outputs[ch].get(pos);
+			const float sample = stream.get(ch, pos);
 			m_audio_buf[m_audio_fill_index][ch][m_audio_count[m_audio_fill_index]] = sample;
 		}
 
@@ -389,8 +389,8 @@ static void firebeat_ata_devices(device_slot_interface &device)
 
 static void cdrom_config(device_t *device)
 {
-	device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 0.5);
-	device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 0.5);
+	device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 0.5, 0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 0.5, 1);
 }
 
 static void dvdrom_config(device_t *device)
@@ -762,14 +762,13 @@ void firebeat_state::firebeat(machine_config &config)
 	m_gcu->irq_callback().set(FUNC(firebeat_state::gcu_interrupt));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
 	ymz.irq_handler().set(FUNC(firebeat_state::sound_irq_callback));
 	ymz.set_addrmap(0, &firebeat_state::ymz280b_map);
-	ymz.add_route(1, "lspeaker", 1.0);
-	ymz.add_route(0, "rspeaker", 1.0);
+	ymz.add_route(1, "speaker", 1.0, 0);
+	ymz.add_route(0, "speaker", 1.0, 1);
 
 	PC16552D(config, "duart_com", 0);
 	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
@@ -1213,8 +1212,8 @@ void firebeat_spu_state::firebeat_spu_base(machine_config &config)
 	m_rf5c400->set_addrmap(0, &firebeat_spu_state::rf5c400_map);
 
 	// Clean channel audio
-	m_rf5c400->add_route(0, "lspeaker", 0.5);
-	m_rf5c400->add_route(1, "rspeaker", 0.5);
+	m_rf5c400->add_route(0, "speaker", 0.5, 0);
+	m_rf5c400->add_route(1, "speaker", 0.5, 1);
 }
 
 void firebeat_spu_state::firebeat_spu_map(address_map &map)
@@ -1452,14 +1451,14 @@ void firebeat_bm3_state::firebeat_bm3(machine_config &config)
 	NS16550(config, "duart_midi:chan1", XTAL(24'000'000)).out_int_callback().set(FUNC(firebeat_bm3_state::midi_st224_irq_callback));
 
 	// Effects audio channel, routed to ST-224's audio input
-	m_rf5c400->add_route(2, "lspeaker", 0.5);
-	m_rf5c400->add_route(3, "rspeaker", 0.5);
+	m_rf5c400->add_route(2, "speaker", 0.5, 0);
+	m_rf5c400->add_route(3, "speaker", 0.5, 1);
 
 	KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER(config, m_spectrum_analyzer, 0);
-	m_rf5c400->add_route(0, m_spectrum_analyzer, 0.5, AUTO_ALLOC_INPUT, 0);
-	m_rf5c400->add_route(1, m_spectrum_analyzer, 0.5, AUTO_ALLOC_INPUT, 1);
-	m_rf5c400->add_route(2, m_spectrum_analyzer, 0.5, AUTO_ALLOC_INPUT, 0);
-	m_rf5c400->add_route(3, m_spectrum_analyzer, 0.5, AUTO_ALLOC_INPUT, 1);
+	m_rf5c400->add_route(0, m_spectrum_analyzer, 0.5, 0);
+	m_rf5c400->add_route(1, m_spectrum_analyzer, 0.5, 1);
+	m_rf5c400->add_route(2, m_spectrum_analyzer, 0.5, 0);
+	m_rf5c400->add_route(3, m_spectrum_analyzer, 0.5, 1);
 }
 
 void firebeat_bm3_state::init_bm3()
@@ -1548,8 +1547,8 @@ void firebeat_popn_state::firebeat_popn(machine_config &config)
 	TIMER(config, "spu_timer").configure_periodic(FUNC(firebeat_popn_state::spu_timer_callback), attotime::from_hz(500));
 
 	// Effects audio channel, routed back to main (no external processing)
-	m_rf5c400->add_route(2, "lspeaker", 0.5);
-	m_rf5c400->add_route(3, "rspeaker", 0.5);
+	m_rf5c400->add_route(2, "speaker", 0.5, 0);
+	m_rf5c400->add_route(3, "speaker", 0.5, 1);
 }
 
 void firebeat_popn_state::init_popn_base()
@@ -1817,14 +1816,13 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	m_gcu_sub->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
 	ymz.irq_handler().set(FUNC(firebeat_kbm_state::sound_irq_callback));
 	ymz.set_addrmap(0, &firebeat_kbm_state::ymz280b_map);
-	ymz.add_route(1, "lspeaker", 1.0);
-	ymz.add_route(0, "rspeaker", 1.0);
+	ymz.add_route(1, "speaker", 1.0, 0);
+	ymz.add_route(0, "speaker", 1.0, 1);
 
 	// On the main PCB
 	PC16552D(config, "duart_com", 0);
@@ -1844,8 +1842,8 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	// Synth card
 	auto &xt446(XT446(config, "xt446"));
 	midi_chan1.out_tx_callback().set(xt446, FUNC(xt446_device::midi_w));
-	xt446.add_route(0, "lspeaker", 1.0);
-	xt446.add_route(1, "rspeaker", 1.0);
+	xt446.add_route(0, "speaker", 1.0, 0);
+	xt446.add_route(1, "speaker", 1.0, 1);
 }
 
 void firebeat_kbm_state::firebeat_kbm_map(address_map &map)

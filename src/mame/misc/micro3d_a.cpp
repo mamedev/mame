@@ -222,16 +222,9 @@ void micro3d_sound_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void micro3d_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void micro3d_sound_device::sound_stream_update(sound_stream &stream)
 {
 	lp_filter *iir = &m_filter;
-
-	auto &fl = outputs[0];
-	auto &fr = outputs[1];
-
-	// Clear the buffers
-	fl.fill(0);
-	fr.fill(0);
 
 	if (m_gain == 0)
 		return;
@@ -239,7 +232,7 @@ void micro3d_sound_device::sound_stream_update(sound_stream &stream, std::vector
 	float const pan_l = float(255 - m_dac[PAN]) / 255.0f;
 	float const pan_r = float(m_dac[PAN]) / 255.0f;
 
-	for (int sampindex = 0; sampindex < fl.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		int step;
 
@@ -289,7 +282,7 @@ void micro3d_sound_device::sound_stream_update(sound_stream &stream, std::vector
 		}
 		output *= 3.5f / 32768.f;
 
-		fl.put_clamp(sampindex, output * pan_l, 1.0);
-		fr.put_clamp(sampindex, output * pan_r, 1.0);
+		stream.put_clamp(0, sampindex, output * pan_l, 1.0);
+		stream.put_clamp(1, sampindex, output * pan_r, 1.0);
 	}
 }

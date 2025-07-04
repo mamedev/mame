@@ -111,5 +111,5 @@ void efo_sound3_device::device_add_mconfig(machine_config &config)
 	m_tms->ready_cb().set_inputline("soundcpu", COSMAC_INPUT_LINE_EF1).invert();
 	m_tms->ready_cb().append(FUNC(efo_sound3_device::intf_cs_w));
 
-	SPEAKER(config, "mono"); // J5 "Altavoz"
+	SPEAKER(config, "mono").front_center(); // J5 "Altavoz"
 }

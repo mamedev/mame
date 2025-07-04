@@ -7,7 +7,8 @@ license:CC0-1.0
     (skeleton list)
 
     note: many 'original' floppy images are in .atx format, whereas cracked / unprotected ones are .atr format
-          .atx is unsupported, although apparently has been reverse engineered (insert info link here)
+          .atx is unsupported, although apparently has been reverse engineered
+          (https://www.whizzosoftware.com/sio2arduino/vapi.html)
     There are also images in .xex format, which are raw executable files and
     needs to be loaded thru a DOS loader or an SD card cartridge, for all purposes they won't fit here.
 

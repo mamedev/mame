@@ -969,7 +969,7 @@ ROM_START( twcup90bb )
 ROM_END
 
 
-// Modular System is a stack of boards in a cage, there are apparently other games on this 'system' that wouldn't even share any hardware with this apart from the metal cage itself.
+// Modular System is a stack of boards in a cage, there are other games on this 'system'.
 ROM_START( eurogael )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "3z-1_fu301.ic17", 0x00000, 0x10000, CRC(74acc161) SHA1(d8660dd6d05164df4a66125c68627e955b35bef3) )  // c000-ffff is not used
@@ -1011,17 +1011,16 @@ ROM_START( eurogael )
 	ROM_REGION( 0x100, "prom", ROMREGION_ERASEFF )
 	ROM_LOAD( "r4_p0502_82s129.ic10",      0x000, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) )
 
-	ROM_REGION( 0x1000, "plds", ROMREGION_ERASEFF )
-	ROM_LOAD( "r2_p0403_pal16r8a.ic29", 0x000, 0x104, CRC(506156cc) SHA1(5560671fc2c9872ed28620491af5dc486909fc6e) )
-	ROM_LOAD( "r3_p0403_pal16r8a.ic29", 0x000, 0x104, CRC(d8c6ac25) SHA1(d6184e491313ff8da5b1ce60ffe8ef517716807c) )
-	ROM_LOAD( "r4_p0503_pal16r6.ic46",  0x000, 0x104, CRC(07eb86d2) SHA1(482eb325df5bc60353bac85412cf45429cd03c6d) )
-	// these were read protected
-	ROM_LOAD( "3z-1_3138_gal16v8.ic22",    0x0, 0x1, NO_DUMP )
-	ROM_LOAD( "3z-1_3238_gal16v8.ic24",    0x0, 0x1, NO_DUMP )
-	ROM_LOAD( "r1_403_gal16v8.ic29",       0x0, 0x1, NO_DUMP )
-	ROM_LOAD( "system2_9138_gal16v8.ic42", 0x0, 0x1, NO_DUMP )
-	ROM_LOAD( "system2_9238_gal20v8.ic18", 0x0, 0x1, NO_DUMP )
-	ROM_LOAD( "system2_9338_gal16v8.ic10", 0x0, 0x1, NO_DUMP )
+	ROM_REGION( 0x157, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "r2_p0403_pal16r8a.ic29",    0x000, 0x104, CRC(506156cc) SHA1(5560671fc2c9872ed28620491af5dc486909fc6e) )
+	ROM_LOAD( "r3_p0403_pal16r8a.ic29",    0x000, 0x104, CRC(d8c6ac25) SHA1(d6184e491313ff8da5b1ce60ffe8ef517716807c) )
+	ROM_LOAD( "r4_p0503_pal16r6.ic46",     0x000, 0x104, CRC(07eb86d2) SHA1(482eb325df5bc60353bac85412cf45429cd03c6d) )
+	ROM_LOAD( "3z-1_3138_gal16v8.ic22",    0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "3z-1_3238_gal16v8.ic24",    0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "r1_403_gal16v8.ic29",       0x000, 0x117, CRC(c136de93) SHA1(116f6d3b456d20621ab07a005c1421f57569915c) )
+	ROM_LOAD( "system2_9138_gal16v8.ic42", 0x000, 0x117, CRC(bd9ad8c3) SHA1(50e00b0cf7d075f9daed0338bc336a74caa3b66b) )
+	ROM_LOAD( "system2_9238_gal20v8.ic18", 0x000, 0x157, CRC(dd571a59) SHA1(ef2c7b33922dd79513a4fbe6f04a2f2c2c795ada) )
+	ROM_LOAD( "system2_9338_gal16v8.ic10", 0x000, 0x117, CRC(54b4160f) SHA1(0156a2eda97a9d8e0adb3a3795f6ed547c6e06fc) )
 ROM_END
 
 
@@ -1058,4 +1057,3 @@ GAME( 1989, twcup90bb, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bo
 // not sure if it best fits here, in wc90.cpp, or in a new driver, it shares the weird tile decoding with the bootlegs tho
 // Gaelco requested the registry of the "Euro League" trademark on 1990, and it was a Gaelco protected trademark (in Spain) until 1999 (they paid a 5-year renew in 1994): https://www.patentes-y-marcas.com/marca/euro-league-m1546246
 GAME( 1989, eurogael,  twcup90, eurogael, wc90b, eurogael_state, init_wc90b, ROT0, "bootleg (Gaelco / Ervisa)", "Euro League (Gaelco bootleg, Modular System)", MACHINE_IMPERFECT_SOUND )
-

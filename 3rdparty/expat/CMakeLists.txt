@@ -7,7 +7,7 @@
 #
 # Copyright (c) 2010      Patrick Spendrin <ps_ml@gmx.de>
 # Copyright (c) 2012      Karl Waclawek <karl@waclawek.net>
-# Copyright (c) 2016-2024 Sebastian Pipping <sebastian@pipping.org>
+# Copyright (c) 2016-2025 Sebastian Pipping <sebastian@pipping.org>
 # Copyright (c) 2016      Sergei Nikulov <sergey.nikulov@gmail.com>
 # Copyright (c) 2016      Björn Lindahl <bjorn.lindahl@foi.se>
 # Copyright (c) 2016      Tobias Taschner <github@tc84.de>
@@ -30,15 +30,16 @@
 # Copyright (c) 2020      Thomas Beutlich <tc@tbeu.de>
 # Copyright (c) 2021      Alex Richardson <Alexander.Richardson@cl.cam.ac.uk>
 # Copyright (c) 2022      Johnny Jazeix <jazeix@gmail.com>
+# Copyright (c) 2022      Mark Brand <markbrand@google.com>
 # Copyright (c) 2022      David Faure <david.faure@kdab.com>
 # Unlike most of Expat,
 # this file is copyrighted under the BSD-license for buildsystem files of KDE.
 
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.13.0)
 
 project(expat
     VERSION
-        2.6.4
+        2.7.1
     LANGUAGES
         C
 )
@@ -134,7 +135,7 @@ expat_shy_set(EXPAT_SHARED_LIBS ${_EXPAT_SHARED_LIBS_DEFAULT} CACHE BOOL "Build 
 expat_shy_set(EXPAT_BUILD_DOCS ${_EXPAT_BUILD_DOCS_DEFAULT} CACHE BOOL "Build man page for xmlwf")
 expat_shy_set(EXPAT_BUILD_FUZZERS OFF CACHE BOOL "Build fuzzers for the expat library")
 expat_shy_set(EXPAT_BUILD_PKGCONFIG ${_EXPAT_BUILD_PKGCONFIG_DEFAULT} CACHE BOOL "Build pkg-config file")
-expat_shy_set(EXPAT_OSSFUZZ_BUILD OFF CACHE BOOL "Build fuzzers via ossfuzz for the expat library")
+expat_shy_set(EXPAT_OSSFUZZ_BUILD OFF CACHE BOOL "Build fuzzers via OSS-Fuzz for the expat library")
 if(UNIX OR _EXPAT_HELP)
     expat_shy_set(EXPAT_WITH_LIBBSD OFF CACHE BOOL "Utilize libbsd (for arc4random_buf)")
 endif()
@@ -169,11 +170,15 @@ if(NOT _EXPAT_HELP)
     mark_as_advanced(_EXPAT_M32)
 endif()
 
-if(EXPAT_BUILD_TESTS)
+if(EXPAT_BUILD_TESTS OR EXPAT_BUILD_FUZZERS)
     # We have to call enable_language() before modifying any CMAKE_CXX_* variables
     enable_language(CXX)
 
-    set(CMAKE_CXX_STANDARD 11)
+    if (EXPAT_BUILD_FUZZERS)
+        set(CMAKE_CXX_STANDARD 17)  # for std::string_view for Abseil for libprotobuf-mutator
+    else()
+        set(CMAKE_CXX_STANDARD 11)
+    endif()
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)  # i.e. -std=c++11 rather than default -std=gnu++11
 endif()
@@ -320,7 +325,7 @@ if(FLAG_VISIBILITY)
   endif()
   set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -fvisibility=hidden")
 endif()
-if(MINGW)
+if(MINGW AND ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"))
     # Without __USE_MINGW_ANSI_STDIO the compiler produces a false positive
     set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -Wno-pedantic-ms-format")
 endif()
@@ -467,7 +472,7 @@ foreach(build_type_upper
 endforeach()
 
 set(LIBCURRENT 11)  # sync
-set(LIBREVISION 0)  # with
+set(LIBREVISION 2)  # with
 set(LIBAGE 10)      # configure.ac!
 math(EXPR LIBCURRENT_MINUS_AGE "${LIBCURRENT} - ${LIBAGE}")
 
@@ -587,7 +592,7 @@ if(EXPAT_BUILD_TOOLS)
 
     if(MINGW AND _EXPAT_UNICODE_WCHAR_T)
         # https://gcc.gnu.org/onlinedocs/gcc/x86-Windows-Options.html
-        set_target_properties(xmlwf PROPERTIES LINK_FLAGS -municode)
+        target_link_options(xmlwf PRIVATE -municode)
     endif()
 
     if(EXPAT_BUILD_DOCS)
@@ -724,7 +729,7 @@ if(EXPAT_BUILD_FUZZERS)
         message(SEND_ERROR
             "OSS-Fuzz builds require the environment variable "
             "LIB_FUZZING_ENGINE to be set. If you are seeing this "
-            "warning, it points to a deeper problem in the ossfuzz "
+            "warning, it points to a deeper problem in the OSS-Fuzz "
             "build setup.")
     endif()
 
@@ -743,24 +748,78 @@ if(EXPAT_BUILD_FUZZERS)
             target_link_libraries(${target_name} fuzzpat)
             target_compile_definitions(${target_name}
                 PRIVATE ENCODING_FOR_FUZZING=${encoding_type})
-            if(NOT EXPAT_OSSFUZZ_BUILD)
-                target_compile_options(${target_name} PRIVATE -fsanitize=fuzzer-no-link)
-            endif()
-            # NOTE: Avoiding target_link_options here only because it needs CMake >=3.13
             if(EXPAT_OSSFUZZ_BUILD)
-                set_target_properties(${target_name} PROPERTIES LINK_FLAGS $ENV{LIB_FUZZING_ENGINE})
+                target_link_options(${target_name} PRIVATE $ENV{LIB_FUZZING_ENGINE})
                 set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE "CXX")
             else()
-                set_target_properties(${target_name} PROPERTIES LINK_FLAGS -fsanitize=fuzzer)
+                target_compile_options(${target_name} PRIVATE -fsanitize=fuzzer)
+                target_link_options(${target_name} PRIVATE -fsanitize=fuzzer)
             endif()
             set_property(
                 TARGET ${target_name} PROPERTY RUNTIME_OUTPUT_DIRECTORY fuzz)
         endforeach()
     endforeach()
+
+    find_package(Protobuf REQUIRED)
+
+    # Only include libprotobuf-mutator here so we don't build it in non-fuzz
+    # configurations.
+    include(ExternalProject)
+
+    set(ProtobufMutator_PREFIX libprotobuf-mutator)
+    set(ProtobufMutator_PATH ${CMAKE_CURRENT_BINARY_DIR}/${ProtobufMutator_PREFIX}/src/${ProtobufMutator_PREFIX})
+    set(ProtobufMutator_BUILD_PATH ${ProtobufMutator_PATH}-build)
+    set(ProtobufMutator_INCLUDE_DIR ${ProtobufMutator_PATH})
+    set(ProtobufMutator_LIBRARIES ${ProtobufMutator_BUILD_PATH}/src/libfuzzer/libprotobuf-mutator-libfuzzer.a ${ProtobufMutator_BUILD_PATH}/src/libprotobuf-mutator.a)
+
+    ExternalProject_Add(
+        ${ProtobufMutator_PREFIX}
+        PREFIX ${ProtobufMutator_PREFIX}
+        GIT_REPOSITORY https://github.com/google/libprotobuf-mutator.git
+        GIT_TAG 57928f41ae52bb27666aa15b310130d086dac245  # v1.4-16-g57928f4
+        CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        CMAKE_CACHE_ARGS
+            -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+            -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+            -DLIB_PROTO_MUTATOR_EXAMPLES:BOOL=OFF
+            -DLIB_PROTO_MUTATOR_TESTING:BOOL=OFF
+        BUILD_BYPRODUCTS ${ProtobufMutator_LIBRARIES}
+        UPDATE_COMMAND true
+        INSTALL_COMMAND true)
+
+    # Check for availability of protobuf compiler to avoid hard-to-understand
+    # errors from make(1) down the line as seen with CMake 3.25.1 on Debian
+    if(NOT Protobuf_PROTOC_EXECUTABLE)
+        message(SEND_ERROR
+            "The protobuf compiler (protoc) could not be found. "
+            "Is it installed and working properly?")
+    endif()
+
+    protobuf_generate_cpp(XML_LPM_FUZZER_PROTO_SRCS
+                          XML_LPM_FUZZER_PROTO_HDRS
+                          fuzz/xml_lpm_fuzzer.proto)
+
+    add_executable(xml_lpm_fuzzer
+                   fuzz/xml_lpm_fuzzer.cpp
+                   ${XML_LPM_FUZZER_PROTO_SRCS})
+    target_include_directories(xml_lpm_fuzzer PUBLIC ${ProtobufMutator_INCLUDE_DIR})
+    target_link_libraries(xml_lpm_fuzzer
+                          fuzzpat
+                          ${ProtobufMutator_LIBRARIES}
+                          ${Protobuf_LIBRARIES})
+    add_dependencies(xml_lpm_fuzzer ${ProtobufMutator_PREFIX})
+
+    if(EXPAT_OSSFUZZ_BUILD)
+        target_link_options(xml_lpm_fuzzer PRIVATE $ENV{LIB_FUZZING_ENGINE})
+    else()
+        target_compile_options(xml_lpm_fuzzer PRIVATE -fsanitize=fuzzer)
+        target_link_options(xml_lpm_fuzzer PRIVATE -fsanitize=fuzzer)
+    endif()
+    set_property(TARGET xml_lpm_fuzzer PROPERTY RUNTIME_OUTPUT_DIRECTORY fuzz)
 else()
     if(EXPAT_OSSFUZZ_BUILD)
         message(SEND_ERROR
-                "Attempting to perform an ossfuzz build without turning on the fuzzer build. "
+                "Attempting to perform an OSS-Fuzz build without turning on the fuzzer build. "
                 "This is likely in error - consider adding "
                 "-DEXPAT_BUILD_FUZZERS=ON to your cmake execution.")
     endif()
@@ -913,13 +972,7 @@ elseif(EXPAT_CHAR_TYPE STREQUAL "wchar_t")
 else()
     set(_EXPAT_CHAR_TYPE_SUMMARY "ERROR")
 endif()
-# NOTE: We're not accessing global property GENERATOR_IS_MULTI_CONFIG
-#       because that would require CMake >=3.9
-if(CMAKE_CONFIGURATION_TYPES)
-    set(_EXPAT_GENERATOR_IS_MULTI_CONFIG TRUE)
-else()
-    set(_EXPAT_GENERATOR_IS_MULTI_CONFIG FALSE)
-endif()
+get_property(_EXPAT_GENERATOR_IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 message(STATUS "===========================================================================")
 message(STATUS "")

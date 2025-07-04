@@ -24,7 +24,9 @@ their activation sequences (initially there will be no input macros configured).
 Select a macro to edit it, or choose **Add macro** to set up a new input macro.
 See :ref:`plugins-inputmacro-settings` for details on editing input macros.  You
 can delete an input macro by highlighting it in the menu and pressing the UI
-Clear key (Del/Delete/Forward Delete on the keyboard by default).
+Clear key (Del/Delete/Forward Delete on the keyboard by default).  You can also
+delete a macro by selecting the macro to edit it and then selecting **Delete
+macro** from the menu.
 
 Input macros are saved in the **inputmacro** folder in the plugin data folder
 (see the :ref:`homepath option <mame-commandline-homepath>`).  A file is created
@@ -118,6 +120,12 @@ new macro.
 
 When editing an existing macro, select **Done** or press the UI Back key to
 return to the list of input macros.  Changes take effect immediately.
+
+When editing an existing macro, select **Delete macro** to delete the macro.
+The macro will be deleted immediately when you select **Delete macro** without
+requiring additional confirmation.  You can also delete a macro by highlighting
+it in the list of macros and pressing the UI Clear key (Del/Delete/Forward
+Delete on the keyboard by default).
 
 
 .. _plugins-inputmacro-examples:

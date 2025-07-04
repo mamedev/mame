@@ -45,11 +45,12 @@
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/acorn/bus.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/input_merger.h"
 #include "machine/m3002.h"
-#include "bus/acorn/bus.h"
 
 
 namespace {
@@ -77,7 +78,6 @@ protected:
 private:
 	void map_select_w(uint8_t data);
 	void page_select_w(uint8_t data);
-	void bus_nmi_w(int state);
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_rom;
@@ -99,6 +99,7 @@ void cms_state::cms6502_mem(address_map &map)
 	map(0x0000, 0x7fff).ram();  /* socket M1 43256C-12 32K RAM */
 	map(0x8000, 0xbfff).bankr("bank1").w(FUNC(cms_state::page_select_w));
 	map(0xc000, 0xffff).rom().region("mos", 0);
+	map(0xfc00, 0xfdff).lrw8(NAME([this](offs_t offset) { return m_bus->read(offset | 0xfc00); }), NAME([this](offs_t offset, uint8_t data) { m_bus->write(offset | 0xfc00, data); }));
 	map(0xfc00, 0xfc0f).m(m_via, FUNC(via6522_device::map));
 	map(0xfc30, 0xfc30).mirror(0xf).rw("rtc", FUNC(m3002_device::read), FUNC(m3002_device::write));
 	map(0xfc70, 0xfc7f).w(FUNC(cms_state::map_select_w));
@@ -122,11 +123,6 @@ void cms_state::page_select_w(uint8_t data)
 }
 
 
-/* Input ports */
-static INPUT_PORTS_START( cms )
-INPUT_PORTS_END
-
-
 void cms_state::machine_start()
 {
 	m_bank1->configure_entries(0, 16, m_rom->base(), 0x4000);
@@ -148,12 +144,6 @@ void cms_state::machine_reset()
 }
 
 
-void cms_state::bus_nmi_w(int state)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
-}
-
-
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -172,9 +162,8 @@ void cms_state::cms6502(machine_config &config)
 
 	/* 7 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);
-	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
-	m_bus->out_nmi_callback().set(FUNC(cms_state::bus_nmi_w));
+	m_bus->out_nmi_callback().set_inputline(m_maincpu, M6502_NMI_LINE);
 	ACORN_BUS_SLOT(config, "bus1", m_bus, cms_bus_devices, "4080term");
 	ACORN_BUS_SLOT(config, "bus2", m_bus, cms_bus_devices, nullptr);
 	ACORN_BUS_SLOT(config, "bus3", m_bus, cms_bus_devices, "fdc");
@@ -210,7 +199,5 @@ ROM_END
 } // anonymous namespace
 
 
-/* Driver */
-
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                             FULLNAME                       FLAGS */
-COMP( 1986, cms6502, 0,      0,      cms6502, cms,   cms_state, empty_init, "Cambridge Microprocessor Systems", "CMS 6502 Development System", MACHINE_NO_SOUND_HW )
+COMP( 1986, cms6502, 0,      0,      cms6502, 0,     cms_state, empty_init, "Cambridge Microprocessor Systems", "CMS 6502 Development System", MACHINE_NO_SOUND_HW )

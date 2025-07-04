@@ -7,7 +7,7 @@ DEFINE_DEVICE_TYPE(SWX00, swx00_device, "swx00", "Yamaha SWX00")
 
 swx00_device::swx00_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u8 mode) :
 	h8s2000_device(mconfig, SWX00, tag, owner, clock, address_map_constructor(FUNC(swx00_device::map), this)),
-	device_mixer_interface(mconfig, *this, 2),
+	device_mixer_interface(mconfig, *this),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
 	m_dma(*this, "dma"),
@@ -316,8 +316,8 @@ void swx00_device::device_add_mconfig(machine_config &config)
 
 	SWX00_SOUND(config, m_swx00);
 	m_swx00->set_space(DEVICE_SELF, AS_S);
-	m_swx00->add_route(0, DEVICE_SELF, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_swx00->add_route(1, DEVICE_SELF, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_swx00->add_route(0, DEVICE_SELF, 1.0, 0);
+	m_swx00->add_route(1, DEVICE_SELF, 1.0, 1);
 }
 
 device_memory_interface::space_config_vector swx00_device::memory_space_config() const

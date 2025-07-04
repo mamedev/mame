@@ -148,20 +148,13 @@ protected:
 	memory_access<12, 2, 0, ENDIANNESS_BIG>::specific m_dmem;
 
 private:
-	union VECTOR_REG
+	union VECTOR_REG // PAIR128
 	{
 		uint64_t d[2];
 		uint32_t l[4];
 		uint16_t w[8];
 		int16_t  s[8];
 		uint8_t  b[16];
-	};
-
-	union ACCUMULATOR_REG
-	{
-		uint64_t q;
-		uint32_t l[2];
-		uint16_t w[4];
 	};
 
 	uint32_t m_debugger_temp;
@@ -188,26 +181,23 @@ private:
 	// COP2 (vectors)
 	uint16_t SATURATE_ACCUM(int accum, int slice, uint16_t negative, uint16_t positive);
 
-	uint16_t          m_vres[8];
-	VECTOR_REG        m_v[32];
-	ACCUMULATOR_REG   m_accum[8];
-	uint8_t           m_vcarry;
-	uint8_t           m_vcompare;
-	uint8_t           m_vclip1;
-	uint8_t           m_vzero;
-	uint8_t           m_vclip2;
+	uint16_t    m_vres[8];
+	VECTOR_REG  m_v[32];
+	PAIR64      m_accum[8];
+	uint8_t     m_vcarry;
+	uint8_t     m_vcompare;
+	uint8_t     m_vclip1;
+	uint8_t     m_vzero;
+	uint8_t     m_vclip2;
 
-	int32_t           m_reciprocal_res;
-	uint32_t          m_reciprocal_high;
-	int32_t           m_dp_allowed;
+	int32_t     m_reciprocal_res;
+	uint32_t    m_reciprocal_high;
+	int32_t     m_dp_allowed;
 
-	void              handle_cop2(uint32_t op);
-	void              handle_lwc2(uint32_t op);
-	void              handle_swc2(uint32_t op);
-	void              handle_vector_ops(uint32_t op);
-
-	uint32_t          m_div_in;
-	uint32_t          m_div_out;
+	void        handle_cop2(uint32_t op);
+	void        handle_lwc2(uint32_t op);
+	void        handle_swc2(uint32_t op);
+	void        handle_vector_ops(uint32_t op);
 };
 
 DECLARE_DEVICE_TYPE(RSP, rsp_device)

@@ -384,16 +384,10 @@ void mb86235_device::clear_fifoin(void *param)
 	cpu->m_fifoin->clear();
 }
 
-void mb86235_device::clear_fifoout0(void *param)
+void mb86235_device::clear_fifoout(void *param)
 {
 	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_fifoout0->clear();
-}
-
-void mb86235_device::clear_fifoout1(void *param)
-{
-	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_fifoout1->clear();
+	cpu->m_fifoout->clear();
 }
 
 void mb86235_device::read_fifoin(void *param)
@@ -402,16 +396,10 @@ void mb86235_device::read_fifoin(void *param)
 	cpu->m_cur_value = cpu->m_fifoin->pop();
 }
 
-void mb86235_device::write_fifoout0(void *param)
+void mb86235_device::write_fifoout(void *param)
 {
 	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_fifoout0->push(u32(cpu->m_cur_value));
-}
-
-void mb86235_device::write_fifoout1(void *param)
-{
-	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_fifoout1->push(u32(cpu->m_cur_value));
+	cpu->m_fifoout->push(u32(cpu->m_cur_value));
 }
 
 void mb86235_device::empty_fifoin(void *param)
@@ -420,16 +408,10 @@ void mb86235_device::empty_fifoin(void *param)
 	cpu->m_cur_value = cpu->m_fifoin->is_empty();
 }
 
-void mb86235_device::full_fifoout0(void *param)
+void mb86235_device::full_fifoout(void *param)
 {
 	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_cur_value = cpu->m_fifoout0->is_full();
-}
-
-void mb86235_device::full_fifoout1(void *param)
-{
-	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_cur_value = cpu->m_fifoout1->is_full();
+	cpu->m_cur_value = cpu->m_fifoout->is_full();
 }
 
 void mb86235_device::static_generate_memory_accessors()
@@ -706,10 +688,11 @@ void mb86235_device::generate_reg_write(drcuml_block &block, compiler_state &com
 			break;
 
 		case 0x32:      // FO0
-			if (m_fifoout0)
+		case 0x33:      // FO1
+			if (m_fifoout)
 			{
 				UML_MOV(block, mem(&m_cur_value), src);
-				UML_CALLC(block, write_fifoout0, this);
+				UML_CALLC(block, write_fifoout, this);
 			}
 			break;
 
@@ -781,8 +764,7 @@ bool mb86235_device::generate_opcode(drcuml_block &block, compiler_state &compil
 	uint64_t opcode = desc->opptr.q[0];
 
 	bool fifoin_check = false;
-	bool fifoout0_check = false;
-	bool fifoout1_check = false;
+	bool fifoout_check = false;
 
 	// enable fifo in check if this opcode or the delay slot reads from FIFO
 	if (desc->userflags & OP_USERFLAG_FIFOIN)
@@ -793,22 +775,13 @@ bool mb86235_device::generate_opcode(drcuml_block &block, compiler_state &compil
 			fifoin_check = true;
 	}
 
-	// enable fifoout0 check if this opcode or the delay slot writes to FIFO0
-	if (desc->userflags & OP_USERFLAG_FIFOOUT0)
-		fifoout0_check = true;
+	// enable fifo out check if this opcode or the delay slot writes to FIFO
+	if (desc->userflags & OP_USERFLAG_FIFOOUT)
+		fifoout_check = true;
 	if (desc->delayslots > 0)
 	{
-		if (desc->delay.first()->userflags & OP_USERFLAG_FIFOOUT0)
-			fifoout0_check = true;
-	}
-
-	// enable fifoout1 check if this opcode or the delay slot writes to FIFO1
-	if (desc->userflags & OP_USERFLAG_FIFOOUT1)
-		fifoout1_check = true;
-	if (desc->delayslots > 0)
-	{
-		if (desc->delay.first()->userflags & OP_USERFLAG_FIFOOUT1)
-			fifoout1_check = true;
+		if (desc->delay.first()->userflags & OP_USERFLAG_FIFOOUT)
+			fifoout_check = true;
 	}
 
 	// insert FIFO IN check if needed
@@ -826,24 +799,10 @@ bool mb86235_device::generate_opcode(drcuml_block &block, compiler_state &compil
 	}
 
 	// insert FIFO OUT0 check if needed
-	if (fifoout0_check && m_fifoout0)
+	if (fifoout_check && m_fifoout)
 	{
 		uml::code_label const not_full = compiler.labelnum++;
-		UML_CALLC(block, full_fifoout0, this);
-		UML_CMP(block, mem(&m_cur_value), 1);
-		UML_JMPc(block, COND_NE, not_full);
-
-		UML_MOV(block, mem(&m_core->icount), 0);
-		UML_EXH(block, *m_out_of_cycles, desc->pc);
-
-		UML_LABEL(block, not_full);
-	}
-
-	// insert FIFO OUT1 check if needed
-	if (fifoout1_check && m_fifoout1)
-	{
-		uml::code_label const not_full = compiler.labelnum++;
-		UML_CALLC(block, full_fifoout1, this);
+		UML_CALLC(block, full_fifoout, this);
 		UML_CMP(block, mem(&m_cur_value), 1);
 		UML_JMPc(block, COND_NE, not_full);
 
@@ -1544,19 +1503,15 @@ void mb86235_device::generate_control(drcuml_block &block, compiler_state &compi
 			}
 			else if (ef1 == 2)  // CLRFO
 			{
-				if (m_fifoout0)
-					UML_CALLC(block, clear_fifoout0, this);
-				if (m_fifoout1)
-					UML_CALLC(block, clear_fifoout1, this);
+				if (m_fifoout)
+					UML_CALLC(block, clear_fifoout, this);
 			}
 			else if (ef1 == 3)  // CLRF
 			{
 				if (m_fifoin)
 					UML_CALLC(block, clear_fifoin, this);
-				if (m_fifoout0)
-					UML_CALLC(block, clear_fifoout0, this);
-				if (m_fifoout1)
-					UML_CALLC(block, clear_fifoout1, this);
+				if (m_fifoout)
+					UML_CALLC(block, clear_fifoout, this);
 			}
 			break;
 

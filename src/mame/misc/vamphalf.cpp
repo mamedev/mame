@@ -1148,14 +1148,13 @@ void vamphalf_state::common(machine_config &config)
 
 void vamphalf_state::sound_ym_oki(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 28_MHz_XTAL / 8).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); // 3.5MHz
+	YM2151(config, "ymsnd", 28_MHz_XTAL / 8).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1); // 3.5MHz
 
 	okim6295_device &oki1(OKIM6295(config, "oki1", 28_MHz_XTAL / 16 , okim6295_device::PIN7_HIGH)); // 1.75MHz
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 void vamphalf_state::sound_ym_banked_oki(machine_config &config)
@@ -1166,21 +1165,19 @@ void vamphalf_state::sound_ym_banked_oki(machine_config &config)
 
 void vamphalf_state::sound_suplup(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 14.318181_MHz_XTAL / 4).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); // 3.579545 MHz
+	YM2151(config, "ymsnd", 14.318181_MHz_XTAL / 4).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1); // 3.579545 MHz
 
 	okim6295_device &oki1(OKIM6295(config, "oki1", 14.318181_MHz_XTAL / 8, okim6295_device::PIN7_HIGH)); // 1.75MHz
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 void vamphalf_state::sound_qs1000(machine_config &config)
 {
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("qs1000", FUNC(qs1000_device::set_irq));
@@ -1190,8 +1187,8 @@ void vamphalf_state::sound_qs1000(machine_config &config)
 	qs1000.set_external_rom(true);
 	qs1000.p1_in().set("soundlatch", FUNC(generic_latch_8_device::read));
 	qs1000.p3_out().set(FUNC(vamphalf_state::qs1000_p3_w));
-	qs1000.add_route(0, "lspeaker", 1.0);
-	qs1000.add_route(1, "rspeaker", 1.0);
+	qs1000.add_route(0, "speaker", 1.0, 0);
+	qs1000.add_route(1, "speaker", 1.0, 1);
 }
 
 void vamphalf_state::vamphalf(machine_config &config)
@@ -1351,19 +1348,18 @@ void vamphalf_state::aoh(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vamphalf);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
 
 	okim6295_device &oki1(OKIM6295(config, "oki1", 32_MHz_XTAL / 8, okim6295_device::PIN7_HIGH)); // 4MHz
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	okim6295_device &oki2(OKIM6295(config, "oki2", 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH)); // 1MHz
 	oki2.set_addrmap(0, &vamphalf_state::banked_oki_map);
-	oki2.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki2.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki2.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki2.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 void vamphalf_state::boonggab(machine_config &config)

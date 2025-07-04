@@ -132,12 +132,11 @@ void yuvomz80_state::hexaprsz(machine_config &config)
 	I8255A(config, "ppi2", 0);
 	I8255A(config, "ppi3", 0);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
-	ymz.add_route(0, "lspeaker", 1.00);
-	ymz.add_route(1, "rspeaker", 1.00);
+	ymz.add_route(0, "speaker", 1.00, 0);
+	ymz.add_route(1, "speaker", 1.00, 1);
 }
 
 ROM_START( hexaprs )

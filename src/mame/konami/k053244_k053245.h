@@ -24,11 +24,7 @@ public:
 	// configuration
 	void set_bpp(int bpp);
 	template <typename... T> void set_sprite_callback(T &&... args) { m_k05324x_cb.set(std::forward<T>(args)...); }
-	void set_offsets(int x_offset, int y_offset)
-	{
-		m_dx = x_offset;
-		m_dy = y_offset;
-	}
+	void set_offsets(int dx, int dy) { m_dx = dx; m_dy = dy; }
 
 	u16 k053245_word_r(offs_t offset);
 	void k053245_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -36,7 +32,7 @@ public:
 	void k053245_w(offs_t offset, u8 data);
 	u8 k053244_r(offs_t offset);
 	void k053244_w(offs_t offset, u8 data);
-	void bankselect(int bank);    /* used by TMNT2, Asterix and Premier Soccer for ROM testing */
+	void bankselect(int bank); // used by TMNT2, Asterix and Premier Soccer for ROM testing
 	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 	void clear_buffer();
 	void update_buffer();

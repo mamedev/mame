@@ -85,10 +85,9 @@ void k005289_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void k005289_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void k005289_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].fill(0);
-	for (int sampid = 0; sampid < outputs[0].samples(); sampid++)
+	for (int sampid = 0; sampid < stream.samples(); sampid++)
 	{
 		for (int i = 0; i < 2; i++)
 		{
@@ -98,7 +97,7 @@ void k005289_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				v.waveform = (v.waveform & ~0x1f) | ((v.waveform + 1) & 0x1f);
 				v.counter = v.frequency;
 			}
-			outputs[0].add_int(sampid, ((m_sound_prom[((i & 1) << 8) | v.waveform] & 0xf) - 8) * v.volume, 512);
+			stream.add_int(0, sampid, ((m_sound_prom[((i & 1) << 8) | v.waveform] & 0xf) - 8) * v.volume, 512);
 		}
 	}
 }

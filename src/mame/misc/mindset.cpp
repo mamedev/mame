@@ -245,9 +245,7 @@ void mindset_sound_module::device_add_mconfig(machine_config &config)
 	I8042(config, m_soundcpu, 12_MHz_XTAL/2);
 	m_soundcpu->p1_out_cb().set(FUNC(mindset_sound_module::p1_w));
 	m_soundcpu->p2_out_cb().set(FUNC(mindset_sound_module::p2_w));
-
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, ":speaker", 0.5, 1);
 }
 
 
@@ -1346,8 +1344,8 @@ void mindset_state::mindset(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_fdco[0], pc_dd_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_fdco[1], pc_dd_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
 
-	SPEAKER(config, "lspeaker").front_left();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	SPEAKER(config, "speaker", 2).front();
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 
 	MINDSET_MODULE(config, "m0", mindset_modules, "stereo", false);
 	MINDSET_MODULE(config, "m1", mindset_modules, "rs232", false);

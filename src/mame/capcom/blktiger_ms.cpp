@@ -47,9 +47,11 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_txvideoram(*this, "txvideoram"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_bg_view(*this, "bg_view")
 	{ }
 
 	void blktigerm(machine_config &config);
@@ -63,10 +65,12 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<uint8_t> m_txvideoram;
 	required_shared_ptr<uint8_t> m_spriteram;
+	memory_view m_bg_view;
 
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	void txvideoram_w(offs_t offset, uint8_t data);
@@ -84,14 +88,24 @@ void blktiger_ms_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0xbfff).bankr("mainbank");
-	map(0xc000, 0xcfff).ram();
-	map(0xc000, 0xc000).portr("IN0");
-	map(0xc001, 0xc001).portr("IN1");
-	map(0xc002, 0xc002).portr("IN2");
-	map(0xc003, 0xc003).portr("DSW0");
-	map(0xc004, 0xc004).portr("DSW1");
+	map(0xc000, 0xcfff).view(m_bg_view);
+	m_bg_view[0](0xc000, 0xc000).portr("IN0");
+	m_bg_view[0](0xc001, 0xc001).portr("IN1");
+	m_bg_view[0](0xc002, 0xc002).portr("IN2");
+	m_bg_view[0](0xc003, 0xc003).portr("DSW0");
+	m_bg_view[0](0xc004, 0xc004).portr("DSW1");
+	m_bg_view[0](0xc008, 0xc008).w("soundlatch", FUNC(generic_latch_8_device::write));
+	// TODO: c0xx/c1xx also shared RAM with sound?
+	m_bg_view[0](0xc800, 0xcbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	m_bg_view[0](0xcc00, 0xcfff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+
+	m_bg_view[1](0xc000, 0xcfff).ram(); // background tiles, banked?
 	map(0xd000, 0xd7ff).ram().w(FUNC(blktiger_ms_state::txvideoram_w)).share(m_txvideoram);
-	map(0xd800, 0xd800).lw8(NAME([this] (u8 data) { membank("mainbank")->set_entry(data & 0x0f); })); // very probably wrong
+	map(0xd800, 0xd800).lw8(NAME([this] (u8 data) {
+		// TODO: may bitswap, cfr. background collision detection
+		membank("mainbank")->set_entry(data & 0x0f);
+		m_bg_view.select(BIT(data, 4));
+	}));
 	map(0xe000, 0xfdff).ram();
 	map(0xfe00, 0xffff).ram().share(m_spriteram);
 }
@@ -99,8 +113,9 @@ void blktiger_ms_state::main_map(address_map &map)
 void blktiger_ms_state::sound_map(address_map &map) // seems similar to toki_ms.cpp and raiden_ms.cpp
 {
 	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
+	map(0xa000, 0xa000).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
 	map(0xc000, 0xc7ff).ram();
-	map(0xc900, 0xc900).noprw(); // what lives here?
+	map(0xc900, 0xc900).ram(); // what lives here?
 	map(0xdff8, 0xdff8).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xdff0, 0xdfff).nopw(); // what lives here?
 	map(0xe000, 0xe001).w("ym1", FUNC(ym2203_device::write));
@@ -117,6 +132,7 @@ void blktiger_ms_state::machine_start()
 void blktiger_ms_state::video_start()
 {
 	m_tx_tilemap =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blktiger_ms_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tx_tilemap->set_transparent_pen(0);
 }
 
 void blktiger_ms_state::txvideoram_w(offs_t offset, uint8_t data)
@@ -143,7 +159,7 @@ void blktiger_ms_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 			flipx = !flipx;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
 				code,
 				color,
 				flipx, flip_screen(),
@@ -153,6 +169,8 @@ void blktiger_ms_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 uint32_t blktiger_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect);
+
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
@@ -256,8 +274,9 @@ static const gfx_layout charlayout =
 {
 	8,8,
 	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	2,
+	//{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ RGN_FRAC(1, 4), RGN_FRAC(3, 4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -275,8 +294,9 @@ static const gfx_layout tiles16x16x4_layout =
 };
 
 static GFXDECODE_START( gfx_blktiger_ms )
-	GFXDECODE_ENTRY( "chars", 0, charlayout, 0x300, 32 )
-	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x100, 32 )
+	GFXDECODE_ENTRY( "chars", 0, charlayout, 0x000, 32 )
+	GFXDECODE_ENTRY( "tiles", 0, tiles16x16x4_layout, 0x100, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 32 )
 GFXDECODE_END
 
 void blktiger_ms_state::blktigerm(machine_config &config)
@@ -288,6 +308,7 @@ void blktiger_ms_state::blktigerm(machine_config &config)
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 24_MHz_XTAL / 8)); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
 	audiocpu.set_addrmap(AS_PROGRAM, &blktiger_ms_state::sound_map);
+	audiocpu.set_periodic_int(FUNC(blktiger_ms_state::irq0_line_hold), attotime::from_hz(60));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
@@ -298,14 +319,15 @@ void blktiger_ms_state::blktigerm(machine_config &config)
 	m_screen->set_screen_update(FUNC(blktiger_ms_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette").set_format(palette_device::xBRG_444, 1024);
+	// NOTE: swapped R and G compared to original set
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_blktiger_ms);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 
 	YM2203(config, "ym1", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
 
@@ -323,7 +345,7 @@ ROM_START( blktigerm )
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "1_bl_101.ic12",  0x0000, 0x8000, CRC(14028686) SHA1(64dc219d906f1bdd0c2bc05aff5aa73e001a6901) )
 
-	ROM_REGION( 0x10000, "chars", ROMREGION_INVERT ) // on one of the MOD 4/3 boards, both ROMs 0xxxxxxxxxxxxxx = 0xFF
+	ROM_REGION( 0x10000, "chars", 0 ) // on one of the MOD 4/3 boards, both ROMs 0xxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD( "4_bl_401.ic17",  0x0000, 0x8000, CRC(ab1afb3d) SHA1(555332ccfb69e65b776f94ffac9a4a051fb6f09e) )
 	ROM_LOAD( "4_bl_402.ic16",  0x8000, 0x8000, CRC(89445b11) SHA1(7d9ab6e88d7de3a0e31b3b8a5e57dd39afd7940d) )
 

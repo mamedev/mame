@@ -768,6 +768,7 @@ void sb2m600_state::osi600(machine_config &config)
 
 	/* cassette */
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_w").configure_periodic(FUNC(sb2m600_state::kansas_w), attotime::from_hz(4800)); // cass write
 	TIMER(config, "kansas_r").configure_periodic(FUNC(sb2m600_state::kansas_r), attotime::from_hz(40000)); // cass read
@@ -801,6 +802,7 @@ void uk101_state::uk101(machine_config &config)
 
 	/* cassette */
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_w").configure_periodic(FUNC(uk101_state::kansas_w), attotime::from_hz(4800)); // cass write
 	TIMER(config, "kansas_r").configure_periodic(FUNC(uk101_state::kansas_r), attotime::from_hz(40000)); // cass read
@@ -843,6 +845,7 @@ void c1p_state::c1p(machine_config &config)
 
 	/* cassette */
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_w").configure_periodic(FUNC(c1p_state::kansas_w), attotime::from_hz(4800)); // cass write
 	TIMER(config, "kansas_r").configure_periodic(FUNC(c1p_state::kansas_r), attotime::from_hz(40000)); // cass read

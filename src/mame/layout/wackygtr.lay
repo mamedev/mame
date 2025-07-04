@@ -20,6 +20,50 @@ license:CC0-1.0
 		</disk>
 	</element>
 
+	<element name="start_text"><text string="START"><color red="0.83" green="0.76" blue="0.52" /></text></element>
+	<element name="expert_text"><text string="EXPERT"><color red="0" green="0" blue="0" /></text></element>
+	<element name="good_text"><text string="GOOD"><color red="0" green="0" blue="0" /></text></element>
+	<element name="not_bad_text"><text string="NOT BAD"><color red="0" green="0" blue="0" /></text></element>
+	<element name="try_harder_text"><text string="TRY HARDER"><color red="0" green="0" blue="0" /></text></element>
+	<element name="give_up_text"><text string="GIVE UP"><color red="0" green="0" blue="0" /></text></element>
+	<element name="wacks_text"><text string="WACKS"><color red="0" green="0" blue="0" /></text></element>
+	<element name="bites_text"><text string="BITES"><color red="0" green="0" blue="0" /></text></element>
+	<element name="score_text"><text string="SCORE"><color red="0.76" green="0.47" blue="0.08" /></text></element>
+	<element name="todays_high_score_text1"><text string="today's"><color red="0" green="0" blue="0" /></text></element>
+	<element name="todays_high_score_text2"><text string="HIGH"><color red="0" green="0" blue="0" /></text></element>
+	<element name="todays_high_score_text3"><text string="SCORE"><color red="0" green="0" blue="0" /></text></element>
+	<element name="game_over_text" defstate="0">
+		<text string="GAME OVER">
+			<color state="0" red="0.35" green="0.19" blue="0.15" />
+			<color state="1" red="0.76" green="0.69" blue="0.34" />
+		</text>
+	</element>
+
+	<element name="expert_lamp" defstate="0">
+		<rect state="0"><color red="0.95" green="0.2" blue="0.42" /></rect>
+		<rect state="1"><color red="1" green="0.4" blue="0.74" /></rect>
+	</element>
+
+	<element name="good_lamp" defstate="0">
+		<rect state="0"><color red="0.94" green="0.35" blue="0" /></rect>
+		<rect state="1"><color red="1" green="0.67" blue="0" /></rect>
+	</element>
+
+	<element name="not_bad_lamp" defstate="0">
+		<rect state="0"><color red="0.81" green="0.71" blue="0" /></rect>
+		<rect state="1"><color red="1" green="1" blue="0" /></rect>
+	</element>
+
+	<element name="try_harder_lamp" defstate="0">
+		<rect state="0"><color red="0.13" green="0.36" blue="0.26" /></rect>
+		<rect state="1"><color red="0.13" green="0.93" blue="0.26" /></rect>
+	</element>
+
+	<element name="give_up_lamp" defstate="0">
+		<rect state="0"><color red="0.11" green="0.48" blue="0.89" /></rect>
+		<rect state="1"><color red="0.11" green="0.99" blue="0.89" /></rect>
+	</element>
+
 	<element name="rect" defstate="0">
 		<rect state="0">
 			<color red="1" green="1" blue="0" />
@@ -27,200 +71,292 @@ license:CC0-1.0
 		</rect>
 	</element>
 
+	<element name="brown_bg">
+		<rect><color red="0.29" green="0.16" blue="0.13" /></rect>
+	</element>
+
+	<element name="blue_bg">
+		<rect><color red="0.09" green="0.19" blue="0.68" /></rect>
+	</element>
+
+	<element name="7seg_bg">
+		<rect><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+
+	<element name="wacks_or_bites_bg">
+		<rect><color red="0.84" green="0.79" blue="0.8" /></rect>
+	</element>
+
+	<element name="todays_high_score_bg">
+		<rect><color red="0.82" green="0.85" blue="0.31" /></rect>
+	</element>
+	<element name="score_bg">
+		<rect><color red="1" green="0.87" blue="0" /></rect>
+	</element>
+
 	<element name="alligator" defstate="0">
 		<rect state="0">
-			<color red="0" green="1" blue="0" />
+			<color red="0.05" green="0.54" blue="0.4" />
 			<bounds x="0" y="0"  width="10" height="2" />
 		</rect>
 		<disk state="0">
-			<color red="0" green="1" blue="0" />
+			<color red="0.05" green="0.54" blue="0.4" />
 			<bounds x="0" y="0"  width="10" height="4" />
 		</disk>
 
 		<rect state="1">
-			<color red="0" green="1" blue="0" />
+			<color red="0.05" green="0.54" blue="0.4" />
 			<bounds x="0" y="0"  width="10" height="5" />
 		</rect>
 		<disk state="1">
-			<color red="0" green="1" blue="0" />
+			<color red="0.05" green="0.54" blue="0.4" />
 			<bounds x="0" y="0"  width="10" height="10" />
 		</disk>
 
 		<rect state="2">
-			<color red="0" green="1" blue="0" />
+			<color red="0.05" green="0.54" blue="0.4" />
 			<bounds x="0" y="0"  width="10" height="8" />
 		</rect>
 		<disk state="2">
-			<color red="0" green="1" blue="0" />
+			<color red="0.05" green="0.54" blue="0.4" />
 			<bounds x="0" y="0"  width="10" height="16" />
 		</disk>
 
 		<rect state="3">
-			<color red="0" green="1" blue="0" />
+			<color red="0.05" green="0.54" blue="0.4" />
 			<bounds x="0" y="0"  width="10" height="13" />
 		</rect>
 		<disk state="3">
-			<color red="0" green="1" blue="0" />
+			<color red="0.05" green="0.54" blue="0.4" />
 			<bounds x="0" y="5"  width="10" height="16" />
 		</disk>
 
 		<rect state="4">
-			<color red="0" green="1" blue="0" />
+			<color red="0.05" green="0.54" blue="0.4" />
 			<bounds x="0" y="0"  width="10" height="18" />
 		</rect>
 		<disk state="4">
-			<color red="0" green="1" blue="0" />
+			<color red="0.05" green="0.54" blue="0.4" />
 			<bounds x="0" y="10"  width="10" height="16" />
 		</disk>
 
 		<rect state="5">
-			<color red="0" green="1" blue="0" />
+			<color red="0.05" green="0.54" blue="0.4" />
 			<bounds x="0" y="0"  width="10" height="23" />
 		</rect>
 		<disk state="5">
-			<color red="0" green="1" blue="0" />
+			<color red="0.05" green="0.54" blue="0.4" />
 			<bounds x="0" y="15"  width="10" height="16" />
 		</disk>
 	</element>
 
 	<view name="Default Layout">
 
+		<element ref="brown_bg"><bounds x="0" y="0"  width="285" height="160" /></element>
+		<element ref="start_text">
+			<bounds x="117" y="4"  width="48" height="12" />
+		</element>
+
+		<element ref="blue_bg"><bounds x="26" y="18"  width="230" height="122" /></element>
+
 		<!-- wacks -->
+		<element ref="wacks_or_bites_bg">
+			<bounds x="100" y="30"  width="88" height="30" />
+		</element>
+		<element ref="wacks_text">
+			<bounds x="106" y="40"  width="33" height="10" />
+		</element>
+		<element ref="7seg_bg">
+			<bounds x="144" y="32"  width="42" height="26" />
+		</element>
 		<element name="digit5" ref="digit">
-			<bounds x="25" y="10"  width="8" height="10" />
+			<bounds x="145" y="33"  width="20" height="24" />
 		</element>
 		<element name="digit4" ref="digit">
-			<bounds x="35" y="10"  width="8" height="10" />
+			<bounds x="165" y="33"  width="20" height="24" />
 		</element>
 
 		<!-- bites -->
+		<element ref="wacks_or_bites_bg">
+			<bounds x="100" y="63"  width="88" height="30" />
+		</element>
+		<element ref="bites_text">
+			<bounds x="110" y="73"  width="26" height="10" />
+		</element>
+		<element ref="7seg_bg">
+			<bounds x="144" y="65"  width="42" height="26" />
+		</element>
 		<element name="digit3" ref="digit">
-			<bounds x="25" y="25"  width="8" height="10" />
+			<bounds x="145" y="66"  width="20" height="24" />
 		</element>
 		<element name="digit2" ref="digit">
-			<bounds x="35" y="25"  width="8" height="10" />
+			<bounds x="164" y="66"  width="20" height="24" />
 		</element>
 
 		<!-- score -->
+		<element ref="score_bg">
+			<bounds x="100" y="97"  width="89" height="36" />
+		</element>
+		<element ref="score_text">
+			<bounds x="103" y="111"  width="32" height="10" />
+		</element>
+		<element ref="7seg_bg">
+			<bounds x="137" y="99"  width="50" height="32" />
+		</element>
 		<element name="digit1" ref="digit">
-			<bounds x="25" y="40"  width="8" height="10" />
+			<bounds x="138" y="100"  width="24" height="30" />
 		</element>
 		<element name="digit0" ref="digit">
-			<bounds x="35" y="40"  width="8" height="10" />
+			<bounds x="162" y="100"  width="24" height="30" />
 		</element>
 
 		<!-- high score -->
+		<element ref="todays_high_score_bg">
+			<bounds x="202" y="27"  width="46" height="64" />
+		</element>
+		<element ref="todays_high_score_text1">
+			<bounds x="208" y="27"  width="34" height="10" />
+		</element>
+		<element ref="todays_high_score_text2">
+			<bounds x="214" y="39"  width="23" height="10" />
+		</element>
+		<element ref="todays_high_score_text3">
+			<bounds x="209" y="51"  width="32" height="10" />
+		</element>
+		<element ref="7seg_bg">
+			<bounds x="204" y="63"  width="42" height="26" />
+		</element>
 		<element name="digit7" ref="digit">
-			<bounds x="55" y="25"  width="8" height="10" />
+			<bounds x="205" y="64"  width="20" height="24" />
 		</element>
 		<element name="digit6" ref="digit">
-			<bounds x="65" y="25"  width="8" height="10" />
+			<bounds x="225" y="64"  width="20" height="24" />
 		</element>
 
 		<!-- shadow box lamps -->
-		<element name="lamp4" ref="lamp">
-			<bounds x="10" y="10"  width="10" height="4" />
+		<element name="lamp4" ref="expert_lamp">
+			<bounds x="31" y="23"  width="57" height="20" />
 		</element>
-		<element name="lamp3" ref="lamp">
-			<bounds x="10" y="18"  width="10" height="4" />
+		<element ref="expert_text">
+			<bounds x="43" y="28"  width="35" height="10" />
 		</element>
-		<element name="lamp2" ref="lamp">
-			<bounds x="10" y="26"  width="10" height="4" />
+
+		<element name="lamp3" ref="good_lamp">
+			<bounds x="31" y="46"  width="57" height="20" />
 		</element>
-		<element name="lamp1" ref="lamp">
-			<bounds x="10" y="34"  width="10" height="4" />
+		<element ref="good_text">
+			<bounds x="46" y="51"  width="29" height="10" />
 		</element>
-		<element name="lamp0" ref="lamp">
-			<bounds x="10" y="42"  width="10" height="4" />
+
+		<element name="lamp2" ref="not_bad_lamp">
+			<bounds x="31" y="69"  width="57" height="20" />
+		</element>
+		<element ref="not_bad_text">
+			<bounds x="39" y="74"  width="42" height="10" />
+		</element>
+
+		<element name="lamp1" ref="try_harder_lamp">
+			<bounds x="31" y="92"  width="57" height="20" />
+		</element>
+		<element ref="try_harder_text">
+			<bounds x="33" y="98"  width="52" height="10" />
+		</element>
+
+		<element name="lamp0" ref="give_up_lamp">
+			<bounds x="31" y="115"  width="57" height="20" />
+		</element>
+		<element ref="give_up_text">
+			<bounds x="41" y="120"  width="37" height="10" />
 		</element>
 
 		<!-- game over lamp -->
-		<element name="lamp5" ref="lamp">
-			<bounds x="35" y="55"  width="9" height="4" />
+		<element name="lamp5" ref="game_over_text">
+			<bounds x="99" y="144"  width="84" height="10" />
 		</element>
 
 		<!-- left timing lamps -->
 		<element name="lamp8" ref="lamp">
-			<bounds x="25" y="0"  width="4" height="4" />
+			<bounds x="66" y="3"  width="10" height="10" />
 		</element>
 		<element name="lamp9" ref="lamp">
-			<bounds x="15" y="0"  width="4" height="4" />
+			<bounds x="40" y="3"  width="10" height="10" />
 		</element>
 		<element name="lamp11" ref="lamp">
-			<bounds x="5" y="2"  width="4" height="4" />
+			<bounds x="14" y="10"  width="10" height="10" />
 		</element>
 		<element name="lamp10" ref="lamp">
-			<bounds x="0" y="10"  width="4" height="4" />
+			<bounds x="8" y="36"  width="10" height="10" />
 		</element>
 		<element name="lamp12" ref="lamp">
-			<bounds x="0" y="21"  width="4" height="4" />
+			<bounds x="8" y="62"  width="10" height="10" />
 		</element>
 		<element name="lamp13" ref="lamp">
-			<bounds x="0" y="33"  width="4" height="4" />
+			<bounds x="8" y="87"  width="10" height="10" />
 		</element>
 		<element name="lamp15" ref="lamp">
-			<bounds x="0" y="45"  width="4" height="4" />
+			<bounds x="8" y="113"  width="10" height="10" />
 		</element>
 		<element name="lamp14" ref="lamp">
-			<bounds x="5" y="53"  width="4" height="4" />
+			<bounds x="14" y="140"  width="10" height="10" />
 		</element>
 		<element name="lamp16" ref="lamp">
-			<bounds x="15" y="55"  width="4" height="4" />
+			<bounds x="40" y="147"  width="10" height="10" />
 		</element>
 		<element name="lamp17" ref="lamp">
-			<bounds x="25" y="55"  width="4" height="4" />
+			<bounds x="66" y="147"  width="10" height="10" />
 		</element>
 
 		<!-- right timing lamps -->
 		<element name="lamp27" ref="lamp">
-			<bounds x="50" y="0"  width="4" height="4" />
+			<bounds x="208" y="3"  width="10" height="10" />
 		</element>
 		<element name="lamp26" ref="lamp">
-			<bounds x="60" y="0"  width="4" height="4" />
+			<bounds x="235" y="3"  width="10" height="10" />
 		</element>
 		<element name="lamp24" ref="lamp">
-			<bounds x="70" y="2"  width="4" height="4" />
+			<bounds x="260" y="10"  width="10" height="10" />
 		</element>
 		<element name="lamp25" ref="lamp">
-			<bounds x="75" y="10"  width="4" height="4" />
+			<bounds x="266" y="36"  width="10" height="10" />
 		</element>
 		<element name="lamp23" ref="lamp">
-			<bounds x="75" y="21"  width="4" height="4" />
+			<bounds x="266" y="62"  width="10" height="10" />
 		</element>
 		<element name="lamp22" ref="lamp">
-			<bounds x="75" y="33"  width="4" height="4" />
+			<bounds x="266" y="87"  width="10" height="10" />
 		</element>
 		<element name="lamp20" ref="lamp">
-			<bounds x="75" y="45"  width="4" height="4" />
+			<bounds x="266" y="113"  width="10" height="10" />
 		</element>
 		<element name="lamp21" ref="lamp">
-			<bounds x="70" y="53"  width="4" height="4" />
+			<bounds x="260" y="140"  width="10" height="10" />
 		</element>
 		<element name="lamp19" ref="lamp">
-			<bounds x="60" y="55"  width="4" height="4" />
+			<bounds x="235" y="147"  width="10" height="10" />
 		</element>
 		<element name="lamp18" ref="lamp">
-			<bounds x="50" y="55"  width="4" height="4" />
+			<bounds x="208" y="147"  width="10" height="10" />
 		</element>
+
 
 		<!-- alligators -->
 		<element name="alligator0" ref="alligator" inputtag="IN2" inputmask="0x01">
-			<bounds x="5" y="65"  width="10" height="40" />
+			<bounds x="18" y="164"  width="35" height="140" />
 		</element>
 		<element name="alligator1" ref="alligator" inputtag="IN2" inputmask="0x02">
-			<bounds x="20" y="65"  width="10" height="40" />
+			<bounds x="71" y="164"  width="35" height="140" />
 		</element>
 		<element name="alligator2" ref="alligator" inputtag="IN2" inputmask="0x04">
-			<bounds x="35" y="65"  width="10" height="40" />
+			<bounds x="125" y="164"  width="35" height="140" />
 		</element>
 		<element name="alligator3" ref="alligator" inputtag="IN2" inputmask="0x08">
-			<bounds x="50" y="65"  width="10" height="40" />
+			<bounds x="178" y="164"  width="35" height="140" />
 		</element>
 		<element name="alligator4" ref="alligator" inputtag="IN2" inputmask="0x10">
-			<bounds x="65" y="65"  width="10" height="40" />
+			<bounds x="232" y="164"  width="35" height="140" />
 		</element>
 		<element name="cave" ref="rect">
-			<bounds x="0" y="65"  width="80" height="4" />
+			<bounds x="0" y="160"  width="285" height="4" />
 		</element>
 
 	</view>

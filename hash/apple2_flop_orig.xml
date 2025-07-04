@@ -23075,6 +23075,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="infinit">
+		<description>Infinitives (version 1988)</description>
+		<year>1988</year>
+		<publisher>Intellectual Software</publisher>
+		<info name="developer" value="Queue" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1988" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-27 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241419">
+				<rom name="infinitives 1988.woz" size="241419" crc="cab787e3" sha1="1b564c1b4fbc1841bc61c31a0dee7a37a9698e43" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="inthocky">
 		<description>International Hockey</description>
 		<year>1987</year>
@@ -29017,7 +29034,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="panzgrna10" cloneof="panzgrna">
-		<description>Panzer Grenadier (verision 1.0)</description>
+		<description>Panzer Grenadier (version 1.0)</description>
 		<year>1985</year>
 		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="developer" value="LDW Software" />
@@ -29035,7 +29052,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="panzgrna">
-		<description>Panzer Grenadier (verision 1.2)</description>
+		<description>Panzer Grenadier (version 1.2)</description>
 		<year>1985</year>
 		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="developer" value="LDW Software" />

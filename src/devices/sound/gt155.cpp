@@ -93,9 +93,9 @@ void gt155_device::device_clock_changed()
 }
 
 /**************************************************************************/
-void gt155_device::sound_stream_update(sound_stream& stream, std::vector<read_stream_view> const& inputs, std::vector<write_stream_view>& outputs)
+void gt155_device::sound_stream_update(sound_stream& stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		s64 left = 0, right = 0;
 
@@ -108,8 +108,8 @@ void gt155_device::sound_stream_update(sound_stream& stream, std::vector<read_st
 			}
 		}
 
-		outputs[0].put_int_clamp(i, left >> 11, 32678);
-		outputs[1].put_int_clamp(i, right >> 11, 32768);
+		stream.put_int_clamp(0, i, left >> 11, 32678);
+		stream.put_int_clamp(1, i, right >> 11, 32768);
 	}
 }
 

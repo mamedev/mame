@@ -297,13 +297,13 @@ void s14001a_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void s14001a_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void s14001a_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		Clock();
 		s16 sample = m_uOutputP2 - 7; // range -7..8
-		outputs[0].put_int(i, sample, 8);
+		stream.put_int(0, i, sample, 8);
 	}
 }
 

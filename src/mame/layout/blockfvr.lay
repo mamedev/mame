@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:smf
+-->
+<mamelayout version="2">
+	<element name="rect">
+		<rect />
+	</element>
+
+	<element name="overlay">
+		<rect>
+			<bounds left="0" top="0" right="192" bottom="129" />
+			<color red="0.5" green="1.0" blue="1.0" />
+		</rect>
+		<rect>
+			<bounds left="0" top="128" right="192" bottom="256" />
+			<color red="0.1" green="0.5" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="game_disk">
+		<disk>
+			<color red="0.40" green="0.45" blue="0.51" />
+		</disk>
+	</element>
+
+	<element name="game_text">
+		<text state="0x6" string="A">
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text state="0x5" string="B">
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text state="0x3" string="C">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+
+	<view name="Cabinet">
+		<screen index="0">
+			<bounds left="0" top="0" right="192" bottom="256" />
+		</screen>
+
+		<collection name="Color Overlay">
+			<element ref="overlay" blend="multiply">
+				<bounds left="0" top="0" right="192" bottom="256" />
+			</element>
+		</collection>
+
+		<collection name="Control Panel">
+			<element ref="rect">
+				<bounds x="0" y="268" width="4" height="4" />
+				<color alpha="0" />
+			</element>
+
+			<element ref="game_disk">
+				<bounds x="76" y="260" width="8" height="8" />
+			</element>
+
+			<element ref="game_text" inputtag="IN0" inputmask="0x70" inputraw="yes">
+				<bounds x="76" y="260" width="8" height="8" />
+			</element>
+
+			<element name="led0" ref="rect" inputtag="IN0" inputmask="0x02">
+				<bounds x="92" y="260" width="8" height="8" />
+				<color state="0" red="0.50" green="0.30" blue="0" />
+				<color state="1" red="1" green="0.50" blue="0.50" />
+			</element>
+
+			<element name="led1" ref="rect" inputtag="IN0" inputmask="0x04">
+				<bounds x="108" y="260" width="8" height="8" />
+				<color state="0" red="0" green="0.30" blue="0.50" />
+				<color state="1" red="0" green="1" blue="1" />
+			</element>
+		</collection>
+	</view>
+</mamelayout>

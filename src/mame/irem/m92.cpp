@@ -1619,6 +1619,41 @@ ROM_START( kaiteids ) // M92-E-B  05C04238B1 ROM board
 	ROM_LOAD( "m92_e-4k-.ic29", 0x0a00, 0x0117, CRC(506a0e20) SHA1(f10eaf694667239f7cd5209dfcb12d656c697074) ) // PAL16L8 - bruteforced
 ROM_END
 
+ROM_START( inthuntk ) // M92-E-B  05C04238B1 ROM board
+	ROM_REGION( 0x100000, "maincpu", 0 ) // red blank labels
+	ROM_LOAD16_BYTE( "ic28", 0x000001, 0x040000, CRC(90f82ea3) SHA1(0f42367f5c4ba67254bc4e19d30ebd81a45d9f3c) )
+	ROM_LOAD16_BYTE( "ic39", 0x000000, 0x040000, CRC(4bf419c0) SHA1(1de52b4a69d0f36cc308f9d448b7ab2b32343486) )
+	ROM_LOAD16_BYTE( "ic38", 0x080001, 0x020000, CRC(fc2899df) SHA1(f811ff5fd55655afdb25950d317db85c8091b6d6) )
+	ROM_LOAD16_BYTE( "ic27", 0x080000, 0x020000, CRC(955a605a) SHA1(2515accc2f4a06b07418e45eb62e746d09c81720) )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 ) // Irem D8000011A1, red blank labels
+	ROM_LOAD16_BYTE( "ic30", 0x00001, 0x10000, CRC(209c8b7f) SHA1(eaf4a6d9222fe181df65cea1f13c3f2ebff2ec5b) )
+	ROM_LOAD16_BYTE( "ic31", 0x00000, 0x10000, CRC(18472d65) SHA1(2705e94ee350ffda272c50ea3bf605826aa19978) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) // Tiles
+	ROM_LOAD( "ith_-c0-.ic26", 0x000000, 0x080000, CRC(4c1818cf) SHA1(fc8c2ae640bc3504a52736be46febb92c998fd7d) )
+	ROM_LOAD( "ith_-c1-.ic25", 0x080000, 0x080000, CRC(91145bae) SHA1(71b2695575f189a2fc72635831ba408f824d4928) )
+	ROM_LOAD( "ith_-c2-.ic24", 0x100000, 0x080000, CRC(fc03fe3b) SHA1(7e34220b9b21b82e012dcbf3052cccb118e3c382) )
+	ROM_LOAD( "ith_-c3-.ic23", 0x180000, 0x080000, CRC(ee156a0a) SHA1(4a303ed292ce79e3f990139c35b921213eb2711d) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) // Sprites
+	ROM_LOAD( "ith_-000-.ic34", 0x000000, 0x100000, CRC(a019766e) SHA1(59012a41d152a471a95f1f86b6b1e0f9dd3f9711) )
+	ROM_LOAD( "ith_-010-.ic35", 0x100000, 0x100000, CRC(3fca3073) SHA1(bdae171cb7705647f28354ca83ecdea3a15f6e22) )
+	ROM_LOAD( "ith_-020-.ic36", 0x200000, 0x100000, CRC(20d1b28b) SHA1(290947d77242e837444766ff5d420bc9b53b5b01) )
+	ROM_LOAD( "ith_-030-.ic37", 0x300000, 0x100000, CRC(90b6fd4b) SHA1(99237ebab7cf4689e06965bd546cd80a825ab024) )
+
+	ROM_REGION( 0x80000, "irem", 0 ) // Samples
+	ROM_LOAD( "ith_-da-.ic9", 0x000000, 0x080000, CRC(318ee71a) SHA1(e6f49a7adf7155ba40c4f33a8fdc9553c00f5e3d) )
+
+	ROM_REGION( 0x0c00, "plds", 0 )
+	ROM_LOAD( "m92_a-3m-.ic11", 0x0000, 0x0117, CRC(fc718efe) SHA1(d554dd74cecd95754a1e6e24c6a207d6d3428253) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_a-7j-.ic41", 0x0200, 0x0117, CRC(5730b25a) SHA1(1877b807f6a94f6d515afc940e1d615a453490fd) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_a-9j-.ic51", 0x0400, 0x0117, CRC(92d477cf) SHA1(6a1e9bfdb367384e8611f46300f378730817514b) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_e-3k-.ic20", 0x0600, 0x0117, CRC(52ecf083) SHA1(1a1819e572f7fdd5aab2caeca8741441ffbea01d) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_e-3p-.ic21", 0x0800, 0x0117, CRC(67a4cc04) SHA1(0cd035852cc0b9f803ade56529645e052a13b752) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_e-4k-.ic29", 0x0a00, 0x0117, CRC(506a0e20) SHA1(f10eaf694667239f7cd5209dfcb12d656c697074) ) // PAL16L8 - bruteforced
+ROM_END
+
 
 ROM_START( hook ) // M92-D-A  05C04230A1 ROM board
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -2615,6 +2650,7 @@ GAME( 1992, rtypeleoj,   rtypeleo, rtypeleo,      rtypeleo,  m92_state, empty_in
 GAME( 1993, inthunt,     0,        inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem",         "In The Hunt (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1993, inthuntu,    inthunt,  inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem America", "In The Hunt (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1993, kaiteids,    inthunt,  inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem",         "Kaitei Daisensou (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1993, inthuntk,    inthunt,  inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem",         "In The Hunt (Korea?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 
 GAME( 1993, nbbatman,    0,        nbbatman,      nbbatman,  m92_state, init_bank,     ROT0,   "Irem",         "Ninja Baseball Bat Man (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
 GAME( 1993, nbbatmanu,   nbbatman, nbbatman,      nbbatman,  m92_state, init_bank,     ROT0,   "Irem America", "Ninja Baseball Bat Man (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL)

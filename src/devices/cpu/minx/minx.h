@@ -8,9 +8,9 @@
 
 enum
 {
-		MINX_PC=1, MINX_SP, MINX_BA, MINX_HL, MINX_X, MINX_Y,
-		MINX_U, MINX_V, MINX_F, MINX_E, MINX_N, MINX_I,
-		MINX_XI, MINX_YI
+	MINX_PC=1, MINX_SP, MINX_BA, MINX_HL, MINX_X, MINX_Y,
+	MINX_U, MINX_V, MINX_F, MINX_E, MINX_N, MINX_I,
+	MINX_XI, MINX_YI
 };
 
 
@@ -61,6 +61,7 @@ private:
 	uint8_t   m_interrupt_pending;
 	address_space *m_program;
 	int m_icount;
+
 	// For debugger
 	uint32_t m_curpc;
 	uint16_t m_flags;
@@ -108,7 +109,6 @@ private:
 	static const int insnminx_cycles[256];
 	static const int insnminx_cycles_CE[256];
 	static const int insnminx_cycles_CF[256];
-
 };
 
 

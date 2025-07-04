@@ -73,16 +73,15 @@ void tomsadvs_state::tomsadvs(machine_config &config)
 {
 	I80C32(config, m_maincpu, 12.288_MHz_XTAL); // Actually a Winbond W87C32C-40
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	okim6295_device &oki1(OKIM6295(config, "oki1", 12.288_MHz_XTAL/16, okim6295_device::PIN7_HIGH)); // Clock frequency & pin 7 not verified
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.45); // Guess
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.45); // Guess
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.45, 0); // Guess
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.45, 1); // Guess
 
 	okim6295_device &oki2(OKIM6295(config, "oki2", 12.288_MHz_XTAL/16, okim6295_device::PIN7_HIGH)); // Clock frequency & pin 7 not verified
-	oki2.add_route(ALL_OUTPUTS, "lspeaker", 0.45); // Guess
-	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.45); // Guess
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.45, 0); // Guess
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.45, 1); // Guess
 }
 
 ROM_START(tomsadvs)

@@ -153,7 +153,7 @@ private:
 	output_finder<2> m_lamps;
 
 	// logic gates
-	u8 m_sndvol = 0; 
+	u8 m_sndvol = 0;
 	u8 m_inputsel = 0;
 	u8 m_inputasel = 0;
 };
@@ -172,7 +172,7 @@ uint32_t paracaidista_state::screen_update(screen_device &screen, bitmap_ind16 &
 		for (int x = cliprect.left() / 8; x <= (cliprect.right() / 8); x++)
 		{
 			const u8 pixel_data = src[x];
-        
+
 			// unpack 8 pixels from the byte
 			for (int bit = 0; bit < 8; bit++)
 				dst[(x << 3) | bit] = BIT(pixel_data, bit ^ 7);
@@ -420,9 +420,9 @@ void paracaidista_state::paracaidista(machine_config &config)
 
 	I8257(config, m_dma8257, 6'553'600 / 2);
 	m_dma8257->out_tc_cb().set_inputline(m_maincpu, I8085_RST65_LINE);   // under test
-	m_dma8257->out_hrq_cb().set(FUNC(paracaidista_state::dmac_hrq_w));   // tied to HALT(HOLD) 8085 line 
+	m_dma8257->out_hrq_cb().set(FUNC(paracaidista_state::dmac_hrq_w));   // tied to HALT(HOLD) 8085 line
 	m_dma8257->in_memr_cb().set(FUNC(paracaidista_state::dmac_mem_r));   // under test
-	m_dma8257->out_memw_cb().set(FUNC(paracaidista_state::dmac_mem_w));	 // under test
+	m_dma8257->out_memw_cb().set(FUNC(paracaidista_state::dmac_mem_w));  // under test
 
 	// video hardware
 	screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));

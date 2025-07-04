@@ -410,14 +410,17 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 			if (available > 0)
 			{
 				LOG("MC6852 Transmit FIFO %02x\n", data);
-				if (!m_tx_pull_mode && !m_tx_active) {
+				if (!m_tx_pull_mode && !m_tx_active)
+				{
 					// transfer is idle: this emulates moving the first byte
 					// into the shift register, and kicking off transmission.
 					// tra_complete() will be called when the byte has been
 					// sent.
 					m_tx_active = true;
 					transmit_register_setup(data);
-				} else {
+				}
+				else
+				{
 					m_tx_fifo.push(data);
 					available--;
 				}

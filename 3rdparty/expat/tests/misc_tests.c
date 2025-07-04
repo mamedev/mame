@@ -10,7 +10,7 @@
    Copyright (c) 2003      Greg Stein <gstein@users.sourceforge.net>
    Copyright (c) 2005-2007 Steven Solie <steven@solie.ca>
    Copyright (c) 2005-2012 Karl Waclawek <karl@waclawek.net>
-   Copyright (c) 2016-2024 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2016-2025 Sebastian Pipping <sebastian@pipping.org>
    Copyright (c) 2017-2022 Rhodri James <rhodri@wildebeest.org.uk>
    Copyright (c) 2017      Joe Orton <jorton@redhat.com>
    Copyright (c) 2017      José Gutiérrez de la Concha <jose@zeroc.com>
@@ -58,6 +58,9 @@
 #include "ascii.h" /* for ASCII_xxx */
 #include "handlers.h"
 #include "misc_tests.h"
+
+void XMLCALL accumulate_characters_ext_handler(void *userData,
+                                               const XML_Char *s, int len);
 
 /* Test that a failure to allocate the parser structure fails gracefully */
 START_TEST(test_misc_alloc_create_parser) {
@@ -208,7 +211,7 @@ START_TEST(test_misc_version) {
   if (! versions_equal(&read_version, &parsed_version))
     fail("Version mismatch");
 
-  if (xcstrcmp(version_text, XCS("expat_2.6.4"))) /* needs bump on releases */
+  if (xcstrcmp(version_text, XCS("expat_2.7.1"))) /* needs bump on releases */
     fail("XML_*_VERSION in expat.h out of sync?\n");
 }
 END_TEST
@@ -294,6 +297,7 @@ START_TEST(test_misc_stop_during_end_handler_issue_240_1) {
   parser = XML_ParserCreate(NULL);
   XML_SetElementHandler(parser, start_element_issue_240, end_element_issue_240);
   mydata = (DataIssue240 *)malloc(sizeof(DataIssue240));
+  assert_true(mydata != NULL);
   mydata->parser = parser;
   mydata->deep = 0;
   XML_SetUserData(parser, mydata);
@@ -315,6 +319,7 @@ START_TEST(test_misc_stop_during_end_handler_issue_240_2) {
   parser = XML_ParserCreate(NULL);
   XML_SetElementHandler(parser, start_element_issue_240, end_element_issue_240);
   mydata = (DataIssue240 *)malloc(sizeof(DataIssue240));
+  assert_true(mydata != NULL);
   mydata->parser = parser;
   mydata->deep = 0;
   XML_SetUserData(parser, mydata);
@@ -328,64 +333,119 @@ START_TEST(test_misc_stop_during_end_handler_issue_240_2) {
 END_TEST
 
 START_TEST(test_misc_deny_internal_entity_closing_doctype_issue_317) {
-  const char *const inputOne = "<!DOCTYPE d [\n"
-                               "<!ENTITY % e ']><d/>'>\n"
-                               "\n"
-                               "%e;";
+  const char *const inputOne
+      = "<!DOCTYPE d [\n"
+        "<!ENTITY % element_d '<!ELEMENT d (#PCDATA)*>'>\n"
+        "%element_d;\n"
+        "<!ENTITY % e ']><d/>'>\n"
+        "\n"
+        "%e;";
   const char *const inputTwo
       = "<!DOCTYPE d [\n"
+        "<!ENTITY % element_d '<!ELEMENT d (#PCDATA)*>'>\n"
+        "%element_d;\n"
         "<!ENTITY % e1 ']><d/>'><!ENTITY % e2 '&#37;e1;'>\n"
         "\n"
         "%e2;";
-  const char *const inputThree = "<!DOCTYPE d [\n"
-                                 "<!ENTITY % e ']><d'>\n"
-                                 "\n"
-                                 "%e;/>";
-  const char *const inputIssue317 = "<!DOCTYPE doc [\n"
-                                    "<!ENTITY % foo ']>\n"
-                                    "<doc>Hell<oc (#PCDATA)*>'>\n"
-                                    "%foo;\n"
-                                    "]>\n"
-                                    "<doc>Hello, world</dVc>";
+  const char *const inputThree
+      = "<!DOCTYPE d [\n"
+        "<!ENTITY % element_d '<!ELEMENT d (#PCDATA)*>'>\n"
+        "%element_d;\n"
+        "<!ENTITY % e ']><d'>\n"
+        "\n"
+        "%e;/>";
+  const char *const inputIssue317
+      = "<!DOCTYPE doc [\n"
+        "<!ENTITY % element_doc '<!ELEMENT doc (#PCDATA)*>'>\n"
+        "%element_doc;\n"
+        "<!ENTITY % foo ']>\n"
+        "<doc>Hell<oc (#PCDATA)*>'>\n"
+        "%foo;\n"
+        "]>\n"
+        "<doc>Hello, world</dVc>";
 
   const char *const inputs[] = {inputOne, inputTwo, inputThree, inputIssue317};
+  const XML_Bool suspendOrNot[] = {XML_FALSE, XML_TRUE};
   size_t inputIndex = 0;
 
   for (; inputIndex < sizeof(inputs) / sizeof(inputs[0]); inputIndex++) {
-    set_subtest("%s", inputs[inputIndex]);
-    XML_Parser parser;
-    enum XML_Status parseResult;
-    int setParamEntityResult;
-    XML_Size lineNumber;
-    XML_Size columnNumber;
-    const char *const input = inputs[inputIndex];
+    for (size_t suspendOrNotIndex = 0;
+         suspendOrNotIndex < sizeof(suspendOrNot) / sizeof(suspendOrNot[0]);
+         suspendOrNotIndex++) {
+      const char *const input = inputs[inputIndex];
+      const XML_Bool suspend = suspendOrNot[suspendOrNotIndex];
+      if (suspend && (g_chunkSize > 0)) {
+        // We cannot use _XML_Parse_SINGLE_BYTES below due to suspension, and
+        // so chunk sizes >0 would only repeat the very same test
+        // due to use of plain XML_Parse; we are saving upon that runtime:
+        return;
+      }
 
-    parser = XML_ParserCreate(NULL);
-    setParamEntityResult
-        = XML_SetParamEntityParsing(parser, XML_PARAM_ENTITY_PARSING_ALWAYS);
-    if (setParamEntityResult != 1)
-      fail("Failed to set XML_PARAM_ENTITY_PARSING_ALWAYS.");
+      set_subtest("[input=%d suspend=%s] %s", (int)inputIndex,
+                  suspend ? "true" : "false", input);
+      XML_Parser parser;
+      enum XML_Status parseResult;
+      int setParamEntityResult;
+      XML_Size lineNumber;
+      XML_Size columnNumber;
 
-    parseResult = _XML_Parse_SINGLE_BYTES(parser, input, (int)strlen(input), 0);
-    if (parseResult != XML_STATUS_ERROR) {
-      parseResult = _XML_Parse_SINGLE_BYTES(parser, "", 0, 1);
+      parser = XML_ParserCreate(NULL);
+      setParamEntityResult
+          = XML_SetParamEntityParsing(parser, XML_PARAM_ENTITY_PARSING_ALWAYS);
+      if (setParamEntityResult != 1)
+        fail("Failed to set XML_PARAM_ENTITY_PARSING_ALWAYS.");
+
+      if (suspend) {
+        XML_SetUserData(parser, parser);
+        XML_SetElementDeclHandler(parser, suspend_after_element_declaration);
+      }
+
+      if (suspend) {
+        // can't use SINGLE_BYTES here, because it'll return early on
+        // suspension, and we won't know exactly how much input we actually
+        // managed to give Expat.
+        parseResult = XML_Parse(parser, input, (int)strlen(input), 0);
+
+        while (parseResult == XML_STATUS_SUSPENDED) {
+          parseResult = XML_ResumeParser(parser);
+        }
+
+        if (parseResult != XML_STATUS_ERROR) {
+          // can't use SINGLE_BYTES here, because it'll return early on
+          // suspension, and we won't know exactly how much input we actually
+          // managed to give Expat.
+          parseResult = XML_Parse(parser, "", 0, 1);
+        }
+
+        while (parseResult == XML_STATUS_SUSPENDED) {
+          parseResult = XML_ResumeParser(parser);
+        }
+      } else {
+        parseResult
+            = _XML_Parse_SINGLE_BYTES(parser, input, (int)strlen(input), 0);
+
+        if (parseResult != XML_STATUS_ERROR) {
+          parseResult = _XML_Parse_SINGLE_BYTES(parser, "", 0, 1);
+        }
+      }
+
       if (parseResult != XML_STATUS_ERROR) {
         fail("Parsing was expected to fail but succeeded.");
       }
+
+      if (XML_GetErrorCode(parser) != XML_ERROR_INVALID_TOKEN)
+        fail("Error code does not match XML_ERROR_INVALID_TOKEN");
+
+      lineNumber = XML_GetCurrentLineNumber(parser);
+      if (lineNumber != 6)
+        fail("XML_GetCurrentLineNumber does not work as expected.");
+
+      columnNumber = XML_GetCurrentColumnNumber(parser);
+      if (columnNumber != 0)
+        fail("XML_GetCurrentColumnNumber does not work as expected.");
+
+      XML_ParserFree(parser);
     }
-
-    if (XML_GetErrorCode(parser) != XML_ERROR_INVALID_TOKEN)
-      fail("Error code does not match XML_ERROR_INVALID_TOKEN");
-
-    lineNumber = XML_GetCurrentLineNumber(parser);
-    if (lineNumber != 4)
-      fail("XML_GetCurrentLineNumber does not work as expected.");
-
-    columnNumber = XML_GetCurrentColumnNumber(parser);
-    if (columnNumber != 0)
-      fail("XML_GetCurrentColumnNumber does not work as expected.");
-
-    XML_ParserFree(parser);
   }
 }
 END_TEST
@@ -519,6 +579,105 @@ START_TEST(test_misc_stopparser_rejects_unstarted_parser) {
 }
 END_TEST
 
+/* Adaptation of accumulate_characters that takes ExtHdlrData input to work with
+ * test_renter_loop_finite_content below */
+void XMLCALL
+accumulate_characters_ext_handler(void *userData, const XML_Char *s, int len) {
+  ExtHdlrData *const test_data = (ExtHdlrData *)userData;
+  CharData_AppendXMLChars(test_data->storage, s, len);
+}
+
+/* Test that internalEntityProcessor does not re-enter forever;
+ * based on files tests/xmlconf/xmltest/valid/ext-sa/012.{xml,ent} */
+START_TEST(test_renter_loop_finite_content) {
+  CharData storage;
+  CharData_Init(&storage);
+  const char *const text = "<!DOCTYPE doc [\n"
+                           "<!ENTITY e1 '&e2;'>\n"
+                           "<!ENTITY e2 '&e3;'>\n"
+                           "<!ENTITY e3 SYSTEM '012.ent'>\n"
+                           "<!ENTITY e4 '&e5;'>\n"
+                           "<!ENTITY e5 '(e5)'>\n"
+                           "<!ELEMENT doc (#PCDATA)>\n"
+                           "]>\n"
+                           "<doc>&e1;</doc>\n";
+  ExtHdlrData test_data = {"&e4;\n", external_entity_null_loader, &storage};
+  const XML_Char *const expected = XCS("(e5)\n");
+
+  XML_Parser parser = XML_ParserCreate(NULL);
+  assert_true(parser != NULL);
+  XML_SetUserData(parser, &test_data);
+  XML_SetExternalEntityRefHandler(parser, external_entity_oneshot_loader);
+  XML_SetCharacterDataHandler(parser, accumulate_characters_ext_handler);
+  if (_XML_Parse_SINGLE_BYTES(parser, text, (int)strlen(text), XML_TRUE)
+      == XML_STATUS_ERROR)
+    xml_failure(parser);
+
+  CharData_CheckXMLChars(&storage, expected);
+  XML_ParserFree(parser);
+}
+END_TEST
+
+// Inspired by function XML_OriginalString of Perl's XML::Parser
+static char *
+dup_original_string(XML_Parser parser) {
+  const int byte_count = XML_GetCurrentByteCount(parser);
+
+  assert_true(byte_count >= 0);
+
+  int offset = -1;
+  int size = -1;
+
+  const char *const context = XML_GetInputContext(parser, &offset, &size);
+
+#if XML_CONTEXT_BYTES > 0
+  assert_true(context != NULL);
+  assert_true(offset >= 0);
+  assert_true(size >= 0);
+  return portable_strndup(context + offset, byte_count);
+#else
+  assert_true(context == NULL);
+  return NULL;
+#endif
+}
+
+static void
+on_characters_issue_980(void *userData, const XML_Char *s, int len) {
+  (void)s;
+  (void)len;
+  XML_Parser parser = (XML_Parser)userData;
+
+  char *const original_string = dup_original_string(parser);
+
+#if XML_CONTEXT_BYTES > 0
+  assert_true(original_string != NULL);
+  assert_true(strcmp(original_string, "&draft.day;") == 0);
+  free(original_string);
+#else
+  assert_true(original_string == NULL);
+#endif
+}
+
+START_TEST(test_misc_expected_event_ptr_issue_980) {
+  // NOTE: This is a tiny subset of sample "REC-xml-19980210.xml"
+  //       from Perl's XML::Parser
+  const char *const doc = "<!DOCTYPE day [\n"
+                          "  <!ENTITY draft.day '10'>\n"
+                          "]>\n"
+                          "<day>&draft.day;</day>\n";
+
+  XML_Parser parser = XML_ParserCreate(NULL);
+  XML_SetUserData(parser, parser);
+  XML_SetCharacterDataHandler(parser, on_characters_issue_980);
+
+  assert_true(_XML_Parse_SINGLE_BYTES(parser, doc, (int)strlen(doc),
+                                      /*isFinal=*/XML_TRUE)
+              == XML_STATUS_OK);
+
+  XML_ParserFree(parser);
+}
+END_TEST
+
 void
 make_miscellaneous_test_case(Suite *s) {
   TCase *tc_misc = tcase_create("miscellaneous tests");
@@ -545,4 +704,6 @@ make_miscellaneous_test_case(Suite *s) {
   tcase_add_test(tc_misc, test_misc_char_handler_stop_without_leak);
   tcase_add_test(tc_misc, test_misc_resumeparser_not_crashing);
   tcase_add_test(tc_misc, test_misc_stopparser_rejects_unstarted_parser);
+  tcase_add_test__if_xml_ge(tc_misc, test_renter_loop_finite_content);
+  tcase_add_test(tc_misc, test_misc_expected_event_ptr_issue_980);
 }

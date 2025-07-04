@@ -370,8 +370,8 @@ void dc_cons_state::gdrom_config(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
 	cdda->audio_end_cb().set(*device, FUNC(gdrom_device::cdda_end_mark_cb));
-	cdda->add_route(0, "^^aica", 1.0);
-	cdda->add_route(1, "^^aica", 1.0);
+	cdda->add_route(0, "^^aica", 1.0, 0);
+	cdda->add_route(1, "^^aica", 1.0, 1);
 }
 
 void dc_cons_state::dc_base(machine_config &config)
@@ -415,15 +415,14 @@ void dc_cons_state::dc_base(machine_config &config)
 	POWERVR2(config, m_powervr2, 0);
 	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	AICA(config, m_aica, (XTAL(33'868'800)*2)/3); // 67.7376MHz(2*33.8688MHz), div 3 for audio block
 	m_aica->irq().set(FUNC(dc_state::aica_irq));
 	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
 	m_aica->set_addrmap(0, &dc_cons_state::aica_map);
-	m_aica->add_route(0, "lspeaker", 0.4);
-	m_aica->add_route(1, "rspeaker", 0.4);
+	m_aica->add_route(0, "speaker", 0.4, 0);
+	m_aica->add_route(1, "speaker", 0.4, 1);
 
 	AICARTC(config, "aicartc", XTAL(32'768));
 

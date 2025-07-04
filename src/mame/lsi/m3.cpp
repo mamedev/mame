@@ -561,8 +561,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static DEVICE_INPUT_DEFAULTS_START( rs232_defaults )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+static DEVICE_INPUT_DEFAULTS_START( rs232_printer_defaults )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
@@ -604,7 +603,7 @@ void m3_state::m3(machine_config &config)
 	usart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(rs232_defaults));
+	rs232.set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(rs232_printer_defaults));
 	rs232.rxd_handler().set("usart", FUNC(i8251_device::write_rxd));
 	rs232.dsr_handler().set("usart", FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set("usart", FUNC(i8251_device::write_cts));

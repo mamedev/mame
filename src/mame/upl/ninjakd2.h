@@ -56,7 +56,7 @@ protected:
 	void video_init_common();
 
 	void ninjakd2_pcm_play_w(uint8_t data);
-	SAMPLES_START_CB_MEMBER(ninjakd2_init_samples);
+	void ninjakd2_init_samples();
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(ninjakd2_get_bg_tile_info);

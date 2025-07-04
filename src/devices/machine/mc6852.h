@@ -41,6 +41,8 @@ class mc6852_device :   public device_t,
 						public device_serial_interface
 {
 public:
+	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
+
 	// construction/destruction
 	mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

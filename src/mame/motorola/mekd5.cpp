@@ -80,7 +80,6 @@ FS 0 to F
 #include "machine/clock.h"
 #include "machine/timer.h"
 #include "video/pwm.h"
-#include "sound/wave.h"
 #include "speaker.h"
 #include "bus/rs232/rs232.h"
 #include "machine/terminal.h"

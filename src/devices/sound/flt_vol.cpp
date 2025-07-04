@@ -35,10 +35,10 @@ void filter_volume_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void filter_volume_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void filter_volume_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
-		outputs[0].put(i, inputs[0].get(i) * m_gain);
+	for (int i = 0; i < stream.samples(); i++)
+		stream.put(0, i, stream.get(0, i) * m_gain);
 }
 
 

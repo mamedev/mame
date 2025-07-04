@@ -64,7 +64,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	virtual unsigned st2xxx_bt_divider(int n) const override;
 	virtual u8 st2xxx_prs_mask() const override { return 0xc0; }

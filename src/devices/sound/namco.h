@@ -43,7 +43,7 @@ protected:
 	// internal state
 	void build_decoded_waveform( uint8_t *rgnbase );
 	void update_namco_waveform(int offset, uint8_t data);
-	uint32_t namco_update_one(write_stream_view &buffer, const int16_t *wave, uint32_t counter, uint32_t freq);
+	uint32_t namco_update_one(sound_stream &stream, int output, const int16_t *wave, uint32_t counter, uint32_t freq);
 
 	// waveform region
 	optional_region_ptr<uint8_t> m_wave_ptr;
@@ -69,7 +69,7 @@ protected:
 	// decoded waveform table
 	std::unique_ptr<int16_t[]> m_waveform[MAX_VOLUME];
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 };
 
 class namco_device : public namco_audio_device
@@ -86,7 +86,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	std::unique_ptr<uint8_t[]> m_soundregs;
@@ -106,7 +106,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	std::unique_ptr<uint8_t[]> m_soundregs;
@@ -125,7 +125,7 @@ public:
 	void pacman_sound_w(offs_t offset, uint8_t data);
 
 protected:
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 };
 
 

@@ -157,11 +157,11 @@ void dspp_device::device_start()
 
 	// Register our state for the debugger
 	state_add(DSPP_PC,         "PC",        m_core->m_pc);
-	state_add(DSPP_ACC,        "ACC",       m_core->m_acc);
+	state_add(DSPP_ACC,        "ACC",       m_core->m_acc).mask(0xfffff);
 	state_add(STATE_GENPC,     "GENPC",     m_core->m_pc).noshow();
+	state_add(STATE_GENPCBASE, "GENPCBASE", m_core->m_pc).noshow();
 #if 0
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_core->m_flags).callimport().callexport().formatstr("%6s").noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc).noshow();
 
 	state_add(DSPP_PS,         "PS",        m_core->m_flagsio).callimport().callexport();
 	for (int regnum = 0; regnum < 32; regnum++)
@@ -441,18 +441,15 @@ void dspp_device::parse_operands(uint32_t numops)
 			// Immediate value
 			if ((operand & 0xc000) == 0xc000)
 			{
-				val = operand & 0x1fff;
-
 				if (operand & 0x2000)
 				{
 					// Left justify
-					val = val << 3;
+					val = (operand & 0x1fff) << 3;
 				}
 				else
 				{
 					// Sign extend if right justified
-					if (val & 0x1000)
-						val |= 0xe000;
+					val = uint16_t(util::sext(operand, 13));
 				}
 				m_core->m_operands[opidx++].value = val;
 			}
@@ -949,38 +946,6 @@ inline void dspp_device::exec_control()
 	}
 }
 
-//-------------------------------------------------
-//  sign_extend8 - Sign extend 8-bits to 32-bits
-//-------------------------------------------------
-
-static inline int32_t sign_extend8(uint8_t val)
-{
-	return (int32_t)(int8_t)val;
-}
-
-
-//-------------------------------------------------
-//  sign_extend16 - Sign extend 16-bits to 32-bits
-//-------------------------------------------------
-
-static inline int32_t sign_extend16(uint16_t val)
-{
-	return (int32_t)(int16_t)val;
-}
-
-
-//-------------------------------------------------
-//  sign_extend20 - Sign extend 20-bits to 32-bits
-//-------------------------------------------------
-
-static inline int32_t sign_extend20(uint32_t val)
-{
-	if (val & 0x00080000)
-		return (int32_t)(0xfff00000 | val);
-	else
-		return (int32_t)val;
-}
-
 
 //-------------------------------------------------
 //  exec_arithmetic - Execute an arithmetic op
@@ -1013,8 +978,8 @@ inline void dspp_device::exec_arithmetic()
 	{
 		uint32_t mul_sel = (m_core->m_op >> 12) & 1;
 
-		int32_t op1 = sign_extend16(read_next_operand());
-		int32_t op2 = sign_extend16(mul_sel ? read_next_operand() : m_core->m_acc >> 4);
+		int32_t op1 = int16_t(read_next_operand());
+		int32_t op2 = int16_t(mul_sel ? read_next_operand() : m_core->m_acc >> 4);
 
 		mul_res = (op1 * op2) >> 11;
 	}
@@ -1202,7 +1167,7 @@ inline void dspp_device::exec_arithmetic()
 		if (alu_op < 8)
 		{
 			// Arithmetic
-			m_core->m_acc = sign_extend20(alu_res) >> shift;
+			m_core->m_acc = util::sext(alu_res, 20) >> shift;
 		}
 		else
 		{
@@ -1222,11 +1187,11 @@ inline void dspp_device::exec_arithmetic()
 			if (m_core->m_flag_over)
 				m_core->m_acc = m_core->m_flag_neg ? 0x7ffff : 0xfff80000;
 			else
-				m_core->m_acc = sign_extend20(alu_res);
+				m_core->m_acc = util::sext(alu_res, 20);
 		}
 		else
 		{
-			m_core->m_acc = sign_extend20(alu_res) << shift;
+			m_core->m_acc = util::sext(alu_res << shift, 20);
 		}
 	}
 
@@ -1458,7 +1423,7 @@ void dspp_device::process_next_dma(int32_t channel)
 
 int16_t dspp_device::decode_sqxd(int8_t data, int16_t prev)
 {
-	int16_t temp = sign_extend8(data & 0xfe);
+	int16_t temp = int8_t(data & 0xfe);
 	int32_t expanded = (temp * iabs(temp)) << 1;
 	int16_t output;
 

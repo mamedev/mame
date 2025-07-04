@@ -222,19 +222,37 @@ void pgm_state::coin_counter_w(u16 data)
 	machine().bookkeeping().coin_counter_w(3, data & 0x0008);
 }
 
+bool pgm_state::z80_sync(int which)
+{
+	if (!machine().side_effects_disabled())
+	{
+		// retry_access() forces the z80 to catch up before maincpu does the read
+		if (!m_z80_sync[which])
+			m_maincpu->retry_access();
+
+		m_z80_sync[which] = !m_z80_sync[which];
+	}
+
+	return m_z80_sync[which];
+}
+
 u8 pgm_state::z80_ram_r(offs_t offset)
 {
+	// 2 sync semaphores because of word access
+	z80_sync(offset & 1);
 	return m_z80_mainram[offset];
 }
 
 void pgm_state::z80_ram_w(offs_t offset, u8 data)
 {
-	const int pc = m_maincpu->pc();
+	if (!z80_sync(offset & 1))
+	{
+		const u32 pc = m_maincpu->pc();
+		if (pc != 0xf12 && pc != 0xde2 && pc != 0x100c50 && pc != 0x100b20)
+			LOGZ80("Z80: write %04x, %02x (%06x)\n", offset, data, pc);
 
-	m_z80_mainram[offset] = data;
-
-	if (pc != 0xf12 && pc != 0xde2 && pc != 0x100c50 && pc != 0x100b20)
-		LOGZ80("Z80: write %04x, %02x (%06x)\n", offset, data, m_maincpu->pc());
+		m_z80_mainram[offset] = data;
+	}
 }
 
 void pgm_state::z80_reset_w(offs_t offset, u16 data, u16 mem_mask)
@@ -260,17 +278,23 @@ void pgm_state::z80_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 	LOGZ80("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, m_maincpu->pc());
 }
 
-void pgm_state::m68k_l1_w(u8 data)
+template<int N>
+u8 pgm_state::m68k_latch_r()
+{
+	return z80_sync(0) ? 0 : m_soundlatch[N]->read();
+}
+
+void pgm_state::m68k_latch1_w(u8 data)
 {
 	LOGZ80("SL 1 m68.w %02x (%06x) IRQ\n", data, m_maincpu->pc());
-	m_soundlatch->write(data);
+	m_soundlatch[0]->write(data);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void pgm_state::z80_l3_w(u8 data)
+void pgm_state::z80_latch3_w(u8 data)
 {
 	LOGZ80("SL 3 z80.w %02x (%04x)\n", data, m_soundcpu->pc());
-	m_soundlatch3->write(data);
+	m_soundlatch[2]->write(data);
 }
 
 
@@ -286,9 +310,9 @@ void pgm_state::pgm_z80_mem(address_map &map)
 void pgm_state::pgm_z80_io(address_map &map)
 {
 	map(0x8000, 0x8003).rw("ics", FUNC(ics2115_device::read), FUNC(ics2115_device::write));
-	map(0x8100, 0x81ff).r(m_soundlatch3, FUNC(generic_latch_8_device::read)).w(FUNC(pgm_state::z80_l3_w));
-	map(0x8200, 0x82ff).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
-	map(0x8400, 0x84ff).rw("soundlatch2", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
+	map(0x8100, 0x81ff).r(m_soundlatch[2], FUNC(generic_latch_8_device::read)).w(FUNC(pgm_state::z80_latch3_w));
+	map(0x8200, 0x82ff).rw(m_soundlatch[0], FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
+	map(0x8400, 0x84ff).rw(m_soundlatch[1], FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 }
 
 /*** 68000 (main CPU) + variants for protection devices **********************/
@@ -310,12 +334,12 @@ void pgm_state::pgm_base_mem(address_map &map)
 	//map(0xb06000, 0xb06001) Foreground scroll X?
 	//map(0xb0e000, 0xb0e001) Unknown #1
 
-	map(0xc00003, 0xc00003).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(pgm_state::m68k_l1_w));
-	map(0xc00005, 0xc00005).rw("soundlatch2", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
+	map(0xc00003, 0xc00003).rw(FUNC(pgm_state::m68k_latch_r<0>), FUNC(pgm_state::m68k_latch1_w));
+	map(0xc00005, 0xc00005).r(FUNC(pgm_state::m68k_latch_r<1>)).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 	map(0xc00007, 0xc00007).rw("rtc", FUNC(v3021_device::read), FUNC(v3021_device::write));
 	map(0xc00008, 0xc00009).w(FUNC(pgm_state::z80_reset_w));
 	map(0xc0000a, 0xc0000b).w(FUNC(pgm_state::z80_ctrl_w));
-	map(0xc0000d, 0xc0000d).rw(m_soundlatch3, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
+	map(0xc0000d, 0xc0000d).r(FUNC(pgm_state::m68k_latch_r<2>)).w(m_soundlatch[2], FUNC(generic_latch_8_device::write));
 
 	map(0xc08000, 0xc08001).portr("P1P2");
 	map(0xc08002, 0xc08003).portr("P3P4");
@@ -445,6 +469,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::interrupt)
 
 void pgm_state::machine_reset()
 {
+	m_z80_sync[0] = m_z80_sync[1] = false;
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
@@ -453,8 +478,9 @@ u16 pgm_state::sprites_r(offs_t offset)
 	return m_mainram[offset];
 }
 
-void pgm_state::video_start()
+void pgm_state::machine_start()
 {
+	save_item(NAME(m_z80_sync));
 }
 
 void pgm_state::screen_vblank(int state)
@@ -497,9 +523,9 @@ void pgm_state::pgmbase(machine_config &config)
 	/*sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	GENERIC_LATCH_8(config, "soundlatch2");
-	GENERIC_LATCH_8(config, m_soundlatch3);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
+	GENERIC_LATCH_8(config, m_soundlatch[2]);
 
 	IGS023_VIDEO(config, m_video, 0);
 	m_video->set_palette(m_palette);
@@ -5408,6 +5434,67 @@ ROM_START( ddpdojblkbl )
 	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, CRC(5a0dbd76) SHA1(06ab202f6bd5ebfb35b9d8cc7a8fb83ec8840659) ) //music-1
 ROM_END
 
+ROM_START( kovbl )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "prg1.29f1610ml",  0x100000, 0x200000, CRC(e74fcc47) SHA1(79ff714f3f2fac5446d91ba7b7d933036f82bc78) )
+	ROM_LOAD16_WORD_SWAP( "prg2.am27c4096",  0x300000, 0x080000, CRC(7b3577dc) SHA1(0fadd3cfc7cd38352891f7da4dbb8a25615dce54) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t0600a 1610", 0x180000, 0x200000, CRC(64e406a1) SHA1(bae0ec84876d46acbd17032de686057c34535fc8) )
+	ROM_LOAD( "t0600b 1610", 0x380000, 0x200000, CRC(26591209) SHA1(1b187e940108c4cb0db7209029f57c3f9b1c6bc9) )
+	ROM_LOAD( "t0600c 1610", 0x580000, 0x200000, CRC(461dc80c) SHA1(6dfb541f76612fd22f0a9d2be3a15951e76cdbbe) )
+	ROM_LOAD( "t0600d 1610", 0x780000, 0x200000, CRC(f7e6b529) SHA1(1263fa94d5f3c97c505406f732d321ff675652fa) )
+
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "pgm_a0600.u2",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "pgm_a0601.u4",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "pgm_a0602.u6",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "pgm_a0603.u9",    0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
+
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "pgm_b0600.u5",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
+	ROM_LOAD( "pgm_b0601.u7",    0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
+
+	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "pgm_m0600.u3",    0x400000, 0x400000, CRC(3ada4fd6) SHA1(4c87adb25d31cbd41f04fbffe31f7bc37173da76) )
+ROM_END
+
+ROM_START( kovplusbl )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "prg1.29f1610ml",  0x100000, 0x200000, CRC(35806d1b) SHA1(6b56f19d91ac2f99f3bfbbd4859edf4f85938a27) )
+	ROM_LOAD16_WORD_SWAP( "prg2.am27c4096",  0x300000, 0x080000, CRC(7b3577dc) SHA1(0fadd3cfc7cd38352891f7da4dbb8a25615dce54) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0xa00000, "igs023", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t0600a 1610", 0x180000, 0x200000, CRC(64e406a1) SHA1(bae0ec84876d46acbd17032de686057c34535fc8) )
+	ROM_LOAD( "t0600b 1610", 0x380000, 0x200000, CRC(26591209) SHA1(1b187e940108c4cb0db7209029f57c3f9b1c6bc9) )
+	ROM_LOAD( "t0600c 1610", 0x580000, 0x200000, CRC(461dc80c) SHA1(6dfb541f76612fd22f0a9d2be3a15951e76cdbbe) )
+	ROM_LOAD( "t0600d 1610", 0x780000, 0x200000, CRC(f7e6b529) SHA1(1263fa94d5f3c97c505406f732d321ff675652fa) )
+
+	ROM_REGION16_LE( 0x2000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "pgm_a0600.u2",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "pgm_a0601.u4",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "pgm_a0602.u6",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "pgm_a0603.u9",    0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
+
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "pgm_b0600.u5",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
+	ROM_LOAD( "pgm_b0601.u7",    0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
+
+	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "pgm_m0600.u3",    0x400000, 0x400000, CRC(3ada4fd6) SHA1(4c87adb25d31cbd41f04fbffe31f7bc37173da76) )
+ROM_END
 
 /*** Init Stuff **************************************************************/
 
@@ -5731,3 +5818,7 @@ GAME( 200?, kovlsjb,      kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_
 GAME( 200?, kovlsjba,     kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 GAME( 2010, kovgsyx,      kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovqhsgs, ROT0,   "bootleg (WDF)", "Gaishi Xingxiong Tebie Ban (bootleg of Knights of Valour Super Heroes Plus, V302CN, Dec 29 2010 16:31:32)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption and IGS027A simulation adaptation
+
+GAME( 199?, kovbl,        kov,       pgm_arm_type1_sim,      sango,     pgm_arm_type1_state, init_kov,      ROT0,   "bootleg", "Knights of Valour / Sanguo Zhan Ji / Sangoku Senki (bootleg, ver. 112CN?)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+
+GAME( 199?, kovplusbl,    kovplus,   pgm_arm_type1_sim,      sango,     pgm_arm_type1_state,  init_kov,     ROT0,   "bootleg", "Knights of Valour Plus / Sanguo Zhan Ji Zhengzong Plus / Sangoku Senki Masamune Plus (bootleg, ver. 117CN?)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

@@ -992,7 +992,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 void superxavix_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	if (m_extra)
+	if (m_extra && m_allow_superxavix_extra_rom_sprites)
 		m_use_superxavix_extra = true;
 
 	xavix_state::draw_sprites(screen, bitmap, cliprect);

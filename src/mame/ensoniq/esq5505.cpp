@@ -658,13 +658,12 @@ void esq5505_state::vfx(machine_config &config)
 
 	midiout_slot(MIDI_PORT(config, "mdout"));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ESQ_5505_5510_PUMP(config, m_pump, 10_MHz_XTAL / (16 * 21));
 	m_pump->set_esp(m_esp);
-	m_pump->add_route(0, "lspeaker", 1.0);
-	m_pump->add_route(1, "rspeaker", 1.0);
+	m_pump->add_route(0, "speaker", 1.0, 0);
+	m_pump->add_route(1, "speaker", 1.0, 1);
 
 	auto &es5505(ES5505(config, "otis", 10_MHz_XTAL));
 	es5505.sample_rate_changed().set(FUNC(esq5505_state::es5505_clock_changed));
@@ -749,13 +748,12 @@ void esq5505_state::vfx32(machine_config &config)
 
 	midiout_slot(MIDI_PORT(config, "mdout"));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ESQ_5505_5510_PUMP(config, m_pump, 30.47618_MHz_XTAL / (2 * 16 * 32));
 	m_pump->set_esp(m_esp);
-	m_pump->add_route(0, "lspeaker", 1.0);
-	m_pump->add_route(1, "rspeaker", 1.0);
+	m_pump->add_route(0, "speaker", 1.0, 0);
+	m_pump->add_route(1, "speaker", 1.0, 1);
 
 	auto &es5505(ES5505(config, "otis", 30.47618_MHz_XTAL / 2));
 	es5505.sample_rate_changed().set(FUNC(esq5505_state::es5505_clock_changed));

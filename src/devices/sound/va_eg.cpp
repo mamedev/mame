@@ -87,9 +87,35 @@ float va_rc_eg_device::get_v() const
 	return get_v(machine().time());
 }
 
+attotime va_rc_eg_device::get_dt(float v) const
+{
+	if (m_v_start == m_v_end)
+	{
+		// This only happens after a set_instant_v. If v != m_v_start, then it
+		// is unreachable. If v == m_vstart, then we (somewhat arbitrarily)
+		// consider it as having been reached in the past.
+		return attotime::never;
+	}
+	if (m_v_start < m_v_end && (v < m_v_start || v >= m_v_end))
+		return attotime::never;
+	if (m_v_start > m_v_end && (v > m_v_start || v <= m_v_end))
+		return attotime::never;
+
+	const double t_from_start = -m_r * m_c * log((m_v_end - v) / (m_v_end - m_v_start));
+	const attotime t_abs = m_t_start + attotime::from_double(t_from_start);
+	const attotime now = has_running_machine() ? machine().time() : attotime::zero;
+	if (t_abs < now)
+		return attotime::never;
+	return t_abs - now;
+}
+
 void va_rc_eg_device::device_start()
 {
-	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+	if (get_sound_requested_outputs() > 0)
+		m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+	else
+		m_stream = nullptr;
+
 	save_item(NAME(m_r));
 	save_item(NAME(m_c));
 	save_item(NAME(m_rc_inv));
@@ -99,23 +125,22 @@ void va_rc_eg_device::device_start()
 	save_item(NAME(m_t_end_approx));
 }
 
-void va_rc_eg_device::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void va_rc_eg_device::sound_stream_update(sound_stream &stream)
 {
-	assert(inputs.size() == 0 && outputs.size() == 1);
-	write_stream_view &out = outputs[0];
-	attotime t = out.start_time();
+	assert(stream.input_count() == 0 && stream.output_count() == 1);
+	attotime t = stream.start_time();
 
 	if (t >= m_t_end_approx)
 	{
 		// Avoid expensive get_v() calls if the envelope stage has completed.
-		out.fill(m_v_end);
+		stream.fill(0, m_v_end);
 		return;
 	}
 
-	const int n = out.samples();
-	const attotime dt = out.sample_period();
+	const int n = stream.samples();
+	const attotime dt = stream.sample_period();
 	for (int i = 0; i < n; ++i, t += dt)
-		out.put(i, get_v(t));
+		stream.put(0, i, get_v(t));
 }
 
 void va_rc_eg_device::snapshot()

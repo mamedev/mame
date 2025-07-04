@@ -1365,13 +1365,12 @@ void snes_console_state::snes(machine_config &config)
 	m_ctrl2->set_gunlatch_callback(FUNC(snes_console_state::gun_latch_cb));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	S_DSP(config, m_s_dsp, XTAL(24'576'000));
 	m_s_dsp->set_addrmap(0, &snes_console_state::spc_map);
-	m_s_dsp->add_route(0, "lspeaker", 1.00);
-	m_s_dsp->add_route(1, "rspeaker", 1.00);
+	m_s_dsp->add_route(0, "speaker", 1.00, 0);
+	m_s_dsp->add_route(1, "speaker", 1.00, 1);
 
 	SNS_CART_SLOT(config, m_cartslot, MCLK_NTSC, snes_cart, nullptr);
 	m_cartslot->set_must_be_loaded(true);

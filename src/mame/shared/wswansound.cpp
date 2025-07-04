@@ -158,11 +158,9 @@ u8 wswan_sound_device::fetch_sample(int channel, int offset)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void wswan_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &outputl = outputs[0];
-	auto &outputr = outputs[1];
-	for (int sampindex = 0; sampindex < outputl.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		m_loutput = m_routput = 0;
 		if (m_headphone_connected ? m_headphone_enable : m_speaker_enable)
@@ -270,20 +268,20 @@ void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 					}
 				}
 				// TODO: clamped?
-				outputl.put_int_clamp(sampindex, left, 32768);
-				outputr.put_int_clamp(sampindex, right, 32768);
+				stream.put_int_clamp(0, sampindex, left, 32768);
+				stream.put_int_clamp(1, sampindex, right, 32768);
 			}
 			else
 			{
 				u8 const mono = (((m_loutput & 0x3ff) + (m_routput & 0x3ff)) >> m_speaker_volume) & 0xff;
-				outputl.put_int(sampindex, mono, 256);
-				outputr.put_int(sampindex, mono, 256);
+				stream.put_int(0, sampindex, mono, 256);
+				stream.put_int(1, sampindex, mono, 256);
 			}
 		}
 		else
 		{
-			outputl.put(sampindex, 0.0);
-			outputr.put(sampindex, 0.0);
+			stream.put(0, sampindex, 0.0);
+			stream.put(1, sampindex, 0.0);
 		}
 	}
 }

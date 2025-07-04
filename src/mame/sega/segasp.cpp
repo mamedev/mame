@@ -783,6 +783,23 @@ ROM_START( shateki )
 	ROM_LOAD( "317-0628-jpn.ic15", 0, 0x800, CRC(c02f7424) SHA1(901e7f17a8e9e2e265ce4b2ec2cc56649ae57b17) )
 ROM_END
 
+ROM_START( spchecksrv )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	// note: software tool is only 1MB in size, the rest is leftovers from Love&Berry Japan game, let's keep it until it's undumped
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(dddd6d39) SHA1(e1eebd604f44b1dfb7dfb7c00283b4638204b996) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(4bce8ef2) SHA1(bcdd6968f666a1b350df5c050e65123ec3b83a77) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0399-jpn.ic15", 0, 0x800, CRC(7d9d7193) SHA1(d0062a1357e4f9e6737d103d682665e238998c66) ) // all key bits is 1, is this equivalent of NAOMI DIMM's "zero key"?
+ROM_END
+
 ROM_START( tetgiant )
 	SEGASP_BIOS
 	ROM_DEFAULT_BIOS( "v201" )
@@ -1039,6 +1056,7 @@ GAME( 2007, mirworld,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2007, ochaken, segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Ocha-Ken Hot Medal", GAME_FLAGS )
 GAME( 2009, puyomedal,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Puyo Puyo! The Medal Edition", GAME_FLAGS )
 GAME( 2010, shateki,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Shateki (1-player, Japan, Ver 1.000)", GAME_FLAGS )
+GAME( 2005, spchecksrv,segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "SystemSP Factory Check Server", GAME_FLAGS )
 GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
 GAME( 2009, unomedal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "UNO the Medal", GAME_FLAGS )
 GAME( 2009, westdrmg,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Western Dream Gold", GAME_FLAGS )

@@ -65,7 +65,7 @@ protected:
 	virtual void device_post_load() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	void save_state(SID6581_t *token);
 private:

@@ -149,6 +149,12 @@ void sh7604_device::device_start()
 	save_item(NAME(m_rstcsr));
 	save_item(NAME(m_wtcw));
 
+	// UBC
+	save_item(NAME(m_barah));
+	save_item(NAME(m_baral));
+	save_item(NAME(m_barbh));
+	save_item(NAME(m_barbl));
+
 	// DMAC
 	save_item(NAME(m_dmaor));
 	save_item(STRUCT_MEMBER(m_dmac, drcr));
@@ -197,6 +203,11 @@ void sh7604_device::device_reset()
 
 	m_wtcnt = 0;
 	m_wtcsr = 0;
+
+	m_barah = 0;
+	m_baral = 0;
+	m_barbh = 0;
+	m_barbl = 0;
 }
 
 void sh7604_device::sh7604_map(address_map &map)
@@ -262,6 +273,24 @@ void sh7604_device::sh7604_map(address_map &map)
 	map(0xffffff14, 0xffffff17).rw(FUNC(sh7604_device::dvdntl_r), FUNC(sh7604_device::dvdntl_w));
 	map(0xffffff18, 0xffffff1b).r(FUNC(sh7604_device::dvdnth_r));
 	map(0xffffff1c, 0xffffff1f).r(FUNC(sh7604_device::dvdntl_r));
+
+	// UBC
+	map(0xffffff40, 0xffffff41).rw(FUNC(sh7604_device::barah_r), FUNC(sh7604_device::barah_w));
+	map(0xffffff42, 0xffffff43).rw(FUNC(sh7604_device::baral_r), FUNC(sh7604_device::baral_w));
+//  map(0xffffff44, 0xffffff45).rw(FUNC(sh7604_device::bamrah_r), FUNC(sh7604_device::bamrah_w));
+//  map(0xffffff46, 0xffffff47).rw(FUNC(sh7604_device::bamral_r), FUNC(sh7604_device::bamral_w));
+//  map(0xffffff48, ).rw(FUNC(sh7604_device::bbra_r), FUNC(sh7604_device::bbra_w));
+
+	map(0xffffff60, 0xffffff61).rw(FUNC(sh7604_device::barbh_r), FUNC(sh7604_device::barbh_w));
+	map(0xffffff62, 0xffffff63).rw(FUNC(sh7604_device::barbl_r), FUNC(sh7604_device::barbl_w));
+//  map(0xffffff64, 0xffffff65).rw(FUNC(sh7604_device::bamrbh_r), FUNC(sh7604_device::bamrbh_w));
+//  map(0xffffff66, 0xffffff67).rw(FUNC(sh7604_device::bamrbl_r), FUNC(sh7604_device::bamrbl_w));
+//  map(0xffffff68, ).rw(FUNC(sh7604_device::bbrb_r), FUNC(sh7604_device::bbrb_w));
+//	map(0xffffff70, 0xffffff71).rw(FUNC(sh7604_device::bdrbh_r), FUNC(sh7604_device::bdrbh_w));
+//	map(0xffffff72, 0xffffff73).rw(FUNC(sh7604_device::bdrbl_r), FUNC(sh7604_device::bdrbl_w));
+//	map(0xffffff74, 0xffffff75).rw(FUNC(sh7604_device::bdmrbh_r), FUNC(sh7604_device::bdmrbh_w));
+//	map(0xffffff76, 0xffffff77).rw(FUNC(sh7604_device::bdmrbl_r), FUNC(sh7604_device::bdmrbl_w));
+//	map(0xffffff78, 0xffffff79).rw(FUNC(sh7604_device::brcr_r), FUNC(sh7604_device::brcr_w));
 
 	// DMAC
 	map(0xffffff80, 0xffffff83).rw(FUNC(sh7604_device::sar_r<0>), FUNC(sh7604_device::sar_w<0>));
@@ -1171,6 +1200,52 @@ void sh7604_device::dvdntl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_dvdnth = 0x7fffffff;
 		sh2_recalc_irq();
 	}
+}
+
+/*
+ * UBC
+ */
+
+// TODO: bare-bones, used for proper 32x:aburnerju sound (on slave side) as buffer storage
+
+uint16_t sh7604_device::barah_r()
+{
+	return m_barah;
+}
+
+uint16_t sh7604_device::baral_r()
+{
+	return m_baral;
+}
+
+void sh7604_device::barah_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_barah);
+}
+
+void sh7604_device::baral_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_baral);
+}
+
+uint16_t sh7604_device::barbh_r()
+{
+	return m_barbh;
+}
+
+uint16_t sh7604_device::barbl_r()
+{
+	return m_barbl;
+}
+
+void sh7604_device::barbh_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_barbh);
+}
+
+void sh7604_device::barbl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_barbl);
 }
 
 /*

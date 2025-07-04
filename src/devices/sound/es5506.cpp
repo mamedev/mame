@@ -1009,10 +1009,10 @@ inline void es550x_device::generate_irq(es550x_voice *voice, int v)
 
 ***********************************************************************************************/
 
-void es5506_device::generate_samples(std::vector<write_stream_view> &outputs)
+void es5506_device::generate_samples(sound_stream &stream)
 {
 	// loop while we still have samples to generate
-	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		// loop over voices
 		s32 cursample[12] = { 0 };
@@ -1038,15 +1038,15 @@ void es5506_device::generate_samples(std::vector<write_stream_view> &outputs)
 			generate_irq(voice, v);
 		}
 
-		for (int c = 0; c < outputs.size(); c++)
-			outputs[c].put_int(sampindex, cursample[c], 32768);
+		for (int c = 0; c < stream.output_count(); c++)
+			stream.put_int(c, sampindex, cursample[c], 32768);
 	}
 }
 
-void es5505_device::generate_samples(std::vector<write_stream_view> &outputs)
+void es5505_device::generate_samples(sound_stream &stream)
 {
 	// loop while we still have samples to generate
-	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		// loop over voices
 		s32 cursample[12] = { 0 };
@@ -1076,8 +1076,8 @@ void es5505_device::generate_samples(std::vector<write_stream_view> &outputs)
 			generate_irq(voice, v);
 		}
 
-		for (int c = 0; c < outputs.size(); c++)
-			outputs[c].put_int(sampindex, cursample[c], 32768);
+		for (int c = 0; c < stream.output_count(); c++)
+			stream.put_int(c, sampindex, cursample[c], 32768);
 	}
 }
 
@@ -2091,7 +2091,7 @@ u16 es5505_device::read(offs_t offset)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void es550x_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void es550x_device::sound_stream_update(sound_stream &stream)
 {
 #if ES5506_MAKE_WAVS
 	// start the logging once we have a sample rate
@@ -2103,7 +2103,7 @@ void es550x_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 #endif
 
 	// loop until all samples are output
-	generate_samples(outputs);
+	generate_samples(stream);
 
 #if ES5506_MAKE_WAVS
 	// log the raw data

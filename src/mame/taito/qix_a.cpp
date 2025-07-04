@@ -176,12 +176,11 @@ void qix_state::qix_audio(machine_config &config)
 	m_sndpia[2]->ca2_handler().set(FUNC(qix_state::sndpia_2_warning_w));
 	m_sndpia[2]->cb2_handler().set(FUNC(qix_state::sndpia_2_warning_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DISCRETE(config, m_discrete, qix_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
+	m_discrete->add_route(0, "speaker", 1.0, 0);
+	m_discrete->add_route(1, "speaker", 1.0, 1);
 }
 
 void slither_state::audio(machine_config &config)

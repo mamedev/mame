@@ -116,7 +116,6 @@ The ROM support is still TODO.
 #include "video/pwm.h"
 #include "bus/rs232/rs232.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "speaker.h"
 #include "mekd3.lh"
 

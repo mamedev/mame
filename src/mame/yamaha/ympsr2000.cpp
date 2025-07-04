@@ -58,8 +58,7 @@ void psr2000_state::psr2000(machine_config &config)
 	m_lcdc->set_screen("screen");
 	m_lcdc->set_addrmap(0, &psr2000_state::lcdc_map);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void psr2000_state::map(address_map &map)

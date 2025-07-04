@@ -131,7 +131,7 @@ void nesapu_device::device_start()
 	*/
 	for (int i = 0; i < 31; i++)
 	{
-		stream_buffer::sample_t pulse_out = (i == 0) ? 0.0 : 95.88 / ((8128.0 / i) + 100.0);
+		sound_stream::sample_t pulse_out = (i == 0) ? 0.0 : 95.88 / ((8128.0 / i) + 100.0);
 		m_square_lut[i] = pulse_out;
 	}
 
@@ -153,7 +153,7 @@ void nesapu_device::device_start()
 		{
 			for (int d = 0; d < 128; d++)
 			{
-				stream_buffer::sample_t tnd_out = (t / 8227.0) + (n / 12241.0) + (d / 22638.0);
+				sound_stream::sample_t tnd_out = (t / 8227.0) + (n / 12241.0) + (d / 22638.0);
 				tnd_out = (tnd_out == 0.0) ? 0.0 : 159.79 / ((1.0 / tnd_out) + 100.0);
 				m_tnd_lut[t][n][d] = tnd_out;
 			}
@@ -766,12 +766,11 @@ u8 nesapu_device::status_r()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void nesapu_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void nesapu_device::sound_stream_update(sound_stream &stream)
 {
-	stream_buffer::sample_t accum = 0.0;
-	auto &output = outputs[0];
+	sound_stream::sample_t accum = 0.0;
 
-	for (int sampindex = 0; sampindex < output.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		apu_square(&m_APU.squ[0]);
 		apu_square(&m_APU.squ[1]);
@@ -782,6 +781,6 @@ void nesapu_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		accum = m_square_lut[m_APU.squ[0].output + m_APU.squ[1].output];
 		accum += m_tnd_lut[m_APU.tri.output][m_APU.noi.output][m_APU.dpcm.output];
 
-		output.put(sampindex, accum);
+		stream.put(0, sampindex, accum);
 	}
 }

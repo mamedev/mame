@@ -417,15 +417,9 @@ int ymz280b_device::generate_pcm16(YMZ280BVoice *voice, s16 *buffer, int samples
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ymz280b_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ymz280b_device::sound_stream_update(sound_stream &stream)
 {
-	auto &lacc = outputs[0];
-	auto &racc = outputs[1];
 	int v;
-
-	/* clear out the accumulator */
-	lacc.fill(0);
-	racc.fill(0);
 
 	/* loop over voices */
 	for (v = 0; v < 8; v++)
@@ -437,7 +431,7 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		s32 sampindex = 0;
 		u32 new_samples, samples_left;
 		u32 final_pos;
-		int remaining = lacc.samples();
+		int remaining = stream.samples();
 		int lvol = voice->output_left;
 		int rvol = voice->output_right;
 
@@ -454,8 +448,8 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		while (remaining > 0 && voice->output_pos < FRAC_ONE)
 		{
 			int interp_sample = ((s32(prev) * (FRAC_ONE - voice->output_pos)) + (s32(curr) * voice->output_pos)) >> FRAC_BITS;
-			lacc.add_int(sampindex, interp_sample * lvol / 2, 32768 * 256);
-			racc.add_int(sampindex, interp_sample * rvol / 2, 32768 * 256);
+			stream.add_int(0, sampindex, interp_sample * lvol / 2, 32768 * 256);
+			stream.add_int(1, sampindex, interp_sample * rvol / 2, 32768 * 256);
 			sampindex++;
 			voice->output_pos += voice->output_step;
 			remaining--;
@@ -519,8 +513,8 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			while (remaining > 0 && voice->output_pos < FRAC_ONE)
 			{
 				int interp_sample = ((s32(prev) * (FRAC_ONE - voice->output_pos)) + (s32(curr) * voice->output_pos)) >> FRAC_BITS;
-				lacc.add_int(sampindex, interp_sample * lvol / 2, 32768 * 256);
-				racc.add_int(sampindex, interp_sample * rvol / 2, 32768 * 256);
+				stream.add_int(0, sampindex, interp_sample * lvol / 2, 32768 * 256);
+				stream.add_int(1, sampindex, interp_sample * rvol / 2, 32768 * 256);
 				sampindex++;
 				voice->output_pos += voice->output_step;
 				remaining--;

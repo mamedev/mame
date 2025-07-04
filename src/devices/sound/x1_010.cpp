@@ -206,16 +206,10 @@ void x1_010_device::word_w(offs_t offset, u16 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void x1_010_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void x1_010_device::sound_stream_update(sound_stream &stream)
 {
-	// mixer buffer zero clear
-	outputs[0].fill(0);
-	outputs[1].fill(0);
-
 //  if (m_sound_enable == 0) return;
 
-	auto &bufL = outputs[0];
-	auto &bufR = outputs[1];
 	for (int ch = 0; ch < NUM_CHANNELS; ch++)
 	{
 		X1_010_CHANNEL *reg = (X1_010_CHANNEL *)&(m_reg[ch*sizeof(X1_010_CHANNEL)]);
@@ -239,7 +233,7 @@ void x1_010_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 					LOGMASKED(LOG_SOUND, "Play sample %p - %p, channel %X volume %d:%d freq %X step %X offset %X\n",
 						start, end, ch, volL, volR, freq, smp_step, smp_offs);
 				}
-				for (int i = 0; i < bufL.samples(); i++)
+				for (int i = 0; i < stream.samples(); i++)
 				{
 					const u32 delta = smp_offs >> 4;
 					// sample ended?
@@ -249,8 +243,8 @@ void x1_010_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 						break;
 					}
 					const s8 data = (s8)(read_byte(start+delta));
-					bufL.add_int(i, data * volL, 32768 * 256);
-					bufR.add_int(i, data * volR, 32768 * 256);
+					stream.add_int(0, i, data * volL, 32768 * 256);
+					stream.add_int(1, i, data * volR, 32768 * 256);
 					smp_offs += smp_step;
 				}
 				m_smp_offset[ch] = smp_offs;
@@ -271,7 +265,7 @@ void x1_010_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 					LOGMASKED(LOG_SOUND, "Play waveform %X, channel %X volume %X freq %4X step %X offset %X\n",
 						reg->volume, ch, reg->end, freq, smp_step, smp_offs);
 				}
-				for (int i = 0; i < bufL.samples(); i++)
+				for (int i = 0; i < stream.samples(); i++)
 				{
 					const u32 delta = env_offs >> 10;
 					// Envelope one shot mode
@@ -284,8 +278,8 @@ void x1_010_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 					const int volL = ((vol >> 4) & 0xf) * VOL_BASE;
 					const int volR = ((vol >> 0) & 0xf) * VOL_BASE;
 					const s8 data  = (s8)(m_reg[start + ((smp_offs >> 10) & 0x7f)]);
-					bufL.add_int(i, data * volL, 32768 * 256);
-					bufR.add_int(i, data * volR, 32768 * 256);
+					stream.add_int(0, i, data * volL, 32768 * 256);
+					stream.add_int(1, i, data * volR, 32768 * 256);
 					smp_offs += smp_step;
 					env_offs += env_step;
 				}
@@ -293,11 +287,5 @@ void x1_010_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				m_env_offset[ch] = env_offs;
 			}
 		}
-	}
-
-	for (int i = 0; i < bufL.samples(); i++)
-	{
-		bufL.put(i, std::clamp(bufL.getraw(i), -1.0f, 1.0f));
-		bufR.put(i, std::clamp(bufR.getraw(i), -1.0f, 1.0f));
 	}
 }

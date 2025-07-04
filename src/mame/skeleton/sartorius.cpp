@@ -12,7 +12,7 @@
  * National Semiconductor MM74C907N hex open-drain P-channel buffer
  * Intersil IM6561AIJN 256*4 CMOS RAM
  * RCA CD4007AE dual complementary pair plus inverter
- * National Semicondictor CD4049CN hex inverting buffer
+ * National Semiconductor CD4049CN hex inverting buffer
  * Intel P4201A clock generator
  * 4 * Motorola MC14099B 8-bit addressable latch
  * 2 * RCA CD4052BE 2-channel 4:1 analog switch

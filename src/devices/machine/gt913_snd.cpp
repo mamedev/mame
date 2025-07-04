@@ -102,9 +102,9 @@ void gt913_sound_device::device_reset()
 	std::memset(m_voices, 0, sizeof(m_voices));
 }
 
-void gt913_sound_device::sound_stream_update(sound_stream& stream, std::vector<read_stream_view> const& inputs, std::vector<write_stream_view>& outputs)
+void gt913_sound_device::sound_stream_update(sound_stream& stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		s64 left = 0, right = 0;
 
@@ -115,8 +115,8 @@ void gt913_sound_device::sound_stream_update(sound_stream& stream, std::vector<r
 				mix_sample(voice, left, right);
 		}
 
-		outputs[0].put_int_clamp(i, (left * m_gain) >> 27, 32678);
-		outputs[1].put_int_clamp(i, (right * m_gain) >> 27, 32768);
+		stream.put_int_clamp(0, i, (left * m_gain) >> 27, 32678);
+		stream.put_int_clamp(1, i, (right * m_gain) >> 27, 32768);
 	}
 }
 

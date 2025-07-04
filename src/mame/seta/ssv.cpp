@@ -2445,8 +2445,7 @@ void ssv_state::ssv(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x8000);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ES5506(config, m_ensoniq, SSV_MASTER_CLOCK);
 	m_ensoniq->set_region0("ensoniq.0");
@@ -2454,8 +2453,8 @@ void ssv_state::ssv(machine_config &config)
 	m_ensoniq->set_region2("ensoniq.2");
 	m_ensoniq->set_region3("ensoniq.3");
 	m_ensoniq->set_channels(1);
-	m_ensoniq->add_route(0, "lspeaker", 0.075);
-	m_ensoniq->add_route(1, "rspeaker", 0.075);
+	m_ensoniq->add_route(0, "speaker", 0.075, 0);
+	m_ensoniq->add_route(1, "speaker", 0.075, 1);
 }
 
 void drifto94_state::drifto94(machine_config &config)

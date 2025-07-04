@@ -157,13 +157,13 @@ void votrax_sc01_device::inflection_w(uint8_t data)
 //  for our sound stream
 //-------------------------------------------------
 
-void votrax_sc01_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void votrax_sc01_device::sound_stream_update(sound_stream &stream)
 {
-	for(int i=0; i<outputs[0].samples(); i++) {
+	for(int i=0; i<stream.samples(); i++) {
 		m_sample_count++;
 		if(m_sample_count & 1)
 			chip_update();
-		outputs[0].put(i, analog_calc());
+		stream.put(0, i, analog_calc());
 	}
 }
 
@@ -596,7 +596,7 @@ void votrax_sc01_device::filters_commit(bool force)
 		LOGMASKED(LOG_FILTER, "filter fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%x f3=%x\n", m_filt_fa, m_filt_va, m_filt_fc, m_filt_f1, m_filt_f2, m_filt_f2q, m_filt_f3);
 }
 
-stream_buffer::sample_t votrax_sc01_device::analog_calc()
+sound_stream::sample_t votrax_sc01_device::analog_calc()
 {
 	// Voice-only path.
 	// 1. Pick up the pitch wave

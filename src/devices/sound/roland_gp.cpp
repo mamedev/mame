@@ -73,6 +73,6 @@ void tc6116_device::write(offs_t offset, u8 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tc6116_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void tc6116_device::sound_stream_update(sound_stream &stream)
 {
 }

@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "speculator.h"
 #include "machine/rescap.h"
-#include "sound/wave.h"
 #include "formats/tzx_cas.h"
 
 
@@ -46,10 +45,10 @@ void einstein_speculator_device::device_add_mconfig(machine_config &config)
 	m_ic5b->out_cb().set(FUNC(einstein_speculator_device::ic5b_q_w));
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	CASSETTE(config, m_cassette);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_formats(tzx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("spectrum_cass");

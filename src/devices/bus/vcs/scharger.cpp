@@ -34,7 +34,6 @@
 
 #include "emu.h"
 #include "scharger.h"
-#include "sound/wave.h"
 #include "formats/a26_cas.h"
 
 //#define VERBOSE (LOG_GENERAL)
@@ -91,8 +90,6 @@ void a26_rom_ss_device::device_add_mconfig(machine_config &config)
 	m_cassette->set_formats(a26_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("a2600_cass");
-
-//  WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void a26_rom_ss_device::install_memory_handlers(address_space *space)

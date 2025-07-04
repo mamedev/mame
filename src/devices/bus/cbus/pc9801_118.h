@@ -48,7 +48,7 @@ private:
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2608_device>  m_opn3;
 
-//	u16 m_io_base, m_joy_sel;
+//  u16 m_io_base, m_joy_sel;
 
 	uint8_t m_ext_reg;
 };

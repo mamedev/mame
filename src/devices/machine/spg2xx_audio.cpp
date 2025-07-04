@@ -871,12 +871,9 @@ void spg2xx_audio_device::audio_w(offs_t offset, uint16_t data)
 	}
 }
 
-void spg2xx_audio_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void spg2xx_audio_device::sound_stream_update(sound_stream &stream)
 {
-	auto &out_l = outputs[0];
-	auto &out_r = outputs[1];
-
-	for (int i = 0; i < out_l.samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		int32_t left_total = 0;
 		int32_t right_total = 0;
@@ -976,8 +973,8 @@ void spg2xx_audio_device::sound_stream_update(sound_stream &stream, std::vector<
 		int32_t left_final = (int16_t)((left_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7);
 		int32_t right_final = (int16_t)((right_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7);
 
-		out_l.put_int(i, int16_t(left_final), 32768);
-		out_r.put_int(i, int16_t(right_final), 32768);
+		stream.put_int(0, i, int16_t(left_final), 32768);
+		stream.put_int(1, i, int16_t(right_final), 32768);
 	}
 }
 

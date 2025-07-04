@@ -5,8 +5,6 @@
 "Combat School" (also known as "Boot Camp") - (Konami GX611)
 
 TODO:
-- Ugly text flickering in various places, namely the text when you finish level 1.
-  This is due of completely busted sprite limit hook-up. (check k007121.cpp and MT #00185)
 - understand how the trackball really works for clone sets.
 - it seems that to get correct target colors in firing range III we have to
   use the WRONG lookup table (the one for tiles instead of the one for
@@ -47,6 +45,32 @@ Credits:
 
 Memory Maps (preliminary):
 
+****************************
+* Combat School (Original) *
+****************************
+
+0000-005f   Video Registers (banked)
+0400-0407   input ports
+0408        coin counters
+0410        bankswitch control
+0600-06ff   palette
+0800-1fff   RAM
+2000-2fff   Video RAM (banked)
+3000-3fff   Object RAM (banked)
+4000-7fff   Banked Area + IO + Video Registers
+8000-ffff   ROM
+
+SOUND CPU:
+----------
+0000-8000   ROM
+8000-87ff   RAM
+9000        uPD7759
+b000        uPD7759
+c000        uPD7759
+d000        soundlatch read
+e000-e001   YM2203
+
+
 ***************************
 * Combat School (bootleg) *
 ***************************
@@ -74,49 +98,19 @@ a000        soundlatch?
 a800        OKIM5205?
 fffc-ffff   ???
 
+Notes about the sound system of the bootleg:
+---------------------------------------------
+The positions 0x87f0-0x87ff are very important, it
+does work similar to a semaphore (same as a lot of
+vblank bits). For example in the init code, it writes
+zero to 0x87fa, then it waits until it'll be different
+to zero, but it isn't written by this cpu. (shareram?)
+I have tried to put here a K007232 chip, but it didn't
+work.
 
-        Notes about the sound system of the bootleg:
-        ---------------------------------------------
-        The positions 0x87f0-0x87ff are very important, it
-        does work similar to a semaphore (same as a lot of
-        vblank bits). For example in the init code, it writes
-        zero to 0x87fa, then it waits until it'll be different
-        to zero, but it isn't written by this cpu. (shareram?)
-        I have tried to put here a K007232 chip, but it didn't
-        work.
+Sound chips: OKI M5205 & YM2203
 
-        Sound chips: OKI M5205 & YM2203
-
-        We are using the other sound hardware for now.
-
-****************************
-* Combat School (Original) *
-****************************
-
-0000-005f   Video Registers (banked)
-0400-0407   input ports
-0408        coin counters
-0410        bankswitch control
-0600-06ff   palette
-0800-1fff   RAM
-2000-2fff   Video RAM (banked)
-3000-3fff   Object RAM (banked)
-4000-7fff   Banked Area + IO + Video Registers
-8000-ffff   ROM
-
-SOUND CPU:
-----------
-0000-8000   ROM
-8000-87ff   RAM
-9000        uPD7759
-b000        uPD7759
-c000        uPD7759
-d000        soundlatch read
-e000-e001   YM2203
-
-
-2008-08:
-Dip location and recommended settings verified with the US manual
+We are using the other sound hardware for now.
 
 ***************************************************************************/
 
@@ -127,6 +121,7 @@ Dip location and recommended settings verified with the US manual
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ymopn.h"
+
 #include "speaker.h"
 
 
@@ -135,6 +130,24 @@ Dip location and recommended settings verified with the US manual
  *  Memory handlers
  *
  *************************************/
+
+template <uint8_t Which>
+void combatsc_state::flipscreen_w(int state)
+{
+	const uint32_t flip = state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0;
+
+	m_bg_tilemap[Which]->set_flip(flip);
+	if (Which == 0)
+		m_textlayer->set_flip(flip);
+}
+
+template <uint8_t Which>
+void combatsc_state::dirtytiles()
+{
+	m_bg_tilemap[Which]->mark_all_dirty();
+	if (Which == 0)
+		m_textlayer->mark_all_dirty();
+}
 
 void combatsc_base_state::vreg_w(uint8_t data)
 {
@@ -149,37 +162,21 @@ void combatsc_base_state::vreg_w(uint8_t data)
 	}
 }
 
-void combatscb_state::priority_w(uint8_t data)
-{
-	if (data & 0x40)
-	{
-		m_video_circuit = 1;
-		m_video_view.select(1);
-	}
-	else
-	{
-		m_video_circuit = 0;
-		m_video_view.select(0);
-	}
-
-	m_priority = data & 0x20;
-}
-
 void combatsc_state::bankselect_w(uint8_t data)
 {
-	m_priority = data & 0x20;
+	m_priority = BIT(data, 5);
 
 	if (data & 0x40)
 	{
-		m_video_circuit = 1;
-		m_video_view.select(1);
+		m_pf_view.select(1);
 		m_scroll_view.select(1);
+		m_video_view.select(1);
 	}
 	else
 	{
-		m_video_circuit = 0;
-		m_video_view.select(0);
+		m_pf_view.select(0);
 		m_scroll_view.select(0);
+		m_video_view.select(0);
 	}
 
 	if (data & 0x10)
@@ -188,25 +185,11 @@ void combatsc_state::bankselect_w(uint8_t data)
 		m_mainbank->set_entry(8 + (data & 1));
 }
 
-void combatscb_state::io_w(offs_t offset, uint8_t data)
-{
-	m_io_ram[offset] = data;
-}
-
 void combatscb_state::bankselect_w(uint8_t data)
 {
-	if (data & 0x40)
-	{
-		m_video_circuit = 1;
-		m_video_view.select(1);
-	}
-	else
-	{
-		m_video_circuit = 0;
-		m_video_view.select(0);
-	}
+	m_video_view.select(BIT(data, 6));
 
-	data = data & 0x1f;
+	data &= 0x1f;
 
 	if (data != m_bank_select)
 	{
@@ -227,6 +210,18 @@ void combatscb_state::bankselect_w(uint8_t data)
 	}
 }
 
+void combatscb_state::priority_w(uint8_t data)
+{
+	m_priority = BIT(data, 5);
+	m_video_view.select(BIT(data, 6));
+}
+
+void combatscb_state::io_w(offs_t offset, uint8_t data)
+{
+	m_io_ram[offset] = data;
+}
+
+
 /****************************************************************************/
 
 void combatsc_state::coin_counter_w(uint8_t data)
@@ -243,9 +238,9 @@ uint8_t combatsc_state::trackball_r(offs_t offset)
 {
 	if (offset == 0)
 	{
-		int i, dir[4];
+		int dir[4];
 
-		for (i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			uint8_t curr = m_track_ports[i].read_safe(0xff);
 
@@ -312,12 +307,14 @@ uint8_t combatsc_state::unk_r()
 
 void combatsc_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0007).w(FUNC(combatsc_state::pf_control_w));
+	map(0x0000, 0x0007).view(m_pf_view);
+	m_pf_view[0](0x0000, 0x0007).w(m_k007121[0], FUNC(k007121_device::ctrl_w));
+	m_pf_view[1](0x0000, 0x0007).w(m_k007121[1], FUNC(k007121_device::ctrl_w));
+
 	map(0x001f, 0x001f).r(FUNC(combatsc_state::unk_r));
 	map(0x0020, 0x005f).view(m_scroll_view);
-	m_scroll_view[0](0x0020, 0x005f).ram().share(m_scrollram[0]);
-	m_scroll_view[1](0x0020, 0x005f).ram().share(m_scrollram[1]);
-//  map(0x0060, 0x00ff).writeonly();                 // RAM
+	m_scroll_view[0](0x0020, 0x005f).rw(m_k007121[0], FUNC(k007121_device::scroll_r), FUNC(k007121_device::scroll_w));
+	m_scroll_view[1](0x0020, 0x005f).rw(m_k007121[1], FUNC(k007121_device::scroll_r), FUNC(k007121_device::scroll_w));
 
 	map(0x0200, 0x0207).rw("k007452", FUNC(k007452_device::read), FUNC(k007452_device::write));
 
@@ -325,7 +322,7 @@ void combatsc_state::main_map(address_map &map)
 	map(0x0401, 0x0401).portr("DSW3");
 	map(0x0402, 0x0402).portr("DSW1");
 	map(0x0403, 0x0403).portr("DSW2");
-	map(0x0404, 0x0407).r(FUNC(combatsc_state::trackball_r));           // 1P & 2P controls / trackball
+	map(0x0404, 0x0407).r(FUNC(combatsc_state::trackball_r)); // 1P & 2P controls / trackball
 	map(0x0408, 0x0408).w(FUNC(combatsc_state::coin_counter_w));
 	map(0x040c, 0x040c).w(FUNC(combatsc_state::vreg_w));
 	map(0x0410, 0x0410).nopr().w(FUNC(combatsc_state::bankselect_w)); // read is clr a (discarded)
@@ -619,7 +616,6 @@ void combatsc_base_state::machine_start()
 
 	save_item(NAME(m_priority));
 	save_item(NAME(m_vreg));
-	save_item(NAME(m_video_circuit));
 }
 
 void combatsc_state::machine_start()
@@ -671,11 +667,10 @@ void combatscb_state::machine_reset()
 void combatsc_state::combatsc(machine_config &config)
 {
 	// basic machine hardware
-	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8);  // HD63C09E, 3 MHz?
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // HD63C09E, 3 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &combatsc_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(combatsc_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 3579545);   // 3.579545 MHz??? (no such XTAL on board!)
+	Z80(config, m_audiocpu, 3579545); // 3.579545 MHz??? (no such XTAL on board!)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &combatsc_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(1200));
@@ -686,11 +681,7 @@ void combatsc_state::combatsc(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(60);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_raw(XTAL(24'000'000)/3, 528, 0, 256, 256, 16, 240); // not accurate, assuming same to other Konami games (59.17)
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(combatsc_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -698,15 +689,21 @@ void combatsc_state::combatsc(machine_config &config)
 	m_palette->set_format(palette_device::xBGR_555, 8 * 16 * 16, 128);
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
-	K007121(config, m_k007121[0], 0, m_palette, gfx_combatsc_1);
-	K007121(config, m_k007121[1], 0, m_palette, gfx_combatsc_2);
+	K007121(config, m_k007121[0], 0, gfx_combatsc_1, m_palette, m_screen);
+	m_k007121[0]->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
+	m_k007121[0]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<0>));
+	m_k007121[0]->set_dirtytiles_cb(FUNC(combatsc_state::dirtytiles<0>));
+
+	K007121(config, m_k007121[1], 0, gfx_combatsc_2, m_palette, m_screen);
+	m_k007121[1]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<1>));
+	m_k007121[1]->set_dirtytiles_cb(FUNC(combatsc_state::dirtytiles<1>));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 3000000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 24_MHz_XTAL / 8));
 	ymsnd.port_a_write_callback().set(FUNC(combatsc_state::portA_w));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 

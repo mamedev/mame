@@ -346,7 +346,7 @@ void i2cmem_device::write_sda(int state)
 				verboselog( this, 1, "stop\n" );
 				m_state = STATE_IDLE;
 			}
-			else
+			else if( m_state == STATE_IDLE )
 			{
 				verboselog( this, 1, "start\n" );
 				m_state = STATE_DEVSEL;

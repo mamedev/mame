@@ -15,7 +15,7 @@
    Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
    Copyright (c) 2019      David Loffredo <loffredo@steptools.com>
    Copyright (c) 2020      Joe Orton <jorton@redhat.com>
-   Copyright (c) 2020      Kleber Tarcísio <klebertarcisio@yahoo.com.br>
+   Copyright (c) 2020      Kleber TarcÃ­sio <klebertarcisio@yahoo.com.br>
    Copyright (c) 2021      Tim Bray <tbray@textuality.com>
    Copyright (c) 2022      Martin Ettl <ettl.martin78@googlemail.com>
    Copyright (c) 2022      Sean McBride <sean@rogue-research.com>

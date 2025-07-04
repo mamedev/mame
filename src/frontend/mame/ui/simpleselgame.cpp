@@ -43,7 +43,8 @@ simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_co
 	, m_driverlist(driver_list::total() + 1)
 	, m_drivlist()
 	, m_cached_driver(nullptr)
-	, m_cached_flags(machine_flags::NOT_WORKING)
+	, m_cached_machine_flags(machine_flags::ROT0)
+	, m_cached_emulation_flags(device_t::flags::NOT_WORKING)
 	, m_cached_unemulated(device_t::feature::NONE), m_cached_imperfect(device_t::feature::NONE)
 	, m_cached_color(ui().colors().background_color())
 {
@@ -353,14 +354,15 @@ void simple_menu_select_game::custom_render(uint32_t flags, void *selectedref, f
 				emu_options clean_options;
 				machine_static_info const info(ui().options(), machine_config(*driver, clean_options));
 				m_cached_driver = driver;
-				m_cached_flags = info.machine_flags();
+				m_cached_machine_flags = info.machine_flags();
+				m_cached_emulation_flags = info.emulation_flags();
 				m_cached_unemulated = info.unemulated_features();
 				m_cached_imperfect = info.imperfect_features();
 				m_cached_color = info.status_color();
 			}
 
 			// next line is overall driver status
-			if (m_cached_flags & machine_flags::NOT_WORKING)
+			if (m_cached_emulation_flags & device_t::flags::NOT_WORKING)
 				tempbuf[3] = _("Status: NOT WORKING");
 			else if ((m_cached_unemulated | m_cached_imperfect) & device_t::feature::PROTECTION)
 				tempbuf[3] = _("Status: Unemulated Protection");
@@ -375,7 +377,7 @@ void simple_menu_select_game::custom_render(uint32_t flags, void *selectedref, f
 			else
 				tempbuf[4] = _("Graphics: OK, ");
 
-			if (m_cached_flags & machine_flags::NO_SOUND_HW)
+			if (m_cached_machine_flags & machine_flags::NO_SOUND_HW)
 				tempbuf[4].append(_("Sound: None"));
 			else if (m_cached_unemulated & device_t::feature::SOUND)
 				tempbuf[4].append(_("Sound: Unimplemented"));

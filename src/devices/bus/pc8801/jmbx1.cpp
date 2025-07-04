@@ -44,15 +44,15 @@ void jmbx1_device::device_add_mconfig(machine_config &config)
 	// doesn't seem to have irq mask
 	YM2151(config, m_opm1, jmb_x1_clock / 2);
 	m_opm1->irq_handler().set(FUNC(jmbx1_device::int4_w));
-	m_opm1->add_route(ALL_OUTPUTS, "^^lspeaker", 0.25);
-	m_opm1->add_route(ALL_OUTPUTS, "^^rspeaker", 0.25);
+	m_opm1->add_route(ALL_OUTPUTS, "^^speaker", 0.25, 0);
+	m_opm1->add_route(ALL_OUTPUTS, "^^speaker", 0.25, 1);
 
 	YM2151(config, m_opm2, jmb_x1_clock / 2);
-	m_opm2->add_route(ALL_OUTPUTS, "^^lspeaker", 0.25);
-	m_opm2->add_route(ALL_OUTPUTS, "^^rspeaker", 0.25);
+	m_opm2->add_route(ALL_OUTPUTS, "^^speaker", 0.25, 0);
+	m_opm2->add_route(ALL_OUTPUTS, "^^speaker", 0.25, 1);
 
 	YM2149(config, m_ssg, jmb_x1_clock / 4);
 	// TODO: adds a non-negligible DC offset, likely needs high pass filter
-	m_ssg->add_route(ALL_OUTPUTS, "^^lspeaker", 0.20);
-	m_ssg->add_route(ALL_OUTPUTS, "^^rspeaker", 0.20);
+	m_ssg->add_route(ALL_OUTPUTS, "^^speaker", 0.20, 0);
+	m_ssg->add_route(ALL_OUTPUTS, "^^speaker", 0.20, 1);
 }

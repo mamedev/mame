@@ -10,7 +10,7 @@
    Copyright (c) 2003      Greg Stein <gstein@users.sourceforge.net>
    Copyright (c) 2005-2007 Steven Solie <steven@solie.ca>
    Copyright (c) 2005-2012 Karl Waclawek <karl@waclawek.net>
-   Copyright (c) 2016-2024 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2016-2025 Sebastian Pipping <sebastian@pipping.org>
    Copyright (c) 2017-2022 Rhodri James <rhodri@wildebeest.org.uk>
    Copyright (c) 2017      Joe Orton <jorton@redhat.com>
    Copyright (c) 2017      José Gutiérrez de la Concha <jose@zeroc.com>
@@ -19,6 +19,7 @@
    Copyright (c) 2020      Tim Gates <tim.gates@iress.com>
    Copyright (c) 2021      Donghee Na <donghee.na@python.org>
    Copyright (c) 2023-2024 Sony Corporation / Snild Dolkow <snild@sony.com>
+   Copyright (c) 2024-2025 Berkay Eren Ürün <berkay.ueruen@siemens.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -1191,6 +1192,22 @@ START_TEST(test_not_standalone_handler_accept) {
 }
 END_TEST
 
+START_TEST(test_entity_start_tag_level_greater_than_one) {
+  const char *const text = "<!DOCTYPE t1 [\n"
+                           "  <!ENTITY e1 'hello'>\n"
+                           "]>\n"
+                           "<t1>\n"
+                           "  <t2>&e1;</t2>\n"
+                           "</t1>\n";
+
+  XML_Parser parser = XML_ParserCreate(NULL);
+  assert_true(_XML_Parse_SINGLE_BYTES(parser, text, (int)strlen(text),
+                                      /*isFinal*/ XML_TRUE)
+              == XML_STATUS_OK);
+  XML_ParserFree(parser);
+}
+END_TEST
+
 START_TEST(test_wfc_no_recursive_entity_refs) {
   const char *text = "<!DOCTYPE doc [\n"
                      "  <!ENTITY entity '&#38;entity;'>\n"
@@ -1199,6 +1216,93 @@ START_TEST(test_wfc_no_recursive_entity_refs) {
 
   expect_failure(text, XML_ERROR_RECURSIVE_ENTITY_REF,
                  "Parser did not report recursive entity reference.");
+}
+END_TEST
+
+START_TEST(test_no_indirectly_recursive_entity_refs) {
+  struct TestCase {
+    const char *doc;
+    bool usesParameterEntities;
+  };
+
+  const struct TestCase cases[] = {
+      // general entity + character data
+      {"<!DOCTYPE a [\n"
+       "  <!ENTITY e1 '&e2;'>\n"
+       "  <!ENTITY e2 '&e1;'>\n"
+       "]><a>&e2;</a>\n",
+       false},
+
+      // general entity + attribute value
+      {"<!DOCTYPE a [\n"
+       "  <!ENTITY e1 '&e2;'>\n"
+       "  <!ENTITY e2 '&e1;'>\n"
+       "]><a k1='&e2;' />\n",
+       false},
+
+      // parameter entity
+      {"<!DOCTYPE doc [\n"
+       "  <!ENTITY % p1 '&#37;p2;'>\n"
+       "  <!ENTITY % p2 '&#37;p1;'>\n"
+       "  <!ENTITY % define_g \"<!ENTITY g '&#37;p2;'>\">\n"
+       "  %define_g;\n"
+       "]>\n"
+       "<doc/>\n",
+       true},
+  };
+  const XML_Bool reset_or_not[] = {XML_TRUE, XML_FALSE};
+
+  for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+    for (size_t j = 0; j < sizeof(reset_or_not) / sizeof(reset_or_not[0]);
+         j++) {
+      const XML_Bool reset_wanted = reset_or_not[j];
+      const char *const doc = cases[i].doc;
+      const bool usesParameterEntities = cases[i].usesParameterEntities;
+
+      set_subtest("[%i,reset=%i] %s", (int)i, (int)j, doc);
+
+#ifdef XML_DTD // both GE and DTD
+      const bool rejection_expected = true;
+#elif XML_GE == 1 // GE but not DTD
+      const bool rejection_expected = ! usesParameterEntities;
+#else             // neither DTD nor GE
+      const bool rejection_expected = false;
+#endif
+
+      XML_Parser parser = XML_ParserCreate(NULL);
+
+#ifdef XML_DTD
+      if (usesParameterEntities) {
+        assert_true(
+            XML_SetParamEntityParsing(parser, XML_PARAM_ENTITY_PARSING_ALWAYS)
+            == 1);
+      }
+#else
+      UNUSED_P(usesParameterEntities);
+#endif // XML_DTD
+
+      const enum XML_Status status
+          = _XML_Parse_SINGLE_BYTES(parser, doc, (int)strlen(doc),
+                                    /*isFinal*/ XML_TRUE);
+
+      if (rejection_expected) {
+        assert_true(status == XML_STATUS_ERROR);
+        assert_true(XML_GetErrorCode(parser) == XML_ERROR_RECURSIVE_ENTITY_REF);
+      } else {
+        assert_true(status == XML_STATUS_OK);
+      }
+
+      if (reset_wanted) {
+        // This covers free'ing of (eventually) all three open entity lists by
+        // XML_ParserReset.
+        XML_ParserReset(parser, NULL);
+      }
+
+      // This covers free'ing of (eventually) all three open entity lists by
+      // XML_ParserFree (unless XML_ParserReset has already done that above).
+      XML_ParserFree(parser);
+    }
+  }
 }
 END_TEST
 
@@ -1417,7 +1521,9 @@ START_TEST(test_suspend_parser_between_char_data_calls) {
 
   XML_SetCharacterDataHandler(g_parser, clearing_aborting_character_handler);
   g_resumable = XML_TRUE;
-  if (_XML_Parse_SINGLE_BYTES(g_parser, text, (int)strlen(text), XML_TRUE)
+  // can't use SINGLE_BYTES here, because it'll return early on suspension, and
+  // we won't know exactly how much input we actually managed to give Expat.
+  if (XML_Parse(g_parser, text, (int)strlen(text), XML_TRUE)
       != XML_STATUS_SUSPENDED)
     xml_failure(g_parser);
   if (XML_GetErrorCode(g_parser) != XML_ERROR_NONE)
@@ -1446,7 +1552,9 @@ START_TEST(test_repeated_stop_parser_between_char_data_calls) {
   XML_SetCharacterDataHandler(g_parser, parser_stop_character_handler);
   g_resumable = XML_TRUE;
   g_abortable = XML_FALSE;
-  if (_XML_Parse_SINGLE_BYTES(g_parser, text, (int)strlen(text), XML_TRUE)
+  // can't use SINGLE_BYTES here, because it'll return early on suspension, and
+  // we won't know exactly how much input we actually managed to give Expat.
+  if (XML_Parse(g_parser, text, (int)strlen(text), XML_TRUE)
       != XML_STATUS_SUSPENDED)
     fail("Failed to double-suspend parser");
 
@@ -1830,12 +1938,19 @@ END_TEST
 
 /* Test suspending the parser in cdata handler */
 START_TEST(test_suspend_parser_between_cdata_calls) {
+  if (g_chunkSize != 0) {
+    // this test does not use SINGLE_BYTES, because of suspension
+    return;
+  }
+
   const char *text = long_cdata_text;
   enum XML_Status result;
 
   XML_SetCharacterDataHandler(g_parser, clearing_aborting_character_handler);
   g_resumable = XML_TRUE;
-  result = _XML_Parse_SINGLE_BYTES(g_parser, text, (int)strlen(text), XML_TRUE);
+  // can't use SINGLE_BYTES here, because it'll return early on suspension, and
+  // we won't know exactly how much input we actually managed to give Expat.
+  result = XML_Parse(g_parser, text, (int)strlen(text), XML_TRUE);
   if (result != XML_STATUS_SUSPENDED) {
     if (result == XML_STATUS_ERROR)
       xml_failure(g_parser);
@@ -2378,6 +2493,11 @@ END_TEST
  * entity.  Exercises some obscure code in XML_ParserReset().
  */
 START_TEST(test_reset_in_entity) {
+  if (g_chunkSize != 0) {
+    // this test does not use SINGLE_BYTES, because of suspension
+    return;
+  }
+
   const char *text = "<!DOCTYPE doc [\n"
                      "<!ENTITY wombat 'wom'>\n"
                      "<!ENTITY entity 'hi &wom; there'>\n"
@@ -2387,7 +2507,9 @@ START_TEST(test_reset_in_entity) {
 
   g_resumable = XML_TRUE;
   XML_SetCharacterDataHandler(g_parser, clearing_aborting_character_handler);
-  if (_XML_Parse_SINGLE_BYTES(g_parser, text, (int)strlen(text), XML_TRUE)
+  // can't use SINGLE_BYTES here, because it'll return early on suspension, and
+  // we won't know exactly how much input we actually managed to give Expat.
+  if (XML_Parse(g_parser, text, (int)strlen(text), XML_TRUE)
       == XML_STATUS_ERROR)
     xml_failure(g_parser);
   XML_GetParsingStatus(g_parser, &status);
@@ -3634,7 +3756,9 @@ START_TEST(test_suspend_xdecl) {
   XML_SetXmlDeclHandler(g_parser, entity_suspending_xdecl_handler);
   XML_SetUserData(g_parser, g_parser);
   g_resumable = XML_TRUE;
-  if (_XML_Parse_SINGLE_BYTES(g_parser, text, (int)strlen(text), XML_TRUE)
+  // can't use SINGLE_BYTES here, because it'll return early on suspension, and
+  // we won't know exactly how much input we actually managed to give Expat.
+  if (XML_Parse(g_parser, text, (int)strlen(text), XML_TRUE)
       != XML_STATUS_SUSPENDED)
     xml_failure(g_parser);
   if (XML_GetErrorCode(g_parser) != XML_ERROR_NONE)
@@ -3830,13 +3954,20 @@ END_TEST
 
 /* Test syntax error is caught at parse resumption */
 START_TEST(test_resume_entity_with_syntax_error) {
+  if (g_chunkSize != 0) {
+    // this test does not use SINGLE_BYTES, because of suspension
+    return;
+  }
+
   const char *text = "<!DOCTYPE doc [\n"
                      "<!ENTITY foo '<suspend>Hi</wombat>'>\n"
                      "]>\n"
                      "<doc>&foo;</doc>\n";
 
   XML_SetStartElementHandler(g_parser, start_element_suspender);
-  if (_XML_Parse_SINGLE_BYTES(g_parser, text, (int)strlen(text), XML_TRUE)
+  // can't use SINGLE_BYTES here, because it'll return early on suspension, and
+  // we won't know exactly how much input we actually managed to give Expat.
+  if (XML_Parse(g_parser, text, (int)strlen(text), XML_TRUE)
       != XML_STATUS_SUSPENDED)
     xml_failure(g_parser);
   if (XML_ResumeParser(g_parser) != XML_STATUS_ERROR)
@@ -3960,7 +4091,7 @@ START_TEST(test_skipped_null_loaded_ext_entity) {
       = {"<!ENTITY % pe1 SYSTEM 'http://example.org/two.ent'>\n"
          "<!ENTITY % pe2 '%pe1;'>\n"
          "%pe2;\n",
-         external_entity_null_loader};
+         external_entity_null_loader, NULL};
 
   XML_SetUserData(g_parser, &test_data);
   XML_SetParamEntityParsing(g_parser, XML_PARAM_ENTITY_PARSING_ALWAYS);
@@ -3978,7 +4109,7 @@ START_TEST(test_skipped_unloaded_ext_entity) {
       = {"<!ENTITY % pe1 SYSTEM 'http://example.org/two.ent'>\n"
          "<!ENTITY % pe2 '%pe1;'>\n"
          "%pe2;\n",
-         NULL};
+         NULL, NULL};
 
   XML_SetUserData(g_parser, &test_data);
   XML_SetParamEntityParsing(g_parser, XML_PARAM_ENTITY_PARSING_ALWAYS);
@@ -5278,6 +5409,151 @@ START_TEST(test_pool_integrity_with_unfinished_attr) {
 }
 END_TEST
 
+/* Test a possible early return location in internalEntityProcessor */
+START_TEST(test_entity_ref_no_elements) {
+  const char *const text = "<!DOCTYPE foo [\n"
+                           "<!ENTITY e1 \"test\">\n"
+                           "]> <foo>&e1;"; // intentionally missing newline
+
+  XML_Parser parser = XML_ParserCreate(NULL);
+  assert_true(_XML_Parse_SINGLE_BYTES(parser, text, (int)strlen(text), XML_TRUE)
+              == XML_STATUS_ERROR);
+  assert_true(XML_GetErrorCode(parser) == XML_ERROR_NO_ELEMENTS);
+  XML_ParserFree(parser);
+}
+END_TEST
+
+/* Tests if chained entity references lead to unbounded recursion */
+START_TEST(test_deep_nested_entity) {
+  const size_t N_LINES = 60000;
+  const size_t SIZE_PER_LINE = 50;
+
+  char *const text = (char *)malloc((N_LINES + 4) * SIZE_PER_LINE);
+  if (text == NULL) {
+    fail("malloc failed");
+  }
+
+  char *textPtr = text;
+
+  // Create the XML
+  textPtr += snprintf(textPtr, SIZE_PER_LINE,
+                      "<!DOCTYPE foo [\n"
+                      "	<!ENTITY s0 'deepText'>\n");
+
+  for (size_t i = 1; i < N_LINES; ++i) {
+    textPtr += snprintf(textPtr, SIZE_PER_LINE, "  <!ENTITY s%lu '&s%lu;'>\n",
+                        (long unsigned)i, (long unsigned)(i - 1));
+  }
+
+  snprintf(textPtr, SIZE_PER_LINE, "]> <foo>&s%lu;</foo>\n",
+           (long unsigned)(N_LINES - 1));
+
+  const XML_Char *const expected = XCS("deepText");
+
+  CharData storage;
+  CharData_Init(&storage);
+
+  XML_Parser parser = XML_ParserCreate(NULL);
+
+  XML_SetCharacterDataHandler(parser, accumulate_characters);
+  XML_SetUserData(parser, &storage);
+
+  if (_XML_Parse_SINGLE_BYTES(parser, text, (int)strlen(text), XML_TRUE)
+      == XML_STATUS_ERROR)
+    xml_failure(parser);
+
+  CharData_CheckXMLChars(&storage, expected);
+  XML_ParserFree(parser);
+  free(text);
+}
+END_TEST
+
+/* Tests if chained entity references in attributes
+lead to unbounded recursion */
+START_TEST(test_deep_nested_attribute_entity) {
+  const size_t N_LINES = 60000;
+  const size_t SIZE_PER_LINE = 100;
+
+  char *const text = (char *)malloc((N_LINES + 4) * SIZE_PER_LINE);
+  if (text == NULL) {
+    fail("malloc failed");
+  }
+
+  char *textPtr = text;
+
+  // Create the XML
+  textPtr += snprintf(textPtr, SIZE_PER_LINE,
+                      "<!DOCTYPE foo [\n"
+                      "	<!ENTITY s0 'deepText'>\n");
+
+  for (size_t i = 1; i < N_LINES; ++i) {
+    textPtr += snprintf(textPtr, SIZE_PER_LINE, "  <!ENTITY s%lu '&s%lu;'>\n",
+                        (long unsigned)i, (long unsigned)(i - 1));
+  }
+
+  snprintf(textPtr, SIZE_PER_LINE, "]> <foo name='&s%lu;'>mainText</foo>\n",
+           (long unsigned)(N_LINES - 1));
+
+  AttrInfo doc_info[] = {{XCS("name"), XCS("deepText")}, {NULL, NULL}};
+  ElementInfo info[] = {{XCS("foo"), 1, NULL, NULL}, {NULL, 0, NULL, NULL}};
+  info[0].attributes = doc_info;
+
+  XML_Parser parser = XML_ParserCreate(NULL);
+  ParserAndElementInfo parserPlusElemenInfo = {parser, info};
+
+  XML_SetStartElementHandler(parser, counting_start_element_handler);
+  XML_SetUserData(parser, &parserPlusElemenInfo);
+
+  if (_XML_Parse_SINGLE_BYTES(parser, text, (int)strlen(text), XML_TRUE)
+      == XML_STATUS_ERROR)
+    xml_failure(parser);
+
+  XML_ParserFree(parser);
+  free(text);
+}
+END_TEST
+
+START_TEST(test_deep_nested_entity_delayed_interpretation) {
+  const size_t N_LINES = 70000;
+  const size_t SIZE_PER_LINE = 100;
+
+  char *const text = (char *)malloc((N_LINES + 4) * SIZE_PER_LINE);
+  if (text == NULL) {
+    fail("malloc failed");
+  }
+
+  char *textPtr = text;
+
+  // Create the XML
+  textPtr += snprintf(textPtr, SIZE_PER_LINE,
+                      "<!DOCTYPE foo [\n"
+                      "	<!ENTITY %% s0 'deepText'>\n");
+
+  for (size_t i = 1; i < N_LINES; ++i) {
+    textPtr += snprintf(textPtr, SIZE_PER_LINE,
+                        "  <!ENTITY %% s%lu '&#37;s%lu;'>\n", (long unsigned)i,
+                        (long unsigned)(i - 1));
+  }
+
+  snprintf(textPtr, SIZE_PER_LINE,
+           "  <!ENTITY %% define_g \"<!ENTITY g '&#37;s%lu;'>\">\n"
+           "  %%define_g;\n"
+           "]>\n"
+           "<foo/>\n",
+           (long unsigned)(N_LINES - 1));
+
+  XML_Parser parser = XML_ParserCreate(NULL);
+
+  XML_SetParamEntityParsing(parser, XML_PARAM_ENTITY_PARSING_ALWAYS);
+  if (_XML_Parse_SINGLE_BYTES(parser, text, (int)strlen(text), XML_TRUE)
+      == XML_STATUS_ERROR)
+    xml_failure(parser);
+
+  XML_ParserFree(parser);
+  free(text);
+}
+END_TEST
+
 START_TEST(test_nested_entity_suspend) {
   const char *const text = "<!DOCTYPE a [\n"
                            "  <!ENTITY e1 '<!--e1-->'>\n"
@@ -5294,6 +5570,35 @@ START_TEST(test_nested_entity_suspend) {
 
   XML_SetParamEntityParsing(parser, XML_PARAM_ENTITY_PARSING_ALWAYS);
   XML_SetCommentHandler(parser, accumulate_and_suspend_comment_handler);
+  XML_SetUserData(parser, &parserPlusStorage);
+
+  enum XML_Status status = XML_Parse(parser, text, (int)strlen(text), XML_TRUE);
+  while (status == XML_STATUS_SUSPENDED) {
+    status = XML_ResumeParser(parser);
+  }
+  if (status != XML_STATUS_OK)
+    xml_failure(parser);
+
+  CharData_CheckXMLChars(&storage, expected);
+  XML_ParserFree(parser);
+}
+END_TEST
+
+START_TEST(test_nested_entity_suspend_2) {
+  const char *const text = "<!DOCTYPE doc [\n"
+                           "  <!ENTITY ge1 'head1Ztail1'>\n"
+                           "  <!ENTITY ge2 'head2&ge1;tail2'>\n"
+                           "  <!ENTITY ge3 'head3&ge2;tail3'>\n"
+                           "]>\n"
+                           "<doc>&ge3;</doc>";
+  const XML_Char *const expected = XCS("head3") XCS("head2") XCS("head1")
+      XCS("Z") XCS("tail1") XCS("tail2") XCS("tail3");
+  CharData storage;
+  CharData_Init(&storage);
+  XML_Parser parser = XML_ParserCreate(NULL);
+  ParserPlusStorage parserPlusStorage = {parser, &storage};
+
+  XML_SetCharacterDataHandler(parser, accumulate_char_data_and_suspend);
   XML_SetUserData(parser, &parserPlusStorage);
 
   enum XML_Status status = XML_Parse(parser, text, (int)strlen(text), XML_TRUE);
@@ -5968,7 +6273,9 @@ make_basic_test_case(Suite *s) {
   tcase_add_test(tc_basic, test_wfc_undeclared_entity_with_external_subset);
   tcase_add_test(tc_basic, test_not_standalone_handler_reject);
   tcase_add_test(tc_basic, test_not_standalone_handler_accept);
+  tcase_add_test(tc_basic, test_entity_start_tag_level_greater_than_one);
   tcase_add_test__if_xml_ge(tc_basic, test_wfc_no_recursive_entity_refs);
+  tcase_add_test(tc_basic, test_no_indirectly_recursive_entity_refs);
   tcase_add_test__ifdef_xml_dtd(tc_basic, test_ext_entity_invalid_parse);
   tcase_add_test__if_xml_ge(tc_basic, test_dtd_default_handling);
   tcase_add_test(tc_basic, test_dtd_attr_handling);
@@ -6147,7 +6454,13 @@ make_basic_test_case(Suite *s) {
   tcase_add_test(tc_basic, test_empty_element_abort);
   tcase_add_test__ifdef_xml_dtd(tc_basic,
                                 test_pool_integrity_with_unfinished_attr);
+  tcase_add_test__if_xml_ge(tc_basic, test_entity_ref_no_elements);
+  tcase_add_test__if_xml_ge(tc_basic, test_deep_nested_entity);
+  tcase_add_test__if_xml_ge(tc_basic, test_deep_nested_attribute_entity);
+  tcase_add_test__if_xml_ge(tc_basic,
+                            test_deep_nested_entity_delayed_interpretation);
   tcase_add_test__if_xml_ge(tc_basic, test_nested_entity_suspend);
+  tcase_add_test__if_xml_ge(tc_basic, test_nested_entity_suspend_2);
   tcase_add_test(tc_basic, test_big_tokens_scale_linearly);
   tcase_add_test(tc_basic, test_set_reparse_deferral);
   tcase_add_test(tc_basic, test_reparse_deferral_is_inherited);

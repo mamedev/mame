@@ -940,6 +940,24 @@ ROM_START( luckstrn )
 	ROM_LOAD( "6.r1", 0x40000, 0x20000, CRC(16823fb7) SHA1(e62b5fbf7a105df128dd9dd6d45e59f0ffef5bb8) )
 ROM_END
 
+ROM_START( luckstrna )
+	ROM_REGION( 0x4000, "maincpu", 0 ) // internal Z180 ROM
+	ROM_LOAD( "internal_rom", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "rom_data", 0 ) // external data / CPU ROM
+	ROM_LOAD( "16.t1", 0x00000, 0x20000, CRC(1906dd3e) SHA1(35c7d5a6f2dc6291ab5e40ab56951ac7b384ff16) )
+
+	ROM_REGION( 0x60000, "reels", 0 )
+	ROM_LOAD( "1.c1", 0x00000, 0x20000, CRC(1fca2f4f) SHA1(e54595e387c3a742ebf777a2c2795c2d64ec166b) ) // 1ST AND 2ND HALF IDENTICAL, half unused, 5bpp
+	ROM_LOAD( "2.e1", 0x20000, 0x20000, CRC(311a1801) SHA1(ed822dc5b38408221dfbde767abd675c53a766f8) )
+	ROM_LOAD( "3.h1", 0x40000, 0x20000, CRC(ae557bbd) SHA1(4b4ddb5fbb36019c4bd0cfab6a229f3ad09ac95a) )
+
+	ROM_REGION( 0x60000, "gfx2", 0 )
+	ROM_LOAD( "4.l1", 0x00000, 0x20000, CRC(00a1b66d) SHA1(107306689032d5a56fc9337e22a447bad4c371e4) ) // half unused, 5bpp
+	ROM_LOAD( "5.n1", 0x20000, 0x20000, CRC(df29763e) SHA1(5468cccae98aa7e5b141cdb1fc899f418c79f6e7) )
+	ROM_LOAD( "6.r1", 0x40000, 0x20000, CRC(16823fb7) SHA1(e62b5fbf7a105df128dd9dd6d45e59f0ffef5bb8) )
+ROM_END
+
 ROM_START( 7smash )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "eagle.8",      0x000000, 0x020000, CRC(b115c5d5) SHA1(3f80613886b7f8092ec914c9bfb416078aca82a3) )
@@ -967,7 +985,8 @@ ROM_END
 *                Game Drivers                *
 **********************************************/
 
-//     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT           ROT   COMPANY           FULL NAME                                 FLAGS                                     LAYOUT
-GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180-based hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln )
-GAMEL( 1991, luckstrn, 0,      luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Star (newer Z180-based hardware)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln ) // missing internal ROM dump
-GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  luckgrln_state, empty_init,    ROT0, "Sovic",          "7 Smash",                                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_7smash )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY           FULL NAME                                        FLAGS                                     LAYOUT
+GAMEL( 1991, luckgrln,  0,        luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180-based hardware)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln )
+GAMEL( 1991, luckstrn,  0,        luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Star (newer Z180-based hardware, set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln ) // missing internal ROM dump
+GAMEL( 1991, luckstrna, luckstrn, luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Star (newer Z180-based hardware, set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln ) // missing internal ROM dump
+GAMEL( 1993, 7smash,    0,        _7smash,  _7smash,  luckgrln_state, empty_init,    ROT0, "Sovic",          "7 Smash",                                       MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_7smash )

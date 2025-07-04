@@ -10,20 +10,53 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "vdu80.h"
 
+#include "video/mc6845.h"
+#include "emupal.h"
+#include "screen.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(ACORN_VDU80, acorn_vdu80_device, "acorn_vdu80", "Acorn 80x25 VDU Interface")
+namespace {
+
+class acorn_vdu80_device : public device_t, public device_acorn_bus_interface
+{
+public:
+	acorn_vdu80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, ACORN_VDU80, tag, owner, clock)
+		, device_acorn_bus_interface(mconfig, *this)
+		, m_chargen(*this, "chargen")
+		, m_videoram(*this, "videoram", 0x800, ENDIANNESS_LITTLE)
+		, m_crtc(*this, "mc6845")
+		, m_palette(*this, "palette")
+		, m_links(*this, "LINKS")
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+private:
+	required_memory_region m_chargen;
+	memory_share_creator<uint8_t> m_videoram;
+	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
+	required_ioport m_links;
+
+	MC6845_UPDATE_ROW(crtc_update_row);
+};
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( vdu80 )
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 INPUT_PORTS_START( vdu80 )
@@ -36,11 +69,6 @@ INPUT_PORTS_START( vdu80 )
 	PORT_CONFSETTING(0x02, DEF_STR(Yes))
 INPUT_PORTS_END
 
-
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
 ioport_constructor acorn_vdu80_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( vdu80 );
@@ -48,13 +76,18 @@ ioport_constructor acorn_vdu80_device::device_input_ports() const
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( vdu80 )
+//  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 ROM_START( vdu80 )
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD("80chvdu.ic13", 0x0000, 0x0800, CRC(a943f01b) SHA1(04c326a745ba6a78185ebc2adeecb53a166a6ab3))
 ROM_END
+
+const tiny_rom_entry *acorn_vdu80_device::device_rom_region() const
+{
+	return ROM_NAME( vdu80 );
+}
 
 
 //-------------------------------------------------
@@ -89,10 +122,10 @@ GFXDECODE_END
 
 void acorn_vdu80_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_color(rgb_t::white());
-	m_screen->set_raw(12_MHz_XTAL, 768, 132, 612, 312, 20, 270);
-	m_screen->set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::white());
+	screen.set_raw(12_MHz_XTAL, 768, 132, 612, 312, 20, 270);
+	screen.set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_acorn_vdu80);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
@@ -105,39 +138,12 @@ void acorn_vdu80_device::device_add_mconfig(machine_config &config)
 }
 
 
-const tiny_rom_entry *acorn_vdu80_device::device_rom_region() const
-{
-	return ROM_NAME( vdu80 );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  acorn_vdu80_device - constructor
-//-------------------------------------------------
-
-acorn_vdu80_device::acorn_vdu80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ACORN_VDU80, tag, owner, clock)
-	, device_acorn_bus_interface(mconfig, *this)
-	, m_chargen(*this, "chargen")
-	, m_screen(*this, "screen")
-	, m_crtc(*this, "mc6845")
-	, m_palette(*this, "palette")
-	, m_links(*this, "LINKS")
-{
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void acorn_vdu80_device::device_start()
 {
-	/* allocate m_videoram */
-	m_videoram = std::make_unique<uint8_t[]>(0x0800);
 }
 
 //-------------------------------------------------
@@ -150,17 +156,17 @@ void acorn_vdu80_device::device_reset()
 
 	if (m_links->read() & 0x01)
 	{
-		space.install_ram(0xf000, 0x0f7ff, m_videoram.get());
+		space.install_ram(0xf000, 0x0f7ff, m_videoram);
 
-		space.install_readwrite_handler(0xe840, 0xe840, 0, 0x3f, 0, read8smo_delegate(*m_crtc, FUNC(mc6845_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
-		space.install_readwrite_handler(0xe841, 0xe841, 0, 0x3e, 0, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
+		space.install_readwrite_handler(0xe840, 0xe840, 0, 0x3f, 0, emu::rw_delegate(*m_crtc, FUNC(mc6845_device::status_r)), emu::rw_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
+		space.install_readwrite_handler(0xe841, 0xe841, 0, 0x3e, 0, emu::rw_delegate(*m_crtc, FUNC(mc6845_device::register_r)), emu::rw_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
 	}
 	else
 	{
-		space.install_ram(0x1000, 0x017ff, m_videoram.get());
+		space.install_ram(0x1000, 0x017ff, m_videoram);
 
-		space.install_readwrite_handler(0x1840, 0x1840, 0, 0x3f, 0, read8smo_delegate(*m_crtc, FUNC(mc6845_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
-		space.install_readwrite_handler(0x1841, 0x1841, 0, 0x3e, 0, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
+		space.install_readwrite_handler(0x1840, 0x1840, 0, 0x3f, 0, emu::rw_delegate(*m_crtc, FUNC(mc6845_device::status_r)), emu::rw_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
+		space.install_readwrite_handler(0x1841, 0x1841, 0, 0x3e, 0, emu::rw_delegate(*m_crtc, FUNC(mc6845_device::register_r)), emu::rw_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
 	}
 }
 
@@ -193,3 +199,8 @@ MC6845_UPDATE_ROW(acorn_vdu80_device::crtc_update_row)
 		}
 	}
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(ACORN_VDU80, device_acorn_bus_interface, acorn_vdu80_device, "acorn_vdu80", "Acorn 80x25 VDU Interface")

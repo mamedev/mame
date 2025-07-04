@@ -123,7 +123,8 @@ space:install_read_tap(start, end, name, callback)
     Installs a :ref:`pass-through handler <luascript-ref-addrspacetap>` that
     will receive notifications on reads from the specified range of addresses in
     the address space.  The start and end addresses are inclusive.  The name
-    must be a string, and the callback must be a function.
+    must be a string, and the callback must be a function.  Returns the new
+    pass-through handler.
 
     The callback is passed three arguments for the access offset, the data read,
     and the memory access mask.  The offset is the absolute offset into the
@@ -134,7 +135,8 @@ space:install_write_tap(start, end, name, callback)
     Installs a :ref:`pass-through handler <luascript-ref-addrspacetap>` that
     will receive notifications on write to the specified range of addresses in
     the address space.  The start and end addresses are inclusive.  The name
-    must be a string, and the callback must be a function.
+    must be a string, and the callback must be a function.  Returns the new
+    pass-through handler.
 
     The callback is passed three arguments for the access offset, the data
     written, and the memory access mask.  The offset is the absolute offset into

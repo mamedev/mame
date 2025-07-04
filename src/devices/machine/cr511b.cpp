@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(CR511B, cr511b_device, "cr511b", "CR-511-B CD-ROM drive")
 
 cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cdrom_image_device(mconfig, CR511B, tag, owner, clock),
-	device_mixer_interface(mconfig, *this, 2),
+	device_mixer_interface(mconfig, *this),
 	m_cdda(*this, "cdda"),
 	m_stch_cb(*this),
 	m_sten_cb(*this),
@@ -72,8 +72,8 @@ cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, dev
 void cr511b_device::device_add_mconfig(machine_config &config)
 {
 	CDDA(config, m_cdda);
-	m_cdda->add_route(0, DEVICE_SELF, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_cdda->add_route(1, DEVICE_SELF, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_cdda->add_route(0, DEVICE_SELF, 1.0, 0);
+	m_cdda->add_route(1, DEVICE_SELF, 1.0, 1);
 	m_cdda->set_cdrom_tag(*this);
 	m_cdda->audio_end_cb().set(FUNC(cr511b_device::audio_end_cb));
 }

@@ -119,26 +119,19 @@ device_memory_interface::space_config_vector rf5c68_device::memory_space_config(
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void rf5c68_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void rf5c68_device::sound_stream_update(sound_stream &stream)
 {
-	auto &left = outputs[0];
-	auto &right = outputs[1];
-
 	/* bail if not enabled */
 	if (!m_enable)
-	{
-		left.fill(0);
-		right.fill(0);
 		return;
-	}
 
-	if (m_mixleft.size() < left.samples())
-		m_mixleft.resize(left.samples());
-	if (m_mixright.size() < right.samples())
-		m_mixright.resize(right.samples());
+	if (m_mixleft.size() < stream.samples())
+		m_mixleft.resize(stream.samples());
+	if (m_mixright.size() < stream.samples())
+		m_mixright.resize(stream.samples());
 
-	std::fill_n(&m_mixleft[0], left.samples(), 0);
-	std::fill_n(&m_mixright[0], right.samples(), 0);
+	std::fill_n(&m_mixleft[0], stream.samples(), 0);
+	std::fill_n(&m_mixright[0], stream.samples(), 0);
 
 	/* loop over channels */
 	for (pcm_channel &chan : m_chan)
@@ -150,7 +143,7 @@ void rf5c68_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			int rv = ((chan.pan >> 4) & 0x0f) * chan.env;
 
 			/* loop over the sample buffer */
-			for (int j = 0; j < left.samples(); j++)
+			for (int j = 0; j < stream.samples(); j++)
 			{
 				int sample;
 
@@ -196,10 +189,10 @@ void rf5c68_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	*/
 	const u8 output_shift = (m_output_bits > 16) ? 0 : (16 - m_output_bits);
 	const s32 output_nandmask = (1 << output_shift) - 1;
-	for (int j = 0; j < left.samples(); j++)
+	for (int j = 0; j < stream.samples(); j++)
 	{
-		left.put_int_clamp(j, m_mixleft[j] & ~output_nandmask, 32768);
-		right.put_int_clamp(j, m_mixright[j] & ~output_nandmask, 32768);
+		stream.put_int_clamp(0, j, m_mixleft[j] & ~output_nandmask, 32768);
+		stream.put_int_clamp(1, j, m_mixright[j] & ~output_nandmask, 32768);
 	}
 }
 

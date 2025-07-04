@@ -928,11 +928,10 @@ void magictg_state::magictg(machine_config &config)
 	m_adsp->set_addrmap(AS_DATA, &magictg_state::adsp_data_map);
 	m_adsp->set_addrmap(AS_IO, &magictg_state::adsp_io_map);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
 	pcibus.set_device(0, FUNC(magictg_state::pci_dev0_r), FUNC(magictg_state::pci_dev0_w));

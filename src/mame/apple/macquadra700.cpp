@@ -396,6 +396,9 @@ u16 quadrax00_state::swim_r(offs_t offset, u16 mem_mask)
 void quadrax00_state::swim_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_swim->write((offset >> 8) & 0xf, data >> 8);
+
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
 }
 
 void eclipse_state::fdc_hdsel(int state)
@@ -759,8 +762,8 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
 																								 {
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0); });
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1); });
 		NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
@@ -800,12 +803,11 @@ void eclipse_state::via2_out_b_q900(u8 data)
 
 		MACADB(config, m_macadb, C15M);
 
-		SPEAKER(config, "lspeaker").front_left();
-		SPEAKER(config, "rspeaker").front_right();
+		SPEAKER(config, "speaker", 2).front();
 		ASC(config, m_easc, 22.5792_MHz_XTAL, asc_device::asc_type::EASC);
 		m_easc->irqf_callback().set(m_via2, FUNC(via6522_device::write_cb1)).invert();
-		m_easc->add_route(0, "lspeaker", 1.0);
-		m_easc->add_route(1, "rspeaker", 1.0);
+		m_easc->add_route(0, "speaker", 1.0, 0);
+		m_easc->add_route(1, "speaker", 1.0, 1);
 
 		// DFAC is only for audio input on Q700/Q800
 		APPLE_DFAC(config, m_dfac, 22257);
@@ -866,8 +868,8 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		m_sccpic->hint_callback().set(FUNC(eclipse_state::scc_irq_w));
 
 		m_scc->out_int_callback().set(m_sccpic, FUNC(applepic_device::pint_w));
-		m_scc->out_wreqa_callback().set(m_sccpic, FUNC(applepic_device::reqa_w));
-		m_scc->out_wreqb_callback().set(m_sccpic, FUNC(applepic_device::reqb_w));
+		m_scc->out_wreqa_callback().set(m_sccpic, FUNC(applepic_device::reqa_w)).invert();
+		m_scc->out_wreqb_callback().set(m_sccpic, FUNC(applepic_device::reqb_w)).invert();
 
 		APPLEPIC(config, m_swimpic, C15M);
 		m_swimpic->prd_callback().set(m_swim, FUNC(applefdintf_device::read));

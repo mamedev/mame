@@ -49,6 +49,7 @@ public:
 	virtual void device_add_mconfig(machine_config& config) override;
 
 	void set_bootmode(int mode) { m_boot_mode = mode; }
+	void set_alt_periodic_irq(bool alt) { m_alt_periodic_irq = alt; }
 
 	IRQ_CALLBACK_MEMBER(irq_vector_cb);
 	template <typename... T> void set_cs_config_callback(T &&... args) { m_cs_callback.set(std::forward<T>(args)...); }
@@ -296,10 +297,12 @@ private:
 	void unkarea_78b8_w(uint16_t data);
 
 	uint16_t unkarea_78c0_r();
+	uint16_t unkarea_78c8_r();
 
 	uint16_t unkarea_78d0_r();
 	uint16_t unkarea_78d8_r();
 
+	uint16_t unkarea_78f0_r();
 	void unkarea_78f0_w(uint16_t data);
 
 	uint16_t unkarea_7904_r();
@@ -320,7 +323,7 @@ private:
 	void unkarea_7960_w(uint16_t data);
 	uint16_t unkarea_7961_r();
 	void unkarea_7961_w(uint16_t data);
-
+	uint16_t unkarea_7962_r();
 
 	void videoirq_w(int state);
 	void audioirq_w(int state);
@@ -340,6 +343,8 @@ private:
 
 	inline uint16_t read_space(uint32_t offset);
 	inline void write_space(uint32_t offset, uint16_t data);
+
+	bool m_alt_periodic_irq; // might be multiple timers, might be a register to configure, currently a config option.
 
 	// config registers (external pins)
 	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on

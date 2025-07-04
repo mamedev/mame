@@ -479,13 +479,12 @@ void mu100_state::mu100b(machine_config &config)
 	PLG1X0_CONNECTOR(config, m_ext1, plg1x0_intf, nullptr);
 	m_ext1->midi_tx().set(FUNC(mu100_state::e1_tx));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SWP30(config, m_swp30);
 	m_swp30->set_addrmap(AS_DATA, &mu100_state::swp30_map);
-	m_swp30->add_route(0, "lspeaker", 1.0);
-	m_swp30->add_route(1, "rspeaker", 1.0);
+	m_swp30->add_route(0, "speaker", 1.0, 0);
+	m_swp30->add_route(1, "speaker", 1.0, 1);
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);

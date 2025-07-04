@@ -49,18 +49,18 @@ public:
 		m_49way_y(*this, "49WAYY")
 	{ }
 
-	void williams_base(machine_config &config);
-	void williams_b1(machine_config &config);
+	void williams_base(machine_config &config) ATTR_COLD;
+	void williams_b1(machine_config &config) ATTR_COLD;
 
-	void joust(machine_config &config);
-	void bubbles(machine_config &config);
-	void sinistar_upright(machine_config &config);
-	void sinistar_cockpit(machine_config &config);
-	void splat(machine_config &config);
-	void playball(machine_config &config);
-	void spdball(machine_config &config);
-	void alienar(machine_config &config);
-	void lottofun(machine_config &config);
+	void joust(machine_config &config) ATTR_COLD;
+	void bubbles(machine_config &config) ATTR_COLD;
+	void sinistar_upright(machine_config &config) ATTR_COLD;
+	void sinistar_cockpit(machine_config &config) ATTR_COLD;
+	void splat(machine_config &config) ATTR_COLD;
+	void playball(machine_config &config) ATTR_COLD;
+	void spdball(machine_config &config) ATTR_COLD;
+	void alienar(machine_config &config) ATTR_COLD;
+	void lottofun(machine_config &config) ATTR_COLD;
 
 	virtual u8 video_counter_r();
 	virtual void watchdog_reset_w(u8 data);
@@ -69,7 +69,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(count240_callback);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void palette_init(palette_device &palette) const;
+	void palette_init(palette_device &palette) const ATTR_COLD;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -106,7 +106,7 @@ protected:
 	void playball_snd_cmd_w(u8 data);
 	void cockpit_snd_cmd_w(u8 data);
 
-	void williams_muxed(machine_config &config);
+	void williams_muxed(machine_config &config) ATTR_COLD;
 
 	void main_map(address_map &map) ATTR_COLD;
 	void main_map_blitter(address_map &map) ATTR_COLD;
@@ -126,11 +126,12 @@ public:
 		williams_state(mconfig, type, tag)
 	{ }
 
-	void defender(machine_config &config);
-	void defender_6802snd(machine_config &config);
-	void jin(machine_config &config);
+	void defender(machine_config &config) ATTR_COLD;
+	void defender_6802snd(machine_config &config) ATTR_COLD;
+	void jin(machine_config &config) ATTR_COLD;
+	void nextcent(machine_config &config) ATTR_COLD;
 
-	void init_defndjeu();
+	void init_defndjeu() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -153,7 +154,7 @@ public:
 		defender_state(mconfig, type, tag)
 	{ }
 
-	void mayday(machine_config &config);
+	void mayday(machine_config &config) ATTR_COLD;
 
 private:
 	void mayday_main_map(address_map &map) ATTR_COLD;
@@ -187,8 +188,8 @@ public:
 		m_mainbank(*this, "mainbank")
 	{ }
 
-	void blastkit(machine_config &config);
-	void blaster(machine_config &config);
+	void blastkit(machine_config &config) ATTR_COLD;
+	void blaster(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -227,7 +228,7 @@ public:
 		m_offset({ 0.00f, 0.00f, 0.00f })
 	{ }
 
-	void inferno(machine_config &config);
+	void inferno(machine_config &config) ATTR_COLD;
 
 	INPUT_CHANGED_MEMBER(rgb_gain)
 	{
@@ -251,7 +252,7 @@ protected:
 	std::array<float, 3> m_gain;
 	std::array<float, 3> m_offset;
 
-	void williams2_base(machine_config &config);
+	void williams2_base(machine_config &config) ATTR_COLD;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -300,7 +301,7 @@ public:
 		m_offset = { -0.27f, 0.00f, -0.22f };
 	}
 
-	void mysticm(machine_config &config);
+	void mysticm(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -330,7 +331,7 @@ public:
 		m_feather_blower(*this, "Feather_Blower")
 	{ }
 
-	void tshoot(machine_config &config);
+	void tshoot(machine_config &config) ATTR_COLD;
 
 	template <int P> ioport_value gun_r();
 
@@ -358,7 +359,7 @@ public:
 		m_bg(*this, "bg")
 	{ }
 
-	void joust2(machine_config &config);
+	void joust2(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;

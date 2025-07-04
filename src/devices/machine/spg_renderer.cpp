@@ -134,7 +134,7 @@ void spg_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screen
 
 			if (!(rgb & 0x8000))
 			{
-				if (Blend)
+				if (Blend && !(m_linebuf[realdrawpos] & 0x8000))
 				{
 
 					m_linebuf[realdrawpos] = (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 10) & 0x1f,  (rgb >> 10) & 0x1f, blendlevel) << 10) |
@@ -791,7 +791,7 @@ void spg_renderer_device::new_line(const rectangle& cliprect)
 
 	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 	{
-		m_linebuf[x] = 0x0000;
+		m_linebuf[x] = 0x8000; // transparent
 	}
 }
 
@@ -856,7 +856,8 @@ void spg_renderer_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const 
 
 	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 	{
-		*src = m_rgb555_to_rgb888_current[m_linebuf[x]];
+		uint16_t px = (m_linebuf[x] & 0x8000) ? 0x0 : m_linebuf[x];
+		*src = m_rgb555_to_rgb888_current[px];
 		src++;
 	}
 }

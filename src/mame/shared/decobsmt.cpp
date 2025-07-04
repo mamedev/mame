@@ -54,8 +54,8 @@ void decobsmt_device::device_add_mconfig(machine_config &config)
 	BSMT2000(config, m_bsmt, XTAL(24'000'000));
 	m_bsmt->set_addrmap(0, &decobsmt_device::bsmt_map);
 	m_bsmt->set_ready_callback(FUNC(decobsmt_device::bsmt_ready_callback));
-	m_bsmt->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_bsmt->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_bsmt->add_route(0, *this, 1.0, 0);
+	m_bsmt->add_route(1, *this, 1.0, 1);
 }
 
 //**************************************************************************
@@ -68,7 +68,7 @@ void decobsmt_device::device_add_mconfig(machine_config &config)
 
 decobsmt_device::decobsmt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECOBSMT, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_ourcpu(*this, "soundcpu")
 	, m_bsmt(*this, "bsmt")
 	, m_bsmt_latch(0)

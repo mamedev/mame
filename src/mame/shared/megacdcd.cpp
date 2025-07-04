@@ -1161,8 +1161,8 @@ void lc89510_temp_device::device_add_mconfig(machine_config &config)
 	TIMER(config, "hock_timer").configure_periodic(FUNC(lc89510_temp_device::segacd_access_timer_callback), attotime::from_hz(75));
 
 	cdda_device &cdda(CDDA(config, "cdda"));
-	cdda.add_route(0, ":lspeaker", 0.50); // TODO: accurate volume balance
-	cdda.add_route(1, ":rspeaker", 0.50);
+	cdda.add_route(0, ":speaker", 0.50, 0); // TODO: accurate volume balance
+	cdda.add_route(1, ":speaker", 0.50, 1);
 	cdda.set_cdrom_tag(m_cdrom);
 }
 

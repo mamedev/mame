@@ -538,7 +538,7 @@ This list shows the standard keyboard configuration.
     Player 1 Hanafuda No
 **O**
     Player 1 Taiwanese Mahjong O
-**Semicolon**
+**P**
     Player 1 Taiwanese Mahjong P
 **Q**
     Player 1 Taiwanese Mahjong Q
@@ -582,6 +582,7 @@ buttons.
     navigate the internal operator service menus)
 **0** *(not numeric keypad)*
     Service 2
+
     Book-Keeping (for machines that have this functionality)
 **-** *(not numeric keypad)*
     Service 3
@@ -595,25 +596,25 @@ buttons.
     Deal
 **L**
     Stand
-**4** *(not numeric keypad)*
-    Take Score
-
-    For games that allow gambling winnings in a double-or-nothing bonus game,
-    this takes the winnings from the main game.
-**3** *(not numeric keypad)*
+**D**
     Double Up
 
     For games that allow gambling winnings in a double-or-nothing bonus game,
     this gambles the winnings from the main game in the bonus game.
-**D**
+**F**
     Half Gamble
 
     Used by games that allow gambling half or all of the winnings from the main
-    game in the bonus game.
+    game in the bonus game, this stakes half the winnings from the main game.
+**G**
+    Take Score
+
+    For games that allow gambling winnings in a double-or-nothing bonus game,
+    this stakes the winnings from the main game.
 **A**
-    High
+    High/big
 **S**
-    Low
+    Low/small
 **O**
     Door
 

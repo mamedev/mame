@@ -230,7 +230,7 @@ void ad_59mc07_device::ay8910_porta_w(uint8_t data)
 void ad_59mc07_device::ay8910_portb_w(uint8_t data)
 {
 	// bongo 3
-	m_samples->set_volume(2, ((data & 0x30)>>4) * 0.33);
+	m_samples->set_volume(2, ((data & 0x30) >> 4) * 0.33);
 	if (data & ~m_ay_port_b & 0x80)
 		m_samples->start(2, 2);
 

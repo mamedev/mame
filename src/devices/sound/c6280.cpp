@@ -42,15 +42,11 @@
 
 #include <algorithm>
 
-void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void c6280_device::sound_stream_update(sound_stream &stream)
 {
 	// Fast method if none of the channels are enabled (most Data East arcade games)
 	if (!(m_enabled & 0x3f))
-	{
-		outputs[0].fill(0);
-		outputs[1].fill(0);
 		return;
-	}
 
 	static const u8 scale_tab[16] =
 	{
@@ -61,7 +57,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 	const u8 lmal = scale_tab[(m_balance >> 4) & 0x0f];
 	const u8 rmal = scale_tab[(m_balance >> 0) & 0x0f];
 
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		s32 lout = 0, rout = 0;
 		for (int ch = 0; ch < 6; ch++)
@@ -169,8 +165,8 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 				}
 			}
 		}
-		outputs[0].put_int(i, lout, 32768);
-		outputs[1].put_int(i, rout, 32768);
+		stream.put_int(0, i, lout, 32768);
+		stream.put_int(1, i, rout, 32768);
 	}
 }
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:Nigel Barnes
 /*********************************************************************************************************
 
 Optomax V image analyser, from AMS (Analytical Measuring Systems Ltd.).
@@ -180,7 +180,7 @@ HTL LED  |       |  _______________  _______________   |SN74LS645-1N    |   |
 
 PCB (B3) (labeled "9000-0025 SS 1-1")
  - HM6116LP-3
- - MK48202B-20 NVRAM
+ - MK48Z02B-20 NVRAM
  - 2 x HM6264LP-15
  - 3 x 27128 EPROM
  - Fujitsu MB7124H
@@ -193,7 +193,7 @@ PCB (B3) (labeled "9000-0025 SS 1-1")
      |             ______      ______     __________   ______    ______    ______    ______    ______  |
      |            |     |     |     |    |PC74HCT157P | <-HM6264LP-15 |   |     |   |     |   |     |  |
      |   HM6116LP-3->   |     |     |     __________  |     |   | <-HM6264LP-15 |   |     |   | <-EPROM|
-     |            |  MK48202B-20->  |    |CD74HCT157E |     |   |     |   | <-EPROM |     |   |     |  |
+     |            |  MK48Z02B-20->  |    |CD74HCT157E |     |   |     |   | <-EPROM |     |   |     |  |
      |            |     |     |     |     __________  |     |   |     |   |     |   | <-EPROM |     |  |
      |            |_____|     |_____|    |CD74HCT157E |_____|   |_____|   |____ |   |_____|   |_____|  |
      |  _________  __________  __________  __________  __________  __________  __________  __________  |
@@ -216,7 +216,7 @@ PCB MEASUREMENT (B2) (labeled "MEASUREMENT CIRCUIT 9000-0024")
 
 
 PCB VIDEO (B1) (labeled "OPTOMAX VIDEO PCB 9000-0022-2/2")
- - Xtal (unoknown frequency, labeled "Xtal Hy-O 2562-50 GE01S")
+ - Xtal (unknown frequency, labeled "Xtal Hy-O 2562-50 GE01S")
  - 2716 EPROM
  - 2 x Toshiba TC5565PL-15
  - Motorola MC68230P8
@@ -275,21 +275,21 @@ PCB VIDEO (B1) (labeled "OPTOMAX VIDEO PCB 9000-0022-2/2")
 
 #include "emu.h"
 
+#include "bus/acorn/bus.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m68000/m68000.h"
-
 #include "machine/6522via.h"
 #include "machine/68230pit.h"
 #include "machine/6850acia.h"
+#include "machine/input_merger.h"
 #include "machine/m3002.h"
 #include "machine/mc14411.h"
 #include "machine/mm58167.h"
 #include "machine/mos6551.h"
-//#include "machine/nvram.h"
+#include "machine/nvram.h"
 #include "machine/pit8253.h"
-
-#include "video/mc6845.h"
-#include "video/saa5050.h"
+#include "sound/adc.h"
 
 #include "screen.h"
 
@@ -304,159 +304,418 @@ public:
 
 		// CPU PCB (B4)
 		, m_maincpu(*this, "maincpu")
-		, m_acia_1(*this, "acia1")
-		, m_acia_2(*this, "acia2")
-		, m_acia_3(*this, "acia3")
-		, m_brg(*this, "brg")
-		, m_rtc_1(*this, "rtc1")
-		, m_pit_1(*this, "pit1")
+		, m_b4_acia(*this, "b4_acia%u", 0U)
+		, m_b4_brg(*this, "b4_brg")
+		, m_b4_rtc(*this, "b4_rtc")
+		, m_b4_pit(*this, "b4_pit")
+		, m_b4_brf(*this, "BRF")
+		, m_b4_baud_p3(*this, "BAUD_P3")
+		, m_b4_baud_p4(*this, "BAUD_P4")
+		, m_b4_baud_p5(*this, "BAUD_P5")
 
 		// OSD PCB (B6)
-		, m_bbccpu(*this, "bbccpu")
-		, m_acia_4(*this, "acia4")
-		, m_rtc_2(*this, "rtc2")
-		, m_via_1(*this, "via1")
+		, m_eurocpu(*this, "eurocpu")
+		, m_b6_acia(*this, "b6_acia")
+		, m_b6_rtc(*this, "b6_rtc")
+		, m_b6_via(*this, "b6_via")
+		, m_b6_bus(*this, "b6_bus")
 
-		// Teletext PCB (B5)
-		, m_trom(*this, "saa5050")
-		, m_hd6845(*this, "hd6845")
-		, m_screen(*this, "screen")
-		, m_via_2(*this, "via2")
+		// PCB (B3)
+		, m_b3_view(*this, "b3_view")
+		, m_b3_ram(*this, "b3_ram", 0x4000, ENDIANNESS_LITTLE)
 
 		// Measurement PCB (B2)
-		, m_pit_2(*this, "pit2")
-		, m_pit_3(*this, "pit3")
-		, m_pit_4(*this, "pit4")
+		, m_b2_pit(*this, "b2_pit")
+		, m_b2_pit8254(*this, "b2_pit8254_%u", 0U)
 
 		// Video PCB (B1)
-		, m_pit_5(*this, "pit5")
+		, m_b1_pit(*this, "b1_pit")
 	{ }
 
 	void optomaxv(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
 	// CPU PCB (B4)
 	required_device<cpu_device> m_maincpu;
-	required_device<acia6850_device> m_acia_1;
-	required_device<acia6850_device> m_acia_2;
-	required_device<acia6850_device> m_acia_3;
-	required_device<mc14411_device> m_brg;
-	required_device<mm58167_device> m_rtc_1;
-	required_device<pit68230_device> m_pit_1;
+	required_device_array<acia6850_device, 3> m_b4_acia;
+	required_device<mc14411_device> m_b4_brg;
+	required_device<mm58167_device> m_b4_rtc;
+	required_device<pit68230_device> m_b4_pit;
+	required_ioport m_b4_brf;
+	required_ioport m_b4_baud_p3;
+	required_ioport m_b4_baud_p4;
+	required_ioport m_b4_baud_p5;
 
 	// OSD PCB (B6)
-	required_device<m6502_device> m_bbccpu;
-	required_device<mos6551_device> m_acia_4;
-	required_device<m3002_device> m_rtc_2;
-	required_device<via6522_device> m_via_1;
+	required_device<m6502_device> m_eurocpu;
+	required_device<mos6551_device> m_b6_acia;
+	required_device<m3002_device> m_b6_rtc;
+	required_device<via6522_device> m_b6_via;
+	required_device<acorn_bus_device> m_b6_bus;
 
-	// Teletext PCB (B5)
-	required_device<saa5050_device> m_trom;
-	required_device<mc6845_device> m_hd6845;
-	required_device<screen_device> m_screen;
-	required_device<via6522_device> m_via_2;
+	// PCB (B3)
+	memory_view m_b3_view;
+	memory_share_creator<uint8_t> m_b3_ram;
 
 	// Measurement PCB (B2)
-	required_device<pit68230_device> m_pit_2;
-	required_device<pit8254_device> m_pit_3;
-	required_device<pit8254_device> m_pit_4;
+	required_device<pit68230_device> m_b2_pit;
+	required_device_array<pit8254_device, 2> m_b2_pit8254;
 
 	// Video PCB (B1)
-	required_device<pit68230_device> m_pit_5;
+	required_device<pit68230_device> m_b1_pit;
+
+	void mem_map(address_map &map) ATTR_COLD;
+	void osd_map(address_map &map) ATTR_COLD;
+
+	void write_acia_clocks(int id, int state);
+	void write_f1_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F1, state); }
+	void write_f3_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F3, state); }
+	void write_f5_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F5, state); }
+	void write_f7_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F7, state); }
+	void write_f8_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F8, state); }
+	void write_f9_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F9, state); }
+	void write_f11_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F11, state); }
+	void write_f13_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F13, state); }
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	uint8_t map_r();
+	void map_w(uint8_t data);
+
+	uint8_t m_map = 0x00;
 };
 
 
-static INPUT_PORTS_START(optomaxv)
-INPUT_PORTS_END
-
-void optomaxv_state::optomaxv(machine_config &config)
+void optomaxv_state::mem_map(address_map &map)
 {
-	// All clocks unverified
-
 	// Main CPU PCB (B4)
 
-	M68000(config, m_maincpu, 32_MHz_XTAL / 2); // Signetics SCN68000
-
-	ACIA6850(config, m_acia_1, 0); // Hitachi HD46850P
-	ACIA6850(config, m_acia_2, 0); // Hitachi HD46850P
-	ACIA6850(config, m_acia_3, 0); // Hitachi HD46850P
-
-	MC14411(config, m_brg, 32_MHz_XTAL / 10); // Motorola MC14411P
-
-	MM58167(config, m_rtc_1, 32_MHz_XTAL / 10); // National Semiconductor MM58167AN
-
-	PIT68230(config, m_pit_1, 1.8432_MHz_XTAL); // Motorola MC68230L8
-
-	// OSD PCB (B6) (CUBE EuroBEEB System CPU board)
-
-	M6502(config, m_bbccpu, 1.8432_MHz_XTAL); // Rockwell R6502AP
-
-	MOS6522(config, m_via_1, 1.8432_MHz_XTAL); // Rockwell R6551AP
-	MOS6551(config, m_acia_4, 1.8432_MHz_XTAL); // Rockwell R6551AP
-
-	M3002(config, m_rtc_2, 1.8432_MHz_XTAL); // uEM M-3002-16PI Real Time Clock
-
-	// Teletext PCB (B5) (CUBE EuroBEEB System Teletext Video Card)
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
-	m_screen->set_screen_update("hd6845", FUNC(hd6845s_device::screen_update));
-
-	SAA5050(config, m_trom, 6_MHz_XTAL);
-	m_trom->set_screen_size(40, 25, 40);
-
-	HD6845S(config, m_hd6845, 6_MHz_XTAL / 3); // Hitachi HD46505SP-2
-	m_hd6845->set_screen("screen");
-	m_hd6845->set_show_border_area(false);
-	m_hd6845->set_char_width(12);
-
-	MOS6522(config, m_via_2, 6_MHz_XTAL / 6); // Rockwell R6551AP
-
-	// PCB (B3)
-
-	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // Mostek MK48Z02B-20 ZeroPower
+	map(0x000000, 0x07ffff).ram();
+	map(0x000000, 0x000007).rom().region("eprom_sys", 0);
+	map(0x080000, 0x087fff).rom().region("eprom_sys", 0);
+	map(0x0a0000, 0x0affff).rom().region("eprom_usr", 0);
+	map(0x0c0040, 0x0c0043).rw(m_b4_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0x0c0080, 0x0c0083).rw(m_b4_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
+	map(0x0c0100, 0x0c0103).rw(m_b4_acia[2], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0x0c0400, 0x0c042f).rw(m_b4_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
+	map(0x0e0000, 0x0e003f).rw(m_b4_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
 
 	// Measurement PCB (B2)
 
-	PIT68230(config, m_pit_2, 2_MHz_XTAL); // Motorola MC68230P8, unknown xtal
-	PIT8254(config, m_pit_3); // Intel P8254
-	PIT8254(config, m_pit_4); // Intel P8254
+	map(0x100000, 0x117fff).ram();
+	map(0x140000, 0x14003f).rw(m_b2_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0xff00);
+	//map(0x160000, 0x160007).rw(m_b2_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
+	//map(0x160008, 0x16000f).rw(m_b2_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 
 	// VIDEO PCB (B1)
 
-	PIT68230(config, m_pit_5, 2_MHz_XTAL); // Motorola MC68230P8, unknown xtal
+	// B1 2 x 8K static ram
+	// B1 2K rom
+	//map(0x200000, 0x201fff).ram();
+	map(0x300000, 0x30003f).rw(m_b1_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
+}
+
+void optomaxv_state::osd_map(address_map &map)
+{
+	// OSD PCB (B6)
+
+	map(0x0000, 0x1fff).ram();                           // M3
+	map(0x8000, 0xbfff).rom().region("b6_rom", 0x0000);  // M1
+	map(0xe000, 0xffff).rom().region("b6_rom", 0x6000);  // M0
+	map(0xd000, 0xdfff).lrw8(                    // I/O Block
+		NAME([this](offs_t offset) { return m_b6_bus->read(offset | 0xd000); }),
+		NAME([this](offs_t offset, uint8_t data) { m_b6_bus->write(offset | 0xd000, data); })
+	);
+	map(0xfe00, 0xfeff).lrw8(                   // I/O Page
+		NAME([this](offs_t offset) { return m_b6_bus->read(offset | 0xfe00); }),
+		NAME([this](offs_t offset, uint8_t data) { m_b6_bus->write(offset | 0xfe00, data); })
+	);
+	map(0xfe00, 0xfe0f).rw(m_b6_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xfe10, 0xfe17).rw(m_b6_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xfe18, 0xfe1f).rw(m_b6_rtc, FUNC(m3002_device::read), FUNC(m3002_device::write));
+	map(0xfe30, 0xfe30).nopw(); // usually ROM banking of region 0x8000-0xBFFF but unlikely to be relevant in this machine.
+
+	// PCB (B3)
+
+	map(0x2000, 0x7fff).rom().region("b3_rom", 0x2000);
+	map(0x2000, 0x7fff).view(m_b3_view);
+	m_b3_view[0](0x2000, 0x2fff).rom().region("b3_rom", 0xa000);
+	m_b3_view[1](0x3000, 0x3fff).rom().region("b3_rom", 0xb000);
+	m_b3_view[1](0x4000, 0x7fff).ram().share("b3_ram");
+	map(0xc000, 0xc7ff).ram().share("nvram");
+	map(0xc800, 0xcfff).ram();
+	map(0xdc00, 0xdc00).rw(FUNC(optomaxv_state::map_r), FUNC(optomaxv_state::map_w));
+}
+
+
+void optomaxv_state::machine_start()
+{
+	save_item(NAME(m_map));
+}
+
+void optomaxv_state::machine_reset()
+{
+	// Set up the BRG divider. RSA is a jumper setting and RSB is always set High
+	m_b4_brg->rsa_w(m_b4_brf->read() == 0x80 ? ASSERT_LINE : CLEAR_LINE);
+	m_b4_brg->rsb_w(ASSERT_LINE);
+
+	// Disable all configured timers, only enabling the used ones
+	m_b4_brg->timer_disable_all();
+	m_b4_brg->timer_enable((mc14411_device::timer_id) m_b4_baud_p3->read(), true);
+	m_b4_brg->timer_enable((mc14411_device::timer_id) m_b4_baud_p4->read(), true);
+	m_b4_brg->timer_enable((mc14411_device::timer_id) m_b4_baud_p5->read(), true);
+
+	// Default memory map
+	m_b3_view.disable();
+}
+
+
+uint8_t optomaxv_state::map_r()
+{
+	return m_map;
+}
+
+void optomaxv_state::map_w(uint8_t data)
+{
+	m_map = data;
+
+	switch (m_map)
+	{
+	case 0x00:
+		m_b3_view.disable();
+		break;
+	case 0x40:
+		m_b3_view.select(0);
+		break;
+	case 0x80:
+		m_b3_view.select(1);
+		break;
+	default:
+		logerror("%s map_w: unknown %02x\n", machine().describe_context(), data);
+		break;
+	}
+}
+
+
+void optomaxv_state::write_acia_clocks(int id, int state)
+{
+	if (id == m_b4_baud_p3->read())
+	{
+		m_b4_acia[0]->write_txc(state);
+		m_b4_acia[0]->write_rxc(state);
+	}
+	if (id == m_b4_baud_p4->read())
+	{
+		m_b4_acia[1]->write_txc(state);
+		m_b4_acia[1]->write_rxc(state);
+	}
+	if (id == m_b4_baud_p5->read())
+	{
+		m_b4_acia[2]->write_txc(state);
+		m_b4_acia[2]->write_rxc(state);
+	}
+}
+
+
+uint32_t optomaxv_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
+
+
+static INPUT_PORTS_START(optomaxv)
+	PORT_START("BRF")
+	PORT_CONFNAME(0x80, 0x00, "Baud Rate Factor") // RSA pin on MC14411
+	PORT_CONFSETTING(0x00, "1x (Lo)")
+	PORT_CONFSETTING(0x80, "4x (Hi)")
+
+	PORT_START("BAUD_P3")
+	PORT_CONFNAME(0x0f, 0x00, "P3 Host Baud Lo/Hi") // F1-Fx pins on MC14411
+	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "9600/38400") // RSA=1x/16x
+	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "4800/19200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "2400/9600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "1200/4800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "600/2400")
+	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "300/1200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F11, "150/600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F13, "110/440")
+
+	PORT_START("BAUD_P4")
+	PORT_CONFNAME(0x0f, 0x00, "P4 Terminal Baud Lo/Hi") // F1-Fx pins on MC14411
+	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "9600/38400") // RSA=1x/16x
+	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "4800/19200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "2400/9600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "1200/4800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "600/2400")
+	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "300/1200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F11, "150/600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F13, "110/440")
+
+	PORT_START("BAUD_P5")
+	PORT_CONFNAME(0x0f, 0x00, "P5 Remote Baud Lo/Hi") // F1-Fx pins on MC14411
+	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "9600/38400") // RSA=1x/16x
+	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "4800/19200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "2400/9600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "1200/4800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "600/2400")
+	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "300/1200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F11, "150/600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F13, "110/440")
+INPUT_PORTS_END
+
+
+static DEVICE_INPUT_DEFAULTS_START(terminal)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
+
+
+void optomaxv_state::optomaxv(machine_config &config)
+{
+	// Main CPU PCB (B4)
+
+	M68000(config, m_maincpu, 32_MHz_XTAL / 4); // Signetics SCN68000
+	m_maincpu->set_addrmap(AS_PROGRAM, &optomaxv_state::mem_map);
+
+	ACIA6850(config, m_b4_acia[0], 0); // Hitachi HD46850P (Host)
+	m_b4_acia[0]->txd_handler().set("rs232host", FUNC(rs232_port_device::write_txd));
+	m_b4_acia[0]->rts_handler().set("rs232host", FUNC(rs232_port_device::write_rts));
+	m_b4_acia[0]->irq_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+
+	rs232_port_device &rs232host(RS232_PORT(config, "rs232host", default_rs232_devices, nullptr));
+	rs232host.rxd_handler().set(m_b4_acia[0], FUNC(acia6850_device::write_rxd));
+	rs232host.cts_handler().set(m_b4_acia[0], FUNC(acia6850_device::write_cts));
+
+	ACIA6850(config, m_b4_acia[1], 0); // Hitachi HD46850P (Terminal)
+	m_b4_acia[1]->txd_handler().set("rs232term", FUNC(rs232_port_device::write_txd));
+	m_b4_acia[1]->rts_handler().set("rs232term", FUNC(rs232_port_device::write_rts));
+	m_b4_acia[1]->irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
+
+	rs232_port_device &rs232term(RS232_PORT(config, "rs232term", default_rs232_devices, "terminal"));
+	rs232term.rxd_handler().set(m_b4_acia[1], FUNC(acia6850_device::write_rxd));
+	rs232term.cts_handler().set(m_b4_acia[1], FUNC(acia6850_device::write_cts));
+	rs232term.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+
+	ACIA6850(config, m_b4_acia[2], 0); // Hitachi HD46850P (Remote)
+	m_b4_acia[2]->txd_handler().set("rs232remt", FUNC(rs232_port_device::write_txd));
+	m_b4_acia[2]->rts_handler().set("rs232remt", FUNC(rs232_port_device::write_rts));
+	m_b4_acia[2]->irq_handler().set_inputline(m_maincpu, M68K_IRQ_3);
+
+	rs232_port_device &rs232remt(RS232_PORT(config, "rs232remt", default_rs232_devices, nullptr));
+	rs232remt.rxd_handler().set(m_b4_acia[2], FUNC(acia6850_device::write_rxd));
+	rs232remt.cts_handler().set(m_b4_acia[2], FUNC(acia6850_device::write_cts));
+
+	MC14411(config, m_b4_brg, 1.8432_MHz_XTAL); // Motorola MC14411P
+	m_b4_brg->out_f<1>().set(FUNC(optomaxv_state::write_f1_clock));
+	m_b4_brg->out_f<3>().set(FUNC(optomaxv_state::write_f3_clock));
+	m_b4_brg->out_f<5>().set(FUNC(optomaxv_state::write_f5_clock));
+	m_b4_brg->out_f<7>().set(FUNC(optomaxv_state::write_f7_clock));
+	m_b4_brg->out_f<8>().set(FUNC(optomaxv_state::write_f8_clock));
+	m_b4_brg->out_f<9>().set(FUNC(optomaxv_state::write_f9_clock));
+	m_b4_brg->out_f<11>().set(FUNC(optomaxv_state::write_f11_clock));
+	m_b4_brg->out_f<13>().set(FUNC(optomaxv_state::write_f13_clock));
+
+	MM58167(config, m_b4_rtc, 32.768_kHz_XTAL); // National Semiconductor MM58167AN
+	m_b4_rtc->irq().set_inputline(m_maincpu, M68K_IRQ_6);
+
+	PIT68230(config, m_b4_pit, 32_MHz_XTAL / 4); // Motorola MC68230L8
+	m_b4_pit->port_irq_callback().set_inputline(m_maincpu, M68K_IRQ_5);
+
+	// OSD PCB (B6) (CUBE EuroBEEB System CPU board)
+
+	M6502(config, m_eurocpu, 2'000'000); // Rockwell R6502AP
+	m_eurocpu->set_addrmap(AS_PROGRAM, &optomaxv_state::osd_map);
+
+	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_eurocpu, M6502_IRQ_LINE);
+
+	MOS6522(config, m_b6_via, 2'000'000); // Rockwell R6522AP
+	m_b6_via->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
+
+	MOS6551(config, m_b6_acia, 0); // Rockwell R6551AP
+	m_b6_acia->set_xtal(1.8432_MHz_XTAL);
+	m_b6_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
+	m_b6_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_b6_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set(m_b6_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dsr_handler().set(m_b6_acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_b6_acia, FUNC(mos6551_device::write_cts));
+
+	M3002(config, m_b6_rtc, 32.768_kHz_XTAL); // uEM M-3002-16PI Real Time Clock
+
+	ACORN_BUS(config, m_b6_bus, 1'000'000);
+	m_b6_bus->out_irq_callback().set("irqs", FUNC(input_merger_device::in_w<2>));
+	m_b6_bus->out_nmi_callback().set_inputline(m_eurocpu, M6502_NMI_LINE);
+
+	// Teletext PCB (B5) (CUBE EuroBEEB System Teletext Video Card)
+
+	ACORN_BUS_SLOT(config, "slot1", m_b6_bus, eurocube_bus_devices, "teletext").set_fixed(true);
+
+	// PCB (B3)
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // Mostek MK48Z02B-20 ZeroPower
+
+	// Measurement PCB (B2)
+
+	PIT68230(config, m_b2_pit, 32_MHz_XTAL / 4); // Motorola MC68230P8, unknown xtal
+	PIT8254(config, m_b2_pit8254[0]); // Intel P8254
+	PIT8254(config, m_b2_pit8254[1]); // Intel P8254
+
+	// VIDEO PCB (B1)
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.screen_vblank().set(m_b1_pit, FUNC(pit68230_device::h2_w));
+	screen.set_size(1024, 768);
+	screen.set_visarea(0, 704-1, 0, 560-1);
+	screen.set_screen_update(FUNC(optomaxv_state::screen_update));
+
+	PIT68230(config, m_b1_pit, 32_MHz_XTAL / 4); // Motorola MC68230P8, unknown xtal
+
+	ZN449(config, "adc", 0); // ZN448
 }
 
 
 ROM_START(optomaxv)
-	ROM_REGION(0x18000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "b4_68up-12-01-sd-1-86_27256.j41", 0x00000, 0x08000, CRC(a3196db7) SHA1(06773dea886908673d9def406d4985a6eef71d0c) )
-	ROM_LOAD16_BYTE( "b4_68lw-12-01-sd-1-86_27256.j25", 0x00001, 0x08000, CRC(c0a88d38) SHA1(836a616bb6df84e3e6dfb1d42cacd592f6c6b4e6) )
-	ROM_LOAD( "b4_hn4827128g.j24",                      0x10000, 0x04000, CRC(a6399550) SHA1(602b7152a5a5cbe1f8f598e6622d2bdfccd5d322) )
-	ROM_LOAD( "b4_hn4827128g.j40",                      0x14000, 0x04000, CRC(b85f37f7) SHA1(dc532ba0af735233c5a7308a5fbc90be746ee08c) )
+	ROM_REGION16_BE(0x8000, "eprom_sys", 0)
+	ROM_LOAD16_BYTE( "b4_hn4827128g.j24",               0x0000, 0x4000, CRC(a6399550) SHA1(602b7152a5a5cbe1f8f598e6622d2bdfccd5d322) )
+	ROM_LOAD16_BYTE( "b4_hn4827128g.j40",               0x0001, 0x4000, CRC(b85f37f7) SHA1(dc532ba0af735233c5a7308a5fbc90be746ee08c) )
 
-	ROM_REGION(0x44000, "bbccpu", 0)
-	ROM_LOAD( "b6_abmon4-abci-12-12_hn482764g.m0",      0x40000, 0x02000, CRC(8f9ce214) SHA1(37fca4a5184025ed034acd5f20a4614163246779) ) // On OSD PCB
-	ROM_LOAD( "b6_hn613128pb05.m1",                     0x0c000, 0x04000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) ) // Standard BBC Micro Acorn BASIC, on OSD PCB
+	ROM_REGION16_BE(0x10000, "eprom_usr", 0)
+	ROM_LOAD16_BYTE( "b4_68up-12-01-sd-1-86_27256.j41", 0x0000, 0x8000, CRC(a3196db7) SHA1(06773dea886908673d9def406d4985a6eef71d0c) )
+	ROM_LOAD16_BYTE( "b4_68lw-12-01-sd-1-86_27256.j25", 0x0001, 0x8000, CRC(c0a88d38) SHA1(836a616bb6df84e3e6dfb1d42cacd592f6c6b4e6) )
 
-	ROM_REGION(0x10000, "unknown", 0)
-	ROM_LOAD( "b3_6sr03-04-b03f-1-86_hn4827128g.ic22",  0x00000, 0x04000, CRC(705f0f4d) SHA1(5c836694d736b2d2a268e3a8acdfb76fde6698c4) ) // On PCB (B3)
-	ROM_LOAD( "b3_6sr02-04-8140-1-86_d27128d.ic23",     0x04000, 0x04000, CRC(58c04246) SHA1(7eb0b276206f546b34bc5f32e05d755f1a700294) ) // On PCB (B3)
-	ROM_LOAD( "b3_6sr01-04-4477-1-86_hn4827128g.ic24",  0x08000, 0x04000, CRC(e9110243) SHA1(c96f6f526b0b1c36971f7a0fc03a6e57d02213e5) ) // On PCB (B3)
+	ROM_REGION(0x8000, "b6_rom", 0)
+	ROM_LOAD( "b6_hn613128pb05.m1",                     0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) ) // Acorn BASIC, on OSD PCB
+	ROM_LOAD( "b6_abmon4-abci-12-12_hn482764g.m0",      0x6000, 0x2000, CRC(8f9ce214) SHA1(37fca4a5184025ed034acd5f20a4614163246779) ) // On OSD PCB
 
-	ROM_REGION(0x00800, "video", 0)
-	ROM_LOAD( "b1_9000-vs-1.1_d2716d.ic46",             0x00000, 0x00800, CRC(ebaefb94) SHA1(ca6d194926a98b846443ce7393e3b44d3e5199f9) ) // On Video PCB (B1)
+	ROM_REGION(0x10000, "b3_rom", 0)
+	ROM_LOAD( "b3_6sr01-04-4477-1-86_hn4827128g.ic24",  0x0000, 0x4000, CRC(e9110243) SHA1(c96f6f526b0b1c36971f7a0fc03a6e57d02213e5) ) // On PCB (B3)
+	ROM_LOAD( "b3_6sr02-04-8140-1-86_d27128d.ic23",     0x4000, 0x4000, CRC(58c04246) SHA1(7eb0b276206f546b34bc5f32e05d755f1a700294) ) // On PCB (B3)
+	ROM_LOAD( "b3_6sr03-04-b03f-1-86_hn4827128g.ic22",  0x8000, 0x4000, CRC(705f0f4d) SHA1(5c836694d736b2d2a268e3a8acdfb76fde6698c4) ) // On PCB (B3)
 
-	ROM_REGION(0x00200, "proms", 0)
-	ROM_LOAD( "b6_sp007mp_82s147n.ic9",                 0x00000, 0x00200, CRC(35aaa7a3) SHA1(ebc977ff748a19cd0e9d0626cf7cf97d07656f80) ) // On OSD PCB (B6), for CPU address decoding
-	ROM_LOAD( "b6_502_82s147.ic10",                     0x00000, 0x00200, CRC(401fa579) SHA1(e6320f70da9dfed0daae47af7b6cf9f3a62313b2) ) // On OSD PCB (B6), for CPU address decoding. Same as the standard EURO-BEEB
-	ROM_LOAD( "b3_b515c1-1.ic15",                       0x00000, 0x00200, CRC(c4b02b5f) SHA1(e7b3363974b8a1b61169f543a672dff37e8e0e11) ) // On PCB (B3)
-	ROM_LOAD( "b2_cpi-sl-1.3_am27s21a.ic29",            0x00000, 0x00100, CRC(897071f9) SHA1(912154fd24d3601bcfd7fbd61be5c1ade62c12f3) ) // On Measurement PCB (B2)
-	ROM_LOAD( "b2_hb-11.2_mb7124h.ic6",                 0x00000, 0x00200, CRC(78bab798) SHA1(f5b88db41efed9c540801c367047d608fb086094) ) // On Measurement PCB (B2)
-	ROM_LOAD( "b2_hgb-22.2_am27s21a.ic7",               0x00000, 0x00100, CRC(5c3f4be5) SHA1(1ead926a5c71232c75f20673fe0a7c36ff4480bb) ) // On Measurement PCB (B2)
-	ROM_LOAD( "b2_hgw-1.2_am27s21a.ic8",                0x00000, 0x00100, CRC(b45f4d48) SHA1(7cfe7b19efc7d034a5795a99dda347ae742c904d) ) // On Measurement PCB (B2)
+	ROM_REGION(0x0800, "video", 0)
+	ROM_LOAD( "b1_9000-vs-1.1_d2716d.ic46",             0x0000, 0x0800, CRC(ebaefb94) SHA1(ca6d194926a98b846443ce7393e3b44d3e5199f9) ) // On Video PCB (B1)
 
-	ROM_REGION(0x00117, "plds", 0)
+	ROM_REGION(0x0200, "proms", 0)
+	ROM_LOAD( "b6_sp007mp_82s147n.ic9",                 0x0000, 0x0200, CRC(35aaa7a3) SHA1(ebc977ff748a19cd0e9d0626cf7cf97d07656f80) ) // On OSD PCB (B6), for CPU address decoding
+	ROM_LOAD( "b6_502_82s147.ic10",                     0x0000, 0x0200, CRC(401fa579) SHA1(e6320f70da9dfed0daae47af7b6cf9f3a62313b2) ) // On OSD PCB (B6), for CPU address decoding. Same as the standard EuroBEEB
+	ROM_LOAD( "b3_b515c1-1.ic15",                       0x0000, 0x0200, CRC(c4b02b5f) SHA1(e7b3363974b8a1b61169f543a672dff37e8e0e11) ) // On PCB (B3)
+	ROM_LOAD( "b2_cpi-sl-1.3_am27s21a.ic29",            0x0000, 0x0100, CRC(897071f9) SHA1(912154fd24d3601bcfd7fbd61be5c1ade62c12f3) ) // On Measurement PCB (B2)
+	ROM_LOAD( "b2_hb-11.2_mb7124h.ic6",                 0x0000, 0x0200, CRC(78bab798) SHA1(f5b88db41efed9c540801c367047d608fb086094) ) // On Measurement PCB (B2)
+	ROM_LOAD( "b2_hgb-22.2_am27s21a.ic7",               0x0000, 0x0100, CRC(5c3f4be5) SHA1(1ead926a5c71232c75f20673fe0a7c36ff4480bb) ) // On Measurement PCB (B2)
+	ROM_LOAD( "b2_hgw-1.2_am27s21a.ic8",                0x0000, 0x0100, CRC(b45f4d48) SHA1(7cfe7b19efc7d034a5795a99dda347ae742c904d) ) // On Measurement PCB (B2)
+
+	ROM_REGION(0x0117, "plds", 0)
 	ROM_LOAD( "b4_0544_pal16l6.j22",                    0x00000, 0x00054, CRC(7d325ea4) SHA1(723a9938b7e3a0edf38261d7b6349efe0443d2e0) ) // On main CPU PCB (B4)
 	ROM_LOAD( "b4_0545_pal16l8.j66",                    0x00000, 0x00104, CRC(f1837b78) SHA1(8eb40c7320bd626ec6037662234c5befba88e116) ) // On main CPU PCB (B4)
 	ROM_LOAD( "b4_0546_pal12l10c.j17",                  0x00000, 0x00040, CRC(b669fd4a) SHA1(f122719c62e797a1c514389d8ea013e86c8b2040) ) // On main CPU PCB (B4)
@@ -466,4 +725,6 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 1986, optomaxv, 0, 0, optomaxv, optomaxv, optomaxv_state, empty_init, "AMS", "Optomax V", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING ) // Hardware from 1985, software on ROM from 1986.
+
+//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME     FLAGS
+SYST( 1986, optomaxv,  0,      0,      optomaxv, optomaxv, optomaxv_state, empty_init, "AMS",   "Optomax V", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING ) // Hardware from 1985, software on ROM from 1986.

@@ -29,9 +29,9 @@ float filterResTable[16];
 
 #define maxLogicalVoices 4
 
-inline stream_buffer::sample_t mix_mono(uint16_t usum)
+inline sound_stream::sample_t mix_mono(uint16_t usum)
 {
-	return stream_buffer::sample_t(int16_t(usum - maxLogicalVoices*128)) * (1.0 / (256 * maxLogicalVoices));
+	return sound_stream::sample_t(int16_t(usum - maxLogicalVoices*128)) * (1.0 / (256 * maxLogicalVoices));
 }
 } // anonymous namespace
 
@@ -61,13 +61,13 @@ inline void SID6581_t::syncEm()
 }
 
 
-void SID6581_t::fill_buffer(write_stream_view &buffer)
+void SID6581_t::fill_buffer(sound_stream &stream)
 {
 //void* SID6581_t::fill16bitMono(void* buffer, uint32_t numberOfSamples)
 
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
-		buffer.put(sampindex, mix_mono(
+		stream.put(0, sampindex, mix_mono(
 								 (*optr[0].outProc)(&optr[0])
 								+(*optr[1].outProc)(&optr[1])
 								+((*optr[2].outProc)(&optr[2])&optr3_outputmask)

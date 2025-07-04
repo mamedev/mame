@@ -270,7 +270,6 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_mouse_arrow_texture(nullptr)
 	, m_pointers_changed(false)
 	, m_target_font_height(0)
-	, m_has_warnings(false)
 	, m_unthrottle_mute(false)
 	, m_image_display_enabled(true)
 	, m_machine_info()
@@ -672,6 +671,33 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				return HANDLER_CANCEL;
 			}
 
+			ui_event event;
+			while (machine().ui_input().pop_event(&event))
+			{
+				if (event.target)
+				{
+					switch (event.event_type)
+					{
+					case ui_event::type::NONE:
+					case ui_event::type::WINDOW_FOCUS:
+					case ui_event::type::WINDOW_DEFOCUS:
+					case ui_event::type::MOUSE_WHEEL:
+						break;
+
+					case ui_event::type::POINTER_UPDATE:
+						// exit on primary button down
+						if (BIT(event.pointer_pressed, 0) && (1 == event.pointer_clicks))
+							return HANDLER_CANCEL;
+						break;
+
+					case ui_event::type::POINTER_LEAVE:
+					case ui_event::type::POINTER_ABORT:
+					case ui_event::type::IME_CHAR:
+						break;
+					}
+				}
+			}
+
 			return 0;
 		};
 	set_handler(ui_callback_type::GENERAL, handler_callback_func(&mame_ui_manager::handler_ingame, this));
@@ -697,12 +723,10 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			break;
 
 		case 1:
-			warning_text = machine_info().warnings_string();
-			m_has_warnings = !warning_text.empty();
 			if (show_warnings)
 			{
-				bool need_warning = m_has_warnings;
-				if (machine_info().has_severe_warnings() || !m_has_warnings)
+				bool need_warning = machine_info().has_warnings();
+				if (machine_info().has_severe_warnings() || !machine_info().has_warnings())
 				{
 					// critical warnings - no need to persist stuff
 					m_unemulated_features.clear();
@@ -717,6 +741,8 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 					for (device_t &device : device_enumerator(machine().root_device()))
 					{
 						device_t::feature_type unemulated = device.type().unemulated_features();
+						if ((&device != &machine().root_device()) && (device.type().emulation_flags() & device_t::flags::NOT_WORKING))
+							unemulated_features.emplace(device.type().shortname(), "functionality");
 						for (std::underlying_type_t<device_t::feature_type> feature = 1U; unemulated; feature <<= 1)
 						{
 							if (unemulated & feature)
@@ -764,6 +790,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				}
 				if (need_warning)
 				{
+					warning_text = machine_info().warnings_string();
 					warning_text.append(_("\n\nPress any key to continue"));
 					set_handler(ui_callback_type::MODAL, handler_callback_func(handler_messagebox_anykey));
 					warning_color = machine_info().warnings_color();
@@ -799,6 +826,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		// clear the input memory and wait for all keys to be released
 		poller.reset();
 		while (poller.poll() != INPUT_CODE_INVALID) { }
+		machine().ui_input().reset();
 
 		if (m_handler_callback_type == ui_callback_type::MODAL)
 		{
@@ -815,7 +843,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	}
 
 	// update last launch time if this was a run that was eligible for emulation warnings
-	if (m_has_warnings && show_warnings && !machine().scheduled_event_pending())
+	if (machine_info().has_warnings() && show_warnings && !machine().scheduled_event_pending())
 		m_last_launch_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
 	// if we're the empty driver, force the menus on
@@ -880,20 +908,6 @@ bool mame_ui_manager::update_and_render(render_container &container)
 			alpha = 255;
 		if (alpha >= 0)
 			container.add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(alpha,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	}
-
-	// show red if overdriving sound
-	if (machine().options().speaker_report() != 0 && machine().phase() == machine_phase::RUNNING)
-	{
-		auto compressor = machine().sound().compressor_scale();
-		if (compressor < 1.0)
-		{
-			float width = 0.05f + std::min(0.15f, (1.0f - compressor) * 0.4f);
-			container.add_rect(0.0f, 0.0f, 1.0f, width, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			container.add_rect(0.0f, 1.0f - width, 1.0f, 1.0f, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			container.add_rect(0.0f, width, width, 1.0f - width, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			container.add_rect(1.0f - width, width, 1.0f, 1.0f - width, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		}
 	}
 
 	// render any cheat stuff at the bottom
@@ -1457,7 +1471,7 @@ void mame_ui_manager::draw_fps_counter(render_container &container)
 			machine().video().speed_text(),
 			0.0f, 0.0f, 1.0f,
 			ui::text_layout::text_justify::RIGHT, ui::text_layout::word_wrapping::WORD,
-			OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
+			OPAQUE_, colors().text_color(), colors().background_color(), nullptr, nullptr);
 }
 
 
@@ -1473,7 +1487,7 @@ void mame_ui_manager::draw_profiler(render_container &container)
 			text,
 			0.0f, 0.0f, 1.0f,
 			ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping::WORD,
-			OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
+			OPAQUE_, colors().text_color(), colors().background_color(), nullptr, nullptr);
 }
 
 
@@ -1607,7 +1621,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// if the on-screen display isn't up and the user has toggled it, turn it on
-	if (!(machine().debug_flags & DEBUG_FLAG_ENABLED) && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
+	if (!get_slider_list().empty() && !(machine().debug_flags & DEBUG_FLAG_ENABLED) && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
 	{
 		ui::menu::stack_push<ui::menu_sliders>(*this, machine().render().ui_container(), true);
 		show_menu();
@@ -1873,23 +1887,21 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 
 	m_sliders.clear();
 
-	// add overall volume
-	slider_alloc(_("Master Volume"), -32, 0, 0, 1, std::bind(&mame_ui_manager::slider_volume, this, _1, _2));
-
-	// add per-channel volume
-	mixer_input info;
-	for (int item = 0; machine.sound().indexed_mixer_input(item, info); item++)
+	// add per-sound device and per-sound device channel volume
+	for (device_sound_interface &snd : sound_interface_enumerator(machine.root_device()))
 	{
-		std::string str = string_format(_("%1$s Volume"), info.stream->input(info.inputnum).name());
-		slider_alloc(std::move(str), 0, 1000, 4000, 20, std::bind(&mame_ui_manager::slider_mixervol, this, item, _1, _2));
-	}
+		// don't add microphones, speakers or devices without outputs
+		if (dynamic_cast<sound_io_device *>(&snd) || !snd.outputs())
+			continue;
 
-	// add speaker panning
-	for (speaker_device &speaker : speaker_device_enumerator(machine.root_device()))
-	{
-		int defpan = floorf(speaker.defpan() * 1000.0f + 0.5f);
-		std::string str = string_format(_("%s '%s' Panning"), speaker.name(), speaker.tag());
-		slider_alloc(std::move(str), -1000, defpan, 1000, 20, std::bind(&mame_ui_manager::slider_panning, this, std::ref(speaker), _1, _2));
+		// add overall volume first
+		if (m_sliders.empty())
+			slider_alloc(_("Master Volume"), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_volume, this, _1, _2));
+
+		slider_alloc(util::string_format(_("%1$s Volume"), snd.device().tag()), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_devvol, this, &snd, _1, _2));
+		if (snd.outputs() != 1)
+			for (int channel = 0; channel != snd.outputs(); channel ++)
+				slider_alloc(util::string_format(_("%1$s Channel %d Volume"), snd.device().tag(), channel), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_devvol_chan, this, &snd, channel, _1, _2));
 	}
 
 	// add analog adjusters
@@ -1904,9 +1916,11 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		}
 	}
 
-	// add CPU overclocking (cheat only)
+	// add speed and CPU overclocking (cheat only)
 	if (machine.options().cheat())
 	{
+		slider_alloc(_("Global Speed"), 100, 1000, 10000, 10, std::bind(&mame_ui_manager::slider_speed, this, _1, _2));
+
 		for (device_execute_interface &exec : execute_interface_enumerator(machine.root_device()))
 		{
 			std::string str = string_format(_("Overclock CPU %1$s"), exec.device().tag());
@@ -1937,7 +1951,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		if (machine.options().cheat())
 		{
 			std::string str = string_format(_("%1$s Refresh Rate"), screen_desc);
-			slider_alloc(std::move(str), -10000, 0, 10000, 1000, std::bind(&mame_ui_manager::slider_refresh, this, std::ref(screen), _1, _2));
+			slider_alloc(std::move(str), -10000, 0, 10000, 100, std::bind(&mame_ui_manager::slider_refresh, this, std::ref(screen), _1, _2));
 		}
 
 		// add standard brightness/contrast/gamma controls per-screen
@@ -2032,82 +2046,72 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 int32_t mame_ui_manager::slider_volume(std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		machine().sound().set_attenuation(newval);
+		machine().sound().set_master_gain(newval == -960 ? 0 : osd::db_to_linear(newval * 0.1f));
 
-	int32_t curval = machine().sound().attenuation();
+	int curval = machine().sound().master_gain() == 0 ? -960 : floorf(osd::linear_to_db(machine().sound().master_gain()) * 10.0f + 0.5f);
+
 	if (str)
-		*str = string_format(_(u8"%1$3d\u00a0dB"), curval);
-
+	{
+		if (curval == -960)
+			*str = _("Mute");
+		else if (curval % 10)
+			*str = string_format(_(u8"%1$5.1f\u00a0dB"), float(curval) * 0.1f);
+		else
+			*str = string_format(_(u8"%1$3d\u00a0dB"), curval / 10);
+	}
 	return curval;
 }
 
 
 //-------------------------------------------------
-//  slider_mixervol - single channel volume
+//  slider_devvol - device volume
 //  slider callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_mixervol(int item, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_devvol(device_sound_interface *snd, std::string *str, int32_t newval)
 {
-	mixer_input info;
-	if (!machine().sound().indexed_mixer_input(item, info))
-		return 0;
-
 	if (newval != SLIDER_NOCHANGE)
-		info.stream->input(info.inputnum).set_user_gain(float(newval) * 0.001f);
+		snd->set_user_output_gain(newval == -960 ? 0 : osd::db_to_linear(newval * 0.1f));
 
-	int32_t curval = floorf(info.stream->input(info.inputnum).user_gain() * 1000.0f + 0.5f);
+	int curval = snd->user_output_gain() == 0 ? -960 : floorf(osd::linear_to_db(snd->user_output_gain()) * 10.0f + 0.5f);
+
 	if (str)
 	{
-		if (curval == 0)
+		if (curval == -960)
 			*str = _("Mute");
 		else if (curval % 10)
-			*str = string_format(_("%1$.1f%%"), float(curval) * 0.1f);
+			*str = string_format(_(u8"%1$5.1f\u00a0dB"), float(curval) * 0.1f);
 		else
-			*str = string_format(_("%1$3d%%"), curval / 10);
+			*str = string_format(_(u8"%1$3d\u00a0dB"), curval / 10);
 	}
-
 	return curval;
 }
 
 
 //-------------------------------------------------
-//  slider_panning - speaker panning slider
-//  callback
+//  slider_devvol_chan - device channel volume
+//  slider callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_panning(speaker_device &speaker, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_devvol_chan(device_sound_interface *snd, int channel, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		speaker.set_pan(float(newval) * 0.001f);
+		snd->set_user_output_gain(channel, newval == -960 ? 0 : osd::db_to_linear(newval * 0.1f));
 
-	int32_t curval = floorf(speaker.pan() * 1000.0f + 0.5f);
+	int curval = snd->user_output_gain(channel) == 0 ? -960 : floorf(osd::linear_to_db(snd->user_output_gain(channel)) * 10.0f + 0.5f);
+
 	if (str)
 	{
-		switch (curval)
-		{
-			// preset strings for exact center/left/right
-			case 0:
-				*str = _("Center");
-				break;
-
-			case -1000:
-				*str = _("Left");
-				break;
-
-			case 1000:
-				*str = _("Right");
-				break;
-
-			// otherwise show as floating point
-			default:
-				*str = string_format(_("%1$.3f"), float(curval) * 0.001f);
-				break;
-		}
+		if (curval == -960)
+			*str = _("Mute");
+		else if (curval % 10)
+			*str = string_format(_(u8"%1$5.1f\u00a0dB"), float(curval) * 0.1f);
+		else
+			*str = string_format(_(u8"%1$3d\u00a0dB"), curval / 10);
 	}
-
 	return curval;
 }
+
 
 
 //-------------------------------------------------
@@ -2128,6 +2132,28 @@ int32_t mame_ui_manager::slider_adjuster(ioport_field &field, std::string *str, 
 	if (str)
 		*str = string_format(_("%1$3d%%"), settings.value);
 	return settings.value;
+}
+
+
+//-------------------------------------------------
+//  slider_speed - speed factor slider callback
+//-------------------------------------------------
+
+int32_t mame_ui_manager::slider_speed(std::string *str, int32_t newval)
+{
+	if (newval != SLIDER_NOCHANGE)
+		machine().video().set_speed_factor(newval);
+
+	int32_t curval = machine().video().speed_factor();
+	if (str)
+	{
+		if (curval % 10)
+			*str = string_format(_("%1$.1f%%"), float(curval) * 0.1f);
+		else
+			*str = string_format(_("%1$3d%%"), curval / 10);
+	}
+
+	return curval;
 }
 
 
@@ -2161,7 +2187,6 @@ int32_t mame_ui_manager::slider_overclock(device_t &device, std::string *str, in
 int32_t mame_ui_manager::slider_refresh(screen_device &screen, std::string *str, int32_t newval)
 {
 	double defrefresh = ATTOSECONDS_TO_HZ(screen.refresh_attoseconds());
-	double refresh;
 
 	if (newval != SLIDER_NOCHANGE)
 	{
@@ -2173,7 +2198,7 @@ int32_t mame_ui_manager::slider_refresh(screen_device &screen, std::string *str,
 
 	if (str)
 		*str = string_format(_(u8"%1$.3f\u00a0Hz"), screen.frame_period().as_hz());
-	refresh = screen.frame_period().as_hz();
+	double refresh = screen.frame_period().as_hz();
 	return floor((refresh - defrefresh) * 1000.0 + 0.5);
 }
 

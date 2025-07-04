@@ -16,7 +16,7 @@
 #include "formats/cassimg.h"
 
 
-enum cassette_state
+enum cassette_state : uint8_t
 {
 	// this part of the state is controlled by the UI
 	CASSETTE_STOPPED            = 0,
@@ -103,7 +103,7 @@ public:
 	void seek(double time, int origin);
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 	device_sound_interface& set_stereo() { m_stereo = true; return *this; }
 
 protected:
@@ -129,8 +129,8 @@ private:
 	char            m_extension_list[256];
 	const cassette_image::Format*    const *m_formats;
 	const cassette_image::Options    *m_create_opts;
-	cassette_state                  m_default_state;
-	const char *                    m_interface;
+	cassette_state  m_default_state;
+	const char *    m_interface;
 
 	std::error_condition internal_load(bool is_create);
 	bool has_any_extension(std::string_view candidate_extensions) const;

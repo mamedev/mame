@@ -123,7 +123,8 @@ enum p3_mask : u8
 
 void sgi_kbd_device::device_add_mconfig(machine_config &config)
 {
-	speaker_device &speaker(SPEAKER(config, "speaker").front_center());
+	speaker_device &speaker(SPEAKER(config, "speaker"));
+	speaker.front_center();
 
 	beep_device &beeper(BEEP(config, "beeper", 480));
 	beeper.add_route(ALL_OUTPUTS, speaker, 0.25);

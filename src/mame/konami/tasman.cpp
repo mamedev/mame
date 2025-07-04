@@ -690,8 +690,7 @@ void kongambl_state::kongambl(machine_config &config)
 	m_k056832->set_config(K056832_BPP_8TASMAN, 0, 0);
 	m_k056832->set_palette(m_palette);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 

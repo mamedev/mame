@@ -518,17 +518,16 @@ void blackt96_state::blackt96(machine_config &config)
 	m_sprites->set_xpos_shift(12);
 	m_sprites->set_color_entry_mask(0x7f);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM6295(config, m_oki[0], 8_MHz_XTAL / 8, okim6295_device::PIN7_HIGH); // music
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
 	m_oki[0]->set_addrmap(0, &blackt96_state::oki1_map);
 
 	OKIM6295(config, m_oki[1], 8_MHz_XTAL / 8, okim6295_device::PIN7_HIGH); // sfx
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
 }
 
 

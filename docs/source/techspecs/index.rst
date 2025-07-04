@@ -15,6 +15,7 @@ MAME’s source or working on scripts that run within the MAME framework.
     device_memory_interface
     device_rom_interface
     device_disasm_interface
+    device_sound_interface
     memory
     cpu_device
     floppy
@@ -22,3 +23,5 @@ MAME’s source or working on scripts that run within the MAME framework.
     m6502
     uml_instructions
     poly_manager
+    audio_effects
+    osd_audio

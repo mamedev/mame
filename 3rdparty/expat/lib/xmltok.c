@@ -18,12 +18,12 @@
    Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
    Copyright (c) 2017      Alexander Bluhm <alexander.bluhm@gmx.net>
    Copyright (c) 2017      Benbuck Nason <bnason@netflix.com>
-   Copyright (c) 2017      José Gutiérrez de la Concha <jose@zeroc.com>
+   Copyright (c) 2017      JosÃ© GutiÃ©rrez de la Concha <jose@zeroc.com>
    Copyright (c) 2019      David Loffredo <loffredo@steptools.com>
    Copyright (c) 2021      Donghee Na <donghee.na@python.org>
    Copyright (c) 2022      Martin Ettl <ettl.martin78@googlemail.com>
    Copyright (c) 2022      Sean McBride <sean@rogue-research.com>
-   Copyright (c) 2023      Hanno Böck <hanno@gentoo.org>
+   Copyright (c) 2023      Hanno BÃ¶ck <hanno@gentoo.org>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining

@@ -19,6 +19,7 @@
    Copyright (c) 2020      Tim Gates <tim.gates@iress.com>
    Copyright (c) 2021      Donghee Na <donghee.na@python.org>
    Copyright (c) 2023      Sony Corporation / Snild Dolkow <snild@sony.com>
+   Copyright (c) 2025      Berkay Eren Ürün <berkay.ueruen@siemens.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -447,6 +448,31 @@ START_TEST(test_alloc_internal_entity) {
     fail("Internal entity worked despite failing allocations");
   else if (i == max_alloc_count)
     fail("Internal entity failed at max allocation count");
+}
+END_TEST
+
+START_TEST(test_alloc_parameter_entity) {
+  const char *text = "<!DOCTYPE foo ["
+                     "<!ENTITY % param1 \"<!ENTITY internal 'some_text'>\">"
+                     "%param1;"
+                     "]> <foo>&internal;content</foo>";
+  int i;
+  const int alloc_test_max_repeats = 30;
+
+  for (i = 0; i < alloc_test_max_repeats; i++) {
+    g_allocation_count = i;
+    XML_SetParamEntityParsing(g_parser, XML_PARAM_ENTITY_PARSING_ALWAYS);
+    if (_XML_Parse_SINGLE_BYTES(g_parser, text, (int)strlen(text), XML_TRUE)
+        != XML_STATUS_ERROR)
+      break;
+    alloc_teardown();
+    alloc_setup();
+  }
+  g_allocation_count = -1;
+  if (i == 0)
+    fail("Parameter entity processed despite duff allocator");
+  if (i == alloc_test_max_repeats)
+    fail("Parameter entity not processed at max allocation count");
 }
 END_TEST
 
@@ -2079,6 +2105,7 @@ make_alloc_test_case(Suite *s) {
   tcase_add_test__ifdef_xml_dtd(tc_alloc, test_alloc_external_entity);
   tcase_add_test__ifdef_xml_dtd(tc_alloc, test_alloc_ext_entity_set_encoding);
   tcase_add_test__ifdef_xml_dtd(tc_alloc, test_alloc_internal_entity);
+  tcase_add_test__ifdef_xml_dtd(tc_alloc, test_alloc_parameter_entity);
   tcase_add_test__ifdef_xml_dtd(tc_alloc, test_alloc_dtd_default_handling);
   tcase_add_test(tc_alloc, test_alloc_explicit_encoding);
   tcase_add_test(tc_alloc, test_alloc_set_base);

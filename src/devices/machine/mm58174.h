@@ -38,23 +38,23 @@ private:
 
 	attotime interrupt_period_table(int val);
 
-	int m_control;    /* control register (write to address 14) */
+	uint8_t m_control;    // control register (write to address 14)
 
-	int m_int_ctl;    /* interrupt control register */
+	uint8_t m_int_ctl;    // interrupt control register
 
-	int m_years;
-	int m_wday;       /* day of the week (1-7 (1=day1 as set in init)) */
-	int m_months1;    /* months (BCD: 1-12) */
-	int m_months2;
-	int m_days1;      /* days (BCD: 1-31) */
-	int m_days2;
-	int m_hours1;     /* hours (BCD : 0-23) */
-	int m_hours2;
-	int m_minutes1;   /* minutes (BCD : 0-59) */
-	int m_minutes2;
-	int m_seconds1;   /* seconds (BCD : 0-59) */
-	int m_seconds2;
-	int m_tenths;     /* tenths of second (BCD : 0-9) */
+	uint8_t m_years;      // a year that maps to leap year setting
+	uint8_t m_wday;       // day of the week (1-7 (1=day1 as set in init))
+	uint8_t m_months1;    // months (BCD: 1-12)
+	uint8_t m_months2;
+	uint8_t m_days1;      // days (BCD: 1-31)
+	uint8_t m_days2;
+	uint8_t m_hours1;     // hours (BCD : 0-23)
+	uint8_t m_hours2;
+	uint8_t m_minutes1;   // minutes (BCD : 0-59)
+	uint8_t m_minutes2;
+	uint8_t m_seconds1;   // seconds (BCD : 0-59)
+	uint8_t m_seconds2;
+	uint8_t m_tenths;     // tenths of second (BCD : 0-9)
 
 	emu_timer *m_rtc_timer;
 	emu_timer *m_interrupt_timer;

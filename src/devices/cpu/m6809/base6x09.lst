@@ -490,11 +490,7 @@ SEX:
 
 BRANCH:
 	@m_temp.b.l = read_opcode_arg();
-	if(!hd6309_native_mode())
-	{
-		@dummy_vma(1);
-		;
-	}
+	@dummy_vma(1);
 	if (branch_taken())
 	{
 		m_pc.w += (int8_t) m_temp.b.l;
@@ -504,11 +500,7 @@ BRANCH:
 LBRANCH:
 	@m_temp.b.h = read_opcode_arg();
 	@m_temp.b.l = read_opcode_arg();
-	if(!hd6309_native_mode())
-	{
-		@dummy_vma(1);
-		;
-	}
+	@dummy_vma(1);
 	if (branch_taken())
 	{
 		m_pc.w += m_temp.w;

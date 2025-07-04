@@ -845,7 +845,7 @@ static int tap_cas_to_wav_size(const uint8_t *casdata, int caslen)
 		}
 		if (check != checksum)
 		{
-			LOG_FORMATS("tap_cas_to_wav_size: wrong checksum 0x%X\n", check);
+			osd_printf_warning("tap_cas_to_wav_size: wrong checksum 0x%X\n", check);
 		}
 
 		p += data_size;
@@ -858,6 +858,7 @@ static int tap_cas_fill_wave(int16_t *buffer, int length, const uint8_t *bytes, 
 	int16_t *p = buffer;
 	int size = 0;
 
+	int block = 0;
 	while (bytes_length > 2)
 	{
 		int data_size = get_u16le(&bytes[0]);
@@ -867,6 +868,7 @@ static int tap_cas_fill_wave(int16_t *buffer, int length, const uint8_t *bytes, 
 		LOG_FORMATS("tap_cas_fill_wave: Handling TAP block containing 0x%X bytes\n", data_size);
 		if (bytes_length < data_size)
 		{
+			osd_printf_warning("BAD Image: block #%d required %d byte(s), but only %d available\n", block, data_size, bytes_length);
 			data_size = bytes_length; // Take as much as we can.
 		}
 		bytes_length -= data_size;
@@ -874,6 +876,7 @@ static int tap_cas_fill_wave(int16_t *buffer, int length, const uint8_t *bytes, 
 		int pilot_length = (bytes[0] == 0x00) ? 8063 : 3223;
 		size += tzx_cas_handle_block(&p, bytes, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
 		bytes += data_size;
+		++block;
 	}
 	return size;
 }

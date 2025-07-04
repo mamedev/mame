@@ -615,12 +615,11 @@ void systemm1_state::m1base(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM3438(config, m_ym, XTAL(8'000'000));
-	m_ym->add_route(0, "lspeaker", 0.40);
-	m_ym->add_route(1, "rspeaker", 0.40);
+	m_ym->add_route(0, "speaker", 0.40, 0);
+	m_ym->add_route(1, "speaker", 0.40, 1);
 
 	SEGA_315_5296(config, m_io1, XTAL(16'000'000));
 	m_io1->in_pa_callback().set_ioport("IN1_PA");

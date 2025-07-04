@@ -8,7 +8,7 @@ Fidelity Sensory 12 Chess Challenger (SC12, SE12, 6086)
 RE information from netlist by Berger
 
 8*(8+1) buttons, 8+8+2 red LEDs
-DIN 41524C printer port
+DIN 41524C printer port (600 baud, 7 data bits, 1 stop bit, no parity)
 36-pin edge connector
 CPU is a R65C02P4, running at 4MHz*
 
@@ -60,6 +60,7 @@ TODO:
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/clock.h"
 #include "machine/sensorboard.h"
@@ -82,6 +83,7 @@ class sc12_state : public fidel_clockdiv_state
 public:
 	sc12_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidel_clockdiv_state(mconfig, type, tag),
+		m_rs232(*this, "rs232"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -99,6 +101,7 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<rs232_port_device> m_rs232;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
@@ -148,8 +151,9 @@ void sc12_state::control_w(u8 data)
 	// d6,d7: led select (active low)
 	m_display->matrix(~data >> 6 & 3, sel & 0x1ff);
 
-	// d4,d5: printer
-	//..
+	// d4: set when reading printer busy flag from 0xa000
+	// d5: printer port data
+	m_rs232->write_txd(BIT(~data, 5));
 }
 
 u8 sc12_state::input_r(offs_t offset)
@@ -241,6 +245,8 @@ void sc12_state::sc12(machine_config &config)
 	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
 	irq_clock.set_pulse_width(attotime::from_nsec(15250)); // active for 15.25us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

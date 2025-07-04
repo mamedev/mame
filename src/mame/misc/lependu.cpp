@@ -46,7 +46,7 @@
   There are some critical registers and rerouted subroutines in the battery backed
   RAM, hence the game dies once the battery drains.
 
-  Here, you can see a video of the game working for refference:
+  Here, you can see a video of the game working for reference:
   https://youtu.be/e3d8KyUVL_g
 
 

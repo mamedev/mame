@@ -8,5 +8,6 @@
 #include "nubus.h"
 
 DECLARE_DEVICE_TYPE(NUBUS_THUNDERIVGX, device_nubus_card_interface)
+DECLARE_DEVICE_TYPE(NUBUS_THUNDERIVGX16, device_nubus_card_interface)
 
 #endif // MAME_BUS_NUBUS_THUNDER4GX_H

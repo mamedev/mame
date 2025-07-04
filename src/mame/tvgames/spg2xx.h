@@ -5,16 +5,17 @@
 
 #pragma once
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/unsp/unsp.h"
+#include "machine/eepromser.h"
 #include "machine/i2cmem.h"
 #include "machine/spg2xx.h"
 
-
 #include "screen.h"
 #include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
-#include "machine/eepromser.h"
-#include "machine/i2cmem.h"
 
 
 class spg2xx_game_state : public driver_device
@@ -201,6 +202,23 @@ private:
 	uint16_t porta_r();
 	uint16_t portb_r();
 	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	required_device<i2cmem_device> m_i2cmem;
+};
+
+class spg2xx_game_lpetshop_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_lpetshop_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void lpetshop(machine_config &config);
+
+private:
+	uint16_t porta_r();
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	required_device<i2cmem_device> m_i2cmem;
@@ -415,6 +433,52 @@ protected:
 
 private:
 	required_device<i2cmem_device> m_i2cmem;
+};
+
+class spg2xx_game_hasbro_93lc66_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_hasbro_93lc66_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_eeprom(*this, "eeprom")
+	{ }
+
+	void mylpony(machine_config &config);
+	void whacmole(machine_config &config);
+
+private:
+	uint16_t whacmole_porta_r();
+	void whacmole_porta_w(uint16_t data);
+
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+};
+
+class spg2xx_game_smartcycle_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_smartcycle_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_cart(*this, "cartslot"),
+		m_cart_region(nullptr)
+	{ }
+
+	void smartcycle(machine_config &config);
+
+	u16 unknown_random_r()
+	{
+		if (!machine().side_effects_disabled())
+			return machine().rand();
+		else
+			return 0;
+	}
+
+private:
+	virtual void machine_start() override ATTR_COLD;
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+	required_device<generic_slot_device> m_cart;
+	memory_region *m_cart_region;
 };
 
 #endif // MAME_TVGAMES_SPG2XX_H

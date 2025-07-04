@@ -65,6 +65,9 @@ TODO:
 
 void circus_state::machine_start()
 {
+	// trapeze locks up generating random numbers if both 0x0e and 0x0f are zero
+	std::fill(m_ram.begin(), m_ram.end(), 0xff);
+
 	save_item(NAME(m_clown_x));
 	save_item(NAME(m_clown_y));
 	save_item(NAME(m_clown_z));
@@ -113,16 +116,23 @@ void circus_state::clown_z_w(uint8_t data)
 
 void circus_state::main_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();
+	// 5M0-1
+	map(0x0000, 0x01ff).mirror(0x1e00).ram().share(m_ram);
 	map(0x1000, 0x1fff).rom();
-	map(0x2000, 0x2000).w(FUNC(circus_state::clown_x_w));
-	map(0x3000, 0x3000).w(FUNC(circus_state::clown_y_w));
-	map(0x4000, 0x43ff).ram().w(FUNC(circus_state::videoram_w)).share("videoram");
-	map(0x8000, 0x8000).ram().w(FUNC(circus_state::clown_z_w));
-	map(0xa000, 0xa000).portr("INPUTS");
-	map(0xc000, 0xc000).portr("DSW");
-	map(0xd000, 0xd000).r(FUNC(circus_state::paddle_r));
-	map(0xf000, 0xffff).rom();
+	// 5MLS
+	map(0x2000, 0x2000).mirror(0x0fff).w(FUNC(circus_state::clown_x_w));
+	map(0x3000, 0x3000).mirror(0x0fff).w(FUNC(circus_state::clown_y_w));
+	// TOE
+	map(0x4000, 0x43ff).mirror(0x1c00).ram().w(FUNC(circus_state::videoram_w)).share(m_videoram);
+	// 5MOUTP
+	map(0x8000, 0x8000).mirror(0x1fff).w(FUNC(circus_state::clown_z_w));
+	// 5MINPT
+	map(0xa000, 0xa000).mirror(0x1fff).portr("INPUTS");
+	// 5C-D
+	map(0xc000, 0xc000).mirror(0x0fff).portr("DSW");
+	map(0xd000, 0xd000).mirror(0x0fff).r(FUNC(circus_state::paddle_r));
+	// 5E-F
+	map(0xe000, 0xefff).mirror(0x1000).rom().region("maincpu", 0x1000);
 }
 
 
@@ -162,6 +172,24 @@ static INPUT_PORTS_START( circus )
 	PORT_BIT( 0xff, 115, IPT_PADDLE ) PORT_MINMAX(64,167) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( trapeze )
+	PORT_INCLUDE(circus)
+
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "14A:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "14A:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "14A:5" )
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("14A:3,4")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPSETTING(    0x10, "7" )
+	PORT_DIPSETTING(    0x18, "9" )
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "14A:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "14A:1")
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( robotbwl )
 	PORT_START("INPUTS")
@@ -435,7 +463,6 @@ ROM_START( circus )
 	ROM_LOAD( "9009.7a",    0x1a00, 0x0200, CRC(585f633e) SHA1(46133409f42e8cbc095dde576ce07d97b235972d) )
 	ROM_LOAD( "9010.8a",    0x1c00, 0x0200, CRC(69cc409f) SHA1(b77289e62313e8535ce40686df7238aa9c0035bc) )
 	ROM_LOAD( "9011.9a",    0x1e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
-	ROM_RELOAD(             0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "9003.4c",    0x0000, 0x0200, CRC(6efc315a) SHA1(d5a4a64a901853fff56df3c65512afea8336aad2) )
@@ -461,7 +488,6 @@ ROM_START( circuso ) // older set, there exist several bootlegs identical to thi
 	ROM_LOAD( "9009.7a",    0x1a00, 0x0200, CRC(585f633e) SHA1(46133409f42e8cbc095dde576ce07d97b235972d) )
 	ROM_LOAD( "9010.8a",    0x1c00, 0x0200, CRC(69cc409f) SHA1(b77289e62313e8535ce40686df7238aa9c0035bc) )
 	ROM_LOAD( "9011.9a",    0x1e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
-	ROM_RELOAD(             0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "9003.4c",    0x0000, 0x0200, CRC(6efc315a) SHA1(d5a4a64a901853fff56df3c65512afea8336aad2) )
@@ -487,7 +513,6 @@ ROM_START( springbd )
 	ROM_LOAD( "93448.7a",   0x1a00, 0x0200, CRC(585f633e) SHA1(46133409f42e8cbc095dde576ce07d97b235972d) )
 	ROM_LOAD( "93448.8a",   0x1c00, 0x0200, CRC(d7c0dc05) SHA1(cc6f7d16ca4be74370c305c34aa1a2e338d2c41f) )
 	ROM_LOAD( "93448.9a",   0x1e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
-	ROM_RELOAD(             0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "93448.4c",   0x0000, 0x0200, CRC(6efc315a) SHA1(d5a4a64a901853fff56df3c65512afea8336aad2) )
@@ -528,6 +553,31 @@ ROM_START( robotbwl )
 	ROM_LOAD( "5001.5d",  0x0020, 0x0020, NO_DUMP )
 ROM_END
 
+ROM_START( trapeze ) // loose roms labelled with pencil
+	ROM_REGION( 0x10000, "maincpu", 0 ) // code
+	ROM_LOAD( "9004.1a",    0x1000, 0x0200, CRC(fe55a601) SHA1(f23955b4f2d00567f94f96741dc5bfb048a263a2) )
+	ROM_LOAD( "9005.2a",    0x1200, 0x0200, CRC(37948b8d) SHA1(77d9932f4f853a7fb754f9b8fad2e38577077d79) )
+	ROM_LOAD( "9008.3a",    0x1400, 0x0200, CRC(b6c2e1cb) SHA1(a40a1c1b3b780949cc64f8e5ca408619d58437ba) ) // mislabelled?
+	ROM_LOAD( "9009.5a",    0x1600, 0x0200, CRC(875fd035) SHA1(1435f42dad56a18bf967cbc962d74bd2be511f62) ) // mislabelled?
+	ROM_LOAD( "9006.6a",    0x1800, 0x0200, CRC(3572445f) SHA1(78f58c603df5deb483ca80ae6972d6e9ed4a3b96) ) // mislabelled?
+	ROM_LOAD( "9007.7a",    0x1a00, 0x0200, CRC(7d26899b) SHA1(8845383edfdd26cc6c817e5c5b86f12d26914904) ) // mislabelled?
+	ROM_LOAD( "9010.8a",    0x1c00, 0x0200, CRC(7114d163) SHA1(bb301703cc9856c167cd67c825b99fb286f29498) )
+	ROM_LOAD( "9011.9a",    0x1e00, 0x0200, CRC(325a2b38) SHA1(fb4cd885f7202a23ac5d8119b91eaf2c80af5e17) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
+	ROM_LOAD( "9003.4c",    0x0000, 0x0200, CRC(e46eae6c) SHA1(0da9e92ef63c793792c0ec2801475fd860f86cec) )
+	ROM_LOAD( "9002.3c",    0x0200, 0x0200, CRC(5f139f8c) SHA1(9f860503ab0dd2fe69975cb13ce7bf0506d67cdb) )
+	ROM_LOAD( "9001.2c",    0x0400, 0x0200, CRC(0ddc4b45) SHA1(37081a2d0563e6fd58ce41f3bfe0b3c08dcd6653) )
+	ROM_LOAD( "9000.1c",    0x0600, 0x0200, CRC(0ddc4b45) SHA1(37081a2d0563e6fd58ce41f3bfe0b3c08dcd6653) )
+
+	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
+	ROM_LOAD( "9012.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
+
+	ROM_REGION( 0x400, "proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but might match
+	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
+	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
+ROM_END
+
 ROM_START( crash )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // code
 	ROM_LOAD( "crash.a1",   0x1000, 0x0200, CRC(b9571203) SHA1(1299e476598d07a67aa1640f3320de1198280296) )
@@ -538,7 +588,6 @@ ROM_START( crash )
 	ROM_LOAD( "crash.a6",   0x1a00, 0x0200, CRC(c7d62d27) SHA1(974800cbeba2f2d0d796200d235371e2ce3a1d28) )
 	ROM_LOAD( "crash.a7",   0x1c00, 0x0200, CRC(5e5af244) SHA1(9ea27241a5ac97b260599d56f60bf9ec3ffcac7f) )
 	ROM_LOAD( "crash.a8",   0x1e00, 0x0200, CRC(3dc50839) SHA1(5782ea7d70e5cbe8b8245ed1075ce92b57cc6ddf) )
-	ROM_RELOAD(             0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "crash.c4",   0x0000, 0x0200, CRC(ba16f9e8) SHA1(fdbf8d36993196552ddb7729750420f8e31eee70) )
@@ -573,7 +622,6 @@ ROM_START( smash )
 	ROM_LOAD( "smash.a6",   0x1a00, 0x0200, CRC(c7d62d27) SHA1(974800cbeba2f2d0d796200d235371e2ce3a1d28) )
 	ROM_LOAD( "smash.a7",   0x1c00, 0x0200, CRC(5e5af244) SHA1(9ea27241a5ac97b260599d56f60bf9ec3ffcac7f) )
 	ROM_LOAD( "smash.a8",   0x1e00, 0x0200, CRC(3dc50839) SHA1(5782ea7d70e5cbe8b8245ed1075ce92b57cc6ddf) )
-	ROM_RELOAD(             0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "smash.c4",   0x0000, 0x0200, CRC(442500e5) SHA1(c54ebd5ccee096d8eed4153f623adc4e655b3909) )
@@ -595,7 +643,6 @@ ROM_START( ripcord )
 	ROM_LOAD( "9032.7a",    0x1a00, 0x0200, CRC(a6588bec) SHA1(76321ab29329b6291e4d4731bb445a6ac4ce2d86) )
 	ROM_LOAD( "9033.8a",    0x1c00, 0x0200, CRC(fd49b806) SHA1(5205ee8e9cec53be6e79e0183bc1e9d96c8c2e55) )
 	ROM_LOAD( "9034.9a",    0x1e00, 0x0200, CRC(7caf926d) SHA1(f51d010ce1909e21e04313e4262c70ab948c14e0) )
-	ROM_RELOAD(             0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "9026.5c",    0x0000, 0x0200, CRC(06e7adbb) SHA1(0c119743eacc30d6d9eb50dfee0746b69bb17377) )
@@ -618,6 +665,8 @@ GAMEL( 1977, circuso,  circus, circus,   circus,   circus_state,   empty_init, R
 GAMEL( 1977, springbd, circus, circus,   circus,   circus_state,   empty_init, ROT0, "bootleg (Sub-Electro)", "Springboard (bootleg of Circus)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but it also had a different bezel
 
 GAME(  1977, robotbwl, 0,      robotbwl, robotbwl, robotbwl_state, empty_init, ROT0, "Exidy", "Robot Bowl", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+
+GAME(  1978, trapeze,  0,      circus,   trapeze,  ripcord_state,  empty_init, ROT0, "Exidy / Taito", "Trapeze / Trampoline", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // named Trampoline when Taito published it in Japan
 
 GAMEL( 1979, crash,    0,      crash,    crash,    crash_state,    empty_init, ROT0, "Exidy", "Crash (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash )
 GAMEL( 1979, crasha,   crash,  crash,    crash,    crash_state,    empty_init, ROT0, "Exidy", "Crash (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crasha )

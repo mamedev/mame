@@ -2237,20 +2237,19 @@ void x1_state::x1(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "x1_cart", "bin,rom");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// TODO: fix thru schematics (formation of resistors tied to ABC outputs)
 	ay8910_device &ay(AY8910(config, "ay", MAIN_CLOCK/8));
 	ay.port_a_read_callback().set_ioport("P1");
 	ay.port_b_read_callback().set_ioport("P2");
-	ay.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	ay.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	ay.add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
+	ay.add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x1_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.10, 1);
 	m_cassette->set_interface("x1_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
@@ -2289,8 +2288,8 @@ void x1turbo_state::x1turbo(machine_config &config)
 	m_ctc_ym->zc_callback<0>().set(m_ctc_ym, FUNC(z80ctc_device::trg3));
 
 	YM2151(config, m_ym, MAIN_CLOCK/8);
-	m_ym->add_route(0, "lspeaker", 0.50);
-	m_ym->add_route(1, "rspeaker", 0.50);
+	m_ym->add_route(0, "speaker", 0.50, 0);
+	m_ym->add_route(1, "speaker", 0.50, 1);
 }
 
 /*************************************

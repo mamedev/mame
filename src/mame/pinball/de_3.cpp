@@ -527,12 +527,11 @@ void de_3_state::de_3_dmd2(machine_config &config)
 	de_3(config);
 	DECODMD2(config, m_dmdtype2, 0);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DECOBSMT(config, m_decobsmt, 0);
-	m_decobsmt->add_route(0, "lspeaker", 1.0);
-	m_decobsmt->add_route(1, "rspeaker", 1.0);
+	m_decobsmt->add_route(0, "speaker", 1.0, 0);
+	m_decobsmt->add_route(1, "speaker", 1.0, 1);
 }
 
 void de_3_state::de_3_dmd1(machine_config &config)
@@ -540,12 +539,11 @@ void de_3_state::de_3_dmd1(machine_config &config)
 	de_3(config);
 	DECODMD1(config, m_dmdtype1, 0);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DECOBSMT(config, m_decobsmt, 0);
-	m_decobsmt->add_route(0, "lspeaker", 1.0);
-	m_decobsmt->add_route(1, "rspeaker", 1.0);
+	m_decobsmt->add_route(0, "speaker", 1.0, 0);
+	m_decobsmt->add_route(1, "speaker", 1.0, 1);
 }
 
 void de_3_state::de_3_dmdo(machine_config &config)
@@ -573,12 +571,11 @@ void de_3_state::de_3b(machine_config &config)
 	DECODMD3(config, m_dmdtype3, 0);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DECOBSMT(config, m_decobsmt, 0);
-	m_decobsmt->add_route(0, "lspeaker", 1.0);
-	m_decobsmt->add_route(1, "rspeaker", 1.0);
+	m_decobsmt->add_route(0, "speaker", 1.0, 0);
+	m_decobsmt->add_route(1, "speaker", 1.0, 1);
 }
 
 void de_3_state::detest(machine_config &config)

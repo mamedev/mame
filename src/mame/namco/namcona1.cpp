@@ -1067,13 +1067,12 @@ void namcona1_state::namcona_base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcona1);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	C219(config, m_c219, 44100);
 	m_c219->set_addrmap(0, &namcona1_state::namcona1_c219_map);
-	m_c219->add_route(0, "rspeaker", 1.00);
-	m_c219->add_route(1, "lspeaker", 1.00);
+	m_c219->add_route(0, "speaker", 1.00, 1);
+	m_c219->add_route(1, "speaker", 1.00, 0);
 }
 
 void namcona1_state::namcona1(machine_config &config)

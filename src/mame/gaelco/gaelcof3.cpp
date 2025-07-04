@@ -34,12 +34,18 @@
   The PCBs were inside two "Coche de Bomberos" kiddie rides from CMC Cresmatic (https://www.recreativas.org/coche-de-bomberos-6022-cresmatic).
   Anyway, the hardware is generic enough to serve any basic kiddie ride.
 
-  There are three different versions dumped (from different machines):
+  There are five different versions dumped (from different machines):
      -"Susanita" - Based on the song composed by Rafael Pérez Botija.
-     -"El auto feo" - Based on the song composed by Enrique Fischer 'Pipo Pescador'.
-     -"Hola Don Pepito" - Based on the song composed by Ramón del Rivero.
+     -"El auto de papá" - Based on the song "El auto feo", composed by Enrique Fischer 'Pipo Pescador'.
+     -"Don Pepito" - Based on the song "Hola Don Pepito", composed by Ramón del Rivero.
+     -"Ob-La-Di" - Based on the song by the Beatles.
+     -"Mueve" - Based on the Spanish cover version of the song "I Like To Move It" by Reel 2 Real, named "Te Gusta el Mueve Mueve".
 
-  The PIC16C56 from Hola Don Pepito has been decapped. It is believed it has the same contents for all games.
+  There is a newer version of the PCB with the same components (Gaelco REF.920505, from 1992). It adds a fuse, a LED for PCB control, and
+  better connectors.
+
+
+  The PIC16C56 from Hola Don Pepito has been decapped.
 
   TODO:
   inputs;
@@ -115,8 +121,7 @@ void gaelcof3_state::gaelcof3(machine_config &config)
 
 ROM_START( autopapa )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	// this was decapped and dumped for donpepito, should be the same but marking it as bad dump for overcautiousness
-	ROM_LOAD( "pic16c56.u3", 0x0000, 0x1fff, BAD_DUMP CRC(a2c24ec3) SHA1(e87520c6de714b1638c9b156411522e0209fb06e) )
+	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x2000, CRC(089699f5) SHA1(2cc470a97936887804363c8783bad4db4cad4f64) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "autopapa.u1", 0x00000, 0x40000, CRC(a3e5607e) SHA1(24a9c79edec7b2f7f64b622240f2ad8f3ffa29ca) )
@@ -124,16 +129,31 @@ ROM_END
 
 ROM_START( donpepito )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "pic16c56.u3", 0x0000, 0x1fff, CRC(a2c24ec3) SHA1(e87520c6de714b1638c9b156411522e0209fb06e) )
+	ROM_LOAD( "ir_pic16c56.u3", 0x0000, 0x1fff, CRC(a2c24ec3) SHA1(e87520c6de714b1638c9b156411522e0209fb06e) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "don_pepito.u1", 0x00000, 0x40000, CRC(574fcd14) SHA1(a23f1eb6d2cef5aa07df3a553fe1d33803648f43) )
 ROM_END
 
+ROM_START( mueve )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x2000, CRC(089699f5) SHA1(2cc470a97936887804363c8783bad4db4cad4f64) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "mueve_reclam_ea76_pic_irn_27c020.u1", 0x00000, 0x40000, CRC(f3cc6936) SHA1(35334aeb85f3524f2afdf20f49005d7573ec5494) )
+ROM_END
+
+ROM_START( obladi )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x2000, CRC(089699f5) SHA1(2cc470a97936887804363c8783bad4db4cad4f64) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "obladi_reclam_5a5c_pic_irn_27c020.u1", 0x00000, 0x40000, CRC(a156f749) SHA1(f2bcbe5857e8ea6d96c2abe3051a5d02308dc963) )
+ROM_END
+
 ROM_START( susanita )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	// this was decapped and dumped for donpepito, should be the same but marking it as bad dump for overcautiousness
-	ROM_LOAD( "pic16c56.u3", 0x0000, 0x1fff, BAD_DUMP CRC(a2c24ec3) SHA1(e87520c6de714b1638c9b156411522e0209fb06e) )
+	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x2000, CRC(089699f5) SHA1(2cc470a97936887804363c8783bad4db4cad4f64) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "susanita.u1", 0x00000, 0x40000, CRC(766868cb) SHA1(eb42dc46b865bc448052d9d67c840e51c49ce49a) )
@@ -142,6 +162,8 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, autopapa,  0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco", "El auto feo",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 199?, donpepito, 0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco", "Hola Don Pepito", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 199?, susanita,  0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco", "Susanita",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, autopapa,  0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", u8"El auto de papá", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, donpepito, 0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Don Pepito",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, mueve,     0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Mueve",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, obladi,    0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Ob-La-Di",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, susanita,  0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Susanita",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

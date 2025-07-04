@@ -123,14 +123,9 @@ void c352_device::ramp_volume(c352_voice_t &v, int ch, u8 val)
 		v.curr_vol[ch] += (vol_delta > 0) ? -1 : 1;
 }
 
-void c352_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void c352_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer_fl = outputs[0];
-	auto &buffer_fr = outputs[1];
-	auto &buffer_rl = outputs[2];
-	auto &buffer_rr = outputs[3];
-
-	for (int i = 0; i < buffer_fl.samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		int out[4] = { 0, 0, 0, 0 };
 
@@ -174,10 +169,10 @@ void c352_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 			out[3] += (((v.flags & C352_FLG_PHASEFR) ? -s : s) * v.curr_vol[3]) >> 8;
 		}
 
-		buffer_fl.put_int(i, s16(out[0] >> 3), 32768);
-		buffer_fr.put_int(i, s16(out[1] >> 3), 32768);
-		buffer_rl.put_int(i, s16(out[2] >> 3), 32768);
-		buffer_rr.put_int(i, s16(out[3] >> 3), 32768);
+		stream.put_int(0, i, s16(out[0] >> 3), 32768);
+		stream.put_int(1, i, s16(out[1] >> 3), 32768);
+		stream.put_int(2, i, s16(out[2] >> 3), 32768);
+		stream.put_int(3, i, s16(out[3] >> 3), 32768);
 	}
 }
 

@@ -176,8 +176,8 @@ void mu15_state::mu15(machine_config &config)
 	m_maincpu->set_addrmap(swx00_device::AS_C, &mu15_state::c_map);
 	m_maincpu->set_addrmap(swx00_device::AS_S, &mu15_state::s_map);
 
-	m_maincpu->add_route(0, "lspeaker", 1.0);
-	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "speaker", 1.0, 0);
+	m_maincpu->add_route(1, "speaker", 1.0, 1);
 
 	// Nothing connected to sclki, yet...
 	m_maincpu->sci_set_external_clock_period(0, attotime::from_hz(500000));
@@ -197,8 +197,7 @@ void mu15_state::mu15(machine_config &config)
 
 	MU5LCD(config, m_lcd);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// sci0 goes to the host connector
 

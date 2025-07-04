@@ -59,14 +59,14 @@ void sega005_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void sega005_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void sega005_sound_device::sound_stream_update(sound_stream &stream)
 {
 	segag80r_state *state = machine().driver_data<segag80r_state>();
 	const uint8_t *sound_prom = state->memregion("proms")->base();
 	int i;
 
 	/* no implementation yet */
-	for (i = 0; i < outputs[0].samples(); i++)
+	for (i = 0; i < stream.samples(); i++)
 	{
 		if (!(state->m_sound_state[1] & 0x10) && (++state->m_square_count & 0xff) == 0)
 		{
@@ -77,7 +77,7 @@ void sega005_sound_device::sound_stream_update(sound_stream &stream, std::vector
 				state->m_square_state += 2;
 		}
 
-		outputs[0].put(i, (state->m_square_state & 2) ? 1.0 : 0.0);
+		stream.put(0, i, (state->m_square_state & 2) ? 1.0 : 0.0);
 	}
 }
 

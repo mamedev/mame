@@ -125,7 +125,6 @@ expansion.
 #include "machine/timer.h"
 #include "video/mc6847.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "machine/terminal.h"

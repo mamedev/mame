@@ -504,20 +504,19 @@ void mugsmash_state::mugsmash(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x300);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3'579'545));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 1.00);   // music
-	ymsnd.add_route(1, "rspeaker", 1.00);
+	ymsnd.add_route(0, "speaker", 1.00, 0);   // music
+	ymsnd.add_route(1, "speaker", 1.00, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 1'122'000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50); // sound fx
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 0); // sound fx
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 }
 
 ROM_START( mugsmash )

@@ -114,8 +114,7 @@ void cupidon_state::cupidon(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x10000);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	/* unknown sound, probably DAC driven using 68340 DMA */
 }
 

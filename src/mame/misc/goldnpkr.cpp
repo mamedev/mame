@@ -1028,6 +1028,7 @@
 
 #include "emu.h"
 
+#include "cpu/m6502/g65sc02.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6805/m68705.h"
@@ -1040,6 +1041,7 @@
 #include "machine/timekpr.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
+#include "sound/sn76496.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
@@ -1099,6 +1101,7 @@ public:
 	void lespendu(machine_config &config);
 	void icproul(machine_config &config);
 	void glfever(machine_config &config);
+	void kmhpan(machine_config &config);
 
 	void init_vkdlswwh();
 	void init_icp1db();
@@ -1195,6 +1198,7 @@ private:
 	void icp_ext_map(address_map &map) ATTR_COLD;
 	void lespendu_map(address_map &map) ATTR_COLD;
 	void glfever_map(address_map &map) ATTR_COLD;
+	void kmhpan_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -1975,6 +1979,22 @@ void goldnpkr_state::glfever_map(address_map &map)
 	map(0x3000, 0x7fff).rom();  // base rom space
 	map(0xa000, 0xa000).portr("SWB");
 	map(0xf000, 0xffff).rom();  // extended rom space
+}
+
+void goldnpkr_state::kmhpan_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	//map(0x2000, 0x2000).r // ??
+	map(0x2400, 0x2400).w("sn", FUNC(sn76489a_device::write));
+	//map(0x2800, 0x2800).w // SN76489AN, initialized but not present on PCB? not written during gameplay
+	map(0x4000, 0x7fff).rom();
+	map(0xc000, 0xffff).rom();  // extended rom space
 }
 
 
@@ -4651,6 +4671,16 @@ static INPUT_PORTS_START( potnpkro )  // ICP-1 w/daughterboard
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( kmhpan ) // TODO: verify inputs
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4") // Game specifically checks for this to be off
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 /*********************************************
 *              Graphics Layouts              *
 *********************************************/
@@ -5285,6 +5315,19 @@ void goldnpkr_state::glfever(machine_config &config)
 	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void goldnpkr_state::kmhpan(machine_config &config)
+{
+	goldnpkr_base(config);
+
+	G65SC02(config.replace(), m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::kmhpan_map);
+
+	m_pia[1]->writepa_handler().remove();
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SN76489A(config, "sn", CPU_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.5); // divider unknown
+}
 
 void blitz_state::megadpkr(machine_config &config)
 {
@@ -12634,6 +12677,38 @@ ROM_START( icproul )
 	ROM_LOAD( "n82s129an.bin", 0x0000, 0x0100, CRC(1a30bdd8) SHA1(d0a020e9604e8e0920a4500e02770db6c639bace) )
 ROM_END
 
+// PCB serigraphed PAN 电子 (PAN diànzǐ)
+// G65SC02P-2, 10 MHz XTAL, EF6821P, MC68B21P, HD46505SP-2, SN76489AN, bank of 8 switches, reset button
+ROM_START( kmhpan )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "main-prog.bin", 0x00000, 0x10000, CRC(1f96ec9f) SHA1(fb2f7e725af888b371e314a8f482c9acdf9a5894) )
+
+	// TODO: correct GFX ROMs' loading
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "kai-1.bin", 0x0000, 0x2000, CRC(825ec1ac) SHA1(6771b5f696e53222fb69e464e03935978e43cafb) ) // BADADDR         x-xxxxxxxxxxxxx
+	ROM_CONTINUE(          0x0000, 0x2000 )
+	ROM_CONTINUE(          0x0000, 0x2000 )
+	ROM_CONTINUE(          0x0000, 0x2000 )
+	ROM_LOAD( "kai-2.bin", 0x2000, 0x2000, CRC(22a51cf2) SHA1(a158acb450f1bfbc26384a3136fed4c268213de6) ) // BADADDR         x-xxxxxxxxxxxxx
+	ROM_CONTINUE(          0x2000, 0x2000 )
+	ROM_CONTINUE(          0x2000, 0x2000 )
+	ROM_CONTINUE(          0x2000, 0x2000 )
+	ROM_LOAD( "kai-3.bin", 0x4000, 0x2000, CRC(2ffd4c95) SHA1(c239213203bf7c5fc6336b3ef8e33904c4c1bcf2) ) // BADADDR         x-xxxxxxxxxxxxx
+	ROM_CONTINUE(          0x4000, 0x2000 )
+	ROM_CONTINUE(          0x4000, 0x2000 )
+	ROM_CONTINUE(          0x4000, 0x2000 )
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_COPY( "gfx1", 0x5000, 0x0000, 0x1000 )
+	ROM_FILL(         0x1000, 0x5000, 0x0000 )
+
+	ROM_REGION( 0x10000, "unkroms", 0 )
+	ROM_LOAD( "pan_dianzi_f.bin", 0x0000, 0x8000, NO_DUMP ) // M27C256B, soldered, not dumped yet
+	ROM_LOAD( "pan_dianzi_g.bin", 0x8000, 0x8000, NO_DUMP ) // M27C256B, soldered, not dumped yet
+
+	ROM_REGION( 0x0100, "proms", ROMREGION_ERASE00 ) // not identified / dumped yet
+	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // borrowed from goldnpkr for now, just to see something
+ROM_END
 
 /*********************************************
 *                Driver Init                 *
@@ -13345,6 +13420,7 @@ GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespe
 
 GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Roulette (ICP-1 PCB)",                    0 )  // password protected
 
+GAME(  199?, kmhpan,    0,        kmhpan,   kmhpan,   goldnpkr_state, empty_init,    ROT0,   "PAN Electronics",          "Kaimen Hu (PAN Electronics)",             MACHINE_NOT_WORKING )
 
 /*************************************** SETS W/IRQ0 ***************************************/
 

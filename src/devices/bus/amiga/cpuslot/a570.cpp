@@ -120,8 +120,8 @@ void a570_device::device_add_mconfig(machine_config &config)
 	m_tpi->out_pb_cb().set(FUNC(a570_device::tpi_portb_w));
 
 	CR511B(config, m_drive, 0);
-	m_drive->add_route(0, "lspeaker", 1.0);
-	m_drive->add_route(1, "rspeaker", 1.0);
+	m_drive->add_route(0, "speaker", 1.0, 0);
+	m_drive->add_route(1, "speaker", 1.0, 1);
 	m_drive->scor_cb().set(m_tpi, FUNC(tpi6525_device::i1_w)).invert();
 	m_drive->stch_cb().set(m_tpi, FUNC(tpi6525_device::i2_w)).invert();
 	m_drive->sten_cb().set(m_tpi, FUNC(tpi6525_device::i3_w));
@@ -129,8 +129,7 @@ void a570_device::device_add_mconfig(machine_config &config)
 	m_drive->drq_cb().set(m_tpi, FUNC(tpi6525_device::i4_w));
 	m_drive->drq_cb().append(FUNC(a570_device::drq_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// TODO: Add stereo input for Amiga sound
 }

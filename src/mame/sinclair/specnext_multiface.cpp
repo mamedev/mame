@@ -97,7 +97,7 @@ void specnext_multiface_device::device_start()
 void specnext_multiface_device::device_reset()
 {
 	m_cpu_a_0066 = 0;
-	m_cpu_mreq_n = 0;;
+	m_cpu_mreq_n = 0;
 	m_cpu_m1_n = 1;
 	m_cpu_retn_seen = 0;
 	m_enable = 1;

@@ -20,7 +20,7 @@ public:
 	bool nmi_stackless_r() { return m_stackless; }
 	void nmi_stackless_w(bool data) { m_stackless = data; }
 
-	void nmi() { m_nmi_pending = true; }
+	void nmi() { set_service_attention<SA_NMI_PENDING, 1>(); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;

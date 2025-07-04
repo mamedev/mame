@@ -1801,11 +1801,10 @@ void mcr_state::mcr_90009(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRBG_444, 32);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	MIDWAY_SSIO(config, m_ssio);
-	m_ssio->add_route(0, "lspeaker", 1.0);
-	m_ssio->add_route(1, "rspeaker", 1.0);
+	m_ssio->add_route(0, "speaker", 1.0, 0);
+	m_ssio->add_route(1, "speaker", 1.0, 1);
 }
 
 /* as above, but in a casino cabinet */
@@ -1843,8 +1842,8 @@ void mcr_state::mcr_90010_tt(machine_config &config)
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(2);
 	m_samples->set_samples_names(twotiger_sample_names);
-	m_samples->add_route(0, "lspeaker", 0.25);
-	m_samples->add_route(1, "rspeaker", 0.25);
+	m_samples->add_route(0, "speaker", 0.25, 0);
+	m_samples->add_route(1, "speaker", 0.25, 1);
 }
 
 /* 91475 CPU board plus 90908/90913/91483 sound board plus cassette interface */
@@ -1859,8 +1858,8 @@ void mcr_state::mcr_91475(machine_config &config)
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
 	m_samples->set_samples_names(journey_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_samples->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 }
 
 
@@ -1885,8 +1884,8 @@ void mcr_state::mcr_91490_snt(machine_config &config)
 
 	/* basic machine hardware */
 	BALLY_SQUAWK_N_TALK(config, m_squawk_n_talk);
-	m_squawk_n_talk->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_squawk_n_talk->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_squawk_n_talk->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_squawk_n_talk->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 
@@ -1926,8 +1925,8 @@ void mcr_state::mcr_91490_tcs(machine_config &config)
 
 	/* basic machine hardware */
 	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak);
-	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 

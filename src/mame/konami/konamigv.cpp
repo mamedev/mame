@@ -580,8 +580,8 @@ void konamigv_state::konamigv(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4").option_set("cdrom", NSCSI_XM5401).machine_config(
 			[](device_t *device)
 			{
-				device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-				device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+				device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+				device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
 			});
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53cf96", NCR53CF96).clock(32_MHz_XTAL/2).machine_config(
 			[this](device_t *device)
@@ -597,12 +597,11 @@ void konamigv_state::konamigv(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
-	spu.add_route(1, "lspeaker", 0.75); // to verify the channels, btchamp's "game sound test" in the sound test menu speaks the words left, right, center
-	spu.add_route(0, "rspeaker", 0.75);
+	spu.add_route(1, "speaker", 0.75, 0); // to verify the channels, btchamp's "game sound test" in the sound test menu speaks the words left, right, center
+	spu.add_route(0, "speaker", 0.75, 1);
 }
 
 

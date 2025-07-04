@@ -321,12 +321,11 @@ void invqix_state::invqix(machine_config &config)
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 256-1, 0, 240-1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	okim9810_device &oki(OKIM9810(config, "oki", XTAL(4'096'000)));
-	oki.add_route(0, "lspeaker", 0.80);
-	oki.add_route(1, "rspeaker", 0.80);
+	oki.add_route(0, "speaker", 0.80, 0);
+	oki.add_route(1, "speaker", 0.80, 1);
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
 }

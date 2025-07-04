@@ -88,7 +88,7 @@ void upd934g_device::device_reset()
 //  our sound stream
 //-------------------------------------------------
 
-void upd934g_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void upd934g_device::sound_stream_update(sound_stream &stream)
 {
 	for (unsigned ch = 0; ch < 4; ch++)
 	{
@@ -96,7 +96,7 @@ void upd934g_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		{
 			uint16_t end = m_addr[(m_channel[ch].playing + 1) & 0xf] - 1;
 
-			for (unsigned i = 0; i < outputs[ch].samples(); i++)
+			for (unsigned i = 0; i < stream.samples(); i++)
 			{
 				int16_t raw = static_cast<int8_t>(read_byte(m_channel[ch].pos)) * 4;
 
@@ -105,18 +105,15 @@ void upd934g_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				const double adjust[] = { 0.4, 0.7, 0.4, 1.0 };
 				raw *= adjust[m_channel[ch].effect];
 
-				outputs[ch].put_int(i, raw, 32768 / 64);
+				stream.put_int(ch, i, raw, 32768 / 64);
 
 				if (++m_channel[ch].pos >= end)
 				{
 					m_channel[ch].playing = -1;
-					outputs[ch].fill(0, i + 1);
 					break;
 				}
 			}
 		}
-		else
-			outputs[ch].fill(0);
 	}
 }
 

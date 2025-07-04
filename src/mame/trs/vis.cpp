@@ -134,19 +134,18 @@ TIMER_CALLBACK_MEMBER(vis_audio_device::pcm_update)
 
 void vis_audio_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymf262_device &ymf262(YMF262(config, "ymf262", XTAL(14'318'181)));
-	ymf262.add_route(0, "lspeaker", 1.00);
-	ymf262.add_route(1, "rspeaker", 1.00);
-	ymf262.add_route(2, "lspeaker", 1.00);
-	ymf262.add_route(3, "rspeaker", 1.00);
+	ymf262.add_route(0, "speaker", 1.00, 0);
+	ymf262.add_route(1, "speaker", 1.00, 1);
+	ymf262.add_route(2, "speaker", 1.00, 0);
+	ymf262.add_route(3, "speaker", 1.00, 1);
 
 	DAC_16BIT_R2R(config, m_ldac, 0);
 	DAC_16BIT_R2R(config, m_rdac, 0);
-	m_ldac->add_route(ALL_OUTPUTS, "lspeaker", 1.0); // sanyo lc7883k
-	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 1.0); // sanyo lc7883k
+	m_ldac->add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // sanyo lc7883k
+	m_rdac->add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // sanyo lc7883k
 }
 
 uint8_t vis_audio_device::pcm_r(offs_t offset)

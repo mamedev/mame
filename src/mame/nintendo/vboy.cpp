@@ -1273,11 +1273,10 @@ void vboy_state::vboy(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("vboy");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	vboysnd_device &vbsnd(VBOYSND(config, "vbsnd"));
-	vbsnd.add_route(0, "lspeaker", 1.0);
-	vbsnd.add_route(1, "rspeaker", 1.0);
+	vbsnd.add_route(0, "speaker", 1.0, 0);
+	vbsnd.add_route(1, "speaker", 1.0, 1);
 }
 
 /* ROM definition */

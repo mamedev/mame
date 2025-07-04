@@ -38,6 +38,7 @@
 #define LOG_SPI         (1U << 5)
 #define LOG_SPI_VERBOSE (1U << 6)
 #define LOG_ADC         (1U << 7)
+#define LOG_KEYSCAN     (1U << 8)
 
 #define VERBOSE (0)
 
@@ -82,7 +83,17 @@ static constexpr u8  ADBXR_TC                   = 6;                    // ADB t
 static constexpr u8  ADBXR_SRQ                  = 5;                    // ADB got a Service ReQuest
 static constexpr u8  ADBXR_RDRF                 = 3;                    // ADB receiver full
 static constexpr u8  ADBXR_BRST                 = 0;                    // ADB send reset
-static constexpr u8  ADBXR_IRQS ((1 << ADBXR_TDRE) | (1 << ADBXR_TC) | (1 << ADBXR_SRQ) | (1 << ADBXR_RDRF));
+static constexpr u8  ADBXR_IRQS = ((1 << ADBXR_TDRE) | (1 << ADBXR_TC) | (1 << ADBXR_SRQ) | (1 << ADBXR_RDRF));
+
+static constexpr u8  KCSR_SR0                   = 0;                    // Scan rate bits
+static constexpr u8  KCSR_SR1                   = 1;                    // %010 = 4 uSec, assume (1 << rate) microseconds.
+static constexpr u8  KCSR_SR2                   = 2;
+static constexpr u8  KCSR_KSCAN                 = 3;                    // Enable automatic hardware scanning
+static constexpr u8  KCSR_SIE                   = 4;                    // Scan interrupt enable
+static constexpr u8  KCSR_KIE                   = 5;                    // Keyboard interrupt enable
+static constexpr u8  KCSR_SIF                   = 6;                    // Scan interrupt flag
+static constexpr u8  KCSR_KIF                   = 7;                    // Keyboard interrupt flag
+static constexpr u8  KCSR_RATE_MASK = ((1 << KCSR_SR0) | (1 << KCSR_SR1) | (1 << KCSR_SR2));
 
 static constexpr int s_spi_divisors[4] = {2, 4, 16, 32};
 
@@ -118,7 +129,8 @@ m68hc05pge_device::m68hc05pge_device(const machine_config &mconfig, device_type 
 	m_tbcs(0),
 	m_pwmacr(0), m_pwma0(0), m_pwma1(0),
 	m_pwmbcr(0), m_pwmb0(0), m_pwmb1(0),
-	m_plmcr(0), m_plmt1(0), m_plmt2(0)
+	m_plmcr(0), m_plmt1(0), m_plmt2(0),
+	m_kcsr(0)
 {
 	std::fill(std::begin(m_pullups), std::end(m_pullups), 0);
 }
@@ -161,14 +173,16 @@ void m68hc05pge_device::device_start()
 	save_item(NAME(m_plmcr));
 	save_item(NAME(m_plmt1));
 	save_item(NAME(m_plmt2));
+	save_item(NAME(m_kcsr));
 
 	m_seconds_timer = timer_alloc(FUNC(m68hc05pge_device::seconds_tick), this);
 	m_cpi_timer = timer_alloc(FUNC(m68hc05pge_device::cpi_tick), this);
 	m_spi_timer = timer_alloc(FUNC(m68hc05pge_device::spi_tick), this);
 	m_adb_timer = timer_alloc(FUNC(m68hc05pge_device::adb_tick), this);
+	m_keyscan_timer = timer_alloc(FUNC(m68hc05pge_device::keyscan_tick), this);
 
 	system_time systime;
-	struct tm cur_time, macref;
+	struct tm cur_time;
 	machine().current_datetime(systime);
 
 	cur_time.tm_sec = systime.local_time.second;
@@ -179,15 +193,8 @@ void m68hc05pge_device::device_start()
 	cur_time.tm_year = systime.local_time.year - 1900;
 	cur_time.tm_isdst = 0;
 
-	macref.tm_sec = 0;
-	macref.tm_min = 0;
-	macref.tm_hour = 0;
-	macref.tm_mday = 1;
-	macref.tm_mon = 0;
-	macref.tm_year = 4;
-	macref.tm_isdst = 0;
-	const u32 ref = (u32)mktime(&macref);
-	m_rtc = (u32)((u32)mktime(&cur_time) - ref);
+	// Add the difference in seconds between the Unix epoch (1/1/1970) and the Mac OS epoch (1/1/1904)
+	m_rtc = (u32)(mktime(&cur_time) + 2082844800);
 }
 
 void m68hc05pge_device::device_reset()
@@ -529,14 +536,62 @@ void m68hc05pge_device::cscr_w(u8 data)
 	m_cscr = data;
 }
 
+TIMER_CALLBACK_MEMBER(m68hc05pge_device::keyscan_tick)
+{
+	m_kcsr |= (1 << KCSR_SIF);
+
+	for (int row = 0; row < 8; row++)
+	{
+		ports_w(PGE_PORTC, (1 << row) ^ 0xff);
+		const u8 rowdata1 = ports_r(PGE_PORTA);
+		const u8 rowdata2 = ports_r(PGE_PORTB);
+
+		// keys are active low
+		if ((rowdata1 != 0xff) || (rowdata2 != 0xff))
+		{
+			m_kcsr |= (1 << KCSR_KIF);
+			LOGMASKED(LOG_KEYSCAN, "Scanner found a keypress\n");
+		}
+	}
+
+	const u8 keyirq = ((1 << KCSR_KIF) | (1 << KCSR_KIE));
+	const u8 scanirq = ((1 << KCSR_SIF) | (1 << KCSR_SIE));
+	if (((m_kcsr & keyirq) == keyirq) || ((m_kcsr & scanirq) == scanirq))
+	{
+		set_input_line(M68HC05PGE_INT_KEY, ASSERT_LINE);
+	}
+}
+
 u8 m68hc05pge_device::kcsr_r()
 {
-	return 0;
+	const u8 retval = m_kcsr;
+
+	if (!machine().side_effects_disabled())
+	{
+		// based on the 6805 program's usage, just reading this acks the interrupts
+		const u8 irqs = ((1 << KCSR_KIF) | (1 << KCSR_SIF));
+		if ((m_kcsr & irqs) != 0)
+		{
+			set_input_line(M68HC05PGE_INT_KEY, CLEAR_LINE);
+		}
+		m_kcsr &= ~((1 << KCSR_KIF) | (1 << KCSR_SIF));
+	}
+	return retval;
 }
 
 void m68hc05pge_device::kcsr_w(u8 data)
 {
-//  printf("%02x to KCSR\n", data);
+	if ((data & (1 << KCSR_KSCAN)) && !(m_kcsr & (1 << KCSR_KSCAN)))
+	{
+		LOGMASKED(LOG_KEYSCAN, "Starting keyboard scanner\n");
+		m_keyscan_timer->adjust(attotime::from_usec(1 << (data & KCSR_RATE_MASK)), 0, attotime::from_usec(1 << (data & KCSR_RATE_MASK)));
+	}
+	else if ((!(data & (1 << KCSR_KSCAN))) && (m_kcsr & (1 << KCSR_KSCAN)))
+	{
+		LOGMASKED(LOG_KEYSCAN, "Stopping keyboard scanner\n");
+		m_keyscan_timer->adjust(attotime::never);
+	}
+	m_kcsr = data;
 }
 
 u8 m68hc05pge_device::trackball_r(offs_t offset)

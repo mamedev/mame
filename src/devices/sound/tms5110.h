@@ -60,7 +60,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(romclk_hack_toggle);
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	uint8_t TALK_STATUS() const { return m_SPEN | m_TALKD; }
 

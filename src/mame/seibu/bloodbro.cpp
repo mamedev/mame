@@ -231,7 +231,6 @@ private:
 	bool m_opl_irq = false;
 	bool m_soundnmi_mask = false;
 
-	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void soundlatch_w(offs_t offset, u8 data);
 	void opl_irq_w(int state);
 	void opl_w(offs_t offset, uint8_t data);
@@ -826,11 +825,6 @@ void bloodbro_state::layer_en_w(uint16_t data)
 }
 
 void bloodbro_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_scrollram[offset]);
-}
-
-void weststry_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }

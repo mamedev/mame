@@ -473,16 +473,6 @@ flags {
 	"Cpp17",
 }
 
-configuration { "vs20*" }
-	buildoptions {
-		"/bigobj",
-	}
-	buildoptions_cpp {
-		"/Zc:__cplusplus",
-	}
-	flags {
-		"ExtraWarnings",
-	}
 	if not _OPTIONS["NOWERROR"] then
 		flags{
 			"FatalWarnings",
@@ -1112,6 +1102,7 @@ configuration { "asmjs" }
 	}
 	defines {
 		"ASIO_HAS_PTHREADS",
+		"SOUND_DISABLE_THREADING",
 	}
 	linkoptions {
 		"-Wl,--start-group",
@@ -1237,14 +1228,18 @@ configuration { "vs20*" }
 			"userenv",
 		}
 
+if _OPTIONS["vs"]==nil then
 		buildoptions {
-			"/Zc:preprocessor",
-			"/utf-8",
+			"/bigobj",
 			"/permissive-",
-			"/w45038", -- warning C5038: data member 'member1' will be initialized after data member 'member2'
+			"/utf-8",
+			"/Zc:enumTypes",
+			"/Zc:preprocessor",
+			"/Zc:templateScope",
 		}
 
 		buildoptions {
+			"/w45038", -- warning C5038: data member 'member1' will be initialized after data member 'member2'
 			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
 			"/wd4060", -- warning C4060: switch statement contains no 'case' or 'default' labels
 			"/wd4065", -- warning C4065: switch statement contains 'default' but no 'case' labels
@@ -1275,7 +1270,18 @@ configuration { "vs20*" }
 			"/wd4996", -- warning C4996: 'function': was declared deprecated
 		}
 
-if _OPTIONS["vs"]=="intel-15" then
+		buildoptions_cpp {
+			"/Zc:__cplusplus",
+		}
+
+		flags {
+			"ExtraWarnings",
+		}
+elseif _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/bigobj",
+		}
+
 		buildoptions {
 			"/Qwd9",                -- remark #9: nested comment is not allowed
 			"/Qwd82",               -- remark #82: storage class is not first
@@ -1310,36 +1316,32 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd11074",            -- remark #11074: Inlining inhibited by limit max-size  / remark #11074: Inlining inhibited by limit max-total-size
 			"/Qwd11075",            -- remark #11075: To get full report use -Qopt-report:4 -Qopt-report-phase ipo
 		}
-end
 
-if _OPTIONS["vs"]=="clangcl" then
+		flags {
+			"ExtraWarnings",
+		}
+elseif _OPTIONS["vs"]=="clangcl" then
 		buildoptions {
-			"-Wno-enum-conversion",
 			"-Wno-ignored-qualifiers",
-			"-Wno-missing-braces",
-			"-Wno-missing-field-initializers",
 			"-Wno-new-returns-null",
-			"-Wno-nonportable-include-path",
-			"-Wno-pointer-bool-conversion",
-			"-Wno-pragma-pack",
-			"-Wno-switch",
-			"-Wno-tautological-constant-out-of-range-compare",
-			"-Wno-tautological-pointer-compare",
-			"-Wno-unknown-warning-option",
 			"-Wno-unused-const-variable",
-			"-Wno-unused-function",
 			"-Wno-unused-label",
-			"-Wno-unused-local-typedef",
 			"-Wno-unused-private-field",
-			"-Wno-unused-variable",
 			"-Wno-xor-used-as-pow",
-			"-Wno-microsoft-cast",
+			"-Wno-error=deprecated-declarations",
+			"-Wno-error=tautological-compare",
+		}
+	if _OPTIONS["DEPRECATED"]=="0" then
+		buildoptions {
+			"-Wno-deprecated-declarations"
+		}
+	end
+
+		flags {
+			-- don't set ExtraWarnings flag (/W4 == -Wall -Wextra); use default (/W3 == -Wall) instead
 		}
 end
 
-		linkoptions {
-			"/ignore:4221", -- LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
-		}
 		includedirs {
 			MAME_DIR .. "3rdparty/dxsdk/Include"
 		}

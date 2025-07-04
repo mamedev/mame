@@ -5,37 +5,51 @@
 *
 */
 
-#include "modules/osdmodule.h"
 #include "monitor_module.h"
+
+#include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS)
 
-// standard windows headers
-#include <windows.h>
-#include <dxgi1_2.h>
-#include <wrl/client.h>
-#undef interface
-
-#include "strconv.h"
-#include "modules/lib/osdlib.h"
+// local headers
 #include "monitor_common.h"
+
+// OSD headers
+#include "modules/lib/osdlib.h"
 #include "osdcore.h"
+#include "strconv.h"
 #include "window.h"
 #include "windows/video.h"
 
-using namespace Microsoft::WRL;
+// standard windows headers
+#include <windows.h>
+
+#include <dxgi1_2.h>
+#include <objbase.h>
+#include <wrl/client.h>
+#undef interface
+
+
+namespace osd {
+
+namespace {
+
+using dxgi_factory_ptr = Microsoft::WRL::ComPtr<IDXGIFactory2>;
+using dxgi_adapter_ptr = Microsoft::WRL::ComPtr<IDXGIAdapter>;
+using dxgi_output_ptr  = Microsoft::WRL::ComPtr<IDXGIOutput>;
+
 
 class dxgi_monitor_info : public osd_monitor_info
 {
 private:
-	ComPtr<IDXGIOutput>    m_output;    // The output interface
+	dxgi_output_ptr m_output;    // The output interface
 
 public:
-	dxgi_monitor_info(monitor_module& module, HMONITOR handle, const char* monitor_device, float aspect, ComPtr<IDXGIOutput> output)
-		: osd_monitor_info(module, reinterpret_cast<std::uint64_t>(handle), monitor_device, aspect),
-			m_output(output)
+	dxgi_monitor_info(monitor_module& module, HMONITOR handle, std::string &&monitor_device, float aspect, dxgi_output_ptr output) :
+		osd_monitor_info(module, reinterpret_cast<std::uint64_t>(handle), std::move(monitor_device), aspect),
+		m_output(output)
 	{
-		dxgi_monitor_info::refresh();
+		refresh();
 	}
 
 	void refresh() override
@@ -106,11 +120,10 @@ protected:
 	int init_internal(const osd_options& options) override
 	{
 		HRESULT result;
-		ComPtr<IDXGIDevice> dxgiDevice;
-		ComPtr<IDXGIFactory2> factory;
-		ComPtr<IDXGIAdapter> adapter;
+		dxgi_factory_ptr factory;
+		dxgi_adapter_ptr adapter;
 
-		result = OSD_DYNAMIC_CALL(CreateDXGIFactory1, __uuidof(IDXGIFactory2), reinterpret_cast<void**>(factory.GetAddressOf()));
+		result = OSD_DYNAMIC_CALL(CreateDXGIFactory1, IID_PPV_ARGS(factory.GetAddressOf()));
 		if (result != ERROR_SUCCESS)
 		{
 			osd_printf_error("CreateDXGIFactory1 failed with error 0x%x\n", static_cast<unsigned int>(result));
@@ -121,21 +134,21 @@ protected:
 		while (!factory->EnumAdapters(iAdapter, adapter.ReleaseAndGetAddressOf()))
 		{
 			UINT i = 0;
-			ComPtr<IDXGIOutput> output;
+			dxgi_output_ptr output;
 			DXGI_OUTPUT_DESC desc;
-			while (!adapter->EnumOutputs(i, output.GetAddressOf()))
+			while (!adapter->EnumOutputs(i, &output))
 			{
 				output->GetDesc(&desc);
 
 				// guess the aspect ratio assuming square pixels
-				RECT * coords = &desc.DesktopCoordinates;
-				float aspect = float(coords->right - coords->left) / float(coords->bottom - coords->top);
+				RECT const &coords = desc.DesktopCoordinates;
+				float aspect = float(coords.right - coords.left) / float(coords.bottom - coords.top);
 
 				// allocate a new monitor info
 				std::string devicename = osd::text::from_wstring(desc.DeviceName);
 
 				// allocate a new monitor info
-				auto monitor = std::make_shared<dxgi_monitor_info>(*this, desc.Monitor, devicename.c_str(), aspect, output);
+				auto monitor = std::make_shared<dxgi_monitor_info>(*this, desc.Monitor, std::move(devicename), aspect, output);
 
 				// hook us into the list
 				add_monitor(monitor);
@@ -147,19 +160,23 @@ protected:
 		}
 
 		// if we're verbose, print the list of monitors
+		for (const auto &monitor : list())
 		{
-			for (const auto &monitor : list())
-			{
-				osd_printf_verbose("Video: Monitor %u = \"%s\" %s\n", monitor->oshandle(), monitor->devicename(), monitor->is_primary() ? "(primary)" : "");
-			}
+			osd_printf_verbose("Video: Monitor %u = \"%s\" %s\n", monitor->oshandle(), monitor->devicename(), monitor->is_primary() ? "(primary)" : "");
 		}
 
 		return 0;
 	}
 };
 
+} // anonymous namespace
+
+} // namespace osd
+
 #else
-MODULE_NOT_SUPPORTED(dxgi_monitor_module, OSD_MONITOR_PROVIDER, "dxgi")
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(dxgi_monitor_module, OSD_MONITOR_PROVIDER, "dxgi") } }
+
 #endif
 
-MODULE_DEFINITION(MONITOR_DXGI, dxgi_monitor_module)
+MODULE_DEFINITION(MONITOR_DXGI, osd::dxgi_monitor_module)

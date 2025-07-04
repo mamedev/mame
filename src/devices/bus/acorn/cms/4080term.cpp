@@ -8,18 +8,60 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "4080term.h"
+
+#include "bus/rs232/rs232.h"
+#include "bus/centronics/ctronics.h"
+#include "machine/6522via.h"
+#include "machine/mos6551.h"
+#include "machine/timer.h"
+#include "video/ef9345.h"
+
 #include "screen.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(CMS_4080TERM, cms_4080term_device, "cms_4080term", "CMS 40/80 Video Terminal Card")
+class cms_4080term_device : public device_t, public device_acorn_bus_interface
+{
+public:
+	cms_4080term_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, CMS_4080TERM, tag, owner, clock)
+		, device_acorn_bus_interface(mconfig, *this)
+		, m_via(*this, "via")
+		, m_acia(*this, "acia")
+		, m_ef9345(*this, "ef9345")
+		, m_rs232(*this, "rs232")
+		, m_centronics(*this, "centronics")
+	{
+	}
 
+	TIMER_DEVICE_CALLBACK_MEMBER(update_scanline)
+	{
+		m_ef9345->update_scanline((uint16_t)param);
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+private:
+	required_device<via6522_device> m_via;
+	required_device<mos6551_device> m_acia;
+	required_device<ef9345_device> m_ef9345;
+	required_device<rs232_port_device> m_rs232;
+	required_device<centronics_device> m_centronics;
+
+	void bus_irq_w(int state)
+	{
+		m_bus->irq_w(state);
+	}
+};
 
 //-------------------------------------------------
 //  gfx_layout cms_4080term_charlayout
@@ -46,14 +88,20 @@ static GFXDECODE_START(gfx_cms_4080term)
 	GFXDECODE_ENTRY("ef9345", 0x2000, cms_4080term_charlayout, 0, 4)
 GFXDECODE_END
 
+
 //-------------------------------------------------
-//  MACHINE_DRIVER( cms_4080term )
+//  ROM( cms_4080term )
 //-------------------------------------------------
 
 ROM_START(cms_4080term)
 	ROM_REGION(0x4000, "ef9345", 0)
 	ROM_LOAD("charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc))            // from dcvg5k
 ROM_END
+
+const tiny_rom_entry *cms_4080term_device::device_rom_region() const
+{
+	return ROM_NAME( cms_4080term );
+}
 
 
 static DEVICE_INPUT_DEFAULTS_START(keyboard)
@@ -63,6 +111,7 @@ static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_2)
 DEVICE_INPUT_DEFAULTS_END
 
+
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
@@ -70,9 +119,9 @@ DEVICE_INPUT_DEFAULTS_END
 void cms_4080term_device::device_add_mconfig(machine_config &config)
 {
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(12_MHz_XTAL, 768, 0, 492, 312, 0, 270);
-	m_screen->set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12_MHz_XTAL, 768, 0, 492, 312, 0, 270);
+	screen.set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_cms_4080term);
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
@@ -110,32 +159,6 @@ void cms_4080term_device::device_add_mconfig(machine_config &config)
 }
 
 
-const tiny_rom_entry *cms_4080term_device::device_rom_region() const
-{
-	return ROM_NAME( cms_4080term );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  cms_4080term_device - constructor
-//-------------------------------------------------
-
-cms_4080term_device::cms_4080term_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CMS_4080TERM, tag, owner, clock)
-	, device_acorn_bus_interface(mconfig, *this)
-	, m_via(*this, "via")
-	, m_acia(*this, "acia")
-	, m_screen(*this, "screen")
-	, m_ef9345(*this, "ef9345")
-	, m_rs232(*this, "rs232")
-	, m_centronics(*this, "centronics")
-{
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -144,9 +167,9 @@ void cms_4080term_device::device_start()
 {
 	address_space &space = m_bus->memspace();
 
-	space.install_readwrite_handler(0xfd20, 0xfd2f, read8sm_delegate(*m_ef9345, FUNC(ef9345_device::data_r)), write8sm_delegate(*m_ef9345, FUNC(ef9345_device::data_w)));
+	space.install_readwrite_handler(0xfd20, 0xfd2f, emu::rw_delegate(*m_ef9345, FUNC(ef9345_device::data_r)), emu::rw_delegate(*m_ef9345, FUNC(ef9345_device::data_w)));
 	space.install_device(0xfd30, 0xfd3f, *m_via, &via6522_device::map);
-	space.install_readwrite_handler(0xfd40, 0xfd4f, read8sm_delegate(*m_acia, FUNC(mos6551_device::read)), write8sm_delegate(*m_acia, FUNC(mos6551_device::write)));
+	space.install_readwrite_handler(0xfd40, 0xfd4f, emu::rw_delegate(*m_acia, FUNC(mos6551_device::read)), emu::rw_delegate(*m_acia, FUNC(mos6551_device::write)));
 
 	uint8_t *FNT = memregion("ef9345")->base();
 	uint16_t dest = 0x2000;
@@ -159,17 +182,7 @@ void cms_4080term_device::device_start()
 					FNT[dest++] = FNT[a | b | c | d];
 }
 
+} // anonymous namespace
 
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
 
-TIMER_DEVICE_CALLBACK_MEMBER(cms_4080term_device::update_scanline)
-{
-	m_ef9345->update_scanline((uint16_t)param);
-}
-
-void cms_4080term_device::bus_irq_w(int state)
-{
-	m_bus->irq_w(state);
-}
+DEFINE_DEVICE_TYPE_PRIVATE(CMS_4080TERM, device_acorn_bus_interface, cms_4080term_device, "cms_4080term", "CMS 40/80 Video Terminal Card")

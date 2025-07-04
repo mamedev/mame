@@ -1537,8 +1537,6 @@ void duart_channel::recalc_framing()
 
 void duart_channel::write_CR(uint8_t data)
 {
-	CR = data;
-
 	switch ((data >> 4) & 0x07)
 	{
 	case 0: /* No command */
@@ -1626,7 +1624,7 @@ void duart_channel::write_CR(uint8_t data)
 		SR &= ~STATUS_RECEIVER_READY;
 	}
 
-	if (!(SR & STATUS_TRANSMITTER_READY) && BIT(data, 2))
+	if (!BIT(CR, 2) && BIT(data, 2))
 	{
 		SR |= STATUS_TRANSMITTER_READY | STATUS_TRANSMITTER_EMPTY;
 		m_tx_data_in_buffer = false;
@@ -1646,6 +1644,7 @@ void duart_channel::write_CR(uint8_t data)
 	}
 
 	update_interrupts();
+	CR = data;
 }
 
 void duart_channel::write_TX(uint8_t data)

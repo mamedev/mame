@@ -1843,6 +1843,15 @@ element_decl_suspender(void *userData, const XML_Char *name,
 }
 
 void XMLCALL
+suspend_after_element_declaration(void *userData, const XML_Char *name,
+                                  XML_Content *model) {
+  UNUSED_P(name);
+  XML_Parser parser = (XML_Parser)userData;
+  assert_true(XML_StopParser(parser, /*resumable*/ XML_TRUE) == XML_STATUS_OK);
+  XML_FreeContentModel(parser, model);
+}
+
+void XMLCALL
 accumulate_pi_characters(void *userData, const XML_Char *target,
                          const XML_Char *data) {
   CharData *storage = (CharData *)userData;
@@ -1880,6 +1889,20 @@ accumulate_entity_decl(void *userData, const XML_Char *entityName,
   else
     CharData_AppendXMLChars(storage, value, value_length);
   CharData_AppendXMLChars(storage, XCS("\n"), 1);
+}
+
+void XMLCALL
+accumulate_char_data_and_suspend(void *userData, const XML_Char *s, int len) {
+  ParserPlusStorage *const parserPlusStorage = (ParserPlusStorage *)userData;
+
+  CharData_AppendXMLChars(parserPlusStorage->storage, s, len);
+
+  for (int i = 0; i < len; i++) {
+    if (s[i] == 'Z') {
+      XML_StopParser(parserPlusStorage->parser, /*resumable=*/XML_TRUE);
+      break;
+    }
+  }
 }
 
 void XMLCALL

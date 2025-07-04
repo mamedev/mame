@@ -51,12 +51,12 @@ void socrates_snd_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void socrates_snd_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void socrates_snd_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		snd_clock();
-		outputs[0].put_int(i, (int)m_DAC_output, 32768 >> 4);
+		stream.put_int(0, i, (int)m_DAC_output, 32768 >> 4);
 	}
 }
 

@@ -1285,10 +1285,10 @@ void swp30_device::state_string_export(const device_state_entry &entry, std::str
 {
 }
 
-void swp30_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void swp30_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].put_int_clamp(0, m_meg_output[0], 32768);
-	outputs[1].put_int_clamp(0, m_meg_output[1], 32768);
+	stream.put_int_clamp(0, 0, m_meg_output[0], 32768);
+	stream.put_int_clamp(1, 0, m_meg_output[1], 32768);
 }
 
 void swp30_device::change_mode_attack_decay1(int chan)

@@ -78,12 +78,11 @@ void mockingboard_d_device::device_add_mconfig(machine_config &config)
 	m_cpu->out_p1_cb().set(FUNC(mockingboard_d_device::p1_w));
 	m_cpu->out_ser_tx_cb().set(FUNC(mockingboard_d_device::ser_tx_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	AY8913(config, m_ay1, 1022727);
-	m_ay1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_ay1->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 	AY8913(config, m_ay2, 1022727);
-	m_ay2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_ay2->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 }
 
 const tiny_rom_entry *mockingboard_d_device::device_rom_region() const

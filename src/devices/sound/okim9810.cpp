@@ -219,21 +219,11 @@ void okim9810_device::rom_bank_pre_change()
 //  our sound stream
 //-------------------------------------------------
 
-void okim9810_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void okim9810_device::sound_stream_update(sound_stream &stream)
 {
-	// reset the output streams
-	outputs[0].fill(0);
-	outputs[1].fill(0);
-
 	// iterate over voices and accumulate sample data
 	for (auto & elem : m_voice)
-		elem.generate_audio(*this, outputs, m_global_volume, m_filter_type);
-
-	for (int i = 0; i < outputs[0].samples(); i++)
-	{
-		outputs[0].put(i, std::clamp(outputs[0].getraw(i), -1.0f, 1.0f));
-		outputs[1].put(i, std::clamp(outputs[1].getraw(i), -1.0f, 1.0f));
-	}
+		elem.generate_audio(*this, stream, m_global_volume, m_filter_type);
 }
 
 
@@ -627,17 +617,13 @@ okim9810_device::okim_voice::okim_voice()
 //-------------------------------------------------
 
 void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
-													std::vector<write_stream_view> &outputs,
+													sound_stream &stream,
 													const uint8_t global_volume,
 													const uint8_t filter_type)
 {
 	// skip if not active
 	if (!m_playing)
 		return;
-
-	// separate out left and right channels
-	auto &outL = outputs[0];
-	auto &outR = outputs[1];
 
 	// get left and right volumes
 	uint8_t volume_scale_left = volume_scale(global_volume, m_channel_volume, m_pan_volume_left);
@@ -649,7 +635,7 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 		return;
 
 	// loop while we still have samples to generate
-	for (int sampindex = 0; sampindex < outL.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		if (m_phrase_state == SEQ_PAUSE)
 		{
@@ -814,10 +800,10 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 		// output to the stereo buffers, scaling by the volume
 		// signal in range -2048..2047, volume in range 2..128 => signal * volume / 8 in range -32768..32767
 		int32_t interpValueL = (interpValue * (int32_t)volume_scale_left);
-		outL.add_int(sampindex, interpValueL, 32768 * 8);
+		stream.add_int(0, sampindex, interpValueL, 32768 * 8);
 
 		int32_t interpValueR = (interpValue * (int32_t)volume_scale_right);
-		outR.add_int(sampindex, interpValueR, 32768 * 8);
+		stream.add_int(1, sampindex, interpValueR, 32768 * 8);
 
 		// if the interpsample has reached its end, move on to the next sample
 		m_interpSampleNum++;

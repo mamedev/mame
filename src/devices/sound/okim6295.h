@@ -60,7 +60,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_pre_change() override;
@@ -70,14 +70,14 @@ protected:
 	{
 	public:
 		okim_voice();
-		void generate_adpcm(device_rom_interface &rom, write_stream_view &buffer);
+		void generate_adpcm(device_rom_interface &rom, sound_stream &stream);
 
 		oki_adpcm_state m_adpcm;          // current ADPCM state
 		bool            m_playing;
 		offs_t          m_base_offset;    // pointer to the base memory location
 		uint32_t        m_sample;         // current sample number
 		uint32_t        m_count;          // total samples to play
-		stream_buffer::sample_t m_volume; // output volume
+		sound_stream::sample_t m_volume; // output volume
 	};
 
 	// configuration state
@@ -91,7 +91,7 @@ protected:
 	sound_stream *        m_stream;
 	uint8_t               m_pin7_state;
 
-	static const stream_buffer::sample_t s_volume_table[16];
+	static const sound_stream::sample_t s_volume_table[16];
 };
 
 

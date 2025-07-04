@@ -107,6 +107,7 @@ void bbc_1mhzbus_slot_device::jim_w(offs_t offset, uint8_t data)
 #include "2ndserial.h"
 #include "autoprom.h"
 #include "barrybox.h"
+#include "beebex.h"
 #include "cc500.h"
 #include "cisco.h"
 //#include "beebscan.h"
@@ -141,6 +142,7 @@ void bbc_1mhzbus_devices(device_slot_interface &device)
 	device.option_add("awhd",       BBC_AWHD);            /* Acorn Winchester Disc */
 	device.option_add("autoprom",   BBC_AUTOPROM);        /* ATPL AutoPrommer */
 	device.option_add("barrybox",   BBC_BARRYBOX);        /* The Barry-Box */
+	device.option_add("beebex",     BBC_BEEBEX);          /* Control Universal BEEBEX */
 	device.option_add("24bbc",      BBC_24BBC);           /* Sprow 24bBC/RAM Disc */
 	device.option_add("2ndserial",  BBC_2NDSERIAL);       /* Sprow 2nd Serial Port */
 	device.option_add("beebide",    BBC_BEEBIDE);         /* Sprow BeebIDE 16-bit */
@@ -177,6 +179,7 @@ void bbcm_1mhzbus_devices(device_slot_interface &device)
 	device.option_add("ieee488",    BBC_IEEE488);         /* Acorn ANK01 IEEE488 Interface */
 	device.option_add("awhd",       BBC_AWHD);            /* Acorn Winchester Disc */
 	device.option_add("barrybox",   BBC_BARRYBOX);        /* The Barry-Box */
+	device.option_add("beebex",     BBC_BEEBEX);          /* Control Universal BEEBEX */
 	device.option_add("24bbc",      BBC_24BBC);           /* Sprow 24bBC/RAM Disc */
 	device.option_add("2ndserial",  BBC_2NDSERIAL);       /* Sprow 2nd Serial Port */
 	device.option_add("beebide",    BBC_BEEBIDE);         /* Sprow BeebIDE 16-bit */

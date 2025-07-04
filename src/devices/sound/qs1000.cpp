@@ -423,12 +423,8 @@ void qs1000_device::wave_w(offs_t offset, uint8_t data)
 //-------------------------------------------------
 //  sound_stream_update -
 //-------------------------------------------------
-void qs1000_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void qs1000_device::sound_stream_update(sound_stream &stream)
 {
-	// Rset the output stream
-	outputs[0].fill(0);
-	outputs[1].fill(0);
-
 	// Iterate over voices and accumulate sample data
 	for (auto & chan : m_channels)
 	{
@@ -440,7 +436,7 @@ void qs1000_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		{
 			if (chan.m_flags & QS1000_ADPCM)
 			{
-				for (int samp = 0; samp < outputs[0].samples(); samp++)
+				for (int samp = 0; samp < stream.samples(); samp++)
 				{
 					if (chan.m_addr >= chan.m_loop_end)
 					{
@@ -484,13 +480,13 @@ void qs1000_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 					chan.m_addr = (chan.m_addr + (chan.m_acc >> 18)) & QS1000_ADDRESS_MASK;
 					chan.m_acc &= ((1 << 18) - 1);
 
-					outputs[0].add_int(samp, result * 4 * lvol * vol, 32768 << 12);
-					outputs[1].add_int(samp, result * 4 * rvol * vol, 32768 << 12);
+					stream.add_int(0, samp, result * 4 * lvol * vol, 32768 << 12);
+					stream.add_int(1, samp, result * 4 * rvol * vol, 32768 << 12);
 				}
 			}
 			else
 			{
-				for (int samp = 0; samp < outputs[0].samples(); samp++)
+				for (int samp = 0; samp < stream.samples(); samp++)
 				{
 					if (chan.m_addr >= chan.m_loop_end)
 					{
@@ -513,8 +509,8 @@ void qs1000_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 					chan.m_addr = (chan.m_addr + (chan.m_acc >> 18)) & QS1000_ADDRESS_MASK;
 					chan.m_acc &= ((1 << 18) - 1);
 
-					outputs[0].add_int(samp, result * lvol * vol, 32768 << 12);
-					outputs[1].add_int(samp, result * rvol * vol, 32768 << 12);
+					stream.add_int(0, samp, result * lvol * vol, 32768 << 12);
+					stream.add_int(1, samp, result * rvol * vol, 32768 << 12);
 				}
 			}
 		}

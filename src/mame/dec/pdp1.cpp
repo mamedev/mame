@@ -1803,7 +1803,7 @@ void pdp1_state::pdp1(machine_config &config)
 */
 ROM_START(pdp1)
 	ROM_REGION(pdp1_fontdata_size, "gfx1", ROMREGION_ERASEFF)
-		/* space filled with our font */
+	/* space filled with our font */
 ROM_END
 
 /***************************************************************************

@@ -20,16 +20,53 @@
 #include "emu.h"
 #include "mm58174.h"
 
+#define LOG_PORT (1U << 1)
+#define LOG_ERR  (1U << 2)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOGPORT(...)      LOGMASKED(LOG_PORT, __VA_ARGS__)
+#define LOGERR(...)       LOGMASKED(LOG_ERR, __VA_ARGS__)
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
+
+namespace {
+
 enum
 {
-	ctl_clkrun = 0x1,  /* clock start/stop (1=run, 0=stop) */
+	CTL_CLKRUN = 0x1,     // clock start/stop (1=run, 0=stop)
 
-	year_leap = 0x8,
-
-	int_ctl_rpt = 0x8,  /* 1 for repeated interrupt */
-	int_ctl_dly = 0x7   /* 0 no interrupt, 1 = .5 second, 2=5, 4=60 */
+	INT_CTL_REPEAT = 0x8, // 1 for repeated interrupt
+	INT_CTRL_DELAY = 0x7  // 0 no interrupt, 1 = .5 second, 2=5, 4=60 seconds
 };
 
+enum regs: u8
+{
+	TEST_ONLY = 0x00,         // Write Only
+	TENTHS_OF_SECONDS = 0x01, // Read Only
+	UNITS_OF_SECONDS = 0x02,  // Read Only
+	TENS_OF_SECONDS = 0x03,   // Read Only
+	UNITS_OF_MINUTES = 0x04,  // Read/Write
+	TENS_OF_MINUTES = 0x05,   // Read/Write
+	UNITS_OF_HOURS = 0x06,    // Read/Write
+	TENS_OF_HOURS = 0x07,     // Read/Write
+	UNITS_OF_DAYS = 0x08,     // Read/Write
+	TENS_OF_DAYS = 0x09,      // Read/Write
+	DAY_OF_WEEK = 0x0a,       // Read/Write
+	UNITS_OF_MONTHS = 0x0b,   // Read/Write
+	TENS_OF_MONTHS = 0x0c,    // Read/Write
+	LEAP_YEAR_STATUS = 0x0d,  // Write Only
+	STOP_START = 0x0e,        // Write Only
+	INTERRUPT_REGISTER = 0x0f // Read/Write
+};
+
+} // anonymous namespace
 
 DEFINE_DEVICE_TYPE(MM58174, mm58174_device, "mm58174", "National Semiconductor MM58174 RTC")
 
@@ -55,6 +92,7 @@ void mm58174_device::device_start()
 	m_interrupt_timer = timer_alloc(FUNC(mm58174_device::scheduler_sync), this);
 
 	// register for state saving
+	save_item(NAME(m_years));
 	save_item(NAME(m_control));
 	save_item(NAME(m_int_ctl));
 	save_item(NAME(m_wday));
@@ -88,19 +126,25 @@ void mm58174_device::rtc_clock_updated(int year, int month, int day, int day_of_
 	m_days2 = day % 10;
 	m_months1 = month / 10;
 	m_months2 = month % 10;
-	m_years = 1 << (3 - (year & 3));
+	m_years = year & 3;  // only care about leap year status
 }
 
 
 attotime mm58174_device::interrupt_period_table(int val)
 {
-	switch(val)
+	switch (val)
 	{
-		case 0: return attotime::never;
-		case 1: return attotime::from_msec(500);
-		case 2: return attotime::from_seconds(5);
-		case 4: return attotime::from_seconds(60);
-		default: fatalerror("out of range\n");
+		case 0:
+			return attotime::never;
+		case 1:
+			return attotime::from_msec(500);
+		case 2:
+			return attotime::from_seconds(5);
+		case 4:
+			return attotime::from_seconds(60);
+		default:
+			LOGERR("%s: out of range\n", FUNCNAME);
+			return attotime::never;
 	}
 }
 
@@ -112,6 +156,7 @@ void mm58174_device::update_rtc()
 	set_clock_register(RTC_DAY, m_days1 * 10 + m_days2);
 	set_clock_register(RTC_DAY_OF_WEEK, m_wday);
 	set_clock_register(RTC_MONTH, m_months1 * 10 + m_months2);
+	set_clock_register(RTC_YEAR, m_years);
 }
 
 uint8_t mm58174_device::read(offs_t offset)
@@ -122,65 +167,64 @@ uint8_t mm58174_device::read(offs_t offset)
 
 	switch (offset)
 	{
-		case 0x01:   /* Tenths of Seconds */
+		case TENTHS_OF_SECONDS:
 			reply = m_tenths;
 			break;
 
-		case 0x02:   /* Units Seconds */
+		case UNITS_OF_SECONDS:
 			reply = m_seconds2;
 			break;
 
-		case 0x03:   /* Tens Seconds */
+		case TENS_OF_SECONDS:
 			reply = m_seconds1;
 			break;
 
-		case 0x04:  /* Units Minutes */
+		case UNITS_OF_MINUTES:
 			reply = m_minutes2;
 			break;
 
-		case 0x05:   /* Tens Minutes */
+		case TENS_OF_MINUTES:
 			reply = m_minutes1;
 			break;
 
-		case 0x06:   /* Units Hours */
+		case UNITS_OF_HOURS:
 			reply = m_hours2;
 			break;
 
-		case 0x07:   /* Tens Hours */
+		case TENS_OF_HOURS:
 			reply = m_hours1;
 			break;
 
-		case 0x08:   /* Units Days */
+		case UNITS_OF_DAYS:
 			reply = m_days2;
 			break;
 
-		case 0x09:   /* Tens Days */
+		case TENS_OF_DAYS:
 			reply = m_days1;
 			break;
 
-		case 0x0a:   /* Day of Week */
+		case DAY_OF_WEEK:
 			reply = m_wday;
 			break;
 
-		case 0x0b:   /* Units Months */
+		case UNITS_OF_MONTHS:
 			reply = m_months2;
 			break;
 
-		case 0x0c:   /* Tens Months */
+		case TENS_OF_MONTHS:
 			reply = m_months1;
 			break;
 
-		case 0x0f:   /* Clock Setting & Interrupt Registers */
+		case INTERRUPT_REGISTER:
 			reply = m_int_ctl;
 			break;
 
 		default:
-			reply = 0;
+			LOGERR("%s: address out of range: 0x%02x\n", FUNCNAME, offset);
 			break;
 	}
 
-	logerror("reg %02x == %02x\n", offset, reply);
-
+	LOGPORT("%s: reg %02x == %02x\n", FUNCNAME, offset, reply);
 	return reply;
 }
 
@@ -190,91 +234,108 @@ void mm58174_device::write(offs_t offset, uint8_t data)
 	offset &= 0xf;
 	data &= 0xf;
 
-	logerror("reg %02x <- %02x\n", offset, data);
+	LOGPORT("%s: reg %02x <- %02x\n", FUNCNAME, offset, data);
 
 	switch (offset)
 	{
-		case 0x00:   /* Test Mode Register (emulated) */
+		case TEST_ONLY:
+		case TENTHS_OF_SECONDS:
+		case UNITS_OF_SECONDS:
+		case TENS_OF_SECONDS:
+			LOGERR("%s: address out of range: 0x%02x\n", FUNCNAME, offset);
 			break;
 
-		case 0x01:   /* Tenths of Seconds: cannot be written */
-			break;
-
-		case 0x02:   /* Units Seconds: cannot be written */
-			break;
-
-		case 0x03:   /* Tens Seconds: cannot be written */
-			break;
-
-		case 0x04:   /* Units Minutes */
+		case UNITS_OF_MINUTES:
 			m_minutes2 = data;
 			update_rtc();
 			break;
 
-		case 0x05:   /* Tens Minutes */
-			m_minutes1 = data;
+		case TENS_OF_MINUTES:
+			m_minutes1 = data & 0x7;
 			update_rtc();
 			break;
 
-		case 0x06:   /* Units Hours */
+		case UNITS_OF_HOURS:
 			m_hours2 = data;
 			update_rtc();
 			break;
 
-		case 0x07:   /* Tens Hours */
-			m_hours1 = data;
+		case TENS_OF_HOURS:
+			m_hours1 = data & 0x3;
 			update_rtc();
 			break;
 
-		case 0x08:   /* Units Days */
+		case UNITS_OF_DAYS:
 			m_days2 = data;
 			update_rtc();
 			break;
 
-		case 0x09:   /* Tens Days */
-			m_days1 = data;
+		case TENS_OF_DAYS:
+			m_days1 = data & 0x3;
 			update_rtc();
 			break;
 
-		case 0x0a:   /* Day of Week */
-			m_wday = data;
+		case DAY_OF_WEEK:
+			m_wday = data & 0x7;
 			update_rtc();
 			break;
 
-		case 0x0b:   /* Units Months */
+		case UNITS_OF_MONTHS:
 			m_months2 = data;
 			update_rtc();
 			break;
 
-		case 0x0c:   /* Tens Months */
-			m_months1 = data;
+		case TENS_OF_MONTHS:
+			m_months1 = data & 0x1;
 			update_rtc();
 			break;
 
-		case 0x0d:   /* Years Status */
+		case LEAP_YEAR_STATUS:
+			// Map to a value that works for the RTC implementation
+			{
+				int year = 0;
+				if (BIT(data, 3))
+				{
+					year = 0;
+				}
+				else if (BIT(data, 2))
+				{
+					year = 3;
+				}
+				else if (BIT(data, 1))
+				{
+					year = 2;
+				}
+				else if (BIT(data, 0))
+				{
+					year = 1;
+				}
+				m_years = year;
+				update_rtc();
+			}
 			break;
 
-		case 0x0e:   /* Stop/Start */
-			if ((m_control & ctl_clkrun) && (!(data & ctl_clkrun)))  /* interrupt stop */
+		case STOP_START:
+			if ((m_control & CTL_CLKRUN) && (!(data & CTL_CLKRUN)))  // interrupt stop
 				m_interrupt_timer->enable(0);
-			else if ((!(m_control & ctl_clkrun)) && (data & ctl_clkrun))   /* interrupt run */
+			else if ((!(m_control & CTL_CLKRUN)) && (data & CTL_CLKRUN))   // interrupt run
 			{
-				attotime period = interrupt_period_table(m_int_ctl & int_ctl_dly);
+				attotime period = interrupt_period_table(m_int_ctl & INT_CTRL_DELAY);
 
-				m_interrupt_timer->adjust(period, 0, m_int_ctl & int_ctl_rpt ? period : attotime::zero);
+				m_interrupt_timer->adjust(period, 0, m_int_ctl & INT_CTL_REPEAT ? period : attotime::zero);
 			}
-			if (!(data & ctl_clkrun)) /* stopping the clock clears the tenth counter */
+			if (!(data & CTL_CLKRUN)) // stopping the clock clears the tenth counter
 				m_tenths = 0;
 			m_control = data;
 			break;
 
-		case 0x0f:   /* Interrupt Register */
+		case INTERRUPT_REGISTER:
 			m_int_ctl = data;
-			if (m_control & ctl_clkrun) /* interrupt run */
+			if (m_control & CTL_CLKRUN) // interrupt run
 			{
-				attotime period = interrupt_period_table(m_int_ctl & int_ctl_dly);
+				attotime period = interrupt_period_table(m_int_ctl & INT_CTRL_DELAY);
 
-				m_interrupt_timer->adjust(period, 0, m_int_ctl & int_ctl_rpt ? period : attotime::zero);
+				m_interrupt_timer->adjust(period, 0, m_int_ctl & INT_CTL_REPEAT ? period : attotime::zero);
 			}
 			break;
 	}
@@ -284,7 +345,7 @@ void mm58174_device::write(offs_t offset, uint8_t data)
 // Increment RTC clock (timed interrupt every 1/10s)
 TIMER_CALLBACK_MEMBER(mm58174_device::clock_tick)
 {
-	if (m_control & ctl_clkrun)
+	if (m_control & CTL_CLKRUN)
 	{
 		if ((++m_tenths) == 10)
 		{

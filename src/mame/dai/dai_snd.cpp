@@ -119,23 +119,20 @@ void dai_sound_device::set_input_ch2(int state)
 //  our sound stream
 //-------------------------------------------------
 
-void dai_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void dai_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &sample_left = outputs[0];
-	auto &sample_right = outputs[1];
-
 	int16_t channel_0_signal = m_dai_input[0] ? s_osc_volume_table[m_osc_volume[0]] : -s_osc_volume_table[m_osc_volume[0]];
 	int16_t channel_1_signal = m_dai_input[1] ? s_osc_volume_table[m_osc_volume[1]] : -s_osc_volume_table[m_osc_volume[1]];
 	int16_t channel_2_signal = m_dai_input[2] ? s_osc_volume_table[m_osc_volume[2]] : -s_osc_volume_table[m_osc_volume[2]];
 
-	for (int sampindex = 0; sampindex < sample_left.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		int16_t noise = machine().rand()&0x01 ? s_noise_volume_table[m_noise_volume] : -s_noise_volume_table[m_noise_volume];
 
 		/* channel 0 + channel 1 + noise */
-		sample_left.put_int(sampindex, channel_0_signal + channel_1_signal + noise, 32768);
+		stream.put_int(0, sampindex, channel_0_signal + channel_1_signal + noise, 32768);
 
 		/* channel 1 + channel 2 + noise */
-		sample_right.put_int(sampindex, channel_1_signal + channel_2_signal + noise, 32768);
+		stream.put_int(1, sampindex, channel_1_signal + channel_2_signal + noise, 32768);
 	}
 }

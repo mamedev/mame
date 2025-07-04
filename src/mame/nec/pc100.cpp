@@ -66,29 +66,26 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
-
-#include "formats/d88_dsk.h"
-#include "formats/mfi_dsk.h"
-
 
 namespace {
 
 class pc100_state : public driver_device
 {
 public:
-	pc100_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_beeper(*this, "beeper"),
-		m_rtc(*this, "rtc"),
-		m_fdc(*this, "upd765"),
-		m_pic(*this, "pic8259"),
-		m_palette(*this, "palette"),
-		m_kanji_rom(*this, "kanji"),
-		m_vram(*this, "vram"),
-		m_keys(*this, "ROW.%u", 0U),
-		m_rtc_portc(0)
+	pc100_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_beeper(*this, "beeper")
+		, m_rtc(*this, "rtc")
+		, m_fdc(*this, "fdc")
+		, m_pic(*this, "pic8259")
+		, m_palette(*this, "palette")
+		, m_kanji_rom(*this, "kanji")
+		, m_vram(*this, "vram")
+		, m_keys(*this, "ROW.%u", 0U)
+		, m_rtc_portc(0)
 	{
 	}
 	void pc100(machine_config &config);
@@ -626,6 +623,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_10hz_irq)
 static void pc100_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525sd", FLOPPY_525_SD);
 }
 
 #define MASTER_CLOCK 6988800
@@ -674,8 +672,10 @@ void pc100_state::pc100(machine_config &config)
 	m_rtc->d2_handler().set(FUNC(pc100_state::rtc_portc_2_w));
 	m_rtc->d3_handler().set(FUNC(pc100_state::rtc_portc_3_w));
 
-	FLOPPY_CONNECTOR(config, "upd765:0", pc100_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", pc100_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pc100_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc100_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", pc100_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", pc100_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -690,6 +690,8 @@ void pc100_state::pc100(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	SOFTWARE_LIST(config, "disk_list").set_original("pc100_flop");
 }
 
 /* ROM definition */

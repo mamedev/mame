@@ -573,8 +573,8 @@ static const gfx_layout spritelayout_p =
 };
 
 static GFXDECODE_START( gfx_1942p )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_p,             0x000, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_p,          0x300, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout_p,   0x000, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_p,   0x300, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_p, 0x400, 16 )
 GFXDECODE_END
 

@@ -121,13 +121,12 @@ void flower_sound_device::device_reset()
 	}
 }
 
-void flower_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void flower_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
 	short *mix;
 	u8 raw_sample;
 
-	std::fill_n(&m_mixer_buffer[0], buffer.samples(), 0);
+	std::fill_n(&m_mixer_buffer[0], stream.samples(), 0);
 
 	for (auto &voice : m_channel_list)
 	{
@@ -139,7 +138,7 @@ void flower_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 
 		mix = &m_mixer_buffer[0];
 
-		for (int i = 0; i < buffer.samples(); i++)
+		for (int i = 0; i < stream.samples(); i++)
 		{
 			// Volume LUT ROM address bit:
 			// Bit 0-7: Sample ROM data
@@ -173,8 +172,8 @@ void flower_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 
 	/* mix it down */
 	mix = &m_mixer_buffer[0];
-	for (int i = 0; i < buffer.samples(); i++)
-		buffer.put_int(i, m_mixer_lookup[*mix++], 32768);
+	for (int i = 0; i < stream.samples(); i++)
+		stream.put_int(0, i, m_mixer_lookup[*mix++], 32768);
 }
 
 //-------------------------------------------------

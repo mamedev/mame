@@ -26,6 +26,7 @@
 #include "sys68k_isio.h"
 #include "tp880v.h"
 #include "tp881v.h"
+#include "tsvme104.h"
 
 void vme_cards(device_slot_interface &device)
 {
@@ -66,4 +67,5 @@ void vme_cards(device_slot_interface &device)
 	device.option_add("sys68k_isio1",     VME_SYS68K_ISIO1),
 	device.option_add("tp880v",           VME_TP880V);
 	device.option_add("tp881v",           VME_TP881V);
+	device.option_add("tsvme104",         VME_TSVME104);
 }

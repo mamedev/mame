@@ -245,7 +245,7 @@ void sega315_5313_device::device_add_mconfig(machine_config &config)
 {
 	sega315_5313_mode4_device::device_add_mconfig(config);
 
-	SEGAPSG(config.replace(), m_snsnd, DERIVED_CLOCK(1, 15)).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
+	SEGAPSG(config.replace(), m_snsnd, DERIVED_CLOCK(1, 15)).add_route(ALL_OUTPUTS, *this, 0.5, 0);
 
 	PALETTE(config, m_gfx_palette, palette_device::BLACK).set_entries(PALETTE_PER_FRAME);
 	PALETTE(config, m_gfx_palette_shadow, palette_device::BLACK).set_entries(PALETTE_PER_FRAME);

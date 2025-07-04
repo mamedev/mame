@@ -83,12 +83,11 @@ void sw1000xg_device::device_add_mconfig(machine_config &config)
 	H83002(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sw1000xg_device::h8_map);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SWP30(config, m_swp30);
 	m_swp30->set_addrmap(AS_DATA, &sw1000xg_device::swp30_map);
-	m_swp30->add_route(0, "lspeaker", 1.0);
-	m_swp30->add_route(1, "rspeaker", 1.0);
+	m_swp30->add_route(0, "speaker", 1.0, 0);
+	m_swp30->add_route(1, "speaker", 1.0, 1);
 }
 

@@ -315,14 +315,13 @@ void vd_state::vd(machine_config &config)
 
 	/* Sound */
 	genpin_audio(config);
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	ay8910_device &ay1(AY8910(config, "ay1", 2000000)); //?
-	ay1.add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 	ay1.port_a_read_callback().set_ioport("DSW2");
 	ay1.port_b_read_callback().set_ioport("DSW1");
 	ay8910_device &ay2(AY8910(config, "ay2", 2000000)); //?
-	ay2.add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	ay2.port_b_read_callback().set_ioport("DSW3");
 
 	/* Video */

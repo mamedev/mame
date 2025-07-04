@@ -133,8 +133,7 @@ void generalplus_gp327902_game_state::gp327902(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(generalplus_gp327902_game_state::screen_update_gp327902));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gp327902_game_state::timer), attotime::from_hz(1000));
 }

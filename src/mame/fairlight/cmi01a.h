@@ -28,7 +28,7 @@ public:
 	void write(offs_t offset, u8 data);
 	u8 read(offs_t offset);
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	void set_master_osc(double mosc) { m_mosc = mosc; }
 

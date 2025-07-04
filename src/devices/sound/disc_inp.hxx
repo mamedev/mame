@@ -242,25 +242,17 @@ void DISCRETE_CLASS_FUNC(dss_input_pulse, input_write)(int sub_node, uint8_t dat
 #define DSS_INPUT_STREAM__GAIN      DISCRETE_INPUT(1)
 #define DSS_INPUT_STREAM__OFFSET    DISCRETE_INPUT(2)
 
-void discrete_dss_input_stream_node::stream_generate(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
-{
-	outputs[0].fill(m_data * (1.0 / 32768.0));
-}
 DISCRETE_STEP(dss_input_stream)
 {
 	/* the context pointer is set to point to the current input stream data in discrete_stream_update */
-	if (EXPECTED(m_inview))
-	{
-		set_output(0,  m_inview->get(m_inview_sample) * 32768.0 * m_gain + m_offset);
-		m_inview_sample++;
-	}
+	if (m_is_buffered)
+		set_output(0,  m_data * m_gain + m_offset);
 	else
-		set_output(0,  0);
+		set_output(0,  m_stream->get(m_stream_input, m_stream_sample ++) * 32768.0 * m_gain + m_offset);
 }
 
 DISCRETE_RESET(dss_input_stream)
 {
-	m_inview = nullptr;
 	m_data = 0;
 }
 
@@ -272,23 +264,14 @@ void DISCRETE_CLASS_FUNC(dss_input_stream, input_write)(int sub_node, uint8_t da
 
 	if (m_data != new_data)
 	{
-		if (m_is_buffered)
-		{
-			/* Bring the system up to now */
-			m_buffer_stream->update();
+		/* Bring the system up to now */
+		m_device->update_to_current_time();
 
-			m_data = new_data;
-		}
-		else
-		{
-			/* Bring the system up to now */
-			m_device->update_to_current_time();
+		m_data = new_data;
 
-			m_data = new_data;
-
+		if (!m_is_buffered)
 			/* Update the node output here so we don't have to do it each step */
 			set_output(0,  new_data * m_gain + m_offset);
-		}
 	}
 }
 
@@ -296,26 +279,12 @@ DISCRETE_START(dss_input_stream)
 {
 	discrete_base_node::start();
 
-	/* Stream out number is set during start */
-	m_stream_in_number = DSS_INPUT_STREAM__STREAM;
 	m_gain = DSS_INPUT_STREAM__GAIN;
 	m_offset = DSS_INPUT_STREAM__OFFSET;
-	m_inview = nullptr;
 
 	m_is_buffered = is_buffered();
-	m_buffer_stream = nullptr;
 }
 
 void DISCRETE_CLASS_NAME(dss_input_stream)::stream_start(void)
 {
-	if (m_is_buffered)
-	{
-		/* stream_buffered input only supported for sound devices */
-		discrete_sound_device *snd_device = downcast<discrete_sound_device *>(m_device);
-		//assert(DSS_INPUT_STREAM__STREAM < snd_device->m_input_stream_list.count());
-
-		m_buffer_stream = m_device->machine().sound().stream_alloc(*snd_device, 0, 1, this->sample_rate(), stream_update_delegate(&discrete_dss_input_stream_node::stream_generate,this), STREAM_DEFAULT_FLAGS);
-
-		snd_device->get_stream()->set_input(m_stream_in_number, m_buffer_stream);
-	}
 }

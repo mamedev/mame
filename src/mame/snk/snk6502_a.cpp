@@ -512,14 +512,12 @@ void snk6502_sound_device::speech_w(uint8_t data, const uint16_t *table, int sta
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void snk6502_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void snk6502_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
-
 	for (int i = 0; i < NUM_CHANNELS; i++)
 		validate_tone_channel(i);
 
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		int32_t data = 0;
 
@@ -541,7 +539,7 @@ void snk6502_sound_device::sound_stream_update(sound_stream &stream, std::vector
 			}
 		}
 
-		buffer.put_int(sampindex, data, 3768);
+		stream.put_int(0, sampindex, data, 3768);
 
 		m_tone_clock += FRAC_ONE;
 		if (m_tone_clock >= m_tone_clock_expire)

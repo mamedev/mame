@@ -14,7 +14,7 @@ GX361 PWB(B)3000151A
 |----------------------------------------|
 |     Z80A                    3.579545MHz|
 |              14.31818MHz        VLM5030|
-|CN1                            SN76489  |
+|CN1                            SN76489AN|
 |                                        |
 |   361D13.2C                            |
 |                               361D15.9C|
@@ -30,18 +30,18 @@ GX361 PWB(B)3000151A
 |CN2         DSW1 DSW2            LM358  |
 |----------------------------------------|
 Notes:
-      Z80A    - Clock input 3.579545MHz [14.31818/4]
-      VLM5030 - Clock input 3.579545MHz
-      SN76489 - Texas Instruments Digital Complex Sound Generator, clock input 1.7897725MHz [3.579545/2]
-      361*    - 2764 EPROMs
-      2114    - 1k x4 SRAM with multiplexed I/O
-      M5224   - Mitsubishi M5224 Quad Operational Amplifier (compatible with LM324)
-      LM358   - Dual Operational Amplifier
-      CN1     - Flat cable joining to main board
-      CN2     - 2-pin power connector for +5V/GND
-      DSW1/2  - 8-position DIP switches
-      Note: On most original boards the Z80, VLM and 76489 have their part numbers scratched off. The
-            76489 might be a 76496? The schematics say '76489'
+      Z80A      - Clock input 3.579545MHz [14.31818/4]
+      VLM5030   - Clock input 3.579545MHz
+      SN76489AN - Texas Instruments Digital Complex Sound Generator, clock input 1.7897725MHz [3.579545/2]
+      361*      - 2764 EPROMs
+      2114      - 1k x4 SRAM with multiplexed I/O
+      M5224     - Mitsubishi M5224 Quad Operational Amplifier (compatible with LM324)
+      LM358     - Dual Operational Amplifier
+      CN1       - Flat cable joining to main board
+      CN2       - 2-pin power connector for +5V/GND
+      DSW1/2    - 8-position DIP switches
+      Note: On most original boards the Z80, VLM and 76489AN have their part numbers scratched off. 
+	        The schematics say '76489AN'
 
       Measurements
       ------------
@@ -276,8 +276,8 @@ void trackfld_state::trackfld_VLM5030_control_w(uint8_t data)
 
 void trackfld_state::yieartf_map(address_map &map)
 {
-	map(0x0000, 0x0000).r(FUNC(trackfld_state::trackfld_speech_r)).w(FUNC(trackfld_state::konami_SN76496_latch_w));
-	map(0x0001, 0x0001).w(FUNC(trackfld_state::konami_SN76496_w));
+	map(0x0000, 0x0000).r(FUNC(trackfld_state::trackfld_speech_r)).w(FUNC(trackfld_state::konami_SN76489a_latch_w));
+	map(0x0001, 0x0001).w(FUNC(trackfld_state::konami_SN76489a_w));
 	map(0x0002, 0x0002).w(FUNC(trackfld_state::trackfld_VLM5030_control_w));
 	map(0x0003, 0x0003).w(m_vlm, FUNC(vlm5030_device::data_w));
 	map(0x1000, 0x1000).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));       /* AFE */
@@ -386,9 +386,9 @@ void trackfld_state::wizzquiz_map(address_map &map)
 }
 
 
-uint8_t trackfld_state::trackfld_SN76496_r()
+uint8_t trackfld_state::trackfld_SN76489a_r()
 {
-	konami_SN76496_w(0);
+	konami_SN76489a_w(0);
 	return 0xff; // ?
 }
 
@@ -398,8 +398,8 @@ void trackfld_state::sound_map(address_map &map)
 	map(0x4000, 0x43ff).mirror(0x1c00).ram();
 	map(0x6000, 0x6000).mirror(0x1fff).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8000).mirror(0x1fff).r(m_soundbrd, FUNC(trackfld_audio_device::trackfld_sh_timer_r));
-	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(trackfld_state::konami_SN76496_latch_w));
-	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(trackfld_state::trackfld_SN76496_r)).w(FUNC(trackfld_state::konami_SN76496_w));
+	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(trackfld_state::konami_SN76489a_latch_w));
+	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(trackfld_state::trackfld_SN76489a_r)).w(FUNC(trackfld_state::konami_SN76489a_w));
 	map(0xe000, 0xe000).mirror(0x1ff8).w(m_dac, FUNC(dac_byte_interface::data_w));
 	map(0xe001, 0xe001).mirror(0x1ff8).noprw();           /* watch dog ?; reaktor reads here */
 	map(0xe002, 0xe002).mirror(0x1ff8).r(m_soundbrd, FUNC(trackfld_audio_device::trackfld_speech_r));
@@ -413,8 +413,8 @@ void trackfld_state::hyprolyb_sound_map(address_map &map)
 	map(0x4000, 0x43ff).mirror(0x1c00).ram();
 	map(0x6000, 0x6000).mirror(0x1fff).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8000).mirror(0x1fff).r(m_soundbrd, FUNC(trackfld_audio_device::trackfld_sh_timer_r));
-	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(trackfld_state::konami_SN76496_latch_w));
-	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(trackfld_state::trackfld_SN76496_r)).w(FUNC(trackfld_state::konami_SN76496_w));
+	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(trackfld_state::konami_SN76489a_latch_w));
+	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(trackfld_state::trackfld_SN76489a_r)).w(FUNC(trackfld_state::konami_SN76489a_w));
 	map(0xe000, 0xe000).mirror(0x1ff8).w(m_dac, FUNC(dac_byte_interface::data_w));
 	map(0xe001, 0xe001).mirror(0x1ff8).noprw();           /* watch dog ?; reaktor reads here */
 	map(0xe002, 0xe002).mirror(0x1ff8).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::busy_r));
@@ -932,7 +932,7 @@ void trackfld_state::trackfld(machine_config &config)
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
 
-	SN76496(config, m_sn, SOUND_CLOCK/8);
+	SN76489A(config, m_sn, SOUND_CLOCK/8);
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	VLM5030(config, m_vlm, VLM_CLOCK);
@@ -1004,7 +1004,7 @@ void trackfld_state::yieartf(machine_config &config)
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
 
-	SN76496(config, m_sn, MASTER_CLOCK/6/2);
+	SN76489A(config, m_sn, MASTER_CLOCK/6/2);
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	VLM5030(config, m_vlm, VLM_CLOCK);

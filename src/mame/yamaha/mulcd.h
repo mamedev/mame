@@ -38,7 +38,7 @@ private:
 	output_finder<> m_contrast;
 	output_finder<10> m_led_outputs;
 
-	void render_w(int state);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 #endif // MAME_YAMAHA_MULCD_H

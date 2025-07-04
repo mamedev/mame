@@ -2341,8 +2341,8 @@ GAME( 1987, arkatour2,    arkatour, arkanoid, arkanoid,  arkanoid_state, empty_i
 GAME( 19??, tetrsark,     0,        bootleg,  tetrsark,  arkanoid_state, init_tetrsark,  ROT0,  "D.R. Korea",                                          "Tetris (D.R. Korea, set 1, encrypted)",       MACHINE_SUPPORTS_SAVE )
 GAME( 19??, tetrsark2,    tetrsark, bootleg,  tetrsark,  arkanoid_state, init_tetrsark2, ROT0,  "D.R. Korea",                                          "Tetris (D.R. Korea, set 2)",                  MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, hexa,         0,        hexa,     hexa,      arkanoid_state, init_hexa,      ROT0,  "D.R. Korea",                                          "Hexa",                                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, hexaa,        hexa,     hexaa,    hexa,      arkanoid_state, init_hexaa,     ROT0,  "D.R. Korea",                                          "Hexa (with 2xZ80, protected)",                MACHINE_NOT_WORKING )
+GAME( 1990, hexa,         0,        hexa,     hexa,      arkanoid_state, init_hexa,      ROT0,  "D.R. Korea",                                          "Hexa",                                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hexaa,        hexa,     hexaa,    hexa,      arkanoid_state, init_hexaa,     ROT0,  "D.R. Korea",                                          "Hexa (with 2xZ80, protected)",                MACHINE_NOT_WORKING )
 
 GAME( 1993, brixian,      0,        brixian,  brixian,   arkanoid_state, init_brixian,   ROT0,  "Cheil Computer System",                               "Brixian",                                     MACHINE_SUPPORTS_SAVE )
 

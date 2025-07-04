@@ -92,7 +92,7 @@ void screamer_device::device_reset()
 //  our sound stream
 //-------------------------------------------------
 
-void awacs_macrisc_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void awacs_macrisc_device::sound_stream_update(sound_stream &stream)
 {
 	// if we're active and not muted
 	if ((m_active & ACTIVE_OUT) && !(m_registers[1] & REGISTER_1_MUTE))
@@ -106,13 +106,13 @@ void awacs_macrisc_device::sound_stream_update(sound_stream &stream, std::vector
 
 		const s32 left = ((s32)l_raw * atten_L) >> 4;
 		const s32 right = ((s32)r_raw * atten_R) >> 4;
-		outputs[0].put_int(0, left, 32768);
-		outputs[1].put_int(0, right, 32768);
+		stream.put_int(0, 0, left, 32768);
+		stream.put_int(1, 0, right, 32768);
 	}
 	else
 	{
-		outputs[0].put_int(0, 0, 32768);
-		outputs[1].put_int(0, 0, 32768);
+		stream.put_int(0, 0, 0, 32768);
+		stream.put_int(1, 0, 0, 32768);
 	}
 
 	m_phase = (m_phase + 1) & 0xfff;

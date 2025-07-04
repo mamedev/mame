@@ -57,15 +57,15 @@ static int phc25_output_bit(int16_t *buffer, int sample_pos, bool bit)
 
 	if (bit)
 	{
-		samples += phc25_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_LOW);
 		samples += phc25_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_HIGH);
 		samples += phc25_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_LOW);
 		samples += phc25_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_HIGH);
+		samples += phc25_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_LOW);
 	}
 	else
 	{
-		samples += phc25_put_samples(buffer, sample_pos + samples, 4, WAVEENTRY_LOW);
 		samples += phc25_put_samples(buffer, sample_pos + samples, 4, WAVEENTRY_HIGH);
+		samples += phc25_put_samples(buffer, sample_pos + samples, 4, WAVEENTRY_LOW);
 	}
 
 	return samples;

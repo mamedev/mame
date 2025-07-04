@@ -41,13 +41,16 @@ private:
 	int check_command( const char* commandtocheck, int command_len, uint8_t* command_data );
 	void send_format_table_packet(uint8_t flag, int x, int y);
 	void send_format_decimal_packet(int x, int y);
+	void send_format_hex_packet(int x, int y);
 	void send_touch_packet();
+	char ntoc(int n) { return n < 10 ?  n + '0' : n - 10 + 'A'; }
 
 	enum
 	{
 		FORMAT_UNKNOWN,
 		FORMAT_TABLET,
-		FORMAT_DECIMAL
+		FORMAT_DECIMAL,
+		FORMAT_HEX
 	};
 
 	enum

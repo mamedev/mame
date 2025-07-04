@@ -636,12 +636,12 @@ void sh4_base_device::pteh_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// for use with LDTLB opcode
 	/*
-		NNNN NNNN NNNN NNNN NNNN NN-- AAAA AAAA
+	    NNNN NNNN NNNN NNNN NNNN NN-- AAAA AAAA
 
-		N = VPM = Virtual Page Number
-		A = ASID = Address Space Identifier
+	    N = VPM = Virtual Page Number
+	    A = ASID = Address Space Identifier
 
-		same as the address table part of the utlb but with 2 unused bits (these are sourced from PTEL instead when LDTLB is called)
+	    same as the address table part of the utlb but with 2 unused bits (these are sourced from PTEL instead when LDTLB is called)
 	*/
 	COMBINE_DATA(&m_pteh);
 }
@@ -654,9 +654,9 @@ uint32_t sh4_base_device::ptel_r(offs_t offset, uint32_t mem_mask)
 void sh4_base_device::ptel_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
-			---P PPPP PPPP PPPP PPPP PP-V zRRz CDHW
+	        ---P PPPP PPPP PPPP PPPP PP-V zRRz CDHW
 
-			same format as data array 1 of the utlb
+	        same format as data array 1 of the utlb
 	*/
 	COMBINE_DATA(&m_ptel);
 }
@@ -692,15 +692,15 @@ void sh4_base_device::mmucr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// MMU Control
 	/*
-		LLLL LL-- BBBB BB-- CCCC CCQV ---- -T-A
+	    LLLL LL-- BBBB BB-- CCCC CCQV ---- -T-A
 
-		L = LRUI = Least recently used ITLB
-		B = URB = UTLB replace boundary
-		C = URC = UTLB replace counter
-		Q = SQMD = Store Queue Mode Bit
-		V = SV = Single Virtual Mode Bit
-		T = TI = TLB invalidate
-		A = AT = Address translation bit (enable)
+	    L = LRUI = Least recently used ITLB
+	    B = URB = UTLB replace boundary
+	    C = URC = UTLB replace counter
+	    Q = SQMD = Store Queue Mode Bit
+	    V = SV = Single Virtual Mode Bit
+	    T = TI = TLB invalidate
+	    A = AT = Address translation bit (enable)
 	*/
 	COMBINE_DATA(&m_mmucr);
 	// MMUCR_AT
@@ -823,9 +823,9 @@ uint32_t sh4_base_device::ptea_r(offs_t offset, uint32_t mem_mask)
 void sh4_base_device::ptea_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
-		---- ---- ---- ---- ---- ---- ---- TSSS
+	    ---- ---- ---- ---- ---- ---- ---- TSSS
 
-		same format as data array 2 of the utlb
+	    same format as data array 2 of the utlb
 	*/
 	COMBINE_DATA(&m_ptea);
 }

@@ -344,7 +344,7 @@ license:CC0-1.0
 	*KD-1  Kids' Song 20 - Volume 1
 	*KD-2  Kids' Song 20 - Volume 2
 	*KD-3  Kids' Song 20 - Volume 3
-	 KD-4  Kids' Song 20 - Volume 4
+	*KD-4  Kids' Song 20 - Volume 4
 
 	***********************************************************************************
 
@@ -2358,6 +2358,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="kd4">
+		<description>Kids' Song 20 (Japan) (KD-4)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング20" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="kd0004.bin" size="0x100000" crc="c9719803" sha1="5aa6ec9742d8e560a86319e40d5f731b8ef60dd3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- ********************************************************************************************************************************************************************** -->
 
 
@@ -3126,7 +3139,46 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="web.u1" size="0x200000" crc="69bb06bf" sha1="dafa4fde7b59cb547e1f3af0b29606b33cb76fd0"/>
+				<rom name="ekaraweb_28m_blank.u1" size="0x200000" crc="69bb06bf" sha1="dafa4fde7b59cb547e1f3af0b29606b33cb76fd0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     夢のチカラ                      上戸彩                          Yume no Chikara                Ueto Aya
+	     何度でも                        DREAMS COME TRUE                Nando Demo                     DREAMS COME TRUE
+	     桜色舞うころ                    中島美嘉                        Sakurairo Maukoro              Nakashima Mika
+	     自分のために                    TOKIO                           Jibun no Tameni                Tokio
+	     夏を待つセイル（帆）のように    ZARD                            Natsu o Matsu Sail no Yō ni    ZARD
+	     SMILY                           大塚愛                          Smily                          Ōtsuka Ai
+	     NO MORE CRY                     D-51                            No More Cry                    D-51
+	     Feel your breeze                V6                              Feel your breeze               V6
+	     KISS or KISS                    北出菜奈                        Kiss or Kiss                   Kitade Nana
+	     MERMAID                         上戸彩                          Mermaid                        Ueto Aya
+	     未来の地図                      Mi                              Mirai no Chizu                 Mi
+	     絆                              亀梨和也                        Kizuna                         Kamenashi Kazuya
+	     青春アミーゴ                    修二と彰                        Seishun Amigo                  Shūji to Akira
+	     プラネタリウム                  大塚愛                          Planetarium                    Ōtsuka Ai
+	     ENDLESS STORY                   REIRA starring Yuna Ito         Endless Story                  Reira starring Yuna Ito
+	     GLAMOROUS SKY                   NANA starring MIKA NAKASHIMA    Glamorous Sky                  Nana starring Mika Nakashima
+	     Sweet Mom                       柴咲コウ                        Sweet Mom                      Shibasaki Kō
+	     WISH                            嵐                              WISH                           ARASHI
+	     Growing of my heart             倉木麻衣                        Growing of my heart            Kuraki Mai
+	     Triangle                        SMAP                            Triangle                       SMAP
+	     抱きしめる                      BoA                             Dakishimeru                    BoA
+	     Faith                           伊藤由奈                        Faith                          Itō Yuna
+	     影                              柴咲コウ                        Kage                           Shibasaki Kō
+	     ベスト オブ ヒーロー            倉木麻衣                        Best of Hero                   Kuraki Mai
+	     Someday                         倖田來未                        Someday                        Kōda Kumi
+	     FIND THE WAY                    中島美嘉                        Find the Way                   Nakashima Mika -->
+	<software name="ekaraweb28a" cloneof="ekaraweb28">
+		<description>e-kara Web cartridge 28M (used, with 26 songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekaraweb_28m_26.u1" size="0x200000" crc="3c03be04" sha1="c3a68376d798f911a38634f19abe4ca870ae8b5c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3138,19 +3190,19 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekaraweb2.bin" size="0x100000" crc="9149a3a8" sha1="01277650706c1b168c5125b0ddcceacbd207be25"/>
+				<rom name="ekaraweb_12m_blank.u1" size="0x100000" crc="9149a3a8" sha1="01277650706c1b168c5125b0ddcceacbd207be25"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- this one has some songs programmed into it:
-	     河内おとこ節              中村美律子      Kawachi Otokobushi          Nakamura Mitsuko
-	     珍島(チンド)物語          天童よしみ      Chindo Monogatari           Tendō Yoshimi
-	     こころ酒                  藤あや子        Kokoro Sake                 Fuji Ayako
-	     夜桜お七                  坂本冬美        Yozakura O-shichi           Sakamoto Fuyumi
-	     愛燦燦(あいさんさん)      美空ひばり      Ai Sansan                   Misora Hibari
-	     川の流れのように          美空ひばり      Kawa no Nagare no Yō ni     Misora Hibari
-	     真赤な太陽                美空ひばり      Makkana TaiYō               Misora Hibari -->
+	     河内おとこ節                  中村美律子          Kawachi Otokobushi                         Nakamura Mitsuko
+	     珍島(チンド)物語              天童よしみ          Chindo Monogatari                          Tendō Yoshimi
+	     こころ酒                      藤あや子            Kokoro Sake                                Fuji Ayako
+	     夜桜お七                      坂本冬美            Yozakura O-shichi                          Sakamoto Fuyumi
+	     愛燦燦(あいさんさん)          美空ひばり          Ai Sansan                                  Misora Hibari
+	     川の流れのように              美空ひばり          Kawa no Nagare no Yō ni                    Misora Hibari
+	     真赤な太陽                    美空ひばり          Makkana TaiYō                              Misora Hibari -->
 	<software name="ekaraweb12a" cloneof="ekaraweb12">
 		<description>e-kara Web cartridge 12M (used, with 7 songs) (Japan)</description>
 		<year>2003</year>
@@ -3158,42 +3210,42 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekaraweb3.bin" size="0x100000" crc="a6a095b9" sha1="709d7edb5799b97127502408bec698663b902462"/>
+				<rom name="ekaraweb_12m_7.u1" size="0x100000" crc="a6a095b9" sha1="709d7edb5799b97127502408bec698663b902462"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- this one has some songs programmed into it:
-	     さくらんぼ                  大塚愛              Sakuranbo                                  Ōtsuka Ai
-	     花                          ORANGE RANGE        Hana                                       Orange Range
-	     ロコローション              ORANGE RANGE        Locolotion                                 Orange Range
-	     solitude～真実のサヨナラ～  KinKi Kids          Solitude - Shinjitsu no Sayonara           KinKi Kids
-	     薄荷キャンディー            KinKi Kids          Hakka Candy                                KinKi Kids
-	     ボクの背中には羽根がある    KinKi Kids          Boku no Senaka ni wa Hane ga Aru           KinKi Kids
-	     愛の温度℃                   ぴちぴちピッチ      Ai no Ondo °C                              Pichi Pichi Pitch
-	     世界で一番早く朝が来る場所  ぴちぴちピッチ      Sekai de Ichiban Hayaku Asa ga Kuru Basho  Pichi Pichi Pitch
-	     YUME日和                    島谷ひとみ          Yume Biyori                                Shimatani Hitomi
-	     LOVE LOVE LOVE              DREAMS COME TRUE    Love Love Love                             Dreams Come True
-	     キラリ☆セーラードリーム     小枝(さえ)          Kirari ☆ Sailor Dream                      Koeda (Sae)
-	     夏祭り                      Whiteberry          Natsu Matsuri                              Whiteberry -->
+	     さくらんぼ                    大塚愛              Sakuranbo                                  Ōtsuka Ai
+	     花                            ORANGE RANGE        Hana                                       Orange Range
+	     ロコローション                ORANGE RANGE        Locolotion                                 Orange Range
+	     solitude～真実のサヨナラ～    KinKi Kids          Solitude - Shinjitsu no Sayonara           KinKi Kids
+	     薄荷キャンディー              KinKi Kids          Hakka Candy                                KinKi Kids
+	     ボクの背中には羽根がある      KinKi Kids          Boku no Senaka ni wa Hane ga Aru           KinKi Kids
+	     愛の温度℃                     ぴちぴちピッチ      Ai no Ondo °C                              Pichi Pichi Pitch
+	     世界で一番早く朝が来る場所    ぴちぴちピッチ      Sekai de Ichiban Hayaku Asa ga Kuru Basho  Pichi Pichi Pitch
+	     YUME日和                      島谷ひとみ          Yume Biyori                                Shimatani Hitomi
+	     LOVE LOVE LOVE                DREAMS COME TRUE    Love Love Love                             Dreams Come True
+	     キラリ☆セーラードリーム       小枝(さえ)          Kirari ☆ Sailor Dream                      Koeda (Sae)
+	     夏祭り                        Whiteberry          Natsu Matsuri                              Whiteberry -->
 	<software name="ekaraweb12b" cloneof="ekaraweb12">
-		<description>e-kara Web cartridge 12M (used, with 12 songs) (Japan)</description>
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 1) (Japan)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekaraweb4.bin" size="0x100000" crc="23df7749" sha1="cfd3f9f0b9f4713d560700c4e463d0e9d94c9447"/>
+				<rom name="ekaraweb_12m_12_set1.u1" size="0x100000" crc="23df7749" sha1="cfd3f9f0b9f4713d560700c4e463d0e9d94c9447"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- this one has some songs programmed into it:
-	    月光町のうた                  おじゃる丸・キス                      Gekkō Machi no Uta              Ojarumaru/Kiss
-	    詠人（うたびと）              北島三郎                              Utabito                         Kitajima Saburō
-	    アララの呪文                  ちびまる子ちゃんwith爆チュー問題      Arara no Jumon                  Chibi Maruko-chan with Bakuchū Mondai
-	    サザエさん                    宇野ゆう子                            Sazae-san                       Uno Yūko
-	    島人ぬ宝                      BEGIN                                 Shimanchunu Takara              BEGIN -->
+	     月光町のうた                  おじゃる丸・キス                      Gekkō Machi no Uta              Ojarumaru/Kiss
+	     詠人（うたびと）              北島三郎                              Utabito                         Kitajima Saburō
+	     アララの呪文                  ちびまる子ちゃんwith爆チュー問題      Arara no Jumon                  Chibi Maruko-chan with Bakuchū Mondai
+	     サザエさん                    宇野ゆう子                            Sazae-san                       Uno Yūko
+	     島人ぬ宝                      BEGIN                                 Shimanchunu Takara              BEGIN -->
 	<software name="ekaraweb12c" cloneof="ekaraweb12">
 		<description>e-kara Web cartridge 12M (used, with 5 songs) (Japan)</description>
 		<year>2003</year>
@@ -3201,28 +3253,292 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="usercart.bin" size="0x100000" crc="bc4635cd" sha1="5343b254218f85a2f9e5ae9e4646b456d82c7d27"/>
+				<rom name="ekaraweb_12m_5.u1" size="0x100000" crc="bc4635cd" sha1="5343b254218f85a2f9e5ae9e4646b456d82c7d27"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- this one has some songs programmed into it:
-	    世界に一つだけの花            SMAP                                  Sekai ni Hitotsu Dake no Hana   SMAP
-	    さくらんぼ                    大塚愛                                Sakuranbo                       Ōtsuka Ai
-	    あ～よかった                  花*花                                 Ah Yokatta                      hana*hana
-	    ハッスル                      かいけつゾロリ(山寺宏一)              Hustle                          Kaiketsu Zorori (Yamadera Kōichi)
-	    アララの呪文                  ちびまる子ちゃん with 爆チュー問題    Arara no Jumon                  Chibi Maruko-chan with Bakuchū Mondai
-	    ミニハムずの愛の唄            ミニハムず                            Minihams no Ai no Uta           Minihams
-	    ミニモニ。ジャンケンぴょん!   ミニモニ。                            mini-moni Jankenpyon!           mini-moni
-	    大きな古時計                  童謡                                  Ōkina Furudokei                 Dōyō -->
-	<software name="ekaraweb8">
-		<description>e-kara Web cartridge 8M (used, with 8 songs) (Japan)</description>
+	     SMILY〈なかよしVer.〉         大塚愛                                Smily <Nakayoshi Ver.>          Ōtsuka Ai
+	     SMILY                         大塚愛                                Smily                           Ōtsuka Ai
+	     以心電信                      ORANGE RANGE                          Ishin Denshin                   Orange Range
+	     お願い!セニョリータ           ORANGE RANGE                          Onegai! Señorita                Orange Range
+	     ロコローション                ORANGE RANGE                          Locolotion                      Orange Range
+	     花                            ORANGE RANGE                          Hana                            Orange Range
+	     ビーだま                      大塚愛                                Bīdama                          Ōtsuka Ai
+	     大好きだよ。                  大塚愛                                Daisuki dayo.                   Ōtsuka Ai
+	     君は天然色                    大滝詠一                              Kimi wa Tennenshoku             Ōtaki Eiichi
+	     メリー・ジェーン              つのだ☆ひろ                           Mary Jane                       Tsunoda☆Hiro
+	     壊れかけのRadio               德永英明                              Kowarekake no Radio             Tokunaga Hideaki
+	     そっとおやすみ                布施明                                Sotto O-yasumi                  Fuse Akira -->
+	<software name="ekaraweb12d" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 2) (Japan)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="usercart.u1" size="0x100000" crc="28a5a5c7" sha1="408ef97a8a42e286cb18b9df61ac575a24b1462d"/>
+				<rom name="ekaraweb_12m_12_set2.u1" size="0x100000" crc="23507ed2" sha1="254c24c23b51cae181579ac062cf01f76edebb73"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     真赤な太陽                                                      美空ひばり          Makkana Taiyō             Misora Hibari
+	     みだれ髪                                                        美空ひばり          Midare Gami               Misora Hibari
+	     チャンピオーネ                                                  ORANGE RANGE        Champione                 ORANGE RANGE
+	     旅人                                                            ケツメイシ          Tabiudo                   Ketsumeishi
+	     純恋歌                                                          湘南乃風            Junrenka                  Shōnan no Kaze
+	     花                                                              喜納昌吉            Hana                      Kina Shōkichi
+	     I Was Born To Love You［アイ・ワズ・ボーン・トゥ・ラヴ・ユー］  QUEEN               I Was Born To Love You    Queen
+	     花                                                              ORANGE RANGE        Hana                      Orange Range
+	     Together                                                        EXILE               Together                  EXILE
+	     君といつまでも                                                  加山雄三            Kimi to Itsma demo        Kayama Yūzō
+	     しあわせになろうよ                                              長渕剛              Shiawase ni Narō yo       Nagabuchi Tsuyoshi
+	     Believe                                                         AI                  Believe                   AI -->
+	<software name="ekaraweb12e" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 3) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set3.u1" size="0x100000" crc="1aa61941" sha1="002353dfd8ac61c4ea3e82d3fdd95d98a0fbf29e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     恋のつぼみ                                      倖田來未                        Koi no Tsubomi                           Kōda Kumi
+	     Someday                                         倖田來未                        Someday                                  Kōda Kumi
+	     Jupiter                                         倖田來未                        Jupiter                                  Kōda Kumi
+	     明日                                            倖田來未                        Ashita                                   Kōda Kumi
+	     純愛ラプソディ                                  竹内まりや                      Junai Rhapsody                           Takeuchi Mariya
+	     元気を出して                                    竹内まりや                      Genki o Dashite                          Takeuchi Mariya
+	     家（うち）に帰ろう～マイ・スイート・ホーム～    竹内まりや                      Uchi ni Kaerō – My Sweet Home            Takeuchi Mariya
+	     時代                                            中島みゆき                      Jidai                                    Nakashima Miyuki
+	     地上の星                                        中島みゆき                      Chijō no Hoshi                           Nakashima Miyuki
+	     for you...                                      前野智昭                        for you...                               Maeno Tomoaki
+	     恋の奴隷                                        奥村チヨ                        Koi no Dorei                             Okumura Chiyo
+	     サン・トワ・マミー                              後藤真希                        Sans toi ma mie                          Gotō Maki -->
+	<software name="ekaraweb12f" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 4) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set4.u1" size="0x100000" crc="4df715fe" sha1="8aa22b8f1823c186124c4e083efc94d3b1adb5f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     Time after time～花舞う街で～                   倉木麻衣                        Time after time – Hana Mau Machi de      Kuraki Mai
+	     Stay by my side                                 倉木麻衣                        Stay by my side                          Kuraki Mai
+	     冷たい海                                        倉木麻衣                        Tsumetai Umi                             Kuraki Mai
+	     Reach for the sky                               倉木麻衣                        Reach for the sky                        Kuraki Mai
+	     さくらんぼ                                      大塚愛                          Sakuranbo                                Ōtsuka Ai
+	     Dream×Dream                                     愛内里菜                        Dream×Dream                              Aiuchi Rina
+	     I can’t stop my love for you♥                   愛内里菜                        I can’t stop my love for you♥            Aiuchi Rina
+	     MESSAGE                                         上戸彩                          Message                                  Ueto Aya
+	     愛のために。                                    上戸彩                          Ai no Tame ni.                           Ueto Aya
+	     無色                                            上原あずみ                      Mushoku                                  Uehara Azumi
+	     謎                                              小松未歩                        Nazo                                     Komatsu Miho
+	     かたちあるもの                                  柴咲コウ                        Katachi Arumono                          Shibasaki Kō -->
+	<software name="ekaraweb12g" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 5) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set5.u1" size="0x100000" crc="2d05d13d" sha1="252a74157e403e61107945d05e72d0c0d7b8f1c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     悪女                                            中島みゆき                      Akujo                                    Nakashima Miyuki
+	     あの鐘を鳴らすのはあなた                        和田アキ子                      Ano Kane o Narasu no wa Anata            Wada Akiko
+	     あの日にかえりたい                              松任谷由実（荒井由実）          Ano Nichi ni Kaeritai                    Matsutōya Yumi (Arai Yumi)
+	     勝手にしやがれ                                  沢田研二                        Katte ni Shiyagare                       Sawada Kenji
+	     季節の中で                                      松山千                          Kisetsu no Naka de                       Matsuyama Chiharu
+	     シングル・アゲイン                              竹内まりや                      Single Again                             Takeuchi Mariya
+	     Story                                           AI                              Story                                    AI
+	     未来の地図                                      Mi                              Mirai no Chizu                           Mi
+	     明日へ架ける橋                                  倉木麻衣                        Ashita e Kakeru Hashi                    Kuraki Mai
+	     feel my soul                                    YUI                             feel my soul                             YUI
+	     P.S ♥ MY SUNSHINE                               倉木麻衣                        P.S ♥ My Sunshine                        Kuraki Mai
+	     金色のライオン                                  長渕剛                          Kiniro no Lion                           Nagabuchi Tsuyoshi -->
+	<software name="ekaraweb12h" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 6) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set6.u1" size="0x100000" crc="cc7d21bc" sha1="14da4da1af6c9c36fac03d80a596b033347aae30"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     「いちご白書」をもう一度                        バンバン                        “Ichigo Hakusho” o Mōichido              Bang Bang
+	     卒業写真                                        松任谷由実（荒井由実）          Sotsugyō Shashin                         Matsutōya Yumi (Arai Yumi)
+	     神田川                                          南こうせつとかぐや姫            Kandagawa                                Minami Kōsetsu to Kaguyahime
+	     どうにもとまらない～ノンストップ                山本リンダ                      Dōnimo Tomaranai – Nonstop               Yamamoto Linda
+	     HERO～ヒーローになる時、それは今～              甲斐バンド                      Hero (Hero ni naru toki, sore wa ima)    Kai Band
+	     ルビーの指環                                    寺尾聰                          Ruby no Yubiwa                           Terao Akira
+	     みちづれ                                        渡哲也                          Michizure                                Watari Tetsuya
+	     ダンシング・オールナイト                        もんた&ブラザーズ               Dancing All Night                        Monta & Brothers
+	     結婚しようよ                                    吉田拓郎                        Kekkon Shiyō yo                          Yoshida Takurō
+	     心の旅                                          チューリップ                    Kokoro no Tabi                           TULIP
+	     ふたり酒                                        川中美幸                        Futari Sake                              Kawanaka Miyuki
+	     かもめはかもめ                                  研ナオコ                        Kamome wa Kamome                         Ken Naoko -->
+	<software name="ekaraweb12i" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 7) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set7.u1" size="0x100000" crc="6230d3d2" sha1="8b9ca56d64b37cf96cc97f953d2ad2525c4ee98e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     いつかのメリークリスマス                        B'z                             Itsuka no Merry Christmas                B'z
+	     愛しい人よ Good Night...                        B'z                             Itoshī Hito yo Good Night...             B'z
+	     夕暮れ                                          THE BLUE HEARTS                 Yūgure                                   The Blue Hearts
+	     ラブレター                                      THE BLUE HEARTS                 Love Letter                              The Blue Hearts
+	     終わらない歌                                    THE BLUE HEARTS                 Owaranai Uta                             The Blue Hearts
+	     情熱の薔薇                                      THE BLUE HEARTS                 Jōnetsu no Bara                          The Blue Hearts
+	     My Gift to You                                  CHEMISTRY meets S.O.S           My Gift to You                           Chemistry meets S.O.S
+	     涙                                              ケツメイシ                      Namida                                   Ketsumeishi
+	     さくら                                          ケツメイシ                      Sakura                                   Ketsumeishi
+	     squall                                          福山雅治                        squall                                   Fukuyama Masaharu
+	     恋                                              松山千春                        Koi                                      Matsuyama Chiharu
+	     離したくはない                                  T-BOLAN                         Hanashitaku wa Nai                       T-Bolan -->
+	<software name="ekaraweb12j" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 8) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set8.u1" size="0x100000" crc="fd6f4039" sha1="d8b5e4dab616aaa2ae63ab14a919ca4b0e395614"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     白い恋人達                                      桑田佳祐                        Shiroi Koibitotachi                      Kuwata Keisuke
+	     ずっと2人で…                                    GLAY                            Zutto Futari de...                       GLAY
+	     夏色                                            ゆず                            Natsuiro                                 Yuzu
+	     One more time,One more chance                   山崎まさよし                    One more time, One more chance           Yamazaki Masayoshi
+	     抱きしめたい                                    Mr.Children                     Dakishimetai                             Mr.Children
+	     大阪で生まれた女                                BORO                            Ōsaka de Umareta Onna                    BORO
+	     Automatic                                       宇多田ヒカル                    Automatic                                Utada Hikaru
+	     Don’t wanna cry                                 安室奈美恵                      Don’t wanna cry                          Amuro Namie
+	     花の首飾り                                      ザ・タイガース                  Hana no Kubikazari                       The Tigers
+	     恋人よ                                          五輪真弓                        Koibito yo                               Itsuwa Mayumi
+	     時間よ止まれ                                    矢沢永吉                        Jikan yo Tomare                          Yazawa Eikichi
+	     異邦人                                          TAK MATSUMOTO featuring ZARD    Ihōjin                                   Tak Matsumoto featuring ZARD
+	-->
+	<software name="ekaraweb12k" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 9) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set9.u1" size="0x100000" crc="52535bbf" sha1="598734744c661226e4be79ec44d75ad556c05262"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     世界に一つだけの花            SMAP                                  Sekai ni Hitotsu Dake no Hana   SMAP
+	     さくらんぼ                    大塚愛                                Sakuranbo                       Ōtsuka Ai
+	     あ～よかった                  花*花                                 Ah Yokatta                      hana*hana
+	     ハッスル                      かいけつゾロリ(山寺宏一)              Hustle                          Kaiketsu Zorori (Yamadera Kōichi)
+	     アララの呪文                  ちびまる子ちゃん with 爆チュー問題    Arara no Jumon                  Chibi Maruko-chan with Bakuchū Mondai
+	     ミニハムずの愛の唄            ミニハムず                            Minihams no Ai no Uta           Minihams
+	     ミニモニ。ジャンケンぴょん!   ミニモニ。                            mini-moni Jankenpyon!           mini-moni
+	     大きな古時計                  童謡                                  Ōkina Furudokei                 Dōyō -->
+	<software name="ekaraweb8">
+		<description>e-kara Web cartridge 8M (used, with 8 songs, set 1) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_8m_8_set1.u1" size="0x100000" crc="28a5a5c7" sha1="408ef97a8a42e286cb18b9df61ac575a24b1462d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     I Was Born To Love You［アイ・ワズ・ボーン・トゥ・ラヴ・ユー］  QUEEN                 I Was Born To Love You        Queen
+	     Alone Again(Naturally)［アローン・アゲイン］                    Gilbert O’Sullivan    Alone Again (Naturally)       Gilbert O’Sullivan
+	     I Don’t Want To Miss A Thing［ミス・ア・シング］                Aerosmith             I Don’t Want to Miss a Thing  Aerosmith
+	     Yesterday Once More［イエスタデイ・ワンス・モア］               CARPENTERS            Yesterday Once More           Carpenters
+	     Tears In Heaven［ティアーズ・イン・ヘヴン］                     Eric Clapton          Tears in Heaven               Eric Clapton
+	     Top Of The World［トップ・オブ・ザ・ワールド］                  Carpenters            Top of the World              Carpenters
+	     Last Christmas［ラスト・クリスマス］                            Wham!                 Last Christmas                Wham!
+	     Honesty［オネスティ］                                           Billy Joel            Honesty                       Billy Joel -->
+	<software name="ekaraweb8a" cloneof="ekaraweb8">
+		<description>e-kara Web cartridge 8M (used, with 8 songs, set 2) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_8m_8_set2.u1" size="0x100000" crc="abc09a19" sha1="8b65e4b00a8757a0df3965548fd52e6b12b92756"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     ３年目の浮気        ヒロシ＆キーボー                        3-nen-me no Uwaki   Hiroshi & Keybow
+	     CHA-LA HEAD-CHA-LA  影山ヒロノブ                            Cha-La Head-Cha-La  Kageyama Hironobu
+	     DANCE!おジャ魔女    MAHO堂                                  Dance! Ojamajo      Maho-Dō
+	     ポルカ・オ・ドルカ  ニャース（犬山犬子）＆ノルソル合唱団    Polka O Dolka       Meowth (Inuyama Inuko) & Nolsol Gasshō-dan
+	     サザエさん          宇野ゆう子                              Sazae-san           Uno Yūko
+	     さくら（独唱）      森山直太朗                              Sakura (dokushō)    Moriyama Naotarō
+	     アタックNo.1 2005   福田沙紀                                Attack No.1 2005    Fukuda Saki
+	     虹                  福山雅治                                Niji                Fukuyama Masaharu -->
+	<software name="ekaraweb8b" cloneof="ekaraweb8">
+		<description>e-kara Web cartridge 8M (used, with 8 songs, set 3) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_8m_8_set3.u1" size="0x100000" crc="a97521cb" sha1="d5b826e7313697491cbcfab243439899a46f17c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     SWEET MEMORIES        松田聖子              Sweet Memories                 Matsuda Seiko
+	     出逢った頃のように    Every Little Thing    Deatta Koro no Yō ni           Every Little Thing
+	     Shine We Are!         BoA                   Shine We Are!                  BoA
+	     長い間                Kiroro                Nagai Aida                     Kiroro
+	     雪の華                中島美嘉              Yuki no Hana                   Nakashima Mika
+	     世界に一つだけの花    SMAP                  Sekai ni Hitotsu Dake no Hana  SMAP
+	     ハム太郎とっとこうた  ハムちゃんず          Hamtaro Tottokōta              Hamuchans
+	     乙女 パスタに感動     タンポポ              Otome Pasta ni Kando           Tanpopo -->
+	<software name="ekaraweb8c" cloneof="ekaraweb8">
+		<description>e-kara Web cartridge 8M (used, with 8 songs, set 4) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_8m_8_set4.u1" size="0x100000" crc="4e7c04d8" sha1="f81c134849cd846ede0106bf355c71408a2771a1"/>
 			</dataarea>
 		</part>
 	</software>

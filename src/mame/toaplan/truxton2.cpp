@@ -339,14 +339,13 @@ void truxton2_state::truxton2(machine_config &config)
 
 	/* sound hardware */
 #ifdef TRUXTON2_STEREO  // music data is stereo...
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(0, "lspeaker", 0.5).add_route(1, "rspeaker", 0.5);
+	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(0, "speaker", 0.5, 0).add_route(1, "speaker", 0.5, 1);
 
 	OKIM6295(config, m_oki, 16_MHz_XTAL/4, okim6295_device::PIN7_LOW);
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 #else   // ...but the hardware is mono
 	SPEAKER(config, "mono").front_center();
 

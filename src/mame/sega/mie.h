@@ -69,13 +69,19 @@ public:
 
 	uint8_t read_ff();
 	uint8_t read_00();
-	uint8_t read_78xx(offs_t offset);
+	//uint8_t read_78xx(offs_t offset);
 
 	void maple_w(const uint32_t *data, uint32_t in_size) override;
 	virtual void maple_reset() override;
 
 	void mie_map(address_map &map) ATTR_COLD;
 	void mie_port(address_map &map) ATTR_COLD;
+
+	void busrq_w(int state) { busrq = state; }; // TODO stop Z80
+	int busak_r() { return busrq && BIT(irq_enable, 6); };
+
+	uint8_t mem_r(offs_t offset) { return m_space->read_byte(offset); };
+	void mem_w(offs_t offset, uint8_t data) { m_space->write_byte(offset, data); };
 
 protected:
 	template <uint8_t First> void set_gpio_names() { }
@@ -111,6 +117,7 @@ private:
 	emu_timer *timer = nullptr;
 	required_device<mie_jvs_device> jvs;
 	optional_ioport_array<8> gpio_port;
+	address_space* m_space;
 
 	uint32_t tbuf[TBUF_SIZE]{};
 	uint32_t control = 0, lreg = 0, jvs_rpos = 0;
@@ -118,6 +125,7 @@ private:
 	uint8_t irq_enable = 0, irq_pending = 0, maple_irqlevel = 0;
 	uint8_t jvs_control = 0, jvs_dest = 0;
 	uint8_t jvs_lcr = 0;
+	int busrq = 0;
 
 	void raise_irq(int level);
 	void recalc_irq();

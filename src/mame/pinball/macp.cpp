@@ -363,20 +363,20 @@ void macp_state::mac16k(machine_config &config)
 	genpin_audio(config);
 
 	//2x AY8910
-	SPEAKER(config, "lspkr").front_left();
+	SPEAKER(config, "speaker", 2).front();
+
 	AY8910(config, m_ay8910[0], 3'800'000/2);
 	m_ay8910[0]->set_resistors_load(10e3,10e3,10e3);
 	m_ay8910[0]->port_a_write_callback().set(FUNC(macp_state::ay0_a_w));
 	m_ay8910[0]->port_b_write_callback().set(FUNC(macp_state::ay0_b_w));
-	m_ay8910[0]->add_route(ALL_OUTPUTS, "lspkr", 0.50);
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
 
-	SPEAKER(config, "rspkr").front_right();
 	AY8910(config, m_ay8910[1], 3'800'000/2);
 	m_ay8910[1]->set_resistors_load(10e3,10e3,10e3);
 	m_ay8910[1]->port_a_write_callback().set(FUNC(macp_state::ay1_a_w));
 	m_ay8910[1]->port_b_write_callback().set(FUNC(macp_state::ay1_b_w));
 	m_ay8910[1]->port_b_read_callback().set(FUNC(macp_state::ay1_b_r));
-	m_ay8910[1]->add_route(ALL_OUTPUTS, "rspkr", 0.50);
+	m_ay8910[1]->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 }
 
 void macp_state::mac32k(machine_config &config)

@@ -404,19 +404,18 @@ void pico_state::pico_ntsc(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pico_state::pico_mem);
 
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
 	m_sega_315_5641_pcm->fifo_cb().set(FUNC(pico_state::sound_cause_irq));
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "speaker", 0.16, 0);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "speaker", 0.16, 1);
 }
 
 void pico_state::pico_pal(machine_config &config)
@@ -425,19 +424,18 @@ void pico_state::pico_pal(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pico_state::pico_mem);
 
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
 	m_sega_315_5641_pcm->fifo_cb().set(FUNC(pico_state::sound_cause_irq));
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "speaker", 0.16, 0);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "speaker", 0.16, 1);
 }
 
 
@@ -683,19 +681,18 @@ void copera_state::copera(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &copera_state::copera_mem);
 
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	COPERA_CART_SLOT(config, m_picocart, copera_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("copera");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK);
 	m_sega_315_5641_pcm->fifo_cb().set(FUNC(copera_state::copera_pcm_cb));
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "speaker", 0.16, 0);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "speaker", 0.16, 1);
 }
 
 void copera_state::copera_pcm_cb(int state)

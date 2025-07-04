@@ -92,19 +92,22 @@ void DebuggerView::paintEvent(QPaintEvent *event)
 	if (m_preferBottom && atEnd)
 		verticalScrollBar()->setValue(verticalScrollSize);
 
+	const auto palette = QApplication::palette();
+
 	// Draw the viewport widget
 	QPainter painter(viewport());
-	painter.fillRect(0, 0, width(), height(), QBrush(Qt::white));
+	painter.fillRect(0, 0, width(), height(), QBrush(palette.color(QPalette::Window)));
 	painter.setBackgroundMode(Qt::OpaqueMode);
-	painter.setBackground(QColor(255,255,255));
+	painter.setBackground(palette.color(QPalette::Window));
 
 	// Background control
 	QBrush bgBrush;
 	bgBrush.setStyle(Qt::SolidPattern);
-	painter.setPen(QPen(QColor(0,0,0)));
+	painter.setPen(QPen(QPalette::WindowText));
 
 	const debug_view_xy visibleCharDims = m_view->visible_size();
 	const debug_view_char *viewdata = m_view->viewdata();
+
 	for (int y = 0; y < visibleCharDims.y; y++, viewdata += visibleCharDims.x)
 	{
 		int width = 1;
@@ -113,23 +116,29 @@ void DebuggerView::paintEvent(QPaintEvent *event)
 			const unsigned char textAttr = viewdata[x].attrib;
 
 			// Text color handling
-			QColor fgColor(0,0,0);
-			QColor bgColor(255,255,255);
+			QColor fgColor(palette.color(QPalette::WindowText));
+			QColor bgColor(palette.color(QPalette::Window));
 
 			if (textAttr & DCA_VISITED)
 				bgColor.setRgb(0xc6, 0xe2, 0xff);
 
 			if (textAttr & DCA_ANCILLARY)
-				bgColor.setRgb(0xe0, 0xe0, 0xe0);
+				bgColor.setRgb(palette.color(QPalette::Base).rgb());
 
 			if (textAttr & DCA_SELECTED)
 				bgColor.setRgb(0xff, 0x80, 0x80);
 
 			if (textAttr & DCA_CURRENT)
-				bgColor.setRgb(0xff, 0xff, 0x00);
+				bgColor.setRgb(palette.color(QPalette::Highlight).rgb());
 
 			if ((textAttr & DCA_SELECTED) && (textAttr & DCA_CURRENT))
-				bgColor.setRgb(0xff,0xc0,0x80);
+			{
+				#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+					bgColor.setRgb(palette.color(QPalette::Accent).rgb());
+				#else
+					bgColor.setRgb(0xff,0xc0,0x80);
+				#endif
+			}
 
 			if (textAttr & DCA_CHANGED)
 				fgColor.setRgb(0xff, 0x00, 0x00);
@@ -171,9 +180,9 @@ void DebuggerView::paintEvent(QPaintEvent *event)
 			if (((y + 1) == visibleCharDims.y) && (contentHeight > (visibleCharDims.y * fontHeight)))
 			{
 				if (textAttr & DCA_ANCILLARY)
-					bgColor.setRgb(0xe0, 0xe0, 0xe0);
+					bgColor.setRgb(palette.color(QPalette::Base).rgb());
 				else
-					bgColor.setRgb(0xff, 0xff, 0xff);
+					bgColor.setRgb(palette.color(QPalette::Window).rgb());
 				bgBrush.setColor(bgColor);
 				painter.fillRect(
 						x * fontWidth,

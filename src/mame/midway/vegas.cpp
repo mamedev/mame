@@ -2021,15 +2021,14 @@ void vegas_state::gauntleg(machine_config &config)
 	// Firmware frequency detection seems to have a bug, console reports 220MHz for a 200MHz cpu and 260MHz for a 250MHz cpu
 	vegas250(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2104(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2049,15 +2048,14 @@ void vegas_state::gauntdl(machine_config &config)
 	// Needs 250MHz MIPS or screen tearing occurs (See MT8064)
 	vegas250(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2104(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2076,15 +2074,14 @@ void vegas_state::warfa(machine_config &config)
 {
 	vegas250(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2104(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2103,15 +2100,14 @@ void vegas_state::tenthdeg(machine_config &config)
 {
 	vegas(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0afb);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2130,15 +2126,14 @@ void vegas_state::roadburn(machine_config &config)
 {
 	vegas32m(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_DSIO(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0ddd);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2157,15 +2152,14 @@ void vegas_state::nbashowt(machine_config &config)
 {
 	vegasban(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2104(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2186,15 +2180,14 @@ void vegas_state::nbanfl(machine_config &config)
 {
 	vegasban(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2104(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2220,15 +2213,14 @@ void vegas_state::nbagold(machine_config &config)
 	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
 	m_nile->set_sdram_size(0, 0x00800000);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2104(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2248,21 +2240,17 @@ void vegas_state::sf2049(machine_config &config)
 {
 	denver(config);
 
-	SPEAKER(config, "flspeaker").front_left();
-	SPEAKER(config, "frspeaker").front_right();
-	SPEAKER(config, "rlspeaker").headrest_left();
-	SPEAKER(config, "rrspeaker").headrest_right();
-	SPEAKER(config, "subwoofer").backrest();
+	SPEAKER(config, "speaker", 5).front().headrest_left(2).headrest_right(3).backrest(4);
 
 	DCS2_AUDIO_DENVER_5CH(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(8);
 	m_dcs->set_polling_offset(0x872);
-	m_dcs->add_route(0, "flspeaker", 1.0);
-	m_dcs->add_route(1, "frspeaker", 1.0);
-	m_dcs->add_route(2, "rlspeaker", 1.0);
-	m_dcs->add_route(3, "rrspeaker", 1.0);
-	m_dcs->add_route(4, "subwoofer", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 0);
+	m_dcs->add_route(1, "speaker", 1.0, 1);
+	m_dcs->add_route(2, "speaker", 1.0, 2);
+	m_dcs->add_route(3, "speaker", 1.0, 3);
+	m_dcs->add_route(4, "speaker", 1.0, 4);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2282,21 +2270,17 @@ void vegas_state::sf2049se(machine_config &config)
 {
 	denver(config);
 
-	SPEAKER(config, "flspeaker").front_left();
-	SPEAKER(config, "frspeaker").front_right();
-	SPEAKER(config, "rlspeaker").headrest_left();
-	SPEAKER(config, "rrspeaker").headrest_right();
-	SPEAKER(config, "subwoofer").backrest();
+	SPEAKER(config, "speaker", 5).front().headrest_left(2).headrest_right(3).backrest(4);
 
 	DCS2_AUDIO_DENVER_5CH(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(8);
 	m_dcs->set_polling_offset(0x872);
-	m_dcs->add_route(0, "flspeaker", 1.0);
-	m_dcs->add_route(1, "frspeaker", 1.0);
-	m_dcs->add_route(2, "rlspeaker", 1.0);
-	m_dcs->add_route(3, "rrspeaker", 1.0);
-	m_dcs->add_route(4, "subwoofer", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 0);
+	m_dcs->add_route(1, "speaker", 1.0, 1);
+	m_dcs->add_route(2, "speaker", 1.0, 2);
+	m_dcs->add_route(3, "speaker", 1.0, 3);
+	m_dcs->add_route(4, "speaker", 1.0, 4);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2316,21 +2300,17 @@ void vegas_state::sf2049te(machine_config &config)
 {
 	denver(config);
 
-	SPEAKER(config, "flspeaker").front_left();
-	SPEAKER(config, "frspeaker").front_right();
-	SPEAKER(config, "rlspeaker").headrest_left();
-	SPEAKER(config, "rrspeaker").headrest_right();
-	SPEAKER(config, "subwoofer").backrest();
+	SPEAKER(config, "speaker", 5).front().headrest_left(2).headrest_right(3).backrest(4);
 
 	DCS2_AUDIO_DENVER_5CH(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(8);
 	m_dcs->set_polling_offset(0x872);
-	m_dcs->add_route(0, "flspeaker", 1.0);
-	m_dcs->add_route(1, "frspeaker", 1.0);
-	m_dcs->add_route(2, "rlspeaker", 1.0);
-	m_dcs->add_route(3, "rrspeaker", 1.0);
-	m_dcs->add_route(4, "subwoofer", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 0);
+	m_dcs->add_route(1, "speaker", 1.0, 1);
+	m_dcs->add_route(2, "speaker", 1.0, 2);
+	m_dcs->add_route(3, "speaker", 1.0, 3);
+	m_dcs->add_route(4, "speaker", 1.0, 4);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2350,15 +2330,14 @@ void vegas_state::cartfury(machine_config &config)
 {
 	vegasv3(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2104(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");

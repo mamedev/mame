@@ -487,22 +487,21 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2413_device &ymsnd(YM2413(config, "ymsnd", 3.579545_MHz_XTAL)); // guessed chip type
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 21.477272_MHz_XTAL / 16)); // matches PCB recording
 	aysnd.port_a_read_callback().set(FUNC(bmcbowl_state::dips1_r));
 	aysnd.port_b_write_callback().set(FUNC(bmcbowl_state::input_mux_w));
-	aysnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	aysnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 21.477272_MHz_XTAL / 16, okim6295_device::PIN7_LOW)); // matches PCB recording
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	/* via */
 	via6522_device &via(MOS6522(config, "via6522", 13.3_MHz_XTAL / 16)); // clock not verified (controls music tempo)

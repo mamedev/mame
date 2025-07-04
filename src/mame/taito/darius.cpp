@@ -971,8 +971,7 @@ void darius_state::darius(machine_config &config)
 	m_pc080sn->set_dblwidth(1);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2203_device &ym1(YM2203(config, "ym1", XTAL(8'000'000)/2)); /* 4 MHz */
 	ym1.irq_handler().set_inputline(m_audiocpu, 0); /* assumes Z80 sandwiched between 68Ks */
@@ -1009,13 +1008,13 @@ void darius_state::darius(machine_config &config)
 	{
 		for (int out = 0; out < 4; out++)
 		{
-			FILTER_VOLUME(config, m_filter_l[chip][out]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-			FILTER_VOLUME(config, m_filter_r[chip][out]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+			FILTER_VOLUME(config, m_filter_l[chip][out]).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+			FILTER_VOLUME(config, m_filter_r[chip][out]).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 		}
 	}
 
-	FILTER_VOLUME(config, m_msm5205_l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, m_msm5205_r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_msm5205_l).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, m_msm5205_r).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);

@@ -47,11 +47,9 @@ alesis_dm3ag_device::alesis_dm3ag_device(const machine_config &mconfig, const ch
 
 void alesis_dm3ag_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker1").front_left();
-	SPEAKER(config, "rspeaker1").front_right();
-	SPEAKER(config, "lspeaker2").front_left();
-	SPEAKER(config, "rspeaker2").front_right();
-	PCM54HP(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker1", 1.0).add_route(ALL_OUTPUTS, "rspeaker1", 1.0); // PCM54HP DAC + R63/R73-75 + Sample and hold
+	SPEAKER(config, "speaker1", 2).front();
+	SPEAKER(config, "speaker2", 2).front();
+	PCM54HP(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker1", 1.0, 0).add_route(ALL_OUTPUTS, "speaker1", 1.0, 1); // PCM54HP DAC + R63/R73-75 + Sample and hold
 }
 
 //-------------------------------------------------

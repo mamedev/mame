@@ -1700,18 +1700,17 @@ void djmain_state::djmainj(machine_config &config)
 	K055555(config, m_k055555, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	k054539_device &k054539_1(K054539(config, "k054539_1", XTAL(18'432'000)));
 	k054539_1.set_addrmap(0, &djmain_state::k054539_map);
-	k054539_1.add_route(0, "lspeaker", 1.0);
-	k054539_1.add_route(1, "rspeaker", 1.0);
+	k054539_1.add_route(0, "speaker", 1.0, 0);
+	k054539_1.add_route(1, "speaker", 1.0, 1);
 
 	k054539_device &k054539_2(K054539(config, "k054539_2", XTAL(18'432'000)));
 	k054539_2.set_addrmap(0, &djmain_state::k054539_map);
-	k054539_2.add_route(0, "lspeaker", 1.0);
-	k054539_2.add_route(1, "rspeaker", 1.0);
+	k054539_2.add_route(0, "speaker", 1.0, 0);
+	k054539_2.add_route(1, "speaker", 1.0, 1);
 }
 
 void djmain_state::djmainu(machine_config &config)

@@ -21,7 +21,7 @@
 //  LOCALIZATION SUPPORT
 //**************************************************************************
 
-#define _(...) lang_translate(__VA_ARGS__)
+#define _(...) (::util::lang_translate(__VA_ARGS__))
 
 #define N_(msg) (msg)
 #define N_p(ctx, msg) (msg)
