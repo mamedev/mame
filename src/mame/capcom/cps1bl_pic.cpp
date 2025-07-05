@@ -843,7 +843,6 @@ void cps1bl_pic_state::init_dinopic()
 {
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
-	init_cps1();
 }
 
 void cps1bl_pic_state::init_punipic()
@@ -876,8 +875,6 @@ void slampic2_state::init_slampic2()
 
 	m_bootleg_work_ram = std::make_unique<uint16_t[]>(0x20000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0xf00000, 0xf3ffff, m_bootleg_work_ram.get());
-
-	init_cps1();
 }
 
 void wofpic_state::init_wofpic()
@@ -885,7 +882,6 @@ void wofpic_state::init_wofpic()
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x990000, 0x990001, write16smo_delegate(*this, FUNC(wofpic_state::wofpic_spr_base_w)));
-	init_cps1();
 }
 
 

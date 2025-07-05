@@ -545,12 +545,6 @@ Notes:
 
 Known problems with this driver.
 
-  - Rasters are not correctly emulated in places where more than one split happens
-    per frame. A known place where this problem happens is during Shuma-Gorath's
-    Chaos Dimension super move in both MSH and MSHVSF. The screen should split into
-    around 6 or more strips and then scroll the gfx inside those strips up and down
-    alternatly (as one stip moves gfx up the next strip moves the gfx down).
-
   - The network adapter used in Super Street Fighter II: The Tournament Battle is
     not currently emulated though the ports it uses are setup in the memory map.
 
@@ -562,10 +556,10 @@ Known problems with this driver.
     hardware when timing is not based on Vsync (ssf2 and ssf2t for example). It is
     possible that what is slowing the cpu is read/write wait states when accessing
     RAM areas. This would mean that in places where lots of opcodes are being used
-    in connetion with data registers only the code would end up running to slow.
+    in connection with data registers only the code would end up running to slow.
 
   - Giga Wing's sprites are 1 frame out when compared to background scrolling. See
-    the explanation above for the most likley cause of this problem.
+    the explanation above for the most likely cause of this problem.
 
   - Progear slows down more than it should when compared to real hardware. See
     the explanation above for the most likely cause of this problem.
@@ -924,7 +918,6 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 				SX,SY, screen.priority(),primasks[priority],15);                 \
 }
 
-	int i;
 	uint16_t *base = m_cps2_buffered_obj.get();
 	int xoffs = 64 - m_output[CPS2_OBJ_XOFFS /2];
 	int yoffs = 16 - m_output[CPS2_OBJ_YOFFS /2];
@@ -936,7 +929,7 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 	}
 #endif
 
-	for (i = m_cps2_last_sprite_offset; i >= 0; i -= 4)
+	for (int i = m_cps2_last_sprite_offset; i >= 0; i -= 4)
 	{
 		int x = base[i + 0];
 		int y = base[i + 1];
@@ -1139,46 +1132,32 @@ void cps2_state::cps2_objram_latch()
 
 TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
 {
-	// Direct irq line connection, IPL1 is vblank, IPL2 is some sort of scanline interrupt.
-	if (param == 0)
-		m_scancalls = 0;
+	int scanline = param;
 
-	if (m_cps_b_regs[0x10 / 2] & 0x8000)
-		m_cps_b_regs[0x10 / 2] &= 0x1ff;
-
-	if (m_cps_b_regs[0x12 / 2] & 0x8000)
-		m_cps_b_regs[0x12 / 2] &= 0x1ff;
-
-//  popmessage("%04x %04x - %04x %04x",m_scanline1,m_scanline2,m_cps_b_regs[0x10/2],m_cps_b_regs[0x12/2]);
-
-	// Raster effects
-	if (m_scanline1 == param || (m_scanline1 < param && !m_scancalls))
+	// scanline interrupt on IPL2
+	for (int i = 0; i < 2; i++)
 	{
-		m_cps_b_regs[0x10/2] = 0;
-		m_maincpu->set_input_line(2, HOLD_LINE);
-		m_screen->update_partial(param);
-		m_scancalls++;
-//      popmessage("IRQ4 scancounter = %04i", param);
+		if (scanline == 0)
+			m_raster_counter[i] = m_raster_reload[i];
+		else if (--m_raster_counter[i] == 0)
+		{
+			m_maincpu->set_input_line(2, HOLD_LINE);
+
+			// note: normally it's update_partial(scanline - 1),
+			// but let's give it some time before it actually writes to gfx registers
+			m_screen->update_partial(scanline);
+		}
 	}
 
-	// Raster effects
-	if(m_scanline2 == param || (m_scanline2 < param && !m_scancalls))
-	{
-		m_cps_b_regs[0x12 / 2] = 0;
-		m_maincpu->set_input_line(2, HOLD_LINE);
-		m_screen->update_partial(param);
-		m_scancalls++;
-//      popmessage("IRQ4 scancounter = %04i", param);
-	}
+	// TODO: mid-scanline interrupt?
+	m_raster_counter[2] = m_raster_reload[2];
 
-	if (param == 240)  // VBlank
+	// VBlank interrupt on IPL1
+	if (scanline == 240)
 	{
-		m_cps_b_regs[0x10 / 2] = m_scanline1;
-		m_cps_b_regs[0x12 / 2] = m_scanline2;
 		m_maincpu->set_input_line(1, HOLD_LINE);
 		cps2_objram_latch();
 	}
-//  popmessage("Raster calls = %i", m_scancalls);
 }
 
 
@@ -10957,9 +10936,6 @@ void cps2_state::init_cps2_video()
 {
 	cps2_gfx_decode();
 
-	m_scanline1 = 262;
-	m_scanline2 = 262;
-	m_scancalls = 0;
 	m_last_sprite_offset = 0;
 	m_cps2_last_sprite_offset = 0;
 	m_pri_ctrl = 0;

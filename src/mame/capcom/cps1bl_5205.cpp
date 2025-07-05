@@ -615,8 +615,6 @@ void cps1bl_5205_state::init_sf2b()
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x700000, 0x703fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram.get());
-
-	init_cps1();
 }
 
 void cps1bl_5205_state::init_sf2mdt()

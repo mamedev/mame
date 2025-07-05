@@ -147,7 +147,6 @@ public:
 	void varthb2(machine_config &config);
 	void varthb3(machine_config &config);
 
-	void init_cps1();
 	void init_cps1mult();
 	void init_sf2ee();
 	void init_wof();
@@ -246,9 +245,8 @@ protected:
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap[3]{};
-	int m_scanline1 = 0;
-	int m_scanline2 = 0;
-	int m_scancalls = 0;
+	uint16_t m_raster_counter[3]{};
+	uint16_t m_raster_reload[3]{};
 
 	int m_scroll1x = 0;
 	int m_scroll1y = 0;
