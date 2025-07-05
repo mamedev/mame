@@ -208,7 +208,7 @@ uint32_t sound_sdl::stream_sink_open(uint32_t node, std::string name, uint32_t r
 	dspec.callback = sink_callback;
 	dspec.userdata = stream.get();
 
-	stream->m_sdl_id = SDL_OpenAudioDevice(dev.m_def ? nullptr : dev.m_name.c_str(), 0, &dspec, &ospec, 0);
+	stream->m_sdl_id = SDL_OpenAudioDevice(dev.m_def ? dev.m_name.c_str() : nullptr, 0, &dspec, &ospec, 0);
 	if(!stream->m_sdl_id)
 		return 0;
 	SDL_PauseAudioDevice(stream->m_sdl_id, 0);
