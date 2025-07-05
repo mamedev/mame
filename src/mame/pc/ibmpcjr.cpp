@@ -696,6 +696,10 @@ void pcjr_state::ibmpcjx(machine_config &config)
 
 	/* internal ram */
 	m_ram->set_default_size("512K").set_extra_options(""); // only boots with 512k currently
+
+	/* Software lists */
+	SOFTWARE_LIST(config, "jx_list").set_original("ibmpcjx");
+
 }
 
 
