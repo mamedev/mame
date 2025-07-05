@@ -3837,7 +3837,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	SPEAKER(config, "ensoniq", 4).corners();
 	ES5503(config, m_doc, A2GS_7M);
-	m_doc->set_channels(4));
+	m_doc->set_channels(4);
 	m_doc->set_addrmap(0, &apple2gs_state::a2gs_es5503_map);
 	m_doc->irq_func().set(FUNC(apple2gs_state::doc_irq_w));
 	m_doc->adc_func().set(FUNC(apple2gs_state::doc_adc_read));
