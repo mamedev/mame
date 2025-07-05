@@ -1134,25 +1134,34 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
 {
 	int scanline = param;
 
-	// scanline interrupt on IPL2
+	// scanline interrupt on IPL2 (IRQ4)
 	for (int i = 0; i < 2; i++)
 	{
 		if (scanline == 0)
-			m_raster_counter[i] = m_raster_reload[i];
-		else if (--m_raster_counter[i] == 0)
 		{
-			m_maincpu->set_input_line(2, HOLD_LINE);
+			// reload counter each frame
+			m_raster_counter[i] = m_raster_reload[i];
+		}
+		else
+		{
+			// decrement counter each scanline
+			m_raster_counter[i] = (m_raster_counter[i] - 1) & 0x1ff;
 
-			// note: normally it's update_partial(scanline - 1),
-			// but let's give it some time before it actually writes to gfx registers
-			m_screen->update_partial(scanline);
+			if (m_raster_counter[i] == 0)
+			{
+				m_maincpu->set_input_line(2, HOLD_LINE);
+
+				// note: normally it's update_partial(scanline - 1),
+				// but let's give it some time before it actually writes to gfx registers
+				m_screen->update_partial(scanline);
+			}
 		}
 	}
 
 	// TODO: mid-scanline interrupt?
 	m_raster_counter[2] = m_raster_reload[2];
 
-	// VBlank interrupt on IPL1
+	// VBlank interrupt on IPL1 (IRQ2)
 	if (scanline == 240)
 	{
 		m_maincpu->set_input_line(1, HOLD_LINE);
@@ -1853,16 +1862,18 @@ MACHINE_START_MEMBER(cps2_state,cps2)
 void cps2_state::cps2(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, XTAL(16'000'000));
+	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::cps2_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cps2_state::decrypted_opcodes_map);
 	m_maincpu->set_interrupt_mixer(false);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::cps2_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, XTAL(8'000'000));
+	Z80(config, m_audiocpu, 8_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps2_state::qsound_sub_map);
-	m_audiocpu->set_periodic_int(FUNC(cps2_state::irq0_line_hold), attotime::from_hz(250)); // measured
+
+	const attotime audio_irq_period = attotime::from_hz(8_MHz_XTAL / 32000); // measured
+	m_audiocpu->set_periodic_int(FUNC(cps2_state::irq0_line_hold), audio_irq_period);
 
 	MCFG_MACHINE_START_OVERRIDE(cps2_state, cps2)
 
@@ -1920,7 +1931,7 @@ void cps2_state::gigaman2(machine_config &config)
 	// gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
 	config.device_remove("qsound");
 
-	OKIM6295(config, m_oki, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
 	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
 }
