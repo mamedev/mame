@@ -7796,6 +7796,11 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 
 	m68ki_write_8(ea, dst | 0x80);
 
+4ac8 ffff halt 	   . . 			c:0p
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	m_icount = 0;
+	m_stopped = STOP_LEVEL_HALT;
+
 
 4e40 fff0 trap     . .          071234fc:4
 	/* Trap#n stacks exception frame type 0 */
