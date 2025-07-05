@@ -694,7 +694,7 @@ ROM_START( crownpkr ) // PCB E56-00002. "1.20 1997/05/30 19:00 Programming by K&
 	// U34 not populated
 ROM_END
 
-ROM_START( premline ) // not an original Seta PCB
+ROM_START( premline ) // original Seta PCB with sanded logos. The spaces for the 2 banks of 8 switches aren't populated.
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "pl-0.u31", 0x000000, 0x080000, CRC(3679a297) SHA1(9f29cfecdb51babc0ad9e15b6d5000834af6f481) )
 	ROM_LOAD( "pl-1.u32", 0x080000, 0x080000, CRC(fd2b53ee) SHA1(784886f90a2b6b812a8c44de1e17a216518e1830) )
