@@ -150,6 +150,7 @@ public:
 	void init_wtrnymph() ATTR_COLD;
 	void init_mtrain() ATTR_COLD;
 	void init_tbonusal() ATTR_COLD;
+	void init_jgaoshou() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD { m_leds.resolve(); }
@@ -3526,6 +3527,31 @@ ROM_START( expcard )
 	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(622a8862) SHA1(fae60a326e6905aefc36275d505147e1860a71d0) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
+// 集邮高手 (Jíyóu Gāoshǒu)
+ROM_START( jgaoshou )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "topcard_u12.rom", 0x00000, 0x40000, CRC(70760300) SHA1(0ec9a02e434c1fa81e3e7f7c6bf9f06b5915d0f5) )
+
+	ROM_REGION( 0x200000, "tilemap", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "missing.rom",     0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD32_BYTE( "topcard_u16.rom", 0x00002, 0x80000, CRC(4e27673c) SHA1(17c116215b312afa736c964f74a3f584ac3cf99d) )
+	ROM_LOAD32_BYTE( "topcard_u17.rom", 0x00001, 0x80000, CRC(4eaf1dde) SHA1(29b17680b23ec250f079450177266f0c7b2441e1) )
+	ROM_LOAD32_BYTE( "topcard_u18.rom", 0x00003, 0x80000, CRC(7528c165) SHA1(4e95029524573eab3c439f12f324a6749970e87f) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "topcard_u15.rom", 0x00000, 0x80000, CRC(6451cd38) SHA1(75408df703f6ea780964cce6a686208032776f39) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, NO_DUMP )
+ROM_END
+
+void subsino2_state::init_jgaoshou()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	// patch protection test (it always enters test mode on boot otherwise)
+	rom[0xed72a-0xc0000] = 0xeb;
+}
 
 /***************************************************************************
 
@@ -4047,6 +4073,7 @@ GAME( 1995, tbonusal,    0,        tbonusal, tbonusal, subsino2_state, init_tbon
 GAME( 1996, wtrnymph,    0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
 
 GAME( 1998, expcard,     0,        expcard,  expcard,  subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Express Card / Top Card (Ver. 1.5)",    0 )
+GAME( 1999, jgaoshou,    expcard,  expcard,  expcard,  subsino2_state, init_jgaoshou, ROT0, "Subsino",                          "Jíyou Gaoshou (China, 1.2)",            MACHINE_NOT_WORKING ) // missing GFX ROM, inputs / outputs
 
 GAME( 1998, saklove,     0,        saklove,  saklove,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Ying Hua Lian 2.0 (China, Ver. 1.02)",  0 )
 
