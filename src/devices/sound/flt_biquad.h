@@ -82,6 +82,15 @@ public:
 	void opamp_diff_bandpass_modify(double r1, double r2, double c1, double c2);
 	biquad_params opamp_diff_bandpass_calc(double r1, double r2, double c1, double c2);
 
+	// RC-based band-pass, resistors connected to each other.
+	filter_biquad_device& rc_rr_bandpass_setup(double r1, double r2, double c1, double c2);
+	void rc_rr_bandpass_modify(double r1, double r2, double c1, double c2);
+	biquad_params rc_rr_bandpass_calc(double r1, double r2, double c1, double c2);
+
+	// RC-based band-pass, capacitors connected to each other.
+	filter_biquad_device& rc_cc_bandpass_setup(double r1, double r2, double c1, double c2);
+	void rc_cc_bandpass_modify(double r1, double r2, double c1, double c2);
+	biquad_params rc_cc_bandpass_calc(double r1, double r2, double c1, double c2);
 
 protected:
 	// device-level overrides
