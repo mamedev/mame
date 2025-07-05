@@ -2206,7 +2206,6 @@ void cps_state::cps1_cps_b_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		if (offset == 0x0e/2)
 		{
-			// TODO: mid-scanline interrupt?
 			m_raster_reload[2] = data >> 1 & 0xff;
 			return;
 		}

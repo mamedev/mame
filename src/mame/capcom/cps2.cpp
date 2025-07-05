@@ -691,6 +691,7 @@ private:
 	uint16_t joy_or_paddle_r();
 	uint16_t joy_or_paddle_ecofghtr_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
+	TIMER_CALLBACK_MEMBER(raster_irq);
 	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
 
 	void cps2_objram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -743,6 +744,7 @@ private:
 	int          m_pri_ctrl = 0;                /* Sprite layer priorities */
 	int          m_objram_bank = 0;
 	int          m_cps2_obj_size = 0;
+	emu_timer    *m_raster_irq = nullptr;
 
 	/* misc */
 	int          m_readpaddle = 0;  // pzloop2
@@ -809,6 +811,7 @@ void cps2_state::video_start()
 	m_cps2_obj_size = 0x2000;
 	m_cps2_buffered_obj = make_unique_clear<uint16_t[]>(m_cps2_obj_size / 2);
 
+	m_raster_counter[0] = m_raster_counter[1] = 0x1ff;
 	memset(m_objram1, 0, m_cps2_obj_size);
 	memset(m_objram2, 0, m_cps2_obj_size);
 
@@ -1133,33 +1136,24 @@ void cps2_state::cps2_objram_latch()
 TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
 {
 	int scanline = param;
+	int raster_irq_pending = 0;
 
-	// scanline interrupt on IPL2 (IRQ4)
+	// clock raster counters on each scanline increment
 	for (int i = 0; i < 2; i++)
 	{
 		if (scanline == 0)
-		{
-			// reload counter each frame
 			m_raster_counter[i] = m_raster_reload[i];
-		}
 		else
-		{
-			// decrement counter each scanline
 			m_raster_counter[i] = (m_raster_counter[i] - 1) & 0x1ff;
 
-			if (m_raster_counter[i] == 0)
-			{
-				m_maincpu->set_input_line(2, HOLD_LINE);
-
-				// note: normally it's update_partial(scanline - 1),
-				// but let's give it some time before it actually writes to gfx registers
-				m_screen->update_partial(scanline);
-			}
-		}
+		if (m_raster_counter[i] == 0)
+			raster_irq_pending |= 1 << i;
 	}
 
-	// TODO: mid-scanline interrupt?
+	// schedule raster interrupt on IPL2 (IRQ4)
 	m_raster_counter[2] = m_raster_reload[2];
+	if (raster_irq_pending)
+		m_raster_irq->adjust(m_raster_counter[2] * 2 * m_screen->pixel_period());
 
 	// VBlank interrupt on IPL1 (IRQ2)
 	if (scanline == 240)
@@ -1167,6 +1161,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 		cps2_objram_latch();
 	}
+}
+
+TIMER_CALLBACK_MEMBER(cps2_state::raster_irq)
+{
+	m_maincpu->set_input_line(2, HOLD_LINE);
+
+	// note: normally it's vpos - 1, but let's give it some time before it actually writes to gfx registers
+	m_screen->update_partial(m_screen->vpos());
 }
 
 
@@ -1287,11 +1289,10 @@ uint16_t cps2_state::cps2_qsound_volume_r()
 
 	if (m_comm && m_comm->comm_enabled())
 		return 0x2021; // SSF2TB doesn't have a digital slider in the test screen
+	else if (m_cps2disabledigitalvolume)
+		return 0xd000; // Digital display isn't shown in test mode
 	else
-		if (m_cps2disabledigitalvolume)
-			return 0xd000; // Digital display isn't shown in test mode
-		else
-			return result;
+		return result;
 }
 
 
@@ -1856,6 +1857,8 @@ MACHINE_START_MEMBER(cps2_state,cps2)
 {
 	if (m_audiocpu != nullptr) // gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
 		membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, memregion("audiocpu")->base() + 0x10000, 0x4000);
+
+	m_raster_irq = timer_alloc(FUNC(cps2_state::raster_irq), this);
 }
 
 
