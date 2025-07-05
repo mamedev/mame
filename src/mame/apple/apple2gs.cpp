@@ -1057,7 +1057,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 			raise_irq(IRQS_VBL);
 		}
 
-		m_adbmicro->set_input_line(0, ASSERT_LINE);
+		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, ASSERT_LINE);
 
 		m_clock_frame++;
 
@@ -1097,7 +1097,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	}
 	else if (scanline == (192+BORDER_TOP+1))
 	{
-		m_adbmicro->set_input_line(1, ASSERT_LINE);
+		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, CLEAR_LINE);
 	}
 }
 
@@ -3668,6 +3668,12 @@ void apple2gs_state::keyglu_regen_irqs()
 	{
 		bIRQ = true;
 	}
+
+	if ((m_glu_regs[GLU_KG_STATUS] & KGS_MOUSEX_FULL) && (m_glu_regs[GLU_SYSSTAT] & GLU_STATUS_MOUSEIRQEN))
+	{
+		bIRQ = true;
+	}
+
 	if (bIRQ)
 	{
 		raise_irq(IRQS_ADB);
