@@ -10,7 +10,7 @@ DMA Controller mod is available in two variants:
 The most commonly used implementation was based on the UA858D chip, which differs in behavior from
 the original Zilog DMA controller.
 For example, several source code examples published in Czech magazines were written for the UA858D
-and did not account for differences in control logic?such as the lack of automatic transfer enable
+and did not account for differences in control logic - such as the lack of automatic transfer enable
 via WR3, a feature that is present in the Zilog chip.
 As a result, there are two versions of the "DMA DEMO LEVEL 3" by Busysoft:
 - The original, compatible with the UA858D
