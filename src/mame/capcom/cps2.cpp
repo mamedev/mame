@@ -811,7 +811,7 @@ void cps2_state::video_start()
 	m_cps2_obj_size = 0x2000;
 	m_cps2_buffered_obj = make_unique_clear<uint16_t[]>(m_cps2_obj_size / 2);
 
-	m_raster_counter[0] = m_raster_counter[1] = 0x1ff;
+	m_raster_reload[0] = m_raster_reload[1] = 0x1ff;
 	memset(m_objram1, 0, m_cps2_obj_size);
 	memset(m_objram2, 0, m_cps2_obj_size);
 
