@@ -1152,9 +1152,9 @@ void segas32_state::system32_map(address_map &map)
 	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>));
 	map(0x610000, 0x61007f).mirror(0x0eff80).rw(FUNC(segas32_state::mixer_r<0>), FUNC(segas32_state::mixer_w<0>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
-	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask16(0x00ff);
-	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
-	map(0x801002, 0x801002).rw("s32comm", FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
+	map(0x800000, 0x800fff).rw(m_s32comm, FUNC(sega_s32comm_device::share_r), FUNC(sega_s32comm_device::share_w)).umask16(0x00ff);
+	map(0x801000, 0x801000).rw(m_s32comm, FUNC(sega_s32comm_device::cn_r), FUNC(sega_s32comm_device::cn_w));
+	map(0x801002, 0x801002).rw(m_s32comm, FUNC(sega_s32comm_device::fg_r), FUNC(sega_s32comm_device::fg_w));
 	map(0xc00000, 0xc0001f).mirror(0x0fff80).rw("io_chip", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	// 0xc00040-0xc0007f - I/O expansion area
 	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
@@ -1177,9 +1177,9 @@ void segas32_state::multi32_map(address_map &map)
 	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<1>), FUNC(segas32_state::paletteram_w<1>));
 	map(0x690000, 0x69007f).mirror(0x06ff80).rw(FUNC(segas32_state::mixer_r<1>), FUNC(segas32_state::mixer_w<1>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
-	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
-	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
-	map(0x801002, 0x801002).rw("s32comm", FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
+	map(0x800000, 0x800fff).rw(m_s32comm, FUNC(sega_s32comm_device::share_r), FUNC(sega_s32comm_device::share_w)).umask32(0x00ff00ff);
+	map(0x801000, 0x801000).rw(m_s32comm, FUNC(sega_s32comm_device::cn_r), FUNC(sega_s32comm_device::cn_w));
+	map(0x801002, 0x801002).rw(m_s32comm, FUNC(sega_s32comm_device::fg_r), FUNC(sega_s32comm_device::fg_w));
 	map(0xc00000, 0xc0001f).mirror(0x07ff80).rw("io_chip_0", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask32(0x00ff00ff);
 	// 0xc00040-0xc0007f - I/O expansion area 0
 	map(0xc80000, 0xc8001f).mirror(0x07ff80).rw("io_chip_1", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask32(0x00ff00ff);
@@ -2290,7 +2290,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 	rfsnd.add_route(1, "speaker", 0.40, 1);
 	rfsnd.set_addrmap(0, &segas32_state::rf5c68_map);
 
-	S32COMM(config, m_s32comm, 0);
+	SEGA_SYSTEM32_COMM(config, m_s32comm, 0U);
 }
 
 DEFINE_DEVICE_TYPE(SEGA_S32_REGULAR_DEVICE, segas32_regular_state, "segas32_pcb_regular", "Sega System 32 regular PCB")
@@ -2620,7 +2620,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	m_multipcm->add_route(1, "sleft", 0.35);
 	m_multipcm->add_route(0, "sright", 0.35);
 
-	S32COMM(config, m_s32comm, 0);
+	SEGA_SYSTEM32_COMM(config, m_s32comm, 0U);
 }
 
 
