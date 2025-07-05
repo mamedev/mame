@@ -43,6 +43,7 @@ public:
 	void set_foreground() const { SetForegroundWindow(m_wnd); }
 	void redraw();
 	void destroy();
+	bool has_focus() const;
 
 	virtual bool set_default_focus();
 	void prev_view(debugview_info *curview);

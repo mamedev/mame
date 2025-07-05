@@ -81,6 +81,14 @@ void debugwin_info::destroy()
 	DestroyWindow(m_wnd);
 }
 
+
+bool debugwin_info::has_focus() const
+{
+	HWND focus_hwnd = GetFocus();
+	return m_wnd == focus_hwnd || IsChild(m_wnd, focus_hwnd);
+}
+
+
 bool debugwin_info::set_default_focus()
 {
 	return false;
