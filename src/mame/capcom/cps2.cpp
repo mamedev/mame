@@ -690,8 +690,6 @@ private:
 	uint16_t cps2_qsound_volume_r();
 	uint16_t joy_or_paddle_r();
 	uint16_t joy_or_paddle_ecofghtr_r();
-	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
-	TIMER_CALLBACK_MEMBER(raster_irq);
 	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
 
 	void cps2_objram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -705,7 +703,7 @@ private:
 	virtual void find_last_sprite() override;
 	void cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks);
 	void cps2_set_sprite_priorities();
-	void cps2_objram_latch();
+	void cps2_objram_latch(int state);
 	uint16_t *cps2_objbase();
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	uint32_t screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -744,7 +742,6 @@ private:
 	int          m_pri_ctrl = 0;                /* Sprite layer priorities */
 	int          m_objram_bank = 0;
 	int          m_cps2_obj_size = 0;
-	emu_timer    *m_raster_irq = nullptr;
 
 	/* misc */
 	int          m_readpaddle = 0;  // pzloop2
@@ -811,7 +808,6 @@ void cps2_state::video_start()
 	m_cps2_obj_size = 0x2000;
 	m_cps2_buffered_obj = make_unique_clear<uint16_t[]>(m_cps2_obj_size / 2);
 
-	m_raster_reload[0] = m_raster_reload[1] = 0x1ff;
 	memset(m_objram1, 0, m_cps2_obj_size);
 	memset(m_objram2, 0, m_cps2_obj_size);
 
@@ -1119,56 +1115,13 @@ void cps2_state::cps2_set_sprite_priorities()
 	m_pri_ctrl = m_output[CPS2_OBJ_PRI /2];
 }
 
-void cps2_state::cps2_objram_latch()
+void cps2_state::cps2_objram_latch(int state)
 {
-	cps2_set_sprite_priorities();
-	memcpy(m_cps2_buffered_obj.get(), cps2_objbase(), m_cps2_obj_size);
-}
-
-
-
-/*************************************
- *
- *  Interrupt generation
- *
- *************************************/
-
-TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
-{
-	int scanline = param;
-	int raster_irq_pending = 0;
-
-	// clock raster counters on each scanline increment
-	for (int i = 0; i < 2; i++)
+	if (state)
 	{
-		if (scanline == 0)
-			m_raster_counter[i] = m_raster_reload[i];
-		else
-			m_raster_counter[i] = (m_raster_counter[i] - 1) & 0x1ff;
-
-		if (m_raster_counter[i] == 0)
-			raster_irq_pending |= 1 << i;
+		cps2_set_sprite_priorities();
+		memcpy(m_cps2_buffered_obj.get(), cps2_objbase(), m_cps2_obj_size);
 	}
-
-	// schedule raster interrupt on IPL2 (IRQ4)
-	m_raster_counter[2] = m_raster_reload[2];
-	if (raster_irq_pending)
-		m_raster_irq->adjust(m_raster_counter[2] * 2 * m_screen->pixel_period());
-
-	// VBlank interrupt on IPL1 (IRQ2)
-	if (scanline == 240)
-	{
-		m_maincpu->set_input_line(1, HOLD_LINE);
-		cps2_objram_latch();
-	}
-}
-
-TIMER_CALLBACK_MEMBER(cps2_state::raster_irq)
-{
-	m_maincpu->set_input_line(2, HOLD_LINE);
-
-	// note: normally it's vpos - 1, but let's give it some time before it actually writes to gfx registers
-	m_screen->update_partial(m_screen->vpos());
 }
 
 
@@ -1857,8 +1810,6 @@ MACHINE_START_MEMBER(cps2_state,cps2)
 {
 	if (m_audiocpu != nullptr) // gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
 		membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, memregion("audiocpu")->base() + 0x10000, 0x4000);
-
-	m_raster_irq = timer_alloc(FUNC(cps2_state::raster_irq), this);
 }
 
 
@@ -1866,11 +1817,11 @@ void cps2_state::cps2(machine_config &config)
 {
 	// Basic machine hardware
 	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::cps2_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cps2_state::decrypted_opcodes_map);
-	m_maincpu->set_interrupt_mixer(false);
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::cps2_interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::raster_scanline), "screen", 0, 1);
 
 	Z80(config, m_audiocpu, 8_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps2_state::qsound_sub_map);
@@ -1888,6 +1839,7 @@ void cps2_state::cps2(machine_config &config)
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
 	m_screen->set_screen_update(FUNC(cps2_state::screen_update_cps2));
 	m_screen->screen_vblank().set(FUNC(cps2_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(cps2_state::cps2_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -10949,11 +10901,7 @@ void cps2_state::init_digital_volume()
 void cps2_state::init_cps2_video()
 {
 	cps2_gfx_decode();
-
-	m_last_sprite_offset = 0;
-	m_cps2_last_sprite_offset = 0;
-	m_pri_ctrl = 0;
-	m_objram_bank = 0;
+	init_rasters(); // cps1.cpp
 }
 
 

@@ -432,8 +432,7 @@ void fcrash_state::fcrash(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::fcrash_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 24000000/6); /* ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::fcrash_sound_map);
@@ -449,6 +448,7 @@ void fcrash_state::fcrash(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -484,11 +484,10 @@ void fcrash_state::fcrash(machine_config &config)
 
 void fcrash_state::ffightblb(machine_config &config)
 {
-		/* basic machine hardware */
+	/* basic machine hardware */
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::fcrash_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 24000000/6); /* ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::ffightblb_sound_map);
@@ -504,6 +503,7 @@ void fcrash_state::ffightblb(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -522,9 +522,9 @@ void fcrash_state::ffightblb(machine_config &config)
 void fcrash_state::cawingbl(machine_config &config)
 {
 	fcrash(config);
+
 	/* basic machine hardware */
 	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq6_line_hold)); /* needed to write to scroll values */
-
 	MCFG_MACHINE_START_OVERRIDE(fcrash_state, cawingbl)
 }
 
@@ -533,8 +533,7 @@ void fcrash_state::kodb(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::fcrash_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::kodb_sound_map);
@@ -549,6 +548,7 @@ void fcrash_state::kodb(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -574,8 +574,7 @@ void fcrash_state::mtwinsb(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::mtwinsb_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_sound_map);
@@ -590,6 +589,7 @@ void fcrash_state::mtwinsb(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -615,8 +615,7 @@ void fcrash_state::sf2m1(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::sf2m1_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, XTAL(3'579'545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_sound_map);
@@ -628,6 +627,7 @@ void fcrash_state::sf2m1(machine_config &config)
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -649,8 +649,7 @@ void fcrash_state::sgyxz(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_sound_map);
@@ -666,6 +665,7 @@ void fcrash_state::sgyxz(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
@@ -705,8 +705,7 @@ void fcrash_state::varthb(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::varthb_map);
-	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_sound_map);
@@ -721,6 +720,7 @@ void fcrash_state::varthb(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
 	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_cps1));
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);

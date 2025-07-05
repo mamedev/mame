@@ -2107,7 +2107,7 @@ MACHINE_RESET_MEMBER(cps_state,cps)
 }
 
 
-inline uint16_t *cps_state::cps1_base( int offset, int boundary )
+inline uint16_t *cps_state::cps1_base(int offset, int boundary)
 {
 	int base = m_cps_a_regs[offset] * 256;
 
@@ -2140,11 +2140,8 @@ void cps_state::cps1_cps_a_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (offset == CPS1_PALETTE_BASE)
 		cps1_build_palette(cps1_base(CPS1_PALETTE_BASE, m_palette_align));
 
-	// pzloop2 write to register 24 on startup. This is probably just a bug.
-	if (offset == 0x24 / 2 && m_cps_version == 2)
-		return;
-
 #ifdef MAME_DEBUG
+	// pzloop2 write to register 24 on startup. This is probably just a bug.
 	if (offset > CPS1_VIDEOCONTROL)
 		popmessage("write to CPS-A register %02x contact MAMEDEV", offset * 2);
 #endif
@@ -2178,7 +2175,8 @@ uint16_t cps_state::cps1_cps_b_r(offs_t offset)
 	if (m_game_config->in3_addr != 0 && offset == m_game_config->in3_addr / 2)
 		return ioport("IN3")->read();
 
-	if (m_cps_version == 2)
+	// raster counters for cps2 & ganbare
+	if (m_raster_irq != nullptr)
 	{
 		if (offset == 0x0e/2)
 		{
@@ -2202,7 +2200,8 @@ void cps_state::cps1_cps_b_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_cps_b_regs[offset]);
 
-	if (m_cps_version == 2)
+	// raster counters for cps2 & ganbare
+	if (m_raster_irq != nullptr)
 	{
 		if (offset == 0x0e/2)
 		{
@@ -2602,8 +2601,8 @@ void cps_state::video_start()
 	m_screen->register_screen_bitmap(m_dummy_bitmap);
 
 	/* state save register */
-	save_item(NAME(m_raster_counter));
-	save_item(NAME(m_raster_reload));
+	save_item(NAME(m_last_sprite_offset));
+	save_pointer(NAME(m_buffered_obj), m_obj_size / 2);
 #if 0
 	/* these do not need to be saved, because they are recovered from cps_a_regs in cps1_postload */
 	save_item(NAME(m_scroll1x));
@@ -2618,9 +2617,6 @@ void cps_state::video_start()
 	save_item(NAME(m_stars2y));
 	save_item(NAME(m_stars_enabled));
 #endif
-	save_item(NAME(m_last_sprite_offset));
-
-	save_pointer(NAME(m_buffered_obj), m_obj_size / 2);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(cps_state::cps1_get_video_base), this));
 }
@@ -2887,7 +2883,7 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 			else
 			{
 				/* Simple case... 1 sprite */
-						DRAWSPRITE(
+				DRAWSPRITE(
 						code,
 						(col & 0x1f),
 						colour&0x20,colour&0x40,
@@ -3073,7 +3069,6 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 	m_bg_tilemap[2]->set_scrollx(0, m_scroll3x);
 	m_bg_tilemap[2]->set_scrolly(0, m_scroll3y);
 
-
 	/* Blank screen */
 	if (m_cps_version == 1)
 	{
@@ -3103,16 +3098,18 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 
 void cps_state::screen_vblank_cps1(int state)
 {
-	// rising edge
 	if (state)
 	{
 		/* Get video memory base registers */
 		cps1_get_video_base();
+	}
+}
 
-		if (m_cps_version == 1)
-		{
-			/* CPS1 sprites have to be delayed one frame */
-			memcpy(m_buffered_obj.get(), m_obj, m_obj_size);
-		}
+void cps_state::cps1_objram_latch(int state)
+{
+	if (state)
+	{
+		/* CPS1 sprites have to be delayed one frame */
+		memcpy(m_buffered_obj.get(), m_obj, m_obj_size);
 	}
 }
