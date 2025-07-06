@@ -32465,6 +32465,9 @@ pr_whlft
 pr_wldkn
 pr_wnstk
 
+@source:misc/ps_m3.cpp
+unkpara
+
 @source:misc/psattack.cpp
 psattack
 
