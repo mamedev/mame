@@ -146,11 +146,11 @@ public:
 	void xplan(machine_config &config) ATTR_COLD;
 	void xtrain(machine_config &config) ATTR_COLD;
 	void ptrain(machine_config &config) ATTR_COLD;
+	void jgaoshou(machine_config &config) ATTR_COLD;
 
 	void init_wtrnymph() ATTR_COLD;
 	void init_mtrain() ATTR_COLD;
 	void init_tbonusal() ATTR_COLD;
-	void init_jgaoshou() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD { m_leds.resolve(); }
@@ -207,6 +207,7 @@ private:
 	void humlan_output1_w(uint8_t data);
 	void expcard_out_b_w(uint8_t data);
 	void expcard_out_a_w(uint8_t data);
+	void jgaoshou_out_a_w(uint8_t data);
 	void mtrain_output0_w(uint8_t data);
 	void mtrain_output1_w(uint8_t data);
 	void mtrain_output2_w(uint8_t data);
@@ -1130,6 +1131,19 @@ void subsino2_state::expcard_out_a_w(uint8_t data)
 	m_leds[5] = BIT(data, 4);   // start
 }
 
+// OUT B, C, D are also shown in service mode, but ports are not enabled for output
+void subsino2_state::jgaoshou_out_a_w(uint8_t data)
+{
+	m_leds[0] = BIT(data, 3);
+	m_leds[1] = BIT(data, 1);
+	m_leds[2] = BIT(data, 2);
+	m_leds[3] = BIT(data, 0);
+
+	m_ticket->motor_w(BIT(data, 4));
+
+	m_eeprom->data_w(!BIT(data, 6));
+}
+
 /***************************************************************************
                                 Magic Train
 ***************************************************************************/
@@ -1767,6 +1781,78 @@ static INPUT_PORTS_START( expcard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN      )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER       ) // serial out
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM      ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jgaoshou )
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+
+	PORT_START("DSW4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW4:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW4:8" )
+
+	PORT_START("IN-A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown IN-A1") PORT_CODE(KEYCODE_W) // used
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown IN-A4") PORT_CODE(KEYCODE_E) // used
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("IN-B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )
+
+	PORT_START("IN-C")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN-D")
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED ) // outputs
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r))
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -3068,6 +3154,25 @@ void subsino2_state::expcard(machine_config &config)
 	io.out_port_callback<9>().set(FUNC(subsino2_state::expcard_out_a_w)); // A
 }
 
+void subsino2_state::jgaoshou(machine_config &config)
+{
+	xplan(config);
+
+	ss9802_device &io(SS9802(config.replace(), "io"));
+	io.in_port_callback<0>().set(FUNC(subsino2_state::vblank_bit6_r));
+	io.in_port_callback<1>().set_ioport("DSW4");
+	io.in_port_callback<3>().set_ioport("IN-C");
+	io.in_port_callback<4>().set_ioport("IN-B");
+	io.in_port_callback<5>().set_ioport("IN-A");
+	io.in_port_callback<6>().set_ioport("DSW3");
+	io.in_port_callback<7>().set_ioport("DSW2");
+	io.in_port_callback<8>().set_ioport("DSW1");
+	io.in_port_callback<9>().set_ioport("IN-D");
+	io.out_port_callback<9>().set(FUNC(subsino2_state::jgaoshou_out_a_w));
+
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
+}
+
 
 /***************************************************************************
                                 ROMs Loading
@@ -3542,16 +3647,8 @@ ROM_START( jgaoshou )
 	ROM_LOAD( "topcard_u15.rom", 0x00000, 0x80000, CRC(6451cd38) SHA1(75408df703f6ea780964cce6a686208032776f39) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
-	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, NO_DUMP )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(44454960) SHA1(ab6fee5ab8cb4b80f7e007bbfe05c7e3858a1504) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
-
-void subsino2_state::init_jgaoshou()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	// patch protection test (it always enters test mode on boot otherwise)
-	rom[0xed72a-0xc0000] = 0xeb;
-}
 
 /***************************************************************************
 
@@ -4073,7 +4170,7 @@ GAME( 1995, tbonusal,    0,        tbonusal, tbonusal, subsino2_state, init_tbon
 GAME( 1996, wtrnymph,    0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
 
 GAME( 1998, expcard,     0,        expcard,  expcard,  subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Express Card / Top Card (Ver. 1.5)",    0 )
-GAME( 1999, jgaoshou,    expcard,  expcard,  expcard,  subsino2_state, init_jgaoshou, ROT0, "Subsino",                          "Jíyou Gaoshou (China, 1.2)",            MACHINE_NOT_WORKING ) // missing GFX ROM, inputs / outputs
+GAME( 1999, jgaoshou,    expcard,  jgaoshou, jgaoshou, subsino2_state, empty_init,    ROT0, "Subsino",                          "Jiyou Gaoshou (China, 1.2)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // missing GFX ROM, inputs / outputs
 
 GAME( 1998, saklove,     0,        saklove,  saklove,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Ying Hua Lian 2.0 (China, Ver. 1.02)",  0 )
 
