@@ -1829,7 +1829,7 @@ static INPUT_PORTS_START( jgaoshou )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown IN-A4") PORT_CODE(KEYCODE_E) // used
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Raise") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1847,7 +1847,7 @@ static INPUT_PORTS_START( jgaoshou )
 	PORT_START("IN-C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN-D")
@@ -4171,7 +4171,7 @@ GAME( 1995, tbonusal,    0,        tbonusal, tbonusal, subsino2_state, init_tbon
 GAME( 1996, wtrnymph,    0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
 
 GAME( 1998, expcard,     0,        expcard,  expcard,  subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Express Card / Top Card (Ver. 1.5)",    0 )
-GAME( 1999, jgaoshou,    expcard,  jgaoshou, jgaoshou, subsino2_state, empty_init,    ROT0, "Subsino",                          "Jiyou Gaoshou (China, 1.2)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // missing GFX ROM, inputs / outputs
+GAME( 1999, jgaoshou,    expcard,  jgaoshou, jgaoshou, subsino2_state, empty_init,    ROT0, "Subsino",                          "Jiyou Gaoshou (China, Ver 1.2)",        MACHINE_IMPERFECT_GRAPHICS ) // missing GFX ROM
 
 GAME( 1998, saklove,     0,        saklove,  saklove,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Ying Hua Lian 2.0 (China, Ver. 1.02)",  0 )
 
