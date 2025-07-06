@@ -1182,10 +1182,6 @@ void mcd212_device::device_start()
 		m_dyuv_v_to_r[sw] = (351 * (sw - 128)) / 256;
 	}
 
-	save_item(NAME(m_matte_flag[0]));
-	save_item(NAME(m_matte_flag[1]));
-	save_item(NAME(m_ica_height));
-	save_item(NAME(m_total_height));
 	save_item(NAME(m_csrr));
 	save_item(NAME(m_csrw));
 	save_item(NAME(m_dcr));
@@ -1209,6 +1205,11 @@ void mcd212_device::device_start()
 	save_item(NAME(m_mosaic_hold));
 	save_item(NAME(m_weight_factor[0]));
 	save_item(NAME(m_weight_factor[1]));
+
+	save_item(NAME(m_matte_flag));
+	save_item(NAME(m_ica_height));
+	save_item(NAME(m_total_height));
+
 	save_item(NAME(m_blink_time));
 	save_item(NAME(m_blink_active));
 
