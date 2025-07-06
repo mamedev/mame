@@ -31,6 +31,7 @@ Both games run on Konami's PWB351024A PCB
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "machine/watchdog.h"
 #include "sound/k007232.h"
 #include "sound/upd7759.h"
 #include "sound/ymopm.h"
@@ -335,7 +336,7 @@ void mainevt_state::main_map(address_map &map)
 	map(0x1f80, 0x1f80).w(FUNC(mainevt_state::bankswitch_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write)); // probably
 	map(0x1f88, 0x1f88).w(FUNC(mainevt_state::sh_irqtrigger_w)); // probably
-	map(0x1f8c, 0x1f8d).nopw(); // ???
+	map(0x1f8c, 0x1f8c).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
 	map(0x1f90, 0x1f90).w(FUNC(mainevt_state::coin_w)); // coin counters + lamps
 
 	map(0x1f94, 0x1f94).portr("SYSTEM");
@@ -361,6 +362,7 @@ void devstors_state::main_map(address_map &map)
 	map(0x1f80, 0x1f80).w(FUNC(devstors_state::bankswitch_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write)); // probably
 	map(0x1f88, 0x1f88).w(FUNC(devstors_state::sh_irqtrigger_w)); // probably
+	map(0x1f8c, 0x1f8c).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
 	map(0x1f90, 0x1f90).w(FUNC(devstors_state::coin_w)); // coin counters + lamps
 
 	map(0x1f94, 0x1f94).portr("SYSTEM");
@@ -600,6 +602,8 @@ void mainevt_state::mainevt(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mainevt_state::sound_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(mainevt_state::sound_timer_irq), "screen", 0, 1);
 
+	WATCHDOG_TIMER(config, "watchdog");
+
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240); // same hardware as Devastators so assume 59.17
@@ -643,6 +647,8 @@ void devstors_state::devstors(machine_config &config)
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &devstors_state::sound_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(devstors_state::sound_timer_irq), "screen", 0, 1);
+
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
