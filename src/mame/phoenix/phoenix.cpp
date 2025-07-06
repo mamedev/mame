@@ -1487,6 +1487,55 @@ ROM_START( pleiadce )
 	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette high bits
 ROM_END
 
+ROM_START( pleiadsi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1 2716.bin",    0x0000, 0x0800, CRC(9bbef607) SHA1(e563b72294fdbf4ff5bf748d0765af9e86e119bd) ) // unique to the Irecsa sets
+	ROM_LOAD( "2 2716.bin",    0x0800, 0x0800, CRC(e2b5b8cd) SHA1(514ab2b24fc1d6d1fd64e74470b601ba9a11f36f) )
+	ROM_LOAD( "3 2716.bin",    0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) )
+	ROM_LOAD( "4 2716.bin",    0x1800, 0x0800, CRC(ca14fe4a) SHA1(fbd60b8f98275193df6633b3589106c4e392fb62) ) // unique to this set
+	ROM_LOAD( "5 2716.bin",    0x2000, 0x0800, CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) )
+	ROM_LOAD( "6 2716.bin",    0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
+	ROM_LOAD( "7 2716.bin",    0x3000, 0x0800, CRC(6f56f317) SHA1(d7e6b0b1c58b741de3504640bcc23e86d1a134a0) )
+	ROM_LOAD( "8 2716.bin",    0x3800, 0x0800, CRC(ca264c7c) SHA1(3a6adfaa935a1a11cb62e73b9f43b228b711c2da) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "11 2716.bin",   0x0000, 0x0800, CRC(8dbd3785) SHA1(700cb9eb8ea64be99d843910cebcd29d601ab2e9) )
+	ROM_LOAD( "12 2716.bin",   0x0800, 0x0800, CRC(0db3e436) SHA1(cd1825775b0a10df66d2ccc01cb4b6a9a3d2141a) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "9 2716.bin",    0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
+	ROM_LOAD( "10 2716.bin",   0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // not present in dump, assuming to be the same, matches screenshots, note reverse order to most sets, same as pleiadsb2.
+	ROM_LOAD( "7611-5.26",     0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
+	ROM_LOAD( "7611-5.33",     0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette high bits
+ROM_END
+
+// This set shows an Irecsa patent number on the title screen.
+ROM_START( pleiadsia )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.ic47",        0x0000, 0x0800, CRC(9bbef607) SHA1(e563b72294fdbf4ff5bf748d0765af9e86e119bd) )
+	ROM_LOAD( "2.ic46",        0x0800, 0x0800, CRC(e2b5b8cd) SHA1(514ab2b24fc1d6d1fd64e74470b601ba9a11f36f) )
+	ROM_LOAD( "3.ic49",        0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) )
+	ROM_LOAD( "4.ic50",        0x1800, 0x0800, CRC(3e0d3a6e) SHA1(dba3432b8060fed967bcc64025a5fa5a78f2edf3) )
+	ROM_LOAD( "5.ic51",        0x2000, 0x0800, CRC(65a58c6d) SHA1(b8c2724099928c96674068a52ef26530f391ded5) )
+	ROM_LOAD( "6.ic52",        0x2800, 0x0800, CRC(44ab59c1) SHA1(518a296558998729e44602267e525da2e1c84e39) )
+	ROM_LOAD( "7.ic53",        0x3000, 0x0800, CRC(6f56f317) SHA1(d7e6b0b1c58b741de3504640bcc23e86d1a134a0) )
+	ROM_LOAD( "8.ic54",        0x3800, 0x0800, CRC(ca264c7c) SHA1(3a6adfaa935a1a11cb62e73b9f43b228b711c2da) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "10.ic45",       0x0000, 0x0800, CRC(8dbd3785) SHA1(700cb9eb8ea64be99d843910cebcd29d601ab2e9) )
+	ROM_LOAD( "9.ic44",        0x0800, 0x0800, CRC(0db3e436) SHA1(cd1825775b0a10df66d2ccc01cb4b6a9a3d2141a) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "r10.c26",       0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
+	ROM_LOAD( "r9.ic27",       0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "a_hm7611.ic26", 0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
+	ROM_LOAD( "b_hm7611.ic33", 0x0100, 0x0100, CRC(304cf3f1) SHA1(2821577b792a9a9b0ddded4ba8046a2cef1e7d1f) ) // palette high bits
+ROM_END
+
 ROM_START( pleiadbl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic45.bin",     0x0000, 0x0800, CRC(93fc2958) SHA1(d8723c4f4376e035e655f69352c1765fdbf4a602) )
@@ -1558,55 +1607,6 @@ ROM_START( pleiadsgmp )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "cpu41.bin", 0x0000, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )
 	ROM_LOAD( "cpu40.bin", 0x0100, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )
-ROM_END
-
-ROM_START( pleiadsi )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1 2716.bin",    0x0000, 0x0800, CRC(9bbef607) SHA1(e563b72294fdbf4ff5bf748d0765af9e86e119bd) ) // unique to the Irecsa sets
-	ROM_LOAD( "2 2716.bin",    0x0800, 0x0800, CRC(e2b5b8cd) SHA1(514ab2b24fc1d6d1fd64e74470b601ba9a11f36f) )
-	ROM_LOAD( "3 2716.bin",    0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) )
-	ROM_LOAD( "4 2716.bin",    0x1800, 0x0800, CRC(ca14fe4a) SHA1(fbd60b8f98275193df6633b3589106c4e392fb62) ) // unique to this set
-	ROM_LOAD( "5 2716.bin",    0x2000, 0x0800, CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) )
-	ROM_LOAD( "6 2716.bin",    0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
-	ROM_LOAD( "7 2716.bin",    0x3000, 0x0800, CRC(6f56f317) SHA1(d7e6b0b1c58b741de3504640bcc23e86d1a134a0) )
-	ROM_LOAD( "8 2716.bin",    0x3800, 0x0800, CRC(ca264c7c) SHA1(3a6adfaa935a1a11cb62e73b9f43b228b711c2da) )
-
-	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "11 2716.bin",   0x0000, 0x0800, CRC(8dbd3785) SHA1(700cb9eb8ea64be99d843910cebcd29d601ab2e9) )
-	ROM_LOAD( "12 2716.bin",   0x0800, 0x0800, CRC(0db3e436) SHA1(cd1825775b0a10df66d2ccc01cb4b6a9a3d2141a) )
-
-	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "9 2716.bin",    0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
-	ROM_LOAD( "10 2716.bin",   0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
-
-	ROM_REGION( 0x0200, "proms", 0 ) // not present in dump, assuming to be the same, matches screenshots, note reverse order to most sets, same as pleiadsb2.
-	ROM_LOAD( "7611-5.26",     0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
-	ROM_LOAD( "7611-5.33",     0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette high bits
-ROM_END
-
-// This set shows an Irecsa patent number on the title screen.
-ROM_START( pleiadsia )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.ic47",        0x0000, 0x0800, CRC(9bbef607) SHA1(e563b72294fdbf4ff5bf748d0765af9e86e119bd) )
-	ROM_LOAD( "2.ic46",        0x0800, 0x0800, CRC(e2b5b8cd) SHA1(514ab2b24fc1d6d1fd64e74470b601ba9a11f36f) )
-	ROM_LOAD( "3.ic49",        0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) )
-	ROM_LOAD( "4.ic50",        0x1800, 0x0800, CRC(3e0d3a6e) SHA1(dba3432b8060fed967bcc64025a5fa5a78f2edf3) )
-	ROM_LOAD( "5.ic51",        0x2000, 0x0800, CRC(65a58c6d) SHA1(b8c2724099928c96674068a52ef26530f391ded5) )
-	ROM_LOAD( "6.ic52",        0x2800, 0x0800, CRC(44ab59c1) SHA1(518a296558998729e44602267e525da2e1c84e39) )
-	ROM_LOAD( "7.ic53",        0x3000, 0x0800, CRC(6f56f317) SHA1(d7e6b0b1c58b741de3504640bcc23e86d1a134a0) )
-	ROM_LOAD( "8.ic54",        0x3800, 0x0800, CRC(ca264c7c) SHA1(3a6adfaa935a1a11cb62e73b9f43b228b711c2da) )
-
-	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "10.ic45",       0x0000, 0x0800, CRC(8dbd3785) SHA1(700cb9eb8ea64be99d843910cebcd29d601ab2e9) )
-	ROM_LOAD( "9.ic44",        0x0800, 0x0800, CRC(0db3e436) SHA1(cd1825775b0a10df66d2ccc01cb4b6a9a3d2141a) )
-
-	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "r10.c26",       0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
-	ROM_LOAD( "r9.ic27",       0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "a_hm7611.ic26", 0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
-	ROM_LOAD( "b_hm7611.ic33", 0x0100, 0x0100, CRC(304cf3f1) SHA1(2821577b792a9a9b0ddded4ba8046a2cef1e7d1f) ) // palette high bits
 ROM_END
 
 ROM_START( pleiadsn )
@@ -1805,11 +1805,11 @@ GAME( 1980, fenixexpl,  phoenix, phoenix,  phoenix,  phoenix_state, empty_init, 
 /*** Pleiads (& clones) ***/
 GAME( 1981, pleiads,    0,       pleiads,  pleiads,  phoenix_state, empty_init,           ROT90, "Tehkan",                                 "Pleiads (Tehkan)",                                           MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadce,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Centuri license)",               "Pleiads (Centuri)",                                          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // "Pleiades" in manual and on cabinet
+GAME( 1981, pleiadsi,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Irecsa license)",                "Pleiads (Irecsa, set 1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadsia,  pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Irecsa license)",                "Pleiads (Irecsa, set 2)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadbl,   pleiads, pleiads,  pleiadbl, phoenix_state, empty_init,           ROT90, "bootleg",                                "Pleiads (bootleg set 1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsb2,  pleiads, pleiads,  pleiads,  phoenix_state, empty_init,           ROT90, "bootleg (ESG)",                          "Pleiads (bootleg set 2)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsgmp, pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (GMP Games)",                    "Pleiads (GMP Games)",                                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadsi,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Irecsa)",                       "Pleiads (Irecsa, set 1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadsia,  pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Irecsa)",                       "Pleiads (Irecsa, set 2)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsn,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Niemer S.A.)",                  "Pleiads (Niemer S.A.)",                                      MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadss,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Famaresa)",                     "Pleiads (Famaresa, Spanish bootleg)",                        MACHINE_SUPPORTS_SAVE ) // colours match PCB (but are ugly)
 GAME( 1981, cityatta,   pleiads, pleiads,  cityatta, phoenix_state, empty_init,           ROT90, "bootleg (Petaco S.A.)",                  "City Attack (Petaco S.A., bootleg of Pleiads)",              MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // Colors are bad, as seen on the screenshot from https://www.recreativas.org/city-attack-454-petaco
