@@ -580,7 +580,7 @@ void senjyo_state::senjyo(machine_config &config)
 	m_pio->out_int_callback().set_inputline("sub", INPUT_LINE_IRQ0);
 	m_pio->in_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 
-	z80ctc_device& ctc(Z80CTC(config, "z80ctc", 4_MHz_XTAL / 2 /* same as "sub */));
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", 4_MHz_XTAL / 2 /* same as "sub" */));
 	ctc.intr_callback().set_inputline("sub", INPUT_LINE_IRQ0);
 	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
 	ctc.zc_callback<2>().set(FUNC(senjyo_state::dac_clock_w));
