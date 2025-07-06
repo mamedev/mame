@@ -24,6 +24,7 @@ Year + Game                PCB ID                    CPU                Video   
 02  Skill Drop GA          None                      JX-1689F1028N      ASTRO V02      pLSI1016-60LJ
 02? Keno 21                ?                         ASTRO V102?        ASTRO V05      ASTRO F02?                                 not dumped
 03  Magic Bomb (AB5.3)     CS350P003                 ASTRO V102PX-014?  ASTRO V01      ASTRO F02 2003-03-31                       Encrypted
+03  Magic Bomb (AB6.0)     J (CS350P001)             ASTRO V102PX-014?  ASTRO V05      ASTRO F02 2003-08-12                       Encrypted
 03  Speed Drop             None                      JX-1689HP          ASTRO V05      pLSI1016-60LJ
 03  Speed Master (V1.0)    M02                       AST-V102PX         scratched      scratched                                  Encrypted
 04  Zoo                    M1.1                      ASTRO V102PX-005?  ASTRO V06      ASTRO F02 2005-02-18                       Encrypted
@@ -40,7 +41,7 @@ Year + Game                PCB ID                    CPU                Video   
 05  Stone Age              L1                        ASTRO V102PX-012?  ASTRO V05(x2)  ASTRO F02 2004-09-04                       Encrypted
 05? Hacher (hack)          M1.2                      ?                  ?              ASTRO F02 2005-02-18                       Encrypted
 05  Wicked Witch           O (CS350P032)             ASTRO V102PX-016?  ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
-06  Captain Shark          M1.2                      ASTRO V102PX-006?  ASTRO V06      ASTRO F02 2005-05-29                       Encrypted
+06  Captain Shark          M1.2 (CS350P016)          ASTRO V102PX-006?  ASTRO V06      ASTRO F02 2005-05-29                       Encrypted
 06  Little Witch (EN.01A)  P1                        ASTRO V102PX-016?  ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
 06  Win Win Bingo          M1.2                      ASTRO V102PX-006?  ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
 07? Western Venture        O (CS350P032)             ASTRO V102?        ASTRO V07      ASTRO F01 2007-06-03                       Encrypted
@@ -317,6 +318,7 @@ public:
 	void magibombg(machine_config &config) ATTR_COLD;
 	void magibombm(machine_config &config) ATTR_COLD;
 	void magibombo(machine_config &config) ATTR_COLD;
+	void magibombp(machine_config &config) ATTR_COLD;
 	void monkeyl(machine_config &config) ATTR_COLD;
 	void monkeyld(machine_config &config) ATTR_COLD;
 	void monkeyle(machine_config &config) ATTR_COLD;
@@ -1559,6 +1561,12 @@ void zoo_state::magibombo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::magibombo_map);
 }
 
+void zoo_state::magibombp(machine_config &config)
+{
+	magibombd(config);
+	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(zoo_state::irq_2_4_scanline_cb), "screen", 0, 1);
+}
+
 void zoo_state::winbingo(machine_config &config)
 {
 	zoo(config);
@@ -2196,6 +2204,25 @@ ROM_START( magibombo )
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "magibombo_cpucode.key", 0x00, 0x02, NO_DUMP ) // TODO: RE correct one
+ROM_END
+
+ROM_START( magibombp )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_m.b._ab6.0j.u19", 0x00000, 0x10000, CRC(01bdb114) SHA1(a69b8a4f9332410f86c7d65664976a15ae8f315c) )
+	ROM_LOAD16_BYTE( "2_m.b._ab6.0j.u20", 0x00001, 0x10000, CRC(b5fd35aa) SHA1(7b1f157788824f1fc0924ad5e60f014b5bcc71f4) )
+	ROM_FILL(                             0x20000, 0x20000, 0xff )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "mx29f1610mc.u130", 0x000000, 0x200000, CRC(b983c1c1) SHA1(a372f90b5908be639b22169c57962059b4122540) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_m.b._e1.0.rom", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46", 0x00, 0x80, CRC(c03fc61b) SHA1(c390577a69a1f2cf7fe93a75318912fc4f194bab) ) // TODO: factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "magibombg_cpucode.key", 0x00, 0x02, NO_DUMP ) // TODO: RE correct one
 ROM_END
 
 
@@ -3783,6 +3810,7 @@ GAMEL( 2005,  magibombj, magibomb, magibombd, magibombd, zoo_state,       init_m
 GAMEL( 2004,  magibombg, magibomb, magibombg, magibombg, zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. NB6.1, 26/04/04)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 26/04/04. Undumped sprite ROM
 GAMEL( 2003,  magibombm, magibomb, magibombm, magibombg, zoo_state,       init_magibombm, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB5.3, 20/06/03)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 062003S
 GAMEL( 2014,  magibombo, magibomb, magibombo, magibombd, zoo_state,       init_magibombo, ROT0, "Astro Corp.", "Magic Bomb (Ver. BR71.A, 30/05/14)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 30/05/14 10:29
+GAMEL( 2003,  magibombp, magibomb, magibombp, magibombg, zoo_state,       init_magibombm, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB6.0J, 26/11/03)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 112603S
 GAMEL( 2004,  speedmst,  0,        speedmst,  dinodino,  zoo_state,       init_speedmst,  ROT0, "D2 Enterprises", "Speed Master (D2.01.C, Apr 29 2004)",        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 29 2004 16:29:35
 GAMEL( 2003,  speedmsta, speedmst, speedmst,  dinodino,  zoo_state,       init_speedmsta, ROT0, "D2 Enterprises", "Speed Master (D1.4, May 23 2003)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // May 23 2003 16:38:02
 GAMEL( 2003,  speedmstb, speedmst, speedmst,  dinodino,  zoo_state,       init_speedmstb, ROT0, "D2 Enterprises", "Speed Master (D2.01.C, Apr 28 2004)",        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 28 2004 17:21:26
