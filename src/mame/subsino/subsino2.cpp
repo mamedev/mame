@@ -3160,6 +3160,7 @@ void subsino2_state::jgaoshou(machine_config &config)
 
 	ss9802_device &io(SS9802(config.replace(), "io"));
 	io.in_port_callback<0>().set(FUNC(subsino2_state::vblank_bit6_r));
+	io.out_port_callback<0>().set(FUNC(subsino2_state::oki_bank_bit4_w));
 	io.in_port_callback<1>().set_ioport("DSW4");
 	io.in_port_callback<3>().set_ioport("IN-C");
 	io.in_port_callback<4>().set_ioport("IN-B");
