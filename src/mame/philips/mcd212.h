@@ -88,10 +88,11 @@ protected:
 	{
 		CURCNT_COLOR         = 0x00000f,    // Cursor color
 		CURCNT_CUW           = 0x008000,    // Cursor width
-		CURCNT_COF           = 0x070000,    // Cursor off time
 		CURCNT_COF_SHIFT     = 16,
-		CURCNT_CON           = 0x280000,    // Cursor on time
+		CURCNT_COF           = 0b111 << CURCNT_COF_SHIFT,    // Cursor off time
 		CURCNT_CON_SHIFT     = 19,
+		CURCNT_CON           = 0b111 << CURCNT_CON_SHIFT,    // Cursor on time
+		CURCNT_BLKC_SHIFT    = 22,
 		CURCNT_BLKC          = 0x400000,    // Blink type
 		CURCNT_EN            = 0x800000,    // Cursor enable
 
@@ -234,6 +235,10 @@ protected:
 	int m_total_height = 0;
 	emu_timer *m_ica_timer = nullptr;
 	emu_timer *m_dca_timer = nullptr;
+
+	// Cursor State
+	uint16_t m_blink_time; // Counter that tracks how long since the last m_blink_active last changed.
+	bool m_blink_active = false;
 
 	static const uint32_t s_4bpp_color[16];
 
