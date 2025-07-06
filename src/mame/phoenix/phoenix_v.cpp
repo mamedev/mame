@@ -248,7 +248,6 @@ void phoenix_state::phoenix_videoreg_w(uint8_t data)
 	if (m_palette_bank != ((data >> 1) & 1))
 	{
 		m_palette_bank = (data >> 1) & 1;
-
 		machine().tilemap().mark_all_dirty();
 	}
 }
@@ -267,16 +266,14 @@ void phoenix_state::pleiads_videoreg_w(uint8_t data)
 		machine().tilemap().mark_all_dirty();
 	}
 
-	/* the palette table is at $0420-$042f and is set by $06bc.
-	   Four palette changes by level.  The palette selection is
-	   wrong, but the same palette is used for both layers. */
+	/* the palette table is at $0420-$042f and is set by $06bc. Four palette
+       changes by level.  The same palette is used for both layers. */
 	if (m_palette_bank != ((data >> 1) & 3))
 	{
 		m_palette_bank = ((data >> 1) & 3);
-
 		machine().tilemap().mark_all_dirty();
 
-		logerror("Palette: %02X\n", (data & 0x06) >> 1);
+		logerror("Palette: %02X\n", m_palette_bank);
 	}
 
 	m_pleiads_protection_question = data & 0xfc;

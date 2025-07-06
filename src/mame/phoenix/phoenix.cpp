@@ -22,11 +22,19 @@ There are 2 Phoenix board families:
   manufactured more cheaply thanks to some reengineering of the circuits.
 
 Notes:
-- Discrete sound emulation is in audio/phoenix.cpp,
-  pleiads is using another sound driver, audio/pleiads.cpp
+
+Discrete sound emulation is in audio/phoenix.cpp,
+pleiads is using another sound driver, audio/pleiads.cpp
+
+Official versions of Pleiads (Tehkan, Centuri, Irecsa) have an Epson 7910E
+Multi-Melody IC for the BGM.
+
+Pleiads protection and palette banking is via 3 custom labled chips T-X, T-Y
+and T-Z. These 3 chips are actually equivalent to 74LS669, 74LS83, 74LS74,
+just with a modified pinout.
 
 
-To Do:
+TODO:
 
 Phoenix:
 - Emulate the different sound system used at least by phoenixc2, griffono,
@@ -35,14 +43,11 @@ Phoenix:
 - Better documentation of the bootlegs.
 
 Survival:
-
 - Check background visible area.  When the background scrolls up, it
   currently shows below the top and bottom of the border of the play area.
 
 Pleiads:
-
-- Palette banking.  Controlled by 3 custom chips marked T-X, T-Y and T-Z.
-  These chips are responsible for the protection as well.
+- Add Epson melody IC.
 
 ***************************************************************************/
 
@@ -1456,8 +1461,8 @@ ROM_START( pleiads )
 	ROM_LOAD( "7910e",        0x0000, 0x0800, NO_DUMP ) // actual size unknown, needs decapping
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette low bits
-	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette high bits
+	ROM_LOAD( "7611-5.26",    0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
+	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette high bits
 ROM_END
 
 ROM_START( pleiadce )
@@ -1483,8 +1488,8 @@ ROM_START( pleiadce )
 	ROM_LOAD( "7910e",        0x0000, 0x0800, NO_DUMP ) // actual size unknown, needs decapping
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette low bits
-	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette high bits
+	ROM_LOAD( "7611-5.26",    0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
+	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette high bits
 ROM_END
 
 ROM_START( pleiadsi )
@@ -1505,6 +1510,9 @@ ROM_START( pleiadsi )
 	ROM_REGION( 0x1000, "fgtiles", 0 )
 	ROM_LOAD( "9 2716.bin",    0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
 	ROM_LOAD( "10 2716.bin",   0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+
+	ROM_REGION( 0x800, "melody", 0 )
+	ROM_LOAD( "7910e",         0x0000, 0x0800, NO_DUMP ) // actual size unknown, needs decapping
 
 	ROM_REGION( 0x0200, "proms", 0 ) // not present in dump, assuming to be the same, matches screenshots, note reverse order to most sets, same as pleiadsb2.
 	ROM_LOAD( "7611-5.26",     0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
@@ -1530,6 +1538,9 @@ ROM_START( pleiadsia )
 	ROM_REGION( 0x1000, "fgtiles", 0 )
 	ROM_LOAD( "r10.c26",       0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
 	ROM_LOAD( "r9.ic27",       0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+
+	ROM_REGION( 0x800, "melody", 0 )
+	ROM_LOAD( "7910e",         0x0000, 0x0800, NO_DUMP ) // actual size unknown, needs decapping
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "a_hm7611.ic26", 0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
@@ -1584,6 +1595,30 @@ ROM_START( pleiadsb2 )
 	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette high bits
 ROM_END
 
+ROM_START( pleiadsn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",        0x0000, 0x0800, CRC(c013515f) SHA1(c44db1c615c11ace997c0065762020827bf9ef7e) )
+	ROM_LOAD( "2.bin",        0x0800, 0x0800, CRC(b254217c) SHA1(312a33cca09d5d2d18992f28eb051230a90db6e3) )
+	ROM_LOAD( "3.bin",        0x1000, 0x0800, CRC(3b29aec5) SHA1(b90b55fdc799db672558e2f7c6b05a958bf33a2c) )
+	ROM_LOAD( "4.bin",        0x1800, 0x0800, CRC(1fbde4d7) SHA1(b358649288108159a426dba3940c627c2d2aeb01) )
+	ROM_LOAD( "5.bin",        0x2000, 0x0800, BAD_DUMP CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) ) // the best of 50 different dumps. the device is clearly damaged.
+	ROM_LOAD( "6.bin",        0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
+	ROM_LOAD( "7.bin",        0x3000, 0x0800, CRC(b5f07fbc) SHA1(2ae687c84732942e69ad4dfb7a4ac1b97b77487a) )
+	ROM_LOAD( "8.bin",        0x3800, 0x0800, CRC(b3db08c2) SHA1(d5b1b77dcf2d76498f30d5f880635f5acfac7dfd) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 ) // these are straight (colors match the real machine)
+	ROM_LOAD( "11.bin",       0x0000, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) )
+	ROM_LOAD( "12.bin",       0x0800, 0x0800, CRC(72d511fc) SHA1(a12485698ad35ba3a8c72bb9401c0cf522ffc73c) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "9.bin",        0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
+	ROM_LOAD( "10.bin",       0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // proms borrowed from pleiads
+	ROM_LOAD( "mb7052.ic41",  0x0000, 0x0100, BAD_DUMP CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
+	ROM_LOAD( "hm3-7611.bin", 0x0100, 0x0100, BAD_DUMP CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette high bits
+ROM_END
+
 // TIM-8001 + TIM-8002 PCBs. Sound section seems more similar to Phoenix (MM6221AA instead of TMS3615, etc)
 ROM_START( pleiadsgmp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1607,30 +1642,6 @@ ROM_START( pleiadsgmp )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "cpu41.bin", 0x0000, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )
 	ROM_LOAD( "cpu40.bin", 0x0100, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )
-ROM_END
-
-ROM_START( pleiadsn )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.bin",        0x0000, 0x0800, CRC(c013515f) SHA1(c44db1c615c11ace997c0065762020827bf9ef7e) )
-	ROM_LOAD( "2.bin",        0x0800, 0x0800, CRC(b254217c) SHA1(312a33cca09d5d2d18992f28eb051230a90db6e3) )
-	ROM_LOAD( "3.bin",        0x1000, 0x0800, CRC(3b29aec5) SHA1(b90b55fdc799db672558e2f7c6b05a958bf33a2c) )
-	ROM_LOAD( "4.bin",        0x1800, 0x0800, CRC(1fbde4d7) SHA1(b358649288108159a426dba3940c627c2d2aeb01) )
-	ROM_LOAD( "5.bin",        0x2000, 0x0800, BAD_DUMP CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) ) // the best of 50 different dumps. the device is clearly damaged.
-	ROM_LOAD( "6.bin",        0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
-	ROM_LOAD( "7.bin",        0x3000, 0x0800, CRC(b5f07fbc) SHA1(2ae687c84732942e69ad4dfb7a4ac1b97b77487a) )
-	ROM_LOAD( "8.bin",        0x3800, 0x0800, CRC(b3db08c2) SHA1(d5b1b77dcf2d76498f30d5f880635f5acfac7dfd) )
-
-	ROM_REGION( 0x1000, "bgtiles", 0 ) // these are straight (colors match the real machine)
-	ROM_LOAD( "11.bin",       0x0000, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) )
-	ROM_LOAD( "12.bin",       0x0800, 0x0800, CRC(72d511fc) SHA1(a12485698ad35ba3a8c72bb9401c0cf522ffc73c) )
-
-	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "9.bin",        0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
-	ROM_LOAD( "10.bin",       0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
-
-	ROM_REGION( 0x0200, "proms", 0 ) // proms borrowed from phoenix, reverse order.
-	ROM_LOAD( "hm3-7611.bin", 0x0000, 0x0100, BAD_DUMP CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette low bits
-	ROM_LOAD( "mb7052.ic41",  0x0100, 0x0100, BAD_DUMP CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette high bits
 ROM_END
 
 // Famaresa "580" PCB set (580-001 and 580-002).
@@ -1803,14 +1814,14 @@ GAME( 1980, avefenixl,  phoenix, phoenix,  phoenix,  phoenix_state, empty_init, 
 GAME( 1980, fenixexpl,  phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Explomatic)",                   "Fenix (Explomatic, Spanish bootleg of Phoenix)",             MACHINE_SUPPORTS_SAVE )
 
 /*** Pleiads (& clones) ***/
-GAME( 1981, pleiads,    0,       pleiads,  pleiads,  phoenix_state, empty_init,           ROT90, "Tehkan",                                 "Pleiads (Tehkan)",                                           MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadce,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Centuri license)",               "Pleiads (Centuri)",                                          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // "Pleiades" in manual and on cabinet
-GAME( 1981, pleiadsi,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Irecsa license)",                "Pleiads (Irecsa, set 1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadsia,  pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Irecsa license)",                "Pleiads (Irecsa, set 2)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadbl,   pleiads, pleiads,  pleiadbl, phoenix_state, empty_init,           ROT90, "bootleg",                                "Pleiads (bootleg set 1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiads,    0,       pleiads,  pleiads,  phoenix_state, empty_init,           ROT90, "Tehkan",                                 "Pleiads (Tehkan)",                                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadce,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Centuri license)",               "Pleiads (Centuri)",                                          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "Pleiades" in manual and on cabinet
+GAME( 1981, pleiadsi,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Irecsa license)",                "Pleiads (Irecsa, set 1)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadsia,  pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Irecsa license)",                "Pleiads (Irecsa, set 2)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadbl,   pleiads, pleiads,  pleiadbl, phoenix_state, empty_init,           ROT90, "bootleg",                                "Pleiads (bootleg set 1)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsb2,  pleiads, pleiads,  pleiads,  phoenix_state, empty_init,           ROT90, "bootleg (ESG)",                          "Pleiads (bootleg set 2)",                                    MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadsgmp, pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (GMP Games)",                    "Pleiads (GMP Games)",                                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsn,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Niemer S.A.)",                  "Pleiads (Niemer S.A.)",                                      MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadsgmp, pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (GMP Games)",                    "Pleiads (GMP Games)",                                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadss,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Famaresa)",                     "Pleiads (Famaresa, Spanish bootleg)",                        MACHINE_SUPPORTS_SAVE ) // colours match PCB (but are ugly)
 GAME( 1981, cityatta,   pleiads, pleiads,  cityatta, phoenix_state, empty_init,           ROT90, "bootleg (Petaco S.A.)",                  "City Attack (Petaco S.A., bootleg of Pleiads)",              MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // Colors are bad, as seen on the screenshot from https://www.recreativas.org/city-attack-454-petaco
 GAME( 1981, capitol,    pleiads, phoenix,  capitol,  phoenix_state, empty_init,           ROT90, "bootleg? (Universal Video Spiel)",       "Capitol",                                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
