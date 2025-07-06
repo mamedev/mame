@@ -1106,7 +1106,6 @@ configuration { "asmjs" }
 	}
 	linkoptions {
 		"-Wl,--start-group",
-		"-O" .. _OPTIONS["OPTIMIZE"],
 		"-s USE_SDL=2",
 		"-s USE_SDL_TTF=2",
 		"-s DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=\"['\\$$ERRNO_CODES']\"",
@@ -1124,6 +1123,19 @@ configuration { "asmjs" }
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/lut-default.png@artwork/lut-default.png",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png",
 	}
+	if _OPTIONS["OPTIMIZE"]~=nil then
+		if _OPTIONS["OPTIMIZE"]=="3" then
+			-- emcc's link-time -O3 is very slow, max out at -O2 for now
+			-- we should still be getting the benefit of -O3 on the individual object files
+			linkoptions {
+				"-O2",
+			}
+		else
+			linkoptions {
+				"-O" .. _OPTIONS["OPTIMIZE"],
+			}
+		end
+	end
 	if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 		linkoptions {
 			"-g" .. _OPTIONS["SYMLEVEL"],
