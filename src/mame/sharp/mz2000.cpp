@@ -47,15 +47,16 @@ Notes:
 
 namespace {
 
-class mz2000_state : public driver_device
+class mz80b_state : public driver_device
 {
 public:
-	mz2000_state(const machine_config &mconfig, device_type type, const char *tag)
+	mz80b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_region_chargen(*this, "chargen")
+		, m_ipl_view(*this, "ipl_view")
 		, m_cassette(*this, "cassette")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
@@ -67,10 +68,8 @@ public:
 		, m_dac1bit(*this, "dac1bit")
 		, m_io_keys(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "UNUSED", "UNUSED"})
 		, m_io_config(*this, "CONFIG")
-		, m_ipl_view(*this, "ipl_view")
 	{ }
 
-	void mz2000(machine_config &config);
 	void mz80b(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(boot_reset_cb);
@@ -81,6 +80,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	virtual void draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -88,14 +89,32 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_memory_region m_region_chargen;
+	memory_view m_ipl_view;
+	std::unique_ptr<u8[]> m_work_ram;
 	std::unique_ptr<u8[]> m_tvram;
 	std::unique_ptr<u8[]> m_gvram;
+
 	u8 m_width80;
 	u8 m_tvram_attr;
 	u8 m_gvram_mask;
 	u8 m_back_color_mask;
+	u8 m_video_reverse;
+	u8 m_gvram_bank;
+	u8 m_back_color;
+	bool m_vgate;
 
 	virtual void set_palette_bank();
+
+	void mz80b_io(address_map &map) ATTR_COLD;
+
+	void tvram_w(offs_t offset, u8 data);
+	u8 tvram_r(offs_t offset);
+
+	u8 m_vram_overlay_enable, m_vram_overlay_select;
+	bool m_wait_state, m_hblank_state;
+
+	bitmap_ind16 m_text_bitmap;
+	bitmap_ind16 m_graphic_bitmap;
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -109,17 +128,8 @@ private:
 	floppy_image_device *m_floppy;
 	required_device<pit8253_device> m_pit;
 	required_device<speaker_sound_device> m_dac1bit;
-	std::unique_ptr<u8[]> m_work_ram;
 	required_ioport_array<16> m_io_keys;
 	required_ioport m_io_config;
-	memory_view m_ipl_view;
-
-	u8 m_video_reverse;
-	u8 m_gvram_bank;
-	u8 m_back_color;
-	bool m_vgate;
-
-	u8 m_vram_overlay_enable, m_vram_overlay_select;
 
 	u8 m_key_mux;
 
@@ -129,24 +139,12 @@ private:
 
 	u8 m_has_fdc;
 
-	bool m_wait_state, m_hblank_state;
 	emu_timer *m_ipl_reset_timer = nullptr;
 	emu_timer *m_hblank_timer = nullptr;
 
-	template <unsigned N> void work_ram_w(offs_t offset, u8 data);
-	template <unsigned N> u8 work_ram_r(offs_t offset);
-	void tvram_w(offs_t offset, u8 data);
-	u8 tvram_r(offs_t offset);
-	void gvram_w(offs_t offset, u8 data);
-	u8 gvram_r(offs_t offset);
-	void gvram_bank_w(u8 data);
-	void back_color_w(u8 data);
 	void floppy_select_w(u8 data);
 	void floppy_side_w(u8 data);
 	void timer_w(u8 data);
-	void tvram_attr_w(u8 data);
-	void gvram_mask_w(u8 data);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u8 fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, u8 data);
 	u8 ppi_portb_r();
@@ -156,17 +154,51 @@ private:
 	u8 pio_portb_r();
 	u8 pio_porta_r();
 
-	void mz2000_io(address_map &map) ATTR_COLD;
-	void mz2000_map(address_map &map) ATTR_COLD;
-	void mz80b_io(address_map &map) ATTR_COLD;
-
 	TIMER_CALLBACK_MEMBER(ipl_timer_reset_cb);
 	TIMER_CALLBACK_MEMBER(hblank_cb);
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
-	bitmap_ind16 m_text_bitmap;
-	bitmap_ind16 m_graphic_bitmap;
+	// MZ-80B specifics
+	void mz80b_map(address_map &map) ATTR_COLD;
+
+	template <unsigned N> void mz80b_work_ram_w(offs_t offset, u8 data);
+	template <unsigned N> u8 mz80b_work_ram_r(offs_t offset);
+	void mz80b_vram_w(offs_t offset, u8 data);
+	u8 mz80b_vram_r(offs_t offset);
+	void mz80b_gvram_w(offs_t offset, u8 data);
+	u8 mz80b_gvram_r(offs_t offset);
+};
+
+class mz2000_state : public mz80b_state
+{
+public:
+	mz2000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: mz80b_state(mconfig, type, tag)
+	{ }
+
+	void mz2000(machine_config &config);
+
+protected:
+	virtual void draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+//	virtual void draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+private:
+	void mz2000_io(address_map &map) ATTR_COLD;
+	void mz2000_map(address_map &map) ATTR_COLD;
+
+	template <unsigned N> void work_ram_w(offs_t offset, u8 data);
+	template <unsigned N> u8 work_ram_r(offs_t offset);
+
+	void gvram_w(offs_t offset, u8 data);
+	u8 gvram_r(offs_t offset);
+
+	void gvram_bank_w(u8 data);
+	void back_color_w(u8 data);
+	void tvram_attr_w(u8 data);
+	void gvram_mask_w(u8 data);
 };
 
 class mz2200_state : public mz2000_state
@@ -188,7 +220,7 @@ protected:
 };
 
 
-void mz2000_state::video_start()
+void mz80b_state::video_start()
 {
 	m_tvram = std::make_unique<u8[]>(0x1000);
 	m_gvram = std::make_unique<u8[]>(0x10000);
@@ -219,18 +251,51 @@ void mz2200_state::video_start()
 }
 
 /*
- * MZ-2000 (monochrome)
+ * MZ-80B / MZ-2000 (monochrome)
  */
 
-void mz2000_state::set_palette_bank()
+void mz80b_state::set_palette_bank()
 {
 	m_palette->set_pen_color(m_video_reverse ^ 0, rgb_t(0, 0, 0));
 	m_palette->set_pen_color(m_video_reverse ^ 1, rgb_t(0, 255, 0));
 	m_screen->update_partial(m_screen->vpos());
 }
 
+// MZ-80B is in 320 horizontal res compared to MZ-2000/MZ-2200 that is in pure 640.
+void mz80b_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const u8 layer1_mask = BIT(m_gvram_mask, 0) * 0xff;
+	const u8 layer2_mask = BIT(m_gvram_mask, 1) * 0xff;
+
+	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const u16 gfx_offset = y * 40;
+		auto *const dst = &bitmap.pix(y);
+
+		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += 16)
+		{
+			const u8 x_offset = x >> 4;
+			const u8 gfx_1 = m_gvram[gfx_offset + x_offset + 0x0000] & layer1_mask;
+			const u8 gfx_2 = m_gvram[gfx_offset + x_offset + 0x2000] & layer2_mask;
+
+			for (unsigned xi = 0; xi < 8; xi ++)
+			{
+				const u8 pen = BIT(gfx_1, xi) || BIT(gfx_2, xi);
+
+				dst[x + xi * 2 + 0] = m_palette->pen(pen);
+				dst[x + xi * 2 + 1] = m_palette->pen(pen);
+			}
+		}
+	}
+}
+
+
 void mz2000_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	const u8 layer1_mask = BIT(m_gvram_mask, 0) * 0xff;
+	const u8 layer2_mask = BIT(m_gvram_mask, 1) * 0xff;
+	const u8 layer3_mask = BIT(m_gvram_mask, 2) * 0xff;
+
 	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const u16 gfx_offset = y * 80;
@@ -239,9 +304,9 @@ void mz2000_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cl
 		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
 			const u8 x_offset = x >> 3;
-			const u8 gfx_b = m_gvram[gfx_offset + x_offset + 0x4000];
-			const u8 gfx_r = m_gvram[gfx_offset + x_offset + 0x8000];
-			const u8 gfx_g = m_gvram[gfx_offset + x_offset + 0xc000];
+			const u8 gfx_b = m_gvram[gfx_offset + x_offset + 0x4000] & layer1_mask;
+			const u8 gfx_r = m_gvram[gfx_offset + x_offset + 0x8000] & layer2_mask;
+			const u8 gfx_g = m_gvram[gfx_offset + x_offset + 0xc000] & layer3_mask;
 
 			for (unsigned xi = 0; xi < 8; xi ++)
 			{
@@ -253,7 +318,7 @@ void mz2000_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cl
 	}
 }
 
-void mz2000_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void mz80b_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  const u8 color = m_tvram_attr & 7;
 	const u8 x_size = (m_width80 + 1) * 40;
@@ -339,6 +404,25 @@ void mz2200_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 
+uint32_t mz80b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// mz2000_cass:harvestc uses this extensively
+	bitmap.fill(m_back_color, cliprect);
+
+	if (m_vgate)
+	{
+		return 0;
+	}
+
+	draw_text_layer(m_text_bitmap, cliprect);
+	draw_graphics_layer(m_graphic_bitmap, cliprect);
+
+	copybitmap_trans(bitmap, m_graphic_bitmap, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, 0);
+
+	return 0;
+}
+
 uint32_t mz2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// mz2000_cass:harvestc uses this extensively
@@ -367,8 +451,9 @@ uint32_t mz2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-u8 mz2000_state::tvram_r(offs_t offset) { return m_tvram[offset]; }
-void mz2000_state::tvram_w(offs_t offset, u8 data) { m_tvram[offset] = data; }
+
+u8 mz80b_state::tvram_r(offs_t offset) { return m_tvram[offset]; }
+void mz80b_state::tvram_w(offs_t offset, u8 data) { m_tvram[offset] = data; }
 
 u8 mz2000_state::gvram_r(offs_t offset)
 {
@@ -388,6 +473,10 @@ void mz2000_state::gvram_bank_w(u8 data)
 {
 	m_gvram_bank = data & 3;
 }
+
+/*
+ * MZ-2000 work RAM handling
+ */
 
 template <unsigned N> u8 mz2000_state::work_ram_r(offs_t offset)
 {
@@ -460,7 +549,166 @@ template <unsigned N> void mz2000_state::work_ram_w(offs_t offset, u8 data)
 	m_work_ram[offset] = data;
 }
 
-u8 mz2000_state::fdc_r(offs_t offset)
+/*
+ * MZ-80B work RAM handling
+ */
+
+u8 mz80b_state::mz80b_gvram_r(offs_t offset)
+{
+	return m_gvram[(offset + m_gvram_bank * 0x2000)];
+}
+
+void mz80b_state::mz80b_gvram_w(offs_t offset, u8 data)
+{
+	m_gvram[(offset + m_gvram_bank * 0x2000)] = data;
+}
+
+template <unsigned N> u8 mz80b_state::mz80b_work_ram_r(offs_t offset)
+{
+	if (m_vram_overlay_enable)
+	{
+		const u8 page_mem = (offset | (N << 15)) >> 12;
+
+		// TVRAM: 0xd*** or 0x5***
+		// GVRAM: 0xe*** or 0x6***
+		if (page_mem == (0xd ^ (m_vram_overlay_select << 3)))
+		{
+			if (!m_hblank_state && !machine().side_effects_disabled())
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_maincpu->retry_access();
+				m_wait_state = true;
+				return 0xff;
+			}
+			return tvram_r(offset & 0xfff);
+		}
+		else if (page_mem >= (0xe ^ (m_vram_overlay_select << 3)))
+		{
+			if (!m_hblank_state && !machine().side_effects_disabled())
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_maincpu->retry_access();
+				m_wait_state = true;
+				return 0xff;
+			}
+
+			return mz80b_gvram_r(offset & 0x1fff);
+		}
+	}
+
+	return m_work_ram[offset];
+}
+
+template <unsigned N> void mz80b_state::mz80b_work_ram_w(offs_t offset, u8 data)
+{
+	if (m_vram_overlay_enable)
+	{
+		const u8 page_mem = (offset | (N << 15)) >> 12;
+
+		if (page_mem == (0xd ^ (m_vram_overlay_select << 3)))
+		{
+			if (!m_hblank_state && !machine().side_effects_disabled())
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_maincpu->retry_access();
+				m_wait_state = true;
+				return;
+			}
+
+			tvram_w(offset & 0xfff, data);
+			return;
+		}
+		else if (page_mem >= (0xe ^ (m_vram_overlay_select << 3)))
+		{
+			if (!m_hblank_state && !machine().side_effects_disabled())
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_maincpu->retry_access();
+				m_wait_state = true;
+				return;
+			}
+
+			mz80b_gvram_w(offset & 0x1fff, data);
+			return;
+		}
+	}
+
+	m_work_ram[offset] = data;
+}
+
+// 0x5000-0x7fff alias when IPL is enabled
+u8 mz80b_state::mz80b_vram_r(offs_t offset)
+{
+	if (m_vram_overlay_enable && offset & 0x3000)
+	{
+		offset |= 0x4000;
+		const u8 page_mem = (offset) >> 12;
+
+		if (page_mem == (0xd ^ (m_vram_overlay_select << 3)))
+		{
+			if (!m_hblank_state && !machine().side_effects_disabled())
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_maincpu->retry_access();
+				m_wait_state = true;
+				return 0xff;
+			}
+			return tvram_r(offset & 0xfff);
+		}
+		else if (page_mem >= (0xe ^ (m_vram_overlay_select << 3)))
+		{
+			if (!m_hblank_state && !machine().side_effects_disabled())
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_maincpu->retry_access();
+				m_wait_state = true;
+				return 0xff;
+			}
+
+			return mz80b_gvram_r(offset & 0x1fff);
+		}
+	}
+
+	return 0xff;
+}
+
+void mz80b_state::mz80b_vram_w(offs_t offset, u8 data)
+{
+	if (m_vram_overlay_enable && offset & 0x3000)
+	{
+		offset |= 0x4000;
+		const u8 page_mem = (offset) >> 12;
+
+		if (page_mem == (0xd ^ (m_vram_overlay_select << 3)))
+		{
+			if (!m_hblank_state && !machine().side_effects_disabled())
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_maincpu->retry_access();
+				m_wait_state = true;
+				return;
+			}
+
+			tvram_w(offset & 0xfff, data);
+			return;
+		}
+		else if (page_mem >= (0xe ^ (m_vram_overlay_select << 3)))
+		{
+			if (!m_hblank_state && !machine().side_effects_disabled())
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_maincpu->retry_access();
+				m_wait_state = true;
+				return;
+			}
+
+			mz80b_gvram_w(offset & 0x1fff, data);
+			return;
+		}
+	}
+}
+
+u8 mz80b_state::fdc_r(offs_t offset)
 {
 	if(m_has_fdc)
 		return m_fdc->read(offset) ^ 0xff;
@@ -468,13 +716,13 @@ u8 mz2000_state::fdc_r(offs_t offset)
 	return 0xff;
 }
 
-void mz2000_state::fdc_w(offs_t offset, u8 data)
+void mz80b_state::fdc_w(offs_t offset, u8 data)
 {
 	if(m_has_fdc)
 		m_fdc->write(offset, data ^ 0xff);
 }
 
-void mz2000_state::floppy_select_w(u8 data)
+void mz80b_state::floppy_select_w(u8 data)
 {
 	switch (data & 0x03)
 	{
@@ -492,13 +740,13 @@ void mz2000_state::floppy_select_w(u8 data)
 		m_floppy->mon_w(!BIT(data, 7));
 }
 
-void mz2000_state::floppy_side_w(u8 data)
+void mz80b_state::floppy_side_w(u8 data)
 {
 	if (m_floppy)
 		m_floppy->ss_w(BIT(data, 0));
 }
 
-void mz2000_state::timer_w(u8 data)
+void mz80b_state::timer_w(u8 data)
 {
 	m_pit->write_gate0(1);
 	m_pit->write_gate1(1);
@@ -526,6 +774,26 @@ void mz2000_state::gvram_mask_w(u8 data)
 	m_screen->update_partial(m_screen->vpos());
 }
 
+void mz80b_state::mz80b_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(FUNC(mz80b_state::mz80b_work_ram_r<0>), FUNC(mz80b_state::mz80b_work_ram_w<0>));
+	map(0x0000, 0xffff).view(m_ipl_view);
+	m_ipl_view[0](0x0000, 0x07ff).rom().region("ipl", 0);
+	m_ipl_view[0](0x0800, 0x3fff).unmaprw();
+	m_ipl_view[0](0x4000, 0x7fff).rw(FUNC(mz80b_state::mz80b_vram_r), FUNC(mz80b_state::mz80b_vram_w));
+	m_ipl_view[0](0x8000, 0xffff).rw(FUNC(mz80b_state::mz80b_work_ram_r<1>), FUNC(mz80b_state::mz80b_work_ram_w<1>));
+
+	// theoretical, cfr. below
+//  map(0x5000, 0x7fff).view(m_vram_lo_view);
+//  m_vram_lo_view[0](0x5000, 0x5fff).ram().share("tvram");
+//  m_vram_lo_view[0](0x6000, 0x7fff).rw(FUNC(mz80b_state::gvram_r), FUNC(mz80b_state::gvram_w));
+
+//  map(0xd000, 0xffff).view(m_vram_hi_view);
+//  m_vram_hi_view[0](0xd000, 0xdfff).ram().share("tvram");
+//  m_vram_hi_view[0](0xe000, 0xffff).rw(FUNC(mz80b_state::gvram_r), FUNC(mz80b_state::gvram_w));
+}
+
 void mz2000_state::mz2000_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -543,7 +811,7 @@ void mz2000_state::mz2000_map(address_map &map)
 //  m_vram_view[1](0xd000, 0xdfff).ram().share("tvram");
 }
 
-void mz2000_state::mz80b_io(address_map &map)
+void mz80b_state::mz80b_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -559,6 +827,11 @@ void mz2000_state::mz80b_io(address_map &map)
 	map(0xe4, 0xe7).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xe8, 0xeb).rw("pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0xf0, 0xf3).w(FUNC(mz2000_state::timer_w));
+	map(0xf4, 0xf7).lw8(NAME([this] (u8 data) {
+		m_gvram_bank = (data & 1);
+		m_gvram_mask = (data & 6) >> 1;
+		m_screen->update_partial(m_screen->vpos());
+	}));
 //  map(0xf4, 0xf7).w(FUNC(mz2000_state::vram_bank_w));
 //  map(0xf8, 0xfa) MZ-1R12 SRAM
 //  map(0xfe, 0xfe) printer (w) strobe/reset (r) status
@@ -584,7 +857,7 @@ void mz2000_state::mz2000_io(address_map &map)
  * ---- x--- end of tape reached
  * ---- ---x "blank" control
  */
-u8 mz2000_state::ppi_portb_r()
+u8 mz80b_state::ppi_portb_r()
 {
 	u8 res = m_io_keys[3]->read() & 0x80;
 
@@ -613,7 +886,7 @@ u8 mz2000_state::ppi_portb_r()
  * ---- --x- tape ff
  * ---- ---x tape rewind
  */
-void mz2000_state::ppi_porta_w(u8 data)
+void mz80b_state::ppi_porta_w(u8 data)
 {
 	if((m_tape_ctrl & 0x80) == 0 && data & 0x80)
 	{
@@ -673,7 +946,7 @@ void mz2000_state::ppi_porta_w(u8 data)
  * ---- -x-- DAC1BIT state
  * ---- --x- 0->1 transition = Work RAM reset
  */
-void mz2000_state::ppi_portc_w(u8 data)
+void mz80b_state::ppi_portc_w(u8 data)
 {
 	//logerror("C W %02x\n",data);
 
@@ -698,7 +971,7 @@ void mz2000_state::ppi_portc_w(u8 data)
 	m_old_portc = data;
 }
 
-void mz2000_state::pio_porta_w(u8 data)
+void mz80b_state::pio_porta_w(u8 data)
 {
 	m_vram_overlay_enable = BIT(data, 7);
 	m_vram_overlay_select = BIT(data, 6);
@@ -718,7 +991,7 @@ void mz2000_state::pio_porta_w(u8 data)
 	m_porta_latch = data;
 }
 
-u8 mz2000_state::pio_portb_r()
+u8 mz80b_state::pio_portb_r()
 {
 	if(((m_key_mux & 0x10) == 0x00) || ((m_key_mux & 0x0f) == 0x0f)) //status read
 	{
@@ -734,7 +1007,7 @@ u8 mz2000_state::pio_portb_r()
 	return m_io_keys[m_key_mux & 0xf]->read();
 }
 
-u8 mz2000_state::pio_porta_r()
+u8 mz80b_state::pio_porta_r()
 {
 	return m_porta_latch;
 }
@@ -750,17 +1023,17 @@ u8 mz2000_state::pio_porta_r()
    has been mapped accordingly.
 */
 
-INPUT_CHANGED_MEMBER(mz2000_state::boot_reset_cb)
+INPUT_CHANGED_MEMBER(mz80b_state::boot_reset_cb)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER(mz2000_state::ipl_reset_cb)
+INPUT_CHANGED_MEMBER(mz80b_state::ipl_reset_cb)
 {
 	machine().schedule_soft_reset();
 }
 
-TIMER_CALLBACK_MEMBER(mz2000_state::ipl_timer_reset_cb)
+TIMER_CALLBACK_MEMBER(mz80b_state::ipl_timer_reset_cb)
 {
 	logerror("IPL reset kicked in\n");
 	machine().schedule_soft_reset();
@@ -768,8 +1041,8 @@ TIMER_CALLBACK_MEMBER(mz2000_state::ipl_timer_reset_cb)
 
 static INPUT_PORTS_START( mz80be ) // European keyboard
 	PORT_START("BACK_PANEL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mz2000_state::boot_reset_cb), 0) PORT_NAME("Boot Reset")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mz2000_state::ipl_reset_cb), 0) PORT_NAME("IPL Reset")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mz80b_state::boot_reset_cb), 0) PORT_NAME("Boot Reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mz80b_state::ipl_reset_cb), 0) PORT_NAME("IPL Reset")
 
 	PORT_START("KEY0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
@@ -1000,7 +1273,7 @@ static GFXDECODE_START( gfx_mz2000 )
 //  GFXDECODE_ENTRY( "chargen", 0x0800, charlayout_8x16, 0, 1 )
 GFXDECODE_END
 
-void mz2000_state::machine_start()
+void mz80b_state::machine_start()
 {
 	m_work_ram = make_unique_clear<u8[]>(0x10000);
 	save_pointer(NAME(m_work_ram), 0x10000);
@@ -1021,7 +1294,7 @@ void mz2000_state::machine_start()
 	m_hblank_timer = timer_alloc(FUNC(mz2000_state::hblank_cb), this);
 }
 
-void mz2000_state::machine_reset()
+void mz80b_state::machine_reset()
 {
 	m_ipl_view.select(0);
 
@@ -1033,7 +1306,7 @@ void mz2000_state::machine_reset()
 }
 
 
-void mz2000_state::floppy_formats(format_registration &fr)
+void mz80b_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_2D_FORMAT);
@@ -1047,7 +1320,7 @@ static void mz2000_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-SNAPSHOT_LOAD_MEMBER(mz2000_state::snapshot_cb)
+SNAPSHOT_LOAD_MEMBER(mz80b_state::snapshot_cb)
 {
 	if (image.length() > 0x10000)
 		return std::make_pair(image_error::INVALIDLENGTH, std::string());
@@ -1066,7 +1339,7 @@ SNAPSHOT_LOAD_MEMBER(mz2000_state::snapshot_cb)
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-TIMER_CALLBACK_MEMBER(mz2000_state::hblank_cb)
+TIMER_CALLBACK_MEMBER(mz80b_state::hblank_cb)
 {
 	m_hblank_state = param;
 
@@ -1085,24 +1358,24 @@ TIMER_CALLBACK_MEMBER(mz2000_state::hblank_cb)
 }
 
 // TODO: verify all clocks
-void mz2000_state::mz2000(machine_config &config)
+void mz80b_state::mz80b(machine_config &config)
 {
 	constexpr XTAL MASTER_CLOCK = XTAL(24'000'000) / 6;
 
 	Z80(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mz2000_state::mz2000_map);
-	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz80b_state::mz80b_map);
+	m_maincpu->set_addrmap(AS_IO, &mz80b_state::mz80b_io);
 //  m_maincpu->set_addrmap(AS_OPCODES, &mz2000_state::mz2000_opcodes);
 
 	i8255_device &ppi(I8255(config, "ppi"));
-	ppi.out_pa_callback().set(FUNC(mz2000_state::ppi_porta_w));
-	ppi.in_pb_callback().set(FUNC(mz2000_state::ppi_portb_r));
-	ppi.out_pc_callback().set(FUNC(mz2000_state::ppi_portc_w));
+	ppi.out_pa_callback().set(FUNC(mz80b_state::ppi_porta_w));
+	ppi.in_pb_callback().set(FUNC(mz80b_state::ppi_portb_r));
+	ppi.out_pc_callback().set(FUNC(mz80b_state::ppi_portc_w));
 
 	z80pio_device &pio(Z80PIO(config, "pio", MASTER_CLOCK));
-	pio.in_pa_callback().set(FUNC(mz2000_state::pio_porta_r));
-	pio.out_pa_callback().set(FUNC(mz2000_state::pio_porta_w));
-	pio.in_pb_callback().set(FUNC(mz2000_state::pio_portb_r));
+	pio.in_pa_callback().set(FUNC(mz80b_state::pio_porta_r));
+	pio.out_pa_callback().set(FUNC(mz80b_state::pio_porta_w));
+	pio.in_pb_callback().set(FUNC(mz80b_state::pio_portb_r));
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(MASTER_CLOCK / 128); // 31'250
@@ -1136,7 +1409,7 @@ void mz2000_state::mz2000(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: unverified, 60 Hz/15.75 kHz according to MZ-80B service manual
 	m_screen->set_raw(XTAL(14'318'181), 910, 0, 640, 262, 0, 200);
-	m_screen->set_screen_update(FUNC(mz2000_state::screen_update));
+	m_screen->set_screen_update(FUNC(mz80b_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mz2000);
@@ -1145,7 +1418,17 @@ void mz2000_state::mz2000(machine_config &config)
 	// TODO: placeholder for actual MZ-1E18 / MZ-1R12 options.
 	// mz800 actually reads $f8-$fa from IPL
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "bin,dat", attotime::from_seconds(1)));
-	snapshot.set_load_callback(FUNC(mz2000_state::snapshot_cb));
+	snapshot.set_load_callback(FUNC(mz80b_state::snapshot_cb));
+}
+
+
+void mz2000_state::mz2000(machine_config &config)
+{
+	mz80b(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz2000_state::mz2000_map);
+	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
+
+	m_screen->set_screen_update(FUNC(mz2000_state::screen_update));
 }
 
 void mz2200_state::mz2200(machine_config &config)
@@ -1156,12 +1439,6 @@ void mz2200_state::mz2200(machine_config &config)
 	PALETTE(config.replace(), m_palette, palette_device::BRG_3BIT);
 }
 
-// TODO: significantly different memory model and video output (PIO-3039)
-void mz2000_state::mz80b(machine_config &config)
-{
-	mz2000(config);
-	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz80b_io);
-}
 
 
 ROM_START( mz80b )
@@ -1197,6 +1474,6 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1981, mz80b,  0,      0,      mz80b,   mz80be, mz2000_state, empty_init, "Sharp", "MZ-80B",  MACHINE_NOT_WORKING )
+COMP( 1981, mz80b,  0,      0,      mz80b,   mz80be, mz80b_state,  empty_init, "Sharp", "MZ-80B",  MACHINE_NOT_WORKING )
 COMP( 1982, mz2000, 0,      0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2000", MACHINE_NOT_WORKING )
 COMP( 1982, mz2200, mz2000, 0,      mz2200,  mz80bj, mz2200_state, empty_init, "Sharp", "MZ-2200", MACHINE_NOT_WORKING )
