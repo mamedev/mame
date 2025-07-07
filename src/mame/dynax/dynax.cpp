@@ -1980,7 +1980,7 @@ static INPUT_PORTS_START( hjingi )
 	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )                                                    // １コイン　１プレイ
 	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )                                                    // １コイン　２プレイ
 	PORT_DIPSETTING(    0x01, DEF_STR(1C_5C) )                                                    // １コイン　５プレイ
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )                                               // １コイン１０プレイ
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_10C) )                                                   // １コイン１０プレイ
 	PORT_DIPNAME( 0x04, 0x04, "Key-In Rate" )                PORT_DIPLOCATION("DIPSW 3:3")        // キーインレーと
 	PORT_DIPSETTING(    0x00, "5" )      PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)               // ×　５
 	PORT_DIPSETTING(    0x00, "10" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)

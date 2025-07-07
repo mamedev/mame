@@ -1044,7 +1044,7 @@ static INPUT_PORTS_START( forgottnj ) // Where's the Demo Sound????
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, "2 Coins / 2 Credits" ) // Must insert 2 coins to get a credit, but credits come in 2s
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_2C ) ) // Must insert 2 coins to get a credit, but credits come in 2s
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
@@ -1053,7 +1053,7 @@ static INPUT_PORTS_START( forgottnj ) // Where's the Demo Sound????
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, "2 Coins / 2 Credits" ) // Must insert 2 coins to get a credit, but credits come in 2s
+	PORT_DIPSETTING(    0x30, DEF_STR( 2C_2C ) ) // Must insert 2 coins to get a credit, but credits come in 2s
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
