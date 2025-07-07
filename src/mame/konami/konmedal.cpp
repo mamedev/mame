@@ -223,7 +223,7 @@ void konmedal_state::medalcnt_w(uint8_t data)
 
 void konmedal_state::lamps_w(uint8_t data)
 {
-	//  CN6
+	// CN6
 	for (int i = 0; i < 8; i++)
 	{
 		m_lamps[i] = BIT(data, i);
@@ -243,7 +243,7 @@ uint8_t konmedal_state::vram_r(offs_t offset)
 			return m_k056832->ram_code_lo_r(offset>>1);
 		}
 	}
-	else if (m_control == 0)    // ROM readback
+	else if (m_control == 0) // ROM readback
 	{
 		return m_k056832->konmedal_rom_r(offset);
 	}
@@ -264,7 +264,7 @@ uint8_t konmedal_state::chusenoh_vram_r(offs_t offset)
 			return m_k056832->ram_code_lo_r(offset >> 1);
 		}
 	}
-	else    // ROM readback
+	else // ROM readback
 	{
 		return m_k056832->chusenoh_rom_r(offset);
 	}
@@ -275,7 +275,7 @@ uint8_t konmedal_state::chusenoh_vram_r(offs_t offset)
 void konmedal_state::vram_w(offs_t offset, uint8_t data)
 {
 	// there are (very few) writes above F000 in some screens.
-	// bug?  debug?  this?  who knows.
+	// bug? debug? this? who knows.
 
 	if (offset & 1)
 	{
@@ -396,8 +396,11 @@ uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_in
 	}
 
 	for (int p = 0; p < 2; p++)
+	{
 		for (int l = 0; l < 4; l++)
 			m_k056832->tilemap_draw(screen, bitmap, cliprect, m_layer_order[l], TILEMAP_DRAW_CATEGORY(p), 0);
+	}
+
 	return 0;
 }
 
@@ -406,9 +409,13 @@ uint32_t konmedal_state::screen_update_shuriboy(screen_device &screen, bitmap_in
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 	m_k052109->tilemap_update();
+
 	for (int p = 0; p < 2; p++)
+	{
 		for (int l = 0; l < 3; l++)
 			m_k052109->tilemap_draw(screen, bitmap, cliprect, m_layer_order[l], TILEMAP_DRAW_CATEGORY(p), 0);
+	}
+
 	return 0;
 }
 
@@ -557,14 +564,14 @@ void konmedal_state::shuriboy_main(address_map &map)
 static INPUT_PORTS_START( konmedal )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, "Coin Slot 1" )   PORT_DIPLOCATION("SW1:1,2,3")
-	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) ) // 0.2
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) ) // 0.25
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) ) // 0.33
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) ) // 0.4
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) ) // 0.5
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) ) // 0.75
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) ) // 1.0
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) ) // 1.5
 	PORT_DIPNAME( 0x78, 0x00, "Coin Slot 2" )   PORT_DIPLOCATION("SW1:4,5,6,7")
 //  PORT_DIPSETTING(    0x78, "2 Medals" )
 	PORT_DIPSETTING(    0x70, "2 Medals" )
@@ -677,12 +684,12 @@ static INPUT_PORTS_START( fuusenpn )
 	PORT_DIPNAME( 0x07, 0x07, "Coin Slot 1" )   PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "5 Coins/0 Credits" )
 	PORT_DIPSETTING(    0x04, "3 Coins/0 Credits" )
-	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) ) // 0.2
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) ) // 0.25
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) ) // 0.33
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) ) // 0.5
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_3C ) ) // 0.75
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) ) // 1.0
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mario )
@@ -691,13 +698,13 @@ static INPUT_PORTS_START( mario )
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, "Coin Slot 1" )   PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x04, "3 Coins/0 Credits" )
-	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) ) // 0.2
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) ) // 0.25
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) ) // 0.33
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) ) // 0.4
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) ) // 0.5
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_3C ) ) // 0.75
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) ) // 1.0
 	PORT_DIPNAME( 0x38, 0x38, "Coin Slot 2" )   PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(    0x00, "4 Medals" )
 	PORT_DIPSETTING(    0x08, "5 Medals" )
@@ -751,34 +758,34 @@ static INPUT_PORTS_START( slimekun )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR ( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(    0x00, "4 Coins/0 Credits" )
-	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x00, "1 Coins/0 Credits" )
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) ) // 0.25
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) ) // 0.33
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) ) // 0.5
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_2C ) ) // 0.66
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) ) // 0.75
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) ) // 1.0
+	PORT_DIPSETTING(    0x03, DEF_STR( 3C_4C ) ) // 1.33
+	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ) ) // 1.5
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) ) // 2.0
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_5C ) ) // 2.5
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) ) // 3.0
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) ) // 4.0
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) ) // 5.0
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) ) // 6.0
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) ) // 7.0
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR ( Coin_B ) )   PORT_DIPLOCATION("SW1:5,6,7,8")
-	PORT_DIPSETTING(    0x00, "4 Coins/0 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coins/0 Credits" )
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_5C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
@@ -812,63 +819,7 @@ static INPUT_PORTS_START( slimekun )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tsururin )
-	PORT_INCLUDE( shuriboy )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // works as start, too
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	// 0x80 upd busy_r
-
-	PORT_MODIFY("IN2")
-	// 0x01 service coin
-	// 0x02 service switch
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	// 0x10 hopper line_r
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode but effect during gameplay unknown
-
-	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR ( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(    0x00, "4 Coins/0 Credits" )
-	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR ( Coin_B ) )   PORT_DIPLOCATION("SW1:5,6,7,8")
-	PORT_DIPSETTING(    0x00, "4 Coins/0 Credits" )
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
+	PORT_INCLUDE( slimekun )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1") // named 'Retire' in test screen
@@ -890,11 +841,19 @@ static INPUT_PORTS_START( tsururin )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Service_Mode ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 INPUT_PORTS_END
 
 void konmedal_state::machine_start_common()
 {
 	m_lamps.resolve();
+
 	save_item(NAME(m_control));
 	save_item(NAME(m_control2));
 	save_item(NAME(m_ccu_int_time));
@@ -1434,20 +1393,20 @@ ROM_END
 
 
 // Konami PWB 451847A and PWB 452093A boards (TMNT tilemaps)
-GAME( 1990, tsururin, 0,     tsururin, tsururin, konmedal_state, mario_init,    ROT0, "Konami", "Tsururin Kun", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING)
-GAME( 1991, slimekun, 0,     tsupenta, slimekun, konmedal_state, mario_init,    ROT0, "Konami", "Slime Kun", MACHINE_SUPPORTS_SAVE)
-GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,    ROT0, "Konami", "Mario Roulette", MACHINE_SUPPORTS_SAVE)
-GAME( 1991, tsupenta, 0,     tsupenta, tsupenta, konmedal_state, mario_init,    ROT0, "Konami", "Tsurikko Penta", MACHINE_SUPPORTS_SAVE)
-GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,    ROT0, "Konami", "Shuriken Boy", MACHINE_SUPPORTS_SAVE)
-GAME( 1993, fuusenpn, 0,     fuusenpn, fuusenpn, konmedal_state, fuusen_init,   ROT0, "Konami", "Fuusen Pentai", MACHINE_SUPPORTS_SAVE)
+GAME( 1990, tsururin, 0,     tsururin, tsururin, konmedal_state, mario_init,    ROT0, "Konami", "Tsururin Kun", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, slimekun, 0,     tsupenta, slimekun, konmedal_state, mario_init,    ROT0, "Konami", "Slime Kun", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,    ROT0, "Konami", "Mario Roulette", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tsupenta, 0,     tsupenta, tsupenta, konmedal_state, mario_init,    ROT0, "Konami", "Tsurikko Penta", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,    ROT0, "Konami", "Shuriken Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fuusenpn, 0,     fuusenpn, fuusenpn, konmedal_state, fuusen_init,   ROT0, "Konami", "Fuusen Pentai", MACHINE_SUPPORTS_SAVE )
 
 // Konami PWB 452574A boards (GX tilemaps)
-GAME( 1994, buttobi,  0,     ddboy,    ddboy,    konmedal_state, buttobi_init,  ROT0, "Konami", "Buttobi Striker", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1994, ddboy,    0,     ddboy,    ddboy,    konmedal_state, ddboy_init,    ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1994, buttobi,  0,     ddboy,    ddboy,    konmedal_state, buttobi_init,  ROT0, "Konami", "Buttobi Striker", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ddboy,    0,     ddboy,    ddboy,    konmedal_state, ddboy_init,    ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Konami PWB 452944A boards (GX tilemaps, TV Plug-and-Play form factor)
-GAME( 1992, chusenoh, 0,     chusenoh, chusenoh, konmedal_state, chusenoh_init, ROT0, "Konami", "Chusenoh", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1992, chusenoh, 0,     chusenoh, chusenoh, konmedal_state, chusenoh_init, ROT0, "Konami", "Chusenoh", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Konami PWB 402218 boards (GX tilemaps)
-GAME( 1994, ddboya,   ddboy, tsukande, ddboy,    konmedal_state, ddboy_init,    ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, tsuka_init,    ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_SUPPORTS_SAVE)
+GAME( 1994, ddboya,   ddboy, tsukande, ddboy,    konmedal_state, ddboy_init,    ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, tsuka_init,    ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_SUPPORTS_SAVE )
