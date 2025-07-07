@@ -25,12 +25,16 @@
       NC    |U|17|    NC
     1P "1"  |V|18|  1P "2"
 
+
+TODO:
+- hanaawasa reads inputs differently. Not implemented yet.
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -53,7 +57,7 @@ public:
 		m_player(*this, "P%u", 1U)
 	{ }
 
-	void hanaawas(machine_config &config);
+	void hanaawas(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -70,11 +74,11 @@ private:
 	required_ioport m_coins, m_start;
 	required_ioport_array<2> m_player;
 
-	tilemap_t    *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint8_t    m_mux;
-	uint8_t    m_coin_settings;
-	uint8_t    m_coin_impulse;
+	uint8_t m_mux = 0;
+	uint8_t m_coin_settings = 0;
+	uint8_t m_coin_impulse = 0;
 
 	uint8_t input_port_0_r();
 	void inputs_mux_w(uint8_t data);
@@ -83,7 +87,7 @@ private:
 	void key_matrix_status_w(uint8_t data);
 	void irq_ack_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void palette(palette_device &palette) const;
+	void palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void portb_w(uint8_t data);
 	void prg_map(address_map &map) ATTR_COLD;
@@ -368,11 +372,10 @@ void hanaawas_state::machine_reset()
 void hanaawas_state::hanaawas(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 18432000 / 6); // 3.072 MHz ???
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.072 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &hanaawas_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &hanaawas_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(hanaawas_state::irq0_line_assert));
-
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -389,7 +392,7 @@ void hanaawas_state::hanaawas(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 18432000 / 12));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 18.432_MHz_XTAL / 12));
 	aysnd.port_a_read_callback().set_ioport("DSW");
 	aysnd.port_b_write_callback().set(FUNC(hanaawas_state::portb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -421,7 +424,28 @@ ROM_START( hanaawas )
 	ROM_LOAD( "6g.bpr",     0x0120, 0x0100, CRC(4d94fed5) SHA1(3ea8e6fb95d5677991dc90fe7435f91e5320bb16) )  // I don't know what this is
 ROM_END
 
-} // Anonymous namespace
+ROM_START( hanaawasa ) // PC0-017-41 PCB
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "za51.1e", 0x0000, 0x2000, CRC(9f7d97cb) SHA1(d9172105acb268056ec53774c869cde91534aeb5) )
+	ROM_LOAD( "za12.3e", 0x2000, 0x1000, CRC(b29222f6) SHA1(7cafdd66cfd9cc6c0e9284095ef77859f2dadb12) )
+	ROM_LOAD( "za13.4e", 0x4000, 0x1000, CRC(8ba0ee3c) SHA1(dd5e9a1285ad19800d32ff029bb2ae4ea5ff8a57) )
+	ROM_LOAD( "za34.6e", 0x6000, 0x1000, CRC(7dd06d73) SHA1(2172c5e31afec023c585cc7e3a01fce20a0fa01c) )
+
+	ROM_REGION( 0x4000, "tiles", 0 )
+	ROM_LOAD( "za05.9a",  0x0000, 0x1000, CRC(304ae219) SHA1(c1eac4973a6aec9fd8e848c206870667a8bb0922) )
+	ROM_LOAD( "za06.10a", 0x1000, 0x1000, CRC(765a4e5f) SHA1(b2f148c60cffb75d1a841be8b924a874bff22ce4) )
+	ROM_LOAD( "za07.12a", 0x2000, 0x1000, CRC(4bffdd52) SHA1(c077506da0af589cdf366b3f1f1be9faa469771c) )
+	ROM_LOAD( "za38.13a", 0x3000, 0x1000, CRC(7dfd9deb) SHA1(bcddaf74be8d2d845a6f08fb9ad2a84d57712a53) )
+
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "z2.13j", 0x0000, 0x0020, CRC(99300d85) SHA1(dd383db1f3c8c6d784121d32f20ffed3d83e2278) )  // color PROM, N82S123
+	ROM_LOAD( "z1.2a",  0x0020, 0x0100, BAD_DUMP CRC(e26f21a2) SHA1(d0df06f833e0f97872d9d2ffeb7feef94aaaa02a) )  // lookup table, not dumped for this set but expected to match
+	ROM_LOAD( "6g.bpr", 0x0120, 0x0100, BAD_DUMP CRC(4d94fed5) SHA1(3ea8e6fb95d5677991dc90fe7435f91e5320bb16) )  // not dumped for this set
+ROM_END
+
+} // anonymous namespace
 
 
-GAME( 1982, hanaawas, 0, hanaawas, hanaawas, hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hanaawas,  0,        hanaawas, hanaawas, hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hanaawasa, hanaawas, hanaawas, hanaawas, hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+
