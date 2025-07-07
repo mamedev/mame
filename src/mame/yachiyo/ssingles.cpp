@@ -6,7 +6,6 @@
  Original Japan release is 'Utamaro' by 'Yachiyo' (undumped!)
  driver by Tomasz Slanina
 
-
  Crap XXX game.
  Three ROMs contain text "BY YACHIYO"
 
@@ -20,14 +19,16 @@
 
  Unknown reads/writes:
  - AY i/o ports (writes)
- - mem $c000, $c001 = protection device ? if tests fails, game crashes (problems with stack - skipped code with "pop af")
- - i/o port $8 = data read used for  $e command arg for one of AY chips (volume? - could be a sample player (based on volume changes?)
+ - mem $c000, $c001 = protection device ? if tests fails, game crashes
+   (problems with stack - skipped code with "pop af")
+ - i/o port $8 = data read used for $e command arg for one of AY chips
+   (volume? - could be a sample player (based on volume changes?)
  - i/o port $1a = 1 or 0, rarely accessed, related to crt writes
 
 ==================================================================
 
 Computer Quiz Atama no Taisou
-(c)1983 Yachiyo Denki / Uni Enterprize
+(c)1983 Yachiyo Denki / Uni Enterprise
 
 -----------------------------------------
 TZU-093
@@ -178,6 +179,7 @@ public:
 	ssingles_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_videoram(*this, "videoram")
 		, m_colorram(*this, "colorram")
 		, m_gfx_rom(*this, "gfx")
@@ -190,10 +192,12 @@ public:
 	ioport_value controls_r();
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -202,17 +206,14 @@ private:
 	required_ioport m_extra;
 
 	pen_t m_pens[NUM_PENS];
-
-	// ssingles
 	uint8_t m_prot_data = 0;
-
-	// atamanot
-	uint8_t m_atamanot_prot_state = 0;
 
 	// ssingles
 	uint8_t c000_r();
 	uint8_t c001_r();
 	void c001_w(uint8_t data);
+
+	void palette(palette_device &palette) const;
 
 	// atamanot
 	uint8_t atamanot_prot_r(offs_t offset);
@@ -228,18 +229,36 @@ private:
 	void ssingles_map(address_map &map) ATTR_COLD;
 };
 
-//fake palette
+void ssingles_state::machine_start()
+{
+	save_item(NAME(m_prot_data));
+}
+
+
+// fake palette
 static constexpr rgb_t ssingles_colors[NUM_PENS] =
 {
-	{ 0x00,0x00,0x00 }, { 0xff,0xff,0xff }, { 0xff,0x00,0x00 }, { 0x80,0x00,0x00 },
-	{ 0x00,0x00,0x00 }, { 0xf0,0xf0,0xf0 }, { 0xff,0xff,0x00 }, { 0x40,0x40,0x40 },
-	{ 0x00,0x00,0x00 }, { 0xff,0xff,0xff }, { 0xff,0x00,0x00 }, { 0xff,0xff,0x00 },
-	{ 0x00,0x00,0x00 }, { 0xff,0xff,0x00 }, { 0xd0,0x00,0x00 }, { 0x80,0x00,0x00 },
-	{ 0x00,0x00,0x00 }, { 0xff,0x00,0x00 }, { 0xff,0xff,0x00 }, { 0x80,0x80,0x00 },
-	{ 0x00,0x00,0x00 }, { 0xff,0x00,0x00 }, { 0x40,0x40,0x40 }, { 0xd0,0xd0,0xd0 },
-	{ 0x00,0x00,0x00 }, { 0x00,0x00,0xff }, { 0x60,0x40,0x30 }, { 0xff,0xff,0x00 },
-	{ 0x00,0x00,0x00 }, { 0xff,0x00,0xff }, { 0x80,0x00,0x80 }, { 0x40,0x00,0x40 }
+	{ 0x00,0x00,0x00 }, { 0xff,0xff,0xff }, { 0xff,0x00,0x00 }, { 0xaa,0x00,0x00 },
+	{ 0x00,0x00,0x00 }, { 0xff,0xff,0xff }, { 0xff,0xaa,0x00 }, { 0xaa,0x55,0x00 },
+	{ 0x00,0x00,0x00 }, { 0xff,0xff,0xff }, { 0xff,0x00,0x00 }, { 0xff,0xaa,0x00 },
+	{ 0x00,0x00,0x00 }, { 0xff,0xaa,0x00 }, { 0xff,0x00,0x00 }, { 0xff,0x55,0x00 },
+	{ 0x00,0x00,0x00 }, { 0xff,0xff,0x00 }, { 0xff,0xaa,0x00 }, { 0xaa,0x55,0x00 },
+	{ 0x00,0x00,0x00 }, { 0xff,0x00,0x00 }, { 0xff,0xff,0x00 }, { 0x00,0xff,0x00 },
+	{ 0x00,0x00,0x00 }, { 0x00,0x00,0xff }, { 0xaa,0xff,0x00 }, { 0xff,0xaa,0x00 },
+	{ 0x00,0x00,0x00 }, { 0xff,0x00,0xff }, { 0xaa,0x00,0xaa }, { 0x55,0x00,0x55 }
 };
+
+void ssingles_state::palette(palette_device &palette) const
+{
+	for (int i = 0; i < NUM_PENS; ++i)
+		palette.set_pen_color(i, ssingles_colors[i]);
+}
+
+void ssingles_state::video_start()
+{
+	for (int i = 0; i < NUM_PENS; ++i)
+		m_pens[i] = ssingles_colors[i];
+}
 
 MC6845_UPDATE_ROW(ssingles_state::ssingles_update_row)
 {
@@ -306,13 +325,6 @@ MC6845_UPDATE_ROW(ssingles_state::atamanot_update_row)
 }
 
 
-void ssingles_state::video_start()
-{
-	for (int i = 0; i < NUM_PENS; ++i)
-		m_pens[i] = ssingles_colors[i];
-}
-
-
 uint8_t ssingles_state::c000_r()
 {
 	return m_prot_data;
@@ -332,7 +344,7 @@ void ssingles_state::c001_w(uint8_t data)
 ioport_value ssingles_state::controls_r()
 {
 	int data = 7;
-	switch (m_extra->read())     //multiplexed
+	switch (m_extra->read()) // multiplexed
 	{
 		case 0x01: data = 1; break;
 		case 0x02: data = 2; break;
@@ -362,9 +374,9 @@ uint8_t ssingles_state::atamanot_prot_r(offs_t offset)
 {
 	static const char prot_id[] = { "PROGRAM BY KOYAMA" };
 
-	LOGATAMANOTPROT("%04x %02x\n", offset, m_atamanot_prot_state);
+	LOGATAMANOTPROT("%04x %02x\n", offset, m_prot_data);
 
-	switch (m_atamanot_prot_state)
+	switch (m_prot_data)
 	{
 		case 0x20:
 		case 0x21:
@@ -381,7 +393,7 @@ uint8_t ssingles_state::atamanot_prot_r(offs_t offset)
 
 void ssingles_state::atamanot_prot_w(uint8_t data)
 {
-	m_atamanot_prot_state = data;
+	m_prot_data = data;
 }
 
 
@@ -395,8 +407,6 @@ void ssingles_state::atamanot_map(address_map &map)
 //  map(0x6000, 0x7fff).rom();
 	map(0x8000, 0x83ff).r(FUNC(ssingles_state::atamanot_prot_r));
 //  map(0x8000, 0x9fff).rom().region("question", 0x10000);
-//  map(0xc000, 0xc000).r(FUNC(ssingles_state::c000_r));
-//  map(0xc001, 0xc001).rw(FUNC(ssingles_state::c001_r), FUNC(ssingles_state::c001_w));
 }
 
 void ssingles_state::ssingles_io_map(address_map &map)
@@ -475,7 +485,7 @@ static INPUT_PORTS_START( ssingles )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Unk 6" )
+	PORT_DIPNAME( 0x03, 0x03, "Unk6" )
 	PORT_DIPSETTING(    0x01, "Pos 1" )
 	PORT_DIPSETTING(    0x03, "Pos 2" )
 	PORT_DIPSETTING(    0x00, "Pos 3" )
@@ -549,27 +559,29 @@ static GFXDECODE_START( gfx_ssingles )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_atamanot )
-	GFXDECODE_ENTRY( "gfx", 0, layout_8x8, 0, 8 )
-	GFXDECODE_ENTRY( "kanji", 0, layout_16x16,     0, 8 )
-	GFXDECODE_ENTRY( "kanji_uc", 0, layout_8x16,     0, 8 )
-	GFXDECODE_ENTRY( "kanji_lc", 0, layout_8x16,     0, 8 )
+	GFXDECODE_ENTRY( "gfx",      0, layout_8x8,   0, 8 )
+	GFXDECODE_ENTRY( "kanji",    0, layout_16x16, 0, 8 )
+	GFXDECODE_ENTRY( "kanji_uc", 0, layout_8x16,  0, 8 )
+	GFXDECODE_ENTRY( "kanji_lc", 0, layout_8x16,  0, 8 )
 GFXDECODE_END
 
 void ssingles_state::ssingles(machine_config &config)
 {
-	Z80(config, m_maincpu, 4'000'000);         // ? MHz
+	// basic machine hardware
+	Z80(config, m_maincpu, 14_MHz_XTAL / 4); // 3.5 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssingles_state::ssingles_map);
 	m_maincpu->set_addrmap(AS_IO, &ssingles_state::ssingles_io_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(4'000'000, 256, 0, 256, 256, 0, 256);   // temporary, CRTC will configure screen
-	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	// video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(14_MHz_XTAL / 2, 424, 0, 288, 256, 0, 224); // from CRTC
+	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	PALETTE(config, "palette").set_entries(4); // guess
+	PALETTE(config, "palette", FUNC(ssingles_state::palette), NUM_PENS);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ssingles);
 
-	mc6845_device &crtc(MC6845(config, "crtc", 1'000'000)); // ? MHz
+	mc6845_device &crtc(MC6845(config, "crtc", 14_MHz_XTAL / 16));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
@@ -579,8 +591,8 @@ void ssingles_state::ssingles(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.5); // ? MHz
-	AY8910(config, "ay2", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.5); // ? MHz
+	AY8910(config, "ay1", 14_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.5);
+	AY8910(config, "ay2", 14_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void ssingles_state::atamanot_irq(int state)
@@ -592,8 +604,12 @@ void ssingles_state::atamanot(machine_config &config)
 {
 	ssingles(config);
 
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssingles_state::atamanot_map);
 	m_maincpu->set_addrmap(AS_IO, &ssingles_state::atamanot_io_map);
+
+	// video hardware
+	m_screen->set_raw(14_MHz_XTAL / 2, 400, 0, 288, 293, 0, 192); // from CRTC
 
 	mc6845_device &crtc(*subdevice<mc6845_device>("crtc"));
 	crtc.set_update_row_callback(FUNC(ssingles_state::atamanot_update_row));
@@ -620,7 +636,6 @@ ROM_START( ssingles )
 	ROM_LOAD( "6.bin", 0x02000, 0x2000, CRC(85ab8aab) SHA1(566f034e1ba23382442f27457447133a0e0f1cfc) )
 	ROM_LOAD( "7.bin", 0x04000, 0x2000, CRC(57cc112d) SHA1(fc861c58ae39503497f04d302a9f16fca19b37fb) )
 	ROM_LOAD( "8.bin", 0x06000, 0x2000, CRC(52de717a) SHA1(e60399355165fb46fac862fb7fcdff16ff351631) )
-
 ROM_END
 
 
@@ -673,4 +688,4 @@ ROM_END
 
 
 GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles_state, empty_init, ROT90, "Yachiyo Denki (Entertainment Enterprises, Ltd. license)", "Swinging Singles (US)",                 MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND )
-GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles_state, empty_init, ROT90, "Yachiyo Denki / Uni Enterprize",                          "Computer Quiz Atama no Taisou (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles_state, empty_init, ROT90, "Yachiyo Denki / Uni Enterprise",                          "Computer Quiz Atama no Taisou (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
