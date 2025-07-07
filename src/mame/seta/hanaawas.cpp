@@ -33,6 +33,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
 
 #include "emupal.h"
@@ -58,6 +59,7 @@ public:
 	{ }
 
 	void hanaawas(machine_config &config) ATTR_COLD;
+	void hanaawasa(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -71,7 +73,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_ioport m_coins, m_start;
+	optional_ioport m_coins, m_start;
 	required_ioport_array<2> m_player;
 
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -82,6 +84,7 @@ private:
 
 	uint8_t input_port_0_r();
 	void inputs_mux_w(uint8_t data);
+	uint8_t hanaawasa_matrix_r();
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	void key_matrix_status_w(uint8_t data);
@@ -91,7 +94,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void portb_w(uint8_t data);
 	void prg_map(address_map &map) ATTR_COLD;
-	void io_map(address_map &map) ATTR_COLD;
+	void base_io_map(address_map &map) ATTR_COLD;
+	void hanaawas_io_map(address_map &map) ATTR_COLD;
+	void hanaawasa_io_map(address_map &map) ATTR_COLD;
 };
 
 uint8_t hanaawas_state::input_port_0_r()
@@ -156,6 +161,25 @@ void hanaawas_state::key_matrix_status_w(uint8_t data)
 {
 	if ((data & 0xf0) == 0x40) //coinage setting command
 		m_coin_settings = data & 0xf;
+}
+
+uint8_t hanaawas_state::hanaawasa_matrix_r()
+{
+	uint8_t ret = 0xff;
+
+	if (!BIT(m_mux, 3))
+		ret &= (~m_player[0]->read() & 0x01f) << 3 | 0x07;
+
+	if (!BIT(m_mux, 2))
+		ret &= (~m_player[0]->read() & 0x3e0) >> 2 | 0x07;
+
+	if (!BIT(m_mux, 0))
+		ret &= (~m_player[1]->read() & 0x01f) << 3 | 0x07;
+
+	if (!BIT(m_mux, 6))
+		ret &= (~m_player[1]->read() & 0x3e0) >> 2 | 0x07;
+
+	return ret;
 }
 
 /***************************************************************************
@@ -264,21 +288,28 @@ void hanaawas_state::prg_map(address_map &map)
 }
 
 
-void hanaawas_state::io_map(address_map &map)
+void hanaawas_state::base_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(FUNC(hanaawas_state::input_port_0_r), FUNC(hanaawas_state::inputs_mux_w));
-	map(0x01, 0x01).nopr().w(FUNC(hanaawas_state::key_matrix_status_w)); // r bit 1: status ready, presumably of the input mux device / w = configure device?
 	map(0x10, 0x10).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x10, 0x11).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xc0, 0xc0).nopw(); // watchdog
 }
 
-static INPUT_PORTS_START( hanaawas )
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+void hanaawas_state::hanaawas_io_map(address_map &map)
+{
+	base_io_map(map);
+	map(0x00, 0x00).rw(FUNC(hanaawas_state::input_port_0_r), FUNC(hanaawas_state::inputs_mux_w));
+	map(0x01, 0x01).nopr().w(FUNC(hanaawas_state::key_matrix_status_w)); // r bit 1: status ready, presumably of the input mux device / w = configure device?
+}
 
+void hanaawas_state::hanaawasa_io_map(address_map &map)
+{
+	base_io_map(map);
+	map(0x00, 0x03).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
+
+static INPUT_PORTS_START( common )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -328,10 +359,31 @@ static INPUT_PORTS_START( hanaawas )
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_HANAFUDA_H ) PORT_PLAYER(2)
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_HANAFUDA_YES ) PORT_PLAYER(2)
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_HANAFUDA_NO ) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hanaawas )
+	PORT_INCLUDE( common )
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 
 	PORT_START("START")
 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_START2 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hanaawasa )
+	PORT_INCLUDE( common )
+
+	PORT_START("START")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown system input")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -374,7 +426,7 @@ void hanaawas_state::hanaawas(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.072 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &hanaawas_state::prg_map);
-	m_maincpu->set_addrmap(AS_IO, &hanaawas_state::io_map);
+	m_maincpu->set_addrmap(AS_IO, &hanaawas_state::hanaawas_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(hanaawas_state::irq0_line_assert));
 
 	// video hardware
@@ -396,6 +448,18 @@ void hanaawas_state::hanaawas(machine_config &config)
 	aysnd.port_a_read_callback().set_ioport("DSW");
 	aysnd.port_b_write_callback().set(FUNC(hanaawas_state::portb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void hanaawas_state::hanaawasa(machine_config &config)
+{
+	hanaawas(config);
+
+	m_maincpu->set_addrmap(AS_IO, &hanaawas_state::hanaawasa_io_map);
+
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("START");
+	ppi.in_pb_callback().set(FUNC(hanaawas_state::hanaawasa_matrix_r));
+	ppi.out_pc_callback().set(FUNC(hanaawas_state::inputs_mux_w));
 }
 
 
@@ -446,6 +510,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1982, hanaawas,  0,        hanaawas, hanaawas, hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, hanaawasa, hanaawas, hanaawas, hanaawas, hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hanaawas,  0,        hanaawas,  hanaawas,  hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hanaawasa, hanaawas, hanaawasa, hanaawasa, hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
