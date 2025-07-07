@@ -722,6 +722,23 @@ ROM_START( mympac )
 	ROM_LOAD16_WORD_SWAP( "m29w640ft.bin", 0x000000, 0x800000, CRC(d6ceda9e) SHA1(c897f8d5661fea0c030daf9c5e92524eb4e71d52) )
 ROM_END
 
+ROM_START( mygalag )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "galaga_standup_s29al016d70tfi02_00012249.bin", 0x000000, 0x200000, CRC(8f3d2e05) SHA1(8f6a54e5a8ee55e7a6cae3e72b8e70c4eee2c1ef) )
+ROM_END
+
+ROM_START( mygalaga )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "galaga_s29jl032h70tfi01_0001227e.bin", 0x000000, 0x400000, CRC(e775089a) SHA1(0938afa8e92a8c77b4fb86e0ec044fbb2b572570) )
+ROM_END
+
+ROM_START( mysinv )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "spaceinvaders_s29gl0640n90tfi04_0001227e.bin", 0x000000, 0x800000, CRC(55e001d1) SHA1(1eaa377bf78a0f1f492565a9f38b2f7d60d0e440) )
+	ROM_IGNORE(0x100)
+ROM_END
+
+
 
 /*
 
@@ -972,6 +989,12 @@ CONS( 2018, ra145,     0,        0, megadriv_ra145_ntsc, msi_6button,           
 CONS( 2021, mypac,     0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Pac-Man (DGUNL-4198, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
 CONS( 2021, mympac,    0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Ms. Pac-Man (DGUNL-7010, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+
+// menu uses unsupported extended mode
+CONS( 2021, mygalag,   0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Galaga (DGUNL-4195, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mygalaga,  mygalag,  0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Galaga (DGUNL-4199, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+
+CONS( 2021, mysinv,    0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Space Invaders (DGUNL-7006, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT90 )
 
 CONS( 2012, atgame40,  0,        0, megadriv_radica_3button_pal,  radica_3button, megadriv_b010xx_select_state, init_atgame40, "AtGames",               "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)
 
