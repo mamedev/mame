@@ -164,7 +164,10 @@ void i8256_device::write(offs_t offset, u8 data)
 
 				set_rate(baudRates[m_command2 & 0x0F]);
 
-				m_parity = BIT(m_command2,CMD2_EP) ? PARITY_EVEN : PARITY_ODD;
+				if (BIT(m_command2,CMD2_PEN))
+					m_parity = BIT(m_command2,CMD2_EP) ? PARITY_EVEN : PARITY_ODD;
+				else
+					m_parity = PARITY_NONE;				
 
 				set_data_frame(1, m_data_bits_count, m_parity, m_stop_bits);
 
