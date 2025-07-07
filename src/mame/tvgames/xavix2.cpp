@@ -801,6 +801,13 @@ ROM_START( epo_sskj )
 	// SEEPROM is a AT24C04 at u4
 ROM_END
 
+ROM_START( epo_ssk2 )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "ssk2.u2", 0x000000, 0x800000, CRC(d5902e48) SHA1(010bc2417814ded24a474d9165f6b9523af7d1ef) )
+
+	// SEEPROM is a 24CS04
+ROM_END
+
 ROM_START( epo_pabj )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "pabj.u3", 0x000000, 0x800000, CRC(ac46991c) SHA1(06c2b493824085502e96a7c1e46e9e89433e7301) )
@@ -839,6 +846,8 @@ CONS( 2006, epo_dtcj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / S
 
 // SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦
 CONS( 2006, epo_sskj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Sasuke & Kinniku Battle!! Sportsman No. 1 Ketteisen (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 200?, epo_ssk2, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Sasuke 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, epo_pabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "TV de Asobou! Manabou! Pooh-san to Issho: ABC AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
