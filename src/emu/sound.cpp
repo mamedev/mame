@@ -689,7 +689,7 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_effects_thread(nullptr),
 #endif
 	m_effects_done(false),
-	m_master_gain(1.0),
+	m_master_gain(osd::db_to_linear(machine.options().volume())),
 	m_muted(0),
 	m_nosound_mode(machine.osd().no_sound()),
 	m_unique_id(0),
@@ -1316,8 +1316,6 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 			if(lv_node)
 				m_master_gain = lv_node->get_attribute_float("gain", 1.0);
 		}
-		else
-			m_master_gain = osd::db_to_linear(machine().options().volume());
 
 		for(const util::xml::data_node *lv_node = parentnode->get_child("device_volume"); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_volume")) {
 			std::string device_tag = lv_node->get_attribute_string("device", "");

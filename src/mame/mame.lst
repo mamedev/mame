@@ -1506,6 +1506,7 @@ magibombl
 magibombm
 magibombn
 magibombo
+magibombp
 monkeyl
 monkeyla
 monkeylb
@@ -1521,6 +1522,7 @@ speedmst
 speedmsta
 speedmstb
 westvent
+westventa
 winbingo
 winbingoa
 wwitch
@@ -24095,6 +24097,7 @@ fantsia2a
 fantsia2n
 fantsy95
 galhustl
+galhustla
 galsnew
 galsnewj
 galsnewk
@@ -32114,6 +32117,7 @@ neoprint
 npcartv1
 npcramen
 npeurver
+npeurver2
 npfpit
 npft
 npmillen
@@ -32461,6 +32465,9 @@ pr_walls
 pr_whlft
 pr_wldkn
 pr_wnstk
+
+@source:misc/ps_m3.cpp
+unkpara
 
 @source:misc/psattack.cpp
 psattack
@@ -41972,6 +41979,9 @@ tvdenwad
 tvdenwam
 tvdenwat
 
+@source:seibu/banprestomsz80.cpp
+dnjsenso
+
 @source:seibu/bloodbro.cpp
 bloodbro
 bloodbroj
@@ -42442,6 +42452,7 @@ koikois
 mayjinsn
 mayjisn2
 nratechu
+premline
 renju
 
 @source:seta/speedatk.cpp
@@ -44241,6 +44252,7 @@ tesorone240
 tisub
 tisuba
 tisubb
+trsocean
 victor21
 victor5
 victor5a
@@ -44252,6 +44264,7 @@ victor6b
 bishjan
 expcard
 humlan
+jgaoshou
 mtrain
 mtraina
 new2001
@@ -44517,6 +44530,7 @@ fieldday
 undoukai
 
 @source:taito/arkanoid.cpp
+arkaboot
 ark1ball
 arkangc
 arkangc2

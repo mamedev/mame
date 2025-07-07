@@ -412,8 +412,8 @@ Known Bug List
 ==============
 CPS2:
 * CPS2 can do raster effects, certainly used by ssf2 (Cammy, DeeJay, T.Hawk stages),
-  msh (Blackheart lava stage) and maybe others (xmcotaj, vsavj).
-  IRQ4 is some sort of scanline interrupt used for that purpose.
+  msh (Blackheart lava stage, Shuma-Gorath's Chaos Dimension) and maybe others
+  (xmcotaj, vsavj). IRQ4 is some sort of scanline interrupt used for that purpose.
 
 * Its unknown what CPS2_OBJ_BASE register (0x400000) does but it is not a object base
   register. The base is 0x7000 for all games even if 0x7080 is written to this register
@@ -2107,7 +2107,7 @@ MACHINE_RESET_MEMBER(cps_state,cps)
 }
 
 
-inline uint16_t *cps_state::cps1_base( int offset, int boundary )
+inline uint16_t *cps_state::cps1_base(int offset, int boundary)
 {
 	int base = m_cps_a_regs[offset] * 256;
 
@@ -2140,11 +2140,8 @@ void cps_state::cps1_cps_a_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (offset == CPS1_PALETTE_BASE)
 		cps1_build_palette(cps1_base(CPS1_PALETTE_BASE, m_palette_align));
 
-	// pzloop2 write to register 24 on startup. This is probably just a bug.
-	if (offset == 0x24 / 2 && m_cps_version == 2)
-		return;
-
 #ifdef MAME_DEBUG
+	// pzloop2 write to register 24 on startup. This is probably just a bug.
 	if (offset > CPS1_VIDEOCONTROL)
 		popmessage("write to CPS-A register %02x contact MAMEDEV", offset * 2);
 #endif
@@ -2178,15 +2175,19 @@ uint16_t cps_state::cps1_cps_b_r(offs_t offset)
 	if (m_game_config->in3_addr != 0 && offset == m_game_config->in3_addr / 2)
 		return ioport("IN3")->read();
 
-	if (m_cps_version == 2)
+	// raster counters for cps2 & ganbare
+	if (m_raster_irq != nullptr)
 	{
-		if (offset == 0x10/2)
+		if (offset == 0x0e/2)
 		{
-			// UNKNOWN--only mmatrix appears to read this, and I'm not sure if the result is actually used
-			return m_cps_b_regs[0x10 / 2];
+			// 2-pixel hpos relative to raster counter #3
+			return ((m_raster_counter[2] - m_screen->hpos() / 2) << 1 & 0x1fe) | (m_cps_b_regs[0x0e / 2] & 1);
 		}
-		if (offset == 0x12/2)
-			return m_cps_b_regs[0x12 / 2];
+		if (offset == 0x10/2 || offset == 0x12/2)
+		{
+			// scanline relative to raster counter #1, #2
+			return m_raster_counter[offset & 1] & 0x1ff;
+		}
 	}
 #ifdef MAME_DEBUG
 	popmessage("CPS-B read port %02x contact MAMEDEV", offset * 2);
@@ -2199,40 +2200,38 @@ void cps_state::cps1_cps_b_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_cps_b_regs[offset]);
 
-	if (m_cps_version == 2)
+	// raster counters for cps2 & ganbare
+	if (m_raster_irq != nullptr)
 	{
-		/* To mark scanlines for raster effects */
 		if (offset == 0x0e/2)
 		{
-			// UNKNOWN
+			m_raster_reload[2] = data >> 1 & 0xff;
 			return;
 		}
-		if (offset == 0x10/2)
+		if (offset == 0x10/2 || offset == 0x12/2)
 		{
-			m_scanline1 = (data & 0x1ff);
-			return;
-		}
-		if (offset == 0x12/2)
-		{
-			m_scanline2 = (data & 0x1ff);
+			m_raster_reload[offset & 1] = data & 0x1ff;
+
+			// manually reload counter
+			if (BIT(data, 15))
+				m_raster_counter[offset & 1] = m_raster_reload[offset & 1];
 			return;
 		}
 	}
-
 
 	// additional outputs on C-board
 	if (m_game_config->out2_addr != 0 && offset == m_game_config->out2_addr / 2)
 	{
 		if (ACCESSING_BITS_0_7)
 		{
-			if (m_game_config->cpsb_value == 0x0402)    // Mercs (CN2 connector)
+			if (m_game_config->cpsb_value == 0x0402) // Mercs (CN2 connector)
 			{
 				machine().bookkeeping().coin_lockout_w(2, ~data & 0x01);
 				m_led_cboard[0] = BIT(data, 1);
 				m_led_cboard[1] = BIT(data, 2);
 				m_led_cboard[2] = BIT(data, 3);
 			}
-			else    // kod, captcomm, knights
+			else // kod, captcomm, knights
 			{
 				machine().bookkeeping().coin_lockout_w(2, ~data & 0x02);
 				machine().bookkeeping().coin_lockout_w(3, ~data & 0x08);
@@ -2257,15 +2256,6 @@ void cps_state::cps1_cps_b_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			!m_game_config->bootleg_kludge)
 		popmessage("CPS-B write %04x to port %02x contact MAMEDEV", data, offset * 2);
 #endif
-}
-
-
-void cps_state::init_cps1()
-{
-	m_scanline1 = 0;
-	m_scanline2 = 0;
-	m_scancalls = 0;
-	m_last_sprite_offset = 0;
 }
 
 
@@ -2299,37 +2289,32 @@ void cps_state::cps1_get_video_base()
 		scroll2xoff = -0x0e;
 		scroll3xoff = -0x10;
 	}
-	else
-	if (kludge == 0x0E)
+	else if (kludge == 0x0e)
 	{
 		scroll1xoff = 0xffba;
 		scroll2xoff = 0xffc0;
 		scroll3xoff = 0xffba;
 	}
-	else
-	if (kludge == 0x0F)
+	else if (kludge == 0x0f)
 	{
 		scroll1xoff = 0xffc0;
 		scroll2xoff = 0xffc0;
 		scroll3xoff = 0xffc0;
 	}
-	else
-	if (kludge == 2)
+	else if (kludge == 2)
 	{
 		m_cps_a_regs[CPS1_OBJ_BASE] = 0x9100;
 		scroll1xoff = -0x10;
 		scroll2xoff = -0x10;
 		scroll3xoff = -0x10;
 	}
-	else
-	if (kludge == 3)
+	else if (kludge == 3)
 	{
 		scroll1xoff = -0x08;
 		scroll2xoff = -0x0b;
 		scroll3xoff = -0x0c;
 	}
-	else
-	if (m_game_config->bootleg_kludge == 0x88) // 3wondersb
+	else if (m_game_config->bootleg_kludge == 0x88) // 3wondersb
 	{
 		scroll1xoff = 0x4;
 		scroll2xoff = 0x6;
@@ -2547,9 +2532,7 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile2_info)
 
 void cps_state::cps1_update_transmasks()
 {
-	int i;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		int mask;
 
@@ -2606,7 +2589,6 @@ void cps_state::video_start()
 	if (!m_game_config)
 		throw emu_fatalerror("cps_state::video_start: m_game_config hasn't been set up yet");
 
-
 	/* Set up old base */
 	m_scroll1 = nullptr;
 	m_scroll2 = nullptr;
@@ -2619,9 +2601,8 @@ void cps_state::video_start()
 	m_screen->register_screen_bitmap(m_dummy_bitmap);
 
 	/* state save register */
-	save_item(NAME(m_scanline1));
-	save_item(NAME(m_scanline2));
-	save_item(NAME(m_scancalls));
+	save_item(NAME(m_last_sprite_offset));
+	save_pointer(NAME(m_buffered_obj), m_obj_size / 2);
 #if 0
 	/* these do not need to be saved, because they are recovered from cps_a_regs in cps1_postload */
 	save_item(NAME(m_scroll1x));
@@ -2636,9 +2617,6 @@ void cps_state::video_start()
 	save_item(NAME(m_stars2y));
 	save_item(NAME(m_stars_enabled));
 #endif
-	save_item(NAME(m_last_sprite_offset));
-
-	save_pointer(NAME(m_buffered_obj), m_obj_size / 2);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(cps_state::cps1_get_video_base), this));
 }
@@ -2905,7 +2883,7 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 			else
 			{
 				/* Simple case... 1 sprite */
-						DRAWSPRITE(
+				DRAWSPRITE(
 						code,
 						(col & 0x1f),
 						colour&0x20,colour&0x40,
@@ -3091,7 +3069,6 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 	m_bg_tilemap[2]->set_scrollx(0, m_scroll3x);
 	m_bg_tilemap[2]->set_scrolly(0, m_scroll3y);
 
-
 	/* Blank screen */
 	if (m_cps_version == 1)
 	{
@@ -3121,16 +3098,18 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 
 void cps_state::screen_vblank_cps1(int state)
 {
-	// rising edge
 	if (state)
 	{
 		/* Get video memory base registers */
 		cps1_get_video_base();
+	}
+}
 
-		if (m_cps_version == 1)
-		{
-			/* CPS1 sprites have to be delayed one frame */
-			memcpy(m_buffered_obj.get(), m_obj, m_obj_size);
-		}
+void cps_state::cps1_objram_latch(int state)
+{
+	if (state)
+	{
+		/* CPS1 sprites have to be delayed one frame */
+		memcpy(m_buffered_obj.get(), m_obj, m_obj_size);
 	}
 }

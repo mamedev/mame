@@ -775,10 +775,10 @@ void gms_2layers_state::mcu_io(address_map &map)
 		PORT_DIPSETTING(      0x0001, DEF_STR(1C_2C) ) \
 		PORT_DIPSETTING(      0x0002, DEF_STR(1C_3C) ) \
 		PORT_DIPSETTING(      0x0003, DEF_STR(1C_5C) ) \
-		PORT_DIPSETTING(      0x0004, "1 Coin/10 Credits" ) \
-		PORT_DIPSETTING(      0x0005, "1 Coin/20 Credits" ) \
-		PORT_DIPSETTING(      0x0006, "1 Coin/50 Credits" ) \
-		PORT_DIPSETTING(      0x0007, "1 Coin/100 Credits" ) \
+		PORT_DIPSETTING(      0x0004, DEF_STR(1C_10C) ) \
+		PORT_DIPSETTING(      0x0005, DEF_STR(1C_20C) ) \
+		PORT_DIPSETTING(      0x0006, DEF_STR(1C_50C) ) \
+		PORT_DIPSETTING(      0x0007, DEF_STR(1C_100C) ) \
 		PORT_DIPNAME( 0x0018, 0x0000, "Key-In Rate" )                 PORT_DIPLOCATION(loc ":4,5")    /* 投幣×開分倍率 */ \
 		PORT_DIPSETTING(      0x0018, "5" )      PORT_CONDITION(tag, 0x0007, EQUALS, 0x0000) \
 		PORT_DIPSETTING(      0x0000, "10" )     PORT_CONDITION(tag, 0x0007, EQUALS, 0x0000) \
@@ -1338,11 +1338,11 @@ static INPUT_PORTS_START( super555 )
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0007, 0x0000, DEF_STR(Coinage) )              PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(      0x0001, DEF_STR(1C_5C) )
-	PORT_DIPSETTING(      0x0002, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(      0x0003, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(      0x0002, DEF_STR(1C_10C) )
+	PORT_DIPSETTING(      0x0003, DEF_STR(1C_20C) )
 	PORT_DIPSETTING(      0x0004, "1 Coin/30 Credits" )
-	PORT_DIPSETTING(      0x0000, "1 Coin/50 Credits" )
-	PORT_DIPSETTING(      0x0005, "1 Coin/100 Credits" )
+	PORT_DIPSETTING(      0x0000, DEF_STR(1C_50C) )
+	PORT_DIPSETTING(      0x0005, DEF_STR(1C_100C) )
 	PORT_DIPSETTING(      0x0006, "1 Coin/200 Credits" )
 	PORT_DIPSETTING(      0x0007, "1 Coin/300 Credits" )
 	PORT_DIPNAME( 0x0018, 0x0000, "Credits Per Note" )            PORT_DIPLOCATION("SW2:4,5")
@@ -1490,11 +1490,11 @@ static INPUT_PORTS_START( sscs )
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0007, 0x0000, DEF_STR(Coinage) )              PORT_DIPLOCATION("SW2:1,2,3")  // 投幣比例
 	PORT_DIPSETTING(      0x0001, DEF_STR(1C_5C) )
-	PORT_DIPSETTING(      0x0002, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(      0x0003, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(      0x0002, DEF_STR(1C_10C) )
+	PORT_DIPSETTING(      0x0003, DEF_STR(1C_20C) )
 	PORT_DIPSETTING(      0x0004, "1 Coin/30 Credits" )
-	PORT_DIPSETTING(      0x0000, "1 Coin/50 Credits" )
-	PORT_DIPSETTING(      0x0005, "1 Coin/100 Credits" )
+	PORT_DIPSETTING(      0x0000, DEF_STR(1C_50C) )
+	PORT_DIPSETTING(      0x0005, DEF_STR(1C_100C) )
 	PORT_DIPSETTING(      0x0006, "1 Coin/200 Credits" )
 	PORT_DIPSETTING(      0x0007, "1 Coin/300 Credits" )
 	PORT_DIPNAME( 0x0018, 0x0000, "Key-In Rate" )                 PORT_DIPLOCATION("SW2:4,5")    // 投幣比例×開分倍率 (Key-In rate as a multiple of coin rate)
@@ -1859,11 +1859,11 @@ static INPUT_PORTS_START( ballch )
 	PORT_DIPNAME( 0x0007, 0x0000, DEF_STR(Coinage) ) PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR(1C_1C) )
 	PORT_DIPSETTING(      0x0001, DEF_STR(1C_5C) )
-	PORT_DIPSETTING(      0x0002, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(      0x0003, "1 Coin/25 Credits" )
-	PORT_DIPSETTING(      0x0004, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(      0x0002, DEF_STR(1C_10C) )
+	PORT_DIPSETTING(      0x0003, DEF_STR(1C_25C) )
+	PORT_DIPSETTING(      0x0004, DEF_STR(1C_50C) )
 	PORT_DIPSETTING(      0x0005, "1 Coin/75 Credits" )
-	PORT_DIPSETTING(      0x0006, "1 Coin/100 Credits" )
+	PORT_DIPSETTING(      0x0006, DEF_STR(1C_100C) )
 	PORT_DIPSETTING(      0x0007, "1 Coin/500 Credits" )
 	PORT_DIPNAME( 0x0038, 0x0000, "Key-In Rate" ) PORT_DIPLOCATION("SW2:4,5,6")
 	PORT_DIPSETTING(      0x0000, "1" )
@@ -2352,10 +2352,10 @@ static INPUT_PORTS_START( hgly )
 	PORT_DIPSETTING(      0x0001, DEF_STR(1C_1C) )
 	PORT_DIPSETTING(      0x0002, DEF_STR(1C_2C) )
 	PORT_DIPSETTING(      0x0003, DEF_STR(1C_5C) )
-	PORT_DIPSETTING(      0x0000, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(      0x0004, "1 Coin/20 Credits" )
-	PORT_DIPSETTING(      0x0005, "1 Coin/50 Credits" )
-	PORT_DIPSETTING(      0x0006, "1 Coin/100 Credits" )
+	PORT_DIPSETTING(      0x0000, DEF_STR(1C_10C) )
+	PORT_DIPSETTING(      0x0004, DEF_STR(1C_20C) )
+	PORT_DIPSETTING(      0x0005, DEF_STR(1C_50C) )
+	PORT_DIPSETTING(      0x0006, DEF_STR(1C_100C) )
 	PORT_DIPSETTING(      0x0007, "1 Coin/300 Credits" )
 	PORT_DIPNAME( 0x0018, 0x0000, "Key-In Rate" )                 PORT_DIPLOCATION("DSW2:4,5")    // 投幣×開分倍率
 	PORT_DIPSETTING(      0x0008, "2" )      PORT_CONDITION("DSW2", 0x0007, EQUALS, 0x0001)
@@ -3501,7 +3501,7 @@ GAME( 1999, cjdlz,    0,    super555, cjdlz,    gms_2layers_state, init_cjdlz,  
 GAME( 2005, yyhm,     0,    magslot,  yyhm,     gms_3layers_state, init_yyhm,     ROT0,  "GMS", "Yuanyang Hudie Meng (Version 8.8A 2005-09-25)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now.
 
 // card games
-GAME( 1998, tbss,     0,    super555, super555, gms_2layers_state, init_tbss,     ROT0,  "GMS", "Tieben Shensuan (Mainland version 2.0)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface doesn't quite work.
+GAME( 1998, tbss,     0,    super555, super555, gms_2layers_state, init_tbss,     ROT0,  "GMS", "Tieban Shensuan (Mainland version 2.0)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface doesn't quite work.
 GAME( 1999, super555, 0,    super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now.
 GAME( 1999, sscs,     0,    super555, sscs,     gms_2layers_state, init_sscs,     ROT0,  "GMS", "San Se Caishen (Version 0502)",                         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface isn't fully understood.
 GAME( 1999, sscs0118, sscs, super555, sscs,     gms_2layers_state, init_sscs0118, ROT0,  "GMS", "San Se Caishen (Version 0118)",                         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface isn't fully understood.

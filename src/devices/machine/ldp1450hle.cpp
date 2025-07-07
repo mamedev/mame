@@ -296,7 +296,7 @@ void sony_ldp1450hle_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch,
 	// m_user_index_mode >> 5 & 0x04: 0,2 = normal, 1 = 1px shadow, 3 = grey box
 	uint16_t black = 0x0080;
 
-	u8 modeval = (m_user_index_mode >> 5) & 0x04;
+	u8 modeval = (m_user_index_mode >> 5) & 0x03;
 
 	for (u32 y = 0; y < char_height; y++)
 	{
@@ -310,8 +310,8 @@ void sony_ldp1450hle_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch,
 				{
 					if (modeval == 0x03)
 					{
-						// FIXME: this is unreachable because modeval is masked with 0x04 above
-						//fill with grey
+						//TODO: Check Grey is correct value
+						bitmap.pix(ystart + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin+xx) =  0xc080;
 					}
 
 					if (m_osd_font[ch].pix(y,x) != black)
