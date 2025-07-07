@@ -48,13 +48,16 @@ void i8256_device::device_reset()
     m_port1_control = 0;
     m_interrupts = 0;
 
+	m_tx_buffer = 0;
+	m_rx_buffer = 0;
+
 	m_timers[0] = 0;
 	m_timers[1] = 0;
 	m_timers[2] = 0;
 	m_timers[3] = 0;
 	m_timers[4] = 0;
 
-	m_status = 0x30;
+	m_status = 0x30; // TRE and TBE
 	m_port1_int = 0;
     m_port2_int = 0;
 
@@ -151,13 +154,25 @@ void i8256_device::write(offs_t offset, u8 data)
 				{
 					LOG("I8256 Enabled 8086 mode\n");
 				}
+
+				m_data_bits_count = 8-(m_command1 & 0xC0);
+				m_stop_bits = stopBits[m_command1 & 0x30];
+
+				set_data_frame(1, m_data_bits_count, m_parity, m_stop_bits);
+
 				LOG("I8256 Character length: %u\n", 8-(m_command1 & 0xC0));
 			}            
 			break;
 		case REG_CMD2:
 			if (m_command2 != data) {
             	m_command2 = data;
-				LOG("I8256 Baud rate: %u\n", baudRates[m_command2 & 0x0F]);
+
+				set_rate(baudRates[m_command2 & 0x0F]);
+
+				m_parity = BIT(m_command2,CMD2_EP) ? PARITY_EVEN : PARITY_ODD;
+
+				set_data_frame(1, m_data_bits_count, m_parity, m_stop_bits);
+
 				LOG("I8256 Clock Scale: %u\n", sysclockDivider[(m_command2 & 0x30 >> 4)]);
 				if((clock() / sysclockDivider[(m_command2 & 0x30 >> 4)])!=1024000)
 				{				
@@ -202,6 +217,13 @@ void i8256_device::write(offs_t offset, u8 data)
 			LOG("I8256 Unmapped write %02x to %02x\n", data, reg);
 			break;
 	};
+}
+
+void i8256_device::write_rxd(int state)
+{
+	m_rxd = state;
+	LOG("8256: Presented a %d\n", m_rxd);
+	//  device_serial_interface::rx_w(state);
 }
 
 uint8_t i8256_device::p1_r()

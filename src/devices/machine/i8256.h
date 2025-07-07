@@ -79,7 +79,13 @@ private:
 	bool m_rxc;
 	bool m_txc;
 
+    uint8_t m_data_bits_count;
+    parity_t m_parity;
+    stop_bits_t m_stop_bits;
+
     uint8_t m_command1, m_command2, m_command3, m_mode, m_interrupts;
+
+    uint8_t m_tx_buffer, m_rx_buffer;
 
     uint8_t m_port1_control, m_port1_int;
     uint8_t m_port2_int;
@@ -129,6 +135,8 @@ private:
         STOP_2,
         STOP_075
     };
+
+    stop_bits_t stopBits[4] = {STOP_BITS_1, STOP_BITS_1_5, STOP_BITS_2, STOP_BITS_0};
 
     enum
     {
