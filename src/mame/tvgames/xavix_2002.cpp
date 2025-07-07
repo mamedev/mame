@@ -660,6 +660,42 @@ void superxavix_i2c_state::superxavix_i2c_mrangbat(machine_config &config)
 	m_xavix2002io->read_2_callback().set_ioport("EX2");
 }
 
+// TODO, this hookup doesn't work, is this really the SEEPROM or the RTC?
+uint8_t superxavix_i2c_ndpmj_state::read_extended_io1(offs_t offset, uint8_t mem_mask)
+{
+	logerror("%s: read_extended_io1 (SEEPROM?) mask %02x\n", machine().describe_context(), mem_mask);
+	uint8_t ret = 0x00;
+
+	if (!(mem_mask & 0x80))
+		ret |= m_i2cmem->read_sda() << 7;
+	else
+		ret |= 0x80;
+
+	return ret;
+}
+
+void superxavix_i2c_ndpmj_state::write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+	logerror("%s: write_extended_io1 (SEEPROM?) mask %02x data %02x\n", machine().describe_context(), mem_mask, data);
+
+	if (mem_mask & 0x80)
+		m_i2cmem->write_sda((data & 0x80) >> 7);
+
+	if (mem_mask & 0x40)
+		m_i2cmem->write_scl((data & 0x40) >> 6);
+}
+
+void superxavix_i2c_ndpmj_state::superxavix_i2c_ndpmj(machine_config &config)
+{
+	superxavix_i2c_24c16(config);
+
+	// S35390A at u6
+
+	m_xavix2002io->read_1_callback().set(FUNC(superxavix_i2c_ndpmj_state::read_extended_io1));
+	m_xavix2002io->write_1_callback().set(FUNC(superxavix_i2c_ndpmj_state::write_extended_io1));
+}
+
+
 
 // XaviXPORT
 ROM_START( xavtenni )
@@ -942,6 +978,14 @@ ROM_START( ndpbj )
 	ROM_LOAD("s-24cs08a.u6", 0x000, 0x400, CRC(a22db408) SHA1(f8d925c75054a961930af12869e3002bb9c4600b) )
 ROM_END
 
+ROM_START( ndpmj )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("ndpmj.u3", 0x000000, 0x800000, CRC(a8132d93) SHA1(2bcbf497e3fa7c7f44569f337cb8babff80c9338) )
+
+	ROM_REGION( 0x800, "i2cmem", ROMREGION_ERASE00)
+	ROM_LOAD("s-24cs16a.u5", 0x000, 0x800, CRC(5d2dd322) SHA1(c0af08a382c4dbefe290fef34cfd8345e904bd74) )
+ROM_END
+
 
 void superxavix_super_tv_pc_state::init_stvpc()
 {
@@ -1081,3 +1125,5 @@ CONS( 2007, doradraw,  0, 0, superxavix_doradraw,    xavix,      superxavix_dora
 // どんトレだ兵衛～どん兵衛くんとトレーニング
 // doesn't boot, has a camera with a large number of connections going to it, probably wants comms to work with it?
 CONS( 2007, ndpbj, 0, 0, superxavix_i2c_24c08,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Nissin / SSD Company LTD",   "Dontore da bei - Donbei-kun to Training (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 200?, ndpmj, 0, 0, superxavix_i2c_ndpmj,    xavix,  superxavix_i2c_ndpmj_state, init_xavix, "Nissin / SSD Company LTD",   "Dontore da bei 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
