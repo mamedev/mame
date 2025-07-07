@@ -32,9 +32,6 @@ void i8256_device::device_start()
 	save_item(NAME(m_port1_control));
 	save_item(NAME(m_interrupts));
 	save_item(NAME(m_status));
-	for (int i = 0; i < 5; ++i) {
-		save_item(NAME(m_timers[i]));
-	}
 
 	m_timer = timer_alloc(FUNC(i8256_device::timer_check), this);
 }
@@ -155,12 +152,10 @@ void i8256_device::write(offs_t offset, u8 data)
 					LOG("I8256 Enabled 8086 mode\n");
 				}
 
-				m_data_bits_count = 8-(m_command1 & 0xC0);
-				m_stop_bits = stopBits[m_command1 & 0x30];
+				m_data_bits_count = 8-((BIT(m_command1, CMD1_L0)) | (BIT(m_command1, CMD1_L1) << 1));
+				m_stop_bits = stopBits[(BIT(m_command1, CMD1_S0)) | (BIT(m_command1, CMD1_S1) << 1)];
 
 				set_data_frame(1, m_data_bits_count, m_parity, m_stop_bits);
-
-				LOG("I8256 Character length: %u\n", 8-(m_command1 & 0xC0));
 			}            
 			break;
 		case REG_CMD2:
