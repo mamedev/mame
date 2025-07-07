@@ -1001,10 +1001,6 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		{
 			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 			
-// is this right?  
-m_map_control &= ~(1 << MAP_SYS_WR_ENABLE);
-
-
 			inbuserr = 1;
 
 			LOGMASKED(LOG_MMU,"memory_w:  %06x bus error: READONLY fc(%d) pc(%08x)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc(),  m_maincpu->pc());
