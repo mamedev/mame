@@ -781,6 +781,12 @@ ROM_START( epo_dabj )
 	ROM_LOAD( "dabj.u3", 0x000000, 0x800000, CRC(9ebc1384) SHA1(38abaebd05bc9ab300ee5fbf37bd88ce9cbd20e1) )
 ROM_END
 
+ROM_START( epo_dab2j )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "dab2j.u4", 0x000000, 0x800000, CRC(e3d12ee6) SHA1(a2f930f4ffe778e02556b5e1a1836f88888e7c82) )
+ROM_END
+
+
 ROM_START( epo_dtcj )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "dtcj.u2", 0x000000, 0x800000, CRC(64c2aabb) SHA1(14f02eb01f1c6e76202f7a70818c300ba23fd879) )
@@ -825,6 +831,8 @@ CONS( 2006, ban_db2j, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / 
 
 // テレビであそぼう!まなぼう! 超脳力あいうえお図鑑
 CONS( 2006, epo_dabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "TV de Asobou! Manabou! Chou Nouryoku AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 200?, epo_dab2j, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "TV de Asobou! Manabou! Chou Nouryoku AIUEO Zukan 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ドラえもん 体感タケコプター! 空とぶ大冒険
 CONS( 2006, epo_dtcj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Doraemon Taikan Take-copter! Sora Tobu Daibouken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
