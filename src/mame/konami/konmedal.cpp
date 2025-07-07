@@ -627,7 +627,7 @@ static INPUT_PORTS_START( konmedal )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) // 10Y
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) // 100Y for medals exchange, not game coin in to play
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused
 
 	PORT_START("OUT")
@@ -1448,20 +1448,20 @@ ROM_END
 
 
 // Konami PWB 451847A and PWB 452093A boards (TMNT tilemaps)
-GAME( 1990, tsururin, 0,     tsururin, tsururin, konmedal_state, mario_init,   ROT0, "Konami", "Tsururin Kun", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING)
-GAME( 1991, slimekun, 0,     tsupenta, slimekun, konmedal_state, mario_init,   ROT0, "Konami", "Slime Kun", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING)
-GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,   ROT0, "Konami", "Mario Roulette", MACHINE_SUPPORTS_SAVE)
-GAME( 1991, tsupenta, 0,     tsupenta, tsupenta, konmedal_state, mario_init,   ROT0, "Konami", "Tsurikko Penta", MACHINE_SUPPORTS_SAVE)
-GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,   ROT0, "Konami", "Shuriken Boy", MACHINE_SUPPORTS_SAVE)
-GAME( 1993, fuusenpn, 0,     fuusenpn, fuusenpn, konmedal_state, fuusen_init,  ROT0, "Konami", "Fuusen Pentai", MACHINE_SUPPORTS_SAVE)
+GAME( 1990, tsururin, 0,     tsururin, tsururin, konmedal_state, mario_init,    ROT0, "Konami", "Tsururin Kun", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING)
+GAME( 1991, slimekun, 0,     tsupenta, slimekun, konmedal_state, mario_init,    ROT0, "Konami", "Slime Kun", MACHINE_SUPPORTS_SAVE)
+GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,    ROT0, "Konami", "Mario Roulette", MACHINE_SUPPORTS_SAVE)
+GAME( 1991, tsupenta, 0,     tsupenta, tsupenta, konmedal_state, mario_init,    ROT0, "Konami", "Tsurikko Penta", MACHINE_SUPPORTS_SAVE)
+GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,    ROT0, "Konami", "Shuriken Boy", MACHINE_SUPPORTS_SAVE)
+GAME( 1993, fuusenpn, 0,     fuusenpn, fuusenpn, konmedal_state, fuusen_init,   ROT0, "Konami", "Fuusen Pentai", MACHINE_SUPPORTS_SAVE)
 
 // Konami PWB 452574A boards (GX tilemaps)
-GAME( 1994, buttobi,  0,     ddboy,    ddboy,    konmedal_state, buttobi_init, ROT0, "Konami", "Buttobi Striker", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1994, ddboy,    0,     ddboy,    ddboy,    konmedal_state, ddboy_init,   ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1994, buttobi,  0,     ddboy,    ddboy,    konmedal_state, buttobi_init,  ROT0, "Konami", "Buttobi Striker", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1994, ddboy,    0,     ddboy,    ddboy,    konmedal_state, ddboy_init,    ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 // Konami PWB 452944A boards (GX tilemaps, TV Plug-and-Play form factor)
-GAME( 1992, chusenoh, 0,     chusenoh, chusenoh, konmedal_state, chusenoh_init,  ROT0, "Konami", "Chusenoh", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1992, chusenoh, 0,     chusenoh, chusenoh, konmedal_state, chusenoh_init, ROT0, "Konami", "Chusenoh", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 // Konami PWB 402218 boards (GX tilemaps)
-GAME( 1994, ddboya,   ddboy, tsukande, ddboy,    konmedal_state, ddboy_init,   ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, tsuka_init,   ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_SUPPORTS_SAVE)
+GAME( 1994, ddboya,   ddboy, tsukande, ddboy,    konmedal_state, ddboy_init,    ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, tsuka_init,    ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_SUPPORTS_SAVE)
