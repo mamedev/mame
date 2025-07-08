@@ -405,8 +405,11 @@ TIMER_CALLBACK_MEMBER(cps_state::raster_irq)
 uint16_t cps_state::irqack_r(offs_t offset)
 {
 	// FC0-FC2(any) + BGACK: VPA and clears both IPL1 and IPL2
-	m_maincpu->set_input_line(M68K_IRQ_IPL1, CLEAR_LINE);
-	m_maincpu->set_input_line(M68K_IRQ_IPL2, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		m_maincpu->set_input_line(M68K_IRQ_IPL1, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_IPL2, CLEAR_LINE);
+	}
 
 	return m68000_base_device::autovector(offset + 1);
 }

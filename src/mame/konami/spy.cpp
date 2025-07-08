@@ -133,8 +133,8 @@ K051960_CB_MEMBER(spy_state::sprite_callback)
 {
 	enum { sprite_colorbase = 512 / 16 };
 
-	/* bit 4 = priority over layer A (0 = have priority) */
-	/* bit 5 = priority over layer B (1 = have priority) */
+	// bit 4 = priority over layer A (0 = have priority)
+	// bit 5 = priority over layer B (1 = have priority)
 	*priority = 0x00;
 	if ( *color & 0x10) *priority |= GFX_PMASK_1;
 	if (~*color & 0x20) *priority |= GFX_PMASK_2;
@@ -244,22 +244,6 @@ Collision check routine:
 3f: 5f 7e 00 ce 08  ret
 */
 
-void spy_state::bankswitch_w(uint8_t data)
-{
-	/* bit 0 = RAM bank */
-	if (BIT(~data, 0))
-		popmessage("bankswitch RAM bank 0");
-
-	/* bit 1-4 = ROM bank */
-	int bank;
-	if (BIT(data, 4))
-		bank = 8 + ((data & 0x06) >> 1);
-	else
-		bank = (data & 0x0e) >> 1;
-
-	m_rombank->set_entry(bank);
-}
-
 void spy_state::pmc_run()
 {
 	constexpr uint16_t MAX_SPRITES = 64;
@@ -339,6 +323,22 @@ void spy_state::pmc_run()
 			m_pmcram[i + 0xd] = tests_failed;
 		}
 	}
+}
+
+void spy_state::bankswitch_w(uint8_t data)
+{
+	/* bit 0 = RAM bank */
+	if (BIT(~data, 0))
+		popmessage("bankswitch RAM bank 0");
+
+	/* bit 1-4 = ROM bank */
+	int bank;
+	if (BIT(data, 4))
+		bank = 8 + ((data & 0x06) >> 1);
+	else
+		bank = (data & 0x0e) >> 1;
+
+	m_rombank->set_entry(bank);
 }
 
 
@@ -681,5 +681,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1989, spy,  0,   spy, spy, spy_state, empty_init, ROT0, "Konami", "S.P.Y. - Special Project Y (World ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spyu, spy, spy, spy, spy_state, empty_init, ROT0, "Konami", "S.P.Y. - Special Project Y (US ver. M)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spy,  0,   spy, spy, spy_state, empty_init, ROT0, "Konami", "S.P.Y.: Special Project Y. (World ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spyu, spy, spy, spy, spy_state, empty_init, ROT0, "Konami", "S.P.Y.: Special Project Y. (US ver. M)", MACHINE_SUPPORTS_SAVE )
