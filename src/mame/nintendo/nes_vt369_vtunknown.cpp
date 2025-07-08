@@ -117,6 +117,7 @@ public:
 	void vt36x_4mb(machine_config& config);
 	void vt36x_8mb(machine_config& config);
 	void vt36x_16mb(machine_config& config);
+	void vt36x_16mb_sdcard(machine_config& config);
 	void vt36x_32mb(machine_config& config);
 	void vt36x_32mb_2banks_lexi(machine_config& config);
 	void vt36x_32mb_2banks_lexi300(machine_config& config);
@@ -489,6 +490,12 @@ void vt36x_state::vt36x_8mb(machine_config& config)
 }
 
 void vt36x_state::vt36x_16mb(machine_config& config)
+{
+	vt36x(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
+}
+
+void vt36x_state::vt36x_16mb_sdcard(machine_config& config)
 {
 	vt36x(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
@@ -1037,6 +1044,12 @@ ROM_START( dgun2572 )
 ROM_END
 
 
+ROM_START( gb50_150 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "w25q128jvsiq.bin", 0x00000, 0x1000000, CRC(3cc43fcb) SHA1(6c5e09fadb14e99e6db8c316026d124326a90557) )
+ROM_END
+
+
 void vt369_state::init_lxcmcypp()
 {
 	int size = memregion("mainrom")->bytes()/2;
@@ -1262,3 +1275,8 @@ CONS( 200?, mc_110cb,  0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, 
 CONS( 200?, mc_138cb,  0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, jl2050,    0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "LexiBook / JungleTac / NiceCode",  "Cyber Console Center 200-in-1 (JL2050)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// GB-50 console supports loading games from SD card (not emulated), main ROM is QSPI flash
+// Games loaded from SD card are loaded into the QSPI flash at 0x800000 - dump is from a clean factory console
+// PCB is marked "389" so possibly VT389 but VT369 string in a debug message in firmware
+CONS( 2019, gb50_150,  0,        0,  vt36x_16mb_sdcard, vt369, vt36x_state, empty_init, "<unknown>",  "GB-50 Retro Station Pocket System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
