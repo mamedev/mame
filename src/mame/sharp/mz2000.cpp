@@ -292,10 +292,6 @@ void mz80b_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cli
 
 void mz2000_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const u8 layer1_mask = BIT(m_gvram_mask, 0) * 0xff;
-	const u8 layer2_mask = BIT(m_gvram_mask, 1) * 0xff;
-	const u8 layer3_mask = BIT(m_gvram_mask, 2) * 0xff;
-
 	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const u16 gfx_offset = y * 80;
@@ -304,9 +300,9 @@ void mz2000_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cl
 		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
 			const u8 x_offset = x >> 3;
-			const u8 gfx_b = m_gvram[gfx_offset + x_offset + 0x4000] & layer1_mask;
-			const u8 gfx_r = m_gvram[gfx_offset + x_offset + 0x8000] & layer2_mask;
-			const u8 gfx_g = m_gvram[gfx_offset + x_offset + 0xc000] & layer3_mask;
+			const u8 gfx_b = m_gvram[gfx_offset + x_offset + 0x4000];
+			const u8 gfx_r = m_gvram[gfx_offset + x_offset + 0x8000];
+			const u8 gfx_g = m_gvram[gfx_offset + x_offset + 0xc000];
 
 			for (unsigned xi = 0; xi < 8; xi ++)
 			{
