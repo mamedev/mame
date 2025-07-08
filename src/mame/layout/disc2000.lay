@@ -30,14 +30,20 @@ license:CC0-1.0
 	</element>
 
     <element name="ladder" defstate="0">
-		<rect>
+		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.7" green="0.7" blue="0.7" />
 		</rect>
 	</element>
 
 	<element name="indicator_red" defstate="0">
-		<rect>
+		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.5" green="0.0" blue="0.0" />
 		</rect>
 	</element>
 
