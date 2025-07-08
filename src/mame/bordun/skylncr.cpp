@@ -1795,7 +1795,7 @@ Notes:
 */
 
 ROM_START( skylncr )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27512.u35",  0x00000, 0x10000, CRC(98b1c9fe) SHA1(9ca1706d25038a078fb07ba5c2e6681ed468bc88) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1806,7 +1806,7 @@ ROM_START( skylncr )
 ROM_END
 
 ROM_START( butrfly ) // this has original Bordun copyright in ROMs and test mode in Chinese
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sub-pcb.bin", 0x00000, 0x10000, CRC(f5618f8e) SHA1(390b238821b195f444e69c45786617524e6f5394) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1822,8 +1822,26 @@ ROM_START( butrfly ) // this has original Bordun copyright in ROMs and test mode
 	ROM_LOAD16_BYTE( "u58", 0x40001, 0x20000, CRC(a69b5994) SHA1(f7f849c752740089a49dc6693822466d73010ea0) )
 ROM_END
 
+ROM_START( butrflya ) // this was on an original Bordun PCB, with Bordun copyright in ROMs and title screen, test mode in Chinese
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u15.u15", 0x00000, 0x08000, CRC(31f7dca8) SHA1(c433b3a4f5c7f504dfc89f499fa244e59235bc89) ) // 27256
+	ROM_LOAD( "u48",     0x0c000, 0x04000, CRC(39c391c5) SHA1(326f4d72d546bc902542e628a6e87dc941ef0ef4) ) // 27128, no label
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) // all 27010
+	ROM_LOAD16_BYTE( "100.u20", 0x00000, 0x20000, CRC(2ff775ea) SHA1(2219c75cbac2969485607446ab116587bdee7278) )
+	ROM_LOAD16_BYTE( "102.u21", 0x00001, 0x20000, CRC(029d2214) SHA1(cf8256157db0b297ed457b3da6b6517907128843) )
+	ROM_LOAD16_BYTE( "103.u22", 0x40000, 0x20000, CRC(37bad677) SHA1(c077f0c07b097b376a01e5637446e4c4f82d9e28) )
+	ROM_LOAD16_BYTE( "104.u23", 0x40001, 0x20000, CRC(d14c7713) SHA1(c229ef64f3b0a04ff8e27bc56cff6a55ca34b80c) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) // all 27010
+	ROM_LOAD16_BYTE( "105.u22", 0x00000, 0x20000, CRC(15051537) SHA1(086c38c05c605f297a7bc470eb51763a7648e72c) )
+	ROM_LOAD16_BYTE( "106.u21", 0x00001, 0x20000, CRC(8e34d029) SHA1(ae316f2f34768938a07d62db110ce59d2751abaa) )
+	ROM_LOAD16_BYTE( "107.u20", 0x40000, 0x20000, CRC(226cb483) SHA1(89efa0e11700bcab0024a6058a5f1ee6b4a09953) )
+	ROM_LOAD16_BYTE( "108.u19", 0x40001, 0x20000, CRC(a69b5994) SHA1(f7f849c752740089a49dc6693822466d73010ea0) )
+ROM_END
+
 ROM_START( butrflybl ) // this has Bordun copyright removed and test mode in English
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "butterfly.prg",  0x00000, 0x10000, CRC(b35b289c) SHA1(5a02bfb6e1fb608099b9f491c10795ef888a3b36) ) // Mata Electronic / Sen Xing Trading copyright instead of Bordun
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1840,7 +1858,7 @@ ROM_START( butrflybl ) // this has Bordun copyright removed and test mode in Eng
 ROM_END
 
 ROM_START( mbutrfly )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "magical_butterfy_x4_cleco.bin",  0x00000, 0x10000, CRC(2391778f) SHA1(f82ee9fb571547fda70867e091317779e2fe6e80) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1857,7 +1875,7 @@ ROM_START( mbutrfly )
 ROM_END
 
 ROM_START( gallag50 )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27512.u9",  0x00000, 0x10000, CRC(355f8c3b) SHA1(d419fcb96bf936eaf7afb1a4b38a9e1d2a191686) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1904,7 +1922,7 @@ Notes:
 */
 
 ROM_START( madzoo )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27512.u9",  0x00000, 0x10000, CRC(98b1c9fe) SHA1(9ca1706d25038a078fb07ba5c2e6681ed468bc88) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1921,7 +1939,7 @@ ROM_START( madzoo )
 ROM_END
 
 ROM_START( leader )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "leader.prg",  0x00000, 0x10000, CRC(1a6e1129) SHA1(639f687e7720bab89628b377dca0475f17a35041) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1938,7 +1956,7 @@ ROM_START( leader )
 ROM_END
 
 ROM_START( leadera ) // this has the same GFX ROMs as butrfly, with different program
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "leader 2ka.bin",  0x00000, 0x10000, CRC(2664db55) SHA1(de4c07a8ba8fab772441395b6d05272ee54d9614) ) // on sub board with Altera EPM7032
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1962,7 +1980,7 @@ ROM_END
   Maybe it's a leftover, or it's a sort of stealth game.
 */
 ROM_START( neraidou )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "aepi.prg",  0x00000, 0x10000, CRC(7ac74830) SHA1(1e3322341711e329b40d94ac6ec25fbafb1d4d62) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1986,7 +2004,7 @@ ROM_END
   But is not the real title.
 */
 ROM_START( miaction )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512_sub_board_miaction.bin",  0x00000, 0x10000, CRC(4865a6de) SHA1(cfa23eef004f9a29d462676d9b9b94a1e84064d6) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2011,7 +2029,7 @@ ROM_END
 
 */
 ROM_START( tigerslt )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512_sub_board_tiger.bin",  0x00000, 0x10000, CRC(3c4181bf) SHA1(afc4fcd7ec9a48406242fe7e01a32e1a20216330) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2236,7 +2254,7 @@ ROM_END
   Program ROM is encrypted.
 */
 ROM_START( sonikfig )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "subboard_27c512.bin",  0x00000, 0x10000, CRC(f9b5b03e) SHA1(3832a7d70b41052f9dca46faa6f311ccc5a817b7) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2369,7 +2387,7 @@ ROM_START( speedwaya ) // runs on a Rolla PCB with small sub board with main CPU
 ROM_END
 
 ROM_START( seadevil ) // on a POCKBOY REV.0 PCB
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "v42 scr scm.u13", 0x00000, 0x10000, CRC(23b6eb48) SHA1(469d9f766ce96d2c850d611cd9a8b48545c71aaf) ) // on sub PCB, M27C512
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) // all AM27C010
@@ -2386,7 +2404,7 @@ ROM_START( seadevil ) // on a POCKBOY REV.0 PCB
 ROM_END
 
 ROM_START( spcliner ) // on a ROLLA PCB, might actually be another title, won't know until palette is fixed. GFX ROM loading is wrong.
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "9.sub", 0x00000, 0x10000, CRC(80f65def) SHA1(a0716d57ae4935a79d32971d0bcb9f40dd9f1d54) ) // on sub PCB
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2403,7 +2421,7 @@ ROM_START( spcliner ) // on a ROLLA PCB, might actually be another title, won't 
 ROM_END
 
 ROM_START( blshark )
-	ROM_REGION( 0x80000, "maincpu", 0 ) // on sub PCB
+	ROM_REGION( 0x10000, "maincpu", 0 ) // on sub PCB
 	ROM_LOAD( "sub",  0x00000, 0x10000, CRC(ed005267) SHA1(b20c62d76d4d49ee42e1f2f922015bec3cbbd25d) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2637,6 +2655,7 @@ void skylncr_state::init_blshark() // done by comparing code to skylancr, may be
 //    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT            ROT   COMPANY                 FULLNAME                                          FLAGS
 GAME( 1995, skylncr,   0,        skylncr,  skylncr,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1995, butrfly,   0,        skylncr,  skylncr,  skylncr_state,  init_butrfly,   ROT0, "Bordun International", "Butterfly Video Game (version A00)",             MACHINE_SUPPORTS_SAVE )
+GAME( 2006, butrflya,  butrfly,  skylncr,  skylncr,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Butterfly Video Game (version U863M)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1995, butrflybl, butrfly,  skylncr,  skylncr,  skylncr_state,  empty_init,     ROT0, "bootleg",              "Butterfly Video Game (version U350C)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1999, mbutrfly,  0,        mbutrfly, mbutrfly, skylncr_state,  init_mbutrfly,  ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995, madzoo,    0,        skylncr,  skylncr,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Mad Zoo (version U450C)",                        MACHINE_SUPPORTS_SAVE )

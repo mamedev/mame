@@ -792,4 +792,4 @@ GAME( 1983, daifugo,  0, daifugo,  daifugo,  speedatk_state, empty_init, ROT90, 
 GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, empty_init, ROT0,  "Seta Kikaku",                                  "Speed Attack! (Japan)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1985, hanaren2, 0, harashi,  speedatk, speedatk_state, empty_init, ROT0,  "K & K Electron",                               "Hana no Ren-Chan II (Japan)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, harashi,  0, harashi,  speedatk, speedatk_state, empty_init, ROT0,  "Asahi Bussan",                                 "Hana Arashi (Japan)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1982, unkalba,  0, harashi,  speedatk, speedatk_state, empty_init, ROT90, "Alba",                                         "unknown Alba game",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1982, unkalba,  0, harashi,  speedatk, speedatk_state, empty_init, ROT90, "Alba",                                         "unknown Alba game",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

@@ -21,10 +21,11 @@ Main components:
 - OKI M6295
 
 TODO:
-- sprites
-- visible area
-- hopper
-- more tilemaps?
+- hopper (stops the game from working)
+- sprites' priority
+- check visible area
+- 2 more tilemaps (don't seem used by the dumped game)
+- enable NVRAM support once it works
 */
 
 #include "emu.h"
@@ -42,7 +43,7 @@ TODO:
 #include "tilemap.h"
 
 
-//namespace {
+namespace {
 
 class banprestomsz80_state : public driver_device
 {
@@ -55,8 +56,8 @@ public:
 		m_palette(*this, "palette"),
 		m_hopper(*this, "hopper"),
 		m_charram(*this, "charram"),
-		m_bgram(*this, "bgram")
-		//m_spriteram(*this, "sprite_ram")
+		m_bgram(*this, "bgram"),
+		m_spriteram(*this, "sprite_ram")
 	{ }
 
 	void banprestomsz80(machine_config &config) ATTR_COLD;
@@ -73,12 +74,14 @@ private:
 
 	required_shared_ptr<uint8_t> m_charram;
 	required_shared_ptr<uint8_t> m_bgram;
-	//required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	tilemap_t *m_char_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	uint8_t m_crtc_upper_data = 0;
+	uint16_t m_layer_en = 0;
+	uint16_t m_scrollram[6] {};
 
 	void output_w(uint8_t data);
 	void output2_w(uint8_t data);
@@ -89,6 +92,8 @@ private:
 
 	void crtc_upper_data_w(uint8_t data);
 	void crtc_w(offs_t offset, uint8_t data);
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_char_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -109,8 +114,9 @@ void banprestomsz80_state::video_start()
 	m_bg_tilemap->set_transparent_pen(0x0f);
 
 	save_item(NAME(m_crtc_upper_data));
+	save_item(NAME(m_layer_en));
+	save_item(NAME(m_scrollram));
 }
-
 
 void banprestomsz80_state::charram_w(offs_t offset, uint8_t data)
 {
@@ -129,7 +135,7 @@ TILE_GET_INFO_MEMBER(banprestomsz80_state::get_char_tile_info)
 	int const tile = m_charram[2 * tile_index] | ((m_charram[2 * tile_index + 1] & 0x07) << 8);
 	int const color = m_charram[2 * tile_index + 1] >> 4;
 
-	tileinfo.set(2, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(banprestomsz80_state::get_bg_tile_info)
@@ -140,10 +146,33 @@ TILE_GET_INFO_MEMBER(banprestomsz80_state::get_bg_tile_info)
 	tileinfo.set(1, tile, color, 0);
 }
 
+void banprestomsz80_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int i = 0x200 - 4; i > -1; i -= 4)
+	{
+		int const tile = m_spriteram[i] | ((m_spriteram[i + 1] & 0x70) << 4);
+		int const color = m_spriteram[i + 1] & 0x0f;
+		int const y = m_spriteram[i + 2];
+		int const x = m_spriteram[i + 3];
+
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, tile, color, 0, 0, x, y, 0xf);
+	}
+}
+
 uint32_t banprestomsz80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_char_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	screen.priority().fill(0, cliprect);
+
+	m_bg_tilemap->set_scrollx(0, m_scrollram[4]);
+	m_bg_tilemap->set_scrolly(0, m_scrollram[5]);
+
+	// are these two tilemaps used? doesn't seem so
+	//if (BIT(~m_layer_en, 0)) { tilemap0->draw(screen, bitmap, cliprect, 0, 1); }
+	//if (BIT(~m_layer_en, 1)) { tilemap1->draw(screen, bitmap, cliprect, 0, 2); }
+
+	if (BIT(~m_layer_en, 2)) { m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 4); }
+	if (BIT(~m_layer_en, 3)) { m_char_tilemap->draw(screen, bitmap, cliprect, 0, 8); }
+	if (BIT(~m_layer_en, 4)) { draw_sprites(bitmap, cliprect); }
 
 	return 0;
 }
@@ -196,7 +225,8 @@ void banprestomsz80_state::program_map(address_map &map)
 	map(0xe000, 0xe7ff).ram();
 	map(0xe800, 0xefff).ram().w(FUNC(banprestomsz80_state::charram_w)).share(m_charram);
 	map(0xf000, 0xf7ff).ram().w(FUNC(banprestomsz80_state::bgram_w)).share(m_bgram);
-	map(0xf800, 0xffff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf800, 0xfdff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xfe00, 0xffff).ram().share(m_spriteram);
 }
 
 // TODO: various writes
@@ -241,70 +271,67 @@ static INPUT_PORTS_START( dnjsenso )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME( "Bet 1" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME( "Bet 2" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME( "Bet 3" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4) PORT_NAME( "Bet 4" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(4) PORT_NAME( "Bet 5" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(4) PORT_NAME( "Bet 6" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(4) PORT_NAME( "Bet 7" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // No effect in test mode
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("Bet 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("Bet 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("Bet 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4) PORT_NAME("Bet 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(4) PORT_NAME("Bet 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(4) PORT_NAME("Bet 6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(4) PORT_NAME("Bet 7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 
+	// Switch effects taken from test mode. No medal in rate shown, so possibly a couple of the unknown ones are that
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW1:1,2") // 100 Yen
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x03, "1 Coin/11 Credits" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3") // no effect in test mode
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4") // no effect in test mode
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:5") // no effect in test mode
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Voice" ) PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW1:7,8") // 10 Yen
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x07, 0x07, "Payout Rate" ) PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(    0x07, "50%" )
+	PORT_DIPSETTING(    0x03, "60%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x01, "70%" )
+	PORT_DIPSETTING(    0x06, "75%" )
+	PORT_DIPSETTING(    0x02, "80%" )
+	PORT_DIPSETTING(    0x04, "85%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0x08, 0x08, "Winwave" ) PORT_DIPLOCATION("DSW2:4") // ??
+	PORT_DIPSETTING(    0x08, "Small" )
+	PORT_DIPSETTING(    0x00, "Big" )
+	PORT_DIPNAME( 0x30, 0x30, "G Medal Rate" ) PORT_DIPLOCATION("DSW2:5,6")
+	PORT_DIPSETTING(    0x30, "03%" )
+	PORT_DIPSETTING(    0x10, "05%" )
+	PORT_DIPSETTING(    0x20, "07%" )
+	PORT_DIPSETTING(    0x00, "10%" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7") // no effect shown in test mode
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8") // no effect shown in test mode
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
-// TODO: maybe not 100% correct
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -331,7 +358,7 @@ static const gfx_layout tilelayout =
 static GFXDECODE_START( gfx )
 	GFXDECODE_ENTRY( "tiles", 0, charlayout, 0x200, 16 )
 	GFXDECODE_ENTRY( "tiles", 0, tilelayout, 0, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x300, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 )
 GFXDECODE_END
 
 
@@ -352,14 +379,16 @@ void banprestomsz80_state::banprestomsz80(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_visarea(0, 32*8-1, 0, 28*8-1);
 	screen.set_screen_update(FUNC(banprestomsz80_state::screen_update));
 	screen.set_palette(m_palette);
 
 	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set([this] (uint16_t data) { m_layer_en = data; });
+	m_crtc->layer_scroll_callback().set([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_scrollram[offset]); });
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x300);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -368,14 +397,14 @@ void banprestomsz80_state::banprestomsz80(machine_config &config)
 }
 
 
-// ウルトラマン超闘士激戦 - 大日本重弾戦争 (Ultraman Chō Tōshi Gekisen - Dai Nippon Jūdan Sensō)
+// ウルトラマン倶楽部 大地防衛戦 (Club Ultraman - Daichikyū Bōeisen)
 ROM_START( dnjsenso )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "s83-c01.u0129", 0x00000, 0x10000, CRC(b9cb8a41) SHA1(4ca9c6dd44691e90ac8373fc7e1e6c704cb2f64c) )
 
 	ROM_REGION( 0x40000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "s83-a05.u052",  0x00000, 0x20000, CRC(e7fdc950) SHA1(3fe2839a8a8402aa3ee1e867d249b53a4f5bf7a1) )
-	ROM_LOAD16_BYTE( "s83-a06.u0510", 0x00001, 0x20000, CRC(d2221ab9) SHA1(168ca7cca0d759e7de9d20f838ed9a303ce7bfa8) )
+	ROM_LOAD16_BYTE( "s83-a06.u0510", 0x00000, 0x20000, CRC(d2221ab9) SHA1(168ca7cca0d759e7de9d20f838ed9a303ce7bfa8) )
+	ROM_LOAD16_BYTE( "s83-a05.u052",  0x00001, 0x20000, CRC(e7fdc950) SHA1(3fe2839a8a8402aa3ee1e867d249b53a4f5bf7a1) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD16_BYTE( "s83-a03.u049",  0x00000, 0x20000, CRC(dced1091) SHA1(03cb87330bed98b96c3ef790bc4dafb744e2f3c9) )
@@ -389,7 +418,7 @@ ROM_START( dnjsenso )
 	ROM_LOAD( "scz02.u061",  0x200, 0x155, NO_DUMP ) // 18CV8-PC25
 ROM_END
 
-//} // anonymous namespace
+} // anonymous namespace
 
 
-GAME( 1992, dnjsenso, 0, banprestomsz80, dnjsenso, banprestomsz80_state, empty_init, ROT0, "Banpresto", "Ultraman Cho Toshi Gekisen - Dai Nippon Judan Senso", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dnjsenso, 0, banprestomsz80, dnjsenso, banprestomsz80_state, empty_init, ROT0, "Banpresto", "Club Ultraman - Daichikyu Boeisen", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
