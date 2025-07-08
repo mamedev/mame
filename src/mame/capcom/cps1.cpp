@@ -413,7 +413,7 @@ uint16_t cps_state::irqack_r(offs_t offset)
 
 void cps_state::cpu_space_map(address_map &map)
 {
-	map(0xfffff2, 0xffffff).r(FUNC(cps_state::irqack_r));
+	map(0xfffff2, 0xffffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).r(FUNC(cps_state::irqack_r));
 }
 
 
