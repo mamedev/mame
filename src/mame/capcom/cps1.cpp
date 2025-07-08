@@ -348,7 +348,7 @@ INTERRUPT_GEN_MEMBER(cps_state::cps1_interrupt)
 	/* Strider also has a IRQ4 handler. It is input port related, but the game */
 	/* works without it. It is the *only* CPS1 game to have that. */
 	/* ...until we found out that ganbare relies on it, see below */
-	device.execute().set_input_line(M68K_IRQ_IPL1, HOLD_LINE);
+	device.execute().set_input_line(M68K_IRQ_IPL1, ASSERT_LINE);
 }
 
 /*
@@ -366,7 +366,6 @@ Strider has a handler but no h/w support to call IRQ4, perhaps a remnant of some
 dev tool?
 
 And particularly on CPS2, CPS-B-21 triggers raster interrupts.
-
 */
 TIMER_DEVICE_CALLBACK_MEMBER(cps_state::raster_scanline)
 {
@@ -392,15 +391,29 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::raster_scanline)
 
 	// vblank interrupt on IPL1 (IRQ2)
 	if (scanline == 240)
-		m_maincpu->set_input_line(M68K_IRQ_IPL1, HOLD_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_IPL1, ASSERT_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(cps_state::raster_irq)
 {
-	m_maincpu->set_input_line(M68K_IRQ_IPL2, HOLD_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_IPL2, ASSERT_LINE);
 
 	// note: normally it's vpos - 1, but let's give it some time before it actually writes to gfx registers
 	m_screen->update_partial(m_screen->vpos());
+}
+
+uint16_t cps_state::irqack_r(offs_t offset)
+{
+	// FC0-FC2(any) + BGACK: VPA and clears both IPL1 and IPL2
+	m_maincpu->set_input_line(M68K_IRQ_IPL1, CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_IPL2, CLEAR_LINE);
+
+	return m68000_base_device::autovector(offset + 1);
+}
+
+void cps_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff2, 0xffffff).r(FUNC(cps_state::irqack_r));
 }
 
 
@@ -3927,6 +3940,7 @@ void cps_state::cps1_10MHz(machine_config &config)
 	M68000(config, m_maincpu, XTAL(10'000'000));    /* verified on pcb */
 	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::main_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
 
 	Z80(config, m_audiocpu, XTAL(3'579'545));  /* verified on pcb */
