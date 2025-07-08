@@ -189,7 +189,7 @@ uint8_t servicet_state::port3_r()
 	uint8_t sda = m_i2cmem->read_sda();
 
 	// Clear bit 4 (SDA) and insert actual value from EEPROM
-	data = (data & ~(1 << PORT_3_SDA)) | (sda << PORT_3_SDA);
+	data = (data & ~(1 << PORT_3_SDA)) | (sda ? (1 << PORT_3_SDA) : 0);
 
 	return data;
 }
