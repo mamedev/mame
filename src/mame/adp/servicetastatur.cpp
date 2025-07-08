@@ -11,7 +11,7 @@ Hardware:
 
 Key Matrix Layout:
 Col 0 (P1.0): OK, F4, UP
-Col 1 (P1.1): RIGHT, LEFT, DOWN  
+Col 1 (P1.1): RIGHT, LEFT, DOWN
 Col 2 (P1.2): F3, F1, F2
 
     _____________________________________
@@ -26,7 +26,7 @@ ___| XTAL  80C31          +KEYPAD+       |__
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h" 
+#include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
 #include "video/hd44780.h"
 #include "emupal.h"
@@ -73,30 +73,31 @@ public:
 
 	void servicet(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	
+
+private:
 	uint8_t port1_r();
 	void port1_w(uint8_t data);
 	uint8_t port3_r();
 	void port3_w(uint8_t data);
 	uint8_t bus_r(offs_t offset);
 	void bus_w(offs_t offset, uint8_t data);
-		
+
+	void servicet_io(address_map &map) ATTR_COLD;
+	void servicet_map(address_map &map) ATTR_COLD;
+
 	HD44780_PIXEL_UPDATE(servicet_pixel_update);
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<hd44780_device> m_lcd;
 	required_ioport_array<3> m_io_keys;
-	
+
 	uint8_t m_port1 = 0xff;
 	uint8_t m_port3 = 0xff;
 	uint8_t m_lcd_data = 0;
-
-	void servicet_io(address_map &map) ATTR_COLD;
-	void servicet_map(address_map &map) ATTR_COLD;
 };
 
 void servicet_state::servicet_map(address_map &map)
@@ -119,7 +120,7 @@ static INPUT_PORTS_START( servicet )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_4WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_4WAY
-	
+
 	PORT_START("IN2") // P1.2
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
@@ -143,10 +144,10 @@ void servicet_state::machine_reset()
 uint8_t servicet_state::port1_r()
 {
 	uint8_t data = m_port1; // Start with what was written to port1
-	
+
 	// key matrix scanning seems to be bidirectional
 	// CPU drives each line HIGH and checks if connected lines are also HIGH = button pressed
-	
+
 	// Column-to-Row scanning: When columns (P1.0-P1.2) are driven HIGH
 	for (int col = 0; col < 3; col++)
 	{
@@ -156,7 +157,7 @@ uint8_t servicet_state::port1_r()
 			data |= (keys & 0x70); // Mask to only row bits (4,5,6)
 		}
 	}
-	
+
 	// Row-to-Column scanning: When rows (P1.4-P1.6) are driven HIGH
 	for (int row = 0; row < 3; row++)
 	{
@@ -173,7 +174,7 @@ uint8_t servicet_state::port1_r()
 			}
 		}
 	}
-	
+
 	return data;
 }
 
@@ -205,19 +206,19 @@ void servicet_state::port3_w(uint8_t data)
 uint8_t servicet_state::bus_r(offs_t offset)
 {
 	uint8_t data = 0xff;
-	
+
 	// LCD is mapped to addresses where A6:A4 = 111 (0x70-0x7f)
 	if ((offset & 0x70) == 0x70)
 	{
 		// RS and RW are A1 and A0
 		bool rs = BIT(offset, 1);
 		bool rw = BIT(offset, 0);
-		
+
 		if (rw)
 		{
 			m_lcd->rs_w(rs);
 			m_lcd->rw_w(1);
-			
+
 			m_lcd->e_w(1);
 			data = m_lcd->db_r();
 			m_lcd->e_w(0);
@@ -227,33 +228,37 @@ uint8_t servicet_state::bus_r(offs_t offset)
 			data = m_lcd_data;
 		}
 	}
-	
+
 	return data;
 }
 
 void servicet_state::bus_w(offs_t offset, uint8_t data)
-{	
+{
 	// LCD is mapped to addresses where A6:A4 = 111 (0x70-0x7f)
 	if ((offset & 0x70) == 0x70)
 	{
 		// RS and RW are A1 and A0
 		bool rs = BIT(offset, 1);
 		bool rw = BIT(offset, 0);
-		
+
 		if (!rw)
 		{
 			m_lcd_data = data;
-			
+
 			m_lcd->rs_w(rs);
 			m_lcd->rw_w(0);
 			m_lcd->db_w(data);
-			
+
 			m_lcd->e_w(1);
 			m_lcd->e_w(0);
 		}
-	} else if (offset == 0x4000){
+	}
+	else if (offset == 0x4000)
+	{
 		//LOG("GSG write: %02X \n", data, offset);
-	} else {
+	}
+	else
+	{
 		//LOG("IO write: %02X to %04X\n", data, offset);
 	}
 }
