@@ -33,6 +33,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 
@@ -429,6 +430,8 @@ void hanaawas_state::hanaawas(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &hanaawas_state::hanaawas_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(hanaawas_state::irq0_line_assert));
 
+	I8741A(config, "iomcu", 18.432_MHz_XTAL / 6).set_disable(); // type only faintly discerned on one PCB photo; divider not verified
+
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -456,6 +459,8 @@ void hanaawas_state::hanaawasa(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_IO, &hanaawas_state::hanaawasa_io_map);
 
+	config.device_remove("iomcu");
+
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.in_pa_callback().set_ioport("START");
 	ppi.in_pb_callback().set(FUNC(hanaawas_state::hanaawasa_matrix_r));
@@ -469,12 +474,15 @@ void hanaawas_state::hanaawasa(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( hanaawas )
+ROM_START( hanaawas ) // PC0-017-11 PCB?
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "1.1e",       0x0000, 0x2000, CRC(618dc1e3) SHA1(31817f256512352db0d27322998d9dcf95a993cf) )
 	ROM_LOAD( "2.3e",       0x2000, 0x1000, CRC(5091b67f) SHA1(5a66740b8829b9b4d3aea274f9ff36e0b9e8c151) )
 	ROM_LOAD( "3.4e",       0x4000, 0x1000, CRC(dcb65067) SHA1(37964ff4016bd927b9f13b4358b831bb667f993b) )
 	ROM_LOAD( "4.6e",       0x6000, 0x1000, CRC(24bee0dc) SHA1(a4237ad3611c923b563923462e79b0b3f66cc721) )
+
+	ROM_REGION( 0x0400, "iomcu", 0 )
+	ROM_LOAD( "az-001.3j",  0x0000, 0x0400, NO_DUMP )
 
 	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "5.9a",       0x0000, 0x1000, CRC(304ae219) SHA1(c1eac4973a6aec9fd8e848c206870667a8bb0922) )
