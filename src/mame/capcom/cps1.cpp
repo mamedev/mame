@@ -384,7 +384,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::raster_scanline)
 			raster_irq_pending |= 1 << i;
 	}
 
-	// schedule raster interrupt on IPL2 (IRQ4, or IRQ6 if it's on the same line as vblank)
+	// schedule raster interrupt on IPL2 (IRQ4, or IRQ6 if it's at the same time as vblank)
 	m_raster_counter[2] = m_raster_reload[2];
 	if (raster_irq_pending)
 		m_raster_irq->adjust(m_raster_counter[2] * 2 * m_screen->pixel_period());

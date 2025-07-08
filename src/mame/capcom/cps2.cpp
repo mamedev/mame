@@ -1018,8 +1018,8 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 							sy = (y + nys * 16 + yoffs) & 0x3ff;
 
 							DRAWSPRITE(
-//                                      code + nxs + 0x10 * nys,
-									(code & ~0xf) + ((code + nxs) & 0xf) + 0x10 * nys,  //  pgear fix
+									//code + nxs + 0x10 * nys,
+									(code & ~0xf) + ((code + nxs) & 0xf) + 0x10 * nys, // pgear fix
 									(col & 0x1f),
 									0,0,
 									sx,sy);
