@@ -174,7 +174,7 @@ license:CC0-1.0
 
 <!-- center -->
 		<!-- gestoert -->
-		<element name="lamp24" ref="indicator_red">
+		<element name="lamp26" ref="indicator_red">
             <bounds x="50" y="120" width="20" height="10" />
 	    </element>
 

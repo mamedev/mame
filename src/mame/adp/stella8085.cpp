@@ -140,8 +140,7 @@ void stella8085_state::mc146818_io_map(address_map &map)
 
 void stella8085_state::kbd_sl_w(u8 data)
 {
-	m_kbd_sl = data;// & 0x07;
-	//LOG("I8279: Scan Line: %02X\n", m_kbd_sl);
+	m_kbd_sl = data;
 }
 
 u8 stella8085_state::kbd_rl_r()
@@ -158,18 +157,23 @@ u8 stella8085_state::kbd_rl_r()
 
 void stella8085_state::disp_w(u8 data)
 {
-// 0x02, 0x04 gestört
-
-//  Display data
-	if (m_kbd_sl==2 && data==0x40)
-		m_lamps[42] = 1;
-	output_digit(m_kbd_sl, data);
+    if (m_kbd_sl == 2) {
+        for (int i = 0; i < 8; i++)
+        {
+            u8 lamp_index = (m_kbd_sl * 10) + i;
+            bool lamp_value = BIT(data, i);
+            m_lamps[lamp_index] = lamp_value;
+        }
+    }
+	else
+	    output_digit(m_kbd_sl, data);
 }
 
 void stella8085_state::output_digit(u8 i, u8 data)
 {
-    if (i < 8)
-		m_digits[i] = data;
+    if (i < 8) {
+		//m_digits[i] = data;
+	}
 }
 
 void stella8085_state::rst65_w(u8 state)
