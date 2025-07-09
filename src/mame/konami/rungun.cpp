@@ -212,7 +212,7 @@ void rungun_state::sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			    bit3  : coin counter #1
 			    bit4  : coin counter #2 (when coin slot "common" is selected)
 			    bit7  : set before massive memory writes (video chip select?)
-			    bit10 : IRQ5 ACK
+			    bit10 : IRQ5 enable
 			    bit12 : if set, forces screen output to 1 monitor.
 			    bit14 : (0) sprite on top of PSAC2 layer (1) other way around (title screen)
 			*/
@@ -236,10 +236,10 @@ void rungun_state::sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 		case 0x0c/2:
 			/*
-			    bit 0  : also enables IRQ???
-			    bit 1  : disable PSAC2 input?
+			    bit 0  : screen field selection (FSEL)
+			    bit 1  : screen field mode      (FMODE)
 			    bit 2  : OBJCHA
-			    bit 3  : enable IRQ 5
+			    bit 3  : MUTE
 			    bit 7-4: base address for 53936 ROM readback.
 			*/
 			m_k055673->k053246_set_objcha_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
@@ -259,8 +259,8 @@ INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 	// send to sprite device current state (i.e. bread & butter sprite DMA)
 	// TODO: firing this in screen update causes sprites to desync badly ...
 	sprite_dma_trigger();
-
-	if (m_sysreg[0x0c / 2] & 0x09)
+	bool is_irq5_enabled = BIT(m_sysreg[0x08/2],10)!=0;
+	if( is_irq5_enabled )
 		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
 }
 
