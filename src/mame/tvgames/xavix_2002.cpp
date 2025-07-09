@@ -668,8 +668,6 @@ uint8_t superxavix_i2c_ndpmj_state::read_extended_io1(offs_t offset, uint8_t mem
 
 	if (!(mem_mask & 0x80))
 		ret |= m_i2cmem->read_sda() << 7;
-	else
-		ret |= 0x80;
 
 	return ret;
 }
@@ -678,11 +676,8 @@ void superxavix_i2c_ndpmj_state::write_extended_io1(offs_t offset, uint8_t data,
 {
 	logerror("%s: write_extended_io1 (SEEPROM?) mask %02x data %02x\n", machine().describe_context(), mem_mask, data);
 
-	if (mem_mask & 0x80)
-		m_i2cmem->write_sda((data & 0x80) >> 7);
-
-	if (mem_mask & 0x40)
-		m_i2cmem->write_scl((data & 0x40) >> 6);
+	m_i2cmem->write_sda(BIT(data | ~mem_mask, 7));
+	m_i2cmem->write_scl(BIT(data | ~mem_mask, 6));
 }
 
 void superxavix_i2c_ndpmj_state::superxavix_i2c_ndpmj(machine_config &config)
