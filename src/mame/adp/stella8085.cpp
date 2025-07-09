@@ -105,6 +105,8 @@ void stella8085_state::machine_start()
 void stella8085_state::program_map(address_map &map)
 {
 	map(0x0000, 0x8fff).rom(); // ICE6, ICD6, ICC5
+	map(0x9000, 0x90ff).ram(); // ??
+	map(0xa000, 0xafff).ram(); // ??
 	map(0xc000, 0xc7ff).ram(); // ICC6
 }
 
