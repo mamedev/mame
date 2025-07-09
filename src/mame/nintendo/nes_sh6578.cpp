@@ -834,7 +834,8 @@ CONS( 1997, mousekid,    0,  0,  nes_sh6578,     bancook, nes_sh6578_state, init
 CONS( 2001, bancook,     0,  0,  nes_sh6578,     bancook,    nes_sh6578_state, init_nes_sh6578, "Bandai", "Ojamajo Doremi no TV de Magical Cooking (Japan)", MACHINE_NOT_WORKING )
 
 // there's no SEEPROM, it uses a CR2032 to keep some RAM data alive
-CONS( 2001, soulbird,     0,  0,  nes_sh6578,     soulbird,    nes_sh6578_state, init_nes_sh6578, "Bandai", "Hyakujuu Sentai Gaoranger: DX Soul Bird (Japan)", 0 )
+// 百獣戦隊ガオレンジャー ソウルバード アニマル救出大作戦 (aka DX Soul Bird)
+CONS( 2001, soulbird,     0,  0,  nes_sh6578,     soulbird,    nes_sh6578_state, init_nes_sh6578, "Bandai", "Hyakujuu Sentai Gaoranger Soul Bird: Animal Kyuushutsu Daisakusen (Japan)", 0 )
 
 CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
 
