@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// copyright-holders:stonedDiscord
 /*
 
 ADP
@@ -13,6 +14,19 @@ Key Matrix Layout:
 Col 0 (P1.0): OK, F4, UP
 Col 1 (P1.1): RIGHT, LEFT, DOWN
 Col 2 (P1.2): F3, F1, F2
+
+GSG pinout to machine:
+GND
+Data Out
+Enable
+Data Clock
+Data In
+5V
+
+Output is done by 74HC165.
+Input is done by the 2 74HC4094.
+D7 is connected to QP0 and D0 to QP7.
+U19 has D1-D3 reversed from this.
 
     _____________________________________
    | 11.059     24CS16           TL7705  |
@@ -31,8 +45,6 @@ ___| XTAL  80C31          +KEYPAD+       |__
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
-
-#include "logmacro.h"
 
 namespace {
 
@@ -228,6 +240,10 @@ uint8_t servicet_state::bus_r(offs_t offset)
 			data = m_lcd_data;
 		}
 	}
+	else
+	{
+		//LOG("Bus read: %02X to %04X\n", offset);
+	}
 
 	return data;
 }
@@ -259,7 +275,7 @@ void servicet_state::bus_w(offs_t offset, uint8_t data)
 	}
 	else
 	{
-		//LOG("IO write: %02X to %04X\n", data, offset);
+		//LOG("Bus write: %02X to %04X\n", data, offset);
 	}
 }
 
@@ -290,7 +306,7 @@ void servicet_state::servicet(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	HD44780(config, m_lcd, 270'000);
-	m_lcd->set_lcd_size(2, 40);      // 2 lines, 40 characters
+	m_lcd->set_lcd_size(2, 40); // 2 lines, 40 characters
 }
 
 ROM_START( servicet )
