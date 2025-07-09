@@ -686,6 +686,7 @@ void nes_sh6578_state::nes_sh6578_pal(machine_config& config)
 	PPU_SH6578PAL(config.replace(), m_ppu, RP2A03_PAL_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_ppu->set_addrmap(AS_PROGRAM, &nes_sh6578_state::ppu_map);
 
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66 / (PALC_APU_CLOCK.dvalue() / 1000000)) *
