@@ -34,7 +34,7 @@
 
 #include "bus/spectrum/zxbus/bus.h"
 #include "cpu/z80/z80n.h"
-#include "machine/i2cmem.h"
+#include "machine/i2cds1307.h"
 #include "machine/spi_sdcard.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -81,7 +81,7 @@ public:
 		, m_copper(*this, "copper")
 		, m_ctc(*this, "ctc")
 		, m_dma(*this, "ndma")
-		, m_i2cmem(*this, "i2cmem")
+		, m_i2c(*this, "i2c")
 		, m_sdcard(*this, "sdcard")
 		, m_ay(*this, "ay%u", 0U)
 		, m_dac(*this, "dac%u", 0U)
@@ -293,7 +293,7 @@ private:
 	required_device<specnext_copper_device> m_copper;
 	required_device<specnext_ctc_device> m_ctc;
 	required_device<specnext_dma_device> m_dma;
-	required_device<i2cmem_device> m_i2cmem;
+	optional_device<i2c_ds1307_device> m_i2c;
 	required_device<spi_sdcard_device> m_sdcard;
 	required_device_array<ym2149_device, 3> m_ay;
 	required_device_array<dac_byte_interface, 4> m_dac;
@@ -535,6 +535,7 @@ private:
 	u8 m_spi_mosi_dat;
 	u8 m_spi_miso_dat;
 	bool m_i2c_scl_data;
+	bool m_i2c_sda_data;
 
 	u16 m_irq_mask;
 };
@@ -1006,7 +1007,7 @@ void specnext_state::i2c_scl_w(u8 data)
 	if (port_i2c_io_en())
 	{
 		m_i2c_scl_data = data & 1;
-		m_i2cmem->write_scl(m_i2c_scl_data);
+		m_i2c->scl_write(m_i2c_scl_data);
 	}
 }
 
@@ -2616,10 +2617,10 @@ void specnext_state::map_io(address_map &map)
 		return port_i2c_io_en() ? (0xfe | m_i2c_scl_data) : 0x00;
 	})).w(FUNC(specnext_state::i2c_scl_w));
 	map(0x113b, 0x113b).lrw8(NAME([this]() {
-		return port_i2c_io_en() ? (0xfe | (m_i2cmem->read_sda() & 1)) : 0x00;
+		return port_i2c_io_en() ? (0xfe | (m_i2c_sda_data & 1)) : 0x00;
 	}), NAME([this](u8 data) {
 		if(port_i2c_io_en())
-			m_i2cmem->write_sda(data & 1);
+			m_i2c->sda_write(data & 1);
 	}));
 	map(0x183b, 0x183b).select(0x0700).lrw8(NAME([this](offs_t offset) {
 		u8 chanel = offset >> 8;
@@ -3024,6 +3025,7 @@ void specnext_state::machine_start()
 	save_item(NAME(m_spi_mosi_dat));
 	save_item(NAME(m_spi_miso_dat));
 	save_item(NAME(m_i2c_scl_data));
+	save_item(NAME(m_i2c_sda_data));
 	save_item(NAME(m_irq_mask));
 }
 
@@ -3175,6 +3177,7 @@ void specnext_state::machine_reset()
 	//port_253b_rd_qq  = 0b00;
 	//sram_req_d  = 0;
 	m_i2c_scl_data = 1;
+	m_i2c_sda_data = 1;
 	port_e7_reg_w(0xff);
 	//joy_iomode_pin7  = 1;
 
@@ -3461,7 +3464,8 @@ void specnext_state::tbblue(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_regs_map).set_map(&specnext_state::map_regs).set_options(ENDIANNESS_LITTLE, 8, 8, 0);
 
-	I2C_24C01(config, m_i2cmem).set_address(0xd0); // RTC + DEFAULT_ALL_0; confitm size
+	I2C_DS1307(config, m_i2c);
+	m_i2c->sda_callback().set([this](int state) { m_i2c_sda_data = state & 1; });
 
 	SPI_SDCARD(config, m_sdcard, 0);
 	m_sdcard->set_prefer_sdhc();
