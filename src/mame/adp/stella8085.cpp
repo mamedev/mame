@@ -5,7 +5,7 @@
 
 Elektronische Steuereinheit
 8085 based hardware
-Lots of lamps and 4 7-segment LEDs
+Lots of lamps and 8 7-segment LEDs
 
 Main components:
 Siemens SAB 8085AH-2-P (CPU)
@@ -14,11 +14,11 @@ Siemens SAB 8256 A 2 P (MUART)
 NEC D8279C-2 (keyboard & display interface)
 AMI or Micrel S50240 (sound)
 
-3 Different boards:
-4040-000-101 (6 ROM slots, TC5514 RAM) Parent is excellent
-4087-000-101 (3 ROM slots, RTC HD146818) Parent is doppelpot
-4109-000-101 (2 ROM slots, RTC 62421A) Parent is kniffi
-4382-000-101 (2 ROM slots, RTC 62421A) Parent is dicemstr
+At least 4 different boards exist:
+4040-000-101 (6 ROM slots, TC5514 RAM) used in excellent
+4087-000-101 (3 ROM slots, RTC HD146818) used in doppelpot
+4109-000-101 (2 ROM slots, RTC 62421A) used in kniffi
+4382-000-101 (2 ROM slots, RTC 62421A) used in dicemstr
 
 Dice Master reference: https://www.youtube.com/watch?v=NlB06dMxjME
 Merkur Disc reference: https://www.youtube.com/watch?v=1NjJPkzg9Mk
