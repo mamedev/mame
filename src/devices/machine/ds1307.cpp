@@ -6,7 +6,7 @@
 
 #include "emu.h"
 
-#include "i2cds1307.h"
+#include "ds1307.h"
 
 
 DEFINE_DEVICE_TYPE(I2C_DS1307, i2c_ds1307_device, "i2c_ds1307", "I2C DS1307 RTC/SRAM")

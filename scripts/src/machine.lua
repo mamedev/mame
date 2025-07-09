@@ -1524,13 +1524,13 @@ if (MACHINES["1MB5"]~=null) then
 end
 
 ---------------------------------------------------
---@src/devices/machine/i2cds1307.h,MACHINES["I2C_DS1307"] = true
+--@src/devices/machine/ds1307.h,MACHINES["I2C_DS1307"] = true
 ---------------------------------------------------
 
 if (MACHINES["I2C_DS1307"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/i2cds1307.cpp",
-		MAME_DIR .. "src/devices/machine/i2cds1307.h",
+		MAME_DIR .. "src/devices/machine/ds1307.cpp",
+		MAME_DIR .. "src/devices/machine/ds1307.h",
 	}
 end
 

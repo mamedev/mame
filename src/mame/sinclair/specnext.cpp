@@ -34,7 +34,7 @@
 
 #include "bus/spectrum/zxbus/bus.h"
 #include "cpu/z80/z80n.h"
-#include "machine/i2cds1307.h"
+#include "machine/ds1307.h"
 #include "machine/spi_sdcard.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
