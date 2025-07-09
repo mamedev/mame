@@ -50,6 +50,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_kdc(*this, "kdc"),
+		m_dsw(*this, "DSW"),
 		m_digits(*this, "digit%u", 0U),
 		m_lamps(*this, "lamp%u", 0U),
 		m_beep(*this, "beeper")
@@ -59,15 +60,20 @@ public:
 	void doppelpot(machine_config &config);
 	void excellent(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER( handle_dip );
+
+protected:
+	void machine_start() override ATTR_COLD;
+
 private:
 	u8 m_digit = 0U;
+	u8 m_kbd_sl = 0x00;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8279_device> m_kdc;
+	required_ioport m_dsw;
 	output_finder<8> m_digits;
 	output_finder<64> m_lamps;
 	required_device<beep_device> m_beep;
-
-	void machine_start() override ATTR_COLD;
 
 	void program_map(address_map &map) ATTR_COLD;
 	void large_program_map(address_map &map) ATTR_COLD;
@@ -79,10 +85,9 @@ private:
 	u8 kbd_rl_r();
 	void kbd_sl_w(u8 data);
 	void disp_w(u8 data);
+	void handle_dip();
 	void rst65_w(u8 state);
 	void output_digit(u8 i, u8 data);
-	u8 m_kbd_sl = 0x00;
-
 	
 	void sounddev(offs_t offset, u8 data) ATTR_COLD;
 	void makesound(uint8_t channel, uint8_t length);
@@ -176,12 +181,18 @@ void stella8085_state::output_digit(u8 i, u8 data)
 	}
 }
 
+INPUT_CHANGED_MEMBER( stella8085_state::handle_dip )
+{
+	uint8_t data = m_dsw->read();
+	LOG("RST75 %02x\n", BIT(data,0));
+	m_maincpu->set_input_line(I8085_RST75_LINE, BIT(data,0) ? ASSERT_LINE : CLEAR_LINE);
+	LOG("RST55 %02x\n", BIT(data,2));
+	m_maincpu->set_input_line(I8085_RST55_LINE, BIT(data,2) ? ASSERT_LINE : CLEAR_LINE);
+}
+
 void stella8085_state::rst65_w(u8 state)
 {
-//  KBD Interrupt
-
 	m_maincpu->set_input_line(I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-	LOG("I8279: irq state: %s - state:%02x time:%s\n", state ? "Assert Line":"Clear Line", state, machine().time().as_string());
 }
 
 
@@ -247,18 +258,18 @@ int stella8085_state::soundfreq(uint8_t channel)
 
 static INPUT_PORTS_START( dicemstr )
 	PORT_START("DSW")
-	PORT_DIPNAME(0x01, 0x01, "Restart Interrupt 7")
-	PORT_DIPSETTING(0x01, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x02, "Hold")
-	PORT_DIPSETTING(0x02, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x04, 0x04, "Restart Interrupt 5")
-	PORT_DIPSETTING(0x04, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x08, 0x08, "Reset")
-	PORT_DIPSETTING(0x08, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x01, 0x01, "8085 RST75") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(stella8085_state::handle_dip), 0)
+	PORT_DIPSETTING(0x01, DEF_STR(On))
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPNAME(0x02, 0x02, "8085 HOLD")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x02, DEF_STR(On))	
+	PORT_DIPNAME(0x04, 0x04, "8085 RST55") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(stella8085_state::handle_dip), 0)
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x04, DEF_STR(On))	
+	PORT_DIPNAME(0x08, 0x08, "8085 Reset")
+	PORT_DIPSETTING(0x08, DEF_STR(On))
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
 
 	PORT_START("SERVICE1") // Row 6
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") // Col 7
