@@ -281,9 +281,9 @@ static INPUT_PORTS_START( psion3a_de )
 	PORT_INCLUDE(psion3a)
 
 	PORT_MODIFY("COL0")
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))                 PORT_NAME(u8"\u2192 Ende") // U+2192 = →
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))                 PORT_NAME(u8"\u2192 Ende")    // U+2192 = →
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)          PORT_CHAR('z')  PORT_CHAR('Z')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))                  PORT_NAME(u8"\u2190 Pos1") // U+2190 = ←
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))                  PORT_NAME(u8"\u2190 Pos1")    // U+2190 = ←
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))                  PORT_NAME(u8"\u2193 Bild Dn") // U+2193 = ↓
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(F8))                    PORT_NAME("Tabelle")         PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion3a_state::wakeup), 0)
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)         PORT_CHAR(UCHAR_MAMEKEY(F5))                    PORT_NAME("Uhr")             PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion3a_state::wakeup), 0)
@@ -333,9 +333,9 @@ static INPUT_PORTS_START( psion3a_fr )
 
 	PORT_MODIFY("COL0")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)                                   PORT_NAME(u8"Entrée")
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))                 PORT_NAME(u8"\u2192 Fin") // U+2192 = →
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))                 PORT_NAME(u8"\u2192 Fin")   // U+2192 = →
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))                  PORT_NAME(u8"\u2190 Debut") // U+2190 = ←
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))                  PORT_NAME(u8"\u2193") // U+2193 = ↓
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))                  PORT_NAME(u8"\u2193")       // U+2193 = ↓
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(F8))                    PORT_NAME("Tableur")         PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion3a_state::wakeup), 0)
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)         PORT_CHAR(UCHAR_MAMEKEY(F5))                    PORT_NAME("Heure")           PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion3a_state::wakeup), 0)
 	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2)         PORT_CHAR(UCHAR_MAMEKEY(F2))                    PORT_NAME("Fiche")           PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion3a_state::wakeup), 0)
@@ -387,9 +387,9 @@ static INPUT_PORTS_START( psion3a_it )
 
 	PORT_MODIFY("COL0")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)                                   PORT_NAME("Invio")
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))                 PORT_NAME(u8"\u2192 Fine") // U+2192 = →
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))                 PORT_NAME(u8"\u2192 Fine")   // U+2192 = →
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))                  PORT_NAME(u8"\u2190 Inizio") // U+2190 = ←
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))                  PORT_NAME(u8"\u2193 Pag") // U+2193 = ↓
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))                  PORT_NAME(u8"\u2193 Pag")    // U+2193 = ↓
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(F8))                    PORT_NAME("Foglio")          PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion3a_state::wakeup), 0)
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)         PORT_CHAR(UCHAR_MAMEKEY(F5))                    PORT_NAME("Ora")             PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion3a_state::wakeup), 0)
 	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2)         PORT_CHAR(UCHAR_MAMEKEY(F2))                    PORT_NAME("Archivi")         PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion3a_state::wakeup), 0)
@@ -665,6 +665,12 @@ ROM_START(psion3mx)
 	ROMX_LOAD("maple_v6.16f_uk.bin", 0x000000, 0x200000, CRC(10011d9d) SHA1(8c657414513ed57ccf6beddc65dca1fe5ab600fb), ROM_BIOS(0))
 ROM_END
 
+ROM_START(psion3mx_nl)
+	ROM_REGION16_LE(0x200000, "rom", 0)
+	ROM_SYSTEM_BIOS(0, "617f", "V6.17F/DUT")
+	ROMX_LOAD("maple_v6.17f_nl.bin", 0x000000, 0x200000, CRC(900752c8) SHA1(7fee6ac2d386f61c7a01cf91033a79a9c2532c6e), ROM_BIOS(0))
+ROM_END
+
 ROM_START(psion3mx_fr)
 	ROM_REGION16_LE(0x200000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "620f", "V6.20F/FRE")
@@ -690,4 +696,5 @@ COMP( 1995, psion3a2_de,  psion3a,  0,      psion3a2,  psion3a_de,  psion3a_stat
 COMP( 1997, psion3a2_ru,  psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (Russian)", MACHINE_SUPPORTS_SAVE )
 COMP( 1996, psion3c,      0,        0,      psion3c,   psion3c,     psion3c_state,  empty_init,  "Psion",            "Series 3c",                MACHINE_SUPPORTS_SAVE )
 COMP( 1998, psion3mx,     0,        0,      psion3mx,  psion3c,     psion3mx_state, empty_init,  "Psion",            "Series 3mx",               MACHINE_SUPPORTS_SAVE )
+COMP( 1998, psion3mx_nl,  psion3mx, 0,      psion3mx,  psion3c,     psion3mx_state, empty_init,  "Psion",            "Series 3mx (Dutch)",       MACHINE_SUPPORTS_SAVE )
 COMP( 1998, psion3mx_fr,  psion3mx, 0,      psion3mx,  psion3c_fr,  psion3mx_state, empty_init,  "Psion",            "Series 3mx (French)",      MACHINE_SUPPORTS_SAVE )

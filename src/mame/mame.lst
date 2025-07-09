@@ -39489,13 +39489,14 @@ psion3s
 pocketbk2
 psion3a
 psion3a2
-psion3a2_us
 psion3a2_de
 psion3a2_it
 psion3a2_ru
+psion3a2_us
 psion3c
 psion3mx
 psion3mx_fr
+psion3mx_nl
 
 @source:psion/psion5.cpp
 psion5mx
