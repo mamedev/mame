@@ -17,12 +17,18 @@ which uses 3 bits for the color code and 13 bits for the character code.
 The 051962 multiplexes the data of the three layers and converts it into
 palette indexes and transparency bits which will be mixed later in the video
 chain.
+
 Priority is handled externally: these chips only generate the tilemaps, they
 don't mix them.
+
 Both chips are interfaced with the main CPU. When the RMRD pin is asserted,
 the CPU can read the gfx ROM data. This is done by telling the 052109 which
 dword to read (this is a combination of some banking registers, and the CPU
 address lines), and then reading it from the 051962.
+
+The hardware does not support raster effects, meaning: writes to the scroll
+registers during active display don't immediately show on the screen. The same
+probably applies to tilemap writes.
 
 052109 inputs:
 - address lines (AB0-AB15, AB13-AB15 seem to have a different function)
@@ -94,14 +100,14 @@ address lines), and then reading it from the 051962.
                     1 = 64 (actually 40) columns
            ---xx--- layer B row scroll
            --x----- layer B column scroll
-           suratk sets this register to 0x70 during the second boss to produce a rotating star field,
-           using X and Y scroll at the same time. In MAME, the corners don't scroll, or is that normal?
-           It only modifies Y scroll 0x23-0x32 (no columns after that), or maybe bit 6 has a meaning.
+           suratk sets this register to 0x70 during the second boss to produce a rotating
+           star field, using X and Y scroll at the same time. Bit 6 probably has no meaning.
            glfgreat sets it to 0x30 when showing the leader board
-           mariorou sets it to 0x36 when ingame, while actually does per-row scroll for layer A and
-           per-column scroll for layer B.
-1d00     : bits 0 & 1 might enable NMI and FIRQ, not sure
-         : bit 2 = IRQ enable
+           mariorou sets it to 0x36 when ingame, while actually does per-row scroll for layer A
+           and per-column scroll for layer B.
+1d00     : bit 0 = NMI enable/acknowledge
+         : bit 1 = FIRQ enable/acknowledge
+         : bit 2 = IRQ enable/acknowledge
 1d80     : ROM bank selector bits 0-3 = bank 0 bits 4-7 = bank 1
 1e00     : ROM membank selector for ROM testing
 1e80     : bit 0 = flip screen (applies to tilemaps only, not sprites)
@@ -190,24 +196,17 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 	m_tileflip_enable(0),
 	m_has_extra_video_ram(0),
 	m_rmrd_line(0),
-	m_irq_enabled(0),
+	m_irq_control(0),
 	m_romsubbank(0),
 	m_scrollctrl(0),
 	m_char_rom(*this, DEVICE_SELF),
 	m_k052109_cb(*this),
 	m_irq_handler(*this),
 	m_firq_handler(*this),
-	m_nmi_handler(*this)
+	m_nmi_handler(*this),
+	m_firq_scanline(nullptr),
+	m_nmi_scanline(nullptr)
 {
-}
-
-
-void k052109_device::set_char_ram(bool ram)
-{
-	if (ram)
-		set_info(gfxinfo_ram);
-	else
-		set_info(gfxinfo);
 }
 
 
@@ -220,23 +219,37 @@ void k052109_device::device_start()
 	// assumes it can make an address mask with m_char_rom.length() - 1
 	assert(!m_char_rom.found() || !(m_char_rom.length() & (m_char_rom.length() - 1)));
 
-	if (has_screen())
-	{
-		// make sure our screen is started
-		if (!screen().started())
-			throw device_missing_dependencies();
+	// make sure our screen is started
+	if (!screen().started())
+		throw device_missing_dependencies();
+	if (!palette().device().started())
+		throw device_missing_dependencies();
 
-		// and register a callback for vblank state
-		screen().register_vblank_callback(vblank_state_delegate(&k052109_device::vblank_callback, this));
-	}
+	// and register a callback for vblank state
+	screen().register_vblank_callback(vblank_state_delegate(&k052109_device::vblank_callback, this));
 
 	// resolve delegates
 	m_k052109_cb.resolve();
+
+	// allocate scanline timers and start at first scanline
+	if (!m_firq_handler.isunset())
+	{
+		m_firq_scanline = timer_alloc(FUNC(k052109_device::firq_scanline), this);
+		m_firq_scanline->adjust(screen().time_until_pos(0), 0);
+	}
+
+	if (!m_nmi_handler.isunset())
+	{
+		m_nmi_scanline = timer_alloc(FUNC(k052109_device::nmi_scanline), this);
+		m_nmi_scanline->adjust(screen().time_until_pos(0), 0);
+	}
 
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
 	m_ram = make_unique_clear<uint8_t[]>(0x6000);
+	memset(m_charrombank, 0, sizeof(m_charrombank));
+	memset(m_charrombank_2, 0, sizeof(m_charrombank_2));
 
 	m_colorram_F = &m_ram[0x0000];
 	m_colorram_A = &m_ram[0x0800];
@@ -252,6 +265,9 @@ void k052109_device::device_start()
 	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k052109_device::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k052109_device::get_tile_info2)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
+	m_tilemap[1]->set_blitter(tilemap_blitter_delegate(*this, FUNC(k052109_device::tile_blitter)));
+	m_tilemap[2]->set_blitter(tilemap_blitter_delegate(*this, FUNC(k052109_device::tile_blitter)));
+
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
@@ -266,7 +282,7 @@ void k052109_device::device_start()
 	save_item(NAME(m_charrombank_2));
 	save_item(NAME(m_has_extra_video_ram));
 	save_item(NAME(m_rmrd_line));
-	save_item(NAME(m_irq_enabled));
+	save_item(NAME(m_irq_control));
 	save_item(NAME(m_romsubbank));
 	save_item(NAME(m_scrollctrl));
 	save_item(NAME(m_addrmap));
@@ -279,11 +295,10 @@ void k052109_device::device_start()
 void k052109_device::device_reset()
 {
 	m_rmrd_line = CLEAR_LINE;
-	m_irq_enabled = 0;
-	m_romsubbank = 0;
-	m_scrollctrl = 0;
-	m_addrmap    = 0;
 	m_has_extra_video_ram = 0;
+
+	for (offs_t offset = 0x1c00; offset <= 0x1f00; offset += 0x80)
+		write(offset, 0);
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -292,23 +307,32 @@ void k052109_device::device_reset()
 	}
 }
 
-//-------------------------------------------------
-//  device_post_load - device-specific postload
-//-------------------------------------------------
-
-void k052109_device::device_post_load()
-{
-	tileflip_reset();
-}
-
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
 void k052109_device::vblank_callback(screen_device &screen, bool state)
 {
-	if (state && m_irq_enabled)
+	if (state && BIT(m_irq_control, 2))
 		m_irq_handler(ASSERT_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(k052109_device::firq_scanline)
+{
+	// FIRQ every other scanline
+	if (BIT(m_irq_control, 1))
+		m_firq_handler(ASSERT_LINE);
+
+	m_firq_scanline->adjust(screen().time_until_pos(screen().vpos() + 2));
+}
+
+TIMER_CALLBACK_MEMBER(k052109_device::nmi_scanline)
+{
+	// NMI every 32 scanlines (not on 16V)
+	if (BIT(m_irq_control, 0))
+		m_nmi_handler(ASSERT_LINE);
+
+	m_nmi_scanline->adjust(screen().time_until_pos(screen().vpos() + 32));
 }
 
 u8 k052109_device::read(offs_t offset)
@@ -334,7 +358,7 @@ u8 k052109_device::read(offs_t offset)
 	}
 	else    /* Punk Shot and TMNT read from 0000-1fff, Aliens from 2000-3fff */
 	{
-		assert (m_char_rom.found());
+		assert(m_char_rom.found());
 
 		int code = (offset & 0x1fff) >> 5;
 		int color = m_romsubbank;
@@ -393,11 +417,17 @@ void k052109_device::write(offs_t offset, u8 data)
 		else if (offset == 0x1d00)
 		{
 			//logerror("%s: 052109 register 1d00 = %02x\n", machine().describe_context(), data);
-			/* bit 2 = irq enable */
-			/* the custom chip can also generate NMI and FIRQ, for use with a 6809 */
-			m_irq_enabled = data & 0x04;
-			if (!m_irq_enabled)
+			// clear interrupts
+			if (BIT(~data & m_irq_control, 0))
+				m_nmi_handler(CLEAR_LINE);
+
+			if (BIT(~data & m_irq_control, 1))
+				m_firq_handler(CLEAR_LINE);
+
+			if (BIT(~data & m_irq_control, 2))
 				m_irq_handler(CLEAR_LINE);
+
+			m_irq_control = data;
 		}
 		else if (offset == 0x1d80)
 		{
@@ -415,7 +445,7 @@ void k052109_device::write(offs_t offset, u8 data)
 
 				for (int i = 0; i < 0x1800; i++)
 				{
-					int bank = (m_ram[i]&0x0c) >> 2;
+					int bank = (m_ram[i] & 0x0c) >> 2;
 					if ((bank == 0 && (dirty & 1)) || (bank == 1 && (dirty & 2)))
 					{
 						m_tilemap[(i & 0x1800) >> 11]->mark_tile_dirty(i & 0x7ff);
@@ -431,17 +461,13 @@ void k052109_device::write(offs_t offset, u8 data)
 		else if (offset == 0x1e80)
 		{
 			//if ((data & 0xfe)) logerror("%s: 052109 register 1e80 = %02x\n",machine().describe_context(),data);
-			m_tilemap[0]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_tilemap[1]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_tilemap[2]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			if (m_tileflip_enable != ((data & 0x06) >> 1))
+			if ((m_tileflip_enable & 0x06) != (data & 0x06))
 			{
-				m_tileflip_enable = ((data & 0x06) >> 1);
-
-				m_tilemap[0]->mark_all_dirty();
-				m_tilemap[1]->mark_all_dirty();
-				m_tilemap[2]->mark_all_dirty();
+				for (int i = 0; i < 3; i++)
+					m_tilemap[i]->mark_all_dirty();
 			}
+			m_tileflip_enable = data & 0x07;
+			tileflip_reset();
 		}
 		else if (offset == 0x1f00)
 		{
@@ -484,16 +510,6 @@ void k052109_device::write(offs_t offset, u8 data)
 		}
 		//else logerror("%s: write %02x to unknown 052109 address %04x\n",machine().describe_context(),data,offset);
 	}
-}
-
-void k052109_device::set_rmrd_line(int state)
-{
-	m_rmrd_line = state;
-}
-
-int k052109_device::get_rmrd_line()
-{
-	return m_rmrd_line;
 }
 
 
@@ -580,7 +596,7 @@ void k052109_device::tilemap_update()
 			}
 		}
 
-		// mixed scroll
+		// mixed scroll (handled in tile_blitter)
 		else
 		{
 			m_tilemap[t]->set_scroll_rows(rows);
@@ -613,6 +629,13 @@ void k052109_device::mark_tilemap_dirty(uint8_t tmap_num)
 	m_tilemap[tmap_num]->mark_all_dirty();
 }
 
+void k052109_device::tileflip_reset()
+{
+	u32 flip = BIT(m_tileflip_enable, 0) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0;
+	for (int i = 0; i < 3; i++)
+		m_tilemap[i]->set_flip(flip);
+}
+
 
 /***************************************************************************
 
@@ -639,7 +662,7 @@ void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int laye
 	int flags = 0;
 	int priority = 0;
 	int bank = m_charrombank[(color & 0x0c) >> 2];
-	if (!BIT(m_addrmap,6))
+	if (!BIT(m_addrmap, 6))
 	{
 		color = (color & 0xf3) | ((bank & 0x03) << 2);
 	}
@@ -651,11 +674,11 @@ void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int laye
 	m_k052109_cb(layer, bank, &code, &color, &flags, &priority);
 
 	/* if the callback set flip X but it is not enabled, turn it off */
-	if (!(m_tileflip_enable & 1))
+	if (!BIT(m_tileflip_enable, 1))
 		flags &= ~TILE_FLIPX;
 
 	/* if flip Y is enabled and the attribute but is set, turn it on */
-	if (flipy && (m_tileflip_enable & 2))
+	if (flipy && BIT(m_tileflip_enable, 2))
 		flags |= TILE_FLIPY;
 
 	tileinfo.set(0, code, color, flags);
@@ -678,11 +701,45 @@ TILE_GET_INFO_MEMBER(k052109_device::get_tile_info2)
 }
 
 
-void k052109_device::tileflip_reset()
+// blitter callback for mixed col+rowscroll
+
+TILE_BLITTER_MEMBER(k052109_device::tile_blitter)
 {
-	int data = m_ram[0x1e80];
-	m_tilemap[0]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	m_tilemap[1]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	m_tilemap[2]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	m_tileflip_enable = ((data & 0x06) >> 1);
+	// standard scrolling
+	if (tilemap.scroll_rows() == 1 || tilemap.scroll_cols() == 1)
+		return false;
+
+	assert(tilemap.scroll_cols() == 0x40);
+
+	int rowheight = tilemap.height() / tilemap.scroll_rows();
+	rectangle rect;
+
+	// iterate over rows in the tilemap
+	for (int currow = 0; currow < tilemap.height(); currow += rowheight)
+	{
+		s32 scrollx = rowscroll[currow / rowheight];
+
+		u32 scrollxi = tilemap.scrollx(currow / rowheight) & ~7;
+		if (~tilemap.flip() & TILEMAP_FLIPX)
+			scrollxi = -scrollxi;
+
+		// iterate over columns in the tilemap
+		for (int curcol = 0; curcol < tilemap.width(); curcol += 8)
+		{
+			s32 scrolly = colscroll[(scrollxi + curcol) >> 3 & 0x3f];
+
+			// iterate to handle wraparound
+			for (int xpos = scrollx - tilemap.width(); xpos <= cliprect.right(); xpos += tilemap.width())
+			{
+				for (int ypos = scrolly - tilemap.height(); ypos <= cliprect.bottom(); ypos += tilemap.height())
+				{
+					// update the cliprect just for this block
+					rect.set(curcol + xpos, curcol + xpos + 7, currow, currow + rowheight - 1);
+					blit(rect, xpos, ypos);
+				}
+			}
+		}
+	}
+
+	return true;
 }

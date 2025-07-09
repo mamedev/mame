@@ -24,7 +24,7 @@ The sprite RAM format is very similar to the 053245.
 005     W  bit 0 = flip screen X
            bit 1 = flip screen Y
            bit 2 = unknown
-           bit 4 = interrupt enable
+           bit 4 = obj dma/interrupt enable
            bit 5 = unknown
 006-007 W  high 16 bits of the ROM address to read
 
@@ -46,18 +46,6 @@ The sprite RAM format is very similar to the 053245.
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
-
-void k053247_device::clear_all()
-{
-	m_ram = nullptr;
-	m_gfx = nullptr;
-
-	std::fill(std::begin(m_kx46_regs), std::end(m_kx46_regs), 0);
-	std::fill(std::begin(m_kx47_regs), std::end(m_kx47_regs), 0);
-
-	m_objcha_line = 0;
-	m_z_rejection = 0;
-}
 
 void k053247_device::k053247_get_ram(u16 **ram)
 {
@@ -532,10 +520,10 @@ void k053247_device::zdrawgfxzoom32GP(
 				const int x_off = (src_base_x + x * src_stride_x) >> FP;
 				const int y_off = (src_base_y + y * src_stride_y) >> FP;
 				const u8 pal_idx = src_base[(x_off + y_off * 16) ^ flip_mask];
-				if (!pal_idx || (drawmode & 0b01 && pal_idx >= shdpen) || ozbuf_ptr[x + y * GX_ZBUFW] < z8) continue;
+				if (!pal_idx || (drawmode & 3 && pal_idx >= shdpen) || ozbuf_ptr[x + y * GX_ZBUFW] < z8) continue;
 				ozbuf_ptr[x + y * GX_ZBUFW] = z8;
 
-				if ((drawmode & 0b10) == 0) // solid sprite
+				if (!BIT(drawmode, 1)) // solid sprite
 				{
 					dst_ptr[x + y * dst_pitch] = pal_base[pal_idx];
 				}
@@ -774,11 +762,19 @@ k053247_device::k053247_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_gfx_interface(mconfig, *this, nullptr)
+	, m_ram(nullptr)
+	, m_gfx(nullptr)
+	, m_dx(0)
+	, m_dy(0)
+	, m_objcha_line(0)
+	, m_z_rejection(0)
 	, m_k053247_cb(*this)
 	, m_gfxrom(*this, DEVICE_SELF)
 	, m_gfx_num(0)
+	, m_bpp(0)
 {
-	clear_all();
+	std::fill(std::begin(m_kx46_regs), std::end(m_kx46_regs), 0);
+	std::fill(std::begin(m_kx47_regs), std::end(m_kx47_regs), 0);
 }
 
 //-------------------------------------------------

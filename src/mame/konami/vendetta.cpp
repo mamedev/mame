@@ -622,6 +622,7 @@ void vendetta_state::vendetta(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240); // measured 59.17
 	screen.set_screen_update(FUNC(vendetta_state::screen_update));
 	screen.set_palette(m_palette);
@@ -632,6 +633,7 @@ void vendetta_state::vendetta(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(vendetta_state::vendetta_tile_callback));
 
 	K053246(config, m_k053246, 24_MHz_XTAL);
@@ -666,12 +668,8 @@ void vendetta_state::esckids(machine_config &config)
 	subdevice<screen_device>("screen")->set_visarea(2*8, 38*8-1, 2*8, 30*8-1);
 
 	config.device_remove("k054000");
-	config.device_remove("k052109");
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
 	m_k052109->set_tile_callback(FUNC(vendetta_state::esckids_tile_callback));
-
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 5, 6);
 
 	K053252(config, "k053252", 24_MHz_XTAL / 4).set_offsets(0, 8);

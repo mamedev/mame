@@ -75,8 +75,6 @@ private:
 
 	required_region_ptr<u8> m_sprite_rom;
 
-	emu_timer *m_scanline_timer;
-
 	sprite_delegate m_k051960_cb;
 	devcb_write_line m_shadow_config_cb;
 
@@ -84,15 +82,20 @@ private:
 	devcb_write_line m_firq_handler;
 	devcb_write_line m_nmi_handler;
 
+	emu_timer *m_firq_scanline;
+	emu_timer *m_nmi_scanline;
+
 	u8 m_spriterombank[3];
 	u8 m_romoffset;
 	u8 m_control;
-	u8 m_nmi_count;
 	emu_timer *m_sprites_busy;
 	u8 m_shadow_config;
 
 	u8 k051960_fetchromdata(offs_t offset);
-	TIMER_CALLBACK_MEMBER(scanline_callback);
+
+	void vblank_callback(screen_device &screen, bool state);
+	TIMER_CALLBACK_MEMBER(firq_scanline);
+	TIMER_CALLBACK_MEMBER(nmi_scanline);
 };
 
 DECLARE_DEVICE_TYPE(K051960, k051960_device)

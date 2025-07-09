@@ -694,6 +694,14 @@ ROM_START( crownpkr ) // PCB E56-00002. "1.20 1997/05/30 19:00 Programming by K&
 	// U34 not populated
 ROM_END
 
+ROM_START( premline ) // original Seta PCB with sanded logos. The spaces for the 2 banks of 8 switches aren't populated.
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "pl-0.u31", 0x000000, 0x080000, CRC(3679a297) SHA1(9f29cfecdb51babc0ad9e15b6d5000834af6f481) )
+	ROM_LOAD( "pl-1.u32", 0x080000, 0x080000, CRC(fd2b53ee) SHA1(784886f90a2b6b812a8c44de1e17a216518e1830) )
+	ROM_LOAD( "pl-2.u33", 0x100000, 0x080000, CRC(309c103c) SHA1(c17483f332e364a8664f36750bf3325c340168f5) )
+	// U34 not populated
+ROM_END
+
 ROM_START( dcrown ) // PCB E51-00001 (almost identical to above)
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "dc1.u31", 0x000000, 0x80000, CRC(e55200b8) SHA1(20a968dc895bb636b064c29b4b53c6ffa49fea36) )
@@ -889,5 +897,6 @@ GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state, init_renju,   
 // Not working
 GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   st0016_state, init_mayjinsn, ROT0, "Seta",             "Mayjinsen",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, crownpkr,   0,      st0016,   crownpkr, st0016_state, init_crownpkr, ROT0, "<unknown>",        "Crown Poker (ver. 1.20)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // coining in doesn't work
+GAME( 199?, premline,   0,      st0016,   crownpkr, st0016_state, init_crownpkr, ROT0, "MK Electronics",   "Premiums Line",           MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // coining in doesn't work
 GAME( 1994, dcrown,     0,      st0016,   dcrown,   st0016_state, init_dcrown,   ROT0, "Nippon Data Kiki", "Dream Crown (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
 GAME( 1994, dcrowna,    dcrown, st0016,   dcrown,   st0016_state, init_dcrown,   ROT0, "Nippon Data Kiki", "Dream Crown (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the Insert Coin text has been translated to English and no (c) is uploaded

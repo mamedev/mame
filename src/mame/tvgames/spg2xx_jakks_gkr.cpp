@@ -89,10 +89,8 @@ void jakks_gkr_state::gkr_portc_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	{
 		if (m_i2cmem)
 		{
-			if (BIT(mem_mask, 1))
-				m_i2cmem->write_scl(BIT(data, 1));
-			if (BIT(mem_mask, 0))
-				m_i2cmem->write_sda(BIT(data, 0));
+			m_i2cmem->write_scl(BIT(data | ~mem_mask, 1));
+			m_i2cmem->write_sda(BIT(data | ~mem_mask, 0));
 		}
 	}
 }

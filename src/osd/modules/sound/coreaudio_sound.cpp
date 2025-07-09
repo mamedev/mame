@@ -25,7 +25,7 @@
 #include <new>
 #include <cstring>
 
-#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 1200
+#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 120000
 #define PROPERTY_ELEMENT_MASTER kAudioObjectPropertyElementMain
 #else
 #define PROPERTY_ELEMENT_MASTER kAudioObjectPropertyElementMaster

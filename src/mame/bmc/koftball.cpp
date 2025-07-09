@@ -860,4 +860,4 @@ void koftball_state::init_koftball()
 
 GAME( 1995, koftball, 0, koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "Zuqiu Wang - King of Football",  MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, jxzh,     0, jxzh,     jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",                MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1996, kaimenhu, 0, kaimenhu, kaimenhu, koftball_state, empty_init,    ROT0, "BMC", "Kaimen Hu",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kaimenhu, 0, kaimenhu, kaimenhu, koftball_state, empty_init,    ROT0, "BMC", "Kaimen Hu (BMC)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

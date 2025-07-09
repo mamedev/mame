@@ -200,6 +200,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP6358   TMS1475   1982, Bandai U-Boat
  *MP6361   TMS1475   1983, <unknown> Defender Strikes
  @MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
+ *MP7303   TMS1400   1980, Entex Football 3 (6018)
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
@@ -5622,7 +5623,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Entex (Electronic) Basketball 2
+  Entex Basketball 2
   * TMS1100 6010 MP1218 (die label: 1100B, MP1218)
   * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
@@ -17466,7 +17467,7 @@ SYST( 1979, esbattle,   0,         0,      esbattle,  esbattle,  esbattle_state,
 SYST( 1980, blastit,    0,         0,      blastit,   blastit,   blastit_state,   empty_init, "Entex", "Blast It", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, einvader,   0,         0,      einvader,  einvader,  einvader_state,  empty_init, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, efootb4 ,   0,         0,      efootb4,   efootb4,   efootb4_state,   empty_init, "Entex", "Color Football 4 (Entex)", MACHINE_SUPPORTS_SAVE )
-SYST( 1980, ebaskb2 ,   0,         0,      ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, ebaskb2 ,   0,         0,      ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, raisedvl,   0,         0,      raisedvl,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Raise The Devil Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, ebknight,   0,         0,      ebknight,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Black Knight Pinball (Entex)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1980, mmarvin,    0,         0,      mmarvin,   mmarvin,   mmarvin_state,   empty_init, "Entex", "Musical Marvin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

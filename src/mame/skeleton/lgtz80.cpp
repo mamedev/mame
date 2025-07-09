@@ -30,6 +30,9 @@ TODO:
   - outputs (lamps / meters)
   - hopper (off by default)
   - visible area is probably not 100% correct
+  - in the bonus games which appear when hitting 3 "bars", reels remain on screen when they
+    shouldn't
+ - arthurkn100 locks when soft-reset
 */
 
 
@@ -67,8 +70,10 @@ public:
 
 	void fruitcat(machine_config &config) ATTR_COLD;
 	void arthurkn(machine_config &config) ATTR_COLD;
+	void arthurkn100(machine_config &config) ATTR_COLD;
 
 	void init_arthurkn() ATTR_COLD;
+	void init_arthurkn100() ATTR_COLD;
 	void init_fruitcat() ATTR_COLD;
 
 protected:
@@ -112,6 +117,7 @@ private:
 	void program_map(address_map &map) ATTR_COLD;
 	void fruitcat_io_map(address_map &map) ATTR_COLD;
 	void arthurkn_io_map(address_map &map) ATTR_COLD;
+	void arthurkn100_io_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
 };
 
@@ -293,6 +299,14 @@ void lgtz80_state::arthurkn_io_map(address_map &map)
 	map(0xe0, 0xe0).r(FUNC(lgtz80_state::e0_r));
 }
 
+void lgtz80_state::arthurkn100_io_map(address_map &map)
+{
+	arthurkn_io_map(map);
+
+	map(0xa8, 0xa8).portr("DSW1");
+	map(0xb8, 0xb8).portr("DSW2");
+}
+
 void lgtz80_state::ramdac_map(address_map &map)
 {
 	map(0x000, 0x2ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
@@ -331,6 +345,61 @@ static INPUT_PORTS_START( arthurkn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) // ??
 
 // no DSW on PCB
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( arthurkn100 )
+	PORT_INCLUDE( arthurkn )
+
+	// 2 banks of 8 switches on this PCB
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, "10 Times Feature" )  PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPSETTING(    0x03, "No (Win Points to Points)" )
+	PORT_DIPSETTING(    0x02, "Yes (Free Spin Deduct Credit)" )
+	PORT_DIPSETTING(    0x01, "No (Win Points to Score)" )
+	PORT_DIPSETTING(    0x00, "Yes (Normal)" )
+	PORT_DIPNAME( 0x04, 0x04, "Play Score" )  PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Display Odds" )  PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Pay-Out Mode" )  PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, "Credit Only" )
+	PORT_DIPSETTING(    0x00, "Credit Only (duplicate)" ) // credit + black box according to notes, but seems hard-coded
+	PORT_DIPNAME( 0x20, 0x20, "Key-Out Mode" )  PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Game Count Mode" )  PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x40, "Count" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x80, 0x80, "L-Win Mode" )  PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )  PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x04, "1 Coin/15 Credits" )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0x02, "1 Coin/75 Credits" )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_100C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin/500 Credits" )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )  PORT_DIPLOCATION("DSW2:4,5,6") // Key
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x20, "1 Coin/15 Credits" )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0x10, "1 Coin/75 Credits" )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_100C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin/500 Credits" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Pay-Out Setting" )  PORT_DIPLOCATION("DSW2:7,8")
+	PORT_DIPSETTING(    0xc0, "Fixed 10 Points/1 Ticket" )
+	PORT_DIPSETTING(    0x80, "Fixed 20 Points/1 Ticket" )
+	PORT_DIPSETTING(    0x40, "Fixed 50 Points/1 Ticket" )
+	PORT_DIPSETTING(    0x00, "1 (Same as Key-In)" )
 INPUT_PORTS_END
 
 
@@ -379,6 +448,12 @@ void lgtz80_state::arthurkn(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &lgtz80_state::arthurkn_io_map);
 }
 
+void lgtz80_state::arthurkn100(machine_config &config)
+{
+	arthurkn(config);
+	m_maincpu->set_addrmap(AS_IO, &lgtz80_state::arthurkn100_io_map);
+}
+
 
 ROM_START( fruitcat )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
@@ -400,6 +475,23 @@ ROM_END
 ROM_START( arthurkn ) // no stickers on ROMs
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "w29ee011.u21", 0x00000, 0x20000, CRC(d8e2b9f4) SHA1(e8c55c42d7b57fde3168e07fa51f307b83803967) )
+
+	ROM_REGION( 0x200000, "tiles", 0 )
+	ROM_LOAD16_WORD_SWAP( "m27c160.u42", 0x000000, 0x200000, CRC(f03a9b0d) SHA1(1e8d9efe7d50871ffc6a0c4c7f08047dd5aac294) )
+
+	ROM_REGION( 0x200000, "reels", 0 )
+	ROM_LOAD16_WORD_SWAP( "m27c160.u43", 0x000000, 0x200000, CRC(31d2caab) SHA1(0ee7f35dadb1d5159a487701d059bfd2f54f8c02) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "m29f040b.u18", 0x00000, 0x80000, CRC(2b9ab706) SHA1(92154126c7db227acaa4966f71d28475c622e1e6) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "atf16v8b-15pc.u3", 0x000, 0x117, NO_DUMP )
+ROM_END
+
+ROM_START( arthurkn100 )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "sst39sf010.u21", 0x00000, 0x20000, CRC(4f4d416a) SHA1(7f4eba1e62b65e9acd31a0432ba14728ebeb0bb7) )
 
 	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD16_WORD_SWAP( "m27c160.u42", 0x000000, 0x200000, CRC(f03a9b0d) SHA1(1e8d9efe7d50871ffc6a0c4c7f08047dd5aac294) )
@@ -645,8 +737,123 @@ void lgtz80_state::init_arthurkn()
 	}
 }
 
+void lgtz80_state::init_arthurkn100()
+{
+	// Encryption involves a permutation of odd-numbered data lines, conditional on address lines
+	u8 *rom = memregion("maincpu")->base();
+	for (int i = 0; i < 0x20000; i++)
+	{
+		switch (i & 0x7c0)
+		{
+		case 0x000:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 3, 4, 1, 2, 7, 0);
+			break;
+
+		case 0x040:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 7, 4, 3, 2, 5, 0);
+			break;
+
+		case 0x080:
+		case 0x200:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 1, 2, 5, 0);
+			break;
+
+		case 0x0c0:
+		case 0x700:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 1, 4, 5, 2, 3, 0);
+			break;
+
+		case 0x100:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 7, 4, 3, 2, 1, 0);
+			break;
+
+		case 0x140:
+		case 0x4c0:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 7, 4, 5, 2, 1, 0);
+			break;
+
+		case 0x180:
+		case 0x780:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 1, 4, 7, 2, 3, 0);
+			break;
+
+		case 0x1c0:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 7, 4, 1, 2, 3, 0);
+			break;
+
+		case 0x240:
+		case 0x300:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 1, 4, 3, 2, 5, 0);
+			break;
+
+		case 0x280:
+		case 0x400:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 1, 4, 3, 2, 7, 0);
+			break;
+
+		case 0x2c0:
+		case 0x380:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 5, 4, 1, 2, 7, 0);
+			break;
+
+		case 0x340:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 5, 2, 1, 0);
+			break;
+
+		case 0x3c0:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 5, 4, 7, 2, 3, 0);
+			break;
+
+		case 0x440:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 1, 4, 5, 2, 7, 0);
+			break;
+
+		case 0x480:
+		case 0x740:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 7, 4, 5, 2, 3, 0);
+			break;
+
+		case 0x500:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 3, 4, 7, 2, 5, 0);
+			break;
+
+		case 0x540:
+			rom[i] = bitswap<8>(rom[i], 5, 6, 3, 4, 7, 2, 1, 0);
+			break;
+
+		case 0x580:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 5, 4, 7, 2, 1, 0);
+			break;
+
+		case 0x5c0:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 1, 4, 7, 2, 5, 0);
+			break;
+
+		case 0x600:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 3, 4, 5, 2, 7, 0);
+			break;
+
+		case 0x640:
+			rom[i] = bitswap<8>(rom[i], 3, 6, 7, 4, 1, 2, 5, 0);
+			break;
+
+		case 0x680:
+			rom[i] = bitswap<8>(rom[i], 1, 6, 5, 4, 3, 2, 7, 0);
+			break;
+
+		case 0x6c0:
+			rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 1, 2, 3, 0);
+			break;
+
+		case 0x7c0:
+			break;
+		}
+	}
+}
+
 } // anonymous namespace
 
 
-GAME( 2003?, fruitcat, 0, fruitcat, arthurkn, lgtz80_state, init_fruitcat, ROT0, "LGT", "Fruit Cat (v2.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 200?,  arthurkn, 0, arthurkn, arthurkn, lgtz80_state, init_arthurkn, ROT0, "LGT", "Arthur's Knights",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003?, fruitcat,    0,        fruitcat,    arthurkn,    lgtz80_state, init_fruitcat,    ROT0, "LGT",               "Fruit Cat (v2.00)",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 200?,  arthurkn,    0,        arthurkn,    arthurkn,    lgtz80_state, init_arthurkn,    ROT0, "LGT",               "Arthur's Knights",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 200?,  arthurkn100, arthurkn, arthurkn100, arthurkn100, lgtz80_state, init_arthurkn100, ROT0, "LGT (LSE license)", "Arthur's Knights (v1.00)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

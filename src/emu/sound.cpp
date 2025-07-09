@@ -689,15 +689,15 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_effects_thread(nullptr),
 #endif
 	m_effects_done(false),
-	m_master_gain(1.0),
+	m_master_gain(osd::db_to_linear(machine.options().volume())),
 	m_muted(0),
 	m_nosound_mode(machine.osd().no_sound()),
 	m_unique_id(0),
 	m_wavfile(),
-	m_resampler_type(RESAMPLER_LOFI),
-	m_resampler_hq_latency(0.005),
-	m_resampler_hq_length(400),
-	m_resampler_hq_phases(200)
+	m_resampler_type(default_resampler_type()),
+	m_resampler_hq_latency(default_resampler_hq_latency()),
+	m_resampler_hq_length(default_resampler_hq_length()),
+	m_resampler_hq_phases(default_resampler_hq_phases())
 {
 	// register callbacks
 	machine.configuration().config_register(
@@ -1281,12 +1281,12 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 		// and the resampler configuration
 		util::xml::data_node const *rs_node = parentnode->get_child("resampler");
 		if(rs_node) {
-			m_resampler_hq_latency = rs_node->get_attribute_float("hq_latency", 0.0050);
-			m_resampler_hq_length = rs_node->get_attribute_int("hq_length", 400);
-			m_resampler_hq_phases = rs_node->get_attribute_int("hq_phases", 200);
+			m_resampler_hq_latency = rs_node->get_attribute_float("hq_latency", default_resampler_hq_latency());
+			m_resampler_hq_length = rs_node->get_attribute_int("hq_length", default_resampler_hq_length());
+			m_resampler_hq_phases = rs_node->get_attribute_int("hq_phases", default_resampler_hq_phases());
 
 			// this also applies the hq settings if resampler is hq
-			set_resampler_type(rs_node->get_attribute_int("type", RESAMPLER_LOFI));
+			set_resampler_type(rs_node->get_attribute_int("type", default_resampler_type()));
 		}
 		break;
 	}
@@ -1316,8 +1316,6 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 			if(lv_node)
 				m_master_gain = lv_node->get_attribute_float("gain", 1.0);
 		}
-		else
-			m_master_gain = osd::db_to_linear(machine().options().volume());
 
 		for(const util::xml::data_node *lv_node = parentnode->get_child("device_volume"); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_volume")) {
 			std::string device_tag = lv_node->get_attribute_string("device", "");
@@ -1384,11 +1382,17 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 			e->config_save(ef_node);
 		}
 
-		util::xml::data_node *const rs_node = parentnode->add_child("resampler", nullptr);
-		rs_node->set_attribute_int("type", m_resampler_type);
-		rs_node->set_attribute_float("hq_latency", m_resampler_hq_latency);
-		rs_node->set_attribute_int("hq_length", m_resampler_hq_length);
-		rs_node->set_attribute_int("hq_phases", m_resampler_hq_phases);
+		if (m_resampler_type != default_resampler_type() ||
+				m_resampler_hq_latency != default_resampler_hq_latency() ||
+				m_resampler_hq_length != default_resampler_hq_length() ||
+				m_resampler_hq_phases != default_resampler_hq_phases()) {
+
+			util::xml::data_node *const rs_node = parentnode->add_child("resampler", nullptr);
+			rs_node->set_attribute_int("type", m_resampler_type);
+			rs_node->set_attribute_float("hq_latency", m_resampler_hq_latency);
+			rs_node->set_attribute_int("hq_length", m_resampler_hq_length);
+			rs_node->set_attribute_int("hq_phases", m_resampler_hq_phases);
+		}
 		break;
 	}
 
@@ -1698,6 +1702,11 @@ void sound_manager::startup_cleanups()
 	for(sound_io_device &dev : microphone_device_enumerator(machine().root_device()))
 		default_one(dev);
 
+	auto is_output_device = [this](std::string dname) -> bool {
+		sound_io_device *sio = machine().root_device().subdevice<sound_io_device>(dname);
+		return sio->is_output();
+	};
+
 	// If there's no default sink replace all the default sink config
 	// entries into the first sink available
 	if(!osd_info.m_default_sink) {
@@ -1710,6 +1719,8 @@ void sound_manager::startup_cleanups()
 
 		if(first_sink_name != "")
 			for(auto &config : m_configs) {
+				if(!is_output_device(config.m_name))
+					continue;
 				for(auto &nmap : config.m_node_mappings)
 					if(nmap.first == "")
 						nmap.first = first_sink_name;
@@ -1732,6 +1743,8 @@ void sound_manager::startup_cleanups()
 
 		if(first_source_name != "")
 			for(auto &config : m_configs) {
+				if(is_output_device(config.m_name))
+					continue;
 				for(auto &nmap : config.m_node_mappings)
 					if(nmap.first == "")
 						nmap.first = first_source_name;
@@ -2740,7 +2753,7 @@ void sound_manager::set_resampler_type(u32 type)
 	}
 }
 
-void sound_manager::set_resampler_hq_latency(double latency)
+void sound_manager::set_resampler_hq_latency(float latency)
 {
 	if(latency != m_resampler_hq_latency) {
 #ifndef SOUND_DISABLE_THREADING
@@ -2784,4 +2797,25 @@ const char *sound_manager::resampler_type_names(u32 type) const
 		return _("audio-resampler", "HQ");
 	else
 		return _("audio-resampler", "LoFi");
+}
+
+// don't inline these in the .h file (emu.h)
+u32 sound_manager::default_resampler_type() const
+{
+	return RESAMPLER_LOFI;
+}
+
+float sound_manager::default_resampler_hq_latency() const
+{
+	return 0.005f;
+}
+
+u32 sound_manager::default_resampler_hq_length() const
+{
+	return 400;
+}
+
+u32 sound_manager::default_resampler_hq_phases() const
+{
+	return 200;
 }

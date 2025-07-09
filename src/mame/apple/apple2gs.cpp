@@ -897,6 +897,10 @@ void apple2gs_state::machine_reset()
 	// reset the slots
 	m_a2bus->reset_bus();
 
+	// Apple-specific initial state
+	m_scc->ctsa_w(0);
+	m_scc->dcda_w(0);
+
 	// with all the banking reset, now reset the CPU
 	m_maincpu->reset();
 
@@ -1057,7 +1061,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 			raise_irq(IRQS_VBL);
 		}
 
-		m_adbmicro->set_input_line(0, ASSERT_LINE);
+		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, ASSERT_LINE);
 
 		m_clock_frame++;
 
@@ -1097,7 +1101,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	}
 	else if (scanline == (192+BORDER_TOP+1))
 	{
-		m_adbmicro->set_input_line(1, ASSERT_LINE);
+		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, CLEAR_LINE);
 	}
 }
 
@@ -2096,10 +2100,12 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			m_inten = data & 0x1f;
 			if (!(data & 0x10))
 			{
+				m_intflag &= ~INTFLAG_QUARTER;
 				lower_irq(IRQS_QTRSEC);
 			}
 			if (!(data & 0x08))
 			{
+				m_intflag &= ~INTFLAG_VBL;
 				lower_irq(IRQS_VBL);
 			}
 			//printf("%02x to INTEN, now %02x\n", data, m_vgcint);
@@ -3666,6 +3672,12 @@ void apple2gs_state::keyglu_regen_irqs()
 	{
 		bIRQ = true;
 	}
+
+	if ((m_glu_regs[GLU_KG_STATUS] & KGS_MOUSEX_FULL) && (m_glu_regs[GLU_SYSSTAT] & GLU_STATUS_MOUSEIRQEN))
+	{
+		bIRQ = true;
+	}
+
 	if (bIRQ)
 	{
 		raise_irq(IRQS_ADB);
@@ -3830,18 +3842,19 @@ void apple2gs_state::apple2gs(machine_config &config)
 	PALETTE(config, "palette", FUNC(apple2gs_state::palette_init), 256);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER(config, "a2speaker").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "a2speaker", 1.00);
 
-	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "ensoniq", 4).corners();
 	ES5503(config, m_doc, A2GS_7M);
-	m_doc->set_channels(2);
+	m_doc->set_channels(4);
 	m_doc->set_addrmap(0, &apple2gs_state::a2gs_es5503_map);
 	m_doc->irq_func().set(FUNC(apple2gs_state::doc_irq_w));
 	m_doc->adc_func().set(FUNC(apple2gs_state::doc_adc_read));
-	// IIgs Tech Node #19 says even channels are right, odd are left, and 80s/90s stereo cards followed that.
-	m_doc->add_route(0, "speaker", 1.0, 1);
-	m_doc->add_route(1, "speaker", 1.0, 0);
+	m_doc->add_route(0, "ensoniq", 1.0, 0);
+	m_doc->add_route(1, "ensoniq", 1.0, 1);
+	m_doc->add_route(2, "ensoniq", 1.0, 2);
+	m_doc->add_route(3, "ensoniq", 1.0, 3);
 
 	/* RAM */
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);

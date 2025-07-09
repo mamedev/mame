@@ -1524,6 +1524,17 @@ if (MACHINES["1MB5"]~=null) then
 end
 
 ---------------------------------------------------
+--@src/devices/machine/i2cds1307.h,MACHINES["I2C_DS1307"] = true
+---------------------------------------------------
+
+if (MACHINES["I2C_DS1307"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i2cds1307.cpp",
+		MAME_DIR .. "src/devices/machine/i2cds1307.h",
+	}
+end
+
+---------------------------------------------------
 --@src/devices/machine/i2chle.h,MACHINES["I2CHLE"] = true
 ---------------------------------------------------
 
@@ -1712,6 +1723,18 @@ if (MACHINES["IBM21S850"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ibm21s850.cpp",
 		MAME_DIR .. "src/devices/machine/ibm21s850.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/icd2053b.h,MACHINES["ICD2053B"] = true
+---------------------------------------------------
+
+if (MACHINES["ICD2053B"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/icd2053b.cpp",
+		MAME_DIR .. "src/devices/machine/icd2053b.h",
 	}
 end
 

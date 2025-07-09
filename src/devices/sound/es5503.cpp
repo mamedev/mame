@@ -36,6 +36,7 @@
   2.1.3 (RB) - Fixed oscillator enable register off-by-1 which caused everything to be half a step sharp.
   2.2 (RB) - More precise one-shot even/swap odd behavior from hardware observations with Ian Brumby's SWAPTEST.
   2.3 (RB) - Sync & AM modes added, emulate the volume glitch for the highest-numbered enabled oscillator.
+  2.3.1 (RB) - Fixed thinko in the volume glitch emulation and minor cleanup.
 */
 
 #include "emu.h"
@@ -48,7 +49,7 @@ DEFINE_DEVICE_TYPE(ES5503, es5503_device, "es5503", "Ensoniq ES5503")
 static constexpr uint16_t wavesizes[8] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
 static constexpr uint32_t wavemasks[8] = { 0x1ff00, 0x1fe00, 0x1fc00, 0x1f800, 0x1f000, 0x1e000, 0x1c000, 0x18000 };
 static constexpr uint32_t accmasks[8]  = { 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff, 0x3fff, 0x7fff };
-static constexpr int    resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
+static constexpr int      resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -92,8 +93,8 @@ void es5503_device::rom_bank_pre_change()
 // type = 1 for 0 found in sample data, 0 for hit end of table size
 void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int resshift)
 {
-	ES5503Osc *pOsc = &oscillators[onum];
-	ES5503Osc *pPartner = &oscillators[onum^1];
+	ES5503Osc *pOsc = &m_oscillators[onum];
+	ES5503Osc *pPartner = &m_oscillators[onum^1];
 	int mode = (pOsc->control>>1) & 3;
 	const int partnerMode = (pPartner->control>>1) & 3;
 
@@ -104,9 +105,9 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 		{
 			// we're even, so if the odd oscillator 1 below us is playing,
 			// restart it.
-			if (!(oscillators[onum - 1].control & 1))
+			if (!(m_oscillators[onum - 1].control & 1))
 			{
-				oscillators[onum - 1].accumulator = 0;
+				m_oscillators[onum - 1].accumulator = 0;
 			}
 		}
 
@@ -160,15 +161,15 @@ void es5503_device::sound_stream_update(sound_stream &stream)
 	int samples = stream.samples();
 
 	assert(samples < (44100/50));
-	std::fill_n(&m_mix_buffer[0], samples*output_channels, 0);
+	std::fill_n(&m_mix_buffer[0], samples * m_output_channels, 0);
 
-	for (int chan = 0; chan < output_channels; chan++)
+	for (int chan = 0; chan < m_output_channels; chan++)
 	{
-		for (osc = 0; osc < oscsenabled; osc++)
+		for (osc = 0; osc < m_oscsenabled; osc++)
 		{
-			ES5503Osc *pOsc = &oscillators[osc];
+			ES5503Osc *pOsc = &m_oscillators[osc];
 
-			if (!(pOsc->control & 1) && ((pOsc->control >> 4) & (output_channels - 1)) == chan)
+			if (!(pOsc->control & 1) && ((pOsc->control >> 4) & (m_output_channels - 1)) == chan)
 			{
 				uint32_t wtptr = pOsc->wavetblpointer & wavemasks[pOsc->wavetblsize], altram;
 				uint32_t acc = pOsc->accumulator;
@@ -202,7 +203,7 @@ void es5503_device::sound_stream_update(sound_stream &stream)
 						if (mode != MODE_SYNCAM)
 						{
 							*mixp += data * vol;
-							if (chan == (output_channels - 1))
+							if (osc == (m_oscsenabled - 1))
 							{
 								*mixp += data * vol;
 								*mixp += data * vol;
@@ -216,23 +217,23 @@ void es5503_device::sound_stream_update(sound_stream &stream)
 								if (osc < 31)
 								{
 									// if the next oscillator up is playing, it's volume becomes our control
-									if (!(oscillators[osc + 1].control & 1))
+									if (!(m_oscillators[osc + 1].control & 1))
 									{
-										oscillators[osc + 1].vol = data ^ 0x80;
+										m_oscillators[osc + 1].vol = data ^ 0x80;
 									}
 								}
 							}
 							else    // hard sync, both oscillators play?
 							{
 								*mixp += data * vol;
-								if (chan == (output_channels - 1))
+								if (osc == (m_oscsenabled - 1))
 								{
 									*mixp += data * vol;
 									*mixp += data * vol;
 								}
 							}
 						}
-						mixp += output_channels;
+						mixp += m_output_channels;
 
 						if (altram >= wtsize)
 						{
@@ -255,7 +256,7 @@ void es5503_device::sound_stream_update(sound_stream &stream)
 		}
 	}
 	mixp = &m_mix_buffer[0];
-	for (int chan = 0; chan < output_channels; chan++)
+	for (int chan = 0; chan < m_output_channels; chan++)
 	{
 		for (i = 0; i < stream.samples(); i++)
 		{
@@ -267,42 +268,42 @@ void es5503_device::sound_stream_update(sound_stream &stream)
 
 void es5503_device::device_start()
 {
-	rege0 = 0xff;
+	m_rege0 = 0xff;
 
-	save_pointer(STRUCT_MEMBER(oscillators, freq), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, wtsize), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, control), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, vol), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, data), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, wavetblpointer), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, wavetblsize), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, resolution), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, accumulator), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, irqpend), 32);
+	save_pointer(STRUCT_MEMBER(m_oscillators, freq), 32);
+	save_pointer(STRUCT_MEMBER(m_oscillators, wtsize), 32);
+	save_pointer(STRUCT_MEMBER(m_oscillators, control), 32);
+	save_pointer(STRUCT_MEMBER(m_oscillators, vol), 32);
+	save_pointer(STRUCT_MEMBER(m_oscillators, data), 32);
+	save_pointer(STRUCT_MEMBER(m_oscillators, wavetblpointer), 32);
+	save_pointer(STRUCT_MEMBER(m_oscillators, wavetblsize), 32);
+	save_pointer(STRUCT_MEMBER(m_oscillators, resolution), 32);
+	save_pointer(STRUCT_MEMBER(m_oscillators, accumulator), 32);
+	save_pointer(STRUCT_MEMBER(m_oscillators, irqpend), 32);
 
-	oscsenabled = 1;
-	output_rate = (clock() / 8) / (oscsenabled + 2);
-	m_stream = stream_alloc(0, output_channels, output_rate);
+	m_oscsenabled = 1;
+	m_output_rate = (clock() / 8) / (m_oscsenabled + 2);
+	m_stream = stream_alloc(0, m_output_channels, m_output_rate);
 
 	m_timer = timer_alloc(FUNC(es5503_device::delayed_stream_update), this);
 }
 
 void es5503_device::device_clock_changed()
 {
-	output_rate = (clock() / 8) / (oscsenabled + 2);
-	m_stream->set_sample_rate(output_rate);
+	m_output_rate = (clock() / 8) / (m_oscsenabled + 2);
+	m_stream->set_sample_rate(m_output_rate);
 
-	m_mix_buffer.resize((output_rate/50)*8);
+	m_mix_buffer.resize((m_output_rate/50)*8);
 
-	attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;
+	attotime update_rate = m_output_rate ? attotime::from_hz(m_output_rate) : attotime::never;
 	m_timer->adjust(update_rate, 0, update_rate);
 }
 
 void es5503_device::device_reset()
 {
-	rege0 = 0xff;
+	m_rege0 = 0xff;
 
-	for (auto & elem : oscillators)
+	for (auto & elem : m_oscillators)
 	{
 		elem.freq = 0;
 		elem.wtsize = 0;
@@ -316,7 +317,7 @@ void es5503_device::device_reset()
 		elem.irqpend = 0;
 	}
 
-	oscsenabled = 1;
+	m_oscsenabled = 1;
 	notify_clock_changed();
 
 	m_channel_strobe = 0;
@@ -336,32 +337,32 @@ u8 es5503_device::read(offs_t offset)
 		switch(offset & 0xe0)
 		{
 			case 0:     // freq lo
-				return (oscillators[osc].freq & 0xff);
+				return (m_oscillators[osc].freq & 0xff);
 
 			case 0x20:      // freq hi
-				return (oscillators[osc].freq >> 8);
+				return (m_oscillators[osc].freq >> 8);
 
 			case 0x40:  // volume
-				return oscillators[osc].vol;
+				return m_oscillators[osc].vol;
 
 			case 0x60:  // data
-				return oscillators[osc].data;
+				return m_oscillators[osc].data;
 
 			case 0x80:  // wavetable pointer
-				return (oscillators[osc].wavetblpointer>>8) & 0xff;
+				return (m_oscillators[osc].wavetblpointer>>8) & 0xff;
 
 			case 0xa0:  // oscillator control
-				return oscillators[osc].control;
+				return m_oscillators[osc].control;
 
 			case 0xc0:  // bank select / wavetable size / resolution
 				retval = 0;
-				if (oscillators[osc].wavetblpointer & 0x10000)
+				if (m_oscillators[osc].wavetblpointer & 0x10000)
 				{
 					retval |= 0x40;
 				}
 
-				retval |= (oscillators[osc].wavetblsize<<3);
-				retval |= oscillators[osc].resolution;
+				retval |= (m_oscillators[osc].wavetblsize<<3);
+				retval |= m_oscillators[osc].resolution;
 				return retval;
 		}
 	}
@@ -370,30 +371,30 @@ u8 es5503_device::read(offs_t offset)
 		switch (offset)
 		{
 			case 0xe0:  // interrupt status
-				retval = rege0;
+				retval = m_rege0;
 
 				m_irq_func(0);
 
 				// scan all oscillators
-				for (i = 0; i < oscsenabled; i++)
+				for (i = 0; i < m_oscsenabled; i++)
 				{
-					if (oscillators[i].irqpend)
+					if (m_oscillators[i].irqpend)
 					{
 						// signal this oscillator has an interrupt
 						retval = i<<1;
 
-						rege0 = retval | 0x80;
+						m_rege0 = retval | 0x80;
 
 						// and clear its flag
-						oscillators[i].irqpend = 0;
+						m_oscillators[i].irqpend = 0;
 						break;
 					}
 				}
 
 				// if any oscillators still need to be serviced, assert IRQ again immediately
-				for (i = 0; i < oscsenabled; i++)
+				for (i = 0; i < m_oscsenabled; i++)
 				{
-					if (oscillators[i].irqpend)
+					if (m_oscillators[i].irqpend)
 					{
 						m_irq_func(1);
 						break;
@@ -403,7 +404,7 @@ u8 es5503_device::read(offs_t offset)
 				return retval | 0x41;
 
 			case 0xe1:  // oscillator enable
-				return (oscsenabled - 1) << 1;
+				return (m_oscsenabled - 1) << 1;
 
 			case 0xe2:  // A/D converter
 				return m_adc_func();
@@ -424,48 +425,48 @@ void es5503_device::write(offs_t offset, u8 data)
 		switch(offset & 0xe0)
 		{
 			case 0:     // freq lo
-				oscillators[osc].freq &= 0xff00;
-				oscillators[osc].freq |= data;
+				m_oscillators[osc].freq &= 0xff00;
+				m_oscillators[osc].freq |= data;
 				break;
 
 			case 0x20:      // freq hi
-				oscillators[osc].freq &= 0x00ff;
-				oscillators[osc].freq |= (data<<8);
+				m_oscillators[osc].freq &= 0x00ff;
+				m_oscillators[osc].freq |= (data<<8);
 				break;
 
 			case 0x40:  // volume
-				oscillators[osc].vol = data;
+				m_oscillators[osc].vol = data;
 				break;
 
 			case 0x60:  // data - ignore writes
 				break;
 
 			case 0x80:  // wavetable pointer
-				oscillators[osc].wavetblpointer = (data<<8);
+				m_oscillators[osc].wavetblpointer = (data<<8);
 				break;
 
 			case 0xa0:  // oscillator control
 				// key on?
-				if ((oscillators[osc].control & 1) && (!(data&1)))
+				if ((m_oscillators[osc].control & 1) && (!(data&1)))
 				{
-					oscillators[osc].accumulator = 0;
+					m_oscillators[osc].accumulator = 0;
 				}
-				oscillators[osc].control = data;
+				m_oscillators[osc].control = data;
 				break;
 
 			case 0xc0:  // bank select / wavetable size / resolution
 				if (data & 0x40)    // bank select - not used on the Apple IIgs
 				{
-					oscillators[osc].wavetblpointer |= 0x10000;
+					m_oscillators[osc].wavetblpointer |= 0x10000;
 				}
 				else
 				{
-					oscillators[osc].wavetblpointer &= 0xffff;
+					m_oscillators[osc].wavetblpointer &= 0xffff;
 				}
 
-				oscillators[osc].wavetblsize = ((data>>3) & 7);
-				oscillators[osc].wtsize = wavesizes[oscillators[osc].wavetblsize];
-				oscillators[osc].resolution = (data & 7);
+				m_oscillators[osc].wavetblsize = ((data>>3) & 7);
+				m_oscillators[osc].wtsize = wavesizes[m_oscillators[osc].wavetblsize];
+				m_oscillators[osc].resolution = (data & 7);
 				break;
 		}
 	}
@@ -479,7 +480,7 @@ void es5503_device::write(offs_t offset, u8 data)
 			case 0xe1:  // oscillator enable
 				// The number here is the number of oscillators to enable -1 times 2.  You can never
 				// have zero oscilllators enabled.  So a value of 62 enables all 32 oscillators.
-				oscsenabled = ((data>>1) & 0x1f) + 1;
+				m_oscsenabled = ((data>>1) & 0x1f) + 1;
 				notify_clock_changed();
 				break;
 

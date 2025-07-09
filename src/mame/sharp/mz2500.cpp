@@ -479,7 +479,7 @@ void mz2500_state::draw_cg_screen(bitmap_ind16 &bitmap,const rectangle &cliprect
 			draw_cg16_screen(bitmap,cliprect,2,640,pri);
 			break;
 		default:
-			popmessage("Unsupported CG mode %02x, contact MAME dev",m_cg_reg[0x0e]);
+			popmessage("Unsupported CG mode %02x",m_cg_reg[0x0e]);
 			break;
 	}
 }
@@ -1813,10 +1813,6 @@ void mz2500_state::mz2500(machine_config &config)
 
 	Z80SIO(config, m_sio, 24_MHz_XTAL / 4);
 
-	rs232_port_device &mouse(RS232_PORT(config, "mouse_port", mouse_devices, "x68k"));
-	mouse.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
-	m_sio->out_dtrb_callback().set(mouse, FUNC(rs232_port_device::write_rts));
-
 	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->alarm().set(FUNC(mz2500_state::rtc_alarm_irq));
 
@@ -1830,6 +1826,10 @@ void mz2500_state::mz2500(machine_config &config)
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[0], msx_general_purpose_port_devices, "joystick");
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");
+
+	rs232_port_device &mouse(RS232_PORT(config, "mouse_port", mouse_devices, "x68k"));
+	mouse.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
+	m_sio->out_dtrb_callback().set(mouse, FUNC(rs232_port_device::write_rts));
 
 	FLOPPY_CONNECTOR(config, "fdc:0", mz2500_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", mz2500_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);

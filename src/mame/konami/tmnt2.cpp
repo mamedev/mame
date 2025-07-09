@@ -2788,7 +2788,7 @@ void sunsetbl_state::sunsetbl(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(sunsetbl_state::ssbl_tile_callback));
 
 	K053245(config, m_k053245, 24_MHz_XTAL);

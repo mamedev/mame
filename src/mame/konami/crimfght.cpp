@@ -445,6 +445,7 @@ void crimfght_state::crimfght(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // measured 59.17
 	screen.set_screen_update(FUNC(crimfght_state::screen_update));
 	screen.set_palette(m_palette);
@@ -454,7 +455,7 @@ void crimfght_state::crimfght(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(crimfght_state::tile_callback));
 
 	K051960(config, m_k051960, 24_MHz_XTAL);

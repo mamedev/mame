@@ -123,7 +123,7 @@ private:
 	SED1520_UPDATE_CB(sed1520_update);
 
 	u32 input_r();
-	void control_w(u32 data);
+	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 rom_r(offs_t offset);
 	void power_off();
 
@@ -264,8 +264,11 @@ u32 risc2500_state::input_r()
 	return data;
 }
 
-void risc2500_state::control_w(u32 data)
+void risc2500_state::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	if (mem_mask != 0xffffffff)
+		logerror("control_w unexpected mem_mask %08X\n", mem_mask);
+
 	// lcd
 	if (BIT(m_control & ~data, 27))
 	{
@@ -336,8 +339,8 @@ void risc2500_state::risc2500_mem(address_map &map)
 	map(0x00000000, 0x001fffff).view(m_boot_view);
 	m_boot_view[0](0x00000000, 0x0003ffff).r(FUNC(risc2500_state::rom_r));
 
-	map(0x01800000, 0x01800003).r(FUNC(risc2500_state::disable_bootrom_r));
 	map(0x01000000, 0x01000003).rw(FUNC(risc2500_state::input_r), FUNC(risc2500_state::control_w));
+	map(0x01800000, 0x01800003).r(FUNC(risc2500_state::disable_bootrom_r));
 	map(0x02000000, 0x0203ffff).r(FUNC(risc2500_state::rom_r));
 }
 

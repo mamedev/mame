@@ -343,7 +343,7 @@ void macportable_state::pmu_p0_w(u8 data)
 	if ((!BIT(data, 7)) && (BIT(m_pmu_p0, 7)))
 	{
 		system_time systime;
-		struct tm cur_time, macref;
+		struct tm cur_time;
 		machine().current_datetime(systime);
 
 		cur_time.tm_sec = systime.local_time.second;
@@ -354,16 +354,8 @@ void macportable_state::pmu_p0_w(u8 data)
 		cur_time.tm_year = systime.local_time.year - 1900;
 		cur_time.tm_isdst = 0;
 
-		macref.tm_sec = 0;
-		macref.tm_min = 0;
-		macref.tm_hour = 0;
-		macref.tm_mday = 1;
-		macref.tm_mon = 0;
-		macref.tm_year = 4;
-		macref.tm_isdst = 0;
-		const u32 ref = (u32)mktime(&macref);
-
-		const u32 seconds = (u32)((u32)mktime(&cur_time) - ref);
+		// add the offset between the Unix epoch and the classic Mac OS epoch (hat tip to https://www.epochconverter.com/mac)
+		u32 seconds = (u32)(mktime(&cur_time) + 2082844800);
 		m_pmu->space(AS_PROGRAM).write_byte(0x28, seconds & 0xff);
 		m_pmu->space(AS_PROGRAM).write_byte(0x27, (seconds >> 8) & 0xff);
 		m_pmu->space(AS_PROGRAM).write_byte(0x26, (seconds >> 16) & 0xff);
