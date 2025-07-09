@@ -35,7 +35,6 @@ public:
 	void md_32x(machine_config &config);
 	void genesis_32x(machine_config &config);
 	void mdj_32x(machine_config &config);
-	void dcat16_megadriv(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -64,10 +63,6 @@ private:
 
 	uint16_t tmss_r(offs_t offset);
 	void tmss_swap_w(uint16_t data);
-
-	void dcat16_megadriv_base(machine_config &config);
-
-	void dcat16_megadriv_map(address_map &map) ATTR_COLD;
 };
 
 

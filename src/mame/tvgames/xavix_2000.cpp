@@ -154,6 +154,8 @@ static INPUT_PORTS_START( duelmast )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
 
 	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_duelmast_state::unknown_random_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_duelmast_state::unknown_random_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 INPUT_PORTS_END
 
@@ -289,7 +291,21 @@ void xavix_i2c_state::xavix2000_i2c_24c02(machine_config &config)
 	I2C_24C02(config, "i2cmem", 0);
 }
 
+void xavix_duelmast_state::xavix_extbus_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rw(FUNC(xavix_duelmast_state::cart_r), FUNC(xavix_duelmast_state::cart_w));
+	map(0x408000, 0x40ffff).ram(); // seems to expect RAM here (at least when cart is enabled)
+}
 
+void xavix_duelmast_state::duelmast(machine_config &config)
+{
+	xavix2000(config);
+
+	I2C_24C04(config, "i2cmem", 0);
+
+	EKARA_CART_SLOT(config, m_cartslot, 0, ekara_cart, nullptr);
+	SOFTWARE_LIST(config, "cart_list_duelmast").set_original("duelmast_cart");
+}
 
 
 ROM_START( epo_sdb )
@@ -370,8 +386,11 @@ ROM_START( ban_onep )
 ROM_END
 
 ROM_START( duelmast )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("duelmasters.u4", 0x000000, 0x200000, CRC(2f11fcd7) SHA1(d8849c74833e77b8b309e845523f2cdc7ac68054) )
+	ROM_RELOAD(0x200000,0x200000)
+	ROM_RELOAD(0x400000,0x200000)
+	ROM_RELOAD(0x600000,0x200000)
 ROM_END
 
 ROM_START( tom_dpgm )
@@ -411,9 +430,7 @@ CONS( 2006, epo_es2j,   0,     0,  xavix2000_4mb,      xavix,      xavix_state, 
 
 // takes a long time to boot to a card scanner error
 // This is a product in the Duel Masters line called Duel Station; the boot up screen calls it Duel Station, title logo is Duel Masters
-// It also has a cartridge slot in addition to the card scanner and at least 1 ROM cartridge was produced "デュエルマスターズ　デュエルステーション専用カートリッジ　Ver.1"
-// デュエルステーション
-CONS( 2003, duelmast, 0, 0, xavix2000_i2c_24c04_2mb, duelmast,    xavix_duelmast_state,    init_xavix, "Takara / SSD Company LTD",      "Duel Masters: Duel Station (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, duelmast, 0, 0, duelmast, duelmast,    xavix_duelmast_state,    init_xavix, "Takara / SSD Company LTD",      "Duel Masters: Duel Station (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // スーパーダッシュボール
 CONS( 2004, epo_sdb,  0, 0, xavix2000_nv_sdb,    epo_sdb,     xavix_2000_nv_sdb_state, init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)",  MACHINE_IMPERFECT_SOUND )

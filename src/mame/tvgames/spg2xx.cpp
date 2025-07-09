@@ -558,10 +558,10 @@ static INPUT_PORTS_START( carled99 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_NAME("Steer Right")
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) // directional buttons, not a real joystick!
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Menu Select")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Menu Back")
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Accelerate")
@@ -1190,6 +1190,50 @@ static INPUT_PORTS_START( pballpup )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // reload
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( mpntball )
+	PORT_START("GUNY") // not verified
+	PORT_BIT(0x0ff, 0x80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 256.0f / 240.0f, 0.0, 0) PORT_MINMAX(0x000, 0x0ff) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("GUNX") // not verified
+	PORT_BIT(0x1ff, 0x100, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 512.0f / 320.0f, -0.06f, 0) PORT_MINMAX(0x000, 0x1ff) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Reload") // beeps if you hold on startup
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pause")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Trigger")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hide")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mpntbalt )
+	PORT_START("GUNY") // not verified
+	PORT_BIT(0x0ff, 0x80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 256.0f / 240.0f, 0.0, 0) PORT_MINMAX(0x000, 0x0ff) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("GUNX") // not verified
+	PORT_BIT(0x1ff, 0x100, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 512.0f / 320.0f, -0.06f, 0) PORT_MINMAX(0x000, 0x1ff) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Trigger")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hide")
+	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( swclone )
 	PORT_START("GUNY")
@@ -1977,12 +2021,19 @@ uint16_t spg2xx_game_pballpup_state::porta_r()
 void spg2xx_game_pballpup_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: spg2xx_game_pballpup_state::porta_w (%04x)\n", machine().describe_context(), data);
-	m_eeprom->di_write(BIT(data, 2));
-	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
+
+	porta_nobank_w(offset, data, mem_mask);
 
 	// this can actually change bank from running code, because the code part in each bank is almost identical, just the data changes
 	switch_bank((data & 0x1000) ? 1 : 0);
+}
+
+void spg2xx_game_pballpup_state::porta_nobank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: spg2xx_game_pballpup_state::porta_nobank_w (%04x)\n", machine().describe_context(), data);
+	m_eeprom->di_write(BIT(data, 2));
+	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2005,6 +2056,27 @@ void spg2xx_game_pballpup_state::pballpup(machine_config &config)
 	m_maincpu->gunx_in().set(FUNC(spg2xx_game_pballpup_state::base_gunx_r));
 
 	EEPROM_93C66_16BIT(config, m_eeprom); // type?
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(spg2xx_game_pballpup_state::gun_irq)
+{
+	m_maincpu->extint_w(0, 1);
+}
+
+
+void spg2xx_game_pballpup_state::mpntball(machine_config &config)
+{
+	pballpup(config);
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_pballpup_state::porta_nobank_w));
+
+	// the gun can track (even without the screen flash) so this must be tied to movement, or periodic
+	TIMER(config, "guntimer").configure_periodic(FUNC(spg2xx_game_pballpup_state::gun_irq), attotime::from_hz(1000));
+}
+
+void spg2xx_game_pballpup_state::mpntbalt(machine_config &config)
+{
+	mpntball(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_pballpup_state::mem_map_2m);
 }
 
 uint16_t spg2xx_game_swclone_state::porta_r()
@@ -2069,8 +2141,6 @@ void spg2xx_game_dreamlss_state::porta_w(offs_t offset, uint16_t data, uint16_t 
 	switch_bank((data & 0x1000) ? 1 : 0);
 }
 
-
-// TODO: how does the SEEPROM hook up? (will need hack removing in init_dreamlss )
 uint16_t spg2xx_game_dreamlss_state::portb_r()
 {
 	uint16_t ret = m_portb_data & 0xfffe;
@@ -2895,6 +2965,22 @@ ROM_START( whacmole )
 	ROM_LOAD16_WORD_SWAP( "whacamole.u1a", 0x000000, 0x400000, CRC(5841ba80) SHA1(b3ec922e1899a1f2e34069a50e36721e925afb9f) )
 ROM_END
 
+ROM_START( mpntbalt )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "paintball.u1", 0x000000, 0x400000, CRC(888e140e) SHA1(2406cfe7d9e40f112b6f161aba4886472524157e) )
+
+	//ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 ) // dumped, but just contains user profiles / settings
+	//ROM_LOAD16_WORD_SWAP( "93c66.u2", 0x000, 0x200, CRC(3b5cf033) SHA1(5ac730141d2f44da6a18ab1ccb540543bace7553) )
+ROM_END
+
+ROM_START( mpntball )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "missionpaintball.u1", 0x000000, 0x800000, CRC(3962731a) SHA1(f33e69c681fb69204cf04174f725ebae30da6a43) )
+
+	//ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 ) // dumped, but just contains user profiles / settings
+	//ROM_LOAD16_WORD_SWAP( "93c66.u4", 0x000, 0x200, CRC(cb6b9c9f) SHA1(78f485ee9a1f724428d08e4e2e152e95485777bb) )
+ROM_END
+
 ROM_START( backybbs )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "backyardbs.bin", 0x000000, 0x400000, CRC(9c378f27) SHA1(ca0c212482d0743db10046f550fee511a13e1ddb) )
@@ -3095,6 +3181,10 @@ CONS( 2005, knd,        0,        0, spg2xx,    knd,       spg2xx_game_state,   
 CONS( 2005, tmntmutm,   0,        0, tmntmutm,  tmntmutm,  spg2xx_game_tmntmutm_state, empty_init,    "Tech2Go / WayForward",                                   "Teenage Mutant Ninja Turtles: Mutant and Monster Mayhem",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, pballpup,   0,        0, pballpup,  pballpup,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball Powered Up",                                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2005, mpntbalt,   0,        0, mpntbalt,  mpntbalt,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball Trainer",                                            MACHINE_IMPERFECT_SOUND )
+
+CONS( 2004, mpntball,   0,        0, mpntball,  mpntball,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball",                                                    MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, dreamlss,   0,        0, dreamlss,  dreamlss,  spg2xx_game_dreamlss_state, empty_init,    "Hasbro / Tiger Electronics",                             "Dream Life Superstar (Version 0.3, Mar 16 2007)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
