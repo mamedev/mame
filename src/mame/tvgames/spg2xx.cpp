@@ -2141,8 +2141,6 @@ void spg2xx_game_dreamlss_state::porta_w(offs_t offset, uint16_t data, uint16_t 
 	switch_bank((data & 0x1000) ? 1 : 0);
 }
 
-
-// TODO: how does the SEEPROM hook up? (will need hack removing in init_dreamlss )
 uint16_t spg2xx_game_dreamlss_state::portb_r()
 {
 	uint16_t ret = m_portb_data & 0xfffe;
