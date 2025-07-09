@@ -220,6 +220,7 @@ protected:
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(raster_scanline);
 	TIMER_CALLBACK_MEMBER(raster_irq);
+	uint16_t irqack_r(offs_t offset);
 
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -230,6 +231,7 @@ protected:
 
 	/* maps */
 	void main_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 	void forgottn_map(address_map &map) ATTR_COLD;
 	void qsound_main_map(address_map &map) ATTR_COLD;
 	void qsound_decrypted_opcodes_map(address_map &map) ATTR_COLD;

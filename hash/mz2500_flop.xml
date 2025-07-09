@@ -21,7 +21,7 @@ TODO:
 
 <softwarelist name="mz2500_flop" description="Sharp MZ-2500 disk images">
 
-<!-- !Game disks -->
+<!-- !Games -->
 
 	<software name="simulwar">
 		<description>Aoki Ookami to Shiroki Mejika - Simulation War Game</description>
@@ -131,6 +131,25 @@ TODO:
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
 				<rom name="disk.d88" size="697008" crc="8047e60c" sha1="37b70478bf8d87ee7660cf4c85b781fb7c67065a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hashires" supported="no">
+		<description>Hashire! Skyline</description>
+		<year>198?</year>
+		<!-- Compaq? -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Missing blink effect on title screen
+Requires [GVRAM] layer split emulation (currently repeating horizon)
+Cannot steer, does it require an analog joystick?
+]]></notes>
+		<info name="alt_title" value="走れ!スカイライン"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="hashire_skyline.d88" size="697008" crc="897257a1" sha1="916332d226a7e2fe60613b46d003c5de196bb8e4"/>
 			</dataarea>
 		</part>
 	</software>

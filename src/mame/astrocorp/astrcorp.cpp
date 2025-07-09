@@ -48,7 +48,7 @@ Year + Game                PCB ID                    CPU                Video   
 07  Happy Farm (US.01.02B) _P_ROHS                   ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 M835KK01             Encrypted
 11  Happy Farm (IN.01.02B) P1                        ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 N011483              Encrypted
 13  Monkey Land (EN.20B)   N1                        ASTRO V102PX-005   ASTRO V05      ?                                          Encrypted
-14  Magic Bomb (BR.71A)    P1                        ASTRO V102PX-014   ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
+14  Magic Bomb (BR.71A)    P1 (CS350P087)            ASTRO V102PX-014   ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Note: ASTRO F01 is a QuickLogic pASIC 3 FPGA (die-marked as QL3161A/1999).
@@ -77,8 +77,7 @@ TODO:
 - hacher: need a redump of the sprite ROMs.
 - astoneag, dinodino, magibombd, magibombg: exiting from test menu goes haywire (requires a soft-reset with F3).
 - magibombg,m: need RE of the CPU code and correct EEPROM.
-- gostopac: stops with 'S4' message during boot. Needs RE of the CPU code and emulation of its peculiarities.
-  when the "S4" message is on screen, enter PC=5f6 in the debugger to go to attract, but inputs and sound don't work.
+- gostopac: needs verifying of inputs, outputs and layout. Sound doesn't seem 100% correct (Oki banking problem?)
 - monkeyl and clones: need RE of the CPU code, inputs and layout. After reset it initializes.
 - speedmst,a,b: needs verifying of inputs, outputs and layout.
 - cptshark: needs verifying of inputs and layout
@@ -1016,7 +1015,7 @@ void zoo_state::zulu_map(address_map &map)
 void zoo_state::gostopac_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
-	map(0xb00001, 0xb00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xb00000, 0xb00000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
 	map(0xc00000, 0xc00fff).ram().share("spriteram");
 	map(0xc02000, 0xc02001).nopr().w(FUNC(zoo_state::draw_sprites_w));
@@ -1026,8 +1025,7 @@ void zoo_state::gostopac_map(address_map &map)
 	map(0xc0e000, 0xc0e001).portr("EEPROM_IN");
 	map(0xc80000, 0xc801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd00000, 0xd03fff).ram().share("nvram"); // battery
-//  map(0xb00001, 0xb00001).w(FUNC(zoo_state::oki_bank_w)); // TODO once it runs
-//  map(0xc00000, 0xc00001).nopr().w(FUNC(zoo_state::screen_enable_w)).umask16(0x00ff); // unknown location
+	map(0xd80001, 0xd80001).w(FUNC(zoo_state::oki_bank_w));
 }
 
 void zoo_state::monkeyl_map(address_map &map)
@@ -2723,7 +2721,7 @@ ROM_START( gostopac )
 	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(c5bfafa4) SHA1(b482fad6445487a5c14c4360c7b3b0b02f16944c) ) // TODO: factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
-	ROM_LOAD( "gostopac_cpucode.key", 0x00, 0x02, NO_DUMP )
+	ROM_LOAD( "gostopac_cpucode.key", 0x00, 0x02, CRC(e14ff981) SHA1(322130632f4a29531f53755594f19876b371a223) )
 ROM_END
 
 /***************************************************************************
@@ -3541,8 +3539,8 @@ void zoo_state::init_gostopac()
 	// TODO: There's more stuff happening for addresses < 0x400...
 	// override reset vector for now
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0000;
-	rom[0x00006/2] = 0x040e;
+	rom[0x00004/2] = 0x0400;
+	rom[0x00006/2] = 0x0400;
 
 	rom[0x00010/2] = 0x0000;
 	rom[0x00012/2] = 0x1594;
@@ -3893,7 +3891,7 @@ GAMEL( 2001,  magibombn, magibomb, magibombf, magibomb,  magibomb_state,  init_m
 // Heavier encryption
 GAMEL( 2004,  zoo,       0,        zoo,       magibombd, zoo_state,       init_zoo,       ROT0, "Astro Corp.", "Zoo (Ver. ZO.02.D, Aug 27 2004)",               MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_zoo       ) // 10:53:44 Aug 27 2004
 GAMEL( 2004,  zulu,      zoo,      zulu,      dinodino,  zoo_state,       init_zulu,      ROT0, "Astro Corp.", "Zulu (Ver. 2.04J, Feb 3 2004)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_zoo ) // 14:06:51 Feb  3 2004
-GAME(  2004,  gostopac,  0,        gostopac,  dinodino,  zoo_state,       init_gostopac,  ROT0, "Astro Corp.", "Go & Stop (Ver. EN1.10)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME(  2004,  gostopac,  0,        gostopac,  dinodino,  zoo_state,       init_gostopac,  ROT0, "Astro Corp.", "Go & Stop (Ver. EN1.10)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAMEL( 2005,  dinodino,  0,        dinodino,  dinodino,  zoo_state,       init_dinodino,  ROT0, "Astro Corp.", "Dino Dino (Ver. A1.1, 01/13/2005)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_dinodino  ) // 13/01.2005 10:59
 GAMEL( 2005,  astoneag,  0,        astoneag,  astoneag,  astoneag_state,  init_astoneag,  ROT0, "Astro Corp.", "Stone Age (Astro, Ver. EN.03.A, 2005/02/21)",   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_astoneag  )
 GAME(  2005,  monkeyl,   0,        monkeyl,   magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. AA.21.A)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 18/02/2005 15:47

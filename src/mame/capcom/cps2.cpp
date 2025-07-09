@@ -1018,8 +1018,8 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 							sy = (y + nys * 16 + yoffs) & 0x3ff;
 
 							DRAWSPRITE(
-//                                      code + nxs + 0x10 * nys,
-									(code & ~0xf) + ((code + nxs) & 0xf) + 0x10 * nys,  //  pgear fix
+									//code + nxs + 0x10 * nys,
+									(code & ~0xf) + ((code + nxs) & 0xf) + 0x10 * nys, // pgear fix
 									(col & 0x1f),
 									0,0,
 									sx,sy);
@@ -1820,6 +1820,7 @@ void cps2_state::cps2(machine_config &config)
 	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::cps2_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cps2_state::decrypted_opcodes_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps2_state::cpu_space_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::raster_scanline), "screen", 0, 1);
 
