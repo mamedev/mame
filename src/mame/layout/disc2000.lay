@@ -12,14 +12,20 @@ license:CC0-1.0
 	</element>
 
     <element name="button_yellow" defstate="0">
-		<disk>
+		<disk state="1">
 			<color red="1.0" green="1.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.7" green="0.7" blue="0.0" />
 		</disk>
 	</element>
 
     <element name="button_red" defstate="0">
-		<disk>
+		<disk state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.7" green="0.0" blue="0.0" />
 		</disk>
 	</element>
 
