@@ -13441,4 +13441,4 @@ GAME(  1990, maxidpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init
 /*************************************** SETS W/R6511 ***************************************/
 
 GAME(  1989, olym65wc,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Wild Card (Olympic Games, v2.0)",                              MACHINE_NOT_WORKING )
-GAME(  1989, olym65bj,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Black jack (Olympic Games, v5.04, upgrade kit for Wild Card)", MACHINE_NOT_WORKING )
+GAME(  1989, olym65bj,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Black Jack (Olympic Games, v5.04, upgrade kit for Wild Card)", MACHINE_NOT_WORKING )
