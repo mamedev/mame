@@ -31,6 +31,7 @@ public:
 	megadriv_radica_state_base(const machine_config &mconfig, device_type type, const char *tag) :
 		md_ctrl_state(mconfig, type, tag),
 		m_bank(0),
+		m_externalbank(0),
 		m_romsize(0x400000),
 		m_rom(*this, "maincpu")
 	{ }
@@ -44,6 +45,7 @@ protected:
 	void radica_base_map(address_map &map) ATTR_COLD;
 
 	int m_bank;
+	int m_externalbank;
 	int m_romsize;
 
 	required_region_ptr<uint16_t> m_rom;
@@ -75,7 +77,10 @@ public:
 	megadriv_b010xx_select_state(const machine_config& mconfig, device_type type, const char* tag) :
 		megadriv_radica_state(mconfig, type, tag)
 	{ }
+
 	void init_atgame40();
+	void init_dcat();
+	void init_mdhh100();
 
 private:
 	virtual void machine_reset() override ATTR_COLD;
@@ -357,7 +362,7 @@ void megadriv_ra145_state::write_a1630a(offs_t offset, uint16_t data, uint16_t m
 
 uint16_t megadriv_b010xx_select_state::read(offs_t offset)
 {
-	return m_rom[((m_bank >> 1) + offset) & (m_romsize - 1)];
+	return m_rom[(((m_externalbank | m_bank) >> 1) + offset) & (m_romsize - 1)];
 }
 
 void megadriv_b010xx_select_state::bank_high_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -722,6 +727,23 @@ ROM_START( mympac )
 	ROM_LOAD16_WORD_SWAP( "m29w640ft.bin", 0x000000, 0x800000, CRC(d6ceda9e) SHA1(c897f8d5661fea0c030daf9c5e92524eb4e71d52) )
 ROM_END
 
+ROM_START( mygalag )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "galaga_standup_s29al016d70tfi02_00012249.bin", 0x000000, 0x200000, CRC(8f3d2e05) SHA1(8f6a54e5a8ee55e7a6cae3e72b8e70c4eee2c1ef) )
+ROM_END
+
+ROM_START( mygalaga )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "galaga_s29jl032h70tfi01_0001227e.bin", 0x000000, 0x400000, CRC(e775089a) SHA1(0938afa8e92a8c77b4fb86e0ec044fbb2b572570) )
+ROM_END
+
+ROM_START( mysinv )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "spaceinvaders_s29gl0640n90tfi04_0001227e.bin", 0x000000, 0x800000, CRC(55e001d1) SHA1(1eaa377bf78a0f1f492565a9f38b2f7d60d0e440) )
+	ROM_IGNORE(0x100)
+ROM_END
+
+
 
 /*
 
@@ -779,6 +801,53 @@ ROM_START( atgame40 )
 ROM_END
 
 
+ROM_START(dcat16)
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "mg6025.u1", 0x0000,  0x800000, CRC(5453d673) SHA1(b9f8d849cbed81fe73525229f4897ccaeeb7a833) )
+	ROM_RELOAD(0x800000,0x800000)
+ROM_END
+
+
+ROM_START(mahg156)
+	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "md156.u3", 0x0000,  0x8000000, CRC(665fc68c) SHA1(6b765f96716c4a0abf3d27252ec82be6b0d9a985) )
+//  the Megadrive ROMs for the most part appear to be hacked versions of the games / old scene dumps
+//  some are region locked to differing regions (not all games present in ROM appear on the menu)
+//  ROM_COPY( "maincpu", 0x0000000, 0, 0x080000) // FORGOTTEN WORLDS
+//  ROM_COPY( "maincpu", 0x0080000, 0, 0x080000) // FIRE PRO WRESTLING
+//  ROM_COPY( "maincpu", 0x0100000, 0, 0x080000) // GHOST BUSTERS
+//  ROM_COPY( "maincpu", 0x0180000, 0, 0x080000) // DICK TRACY
+//  ROM_COPY( "maincpu", 0x0200000, 0, 0x080000) // DEVIL CRASH
+//  ROM_COPY( "maincpu", 0x0280000, 0, 0x080000) // DECAP ATTACK
+//  ROM_COPY( "maincpu", 0x0300000, 0, 0x080000) // DARWIN 4081
+//  ROM_COPY( "maincpu", 0x0380000, 0, 0x080000) // CRACK DOWN
+//  ROM_COPY( "maincpu", 0x0400000, 0, 0x080000) // CAPTAIN PLANET
+//  ROM_COPY( "maincpu", 0x0480000, 0, 0x080000) // CALIFORNIA GAMES
+//  ROM_COPY( "maincpu", 0x0500000, 0, 0x080000) // CADASH
+//  ROM_COPY( "maincpu", 0x0580000, 0, 0x080000) // BOOGIE WOOGIE BOWLING
+//  ROM_COPY( "maincpu", 0x0600000, 0, 0x080000) // BIMINI RUN
+//  ROM_COPY( "maincpu", 0x0700000, 0, 0x080000) // BATTLE TOADS
+//  ROM_COPY( "maincpu", 0x0780000, 0, 0x080000) // TROUBLE SHOOTER
+//  ROM_COPY( "maincpu", 0x0800000, 0, 0x080000) // BURNING FORCE
+//  ROM_COPY( "maincpu", 0x0880000, 0, 0x080000) // FAERY TALE ADVENTURE
+//  ROM_COPY( "maincpu", 0x0900000, 0, 0x080000) // E-SWAT
+//  ROM_COPY( "maincpu", 0x0980000, 0, 0x080000) // ELEMENTAL MASTER
+//  ROM_COPY( "maincpu", 0x0a00000, 0, 0x080000) // EA HOCKEY
+//  ROM_COPY( "maincpu", 0x0a80000, 0, 0x080000) // DARK CASTLE
+//  ROM_COPY( "maincpu", 0x0b00000, 0, 0x080000) // CYBORG JUSTICE (CENSOR)
+//  ROM_COPY( "maincpu", 0x0b80000, 0, 0x080000) // LITTLE MERMAID
+//  ROM_COPY( "maincpu", 0x0c00000, 0, 0x080000) // DORAEMON
+//  ROM_COPY( "maincpu", 0x0c80000, 0, 0x080000) // SONIC
+//  ROM_COPY( "maincpu", 0x0d00000, 0, 0x080000) // WANI WANI WORLD
+//  ROM_COPY( "maincpu", 0x0d80000, 0, 0x080000) // GOLDEN AXE 2
+//  etc.
+ROM_END
+
+ROM_START(mdhh100)
+	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "s29gl01gp11tfir1.u13", 0x0000,  0x8000000, CRC(564ab33a) SHA1(e455aaa9ed6f302d1ebe55b5202f983af612c415) )
+ROM_END
+
 ROM_START( ra145 )
 	/*
 	Data for the following games is corrupt (ranges approximate, based on areas of inconsistent readout)
@@ -808,8 +877,21 @@ ROM_END
 
 void megadriv_b010xx_select_state::init_atgame40()
 {
-	m_romsize = 0x1000000;
+	m_romsize = memregion("maincpu")->bytes();
 	init_megadrie();
+}
+
+void megadriv_b010xx_select_state::init_dcat()
+{
+	m_romsize = memregion("maincpu")->bytes();
+	init_megadriv();
+}
+
+void megadriv_b010xx_select_state::init_mdhh100()
+{
+	m_romsize = memregion("maincpu")->bytes();
+	m_externalbank = 0x7800000;
+	init_megadriv();
 }
 
 void megadriv_dgunl_state::init_dgunl3227()
@@ -892,7 +974,7 @@ void megadriv_dgunl_state::init_dgunl3227()
 
 void megadriv_ra145_state::init_ra145()
 {
-	m_romsize = 0x8000000;
+	m_romsize = memregion("maincpu")->bytes();
 	init_megadriv();
 }
 
@@ -973,6 +1055,19 @@ CONS( 2021, mypac,     0,        0, megadriv_radica_3button_ntsc,  mympac, megad
 
 CONS( 2021, mympac,    0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Ms. Pac-Man (DGUNL-7010, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
+// menu uses unsupported extended mode
+CONS( 2021, mygalag,   0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Galaga (DGUNL-4195, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mygalaga,  mygalag,  0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Galaga (DGUNL-4199, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+
+CONS( 2021, mysinv,    0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Space Invaders (DGUNL-7006, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT90 )
+
 CONS( 2012, atgame40,  0,        0, megadriv_radica_3button_pal,  radica_3button, megadriv_b010xx_select_state, init_atgame40, "AtGames",               "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)
 
 CONS( 2021, matet,      0,        0, megadriv_radica_3button_ntsc,  radica_3button, megadriv_b010xx_select_state, init_megadriv, "dreamGEAR",            "My Arcade Tetris (DGUNL-7028, Pocket Player Pro)", MACHINE_NOT_WORKING)
+
+// has an SD card slot?
+CONS( 200?, dcat16,       0,        0,      megadriv_radica_3button_ntsc, radica_3button,       megadriv_b010xx_select_state, init_dcat, "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )
+// seems to be based on the AT games units, requires custom mode for menu?
+CONS( 201?, mahg156,      0,        0,      megadriv_radica_3button_ntsc, radica_3button,       megadriv_b010xx_select_state, init_mdhh100, "<unknown>",   "Mini Arcade Handheld Game Console 2.8 Inch Screen Built in 156 Retro Games (Mega Drive handheld)",  MACHINE_NOT_WORKING )
+// game-boy like handheld, pink in colour, 6 button controller (+ home select, start, vol buttons)
+CONS( 201?, mdhh100,      0,        0,      megadriv_radica_3button_ntsc, radica_3button,       megadriv_b010xx_select_state, init_mdhh100, "<unknown>",   "unknown 100-in-1 handheld (Mega Drive based)",  MACHINE_NOT_WORKING )

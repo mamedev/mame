@@ -660,6 +660,41 @@ void superxavix_i2c_state::superxavix_i2c_mrangbat(machine_config &config)
 	m_xavix2002io->read_2_callback().set_ioport("EX2");
 }
 
+// TODO, this hookup doesn't work, is this really the SEEPROM or the RTC?
+uint8_t superxavix_i2c_ndpmj_state::read_extended_io1(offs_t offset, uint8_t mem_mask)
+{
+	logerror("%s: read_extended_io1 (SEEPROM?) mask %02x\n", machine().describe_context(), mem_mask);
+	uint8_t ret = 0x00;
+
+	if (!(mem_mask & 0x80))
+		ret |= m_i2cmem->read_sda() << 7;
+
+	return ret;
+}
+
+void superxavix_i2c_ndpmj_state::write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+	logerror("%s: write_extended_io1 (SEEPROM?) mask %02x data %02x\n", machine().describe_context(), mem_mask, data);
+
+	m_i2cmem->write_sda(BIT(data | ~mem_mask, 7));
+	m_i2cmem->write_scl(BIT(data | ~mem_mask, 6));
+}
+
+void superxavix_i2c_ndpmj_state::superxavix_i2c_ndpmj(machine_config &config)
+{
+	superxavix_i2c_24c16(config);
+
+	// S35390A at u6
+
+	m_xavix2002io->read_0_callback().set(FUNC(superxavix_i2c_ndpmj_state::superxavix_read_extended_io0));
+	m_xavix2002io->write_0_callback().set(FUNC(superxavix_i2c_ndpmj_state::superxavix_write_extended_io0));
+	m_xavix2002io->read_1_callback().set(FUNC(superxavix_i2c_ndpmj_state::read_extended_io1));
+	m_xavix2002io->write_1_callback().set(FUNC(superxavix_i2c_ndpmj_state::write_extended_io1));
+	m_xavix2002io->read_2_callback().set(FUNC(superxavix_i2c_ndpmj_state::superxavix_read_extended_io2));
+	m_xavix2002io->write_2_callback().set(FUNC(superxavix_i2c_ndpmj_state::superxavix_write_extended_io2));
+}
+
+
 
 // XaviXPORT
 ROM_START( xavtenni )
@@ -864,6 +899,12 @@ ROM_START( ban_gkrj )
 	ROM_LOAD("gkrj.u2", 0x000000, 0x400000, CRC(d9ffe41a) SHA1(18583e1b5d9eb89e0364bd84b14f89bbe9640b19) )
 ROM_END
 
+ROM_START( ban_pr2j )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("pr2j.u2", 0x000000, 0x800000, CRC(e46bf811) SHA1(4b88a7a7001e99be526e889d0b81a43be0b1e464)  )
+ROM_END
+
+
 ROM_START( ban_bkgj )
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("bkgj.u2", 0x000000, 0x400000, CRC(a59ce23c) SHA1(d2a6be9e46f3cfc3cf798bf1f76732eee909c93b) )
@@ -940,6 +981,14 @@ ROM_START( ndpbj )
 
 	ROM_REGION( 0x400, "i2cmem", ROMREGION_ERASE00)
 	ROM_LOAD("s-24cs08a.u6", 0x000, 0x400, CRC(a22db408) SHA1(f8d925c75054a961930af12869e3002bb9c4600b) )
+ROM_END
+
+ROM_START( ndpmj )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("ndpmj.u3", 0x000000, 0x800000, CRC(a8132d93) SHA1(2bcbf497e3fa7c7f44569f337cb8babff80c9338) )
+
+	ROM_REGION( 0x800, "i2cmem", ROMREGION_ERASE00)
+	ROM_LOAD("s-24cs16a.u5", 0x000, 0x800, CRC(5d2dd322) SHA1(c0af08a382c4dbefe290fef34cfd8345e904bd74) )
 ROM_END
 
 
@@ -1037,10 +1086,13 @@ CONS( 2006, ban_utmj, 0, 0, superxavix_i2c_24c02,    xavix_i2c,  superxavix_i2c_
 CONS( 2006, ban_ult, 0, 0, superxavix_i2c_24c02,    ban_ult,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",  "Let's! TV Play Narikiri Fight Ultraman - Ute! Hissatsu Kousen!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ 体感大怪獣バトル あやつれ!ウルトラ大怪獣!
-CONS( 2007, ban_um2j, 0, 0, superxavix_i2c_24c04,    ban_gkr,  superxavix_i2c_state, init_no_timer, "Bandai / SSD Company LTD",   "Let's! TV Play Taikan Daikaijuu Battle: Ayatsure! Ultra Daikaijuu! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, ban_um2j, 0, 0, superxavix_i2c_24c04,    ban_gkr,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",   "Let's! TV Play Taikan Daikaijuu Battle: Ayatsure! Ultra Daikaijuu! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let’s!TVプレイ ゲキワザ習得 ゲキレンジャー スーパーゲキレンジャーへの道
-CONS( 2007, ban_gkrj, 0, 0, superxavix_i2c_24c02_4mb,    ban_gkr,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",  "Let's! TV Play Gekiwaza Shuutoku Gekiranger - Super Gekiranger-e no Michi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, ban_gkrj, 0, 0, superxavix_i2c_24c02_4mb,    ban_gkr,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",  "Let's! TV Play Gekiwaza Shuutoku Gekiranger - Super Gekiranger e no Michi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// Yes!プリキュア5 いっしょに変身!メタモルフォーゼ!
+CONS( 2007, ban_pr2j, 0, 0, superxavix_i2c_24c04,    ban_gkr,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",   "Yes! Precure 5: Issho to Henshin! Metamorphose! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // それいけトーマス ソドー島のなかまたち
 CONS( 2005, tmy_thom, 0, 0, superxavix_i2c_24c04,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Soreike Thomas - Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -1081,3 +1133,6 @@ CONS( 2007, doradraw,  0, 0, superxavix_doradraw,    xavix,      superxavix_dora
 // どんトレだ兵衛～どん兵衛くんとトレーニング
 // doesn't boot, has a camera with a large number of connections going to it, probably wants comms to work with it?
 CONS( 2007, ndpbj, 0, 0, superxavix_i2c_24c08,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Nissin / SSD Company LTD",   "Dontore da bei - Donbei-kun to Training (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// どんトレだ兵衛2～おうちで、みんなでフィットネス!～
+CONS( 2008, ndpmj, 0, 0, superxavix_i2c_ndpmj,    xavix,  superxavix_i2c_ndpmj_state, init_xavix, "Nissin / SSD Company LTD",   "Dontore da bei 2 - Ouchi de, Minna de Fitness! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
