@@ -663,6 +663,11 @@ ROM_START( mc_9x6sa )
 	ROM_LOAD( "999999-in-1, 8 bit slim station, newpxp-dvt22-a pcb.bin", 0x00000, 0x200000, CRC(6a47c6a0) SHA1(b4dd376167a57dbee3dea70eb16f1a38e16bcdaa) )
 ROM_END
 
+ROM_START( typo240 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "240nes.u2", 0x00000, 0x1000000, CRC(d709f66c) SHA1(73ca34ce07a1a8782226bd74b1ae43fc6d7126e1) ) // s29gl128p90tfcr1
+ROM_END
+
 void nes_vt32_unk_state::init_rfcp168()
 {
 	uint8_t *romdata = memregion("mainrom")->base();
@@ -765,6 +770,9 @@ CONS( 200?, mc_9x6ss, 0,        0, nes_vt32_4mb, nes_vt32, nes_vt32_unk_state, e
 CONS( 200?, mc_9x6sa, mc_9x6ss, 0, nes_vt32_2mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_7x6ss, 0,        0, nes_vt32_1mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "777777 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_8x6ss, 0,        0, nes_vt32_1mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
+
+// most games work, a few minor graphical issues common to the same games in other units
+CONS( 202?, typo240,   0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "Typo", "Vintage Gamer 240-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
 // there's also a 250+ version of the unit below at least
 CONS( 2018, goretrop,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
