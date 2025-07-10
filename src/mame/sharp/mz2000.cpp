@@ -225,6 +225,7 @@ void mz80b_state::video_start()
 	m_tvram = std::make_unique<u8[]>(0x1000);
 	m_gvram = std::make_unique<u8[]>(0x10000);
 	// back color register doesn't apply to monochrome monitor
+	m_back_color = 0;
 	m_back_color_mask = 0;
 
 	save_pointer(NAME(m_tvram), 0x1000);
@@ -402,7 +403,6 @@ void mz2200_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &clipre
 
 uint32_t mz80b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// mz2000_cass:harvestc uses this extensively
 	bitmap.fill(m_back_color, cliprect);
 
 	if (m_vgate)
