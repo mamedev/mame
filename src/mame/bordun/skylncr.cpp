@@ -1373,6 +1373,23 @@ static INPUT_PORTS_START( sstar97 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( sstar97b )
+	PORT_INCLUDE(sstar97)
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x20, 0x20, "Max Win Bonus" )
+	PORT_DIPSETTING(    0x20, "30000" )
+	PORT_DIPSETTING(    0x00, "60000" )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x18, 0x18, "Max Bet" )
+	PORT_DIPSETTING(    0x18, "32" )
+	PORT_DIPSETTING(    0x10, "64" )
+	PORT_DIPSETTING(    0x08, "80" )
+	PORT_DIPSETTING(    0x00, "240" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( sonikfig )
 	PORT_START("IN1")   // $00 (PPI0 port A)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2)
@@ -1828,9 +1845,9 @@ ROM_START( butrflya ) // this was on an original Bordun PCB, with Bordun copyrig
 	ROM_LOAD( "u48",     0x0c000, 0x04000, CRC(39c391c5) SHA1(326f4d72d546bc902542e628a6e87dc941ef0ef4) ) // 27128, no label
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) // all 27010
-	ROM_LOAD16_BYTE( "100.u20", 0x00000, 0x20000, CRC(2ff775ea) SHA1(2219c75cbac2969485607446ab116587bdee7278) )
-	ROM_LOAD16_BYTE( "102.u21", 0x00001, 0x20000, CRC(029d2214) SHA1(cf8256157db0b297ed457b3da6b6517907128843) )
-	ROM_LOAD16_BYTE( "103.u22", 0x40000, 0x20000, CRC(37bad677) SHA1(c077f0c07b097b376a01e5637446e4c4f82d9e28) )
+	ROM_LOAD16_BYTE( "101.u26", 0x00000, 0x20000, CRC(2ff775ea) SHA1(2219c75cbac2969485607446ab116587bdee7278) )
+	ROM_LOAD16_BYTE( "102.u25", 0x00001, 0x20000, CRC(029d2214) SHA1(cf8256157db0b297ed457b3da6b6517907128843) )
+	ROM_LOAD16_BYTE( "103.u24", 0x40000, 0x20000, CRC(37bad677) SHA1(c077f0c07b097b376a01e5637446e4c4f82d9e28) )
 	ROM_LOAD16_BYTE( "104.u23", 0x40001, 0x20000, CRC(d14c7713) SHA1(c229ef64f3b0a04ff8e27bc56cff6a55ca34b80c) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 ) // all 27010
@@ -1890,6 +1907,7 @@ ROM_START( gallag50 )
 	ROM_LOAD16_BYTE( "27c301.u56", 0x40000, 0x20000, CRC(7eec4edf) SHA1(897fbbcda8d1c42b3a59f0f2f68e295e054d062d) )
 	ROM_LOAD16_BYTE( "27c301.u58", 0x40001, 0x20000, CRC(afd0d391) SHA1(cc024d37cc23f94ef09a8a543cb1604e3f82c306) )
 ROM_END
+
 
 /*
 
@@ -2171,6 +2189,26 @@ ROM_START( sstar97b )
 	ROM_LOAD16_BYTE( "bor_dun_6.u21", 0x00001, 0x20000, BAD_DUMP CRC(37be2cbe) SHA1(78acda58aab605cb992c3b9fbaf18d38f768ed1a) )
 	ROM_LOAD16_BYTE( "bor_dun_7.u20", 0x40000, 0x20000, BAD_DUMP CRC(43908665) SHA1(41b9cee0723d9da6934ab7934012fb1625a8f080) )
 	ROM_LOAD16_BYTE( "bor_dun_5.u22", 0x40001, 0x20000, BAD_DUMP CRC(ca17a632) SHA1(d491310ccdbe9b59a1e607f9254646f20700d79d) )
+ROM_END
+
+// 铭石 II (Míng Shí II)
+ // Has Bordun sticker on PCB and logo in game, but is it an original reskin or a hack?
+ROM_START( mingshi2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u15.u15", 0x00000, 0x08000, CRC(7e06518b) SHA1(7814105673c59b68a8e8807143acb37a2c9a9c6f) )
+	ROM_LOAD( "u48",     0x0c000, 0x04000, CRC(26b5b874) SHA1(80f478350d1303a53a532380d3b90cde2310c39c) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "104.u23", 0x00000, 0x20000, CRC(ef796d0f) SHA1(f4235fc318fcb3ed91bd018078ae590c863556a5) )
+	ROM_LOAD16_BYTE( "102.u25", 0x00001, 0x20000, CRC(804727d8) SHA1(2d52c7dc93806b4a5dd390cf634bae648b9eac1f) )
+	ROM_LOAD16_BYTE( "103.u24", 0x40000, 0x20000, CRC(34d16451) SHA1(18fe4e774ad09421fe8642e0d55546476452d4a8) )
+	ROM_LOAD16_BYTE( "101.u26", 0x40001, 0x20000, CRC(5c2b9d8a) SHA1(250432ea1544cdb5e2aacabbc05e3506c6e6af7e) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "108.u19", 0x00000, 0x20000, CRC(569d4815) SHA1(acdf553971fa32e2fa01cbf8e04d2fc9c9d1d54c) )
+	ROM_LOAD16_BYTE( "106.u21", 0x00001, 0x20000, CRC(35b2842e) SHA1(56c1cc51fab59d888197f40b1de6b3477794bcc7) )
+	ROM_LOAD16_BYTE( "107.u20", 0x40000, 0x20000, CRC(2a64983f) SHA1(55dcd3e145cf6589e88c5b5c55531b20f7ef79c1) )
+	ROM_LOAD16_BYTE( "105.u22", 0x40001, 0x20000, CRC(0583768a) SHA1(61855b9e0f197e3a815f05092fc45488987b0094) )
 ROM_END
 
 // PCB has a Z84C0008PEC, 2x 82C55AC-2, AT89C2051 MCU, 2x ATF1508AS EEPLD, 24C04AN, JFC 95101 (AY-8910 clone), Altera EPM7032LC44-15
@@ -2669,7 +2707,8 @@ GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  init_miacti
 GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction,  ROT0, "bootleg",              "Tiger (slot)",                                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE  )
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
 GAME( 199?, sstar97a,  sstar97,  sstar97,  sstar97,  skylncr_state,  init_sstar97a,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V168A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, sstar97b,  sstar97,  sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153A)",   MACHINE_SUPPORTS_SAVE )
+GAME( 199?, sstar97b,  sstar97,  sstar97,  sstar97b, skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153A)",   MACHINE_SUPPORTS_SAVE )
+GAME( 199?, mingshi2,  sstar97,  sstar97,  sstar97b, skylncr_state,  empty_init,     ROT0, "Bordun International", "Ming Shi II (version V153A)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 199?, sstar97jb, sstar97,  sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 Jianan Ban",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
 GAME( 199?, hongmayi,  0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "bootleg",              "Hong Mayi",                                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
 GAME( 199?, dbsha,     0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "bootleg",              "Da Bai Sha",                                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
