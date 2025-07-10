@@ -47,6 +47,10 @@ protected:
 	void vtfp_4a00_w(u8 data);
 	void vtfp_411d_w(u8 data);
 	u8 vthh_414a_r();
+	u8 vt32_4132_r();
+	void vt32_4132_w(u8 data);
+	u8 vt32_4134_r();
+	void vt32_4134_w(u8 data);
 	virtual u8 spr_r(offs_t offset) override;
 	virtual u8 chr_r(offs_t offset) override;
 
@@ -58,6 +62,9 @@ private:
 	u8 m_mmc1_shift_reg;
 	u8 m_mmc1_control;
 	u8 m_mmc1_prg_bank;
+
+	u8 m_4132;
+	u8 m_4134;
 };
 
 class nes_vt32_soc_pal_device : public nes_vt32_soc_device

@@ -191,6 +191,26 @@ u8 nes_vt32_soc_device::vtfp_412d_r()
 	return m_upper_read_412d_callback();
 }
 
+u8 nes_vt32_soc_device::vt32_4132_r()
+{
+	return m_4132;
+}
+
+void nes_vt32_soc_device::vt32_4132_w(u8 data)
+{
+	m_4132 = data;
+}
+
+u8 nes_vt32_soc_device::vt32_4134_r()
+{
+	return m_4134;
+}
+
+void nes_vt32_soc_device::vt32_4134_w(u8 data)
+{
+	m_4134 = data;
+}
+
 void nes_vt32_soc_device::vtfp_4242_w(u8 data)
 {
 	logerror("%s: vtfp_4242_w %02x\n", machine().describe_context(), data);
@@ -365,6 +385,8 @@ void nes_vt32_soc_device::device_start()
 	save_item(NAME(m_mmc1_shift_reg));
 	save_item(NAME(m_mmc1_control));
 	save_item(NAME(m_mmc1_prg_bank));
+	save_item(NAME(m_4132));
+	save_item(NAME(m_4134));
 }
 
 void nes_vt32_soc_device::device_reset()
@@ -374,6 +396,8 @@ void nes_vt32_soc_device::device_reset()
 	m_mmc1_shift_reg = 1 << 4;
 	m_mmc1_control = 0x0c;
 	m_mmc1_prg_bank = 0;
+	m_4132 = 0;
+	m_4134 = 0;
 }
 
 void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
@@ -430,6 +454,9 @@ void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
 
 	map(0x412c, 0x412c).rw(FUNC(nes_vt32_soc_device::vtfp_412c_r), FUNC(nes_vt32_soc_device::vtfp_412c_extbank_w)); // GPIO
 	map(0x412d, 0x412d).r(FUNC(nes_vt32_soc_device::vtfp_412d_r)).nopw(); // GPIO
+
+	map(0x4132, 0x4132).rw(FUNC(nes_vt32_soc_device::vt32_4132_r), FUNC(nes_vt32_soc_device::vt32_4132_w));
+	map(0x4134, 0x4134).rw(FUNC(nes_vt32_soc_device::vt32_4134_r), FUNC(nes_vt32_soc_device::vt32_4134_w));
 
 	map(0x4141, 0x4141).nopw(); // ??
 	map(0x4142, 0x4142).nopw(); // ??
