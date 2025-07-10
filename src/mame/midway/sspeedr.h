@@ -64,8 +64,6 @@ private:
 	void io_map(address_map &map) ATTR_COLD;
 	void prg_map(address_map &map) ATTR_COLD;
 
-	uint8_t m_led_time[2]{};
-	uint8_t m_led_score[24]{};
 	uint8_t m_toggle = 0;
 	uint16_t m_driver_horz = 0;
 	uint8_t m_driver_vert = 0;
@@ -77,7 +75,7 @@ private:
 	uint8_t m_track_vert[2]{};
 	uint8_t m_track_ice = 0;
 
-	void draw_track(bitmap_ind16 &bitmap);
+	void draw_track(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_drones(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_driver(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

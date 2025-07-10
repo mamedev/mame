@@ -68,17 +68,12 @@ constexpr uint8_t ls48_map[16] =
 
 void sspeedr_state::time_w(offs_t offset, uint8_t data)
 {
-	data = data & 15;
-	m_digits[24 + offset] = ls48_map[data];
-	m_led_time[offset] = data;
+	m_digits[24 + offset] = ls48_map[data & 0xf];
 }
-
 
 void sspeedr_state::score_w(offs_t offset, uint8_t data)
 {
-	data = ~data & 15;
-	m_digits[offset] = ls48_map[data];
-	m_led_score[offset] = data;
+	m_digits[offset] = ls48_map[~data & 0xf];
 }
 
 
@@ -252,7 +247,7 @@ GFXDECODE_END
 void sspeedr_state::sspeedr(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(19'968'000)/8);
+	Z80(config, m_maincpu, 19.968_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sspeedr_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &sspeedr_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sspeedr_state::irq0_line_assert));
@@ -261,10 +256,7 @@ void sspeedr_state::sspeedr(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.39);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(16 * 1000000 / 15680));
-	screen.set_size(376, 256);
-	screen.set_visarea(0, 375, 0, 247);
+	screen.set_raw(14.318181_MHz_XTAL / 2, 456, 0, 376, 264, 0, 248);
 	screen.set_screen_update(FUNC(sspeedr_state::screen_update));
 	screen.screen_vblank().set(FUNC(sspeedr_state::screen_vblank));
 	screen.set_palette(m_palette);
@@ -286,15 +278,14 @@ void sspeedr_state::sspeedr(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:hi_shift", "I_HI_SHIFT", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:lo_shift", "I_LO_SHIFT", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:boom", "I_BOOM", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:engine_sound_off",
-				"I_ENGINE_SOUND_OFF", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:engine_sound_off", "I_ENGINE_SOUND_OFF", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_1", "I_NOISE_CR_1", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_2", "I_NOISE_CR_2", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:silence", "I_SILENCE", 0);
 
 	// Audio output is from an LM3900 op-amp whose output has a
 	// peak-to-peak range of about 12 volts, centered on 6 volts.
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(32767.0 / 6.0, -32767.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0 / 6.0, -1.0);
 
 	// Netlist volume-potentiometer interface
 	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_master_vol", "R70.DIAL");
