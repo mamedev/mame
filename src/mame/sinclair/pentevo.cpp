@@ -536,26 +536,24 @@ void pentevo_state::gluk_data_w(offs_t offset, u8 data)
 	if (!m_glukrs->is_active())
 		return;
 
-	u8 addr = m_glukrs->address_r();
+	const u8 addr = m_glukrs->address_r();
 	if (addr >= 0xf0 && addr <= 0xf0)
 	{
 		m_gluk_ext = data;
 		u8 m_fx[0xf] = {0x00};
 		if (data == 0 || data == 1) // BASECONF_VERSION + BOOTLOADER_VERSION
 		{
-			strcpy((char *)m_fx, "M.A.M.E.");
+			strcpy((char *)m_fx, "MAME");
 			PAIR16 m_ver;
-			m_ver.w = ((22 << 9) | (9 << 5) | 3); // y.m.d
+			m_ver.w = ((25 << 9) | (7 << 5) | 31); // y.m.d
 			m_fx[0x0c] = m_ver.b.l;
 			m_fx[0x0d] = m_ver.b.h;
 		}
 
 		for (u8 i = 0; i < 0xf; i++)
 		{
-			m_glukrs->address_w(0xf0 + i);
-			m_glukrs->data_w(m_fx[i]);
+			m_glukrs->write_direct(0xf0 + i, m_fx[i]);
 		}
-		m_glukrs->address_w(addr);
 	}
 	else
 	{
@@ -740,7 +738,7 @@ void pentevo_state::pentevo(machine_config &config)
 	m_ram->set_default_size("4M");
 	RAM(config, m_char_ram).set_default_size("2048").set_default_value(0);
 
-	GLUKRS(config, m_glukrs);
+	GLUKRS(config, m_glukrs, 4'194'304);
 	SPI_SDCARD(config, m_sdcard, 0);
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(pentevo_state::spi_miso_w));

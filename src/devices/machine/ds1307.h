@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
-#ifndef MAME_MACHINE_I2CDS1307_H
-#define MAME_MACHINE_I2CDS1307_H
+#ifndef MAME_MACHINE_DS1307_H
+#define MAME_MACHINE_DS1307_H
 
 #include "dirtc.h"
 #include "i2chle.h"
@@ -33,4 +33,4 @@ private:
 
 DECLARE_DEVICE_TYPE(I2C_DS1307, i2c_ds1307_device)
 
-#endif // MAME_MACHINE_I2CDS1307_H
+#endif // MAME_MACHINE_DS1307_H
