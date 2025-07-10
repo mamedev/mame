@@ -1391,15 +1391,12 @@ void mz80b_state::mz80b(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", mz2000_floppies, nullptr, mz2000_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", mz2000_floppies, nullptr, mz2000_state::floppy_formats).enable_sound(true);
 
-	SOFTWARE_LIST(config, "flop_list").set_original("mz2000_flop");
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(mz700_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mz_cass");
-
-	SOFTWARE_LIST(config, "cass_list").set_original("mz2000_cass").set_filter("MONO");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1415,6 +1412,9 @@ void mz80b_state::mz80b(machine_config &config)
 	// mz800 actually reads $f8-$fa from IPL
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "bin,dat", attotime::from_seconds(1)));
 	snapshot.set_load_callback(FUNC(mz80b_state::snapshot_cb));
+
+	SOFTWARE_LIST(config, "flop_list").set_original("mz80b_flop");
+	SOFTWARE_LIST(config, "cass_list").set_original("mz80b_cass");
 }
 
 
@@ -1425,14 +1425,18 @@ void mz2000_state::mz2000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
 
 	m_screen->set_screen_update(FUNC(mz2000_state::screen_update));
+
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("mz2000_flop");
+	SOFTWARE_LIST(config.replace(), "cass_list").set_original("mz2000_cass").set_filter("MONO");
 }
 
 void mz2200_state::mz2200(machine_config &config)
 {
 	mz2000(config);
-	SOFTWARE_LIST(config.replace(), "cass_list").set_original("mz2000_cass").set_filter("COLOR");
 
 	PALETTE(config.replace(), m_palette, palette_device::BRG_3BIT);
+
+	SOFTWARE_LIST(config.replace(), "cass_list").set_original("mz2000_cass").set_filter("COLOR");
 }
 
 
