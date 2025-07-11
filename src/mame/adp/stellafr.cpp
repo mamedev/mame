@@ -250,8 +250,8 @@ void stellafr_state::mux2_w(uint8_t data)
 
 void stellafr_state::duart_output_w(uint8_t data)
 {
-	m_leds[0] = BIT(data, PORT_O_LED0);
-	m_leds[1] = BIT(data, PORT_O_SDA);
+	m_leds[0] = !BIT(data, PORT_O_LED0);
+	m_leds[1] = !BIT(data, PORT_O_SDA);
 }
 
 void stellafr_state::ay8910_portb_w(uint8_t data)
