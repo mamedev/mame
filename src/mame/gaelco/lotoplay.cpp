@@ -7,7 +7,6 @@
  free play.
 
  It's a very simple PCB with this layout:
-
   ___________________________________
  |   _________               O <- GREEN LED
  |  |_8xDIPS_|            O     O   |
@@ -29,7 +28,18 @@
   - https://www.recreativas.org/first-games-954-covielsa
 
  There are other versions with external ROM, and even others with PIC16C54
- instead of the MC68705 MCU.
+ instead of the MC68705 MCU:
+  _____________________________________________
+ |  |_8xDIPS_|   __________            O <- GREEN LED
+ |              |SN74LS166N         O     O   |
+ |                   Xtal         O         O |
+ |                  4 MHz           O     O   |
+ |         ___   ___                   O      |
+=|=       |  |  |  |<-PIC16C54-XT/P           |
+=|= <- 8-Pin Connector     ___                |
+ |        |  |<-CNY/74-4  |  |<-TL7702ACP     |
+ |        |__|  |__|      |__|                |
+ |____________________________________________|
 
 *******************************************************************************/
 
@@ -72,7 +82,7 @@ void lotoplay_state::lotoplay_p5(machine_config &config)
 
 void lotoplay_state::lotoplay_pic(machine_config &config)
 {
-	PIC16C54(config, m_maincpu, 3'000'000); // PIC16C54, unknown clock
+	PIC16C54(config, m_maincpu, 4_MHz_XTAL); // PIC16C54
 }
 
 // Sets with MC68705 MCU.
