@@ -102,11 +102,6 @@ ROM_START(lotoplayb)
 	ROM_LOAD("lp_vii_sch_mostra_11302_68705p3s.bin", 0x0000, 0x0800, CRC(61b426d3) SHA1(b66dc6c382a04d8cdbaee342f179ce80abfd3c71))
 ROM_END
 
-ROM_START(lotoplayc)
-	ROM_REGION(0x0800, "maincpu", 0)
-	ROM_LOAD("miv_00_68705p5s.bin",                  0x0000, 0x0800, CRC(67b1d2fc) SHA1(98ea18d4f55faef369a8fd701f936efab3cd084f))
-ROM_END
-
 ROM_START(lotoplayp)
 	ROM_REGION(0x1fff, "maincpu", 0)
 	ROM_LOAD("loto_play_ff46_pic16c54.bin",          0x0000, 0x1fff, CRC(8840349d) SHA1(e9dcc572c7b577618ddda06be1538be69eb15584))
@@ -118,5 +113,4 @@ ROM_END
 GAME( 1988?, lotoplay,  0,        lotoplay_p3,  lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 1)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 GAME( 1988?, lotoplaya, lotoplay, lotoplay_p3,  lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 2)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 GAME( 1988?, lotoplayb, lotoplay, lotoplay_p3,  lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 3)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-GAME( 1988?, lotoplayc, lotoplay, lotoplay_p5,  lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 4)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 GAME( 1990?, lotoplayp, lotoplay, lotoplay_pic, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (PIC16C54)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
