@@ -154,6 +154,7 @@ reference(xexexj) : https://www.youtube.com/watch?v=TegjBEvvGxI
 #include "sound/flt_vol.h"
 #include "sound/k054539.h"
 #include "sound/ymopm.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -417,7 +418,6 @@ void xexex_state::xexex_objdma(int limiter)
 		return; // make sure we only do DMA transfer once per frame
 
 	m_k053246->k053247_get_ram(&dst);
-	counter = m_k053246->k053247_get_dy();
 	src = m_spriteram;
 	num_inactive = counter = 256;
 
@@ -542,8 +542,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(xexex_state::xexex_interrupt)
 			m_maincpu->set_input_line(6, HOLD_LINE);
 	}
 
-	/* TODO: vblank is at 256! (enable CCU then have fun in fixing offsetted layers) */
-	if (scanline == 128)
+	if (scanline == 256)
 	{
 		if (m_k053246->k053246_is_irq_enabled())
 		{
@@ -580,7 +579,7 @@ void xexex_state::main_map(address_map &map)
 	map(0x0c8000, 0x0c800f).rw(m_k053250, FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));              // CLTC
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);               // priority encoder
-//  map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);                // CCU
+	map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); // CCU
 	map(0x0d4000, 0x0d4001).w(FUNC(xexex_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));                // VSCCS regs
@@ -688,26 +687,22 @@ void xexex_state::machine_reset()
 
 void xexex_state::xexex(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2); // 16MHz
+	// basic machine hardware
+	M68000(config, m_maincpu, 32_MHz_XTAL / 2); // 16MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &xexex_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(xexex_state::xexex_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, XTAL(32'000'000)/4); // Z80E 8Mhz
+	Z80(config, m_audiocpu, 32_MHz_XTAL / 4); // Z80E 8Mhz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &xexex_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(1920));
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-//  m_screen->set_refresh_hz(XTAL(32'000'000)/4/512/288);
-	m_screen->set_raw(XTAL(32'000'000)/4, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255); // 8Mhz horizontal dotclock
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(40, 40+384-1, 0, 0+256-1);
+	m_screen->set_raw(32_MHz_XTAL / 4, 512, 0+40, 384+40, 289, 0, 256); // from CCU
 	m_screen->set_screen_update(FUNC(xexex_state::screen_update_xexex));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
@@ -728,22 +723,22 @@ void xexex_state::xexex(machine_config &config)
 
 	K053251(config, m_k053251, 0);
 
-	K053252(config, m_k053252, XTAL(32'000'000)/4);
+	K053252(config, m_k053252, 32_MHz_XTAL / 4).set_offsets(40, 0);
 
 	K054338(config, m_k054338, 0);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	K054321(config, m_k054321, "speaker");
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'000'000)/8)); // 4MHz
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32_MHz_XTAL / 8)); // 4MHz
 	ymsnd.add_route(0, "filter1_l", 0.2);
 	ymsnd.add_route(0, "filter1_r", 0.2);
 	ymsnd.add_route(1, "filter2_l", 0.2);
 	ymsnd.add_route(1, "filter2_r", 0.2);
 
-	K054539(config, m_k054539, XTAL(18'432'000));
+	K054539(config, m_k054539, 18.432_MHz_XTAL);
 	m_k054539->set_analog_callback(FUNC(xexex_state::ym_set_mixing));
 	m_k054539->add_route(0, "speaker", 0.4, 0);
 	m_k054539->add_route(0, "speaker", 0.4, 1);
