@@ -274,7 +274,8 @@ static const md_slot slot_list[] =
 	{ TOPFIGHTER, "rom_topf" },
 
 	{ SEGA_SRAM_FULLPATH, "rom_sram" },
-	{ SEGA_SRAM_FALLBACK, "rom_sramsafe" }
+	{ SEGA_SRAM_FALLBACK, "rom_sramsafe" },
+	{ PAPRIUM, "rom_paprium" }
 };
 
 static int md_get_pcb_id(const char *slot)
@@ -666,6 +667,9 @@ void base_md_cart_slot_device::setup_nvram()
 		case NBA_JAM_ALT:
 			m_cart->nvram_alloc(0x100);
 			break;
+		case PAPRIUM:
+			m_cart->nvram_alloc(0x2000);
+			break;
 	}
 }
 
@@ -865,6 +869,8 @@ int base_md_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 		case 0x800000:
 			if (!memcmp((char *)&ROM[0x0180], "GM T-574023-", 12)) // Pier Solar
 				type = PSOLAR;
+			if (!memcmp((char *)&ROM[0x0120], "PAPRIUM", 7)) // Paprium
+				type = PAPRIUM;
 			break;
 
 		default:
