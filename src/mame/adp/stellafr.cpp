@@ -94,6 +94,7 @@ Connectors:
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 #include "speaker.h"
 
 #include "stellafr.lh"
@@ -192,6 +193,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
 		m_nvram(*this, "nvram"),
+		m_dac(*this, "dac"),
 		m_digits(*this, "digit%u", 0U),
 		m_leds(*this, "led%u", 0U)
 	{ }
@@ -200,36 +202,32 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void write_8000c1(uint8_t data);
-	uint8_t read_800101();
-	void write_800101(uint8_t data);
+	required_device<cpu_device> m_maincpu;
+	required_device<mc68681_device> m_duart;
+	required_device<nvram_device> m_nvram;
+	required_device<ad7224_device> m_dac;
+	output_finder<8> m_digits;
+	output_finder<2> m_leds;
+
+	uint8_t m_mux_data;
+
+	uint16_t mux_r();
+	void mux_w(uint16_t data);
+	void mux2_w(uint8_t data);
 	void duart_output_w(uint8_t data);
 	void ay8910_portb_w(uint8_t data);
 
 	void mem_map(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<mc68681_device> m_duart;
-	required_device<nvram_device> m_nvram;
-	output_finder<8> m_digits;
-	output_finder<2> m_leds;
 };
 
-void stellafr_state::write_8000c1(uint8_t data)
+void stellafr_state::mux2_w(uint8_t data)
 {
-}
-
-uint8_t stellafr_state::read_800101()
-{
-	return 0xff;
-}
-
-void stellafr_state::write_800101(uint8_t data)
-{
+	// U1
 }
 
 void stellafr_state::duart_output_w(uint8_t data)
@@ -248,11 +246,15 @@ void stellafr_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	// controlled by U17 74HC138
-	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::write_8000c1)); // Y3
-	map(0x800101, 0x800101).rw(FUNC(stellafr_state::read_800101), FUNC(stellafr_state::write_800101)); // Y4
+	map(0x800001, 0x800001).w(m_dac, FUNC(dac_byte_interface::data_w)); // Y0
+	// Y1 device on cpu board
+	// Y2 device on cpu board
+	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::mux2_w)); // Y3 SP/ME II out
+	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::mux_w)); // Y4 SP/ME I out / Inputs
 	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)); // Y5
 	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w)); // Y5
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
+	// Y7 NC
 	map(0xff0000, 0xffffff).ram().share("nvram");
 }
 
@@ -265,6 +267,12 @@ void stellafr_state::machine_start()
 {
 	m_digits.resolve();
 	m_leds.resolve();
+	save_item(NAME(m_mux_data));
+}
+
+void stellafr_state::machine_reset()
+{
+	m_mux_data = 0;
 }
 
 static INPUT_PORTS_START( stellafr )
@@ -288,6 +296,8 @@ void stellafr_state::stellafr(machine_config &config)
 	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+
+	AD7224(config, m_dac, 0);
 
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", 1000000));
