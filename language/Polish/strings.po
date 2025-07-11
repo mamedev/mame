@@ -173,7 +173,7 @@ msgstr "Zrównoważenie celownika dla %1$s"
 #: src/frontend/mame/ui/ui.cpp:1644
 #, c-format
 msgid "%1$3ddB"
-msgstr "1$3ddB"
+msgstr "%1$3ddB"
 
 #: src/frontend/mame/ui/ui.cpp:1687
 #, c-format
