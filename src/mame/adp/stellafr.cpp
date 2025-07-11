@@ -225,6 +225,22 @@ private:
 
 };
 
+
+uint16_t stellafr_state::mux_r()
+{
+	uint16_t data = 0xffff;
+
+	data &= ~(BIT(m_in0->read(), m_mux_data) ? 0x0000 : 0x0004);
+
+	return data;
+}
+
+void stellafr_state::mux_w(uint16_t data)
+{
+	m_mux_data++;
+	m_mux_data &= 0x0f;
+}
+
 void stellafr_state::mux2_w(uint8_t data)
 {
 	// U1
@@ -239,8 +255,6 @@ void stellafr_state::duart_output_w(uint8_t data)
 void stellafr_state::ay8910_portb_w(uint8_t data)
 {
 }
-
-
 
 void stellafr_state::mem_map(address_map &map)
 {
