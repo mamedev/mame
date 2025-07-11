@@ -31,6 +31,7 @@ public:
 	void init_genesis();
 	void init_md_eur();
 	void init_md_jpn();
+	void init_genesis_tmss();
 
 	void md_32x(machine_config &config);
 	void genesis_32x(machine_config &config);

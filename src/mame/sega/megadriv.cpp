@@ -245,9 +245,8 @@ uint16_t md_base_state::m68k_version_read()
 	  D0 : Bit 0 of version number
 	*/
 	LOG("%s: read version register\n", machine().describe_context());
-	// Version number contained in bits 3-0
-	// TODO: non-TMSS BIOSes must return 0 here
-	uint16_t const retdata = m_version_hi_nibble | 0x01;
+	// Version number contained in bits 3-0 (TMSS)
+	uint16_t const retdata = m_version_hi_nibble | m_version_lo_nibble;
 
 	return retdata | (retdata << 8);
 }
@@ -956,6 +955,8 @@ void md_base_state::megadriv_init_common()
 	save_pointer(NAME(m_genz80.z80_prgram), 0x2000);
 
 	m_maincpu->set_tas_write_callback(*this, FUNC(md_base_state::megadriv_tas_callback));
+
+	m_version_lo_nibble = 0;
 }
 
 void md_base_state::init_megadriv()
