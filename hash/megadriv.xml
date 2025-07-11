@@ -37535,10 +37535,10 @@ Tries to jump to jsr $a385b86.l (?) at PC=0x38b0, must be using its own mapper r
 			<dataarea name="rom" width="16" endianness="big" size="0x800000">
 				<rom loadflag="load16_word_swap" name="S29GL064N90BFI03@BGA48_20210924_142237.bin" size="0x800000" crc="6a95876f" sha1="6fa3725e8559720816c6cc71d5ad4b1c67652f17"/>
 				<!-- overlaying atm, fix me -->
-				<rom name="paprium_max10.bin" offest="0x000000" size="0x2000" crc="413d9670" sha1="f890e5e366f5bb6880e6582b91b04d2eeae76e96" status="baddump"/>
+				<rom name="paprium_max10.bin" offset="0x000000" size="0x2000" crc="413d9670" sha1="f890e5e366f5bb6880e6582b91b04d2eeae76e96" status="baddump"/>
 			</dataarea>
 			<dataarea name="max10" width="16" endianness="big" size="0x2000">
-				<rom name="paprium_max10.bin" offest="0x000000" size="0x2000" crc="413d9670" sha1="f890e5e366f5bb6880e6582b91b04d2eeae76e96" status="baddump"/>
+				<rom name="paprium_max10.bin" offset="0x000000" size="0x2000" crc="413d9670" sha1="f890e5e366f5bb6880e6582b91b04d2eeae76e96" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
