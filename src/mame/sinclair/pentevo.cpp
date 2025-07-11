@@ -515,19 +515,9 @@ void pentevo_state::spi_miso_w(u8 data)
 
 u8 pentevo_state::gluk_data_r(offs_t offset)
 {
-	if (m_glukrs->is_active())
-	{
-		if (m_gluk_ext == 2)
-			return m_keyboard->read();
-		else if (m_glukrs->address_r() == 0x0a)
-			return 0x20 | (m_glukrs->data_r() & 0x0f);
-		else if (m_glukrs->address_r() == 0x0b)
-			return 0x02 | (m_glukrs->data_r() & 0x04);
-		else if (m_glukrs->address_r() == 0x0c)
-			return 0x10;
-		else if (m_glukrs->address_r() == 0x0d)
-			return 0x80;
-	}
+	if (m_glukrs->is_active() && (m_gluk_ext == 2))
+		return m_keyboard->read();
+
 	return m_glukrs->data_r(); // returns 0xff if inactive
 }
 
@@ -738,7 +728,7 @@ void pentevo_state::pentevo(machine_config &config)
 	m_ram->set_default_size("4M");
 	RAM(config, m_char_ram).set_default_size("2048").set_default_value(0);
 
-	GLUKRS(config, m_glukrs, 4'194'304);
+	GLUKRS(config, m_glukrs);
 	SPI_SDCARD(config, m_sdcard, 0);
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(pentevo_state::spi_miso_w));

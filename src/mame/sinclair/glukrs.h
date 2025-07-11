@@ -12,7 +12,7 @@
 class glukrs_device : public mc146818_device
 {
 public:
-	glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void enable() { m_glukrs_active = true; }
 	void disable() { m_glukrs_active = false; }
