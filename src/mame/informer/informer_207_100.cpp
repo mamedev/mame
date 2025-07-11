@@ -15,17 +15,17 @@
     - M58321 RTC
     - 19.7184 MHz XTAL, 3.6864 MHz XTAL
 
-    TODO:
-    - Redump ROM 207_100_2.bin
-
 ***************************************************************************/
 
 #include "emu.h"
+#include "informer_207_100_kbd.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/6850acia.h"
 #include "machine/mc68681.h"
 #include "machine/msm58321.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -83,11 +83,12 @@ private:
 void informer_207_100_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x27ff).ram().share("ram");
-	map(0xc000, 0xffff).rom().region("maincpu", 0);
+	map(0x8000, 0xffff).rom().region("maincpu", 0);
 	map(0xff00, 0xff0f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
 	map(0xff20, 0xff20).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xff21, 0xff21).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0xff40, 0xff41).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xff40, 0xff41).w(m_acia, FUNC(acia6850_device::write));
+	map(0xff42, 0xff43).r(m_acia, FUNC(acia6850_device::read));
 }
 
 
@@ -122,14 +123,16 @@ MC6845_UPDATE_ROW( informer_207_100_state::crtc_update_row )
 			data = 0xff;
 
 		// draw 8 pixels of the character
-		bitmap.pix(y, x * 8 + 7) = pen[BIT(data, 0)];
-		bitmap.pix(y, x * 8 + 6) = pen[BIT(data, 1)];
-		bitmap.pix(y, x * 8 + 5) = pen[BIT(data, 2)];
-		bitmap.pix(y, x * 8 + 4) = pen[BIT(data, 3)];
-		bitmap.pix(y, x * 8 + 3) = pen[BIT(data, 4)];
-		bitmap.pix(y, x * 8 + 2) = pen[BIT(data, 5)];
-		bitmap.pix(y, x * 8 + 1) = pen[BIT(data, 6)];
-		bitmap.pix(y, x * 8 + 0) = pen[BIT(data, 7)];
+		bitmap.pix(y, x * 10 + 9) = pen[0];
+		bitmap.pix(y, x * 10 + 8) = pen[0];
+		bitmap.pix(y, x * 10 + 7) = pen[BIT(data, 0)];
+		bitmap.pix(y, x * 10 + 6) = pen[BIT(data, 1)];
+		bitmap.pix(y, x * 10 + 5) = pen[BIT(data, 2)];
+		bitmap.pix(y, x * 10 + 4) = pen[BIT(data, 3)];
+		bitmap.pix(y, x * 10 + 3) = pen[BIT(data, 4)];
+		bitmap.pix(y, x * 10 + 2) = pen[BIT(data, 5)];
+		bitmap.pix(y, x * 10 + 1) = pen[BIT(data, 6)];
+		bitmap.pix(y, x * 10 + 0) = pen[BIT(data, 7)];
 	}
 }
 
@@ -159,8 +162,6 @@ void informer_207_100_state::machine_start()
 
 void informer_207_100_state::machine_reset()
 {
-	// start executing somewhere sane
-	m_maincpu->set_pc(0xc000);
 }
 
 
@@ -170,29 +171,34 @@ void informer_207_100_state::machine_reset()
 
 void informer_207_100_state::informer_207_100(machine_config &config)
 {
-	MC6809(config, m_maincpu, 19.7184_MHz_XTAL / 4); // unknown clock divisor
+	MC6809E(config, m_maincpu, 19.7184_MHz_XTAL / 10); // clock divisor guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &informer_207_100_state::mem_map);
 
-	ACIA6850(config, m_acia, 0); // unknown clock
+	ACIA6850(config, m_acia);
 
-	SCN2681(config, m_duart, 0); // unknown clock
+	INFORMER_207_100_KBD(config, "kbd");
+
+	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->irq_cb().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	m_duart->outport_cb().set(m_acia, FUNC(acia6850_device::write_txc)).bit(3);
+	m_duart->outport_cb().append(m_acia, FUNC(acia6850_device::write_rxc)).bit(3);
 
 	MSM58321(config, m_rtc, 32.768_kHz_XTAL);
 
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_color(rgb_t::green());
-	m_screen->set_raw(19.7184_MHz_XTAL, 832, 0, 640, 316, 0, 300);
+	m_screen->set_raw(19.7184_MHz_XTAL, 1040, 0, 800, 316, 0, 300);
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	GFXDECODE(config, "gfxdecode", m_palette, chars);
 
-	R6545_1(config, m_crtc, 19.7184_MHz_XTAL / 8); // unknown clock divisor
+	R6545_1(config, m_crtc, 19.7184_MHz_XTAL / 10); // clock divisor guessed
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(8);
+	m_crtc->set_char_width(10);
 	m_crtc->set_on_update_addr_change_callback(FUNC(informer_207_100_state::crtc_addr));
 	m_crtc->set_update_row_callback(FUNC(informer_207_100_state::crtc_update_row));
 }
@@ -203,15 +209,19 @@ void informer_207_100_state::informer_207_100(machine_config &config)
 //**************************************************************************
 
 ROM_START( in207100 )
-	ROM_REGION(0x4000, "maincpu", 0)
-	// 79505-001  V2.00  <unreadable>
-	ROM_LOAD("79505-001.bin", 0x0000, 0x2000, CRC(272ebfac) SHA1(b6b9dc523028ace9e5a210e908de2260f36dde4a))
-	// <Label lost>
-	ROM_LOAD("207_100_2.bin", 0x2000, 0x2000, BAD_DUMP CRC(848d1b45) SHA1(77dd68951ac85e5dc51b51db002d90863b0fce43))
+	ROM_REGION(0x8000, "maincpu", 0)
+	// <Label lost; EPROM type is SEEQ DQ1533-300 2764-30> (1 empty socket is directly to left)
+	ROM_LOAD("79532-002.bin", 0x0000, 0x2000, CRC(848d1b45) SHA1(77dd68951ac85e5dc51b51db002d90863b0fce43))
+	// 79505-002  V2.00  ED2F -2-3
+	ROM_LOAD("79505-002.bin", 0x4000, 0x4000, CRC(3dfae553) SHA1(ae6849cacb07792769f93aa736f5603e28fa8635))
 
 	ROM_REGION(0x1000, "chargen", 0)
 	// 79496  REV 1.01  12-29-83
-	ROM_LOAD("79496.bin", 0x0000, 0x1000, CRC(930ac23a) SHA1(74e6bf81b60e3504cb2b9f14a33e7c3e367dc825))
+	ROM_LOAD("79496-101.bin", 0x0000, 0x1000, CRC(930ac23a) SHA1(74e6bf81b60e3504cb2b9f14a33e7c3e367dc825))
+
+	ROM_REGION(0x220, "proms", 0)
+	ROM_LOAD("82s131_z35.bin", 0x000, 0x200, CRC(5a002c87) SHA1(59e51ac7106f0925959655b1df1d8452db76943e))
+	ROM_LOAD("82s123_z5.bin", 0x200, 0x020, CRC(eec80ecf) SHA1(fb58086229aed8187ecf0d24573b7e71980f271c))
 ROM_END
 
 } // anonymous namespace
