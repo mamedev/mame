@@ -317,9 +317,6 @@ void stella8085_state::dicemstr(machine_config &config)
 	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));
 	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
 
-	/* video hardware */
-	config.set_default_layout(layout_disc2000);
-
 	RTC62421(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
@@ -340,6 +337,8 @@ void stella8085_state::doppelpot(machine_config &config)
 	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));
 	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));
 	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
+
+	config.set_default_layout(layout_disc2000);
 
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 
