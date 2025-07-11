@@ -195,7 +195,8 @@ public:
 		m_nvram(*this, "nvram"),
 		m_dac(*this, "dac"),
 		m_digits(*this, "digit%u", 0U),
-		m_leds(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U),
+		m_in0(*this, "IN0")
 	{ }
 
 	void stellafr(machine_config &config);
@@ -211,6 +212,7 @@ private:
 	required_device<ad7224_device> m_dac;
 	output_finder<8> m_digits;
 	output_finder<2> m_leds;
+	required_ioport m_in0;
 
 	uint8_t m_mux_data;
 
