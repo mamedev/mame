@@ -14,18 +14,9 @@
 #include "glukrs.h"
 
 glukrs_device::glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: mc146818_device(mconfig, GLUKRS, tag, owner, clock)
+		: mc146818_device(mconfig, GLUKRS, tag, owner, 32'768)
 {
-	switch (clock)
-	{
-	case 4'194'304:
-	case 1'048'576:
-		m_tuc = 248;
-		break;
-	case 32'768:
-		m_tuc = 1984;
-		break;
-	}
+	m_tuc = 1984;
 	set_24hrs(true);
 }
 
@@ -38,7 +29,11 @@ void glukrs_device::device_start()
 
 void glukrs_device::device_reset()
 {
+	m_data[REG_A] &= ~(REG_A_DV2 | REG_A_DV1 | REG_A_DV2);
+	m_data[REG_A] |= REG_A_DV1;
 	mc146818_device::device_reset();
+
+	update_timer();
 
 	m_glukrs_active = false;
 }
