@@ -122,6 +122,7 @@ public:
 		m_k053251(*this, "k053251"),
 		m_k053252(*this, "k053252"),
 		m_k054000(*this, "k054000"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_videoview0(*this, "videoview0"),
 		m_videoview1(*this, "videoview1"),
@@ -157,6 +158,7 @@ private:
 	required_device<k053251_device> m_k053251;
 	optional_device<k053252_device> m_k053252;
 	optional_device<k054000_device> m_k054000;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	// views
@@ -621,12 +623,12 @@ void vendetta_state::vendetta(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240); // measured 59.17
-	screen.set_screen_update(FUNC(vendetta_state::screen_update));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(vendetta_state::vblank_irq));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240); // measured 59.17
+	m_screen->set_screen_update(FUNC(vendetta_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(vendetta_state::vblank_irq));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
@@ -664,8 +666,8 @@ void vendetta_state::esckids(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &vendetta_state::esckids_map);
 
-	//subdevice<screen_device>("screen")->set_visarea(1*8, 39*8-1, 2*8, 30*8-1); // black areas on the edges
-	subdevice<screen_device>("screen")->set_visarea(2*8, 38*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 321, 264, 0+8, 240+8); // from CCU
+	m_screen->set_default_position(1.112, 0.0, 1.0, 0.0); // black edges
 
 	config.device_remove("k054000");
 
