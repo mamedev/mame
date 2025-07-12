@@ -2191,9 +2191,9 @@ ROM_START( sstar97b )
 	ROM_LOAD16_BYTE( "bor_dun_5.u22", 0x40001, 0x20000, BAD_DUMP CRC(ca17a632) SHA1(d491310ccdbe9b59a1e607f9254646f20700d79d) )
 ROM_END
 
-// 铭石 II (Míng Shí II)
+// 钻石 II (Zuàn Shí II)
  // Has Bordun sticker on PCB and logo in game, but is it an original reskin or a hack?
-ROM_START( mingshi2 )
+ROM_START( zuanshi2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u15.u15", 0x00000, 0x08000, CRC(7e06518b) SHA1(7814105673c59b68a8e8807143acb37a2c9a9c6f) )
 	ROM_LOAD( "u48",     0x0c000, 0x04000, CRC(26b5b874) SHA1(80f478350d1303a53a532380d3b90cde2310c39c) )
@@ -2708,7 +2708,7 @@ GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miacti
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
 GAME( 199?, sstar97a,  sstar97,  sstar97,  sstar97,  skylncr_state,  init_sstar97a,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V168A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, sstar97b,  sstar97,  sstar97,  sstar97b, skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153A)",   MACHINE_SUPPORTS_SAVE )
-GAME( 199?, mingshi2,  sstar97,  sstar97,  sstar97b, skylncr_state,  empty_init,     ROT0, "Bordun International", "Ming Shi II (version V153A)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 199?, zuanshi2,  sstar97,  sstar97,  sstar97b, skylncr_state,  empty_init,     ROT0, "Bordun International", "Zuan Shi II (version V153A)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 199?, sstar97jb, sstar97,  sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 Jianan Ban",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
 GAME( 199?, hongmayi,  0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "bootleg",              "Hong Mayi",                                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
 GAME( 199?, dbsha,     0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "bootleg",              "Da Bai Sha",                                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption

@@ -74,15 +74,13 @@ TODO:
 - Fix mirror ROM checksum / ROM overlay without code patches (in games with heavier encryption).
 - Find source of level 2 interrupt (sprite DMA end?).
 - magibomba, westvent: need a redump of one of the program ROMs.
-- hacher: need a redump of the sprite ROMs.
-- astoneag, dinodino, magibombd, magibombg: exiting from test menu goes haywire (requires a soft-reset with F3).
-- magibombg,m: need RE of the CPU code and correct EEPROM.
+- hacher: needs a redump of the sprite ROMs.
 - gostopac: needs verifying of inputs, outputs and layout. Sound doesn't seem 100% correct (Oki banking problem?)
-- monkeyl and clones: need RE of the CPU code, inputs and layout. After reset it initializes.
-- speedmst,a,b: needs verifying of inputs, outputs and layout.
+- monkeyl and clones: need verifying of inputs, outputs and layout.
+- speedmst,a,b: need verifying of inputs, outputs and layout.
 - cptshark: needs verifying of inputs and layout
-- wwitch, lwitch: need  RE of the CPU code, inputs, outputs. Currently start but then freeze with clean NVRAM. Soft reset and they work.
-- hapfarm,a: needs verifying of inputs, outputs and layout.
+- wwitch, lwitch: need verifying of inputs, outputs and layout.
+- hapfarm,a: need verifying of inputs, outputs and layout.
 - zulu: needs verifying of inputs, outputs and layout.
 - westventa: needs verifying of inputs, outputs and layout.
 
@@ -1111,7 +1109,7 @@ void zoo_state::lwitch_map(address_map &map)
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
 }
 
-void zoo_state::hapfarm_map(address_map &map) // TODO: verify everything
+void zoo_state::hapfarm_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
 	map(0x480000, 0x483fff).ram().share("nvram"); // battery
@@ -1128,7 +1126,7 @@ void zoo_state::hapfarm_map(address_map &map) // TODO: verify everything
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
 }
 
-void zoo_state::hapfarma_map(address_map &map) // TODO: verify everything
+void zoo_state::hapfarma_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
 	map(0x300000, 0x303fff).ram().share("nvram"); // battery
@@ -1287,18 +1285,6 @@ static INPUT_PORTS_START( magibombd )
 
 	PORT_MODIFY( "EEPROM_OUT" )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
-
-	PORT_START( "CPUCODE_OUT" )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::clk_write))
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::cs_write))
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( magibombg )
-	PORT_INCLUDE( magibomb )
-
-	PORT_START( "CPUCODE_IN" )
-	PORT_BIT( 0xfff7, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::do_read))
 
 	PORT_START( "CPUCODE_OUT" )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::clk_write))
@@ -2095,10 +2081,10 @@ ROM_START( magibombg )
 	ROM_LOAD( "5 magic bomb", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u10", 0x00, 0x80, BAD_DUMP CRC(a01e5ce7) SHA1(77213c0b426ca1806bb8a4c55e9e7f4f2db66962)  ) // TODO: this is correct for magibombf, create good one
+	ROM_LOAD( "93c46.u10", 0x00, 0x80, CRC(8ebec1ee) SHA1(be7d34241518a5b354a91ef83f8ca58fe71b35f2) ) // factory default
 
-	ROM_REGION16_LE( 0x02, "astro_cpucode", ROMREGION_ERASE00 )
-	ROM_LOAD( "magibombg_cpucode.key", 0x00, 0x02, NO_DUMP ) // TODO: RE correct one
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "magibombg_cpucode.key", 0x00, 0x02, CRC(ccf8c6c3) SHA1(230c465120211e09e688e390b2e86e23a590c01f) )
 ROM_END
 
 ROM_START( magibombh )// min bet 1 8 16 32, minimum percentage % 91/50%
@@ -2196,7 +2182,7 @@ ROM_START( magibombm )
 	ROM_LOAD( "93c46", 0x00, 0x80, CRC(e717146d) SHA1(beca9d9cece337b05f77881073a4da7ddb9659da) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
-	ROM_LOAD( "magibombg_cpucode.key", 0x00, 0x02, NO_DUMP ) // TODO: RE correct one
+	ROM_LOAD( "magibombm_cpucode.key", 0x00, 0x02, CRC(d0b51355) SHA1(4cf2cc5419330915ceb88f803da616df3e656fb1) )
 ROM_END
 
 ROM_START( magibombn ) // MIN BET 1-8-16-32 MINIMUM % = 91/50%
@@ -2226,10 +2212,10 @@ ROM_START( magibombo )
 	ROM_LOAD( "5_magic_bomb", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) ) // A29040
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(70b07946) SHA1(45aa5c118064d1f4c9555e53e0ef1bc788144c72) ) // TODO: factory default
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(ff6226f7) SHA1(393877ef2ffaff6e6e16a89757d0c268cbe27aa8) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
-	ROM_LOAD( "magibombo_cpucode.key", 0x00, 0x02, NO_DUMP ) // TODO: RE correct one
+	ROM_LOAD( "magibombo_cpucode.key", 0x00, 0x02, CRC(28bbbba9) SHA1(cc36cfdf7527c055d82947e5d1c36e6b01dd4b93) )
 ROM_END
 
 ROM_START( magibombp )
@@ -2245,10 +2231,10 @@ ROM_START( magibombp )
 	ROM_LOAD( "5_m.b._e1.0.rom", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46", 0x00, 0x80, CRC(c03fc61b) SHA1(c390577a69a1f2cf7fe93a75318912fc4f194bab) ) // TODO: factory default
+	ROM_LOAD( "93c46", 0x00, 0x80, CRC(878a2671) SHA1(2a5dc7721d3f53124a29403f14bb42ec4e516c61) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
-	ROM_LOAD( "magibombg_cpucode.key", 0x00, 0x02, NO_DUMP ) // TODO: RE correct one
+	ROM_LOAD( "magibombp_cpucode.key", 0x00, 0x02, CRC(ee980d67) SHA1(f3bdb8a14701ec01828f7c92f18e9bba4c56a4e0) )
 ROM_END
 
 
@@ -2289,10 +2275,10 @@ ROM_START( westvent )
 	ROM_LOAD( "5.bin", 0x00000, 0x80000, CRC(92dc09d1) SHA1(6b448b3372e78047d054c5e42fcfcff7f75ff9b9) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "at93c46.bin", 0x00, 0x80, CRC(fd961d46) SHA1(e238da65e8769575f17b4464fb00f5c4813bafab) )
+	ROM_LOAD( "at93c46.bin", 0x00, 0x80, CRC(fd961d46) SHA1(e238da65e8769575f17b4464fb00f5c4813bafab) ) // TODO: factory reset if the program ROMs get redumped
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
-	ROM_LOAD( "westvent_cpucode.key", 0x00, 0x02, NO_DUMP )
+	ROM_LOAD( "westvent_cpucode.key", 0x00, 0x02, CRC(34a0ddfb) SHA1(36cc99917d43f0ee966e85a67eb89cc60b3ca02a) )
 ROM_END
 
 ROM_START( westventa )
@@ -2309,7 +2295,7 @@ ROM_START( westventa )
 	ROM_LOAD( "5_western_venture", 0x00000, 0x80000, CRC(92dc09d1) SHA1(6b448b3372e78047d054c5e42fcfcff7f75ff9b9) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "at93c46.bin", 0x00, 0x80, CRC(1bd1801e) SHA1(ea3839a95a4ec8b54f5ddc13ca3035a88cf46ff6) ) // TODO: factory reset
+	ROM_LOAD( "at93c46.bin", 0x00, 0x80, CRC(acd6a834) SHA1(9f7019e59267d31bff3bfde588a2e114d0799c64) ) // factory default but with demo sounds on
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "westventa_cpucode.key", 0x00, 0x02, CRC(34a0ddfb) SHA1(36cc99917d43f0ee966e85a67eb89cc60b3ca02a) )
@@ -2558,7 +2544,7 @@ ROM_START( zulu )
 	ROM_LOAD( "5_zulu.rom5", 0x00000, 0x80000, CRC(b0c9f7aa) SHA1(99345ba0f8da3907f26c9bd29d70135f3ab7cd60) ) // MX27C4000A
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "at93c46.u10", 0x00, 0x80, CRC(c4e5dffe) SHA1(38fff8d0d11aaf1a5e7faa91a1a45a7901b6c092) ) // TODO: factory default
+	ROM_LOAD( "at93c46.u10", 0x00, 0x80, CRC(ed57565a) SHA1(8ce9ae56b691582b4f06081ee8eb8fe2440436bb) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "zulu_cpucode.key", 0x00, 0x02, CRC(1d41cca1) SHA1(61564a62802c9f88d364f1830a4a54dd3de83b66) )
@@ -2718,7 +2704,7 @@ ROM_START( gostopac )
 	ROM_LOAD( "go stop 3.u33", 0x00000, 0x80000, CRC(3d519d59) SHA1(58f0fb42724da75c56eae37ffe47c7e0caf87ee4) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(c5bfafa4) SHA1(b482fad6445487a5c14c4360c7b3b0b02f16944c) ) // TODO: factory default
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(db769f17) SHA1(19f1481c41f0e35d2379fddabf28e3a8e5c7624e) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "gostopac_cpucode.key", 0x00, 0x02, CRC(e14ff981) SHA1(322130632f4a29531f53755594f19876b371a223) )
@@ -2739,21 +2725,21 @@ ROM_START( monkeyl )
 	ROM_REGION( 0x1000000, "sprites", 0 )
 	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) ) // the "U26" marking is present twice (should have been U31?)
 	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(9d26fa05) SHA1(571f5515411e504bf7661b8b5d358dc6c55e6fbe) )
-	ROM_RELOAD(      0x400000, 0x200000 )
-	ROM_RELOAD(      0x600000, 0x200000 )
-	ROM_RELOAD(      0x800000, 0x200000 )
-	ROM_RELOAD(      0xa00000, 0x200000 )
-	ROM_RELOAD(      0xc00000, 0x200000 )
-	ROM_RELOAD(      0xe00000, 0x200000 )
+	ROM_RELOAD(                  0x400000, 0x200000 )
+	ROM_RELOAD(                  0x600000, 0x200000 )
+	ROM_RELOAD(                  0x800000, 0x200000 )
+	ROM_RELOAD(                  0xa00000, 0x200000 )
+	ROM_RELOAD(                  0xc00000, 0x200000 )
+	ROM_RELOAD(                  0xe00000, 0x200000 )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "5_m.l._e1.0.u33", 0x00000, 0x80000, CRC(62122100) SHA1(519df7825ab62f0648192e6b1760dd9cc5ec7f9f) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(eab965cc) SHA1(258358c89faaf643b526d1014946e14567cba88d) ) // TODO: factory default
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(0a10f1f0) SHA1(038bab492a9225c065b428eb0eb22ec44608d58f) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
-	ROM_LOAD( "monkeyl_cpucode.key", 0x00, 0x02, NO_DUMP )
+	ROM_LOAD( "monkeyl_cpucode.key", 0x00, 0x02, CRC(0a1ca7a5) SHA1(ee39ae96a7cec3da2b8f66e5b605e13eed9c0f32) )
 ROM_END
 
 ROM_START( monkeyla ) // MIN BET 1-XXX, % = LEVELS 1-8
@@ -2764,21 +2750,21 @@ ROM_START( monkeyla ) // MIN BET 1-XXX, % = LEVELS 1-8
 	ROM_REGION( 0x1000000, "sprites", 0 )
 	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) ) // the "U26" marking is present twice (should have been U31?)
 	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(9d26fa05) SHA1(571f5515411e504bf7661b8b5d358dc6c55e6fbe) )
-	ROM_RELOAD(      0x400000, 0x200000 )
-	ROM_RELOAD(      0x600000, 0x200000 )
-	ROM_RELOAD(      0x800000, 0x200000 )
-	ROM_RELOAD(      0xa00000, 0x200000 )
-	ROM_RELOAD(      0xc00000, 0x200000 )
-	ROM_RELOAD(      0xe00000, 0x200000 )
+	ROM_RELOAD(                  0x400000, 0x200000 )
+	ROM_RELOAD(                  0x600000, 0x200000 )
+	ROM_RELOAD(                  0x800000, 0x200000 )
+	ROM_RELOAD(                  0xa00000, 0x200000 )
+	ROM_RELOAD(                  0xc00000, 0x200000 )
+	ROM_RELOAD(                  0xe00000, 0x200000 )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "5_m.l._e1.0.u33", 0x00000, 0x80000, CRC(62122100) SHA1(519df7825ab62f0648192e6b1760dd9cc5ec7f9f) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(28e861d6) SHA1(4faa4d62954fd9a263d24caa6214353a109ec4f1) ) // TODO: factory default
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(24b06cf9) SHA1(d8cf2619621a57cde60eb6758bfbe1d8b3bf392a) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
-	ROM_LOAD( "monkeyla_cpucode.key", 0x00, 0x02, NO_DUMP )
+	ROM_LOAD( "monkeyla_cpucode.key", 0x00, 0x02, CRC(0a1ca7a5) SHA1(ee39ae96a7cec3da2b8f66e5b605e13eed9c0f32) )
 ROM_END
 
 ROM_START( monkeylb )
@@ -2789,21 +2775,21 @@ ROM_START( monkeylb )
 	ROM_REGION( 0x1000000, "sprites", 0 )
 	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) ) // the "U26" marking is present twice (should have been U31?)
 	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(9d26fa05) SHA1(571f5515411e504bf7661b8b5d358dc6c55e6fbe) )
-	ROM_RELOAD(      0x400000, 0x200000 )
-	ROM_RELOAD(      0x600000, 0x200000 )
-	ROM_RELOAD(      0x800000, 0x200000 )
-	ROM_RELOAD(      0xa00000, 0x200000 )
-	ROM_RELOAD(      0xc00000, 0x200000 )
-	ROM_RELOAD(      0xe00000, 0x200000 )
+	ROM_RELOAD(                  0x400000, 0x200000 )
+	ROM_RELOAD(                  0x600000, 0x200000 )
+	ROM_RELOAD(                  0x800000, 0x200000 )
+	ROM_RELOAD(                  0xa00000, 0x200000 )
+	ROM_RELOAD(                  0xc00000, 0x200000 )
+	ROM_RELOAD(                  0xe00000, 0x200000 )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "5_m.l._e1.0.u33", 0x00000, 0x80000, CRC(62122100) SHA1(519df7825ab62f0648192e6b1760dd9cc5ec7f9f) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(eab965cc) SHA1(258358c89faaf643b526d1014946e14567cba88d) ) // TODO: factory default
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(8db901cc) SHA1(846533faf54c4c71866cd08cd45e7ed160ef2615) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
-	ROM_LOAD( "monkeylb_cpucode.key", 0x00, 0x02, NO_DUMP )
+	ROM_LOAD( "monkeylb_cpucode.key", 0x00, 0x02, CRC(0a1ca7a5) SHA1(ee39ae96a7cec3da2b8f66e5b605e13eed9c0f32) )
 ROM_END
 
 ROM_START( monkeylc )
@@ -2814,21 +2800,21 @@ ROM_START( monkeylc )
 	ROM_REGION( 0x1000000, "sprites", 0 )
 	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) ) // the "U26" marking is present twice (should have been U31?)
 	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(9d26fa05) SHA1(571f5515411e504bf7661b8b5d358dc6c55e6fbe) )
-	ROM_RELOAD(      0x400000, 0x200000 )
-	ROM_RELOAD(      0x600000, 0x200000 )
-	ROM_RELOAD(      0x800000, 0x200000 )
-	ROM_RELOAD(      0xa00000, 0x200000 )
-	ROM_RELOAD(      0xc00000, 0x200000 )
-	ROM_RELOAD(      0xe00000, 0x200000 )
+	ROM_RELOAD(                  0x400000, 0x200000 )
+	ROM_RELOAD(                  0x600000, 0x200000 )
+	ROM_RELOAD(                  0x800000, 0x200000 )
+	ROM_RELOAD(                  0xa00000, 0x200000 )
+	ROM_RELOAD(                  0xc00000, 0x200000 )
+	ROM_RELOAD(                  0xe00000, 0x200000 )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "5_monkey_land.u33", 0x00000, 0x80000, CRC(62122100) SHA1(519df7825ab62f0648192e6b1760dd9cc5ec7f9f) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(eab965cc) SHA1(258358c89faaf643b526d1014946e14567cba88d) ) // TODO: factory default
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(8f406753) SHA1(3a7893452e6bc6d4f78e8d5be7fb3e6b3cdc9bbe) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
-	ROM_LOAD( "monkeylc_cpucode.key", 0x00, 0x02, NO_DUMP )
+	ROM_LOAD( "monkeylc_cpucode.key", 0x00, 0x02, CRC(0a1ca7a5) SHA1(ee39ae96a7cec3da2b8f66e5b605e13eed9c0f32) )
 ROM_END
 
 ROM_START( monkeyld )
@@ -2839,21 +2825,21 @@ ROM_START( monkeyld )
 	ROM_REGION( 0x1000000, "sprites", 0 ) // not dumped for this set
 	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, BAD_DUMP CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) )
 	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, BAD_DUMP CRC(9d26fa05) SHA1(571f5515411e504bf7661b8b5d358dc6c55e6fbe) )
-	ROM_RELOAD(      0x400000, 0x200000 )
-	ROM_RELOAD(      0x600000, 0x200000 )
-	ROM_RELOAD(      0x800000, 0x200000 )
-	ROM_RELOAD(      0xa00000, 0x200000 )
-	ROM_RELOAD(      0xc00000, 0x200000 )
-	ROM_RELOAD(      0xe00000, 0x200000 )
+	ROM_RELOAD(                  0x400000, 0x200000 )
+	ROM_RELOAD(                  0x600000, 0x200000 )
+	ROM_RELOAD(                  0x800000, 0x200000 )
+	ROM_RELOAD(                  0xa00000, 0x200000 )
+	ROM_RELOAD(                  0xc00000, 0x200000 )
+	ROM_RELOAD(                  0xe00000, 0x200000 )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "mx27c4000.rom5", 0x00000, 0x80000, CRC(10971c7f) SHA1(9de24e1585c1505dd07679dcb4eed94972fb09b7) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(eab965cc) SHA1(258358c89faaf643b526d1014946e14567cba88d) ) // TODO: factory default
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(0a10f1f0) SHA1(038bab492a9225c065b428eb0eb22ec44608d58f) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
-	ROM_LOAD( "monkeyld_cpucode.key", 0x00, 0x02, NO_DUMP )
+	ROM_LOAD( "monkeyld_cpucode.key", 0x00, 0x02, CRC(0a1ca7a5) SHA1(ee39ae96a7cec3da2b8f66e5b605e13eed9c0f32) )
 ROM_END
 
 ROM_START( monkeyle )
@@ -2875,10 +2861,10 @@ ROM_START( monkeyle )
 	ROM_LOAD( "5_monkey_land.u33", 0x00000, 0x80000, CRC(62122100) SHA1(519df7825ab62f0648192e6b1760dd9cc5ec7f9f) ) // MX27C4000A
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(32f4814f) SHA1(bfef933dfab8ddeb4ab51c4ce4aa936e427579b9) ) // TODO: factory default
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(29c6fe33) SHA1(bbc4caa72851d837a34da417fb110e5728edb296) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
-	ROM_LOAD( "monkeyle_cpucode.key", 0x00, 0x02, NO_DUMP )
+	ROM_LOAD( "monkeyle_cpucode.key", 0x00, 0x02, CRC(64e71e5f) SHA1(46bc5e5568a5cb625a91cb488dfc6e7beadd3725) )
 ROM_END
 
 
@@ -2909,7 +2895,7 @@ ROM_START( speedmst )
 	ROM_LOAD( "5_speed_master.u44", 0x00000, 0x80000, CRC(5eacf25c) SHA1(affbf8176b6cbc406a281793c0a9c79e7175942d) ) // 27C4000
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u9", 0x0000, 0x0080, CRC(5e03d141) SHA1(d475bd0509fb977d38f012c4eb1e9cb88c3d130a) )
+	ROM_LOAD( "93c46.u9", 0x0000, 0x0080, CRC(feea7a34) SHA1(803c0d948e893f42567d0d94f47dfc51ab4a8ba9) ) // factory default but with demo sounds on
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "speedmst_cpucode.key", 0x00, 0x02, CRC(768e4c91) SHA1(14a20176bd9d7aeb613362716a69a14cd34b18af) )
@@ -2935,7 +2921,7 @@ ROM_START( speedmsta )
 	ROM_LOAD( "5_speed_master.u44", 0x00000, 0x80000, CRC(d2c7025f) SHA1(3337216811c8b81ce72cfdd1ed9eecd4b0622dc7) ) // SLDH, 27C4001
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u9", 0x0000, 0x0080, BAD_DUMP CRC(5e03d141) SHA1(d475bd0509fb977d38f012c4eb1e9cb88c3d130a) ) // dumped for the D2.01.C set
+	ROM_LOAD( "93c46.u9", 0x0000, 0x0080, CRC(eca0f599) SHA1(d10a4f75afc578c790f6d9d1cf452bbbe8cf1602) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "speedmsta_cpucode.key", 0x00, 0x02, CRC(768e4c91) SHA1(14a20176bd9d7aeb613362716a69a14cd34b18af) )
@@ -2961,7 +2947,7 @@ ROM_START( speedmstb )
 	ROM_LOAD( "5_speed_master.u44", 0x00000, 0x80000, CRC(d2c7025f) SHA1(3337216811c8b81ce72cfdd1ed9eecd4b0622dc7) ) // 27C040
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u9", 0x0000, 0x0080, BAD_DUMP CRC(5e03d141) SHA1(d475bd0509fb977d38f012c4eb1e9cb88c3d130a) ) // dumped for the D2.01.C set
+	ROM_LOAD( "93c46.u9", 0x0000, 0x0080, CRC(a6a24b2c) SHA1(5a4fe670bfb132b2022b45d0e0f2148d0ec98f97) ) // factory default but with demo sounds on
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "speedmstb_cpucode.key", 0x00, 0x02, CRC(768e4c91) SHA1(14a20176bd9d7aeb613362716a69a14cd34b18af) )
@@ -2993,7 +2979,7 @@ ROM_START( cptshark ) // clearly based on Win Win Bingo, still has strings for i
 	ROM_LOAD( "5_captain_shark.u35", 0x00000, 0x80000, CRC(e48ed57d) SHA1(11995b90e70e010b292ba9db2da0af4ebf795c1a) ) // 27C040, same as winbingoa
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(d2f41598) SHA1(3876553e5cfc5b8c8383e1dc828a0f393bb15e22) ) // TODO: factory default
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(f9ea7ba4) SHA1(3bf4572a061afd953f95b345e74491ca449d1ae0) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "cptshark_cpucode.key", 0x00, 0x02, CRC(c38c8e25) SHA1(7e866fc75f4ddbbd6efbbd359f2b378c798e2cec) )
@@ -3020,7 +3006,7 @@ ROM_START( wwitch )
 	ROM_LOAD( "5_wicked_w_aa.01.a.bin", 0x00000, 0x80000, CRC(298014f3) SHA1(98da24e84ec69c48e8754f8406e11e68fb352e28) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(663f14cd) SHA1(8a675a4e270d86d3a350e7ddbeb3f9d958798bd1) )
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(8db901cc) SHA1(846533faf54c4c71866cd08cd45e7ed160ef2615) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "wwitch_cpucode.key", 0x00, 0x02, NO_DUMP ) // never checked?
@@ -3040,7 +3026,7 @@ ROM_START( lwitch )
 	ROM_LOAD( "5_little_witch.rom5", 0x00000, 0x80000, CRC(298014f3) SHA1(98da24e84ec69c48e8754f8406e11e68fb352e28) ) // A29040, same as wwitch
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(dffedf0e) SHA1(45f52366003e7a3d0ef72dbac17cda8737f6b8e2) )
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(7d58e052) SHA1(5978edaf5e5dbca06ba8e8945b354eb6a185e211) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "lwitch_cpucode.key", 0x00, 0x02, CRC(e7b6936c) SHA1(12a09319d9754bc0d05f35c9b61cf48136fb1233) )
@@ -3067,7 +3053,7 @@ ROM_START( hapfarm ) // also has Hot Runner N3.00 string, so probably derived fr
 	ROM_LOAD( "5_happy_farm.bin", 0x00000, 0x80000, CRC(f6b7cc89) SHA1(3a5863a643b9259db95522e1a7f1b1eea457d28a) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(c11f2b48) SHA1(174681a01b30b036e948a90313add8e7de9aef55) )
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(bccecb00) SHA1(d2ed4366493746ca253945910a80b8ea64a1b437) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "hapfarm_cpucode.key", 0x00, 0x02, CRC(f442d91a) SHA1(c6286f7cc262e52f35472a6c340f202cfbba6094) )
@@ -3087,7 +3073,7 @@ ROM_START( hapfarma )
 	ROM_LOAD( "5_happy_farm.rom5", 0x00000, 0x80000, CRC(f6b7cc89) SHA1(3a5863a643b9259db95522e1a7f1b1eea457d28a) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(59df0bbf) SHA1(701b485b23c124172a80cfffdea579fb91cbf37c) )
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(58c6d938) SHA1(4a023bd11a543a6ec90a4e8b564dfd8efe4d5675) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "hapfarma_cpucode.key", 0x00, 0x02, CRC(3e92abb0) SHA1(8e0eb6b43a45a4a4d402d06c32a25b64c7503f0c) ) // TODO: is this needed? game doesn't seem to check it
@@ -3244,9 +3230,20 @@ void zoo_state::init_magibombd()
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0446;
 
-	rom[0x00400/2] = 0x4e75; // overlay!?
-
 	rom[0x00f80/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+	{
+		switch (offset & 0x02)
+		{
+			case 0x00: data = 0x1227; break;
+			case 0x02: data = 0x5695; break;
+		}
+
+		return data;
+	});
 #endif
 }
 
@@ -3260,9 +3257,20 @@ void zoo_state::init_magibombg()
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x043e;
 
-	rom[0x00400/2] = 0x4e75; // overlay!?
-
 	rom[0x00f26/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+	{
+		switch (offset & 0x02)
+		{
+			case 0x00: data = 0x1267; break;
+			case 0x02: data = 0x5715; break;
+		}
+
+		return data;
+	});
 #endif
 }
 
@@ -3276,9 +3284,20 @@ void zoo_state::init_magibombm()
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x043e;
 
-	rom[0x00400/2] = 0x4e75; // overlay!?
-
 	rom[0x00f80/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+	{
+		switch (offset & 0x02)
+		{
+			case 0x00: data = 0x1267; break;
+			case 0x02: data = 0x5715; break;
+		}
+
+		return data;
+	});
 #endif
 }
 
@@ -3292,9 +3311,20 @@ void zoo_state::init_magibombo()
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0446;
 
-	rom[0x00400/2] = 0x4e75; // overlay!?
-
 	rom[0x00f52/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+	{
+		switch (offset & 0x02)
+		{
+			case 0x00: data = 0x1227; break;
+			case 0x02: data = 0x5695; break;
+		}
+
+		return data;
+	});
 #endif
 }
 
@@ -3494,7 +3524,8 @@ void zoo_state::init_dinodino()
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0446;
 
-	rom[0x00400/2] = 0x4e75; // overlay!?
+	rom[0x00010/2] = 0x1aa9;
+	rom[0x00012/2] = 0x6799;
 
 	rom[0x02236/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
 #endif
@@ -3557,7 +3588,8 @@ void zoo_state::init_monkeyl()
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0470;
 
-	rom[0x00400/2] = 0x4e75; // overlay!?
+	rom[0x00010/2] = 0x12a9;
+	rom[0x00012/2] = 0x5799;
 
 	rom[0x01352/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
 #endif
@@ -3573,7 +3605,8 @@ void zoo_state::init_monkeyla()
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0470;
 
-	rom[0x00400/2] = 0x4e75; // overlay!?
+	rom[0x00010/2] = 0x12a9;
+	rom[0x00012/2] = 0x5799;
 
 	rom[0x01334/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
 #endif
@@ -3589,7 +3622,8 @@ void zoo_state::init_monkeyld()
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0468;
 
-	rom[0x00400/2] = 0x4e75; // overlay!?
+	rom[0x00010/2] = 0x12a9;
+	rom[0x00012/2] = 0x5799;
 
 	rom[0x01334/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
 #endif
@@ -3688,9 +3722,21 @@ void zoo_state::init_wwitch()
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0446;
 
-	rom[0x00400/2] = 0x4e75; // overlay!?
-
 	rom[0x01220/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	program.install_read_tap(0x800008, 0x80000b, "magic_mirror_r", [] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+	{
+		switch (offset & 0x02)
+		{
+			case 0x00: data = 0x12a9; break;
+			case 0x02: data = 0x5799; break;
+		}
+
+		return data;
+	});
+
 #endif
 }
 
@@ -3845,9 +3891,22 @@ void astoneag_state::init_astoneag()
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0440;
 
-	rom[0x00400/2] = 0x4e75; // overlay!?
-
 	rom[0x02872/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
+
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+	{
+		switch (offset & 0x02)
+		{
+			case 0x00: data = 0x1aa9; break;
+			case 0x02: data = 0x6799; break;
+		}
+
+		return data;
+	});
+
 #endif
 
 	interleave_sprites_16x32();
@@ -3898,14 +3957,14 @@ GAME(  2005,  monkeyl,   0,        monkeyl,   magibombd, zoo_state,       init_m
 GAME(  2004,  monkeyla,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_monkeyla,  ROT0, "Astro Corp.", "Monkey Land (Ver. AA.13.B)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 23/04/2004 14:57
 GAME(  2005,  monkeylb,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. AA.21.B)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 25/05/2005 11:18
 GAME(  2007,  monkeylc,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. AA.21.C)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 05/03/2007 10:40
-GAME(  2003,  monkeyld,  monkeyl,  monkeyld,  magibombg, zoo_state,       init_monkeyld,  ROT0, "Astro Corp.", "Monkey Land (Ver. A1.2)",                       MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 122303S
+GAME(  2003,  monkeyld,  monkeyl,  monkeyld,  dinodino,  zoo_state,       init_monkeyld,  ROT0, "Astro Corp.", "Monkey Land (Ver. A1.2)",                       MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 122303S
 GAME(  2013,  monkeyle,  monkeyl,  monkeyle,  magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. EN.20.B)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 24/03/2013 17:42
 GAMEL( 2005,  magibombd, magibomb, magibombd, magibombd, zoo_state,       init_magibombd, ROT0, "Astro Corp.", "Magic Bomb (Ver. AA.72.D, 14/11/05)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb ) // 15/11/05 09:31
 GAMEL( 2005,  magibombj, magibomb, magibombd, magibombd, zoo_state,       init_magibombd, ROT0, "Astro Corp.", "Magic Bomb (Ver. AA.72.C, 25/05/05)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb ) // 25/05/05 11:26
-GAMEL( 2004,  magibombg, magibomb, magibombg, magibombg, zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. NB6.1, 26/04/04)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 26/04/04. Undumped sprite ROM
-GAMEL( 2003,  magibombm, magibomb, magibombm, magibombg, zoo_state,       init_magibombm, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB5.3, 20/06/03)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 062003S
+GAMEL( 2004,  magibombg, magibomb, magibombg, dinodino,  zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. NB6.1, 26/04/04)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 26/04/04. Undumped sprite ROM
+GAMEL( 2003,  magibombm, magibomb, magibombm, dinodino,  zoo_state,       init_magibombm, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB5.3, 20/06/03)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 062003S
 GAMEL( 2014,  magibombo, magibomb, magibombo, magibombd, zoo_state,       init_magibombo, ROT0, "Astro Corp.", "Magic Bomb (Ver. BR71.A, 30/05/14)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 30/05/14 10:29
-GAMEL( 2003,  magibombp, magibomb, magibombp, magibombg, zoo_state,       init_magibombm, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB6.0J, 26/11/03)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 112603S
+GAMEL( 2003,  magibombp, magibomb, magibombp, dinodino,  zoo_state,       init_magibombm, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB6.0J, 26/11/03)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 112603S
 GAMEL( 2004,  speedmst,  0,        speedmst,  dinodino,  zoo_state,       init_speedmst,  ROT0, "D2 Enterprises", "Speed Master (D2.01.C, Apr 29 2004)",        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 29 2004 16:29:35
 GAMEL( 2003,  speedmsta, speedmst, speedmst,  dinodino,  zoo_state,       init_speedmsta, ROT0, "D2 Enterprises", "Speed Master (D1.4, May 23 2003)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // May 23 2003 16:38:02
 GAMEL( 2003,  speedmstb, speedmst, speedmst,  dinodino,  zoo_state,       init_speedmstb, ROT0, "D2 Enterprises", "Speed Master (D2.01.C, Apr 28 2004)",        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 28 2004 17:21:26
