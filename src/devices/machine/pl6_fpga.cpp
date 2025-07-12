@@ -338,8 +338,8 @@ void pl6fpga_device::device_reset(){
 
 void pl6fpga_device::device_add_mconfig(machine_config &config)
 {
-	CS4334(config, m_ldac, 0).add_route(ALL_OUTPUTS, ":lspeaker", 1.0);
-	CS4334(config, m_rdac, 0).add_route(ALL_OUTPUTS, ":rspeaker", 1.0);
+	CS4334(config, m_ldac, 0).add_route(ALL_OUTPUTS, ":speaker", 1.0, 0);
+	CS4334(config, m_rdac, 0).add_route(ALL_OUTPUTS, ":speaker", 1.0, 1);
 
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
 	m_rs232a->rxd_handler().set(FUNC(pl6fpga_device::rs232a_rx_w));
