@@ -19,6 +19,7 @@
 
  Roulette of eight LEDS, seven red and one green (the upper one).
  There are at least two version, onw from 1988 and other from 1990.
+ Some units use a M68705P5 instead of a MC68705P3S.
 
  More info and dip switches:
   - https://www.recreativas.org/loto-play-88-11392-gaelco-sa
@@ -60,7 +61,6 @@ public:
 	}
 
 	void lotoplay_p3(machine_config &config);
-	void lotoplay_p5(machine_config &config);
 	void lotoplay_pic(machine_config &config);
 
 protected:
@@ -73,11 +73,6 @@ INPUT_PORTS_END
 void lotoplay_state::lotoplay_p3(machine_config &config)
 {
 	M68705P3(config, m_maincpu, 3'579'545); // MC68705P3S, unknown clock
-}
-
-void lotoplay_state::lotoplay_p5(machine_config &config)
-{
-	M68705P5(config, m_maincpu, 3'579'545); // MC68705P5S, unknown clock
 }
 
 void lotoplay_state::lotoplay_pic(machine_config &config)
