@@ -175,7 +175,7 @@
    Set to 0 if you want to see the Test switch as a standard input.
    Set to 1 if you want to see the Test switch as a fake Dip Switch */
 
-#define SHOW_TEST_AS_DIP    1
+#define SHOW_TEST_AS_DIP    0
 
 #if SHOW_TEST_AS_DIP
 #define TOAPLAN_TEST_SWITCH(MASK, STATE) \
@@ -184,5 +184,5 @@
 	PORT_DIPSETTING(    MASK & ~STATE, DEF_STR( On ) )
 #else
 #define TOAPLAN_TEST_SWITCH(MASK, STATE) \
-	PORT_BIT( MASK, MASK & STATE, IPT_OTHER ) PORT_NAME("Test Switch") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( MASK, MASK & STATE, IPT_OTHER ) PORT_NAME("Test Switch")
 #endif
