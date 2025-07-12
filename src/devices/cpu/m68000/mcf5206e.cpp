@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Karl Stenerud / NaokiS
+// copyright-holders: Karl Stenerud, NaokiS
 
 /*
 	Notes:
@@ -49,7 +49,8 @@ static constexpr int EXCEPTION_UNINITIALIZED_INTERRUPT = 15;
 static constexpr int EXCEPTION_SPURIOUS_INTERRUPT      = 24;
 
 template <typename T, typename U>
-inline void BITWRITE(T &var, U bit_number, bool state) {
+inline void BITWRITE(T &var, U bit_number, bool state) 
+{
     var = (var & ~(static_cast<T>(1) << bit_number)) | (static_cast<T>(state) << bit_number);
 }
 
@@ -90,7 +91,8 @@ device_memory_interface::space_config_vector mcf5206e_device::memory_space_confi
 	};
 }
 
-void mcf5206e_device::device_add_mconfig(machine_config &config){
+void mcf5206e_device::device_add_mconfig(machine_config &config)
+{
 	COLDFIRE_SIM(config, m_sim, this->clock(), this->tag());
 
 	COLDFIRE_TIMER(config, m_timer[0], this->clock());
@@ -226,42 +228,50 @@ void mcf5206e_device::coldfire_vector_map(address_map &map){
  * DRAM Controller
  * Handles the DRAM refresh and access control circuits
  */
-void mcf5206e_device::dcrr_w(u16 data){
+void mcf5206e_device::dcrr_w(u16 data)
+{
 	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Refresh Register) DCRR_w: %04x\n", this->machine().describe_context(), data);
 	m_dcrr = data;
 }
 
-void mcf5206e_device::dctr_w(u16 data){
+void mcf5206e_device::dctr_w(u16 data)
+{
 	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Timing Register) DCTR_w: %04x\n", this->machine().describe_context(), data);
 	m_dctr = data;
 }
 
-void mcf5206e_device::dcar0_w(u16 data){
+void mcf5206e_device::dcar0_w(u16 data)
+{
 	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Access Register 0) DCAR0_w: %04x\n", this->machine().describe_context(), data);
 	m_dcar0 = data;
 }
 
-void mcf5206e_device::dcmr0_w(u32 data){
+void mcf5206e_device::dcmr0_w(u32 data)
+{
 	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Mask Register 0) DCMR0_w: %08x\n", this->machine().describe_context(), data);
 	m_dcmr0 = data;
 }
 
-void mcf5206e_device::dccr0_w(u8 data){
+void mcf5206e_device::dccr0_w(u8 data)
+{
 	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Control Register 0) DCCR0_w: %04x\n", this->machine().describe_context(), data);
 	m_dccr0 = data;
 }
 
-void mcf5206e_device::dcar1_w(u16 data){
+void mcf5206e_device::dcar1_w(u16 data)
+{
 	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Access Register 1) DCAR1_w: %04x\n", this->machine().describe_context(), data);
 	m_dcar1 = data;
 }
 
-void mcf5206e_device::dcmr1_w(u32 data){
+void mcf5206e_device::dcmr1_w(u32 data)
+{
 	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Mask Register 1) DCMR1_w: %04x\n", this->machine().describe_context(), data);
 	m_dcmr1 = data;
 }
 
-void mcf5206e_device::dccr1_w(u8 data){
+void mcf5206e_device::dccr1_w(u8 data)
+{
 	LOGMASKED(LOG_DRAM, "%s: (DRAM Controller Control Register 1) DCCR1_w: %04x\n", this->machine().describe_context(), data);
 	m_dccr1 = data;
 }
@@ -319,11 +329,13 @@ void mcf5206e_device::dmcr_w(u16 data)
  * Just a 8 bit GPIO. Nothing to see here
  */
 
-void mcf5206e_device::gpio_pin_w(int pin, int state){
+void mcf5206e_device::gpio_pin_w(int pin, int state)
+{
 	BITWRITE(m_ppdat_in, pin, state);
 }
 
-void mcf5206e_device::gpio_port_w(u8 state){
+void mcf5206e_device::gpio_port_w(u8 state)
+{
 	m_ppdat_in = state;
 }
 
@@ -370,11 +382,13 @@ coldfire_sim_device::coldfire_sim_device(const machine_config &mconfig, const ch
 {
 }
 
-void coldfire_sim_device::device_add_mconfig(machine_config &config){
+void coldfire_sim_device::device_add_mconfig(machine_config &config)
+{
 	WATCHDOG_TIMER(config, m_swdt);
 }
 
-void coldfire_sim_device::device_start(){
+void coldfire_sim_device::device_start()
+{
 	m_swdt->watchdog_enable(0);
 	m_timer_swdt = timer_alloc( FUNC( coldfire_sim_device::swdt_callback ), this );	// For interrupt version
 	
@@ -393,7 +407,8 @@ void coldfire_sim_device::device_start(){
 	save_item(NAME(m_external_ipl));
 }
 
-void coldfire_sim_device::device_reset(){
+void coldfire_sim_device::device_reset()
+{
 	if(!(m_rsr & 0x20)) m_rsr = 0x00;	// don't clear if watchdog triggered
 	else m_rsr = 0x70;
 
@@ -428,7 +443,8 @@ void coldfire_sim_device::device_reset(){
 	m_external_ipl = 0;
 }
 
-void coldfire_sim_device::sim_map(address_map &map){
+void coldfire_sim_device::sim_map(address_map &map)
+{
 	map(0x03, 0x03).rw(FUNC(coldfire_sim_device::simr_r), FUNC(coldfire_sim_device::simr_w));
 	map(0x07, 0x07).rw(FUNC(coldfire_sim_device::marb_r), FUNC(coldfire_sim_device::marb_w));
 
@@ -458,7 +474,8 @@ void coldfire_sim_device::marb_w(u8 data){
 }
 
 // MBAR + 0x014 -> 0x022: Interupt Control Registers
-u8 coldfire_sim_device::icr_r(offs_t offset){
+u8 coldfire_sim_device::icr_r(offs_t offset)
+{
 	if(offset > 15){
 		logerror("%s: Request to read invalid ICR offset received: %d\n", this->machine().describe_context(), offset);
 		return 0;
@@ -467,7 +484,8 @@ u8 coldfire_sim_device::icr_r(offs_t offset){
 	return m_icr[offset];
 }
 
-void coldfire_sim_device::icr_w(offs_t offset, u8 data){
+void coldfire_sim_device::icr_w(offs_t offset, u8 data)
+{
 	switch (offset){
 		case 0: m_icr[offset] = (data & 0x83) + (1 << 2); break;
 		case 1: m_icr[offset] = (data & 0x83) + (2 << 2); break;
@@ -510,7 +528,8 @@ void coldfire_sim_device::par_w(u16 data)
 	LOGMASKED(LOG_DEBUG, "%s: (Pin Assignment Register) PAR_w %04x\n", this->machine().describe_context(), data);
 }
 
-void coldfire_sim_device::set_external_interrupt(int level, int state){
+void coldfire_sim_device::set_external_interrupt(int level, int state)
+{
 	// State here is inverted, inputs are active low
 	if(BIT(m_par, 6)){
 		// External IPL pins are encoded (IPL 1-7 levels)
@@ -600,7 +619,8 @@ u8 coldfire_sim_device::interrupt_callback(offs_t level)
 	return vector;
 }
 
-void coldfire_sim_device::set_interrupt(int interrupt, int state){
+void coldfire_sim_device::set_interrupt(int interrupt, int state)
+{
 	BITWRITE(m_ipr, interrupt, ((state == CLEAR_LINE) ? 0 : 1));
 
 	//LOGMASKED(LOG_DEBUG, "%s: set_interrupt(%u, %u): %x, %d, %d\n", this->machine().describe_context(), interrupt, state, m_ipr, BIT(m_imr, interrupt), m_imr & interrupt);
@@ -645,7 +665,8 @@ void coldfire_sim_device::rsr_w(u8 data)
 
 /* Watchdog */
 // MBAR + 0x041
-void coldfire_sim_device::sypcr_w(u8 data){
+void coldfire_sim_device::sypcr_w(u8 data)
+{
 	if(!m_sypcr_locked){
 		// SYPCR is a write-once register, whatever is written first remains until system reset.
 		LOGMASKED(LOG_SWDT, "%s: (System Protection Control) SYPCR_w %02x\n", this->machine().describe_context(), data);
@@ -665,13 +686,15 @@ void coldfire_sim_device::sypcr_w(u8 data){
 }
 
 // MBAR + 0x042
-void coldfire_sim_device::swivr_w(u8 data){
+void coldfire_sim_device::swivr_w(u8 data)
+{
 	LOGMASKED(LOG_SWDT, "%s: (Software Watchdog Interrupt Vector) SWIVR_w %02x\n", this->machine().describe_context(), data);
 	m_swivr = data;
 }
 
 // MBAR + 0x043
-void coldfire_sim_device::swsr_w(u8 data){
+void coldfire_sim_device::swsr_w(u8 data)
+{
 	LOGMASKED(LOG_SWDT, "%s: (Software Watchdog Service Routine) SWIVR_r %02x\n", this->machine().describe_context(), data);
 	if(data == swdt_reset_sequence[m_swdt_w_count]) m_swdt_w_count++;
 	if(m_swdt_w_count == 2) {
@@ -696,7 +719,8 @@ coldfire_timer_device::coldfire_timer_device(const machine_config &mconfig, cons
 {
 }
 
-void coldfire_timer_device::timer_map(address_map &map){
+void coldfire_timer_device::timer_map(address_map &map)
+{
 	map(0x00, 0x01).rw(FUNC(coldfire_timer_device::tmr_r), FUNC(coldfire_timer_device::tmr_w));
 	map(0x04, 0x05).rw(FUNC(coldfire_timer_device::trr_r), FUNC(coldfire_timer_device::trr_w));
 	map(0x08, 0x09).r(FUNC(coldfire_timer_device::tcr_r));	// TCR is r/only
@@ -704,7 +728,8 @@ void coldfire_timer_device::timer_map(address_map &map){
 	map(0x11, 0x11).rw(FUNC(coldfire_timer_device::ter_r), FUNC(coldfire_timer_device::ter_w));
 }
 
-void coldfire_timer_device::device_start(){
+void coldfire_timer_device::device_start()
+{
 	m_timer = timer_alloc( FUNC( coldfire_timer_device::timer_callback ), this );
 
 	save_item(NAME(m_tmr));
@@ -728,7 +753,7 @@ void coldfire_timer_device::device_reset(){
 
 TIMER_CALLBACK_MEMBER(coldfire_timer_device::timer_callback)
 {
-	if(m_tmr& T_FRR){
+	if(m_tmr & T_FRR){
 		// FRR resets counter to 0
 		m_tcn = 0;
 	}
@@ -845,7 +870,8 @@ coldfire_mbus_device::coldfire_mbus_device(const machine_config &mconfig, const 
 }
 
 
-void coldfire_mbus_device::device_start(){
+void coldfire_mbus_device::device_start()
+{
 	m_timer_mbus = timer_alloc( FUNC( coldfire_mbus_device::mbus_callback ), this );
 
 	save_item(NAME(m_madr));
@@ -861,7 +887,8 @@ void coldfire_mbus_device::device_start(){
 	save_item(NAME(m_tx_in));
 }
 
-void coldfire_mbus_device::device_reset(){
+void coldfire_mbus_device::device_reset()
+{
 	m_madr = 0x00;
 	m_mfdr = 0x00;
 	m_mbcr = 0x00;
@@ -878,7 +905,8 @@ void coldfire_mbus_device::device_reset(){
 }
 
 
-void coldfire_mbus_device::mbus_map(address_map &map){
+void coldfire_mbus_device::mbus_map(address_map &map)
+{
 	map(0x00, 0x00).rw(FUNC(coldfire_mbus_device::madr_r), FUNC(coldfire_mbus_device::madr_w));
 	map(0x04, 0x04).rw(FUNC(coldfire_mbus_device::mfdr_r), FUNC(coldfire_mbus_device::mfdr_w));
 	map(0x08, 0x08).rw(FUNC(coldfire_mbus_device::mbcr_r), FUNC(coldfire_mbus_device::mbcr_w));
@@ -886,7 +914,8 @@ void coldfire_mbus_device::mbus_map(address_map &map){
 	map(0x10, 0x10).rw(FUNC(coldfire_mbus_device::mbdr_r), FUNC(coldfire_mbus_device::mbdr_w));
 }
 
-TIMER_CALLBACK_MEMBER(coldfire_mbus_device::mbus_callback){
+TIMER_CALLBACK_MEMBER(coldfire_mbus_device::mbus_callback)
+{
 	// Do bit transfers etc
 }
 
@@ -950,7 +979,8 @@ coldfire_dma_device::coldfire_dma_device(const machine_config &mconfig, const ch
 }
 
 
-void coldfire_dma_device::device_start(){
+void coldfire_dma_device::device_start()
+{
 	//m_timer_dma = timer_alloc( FUNC( coldfire_dma_device::dma_callback ), this );
 
 	save_item(NAME(m_sar));
@@ -961,7 +991,8 @@ void coldfire_dma_device::device_start(){
 	save_item(NAME(m_divr));
 }
 
-void coldfire_dma_device::device_reset(){
+void coldfire_dma_device::device_reset()
+{
 	m_sar = 0x00000000;
 	m_dar = 0x00000000;
 	m_dcr 	 = 0x0000;
@@ -973,7 +1004,8 @@ void coldfire_dma_device::device_reset(){
 }
 
 
-void coldfire_dma_device::dma_map(address_map &map){
+void coldfire_dma_device::dma_map(address_map &map)
+{
 	map(0x00, 0x03).rw(FUNC(coldfire_dma_device::sar_r), FUNC(coldfire_dma_device::sar_w));
 	map(0x04, 0x07).rw(FUNC(coldfire_dma_device::dar_r), FUNC(coldfire_dma_device::dar_w));
 	map(0x08, 0x09).rw(FUNC(coldfire_dma_device::dcr_r), FUNC(coldfire_dma_device::dcr_w));
@@ -982,32 +1014,38 @@ void coldfire_dma_device::dma_map(address_map &map){
 	map(0x14, 0x14).rw(FUNC(coldfire_dma_device::divr_r), FUNC(coldfire_dma_device::divr_w));
 }
 
-void coldfire_dma_device::sar_w(u32 data){
+void coldfire_dma_device::sar_w(u32 data)
+{
 	m_sar = data;
 	LOGMASKED(LOG_DMA, "%s: (DMA Source Address) sar_w: %08x\n", this->machine().describe_context(), data);
 }
 
-void coldfire_dma_device::dar_w(u32 data){
+void coldfire_dma_device::dar_w(u32 data)
+{
 	m_dar = data;
 	LOGMASKED(LOG_DMA, "%s: (DMA Destination Address) dar_w: %08x\n", this->machine().describe_context(), data);
 }
 
-void coldfire_dma_device::dcr_w(u16 data){
+void coldfire_dma_device::dcr_w(u16 data)
+{
 	m_dcr = data;
 	LOGMASKED(LOG_DMA, "%s: (DMA Control Register) dcr_w: %04x\n", this->machine().describe_context(), data);
 }
 
-void coldfire_dma_device::bcr_w(u16 data){
+void coldfire_dma_device::bcr_w(u16 data)
+{
 	m_bcr = data;
 	LOGMASKED(LOG_DMA, "%s: (DMA Byte Count) bcr_w: %04x\n", this->machine().describe_context(), data);
 }
 
-void coldfire_dma_device::dsr_w(u8 data){
+void coldfire_dma_device::dsr_w(u8 data)
+{
 	BITWRITE(m_dsr, 0, BIT(data, 0));	// Manual states only writes to bit 0 has any effect on the register
 	LOGMASKED(LOG_DMA, "%s: (DMA Status Register) dsr_w: %02x\n", this->machine().describe_context(), data);
 }
 
-void coldfire_dma_device::divr_w(u8 data){
+void coldfire_dma_device::divr_w(u8 data)
+{
 	m_divr = data;
 	LOGMASKED(LOG_DMA, "%s: (DMA Interrupt Vector) divr_w: %02x\n", this->machine().describe_context(), data);
 }
