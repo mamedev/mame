@@ -22,11 +22,12 @@
 #include "emu.h"
 #include "cr511b.h"
 
-#define LOG_CMD    (1 << 1)
-#define LOG_PARAM  (1 << 2)
-#define LOG_DATA   (1 << 3)
-#define LOG_SUBQ   (1 << 4)
-#define LOG_SUBQ2  (1 << 5) // log subq data to popmessage
+#define LOG_CMD     (1 << 1)
+#define LOG_PARAM   (1 << 2)
+#define LOG_DATA    (1 << 3)
+#define LOG_SUBQ    (1 << 4)
+#define LOG_SUBQ2   (1 << 5) // log subq data to popmessage
+#define LOG_SUBCODE (1 << 6)
 
 #define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_PARAM)
 
@@ -52,6 +53,8 @@ cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, dev
 	m_drq_cb(*this),
 	m_dten_cb(*this),
 	m_scor_cb(*this),
+	m_sbcp_cb(*this),
+	m_subcode_data_cb(*this),
 	m_input_fifo_pos(0),
 	m_output_fifo_pos(0),
 	m_output_fifo_length(0),
@@ -88,8 +91,10 @@ void cr511b_device::device_start()
 	cdrom_image_device::device_start();
 
 	m_frame_timer = timer_alloc(FUNC(cr511b_device::frame_cb), this);
+	m_subcode_timer = timer_alloc(FUNC(cr511b_device::subcode_cb), this);
 	m_stch_timer = timer_alloc(FUNC(cr511b_device::stch), this);
 	m_sten_timer = timer_alloc(FUNC(cr511b_device::sten), this);
+	m_scor_timer = timer_alloc(FUNC(cr511b_device::scor), this);
 
 	std::fill(std::begin(m_input_fifo), std::end(m_input_fifo), 0x00);
 	std::fill(std::begin(m_output_fifo), std::end(m_output_fifo), 0x00);
@@ -102,6 +107,9 @@ void cr511b_device::device_start()
 	save_item(NAME(m_output_fifo_length));
 	save_item(NAME(m_status));
 	save_item(NAME(m_sector_size));
+	save_item(NAME(m_subcode_count));
+	save_item(NAME(m_subcode_buffer));
+	save_item(NAME(m_subcode_valid));
 	save_item(NAME(m_transfer_lba));
 	save_item(NAME(m_transfer_sectors));
 	save_item(NAME(m_transfer_length));
@@ -210,16 +218,52 @@ TIMER_CALLBACK_MEMBER(cr511b_device::frame_cb)
 	}
 	else if (m_status & STATUS_PLAYING)
 	{
-		// TODO: subcode handling
-		m_scor_cb(0);
-		m_scor_cb(1);
+		if (!m_cdda->audio_paused())
+		{
+			uint32_t lba = m_cdda->get_audio_lba();
+
+			LOGMASKED(LOG_SUBCODE, "Fetching new subchannel data for sector %d\n", lba);
+
+			uint32_t subsize = get_toc().tracks[get_track(lba)].subsize;
+
+			m_subcode_count = 0;
+			m_subcode_valid = read_subcode(lba, m_subcode_buffer) && (subsize == 96);
+
+			if (m_subcode_valid)
+				m_subcode_timer->adjust(attotime::zero, 0, attotime::from_hz(75 * 98));
+		}
+
+		m_scor_timer->adjust(attotime::from_usec(64), 1); // TODO: Timing
+	}
+}
+
+TIMER_CALLBACK_MEMBER(cr511b_device::subcode_cb)
+{
+	if (!m_cdda->audio_paused())
+	{
+		// we skip the first two (sync) bytes
+		if (m_subcode_count > 1 && m_subcode_count < 98)
+		{
+			uint8_t data = m_subcode_buffer[m_subcode_count - 2];
+
+			LOGMASKED(LOG_SUBCODE, "Subcode %d = %02x\n", m_subcode_count - 2, data);
+
+			m_subcode_data_cb(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
+
+			m_sbcp_cb(0);
+			m_sbcp_cb(1);
+		}
+
+		m_subcode_count++;
 	}
 }
 
 TIMER_CALLBACK_MEMBER(cr511b_device::stch)
 {
-	m_stch_cb(1);
-	m_stch_cb(0);
+	m_sten_cb(param);
+
+	if (param == 0)
+		m_stch_timer->adjust(attotime::from_usec(64 / 64), 1);
 }
 
 void cr511b_device::status_change(uint8_t status)
@@ -233,16 +277,19 @@ void cr511b_device::status_change(uint8_t status)
 		else
 			m_frame_timer->adjust(attotime::never);
 
-		m_stch_timer->adjust(attotime::from_usec(64 * 3)); // TODO
+		if (!(m_status & STATUS_PLAYING))
+			m_subcode_timer->adjust(attotime::never);
+	
+		m_stch_timer->adjust(attotime::from_usec(64 * 3), 0); // TODO: Timing
 	}
 }
 
 TIMER_CALLBACK_MEMBER(cr511b_device::sten)
 {
-	m_status_ready = true;
+	m_sten_cb(param);
 
-	m_sten_cb(0);
-	m_sten_cb(1);
+	if (param == 0)
+		m_sten_timer->adjust(attotime::from_usec(64 / 64), 1);
 }
 
 void cr511b_device::status_enable(uint8_t output_length)
@@ -257,8 +304,17 @@ void cr511b_device::status_enable(uint8_t output_length)
 		if (m_input_fifo[0] != 0x87 || (VERBOSE & LOG_SUBQ))
 			LOGMASKED(LOG_CMD, "-> Output: %02x %02x %02x %02x  %02x %02x %02x %02x  %02x %02x %02x %02x\n", m_output_fifo[0], m_output_fifo[1], m_output_fifo[2], m_output_fifo[3], m_output_fifo[4], m_output_fifo[5], m_output_fifo[6], m_output_fifo[7], m_output_fifo[8], m_output_fifo[9], m_output_fifo[10], m_output_fifo[11]);
 
-		m_sten_timer->adjust(attotime::from_usec(64 * 4)); // TODO
+		m_status_ready = true;
+		m_sten_timer->adjust(attotime::from_usec(64 * 4), 0); // TODO: Timing
 	}
+}
+
+TIMER_CALLBACK_MEMBER(cr511b_device::scor)
+{
+	m_scor_cb(param);
+
+	if (param == 1)
+		m_scor_timer->adjust(attotime::from_usec(64), 0);
 }
 
 void cr511b_device::audio_end_cb(int state)
@@ -269,6 +325,47 @@ void cr511b_device::audio_end_cb(int state)
 	LOGMASKED(LOG_CMD, "Playing audio finished\n", state);
 
 	status_change(m_status & ~STATUS_PLAYING);
+}
+
+void cr511b_device::play_audio(uint32_t start, uint32_t end)
+{
+	if (start == 0 && end == 0)
+	{
+		LOGMASKED(LOG_CMD, "Stop audio\n");
+
+		uint8_t status = m_status;
+
+		if (m_cdda->audio_active())
+			status |= STATUS_SUCCESS;
+
+		m_cdda->stop_audio();
+
+		status &= ~STATUS_PLAYING;
+		status &= ~STATUS_MOTOR;
+
+		status_change(status);
+	}
+	else if (start < end)
+	{
+		LOGMASKED(LOG_CMD, "Playing audio %02d:%02d.%02d to %02d:%02d.%02d (LBA %d to %d)\n",
+			m_input_fifo[1], m_input_fifo[2], m_input_fifo[3],
+			m_input_fifo[4], m_input_fifo[5], m_input_fifo[6], start, end);
+
+		m_cdda->start_audio(start, end - start);
+
+		uint8_t status = m_status;
+
+		status |= STATUS_PLAYING;
+		status |= STATUS_MOTOR;
+
+		status_change(status);
+	}
+	else
+	{
+		LOGMASKED(LOG_CMD, "Invalid range %d to %d!\n", start, end);
+
+		status_change(m_status | STATUS_ERROR);
+	}
 }
 
 uint8_t cr511b_device::read()
@@ -439,8 +536,15 @@ void cr511b_device::cmd_play_lba()
 	LOGMASKED(LOG_CMD, "Command: Play LBA\n");
 	LOGPARAM;
 
-	// haven't found anything that uses it yet
-	fatalerror("Play LBA: Not implemented\n");
+	uint32_t start = (m_input_fifo[1] << 16) | (m_input_fifo[2] << 8) | (m_input_fifo[3] << 0);
+	uint32_t end = (m_input_fifo[4] << 16) | (m_input_fifo[5] << 8) | (m_input_fifo[6] << 0);
+
+	// play to the end of the disc?
+	if (end == 0x7fffff)
+		end = get_track_start(0xaa) - 1;
+	
+	play_audio(start, end);
+	status_enable(0);
 }
 
 void cr511b_device::cmd_play_msf()
@@ -448,53 +552,17 @@ void cr511b_device::cmd_play_msf()
 	LOGMASKED(LOG_CMD, "Command: Play MSF\n");
 	LOGPARAM;
 
-	uint32_t start = (m_input_fifo[1] << 16) | (m_input_fifo[2] << 8) | (m_input_fifo[3] << 0);
-	uint32_t end = (m_input_fifo[4] << 16) | (m_input_fifo[5] << 8) | (m_input_fifo[6] << 0);
+	uint32_t start_msf = (m_input_fifo[1] << 16) | (m_input_fifo[2] << 8) | (m_input_fifo[3] << 0);
+	uint32_t end_msf = (m_input_fifo[4] << 16) | (m_input_fifo[5] << 8) | (m_input_fifo[6] << 0);
 
-	int32_t start_lba = msf_to_lba(start);
-	int32_t end_lba = msf_to_lba(end);
+	int32_t start = start_msf ? msf_to_lba(start_msf) : 0;
+	int32_t end = end_msf ? msf_to_lba(end_msf) : 0;
 
 	// play to the end of the disc?
 	if (end == 0xffffff)
-		end_lba = get_track_start(0xaa) - 1;
+		end = get_track_start(0xaa) - 1;
 
-	if (start == 0 && end == 0)
-	{
-		LOGMASKED(LOG_CMD, "Stop audio\n");
-
-		uint8_t status = m_status;
-
-		if (m_cdda->audio_active())
-			status |= STATUS_SUCCESS;
-
-		m_cdda->stop_audio();
-
-		status &= ~STATUS_PLAYING;
-		status &= ~STATUS_MOTOR;
-
-		status_change(status);
-	}
-	else if (start_lba < end_lba)
-	{
-		LOGMASKED(LOG_CMD, "Playing audio %02d:%02d.%02d to %02d:%02d.%02d (LBA %d to %d)\n",
-			m_input_fifo[1], m_input_fifo[2], m_input_fifo[3],
-			m_input_fifo[4], m_input_fifo[5], m_input_fifo[6], start_lba, end_lba);
-
-		m_cdda->start_audio(start_lba, end_lba - start_lba);
-
-		uint8_t status = m_status;
-
-		status |= STATUS_PLAYING;
-		status |= STATUS_MOTOR;
-
-		status_change(status);
-	}
-	else
-	{
-		LOGMASKED(LOG_CMD, "Invalid range %d to %d!\n", start_lba, end_lba);
-		status_change(m_status | STATUS_ERROR);
-	}
-
+	play_audio(start, end);
 	status_enable(0);
 }
 
@@ -508,6 +576,10 @@ void cr511b_device::cmd_play_track()
 	uint8_t end_track = m_input_fifo[3];
 	uint8_t end_index = m_input_fifo[4]; // TODO
 
+	// cd+g/cd+midi mode sends an all 0x00 cmd after starting the motor?
+	if (start_track == 0 || end_track == 0)
+		return;
+
 	uint32_t start_lba = get_track_start(start_track - 1);
 	uint32_t end_lba = get_track_start(end_track - 1) - 1;
 
@@ -515,7 +587,7 @@ void cr511b_device::cmd_play_track()
 
 	m_cdda->start_audio(start_lba, end_lba - start_lba);
 
-	status_change(m_status | STATUS_PLAYING | STATUS_MOTOR);
+	status_change(m_status | STATUS_PLAYING | STATUS_MOTOR);	
 	status_enable(0);
 }
 

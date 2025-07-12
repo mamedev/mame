@@ -1980,12 +1980,14 @@ void cdtv_state::cdtv(machine_config &config)
 	CR511B(config, m_cdrom, 0);
 	m_cdrom->add_route(0, "speaker", 1.0, 0);
 	m_cdrom->add_route(1, "speaker", 1.0, 1);
-	m_cdrom->scor_cb().set(m_tpi, FUNC(tpi6525_device::i1_w)).invert();
-	m_cdrom->stch_cb().set(m_tpi, FUNC(tpi6525_device::i2_w)).invert();
-	m_cdrom->sten_cb().set(m_tpi, FUNC(tpi6525_device::i3_w));
+	m_cdrom->sbcp_cb().set(m_tpi, FUNC(tpi6525_device::pc0_w)).invert();
+	m_cdrom->scor_cb().set(m_tpi, FUNC(tpi6525_device::pc1_w)).invert();
+	m_cdrom->stch_cb().set(m_tpi, FUNC(tpi6525_device::pc2_w)).invert();
+	m_cdrom->sten_cb().set(m_tpi, FUNC(tpi6525_device::pc3_w));
 	m_cdrom->sten_cb().append(FUNC(cdtv_state::sten_w));
-	m_cdrom->drq_cb().set(m_tpi, FUNC(tpi6525_device::i4_w));
+	m_cdrom->drq_cb().set(m_tpi, FUNC(tpi6525_device::pc4_w));
 	m_cdrom->drq_cb().append(FUNC(cdtv_state::drq_w));
+	m_cdrom->subcode_data_cb().set(m_tpi, FUNC(tpi6525_device::pa_w));
 
 	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
 }

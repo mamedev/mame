@@ -1975,7 +1975,7 @@ void cbm2_state::ext_tpi_pc_w(uint8_t data)
 
 void cbm2_state::ext_cia_irq_w(int state)
 {
-	m_tpi1->i3_w(!state);
+	m_tpi1->pc3_w(!state);
 }
 
 uint8_t cbm2_state::ext_cia_pb_r()
@@ -2055,7 +2055,7 @@ void cbm2_state::ext_cia_pb_w(uint8_t data)
 
 TIMER_CALLBACK_MEMBER(cbm2_state::tod_tick)
 {
-	m_tpi1->i0_w(m_todclk);
+	m_tpi1->pc0_w(m_todclk);
 
 	if (m_ext_pic) m_ext_pic->ir2_w(m_todclk);
 
@@ -2291,7 +2291,7 @@ void p500_state::p500_ntsc(machine_config &config)
 
 	MOS6551(config, m_acia, VIC6567_CLOCK);
 	m_acia->set_xtal(XTAL(1'843'200));
-	m_acia->irq_handler().set(m_tpi1, FUNC(tpi6525_device::i4_w));
+	m_acia->irq_handler().set(m_tpi1, FUNC(tpi6525_device::pc4_w));
 	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_acia->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
@@ -2299,7 +2299,7 @@ void p500_state::p500_ntsc(machine_config &config)
 
 	MOS6526A(config, m_cia, XTAL(14'318'181)/14);
 	m_cia->set_tod_clock(60);
-	m_cia->irq_wr_callback().set(m_tpi1, FUNC(tpi6525_device::i2_w));
+	m_cia->irq_wr_callback().set(m_tpi1, FUNC(tpi6525_device::pc2_w));
 	m_cia->cnt_wr_callback().set(m_user, FUNC(cbm2_user_port_device::cnt_w));
 	m_cia->sp_wr_callback().set(m_user, FUNC(cbm2_user_port_device::sp_w));
 	m_cia->pa_rd_callback().set(FUNC(cbm2_state::cia_pa_r));
@@ -2332,7 +2332,7 @@ void p500_state::p500_ntsc(machine_config &config)
 
 	IEEE488(config, m_ieee, 0);
 	ieee488_slot_device::add_cbm_defaults(config, "c8050");
-	m_ieee->srq_callback().set(m_tpi1, FUNC(tpi6525_device::i1_w));
+	m_ieee->srq_callback().set(m_tpi1, FUNC(tpi6525_device::pc1_w));
 
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, nullptr);
 	m_cassette->read_handler().set(m_cia, FUNC(mos6526_device::flag_w));
@@ -2424,12 +2424,12 @@ void p500_state::p500_pal(machine_config &config)
 
 	MOS6551(config, m_acia, 0);
 	m_acia->set_xtal(XTAL(1'843'200));
-	m_acia->irq_handler().set(m_tpi1, FUNC(tpi6525_device::i4_w));
+	m_acia->irq_handler().set(m_tpi1, FUNC(tpi6525_device::pc4_w));
 	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	MOS6526A(config, m_cia, XTAL(17'734'472)/18);
 	m_cia->set_tod_clock(50);
-	m_cia->irq_wr_callback().set(m_tpi1, FUNC(tpi6525_device::i2_w));
+	m_cia->irq_wr_callback().set(m_tpi1, FUNC(tpi6525_device::pc2_w));
 	m_cia->cnt_wr_callback().set(m_user, FUNC(cbm2_user_port_device::cnt_w));
 	m_cia->sp_wr_callback().set(m_user, FUNC(cbm2_user_port_device::sp_w));
 	m_cia->pa_rd_callback().set(FUNC(cbm2_state::cia_pa_r));
@@ -2462,7 +2462,7 @@ void p500_state::p500_pal(machine_config &config)
 
 	IEEE488(config, m_ieee, 0);
 	ieee488_slot_device::add_cbm_defaults(config, "c8050");
-	m_ieee->srq_callback().set(m_tpi1, FUNC(tpi6525_device::i1_w));
+	m_ieee->srq_callback().set(m_tpi1, FUNC(tpi6525_device::pc1_w));
 
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, nullptr);
 	m_cassette->read_handler().set(m_cia, FUNC(mos6526_device::flag_w));
@@ -2554,12 +2554,12 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 
 	MOS6551(config, m_acia, 0);
 	m_acia->set_xtal(XTAL(1'843'200));
-	m_acia->irq_handler().set(m_tpi1, FUNC(tpi6525_device::i4_w));
+	m_acia->irq_handler().set(m_tpi1, FUNC(tpi6525_device::pc4_w));
 	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	MOS6526A(config, m_cia, XTAL(18'000'000)/9);
 	m_cia->set_tod_clock(60);
-	m_cia->irq_wr_callback().set(m_tpi1, FUNC(tpi6525_device::i2_w));
+	m_cia->irq_wr_callback().set(m_tpi1, FUNC(tpi6525_device::pc2_w));
 	m_cia->cnt_wr_callback().set(m_user, FUNC(cbm2_user_port_device::cnt_w));
 	m_cia->sp_wr_callback().set(m_user, FUNC(cbm2_user_port_device::sp_w));
 	m_cia->pa_rd_callback().set(FUNC(cbm2_state::cia_pa_r));
@@ -2592,7 +2592,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 
 	IEEE488(config, m_ieee, 0);
 	ieee488_slot_device::add_cbm_defaults(config, "c8050");
-	m_ieee->srq_callback().set(m_tpi1, FUNC(tpi6525_device::i1_w));
+	m_ieee->srq_callback().set(m_tpi1, FUNC(tpi6525_device::pc1_w));
 
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, nullptr);
 	m_cassette->read_handler().set(m_cia, FUNC(mos6526_device::flag_w));
