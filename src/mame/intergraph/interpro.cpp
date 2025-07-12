@@ -138,11 +138,11 @@
  * 2700 Sapphire (SMT128 rev 0, SMT104 rev A)
  *
  *   Ref   Part                      Function
- *   U31   Zilog Z85C30 SCC          Keyboard and console serial controller
- *   U32   Zilog Z85230 ESCC         Serial controller for serial port 0 and 1
+ *   U31   Zilog Z85C30 SCC          Serial controller for serial port 0 and 1
+ *   U32   Zilog Z85230 ESCC         Keyboard and console serial controller
  *   U34   Xilinx XC3020-70          Plotter control FPGA?
  *   U35   128 kB EPROM (MPRGZ530A)  Boot ROM
- *   U43?  (MPRGM610P)               Bitstream for XC3020?
+ *   U43   GAL16V8B (MPRGM610P)      Bitstream for XC3020?
  *   U44   Intel 82596SX-20          Ethernet controller
  *   U68   CYID21603 TC150G89AF
  *   U67   Intel N28F010             128Kx8 flash memory (Y226 0C30 4291)
@@ -155,11 +155,11 @@
  *   U91   Intel N82077SL-1          Floppy drive controller
  *   U96   29.0 MHz crystal
  *   U97   40.0 MHz crystal
- *   U112? (MPRGZ260E)               node ID prom?
+ *   U112  82s123 (MPRG4230A)        node ID prom?
  *   U113  Dallas DS12887            RTC and NVRAM
- *   U117?                           diagnostic 7-segment LED?
- *   U118? ()
- *   U155  CYID212?4 TC140G54AF?
+ *   U117  [empty]                   diagnostic 7-segment LED?
+ *   U118  82S123 (MPRGZ260F)
+ *   U155  CYID21704 TC140G54AF
  *
  * 6000 (PCB765 rev B, PCB82409 rev D)
  *
@@ -1618,26 +1618,26 @@ ROM_START(ip2400)
 	ROMX_LOAD("mprgw510b__05_16_92.u35", 0x00000, 0x20000, CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
-	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
 	ROM_REGION(0x20000, "flash_msb", 0)
-	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip2500)
 	ROM_REGION32_LE(0x80, "idprom", 0)
 	ROM_LOAD32_BYTE("msmt1000.bin", 0x0, 0x20, CRC(548046c0) SHA1(ce7646e868f3aa35642d7f9348f6b9e91693918e))
 
-	// FIXME: undumped - probably identical to ip2700 eprom
+	// FIXME: undumped - probably identical to ip2700 EPROM
 	ROM_REGION16_LE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "ip2500", "InterPro/InterServe 25x0 EPROM")
 	ROMX_LOAD("ip2500_eprom.bin", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa) BAD_DUMP, ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
-	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
 	ROM_REGION(0x20000, "flash_msb", 0)
-	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip2700)
@@ -1650,10 +1650,36 @@ ROM_START(ip2700)
 	ROMX_LOAD("mprgz530a__9405181.u35", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
-	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
 	ROM_REGION(0x20000, "flash_msb", 0)
-	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+
+	ROM_REGION(0x2e5, "plds", 0)
+	ROM_LOAD("mprgm610p_9311290_gal16v8b.u43", 0x000, 0x117, CRC(9b825384) SHA1(7d531394a046e2507844423a7fea834730843ce3))
+	ROM_LOAD("y215_0c31_1230_gal22v10.u72",    0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y216_0d31_1290_gal16v8.u58",     0x000, 0x117, NO_DUMP)
+	ROM_LOAD("y279_0a31_1291_gal20v8.u57",     0x000, 0x157, NO_DUMP)
+	ROM_LOAD("y277_0a31_1300_gal22v10.u70",    0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y272_0a31_1300_gal22v10.u56",    0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y515_0a31_1300_gal22v10.u69",    0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y283_0a31_1290_gal20v8.u80",     0x000, 0x157, NO_DUMP)
+	ROM_LOAD("y224_0b31_1300_gal20v8.u75",     0x000, 0x157, NO_DUMP)
+	ROM_LOAD("y219_0b31_1300_gal16v8.u66",     0x000, 0x117, NO_DUMP)
+	ROM_LOAD("y221_0a31_1290_gal16v8.u82",     0x000, 0x117, NO_DUMP)
+	ROM_LOAD("y222_0a31_1290_gal16v8.u74",     0x000, 0x117, NO_DUMP)
+	ROM_LOAD("y218_0b31_1180_gal22v10.u65",    0x000, 0x2e5, NO_DUMP)
+
+	ROM_REGION(0x020, "proms", 0)
+	ROM_LOAD("mprgy920f_9305070_82s123.u71",  0x000, 0x020, CRC(4fec770c) SHA1(25bfb863336315975568f137e7e76bdc8101ab02))
+	ROM_LOAD("mprg4230a_9311300_82s123.u112", 0x000, 0x020, CRC(8633fa2c) SHA1(e93fb6a65c78202a79c94adbf05d438fc6774333))
+	ROM_LOAD("mprgz260f_9310270_82s123.u118", 0x000, 0x020, CRC(bef9a02b) SHA1(5a50f8922fc0a7ae5f7934ccc1e178f3c8ec8489))
+
+	ROM_REGION(0x080, "nvram", 0)
+	ROM_LOAD("ds12887.u113", 0x000, 0x080, CRC(108116fb) SHA1(9cc538bf1ad784e8f1a1d02ae24fb13370f1a533))
+
+	ROM_REGION(0x11b9, "scprom", 0)
+	ROM_LOAD("h300_pb29_xc1736d.u64", 0x0000, 0x11b9, CRC(e9ad2194) SHA1(d8dbecad5f2cdbf19b821b500a8db6a64303b322))
 ROM_END
 
 ROM_START(ip2800)
@@ -1665,10 +1691,10 @@ ROM_START(ip2800)
 	ROMX_LOAD("ip2800_eprom.bin", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
-	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
 	ROM_REGION(0x20000, "flash_msb", 0)
-	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip6000)
@@ -1711,10 +1737,10 @@ ROM_START(ip6700)
 	ROMX_LOAD("mprgz530a.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
-	ROM_LOAD_OPTIONAL("y225.u117", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+	ROM_LOAD_OPTIONAL("y226.u130", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
 	ROM_REGION(0x20000, "flash_msb", 0)
-	ROM_LOAD_OPTIONAL("y226.u130", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+	ROM_LOAD_OPTIONAL("y225.u117", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip6800)
@@ -1726,21 +1752,21 @@ ROM_START(ip6800)
 	ROMX_LOAD("mprgz530a__9406270.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
-	ROM_LOAD_OPTIONAL("y225.u117", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+	ROM_LOAD_OPTIONAL("y226.u130", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
 	ROM_REGION(0x20000, "flash_msb", 0)
-	ROM_LOAD_OPTIONAL("y226.u130", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+	ROM_LOAD_OPTIONAL("y225.u117", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 }
 
-/*    YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS                INIT        COMPANY        FULLNAME                    FLAGS */
-COMP( 1990,  ip2000,  0,      0,      ip2000,  0,     turquoise_state,     init_common,"Intergraph",  "InterPro/InterServe 20x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1992,  ip2400,  0,      0,      ip2400,  0,     cbus_sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 24x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip2500,  0,      0,      ip2500,  0,     cbus_sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 25x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip2700,  0,      0,      ip2700,  0,     cbus_sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 27x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1994,  ip2800,  0,      0,      ip2800,  0,     cbus_sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 28x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1990,  ip6000,  0,      0,      ip6000,  0,     emerald_state,       init_common,"Intergraph",  "InterPro/InterServe 60x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1992,  ip6400,  0,      0,      ip6400,  0,     srx_sapphire_state,  init_common,"Intergraph",  "InterPro/InterServe 64x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip6700,  0,      0,      ip6700,  0,     srx_sapphire_state,  init_common,"Intergraph",  "InterPro/InterServe 67x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip6800,  0,      0,      ip6800,  0,     srx_sapphire_state,  init_common,"Intergraph",  "InterPro/InterServe 68x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS                INIT         COMPANY        FULLNAME                    FLAGS
+COMP( 1990, ip2000,  0,      0,      ip2000,  0,     turquoise_state,     init_common, "Intergraph", "InterPro/InterServe 20x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1992, ip2400,  0,      0,      ip2400,  0,     cbus_sapphire_state, init_common, "Intergraph", "InterPro/InterServe 24x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993, ip2500,  0,      0,      ip2500,  0,     cbus_sapphire_state, init_common, "Intergraph", "InterPro/InterServe 25x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993, ip2700,  0,      0,      ip2700,  0,     cbus_sapphire_state, init_common, "Intergraph", "InterPro/InterServe 27x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1994, ip2800,  0,      0,      ip2800,  0,     cbus_sapphire_state, init_common, "Intergraph", "InterPro/InterServe 28x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1990, ip6000,  0,      0,      ip6000,  0,     emerald_state,       init_common, "Intergraph", "InterPro/InterServe 60x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1992, ip6400,  0,      0,      ip6400,  0,     srx_sapphire_state,  init_common, "Intergraph", "InterPro/InterServe 64x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993, ip6700,  0,      0,      ip6700,  0,     srx_sapphire_state,  init_common, "Intergraph", "InterPro/InterServe 67x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993, ip6800,  0,      0,      ip6800,  0,     srx_sapphire_state,  init_common, "Intergraph", "InterPro/InterServe 68x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
