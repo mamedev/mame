@@ -447,7 +447,7 @@ private:
 
 	// Sound GLU variables
 	u8 m_sndglu_ctrl = 0;
-	int m_sndglu_addr = 0;
+	u16 m_sndglu_addr = 0;
 	int m_sndglu_dummy_read = 0;
 
 	// Key GLU variables
