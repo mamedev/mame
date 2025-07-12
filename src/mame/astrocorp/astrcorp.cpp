@@ -15,14 +15,14 @@ OTHER:  EEPROM, Battery
 
  512 sprites, each made of N x M tiles. Tiles are 16x16x8 (16x32x8 in Stone Age)
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Year + Game                PCB ID                    CPU                Video          Chips                                      Notes
------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 00  Show Hand              CHE-B50-4002A             MC68HC000FN12      ASTRO V01      pLSI1016-60LJ, ASTRO 0001B MCU? (28 pins)
 00  Wangpai Duijue         CHE-B50-4002A             MC68HC000FN12      ASTRO V01      pLSI1016,      MDT2020AP   MCU  (28 pins)
 01  Magic Bomb (NB4.5)     None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
 02  Skill Drop GA          None                      JX-1689F1028N      ASTRO V02      pLSI1016-60LJ
-02? Keno 21                ?                         ASTRO V102?        ASTRO V05      ASTRO F02?                                 not dumped
+02? Keno 21                T-3802A                   ASTRO V102PX-001   ASTRO V05      ASTRO F02 2003-04-14                       Encrypted
 03  Magic Bomb (AB5.3)     CS350P003                 ASTRO V102PX-014   ASTRO V01      ASTRO F02 2003-03-31                       Encrypted
 03  Magic Bomb (AB6.0)     J (CS350P001)             ASTRO V102PX-014   ASTRO V05      ASTRO F02 2003-08-12                       Encrypted
 03  Speed Drop             None                      JX-1689HP          ASTRO V05      pLSI1016-60LJ
@@ -45,11 +45,11 @@ Year + Game                PCB ID                    CPU                Video   
 06  Little Witch (EN.01A)  P1                        ASTRO V102PX-016   ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
 06  Win Win Bingo          M1.2                      ASTRO V102PX-006   ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
 07? Western Venture        O (CS350P032)             ASTRO V102PX-007   ASTRO V07      ASTRO F01 2007-06-03                       Encrypted
-07  Happy Farm (US.01.02B) _P_ROHS                   ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 M835KK01             Encrypted
+07  Happy Farm (US.01.02B) _P_ROHS                   ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 M835KK01             Encrypted, also seen on ASTRO _P CS350P071
 11  Happy Farm (IN.01.02B) P1                        ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 N011483              Encrypted
 13  Monkey Land (EN.20B)   N1                        ASTRO V102PX-005   ASTRO V05      ?                                          Encrypted
 14  Magic Bomb (BR.71A)    P1 (CS350P087)            ASTRO V102PX-014   ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Note: ASTRO F01 is a QuickLogic pASIC 3 FPGA (die-marked as QL3161A/1999).
 
@@ -74,7 +74,7 @@ TODO:
 - Fix mirror ROM checksum / ROM overlay without code patches (in games with heavier encryption).
 - Find source of level 2 interrupt (sprite DMA end?).
 - magibomba, westvent: need a redump of one of the program ROMs.
-- hacher: needs a redump of the sprite ROMs.
+- hacher, keno21: need a redump of the sprite ROMs.
 - gostopac: needs verifying of inputs, outputs and layout. Sound doesn't seem 100% correct (Oki banking problem?)
 - monkeyl and clones: need verifying of inputs, outputs and layout.
 - speedmst,a,b: need verifying of inputs, outputs and layout.
@@ -83,6 +83,7 @@ TODO:
 - hapfarm,a: need verifying of inputs, outputs and layout.
 - zulu: needs verifying of inputs, outputs and layout.
 - westventa: needs verifying of inputs, outputs and layout.
+- keno21: doesn't manage to read the CPU code. bp 1164,1,{curpc=0x117a;g} for now to go further. Fails shortly thereafter.
 
 *************************************************************************************************************/
 
@@ -311,6 +312,7 @@ public:
 	void gostopac(machine_config &config) ATTR_COLD;
 	void hapfarm(machine_config &config) ATTR_COLD;
 	void hapfarma(machine_config &config) ATTR_COLD;
+	void keno21(machine_config &config) ATTR_COLD;
 	void lwitch(machine_config &config) ATTR_COLD;
 	void magibombd(machine_config &config) ATTR_COLD;
 	void magibombg(machine_config &config) ATTR_COLD;
@@ -333,6 +335,7 @@ public:
 	void init_hacher() ATTR_COLD;
 	void init_hapfarm() ATTR_COLD;
 	void init_hapfarma() ATTR_COLD;
+	void init_keno21() ATTR_COLD;
 	void init_magibombd() ATTR_COLD;
 	void init_magibombg() ATTR_COLD;
 	void init_magibombm() ATTR_COLD;
@@ -383,6 +386,7 @@ private:
 	void hacher_map(address_map &map) ATTR_COLD;
 	void hapfarm_map(address_map &map) ATTR_COLD;
 	void hapfarma_map(address_map &map) ATTR_COLD;
+	void keno21_map(address_map &map) ATTR_COLD;
 	void lwitch_map(address_map &map) ATTR_COLD;
 	void magibombd_map(address_map &map) ATTR_COLD;
 	void magibombg_map(address_map &map) ATTR_COLD;
@@ -398,6 +402,7 @@ private:
 	void zulu_map(address_map &map) ATTR_COLD;
 
 	static const decryption_info gostopac_table;
+	static const decryption_info v102_px001_table;
 	static const decryption_info v102_px005_table;
 	static const decryption_info v102_px006_table;
 	static const decryption_info v102_px007_table;
@@ -871,6 +876,23 @@ void zoo_state::dinodino_map(address_map &map)
 	map(0xc80000, 0xc801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd00001, 0xd00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xd80000, 0xd80000).w(FUNC(zoo_state::oki_bank_w));
+//  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
+}
+
+void zoo_state::keno21_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x400000, 0x403fff).ram().share("nvram"); // battery
+	map(0xa00000, 0xa00fff).ram().share("spriteram");
+	map(0xa02000, 0xa02001).nopr().w(FUNC(zoo_state::draw_sprites_w));
+	map(0xa04000, 0xa04001).portr("INPUTS");
+	map(0xa08001, 0xa08001).w(FUNC(zoo_state::eeprom_w));
+	map(0xa0a000, 0xa0a001).w(FUNC(zoo_state::magibomb_outputs_w));
+	map(0xa0e000, 0xa0e001).portr("EEPROM_IN");
+	map(0xb00000, 0xb00000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
+	//map(0xc80000, 0xc80000).w(FUNC(zoo_state::oki_bank_w));
+	map(0xe00000, 0xe001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
 }
 
@@ -1592,6 +1614,12 @@ void zoo_state::dinodino(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::dinodino_map);
 
 	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(zoo_state::irq_2_4_scanline_cb), "screen", 0, 1);
+}
+
+void zoo_state::keno21(machine_config &config)
+{
+	dinodino(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::keno21_map);
 }
 
 void zoo_state::gostopac(machine_config &config)
@@ -2677,6 +2705,32 @@ ROM_START( dinodino )
 	ROM_LOAD( "dinodino_cpucode.key", 0x00, 0x02, CRC(674b2687) SHA1(9c1338a41162fa2ffbd2ea0a579ad87a6c084a0e) )
 ROM_END
 
+ROM_START( keno21 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_keno21_am-230.u20", 0x00000, 0x10000, CRC(362e81b9) SHA1(5f311fde80d8a18324413f0fdfb294f03eac78f4) ) // 27C512
+	ROM_LOAD16_BYTE( "2_keno21_am-230.u19", 0x00001, 0x10000, CRC(9201e3eb) SHA1(665991dfe55da93331e36f048bd4dac46445a9f3) ) // 27C512
+	ROM_FILL(                               0x20000, 0x20000, 0xff )
+
+	ROM_REGION( 0x1000000, "sprites", 0 )
+	ROM_LOAD( "rom3.u26", 0x000000, 0x200000, CRC(bb4e024c) SHA1(036a237ab994041e21b76eda7363656b29fd1299) ) // MX29F1610MC
+	ROM_LOAD( "rom4.u24", 0x200000, 0x200000, BAD_DUMP CRC(924537f8) SHA1(06966601bf25fed2d9125b6acef65fd4eaab9f26) ) // MX29F1610MC, seems corrupt
+	ROM_RELOAD(           0x400000, 0x200000 )
+	ROM_RELOAD(           0x600000, 0x200000 )
+	ROM_RELOAD(           0x800000, 0x200000 )
+	ROM_RELOAD(           0xa00000, 0x200000 )
+	ROM_RELOAD(           0xc00000, 0x200000 )
+	ROM_RELOAD(           0xe00000, 0x200000 )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_keno21-i.u33", 0x00000, 0x80000, CRC(949b23db) SHA1(e9579f751ca728a633c6317ccea8454b10adf1a0) ) // 27C040
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(0aaf5ce7) SHA1(df61118c025a62cde9bd442c88bad129bd49c7c3) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "keno21.key", 0x00, 0x02, CRC(feea10e2) SHA1(75f4aea7d859c8d96e9b03540b91393c19ef4c5f) )
+ROM_END
+
 /***************************************************************************
 
 Go Stop
@@ -3234,7 +3288,7 @@ void zoo_state::init_magibombd()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, u16 &data, u16 mem_mask)
 	{
 		switch (offset & 0x02)
 		{
@@ -3261,7 +3315,7 @@ void zoo_state::init_magibombg()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, u16 &data, u16 mem_mask)
 	{
 		switch (offset & 0x02)
 		{
@@ -3288,7 +3342,7 @@ void zoo_state::init_magibombm()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, u16 &data, u16 mem_mask)
 	{
 		switch (offset & 0x02)
 		{
@@ -3315,7 +3369,7 @@ void zoo_state::init_magibombo()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, u16 &data, u16 mem_mask)
 	{
 		switch (offset & 0x02)
 		{
@@ -3726,7 +3780,7 @@ void zoo_state::init_wwitch()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	program.install_read_tap(0x800008, 0x80000b, "magic_mirror_r", [] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+	program.install_read_tap(0x800008, 0x80000b, "magic_mirror_r", [] (offs_t offset, u16 &data, u16 mem_mask)
 	{
 		switch (offset & 0x02)
 		{
@@ -3849,6 +3903,54 @@ void zoo_state::init_hapfarma()
 #endif
 }
 
+const zoo_state::decryption_info zoo_state::v102_px001_table = {
+	{
+		{
+			{ 8, 9, 10 },
+			{
+				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
+				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
+				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
+				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
+				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
+				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
+				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
+				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
+			}
+		},
+		{
+			{ 12, 9, 11 },
+			{
+				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
+				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
+				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
+				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
+				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
+				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
+				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
+				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
+			}
+		}
+	},
+	{ 12, 10, 8, 11, 9, 7, 2, 4, 6, 5, 3 }
+};
+
+void zoo_state::init_keno21()
+{
+	decrypt_rom(v102_px001_table);
+#if 1
+	// TODO: There's more stuff happening for addresses < 0x400...
+	// override reset vector for now
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	rom[0x00004/2] = 0x0400;
+	rom[0x00006/2] = 0x0400;
+	rom[0x00008/2] = 0x0000;
+	rom[0x0000a/2] = 0x0400;
+
+	rom[0x163ba/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
+#endif
+}
+
 const astoneag_state::decryption_info astoneag_state::v102_px012_table = {
 	{
 		{
@@ -3896,7 +3998,7 @@ void astoneag_state::init_astoneag()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, u16 &data, u16 mem_mask)
 	{
 		switch (offset & 0x02)
 		{
@@ -3952,6 +4054,7 @@ GAMEL( 2004,  zoo,       0,        zoo,       magibombd, zoo_state,       init_z
 GAMEL( 2004,  zulu,      zoo,      zulu,      dinodino,  zoo_state,       init_zulu,      ROT0, "Astro Corp.", "Zulu (Ver. 2.04J, Feb 3 2004)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_zoo ) // 14:06:51 Feb  3 2004
 GAME(  2004,  gostopac,  0,        gostopac,  dinodino,  zoo_state,       init_gostopac,  ROT0, "Astro Corp.", "Go & Stop (Ver. EN1.10)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAMEL( 2005,  dinodino,  0,        dinodino,  dinodino,  zoo_state,       init_dinodino,  ROT0, "Astro Corp.", "Dino Dino (Ver. A1.1, 01/13/2005)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_dinodino  ) // 13/01.2005 10:59
+GAME(  200?,  keno21,    0,        keno21,    dinodino,  zoo_state,       init_keno21,    ROT0, "Astro Corp.", "Keno 21 (Ver. A-2.30)",                         MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAMEL( 2005,  astoneag,  0,        astoneag,  astoneag,  astoneag_state,  init_astoneag,  ROT0, "Astro Corp.", "Stone Age (Astro, Ver. EN.03.A, 2005/02/21)",   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_astoneag  )
 GAME(  2005,  monkeyl,   0,        monkeyl,   magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. AA.21.A)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 18/02/2005 15:47
 GAME(  2004,  monkeyla,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_monkeyla,  ROT0, "Astro Corp.", "Monkey Land (Ver. AA.13.B)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 23/04/2004 14:57
