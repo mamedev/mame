@@ -38,7 +38,7 @@ PMEXPORT PtError Pt_Start(int resolution, PtCallback *callback, void *userData)
 }
 
 
-PMEXPORT PtError Pt_Stop()
+PMEXPORT PtError Pt_Stop(void)
 {
     if (!time_started_flag) return ptAlreadyStopped;
     if (time_callback && timer_id) {
@@ -52,13 +52,13 @@ PMEXPORT PtError Pt_Stop()
 }
 
 
-PMEXPORT int Pt_Started()
+PMEXPORT int Pt_Started(void)
 {
     return time_started_flag;
 }
 
 
-PMEXPORT PtTimestamp Pt_Time()
+PMEXPORT PtTimestamp Pt_Time(void)
 {
     return timeGetTime() - time_offset;
 }

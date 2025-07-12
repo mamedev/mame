@@ -112,8 +112,6 @@ private:
 
 	devcb_read8 m_excsr_handler;
 	devcb_write8 m_excsw_handler;
-
-	uint8_t m_dummy; // needed for save-state support
 };
 
 

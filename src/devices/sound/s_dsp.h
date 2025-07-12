@@ -30,7 +30,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
@@ -56,19 +56,19 @@ private:
 	struct voice_state_type                      /* Voice state type             */
 	{
 		u16             mem_ptr;        /* Sample data memory pointer   */
-		int             end;            /* End or loop after block      */
-		int             envcnt;         /* Counts to envelope update    */
+		u8              end;            /* End or loop after block      */
+		s32             envcnt;         /* Counts to envelope update    */
 		env_state_t32   envstate;       /* Current envelope state       */
-		int             envx;           /* Last env height (0-0x7FFF)   */
-		int             filter;         /* Last header's filter         */
-		int             half;           /* Active nybble of BRR         */
-		int             header_cnt;     /* Bytes before new header (0-8)*/
-		int             mixfrac;        /* Fractional part of smpl pstn */
-		int             on_cnt;         /* Is it time to turn on yet?   */
-		int             pitch;          /* Sample pitch (4096->32000Hz) */
-		int             range;          /* Last header's range          */
+		s32             envx;           /* Last env height (0-0x7FFF)   */
+		u8              filter;         /* Last header's filter         */
+		bool            half;           /* Active nybble of BRR         */
+		s8              header_cnt;     /* Bytes before new header (0-8)*/
+		s32             mixfrac;        /* Fractional part of smpl pstn */
+		s32             on_cnt;         /* Is it time to turn on yet?   */
+		s32             pitch;          /* Sample pitch (4096->32000Hz) */
+		u8              range;          /* Last header's range          */
 		u32             samp_id;        /* Sample ID#                   */
-		int             sampptr;        /* Where in sampbuf we are      */
+		s8              sampptr;        /* Where in sampbuf we are      */
 		s32             smp1;           /* Last sample (for BRR filter) */
 		s32             smp2;           /* Second-to-last sample decoded*/
 		s16             sampbuf[4];     /* Buffer for Gaussian interp   */
@@ -92,20 +92,20 @@ private:
 	u8                    m_dsp_addr;
 	u8                    m_dsp_regs[256];      /* DSP registers */
 
-	int                   m_keyed_on;
-	int                   m_keys;               /* 8-bits for 8 voices */
+	u8                    m_keyed_on;
+	u8                    m_keys;               /* 8-bits for 8 voices */
 	voice_state_type      m_voice_state[8];
 
 	/* Noise stuff */
-	int                   m_noise_cnt;
-	int                   m_noise_lev;
+	u32                   m_noise_cnt;
+	u32                   m_noise_lev;
 
 	/* These are for the FIR echo filter */
 #ifndef NO_ECHO
 	s16                   m_fir_lbuf[8];
 	s16                   m_fir_rbuf[8];
-	int                   m_fir_ptr;
-	int                   m_echo_ptr;
+	u8                    m_fir_ptr;
+	u16                   m_echo_ptr;
 #endif
 
 };

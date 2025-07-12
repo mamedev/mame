@@ -2115,25 +2115,24 @@ void salamand_state::salamand(machine_config &config)
 	m_palette->set_membits(8);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	VLM5030(config, m_vlm, 3'579'545);
 	m_vlm->set_addrmap(0, &salamand_state::salamand_vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 2.50);
-	m_vlm->add_route(ALL_OUTPUTS, "rspeaker", 2.50);
+	m_vlm->add_route(ALL_OUTPUTS, "speaker", 2.50, 0);
+	m_vlm->add_route(ALL_OUTPUTS, "speaker", 2.50, 1);
 
 	K007232(config, m_k007232, 3'579'545);
 	m_k007232->port_write().set(FUNC(salamand_state::volume_callback));
-	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.08);
-	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.08);
+	m_k007232->add_route(ALL_OUTPUTS, "speaker", 0.08, 0);
+	m_k007232->add_route(ALL_OUTPUTS, "speaker", 0.08, 1);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3'579'545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
-	ymsnd.add_route(0, "rspeaker", 1.2); // reversed according to MT #4565
-	ymsnd.add_route(1, "lspeaker", 1.2);
+	ymsnd.add_route(0, "speaker", 1.2, 1); // reversed according to MT #4565
+	ymsnd.add_route(1, "speaker", 1.2, 0);
 }
 
 void salamand_state::blkpnthr(machine_config &config)
@@ -2159,20 +2158,19 @@ void salamand_state::blkpnthr(machine_config &config)
 	m_palette->set_membits(8);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	K007232(config, m_k007232, 3'579'545);
 	m_k007232->port_write().set(FUNC(salamand_state::volume_callback));
-	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
-	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "speaker", 0.10, 0);
+	m_k007232->add_route(ALL_OUTPUTS, "speaker", 0.10, 1);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3'579'545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
-	ymsnd.add_route(0, "lspeaker", 1.0);
-	ymsnd.add_route(1, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(1, "speaker", 1.0, 1);
 }
 
 void hcrash_state::citybomb(machine_config &config)
@@ -2287,25 +2285,24 @@ void hcrash_state::hcrash(machine_config &config)
 	m_palette->set_membits(8);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	VLM5030(config, m_vlm, 3'579'545);
 	m_vlm->set_addrmap(0, &hcrash_state::salamand_vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 2.00);
-	m_vlm->add_route(ALL_OUTPUTS, "rspeaker", 2.00);
+	m_vlm->add_route(ALL_OUTPUTS, "speaker", 2.00, 0);
+	m_vlm->add_route(ALL_OUTPUTS, "speaker", 2.00, 1);
 
 	K007232(config, m_k007232, 3'579'545);
 	m_k007232->port_write().set(FUNC(hcrash_state::volume_callback));
-	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
-	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "speaker", 0.10, 0);
+	m_k007232->add_route(ALL_OUTPUTS, "speaker", 0.10, 1);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3'579'545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
-	ymsnd.add_route(0, "lspeaker", 0.50);
-	ymsnd.add_route(1, "rspeaker", 0.50);
+	ymsnd.add_route(0, "speaker", 0.50, 0);
+	ymsnd.add_route(1, "speaker", 0.50, 1);
 }
 
 /***************************************************************************

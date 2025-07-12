@@ -11,10 +11,9 @@
 
 #pragma once
 
-#include "bus/cbus/pc9801_cbus.h"
 #include "sound/ymopn.h"
-#include "pc9801_snd.h"
 
+#include "pc9801_cbus.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -22,7 +21,7 @@
 
 // ======================> pc9801_118_device
 
-class pc9801_118_device : public pc9801_snd_device
+class pc9801_118_device : public device_t
 {
 public:
 	// construction/destruction
@@ -44,15 +43,14 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-	virtual u16 read_io_base() override;
 
 private:
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2608_device>  m_opn3;
 
-	uint8_t m_ext_reg;
+//  u16 m_io_base, m_joy_sel;
 
-	void sound_irq(int state);
+	uint8_t m_ext_reg;
 };
 
 

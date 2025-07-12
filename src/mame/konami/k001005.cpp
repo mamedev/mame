@@ -788,7 +788,7 @@ uint32_t k001005_device::read(address_space &space, offs_t offset, uint32_t mem_
 			{
 				//osd_printf_debug("FIFO_r1: %08X\n", m_fifo_read_ptr);
 				uint16_t const value = m_fifo[m_fifo_read_ptr] & 0xffff;
-	
+
 				if (!machine().side_effects_disabled())
 				{
 					if (m_status != 1 && m_status != 2)
@@ -802,7 +802,7 @@ uint32_t k001005_device::read(address_space &space, offs_t offset, uint32_t mem_
 					{
 						dsp->set_flag_input(1, ASSERT_LINE);
 					}
-	
+
 					m_fifo_read_ptr++;
 					m_fifo_read_ptr &= 0x7ff;
 				}

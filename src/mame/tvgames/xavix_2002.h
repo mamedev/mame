@@ -18,6 +18,7 @@ public:
 	{ }
 
 	void superxavix_i2c_jmat(machine_config &config);
+	void superxavix_i2c_jmat_24c64(machine_config &config);
 
 	void init_xavmusic();
 
@@ -120,8 +121,6 @@ public:
 	superxavix_i2c_bowl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: superxavix_i2c_state(mconfig, type, tag)
 	{ }
-
-	int camera_r();
 };
 
 

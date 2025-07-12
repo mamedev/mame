@@ -12,7 +12,7 @@
 
 namespace fs {
 
-const u8 *fsblk_vec_t::blk_t::rodata()
+const u8 *fsblk_vec_t::blk_t::rodata() const
 {
 	return m_data;
 }
@@ -22,23 +22,19 @@ u8 *fsblk_vec_t::blk_t::data()
 	return m_data;
 }
 
-void fsblk_vec_t::blk_t::drop_weak_references()
-{
-}
-
 u32 fsblk_vec_t::block_count() const
 {
 	return m_data.size() / m_block_size;
 }
 
-fsblk_t::block_t fsblk_vec_t::get(u32 id)
+fsblk_vec_t::block_t::ptr fsblk_vec_t::get(u32 id)
 {
 	if(id >= block_count())
 		throw std::out_of_range(util::string_format("Block number overflow: requiring block %d on device of size %d (%d bytes, block size %d)", id, block_count(), m_data.size(), m_block_size));
-	return block_t(new blk_t(m_data.data() + m_block_size*id, m_block_size));
+	return std::make_shared<blk_t>(m_data.data() + m_block_size*id, m_block_size);
 }
 
-void fsblk_vec_t::fill(u8 data)
+void fsblk_vec_t::fill_all(u8 data)
 {
 	std::fill(m_data.begin(), m_data.end(), data);
 }

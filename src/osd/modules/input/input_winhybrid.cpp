@@ -296,8 +296,7 @@ private:
 				__uuidof(WbemLocator),
 				nullptr,
 				CLSCTX_INPROC_SERVER,
-				__uuidof(IWbemLocator),
-				reinterpret_cast<void **>(pIWbemLocator.GetAddressOf()));
+				IID_PPV_ARGS(pIWbemLocator.GetAddressOf()));
 		if (FAILED(hr) || !pIWbemLocator)
 		{
 			osd_printf_error("Creating WbemLocator failed. Error: 0x%X\n", static_cast<unsigned int>(hr));

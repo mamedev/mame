@@ -636,10 +636,9 @@ void ldv1000_state::ldv1000(machine_config &config)
 {
 	ldplayer_ntsc(config, PIONEER_LDV1000, m_laserdisc);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	m_laserdisc->add_route(0, "lspeaker", 1.0);
-	m_laserdisc->add_route(1, "rspeaker", 1.0);
+	SPEAKER(config, "speaker", 2).front();
+	m_laserdisc->add_route(0, "speaker", 1.0, 0);
+	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -647,10 +646,9 @@ void pr8210_state::pr8210(machine_config &config)
 {
 	ldplayer_ntsc(config, PIONEER_PR8210, m_laserdisc);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	m_laserdisc->add_route(0, "lspeaker", 1.0);
-	m_laserdisc->add_route(1, "rspeaker", 1.0);
+	SPEAKER(config, "speaker", 2).front();
+	m_laserdisc->add_route(0, "speaker", 1.0, 0);
+	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 }
 
 

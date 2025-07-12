@@ -113,6 +113,8 @@
 #include "machine/i2cmem.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/upd7759.h"
 #include "sound/ymopl.h"
@@ -1341,8 +1343,6 @@ void bfcobra_state::ramdac_map(address_map &map)
     /IRQ provided by EF68850P at IC38
     /FIRQ connected to meter current sensing circuitry
 
-    TODO: Calculate watchdog timer period.
-
 ***************************************************************************/
 
 /* TODO */
@@ -1451,7 +1451,7 @@ void bfcobra_state::m6809_prog_map(address_map &map)
 //  map(0x3600, 0x3600).noprw();
 	map(0x3801, 0x3801).rw(FUNC(bfcobra_state::upd_r), FUNC(bfcobra_state::upd_w));
 	map(0x8000, 0xffff).rom();
-	map(0xf000, 0xf000).nopw();    /* Watchdog */
+	map(0xf000, 0xf000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 
 static INPUT_PORTS_START( bfcobra )
@@ -1459,7 +1459,7 @@ static INPUT_PORTS_START( bfcobra )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin: 10p")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin: 20p")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Coin: 50p")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("Coin: 1 pound")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME(u8"Coin: £1")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Green Test?") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Red Test?")
@@ -1471,9 +1471,9 @@ static INPUT_PORTS_START( bfcobra )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Collect") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bonus") PORT_CODE(KEYCODE_F)
-//  PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-//  PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-//  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("STROBE2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("<A")
@@ -1502,25 +1502,128 @@ static INPUT_PORTS_START( bfcobra )
 	PORT_BIT( 0xFF, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("STROBE6")
-	PORT_DIPNAME( 0x01, 0x00, "DIL09" )
+	PORT_DIPNAME( 0x01, 0x00, "DIL10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIL10" )
+	PORT_DIPNAME( 0x02, 0x00, "DIL11" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIL11" )
+	PORT_DIPNAME( 0x04, 0x00, "DIL12" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIL12" )
+	PORT_DIPNAME( 0x08, 0x00, "DIL13" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIL13" )
+	PORT_DIPNAME( 0x10, 0x00, "DIL14" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIL14" )
+	PORT_DIPNAME( 0x20, 0x00, "DIL15" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIL15" )
+	PORT_DIPNAME( 0x40, 0x00, "DIL16" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("STROBE7")
+	PORT_DIPNAME( 0x01, 0x00, "DIL02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL03" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL05" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL06" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL07" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("JOYSTICK")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( brainbox2 )
+	PORT_START("STROBE0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_NAME("Coin: 10p")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )   PORT_NAME("Coin: 20p")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )   PORT_NAME("Coin: 50p")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 )   PORT_NAME(u8"Coin: £1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Green Test") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START("STROBE1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Collect") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START )   PORT_NAME("Start")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+
+	PORT_START("STROBE2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 )  PORT_NAME("<A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 )  PORT_NAME("<B")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 )  PORT_NAME("<C")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON8 )  PORT_NAME("C>")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON9 )  PORT_NAME("B>")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("A>")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("STROBE3")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("STROBE4")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("STROBE5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Fitted") PORT_CODE(KEYCODE_H) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_INTERLOCK ) PORT_NAME("Cash box door") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Front Door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("STROBE6")
+	PORT_DIPNAME( 0x01, 0x00, "DIL10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL11" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL12" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL13" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL14" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL15" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL16" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1679,6 +1782,8 @@ void bfcobra_state::bfcobra(machine_config &config)
 	MC6809(config, m_audiocpu, M6809_XTAL); // MC6809P
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bfcobra_state::m6809_prog_map);
 	m_audiocpu->set_periodic_int(FUNC(bfcobra_state::timer_irq), attotime::from_hz(1000));
+
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2994,17 +3099,34 @@ ROM_START( brkball )
 	ROM_LOAD("ledv1.bin",  0x00000, 0x10000, CRC(ea918cb9) SHA1(9e7047613cf1cb4b9a7fefb8a02d8479a7b09e6a))
 ROM_END
 
+ROM_START( brainbox2 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "brainbox2-roma-114.bin", 0x08000, 0x8000, CRC(ecd2a1d1) SHA1(f9e77fb63f20748f644ab270b56a68e9e53b77f9) )
+
+	ROM_REGION( 0x200000, "user1", 0 )
+	ROM_LOAD( "brainbox2-rom0-228.bin", 0x000000, 0x80000, CRC(bf4e37b2) SHA1(6368f186cd40d8da83646e3d4bc1e46c0a76fb01) )
+	ROM_LOAD( "brainbox2-rom1-229.bin", 0x080000, 0x80000, CRC(a937de4e) SHA1(5b3cfe31cdc5b95f0813194bafd3d9a029e7acf5) )
+	ROM_LOAD( "brainbox2-rom2-230.bin", 0x100000, 0x80000, CRC(2fc1588f) SHA1(f973692c6902eeaca47ddc4db85d3651e9a96355) )
+	ROM_LOAD( "brainbox2-rom3-331.bin", 0x180000, 0x80000, CRC(c6e326f4) SHA1(c0fb2f262a0554e3314bf7729f95d98c8affa236) )
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "brainbox-snd1-231.bin", 0x00000, 0x10000, CRC(38768cbc) SHA1(858ee49ee3cd7b616050584549122b17128fe71c) )
+	ROM_LOAD( "brainbox-snd2-232.bin", 0x10000, 0x10000, CRC(131db39d) SHA1(3cd329d608a3af6fd8148294ccb6871fe525e59c) )
+ROM_END
+
+
 } // Anonymous namespace
 
 
-GAME( 1989, inquiztr,    0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.2)",                       MACHINE_NOT_WORKING )
-GAME( 1989, inquiztr12a, inquiztr,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.2, alt)",                  MACHINE_NOT_WORKING )
-GAME( 1989, inquiztr11,  inquiztr,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.1)",                       MACHINE_NOT_WORKING )
-GAME( 1990, escounts,    0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Every Second Counts (39-360-053)",        MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, trebltop,    0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Treble Top (39-360-070)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, beeline,     0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Beeline (39-360-075)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, quizvadr,    0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Quizvaders (39-360-078)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qos,         0,          bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosa,        qos,        bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosb,        qos,        bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1994, brkball,     0,          bfcobjam_with_dmd,brkball, bfcobjam_state,init_bfcobjam,ROT0, "BFM/ATOD", "Break Ball",                              MACHINE_IMPERFECT_GRAPHICS, layout_brkball )
+GAME( 1989, inquiztr,    0,          bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.2)",                       MACHINE_NOT_WORKING )
+GAME( 1989, inquiztr12a, inquiztr,   bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.2, alt)",                  MACHINE_NOT_WORKING )
+GAME( 1989, inquiztr11,  inquiztr,   bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.1)",                       MACHINE_NOT_WORKING )
+GAME( 1990, escounts,    0,          bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Every Second Counts (39-360-053)",        MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, trebltop,    0,          bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Treble Top (39-360-070)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, beeline,     0,          bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Beeline (39-360-075)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, quizvadr,    0,          bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Quizvaders (39-360-078)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qos,         0,          bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosa,        qos,        bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosb,        qos,        bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1994, brkball,     0,          bfcobjam_with_dmd,brkball,   bfcobjam_state,init_bfcobjam,ROT0, "BFM/ATOD", "Break Ball",                              MACHINE_IMPERFECT_GRAPHICS, layout_brkball )
+GAME( 1993, brainbox2,   0,          bfcobra,          brainbox2, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Brain Box II (Set 114)",                  MACHINE_IMPERFECT_GRAPHICS )

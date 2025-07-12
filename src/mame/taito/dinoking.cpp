@@ -11,7 +11,8 @@ TODO:
 
 Taito mid-2000s medal hardware
 
-Currently two games are dumped:
+Currently these games are dumped:
+Hello Kitty Koi no Shugoshin Uranai - ハローキティ 恋の守護神占い (2003) - K11J0958C - F19 ROM code
 Dinoking Kids - ダイノキングキッズ (2004) - K11J0985A - F39 ROM code
 Dinoking Battle - ダイノキングバトル (2005) - K11J0998A - F54 ROM code
 
@@ -162,14 +163,28 @@ void dinoking_state::dinoking(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::RGB_555);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	okim9810_device &oki(OKIM9810(config, "oki", XTAL(4'096'000)));
-	oki.add_route(0, "lspeaker", 0.80);
-	oki.add_route(1, "rspeaker", 0.80);
+	oki.add_route(0, "speaker", 0.80, 0);
+	oki.add_route(1, "speaker", 0.80, 1);
 }
 
+
+ROM_START( hkuranai ) // slightly different PCB, but mostly same components. Adds a printer.
+	ROM_REGION16_BE( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "f19-04.ic28", 0x000000, 0x200000, CRC(2e8e409f) SHA1(5845c4e5ea1d95d57f2a31bc590b98e09d74c5b4) ) // silkscreened PRG M27C160-120F1 on PCB
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_LOAD( "f19-01.ic18", 0x000000, 0x200000, CRC(260213f9) SHA1(128b21a7288d5386e286358d0bc57c4c6494f56a) ) // silkscreened CG-ROM1 MSM27C1602CZ on PCB
+	 // empty socket marked as CG-ROM2 MSM27C1602CZ on PCB at ic19
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "f19-03.ic20", 0x000000, 0x200000, CRC(5e844985) SHA1(6e31cab29d7e6754e345dac94551b59a700356db) ) // silkscreened PCM MSM27C1602CZ on PCB
+
+	ROM_REGION( 0x100000, "printer_font", 0 ) // on ALPS PTCBL11/21-MAIN PCB
+	ROM_LOAD( "165-02.u1", 0x000000, 0x100000, CRC(5a9e98ac) SHA1(fc7dd89abebbc32cd833f3abd3bbb10c5f5b790e) )
+ROM_END
 
 ROM_START( dkkids )
 	ROM_REGION16_BE( 0x200000, "maincpu", 0 )
@@ -196,5 +211,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004, dkkids,   0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Dinoking Kids",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2005, dkbattle, 0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Dinoking Battle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, hkuranai, 0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Hello Kitty Koi no Shugoshin Uranai", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, dkkids,   0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Dinoking Kids",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, dkbattle, 0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Dinoking Battle",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

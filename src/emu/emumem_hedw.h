@@ -17,7 +17,7 @@ public:
 	using mapping = typename handler_entry_write<Width, AddrShift>::mapping;
 
 	handler_entry_write_dispatch(address_space *space, const handler_entry::range &init, handler_entry_write<Width, AddrShift> *handler);
-	handler_entry_write_dispatch(address_space *space, memory_view &view);
+	handler_entry_write_dispatch(address_space *space, memory_view &view, offs_t addrstart, offs_t addrend);
 	handler_entry_write_dispatch(handler_entry_write_dispatch<HighBits, Width, AddrShift> *src);
 	~handler_entry_write_dispatch();
 
@@ -91,6 +91,8 @@ private:
 
 	handler_entry_write<Width, AddrShift> **m_u_dispatch;
 	handler_entry::range *m_u_ranges;
+
+	handler_entry::range m_global_range;
 
 	void populate_nomirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift> *handler);
 	void populate_mirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write<Width, AddrShift> *handler);

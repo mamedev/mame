@@ -7468,6 +7468,23 @@ Other stuff untested
 		</part>
 	</software>
 
+	<!-- DOS, Windows 95B, Windows 98, Windows Me, Windows 2000, Windows XP
+	     and El Torito bootable. -->
+	<software name="pmagic">
+		<description>PartitionMagic 8.05</description>
+		<year>2004</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="release" value="20040505" />
+		<info name="usage" value="Windows installer accepts any string starting with &quot;PM805EN1-&quot; for a product key." />
+		<info name="version" value="8.05" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="partitionmagic 8.05" sha1="f783735693288fa20c8d2d7a614a3d0674ede2bf" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!--                                         -->
 	<!--                Multimedia               -->
 	<!--                                         -->
@@ -7704,6 +7721,37 @@ Installation and Open Circulation CDs are bootable.
 			<feature name="part_id" value="Boot Floppy" />
 			<dataarea name="flop" size="1474560">
 				<rom name="FD13BOOT.img" size="1474560" crc="5c647576" sha1="ec08f57f36b0bbc4d2b7613dc0857f0b43fd08e5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos14">
+		<description>FreeDOS 1.4</description>
+		<year>2025</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.4" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="LiveCD" />
+			<diskarea name="cdrom">
+				<disk name="fd14live" sha1="05d928a57c1197a78f0503f8c56d3b63e5334a5e" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Legacy CD" />
+			<diskarea name="cdrom">
+				<disk name="fd14lgcy" sha1="e0c4ccec6b798811df2849f2d7112f95e29cd4e3" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Bonus CD" />
+			<diskarea name="cdrom">
+				<disk name="fd14bns" sha1="12b6f445a75d4b1bc236626631396efd638f2381" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot Floppy" />
+			<dataarea name="flop" size="1474560">
+				<rom name="FD14BOOT.img" size="1474560" crc="930a7c56" sha1="67581ee9c6b20d44599626c2a68939de85b5b4a9" />
 			</dataarea>
 		</part>
 	</software>
@@ -9475,6 +9523,24 @@ Installation and Open Circulation CDs are bootable.
 		</part>
 	</software>
 
+	<!-- Windows 9x/NT -->
+	<software name="dc10plus" supported="no">
+		<description>miroVIDEO Studio DC10 Plus (V. 1.04, 160657)</description>
+		<year>1998</year>
+		<publisher>Pinnacle Systems</publisher>
+		<notes><![CDATA[
+Video editing software for [ZR36067]-based PCI card, can also detect [DC30] and [DC50]
+Has an HW tester, DirectDraw fails to enable overlay with [ViRGE] Scenic Highway interface
+]]></notes>
+		<!-- Serial number: 3920519554 -->
+		<info name="language" value="Deutsch/Dutch/English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pinnacle-studio-dc10-plus" sha1="1530776b913e21774ade2b160960f2fe70bf4c6b"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<software name="div103b" supported="partial">
 		<description>DIV Games Studio (English, v1.03b)</description>
@@ -9697,7 +9763,7 @@ Contains software drivers for a ScanExpress 6000SP Flatbed Scanner, SCSI i/f
 		<description>Paranasal Sinuses &amp; Anterior Skull Base</description>
 		<year>1993</year>
 		<publisher>Elsevier Science B.V.</publisher>
-		<part name="cdrom" interface="cdi_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="paranasal sinuses &amp; anterior skull base (1993)(elsevier science b.v.)(windows 3.1 disc)" sha1="fddedb4f78bc5687d65f11fd4e18463e1fc4edda"/>
 			</diskarea>

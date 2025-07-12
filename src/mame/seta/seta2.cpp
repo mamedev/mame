@@ -88,6 +88,9 @@ funcube series:
 - Hacked to run, as they use a ColdFire CPU.
 - Pay-out key causes "unknown error" after coin count reaches 0.
 
+blnctry:
+- hook up sub CPU, inputs, sound
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -465,13 +468,15 @@ void seta2_state::reelquak_map(address_map &map)
                                 Namco Stars
 ***************************************************************************/
 
-// To be done:
+// TODO: very incomplete
 void seta2_state::namcostr_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                              // ROM
-	map(0x200000, 0x20ffff).ram();                                              // RAM
-	map(0xc00000, 0xc3ffff).ram().share(m_spriteram);                           // Sprites
-	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs); // Video Registers
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x21ffff).ram();                                                              // RAM
+	map(0x400006, 0x400007).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).nopw();
+	map(0x800000, 0x83ffff).ram().share(m_spriteram);                                           // Sprites
+	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
+	map(0x860000, 0x86003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs);                 // Video Registers
 }
 
 
@@ -2493,12 +2498,11 @@ void funcube_state::funcube(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM9810(config, m_oki, XTAL(4'096'000));
-	m_oki->add_route(0, "lspeaker", 0.80);
-	m_oki->add_route(1, "rspeaker", 0.80);
+	m_oki->add_route(0, "speaker", 0.80, 0);
+	m_oki->add_route(1, "speaker", 0.80, 1);
 }
 
 
@@ -2516,16 +2520,18 @@ void funcube_state::funcube2(machine_config &config)
 
 void seta2_state::namcostr(machine_config &config)
 {
-	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);   // !! TMP68301 !!
+	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::namcostr_map);
 	// does this have a ticket dispenser?
+
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(0x200, 0x200);
-	m_screen->set_visarea(0x40, 0x1c0-1, 0x00, 0xf0-1);
+	m_screen->set_visarea(0x01, 0x140, 0x00, 0xf0-1);
 	m_screen->set_screen_update(FUNC(seta2_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(seta2_state::screen_vblank));
 	m_screen->screen_vblank().append_inputline(m_maincpu, 0);
@@ -2535,12 +2541,11 @@ void seta2_state::namcostr(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM9810(config, m_oki, XTAL(4'096'000));
-	m_oki->add_route(0, "lspeaker", 0.80);
-	m_oki->add_route(1, "rspeaker", 0.80);
+	m_oki->add_route(0, "speaker", 0.80, 0);
+	m_oki->add_route(1, "speaker", 0.80, 1);
 }
 
 
@@ -3324,6 +3329,21 @@ void seta2_state::init_namcostr()
 	for (offs_t addr = 0x003b0; addr < 0x00400; addr += 2)
 		cpurom[addr / 2] &= 0xfbff;
 }
+
+ROM_START( blnctry ) // same exact PCB as Namco Stars + M144 EMI-DRIVE daughter board with H8/3007 and a MAX232 chip
+	ROM_REGION( 0x80000, "maincpu", 0 ) // TMP68301 Code
+	ROM_LOAD( "blt1mpro.u08", 0x00000, 0x80000, CRC(1d8752d7) SHA1(76f61a2841224653e9f1a2363938d0449c08027b) )
+
+	ROM_REGION( 0x10000, "sub", 0 )     // H8/3007 Code
+	ROM_LOAD( "blt1spr-0.ic3", 0x00000, 0x10000, CRC(cec19b16) SHA1(bc8a95942c6990030cfc11c7ce9f649a7e9b226f) ) // 111xxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x800000, "sprites", 0 )
+	ROM_LOAD32_WORD( "blt1cg0.u39", 0x000000, 0x400000, CRC(d24e223e) SHA1(0c49bb4d3219036029a43fd3a08cd409d93b316f) )
+	ROM_LOAD32_WORD( "blt1cg1.u38", 0x000002, 0x400000, CRC(cd594a58) SHA1(ede40089183b15a1439777170763a21648ef0e2e) )
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "blt1snd0.u40", 0x000000, 0x400000, CRC(3ab59b18) SHA1(149c4fe0c248f79bc00af8ef4946ca4edc93ba86) )
+ROM_END
 
 /***************************************************************************
 
@@ -4442,6 +4462,8 @@ GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state,    empty_init,
 GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Penguin Brothers (Japan)",                            MACHINE_NO_COCKTAIL )
 GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Hong Tian Lei (A-Blast) (Japan)",                     MACHINE_NO_COCKTAIL ) // 轟天雷/Hōng tiān léi
 GAME( 2000, ablastb,   penbros,  ablastb,  penbros,  seta2_state,    empty_init,    ROT0,   "bootleg",               "Hong Tian Lei (A-Blast) (bootleg)",                   MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // at least "tilemap sprite" scrolly flag differs, FPGA instead of x1-010
+
+GAME( 1998, blnctry,   0,        namcostr, funcube,  seta2_state,    empty_init,    ROT0,   "Namco",                 "Balance Try (Japan, ver 1.00)",                       MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
 
 GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state,    init_namcostr, ROT0,   "Namco",                 "Namco Stars",                                         MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
 

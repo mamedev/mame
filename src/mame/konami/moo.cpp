@@ -333,7 +333,7 @@ uint32_t moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitma
 	// There is probably a control bit somewhere to turn off alpha blending.
 	m_alpha_enabled = m_k054338->register_r(K338_REG_CONTROL) & K338_CTL_MIXPRI; // DUMMY
 
-	alpha = (m_alpha_enabled) ? m_k054338->set_alpha_level(1) : 255;
+	alpha = (m_alpha_enabled) ? m_k054338->set_alpha_level(1) & 0xff : 255;
 
 	if (alpha > 0)
 		m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[2], TILEMAP_DRAW_ALPHA(alpha), 4);
@@ -735,7 +735,7 @@ void moo_state::moo(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
@@ -754,16 +754,15 @@ void moo_state::moo(machine_config &config)
 	K054338(config, m_k054338, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	K054321(config, m_k054321, "lspeaker", "rspeaker");
+	K054321(config, m_k054321, "speaker");
 
-	YM2151(config, "ymsnd", XTAL(32'000'000)/8).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50); // 4MHz verified
+	YM2151(config, "ymsnd", XTAL(32'000'000)/8).add_route(0, "speaker", 0.50, 0).add_route(1, "speaker", 0.50, 1); // 4MHz verified
 
 	K054539(config, m_k054539, XTAL(18'432'000));
-	m_k054539->add_route(0, "rspeaker", 0.75);
-	m_k054539->add_route(1, "lspeaker", 0.75);
+	m_k054539->add_route(0, "speaker", 0.75, 0);
+	m_k054539->add_route(1, "speaker", 0.75, 1);
 }
 
 void moo_state::moobl(machine_config &config)
@@ -786,7 +785,7 @@ void moo_state::moobl(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
@@ -805,12 +804,11 @@ void moo_state::moobl(machine_config &config)
 	K054338(config, m_k054338, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 void moo_state::bucky(machine_config &config)

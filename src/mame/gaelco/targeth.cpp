@@ -95,6 +95,7 @@ public:
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
 		m_shareram(*this, "shareram"),
+		m_service(*this, "SERVICE"),
 		m_okibank(*this, "okibank")
 	{ }
 
@@ -110,6 +111,7 @@ private:
 	template <uint8_t Which> void coin_counter_w(int state);
 	void shareram_w(offs_t offset, uint8_t data);
 	uint8_t shareram_r(offs_t offset);
+	uint16_t service_mirror_r() { return m_service->read() << 8; }
 
 	void vram_w(offs_t offset, uint16_t data);
 
@@ -136,6 +138,7 @@ private:
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_shareram;
+	required_ioport m_service;
 
 	required_memory_bank m_okibank;
 
@@ -342,19 +345,20 @@ void targeth_state::main_map(address_map &map)
 	map(0x108004, 0x108005).portr("GUNX2");
 	map(0x108006, 0x108007).portr("GUNY2");
 	map(0x108000, 0x108007).writeonly().share(m_vregs);
-	map(0x10800c, 0x10800d).nopw();                    /* CLR Video INT */
+	map(0x10800c, 0x10800d).nopw();                                   // CLR Video INT
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x440000, 0x440fff).ram().share(m_spriteram);
 	map(0x700000, 0x700001).portr("DSW2");
 	map(0x700002, 0x700003).portr("DSW1");
-	map(0x700006, 0x700007).portr("SYSTEM");             // Coins, Start & Fire buttons
-	map(0x700008, 0x700009).portr("SERVICE");            // Service & Guns Reload?
+	map(0x700006, 0x700007).portr("SYSTEM");                          // Coins, Start & Fire buttons
+	map(0x700008, 0x700009).portr("SERVICE");                         // Service & Guns Reload?
+	map(0x70000a, 0x70000b).r(FUNC(targeth_state::service_mirror_r)); // quickshts reads the service switch here instead
 	map(0x70000a, 0x70000b).select(0x000070).w(FUNC(targeth_state::output_latch_w));
 	map(0x70000d, 0x70000d).w(FUNC(targeth_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x700010, 0x700011).nopw();                        // ??? Guns reload related?
-	map(0xfe0000, 0xfe7fff).ram();                                          // Work RAM
-	map(0xfe8000, 0xfeffff).ram().share(m_shareram);                     // Work RAM (shared with D5002FP)
+	map(0x700010, 0x700011).nopw();                                   // ??? Guns reload related?
+	map(0xfe0000, 0xfe7fff).ram();                                    // Work RAM
+	map(0xfe8000, 0xfeffff).ram().share(m_shareram);                  // Work RAM (shared with D5002FP)
 }
 
 
@@ -501,7 +505,7 @@ ROM_START( targeth )
 	ROM_LOAD16_BYTE( "th2_b_c_22.c22", 0x000001, 0x040000, CRC(d2435eb8) SHA1(ce75a115dad8019c8e66a1c3b3e15f54781f65ae) ) // The "B" was hand written
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
-	ROM_LOAD( "targeth_ds5002fp.bin", 0x00000, 0x8000, CRC(abcdfee4) SHA1(c5955d5dbbcecbe1c2ae77d59671ae40eb814d30) )
+	ROM_LOAD( "targeth_ds5002fp.bin", 0x0000, 0x8000, CRC(abcdfee4) SHA1(c5955d5dbbcecbe1c2ae77d59671ae40eb814d30) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD( "targeth_ds5002fp_scratch", 0x00, 0x80, CRC(c927bcb1) SHA1(86b5c7ee6a4a5f0aa538a6742253da1afadb4345) ) // default state so you don't have to manually initialize game
@@ -510,24 +514,24 @@ ROM_START( targeth )
 	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x200000, "gfx", 0 )
-	ROM_LOAD( "targeth.i13",    0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )
-	ROM_LOAD( "targeth.i11",    0x080000, 0x080000, CRC(6797faf9) SHA1(112cffe72f91cb46c262e19a47b0cab3237dd60f) )
-	ROM_LOAD( "targeth.i9",     0x100000, 0x080000, CRC(0e922c1c) SHA1(6920e345c82e76f7e0af6101f39eb65ac1f112b9) )
-	ROM_LOAD( "targeth.i7",     0x180000, 0x080000, CRC(d8b41000) SHA1(cbe91eb91bdc7a60b2333c6bea37d08a57902669) )
+	ROM_LOAD( "targeth.i13", 0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )
+	ROM_LOAD( "targeth.i11", 0x080000, 0x080000, CRC(6797faf9) SHA1(112cffe72f91cb46c262e19a47b0cab3237dd60f) )
+	ROM_LOAD( "targeth.i9",  0x100000, 0x080000, CRC(0e922c1c) SHA1(6920e345c82e76f7e0af6101f39eb65ac1f112b9) )
+	ROM_LOAD( "targeth.i7",  0x180000, 0x080000, CRC(d8b41000) SHA1(cbe91eb91bdc7a60b2333c6bea37d08a57902669) )
 
 	ROM_REGION( 0x100000, "oki", 0 )
-	ROM_LOAD( "targeth.c1",     0x000000, 0x080000, CRC(d6c9dfbc) SHA1(3ec70dea94fc89df933074012a52de6034571e87) )
+	ROM_LOAD( "targeth.c1", 0x000000, 0x080000, CRC(d6c9dfbc) SHA1(3ec70dea94fc89df933074012a52de6034571e87) )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
-	ROM_LOAD( "targeth.c3",     0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
+	ROM_LOAD( "targeth.c3", 0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
 ROM_END
 
 ROM_START( targetha )
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "th2_n_c_23.c23", 0x000000, 0x040000, CRC(b99b25dc) SHA1(1bf35b2c05a58f934d06eb6ef93f592d9f16344a) ) // The "N" was hand written
 	ROM_LOAD16_BYTE( "th2_n_c_22.c22", 0x000001, 0x040000, CRC(6d34f0cf) SHA1(f44a1231f4fac1f9d443990e8fe2b4aaa3f338be) ) // The "N" was hand written
 
-	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
-	ROM_LOAD( "targeth_ds5002fp.bin", 0x00000, 0x8000, CRC(abcdfee4) SHA1(c5955d5dbbcecbe1c2ae77d59671ae40eb814d30) )
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "targeth_ds5002fp.bin", 0x0000, 0x8000, CRC(abcdfee4) SHA1(c5955d5dbbcecbe1c2ae77d59671ae40eb814d30) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD( "targeth_ds5002fp_scratch", 0x00, 0x80, CRC(c927bcb1) SHA1(86b5c7ee6a4a5f0aa538a6742253da1afadb4345) ) // default state so you don't have to manually initialize game
@@ -536,15 +540,41 @@ ROM_START( targetha )
 	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x200000, "gfx", 0 )
-	ROM_LOAD( "targeth.i13",    0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )
-	ROM_LOAD( "targeth.i11",    0x080000, 0x080000, CRC(6797faf9) SHA1(112cffe72f91cb46c262e19a47b0cab3237dd60f) )
-	ROM_LOAD( "targeth.i9",     0x100000, 0x080000, CRC(0e922c1c) SHA1(6920e345c82e76f7e0af6101f39eb65ac1f112b9) )
-	ROM_LOAD( "targeth.i7",     0x180000, 0x080000, CRC(d8b41000) SHA1(cbe91eb91bdc7a60b2333c6bea37d08a57902669) )
+	ROM_LOAD( "targeth.i13", 0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )
+	ROM_LOAD( "targeth.i11", 0x080000, 0x080000, CRC(6797faf9) SHA1(112cffe72f91cb46c262e19a47b0cab3237dd60f) )
+	ROM_LOAD( "targeth.i9",  0x100000, 0x080000, CRC(0e922c1c) SHA1(6920e345c82e76f7e0af6101f39eb65ac1f112b9) )
+	ROM_LOAD( "targeth.i7",  0x180000, 0x080000, CRC(d8b41000) SHA1(cbe91eb91bdc7a60b2333c6bea37d08a57902669) )
 
 	ROM_REGION( 0x100000, "oki", 0 )
-	ROM_LOAD( "targeth.c1",     0x000000, 0x080000, CRC(d6c9dfbc) SHA1(3ec70dea94fc89df933074012a52de6034571e87) )
+	ROM_LOAD( "targeth.c1", 0x000000, 0x080000, CRC(d6c9dfbc) SHA1(3ec70dea94fc89df933074012a52de6034571e87) )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
-	ROM_LOAD( "targeth.c3",     0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
+	ROM_LOAD( "targeth.c3", 0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
+ROM_END
+
+ROM_START( targethb )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "zigurat_e_esc_25-oct-94_f616_27c020.bin", 0x000000, 0x040000, CRC(296085a6) SHA1(db917002c818ecdbff98946c5d46129036796141) )
+	ROM_LOAD16_BYTE( "zigurat_o_esc_25-oct-94_405d_27c020.bin", 0x000001, 0x040000, CRC(ef93a1cc) SHA1(2e008319880e2e3dd1f552acc283af69164eb74e) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "targeth_ds5002fp.bin", 0x0000, 0x8000, CRC(abcdfee4) SHA1(c5955d5dbbcecbe1c2ae77d59671ae40eb814d30) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD( "targeth_ds5002fp_scratch", 0x00, 0x80, CRC(c927bcb1) SHA1(86b5c7ee6a4a5f0aa538a6742253da1afadb4345) ) // default state so you don't have to manually initialize game
+	DS5002FP_SET_MON( 0x49 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_LOAD( "targeth.i13", 0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )
+	ROM_LOAD( "targeth.i11", 0x080000, 0x080000, CRC(6797faf9) SHA1(112cffe72f91cb46c262e19a47b0cab3237dd60f) )
+	ROM_LOAD( "targeth.i9",  0x100000, 0x080000, CRC(0e922c1c) SHA1(6920e345c82e76f7e0af6101f39eb65ac1f112b9) )
+	ROM_LOAD( "targeth.i7",  0x180000, 0x080000, CRC(d8b41000) SHA1(cbe91eb91bdc7a60b2333c6bea37d08a57902669) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "targeth.c1", 0x000000, 0x080000, CRC(d6c9dfbc) SHA1(3ec70dea94fc89df933074012a52de6034571e87) )
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+	ROM_LOAD( "targeth.c3", 0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
 ROM_END
 
 ROM_START( targeth10 )
@@ -553,7 +583,7 @@ ROM_START( targeth10 )
 	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x040000, CRC(24fe3efb) SHA1(8f48f08a6db28966c9263be119883c9179e349ed) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
-	ROM_LOAD( "targeth_ds5002fp.bin", 0x00000, 0x8000, CRC(abcdfee4) SHA1(c5955d5dbbcecbe1c2ae77d59671ae40eb814d30) )
+	ROM_LOAD( "targeth_ds5002fp.bin", 0x0000, 0x8000, CRC(abcdfee4) SHA1(c5955d5dbbcecbe1c2ae77d59671ae40eb814d30) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD( "targeth_ds5002fp_scratch", 0x00, 0x80, CRC(c927bcb1) SHA1(86b5c7ee6a4a5f0aa538a6742253da1afadb4345) ) // default state so you don't have to manually initialize game
@@ -562,20 +592,51 @@ ROM_START( targeth10 )
 	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x200000, "gfx", 0 )
-	ROM_LOAD( "targeth.i13",    0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )
-	ROM_LOAD( "targeth.i11",    0x080000, 0x080000, CRC(6797faf9) SHA1(112cffe72f91cb46c262e19a47b0cab3237dd60f) )
-	ROM_LOAD( "targeth.i9",     0x100000, 0x080000, CRC(0e922c1c) SHA1(6920e345c82e76f7e0af6101f39eb65ac1f112b9) )
-	ROM_LOAD( "targeth.i7",     0x180000, 0x080000, CRC(d8b41000) SHA1(cbe91eb91bdc7a60b2333c6bea37d08a57902669) )
+	ROM_LOAD( "targeth.i13", 0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )
+	ROM_LOAD( "targeth.i11", 0x080000, 0x080000, CRC(6797faf9) SHA1(112cffe72f91cb46c262e19a47b0cab3237dd60f) )
+	ROM_LOAD( "targeth.i9",  0x100000, 0x080000, CRC(0e922c1c) SHA1(6920e345c82e76f7e0af6101f39eb65ac1f112b9) )
+	ROM_LOAD( "targeth.i7",  0x180000, 0x080000, CRC(d8b41000) SHA1(cbe91eb91bdc7a60b2333c6bea37d08a57902669) )
 
 	ROM_REGION( 0x100000, "oki", 0 )
-	ROM_LOAD( "targeth.c1",     0x000000, 0x080000, CRC(d6c9dfbc) SHA1(3ec70dea94fc89df933074012a52de6034571e87) )
+	ROM_LOAD( "targeth.c1", 0x000000, 0x080000, CRC(d6c9dfbc) SHA1(3ec70dea94fc89df933074012a52de6034571e87) )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
-	ROM_LOAD( "targeth.c3",     0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
+	ROM_LOAD( "targeth.c3", 0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
+ROM_END
+
+ROM_START( quickshts )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "book_16-06_o_6f77_27c020.bin", 0x000001, 0x040000, CRC(9305509b) SHA1(aca1c468b9af2c56ca0d34dcbaa1b18f9c643250) )
+	ROM_LOAD16_BYTE( "book_16-06_e_7fd9_27c020.bin", 0x000000, 0x040000, CRC(74999de4) SHA1(ad735a8a5f0543d7419b3b34133982537b378ea4) )
+
+	// Either this isn't using a DS5002FP (but something else) or it expects a different ROM.
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "targeth_ds5002fp.bin", 0x0000, 0x8000, BAD_DUMP CRC(abcdfee4) SHA1(c5955d5dbbcecbe1c2ae77d59671ae40eb814d30) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD( "targeth_ds5002fp_scratch", 0x00, 0x80, BAD_DUMP CRC(c927bcb1) SHA1(86b5c7ee6a4a5f0aa538a6742253da1afadb4345) ) // default state so you don't have to manually initialize game
+	DS5002FP_SET_MON( 0x49 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_LOAD( "targeth.i13", 0x000000, 0x080000, CRC(b892be24) SHA1(9cccaaacf20e77c7358f0ceac60b8a1012f1216c) )
+	ROM_LOAD( "targeth.i11", 0x080000, 0x080000, CRC(6797faf9) SHA1(112cffe72f91cb46c262e19a47b0cab3237dd60f) )
+	ROM_LOAD( "targeth.i9",  0x100000, 0x080000, CRC(0e922c1c) SHA1(6920e345c82e76f7e0af6101f39eb65ac1f112b9) )
+	ROM_LOAD( "targeth.i7",  0x180000, 0x080000, CRC(d8b41000) SHA1(cbe91eb91bdc7a60b2333c6bea37d08a57902669) )
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "targeth.c1", 0x000000, 0x080000, CRC(d6c9dfbc) SHA1(3ec70dea94fc89df933074012a52de6034571e87) )
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+	ROM_LOAD( "targeth.c3", 0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 1994, targeth,   0,       targeth, targeth, targeth_state, empty_init, ROT0, "Gaelco", "Target Hits (ver 1.1, Checksum 5152)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, targetha,  targeth, targeth, targeth, targeth_state, empty_init, ROT0, "Gaelco", "Target Hits (ver 1.1, Checksum 86E1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, targeth10, targeth, targeth, targeth, targeth_state, empty_init, ROT0, "Gaelco", "Target Hits (ver 1.0, Checksum FBCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, targeth,   0,       targeth, targeth, targeth_state, empty_init, ROT0, "Gaelco", "Target Hits (ver 1.1, checksum 5152)", MACHINE_SUPPORTS_SAVE ) // 02/Nov/1994
+GAME( 1994, targetha,  targeth, targeth, targeth, targeth_state, empty_init, ROT0, "Gaelco", "Target Hits (ver 1.1, checksum 86E1)", MACHINE_SUPPORTS_SAVE ) // 27/Oct/1994
+GAME( 1994, targethb,  targeth, targeth, targeth, targeth_state, empty_init, ROT0, "Gaelco", "Target Hits (ver 1.1, checksum B1F7)", MACHINE_SUPPORTS_SAVE ) // 25/Oct/1994. Marked "Zigurat" internally at Gaelco
+GAME( 1994, targeth10, targeth, targeth, targeth, targeth_state, empty_init, ROT0, "Gaelco", "Target Hits (ver 1.0, checksum FBCB)", MACHINE_SUPPORTS_SAVE ) // 12/Jul/1994
+
+/* This is a strange set, it reports the DS5002 / Coprocessor as "Not Ready" but isn't using it for the usual protection (maybe only NVRAM storage, check)
+   It also reads the service port on a different address, could be it has a different co-processor entirely? */
+GAME( 1994, quickshts,  targeth, targeth, targeth, targeth_state, empty_init, ROT0, "Zero / Gaelco", "Quick Shots (ver 1.0, checksum AD0C)", MACHINE_SUPPORTS_SAVE ) // 16/Jun/1994. Marked "Book" internally at Gaelco

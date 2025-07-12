@@ -8,18 +8,18 @@
 #include "screen.h"
 
 
-#define POLY_FIFO_SIZE  32
+static constexpr unsigned POLY_FIFO_SIZE = 32;
 
 
 tc0780fpa_renderer::tc0780fpa_renderer(device_t &parent, screen_device &screen, const uint8_t *texture_ram)
 	: poly_manager<float, tc0780fpa_polydata, 6>(screen.machine())
 {
-	int width = screen.width();
-	int height = screen.height();
+	int const width = screen.width();
+	int const height = screen.height();
 
-	m_fb[0] = std::make_unique<bitmap_ind16>(width, height);
-	m_fb[1] = std::make_unique<bitmap_ind16>(width, height);
-	m_zb = std::make_unique<bitmap_ind16>(width, height);
+	m_fb[0].allocate(width, height);
+	m_fb[1].allocate(width, height);
+	m_zb.allocate(width, height);
 
 	m_texture = texture_ram;
 
@@ -28,9 +28,9 @@ tc0780fpa_renderer::tc0780fpa_renderer(device_t &parent, screen_device &screen, 
 	m_current_fb = 0;
 
 	// save state
-	parent.save_item(NAME(*m_fb[0]));
-	parent.save_item(NAME(*m_fb[1]));
-	parent.save_item(NAME(*m_zb));
+	parent.save_item(NAME(m_fb[0]));
+	parent.save_item(NAME(m_fb[1]));
+	parent.save_item(NAME(m_zb));
 }
 
 void tc0780fpa_renderer::swap_buffers()
@@ -39,26 +39,26 @@ void tc0780fpa_renderer::swap_buffers()
 
 	m_current_fb ^= 1;
 
-	m_fb[m_current_fb]->fill(0, m_cliprect);
-	m_zb->fill(0xffff, m_cliprect);
+	m_fb[m_current_fb].fill(0, m_cliprect);
+	m_zb.fill(0xffff, m_cliprect);
 }
 
 void tc0780fpa_renderer::draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	copybitmap_trans(bitmap, *m_fb[m_current_fb^1], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, m_fb[m_current_fb ^ 1], 0, 0, 0, 0, cliprect, 0);
 }
 
 void tc0780fpa_renderer::render_solid_scan(int32_t scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid)
 {
 	float z = extent.param[0].start;
-	int color = extent.param[1].start;
-	float dz = extent.param[0].dpdx;
-	uint16_t *const fb = &m_fb[m_current_fb]->pix(scanline);
-	uint16_t *const zb = &m_zb->pix(scanline);
+	int const color = extent.param[1].start;
+	float const dz = extent.param[0].dpdx;
+	uint16_t *const fb = &m_fb[m_current_fb].pix(scanline);
+	uint16_t *const zb = &m_zb.pix(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
-		int iz = (int)z & 0xffff;
+		int const iz = (int)z & 0xffff;
 
 		if (iz <= zb[x])
 		{
@@ -74,15 +74,15 @@ void tc0780fpa_renderer::render_shade_scan(int32_t scanline, const extent_t &ext
 {
 	float z = extent.param[0].start;
 	float color = extent.param[1].start;
-	float dz = extent.param[0].dpdx;
-	float dcolor = extent.param[1].dpdx;
-	uint16_t *const fb = &m_fb[m_current_fb]->pix(scanline);
-	uint16_t *const zb = &m_zb->pix(scanline);
+	float const dz = extent.param[0].dpdx;
+	float const dcolor = extent.param[1].dpdx;
+	uint16_t *const fb = &m_fb[m_current_fb].pix(scanline);
+	uint16_t *const zb = &m_zb.pix(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
-		int ic = (int)color & 0xffff;
-		int iz = (int)z & 0xffff;
+		int const ic = (int)color & 0xffff;
+		int const iz = (int)z & 0xffff;
 
 		if (iz <= zb[x])
 		{
@@ -101,23 +101,22 @@ void tc0780fpa_renderer::render_texture_scan(int32_t scanline, const extent_t &e
 	float u = extent.param[1].start;
 	float v = extent.param[2].start;
 	float color = extent.param[3].start;
-	float dz = extent.param[0].dpdx;
-	float du = extent.param[1].dpdx;
-	float dv = extent.param[2].dpdx;
-	float dcolor = extent.param[3].dpdx;
-	uint16_t *const fb = &m_fb[m_current_fb]->pix(scanline);
-	uint16_t *const zb = &m_zb->pix(scanline);
-	int tex_wrap_x = extradata.tex_wrap_x;
-	int tex_wrap_y = extradata.tex_wrap_y;
-	int tex_base_x = extradata.tex_base_x;
-	int tex_base_y = extradata.tex_base_y;
+	float const dz = extent.param[0].dpdx;
+	float const du = extent.param[1].dpdx;
+	float const dv = extent.param[2].dpdx;
+	float const dcolor = extent.param[3].dpdx;
+	uint16_t *const fb = &m_fb[m_current_fb].pix(scanline);
+	uint16_t *const zb = &m_zb.pix(scanline);
+	int const tex_wrap_x = extradata.tex_wrap_x;
+	int const tex_wrap_y = extradata.tex_wrap_y;
+	int const tex_base_x = extradata.tex_base_x;
+	int const tex_base_y = extradata.tex_base_y;
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		int iu, iv;
-		uint8_t texel;
-		int palette = ((int)color & 0x7f) << 8;
-		int iz = (int)z & 0xffff;
+		int const palette = ((int)color & 0x7f) << 8;
+		int const iz = (int)z & 0xffff;
 
 		if (!tex_wrap_x)
 		{
@@ -137,7 +136,7 @@ void tc0780fpa_renderer::render_texture_scan(int32_t scanline, const extent_t &e
 			iv = (tex_base_y + (((int)v >> 4) & ((0x08 << tex_wrap_y) - 1))) & 0x7ff;
 		}
 
-		texel = m_texture[(iv * 2048) + iu];
+		uint8_t const texel = m_texture[(iv << 11) + iu];
 
 		if (iz <= zb[x] && texel != 0)
 		{
@@ -157,7 +156,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 {
 	vertex_t vert[4];
 
-	uint16_t cmd = polygon_fifo[0];
+	uint16_t const cmd = polygon_fifo[0];
 
 	int ptr = 1;
 	switch (cmd & 0x7)
@@ -165,24 +164,22 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 		// screen global clipping for 3d(?)
 		case 0x00:
 		{
-			uint16_t min_x,min_y,min_z,max_x,max_y,max_z;
+			uint16_t const min_x = polygon_fifo[ptr+1];
+			uint16_t const min_y = polygon_fifo[ptr+0];
+			uint16_t const min_z = polygon_fifo[ptr+2];
+			uint16_t const max_x = polygon_fifo[ptr+4];
+			uint16_t const max_y = polygon_fifo[ptr+3];
+			uint16_t const max_z = polygon_fifo[ptr+5];
 
-			min_x = polygon_fifo[ptr+1];
-			min_y = polygon_fifo[ptr+0];
-			min_z = polygon_fifo[ptr+2];
-			max_x = polygon_fifo[ptr+4];
-			max_y = polygon_fifo[ptr+3];
-			max_z = polygon_fifo[ptr+5];
-
-			if(min_x != 0 || min_y != 0 || min_z != 0 || max_x != 512 || max_y != 400 || max_z != 0x7fff)
+			if (min_x != 0 || min_y != 0 || min_z != 0 || max_x != 512 || max_y != 400 || max_z != 0x7fff)
 			{
-				printf("CMD %04x\n",cmd);
-				printf("MIN Y %04x\n",polygon_fifo[ptr+0]);
-				printf("MIN X %04x\n",polygon_fifo[ptr+1]);
-				printf("MIN Z %04x\n",polygon_fifo[ptr+2]);
-				printf("MAX Y %04x\n",polygon_fifo[ptr+3]);
-				printf("MAX X %04x\n",polygon_fifo[ptr+4]);
-				printf("MAX Z %04x\n",polygon_fifo[ptr+5]);
+				printf("CMD %04x\n", cmd);
+				printf("MIN Y %04x\n", polygon_fifo[ptr+0]);
+				printf("MIN X %04x\n", polygon_fifo[ptr+1]);
+				printf("MIN Z %04x\n", polygon_fifo[ptr+2]);
+				printf("MAX Y %04x\n", polygon_fifo[ptr+3]);
+				printf("MAX X %04x\n", polygon_fifo[ptr+4]);
+				printf("MAX Z %04x\n", polygon_fifo[ptr+5]);
 			}
 
 			swap_buffers();
@@ -206,7 +203,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			// 0x0b: Vertex 3 X
 			// 0x0c: Vertex 3 Z
 
-			for (int i=0; i < 3; i++)
+			for (int i = 0; i < 3; i++)
 			{
 				vert[i].p[1] = polygon_fifo[ptr++];
 				vert[i].y =  (int16_t)(polygon_fifo[ptr++]);
@@ -255,7 +252,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			// 0x13: Vertex 3 Z
 
 			tc0780fpa_polydata &extra = object_data().next();
-			uint16_t texbase = polygon_fifo[ptr++];
+			uint16_t const texbase = polygon_fifo[ptr++];
 
 			extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
 			extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
@@ -263,7 +260,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			extra.tex_wrap_x = (cmd >> 6) & 3;
 			extra.tex_wrap_y = (cmd >> 4) & 3;
 
-			for (int i=0; i < 3; i++)
+			for (int i = 0; i < 3; i++)
 			{
 				vert[i].p[3] = polygon_fifo[ptr++] + 0.5; // palette
 				vert[i].p[2] = (int16_t)(polygon_fifo[ptr++]);
@@ -301,7 +298,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			// 0x0f: Vertex 4 X
 			// 0x10: Vertex 4 Z
 
-			for (int i=0; i < 4; i++)
+			for (int i = 0; i < 4; i++)
 			{
 				vert[i].p[1] = polygon_fifo[ptr++];
 				vert[i].y =  (int16_t)(polygon_fifo[ptr++]);
@@ -357,7 +354,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			// 0x19: Vertex 4 Z
 
 			tc0780fpa_polydata &extra = object_data().next();
-			uint16_t texbase = polygon_fifo[ptr++];
+			uint16_t const texbase = polygon_fifo[ptr++];
 
 			extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
 			extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
@@ -365,7 +362,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			extra.tex_wrap_x = (cmd >> 6) & 3;
 			extra.tex_wrap_y = (cmd >> 4) & 3;
 
-			for (int i=0; i < 4; i++)
+			for (int i = 0; i < 4; i++)
 			{
 				vert[i].p[3] = polygon_fifo[ptr++] + 0.5; // palette
 				vert[i].p[2] = (int16_t)(polygon_fifo[ptr++]);
@@ -384,7 +381,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 
 		default:
 		{
-			printf("tc0780fpa::render(): unknown command %04X %d, %d\n", cmd,ptr,length);
+			printf("tc0780fpa::render(): unknown command %04X %d, %d\n", cmd, ptr, length);
 			break;
 		}
 	}
@@ -457,10 +454,10 @@ void tc0780fpa_device::tex_addr_w(uint16_t data)
 
 void tc0780fpa_device::tex_w(uint16_t data)
 {
-	int x = ((m_tex_offset >> 0) & 0x1f) | ((m_tex_offset >> 5) & 0x20);
-	int y = ((m_tex_offset >> 5) & 0x1f) | ((m_tex_offset >> 6) & 0x20);
+	int const x = ((m_tex_offset >> 0) & 0x1f) | ((m_tex_offset >> 5) & 0x20);
+	int const y = ((m_tex_offset >> 5) & 0x1f) | ((m_tex_offset >> 6) & 0x20);
 
-	int index = (((m_texbase_y * 32) + y) * 2048) + ((m_texbase_x * 32) + x);
+	int const index = (((m_texbase_y << 5) + y) << 11) + ((m_texbase_x << 5) + x);
 	m_texture[index] = data & 0xff;
 
 	m_tex_offset++;
@@ -472,7 +469,7 @@ void tc0780fpa_device::poly_fifo_w(uint16_t data)
 	m_poly_fifo[m_poly_fifo_ptr++] = data;
 
 	static const int cmd_length[8] = { 7, 13, -1, 20, 17, -1, 26, -1 };
-	uint16_t cmd = m_poly_fifo[0] & 0x7;
+	uint16_t const cmd = m_poly_fifo[0] & 0x7;
 
 	if (m_poly_fifo_ptr >= cmd_length[cmd])
 	{

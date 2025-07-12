@@ -75,7 +75,9 @@ inline std::pair<std::uintptr_t, std::uintptr_t> resolve_member_function(Ret (T:
 	}
 	else
 	{
-		return std::make_pair(std::uintptr_t(static_cast<void (*)()>(nullptr)), std::uintptr_t(nullptr));
+		return std::make_pair(
+				std::uintptr_t(static_cast<void (*)()>(nullptr)),
+				std::uintptr_t(static_cast<void *>(nullptr)));
 	}
 }
 
@@ -96,7 +98,9 @@ inline std::pair<std::uintptr_t, std::uintptr_t> resolve_member_function(Ret (T:
 	}
 	else
 	{
-		return std::make_pair(std::uintptr_t(static_cast<void (*)()>(nullptr)), std::uintptr_t(nullptr));
+		return std::make_pair(
+				std::uintptr_t(static_cast<void (*)()>(nullptr)),
+				std::uintptr_t(static_cast<void *>(nullptr)));
 	}
 }
 

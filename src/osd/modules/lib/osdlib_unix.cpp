@@ -17,8 +17,10 @@
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <iomanip>
 #include <memory>
+#include <string_view>
 
 #include <dlfcn.h>
 #include <sys/mman.h>
@@ -60,13 +62,52 @@ void osd_process_kill()
 
 void osd_break_into_debugger(const char *message)
 {
-#ifdef MAME_DEBUG
-	printf("MAME exception: %s\n", message);
-	printf("Attempting to fall into debugger\n");
-	kill(getpid(), SIGTRAP);
+#if defined(__linux__)
+	bool do_break = false;
+	FILE *const f = std::fopen("/proc/self/status", "r");
+	if (f)
+	{
+		using namespace std::literals;
+
+		std::string_view const tag = "TracerPid:\t"sv;
+		char buf[128];
+		bool ignore = false;
+		while (std::fgets(buf, std::size(buf), f))
+		{
+			// ignore excessively long lines
+			auto const len = strnlen(buf, std::size(buf));
+			bool const noeol = !len || ('\n' != buf[len - 1]);
+			if (ignore || noeol)
+			{
+				ignore = noeol;
+				continue;
+			}
+
+			if (!std::strncmp(buf, tag.data(), tag.length()))
+			{
+				long tpid;
+				if ((std::sscanf(buf + tag.length(), "%ld", &tpid) == 1) && (0 != tpid))
+					do_break = true;
+				break;
+			}
+		}
+		std::fclose(f);
+	}
+#elif defined(MAME_DEBUG)
+	bool const do_break = true;
 #else
-	printf("Ignoring MAME exception: %s\n", message);
+	bool const do_break = false;
 #endif
+	if (do_break)
+	{
+		printf("MAME exception: %s\n", message);
+		printf("Attempting to fall into debugger\n");
+		kill(getpid(), SIGTRAP);
+	}
+	else
+	{
+		printf("Ignoring MAME exception: %s\n", message);
+	}
 }
 
 

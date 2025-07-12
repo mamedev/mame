@@ -3061,14 +3061,18 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 						{  // check if conforming, these are always readable, regardless of privilege
 							if(!(seg.flags & 0x04))
 							{
-								// if not conforming, then we must check privilege levels (TODO: current privilege level check)
-								if(((seg.flags >> 5) & 0x03) < (address & 0x03))
+								// if not conforming, then we must check privilege levels
+								if(((seg.flags >> 5) & 0x03) < std::max(m_CPL, (uint8_t)(address & 0x03)))
 									result = 0;
 							}
 						}
 					}
+					else
+					{
+						if(((seg.flags >> 5) & 0x03) < std::max(m_CPL, (uint8_t)(address & 0x03)))
+							result = 0;
+					}
 				}
-				// check that the descriptor privilege is greater or equal to the selector's privilege level and the current privilege (TODO)
 				SetZF(result);
 			}
 			else
@@ -3108,8 +3112,7 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 							result = 0;
 					}
 				}
-				// check that the descriptor privilege is greater or equal to the selector's privilege level and the current privilege (TODO)
-				if(((seg.flags >> 5) & 0x03) < (address & 0x03))
+				if(((seg.flags >> 5) & 0x03) < std::max(m_CPL, (uint8_t)(address & 0x03)))
 					result = 0;
 				SetZF(result);
 			}
@@ -3548,47 +3551,52 @@ void i386_device::i386_retf_i32()          // Opcode 0xca
 	CYCLES(CYCLES_RET_IMM_INTERSEG);
 }
 
-void i386_device::i386_load_far_pointer32(int s)
+bool i386_device::i386_load_far_pointer32(int s)
 {
 	uint8_t modrm = FETCH();
 	uint16_t selector;
+	bool fault = false;
 
 	if( modrm >= 0xc0 ) {
 		report_invalid_modrm("load_far_pointer32", modrm);
+		return false;
 	} else {
 		uint32_t ea = GetEA(modrm,0);
-		STORE_REG32(modrm, READ32(ea + 0));
+		uint32_t val = READ32(ea + 0);
 		selector = READ16(ea + 4);
-		i386_sreg_load(selector,s,nullptr);
+		i386_sreg_load(selector,s,&fault);
+		if(!fault)
+			STORE_REG32(modrm, val);
 	}
+	return !fault;
 }
 
 void i386_device::i386_lds32()             // Opcode 0xc5
 {
-	i386_load_far_pointer32(DS);
-	CYCLES(CYCLES_LDS);
+	if(i386_load_far_pointer32(DS))
+		CYCLES(CYCLES_LDS);
 }
 
 void i386_device::i386_lss32()             // Opcode 0x0f 0xb2
 {
-	i386_load_far_pointer32(SS);
-	CYCLES(CYCLES_LSS);
+	if(i386_load_far_pointer32(SS))
+		CYCLES(CYCLES_LSS);
 }
 
 void i386_device::i386_les32()             // Opcode 0xc4
 {
-	i386_load_far_pointer32(ES);
-	CYCLES(CYCLES_LES);
+	if(i386_load_far_pointer32(ES))
+		CYCLES(CYCLES_LES);
 }
 
 void i386_device::i386_lfs32()             // Opcode 0x0f 0xb4
 {
-	i386_load_far_pointer32(FS);
-	CYCLES(CYCLES_LFS);
+	if(i386_load_far_pointer32(FS))
+		CYCLES(CYCLES_LFS);
 }
 
 void i386_device::i386_lgs32()             // Opcode 0x0f 0xb5
 {
-	i386_load_far_pointer32(GS);
-	CYCLES(CYCLES_LGS);
+	if(i386_load_far_pointer32(GS))
+		CYCLES(CYCLES_LGS);
 }

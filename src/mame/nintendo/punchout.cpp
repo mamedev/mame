@@ -652,16 +652,15 @@ void punchout_state::punchout(machine_config &config)
 	bottom.set_palette(m_palette);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 	GENERIC_LATCH_8(config, "soundlatch2");
 
 	VLM5030(config, m_vlm, RP2A03_NTSC_XTAL/6);
 	m_vlm->set_addrmap(0, &punchout_state::punchout_vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_vlm->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_audiocpu->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 }
 
 

@@ -14,7 +14,7 @@
     - SCSI
     - Support newer variant
     - DAWR
-    - Data corruption when installing WB31
+    - Rev 1: Data corruption when installing WB31
     - FIFO?
 
 ***************************************************************************/
@@ -35,10 +35,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(AMIGA_DMAC, amiga_dmac_device, "amiga_dmac", "Amiga DMAC DMA Controller")
+DEFINE_DEVICE_TYPE(AMIGA_DMAC_REV1, amiga_dmac_rev1_device, "amiga_dmac_rev1", "Amiga DMAC Rev. 1 DMA Controller")
+DEFINE_DEVICE_TYPE(AMIGA_DMAC_REV2, amiga_dmac_rev2_device, "amiga_dmac_rev2", "Amiga DMAC Rev. 2 DMA Controller")
 
-amiga_dmac_device::amiga_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, AMIGA_DMAC, tag, owner, clock),
+amiga_dmac_device::amiga_dmac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool rev1) :
+	device_t(mconfig, type, tag, owner, clock),
 	amiga_autoconfig(),
 	m_cfgout_cb(*this),
 	m_int_cb(*this),
@@ -46,6 +47,8 @@ amiga_dmac_device::amiga_dmac_device(const machine_config &mconfig, const char *
 	m_css_write_cb(*this),
 	m_csx0_read_cb(*this, 0),
 	m_csx0_write_cb(*this),
+	m_csx0_a4_read_cb(*this, 0),
+	m_csx0_a4_write_cb(*this),
 	m_csx1_read_cb(*this, 0),
 	m_csx1_write_cb(*this),
 	m_sdack_read_cb(*this, 0),
@@ -56,6 +59,7 @@ amiga_dmac_device::amiga_dmac_device(const machine_config &mconfig, const char *
 	m_space(nullptr),
 	m_ram(nullptr),
 	m_ram_size(-1),
+	m_rev1(rev1),
 	m_cntr(0),
 	m_istr(0),
 	m_wtc(0),
@@ -70,6 +74,16 @@ amiga_dmac_device::amiga_dmac_device(const machine_config &mconfig, const char *
 {
 }
 
+amiga_dmac_rev1_device::amiga_dmac_rev1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	amiga_dmac_device(mconfig, AMIGA_DMAC_REV1, tag, owner, clock, true)
+{
+}
+
+amiga_dmac_rev2_device::amiga_dmac_rev2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	amiga_dmac_device(mconfig, AMIGA_DMAC_REV2, tag, owner, clock, false)
+{
+}
+
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -80,13 +94,14 @@ void amiga_dmac_device::map(address_map &map)
 	map(0x0000, 0x003f).rw(FUNC(amiga_dmac_device::autoconfig_r), FUNC(amiga_dmac_device::autoconfig_w));
 	map(0x0040, 0x0041).r(FUNC(amiga_dmac_device::istr_r));
 	map(0x0042, 0x0043).rw(FUNC(amiga_dmac_device::cntr_r), FUNC(amiga_dmac_device::cntr_w));
-	map(0x0080, 0x0081).w(FUNC(amiga_dmac_device::wtc_hi_w));
-	map(0x0082, 0x0083).w(FUNC(amiga_dmac_device::wtc_lo_w));
+	map(0x0080, 0x0081).w(FUNC(amiga_dmac_device::wtc_hi_w)); // read?
+	map(0x0082, 0x0083).w(FUNC(amiga_dmac_device::wtc_lo_w)); // read?
 	map(0x0084, 0x0085).w(FUNC(amiga_dmac_device::acr_hi_w));
 	map(0x0086, 0x0087).w(FUNC(amiga_dmac_device::acr_lo_w));
 	map(0x008e, 0x008f).w(FUNC(amiga_dmac_device::dawr_w));
 	map(0x0090, 0x0093).rw(FUNC(amiga_dmac_device::css_r), FUNC(amiga_dmac_device::css_w)).umask16(0x00ff);
 	map(0x00a0, 0x00a7).rw(FUNC(amiga_dmac_device::csx0_r), FUNC(amiga_dmac_device::csx0_w)).umask16(0x00ff);
+	map(0x00b0, 0x00bf).rw(FUNC(amiga_dmac_device::csx0_a4_r), FUNC(amiga_dmac_device::csx0_a4_w)).umask16(0x00ff); // a4 + csx0
 	map(0x00c0, 0x00c7).rw(FUNC(amiga_dmac_device::csx1_r), FUNC(amiga_dmac_device::csx1_w)).umask16(0x00ff);
 	map(0x00e0, 0x00e1).rw(FUNC(amiga_dmac_device::st_dma_r), FUNC(amiga_dmac_device::st_dma_w));
 	map(0x00e2, 0x00e3).rw(FUNC(amiga_dmac_device::sp_dma_r), FUNC(amiga_dmac_device::sp_dma_w));
@@ -189,6 +204,8 @@ TIMER_CALLBACK_MEMBER(amiga_dmac_device::update_dma)
 				{
 					LOGMASKED(LOG_DMA, "Terminal count\n");
 
+					stop_dma();
+
 					m_istr |= ISTR_E_INT;
 					update_interrupts();
 				}
@@ -267,7 +284,7 @@ void amiga_dmac_device::acr_lo_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	LOGMASKED(LOG_REGS, "acr_lo_w: %04x & %04x\n", data, mem_mask);
 
 	m_acr &= 0xffff0000 & (~mem_mask);
-	m_acr |= (data & mem_mask) & 0xfffc; // 0xfffe for rev 2
+	m_acr |= (data & mem_mask) & (m_rev1 ? 0xfffc : 0xfffe);
 }
 
 void amiga_dmac_device::dawr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -280,67 +297,39 @@ uint8_t amiga_dmac_device::css_r(offs_t offset) { return m_css_read_cb(offset); 
 void amiga_dmac_device::css_w(offs_t offset, uint8_t data) { m_css_write_cb(offset, data); }
 uint8_t amiga_dmac_device::csx0_r(offs_t offset) { return m_csx0_read_cb(offset); }
 void amiga_dmac_device::csx0_w(offs_t offset, uint8_t data) { m_csx0_write_cb(offset, data); }
+uint8_t amiga_dmac_device::csx0_a4_r(offs_t offset) { return m_csx0_a4_read_cb(offset); }
+void amiga_dmac_device::csx0_a4_w(offs_t offset, uint8_t data) { m_csx0_a4_write_cb(offset, data); }
 uint8_t amiga_dmac_device::csx1_r(offs_t offset) { return m_csx1_read_cb(offset); }
 void amiga_dmac_device::csx1_w(offs_t offset, uint8_t data) { m_csx1_write_cb(offset, data); }
 
-uint16_t amiga_dmac_device::st_dma_r(offs_t offset, uint16_t mem_mask)
+void amiga_dmac_device::st_dma()
 {
-	LOGMASKED(LOG_DMA, "st_dma_r\n");
-
-	start_dma();
-	return 0;
-}
-
-void amiga_dmac_device::st_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	LOGMASKED(LOG_DMA, "st_dma_w\n");
-
+	LOGMASKED(LOG_DMA, "st_dma\n");
 	start_dma();
 }
 
-uint16_t amiga_dmac_device::sp_dma_r(offs_t offset, uint16_t mem_mask)
+void amiga_dmac_device::sp_dma()
 {
-	LOGMASKED(LOG_DMA, "sp_dma_r\n");
-
-	stop_dma();
-	return 0;
-}
-
-void amiga_dmac_device::sp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	LOGMASKED(LOG_REGS, "sp_dma_w\n");
-
+	LOGMASKED(LOG_DMA, "sp_dma\n");
 	stop_dma();
 }
 
-uint16_t amiga_dmac_device::cint_r(offs_t offset, uint16_t mem_mask)
+void amiga_dmac_device::cint()
 {
-	LOGMASKED(LOG_INT, "cint_r\n");
-
-	m_istr = 0;
-	update_interrupts();
-
-	return 0;
-}
-
-void amiga_dmac_device::cint_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	LOGMASKED(LOG_INT, "cint_w\n");
-
+	LOGMASKED(LOG_DMA, "cint\n");
 	m_istr = 0;
 	update_interrupts();
 }
 
-uint16_t amiga_dmac_device::flush_r(offs_t offset, uint16_t mem_mask)
+void amiga_dmac_device::flush()
 {
-	LOGMASKED(LOG_REGS, "flush_r\n");
+	LOGMASKED(LOG_DMA, "flush\n");
 
-	return 0;
-}
-
-void amiga_dmac_device::flush_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	LOGMASKED(LOG_REGS, "flush_w\n");
+	if (!m_rev1)
+	{
+		m_istr &= ~ISTR_FF_FLG;
+		m_istr |= ISTR_FE_FLG;
+	}
 }
 
 void amiga_dmac_device::ramsz_w(int state)
@@ -486,7 +475,7 @@ void amiga_dmac_device::configin_w(int state)
 		autoconfig_multi_device(false);
 		autoconfig_8meg_preferred(false);
 		autoconfig_can_shutup(true);
-		autoconfig_product(2); // or 3 for rev 2
+		autoconfig_product(m_rev1 ? 2 : 3);
 		autoconfig_manufacturer(514);
 		autoconfig_serial(0x00000000);
 	}

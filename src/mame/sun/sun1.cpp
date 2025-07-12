@@ -76,7 +76,7 @@ class sun1_state : public driver_device
 public:
 	sun1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_bus(*this, "slot")
+		, m_bus(*this, "bus")
 	{
 	}
 
@@ -108,13 +108,13 @@ void sun1_state::sun1(machine_config &config)
 	MULTIBUS(config, m_bus, 19.6608_MHz_XTAL / 2);
 
 	// slot 1 is physically located at top, only slots 1-3 have P2
-	MULTIBUS_SLOT(config, "slot:1", sun1_cards, nullptr, false); // memory expansion 2
-	MULTIBUS_SLOT(config, "slot:2", sun1_cards, nullptr, false); // memory expansion 1
-	MULTIBUS_SLOT(config, "slot:3", sun1_cards, "sun1cpu", false); // processor
-	MULTIBUS_SLOT(config, "slot:4", sun1_cards, nullptr, false); // bus master 1
-	MULTIBUS_SLOT(config, "slot:5", sun1_cards, nullptr, false); // bus master 2
-	MULTIBUS_SLOT(config, "slot:6", sun1_cards, nullptr, false); // multibus memory, optional
-	MULTIBUS_SLOT(config, "slot:7", sun1_cards, nullptr, false); // graphics
+	MULTIBUS_SLOT(config, "slot1", m_bus, sun1_cards, nullptr, false); // memory expansion 2
+	MULTIBUS_SLOT(config, "slot2", m_bus, sun1_cards, nullptr, false); // memory expansion 1
+	MULTIBUS_SLOT(config, "slot3", m_bus, sun1_cards, "sun1cpu", false); // processor
+	MULTIBUS_SLOT(config, "slot4", m_bus, sun1_cards, nullptr, false); // bus master 1
+	MULTIBUS_SLOT(config, "slot5", m_bus, sun1_cards, nullptr, false); // bus master 2
+	MULTIBUS_SLOT(config, "slot6", m_bus, sun1_cards, nullptr, false); // multibus memory, optional
+	MULTIBUS_SLOT(config, "slot7", m_bus, sun1_cards, nullptr, false); // graphics
 }
 
 ROM_START(sun1)

@@ -20,7 +20,7 @@ namespace osd::debugger::win {
 class disasmbasewin_info : public editwin_info
 {
 public:
-	disasmbasewin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);
+	disasmbasewin_info(debugger_windows_interface &debugger, bool is_main_console, int viewidx, LPCSTR title, WNDPROC handler);
 	virtual ~disasmbasewin_info();
 
 	virtual bool handle_key(WPARAM wparam, LPARAM lparam) override;

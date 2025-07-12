@@ -1711,7 +1711,7 @@ ROM_END
 
 void model1_state::model1(machine_config &config)
 {
-	V60(config, m_maincpu, 16000000);
+	V60(config, m_maincpu, 32_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model1_state::model1_mem);
 	m_maincpu->set_addrmap(AS_IO, &model1_state::model1_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(model1_state::irq_callback));
@@ -1723,7 +1723,7 @@ void model1_state::model1(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(model1_state::model1_interrupt), "screen", 0, 1);
 
-	MB86233(config, m_tgp_copro, 16000000);
+	MB86233(config, m_tgp_copro, 40_MHz_XTAL);
 	m_tgp_copro->set_addrmap(AS_PROGRAM, &model1_state::copro_prog_map);
 	m_tgp_copro->set_addrmap(AS_DATA, &model1_state::copro_data_map);
 	m_tgp_copro->set_addrmap(AS_IO, &model1_state::copro_io_map);

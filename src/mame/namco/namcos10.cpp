@@ -1101,15 +1101,14 @@ void namcos10_state::namcos10_base(machine_config &config)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// CXD2938Q; SPU with CD-ROM controller - also seen in PSone, 101.4912MHz / 2
 	// TODO: This must be replaced with a proper CXD2938Q device, CD-ROM functionality of chip not used
 	spu_device &spu(SPU(config, "spu", XTAL(101'491'200)/2, m_maincpu.target()));
 	spu.set_stream_flags(STREAM_SYNCHRONOUS);
-	spu.add_route(0, "lspeaker", 0.75);
-	spu.add_route(1, "rspeaker", 0.75);
+	spu.add_route(0, "speaker", 0.75, 0);
+	spu.add_route(1, "speaker", 0.75, 1);
 
 	// TODO: Trace main PCB to see where JAMMA I/O goes and/or how int10 can be triggered (SM10MA3?)
 	m_io_update_interrupt.bind().set("maincpu:irq", FUNC(psxirq_device::intin10));
@@ -2899,8 +2898,8 @@ void namcos10_memp3_state::namcos10_memp3_base(machine_config &config)
 	});
 
 	LC82310(config, m_lc82310, XTAL(16'934'400));
-	m_lc82310->add_route(0, "lspeaker", 1.0);
-	m_lc82310->add_route(1, "rspeaker", 1.0);
+	m_lc82310->add_route(0, "speaker", 1.0, 0);
+	m_lc82310->add_route(1, "speaker", 1.0, 1);
 }
 
 void namcos10_memp3_state::machine_start()

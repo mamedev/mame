@@ -480,7 +480,7 @@ u16 toaplan1_state::scroll_regs_r(offs_t offset)
 		case 03:
 		case 05:
 		case 07: scroll = m_scrolly[layer]; break;
-		default: 
+		default:
 			if (!machine().side_effects_disabled())
 				logerror("Hmmm, reading unknown video scroll register (%02x) !!!\n",offset);
 			break;

@@ -469,8 +469,7 @@ void tecmosys_state::tecmosys(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x4000+0x800);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
@@ -480,19 +479,19 @@ void tecmosys_state::tecmosys(machine_config &config)
 
 	ymf262_device &ymf(YMF262(config, "ymf", XTAL(14'318'181)));
 	ymf.irq_handler().set_inputline("audiocpu", 0);
-	ymf.add_route(0, "lspeaker", 0.50);
-	ymf.add_route(1, "rspeaker", 0.50);
-	ymf.add_route(2, "lspeaker", 0.50);
-	ymf.add_route(3, "rspeaker", 0.50);
+	ymf.add_route(0, "speaker", 0.50, 0);
+	ymf.add_route(1, "speaker", 0.50, 1);
+	ymf.add_route(2, "speaker", 0.50, 0);
+	ymf.add_route(3, "speaker", 0.50, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000)/8, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 	oki.set_addrmap(0, &tecmosys_state::oki_map);
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
-	ymz.add_route(0, "lspeaker", 0.30);
-	ymz.add_route(1, "rspeaker", 0.30);
+	ymz.add_route(0, "speaker", 0.30, 0);
+	ymz.add_route(1, "speaker", 0.30, 1);
 }
 
 ROM_START( deroon )

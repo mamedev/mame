@@ -14,7 +14,6 @@ class sun1mmu_device
 {
 public:
 	template <unsigned N, typename T> void set_space(T &&tag, int spacenum) { m_space[N].set_tag(std::forward<T>(tag), spacenum); }
-	template <unsigned N> void set_space(device_t &base, char const *tag, int spacenum) { m_space[N].set_tag(base, tag, spacenum); }
 
 	enum error_type : unsigned
 	{

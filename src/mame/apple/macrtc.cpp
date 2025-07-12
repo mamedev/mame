@@ -146,7 +146,7 @@ TIMER_CALLBACK_MEMBER(rtc3430042_device::half_seconds_tick)
 
 void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	struct tm cur_time, macref;
+	struct tm cur_time;
 	uint32_t seconds;
 
 	if (m_time_was_set)
@@ -164,16 +164,8 @@ void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_
 		cur_time.tm_year = year+100;    // assumes post-2000 current system time
 		cur_time.tm_isdst = 0;
 
-		macref.tm_sec = 0;
-		macref.tm_min = 0;
-		macref.tm_hour = 0;
-		macref.tm_mday = 1;
-		macref.tm_mon = 0;
-		macref.tm_year = 4;
-		macref.tm_isdst = 0;
-		uint32_t ref = (uint32_t)mktime(&macref);
-
-		seconds = (uint32_t)((uint32_t)mktime(&cur_time) - ref);
+		// add the offset between the Unix epoch and the classic Mac OS epoch (hat tip to https://www.epochconverter.com/mac)
+		seconds = (uint32_t)(mktime(&cur_time) + 2082844800);
 	}
 
 	LOG("second count 0x%lX\n", (unsigned long) seconds);

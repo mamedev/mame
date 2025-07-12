@@ -2629,19 +2629,27 @@ bool invaders_state::is_cabinet_cocktail()
 }
 
 
-void invaders_state::io_map(address_map &map)
+void invaders_state::io_map_noshift(address_map &map)
 {
 	map.global_mask(0x7);
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
+
+	map(0x02, 0x02).nopw(); // galmonst has vestigial writes to this port
+	map(0x03, 0x03).w("soundboard", FUNC(invaders_audio_device::p1_w));
+	map(0x05, 0x05).w("soundboard", FUNC(invaders_audio_device::p2_w));
+	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+}
+
+void invaders_state::io_map(address_map &map)
+{
+	io_map_noshift(map);
+
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).w("soundboard", FUNC(invaders_audio_device::p1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w("soundboard", FUNC(invaders_audio_device::p2_w));
-	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
 
@@ -2726,6 +2734,22 @@ void invaders_state::invaders(machine_config &config)
 						if (is_cabinet_cocktail()) // the flip screen line is only connected on the cocktail PCB
 							m_flip_screen = state ? 1 : 0;
 					});
+}
+
+void invaders_state::invnomb(machine_config &config)
+{
+	invaders(config);
+
+	m_maincpu->set_addrmap(AS_IO, &invaders_state::io_map_noshift);
+
+	config.device_remove("mb14241");
+}
+
+void invaders_state::cosmicbat(machine_config &config)
+{
+	invaders(config);
+
+	m_maincpu->set_clock(20_MHz_XTAL / 10);
 }
 
 
@@ -2961,6 +2985,14 @@ ROM_START( 280zzzap )
 	ROM_LOAD( "zzzape",     0x0c00, 0x0400, CRC(472493d6) SHA1(ae5cf4481ee4b78ca0d2f4d560d295e922aa04a7) )
 	ROM_LOAD( "zzzapd",     0x1000, 0x0400, CRC(4c240ee1) SHA1(972475f80253bb0d24773a10aec26a12f28e7c23) )
 	ROM_LOAD( "zzzapc",     0x1400, 0x0400, CRC(6e85aeaf) SHA1(ffa6bb84ef1f7c2d72fd26c24bd33aa014aeab7e) )
+ROM_END
+
+
+ROM_START( 280zzzapa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "h", 0x0000, 0x0800, CRC(cb56e0f8) SHA1(4e490bff71b9c3ba6c84b7f9879acfcfa336d0f8) )
+	ROM_LOAD( "g", 0x0800, 0x0800, CRC(f30dd025) SHA1(2ddacc7912487f36d88e7b924477816702460881) )
+	ROM_LOAD( "f", 0x1000, 0x0800, CRC(8d51ec2d) SHA1(37c744c5bf4a330e26f85377871c637a478dd278) )
 ROM_END
 
 
@@ -3238,7 +3270,8 @@ ROM_END
 /* 597 */ GAMEL( 1975, gunfighto,  gunfight, gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_SUPPORTS_SAVE, layout_gunfight )
 /* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME(  1976, tornbase,   0,        tornbase, tornbase, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    zzzap_state,    empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
+/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    zzzap_state,    empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP (set 1)", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
+/* 610 */ GAMEL( 1976, 280zzzapa,  280zzzap, zzzap,    zzzap,    zzzap_state,    empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP (set 2)", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
 /* 611 */ GAMEL( 1976, maze,       0,        maze,     maze,     mw8080bw_state, empty_init, ROT0,   "Midway", "Amazing Maze", MACHINE_SUPPORTS_SAVE, layout_maze )
 /* 612 */ GAME(  1977, boothill,   0,        boothill, boothill, boothill_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", MACHINE_SUPPORTS_SAVE )
 /* 615 */ GAME(  1977, checkmat,   0,        checkmat, checkmat, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

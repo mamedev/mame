@@ -1749,18 +1749,17 @@ void ms32_state::ms32(machine_config &config)
 	m_sprite->set_color_entries(16);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	YMF271(config, m_ymf, XTAL(16'934'400)); // 16.9344MHz
-	m_ymf->add_route(0, "lspeaker", 1.0);
-	m_ymf->add_route(1, "rspeaker", 1.0);
+	m_ymf->add_route(0, "speaker", 1.0, 0);
+	m_ymf->add_route(1, "speaker", 1.0, 1);
 // Output 2/3 not used?
-//  m_ymf->add_route(2, "lspeaker", 1.0);
-//  m_ymf->add_route(3, "rspeaker", 1.0);
+//  m_ymf->add_route(2, "speaker", 1.0);
+//  m_ymf->add_route(3, "speaker", 1.0);
 }
 
 void ms32_state::ms32_invert_lines(machine_config &config)
@@ -2703,4 +2702,4 @@ GAME( 1997, bnstars,   bnstars1, ms32,              suchie2,  ms32_state,       
 GAME( 1996, wpksocv2,  0,        ms32_invert_lines, wpksocv2, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* these boot and show something */
-GAMEL( 1994, f1superb, 0,        f1superb,          f1superb, ms32_f1superbattle_state, init_f1superb,   ROT0,   "Jaleco",       "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )
+GAMEL(1994, f1superb,  0,        f1superb,          f1superb, ms32_f1superbattle_state, init_f1superb,   ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )

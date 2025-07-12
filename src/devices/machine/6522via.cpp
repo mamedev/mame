@@ -171,6 +171,9 @@ void via6522_device::map(address_map &map)
 
 via6522_device::via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	m_in_cb1(0),
+	m_in_cb2(0),
+	m_acr(0),
 	m_in_a_handler(*this, 0xff),
 	m_in_b_handler(*this, 0xff),
 	m_out_a_handler(*this),
@@ -183,10 +186,7 @@ via6522_device::via6522_device(const machine_config &mconfig, device_type type, 
 	m_in_ca1(0),
 	m_in_ca2(0),
 	m_in_b(0xff),
-	m_in_cb1(0),
-	m_in_cb2(0),
-	m_pcr(0),
-	m_acr(0)
+	m_pcr(0)
 {
 }
 
@@ -535,7 +535,14 @@ TIMER_CALLBACK_MEMBER(via6522_device::t1_tick)
 	if (T1_CONTINUOUS (m_acr))
 	{
 		m_t1_pb7 = !m_t1_pb7;
-		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
+		if (TIMER1_VALUE > 0)
+		{
+			m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
+		}
+		else
+		{
+			m_t1_active = 0;
+		}
 	}
 	else
 	{
@@ -934,8 +941,15 @@ void via6522_device::write(offs_t offset, u8 data)
 			output_pb();
 		}
 
-		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
-		m_t1_active = 1;
+		if (TIMER1_VALUE > 0)
+		{
+			m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
+			m_t1_active = 1;
+		}
+		else
+		{
+			m_t1_active = 0;
+		}
 		break;
 
 	case VIA_T2CL:

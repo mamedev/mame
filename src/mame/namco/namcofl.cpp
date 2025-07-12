@@ -655,7 +655,7 @@ void namcofl_state::machine_reset()
 
 void namcofl_state::namcofl(machine_config &config)
 {
-	I960(config, m_maincpu, 80_MHz_XTAL / 4); // i80960KA-20 == 20 MHz part
+	I80960KA(config, m_maincpu, 80_MHz_XTAL / 4); // i80960KA-20 == 20 MHz part
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcofl_state::main_map);
 
 	NAMCO_C75(config, m_mcu, 48.384_MHz_XTAL / 3);
@@ -707,13 +707,12 @@ void namcofl_state::namcofl(machine_config &config)
 	NAMCO_C116(config, m_c116, 0);
 	m_c116->enable_shadows();
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	c352_device &c352(C352(config, "c352", 48.384_MHz_XTAL / 2, 288));
-	c352.add_route(0, "lspeaker", 1.00);
-	c352.add_route(1, "rspeaker", 1.00);
-	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
-	//c352.add_route(3, "rspeaker", 1.00);
+	c352.add_route(0, "speaker", 1.00, 0);
+	c352.add_route(1, "speaker", 1.00, 1);
+	//c352.add_route(2, "speaker", 1.00); // Second DAC not present.
+	//c352.add_route(3, "speaker", 1.00);
 }
 
 ROM_START( speedrcr )

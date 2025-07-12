@@ -3268,21 +3268,20 @@ void coolridr_state::coolridr(machine_config &config)
 
 	config.set_default_layout(layout_dualhsxs);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	scsp_device &scsp1(SCSP(config, "scsp1", XTAL(22'579'000))); // 22.579 MHz
 	scsp1.set_addrmap(0, &coolridr_state::scsp_map<0>);
 	scsp1.irq_cb().set(FUNC(coolridr_state::scsp_irq));
 	scsp1.main_irq_cb().set(FUNC(coolridr_state::scsp1_to_sh1_irq));
-	scsp1.add_route(0, "lspeaker", 1.0);
-	scsp1.add_route(1, "rspeaker", 1.0);
+	scsp1.add_route(0, "speaker", 1.0, 0);
+	scsp1.add_route(1, "speaker", 1.0, 1);
 
 	scsp_device &scsp2(SCSP(config, "scsp2", XTAL(22'579'000))); // 22.579 MHz
 	scsp2.set_addrmap(0, &coolridr_state::scsp_map<1>);
 	scsp2.main_irq_cb().set(FUNC(coolridr_state::scsp2_to_sh1_irq));
-	scsp2.add_route(0, "lspeaker", 1.0);
-	scsp2.add_route(1, "rspeaker", 1.0);
+	scsp2.add_route(0, "speaker", 1.0, 0);
+	scsp2.add_route(1, "speaker", 1.0, 1);
 }
 
 void coolridr_state::aquastge(machine_config &config)

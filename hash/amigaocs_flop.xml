@@ -16264,7 +16264,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="dynablst" supported="no">
+	<software name="dynablst" supported="yes">
 		<!-- SPS (CAPS) release 664 -->
 		<description>Dyna Blaster (Europe)</description>
 		<!-- retail, standalone -->
@@ -16274,6 +16274,7 @@ ATK test: OK
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Requires adaptator in Centronics port (player 1 is in port 3)" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps664)dynablaster.ipf" size="1049612" crc="cb1f037c" sha1="11d6f5d65ae7affd4e6ab90bcfde1e725d217560"/>
@@ -18217,14 +18218,16 @@ ATK test: failed
 
 	<software name="fa18" supported="no">
 		<!-- SPS (CAPS) release 119 -->
-		<description>FA18 Interceptor (Europe)</description>
+		<description>F/A-18 Interceptor (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+		<!-- TODO: untested afterwards -->
+		<info name="usage" value="Sports code wheel copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps119)fa18interceptor.ipf" size="1049180" crc="3a323362" sha1="a4285482aee97cf5243bcfc5ac0e3cde6a1d4e69"/>
@@ -19020,6 +19023,7 @@ ATK test: C:0 H:U Bad
 		<year>1991</year>
 		<publisher>Storm</publisher>
 		<notes><![CDATA[
+Runs too fast
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -33070,7 +33074,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="micromac" supported="no">
+	<software name="micromac" supported="yes">
 		<!-- SPS (CAPS) release 357 -->
 		<description>Micro Machines (Europe)</description>
 		<!-- retail, standalone -->
@@ -33078,7 +33082,6 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<notes><![CDATA[
-White screen
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -33142,7 +33145,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="mpsoccer" supported="no">
+	<software name="mpsoccer" supported="yes">
 		<!-- SPS (CAPS) release 1078 -->
 		<description>MicroProse Soccer (Europe, Soccer Stars)</description>
 		<!-- retail, standalone -->
@@ -33150,7 +33153,6 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>MicroProse</publisher>
 		<notes><![CDATA[
-Hangs after selecting a game mode on title screen
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">

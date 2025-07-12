@@ -288,69 +288,82 @@ uint32_t vindictr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* partially verified via schematics (there are a lot of PALs involved!):
-
-					    SHADE = PAL(MPR1-0, LB7-0, PFX6-5, PFX3-2, PF/M)
-
-					    if (SHADE)
-					        CRA |= 0x100
-
-					    MOG3-1 = ~MAT3-1 if MAT6==1 and MSD3==1
-					*/
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-
-					// upper bit of MO priority signals special rendering and doesn't draw anything
-					if (mopriority & 4)
-						continue;
-
-					// MO pen 1 doesn't draw, but it sets the SHADE flag and bumps the palette offset
-					if ((mo[x] & 0x0f) == 1)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						if ((mo[x] & 0xf0) != 0)
-							pf[x] |= 0x100;
-					}
-					else
-						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+						if (mo[x] != 0xffff)
+						{
+							/* partially verified via schematics (there are a lot of PALs involved!):
 
-					// don't erase yet -- we need to make another pass later
+							    SHADE = PAL(MPR1-0, LB7-0, PFX6-5, PFX3-2, PF/M)
+
+							    if (SHADE)
+							        CRA |= 0x100
+
+							    MOG3-1 = ~MAT3-1 if MAT6==1 and MSD3==1
+							*/
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+
+							// upper bit of MO priority signals special rendering and doesn't draw anything
+							if (mopriority & 4)
+								continue;
+
+							// MO pen 1 doesn't draw, but it sets the SHADE flag and bumps the palette offset
+							if ((mo[x] & 0x0f) == 1)
+							{
+								if ((mo[x] & 0xf0) != 0)
+									pf[x] |= 0x100;
+							}
+							else
+								pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+
+							// don't erase yet -- we need to make another pass later
+						}
+					}
 				}
-		}
+			});
 
 	// add the alpha on top
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// now go back and process the upper bit of MO priority
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-
-					// upper bit of MO priority might mean palette kludges
-					if (mopriority & 4)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						// if bit 2 is set, start setting high palette bits
-						if (mo[x] & 2)
-							m_mob->apply_stain(bitmap, pf, mo, x, y);
+						if (mo[x] != 0xffff)
+						{
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
 
-						// if the upper bit of pen data is set, we adjust the final intensity
-						if (mo[x] & 8)
-							pf[x] |= (~mo[x] & 0xe0) << 6;
+							// upper bit of MO priority might mean palette kludges
+							if (mopriority & 4)
+							{
+								// if bit 2 is set, start setting high palette bits
+								if (mo[x] & 2)
+									m_mob->apply_stain(bitmap, pf, mo, x, y);
+
+								// if the upper bit of pen data is set, we adjust the final intensity
+								if (mo[x] & 8)
+									pf[x] |= (~mo[x] & 0xe0) << 6;
+							}
+						}
 					}
 				}
-		}
+			});
+
 	return 0;
 }
 
@@ -538,14 +551,13 @@ void vindictr_state::vindictr(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ATARI_JSA_I(config, m_jsa, 0);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260010").bit(12);
-	m_jsa->add_route(0, "lspeaker", 1.0);
-	m_jsa->add_route(1, "rspeaker", 1.0);
+	m_jsa->add_route(0, "speaker", 1.0, 0);
+	m_jsa->add_route(1, "speaker", 1.0, 1);
 	config.device_remove("jsa:tms");
 }
 

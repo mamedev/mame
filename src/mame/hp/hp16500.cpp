@@ -436,8 +436,7 @@ void hp16500_state::hp1650(machine_config &config)
 
 	SCN2661A(config, "epci", 5000000);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void hp16500_state::hp1651(machine_config &config)
@@ -459,8 +458,7 @@ void hp16500_state::hp1651(machine_config &config)
 
 	SCN2661A(config, "epci", 5000000);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void hp16500_state::hp16500a(machine_config &config)
@@ -480,8 +478,7 @@ void hp16500_state::hp16500a(machine_config &config)
 	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row));
 	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void hp16500_state::hp16500b(machine_config &config)
@@ -509,8 +506,7 @@ void hp16500_state::hp16500b(machine_config &config)
 	DS1286(config, "rtc", 32768);
 	//WD37C65C(config, "fdc", 16_MHz_XTAL);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 static INPUT_PORTS_START( hp16500 )

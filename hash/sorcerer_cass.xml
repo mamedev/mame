@@ -495,7 +495,7 @@ Compiled by Robbbert
 	<software name="adv1">
 		<description>Adventureland</description>
 		<year>1979</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Adventure International</publisher>
 		<info name="serial" value="504ES" />
 		<info name="developer" value="Scott Adams"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
@@ -508,7 +508,7 @@ Compiled by Robbbert
 	<software name="adv3">
 		<description>Mission Impossible</description>
 		<year>1979</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Adventure International</publisher>
 		<info name="serial" value="505ES" />
 		<info name="developer" value="Scott Adams"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
@@ -521,7 +521,7 @@ Compiled by Robbbert
 	<software name="adv4">
 		<description>Voodoo Castle</description>
 		<year>1979</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Adventure International</publisher>
 		<info name="developer" value="Scott and Alexis Adams"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -533,7 +533,7 @@ Compiled by Robbbert
 	<software name="adv7">
 		<description>Mystery Fun House</description>
 		<year>1979</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Adventure International</publisher>
 		<info name="developer" value="Scott Adams"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -545,7 +545,7 @@ Compiled by Robbbert
 	<software name="adv8">
 		<description>Pyramid of Doom</description>
 		<year>1979</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Adventure International</publisher>
 		<info name="developer" value="Scott Adams"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -1037,7 +1037,7 @@ Compiled by Robbbert
 	</software>
 	<software name="grotnik">
 		<description>Grotnik Wars</description>
-		<year>198?</year>
+		<year>1981</year>
 		<publisher>System Software</publisher>
 		<info name="developer" value="Ross Williams" />
 		<info name="usage" value="Boot to Monitor, LOG" />
@@ -1074,7 +1074,7 @@ Compiled by Robbbert
 	<software name="landarc">
 		<description>Lander Arcade</description>
 		<year>1982</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>System Software</publisher>
 		<info name="developer" value="Jeffrey A Bell" />
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -1086,7 +1086,7 @@ Compiled by Robbbert
 	<software name="adv2">
 		<description>Pirate Adventure</description>
 		<year>1979</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Adventure International</publisher>
 		<info name="developer" value="Scott Adams"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -1098,7 +1098,7 @@ Compiled by Robbbert
 	<software name="adv6">
 		<description>Strange Odyssey</description>
 		<year>1979</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Adventure International</publisher>
 		<info name="developer" value="Scott Adams"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -1110,7 +1110,7 @@ Compiled by Robbbert
 	<software name="adv9">
 		<description>Ghost Town</description>
 		<year>1979</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Adventure International</publisher>
 		<info name="developer" value="Scott Adams"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -1169,8 +1169,9 @@ Compiled by Robbbert
 	</software>
 	<software name="wilde">
 		<description>Wilderness</description>
-		<year>198?</year>
+		<year>1980</year>
 		<publisher>Dick Smith Electronics</publisher>
+		<info name="developer" value="Robert Cox and John Connor"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="16216806">
@@ -1288,7 +1289,7 @@ Compiled by Robbbert
 		<description>Cassette Disk database system</description>
 		<year>1981</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="developer" value="Jim Stafford"/>
+		<info name="developer" value="Bob Stafford"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="0x602f6a">
@@ -1428,7 +1429,7 @@ Compiled by Robbbert
 		<description>Sorcerer Invaders (alt)</description>
 		<year>1980</year>
 		<publisher>System Software</publisher>
-		<info name="developer" value="Martin Seymor"/>
+		<info name="developer" value="Martin Sevior"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="0x697a50">

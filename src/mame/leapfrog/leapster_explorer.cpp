@@ -91,8 +91,7 @@ void leapfrog_leapster_explorer_state::leapfrog_leapster_explorer(machine_config
 	m_screen->set_visarea(0, 320 - 1, 0, 240 - 1);
 	m_screen->set_screen_update(FUNC(leapfrog_leapster_explorer_state::screen_update_innotab));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_leapster_explorer_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);

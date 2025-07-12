@@ -541,8 +541,17 @@ void sega_32x_device::dreq_common_w(address_space &space, offs_t offset, uint16_
 				return;
 			}
 
+			// https://jsgroth.dev/blog/posts/adventures-in-32x-emulation/#first-in-first-out
+			// Required by vrdx, otherwise crashes after title screen
+			if (m_dreq_size <= 0)
+			{
+				m_a15106_reg &= ~4;
+				return;
+			}
+
 			m_current_fifo_block[m_current_fifo_write_pos] = data;
 			m_current_fifo_write_pos++;
+			m_dreq_size --;
 
 			if (m_current_fifo_write_pos==4)
 			{
@@ -935,10 +944,10 @@ void sega_32x_device::m68k_pwm_w(offs_t offset, uint16_t data)
 		pwm_w(offset,data);
 }
 
-void sega_32x_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void sega_32x_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0] = inputs[0];
-	outputs[1] = inputs[1];
+	stream.copy(0, 0);
+	stream.copy(1, 1);
 }
 
 /**********************************************************************************************/

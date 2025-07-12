@@ -2,10 +2,10 @@
 // copyright-holders:Olivier Galibert, smf
 /*
 
-GNET Motherboard
+G NET Motherboard
 Taito, 1998
 
-The Taito GNET System comprises the following main parts....
+The Taito G NET System comprises the following main parts....
 - Sony ZN-2 Motherboard (Main CPU/GPU/SPU, RAM, BIOS, EEPROM & peripheral interfaces)
 - Taito FC PCB (Sound hardware & FLASHROMs for storage of PCMCIA cart contents)
 - Taito CD PCB (PCMCIA cart interface)
@@ -15,7 +15,7 @@ Also available are...
 - Optional Save PCB
 
 On power-up, the BIOS decrypts the boot loader from the flashROM at U30 which checks for a PCMCIA cart.
-If no cart is present, the Taito GNET logo is displayed with the message 'SYSTEM ERROR'
+If no cart is present, the Taito G NET logo is displayed with the message 'SYSTEM ERROR'
 If the cart matches the contents of the flashROMs, the game boots immediately with no delay.
 If the cart doesn't match, it re-flashes U27, U29, U30, U55 & U56 with _some_
 of the information contained in the cart, which takes approximately 2-3 minutes.
@@ -28,7 +28,7 @@ PCB Layouts
 -----------
 (Standard ZN2 Motherboard)
 
-ZN-2 COH-3000 (sticker says COH-3002T denoting Taito GNET BIOS version)
+ZN-2 COH-3000 (sticker says COH-3002T denoting Taito G NET BIOS version)
 |--------------------------------------------------------|
 |  LA4705             |---------------------------|      |
 |                     |---------------------------|      |
@@ -70,7 +70,7 @@ Notes:
       S301  - Slide switch for stereo or mono sound output
       S551  - Dip switch (4 position, defaults all OFF)
 
-      COH3002T.353   - GNET BIOS 4MBit MaskROM type M534002 (SOP40)
+      COH3002T.353   - G NET BIOS 4MBit MaskROM type M534002 (SOP40)
       AT28C16        - Atmel AT28C16 2K x8 EEPROM
       814260-70      - 256K x16 (4MBit) DRAM
       KM4132G271BQ-8 - 128K x 32Bit x 2 Banks SGRAM
@@ -132,10 +132,10 @@ Notes:
       *               - These parts located under the PCB
 
 
-Taito G-Net card info
+Taito G NET card info
 ---------------------
 
-The G-Net system uses a custom PCMCIA card for game software storage. The card is
+The G NET system uses a custom PCMCIA card for game software storage. The card is
 locked with a password and can't be read by conventional means.
 Some of the cards are made in separate pieces and can be opened. However some
 are encased in a single-piece steel shell and opening it up destroys the card.
@@ -164,7 +164,7 @@ The ANALOG connector output pins are tied directly to a chip next to the connect
 Card PCB Layouts
 ----------------
 
-Type 1 (standard 'Taito' type, as found on most G-Net games)
+Type 1 (standard 'Taito' type, as found on most G NET games)
 ------ (This type has separate top and bottom pieces which are glued together and
        (can be opened if done 'carefully'. But be careful the edges of the top lid are SHARP!)
 
@@ -435,13 +435,13 @@ protected:
 		ADDRESS_MAP_BANK(config, m_flashbank).set_map(&taitogn_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x8000000);
 
 		m_spu->reset_routes();
-		m_spu->add_route(0, "lspeaker", 0.3);
-		m_spu->add_route(1, "rspeaker", 0.3);
+		m_spu->add_route(0, "speaker", 0.3, 0);
+		m_spu->add_route(1, "speaker", 0.3, 1);
 
 		TAITO_ZOOM(config, m_zoom);
 		m_zoom->set_use_flash();
-		m_zoom->add_route(0, "lspeaker", 1.0);
-		m_zoom->add_route(1, "rspeaker", 1.0);
+		m_zoom->add_route(0, "speaker", 1.0, 0);
+		m_zoom->add_route(1, "speaker", 1.0, 1);
 
 		m_zoom->subdevice<zsg2_device>("zsg2")->ext_read().set(FUNC(taitogn_state::zsg2_ext_r));
 	}
@@ -1009,21 +1009,10 @@ static INPUT_PORTS_START(mawasunda)
 	PORT_INCLUDE(taitogn)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED) // debug
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x7f, IP_ACTIVE_LOW, IPT_UNUSED) // P1 UP/P1 DOWN/P1 LEFT/P1 RIGHT/P1 BUTTON1/P1 BUTTON2/P1 BUTTON3
 
 	PORT_MODIFY("P2")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED) // debug
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_MODIFY("P3")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_MODIFY("P4")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT(0xcc, IP_ACTIVE_LOW, IPT_UNUSED) // START3/START4/COIN3/COIN4
+	PORT_BIT(0x7f, IP_ACTIVE_LOW, IPT_UNUSED) // P2 UP/P2 DOWN/P2 LEFT/P2 RIGHT/P2 BUTTON1/P2 BUTTON2/P2 BUTTON3
 
 	PORT_START("HANDLE1")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_CENTERDELTA(32) PORT_NAME("%p Handle")
@@ -1064,9 +1053,9 @@ INPUT_PORTS_END
 	ROM_REGION16_LE( 0x200000, "firm", 0 ) \
 	ROM_LOAD( "flash.u30", 0x000000, 0x200000, CRC(c48c8236) SHA1(c6dad60266ce2ff635696bc0d91903c543273559) ) \
 	ROM_REGION16_LE( 0x100000, "eprom", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "v1", "G-NET BIOS v1 flasher" ) \
+	ROM_SYSTEM_BIOS( 0, "v1", "G NET BIOS v1 flasher" ) \
 	ROMX_LOAD( "f35-01_m27c800_v1.bin", 0x000000, 0x100000, CRC(cd15cc30) SHA1(78361f46fa7186d5058937c86c66247a86b1257f), ROM_BIOS(0) ) /* hand made */ \
-	ROM_SYSTEM_BIOS( 1, "v2", "G-NET BIOS v2 flasher" ) \
+	ROM_SYSTEM_BIOS( 1, "v2", "G NET BIOS v2 flasher" ) \
 	ROMX_LOAD( "f35-01_m27c800.bin", 0x000000, 0x100000, CRC(6225ec11) SHA1(047852d456b6ff85f8e640887caa03cf3e63ffad), ROM_BIOS(1) ) \
 	ROM_SYSTEM_BIOS( 2, "mb2009", "MB2009" ) \
 	ROMX_LOAD( "f35-01_m27c800_modbios_mb-2009_dump_by_aje_fr.bin", 0x000000, 0x100000, CRC(6367aedf) SHA1(8400775e0c974c8b017e26ef9339144cad457c63), ROM_BIOS(2) ) \
@@ -1193,7 +1182,7 @@ ROM_START( mawasunda )
 	COH1002T_BIOS
 
 	DISK_REGION( "pccard:taitocf" )
-	DISK_IMAGE( "mawasunda", 0, SHA1(ae5b14186905c93401ca65231dec43724df7957a) )
+	DISK_IMAGE( "e83-01__", 0, SHA1(ae5b14186905c93401ca65231dec43724df7957a) ) // e83-01**
 ROM_END
 
 ROM_START( nightrai )
@@ -1385,8 +1374,8 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1998, coh1002t,  0,        coh1002t,       taitogn,      taitogn_state, empty_init, ROT0,   "Taito", "Taito GNET (COH-1002T)", MACHINE_IS_BIOS_ROOT )
-GAME( 1998, coh3002t,  0,        coh3002t,       taitogn,      taitogn_state, empty_init, ROT0,   "Taito", "Taito GNET (COH-3002T)", MACHINE_IS_BIOS_ROOT )
+GAME( 1998, coh3002t,  0,        coh3002t,       taitogn,      taitogn_state, empty_init, ROT0,   "Taito", "Taito G NET (COH-3002T)", MACHINE_IS_BIOS_ROOT )
+GAME( 1999, coh1002t,  0,        coh1002t,       taitogn,      taitogn_state, empty_init, ROT0,   "Taito", "Taito G NET (COH-1002T)", MACHINE_IS_BIOS_ROOT )
 
 // Taito
 GAME( 1998, chaoshea,  coh3002t, coh3002t_t1,    taitogn,      taitogn_state, empty_init, ROT0,   "Taito", "Chaos Heat (V2.09O 1998/10/02 17:00)", MACHINE_SUPPORTS_SAVE )
@@ -1415,16 +1404,16 @@ GAME( 2001, zokuotena, zokuoten, coh3002t_t1,    taitogn,      ttgncl4_state, in
 GAME( 2004, zooo,      coh3002t, coh3002t_t1,    taitogn,      ttgncl4_state, init_nozoom,ROT0,   "Success", "Zooo (V2.01JA 2004/04/13 12:00)", MACHINE_SUPPORTS_SAVE )
 GAME( 2005, otenamhf,  coh3002t, coh3002t_cf,    taitogn_jp1,  ttgncl4_state, init_nozoom,ROT0,   "Success / Warashi", "Otenami Haiken Final (V2.07JC 2005/04/20 15:36)", MACHINE_SUPPORTS_SAVE )
 
-// Takumi
-GAME( 2001, nightrai,  coh3002t, coh3002t_t1,    taitogn,      ttgncl4_state, empty_init, ROT0,   "Takumi", "Night Raid (V2.03J 2001/02/26 17:00)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, otenki,    coh3002t, coh3002t_t1,    taitogn,      ttgncl4_state, empty_init, ROT0,   "Takumi", "Otenki Kororin (V2.01J 2001/07/02 1	0:00)", MACHINE_SUPPORTS_SAVE )
-
 // Warashi
 GAME( 1999, mahjngoh,  coh3002t, coh3002t_t1,    mahjngoh,     ttgnmp_state,  empty_init, ROT0,   "Warashi / Mahjong Kobo / Taito", "Mahjong Oh (V2.06J 1999/11/23 08:52:22)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, shanghss,  coh3002t, coh3002t_t1,    taitogn,      taitogn_state, empty_init, ROT0,   "Warashi", "Shanghai Shoryu Sairin (V2.03J 2000/05/26 12:45:28)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, soutenry,  coh3002t, coh3002t_t1,    taitogn,      taitogn_state, empty_init, ROT0,   "Warashi", "Soutenryu (V2.07J 2000/12/14 11:13:02)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, usagi,     coh3002t, coh3002t_t2,    usagi,        ttgnmp_state,  empty_init, ROT0,   "Warashi / Mahjong Kobo / Taito", "Usagi (V2.02J 2001/10/02 12:41:19)", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, shangtou,  coh3002t, coh3002t_t1,    taitogn,      taitogn_state, empty_init, ROT0,   "Warashi / Sunsoft / Taito", "Shanghai Sangokuhai Tougi (Ver 2.01J 2002/01/18 18:26:58)", MACHINE_SUPPORTS_SAVE )
+
+// Takumi
+GAME( 2001, nightrai,  coh3002t, coh3002t_t1,    taitogn,      ttgncl4_state, empty_init, ROT0,   "Takumi", "Night Raid (V2.03J 2001/02/26 17:00)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, otenki,    coh3002t, coh3002t_t1,    taitogn,      ttgncl4_state, empty_init, ROT0,   "Takumi", "Otenki Kororin (V2.01J 2001/07/02 10:00)", MACHINE_SUPPORTS_SAVE )
 
 // Triangle Service
 GAME( 2002, xiistag,   coh3002t, coh3002t_t1,    taitogn,      taitogn_state, empty_init, ROT270, "Triangle Service", "XII Stag (V2.01J 2002/6/26 22:27)", MACHINE_SUPPORTS_SAVE )

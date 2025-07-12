@@ -67,6 +67,9 @@ manager.machine.images
 manager.machine.slots
     Returns a device enumerator that will iterate over
     :ref:`slot devices <luascript-ref-dislot>` in the system.
+manager.machine.sounds
+    Returns a device enumerator that will iterate over
+    :ref:`sound devices <luascript-ref-disound>` in the system.
 emu.device_enumerator(device, [depth])
     Returns a device enumerator that will iterate over
     :ref:`devices <luascript-ref-device>` in the sub-tree starting at the
@@ -621,6 +624,52 @@ image.software_parent (read-only)
     The short name of the parent software item if the mounted media image was
     loaded from a software list, or ``nil`` otherwise.
 image.device (read-only)
+    The underlying :ref:`device <luascript-ref-device>`.
+
+
+.. _luascript-ref-disound:
+
+Sound device interface
+----------------------
+
+Wraps MAME’s ``device_sound_interface`` class which is a mix-in implemented by
+devices that input and/or output sound.
+
+Instantiation
+~~~~~~~~~~~~~
+
+manager.machine.sounds[tag]
+    Gets an sound device by tag relative to the root machine device, or ``nil``
+    if no such device exists or it is not a slot device.
+
+Properties
+~~~~~~~~~~
+
+sound.inputs (read-only)
+    Number of sound inputs of the device.
+
+sound.outputs (read-only)
+    Number of sound outputs of the device.
+
+sound.microphone (read-only)
+    True if the device is a microphone, false otherwise
+
+sound.speaker (read-only)
+    True if the device is a speaker, false otherwise
+
+sound.io_positions[] (read-only)
+    Non-empty only for microphones and speakers, indicates the positions of
+    the inputs or outputs as (x, y, z) coordinates (e.g. [-0.2, 0.0, 1.0])
+
+sound.io_names[] (read-only)
+    Non-empty only for microphones and speakers, indicates the positions of
+    the inputs or outputs as strings (e.g. Front Left)
+
+sound.hook
+    A boolean indicating whether to tap the output samples of this device in
+    the global sound hook.
+
+sound.device (read-only)
     The underlying :ref:`device <luascript-ref-device>`.
 
 

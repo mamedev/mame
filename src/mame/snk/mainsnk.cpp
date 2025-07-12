@@ -138,7 +138,7 @@ public:
 		m_fgram(*this, "fgram")
 	{ }
 
-	void mainsnk(machine_config &config);
+	void mainsnk(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -213,7 +213,7 @@ TILEMAP_MAPPER_MEMBER(mainsnk_state::tx_scan_cols)
 	// tilemap is 36x28, the central part is from the first RAM page and the
 	// extra 4 columns are from the second page
 	col -= 2;
-	if (col & 0x20)
+	if (BIT(col, 5))
 		return 0x400 + row + ((col & 0x1f) << 5);
 	else
 		return row + (col << 5);
@@ -221,17 +221,17 @@ TILEMAP_MAPPER_MEMBER(mainsnk_state::tx_scan_cols)
 
 TILE_GET_INFO_MEMBER(mainsnk_state::get_tx_tile_info)
 {
-	int code = m_fgram[tile_index];
+	int const code = m_fgram[tile_index];
 
 	tileinfo.set(0,
 			code,
 			0,
-			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
+			BIT(tile_index, 10) ? TILE_FORCE_LAYER0 : 0);
 }
 
 TILE_GET_INFO_MEMBER(mainsnk_state::get_bg_tile_info)
 {
-	int code = (m_bgram[tile_index]);
+	int const code = (m_bgram[tile_index]);
 
 	tileinfo.set(0,
 			m_bg_tile_offset + code,
@@ -257,7 +257,7 @@ void mainsnk_state::video_start()
 
 void mainsnk_state::c600_w(uint8_t data)
 {
-	int total_elements = m_gfxdecode->gfx(0)->elements();
+	int const total_elements = m_gfxdecode->gfx(0)->elements();
 
 	flip_screen_set(BIT(data, 7));
 
@@ -299,13 +299,13 @@ void mainsnk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	while (source < finish)
 	{
-		int attributes = source[3];
+		int const attributes = source[3];
 		int tile_number = source[1];
 		int sy = source[0];
 		int sx = source[2];
-		int color = attributes & 0xf;
-		int flipx = 0;
-		int flipy = 0;
+		int const color = attributes & 0xf;
+		bool flipx = false;
+		bool flipy = false;
 		if (sy > 240) sy -= 256;
 
 		tile_number |= attributes << 4 & 0x300;
@@ -344,7 +344,8 @@ uint32_t mainsnk_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 uint8_t mainsnk_state::sound_ack_r()
 {
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -573,9 +574,8 @@ static const gfx_layout sprite_layout =
 	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
-	{ 7,6,5,4,3,2,1,0, 15,14,13,12,11,10,9,8 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(7,-1), STEP8(15,-1) },
+	{ STEP16(0,16) },
 	256
 };
 

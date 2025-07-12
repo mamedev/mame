@@ -474,9 +474,9 @@ bool emulator_info::frame_hook()
 	return mame_machine_manager::instance()->lua()->frame_hook();
 }
 
-void emulator_info::sound_hook()
+void emulator_info::sound_hook(const std::map<std::string, std::vector<std::pair<const float *, int>>> &sound)
 {
-	return mame_machine_manager::instance()->lua()->on_sound_update();
+	return mame_machine_manager::instance()->lua()->on_sound_update(sound);
 }
 
 void emulator_info::layout_script_cb(layout_file &file, const char *script)

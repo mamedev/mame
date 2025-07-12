@@ -14,6 +14,8 @@
 
 #include "drccache.h"
 
+#include <algorithm>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -49,6 +51,10 @@ namespace uml
 	constexpr u8 FLAG_Z = 0x04;     // zero flag
 	constexpr u8 FLAG_S = 0x08;     // sign flag (defined for integer only)
 	constexpr u8 FLAG_U = 0x10;     // unordered flag (defined for FP only)
+
+	// flag combinations
+	constexpr u8 FLAGS_NONE = 0x00;
+	constexpr u8 FLAGS_ALL  = FLAG_U | FLAG_S | FLAG_Z | FLAG_V | FLAG_C;
 
 	// testable conditions; note that these are defined such that (condition ^ 1) is
 	// always the opposite
@@ -109,8 +115,7 @@ namespace uml
 		SCALE_x1 = 0,               // index * 1
 		SCALE_x2,                   // index * 2
 		SCALE_x4,                   // index * 4
-		SCALE_x8,                   // index * 8
-		SCALE_DEFAULT
+		SCALE_x8                    // index * 8
 	};
 
 	// spaces
@@ -118,7 +123,8 @@ namespace uml
 	{
 		SPACE_PROGRAM = AS_PROGRAM,
 		SPACE_DATA = AS_DATA,
-		SPACE_IO = AS_IO
+		SPACE_IO = AS_IO,
+		SPACE_OPCODES = AS_OPCODES
 	};
 
 	// opcodes
@@ -222,7 +228,7 @@ namespace uml
 	};
 
 	// C function callback definition
-	typedef void (*c_function)(void *ptr);
+	using c_function = void (*)(void *ptr);
 
 	// class describing a global code handle
 	class code_handle
@@ -298,7 +304,7 @@ namespace uml
 		constexpr parameter(parameter const &param) : m_type(param.m_type), m_value(param.m_value) { }
 		constexpr parameter(u64 val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
 		parameter(operand_size size, memory_scale scale) : m_type(PTYPE_SIZE_SCALE), m_value((scale << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_QWORD); assert(scale >= SCALE_x1 && scale <= SCALE_x8); }
-		parameter(operand_size size, memory_space space) : m_type(PTYPE_SIZE_SPACE), m_value((space << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_QWORD); assert(space >= SPACE_PROGRAM && space <= SPACE_IO); }
+		parameter(operand_size size, memory_space space) : m_type(PTYPE_SIZE_SPACE), m_value((space << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_QWORD); }
 		parameter(code_handle &handle) : m_type(PTYPE_CODE_HANDLE), m_value(reinterpret_cast<parameter_value>(&handle)) { }
 		constexpr parameter(code_label const &label) : m_type(PTYPE_CODE_LABEL), m_value(label) { }
 
@@ -384,6 +390,9 @@ namespace uml
 	class instruction
 	{
 	public:
+		// constants
+		static constexpr int MAX_PARAMS = 4;
+
 		// construction/destruction
 		constexpr instruction() : m_param{ } { }
 
@@ -407,6 +416,22 @@ namespace uml
 		u8 output_flags() const;
 		u8 modified_flags() const;
 		void simplify();
+
+		// operators
+		bool operator==(instruction const &that) const
+		{
+			if ((m_opcode != that.m_opcode) || (m_condition != that.m_condition) || (m_flags != that.m_flags) || (m_size != that.m_size) || (m_numparams != that.m_numparams))
+				return false;
+			auto const last = m_param + m_numparams;
+			return std::mismatch(std::begin(m_param), last, std::begin(that.m_param)).first == last;
+		}
+		bool operator!=(instruction const &that) const
+		{
+			if ((m_opcode != that.m_opcode) || (m_condition != that.m_condition) || (m_flags != that.m_flags) || (m_size != that.m_size) || (m_numparams != that.m_numparams))
+				return true;
+			auto const last = m_param + m_numparams;
+			return std::mismatch(std::begin(m_param), last, std::begin(that.m_param)).first != last;
+		}
 
 		// compile-time opcodes
 		void handle(code_handle &hand) { configure(OP_HANDLE, 4, hand); }
@@ -444,13 +469,13 @@ namespace uml
 		void restore(drcuml_machine_state *src) { configure(OP_RESTORE, 4, parameter::make_memory(src)); }
 
 		// 32-bit integer operations
-		void load(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale = SCALE_DEFAULT) { configure(OP_LOAD, 4, dst, parameter::make_memory(base), index, parameter(size, scale)); }
-		void loads(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale = SCALE_DEFAULT) { configure(OP_LOADS, 4, dst, parameter::make_memory(base), index, parameter(size, scale)); }
-		void store(void *base, parameter index, parameter src1, operand_size size, memory_scale scale = SCALE_DEFAULT) { configure(OP_STORE, 4, parameter::make_memory(base), index, src1, parameter(size, scale)); }
-		void read(parameter dst, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READ, 4, dst, src1, parameter(size, space)); }
-		void readm(parameter dst, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READM, 4, dst, src1, mask, parameter(size, space)); }
-		void write(parameter dst, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITE, 4, dst, src1, parameter(size, space)); }
-		void writem(parameter dst, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITEM, 4, dst, src1, mask, parameter(size, space)); }
+		void load(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale) { configure(OP_LOAD, 4, dst, parameter::make_memory(base), index, parameter(size, scale)); }
+		void loads(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale) { configure(OP_LOADS, 4, dst, parameter::make_memory(base), index, parameter(size, scale)); }
+		void store(void *base, parameter index, parameter src1, operand_size size, memory_scale scale) { configure(OP_STORE, 4, parameter::make_memory(base), index, src1, parameter(size, scale)); }
+		void read(parameter dst, parameter addr, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READ, 4, dst, addr, parameter(size, space)); }
+		void readm(parameter dst, parameter addr, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READM, 4, dst, addr, mask, parameter(size, space)); }
+		void write(parameter addr, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITE, 4, addr, src1, parameter(size, space)); }
+		void writem(parameter addr, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITEM, 4, addr, src1, mask, parameter(size, space)); }
 		void carry(parameter src, parameter bitnum) { configure(OP_CARRY, 4, src, bitnum); }
 		void set(condition_t cond, parameter dst) { configure(OP_SET, 4, dst, cond); }
 		void mov(parameter dst, parameter src1) { configure(OP_MOV, 4, dst, src1); }
@@ -485,13 +510,13 @@ namespace uml
 		void rorc(parameter dst, parameter src, parameter count) { configure(OP_RORC, 4, dst, src, count); }
 
 		// 64-bit integer operations
-		void dload(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale = SCALE_DEFAULT) { configure(OP_LOAD, 8, dst, parameter::make_memory(base), index, parameter(size, scale)); }
-		void dloads(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale = SCALE_DEFAULT) { configure(OP_LOADS, 8, dst, parameter::make_memory(base), index, parameter(size, scale)); }
-		void dstore(void *base, parameter index, parameter src1, operand_size size, memory_scale scale = SCALE_DEFAULT) { configure(OP_STORE, 8, parameter::make_memory(base), index, src1, parameter(size, scale)); }
-		void dread(parameter dst, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READ, 8, dst, src1, parameter(size, space)); }
-		void dreadm(parameter dst, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READM, 8, dst, src1, mask, parameter(size, space)); }
-		void dwrite(parameter dst, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITE, 8, dst, src1, parameter(size, space)); }
-		void dwritem(parameter dst, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITEM, 8, dst, src1, mask, parameter(size, space)); }
+		void dload(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale) { configure(OP_LOAD, 8, dst, parameter::make_memory(base), index, parameter(size, scale)); }
+		void dloads(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale) { configure(OP_LOADS, 8, dst, parameter::make_memory(base), index, parameter(size, scale)); }
+		void dstore(void *base, parameter index, parameter src1, operand_size size, memory_scale scale) { configure(OP_STORE, 8, parameter::make_memory(base), index, src1, parameter(size, scale)); }
+		void dread(parameter dst, parameter addr, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READ, 8, dst, addr, parameter(size, space)); }
+		void dreadm(parameter dst, parameter addr, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READM, 8, dst, addr, mask, parameter(size, space)); }
+		void dwrite(parameter addr, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITE, 8, addr, src1, parameter(size, space)); }
+		void dwritem(parameter addr, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITEM, 8, addr, src1, mask, parameter(size, space)); }
 		void dcarry(parameter src, parameter bitnum) { configure(OP_CARRY, 8, src, bitnum); }
 		void dset(condition_t cond, parameter dst) { configure(OP_SET, 8, dst, cond); }
 		void dmov(parameter dst, parameter src1) { configure(OP_MOV, 8, dst, src1); }
@@ -528,8 +553,8 @@ namespace uml
 		// 32-bit floating point operations
 		void fsload(parameter dst, void const *base, parameter index) { configure(OP_FLOAD, 4, dst, parameter::make_memory(base), index); }
 		void fsstore(void *base, parameter index, parameter src1) { configure(OP_FSTORE, 4, parameter::make_memory(base), index, src1); }
-		void fsread(parameter dst, parameter src1, memory_space space) { configure(OP_FREAD, 4, dst, src1, parameter(SIZE_SHORT, space)); }
-		void fswrite(parameter dst, parameter src1, memory_space space) { configure(OP_FWRITE, 4, dst, src1, parameter(SIZE_SHORT, space)); }
+		void fsread(parameter dst, parameter addr, memory_space space) { configure(OP_FREAD, 4, dst, addr, parameter(SIZE_SHORT, space)); }
+		void fswrite(parameter addr, parameter src1, memory_space space) { configure(OP_FWRITE, 4, addr, src1, parameter(SIZE_SHORT, space)); }
 		void fsmov(parameter dst, parameter src1) { configure(OP_FMOV, 4, dst, src1); }
 		void fsmov(condition_t cond, parameter dst, parameter src1) { configure(OP_FMOV, 4, dst, src1, cond); }
 		void fstoint(parameter dst, parameter src1, operand_size size, float_rounding_mode round) { configure(OP_FTOINT, 4, dst, src1, parameter::make_size(size), parameter::make_rounding(round)); }
@@ -551,8 +576,8 @@ namespace uml
 		// 64-bit floating point operations
 		void fdload(parameter dst, void const *base, parameter index) { configure(OP_FLOAD, 8, dst, parameter::make_memory(base), index); }
 		void fdstore(void *base, parameter index, parameter src1) { configure(OP_FSTORE, 8, parameter::make_memory(base), index, src1); }
-		void fdread(parameter dst, parameter src1, memory_space space) { configure(OP_FREAD, 8, dst, src1, parameter(SIZE_DOUBLE, space)); }
-		void fdwrite(parameter dst, parameter src1, memory_space space) { configure(OP_FWRITE, 8, dst, src1, parameter(SIZE_DOUBLE, space)); }
+		void fdread(parameter dst, parameter addr, memory_space space) { configure(OP_FREAD, 8, dst, addr, parameter(SIZE_DOUBLE, space)); }
+		void fdwrite(parameter addr, parameter src1, memory_space space) { configure(OP_FWRITE, 8, addr, src1, parameter(SIZE_DOUBLE, space)); }
 		void fdmov(parameter dst, parameter src1) { configure(OP_FMOV, 8, dst, src1); }
 		void fdmov(condition_t cond, parameter dst, parameter src1) { configure(OP_FMOV, 8, dst, src1, cond); }
 		void fdtoint(parameter dst, parameter src1, operand_size size, float_rounding_mode round) { configure(OP_FTOINT, 8, dst, src1, parameter::make_size(size), parameter::make_rounding(round)); }
@@ -572,9 +597,6 @@ namespace uml
 		void fdcopyi(parameter dst, parameter src) { configure(OP_FCOPYI, 8, dst, src); }
 		void icopyfd(parameter dst, parameter src) { configure(OP_ICOPYF, 8, dst, src); }
 
-		// constants
-		static constexpr int MAX_PARAMS = 4;
-
 	private:
 		// internal configuration
 		void configure(opcode_t op, u8 size, condition_t cond = COND_ALWAYS);
@@ -585,8 +607,6 @@ namespace uml
 
 		// opcode validation and simplification
 		void validate();
-		void convert_to_mov_immediate(u64 immediate) { m_opcode = OP_MOV; m_numparams = 2; m_param[1] = immediate; }
-		void convert_to_mov_param(int pnum) { m_opcode = OP_MOV; m_numparams = 2; m_param[1] = m_param[pnum]; }
 
 		// internal state
 		opcode_t            m_opcode = OP_INVALID;      // opcode
@@ -597,6 +617,7 @@ namespace uml
 		parameter           m_param[MAX_PARAMS];        // up to 4 parameters
 
 		static opcode_info const s_opcode_info_table[OP_MAX];
+		struct simplify_op;
 	};
 
 	// structure describing rules for parameter encoding

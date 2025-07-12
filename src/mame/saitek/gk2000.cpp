@@ -9,7 +9,6 @@ These chess computers all have the same I/O and fit in the same driver. The ches
 engine is by Frans Morsch.
 
 TODO:
-- is the H8/3212 V04 ROM the same as V03, just a different package?
 - versions with the A20 ROM that don't officially support the extra options on
   the 2nd row, can still access them when turning the computer on by simultaneously
   pressing the Go/Stop button with the Option button. This doesn't work on MAME,
@@ -42,6 +41,12 @@ Radio Shack Chess Master:
 - PCB label: same as Centurion / Cougar (see below)
 - rest is same as Barracuda
 
+Mephisto Explorer:
+- PCB label: 51CT09-01001L
+- Hitachi H8/3212 MCU (QFP), 10MHz XTAL, same ROM contents as Barracuda
+- LCD layout is slightly different, symbols are on the right side
+- no board edge LEDs, LCD backlight via P51
+
 H8/323 A13 MCU is used in:
 - Saitek GK 2000 (1992 version, 86071220X12)
 - Saitek Travel Champion 2080 (86071220X12)
@@ -65,6 +70,8 @@ H8/3212 V04 MCU (QFP) is used in:
 - Saitek Mephisto Miami
 - Saitek Mephisto Diplomat Advanced Travel Chess (suspected)
 - Saitek Mephisto Explorer
+
+The V04 QFP MCU is confirmed to have the same ROM contents as the V03 DIP MCU.
 
 ================================================================================
 
@@ -100,7 +107,7 @@ Centurion / Cougar:
 Mephisto Explorer Pro:
 - PCB label: 51CT12-01002, REV1.0 (smaller PCB)
 - same MCU as Cougar, 16MHz XTAL
-- LCD layout is slightly different, symbols are on the right side
+- LCD layout is slightly different (same as Mephisto Explorer)
 
 For test mode, hold Enter after cold boot during the LCD test. It will say "TST",
 press Enter again to see the diode configuration setting.

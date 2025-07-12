@@ -689,24 +689,23 @@ void djboy_state::djboy(machine_config &config)
 
 	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_djboy_spr);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12_MHz_XTAL / 4)); // 3.000MHz, verified
 	ymsnd.irq_handler().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.40, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.40, 1);
 
 	okim6295_device &oki_l(OKIM6295(config, "oki_l", 12_MHz_XTAL / 8, okim6295_device::PIN7_LOW)); // 1.500MHz, verified
 	oki_l.set_device_rom_tag("oki");
-	oki_l.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	oki_l.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
 
 	okim6295_device &oki_r(OKIM6295(config, "oki_r", 12_MHz_XTAL / 8, okim6295_device::PIN7_LOW)); // 1.500MHz, verified
 	oki_r.set_device_rom_tag("oki");
-	oki_r.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	oki_r.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 }
 
 

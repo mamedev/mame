@@ -46,6 +46,7 @@ public:
 	void write_syn(int state);
 
 	int txrdy_r();
+	int rxrdy_r();
 
 protected:
 	enum
@@ -74,8 +75,8 @@ protected:
 
 	void receive_character(uint8_t ch);
 
-	void update_rx_ready();
-	void update_tx_ready();
+	virtual void update_rx_ready();
+	virtual void update_tx_ready();
 	void update_tx_empty();
 	void transmit_clock();
 	void receive_clock();
@@ -153,6 +154,8 @@ public:
 	// construction/destruction
 	v5x_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
 
+	auto sint_handler() { return m_sint_handler.bind(); }
+
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
 
@@ -161,11 +164,29 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// TODO: currently unimplemented interrupt masking
+	virtual void update_rx_ready() override;
+	virtual void update_tx_ready() override;
+
+	template<int Bit>
+	void sint_bit_w(int state)
+	{
+		if (state)
+			m_sint |= (1 << Bit);
+		else
+			m_sint &= ~(1 << Bit);
+
+		update_sint();
+	}
+
 	u8 simk_r() { return m_simk; }
-	void simk_w(u8 data) { m_simk = data; }
+	void simk_w(u8 data) { m_simk = data; update_sint(); }
 
 private:
+	void update_sint();
+
+	devcb_write_line m_sint_handler;
+
+	u8 m_sint;
 	u8 m_simk;
 };
 

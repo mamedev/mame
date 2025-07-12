@@ -136,9 +136,9 @@ public:
 	virtual void reset() = 0;
 	virtual int execute(uml::code_handle &entry) = 0;
 	virtual void generate(drcuml_block &block, uml::instruction const *instlist, u32 numinst) = 0;
-	virtual bool hash_exists(u32 mode, u32 pc) = 0;
-	virtual void get_info(drcbe_info &info) = 0;
-	virtual bool logging() const { return false; }
+	virtual bool hash_exists(u32 mode, u32 pc) const noexcept = 0;
+	virtual void get_info(drcbe_info &info) const noexcept = 0;
+	virtual bool logging() const noexcept { return false; }
 
 protected:
 	// base constructor
@@ -173,8 +173,8 @@ public:
 	drcuml_block &begin_block(u32 maxinst);
 
 	// back-end interface
-	void get_backend_info(drcbe_info &info) { m_beintf->get_info(info); }
-	bool hash_exists(u32 mode, u32 pc) { return m_beintf->hash_exists(mode, pc); }
+	void get_backend_info(drcbe_info &info) const { m_beintf->get_info(info); }
+	bool hash_exists(u32 mode, u32 pc) const { return m_beintf->hash_exists(mode, pc); }
 	void generate(drcuml_block &block, uml::instruction *instructions, u32 count) { m_beintf->generate(block, instructions, count); }
 
 	// handle management

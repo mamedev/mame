@@ -404,15 +404,14 @@ void dcheese_state::dcheese(machine_config &config)
 	PALETTE(config, "palette", FUNC(dcheese_state::dcheese_palette), 65536);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	BSMT2000(config, m_bsmt, SOUND_OSC);
-	m_bsmt->add_route(0, "lspeaker", 1.2);
-	m_bsmt->add_route(1, "rspeaker", 1.2);
+	m_bsmt->add_route(0, "speaker", 1.2, 0);
+	m_bsmt->add_route(1, "speaker", 1.2, 1);
 }
 
 

@@ -213,10 +213,9 @@ void imac_state::imac(machine_config &config)
 	paddington.codec_r_callback().set(burgundy, FUNC(burgundy_device::read_macrisc));
 	paddington.codec_w_callback().set(burgundy, FUNC(burgundy_device::write_macrisc));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	burgundy.add_route(0, "lspeaker", 1.0);
-	burgundy.add_route(1, "rspeaker", 1.0);
+	SPEAKER(config, "speaker", 2).front();
+	burgundy.add_route(0, "speaker", 1.0, 0);
+	burgundy.add_route(1, "speaker", 1.0, 1);
 }
 
 ROM_START(imac)
