@@ -22,6 +22,7 @@
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6850acia.h"
+#include "machine/input_merger.h"
 #include "machine/mc68681.h"
 #include "machine/msm58321.h"
 #include "video/mc6845.h"
@@ -174,14 +175,19 @@ void informer_207_100_state::informer_207_100(machine_config &config)
 	MC6809E(config, m_maincpu, 19.7184_MHz_XTAL / 10); // clock divisor guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &informer_207_100_state::mem_map);
 
-	ACIA6850(config, m_acia);
-
-	INFORMER_207_100_KBD(config, "kbd");
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
-	m_duart->irq_cb().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	m_duart->irq_cb().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_duart->b_tx_cb().set("kbd", FUNC(informer_207_100_kbd_device::rxd_w));
 	m_duart->outport_cb().set(m_acia, FUNC(acia6850_device::write_txc)).bit(3);
 	m_duart->outport_cb().append(m_acia, FUNC(acia6850_device::write_rxc)).bit(3);
+
+	ACIA6850(config, m_acia);
+	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+
+	informer_207_100_kbd_device &kbd(INFORMER_207_100_KBD(config, "kbd"));
+	kbd.txd_callback().set(m_duart, FUNC(scn2681_device::rx_b_w));
 
 	MSM58321(config, m_rtc, 32.768_kHz_XTAL);
 
@@ -232,4 +238,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE           INPUT             CLASS                   INIT        COMPANY     FULLNAME            FLAGS
-COMP( 1983, in207100, 0,       0,      informer_207_100, informer_207_100, informer_207_100_state, empty_init, "Informer", "Informer 207/100", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, in207100, 0,       0,      informer_207_100, informer_207_100, informer_207_100_state, empty_init, "Informer", "Informer 207/100", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
