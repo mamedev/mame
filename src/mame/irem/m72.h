@@ -56,12 +56,8 @@ public:
 		m_fg_tilemap(nullptr),
 		m_bg_tilemap(nullptr),
 		m_video_off(false),
-		m_fg_source(0),
-		m_bg_source(0),
 		m_m81_b_b_j3(*this, "JumperJ3")
 	{
-		m_scrollx[0] = m_scrollx[1] = 0;
-		m_scrolly[0] = m_scrolly[1] = 0;
 	}
 
 	void m72_base(machine_config &config);
@@ -146,7 +142,6 @@ protected:
 	template<unsigned N> TILE_GET_INFO_MEMBER(rtype2_get_tile_info);
 
 	DECLARE_VIDEO_START(m72);
-	DECLARE_VIDEO_START(dbreedm72);
 	DECLARE_VIDEO_START(xmultipl);
 	DECLARE_VIDEO_START(hharry);
 	DECLARE_VIDEO_START(rtype2);
@@ -211,10 +206,11 @@ public:
 	void m72_airduel(machine_config &config);
 	void m72_dbreed(machine_config &config);
 	void m72_xmultipl(machine_config &config);
-	void imgfight(machine_config &config);
-	void imgfightjb(machine_config &config);
 	void mrheli(machine_config &config);
 	void nspirit(machine_config &config);
+	void imgfight(machine_config &config);
+	void imgfightjb(machine_config &config);
+	void loht(machine_config &config);
 
 	//void init_m72_8751();
 
@@ -237,9 +233,10 @@ private:
 	void mcu_low_w(u8 data);
 	void mcu_high_w(u8 data);
 
-	DECLARE_VIDEO_START(imgfight);
 	DECLARE_VIDEO_START(mrheli);
 	DECLARE_VIDEO_START(nspirit);
+	DECLARE_VIDEO_START(imgfight);
+	DECLARE_VIDEO_START(loht);
 
 	TIMER_CALLBACK_MEMBER(delayed_ram16_w);
 	TIMER_CALLBACK_MEMBER(delayed_ram8_w);

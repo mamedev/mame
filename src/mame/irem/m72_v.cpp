@@ -106,9 +106,7 @@ VIDEO_START_MEMBER(m72_state,m72)
 
 	m_bg_tilemap->set_transmask(0,0xffff,0x0000);
 	m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
-
-	//m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
-	m_bg_tilemap->set_transmask(2,0x0007,0xfff8); // needed for lohtj Japan warning to look correct
+	m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
 
 	memset(m_spriteram->buffer(),0,m_spriteram->bytes());
 
@@ -125,22 +123,10 @@ VIDEO_START_MEMBER(m72_state,m72)
 	register_savestate();
 }
 
-VIDEO_START_MEMBER(m72_state,dbreedm72)
-{
-	VIDEO_START_CALL_MEMBER(m72);
-	m_bg_tilemap->set_transmask(2,0x0001,0xfffe); // for score bar
-}
-
-VIDEO_START_MEMBER(m72_mcu_state,imgfight)
-{
-	VIDEO_START_CALL_MEMBER(m72);
-	m_bg_tilemap->set_transmask(2,0xff00,0x00ff); // for RAM/ROM & Japan message
-}
-
 VIDEO_START_MEMBER(m72_mcu_state,mrheli)
 {
 	VIDEO_START_CALL_MEMBER(m72);
-	m_bg_tilemap->set_transmask(2,0x00ff,0xff00); // for Japan message
+	m_bg_tilemap->set_transmask(2,0x0081,0xff7e); // for Japan message
 }
 
 VIDEO_START_MEMBER(m72_mcu_state,nspirit)
@@ -149,14 +135,24 @@ VIDEO_START_MEMBER(m72_mcu_state,nspirit)
 	m_bg_tilemap->set_transmask(2,0x001f,0xffe0); // for Japan message
 }
 
+VIDEO_START_MEMBER(m72_mcu_state,imgfight)
+{
+	VIDEO_START_CALL_MEMBER(m72);
+	m_bg_tilemap->set_transmask(2,0x7f01,0x80fe); // for Japan message
+}
+
+VIDEO_START_MEMBER(m72_mcu_state,loht)
+{
+	VIDEO_START_CALL_MEMBER(m72);
+	m_bg_tilemap->set_transmask(2,0x0007,0xfff8); // for Japan message & initial title screen
+}
+
 
 // M81
 
 VIDEO_START_MEMBER(m72_state,hharry)
 {
 	VIDEO_START_CALL_MEMBER(m72);
-
-	m_bg_tilemap->set_transmask(2,0x0001,0xfffe); // ? maybe the standard logic is ok.
 
 	m_fg_tilemap->set_scrolldx(4,3);
 	m_fg_tilemap->set_scrolldy(-128,-128);
@@ -510,6 +506,7 @@ u32 m72_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
 	draw_sprites(bitmap,cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
+
 	return 0;
 }
 
@@ -517,10 +514,7 @@ u32 m72_state::screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, co
 {
 	// on M81 the FG data always comes from the Ax roms
 	// the source of the BG data however depends on Jumper J3
-	const int J3 = m_m81_b_b_j3->read();
-	if (J3 == 0) m_bg_source = 1;
-	else m_bg_source = 2;
-
+	m_bg_source = m_m81_b_b_j3->read() ? 2 : 1;
 	return screen_update(screen, bitmap, cliprect);
 }
 
@@ -545,8 +539,7 @@ u32 m82_state::screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, co
 	{
 		tm->set_scroll_rows(512);
 		for (int i = 0; i < 512; i++)
-			tm->set_scrollx((i+m_scrolly[1])&0x1ff,
-					256 + m_m82_rowscrollram[i]);
+			tm->set_scrollx((i + m_scrolly[1]) & 0x1ff, 256 + m_m82_rowscrollram[i]);
 	}
 	else
 	{
@@ -561,5 +554,6 @@ u32 m82_state::screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, co
 	draw_sprites(bitmap,cliprect);
 	tm->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
+
 	return 0;
 }

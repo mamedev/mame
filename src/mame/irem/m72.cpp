@@ -15,7 +15,7 @@ M72 - 3 board stack, 2 known variants
 
       This is the original hardware used by R-type
       Z80 program uploaded to RAM rather than having a ROM
-      each of the 2 tile layers uses it's own set of ROMs.
+      each of the 2 tile layers uses its own set of ROMs.
       Flip bits are with the tile num, so 0x3fff max tiles
       per layer
 
@@ -43,7 +43,6 @@ M81 - 2 PCB Stack
       W - use both sets of ROMs
       S - use a single set of ROMs (A0-A3)
 
-
       revised hardware, Z80 uses a ROM, no MCU, same video
       system as M72 (some layer offsets - why?)
 
@@ -57,41 +56,41 @@ M82 - board made for Major Title, Z80 has a rom, no MCU
       * Some games were converted to run on this board,
       leaving the extra sprite HW unused.
 
-M84 -   2 PCB stack
-        functionally same as M82 but without the extra sprite hw??
 
-        M84-A-A (bottom board) (most games)
-        supports
-        4 program roms
-        8 tile roms
-        1 snd prg, 1 voice rom
-        CPUs and some customs etc.
+M84 - 2 PCB stack
+      functionally same as M82 but without the extra sprite hw??
 
-        M84-D-B (bottom board) (found on lightning swords / kengo)
-        redesigned version of above but
-        for V35 CPU? (seems to lack the UPD71059C interrupt
-        controller which isn't needed when with the V35)
+      M84-A-A (bottom board) (most games)
+      supports
+      4 program roms
+      8 tile roms
+      1 snd prg, 1 voice rom
+      CPUs and some customs etc.
 
-        M84-C-A (top board) (listed as for Hammering Harry)
-        4 sprite roms (in a row)
-        6 larger chips with detail removed
-        etc.
+      M84-D-B (bottom board) (found on lightning swords / kengo)
+      redesigned version of above but
+      for V35 CPU? (seems to lack the UPD71059C interrupt
+      controller which isn't needed when with the V35)
 
-        M84-B-A (top board) (found on rytpe 2)
-        M84-B-B (top board) (lightning swords / kengo)
-        these both look very similar, if not the same
+      M84-C-A (top board) (listed as for Hammering Harry)
+      4 sprite roms (in a row)
+      6 larger chips with detail removed
+      etc.
 
-        4 sprite roms (in a square)
-        various NANAO marked customs
-        KNA70H016(12)  NANAO 0201
-        KNA65005 17 NANAO 9048KS
-        KNA71H010(15) NANAO 0X2002
-        KNA72H010(14) NANAO 0Z2001
-        KNA71H009(13) NANAO 122001
-        KNA70H015(11) NANAO 092002
-        KNA91H014 NANAO 0Z2001V
-        etc.
+      M84-B-A (top board) (found on rytpe 2)
+      M84-B-B (top board) (lightning swords / kengo)
+      these both look very similar, if not the same
 
+      4 sprite roms (in a square)
+      various NANAO marked customs
+      KNA70H016(12)  NANAO 0201
+      KNA65005 17 NANAO 9048KS
+      KNA71H010(15) NANAO 0X2002
+      KNA72H010(14) NANAO 0Z2001
+      KNA71H009(13) NANAO 122001
+      KNA70H015(11) NANAO 092002
+      KNA91H014 NANAO 0Z2001V
+      etc.
 
 
 M85 - Pound for Pound uses this, possibly just M84 with
@@ -149,7 +148,8 @@ TODO:
   The cpu board also has support for IRQ3 and IRQ4, coming from the external
   connectors, but I don't think they are used by any game.
 
-- excessive transmask difference between m72 games, this must be user selectable somehow;
+- excessive transmask difference between m72 games, this must be user selectable
+  somehow, or is it related to MCU comms?
 
 IRQ controller
 --------------
@@ -346,6 +346,7 @@ TIMER_CALLBACK_MEMBER(m72_mcu_state::delayed_ram8_w)
 
 void m72_mcu_state::main_mcu_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	// compress mem_mask (lossless), since param is 32-bit
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_mcu_state::delayed_ram16_w), this), offset << 16 | data | (mem_mask & 0x0180) << 20);
 }
 
@@ -522,12 +523,9 @@ static const u8 dkgenm72_crc[CRC_LEN] =  {   0xc8,0xb4,0xdc,0xf8, 0xd3,0xba,0x48
 												0x79,0x08,0x1c,0xb3, 0x00,0x00 };
 
 
-
 void m72_state::copy_le(u16 *dest, const u8 *src, u8 bytes)
 {
-	int i;
-
-	for (i = 0; i < bytes; i += 2)
+	for (int i = 0; i < bytes; i += 2)
 		dest[i/2] = src[i+0] | (src[i+1] << 8);
 }
 
@@ -1032,7 +1030,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM )  /* sprite DMA complete */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) /* sprite DMA complete */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -1770,6 +1768,30 @@ void m72_mcu_state::m72_8751(machine_config &config)
 	mcu.port_out_cb<1>().set(m_dac, FUNC(dac_byte_interface::write));
 }
 
+void m72_mcu_state::mrheli(machine_config &config)
+{
+	m72_8751(config);
+	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,mrheli)
+}
+
+void m72_mcu_state::nspirit(machine_config &config)
+{
+	m72_8751(config);
+	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,nspirit)
+}
+
+void m72_mcu_state::imgfight(machine_config &config)
+{
+	m72_8751(config);
+	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,imgfight)
+}
+
+void m72_mcu_state::loht(machine_config &config)
+{
+	m72_8751(config);
+	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,loht)
+}
+
 void m72_mcu_state::m72_airduel(machine_config &config)
 {
 	m72_8751(config);
@@ -1813,8 +1835,6 @@ void m72_state::m72_dbreedw(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::dbreedwm72_map);
 
 	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); // verified
-
-	MCFG_VIDEO_START_OVERRIDE(m72_state,dbreedm72)
 }
 
 void m72_mcu_state::m72_dbreed(machine_config &config)
@@ -1823,8 +1843,6 @@ void m72_mcu_state::m72_dbreed(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m72_mcu_state::dbreedm72_map);
 
 	m_soundcpu->set_periodic_int(FUNC(m72_mcu_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); // verified
-
-	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,dbreedm72)
 }
 
 
@@ -1948,23 +1966,6 @@ void m72_state::kengo(machine_config &config)
 	subdevice<v35_device>("maincpu")->set_decryption_table(gunforce_decryption_table);
 }
 
-void m72_mcu_state::imgfight(machine_config &config)
-{
-	m72_8751(config);
-	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,imgfight)
-}
-
-void m72_mcu_state::nspirit(machine_config &config)
-{
-	m72_8751(config);
-	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,nspirit)
-}
-
-void m72_mcu_state::mrheli(machine_config &config)
-{
-	m72_8751(config);
-	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,mrheli)
-}
 
 /****************************************** M82 ***********************************************/
 
@@ -4652,10 +4653,10 @@ GAME( 1988, imgfight,    0,        imgfight,     imgfight,     m72_mcu_state,  e
 GAME( 1988, imgfightj,   imgfight, imgfight,     imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, imgfightjb,  imgfight, imgfightjb,   imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU
 
-GAME( 1989, loht,        0,        m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "Irem", "Legend of Hero Tonma (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, lohtj,       loht,     m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, lohtb2,      loht,     m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
-GAME( 1997, lohtb3,      loht,     m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (World, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, loht,        0,        loht,         loht,         m72_mcu_state,  empty_init,      ROT0,   "Irem", "Legend of Hero Tonma (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lohtj,       loht,     loht,         loht,         m72_mcu_state,  empty_init,      ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lohtb2,      loht,     loht,         loht,         m72_mcu_state,  empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
+GAME( 1997, lohtb3,      loht,     loht,         loht,         m72_mcu_state,  empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (World, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_mcu_state,  empty_init,      ROT0,   "Irem", "X Multiply (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
