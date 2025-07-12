@@ -209,9 +209,9 @@ static INPUT_PORTS_START( mirage )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("A / 1")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("ENT")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("ENT")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("B / 2 / Pawn")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("STA")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("STA")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("C / 3 / Knight")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("LEV")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("D / 4 / Bishop")
@@ -250,7 +250,7 @@ void mm1_state::mirage(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mirage_map);
 	m_maincpu->set_addrmap(AS_IO, &mm1_state::mm1_io);
 	m_maincpu->clear_cb().set(FUNC(mm1_state::clear_r));
-	m_maincpu->q_cb().set("display", FUNC(mephisto_display1_device::strobe_w)).invert();
+	m_maincpu->q_cb().set("display", FUNC(mephisto_display1_device::common_w));
 	m_maincpu->ef3_cb().set(FUNC(mm1_state::keypad_r<0>));
 	m_maincpu->ef4_cb().set(FUNC(mm1_state::keypad_r<1>));
 
@@ -272,7 +272,6 @@ void mm1_state::mm1(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mm1_map);
-	m_maincpu->q_cb().set("display", FUNC(mephisto_display1_device::strobe_w));
 
 	MEPHISTO_SENSORS_BOARD(config.replace(), m_board);
 	m_board->set_delay(attotime::from_msec(200));

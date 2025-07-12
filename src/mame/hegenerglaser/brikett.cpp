@@ -491,7 +491,7 @@ void brikett_state::mephistoj(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephistoj_map);
 	m_maincpu->set_addrmap(AS_IO, &brikett_state::mephistoj_io);
 	m_maincpu->clear_cb().set(FUNC(brikett_state::clear_r));
-	m_maincpu->q_cb().set(m_display, FUNC(mephisto_display1_device::strobe_w)).invert();
+	m_maincpu->q_cb().set(m_display, FUNC(mephisto_display1_device::common_w));
 
 	const attotime irq_period = attotime::from_ticks(0x10000, 4.194304_MHz_XTAL); // through SAJ300T
 	CLOCK(config, m_irq_clock).set_period(irq_period);
@@ -567,7 +567,6 @@ void brikett_state::mephisto3(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_clock(6.144_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto3_map);
-	m_maincpu->q_cb().set(m_display, FUNC(mephisto_display1_device::strobe_w));
 
 	config.set_default_layout(layout_mephisto_3);
 }

@@ -193,7 +193,7 @@ void mm2_state::lcd_irqack_w(u8 data)
 
 u8 mm2_state::keys_r(offs_t offset)
 {
-	// lcd strobe is shared with keypad select
+	// lcd common is shared with keypad select
 	return ~(BIT(m_keys[m_outlatch->q7_r()]->read(), offset) << 7);
 }
 
@@ -331,7 +331,7 @@ void mm2_state::rebel5(machine_config &config)
 	m_outlatch->q_out_cb<4>().set_output("led104");
 	m_outlatch->q_out_cb<5>().set_output("led105");
 	m_outlatch->q_out_cb<6>().set("dac", FUNC(dac_1bit_device::write));
-	m_outlatch->q_out_cb<7>().set(m_display, FUNC(mephisto_display1_device::strobe_w)).invert();
+	m_outlatch->q_out_cb<7>().set(m_display, FUNC(mephisto_display1_device::common_w));
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
 	MEPHISTO_DISPLAY_MODULE1(config, m_display);
@@ -390,8 +390,6 @@ void mm2_state::bup(machine_config &config)
 	const attotime irq_period = attotime::from_hz(7.3728_MHz_XTAL / 2 / 0x2000); // 450Hz from 4020 Q13
 	m_maincpu->set_periodic_int(FUNC(mm2_state::irq0_line_assert), irq_period);
 
-	m_outlatch->q_out_cb<7>().set(m_display, FUNC(mephisto_display1_device::strobe_w));
-
 	config.set_default_layout(layout_mephisto_bup);
 }
 
@@ -412,7 +410,6 @@ void mm2_state::mm2nona(machine_config &config)
 {
 	bup(config);
 
-	m_outlatch->q_out_cb<7>().set(m_display, FUNC(mephisto_display1_device::strobe_w)).invert();
 	config.set_default_layout(layout_mephisto_mm2);
 }
 
