@@ -1,5 +1,5 @@
-#ifndef MAME_HEBER_PLUTO6_EXP_H
-#define MAME_HEBER_PLUTO6_EXP_H
+#ifndef MAME_MACHINE_PL6_EXP_H
+#define MAME_MACHINE_PL6_EXP_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ class pluto6_calypso32_device : public device_t, public pluto6_expansion_card_in
 };
 
 
-#endif // MAME_HEBER_PLUTO6_GPU_H
+#endif // MAME_MACHINE_PL6_EXP_H

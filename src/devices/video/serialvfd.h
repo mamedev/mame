@@ -9,8 +9,8 @@
 
 */
 
-#ifndef MAME_SERIAL_VFD_H
-#define MAME_SERIAL_VFD_H
+#ifndef MAME_VIDEO_SERIALVFD_H
+#define MAME_VIDEO_SERIALVFD_H
 
 #pragma once
 
@@ -56,4 +56,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SERIAL_VFD, serial_vfd_device)
 
-#endif // MAME_SERIAL_VFD_H
+#endif // MAME_VIDEO_SERIALVFD_H

@@ -52,8 +52,8 @@
 			share a common register and thus function.
 */
 
-#ifndef MAME_PLUTO6_FPGA_H
-#define MAME_PLUTO6_FPGA_H
+#ifndef MAME_MACHINE_PL6_FPGA_H
+#define MAME_MACHINE_PL6_FPGA_H
 
 #pragma once
 
@@ -250,4 +250,4 @@ private:
 
 DECLARE_DEVICE_TYPE(HEBER_PLUTO6_FPGA, pl6fpga_device)
 
-#endif // MAME_PLUTO6_FPGA_H
+#endif // MAME_MACHINE_PL6_FPGA_H

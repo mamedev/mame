@@ -27,8 +27,8 @@ When the Pluto 6 is powered up, it does the following:
 		* Hold CPU in reset?
 */
 
-#ifndef MAME_PLUTO6_PIC_H
-#define MAME_PLUTO6_PIC_H
+#ifndef MAME_MACHINE_PL6_PIC_H
+#define MAME_MACHINE_PL6_PIC_H
 
 #pragma once
 
@@ -83,4 +83,4 @@ private:
 
 DECLARE_DEVICE_TYPE(HEBER_PLUTO6_PIC, pl6pic_device)
 
-#endif // MAME_PLUTO6_FPGA_H
+#endif // MAME_MACHINE_PL6_PIC_H
