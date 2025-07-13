@@ -81,7 +81,7 @@ TODO:
 - wwitch, lwitch: need verifying of inputs, outputs and layout.
 - hapfarm,a: need verifying of inputs, outputs and layout.
 - zulu: needs verifying of inputs, outputs and layout.
-- westventa: needs verifying of inputs, outputs and layout.
+- westventa,b: needs verifying of inputs, outputs and layout.
 - keno21: doesn't manage to read the CPU code. bp 1164,1,{curpc=0x117a;g} for now to go further. Fails shortly thereafter.
 
 *************************************************************************************************************/
@@ -2370,6 +2370,29 @@ ROM_START( westventa )
 	ROM_LOAD( "westventa_cpucode.key", 0x00, 0x02, CRC(34a0ddfb) SHA1(36cc99917d43f0ee966e85a67eb89cc60b3ca02a) )
 ROM_END
 
+ROM_START( westventb )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "2_w.v.aa.01.b.u26", 0x00000, 0x20000, BAD_DUMP CRC(ea9ed078) SHA1(5ed6f59ab8b36079b610b36931640c78da3c2b3d) ) // only one of the two is bad
+	ROM_LOAD16_BYTE( "1_w.v.aa.01.b.u25", 0x00001, 0x20000, BAD_DUMP CRC(f897114a) SHA1(02f9b82608ac0873c165cac7e0a622d94b8ff479) ) // "
+	ROM_FILL( 0x00, 0x01, 0x80) // checksum fails cause of one bad byte, hand fix for now
+
+	ROM_REGION( 0x1800000, "sprites", ROMREGION_ERASE00 ) // not dumped for this set, but seem good
+	ROM_LOAD( "mx29f1610mc_middle.u51", 0x0000000, 0x200000, CRC(7348fd37) SHA1(b5ec0994afb5bceae5627c37f1b35c7abcfd2f0a) )
+	ROM_LOAD( "mx29f1610mc_top.u30",    0x0800000, 0x200000, CRC(75bbaae0) SHA1(ef35775dd481ff343df1ee071ccd52b024d084b7) )
+	ROM_LOAD( "mx29f1610mc_bottom.bin", 0x1000000, 0x200000, CRC(e2dd58d5) SHA1(9ab881cfb2ee6cbc48aa28ba28529adb00803e44) ) // no U location on the PCB
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_western_venture", 0x00000, 0x80000, CRC(92dc09d1) SHA1(6b448b3372e78047d054c5e42fcfcff7f75ff9b9) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "at93c46.bin", 0x00, 0x80, CRC(0f934787) SHA1(81f2d8e3321ba5c065b0268da83761e805d7441c) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "westventb_cpucode.key", 0x00, 0x02, CRC(34a0ddfb) SHA1(36cc99917d43f0ee966e85a67eb89cc60b3ca02a) )
+ROM_END
+
 /***************************************************************************
 
 Win Win Bingo
@@ -3128,8 +3151,9 @@ ROM_START( cptshark ) // clearly based on Win Win Bingo, still has strings for i
 	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
-	ROM_LOAD16_BYTE( "1_c.s._cs.01.6.u31", 0x00000, 0x20000, CRC(87eb4151) SHA1(600154bde858a185d18db9a2a2cb58284622e905) ) // F29C51001T
-	ROM_LOAD16_BYTE( "2_c.s._cs.01.6.u25", 0x00001, 0x20000, CRC(ed59d9b5) SHA1(30ac8a988e8b80463b1e67614a784c75582bcf16) ) // F29C51001T
+	ROM_LOAD16_BYTE( "1_c.s._cs.01.6.u31", 0x00000, 0x20000, BAD_DUMP CRC(87eb4151) SHA1(600154bde858a185d18db9a2a2cb58284622e905) ) // F29C51001T, only one of the 2 is bad
+	ROM_LOAD16_BYTE( "2_c.s._cs.01.6.u25", 0x00001, 0x20000, BAD_DUMP CRC(ed59d9b5) SHA1(30ac8a988e8b80463b1e67614a784c75582bcf16) ) // F29C51001T, only one of the 2 is bad
+	ROM_FILL( 0x00, 0x01, 0x80) // checksum fails cause of one bad byte, hand fix for now
 
 	ROM_REGION( 0x1000000, "sprites", 0 )
 	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(ed034ac1) SHA1(7f26d81e65cb4519018ee01f247b91cd711cba4f) )
@@ -4037,6 +4061,7 @@ GAMEL( 2006,  winbingoa, winbingo, winbingo,  winbingo,  zoo_state,       init_w
 GAMEL( 2005,  hacher,    winbingo, hacher,    winbingo,  zoo_state,       init_hacher,    ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo EN.01.6)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS, layout_winbingo  ) // 14:25:46 Mar 10 2005. One bad sprite ROM
 GAME ( 2007?, westvent,  0,        westvent,  winbingo,  zoo_state,       init_westvent,  ROT0, "Astro Corp.", "Western Venture (Ver. AA.02.D)",                MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING                             ) // One bad program ROM
 GAME ( 2008,  westventa, westvent, westvent,  winbingo,  zoo_state,       init_westvent,  ROT0, "Astro Corp.", "Western Venture (Ver. AA.02.E)",                MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING                             ) // 2008/9/8
+GAME ( 2006,  westventb, westvent, westvent,  winbingo,  zoo_state,       init_westvent,  ROT0, "Astro Corp.", "Western Venture (Ver. AA.01.B)",                MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING                             ) // 2008/9/8
 GAME ( 2005,  wwitch,    0,        wwitch,    magibombd, zoo_state,       init_wwitch,    ROT0, "Astro Corp.", "Wicked Witch (Ver. AA.01.A)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 29/12/05 09:29
 GAME ( 2006,  lwitch,    wwitch,   lwitch,    magibombd, zoo_state,       init_wwitch,    ROT0, "Astro Corp.", "Little Witch (Ver. EN.01.A)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 06/01/06 14:08
 GAME ( 2008,  hapfarm,   0,        hapfarm,   magibombd, zoo_state,       init_hapfarm,   ROT0, "Astro Corp.", "Happy Farm (Ver. US.01.02.B)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/16
