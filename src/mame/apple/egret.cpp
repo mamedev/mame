@@ -102,6 +102,7 @@ const tiny_rom_entry *egret_device::device_rom_region() const
 egret_device::egret_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, EGRET, tag, owner, clock),
 	  device_nvram_interface(mconfig, *this),
+	  macseconds_interface(),
 	  write_reset(*this),
 	  write_linechange(*this),
 	  write_via_clock(*this),
@@ -253,19 +254,9 @@ void egret_device::pc_w(u8 data)
 				m_pram_loaded = true;
 
 				system_time systime;
-				struct tm cur_time;
 				machine().current_datetime(systime);
+				u32 seconds = get_local_seconds(systime);
 
-				cur_time.tm_sec = systime.local_time.second;
-				cur_time.tm_min = systime.local_time.minute;
-				cur_time.tm_hour = systime.local_time.hour;
-				cur_time.tm_mday = systime.local_time.mday;
-				cur_time.tm_mon = systime.local_time.month;
-				cur_time.tm_year = systime.local_time.year - 1900;
-				cur_time.tm_isdst = 0;
-
-				// add the offset between the Unix epoch and the classic Mac OS epoch (hat tip to https://www.epochconverter.com/mac)
-				u32 seconds = (u32)(mktime(&cur_time) + 2082844800);
 				m_maincpu->write_internal_ram(0xae - 0x90, seconds & 0xff);
 				m_maincpu->write_internal_ram(0xad - 0x90, (seconds >> 8) & 0xff);
 				m_maincpu->write_internal_ram(0xac - 0x90, (seconds >> 16) & 0xff);
