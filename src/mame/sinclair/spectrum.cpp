@@ -722,13 +722,13 @@ TIMER_CALLBACK_MEMBER(spectrum_state::irq_on)
 {
 	m_int_at = m_maincpu->total_cycles();
 	m_int_at -= m_maincpu->attotime_to_cycles(m_maincpu->local_time() - machine().time());
-	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 }
 
 TIMER_CALLBACK_MEMBER(spectrum_state::irq_off)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)

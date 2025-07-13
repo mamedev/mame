@@ -262,7 +262,7 @@ void specnext_sprites_device::mirror_data_w(u8 mirror_data)
 	}
 	else if (m_mirror_inc)
 	{
-		m_mirror_sprite_q = (m_mirror_sprite_q & ~0xff) | ((BIT(m_mirror_sprite_q, 0, TOTAL_SPRITES_BITS) + 1) & 0x7f);
+		m_mirror_sprite_q = (BIT(m_mirror_sprite_q, 0, TOTAL_SPRITES_BITS) + 1) & 0x7f;
 		m_mirror_sprite_q |= m_pattern_index & 0x80;
 		mirror_num_change = 1;
 	}

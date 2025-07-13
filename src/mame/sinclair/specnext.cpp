@@ -2262,13 +2262,13 @@ static const z80_daisy_config z80_daisy_chain[] =
 
 TIMER_CALLBACK_MEMBER(specnext_state::irq_off)
 {
-	spectrum_state::irq_off(param);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	m_irq_mask = 0;
 }
 
 TIMER_CALLBACK_MEMBER(specnext_state::irq_on)
 {
-	spectrum_state::irq_on(param);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	m_irq_mask |= 1 << 11;
 	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 }

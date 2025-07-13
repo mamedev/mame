@@ -24,7 +24,7 @@ specnext_layer2_device &specnext_layer2_device::set_palette(const char *tag, u16
 	return *this;
 }
 
-static rgb_t blend(u32 &target, const rgb_t pen, u8 mixer)
+rgb_t specnext_layer2_device::blend(u32 &target, const rgb_t pen, u8 mixer)
 {
 	switch (mixer)
 	{
@@ -63,17 +63,10 @@ void specnext_layer2_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, c
 		draw_256(screen, bitmap, cliprect, pcode, priority_mask, mixer);
 }
 
-static const u16 layer2_info[2][5] =
-{
-	//width  height  border  x-inc  y-inc
-	{   256,    192,      0,     1,   256 },
-	{   320,    256,     32,   256,     1 },
-};
-
 void specnext_layer2_device::draw_256(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode, u8 priority_mask, u8 mixer)
 {
 	const u8 res = m_resolution + 1;
-	const u16 (&info)[5] = layer2_info[m_resolution];
+	const u16 (&info)[5] = LAYER2_INFO[m_resolution];
 
 	rectangle clip = rectangle{ m_clip_x1 << res, (std::min<u16>(m_clip_x2, info[0] - 1) << res) | 1, m_clip_y1, std::min<u8>(m_clip_y2, info[1] - 1) };
 
@@ -127,7 +120,7 @@ void specnext_layer2_device::draw_256(screen_device &screen, bitmap_rgb32 &bitma
 
 void specnext_layer2_device::draw_16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode, u8 priority_mask, u8 mixer)
 {
-	const u16 (&info)[5] = layer2_info[1];
+	const u16 (&info)[5] = LAYER2_INFO[1];
 
 	rectangle clip = rectangle{ m_clip_x1 << 2, (std::min<u16>(m_clip_x2, info[0] - 1) << 2) | 1, m_clip_y1, std::min<u8>(m_clip_y2, info[1] - 1) };
 
