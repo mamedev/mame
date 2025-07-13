@@ -121,7 +121,7 @@ Air Duel (World)                   1990  M82-A-A + M82-B-A   N
 Air Duel (World)                   1990  M72                 Y
 Air Duel (Japan)                   1990  M72                 Y
 Cosmic Cop /                       1991  M84-D-B + M84-B-B   N
-  Gallop - Armed Police Unit       1991  M72                 Y (sample playback only)
+  Armed Police Unit Gallop         1991  M72                 Y (sample playback only)
 Ken-Go / Lightning Swords          1991  M84-D-B + M84-B-B   Encrypted
 
 
@@ -138,9 +138,6 @@ TODO:
 - m82_gfx_ctrl_w is unknown, it seems to be used to disable rowscroll,
   and maybe other things
 
-- Maybe there is a layer enable register, e.g. nspirit shows (for an instant)
-  incomplete screens with bad colors when you start a game.
-
 - A lot of unknown I/O writes from the sound CPU in Pound for Pound.
 
 - the sprite chip triggers IRQ1 when it has finished copying the sprite RAM to its
@@ -148,8 +145,9 @@ TODO:
   The cpu board also has support for IRQ3 and IRQ4, coming from the external
   connectors, but I don't think they are used by any game.
 
-- excessive transmask difference between m72 games, this must be user selectable
-  somehow, or is it related to MCU comms?
+- occasional raster effect scroll glitches in bchopper/mrheli, the maincpu is
+  probably a bit too slow. To force it to happen more regularly: mame -cheat,
+  max out ammo and enable rapid fire.
 
 IRQ controller
 --------------
@@ -186,7 +184,6 @@ The other locations have been added assuming that the layout is the same
 on all m72 boards. However, it would be nice to have them confirmed for
 other supported games as well.
 
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -200,11 +197,12 @@ other supported games as well.
 #include "irem_cpu.h"
 #include "machine/rstbuf.h"
 #include "sound/ymopm.h"
+
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL(32'000'000)
-#define SOUND_CLOCK         XTAL(3'579'545)
+#define MASTER_CLOCK XTAL(32'000'000)
+#define SOUND_CLOCK  XTAL(3'579'545)
 
 
 
@@ -380,32 +378,6 @@ void m72_mcu_state::mcu_high_w(u8 data)
 	logerror("high: %02x %08x\n", data, m_mcu_sample_addr);
 }
 
-#if 0
-void m72_mcu_state::init_m72_8751()
-{
-	/* lohtb2 */
-	/* running the mcu at twice the speed, the following
-	 * timeouts have to be modified.
-	 * At normal speed, the timing heavily depends on opcode
-	 * prefetching on the V30.
-	 */
-	{
-		u8 *rom=memregion("mcu")->base();
-
-		rom[0x12d+5] += 1; printf(" 5: %d\n", rom[0x12d+5]);
-		rom[0x12d+8] += 5;  printf(" 8: %d\n", rom[0x12d+8]);
-		rom[0x12d+11] += 7; printf("11: %d\n", rom[0x12d+11]);
-		rom[0x12d+14] += 9; printf("14: %d\n", rom[0x12d+14]);
-		rom[0x12d+17] += 1; printf("17: %d\n", rom[0x12d+17]);
-		rom[0x12d+20] += 10; printf("20: %d\n", rom[0x12d+20]);
-		rom[0x12d+23] += 3; printf("23: %d\n", rom[0x12d+23]);
-		rom[0x12d+26] += 2; printf("26: %d\n", rom[0x12d+26]);
-		rom[0x12d+29] += 2; printf("29: %d\n", rom[0x12d+29]);
-		rom[0x12d+32] += 16; printf("32: %d\n", rom[0x12d+32]);
-	}
-}
-#endif
-
 
 /***************************************************************************
 
@@ -436,7 +408,7 @@ int m72_state::find_sample(int num)
 	while (num--)
 	{
 		/* find end of sample */
-		while (addr < len &&  m_samples_region[addr]) addr++;
+		while (addr < len && m_samples_region[addr]) addr++;
 
 		/* skip 0 filler between samples */
 		while (addr < len && !m_samples_region[addr]) addr++;
@@ -794,7 +766,6 @@ void m72_state::m72_portmap(address_map &map)
 	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
 	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
 	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
-/*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
 }
 
 void m72_mcu_state::m72_protected_portmap(address_map &map)
@@ -924,7 +895,6 @@ void m72_state::rtype_sound_portmap(address_map &map)
 void m72_state::sound_portmap(address_map &map)
 {
 	rtype_sound_portmap(map);
-	map.global_mask(0xff);
 	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));
 	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));
 }
@@ -932,7 +902,6 @@ void m72_state::sound_portmap(address_map &map)
 void m72_mcu_state::sound_protected_portmap(address_map &map)
 {
 	rtype_sound_portmap(map);
-	map.global_mask(0xff);
 	map(0x82, 0x82).w("mculatch", FUNC(generic_latch_8_device::write));
 	map(0x84, 0x84).r("soundlatch2", FUNC(generic_latch_8_device::read));
 }
@@ -1002,6 +971,18 @@ void m72_mcu_state::mcu_io_map(address_map &map)
 	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) ) \
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_5C ) ) \
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
+
+#define M81_B_B_JUMPER_J3_S \
+	PORT_START("JumperJ3") \
+	PORT_CONFNAME( 0x0001, 0x0000, "M81-B-B Jumper J3" ) \
+	PORT_CONFSETTING(      0x0000, "S" ) \
+	/* PORT_CONFSETTING(      0x0001, "W" ) */
+
+#define M81_B_B_JUMPER_J3_W \
+	PORT_START("JumperJ3") \
+	PORT_CONFNAME( 0x0001, 0x0001, "M81-B-B Jumper J3" ) \
+	/* PORT_CONFSETTING(      0x0000, "S" ) */ \
+	PORT_CONFSETTING(      0x0001, "W" )
 
 static INPUT_PORTS_START( common )
 	PORT_START("IN0")
@@ -1768,34 +1749,13 @@ void m72_mcu_state::m72_8751(machine_config &config)
 	mcu.port_out_cb<1>().set(m_dac, FUNC(dac_byte_interface::write));
 }
 
-void m72_mcu_state::mrheli(machine_config &config)
-{
-	m72_8751(config);
-	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,mrheli)
-}
-
-void m72_mcu_state::nspirit(machine_config &config)
-{
-	m72_8751(config);
-	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,nspirit)
-}
-
-void m72_mcu_state::imgfight(machine_config &config)
-{
-	m72_8751(config);
-	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,imgfight)
-}
-
-void m72_mcu_state::loht(machine_config &config)
-{
-	m72_8751(config);
-	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,loht)
-}
-
 void m72_mcu_state::m72_airduel(machine_config &config)
 {
 	m72_8751(config);
 	m_maincpu->set_addrmap(AS_IO, &m72_mcu_state::m72_airduel_portmap);
+	m_soundcpu->set_addrmap(AS_IO, &m72_mcu_state::rtype_sound_portmap);
+
+	config.device_remove("soundlatch2");
 }
 
 void m72_mcu_state::imgfightjb(machine_config &config)
@@ -1807,26 +1767,18 @@ void m72_mcu_state::imgfightjb(machine_config &config)
 	mcu.port_out_cb<1>().set(m_dac, FUNC(dac_byte_interface::write));
 
 	// TODO: uses 6116 type RAM instead of MB8421 and MB8431
-
-	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state, imgfight)
-}
-
-void m72_state::rtype(machine_config &config)
-{
-	m72_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::rtype_map);
-	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype_sound_portmap);
-
-	config.device_remove("m72");
-	config.device_remove("dac");
 }
 
 void m72_mcu_state::m72_xmultipl(machine_config &config)
 {
 	m72_8751(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m72_mcu_state::xmultiplm72_map);
+}
 
-	m_soundcpu->set_periodic_int(FUNC(m72_mcu_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); // verified
+void m72_mcu_state::m72_dbreed(machine_config &config)
+{
+	m72_8751(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_mcu_state::dbreedm72_map);
 }
 
 void m72_state::m72_dbreedw(machine_config &config)
@@ -1837,12 +1789,14 @@ void m72_state::m72_dbreedw(machine_config &config)
 	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); // verified
 }
 
-void m72_mcu_state::m72_dbreed(machine_config &config)
+void m72_state::rtype(machine_config &config)
 {
-	m72_8751(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &m72_mcu_state::dbreedm72_map);
+	m72_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::rtype_map);
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype_sound_portmap);
 
-	m_soundcpu->set_periodic_int(FUNC(m72_mcu_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); // verified
+	config.device_remove("m72");
+	config.device_remove("dac");
 }
 
 
@@ -4643,27 +4597,27 @@ GAME( 1987, rtypejp,     rtype,    rtype,        rtypep,       m72_state,      e
 GAME( 1987, rtypeu,      rtype,    rtype,        rtype,        m72_state,      empty_init,      ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rtypeb,      rtype,    rtype,        rtype,        m72_state,      empty_init,      ROT0,   "bootleg", "R-Type (World bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, bchopper,    0,        mrheli,       bchopper,     m72_mcu_state,  empty_init,      ROT0,   "Irem", "Battle Chopper (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mrheli,      bchopper, mrheli,       bchopper,     m72_mcu_state,  empty_init,      ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bchopper,    0,        m72_8751,     bchopper,     m72_mcu_state,  empty_init,      ROT0,   "Irem", "Battle Chopper (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mrheli,      bchopper, m72_8751,     bchopper,     m72_mcu_state,  empty_init,      ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, nspirit,     0,        nspirit,      nspirit,      m72_mcu_state,  empty_init,      ROT0,   "Irem", "Ninja Spirit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, nspiritj,    nspirit,  nspirit,      nspirit,      m72_mcu_state,  empty_init,      ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nspirit,     0,        m72_8751,     nspirit,      m72_mcu_state,  empty_init,      ROT0,   "Irem", "Ninja Spirit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nspiritj,    nspirit,  m72_8751,     nspirit,      m72_mcu_state,  empty_init,      ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, imgfight,    0,        imgfight,     imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, imgfightj,   imgfight, imgfight,     imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, imgfight,    0,        m72_8751,     imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, imgfightj,   imgfight, m72_8751,     imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, imgfightjb,  imgfight, imgfightjb,   imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU
 
-GAME( 1989, loht,        0,        loht,         loht,         m72_mcu_state,  empty_init,      ROT0,   "Irem", "Legend of Hero Tonma (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, lohtj,       loht,     loht,         loht,         m72_mcu_state,  empty_init,      ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, lohtb2,      loht,     loht,         loht,         m72_mcu_state,  empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
-GAME( 1997, lohtb3,      loht,     loht,         loht,         m72_mcu_state,  empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (World, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, loht,        0,        m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "Irem", "Legend of Hero Tonma (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lohtj,       loht,     m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lohtb2,      loht,     m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
+GAME( 1997, lohtb3,      loht,     m72_8751,     loht,         m72_mcu_state,  empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (World, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_mcu_state,  empty_init,      ROT0,   "Irem", "X Multiply (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, dbreedm72,   dbreed,   m72_dbreedw,  dbreed,       m72_state,      init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (World, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
 GAME( 1989, dbreedjm72,  dbreed,   m72_dbreed,   dbreed,       m72_mcu_state,  empty_init,      ROT0,   "Irem", "Dragon Breed (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, gallopm72,   cosmccop, m72_airduel,  gallop,       m72_mcu_state,  empty_init,      ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gallopm72,   cosmccop, m72_airduel,  gallop,       m72_mcu_state,  empty_init,      ROT0,   "Irem", "Armed Police Unit Gallop (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, airduelm72,  airduel,  m72_airduel,  airduel,      m72_mcu_state,  empty_init,      ROT270, "Irem", "Air Duel (World, M72 hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, airdueljm72, airduel,  m72_airduel,  airduel,      m72_mcu_state,  empty_init,      ROT270, "Irem", "Air Duel (Japan, M72 hardware)", MACHINE_SUPPORTS_SAVE )
@@ -4697,7 +4651,7 @@ GAME( 1989, rtype2j,     rtype2,   rtype2,       rtype2,       m72_state,      e
 GAME( 1989, rtype2jc,    rtype2,   rtype2,       rtype2,       m72_state,      empty_init,      ROT0,   "Irem", "R-Type II (Japan, revision C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, cosmccop,    0,        cosmccop,     gallop,       m72_state,      empty_init,      ROT0,   "Irem", "Cosmic Cop (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gallop,      cosmccop, cosmccop,     gallop,       m72_state,      empty_init,      ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gallop,      cosmccop, cosmccop,     gallop,       m72_state,      empty_init,      ROT0,   "Irem", "Armed Police Unit Gallop (Japan, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, ltswords,    0,        kengo,        kengo,        m72_state,      empty_init,      ROT0,   "Irem", "Lightning Swords (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, kengo,       ltswords, kengo,        kengo,        m72_state,      empty_init,      ROT0,   "Irem", "Ken-Go (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
