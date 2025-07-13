@@ -71,7 +71,6 @@ TODO:
 
 - MCU on showhand/showhanc PCB, what does it do? Games run fine and there appears to be no interaction...
 - Protection in magibomb sets with simpler encryption (writes to $a0101x, $a11100, etc.). Some sets appear to work fine regardless, others freeze.
-- Fix mirror ROM checksum / ROM overlay without code patches (in games with heavier encryption).
 - Find source of level 2 interrupt (sprite DMA end?).
 - magibomba, westvent: need a redump of one of the program ROMs.
 - hacher, keno21: need a redump of the sprite ROMs.
@@ -864,7 +863,8 @@ void zoo_state::eeprom_w(u8 data)
 
 void zoo_state::dinodino_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0x900000, 0x903fff).ram().share("nvram"); // battery
 	map(0xb00000, 0xb00fff).ram().share("spriteram");
 	map(0xb02000, 0xb02001).nopr().w(FUNC(zoo_state::draw_sprites_w));
@@ -881,7 +881,8 @@ void zoo_state::dinodino_map(address_map &map)
 
 void zoo_state::keno21_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0x400000, 0x403fff).ram().share("nvram"); // battery
 	map(0xa00000, 0xa00fff).ram().share("spriteram");
 	map(0xa02000, 0xa02001).nopr().w(FUNC(zoo_state::draw_sprites_w));
@@ -898,7 +899,8 @@ void zoo_state::keno21_map(address_map &map)
 
 void zoo_state::magibombd_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xa80000, 0xa80fff).ram().share("spriteram");
 	map(0xa82000, 0xa82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
 	map(0xa84000, 0xa84001).portr("INPUTS");
@@ -915,7 +917,8 @@ void zoo_state::magibombd_map(address_map &map)
 
 void zoo_state::magibombg_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xa00000, 0xa00fff).ram().share("spriteram");
 	map(0xa02000, 0xa02001).nopr().w(FUNC(zoo_state::draw_sprites_w));
 	map(0xa04000, 0xa04001).portr("INPUTS");
@@ -932,7 +935,8 @@ void zoo_state::magibombg_map(address_map &map)
 
 void zoo_state::magibombm_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0x840000, 0x843fff).ram().share("nvram"); // battery
 	map(0x880000, 0x880fff).ram().share("spriteram");
 	map(0x882000, 0x882001).nopr().w(FUNC(zoo_state::draw_sprites_w));
@@ -949,7 +953,8 @@ void zoo_state::magibombm_map(address_map &map)
 
 void zoo_state::magibombo_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0x900000, 0x903fff).ram().share("nvram"); // battery
 	map(0xc00000, 0xc00fff).ram().share("spriteram");
 	map(0xc02000, 0xc02001).nopr().w(FUNC(zoo_state::draw_sprites_w));
@@ -966,7 +971,8 @@ void zoo_state::magibombo_map(address_map &map)
 
 void zoo_state::winbingo_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0x900001, 0x900001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x980001, 0x980001).w(FUNC(zoo_state::oki_bank_w));
 	map(0xa00000, 0xa03fff).ram().share("nvram"); // battery
@@ -983,7 +989,8 @@ void zoo_state::winbingo_map(address_map &map)
 
 void zoo_state::hacher_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xb80000, 0xb80fff).ram().share("spriteram");
 	map(0xb82000, 0xb82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
 	map(0xb84000, 0xb84001).portr("INPUTS");
@@ -1000,7 +1007,8 @@ void zoo_state::hacher_map(address_map &map)
 
 void zoo_state::zoo_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xa80000, 0xa83fff).ram().share("nvram"); // battery
 	map(0xb80000, 0xb80fff).ram().share("spriteram");
 	map(0xb82000, 0xb82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
@@ -1017,7 +1025,8 @@ void zoo_state::zoo_map(address_map &map)
 
 void zoo_state::zulu_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xb00000, 0xb03fff).ram().share("nvram"); // battery
 	map(0xb80000, 0xb801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00fff).ram().share("spriteram");
@@ -1034,7 +1043,8 @@ void zoo_state::zulu_map(address_map &map)
 
 void zoo_state::gostopac_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xb00000, 0xb00000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
 	map(0xc00000, 0xc00fff).ram().share("spriteram");
@@ -1050,7 +1060,8 @@ void zoo_state::gostopac_map(address_map &map)
 
 void zoo_state::monkeyl_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xa00000, 0xa00fff).ram().share("spriteram");
 	map(0xa02000, 0xa02001).nopr().w(FUNC(zoo_state::draw_sprites_w));
 	map(0xa04000, 0xa04001).portr("INPUTS");
@@ -1066,7 +1077,8 @@ void zoo_state::monkeyl_map(address_map &map)
 
 void zoo_state::monkeyle_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xa00000, 0xa03fff).ram().share("nvram"); // battery
 	map(0xa80000, 0xa80fff).ram().share("spriteram");
 	map(0xa82000, 0xa82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
@@ -1082,7 +1094,8 @@ void zoo_state::monkeyle_map(address_map &map)
 
 void zoo_state::speedmst_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0x850000, 0x850001).nopr().w(FUNC(zoo_state::screen_enable_w)).umask16(0x00ff);
 	map(0x860000, 0x863fff).ram().share("nvram"); // battery
 	map(0x880000, 0x880fff).ram().share("spriteram");
@@ -1099,7 +1112,8 @@ void zoo_state::speedmst_map(address_map &map)
 
 void zoo_state::wwitch_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xa00001, 0xa00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa80000, 0xa80fff).ram().share("spriteram");
 	map(0xa82000, 0xa82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
@@ -1116,7 +1130,8 @@ void zoo_state::wwitch_map(address_map &map)
 
 void zoo_state::lwitch_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xa00001, 0xa00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa80000, 0xa80fff).ram().share("spriteram");
 	map(0xa82000, 0xa82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
@@ -1133,7 +1148,8 @@ void zoo_state::lwitch_map(address_map &map)
 
 void zoo_state::hapfarm_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0x480000, 0x483fff).ram().share("nvram"); // battery
 	map(0xb00000, 0xb00001).portr("CPUCODE_IN");
 	map(0xb80000, 0xb80fff).ram().share("spriteram");
@@ -1150,7 +1166,8 @@ void zoo_state::hapfarm_map(address_map &map)
 
 void zoo_state::hapfarma_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0x300000, 0x303fff).ram().share("nvram"); // battery
 	map(0xa80000, 0xa80001).portr("CPUCODE_IN");
 	map(0xb80000, 0xb80fff).ram().share("spriteram");
@@ -1167,7 +1184,8 @@ void zoo_state::hapfarma_map(address_map &map)
 
 void zoo_state::westvent_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xa00000, 0xa00000).w(FUNC(zoo_state::oki_bank_w));
 	map(0xa80000, 0xa83fff).ram().share("nvram"); // battery
 	map(0xb00001, 0xb00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -1184,7 +1202,8 @@ void zoo_state::westvent_map(address_map &map)
 
 void astoneag_state::astoneag_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xb00000, 0xb03fff).ram().share("nvram"); // battery
 	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
 	map(0xc00000, 0xc00fff).ram().share("spriteram");
@@ -1864,7 +1883,9 @@ RAM1 are SEC KM681000BLG-7L RAM chips
 ***************************************************************************/
 
 ROM_START( skilldrp )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_WORD_SWAP( "7-skill_drop_g1.01s.u100", 0x00000, 0x40000, CRC(8867df18) SHA1(19ad0104647b6f5c8b6c06749c24defdcacfd54d) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
@@ -1878,7 +1899,9 @@ ROM_START( skilldrp )
 ROM_END
 
 ROM_START( skilldrpa )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_WORD_SWAP( "7-skill_drop_g1.0s.u100", 0x00000, 0x40000, CRC(f968b783) SHA1(1d693b1d460e659ca94aae8625ea26e120053f84) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
@@ -1892,7 +1915,9 @@ ROM_START( skilldrpa )
 ROM_END
 
 ROM_START( luckycoin )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_WORD_SWAP( "u100", 0x00000, 0x40000, CRC(77bbeebc) SHA1(45f5a18694e2a93d9c299dc1f405df32c9773ce6) ) // label was peeled off
 
 	ROM_REGION( 0x200000, "sprites", 0 )
@@ -2048,7 +2073,9 @@ ROM_START( magibombc )
 ROM_END
 
 ROM_START( magibombd )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "rom1", 0x00000, 0x10000, CRC(91883755) SHA1(bc6dd5cac352f169beac790825e86a2ecb45af05) )
 	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(b55bc270) SHA1(7486018b87708cf5b653c27b1ed824e441c169b7) )
 	ROM_FILL(                0x20000, 0x20000, 0xff )
@@ -2097,7 +2124,9 @@ ROM_START( magibombf )
 ROM_END
 
 ROM_START( magibombg )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1 magic bomb nb.6.1.u20", 0x00000, 0x10000, CRC(8aaa14c3) SHA1(44ade91596b8cd907c7556f3c5f977e2c7b4029d) )
 	ROM_LOAD16_BYTE( "2 magic bomb nb.6.1.u19", 0x00001, 0x10000, CRC(d371c3ab) SHA1(3f63883ad2735a772e9dbc958346b692420667dc) )
 	ROM_FILL(                                   0x20000, 0x20000, 0xff )
@@ -2146,7 +2175,9 @@ ROM_START( magibombi )
 ROM_END
 
 ROM_START( magibombj )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_mb_aa72c.u26", 0x00000, 0x10000, CRC(7faa57c3) SHA1(6176848354f90b819d4ffe2d91cdd9cca36ff58f) )
 	ROM_LOAD16_BYTE( "2_mb_aa72c.u25", 0x00001, 0x10000, CRC(987c3e4e) SHA1(d2ffac771dc1d30f0598c79cad0691753e4945f7) )
 	ROM_FILL(                          0x20000, 0x20000, 0xff )
@@ -2195,7 +2226,9 @@ ROM_START( magibombl ) // MIN BET 1-XXX, MINIMUM % = 91/50%, OSAMA BIN LADEN GFX
 ROM_END
 
 ROM_START( magibombm )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "2_m._b._ab5.3.u22", 0x00000, 0x10000, CRC(e568681a) SHA1(ec55de2ebfb2b10e1873cc11ec4f47e17dd2fffa) )
 	ROM_LOAD16_BYTE( "1_m._b._ab5.3.u23", 0x00001, 0x10000, CRC(dfb63c3d) SHA1(0f0bd5cccf5ab08003bfb751355304386682bbd0) )
 	ROM_FILL(                             0x20000, 0x20000, 0xff )
@@ -2229,7 +2262,9 @@ ROM_START( magibombn ) // MIN BET 1-8-16-32 MINIMUM % = 91/50%
 ROM_END
 
 ROM_START( magibombo )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_m.b.br.71.a.u26", 0x00000, 0x20000, CRC(6e815fa3) SHA1(f88b07c0d0bdb9667d7de5383623ac20ce48a7e9) ) // A290011T
 	ROM_LOAD16_BYTE( "2_m.b.br.71.a.u25", 0x00001, 0x20000, CRC(b3c24e55) SHA1(34e2e2e2862c761e6b869aaac003a73615ab730b) ) // A290011T
 
@@ -2247,7 +2282,9 @@ ROM_START( magibombo )
 ROM_END
 
 ROM_START( magibombp )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_m.b._ab6.0j.u19", 0x00000, 0x10000, CRC(01bdb114) SHA1(a69b8a4f9332410f86c7d65664976a15ae8f315c) )
 	ROM_LOAD16_BYTE( "2_m.b._ab6.0j.u20", 0x00001, 0x10000, CRC(b5fd35aa) SHA1(7b1f157788824f1fc0924ad5e60f014b5bcc71f4) )
 	ROM_FILL(                             0x20000, 0x20000, 0xff )
@@ -2290,7 +2327,9 @@ MX29F1610MC-10
 ***************************************************************************/
 
 ROM_START( westvent )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_w.v.aa.02.d.bin", 0x00000, 0x20000, CRC(5e208192) SHA1(5a35a419fe95513b68423d4eb6c77fdd375667f3) )  // good?
 	ROM_LOAD16_BYTE( "2_w.v.aa.02.d.bin", 0x00001, 0x20000, BAD_DUMP CRC(f56d3ead) SHA1(2cf8960eab221cfce1c7ac6a20d002c4b05d8cc6) ) // FIXED BITS (xxxxxx0xxxxxxxxx)
 
@@ -2310,7 +2349,9 @@ ROM_START( westvent )
 ROM_END
 
 ROM_START( westventa )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "2_w.v.aa.02.e.u26", 0x00000, 0x20000, CRC(48892445) SHA1(b3697d309d6f4a3df19c8e9c5708b07fb36e03b0) )
 	ROM_LOAD16_BYTE( "1_w.v.aa.02.e.u25", 0x00001, 0x20000, CRC(81234856) SHA1(86e3f2578e77d88be36fb9e1cc2ad8f9e9e883ab) )
 
@@ -2393,7 +2434,9 @@ J1 is an 2 pin connector, unknown purpose
 ***************************************************************************/
 
 ROM_START( winbingo )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "f29c51001t.u31", 0x00000, 0x20000, CRC(964cfdb5) SHA1(01109466e07f5e906be300bc69310171d34f2e6c) )
 	ROM_LOAD16_BYTE( "f29c51001t.u25", 0x00001, 0x20000, CRC(4ebeec72) SHA1(c603265e6319cff94a0c75017a12c6d86787f906) )
 
@@ -2418,7 +2461,9 @@ ROM_START( winbingo )
 ROM_END
 
 ROM_START( winbingoa )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "f29c51001t.u31", 0x00000, 0x20000, CRC(c33676c3) SHA1(9f5b7d05d187cf59948a572f80c55cb8fa1f656f) ) // sldh
 	ROM_LOAD16_BYTE( "f29c51001t.u25", 0x00001, 0x20000, CRC(43c7b2d8) SHA1(16ee79c34b7c485dfccecdf3e0ae9f18f8a20150) ) // sldh
 
@@ -2451,7 +2496,9 @@ ASTRO M1.2 PCB with Astro F02 2005-02-18
 ***************************************************************************/
 
 ROM_START( hacher )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "w-w-en-01-6.rom1", 0x00000, 0x20000, CRC(994acd32) SHA1(ee137ca96f4e2d22f2bae32051bbf2bd487e8c5a) )
 	ROM_LOAD16_BYTE( "w-w-en-01-6.rom2", 0x00001, 0x20000, CRC(b45c3f64) SHA1(c8f26fc3f9e2c46d8083d249f79ff8a3d47b67d0) )
 
@@ -2541,7 +2588,9 @@ J1 is an 2 pin connector, unknown purpose
 ***************************************************************************/
 
 ROM_START( zoo )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "zoo_zo.02.d.u26", 0x00000, 0x10000, CRC(1a3be45a) SHA1(877be4c9e8d5e7c4644e7bcb9a6729443ed772a4) )
 	ROM_LOAD16_BYTE( "zoo_zo.02.d.u25", 0x00001, 0x10000, CRC(8566aa21) SHA1(319192e2074f3bdda6001d8e9a4b97e98826d7ce) )
 	ROM_FILL(                           0x20000, 0x20000, 0xff )
@@ -2560,7 +2609,9 @@ ROM_START( zoo )
 ROM_END
 
 ROM_START( zulu )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_zulu_2.04.j.rom1.u20", 0x00000, 0x10000, CRC(f5004736) SHA1(c975556933303b47ae7cbda3641c7f367ab73871) ) // W27C512
 	ROM_LOAD16_BYTE( "2_zulu_2.04.j.rom1.u19", 0x00001, 0x10000, CRC(2eff3ab5) SHA1(21c2af44861ba5486cc53e39c6d04e5fe3d425b6) ) // W27C512
 	ROM_FILL(                                  0x20000, 0x20000, 0xff )
@@ -2629,7 +2680,9 @@ Video output only on VGA connector, video signals ARE VGA
 ***************************************************************************/
 
 ROM_START( astoneag )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1-s-a-eng-03-a.rom1", 0x00000, 0x20000, CRC(5e600713) SHA1(48ac0a52f90b972b77064e9e59711082aa95c654) )
 	ROM_LOAD16_BYTE( "2-s-a-eng-03-a.rom2", 0x00001, 0x20000, CRC(488e355e) SHA1(6550292cae7eda95a24e1982e869540464b1fcdd) )
 
@@ -2681,7 +2734,9 @@ ASTRO T-3802A PCB with ASTRO F02 2003-03-12
 ***************************************************************************/
 
 ROM_START( dinodino )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "dd_rom1.u20", 0x00000, 0x20000, CRC(056613dd) SHA1(e8481177b1dacda222fe4fae2b50841ddb0c87ba) )
 	ROM_LOAD16_BYTE( "dd_rom2.u19", 0x00001, 0x20000, CRC(575519c5) SHA1(249fe33b6ea0bc154125a988315f571a30b9375c) )
 
@@ -2705,8 +2760,17 @@ ROM_START( dinodino )
 	ROM_LOAD( "dinodino_cpucode.key", 0x00, 0x02, CRC(674b2687) SHA1(9c1338a41162fa2ffbd2ea0a579ad87a6c084a0e) )
 ROM_END
 
+/***************************************************************************
+
+Keno 21
+Astro Corp.
+
+***************************************************************************/
+
 ROM_START( keno21 )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_keno21_am-230.u20", 0x00000, 0x10000, CRC(362e81b9) SHA1(5f311fde80d8a18324413f0fdfb294f03eac78f4) ) // 27C512
 	ROM_LOAD16_BYTE( "2_keno21_am-230.u19", 0x00001, 0x10000, CRC(9201e3eb) SHA1(665991dfe55da93331e36f048bd4dac46445a9f3) ) // 27C512
 	ROM_FILL(                               0x20000, 0x20000, 0xff )
@@ -2739,7 +2803,9 @@ Astro Corp.
 ***************************************************************************/
 
 ROM_START( gostopac )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "go stop en1.0 1.u20", 0x00000, 0x10000, CRC(288eb9e2) SHA1(cb1181a3ff260374d786fa3b967e3200cdc545c5) )
 	ROM_LOAD16_BYTE( "go stop en1.0 2.u19", 0x00001, 0x10000, CRC(6cee46c2) SHA1(f63914264fbe9c3124f7e6e1fbd6fb1a72314de9) )
 	ROM_FILL(                               0x20000, 0x20000, 0xff )
@@ -2772,7 +2838,9 @@ Astro Corp.
 ***************************************************************************/
 
 ROM_START( monkeyl )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_m.l._aa.21.a.u26", 0x00000, 0x20000, CRC(2286237f) SHA1(cbf6589fe3eedd9482f8ba01c4510a5699085e69) ) // F29C51001T
 	ROM_LOAD16_BYTE( "1_m.l._aa.21.a.u25", 0x00001, 0x20000, CRC(0612f893) SHA1(6300d9defc75b1b09fad31f719c841c728fe3ff6) ) // F29C51001T
 
@@ -2797,7 +2865,9 @@ ROM_START( monkeyl )
 ROM_END
 
 ROM_START( monkeyla ) // MIN BET 1-XXX, % = LEVELS 1-8
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_m.l._aa.13.b.u26", 0x00000, 0x20000, CRC(0ff56936) SHA1(70f9cf3b6b71514b2401b7a516ae85ad86b5321f) ) // F29C51001T
 	ROM_LOAD16_BYTE( "1_m.l._aa.13.b.u25", 0x00001, 0x20000, CRC(d261b6ed) SHA1(347feb51b67cd0e0faeff98fa023b3f4a8cb9c32) ) // F29C51001T
 
@@ -2822,7 +2892,9 @@ ROM_START( monkeyla ) // MIN BET 1-XXX, % = LEVELS 1-8
 ROM_END
 
 ROM_START( monkeylb )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "f29c51001t.u26", 0x00000, 0x20000, CRC(bae5b055) SHA1(742f6aa7b66abdcfe140fb777aecb5388e9f8bdf) )
 	ROM_LOAD16_BYTE( "f29c51001t.u25", 0x00001, 0x20000, CRC(06362b30) SHA1(a73bc2bc217ecae6ed48ec30481f88767058837b) )
 
@@ -2847,7 +2919,9 @@ ROM_START( monkeylb )
 ROM_END
 
 ROM_START( monkeylc )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_m.l._aa.21.c.u26", 0x00000, 0x20000, CRC(482303fd) SHA1(494df379dd4436546e2ce03194ac2f214a91bd92) ) // F29C51001T
 	ROM_LOAD16_BYTE( "1_m.l._aa.21.c.u25", 0x00001, 0x20000, CRC(ccb3392e) SHA1(2ea301ae857f4360012f3adfc96b66319503a033) ) // F29C51001T
 
@@ -2872,7 +2946,9 @@ ROM_START( monkeylc )
 ROM_END
 
 ROM_START( monkeyld )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "w27e010.u20", 0x00000, 0x20000, CRC(4a5c78bc) SHA1(e310605ee102eee706c9e672ca722fa5c6163f39) )
 	ROM_LOAD16_BYTE( "w27e010.u19", 0x00001, 0x20000, CRC(ac37c3be) SHA1(489d4aafdd3228b096988090da9b712a9c08b74c) )
 
@@ -2897,7 +2973,9 @@ ROM_START( monkeyld )
 ROM_END
 
 ROM_START( monkeyle )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_m.l._en.20.b.u26", 0x00000, 0x20000, CRC(ec638bad) SHA1(dd7d7e2bfdbb2cf27b4523c49caf005b887d96f9) ) // A290011T
 	ROM_LOAD16_BYTE( "2_m.l._en.20.b.u25", 0x00001, 0x20000, CRC(65441a49) SHA1(07d7d5993ed5857c724bf071059a029098b34672) ) // A290011T
 
@@ -2922,7 +3000,9 @@ ROM_START( monkeyle )
 ROM_END
 
 ROM_START( monkeylf )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_WORD_SWAP( "monkey_land.u11", 0x00000, 0x40000, CRC(15765d17) SHA1(99fccb820a6f4001fae24faa8c67ffab2d9d70f2) )
 
 	ROM_REGION( 0x1000000, "sprites", 0 ) // not dumped for this set
@@ -2954,7 +3034,9 @@ D2 Enterprises
 ***************************************************************************/
 
 ROM_START( speedmst )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_s.m._d2.01.c.u23", 0x00000, 0x10000, CRC(f98cdc5f) SHA1(59088d649ec47c94469de3d409d75ab29ebdd4ec) ) // 27C512
 	ROM_LOAD16_BYTE( "2_s.m._d2.01.c.u22", 0x00001, 0x10000, CRC(f5017c91) SHA1(fa5e4888ff819dbaa5f10f089c6de2f32b8888ac) ) // 27C512
 	ROM_FILL(                              0x20000, 0x20000, 0xff )
@@ -2980,7 +3062,9 @@ ROM_START( speedmst )
 ROM_END
 
 ROM_START( speedmsta )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "speed_master_1.u23", 0x00000, 0x10000, CRC(c99200af) SHA1(0573ebc4bd866850aa6c16a0b9db7d7229865dbf) ) // 27C512
 	ROM_LOAD16_BYTE( "speed_master_2.u22", 0x00001, 0x10000, CRC(041ff0de) SHA1(63b129605d1c330836fdd5fa8a654f5d20170f0d) ) // 27C512
 	ROM_FILL(                              0x20000, 0x20000, 0xff )
@@ -3006,7 +3090,9 @@ ROM_START( speedmsta )
 ROM_END
 
 ROM_START( speedmstb )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_speed_master_d1.6.u23", 0x00000, 0x10000, CRC(beb8bcb8) SHA1(a06f4cb151ae6e80a4d5335a774be06d2c1feb2b) ) // 27C512
 	ROM_LOAD16_BYTE( "2_speed_master_d1.6.u22", 0x00001, 0x10000, CRC(2a0912fd) SHA1(e83bb6f131ea0d6dd5dc8e71e21a76b1f1ba1f09) ) // 27C512
 	ROM_FILL(                              0x20000, 0x20000, 0xff )
@@ -3039,7 +3125,9 @@ Astro Corp. / American Alpha
 ***************************************************************************/
 
 ROM_START( cptshark ) // clearly based on Win Win Bingo, still has strings for it
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_c.s._cs.01.6.u31", 0x00000, 0x20000, CRC(87eb4151) SHA1(600154bde858a185d18db9a2a2cb58284622e905) ) // F29C51001T
 	ROM_LOAD16_BYTE( "2_c.s._cs.01.6.u25", 0x00001, 0x20000, CRC(ed59d9b5) SHA1(30ac8a988e8b80463b1e67614a784c75582bcf16) ) // F29C51001T
 
@@ -3071,7 +3159,9 @@ Astro Corp.
 ***************************************************************************/
 
 ROM_START( wwitch )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_wicked_w_aa.01.a.u26", 0x00000, 0x20000, CRC(6c654105) SHA1(b07e807864d7d0ccb80111369f8dc205fe45aea4) ) // F29C51001T
 	ROM_LOAD16_BYTE( "2_wicked_w_aa.01.a.u25", 0x00001, 0x20000, CRC(66206bb4) SHA1(80513d7dc7cd664238f01a6c1b3e40e7696e2211) ) // F29C51001T
 
@@ -3091,7 +3181,9 @@ ROM_START( wwitch )
 ROM_END
 
 ROM_START( lwitch )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_l.w.en.01.a.u26", 0x00000, 0x20000, CRC(dadf2a55) SHA1(ed60182624d48c3bbfc80e0469221fbfc1a8b7ca) ) // A290011T
 	ROM_LOAD16_BYTE( "2_l.w.en.01.a.u25", 0x00001, 0x20000, CRC(307ce189) SHA1(cebc5a1393fbea2a2be9cc953ebf52b859255def) ) // A290011T
 
@@ -3118,7 +3210,9 @@ Astro Corp.
 ***************************************************************************/
 
 ROM_START( hapfarm ) // also has Hot Runner N3.00 string, so probably derived from that code base
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_happy_farm_us.01.02.b.u26", 0x00000, 0x20000, CRC(c60bbc39) SHA1(fcf23c9c75bc221a310b87de58dea75f018065c2) ) // EV29001TSC-70R read as F29C51001T
 	ROM_LOAD16_BYTE( "2_happy_farm_us.01.02.b.u25", 0x00001, 0x20000, CRC(186a3e0f) SHA1(8e2474beb9264dbadc154cdfdc7b911cc1a3a601) ) // EV29001TSC-70R read as F29C51001T
 
@@ -3138,7 +3232,9 @@ ROM_START( hapfarm ) // also has Hot Runner N3.00 string, so probably derived fr
 ROM_END
 
 ROM_START( hapfarma )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_happy_farm_in.01.02.b.u26", 0x00000, 0x20000, CRC(c7b32cbe) SHA1(08414711180485ebbb19583aaddb1cfaf19f2ac6) )
 	ROM_LOAD16_BYTE( "2_happy_farm_in.01.02.b.u25", 0x00001, 0x20000, CRC(8a3885a6) SHA1(adc74aaacda583b1d8ef3dcdc9c2075e89bfe7b7) )
 
@@ -3214,7 +3310,8 @@ void magibomb_state::init_magibomb()
 void zoo_state::decrypt_rom(const decryption_info &table)
 {
 	const u32 size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 * const rom = (u16 *)memregion("encrypted_rom")->base();
+	u16 * const decrypted = (u16 *)memregion("maincpu")->base();
 	std::unique_ptr<u16[]> tmp = std::make_unique<u16[]>(size/2);
 
 	// Pass 1: decrypt high and low byte independently.  They go
@@ -3262,7 +3359,7 @@ void zoo_state::decrypt_rom(const decryption_info &table)
 			(BIT(i, table.bits[8])  <<  4) |
 			(BIT(i, table.bits[9])  <<  3) |
 			(BIT(i, table.bits[10]) <<  2);
-		rom[dest >> 1] = tmp[i >> 1];
+		decrypted[dest >> 1] = tmp[i >> 1];
 	}
 }
 
@@ -3307,21 +3404,6 @@ void zoo_state::init_magibombd()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0446;
-
-	rom[0x00f80/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
-
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, u16 &data, u16 mem_mask)
-	{
-		switch (offset & 0x02)
-		{
-			case 0x00: data = 0x1227; break;
-			case 0x02: data = 0x5695; break;
-		}
-
-		return data;
-	});
 #endif
 }
 
@@ -3334,21 +3416,6 @@ void zoo_state::init_magibombg()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x043e;
-
-	rom[0x00f26/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
-
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, u16 &data, u16 mem_mask)
-	{
-		switch (offset & 0x02)
-		{
-			case 0x00: data = 0x1267; break;
-			case 0x02: data = 0x5715; break;
-		}
-
-		return data;
-	});
 #endif
 }
 
@@ -3361,21 +3428,6 @@ void zoo_state::init_magibombm()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x043e;
-
-	rom[0x00f80/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
-
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, u16 &data, u16 mem_mask)
-	{
-		switch (offset & 0x02)
-		{
-			case 0x00: data = 0x1267; break;
-			case 0x02: data = 0x5715; break;
-		}
-
-		return data;
-	});
 #endif
 }
 
@@ -3388,21 +3440,6 @@ void zoo_state::init_magibombo()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0446;
-
-	rom[0x00f52/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
-
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, u16 &data, u16 mem_mask)
-	{
-		switch (offset & 0x02)
-		{
-			case 0x00: data = 0x1227; break;
-			case 0x02: data = 0x5695; break;
-		}
-
-		return data;
-	});
 #endif
 }
 
@@ -3447,8 +3484,6 @@ void zoo_state::init_winbingo()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0400;
-
-	rom[0x0821c/2] = 0x4e71; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3461,8 +3496,6 @@ void zoo_state::init_winbingoa()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0400;
-
-	rom[0x081f2/2] = 0x4e71; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3475,8 +3508,6 @@ void zoo_state::init_hacher()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0400;
-
-	rom[0x07d6e/2] = 0x4e71; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3489,8 +3520,6 @@ void zoo_state::init_cptshark()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0400;
-
-	rom[0x08a2a/2] = 0x4e71; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3535,11 +3564,6 @@ void zoo_state::init_zoo()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0400;
-
-	rom[0x00010/2] = 0x1e00; // ROM 0405 ERROR
-	rom[0x00012/2] = 0x10d0; // ""
-
-	rom[0x091ac/2] = 0x4e71; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3552,11 +3576,6 @@ void zoo_state::init_zulu()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0400;
-
-	rom[0x00010/2] = 0x1d24; // ROM 0405 ERROR
-	rom[0x00012/2] = 0x18e0; // ""
-
-	rom[0x090da/2] = 0x4e71; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3601,11 +3620,6 @@ void zoo_state::init_dinodino()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0446;
-
-	rom[0x00010/2] = 0x1aa9;
-	rom[0x00012/2] = 0x6799;
-
-	rom[0x02236/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3650,9 +3664,6 @@ void zoo_state::init_gostopac()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0400;
 	rom[0x00006/2] = 0x0400;
-
-	rom[0x00010/2] = 0x0000;
-	rom[0x00012/2] = 0x1594;
 #endif
 }
 
@@ -3665,11 +3676,6 @@ void zoo_state::init_monkeyl()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0470;
-
-	rom[0x00010/2] = 0x12a9;
-	rom[0x00012/2] = 0x5799;
-
-	rom[0x01352/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3682,11 +3688,6 @@ void zoo_state::init_monkeyla()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0470;
-
-	rom[0x00010/2] = 0x12a9;
-	rom[0x00012/2] = 0x5799;
-
-	rom[0x01334/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3699,11 +3700,6 @@ void zoo_state::init_monkeyld()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0468;
-
-	rom[0x00010/2] = 0x12a9;
-	rom[0x00012/2] = 0x5799;
-
-	rom[0x01334/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3716,11 +3712,6 @@ void zoo_state::init_speedmst()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0400;
-
-	rom[0x00010/2] = 0x1c28;
-	rom[0x00012/2] = 0x1840;
-
-	rom[0x08736/2] = 0x4e71; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3733,11 +3724,6 @@ void zoo_state::init_speedmsta()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0400;
-
-	rom[0x00010/2] = 0x1c32;
-	rom[0x00012/2] = 0x1840;
-
-	rom[0x086fc/2] = 0x4e71; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3750,11 +3736,6 @@ void zoo_state::init_speedmstb()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0400;
-
-	rom[0x00010/2] = 0x1c28;
-	rom[0x00012/2] = 0x1840;
-
-	rom[0x0871a/2] = 0x4e71; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3799,22 +3780,6 @@ void zoo_state::init_wwitch()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0446;
-
-	rom[0x01220/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
-
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	program.install_read_tap(0x800008, 0x80000b, "magic_mirror_r", [] (offs_t offset, u16 &data, u16 mem_mask)
-	{
-		switch (offset & 0x02)
-		{
-			case 0x00: data = 0x12a9; break;
-			case 0x02: data = 0x5799; break;
-		}
-
-		return data;
-	});
-
 #endif
 }
 
@@ -3859,11 +3824,6 @@ void zoo_state::init_westvent()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x043e;
-
-	rom[0x00010/2] = 0x12a9;
-	rom[0x00012/2] = 0x5799;
-
-	rom[0x021d6/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3908,8 +3868,6 @@ void zoo_state::init_hapfarm()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0400;
-
-	rom[0x32126/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3922,8 +3880,6 @@ void zoo_state::init_hapfarma()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0400;
-
-	rom[0x32490/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3968,10 +3924,6 @@ void zoo_state::init_keno21()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0400;
 	rom[0x00006/2] = 0x0400;
-	rom[0x00008/2] = 0x0000;
-	rom[0x0000a/2] = 0x0400;
-
-	rom[0x163ba/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -4016,23 +3968,6 @@ void astoneag_state::init_astoneag()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0440;
-
-	rom[0x02872/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
-
-
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	program.install_read_tap(0x800004, 0x800007, "magic_mirror_r", [] (offs_t offset, u16 &data, u16 mem_mask)
-	{
-		switch (offset & 0x02)
-		{
-			case 0x00: data = 0x1aa9; break;
-			case 0x02: data = 0x6799; break;
-		}
-
-		return data;
-	});
-
 #endif
 
 	interleave_sprites_16x32();
