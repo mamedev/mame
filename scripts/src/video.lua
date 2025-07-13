@@ -1780,3 +1780,15 @@ if (VIDEOS["ST7626"]~=null) then
 		MAME_DIR .. "src/devices/video/st7626.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/serialvfd.h,VIDEOS["SERIALVFD"] = true
+--------------------------------------------------
+
+if (VIDEOS["SERIALVFD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/serialvfd.cpp",
+		MAME_DIR .. "src/devices/video/serialvfd.h",
+	}
+end
