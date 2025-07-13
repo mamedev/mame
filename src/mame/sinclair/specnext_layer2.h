@@ -40,6 +40,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	void draw_256(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode, u8 priority_mask, u8 mixer);
+	void draw_16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode, u8 priority_mask, u8 mixer);
+
 	u16 m_offset_h, m_offset_v;
 	const u8 *m_host_ram_ptr;
 	u8 m_global_transparent;
