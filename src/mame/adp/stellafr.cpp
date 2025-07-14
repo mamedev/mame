@@ -230,17 +230,19 @@ private:
 
 uint16_t stellafr_state::mux_r()
 {
+	// U10
 	uint16_t data = 0xffff;
 
-	data &= ~(BIT(m_in0->read(), m_mux_data) ? 0x0000 : 0x0004);
+	// data &= ~(BIT(m_in0->read(), m_mux_data) ? 0x0000 : 0x0004);
 
 	return data;
 }
 
 void stellafr_state::mux_w(uint16_t data)
 {
-	m_mux_data++;
-	m_mux_data &= 0x0f;
+	//m_mux_data++;
+	//m_mux_data &= 0x0f;
+	// U5
 }
 
 void stellafr_state::mux2_w(uint8_t data)
