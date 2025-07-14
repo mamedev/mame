@@ -25,8 +25,8 @@ license:CC0-1.0
 *V H2685 - Yu-Gi-Oh! Volume 1
 *  H2686 - Winx Club Volume 1
    H2687 - The Grim Adventures of Billy and Mandy Volume 1
-   H2688 - Vans Triple Crown Volume 1 (BMX)
-   H2689 - Vans Triple Crown Volume 2 (Skateboarding)
+*  H2688 - Vans Triple Crown Volume 1 (BMX)
+*  H2689 - Vans Triple Crown Volume 2 (Skateboarding)
 *  H2690 - Vans Pipeline Masters Volume 1
 *V H2692 - Teenage Mutant Ninja Turtles Volume 1
    H2694 - Trading Spaces Volume 1
@@ -217,6 +217,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
+	<!-- also seen on a 32Mbyte ROM <rom name="h6258.bin" size="0x2100000" crc="ca34d4e9" sha1="e7ee85edc0fe7ae13fc76af0af2a59d01bb0ced4" /> -->
 	<software name="winxe103">
 		<description>Winx Club Episode 103 (H6258)</description>
 		<year>2004</year>
@@ -408,6 +409,34 @@ license:CC0-1.0
 			<feature name="nandtype2" value="0x73"/>
 			<dataarea name="rom" size="0x1080000">
 				<rom name="h6247.bin" size="0x1080000" crc="31fd2902" sha1="5d28ea98665bd99fc8c9b460f0cccd7a566ec6ee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vans1">
+		<description>Vans Triple Crown Volume 1 (BMX) (H2688)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2688" />
+		<part name="memc" interface="sm_memc">
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="h2688.bin" size="0x2100000" crc="c463b055" sha1="735e0a5c411673c69b9105f1e4a78be8ecfb565a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vans2">
+		<description>Vans Triple Crown Volume 2 (Skateboarding) (H2689)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2689" />
+		<part name="memc" interface="sm_memc">
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="h2689.bin" size="0x2100000" crc="16d12a69" sha1="eb20b42dac9df39b5943f0f485826d011a3d93a2" />
 			</dataarea>
 		</part>
 	</software>
