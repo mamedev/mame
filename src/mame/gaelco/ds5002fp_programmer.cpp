@@ -96,6 +96,7 @@ void ds5002fp_programmer_state::ds5002fp_programmer(machine_config &config)
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "gaelcods_rom");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(ds5002fp_programmer_state::cart_load));
+	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gaelco_ds5002fp_rom");
 }

@@ -6,7 +6,7 @@ license:CC0-1.0
 
 <softwarelist name="gaelco_ds5002fp_rom" description="Gaelco DS5002FP Programmer ROMs">
 
-	<software name="aligator">
+	<software name="aligator" supported="no">
 		<description>Alligator Hunt</description>
 		<year>1994</year>
 		<publisher>Gaelco</publisher>
@@ -17,7 +17,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="maniacsq">
+	<software name="maniacsq" supported="no">
 		<description>Maniac Square</description>
 		<year>1996</year>
 		<publisher>Gaelco</publisher>
@@ -28,7 +28,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="targeth">
+	<software name="targeth" supported="no">
 		<description>Target Hits</description>
 		<year>1994</year>
 		<publisher>Gaelco</publisher>
@@ -39,7 +39,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="glass">
+	<software name="glass" supported="no">
 		<description>Glass</description>
 		<year>1993</year>
 		<publisher>Gaelco</publisher>
@@ -50,7 +50,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="thoop2">
+	<software name="thoop2" supported="no">
 		<description>TH Strikes Back</description>
 		<year>1994</year>
 		<publisher>Gaelco</publisher>
@@ -61,7 +61,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="touchgo">
+	<software name="touchgo" supported="no">
 		<description>Touch and Go</description>
 		<year>1995</year>
 		<publisher>Gaelco</publisher>
@@ -72,7 +72,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wrally2">
+	<software name="wrally2" supported="no">
 		<description>World Rally 2</description>
 		<year>1995</year>
 		<publisher>Gaelco</publisher>
@@ -83,7 +83,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wrally2a">
+	<software name="wrally2a" supported="no">
 		<description>World Rally 2 (older)</description>
 		<year>1995</year>
 		<publisher>Gaelco</publisher>
@@ -93,5 +93,16 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
+	<software name="goldart" supported="no">
+		<description>Goldart</description>
+		<year>1994</year>
+		<publisher>Gaelco</publisher>
+		<part name="cart" interface="gaelcods_rom">
+			<dataarea name="rom" width="16" endianness="big" size="0x20000">
+				<rom name="diana_27c1024.bin" size="0x20000" crc="20c4d1d9" sha1="067be3b3efa0f37dfb7b06d3a83452a1619933e2" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
