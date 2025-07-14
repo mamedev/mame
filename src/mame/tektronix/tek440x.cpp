@@ -100,6 +100,8 @@ constexpr offs_t MAXRAM = 0x200000;	// +1MB
 // pagetable as internal
 #define USE_INTERNAL_MAPxx
 
+DECLARE_DEVICE_TYPE(M68010_TEKMMU, m68010_tekmmu_device)
+
 class m68010_tekmmu_device : public m68010_device
 {
 	using m68010_device::m68010_device;
@@ -215,12 +217,24 @@ class m68010_tekmmu_device : public m68010_device
 		map(0x800000, 0xffffff).rw(FUNC(m68010_tekmmu_device::map_r), FUNC(m68010_tekmmu_device::map_w));
 	}
 
-	m68010_tekmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-		m68010_device::m68010_device(mconfig, tag, owner, clock, address_map_constructor(FUNC(m68010_tekmmu_device::cpu_internal_map),this)),
+	m68010_tekmmu_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, u32 clock) :
+		m68010_device::m68010_device(mconfig, M68010_TEKMMU, tag, owner, clock, address_map_constructor(FUNC(m68010_tekmmu_device::cpu_internal_map),this)),
 		m_map(*this, "map", 0x1000, ENDIANNESS_BIG)		// 2k 16-bit entries
 	{
 	}
 #endif
+
+//protected:
+public:
+	m68010_tekmmu_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, u32 clock) :
+		m68010_device::m68010_device(mconfig, type, "mc68010_tekmmu", owner, clock)
+	{
+
+		fprintf(stderr, "m68010_tekmmu_device::shortname(%s)\n",shortname());
+
+	}
+
+
 
 public:
 	// device_memory_interface overrides
@@ -500,7 +514,6 @@ public:
 	}
 
 };
-DECLARE_DEVICE_TYPE(M68010_TEKMMU, m68010_tekmmu_device)
 
 DEFINE_DEVICE_TYPE(M68010_TEKMMU, m68010_tekmmu_device, "mc68010_tekmmu", "MC68010 with Tek4404 custom MMU")
 
