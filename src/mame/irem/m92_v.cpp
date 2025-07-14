@@ -226,7 +226,7 @@ void m92_state::master_control_w(offs_t offset, uint16_t data, uint16_t mem_mask
 			break;
 
 		case 3:
-			m_raster_irq_position = m_pf_master_control[3] - 128;
+			m_raster_irq_position = (m_pf_master_control[3] & 0x1ff) - 128;
 			m_upd71059c->ir2_w(0);
 			break;
 	}
@@ -239,13 +239,8 @@ VIDEO_START_MEMBER(m92_state,m92)
 	m_spritebuffer_timer = timer_alloc(FUNC(m92_state::spritebuffer_done), this);
 
 	memset(m_pf_master_control, 0, sizeof(m_pf_master_control));
-	m_videocontrol = 0;
-	m_sprite_list = 0;
-	m_raster_irq_position = 0;
-	m_sprite_buffer_busy = 0;
-	m_palette_bank = 0;
-
 	memset(&m_pf_layer, 0, sizeof(m_pf_layer));
+
 	for (int laynum = 0; laynum < 3; laynum++)
 	{
 		M92_pf_layer_info *layer = &m_pf_layer[laynum];
@@ -462,9 +457,6 @@ void m92_state::ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void m92_state::m92_update_scroll_positions()
 {
-	int laynum;
-	int i;
-
 	/*  Playfield 3 rowscroll data is 0xdfc00 - 0xdffff
 	    Playfield 2 rowscroll data is 0xdf800 - 0xdfbff
 	    Playfield 1 rowscroll data is 0xdf400 - 0xdf7ff
@@ -476,7 +468,7 @@ void m92_state::m92_update_scroll_positions()
 
 	*/
 
-	for (laynum = 0; laynum < 3; laynum++)
+	for (int laynum = 0; laynum < 3; laynum++)
 	{
 		M92_pf_layer_info *layer = &m_pf_layer[laynum];
 
@@ -486,7 +478,7 @@ void m92_state::m92_update_scroll_positions()
 
 			layer->tmap->set_scroll_rows(512);
 			layer->wide_tmap->set_scroll_rows(512);
-			for (i = 0; i < 512; i++)
+			for (int i = 0; i < 512; i++)
 			{
 				layer->tmap->set_scrollx(i, scrolldata[i]);
 				layer->wide_tmap->set_scrollx(i, scrolldata[i]);

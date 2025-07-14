@@ -92,6 +92,7 @@ private:
 
 	uint16_t  m_ip;
 	uint16_t  m_prev_ip;
+	uint16_t  m_rep_ip;
 
 	/* PSW flags */
 	int32_t   m_SignVal;
@@ -118,6 +119,7 @@ private:
 	uint8_t   m_intm;
 	uint8_t   m_no_interrupt;
 	uint8_t   m_halted;
+	uint32_t  m_rep_opcode;
 
 	// timer related
 	uint16_t  m_TM0, m_MD0, m_TM1, m_MD1;
@@ -303,6 +305,13 @@ private:
 	uint16_t v25_read_word(unsigned a);
 	void v25_write_byte(unsigned a, uint8_t d);
 	void v25_write_word(unsigned a, uint16_t d);
+
+	uint8_t start_rep();
+	void cont_rep();
+	void do_repnc(uint8_t next);
+	void do_repc(uint8_t next);
+	void do_repne(uint8_t next);
+	void do_repe(uint8_t next);
 
 	void i_add_br8();
 	void i_add_wr16();

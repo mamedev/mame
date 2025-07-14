@@ -274,8 +274,8 @@ void m82_state::videoram2_m82_w(offs_t offset, u16 data, u16 mem_mask)
 void m72_state::irq_line_w(u16 data)
 {
 	// KNA70H015(11): ISET
-	m_raster_irq_position = data & 0x1ff;
-	// printf("m_raster_irq_position %04x\n", m_raster_irq_position);
+	m_raster_irq_position = (data & 0x1ff) - 128;
+	// printf("m_raster_irq_position %d\n", m_raster_irq_position);
 
 	// bchopper title screen jumps around, as does ingame at times, if this isn't done here
 	if (m_upd71059c.found())

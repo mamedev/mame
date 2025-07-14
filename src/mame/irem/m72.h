@@ -32,6 +32,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
+		m_upd71059c(*this, "upd71059c"),
 		m_dac(*this, "dac"),
 		m_audio(*this, "m72"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -41,7 +42,6 @@ public:
 		m_videoram(*this, "videoram%u", 1U),
 		m_soundram(*this, "soundram"),
 		m_paletteram(*this, "paletteram%u", 1U),
-		m_upd71059c(*this, "upd71059c"),
 		m_samples_region(*this, "samples"),
 		m_io_dsw(*this, "DSW"),
 		m_fg_tilemap(nullptr),
@@ -74,6 +74,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	optional_device<pic8259_device> m_upd71059c;
 	optional_device<dac_byte_interface> m_dac;
 	optional_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -84,18 +85,14 @@ protected:
 	required_shared_ptr_array<u16, 2> m_videoram;
 	optional_shared_ptr<u8> m_soundram;
 	required_shared_ptr_array<u16, 2> m_paletteram;
-
-	optional_device<pic8259_device> m_upd71059c;
-
 	optional_region_ptr<u8> m_samples_region;
-
 	optional_ioport m_io_dsw;
 
 	std::unique_ptr<u16[]> m_protection_ram;
 	emu_timer *m_scanline_timer = nullptr;
 	const u8 *m_protection_code = nullptr;
 	const u8 *m_protection_crc = nullptr;
-	u32 m_raster_irq_position = 0;
+	s32 m_raster_irq_position = -1;
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
 	s32 m_scrollx[2]{};
@@ -243,10 +240,7 @@ public:
 	m82_state(const machine_config &mconfig, device_type type, const char *tag) :
 		m72_state(mconfig, type, tag),
 		m_m82_rowscrollram(*this, "majtitle_rowscr"),
-		m_spriteram2(*this, "spriteram2"),
-		m_bg_tilemap_large(nullptr),
-		m_m82_rowscroll(false),
-		m_m82_tmcontrol(0)
+		m_spriteram2(*this, "spriteram2")
 	{
 	}
 

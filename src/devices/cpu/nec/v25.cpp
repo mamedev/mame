@@ -140,13 +140,12 @@ void v25_common_device::do_prefetch(int previous_ICount)
 		diff -= m_prefetch_cycles;
 		m_prefetch_count++;
 	}
-
 }
 
 uint8_t v25_common_device::fetch()
 {
 	prefetch();
-	return m_dr8((Sreg(PS)<<4)+m_ip++);
+	return m_dr8((Sreg(PS)<<4) + m_ip++);
 }
 
 uint16_t v25_common_device::fetchword()
@@ -170,7 +169,7 @@ uint8_t v25_common_device::fetchop()
 	uint8_t ret;
 
 	prefetch();
-	ret = m_dr8((Sreg(PS)<<4)+m_ip++);
+	ret = m_dr8((Sreg(PS)<<4) + m_ip++);
 
 	if (m_MF == 0)
 		if (m_v25v35_decryptiontable)
@@ -188,6 +187,7 @@ void v25_common_device::device_reset()
 {
 	m_ip = 0;
 	m_prev_ip = 0;
+	m_rep_ip = 0;
 	m_IBRK = 1;
 	m_F0 = 0;
 	m_F1 = 0;
@@ -216,6 +216,7 @@ void v25_common_device::device_reset()
 	m_mode_state = m_MF = (m_v25v35_decryptiontable) ? 0 : 1;
 	m_intm = 0;
 	m_halted = 0;
+	m_rep_opcode = 0;
 
 	m_TMC0 = m_TMC1 = 0;
 
@@ -260,6 +261,7 @@ void v25_common_device::nec_interrupt(unsigned int_num, int /*INTSOURCES*/ sourc
 {
 	uint32_t dest_seg, dest_off;
 
+	m_rep_opcode = 0;
 	i_pushf();
 	m_TF = m_IF = 0;
 	m_MF = m_mode_state;
@@ -696,6 +698,7 @@ void v25_common_device::device_start()
 
 	save_item(NAME(m_ip));
 	save_item(NAME(m_prev_ip));
+	save_item(NAME(m_rep_ip));
 	save_item(NAME(m_IBRK));
 	save_item(NAME(m_F0));
 	save_item(NAME(m_F1));
@@ -733,6 +736,7 @@ void v25_common_device::device_start()
 	save_item(NAME(m_no_interrupt));
 	save_item(NAME(m_intm));
 	save_item(NAME(m_halted));
+	save_item(NAME(m_rep_opcode));
 	save_item(NAME(m_TM0));
 	save_item(NAME(m_MD0));
 	save_item(NAME(m_TM1));
@@ -869,8 +873,6 @@ void v25_common_device::state_export(const device_state_entry &entry)
 
 void v25_common_device::execute_run()
 {
-	int prev_ICount;
-
 	int pending = m_pending_irq & m_unmasked_irq;
 
 	if (m_halted && pending)
@@ -906,14 +908,15 @@ void v25_common_device::execute_run()
 		return;
 	}
 
-	while(m_icount>0) {
+	while(m_icount>0)
+	{
 		if (m_dma_channel != -1)
 		{
 			dma_process();
 			continue;
 		}
 
-		/* Dispatch IRQ */
+		// Dispatch IRQ
 		m_prev_ip = m_ip;
 		if (m_no_interrupt==0 && (m_pending_irq & m_unmasked_irq))
 		{
@@ -923,13 +926,17 @@ void v25_common_device::execute_run()
 				external_int();
 		}
 
-		/* No interrupt allowed between last instruction and this one */
+		// No interrupt allowed between last instruction and this one
 		if (m_no_interrupt)
 			m_no_interrupt--;
 
 		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
-		prev_ICount = m_icount;
-		(this->*s_nec_instruction[fetchop()])();
+		int prev_ICount = m_icount;
+
+		if (m_rep_opcode)
+			cont_rep();
+		else
+			(this->*s_nec_instruction[fetchop()])();
 		do_prefetch(prev_ICount);
 
 		if ((m_dmam[0] & 0x0c) == 0x0c || (m_dmam[1] & 0x0c) == 0x0c)

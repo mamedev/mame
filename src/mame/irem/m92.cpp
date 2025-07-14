@@ -66,10 +66,6 @@ Glitch list!
         - EEPROM load/save not yet implemented - when done, MT2EEP should
           be removed from the ROM definition. (?)
 
-    LeagueMan:
-        Raster effects don't work properly (not even cpu time per line?).
-        Reference : https://youtu.be/K8mvKXnvgXc?t=53s
-
     (0.141 update: at least following two seems fixed from a lot of time ... -AS)
     Perfect Soldiers:
         Shortly into the fight, the sound CPU enters a tight loop, continuously
@@ -240,18 +236,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::scanline_interrupt)
 		m_upd71059c->ir2_w(1);
 	}
 	else
-	{
-		/* VBLANK interrupt */
-		if (scanline == m_screen->visible_area().max_y + 1)
-		{
-			m_screen->update_partial(scanline);
-			m_upd71059c->ir0_w(1);
-		}
-		else
-		{
-			m_upd71059c->ir0_w(0);
-		}
-	}
+		m_upd71059c->ir2_w(0);
+
+	/* VBLANK interrupt */
+	if (scanline == m_screen->visible_area().max_y + 1)
+		m_upd71059c->ir0_w(1);
+	else
+		m_upd71059c->ir0_w(0);
 }
 
 
@@ -282,8 +273,6 @@ int m92_state::sprite_busy_r()
 template<int Layer>
 void m92_state::pf_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	//Fix for nbbm stage start screen
-	//m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_pf_layer[Layer].control[offset]);
 }
 
@@ -2652,10 +2641,10 @@ GAME( 1993, inthuntu,    inthunt,  inthunt,       inthunt,   m92_state, empty_in
 GAME( 1993, kaiteids,    inthunt,  inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem",         "Kaitei Daisensou (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1993, inthuntk,    inthunt,  inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem",         "In The Hunt (Korea?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 
-GAME( 1993, nbbatman,    0,        nbbatman,      nbbatman,  m92_state, init_bank,     ROT0,   "Irem",         "Ninja Baseball Bat Man (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1993, nbbatmanu,   nbbatman, nbbatman,      nbbatman,  m92_state, init_bank,     ROT0,   "Irem America", "Ninja Baseball Bat Man (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL)
-GAME( 1993, leaguemn,    nbbatman, nbbatman,      nbbatman,  m92_state, init_bank,     ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL ) // M92-F-A ROM board
-GAME( 1993, leaguemna,   nbbatman, leaguemna,     nbbatman,  m92_state, init_bank,     ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL ) // M92-Z-C ROM board
+GAME( 1993, nbbatman,    0,        nbbatman,      nbbatman,  m92_state, init_bank,     ROT0,   "Irem",         "Ninja Baseball Bat Man (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1993, nbbatmanu,   nbbatman, nbbatman,      nbbatman,  m92_state, init_bank,     ROT0,   "Irem America", "Ninja Baseball Bat Man (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1993, leaguemn,    nbbatman, nbbatman,      nbbatman,  m92_state, init_bank,     ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // M92-F-A ROM board
+GAME( 1993, leaguemna,   nbbatman, leaguemna,     nbbatman,  m92_state, init_bank,     ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // M92-Z-C ROM board
 GAME( 1993, nbbatman2bl, nbbatman, nbbatman2bl,   nbbatman,  m92_state, init_bank,     ROT0,   "bootleg",      "Ninja Baseball Bat Man II (bootleg)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // different sprite system, MCU as soundcpu, OKI samples for music/sound
 
 GAME( 1993, ssoldier,    0,        psoldier,      psoldier,  m92_state, empty_init,    ROT0,   "Irem America", "Superior Soldiers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

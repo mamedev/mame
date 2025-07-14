@@ -79,6 +79,7 @@ private:
 
 	uint16_t  m_ip;
 	uint16_t  m_prev_ip;
+	uint16_t  m_rep_ip;
 
 	/* PSW flags */
 	int32_t   m_SignVal;
@@ -99,6 +100,7 @@ private:
 	uint32_t  m_poll_state;
 	uint8_t   m_no_interrupt;
 	uint8_t   m_halted;
+	uint32_t  m_rep_opcode;
 
 	address_space *m_program;
 	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache m_cache8;
@@ -147,6 +149,13 @@ private:
 	void nec_trap();
 	void nec_brk(unsigned int_num);
 	void external_int();
+
+	uint8_t start_rep();
+	void cont_rep();
+	void do_repnc(uint8_t next);
+	void do_repc(uint8_t next);
+	void do_repne(uint8_t next);
+	void do_repe(uint8_t next);
 
 	void i_add_br8();
 	void i_add_wr16();

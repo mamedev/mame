@@ -2,6 +2,150 @@
 // copyright-holders:Bryan McPhail
 #define OP(num,func_name) void nec_common_device::func_name()
 
+uint8_t nec_common_device::start_rep()
+{
+	uint8_t next = fetchop();
+
+	switch(next) { /* Segments */
+		case 0x26:  m_seg_prefix=true; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;
+		case 0x2e:  m_seg_prefix=true; m_prefix_base=Sreg(PS)<<4;     next = fetchop();  CLK(2); break;
+		case 0x36:  m_seg_prefix=true; m_prefix_base=Sreg(SS)<<4;     next = fetchop();  CLK(2); break;
+		case 0x3e:  m_seg_prefix=true; m_prefix_base=Sreg(DS0)<<4;    next = fetchop();  CLK(2); break;
+	}
+
+	return next;
+}
+
+void nec_common_device::cont_rep()
+{
+	m_ip = m_rep_ip;
+	m_seg_prefix = bool(BIT(m_rep_opcode, 2));
+
+	const uint8_t opcode = m_rep_opcode & 3;
+	const uint8_t next = m_rep_opcode >> 8 & 0xff;
+	m_rep_opcode = 0;
+
+	// continue REP loop where it left off
+	switch(opcode) {
+		case 0: do_repnc(next); break;
+		case 1: do_repc(next); break;
+		case 2: do_repne(next); break;
+		case 3: do_repe(next); break;
+	}
+}
+
+void nec_common_device::do_repnc(uint8_t next)
+{
+	uint16_t c = Wreg(CW);
+	switch(next) {
+		case 0x6c:  CLK(2); if (c) do { i_insb();  c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		case 0x6d:  CLK(2); if (c) do { i_insw();  c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		case 0x6e:  CLK(2); if (c) do { i_outsb(); c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		case 0x6f:  CLK(2); if (c) do { i_outsw(); c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xa4:  CLK(2); if (c) do { i_movsb(); c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xa5:  CLK(2); if (c) do { i_movsw(); c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xa6:  CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xa7:  CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xaa:  CLK(2); if (c) do { i_stosb(); c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xab:  CLK(2); if (c) do { i_stosw(); c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xac:  CLK(2); if (c) do { i_lodsb(); c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && !CF && m_icount>0); Wreg(CW)=c; break;
+		default:    logerror("%06x: REPNC invalid\n",PC()); c = 0; (this->*s_nec_instruction[next])(); break;
+	}
+	if (c && !CF) {
+		m_rep_ip = m_ip;
+		m_ip = m_prev_ip;
+		m_rep_opcode = next << 8 | 0 | (m_seg_prefix ? 4 : 0);
+	}
+	m_seg_prefix=false;
+}
+
+void nec_common_device::do_repc(uint8_t next)
+{
+	uint16_t c = Wreg(CW);
+	switch(next) {
+		case 0x6c:  CLK(2); if (c) do { i_insb();  c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		case 0x6d:  CLK(2); if (c) do { i_insw();  c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		case 0x6e:  CLK(2); if (c) do { i_outsb(); c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		case 0x6f:  CLK(2); if (c) do { i_outsw(); c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xa4:  CLK(2); if (c) do { i_movsb(); c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xa5:  CLK(2); if (c) do { i_movsw(); c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xa6:  CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xa7:  CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xaa:  CLK(2); if (c) do { i_stosb(); c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xab:  CLK(2); if (c) do { i_stosw(); c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xac:  CLK(2); if (c) do { i_lodsb(); c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && CF && m_icount>0); Wreg(CW)=c; break;
+		default:    logerror("%06x: REPC invalid\n",PC()); c = 0; (this->*s_nec_instruction[next])(); break;
+	}
+	if (c && CF) {
+		m_rep_ip = m_ip;
+		m_ip = m_prev_ip;
+		m_rep_opcode = next << 8 | 1 | (m_seg_prefix ? 4 : 0);
+	}
+	m_seg_prefix=false;
+}
+
+void nec_common_device::do_repne(uint8_t next)
+{
+	uint16_t c = Wreg(CW);
+	switch(next) {
+		case 0x6c:  CLK(2); if (c) do { i_insb();  c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0x6d:  CLK(2); if (c) do { i_insw();  c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0x6e:  CLK(2); if (c) do { i_outsb(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0x6f:  CLK(2); if (c) do { i_outsw(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xa4:  CLK(2); if (c) do { i_movsb(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xa5:  CLK(2); if (c) do { i_movsw(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xa6:  CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && !ZF && m_icount>0);    Wreg(CW)=c; break;
+		case 0xa7:  CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && !ZF && m_icount>0);    Wreg(CW)=c; break;
+		case 0xaa:  CLK(2); if (c) do { i_stosb(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xab:  CLK(2); if (c) do { i_stosw(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xac:  CLK(2); if (c) do { i_lodsb(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && !ZF && m_icount>0);    Wreg(CW)=c; break;
+		case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && !ZF && m_icount>0);    Wreg(CW)=c; break;
+		default:    logerror("%06x: REPNE invalid\n",PC()); c = 0; (this->*s_nec_instruction[next])(); break;
+	}
+	if (c && !(ZF && ((next & 0x86) == 0x86))) {
+		m_rep_ip = m_ip;
+		m_ip = m_prev_ip;
+		m_rep_opcode = next << 8 | 2 | (m_seg_prefix ? 4 : 0);
+	}
+	m_seg_prefix=false;
+}
+
+void nec_common_device::do_repe(uint8_t next)
+{
+	uint16_t c = Wreg(CW);
+	switch(next) {
+		case 0x6c:  CLK(2); if (c) do { i_insb();  c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0x6d:  CLK(2); if (c) do { i_insw();  c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0x6e:  CLK(2); if (c) do { i_outsb(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0x6f:  CLK(2); if (c) do { i_outsw(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xa4:  CLK(2); if (c) do { i_movsb(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xa5:  CLK(2); if (c) do { i_movsw(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xa6:  CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && ZF && m_icount>0);    Wreg(CW)=c; break;
+		case 0xa7:  CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && ZF && m_icount>0);    Wreg(CW)=c; break;
+		case 0xaa:  CLK(2); if (c) do { i_stosb(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xab:  CLK(2); if (c) do { i_stosw(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xac:  CLK(2); if (c) do { i_lodsb(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && m_icount>0); Wreg(CW)=c; break;
+		case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && ZF && m_icount>0);    Wreg(CW)=c; break;
+		case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && ZF && m_icount>0);    Wreg(CW)=c; break;
+		default:    logerror("%06x: REPE invalid\n",PC()); c = 0; (this->*s_nec_instruction[next])(); break;
+	}
+	if (c && !(!ZF && ((next & 0x86) == 0x86))) {
+		m_rep_ip = m_ip;
+		m_ip = m_prev_ip;
+		m_rep_opcode = next << 8 | 3 | (m_seg_prefix ? 4 : 0);
+	}
+	m_seg_prefix=false;
+}
+
 OP( 0x00, i_add_br8  ) { DEF_br8;   ADDB;   PutbackRMByte(ModRM,dst);   CLKM(2,2,2,16,16,7);        }
 OP( 0x01, i_add_wr16 ) { DEF_wr16;  ADDW;   PutbackRMWord(ModRM,dst);   CLKR(24,24,11,24,16,7,2,m_EA);}
 OP( 0x02, i_add_r8b  ) { DEF_r8b;   ADDB;   RegByte(ModRM)=dst;         CLKM(2,2,2,11,11,6);        }
@@ -266,62 +410,8 @@ OP( 0x62, i_chkind  ) {
 	m_icount-=20;
 	logerror("%06x: bound %04x high %04x low %04x tmp\n",PC(),high,low,tmp);
 }
-OP( 0x64, i_repnc  ) {  uint32_t next = fetchop();   uint16_t c = Wreg(CW);
-	switch(next) { /* Segments */
-		case 0x26:  m_seg_prefix=true; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;
-		case 0x2e:  m_seg_prefix=true; m_prefix_base=Sreg(PS)<<4; next = fetchop();  CLK(2); break;
-		case 0x36:  m_seg_prefix=true; m_prefix_base=Sreg(SS)<<4; next = fetchop();  CLK(2); break;
-		case 0x3e:  m_seg_prefix=true; m_prefix_base=Sreg(DS0)<<4;    next = fetchop();  CLK(2); break;
-	}
-
-	switch(next) {
-		case 0x6c:  CLK(2); if (c) do { i_insb();  c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		case 0x6d:  CLK(2); if (c) do { i_insw();  c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		case 0x6e:  CLK(2); if (c) do { i_outsb(); c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		case 0x6f:  CLK(2); if (c) do { i_outsw(); c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		case 0xa4:  CLK(2); if (c) do { i_movsb(); c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		case 0xa5:  CLK(2); if (c) do { i_movsw(); c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		case 0xa6:  CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		case 0xa7:  CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		case 0xaa:  CLK(2); if (c) do { i_stosb(); c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		case 0xab:  CLK(2); if (c) do { i_stosw(); c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		case 0xac:  CLK(2); if (c) do { i_lodsb(); c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && !CF); Wreg(CW)=c; break;
-		default:    logerror("%06x: REPNC invalid\n",PC());    (this->*s_nec_instruction[next])();
-	}
-	m_seg_prefix=false;
-}
-
-OP( 0x65, i_repc  ) {   uint32_t next = fetchop();   uint16_t c = Wreg(CW);
-	switch(next) { /* Segments */
-		case 0x26:  m_seg_prefix=true; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;
-		case 0x2e:  m_seg_prefix=true; m_prefix_base=Sreg(PS)<<4; next = fetchop();  CLK(2); break;
-		case 0x36:  m_seg_prefix=true; m_prefix_base=Sreg(SS)<<4; next = fetchop();  CLK(2); break;
-		case 0x3e:  m_seg_prefix=true; m_prefix_base=Sreg(DS0)<<4;    next = fetchop();  CLK(2); break;
-	}
-
-	switch(next) {
-		case 0x6c:  CLK(2); if (c) do { i_insb();  c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		case 0x6d:  CLK(2); if (c) do { i_insw();  c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		case 0x6e:  CLK(2); if (c) do { i_outsb(); c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		case 0x6f:  CLK(2); if (c) do { i_outsw(); c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		case 0xa4:  CLK(2); if (c) do { i_movsb(); c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		case 0xa5:  CLK(2); if (c) do { i_movsw(); c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		case 0xa6:  CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		case 0xa7:  CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		case 0xaa:  CLK(2); if (c) do { i_stosb(); c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		case 0xab:  CLK(2); if (c) do { i_stosw(); c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		case 0xac:  CLK(2); if (c) do { i_lodsb(); c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && CF);   Wreg(CW)=c; break;
-		default:    logerror("%06x: REPC invalid\n",PC()); (this->*s_nec_instruction[next])();
-	}
-	m_seg_prefix=false;
-}
-
+OP( 0x64, i_repnc    ) { do_repnc(start_rep()); }
+OP( 0x65, i_repc     ) { do_repc(start_rep()); }
 OP( 0x68, i_push_d16 ) { uint32_t tmp;    tmp = fetchword(); PUSH(tmp);   CLKW(12,12,5,12,8,5,Wreg(SP));  }
 OP( 0x69, i_imul_d16 ) { uint32_t tmp;    DEF_r16w;   tmp = fetchword(); dst = (int32_t)((int16_t)src)*(int32_t)((int16_t)tmp); m_CarryVal = m_OverVal = (((int32_t)dst) >> 15 != 0) && (((int32_t)dst) >> 15 != -1);     RegWord(ModRM)=(WORD)dst;     m_icount-=(ModRM >=0xc0 )?38:47;}
 OP( 0x6a, i_push_d8  ) { uint32_t tmp = (WORD)((int16_t)((int8_t)fetch()));   PUSH(tmp);  CLKW(11,11,5,11,7,3,Wreg(SP));  }
@@ -644,60 +734,8 @@ OP( 0xee, i_outdxal  ) { write_port_byte(Wreg(DW), Breg(AL)); CLKS(8,8,3);  }
 OP( 0xef, i_outdxax  ) { write_port_word(Wreg(DW), Wreg(AW)); CLKW(12,12,5,12,8,3,Wreg(DW)); }
 
 OP( 0xf0, i_lock     ) { LOGMASKED(LOG_BUSLOCK, "%06x: Warning - BUSLOCK\n",PC()); m_no_interrupt=1; CLK(2); }
-OP( 0xf2, i_repne    ) { uint32_t next = fetchop(); uint16_t c = Wreg(CW);
-	switch(next) { /* Segments */
-		case 0x26:  m_seg_prefix=true; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;
-		case 0x2e:  m_seg_prefix=true; m_prefix_base=Sreg(PS)<<4;     next = fetchop();  CLK(2); break;
-		case 0x36:  m_seg_prefix=true; m_prefix_base=Sreg(SS)<<4;     next = fetchop();  CLK(2); break;
-		case 0x3e:  m_seg_prefix=true; m_prefix_base=Sreg(DS0)<<4;    next = fetchop();  CLK(2); break;
-	}
-
-	switch(next) {
-		case 0x6c:  CLK(2); if (c) do { i_insb();  c--; } while (c>0); Wreg(CW)=c; break;
-		case 0x6d:  CLK(2); if (c) do { i_insw();  c--; } while (c>0); Wreg(CW)=c; break;
-		case 0x6e:  CLK(2); if (c) do { i_outsb(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0x6f:  CLK(2); if (c) do { i_outsw(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xa4:  CLK(2); if (c) do { i_movsb(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xa5:  CLK(2); if (c) do { i_movsw(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xa6:  CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && !ZF);    Wreg(CW)=c; break;
-		case 0xa7:  CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && !ZF);    Wreg(CW)=c; break;
-		case 0xaa:  CLK(2); if (c) do { i_stosb(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xab:  CLK(2); if (c) do { i_stosw(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xac:  CLK(2); if (c) do { i_lodsb(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && !ZF);    Wreg(CW)=c; break;
-		case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && !ZF);    Wreg(CW)=c; break;
-		default:    logerror("%06x: REPNE invalid\n",PC());    (this->*s_nec_instruction[next])();
-	}
-	m_seg_prefix=false;
-}
-OP( 0xf3, i_repe     ) { uint32_t next = fetchop(); uint16_t c = Wreg(CW);
-	switch(next) { /* Segments */
-		case 0x26:  m_seg_prefix=true; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;
-		case 0x2e:  m_seg_prefix=true; m_prefix_base=Sreg(PS)<<4; next = fetchop();  CLK(2); break;
-		case 0x36:  m_seg_prefix=true; m_prefix_base=Sreg(SS)<<4; next = fetchop();  CLK(2); break;
-		case 0x3e:  m_seg_prefix=true; m_prefix_base=Sreg(DS0)<<4;    next = fetchop();  CLK(2); break;
-	}
-
-	switch(next) {
-		case 0x6c:  CLK(2); if (c) do { i_insb();  c--; } while (c>0); Wreg(CW)=c; break;
-		case 0x6d:  CLK(2); if (c) do { i_insw();  c--; } while (c>0); Wreg(CW)=c; break;
-		case 0x6e:  CLK(2); if (c) do { i_outsb(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0x6f:  CLK(2); if (c) do { i_outsw(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xa4:  CLK(2); if (c) do { i_movsb(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xa5:  CLK(2); if (c) do { i_movsw(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xa6:  CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && ZF);    Wreg(CW)=c; break;
-		case 0xa7:  CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && ZF);    Wreg(CW)=c; break;
-		case 0xaa:  CLK(2); if (c) do { i_stosb(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xab:  CLK(2); if (c) do { i_stosw(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xac:  CLK(2); if (c) do { i_lodsb(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0); Wreg(CW)=c; break;
-		case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && ZF);    Wreg(CW)=c; break;
-		case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && ZF);    Wreg(CW)=c; break;
-		default:    logerror("%06x: REPE invalid\n",PC()); (this->*s_nec_instruction[next])();
-	}
-	m_seg_prefix=false;
-}
+OP( 0xf2, i_repne    ) { do_repne(start_rep()); }
+OP( 0xf3, i_repe     ) { do_repe(start_rep()); }
 OP( 0xf4, i_hlt ) { m_halted=1; m_icount=0; }
 OP( 0xf5, i_cmc ) { m_CarryVal = !CF; CLK(2); }
 OP( 0xf6, i_f6pre ) { uint32_t tmp; uint32_t uresult,uresult2; int32_t result,result2;

@@ -145,10 +145,6 @@ TODO:
   The cpu board also has support for IRQ3 and IRQ4, coming from the external
   connectors, but I don't think they are used by any game.
 
-- occasional raster effect scroll glitches in bchopper/mrheli, the maincpu is
-  probably a bit too slow. To force it to happen more regularly: mame -cheat,
-  max out ammo and enable rapid fire.
-
 IRQ controller
 --------------
 The IRQ controller is a UPD71059C
@@ -257,22 +253,20 @@ TIMER_CALLBACK_MEMBER(m72_state::scanline_interrupt)
 {
 	int scanline = param;
 
-	/* raster interrupt - visible area only? */
-	if (scanline < 256 && scanline == m_raster_irq_position - 128)
+	/* raster interrupt */
+	if (scanline == m_raster_irq_position)
 	{
+		m_screen->update_partial(m_screen->vpos());
 		m_upd71059c->ir2_w(1);
 	}
+	else
+		m_upd71059c->ir2_w(0);
 
 	/* VBLANK interrupt */
 	if (scanline == 256)
-	{
 		m_upd71059c->ir0_w(1);
-		m_upd71059c->ir2_w(0);
-	}
 	else
-	{
 		m_upd71059c->ir0_w(0);
-	}
 
 	/* adjust for next scanline */
 	if (++scanline >= m_screen->height())
@@ -284,10 +278,10 @@ TIMER_CALLBACK_MEMBER(m72_state::kengo_scanline_interrupt)
 {
 	int scanline = param;
 
-	/* raster interrupt - visible area only? */
-	if (scanline < 256 && scanline == m_raster_irq_position - 128)
+	/* raster interrupt */
+	if (scanline == m_raster_irq_position)
 	{
-		m_screen->update_partial(scanline);
+		m_screen->update_partial(m_screen->vpos());
 		m_maincpu->set_input_line(NEC_INPUT_LINE_INTP2, ASSERT_LINE);
 	}
 	else
@@ -295,10 +289,7 @@ TIMER_CALLBACK_MEMBER(m72_state::kengo_scanline_interrupt)
 
 	/* VBLANK interrupt */
 	if (scanline == 256)
-	{
-		m_screen->update_partial(scanline);
 		m_maincpu->set_input_line(NEC_INPUT_LINE_INTP0, ASSERT_LINE);
-	}
 	else
 		m_maincpu->set_input_line(NEC_INPUT_LINE_INTP0, CLEAR_LINE);
 
@@ -576,14 +567,12 @@ void m72_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 template<unsigned N>
 void m72_state::scrollx_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrollx[N]);
 }
 
 template<unsigned N>
 void m72_state::scrolly_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrolly[N]);
 }
 

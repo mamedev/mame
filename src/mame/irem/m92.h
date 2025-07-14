@@ -88,7 +88,7 @@ private:
 	required_ioport m_dsw;
 
 	emu_timer *m_spritebuffer_timer = nullptr;
-	uint32_t m_raster_irq_position = 0;
+	int32_t m_raster_irq_position = -1;
 	uint16_t m_videocontrol = 0;
 	uint8_t m_sprite_buffer_busy = 0;
 	M92_pf_layer_info m_pf_layer[3];
