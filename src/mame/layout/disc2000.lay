@@ -11,13 +11,12 @@ license:CC0-1.0
 		</rect>
 	</element>
 
-	<element name="button_yellow" defstate="0">
-		<disk state="1">
-			<color red="1.0" green="1.0" blue="0.0" />
-		</disk>
-		<disk state="0">
-			<color red="0.7" green="0.7" blue="0.0" />
-		</disk>
+	<element name="button_risk" defstate="0">
+		<disk><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0" green="0" blue="0.0" /></disk>
+		<disk state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="0.0" /></disk>
+		<disk state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.7" green="0.7" blue="0.0" /></disk>
+		<text string="1:1"><bounds x="0.4" y="0.3" width="0.2" height="0.2" /><color red="0" green="0" blue="0" /></text>
+		<text string="RISIKO"><bounds x="0.2" y="0.6" width="0.6" height="0.1" /><color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="button_red" defstate="0">
@@ -239,23 +238,23 @@ license:CC0-1.0
 
 <!-- bottom panel -->
 		<!-- Tasten -->
-		<element name="lamp02" ref="button_yellow">
+		<element name="lamp02" ref="button_risk" inputtag="INPUTS">
 			<bounds x="40" y="220" width="15" height="15" />
 		</element>
 
-		<element name="lamp00" ref="button_red">
+		<element name="lamp00" ref="button_red" inputtag="INPUTS">
 			<bounds x="65" y="220" width="15" height="15" />
 		</element>
 
-		<element name="lamp07" ref="button_red">
+		<element name="lamp07" ref="button_red" inputtag="INPUTS">
 			<bounds x="90" y="220" width="15" height="15" />
 		</element>
 
-		<element name="lamp04" ref="button_red">
+		<element name="lamp04" ref="button_red" inputtag="INPUTS">
 			<bounds x="115" y="220" width="15" height="15" />
 		</element>
 
-		<element name="lamp01" ref="button_yellow">
+		<element name="lamp01" ref="button_risk" inputtag="INPUTS">
 			<bounds x="140" y="220" width="15" height="15" />
 		</element>
 
