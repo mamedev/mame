@@ -73,7 +73,7 @@ TODO:
 - Protection in magibomb sets with simpler encryption (writes to $a0101x, $a11100, etc.). Some sets appear to work fine regardless, others freeze.
 - Find source of level 2 interrupt (sprite DMA end?).
 - magibomba, westvent: need a redump of one of the program ROMs.
-- hacher, keno21: need a redump of the sprite ROMs.
+- hacher, keno21, winbingoa: need a redump of the sprite ROMs.
 - gostopac: needs verifying of inputs, outputs and layout. Sound doesn't seem 100% correct (Oki banking problem?)
 - monkeyl and clones: need verifying of inputs, outputs and layout.
 - speedmst,a,b: need verifying of inputs, outputs and layout.
@@ -328,29 +328,18 @@ public:
 	void zoo(machine_config &config) ATTR_COLD;
 	void zulu(machine_config &config) ATTR_COLD;
 
-	void init_cptshark() ATTR_COLD;
 	void init_dinodino() ATTR_COLD;
 	void init_gostopac() ATTR_COLD;
-	void init_hacher() ATTR_COLD;
 	void init_hapfarm() ATTR_COLD;
-	void init_hapfarma() ATTR_COLD;
 	void init_keno21() ATTR_COLD;
 	void init_magibombd() ATTR_COLD;
 	void init_magibombg() ATTR_COLD;
-	void init_magibombm() ATTR_COLD;
-	void init_magibombo() ATTR_COLD;
 	void init_monkeyl() ATTR_COLD;
-	void init_monkeyla() ATTR_COLD;
 	void init_monkeyld() ATTR_COLD;
-	void init_speedmst() ATTR_COLD;
-	void init_speedmsta() ATTR_COLD;
-	void init_speedmstb() ATTR_COLD;
 	void init_westvent() ATTR_COLD;
 	void init_winbingo() ATTR_COLD;
-	void init_winbingoa() ATTR_COLD;
 	void init_wwitch() ATTR_COLD;
 	void init_zoo() ATTR_COLD;
-	void init_zulu() ATTR_COLD;
 
 	virtual void eeprom_w(u8 data) override;
 
@@ -2018,7 +2007,7 @@ ROM_START( magibomb )
 	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(ca0b693d) SHA1(27fc7db9d3f19d6dcb8756e4fc9c3839116977fe) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "gfx", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1 set, should be the same for most sets, marking as bad as precaution
+	ROM_LOAD( "gfx", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
@@ -2033,7 +2022,7 @@ ROM_START( magibomba )
 	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(ac3224ef) SHA1(810117dc89369eee0f4f5b6744cfbf0cb70ccce6) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "gfx", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1 set, should be the same for most sets, marking as bad as precaution
+	ROM_LOAD( "gfx", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // TODO: verify once the program ROM gets redumped
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(f7d14414) SHA1(af932df09aa970ec05cc12e590e152e7288c1f5c) )
@@ -2048,7 +2037,7 @@ ROM_START( magibombb )
 	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(55ea8303) SHA1(974bc026f0b284ffad50d3e441613952db768e04) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "gfx", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1 set, should be the same for most sets, marking as bad as precaution
+	ROM_LOAD( "gfx", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
@@ -2063,7 +2052,7 @@ ROM_START( magibombc )
 	ROM_LOAD16_BYTE( "rom2", 0x00001, 0x10000, CRC(3d2abaa5) SHA1(8a39abda8e52a0d8a8d0c54a45b72a7d9f624e84) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "gfx", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1 set, should be the same for most sets, marking as bad as precaution
+	ROM_LOAD( "gfx", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
@@ -2114,7 +2103,7 @@ ROM_START( magibombf )
 	ROM_LOAD16_BYTE( "rom2.u20", 0x00001, 0x10000, CRC(b52bfa4d) SHA1(e413536867148967f4ddbf1cf81c4cf45da41d1e) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "29f1610mc.u26", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1 set, should be the same for most sets, marking as bad as precaution
+	ROM_LOAD( "29f1610mc.u26", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
@@ -2132,7 +2121,7 @@ ROM_START( magibombg )
 	ROM_FILL(                                   0x20000, 0x20000, 0xff )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, BAD_DUMP CRC(ec43e200) SHA1(bf30d2e99751a93c0b72dd782fce77e9b582c89c) ) // wasn't dumped, magibombo's one seems to work correctly
+	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(ec43e200) SHA1(bf30d2e99751a93c0b72dd782fce77e9b582c89c) )  // not dumped for this set but seems correct
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "5 magic bomb", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
@@ -2150,7 +2139,7 @@ ROM_START( magibombh )// min bet 1 8 16 32, minimum percentage % 91/50%
 	ROM_LOAD16_BYTE( "rom2.u20", 0x00001, 0x10000, CRC(b8ff0c2d) SHA1(422ea7578dbe1093ea886621ebefad0cc8e74eb4) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "29f1610mc.u26", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1 set, should be the same for most sets, marking as bad as precaution
+	ROM_LOAD( "29f1610mc.u26", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
@@ -2165,7 +2154,7 @@ ROM_START( magibombi )
 	ROM_LOAD16_BYTE( "rom2.u20", 0x00001, 0x10000, CRC(0880e66d) SHA1(cef642ced8718a9cbe12b3e4c087debfa9591a9b) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD( "29f1610mc.u26", 0x000000, 0x200000, BAD_DUMP CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // dumped for the Ver. A3.1 set, should be the same for most sets, marking as bad as precaution
+	ROM_LOAD( "29f1610mc.u26", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom5.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
@@ -2302,6 +2291,240 @@ ROM_START( magibombp )
 	ROM_LOAD( "magibombp_cpucode.key", 0x00, 0x02, CRC(ee980d67) SHA1(f3bdb8a14701ec01828f7c92f18e9bba4c56a4e0) )
 ROM_END
 
+/*
+PCB with no model
+
+Astro V03
+LATTICE ispLSI 1016
+Astro V02 0016
+
+91%/50%
+JP MAX 60000
+MIN BET 1-8-16
+*/
+ROM_START( magibombq )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "magic_bomb_l4.0s_rom1_u21.u21", 0x00000, 0x10000, CRC(02b59ba8) SHA1(06db58b899566cd9c860d6ff7cbea7147610f31b) )
+	ROM_LOAD16_BYTE( "magic_bomb_l4.0s_rom2_u20.u20", 0x00001, 0x10000, CRC(18a50299) SHA1(97c70d592f47fabc0b5a61a469628044334891bc) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "gfx.u26", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "magic_bomb_l4.0s_rom5.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(30e71596) SHA1(98923053f33550c36dcc337675d85c27fbd175eb) ) // factory default
+ROM_END
+
+/*
+PCB with no model
+
+Astro V03
+LATTICE ispLSI 1016
+V02 0022
+*/
+
+ROM_START( magibombr )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mbvab4.5_1.u21", 0x00000, 0x10000, CRC(83c4b98e) SHA1(7477da6ada73db30d83ca85233193e64debb5e8d) )
+	ROM_LOAD16_BYTE( "mbvab4.5_2.u20", 0x00001, 0x10000, CRC(294f451b) SHA1(5fcc0df2ab46fd08a79166d5c1321edb216dadf8) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "gfx.u26", 0x000000, 0x200000, CRC(e572d4b5) SHA1(1e7a228abab2202cc28d19e96fb89b899c0d1621) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_magic_bomb_e1.0.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(30e71596) SHA1(98923053f33550c36dcc337675d85c27fbd175eb) ) // factory default
+ROM_END
+
+/*
+PCB with no model
+
+Astro V03
+LATTICE ispLSI 1016
+V02 0022
+*/
+
+ROM_START( magibombs )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_magic_bomb_ab4.3.u21", 0x00000, 0x10000, CRC(c849b614) SHA1(e93f76a47f9c18f4ead20eda23ec0903921582d7) )
+	ROM_LOAD16_BYTE( "2_magic_bomb_ab4.3.u20", 0x00001, 0x10000, CRC(96cff5c0) SHA1(590a38153040e7fae69bd66d2a54c0067118e09e) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "gfx.u26", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_magic_bomb_e1.0.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(53bb180a) SHA1(8a2b7ae3abf31a1972864cf96e1ac74ed69fb1ee) ) // factory default
+ROM_END
+
+/*
+PCB with no model
+
+Astro V03
+LATTICE ispLSI 1016
+V02 0022
+*/
+
+ROM_START( magibombt )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_magic_bomb_a4.2a.u21", 0x00000, 0x10000, CRC(80614129) SHA1(ea45ca322db4bfec86e5e621a673b787316d5d17) )
+	ROM_LOAD16_BYTE( "2_magic_bomb_a4.2a.u20", 0x00001, 0x10000, CRC(1dacac45) SHA1(8c8f34f6b07df4af8bf153e034fe18c5d8b50192) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "gfx.u26", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_magic_bomb_e1.0.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(baa118e0) SHA1(0d676d7264fe3fbf62d21f21d4b25a69e8d54fe3) ) // factory default
+ROM_END
+
+/*
+PCB with no model
+
+Astro V03
+LATTICE ispLSI 1016
+V02 0022
+
+MIN BET 1-8-10-16-32-64
+MINIMUM % = 91/50%
+*/
+
+ROM_START( magibombu )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_magic_bomb_a4.2a_.u21", 0x00000, 0x10000, CRC(7289b55e) SHA1(4219b205650355c56ccf433b0a11328b6ad343d8) )
+	ROM_LOAD16_BYTE( "2_magic_bomb_a4.2a_.u20", 0x00001, 0x10000, CRC(139c61b3) SHA1(eeaf2840850f164e42a390e06d091bc4d5cad5a8) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "gfx.u26", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_magic_bomb_e1.0.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(baa118e0) SHA1(0d676d7264fe3fbf62d21f21d4b25a69e8d54fe3) ) // factory default
+ROM_END
+
+/*
+PCB with no model
+
+Astro V03
+LATTICE ispLSI 1016
+V02 0022
+
+MIN BET 1-8-10-16-32-64
+MINIMUM % = 91/50%
+*/
+
+ROM_START( magibombv )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_magic_bomb_a4.1a.u21", 0x00000, 0x10000, CRC(5754f2b4) SHA1(7da3f3abea3ba034a1c1787e37e02c7cb2d7c475) )
+	ROM_LOAD16_BYTE( "2_magic_bomb_a4.1a.u20", 0x00001, 0x10000, CRC(edb98f01) SHA1(7c9393e2561cd2d29af2035aed9070763f601496) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "gfx.u26", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_magic_bomb_e1.0.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(baa118e0) SHA1(0d676d7264fe3fbf62d21f21d4b25a69e8d54fe3) ) // factory default
+ROM_END
+
+/*
+PCB with no model
+
+Astro V03
+LATTICE ispLSI 1016
+V02 0016
+
+MIN BET 1-8-10-16-32-64
+MINIMUM % = 91/50%
+*/
+
+ROM_START( magibombw )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_magic_bomb_a4.0a.u21", 0x00000, 0x10000, CRC(2c69f82b) SHA1(f1e5da104640f95b571fbb281179544f807722d3) )
+	ROM_LOAD16_BYTE( "2_magic_bomb_a4.0a.u20", 0x00001, 0x10000, CRC(f2e7502c) SHA1(a44f3ec9559f60828eaa0917386edeffd2d5f404) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "gfx.u26", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_magic_bomb_e1.0.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(d3ac4885) SHA1(f016a23e4a0ad65a41a2a3205a11d8170e0a4a6b) ) // factory default
+ROM_END
+
+/*
+PCB T-3978
+
+V102PX-014 T020620171
+V01 0016
+F02 2002-08-19
+*/
+
+ROM_START( magibombx )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "1_m.b._ab5.1.u23", 0x00000, 0x10000, CRC(72e1a30c) SHA1(e32b0107d0bbca853735b229cffe6f94cbd9d150) )
+	ROM_LOAD16_BYTE( "2_m.b._ab5.1.u22", 0x00001, 0x10000, CRC(8a4d5ba5) SHA1(1d327624e51b694288ce83b96e3c6c7090de66c5) )
+	ROM_FILL(                            0x20000, 0x20000, 0xff )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "mx29f1610mc.u130", 0x000000, 0x200000, CRC(82c643f6) SHA1(50f35cf5b300c5167c6ce2f199a4d991e7258a2a) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_m.b._e1.0.rom", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46", 0x00, 0x80, CRC(7d4d3e7b) SHA1(abf795b3272d483cd487c3896fde20a6ac83d119) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "magibombx_cpucode.key", 0x00, 0x02, CRC(d0b51355) SHA1(4cf2cc5419330915ceb88f803da616df3e656fb1) )
+ROM_END
+
+/*
+V102PX-014 T020620171
+V01 0016
+F02 2002-09-04
+PCB T-3978
+
+MIN BET 1
+91%/50%
+
+OSAMA & HUSSEIN BOMBS
+*/
+
+ROM_START( magibomby )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "1_m.b._ab5.0.u23", 0x00000, 0x10000, CRC(bb0abd5d) SHA1(2021ce89dd149a6548f71b3b53fbb3c05074ea78) )
+	ROM_LOAD16_BYTE( "2_m.b._ab5.0.u22", 0x00001, 0x10000, CRC(329a462f) SHA1(adfd45b33085a18cb482e749e0d5f13e0ba84f75) )
+	ROM_FILL(                            0x20000, 0x20000, 0xff )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "mx29f1610mc.u130", 0x000000, 0x200000, CRC(82c643f6) SHA1(50f35cf5b300c5167c6ce2f199a4d991e7258a2a) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_m.b._e1.0.rom", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46", 0x00, 0x80, CRC(7d4d3e7b) SHA1(abf795b3272d483cd487c3896fde20a6ac83d119) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "magibomby_cpucode.key", 0x00, 0x02, CRC(d0b51355) SHA1(4cf2cc5419330915ceb88f803da616df3e656fb1) )
+ROM_END
 
 /***************************************************************************
 
@@ -3443,30 +3666,6 @@ void zoo_state::init_magibombg()
 #endif
 }
 
-void zoo_state::init_magibombm()
-{
-	decrypt_rom(v102_px014_table);
-#if 1
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0000;
-	rom[0x00006/2] = 0x043e;
-#endif
-}
-
-void zoo_state::init_magibombo()
-{
-	decrypt_rom(v102_px014_table);
-#if 1
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0000;
-	rom[0x00006/2] = 0x0446;
-#endif
-}
-
 const zoo_state::decryption_info zoo_state::v102_px006_table = {
 	{
 		{
@@ -3511,42 +3710,6 @@ void zoo_state::init_winbingo()
 #endif
 }
 
-void zoo_state::init_winbingoa()
-{
-	decrypt_rom(v102_px006_table);
-#if 1
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0000;
-	rom[0x00006/2] = 0x0400;
-#endif
-}
-
-void zoo_state::init_hacher()
-{
-	decrypt_rom(v102_px006_table);
-#if 1
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0000;
-	rom[0x00006/2] = 0x0400;
-#endif
-}
-
-void zoo_state::init_cptshark()
-{
-	decrypt_rom(v102_px006_table);
-#if 1
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0000;
-	rom[0x00006/2] = 0x0400;
-#endif
-}
-
 const zoo_state::decryption_info zoo_state::v102_px005_table = {
 	{
 		{
@@ -3580,18 +3743,6 @@ const zoo_state::decryption_info zoo_state::v102_px005_table = {
 };
 
 void zoo_state::init_zoo()
-{
-	decrypt_rom(v102_px005_table);
-#if 1
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0000;
-	rom[0x00006/2] = 0x0400;
-#endif
-}
-
-void zoo_state::init_zulu()
 {
 	decrypt_rom(v102_px005_table);
 #if 1
@@ -3703,18 +3854,6 @@ void zoo_state::init_monkeyl()
 #endif
 }
 
-void zoo_state::init_monkeyla()
-{
-	decrypt_rom(v102_px005_table);
-#if 1
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0000;
-	rom[0x00006/2] = 0x0470;
-#endif
-}
-
 void zoo_state::init_monkeyld()
 {
 	decrypt_rom(v102_px005_table);
@@ -3724,42 +3863,6 @@ void zoo_state::init_monkeyld()
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
 	rom[0x00004/2] = 0x0000;
 	rom[0x00006/2] = 0x0468;
-#endif
-}
-
-void zoo_state::init_speedmst()
-{
-	decrypt_rom(v102_px005_table);
-#if 1
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0000;
-	rom[0x00006/2] = 0x0400;
-#endif
-}
-
-void zoo_state::init_speedmsta()
-{
-	decrypt_rom(v102_px005_table);
-#if 1
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0000;
-	rom[0x00006/2] = 0x0400;
-#endif
-}
-
-void zoo_state::init_speedmstb()
-{
-	decrypt_rom(v102_px005_table);
-#if 1
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0000;
-	rom[0x00006/2] = 0x0400;
 #endif
 }
 
@@ -3895,18 +3998,6 @@ void zoo_state::init_hapfarm()
 #endif
 }
 
-void zoo_state::init_hapfarma()
-{
-	decrypt_rom(v102_px008_table);
-#if 1
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0000;
-	rom[0x00006/2] = 0x0400;
-#endif
-}
-
 const zoo_state::decryption_info zoo_state::v102_px001_table = {
 	{
 		{
@@ -4031,16 +4122,23 @@ GAMEL( 2001?, magibombi, magibomb, magibombb, magibomb,  magibomb_state,  init_m
 GAMEL( 2001?, magibombk, magibomb, magibombf, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. A3.0)",                        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  )
 GAMEL( 2001,  magibombl, magibomb, magibombb, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. AB4.3A, 10/30/01S)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  )
 GAMEL( 2001,  magibombn, magibomb, magibombf, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. EB4.0, 05/04/01)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  )
+GAMEL( 2001?, magibombq, magibomb, magibomb,  magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. L4.0S)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  )
+GAMEL( 2002,  magibombr, magibomb, magibombb, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. AB4.5A, 05/24/02S)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb )
+GAMEL( 2001,  magibombs, magibomb, magibombb, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. AB4.3A, 11/22/01S)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb )
+GAMEL( 2001,  magibombt, magibomb, magibombb, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. A4.2A, 8/09/01)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb )
+GAMEL( 2001,  magibombu, magibomb, magibombb, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. A4.2A, 7/06/01)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb )
+GAMEL( 2001,  magibombv, magibomb, magibombb, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. A4.1A, 5/4/01)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb )
+GAMEL( 2001,  magibombw, magibomb, magibombb, magibomb,  magibomb_state,  init_magibomb,  ROT0, "Astro Corp.", "Magic Bomb (Ver. A4.0A, 4/06/01)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb )
 
 // Heavier encryption
 GAMEL( 2004,  zoo,       0,        zoo,       magibombd, zoo_state,       init_zoo,       ROT0, "Astro Corp.", "Zoo (Ver. ZO.02.D, Aug 27 2004)",               MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_zoo       ) // 10:53:44 Aug 27 2004
-GAMEL( 2004,  zulu,      zoo,      zulu,      dinodino,  zoo_state,       init_zulu,      ROT0, "Astro Corp.", "Zulu (Ver. 2.04J, Feb 3 2004)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_zoo ) // 14:06:51 Feb  3 2004
+GAMEL( 2004,  zulu,      zoo,      zulu,      dinodino,  zoo_state,       init_zoo,       ROT0, "Astro Corp.", "Zulu (Ver. 2.04J, Feb 3 2004)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_zoo ) // 14:06:51 Feb  3 2004
 GAME(  2004,  gostopac,  0,        gostopac,  dinodino,  zoo_state,       init_gostopac,  ROT0, "Astro Corp.", "Go & Stop (Ver. EN1.10)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAMEL( 2005,  dinodino,  0,        dinodino,  dinodino,  zoo_state,       init_dinodino,  ROT0, "Astro Corp.", "Dino Dino (Ver. A1.1, 01/13/2005)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_dinodino  ) // 13/01.2005 10:59
 GAME(  200?,  keno21,    0,        keno21,    dinodino,  zoo_state,       init_keno21,    ROT0, "Astro Corp.", "Keno 21 (Ver. A-2.30)",                         MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAMEL( 2005,  astoneag,  0,        astoneag,  astoneag,  astoneag_state,  init_astoneag,  ROT0, "Astro Corp.", "Stone Age (Astro, Ver. EN.03.A, 2005/02/21)",   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_astoneag  )
 GAME(  2005,  monkeyl,   0,        monkeyl,   magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. AA.21.A)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 18/02/2005 15:47
-GAME(  2004,  monkeyla,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_monkeyla,  ROT0, "Astro Corp.", "Monkey Land (Ver. AA.13.B)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 23/04/2004 14:57
+GAME(  2004,  monkeyla,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. AA.13.B)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 23/04/2004 14:57
 GAME(  2005,  monkeylb,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. AA.21.B)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 25/05/2005 11:18
 GAME(  2007,  monkeylc,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. AA.21.C)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 05/03/2007 10:40
 GAME(  2003,  monkeyld,  monkeyl,  monkeyld,  dinodino,  zoo_state,       init_monkeyld,  ROT0, "Astro Corp.", "Monkey Land (Ver. A1.2)",                       MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 122303S
@@ -4049,20 +4147,22 @@ GAME(  2003,  monkeylf,  monkeyl,  monkeyld,  dinodino,  zoo_state,       init_m
 GAMEL( 2005,  magibombd, magibomb, magibombd, magibombd, zoo_state,       init_magibombd, ROT0, "Astro Corp.", "Magic Bomb (Ver. AA.72.D, 14/11/05)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb ) // 15/11/05 09:31
 GAMEL( 2005,  magibombj, magibomb, magibombd, magibombd, zoo_state,       init_magibombd, ROT0, "Astro Corp.", "Magic Bomb (Ver. AA.72.C, 25/05/05)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb ) // 25/05/05 11:26
 GAMEL( 2004,  magibombg, magibomb, magibombg, dinodino,  zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. NB6.1, 26/04/04)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 26/04/04. Undumped sprite ROM
-GAMEL( 2003,  magibombm, magibomb, magibombm, dinodino,  zoo_state,       init_magibombm, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB5.3, 20/06/03)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 062003S
-GAMEL( 2014,  magibombo, magibomb, magibombo, magibombd, zoo_state,       init_magibombo, ROT0, "Astro Corp.", "Magic Bomb (Ver. BR71.A, 30/05/14)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 30/05/14 10:29
-GAMEL( 2003,  magibombp, magibomb, magibombp, dinodino,  zoo_state,       init_magibombm, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB6.0J, 26/11/03)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 112603S
-GAMEL( 2004,  speedmst,  0,        speedmst,  dinodino,  zoo_state,       init_speedmst,  ROT0, "D2 Enterprises", "Speed Master (D2.01.C, Apr 29 2004)",        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 29 2004 16:29:35
-GAMEL( 2003,  speedmsta, speedmst, speedmst,  dinodino,  zoo_state,       init_speedmsta, ROT0, "D2 Enterprises", "Speed Master (D1.4, May 23 2003)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // May 23 2003 16:38:02
-GAMEL( 2003,  speedmstb, speedmst, speedmst,  dinodino,  zoo_state,       init_speedmstb, ROT0, "D2 Enterprises", "Speed Master (D2.01.C, Apr 28 2004)",        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 28 2004 17:21:26
-GAMEL( 2006,  cptshark,  0,        winbingo,  winbingo,  zoo_state,       init_cptshark,  ROT0, "Astro Corp. / American Alpha", "Captain Shark (Ver. CS.01.6, Apr 21 2006)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_winbingo  ) // 13:50:11 Apr 21 2006
+GAMEL( 2003,  magibombm, magibomb, magibombm, dinodino,  zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB5.3, 20/06/03)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 062003S
+GAMEL( 2014,  magibombo, magibomb, magibombo, magibombd, zoo_state,       init_magibombd, ROT0, "Astro Corp.", "Magic Bomb (Ver. BR71.A, 30/05/14)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 30/05/14 10:29
+GAMEL( 2003,  magibombp, magibomb, magibombp, dinodino,  zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB6.0J, 26/11/03)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 112603S
+GAMEL( 2003,  magibombx, magibomb, magibombm, dinodino,  zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB5.1, 01/10/03)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 011003S
+GAMEL( 2002,  magibomby, magibomb, magibombm, dinodino,  zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB5.0, 09/26/02)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 092602S
+GAMEL( 2004,  speedmst,  0,        speedmst,  dinodino,  zoo_state,       init_zoo,       ROT0, "D2 Enterprises", "Speed Master (D2.01.C, Apr 29 2004)",        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 29 2004 16:29:35
+GAMEL( 2003,  speedmsta, speedmst, speedmst,  dinodino,  zoo_state,       init_zoo,       ROT0, "D2 Enterprises", "Speed Master (D1.4, May 23 2003)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // May 23 2003 16:38:02
+GAMEL( 2003,  speedmstb, speedmst, speedmst,  dinodino,  zoo_state,       init_zoo,       ROT0, "D2 Enterprises", "Speed Master (D2.01.C, Apr 28 2004)",        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 28 2004 17:21:26
+GAMEL( 2006,  cptshark,  0,        winbingo,  winbingo,  zoo_state,       init_winbingo,  ROT0, "Astro Corp. / American Alpha", "Captain Shark (Ver. CS.01.6, Apr 21 2006)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_winbingo  ) // 13:50:11 Apr 21 2006
 GAMEL( 2006,  winbingo,  0,        winbingo,  winbingo,  zoo_state,       init_winbingo,  ROT0, "Astro Corp.", "Win Win Bingo (Ver. GM.03.3, Feb 23 2006)",     MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION, layout_winbingo  ) // 15:47:48 Feb 23 2006
-GAMEL( 2006,  winbingoa, winbingo, winbingo,  winbingo,  zoo_state,       init_winbingoa, ROT0, "Astro Corp.", "Win Win Bingo (Ver. GM.05.1, May 11 2006)",     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_winbingo  ) // 11:02:07 May 11 2006. Undumped sprite ROMs
-GAMEL( 2005,  hacher,    winbingo, hacher,    winbingo,  zoo_state,       init_hacher,    ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo EN.01.6)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS, layout_winbingo  ) // 14:25:46 Mar 10 2005. One bad sprite ROM
+GAMEL( 2006,  winbingoa, winbingo, winbingo,  winbingo,  zoo_state,       init_winbingo,  ROT0, "Astro Corp.", "Win Win Bingo (Ver. GM.05.1, May 11 2006)",     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_winbingo  ) // 11:02:07 May 11 2006. Undumped sprite ROMs
+GAMEL( 2005,  hacher,    winbingo, hacher,    winbingo,  zoo_state,       init_winbingo,  ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo EN.01.6)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS, layout_winbingo  ) // 14:25:46 Mar 10 2005. One bad sprite ROM
 GAME ( 2007?, westvent,  0,        westvent,  winbingo,  zoo_state,       init_westvent,  ROT0, "Astro Corp.", "Western Venture (Ver. AA.02.D)",                MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING                             ) // One bad program ROM
 GAME ( 2008,  westventa, westvent, westvent,  winbingo,  zoo_state,       init_westvent,  ROT0, "Astro Corp.", "Western Venture (Ver. AA.02.E)",                MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING                             ) // 2008/9/8
-GAME ( 2006,  westventb, westvent, westvent,  winbingo,  zoo_state,       init_westvent,  ROT0, "Astro Corp.", "Western Venture (Ver. AA.01.B)",                MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING                             ) // 2008/9/8
+GAME ( 2006,  westventb, westvent, westvent,  winbingo,  zoo_state,       init_westvent,  ROT0, "Astro Corp.", "Western Venture (Ver. AA.01.B)",                MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING                             ) // 2006/8/15
 GAME ( 2005,  wwitch,    0,        wwitch,    magibombd, zoo_state,       init_wwitch,    ROT0, "Astro Corp.", "Wicked Witch (Ver. AA.01.A)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 29/12/05 09:29
 GAME ( 2006,  lwitch,    wwitch,   lwitch,    magibombd, zoo_state,       init_wwitch,    ROT0, "Astro Corp.", "Little Witch (Ver. EN.01.A)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 06/01/06 14:08
 GAME ( 2008,  hapfarm,   0,        hapfarm,   magibombd, zoo_state,       init_hapfarm,   ROT0, "Astro Corp.", "Happy Farm (Ver. US.01.02.B)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/16
-GAME ( 2011,  hapfarma,  hapfarm,  hapfarma,  magibombd, zoo_state,       init_hapfarma,  ROT0, "Astro Corp.", "Happy Farm (Ver. IN.01.02.B)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2011/06/02
+GAME ( 2011,  hapfarma,  hapfarm,  hapfarma,  magibombd, zoo_state,       init_hapfarm,   ROT0, "Astro Corp.", "Happy Farm (Ver. IN.01.02.B)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2011/06/02
