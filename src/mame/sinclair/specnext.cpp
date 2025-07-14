@@ -2288,8 +2288,7 @@ INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 	line_irq_adjust();
 	if (!port_ff_interrupt_disable())
 	{
-		m_irq_on_timer->adjust(m_screen->time_until_pos(SCR_256x192.top(), SCR_256x192.left())
-			- attotime::from_ticks(14365, m_maincpu->unscaled_clock()));
+		m_irq_on_timer->adjust(m_screen->time_until_pos((SCR_256x192.bottom() + 57) % CYCLES_VERT, SCR_256x192.left()));
 	}
 }
 
