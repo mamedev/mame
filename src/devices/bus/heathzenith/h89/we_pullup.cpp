@@ -31,9 +31,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 };
 
-h89bus_we_pullup_device::h89bus_we_pullup_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H89BUS_WE_PULLUP, tag, owner, 0),
-	device_h89bus_right_card_interface(mconfig, *this)
+h89bus_we_pullup_device::h89bus_we_pullup_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+  : device_t(mconfig, H89BUS_WE_PULLUP, tag, owner, 0)
+  , device_h89bus_right_card_interface(mconfig, *this)
 {
 }
 
