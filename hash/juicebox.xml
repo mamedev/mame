@@ -62,7 +62,7 @@ license:CC0-1.0
    H6234 - Juice Box Music Video (Ashlee Simpson, Ashlee Simpson) (same 2 Ashlee Simpson songs as H6226, but without other tracks)
 *  H6247 - Dexter's Laboratory Episode 51
    H6248 - Codename: Kids Next Door - Episode #19
-*  H6254 - Juice Box Music Video (Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1) (include 'the making of' for Skye Sweetnam Tangled Up in Me)
+*  H6254 - Juice Box Music Video (Liz Phair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1) (include 'the making of' for Skye Sweetnam Tangled Up in Me)
 *V H6258 - Winx Club Episode 103
    H6259 - SonicX Episode 3: Missile Wrist Rampage
 *V H6260 - Teenage Mutant Ninja Turtles Episode 36
@@ -492,7 +492,7 @@ license:CC0-1.0
 	The Making of Tangled Up In Me
 	-->
 	<software name="h6254">
-		<description>Juicebox Music Video - Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl (H6254)</description>
+		<description>Juicebox Music Video - Liz Phair, Stacie Orrico, Skye Sweetnam, Zoegirl (H6254)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H2689" />
