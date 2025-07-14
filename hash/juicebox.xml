@@ -18,7 +18,11 @@ license:CC0-1.0
    The flash ROMs on these cartridges look to be deteriorating, each will likely need verifying against multiple cartridges to verify the integrity of
    the data.
 
+   H26xx/H27xx coded carts
+
 *  H2679 - Ed, Edd n Eddy Episode #39
+   H2680
+*  H2681 - Juice Box Music Video (Avril Lavine, The Calling, Clay Miken)
    H2682 - Juiceware Animated Assortment
 *V H2683 - Codename: Kids Next Door Volume 1
    H2684 - Ed, Edd n Eddy Volume 1
@@ -28,41 +32,58 @@ license:CC0-1.0
 *  H2688 - Vans Triple Crown Volume 1 (BMX)
 *  H2689 - Vans Triple Crown Volume 2 (Skateboarding)
 *  H2690 - Vans Pipeline Masters Volume 1
+   H2691 - Courage - The Cowardly Dog Volume 1
 *V H2692 - Teenage Mutant Ninja Turtles Volume 1
+   H2693
    H2694 - Trading Spaces Volume 1
+   H2695
+   H2696
 *  H2697 - Megas XLR Volume 1
    H2698 - WWE Rey Mysterio Volume 1
    H2699 - Motocycle Mania 1 Volume 1
    H2700 - Powerpuff Girls Volume 1
    H2701 - Dexter's Laboratory Volume 1
    H2702 - WWE Chris Benoit Volume 1
+   H2703
+   H2704
+   H2705
    H2706 - MyScene Jammin in Jamaica Volume 1
    H2707 - MyScene Masquerade Madness
    H2708 - WWE Eugene Volume 1
 *V H2709 - Juice Box Music Video (Liz Phair, Stacie Orrico, Skye Sweetnam)
-*B H6226 - Juice Box Music Video (Ashlee Simpson, The Cure, Vanessa Carlton, fan_3, Ashlee Simpson)
+
+   H62xx carts
+
+*  H6226 - Juice Box Music Video (Ashlee Simpson, The Cure, Vanessa Carlton, fan_3, Ashlee Simpson)
 *  H6228 - Juice Box Music Video (Avril Lavine, The Calling, Clay Miken, Ruben Studdard)
 *  H6230A- Juice Box Music Video (Baha Men, Jump5, Jump5, Beu Sisters, ZOEgirl)
 *  H6232 - Juice Box Music Video (Zoegirl, Jump5, Jump5, Baha Men, Atomic Kitten)
    H6233 - Kenny Chesney - 'Live Those Songs', 'No Shoes, No Shirt, No Problems', 'I Go Back'  Sara Evans - 'Suds in the Bucket, Martina McBride - 'This One's For The Girls'
    H6234 - Juice Box Music Video (Ashlee Simpson, Ashlee Simpson) (same 2 Ashlee Simpson songs as H6226, but without other tracks)
+*  H6247 - Dexter's Laboratory Episode 51
    H6248 - Codename: Kids Next Door - Episode #19
-   H6254 - Juice Box Music Video (Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1) (include 'the making of' for Skye Sweetnam Tangled Up in Me)
+*  H6254 - Juice Box Music Video (Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1) (include 'the making of' for Skye Sweetnam Tangled Up in Me)
 *V H6258 - Winx Club Episode 103
    H6259 - SonicX Episode 3: Missile Wrist Rampage
 *V H6260 - Teenage Mutant Ninja Turtles Episode 36
 
+   H74xx carts
+
 *  H7416 - Streetball Classics Volume 1
    H7417 - Streetball Classics Volume 2
+
+   H80xx carts
 
 *V H8084 - Yu-Gi-Oh! Episode 175
    H8085 - Good Times with Carey Hart
 *V H8143 - Yu-Gi-Oh! Episode 176
 
+   unknown series carts
+
          - Johnny Bravo Vol 1
          - Brett Favre - The Field General
-   H269x - Courage - The Cowardly Dog Volume 1
-*  H6247 - Dexter's Laboratory Episode 51
+
+
 
   (many still missing from this list)
 
@@ -380,7 +401,8 @@ license:CC0-1.0
 			<feature name="nandtype2" value="0x75"/>
 			<dataarea name="rom" size="0x2100000">
 				<!-- start of The Cure song has corrupt video, so might still be bad -->
-				<rom name="jb_musicvideo_h6226_matrix11247_9875.bin" size="0x2100000" crc="4570bf54" sha1="a77449136ecccd08c98128215302c701269e886f" status="baddump" />
+				<!--<rom name="jb_musicvideo_h6226_matrix11247_9875.bin" size="0x2100000" crc="4570bf54" sha1="a77449136ecccd08c98128215302c701269e886f" status="baddump" />-->
+				<rom name="h6226.bin" size="0x2100000" crc="e4b5d8fb" sha1="a437e80a53bcb6f89c110cca8008159f0df7abcf" />
 			</dataarea>
 		</part>
 	</software>
@@ -437,6 +459,48 @@ license:CC0-1.0
 			<feature name="nandtype2" value="0x75"/>
 			<dataarea name="rom" size="0x2100000">
 				<rom name="h2689.bin" size="0x2100000" crc="16d12a69" sha1="eb20b42dac9df39b5943f0f485826d011a3d93a2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
+	Avril Lavigne - My Happy Ending
+	The Calling - Our Lives
+	Clay Aiken - Invisible
+	-->
+	<software name="h2681">
+		<description>Juicebox Music Video - Avril Lavigne, The Calling, Clay Aiken (H2681)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2689" />
+		<part name="memc" interface="sm_memc">
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="h2681.bin" size="0x2100000" crc="d66dbe5b" sha1="4eff67088294efb40f6596a643b4084ab8dc4084" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
+	Liz Phair - Extraordinary
+	Stacie Orrico - Stuck
+	Skye Sweetnam - Tangled Up In Me
+	Zoegirl - You Get Me
+	The Making of Tangled Up In Me
+	-->
+	<software name="h6254">
+		<description>Juicebox Music Video - Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl (H6254)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2689" />
+		<part name="memc" interface="sm_memc">
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="h6254-0971g1.bin" size="0x2100000" crc="0f96880b" sha1="283eee7df7a152eb7f71ad9f94f73900e090df45" />
 			</dataarea>
 		</part>
 	</software>
