@@ -120,10 +120,10 @@ void m92_state::videocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	/*
 	    fedc ba98 7654 3210
 	    .x.. x... .xx. ....   always 0?
-	    x... .... .... ....   disable tiles?? (but that breaks mysticri)
+	    x... .... .... ....   video off? (but that breaks mysticri)
 	    ..xx .... .... ....   ? only written at POST - otherwise always 2
 	    .... .xxx .... ....   ? only written at POST - otherwise always 0
-	    .... .... x... ....   disable sprites??
+	    .... .... x... ....   disable sprites
 	    .... .... ...x ....   ?
 	    .... .... .... x...   ?
 	    .... .... .... .x..   ? maybe more palette banks?
@@ -234,7 +234,7 @@ void m92_state::master_control_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 /*****************************************************************************/
 
-VIDEO_START_MEMBER(m92_state,m92)
+void m92_state::video_start()
 {
 	m_spritebuffer_timer = timer_alloc(FUNC(m92_state::spritebuffer_done), this);
 
@@ -290,9 +290,9 @@ VIDEO_START_MEMBER(m92_state,m92)
 	save_item(NAME(m_paletteram));
 }
 
-VIDEO_START_MEMBER(m92_state,ppan)
+void ppan_state::video_start()
 {
-	VIDEO_START_CALL_MEMBER(m92);
+	m92_state::video_start();
 
 	for (int laynum = 0; laynum < 3; laynum++)
 	{
@@ -380,7 +380,7 @@ void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 }
 
 // This needs a lot of work...
-void m92_state::ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void ppan_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint16_t *source = m_spriteram->live(); // sprite buffer control is never triggered
 	int offs, layer;
@@ -499,7 +499,7 @@ void m92_state::m92_update_scroll_positions()
 
 /*****************************************************************************/
 
-void m92_state::m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void m92_state::m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if ((~m_pf_master_control[2] >> 4) & 1)
 	{
@@ -528,7 +528,8 @@ uint32_t m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitma
 	m92_update_scroll_positions();
 	m92_draw_tiles(screen, bitmap, cliprect);
 
-	draw_sprites(screen, bitmap, cliprect);
+	if (~m_videocontrol & 0x80)
+		draw_sprites(screen, bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
 	if (m_dsw->read() & 0x100)
@@ -538,19 +539,14 @@ uint32_t m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-uint32_t m92_state::screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m92_state::screen_update_nbbatman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen.priority().fill(0, cliprect);
-	bitmap.fill(0, cliprect);
-	m92_update_scroll_positions();
-	m92_draw_tiles(screen, bitmap, cliprect);
+	// nbbatman is the only game using this flag to turn off video? (normally, games just disable each tile layer)
+	if (m_videocontrol & 0x8000)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
 
-	ppan_draw_sprites(screen, bitmap, cliprect);
-
-	/* Flipscreen appears hardwired to the dipswitch - strange */
-	if (m_dsw->read() & 0x100)
-		flip_screen_set(0);
-	else
-		flip_screen_set(1);
-	return 0;
+	return screen_update_m92(screen, bitmap, cliprect);
 }

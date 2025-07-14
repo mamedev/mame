@@ -217,14 +217,6 @@ psoldier dip locations still need verification.
 
 /*****************************************************************************/
 
-MACHINE_RESET_MEMBER(m92_state,m92)
-{
-	m_sprite_buffer_busy = 1;
-}
-
-/*****************************************************************************/
-
-
 TIMER_DEVICE_CALLBACK_MEMBER(m92_state::scanline_interrupt)
 {
 	int scanline = param;
@@ -244,7 +236,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::scanline_interrupt)
 	else
 		m_upd71059c->ir0_w(0);
 }
-
 
 
 /*****************************************************************************/
@@ -328,7 +319,7 @@ void m92_state::majtitl2_map(address_map &map)
 	map(0xf0000, 0xf3fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 }
 
-void m92_state::nbbatman2bl_map(address_map &map)
+void nbb2b_state::nbbatman2bl_map(address_map &map)
 {
 	m92_banked_map(map);
 
@@ -366,20 +357,20 @@ void m92_state::oki_bank_w(uint16_t data)
 	m_oki->set_rom_bank((data+1) & 0x3); // +1?
 }
 
-void m92_state::ppan_portmap(address_map &map)
+void ppan_state::ppan_portmap(address_map &map)
 {
 	map(0x00, 0x01).portr("P1_P2");
 	map(0x02, 0x03).portr("COINS_DSW3");
-	map(0x02, 0x02).w(FUNC(m92_state::coincounter_w));
+	map(0x02, 0x02).w(FUNC(ppan_state::coincounter_w));
 	map(0x04, 0x05).portr("DSW");
 	map(0x06, 0x07).portr("P3_P4");
-	map(0x10, 0x11).w(FUNC(m92_state::oki_bank_w));
+	map(0x10, 0x11).w(FUNC(ppan_state::oki_bank_w));
 	map(0x18, 0x18).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x87).w(FUNC(m92_state::pf_control_w<0>));
-	map(0x88, 0x8f).w(FUNC(m92_state::pf_control_w<1>));
-	map(0x90, 0x97).w(FUNC(m92_state::pf_control_w<2>));
-	map(0x98, 0x9f).w(FUNC(m92_state::master_control_w));
+	map(0x80, 0x87).w(FUNC(ppan_state::pf_control_w<0>));
+	map(0x88, 0x8f).w(FUNC(ppan_state::pf_control_w<1>));
+	map(0x90, 0x97).w(FUNC(ppan_state::pf_control_w<2>));
+	map(0x98, 0x9f).w(FUNC(ppan_state::master_control_w));
 }
 
 
@@ -917,8 +908,6 @@ void m92_state::m92(machine_config &config)
 	PIC8259(config, m_upd71059c, 0);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_MACHINE_RESET_OVERRIDE(m92_state,m92)
-
 	TIMER(config, "scantimer").configure_scanline(FUNC(m92_state::scanline_interrupt), "screen", 0, 1);
 
 	/* video hardware */
@@ -935,8 +924,6 @@ void m92_state::m92(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m92);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
-
-	MCFG_VIDEO_START_OVERRIDE(m92_state,m92)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1019,20 +1006,16 @@ void m92_state::hook(machine_config &config)
 	m_soundcpu->set_decryption_table(hook_decryption_table);
 }
 
-void m92_state::ppan(machine_config &config)
+void ppan_state::ppan(machine_config &config)
 {
 	m92(config);
-	m_maincpu->set_addrmap(AS_IO, &m92_state::ppan_portmap);
+	m_maincpu->set_addrmap(AS_IO, &ppan_state::ppan_portmap);
 
 	config.device_remove("soundcpu");
 	config.device_remove("soundlatch");
 	config.device_remove("soundlatch2");
 	config.device_remove("ymsnd");
 	config.device_remove("irem");
-
-	m_screen->set_screen_update(FUNC(m92_state::screen_update_ppan));
-
-	MCFG_VIDEO_START_OVERRIDE(m92_state,ppan)
 
 	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -1054,6 +1037,8 @@ void m92_state::nbbatman(machine_config &config)
 {
 	m92_banked(config);
 	m_soundcpu->set_decryption_table(leagueman_decryption_table);
+
+	m_screen->set_screen_update(FUNC(m92_state::screen_update_nbbatman));
 }
 
 void m92_state::leaguemna(machine_config &config)
@@ -1062,14 +1047,14 @@ void m92_state::leaguemna(machine_config &config)
 	m_gfxdecode->set_info(gfx_psoldier);
 }
 
-void m92_state::nbbatman2bl(machine_config &config)
+void nbb2b_state::nbbatman2bl(machine_config &config)
 {
 	m92_banked(config);
 	config.device_remove("soundcpu");
 	config.device_remove("ymsnd");
 	config.device_remove("irem");
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &m92_state::nbbatman2bl_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbb2b_state::nbbatman2bl_map);
 
 	m_gfxdecode->set_info(gfx_bootleg);
 
@@ -2592,66 +2577,66 @@ void m92_state::init_bank()
 
 /* TODO: figure out actual address map and other differences from real Irem h/w */
 /*
-void m92_state::init_ppan()
+void ppan_state::init_ppan()
 {
 }
 */
 
 /***************************************************************************/
 
-GAME( 1991, gunforce,    0,        gunforce,      gunforce,  m92_state, empty_init,    ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, gunforcej,   gunforce, gunforce,      gunforce,  m92_state, empty_init,    ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, gunforceu,   gunforce, gunforce,      gunforce,  m92_state, empty_init,    ROT0,   "Irem America", "Gunforce - Battle Fire Engulfed Terror Island (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, gunforce,    0,        gunforce,      gunforce,  m92_state,   empty_init, ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, gunforcej,   gunforce, gunforce,      gunforce,  m92_state,   empty_init, ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, gunforceu,   gunforce, gunforce,      gunforce,  m92_state,   empty_init, ROT0,   "Irem America", "Gunforce - Battle Fire Engulfed Terror Island (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1991, bmaster,     0,        bmaster,       bmaster,   m92_state, empty_init,    ROT0,   "Irem",         "Blade Master (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, crossbld,    bmaster,  bmaster,       bmaster,   m92_state, empty_init,    ROT0,   "Irem",         "Cross Blades! (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1991, bmaster,     0,        bmaster,       bmaster,   m92_state,   empty_init, ROT0,   "Irem",         "Blade Master (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, crossbld,    bmaster,  bmaster,       bmaster,   m92_state,   empty_init, ROT0,   "Irem",         "Cross Blades! (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 
-GAME( 1991, lethalth,    0,        lethalth,      lethalth,  m92_state, empty_init,  ROT270,   "Irem",         "Lethal Thunder (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, thndblst,    lethalth, lethalth,      thndblst,  m92_state, empty_init,  ROT270,   "Irem",         "Thunder Blaster (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, lethalth,    0,        lethalth,      lethalth,  m92_state,   empty_init, ROT270, "Irem",         "Lethal Thunder (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, thndblst,    lethalth, lethalth,      thndblst,  m92_state,   empty_init, ROT270, "Irem",         "Thunder Blaster (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1992, uccops,      0,        uccops,        uccops,    m92_state, empty_init,    ROT0,   "Irem",         "Undercover Cops (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, uccopsu,     uccops,   uccops,        uccops,    m92_state, empty_init,    ROT0,   "Irem",         "Undercover Cops (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, uccopsj,     uccops,   uccops,        uccops,    m92_state, empty_init,    ROT0,   "Irem",         "Undercover Cops (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, uccopsar,    uccops,   uccops,        uccops,    m92_state, empty_init,    ROT0,   "Irem",         "Undercover Cops - Alpha Renewal Version (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, uccopsaru,   uccops,   uccops,        uccops,    m92_state, empty_init,    ROT0,   "Irem America", "Undercover Cops - Alpha Renewal Version (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, uccops,      0,        uccops,        uccops,    m92_state,   empty_init, ROT0,   "Irem",         "Undercover Cops (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, uccopsu,     uccops,   uccops,        uccops,    m92_state,   empty_init, ROT0,   "Irem",         "Undercover Cops (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, uccopsj,     uccops,   uccops,        uccops,    m92_state,   empty_init, ROT0,   "Irem",         "Undercover Cops (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, uccopsar,    uccops,   uccops,        uccops,    m92_state,   empty_init, ROT0,   "Irem",         "Undercover Cops - Alpha Renewal Version (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, uccopsaru,   uccops,   uccops,        uccops,    m92_state,   empty_init, ROT0,   "Irem America", "Undercover Cops - Alpha Renewal Version (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1992, mysticri,    0,        mysticri,      mysticri,  m92_state, empty_init,    ROT0,   "Irem",         "Mystic Riders (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
-GAME( 1992, gunhohki,    mysticri, mysticri,      mysticri,  m92_state, empty_init,    ROT0,   "Irem",         "Mahou Keibitai Gun Hohki (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, mysticri,    0,        mysticri,      mysticri,  m92_state,   empty_init, ROT0,   "Irem",         "Mystic Riders (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1992, gunhohki,    mysticri, mysticri,      mysticri,  m92_state,   empty_init, ROT0,   "Irem",         "Mahou Keibitai Gun Hohki (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 // cheaply produced Korean board, has original chips, but lacks any proper labels
 // main code is also significantly different to the supported original set, so it might just be a legitimate early revision on a cheap board
-GAME( 1992, mysticrib,   mysticri, mysticri,      mysticri,  m92_state, empty_init,    ROT0,   "Irem",         "Mystic Riders (bootleg?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, mysticrib,   mysticri, mysticri,      mysticri,  m92_state,   empty_init, ROT0,   "Irem",         "Mystic Riders (bootleg?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1992, majtitl2,    0,        majtitl2,      majtitl2,  m92_state, init_bank,     ROT0,   "Irem",         "Major Title 2 (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // Nanao 08J27291A7 017 9227NK700 sound CPU
-GAME( 1992, majtitl2a,   majtitl2, majtitl2a,     majtitl2,  m92_state, init_bank,     ROT0,   "Irem",         "Major Title 2 (World, set 1, alt sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // same as set 1 but for the Nanao 08J27291A6 016 9217NK700 sound CPU
-GAME( 1992, majtitl2b,   majtitl2, majtitl2,      majtitl2,  m92_state, init_bank,     ROT0,   "Irem",         "Major Title 2 (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
-GAME( 1992, majtitl2j,   majtitl2, majtitl2,      majtitl2,  m92_state, init_bank,     ROT0,   "Irem",         "Major Title 2 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
-GAME( 1992, skingame,    majtitl2, majtitl2,      majtitl2,  m92_state, init_bank,     ROT0,   "Irem America", "The Irem Skins Game (US set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, skingame2,   majtitl2, majtitl2,      majtitl2,  m92_state, init_bank,     ROT0,   "Irem America", "The Irem Skins Game (US set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, majtitl2,    0,        majtitl2,      majtitl2,  m92_state,   init_bank,  ROT0,   "Irem",         "Major Title 2 (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // Nanao 08J27291A7 017 9227NK700 sound CPU
+GAME( 1992, majtitl2a,   majtitl2, majtitl2a,     majtitl2,  m92_state,   init_bank,  ROT0,   "Irem",         "Major Title 2 (World, set 1, alt sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // same as set 1 but for the Nanao 08J27291A6 016 9217NK700 sound CPU
+GAME( 1992, majtitl2b,   majtitl2, majtitl2,      majtitl2,  m92_state,   init_bank,  ROT0,   "Irem",         "Major Title 2 (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1992, majtitl2j,   majtitl2, majtitl2,      majtitl2,  m92_state,   init_bank,  ROT0,   "Irem",         "Major Title 2 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1992, skingame,    majtitl2, majtitl2,      majtitl2,  m92_state,   init_bank,  ROT0,   "Irem America", "The Irem Skins Game (US set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, skingame2,   majtitl2, majtitl2,      majtitl2,  m92_state,   init_bank,  ROT0,   "Irem America", "The Irem Skins Game (US set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1992, hook,        0,        hook,          hook,      m92_state, empty_init,    ROT0,   "Irem",         "Hook (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
-GAME( 1992, hooku,       hook,     hook,          hook,      m92_state, empty_init,    ROT0,   "Irem America", "Hook (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
-GAME( 1992, hookj,       hook,     hook,          hook,      m92_state, empty_init,    ROT0,   "Irem",         "Hook (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
-GAME( 1992, ppan,        hook,     ppan,          hook,      m92_state, empty_init,    ROT0,   "bootleg",      "Peter Pan (bootleg of Hook)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL) // PCB marked 'Peter Pan', no title screen, made in Italy?
+GAME( 1992, hook,        0,        hook,          hook,      m92_state,   empty_init, ROT0,   "Irem",         "Hook (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1992, hooku,       hook,     hook,          hook,      m92_state,   empty_init, ROT0,   "Irem America", "Hook (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1992, hookj,       hook,     hook,          hook,      m92_state,   empty_init, ROT0,   "Irem",         "Hook (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1992, ppan,        hook,     ppan,          hook,      ppan_state,  empty_init, ROT0,   "bootleg",      "Peter Pan (bootleg of Hook)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL) // PCB marked 'Peter Pan', no title screen, made in Italy?
 
-GAME( 1992, rtypeleo,    0,        rtypeleo,      rtypeleo,  m92_state, empty_init,    ROT0,   "Irem",         "R-Type Leo (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
-GAME( 1992, rtypeleoj,   rtypeleo, rtypeleo,      rtypeleo,  m92_state, empty_init,    ROT0,   "Irem",         "R-Type Leo (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1992, rtypeleo,    0,        rtypeleo,      rtypeleo,  m92_state,   empty_init, ROT0,   "Irem",         "R-Type Leo (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1992, rtypeleoj,   rtypeleo, rtypeleo,      rtypeleo,  m92_state,   empty_init, ROT0,   "Irem",         "R-Type Leo (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 
-GAME( 1993, inthunt,     0,        inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem",         "In The Hunt (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
-GAME( 1993, inthuntu,    inthunt,  inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem America", "In The Hunt (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
-GAME( 1993, kaiteids,    inthunt,  inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem",         "Kaitei Daisensou (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1993, inthuntk,    inthunt,  inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem",         "In The Hunt (Korea?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1993, inthunt,     0,        inthunt,       inthunt,   m92_state,   empty_init, ROT0,   "Irem",         "In The Hunt (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1993, inthuntu,    inthunt,  inthunt,       inthunt,   m92_state,   empty_init, ROT0,   "Irem America", "In The Hunt (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1993, kaiteids,    inthunt,  inthunt,       inthunt,   m92_state,   empty_init, ROT0,   "Irem",         "Kaitei Daisensou (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1993, inthuntk,    inthunt,  inthunt,       inthunt,   m92_state,   empty_init, ROT0,   "Irem",         "In The Hunt (Korea?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 
-GAME( 1993, nbbatman,    0,        nbbatman,      nbbatman,  m92_state, init_bank,     ROT0,   "Irem",         "Ninja Baseball Bat Man (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1993, nbbatmanu,   nbbatman, nbbatman,      nbbatman,  m92_state, init_bank,     ROT0,   "Irem America", "Ninja Baseball Bat Man (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
-GAME( 1993, leaguemn,    nbbatman, nbbatman,      nbbatman,  m92_state, init_bank,     ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // M92-F-A ROM board
-GAME( 1993, leaguemna,   nbbatman, leaguemna,     nbbatman,  m92_state, init_bank,     ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // M92-Z-C ROM board
-GAME( 1993, nbbatman2bl, nbbatman, nbbatman2bl,   nbbatman,  m92_state, init_bank,     ROT0,   "bootleg",      "Ninja Baseball Bat Man II (bootleg)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // different sprite system, MCU as soundcpu, OKI samples for music/sound
+GAME( 1993, nbbatman,    0,        nbbatman,      nbbatman,  m92_state,   init_bank,  ROT0,   "Irem",         "Ninja Baseball Bat Man (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1993, nbbatmanu,   nbbatman, nbbatman,      nbbatman,  m92_state,   init_bank,  ROT0,   "Irem America", "Ninja Baseball Bat Man (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1993, leaguemn,    nbbatman, nbbatman,      nbbatman,  m92_state,   init_bank,  ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // M92-F-A ROM board
+GAME( 1993, leaguemna,   nbbatman, leaguemna,     nbbatman,  m92_state,   init_bank,  ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // M92-Z-C ROM board
+GAME( 1993, nbbatman2bl, nbbatman, nbbatman2bl,   nbbatman,  nbb2b_state, init_bank,  ROT0,   "bootleg",      "Ninja Baseball Bat Man II (bootleg)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // different sprite system, MCU as soundcpu, OKI samples for music/sound
 
-GAME( 1993, ssoldier,    0,        psoldier,      psoldier,  m92_state, empty_init,    ROT0,   "Irem America", "Superior Soldiers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1993, psoldier,    ssoldier, psoldier,      psoldier,  m92_state, empty_init,    ROT0,   "Irem",         "Perfect Soldiers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1993, ssoldier,    0,        psoldier,      psoldier,  m92_state,   empty_init, ROT0,   "Irem America", "Superior Soldiers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1993, psoldier,    ssoldier, psoldier,      psoldier,  m92_state,   empty_init, ROT0,   "Irem",         "Perfect Soldiers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1994, dsoccr94j,   dsoccr94, dsoccr94j,     dsoccr94j, m92_state, init_bank,     ROT0,   "Irem",         "Dream Soccer '94 (Japan, M92 hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, dsoccr94j,   dsoccr94, dsoccr94j,     dsoccr94j, m92_state,   init_bank,  ROT0,   "Irem",         "Dream Soccer '94 (Japan, M92 hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1994, gunforc2,    0,        gunforc2,      gunforc2,  m92_state, init_bank,     ROT0,   "Irem",         "Gun Force II (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1994, geostorm,    gunforc2, gunforc2,      gunforc2,  m92_state, init_bank,     ROT0,   "Irem",         "Geo Storm (Japan, 014 custom sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1994, geostorma,   gunforc2, geostorma,     gunforc2,  m92_state, init_bank,     ROT0,   "Irem",         "Geo Storm (Japan, 026 custom sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, gunforc2,    0,        gunforc2,      gunforc2,  m92_state,   init_bank,  ROT0,   "Irem",         "Gun Force II (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, geostorm,    gunforc2, gunforc2,      gunforc2,  m92_state,   init_bank,  ROT0,   "Irem",         "Geo Storm (Japan, 014 custom sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, geostorma,   gunforc2, geostorma,     gunforc2,  m92_state,   init_bank,  ROT0,   "Irem",         "Geo Storm (Japan, 026 custom sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
