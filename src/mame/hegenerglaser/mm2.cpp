@@ -7,9 +7,9 @@ Mephisto MM II series chesscomputers
 
 TODO:
 - rebel5 unknown read from 0x4002, looks like leftover bookrom check
-- need to emulate TurboKit properly as a slot device, also for mm5p (it's not as
-  simple as a CPU overclock), TK20 EPROM is dumped for the common version (6502
-  Mephisto/Fidelity/Novag/etc.) and for the SciSys Maestro/Analyst version
+- need to emulate TurboKit properly as a slot device (it's not as simple as a CPU
+  overclock), TK20 EPROM is dumped for the common version (6502 Mephisto/Fidelity/
+  Novag/etc.) and for the SciSys Maestro/Analyst version
 - correct rom labels (applies to the filenames with .bin extension)
 
 ================================================================================
@@ -42,9 +42,10 @@ blinks the LEDs a little slower.
 Correction: The real TK20 TurboKit does not patch the ROM, so mm4tk (and a possible
 mm5 version of this) is more likely a SteveUK hack.
 
-The MM V prototype was the program that Ed Schröder participated with as "Rebel" at
-the 1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
-For more information, see: http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
+MM IV (Rebel program) was never sold in this format, the chess engine is from Mephisto
+Polgar. Ed Schröder participated with it at the 1989 WMCCC in Portorose, on an MM IV
+module combined with the TK20 TurboKit. For more information, see:
+http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm (mistakenly claims it's MM V)
 
 MM VI (Saitek, 1994) is on different hardware, H8 CPU.
 
@@ -140,9 +141,9 @@ public:
 
 	void rebel5(machine_config &config);
 	void mm4(machine_config &config);
+	void mm4rebel(machine_config &config);
 	void mm4tk(machine_config &config);
 	void mm5(machine_config &config);
-	void mm5p(machine_config &config);
 	void mm2(machine_config &config);
 	void mm2nona(machine_config &config);
 	void bup(machine_config &config);
@@ -160,7 +161,7 @@ private:
 	void bup_mem(address_map &map) ATTR_COLD;
 	void mm2_mem(address_map &map) ATTR_COLD;
 	void mm4_mem(address_map &map) ATTR_COLD;
-	void mm5p_mem(address_map &map) ATTR_COLD;
+	void mm4rebel_mem(address_map &map) ATTR_COLD;
 	void rebel5_mem(address_map &map) ATTR_COLD;
 
 	void lcd_irqack_w(u8 data);
@@ -233,7 +234,7 @@ void mm2_state::rebel5_mem(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-void mm2_state::mm5p_mem(address_map &map)
+void mm2_state::mm4rebel_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2000).mirror(0x03ff).w(m_display, FUNC(mephisto_display1_device::data_w));
@@ -248,7 +249,7 @@ void mm2_state::mm5p_mem(address_map &map)
 
 void mm2_state::mm4_mem(address_map &map)
 {
-	mm5p_mem(map);
+	mm4rebel_mem(map);
 	map(0x4000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 }
 
@@ -342,13 +343,13 @@ void mm2_state::rebel5(machine_config &config)
 	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
-void mm2_state::mm5p(machine_config &config)
+void mm2_state::mm4rebel(machine_config &config)
 {
 	rebel5(config);
 
 	// basic machine hardware
 	m_maincpu->set_clock(4.9152_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm5p_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm4rebel_mem);
 
 	const attotime nmi_period = attotime::from_hz(4.9152_MHz_XTAL / 0x2000); // 600Hz
 	m_maincpu->set_periodic_int(FUNC(mm2_state::nmi_line_pulse), nmi_period);
@@ -356,7 +357,7 @@ void mm2_state::mm5p(machine_config &config)
 
 void mm2_state::mm4(machine_config &config)
 {
-	mm5p(config);
+	mm4rebel(config);
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm4_mem);
@@ -376,7 +377,7 @@ void mm2_state::mm5(machine_config &config)
 	mm4(config);
 	SOFTWARE_LIST(config.replace(), "cart_list").set_original("mephisto_mm5");
 
-	config.set_default_layout(layout_mephisto_mm5); // does not apply to mm5p
+	config.set_default_layout(layout_mephisto_mm5);
 }
 
 void mm2_state::bup(machine_config &config)
@@ -465,7 +466,7 @@ ROM_END
 ROM_START( mm2e ) // 13 Sep 1985, serial 05569xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("hg_8b_13.9", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
-	ROM_LOAD("c-f_6.9",   0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d) )
+	ROM_LOAD("c-f_6.9",    0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d) )
 ROM_END
 
 
@@ -513,6 +514,12 @@ ROM_START( mm4tk ) // hack of 710
 ROM_END
 
 
+ROM_START( mm4rebel )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rebel_w.m.89_24_8_89", 0x0000, 0x10000, CRC(db630dcd) SHA1(92bcdd5ed7a27ea8331b810e8e81b2cc29abfce1) ) // Atmel 27C512-15DC
+ROM_END
+
+
 ROM_START( mm5 ) // v5.1 (MEM->INFO to see version number)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("mm5.bin", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048) )
@@ -523,12 +530,6 @@ ROM_START( mm5a ) // v5.0
 	ROM_LOAD("mm5a.bin", 0x8000, 0x8000, CRC(fcfa7e6e) SHA1(afeac3a8c957ba58cefaa27b11df974f6f2066da) )
 ROM_END
 
-ROM_START( mm5p )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("buch.bin",     0x0000, 0x8000, CRC(534607c7) SHA1(d0347a5f8dc4cf6001f649aa13e7a7fe75bec5b9) ) // 1st half empty
-	ROM_LOAD("programm.bin", 0x8000, 0x8000, CRC(ee22b974) SHA1(37267507be30ee84051bc94c3a63fb1298a00261) )
-ROM_END
-
 } // anonymous namespace
 
 
@@ -537,28 +538,29 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, bup,     0,      0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, bupa,    bup,    0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 2)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1985, bup,      0,      0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, bupa,     bup,    0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1985, mm2,     0,      0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 1, v4.00)", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, mm2a,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 2, v3.00)", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, mm2b,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 3, v2.00)", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, mm2c,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 4)", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, mm2d,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 5)", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, mm2e,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 6)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, mm2,      0,      0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 1, v4.00)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, mm2a,     mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 2, v3.00)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, mm2b,     mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 3, v2.00)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, mm2c,     mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 4)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, mm2d,     mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 5)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, mm2e,     mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 6)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1985, mm2nona, 0,      0,      mm2nona,  mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (Nona program, DOCCC 1985 Leiden TM)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, mm2nona,  0,      0,      mm2nona,  mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (Nona program, DOCCC 1985 Leiden TM)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1986, rebel5,  0,      0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 1)", MACHINE_SUPPORTS_SAVE ) // aka MM III
-SYST( 1986, rebel5a, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 2)", MACHINE_SUPPORTS_SAVE ) // "
-SYST( 1986, rebel5b, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 3)", MACHINE_SUPPORTS_SAVE ) // "
+SYST( 1986, rebel5,   0,      0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 1)", MACHINE_SUPPORTS_SAVE ) // aka MM III
+SYST( 1986, rebel5a,  rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 2)", MACHINE_SUPPORTS_SAVE ) // "
+SYST( 1986, rebel5b,  rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 3)", MACHINE_SUPPORTS_SAVE ) // "
 
-SYST( 1987, mm4,     0,      0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.10)", MACHINE_SUPPORTS_SAVE )
-SYST( 1987, mm4a,    mm4,    0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.00)", MACHINE_SUPPORTS_SAVE )
-SYST( 1987, mm4b,    mm4,    0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v6.00)", MACHINE_SUPPORTS_SAVE )
-SYST( 1987, mm4tk,   mm4,    0,      mm4tk,    mm2,   mm2_state, empty_init, "hack",             "Mephisto MM IV (TurboKit)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+SYST( 1987, mm4,      0,      0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.10)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, mm4a,     mm4,    0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.00)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, mm4b,     mm4,    0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v6.00)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, mm4tk,    mm4,    0,      mm4tk,    mm2,   mm2_state, empty_init, "hack",             "Mephisto MM IV (TurboKit)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
-SYST( 1990, mm5,     0,      0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (v5.1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1990, mm5a,    mm5,    0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (v5.0)", MACHINE_SUPPORTS_SAVE )
-SYST( 1989, mm5p,    mm5,    0,      mm5p,     mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (WMCCC 1989 Portorose TM)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // aka Rebel
+SYST( 1989, mm4rebel, 0,      0,      mm4rebel, mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (Rebel program, WMCCC 1989 Portorose TM)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+
+SYST( 1990, mm5,      0,      0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (v5.1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, mm5a,     mm5,    0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (v5.0)", MACHINE_SUPPORTS_SAVE )
