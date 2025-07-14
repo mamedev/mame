@@ -88,7 +88,7 @@ private:
 	void handle_dip();
 	void rst65_w(u8 state);
 	void output_digit(u8 i, u8 data);
-	
+
 	void sounddev(offs_t offset, u8 data) ATTR_COLD;
 	void makesound(uint8_t channel, uint8_t length);
 	int soundfreq(uint8_t channel);
@@ -129,7 +129,7 @@ void stella8085_state::rtc62421_io_map(address_map &map)
 	map(0x70, 0x73).w(FUNC(stella8085_state::sounddev));
 	// EXROM??
 	map(0x90, 0x9f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
-	
+
 }
 
 void stella8085_state::mc146818_io_map(address_map &map)
@@ -164,21 +164,21 @@ u8 stella8085_state::kbd_rl_r()
 
 void stella8085_state::disp_w(u8 data)
 {
-    if (m_kbd_sl == 2) {
-        for (int i = 0; i < 8; i++)
-        {
-            u8 lamp_index = (m_kbd_sl * 10) + i;
-            bool lamp_value = BIT(data, i);
-            m_lamps[lamp_index] = lamp_value;
-        }
-    }
+	if (m_kbd_sl == 2) {
+		for (int i = 0; i < 8; i++)
+		{
+			u8 lamp_index = (m_kbd_sl * 10) + i;
+			bool lamp_value = BIT(data, i);
+			m_lamps[lamp_index] = lamp_value;
+		}
+	}
 	else
-	    output_digit(m_kbd_sl, data);
+		output_digit(m_kbd_sl, data);
 }
 
 void stella8085_state::output_digit(u8 i, u8 data)
 {
-    if (i < 8) {
+	if (i < 8) {
 		//m_digits[i] = data;
 	}
 }
@@ -265,10 +265,10 @@ static INPUT_PORTS_START( dicemstr )
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPNAME(0x02, 0x02, "8085 HOLD")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x02, DEF_STR(On))	
+	PORT_DIPSETTING(0x02, DEF_STR(On))
 	PORT_DIPNAME(0x04, 0x04, "8085 RST55") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(stella8085_state::handle_dip), 0)
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x04, DEF_STR(On))	
+	PORT_DIPSETTING(0x04, DEF_STR(On))
 	PORT_DIPNAME(0x08, 0x08, "8085 Reset")
 	PORT_DIPSETTING(0x08, DEF_STR(On))
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
