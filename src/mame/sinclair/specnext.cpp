@@ -2262,13 +2262,13 @@ static const z80_daisy_config z80_daisy_chain[] =
 
 TIMER_CALLBACK_MEMBER(specnext_state::irq_off)
 {
-	spectrum_state::irq_off(param);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	m_irq_mask = 0;
 }
 
 TIMER_CALLBACK_MEMBER(specnext_state::irq_on)
 {
-	spectrum_state::irq_on(param);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	m_irq_mask |= 1 << 11;
 	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 }
@@ -2288,8 +2288,7 @@ INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 	line_irq_adjust();
 	if (!port_ff_interrupt_disable())
 	{
-		m_irq_on_timer->adjust(m_screen->time_until_pos(SCR_256x192.top(), SCR_256x192.left())
-			- attotime::from_ticks(14365, m_maincpu->unscaled_clock()));
+		m_irq_on_timer->adjust(m_screen->time_until_pos((SCR_256x192.bottom() + 57) % CYCLES_VERT, SCR_256x192.left()));
 	}
 }
 
