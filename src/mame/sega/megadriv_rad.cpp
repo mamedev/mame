@@ -717,9 +717,22 @@ ROM_START( matet )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( mateta )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "testris_s29gl032m90tfir4_0001227e.bin", 0x000000, 0x400000, CRC(656ffc77) SHA1(da7ca2d4c2bff3e583f5ad30aa4fe722691a03d9) )
+	ROM_IGNORE(0x100)
+ROM_END
+
+
 ROM_START( mypac )
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "en29lb160bb.bin", 0x000000, 0x200000, CRC(d741a601) SHA1(a8d89034458b14c5cea83980be5400b82081b274) )
+ROM_END
+
+ROM_START( mypaca )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "pacmanarcade_s29gl064n90tfi04_0001227e.bin", 0x000000, 0x800000, CRC(41495033) SHA1(219f0bd38b8a646ca43c9679aeed02c121467cd7) )
+	ROM_IGNORE(0x100)
 ROM_END
 
 ROM_START( mympac )
@@ -1052,6 +1065,7 @@ CONS( 2018, ra145,     0,        0, megadriv_ra145_ntsc, msi_6button,           
 // as NOT WORKING for now although some games run to a degree
 
 CONS( 2021, mypac,     0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Pac-Man (DGUNL-4198, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mypaca,    mypac,    0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Pac-Man (DGUNL-4194, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
 CONS( 2021, mympac,    0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Ms. Pac-Man (DGUNL-7010, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
@@ -1064,6 +1078,7 @@ CONS( 2021, mysinv,    0,        0, megadriv_radica_3button_ntsc,  mympac, megad
 CONS( 2012, atgame40,  0,        0, megadriv_radica_3button_pal,  radica_3button, megadriv_b010xx_select_state, init_atgame40, "AtGames",               "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)
 
 CONS( 2021, matet,      0,        0, megadriv_radica_3button_ntsc,  radica_3button, megadriv_b010xx_select_state, init_megadriv, "dreamGEAR",            "My Arcade Tetris (DGUNL-7028, Pocket Player Pro)", MACHINE_NOT_WORKING)
+CONS( 2021, mateta,     matet,    0, megadriv_radica_3button_ntsc,  radica_3button, megadriv_b010xx_select_state, init_megadriv, "dreamGEAR",            "My Arcade Tetris (DGUNL-7025, Micro Player Pro)", MACHINE_NOT_WORKING)
 
 // has an SD card slot?
 CONS( 200?, dcat16,       0,        0,      megadriv_radica_3button_ntsc, radica_3button,       megadriv_b010xx_select_state, init_dcat, "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )
