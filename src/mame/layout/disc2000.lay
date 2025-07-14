@@ -97,7 +97,7 @@ license:CC0-1.0
 <!-- lampZEILESPALTE -->
 
 <!-- left panel -->
-		<!-- Leiter II -->
+		<!-- Leiter II LZ3+LZ6+LZ7-->
 
 		<element name="lamp" ref="ladder">
 			<bounds x="10" y="40" width="20" height="10" />
@@ -140,7 +140,7 @@ license:CC0-1.0
 		</element>
 
 <!-- right panel -->
-		<!-- Leiter I -->
+		<!-- Leiter I  LZ3+LZ4-->
 
 		<element name="lamp45" ref="ladder">
 			<bounds x="170" y="40" width="20" height="10" />
@@ -182,7 +182,7 @@ license:CC0-1.0
 			<bounds x="170" y="220" width="20" height="10" />
 		</element>
 
-<!-- center -->
+<!-- center LZ0+LZ2+LZ5-->
 		<!-- gestoert -->
 		<element name="lamp26" ref="indicator_red">
 			<bounds x="50" y="120" width="20" height="10" />
@@ -241,17 +241,17 @@ license:CC0-1.0
 			<bounds x="130" y="170" width="20" height="10" />
 		</element>
 
-<!-- bottom panel -->
+<!-- bottom panel LZ0 -->
 		<!-- Tasten -->
-		<element name="lamp02" ref="button_risk" inputtag="INPUTS" inputmask="0x01">
+		<element name="lamp02" ref="button_risk" inputtag="INPUTS" inputmask="0x02">
 			<bounds x="40" y="220" width="15" height="15" />
 		</element>
 
-		<element name="lamp00" ref="button_start" inputtag="INPUTS" inputmask="0x02">
+		<element name="lamp00" ref="button_start" inputtag="INPUTS" inputmask="0x80">
 			<bounds x="65" y="220" width="15" height="15" />
 		</element>
 
-		<element name="lamp07" ref="button_stop" inputtag="INPUTS" inputmask="0x04">
+		<element name="lamp07" ref="button_stop" inputtag="INPUTS" inputmask="0x10">
 			<bounds x="90" y="220" width="15" height="15" />
 		</element>
 
@@ -259,7 +259,7 @@ license:CC0-1.0
 			<bounds x="115" y="220" width="15" height="15" />
 		</element>
 
-		<element name="lamp01" ref="button_risk" inputtag="INPUTS" inputmask="0x10">
+		<element name="lamp01" ref="button_risk" inputtag="INPUTS" inputmask="0x01">
 			<bounds x="140" y="220" width="15" height="15" />
 		</element>
 
