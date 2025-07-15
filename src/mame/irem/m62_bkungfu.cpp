@@ -130,6 +130,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
 	DECLARE_VIDEO_START(bkungfu);
 
+	void bkungfu_blitter_draw_text_inner(uint16_t blitterromptr);
 	void bkungfu_blitter_draw_text();
 
 	// done this way so it can be viewed win the debugger with save state registration
@@ -175,11 +176,9 @@ uint8_t m62_bkungfu_state::bkungfu_blitter_r(offs_t offset)
 	return 0xfe;
 }
 
-void m62_bkungfu_state::bkungfu_blitter_draw_text()
+void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr)
 {
-	uint16_t blitterromptr = m_blittercmdram[0x001] * 2;
 	uint16_t blitterromdataptr = m_blitterdatarom[blitterromptr] | (m_blitterdatarom[blitterromptr + 1] << 8);
-
 	uint8_t blitdat = m_blitterdatarom[blitterromdataptr++];
 	while (blitdat != 0x00)
 	{
@@ -200,7 +199,7 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text()
 
 			m_bkungfu_tileram[(position) & 0xfff] = blitdat;
 			m_bkungfu_tileram[(position + 1) & 0xfff] = m_blittercmdram[0x004];
-			m_bg_tilemap->mark_tile_dirty((position&0xfff) >> 1);
+			m_bg_tilemap->mark_tile_dirty((position & 0xfff) >> 1);
 
 			position += 2;
 			m_blittercmdram[0x002] = position & 0xff;
@@ -209,6 +208,12 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text()
 
 		blitdat = m_blitterdatarom[blitterromdataptr++];
 	}
+}
+
+void m62_bkungfu_state::bkungfu_blitter_draw_text()
+{
+	uint16_t blitterromptr = m_blittercmdram[0x001] * 2;
+	bkungfu_blitter_draw_text_inner(blitterromptr);
 }
 
 void m62_bkungfu_state::machine_start()
@@ -308,7 +313,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 	}
 	// all these 'slots' are initialized when you start a game
 	// there seem to be 3 param bytes and a trigger address for each
-	else if ((offset >= 0x10) && (offset <0x30))
+	else if ((offset >= 0x10) && (offset < 0x30))
 	{
 		int select = offset & 0x3c;
 		int part = offset & 0x03;
@@ -319,12 +324,26 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			{
 			default:
 			{
-				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (unknown select %02x | %02x %02x %02x)\n", machine().describe_context(), offset, data, select, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (unknown select %02x | %02x %02x %02x)\n", machine().describe_context(), offset, data, select, m_blittercmdram[offset + 1], m_blittercmdram[offset + 2], m_blittercmdram[offset + 3]);
 				break;
 			}
-			case 0x10:
+			case 0x10:  // 0x140 in data ROM?
 			{
-				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				break;
+			}
+			case 0x14: // used but only ever with 0x00 values?
+			{
+				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (unknown but used %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				break;
+			}
+			case 0x18:
+			{
+				// called at the start of stages with 08 64 00, could be the non-animated parts of the HUD
+				// a pointer to this basic layout is at 0x140, although it could be a leftover
+				// as the other commands need to be able to form their own versions of the elements here with the correct data inserted
+				bkungfu_blitter_draw_text_inner(0x140);
+				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (unknown draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
 				break;
 			}
 			case 0x1c:
@@ -345,16 +364,25 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			}
 			case 0x28:
 			{
-				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (energy draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (player energy draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				break;
+			}
+			case 0x2c:
+			{
+				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (boss energy draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
 				break;
 			}
 			}
 		}
 
 	}
+	// used on the high score table, is this just data for other commands?
+	else if ((offset >= 0x0102) && (offset < 0x12c))
+	{
+		logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (high score table related)\n", machine().describe_context(), offset, data);
+	}
 	else
 	{
-		// higher offsets used for score & timer display
 		if ((pc != 0x122c) && (pc != 0x0bd5))
 		{
 			// don't log initial RAM test 0x122c
