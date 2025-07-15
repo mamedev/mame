@@ -43,16 +43,17 @@ float menu_audio_effects::change_f(float val, bool inc, bool alt_pressed, bool c
 		incval = -incval;
 
 	val = roundf((val + incval) * 10000.0f) / 10000.0f;
-	return std::clamp(val, 0.0f, 0.1f);
+	return std::clamp(val, 0.0f, 0.05f);
 }
 
-u32 menu_audio_effects::change_int(int val, bool inc, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
+u32 menu_audio_effects::change_int(u16 which, int val, bool inc, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
 {
 	int incval = alt_pressed ? 10000 : ctrl_pressed ? 100 : shift_pressed ? 1 : 10;
 	if(!inc)
 		incval = -incval;
 
-	return std::clamp(val + incval, 10, 1000);
+	const int max = (which == RS_LENGTH) ? 500 : 1000;
+	return std::clamp(val + incval, 10, max);
 }
 
 bool menu_audio_effects::handle(event const *ev)
@@ -133,13 +134,13 @@ bool menu_audio_effects::handle(event const *ev)
 			return true;
 
 		case RS_LENGTH:
-			machine().sound().set_resampler_hq_length(change_int(machine().sound().resampler_hq_length(), false, alt_pressed, ctrl_pressed, shift_pressed));
+			machine().sound().set_resampler_hq_length(change_int(uintptr_t(ev->itemref), machine().sound().resampler_hq_length(), false, alt_pressed, ctrl_pressed, shift_pressed));
 			ev->item->set_subtext(format_u32(machine().sound().resampler_hq_length()));
 			ev->item->set_flags(flag_length());
 			return true;
 
 		case RS_PHASES:
-			machine().sound().set_resampler_hq_phases(change_int(machine().sound().resampler_hq_phases(), false, alt_pressed, ctrl_pressed, shift_pressed));
+			machine().sound().set_resampler_hq_phases(change_int(uintptr_t(ev->itemref), machine().sound().resampler_hq_phases(), false, alt_pressed, ctrl_pressed, shift_pressed));
 			ev->item->set_subtext(format_u32(machine().sound().resampler_hq_phases()));
 			ev->item->set_flags(flag_phases());
 			return true;
@@ -161,13 +162,13 @@ bool menu_audio_effects::handle(event const *ev)
 			return true;
 
 		case RS_LENGTH:
-			machine().sound().set_resampler_hq_length(change_int(machine().sound().resampler_hq_length(), true, alt_pressed, ctrl_pressed, shift_pressed));
+			machine().sound().set_resampler_hq_length(change_int(uintptr_t(ev->itemref), machine().sound().resampler_hq_length(), true, alt_pressed, ctrl_pressed, shift_pressed));
 			ev->item->set_subtext(format_u32(machine().sound().resampler_hq_length()));
 			ev->item->set_flags(flag_length());
 			return true;
 
 		case RS_PHASES:
-			machine().sound().set_resampler_hq_phases(change_int(machine().sound().resampler_hq_phases(), true, alt_pressed, ctrl_pressed, shift_pressed));
+			machine().sound().set_resampler_hq_phases(change_int(uintptr_t(ev->itemref), machine().sound().resampler_hq_phases(), true, alt_pressed, ctrl_pressed, shift_pressed));
 			ev->item->set_subtext(format_u32(machine().sound().resampler_hq_phases()));
 			ev->item->set_flags(flag_phases());
 			return true;
@@ -207,7 +208,7 @@ u32 menu_audio_effects::flag_latency() const
 	float latency = machine().sound().resampler_hq_latency();
 	if(latency > 0.0f)
 		flag |= FLAG_LEFT_ARROW;
-	if(latency < 0.1f)
+	if(latency < 0.05f)
 		flag |= FLAG_RIGHT_ARROW;
 	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
 		flag |= FLAG_INVERT | FLAG_DISABLE;
@@ -220,7 +221,7 @@ u32 menu_audio_effects::flag_length() const
 	u32 length = machine().sound().resampler_hq_length();
 	if(length > 10)
 		flag |= FLAG_LEFT_ARROW;
-	if(length < 1000)
+	if(length < 500)
 		flag |= FLAG_RIGHT_ARROW;
 	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
 		flag |= FLAG_INVERT | FLAG_DISABLE;

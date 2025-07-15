@@ -42,7 +42,7 @@ private:
 	u32 flag_phases() const;
 
 	float change_f(float val, bool inc, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
-	u32 change_int(int val, bool inc, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
+	u32 change_int(u16 type, int which, bool inc, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
 
 	static std::string format_lat(float latency);
 	static std::string format_u32(u32 val);
