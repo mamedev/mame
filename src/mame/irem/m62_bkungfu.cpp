@@ -236,14 +236,14 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 	{
 		if (data == 0x14)
 		{
-			printf("%s: Command %02x: blitter: draw text from ROM\n", machine().describe_context().c_str(), data);
+			logerror("%s: Command %02x: blitter: draw text from ROM\n", machine().describe_context(), data);
 			bkungfu_blitter_draw_text();
 		}
 		else if (data == 0x0d)
 		{
 			// this is used on the ending, and to draw the headers for the high score table
 			// should it differ from the above somehow, or is it just a mirrored command?
-			printf("%s: Command %02x: blitter: draw text from ROM (alt)\n", machine().describe_context().c_str(), data);
+			logerror("%s: Command %02x: blitter: draw text from ROM (alt)\n", machine().describe_context(), data);
 			bkungfu_blitter_draw_text();
 		}
 		else if (data == 0x10)
@@ -251,11 +251,11 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// displays the number of coins after 'CREDIT'
 			// write number of credits to param 0x01 and 0x1d to 0x04
 			uint8_t param = m_blittercmdram[0x001];
-			printf("%s: Command %02x: blitter: draw number of coins %02x\n", machine().describe_context().c_str(), data, param);
+			logerror("%s: Command %02x: blitter: draw number of coins %02x\n", machine().describe_context(), data, param);
 		}
 		else if (data == 0x08) // clear layer to fixed value
 		{
-			printf("%s: Command %02x: blitter: clear layer\n", machine().describe_context().c_str(), data);
+			logerror("%s: Command %02x: blitter: clear layer\n", machine().describe_context(), data);
 			for (int position = 0; position < 0x1000; position += 2)
 			{
 				m_bkungfu_tileram[(position) & 0xfff] = m_blittercmdram[0x002];
@@ -264,78 +264,103 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 		}
 		else if (data == 0x02)
 		{
-			bkungfu_blitter_draw_text();
 			// triggered just afer command 0x01 below
-			printf("%s: Command %02x: blitter: draw level from ROM(2)\n", machine().describe_context().c_str(), data);
+			logerror("%s: Command %02x: blitter: draw level from ROM(2)\n", machine().describe_context(), data);
 		}
 		else if (data == 0x01)
 		{
-			bkungfu_blitter_draw_text();
 			// triggered just after command 0x0a below, and before command 0x02 above
 			// it happens twice at the start of each stage, once before any level animations are complete
 			// and then again after them (even on levels with no animation commands)
-			printf("%s: Command %02x: blitter: draw level from ROM(1)\n", machine().describe_context().c_str(), data);
+			logerror("%s: Command %02x: blitter: draw level from ROM(1)\n", machine().describe_context(), data);
 		}
 		else if (data == 0x0a)
 		{
 			// see notes at top of driver
 			uint16_t blitterromptr = m_blittercmdram[0x001];
 			uint16_t blitterromdataptr = m_blitterdatarom[0x200 + (blitterromptr << 1)] | (m_blitterdatarom[0x200 + (blitterromptr << 1) + 1] << 8);
-			popmessage("%s: Command %02x: blitter: draw level from ROM initialize - param %02x source address is %04x", machine().describe_context(), data, blitterromptr, blitterromdataptr);
-			printf("%s: Command %02x: blitter: draw level from ROM initialize - param %02x source address is %04x\n", machine().describe_context().c_str(), data, blitterromptr, blitterromdataptr);
+			//popmessage("%s: Command %02x: blitter: draw level from ROM initialize - param %02x source address is %04x", machine().describe_context(), data, blitterromptr, blitterromdataptr);
+			logerror("%s: Command %02x: blitter: draw level from ROM initialize - param %02x source address is %04x\n", machine().describe_context(), data, blitterromptr, blitterromdataptr);
 		}
 		else if (data == 0x05)
 		{
 			// used at the start of stages 4,5,6,7,8 to draw animated stage elements
 			// these are simple animations such as a door or trapdoor closing
 			// it's called after command 0xf in those cases
-			printf("%s: Command %02x: blitter: draw animated level element\n", machine().describe_context().c_str(), data);
+			logerror("%s: Command %02x: blitter: draw animated level element\n", machine().describe_context(), data);
 		}
 		else if (data == 0x0f)
 		{
 			// used in the attract mode when drawing the background of the title screen
-			printf("%s: Command %02x: blitter: draw title animation flames\n", machine().describe_context().c_str(), data);
+			// and before animated level elements at the start of later stages
+			logerror("%s: Command %02x: blitter: draw title animation flames\n", machine().describe_context(), data);
 		}
 		else if (data == 0xfe)
 		{
-			printf("%s: Command %02x: blitter: start up\n", machine().describe_context().c_str(), data);
+			// probably tells the MCU to start running
+			logerror("%s: Command %02x: blitter: start up\n", machine().describe_context(), data);
 		}
 		else
 		{
-			printf("%s: Command %02x: blitter: unknown\n", machine().describe_context().c_str(), data);
+			logerror("%s: Command %02x: blitter: unknown\n", machine().describe_context(), data);
 		}
 		m_bg_tilemap->mark_all_dirty();
+	}
+	// all these 'slots' are initialized when you start a game
+	// there seem to be 3 param bytes and a trigger address for each
+	else if ((offset >= 0x10) && (offset <0x30))
+	{
+		int select = offset & 0x3c;
+		int part = offset & 0x03;
+
+		if (part == 0x00)
+		{
+			switch (select)
+			{
+			default:
+			{
+				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (unknown select %02x | %02x %02x %02x)\n", machine().describe_context(), offset, data, select, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				break;
+			}
+			case 0x10:
+			{
+				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				break;
+			}
+			case 0x1c:
+			{
+				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (timer draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				break;
+			}
+			case 0x20:
+			{
+				// this is triggered with 0x01 and 0x02, the counter display is meant to flash between 2 states like in the original
+				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (floor counter draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				break;
+			}
+			case 0x24:
+			{
+				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (lives counter draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				break;
+			}
+			case 0x28:
+			{
+				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (energy draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				break;
+			}
+			}
+		}
+
 	}
 	else
 	{
 		// higher offsets used for score & timer display
-
-		if (offset == 0x1e)
+		if ((pc != 0x122c) && (pc != 0x0bd5))
 		{
-			//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (timer low)\n", machine().describe_context().c_str(), offset, data);
+			// don't log initial RAM test 0x122c
+			// or the scroll MSB it writes during gameplay (0x0bd5)
+			logerror("%s: bkungfu_blitter_w offset: %04x data: %02x\n", machine().describe_context(), offset, data);
 		}
-		else if (offset == 0x1d)
-		{
-			//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (timer high)\n", machine().describe_context().c_str(), offset, data);
-		}
-		else if (offset == 0x1c)
-		{
-			printf("%s: bkungfu_blitter_w offset: %04x data: %02x (timer draw %02x%02x))\n", machine().describe_context().c_str(), offset, data, m_blittercmdram[0x1d], m_blittercmdram[0x1e]);
-		}
-		if (offset == 0x29)
-		{
-			//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (energy value)\n", machine().describe_context().c_str(), offset, data);
-		}
-		if (offset == 0x28)
-		{
-			printf("%s: bkungfu_blitter_w offset: %04x data: %02x (energy draw %02x))\n", machine().describe_context().c_str(), offset, data, m_blittercmdram[0x29]);
-		}
-		else
-		{
-			if (pc != 0x122c) // don't log initial RAM test
-				printf("%s: bkungfu_blitter_w offset: %04x data: %02x\n", machine().describe_context().c_str(), offset, data);
-		}
-
 	}
 }
 
