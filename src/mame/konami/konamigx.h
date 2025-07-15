@@ -14,6 +14,7 @@
 #include "cpu/tms57002/tms57002.h"
 #include "machine/adc083x.h"
 #include "machine/k053252.h"
+#include "machine/k056230.h"
 #include "machine/timer.h"
 #include "sound/k054539.h"
 #include "sound/k056800.h"
@@ -35,6 +36,7 @@ public:
 		, m_k053252(*this, "k053252")
 		, m_k055673(*this, "k055673")
 		, m_k055555(*this, "k055555")
+		, m_k056230(*this, "k056230")
 		, m_k056832(*this, "k056832")
 		, m_k054338(*this, "k054338")
 		, m_k056800(*this, "k056800")
@@ -212,6 +214,7 @@ protected:
 	optional_device<k053252_device> m_k053252;
 	required_device<k055673_device> m_k055673;
 	required_device<k055555_device> m_k055555;
+	optional_device<k056230_device> m_k056230;
 	required_device<k056832_device> m_k056832;
 	optional_device<k054338_device> m_k054338;
 	optional_device<k056800_device> m_k056800;

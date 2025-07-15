@@ -30,9 +30,6 @@
     - Controls
     - Palettes
 
-    Driver needs:
-    - Network at 580800 (K056230)
-
     Tech info by Phil Bennett, from the schematics:
 
     68000 address map
@@ -1058,7 +1055,7 @@ void polygonet_state::plygonet(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	// Networking hardware
-	K056230(config, m_k056230);
+	K056230(config, m_k056230, 0U);
 	m_k056230->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 
 	// Video hardware
@@ -1147,5 +1144,5 @@ ROM_END
 //-------------------------------------------------
 
 //    YEAR  NAME      PARENT   MACHINE   INPUT      STATE            INIT
-GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet_state, empty_init, ROT90, "Konami", "Polygonet Commanders (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet_state, empty_init, ROT90, "Konami", "Poly-Net Warriors (ver JAA)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet_state, empty_init, ROT90, "Konami", "Polygonet Commanders (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet_state, empty_init, ROT90, "Konami", "Poly-Net Warriors (ver JAA)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
