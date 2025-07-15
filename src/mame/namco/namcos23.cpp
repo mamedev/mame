@@ -4810,9 +4810,11 @@ u16 namcos23_state::c417_ptrom_lsw_r()
 		LOGMASKED(LOG_C417_REG, "%s: c417 point rom (over-limit) lsw read: %04x\n", machine().describe_context(), 0xffff);
 		return 0xffff;
 	}
-	// TODO: rapid river wants auto-inc in some way here (NGs point ROM self test otherwise)
 	LOGMASKED(LOG_C417_REG, "%s: c417 point rom[%06x] lsw read: %04x\n", machine().describe_context(), m_c417.pointrom_adr, (u16)m_ptrom[m_c417.pointrom_adr]);
-	return m_ptrom[m_c417.pointrom_adr];
+	if (machine().side_effects_disabled())
+		return m_ptrom[m_c417.pointrom_adr];
+	else
+		return m_ptrom[m_c417.pointrom_adr++];
 }
 
 void namcos23_state::c417_irq_ack_w(offs_t offset, u16 data)
