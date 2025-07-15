@@ -173,7 +173,7 @@ audio_resampler_hq::audio_resampler_hq(u32 fs, u32 ft, float latency, u32 max_or
 	u32 filter_length = m_order_per_lane * m_phases;
 	if((filter_length & 1) == 0)
 		filter_length --;
-	u32 hlen = filter_length / 2;
+	u32 hlen = std::max(1U, filter_length / 2);
 
 	// Prepare the per-phase filters
 	m_coefficients.resize(m_phases);
