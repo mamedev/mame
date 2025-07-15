@@ -10,6 +10,93 @@ video reference: https://www.youtube.com/watch?v=Efr9EQkbCSQ
 TODO:
 - finish background gfx emulation, supposedly via an (undumped) MCU
 
+NOTES ON MCU DATA ROM FORMAT
+----------------------------
+
+Table for levels, initial state
+0200  4D 18 | 184d
+0202  DD 17 | 17dd
+0204  6D 17 | 176d
+0206  FD 16 | 16fd
+0208  8D 16 | 168d
+020A  1D 16 | 161d
+020C  AD 15 | 15ad
+020E  3D 15 | 153d
+
+Tables for levels, state for redrawing after death (with animated pieces in place)
+0210  4D 18 | 184d
+0212  DD 17 | 17dd
+0214  6D 17 | 176d
+0216  7D 1A | 1a7d
+0218  0D 1A | 1a0d
+021A  9D 19 | 199d
+021C  2D 19 | 192d
+021E  BD 18 | 18bd
+
+This initial / redraw after death table use can be confirmed by looking at the pairs
+
+0200  4D 18 | 184d / 0210  4D 18 | 184d  - identical in both states (Stage 1 data)
+0202  DD 17 | 17dd / 0212  DD 17 | 17dd  - identical in both states (Stage 2 data)
+0204  6D 17 | 176d / 0214  6D 17 | 176d  - identical in both states (Stage 3 data)
+0206  FD 16 | 16fd / 0216  7D 1A | 1a7d  - different (Stage 4 data)
+0208  8D 16 | 168d / 0218  0D 1A | 1a0d  - different (Stage 5 data)
+020A  1D 16 | 161d / 021A  9D 19 | 199d  - different (Stage 6 data)
+020C  AD 15 | 15ad / 021C  2D 19 | 192d  - different (Stage 7 data)
+020E  3D 15 | 153d / 021E  BD 18 | 18bd  - different (Stage 8 data)
+
+The game has 8 stages, the first 3 stages do not contain animated objects
+The remaining stages have animated objects (animated with different commands) that close behind the player when they first enter the stage
+
+Stage 4 contains a door on the very right of the tilemap
+Stage 5 contains a trap door on the very left of the tilemap
+Stage 6 contains a trap door on the very right of the tilemap
+Stage 7 contains a trap door on the very left of the tilemap
+Stage 8 contains a trap door on the very right of the tilemap
+
+Due to this you would expect the data pointed to by the stages with tiny modifications to be similar once decrypted as only a few details
+are different between the 2 versions so
+16fd should be similar to 1a7d
+168d should be similar to 1a0d
+161d should be similar to 199d
+15ad should be similar to 192d
+153d should be similar to 18bd
+
+if you sort by address pointed to you get
+
+020E  3D 15 | 153d
+020C  AD 15 | 15ad
+020A  1D 16 | 161d
+0208  8D 16 | 168d
+0206  FD 16 | 16fd
+0204  6D 17 | 176d / 0214  6D 17 | 176d
+0202  DD 17 | 17dd / 0212  DD 17 | 17dd
+0200  4D 18 | 184d / 0210  4D 18 | 184d
+021E  BD 18 | 18bd
+021C  2D 19 | 192d
+021A  9D 19 | 199d
+0218  0D 1A | 1a0d
+0216  7D 1A | 1a7d
+
+so each of these blocks is 0x70 bytes long giving the following ranges
+
+153d - 15ac
+15ad - 161c
+161d - 168c
+168d - 16fc
+16fd - 176c
+176d - 17dc
+17dd - 184c
+184d - 18bc
+18bd - 192c
+192d - 199c
+199d - 1a0d
+1a0d - 1a7d
+1a7d - 1aec
+
+data from 1aed - 7fff is not directly referenced by anything, so the tables above probably point to it
+
+
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -26,12 +113,14 @@ public:
 		: m62_state(mconfig, type, tag)
 		, m_bkungfu_tileram(*this, "tileram", 64*32*2, ENDIANNESS_LITTLE)
 		, m_blitterdatarom(*this, "blitterdat")
-		, m_blittercmdram(*this, "blittercmdram")
 	{ }
 
 	void bkungfu(machine_config& config);
 
 private:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
@@ -41,10 +130,14 @@ private:
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
 	DECLARE_VIDEO_START(bkungfu);
 
+	void bkungfu_blitter_draw_text();
+
+	// done this way so it can be viewed win the debugger with save state registration
+	uint8_t m_blittercmdram[0x800];
+
 	memory_share_creator<uint8_t> m_bkungfu_tileram;
 
 	required_region_ptr<uint8_t> m_blitterdatarom;
-	required_shared_ptr<uint8_t> m_blittercmdram;
 };
 
 
@@ -82,51 +175,87 @@ uint8_t m62_bkungfu_state::bkungfu_blitter_r(offs_t offset)
 	return 0xfe;
 }
 
+void m62_bkungfu_state::bkungfu_blitter_draw_text()
+{
+	uint16_t blitterromptr = m_blittercmdram[0x001] * 2;
+	uint16_t blitterromdataptr = m_blitterdatarom[blitterromptr] | (m_blitterdatarom[blitterromptr + 1] << 8);
+
+	uint8_t blitdat = m_blitterdatarom[blitterromdataptr++];
+	while (blitdat != 0x00)
+	{
+		if (blitdat == 0x01)
+		{
+			// change color value during blit
+			m_blittercmdram[0x004] = m_blitterdatarom[blitterromdataptr++];
+		}
+		else if (blitdat == 0x02)
+		{
+			// change position params during blit
+			m_blittercmdram[0x002] = m_blitterdatarom[blitterromdataptr++];
+			m_blittercmdram[0x003] = m_blitterdatarom[blitterromdataptr++];
+		}
+		else
+		{
+			uint16_t position = (m_blittercmdram[0x003] << 8) | m_blittercmdram[0x002];
+
+			m_bkungfu_tileram[(position) & 0xfff] = blitdat;
+			m_bkungfu_tileram[(position + 1) & 0xfff] = m_blittercmdram[0x004];
+			m_bg_tilemap->mark_tile_dirty((position&0xfff) >> 1);
+
+			position += 2;
+			m_blittercmdram[0x002] = position & 0xff;
+			m_blittercmdram[0x003] = (position & 0xff00) >> 8;
+		}
+
+		blitdat = m_blitterdatarom[blitterromdataptr++];
+	}
+}
+
+void m62_bkungfu_state::machine_start()
+{
+	m62_state::machine_start();
+
+	save_item(NAME(m_blittercmdram));
+}
+
+void m62_bkungfu_state::machine_reset()
+{
+	m62_state::machine_reset();
+
+	for (int i = 0; i < 0x800; i++)
+		m_blittercmdram[i] = 0x00;
+}
+
 void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 {
+	int pc = m_maincpu->pc();
+
 	m_blittercmdram[offset] = data;
 
 	if (offset == 0x00)
 	{
 		if (data == 0x14)
 		{
-			//logerror("%s: blitter: draw text from ROM\n", machine().describe_context());
-
-			uint16_t blitterromptr = m_blittercmdram[0x001] * 2;
-			uint16_t blitterromdataptr = m_blitterdatarom[blitterromptr] | (m_blitterdatarom[blitterromptr + 1] << 8);
-
-			uint8_t blitdat = m_blitterdatarom[blitterromdataptr++];
-			while (blitdat != 0x00)
-			{
-				if (blitdat == 0x01)
-				{
-					// change color value during blit
-					m_blittercmdram[0x004] = m_blitterdatarom[blitterromdataptr++];
-				}
-				else if (blitdat == 0x02)
-				{
-					// change position params during blit
-					m_blittercmdram[0x002] = m_blitterdatarom[blitterromdataptr++];
-					m_blittercmdram[0x003] = m_blitterdatarom[blitterromdataptr++];
-				}
-				else
-				{
-					uint16_t position = (m_blittercmdram[0x003] << 8) | m_blittercmdram[0x002];
-
-					m_bkungfu_tileram[(position) & 0xfff] = blitdat;
-					m_bkungfu_tileram[(position + 1) & 0xfff] = m_blittercmdram[0x004];
-					m_bg_tilemap->mark_tile_dirty((position&0xfff) >> 1);
-
-					position += 2;
-					m_blittercmdram[0x002] = position & 0xff;
-					m_blittercmdram[0x003] = (position & 0xff00) >> 8;
-				}
-
-				blitdat = m_blitterdatarom[blitterromdataptr++];
-			}
+			printf("%s: Command %02x: blitter: draw text from ROM\n", machine().describe_context().c_str(), data);
+			bkungfu_blitter_draw_text();
+		}
+		else if (data == 0x0d)
+		{
+			// this is used on the ending, and to draw the headers for the high score table
+			// should it differ from the above somehow, or is it just a mirrored command?
+			printf("%s: Command %02x: blitter: draw text from ROM (alt)\n", machine().describe_context().c_str(), data);
+			bkungfu_blitter_draw_text();
+		}
+		else if (data == 0x10)
+		{
+			// displays the number of coins after 'CREDIT'
+			// write number of credits to param 0x01 and 0x1d to 0x04
+			uint8_t param = m_blittercmdram[0x001];
+			printf("%s: Command %02x: blitter: draw number of coins %02x\n", machine().describe_context().c_str(), data, param);
 		}
 		else if (data == 0x08) // clear layer to fixed value
 		{
+			printf("%s: Command %02x: blitter: clear layer\n", machine().describe_context().c_str(), data);
 			for (int position = 0; position < 0x1000; position += 2)
 			{
 				m_bkungfu_tileram[(position) & 0xfff] = m_blittercmdram[0x002];
@@ -135,50 +264,78 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 		}
 		else if (data == 0x02)
 		{
-			//logerror("%s: blitter: draw level from ROM(2)\n", machine().describe_context());
+			bkungfu_blitter_draw_text();
+			// triggered just afer command 0x01 below
+			printf("%s: Command %02x: blitter: draw level from ROM(2)\n", machine().describe_context().c_str(), data);
 		}
 		else if (data == 0x01)
 		{
-			//logerror("%s: blitter: draw level from ROM(1)\n", machine().describe_context());
+			bkungfu_blitter_draw_text();
+			// triggered just after command 0x0a below, and before command 0x02 above
+			// it happens twice at the start of each stage, once before any level animations are complete
+			// and then again after them (even on levels with no animation commands)
+			printf("%s: Command %02x: blitter: draw level from ROM(1)\n", machine().describe_context().c_str(), data);
 		}
 		else if (data == 0x0a)
 		{
-			// level data is in custom format. draws 14x4 tile blocks. compression?
-			//logerror("%s: blitter: draw level from ROM initialize\n", machine().describe_context());
-
-			//uint16_t blitterromptr = m_blittercmdram[0x001] << 1;
-			//uint16_t blitterromdataptr = m_blitterdatarom[0x200 + blitterromptr] | (m_blitterdatarom[0x200 + blitterromptr + 1] << 8);
-			//logerror("source address is % 04x\n", blitterromdataptr);
+			// see notes at top of driver
+			uint16_t blitterromptr = m_blittercmdram[0x001];
+			uint16_t blitterromdataptr = m_blitterdatarom[0x200 + (blitterromptr << 1)] | (m_blitterdatarom[0x200 + (blitterromptr << 1) + 1] << 8);
+			popmessage("%s: Command %02x: blitter: draw level from ROM initialize - param %02x source address is %04x", machine().describe_context(), data, blitterromptr, blitterromdataptr);
+			printf("%s: Command %02x: blitter: draw level from ROM initialize - param %02x source address is %04x\n", machine().describe_context().c_str(), data, blitterromptr, blitterromdataptr);
 		}
 		else if (data == 0x05)
 		{
-			//logerror("%s: blitter: draw level ROM on level 3+\n", machine().describe_context());
+			// used at the start of stages 4,5,6,7,8 to draw animated stage elements
+			// these are simple animations such as a door or trapdoor closing
+			// it's called after command 0xf in those cases
+			printf("%s: Command %02x: blitter: draw animated level element\n", machine().describe_context().c_str(), data);
 		}
 		else if (data == 0x0f)
 		{
-			//logerror("%s: blitter: draw title animation flames\n", machine().describe_context());
-		}
-		else if (data == 0x0d)
-		{
-			//logerror("%s: blitter: draw title animation flames(2)\n", machine().describe_context());
-		}
-		else if (data == 0x10)
-		{
-			//logerror("%s: blitter: coin up\n", machine().describe_context());
+			// used in the attract mode when drawing the background of the title screen
+			printf("%s: Command %02x: blitter: draw title animation flames\n", machine().describe_context().c_str(), data);
 		}
 		else if (data == 0xfe)
 		{
-			//logerror("%s: blitter: start up\n", machine().describe_context());
+			printf("%s: Command %02x: blitter: start up\n", machine().describe_context().c_str(), data);
 		}
 		else
 		{
-			//logerror("%s: blitter: unknown\n", machine().describe_context());
+			printf("%s: Command %02x: blitter: unknown\n", machine().describe_context().c_str(), data);
 		}
 		m_bg_tilemap->mark_all_dirty();
 	}
 	else
 	{
 		// higher offsets used for score & timer display
+
+		if (offset == 0x1e)
+		{
+			//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (timer low)\n", machine().describe_context().c_str(), offset, data);
+		}
+		else if (offset == 0x1d)
+		{
+			//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (timer high)\n", machine().describe_context().c_str(), offset, data);
+		}
+		else if (offset == 0x1c)
+		{
+			printf("%s: bkungfu_blitter_w offset: %04x data: %02x (timer draw %02x%02x))\n", machine().describe_context().c_str(), offset, data, m_blittercmdram[0x1d], m_blittercmdram[0x1e]);
+		}
+		if (offset == 0x29)
+		{
+			//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (energy value)\n", machine().describe_context().c_str(), offset, data);
+		}
+		if (offset == 0x28)
+		{
+			printf("%s: bkungfu_blitter_w offset: %04x data: %02x (energy draw %02x))\n", machine().describe_context().c_str(), offset, data, m_blittercmdram[0x29]);
+		}
+		else
+		{
+			if (pc != 0x122c) // don't log initial RAM test
+				printf("%s: bkungfu_blitter_w offset: %04x data: %02x\n", machine().describe_context().c_str(), offset, data);
+		}
+
 	}
 }
 
@@ -192,7 +349,7 @@ void m62_bkungfu_state::mem_map(address_map& map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc0ff).ram().share("spriteram");
-	map(0xc800, 0xcfff).rw(FUNC(m62_bkungfu_state::bkungfu_blitter_r), FUNC(m62_bkungfu_state::bkungfu_blitter_w)).share("blittercmdram");
+	map(0xc800, 0xcfff).rw(FUNC(m62_bkungfu_state::bkungfu_blitter_r), FUNC(m62_bkungfu_state::bkungfu_blitter_w));
 	map(0xe000, 0xefff).ram();
 }
 
