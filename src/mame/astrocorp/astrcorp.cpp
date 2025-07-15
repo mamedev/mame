@@ -2526,6 +2526,38 @@ ROM_START( magibomby )
 	ROM_LOAD( "magibomby_cpucode.key", 0x00, 0x02, CRC(d0b51355) SHA1(4cf2cc5419330915ceb88f803da616df3e656fb1) )
 ROM_END
 
+/*
+PCB ASTRO J
+CS350P001
+
+CPU ASTRO V102PX-014
+
+CHIP FPGA F02 2005-02-26
+
+VIDEO V05 0424
+*/
+
+ROM_START( magibombz )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 ) // hand-modified labels
+	ROM_LOAD16_BYTE( "1_m.b._bb6.0j.u20", 0x00000, 0x10000, CRC(2f4abf1d) SHA1(2d329525aad22d529e9091980329aff934be1e3d) )
+	ROM_LOAD16_BYTE( "2_m.b._bb6.0j.u19", 0x00001, 0x10000, CRC(30da4f91) SHA1(a5312e5b056bdca8cd6668fb55f3d47f8bc13bfe) )
+	ROM_FILL(                             0x20000, 0x20000, 0xff )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "mx29f1610mc.u130", 0x000000, 0x200000, CRC(82c643f6) SHA1(50f35cf5b300c5167c6ce2f199a4d991e7258a2a) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_m.b._e1.0.rom", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46", 0x00, 0x80, CRC(a00151ca) SHA1(cd85559dcae3fca8f56804d8565e115288eb0bcb) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "magibombz_cpucode.key", 0x00, 0x02, CRC(ccf8c6c3) SHA1(230c465120211e09e688e390b2e86e23a590c01f) )
+ROM_END
+
 /***************************************************************************
 
 Western Venture
@@ -4152,6 +4184,7 @@ GAMEL( 2014,  magibombo, magibomb, magibombo, magibombd, zoo_state,       init_m
 GAMEL( 2003,  magibombp, magibomb, magibombp, dinodino,  zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB6.0J, 26/11/03)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 112603S
 GAMEL( 2003,  magibombx, magibomb, magibombm, dinodino,  zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB5.1, 01/10/03)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 011003S
 GAMEL( 2002,  magibomby, magibomb, magibombm, dinodino,  zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB5.0, 09/26/02)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 092602S
+GAMEL( 2004,  magibombz, magibomb, magibombg, dinodino,  zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. BB6.0, 02/24/04)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 022404S
 GAMEL( 2004,  speedmst,  0,        speedmst,  dinodino,  zoo_state,       init_zoo,       ROT0, "D2 Enterprises", "Speed Master (D2.01.C, Apr 29 2004)",        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 29 2004 16:29:35
 GAMEL( 2003,  speedmsta, speedmst, speedmst,  dinodino,  zoo_state,       init_zoo,       ROT0, "D2 Enterprises", "Speed Master (D1.4, May 23 2003)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // May 23 2003 16:38:02
 GAMEL( 2003,  speedmstb, speedmst, speedmst,  dinodino,  zoo_state,       init_zoo,       ROT0, "D2 Enterprises", "Speed Master (D2.01.C, Apr 28 2004)",        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 28 2004 17:21:26
