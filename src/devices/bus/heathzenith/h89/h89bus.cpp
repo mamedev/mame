@@ -171,7 +171,7 @@ h89bus::addr_ranges device_heath_io_decoder_interface::scan_io_decoder_rom(u8 se
 {
 	h89bus::addr_ranges ranges;
 	bool found = false;
-	u8 first, last;
+	u8 first = 0, last = 0;
 
 	for (int i = 0; i < 256; i++)
 	{
