@@ -5,52 +5,52 @@
 Pluto 6 hardware from Heber Ltd.
 
 Hardware specs:
-	Motorola MCF5206e ColdFire at 40Mhz.
-	2MB EDO RAM + 256KB Battery backed SRAM.
-	512KB Flash BIOS/IPL ROM.
-	IDE/ATAPI interface for CompactFlash, HDDs and/or CD-ROM.
-	Configurable with up to two Fujistu MB86290A GPUs with 8MB per module.
-	Stereo DAC with software based mixer.
-	PIC18 System management, RTC and security device.
+    Motorola MCF5206e ColdFire at 40Mhz.
+    2MB EDO RAM + 256KB Battery backed SRAM.
+    512KB Flash BIOS/IPL ROM.
+    IDE/ATAPI interface for CompactFlash, HDDs and/or CD-ROM.
+    Configurable with up to two Fujistu MB86290A GPUs with 8MB per module.
+    Stereo DAC with software based mixer.
+    PIC18 System management, RTC and security device.
 
 IO:
-	* 32 inputs.
-	* 256 lamps with 1-8 dimming levels.
-	* 256 LEDs or 32 7-Segment displays with 1-8 dimming levels.
-	* 64 open-drain outputs.
-	* 6 TTL auxillary outputs.
-	* Up to 6 UART ports - 4 used as RS232 ports (One used as BACTA Dataport), 2 used for dual ccTalk channels.
-		2x UART on ColdFire, 2x UART in FPGA, optional MC68681 DUART support.
-	* RS485/TTL UART port.
-	
+    * 32 inputs.
+    * 256 lamps with 1-8 dimming levels.
+    * 256 LEDs or 32 7-Segment displays with 1-8 dimming levels.
+    * 64 open-drain outputs.
+    * 6 TTL auxillary outputs.
+    * Up to 6 UART ports - 4 used as RS232 ports (One used as BACTA Dataport), 2 used for dual ccTalk channels.
+        2x UART on ColdFire, 2x UART in FPGA, optional MC68681 DUART support.
+    * RS485/TTL UART port.
+
 
 Pluto 6 (01-16391-8)
 ┌─────────────────────────────────────────────────────────┬───────────────┬───────────────────────────────────┐
-│┌─┐					     ┌───────────┐                │               │┌────────┐ P9 ________________     │
-││⁞│ P26	   ┌─┐	┌─┐	     |___________| P4         ┌──┐│ CompactFlash  ││________││......... .........│    │
-│└─┘		   │││	│││  ┌────┐    U3     U26         │  ││      P6       │    P7	   NMOS  NMOS  NMOS	┌──┐  │
-│┌──┐          │││  │││  │ U1 │ ┌─────┐ ┌─────┐		  │I │├─────┬───────┬─┘		       NMOS  NMOS  NMOS	│  │P │
-││  │P25	   │-│  │-│  └────┘ └─────┘ └─────┘       │D ││_____│ PIC18 │			   NMOS  NMOS  NMOS	│  │1 │
-││  │          │││  │││             ┌──────────┐  U2  │E │	 P8	│  U 5  │			   NMOS  NMOS  NMOS	│  │0 │
-│└──┘          │││  │││     X3      │          │ ┌─┐  │  │		└───────┘ X1		   NMOS  NMOS  NMOS	│  │  │
-│ 		       │││  │││ ┌──┐  ┌─┐   │ COLDFIRE │ |_|  │  │      	  X2	   		   NMOS				└──┘  │
-│┌──┐          │││  │││ │  │  └─┘   │          │ ┌─┐  └──┘		┌────────┐		   						 ┌─┐  │
-││  │ P24	   │-│  │-│ │  │   U6   └──────────┘ |_|   P5		│||||||||│SW2							 │⁞│P │
-││  │		   │││  │││ │  │                     U27			├────────┤				PNP PNP PNP PNP	 │⁞│1 │
-│└──┘ U41	   │││  │││ │  │  ┌──────────┐	 ┌───┐				│||||||||│SW1			PNP PNP PNP PNP	 │⁞│1 │			
-│	 ┌─┐ 	   │││  │││ │  │  │          │   │   │ U55	┌─┐		└────────┘				PNP PNP PNP PNP	 │⁞│  │
-│┌─┐ └─┘	   │││  │││ │  │  │  XCS20XL │   └───┘		│⁞│ P27						    PNP PNP PNP PNP	 └─┘  │
-││⁞│ 		   │││  │││ │  │  │          │				└─┘	_							TPIC255 TPIC255	 	  │
-││⁞│ 74HCT244  │││  │││ │  │  └──────────┘	x4			   |O| ┌──┐ U7					TPIC255 TPIC255	┌──┐  │
-││⁞│ 	       │││  │││ │  │              ┌──────┐		   SW3 └──┘			  ┌─────┐	TPIC255 TPIC255	│  │  │
-│└─┘P23		   │││  │││ │  │  U28		  │ U56  │		   			TPIC255	  │     │	TPIC255 TPIC255 │  │P │
-│┌───┐		   │││  │││ │  │  ┌─┐		  │ DUART│					   		B1│     │		   			│  │1 │
-││/-││		   └─┘  └─┘ └──┘  └─┘		  └──────┘				HCT245		  └─────┘		P14			│  │2 │
-│││ ││		   EXP0 EXP1 P3				U31						HCT245 HCT245		┌─────────────────┐	│  │  │
-│││ ││ 	SN75188N SN75188N			┌──────────────┐						 P16  __│_________________│	│  │  │
-│││ ││ 	  SN75188N SN75188N		P19	│______________│  P18			   P17	 P15 |... ....|    	P13		└──┘  │
-││\_││P22 ┌───────┐┌──────────┐ ______ ┌────────────────────┐  	┌──────────────┐  ________ ┌──────────────┐	  │
-│└───┘	  │__P21__││___P20____│|... ..|│o o o o o o o  o o o│	│______________│ |... ....|│______________│	  │
+│┌─┐                         ┌───────────┐                │               │┌────────┐ P9 ________________     │
+││⁞│ P26       ┌─┐  ┌─┐      |___________| P4         ┌──┐│ CompactFlash  ││________││......... .........│    │
+│└─┘           │││  │││  ┌────┐    U3     U26         │  ││      P6       │    P7      NMOS  NMOS  NMOS ┌──┐  │
+│┌──┐          │││  │││  │ U1 │ ┌─────┐ ┌─────┐       │I │├─────┬───────┬─┘            NMOS  NMOS  NMOS │  │P │
+││  │P25       │-│  │-│  └────┘ └─────┘ └─────┘       │D ││_____│ PIC18 │              NMOS  NMOS  NMOS │  │1 │
+││  │          │││  │││             ┌──────────┐  U2  │E │   P8 │  U 5  │              NMOS  NMOS  NMOS │  │0 │
+│└──┘          │││  │││     X3      │          │ ┌─┐  │  │      └───────┘ X1           NMOS  NMOS  NMOS │  │  │
+│              │││  │││ ┌──┐  ┌─┐   │ COLDFIRE │ |_|  │  │            X2               NMOS             └──┘  │
+│┌──┐          │││  │││ │  │  └─┘   │          │ ┌─┐  └──┘      ┌────────┐                               ┌─┐  │
+││  │ P24      │-│  │-│ │  │   U6   └──────────┘ |_|   P5       │||||||||│SW2                            │⁞│P │
+││  │          │││  │││ │  │                     U27            ├────────┤              PNP PNP PNP PNP  │⁞│1 │
+│└──┘ U41      │││  │││ │  │  ┌──────────┐   ┌───┐              │||||||||│SW1           PNP PNP PNP PNP  │⁞│1 │
+│    ┌─┐       │││  │││ │  │  │          │   │   │ U55  ┌─┐     └────────┘              PNP PNP PNP PNP  │⁞│  │
+│┌─┐ └─┘       │││  │││ │  │  │  XCS20XL │   └───┘      │⁞│ P27                         PNP PNP PNP PNP  └─┘  │
+││⁞│           │││  │││ │  │  │          │              └─┘ _                           TPIC255 TPIC255       │
+││⁞│ 74HCT244  │││  │││ │  │  └──────────┘  x4             |O| ┌──┐ U7                  TPIC255 TPIC255 ┌──┐  │
+││⁞│           │││  │││ │  │              ┌──────┐         SW3 └──┘           ┌─────┐   TPIC255 TPIC255 │  │  │
+│└─┘P23        │││  │││ │  │  U28         │ U56  │                  TPIC255   │     │   TPIC255 TPIC255 │  │P │
+│┌───┐         │││  │││ │  │  ┌─┐         │ DUART│                          B1│     │                   │  │1 │
+││/-││         └─┘  └─┘ └──┘  └─┘         └──────┘              HCT245        └─────┘       P14         │  │2 │
+│││ ││         EXP0 EXP1 P3             U31                     HCT245 HCT245       ┌─────────────────┐ │  │  │
+│││ ││  SN75188N SN75188N           ┌──────────────┐                         P16  __│_________________│ │  │  │
+│││ ││    SN75188N SN75188N     P19 │______________│  P18              P17   P15 |... ....|     P13     └──┘  │
+││\_││P22 ┌───────┐┌──────────┐ ______ ┌────────────────────┐   ┌──────────────┐  ________ ┌──────────────┐   │
+│└───┘    │__P21__││___P20____│|... ..|│o o o o o o o  o o o│   │______________│ |... ....|│______________│   │
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 
 COLDFIRE: MCF5602e CPU @ 40MHz
@@ -67,10 +67,10 @@ U28: ??
 U41: RS485 Transceiver
 U55: Heber custom ASIC. Probably a CPLD of sorts
 U56: SCC68692 DUART
-B1: Varta NiCd 3v SRAM battery, which is likely leaking if not already replaced. 
+B1: Varta NiCd 3v SRAM battery, which is likely leaking if not already replaced.
 
-EXP 0+1: Fujitsu Cremson MB86290A/Expansion ports. 
-	* Some Pluto 6 motherboards are only able to use one GPU as EXP1 has no matching VGA connector.
+EXP 0+1: Fujitsu Cremson MB86290A/Expansion ports.
+    * Some Pluto 6 motherboards are only able to use one GPU as EXP1 has no matching VGA connector.
 P3: DIN41612 port which can be used for ROM or RAM. Some JPM games use the ROM board for game code.
 P4: ColdFire BDM Debug port - Only populated on development boards.
 P5: 40-Pin IDE/ATAPI interface for HDD/CD-ROM drives.
@@ -79,8 +79,8 @@ P7: Percentage/Stake input port for respective dongles.
 P8: PWDWN/Security port. The manual lists these as being for security monitors, go to the PIC18.
 P9: Lamp sinks - Part of the matrixed 256 lamp system.
 P10: LEDs - Unsurprisingly, controls LEDs. Can support 256 LEDs OR 32 7-Segment displays.
-P11: Lamp sourcees - Part of the matrixed 256 lamp system. 
-	Manual says this is 48v, but seems to be either 12v or 48v depending on needs.
+P11: Lamp sourcees - Part of the matrixed 256 lamp system.
+    Manual says this is 48v, but seems to be either 12v or 48v depending on needs.
 P12: Reels - Connects to 24 of the open-drain outputs, some of the lamp signals and 6 inputs.
 P13 + P14: Expose the remaining TTL inputs and open-drain outputs.
 P15: Aux Outputs - 6 TTL outputs. Connects to the VFDs on the development board.
@@ -116,39 +116,39 @@ the CompactFlash, or from the add-on ROM board.
 TODO: Expand as more is learnt.
 
 The security is handled by at least three parts, the FPGA, the CPLD and the PIC18.
-he PIC18 loads the FPGA with a bitstream that is customised by Heber for each manufacturer. 
+he PIC18 loads the FPGA with a bitstream that is customised by Heber for each manufacturer.
 What this entails isn't yet known, but it is known the development board has most/all of this removed.
 This means that the PIC18 is essentially a dongle for each game and needs to be dumped. Whilst it contains the bitstream,
-its also probably stored in an encrypted for and decrypted within the Heber CPLD/ASIC, as the FPGA bitstream lines connect 
+its also probably stored in an encrypted for and decrypted within the Heber CPLD/ASIC, as the FPGA bitstream lines connect
 to this part, not the PIC18.
 
 GPU/Dual GPU: Commented out due to errors and there is not a currently suitable GPU core for the Pluto 6.
 
 * Game Notes *
-pl6_cm: 	Hybrid Pluto 6 + PC setup. They are connected over RS232. Pluto 6 is probably handling IO and security here.
-			Uses a Intel Celeron (2.1Ghz) PC with a Protech PROX3770 motherboard. Game runs on Windows XP.
-pl6_dev: 	Heber's official development kit for the Pluto 6. Only ships with a development BIOS and an SDK.
-			This "game" requires a bootable (FAT32 with Active partition) CHD, else it does nothing visually.
-			The CHD in this driver is an image of the CF card that was supplied by Heber in the SDK for demo purposes.
-			Security and FPGA encryption is disabled on this model.
+pl6_cm:     Hybrid Pluto 6 + PC setup. They are connected over RS232. Pluto 6 is probably handling IO and security here.
+            Uses a Intel Celeron (2.1Ghz) PC with a Protech PROX3770 motherboard. Game runs on Windows XP.
+pl6_dev:    Heber's official development kit for the Pluto 6. Only ships with a development BIOS and an SDK.
+            This "game" requires a bootable (FAT32 with Active partition) CHD, else it does nothing visually.
+            The CHD in this driver is an image of the CF card that was supplied by Heber in the SDK for demo purposes.
+            Security and FPGA encryption is disabled on this model.
 
 EINT3: DUART INT?
 
 */
 
 /*
-	Game compatibility notes:
-		* pl6_demo: Write 0x4e75 at 0x6001063a after CF has loaded to get demo working. Hangs waiting for ColdFire UART to transmit otherwise.
-		* pl6vdemo: Doesn't work at all, needs Cremson emulating.
-		* pl6ddemo: Doesn't work at all, needs Cremson emulating.
-		* pl6_cm:	Windows harddrive is not dumped. PC is connected to the Pluto 6 over RS232.
-		* tijkpots: Game is missing CF card. For whatever reason, the blank image doesn't cause it to fail to load, and so reads invalid data
+    Game compatibility notes:
+        * pl6_demo: Write 0x4e75 at 0x6001063a after CF has loaded to get demo working. Hangs waiting for ColdFire UART to transmit otherwise.
+        * pl6vdemo: Doesn't work at all, needs Cremson emulating.
+        * pl6ddemo: Doesn't work at all, needs Cremson emulating.
+        * pl6_cm:   Windows harddrive is not dumped. PC is connected to the Pluto 6 over RS232.
+        * tijkpots: Game is missing CF card. For whatever reason, the blank image doesn't cause it to fail to load, and so reads invalid data
 */
 /*
-	Todo:
-		* Make the GPU slot device... far better than it currently is.
-		* Configurable amount of VFDs. Currently set at one, but two is not uncommon and shouldn't always be loaded if not needed
-		* Reels
+    Todo:
+        * Make the GPU slot device... far better than it currently is.
+        * Configurable amount of VFDs. Currently set at one, but two is not uncommon and shouldn't always be loaded if not needed
+        * Reels
 */
 
 #include "emu.h"
@@ -173,7 +173,7 @@ EINT3: DUART INT?
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-#define LOGVFDS(...)     	LOGMASKED(LOG_VFD,     __VA_ARGS__)
+#define LOGVFDS(...)        LOGMASKED(LOG_VFD,     __VA_ARGS__)
 
 #include "pl6dev.lh"
 #include "pl6vdev.lh"
@@ -237,7 +237,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	void pluto6(machine_config &config);	// Private to prevent use
+	void pluto6(machine_config &config);    // Private to prevent use
 	void install_duart(machine_config &config);
 	void install_eeprom(machine_config &config);
 	//void install_calypso(machine_config &config, u8 slot);
@@ -263,7 +263,7 @@ private:
 	required_device<pluto6_expansion_slot_device> m_exp1;
 
 	bool duart_installed = false;
-	optional_device<mc68681_device> m_duart;	// Should be a SCC68692 instead
+	optional_device<mc68681_device> m_duart;    // Should be a SCC68692 instead
 	uint8_t m_duart_irq_state = 0;
 
 	bool eeprom_installed = false;
@@ -288,19 +288,19 @@ private:
 void pluto6_state::pluto6_map(address_map &map)
 {
 	// ColdFire (Coldfire chip selects in brackets)
-	map(0x00000000, 0x0007ffff).rom();   					// Boot ROM (CS0)
-	map(0x10000000, 0x1003ffff).ram().share("nvram");		// Battery Backed SRAM (CS1 below 0x12xxxxxx)
+	map(0x00000000, 0x0007ffff).rom();                      // Boot ROM (CS0)
+	map(0x10000000, 0x1003ffff).ram().share("nvram");       // Battery Backed SRAM (CS1 below 0x12xxxxxx)
 	map(0x12000000, 0x1200000f).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w)); // IDE (CS1)
 	map(0x12000010, 0x1200001f).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w)); // IDE (CS1)
-	
+
 	// FPGA
-	map(0x20000000, 0x20003fff).rw(m_fpga, FUNC(pl6fpga_device::dev_r), FUNC(pl6fpga_device::dev_w)); 	// Entire IO system (CS2)
+	map(0x20000000, 0x20003fff).rw(m_fpga, FUNC(pl6fpga_device::dev_r), FUNC(pl6fpga_device::dev_w));   // Entire IO system (CS2)
 
 	// GPU/EXP0/EXP1 Stub - Most bootloaders check this region to see if GPU is installed. (CS3)
 	map(0x30000000, 0x31ffffff).noprw();
 	map(0x34000000, 0x35ffffff).noprw();
-	
-	map(0x50000000, 0x50001fff).ram(); // ColdFire Internal 8Kb SRAM 
+
+	map(0x50000000, 0x50001fff).ram(); // ColdFire Internal 8Kb SRAM
 	map(0x60000000, 0x601fffff).ram(); // 2MB DRAM
 
 	// ColdFire Peripheral Registers
@@ -315,34 +315,34 @@ void pluto6_state::jpm_rom_map(address_map &map){
 /*
 void pluto6_state::pluto6v_map(address_map &map)
 {
-	pluto6_map(map);
-	map(0x31fcfffc, 0x31fcffff).unmaprw();
-	map(0x30000000, 0x307fffff).rw(m_vram1, FUNC(ram_device::read), FUNC(ram_device::write));
-	map(0x31fc0000, 0x31ffffff).m(m_gpu1, FUNC(mb86292_device::vregs_map));
+    pluto6_map(map);
+    map(0x31fcfffc, 0x31fcffff).unmaprw();
+    map(0x30000000, 0x307fffff).rw(m_vram1, FUNC(ram_device::read), FUNC(ram_device::write));
+    map(0x31fc0000, 0x31ffffff).m(m_gpu1, FUNC(mb86292_device::vregs_map));
 }
 
 void pluto6_state::pluto6dv_map(address_map &map)
 {
-	pluto6_map(map);
-	map(0x31fcfffc, 0x31fcffff).unmaprw();
-	map(0x30000000, 0x307fffff).rw(m_vram1, FUNC(ram_device::read), FUNC(ram_device::write));
-	map(0x31fc0000, 0x31ffffff).m(m_gpu1, FUNC(mb86292_device::vregs_map));
+    pluto6_map(map);
+    map(0x31fcfffc, 0x31fcffff).unmaprw();
+    map(0x30000000, 0x307fffff).rw(m_vram1, FUNC(ram_device::read), FUNC(ram_device::write));
+    map(0x31fc0000, 0x31ffffff).m(m_gpu1, FUNC(mb86292_device::vregs_map));
 
-	map(0x35fcfffc, 0x35fcffff).unmaprw();
-	map(0x34000000, 0x347fffff).rw(m_vram2, FUNC(ram_device::read), FUNC(ram_device::write));
-	map(0x35fc0000, 0x35ffffff).m(m_gpu2, FUNC(mb86292_device::vregs_map));
+    map(0x35fcfffc, 0x35fcffff).unmaprw();
+    map(0x34000000, 0x347fffff).rw(m_vram2, FUNC(ram_device::read), FUNC(ram_device::write));
+    map(0x35fc0000, 0x35ffffff).m(m_gpu2, FUNC(mb86292_device::vregs_map));
 }
 
 u32 pluto6_state::screen1_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_gpu1->screen_update(screen, bitmap, cliprect);
-	return 0;
+    m_gpu1->screen_update(screen, bitmap, cliprect);
+    return 0;
 }
 
 u32 pluto6_state::screen2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_gpu2->screen_update(screen, bitmap, cliprect);
-	return 0;
+    m_gpu2->screen_update(screen, bitmap, cliprect);
+    return 0;
 }
 */
 
@@ -401,7 +401,7 @@ void pluto6_state::machine_start()
 }
 
 void pluto6_state::machine_reset(){
-	
+
 }
 
 void pluto6_state::duart_irq_handler(int state)
@@ -413,12 +413,12 @@ void pluto6_state::duart_irq_handler(int state)
 /*
 void pluto6_state::gpu1_irq_handler(int state)
 {
-	//update_interrupts();
+    //update_interrupts();
 }
 
 void pluto6_state::gpu2_irq_handler(int state)
 {
-	//update_interrupts();
+    //update_interrupts();
 }
 */
 
@@ -465,7 +465,7 @@ void pluto6_state::auxout_callback(offs_t offset, uint8_t data){
 void pluto6_state::pluto_sda(uint8_t state){
 	m_maincpu->sda_write(state);
 	m_pic->sda_write(state);
-	if(eeprom_installed) m_i2cmem->write_sda(state);	// i2cmem seems to not have a write_line call back?
+	if(eeprom_installed) m_i2cmem->write_sda(state);    // i2cmem seems to not have a write_line call back?
 }
 
 void pluto6_state::pluto_scl(uint8_t state){
@@ -474,7 +474,7 @@ void pluto6_state::pluto_scl(uint8_t state){
 }
 
 void pluto6_state::install_duart(machine_config &config){
-	MC68681(config, m_duart, XTAL(3'686'400));	// Actually 3.69MHz on the dev board
+	MC68681(config, m_duart, XTAL(3'686'400));  // Actually 3.69MHz on the dev board
 	m_duart->irq_cb().set(FUNC(pluto6_state::duart_irq_handler));
 	m_duart->a_tx_cb().set(FUNC(pluto6_state::duart_tx_a_w));
 	m_duart->b_tx_cb().set(FUNC(pluto6_state::duart_tx_b_w));
@@ -492,9 +492,9 @@ void pluto6_state::install_eeprom(machine_config &config){
 
 /*
 void pluto6_state::install_calypso(machine_config &config, u8 slot){
-	if(slot > 1) return;
-	if(slot == 0) m_exp0->option_set("gpu", HEBER_CALYPSO_GPU);
-	else m_exp1->option_set("gpu", HEBER_CALYPSO_GPU);
+    if(slot > 1) return;
+    if(slot == 0) m_exp0->option_set("gpu", HEBER_CALYPSO_GPU);
+    else m_exp1->option_set("gpu", HEBER_CALYPSO_GPU);
 }*/
 
 // Machine defs
@@ -537,7 +537,7 @@ void pluto6_state::pluto6_dev(machine_config &config){
 
 	m_exp0->option_add("gpu", HEBER_CALYPSO_GPU); // Is optional
 	m_exp0->set_default_option(nullptr);
-	
+
 	install_duart(config);
 	install_eeprom(config);
 
@@ -592,11 +592,12 @@ ROM_END
 
 ROM_START( pl6_cm )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "60a8_b1.u1", 0x00000, 0x40000, CRC(1E9bbb77) SHA1(a93b89856f41cfe477a2791ca22c25e8249ab496) )
-	ROM_RELOAD(0x40000, 0x40000)
+	ROM_LOAD( "60a8_b1.u1", 0x00000, 0x40000, CRC(1e9bbb77) SHA1(a93b89856f41cfe477a2791ca22c25e8249ab496) )
+	ROM_IGNORE(                      0xc0000 )
+	ROM_RELOAD(             0x40000, 0x40000 )
 
-	ROM_REGION( 0x80000, "program1", ROMREGION_ERASE00 )
-	ROM_LOAD( "acc6_b2.u2", 0x00000, 0x40000, CRC(97494822) SHA1(01b7f2eb9af34e0a2d626ec303979c6b53cb83b9) )
+	ROM_REGION( 0x100000, "program1", ROMREGION_ERASE00 )
+	ROM_LOAD( "acc6_b2.u2", 0x000000, 0x100000, CRC(97494822) SHA1(01b7f2eb9af34e0a2d626ec303979c6b53cb83b9) )
 ROM_END
 
 ROM_START( pl6_atw )
@@ -617,19 +618,19 @@ ROM_END
 
 /*
 ROM_START( pl6vdemo )
-	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "17443iss.u1", 0x00000, 0x80000, CRC(40b4211a) SHA1(4cce50fc67a15b2b1f5d12a9f11fc12c51908773))
+    ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+    ROM_LOAD( "17443iss.u1", 0x00000, 0x80000, CRC(40b4211a) SHA1(4cce50fc67a15b2b1f5d12a9f11fc12c51908773))
 
-	DISK_REGION( "ata:0:hdd" )
-	DISK_IMAGE( "21-17460", 0, SHA1(a3604dea855312f5019a4be9e1e25770203c8039) )
+    DISK_REGION( "ata:0:hdd" )
+    DISK_IMAGE( "21-17460", 0, SHA1(a3604dea855312f5019a4be9e1e25770203c8039) )
 ROM_END
 
 ROM_START( pl6ddemo )
-	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "17443iss.u1", 0x00000, 0x80000, CRC(40b4211a) SHA1(4cce50fc67a15b2b1f5d12a9f11fc12c51908773))
+    ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+    ROM_LOAD( "17443iss.u1", 0x00000, 0x80000, CRC(40b4211a) SHA1(4cce50fc67a15b2b1f5d12a9f11fc12c51908773))
 
-	DISK_REGION( "ata:0:hdd" )
-	DISK_IMAGE( "21-17460", 0, SHA1(a3604dea855312f5019a4be9e1e25770203c8039) )
+    DISK_REGION( "ata:0:hdd" )
+    DISK_IMAGE( "21-17460", 0, SHA1(a3604dea855312f5019a4be9e1e25770203c8039) )
 ROM_END
 */
 
@@ -640,7 +641,7 @@ ROM_START( tijkpots )
 	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "pl6_tisl", 0, NO_DUMP )
 ROM_END
- 
+
 } // anonymous namespace
 
 GAME( 2014, pl6_kfp, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "G Squared", "Kung Fu Pounda", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
