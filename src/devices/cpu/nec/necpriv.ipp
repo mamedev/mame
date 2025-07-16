@@ -102,16 +102,15 @@ enum BREGS {
     CLKM - cycle count for reg/mem instructions
     CLKR - cycle count for reg/mem instructions with different counts for odd/even addresses
 
-
     Prefetch & buswait time is not emulated.
     Extra cycles for PUSH'ing or POP'ing registers to odd addresses is not emulated.
 */
 
-#define CLK(all) m_icount-=all
-#define CLKS(v20,v30,v33) { const uint32_t ccount=(v20<<16)|(v30<<8)|v33; m_icount-=(ccount>>m_chip_type)&0x7f; }
-#define CLKW(v20o,v30o,v33o,v20e,v30e,v33e,addr) { const uint32_t ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; m_icount-=(addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f); }
-#define CLKM(v20,v30,v33,v20m,v30m,v33m) { const uint32_t ccount=(v20<<16)|(v30<<8)|v33, mcount=(v20m<<16)|(v30m<<8)|v33m; m_icount-=( ModRM >=0xc0 )?((ccount>>m_chip_type)&0x7f):((mcount>>m_chip_type)&0x7f); }
-#define CLKR(v20o,v30o,v33o,v20e,v30e,v33e,vall,addr) { const uint32_t ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; if (ModRM >=0xc0) m_icount-=vall; else m_icount-=(addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f); }
+#define CLK(all) do { int cc = all; m_cur_cycles+=cc; m_icount-=cc; } while(0)
+#define CLKS(v20,v30,v33) do { const uint32_t ccount=(v20<<16)|(v30<<8)|v33; CLK((ccount>>m_chip_type)&0x7f); } while(0)
+#define CLKW(v20o,v30o,v33o,v20e,v30e,v33e,addr) do { const uint32_t ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; CLK((addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f)); } while(0)
+#define CLKM(v20,v30,v33,v20m,v30m,v33m) do { const uint32_t ccount=(v20<<16)|(v30<<8)|v33, mcount=(v20m<<16)|(v30m<<8)|v33m; CLK(( ModRM >=0xc0 )?((ccount>>m_chip_type)&0x7f):((mcount>>m_chip_type)&0x7f)); } while(0)
+#define CLKR(v20o,v30o,v33o,v20e,v30e,v33e,vall,addr) do { const uint32_t ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; if (ModRM >=0xc0) CLK(vall); else CLK((addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f)); } while(0)
 
 /************************************************************************/
 #define CompressFlags() (WORD)(int(CF) | 0x02 | (int(PF) << 2) | (int(AF) << 4) | (int(ZF) << 6) \

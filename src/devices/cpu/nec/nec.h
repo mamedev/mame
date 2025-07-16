@@ -100,7 +100,7 @@ private:
 	uint32_t  m_poll_state;
 	uint8_t   m_no_interrupt;
 	uint8_t   m_halted;
-	uint32_t  m_rep_opcode;
+	uint32_t  m_rep_params;
 
 	address_space *m_program;
 	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache m_cache8;
@@ -110,9 +110,10 @@ private:
 	address_space *m_io;
 	int     m_icount;
 
+	int32_t   m_cur_cycles;
 	uint8_t   m_prefetch_size;
-	uint8_t   m_prefetch_cycles;
-	int8_t    m_prefetch_count;
+	int32_t   m_prefetch_cycles;
+	int32_t   m_prefetch_count;
 	uint8_t   m_prefetch_reset;
 	const uint32_t m_chip_type;
 
@@ -141,7 +142,7 @@ protected:
 
 private:
 	inline void prefetch();
-	void do_prefetch(int previous_ICount);
+	void do_prefetch();
 	inline uint8_t fetch();
 	inline uint16_t fetchword();
 	uint8_t fetchop();

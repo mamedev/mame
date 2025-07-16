@@ -109,21 +109,19 @@ void v25_common_device::prefetch()
 	m_prefetch_count--;
 }
 
-void v25_common_device::do_prefetch(int previous_ICount)
+void v25_common_device::do_prefetch()
 {
-	int diff = previous_ICount - (int) m_icount;
-
 	/* The implementation is not accurate, but comes close.
 	 * It does not respect that the V30 will fetch two bytes
 	 * at once directly, but instead uses only 2 cycles instead
 	 * of 4. There are however only very few sources publicly
 	 * available and they are vague.
 	 */
-	while (m_prefetch_count<0)
+	while (m_prefetch_count < 0)
 	{
 		m_prefetch_count++;
-		if (diff>m_prefetch_cycles)
-			diff -= m_prefetch_cycles;
+		if (m_cur_cycles > m_prefetch_cycles)
+			m_cur_cycles -= m_prefetch_cycles;
 		else
 			m_icount -= m_prefetch_cycles;
 	}
@@ -135,9 +133,9 @@ void v25_common_device::do_prefetch(int previous_ICount)
 		return;
 	}
 
-	while (diff>=m_prefetch_cycles && m_prefetch_count < m_prefetch_size)
+	while (m_cur_cycles >= m_prefetch_cycles && m_prefetch_count < m_prefetch_size)
 	{
-		diff -= m_prefetch_cycles;
+		m_cur_cycles -= m_prefetch_cycles;
 		m_prefetch_count++;
 	}
 }
@@ -155,6 +153,7 @@ uint16_t v25_common_device::fetchword()
 	return r;
 }
 
+// TODO: make V25 a subclass instead
 #define nec_common_device v25_common_device
 
 #include "v25instr.h"
@@ -216,7 +215,7 @@ void v25_common_device::device_reset()
 	m_mode_state = m_MF = (m_v25v35_decryptiontable) ? 0 : 1;
 	m_intm = 0;
 	m_halted = 0;
-	m_rep_opcode = 0;
+	m_rep_params = 0;
 
 	m_TMC0 = m_TMC1 = 0;
 
@@ -261,7 +260,7 @@ void v25_common_device::nec_interrupt(unsigned int_num, int /*INTSOURCES*/ sourc
 {
 	uint32_t dest_seg, dest_off;
 
-	m_rep_opcode = 0;
+	m_rep_params = 0;
 	i_pushf();
 	m_TF = m_IF = 0;
 	m_MF = m_mode_state;
@@ -515,7 +514,7 @@ void v25_common_device::dma_process()
 			uint8_t data = v25_read_byte(saddr);
 			v25_write_byte(daddr, data);
 		}
-		m_icount -= (w && m_program->addr_width() == 8) ? 8 : 4;
+		CLK((w && m_program->addr_width() == 8) ? 8 : 4);
 		break;
 
 	case 1:
@@ -534,10 +533,10 @@ void v25_common_device::dma_process()
 				logerror("Warning: V25 16-bit I/O to memory transfer\n");
 				data = m_dma_read[m_dma_channel](daddr + 1);
 				v25_write_byte(daddr + 1, data);
-				m_icount -= 2;
+				CLK(2);
 			}
 		}
-		m_icount -= 2;
+		CLK(2);
 		break;
 
 	case 2:
@@ -556,15 +555,15 @@ void v25_common_device::dma_process()
 				logerror("Warning: V25 16-bit memory to I/O transfer\n");
 				data = v25_read_byte(saddr + 1);
 				m_dma_write[m_dma_channel](saddr + 1, data);
-				m_icount -= 2;
+				CLK(2);
 			}
 		}
-		m_icount -= 2;
+		CLK(2);
 		break;
 
 	default:
 		logerror("Reserved DMA transfer mode\n");
-		m_icount--;
+		CLK(1);
 		break;
 	}
 
@@ -674,6 +673,7 @@ void v25_common_device::device_start()
 	}
 
 	m_no_interrupt = 0;
+	m_cur_cycles = 0;
 	m_prefetch_count = 0;
 	m_prefetch_reset = 0;
 	m_prefix_base = 0;
@@ -736,7 +736,7 @@ void v25_common_device::device_start()
 	save_item(NAME(m_no_interrupt));
 	save_item(NAME(m_intm));
 	save_item(NAME(m_halted));
-	save_item(NAME(m_rep_opcode));
+	save_item(NAME(m_rep_params));
 	save_item(NAME(m_TM0));
 	save_item(NAME(m_MD0));
 	save_item(NAME(m_TM1));
@@ -931,13 +931,13 @@ void v25_common_device::execute_run()
 			m_no_interrupt--;
 
 		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
-		int prev_ICount = m_icount;
+		m_cur_cycles = 0;
 
-		if (m_rep_opcode)
+		if (m_rep_params)
 			cont_rep();
 		else
 			(this->*s_nec_instruction[fetchop()])();
-		do_prefetch(prev_ICount);
+		do_prefetch();
 
 		if ((m_dmam[0] & 0x0c) == 0x0c || (m_dmam[1] & 0x0c) == 0x0c)
 		{

@@ -119,7 +119,7 @@ private:
 	uint8_t   m_intm;
 	uint8_t   m_no_interrupt;
 	uint8_t   m_halted;
-	uint32_t  m_rep_opcode;
+	uint32_t  m_rep_params;
 
 	// timer related
 	uint16_t  m_TM0, m_MD0, m_TM1, m_MD1;
@@ -163,9 +163,10 @@ private:
 	devcb_read16::array<2> m_dma_read;
 	devcb_write16::array<2> m_dma_write;
 
+	int32_t   m_cur_cycles;
 	uint8_t   m_prefetch_size;
-	uint8_t   m_prefetch_cycles;
-	int8_t    m_prefetch_count;
+	int32_t   m_prefetch_cycles;
+	int32_t   m_prefetch_count;
 	uint8_t   m_prefetch_reset;
 	uint32_t  m_chip_type;
 
@@ -186,7 +187,7 @@ private:
 	static const nec_eahandler s_GetEA[192];
 
 	inline void prefetch();
-	void do_prefetch(int previous_ICount);
+	void do_prefetch();
 	inline uint8_t fetch();
 	inline uint16_t fetchword();
 	inline uint8_t fetchop();

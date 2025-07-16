@@ -77,7 +77,7 @@
 	{                                       \
 		static const uint8_t table[3]={3,10,10};  \
 		m_ip = (WORD)(m_ip+tmp);          \
-		m_icount-=table[m_chip_type/8];   \
+		CLK(table[m_chip_type/8]);   \
 		CHANGE_PC;                          \
 		return;                             \
 	}
@@ -153,12 +153,12 @@
 #define ROLC_WORD dst = (dst << 1) + CF; SetCFW(dst)
 #define RORC_BYTE dst = (CF<<8)+dst; m_CarryVal = dst & 0x01; dst >>= 1
 #define RORC_WORD dst = (CF<<16)+dst; m_CarryVal = dst & 0x01; dst >>= 1
-#define SHL_BYTE(c) m_icount-=c; dst <<= c;    SetCFB(dst); SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
-#define SHL_WORD(c) m_icount-=c; dst <<= c;    SetCFW(dst); SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
-#define SHR_BYTE(c) m_icount-=c; dst >>= c-1; m_CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
-#define SHR_WORD(c) m_icount-=c; dst >>= c-1; m_CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
-#define SHRA_BYTE(c) m_icount-=c; dst = ((int8_t)dst) >> (c-1);  m_CarryVal = dst & 0x1;    dst = ((int8_t)((BYTE)dst)) >> 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
-#define SHRA_WORD(c) m_icount-=c; dst = ((int16_t)dst) >> (c-1); m_CarryVal = dst & 0x1;    dst = ((int16_t)((WORD)dst)) >> 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
+#define SHL_BYTE(c) CLK(c); dst <<= c;    SetCFB(dst); SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
+#define SHL_WORD(c) CLK(c); dst <<= c;    SetCFW(dst); SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
+#define SHR_BYTE(c) CLK(c); dst >>= c-1; m_CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
+#define SHR_WORD(c) CLK(c); dst >>= c-1; m_CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
+#define SHRA_BYTE(c) CLK(c); dst = ((int8_t)dst) >> (c-1);  m_CarryVal = dst & 0x1;    dst = ((int8_t)((BYTE)dst)) >> 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
+#define SHRA_WORD(c) CLK(c); dst = ((int16_t)dst) >> (c-1); m_CarryVal = dst & 0x1;    dst = ((int16_t)((WORD)dst)) >> 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
 
 #define DIVUB                                               \
 	uresult = Wreg(AW);                                 \
@@ -209,7 +209,7 @@
 	if (m_seg_prefix) logerror("%06x: Warning: seg_prefix defined for add4s\n",PC()); \
 	m_ZeroVal = m_CarryVal = 0;                               \
 	for (i=0;i<count;i++) {                                 \
-		m_icount-=table[m_chip_type/8];                   \
+		CLK(table[m_chip_type/8]);                   \
 		tmp = GetMemB(DS0, si);                             \
 		tmp2 = GetMemB(DS1, di);                            \
 		v1 = (tmp>>4)*10 + (tmp&0xf);                       \
@@ -234,7 +234,7 @@
 	if (m_seg_prefix) logerror("%06x: Warning: seg_prefix defined for sub4s\n",PC()); \
 	m_ZeroVal = m_CarryVal = 0;                               \
 	for (i=0;i<count;i++) {                                 \
-		m_icount-=table[m_chip_type/8];                   \
+		CLK(table[m_chip_type/8]);                   \
 		tmp = GetMemB(DS1, di);                             \
 		tmp2 = GetMemB(DS0, si);                            \
 		v1 = (tmp>>4)*10 + (tmp&0xf);                       \
@@ -264,7 +264,7 @@
 	if (m_seg_prefix) logerror("%06x: Warning: seg_prefix defined for cmp4s\n",PC()); \
 	m_ZeroVal = m_CarryVal = 0;                               \
 	for (i=0;i<count;i++) {                                 \
-		m_icount-=table[m_chip_type/8];                   \
+		CLK(table[m_chip_type/8]);                   \
 		tmp = GetMemB(DS1, di);                             \
 		tmp2 = GetMemB(DS0, si);                            \
 		v1 = (tmp>>4)*10 + (tmp&0xf);                       \
