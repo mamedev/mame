@@ -357,10 +357,10 @@ independent effect chain is applied for each emulated sound output device.
 The effect chain itself is not configurable.  It always consists of these four
 effects, in this order:
 
-* Filter
+* Filters
 * Compressor
 * Reverb
-* Parametric equaliser
+* Equalizer
 
 When editing parameters for an output device’s effect chain, inherited default
 parameter values are showing dimmed, while parameter values set for that chain
@@ -377,9 +377,15 @@ The Audio Effects menu also allows you to configure the algorithm used for audio
 sample rate conversion.  The default **LoFi** algorithm has modest CPU
 requirements.  The **HQ** algorithm provides higher quality sample rate
 conversion at the expense of requiring substantially higher CPU performance.
-The **HQ** algorithm has additional parameters.  Increasing the latency can
-improve quality.  Increasing the filter length or phases can improve quality at
-the expense of higher CPU performance requirements.
+
+The **HQ** algorithm has additional parameters.  Increasing the **HQ latency**
+can improve quality.  If it's increased too much and multiple sound chips are
+used, the latencies will stack up and you will end up with too much lag at the
+end.  When decreasing the latency below 1 ms, the resampler will lose its
+potential (in fact, it will sound similar to MAME's lower quality resampler from
+before version 0.278).  Increasing the **HQ filter max size** or **HQ filter max
+phases** can improve quality at the expense of higher CPU performance
+requirements.
 
 
 Filter effect
@@ -397,7 +403,7 @@ may be surprising or undesirable.
 
 
 Compressor effect
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 This effect provides dynamic range compression (it is based on a
 reimplementation of Alain Paul’s Versatile Compressor).  Dynamic range
@@ -440,10 +446,10 @@ Ceiling
 Reverb effect
 ~~~~~~~~~~~~~
 
-Not implemented yet.
+Not documented yet.
 
 
-Equaliser effect
+Equalizer effect
 ~~~~~~~~~~~~~~~~
 
 A five-band parametric equalizer, allowing to amplify or attenuate specific
