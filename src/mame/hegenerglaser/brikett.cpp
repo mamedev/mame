@@ -658,7 +658,13 @@ ROM_START( mephisto3b ) // module s/n 00737xx
 	ROM_LOAD("207", 0x4000, 0x4000, CRC(9b45c350) SHA1(96a11f740c657a915a9ce3fa417a59f4e064a10b) ) // "
 ROM_END
 
-ROM_START( mephisto3c ) // module s/n 00711xx
+ROM_START( mephisto3c ) // module s/n 04001xx
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("103", 0x0000, 0x4000, CRC(c9fc143a) SHA1(5f3268d9c8c0c0b8fac3e687c30a4871663fbd4f) ) // DQ5143-250 27128-25
+	ROM_LOAD("203", 0x4000, 0x4000, CRC(d565d4b2) SHA1(561584e5ef1db9e9aee67d3c1c1267d210fb7859) ) // "
+ROM_END
+
+ROM_START( mephisto3d ) // module s/n 00711xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101", 0x0000, 0x4000, CRC(923de04f) SHA1(ca7cb3e29aeb3432a815c9d58bb0ed45e7302581) ) // HN4827128G-45 or D27128-4
 	ROM_LOAD("201", 0x4000, 0x4000, CRC(0c3cb8fa) SHA1(31449422142c19fc71474a057fc5d6af8a86be7d) ) // "
@@ -689,3 +695,4 @@ SYST( 1983, mephisto3,   0,          0,      mephisto3,   mephisto3,   brikett_s
 SYST( 1983, mephisto3a,  mephisto3,  0,      mephisto3,   mephisto3,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 2)", MACHINE_SUPPORTS_SAVE )
 SYST( 1983, mephisto3b,  mephisto3,  0,      mephisto3,   mephisto3,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 3)", MACHINE_SUPPORTS_SAVE )
 SYST( 1983, mephisto3c,  mephisto3,  0,      mephisto3,   mephisto3,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 4)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mephisto3d,  mephisto3,  0,      mephisto3,   mephisto3,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 5)", MACHINE_SUPPORTS_SAVE )
