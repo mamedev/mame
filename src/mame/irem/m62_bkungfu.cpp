@@ -240,6 +240,7 @@ void m62_bkungfu_state::machine_start()
 	m62_state::machine_start();
 
 	save_item(NAME(m_blittercmdram));
+	save_item(NAME(m_mcu_running));
 }
 
 void m62_bkungfu_state::machine_reset()
@@ -309,10 +310,14 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 		}
 		else if (data == 0x05)
 		{
-			// used at the start of stages 4,5,6,7,8 to draw animated stage elements
+			// used at the start of stages 4,5,6,7,8 when drawing animated stage elements
+			//
 			// these are simple animations such as a door or trapdoor closing
-			// it's called after command 0xf in those cases
-			logerror("%s: Command %02x: blitter: draw animated level element\n", machine().describe_context(), data);
+			// it's called after command 0xf in those cases, so see details in that command
+			//
+			// no additional params are sent after calling 0xf and before calling this?
+			// which could suggest command 0xf is used to draw instead, but then why this call after it?
+			logerror("%s: Command %02x: blitter: after level animation command on level 3+\n", machine().describe_context(), data);
 		}
 		else if (data == 0x0f)
 		{
@@ -320,8 +325,19 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// and before animated level elements at the start of later stages
 
 			// writes to param offsets 1/2 (same value for each) before this command
-			// uses values of 85, 84, 83, 86, 90 on the title screen
-			logerror("%s: Command %02x: blitter: draw title animation flames %02x %02x\n", machine().describe_context(), data, m_blittercmdram[0x001], m_blittercmdram[0x002]);
+			// uses values of 85, 84, 83, 86 (and 90 when the final title appears) on the title screen
+			//
+			// values 8b, 8c, 8d, 8e, 8f are used for the door on the 4th level (5 frames of animation)
+			// values 80, 81 are used for the trapdoor on the 5th level (2 frames of animation)
+			// values 87, 88 are used for the trapdoor on the 6th level (2 frames of animation)
+			// values 80, 81 are used for the trapdoor on the 7th level (2 frames of animation) (same as 5th level)
+			// values 89, 8a are used for the trapdoor on the 8th level (2 frames of animation)
+			//
+			// so object values are between 0x80 and 0x90, but 0x82 seems unused
+			// there doesn't appear to be any unencrypted data for these in the data ROM, so the object
+			// definitions are either coming from internal MCU ROM or the encrypted area
+
+			logerror("%s: Command %02x: blitter: draw title animation element (flames / level animations) %02x %02x\n", machine().describe_context(), data, m_blittercmdram[0x001], m_blittercmdram[0x002]);
 		}
 		else if (data == 0xfe)
 		{
@@ -353,11 +369,6 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 
 			switch (select)
 			{
-			default:
-			{
-				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (unknown select %02x | %02x %02x %02x)\n", machine().describe_context(), offset, data, select, m_blittercmdram[offset + 1], m_blittercmdram[offset + 2], m_blittercmdram[offset + 3]);
-				break;
-			}
 			case 0x10:
 			{
 				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (player 1 score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
