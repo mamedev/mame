@@ -442,7 +442,7 @@ Ceiling
     The maximum level allowed just before the output amplification.  Causes
     soft clipping at that level.
 
-By setting **Attack* to 0 ms, **Release** to Infinite, and **Ratio** to
+By setting **Attack** to 0 ms, **Release** to Infinite, and **Ratio** to
 Infinity:1, the compressor will turn into a brickwall limiter (leave the
 advanced settings to default).  If you increase **Input gain** on top of that,
 with a **Threshold** of eg. -3 dB, it will act like a dynamic normalizer.
