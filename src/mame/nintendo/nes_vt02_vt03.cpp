@@ -1058,7 +1058,7 @@ INPUT_PORTS_END
 
 
 // Mahjong controller: ES-MJB08 LB090728
-// Input matrix mostly matches silkscreen labels on solder side. Each button feed into "KP6401" 32-pin rectangular ASIC glob @ U2.
+// Input matrix mostly matches silkscreen labels on solder side. Each button feed into "KP6401" 32-pin rectangular ASIC (or MCU?) glob @ U2.
 // The program reencodes key presses to emulate the Famicom mahjong controller.
 static INPUT_PORTS_START( tvmjfc )
 	PORT_START("IO0")
@@ -1673,5 +1673,5 @@ CONS( 201?, ppgc200g,   0,         0,  nes_vt_pal_8mb, nes_vt, nes_vt_state, emp
 CONS( 201?, dgun2869,  0,         0,  nes_vt_16mb,     nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Retro Micro Controller - 220 Built-In Video Games (DGUN-2869)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, dgun2959,  0,         0,  nes_vt_pal_16mb, nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Plug And Play 220 Game Retro Controller (DGUN-2959)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// This is said to be a hack(?) of a Famicom game (unless it was licensed by the original developer)
+// This is a hack of Ide Yosuke Meijin no Jissen Mahjong for the Famicom (unless it was licensed by the original developer)
 CONS( 200?, tvmjfc,    0,        0,  nes_vt_2mb,    tvmjfc, nes_vt_tvmjfc_state, empty_init, "bootleg?", "TV Mahjong Game (VTxx hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )	
