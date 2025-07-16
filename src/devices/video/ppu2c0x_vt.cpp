@@ -589,7 +589,7 @@ void ppu_vt32_device::m_newvid_1d_w(u8 data) { logerror("%s: m_newvid_1d_w %02x\
 
 void ppu_vt32_device::draw_background(u8 *line_priority)
 {
-	if (get_newvid_1c() == 0x2e)
+	if ((get_newvid_1c() == 0x2e) || (get_newvid_1c() == 0x0a))
 	{
 		// strange custom mode, feels more like a vt369 mode
 		// tiles use 16x16x8 packed data
@@ -617,7 +617,7 @@ void ppu_vt32_device::draw_background(u8 *line_priority)
 		{
 			const int index1 = tile_index + (x * 2);
 			int page2 = readbyte(index1);
-			page2 |= (readbyte(index1 + 1) & 0x03) << 8; // index+1 is colour data? and extra tile bits
+			page2 |= (readbyte(index1 + 1) & 0x0f) << 8; // index+1 is colour data? and extra tile bits
 
 			if (start_x < VISIBLE_SCREEN_WIDTH)
 			{
