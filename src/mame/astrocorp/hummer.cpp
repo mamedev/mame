@@ -37,8 +37,8 @@ public:
 	void jackvent(machine_config &config) ATTR_COLD;
 	void pengprty(machine_config &config) ATTR_COLD;
 
-	void init_jackvent() ATTR_COLD;
-	void init_pengprty() ATTR_COLD;
+	void init_px004() ATTR_COLD { decrypt_rom(v102_px004_table); }
+	void init_px013() ATTR_COLD { decrypt_rom(v102_px013_table); }
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -253,6 +253,12 @@ void hummer_state::decrypt_rom(const decryption_info &table)
 			(BIT(i, table.bits[10]) <<  2);
 		decrypted[dest >> 1] = tmp[i >> 1];
 	}
+
+	// TODO: are these overlays provided by the custom CPU? It does seem so.
+	// both the encrypted and decrypted bytes at these positions make no sense.
+	// gostopac explicitly checks that 0x4-0x7 are 0x0400'0400
+	decrypted[0x00004/2] = 0x0400;
+	decrypted[0x00006/2] = 0x0400;
 }
 
 // TODO: this is the same as v102_px001_table, shouldn't be?
@@ -288,18 +294,6 @@ const hummer_state::decryption_info hummer_state::v102_px004_table = {
 	{ 12, 10, 8, 11, 9, 7, 2, 4, 6, 5, 3 }
 };
 
-void hummer_state::init_jackvent()
-{
-	decrypt_rom(v102_px004_table);
-#if 1
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0400;
-	rom[0x00006/2] = 0x0400;
-#endif
-}
-
 const hummer_state::decryption_info hummer_state::v102_px013_table = {
 	{
 		{
@@ -332,19 +326,8 @@ const hummer_state::decryption_info hummer_state::v102_px013_table = {
 	{ 12, 10, 8, 11, 9, 7, 6, 5, 4, 3, 2 }
 };
 
-void hummer_state::init_pengprty()
-{
-	decrypt_rom(v102_px013_table);
-#if 1
-	// TODO: There's more stuff happening for addresses < 0x400...
-	// override reset vector for now
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
-	rom[0x00004/2] = 0x0400;
-	rom[0x00006/2] = 0x0400;
-#endif
-}
-
 } // anonymous namespace
 
-GAME ( 2012,  pengprty, 0, pengprty, hummer, hummer_state, init_pengprty, ROT0, "Astro Corp.", "Penguin Party (TM.01.01.B, 2012/01/16)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME ( 2010,  jackvent, 0, jackvent, hummer, hummer_state, init_jackvent, ROT0, "Astro Corp.", "Jack's Venture - Inca Treasure (US.02.01.A, 2010/01/21)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME ( 2012,  pengprty, 0, pengprty, hummer, hummer_state, init_px013, ROT0, "Astro Corp.", "Penguin Party (TM.01.01.B, 2012/01/16)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME ( 2010,  jackvent, 0, jackvent, hummer, hummer_state, init_px004, ROT0, "Astro Corp.", "Jack's Venture - Inca Treasure (US.02.01.A, 2010/01/21)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

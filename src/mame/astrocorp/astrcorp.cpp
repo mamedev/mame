@@ -18,37 +18,60 @@ OTHER:  EEPROM, Battery
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Year + Game                PCB ID                    CPU                Video          Chips                                      Notes
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-00  Show Hand              CHE-B50-4002A             MC68HC000FN12      ASTRO V01      pLSI1016-60LJ, ASTRO 0001B MCU? (28 pins)
-00  Wangpai Duijue         CHE-B50-4002A             MC68HC000FN12      ASTRO V01      pLSI1016,      MDT2020AP   MCU  (28 pins)
-01  Magic Bomb (NB4.5)     None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
-02  Skill Drop GA          None                      JX-1689F1028N      ASTRO V02      pLSI1016-60LJ
-02? Keno 21                T-3802A                   ASTRO V102PX-001   ASTRO V05      ASTRO F02 2003-04-14                       Encrypted
-03  Magic Bomb (AB5.3)     CS350P003                 ASTRO V102PX-014   ASTRO V01      ASTRO F02 2003-03-31                       Encrypted
-03  Magic Bomb (AB6.0)     J (CS350P001)             ASTRO V102PX-014   ASTRO V05      ASTRO F02 2003-08-12                       Encrypted
-03  Speed Drop             None                      JX-1689HP          ASTRO V05      pLSI1016-60LJ
-03  Speed Master (V1.0)    M02                       AST-V102PX         scratched      scratched                                  Encrypted
-04  Zoo                    M1.1                      ASTRO V102PX-005   ASTRO V06      ASTRO F02 2005-02-18                       Encrypted
-04  Zulu                   CS350P001                 ASTRO V102PX-005   ASTRO V05      ASTRO F01 2007-06-03                       Encrypted
-04  Magic Bomb (NB6.1)     J (CS350P001 + CS350P033) ASTRO V102PX-014   ASTRO V07      ?,                                         Encrypted, select CGA / VGA via jumper
-04  Go & Stop              K2 (CS350P011)            no markings        ASTRO V05      ASTRO F01 2007-06-03                       Encrypted
-04  Magic Bomb (AA.72C)    M1.1                      ASTRO V102PX-014   ASTRO V05      ASTRO F02 2005-02-18                       Encrypted
-04  Speed Master (V1.0)    M02                       AST-V102PX         scratched      scratched                                  Encrypted
-04  Speed Master (V1.0)    CS350P003                 scratched          scratched      scratched                                  Encrypted
-05  Monkey Land (AA.13B)   M1                        ASTRO V102PX-005   ASTRO V06      ASTRO F02 2004-05-18                       Encrypted
-05  Monkey Land (AA.21A)   M1.1                      ASTRO V102PX-005   ASTRO V06      ASTRO F02 2004-12-04                       Encrypted
-05  Monkey Land (AA.21C)   M1.2                      ASTRO V102PX-005   ASTRO V07      ASTRO F01 2006-12-17                       Encrypted
-05  Dino Dino              T-3802A                   ASTRO V102PX-010   ASTRO V05      ASTRO F02 2003-03-12                       Encrypted
-05  Stone Age              L1                        ASTRO V102PX-012   ASTRO V05(x2)  ASTRO F02 2004-09-04                       Encrypted
-05? Hacher (hack)          M1.2                      ?                  ?              ASTRO F02 2005-02-18                       Encrypted
-05  Wicked Witch           O (CS350P032)             ASTRO V102PX-016   ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
-06  Captain Shark          M1.2 (CS350P016)          ASTRO V102PX-006   ASTRO V06      ASTRO F02 2005-05-29                       Encrypted
-06  Little Witch (EN.01A)  P1                        ASTRO V102PX-016   ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
-06  Win Win Bingo          M1.2                      ASTRO V102PX-006   ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
-07? Western Venture        O (CS350P032)             ASTRO V102PX-007   ASTRO V07      ASTRO F01 2007-06-03                       Encrypted
-07  Happy Farm (US.01.02B) _P_ROHS                   ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 M835KK01             Encrypted, also seen on ASTRO _P CS350P071
-11  Happy Farm (IN.01.02B) P1                        ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 N011483              Encrypted
-13  Monkey Land (EN.20B)   N1                        ASTRO V102PX-005   ASTRO V05      ?                                          Encrypted
-14  Magic Bomb (BR.71A)    P1 (CS350P087)            ASTRO V102PX-014   ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
+Game                               Year  PCB ID                    CPU                Video          Chips                                      Notes
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Captain Shark                      06    M1.2 (CS350P016)          ASTRO V102PX-006   ASTRO V06      ASTRO F02 2005-05-29                       Encrypted
+Dino Dino                          05    T-3802A                   ASTRO V102PX-010   ASTRO V05      ASTRO F02 2003-03-12                       Encrypted
+Go & Stop                          04    K2 (CS350P011)            no markings        ASTRO V05      ASTRO F01 2007-06-03                       Encrypted
+Hacher (hack)                      05?   M1.2                      ?                  ?              ASTRO F02 2005-02-18                       Encrypted
+Happy Farm (IN.01.02B)             11    P1                        ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 N011483              Encrypted
+Happy Farm (US.01.02B)             07    _P_ROHS                   ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 M835KK01             Encrypted, also seen on ASTRO _P CS350P071
+Keno 21                            02?   T-3802A                   ASTRO V102PX-001   ASTRO V05      ASTRO F02 2003-04-14                       Encrypted
+Little Witch (EN.01A)              06    P1                        ASTRO V102PX-016   ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
+Magic Bomb (A3.0)                        None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (A3.1A)                       None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (A3.6A)                       None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (A4.0A)                       None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (A4.0A 4/06/01)         01    None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (A4.1A 5/4/01)          01    None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (A4.2A 7/06/01)         01    None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (A4.2A 8/09/01)         01    None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (AA.72C 25/05/05)       05    M1.1                      ASTRO V102PX-014   ASTRO V05      ASTRO F02 2005-02-18                       Encrypted
+Magic Bomb (AA.72D 14/11/05)       05    M1.2                      ASTRO V102PX-014   ASTRO V06      ASTRO F01 2006-08-18                       Encrypted
+Magic Bomb (AB4.2 11/10/01)        01    None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (AB4.3A 10/30/01S)      01    None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (AB4.3A 11/22/01S)      01    None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (AB4.5A 05/24/02S)      02    None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (AB4.5A 07/10/02S)      02    None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (AB5.0 09/26/02S)       02    T-3978                    ASTRO V102PX-014   ASTRO V01      ASTRO F02 2002-09-04                       Encrypted
+Magic Bomb (AB5.1 01/10/03)        03    T-3978                    ASTRO V102PX-014   ASTRO V01      ASTRO F02 2002-08-19                       Encrypted
+Magic Bomb (AB5.3 20/06/03)        03    CS350P003                 ASTRO V102PX-014   ASTRO V01      ASTRO F02 2003-03-31                       Encrypted, also seen on ASTRO F02 2003-03-10
+Magic Bomb (AB6.0J 11/23/03S)      03    J (CS350P001)             ASTRO V102PX-014   ASTRO V05      ASTRO F02 2003-08-12                       Encrypted
+Magic Bomb (BB6.0 02/24/04)        04    J (CS350P001)             ASTRO V102PX-014   ASTRO V05      ASTRO F02 2005-02-26                       Encrypted
+Magic Bomb (BR4.4 04/19/02S)       02    ?                         ?                  ?              ?                                          Encrypted
+Magic Bomb (BR.71.A 30/05/14)      14    P1 (CS350P087)            ASTRO V102PX-014   ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
+Magic Bomb (EB4.0 5/4/01)          01    None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (L3.5S)                       None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (L4.0S)                       None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (NB4.5)                 01    None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
+Magic Bomb (NB6.1)                 04    J (CS350P001 + CS350P033) ASTRO V102PX-014   ASTRO V07      ?,                                         Encrypted, select CGA / VGA via jumper
+Monkey Land (AA.13B)               05    M1                        ASTRO V102PX-005   ASTRO V06      ASTRO F02 2004-05-18                       Encrypted
+Monkey Land (AA.21A)               05    M1.1                      ASTRO V102PX-005   ASTRO V06      ASTRO F02 2004-12-04                       Encrypted
+Monkey Land (AA.21C)               05    M1.2                      ASTRO V102PX-005   ASTRO V07      ASTRO F01 2006-12-17                       Encrypted
+Monkey Land (EN.20B)               13    N1                        ASTRO V102PX-005   ASTRO V05      ?                                          Encrypted
+Show Hand                          00    CHE-B50-4002A             MC68HC000FN12      ASTRO V01      pLSI1016-60LJ, ASTRO 0001B MCU? (28 pins)
+Skill Drop GA                      02    None                      JX-1689F1028N      ASTRO V02      pLSI1016-60LJ
+Speed Drop                         03    None                      JX-1689HP          ASTRO V05      pLSI1016-60LJ
+Speed Master (V1.0)                03    M02                       AST-V102PX         scratched      scratched                                  Encrypted
+Speed Master (V1.0)                04    CS350P003                 scratched          scratched      scratched                                  Encrypted
+Speed Master (V1.0)                04    M02                       AST-V102PX         scratched      scratched                                  Encrypted
+Stone Age                          05    L1                        ASTRO V102PX-012   ASTRO V05(x2)  ASTRO F02 2004-09-04                       Encrypted
+Wangpai Duijue                     00    CHE-B50-4002A             MC68HC000FN12      ASTRO V01      pLSI1016,      MDT2020AP   MCU  (28 pins)
+Western Venture                    07?   O (CS350P032)             ASTRO V102PX-007   ASTRO V07      ASTRO F01 2007-06-03                       Encrypted
+Wicked Witch                       05    O (CS350P032)             ASTRO V102PX-016   ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
+Win Win Bingo                      06    M1.2                      ASTRO V102PX-006   ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
+Zoo                                04    M1.1                      ASTRO V102PX-005   ASTRO V06      ASTRO F02 2005-02-18                       Encrypted
+Zulu                               04    CS350P001                 ASTRO V102PX-005   ASTRO V05      ASTRO F01 2007-06-03                       Encrypted
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Note: ASTRO F01 is a QuickLogic pASIC 3 FPGA (die-marked as QL3161A/1999).
@@ -84,6 +107,34 @@ TODO:
 - westvent and clones: needs verifying of inputs, outputs and layout.
 - keno21: doesn't manage to read the CPU code. bp 1164,1,{curpc=0x117a;g} for now to go further. Fails shortly thereafter.
 
+magibomb sets Q/A as of 15.07.2025:
+MAGIC BOMB\A3.0 (run protected)
+MAGIC BOMB\A3.1A (run protected)
+MAGIC BOMB\A3.6A (run protected)
+MAGIC BOMB\A4.0A (run protected)
+MAGIC BOMB\A4.0A 4-06-01 (freeze)
+MAGIC BOMB\A4.1A 5-4-01 (freeze)
+MAGIC BOMB\A4.2A 7-06-01 (freeze)
+MAGIC BOMB\A4.2A 8-09-01 (freeze)
+MAGIC BOMB\AA.72C 25-05-05 (RUN OK)
+MAGIC BOMB\AA.72D 11-14-05 (RUN OK)
+MAGIC BOMB\AB4.2 11-10-01 (freeze)
+MAGIC BOMB\AB4.3A (WE SUPPORT USA) (BIN LADEN) (no report)
+MAGIC BOMB\AB4.3A 103001S (freeze)
+MAGIC BOMB\AB4.3A 112201S (freeze)
+MAGIC BOMB\AB4.5 05-24-02S (freeze)
+MAGIC BOMB\AB4.5A 07-10-02S (freeze)
+MAGIC BOMB\AB5.0 09-26-02S (RUN OK)
+MAGIC BOMB\AB5.1 01-10-03 (RUN OK)
+MAGIC BOMB\AB5.3 06-20-03S (RUN OK)
+MAGIC BOMB\AB6.0J 11-26-03S (RUN OK)
+MAGIC BOMB\BB6.0 02-24-04 (RUN OK 34%)
+MAGIC BOMB\BR.71.A 30-05-14 (RUN OK 34%)
+MAGIC BOMB\EB4.0 5-4-01 (freeze)
+MAGIC BOMB\L3.5S (run protected)
+MAGIC BOMB\L4.0S (run protected)
+MAGIC BOMB\NB4.5 06-14-02 (freeze)
+MAGIC BOMB\NB6.1 26-04-04 (RUN OK -CGA-VGA)
 *************************************************************************************************************/
 
 #include "emu.h"
@@ -104,8 +155,8 @@ TODO:
 #include "dinodino.lh"
 #include "magibomb.lh"
 #include "magibomb_ab45a.lh"
-#include "showhandc.lh"
 #include "showhand.lh"
+#include "showhandc.lh"
 #include "skilldrp.lh"
 #include "winbingo.lh"
 #include "zoo.lh"
@@ -317,6 +368,7 @@ public:
 	void magibomb_ab53(machine_config &config) ATTR_COLD;
 	void magibomb_ab60j(machine_config &config) ATTR_COLD;
 	void magibomb_br71a(machine_config &config) ATTR_COLD;
+	void magibomb_lb51(machine_config &config) ATTR_COLD;
 	void magibomb_nb61(machine_config &config) ATTR_COLD;
 	void monkeyl(machine_config &config) ATTR_COLD;
 	void monkeyl_a12(machine_config &config) ATTR_COLD;
@@ -361,6 +413,7 @@ private:
 	void magibomb_aa72d_map(address_map &map) ATTR_COLD;
 	void magibomb_ab53_map(address_map &map) ATTR_COLD;
 	void magibomb_br71a_map(address_map &map) ATTR_COLD;
+	void magibomb_lb51_map(address_map &map) ATTR_COLD;
 	void magibomb_nb61_map(address_map &map) ATTR_COLD;
 	void monkeyl_map(address_map &map) ATTR_COLD;
 	void monkeyl_en20b_map(address_map &map) ATTR_COLD;
@@ -956,6 +1009,24 @@ void zoo_state::magibomb_br71a_map(address_map &map)
 	map(0xd00000, 0xd00001).portr("CPUCODE_IN");
 	map(0xd80000, 0xd80000).w(FUNC(zoo_state::oki_bank_w));
 	map(0xe00001, 0xe00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+//  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
+}
+
+void zoo_state::magibomb_lb51_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
+	map(0x850000, 0x853fff).ram().share("nvram"); // battery
+	map(0x880000, 0x880fff).ram().share("spriteram");
+	map(0x882000, 0x882001).nopr().w(FUNC(zoo_state::draw_sprites_w));
+	map(0x884000, 0x884001).portr("INPUTS");
+	map(0x886000, 0x8861ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x888001, 0x888001).w(FUNC(zoo_state::eeprom_w));
+	map(0x88a000, 0x88a001).w(FUNC(zoo_state::magibomb_outputs_w));
+	map(0x890000, 0x890001).portr("EEPROM_IN");
+	map(0x8a0000, 0x8a0001).portr("CPUCODE_IN");
+	map(0x8b0000, 0x8b0000).w(FUNC(zoo_state::oki_bank_w));
+	map(0x8c0001, 0x8c0001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
 }
 
@@ -1604,6 +1675,13 @@ void zoo_state::magibomb_ab60j(machine_config &config)
 	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(zoo_state::irq_2_4_scanline_cb), "screen", 0, 1);
 }
 
+void zoo_state::magibomb_lb51(machine_config &config)
+{
+	magibomb_ab60j(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::magibomb_lb51_map);
+}
+
 void zoo_state::winbingo(machine_config &config)
 {
 	zoo(config);
@@ -2185,6 +2263,60 @@ ROM_START( magibomb_aa72c )
 	ROM_LOAD( "magibomb_aa72c_cpucode.key", 0x00, 0x02, CRC(ee980d67) SHA1(f3bdb8a14701ec01828f7c92f18e9bba4c56a4e0) )
 ROM_END
 
+ROM_START( magibomb_aa71a )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "1_mb_aa71a.u26", 0x00000, 0x10000, CRC(7c97e254) SHA1(6b94302d5e10dea7de25ee3be9b8d6d216285ac1) )
+	ROM_LOAD16_BYTE( "2_mb_aa71a.u25", 0x00001, 0x10000, CRC(dc8ccccb) SHA1(b5ac727d16bba7815c6ff89320babf90b84e3fe9) )
+	ROM_FILL(                          0x20000, 0x20000, 0xff )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "mx29f1610ml.u26", 0x000000, 0x200000, CRC(c120f256) SHA1(f7468fb73b2f7453c950256880c0b8db24849a4e) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_mb_e1.0", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(878a2671) SHA1(2a5dc7721d3f53124a29403f14bb42ec4e516c61) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "magibomb_aa71a_cpucode.key", 0x00, 0x02, CRC(ee980d67) SHA1(f3bdb8a14701ec01828f7c92f18e9bba4c56a4e0) )
+ROM_END
+
+/*
+PCB M1.2
+
+ASTRO V102PX-014 TO42652846
+ASTRO F01 2006-08-18
+ASTRO V06 0535
+
+MIN BET 1-XXX
+MINIMUM % = 91/50%
+OSAMA BIN LADEN GFX
+*/
+
+ROM_START( magibomb_aa73a )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "1_mb_aa73a.u26", 0x00000, 0x10000, CRC(d6e43bd8) SHA1(34cdecc0f449910f190d54a474f0b94927a31761) )
+	ROM_LOAD16_BYTE( "2_mb_aa73a.u25", 0x00001, 0x10000, CRC(91193520) SHA1(8e01b51ef2e5c057c4add2a6f4629b00b7f18b51) )
+	ROM_FILL(                          0x20000, 0x20000, 0xff )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "mx29f1610ml.u26", 0x000000, 0x200000, CRC(c120f256) SHA1(f7468fb73b2f7453c950256880c0b8db24849a4e) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_mb_e1.0", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(7278d581) SHA1(c0851466b669e42c657ca5517c00c44d76e559f4) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "magibomb_aa73a_cpucode.key", 0x00, 0x02, CRC(ee980d67) SHA1(f3bdb8a14701ec01828f7c92f18e9bba4c56a4e0) )
+ROM_END
+
 ROM_START( magibomb_a30 ) // min bet 8 16 32 64, minimum percentage % 91/50%, no Bin Laden GFX
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1_magic_bomb_a3.0.u21", 0x00000, 0x10000, CRC(c9f3c9da) SHA1(ef23a954e4ec1de7a570561ed00715957aea93e3) )
@@ -2251,6 +2383,21 @@ ROM_START( magibomb_eb40 ) // MIN BET 1-8-16-32 MINIMUM % = 91/50%
 	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(59306190) SHA1(c4e6f3070da90c447786e7bc769b37bdc0fa3b77) ) // factory default
 ROM_END
 
+ROM_START( magibomb_eb43 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_magic_bomb_eb4.3.u21", 0x00000, 0x10000, CRC(7268307a) SHA1(7e3ac383baf8635a047dba758f1ed953bc629f46) )
+	ROM_LOAD16_BYTE( "2_magic_bomb_eb4.3.u20", 0x00001, 0x10000, CRC(98a3f889) SHA1(fc7de0e122cede8acaba6dd3c51503e48db63f10) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "gfx", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_magic_bomb_e1.0", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(87b4fbd1) SHA1(4b42172003f9fca9008127900bd248110864530e) ) // factory default
+ROM_END
+
 ROM_START( magibomb_br71a )
 	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
 
@@ -2297,6 +2444,32 @@ PCB with no model
 
 Astro V03
 LATTICE ispLSI 1016
+Astro V02 0022
+
+min bet 8 16 32 64 80-120-160-240
+% 91/50%
+no Bin Laden GFX
+*/
+ROM_START( magibomb_l37s )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "magic_bomb_l3.7s_rom1_u21.u21", 0x00000, 0x10000, CRC(20f03618) SHA1(bcb7568c21bdc02d29fddf67d24be5d3970bfa1b) )
+	ROM_LOAD16_BYTE( "magic_bomb_l3.7s_rom2_u20.u20", 0x00001, 0x10000, CRC(2b5a3a3d) SHA1(b890a112805f1f31ebee9df9984a3b44fdc3a104) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "gfx.u26", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "magic_bomb_l3.7s_rom5.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(7af6401e) SHA1(5fc33c7c7492f25446615b429f7bc0cebf05419d) ) // factory default
+ROM_END
+
+/*
+PCB with no model
+
+Astro V03
+LATTICE ispLSI 1016
 Astro V02 0016
 
 91%/50%
@@ -2316,6 +2489,27 @@ ROM_START( magibomb_l40s )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(30e71596) SHA1(98923053f33550c36dcc337675d85c27fbd175eb) ) // factory default
+ROM_END
+
+ROM_START( magibomb_lb51 )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "1_m.b._lb5.1.u24", 0x00000, 0x10000, CRC(0f87261c) SHA1(9063a215a33576747857136be735ba29cd1f6361) )
+	ROM_LOAD16_BYTE( "2_m.b._lb5.1.u22", 0x00001, 0x10000, CRC(62eaaa50) SHA1(ddf4388a1b26a276440c2de06cf2bf1dbdfe3b1e) )
+	ROM_FILL(                            0x20000, 0x20000, 0xff )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "gfx", 0x000000, 0x200000, CRC(82c643f6) SHA1(50f35cf5b300c5167c6ce2f199a4d991e7258a2a) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "magic_bomb_l3.7s_rom5", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46", 0x00, 0x80, CRC(cd86f24a) SHA1(84cec3cb09cbb16dde107ac44adb22de6571adc5) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "magibomb_lb51_cpucode.key", 0x00, 0x02, CRC(65a56608) SHA1(aca0096f627db6f8bcedc0b4f8abc0f7dbf49b5e) )
 ROM_END
 
 /*
@@ -2353,6 +2547,33 @@ ROM_START( magibomb_ab43aa )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1_magic_bomb_ab4.3.u21", 0x00000, 0x10000, CRC(c849b614) SHA1(e93f76a47f9c18f4ead20eda23ec0903921582d7) )
 	ROM_LOAD16_BYTE( "2_magic_bomb_ab4.3.u20", 0x00001, 0x10000, CRC(96cff5c0) SHA1(590a38153040e7fae69bd66d2a54c0067118e09e) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "gfx.u26", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_magic_bomb_e1.0.u33", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(53bb180a) SHA1(8a2b7ae3abf31a1972864cf96e1ac74ed69fb1ee) ) // factory default
+ROM_END
+
+/*
+PCB with no model
+
+Astro V03
+LATTICE ispLSI 1016
+V02 0022
+
+MIN BET 1-XXX
+MINIMUM % = 91/50%
+OSAMA BIN LADEN GFX
+*/
+
+ROM_START( magibomb_ab43ab )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_magic_bomb_ab4.3.u21", 0x00000, 0x10000, CRC(d1da4877) SHA1(eefe36360f5c5de405109c915161717c1092e0b0) )
+	ROM_LOAD16_BYTE( "2_magic_bomb_ab4.3.u20", 0x00001, 0x10000, CRC(3fc919a0) SHA1(48912e86f9f4d46a405767c8daff8f67ea3c8e2b) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "gfx.u26", 0x000000, 0x200000, CRC(042f7992) SHA1(2e175994d0b14200a92bdb46e82847b1a1c88265) ) // not dumped for this set but seems correct
@@ -4015,10 +4236,13 @@ GAMEL( 2001?, magibomb_ab31,   magibomb, magibomb_ab45a,  magibomb,       magibo
 GAMEL( 2001,  magibomb_ab42,   magibomb, magibomb_ab45a,  magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB4.2, 11/10/01)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  )
 GAMEL( 2001,  magibomb_ab43a,  magibomb, magibomb_ab45a,  magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB4.3A, 10/30/01S)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  )
 GAMEL( 2001,  magibomb_ab43aa, magibomb, magibomb_ab45a,  magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB4.3A, 11/22/01S)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a )
+GAMEL( 2001,  magibomb_ab43ab, magibomb, magibomb_ab45a,  magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB4.3A, 12/19/01S)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a )
 GAMEL( 2002,  magibomb_ab45a,  magibomb, magibomb_ab45a,  magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB4.5A, 07/10/02S)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a )
 GAMEL( 2002,  magibomb_ab45aa, magibomb, magibomb_ab45a,  magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB4.5A, 05/24/02S)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a )
 GAMEL( 2002,  magibomb_br44,   magibomb, magibomb,        magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. BR4.4, 04/19/02S)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  ) // One bad program ROM
 GAMEL( 2001,  magibomb_eb40,   magibomb, magibomb_nb45,   magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. EB4.0, 05/04/01)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  )
+GAMEL( 2001,  magibomb_eb43,   magibomb, magibomb_nb45,   magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. EB4.3, 08/22/01)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  )
+GAMEL( 2001?, magibomb_l37s,   magibomb, magibomb,        magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. L3.7S)",                      MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  )
 GAMEL( 2001?, magibomb_l40s,   magibomb, magibomb,        magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. L4.0S)",                      MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  )
 GAMEL( 2002,  magibomb_nb45,   magibomb, magibomb_nb45,   magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. NB4.5, 06/14/02S)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  )
 
@@ -4030,14 +4254,17 @@ GAME(  2004,  gostopac,        0,        gostopac,        dinodino,       zoo_st
 GAME ( 2008,  hapfarm,         0,        hapfarm,         magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. US.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/16
 GAME ( 2011,  hapfarm_in0102b, hapfarm,  hapfarm_in0102b, magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. IN.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2011/06/02
 GAME(  200?,  keno21,          0,        keno21,          dinodino,       zoo_state,       init_px001,     ROT0, "Astro Corp.",                  "Keno 21 (Ver. A-2.30)",                        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAMEL( 2004,  magibomb_aa71a,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.71.A, 30/04/04)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 30/04/04 10:55
 GAMEL( 2005,  magibomb_aa72c,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.72.C, 25/05/05)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 25/05/05 11:26
 GAMEL( 2005,  magibomb_aa72d,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.72.D, 14/11/05)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 15/11/05 09:31
+GAMEL( 2006,  magibomb_aa73a,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.73.A, 17/10/06)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 17/10/06 17:13
 GAMEL( 2003,  magibomb_ab50,   magibomb, magibomb_ab53,   dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB5.0, 09/26/02)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 092602S
 GAMEL( 2003,  magibomb_ab51,   magibomb, magibomb_ab53,   dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB5.1, 01/10/03)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 011003S
 GAMEL( 2003,  magibomb_ab53,   magibomb, magibomb_ab53,   dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB5.3, 20/06/03)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 062003S
 GAMEL( 2003,  magibomb_ab60j,  magibomb, magibomb_ab60j,  dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB6.0J, 26/11/03)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 112603S
 GAMEL( 2004,  magibomb_bb60,   magibomb, magibomb_nb61,   dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. BB6.0, 02/24/04)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 022404S
 GAMEL( 2014,  magibomb_br71a,  magibomb, magibomb_br71a,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. BR71.A, 30/05/14)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 30/05/14 10:29
+GAMEL( 2001?, magibomb_lb51,   magibomb, magibomb_lb51,   dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. LB5.1 12/13/02)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  )
 GAMEL( 2004,  magibomb_nb61,   magibomb, magibomb_nb61,   dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. NB6.1, 26/04/04)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 26/04/04
 GAME(  2005,  monkeyl,         0,        monkeyl,         magibomb_aa72d, zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.21.A)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 18/02/2005 15:47
 GAME(  2003,  monkeyl_a11,     monkeyl,  monkeyl_a12,     dinodino,       zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. A1.1)",                      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 102203S

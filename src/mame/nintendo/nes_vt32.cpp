@@ -548,6 +548,12 @@ ROM_START( myaasa )
 	ROM_LOAD( "mx29gl256el.u2", 0x00000, 0x2000000, CRC(1882264c) SHA1(e594b5cea634fadc4aac217b6d651be72a3024c0) )
 ROM_END
 
+ROM_START( mymman )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "megaman_s29gl064n90tfi04_0001227e.bin", 0x00000, 0x800000, CRC(1954cc95) SHA1(be20d42d32d625ec7b3c5db983850763c0ceff73) )
+	ROM_IGNORE(0x100)
+ROM_END
+
 ROM_START( goretrop )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "goretroportable.bin", 0x00000, 0x2000000, CRC(e7279dd3) SHA1(5f096ce22e46f112c2cc6588cb1c527f4f0430b5) )
@@ -733,6 +739,8 @@ CONS( 201?, dgunl3202, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 // many of the games don't work or have scrambled graphics, it writes 0xc0 to vtfp_411e_encryption_state_w in such cases
 CONS( 201?, myaass,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Stadium - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 CONS( 201?, myaasa,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Arena - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
+
+CONS( 201?, mymman,    0,  0,  nes_vt32_8mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Mega Man (DGUNL-7011, Pico Player)", MACHINE_NOT_WORKING )
 
 // lots of accesses to $42xx (could this be a different SoC?)
 CONS( 201?, rfcp168,  0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, init_rfcp168, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
