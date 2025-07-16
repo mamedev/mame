@@ -382,7 +382,7 @@ void audio_effect_compressor::apply(const emu::detail::output_buffer_flat<sample
 
 	for(u32 sample = 0; sample != samples; sample ++) {
 		for(u32 channel = 0; channel != m_channels; channel ++) {
-			double input_db = value_to_db(std::abs(*src.ptrs(channel, sample))) + m_input_gain + std::abs(m_output_samples[channel]) * m_feedback;
+			double input_db = value_to_db(std::abs(*src.ptrs(channel, sample) * db_to_value(m_input_gain))) + std::abs(m_output_samples[channel]) * m_feedback;
 			m_output_samples[channel] = 0;
 
 			if(std::isnan(input_db) || input_db < -200)
