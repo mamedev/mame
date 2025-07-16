@@ -373,10 +373,15 @@ by output device chains.  When editing the **Default** chain, you can restore
 the built-in default value for a parameter by pressing the UI Clear key
 (Del/Delete/Forward Delete on the keyboard by default).
 
+By default, the high-pass filter is enabled, with minimal cutoff frequency for
+DC offset removal.  All other effects are bypassed (technically, the equalizer
+effect is active too, but all bands are set to 0 dB so it's still turned off).
+
 The Audio Effects menu also allows you to configure the algorithm used for audio
 sample rate conversion.  The default **LoFi** algorithm has modest CPU
-requirements.  The **HQ** algorithm provides higher quality sample rate
-conversion at the expense of requiring substantially higher CPU performance.
+requirements.  The recommended **HQ** algorithm provides higher quality sample
+rate conversion at the expense of requiring substantially higher CPU
+performance.
 
 The **HQ** algorithm has additional parameters.  Increasing the **HQ latency**
 can improve quality.  If it's increased too much and multiple sound chips are
