@@ -413,12 +413,14 @@ quiet sounds more audible over background noise.
 
 The parameters are:
 
+Threshold
+    The level at which the amplification fully stops.
+Ratio
+    The maximum amplification.
 Attack
     The reaction time to loud sounds to reduce the amplification.
 Release
     The reaction time to allow the amplification to go back up.
-Ratio
-    The maximum amplification.
 Input gain
     The amplification level at the input.
 Output gain
@@ -426,8 +428,6 @@ Output gain
 Convexity
     The shape of the relationship between distance to the threshold and ratio
     value.  Higher values give a steeper shape.
-Threshold
-    The level at which the amplification fully stops.
 Channel link
     At 100%, all channels of an output device are amplified identically, while
     at 0% they are fully independent.  Intermediate values give intermediate
@@ -441,6 +441,11 @@ Inertia decay
 Ceiling
     The maximum level allowed just before the output amplification.  Causes
     soft clipping at that level.
+
+By setting **Attack* to 0 ms, **Release** to Infinite, and **Ratio** to
+Infinity:1, the compressor will turn into a brickwall limiter (leave the
+advanced settings to default).  If you increase **Input gain** on top of that,
+with a **Threshold** of eg. -3 dB, it will act like a dynamic normalizer.
 
 
 Reverb effect

@@ -125,7 +125,7 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case THRESHOLD:
-			m_effect->set_threshold(max(-60, m_effect->threshold() - (alt_pressed ? 10000 : ctrl_pressed ? 20 : shift_pressed ? 1 : 5)));
+			m_effect->set_threshold(max(-60, m_effect->threshold() - (alt_pressed ? 10000 : ctrl_pressed ? 12 : shift_pressed ? 1 : 3)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			ev->item->set_subtext(format_db(m_effect->threshold()));
@@ -240,7 +240,7 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case THRESHOLD:
-			m_effect->set_threshold(min(6, m_effect->threshold() + (alt_pressed ? 10000 : ctrl_pressed ? 20 : shift_pressed ? 1 : 5)));
+			m_effect->set_threshold(min(6, m_effect->threshold() + (alt_pressed ? 10000 : ctrl_pressed ? 12 : shift_pressed ? 1 : 3)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			ev->item->set_subtext(format_db(m_effect->threshold()));
