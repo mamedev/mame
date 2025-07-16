@@ -13,6 +13,8 @@ TODO:
 NOTES ON MCU DATA ROM FORMAT
 ----------------------------
 
+command 0x01 at offset 0x00 uses the table at 0x200
+
 Table for levels, initial state
 0200  4D 18 | 184d
 0202  DD 17 | 17dd
@@ -23,7 +25,7 @@ Table for levels, initial state
 020C  AD 15 | 15ad
 020E  3D 15 | 153d
 
-Tables for levels, state for redrawing after death (with animated pieces in place)
+Tables for levels, state for redrawing with animated pieces already moved (called after pieces have moved, or after respawning on death)
 0210  4D 18 | 184d
 0212  DD 17 | 17dd
 0214  6D 17 | 176d
@@ -33,7 +35,7 @@ Tables for levels, state for redrawing after death (with animated pieces in plac
 021C  2D 19 | 192d
 021E  BD 18 | 18bd
 
-This initial / redraw after death table use can be confirmed by looking at the pairs
+This initial / redraw after animation table use can be confirmed by looking at the pairs
 
 0200  4D 18 | 184d / 0210  4D 18 | 184d  - identical in both states (Stage 1 data)
 0202  DD 17 | 17dd / 0212  DD 17 | 17dd  - identical in both states (Stage 2 data)
@@ -130,6 +132,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
 	DECLARE_VIDEO_START(bkungfu);
 
+	void bkungfu_blitter_draw_text_highscores();
 	void bkungfu_blitter_draw_text_inner(uint16_t blitterromptr);
 	void bkungfu_blitter_draw_text();
 	void bkungfu_blitter_clear_tilemap();
@@ -175,9 +178,30 @@ VIDEO_START_MEMBER(m62_bkungfu_state,bkungfu)
 
 uint8_t m62_bkungfu_state::bkungfu_blitter_r(offs_t offset)
 {
-	// after some scenes this seems to be read from a mirror address
-	// so the MCU isn't just putting it at 0 in shared memory?
-	return 0xfe;
+	// this will read the various trigger addresses, checking if they're 0xfe
+	// presumably this is written by the MCU to signal the task has been completed
+
+	// read address is 0x00 for most commands
+	// 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c for the 'HUD' commands
+
+	// it also checks 0102, 0106, 0118, 011c before sending command 0x0c to draw high score data?
+
+	if (offset != 0)
+		logerror("%s: bkungfu_blitter_r %04x\n", machine().describe_context(), offset);
+
+	// for now always return 0xfe as it isn't clear how the high score drawing sets the flags
+	return 0xfe;// m_blittercmdram[offset];
+}
+
+void m62_bkungfu_state::bkungfu_blitter_draw_text_highscores()
+{
+	if (!m_mcu_running)
+		return;
+
+	for (int i = 0x100; i <= 0x12d; i++)
+	{
+		logerror("high score data %02x\n", m_blittercmdram[i]);
+	}
 }
 
 void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr)
@@ -185,20 +209,22 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr)
 	if (!m_mcu_running)
 		return;
 
-	uint16_t blitterromdataptr = m_blitterdatarom[blitterromptr] | (m_blitterdatarom[blitterromptr + 1] << 8);
-	uint8_t blitdat = m_blitterdatarom[blitterromdataptr++];
+	uint16_t data_address = m_blitterdatarom[blitterromptr] | (m_blitterdatarom[blitterromptr + 1] << 8);
+	const uint8_t* dataptr = m_blitterdatarom;
+
+	uint8_t blitdat = dataptr[data_address++];
 	while (blitdat != 0x00)
 	{
 		if (blitdat == 0x01)
 		{
 			// change color value during blit
-			m_blittercmdram[0x004] = m_blitterdatarom[blitterromdataptr++];
+			m_blittercmdram[0x004] = dataptr[data_address++];
 		}
 		else if (blitdat == 0x02)
 		{
 			// change position params during blit
-			m_blittercmdram[0x002] = m_blitterdatarom[blitterromdataptr++];
-			m_blittercmdram[0x003] = m_blitterdatarom[blitterromdataptr++];
+			m_blittercmdram[0x002] = dataptr[data_address++];
+			m_blittercmdram[0x003] = dataptr[data_address++];
 		}
 		else
 		{
@@ -213,7 +239,7 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr)
 			m_blittercmdram[0x003] = (position & 0xff00) >> 8;
 		}
 
-		blitdat = m_blitterdatarom[blitterromdataptr++];
+		blitdat = dataptr[data_address++];
 	}
 }
 
@@ -273,6 +299,22 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			logerror("%s: Command %02x: blitter: draw text from ROM (alt)\n", machine().describe_context(), data);
 			bkungfu_blitter_draw_text();
 		}
+		else if (data == 0x0c)
+		{
+			// why is it checking 4 addresses for 0xfe before writing the command?
+			//':maincpu' (7DDA): bkungfu_blitter_r 0102
+			//':maincpu' (7DDF): bkungfu_blitter_r 0106
+			//':maincpu' (7DDA): bkungfu_blitter_r 0118
+			//':maincpu' (7DDF): bkungfu_blitter_r 011c
+			//':maincpu' (7DCE): Command 0c: blitter: unknown
+
+			// these are written before the call (always 00 e1?)
+			uint8_t param1 = m_blittercmdram[0x001];
+			uint8_t param2 = m_blittercmdram[0x002];
+
+			logerror("%s: Command %02x: blitter: draw highscores %02x %02x\n", machine().describe_context(), data, param1, param2);
+			bkungfu_blitter_draw_text_highscores();
+		}
 		else if (data == 0x10)
 		{
 			// displays the number of coins after 'CREDIT'
@@ -288,25 +330,33 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 		else if (data == 0x02)
 		{
 			// triggered just afer command 0x01 below
-			logerror("%s: Command %02x: blitter: start of level cmd 2\n", machine().describe_context(), data);
+			// this might trigger the actual drawing if the previous commands were just the set-up for it?
+
+			uint8_t param1 = m_blittercmdram[0x001];
+			uint8_t param2 = m_blittercmdram[0x002];
+			logerror("%s: Command %02x: blitter: start of level cmd 2 (do draw?) %02x %02x\n", machine().describe_context(), data, param1, param2);
 		}
 		else if (data == 0x01)
 		{
+			// see notes at top of driver
+
 			// triggered just after command 0x0a below, and before command 0x02 above
 			// it happens twice at the start of each stage, once before any level animations are complete
-			// and then again after them (even on levels with no animation commands)
-			//
-			// this pair can't be the actual 'draw level to tilemap' command because it would erase
-			// changes made by the 'draw animated part' command
-			logerror("%s: Command %02x: blitter: start of level cmd 1)\n", machine().describe_context(), data);
+			// the param is different each time +8 the 2nd time, as to point to the 'with animations complete' state of the tilemap
+
+			uint16_t blitterromptr = m_blittercmdram[0x001];
+			uint16_t data_address = m_blitterdatarom[0x200 + (blitterromptr << 1)] | (m_blitterdatarom[0x200 + (blitterromptr << 1) + 1] << 8);
+			//popmessage("%s: Command %02x: blitter: draw level from ROM initialize - param %02x source address is %04x", machine().describe_context(), data, blitterromptr, data_address);
+			logerror("%s: Command %02x: blitter: draw level from ROM - param %02x source address is %04x\n", machine().describe_context(), data, blitterromptr, data_address);
+
 		}
 		else if (data == 0x0a)
 		{
-			// see notes at top of driver
-			uint16_t blitterromptr = m_blittercmdram[0x001];
-			uint16_t blitterromdataptr = m_blitterdatarom[0x200 + (blitterromptr << 1)] | (m_blitterdatarom[0x200 + (blitterromptr << 1) + 1] << 8);
-			//popmessage("%s: Command %02x: blitter: draw level from ROM initialize - param %02x source address is %04x", machine().describe_context(), data, blitterromptr, blitterromdataptr);
-			logerror("%s: Command %02x: blitter: draw level from ROM initialize - param %02x source address is %04x\n", machine().describe_context(), data, blitterromptr, blitterromdataptr);
+			// this happens BEFORE the level drawing commands, at the start of a stage
+			// the level number is in the params, maybe it's used to draw the HUD in a default state?
+			uint16_t levelnum = m_blittercmdram[0x001];
+			logerror("%s: Command %02x: blitter: pre-draw level (draw HUD?) %02x\n", machine().describe_context(), data, levelnum);
+			bkungfu_blitter_draw_text_inner(0x140);
 		}
 		else if (data == 0x05)
 		{
@@ -349,6 +399,8 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 		{
 			logerror("%s: Command %02x: blitter: unknown\n", machine().describe_context(), data);
 		}
+
+		m_blittercmdram[0x00] = 0xfe; // flag 'done' in shared RAM byte 0 (trigger address)
 	}
 	// all these 'slots' are initialized when you start a game
 	// there seem to be 3 param bytes and a trigger address for each
@@ -363,9 +415,15 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// all these commands draw the HUD in various states
 			//
 			// a pointer to this basic HUD layout is at 0x140, although it could be a leftover
-			// as the commands below al require elements of it to be different rather than a
+			// as the commands below all require elements of it to be different rather than a
 			// static layout
-			bkungfu_blitter_draw_text_inner(0x140);
+			//
+			// the parts needed for these elements (eg. partial life bars) aren't in the MCU data
+			// ROM anywhere apart from a static version, so probably come from internal ROM or
+			// encrypted area
+			//
+			// we draw the static HUD in command 0xa instead, as these likely just update parts of it
+			// bkungfu_blitter_draw_text_inner(0x140);
 
 			switch (select)
 			{
@@ -411,12 +469,16 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 				break;
 			}
 			}
+
+			m_blittercmdram[offset] = 0xfe; // flag 'done' on the trigger address in shared RAM
 		}
 
 	}
 	// used on the high score table, is this just data for other commands?
-	else if ((offset >= 0x0102) && (offset < 0x12c))
+	else if ((offset >= 0x100) && (offset <= 0x12c))
 	{
+		// text format data used for drawing high score table?
+		// used by command 0x0c at offest 0x00
 		logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (high score table related)\n", machine().describe_context(), offset, data);
 	}
 	else
