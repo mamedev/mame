@@ -387,8 +387,8 @@ void audio_effect_compressor::apply(const emu::detail::output_buffer_flat<sample
 
 			if(std::isnan(input_db) || input_db < -200)
 				input_db = -200;
-			else if(input_db > 4)
-				input_db = 4;
+			else if(input_db > 30)
+				input_db = 30;
 
 			float slewed_signal = m_slewed_signal[channel];
 			if(input_db > slewed_signal)
