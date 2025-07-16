@@ -866,6 +866,10 @@ ROM_START( ban_dn1j )
 	ROM_LOAD( "dn1j.u2", 0x000000, 0x800000, CRC(0a0cef0f) SHA1(c83a2635a969b3c686dbc599a37f8b7496b0c6a1) )
 ROM_END
 
+ROM_START( epo_kabj )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "kabj.u2", 0x000000, 0x800000, CRC(264655ec) SHA1(11a25c7b7e3ffd3c4bc0476c64d5d68754757f40) )
+ROM_END
 
 ROM_START( epo_tfit )
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
@@ -1075,6 +1079,9 @@ CONS( 2004, maxheart, 0, 0, superxavix_i2c_24c04_4mb,    maxheart,   superxavix_
 
 // どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！
 CONS( 2004, epo_doka, 0, 0, xavix2002_4mb,               xavix,      superxavix_state,     init_epo_doka, "Epoch / SSD Company LTD",  "Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// テレビであそぼう!まなぼう! カードでおままごと あいうえお図鑑
+CONS( 2006, epo_kabj, 0, 0, xavix2002,                   xavix,      superxavix_state,     init_xavix, "Epoch / SSD Company LTD",   "Hello Kitty TV de Asobou! Manabou! Card de Omamagoto AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！
 CONS( 2006, ban_bkgj, 0, 0, superxavix_i2c_24c04_4mb,xavix_i2c,  superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Narikiri Taikan Boukenger Hashire! Ute! Mission Start!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
