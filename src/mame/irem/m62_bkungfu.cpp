@@ -306,7 +306,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			//':maincpu' (7DDF): bkungfu_blitter_r 0106
 			//':maincpu' (7DDA): bkungfu_blitter_r 0118
 			//':maincpu' (7DDF): bkungfu_blitter_r 011c
-			//':maincpu' (7DCE): Command 0c: blitter: unknown
+			//':maincpu' (7DCE): Command 0c: blitter: draw highscores
 
 			// these are written before the call (always 00 e1?)
 			uint8_t param1 = m_blittercmdram[0x001];
