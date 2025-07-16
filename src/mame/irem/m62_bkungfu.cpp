@@ -132,9 +132,11 @@ private:
 
 	void bkungfu_blitter_draw_text_inner(uint16_t blitterromptr);
 	void bkungfu_blitter_draw_text();
+	void bkungfu_blitter_clear_tilemap();
 
 	// done this way so it can be viewed win the debugger with save state registration
 	uint8_t m_blittercmdram[0x800];
+	int m_mcu_running;
 
 	memory_share_creator<uint8_t> m_bkungfu_tileram;
 
@@ -173,11 +175,16 @@ VIDEO_START_MEMBER(m62_bkungfu_state,bkungfu)
 
 uint8_t m62_bkungfu_state::bkungfu_blitter_r(offs_t offset)
 {
+	// after some scenes this seems to be read from a mirror address
+	// so the MCU isn't just putting it at 0 in shared memory?
 	return 0xfe;
 }
 
 void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr)
 {
+	if (!m_mcu_running)
+		return;
+
 	uint16_t blitterromdataptr = m_blitterdatarom[blitterromptr] | (m_blitterdatarom[blitterromptr + 1] << 8);
 	uint8_t blitdat = m_blitterdatarom[blitterromdataptr++];
 	while (blitdat != 0x00)
@@ -216,6 +223,18 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text()
 	bkungfu_blitter_draw_text_inner(blitterromptr);
 }
 
+void m62_bkungfu_state::bkungfu_blitter_clear_tilemap()
+{
+	if (!m_mcu_running)
+		return;
+
+	for (int position = 0; position < 0x1000; position += 2)
+	{
+		m_bkungfu_tileram[(position) & 0xfff] = m_blittercmdram[0x002];
+		m_bkungfu_tileram[(position + 1) & 0xfff] = m_blittercmdram[0x001];
+	}
+}
+
 void m62_bkungfu_state::machine_start()
 {
 	m62_state::machine_start();
@@ -229,6 +248,8 @@ void m62_bkungfu_state::machine_reset()
 
 	for (int i = 0; i < 0x800; i++)
 		m_blittercmdram[i] = 0x00;
+
+	m_mcu_running = 0;
 }
 
 void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
@@ -261,23 +282,22 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 		else if (data == 0x08) // clear layer to fixed value
 		{
 			logerror("%s: Command %02x: blitter: clear layer\n", machine().describe_context(), data);
-			for (int position = 0; position < 0x1000; position += 2)
-			{
-				m_bkungfu_tileram[(position) & 0xfff] = m_blittercmdram[0x002];
-				m_bkungfu_tileram[(position + 1) & 0xfff] = m_blittercmdram[0x001];
-			}
+			bkungfu_blitter_clear_tilemap();
 		}
 		else if (data == 0x02)
 		{
 			// triggered just afer command 0x01 below
-			logerror("%s: Command %02x: blitter: draw level from ROM(2)\n", machine().describe_context(), data);
+			logerror("%s: Command %02x: blitter: start of level cmd 2\n", machine().describe_context(), data);
 		}
 		else if (data == 0x01)
 		{
 			// triggered just after command 0x0a below, and before command 0x02 above
 			// it happens twice at the start of each stage, once before any level animations are complete
 			// and then again after them (even on levels with no animation commands)
-			logerror("%s: Command %02x: blitter: draw level from ROM(1)\n", machine().describe_context(), data);
+			//
+			// this pair can't be the actual 'draw level to tilemap' command because it would erase
+			// changes made by the 'draw animated part' command
+			logerror("%s: Command %02x: blitter: start of level cmd 1)\n", machine().describe_context(), data);
 		}
 		else if (data == 0x0a)
 		{
@@ -298,28 +318,39 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 		{
 			// used in the attract mode when drawing the background of the title screen
 			// and before animated level elements at the start of later stages
-			logerror("%s: Command %02x: blitter: draw title animation flames\n", machine().describe_context(), data);
+
+			// writes to param offsets 1/2 (same value for each) before this command
+			// uses values of 85, 84, 83, 86, 90 on the title screen
+			logerror("%s: Command %02x: blitter: draw title animation flames %02x %02x\n", machine().describe_context(), data, m_blittercmdram[0x001], m_blittercmdram[0x002]);
 		}
 		else if (data == 0xfe)
 		{
 			// probably tells the MCU to start running
+			m_mcu_running = 1;
 			logerror("%s: Command %02x: blitter: start up\n", machine().describe_context(), data);
 		}
 		else
 		{
 			logerror("%s: Command %02x: blitter: unknown\n", machine().describe_context(), data);
 		}
-		m_bg_tilemap->mark_all_dirty();
 	}
 	// all these 'slots' are initialized when you start a game
 	// there seem to be 3 param bytes and a trigger address for each
 	else if ((offset >= 0x10) && (offset < 0x30))
 	{
+
 		int select = offset & 0x3c;
 		int part = offset & 0x03;
 
 		if (part == 0x00)
 		{
+			// all these commands draw the HUD in various states
+			//
+			// a pointer to this basic HUD layout is at 0x140, although it could be a leftover
+			// as the commands below al require elements of it to be different rather than a
+			// static layout
+			bkungfu_blitter_draw_text_inner(0x140);
+
 			switch (select)
 			{
 			default:
@@ -327,23 +358,19 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (unknown select %02x | %02x %02x %02x)\n", machine().describe_context(), offset, data, select, m_blittercmdram[offset + 1], m_blittercmdram[offset + 2], m_blittercmdram[offset + 3]);
 				break;
 			}
-			case 0x10:  // 0x140 in data ROM?
+			case 0x10:
 			{
-				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (player 1 score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
 				break;
 			}
-			case 0x14: // used but only ever with 0x00 values?
+			case 0x14:
 			{
-				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (unknown but used %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (player 2 score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
 				break;
 			}
 			case 0x18:
 			{
-				// called at the start of stages with 08 64 00, could be the non-animated parts of the HUD
-				// a pointer to this basic layout is at 0x140, although it could be a leftover
-				// as the other commands need to be able to form their own versions of the elements here with the correct data inserted
-				bkungfu_blitter_draw_text_inner(0x140);
-				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (unknown draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (top score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
 				break;
 			}
 			case 0x1c:
@@ -390,6 +417,9 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			logerror("%s: bkungfu_blitter_w offset: %04x data: %02x\n", machine().describe_context(), offset, data);
 		}
 	}
+
+	// for now mark the whole tilemap dirty after a blit operation
+	m_bg_tilemap->mark_all_dirty();
 }
 
 
