@@ -74,7 +74,7 @@ memory map:
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(K051960, k051960_device, "k051960", "K051960 Sprite Generator")
+DEFINE_DEVICE_TYPE(K051960, k051960_device, "k051960", "Konami 051960 Sprite Generator")
 
 const gfx_layout k051960_device::spritelayout =
 {

@@ -126,7 +126,7 @@ actually used, since the priority is taken from the external ports.
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(K053251, k053251_device, "k053251", "K053251 Priority Encoder")
+DEFINE_DEVICE_TYPE(K053251, k053251_device, "k053251", "Konami 053251 Priority Encoder")
 
 k053251_device::k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, K053251, tag, owner, clock),

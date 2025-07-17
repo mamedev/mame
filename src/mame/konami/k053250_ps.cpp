@@ -40,7 +40,7 @@
     xxxx xxxx    ROM access address [15:8]
  */
 
-DEFINE_DEVICE_TYPE(K053250PS, k053250ps_device, "k053250ps", "K053250PS LVC")
+DEFINE_DEVICE_TYPE(K053250PS, k053250ps_device, "k053250ps", "Konami Pirate Ship LVC")
 
 k053250ps_device::k053250ps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, K053250PS, tag, owner, clock),

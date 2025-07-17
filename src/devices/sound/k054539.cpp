@@ -16,7 +16,7 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(K054539, k054539_device, "k054539", "K054539 ADPCM")
+DEFINE_DEVICE_TYPE(K054539, k054539_device, "k054539", "Konami 054539 ADPCM")
 
 k054539_device::k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K054539, tag, owner, clock)

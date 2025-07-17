@@ -146,7 +146,7 @@ to go through the chip (8 bits at a time, even on 68000-based systems).
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(K052109, k052109_device, "k052109", "K052109 Tilemap Generator")
+DEFINE_DEVICE_TYPE(K052109, k052109_device, "k052109", "Konami 052109 Tilemap Generator")
 
 const gfx_layout k052109_device::charlayout =
 {

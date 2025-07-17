@@ -41,7 +41,7 @@ main ram and the buffer.
     DEVICE INTERFACE
 *****************************************************************************/
 
-DEFINE_DEVICE_TYPE(K053244, k05324x_device, "k05324x", "K053244/053245 Sprite Generator")
+DEFINE_DEVICE_TYPE(K053244, k05324x_device, "k05324x", "Konami 053244/053245 Sprite Generator")
 
 const gfx_layout k05324x_device::spritelayout =
 {
