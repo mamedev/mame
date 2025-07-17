@@ -152,21 +152,22 @@ void stella8085_state::kbd_sl_w(u8 data)
 
 u8 stella8085_state::kbd_rl_r()
 {
-//  Keyboard read (only scan line 0 is used)
-	u8 ret = 0;
+	u8 ret = 0xFF;
 	//LOG("I8279: Read Line: %02X\n", m_kbd_sl);
-	if(m_kbd_sl == 13)
+	if(m_kbd_sl == 9)
+		ret = ioport("ZE1")->read();
+	else if(m_kbd_sl == 13)
 		ret = ioport("ZE5")->read();
-	if(m_kbd_sl == 14)
-		ret = ioport("SERVICE1")->read();
+	else if(m_kbd_sl == 14)
+		ret = ioport("ZE6")->read();
 	else if(m_kbd_sl == 15)
-		ret = ioport("SERVICE2")->read();
+		ret = ioport("ZE7")->read();
 	return ret;
 }
 
 void stella8085_state::disp_w(u8 data)
 {
-	if (m_kbd_sl == 2) {
+	if (m_kbd_sl < 4) {
 		for (int i = 0; i < 8; i++)
 		{
 			u8 lamp_index = (m_kbd_sl * 10) + i;
@@ -180,9 +181,31 @@ void stella8085_state::disp_w(u8 data)
 
 void stella8085_state::output_digit(u8 i, u8 data)
 {
-	if (i < 8) {
-		//m_digits[i] = data;
-	}
+    // Seven-segment encoding for digits 0-9 (abcdefg, no decimal point)
+    static const u8 bcd_to_7seg[16] = {
+        0x3F, // 0: 0b00111111
+        0x06, // 1: 0b00000110
+        0x5B, // 2: 0b01011011
+        0x4F, // 3: 0b01001111
+        0x66, // 4: 0b01100110
+        0x6D, // 5: 0b01101101
+        0x7D, // 6: 0b01111101
+        0x07, // 7: 0b00000111
+        0x7F, // 8: 0b01111111
+        0x6F, // 9: 0b01101111
+        0x00, // 10: blank
+        0x00, // 11: blank
+        0x00, // 12: blank
+        0x00, // 13: blank
+        0x00, // 14: blank
+        0x00  // 15: blank
+    };
+
+    if (i > 7) {
+        u8 lower_bcd = data & 0x0F;
+
+        m_digits[i - 8] = bcd_to_7seg[lower_bcd];
+    }
 }
 
 INPUT_CHANGED_MEMBER( stella8085_state::handle_dip )
@@ -275,17 +298,17 @@ static INPUT_PORTS_START( dicemstr )
 	PORT_DIPSETTING(0x08, DEF_STR(On))
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 
-	PORT_START("SERVICE1") // Row 6
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") // Col 7
+	PORT_START("ZE6") // TZ6
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") // TS7
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dauerlauf")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Spielzähler")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzspeicher")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hardware-Test")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Auszahlquote")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Foul")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gewinn") // Col 0
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gewinn") // TS0
 
-	PORT_START("SERVICE2") // Row 7
+	PORT_START("ZE7") // TZ7
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 1,-")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 1,-")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch Serie")
@@ -295,13 +318,13 @@ static INPUT_PORTS_START( dicemstr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzung")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Initialisieren")
 
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("DM 5.00")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("DM 2.00")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_IMPULSE(3) PORT_NAME("DM 1.00")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_IMPULSE(3) PORT_NAME("DM 0.10")
+	PORT_START("ZE1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("DM 5.00")  //LIx4
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("DM 2.00")  //LIx3
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(3) PORT_NAME("DM 1.00")  //LIx2
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(3) PORT_NAME("DM 0.10")  //LIx1
 
-	PORT_START("INPUTS")
+	PORT_START("ZE5")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -320,7 +343,7 @@ static INPUT_PORTS_START( disc )
 	PORT_DIPSETTING(0x08, DEF_STR(On))
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 
-	PORT_START("SERVICE1") // TZ6
+	PORT_START("ZE6") // TZ6
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") // TS7
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dauerlauf")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Spielzähler")
@@ -330,7 +353,7 @@ static INPUT_PORTS_START( disc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Foul")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gewinn") // TS0
 
-	PORT_START("SERVICE2") // TZ7
+	PORT_START("ZE7") // TZ7
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 1,-")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 1,-")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch Serie")
@@ -340,11 +363,11 @@ static INPUT_PORTS_START( disc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzung")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Initialisieren")
 
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("DM 5.00")  //LIx4
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("DM 2.00")  //LIx3
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_IMPULSE(3) PORT_NAME("DM 1.00")  //LIx2
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_IMPULSE(3) PORT_NAME("DM 0.10")  //LIx1
+	PORT_START("ZE1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("DM 5.00")  //LIx4
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("DM 2.00")  //LIx3
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(3) PORT_NAME("DM 1.00")  //LIx2
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(3) PORT_NAME("DM 0.10")  //LIx1
 
 	PORT_START("ZE5")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH ) // Left
