@@ -230,15 +230,26 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, 
 	uint16_t data_address;
 	uint8_t* dataptr;
 
+	uint8_t poslow_attr;
+	uint8_t poshigh_attr;
+	uint8_t col_attr;
+
 	if (use_ram) // high score table is drawn from RAM
 	{
 		data_address = 0x100;
 		dataptr = m_blittercmdram;
+		// attribute 2 is always set to 0xe1, and the rest are shifted in this mode, why?
+		poslow_attr = 3;
+		poshigh_attr = 4;
+		col_attr = 5;
 	}
 	else
 	{
 		data_address = m_blitterdatarom[blitterromptr] | (m_blitterdatarom[blitterromptr + 1] << 8);
 		dataptr = m_blitterdatarom;
+		poslow_attr = 2;
+		poshigh_attr = 3;
+		col_attr = 4;
 	}
 
 
@@ -248,20 +259,21 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, 
 		if (blitdat == 0x01)
 		{
 			// change color value during blit
-			m_blittercmdram[0x004] = dataptr[data_address++];
+			m_blittercmdram[col_attr] = dataptr[data_address++];
 		}
 		else if (blitdat == 0x02)
 		{
 			// change position params during blit
-			m_blittercmdram[0x002] = dataptr[data_address++];
-			m_blittercmdram[0x003] = dataptr[data_address++];
+			m_blittercmdram[poslow_attr] = dataptr[data_address++];
+			m_blittercmdram[poshigh_attr] = dataptr[data_address++];
 		}
 		else
 		{
-			uint16_t position = (m_blittercmdram[0x003] << 8) | m_blittercmdram[0x002];
+			uint16_t position = (m_blittercmdram[poshigh_attr] << 8) | m_blittercmdram[poslow_attr];
+
 
 			bkungfu_blitter_tilemap_w((position) & 0xfff, blitdat);
-			bkungfu_blitter_tilemap_w((position + 1) & 0xfff, m_blittercmdram[0x004]);
+			bkungfu_blitter_tilemap_w((position + 1) & 0xfff, m_blittercmdram[col_attr]);
 
 			// move along to the next character, wrapping at the end of a line
 			// otherwise Game Over text will sometimes get split across lines due to crossing the right edge
@@ -269,8 +281,8 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, 
 			position += 2;
 			position = vposition | (position & widthmask);
 
-			m_blittercmdram[0x002] = position & 0xff;
-			m_blittercmdram[0x003] = (position & 0xff00) >> 8;
+			m_blittercmdram[poslow_attr] = position & 0xff;
+			m_blittercmdram[poshigh_attr] = (position & 0xff00) >> 8;
 		}
 
 		blitdat = dataptr[data_address++];
@@ -522,8 +534,11 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// these are written before the call (always 00 e1?)
 			uint8_t param1 = m_blittercmdram[0x001];
 			uint8_t param2 = m_blittercmdram[0x002];
+			uint8_t param3 = m_blittercmdram[0x003];
+			uint8_t param4 = m_blittercmdram[0x004];
+			uint8_t param5 = m_blittercmdram[0x005];
 
-			logerror("%s: Command %02x: blitter: draw highscores %02x %02x\n", machine().describe_context(), data, param1, param2);
+			logerror("%s: Command %02x: blitter: draw highscores %02x %02x %02x %02x %02x\n", machine().describe_context(), data, param1, param2, param3, param4, param5);
 			bkungfu_blitter_draw_text_inner(-1, true);
 
 			// override the RAM data with 0xfe (task done flag) so this works for the next call
