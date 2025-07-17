@@ -134,6 +134,7 @@ protected:
 	void content_early(s8 shift = 0);
 	void content_late();
 
+	void spectrum_refresh_w(offs_t offset, uint8_t data);
 	void spectrum_nomreq(offs_t offset, uint8_t data);
 	void spectrum_ula_w(offs_t offset, uint8_t data);
 	uint8_t spectrum_ula_r(offs_t offset);
