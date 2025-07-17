@@ -203,7 +203,6 @@ protected:
 	uint32_t screen_update_glfgreat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_vblank_blswhstl(int state);
 	inline uint32_t tmnt2_get_word(uint32_t addr);
 	void tmnt2_put_word(uint32_t addr, uint16_t data);
 	K051960_CB_MEMBER(punkshot_sprite_callback);
@@ -614,11 +613,9 @@ void prmrsocr_state::prmrsocr_eeprom_w(offs_t offset, uint16_t data, uint16_t me
 TILE_GET_INFO_MEMBER(glfgreat_state::glfgreat_get_roz_tile_info)
 {
 	uint8_t *rom = memregion("user1")->base();
-	int code;
 
 	tile_index += 0x40000 * m_roz_rom_bank;
-
-	code = rom[tile_index + 0x80000] + 256 * rom[tile_index] + 256 * 256 * ((rom[tile_index / 4 + 0x100000] >> (2 * (tile_index & 3))) & 3);
+	int code = rom[tile_index + 0x80000] + 256 * rom[tile_index] + 256 * 256 * ((rom[tile_index / 4 + 0x100000] >> (2 * (tile_index & 3))) & 3);
 
 	tileinfo.set(0, code & 0x3fff, code >> 14, 0);
 }
@@ -655,7 +652,7 @@ K052109_CB_MEMBER(sunsetbl_state::ssbl_tile_callback)
 	else
 	{
 		*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-//      osd_printf_debug("L%d: bank %d code %x color %x\n", layer, bank, *code, *color);
+		//osd_printf_debug("L%d: bank %d code %x color %x\n", layer, bank, *code, *color);
 	}
 
 	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
@@ -732,10 +729,11 @@ K053244_CB_MEMBER(tmnt2_state::lgtnfght_sprite_callback)
 K053244_CB_MEMBER(tmnt2_state::blswhstl_sprite_callback)
 {
 #if 0
-if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x20)) *color = machine().rand();
-if (machine().input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = machine().rand();
-if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = machine().rand();
+	if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x20)) *color = machine().rand();
+	if (machine().input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = machine().rand();
+	if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = machine().rand();
 #endif
+
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
 		*priority = 0;
@@ -1240,18 +1238,9 @@ uint32_t tmnt2_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 
 
 /***************************************************************************
 
-  Housekeeping
+  Address maps
 
 ***************************************************************************/
-
-void tmnt2_state::screen_vblank_blswhstl(int state)
-{
-	// on rising edge
-	if (state)
-	{
-		m_k053245->clear_buffer();
-	}
-}
 
 void tmnt2_state::punkshot_main_map(address_map &map)
 {
@@ -2479,7 +2468,6 @@ void tmnt2_state::blswhstl(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
 	screen.set_screen_update(FUNC(tmnt2_state::screen_update_lgtnfght));
-	screen.screen_vblank().set(FUNC(tmnt2_state::screen_vblank_blswhstl));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);

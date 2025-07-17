@@ -34,8 +34,6 @@ public:
 	void k053244_w(offs_t offset, u8 data);
 	void bankselect(int bank); // used by TMNT2, Asterix and Premier Soccer for ROM testing
 	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
-	void clear_buffer();
-	void update_buffer();
 	void set_z_rejection(int zcode); // common to k053244/5
 
 protected:
@@ -56,6 +54,9 @@ private:
 	int      m_rombank;       // 053244
 	int      m_ramsize;
 	int      m_z_rejection;
+
+	void clear_buffer();
+	void update_buffer();
 };
 
 

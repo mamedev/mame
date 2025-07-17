@@ -18,13 +18,12 @@ main ram and the buffer.
            bit 4 = enable gfx ROM reading
            bit 5 = unknown, used by Rollergames
 006     RW accessing this register copies the sprite ram to the internal buffer
-007      W unknown
+007     RW clear sprite buffer? (see detatwin)
 008-009  W low 16 bits of the ROM address to read
 00a-00b  W high bits of the ROM address to read.  3 bits for most games, 1 for asterix
 00c-00f R  reads data from the gfx ROMs (32 bits in total). The address of the
            data is determined by the registers above; plus bank switch bits for
            larger ROMs.
-
 
 */
 
@@ -192,9 +191,7 @@ void k053244_device::k053245_w(offs_t offset, u8 data)
 
 void k053244_device::clear_buffer()
 {
-	int i, e;
-
-	for (e = m_ramsize / 2, i = 0; i < e; i += 8)
+	for (int e = m_ramsize / 2, i = 0; i < e; i += 8)
 		m_buffer[i] = 0;
 }
 
@@ -205,7 +202,19 @@ void k053244_device::update_buffer()
 
 u8 k053244_device::k053244_r(offs_t offset)
 {
-	if ((m_regs[5] & 0x10) && offset >= 0x0c && offset < 0x10)
+	switch (offset)
+	{
+	case 0x06:
+		if (!machine().side_effects_disabled())
+			update_buffer();
+		break;
+
+	case 0x07:
+		if (!machine().side_effects_disabled())
+			clear_buffer();
+		break;
+
+	case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 	{
 		int addr;
 
@@ -218,17 +227,13 @@ u8 k053244_device::k053244_r(offs_t offset)
 
 		return m_sprite_rom[addr];
 	}
-	else if (offset == 0x06)
-	{
-		if (!machine().side_effects_disabled())
-			update_buffer();
-		return 0;
-	}
-	else
-	{
+
+	default:
 		//logerror("%s: read from unknown 053244 address %x\n", machine().describe_context(), offset);
-		return 0;
+		break;
 	}
+
+	return 0;
 }
 
 void k053244_device::k053244_w(offs_t offset, u8 data)
@@ -247,6 +252,10 @@ void k053244_device::k053244_w(offs_t offset, u8 data)
 
 	case 0x06:
 		update_buffer();
+		break;
+
+	case 0x07:
+		clear_buffer();
 		break;
 	}
 }
