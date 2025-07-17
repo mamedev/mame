@@ -8,7 +8,10 @@ Irem M62-based unreleased Kung-Fu Master sequel
 video reference: https://www.youtube.com/watch?v=Efr9EQkbCSQ
 
 TODO:
-- finish background gfx emulation, supposedly via an (undumped) MCU
+- level backgrounds (encrypted tilemap data in MCU data ROM) (needs decryption)
+- other background elements (title screen animation, moving elements in levels) (either encrypted data in MCU data ROM, or internal to MCU)
+- remaining HUD elements (floor counter, continue screen, credit counter, high score table) again all handled by the MCU
+- test mode doesn't work (there are strings for it in the MCU data ROM, is the MCU involved?)
 
 NOTES ON MCU DATA ROM FORMAT
 ----------------------------
@@ -136,9 +139,24 @@ private:
 	void bkungfu_blitter_draw_text_inner(uint16_t blitterromptr);
 	void bkungfu_blitter_draw_text();
 	void bkungfu_blitter_clear_tilemap();
+	void bkungfu_blitter_set_number_w(int x, int y, uint8_t num);
+	void bkungfu_blitter_set_player_energy_w(int x, int y, uint8_t num, bool is_boss);
+	void bkungfu_blitter_draw_lifebar(int xbase, int ybase, uint8_t energy, bool is_boss);
+	void redraw_hud();
 
 	// done this way so it can be viewed win the debugger with save state registration
 	uint8_t m_blittercmdram[0x800];
+
+	uint16_t m_hud_timer;
+	uint32_t m_hud_p1score;
+	uint32_t m_hud_topscore;
+	uint32_t m_hud_p2score;
+	uint8_t m_hud_lives;
+	uint8_t m_hud_player_energy;
+	uint8_t m_hud_boss_energy;
+	uint8_t m_hud_floorcount;
+	uint8_t m_hud_floorcount_state;
+
 	int m_mcu_running;
 
 	memory_share_creator<uint8_t> m_bkungfu_tileram;
@@ -241,7 +259,6 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr)
 
 			m_bkungfu_tileram[(position) & 0xfff] = blitdat;
 			m_bkungfu_tileram[(position + 1) & 0xfff] = m_blittercmdram[0x004];
-			m_bg_tilemap->mark_tile_dirty((position & 0xfff) >> 1);
 
 			// move along to the next character, wrapping at the end of a line
 			// otherwise Game Over text will sometimes get split across lines due to crossing the right edge
@@ -281,6 +298,16 @@ void m62_bkungfu_state::machine_start()
 
 	save_item(NAME(m_blittercmdram));
 	save_item(NAME(m_mcu_running));
+
+	save_item(NAME(m_hud_timer));
+	save_item(NAME(m_hud_p1score));
+	save_item(NAME(m_hud_topscore));
+	save_item(NAME(m_hud_p2score));
+	save_item(NAME(m_hud_lives));
+	save_item(NAME(m_hud_player_energy));
+	save_item(NAME(m_hud_boss_energy));
+	save_item(NAME(m_hud_floorcount));
+	save_item(NAME(m_hud_floorcount_state));
 }
 
 void m62_bkungfu_state::machine_reset()
@@ -291,6 +318,124 @@ void m62_bkungfu_state::machine_reset()
 		m_blittercmdram[i] = 0x00;
 
 	m_mcu_running = 0;
+
+	m_hud_timer = 0;
+	m_hud_p1score = 0;
+	m_hud_topscore = 0;
+	m_hud_p2score = 0;
+	m_hud_lives = 0;
+	m_hud_player_energy = 0;
+	m_hud_boss_energy = 0;
+	m_hud_floorcount = 0;
+	m_hud_floorcount_state = 0;
+}
+
+
+
+void m62_bkungfu_state::bkungfu_blitter_set_number_w(int x, int y, uint8_t num)
+{
+	int position = (y * 0x40) + x; // 0x40 tiles per line
+	position <<= 1; // 2 bytes per entry in tilemap
+	m_bkungfu_tileram[position] = (num & 0xf) + 0x30;
+}
+
+void m62_bkungfu_state::bkungfu_blitter_set_player_energy_w(int x, int y, uint8_t num, bool is_boss)
+{
+	if (num > 8)
+		return;
+
+	uint8_t energy_table_player[9] = { 0xc2, 0xcb, 0xca, 0xc9, 0xc8, 0xc7, 0xc6, 0xc5, 0xc4 };
+	uint8_t energy_table_boss[9] = { 0xc2, 0xd3, 0xd2, 0xd1, 0xd0, 0xcf, 0xce, 0xcd, 0xcc };
+
+	int position = (y * 0x40) + x; // 0x40 tiles per line
+	position <<= 1; // 2 bytes per entry in tilemap
+
+	if (is_boss)
+		m_bkungfu_tileram[position] = energy_table_boss[num];
+	else
+		m_bkungfu_tileram[position] = energy_table_player[num];
+}
+
+void m62_bkungfu_state::bkungfu_blitter_draw_lifebar(int xbase, int ybase, uint8_t energy, bool is_boss)
+{
+	// the energy bar values range from 0x00 (empty) to 0x40 (full)
+	// player tiles 0xc4 - full bar, 0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb (1 line left)
+	// 0xc2 empty
+	//
+	// player bar is at 0x12e in tile ram and consists of 8 segments
+	// state 0x40 is all full, so 0xc4,0xc4,0xc4,0xc4,0xc4,0xc4,0xc4,0xc4
+
+	const int num8segments = (energy & 0x78) >> 3;
+	int segment = 0;
+	while (segment < num8segments)
+	{
+		// draw the full bar parts
+		bkungfu_blitter_set_player_energy_w(xbase + segment, ybase, 8, is_boss);
+		segment++;
+	}
+	if (segment != 8)
+	{
+		// draw the partial bar parts
+		bkungfu_blitter_set_player_energy_w(xbase + segment, ybase, energy & 0x7, is_boss);
+		segment++;
+	}
+	while (segment < 8)
+	{
+		// draw the empty bar parts
+		bkungfu_blitter_set_player_energy_w(xbase + segment, ybase, 0, is_boss);
+		segment++;
+	}
+}
+
+void m62_bkungfu_state::redraw_hud()
+{
+	// draw the static part of the layout
+	bkungfu_blitter_draw_text_inner(0x140);
+
+	// update the dynamic parts of the layout
+	bkungfu_blitter_set_number_w(0x25, 0x05, ((m_hud_timer >> 8) & 0xf0) >> 4);
+	bkungfu_blitter_set_number_w(0x26, 0x05, ((m_hud_timer >> 8) & 0x0f));
+	bkungfu_blitter_set_number_w(0x27, 0x05, ((m_hud_timer >> 0) & 0xf0) >> 4);
+	bkungfu_blitter_set_number_w(0x28, 0x05, ((m_hud_timer >> 0) & 0x0f));
+
+	bkungfu_blitter_set_number_w(0x2d, 0x05, ((m_hud_lives >> 0) & 0x0f));
+
+	bkungfu_blitter_set_number_w(0x14, 0x00, ((m_hud_p1score >> 16) & 0xf0) >> 4);
+	bkungfu_blitter_set_number_w(0x15, 0x00, ((m_hud_p1score >> 16) & 0x0f));
+	bkungfu_blitter_set_number_w(0x16, 0x00, ((m_hud_p1score >> 8) & 0xf0) >> 4);
+	bkungfu_blitter_set_number_w(0x17, 0x00, ((m_hud_p1score >> 8) & 0x0f));
+	bkungfu_blitter_set_number_w(0x18, 0x00, ((m_hud_p1score >> 0) & 0xf0) >> 4);
+	bkungfu_blitter_set_number_w(0x19, 0x00, ((m_hud_p1score >> 0) & 0x0f));
+
+	bkungfu_blitter_set_number_w(0x1f, 0x00, ((m_hud_topscore >> 16) & 0xf0) >> 4);
+	bkungfu_blitter_set_number_w(0x20, 0x00, ((m_hud_topscore >> 16) & 0x0f));
+	bkungfu_blitter_set_number_w(0x21, 0x00, ((m_hud_topscore >> 8) & 0xf0) >> 4);
+	bkungfu_blitter_set_number_w(0x22, 0x00, ((m_hud_topscore >> 8) & 0x0f));
+	bkungfu_blitter_set_number_w(0x23, 0x00, ((m_hud_topscore >> 0) & 0xf0) >> 4);
+	bkungfu_blitter_set_number_w(0x24, 0x00, ((m_hud_topscore >> 0) & 0x0f));
+
+	bkungfu_blitter_set_number_w(0x29, 0x00, ((m_hud_p2score >> 16) & 0xf0) >> 4);
+	bkungfu_blitter_set_number_w(0x2a, 0x00, ((m_hud_p2score >> 16) & 0x0f));
+	bkungfu_blitter_set_number_w(0x2b, 0x00, ((m_hud_p2score >> 8) & 0xf0) >> 4);
+	bkungfu_blitter_set_number_w(0x2c, 0x00, ((m_hud_p2score >> 8) & 0x0f));
+	bkungfu_blitter_set_number_w(0x2d, 0x00, ((m_hud_p2score >> 0) & 0xf0) >> 4);
+	bkungfu_blitter_set_number_w(0x2e, 0x00, ((m_hud_p2score >> 0) & 0x0f));
+
+	if (m_hud_player_energy <= 0x40)
+	{
+		bkungfu_blitter_draw_lifebar(0x17, 0x2, m_hud_player_energy, false);
+	}
+
+	if (m_hud_boss_energy <= 0x40)
+	{
+		bkungfu_blitter_draw_lifebar(0x17, 0x4, m_hud_boss_energy, true);
+	}
+
+	// need to draw the current floor counter state using
+	//
+	// m_hud_floorcount and m_hud_floorcount_state
+	//
+	// which is more complex as it isn't a simple number or bar
 }
 
 void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
@@ -368,9 +513,10 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 		{
 			// this happens BEFORE the level drawing commands, at the start of a stage
 			// the level number is in the params, maybe it's used to draw the HUD in a default state?
+			// (unlikely, it gets called without updating the other elements after you die etc.)
 			uint16_t levelnum = m_blittercmdram[0x001];
 			logerror("%s: Command %02x: blitter: pre-draw level (draw HUD?) %02x\n", machine().describe_context(), data, levelnum);
-			bkungfu_blitter_draw_text_inner(0x140);
+			redraw_hud();
 		}
 		else if (data == 0x05)
 		{
@@ -445,6 +591,9 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 
 		if (part == 0x00)
 		{
+			if (!m_mcu_running)
+				return;
+
 			// all these commands draw the HUD in various states
 			//
 			// a pointer to this basic HUD layout is at 0x140, although it could be a leftover
@@ -463,42 +612,68 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			case 0x10:
 			{
 				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (player 1 score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+
+				m_hud_p1score =  m_blittercmdram[offset + 1] << 16;
+				m_hud_p1score |= m_blittercmdram[offset + 2] << 8;
+				m_hud_p1score |= m_blittercmdram[offset + 3] << 0;
+				redraw_hud();
 				break;
 			}
 			case 0x14:
 			{
 				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (player 2 score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+
+				m_hud_p2score =  m_blittercmdram[offset + 1] << 16;
+				m_hud_p2score |= m_blittercmdram[offset + 2] << 8;
+				m_hud_p2score |= m_blittercmdram[offset + 3] << 0;
+				redraw_hud();
 				break;
 			}
 			case 0x18:
 			{
 				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (top score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				m_hud_topscore =  m_blittercmdram[offset + 1] << 16;
+				m_hud_topscore |= m_blittercmdram[offset + 2] << 8;
+				m_hud_topscore |= m_blittercmdram[offset + 3] << 0;
+				redraw_hud();
 				break;
 			}
 			case 0x1c:
 			{
 				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (timer draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				m_hud_timer =  m_blittercmdram[offset + 1] << 8;
+				m_hud_timer |= m_blittercmdram[offset + 2] << 0;
+				redraw_hud();
 				break;
 			}
 			case 0x20:
 			{
 				// this is triggered with 0x01 and 0x02, the counter display is meant to flash between 2 states like in the original
 				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (floor counter draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				m_hud_floorcount = m_blittercmdram[offset + 1];
+				m_hud_floorcount_state = data;
+				redraw_hud();
 				break;
 			}
 			case 0x24:
 			{
 				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (lives counter draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				m_hud_lives = m_blittercmdram[offset + 1];
+				redraw_hud();
 				break;
 			}
 			case 0x28:
 			{
 				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (player energy draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				m_hud_player_energy = m_blittercmdram[offset + 1];
+				redraw_hud();
 				break;
 			}
 			case 0x2c:
 			{
 				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (boss energy draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				m_hud_boss_energy = m_blittercmdram[offset + 1];
+				redraw_hud();
 				break;
 			}
 			}
