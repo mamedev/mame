@@ -292,6 +292,15 @@ license:CC0-1.0
 		</element>
 
 
+		<element name="lamp23" ref="ladder">
+			<bounds x="50" y="520" width="45" height="10" />
+		</element>
+
+		<element name="lamp22" ref="ladder">
+			<bounds x="390" y="520" width="45" height="10" />
+		</element>
+
+
 		<element name="disc02" ref="disk_1symbol">
 			<bounds x="185" y="185" width="120" height="120" />
 		</element>
