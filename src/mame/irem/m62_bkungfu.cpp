@@ -140,8 +140,9 @@ private:
 	void bkungfu_blitter_draw_text_inner(uint16_t blitterromptr);
 	void bkungfu_blitter_draw_text();
 	void bkungfu_blitter_clear_tilemap();
-	void bkungfu_blitter_set_number_w(int x, int y, uint8_t num);
-	void bkungfu_blitter_set_player_energy_w(int x, int y, uint8_t num, bool is_boss);
+	void bkungfu_blitter_set_number(int x, int y, uint8_t num);
+	void bkungfu_blitter_set_player_energy(int x, int y, uint8_t num, bool is_boss);
+	void bkungfu_blitter_set_floor_state(int which, int state);
 	void bkungfu_blitter_draw_lifebar(int xbase, int ybase, uint8_t energy, bool is_boss);
 	void redraw_hud();
 
@@ -338,15 +339,25 @@ void m62_bkungfu_state::machine_reset()
 }
 
 
+void m62_bkungfu_state::bkungfu_blitter_set_floor_state(int which, int state)
+{
+	const int y = 3;
+	const int x = 0x20 + which * 2;
 
-void m62_bkungfu_state::bkungfu_blitter_set_number_w(int x, int y, uint8_t num)
+	int position = (y * 0x40) + x; // 0x40 tiles per line
+	position <<= 1; // 2 bytes per entry in tilemap
+	bkungfu_blitter_tilemap_w(position, state ? 0xd5 : 0xd6);
+}
+
+
+void m62_bkungfu_state::bkungfu_blitter_set_number(int x, int y, uint8_t num)
 {
 	int position = (y * 0x40) + x; // 0x40 tiles per line
 	position <<= 1; // 2 bytes per entry in tilemap
 	bkungfu_blitter_tilemap_w(position, (num & 0xf) + 0x30);
 }
 
-void m62_bkungfu_state::bkungfu_blitter_set_player_energy_w(int x, int y, uint8_t num, bool is_boss)
+void m62_bkungfu_state::bkungfu_blitter_set_player_energy(int x, int y, uint8_t num, bool is_boss)
 {
 	if (num > 8)
 		return;
@@ -377,19 +388,19 @@ void m62_bkungfu_state::bkungfu_blitter_draw_lifebar(int xbase, int ybase, uint8
 	while (segment < num8segments)
 	{
 		// draw the full bar parts
-		bkungfu_blitter_set_player_energy_w(xbase + segment, ybase, 8, is_boss);
+		bkungfu_blitter_set_player_energy(xbase + segment, ybase, 8, is_boss);
 		segment++;
 	}
 	if (segment != 8)
 	{
 		// draw the partial bar parts
-		bkungfu_blitter_set_player_energy_w(xbase + segment, ybase, energy & 0x7, is_boss);
+		bkungfu_blitter_set_player_energy(xbase + segment, ybase, energy & 0x7, is_boss);
 		segment++;
 	}
 	while (segment < 8)
 	{
 		// draw the empty bar parts
-		bkungfu_blitter_set_player_energy_w(xbase + segment, ybase, 0, is_boss);
+		bkungfu_blitter_set_player_energy(xbase + segment, ybase, 0, is_boss);
 		segment++;
 	}
 }
@@ -400,33 +411,33 @@ void m62_bkungfu_state::redraw_hud()
 	bkungfu_blitter_draw_text_inner(0x140);
 
 	// update the dynamic parts of the layout
-	bkungfu_blitter_set_number_w(0x25, 0x05, ((m_hud_timer >> 8) & 0xf0) >> 4);
-	bkungfu_blitter_set_number_w(0x26, 0x05, ((m_hud_timer >> 8) & 0x0f));
-	bkungfu_blitter_set_number_w(0x27, 0x05, ((m_hud_timer >> 0) & 0xf0) >> 4);
-	bkungfu_blitter_set_number_w(0x28, 0x05, ((m_hud_timer >> 0) & 0x0f));
+	bkungfu_blitter_set_number(0x25, 0x05, ((m_hud_timer >> 8) & 0xf0) >> 4);
+	bkungfu_blitter_set_number(0x26, 0x05, ((m_hud_timer >> 8) & 0x0f));
+	bkungfu_blitter_set_number(0x27, 0x05, ((m_hud_timer >> 0) & 0xf0) >> 4);
+	bkungfu_blitter_set_number(0x28, 0x05, ((m_hud_timer >> 0) & 0x0f));
 
-	bkungfu_blitter_set_number_w(0x2d, 0x05, ((m_hud_lives >> 0) & 0x0f));
+	bkungfu_blitter_set_number(0x2d, 0x05, ((m_hud_lives >> 0) & 0x0f));
 
-	bkungfu_blitter_set_number_w(0x14, 0x00, ((m_hud_p1score >> 16) & 0xf0) >> 4);
-	bkungfu_blitter_set_number_w(0x15, 0x00, ((m_hud_p1score >> 16) & 0x0f));
-	bkungfu_blitter_set_number_w(0x16, 0x00, ((m_hud_p1score >> 8) & 0xf0) >> 4);
-	bkungfu_blitter_set_number_w(0x17, 0x00, ((m_hud_p1score >> 8) & 0x0f));
-	bkungfu_blitter_set_number_w(0x18, 0x00, ((m_hud_p1score >> 0) & 0xf0) >> 4);
-	bkungfu_blitter_set_number_w(0x19, 0x00, ((m_hud_p1score >> 0) & 0x0f));
+	bkungfu_blitter_set_number(0x14, 0x00, ((m_hud_p1score >> 16) & 0xf0) >> 4);
+	bkungfu_blitter_set_number(0x15, 0x00, ((m_hud_p1score >> 16) & 0x0f));
+	bkungfu_blitter_set_number(0x16, 0x00, ((m_hud_p1score >> 8) & 0xf0) >> 4);
+	bkungfu_blitter_set_number(0x17, 0x00, ((m_hud_p1score >> 8) & 0x0f));
+	bkungfu_blitter_set_number(0x18, 0x00, ((m_hud_p1score >> 0) & 0xf0) >> 4);
+	bkungfu_blitter_set_number(0x19, 0x00, ((m_hud_p1score >> 0) & 0x0f));
 
-	bkungfu_blitter_set_number_w(0x1f, 0x00, ((m_hud_topscore >> 16) & 0xf0) >> 4);
-	bkungfu_blitter_set_number_w(0x20, 0x00, ((m_hud_topscore >> 16) & 0x0f));
-	bkungfu_blitter_set_number_w(0x21, 0x00, ((m_hud_topscore >> 8) & 0xf0) >> 4);
-	bkungfu_blitter_set_number_w(0x22, 0x00, ((m_hud_topscore >> 8) & 0x0f));
-	bkungfu_blitter_set_number_w(0x23, 0x00, ((m_hud_topscore >> 0) & 0xf0) >> 4);
-	bkungfu_blitter_set_number_w(0x24, 0x00, ((m_hud_topscore >> 0) & 0x0f));
+	bkungfu_blitter_set_number(0x1f, 0x00, ((m_hud_topscore >> 16) & 0xf0) >> 4);
+	bkungfu_blitter_set_number(0x20, 0x00, ((m_hud_topscore >> 16) & 0x0f));
+	bkungfu_blitter_set_number(0x21, 0x00, ((m_hud_topscore >> 8) & 0xf0) >> 4);
+	bkungfu_blitter_set_number(0x22, 0x00, ((m_hud_topscore >> 8) & 0x0f));
+	bkungfu_blitter_set_number(0x23, 0x00, ((m_hud_topscore >> 0) & 0xf0) >> 4);
+	bkungfu_blitter_set_number(0x24, 0x00, ((m_hud_topscore >> 0) & 0x0f));
 
-	bkungfu_blitter_set_number_w(0x29, 0x00, ((m_hud_p2score >> 16) & 0xf0) >> 4);
-	bkungfu_blitter_set_number_w(0x2a, 0x00, ((m_hud_p2score >> 16) & 0x0f));
-	bkungfu_blitter_set_number_w(0x2b, 0x00, ((m_hud_p2score >> 8) & 0xf0) >> 4);
-	bkungfu_blitter_set_number_w(0x2c, 0x00, ((m_hud_p2score >> 8) & 0x0f));
-	bkungfu_blitter_set_number_w(0x2d, 0x00, ((m_hud_p2score >> 0) & 0xf0) >> 4);
-	bkungfu_blitter_set_number_w(0x2e, 0x00, ((m_hud_p2score >> 0) & 0x0f));
+	bkungfu_blitter_set_number(0x29, 0x00, ((m_hud_p2score >> 16) & 0xf0) >> 4);
+	bkungfu_blitter_set_number(0x2a, 0x00, ((m_hud_p2score >> 16) & 0x0f));
+	bkungfu_blitter_set_number(0x2b, 0x00, ((m_hud_p2score >> 8) & 0xf0) >> 4);
+	bkungfu_blitter_set_number(0x2c, 0x00, ((m_hud_p2score >> 8) & 0x0f));
+	bkungfu_blitter_set_number(0x2d, 0x00, ((m_hud_p2score >> 0) & 0xf0) >> 4);
+	bkungfu_blitter_set_number(0x2e, 0x00, ((m_hud_p2score >> 0) & 0x0f));
 
 	if (m_hud_player_energy <= 0x40)
 	{
@@ -438,11 +449,20 @@ void m62_bkungfu_state::redraw_hud()
 		bkungfu_blitter_draw_lifebar(0x17, 0x4, m_hud_boss_energy, true);
 	}
 
-	// need to draw the current floor counter state using
-	//
-	// m_hud_floorcount and m_hud_floorcount_state
-	//
-	// which is more complex as it isn't a simple number or bar
+	for (int i = 0; i < 8; i++)
+	{
+		int numcoloured = m_hud_floorcount;
+
+		// uses this to flash the current floor counter dot
+		if (m_hud_floorcount_state == 0x02)
+			numcoloured--;
+
+		if (i <= numcoloured)
+			bkungfu_blitter_set_floor_state(i, 1);
+		else
+			bkungfu_blitter_set_floor_state(i, 0);
+
+	}
 }
 
 void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
@@ -542,7 +562,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// and before animated level elements at the start of later stages
 
 			// writes to param offsets 1/2 (same value for each) before this command
-			// uses values of 85, 84, 83, 86 (and 90 when the final title appears) on the title screen
+			// uses values of 85, 84, 83, 86 (then sits on 90 at the end of the sequence) on the title screen
 			//
 			// values 8b, 8c, 8d, 8e, 8f are used for the door on the 4th level (5 frames of animation)
 			// values 80, 81 are used for the trapdoor on the 5th level (2 frames of animation)
