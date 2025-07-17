@@ -135,6 +135,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
 	DECLARE_VIDEO_START(bkungfu);
 
+	void bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data);
 	void bkungfu_blitter_draw_text_highscores();
 	void bkungfu_blitter_draw_text_inner(uint16_t blitterromptr);
 	void bkungfu_blitter_draw_text();
@@ -257,8 +258,8 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr)
 		{
 			uint16_t position = (m_blittercmdram[0x003] << 8) | m_blittercmdram[0x002];
 
-			m_bkungfu_tileram[(position) & 0xfff] = blitdat;
-			m_bkungfu_tileram[(position + 1) & 0xfff] = m_blittercmdram[0x004];
+			bkungfu_blitter_tilemap_w((position) & 0xfff, blitdat);
+			bkungfu_blitter_tilemap_w((position + 1) & 0xfff, m_blittercmdram[0x004]);
 
 			// move along to the next character, wrapping at the end of a line
 			// otherwise Game Over text will sometimes get split across lines due to crossing the right edge
@@ -287,9 +288,15 @@ void m62_bkungfu_state::bkungfu_blitter_clear_tilemap()
 
 	for (int position = 0; position < 0x1000; position += 2)
 	{
-		m_bkungfu_tileram[(position) & 0xfff] = m_blittercmdram[0x002];
-		m_bkungfu_tileram[(position + 1) & 0xfff] = m_blittercmdram[0x001];
+		bkungfu_blitter_tilemap_w((position) & 0xfff, m_blittercmdram[0x002]);
+		bkungfu_blitter_tilemap_w((position + 1) & 0xfff, m_blittercmdram[0x001]);
 	}
+}
+
+void m62_bkungfu_state::bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data)
+{
+	m_bkungfu_tileram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 void m62_bkungfu_state::machine_start()
@@ -336,7 +343,7 @@ void m62_bkungfu_state::bkungfu_blitter_set_number_w(int x, int y, uint8_t num)
 {
 	int position = (y * 0x40) + x; // 0x40 tiles per line
 	position <<= 1; // 2 bytes per entry in tilemap
-	m_bkungfu_tileram[position] = (num & 0xf) + 0x30;
+	bkungfu_blitter_tilemap_w(position, (num & 0xf) + 0x30);
 }
 
 void m62_bkungfu_state::bkungfu_blitter_set_player_energy_w(int x, int y, uint8_t num, bool is_boss)
@@ -351,9 +358,9 @@ void m62_bkungfu_state::bkungfu_blitter_set_player_energy_w(int x, int y, uint8_
 	position <<= 1; // 2 bytes per entry in tilemap
 
 	if (is_boss)
-		m_bkungfu_tileram[position] = energy_table_boss[num];
+		bkungfu_blitter_tilemap_w(position, energy_table_boss[num]);
 	else
-		m_bkungfu_tileram[position] = energy_table_player[num];
+		bkungfu_blitter_tilemap_w(position, energy_table_player[num]);
 }
 
 void m62_bkungfu_state::bkungfu_blitter_draw_lifebar(int xbase, int ybase, uint8_t energy, bool is_boss)
@@ -698,9 +705,6 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			logerror("%s: bkungfu_blitter_w offset: %04x data: %02x\n", machine().describe_context(), offset, data);
 		}
 	}
-
-	// for now mark the whole tilemap dirty after a blit operation
-	m_bg_tilemap->mark_all_dirty();
 }
 
 
