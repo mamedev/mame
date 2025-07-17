@@ -6,10 +6,10 @@
 #pragma once
 
 
-#define K05324X_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority)
+#define K053244_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority)
 
 
-class k05324x_device : public device_t, public device_gfx_interface
+class k053244_device : public device_t, public device_gfx_interface
 {
 	static const gfx_layout spritelayout;
 	static const gfx_layout spritelayout_6bpp;
@@ -19,11 +19,11 @@ class k05324x_device : public device_t, public device_gfx_interface
 public:
 	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority)>;
 
-	k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k053244_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
 	void set_bpp(int bpp);
-	template <typename... T> void set_sprite_callback(T &&... args) { m_k05324x_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_sprite_callback(T &&... args) { m_k053244_cb.set(std::forward<T>(args)...); }
 	void set_offsets(int dx, int dy) { m_dx = dx; m_dy = dy; }
 
 	u16 k053245_word_r(offs_t offset);
@@ -50,7 +50,7 @@ private:
 	required_region_ptr<uint8_t> m_sprite_rom;
 
 	int m_dx, m_dy;
-	sprite_delegate m_k05324x_cb;
+	sprite_delegate m_k053244_cb;
 
 	uint8_t  m_regs[0x10];    // 053244
 	int      m_rombank;       // 053244
@@ -59,7 +59,7 @@ private:
 };
 
 
-DECLARE_DEVICE_TYPE(K053244, k05324x_device)
+DECLARE_DEVICE_TYPE(K053244, k053244_device)
 static auto &K053245 = K053244;
 
 #endif // MAME_KONAMI_K053244_K053245_H

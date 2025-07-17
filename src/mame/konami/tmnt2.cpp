@@ -157,7 +157,7 @@ protected:
 	optional_device<k054539_device> m_k054539;
 	required_device<k052109_device> m_k052109;
 	optional_device<k051960_device> m_k051960;
-	optional_device<k05324x_device> m_k053245;
+	optional_device<k053244_device> m_k053245;
 	required_device<k053251_device> m_k053251;
 	optional_device<k053936_device> m_k053936;
 	optional_device<k054000_device> m_k054000;
@@ -208,8 +208,8 @@ protected:
 	void tmnt2_put_word(uint32_t addr, uint16_t data);
 	K051960_CB_MEMBER(punkshot_sprite_callback);
 	K051960_CB_MEMBER(thndrx2_sprite_callback);
-	K05324X_CB_MEMBER(lgtnfght_sprite_callback);
-	K05324X_CB_MEMBER(blswhstl_sprite_callback);
+	K053244_CB_MEMBER(lgtnfght_sprite_callback);
+	K053244_CB_MEMBER(blswhstl_sprite_callback);
 	K052109_CB_MEMBER(tmnt_tile_callback);
 	K052109_CB_MEMBER(blswhstl_tile_callback);
 
@@ -278,7 +278,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(prmrsocr_get_roz_tile_info);
 	DECLARE_VIDEO_START(prmrsocr);
-	K05324X_CB_MEMBER(prmrsocr_sprite_callback);
+	K053244_CB_MEMBER(prmrsocr_sprite_callback);
 
 	void prmrsocr_audio_map(address_map &map) ATTR_COLD;
 	void prmrsocr_main_map(address_map &map) ATTR_COLD;
@@ -714,7 +714,7 @@ K051960_CB_MEMBER(tmnt2_state::thndrx2_sprite_callback)
 
 ***************************************************************************/
 
-K05324X_CB_MEMBER(tmnt2_state::lgtnfght_sprite_callback)
+K053244_CB_MEMBER(tmnt2_state::lgtnfght_sprite_callback)
 {
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
@@ -729,7 +729,7 @@ K05324X_CB_MEMBER(tmnt2_state::lgtnfght_sprite_callback)
 	*color = m_sprite_colorbase + (*color & 0x1f);
 }
 
-K05324X_CB_MEMBER(tmnt2_state::blswhstl_sprite_callback)
+K053244_CB_MEMBER(tmnt2_state::blswhstl_sprite_callback)
 {
 #if 0
 if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x20)) *color = machine().rand();
@@ -749,7 +749,7 @@ if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = machi
 	*color = m_sprite_colorbase + (*color & 0x1f);
 }
 
-K05324X_CB_MEMBER(prmrsocr_state::prmrsocr_sprite_callback)
+K053244_CB_MEMBER(prmrsocr_state::prmrsocr_sprite_callback)
 {
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
@@ -1332,7 +1332,7 @@ void glfgreat_state::glfgreat_main_map(address_map &map)
 	map(0x108000, 0x108fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x10c000, 0x10cfff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));  /* 053936? */
 	map(0x110000, 0x11001f).w(FUNC(glfgreat_state::k053244_word_noA1_w));              /* duplicate! */
-	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
+	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
 	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x120000, 0x120001).portr("P1_P2");
@@ -1356,7 +1356,7 @@ void prmrsocr_state::prmrsocr_main_map(address_map &map)
 	map(0x108000, 0x108fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x10c000, 0x10cfff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));
 	map(0x110000, 0x11001f).w(FUNC(prmrsocr_state::k053244_word_noA1_w));              /* duplicate! */
-	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
+	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
 	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x120000, 0x120001).portr("P1_COINS");

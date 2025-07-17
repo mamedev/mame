@@ -297,7 +297,7 @@ private:
 	required_device<cpu_device> m_soundcpu;
 	required_device<address_map_bank_device> m_bank4000;
 	required_device<k056832_device> m_k056832;
-	required_device<k05324x_device> m_k053244;
+	required_device<k053244_device> m_k053244;
 	required_device<k054321_device> m_k054321;
 	required_device<palette_device> m_palette;
 
@@ -313,7 +313,7 @@ private:
 	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lethalen_interrupt);
-	K05324X_CB_MEMBER(sprite_callback);
+	K053244_CB_MEMBER(sprite_callback);
 	K056832_CB_MEMBER(tile_callback);
 	void bank4000_map(address_map &map) ATTR_COLD;
 	void le_main(address_map &map) ATTR_COLD;
@@ -321,7 +321,7 @@ private:
 };
 
 
-K05324X_CB_MEMBER(lethal_state::sprite_callback)
+K053244_CB_MEMBER(lethal_state::sprite_callback)
 {
 	int pri = (*color & 0xfff0);
 	*color = *color & 0x000f;
@@ -523,10 +523,10 @@ void lethal_state::le_main(address_map &map)
 void lethal_state::bank4000_map(address_map &map)
 {
 	// VRD = 0 or 1, CBNK = 0
-	map(0x0840, 0x084f).mirror(0x8000).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
+	map(0x0840, 0x084f).mirror(0x8000).rw(m_k053244, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w));
 	map(0x0880, 0x089f).mirror(0x8000).m("k054000", FUNC(k054000_device::map));
 	map(0x08c0, 0x08cf).m(m_k054321, FUNC(k054321_device::main_map));
-	map(0x1000, 0x17ff).mirror(0x8000).rw(m_k053244, FUNC(k05324x_device::k053245_r), FUNC(k05324x_device::k053245_w));
+	map(0x1000, 0x17ff).mirror(0x8000).rw(m_k053244, FUNC(k053244_device::k053245_r), FUNC(k053244_device::k053245_w));
 
 	// VRD = 0, CBNK = 0
 	map(0x2000, 0x27ff).rw(m_k056832, FUNC(k056832_device::ram_code_lo_r), FUNC(k056832_device::ram_code_lo_w));
