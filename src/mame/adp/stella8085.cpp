@@ -74,6 +74,7 @@ private:
 	output_finder<8> m_digits;
 	output_finder<64> m_lamps;
 	required_device<beep_device> m_beep;
+	emu_timer *m_sound_timer;
 
 	void program_map(address_map &map) ATTR_COLD;
 	void large_program_map(address_map &map) ATTR_COLD;
@@ -92,6 +93,7 @@ private:
 	void sounddev(offs_t offset, u8 data) ATTR_COLD;
 	void makesound(uint8_t channel, uint8_t length);
 	int soundfreq(uint8_t channel);
+	TIMER_CALLBACK_MEMBER(sound_stop);
 
 };
 
@@ -99,6 +101,9 @@ void stella8085_state::machine_start()
 {
 	m_digits.resolve();
 	m_lamps.resolve();
+
+	m_sound_timer = timer_alloc(FUNC(stella8085_state::sound_stop), this);
+
 	save_item(NAME(m_digit));
 }
 
@@ -124,10 +129,10 @@ void stella8085_state::excellent_program_map(address_map &map)
 
 void stella8085_state::rtc62421_io_map(address_map &map)
 {
-	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
-	map(0x70, 0x73).w(FUNC(stella8085_state::sounddev));
-	// EXROM??
+	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write)); //Y5
+	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write)); //Y6
+	map(0x70, 0x7f).w(FUNC(stella8085_state::sounddev));
+	// Y8 EXROM
 	map(0x90, 0x9f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
 
 }
@@ -137,7 +142,7 @@ void stella8085_state::mc146818_io_map(address_map &map)
 	// TODO: map RTC
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
-	map(0x70, 0x73).w(FUNC(stella8085_state::sounddev));
+	map(0x70, 0x72).w(FUNC(stella8085_state::sounddev));
 }
 
 /*********************************************
@@ -148,6 +153,11 @@ void stella8085_state::mc146818_io_map(address_map &map)
 void stella8085_state::kbd_sl_w(u8 data)
 {
 	m_kbd_sl = data;
+
+	if ( BIT(m_dsw->read(),0))
+		m_maincpu->set_input_line(I8085_RST75_LINE, BIT(data,3) ? ASSERT_LINE : CLEAR_LINE);
+	else
+		m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
 u8 stella8085_state::kbd_rl_r()
@@ -212,9 +222,13 @@ INPUT_CHANGED_MEMBER( stella8085_state::handle_dip )
 {
 	uint8_t data = m_dsw->read();
 	LOG("RST75 %02x\n", BIT(data,0));
-	m_maincpu->set_input_line(I8085_RST75_LINE, BIT(data,0) ? ASSERT_LINE : CLEAR_LINE);
 	LOG("RST55 %02x\n", BIT(data,2));
 	m_maincpu->set_input_line(I8085_RST55_LINE, BIT(data,2) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER( stella8085_state::sound_stop )
+{
+	m_beep->set_state(0);
 }
 
 void stella8085_state::rst65_w(u8 state)
@@ -225,14 +239,23 @@ void stella8085_state::rst65_w(u8 state)
 
 void stella8085_state::sounddev(offs_t offset, u8 data)
 {
-	LOG("beep beep at %02x data %02x\n", offset, data);
 	makesound(offset & 0x0F,data & 0xF0);
 }
 
 void stella8085_state::makesound(uint8_t channel, uint8_t length)
 {
 	int sfrq = soundfreq(channel);
+	LOG("beep beep at %02x for %02x ms\n", sfrq, length);
 	m_beep->set_clock(sfrq);
+	if (length > 0)
+	{
+		m_beep->set_state(1);
+		m_sound_timer->adjust(attotime::from_msec(length), 0);
+	}
+	else
+	{
+		m_beep->set_state(0);
+	}
 }
 
 int stella8085_state::soundfreq(uint8_t channel)
@@ -250,7 +273,7 @@ int stella8085_state::soundfreq(uint8_t channel)
 	const int a8sharp = int_clock / 268;
 	const int b8 = int_clock / 253;
 	const int c9 = int_clock / 239;
-	//const int c8 = int_clock / 478;
+	const int c8 = int_clock / 478; //unused?
 	switch (channel)
 	{
 		case 1:
@@ -278,7 +301,7 @@ int stella8085_state::soundfreq(uint8_t channel)
 		case 12:
 			return c8sharp;
 		default:
-			return 0;
+			return c8;
 	}
 }
 
