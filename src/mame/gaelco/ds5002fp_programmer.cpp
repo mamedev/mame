@@ -6,7 +6,36 @@ Small device for programming / reprogramming the DS5002 internal SRAM
 used by Gaelco (was it designed by Gaelco, or is this a standard device provided
 with the DS5002?)
 
-has a 68000 at 16Mhz and various other parts (TODO: list them)
+Two different PCB versions.
+
+One labeled "WR-1". This one had the PAL protected (no dump):
+     _____________________________________      _____________________________________
+  __|    Green LED->(_)(_)(_)<-Yellow LED |    |                                    |__
+ |                    Red LED             |    |     ___________________________       |
+ | ___   Xtal    ºººººººººººººººººººº     |    |    |                          |       |
+ ||  |  12 MHz                            |    |    | Motorola                 |       |
+ ||__|<- Button                <-EPROM socket  |    | MC68000P12               |       |
+ |               ºººººººººººººººººººº     |    |    |__________________________|       |
+ |      ___________                       |    |                                       |
+ |__   |PAL16R6ACN|                       |    |                                     __|
+    |_____________________________________|    |____________________________________|
+
+Another one labeled "WR-2". This one has a 32MHz xtal (instead of 12 MHz), an unknown
+chip with its Surface scratched out in the middle of the EPROM socket (the chips sets
+behind the EPROM once on the socket) and a MC68000P12F 16MHz instead of a MC68000P12.
+This one had the PAL unprotected (dumped).
+     _____________________________________      _____________________________________
+  __|    Green LED->(_)(_)(_)<-Yellow LED |    |                                    |__
+ |                    Red LED             |    |     ___________________________       |
+ | ___   Xtal    ºººººººººººººººººººº     |    |    |                          |       |
+ ||  |  32 MHz    _________               |    |    | Motorola                 |       |
+ ||__|<- Button  |_unknown_|    <-EPROM socket |    | MC68000P12F 16MHz        |       |
+ |               ºººººººººººººººººººº     |    |    |__________________________|       |
+ |      ___________                       |    |                                       |
+ |__   |PAL16R6ACN|                       |    |                                     __|
+    |_____________________________________|    |____________________________________|
+
+Both are silkcreened as "68K-DS5002"
 
 *******************************************************************************/
 
