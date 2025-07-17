@@ -136,8 +136,7 @@ private:
 	DECLARE_VIDEO_START(bkungfu);
 
 	void bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data);
-	void bkungfu_blitter_draw_text_highscores();
-	void bkungfu_blitter_draw_text_inner(uint16_t blitterromptr);
+	void bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, bool use_ram);
 	void bkungfu_blitter_draw_text();
 	void bkungfu_blitter_clear_tilemap();
 	void bkungfu_blitter_set_number(int x, int y, uint8_t num);
@@ -214,18 +213,7 @@ uint8_t m62_bkungfu_state::bkungfu_blitter_r(offs_t offset)
 	return m_blittercmdram[offset];
 }
 
-void m62_bkungfu_state::bkungfu_blitter_draw_text_highscores()
-{
-	if (!m_mcu_running)
-		return;
-
-	for (int i = 0x100; i <= 0x12d; i++)
-	{
-		logerror("high score data %02x\n", m_blittercmdram[i]);
-	}
-}
-
-void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr)
+void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, bool use_ram)
 {
 	// note, this may need to be adjusted, along with the overall tilemap size
 	// as it appears the tilemap might be 128 wide for this game
@@ -239,8 +227,20 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr)
 	if (!m_mcu_running)
 		return;
 
-	uint16_t data_address = m_blitterdatarom[blitterromptr] | (m_blitterdatarom[blitterromptr + 1] << 8);
-	const uint8_t* dataptr = m_blitterdatarom;
+	uint16_t data_address;
+	uint8_t* dataptr;
+
+	if (use_ram) // high score table is drawn from RAM
+	{
+		data_address = 0x100;
+		dataptr = m_blittercmdram;
+	}
+	else
+	{
+		data_address = m_blitterdatarom[blitterromptr] | (m_blitterdatarom[blitterromptr + 1] << 8);
+		dataptr = m_blitterdatarom;
+	}
+
 
 	uint8_t blitdat = dataptr[data_address++];
 	while (blitdat != 0x00)
@@ -280,7 +280,7 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr)
 void m62_bkungfu_state::bkungfu_blitter_draw_text()
 {
 	uint16_t blitterromptr = m_blittercmdram[0x001] * 2;
-	bkungfu_blitter_draw_text_inner(blitterromptr);
+	bkungfu_blitter_draw_text_inner(blitterromptr, false);
 }
 
 void m62_bkungfu_state::bkungfu_blitter_clear_tilemap()
@@ -433,7 +433,7 @@ void m62_bkungfu_state::bkungfu_blitter_draw_lifebar(int xbase, int ybase, uint8
 void m62_bkungfu_state::redraw_hud()
 {
 	// draw the static part of the layout
-	bkungfu_blitter_draw_text_inner(0x140);
+	bkungfu_blitter_draw_text_inner(0x140, false);
 
 	// update the dynamic parts of the layout
 	bkungfu_blitter_set_number(0x25, 0x05, ((m_hud_timer >> 8) & 0xf0) >> 4);
@@ -524,7 +524,15 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			uint8_t param2 = m_blittercmdram[0x002];
 
 			logerror("%s: Command %02x: blitter: draw highscores %02x %02x\n", machine().describe_context(), data, param1, param2);
-			bkungfu_blitter_draw_text_highscores();
+			bkungfu_blitter_draw_text_inner(-1, true);
+
+			// override the RAM data with 0xfe (task done flag) so this works for the next call
+			// (seems logical based on checks above) but works without it, and breaks if you do this?)
+			//	m_blittercmdram[0x102] = 0xfe;
+			//	m_blittercmdram[0x106] = 0xfe;
+			//	m_blittercmdram[0x118] = 0xfe;
+			//	m_blittercmdram[0x11c] = 0xfe;
+
 		}
 		else if (data == 0x10)
 		{
@@ -659,7 +667,6 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// encrypted area
 			//
 			// we draw the static HUD in command 0xa instead, as these likely just update parts of it
-			// bkungfu_blitter_draw_text_inner(0x140);
 
 			switch (select)
 			{
