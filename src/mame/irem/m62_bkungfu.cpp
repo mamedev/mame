@@ -144,6 +144,7 @@ private:
 	void bkungfu_blitter_set_player_energy(int x, int y, uint8_t num, bool is_boss);
 	void bkungfu_blitter_set_floor_state(int which, int state);
 	void bkungfu_blitter_draw_lifebar(int xbase, int ybase, uint8_t energy, bool is_boss);
+	void bkungfu_blitter_draw_credits_continue();
 	void redraw_hud();
 
 	// done this way so it can be viewed win the debugger with save state registration
@@ -357,6 +358,30 @@ void m62_bkungfu_state::bkungfu_blitter_set_number(int x, int y, uint8_t num)
 	bkungfu_blitter_tilemap_w(position, (num & 0xf) + 0x30);
 }
 
+void m62_bkungfu_state::bkungfu_blitter_draw_credits_continue()
+{
+	// draws a 2 digit number from a byte to a given location with given attribute
+	if (!m_mcu_running)
+		return;
+
+	uint16_t position = (m_blittercmdram[0x003] << 8) | m_blittercmdram[0x002];
+	uint8_t attr = m_blittercmdram[0x004];
+
+	int value = (m_blittercmdram[0x001] & 0xf0) >> 4;
+	value += 0x30;
+
+	bkungfu_blitter_tilemap_w((position) & 0xfff, value);
+	bkungfu_blitter_tilemap_w((position + 1) & 0xfff, attr);
+
+	position += 2;
+
+	value = m_blittercmdram[0x001] & 0x0f;
+	value += 0x30;
+
+	bkungfu_blitter_tilemap_w((position) & 0xfff, value);
+	bkungfu_blitter_tilemap_w((position + 1) & 0xfff, attr);
+}
+
 void m62_bkungfu_state::bkungfu_blitter_set_player_energy(int x, int y, uint8_t num, bool is_boss)
 {
 	if (num > 8)
@@ -503,10 +528,12 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 		}
 		else if (data == 0x10)
 		{
-			// displays the number of coins after 'CREDIT'
-			// write number of credits to param 0x01 and 0x1d to 0x04
+			// displays the number of coins after 'CREDIT' and the 'CONTINUE' counter
+			// writes position data(?) to 0x02 / 0x03
+			// write number of credits to param 0x01 and 0x1d (attribute?) to 0x04
 			uint8_t param = m_blittercmdram[0x001];
 			logerror("%s: Command %02x: blitter: draw number of coins %02x\n", machine().describe_context(), data, param);
+			bkungfu_blitter_draw_credits_continue();
 		}
 		else if (data == 0x08) // clear layer to fixed value
 		{
@@ -638,7 +665,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			{
 			case 0x10:
 			{
-				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (player 1 score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (player 1 score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
 
 				m_hud_p1score =  m_blittercmdram[offset + 1] << 16;
 				m_hud_p1score |= m_blittercmdram[offset + 2] << 8;
@@ -648,7 +675,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			}
 			case 0x14:
 			{
-				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (player 2 score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (player 2 score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
 
 				m_hud_p2score =  m_blittercmdram[offset + 1] << 16;
 				m_hud_p2score |= m_blittercmdram[offset + 2] << 8;
@@ -658,7 +685,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			}
 			case 0x18:
 			{
-				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (top score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (top score draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
 				m_hud_topscore =  m_blittercmdram[offset + 1] << 16;
 				m_hud_topscore |= m_blittercmdram[offset + 2] << 8;
 				m_hud_topscore |= m_blittercmdram[offset + 3] << 0;
@@ -667,7 +694,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			}
 			case 0x1c:
 			{
-				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (timer draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (timer draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
 				m_hud_timer =  m_blittercmdram[offset + 1] << 8;
 				m_hud_timer |= m_blittercmdram[offset + 2] << 0;
 				redraw_hud();
@@ -676,7 +703,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			case 0x20:
 			{
 				// this is triggered with 0x01 and 0x02, the counter display is meant to flash between 2 states like in the original
-				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (floor counter draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (floor counter draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
 				m_hud_floorcount = m_blittercmdram[offset + 1];
 				m_hud_floorcount_state = data;
 				redraw_hud();
@@ -684,21 +711,21 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			}
 			case 0x24:
 			{
-				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (lives counter draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (lives counter draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
 				m_hud_lives = m_blittercmdram[offset + 1];
 				redraw_hud();
 				break;
 			}
 			case 0x28:
 			{
-				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (player energy draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (player energy draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
 				m_hud_player_energy = m_blittercmdram[offset + 1];
 				redraw_hud();
 				break;
 			}
 			case 0x2c:
 			{
-				//logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (boss energy draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
+				logerror("%s: bkungfu_blitter_w offset: %04x data: %02x (boss energy draw %02x %02x %02x)\n", machine().describe_context(), offset, data, m_blittercmdram[offset+1], m_blittercmdram[offset+2], m_blittercmdram[offset+3]);
 				m_hud_boss_energy = m_blittercmdram[offset + 1];
 				redraw_hud();
 				break;
