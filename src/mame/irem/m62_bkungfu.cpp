@@ -100,6 +100,14 @@ so each of these blocks is 0x70 bytes long giving the following ranges
 
 data from 1aed - 7fff is not directly referenced by anything, so the tables above probably point to it
 
+when the levels are drawn they're drawn in 4 tile wide strips, from top to bottom, left to right
+each screen has 8 of these strips
+each level is 7 screens wide
+
+as the level structures above are each 0x70 bytes wide, this likely means that each screen takes up
+0x10 bytes of that structure, so 8x2 byte pointers to the later data structures, 1 for each strip
+
+several other games in m62.cpp also draw their backgrounds in 4 tile wide strips
 
 
 *******************************************************************************/
