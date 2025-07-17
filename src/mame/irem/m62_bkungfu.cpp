@@ -185,12 +185,12 @@ uint8_t m62_bkungfu_state::bkungfu_blitter_r(offs_t offset)
 	// 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c for the 'HUD' commands
 
 	// it also checks 0102, 0106, 0118, 011c before sending command 0x0c to draw high score data?
+	// we initialize these to 0xfe when the MCU is 'reset'
 
 	if (offset != 0)
 		logerror("%s: bkungfu_blitter_r %04x\n", machine().describe_context(), offset);
 
-	// for now always return 0xfe as it isn't clear how the high score drawing sets the flags
-	return 0xfe;// m_blittercmdram[offset];
+	return m_blittercmdram[offset];
 }
 
 void m62_bkungfu_state::bkungfu_blitter_draw_text_highscores()
@@ -206,6 +206,15 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_highscores()
 
 void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr)
 {
+	// note, this may need to be adjusted, along with the overall tilemap size
+	// as it appears the tilemap might be 128 wide for this game
+	// (or has 2 banks, the backgrounds are 7 screens wide, and the background draw
+	// commands are only sent at the start of a level)
+
+	const int tilemap_width = 64;
+	const int widthmask = (tilemap_width * 2) - 1;
+	//int tilemap_height = 32;
+
 	if (!m_mcu_running)
 		return;
 
@@ -234,7 +243,12 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr)
 			m_bkungfu_tileram[(position + 1) & 0xfff] = m_blittercmdram[0x004];
 			m_bg_tilemap->mark_tile_dirty((position & 0xfff) >> 1);
 
+			// move along to the next character, wrapping at the end of a line
+			// otherwise Game Over text will sometimes get split across lines due to crossing the right edge
+			int vposition = (position & ~widthmask);
 			position += 2;
+			position = vposition | (position & widthmask);
+
 			m_blittercmdram[0x002] = position & 0xff;
 			m_blittercmdram[0x003] = (position & 0xff00) >> 8;
 		}
@@ -394,6 +408,25 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// probably tells the MCU to start running
 			m_mcu_running = 1;
 			logerror("%s: Command %02x: blitter: start up\n", machine().describe_context(), data);
+
+			// set the command response addresses to ready / done
+			// (the high score table commands check their status before executing anything)
+
+			// HUD Status
+			m_blittercmdram[0x010] = 0xfe;
+			m_blittercmdram[0x014] = 0xfe;
+			m_blittercmdram[0x018] = 0xfe;
+			m_blittercmdram[0x01c] = 0xfe;
+			m_blittercmdram[0x020] = 0xfe;
+			m_blittercmdram[0x024] = 0xfe;
+			m_blittercmdram[0x028] = 0xfe;
+			m_blittercmdram[0x02c] = 0xfe;
+
+			// High Score Table
+			m_blittercmdram[0x102] = 0xfe;
+			m_blittercmdram[0x106] = 0xfe;
+			m_blittercmdram[0x118] = 0xfe;
+			m_blittercmdram[0x11c] = 0xfe;
 		}
 		else
 		{
@@ -505,6 +538,8 @@ void m62_bkungfu_state::mem_map(address_map& map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc0ff).ram().share("spriteram");
+	map(0xc100, 0xc1ff).ram();
+
 	map(0xc800, 0xcfff).rw(FUNC(m62_bkungfu_state::bkungfu_blitter_r), FUNC(m62_bkungfu_state::bkungfu_blitter_w));
 	map(0xe000, 0xefff).ram();
 }
