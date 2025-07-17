@@ -409,6 +409,7 @@ void specpls3_state::spectrum_plus2(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &specpls3_state::plus3_mem);
 	m_maincpu->set_addrmap(AS_IO, &specpls3_state::plus3_io);
+	m_maincpu->refresh_cb().remove();
 	m_maincpu->nomreq_cb().remove();
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(specpls3);

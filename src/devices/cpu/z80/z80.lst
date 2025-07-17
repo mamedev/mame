@@ -46,6 +46,7 @@ macro   wm16_sp %dd
 
 macro   rop
 	m_m1_cycles-2 !! TDAT8 = opcode_read();
+	// TODO based on ULA contention analyzes refresh must send already incremented R.
 	if (refresh_en)
 		m_refresh_cb((I << 8) | (R2 & 0x80) | (R & 0x7f), 0x00, 0xff);
 	+ 2

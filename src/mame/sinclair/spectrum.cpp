@@ -294,7 +294,8 @@ SamRam
 
 uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 {
-	if (is_contended(offset)) content_early();
+	m_is_m1_rd_contended = false;
+	if (!machine().side_effects_disabled() && is_contended(offset)) content_early();
 
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
@@ -308,7 +309,7 @@ uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 
 uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 {
-	if (is_contended(offset)) content_early();
+	if (!machine().side_effects_disabled() && is_contended(offset)) content_early();
 
 	m_exp->pre_data_fetch(offset);
 	uint8_t retval = m_specmem->read8(offset);
@@ -372,8 +373,11 @@ void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 /* DJR: Spectrum+ keys added */
 uint8_t spectrum_state::spectrum_ula_r(offs_t offset)
 {
-	if (is_contended(offset)) content_early();
-	content_early(1);
+	if (!machine().side_effects_disabled())
+	{
+		if (is_contended(offset)) content_early();
+		content_early(1);
+	}
 
 	int lines = offset >> 8;
 	int data = 0xff;
@@ -462,7 +466,7 @@ void spectrum_state::spectrum_port_w(offs_t offset, uint8_t data)
 
 uint8_t spectrum_state::spectrum_port_r(offs_t offset)
 {
-	if (is_contended(offset))
+	if (!machine().side_effects_disabled() && is_contended(offset))
 	{
 		content_early();
 		content_late();
@@ -686,6 +690,7 @@ void spectrum_state::machine_start()
 {
 	save_item(NAME(m_port_fe_data));
 	save_item(NAME(m_int_at));
+	save_item(NAME(m_is_m1_rd_contended));
 
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 	m_maincpu->space(AS_IO).specific(m_io);
@@ -698,6 +703,7 @@ void spectrum_state::machine_reset()
 	m_port_fe_data = -1;
 	m_port_7ffd_data = -1;
 	m_port_1ffd_data = -1;
+	m_is_m1_rd_contended = false;
 	m_irq_on_timer->adjust(attotime::never);
 	m_irq_off_timer->adjust(attotime::never);
 }
@@ -744,6 +750,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_maincpu->set_memory_map(&spectrum_state::spectrum_data);
 	m_maincpu->set_io_map(&spectrum_state::spectrum_io);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
+	m_maincpu->refresh_cb().set(FUNC(spectrum_state::spectrum_refresh_w));
 	m_maincpu->nomreq_cb().set(FUNC(spectrum_state::spectrum_nomreq));
 	m_maincpu->busack_cb().set("dma", FUNC(dma_slot_device::bai_w));
 

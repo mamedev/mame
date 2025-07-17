@@ -174,7 +174,8 @@ void spectrum_128_state::video_start()
 
 uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 {
-	if (is_contended(offset)) content_early();
+	m_is_m1_rd_contended = false;
+	if (!machine().side_effects_disabled() && is_contended(offset)) content_early();
 
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
@@ -213,7 +214,7 @@ template void spectrum_128_state::spectrum_128_ram_w<0>(offs_t offset, u8 data);
 template <u8 Bank> u8 spectrum_128_state::spectrum_128_ram_r(offs_t offset)
 {
 	u16 addr = 0x4000 * Bank + offset;
-	if (is_contended(addr)) content_early();
+	if (!machine().side_effects_disabled() && is_contended(addr)) content_early();
 
 	return ((u8*)m_bank_ram[Bank]->base())[offset];
 }
@@ -254,7 +255,7 @@ void spectrum_128_state::spectrum_128_update_memory()
 
 uint8_t spectrum_128_state::spectrum_port_r(offs_t offset)
 {
-	if (is_contended(offset))
+	if (!machine().side_effects_disabled() && is_contended(offset))
 	{
 		content_early();
 		content_late();
@@ -416,6 +417,7 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	m_maincpu->set_io_map(&spectrum_128_state::spectrum_128_io);
 	m_maincpu->set_m1_map(&spectrum_128_state::spectrum_128_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_128_state::spec_interrupt));
+	m_maincpu->refresh_cb().set(FUNC(spectrum_128_state::spectrum_refresh_w));
 	m_maincpu->nomreq_cb().set(FUNC(spectrum_128_state::spectrum_nomreq));
 	m_maincpu->busack_cb().set("dma", FUNC(dma_slot_device::bai_w));
 
