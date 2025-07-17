@@ -1264,7 +1264,7 @@ void macpb030_state::macpb140(machine_config &config)
 	m_pmu->ad_in<0>().set(FUNC(macpb030_state::brightness_r));
 	m_pmu->ad_in<1>().set(FUNC(macpb030_state::battery_r));
 	m_pmu->ad_in<5>().set(FUNC(macpb030_state::battery2_r));
-	m_pmu->ad_in<8>().set(FUNC(macpb030_state::battery3_r));
+	m_pmu->ad_in<7>().set(FUNC(macpb030_state::battery3_r));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.15);
