@@ -207,8 +207,6 @@ K051960_CB_MEMBER(devstors_state::sprite_callback)
 
 uint32_t mainevt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
 	screen.priority().fill(0, cliprect);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 1, 2); // low priority part of layer
@@ -221,8 +219,6 @@ uint32_t mainevt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 uint32_t devstors_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
 	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);

@@ -127,8 +127,6 @@ K051960_CB_MEMBER(aliens_state::sprite_callback)
 
 uint32_t aliens_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
 	screen.priority().fill(0, cliprect);
 	// The background color is always from layer 1
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);

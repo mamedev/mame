@@ -52,7 +52,7 @@ public:
 
 	void set_rmrd_line(int state) { m_rmrd_line = state; }
 	int get_rmrd_line() { return m_rmrd_line; }
-	void tilemap_update();
+	void update_scroll();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags = 0, uint8_t priority = 0, uint8_t priority_mask = 0xff);
 	void mark_tilemap_dirty(uint8_t tmap_num);
 

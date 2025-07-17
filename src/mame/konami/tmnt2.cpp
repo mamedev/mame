@@ -1025,8 +1025,6 @@ uint32_t tmnt2_state::screen_update_punkshot(screen_device &screen, bitmap_ind16
 			m_k052109->mark_tilemap_dirty(i);
 	}
 
-	m_k052109->tilemap_update();
-
 	// sort layers and draw
 	for (int i = 0; i < 3; i++)
 	{
@@ -1061,8 +1059,6 @@ uint32_t tmnt2_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16
 		if (m_layer_colorbase[i] != prev_colorbase)
 			m_k052109->mark_tilemap_dirty(i);
 	}
-
-	m_k052109->tilemap_update();
 
 	// sort layers and draw
 	for (int i = 0; i < 3; i++)
@@ -1112,8 +1108,6 @@ uint32_t tmnt2_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16
 		if (m_layer_colorbase[i] != prev_colorbase)
 			m_k052109->mark_tilemap_dirty(i);
 	}
-
-	m_k052109->tilemap_update();
 
 	// sort layers and draw
 	for (int i = 0; i < 3; i++)
@@ -1222,8 +1216,6 @@ uint32_t tmnt2_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 
 		if (m_layer_colorbase[i] != prev_colorbase)
 			m_k052109->mark_tilemap_dirty(i);
 	}
-
-	m_k052109->tilemap_update();
 
 	// sort layers and draw
 	for (int i = 0; i < 3; i++)

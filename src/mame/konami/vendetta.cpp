@@ -254,8 +254,6 @@ uint32_t vendetta_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			m_k052109->mark_tilemap_dirty(i);
 	}
 
-	m_k052109->tilemap_update();
-
 	// sort layers and draw
 	int layer[3];
 	for (int i = 0; i < 3; i++)
