@@ -106,19 +106,19 @@ license:CC0-1.0
 		</element>
 
 		<!-- 0.10DM,1DM,2DM,5DM -->
-		<element name="lamp" ref="green_led">
+		<element name="lamp50" ref="green_led">
 			<bounds x="385" y="45" width="5" height="5" />
 		</element>
 
-		<element name="lamp" ref="green_led">
+		<element name="lamp51" ref="green_led">
 			<bounds x="385" y="55" width="5" height="5" />
 		</element>
 
-		<element name="lamp" ref="green_led">
+		<element name="lamp52" ref="green_led">
 			<bounds x="385" y="65" width="5" height="5" />
 		</element>
 
-		<element name="lamp" ref="green_led">
+		<element name="lamp53" ref="green_led">
 			<bounds x="385" y="75" width="5" height="5" />
 		</element>
 
@@ -127,23 +127,23 @@ license:CC0-1.0
 <!-- left panel -->
 		<!-- Leiter II LZ3+LZ6+LZ7-->
 
-		<element name="lamp" ref="ladder">
+		<element name="lamp75" ref="ladder">
 			<bounds x="45" y="150" width="45" height="25" />
 		</element>
 
-		<element name="lamp" ref="ladder">
+		<element name="lamp73" ref="ladder">
 			<bounds x="45" y="190" width="45" height="25" />
 		</element>
 
-		<element name="lamp" ref="ladder">
+		<element name="lamp72" ref="ladder">
 			<bounds x="45" y="220" width="45" height="25" />
 		</element>
 
-		<element name="lamp" ref="ladder">
+		<element name="lamp71" ref="ladder">
 			<bounds x="45" y="250" width="45" height="25" />
 		</element>
 
-		<element name="lamp" ref="ladder">
+		<element name="lamp70" ref="ladder">
 			<bounds x="45" y="280" width="45" height="25" />
 		</element>
 
@@ -182,7 +182,7 @@ license:CC0-1.0
 			<bounds x="390" y="220" width="45" height="25" />
 		</element>
 
-		<element name="lamp4" ref="ladder">
+		<element name="lamp41" ref="ladder">
 			<bounds x="390" y="250" width="45" height="25" />
 		</element>
 
@@ -190,11 +190,11 @@ license:CC0-1.0
 			<bounds x="390" y="280" width="45" height="25" />
 		</element>
 
-		<element name="lamp" ref="ladder">
+		<element name="lamp43" ref="ladder">
 			<bounds x="390" y="310" width="45" height="25" />
 		</element>
 
-		<element name="lamp3" ref="ladder">
+		<element name="lamp33" ref="ladder">
 			<bounds x="390" y="340" width="45" height="25" />
 		</element>
 
