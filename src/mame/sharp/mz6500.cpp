@@ -175,7 +175,7 @@ void mz6500_state::mz6500(machine_config &config)
 /* ROM definition */
 ROM_START( mz6500 )
 	ROM_REGION16_LE( 0x4000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "ipl.rom", 0x0000, 0x4000,CRC(6c978ac4) SHA1(7872d7e6d9cda2ed9f47ed4833a5caa4dfe0e55c))
+	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(6c978ac4) SHA1(7872d7e6d9cda2ed9f47ed4833a5caa4dfe0e55c))
 
 	ROM_REGION16_LE( 0x40000, "dictionary", ROMREGION_ERASEFF )
 	ROM_LOAD( "dict.rom", 0x0000, 0x40000, CRC(2df3cfd3) SHA1(d420ede09658c2626b0bb650a063d88b1783e554))
@@ -186,5 +186,8 @@ ROM_END
 
 } // Anonymous namespace
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
-COMP( 198?, mz6500, 0,      0,      mz6500,  mz6500, mz6500_state, empty_init, "Sharp", "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+
+// MZ-5500 should fit here
+// Released as MZ-5600 in U.K.
+COMP( 1984, mz6500, 0,      0,      mz6500,  mz6500, mz6500_state, empty_init, "Sharp", "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+// MZ-6550, bumped main CPU with a 286

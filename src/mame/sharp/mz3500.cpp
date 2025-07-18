@@ -4,15 +4,21 @@
 
 MZ-3500 (c) 198? Sharp
 
+References:
+- https://sharpmz.org/mz-3500/mztdata.htm
+- http://retropc.net/ohishi/museum/mz3500.htm
+
 TODO:
 - BUSREQ / BUSACK signals.
 - master/slave comms aren't perfect (especially noticeable if you change the video DIP)
 - Interrupt system;
-- Neither available floppy disks boots;
+- Neither available floppy disks boots (missing boot sector);
 - Sound;
 - Printer;
 - Light pen;
 - SIO & RS-232C;
+- Backward compatibility with PC-3100 and PC-3200;
+- Verify relationship with MZ-5500 and MZ-6500;
 
 Notes:
 Sub-CPU test meanings:
@@ -823,8 +829,9 @@ void mz3500_state::upd7220_2_map(address_map &map)
 
 static void mz3500_floppies(device_slot_interface &device)
 {
+	// MZ-3530/MZ-3531
 	device.option_add("525ssdd", FLOPPY_525_SSDD);
-	// from FDC dips
+	// MZ-3540/MZ-3541, requires dip option
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
@@ -910,4 +917,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 198?, mz3500, 0, 0, mz3500, mz3500, mz3500_state, empty_init, "Sharp", "MZ-3500", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1982, mz3500, 0, 0, mz3500, mz3500, mz3500_state, empty_init, "Sharp", "MZ-3500", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // released in November '82
