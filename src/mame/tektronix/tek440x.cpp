@@ -744,7 +744,7 @@ void tek440x_state::machine_reset()
 
 	m_vint->in_w<0>(0);		// VBL enable
 	m_vint->in_w<1>(0);		// VBL
-	m_vint->in_w<2>(0);		// VBL
+//	m_vint->in_w<2>(0);		// VBL
 
 	m_novram->recall(ASSERT_LINE);
 	m_novram->recall(CLEAR_LINE);
