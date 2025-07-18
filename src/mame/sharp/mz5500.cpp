@@ -14,8 +14,10 @@ Sharp MZ-6500
 #include "machine/pic8259.h"
 #include "machine/upd765.h"
 #include "video/upd7220.h"
+
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 namespace {
 
@@ -228,6 +230,9 @@ void mz6500_state::mz6500(machine_config &config)
 //	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", mz6500_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", mz6500_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+
+
+	SOFTWARE_LIST(config, "flop_list").set_original("mz5500_flop");
 }
 
 void mz6550_state::mz6550(machine_config &config)

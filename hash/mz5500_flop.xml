@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+TODO:
+- both images unconfirmed to work for all configurations (package from MZ-6550);
+- serials format are taken from Takeda's emulated pics, verify on actual covers;
+
+-->
+
+<softwarelist name="mz5500_flop" description="Sharp MZ-5500 disk images">
+
+<!-- !Operating Systems -->
+
+	<!-- CP/M-86 V1.0B / 2Z-016A known to exist -->
+	<software name="cpm86" supported="no">
+		<description>Extended CP/M-86 (V1.1A)</description>
+		<year>1983</year>
+		<publisher>Digital Research</publisher>
+		<info name="serial" value="2Z-03A" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1289040">
+				<rom name="cpm-86 2z030a v1.1a.d88" size="1289040" crc="dbc96830" sha1="e899292d92d62fd24f78b3328f3c3acc831abb67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos211" supported="no">
+		<description>MS-DOS v2.11 (V1.1A)</description>
+		<year>1983</year>
+		<publisher>Microsoft</publisher>
+		<!-- MZ-2Z048? -->
+		<info name="serial" value="2Z-048" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1289040">
+				<rom name="ms-dos 2.11 mz-2z048 v1.1a.d88" size="1289040" crc="1edc6bf5" sha1="cc5d0806c640873e0ddf3c3c8337eb86e5d30c5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>
