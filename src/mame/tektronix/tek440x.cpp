@@ -1284,7 +1284,7 @@ void tek440x_state::videocntl_w(u8 data)
 
 	// VBenable was ON, now OFF
 	if (BIT(m_videocntl ^ data, 6) && !BIT(data, 6))
-		m_vint->in_w<2>(0);
+		m_vint->in_w<1>(0);
 
 	m_videocntl = data;
 }
@@ -1723,7 +1723,7 @@ void tek440x_state::tek4404(machine_config &config)
 	m_screen->set_screen_update(FUNC(tek440x_state::screen_update));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
-	m_screen->screen_vblank().append(m_vint, FUNC(input_merger_all_high_device::in_w<2>));
+//	m_screen->screen_vblank().append(m_vint, FUNC(input_merger_all_high_device::in_w<2>));
 	PALETTE(config, "palette", FUNC(tek440x_state::palette),2);
 	
 	MOS6551(config, m_acia, 40_MHz_XTAL / 4 / 10);
