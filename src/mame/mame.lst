@@ -42675,6 +42675,7 @@ mz3500
 
 @source:sharp/mz6500.cpp
 mz6500
+mz6550
 
 @source:sharp/pc1500.cpp
 pc1500
