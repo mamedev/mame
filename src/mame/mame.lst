@@ -29753,6 +29753,14 @@ unktax
 @source:misc/bntyhunt.cpp
 bntyhunt
 
+@source:misc/boramz80.cpp
+pkboram
+pkrboram
+pkts
+tpkboram
+tpkborama
+tpkg2
+
 @source:misc/brglitz.cpp
 brglitz
 
@@ -43007,14 +43015,6 @@ bolsaint
 
 @source:skeleton/boo.cpp
 boo1000
-
-@source:skeleton/boramz80.cpp
-pkboram
-pkrboram
-pkts
-tpkboram
-tpkborama
-tpkg2
 
 @source:skeleton/bpmmicro.cpp
 bp1200
