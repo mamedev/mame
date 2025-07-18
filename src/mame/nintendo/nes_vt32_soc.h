@@ -5,16 +5,7 @@
 
 #pragma once
 
-#include "m6502_swap_op_d5_d6.h"
 #include "nes_vt09_soc.h"
-#include "rp2a03_vtscr.h"
-
-#include "cpu/m6502/rp2a03.h"
-#include "sound/nes_apu_vt.h"
-#include "video/ppu2c0x_vt.h"
-
-#include "screen.h"
-#include "speaker.h"
 
 
 class nes_vt32_soc_device : public nes_vt09_soc_device
@@ -78,18 +69,8 @@ protected:
 	virtual void do_pal_timings_and_ppu_replacement(machine_config& config) override;
 };
 
-class nes_vt32_soc_unk_device : public nes_vt32_soc_device
-{
-public:
-	nes_vt32_soc_unk_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
-};
-
 
 DECLARE_DEVICE_TYPE(NES_VT32_SOC, nes_vt32_soc_device)
 DECLARE_DEVICE_TYPE(NES_VT32_SOC_PAL, nes_vt32_soc_pal_device)
-DECLARE_DEVICE_TYPE(NES_VT32_SOC_UNK, nes_vt32_soc_unk_device)
 
 #endif // MAME_NINTENDO_NES_VT32_SOC_H

@@ -5,8 +5,14 @@
 
 #include "emu.h"
 #include "nes_vt32_soc.h"
+#include "rp2a03_vtscr.h"
 
-#include "m6502_swap_op_d5_d6.h"
+#include "cpu/m6502/rp2a03.h"
+#include "sound/nes_apu_vt.h"
+#include "video/ppu2c0x_vt.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 // these have RGB12 output mode
 DEFINE_DEVICE_TYPE(NES_VT32_SOC,     nes_vt32_soc_device,     "nes_vt32_soc", "VT32 series System on a Chip (FP) (NTSC)")
@@ -450,8 +456,6 @@ void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
 	map(0x411d, 0x411d).w(FUNC(nes_vt32_soc_device::vtfp_411d_w));
 	map(0x411e, 0x411e).w(FUNC(nes_vt32_soc_device::vtfp_411e_encryption_state_w)); // encryption toggle
 
-	map(0x414a, 0x414a).r(FUNC(nes_vt32_soc_device::vthh_414a_r));
-
 	map(0x412c, 0x412c).rw(FUNC(nes_vt32_soc_device::vtfp_412c_r), FUNC(nes_vt32_soc_device::vtfp_412c_extbank_w)); // GPIO
 	map(0x412d, 0x412d).r(FUNC(nes_vt32_soc_device::vtfp_412d_r)).nopw(); // GPIO
 
@@ -460,6 +464,8 @@ void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
 
 	map(0x4141, 0x4141).nopw(); // ??
 	map(0x4142, 0x4142).nopw(); // ??
+
+	map(0x414a, 0x414a).r(FUNC(nes_vt32_soc_device::vthh_414a_r));
 
 	map(0x4242, 0x4242).w(FUNC(nes_vt32_soc_device::vtfp_4242_w));
 
