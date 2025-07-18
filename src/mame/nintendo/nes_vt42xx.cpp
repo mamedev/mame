@@ -95,12 +95,6 @@ protected:
 	uint8_t vt_rom_banked_r(offs_t offset);
 
 	required_device<nes_vt02_vt03_soc_device> m_soc;
-
-private:
-	void vt_external_space_map_fp_2x32mbyte(address_map &map) ATTR_COLD;
-
-	uint8_t fcpocket_412d_r();
-	void fcpocket_412c_w(uint8_t data);
 };
 
 class nes_vt42xx_bitboy_state : public nes_vt42xx_state
@@ -179,11 +173,6 @@ void nes_vt42xx_state::vt_external_space_map_16mbyte(address_map &map)
 uint8_t nes_vt42xx_state::vt_rom_banked_r(offs_t offset)
 {
 	return m_prgrom[m_ahigh | offset];
-}
-
-void nes_vt42xx_state::vt_external_space_map_fp_2x32mbyte(address_map &map)
-{
-	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt42xx_state::vt_rom_banked_r));
 }
 
 void nes_vt42xx_bitboy_state::vt_external_space_map_bitboy_2x16mbyte(address_map &map)
@@ -312,21 +301,6 @@ static INPUT_PORTS_START( nes_vt42xx )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
 INPUT_PORTS_END
-
-uint8_t nes_vt42xx_state::fcpocket_412d_r()
-{
-	if (m_cartsel)
-		return m_cartsel->read();
-	else
-		return 0;
-}
-
-void nes_vt42xx_state::fcpocket_412c_w(uint8_t data)
-{
-	// fcpocket
-	logerror("%s: vtfp_412c_extbank_w %02x\n", machine().describe_context(), data);
-	m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
-}
 
 void nes_vt42xx_state::nes_vt42xx(machine_config &config)
 {
