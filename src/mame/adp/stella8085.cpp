@@ -152,7 +152,7 @@ void stella8085_state::mc146818_io_map(address_map &map)
 
 void stella8085_state::kbd_sl_w(u8 data)
 {
-	m_kbd_sl = data;
+	m_kbd_sl = data & 0x07;
 
 	if ( BIT(m_dsw->read(),0))
 		m_maincpu->set_input_line(I8085_RST75_LINE, BIT(data,3) ? ASSERT_LINE : CLEAR_LINE);
@@ -164,14 +164,30 @@ u8 stella8085_state::kbd_rl_r()
 {
 	u8 ret = 0xFF;
 	//LOG("I8279: Read Line: %02X\n", m_kbd_sl);
-	if(m_kbd_sl == 9)
+	switch (m_kbd_sl)
+	{
+	case 0:
+		ret = ioport("ZE0")->read();
+		break;
+	case 1:
 		ret = ioport("ZE1")->read();
-	else if(m_kbd_sl == 13)
+		break;
+	case 2:
+		ret = ioport("ZE2")->read();
+		break;
+	case 5:
 		ret = ioport("ZE5")->read();
-	else if(m_kbd_sl == 14)
+		break;
+	case 6:
 		ret = ioport("ZE6")->read();
-	else if(m_kbd_sl == 15)
+		break;
+	case 7:
 		ret = ioport("ZE7")->read();
+		break;
+	default:
+		LOG("read unmapped line %02x\n", m_kbd_sl);
+		break;
+	}
 	return ret;
 }
 
@@ -347,6 +363,12 @@ static INPUT_PORTS_START( dicemstr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(3) PORT_NAME("DM 1.00")  //LIx2
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(3) PORT_NAME("DM 0.10")  //LIx1
 
+	PORT_START("ZE2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("DM 5.00")  //LIx4
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("DM 2.00")  //LIx3
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(3) PORT_NAME("DM 1.00")  //LIx2
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(3) PORT_NAME("DM 0.10")  //LIx1
+
 	PORT_START("ZE5")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -386,17 +408,25 @@ static INPUT_PORTS_START( disc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzung")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Initialisieren")
 
+	PORT_START("ZE0")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SLOT_STOP2 ) //STR
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START ) // NF
+
 	PORT_START("ZE1")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("DM 5.00")  //LIx4
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("DM 2.00")  //LIx3
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(3) PORT_NAME("DM 1.00")  //LIx2
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(3) PORT_NAME("DM 0.10")  //LIx1
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("DM 5.00")  //LIM4
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("DM 2.00")  //LIM3
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(3) PORT_NAME("DM 1.00")  //LIM2
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(3) PORT_NAME("DM 0.10")  //LIM1
+
+	PORT_START("ZE2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("DM 5.00")  //LIA4
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("DM 2.00")  //LIA3
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(3) PORT_NAME("DM 1.00")  //LIA2
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(3) PORT_NAME("DM 0.10")  //LIA1
 
 	PORT_START("ZE5")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH ) // Left
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SLOT_STOP1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SLOT_STOP2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW ) // Right
 INPUT_PORTS_END
 
