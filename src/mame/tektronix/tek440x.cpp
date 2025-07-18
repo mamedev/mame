@@ -806,7 +806,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	if (m_boot)
 		return m_prom[offset & 0x3fff];
 
-
+#if 0
 if (OFF16_TO_OFF8(offset) == 0x7538)
 {
 	// AO contains function to be executed
@@ -838,6 +838,7 @@ if (OFF16_TO_OFF8(offset) == 0x7538)
 		LOG("tek4404: KERNEL:  UNKNOWN function 0x%x **************** \n", a0);
 
 }
+#endif
 
 #if 0
 // TRAP 15 argument
@@ -863,6 +864,7 @@ if (OFF16_TO_OFF8(offset) == 0x125ea)
 #endif
 
 
+#if 0
 if (OFF16_TO_OFF8(offset) == 0x104b4)
 	LOG("tek4404: %10s: IRQ1_handler ********\n", machine().time().as_string(8));
 if (OFF16_TO_OFF8(offset) == 0x6009a)
@@ -895,6 +897,7 @@ if (OFF16_TO_OFF8(offset) == 0x1279a)
 	LOG("tek4404: SCSI_wait_empty_with_interrupts\n");
 if (OFF16_TO_OFF8(offset) == 0x11f1e)
 	LOG("tek4404: scsi_wait_then_write\n");
+#endif
 
 
 	if ((m_maincpu->get_fc() & 4) == 0)				// User mode access updates map_control from write latch
