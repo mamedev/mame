@@ -260,6 +260,7 @@ maybe some sprite placement issues
 #include "machine/bankdev.h"
 #include "machine/k054321.h"
 #include "sound/k054539.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -283,14 +284,19 @@ public:
 	void lethalej(machine_config &config);
 	void lethalen(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	/* video-related */
-	int        m_layer_colorbase[4]{};
-	int        m_sprite_colorbase = 0;
-	int        m_back_colorbase = 0;
+	int m_layer_colorbase[4]{};
+	int m_sprite_colorbase = 0;
+	int m_back_colorbase = 0;
 
 	/* misc */
-	uint8_t      m_cur_control2 = 0U;
+	uint8_t m_cur_control2 = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -308,9 +314,6 @@ private:
 	uint8_t guns_r(offs_t offset);
 	uint8_t gunsaux_r();
 	void lethalen_palette_control(offs_t offset, uint8_t data);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lethalen_interrupt);
 	K053244_CB_MEMBER(sprite_callback);
@@ -599,13 +602,13 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( lethalenj )
 	PORT_INCLUDE( lethalen )
 
-		PORT_MODIFY("DSW")  /* Normal DIPs appear to do nothing for Japan region - wrong location?  Set to unknown */
-		PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW:4")
-		PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW:3")
-		PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW:2")
-		PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW:1")
+	PORT_MODIFY("DSW")  /* Normal DIPs appear to do nothing for Japan region - wrong location?  Set to unknown */
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW:4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW:3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW:2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW:1")
 
-		PORT_MODIFY("LIGHT0_X")
+	PORT_MODIFY("LIGHT0_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_MODIFY("LIGHT0_Y")
@@ -622,7 +625,7 @@ static INPUT_PORTS_START( lethalene ) /* European region does not have non-engli
 	PORT_INCLUDE( lethalen )
 
 	PORT_MODIFY("DSW")
-		PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "DSW:4")
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "DSW:4")
 INPUT_PORTS_END
 
 

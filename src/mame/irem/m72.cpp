@@ -145,6 +145,10 @@ TODO:
   The cpu board also has support for IRQ3 and IRQ4, coming from the external
   connectors, but I don't think they are used by any game.
 
+BTANB:
+- majtitle titlescreen rowscroll is buggy, the trees appear to be floating
+
+
 IRQ controller
 --------------
 The IRQ controller is a UPD71059C
