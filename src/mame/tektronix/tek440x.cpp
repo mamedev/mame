@@ -237,6 +237,9 @@ public:
 
 
 public:
+
+	// if we are doing MMU translation inside memory_rw, we dont want to also do it here.
+#ifdef USE_MMU
 	// device_memory_interface overrides
 	bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override
 	{
@@ -275,6 +278,7 @@ public:
 		
 		return true;
 	}
+#endif
 
 	u32 mmu_translate_address(offs_t address, u8 rw, u8 fc, u8 sz)
 	{
