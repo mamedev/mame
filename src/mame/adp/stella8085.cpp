@@ -67,8 +67,8 @@ protected:
 	void machine_start() override ATTR_COLD;
 
 private:
-	u8 m_digit = 0U;
-	u8 m_kbd_sl = 0x00;
+	uint8_t m_digit = 0U;
+	uint8_t m_kbd_sl = 0x00;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8256_device> m_uart;
 	required_device<i8279_device> m_kdc;
@@ -85,16 +85,16 @@ private:
 	void mc146818_io_map(address_map &map) ATTR_COLD;
 
 	// I8279 Interface
-	u8 kbd_rl_r();
-	void kbd_sl_w(u8 data);
-	void disp_w(u8 data);
+	uint8_t kbd_rl_r();
+	void kbd_sl_w(uint8_t data);
+	void disp_w(uint8_t data);
 	void handle_dip();
-	void rst65_w(u8 state);
-	void output_digit(u8 i, u8 data);
+	void rst65_w(uint8_t state);
+	void output_digit(uint8_t i, uint8_t data);
 
-	void sounddev(offs_t offset, u8 data) ATTR_COLD;
-	void makesound(uint8_t channel, uint8_t length);
-	int soundfreq(uint8_t channel);
+	void sounddev(uint8_t data) ATTR_COLD;
+	void makesound(uint8_t tone, uint8_t octave, uint8_t length);
+	int soundfreq(uint8_t channel, uint8_t clockdiv);
 	TIMER_CALLBACK_MEMBER(sound_stop);
 
 };
@@ -133,8 +133,8 @@ void stella8085_state::rtc62421_io_map(address_map &map)
 {
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write)); //Y5
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write)); //Y6
-	map(0x70, 0x7f).w(FUNC(stella8085_state::sounddev));
-	// Y8 EXROM
+	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
+	// map(0x80, 0x8f) //Y8 ICC5 empty socket
 	map(0x90, 0x9f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
 
 }
@@ -143,8 +143,9 @@ void stella8085_state::mc146818_io_map(address_map &map)
 {
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
-	map(0x70, 0x72).w(FUNC(stella8085_state::sounddev));
-	//map(0x90, 0x9f).rw("rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
+	// map(0x80, 0x8f) //Y8 ICC5 empty socket
+	map(0x90, 0x9f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 }
 
 /*********************************************
@@ -152,7 +153,7 @@ void stella8085_state::mc146818_io_map(address_map &map)
 *                                            *
 *********************************************/
 
-void stella8085_state::kbd_sl_w(u8 data)
+void stella8085_state::kbd_sl_w(uint8_t data)
 {
 	m_kbd_sl = data & 0x07;
 
@@ -162,9 +163,9 @@ void stella8085_state::kbd_sl_w(u8 data)
 		m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
-u8 stella8085_state::kbd_rl_r()
+uint8_t stella8085_state::kbd_rl_r()
 {
-	u8 ret = 0xFF;
+	uint8_t ret = 0xFF;
 	switch (m_kbd_sl)
 	{
 	case 0:
@@ -198,12 +199,12 @@ u8 stella8085_state::kbd_rl_r()
 	return ret;
 }
 
-void stella8085_state::disp_w(u8 data)
+void stella8085_state::disp_w(uint8_t data)
 {
 	if (m_kbd_sl < 4) {
 		for (int i = 0; i < 8; i++)
 		{
-			u8 lamp_index = (m_kbd_sl * 10) + i;
+			uint8_t lamp_index = (m_kbd_sl * 10) + i;
 			bool lamp_value = BIT(data, i);
 			m_lamps[lamp_index] = lamp_value;
 		}
@@ -212,10 +213,10 @@ void stella8085_state::disp_w(u8 data)
 		output_digit(m_kbd_sl, data);
 }
 
-void stella8085_state::output_digit(u8 i, u8 data)
+void stella8085_state::output_digit(uint8_t i, uint8_t data)
 {
     // Seven-segment encoding for digits 0-9 (abcdefg, no decimal point)
-    static const u8 bcd_to_7seg[16] = {
+    static const uint8_t bcd_to_7seg[16] = {
         0x3F, // 0: 0b00111111
         0x06, // 1: 0b00000110
         0x5B, // 2: 0b01011011
@@ -235,7 +236,7 @@ void stella8085_state::output_digit(u8 i, u8 data)
     };
 
     if (i > 7) {
-        u8 lower_bcd = data & 0x0F;
+        uint8_t lower_bcd = data & 0x0F;
 
         m_digits[i - 8] = bcd_to_7seg[lower_bcd];
     }
@@ -254,21 +255,24 @@ TIMER_CALLBACK_MEMBER( stella8085_state::sound_stop )
 	m_beep->set_state(0);
 }
 
-void stella8085_state::rst65_w(u8 state)
+void stella8085_state::rst65_w(uint8_t state)
 {
 	m_maincpu->set_input_line(I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-void stella8085_state::sounddev(offs_t offset, u8 data)
+void stella8085_state::sounddev(uint8_t data)
 {
-	makesound(offset & 0x0F,data & 0xF0);
+	uint8_t tone = data & 0x0F;
+	uint8_t length = data & 0x30;
+	uint8_t octave = data & 0xC0;
+	makesound(tone, octave, length);
 }
 
-void stella8085_state::makesound(uint8_t channel, uint8_t length)
+void stella8085_state::makesound(uint8_t tone, uint8_t octave, uint8_t length)
 {
-	int sfrq = soundfreq(channel);
-	LOG("beep beep at %02x for %02x ms\n", sfrq, length);
+	int sfrq = soundfreq(tone, octave);
+	LOG("sound frew %02x for %02x ms\n", sfrq, length);
 	m_beep->set_clock(sfrq);
 	if (length > 0)
 	{
@@ -281,9 +285,9 @@ void stella8085_state::makesound(uint8_t channel, uint8_t length)
 	}
 }
 
-int stella8085_state::soundfreq(uint8_t channel)
+int stella8085_state::soundfreq(uint8_t channel, uint8_t clockdiv)
 {
-	const int int_clock = 2000240;
+	const int int_clock = 2000240 / clockdiv;
 	const int c8sharp = int_clock / 451;
 	const int d8 = int_clock / 426;
 	const int d8sharp = int_clock / 402;
