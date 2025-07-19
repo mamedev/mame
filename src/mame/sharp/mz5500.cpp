@@ -190,10 +190,16 @@ static INPUT_PORTS_START( mz6500 )
 	PORT_DIPNAME( 0x08, 0x08, "Selfcheck mode" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:3") // "fixed to ON"
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:4") // "fixed to OFF"
+	// TODO: "fixed to ON" for MZ-5600, but definitely used in MZ-6500
+	// MZ-5500 uses these SW in following way:
+	// 3 4 5
+	// 0 0 0 Standard MFD drive (54B) DT/DD, 1F02,07,09
+	// 1 0 0 MZ-80BF
+	// * * * <reserved>
+	PORT_DIPNAME( 0x10, 0x10, "Floppy density" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING(    0x10, "2HD" )
+	PORT_DIPSETTING(    0x00, "2D/2DD" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:4") // MZ-5600 "fixed to OFF"
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "CPU clock" ) PORT_DIPLOCATION("SW:5")
