@@ -136,8 +136,15 @@ void nscsi_harddisk_device::scsi_command()
 
 		LOG("command WRITE start=%08x blocks=%04x\n", lba, blocks);
 
-		scsi_data_out(2, blocks*bytes_per_sector);
-		scsi_status_complete(SS_GOOD);
+		if(image->write(lba, block)) {
+			scsi_data_out(2, blocks*bytes_per_sector);
+			scsi_status_complete(SS_GOOD);
+		}
+		else
+		{
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+		}
 		break;
 
 	case SC_INQUIRY: {
@@ -486,8 +493,15 @@ void nscsi_harddisk_device::scsi_command()
 
 		LOG("command WRITE EXTENDED start=%08x blocks=%04x\n", lba, blocks);
 
-		scsi_data_out(2, blocks*bytes_per_sector);
-		scsi_status_complete(SS_GOOD);
+		if(image->write(lba, block)) {
+			scsi_data_out(2, blocks*bytes_per_sector);
+			scsi_status_complete(SS_GOOD);
+		}
+		else
+		{
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+		}
 		break;
 
 	case SC_FORMAT_UNIT:

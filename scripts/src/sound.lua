@@ -1809,3 +1809,15 @@ if (SOUNDS["ADC"]~=null) then
 		MAME_DIR .. "src/devices/sound/adc.h",
 	}
 end
+
+---------------------------------------------------
+-- Casio FZ-series PCM
+--@src/devices/sound/fz_pcm.h,SOUNDS["FZ_PCM"] = true
+---------------------------------------------------
+
+if (SOUNDS["FZ_PCM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/fz_pcm.cpp",
+		MAME_DIR .. "src/devices/sound/fz_pcm.h",
+	}
+end
