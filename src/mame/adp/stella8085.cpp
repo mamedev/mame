@@ -135,6 +135,8 @@ void stella8085_state::rtc62421_io_map(address_map &map)
 {
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write)); //Y5
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write)); //Y6
+	map(0x70, 0x70).w(FUNC(stella8085_state::io70));
+	map(0x71, 0x71).w(FUNC(stella8085_state::io71));
 	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
 	// map(0x80, 0x8f) //Y8 ICC5 empty socket
 	map(0x90, 0x9f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
@@ -145,6 +147,8 @@ void stella8085_state::mc146818_io_map(address_map &map)
 {
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x70, 0x70).w(FUNC(stella8085_state::io70));
+	map(0x71, 0x71).w(FUNC(stella8085_state::io71));
 	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
 	// map(0x80, 0x8f) //Y8 ICC5 empty socket
 	map(0x90, 0x9f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
@@ -264,22 +268,23 @@ void stella8085_state::rst65_w(uint8_t state)
 
 void stella8085_state::io70(uint8_t data)
 {
-	const bool aw1 = BIT(data,0);
+	//const bool aw1 = BIT(data,0);
 	//const bool  = BIT(data,1);
 	//const bool  = BIT(data,2);
 	//const bool  = BIT(data,3);
 	const bool mp = BIT(data,4);
-	const bool sz = BIT(data,5);
+	//const bool sz = BIT(data,5);
 	//const bool  = BIT(data,6);
-	const bool pa7 = BIT(data,7);
+	//const bool pa7 = BIT(data,7);
 
 	machine().bookkeeping().coin_lockout_global_w(mp);
+	LOG("muenzsperrmagnet %02x\n", mp);
 }
 
 void stella8085_state::io71(uint8_t data)
 {
 	//const bool  = BIT(data,0);
-	const bool gong = BIT(data,1);
+	//const bool gong = BIT(data,1);
 	//const bool  = BIT(data,2);
 	//const bool  = BIT(data,3);
 	//const bool  = BIT(data,4);
@@ -298,7 +303,6 @@ void stella8085_state::sounddev(uint8_t data)
 
 void stella8085_state::makesound(uint8_t tone, uint8_t octave, uint8_t length)
 {
-	osd_printf_error("sound tone %02x octave %02x len %02x\n", tone, octave, length);
 	int sfrq = soundfreq(tone, octave);
 	LOG("sound freq %02x for %02x ms\n", sfrq, length);
 	m_beep->set_clock(sfrq);
