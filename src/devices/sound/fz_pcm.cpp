@@ -18,6 +18,8 @@
 
 #include "fz_pcm.h"
 
+#include <climits>
+
 DEFINE_DEVICE_TYPE(FZ_PCM, fz_pcm_device, "fz_pcm", "Casio FZ PCM")
 
 fz_pcm_device::fz_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
