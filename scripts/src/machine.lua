@@ -3931,6 +3931,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/votraxtnt.h,MACHINES["VOTRAXTNT"] = true
+---------------------------------------------------
+
+if (MACHINES["VOTRAXTNT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/votraxtnt.cpp",
+		MAME_DIR .. "src/devices/machine/votraxtnt.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/wd_fdc.h,MACHINES["WD_FDC"] = true
 ---------------------------------------------------
 
