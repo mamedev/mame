@@ -301,7 +301,7 @@ void stella8085_state::sounddev(uint8_t data)
 	uint8_t tone = data & 0x0F;
 	uint8_t length = data & 0x30;
 	uint8_t octave = data & 0xC0;
-	makesound(tone, octave, 60+length); //100 is not correct
+	makesound(tone, octave, 60*(length+1)); //100 is not correct
 }
 
 void stella8085_state::makesound(uint8_t tone, uint8_t octave, uint8_t length)
