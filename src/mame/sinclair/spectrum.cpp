@@ -744,6 +744,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_maincpu->set_memory_map(&spectrum_state::spectrum_data);
 	m_maincpu->set_io_map(&spectrum_state::spectrum_io);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
+	m_maincpu->refresh_cb().set(FUNC(spectrum_state::spectrum_refresh_w));
 	m_maincpu->nomreq_cb().set(FUNC(spectrum_state::spectrum_nomreq));
 	m_maincpu->busack_cb().set("dma", FUNC(dma_slot_device::bai_w));
 

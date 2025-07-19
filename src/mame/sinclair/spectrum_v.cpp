@@ -165,9 +165,12 @@ void spectrum_state::spectrum_update_border(screen_device &screen, bitmap_ind16 
 }
 
 /* ULA reads screen data in 16px (8T) chunks as following:
- T: |   0   |   1   |   2   |   3   |   4   |   5   |   6   |   7   |
-px: | 0 | 1 | 2 | 3 |*4*| 5 | 6 | 7 |*0*| 1 | 2 | 3 | 4 | 5 | 6 | 7 |
-    | << !right <<  | char1 | attr1 | char2 | attr2 |   >> right >> |
+             T: |       |   0   |   1   |   2   |   3   |   4   |   5   |   6   |   7   |
+ULA contention: |       |   6   |   5   |   4   |   3   |   2   |   1   |   0   |   0   |
+ opcode read T: |   0   |   1   | 2 RSH | 3 RSH |       |       |       |       |       | ULA reads lower address for char1/attr1 from R6:0
+ opcode read T: |       |       |   0   |   1   | 2 RSH | 3 RSH |       |       |       | ULA skip reading char2/attr2 and keep them from char1/attr1
+            px: |       | 0 | 1 | 2 | 3 |*4*| 5 | 6 | 7 |*0*| 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+                |       | << !right <<  | char1 | attr1 | char2 | attr2 |   >> right >> |
 
 TODO Curren implementation only tracks char switch position. In order to track both (char and attr) we need to share
      some state between screen->update() events.
@@ -194,7 +197,7 @@ void spectrum_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 
 			chunk_right = !chunk_right;
 		}
 		u16 y = vpos - get_screen_area().top();
-		u8 *scr = &m_screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | (x >> 3)];
+		u8 *scr = &m_screen_location[((y & 0xc0) << 5) | ((y & 7) << 8) | ((y & 0x38) << 2) | (x >> 3)];
 		u8 *attr = &m_screen_location[0x1800 + (((y & 0xf8) << 2) | (x >> 3))];
 		u16 *pix = &(bitmap.pix(vpos, hpos));
 
@@ -264,4 +267,48 @@ void spectrum_state::content_late()
 void spectrum_state::spectrum_nomreq(offs_t offset, uint8_t data)
 {
 	if (is_contended(offset)) content_early();
+}
+
+// see: spectrum_state::spectrum_update_screen()
+void spectrum_state::spectrum_refresh_w(offs_t offset, uint8_t data)
+{
+	if (m_contention_pattern.empty())
+		return;
+
+	const u8 i = offset >> 8;
+	bool is_snow_possible = is_contended(i << 8);
+	if (!is_snow_possible)
+		return;
+
+	const u64 hpos = m_screen->hpos() + m_contention_offset;
+	const u64 vpos = m_screen->vpos();
+	if (hpos < get_screen_area().left() || hpos > get_screen_area().right() || vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
+		return;
+
+	const u16 x = hpos - get_screen_area().left();
+	const u16 y = vpos - get_screen_area().top();
+
+	const u16 px_addr_hi = ((y & 0xc0) << 5) | ((y & 7) << 8);
+	const u16 attr_addr_hi = 0x1800 + ((y & 0xc0) << 2);
+	const u8 addr_lo = ((y & 0x38) << 2) | (x >> 3);
+	const u8 r = (offset + 1) & 0x7f; // R must be already incremented during refresh
+
+	const u8 px_tmp = m_screen_location[px_addr_hi | addr_lo];
+	const u8 attr_tmp = m_screen_location[attr_addr_hi | addr_lo];
+
+	bool chunk_right = x & 8;
+	if (!chunk_right)
+	{
+		m_screen_location[px_addr_hi | addr_lo] = m_specmem->read8((offset & 0xc000) | px_addr_hi | r);
+		m_screen_location[attr_addr_hi | addr_lo] = m_specmem->read8((offset & 0xc000) | attr_addr_hi | r);
+	}
+	else if (chunk_right)
+	{
+		m_screen_location[px_addr_hi | addr_lo] = m_screen_location[(px_addr_hi | addr_lo) - 1];
+		m_screen_location[attr_addr_hi | addr_lo] = m_screen_location[(attr_addr_hi | addr_lo) - 1];
+	}
+
+	m_screen->update_now();
+	m_screen_location[px_addr_hi | addr_lo] = px_tmp;
+	m_screen_location[attr_addr_hi | addr_lo] = attr_tmp;
 }

@@ -485,6 +485,7 @@ void scorpion_state::scorpion(machine_config &config)
 	m_maincpu->set_m1_map(&scorpion_state::scorpion_switch);
 	m_maincpu->set_io_map(&scorpion_state::scorpion_io);
 	m_maincpu->set_vblank_int("screen", FUNC(scorpion_state::scorpion_interrupt));
+	m_maincpu->refresh_cb().remove();
 	m_maincpu->nomreq_cb().remove();
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_scorpion);

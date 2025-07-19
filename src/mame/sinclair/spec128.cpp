@@ -416,6 +416,7 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	m_maincpu->set_io_map(&spectrum_128_state::spectrum_128_io);
 	m_maincpu->set_m1_map(&spectrum_128_state::spectrum_128_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_128_state::spec_interrupt));
+	m_maincpu->refresh_cb().set(FUNC(spectrum_128_state::spectrum_refresh_w));
 	m_maincpu->nomreq_cb().set(FUNC(spectrum_128_state::spectrum_nomreq));
 	m_maincpu->busack_cb().set("dma", FUNC(dma_slot_device::bai_w));
 
