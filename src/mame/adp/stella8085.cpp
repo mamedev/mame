@@ -273,24 +273,27 @@ void stella8085_state::io70(uint8_t data)
 	//const bool  = BIT(data,2);
 	//const bool  = BIT(data,3);
 	const bool mp = BIT(data,4);
-	//const bool sz = BIT(data,5);
-	//const bool  = BIT(data,6);
+	const bool sz = BIT(data,5);
+	//const bool  = BIT(data,6); // high on startup
 	//const bool pa7 = BIT(data,7);
 
 	machine().bookkeeping().coin_lockout_global_w(mp);
-	LOG("muenzsperrmagnet %02x\n", mp);
+	machine().bookkeeping().coin_counter_w(5,sz);
+	LOG("io70 %02x\n", data);
 }
 
 void stella8085_state::io71(uint8_t data)
 {
 	//const bool  = BIT(data,0);
-	//const bool gong = BIT(data,1);
+	const bool gong = BIT(data,1);
 	//const bool  = BIT(data,2);
 	//const bool  = BIT(data,3);
 	//const bool  = BIT(data,4);
 	//const bool  = BIT(data,5);
 	//const bool  = BIT(data,6);
 	//const bool  = BIT(data,7);
+
+	LOG("gong %02x\n", gong);
 }
 
 void stella8085_state::sounddev(uint8_t data)
@@ -298,7 +301,7 @@ void stella8085_state::sounddev(uint8_t data)
 	uint8_t tone = data & 0x0F;
 	uint8_t length = data & 0x30;
 	uint8_t octave = data & 0xC0;
-	makesound(tone, octave, length);
+	makesound(tone, octave, 60+length); //100 is not correct
 }
 
 void stella8085_state::makesound(uint8_t tone, uint8_t octave, uint8_t length)
@@ -320,7 +323,7 @@ void stella8085_state::makesound(uint8_t tone, uint8_t octave, uint8_t length)
 int stella8085_state::soundfreq(uint8_t channel, uint8_t clockdiv)
 {
 	const int sound_clock = (m_maincpu->clock() / 4);
-	const int int_clock = sound_clock / (clockdiv+1);
+	const int int_clock = sound_clock / (4-clockdiv);
 	const int c8sharp = int_clock / 451;
 	const int d8 = int_clock / 426;
 	const int d8sharp = int_clock / 402;
