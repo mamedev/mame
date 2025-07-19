@@ -141,10 +141,10 @@ void stella8085_state::rtc62421_io_map(address_map &map)
 
 void stella8085_state::mc146818_io_map(address_map &map)
 {
-	// TODO: map RTC
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x70, 0x72).w(FUNC(stella8085_state::sounddev));
+	map(0x90, 0x9f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
 }
 
 /*********************************************
