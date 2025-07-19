@@ -234,7 +234,7 @@ void i8256_device::write(offs_t offset, u8 data)
 void i8256_device::write_rxd(int state)
 {
 	m_rxd = state;
-	LOG("8256: Presented a %d\n", m_rxd);
+	LOG("I8256: Presented a %d\n", m_rxd);
 	//  device_serial_interface::rx_w(state);
 }
 
