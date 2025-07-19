@@ -10,9 +10,11 @@ TODO:
 - raster effect in Gemini Wing THE END ending, needs a side-by-side test with
   a real board and maybe waitstate penalties;
 
-Notes:
-- btanb: missing drums in backfirt, there isn't any ADPCM / rom that makes
-  that to happen (code still tries to writes on that, but it's just nop'ed);
+BTANB:
+- missing drums in backfirt, there isn't any ADPCM / rom that makes that to happen
+  (code still tries to writes on that, but it's just nop'ed);
+- silkworm bgm drum samples are cut off abruptly, it does this deliberately
+
 
 Silkworm memory map (preliminary)
 
@@ -233,6 +235,7 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ymopl.h"
+
 #include "speaker.h"
 
 
@@ -375,8 +378,8 @@ void tecmo_state::silkworm_map(address_map &map)
 	map(0xf806, 0xf806).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xf807, 0xf807).w(FUNC(tecmo_state::flipscreen_w));
 	map(0xf808, 0xf808).w(FUNC(tecmo_state::bankswitch_w));
-	map(0xf809, 0xf809).nopw();    // ?
-	map(0xf80b, 0xf80b).nopw();    // ? if mapped to watchdog like in the others, causes reset
+	map(0xf809, 0xf809).nopw(); // ?
+	map(0xf80b, 0xf80b).nopw(); // ? if mapped to watchdog like in the others, causes reset
 }
 
 void tecmo_state::rygar_sound_map(address_map &map)
@@ -390,7 +393,7 @@ void tecmo_state::rygar_sound_map(address_map &map)
 	map(0xf000, 0xf000).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 }
 
-void tecmo_state::silkwormp_sound_map(address_map &map)
+void tecmo_state::geminib_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
@@ -399,18 +402,24 @@ void tecmo_state::silkwormp_sound_map(address_map &map)
 	map(0xcc00, 0xcc00).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 }
 
-void tecmo_state::backfirt_sound_map(address_map &map)
+void tecmo_state::gemini_sound_map(address_map &map)
 {
-	silkwormp_sound_map(map);
-	map(0x2000, 0x207f).ram(); // Silkworm set #2 has a custom CPU which writes code to this area
-}
-
-void tecmo_state::tecmo_sound_map(address_map &map)
-{
-	backfirt_sound_map(map);
+	geminib_sound_map(map);
 	map(0xc000, 0xc000).w(FUNC(tecmo_state::adpcm_start_w));
 	map(0xc400, 0xc400).w(FUNC(tecmo_state::adpcm_end_w));
 	map(0xc800, 0xc800).w(FUNC(tecmo_state::adpcm_vol_w));
+}
+
+void tecmo_state::silkwormj_sound_map(address_map &map)
+{
+	gemini_sound_map(map);
+	map(0x2000, 0x207f).ram(); // Silkworm set #2 has a custom CPU which writes code to this area
+}
+
+void tecmo_state::silkwormp_sound_map(address_map &map)
+{
+	geminib_sound_map(map);
+	map(0x2000, 0x207f).ram();
 }
 
 static INPUT_PORTS_START( tecmo_default )
@@ -505,10 +514,10 @@ static INPUT_PORTS_START( rygar )
 
 	PORT_MODIFY("DSWB")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:!1,!2")
-	PORT_DIPSETTING(    0x00, "50000 200000 500000" )
-	PORT_DIPSETTING(    0x01, "100000 300000 600000" )
-	PORT_DIPSETTING(    0x02, "200000 500000" )
-	PORT_DIPSETTING(    0x03, "100000" )
+	PORT_DIPSETTING(    0x00, "50k 200k 500k" )
+	PORT_DIPSETTING(    0x01, "100k 300k 600k" )
+	PORT_DIPSETTING(    0x02, "200k 500k" )
+	PORT_DIPSETTING(    0x03, "100k" )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
@@ -581,13 +590,13 @@ static INPUT_PORTS_START( gemini )
 	PORT_DIPSETTING(    0x08, DEF_STR( Harder ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x70, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:!5,!6,!7")
-	PORT_DIPSETTING(    0x00, "50000 200000" )
-	PORT_DIPSETTING(    0x10, "50000 300000" )
-	PORT_DIPSETTING(    0x20, "100000 500000" )
-	PORT_DIPSETTING(    0x30, "50000" )
-	PORT_DIPSETTING(    0x40, "100000" )
-	PORT_DIPSETTING(    0x50, "200000" )
-	PORT_DIPSETTING(    0x60, "300000" )
+	PORT_DIPSETTING(    0x00, "50k 200k" )
+	PORT_DIPSETTING(    0x10, "50k 300k" )
+	PORT_DIPSETTING(    0x20, "100k 500k" )
+	PORT_DIPSETTING(    0x30, "50k" )
+	PORT_DIPSETTING(    0x40, "100k" )
+	PORT_DIPSETTING(    0x50, "200k" )
+	PORT_DIPSETTING(    0x60, "300k" )
 	PORT_DIPSETTING(    0x70, DEF_STR( None ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -638,13 +647,13 @@ static INPUT_PORTS_START( backfirt )
 
 	PORT_MODIFY("DSWB")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:!1,!2,!3")
-	PORT_DIPSETTING(    0x00, "50000 200000 500000" )
-	PORT_DIPSETTING(    0x01, "100000 300000 800000" )
-	PORT_DIPSETTING(    0x02, "50000 200000" )
-	PORT_DIPSETTING(    0x03, "100000 300000" )
-	PORT_DIPSETTING(    0x04, "50000" )
-	PORT_DIPSETTING(    0x05, "100000" )
-	PORT_DIPSETTING(    0x06, "200000" )
+	PORT_DIPSETTING(    0x00, "50k 200k 500k" )
+	PORT_DIPSETTING(    0x01, "100k 300k 800k" )
+	PORT_DIPSETTING(    0x02, "50k 200k" )
+	PORT_DIPSETTING(    0x03, "100k 300k" )
+	PORT_DIPSETTING(    0x04, "50k" )
+	PORT_DIPSETTING(    0x05, "100k" )
+	PORT_DIPSETTING(    0x06, "200k" )
 	PORT_DIPSETTING(    0x07, DEF_STR( None ) )
 	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:!4,!5,!6")
 	PORT_DIPSETTING(    0x00, "0" )
@@ -711,13 +720,13 @@ static INPUT_PORTS_START( silkworm )
 
 	PORT_MODIFY("DSWB")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:!1,!2,!3")
-	PORT_DIPSETTING(    0x00, "50000 200000 500000" )
-	PORT_DIPSETTING(    0x01, "100000 300000 800000" )
-	PORT_DIPSETTING(    0x02, "50000 200000" )
-	PORT_DIPSETTING(    0x03, "100000 300000" )
-	PORT_DIPSETTING(    0x04, "50000" )
-	PORT_DIPSETTING(    0x05, "100000" )
-	PORT_DIPSETTING(    0x06, "200000" )
+	PORT_DIPSETTING(    0x00, "50k 200k 500k" )
+	PORT_DIPSETTING(    0x01, "100k 300k 800k" )
+	PORT_DIPSETTING(    0x02, "50k 200k" )
+	PORT_DIPSETTING(    0x03, "100k 300k" )
+	PORT_DIPSETTING(    0x04, "50k" )
+	PORT_DIPSETTING(    0x05, "100k" )
+	PORT_DIPSETTING(    0x06, "200k" )
 	PORT_DIPSETTING(    0x07, DEF_STR( None ) )
 	PORT_DIPNAME( 0x70, 0x30, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:!5,!6,!7")
 //  PORT_DIPSETTING(    0x60, "0" )             // Not listed in manual
@@ -791,13 +800,13 @@ static INPUT_PORTS_START( silkwormp )
 
 	PORT_MODIFY("DSWB")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:!1,!2,!3")
-	PORT_DIPSETTING(    0x00, "50000 200000 500000" )
-	PORT_DIPSETTING(    0x01, "100000 300000 800000" )
-	PORT_DIPSETTING(    0x02, "50000 200000" )
-	PORT_DIPSETTING(    0x03, "100000 300000" )
-	PORT_DIPSETTING(    0x04, "50000" )
-	PORT_DIPSETTING(    0x05, "100000" )
-	PORT_DIPSETTING(    0x06, "200000" )
+	PORT_DIPSETTING(    0x00, "50k 200k 500k" )
+	PORT_DIPSETTING(    0x01, "100k 300k 800k" )
+	PORT_DIPSETTING(    0x02, "50k 200k" )
+	PORT_DIPSETTING(    0x03, "100k 300k" )
+	PORT_DIPSETTING(    0x04, "50k" )
+	PORT_DIPSETTING(    0x05, "100k" )
+	PORT_DIPSETTING(    0x06, "200k" )
 	PORT_DIPSETTING(    0x07, DEF_STR( None ) )
 	PORT_DIPNAME( 0x70, 0x60, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:!5,!6,!7")
 	PORT_DIPSETTING(    0x00, "1" )
@@ -839,18 +848,20 @@ void tecmo_state::machine_reset()
 void tecmo_state::rygar(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(24'000'000)/4); // verified on pcb
+	Z80(config, m_maincpu, 24_MHz_XTAL / 4); // verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo_state::rygar_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tecmo_state::irq0_line_hold));
 
-	Z80(config, m_soundcpu, XTAL(4'000'000)); // verified on pcb
+	Z80(config, m_soundcpu, 4_MHz_XTAL); // verified on pcb
 	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::rygar_sound_map);
+
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(24'000'000)/4, 384,0,256,264,16,240); // 59.18 Hz
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240); // 59.18 Hz
 	m_screen->set_screen_update(FUNC(tecmo_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -867,13 +878,13 @@ void tecmo_state::rygar(machine_config &config)
 	soundlatch.data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 	soundlatch.set_separate_acknowledge(true);
 
-	ym3526_device &ymsnd(YM3526(config, "ymsnd", XTAL(4'000'000))); // verified on pcb
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", 4_MHz_XTAL)); // verified on pcb
 	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MSM5205(config, m_msm, XTAL(400'000)); // verified on pcb, even if schematics shows a 384khz resonator
-	m_msm->vck_legacy_callback().set(FUNC(tecmo_state::adpcm_int));    // interrupt function
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      // 8KHz
+	MSM5205(config, m_msm, 400_kHz_XTAL); // verified on pcb, even if schematics shows a 384khz resonator
+	m_msm->vck_legacy_callback().set(FUNC(tecmo_state::adpcm_int));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -882,22 +893,32 @@ void tecmo_state::gemini(machine_config &config)
 	rygar(config);
 
 	// basic machine hardware
-	// xtal found on bootleg, to be confirmed on a real board
-	m_maincpu->set_clock(XTAL(8'000'000));
+	m_maincpu->set_clock(8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo_state::gemini_map);
 
-	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::tecmo_sound_map);
+	m_soundcpu->set_clock(24_MHz_XTAL / 6);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::gemini_sound_map);
 
-	ym3812_device &ymsnd(YM3812(config.replace(), "ymsnd", XTAL(4'000'000)));
+	// sound hardware
+	ym3812_device &ymsnd(YM3812(config.replace(), "ymsnd", 24_MHz_XTAL / 6));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.33);
+
+	m_msm->set_clock(384_kHz_XTAL);
 }
 
 void tecmo_state::geminib(machine_config &config)
 {
 	gemini(config);
-	// 24.18 MHz OSC / 59.62 Hz, bootleg only?
-	m_screen->set_raw(24180000/4, 384,0,256,264,16,240);
+
+	// 24.180 MHz OSC / 59.62 Hz, bootleg only
+	m_screen->set_raw(24.18_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
+	m_soundcpu->set_clock(24.18_MHz_XTAL / 6);
+	subdevice<ym3812_device>("ymsnd")->set_clock(24.18_MHz_XTAL / 6);
+
+	// this pcb has no MSM5205
+	config.device_remove("msm");
+	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::geminib_sound_map);
 }
 
 void tecmo_state::silkworm(machine_config &config)
@@ -905,8 +926,24 @@ void tecmo_state::silkworm(machine_config &config)
 	gemini(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo_state::silkworm_map);
+}
+
+void tecmo_state::silkwormj(machine_config &config)
+{
+	silkworm(config);
+
+	// basic machine hardware
+	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::silkwormj_sound_map);
+}
+
+void tecmo_state::silkwormp(machine_config &config)
+{
+	silkworm(config);
+
+	// this pcb has no MSM5205
+	config.device_remove("msm");
+	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::silkwormp_sound_map);
 }
 
 void tecmo_state::backfirt(machine_config &config)
@@ -914,15 +951,6 @@ void tecmo_state::backfirt(machine_config &config)
 	gemini(config);
 
 	// this pcb has no MSM5205
-	config.device_remove("msm");
-	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::backfirt_sound_map);
-}
-
-void tecmo_state::silkwormp(machine_config &config)
-{
-	silkworm(config);
-
-	// bootleg pcb doesn't have the MSM5205 populated
 	config.device_remove("msm");
 	m_soundcpu->set_addrmap(AS_PROGRAM, &tecmo_state::silkwormp_sound_map);
 }
@@ -1446,13 +1474,10 @@ ROM_START( geminib )
 	ROM_LOAD( "gw15-2ra.rom", 0x10000, 0x10000, CRC(4cd18cfa) SHA1(c197a098a7c1e5220aad039383a40702fe7c4f21) )  // tiles #2
 	ROM_LOAD( "gw16-2rb.rom", 0x20000, 0x10000, CRC(f911c7be) SHA1(3f49f6c4734f2b644d93c4a54249aae6ff080e1d) )  // tiles #2
 	ROM_LOAD( "gw17-3r.rom",  0x30000, 0x10000, CRC(79a9ce25) SHA1(74e3917b8e7a920ceb2135d7ef8fb2f2c5176b21) )  // tiles #2
-
-	ROM_REGION( 0x8000, "adpcm", 0 )    // ADPCM samples
-	ROM_LOAD( "gw01-6a.rom",  0x0000, 0x8000, CRC(d78afa05) SHA1(b02a739b045f5cddf943ce59226ef234463eeebe) )
 ROM_END
 
 /*
-   video_type is used to distinguish Rygar, Silkworm and Gemini Wing.
+   m_video_type is used to distinguish Rygar, Silkworm and Gemini Wing.
    This is needed because there is a difference in the tile and sprite indexing.
 */
 void tecmo_state::init_rygar()
@@ -1476,12 +1501,15 @@ GAME( 1986, rygar2,     rygar,    rygar,     rygar,     tecmo_state, init_rygar,
 GAME( 1986, rygar3,     rygar,    rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Rygar (US set 3 Old Version)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rygarj,     rygar,    rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Argus no Senshi (Japan set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rygarj2,    rygar,    rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Argus no Senshi (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1987, gemini,     0,        gemini,    gemini,    tecmo_state, init_gemini,   ROT90, "Tecmo",   "Gemini Wing (World)",           MACHINE_SUPPORTS_SAVE ) // No regional "Warning, if you are playing ..." screen
 GAME( 1987, geminij,    gemini,   gemini,    gemini,    tecmo_state, init_gemini,   ROT90, "Tecmo",   "Gemini Wing (Japan)",           MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
 GAME( 1987, geminib,    gemini,   geminib,   gemini,    tecmo_state, init_gemini,   ROT90, "bootleg", "Gemini Wing (bootleg)",         MACHINE_SUPPORTS_SAVE ) // regional warning screen is blanked (still get a delay)
+
 GAME( 1988, silkworm,   0,        silkworm,  silkworm,  tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (World)",             MACHINE_SUPPORTS_SAVE ) // No regional "Warning, if you are playing ..." screen
-GAME( 1988, silkwormj,  silkworm, silkworm,  silkworm,  tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (Japan)",             MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
+GAME( 1988, silkwormj,  silkworm, silkwormj, silkworm,  tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (Japan)",             MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
 GAME( 1988, silkwormp,  silkworm, silkwormp, silkwormp, tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (prototype)",         MACHINE_SUPPORTS_SAVE ) // prototype
 GAME( 1988, silkwormb,  silkworm, silkwormp, silkwormp, tecmo_state, init_silkworm, ROT0,  "bootleg", "Silk Worm (bootleg, set 1)",    MACHINE_SUPPORTS_SAVE ) // bootleg of (a different?) prototype
 GAME( 1988, silkwormb2, silkworm, silkwormp, silkwormp, tecmo_state, init_silkworm, ROT0,  "bootleg", "Silk Worm (bootleg, set 2)",    MACHINE_SUPPORTS_SAVE )
+
 GAME( 1988, backfirt,   0,        backfirt,  backfirt,  tecmo_state, init_gemini,   ROT0,  "Tecmo",   "Back Fire (Tecmo, bootleg)",    MACHINE_SUPPORTS_SAVE )
