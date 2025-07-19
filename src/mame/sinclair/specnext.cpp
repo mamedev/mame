@@ -123,6 +123,7 @@ protected:
 	void mmu_x2_w(offs_t bank, u8 data);
 	u8 dma_r(bool dma_mode);
 	void dma_w(bool dma_mode, u8 data);
+	u8 dma_mreq_r(offs_t offset);
 	u8 spi_data_r();
 	void spi_data_w(u8 data);
 	void spi_miso_w(u8 data);
@@ -1153,6 +1154,15 @@ void specnext_state::dma_w(bool dma_mode, u8 data)
 {
 	m_dma->dma_mode_w(dma_mode);
 	m_dma->write(data);
+}
+
+u8 specnext_state::dma_mreq_r(offs_t offset)
+{
+	if (m_nr_07_cpu_speed == 0b11)
+	{
+		m_dma->adjust_wait(1);
+	}
+	return m_program.read_byte(offset);
 }
 
 u8 specnext_state::reg_r(offs_t nr_register)
@@ -2405,6 +2415,12 @@ void specnext_state::map_fetch(address_map &map)
 			approach gives better experience in debugger UI. */
 			do_m1(offset);
 			m_divmmc_delayed_check = 0;
+
+			// do_m1 performs read from m_program with waits, we need to take it back
+			if (!machine().side_effects_disabled() && (m_nr_07_cpu_speed == 0b11))
+			{
+				m_maincpu->adjust_icount(1);
+			}
 		}
 
 		return m_program.read_byte(offset);
@@ -3428,6 +3444,14 @@ void specnext_state::video_start()
 			to[offset & 0x1fff] = data;
 		}
 	});
+	prg.install_read_tap(0x0000, 0xffff, "mem_wait_r", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		// The 28MHz with core 3.0.5 is adding extra wait state to every instruction opcode fetch and memory read
+		if (!machine().side_effects_disabled() && (m_nr_07_cpu_speed == 0b11))
+		{
+			m_maincpu->adjust_icount(-1);
+		}
+	});
 }
 
 void specnext_state::tbblue(machine_config &config)
@@ -3456,7 +3480,7 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_DMA(config, m_dma, 28_MHz_XTAL / 8);
 	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_dma->in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
+	m_dma->in_mreq_callback().set(FUNC(specnext_state::dma_mreq_r));
 	m_dma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
 	m_dma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
 	m_dma->out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
