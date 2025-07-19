@@ -92,6 +92,8 @@ private:
 	void rst65_w(uint8_t state);
 	void output_digit(uint8_t i, uint8_t data);
 
+	void io70(uint8_t data) ATTR_COLD;
+	void io71(uint8_t data) ATTR_COLD;
 	void sounddev(uint8_t data) ATTR_COLD;
 	void makesound(uint8_t tone, uint8_t octave, uint8_t length);
 	int soundfreq(uint8_t channel, uint8_t clockdiv);
@@ -260,6 +262,31 @@ void stella8085_state::rst65_w(uint8_t state)
 	m_maincpu->set_input_line(I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+void stella8085_state::io70(uint8_t data)
+{
+	const bool aw1 = BIT(data,0);
+	//const bool  = BIT(data,1);
+	//const bool  = BIT(data,2);
+	//const bool  = BIT(data,3);
+	const bool mp = BIT(data,4);
+	const bool sz = BIT(data,5);
+	//const bool  = BIT(data,6);
+	const bool pa7 = BIT(data,7);
+
+	machine().bookkeeping().coin_lockout_global_w(mp);
+}
+
+void stella8085_state::io71(uint8_t data)
+{
+	//const bool  = BIT(data,0);
+	const bool gong = BIT(data,1);
+	//const bool  = BIT(data,2);
+	//const bool  = BIT(data,3);
+	//const bool  = BIT(data,4);
+	//const bool  = BIT(data,5);
+	//const bool  = BIT(data,6);
+	//const bool  = BIT(data,7);
+}
 
 void stella8085_state::sounddev(uint8_t data)
 {
@@ -271,8 +298,9 @@ void stella8085_state::sounddev(uint8_t data)
 
 void stella8085_state::makesound(uint8_t tone, uint8_t octave, uint8_t length)
 {
+	osd_printf_error("sound tone %02x octave %02x len %02x\n", tone, octave, length);
 	int sfrq = soundfreq(tone, octave);
-	LOG("sound frew %02x for %02x ms\n", sfrq, length);
+	LOG("sound freq %02x for %02x ms\n", sfrq, length);
 	m_beep->set_clock(sfrq);
 	if (length > 0)
 	{
@@ -287,7 +315,8 @@ void stella8085_state::makesound(uint8_t tone, uint8_t octave, uint8_t length)
 
 int stella8085_state::soundfreq(uint8_t channel, uint8_t clockdiv)
 {
-	const int int_clock = 2000240 / clockdiv;
+	const int sound_clock = (m_maincpu->clock() / 4);
+	const int int_clock = sound_clock / (clockdiv+1);
 	const int c8sharp = int_clock / 451;
 	const int d8 = int_clock / 426;
 	const int d8sharp = int_clock / 402;
