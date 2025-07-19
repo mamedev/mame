@@ -20,10 +20,10 @@
     A good deal of hardware and programming info is available courtesy of Rainer Buchty:
     http://www.buchty.net/casio/
 
-	TODO:
-	- add mic & line in/cassette, connect to PCM hardware & filter
-	- audio input peak detection (connected to AN0)
-	- filters
+    TODO:
+    - add mic & line in/cassette, connect to PCM hardware & filter
+    - audio input peak detection (connected to AN0)
+    - filters
 */
 
 #include "emu.h"

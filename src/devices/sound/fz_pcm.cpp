@@ -2,16 +2,16 @@
 // copyright-holders:Devin Acker
 
 /*
-	Casio FZ series PCM
+    Casio FZ series PCM
 
-	This hardware actually comprises two main gate arrays (GAA and GAB)
-	which each handle about half of the address generation & timing logic
-	for 8 PCM voices. An additional gate array (GAX) demultiplexes the
-	sample RAM output for each voice.
+    This hardware actually comprises two main gate arrays (GAA and GAB)
+    which each handle about half of the address generation & timing logic
+    for 8 PCM voices. An additional gate array (GAX) demultiplexes the
+    sample RAM output for each voice.
 
-	TODO:
-	- crossfade loop support
-	- sampling (writes 16-bit mic/line input to sample RAM)
+    TODO:
+    - crossfade loop support
+    - sampling (writes 16-bit mic/line input to sample RAM)
 */
 
 #include "emu.h"
