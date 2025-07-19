@@ -48,7 +48,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -115,9 +114,10 @@ private:
 	int m_video_type = 0;
 
 	// ADPCM related
-	int32_t m_adpcm_pos = 0;
-	int32_t m_adpcm_end = 0;
-	int32_t m_adpcm_data = 0;
+	uint8_t m_adpcm_end = 0;
+	uint16_t m_adpcm_pos = 0;
+	bool m_adpcm_toggle = false;
+	bool m_adpcm_enabled = false;
 };
 
 #endif // MAME_TECMO_TECMO_H

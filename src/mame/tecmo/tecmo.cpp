@@ -247,33 +247,47 @@ void tecmo_state::bankswitch_w(uint8_t data)
 void tecmo_state::adpcm_start_w(uint8_t data)
 {
 	m_adpcm_pos = data << 8;
+	m_adpcm_toggle = false;
+	m_adpcm_enabled = true;
 	m_msm->reset_w(0);
 }
 
 void tecmo_state::adpcm_end_w(uint8_t data)
 {
-	m_adpcm_end = (data + 1) << 8;
+	m_adpcm_end = data;
 }
 
 void tecmo_state::adpcm_vol_w(uint8_t data)
 {
+	// 10k, 22k, 47k, 100k
 	m_msm->set_output_gain(ALL_OUTPUTS, (data & 15) / 15.0);
 }
 
 void tecmo_state::adpcm_int(int state)
 {
-	if (m_adpcm_pos >= m_adpcm_end || m_adpcm_pos >= m_adpcm_rom.bytes())
-		m_msm->reset_w(1);
-	else if (m_adpcm_data != -1)
+	if (!state || !m_adpcm_enabled)
+		return;
+
+	uint8_t data = m_adpcm_rom[m_adpcm_pos % m_adpcm_rom.bytes()];
+
+	if (m_adpcm_toggle)
 	{
-		m_msm->data_w(m_adpcm_data & 0x0f);
-		m_adpcm_data = -1;
+		m_msm->data_w(data & 0xf);
+
+		const uint8_t hi = m_adpcm_pos >> 8;
+		m_adpcm_pos++;
+
+		// it checks against m_adpcm_end the same time as m_adpcm_pos low carry out
+		if ((m_adpcm_pos & 0xff) == 0 && (hi == m_adpcm_end))
+		{
+			m_adpcm_enabled = false;
+			m_msm->reset_w(1);
+		}
 	}
 	else
-	{
-		m_adpcm_data = m_adpcm_rom[m_adpcm_pos++];
-		m_msm->data_w(m_adpcm_data >> 4);
-	}
+		m_msm->data_w(data >> 4);
+
+	m_adpcm_toggle = !m_adpcm_toggle;
 }
 
 // the 8-bit dipswitches are split across addresses
@@ -833,16 +847,10 @@ void tecmo_state::machine_start()
 {
 	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
 
-	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_end));
-	save_item(NAME(m_adpcm_data));
-}
-
-void tecmo_state::machine_reset()
-{
-	m_adpcm_pos = 0;
-	m_adpcm_end = 0;
-	m_adpcm_data = -1;
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_toggle));
+	save_item(NAME(m_adpcm_enabled));
 }
 
 void tecmo_state::rygar(machine_config &config)
@@ -883,7 +891,7 @@ void tecmo_state::rygar(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	MSM5205(config, m_msm, 400_kHz_XTAL); // verified on pcb, even if schematics shows a 384khz resonator
-	m_msm->vck_legacy_callback().set(FUNC(tecmo_state::adpcm_int));
+	m_msm->vck_callback().set(FUNC(tecmo_state::adpcm_int));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
