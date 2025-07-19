@@ -674,13 +674,23 @@ const uint32_t mcd212_device::s_4bpp_color[16] =
 template <bool MosaicA, bool MosaicB, bool OrderAB>
 void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *plane_b, bool *transparent_b, uint32_t *out)
 {
-	const uint8_t mosaic_count_a = (m_mosaic_hold[0] & 0x0000ff) << 1;
-	const uint8_t mosaic_count_b = (m_mosaic_hold[1] & 0x0000ff) << 1;
+	const uint8_t icmA = get_icm<0>();
+	const uint8_t icmB = get_icm<1>();
+	uint16_t mosaic_count_a = (m_mosaic_hold[0] & 0x0000ff) << 1;
+	uint16_t mosaic_count_b = (m_mosaic_hold[1] & 0x0000ff) << 1;
 	const int width = get_screen_width();
 	const int border_width = get_border_width();
 
 	uint8_t *weight_a = &m_weight_factor[0][0];
 	uint8_t *weight_b = &m_weight_factor[1][0];
+
+	// Console Verified. CLUT4 pixels are drawn in pairs during VSR. So the mosaic here is halved.
+	if (icmA == ICM_CLUT4) {
+		mosaic_count_a >>= 1;
+	}
+	if (icmB == ICM_CLUT4) {
+		mosaic_count_b >>= 1;
+	}
 
 	for (int x = 0; x < width; x++)
 	{
