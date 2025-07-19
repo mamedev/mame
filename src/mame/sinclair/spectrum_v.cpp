@@ -316,8 +316,8 @@ void spectrum_state::spectrum_refresh_w(offs_t offset, uint8_t data)
 
 	if (snow_pattern == 1)
 	{
-		m_screen_location[px_addr_hi | addr_lo] = m_specmem->read8((offset & 0xc000) | px_addr_hi | r);
-		m_screen_location[attr_addr_hi | addr_lo] = m_specmem->read8((offset & 0xc000) | attr_addr_hi | r);
+		m_screen_location[px_addr_hi | addr_lo] = m_screen_location[px_addr_hi | r];
+		m_screen_location[attr_addr_hi | addr_lo] = m_screen_location[attr_addr_hi | r];
 	}
 	else if (snow_pattern == 2)
 	{
