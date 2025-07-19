@@ -42,23 +42,25 @@ public:
     i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
     auto inta_callback()    { return m_in_inta_cb.bind(); }
-    auto int_callback()    { return m_out_int_cb.bind(); }
+    auto int_callback()     { return m_out_int_cb.bind(); }
     auto extint_callback()  { return m_in_extint_cb.bind(); }
+   
+    void write_rxc(int state);
+    void write_rxd(int state);
+	void write_cts(int state);    
+	void write_txc(int state);
+
+    auto txd_handler() { return m_txd_handler.bind(); }
     
-    auto in_p1_callback()   { return m_in_p1_cb.bind(); }
     auto in_p2_callback()   { return m_in_p2_cb.bind(); }
-    auto out_p1_callback()  { return m_out_p1_cb.bind(); }
     auto out_p2_callback()  { return m_out_p2_cb.bind(); }
+    auto in_p1_callback()   { return m_in_p1_cb.bind(); }
+    auto out_p1_callback()  { return m_out_p1_cb.bind(); }
 
     virtual void device_start() override;
     virtual void device_reset() override;
 
     TIMER_CALLBACK_MEMBER(timer_check);
-
-    void write_rxc(int state);
-    void write_rxd(int state);
-	void write_cts(int state);    
-	void write_txc(int state);
 	
     void write(offs_t offset, u8 data);
     uint8_t read(offs_t offset);
@@ -68,21 +70,24 @@ public:
     uint8_t p2_r();
     void    p2_w(uint8_t data);
 
+
 private:
     devcb_read_line m_in_inta_cb;
     devcb_write_line m_out_int_cb;
     devcb_read_line m_in_extint_cb;
     
-    devcb_read8 m_in_p1_cb;
-	devcb_read8 m_in_p2_cb;
-	devcb_write8 m_out_p1_cb;
-	devcb_write8 m_out_p2_cb;
-
 	bool m_rxc;
     bool m_rxd;
     bool m_cts;
 	bool m_txc;
 
+    devcb_write_line m_txd_handler;
+
+	devcb_read8 m_in_p2_cb;
+    devcb_write8 m_out_p2_cb;
+    devcb_read8 m_in_p1_cb;
+	devcb_write8 m_out_p1_cb;
+	
     uint8_t m_command1, m_command2, m_command3;
     uint8_t m_data_bits_count;
     parity_t m_parity;

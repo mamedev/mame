@@ -11,15 +11,17 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 	device_serial_interface(mconfig, *this),
 	m_in_inta_cb(*this, 0),
 	m_out_int_cb(*this),
-	m_in_extint_cb(*this, 0),	
-	m_in_p1_cb(*this, 0),
-	m_in_p2_cb(*this, 0),
-	m_out_p1_cb(*this),
-	m_out_p2_cb(*this),
+	m_in_extint_cb(*this, 0),
 	m_rxc(0),
 	m_rxd(1),
 	m_cts(1),	
 	m_txc(0),
+	m_txd_handler(*this),	
+	m_in_p2_cb(*this, 0),
+	m_out_p2_cb(*this),
+	m_in_p1_cb(*this, 0),
+	m_out_p1_cb(*this),
+
 	m_timer(nullptr)
 {
 }
@@ -222,6 +224,7 @@ void i8256_device::write(offs_t offset, u8 data)
 			break;
 		case REG_STATUS:
 			m_modification = data;
+			break;
 		default:
 			LOG("I8256 Unmapped write %02x to %02x\n", data, reg);
 			break;
