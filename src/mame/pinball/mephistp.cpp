@@ -220,7 +220,7 @@ void mephisto_state::mephisto(machine_config &config)
 	//config.set_default_layout(layout_mephistp);
 
 	i8256_device &m_uart(I8256(config, "m_uart", XTAL(18'000'000)/3));
-	m_uart.extint_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_uart.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	//m_uart.txd_handler().set_inputline("audiocpu", MCS51_RX_LINE);
 
 	I8155(config, "ic20", XTAL(18'000'000)/6);
