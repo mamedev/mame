@@ -94,6 +94,8 @@ private:
     uint8_t m_port1_control, m_port1_int;
     uint8_t m_port2_int;
 
+    uint8_t m_current_interrupt_level;
+
     uint8_t m_status;
 
     uint8_t m_timers[5];

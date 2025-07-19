@@ -68,6 +68,7 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
         if (m_timers[i] > 0) {
             m_timers[i]--;
 			if (m_timers[i] == 0 && BIT(m_interrupts,timer_interrupt[i])) { // If the interrupt is enabled
+				m_current_interrupt_level = timer_interrupt[i];
 				m_out_int_cb(1); // it occurs when the counter changes from 1 to 0.
 			}            	
         }
@@ -97,6 +98,11 @@ uint8_t i8256_device::read(offs_t offset)
            return m_mode;
 		case REG_INTEN:
 			return m_interrupts;
+		case REG_INTAD:
+			m_out_int_cb(0);
+			return m_current_interrupt_level*4;
+		case REG_BUFFER:
+			return m_rx_buffer;
 		case REG_PORT1C:
             return m_port1_control;
 		case REG_PORT1:
@@ -186,6 +192,12 @@ void i8256_device::write(offs_t offset, u8 data)
 				m_status = 0x30;
 			}
             break;
+		case REG_MODE:
+            m_mode = data;
+			break;
+		case REG_PORT1C:
+            m_port1_control = data;
+			break;
 		case REG_INTEN:
 			m_interrupts = m_interrupts | data;
 			LOG("I8256 Enabled interrupts: %u\n", m_interrupts);
@@ -193,11 +205,8 @@ void i8256_device::write(offs_t offset, u8 data)
 		case REG_INTAD: // reset interrupt
 			m_interrupts = m_interrupts & ~data;
 			break;
-		case REG_MODE:
-            m_mode = data;
-			break;
-		case REG_PORT1C:
-            m_port1_control = data;
+		case REG_BUFFER:
+			m_tx_buffer = data;
 			break;
 		case REG_PORT1:
 			m_port1_int = data;
