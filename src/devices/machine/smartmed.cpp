@@ -165,16 +165,25 @@ int smartmedia_image_device::detect_geometry( uint8_t id1, uint8_t id2)
 	return result;
 }
 
-std::error_condition smartmedia_image_device::smartmedia_format_2()
+std::error_condition smartmedia_image_device::smartmedia_format_2(bool read_header, uint8_t id1, uint8_t id2)
 {
 	std::error_condition err;
 	size_t bytes_read;
 
 	disk_image_format_2_header custom_header;
 
-	std::tie(err, bytes_read) = read(image_core_file(), &custom_header, sizeof(custom_header));
-	if (err || (bytes_read != sizeof(custom_header)))
-		return err ? err : std::errc::io_error;
+	if (read_header)
+	{
+		std::tie(err, bytes_read) = read(image_core_file(), &custom_header, sizeof(custom_header));
+		if (err || (bytes_read != sizeof(custom_header)))
+			return err ? err : std::errc::io_error;
+	}
+	else
+	{
+		memset(&custom_header, 0x00, sizeof(custom_header));
+		custom_header.data1[0] = id1;
+		custom_header.data1[1] = id2;
+	}
 
 	if ((custom_header.data1[0] != 0xEC) && (custom_header.data1[0] != 0x98))
 		return image_error::INVALIDIMAGE;
@@ -222,14 +231,34 @@ std::error_condition smartmedia_image_device::smartmedia_format_2()
 std::pair<std::error_condition, std::string> smartmedia_image_device::call_load()
 {
 	std::error_condition result;
+
+	// if we're loading through the softlist give the option of the geometry being specified there, so that raw flash dumps can be loaded.
+	if (loaded_through_softlist())
+	{
+		logerror("Using softlists\n");
+		const char* nandtype1 = get_feature("nandtype1");
+		const char* nandtype2 = get_feature("nandtype2");
+
+		if (nandtype1 && nandtype2)
+		{
+			result = smartmedia_format_2(false, std::stoi(nandtype1,nullptr,0), std::stoi(nandtype2, nullptr,0));
+			return std::make_pair(result, std::string());
+		}
+		else
+		{
+			logerror("No NAND type specified\n");
+		}
+	}
+
 	// try format 1
 	uint64_t const position = ftell();
+
 	result = smartmedia_format_1();
 	if (result)
 	{
 		// try format 2
 		fseek(position, SEEK_SET);
-		result = smartmedia_format_2();
+		result = smartmedia_format_2(true);
 	}
 	return std::make_pair(result, std::string());
 }
