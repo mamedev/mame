@@ -9,8 +9,9 @@ DEFINE_DEVICE_TYPE(I8256, i8256_device, "intel_8256", "Intel 8256AH MULTIFUNCTIO
 i8256_device::i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
     : device_t(mconfig, I8256, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
-	m_extint_cb(*this),
-	m_inta_cb(*this),
+	m_in_inta_cb(*this, 0),
+	m_out_int_cb(*this),
+	m_in_extint_cb(*this, 0),	
 	m_in_p1_cb(*this, 0),
 	m_in_p2_cb(*this, 0),
 	m_out_p1_cb(*this),
@@ -64,11 +65,11 @@ void i8256_device::device_reset()
 TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 {
     for (int i = 0; i < 5; ++i) {
-        if (m_timers[i] < UINT16_MAX) {
-            m_timers[i]++;
-        } else {
-            m_timers[i] = 0;
-            //trigger_interrupt(timer_interrupt[i]);
+        if (m_timers[i] > 0) {
+            m_timers[i]--;
+			if (m_timers[i] == 0 && BIT(m_interrupts,timer_interrupt[i])) { // If the interrupt is enabled
+				m_out_int_cb(1); // it occurs when the counter changes from 1 to 0.
+			}            	
         }
     }
 }

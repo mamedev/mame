@@ -41,8 +41,10 @@ class i8256_device : public device_t, public device_serial_interface
 public:
     i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-    auto extint_callback()  { return m_extint_cb.bind(); }
-    auto inta_callback()    { return m_inta_cb.bind(); }
+    auto inta_callback()    { return m_in_inta_cb.bind(); }
+    auto int_callback()    { return m_out_int_cb.bind(); }
+    auto extint_callback()  { return m_in_extint_cb.bind(); }
+    
     auto in_p1_callback()   { return m_in_p1_cb.bind(); }
     auto in_p2_callback()   { return m_in_p2_cb.bind(); }
     auto out_p1_callback()  { return m_out_p1_cb.bind(); }
@@ -67,8 +69,10 @@ public:
     void    p2_w(uint8_t data);
 
 private:
-    devcb_write_line m_extint_cb;
-    devcb_write_line m_inta_cb;
+    devcb_read_line m_in_inta_cb;
+    devcb_write_line m_out_int_cb;
+    devcb_read_line m_in_extint_cb;
+    
     devcb_read8 m_in_p1_cb;
 	devcb_read8 m_in_p2_cb;
 	devcb_write8 m_out_p1_cb;
