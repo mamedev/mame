@@ -49,6 +49,7 @@ public:
 	stella8085_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_uart(*this, "muart"),
 		m_kdc(*this, "kdc"),
 		m_dsw(*this, "DSW"),
 		m_digits(*this, "digit%u", 0U),
@@ -69,6 +70,7 @@ private:
 	u8 m_digit = 0U;
 	u8 m_kbd_sl = 0x00;
 	required_device<cpu_device> m_maincpu;
+	required_device<i8256_device> m_uart;
 	required_device<i8279_device> m_kdc;
 	required_ioport m_dsw;
 	output_finder<8> m_digits;
@@ -436,7 +438,7 @@ void stella8085_state::dicemstr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::large_program_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::rtc62421_io_map);
 
-	I8256(config, "muart", 10.240_MHz_XTAL / 2); // divider not verified
+	I8256(config, m_uart, 10.240_MHz_XTAL / 2); // divider not verified
 
 	I8279(config, m_kdc, 10.240_MHz_XTAL / 4); // divider not verified
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
@@ -457,7 +459,8 @@ void stella8085_state::doppelpot(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::mc146818_io_map);
 
-	I8256(config, "muart", 6.144_MHz_XTAL / 2);
+	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
+	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
 
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
