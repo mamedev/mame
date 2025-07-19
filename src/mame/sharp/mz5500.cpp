@@ -6,7 +6,9 @@ Sharp MZ-6500
 
 TODO:
 - keyboard (from MCU thru PIO, serial i/f)
+- "ERROR 06" during selfcheck (r/w from <reserved> "I/O slot" $f5 port);
 - mz6550: hangs for missing second CTC;
+- mz6550: hookup EMM to bus slot (tested in selfcheck, "ERROR 05");
 
 **************************************************************************************************/
 
@@ -15,7 +17,10 @@ TODO:
 #include "cpu/i86/i286.h"
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
+#include "machine/bankdev.h"
+#include "machine/i8255.h"
 #include "machine/pic8259.h"
+#include "machine/rp5c01.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
 #include "sound/ay8910.h"
@@ -37,9 +42,11 @@ public:
 		, m_pic(*this, "pic_%u", 1U)
 		, m_dmac(*this, "dmac")
 		, m_ctc(*this, "ctc")
+		, m_rtc(*this, "rtc")
 		, m_hgdc(*this, "upd7220")
 		, m_vram(*this, "videoram")
 		, m_palette(*this, "palette")
+		, m_user_bank(*this, "user_bank")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0U)
 		, m_psg(*this, "psg")
@@ -53,21 +60,26 @@ protected:
 	required_device_array<pic8259_device, 2>  m_pic;
 	required_device<am9517a_device> m_dmac;
 	required_device<z80ctc_device> m_ctc;
+	required_device<rp5c01_device> m_rtc;
 	required_device<upd7220_device> m_hgdc;
 	required_shared_ptr<u16> m_vram;
 	required_device<palette_device> m_palette;
+	required_device<address_map_bank_device> m_user_bank;
 	required_device<upd765a_device> m_fdc;
 	optional_device_array<floppy_connector, 4> m_floppy;
+	floppy_image_device *m_current_floppy;
 	required_device<ay8912_device> m_psg;
 
 	void io_map(address_map &map) ATTR_COLD;
 	virtual void mem_map(address_map &map) ATTR_COLD;
 
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 private:
 	u8 vram_r(offs_t offset);
 	void vram_w(offs_t offset, u8 data);
-	void machine_reset() override ATTR_COLD;
-	void machine_start() override ATTR_COLD;
+	void user_map(address_map &map);
+
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	void upd7220_map(address_map &map) ATTR_COLD;
 
@@ -125,7 +137,7 @@ void mz6500_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x9ffff).ram();
-//  map(0xa0000,0xbffff) kanji/dictionary ROM
+	map(0xa0000, 0xbffff).m(m_user_bank, FUNC(address_map_bank_device::amap8));
 	map(0xc0000, 0xeffff).rw(FUNC(mz6500_state::vram_r), FUNC(mz6500_state::vram_w));
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
@@ -134,7 +146,7 @@ void mz6500_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x000f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-//  map(0x0010, 0x001f) i8255
+	map(0x0010, 0x0013).mirror(0xc).rw("pio", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0020, 0x0021).mirror(0xe).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x0030, 0x0033).mirror(0xc).rw(m_pic[0], FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0043).mirror(0xc).rw(m_pic[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
@@ -154,11 +166,21 @@ void mz6500_state::io_map(address_map &map)
 //  map(0x0200, 0x020f) z80sio
 	// TODO: second ctc at 0x214-0x217, just one for MZ-5500
 	map(0x0210, 0x0213).mirror(0x8).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-//  map(0x0220, 0x022f) rp5c01
+	map(0x0220, 0x022f).rw(m_rtc, FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
 	map(0x0230, 0x0231).mirror(0xe).rw(m_psg, FUNC(ay8912_device::data_r), FUNC(ay8912_device::data_address_w));
 //  map(0x0240, 0x0240) z80ctc vector ack
 //  map(0x0250, 0x0250) z80sio vector ack
 //  map(0x0270, 0x0270) system port B
+}
+
+void mz6500_state::user_map(address_map &map)
+{
+	map.unmap_value_high();
+//  map(0x60000, 0x7ffff) MZ-1R32 EMM
+	map(0x80000, 0x9ffff).rom().region("dictionary", 0x20000);
+	map(0xa0000, 0xbffff).rom().region("dictionary", 0x00000);
+	map(0xc0000, 0xdffff).rom().region("kanji", 0x20000);
+	map(0xe0000, 0xfffff).rom().region("kanji", 0x00000);
 }
 
 void mz6550_state::mem_map(address_map &map)
@@ -218,6 +240,7 @@ INPUT_PORTS_END
 void mz6500_state::machine_start()
 {
 	m_fdc->set_rate(500000);
+	m_current_floppy = nullptr;
 }
 
 void mz6500_state::machine_reset()
@@ -247,7 +270,7 @@ void mz6500_state::dma_write_byte(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dma_channel] << 16) | offset;
-//	printf("%05x %d -> %02x\n", addr, m_dma_channel, data);
+//  printf("%05x %d -> %02x\n", addr, m_dma_channel, data);
 	program.write_byte(addr, data);
 }
 
@@ -260,25 +283,37 @@ void mz6500_state::set_dma_channel(int channel, int state)
 void mz6500_state::psg_porta_w(u8 data)
 {
 	// SL0-SL3
-	for (int sl_i = 0; sl_i < 4; sl_i ++)
+	// TODO: error 13 without this for drives B (first time) and C (second time onward)
+	// However both msdos211 and cpm86 will be unhappy with this.
+	//if ((data & 0xf) == 0)
+	//{
+	//	m_current_floppy = nullptr;
+	//	m_fdc->set_floppy(nullptr);
+	//}
+	//else
 	{
-		// TODO: can it multiselect?
-		if (BIT(data, sl_i))
+		for (int sl_i = 0; sl_i < 4; sl_i ++)
 		{
-			if (m_floppy[sl_i]->get_device() != nullptr)
+			// Assume multiselect not doable
+			if (BIT(data, sl_i))
 			{
-				// MON
-				//m_fdc->set_floppy(m_floppy[sl_i]->get_device());
-				m_floppy[sl_i]->get_device()->mon_w(BIT(data, 4));
+				m_current_floppy = m_floppy[sl_i]->get_device();
+				m_fdc->set_floppy(m_current_floppy);
+
+				if (m_current_floppy != nullptr)
+				{
+					// /MOTOR ON
+					m_current_floppy->mon_w(BIT(data, 4));
+				}
+				break;
 			}
-			break;
 		}
 	}
 
-	// TODO: MA0-MA2 memory banking + MA0-MA1 trap ir7
+	// TODO: MA0-MA1 also sends ir7 traps
 	// m_pic[0]->ir7_w(BIT(!data, 5));
 	// m_pic[1]->ir7_w(BIT(!data, 6));
-	// set_bank((data & 0xe0) >> 5);
+	m_user_bank->set_bank((data & 0xe0) >> 5);
 }
 
 
@@ -291,6 +326,8 @@ void mz6500_state::mz6500(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz6500_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mz6500_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(m_pic[0], FUNC(pic8259_device::inta_cb));
+
+	ADDRESS_MAP_BANK(config, m_user_bank).set_map(&mz6500_state::user_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x20000);
 
 	PIC8259(config, m_pic[0], 0);
 	m_pic[0]->out_int_callback().set_inputline(m_maincpu, 0);
@@ -320,8 +357,45 @@ void mz6500_state::mz6500(machine_config &config)
 	m_dmac->out_dack_callback<2>().set([this] (int state) { set_dma_channel(2, state); });
 	m_dmac->out_dack_callback<3>().set([this] (int state) { set_dma_channel(3, state); });
 
+	i8255_device &pio(I8255A(config, "pio"));
+//  pio.out_pa_callback() Data output to centronics (negated)
+	/*
+	 * x--- ---- FDC motor on status input
+	 * -x-- ---- SIO /CI
+	 * --x- ---- SIO /CD
+	 * ---x ---- Keyboard SRK (output request)
+	 * ---- x--- Keyboard DK (data bit)
+	 * ---- -x-- Centronics PDTR (select signal)
+	 * ---- --x- Centronics /PE
+	 * ---- ---x Centronics /BUSY
+	 */
+	pio.in_pb_callback().set([this] () {
+		u8 res = 0;
+
+		if (m_current_floppy != nullptr)
+			res |= m_current_floppy->mon_r() << 7;
+		return res;
+	});
+//	pio.in_pc_callback().set([this] () {
+//		return 0;
+//	});
+	/*
+	 * -x-- ---- Centronics /ACK input
+	 * --x- ---- Centronics /STROBE output
+	 * ---- x--- Trap IRQ for Centronics /ACK
+	 * ---- -x-- BSC external clock /EXCLK EN
+	 * ---- --x- Keyboard STC (strobe) output
+	 * ---- ---x Keyboard DC (data bit) output
+	 */
+	pio.out_pc_callback().set([this] (u8 data) {
+		logerror("PIO PORTC: %02x\n", data);
+	});
+
 	Z80CTC(config, m_ctc, 8000000 / 2);
 	m_ctc->intr_callback().set(m_pic[0], FUNC(pic8259_device::ir5_w));
+
+	RP5C01(config, m_rtc, XTAL(32'768));
+	m_rtc->out_alarm_callback().set(m_pic[1], FUNC(pic8259_device::ir0_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
@@ -337,7 +411,8 @@ void mz6500_state::mz6500(machine_config &config)
 	m_hgdc->set_display_pixels(FUNC(mz6500_state::hgdc_display_pixels));
 	m_hgdc->vsync_wr_callback().set(m_pic[0], FUNC(pic8259_device::ir0_w));
 
-	UPD765A(config, m_fdc, 8000000, false, true);
+	// wants ready for detecting if disk is in.
+	UPD765A(config, m_fdc, 8000000, true, true);
 	m_fdc->intrq_wr_callback().set(m_pic[1], FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w)).invert();
 	FLOPPY_CONNECTOR(config, "fdc:0", mz6500_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
@@ -350,7 +425,7 @@ void mz6500_state::mz6500(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	// TODO: clock, discrete mixing
-	AY8912(config, m_psg, 3.579545_MHz_XTAL / 2);
+	AY8912(config, m_psg, 4000000);
 	m_psg->port_a_write_callback().set(FUNC(mz6500_state::psg_porta_w));
 	m_psg->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -371,22 +446,22 @@ ROM_START( mz6500 )
 	ROM_REGION16_LE( 0x4000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(6c978ac4) SHA1(7872d7e6d9cda2ed9f47ed4833a5caa4dfe0e55c))
 
-	ROM_REGION16_LE( 0x40000, "dictionary", ROMREGION_ERASEFF )
-	ROM_LOAD( "dict.rom", 0x0000, 0x40000, CRC(2df3cfd3) SHA1(d420ede09658c2626b0bb650a063d88b1783e554))
+	ROM_REGION( 0x40000, "dictionary", ROMREGION_ERASEFF )
+	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(2df3cfd3) SHA1(d420ede09658c2626b0bb650a063d88b1783e554))
 
-	ROM_REGION16_LE( 0x40000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD( "kanji.rom", 0x0000, 0x40000, CRC(b618e25d) SHA1(1da93337fecde6c0f8a5bd68f3f0b3222a38d63e))
+	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF )
+	ROM_LOAD( "kanji.rom", 0x00000, 0x40000, CRC(b618e25d) SHA1(1da93337fecde6c0f8a5bd68f3f0b3222a38d63e))
 ROM_END
 
 ROM_START( mz6550 )
 	ROM_REGION16_LE( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x8000, CRC(7a751f21) SHA1(4f89eb1400c72540c68fddd8ffc12d1161006fc9))
 
-	ROM_REGION16_LE( 0x40000, "dictionary", ROMREGION_ERASEFF )
-	ROM_LOAD( "dict.rom", 0x0000, 0x40000,  CRC(2df3cfd3) SHA1(d420ede09658c2626b0bb650a063d88b1783e554))
+	ROM_REGION( 0x40000, "dictionary", ROMREGION_ERASEFF )
+	ROM_LOAD( "dict.rom", 0x00000, 0x40000,  CRC(2df3cfd3) SHA1(d420ede09658c2626b0bb650a063d88b1783e554))
 
-	ROM_REGION16_LE( 0x40000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD( "kanji.rom", 0x0000, 0x40000, CRC(b618e25d) SHA1(1da93337fecde6c0f8a5bd68f3f0b3222a38d63e))
+	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF )
+	ROM_LOAD( "kanji.rom", 0x00000, 0x40000, CRC(b618e25d) SHA1(1da93337fecde6c0f8a5bd68f3f0b3222a38d63e))
 ROM_END
 
 
