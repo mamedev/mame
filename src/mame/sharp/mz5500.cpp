@@ -5,7 +5,8 @@
 Sharp MZ-6500
 
 TODO:
-- Fix FDC boot (error 12 in selftest, tanks performance, never output a meaningful byte from DMAC)
+- keyboard (from MCU thru PIO, serial i/f)
+- mz6550: hangs for missing second CTC;
 
 **************************************************************************************************/
 
@@ -217,13 +218,6 @@ INPUT_PORTS_END
 void mz6500_state::machine_start()
 {
 	m_fdc->set_rate(500000);
-	for (int sl_i = 0; sl_i < 4; sl_i++)
-	{
-		if (m_floppy[sl_i]->get_device() != nullptr)
-		{
-			m_floppy[sl_i]->get_device()->set_rpm(300);
-		}
-	}
 }
 
 void mz6500_state::machine_reset()
@@ -308,7 +302,7 @@ void mz6500_state::mz6500(machine_config &config)
 	m_pic[1]->in_sp_callback().set_constant(0);
 
 	AM9517A(config, m_dmac, 5000000);
-//	m_dmac->dreq_active_low();
+	m_dmac->dreq_active_low();
 	m_dmac->out_hreq_callback().set([this] (int state) {
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 		m_dmac->hack_w(state);
@@ -316,8 +310,11 @@ void mz6500_state::mz6500(machine_config &config)
 	m_dmac->out_eop_callback().set([this] (int state) { m_fdc->tc_w(state);});
 	m_dmac->in_memr_callback().set(FUNC(mz6500_state::dma_read_byte));
 	m_dmac->out_memw_callback().set(FUNC(mz6500_state::dma_write_byte));
+	// ch. 0: HDD
 	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_r));
 	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_w));
+	// ch. 2: memory refresh (from CTC ZC0)
+	// ch. 3: user selectable
 	m_dmac->out_dack_callback<0>().set([this] (int state) { set_dma_channel(0, state); });
 	m_dmac->out_dack_callback<1>().set([this] (int state) { set_dma_channel(1, state); });
 	m_dmac->out_dack_callback<2>().set([this] (int state) { set_dma_channel(2, state); });
@@ -334,6 +331,7 @@ void mz6500_state::mz6500(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	PALETTE(config, "palette").set_entries(8);
 
+	// TODO: should reach ~56 Hz
 	UPD7220(config, m_hgdc, 5000000 / 2);
 	m_hgdc->set_addrmap(0, &mz6500_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(mz6500_state::hgdc_display_pixels));
@@ -341,7 +339,7 @@ void mz6500_state::mz6500(machine_config &config)
 
 	UPD765A(config, m_fdc, 8000000, false, true);
 	m_fdc->intrq_wr_callback().set(m_pic[1], FUNC(pic8259_device::ir1_w));
-	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w)).invert();
 	FLOPPY_CONNECTOR(config, "fdc:0", mz6500_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", mz6500_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", mz6500_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
@@ -397,5 +395,5 @@ ROM_END
 
 // MZ-5500 should fit here
 // Released as MZ-5600 in U.K.
-COMP( 1984, mz6500, 0,      0,      mz6500,  mz6500, mz6500_state, empty_init, "Sharp", "MZ-6500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1985, mz6550, mz6500, 0,      mz6550,  mz6500, mz6550_state, empty_init, "Sharp", "MZ-6550", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1984, mz6500, 0,      0,      mz6500,  mz6500, mz6500_state, empty_init, "Sharp", "MZ-6500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, mz6550, mz6500, 0,      mz6550,  mz6500, mz6550_state, empty_init, "Sharp", "MZ-6550", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
