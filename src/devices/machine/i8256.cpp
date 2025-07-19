@@ -200,7 +200,6 @@ void i8256_device::write(offs_t offset, u8 data)
 			break;
 		case REG_INTEN:
 			m_interrupts = m_interrupts | data;
-			LOG("I8256 Enabled interrupts: %u\n", m_interrupts);
 			break;
 		case REG_INTAD: // reset interrupt
 			m_interrupts = m_interrupts & ~data;
@@ -221,6 +220,8 @@ void i8256_device::write(offs_t offset, u8 data)
 		case REG_TIMER5:
 			m_timers[reg-10] = data;
 			break;
+		case REG_STATUS:
+			m_modification = data;
 		default:
 			LOG("I8256 Unmapped write %02x to %02x\n", data, reg);
 			break;

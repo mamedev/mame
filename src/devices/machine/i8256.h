@@ -83,24 +83,25 @@ private:
     bool m_cts;
 	bool m_txc;
 
+    uint8_t m_command1, m_command2, m_command3;
     uint8_t m_data_bits_count;
     parity_t m_parity;
     stop_bits_t m_stop_bits;
+    
+    uint8_t m_mode;
 
-    uint8_t m_command1, m_command2, m_command3, m_mode, m_interrupts;
+    uint8_t m_port1_control;
+
+    uint8_t m_interrupts, m_current_interrupt_level;
 
     uint8_t m_tx_buffer, m_rx_buffer;
 
-    uint8_t m_port1_control, m_port1_int;
-    uint8_t m_port2_int;
-
-    uint8_t m_current_interrupt_level;
-
-    uint8_t m_status;
+    uint8_t m_port1_int, m_port2_int;
 
     uint8_t m_timers[5];
     emu_timer *m_timer;
 
+    uint8_t m_status, m_modification;
 
     enum // MUART REGISTERS
 	{
