@@ -760,7 +760,7 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 	if ((0 <= y) && (y < 16))
 	{
 		const uint32_t color = s_4bpp_color[color_index];
-		const uint8_t resolution = (m_cursor_control & CURCNT_CUW) ? 4 : 2;
+		const uint8_t resolution = (m_cursor_control & CURCNT_CUW) ? 1 : 2;
 		for (int x = 0; x < 16; x++)
 		{
 			if (BIT(m_cursor_pattern[y], 15 - x))
