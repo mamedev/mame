@@ -55,9 +55,9 @@ public:
 
     TIMER_CALLBACK_MEMBER(timer_check);
 
-	void write_cts(int state);
-    void write_rxd(int state);
     void write_rxc(int state);
+    void write_rxd(int state);
+	void write_cts(int state);    
 	void write_txc(int state);
 	
     void write(offs_t offset, u8 data);
@@ -78,9 +78,9 @@ private:
 	devcb_write8 m_out_p1_cb;
 	devcb_write8 m_out_p2_cb;
 
-	bool m_cts;
-	bool m_rxd;
 	bool m_rxc;
+    bool m_rxd;
+    bool m_cts;
 	bool m_txc;
 
     uint8_t m_data_bits_count;
