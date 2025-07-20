@@ -104,8 +104,6 @@ DECLARE_DEVICE_TYPE(M68010_TEKMMU, m68010_tekmmu_device)
 
 class m68010_tekmmu_device : public m68010_device
 {
-	using m68010_device::m68010_device;
-
 	// HACK
 	u8 *m_map_control_ptr = nullptr;
 	u16 *m_map_ptr = nullptr;
@@ -224,19 +222,11 @@ class m68010_tekmmu_device : public m68010_device
 	}
 #endif
 
-//protected:
 public:
-	m68010_tekmmu_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, u32 clock) :
-		m68010_device::m68010_device(mconfig, type, "mc68010_tekmmu", owner, clock)
+	m68010_tekmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+		m68010_device::m68010_device(mconfig, M68010_TEKMMU, tag, owner, clock)
 	{
-
-		fprintf(stderr, "m68010_tekmmu_device::shortname(%s)\n",shortname());
-
 	}
-
-
-
-public:
 
 	// if we are doing MMU translation inside memory_rw, we dont want to also do it here.
 #ifdef USE_MMU
