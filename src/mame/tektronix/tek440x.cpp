@@ -485,6 +485,8 @@ public:
 	}
 
 public:
+	static constexpr feature_type imperfect_features() { return feature::DISK; }	// ncr5385 timing lockup
+
 	void linktoMMU(u8 *map_control, u16 *map)
 	{
 		LOG("m68010_tekmmu_device::linktoMMU: control(%p) map(%p) m_emmu_enabled(%d)\n",map_control, map, m_emmu_enabled);
@@ -1825,4 +1827,4 @@ ROM_END
  *
  *************************************/
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME                               FLAGS
-COMP( 1984, tek4404, 0,      0,      tek4404, tek4404, tek440x_state, empty_init, "Tektronix", "4404 Artificial Intelligence System", MACHINE_IMPERFECT_CONTROLS  )
+COMP( 1984, tek4404, 0,      0,      tek4404, tek4404, tek440x_state, empty_init, "Tektronix", "4404 Artificial Intelligence System", MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
