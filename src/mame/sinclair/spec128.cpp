@@ -248,9 +248,9 @@ void spectrum_128_state::spectrum_128_update_memory()
 
 	m_screen->update_now();
 	if (BIT(m_port_7ffd_data, 3))
-		m_screen_location = m_ram->pointer() + (7<<14);
+		m_screen_location = m_ram->pointer() + (7 << 14);
 	else
-		m_screen_location = m_ram->pointer() + (5<<14);
+		m_screen_location = m_ram->pointer() + (5 << 14);
 }
 
 uint8_t spectrum_128_state::spectrum_port_r(offs_t offset)
@@ -382,9 +382,18 @@ bool spectrum_128_state::is_vram_write(offs_t offset) {
 }
 
 bool spectrum_128_state::is_contended(offs_t offset) {
-	u8 bank = m_bank_ram[3]->entry();
+	u8 pg = m_bank_ram[3]->entry();
 	return spectrum_state::is_contended(offset)
-		|| ((offset >= 0xc000 && offset <= 0xffff) && (bank & 1)); // Memory banks 1,3,5 and 7 are contended
+		|| ((offset >= 0xc000 && offset <= 0xffff) && (pg & 1)); // Memory pages 1,3,5 and 7 are contended
+}
+
+u8* spectrum_128_state::snow_pattern2_base(u8 i_reg)
+{
+	const bool is_alt_scr_selected = BIT(m_port_7ffd_data, 3);
+	const bool is_alt_scr = i_reg & 0x80;
+	const u8 i_pg = is_alt_scr ? (m_bank_ram[3]->entry() & 0b101) : 5;
+
+	return m_ram->pointer() + ((i_pg | (is_alt_scr_selected << 1)) << 14);
 }
 
 static const gfx_layout spectrum_charlayout =

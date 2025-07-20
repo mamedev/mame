@@ -198,7 +198,7 @@ void spectrum_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 
 		}
 		u16 y = vpos - get_screen_area().top();
 		u8 *scr = &m_screen_location[((y & 0xc0) << 5) | ((y & 7) << 8) | ((y & 0x38) << 2) | (x >> 3)];
-		u8 *attr = &m_screen_location[0x1800 + (((y & 0xf8) << 2) | (x >> 3))];
+		u8 *attr = &m_screen_location[0x1800 | (((y & 0xf8) << 2) | (x >> 3))];
 		u16 *pix = &(bitmap.pix(vpos, hpos));
 
 		while ((hpos + (chunk_right ? 0 : 4)) <= cliprect.right())
@@ -306,18 +306,19 @@ void spectrum_state::spectrum_refresh_w(offs_t offset, uint8_t data)
 		return;
 	}
 
-	const u16 px_addr_hi = ((y & 0xc0) << 5) | ((y & 7) << 8);
-	const u16 attr_addr_hi = 0x1800 + ((y & 0xc0) << 2);
-	const u8 addr_lo = ((y & 0x38) << 2) | (x >> 3);
-	const u8 r = (offset + 1) & 0x7f; // R must be already incremented during refresh. Consider z80 update.
+	const u16 px_addr_hi = ((y & 0xc0) << 5) | ((y & 7) << 8) | ((y & 0x20) << 2);
+	const u16 attr_addr_hi = 0x1800 | ((y & 0xe0) << 2);
+	const u8 addr_lo = ((y & 0x18) << 2) | (x >> 3);
 
 	const u8 px_tmp = m_screen_location[px_addr_hi | addr_lo];
 	const u8 attr_tmp = m_screen_location[attr_addr_hi | addr_lo];
 
 	if (snow_pattern == 1)
 	{
-		m_screen_location[px_addr_hi | addr_lo] = m_screen_location[px_addr_hi | r];
-		m_screen_location[attr_addr_hi | addr_lo] = m_screen_location[attr_addr_hi | r];
+		const u8 r = (offset + 1) & 0x7f; // R must be already incremented during refresh. Consider z80 update.
+		const u8* base = snow_pattern2_base(i);
+		m_screen_location[px_addr_hi | addr_lo] = base[px_addr_hi | r];
+		m_screen_location[attr_addr_hi | addr_lo] = base[attr_addr_hi | r];
 	}
 	else if (snow_pattern == 2)
 	{
@@ -330,4 +331,9 @@ void spectrum_state::spectrum_refresh_w(offs_t offset, uint8_t data)
 	m_maincpu->adjust_icount(t_to_chunk_end);
 	m_screen_location[px_addr_hi | addr_lo] = px_tmp;
 	m_screen_location[attr_addr_hi | addr_lo] = attr_tmp;
+}
+
+u8* spectrum_state::snow_pattern2_base(u8 i_reg)
+{
+	return m_screen_location;
 }
