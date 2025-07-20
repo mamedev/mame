@@ -104,6 +104,7 @@ protected:
 		ICM_NM               = 0x080000,    // Number of Matte flags
 		ICM_NM_BIT           = 19,
 		ICM_CS               = 0x400000,    // CLUT select
+		ICM_CS_BIT           = 22,
 
 		TCR_TA               = 0x00000f,    // Plane A
 		TCR_TB               = 0x000f00,    // Plane B
