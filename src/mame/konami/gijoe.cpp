@@ -281,7 +281,7 @@ uint32_t gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &b
 		if (dirty)
 		{
 			m_avac_occupancy[i] = 0;
-			m_k056832->mark_plane_dirty( i);
+			m_k056832->mark_plane_dirty(i);
 		}
 	}
 

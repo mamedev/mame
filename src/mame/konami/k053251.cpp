@@ -114,7 +114,6 @@ actually used, since the priority is taken from the external ports.
 14  unused
 15  unused
 
-
 */
 
 #include "emu.h"
@@ -129,8 +128,7 @@ actually used, since the priority is taken from the external ports.
 DEFINE_DEVICE_TYPE(K053251, k053251_device, "k053251", "Konami 053251 Priority Encoder")
 
 k053251_device::k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, K053251, tag, owner, clock),
-	m_tilemaps_set(0)
+	device_t(mconfig, K053251, tag, owner, clock)
 {
 }
 
@@ -141,7 +139,6 @@ k053251_device::k053251_device(const machine_config &mconfig, const char *tag, d
 void k053251_device::device_start()
 {
 	save_item(NAME(m_ram));
-	save_item(NAME(m_tilemaps_set));
 }
 
 //-------------------------------------------------
@@ -150,8 +147,6 @@ void k053251_device::device_start()
 
 void k053251_device::device_reset()
 {
-	m_tilemaps_set = 0;
-
 	for (int i = 0; i < 0x10; i++)
 		m_ram[i] = 0;
 
@@ -173,38 +168,10 @@ void k053251_device::device_post_load()
 
 void k053251_device::write(offs_t offset, u8 data)
 {
-	data &= 0x3f;
+	m_ram[offset] = data & 0x3f;
 
-	if (m_ram[offset] != data)
-	{
-		m_ram[offset] = data;
-		if (offset == 9)
-		{
-			/* palette base index */
-			for (int i = 0; i < 3; i++)
-			{
-				int newind = 32 * ((data >> 2 * i) & 0x03);
-				if (m_palette_index[i] != newind)
-					m_palette_index[i] = newind;
-			}
-
-			if (!m_tilemaps_set)
-				machine().tilemap().mark_all_dirty();
-		}
-		else if (offset == 10)
-		{
-			/* palette base index */
-			for (int i = 0; i < 2; i++)
-			{
-				int newind = 16 * ((data >> 3 * i) & 0x07);
-				if (m_palette_index[3 + i] != newind)
-					m_palette_index[3 + i] = newind;
-			}
-
-			if (!m_tilemaps_set)
-				machine().tilemap().mark_all_dirty();
-		}
-	}
+	if (offset == 9 || offset == 10)
+		reset_indexes();
 }
 
 int k053251_device::get_priority(int ci)
