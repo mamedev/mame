@@ -353,7 +353,7 @@ void m62_bkungfu_state::bkungfu_blitter_draw_4_tile_column(int column, int row)
 	else
 		tile += 0x37;
 
-	bkungfu_blitter_draw_4_tile_column_row(column, row, tile, m_leveldraw_number);
+	bkungfu_blitter_draw_4_tile_column_row(column, row, tile, m_leveldraw_number & 7);
 }
 
 TIMER_CALLBACK_MEMBER(m62_bkungfu_state::leveldraw_next)
@@ -385,6 +385,10 @@ void m62_bkungfu_state::bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data)
 	// the tilemap needs to be 256 tiles wide for the backgrounds, which are copied in a single command
 	// however the blitter commands seem to only have enough co-ordinates for the current 64 tile page
 	// and the higher bits aren't communicated to the MCU, so assume they mirror across all pages for now
+	//
+	// It's also possible the tilemap is still 64 tiles wide, like kungfum and the MCU is loading in
+	// backgrounds as needed, even if the command to draw the background is only sent at the start of
+	// a level.  The draw-in time on the background might give clues to this.
 
 	int xpart = offset & 0x7f;
 	int ypart = offset & ~0x7f;
