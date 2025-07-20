@@ -58,8 +58,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
 		, m_audiocpu(*this, "audiocpu")
-		, m_k051316_1(*this, "k051316_1")
-		, m_k051316_2(*this, "k051316_2")
+		, m_k051316(*this, "k051316_%u", 1)
 		, m_k053246(*this, "k053246")
 		, m_k053251(*this, "k053251")
 		, m_k053252(*this, "k053252")
@@ -68,6 +67,10 @@ public:
 	{ }
 
 	void overdriv(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -92,10 +95,6 @@ private:
 	void overdriv_slave_map(address_map &map) ATTR_COLD;
 	void overdriv_sound_map(address_map &map) ATTR_COLD;
 
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
 	/* video-related */
 	int       m_zoom_colorbase[2]{};
 	int       m_road_colorbase[2]{};
@@ -103,20 +102,19 @@ private:
 	emu_timer *m_objdma_end_timer = nullptr;
 
 	/* misc */
-	uint16_t     m_cpuB_ctrl = 0;
+	uint16_t  m_cpuB_ctrl = 0;
+	int       m_fake_timer = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<k051316_device> m_k051316_1;
-	required_device<k051316_device> m_k051316_2;
+	required_device_array<k051316_device, 2> m_k051316;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
 	required_device<k053252_device> m_k053252;
 	required_device<screen_device> m_screen;
 	output_finder<> m_led;
-	int m_fake_timer = 0;
 };
 
 
@@ -191,7 +189,7 @@ void overdriv_state::cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 		machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
-//logerror("%s: write %04x to cpuA_ctrl_w\n",machine().describe_context(),data);
+		//logerror("%s: write %04x to cpuA_ctrl_w\n",machine().describe_context(),data);
 	}
 }
 
@@ -284,15 +282,22 @@ uint32_t overdriv_state::screen_update_overdriv(screen_device &screen, bitmap_in
 	m_sprite_colorbase  = m_k053251->get_palette_index(k053251_device::CI0);
 	m_road_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI1);
 	m_road_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
-	m_zoom_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI3);
-	m_zoom_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI4);
+
+	for (int i = 0; i < 2; i++)
+	{
+		int prev_colorbase = m_zoom_colorbase[i];
+		m_zoom_colorbase[i] = m_k053251->get_palette_index(k053251_device::CI4 - i);
+
+		if (m_zoom_colorbase[i] != prev_colorbase)
+			m_k051316[i]->mark_tmap_dirty();
+	}
 
 	screen.priority().fill(0, cliprect);
 
-	m_k051316_1->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_k051316_2->zoom_draw(screen, bitmap, cliprect, 0, 1);
+	m_k051316[0]->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_k051316[1]->zoom_draw(screen, bitmap, cliprect, 0, 1);
 
-	m_k053246->k053247_sprites_draw( bitmap,cliprect);
+	m_k053246->k053247_sprites_draw(bitmap,cliprect);
 	return 0;
 }
 
@@ -308,8 +313,8 @@ void overdriv_state::overdriv_master_map(address_map &map)
 	map(0x100000, 0x10001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); /* 053252? (LSB) */
 	map(0x140000, 0x140001).nopw(); //watchdog reset?
 	map(0x180001, 0x180001).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
-	map(0x1c0000, 0x1c001f).w(m_k051316_1, FUNC(k051316_device::ctrl_w)).umask16(0xff00);
-	map(0x1c8000, 0x1c801f).w(m_k051316_2, FUNC(k051316_device::ctrl_w)).umask16(0xff00);
+	map(0x1c0000, 0x1c001f).w(m_k051316[0], FUNC(k051316_device::ctrl_w)).umask16(0xff00);
+	map(0x1c8000, 0x1c801f).w(m_k051316[1], FUNC(k051316_device::ctrl_w)).umask16(0xff00);
 	map(0x1d0000, 0x1d001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x1d8000, 0x1d8003).rw("k053260_1", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x1e0000, 0x1e0003).rw("k053260_2", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
@@ -317,10 +322,10 @@ void overdriv_state::overdriv_master_map(address_map &map)
 	map(0x1f0000, 0x1f0001).w(FUNC(overdriv_state::cpuA_ctrl_w));  /* halt cpu B, coin counter, start lamp, other? */
 	map(0x1f8000, 0x1f8001).w(FUNC(overdriv_state::eeprom_w));
 	map(0x200000, 0x203fff).ram().share("share1");
-	map(0x210000, 0x210fff).rw(m_k051316_1, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
-	map(0x218000, 0x218fff).rw(m_k051316_2, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
-	map(0x220000, 0x220fff).r(m_k051316_1, FUNC(k051316_device::rom_r)).umask16(0xff00);
-	map(0x228000, 0x228fff).r(m_k051316_2, FUNC(k051316_device::rom_r)).umask16(0xff00);
+	map(0x210000, 0x210fff).rw(m_k051316[0], FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
+	map(0x218000, 0x218fff).rw(m_k051316[1], FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
+	map(0x220000, 0x220fff).r(m_k051316[0], FUNC(k051316_device::rom_r)).umask16(0xff00);
+	map(0x228000, 0x228fff).r(m_k051316[1], FUNC(k051316_device::rom_r)).umask16(0xff00);
 	map(0x230000, 0x230001).w(FUNC(overdriv_state::slave_irq4_assert_w));
 	map(0x238000, 0x238001).w(FUNC(overdriv_state::slave_irq5_assert_w));
 }
@@ -476,16 +481,16 @@ void overdriv_state::overdriv(machine_config &config)
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 77, 22);
 	m_k053246->set_palette("palette");
 
-	K051316(config, m_k051316_1, 24_MHz_XTAL / 2);
-	m_k051316_1->set_palette("palette");
-	m_k051316_1->set_offsets(110, -1);
-	m_k051316_1->set_wrap(1);
-	m_k051316_1->set_zoom_callback(FUNC(overdriv_state::zoom_callback_1));
+	K051316(config, m_k051316[0], 24_MHz_XTAL / 2);
+	m_k051316[0]->set_palette("palette");
+	m_k051316[0]->set_offsets(110, -1);
+	m_k051316[0]->set_wrap(1);
+	m_k051316[0]->set_zoom_callback(FUNC(overdriv_state::zoom_callback_1));
 
-	K051316(config, m_k051316_2, 24_MHz_XTAL / 2);
-	m_k051316_2->set_palette("palette");
-	m_k051316_2->set_offsets(111, 1);
-	m_k051316_2->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2));
+	K051316(config, m_k051316[1], 24_MHz_XTAL / 2);
+	m_k051316[1]->set_palette("palette");
+	m_k051316[1]->set_offsets(111, 1);
+	m_k051316[1]->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2));
 
 	K053251(config, m_k053251, 0);
 

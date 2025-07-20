@@ -370,19 +370,16 @@ void m82_state::m82_tm_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 void m72_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u16 *spriteram = m_spriteram->buffer();
-	std::vector<int> spritelist(m_spriteram->length());
+	std::vector<int> spritelist;
 
 	// reverse spritelist due to priority buffer
-	int i = 0, j = 0;
-	while (j < m_spriteram->length())
+	for (int i = 0, w = 0; i < m_spriteram->length(); i += w * 4)
 	{
-		spritelist[i++] = j;
-
-		const int w = 1 << ((spriteram[j+2] & 0xc000) >> 14);
-		j += w * 4;
+		spritelist.push_back(i);
+		w = 1 << ((spriteram[i+2] & 0xc000) >> 14);
 	}
 
-	while (--i >= 0)
+	for (int i = spritelist.size() - 1; i >= 0; i--)
 	{
 		const int offs = spritelist[i];
 		const int code = spriteram[offs+1];

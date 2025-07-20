@@ -180,11 +180,11 @@ private:
 	int         m_layer_colorbase[4];
 	int         m_layerpri[3];
 	int         m_alpha_enabled = 0;
-	uint16_t      m_zmask = 0;
+	uint16_t    m_zmask = 0;
 
 	/* misc */
-	uint16_t      m_protram[16];
-	uint16_t      m_cur_control2 = 0;
+	uint16_t    m_protram[16];
+	uint16_t    m_cur_control2 = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -291,7 +291,7 @@ uint32_t moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitma
 			if (m_layer_colorbase[plane] != new_colorbase)
 			{
 				m_layer_colorbase[plane] = new_colorbase;
-				m_k056832->mark_plane_dirty( plane);
+				m_k056832->mark_plane_dirty(plane);
 			}
 		}
 	}
@@ -1247,6 +1247,7 @@ GAME( 1992, moomesauac, moomesa, moo,     moo,   moo_state, empty_init, ROT0, "K
 GAME( 1992, moomesauab, moomesa, moo,     moo,   moo_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, moomesaaab, moomesa, moo,     moo,   moo_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver AAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, moomesabl,  moomesa, moobl,   moo,   moo_state, empty_init, ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // based on Version AA
+
 GAME( 1992, bucky,      0,       bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver EAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, buckyea,    bucky,   bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver EA)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, buckyjaa,   bucky,   bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver JAA)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

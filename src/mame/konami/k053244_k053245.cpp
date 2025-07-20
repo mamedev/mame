@@ -18,13 +18,12 @@ main ram and the buffer.
            bit 4 = enable gfx ROM reading
            bit 5 = unknown, used by Rollergames
 006     RW accessing this register copies the sprite ram to the internal buffer
-007      W unknown
+007     RW clear sprite buffer? (see detatwin)
 008-009  W low 16 bits of the ROM address to read
 00a-00b  W high bits of the ROM address to read.  3 bits for most games, 1 for asterix
 00c-00f R  reads data from the gfx ROMs (32 bits in total). The address of the
            data is determined by the registers above; plus bank switch bits for
            larger ROMs.
-
 
 */
 
@@ -41,9 +40,9 @@ main ram and the buffer.
     DEVICE INTERFACE
 *****************************************************************************/
 
-DEFINE_DEVICE_TYPE(K053244, k05324x_device, "k05324x", "K053244/053245 Sprite Generator")
+DEFINE_DEVICE_TYPE(K053244, k053244_device, "k053244", "Konami 053244/053245 Sprite Generator")
 
-const gfx_layout k05324x_device::spritelayout =
+const gfx_layout k053244_device::spritelayout =
 {
 	16,16,
 	RGN_FRAC(1,1),
@@ -58,7 +57,7 @@ const gfx_layout k05324x_device::spritelayout =
 
 // Lethal Enforcers has two k053244s hooked up to one k053245 to give 6bpp...
 // for now we just emulate it using an alternate gfx layout
-const gfx_layout k05324x_device::spritelayout_6bpp =
+const gfx_layout k053244_device::spritelayout_6bpp =
 {
 	16,16,
 	RGN_FRAC(1,2),
@@ -72,16 +71,16 @@ const gfx_layout k05324x_device::spritelayout_6bpp =
 };
 
 
-GFXDECODE_MEMBER( k05324x_device::gfxinfo )
+GFXDECODE_MEMBER( k053244_device::gfxinfo )
 	GFXDECODE_DEVICE(DEVICE_SELF, 0, spritelayout, 0, 1)
 GFXDECODE_END
 
-GFXDECODE_MEMBER( k05324x_device::gfxinfo_6bpp )
+GFXDECODE_MEMBER( k053244_device::gfxinfo_6bpp )
 	GFXDECODE_DEVICE(DEVICE_SELF, 0, spritelayout_6bpp, 0, 1)
 GFXDECODE_END
 
 
-k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+k053244_device::k053244_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, K053244, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(nullptr),
@@ -89,14 +88,14 @@ k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, d
 	m_sprite_rom(*this, DEVICE_SELF),
 	m_dx(0),
 	m_dy(0),
-	m_k05324x_cb(*this),
+	m_k053244_cb(*this),
 	m_rombank(0),
 	m_ramsize(0),
 	m_z_rejection(0)
 {
 }
 
-void k05324x_device::set_bpp(int bpp)
+void k053244_device::set_bpp(int bpp)
 {
 	switch(bpp)
 	{
@@ -116,7 +115,7 @@ void k05324x_device::set_bpp(int bpp)
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void k05324x_device::device_start()
+void k053244_device::device_start()
 {
 	// assumes it can make an address mask with m_sprite_rom.length() - 1
 	assert(!(m_sprite_rom.length() & (m_sprite_rom.length() - 1)));
@@ -125,7 +124,7 @@ void k05324x_device::device_start()
 		throw device_missing_dependencies();
 
 	// bind callbacks
-	m_k05324x_cb.resolve();
+	m_k053244_cb.resolve();
 
 	/* decode the graphics */
 	decode_gfx();
@@ -151,7 +150,7 @@ void k05324x_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void k05324x_device::device_reset()
+void k053244_device::device_reset()
 {
 	m_rombank = 0;
 
@@ -163,17 +162,17 @@ void k05324x_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-u16 k05324x_device::k053245_word_r(offs_t offset)
+u16 k053244_device::k053245_word_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-void k05324x_device::k053245_word_w(offs_t offset, u16 data, u16 mem_mask)
+void k053244_device::k053245_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(m_ram.get() + offset);
 }
 
-u8 k05324x_device::k053245_r(offs_t offset)
+u8 k053244_device::k053245_r(offs_t offset)
 {
 	if(offset & 1)
 		return m_ram[offset >> 1] & 0xff;
@@ -182,7 +181,7 @@ u8 k05324x_device::k053245_r(offs_t offset)
 }
 
 
-void k05324x_device::k053245_w(offs_t offset, u8 data)
+void k053244_device::k053245_w(offs_t offset, u8 data)
 {
 	if(offset & 1)
 		m_ram[offset >> 1] = (m_ram[offset >> 1] & 0xff00) | data;
@@ -190,22 +189,32 @@ void k05324x_device::k053245_w(offs_t offset, u8 data)
 		m_ram[offset >> 1] = (m_ram[offset >> 1] & 0x00ff) | (data << 8);
 }
 
-void k05324x_device::clear_buffer()
+void k053244_device::clear_buffer()
 {
-	int i, e;
-
-	for (e = m_ramsize / 2, i = 0; i < e; i += 8)
+	for (int e = m_ramsize / 2, i = 0; i < e; i += 8)
 		m_buffer[i] = 0;
 }
 
-void k05324x_device::update_buffer()
+void k053244_device::update_buffer()
 {
 	memcpy(m_buffer.get(), m_ram.get(), m_ramsize);
 }
 
-u8 k05324x_device::k053244_r(offs_t offset)
+u8 k053244_device::k053244_r(offs_t offset)
 {
-	if ((m_regs[5] & 0x10) && offset >= 0x0c && offset < 0x10)
+	switch (offset)
+	{
+	case 0x06:
+		if (!machine().side_effects_disabled())
+			update_buffer();
+		break;
+
+	case 0x07:
+		if (!machine().side_effects_disabled())
+			clear_buffer();
+		break;
+
+	case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 	{
 		int addr;
 
@@ -218,20 +227,16 @@ u8 k05324x_device::k053244_r(offs_t offset)
 
 		return m_sprite_rom[addr];
 	}
-	else if (offset == 0x06)
-	{
-		if (!machine().side_effects_disabled())
-			update_buffer();
-		return 0;
-	}
-	else
-	{
+
+	default:
 		//logerror("%s: read from unknown 053244 address %x\n", machine().describe_context(), offset);
-		return 0;
+		break;
 	}
+
+	return 0;
 }
 
-void k05324x_device::k053244_w(offs_t offset, u8 data)
+void k053244_device::k053244_w(offs_t offset, u8 data)
 {
 	m_regs[offset] = data;
 
@@ -248,16 +253,20 @@ void k05324x_device::k053244_w(offs_t offset, u8 data)
 	case 0x06:
 		update_buffer();
 		break;
+
+	case 0x07:
+		clear_buffer();
+		break;
 	}
 }
 
 
-void k05324x_device::bankselect( int bank )
+void k053244_device::bankselect( int bank )
 {
 	m_rombank = bank;
 }
 
-void k05324x_device::set_z_rejection( int zcode )
+void k053244_device::set_z_rejection( int zcode )
 {
 	m_z_rejection = zcode;
 }
@@ -290,7 +299,7 @@ void k05324x_device::set_z_rejection( int zcode )
  * The rest of the sprite remains normal.
  */
 
-void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap )
+void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap )
 {
 	static constexpr int NUM_SPRITES = 128;
 
@@ -367,8 +376,8 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		color = m_buffer[offs + 6] & 0x00ff;
 		pri = 0;
 
-		if (!m_k05324x_cb.isnull())
-			m_k05324x_cb(&code, &color, &pri);
+		if (!m_k053244_cb.isnull())
+			m_k053244_cb(&code, &color, &pri);
 
 		size = (m_buffer[offs] & 0x0f00) >> 8;
 

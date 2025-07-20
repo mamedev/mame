@@ -63,7 +63,7 @@ private:
 	void asterix_spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(asterix_interrupt);
-	K05324X_CB_MEMBER(sprite_callback);
+	K053244_CB_MEMBER(sprite_callback);
 	K056832_CB_MEMBER(tile_callback);
 	void reset_spritebank();
 
@@ -83,7 +83,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k056832_device> m_k056832;
-	required_device<k05324x_device> m_k053244;
+	required_device<k053244_device> m_k053244;
 	required_device<k053251_device> m_k053251;
 };
 
@@ -103,7 +103,7 @@ void asterix_state::asterix_spritebank_w(offs_t offset, uint16_t data, uint16_t 
 	reset_spritebank();
 }
 
-K05324X_CB_MEMBER(asterix_state::sprite_callback)
+K053244_CB_MEMBER(asterix_state::sprite_callback)
 {
 	int pri = (*color & 0x00e0) >> 2;
 	if (pri <= m_layerpri[2])
@@ -291,11 +291,11 @@ void asterix_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x107fff).ram();
-	map(0x180000, 0x1807ff).rw(m_k053244, FUNC(k05324x_device::k053245_word_r), FUNC(k05324x_device::k053245_word_w));
+	map(0x180000, 0x1807ff).rw(m_k053244, FUNC(k053244_device::k053245_word_r), FUNC(k053244_device::k053245_word_w));
 	map(0x180800, 0x180fff).ram();                             // extra RAM, or mirror for the above?
-	map(0x200000, 0x20000f).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
+	map(0x200000, 0x20000f).rw(m_k053244, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w));
 	map(0x280000, 0x280fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x300000, 0x30001f).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);
+	map(0x300000, 0x30001f).rw(m_k053244, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w)).umask16(0x00ff);
 	map(0x380000, 0x380001).portr("IN0");
 	map(0x380002, 0x380003).portr("IN1");
 	map(0x380100, 0x380101).w(FUNC(asterix_state::control2_w));

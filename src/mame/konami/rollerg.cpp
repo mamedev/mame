@@ -64,7 +64,7 @@ private:
 	// devices
 	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<k05324x_device> m_k053244;
+	required_device<k053244_device> m_k053244;
 	required_device<k051316_device> m_k051316;
 
 	required_memory_bank m_mainbank;
@@ -80,7 +80,7 @@ private:
 	void z80_nmi_w(int state);
 	uint8_t pip_r();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	K05324X_CB_MEMBER(sprite_callback);
+	K053244_CB_MEMBER(sprite_callback);
 	K051316_CB_MEMBER(zoom_callback);
 
 	void main_map(address_map &map) ATTR_COLD;
@@ -94,7 +94,7 @@ private:
 
 ***************************************************************************/
 
-K05324X_CB_MEMBER(rollerg_state::sprite_callback)
+K053244_CB_MEMBER(rollerg_state::sprite_callback)
 {
 	enum { sprite_colorbase = 256 / 16 };
 #if 0
@@ -193,11 +193,11 @@ void rollerg_state::main_map(address_map &map)
 	map(0x0061, 0x0061).r(FUNC(rollerg_state::pip_r));             // ?????
 	map(0x0100, 0x010f).rw("k053252", FUNC(k053252_device::read), FUNC(k053252_device::write));      // 053252?
 	map(0x0200, 0x020f).w(m_k051316, FUNC(k051316_device::ctrl_w));
-	map(0x0300, 0x030f).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
+	map(0x0300, 0x030f).rw(m_k053244, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w));
 	map(0x0800, 0x0fff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write));
 	map(0x0800, 0x0fff).view(m_zoomroms_view);
 	m_zoomroms_view[0](0x0800, 0x0fff).r(m_k051316, FUNC(k051316_device::rom_r));
-	map(0x1000, 0x17ff).rw(m_k053244, FUNC(k05324x_device::k053245_r), FUNC(k05324x_device::k053245_w));
+	map(0x1000, 0x17ff).rw(m_k053244, FUNC(k053244_device::k053245_r), FUNC(k053244_device::k053245_w));
 	map(0x1800, 0x1fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x2000, 0x3aff).ram();
 	map(0x4000, 0x7fff).bankr(m_mainbank);

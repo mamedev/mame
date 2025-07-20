@@ -19,12 +19,13 @@ on 0300 III PCB: 4x 8-DIP banks
 Some PCBs have been seen mixing different sets of GFX ROMs with the same program ROM.
 
 TODO:
-- black screen after first attract cycle (interrupts?)
-- colors seem good if compared to available pics, but maybe some slight adjustment needed
-- 0211 PCB only has 2 DIP banks, but the program reads 4?
-- outputs
-- decryption for tpkborama
-- are the tpkg2 GFX ROMs correct for that set?
+- incorrect priorities? Or missing layer disable?
+- 0x60 I/O port write. Lamps?
+
+TODO (game-specific):
+- pkboram: 0211 PCB only has 2 DIP banks, but the program reads 4?
+- pkrboram, pkts, tpkg2: girls' images need a different tilemap size?
+- tpkborama: decryption
 */
 
 
@@ -32,6 +33,8 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 
@@ -39,6 +42,16 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+
+// configurable logging
+#define LOG_PORTS     (1U << 1)
+
+// #define VERBOSE (LOG_GENERAL | LOG_PORTS)
+
+#include "logmacro.h"
+
+#define LOGPORTS(...)     LOGMASKED(LOG_PORTS,     __VA_ARGS__)
 
 
 namespace {
@@ -49,13 +62,17 @@ public:
 	boramz80_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_hopper(*this, "hopper"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_char_ram(*this, "char_ram"),
 		m_tile_ram(*this, "tile_ram"),
+		m_program_rom(*this, "maincpu"),
 		m_in(*this, "IN%u", 0U)
 	{ }
 
-	void pk(machine_config &config) ATTR_COLD;
+	template <uint16_t Base_prot_addr> void smaller_nvram(machine_config &config) ATTR_COLD;
+	template <uint16_t Base_prot_addr> void bigger_nvram(machine_config &config) ATTR_COLD;
+	template <uint16_t Base_prot_addr> void pkrboram(machine_config &config) ATTR_COLD;
 
 	void init_tpkborama() ATTR_COLD;
 
@@ -65,10 +82,13 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<hopper_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<uint8_t> m_char_ram;
 	required_shared_ptr<uint8_t> m_tile_ram;
+
+	required_region_ptr<uint8_t> m_program_rom;
 
 	required_ioport_array<5> m_in;
 
@@ -76,9 +96,14 @@ private:
 	tilemap_t *m_fg_tilemap = nullptr;
 
 	uint8_t m_input_matrix = 0xff;
+	uint8_t m_protection_data = 0;
+	uint8_t m_protection_index = 0;
 
 	uint8_t input_r();
 	void output_w(uint8_t data);
+
+	template <uint16_t Base_prot_addr> uint8_t protection_r();
+	template <uint16_t Base_prot_addr> uint8_t pkrboram_protection_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void charram_w(offs_t offset, uint8_t data);
@@ -86,8 +111,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	void program_map(address_map &map) ATTR_COLD;
-	void io_map(address_map &map) ATTR_COLD;
+	void base_program_map(address_map &map) ATTR_COLD;
+	void bigger_nvram_program_map(address_map &map) ATTR_COLD;
+	void smaller_nvram_program_map(address_map &map) ATTR_COLD;
+	template <uint16_t Base_prot_addr> void io_map(address_map &map) ATTR_COLD;
+	template <uint16_t Base_prot_addr> void pkrboram_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -102,7 +130,7 @@ void boramz80_state::video_start()
 TILE_GET_INFO_MEMBER(boramz80_state::get_fg_tile_info)
 {
 	int const tile = m_tile_ram[2 * tile_index] | ((m_tile_ram[2 * tile_index + 1] & 0x1f) << 8);
-	int const color = (m_tile_ram[2 * tile_index + 1] & 0xe0) >> 5; // TODO: verify
+	int const color = (m_tile_ram[2 * tile_index + 1] & 0xe0) >> 5;
 
 	tileinfo.set(1, tile, color, 0);
 }
@@ -110,7 +138,7 @@ TILE_GET_INFO_MEMBER(boramz80_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(boramz80_state::get_bg_tile_info)
 {
 	int const tile = m_char_ram[2 * tile_index] | ((m_char_ram[2 * tile_index + 1] & 0x03) << 8);
-	int const color = (m_char_ram[2 * tile_index + 1] & 0x3c) >> 2; // TODO: verify
+	int const color = (m_char_ram[2 * tile_index + 1] & 0x3c) >> 2;
 
 	tileinfo.set(0, tile, color, 0);
 }
@@ -141,6 +169,8 @@ uint32_t boramz80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 void boramz80_state::machine_start()
 {
 	save_item(NAME(m_input_matrix));
+	save_item(NAME(m_protection_data));
+	save_item(NAME(m_protection_index));
 }
 
 uint8_t boramz80_state::input_r()
@@ -165,20 +195,71 @@ void boramz80_state::output_w(uint8_t data)
 
 	// bit 6 is used often
 
-	// bit 7 is probably hopper motor
+	// bit 7 is hopper motor
+	m_hopper->motor_w(BIT(data, 7));
+}
+
+// HACK: protection circumvention
+// The protection routine is called at the end of every attract mode cycle, at coin up and various other game events (deal, etc).
+// It works like this (from 0x61ec onward for pboram):
+// the game writes 0x7f at 0xe0 and immediately reads back from 0xe0 (acking some external device?), two times in a row.
+// Then it starts reading a sequence of 21 bytes in ROM (from 0x059f9 onwards for pkboram).
+// It ANDs each byte read with a value (0x5f for pkboram) and then compares it to bytes at a different ROM address (from 0x4824 onwards for pkboram).
+// However, the AND isn't enough to get the correct values, so there must be something going on externally between the write and the read.
+// For now the protection is bypassed by feeding the expected values directly.
+
+template <uint16_t Base_prot_addr>
+uint8_t boramz80_state::protection_r()
+{
+	if (m_protection_data != 0x7f)
+	{
+		uint8_t ret = m_program_rom[Base_prot_addr + m_protection_index];
+		m_protection_index < 0x14 ? m_protection_index++ : m_protection_index = 0;
+		return ret;
+	}
+	else
+		return 0x7f;
+}
+
+// in this case, the protection original and resulting bytes are interleaved
+template <uint16_t Base_prot_addr>
+uint8_t boramz80_state::pkrboram_protection_r()
+{
+	if (m_protection_data != 0x7f)
+	{
+		uint8_t ret = m_program_rom[Base_prot_addr + m_protection_index];
+		m_protection_index < 0x28 ? m_protection_index += 2 : m_protection_index = 0;
+		return ret;
+	}
+	else
+		return 0x7f;
 }
 
 
-void boramz80_state::program_map(address_map &map)
+void boramz80_state::base_program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram(); // TODO: only 0x800 for pkboram
 	map(0xa000, 0xa7ff).ram().w(FUNC(boramz80_state::charram_w)).share(m_char_ram);
 	map(0xc000, 0xc7ff).ram().w(FUNC(boramz80_state::tileram_w)).share(m_tile_ram);
 	map(0xe000, 0xe3ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xf000, 0xf3ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
 }
 
+void boramz80_state::bigger_nvram_program_map(address_map &map)
+{
+	base_program_map(map);
+
+	map(0x8000, 0x8fff).ram().share("nvram");
+}
+
+void boramz80_state::smaller_nvram_program_map(address_map &map)
+{
+	base_program_map(map);
+
+	map(0x8000, 0x87ff).ram().share("nvram");
+}
+
+template <uint16_t Base_prot_addr>
 void boramz80_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
@@ -189,66 +270,74 @@ void boramz80_state::io_map(address_map &map)
 	map(0x60, 0x60).portr("DSW4"); // TODO: write?
 	map(0x80, 0x81).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
-	//map(0xa0, 0xa0).r();
 	map(0xc0, 0xc0).w("crtc", FUNC(hd6845s_device::address_w));
 	map(0xc1, 0xc1).w("crtc", FUNC(hd6845s_device::register_w));
+	map(0xe0, 0xe0).r(FUNC(boramz80_state::protection_r<Base_prot_addr>)).lw8(NAME([this] (uint8_t data) { m_protection_data = data; }));
+}
+
+template <uint16_t Base_prot_addr>
+void boramz80_state::pkrboram_io_map(address_map &map)
+{
+	io_map<Base_prot_addr>(map);
+
+	map(0xe0, 0xe0).r(FUNC(boramz80_state::pkrboram_protection_r<Base_prot_addr>)).lw8(NAME([this] (uint8_t data) { m_protection_data = data; }));
 }
 
 
 static INPUT_PORTS_START( pkboram )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_PLAYER(1)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_PLAYER(1)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_BET ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_PLAYER(2)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_PLAYER(2)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_BET ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // not shown is input test
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // not shown is input test
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_SERVICE )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // not shown is input test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // not shown is input test
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // not shown is input test
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) // hopper line
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // not shown is input test
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN4 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "Take" ) PORT_DIPLOCATION("SW1:1")
@@ -471,18 +560,23 @@ static GFXDECODE_START( gfx_boram )
 GFXDECODE_END
 
 
-void boramz80_state::pk(machine_config &config)
+template <uint16_t Base_prot_addr>
+void boramz80_state::smaller_nvram(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &boramz80_state::program_map);
-	m_maincpu->set_addrmap(AS_IO, &boramz80_state::io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &boramz80_state::smaller_nvram_program_map);
+	m_maincpu->set_addrmap(AS_IO, &boramz80_state::io_map<Base_prot_addr>);
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.in_pa_callback().set_ioport("DSW1");
 	ppi.in_pb_callback().set_ioport("DSW2");
-	ppi.in_pc_callback().set([this] () { logerror("%s: PPI port C read\n", machine().describe_context()); return 0; });
+	ppi.in_pc_callback().set([this] () { LOGPORTS("%s: PPI port C read\n", machine().describe_context()); return 0; });
 	ppi.out_pc_callback().set(FUNC(boramz80_state::output_w));
+
+	NVRAM(config, "nvram");
+
+	HOPPER(config, m_hopper, attotime::from_msec(50)); // period is just a guess
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -503,10 +597,26 @@ void boramz80_state::pk(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 4_MHz_XTAL / 4)); // not sure, could derive from 13 MHz XTAL
-	aysnd.port_a_read_callback().set([this] () { logerror("%s: AY port A read\n", machine().describe_context()); return 0; });
+	aysnd.port_a_read_callback().set([this] () { LOGPORTS("%s: AY port A read\n", machine().describe_context()); return 0; });
 	aysnd.port_b_read_callback().set_ioport("DSW3");
 	aysnd.port_a_write_callback().set([this] (uint8_t data) { m_input_matrix = data; });
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+template <uint16_t Base_prot_addr>
+void boramz80_state::bigger_nvram(machine_config &config)
+{
+	smaller_nvram<Base_prot_addr>(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &boramz80_state::bigger_nvram_program_map);
+}
+
+template <uint16_t Base_prot_addr>
+void boramz80_state::pkrboram(machine_config &config)
+{
+	bigger_nvram<Base_prot_addr>(config);
+
+	m_maincpu->set_addrmap(AS_IO, &boramz80_state::pkrboram_io_map<Base_prot_addr>);
 }
 
 
@@ -649,9 +759,9 @@ void boramz80_state::init_tpkborama()
 } // anonymous namespace
 
 
-GAME( 1987, pkboram,   0,        pk, pkboram,  boramz80_state, empty_init,     ROT0, "Boram", "PK - New Exciting Poker!",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK-BORAM 0211 aug.04.1987. BORAM CORP
-GAME( 1988, tpkboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK-TURBO jan.29.1988. BORAM CORP.
-GAME( 1998, tpkborama, tpkboram, pk, tpkboram, boramz80_state, init_tpkborama, ROT0, "Boram", "PK Turbo (Ver 2.3B2, encrypted)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // dep inctype-23B1998 0519Ver 2.3B2
-GAME( 1990, pkrboram,  0,        pk, pkrboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Rainbow (v 1.5)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK RAINBOW v1.5 BORAM Corp. 1990.11.06
-GAME( 1992, tpkg2,     0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Great 2",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK TURBO GREAT2 1992.06.04 BORAM CORP.
-GAME( 19??, pkts,      0,        pk, pkts,     boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Special",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PKS v100 BORAM CORP
+GAME( 1987, pkboram,   0,        smaller_nvram<0x4824>, pkboram,  boramz80_state, empty_init,     ROT0, "Boram", "PK - New Exciting Poker!",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // PK-BORAM 0211 aug.04.1987. BORAM CORP
+GAME( 1988, tpkboram,  0,        bigger_nvram<0x55b2>,  tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // PK-TURBO jan.29.1988. BORAM CORP.
+GAME( 1998, tpkborama, tpkboram, bigger_nvram<0x0000>,  tpkboram, boramz80_state, init_tpkborama, ROT0, "Boram", "PK Turbo (Ver 2.3B2, encrypted)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // dep inctype-23B1998 0519Ver 2.3B2
+GAME( 1990, pkrboram,  0,        pkrboram<0x6d43>,      pkrboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Rainbow (v 1.5)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // PK RAINBOW v1.5 BORAM Corp. 1990.11.06
+GAME( 1992, tpkg2,     0,        bigger_nvram<0x0115>,  tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Great 2",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // PK TURBO GREAT2 1992.06.04 BORAM CORP.
+GAME( 19??, pkts,      0,        bigger_nvram<0x683f>,  pkts,     boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Special",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // PKS v100 BORAM CORP

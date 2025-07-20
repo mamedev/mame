@@ -18,7 +18,7 @@
 // because the implementation is video dependant, this is just a
 // register-handling shell.
 
-DEFINE_DEVICE_TYPE(K054338, k054338_device, "k054338", "K054338 Mixer")
+DEFINE_DEVICE_TYPE(K054338, k054338_device, "k054338", "Konami 054338 Mixer")
 
 k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K054338, tag, owner, clock),

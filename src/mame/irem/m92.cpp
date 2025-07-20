@@ -599,7 +599,7 @@ static INPUT_PORTS_START( majtitl2 )
 	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "SW3:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW3:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW3:7" )
-	PORT_DIPNAME( 0x8000, 0x8000, "Deltronics Model" ) PORT_DIPLOCATION("SW3:8") /* Ticket Despenser Model Type */
+	PORT_DIPNAME( 0x8000, 0x8000, "Deltronics Model" ) PORT_DIPLOCATION("SW3:8") /* Ticket Dispenser Model Type */
 	PORT_DIPSETTING(      0x8000, "DL 1275" )
 	PORT_DIPSETTING(      0x0000, "DL 4SS" )
 
@@ -667,7 +667,7 @@ static INPUT_PORTS_START( uccops )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
-	/* There is ALLWAYS a Bonus Life at 300K */
+	/* There is ALWAYS a Bonus Life at 300K */
 	/* It does not depends on the value of bit 0x0010 */
 	PORT_DIPNAME( 0x0020, 0x0020, "Any Button to Start" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )

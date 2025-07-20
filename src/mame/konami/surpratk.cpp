@@ -60,7 +60,7 @@ private:
 	required_device<konami_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bank0000;
 	required_device<k052109_device> m_k052109;
-	required_device<k05324x_device> m_k053244;
+	required_device<k053244_device> m_k053244;
 	required_device<k053251_device> m_k053251;
 	required_device<palette_device> m_palette;
 
@@ -70,7 +70,7 @@ private:
 	void _5fc0_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	K05324X_CB_MEMBER(sprite_callback);
+	K053244_CB_MEMBER(sprite_callback);
 	K052109_CB_MEMBER(tile_callback);
 	void banking_callback(uint8_t data);
 	void bank0000_map(address_map &map) ATTR_COLD;
@@ -97,7 +97,7 @@ K052109_CB_MEMBER(surpratk_state::tile_callback)
 
 ***************************************************************************/
 
-K05324X_CB_MEMBER(surpratk_state::sprite_callback)
+K053244_CB_MEMBER(surpratk_state::sprite_callback)
 {
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
@@ -134,8 +134,6 @@ uint32_t surpratk_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		if (m_layer_colorbase[i] != prev_colorbase)
 			m_k052109->mark_tilemap_dirty(i);
 	}
-
-	m_k052109->tilemap_update();
 
 	// sort layers and draw
 	int layer[3];
@@ -201,7 +199,7 @@ void surpratk_state::main_map(address_map &map)
 	map(0x5f8e, 0x5f8e).portr("DSW3");
 	map(0x5f8f, 0x5f8f).portr("DSW1");
 	map(0x5f90, 0x5f90).portr("DSW2");
-	map(0x5fa0, 0x5faf).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
+	map(0x5fa0, 0x5faf).rw(m_k053244, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w));
 	map(0x5fb0, 0x5fbf).w(m_k053251, FUNC(k053251_device::write));
 	map(0x5fc0, 0x5fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(surpratk_state::_5fc0_w));
 	map(0x5fc4, 0x5fc4).w(FUNC(surpratk_state::videobank_w));
@@ -212,7 +210,7 @@ void surpratk_state::main_map(address_map &map)
 void surpratk_state::bank0000_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0fff).rw(m_k053244, FUNC(k05324x_device::k053245_r), FUNC(k05324x_device::k053245_w));
+	map(0x0800, 0x0fff).rw(m_k053244, FUNC(k053244_device::k053245_r), FUNC(k053244_device::k053245_w));
 	map(0x1000, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 

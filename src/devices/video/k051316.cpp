@@ -46,7 +46,7 @@ control registers
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(K051316, k051316_device, "k051316", "K051316 PSAC")
+DEFINE_DEVICE_TYPE(K051316, k051316_device, "k051316", "Konami 051316 PSAC")
 
 
 const gfx_layout k051316_device::charlayout4 =

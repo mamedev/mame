@@ -5,7 +5,7 @@
 #include "screen.h"
 
 
-DEFINE_DEVICE_TYPE(K053250, k053250_device, "k053250", "K053250 LVC")
+DEFINE_DEVICE_TYPE(K053250, k053250_device, "k053250", "Konami 053250 LVC")
 
 k053250_device::k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, K053250, tag, owner, clock),

@@ -33,6 +33,7 @@ TODO:
   banked, or there are controls to clip the visible region (registers 0x06 and
   0x07 of the 053936) or both.
 - is NVBLK really vblank or something else? Investigate.
+- what is OBJMPX? object multiplex? whatever that means, maybe objdma busy?
 - some slowdowns in lgtnfght when there are many sprites on screen - vblank issue?
 
 Updates:
@@ -109,10 +110,8 @@ public:
 		m_k054000(*this, "k054000"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_coins(*this, "COINS"),
-		m_eeprom(*this, "EEPROM"),
-		m_eepromout(*this, "EEPROMOUT"),
-		m_p2_eeprom(*this, "P2_EEPROM")
+		m_screen(*this, "screen"),
+		m_eepromout(*this, "EEPROMOUT")
 	{ }
 
 	void blswhstl(machine_config &config);
@@ -147,8 +146,7 @@ protected:
 
 	// misc
 	emu_timer  *m_nmi_blocked = nullptr;
-	int        m_toggle = 0;
-	int        m_last = 0;
+	int        m_lastirq = 0;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -157,17 +155,14 @@ protected:
 	optional_device<k054539_device> m_k054539;
 	required_device<k052109_device> m_k052109;
 	optional_device<k051960_device> m_k051960;
-	optional_device<k05324x_device> m_k053245;
+	optional_device<k053244_device> m_k053245;
 	required_device<k053251_device> m_k053251;
 	optional_device<k053936_device> m_k053936;
 	optional_device<k054000_device> m_k054000;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-
-	optional_ioport m_coins;
-	optional_ioport m_eeprom;
+	required_device<screen_device> m_screen;
 	optional_ioport m_eepromout;
-	optional_ioport m_p2_eeprom;
 
 	uint16_t k052109_word_r(offs_t offset, uint16_t mem_mask = ~0);
 	void k052109_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -182,11 +177,7 @@ protected:
 	uint16_t punkshot_kludge_r();
 	uint16_t ssriders_protection_r(address_space &space);
 	void ssriders_protection_w(address_space &space, offs_t offset, uint16_t data);
-	uint16_t blswhstl_coin_r();
-	uint16_t ssriders_eeprom_r();
-	uint16_t sunsetbl_eeprom_r();
 	void blswhstl_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t thndrx2_eeprom_r();
 	void thndrx2_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void ssriders_soundkludge_w(uint16_t data);
 	void tmnt2_1c0800_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -203,13 +194,12 @@ protected:
 	uint32_t screen_update_glfgreat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_vblank_blswhstl(int state);
 	inline uint32_t tmnt2_get_word(uint32_t addr);
 	void tmnt2_put_word(uint32_t addr, uint16_t data);
 	K051960_CB_MEMBER(punkshot_sprite_callback);
 	K051960_CB_MEMBER(thndrx2_sprite_callback);
-	K05324X_CB_MEMBER(lgtnfght_sprite_callback);
-	K05324X_CB_MEMBER(blswhstl_sprite_callback);
+	K053244_CB_MEMBER(lgtnfght_sprite_callback);
+	K053244_CB_MEMBER(blswhstl_sprite_callback);
 	K052109_CB_MEMBER(tmnt_tile_callback);
 	K052109_CB_MEMBER(blswhstl_tile_callback);
 
@@ -278,7 +268,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(prmrsocr_get_roz_tile_info);
 	DECLARE_VIDEO_START(prmrsocr);
-	K05324X_CB_MEMBER(prmrsocr_sprite_callback);
+	K053244_CB_MEMBER(prmrsocr_sprite_callback);
 
 	void prmrsocr_audio_map(address_map &map) ATTR_COLD;
 	void prmrsocr_main_map(address_map &map) ATTR_COLD;
@@ -511,46 +501,6 @@ void tmnt2_state::ssriders_protection_w(address_space &space, offs_t offset, uin
 
 ***************************************************************************/
 
-uint16_t tmnt2_state::blswhstl_coin_r()
-{
-	int res;
-
-	/* bit 3 is service button */
-	/* bit 6 is ??? VBLANK? OBJMPX? */
-	res = m_coins->read();
-
-	m_toggle ^= 0x40;
-	return res ^ m_toggle;
-}
-
-uint16_t tmnt2_state::ssriders_eeprom_r()
-{
-	int res;
-
-	/* bit 0 is EEPROM data */
-	/* bit 1 is EEPROM ready */
-	/* bit 2 is VBLANK (???) */
-	/* bit 7 is service button */
-	res = m_eeprom->read();
-
-	m_toggle ^= 0x04;
-	return res ^ m_toggle;
-}
-
-uint16_t tmnt2_state::sunsetbl_eeprom_r()
-{
-	int res;
-
-	/* bit 0 is EEPROM data */
-	/* bit 1 is EEPROM ready */
-	/* bit 2 is VBLANK (???) */
-	/* bit 3 is service button */
-	res = m_eeprom->read();
-
-	m_toggle ^= 0x04;
-	return res ^ m_toggle;
-}
-
 void tmnt2_state::blswhstl_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
@@ -560,19 +510,6 @@ void tmnt2_state::blswhstl_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_m
 		/* bit 2 is clock (active high) */
 		m_eepromout->write(data, 0xff);
 	}
-}
-
-uint16_t tmnt2_state::thndrx2_eeprom_r()
-{
-	int res;
-
-	/* bit 0 is EEPROM data */
-	/* bit 1 is EEPROM ready */
-	/* bit 3 is VBLANK (???) */
-	/* bit 7 is service button */
-	res = m_p2_eeprom->read();
-	m_toggle ^= 0x0800;
-	return (res ^ m_toggle);
 }
 
 void tmnt2_state::thndrx2_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -585,9 +522,9 @@ void tmnt2_state::thndrx2_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_ma
 		m_eepromout->write(data, 0xff);
 
 		/* bit 5 triggers IRQ on sound cpu */
-		if (m_last == 0 && (data & 0x20) != 0)
+		if (m_lastirq == 0 && (data & 0x20) != 0)
 			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
-		m_last = data & 0x20;
+		m_lastirq = data & 0x20;
 
 		/* bit 6 = enable char ROM reading through the video RAM */
 		m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
@@ -614,11 +551,9 @@ void prmrsocr_state::prmrsocr_eeprom_w(offs_t offset, uint16_t data, uint16_t me
 TILE_GET_INFO_MEMBER(glfgreat_state::glfgreat_get_roz_tile_info)
 {
 	uint8_t *rom = memregion("user1")->base();
-	int code;
 
 	tile_index += 0x40000 * m_roz_rom_bank;
-
-	code = rom[tile_index + 0x80000] + 256 * rom[tile_index] + 256 * 256 * ((rom[tile_index / 4 + 0x100000] >> (2 * (tile_index & 3))) & 3);
+	int code = rom[tile_index + 0x80000] + 256 * rom[tile_index] + 256 * 256 * ((rom[tile_index / 4 + 0x100000] >> (2 * (tile_index & 3))) & 3);
 
 	tileinfo.set(0, code & 0x3fff, code >> 14, 0);
 }
@@ -655,7 +590,7 @@ K052109_CB_MEMBER(sunsetbl_state::ssbl_tile_callback)
 	else
 	{
 		*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-//      osd_printf_debug("L%d: bank %d code %x color %x\n", layer, bank, *code, *color);
+		//osd_printf_debug("L%d: bank %d code %x color %x\n", layer, bank, *code, *color);
 	}
 
 	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
@@ -714,7 +649,7 @@ K051960_CB_MEMBER(tmnt2_state::thndrx2_sprite_callback)
 
 ***************************************************************************/
 
-K05324X_CB_MEMBER(tmnt2_state::lgtnfght_sprite_callback)
+K053244_CB_MEMBER(tmnt2_state::lgtnfght_sprite_callback)
 {
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
@@ -729,13 +664,14 @@ K05324X_CB_MEMBER(tmnt2_state::lgtnfght_sprite_callback)
 	*color = m_sprite_colorbase + (*color & 0x1f);
 }
 
-K05324X_CB_MEMBER(tmnt2_state::blswhstl_sprite_callback)
+K053244_CB_MEMBER(tmnt2_state::blswhstl_sprite_callback)
 {
 #if 0
-if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x20)) *color = machine().rand();
-if (machine().input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = machine().rand();
-if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = machine().rand();
+	if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x20)) *color = machine().rand();
+	if (machine().input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = machine().rand();
+	if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = machine().rand();
 #endif
+
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
 		*priority = 0;
@@ -749,7 +685,7 @@ if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = machi
 	*color = m_sprite_colorbase + (*color & 0x1f);
 }
 
-K05324X_CB_MEMBER(prmrsocr_state::prmrsocr_sprite_callback)
+K053244_CB_MEMBER(prmrsocr_state::prmrsocr_sprite_callback)
 {
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
@@ -838,10 +774,10 @@ void tmnt2_state::punkshot_0a0020_w(offs_t offset, uint16_t data, uint16_t mem_m
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 
 		/* bit 2 = trigger irq on sound CPU */
-		if (m_last == 0x04 && (data & 0x04) == 0)
+		if (m_lastirq == 0x04 && (data & 0x04) == 0)
 			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 
-		m_last = data & 0x04;
+		m_lastirq = data & 0x04;
 
 		/* bit 3 = enable char ROM reading through the video RAM */
 		m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
@@ -857,10 +793,10 @@ void tmnt2_state::lgtnfght_0a0018_w(offs_t offset, uint16_t data, uint16_t mem_m
 		machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 		/* bit 2 = trigger irq on sound CPU */
-		if (m_last == 0x00 && (data & 0x04) == 0x04)
+		if (m_lastirq == 0x00 && (data & 0x04) == 0x04)
 			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 
-		m_last = data & 0x04;
+		m_lastirq = data & 0x04;
 
 		/* bit 3 = enable char ROM reading through the video RAM */
 		m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
@@ -1025,8 +961,6 @@ uint32_t tmnt2_state::screen_update_punkshot(screen_device &screen, bitmap_ind16
 			m_k052109->mark_tilemap_dirty(i);
 	}
 
-	m_k052109->tilemap_update();
-
 	// sort layers and draw
 	for (int i = 0; i < 3; i++)
 	{
@@ -1061,8 +995,6 @@ uint32_t tmnt2_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16
 		if (m_layer_colorbase[i] != prev_colorbase)
 			m_k052109->mark_tilemap_dirty(i);
 	}
-
-	m_k052109->tilemap_update();
 
 	// sort layers and draw
 	for (int i = 0; i < 3; i++)
@@ -1112,8 +1044,6 @@ uint32_t tmnt2_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16
 		if (m_layer_colorbase[i] != prev_colorbase)
 			m_k052109->mark_tilemap_dirty(i);
 	}
-
-	m_k052109->tilemap_update();
 
 	// sort layers and draw
 	for (int i = 0; i < 3; i++)
@@ -1223,8 +1153,6 @@ uint32_t tmnt2_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 
 			m_k052109->mark_tilemap_dirty(i);
 	}
 
-	m_k052109->tilemap_update();
-
 	// sort layers and draw
 	for (int i = 0; i < 3; i++)
 	{
@@ -1248,18 +1176,9 @@ uint32_t tmnt2_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 
 
 /***************************************************************************
 
-  Housekeeping
+  Address maps
 
 ***************************************************************************/
-
-void tmnt2_state::screen_vblank_blswhstl(int state)
-{
-	// on rising edge
-	if (state)
-	{
-		m_k053245->clear_buffer();
-	}
-}
 
 void tmnt2_state::punkshot_main_map(address_map &map)
 {
@@ -1317,7 +1236,7 @@ void tmnt2_state::blswhstl_main_map(address_map &map)
 	map(0x680000, 0x68001f).rw(FUNC(tmnt2_state::k053244_word_noA1_r), FUNC(tmnt2_state::k053244_word_noA1_w));
 	map(0x700000, 0x700001).portr("P1");
 	map(0x700002, 0x700003).portr("P2");
-	map(0x700004, 0x700005).r(FUNC(tmnt2_state::blswhstl_coin_r));
+	map(0x700004, 0x700005).portr("COINS");
 	map(0x700006, 0x700007).portr("EEPROM");
 	map(0x700200, 0x700201).w(FUNC(tmnt2_state::blswhstl_eeprom_w));
 	map(0x700300, 0x700301).w(FUNC(tmnt2_state::blswhstl_700300_w));
@@ -1340,7 +1259,7 @@ void glfgreat_state::glfgreat_main_map(address_map &map)
 	map(0x108000, 0x108fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x10c000, 0x10cfff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));  /* 053936? */
 	map(0x110000, 0x11001f).w(FUNC(glfgreat_state::k053244_word_noA1_w));              /* duplicate! */
-	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
+	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
 	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x120000, 0x120001).portr("P1_P2");
@@ -1364,7 +1283,7 @@ void prmrsocr_state::prmrsocr_main_map(address_map &map)
 	map(0x108000, 0x108fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x10c000, 0x10cfff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));
 	map(0x110000, 0x11001f).w(FUNC(prmrsocr_state::k053244_word_noA1_w));              /* duplicate! */
-	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
+	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
 	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x120000, 0x120001).portr("P1_COINS");
@@ -1625,7 +1544,7 @@ void tmnt2_state::tmnt2_main_map(address_map &map)
 	map(0x1c0004, 0x1c0005).portr("P3");
 	map(0x1c0006, 0x1c0007).portr("P4");
 	map(0x1c0100, 0x1c0101).portr("COINS");
-	map(0x1c0102, 0x1c0103).r(FUNC(tmnt2_state::ssriders_eeprom_r));
+	map(0x1c0102, 0x1c0103).portr("EEPROM");
 	map(0x1c0200, 0x1c0201).w(FUNC(tmnt2_state::ssriders_eeprom_w));    /* EEPROM and gfx control */
 	map(0x1c0300, 0x1c0301).w(FUNC(tmnt2_state::ssriders_1c0300_w));
 	map(0x1c0400, 0x1c0401).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
@@ -1650,7 +1569,7 @@ void tmnt2_state::ssriders_main_map(address_map &map)
 	map(0x1c0004, 0x1c0005).portr("P3");
 	map(0x1c0006, 0x1c0007).portr("P4");
 	map(0x1c0100, 0x1c0101).portr("COINS");
-	map(0x1c0102, 0x1c0103).r(FUNC(tmnt2_state::ssriders_eeprom_r));
+	map(0x1c0102, 0x1c0103).portr("EEPROM");
 	map(0x1c0200, 0x1c0201).w(FUNC(tmnt2_state::ssriders_eeprom_w));    /* EEPROM and gfx control */
 	map(0x1c0300, 0x1c0301).w(FUNC(tmnt2_state::ssriders_1c0300_w));
 	map(0x1c0400, 0x1c0401).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
@@ -1685,7 +1604,7 @@ void sunsetbl_state::sunsetbl_main_map(address_map &map)
 	map(0xc00006, 0xc00007).portr("P4");
 	map(0xc00200, 0xc00201).w(FUNC(sunsetbl_state::ssriders_eeprom_w));    /* EEPROM and gfx control */
 	map(0xc00404, 0xc00405).portr("COINS");
-	map(0xc00406, 0xc00407).r(FUNC(sunsetbl_state::sunsetbl_eeprom_r));
+	map(0xc00406, 0xc00407).portr("EEPROM");
 	map(0xc00601, 0xc00601).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x75d288, 0x75d289).nopr(); // read repeatedly in some test menus (PC=181f2)
 }
@@ -1701,7 +1620,7 @@ void tmnt2_state::thndrx2_main_map(address_map &map)
 	map(0x500000, 0x50003f).m(m_k054000, FUNC(k054000_device::map)).umask16(0x00ff);
 	map(0x500100, 0x500101).w(FUNC(tmnt2_state::thndrx2_eeprom_w));
 	map(0x500200, 0x500201).portr("P1_COINS");
-	map(0x500202, 0x500203).r(FUNC(tmnt2_state::thndrx2_eeprom_r));
+	map(0x500202, 0x500203).portr("P2_EEPROM");
 	map(0x500300, 0x500301).nopw();    /* watchdog reset? irq enable? */
 	map(0x600000, 0x607fff).rw(FUNC(tmnt2_state::k052109_word_noA12_r), FUNC(tmnt2_state::k052109_word_noA12_w));
 	map(0x700000, 0x700007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
@@ -1987,7 +1906,7 @@ static INPUT_PORTS_START( blswhstl )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* VBLANK? OBJMPX? */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* VBLANK? OBJMPX? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P1")
@@ -2161,8 +2080,8 @@ static INPUT_PORTS_START( ssriders )
 	PORT_START("EEPROM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* ?? TMNT2: OBJMPX */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))  /* ?? TMNT2: NVBLK */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* ?? TMNT2: OBJMPX */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))  /* ?? TMNT2: NVBLK */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* ?? TMNT2: IPL0 */
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -2267,8 +2186,8 @@ static INPUT_PORTS_START( qgakumon )
 	PORT_START("EEPROM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* ?? TMNT2: OBJMPX */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))  /* ?? TMNT2: NVBLK (needs to be ACTIVE_HIGH to avoid problems) */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* ?? TMNT2: OBJMPX */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))  /* ?? TMNT2: NVBLK */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* ?? TMNT2: IPL0 */
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -2342,8 +2261,7 @@ INPUT_PORTS_END
 
 void tmnt2_state::machine_start()
 {
-	save_item(NAME(m_toggle));
-	save_item(NAME(m_last));
+	save_item(NAME(m_lastirq));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
@@ -2361,8 +2279,7 @@ void sunsetbl_state::machine_start()
 
 void tmnt2_state::machine_reset()
 {
-	m_toggle = 0;
-	m_last = 0;
+	m_lastirq = 0;
 
 	if (m_audiocpu && m_k053260)
 	{
@@ -2385,11 +2302,11 @@ void tmnt2_state::punkshot(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
-	screen.set_screen_update(FUNC(tmnt2_state::screen_update_punkshot));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(tmnt2_state::screen_update_punkshot));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
@@ -2432,11 +2349,11 @@ void tmnt2_state::lgtnfght(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
-	screen.set_screen_update(FUNC(tmnt2_state::screen_update_lgtnfght));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(tmnt2_state::screen_update_lgtnfght));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
@@ -2483,12 +2400,11 @@ void tmnt2_state::blswhstl(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
-	screen.set_screen_update(FUNC(tmnt2_state::screen_update_lgtnfght));
-	screen.screen_vblank().set(FUNC(tmnt2_state::screen_vblank_blswhstl));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(tmnt2_state::screen_update_lgtnfght));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
@@ -2543,11 +2459,11 @@ void glfgreat_state::glfgreat(machine_config &config)
 	adc.vin_callback().set(FUNC(glfgreat_state::controller_r));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
-	screen.set_screen_update(FUNC(glfgreat_state::screen_update_glfgreat));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(glfgreat_state::screen_update_glfgreat));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_glfgreat);
 
@@ -2604,11 +2520,11 @@ void prmrsocr_state::prmrsocr(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
-	screen.set_screen_update(FUNC(prmrsocr_state::screen_update_glfgreat));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(prmrsocr_state::screen_update_glfgreat));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_glfgreat);
 
@@ -2662,11 +2578,11 @@ void tmnt2_state::tmnt2(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
-	screen.set_screen_update(FUNC(tmnt2_state::screen_update_tmnt2));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(tmnt2_state::screen_update_tmnt2));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
@@ -2714,11 +2630,11 @@ void tmnt2_state::ssriders(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
-	screen.set_screen_update(FUNC(tmnt2_state::screen_update_tmnt2));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(tmnt2_state::screen_update_tmnt2));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
@@ -2773,12 +2689,12 @@ void sunsetbl_state::sunsetbl(machine_config &config)
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
-	screen.set_screen_update(FUNC(sunsetbl_state::screen_update_tmnt2));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(sunsetbl_state::sunsetbl_vblank_w));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(sunsetbl_state::screen_update_tmnt2));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(sunsetbl_state::sunsetbl_vblank_w));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
@@ -2818,10 +2734,10 @@ void tmnt2_state::thndrx2(machine_config &config)
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
-	screen.set_screen_update(FUNC(tmnt2_state::screen_update_thndrx2));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(tmnt2_state::screen_update_thndrx2));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
@@ -3962,13 +3878,13 @@ GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  glfgreat_state, empty_in
 GAME( 1991, glfgreatu,   glfgreat, glfgreat, glfgreatu, glfgreat_state, empty_init, ROT0,   "Konami",  "Golfing Greats (US, version K)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, glfgreat_state, empty_init, ROT0,   "Konami",  "Golfing Greats (Japan, version J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmnt2o,      tmnt2,    tmnt2,    ssrid4ps,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver OAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmht24pe,    tmnt2,    tmnt2,    ssridr4p,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (4 Players ver EAA)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmnt24pu,    tmnt2,    tmnt2,    ssrid4ps,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UEA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Ninja Turtles: Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Ninja Turtles: Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt2o,      tmnt2,    tmnt2,    ssrid4ps,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Ninja Turtles: Turtles in Time (4 Players ver OAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Hero Turtles: Turtles in Time (2 Players ver EBA)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmht24pe,    tmnt2,    tmnt2,    ssridr4p,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Hero Turtles: Turtles in Time (4 Players ver EAA)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Ninja Turtles: Turtles in Time (2 Players ver UDA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt24pu,    tmnt2,    tmnt2,    ssrid4ps,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Ninja Turtles: Turtles in Time (4 Players ver UEA)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Quiz Gakumon no Susume (Japan ver. JA1 Type H)", MACHINE_SUPPORTS_SAVE )
 

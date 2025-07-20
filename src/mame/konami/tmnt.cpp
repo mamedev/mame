@@ -444,8 +444,6 @@ void tmnt_state::tmnt_priority_w(offs_t offset, uint16_t data)
 
 uint32_t tmnt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
 	if ((m_tmnt_priorityflag & 1) == 1) m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);

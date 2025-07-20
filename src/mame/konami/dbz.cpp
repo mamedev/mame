@@ -220,7 +220,7 @@ void dbz_state::video_start()
 		m_k056832->set_layer_offs(0, -35, -16);
 
 	m_k056832->set_layer_offs(1, -31, -16);
-	m_k056832->set_layer_offs(3, -31, -16); //?
+	m_k056832->set_layer_offs(3, -31, -16); // ?
 }
 
 uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -237,7 +237,7 @@ uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitma
 		{
 			m_layer_colorbase[plane] = new_colorbase;
 			if (plane <= 3)
-				m_k056832->mark_plane_dirty( plane);
+				m_k056832->mark_plane_dirty(plane);
 			else if (plane == 4)
 				m_bg1_tilemap->mark_all_dirty();
 			else if (plane == 5)
@@ -245,8 +245,7 @@ uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitma
 		}
 	}
 
-	//layers priority
-
+	// layers priority
 	layer[0] = 0;
 	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI3);
 	layer[1] = 1;
@@ -298,7 +297,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::dbz_scanline)
 		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 
 	if(scanline == 0 && m_k053246->k053246_is_irq_enabled()) // vblank-in irq
-		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE); //auto-acks apparently
+		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE); // auto-acks apparently
 }
 
 #if 0
