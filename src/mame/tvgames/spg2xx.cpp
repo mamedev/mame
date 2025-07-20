@@ -2885,7 +2885,7 @@ ROM_END
 
 ROM_START( lexibds )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "barbiedrawingstudio.u3", 0x000000, 0x400000, CRC(16b5b52e) SHA1(e3719523d92d1302883f0b0c2d4b3fabedc34319) )
+	ROM_LOAD16_WORD_SWAP( "barbiedrawingstudio.u3", 0x000000, 0x400000, CRC(16b5b52e) SHA1(e3719523d92d1302883f0b0c2d4b3fabedc34319) ) // no chip markings, dumped as 29LV320
 ROM_END
 
 ROM_START( tiktokmm )
