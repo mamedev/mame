@@ -124,7 +124,7 @@ class m62_bkungfu_state : public m62_state
 public:
 	m62_bkungfu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: m62_state(mconfig, type, tag)
-		, m_bkungfu_tileram(*this, "tileram", 64*32*2, ENDIANNESS_LITTLE)
+		, m_bkungfu_tileram(*this, "tileram", 256*32*2, ENDIANNESS_LITTLE)
 		, m_blitterdatarom(*this, "blitterdat")
 	{ }
 
@@ -143,6 +143,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
 	DECLARE_VIDEO_START(bkungfu);
 
+	void bkungfu_blitter_draw_4_tile_column_row(int column, int row, uint8_t tile, uint8_t attr);
+	void bkungfu_blitter_draw_4_tile_column(int column);
 	void bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data);
 	void bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, bool use_ram);
 	void bkungfu_blitter_draw_text();
@@ -187,7 +189,7 @@ TILE_GET_INFO_MEMBER(m62_bkungfu_state::get_bkungfu_bg_tile_info)
 
 	tileinfo.set(0, code | ((color & 0xe0) << 3) | (m_kidniki_background_bank << 11), color & 0x1f, 0);
 
-	if ((tile_index / 64) < 6 || ((color & 0x1f) >> 1) > 0x0c)
+	if ((tile_index / 256) < 6 || ((color & 0x1f) >> 1) > 0x0c)
 		tileinfo.category = 1;
 	else
 		tileinfo.category = 0;
@@ -195,7 +197,7 @@ TILE_GET_INFO_MEMBER(m62_bkungfu_state::get_bkungfu_bg_tile_info)
 
 VIDEO_START_MEMBER(m62_bkungfu_state,bkungfu)
 {
-	m62_start(tilemap_get_info_delegate(*this, FUNC(m62_bkungfu_state::get_bkungfu_bg_tile_info)), 32, 0, 8, 8, 64, 32);
+	m62_start(tilemap_get_info_delegate(*this, FUNC(m62_bkungfu_state::get_bkungfu_bg_tile_info)), 32, 0, 8, 8, 256, 32);
 }
 
 
@@ -223,11 +225,6 @@ uint8_t m62_bkungfu_state::bkungfu_blitter_r(offs_t offset)
 
 void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, bool use_ram)
 {
-	// note, this may need to be adjusted, along with the overall tilemap size
-	// as it appears the tilemap might be 128 wide for this game
-	// (or has 2 banks, the backgrounds are 7 screens wide, and the background draw
-	// commands are only sent at the start of a level)
-
 	const int tilemap_width = 64;
 	const int widthmask = (tilemap_width * 2) - 1;
 	//int tilemap_height = 32;
@@ -315,10 +312,62 @@ void m62_bkungfu_state::bkungfu_blitter_clear_tilemap()
 	}
 }
 
+void m62_bkungfu_state::bkungfu_blitter_draw_4_tile_column_row(int column, int row, uint8_t tile, uint8_t attr)
+{
+	// rows below 6 are the HUD
+	row += 6;
+
+	int offset = (row * 256);
+	offset += (column * 4);
+	offset <<= 1;
+
+	for (int i = 0; i < 8; i += 2)
+	{
+		m_bkungfu_tileram[offset+i] = tile;
+		m_bkungfu_tileram[offset+i+1] = attr;
+
+		m_bg_tilemap->mark_tile_dirty((offset+i) >> 1);
+
+	}
+}
+
+void m62_bkungfu_state::bkungfu_blitter_draw_4_tile_column(int column)
+{
+	// this just writes column (4 tile block) numbers into the tilemap for the background for now.
+
+	for (int i = 0; i < 25; i++) // 25 matches the height of the tilemaps on kungfum
+	{
+		int tile;
+		if (i & 1)
+			tile = column & 0x0f;
+		else
+			tile = (column >> 4) & 0x0f;
+
+		if (tile <= 0x9)
+			tile += 0x30;
+		else
+			tile += 0x37;
+
+		bkungfu_blitter_draw_4_tile_column_row(column, i, tile, 0x00);
+	}
+}
+
 void m62_bkungfu_state::bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data)
 {
-	m_bkungfu_tileram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset >> 1);
+	// the tilemap needs to be 256 tiles wide for the backgrounds, which are copied in a single command
+	// however the blitter commands seem to only have enough co-ordinates for the current 64 tile page
+	// and the higher bits aren't communicated to the MCU, so assume they mirror across all pages for now
+
+	int xpart = offset & 0x7f;
+	int ypart = offset & ~0x7f;
+
+	for (int page = 0; page < 0x200; page += 0x80)
+	{
+		int realoffset = (ypart << 2) | xpart | page;
+
+		m_bkungfu_tileram[realoffset] = data;
+		m_bg_tilemap->mark_tile_dirty(realoffset >> 1);
+	}
 }
 
 void m62_bkungfu_state::machine_start()
@@ -579,6 +628,12 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			uint8_t param1 = m_blittercmdram[0x001];
 			uint8_t param2 = m_blittercmdram[0x002];
 			logerror("%s: Command %02x: blitter: start of level cmd 2 (do draw?) %02x %02x\n", machine().describe_context(), data, param1, param2);
+
+			// note this isn't instant, we should put the simulation on a timer
+			for (int column = 0; column < 0x38; column++)
+			{
+				bkungfu_blitter_draw_4_tile_column(column);
+			}
 		}
 		else if (data == 0x01)
 		{
