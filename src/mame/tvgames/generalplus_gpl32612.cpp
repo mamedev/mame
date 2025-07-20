@@ -302,6 +302,22 @@ ROM_START( anpanm19 )
 	ROM_LOAD( "25l1280.u3", 0x0000, 0x1000000, CRC(7932fb3e) SHA1(a381eeba5357fe71e4d6081b9b91b57e5705f7f1) )
 ROM_END
 
+ROM_START( pdcm2 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x84000000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "k9gag08u0m.u3", 0x0000, 0x84000000, CRC(88d9c107) SHA1(0b70962ecddf3a8a748b7af5e81cffb365f704e2) )
+ROM_END
+
+ROM_START( arcadege )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x8400000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg0s3eta00.u3", 0x0000, 0x8400000, CRC(9b4db25e) SHA1(7e3d7e15f2592efd98027440c3761179c95e4417) )
+ROM_END
+
 
 void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
@@ -335,16 +351,6 @@ void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_str
 		}
 	}
 }
-
-ROM_START( pdcm2 )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
-
-	ROM_REGION( 0x84000000, "nand", ROMREGION_ERASE00 )
-	ROM_LOAD( "k9gag08u0m.u3", 0x0000, 0x84000000, CRC(88d9c107) SHA1(0b70962ecddf3a8a748b7af5e81cffb365f704e2) )
-ROM_END
-
-
 
 void generalplus_gpl32612_game_state::nand_init840()
 {
@@ -400,3 +406,6 @@ MD481P
 */
 
 CONS( 2009, pdcm2,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VideoJet / Conny",        "PDC M2",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses a GPL32600A-003A-QL141
+CONS( 200?, arcadege,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Millennium 2000 GmbH",        "Millennium Arcade Genius SE",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
