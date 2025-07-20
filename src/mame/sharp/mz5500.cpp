@@ -7,6 +7,7 @@ Sharp MZ-6500
 TODO:
 - keyboard (from MCU thru PIO, serial i/f)
 - "ERROR 06" during selfcheck (r/w from <reserved> "I/O slot" $f5 port);
+- mz5500: "ERROR 12" when testing floppies;
 - mz6550: hangs for missing second CTC;
 - mz6550: hookup EMM to bus slot (tested in selfcheck, "ERROR 05");
 
@@ -33,10 +34,10 @@ TODO:
 
 namespace {
 
-class mz6500_state : public driver_device
+class mz5500_state : public driver_device
 {
 public:
-	mz6500_state(const machine_config &mconfig, device_type type, const char *tag)
+	mz5500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_pic(*this, "pic_%u", 1U)
@@ -52,7 +53,7 @@ public:
 		, m_psg(*this, "psg")
 	{ }
 
-	void mz6500(machine_config &config);
+	void mz5500(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset_cb);
 
 protected:
@@ -73,7 +74,7 @@ protected:
 	void io_map(address_map &map) ATTR_COLD;
 	virtual void mem_map(address_map &map) ATTR_COLD;
 
-	void machine_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void machine_reset() override ATTR_COLD;
 private:
 	u8 vram_r(offs_t offset);
@@ -93,6 +94,20 @@ private:
 	u8 m_dma_channel;
 };
 
+class mz6500_state : public mz5500_state
+{
+public:
+	mz6500_state(const machine_config &mconfig, device_type type, const char *tag)
+		: mz5500_state(mconfig, type, tag)
+	{ }
+
+	void mz6500(machine_config &config);
+
+private:
+	virtual void machine_start() override ATTR_COLD;
+};
+
+
 class mz6550_state : public mz6500_state
 {
 public:
@@ -106,7 +121,7 @@ private:
 	virtual void mem_map(address_map &map) override ATTR_COLD;
 };
 
-UPD7220_DISPLAY_PIXELS_MEMBER( mz6500_state::hgdc_display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( mz5500_state::hgdc_display_pixels )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	int const gfx[3] = { m_vram[(address + 0x00000)], m_vram[(address + 0x8000)], m_vram[(address + 0x10000)] };
@@ -120,12 +135,12 @@ UPD7220_DISPLAY_PIXELS_MEMBER( mz6500_state::hgdc_display_pixels )
 }
 
 
-u8 mz6500_state::vram_r(offs_t offset)
+u8 mz5500_state::vram_r(offs_t offset)
 {
 	return m_vram[offset >> 1] >> ((offset & 1) ? 8 : 0);
 }
 
-void mz6500_state::vram_w(offs_t offset, u8 data)
+void mz5500_state::vram_w(offs_t offset, u8 data)
 {
 	int mask = (offset & 1) ? 8 : 0;
 	offset >>= 1;
@@ -133,16 +148,16 @@ void mz6500_state::vram_w(offs_t offset, u8 data)
 	m_vram[offset] |= data << mask;
 }
 
-void mz6500_state::mem_map(address_map &map)
+void mz5500_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x9ffff).ram();
 	map(0xa0000, 0xbffff).m(m_user_bank, FUNC(address_map_bank_device::amap8));
-	map(0xc0000, 0xeffff).rw(FUNC(mz6500_state::vram_r), FUNC(mz6500_state::vram_w));
+	map(0xc0000, 0xeffff).rw(FUNC(mz5500_state::vram_r), FUNC(mz5500_state::vram_w));
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
 
-void mz6500_state::io_map(address_map &map)
+void mz5500_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x000f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
@@ -173,7 +188,7 @@ void mz6500_state::io_map(address_map &map)
 //  map(0x0270, 0x0270) system port B
 }
 
-void mz6500_state::user_map(address_map &map)
+void mz5500_state::user_map(address_map &map)
 {
 	map.unmap_value_high();
 //  map(0x60000, 0x7ffff) MZ-1R32 EMM
@@ -191,7 +206,7 @@ void mz6550_state::mem_map(address_map &map)
 	map(0xff8000, 0xffffff).rom().region("ipl", 0);
 }
 
-INPUT_CHANGED_MEMBER(mz6500_state::nmi_reset_cb)
+INPUT_CHANGED_MEMBER(mz5500_state::nmi_reset_cb)
 {
 	if (newval)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -206,7 +221,7 @@ static INPUT_PORTS_START( mz6500 )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// /RSTSW, front panel
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mz6500_state::nmi_reset_cb), 0) PORT_NAME("Reset Switch")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mz5500_state::nmi_reset_cb), 0) PORT_NAME("Reset Switch")
 	PORT_DIPNAME( 0x04, 0x04, "Display resolution" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING(    0x04, "High resolution (400)" )
 	PORT_DIPSETTING(    0x00, "Medium resolution (200)" )
@@ -237,13 +252,20 @@ static INPUT_PORTS_START( mz6500 )
 INPUT_PORTS_END
 
 
-void mz6500_state::machine_start()
+void mz5500_state::machine_start()
 {
-	m_fdc->set_rate(500000);
+	m_fdc->set_rate(250000);
 	m_current_floppy = nullptr;
 }
 
-void mz6500_state::machine_reset()
+void mz6500_state::machine_start()
+{
+	mz5500_state::machine_start();
+	m_fdc->set_rate(500000);
+}
+
+
+void mz5500_state::machine_reset()
 {
 }
 
@@ -251,14 +273,16 @@ void mz6500_state::machine_reset()
 static void mz6500_floppies(device_slot_interface &device)
 {
 	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
 }
 
-void mz6500_state::upd7220_map(address_map &map)
+void mz5500_state::upd7220_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).ram().share("videoram");
 }
 
-uint8_t mz6500_state::dma_read_byte(offs_t offset)
+uint8_t mz5500_state::dma_read_byte(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dma_channel] << 16) | offset;
@@ -266,7 +290,7 @@ uint8_t mz6500_state::dma_read_byte(offs_t offset)
 }
 
 
-void mz6500_state::dma_write_byte(offs_t offset, uint8_t data)
+void mz5500_state::dma_write_byte(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dma_channel] << 16) | offset;
@@ -274,13 +298,13 @@ void mz6500_state::dma_write_byte(offs_t offset, uint8_t data)
 	program.write_byte(addr, data);
 }
 
-void mz6500_state::set_dma_channel(int channel, int state)
+void mz5500_state::set_dma_channel(int channel, int state)
 {
 	if (!state) m_dma_channel = channel;
 }
 
 
-void mz6500_state::psg_porta_w(u8 data)
+void mz5500_state::psg_porta_w(u8 data)
 {
 	// SL0-SL3
 	// TODO: error 13 without this for drives B (first time) and C (second time onward)
@@ -317,17 +341,17 @@ void mz6500_state::psg_porta_w(u8 data)
 }
 
 
-void mz6500_state::mz6500(machine_config &config)
+void mz5500_state::mz5500(machine_config &config)
 {
 	// MZ-5500: 5 MHz
 	// MZ-5600 onward: 8 or 5 MHz modes, user settable
 	// TODO: clocks for peripherals
 	I8086(config, m_maincpu, 8000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mz6500_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &mz6500_state::io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz5500_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &mz5500_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(m_pic[0], FUNC(pic8259_device::inta_cb));
 
-	ADDRESS_MAP_BANK(config, m_user_bank).set_map(&mz6500_state::user_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x20000);
+	ADDRESS_MAP_BANK(config, m_user_bank).set_map(&mz5500_state::user_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x20000);
 
 	PIC8259(config, m_pic[0], 0);
 	m_pic[0]->out_int_callback().set_inputline(m_maincpu, 0);
@@ -345,8 +369,8 @@ void mz6500_state::mz6500(machine_config &config)
 		m_dmac->hack_w(state);
 	});
 	m_dmac->out_eop_callback().set([this] (int state) { m_fdc->tc_w(state);});
-	m_dmac->in_memr_callback().set(FUNC(mz6500_state::dma_read_byte));
-	m_dmac->out_memw_callback().set(FUNC(mz6500_state::dma_write_byte));
+	m_dmac->in_memr_callback().set(FUNC(mz5500_state::dma_read_byte));
+	m_dmac->out_memw_callback().set(FUNC(mz5500_state::dma_write_byte));
 	// ch. 0: HDD
 	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_r));
 	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_w));
@@ -391,7 +415,7 @@ void mz6500_state::mz6500(machine_config &config)
 		logerror("PIO PORTC: %02x\n", data);
 	});
 
-	Z80CTC(config, m_ctc, 8000000 / 2);
+	Z80CTC(config, m_ctc, 5000000 / 2);
 	m_ctc->intr_callback().set(m_pic[0], FUNC(pic8259_device::ir5_w));
 
 	RP5C01(config, m_rtc, XTAL(32'768));
@@ -407,16 +431,16 @@ void mz6500_state::mz6500(machine_config &config)
 
 	// TODO: should reach ~56 Hz
 	UPD7220(config, m_hgdc, 5000000 / 2);
-	m_hgdc->set_addrmap(0, &mz6500_state::upd7220_map);
-	m_hgdc->set_display_pixels(FUNC(mz6500_state::hgdc_display_pixels));
+	m_hgdc->set_addrmap(0, &mz5500_state::upd7220_map);
+	m_hgdc->set_display_pixels(FUNC(mz5500_state::hgdc_display_pixels));
 	m_hgdc->vsync_wr_callback().set(m_pic[0], FUNC(pic8259_device::ir0_w));
 
 	// wants ready for detecting if disk is in.
-	UPD765A(config, m_fdc, 8000000, true, true);
+	UPD765A(config, m_fdc, 5000000, true, true);
 	m_fdc->intrq_wr_callback().set(m_pic[1], FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w)).invert();
-	FLOPPY_CONNECTOR(config, "fdc:0", mz6500_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", mz6500_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", mz6500_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", mz6500_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", mz6500_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", mz6500_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
@@ -426,8 +450,17 @@ void mz6500_state::mz6500(machine_config &config)
 
 	// TODO: clock, discrete mixing
 	AY8912(config, m_psg, 4000000);
-	m_psg->port_a_write_callback().set(FUNC(mz6500_state::psg_porta_w));
+	m_psg->port_a_write_callback().set(FUNC(mz5500_state::psg_porta_w));
 	m_psg->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void mz6500_state::mz6500(machine_config &config)
+{
+	mz5500_state::mz5500(config);
+	m_maincpu->set_clock(8000000);
+
+	FLOPPY_CONNECTOR(config.replace(), "fdc:0", mz6500_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config.replace(), "fdc:1", mz6500_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void mz6550_state::mz6550(machine_config &config)
@@ -441,7 +474,19 @@ void mz6550_state::mz6550(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(m_pic[0], FUNC(pic8259_device::inta_cb));
 }
 
-/* ROM definition */
+
+// TODO: actual romlabels for all
+ROM_START( mz5500 )
+	ROM_REGION16_LE( 0x4000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(e5d47f08) SHA1(40f8463b140c18ebd596618907e78cd9f909e7f4))
+
+	ROM_REGION( 0x40000, "dictionary", ROMREGION_ERASEFF )
+	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(422d8996) SHA1(6854f5f2b8a1975847b8ad85a2e038bc52f96d98))
+
+	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF )
+	ROM_LOAD( "kanji.rom", 0x00000, 0x40000, CRC(b618e25d) SHA1(1da93337fecde6c0f8a5bd68f3f0b3222a38d63e))
+ROM_END
+
 ROM_START( mz6500 )
 	ROM_REGION16_LE( 0x4000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(6c978ac4) SHA1(7872d7e6d9cda2ed9f47ed4833a5caa4dfe0e55c))
@@ -468,7 +513,8 @@ ROM_END
 } // Anonymous namespace
 
 
-// MZ-5500 should fit here
+
+COMP( 1984, mz5500, 0,      0, mz5500, mz6500, mz5500_state, empty_init, "Sharp", "MZ-5500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // Released as MZ-5600 in U.K.
-COMP( 1984, mz6500, 0,      0,      mz6500,  mz6500, mz6500_state, empty_init, "Sharp", "MZ-6500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1985, mz6550, mz6500, 0,      mz6550,  mz6500, mz6550_state, empty_init, "Sharp", "MZ-6550", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1984, mz6500, mz5500, 0, mz6500, mz6500, mz6500_state, empty_init, "Sharp", "MZ-6500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, mz6550, mz5500, 0, mz6550, mz6500, mz6550_state, empty_init, "Sharp", "MZ-6550", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
