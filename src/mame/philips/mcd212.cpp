@@ -595,7 +595,7 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 				const uint8_t blue = (byte & 0b11111) << 3;
 				const uint8_t green = ((byte & 0b11100000) >> 2) + ((byte1 & 0b11) << 6);
 				const uint8_t red = (byte1 & 0b01111100) << 1;
-				rgb_tp_bit = (use_rgb_tp_bit && ((byte1 & 0x80) == tp_check_parity));
+				rgb_tp_bit = (use_rgb_tp_bit && (BIT(byte1,7) == tp_check_parity));
 				color1 = color0 = (uint32_t(red) << 16) | (uint32_t(green) << 8) | blue;
 			}
 			else if (icm == ICM_CLUT4)
