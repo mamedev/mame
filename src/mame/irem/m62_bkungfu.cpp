@@ -116,6 +116,7 @@ several other games in m62.cpp also draw their backgrounds in 4 tile wide strips
 #include "m62.h"
 #include "iremipt.h"
 
+#include "machine/timer.h"
 
 namespace {
 
@@ -144,7 +145,7 @@ private:
 	DECLARE_VIDEO_START(bkungfu);
 
 	void bkungfu_blitter_draw_4_tile_column_row(int column, int row, uint8_t tile, uint8_t attr);
-	void bkungfu_blitter_draw_4_tile_column(int column);
+	void bkungfu_blitter_draw_4_tile_column(int column, int row);
 	void bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data);
 	void bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, bool use_ram);
 	void bkungfu_blitter_draw_text();
@@ -155,6 +156,8 @@ private:
 	void bkungfu_blitter_draw_lifebar(int xbase, int ybase, uint8_t energy, bool is_boss);
 	void bkungfu_blitter_draw_credits_continue();
 	void redraw_hud();
+
+	TIMER_CALLBACK_MEMBER(leveldraw_next);
 
 	// done this way so it can be viewed win the debugger with save state registration
 	uint8_t m_blittercmdram[0x800];
@@ -168,12 +171,18 @@ private:
 	uint8_t m_hud_boss_energy;
 	uint8_t m_hud_floorcount;
 	uint8_t m_hud_floorcount_state;
+	uint8_t m_leveldraw_row;
+	uint8_t m_leveldraw_column;
+	uint8_t m_leveldraw_number;
 
 	int m_mcu_running;
+
+	emu_timer *m_leveldraw_timer = nullptr;
 
 	memory_share_creator<uint8_t> m_bkungfu_tileram;
 
 	required_region_ptr<uint8_t> m_blitterdatarom;
+
 };
 
 
@@ -217,8 +226,7 @@ uint8_t m62_bkungfu_state::bkungfu_blitter_r(offs_t offset)
 	// it also checks 0102, 0106, 0118, 011c before sending command 0x0c to draw high score data?
 	// we initialize these to 0xfe when the MCU is 'reset'
 
-	if (offset != 0)
-		logerror("%s: bkungfu_blitter_r %04x\n", machine().describe_context(), offset);
+	logerror("%s: bkungfu_blitter_r %04x\n", machine().describe_context(), offset);
 
 	return m_blittercmdram[offset];
 }
@@ -331,26 +339,46 @@ void m62_bkungfu_state::bkungfu_blitter_draw_4_tile_column_row(int column, int r
 	}
 }
 
-void m62_bkungfu_state::bkungfu_blitter_draw_4_tile_column(int column)
+void m62_bkungfu_state::bkungfu_blitter_draw_4_tile_column(int column, int row)
 {
 	// this just writes column (4 tile block) numbers into the tilemap for the background for now.
+	int tile;
+	if (row & 1)
+		tile = column & 0x0f;
+	else
+		tile = (column >> 4) & 0x0f;
 
-	for (int i = 0; i < 25; i++) // 25 matches the height of the tilemaps on kungfum
+	if (tile <= 0x9)
+		tile += 0x30;
+	else
+		tile += 0x37;
+
+	bkungfu_blitter_draw_4_tile_column_row(column, row, tile, m_leveldraw_number);
+}
+
+TIMER_CALLBACK_MEMBER(m62_bkungfu_state::leveldraw_next)
+{
+	bkungfu_blitter_draw_4_tile_column(m_leveldraw_column, m_leveldraw_row);
+
+	m_leveldraw_row++;
+
+	if (m_leveldraw_row == 26)
 	{
-		int tile;
-		if (i & 1)
-			tile = column & 0x0f;
-		else
-			tile = (column >> 4) & 0x0f;
+		m_leveldraw_row = 0;
+		m_leveldraw_column++;
+	}
 
-		if (tile <= 0x9)
-			tile += 0x30;
-		else
-			tile += 0x37;
-
-		bkungfu_blitter_draw_4_tile_column_row(column, i, tile, 0x00);
+	if (m_leveldraw_column != 0x38)
+	{
+		m_leveldraw_timer->adjust(attotime::from_usec(200));
+	}
+	else
+	{
+		// done
+		m_blittercmdram[0x00] = 0xfe;
 	}
 }
+
 
 void m62_bkungfu_state::bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data)
 {
@@ -386,6 +414,11 @@ void m62_bkungfu_state::machine_start()
 	save_item(NAME(m_hud_boss_energy));
 	save_item(NAME(m_hud_floorcount));
 	save_item(NAME(m_hud_floorcount_state));
+	save_item(NAME(m_leveldraw_row));
+	save_item(NAME(m_leveldraw_column));
+	save_item(NAME(m_leveldraw_number));
+
+	m_leveldraw_timer = timer_alloc(FUNC(m62_bkungfu_state::leveldraw_next), this);
 }
 
 void m62_bkungfu_state::machine_reset()
@@ -406,6 +439,11 @@ void m62_bkungfu_state::machine_reset()
 	m_hud_boss_energy = 0;
 	m_hud_floorcount = 0;
 	m_hud_floorcount_state = 0;
+	m_leveldraw_row = 0;
+	m_leveldraw_column = 0;
+	m_leveldraw_number = 0;
+
+	m_leveldraw_timer->adjust(attotime::never);
 }
 
 
@@ -571,6 +609,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 		{
 			logerror("%s: Command %02x: blitter: draw text from ROM\n", machine().describe_context(), data);
 			bkungfu_blitter_draw_text();
+			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x0d)
 		{
@@ -578,6 +617,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// should it differ from the above somehow, or is it just a mirrored command?
 			logerror("%s: Command %02x: blitter: draw text from ROM (alt)\n", machine().describe_context(), data);
 			bkungfu_blitter_draw_text();
+			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x0c)
 		{
@@ -600,11 +640,11 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 
 			// override the RAM data with 0xfe (task done flag) so this works for the next call
 			// (seems logical based on checks above) but works without it, and breaks if you do this?)
-			//	m_blittercmdram[0x102] = 0xfe;
-			//	m_blittercmdram[0x106] = 0xfe;
-			//	m_blittercmdram[0x118] = 0xfe;
-			//	m_blittercmdram[0x11c] = 0xfe;
-
+			//  m_blittercmdram[0x102] = 0xfe;
+			//  m_blittercmdram[0x106] = 0xfe;
+			//  m_blittercmdram[0x118] = 0xfe;
+			//  m_blittercmdram[0x11c] = 0xfe;
+			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x10)
 		{
@@ -614,11 +654,13 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			uint8_t param = m_blittercmdram[0x001];
 			logerror("%s: Command %02x: blitter: draw number of coins %02x\n", machine().describe_context(), data, param);
 			bkungfu_blitter_draw_credits_continue();
+			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x08) // clear layer to fixed value
 		{
 			logerror("%s: Command %02x: blitter: clear layer\n", machine().describe_context(), data);
 			bkungfu_blitter_clear_tilemap();
+			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x02)
 		{
@@ -629,11 +671,13 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			uint8_t param2 = m_blittercmdram[0x002];
 			logerror("%s: Command %02x: blitter: start of level cmd 2 (do draw?) %02x %02x\n", machine().describe_context(), data, param1, param2);
 
-			// note this isn't instant, we should put the simulation on a timer
-			for (int column = 0; column < 0x38; column++)
-			{
-				bkungfu_blitter_draw_4_tile_column(column);
-			}
+			// note this isn't instant, you can see the draw-in on PCB footage so we're using a timer
+			// however it should complete before the character starts walking, it doesn't, is this the wrong trigger?
+			// or should this command cycle steal the maincpu instead? (there doesn't seem to be any wait for it to complete)
+			m_leveldraw_row = 0;
+			m_leveldraw_column = 0;
+			m_leveldraw_number = param1;
+			m_leveldraw_timer->adjust(attotime::from_usec(200));
 		}
 		else if (data == 0x01)
 		{
@@ -647,7 +691,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			uint16_t data_address = m_blitterdatarom[0x200 + (blitterromptr << 1)] | (m_blitterdatarom[0x200 + (blitterromptr << 1) + 1] << 8);
 			//popmessage("%s: Command %02x: blitter: draw level from ROM initialize - param %02x source address is %04x", machine().describe_context(), data, blitterromptr, data_address);
 			logerror("%s: Command %02x: blitter: draw level from ROM - param %02x source address is %04x\n", machine().describe_context(), data, blitterromptr, data_address);
-
+			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x0a)
 		{
@@ -657,6 +701,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			uint16_t levelnum = m_blittercmdram[0x001];
 			logerror("%s: Command %02x: blitter: pre-draw level (draw HUD?) %02x\n", machine().describe_context(), data, levelnum);
 			redraw_hud();
+			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x05)
 		{
@@ -668,6 +713,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// no additional params are sent after calling 0xf and before calling this?
 			// which could suggest command 0xf is used to draw instead, but then why this call after it?
 			logerror("%s: Command %02x: blitter: after level animation command on level 3+\n", machine().describe_context(), data);
+			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0x0f)
 		{
@@ -688,6 +734,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// definitions are either coming from internal MCU ROM or the encrypted area
 
 			logerror("%s: Command %02x: blitter: draw title animation element (flames / level animations) %02x %02x\n", machine().describe_context(), data, m_blittercmdram[0x001], m_blittercmdram[0x002]);
+			m_blittercmdram[0x00] = 0xfe;
 		}
 		else if (data == 0xfe)
 		{
@@ -713,13 +760,14 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			m_blittercmdram[0x106] = 0xfe;
 			m_blittercmdram[0x118] = 0xfe;
 			m_blittercmdram[0x11c] = 0xfe;
+
+			// trigger
+			m_blittercmdram[0x00] = 0xfe;
 		}
 		else
 		{
 			logerror("%s: Command %02x: blitter: unknown\n", machine().describe_context(), data);
 		}
-
-		m_blittercmdram[0x00] = 0xfe; // flag 'done' in shared RAM byte 0 (trigger address)
 	}
 	// all these 'slots' are initialized when you start a game
 	// there seem to be 3 param bytes and a trigger address for each
