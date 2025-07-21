@@ -917,7 +917,7 @@ elseif _OPTIONS["vs"]=="intel-15" then
 end
 	configuration { }
 		defines {
-			"Z7_PPMD_SUPPPORT",
+			"Z7_PPMD_SUPPORT",
 			"Z7_ST",
 		}
 
