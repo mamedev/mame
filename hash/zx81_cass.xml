@@ -1623,6 +1623,26 @@ MUSIC
 		</part>
 	</software>
 
+	<software name="cass1astr">
+		<description>Cassette 1 (Astro)</description>
+		<year>1983</year>
+		<publisher>Astro Software</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side A: Hangman / Fruit Machine / House of Mystery / Bugman"/>
+			<dataarea name="cass" size="38205">
+				<rom name="Cassette 1 (Astro Software) - Side A.tzx" size="38205" crc="649eb1b9" sha1="9f6de06965954d7cbfd228495e5ab3fcd8afc398"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side B: Defender / Pontoon / Battleships / Codebreaker / Le Mans"/>
+			<dataarea name="cass" size="25342">
+				<rom name="Cassette 1 (Astro Software) - Side B.tzx" size="25342" crc="4d9c5ee0" sha1="ea773d9a8633e57c47b9090925a6caaa6e72d90c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cassett1">
 		<description>Cassette 1</description>
 		<year>1981</year>
@@ -6120,6 +6140,17 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="minefld">
+		<description>Minefield</description>
+		<year>1981</year>
+		<publisher>R&amp;R Software</publisher>
+		<part name="cass" interface="zx81_cass">
+			<dataarea name="cass" size="4071">
+				<rom name="Minefield (RR Software).tzx" size="4071" crc="7eeea5d1" sha1="dc5ae75b839584b3063d8e98cf78dd00d0ba8db5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="minesatn">
 		<description>Mines of Saturn/Return to Earth</description>
 		<year>198?</year>
@@ -8088,6 +8119,17 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="spcshutl">
+		<description>Space Shuttle</description>
+		<year>1983</year>
+		<publisher>Accord Data International</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="11402">
+				<rom name="Space Shuttle (Accord Data).tzx" size="11402" crc="dd754415" sha1="7472bf02b2445ffbfed50f4f3a1583c2028cb7e2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spctrek">
 		<description>Space Trek</description>
 		<year>198?</year>
@@ -8153,6 +8195,18 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="48415">
 				<rom name="SpellingBee.tzx" size="48415" crc="a5987f22" sha1="d992d921483b59b85ae68bdfa6e44d1c9c5068cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spelltut">
+		<description>Spelling Tutor</description>
+		<year>1983</year>
+		<publisher>Bamby Software</publisher>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16448">
+				<rom name="Spelling Tutor (Bamby Software).tzx" size="16448" crc="fbdf4855" sha1="10e0cce9eb24abe3778486ae64e55901216009e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9438,6 +9492,19 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7030">
 				<rom name="Traffic.tzx" size="7030" crc="be09c247" sha1="44626d460f9c918c4bc9e0611737b50215c73a3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trisland">
+		<description>Treasure Island</description>
+		<year>1983</year>
+		<publisher>Bamby Software</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12047">
+				<rom name="Treasure Island (Bamby Software).tzx" size="12047" crc="39beb9bc" sha1="df986d1d2690a516be8cdf6e05d0a89b77a98767"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10758,6 +10825,19 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="zx81ppack4_a" cloneof="zx81ppack4">
+		<description>ZX81 Program Pack 4 (alt)</description>
+		<year>1982</year>
+		<publisher>Bug-Byte</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7935">
+				<rom name="ZX81 Program Pack 4 - Alternate.tzx" size="7935" crc="b4154d24" sha1="b5a3983437cf18a24cb78b9d2b51162ce950c175"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zx81ppack5">
 		<description>ZX81 Program Pack 5</description>
 		<year>198?</year>
@@ -10766,6 +10846,19 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="11492">
 				<rom name="ZX81 Program Pack 5.tzx" size="11492" crc="b259a2cb" sha1="4e411eb79d1122e3c0d7eb028f37f0cc73d95197"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zx81ppack5_a" cloneof="zx81ppack5">
+		<description>ZX81 Program Pack 5 (alt)</description>
+		<year>1981</year>
+		<publisher>Bug-Byte</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="8576">
+				<rom name="ZX81 Program Pack 5 - Alternate.tzx" size="8576" crc="9485083f" sha1="a741ac5f12fc57c940e5d62b8f8866524d9526d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10799,6 +10892,18 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="btlships">
+		<description>Battle Ships (type-in?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="1777">
+				<rom name="Battle Ships.tzx" size="1777" crc="6d072edb" sha1="e478cc556cfbd11554aff3da3763076fd40d67b4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cedriccl">
 		<description>Cedric the Clown (type-in, Sinclair User № 17 - August 1983)</description>
 		<year>1983</year>
@@ -10812,6 +10917,19 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="chomp">
+		<description>Chomp (type-in, ZX Computing № 2 - August 1982)</description>
+		<year>1982</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4247">
+				<rom name="Chomp.tzx" size="4247" crc="856ab283" sha1="c619fabfcdbf2e83237593e5ddbda4319783f931"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="darts">
 		<description>Darts (type-in)</description>
 		<year>198?</year>
@@ -10821,6 +10939,32 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="3589">
 				<rom name="Darts.tzx" size="3589" crc="c502beab" sha1="d7471eeeffd7a5ca04dda0d87ee1ad9784a6a0f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="highlow">
+		<description>Higher-Lower (type-in, Sinclair Programs)</description>
+		<year>198?</year>
+		<publisher>ECC Publications</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4493">
+				<rom name="Higher-Lower.tzx" size="4493" crc="73c6d2f4" sha1="c78b23b46830695918476601377c48693d334aca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jparejas">
+		<description>Juego de las Parejas (type-in, Revista Española de Electrónica - Agosto-Septiembre 1982)</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="Spanish" />
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4129">
+				<rom name="juego de las parejas.p" size="4129" crc="f478a4c3" sha1="9ec9c69fc0733c76887b500014c07a002a215aa0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10862,6 +11006,18 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="minicome">
+		<description>Mini Comecocos (type-in)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2144">
+				<rom name="mini comecocos.p" size="2144" crc="b23cb6ab" sha1="43a8f2446257eb3faea7e7fa5ce33db1eebb3cdc"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="onfinal">
 		<description>On Final (type-in, The ZX Collection - Winter 1984)</description>
 		<year>1984</year>
@@ -10874,6 +11030,19 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="pfplan">
+		<description>Personal Financial Planning (type-in, Sinclair Projects № 11 - August/September 1984)</description>
+		<year>1984</year>
+		<publisher>ECC Publications</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="5301">
+				<rom name="Personal Financial Planning.tzx" size="5301" crc="d4df0f51" sha1="d6b62981888899b280160b41168bf0090c35c5e7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pilottyp">
 		<description>Pilot (type-in)</description>
 		<year>198?</year>
@@ -10882,6 +11051,57 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="6279">
 				<rom name="Pilot.tzx" size="6279" crc="39f98172" sha1="43a1f665ba1d65321b72f8683d55c97173879315"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sandown">
+		<description>Sandown (type-in?)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="1744">
+				<rom name="Sandown.tzx" size="1744" crc="b8e8e990" sha1="bc380bf17b68f062184dcdae5e2c3e2b754d8a38"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scircuit">
+		<description>Short Circuit (type-in, Your Computer Vol. 5 № 11 - November 1985)</description>
+		<year>1985</year>
+		<publisher>IPC Magazines</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="5328">
+				<rom name="Shortcircuit.p" size="5328" crc="e6d4caf6" sha1="d9424abf71e77b9481216a1c3d899b5a1d51649d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="squashed">
+		<description>Squashed (type-in, Sinclair Programs № 3 - September/October 1982)</description>
+		<year>1982</year>
+		<publisher>ECC Publications</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2869">
+				<rom name="Squashed.tzx" size="2869" crc="183d83ec" sha1="641006b47bceab0d25d4c051ae27c979ecb442de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwars">
+		<description>Star Wars (type-in)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2194">
+				<rom name="Star Wars.tzx" size="2194" crc="a912d422" sha1="14915b0ede8585ed44502e54ba8f7b535d68c2be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11086,7 +11306,21 @@ Defender: not working
 	</software>
 
 	<software name="cpayback" supported="partial">
-		<description>Cosmic Payback</description>
+		<description>Cosmic Payback (v1.1)</description>
+		<year>2025</year>
+		<publisher>John Connolly</publisher>
+		<notes>Wrong graphics during gameplay</notes>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="11257">
+				<rom name="CosmicPaybackZX81_v1-1.p" size="11257" crc="da4f8ae3" sha1="2fa606cca4bc91e936dcf42dffa61f76349d1608"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpayback_10" cloneof="cpayback" supported="partial">
+		<description>Cosmic Payback (v1.0)</description>
 		<year>2025</year>
 		<publisher>John Connolly</publisher>
 		<notes>Wrong graphics during gameplay</notes>
@@ -11399,6 +11633,20 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="11280">
 				<rom name="ruptus.p" size="11280" crc="40bf45c7" sha1="f9c6bf9adf4c6d7f110eeb453da7436746e87f07"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sconnex">
+		<description>Sconnex</description>
+		<year>2025</year>
+		<publisher>A.Millett</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<info name="version" value="v1.64" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="9211">
+				<rom name="sconnex-zx81.p" size="9211" crc="ff4d7789" sha1="570752e8d92c1949f2adb8b09f5b599cfaf247e1"/>
 			</dataarea>
 		</part>
 	</software>
