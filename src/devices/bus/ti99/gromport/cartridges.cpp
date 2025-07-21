@@ -97,7 +97,18 @@ ti99_cartridge_device::ti99_cartridge_device(const machine_config &mconfig, cons
 :   device_t(mconfig, TI99_CART, tag, owner, clock),
 	device_cartrom_image_interface(mconfig, *this),
 	m_pcbtype(0),
+	m_rom_size(0),
+	m_ram_size(0),
+	m_has_buffered_ram(false),
 	m_grom_idle(false),
+	m_grom_address(0),
+	m_rom_page(0),
+	m_ram_page(0),
+	m_romspace_selected(false),
+	m_waddr_LSB(false),
+	m_grom_selected(false),
+	m_grom_read_mode(false),
+	m_grom_address_mode(false),
 	m_pcb(nullptr),
 	m_connector(nullptr)
 {
@@ -116,6 +127,7 @@ void ti99_cartridge_device::prepare_cartridge()
 	m_rom_page = 0;
 	m_ram_size = 0;
 	m_ram_page = 0;
+	m_rom_size = 0;
 	// Used in gromemu type
 	m_grom_address = 0;
 	m_waddr_LSB = false;
