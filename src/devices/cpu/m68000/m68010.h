@@ -9,6 +9,10 @@
 
 class m68010_device : public m68000_musashi_device
 {
+protected:
+	m68010_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, u32 clock);
+	m68010_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map);
+
 public:
 	// construction/destruction
 	m68010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
