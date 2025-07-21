@@ -701,7 +701,6 @@ void xexex_state::xexex(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(32_MHz_XTAL / 4, 512, 0+40, 384+40, 289, 0, 256); // from CCU
 	m_screen->set_screen_update(FUNC(xexex_state::screen_update_xexex));
 

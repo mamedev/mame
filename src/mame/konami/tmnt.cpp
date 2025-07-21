@@ -829,7 +829,6 @@ void tmnt_state::cuebrick(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);

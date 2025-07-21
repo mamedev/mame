@@ -668,7 +668,7 @@ static INPUT_PORTS_START( uccops )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
 	/* There is ALWAYS a Bonus Life at 300K */
-	/* It does not depends on the value of bit 0x0010 */
+	/* It does not depend on the value of bit 0x0010 */
 	PORT_DIPNAME( 0x0020, 0x0020, "Any Button to Start" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Yes ) )

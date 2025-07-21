@@ -22,7 +22,6 @@ Notes:
   The controller returns to its default position by internal spring.
 
 TODO:
-
 - glfgreat: imperfect protection emulation:
   1. putting to MAX power on green causes the game to return an incorrect
      value a.k.a. it detects a bunker/rough/water hazard;
@@ -36,8 +35,11 @@ TODO:
 - what is OBJMPX? object multiplex? whatever that means, maybe objdma busy?
 - some slowdowns in lgtnfght when there are many sprites on screen - vblank issue?
 
-Updates:
+BTANB:
+- tmnt2 stage 7 (Neon Night Riders) all sprites flash white every few seconds
+  (it's from a write to k053251 and unrelated to protected spriteram)
 
+Updates:
 - blswhstl: sprites are left on screen during attract mode(fixed)
   Sprite buffer should be cleared at vblank start. On the GX OBJDMA
   automatically occurs 32.0-42.7us after clearing but on older boards
@@ -312,6 +314,9 @@ uint16_t tmnt2_state::k052109_word_r(offs_t offset, uint16_t mem_mask)
 
 void tmnt2_state::k052109_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	// glitch before tmnt2 titlescreen otherwise (maybe other issues too)
+	m_screen->update_partial(m_screen->vpos() - 1);
+
 	// A13 = 68000 UDS. Due to this and related bus buffering, word writes only affect the MSB.
 	// The "ROUND 1" text in punkshtj goes lost otherwise.
 	if (ACCESSING_BITS_8_15)
@@ -330,6 +335,8 @@ uint16_t tmnt2_state::k052109_word_noA12_r(offs_t offset, uint16_t mem_mask)
 
 void tmnt2_state::k052109_word_noA12_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	m_screen->update_partial(m_screen->vpos() - 1);
+
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
@@ -2303,7 +2310,6 @@ void tmnt2_state::punkshot(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(tmnt2_state::screen_update_punkshot));
 	m_screen->set_palette(m_palette);
@@ -2314,13 +2320,13 @@ void tmnt2_state::punkshot(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen("screen");
+	m_k052109->set_screen(m_screen);
 	m_k052109->set_tile_callback(FUNC(tmnt2_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
 
 	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen("screen");
+	m_k051960->set_screen(m_screen);
 	m_k051960->set_sprite_callback(FUNC(tmnt2_state::punkshot_sprite_callback));
 
 	K053251(config, m_k053251, 0);
@@ -2350,7 +2356,6 @@ void tmnt2_state::lgtnfght(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(tmnt2_state::screen_update_lgtnfght));
 	m_screen->set_palette(m_palette);
@@ -2363,7 +2368,7 @@ void tmnt2_state::lgtnfght(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen("screen");
+	m_k052109->set_screen(m_screen);
 	m_k052109->set_tile_callback(FUNC(tmnt2_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_5);
 
@@ -2401,7 +2406,6 @@ void tmnt2_state::blswhstl(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(tmnt2_state::screen_update_lgtnfght));
 	m_screen->set_palette(m_palette);
@@ -2414,7 +2418,7 @@ void tmnt2_state::blswhstl(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen("screen");
+	m_k052109->set_screen(m_screen);
 	m_k052109->set_tile_callback(FUNC(tmnt2_state::blswhstl_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
 
@@ -2460,7 +2464,6 @@ void glfgreat_state::glfgreat(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(glfgreat_state::screen_update_glfgreat));
 	m_screen->set_palette(m_palette);
@@ -2475,7 +2478,7 @@ void glfgreat_state::glfgreat(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen("screen");
+	m_k052109->set_screen(m_screen);
 	m_k052109->set_tile_callback(FUNC(glfgreat_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_5);
 
@@ -2521,7 +2524,6 @@ void prmrsocr_state::prmrsocr(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(prmrsocr_state::screen_update_glfgreat));
 	m_screen->set_palette(m_palette);
@@ -2536,7 +2538,7 @@ void prmrsocr_state::prmrsocr(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen("screen");
+	m_k052109->set_screen(m_screen);
 	m_k052109->set_tile_callback(FUNC(prmrsocr_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_5);
 
@@ -2579,7 +2581,6 @@ void tmnt2_state::tmnt2(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(tmnt2_state::screen_update_tmnt2));
 	m_screen->set_palette(m_palette);
@@ -2592,7 +2593,7 @@ void tmnt2_state::tmnt2(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen("screen");
+	m_k052109->set_screen(m_screen);
 	m_k052109->set_tile_callback(FUNC(tmnt2_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
 
@@ -2631,7 +2632,6 @@ void tmnt2_state::ssriders(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(tmnt2_state::screen_update_tmnt2));
 	m_screen->set_palette(m_palette);
@@ -2644,7 +2644,7 @@ void tmnt2_state::ssriders(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen("screen");
+	m_k052109->set_screen(m_screen);
 	m_k052109->set_tile_callback(FUNC(tmnt2_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
 
@@ -2690,7 +2690,6 @@ void sunsetbl_state::sunsetbl(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(sunsetbl_state::screen_update_tmnt2));
 	m_screen->set_palette(m_palette);
@@ -2704,7 +2703,7 @@ void sunsetbl_state::sunsetbl(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen("screen");
+	m_k052109->set_screen(m_screen);
 	m_k052109->set_tile_callback(FUNC(sunsetbl_state::ssbl_tile_callback));
 
 	K053245(config, m_k053245, 24_MHz_XTAL);
@@ -2745,13 +2744,13 @@ void tmnt2_state::thndrx2(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen("screen");
+	m_k052109->set_screen(m_screen);
 	m_k052109->set_tile_callback(FUNC(tmnt2_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
 
 	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen("screen");
+	m_k051960->set_screen(m_screen);
 	m_k051960->set_sprite_callback(FUNC(tmnt2_state::thndrx2_sprite_callback));
 
 	K053251(config, m_k053251, 0);

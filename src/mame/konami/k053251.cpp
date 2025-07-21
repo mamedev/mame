@@ -147,9 +147,7 @@ void k053251_device::device_start()
 
 void k053251_device::device_reset()
 {
-	for (int i = 0; i < 0x10; i++)
-		m_ram[i] = 0;
-
+	memset(m_ram, 0, sizeof(m_ram));
 	reset_indexes();
 }
 
@@ -168,19 +166,21 @@ void k053251_device::device_post_load()
 
 void k053251_device::write(offs_t offset, u8 data)
 {
+	offset &= 0xf;
 	m_ram[offset] = data & 0x3f;
 
 	if (offset == 9 || offset == 10)
 		reset_indexes();
 }
 
-int k053251_device::get_priority(int ci)
+u8 k053251_device::get_priority(u8 ci)
 {
-	return m_ram[ci];
+	return m_ram[ci & 0xf];
 }
 
-int k053251_device::get_palette_index(int ci)
+u8 k053251_device::get_palette_index(u8 ci)
 {
+	assert(ci < 5);
 	return m_palette_index[ci];
 }
 
@@ -191,11 +191,4 @@ void k053251_device::reset_indexes()
 	m_palette_index[2] = 32 * ((m_ram[9] >> 4) & 0x03);
 	m_palette_index[3] = 16 * ((m_ram[10] >> 0) & 0x07);
 	m_palette_index[4] = 16 * ((m_ram[10] >> 3) & 0x07);
-}
-
-// debug handlers
-
-u8 k053251_device::read(offs_t offset)
-{
-	return m_ram[offset]; // PCU1
 }

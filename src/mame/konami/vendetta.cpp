@@ -633,7 +633,7 @@ void vendetta_state::vendetta(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen("screen");
+	m_k052109->set_screen(m_screen);
 	m_k052109->set_tile_callback(FUNC(vendetta_state::vendetta_tile_callback));
 
 	K053246(config, m_k053246, 24_MHz_XTAL);
