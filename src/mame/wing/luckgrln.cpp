@@ -886,19 +886,6 @@ void luckgrln_state::init_luckgrln()
 		rom[i] = x;
 	}
 
-	#if 0
-	{
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		FILE *fp = fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(rom, 0x20000, 1, fp);
-			fclose(fp);
-		}
-	}
-	#endif
-
 	// ??
 //  membank("bank1")->set_base(&rom[0x010000]);
 }
