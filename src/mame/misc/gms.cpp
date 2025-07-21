@@ -92,6 +92,7 @@ TODO:
 - broken title GFX in yyhm (transparent pen problem?)
 - the newer games seem to use range 0x9e1000-0x9e1fff during gameplay
 - smatch03 seems to use newer / different custom chips, currently not emulated
+- battery-backed RAM support
 
 Video references:
 rbspm: https://www.youtube.com/watch?v=pPk-6N1wXoE
