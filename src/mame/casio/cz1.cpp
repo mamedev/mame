@@ -554,7 +554,7 @@ void cz1_state::stereo_w(u8 data)
 	bit 1: sound chip #2 routing (0: center, 2: right)
 	bit 2: center channel stereo chorus (0: on, 1: off)
 	*/
-	m_mixer[0]->set_input_gain(1, BIT(data, 1) ? 0.0 : 1.0);
+	m_mixer[0]->set_input_gain(0, BIT(data, 1) ? 0.0 : 1.0);
 	m_mixer[1]->set_input_gain(0, BIT(data, 0) ? 0.0 : 1.0);
 }
 
