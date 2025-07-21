@@ -315,8 +315,10 @@ yukongl5
 
 @source:acorn/atom.cpp
 atom
-atombb
-atomeb
+atombbc
+atomes
+atomrr
+prophet2
 
 @source:acorn/bbc.cpp
 abc110
