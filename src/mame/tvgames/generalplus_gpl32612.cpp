@@ -403,6 +403,10 @@ MD481P
 0917
 
 (could be a rebranded GPL32 series, ROM has GPNand header)
+
+there is also a
+GPY0201A
+
 */
 
 CONS( 2009, pdcm2,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VideoJet / Conny",        "PDC M2",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
