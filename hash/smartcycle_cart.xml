@@ -84,7 +84,7 @@ NOTE: There is also a newer version of the Smart Cycle with 3D games, this howev
 		<info name="serial" value="N5992" />
 		<part name="cart" interface="smartcycle_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="N5992 - Dora l'exploratrice - Dora L' aventure de l'amitié (FR).u1" size="0x800000" crc="fa590280" sha1="5767536e1781fee06c52671bc7ca7b639a99e50b"/>
+				<rom name="N5992 - Dora l'exploratrice - Dora L' aventure de l'amitie (FR).u1" size="0x800000" crc="fa590280" sha1="5767536e1781fee06c52671bc7ca7b639a99e50b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -96,7 +96,7 @@ NOTE: There is also a newer version of the Smart Cycle with 3D games, this howev
 		<info name="serial" value="N5993" />
 		<part name="cart" interface="smartcycle_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="N5993 - À la Découverte des Dinosaures (FR).u1" size="0x800000" crc="e6c66830" sha1="d07b3789ef14a431d86c9fa581a3b76993929ac4"/>
+				<rom name="N5993 - A la Decouverte des Dinosaures (FR).u1" size="0x800000" crc="e6c66830" sha1="d07b3789ef14a431d86c9fa581a3b76993929ac4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -108,7 +108,7 @@ NOTE: There is also a newer version of the Smart Cycle with 3D games, this howev
 		<info name="serial" value="N5994" />
 		<part name="cart" interface="smartcycle_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="N5994 - Hot Wheels - Pédale à toute vitesse (FR).u1" size="0x800000" crc="31ded61d" sha1="1e639f3521ab1b5261b618ab4a40ea4099326af9"/>
+				<rom name="N5994 - Hot Wheels - Pedale a toute vitesse (FR).u1" size="0x800000" crc="31ded61d" sha1="1e639f3521ab1b5261b618ab4a40ea4099326af9"/>
 			</dataarea>
 		</part>
 	</software>
