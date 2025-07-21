@@ -554,7 +554,7 @@ void cz1_state::stereo_w(u8 data)
 	bit 1: sound chip #2 routing (0: center, 2: right)
 	bit 2: center channel stereo chorus (0: on, 1: off)
 	*/
-	m_mixer[0]->set_input_gain(0, BIT(data, 1) ? 0.0 : 1.0);
+	m_mixer[0]->set_input_gain(1, BIT(data, 1) ? 0.0 : 1.0);
 	m_mixer[1]->set_input_gain(0, BIT(data, 0) ? 0.0 : 1.0);
 }
 
@@ -879,18 +879,18 @@ void cz1_state::mz1(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	MIXER(config, m_mixer[0]).add_route(0, "speaker", 1.0, 0);
-	MIXER(config, m_mixer[1]).add_route(0, "speaker", 1.0, 1);
+	MIXER(config, m_mixer[0]).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	MIXER(config, m_mixer[1]).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	UPD933(config, m_upd933[0], 8.96_MHz_XTAL / 2);
 	m_upd933[0]->irq_cb().set("irq",  FUNC(input_merger_any_high_device::in_w<0>));
-	m_upd933[0]->add_route(0, m_mixer[0], 1.0);
-	m_upd933[0]->add_route(0, m_mixer[1], 1.0);
+	m_upd933[0]->add_route(0, m_mixer[0], 1.0, 0);
+	m_upd933[0]->add_route(0, m_mixer[1], 1.0, 0);
 
 	UPD933(config, m_upd933[1], 8.96_MHz_XTAL / 2);
 	m_upd933[1]->irq_cb().set("irq",  FUNC(input_merger_any_high_device::in_w<1>));
-	m_upd933[1]->add_route(0, m_mixer[0], 1.0);
-	m_upd933[1]->add_route(0, m_mixer[1], 1.0);
+	m_upd933[1]->add_route(0, m_mixer[0], 1.0, 1);
+	m_upd933[1]->add_route(0, m_mixer[1], 1.0, 1);
 }
 
 /**************************************************************************/
