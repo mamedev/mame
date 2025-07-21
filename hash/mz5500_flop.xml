@@ -60,8 +60,8 @@ TODO:
 		<info name="serial" value="2Z-013" />
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="384144">
-				<rom name="ms-dos 2.11 2z-013 v1.0a_1.d88" size="384144" crc="d0a19181" sha1="90d2e5ca0830576be7aa7c0fe7a0031f972a7c19"/>
+			<dataarea name="flop" size="385200">
+				<rom name="ms-dos 2.11 2z-013 v1.0a_1.d88" size="385200" crc="d0a19181" sha1="90d2e5ca0830576be7aa7c0fe7a0031f972a7c19"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
