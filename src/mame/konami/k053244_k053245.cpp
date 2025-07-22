@@ -88,6 +88,7 @@ k053244_device::k053244_device(const machine_config &mconfig, const char *tag, d
 	m_sprite_rom(*this, DEVICE_SELF),
 	m_dx(0),
 	m_dy(0),
+	m_priority_shadows(false),
 	m_k053244_cb(*this),
 	m_rombank(0),
 	m_ramsize(0),
@@ -311,6 +312,10 @@ void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
 
+	// high priority shadows are enabled in tmnt2 and ssriders highlights (but not the shadows)
+	// also in suratk (enemies behind the glass)
+	const uint32_t shadow_mode = (m_priority_shadows || palette().shadow_mode()) ? DRAWMODE_SHADOW_PRI : DRAWMODE_SHADOW;
+
 	flipscreenX = m_regs[5] & 0x01;
 	flipscreenY = m_regs[5] & 0x02;
 	spriteoffsX = (m_regs[0] << 8) | m_regs[1];
@@ -337,7 +342,7 @@ void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 
 	for (pri_code = NUM_SPRITES - 1; pri_code >= 0; pri_code--)
 	{
-		int ox, oy, color, code, size, w, h, x, y, flipx, flipy, mirrorx, mirrory, shadow, zoomx, zoomy, pri;
+		int ox, oy, size, w, h, x, y, flipx, flipy, mirrorx, mirrory, shadow, zoomx, zoomy;
 
 		offs = sortedlist[pri_code];
 		if (offs == -1)
@@ -370,11 +375,11 @@ void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		/* field to do bank switching. However this applies only to TMNT2, with its */
 		/* protection mcu creating the sprite table, so we don't know where to fetch */
 		/* the bits from. */
-		code = m_buffer[offs + 1];
+		int code = m_buffer[offs + 1];
 		code = ((code & 0xffe1) + ((code & 0x0010) >> 2) + ((code & 0x0008) << 1)
 					+ ((code & 0x0004) >> 1) + ((code & 0x0002) << 2));
-		color = m_buffer[offs + 6] & 0x00ff;
-		pri = 0;
+		int color = m_buffer[offs + 6] & 0x00ff;
+		int pri = 0;
 
 		if (!m_k053244_cb.isnull())
 			m_k053244_cb(&code, &color, &pri);
@@ -449,7 +454,7 @@ void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
 
-		drawmode_table[gfx(0)->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[gfx(0)->granularity() - 1] = shadow ? shadow_mode : DRAWMODE_SOURCE;
 
 		for (y = 0; y < h; y++)
 		{

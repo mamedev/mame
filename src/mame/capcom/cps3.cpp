@@ -616,10 +616,6 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 		int transparency,int transparent_color,
 		int scalex, int scaley)
 {
-//  u8 al;
-
-//  al = (pdrawgfx_shadow_lowpri) ? 0 : 0x80;
-
 	if (!scalex || !scaley) return;
 
 // todo: reimplement this optimization!!
@@ -635,7 +631,6 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 	1<<16 : uniform scale
 	1<<17 : double to 200%
 	*/
-
 
 	/* force clip to bitmap boundary */
 	rectangle myclip = clip;
