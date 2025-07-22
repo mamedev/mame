@@ -78,13 +78,13 @@ NOTE: There is also a newer version of the Smart Cycle with 3D games, this howev
 	</software>
 
 	<software name="n5992" supported="no">
-		<description>Dora l'exploratrice - Dora L' aventure de l'amitié (France)</description>
+		<description>Dora l'Exploratrice - Dora L'Aventure de l'Amitié (France)</description>
 		<year>2008</year>
 		<publisher>Fisher Price</publisher>
 		<info name="serial" value="N5992" />
 		<part name="cart" interface="smartcycle_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="N5992 - Dora l'exploratrice - Dora L' aventure de l'amitie (FR).u1" size="0x800000" crc="fa590280" sha1="5767536e1781fee06c52671bc7ca7b639a99e50b"/>
+				<rom name="N5992 - Dora l'Exploratrice - Dora L'Aventure de l'Amitie (FR).u1" size="0x800000" crc="fa590280" sha1="5767536e1781fee06c52671bc7ca7b639a99e50b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -102,13 +102,13 @@ NOTE: There is also a newer version of the Smart Cycle with 3D games, this howev
 	</software>
 
 	<software name="n5994" supported="no"> <!-- VBL interrupt is turned off and never back on? -->
-		<description>Hot Wheels - Pédale à toute vitesse (France)</description>
+		<description>Hot Wheels - Pédale à Toute Vitesse (France)</description>
 		<year>2008</year>
 		<publisher>Fisher Price</publisher>
 		<info name="serial" value="N5994" />
 		<part name="cart" interface="smartcycle_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="N5994 - Hot Wheels - Pedale a toute vitesse (FR).u1" size="0x800000" crc="31ded61d" sha1="1e639f3521ab1b5261b618ab4a40ea4099326af9"/>
+				<rom name="N5994 - Hot Wheels - Pedale a Toute Vitesse (FR).u1" size="0x800000" crc="31ded61d" sha1="1e639f3521ab1b5261b618ab4a40ea4099326af9"/>
 			</dataarea>
 		</part>
 	</software>
