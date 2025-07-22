@@ -717,7 +717,7 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_update_timer->adjust(STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
 
 	// mark the generation as "just starting, waiting for config loading"
-	m_osd_info.m_generation = 0xfffffffe;
+	m_osd_info.m_generation = 0xffff0000;
 }
 
 sound_manager::~sound_manager()
@@ -1250,7 +1250,7 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 {
 	if(cfg_type == config_type::FINAL)
 		// Note that the config is loaded
-		m_osd_info.m_generation = 0xffffffff;
+		m_osd_info.m_generation = 0xffff0001;
 
 	// If no config file, ignore
 	if(!parentnode)
@@ -1706,9 +1706,9 @@ void sound_manager::startup_cleanups()
 	for(sound_io_device &dev : microphone_device_enumerator(machine().root_device()))
 		default_one(dev);
 
-	auto is_output_device = [this](std::string dname) -> bool {
+	auto test_device = [this](std::string dname, bool output) -> bool {
 		sound_io_device *sio = machine().root_device().subdevice<sound_io_device>(dname);
-		return sio->is_output();
+		return sio && sio->is_output() == output;
 	};
 
 	// If there's no default sink replace all the default sink config
@@ -1723,7 +1723,7 @@ void sound_manager::startup_cleanups()
 
 		if(first_sink_name != "")
 			for(auto &config : m_configs) {
-				if(!is_output_device(config.m_name))
+				if(!test_device(config.m_name, true))
 					continue;
 				for(auto &nmap : config.m_node_mappings)
 					if(nmap.first == "")
@@ -1747,7 +1747,7 @@ void sound_manager::startup_cleanups()
 
 		if(first_source_name != "")
 			for(auto &config : m_configs) {
-				if(is_output_device(config.m_name))
+				if(!test_device(config.m_name, false))
 					continue;
 				for(auto &nmap : config.m_node_mappings)
 					if(nmap.first == "")
@@ -2502,14 +2502,18 @@ void sound_manager::update_osd_streams()
 
 void sound_manager::mapping_update()
 {
-	// fffffffe means the config is not loaded yet, so too early
-	// ffffffff means the config is loaded but the defaults are not setup yet
+	// ffff0000 means the config is not loaded yet, so too early
+	// ffff0001 means the config is loaded but the defaults are not setup yet
+
+	// high enough that the osd is not going to use it, low enough
+	// that the invalidation-through-decrement does not hit it
+
 	if(m_nosound_mode)
 		return;
 
-	if(m_osd_info.m_generation == 0xfffffffe)
+	if(m_osd_info.m_generation == 0xffff0000)
 		return;
-	if(m_osd_info.m_generation == 0xffffffff)
+	if(m_osd_info.m_generation == 0xffff0001)
 		startup_cleanups();
 
 	auto &osd = machine().osd();
