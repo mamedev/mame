@@ -17779,6 +17779,8 @@ mjelct3
 mjelct3a
 mjelct3b
 mjelct3bl
+mjelct3bla
+mjelct3blb
 mjelctrb
 mjelctrn
 mjembase
@@ -19250,6 +19252,7 @@ drivfrcb
 drivfrcg
 drivfrcsg
 drivfrcsga
+drivfrcsgb
 drivfrct
 froggerv
 hexpool
@@ -21113,6 +21116,7 @@ huahuas2a
 huluw2
 jbell
 jinhuang
+jinhuang2
 jinhulu2
 jinhulu2100gi
 jinhulu2101is
@@ -43360,6 +43364,9 @@ itt9216
 
 @source:skeleton/jade.cpp
 jade
+
+@source:skeleton/jinhuang6.cpp
+jinhuang6
 
 @source:skeleton/jonos.cpp
 jonos

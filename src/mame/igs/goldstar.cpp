@@ -15630,7 +15630,7 @@ This game shares the same programmer / programming team as Ichi Ban Jian by Exce
 It seems to use a similar split opcodes / data ROM arrangement.
 */
 
-ROM_START( superdrg ) // TODO: how does the banking work?
+ROM_START( superdrg )
 	ROM_REGION( 0x60000, "maincpu", 0 )
 	ROM_LOAD( "oct1.u20", 0x00000, 0x20000, CRC(0f350eaf) SHA1(36018ec122c96d14f871c1db6517eb090f2d2b65) )
 
