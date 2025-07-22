@@ -14,10 +14,13 @@ license:CC0-1.0
 
 <!-- Confirmed dump by ElBarto -->
 
-	<software name="doom">
+	<software name="doom" supported="partial">
 		<description>Doom (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Missing [PWM] samples
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<feature name="pcb" value="171-6885A" />
@@ -59,7 +62,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="swa" supported="no">
+	<software name="swa">
 		<description>Star Wars Arcade (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -75,8 +78,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- boot OK -->
-	<software name="toughman">
+	<software name="toughman" supported="yes">
 		<description>Toughman Contest (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
@@ -93,11 +95,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Has 3d geometry bugs on attract mode with SH2 DRC, crashes if you attempt to enter into main menu -->
 	<software name="vrdx" supported="no">
 		<description>Virtua Racing Deluxe (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Some 3d geometry bugs when [DRC] is used
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<feature name="pcb" value="171-6885A" />
@@ -169,10 +173,13 @@ license:CC0-1.0
 <!-- Old interleaved/unconfirmed dump -->
 <!-- PCB info and part numbers are taken from SMS Power and from nepereny's PCB pictures and other sources -->
 
-	<software name="aburner">
+	<software name="aburner" supported="partial">
 		<description>After Burner Complete (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[PWM] samples are too quiet
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="2097152">
@@ -370,10 +377,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="darxide">
+	<software name="darxide" supported="partial">
 		<description>Darxide (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[PWM] samples are too quiet
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="2097152">
@@ -563,6 +573,9 @@ license:CC0-1.0
 		<description>Ecco the Dolphin CinePak Demo (Japan, USA, developer cart)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Black screen after Sega logo, tight loops at comms RAM dword read $a15120
+]]></notes>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="ecco the dolphin cinepak demo (japan, usa) (developer cart).bin" size="3145728" crc="b06178df" sha1="10409f2245b058e8a32cba51e1ea391ca4480108" />
@@ -586,6 +599,9 @@ license:CC0-1.0
 		<description>36 Great Holes Starring Fred Couples (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Missing [SRAM] cart interface, may hang
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="3145728">
@@ -598,6 +614,9 @@ license:CC0-1.0
 		<description>36 Great Holes Starring Fred Couples (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Missing [SRAM] cart interface, may hang
+]]></notes>
 		<info name="serial" value="GM-5002 (JPN)"/>
 		<info name="release" value="19950224 (JPN)"/>
 		<info name="alt_title" value="ゴルフマガジンプレゼンツ 36グレイトホールズ スターリング フレッド コプルス"/>
@@ -1009,10 +1028,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="chaotix">
+	<software name="chaotix" supported="partial">
 		<description>Chaotix (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Missing [SRAM] cart interface
+]]></notes>
 		<info name="alt_title" value="Knuckles' Chaotix (Box)"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
@@ -1022,10 +1044,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="chaotixju" cloneof="chaotix">
+	<software name="chaotixju" cloneof="chaotix" supported="partial">
 		<description>Chaotix (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Missing [SRAM] cart interface
+]]></notes>
 		<info name="serial" value="GM-5003 (JPN)"/>
 		<info name="release" value="19950421 (JPN)"/>
 		<info name="alt_title" value="カオティクス フィーチャリング ナックルズ ザ エキドゥナ, Knuckles' Chaotix (USA Box)"/>
@@ -1632,11 +1657,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- missing I2C hookup so POST fails with blue/black vertical stripes (same I2C type as plain MD version) -->
 	<software name="nbajamte" supported="no">
 		<description>NBA Jam T.E. - Tournament Edition (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Missing [I2C] hookup so POST fails with blue/black vertical stripes (same I2C type as plain MD version)
+]]></notes>
 		<info name="serial" value="T-8102A (JPN)"/>
 		<info name="release" value="19950901 (JPN)"/>
 		<info name="alt_title" value="NBAジャム トーナメントエディション"/>
@@ -1647,11 +1674,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- black screen, missing h irq? -->
 	<software name="nflqb" supported="no">
 		<description>NFL Quarterback Club ~ NFL Quarterback '95 (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Black screen, all CPUs lock up in comms RAM.
+Master SH-2 enables HINT
+]]></notes>
 		<info name="serial" value="T-8103A (JPN)"/>
 		<info name="release" value="19950714 (JPN)"/>
 		<info name="alt_title" value="NFL クォーターバッククラブ'95"/>
@@ -1662,10 +1692,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pitfall">
+	<software name="pitfall" supported="no">
 		<description>Pitfall - The Mayan Adventure (USA)</description>
 		<year>1995</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+left/right column sprites don't wraparound properly (webs in stage 1, first boss intro roar) (verify)
+Waterfall in stage 2 is static on left side, looks less prominent in YT videos (verify)
+Randomly crashed once during stage 2
+Reportedly runs at 30 FPS on real HW
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="3145728">
@@ -1698,11 +1734,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- black screen after Sega logo -->
 	<software name="sangoku4" supported="no">
 		<description>Sangokushi IV (Japan)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Black screen after Sega logo, [Master SH-2] corrupts stack
+Accesses [cart] backup RAM
+]]></notes>
 		<info name="serial" value="T-7601A (JPN)"/>
 		<info name="release" value="19950728 (JPN)"/>
 		<info name="alt_title" value="三国志IV"/>
@@ -1824,12 +1863,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- boot OK, OSD and player sprite aren't drawn -->
-	<software name="soulstar" supported="no">
+	<software name="soulstar" supported="partial">
 	<!-- The dumper also released larger size files, which were this exact dump padded with 0xff up to the end of the file -->
 		<description>SoulStar X (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[m68k] writes to cart space at $8a2xxx (Backup RAM? NOP-ed out?)
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="2097152">
@@ -1891,7 +1932,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="swaj" cloneof="swa" supported="no">
+	<software name="swaj" cloneof="swa">
 		<description>Star Wars Arcade (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1905,7 +1946,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="swau" cloneof="swa" supported="no">
+	<software name="swau" cloneof="swa">
 		<description>Star Wars Arcade (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2119,6 +2160,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- TODO: crashed once in stage 1 -->
 	<software name="tmek">
 		<description>T-Mek (Europe, USA)</description>
 		<year>1995</year>
@@ -2250,6 +2292,10 @@ license:CC0-1.0
 		<description>Time Warner 32X CMD Download Cartridge</description>
 		<year>199?</year>
 		<publisher>Time Warner Interactive</publisher>
+		<notes><![CDATA[
+Uses [DE-9] port 2 button B for something
+[Slave SH-2] tests [SCI] port
+]]></notes>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="time warner 32x cmd download cartridge.bin" size="262144" crc="6c2176ca" sha1="460439b83ce50021339acf5fca4a63b45c0c1c0b" />
@@ -2389,6 +2435,9 @@ license:CC0-1.0
 		<description>Virtua Racing Deluxe (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Some 3d geometry bugs when [DRC] is used
+]]></notes>
 		<info name="serial" value="GM-5001 (JPN)"/>
 		<info name="release" value="19941216 (JPN)"/>
 		<info name="alt_title" value="バーチャレーシング デラックス"/>
@@ -2404,6 +2453,9 @@ license:CC0-1.0
 		<description>Virtua Racing Deluxe (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Some 3d geometry bugs when [DRC] is used
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<!-- Dump To Be Confirmed (and split in properly sized parts) (nepereny's) -->
@@ -2453,10 +2505,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wsb">
+	<software name="wsb" supported="no">
 		<description>World Series Baseball Starring Deion Sanders (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Extensive checks for [cart] SRAM space, boots back to main menu if a new league is created
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="3145728">
@@ -2465,10 +2520,12 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- TODO: sometimes it corrupts sound? -->
 	<software name="wwfraw">
 		<description>WWF Raw (World)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="usage" value="Supports 4-players thru teamplay option"/>
 		<info name="serial" value="T-8101A (JPN)"/>
 		<info name="release" value="19950901 (JPN)"/>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
@@ -2479,11 +2536,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- invisible 32x layer -->
-	<software name="wwfag" supported="no">
+	<software name="wwfag" supported="partial">
 		<description>WWF WrestleMania - The Arcade Game (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Missing [PWM] samples
+]]></notes>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="wwf wrestlemania - the arcade game (usa).bin" size="4194304" crc="61833503" sha1="551eedc963cba0e1410b3d229b332ef9ea061469" />
@@ -2491,11 +2550,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- black screen after choosing a level, requires SH2 SCI support -->
 	<software name="xmen" supported="no">
 		<description>X-Men (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Black screen after choosing a level, requires SH-2 [SCI] support
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">

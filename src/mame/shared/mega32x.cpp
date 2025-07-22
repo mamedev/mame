@@ -192,12 +192,16 @@ GFX check (these don't explicitly fails):
 #include "mega32x.h"
 #include "machine/timer.h"
 
+#define LOG_IRQ     (1U << 1)
 
-// Fifa96 needs the CPUs swapped for the gameplay to enter due to some race conditions
-// when using the DRC core.  Needs further investigation, the non-DRC core works either
-// way
-#define _32X_SWAP_MASTER_SLAVE_HACK
-#define _32X_COMMS_PORT_SYNC 0
+#define VERBOSE (LOG_GENERAL | LOG_IRQ)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
+#include "logmacro.h"
+
+#define LOGIRQ(...)     LOGMASKED(LOG_IRQ,     __VA_ARGS__)
+
+
 #define MAX_HPOSITION 480
 /* need to make some pwm stuff part of device */
 
@@ -377,17 +381,17 @@ void sega_32x_device::m68k_a15106_w(address_space &space, offs_t offset, uint16_
 			m_fifo_block_b_full = 0;
 		}
 
-		//printf("m68k_a15106_w %04x\n", data);
+		//logerror("m68k_a15106_w %04x\n", data);
 		/*
 		if (m_a15106_reg & 0x4)
-		    printf(" --- 68k Write Mode enabled\n");
+		    logerror(" --- 68k Write Mode enabled\n");
 		else
-		    printf(" --- 68k Write Mode disabled\n");
+		    logerror(" --- 68k Write Mode disabled\n");
 
 		if (m_a15106_reg & 0x1)
-		    printf(" --- DMA Start Allowed \n");
+		    logerror(" --- DMA Start Allowed \n");
 		else
-		    printf(" --- DMA Start No Operation\n");
+		    logerror(" --- DMA Start No Operation\n");
 
 		*/
 	}
@@ -415,7 +419,7 @@ uint16_t sega_32x_device::dreq_common_r(address_space &space, offs_t offset)
 		case 0x0a/2: // a15112 / 4012
 			if (&space == &_68kspace)
 			{
-				printf("attempting to READ FIFO with 68k!\n");
+				logerror("attempting to READ FIFO with 68k!\n");
 				return 0xffff;
 			}
 
@@ -423,7 +427,7 @@ uint16_t sega_32x_device::dreq_common_r(address_space &space, offs_t offset)
 
 			m_current_fifo_read_pos++;
 
-		//  printf("reading FIFO!\n");
+		//  logerror("reading FIFO!\n");
 
 			if (m_current_fifo_readblock == m_fifo_block_a && !m_fifo_block_a_full)
 				logerror("Fifo block a isn't filled!\n");
@@ -476,14 +480,14 @@ void sega_32x_device::dreq_common_w(address_space &space, offs_t offset, uint16_
 		case 0x02/2: // a1510a / 400a
 			if (&space != &_68kspace)
 			{
-				printf("attempting to WRITE DREQ SRC with SH2!\n");
+				logerror("attempting to WRITE DREQ SRC with SH2!\n");
 				return;
 			}
 
 			m_dreq_src_addr[offset&1] = ((offset&1) == 0) ? (data & 0xff) : (data & 0xfffe);
 
 			//if((m_dreq_src_addr[0]<<16)|m_dreq_src_addr[1])
-			//  printf("DREQ set SRC = %08x\n",(m_dreq_src_addr[0]<<16)|m_dreq_src_addr[1]);
+			//  logerror("DREQ set SRC = %08x\n",(m_dreq_src_addr[0]<<16)|m_dreq_src_addr[1]);
 
 			break;
 
@@ -491,53 +495,53 @@ void sega_32x_device::dreq_common_w(address_space &space, offs_t offset, uint16_
 		case 0x06/2: // a1510e / 400e
 			if (&space != &_68kspace)
 			{
-				printf("attempting to WRITE DREQ DST with SH2!\n");
+				logerror("attempting to WRITE DREQ DST with SH2!\n");
 				return;
 			}
 
 			m_dreq_dst_addr[offset&1] = ((offset&1) == 0) ? (data & 0xff) : (data & 0xffff);
 
 			//if((m_dreq_dst_addr[0]<<16)|m_dreq_dst_addr[1])
-			//  printf("DREQ set DST = %08x\n",(m_dreq_dst_addr[0]<<16)|m_dreq_dst_addr[1]);
+			//  logerror("DREQ set DST = %08x\n",(m_dreq_dst_addr[0]<<16)|m_dreq_dst_addr[1]);
 
 			break;
 
 		case 0x08/2: // a15110 / 4010
 			if (&space != &_68kspace)
 			{
-				printf("attempting to WRITE DREQ SIZE with SH2!\n");
+				logerror("attempting to WRITE DREQ SIZE with SH2!\n");
 				return;
 			}
 
 			m_dreq_size = data & 0xfffc;
 
 			//  if(m_dreq_size)
-			//      printf("DREQ set SIZE = %04x\n",m_dreq_size);
+			//      logerror("DREQ set SIZE = %04x\n",m_dreq_size);
 
 			break;
 
 		case 0x0a/2: // a15112 / 4012 - FIFO Write (68k only!)
 			if (&space != &_68kspace)
 			{
-				printf("attempting to WRITE FIFO with SH2!\n");
+				logerror("attempting to WRITE FIFO with SH2!\n");
 				return;
 			}
 
 			if (m_current_fifo_block==m_fifo_block_a && m_fifo_block_a_full)
 			{
-				printf("attempt to write to Full Fifo block a!\n");
+				logerror("attempt to write to Full Fifo block a!\n");
 				return;
 			}
 
 			if (m_current_fifo_block==m_fifo_block_b && m_fifo_block_b_full)
 			{
-				printf("attempt to write to Full Fifo block b!\n");
+				logerror("attempt to write to Full Fifo block b!\n");
 				return;
 			}
 
 			if((m_a15106_reg & 4) == 0)
 			{
-				printf("attempting to WRITE FIFO with 68S cleared!\n"); // corpse32
+				logerror("attempting to WRITE FIFO with 68S cleared!\n"); // corpse32
 				return;
 			}
 
@@ -602,7 +606,7 @@ void sega_32x_device::m68k_a1511a_w(uint16_t data)
 {
 	m_sega_tv = data & 1;
 
-	printf("SEGA TV register set = %04x\n",data);
+	logerror("SEGA TV register set = %04x\n",data);
 }
 
 /*
@@ -710,7 +714,7 @@ void sega_32x_device::m68k_a15100_w(address_space &space, offs_t offset, uint16_
 
 uint16_t sega_32x_device::m68k_a15102_r()
 {
-	//printf("_32x_68k_a15102_r\n");
+	//logerror("_32x_68k_a15102_r\n");
 	return m_32x_68k_a15102_reg;
 }
 
@@ -723,13 +727,13 @@ void sega_32x_device::m68k_a15102_w(offs_t offset, uint16_t data, uint16_t mem_m
 		if (data&0x1)
 		{
 			if (m_sh2_master_cmdint_enable) m_master_cpu->set_input_line(SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
-			else printf("master cmdint when masked!\n");
+			else logerror("master cmdint when masked!\n");
 		}
 
 		if (data&0x2)
 		{
 			if (m_sh2_slave_cmdint_enable) m_slave_cpu->set_input_line(SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
-			else printf("slave cmdint when masked!\n");
+			else logerror("slave cmdint when masked!\n");
 		}
 	}
 }
@@ -772,15 +776,23 @@ void sega_32x_device::m68k_a15104_w(offs_t offset, uint16_t data, uint16_t mem_m
 // reads
 uint16_t sega_32x_device::m68k_m_commsram_r(offs_t offset)
 {
-	if (_32X_COMMS_PORT_SYNC) machine().scheduler().synchronize();
+	if (!machine().side_effects_disabled())
+		machine().scheduler().synchronize();
 	return m_commsram[offset];
 }
 
 // writes
 void sega_32x_device::m68k_m_commsram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_commsram[offset]);
-	if (_32X_COMMS_PORT_SYNC) machine().scheduler().synchronize();
+//  COMBINE_DATA(&m_commsram[offset]);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sega_32x_device::sync_commsram_w), this), (offset << 16) | (data & mem_mask) | (m_commsram[offset] & ~mem_mask));
+}
+
+void sega_32x_device::sync_commsram_w(s32 param)
+{
+	u8 offset = (param >> 16) & 7;
+	u16 data = param & 0xffff;
+	m_commsram[offset] = data;
 }
 
 /**********************************************************************************************/
@@ -869,8 +881,8 @@ TIMER_CALLBACK_MEMBER(sega_32x_device::handle_pwm_callback)
 	if(m_pwm_timer_tick == m_pwm_tm_reg)
 	{
 		m_pwm_timer_tick = 0;
-		if(sh2_master_pwmint_enable) { m_master_cpu->set_input_line(SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
-		if(sh2_slave_pwmint_enable) { m_slave_cpu->set_input_line(SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+		if(m_sh2_master_pwmint_enable) { m_master_cpu->set_input_line(SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+		if(m_sh2_slave_pwmint_enable) { m_slave_cpu->set_input_line(SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
 	}
 
 	m_32x_pwm_timer->adjust(attotime::from_hz(clock() / (m_pwm_cycle - 1)));
@@ -887,7 +899,7 @@ uint16_t sega_32x_device::pwm_r(offs_t offset)
 		case 0x08/2: return m_lch_fifo_state & m_rch_fifo_state; // mono ch
 	}
 
-	printf("Read at undefined PWM register %02x\n",offset);
+	logerror("Read at undefined PWM register %02x\n",offset);
 	return 0xffff;
 }
 
@@ -931,7 +943,7 @@ void sega_32x_device::pwm_w(offs_t offset, uint16_t data)
 			m_rch_fifo_state = (m_rch_size == PWM_FIFO_SIZE) ? 0x8000 : 0x0000;
 			break;
 		default:
-			printf("Write at undefined PWM register %02x %04x\n",offset,data);
+			logerror("Write at undefined PWM register %02x %04x\n",offset,data);
 			break;
 	}
 }
@@ -985,7 +997,7 @@ uint16_t sega_32x_device::common_vdp_regs_r(offs_t offset)
 
 	int ntsc;
 
-//  printf("_32x_68k_a15180_r (a15180) %04x\n",mem_mask);
+//  logerror("_32x_68k_a15180_r (a15180) %04x\n",mem_mask);
 
 	// read needs authorization too I think, undefined behavior otherwise
 	switch (offset)
@@ -1079,7 +1091,7 @@ void sega_32x_device::common_vdp_regs_w(address_space &space, offs_t offset, uin
 	switch (offset)
 	{
 		case 0x00:
-			//printf("_32x_68k_a15180_w (a15180) %04x %04x   source m_32x_access_auth %04x\n",data,mem_mask, m_32x_access_auth);
+			//logerror("_32x_68k_a15180_w (a15180) %04x %04x   source m_32x_access_auth %04x\n",data,mem_mask, m_32x_access_auth);
 
 			if (ACCESSING_BITS_0_7)
 			{
@@ -1195,7 +1207,7 @@ uint16_t sega_32x_device::master_4000_r()
 	retvalue |= m_sh2_master_vint_enable;
 	retvalue |= m_sh2_master_hint_enable;
 	retvalue |= m_sh2_master_cmdint_enable;
-	retvalue |= sh2_master_pwmint_enable;
+	retvalue |= m_sh2_master_pwmint_enable;
 
 	return retvalue;
 }
@@ -1213,10 +1225,15 @@ void sega_32x_device::master_4000_w(offs_t offset, uint16_t data, uint16_t mem_m
 		m_sh2_master_vint_enable = data & 0x8;
 		m_sh2_master_hint_enable = data & 0x4;
 		m_sh2_master_cmdint_enable = data & 0x2;
-		sh2_master_pwmint_enable = data & 0x1;
+		m_sh2_master_pwmint_enable = data & 0x1;
 
-		//if (m_sh2_master_hint_enable) printf("m_sh2_master_hint_enable enable!\n");
-		//if (sh2_master_pwmint_enable) printf("sh2_master_pwn_enable enable!\n");
+		LOGIRQ("$4000 SH2 master: %d HINT_IN_VBL| %d VINT| %d HINT| %d CMDINT| %d PWMINT\n"
+			, m_sh2_hint_in_vbl
+			, m_sh2_master_vint_enable
+			, m_sh2_master_hint_enable
+			, m_sh2_master_cmdint_enable
+			, m_sh2_master_pwmint_enable
+		);
 
 		check_irqs();
 	}
@@ -1232,7 +1249,7 @@ uint16_t sega_32x_device::slave_4000_r()
 	retvalue |= m_sh2_slave_vint_enable;
 	retvalue |= m_sh2_slave_hint_enable;
 	retvalue |= m_sh2_slave_cmdint_enable;
-	retvalue |= sh2_slave_pwmint_enable;
+	retvalue |= m_sh2_slave_pwmint_enable;
 
 	return retvalue;
 }
@@ -1251,10 +1268,15 @@ void sega_32x_device::slave_4000_w(offs_t offset, uint16_t data, uint16_t mem_ma
 		m_sh2_slave_vint_enable = data & 0x8;
 		m_sh2_slave_hint_enable = data & 0x4;
 		m_sh2_slave_cmdint_enable = data & 0x2;
-		sh2_slave_pwmint_enable = data & 0x1;
+		m_sh2_slave_pwmint_enable = data & 0x1;
 
-		//if (m_sh2_slave_hint_enable) printf("m_sh2_slave_hint_enable enable!\n");
-		//if (sh2_slave_pwmint_enable) printf("sh2_slave_pwm_enable enable!\n");
+		LOGIRQ("$4000 SH2 slave: %d HINT_IN_VBL| %d VINT| %d HINT| %d CMDINT| %d PWMINT\n"
+			, m_sh2_hint_in_vbl
+			, m_sh2_slave_vint_enable
+			, m_sh2_slave_hint_enable
+			, m_sh2_slave_cmdint_enable
+			, m_sh2_slave_pwmint_enable
+		);
 
 		check_irqs();
 	}
@@ -1268,13 +1290,13 @@ void sega_32x_device::slave_4000_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 uint16_t sega_32x_device::common_4002_r()
 {
-	printf("reading 4002!\n");
+	logerror("reading 4002!\n");
 	return 0x0000;
 }
 
 void sega_32x_device::common_4002_w(uint16_t data)
 {
-	printf("write 4002!\n");
+	logerror("write 4002!\n");
 }
 
 
@@ -1301,13 +1323,13 @@ void sega_32x_device::common_4004_w(uint16_t data)
 
 uint16_t sega_32x_device::common_4006_r()
 {
-	//printf("DREQ read!\n"); // tempo reads it, shut up for now
+	//logerror("DREQ read!\n"); // tempo reads it, shut up for now
 	return m68k_a15106_r();
 }
 
 void sega_32x_device::common_4006_w(uint16_t data)
 {
-	printf("DREQ write!\n"); //register is read only on SH-2 side
+	logerror("DREQ write!\n"); //register is read only on SH-2 side
 }
 
 
@@ -1359,12 +1381,12 @@ void sega_32x_device::slave_401c_w(uint16_t data) { m_slave_cpu->set_input_line(
 
 void sega_32x_device::master_401e_w(uint16_t data)
 {
-	printf("master_401e_w\n");
+	logerror("master_401e_w\n");
 }
 
 void sega_32x_device::slave_401e_w(uint16_t data)
 {
-	printf("slave_401e_w\n");
+	logerror("slave_401e_w\n");
 }
 
 /**********************************************************************************************/
@@ -1449,8 +1471,9 @@ void sega_32x_device::sh2_common_map(address_map &map)
 	map(0x00004100, 0x0000410b).rw(FUNC(sega_32x_device::common_vdp_regs_r), FUNC(sega_32x_device::common_vdp_regs_w));
 	map(0x00004200, 0x000043ff).rw(FUNC(sega_32x_device::m68k_palette_r), FUNC(sega_32x_device::m68k_palette_w));
 
-	map(0x04000000, 0x0401ffff).rw(FUNC(sega_32x_device::m68k_dram_r), FUNC(sega_32x_device::m68k_dram_w));
-	map(0x04020000, 0x0403ffff).rw(FUNC(sega_32x_device::m68k_dram_overwrite_r), FUNC(sega_32x_device::m68k_dram_overwrite_w));
+	// soulstar slave access at $0405xxxx
+	map(0x04000000, 0x0401ffff).mirror(0x00040000).rw(FUNC(sega_32x_device::m68k_dram_r), FUNC(sega_32x_device::m68k_dram_w));
+	map(0x04020000, 0x0403ffff).mirror(0x00040000).rw(FUNC(sega_32x_device::m68k_dram_overwrite_r), FUNC(sega_32x_device::m68k_dram_overwrite_w));
 
 	map(0x06000000, 0x0603ffff).ram().share("sh2_shared");
 
@@ -1684,28 +1707,29 @@ const rom_entry *sega_32x_device::device_rom_region() const
 //
 // some games appear to dislike 'perfect' levels of interleave, probably due to
 // non-emulated cache, ram waitstates and other issues?
-#define _32X_INTERLEAVE_LEVEL \
-	config.set_maximum_quantum(attotime::from_hz(1800000));
 
 void sega_32x_device::device_add_mconfig(machine_config &config)
 {
-#ifndef _32X_SWAP_MASTER_SLAVE_HACK
+	// HD6417095
 	SH7604(config, m_master_cpu, DERIVED_CLOCK(1, 1));
 	m_master_cpu->set_is_slave(0);
 	m_master_cpu->set_dma_fifo_data_available_callback(FUNC(sega_32x_device::_32x_fifo_available_callback));
-#endif
 
+	// HD6417095
 	SH7604(config, m_slave_cpu, DERIVED_CLOCK(1, 1));
 	m_slave_cpu->set_is_slave(1);
 	m_slave_cpu->set_dma_fifo_data_available_callback(FUNC(sega_32x_device::_32x_fifo_available_callback));
 
-#ifdef _32X_SWAP_MASTER_SLAVE_HACK
-	SH7604(config, m_master_cpu, DERIVED_CLOCK(1, 1));
-	m_master_cpu->set_is_slave(0);
-	m_master_cpu->set_dma_fifo_data_available_callback(FUNC(sega_32x_device::_32x_fifo_available_callback));
-#endif
+	// brutal: needs high levels of interleaving otherwise background animations won't work
+	// (update: actually fixed by using synchronize in comms space)
+	// sharrierju: "press start button" will flicker at /512 onward
+	// chaotixju: hangs after sega logo at /256
 
-	_32X_INTERLEAVE_LEVEL
+	// some games appear to dislike 'perfect' levels of interleave, probably due to
+	// non-emulated cache, ram waitstates and other issues?
+	const unsigned quantum_hz = this->clock() / 128;
+	config.set_maximum_quantum(attotime::from_hz(quantum_hz));
+//  config.set_maximum_quantum(attotime::from_hz(1800000));
 }
 
 void sega_32x_ntsc_device::device_add_mconfig(machine_config &config)
@@ -1765,7 +1789,7 @@ void sega_32x_device::device_reset()
 	m_sh2_master_vint_enable = m_sh2_slave_vint_enable = 0;
 	m_sh2_master_hint_enable = m_sh2_slave_hint_enable = 0;
 	m_sh2_master_cmdint_enable = m_sh2_slave_cmdint_enable = 0;
-	sh2_master_pwmint_enable = sh2_slave_pwmint_enable = 0;
+	m_sh2_master_pwmint_enable = m_sh2_slave_pwmint_enable = 0;
 	m_sh2_master_vint_pending = m_sh2_slave_vint_pending = 0;
 	m_sh2_hint_in_vbl = 0;
 
