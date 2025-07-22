@@ -130,7 +130,7 @@ control registers:
 TODO:
 - Move tilemap(s) emulation from drivers to this device.
 - As noted above, the maximum number of 64-pixel sprite blocks is 264. MAME
-  doesn't emulate partial sprites at the end of the spritelist. Is's not
+  doesn't emulate partial sprites at the end of the spritelist. It's not
   expected any game relies on this.
 
 BTANB:
@@ -145,7 +145,6 @@ BTANB:
 #include "konami_helper.h"
 
 #include "screen.h"
-#include "tilemap.h"
 
 
 DEFINE_DEVICE_TYPE(K007121, k007121_device, "k007121", "Konami 007121 Video Controller")
@@ -160,7 +159,6 @@ k007121_device::k007121_device(const machine_config &mconfig, const char *tag, d
 	, m_irq_cb(*this)
 	, m_firq_cb(*this)
 	, m_nmi_cb(*this)
-	, m_dirtytiles_cb(*this)
 {
 }
 
@@ -170,8 +168,6 @@ k007121_device::k007121_device(const machine_config &mconfig, const char *tag, d
 
 void k007121_device::device_start()
 {
-	m_dirtytiles_cb.resolve();
-
 	save_item(NAME(m_ctrlram));
 	save_item(NAME(m_scrollram));
 	save_item(NAME(m_flipscreen));
@@ -206,8 +202,11 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 
 	// associated tilemap(s) should be marked dirty if any of these registers changed
 	static const uint8_t dirtymask[8] = { 0x00, 0x00, 0x00, 0x01, 0xff, 0xff, 0x3f, 0x00 };
-	if ((data ^ m_ctrlram[offset]) & dirtymask[offset] && !m_dirtytiles_cb.isnull())
-		m_dirtytiles_cb();
+	if ((data ^ m_ctrlram[offset]) & dirtymask[offset])
+	{
+		for (auto &tilemap : m_tilemaps)
+			tilemap->mark_all_dirty();
+	}
 
 	if (offset == 7)
 	{

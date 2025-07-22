@@ -27,7 +27,7 @@ control registers:
 Above undocumented bits/regs = unknown
 
 TODO:
-- Move sprites and tilemap(s) emulation from drivers to this device.
+- Move sprites and tilemap emulation from drivers to this device.
 
 */
 
