@@ -229,7 +229,7 @@ static const md_slot slot_list[] =
 	{ NBA_JAM, "rom_nbajam" },
 	{ NBA_JAM_ALT, "rom_nbajam_alt" },
 	{ NBA_JAM_TE, "rom_nbajamte" },
-	{ NFL_QB_96, "rom_nflqb" },
+	{ NFL_QB_96, "rom_nflqb96" },
 	{ C_SLAM, "rom_cslam" },
 	{ EA_NHLPA, "rom_nhlpa" },
 	{ BRIAN_LARA, "rom_blara" },
