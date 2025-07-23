@@ -2586,9 +2586,9 @@ void ppan_state::init_ppan()
 
 /***************************************************************************/
 
-GAME( 1991, gunforce,    0,        gunforce,      gunforce,  m92_state,   empty_init, ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, gunforcej,   gunforce, gunforce,      gunforce,  m92_state,   empty_init, ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, gunforceu,   gunforce, gunforce,      gunforce,  m92_state,   empty_init, ROT0,   "Irem America", "Gunforce - Battle Fire Engulfed Terror Island (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, gunforce,    0,        gunforce,      gunforce,  m92_state,   empty_init, ROT0,   "Irem",         "Gunforce: Battle Fire Engulfed Terror Island (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, gunforcej,   gunforce, gunforce,      gunforce,  m92_state,   empty_init, ROT0,   "Irem",         "Gunforce: Battle Fire Engulfed Terror Island (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, gunforceu,   gunforce, gunforce,      gunforce,  m92_state,   empty_init, ROT0,   "Irem America", "Gunforce: Battle Fire Engulfed Terror Island (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 GAME( 1991, bmaster,     0,        bmaster,       bmaster,   m92_state,   empty_init, ROT0,   "Irem",         "Blade Master (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, crossbld,    bmaster,  bmaster,       bmaster,   m92_state,   empty_init, ROT0,   "Irem",         "Cross Blades! (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
