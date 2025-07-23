@@ -47,5 +47,6 @@ extern const uint8_t lhfy_key[0x100];
 extern const uint8_t lhzbgqb_key[0x100];
 extern const uint8_t mghammer_key[0x100];
 extern const uint8_t mghammer_io_key[0x100];
+extern const uint8_t zjddz_key[0x100];
 
 #endif // MAME_IGS_IGS036CRYPT_H

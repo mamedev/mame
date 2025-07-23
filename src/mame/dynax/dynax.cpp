@@ -6007,7 +6007,8 @@ ROM_START( mjelct3bl )
 	ROM_LOAD( "e2.u83", 0x100000, 0x080000, BAD_DUMP CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
 ROM_END
 
-ROM_START( mjelct3bla )
+// uses Z80 CPU and Z80CTC，ROM A17（30p）—— Z80 CPU M1（27p）
+ROM_START( mjelct3bla ) // TODO: correct ROM loading
 	ROM_REGION( 0x50000, "maincpu", 0 ) // Z80 Code
 	ROM_LOAD( "020.u3", 0x00000, 0x20000, CRC(34223e3b) SHA1(c3e936e9d6ba504ce240090cc675a55d0cde80fa) )
 	ROM_CONTINUE(       0x00000, 0x20000 )
@@ -6021,7 +6022,8 @@ ROM_START( mjelct3bla )
 	ROM_LOAD( "e2.u83", 0x100000, 0x080000, BAD_DUMP CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
 ROM_END
 
-ROM_START( mjelct3blb )
+// uses Z80 CPU and Z80CTC，ROM A17（30p）—— Z80 CPU M1（27p）
+ROM_START( mjelct3blb ) // TODO: correct ROM loading
 	ROM_REGION( 0x50000, "maincpu", 0 ) // Z80 Code
 	ROM_LOAD( "mjelct3bl1-fast ron-pld.u3", 0x00000, 0x20000, CRC(a8365b24) SHA1(76ec04fa9f5fa35c28733db4eb931d773d078bfc) )
 	ROM_CONTINUE(                           0x00000, 0x20000 )
