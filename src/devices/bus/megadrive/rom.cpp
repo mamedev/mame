@@ -1885,8 +1885,9 @@ void md_rom_paprium_device::ppm_process_command()
 		printf("CMD 0x%04x\n", ppm_interface->reg_command);
 		#endif
 		ppm_sdram_window_enabled = true;
-		ppm_vram_set_budget(0);
-		ppm_obj_reset(); // spr system reset
+	//	removed, as command 0xb0 was added
+	//	ppm_vram_set_budget(0);
+	//	ppm_obj_reset(); // spr system reset
 		break;
 	// unk startup thing
 	// 8300/8302 toggle *12 (24 total writes) on startup
@@ -1966,6 +1967,10 @@ void md_rom_paprium_device::ppm_process_command()
 		//		break;
 		// sent by waitvbl under condition, instead of 0xaf
 		// end frame without obj rendering ?
+	case 0xb0:
+		// reset SPR engine? (used at startup & test screen)
+		ppm_obj_reset();
+		break;
 	case 0xb1:
 		// seems used to keep previous SAT data in VRAM, do nothing?
 		break;
