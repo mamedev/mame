@@ -173,7 +173,7 @@ void i8256_device::write(offs_t offset, u8 data)
 
 				set_rate(baudRates[m_command2 & 0x0F]);
 
-				if (BIT(m_command2,I8256_CMD2_PEN))
+				if (BIT(m_command2,I8256_CMD2_PARITY_ENABLE))
 					m_parity = BIT(m_command2,I8256_CMD2_EVEN_PARITY) ? PARITY_EVEN : PARITY_ODD;
 				else
 					m_parity = PARITY_NONE;				
