@@ -108,170 +108,186 @@ private:
 
     uint8_t m_status, m_modification;
 
+    uint8_t m_sync_byte_count, m_rxc_count, m_txc_count;
+    uint8_t m_br_factor;
+    uint8_t m_rxd_bits;
+    uint8_t m_rx_data, m_tx_data;
+    uint8_t m_sync1, m_sync2, m_sync8, m_sync16;
+
+    void receive_clock();
+    bool calc_parity(u8 ch);
+    void sync1_rxc();
+    void sync2_rxc();
+    bool is_tx_enabled();
+    void check_for_tx_start();
+    void start_tx();
+    void transmit_clock();
+    void receive_character(uint8_t ch);
+
     enum // MUART REGISTERS
 	{
-		REG_CMD1,
-        REG_CMD2,
-        REG_CMD3,
-        REG_MODE,
-        REG_PORT1C,
-        REG_INTEN,
-        REG_INTAD,
-        REG_BUFFER,
-        REG_PORT1,
-        REG_PORT2,
-        REG_TIMER1,
-        REG_TIMER2,
-        REG_TIMER3,
-        REG_TIMER4,
-        REG_TIMER5,
-        REG_STATUS,
+		I8256_REG_CMD1,
+        I8256_REG_CMD2,
+        I8256_REG_CMD3,
+        I8256_REG_MODE,
+        I8256_REG_PORT1C,
+        I8256_REG_INTEN,
+        I8256_REG_INTAD,
+        I8256_REG_BUFFER,
+        I8256_REG_PORT1,
+        I8256_REG_PORT2,
+        I8256_REG_TIMER1,
+        I8256_REG_TIMER2,
+        I8256_REG_TIMER3,
+        I8256_REG_TIMER4,
+        I8256_REG_TIMER5,
+        I8256_REG_STATUS,
 	};
 
     enum
     {
-        CMD1_FRQ,
-        CMD1_8086,
-        CMD1_BITI,
-        CMD1_BRKI,
-        CMD1_S0,
-        CMD1_S1,
-        CMD1_L0,
-        CMD1_L1
+        I8256_CMD1_FRQ,
+        I8256_CMD1_8086,
+        I8256_CMD1_BITI,
+        I8256_CMD1_BRKI,
+        I8256_CMD1_S0,
+        I8256_CMD1_S1,
+        I8256_CMD1_L0,
+        I8256_CMD1_L1
     };
 
     enum
     {
-        STOP_1,
-        STOP_15,
-        STOP_2,
-        STOP_075
+        I8256_STOP_1,
+        I8256_STOP_15,
+        I8256_STOP_2,
+        I8256_STOP_075
     };
 
     stop_bits_t stopBits[4] = {STOP_BITS_1, STOP_BITS_1_5, STOP_BITS_2, STOP_BITS_0};
 
     enum
     {
-        CHARLEN_8,
-        CHARLEN_7,
-        CHARLEN_6,
-        CHARLEN_5
+        I8256_CHARLEN_8,
+        I8256_CHARLEN_7,
+        I8256_CHARLEN_6,
+        I8256_CHARLEN_5
     };
 
     enum
     {
-        CMD2_B0,
-        CMD2_B1,
-        CMD2_B2,
-        CMD2_B3,
-        CMD2_C0,
-        CMD2_C1,
-        CMD2_EP,
-        CMD2_PEN
+        I8256_CMD2_B0,
+        I8256_CMD2_B1,
+        I8256_CMD2_B2,
+        I8256_CMD2_B3,
+        I8256_CMD2_C0,
+        I8256_CMD2_C1,
+        I8256_CMD2_EVEN_PARITY,
+        I8256_CMD2_PARITY_ENABLE
     };
 
     enum
     {
-        BAUD_TXC,
-        BAUD_TXC64,
-        BAUD_TXC32,
-        BAUD_19200,
-        BAUD_9600,
-        BAUD_4800,
-        BAUD_2400,
-        BAUD_1200,
-        BAUD_600,
-        BAUD_300,
-        BAUD_200,
-        BAUD_150,
-        BAUD_110,
-        BAUD_100,
-        BAUD_75,
-        BAUD_50
+        I8256_BAUD_TXC,
+        I8256_BAUD_TXC64,
+        I8256_BAUD_TXC32,
+        I8256_BAUD_19200,
+        I8256_BAUD_9600,
+        I8256_BAUD_4800,
+        I8256_BAUD_2400,
+        I8256_BAUD_1200,
+        I8256_BAUD_600,
+        I8256_BAUD_300,
+        I8256_BAUD_200,
+        I8256_BAUD_150,
+        I8256_BAUD_110,
+        I8256_BAUD_100,
+        I8256_BAUD_75,
+        I8256_BAUD_50
     };
     const int baudRates[16] = { 0, 0, 0, 19200, 9600, 4800, 2400, 1200, 600, 300, 200, 150, 110, 100, 75, 50 };
 
     enum
     {
-        SCLK_DIV5, // 5.12 MHz
-        SCLK_DIV3, // 3.072 MHz
-        SCLK_DIV2, // 2.048 MHz
-        SCLK_DIV1  // 1.024 MHz
+        I8256_SCLK_DIV5, // 5.12 MHz
+        I8256_SCLK_DIV3, // 3.072 MHz
+        I8256_SCLK_DIV2, // 2.048 MHz
+        I8256_SCLK_DIV1  // 1.024 MHz
     };
     const char sysclockDivider[4] = {5,3,2,1};
 
     enum
     {
-        CMD3_RST,
-        CMD3_TBRK,
-        CMD3_SBRK,
-        CMD3_END,
-        CMD3_NIE,
-        CMD3_IAE,
-        CMD3_RxE,
-        CMD3_SET
+        I8256_CMD3_RST,
+        I8256_CMD3_TBRK,
+        I8256_CMD3_SBRK,
+        I8256_CMD3_END,
+        I8256_CMD3_NIE,
+        I8256_CMD3_IAE,
+        I8256_CMD3_RxE,
+        I8256_CMD3_SET
     };
 
     enum
     {
-        INT_TIMER1,
-        INT_TIMER2,
-        INT_EXTINT,
-        INT_TIMER3,
-        INT_RX,
-        INT_TX,
-        INT_TIMER4,
-        INT_TIMER5
+        I8256_INT_TIMER1,
+        I8256_INT_TIMER2,
+        I8256_INT_EXTINT,
+        I8256_INT_TIMER3,
+        I8256_INT_RX,
+        I8256_INT_TX,
+        I8256_INT_TIMER4,
+        I8256_INT_TIMER5
     };
 
-    const char timer_interrupt[5] = {INT_TIMER1, INT_TIMER2, INT_TIMER3, INT_TIMER4, INT_TIMER5};
+    const char timer_interrupt[5] = {I8256_INT_TIMER1, I8256_INT_TIMER2, I8256_INT_TIMER3, I8256_INT_TIMER4, I8256_INT_TIMER5};
 
     enum
     {
-        MODE_P2C0,
-        MODE_P2C1,
-        MODE_P2C2,
-        MODE_CT2,
-        MODE_CT3,
-        MODE_T5C,
-        MODE_T24,
-        MODE_T35
+        I8256_MODE_P2C0,
+        I8256_MODE_P2C1,
+        I8256_MODE_P2C2,
+        I8256_MODE_CT2,
+        I8256_MODE_CT3,
+        I8256_MODE_T5C,
+        I8256_MODE_T24,
+        I8256_MODE_T35
     };
 
     enum // Upper / Lower
     {
-        PORT2C_II,
-        PORT2C_IO,
-        PORT2C_OI,
-        PORT2C_OO,
-        PORT2C_HI,
-        PORT2C_HO,
-        PORT2C_DNU,
-        PORT2C_TEST
+        I8256_PORT2C_II,
+        I8256_PORT2C_IO,
+        I8256_PORT2C_OI,
+        I8256_PORT2C_OO,
+        I8256_PORT2C_HI,
+        I8256_PORT2C_HO,
+        I8256_PORT2C_DNU,
+        I8256_PORT2C_TEST
     };
 
     enum
     {
-        STATUS_FE,
-        STATUS_OE,
-        STATUS_PE,
-        STATUS_BD,
-        STATUS_TRE,
-        STATUS_TBE,
-        STATUS_RBF,
-        STATUS_INT
+        I8256_STATUS_FRAMING_ERROR,
+        I8256_STATUS_OVERRUN_ERROR,
+        I8256_STATUS_PARITY_ERROR,
+        I8256_STATUS_BREAK,
+        I8256_STATUS_TR_EMPTY,
+        I8256_STATUS_TB_EMPTY,
+        I8256_STATUS_RB_FULL,
+        I8256_STATUS_INT
     };
 
     enum
     {
-        MOD_DSC,
-        MOD_TME,
-        MOD_RS0,
-        MOD_RS1,
-        MOD_RS2,
-        MOD_RS3,
-        MOD_RS4,
-        MOD_0
+        I8256_MOD_DSC,
+        I8256_MOD_TME,
+        I8256_MOD_RS0,
+        I8256_MOD_RS1,
+        I8256_MOD_RS2,
+        I8256_MOD_RS3,
+        I8256_MOD_RS4,
+        I8256_MOD_0
     };
 
 };
