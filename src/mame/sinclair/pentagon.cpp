@@ -195,6 +195,7 @@ void pentagon_state::pentagon(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pentagon_state::pentagon_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &pentagon_state::pentagon_switch);
 	m_maincpu->set_vblank_int("screen", FUNC(pentagon_state::pentagon_interrupt));
+	m_maincpu->refresh_cb().remove();
 	m_maincpu->nomreq_cb().remove();
 
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, 320, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
