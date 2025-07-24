@@ -49,7 +49,7 @@ __|              |         |  |ALS05A| |N82077   |   __             6 x 74F00J->
                                             |                                                                                   __________    ___ |
                                             | _____________       _____________      _____________                            HM6264ALFP-12T |__<-SG51KH 32 MHz
                                             || Motorola   |      | Motorola   |     | Sony       |                  __________________________    |
-                                            ||MC6882FN25A |      |XC68030FE25B|     |L7A0266     |                 | AMD                     |    |
+                                            ||MC68882FN25A|      |XC68030FE25B|     |L7A0266     |                 | AMD                     |    |
                                             ||            |      |            |     |WSC-ICKDMAC |                 | AM7990PC                |    |
                                             ||            |      |            |     |9019        |                 |_________________________|    |
                                             ||____________|      |____________|     |____________|          ___________    ___________            |
@@ -519,11 +519,11 @@ ROM_START(nws1250)
 	ROM_SYSTEM_BIOS(0, "nws1580", "NWS-1250 v2.0a")
 	ROMX_LOAD("nws-1200_ver_2.0a_9010.ic2", 0x00000, 0x20000, CRC(87eca9d2) SHA1(235585a55bc2b3206cfec532852526a638eccad2), ROM_BIOS(0))
 
-	// MB7114 256x4 TTL PROM
+	// AM27S21PC PROM
 	ROM_REGION32_BE(0x100, "idrom", 0)
 	ROM_LOAD("n1250_50292_am27s21pc.ic36", 0x000, 0x100, NO_DUMP)
 
-	// 2 x HN62321BP (128K x 8-bit mask ROM)
+	// 2 x MB834200A (mask ROM)
 	ROM_REGION32_BE(0x100000, "krom", ROMREGION_ERASEFF)
 	ROM_LOAD64_BYTE("mb834200a-20_051_aa_9020_g07.ic1",  0x00000, 0x20000, NO_DUMP)
 	ROM_LOAD64_BYTE("mb834200a-20_052_aa_9002_g02.ic13", 0x00001, 0x20000, NO_DUMP)
