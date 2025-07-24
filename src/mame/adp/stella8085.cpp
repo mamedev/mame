@@ -268,32 +268,50 @@ void stella8085_state::rst65_w(uint8_t state)
 
 void stella8085_state::io70(uint8_t data)
 {
-	//const bool aw1 = BIT(data,0);
-	//const bool  = BIT(data,1);
-	//const bool  = BIT(data,2);
-	//const bool  = BIT(data,3);
+	const bool aw1 = BIT(data,0);
+	const bool aw2 = BIT(data,1);
+	const bool aw3 = BIT(data,2);
+	const bool aw4 = BIT(data,3);
 	const bool mp = BIT(data,4);
 	const bool sz = BIT(data,5);
-	//const bool  = BIT(data,6); // high on startup
-	//const bool pa7 = BIT(data,7);
+	const bool d6 = BIT(data,6); // high on startup
+	const bool pa7 = BIT(data,7);
 
-	machine().bookkeeping().coin_lockout_global_w(mp);
-	machine().bookkeeping().coin_counter_w(5,sz);
-	LOG("io70 %02x\n", data);
+	machine().bookkeeping().coin_lockout_global_w(mp); // coin magnet
+	machine().bookkeeping().coin_counter_w(0,aw1); // coin eject
+	machine().bookkeeping().coin_counter_w(1,aw2);
+	machine().bookkeeping().coin_counter_w(2,aw3);
+	machine().bookkeeping().coin_counter_w(3,aw4);
+	machine().bookkeeping().coin_counter_w(5,sz); // game counter
+
+	if (d6) {
+		;//m_icl8b = true;
+	}
+
+	if (pa7) {
+		LOG("PA7 high\n");
+	}
 }
 
 void stella8085_state::io71(uint8_t data)
 {
-	//const bool  = BIT(data,0);
+	//const bool rs = BIT(data,0);
 	const bool gong = BIT(data,1);
-	//const bool  = BIT(data,2);
-	//const bool  = BIT(data,3);
-	//const bool  = BIT(data,4);
-	//const bool  = BIT(data,5);
-	//const bool  = BIT(data,6);
-	//const bool  = BIT(data,7);
+	const bool dg = BIT(data,2);
+	const bool ug = BIT(data,3);
+	const bool ds = BIT(data,4);
+	const bool d60 = BIT(data,5);
+	const bool dm = BIT(data,6);
+	const bool um = BIT(data,7);
 
-	LOG("gong %02x\n", gong);
+	//rst55_w(rs);
+	if (gong)
+		LOG("GONG!!!!\n");
+	if (d60)
+		LOG("activating D60\n");
+	m_beep->set_output_gain(ALL_OUTPUTS,!dg);
+	if (ug || ds || dm || um)
+		LOG("UG %d DS %d DM %d UM %d\n", ug,ds,dm,um);
 }
 
 void stella8085_state::sounddev(uint8_t data)
