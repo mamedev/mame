@@ -948,12 +948,11 @@ ROM_END
 ROM_START( 7smash )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "eagle.8",      0x000000, 0x020000, CRC(b115c5d5) SHA1(3f80613886b7f8092ec914c9bfb416078aca82a3) )
-	ROM_LOAD( "7smash.bin",   0x000000, 0x004000, CRC(58396efa) SHA1(b957d28e321a5c4f9a90e0a7eaf8f01450662c0e) ) // internal Z180 rom
+	ROM_LOAD( "7smash.bin",   0x000000, 0x004000, CRC(58396efa) SHA1(b957d28e321a5c4f9a90e0a7eaf8f01450662c0e) ) // internal Z180 ROM
 
-	ROM_REGION( 0x20000, "rom_data", ROMREGION_ERASEFF ) // external data / cpu rom
+	ROM_REGION( 0x20000, "rom_data", ROMREGION_ERASEFF ) // external data / CPU ROM
 
-
-	ROM_REGION( 0x60000, "reels", ROMREGION_ERASE00 ) // reel gfxs
+	ROM_REGION( 0x60000, "reels", ROMREGION_ERASE00 ) // reel gfx
 	ROM_LOAD( "eagle.3",      0x40000, 0x020000, CRC(d75b3b2f) SHA1(1d90bc17f9e645966126fa19c42a7c4d54098776) )
 	ROM_LOAD( "eagle.2",      0x20000, 0x020000, CRC(211b5acb) SHA1(e35ae6c93a1daa9d3aa46970c5c3d39788f948bb) )
 	ROM_LOAD( "eagle.1",      0x00000, 0x020000, CRC(21317c37) SHA1(7706045b85f86f6e58cc67c2d7dee01d80df3422) )  // half unused, 5bpp
@@ -964,6 +963,22 @@ ROM_START( 7smash )
 	ROM_LOAD( "eagle.4",      0x00000, 0x20000, CRC(dcf92dca) SHA1(87c7d88dc35981ad636376b53264cee87ccdaa71) )  // half unused, 5bpp
 ROM_END
 
+ROM_START( 7smasha ) // this has the full program in the external ROM, even if the PCB has the custom CPU
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "eagle_9.u1", 0x000000, 0x020000, CRC(cfca7e22) SHA1(74b1c83aea6478a49a6b33950e389a4e2e19c16f) )
+
+	ROM_REGION( 0x20000, "rom_data", ROMREGION_ERASEFF ) // external data / CPU ROM
+
+	ROM_REGION( 0x60000, "reels", ROMREGION_ERASE00 ) // reel gfx
+	ROM_LOAD( "eagle_3.1f", 0x40000, 0x020000, CRC(d75b3b2f) SHA1(1d90bc17f9e645966126fa19c42a7c4d54098776) )
+	ROM_LOAD( "eagle_2.1e", 0x20000, 0x020000, CRC(211b5acb) SHA1(e35ae6c93a1daa9d3aa46970c5c3d39788f948bb) )
+	ROM_LOAD( "eagle_1.1c", 0x00000, 0x020000, CRC(21317c37) SHA1(7706045b85f86f6e58cc67c2d7dee01d80df3422) ) // half unused, 5bpp
+
+	ROM_REGION( 0x60000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "eagle_6.1r", 0x40000, 0x20000, CRC(2c4416d4) SHA1(25d04d4d08ab491a9684b8e6f21e57479711ee87) )
+	ROM_LOAD( "eagle_5.1n", 0x20000, 0x20000, CRC(cd8bc456) SHA1(cefe211492158f445ceaaa9015e1143ea9afddbb) )
+	ROM_LOAD( "eagle_4.1l", 0x00000, 0x20000, CRC(dcf92dca) SHA1(87c7d88dc35981ad636376b53264cee87ccdaa71) ) // half unused, 5bpp
+ROM_END
 
 } // anonymous namespace
 
@@ -976,4 +991,5 @@ ROM_END
 GAMEL( 1991, luckgrln,  0,        luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180-based hardware)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln )
 GAMEL( 1991, luckstrn,  0,        luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Star (newer Z180-based hardware, set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln ) // missing internal ROM dump
 GAMEL( 1991, luckstrna, luckstrn, luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Star (newer Z180-based hardware, set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln ) // missing internal ROM dump
-GAMEL( 1993, 7smash,    0,        _7smash,  _7smash,  luckgrln_state, empty_init,    ROT0, "Sovic",          "7 Smash",                                       MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_7smash )
+GAMEL( 1993, 7smash,    0,        _7smash,  _7smash,  luckgrln_state, empty_init,    ROT0, "Sovic",          "7 Smash (set 1)",                               MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_7smash )
+GAMEL( 1993, 7smasha,   7smash,   _7smash,  _7smash,  luckgrln_state, empty_init,    ROT0, "Sovic",          "7 Smash (set 2)",                               MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_7smash )
