@@ -218,14 +218,14 @@ void ddragon3_state::ddragon3_vreg_w(offs_t offset, uint16_t data, uint16_t mem_
 
 void ddragon3_state::irq6_ack_w(uint16_t data)
 {
-	//  this gets written to on startup and at the end of IRQ6
+	// this gets written to on startup and at the end of IRQ6
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
 
 void ddragon3_state::irq5_ack_w(uint16_t data)
 {
-	//  this gets written to on startup and at the end of IRQ5 (input port read)
+	// this gets written to on startup and at the end of IRQ5 (input port read)
 	m_maincpu->set_input_line(5, CLEAR_LINE);
 }
 

@@ -135,7 +135,7 @@ void cave_state::update_irq_state()
 
 TIMER_CALLBACK_MEMBER(cave_state::vblank_end)
 {
-	if (m_kludge == 3)  /* mazinger metmqstr */
+	if (m_kludge == 3) // mazinger metmqstr
 	{
 		m_unknown_irq = 1;
 		update_irq_state();
@@ -168,8 +168,8 @@ INTERRUPT_GEN_MEMBER(cave_state::interrupt)
 }
 INTERRUPT_GEN_MEMBER(ppsatan_state::interrupt_ppsatan)
 {
-	m_int_timer->adjust      (attotime::from_usec(17376 - m_time_vblank_irq));
-	m_int_timer_left->adjust (attotime::from_usec(17376 - m_time_vblank_irq));
+	m_int_timer->adjust(attotime::from_usec(17376 - m_time_vblank_irq));
+	m_int_timer_left->adjust(attotime::from_usec(17376 - m_time_vblank_irq));
 	m_int_timer_right->adjust(attotime::from_usec(17376 - m_time_vblank_irq));
 }
 
@@ -270,7 +270,7 @@ u8 cave_z80_state::soundflags_r()
 {
 	// bit 2 is low: can read command (lo)
 	// bit 3 is low: can read command (hi)
-	//return  (m_sound_flag[0] ? 0 : 4) | (m_sound_flag[1] ? 0 : 8) ;
+	//return (m_sound_flag[0] ? 0 : 4) | (m_sound_flag[1] ? 0 : 8) ;
 	return 0;
 }
 
@@ -288,7 +288,7 @@ void cave_z80_state::sound_cmd_w(u16 data)
 	//m_sound_flag[0] = 1;
 	//m_sound_flag[1] = 1;
 	m_soundlatch->write(data);
-	m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
+	m_maincpu->spin_until_time(attotime::from_usec(50)); // Allow the other cpu to reply
 }
 
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */
@@ -391,7 +391,7 @@ void ppsatan_state::ppsatan_eeprom_w(offs_t offset, u16 data, u16 mem_mask)
 	if (data & ~0x000f)
 		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
 
-	if (ACCESSING_BITS_0_7)  // odd address
+	if (ACCESSING_BITS_0_7) // odd address
 	{
 		// bit 11?
 
@@ -529,7 +529,7 @@ u16 cave_state::donpachi_videoregs_r(offs_t offset)
 		case 2:
 		case 3: return irq_cause_r(offset);
 
-		default:    return 0x0000;
+		default: return 0x0000;
 	}
 }
 
