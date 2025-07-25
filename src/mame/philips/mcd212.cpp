@@ -727,7 +727,7 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 		if (!invert)
 			return; // Normal Blink
 		else
-			color_index = ~color_index & 0xf; // Inverted Color Blink
+			color_index = color_index ^ 0x7; // Inverted Color Blink. MCD212 Section 7.5
 	}
 
 	const uint16_t cursor_x = m_cursor_position & 0x3ff;
