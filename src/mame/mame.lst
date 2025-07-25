@@ -44033,6 +44033,7 @@ librie
 nws3860
 
 @source:sony/news_68k.cpp
+nws1250
 nws1580
 
 @source:sony/news_68k_iop.cpp
