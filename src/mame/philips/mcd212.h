@@ -101,6 +101,7 @@ protected:
 		ICM_MODE2            = 0x000f00,    // Plane 2
 		ICM_MODE2_SHIFT      = 8,
 		ICM_EV               = 0x040000,    // External video
+		ICM_EV_BIT           = 18,
 		ICM_NM               = 0x080000,    // Number of Matte flags
 		ICM_NM_BIT           = 19,
 		ICM_CS               = 0x400000,    // CLUT select
@@ -249,6 +250,7 @@ protected:
 
 	int get_screen_width();
 	int get_border_width();
+	uint32_t get_backdrop_plane();
 
 	template <int Path> void set_vsr(uint32_t value);
 	template <int Path> uint32_t get_vsr();
