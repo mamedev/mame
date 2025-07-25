@@ -591,7 +591,6 @@ private:
 	void mcu_portc_w(uint8_t data);
 
 	uint8_t nvram_r(offs_t offset);
-	void nvram_w(offs_t offset, uint8_t data);
 
 	void magodds_palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update_bingowng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -606,8 +605,7 @@ private:
 private:
 	optional_device<ds2401_device> m_fl7w4_id;
 	optional_device<m68705p_device> m_mcu;
-	optional_device<nvram_device> m_nvram;
-	std::unique_ptr<uint8_t[]> m_nvram8;
+	optional_shared_ptr<uint8_t> m_nvram;
 
 	uint8_t m_nmi_enable = 0U;
 	uint8_t m_vidreg = 0U;
@@ -753,8 +751,6 @@ void wingco_state::machine_start()
 {
 	goldstar_state::machine_start();
 	m_tile_bank = 0;
-	m_nvram8 = std::make_unique<uint8_t[]>(0x800);
-	m_nvram->set_base(m_nvram8.get(),0x800);
 
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_vidreg));
@@ -1629,14 +1625,14 @@ void wingco_state::mcu_portc_w(uint8_t data)
 
 uint8_t wingco_state::nvram_r(offs_t offset)
 {
-	uint8_t ret = m_nvram8[offset];
+	uint8_t ret = m_nvram[offset];
 
-	if(offset == 0x7ff)
+	if (offset == 0x7ff)
 		ret = 0;
 
-	if(offset == 0x7fd)
+	if (offset == 0x7fd)
 	{
-		switch(m_nvram8[0x7fd])
+		switch (m_nvram[0x7fd])
 		{
 			case 0x01: ret = 0x08; break;
 			case 0x04: ret = 0x02; break;
@@ -1646,11 +1642,6 @@ uint8_t wingco_state::nvram_r(offs_t offset)
 	}
 
 	return ret;
-}
-
-void wingco_state::nvram_w(offs_t offset, uint8_t data)
-{
-	m_nvram8[offset] = data;
 }
 
 
@@ -2571,7 +2562,7 @@ void wingco_state::lucky8_map(address_map &map)
 void wingco_state::luckybar_map(address_map &map)
 {
 	lucky8_map(map);
-	map(0x8000, 0x87ff).rw(FUNC(wingco_state::nvram_r), FUNC(wingco_state::nvram_w));
+	map(0x8000, 0x87ff).ram().r(FUNC(wingco_state::nvram_r)).share(m_nvram);
 }
 
 void wingco_state::lucky8p_map(address_map &map)

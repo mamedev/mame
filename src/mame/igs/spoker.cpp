@@ -33,7 +33,7 @@
     Some type of link feature?
   - Other games in jinhulu2_state have machine translated DIP definitions which
     could use improving and hopper isn't implemented yet.
-  - xjinhuang needs GFX decode and memory map improvements.
+  - xjinhuang and jinhuang2 need correct GFX decode.
 
 ***************************************************************************/
 
@@ -166,7 +166,12 @@ private:
 class xjinhuang_state : public spokeru_state
 {
 public:
-	using spokeru_state::spokeru_state;
+	xjinhuang_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spokeru_state(mconfig, type, tag),
+		m_ymsnd(*this, "ymsnd"),
+		m_service(*this, "SERVICE"),
+		m_in1(*this, "IN1")
+	{ }
 
 	void xjinhuang(machine_config &config) ATTR_COLD;
 
@@ -174,9 +179,21 @@ public:
 	void init_xjinhuang() ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	required_device<ym2413_device> m_ymsnd;
+
+	required_ioport m_service;
+	required_ioport m_in1;
+
+	uint8_t m_protection_res = 0;
+	uint8_t m_input_sel = 0;
+
+	uint8_t igs003e_r();
+	void igs003e_w(uint8_t data);
+
 	void program_map(address_map &map) ATTR_COLD;
 	void portmap(address_map &map) ATTR_COLD;
 };
@@ -541,8 +558,8 @@ uint8_t spoker_state::magic_r()
 				if (BIT(~m_igs_magic[1], 0)) result &= m_dsw[0]->read();
 				if (BIT(~m_igs_magic[1], 1)) result &= m_dsw[1]->read();
 				if (BIT(~m_igs_magic[1], 2)) result &= m_dsw[2]->read();
-				if (BIT(~m_igs_magic[1], 3)) result &= m_dsw[3]->read();
-				if (BIT(~m_igs_magic[1], 4)) result &= m_dsw[4]->read();
+				if (BIT(~m_igs_magic[1], 3)) result &= m_dsw[3].read_safe(0xff);
+				if (BIT(~m_igs_magic[1], 4)) result &= m_dsw[4].read_safe(0xff);
 				return result;
 			}
 
@@ -580,6 +597,32 @@ void jinhulu2_state::igs003c_w(uint8_t data)
 	}
 }
 
+uint8_t xjinhuang_state::igs003e_r()
+{
+	LOGIGS003("PC %06X: Protection read %02x\n", m_maincpu->pc(), m_protection_res);
+
+	return m_protection_res;
+}
+
+void xjinhuang_state::igs003e_w(uint8_t data) // TODO: IGS003E is usually more complex than this. Verify if it needs more.
+{
+	switch (data)
+	{
+		// case 0x01: break; // TODO: what does this do?
+		case 0x02: m_protection_res = ioport("IN0")->read(); break;
+		case 0x20: m_protection_res = 0x49; break;
+		case 0x21: m_protection_res = 0x47; break;
+		case 0x22: m_protection_res = 0x53; break;
+		case 0x24: m_protection_res = 0x41; break;
+		case 0x25: m_protection_res = 0x41; break;
+		case 0x26: m_protection_res = 0x7f; break;
+		case 0x27: m_protection_res = 0x41; break;
+		case 0x28: m_protection_res = 0x41; break;
+		case 0x2a: m_protection_res = 0x3e; break;
+		case 0x2b: m_protection_res = 0x41; break;
+		default: LOGIGS003("PC %06X: Protection write %02x\n", m_maincpu->pc(), data); m_protection_res = data;
+	}
+}
 
 /***************************************************************************
                                 Memory Maps
@@ -643,16 +686,19 @@ void spokeru_state::portmap(address_map &map)
 	map(0x7800, 0x7fff).ram().w(FUNC(spokeru_state::fg_color_w)).share(m_fg_color_ram);
 }
 
-void xjinhuang_state::portmap(address_map &map) // TODO: verify everything
+void xjinhuang_state::portmap(address_map &map)
 {
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
 	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x5000, 0x5fff).ram().w(FUNC(xjinhuang_state::fg_tile_w)).share(m_fg_tile_ram);
-	map(0x6480, 0x6483).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    // NMI and coins (w), service (r), coins (r)
-	map(0x64a1, 0x64a1).portr("BUTTONS1");
-	//map(0x64b0, 0x64b1).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x6480, 0x6480).r(FUNC(xjinhuang_state::igs003e_r)).w(FUNC(xjinhuang_state::igs003e_w));
+	map(0x6482, 0x6482).w(FUNC(xjinhuang_state::nmi_video_leds_w));
+	map(0x64a1, 0x64a1).lr8(NAME([this] () -> uint8_t { return m_input_sel ? m_service->read() : m_in1->read(); }));
+	map(0x64a2, 0x64a2).w(m_ymsnd, FUNC(ym2413_device::data_w));
+	map(0x64a3, 0x64a3).lw8(NAME([this] (uint8_t data) { m_input_sel = BIT(data, 0); m_ymsnd->address_w(data); }));
 	map(0x64b0, 0x64b0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x64c0, 0x64c1).rw(FUNC(xjinhuang_state::magic_r), FUNC(xjinhuang_state::magic_w));    // DSW1-3
 	map(0x7000, 0x7fff).ram().w(FUNC(xjinhuang_state::fg_color_w)).share(m_fg_color_ram);
 }
 
@@ -665,7 +711,7 @@ void jinhulu2_state::portmap(address_map &map)
 	map(0x4001, 0x4001).portr("DSW2");
 	map(0x4002, 0x4002).portr("DSW1");
 	map(0x5001, 0x5001).lr8(NAME([this] () -> uint8_t { return m_input_sel ? m_service->read() : m_in1->read(); }));
-	map(0x5002, 0x5002).w("ymsnd", FUNC(ym2149_device::data_w));
+	map(0x5002, 0x5002).w(m_ymsnd, FUNC(ym2149_device::data_w));
 	map(0x5003, 0x5003).lw8(NAME([this] (uint8_t data) { m_input_sel = BIT(data, 0); m_ymsnd->address_w(data); }));
 	map(0x5010, 0x5010).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x5030, 0x5030).w(FUNC(jinhulu2_state::igs003c_w));
@@ -1643,6 +1689,14 @@ void jinhulu2_state::machine_start()
 	save_item(NAME(m_input_sel));
 }
 
+void xjinhuang_state::machine_start()
+{
+	spoker_state::machine_start();
+
+	save_item(NAME(m_protection_res));
+	save_item(NAME(m_input_sel));
+}
+
 void spoker_state::machine_reset()
 {
 	m_nmi_ack = 0;
@@ -1715,9 +1769,7 @@ void xjinhuang_state::xjinhuang(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &xjinhuang_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &xjinhuang_state::portmap);
 
-	subdevice<i8255_device>("ppi8255_0")->out_pa_callback().remove();
-	subdevice<i8255_device>("ppi8255_0")->out_pc_callback().set(FUNC(xjinhuang_state::nmi_video_leds_w));
-
+	config.device_remove("ppi8255_0");
 	config.device_remove("ppi8255_1");
 }
 
@@ -1731,7 +1783,7 @@ void jinhulu2_state::jinhulu2(machine_config &config)
 
 	m_gfxdecode->set_info(gfx_jinhulu2);
 
-	YM2149(config.replace(), "ymsnd", 12_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM2149(config.replace(), m_ymsnd, 12_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -2319,7 +2371,7 @@ ROM_START( sleyuan2 )
 	ROM_LOAD( "rom.u12", 0x00000, 0x20000, CRC(1aeb078c) SHA1(9b8a256f51e66733c4ec30b451ca0711ed02318e) )
 ROM_END
 
-// IGS PCB NO-0171-4. HD64180RP6, 12 MHz XTAL, Altera MAX EPM3256AQC208-10, I8255, IGS 009, IGS 003E
+// IGS PCB NO-0171-4. HD64180RP6, 12 MHz XTAL, Altera MAX EPM3256AQC208-10, IGS 009, IGS 003E,
 // File KC89C72 (AY8910 compatible), U6295, 3 banks of 8 switches
 // All ROM labels prepend 新金皇冠 (Xīn Jīn Huángguàn)
 ROM_START( xjinhuang )
@@ -2391,7 +2443,6 @@ void jinhulu2_state::init_jinhulu2()
 	memcpy(tmp.get(), gfxrom, rom_size);
 	for (int i = 0; i < rom_size; i++)
 	{
-		// TODO: may need some higher bits swapped, too. To be verified once it passes the connection check
 		int addr = bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 6, 11, 8, 9, 10, 7, 12, 5, 4, 3, 2, 1, 0);
 		gfxrom[i] = tmp[addr];
 	}
@@ -2633,8 +2684,8 @@ GAME( 1996,  spk114it,      spk306us, spoker,   spk114it, spoker_state,   init_s
 GAME( 1996,  spk102ua,      spk306us, spokeru,  spk102ua, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v102UA)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk102u,       spk306us, spoker,   spk102ua, spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v102U)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk100,        spk306us, spoker,   spk100,   spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v100)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  xjinhuang,     0,        xjinhuang,spoker,   xjinhuang_state,init_xjinhuang,     ROT0,  "IGS",       "Xin Jin Huangguan (V400CN)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong GFX decode, memory map incomplete
-GAME( 1997,  jinhuang2,     0,        xjinhuang,spoker,   xjinhuang_state,init_jinhuang2,     ROT0,  "IGS",       "Jin Huangguan II (V310CN)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong GFX decode, memory map incomplete
+GAME( 1997,  xjinhuang,     0,        xjinhuang,jinhulu2, xjinhuang_state,init_xjinhuang,     ROT0,  "IGS",       "Xin Jin Huangguan (V400CN)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong GFX decode, memory map incomplete
+GAME( 1997,  jinhuang2,     0,        xjinhuang,jinhulu2, xjinhuang_state,init_jinhuang2,     ROT0,  "IGS",       "Jin Huangguan II (V310CN)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong GFX decode, memory map incomplete
 GAME( 1993?, 3super8,       0,        _3super8, 3super8,  spoker_state,   init_3super8,       ROT0,  "<unknown>", "3 Super 8 (Italy)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROMs are badly dumped
 GAME( 1997,  jbell,         0,        jb,       jb,       jb_state,       init_spokeru,       ROT0,  "IGS",       "Jingle Bell (v200US)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  jinhulu2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2,      ROT0,  "IGS",       "Jin Hu Lu II (v412GS)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // tries to link to something?
