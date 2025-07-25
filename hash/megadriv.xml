@@ -6109,7 +6109,8 @@ Unsupported [Menacer] peripheral
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="NFLクォーターバッククラブ'95"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_nbajamte"/>
+			<!-- TODO: works with rom_nbajam_alt with i2c reads at bit 0 -->
+			<feature name="slot" value="rom_nbajam"/>
 			<feature name="pcb" value="670127 REV 1"/>
 			<feature name="u1" value="NFL QBC"/>
 			<feature name="u2" value="24LC02B/P"/>

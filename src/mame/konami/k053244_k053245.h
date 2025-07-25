@@ -6,7 +6,7 @@
 #pragma once
 
 
-#define K053244_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority)
+#define K053244_CB_MEMBER(_name) void _name(int *code, int *color, int *priority)
 
 
 class k053244_device : public device_t, public device_gfx_interface
@@ -25,6 +25,7 @@ public:
 	void set_bpp(int bpp);
 	template <typename... T> void set_sprite_callback(T &&... args) { m_k053244_cb.set(std::forward<T>(args)...); }
 	void set_offsets(int dx, int dy) { m_dx = dx; m_dy = dy; }
+	void set_priority_shadows(bool pri) { m_priority_shadows = pri; }
 
 	u16 k053245_word_r(offs_t offset);
 	void k053245_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -48,6 +49,7 @@ private:
 	required_region_ptr<uint8_t> m_sprite_rom;
 
 	int m_dx, m_dy;
+	bool m_priority_shadows;
 	sprite_delegate m_k053244_cb;
 
 	uint8_t  m_regs[0x10];    // 053244

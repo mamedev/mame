@@ -64,7 +64,7 @@ void m92_state::spritecontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	// offset5: ?
 
 	/* Sprite control - display all sprites, or partial list */
-	if (offset==2 && ACCESSING_BITS_0_7)
+	if (offset == 2 && ACCESSING_BITS_0_7)
 	{
 		if ((data & 0xff) == 8)
 			m_sprite_list = (((0x100 - m_spritecontrol[0]) & 0xff) * 4);
@@ -75,7 +75,7 @@ void m92_state::spritecontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 
 	/* Sprite buffer - the data written doesn't matter (confirmed by several games) */
-	if (offset==4)
+	if (offset == 4)
 	{
 		/* this implementation is not accurate: still some delayed sprites in gunforc2 (might be another issue?) */
 		m_spriteram->copy();
@@ -523,19 +523,21 @@ void m92_state::m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 uint32_t m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	/* Flipscreen appears hardwired to the dipswitch - strange */
+	if (m_dsw->read() & 0x100)
+		flip_screen_set(0);
+	else
+		flip_screen_set(1);
+
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
+
 	m92_update_scroll_positions();
 	m92_draw_tiles(screen, bitmap, cliprect);
 
 	if (~m_videocontrol & 0x80)
 		draw_sprites(screen, bitmap, cliprect);
 
-	/* Flipscreen appears hardwired to the dipswitch - strange */
-	if (m_dsw->read() & 0x100)
-		flip_screen_set(0);
-	else
-		flip_screen_set(1);
 	return 0;
 }
 

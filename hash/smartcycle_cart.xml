@@ -57,7 +57,7 @@ NOTE: There is also a newer version of the Smart Cycle with 3D games, this howev
 
 	<software name="sc1410" supported="no">
 		<description>The Penguins of Madagascar (1410)</description>
-		<year>2006</year>
+		<year>2009</year>
 		<publisher>Fisher Price</publisher>
 		<part name="cart" interface="smartcycle_cart">
 			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
@@ -66,13 +66,49 @@ NOTE: There is also a newer version of the Smart Cycle with 3D games, this howev
 		</part>
 	</software>
 
-	<software name="sc2108" supported="no">
+	<software name="sc2108" supported="no"> <!-- VBL interrupt is turned off and never back on? -->
 		<description>Scooby-Doo! (2108)</description>
-		<year>2006</year>
+		<year>2007</year>
 		<publisher>Fisher Price</publisher>
 		<part name="cart" interface="smartcycle_cart">
 			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
 				<rom name="2108.bin" size="0x800000" crc="050c1806" sha1="0ac208781ef2172a1a3c6a974825d5f80e3ef291"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n5992" supported="no">
+		<description>Dora l'Exploratrice - Dora L'Aventure de l'Amitié (France)</description>
+		<year>2008</year>
+		<publisher>Fisher Price</publisher>
+		<info name="serial" value="N5992" />
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="N5992 - Dora l'Exploratrice - Dora L'Aventure de l'Amitie (FR).u1" size="0x800000" crc="fa590280" sha1="5767536e1781fee06c52671bc7ca7b639a99e50b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n5993" cloneof="sc0308" supported="no">
+		<description>À la Découverte des Dinosaures (France)</description>
+		<year>2008</year>
+		<publisher>Fisher Price</publisher>
+		<info name="serial" value="N5993" />
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="N5993 - A la Decouverte des Dinosaures (FR).u1" size="0x800000" crc="e6c66830" sha1="d07b3789ef14a431d86c9fa581a3b76993929ac4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n5994" supported="no"> <!-- VBL interrupt is turned off and never back on? -->
+		<description>Hot Wheels - Pédale à Toute Vitesse (France)</description>
+		<year>2008</year>
+		<publisher>Fisher Price</publisher>
+		<info name="serial" value="N5994" />
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="N5994 - Hot Wheels - Pedale a Toute Vitesse (FR).u1" size="0x800000" crc="31ded61d" sha1="1e639f3521ab1b5261b618ab4a40ea4099326af9"/>
 			</dataarea>
 		</part>
 	</software>

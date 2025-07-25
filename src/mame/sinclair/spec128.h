@@ -38,6 +38,7 @@ protected:
 
 	virtual bool is_contended(offs_t offset) override;
 	virtual bool is_vram_write(offs_t offset) override;
+	virtual u8* snow_pattern1_base(u8 i_reg) override;
 
 	template <u8 Bank>
 	void spectrum_128_ram_w(offs_t offset, u8 data);

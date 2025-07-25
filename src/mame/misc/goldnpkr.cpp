@@ -12702,9 +12702,11 @@ ROM_START( kmhpan )
 	ROM_COPY( "gfx1", 0x5000, 0x0000, 0x1000 )
 	ROM_FILL(         0x1000, 0x5000, 0x0000 )
 
+	// these two ROMs each contain just 0x100 of data from 0x4000 to 0x40ff and another 0x100 from 0x7000 to 0x70ff
+	// PROMs substitutes?
 	ROM_REGION( 0x10000, "unkroms", 0 )
-	ROM_LOAD( "pan_dianzi_f.bin", 0x0000, 0x8000, NO_DUMP ) // M27C256B, soldered, not dumped yet
-	ROM_LOAD( "pan_dianzi_g.bin", 0x8000, 0x8000, NO_DUMP ) // M27C256B, soldered, not dumped yet
+	ROM_LOAD( "pan_dianzi_f.bin", 0x0000, 0x8000, CRC(e6a1907c) SHA1(b5497fd45a9416d926cde856292504c793b9fa2a) ) // M27C256B
+	ROM_LOAD( "pan_dianzi_g.bin", 0x8000, 0x8000, CRC(6ff231b7) SHA1(82da7b4c577669d261a181b4cc1fc91cd56763d3) ) // M27C256B
 
 	ROM_REGION( 0x0100, "proms", ROMREGION_ERASE00 ) // not identified / dumped yet
 	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // borrowed from goldnpkr for now, just to see something

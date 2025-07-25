@@ -1147,7 +1147,7 @@ void atom_state::atom_base(machine_config &config)
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MC6847_NTSC(config, m_vdg, 3.579545_MHz_XTAL);
+	MC6847(config, m_vdg, 3.579545_MHz_XTAL);
 	m_vdg->input_callback().set(FUNC(atom_state::vdg_videoram_r));
 	m_vdg->set_screen("screen");
 

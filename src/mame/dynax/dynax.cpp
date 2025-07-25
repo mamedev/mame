@@ -6007,6 +6007,36 @@ ROM_START( mjelct3bl )
 	ROM_LOAD( "e2.u83", 0x100000, 0x080000, BAD_DUMP CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
 ROM_END
 
+// uses Z80 CPU and Z80CTC，ROM A17（30p）—— Z80 CPU M1（27p）
+ROM_START( mjelct3bla ) // TODO: correct ROM loading
+	ROM_REGION( 0x50000, "maincpu", 0 ) // Z80 Code
+	ROM_LOAD( "020.u3", 0x00000, 0x20000, CRC(34223e3b) SHA1(c3e936e9d6ba504ce240090cc675a55d0cde80fa) )
+	ROM_CONTINUE(       0x00000, 0x20000 )
+	ROM_RELOAD(         0x10000, 0x08000 )
+	ROM_CONTINUE(       0x28000, 0x08000 )
+	ROM_CONTINUE(       0x20000, 0x08000 )
+	ROM_CONTINUE(       0x18000, 0x08000 )
+
+	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data, not dumped for this set
+	ROM_LOAD( "e1.u82", 0x000000, 0x100000, BAD_DUMP CRC(e5c41448) SHA1(b8322e32b0cb3d771316c9c4f7be91de6e422a24) )
+	ROM_LOAD( "e2.u83", 0x100000, 0x080000, BAD_DUMP CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
+ROM_END
+
+// uses Z80 CPU and Z80CTC，ROM A17（30p）—— Z80 CPU M1（27p）
+ROM_START( mjelct3blb ) // TODO: correct ROM loading
+	ROM_REGION( 0x50000, "maincpu", 0 ) // Z80 Code
+	ROM_LOAD( "mjelct3bl1-fast ron-pld.u3", 0x00000, 0x20000, CRC(a8365b24) SHA1(76ec04fa9f5fa35c28733db4eb931d773d078bfc) )
+	ROM_CONTINUE(                           0x00000, 0x20000 )
+	ROM_RELOAD(                             0x10000, 0x08000 )
+	ROM_CONTINUE(                           0x28000, 0x08000 )
+	ROM_CONTINUE(                           0x20000, 0x08000 )
+	ROM_CONTINUE(                           0x18000, 0x08000 )
+
+	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data, not dumped for this set
+	ROM_LOAD( "e1.u82", 0x000000, 0x100000, BAD_DUMP CRC(e5c41448) SHA1(b8322e32b0cb3d771316c9c4f7be91de6e422a24) )
+	ROM_LOAD( "e2.u83", 0x100000, 0x080000, BAD_DUMP CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
+ROM_END
+
 /***************************************************************************
 Que You Ji - Dian Zi Ji Pan Jiaqiang Ban (Mahjong Electron Base bootleg)
 Hom Inn, 1997
@@ -7235,7 +7265,9 @@ GAME( 1990, mjelct3,    mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_
 GAME( 1990, mjelct3a,   mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_mjelct3a, ROT180, "Dynax",                     "Mahjong Electron Base (parts 2 & 3, Japan set 2)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mjelct3b,   mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax",                     "Mahjong Electron Base (parts 2 & 3, Japan set 3)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1993, mjelctrb,   mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_mjelct3,  ROT180, "bootleg",                   "Mahjong Electron Base (parts 2 & 4, Japan bootleg)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mjelct3bl,  mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_mjelct3,  ROT180, "bootleg",                   "Mahjong Electron Base (parts 2 & 3, Japan bootleg)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mjelct3bl,  mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_mjelct3,  ROT180, "bootleg",                   "Mahjong Electron Base (parts 2 & 3, Japan bootleg set 1)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mjelct3bla, mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_mjelct3,  ROT180, "bootleg",                   "Mahjong Electron Base (parts 2 & 3, Japan bootleg set 2)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mjelct3blb, mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_mjelct3,  ROT180, "bootleg",                   "Mahjong Electron Base (parts 2 & 3, Japan bootleg set 3)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, majxtal7,   7jigen,   neruton,    majxtal7, dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax",                     "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // reuses a subset of 7jigen assets
 GAME( 1990, neruton,    0,        neruton,    neruton,  dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro",  "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, nerutona,   neruton,  neruton,    nerutona, dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro",  "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

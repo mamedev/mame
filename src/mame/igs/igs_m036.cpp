@@ -445,12 +445,54 @@ ROM_START( lhfy )
 	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
 	ROM_LOAD( "v-206cn.u19", 0x000000, 0x800000, CRC(f7990ed4) SHA1(e8a72bc0926911ba5c079b02dd324ac060e8c768) ) // same as lhzbgqb
 
-	ROM_REGION( 0x10000000, "gfx", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000000, "gfx", 0 )
 	// 4x 64MB flash ROMs (U1, U2, U3, U4) mounted onto a custom SODIMM at CN1 with a sticker "CG V206CN"
-	ROM_LOAD( "cg_v206cn.u1", 0x0000000, 0x4000000, NO_DUMP )
-	ROM_LOAD( "cg_v206cn.u2", 0x4000000, 0x4000000, NO_DUMP )
-	ROM_LOAD( "cg_v206cn.u3", 0x8000000, 0x4000000, NO_DUMP )
-	ROM_LOAD( "cg_v206cn.u4", 0xc000000, 0x4000000, NO_DUMP )
+	ROM_LOAD( "cg_v206cn.u1", 0x0000000, 0x4000000, CRC(6abd4a31) SHA1(6c5eefc3671c4192a689cb1e82605e65fec44384) )
+	ROM_LOAD( "cg_v206cn.u2", 0x4000000, 0x4000000, CRC(b37e94b2) SHA1(da9e8b38070412a1b4057ddaf1df65878f3e135a) )
+	ROM_LOAD( "cg_v206cn.u3", 0x8000000, 0x4000000, CRC(b379503c) SHA1(fc7d5c4afcef6a7448cc6547fa73e51378a67b3d) )
+	ROM_LOAD( "cg_v206cn.u4", 0xc000000, 0x4000000, CRC(f96be9f1) SHA1(fe957af2e31007b570c4f4b707400a87be1b4301) )
+ROM_END
+
+
+// 欢乐斗地主 (Huānlè Dòu Dìzhǔ)
+ROM_START( hlddz )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "hlddz_igs036", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-104cn.u11", 0x000000, 0x200000, CRC(abc11224) SHA1(cf8119ac6bb75e63da716d643d89619f8f6cd017) )
+
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "v-104cn.u19", 0x000000, 0x800000, CRC(4c2a0c14) SHA1(d98c852273795701a723f4daf7697811acf6e2ff) )
+
+	ROM_REGION( 0x10000000, "gfx", 0 )
+	// 4x 64MB flash ROMs (U1, U2, U3, U4) mounted onto a custom SODIMM at CN1 with a sticker "CG V-104CN"
+	ROM_LOAD( "cg_v-104cn.u1", 0x0000000, 0x4000000, CRC(2b00c8b8) SHA1(6dced939047dd142e75ae6efb1f3cb3ac5188db7) )
+	ROM_LOAD( "cg_v-104cn.u2", 0x4000000, 0x4000000, CRC(42bad72d) SHA1(0a821ed89201b7e14d4ccc93fe2967e60773fb3c) )
+	ROM_LOAD( "cg_v-104cn.u3", 0x8000000, 0x4000000, CRC(b58b4b10) SHA1(d9df10fcb182dc2b01a3b73ac402288facf4eaea) )
+	ROM_LOAD( "cg_v-104cn.u4", 0xc000000, 0x4000000, CRC(c9895b0c) SHA1(532f859d431ab84903485c7c5918529614ea4fe8) )
+ROM_END
+
+
+// 终极斗地主 (Zhōngjí Dòu Dìzhǔ)
+ROM_START( zjddz )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "zjddz_igs036", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-204cn.u11", 0x000000, 0x200000, CRC(c6043975) SHA1(5b7a867e0e3023b831abf35f84f3f60b9ae0e41c) )
+
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "v-204cn.u19", 0x000000, 0x800000, CRC(4c2a0c14) SHA1(d98c852273795701a723f4daf7697811acf6e2ff) )
+
+	ROM_REGION( 0x10000000, "gfx", 0 )
+	// 4x 64MB flash ROMs (U1, U2, U3, U4) mounted onto a custom SODIMM at CN1 with a sticker "CG V-204CN"
+	ROM_LOAD( "cg_v-204cn.u1", 0x0000000, 0x4000000, CRC(2b00c8b8) SHA1(6dced939047dd142e75ae6efb1f3cb3ac5188db7) ) // same as hlddz
+	ROM_LOAD( "cg_v-204cn.u2", 0x4000000, 0x4000000, CRC(42bad72d) SHA1(0a821ed89201b7e14d4ccc93fe2967e60773fb3c) ) // "
+	ROM_LOAD( "cg_v-204cn.u3", 0x8000000, 0x4000000, CRC(b58b4b10) SHA1(d9df10fcb182dc2b01a3b73ac402288facf4eaea) ) // "
+	ROM_LOAD( "cg_v-204cn.u4", 0xc000000, 0x4000000, CRC(c9895b0c) SHA1(532f859d431ab84903485c7c5918529614ea4fe8) ) // "
 ROM_END
 
 
@@ -821,6 +863,10 @@ GAME( 200?, xydn,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<xyd
 GAME( 2010, mjzhizun, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<mjzhizun_key>, ROT0, "IGS",           "Majiang Zhizun (S100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2010, lhfy,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhfy_key>,     ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 20??, hlddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036,          ROT0, "IGS",           "Huanle Dou Dizhu (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 2010, zjddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<zjddz_key>,    ROT0, "IGS",           "Zhongji Dou Dizhu (V204CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhzbgqb_key>,  ROT0, "IGS",           "Long Hu Zheng Ba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

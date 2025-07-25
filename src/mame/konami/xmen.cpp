@@ -251,12 +251,11 @@ uint32_t xmen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase + 1, cliprect); // note the '+1' in the background color!
+
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
-	/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
-	pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
 	m_k053246->k053247_sprites_draw(bitmap, cliprect);
 	return 0;
 }
@@ -329,12 +328,11 @@ void xmen6p_state::screen_vblank(int state)
 
 		m_screen->priority().fill(0, cliprect);
 		renderbitmap.fill(16 * bg_colorbase + 1, cliprect); // note the '+1' in the background color!
+
 		m_k052109->tilemap_draw(*m_screen, renderbitmap, cliprect, layer[0], 0, 1);
 		m_k052109->tilemap_draw(*m_screen, renderbitmap, cliprect, layer[1], 0, 2);
 		m_k052109->tilemap_draw(*m_screen, renderbitmap, cliprect, layer[2], 0, 4);
 
-		/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
-		pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
 		m_k053246->k053247_sprites_draw(renderbitmap, cliprect);
 	}
 }

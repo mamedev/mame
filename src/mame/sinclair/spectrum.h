@@ -122,6 +122,7 @@ protected:
 	u8 m_border4t_render_at = 0;
 	/* Defines offset in CPU cycles from screen left side. Early model (48/128/+2) typically use -1, later (+2A/+3) +1 */
 	s8 m_contention_offset = -1;
+	bool m_is_m1_rd_contended = false;
 	u64 m_int_at;
 
 	uint8_t pre_opcode_fetch_r(offs_t offset);
@@ -133,7 +134,9 @@ protected:
 	virtual bool is_vram_write(offs_t offset);
 	void content_early(s8 shift = 0);
 	void content_late();
+	virtual u8* snow_pattern1_base(u8 i_reg);
 
+	void spectrum_refresh_w(offs_t offset, uint8_t data);
 	void spectrum_nomreq(offs_t offset, uint8_t data);
 	void spectrum_ula_w(offs_t offset, uint8_t data);
 	uint8_t spectrum_ula_r(offs_t offset);
