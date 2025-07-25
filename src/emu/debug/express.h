@@ -82,7 +82,10 @@ public:
 		INVALID_MEMORY_SPACE,
 		NO_SUCH_MEMORY_SPACE,
 		INVALID_MEMORY_NAME,
-		MISSING_MEMORY_NAME
+		MISSING_MEMORY_NAME,
+		SRCDBG_UNAVAILABLE,
+		SRCDBG_FILE_UNAVAILABLE,
+		SRCDBG_FILE_LINE_UNAVAILABLE
 	};
 
 	// construction/destruction
@@ -138,6 +141,7 @@ public:
 	virtual bool is_lval() const = 0;
 	virtual u64 value() const = 0;
 	virtual void set_value(u64 newvalue) = 0;
+	virtual bool is_in_scope() const { return true; }
 
 protected:
 	// internal state
@@ -172,12 +176,30 @@ public:
 	};
 
 	// Identifies the type of symbols stored in this table.  These help symlist create
-	// useful output
+	// useful output, and affect some functionality (e.g., enabling users to skip
+	// source-level symbols in case of collisions).
 	enum table_type
 	{
+		SRCDBG_LOCALS,     // Source-level debugging local variables
+		SRCDBG_GLOBALS,    // Source-level debugging global variables
 		CPU_STATE,         // CPU registers, etc.
 		BUILTIN_GLOBALS,   // Built-in MAME global symbols (e.g., beamx, beamy, frame, etc.)
 						   // (also used for tables outside debugger: lua scripts, cheat engine)
+	};
+
+	class local_range_expression
+	{
+	public:
+		local_range_expression(std::pair<offs_t,offs_t> && address_range, std::string && expression)
+			: m_address_range(std::move(address_range))
+			, m_expression(std::move(expression))
+		{}
+		const std::pair<offs_t,offs_t> & address_range() const { return m_address_range; };
+		const std::string & expression() const { return m_expression; };
+
+	private:
+		std::pair<offs_t,offs_t> m_address_range;
+		std::string m_expression;
 	};
 
 	// construction/destruction
@@ -187,7 +209,7 @@ public:
 	const std::unordered_map<std::string, std::unique_ptr<symbol_entry>> &entries() const { return m_symlist; }
 	table_type type() const { return m_type; }
 	symbol_table *parent() const { return m_parent; }
-	running_machine &machine() { return m_machine; }
+	running_machine &machine() const { return m_machine; }
 
 	// setters
 	void set_memory_modified_func(memory_modified_func modified);
@@ -197,8 +219,10 @@ public:
 	symbol_entry &add(const char *name, u64 constvalue);
 	symbol_entry &add(const char *name, getter_func getter, setter_func setter = nullptr, const std::string &format_string = "");
 	symbol_entry &add(const char *name, int minparams, int maxparams, execute_func execute);
+	symbol_entry &add(const char *name, symbol_table::getter_func get_pc, const std::vector<std::pair<offs_t,offs_t>> & scope_ranges, u64 value);
+	symbol_entry &add(const char *name, symbol_table::getter_func get_pc, const std::vector<local_range_expression> & scoped_values);
 	symbol_entry *find(const char *name) const { if (name) { auto search = m_symlist.find(name); if (search != m_symlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
-	symbol_entry *find_deep(const char *name);
+	symbol_entry *find_deep(const char *name, bool skip_srcdbg = false);
 
 	// value getter/setter
 	u64 value(const char *symbol);
@@ -363,6 +387,7 @@ private:
 	void parse_number(parse_token &token, const char *string, int base, expression_error::error_code errcode);
 	void parse_quoted_char(parse_token &token, const char *&string);
 	void parse_quoted_string(parse_token &token, const char *&string);
+	void parse_source_file_position(parse_token &token, const char *&string);
 	void parse_memory_operator(parse_token &token, const char *string, bool disable_se);
 	void normalize_operator(parse_token &thistoken, parse_token *prevtoken, parse_token *nexttoken, const std::list<parse_token> &stack, bool was_rparen);
 	void infix_to_postfix();

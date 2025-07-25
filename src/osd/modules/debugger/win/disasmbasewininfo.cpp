@@ -36,15 +36,15 @@ disasmbasewin_info::disasmbasewin_info(debugger_windows_interface &debugger, boo
 	}
 
 	// create the options menu
-	HMENU const optionsmenu = CreatePopupMenu();
-	AppendMenu(optionsmenu, MF_ENABLED, ID_TOGGLE_BREAKPOINT, TEXT("Toggle breakpoint at cursor\tF9"));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_DISABLE_BREAKPOINT, TEXT("Disable breakpoint at cursor\tShift+F9"));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_RUN_TO_CURSOR, TEXT("Run to cursor\tF4"));
-	AppendMenu(optionsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_SHOW_RAW, TEXT("Raw opcodes\tCtrl+R"));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_SHOW_ENCRYPTED, TEXT("Encrypted opcodes\tCtrl+E"));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_SHOW_COMMENTS, TEXT("Comments\tCtrl+N"));
-	AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)optionsmenu, TEXT("Options"));
+	m_optionsmenu = CreatePopupMenu();
+	AppendMenu(m_optionsmenu, MF_ENABLED, ID_TOGGLE_BREAKPOINT, TEXT("Toggle breakpoint at cursor\tF9"));
+	AppendMenu(m_optionsmenu, MF_ENABLED, ID_DISABLE_BREAKPOINT, TEXT("Disable breakpoint at cursor\tShift+F9"));
+	AppendMenu(m_optionsmenu, MF_ENABLED, ID_RUN_TO_CURSOR, TEXT("Run to cursor\tF4"));
+	AppendMenu(m_optionsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
+	AppendMenu(m_optionsmenu, MF_ENABLED, ID_SHOW_RAW, TEXT("Raw opcodes\tCtrl+R"));
+	AppendMenu(m_optionsmenu, MF_ENABLED, ID_SHOW_ENCRYPTED, TEXT("Encrypted opcodes\tCtrl+E"));
+	AppendMenu(m_optionsmenu, MF_ENABLED, ID_SHOW_COMMENTS, TEXT("Comments\tCtrl+N"));
+	AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)m_optionsmenu, TEXT("Options"));
 
 	// set up the view to track the initial expression
 	downcast<disasmview_info *>(m_views[expression_view_index()].get())->set_expression("curpc");
@@ -108,17 +108,26 @@ void disasmbasewin_info::update_menu()
 {
 	editwin_info::update_menu();
 
-	auto *const dasmview = downcast<disasmview_info *>(m_views[expression_view_index()].get());
+	disasmview_info *const dasmview = downcast<disasmview_info *>(m_views[expression_view_index()].get());
 	HMENU const menu = GetMenu(window());
 
-	bool const disasm_cursor_visible = dasmview->cursor_visible();
-	if (disasm_cursor_visible)
+	bool const cursor_visible = dasmview->cursor_visible();
+	if (cursor_visible)
 	{
-		offs_t const address = dasmview->selected_address();
-		device_debug *const debug = dasmview->source_device()->debug();
+		std::optional<offs_t> const addropt = dasmview->selected_address();
+		const debug_breakpoint *bp;
+		if (addropt.has_value())
+		{
+			offs_t address = addropt.value();
+			device_debug *const debug = dasmview->source_device()->debug();
 
-		// first find an existing breakpoint at this address
-		const debug_breakpoint *bp = debug->breakpoint_find(address);
+			// first find an existing breakpoint at this address
+			bp = debug->breakpoint_find(address);
+		}
+		else
+		{
+			bp = nullptr;
+		}
 
 		if (!bp)
 		{
@@ -142,8 +151,8 @@ void disasmbasewin_info::update_menu()
 		ModifyMenu(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND, ID_DISABLE_BREAKPOINT, TEXT("Disable breakpoint at cursor\tShift+F9"));
 		EnableMenuItem(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND | MF_GRAYED);
 	}
-	EnableMenuItem(menu, ID_TOGGLE_BREAKPOINT, MF_BYCOMMAND | (disasm_cursor_visible ? MF_ENABLED : MF_GRAYED));
-	EnableMenuItem(menu, ID_RUN_TO_CURSOR, MF_BYCOMMAND | (disasm_cursor_visible ? MF_ENABLED : MF_GRAYED));
+	EnableMenuItem(menu, ID_TOGGLE_BREAKPOINT, MF_BYCOMMAND | (cursor_visible ? MF_ENABLED : MF_GRAYED));
+	EnableMenuItem(menu, ID_RUN_TO_CURSOR, MF_BYCOMMAND | (cursor_visible ? MF_ENABLED : MF_GRAYED));
 
 	disasm_right_column const rightcol = dasmview->right_column();
 	CheckMenuItem(menu, ID_SHOW_RAW, MF_BYCOMMAND | (rightcol == DASM_RIGHTCOL_RAW ? MF_CHECKED : MF_UNCHECKED));
@@ -151,10 +160,18 @@ void disasmbasewin_info::update_menu()
 	CheckMenuItem(menu, ID_SHOW_COMMENTS, MF_BYCOMMAND | (rightcol == DASM_RIGHTCOL_COMMENTS ? MF_CHECKED : MF_UNCHECKED));
 }
 
+// Menu updates that rely on state provided from outside this class
+void disasmbasewin_info::enable_disasm_menu_options(bool enable)
+{
+	HMENU const menu = GetMenu(window());
+	EnableMenuItem(menu, ID_SHOW_RAW, MF_BYCOMMAND | (enable ? MF_ENABLED : MF_GRAYED));
+	EnableMenuItem(menu, ID_SHOW_ENCRYPTED, MF_BYCOMMAND | (enable ? MF_ENABLED : MF_GRAYED));
+	EnableMenuItem(menu, ID_SHOW_COMMENTS, MF_BYCOMMAND | (enable ? MF_ENABLED : MF_GRAYED));
+}
 
 bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 {
-	auto *const dasmview = downcast<disasmview_info *>(m_views[expression_view_index()].get());
+	disasmview_info *const dasmview = downcast<disasmview_info *>(m_views[expression_view_index()].get());
 
 	switch (HIWORD(wparam))
 	{
@@ -165,7 +182,12 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		case ID_TOGGLE_BREAKPOINT:
 			if (dasmview->cursor_visible())
 			{
-				offs_t const address = dasmview->selected_address();
+				std::optional<offs_t> const addropt = dasmview->selected_address();
+				if (!addropt.has_value())
+				{
+					return true;
+				}
+				offs_t address = addropt.value();
 				device_debug *const debug = dasmview->source_device()->debug();
 
 				// first find an existing breakpoint at this address
@@ -203,7 +225,12 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		case ID_DISABLE_BREAKPOINT:
 			if (dasmview->cursor_visible())
 			{
-				offs_t const address = dasmview->selected_address();
+				std::optional<offs_t> const addropt = dasmview->selected_address();
+				if (!addropt.has_value())
+				{
+					return true;
+				}
+				offs_t address = addropt.value();
 				device_debug *const debug = dasmview->source_device()->debug();
 
 				// first find an existing breakpoint at this address
@@ -232,7 +259,12 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		case ID_RUN_TO_CURSOR:
 			if (dasmview->cursor_visible())
 			{
-				offs_t const address = dasmview->selected_address();
+				std::optional<offs_t> const addropt = dasmview->selected_address();
+				if (!addropt.has_value())
+				{
+					return true;
+				}
+				offs_t address = addropt.value();
 				if (dasmview->source_is_visible_cpu())
 				{
 					std::string command;
@@ -263,6 +295,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		}
 		break;
 	}
+
 	return editwin_info::handle_command(wparam, lparam);
 }
 
