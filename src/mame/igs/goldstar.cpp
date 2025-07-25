@@ -20044,6 +20044,19 @@ ROM_START( cmast97i )  // D9503 DYNA
 	ROM_LOAD( "82s135.c9", 0x100, 0x100, CRC(191ebb09) SHA1(6a2a10baa3efec0ced95f8a43eabdf9988c7cdc7) )
 ROM_END
 
+ROM_START( jpknight )  // D9503 DYNA
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "jpk_11d.f10", 0x00000, 0x10000, CRC(78412601) SHA1(a2e2801ccfd767afbd915caa55bdfecf7138192e) )
+
+	ROM_REGION( 0x80000, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "jpk_1d.d9", 0x00000, 0x40000, CRC(620d041a) SHA1(b146acac5ddc163a78685b4cc2837422c7799206) )
+	ROM_RELOAD(            0x40000, 0x40000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // not dumped yet
+	ROM_LOAD( "82s135.c8",  0x000, 0x100, BAD_DUMP CRC(4b715969) SHA1(9429dc8698f4ff9195e5e975e62546b7b7e2f856) )
+	ROM_LOAD( "82s135.c9",  0x100, 0x100, BAD_DUMP CRC(85883486) SHA1(adcee60f6fc1e8a75c529951df9e5e1ee277e131) )
+ROM_END
+
 /*
   DYNA D9106C PCB:
   -Zilog Z0840006.
@@ -24271,6 +24284,7 @@ GAME(  1991, eldoraddoc, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_ini
 GAME(  1996, cmast97,    0,        cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 1)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // fix prom decode / palette
 GAME(  1996, cmast97a,   cmast97,  cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 2)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // fix prom decode / palette
 GAME(  1996, cmast97i,   cmast97,  cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna",              "Cheri Mondo '97 (V1.4I)",                     MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // fix prom decode / palette
+GAME(  1997, jpknight,   0,        cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna / R-Stone",    "Jackpot Knight (V1.1)",                       MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // fix prom decode / palette, check inputs
 GAME(  1999, cmast99,    0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
 GAME(  1999, cmast99b,   cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
 GAME(  1993, aplan,      0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
