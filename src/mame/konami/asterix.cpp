@@ -129,7 +129,7 @@ K056832_CB_MEMBER(asterix_state::tile_callback)
 uint32_t asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// layer offsets are different if horizontally flipped
-	if (m_k056832->read_register(0x0) & 0x10 && 1)
+	if (m_k056832->read_register(0x0) & 0x10)
 	{
 		m_k056832->set_layer_offs(0, -7 - 176, 0);
 		m_k056832->set_layer_offs(1, -5 - 176, 0);
