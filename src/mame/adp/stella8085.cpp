@@ -242,28 +242,29 @@ void stella8085_state::disp_w(uint8_t data)
 void stella8085_state::output_digit(uint8_t i, uint8_t data)
 {
     // Seven-segment encoding for digits 0-9 (abcdefg, no decimal point)
-    static const uint8_t bcd_to_7seg[16] = {
-        0x3F, // 0: 0b00111111
-        0x06, // 1: 0b00000110
-        0x5B, // 2: 0b01011011
-        0x4F, // 3: 0b01001111
-        0x66, // 4: 0b01100110
-        0x6D, // 5: 0b01101101
-        0x7D, // 6: 0b01111101
-        0x07, // 7: 0b00000111
-        0x7F, // 8: 0b01111111
-        0x6F, // 9: 0b01101111
-        0x00, // 10: blank
-        0x00, // 11: blank
-        0x00, // 12: blank
-        0x00, // 13: blank
-        0x00, // 14: blank
-        0x00  // 15: blank
-    };
+	static const uint8_t bcd_to_7seg[16] = {
+		0x3F, // 0: 0b00111111
+		0x06, // 1: 0b00000110
+		0x5B, // 2: 0b01011011
+		0x4F, // 3: 0b01001111
+		0x66, // 4: 0b01100110
+		0x6D, // 5: 0b01101101
+		0x7D, // 6: 0b01111101
+		0x07, // 7: 0b00000111
+		0x7F, // 8: 0b01111111
+		0x6F, // 9: 0b01101111
+
+    	0x77, // A: 0b01110111
+    	0x7C, // B: 0b01111100
+    	0x39, // C: 0b00111001
+    	0x5E, // D: 0b01011110
+    	0x79, // E: 0b01111001
+    	0x71  // F: 0b01110001
+	};
 
     if (i > 7) {
         uint8_t debug = data & 0x0F;
-		uint8_t cash = data & 0xF0;
+		uint8_t cash = data >> 4;
 
         m_digits[i - 8] = bcd_to_7seg[debug];
 		m_digits[i] = bcd_to_7seg[cash];
