@@ -81,6 +81,11 @@ private:
 	void small_program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
+	// I8256 ports
+	uint8_t lw_r(); //P1.0-P1.3
+	void machine1_w(uint8_t data);
+	void machine2_w(uint8_t data);
+
 	// I8279 Interface
 	uint8_t kbd_rl_r();
 	void kbd_sl_w(uint8_t data);
@@ -136,6 +141,30 @@ void stella8085_state::io_map(address_map &map)
 	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
 	// 0x73 SOMETHING write only, probably extra lamps
 	// map(0x80, 0x8f) //Y8 ICC5 empty socket
+	// map(0x9?, 0x9?) //Y9 wired to rtc circuits but somehow memory mapped in hardware
+}
+
+/*********************************************
+*      I8256 Ports controlling the wheels    *
+*                                            *
+*********************************************/
+
+uint8_t stella8085_state::lw_r()
+{
+	// SPIN!! :D
+	return 0x0F;
+}
+
+void stella8085_state::machine1_w(uint8_t data)
+{
+	// SPIN!! :D
+	;
+}
+
+void stella8085_state::machine2_w(uint8_t data)
+{
+	// SPIN!! :D
+	;
 }
 
 /*********************************************
@@ -503,6 +532,7 @@ void stella8085_state::dicemstr(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_map);
 
 	I8256(config, m_uart, 10.240_MHz_XTAL / 2); // divider not verified
+	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
 
 	I8279(config, m_kdc, 10.240_MHz_XTAL / 4); // divider not verified
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
@@ -525,6 +555,9 @@ void stella8085_state::doppelpot(machine_config &config)
 
 	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
+	m_uart->out_p2_callback().set(FUNC(stella8085_state::machine1_w));
+    m_uart->in_p1_callback().set(FUNC(stella8085_state::lw_r));
+    m_uart->out_p1_callback().set(FUNC(stella8085_state::machine2_w));
 
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
