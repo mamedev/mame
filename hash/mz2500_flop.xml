@@ -14,14 +14,15 @@ Dust Box: double click with space key to startup any item, later versions allows
 mouse by holding right button then press left.
 
 TODO:
-- [Missing] Hashire! Skyline / 走れ!スカイライン: heavy GFX artifacts;
 - [Missing] Orrbit 3 / オービット3: floppy issue makes it to throw a game over as soon as you start a game;
+- "Riglas (19xx)(Randam House).d88" (sic): "loading error", probably just bad (cfr. weird geometry on HxC);
+- "Wizardly (19xx)(Ascii).d88" (sic): Invalid image, throws error -2 in HxC;
 
 -->
 
 <softwarelist name="mz2500_flop" description="Sharp MZ-2500 disk images">
 
-<!-- !Game disks -->
+<!-- !Games -->
 
 	<software name="simulwar">
 		<description>Aoki Ookami to Shiroki Mejika - Simulation War Game</description>
@@ -58,11 +59,23 @@ TODO:
 	<software name="backtof">
 		<description>Back to the Future</description>
 		<year>1986</year>
-		<publisher>Pony / Data West</publisher>
+		<publisher>Pony Canyon / Data West</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="696736">
 				<rom name="back to the future.d88" size="696736" crc="f8f31c2c" sha1="544ca759503bbcea62b1574780ea40e90b234a11"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="balonfgt" supported="yes">
+		<description>Balloon Fight</description>
+		<year>1985</year>
+		<publisher>Hudson Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="71792">
+				<rom name="balloon fight.d88" size="71792" crc="89ef19e2" sha1="12954ef1388fd078ef67e457650633a3162cdd67"/>
 			</dataarea>
 		</part>
 	</software>
@@ -110,6 +123,21 @@ TODO:
 		</part>
 	</software>
 
+	<software name="f2gp" supported="yes">
+		<description>F2 Grand Prix</description>
+		<year>1985</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<info name="alt_title" value="F2グランプリ"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1706757">
+				<!-- baddump: converted from .d88 thru HxC (which causes a strong crash in d88_format::load) -->
+				<!-- contains 373+87 bad sectors (protection?), seems to have non-factory times too ... -->
+				<rom name="f2 grand prix (19xx)(carry lab).mfi" size="1706757" crc="c522a8b7" sha1="a4afe9cfd1df86f46846ffa219acb2e249749a03" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="firecrys">
 		<description>The Fire Crystal</description>
 		<year>198?</year>
@@ -118,6 +146,19 @@ TODO:
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="692656">
 				<rom name="fire crystal.d88" size="692656" crc="81b3c897" sha1="984158e6157d44ff31748921b47f71be72c8f731"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaga" supported="yes">
+		<description>Galaga</description>
+		<!-- shows original 1981 release on title screen -->
+		<year>1985?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="ギャラガ" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="205504">
+				<rom name="galaga (19xx)(dempa).d88" size="205504" crc="10db6fc6" sha1="e160071c47368d77cceab60e5fc580cd34bb44c0" />
 			</dataarea>
 		</part>
 	</software>
@@ -131,6 +172,25 @@ TODO:
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
 				<rom name="disk.d88" size="697008" crc="8047e60c" sha1="37b70478bf8d87ee7660cf4c85b781fb7c67065a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hashires" supported="no">
+		<description>Hashire! Skyline (V1.2A)</description>
+		<year>198?</year>
+		<!-- Compaq? -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Missing blink effect on title screen
+Requires [GVRAM] layer split emulation (currently repeating horizon)
+Cannot steer, does it require an analog joystick?
+]]></notes>
+		<info name="alt_title" value="走れ!スカイライン"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="hashire_skyline.d88" size="697008" crc="897257a1" sha1="916332d226a7e2fe60613b46d003c5de196bb8e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -166,6 +226,18 @@ TODO:
 		</part>
 	</software>
 
+	<software name="kingflap" supported="yes">
+		<description>King Flappy</description>
+		<year>1985</year>
+		<publisher>デービーソフト (dB-Soft)</publisher>
+		<info name="alt_title" value="キングフラッピー"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="701360">
+				<rom name="king flappy (19xx)(db-soft).d88" size="701360" crc="73e299d7" sha1="33f9247dd762080f9d7f57ebfd14362217b46c6e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kitahei">
 		<description>Kitahei</description>
 		<year>198?</year>
@@ -191,6 +263,18 @@ Old note: hangs at title screen due of a PIT bug (timer irq dies)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="731856">
 				<rom name="laydock.d88" size="731856" crc="b0304955" sha1="408550668abb3a0fa0a46f2375c10c7411dbeca1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lizard">
+		<description>Lizard</description>
+		<year>1985</year>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<info name="alt_title" value="リザード"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="lizard (1985)(xtal soft).d88" size="697008" crc="209c6e17" sha1="c3c1bf7b53f17a6e3ae4c93f2e478acc2db45332"/>
 			</dataarea>
 		</part>
 	</software>
@@ -235,6 +319,44 @@ Old note: doesn't load if you try to run it directly, it does if you load anothe
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="805728">
 				<rom name="marchen veil.d88" size="805728" crc="4919dd5e" sha1="8e499527610c9bfe00bf12b33c683d5b01275da6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvels" supported="no">
+		<description>Marvelous</description>
+		<year>1986?</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<notes><![CDATA[
+Inconsistent [keyboard] inputs
+]]></notes>
+		<info name="alt_title" value="マーベラス"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="705712">
+				<rom name="marvelous (19xx)(datawest).d88" size="705712" crc="cec0076f" sha1="ac5d71c0ea0ff0ca93f420be1fb4f97846b051e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mclown" supported="partial">
+		<description>Meurtre d'un Clown - Dokeshi Satsujin Jiken</description>
+		<year>1985?</year>
+		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
+		<notes><![CDATA[
+Title screen looks incorrect (verify), also has inconsistent blood animation, randomly doesn't appear
+]]></notes>
+
+		<info name="alt_title" value="道化師殺人事件" />
+		<!-- TODO: pc98:mclown shows these with Disk A/B, verify label for both -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="692656">
+				<rom name="doukeshi satsujin jiken (19xx)(thinking rabbit)(disk 1).d88" size="692656" crc="dc190b39" sha1="819aeae25ec311233e65d3aa03896c2e798a7c84" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="doukeshi satsujin jiken (19xx)(thinking rabbit)(disk 2).d88" size="697008" crc="30dd1b0c" sha1="c5d2c39952a0d1479a6a94c59796b7d8a98ef517" />
 			</dataarea>
 		</part>
 	</software>
@@ -379,6 +501,25 @@ Incorrect layout on track 1 head 0, expected_size=100000, current_size=135872
 		</part>
 	</software>
 
+	<software name="rebirth">
+		<description>Re-Birth</description>
+		<year>1986?</year>
+		<publisher>SPS</publisher>
+
+		<info name="alt_title" value="リバース"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="831136">
+				<rom name="re-birth (19xx)(sps)(disk 1).d88" size="831136" crc="4ae8e09e" sha1="24066c13c9e66befb9f0dd05c29c44a13b00eec4"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="830992">
+				<rom name="re-birth (19xx)(sps)(disk 2).d88" size="830992" crc="1993ce8d" sha1="4ddd93767a75af2ad3850dfd39f8e22862b25585"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="relics" supported="partial">
 		<description>Relics</description>
 		<year>198?</year>
@@ -394,19 +535,30 @@ Cuts off top of player jumps with first capture (verify)
 		</part>
 	</software>
 
-	<software name="soundgal" supported="no">
-		<description>Sound Gal Music Editor (v1.0A)</description>
-		<year>1986</year>
-		<publisher>EA-Z Communication</publisher>
-		<notes><![CDATA[
-Moans about missing Master Disk after title screen
-]]></notes>
-
+	<software name="sangoku">
+		<description>Sangokushi (Ver 3.2 05-Mar-1987)</description>
+		<year>1987</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="三国志" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="544560">
-				<rom name="sound gal.d88" size="544560" crc="b97b4d57" sha1="d1463b3cf1a5bd769a7cd68d1b3f748c4014984a"/>
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="697008">
+				<rom name="sangokushi (1985)(koei)(disk a).d88" size="697008" crc="d1680ced" sha1="43e709c341dfb6ddf51482e071abcbf3f967f2a9" />
 			</dataarea>
 		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="761008">
+				<rom name="sangokushi (1985)(koei)(disk b).d88" size="761008" crc="bc3dd8ad" sha1="317ed8f7278f34607f17dddd2cdd2a8daaee1753" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="761008">
+				<rom name="sangokushi (1985)(koei)(disk c).d88" size="761008" crc="381f7b8a" sha1="f1875f92fd17d673fb633f39343269b6b7794bc9" />
+			</dataarea>
+		</part>
+
 	</software>
 
 	<software name="druaga">
@@ -503,6 +655,7 @@ Moans about missing Master Disk after title screen
 	</software>
 
 	<!-- NOTE: using left to right for listing in notes -->
+	<!-- TODO: romaji-ize entries denoted with triple question mark -->
 
 	<software name="dustbx01" supported="partial">
 		<description>Dust Box Vol. 1 - '90/4</description>
@@ -514,7 +667,6 @@ Vector: doesn't upload [PCG] if run first (works by loading Columns first), miss
 Free Basket Ball:
 Chack N Kun no Koubou:
 ]]></notes>
-
 		<info name="usage" value="Incompatible with MZ-1E30 bios 0 (crashes at startup)" />
 
 		<part name="flop1" interface="floppy_3_5">
@@ -909,6 +1061,21 @@ Hangs randomly after you set date and time, sometimes it loads properly
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
 				<rom name="personal cpm.d88" size="697008" crc="e33d828d" sha1="ca3b4a9950da0b79755389ced851a57b618e9f65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soundgal" supported="no">
+		<description>Sound Gal Music Editor (v1.0A)</description>
+		<year>1986</year>
+		<publisher>EA-Z Communication</publisher>
+		<notes><![CDATA[
+Moans about missing Master Disk after title screen
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="544560">
+				<rom name="sound gal.d88" size="544560" crc="b97b4d57" sha1="d1463b3cf1a5bd769a7cd68d1b3f748c4014984a"/>
 			</dataarea>
 		</part>
 	</software>

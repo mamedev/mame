@@ -256,248 +256,150 @@ const uint8_t cdicdic_device::s_sector_scramble[2448] =
 //  MEMBER FUNCTIONS
 //**************************************************************************
 
+int16_t clip_int16(int32_t sample) {
+	if (sample < -32768)
+		return -32768;
+	else if (sample > 32767)
+		return 32767;
+	return sample;
+}
+
+inline void rotate_samples(int16_t val, int16_t& a, int16_t& b, int16_t& output) {
+	b = a;
+	a = val;
+	output = a;
+}
+void cdicdic_device::decode_xa_unit(const uint8_t param, int16_t sample, int16_t& sample0, int16_t& sample1, int16_t& out_buffer)
+{
+	const int16_t* filter = s_xa_filter_coef[(param >> 4) & 3];
+	uint8_t range = (param & 0xf);
+	sample = (sample>>range) + ((filter[0] * sample0 + filter[1] * sample1 + 128) >> 8);
+
+	//int16_t sample16 = clip_int16(sample);
+	rotate_samples(sample, sample0, sample1, out_buffer);
+}
+
 void cdicdic_device::decode_xa_mono(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp)
 {
-	int16_t l0 = cdic_xa_last[0];
-	int16_t l1 = cdic_xa_last[1];
-
 	for (int32_t b = 0; b < 18; b++)
 	{
 		for (int32_t s = 0; s < 4; s++)
 		{
 			uint8_t flags = xa[4 + (s << 1)];
-			uint8_t shift = flags & 0xf;
-			uint8_t filter = (flags >> 4) & 3;
-			int16_t f0 = s_xa_filter_coef[filter][0];
-			int16_t f1 = s_xa_filter_coef[filter][1];
 
 			for (int32_t i = 0; i < 28; i++)
 			{
+				//int16_t sample = ((*data) & 0xf) << 12;
 				int16_t d = (xa[16 + (i << 2) + s] & 0xf) << 12;
-				d = (d >> shift) + (((l0 * f0) + (l1 * f1) + 128) >> 8);
-				*dp = d;
+				decode_xa_unit(flags, d, cdic_xa_last[0], cdic_xa_last[1], dp[0]);
 				dp++;
-				l1 = l0;
-				l0 = d;
 			}
 
 			flags = xa[5 + (s << 1)];
-			shift = flags & 0xf;
-			filter = flags >> 4;
-			f0 = s_xa_filter_coef[filter][0];
-			f1 = s_xa_filter_coef[filter][1];
 
 			for (int32_t i = 0; i < 28; i++)
 			{
+				//int16_t sample = (*data >> 4) << 12;
 				int16_t d = (xa[16 + (i << 2) + s] >> 4) << 12;
-				d = (d >> shift) + (((l0 * f0) + (l1 * f1) + 128) >> 8);
-				*dp = d;
+				decode_xa_unit(flags, d, cdic_xa_last[0], cdic_xa_last[1], dp[0]);
 				dp++;
-				l1 = l0;
-				l0 = d;
 			}
 		}
 
 		xa += 128;
 	}
-
-	cdic_xa_last[0] = l0;
-	cdic_xa_last[1] = l1;
 }
 
-void cdicdic_device::decode_xa_mono8(int16_t *cdic_xa_last, const unsigned char *xa, signed short *dp)
+void cdicdic_device::decode_xa_mono8(int16_t *cdic_xa_last, const uint8_t *xa, int16_t*dp)
 {
-	int16_t l0 = cdic_xa_last[0];
-	int16_t l1 = cdic_xa_last[1];
-
 	for (int32_t b = 0; b < 18; b++)
 	{
 		for (int32_t s = 0; s < 4; s++)
 		{
 			uint8_t flags = xa[4 + s];
-			uint8_t shift = flags & 0xf;
-			uint8_t filter = (flags >> 4) & 3;
-			int16_t f0 = s_xa_filter_coef[filter][0];
-			int16_t f1 = s_xa_filter_coef[filter][1];
-
 			for (int32_t i = 0; i < 28; i++)
 			{
 				int16_t d = (xa[16 + (i << 2) + s] << 8);
-				d = (d >> shift) + (((l0 * f0) + (l1 * f1) + 128) >> 8);
-				*dp = d;
+				decode_xa_unit(flags, d, cdic_xa_last[0], cdic_xa_last[1], dp[0]);
 				dp++;
-				l1 = l0;
-				l0 = d;
 			}
 		}
 
 		xa += 128;
 	}
-
-	cdic_xa_last[0] = l0;
-	cdic_xa_last[1] = l1;
 }
 
 void cdicdic_device::decode_xa_stereo(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp)
 {
-	int16_t l0 = cdic_xa_last[0];
-	int16_t l1 = cdic_xa_last[1];
-	int16_t l2 = cdic_xa_last[2];
-	int16_t l3 = cdic_xa_last[3];
-
 	for (int32_t b = 0; b < 18; b++)
 	{
 		for (int32_t s = 0; s < 4; s++)
 		{
 			uint8_t flags0 = xa[4 + (s << 1)];
-			uint8_t shift0 = flags0 & 0xf;
-			uint8_t filter0 = (flags0 >> 4) & 3;
 			uint8_t flags1 = xa[5 + (s << 1)];
-			uint8_t shift1 = flags1 & 0xf;
-			uint8_t filter1 = (flags1 >> 4) & 3;
-
-			int16_t f0 = s_xa_filter_coef[filter0][0];
-			int16_t f1 = s_xa_filter_coef[filter0][1];
-			int16_t f2 = s_xa_filter_coef[filter1][0];
-			int16_t f3 = s_xa_filter_coef[filter1][1];
 
 			for (int32_t i = 0; i < 28; i++)
 			{
 				int16_t d = xa[16 + (i << 2) + s];
 				int16_t d0 = (d & 0xf) << 12;
-				int16_t d1 = (d >> 4) << 12;
-				d0 = (d0 >> shift0) + (((l0 * f0) + (l1 * f1) + 128) >> 8);
-				*dp = d0;
+				decode_xa_unit(flags0, d0, cdic_xa_last[0], cdic_xa_last[1], dp[0]);
 				dp++;
-				l1 = l0;
-				l0 = d0;
 
-				d1 = (d1 >> shift1) + (((l2 * f2) + (l3 * f3) + 128) >> 8);
-				*dp = d1;
+				int16_t d1 = (d >> 4) << 12;
+				decode_xa_unit(flags1, d1, cdic_xa_last[2], cdic_xa_last[3], dp[0]);
 				dp++;
-				l3 = l2;
-				l2 = d1;
 			}
 		}
 
 		xa += 128;
 	}
-
-	cdic_xa_last[0] = l0;
-	cdic_xa_last[1] = l1;
-	cdic_xa_last[2] = l2;
-	cdic_xa_last[3] = l3;
 }
 
 void cdicdic_device::decode_xa_stereo8(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp)
 {
-	int16_t l0 = cdic_xa_last[0];
-	int16_t l1 = cdic_xa_last[1];
-	int16_t l2 = cdic_xa_last[2];
-	int16_t l3 = cdic_xa_last[3];
-
 	for (int32_t b = 0; b < 18; b++)
 	{
 		for (int32_t s = 0; s < 4; s += 2)
 		{
 			uint8_t flags0 = xa[4 + s];
-			uint8_t shift0 = flags0 & 0xf;
-			uint8_t filter0 = (flags0 >> 4) & 3;
 			uint8_t flags1 = xa[5 + s];
-			uint8_t shift1 = flags1 & 0xf;
-			uint8_t filter1 = (flags1 >> 4) & 3;
-			int16_t f0 = s_xa_filter_coef[filter0][0];
-			int16_t f1 = s_xa_filter_coef[filter0][1];
-			int16_t f2 = s_xa_filter_coef[filter1][0];
-			int16_t f3 = s_xa_filter_coef[filter1][1];
 
 			for (int32_t i = 0; i < 28; i++)
 			{
 				int16_t d0 = (xa[16 + (i << 2) + s + 0] << 8);
+
+				decode_xa_unit(flags0, d0, cdic_xa_last[0], cdic_xa_last[1], dp[0]);
+				dp++;
+
 				int16_t d1 = (xa[16 + (i << 2) + s + 1] << 8);
-
-				d0 = (d0 >> shift0) + (((l0 * f0) + (l1 * f1) + 128) >> 8);
-				*dp = d0;
+				decode_xa_unit(flags1, d1, cdic_xa_last[2], cdic_xa_last[3], dp[0]);
 				dp++;
-				l1 = l0;
-				l0 = d0;
-
-				d1 = (d1 >> shift1) + (((l2 * f2) + (l3 * f3) + 128) >> 8);
-				*dp = d1;
-				dp++;
-				l3 = l2;
-				l2 = d1;
 			}
 		}
-
 		xa += 128;
 	}
-
-	cdic_xa_last[0] = l0;
-	cdic_xa_last[1] = l1;
-	cdic_xa_last[2] = l2;
-	cdic_xa_last[3] = l3;
 }
+
 
 void cdicdic_device::decode_8bit_xa_unit(int channel, uint8_t param, const uint8_t *data, int16_t *out_buffer)
 {
-	int gain_shift = 8 - (param & 0xf);
-
-	const int16_t *filter = s_xa_filter_coef[(param >> 4) & 3];
-	int16_t *old_samples = &m_xa_last[channel << 1];
-
+	int16_t* old_samples = &m_xa_last[channel << 1];
 	for (int i = 0; i < 28; i++)
 	{
-		int32_t sample = *data;
-		if (sample >= 128)
-			sample -= 256;
+		int16_t sample = (*data)<<8;
+		decode_xa_unit(param, sample, old_samples[0], old_samples[1], out_buffer[i]);
 		data += 4;
-
-		sample <<= gain_shift;
-
-		sample += (filter[0] * old_samples[0] + filter[1] * old_samples[1] + 128) / 256;
-
-		int16_t sample16 = (int16_t)sample;
-		if (sample < -32768)
-			sample16 = -32768;
-		else if (sample > 32767)
-			sample16 = 32767;
-
-		old_samples[1] = old_samples[0];
-		old_samples[0] = sample16;
-
-		out_buffer[i] = sample16;
 	}
 }
 
 void cdicdic_device::decode_4bit_xa_unit(int channel, uint8_t param, const uint8_t *data, uint8_t shift, int16_t *out_buffer)
 {
-	int gain_shift = 12 - (param & 0xf);
-
-	const int16_t *filter = s_xa_filter_coef[(param >> 4) & 3];
-	int16_t *old_samples = &m_xa_last[channel << 1];
-
+	int16_t* old_samples = &m_xa_last[channel << 1];
 	for (int i = 0; i < 28; i++)
 	{
-		int32_t sample = (*data >> shift) & 0xf;
-		if (BIT(sample, 3))
-			sample -= 16;
+		int16_t sample = ((*data >> shift) & 0xf)<<12;
+		decode_xa_unit(param, sample, old_samples[0], old_samples[1], out_buffer[i]);
 		data += 4;
-
-		sample <<= gain_shift;
-
-		sample += (filter[0] * old_samples[0] + filter[1] * old_samples[1] + 128) / 256;
-
-		int16_t sample16 = (int16_t)(uint16_t)(sample & 0xffff);
-		if (sample < -32768)
-			sample16 = -32768;
-		else if (sample > 32767)
-			sample16 = 32767;
-
-		old_samples[1] = old_samples[0];
-		old_samples[0] = sample16;
-
-		out_buffer[i] = sample16;
 	}
 }
 
@@ -516,8 +418,8 @@ void cdicdic_device::play_raw_group(const uint8_t *data)
 
 void cdicdic_device::play_xa_group(const uint8_t coding, const uint8_t *data)
 {
-	static const uint16_t s_4bit_header_offsets[8] = { 0, 1, 2, 3, 8, 9, 10, 11 };
-	static const uint16_t s_8bit_header_offsets[4] = { 0, 1, 2, 3 };
+	static const uint16_t s_4bit_header_offsets[8] = { 4, 5, 6, 7, 12, 13, 14, 15 };
+	static const uint16_t s_8bit_header_offsets[4] = { 4, 5, 6, 7 };
 	static const uint16_t s_4bit_data_offsets[8] = { 16, 16, 17, 17, 18, 18, 19, 19 };
 	static const uint16_t s_8bit_data_offsets[4] = { 16, 17, 18, 19 };
 

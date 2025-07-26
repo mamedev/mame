@@ -1524,6 +1524,17 @@ if (MACHINES["1MB5"]~=null) then
 end
 
 ---------------------------------------------------
+--@src/devices/machine/ds1307.h,MACHINES["I2C_DS1307"] = true
+---------------------------------------------------
+
+if (MACHINES["I2C_DS1307"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ds1307.cpp",
+		MAME_DIR .. "src/devices/machine/ds1307.h",
+	}
+end
+
+---------------------------------------------------
 --@src/devices/machine/i2chle.h,MACHINES["I2CHLE"] = true
 ---------------------------------------------------
 
@@ -2150,6 +2161,18 @@ if (MACHINES["M950X0"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/m950x0.cpp",
 		MAME_DIR .. "src/devices/machine/m950x0.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/macseconds.h,MACHINES["MACSECONDS"] = true
+---------------------------------------------------
+
+if (MACHINES["MACSECONDS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/macseconds.cpp",
+		MAME_DIR .. "src/devices/machine/macseconds.h",
 	}
 end
 
@@ -3908,6 +3931,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/votraxtnt.h,MACHINES["VOTRAXTNT"] = true
+---------------------------------------------------
+
+if (MACHINES["VOTRAXTNT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/votraxtnt.cpp",
+		MAME_DIR .. "src/devices/machine/votraxtnt.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/wd_fdc.h,MACHINES["WD_FDC"] = true
 ---------------------------------------------------
 
@@ -5380,5 +5415,21 @@ if (MACHINES["SCI4"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/sci4.cpp",
 		MAME_DIR .. "src/devices/machine/sci4.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/pl6_fpga.h,MACHINES["HEBER_PLUTO"] = true
+--@src/devices/machine/pl6_pic.h,MACHINES["HEBER_PLUTO"] = true
+---------------------------------------------------
+if (MACHINES["HEBER_PLUTO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pl6_fpga.cpp",
+		MAME_DIR .. "src/devices/machine/pl6_fpga.h",
+		MAME_DIR .. "src/devices/machine/pl6_pic.cpp",
+		MAME_DIR .. "src/devices/machine/pl6_pic.h",
+		MAME_DIR .. "src/devices/machine/pl6_exp.cpp",
+		MAME_DIR .. "src/devices/machine/pl6_exp.h",
 	}
 end

@@ -434,7 +434,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gakupara ) // DIP definitions and defaults verified with manual
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW2:1,2,3,4")
-	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 7C_1C ) )

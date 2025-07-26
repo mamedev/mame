@@ -546,13 +546,13 @@ static const gfx_layout spritelayout2 =
 };
 
 static GFXDECODE_START( gfx_senjyo )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 8 )    /*   0- 63 characters */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  64, 8 )    /*  64-127 background #1 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 128, 8 )    /* 128-191 background #2 */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 192, 8 )    /* 192-255 background #3 */
-	GFXDECODE_ENTRY( "gfx5", 0, spritelayout1,  320, 8 )    /* 320-383 normal sprites */
-	GFXDECODE_ENTRY( "gfx5", 0, spritelayout2,  320, 8 )    /* 320-383 large sprites */
-													/* 384-399 is background */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 8 ) //   0- 63 characters
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     64, 8 ) //  64-127 background #1
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,    128, 8 ) // 128-191 background #2
+	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,    192, 8 ) // 192-255 background #3
+	GFXDECODE_ENTRY( "gfx5", 0, spritelayout1, 320, 8 ) // 320-383 normal sprites
+	GFXDECODE_ENTRY( "gfx5", 0, spritelayout2, 320, 8 ) // 320-383 large sprites
+	//                                                  // 384-399 is background
 GFXDECODE_END
 
 
@@ -566,31 +566,28 @@ static const z80_daisy_config senjyo_daisy_chain[] =
 
 void senjyo_state::senjyo(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);   /* 4 MHz? */
+	// basic machine hardware
+	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_map);
 	m_maincpu->set_vblank_int("screen", FUNC(senjyo_state::irq0_line_assert));
 
-	z80_device& sub(Z80(config, "sub", 2000000));   /* 2 MHz? */
+	z80_device& sub(Z80(config, "sub", 4_MHz_XTAL / 2)); // 2 MHz?
 	sub.set_daisy_config(senjyo_daisy_chain);
 	sub.set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_sound_map);
 	sub.set_addrmap(AS_IO, &senjyo_state::senjyo_sound_io_map);
 
-	Z80PIO(config, m_pio, 2000000);
+	Z80PIO(config, m_pio, 4_MHz_XTAL / 2);
 	m_pio->out_int_callback().set_inputline("sub", INPUT_LINE_IRQ0);
 	m_pio->in_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 
-	z80ctc_device& ctc(Z80CTC(config, "z80ctc", 2000000 /* same as "sub" */));
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", 4_MHz_XTAL / 2 /* same as "sub" */));
 	ctc.intr_callback().set_inputline("sub", INPUT_LINE_IRQ0);
 	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
 	ctc.zc_callback<2>().set(FUNC(senjyo_state::dac_clock_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(senjyo_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_senjyo);
@@ -598,12 +595,12 @@ void senjyo_state::senjyo(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(1, &senjyo_state::IIBBGGRR, 512);
 	PALETTE(config, m_radar_palette, FUNC(senjyo_state::radar_palette), 2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	SN76489A(config, "sn1", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	SN76489A(config, "sn2", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	SN76489A(config, "sn3", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	SN76489A(config, "sn1", 4_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	SN76489A(config, "sn2", 4_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	SN76489A(config, "sn3", 4_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(m_pio, FUNC(z80pio_device::strobe_a)).invert();
@@ -613,11 +610,11 @@ void senjyo_state::senjyo(machine_config &config)
 }
 
 
-
 void senjyo_state::senjyox_e(machine_config &config)
 {
 	senjyo(config);
-	sega_315_5015_device &maincpu(SEGA_315_5015(config.replace(), m_maincpu, 4000000));   /* 4 MHz? */
+
+	sega_315_5015_device &maincpu(SEGA_315_5015(config.replace(), m_maincpu, 4_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_map);
 	maincpu.set_addrmap(AS_OPCODES, &senjyo_state::decrypted_opcodes_map);
 	maincpu.set_vblank_int("screen", FUNC(senjyo_state::irq0_line_assert));
@@ -627,7 +624,8 @@ void senjyo_state::senjyox_e(machine_config &config)
 void senjyo_state::senjyox_a(machine_config &config)
 {
 	senjyo(config);
-	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, 4000000));   /* 4 MHz? */
+
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, 4_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_map);
 	maincpu.set_addrmap(AS_OPCODES, &senjyo_state::decrypted_opcodes_map);
 	maincpu.set_vblank_int("screen", FUNC(senjyo_state::irq0_line_assert));
@@ -639,7 +637,7 @@ void senjyo_state::starforb(machine_config &config)
 {
 	senjyox_e(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &senjyo_state::starforb_map);
 
 	subdevice<z80_device>("sub")->set_addrmap(AS_PROGRAM, &senjyo_state::starforb_sound_map);
@@ -970,6 +968,7 @@ void senjyo_state::init_starforc()
 	m_is_senjyo = 0;
 	m_scrollhack = 1;
 }
+
 void senjyo_state::init_starfore()
 {
 	m_is_senjyo = 0;

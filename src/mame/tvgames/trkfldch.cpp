@@ -1622,6 +1622,12 @@ ROM_START( trkfldch )
 	ROM_LOAD( "trackandfield.bin", 0x000000, 0x400000,  CRC(f4f1959d) SHA1(344dbfe8df1897adf77da6e5ca0435c4d47d6842) )
 ROM_END
 
+ROM_START( trkfldchj )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "trackandfieldjap.u2", 0x000000, 0x400000, CRC(2badbbae) SHA1(8102a6166bda3de2b13a984c391ad05e15fbf7ce) )
+ROM_END
+
+
 ROM_START( my1stddr )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "myfirstddr.bin", 0x000000, 0x400000, CRC(2ef57bfc) SHA1(9feea5adb9de8fe17e915f3a037e8ddd70e58ae7) )
@@ -1737,13 +1743,19 @@ The following were also available (via the Download service?)
 
 
 CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",                                     "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// 走れ!とべ!投げろ! ハイパースポーツチャレンジ
+CONS( 2007, trkfldchj, trkfldch,   0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",                                     "Hashire! Tobe! Nagero! Hyper Sports Challenge (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
 CONS( 2006, my1stddr,  0,          0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",                                     "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
+
 CONS( 200?, abl4play,  0,          0,  trkfldch, abl4play,trkfldch_state,      empty_init,    "Advance Bright Ltd",                         "4 Player System - 10 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
 CONS( 200?, shtscore,  0,          0,  trkfldch, shtscore,trkfldch_state,      empty_init,    "Halsall / time4toys.com / Electronic Games", "Shoot n' Score", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
 CONS( 200?, lexitvsprt,0,          0,  trkfldch, lexi,    trkfldch_lexi_state, empty_init,    "Lexibook",                                   "TV Sports Plug & Play 5-in-1 (JG7000)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
 // don't have a picture of the box, title screen doesn't give a more complete title, I/O seems closer lexitvsprt
 CONS( 2007, senspid,   0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Senario",                                    "The Amazing Spider-Man (Senario, floor mat)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-
 
 // additional online content could be downloaded onto these if they were connected to a PC via USB
 CONS( 2008, teleshi,   0,          0,  trkfldch, konsb,   trkfldch_state,      empty_init,    "Konami",                                     "Teleshibai (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // テレしばい - this one is orange

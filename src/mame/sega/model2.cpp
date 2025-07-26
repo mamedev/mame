@@ -175,7 +175,7 @@ void model2_tgp_state::machine_start()
 {
 	model2_state::machine_start();
 
-	m_copro_fifo_in->setup(16,
+	m_copro_fifo_in->setup(8,
 						   [this]() { m_copro_tgp->stall(); },
 						   [this]() { m_copro_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
 						   [this]() { m_copro_tgp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
@@ -184,7 +184,7 @@ void model2_tgp_state::machine_start()
 						   [    ]() { },
 						   [    ]() { });
 
-	m_copro_fifo_out->setup(16,
+	m_copro_fifo_out->setup(8,
 							[this]() { m_maincpu->i960_stall(); },
 							[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
 							[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },

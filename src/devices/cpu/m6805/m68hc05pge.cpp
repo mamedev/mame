@@ -105,6 +105,7 @@ ROM_END
 m68hc05pge_device::m68hc05pge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int addrbits, address_map_constructor internal_map) :
 	m6805_base_device(mconfig, tag, owner, clock, type, {s_hc_b_ops, s_hc_cycles, 16, 0x00ff, 0x0040, 0xfffc}),
 	device_nvram_interface(mconfig, *this),
+	macseconds_interface(),
 	m_program_config("program", ENDIANNESS_BIG, 8, addrbits, 0, internal_map),
 	m_internal_ram(*this, "internal_ram"),
 	m_introm(*this, "bankfe00"),
@@ -182,19 +183,8 @@ void m68hc05pge_device::device_start()
 	m_keyscan_timer = timer_alloc(FUNC(m68hc05pge_device::keyscan_tick), this);
 
 	system_time systime;
-	struct tm cur_time;
 	machine().current_datetime(systime);
-
-	cur_time.tm_sec = systime.local_time.second;
-	cur_time.tm_min = systime.local_time.minute;
-	cur_time.tm_hour = systime.local_time.hour;
-	cur_time.tm_mday = systime.local_time.mday;
-	cur_time.tm_mon = systime.local_time.month;
-	cur_time.tm_year = systime.local_time.year - 1900;
-	cur_time.tm_isdst = 0;
-
-	// Add the difference in seconds between the Unix epoch (1/1/1970) and the Mac OS epoch (1/1/1904)
-	m_rtc = (u32)(mktime(&cur_time) + 2082844800);
+	m_rtc = get_local_seconds(systime);
 }
 
 void m68hc05pge_device::device_reset()

@@ -516,7 +516,7 @@ void dragon_state::dragon_base(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 
-	MC6847_PAL(config, m_vdg, 14.218_MHz_XTAL / 4);
+	MC6847(config, m_vdg, 14.218_MHz_XTAL / 4, true);
 	m_vdg->set_screen(m_screen);
 	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));
@@ -628,7 +628,7 @@ void dragon64_state::tanodr64(machine_config &config)
 	m_sam->set_clock(14.318181_MHz_XTAL);
 
 	// video hardware
-	MC6847_NTSC(config.replace(), m_vdg, 14.318181_MHz_XTAL / 4);
+	MC6847(config.replace(), m_vdg, 14.318181_MHz_XTAL / 4);
 	m_vdg->set_screen(m_screen);
 	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));

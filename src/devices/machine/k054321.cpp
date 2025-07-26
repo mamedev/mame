@@ -35,7 +35,7 @@
 
 #include <cmath>
 
-DEFINE_DEVICE_TYPE(K054321, k054321_device, "k054321", "K054321 Maincpu-Soundcpu interface")
+DEFINE_DEVICE_TYPE(K054321, k054321_device, "k054321", "Konami 054321 Maincpu-Soundcpu interface")
 
 void k054321_device::main_map(address_map &map)
 {

@@ -188,7 +188,7 @@ void mz800_state::mz800_io(address_map &map)
 	map(0xeb, 0xeb).w(FUNC(mz800_state::mz800_ramaddr_w));
 	map(0xf0, 0xf0).r(m_joy[0], FUNC(msx_general_purpose_port_device::read)).w(FUNC(mz800_state::mz800_palette_w));
 	map(0xf1, 0xf1).r(m_joy[1], FUNC(msx_general_purpose_port_device::read));
-	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489_device::write));
+	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489a_device::write));
 	map(0xfc, 0xff).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
@@ -382,12 +382,11 @@ void mz_state::mz700(machine_config &config)
 	TIMER(config, "other").configure_periodic(FUNC(mz_state::ne556_other_callback), attotime::from_hz(34.5));
 
 	/* devices */
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(XTAL(17'734'470)/20);
 	m_pit->out_handler<0>().set(FUNC(mz_state::pit_out0_changed));
-	m_pit->set_clk<1>(15611.0);
+	m_pit->set_clk<1>(XTAL(17'734'470)/2/568);
 	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
-	m_pit->set_clk<2>(0);
 	m_pit->out_handler<2>().set(FUNC(mz_state::pit_irq_2));
 
 	I8255(config, m_ppi);
@@ -426,7 +425,7 @@ void mz800_state::mz800(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(mz800_state::screen_update_mz800));
 
-	SN76489(config, "sn76489n", XTAL(17'734'470)/5).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489A(config, "sn76489n", XTAL(17'734'470)/5).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	config.device_remove("cass_list");
 	SOFTWARE_LIST(config, "cass_list").set_original("mz800_cass");

@@ -46,6 +46,7 @@ macro   wm16_sp %dd
 
 macro   rop
 	m_m1_cycles-2 !! TDAT8 = opcode_read();
+	// TODO based on ULA contention analyzes refresh must send already incremented R.
 	if (refresh_en)
 		m_refresh_cb((I << 8) | (R2 & 0x80) | (R & 0x7f), 0x00, 0xff);
 	+ 2
@@ -8921,6 +8922,7 @@ macro   ldix
 		@wm DE
 		;
 	}
+	+ 2
 	HL++;
 	DE++;
 	BC--;
@@ -8933,6 +8935,7 @@ macro   lddx
 		@wm DE
 		;
 	}
+	+ 2
 	DE++;
 	HL--;
 	BC--;
@@ -8983,33 +8986,40 @@ z80n:ed33	# add bc,a
 z80n:ed34	# add hl,**
 	@arg16 TDAT
 	HL += TDAT;
+	+ 2
 
 z80n:ed35	# add de,**
 	@arg16 TDAT
 	DE += TDAT;
+	+ 2
 
 z80n:ed36	# add bc,**
 	@arg16 TDAT
 	BC += TDAT;
+	+ 2
 
 z80n:ed8a	# push **
 	@arg
 	TDAT_H = TDAT_L;
 	@arg
 	@push TDAT
+	+ 3
 
 z80n:ed90	# outinb
 	@rm HL
 	@out BC
 	HL++;
+	+ 1
 
 z80n:ed91	# nextreg *,*
 	@arg16 TDAT
 	m_out_nextreg_cb(TDAT_L, TDAT_H);
+	+ 6
 
 z80n:ed92	# nextreg *,a
 	@arg
 	m_out_nextreg_cb(TDAT8, A);
+	+ 3
 
 z80n:ed93	# pixeldn
 	if (0x07 != (H & 0x07))
@@ -9028,6 +9038,7 @@ z80n:ed95	# setae
 z80n:ed98	# jp (c)
 	@in BC
 	PC = (PC & 0xc000) + (TDAT8 << 6);
+	+ 1
 
 z80n:eda4	# ldix
 	@ldix
@@ -9043,8 +9054,10 @@ z80n:edac	# lddx
 
 z80n:edb4	# ldirx
 	@ldix
-	if (BC != 0)
+	if (BC != 0) {
+		+ 5
 		PC -= 2;
+	}
 
 z80n:edb7	# ldpirx
 	@rm (HL & 0xfff8) + (E & 7)
@@ -9054,10 +9067,14 @@ z80n:edb7	# ldpirx
 	}
 	DE++;
 	BC--;
-	if (BC != 0)
+	if (BC != 0) {
+		+ 5
 		PC -= 2;
+	}
 
 z80n:edbc	# lddrx
 	@lddx
-	if (BC != 0)
+	if (BC != 0) {
+		+ 5
 		PC -= 2;
+	}

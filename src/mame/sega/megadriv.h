@@ -131,7 +131,8 @@ protected:
 	optional_shared_ptr<uint16_t> m_megadrive_ram;
 
 	genesis_z80_vars m_genz80;
-	int m_version_hi_nibble;
+	uint8_t m_version_hi_nibble;
+	uint8_t m_version_lo_nibble; // 0 = non-TMSS, 1 = TMSS
 
 	required_device_array<megadrive_io_port_device, 3> m_ioports;
 

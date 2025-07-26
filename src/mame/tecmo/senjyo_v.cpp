@@ -135,21 +135,25 @@ void senjyo_state::fgvideoram_w(offs_t offset, uint8_t data)
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
+
 void senjyo_state::fgcolorram_w(offs_t offset, uint8_t data)
 {
 	m_fgcolorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
+
 void senjyo_state::bg1videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg1videoram[offset] = data;
 	m_bg1_tilemap->mark_tile_dirty(offset);
 }
+
 void senjyo_state::bg2videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg2videoram[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
+
 void senjyo_state::bg3videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg3videoram[offset] = data;
@@ -181,11 +185,15 @@ void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		for (int x = 0;x < 256;x++)
 		{
 			if (flip)
+			{
 				for (int y = 0;y < 256;y++)
 					bitmap.pix(y, 255 - x) = m_palette->pen_color(384 + pen);
+			}
 			else
+			{
 				for (int y = 0;y < 256;y++)
 					bitmap.pix(y, x) = m_palette->pen_color(384 + pen);
+			}
 
 			count += 0x10;
 			if (count >= strwid)
@@ -231,11 +239,13 @@ void senjyo_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				big = (m_spriteram[offs] & 0x80);
 			else    /* Star Force */
 				big = ((m_spriteram[offs] & 0xc0) == 0xc0);
-			sx = m_spriteram[offs+3];
+
 			if (big)
 				sy = 224-m_spriteram[offs+2];
 			else
 				sy = 240-m_spriteram[offs+2];
+
+			sx = m_spriteram[offs+3];
 			flipx = m_spriteram[offs+1] & 0x40;
 			flipy = m_spriteram[offs+1] & 0x80;
 
@@ -255,7 +265,6 @@ void senjyo_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					sy = 242 - sy;
 				}
 			}
-
 
 			m_gfxdecode->gfx(big ? 5 : 4)->transpen(bitmap,cliprect,
 					m_spriteram[offs],

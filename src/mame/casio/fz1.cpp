@@ -19,6 +19,11 @@
 
     A good deal of hardware and programming info is available courtesy of Rainer Buchty:
     http://www.buchty.net/casio/
+
+    TODO:
+    - add mic & line in/cassette, connect to PCM hardware & filter
+    - audio input peak detection (connected to AN0)
+    - filters
 */
 
 #include "emu.h"
@@ -35,6 +40,8 @@
 #include "machine/msm6200.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
+#include "sound/flt_biquad.h"
+#include "sound/fz_pcm.h"
 #include "video/hd44352.h"
 
 #include "emupal.h"
@@ -54,6 +61,9 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
+		, m_pcm(*this, "pcm")
+		, m_filter(*this, "filter_%u", 1)
+		, m_line_out(*this, "line_out_%u", 1)
 		, m_ram(*this, "ram")
 		, m_ram_bank(*this, "ram_bank")
 		, m_io(*this, "io%u", 0u)
@@ -69,6 +79,9 @@ public:
 	void fz1(machine_config &config);
 	void fz10m(machine_config &config);
 	void fz20m(machine_config &config);
+
+	void mem_w(offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(offset, data); }
+	u8 mem_r(offs_t offset) { return m_maincpu->space(AS_PROGRAM).read_byte(offset); }
 
 	u8 fdc_irq_r() { return m_fdc->get_irq() ? 1 : 0; }
 	void fdc_control_w(u8 data);
@@ -98,6 +111,7 @@ private:
 
 	void gal_w(u8 data);
 	void led_w(u8 data);
+	void dca_w(offs_t offset, u8 data);
 
 	// main CPU / key MCU comm methods
 	u8 subcpu_r();
@@ -105,6 +119,10 @@ private:
 
 	required_device<v50_device> m_maincpu;
 	optional_device<i8049_device> m_subcpu;
+
+	required_device<fz_pcm_device> m_pcm;
+	required_device_array<filter_biquad_device, 8> m_filter;
+	required_device_array<speaker_device, 8> m_line_out;
 
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_ram_bank;
@@ -131,6 +149,8 @@ private:
 	u8 m_lcd_data;
 	u8 m_lcd_data_phase;
 	u8 m_lcd_nibble;
+
+	u16 m_dca_level[8];
 };
 
 /**************************************************************************/
@@ -194,10 +214,10 @@ static INPUT_PORTS_START(fz10m)
 	PORT_BIT(0xff, 0x00, IPT_CUSTOM) // audio input peak level
 
 	PORT_START("AN5")
-	PORT_BIT(0xff, 0xff, IPT_POSITIONAL_V) PORT_NAME("Master Volume") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
+	PORT_BIT(0xff, 0xff, IPT_POSITIONAL_V) PORT_NAME("Master Volume") PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(2) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
 
 	PORT_START("AN6")
-	PORT_BIT(0xff, 0x80, IPT_POSITIONAL_V) PORT_NAME("Value") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
+	PORT_BIT(0xff, 0x80, IPT_POSITIONAL_V) PORT_NAME("Value") PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
 
 INPUT_PORTS_END
 
@@ -356,8 +376,8 @@ void fz1_state::maincpu_map(address_map &map)
 /**************************************************************************/
 void fz1_state::fz10m_io_map(address_map &map)
 {
-	// 0x00-07: GAA
-	// 0x08-0f: GAB
+	map(0x00, 0x07).rw(m_pcm, FUNC(fz_pcm_device::gaa_r), FUNC(fz_pcm_device::gaa_w));
+	map(0x08, 0x0f).rw(m_pcm, FUNC(fz_pcm_device::gab_r), FUNC(fz_pcm_device::gab_w));
 	map(0x10, 0x13).mirror(0x04).m(m_fdc, FUNC(upd72065_device::map)).umask16(0x00ff);
 	map(0x18, 0x1f).rw(m_io[0], FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x20, 0x27).rw(m_io[1], FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -366,6 +386,8 @@ void fz1_state::fz10m_io_map(address_map &map)
 	map(0x70, 0x77).w(FUNC(fz1_state::gal_w)).umask16(0x00ff);
 	map(0x78, 0x7f).w(FUNC(fz1_state::led_w)).umask16(0x00ff);
 	// 0x80-bf: DCF/DCA
+	map(0x80, 0x9f).w(FUNC(fz1_state::dca_w)).umask16(0x00ff);
+	map(0xa0, 0xbf).ram();
 }
 
 /**************************************************************************/
@@ -451,6 +473,18 @@ void fz1_state::fz10m(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+
+	FZ_PCM(config, m_pcm, 13.824_MHz_XTAL);
+	m_pcm->irq_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
+	for (int i = 0; i < 8; i++)
+	{
+		SPEAKER(config, m_line_out[i]).front_center();
+		m_pcm->add_route(i, m_filter[i], 1.0);
+
+		FILTER_BIQUAD(config, m_filter[i]);
+		// TODO: these are switched-capacitor lowpass filters
+		m_filter[i]->add_route(0, m_line_out[i], 1.0 / 8);
+	}
 }
 
 /**************************************************************************/
@@ -484,6 +518,9 @@ void fz1_state::fz20m(machine_config &config)
 {
 	fz10m(config);
 	m_maincpu->set_addrmap(AS_IO, &fz1_state::fz20m_io_map);
+	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
+	m_maincpu->in_memr_cb().set(FUNC(fz1_state::mem_r));
+	m_maincpu->out_memw_cb().set(FUNC(fz1_state::mem_w));
 	m_maincpu->in_ior_cb<1>().set("scsi:7:spc", FUNC(mb89352_device::dma_r));
 	m_maincpu->out_iow_cb<1>().set("scsi:7:spc", FUNC(mb89352_device::dma_w));
 
@@ -518,6 +555,7 @@ void fz1_state::machine_start()
 	m_sub_p2 = 0;
 
 	m_ram_bank->space().install_ram(0, m_ram->mask(), m_ram->pointer());
+	m_pcm->space().install_ram(0, m_ram->mask() >> 1, m_ram->pointer());
 
 	m_fdc->set_rate(500000);
 	m_fdc->set_floppy(m_floppy->get_device());
@@ -531,6 +569,8 @@ void fz1_state::machine_start()
 	save_item(NAME(m_lcd_nibble));
 	save_item(NAME(m_lcd_data));
 	save_item(NAME(m_lcd_data_phase));
+
+	save_item(NAME(m_dca_level));
 }
 
 /**************************************************************************/
@@ -649,6 +689,17 @@ void fz1_state::led_w(u8 data)
 }
 
 /**************************************************************************/
+void fz1_state::dca_w(offs_t offset, u8 data)
+{
+	const offs_t num = offset & 7;
+	if (BIT(offset, 3))
+		m_dca_level[num] = (m_dca_level[num] & 0xff) | ((data & 3) << 8);
+	else
+		m_dca_level[num] = (m_dca_level[num] & 0x300) | data;
+	m_filter[num]->set_output_gain(ALL_OUTPUTS, m_dca_level[num] / 1023.0);
+}
+
+/**************************************************************************/
 ROM_START( fz1 )
 	ROM_REGION(0x10000, "maincpu", 0) // "ROM ver.[B]"
 	ROM_LOAD16_BYTE( "fz1s.bin", 0x00000, 0x08000, CRC(b0ba313d) SHA1(45a3660d708f0a584f9f61d04e205a96688f0950) )
@@ -681,6 +732,6 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 1987, fz1,   0,      0, fz1,   fz1,   fz1_state, empty_init, "Casio", "FZ-1 Digital Sampling Synthesizer",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-SYST( 1987, fz10m, fz1,    0, fz10m, fz10m, fz1_state, empty_init, "Casio", "FZ-10M Digital Sampling Synthesizer Module", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-SYST( 1989, fz20m, fz1,    0, fz20m, fz10m, fz1_state, empty_init, "Casio", "FZ-20M Digital Sampling Synthesizer Module", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 1987, fz1,   0,      0, fz1,   fz1,   fz1_state, empty_init, "Casio", "FZ-1 Digital Sampling Synthesizer",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1987, fz10m, fz1,    0, fz10m, fz10m, fz1_state, empty_init, "Casio", "FZ-10M Digital Sampling Synthesizer Module", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1989, fz20m, fz1,    0, fz20m, fz10m, fz1_state, empty_init, "Casio", "FZ-20M Digital Sampling Synthesizer Module", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

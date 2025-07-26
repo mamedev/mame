@@ -57,7 +57,7 @@ static const res_net_info phoenix_net_info =
 	}
 };
 
-static const res_net_info pleiades_net_info =
+static const res_net_info pleiads_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_OPEN_COL,
 	{
@@ -114,7 +114,7 @@ void phoenix_state::pleiads_palette(palette_device &palette) const
 	uint8_t const *const color_prom = memregion("proms")->base();
 
 	std::vector<rgb_t> rgb;
-	compute_res_net_all(rgb, color_prom, phoenix_decode_info, pleiades_net_info);
+	compute_res_net_all(rgb, color_prom, phoenix_decode_info, pleiads_net_info);
 
 	// native order
 	for (int i = 0; i < 256; i++)
@@ -248,7 +248,6 @@ void phoenix_state::phoenix_videoreg_w(uint8_t data)
 	if (m_palette_bank != ((data >> 1) & 1))
 	{
 		m_palette_bank = (data >> 1) & 1;
-
 		machine().tilemap().mark_all_dirty();
 	}
 }
@@ -267,18 +266,14 @@ void phoenix_state::pleiads_videoreg_w(uint8_t data)
 		machine().tilemap().mark_all_dirty();
 	}
 
-
-	/* the palette table is at $0420-$042f and is set by $06bc.
-	   Four palette changes by level.  The palette selection is
-	   wrong, but the same palette is used for both layers. */
-
+	/* the palette table is at $0420-$042f and is set by $06bc. Four palette
+       changes by level.  The same palette is used for both layers. */
 	if (m_palette_bank != ((data >> 1) & 3))
 	{
 		m_palette_bank = ((data >> 1) & 3);
-
 		machine().tilemap().mark_all_dirty();
 
-		logerror("Palette: %02X\n", (data & 0x06) >> 1);
+		logerror("Palette: %02X\n", m_palette_bank);
 	}
 
 	m_pleiads_protection_question = data & 0xfc;
@@ -322,7 +317,7 @@ int phoenix_state::pleiads_protection_r()
 }
 
 /*
-    Protection.  There is a 14 pin part connected to the 8910 Port B D0 labeled DL57S22
+    Protection. There is a 14 pin part connected to the 8910 Port B D0 labeled DL57S22
 
     Inputs are demangled at 0x1ae6-0x1b04 using the table at 0x1b26
     and bit 0 of the data from the AY8910 port B. The equation is:
@@ -337,7 +332,7 @@ int phoenix_state::pleiads_protection_r()
     port B must have bit 0 cleared. For all other joystick bits,
     it must be set.
 
-    Another  routine at 0x02bc checks for bad SID data, and
+    Another routine at 0x02bc checks for bad SID data, and
     increments the same error counter and cancels certain joystick input.
 
     The hiscore data entry routine at 0x2fd8 requires unmangled inputs
@@ -349,7 +344,7 @@ int phoenix_state::pleiads_protection_r()
     distinguish it from a gameplay read.
 */
 
-#define REMAP_JS(js) ((ret & 0xf) | ( (js & 0xf)  << 4))
+#define REMAP_JS(js) ((ret & 0xf) | ((js & 0xf) << 4))
 uint8_t phoenix_state::survival_input_port_0_r()
 {
 	uint8_t ret;

@@ -13,6 +13,7 @@
     Rewrite and modernization in progress by R. Belmont
     Addition of the duart compatible 68340 serial module support by Edstrom
     Support for the Exar XR68C681 by Joseph Zatarski (July of 2018)
+	Support for Freescale/NXP ColdFire UART module by NaokiS (June 2025)
 
     The main incompatibility between the 2681 and 68681 (Signetics and Motorola each
     manufactured both versions of the chip) is that the 68681 has a R/W input and
@@ -41,6 +42,11 @@
     The low power standby mode is entered and left by a command written to CRA
     or CRB registers. Writing the commands to either register affects the whole
     DUART, not just one channel. Resetting the DUART also leaves low power mode.
+
+	On the ColdFire MCF5206e, the UART modules are essentially just a pair of 
+	MC68681s with only the A port visible and no counter/timer. The ACR on the 
+	coldfire uarts shoud be updated to reflect this. Additionally, the 
+	Buad Rate Generator prescaler reg should be used to set the buad.
 */
 
 #include "emu.h"
@@ -61,6 +67,16 @@ static const char *const duart68681_reg_read_names[0x10] =
 static const char *const duart68681_reg_write_names[0x10] =
 {
 	"MRA", "CSRA", "CRA", "THRA", "ACR", "IMR", "CTUR", "CTLR", "MRB", "CSRB", "CRB", "THRB", "IVR", "OPCR", "Set OP Bits", "Reset OP Bits"
+};
+
+static const char *const mcf5206e_duart_reg_read_names[0x10] =
+{
+	"UMR", "USR", "NO ACCESS", "URB", "UIPCR", "UISR", "UBG1", "UBG2", "NO ACCESS", "NO ACCESS", "NO ACCESS", "NO ACCESS", "UIVR", "UIP Input Ports", "NO ACCESS", "NO ACCESS"
+};
+
+static const char *const mcf5206e_duart_reg_write_names[0x10] =
+{
+	"UMR", "UCSR", "UCRA", "UTB", "UACR", "UIMR", "UBG1", "UBG2", "NO ACCESS", "NO ACCESS", "NO ACCESS", "NO ACCESS", "IVR", "NO ACCESS", "Set OP Bits", "Reset OP Bits"
 };
 
 static const int baud_rate_ACR_0[] =     { 50, 110, 134, 200, 300,  600,   1200,  1050,  2400,   4800, 7200, 9600, 38400, 0, 0, 0 }; /* xr68c681 X=0 */
@@ -100,6 +116,7 @@ static const int baud_rate_ACR_1_340[] = { 75, 110, 134, 150, 300,  600,   1200,
 // device type definition
 DEFINE_DEVICE_TYPE(SCN2681, scn2681_device, "scn2681", "SCN2681 DUART")
 DEFINE_DEVICE_TYPE(MC68681, mc68681_device, "mc68681", "MC68681 DUART")
+DEFINE_DEVICE_TYPE(MCF5206E_UART, mcf5206e_uart_device, "mcf5206euart", "MCF5206e UART")
 DEFINE_DEVICE_TYPE(SC28C94, sc28c94_device, "sc28c94", "SC28C94 QUART")
 DEFINE_DEVICE_TYPE(MC68340_DUART, mc68340_duart_device, "mc68340duart", "MC68340 DUART")
 DEFINE_DEVICE_TYPE(XR68C681, xr68c681_device, "xr68c681", "XR68C681 DUART")
@@ -147,6 +164,18 @@ mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, d
 	: mc68681_device(mconfig, MC68681, tag, owner, clock)
 {
 }
+
+mcf5206e_uart_device::mcf5206e_uart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: duart_base_device(mconfig, type, tag, owner, clock),
+	m_read_vector(false)
+{
+}
+
+mcf5206e_uart_device::mcf5206e_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: duart_base_device(mconfig, MCF5206E_UART, tag, owner, clock)
+{
+}
+
 
 sc28c94_device::sc28c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: duart_base_device(mconfig, SC28C94, tag, owner, clock)
@@ -220,6 +249,15 @@ void mc68681_device::device_start()
 	save_item(NAME(IVR));
 }
 
+void mcf5206e_uart_device::device_start()
+{
+	duart_base_device::device_start();
+
+	save_item(NAME(m_read_vector));
+	save_item(NAME(IVR));
+	save_item(NAME(UBG));
+}
+
 void xr68c681_device::device_start()
 {
 	mc68681_device::device_start();
@@ -258,6 +296,15 @@ void mc68681_device::device_reset()
 	m_read_vector = false;
 }
 
+void mcf5206e_uart_device::device_reset()
+{
+	duart_base_device::device_reset();
+
+	IVR = 0x0f;  /* Interrupt Vector Register */
+	UBG = 0x00;	 /* UART Buad Rate Generator Register */
+	m_read_vector = false;
+}
+
 void xr68c681_device::device_reset()
 {
 	mc68681_device::device_reset();
@@ -280,6 +327,12 @@ void sc28c94_device::device_add_mconfig(machine_config &config)
 }
 
 void mc68340_duart_device::device_add_mconfig(machine_config &config)
+{
+	DUART_CHANNEL(config, CHANA_TAG, 0);
+	DUART_CHANNEL(config, CHANB_TAG, 0);
+}
+
+void mcf5206e_uart_device::device_add_mconfig(machine_config &config)
 {
 	DUART_CHANNEL(config, CHANA_TAG, 0);
 	DUART_CHANNEL(config, CHANB_TAG, 0);
@@ -363,6 +416,22 @@ void mc68681_device::update_interrupts()
 }
 
 uint8_t mc68681_device::get_irq_vector()
+{
+	if (!machine().side_effects_disabled())
+		m_read_vector = true;
+
+	return IVR;
+}
+
+void mcf5206e_uart_device::update_interrupts()
+{
+	duart_base_device::update_interrupts();
+
+	if (!irq_pending())
+		m_read_vector = false;  // clear IACK too
+}
+
+uint8_t mcf5206e_uart_device::get_irq_vector()
 {
 	if (!machine().side_effects_disabled())
 		m_read_vector = true;
@@ -502,6 +571,49 @@ uint8_t mc68681_device::read(offs_t offset)
 	return r;
 }
 
+uint8_t mcf5206e_uart_device::read(offs_t offset)
+{
+	// The ColdFire has the registers aligned to 32-bits address values, despite being 8-bit registers
+	// Also has a slightly different mapping
+	uint8_t r = 0xff;
+
+	offset /= 4;
+	offset &= 0xf;
+
+	switch (offset)
+	{
+	case 0x00: /* UMR1/UMR2 */
+	case 0x01: /* USR */
+	case 0x03: /* URBA Receive Buffer Register */
+	case 0x04: /* UIPCR */
+	case 0x05: /* UISR */
+	case 0x0d: /* UIP */
+		r = duart_base_device::read(offset);
+		break;
+	
+	case 0x06: /* UBG Buad Generator Prescale MSB */
+	LOG("%s: Reading mcf5206e (%s) reg %x (%s)\n", this->machine().describe_context(), tag(), offset, mcf5206e_duart_reg_read_names[offset]);
+		r = (UBG & 0xFF00) >> 8;
+		break;
+	case 0x07: /* UBG Buad Generator Prescale LSB */
+	LOG("%s: Reading mcf5206e (%s) reg %x (%s)\n", this->machine().describe_context(), tag(), offset, mcf5206e_duart_reg_read_names[offset]);
+		r = (UBG & 0x00FF);
+		break;
+
+	case 0x0c:	/* UIVR */
+	LOG("%s: Reading mcf5206e (%s) reg %x (%s)\n", this->machine().describe_context(), tag(), offset, mcf5206e_duart_reg_read_names[offset]);
+		r = IVR;
+		break;
+
+	default:
+		LOG("Reading unhandled mcf5206e reg %x\n", offset);
+		break;
+	}
+	LOG("returned %02x\n", r);
+
+	return r;
+}
+
 uint8_t mc68340_duart_device::read(offs_t offset)
 {
 	uint8_t r = 0;
@@ -529,7 +641,7 @@ uint8_t mc68340_duart_device::read(offs_t offset)
 uint8_t sc28c94_device::read(offs_t offset)
 {
 	uint8_t r = 0;
-	offset &= 0x3f;
+	offset &= 0x1f;
 
 	if (offset < 0x10)
 	{
@@ -571,7 +683,7 @@ uint8_t duart_base_device::read(offs_t offset)
 
 	offset &= 0xf;
 
-	LOG("Reading 68681 (%s) reg %x (%s)\n", tag(), offset, duart68681_reg_read_names[offset]);
+	LOG("%s: Reading 68681 (%s) reg %x (%s)\n", this->machine().describe_context(), tag(), offset, duart68681_reg_read_names[offset]);
 
 	switch (offset)
 	{
@@ -669,6 +781,46 @@ void mc68681_device::write(offs_t offset, uint8_t data)
 		duart_base_device::write(offset, data);
 }
 
+void mcf5206e_uart_device::write(offs_t offset, uint8_t data)
+{
+	// The ColdFire has the registers aligned to 32-bits address values, despite being 8-bit registers
+	// Also has a slightly different mapping
+
+	offset /= 4;
+	offset &= 0x0f;
+	switch (offset)
+	{
+	case 0x00: /* UMR */
+	case 0x01: /* UCSR */
+	case 0x02: /* UCR */
+	case 0x03: /* UTB */
+	case 0x04: /* ACR */	// <-- TODO: This needs changing as ACR on ColdFire only handles interrupt enable for CTS
+	case 0x05: /* IMR */
+	case 0x0e: /* Set Output Port (RTS) Bit */
+	case 0x0f: /* Reset Output Port (RTS) Bit */
+		duart_base_device::write(offset, data);
+		break;
+
+	case 0x06: /* UBG1 */
+	LOG("%s: Writing mcf5206e (%s) reg %x (%s) with %02x\n", this->machine().describe_context(), tag(), offset, mcf5206e_duart_reg_write_names[offset], data);
+		UBG = (UBG & 0x00ff) | (data << 8);
+		break;
+	case 0x07: /* UBG2 */
+	LOG("%s: Writing mcf5206e (%s) reg %x (%s) with %02x\n", this->machine().describe_context(), tag(), offset, mcf5206e_duart_reg_write_names[offset], data);
+		UBG = (UBG & 0xff00) | data;
+		m_chanA->baud_updated();
+		m_chanA->update_interrupts();
+		break;
+
+	case 0x0c: /* UIVR */
+	LOG("%s: Writing mcf5206e (%s) reg %x (%s) with %02x\n", this->machine().describe_context(), tag(), offset, mcf5206e_duart_reg_write_names[offset], data);
+		IVR = data;
+		break;
+
+	default: break;
+	}
+}
+
 void mc68340_duart_device::write(offs_t offset, uint8_t data)
 {
 	//printf("Duart write %02x -> %02x\n", data, offset);
@@ -694,7 +846,7 @@ void mc68340_duart_device::write(offs_t offset, uint8_t data)
 
 void sc28c94_device::write(offs_t offset, uint8_t data)
 {
-	offset &= 0x3f;
+	offset &= 0x1f;
 
 	if (offset < 0x10)
 	{
@@ -710,10 +862,10 @@ void sc28c94_device::write(offs_t offset, uint8_t data)
 		m_chanC->write_chan_reg(offset&3, data);
 		break;
 
-	case 0x18: /* MRD */
-	case 0x19: /* CSRD */
-	case 0x1a: /* CRD */
-	case 0x1b: /* THRD */
+	case 0x18: /* MRC */
+	case 0x19: /* CSRC */
+	case 0x1a: /* CRC */
+	case 0x1b: /* THRC */
 		m_chanD->write_chan_reg(offset&3, data);
 		break;
 	}
@@ -722,7 +874,6 @@ void sc28c94_device::write(offs_t offset, uint8_t data)
 void xr68c681_device::write(offs_t offset, uint8_t data)
 {
 	if (offset == 0x02) /* CRA */
-	{
 		switch (data >> 4)
 		{
 		case 0x08: /* set RX extend bit */
@@ -756,9 +907,8 @@ void xr68c681_device::write(offs_t offset, uint8_t data)
 			data &= 0x0f;
 			break;
 		}
-	}
+
 	else if (offset == 0x0a) /* CRB */
-	{
 		switch (data >> 4)
 		{
 		case 0x08: /* set RX extend bit */
@@ -792,7 +942,6 @@ void xr68c681_device::write(offs_t offset, uint8_t data)
 			data &= 0x0f;
 			break;
 		}
-	}
 
 	mc68681_device::write(offset, data); /* pass on 68681 command */
 }
@@ -800,7 +949,7 @@ void xr68c681_device::write(offs_t offset, uint8_t data)
 void duart_base_device::write(offs_t offset, uint8_t data)
 {
 	offset &= 0x0f;
-	LOG("Writing 68681 (%s) reg %x (%s) with %02x\n", tag(), offset, duart68681_reg_write_names[offset], data);
+	LOG("%s: Writing 68681 (%s) reg %x (%s) with %02x\n", this->machine().describe_context(), tag(), offset, duart68681_reg_write_names[offset], data);
 	switch (offset)
 	{
 	case 0x00: /* MRA */
@@ -1098,6 +1247,7 @@ int xr68c681_device::calc_baud(int ch, bool rx, uint8_t data)
 {
 	int baud_rate;
 
+
 	baud_rate = baud_rate_ACR_0[data & 0x0f];
 
 	if (ch == 0)
@@ -1126,6 +1276,24 @@ int xr68c681_device::calc_baud(int ch, bool rx, uint8_t data)
 	if ((baud_rate == 0) && ((data & 0xf) != 0xd))
 	{
 		LOG("Unsupported transmitter clock: channel %d, clock select = %02x\n", ch, data);
+	}
+
+	//printf("%s ch %d setting baud to %d\n", tag(), ch, baud_rate);
+	return baud_rate;
+}
+
+int mcf5206e_uart_device::calc_baud(int ch, bool rx, uint8_t data)
+{
+	int baud_rate = 0;
+	u16 ubg_temp = 1;
+
+	if(UBG > 0) ubg_temp = UBG;
+
+	switch (data & 0xf){
+		case 0xe: baud_rate = ip3clk/16; break;
+		case 0xf: baud_rate = ip3clk; break;
+		case 0xd: baud_rate = (this->clock()/32) / ubg_temp; break;
+		default: LOG("Unsupported transmitter clock: channel %d, clock select = %02x\n", ch, data); break;
 	}
 
 	//printf("%s ch %d setting baud to %d\n", tag(), ch, baud_rate);

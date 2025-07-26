@@ -523,12 +523,14 @@ void ironhors_base_state::filter_w(uint8_t data)
 
 void ironhors_state::master_map(address_map &map)
 {
+	// Konami 005885
 	map(0x0000, 0x0002).ram();
 	map(0x0003, 0x0003).ram().w(FUNC(ironhors_state::charbank_w));
 	map(0x0004, 0x0004).ram().share(m_interrupt_enable);
 	map(0x0005, 0x001f).ram();
 	map(0x0020, 0x003f).ram().share(m_scroll);
 	map(0x0040, 0x005f).ram();
+
 	map(0x0060, 0x00df).ram();
 	map(0x0800, 0x0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0900, 0x0900).portr("DSW3").w(FUNC(ironhors_state::sh_irqtrigger_w));
@@ -580,8 +582,6 @@ void farwest_state::master_map(address_map &map)
 	map(0x0b01, 0x0b01).portr("DSW2"); //.w(FUNC(farwest_state::palettebank_w));
 	map(0x0b02, 0x0b02).portr("P1");
 	map(0x0b03, 0x0b03).portr("SYSTEM");
-
-
 
 	map(0x1800, 0x1800).w(FUNC(farwest_state::sh_irqtrigger_w));
 	map(0x1a00, 0x1a00).ram().share(m_interrupt_enable);
@@ -794,6 +794,7 @@ static DISCRETE_SOUND_START( ironhors_discrete )
 
 DISCRETE_SOUND_END
 
+
 /*************************************
  *
  *  Machine driver
@@ -820,7 +821,7 @@ main Xtal is 18.432mhz
 
 Z80 runs at 3.072mhz
 
-M6809E runs at 1.532mhz ( NOT 3.072mhz)
+M6809E runs at 1.532mhz
 
 Vsync is 61hz
 
@@ -832,15 +833,11 @@ These clocks make the emulation run too fast.
 void ironhors_base_state::base(machine_config &config)
 {
 	// basic machine hardware
-	MC6809E(config, m_maincpu, 18'432'000 / 6);        // 3.072 MHz??? mod by Shingo Suzuki 1999/10/15
+	MC6809E(config, m_maincpu, 18.432_MHz_XTAL / 12); // 1.536 MHz
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(61);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(1*8, 31*8-1, 2*8, 30*8-1);
-	m_screen->set_raw(18'432'000 / 4, 296, 8, 256 - 8, 255, 16, 240); // pixel clock is a guesswork
+	m_screen->set_raw(18.432_MHz_XTAL / 3, 384, 0+8, 256-8, 264, 16, 240);
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(ironhors_state::palette), 16*8*16+16*8*16, 256);
@@ -850,7 +847,7 @@ void ironhors_base_state::base(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym2203(YM2203(config, "ym2203", 18'432'000 / 6));
+	ym2203_device &ym2203(YM2203(config, "ym2203", 18.432_MHz_XTAL / 6));
 	ym2203.port_a_write_callback().set(FUNC(ironhors_state::filter_w));
 	ym2203.add_route(0, "disc_ih", 1.0, 0);
 	ym2203.add_route(1, "disc_ih", 1.0, 1);
@@ -867,7 +864,7 @@ void ironhors_state::ironhors(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ironhors_state::master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ironhors_state::scanline_tick), "screen", 0, 1);
 
-	Z80(config, m_soundcpu, 18'432'000 / 6);      // 3.072 MHz
+	Z80(config, m_soundcpu, 18.432_MHz_XTAL / 6); // 3.072 MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &ironhors_state::slave_map);
 	m_soundcpu->set_addrmap(AS_IO, &ironhors_state::slave_io_map);
 
@@ -899,7 +896,7 @@ void farwest_state::farwest(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &farwest_state::master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(farwest_state::scanline_tick), "screen", 0, 1);
 
-	Z80(config, m_soundcpu, 18'432'000 / 6);      // 3.072 MHz
+	Z80(config, m_soundcpu, 18.432_MHz_XTAL / 6); // 3.072 MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &farwest_state::slave_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_farwest);
@@ -1018,6 +1015,7 @@ ROM_END
  *  Game driver(s)
  *
  *************************************/
+
 // versions are taken from the letters on the program ROMs' labels
 GAME( 1986, ironhors,  0,        ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami",                    "Iron Horse (version K)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ironhorsh, ironhors, ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami",                    "Iron Horse (version H)",               MACHINE_SUPPORTS_SAVE )

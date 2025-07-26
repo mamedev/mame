@@ -749,9 +749,24 @@ void domyos_state::config(machine_config& config)
 	I2C_24C64(config, m_i2cmem);
 }
 
-ROM_START( ltv_naru )
+ROM_START( ban_naru )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "naruto.bin", 0x000000, 0x800000, CRC(e3465ad2) SHA1(13e3d2de5d5a084635cab158f3639a1ea73265dc) )
+ROM_END
+
+ROM_START( ban_bldj )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "bldj.u2", 0x000000, 0x800000, CRC(aa865fe3) SHA1(2f5f4809a07a2f5671f81aa22e379c11c43943a0) )
+
+	// 24c04 at u3
+ROM_END
+
+
+ROM_START( ban_dbz )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "dbz.u2a", 0x000000, 0x800000, CRC(7e535ea2) SHA1(6c746af763273bd9e47929c3ba857c7af563bf79) )
+
+	// also has a 24c02 at u3
 ROM_END
 
 ROM_START( ban_db2j )
@@ -765,6 +780,12 @@ ROM_START( epo_dabj )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "dabj.u3", 0x000000, 0x800000, CRC(9ebc1384) SHA1(38abaebd05bc9ab300ee5fbf37bd88ce9cbd20e1) )
 ROM_END
+
+ROM_START( epo_dab2j )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "dab2j.u4", 0x000000, 0x800000, CRC(e3d12ee6) SHA1(a2f930f4ffe778e02556b5e1a1836f88888e7c82) )
+ROM_END
+
 
 ROM_START( epo_dtcj )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
@@ -780,6 +801,18 @@ ROM_START( epo_sskj )
 	// SEEPROM is a AT24C04 at u4
 ROM_END
 
+ROM_START( epo_ssk2 )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "ssk2.u2", 0x000000, 0x800000, CRC(d5902e48) SHA1(010bc2417814ded24a474d9165f6b9523af7d1ef) )
+
+	// SEEPROM is a 24CS04
+ROM_END
+
+ROM_START( epo_pabj )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "pabj.u3", 0x000000, 0x800000, CRC(ac46991c) SHA1(06c2b493824085502e96a7c1e46e9e89433e7301) )
+ROM_END
+
 ROM_START( domfitad )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpfitnessadventure.bin", 0x000000, 0x1000000, CRC(a7917081) SHA1(95ae5dc6e64a78ae060cb0e61d8b0af34a93c4ce) )
@@ -793,13 +826,21 @@ ROM_END
 } // anonymous namespace
 
 // Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本
-CONS( 2006, ltv_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Naruto (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Naruto (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// Let's!TVプレイ 影発動体感! ブルードラゴン -極めろ!ファイヤークライシス!-
+CONS( 2006, ban_bldj, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Kage Hatsudou Taikan! Blue Dragon - Kiwamero! Fire Crisis! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2005, ban_dbz,  0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Dragon Ball Z Battle Experience Kamehameha (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～
-CONS( 2006, ban_db2j, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_db2j, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // テレビであそぼう!まなぼう! 超脳力あいうえお図鑑
 CONS( 2006, epo_dabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "TV de Asobou! Manabou! Chou Nouryoku AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// ドラえもん 太鼓あいうえお図鑑
+CONS( 200?, epo_dab2j, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Doraemon Taiko AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ドラえもん 体感タケコプター! 空とぶ大冒険
 CONS( 2006, epo_dtcj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Doraemon Taikan Take-copter! Sora Tobu Daibouken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -807,12 +848,13 @@ CONS( 2006, epo_dtcj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / S
 // SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦
 CONS( 2006, epo_sskj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Sasuke & Kinniku Battle!! Sportsman No. 1 Ketteisen (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+// 究極! 筋肉(マッスル)スタジアム! サスケ完全制覇
+CONS( 2008, epo_ssk2, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Kyuukyoku! Muscle Stadium! Sasuke Kanzen Seiha (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, epo_pabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "TV de Asobou! Manabou! Pooh-san to Issho: ABC AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
 // These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
 
 // Has SEEPROM and an RTC.  Adventure has the string DOMYSSDCOLTD a couple of times.
 CONS( 2008, domfitad, 0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2008, dombikec, 0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Bike Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
-
-
-

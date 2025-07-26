@@ -367,7 +367,7 @@ static INPUT_PORTS_START( pkspirit )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0000, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x0c00, 0x0c00, "Up / Down Credit" ) PORT_DIPLOCATION("SW2:3,4") // actually spelt 'doun' in the dip sheet
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0800, "10" )

@@ -64,7 +64,7 @@ private:
 	// devices
 	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<k05324x_device> m_k053244;
+	required_device<k053244_device> m_k053244;
 	required_device<k051316_device> m_k051316;
 
 	required_memory_bank m_mainbank;
@@ -80,7 +80,7 @@ private:
 	void z80_nmi_w(int state);
 	uint8_t pip_r();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	K05324X_CB_MEMBER(sprite_callback);
+	K053244_CB_MEMBER(sprite_callback);
 	K051316_CB_MEMBER(zoom_callback);
 
 	void main_map(address_map &map) ATTR_COLD;
@@ -94,7 +94,7 @@ private:
 
 ***************************************************************************/
 
-K05324X_CB_MEMBER(rollerg_state::sprite_callback)
+K053244_CB_MEMBER(rollerg_state::sprite_callback)
 {
 	enum { sprite_colorbase = 256 / 16 };
 #if 0
@@ -193,11 +193,11 @@ void rollerg_state::main_map(address_map &map)
 	map(0x0061, 0x0061).r(FUNC(rollerg_state::pip_r));             // ?????
 	map(0x0100, 0x010f).rw("k053252", FUNC(k053252_device::read), FUNC(k053252_device::write));      // 053252?
 	map(0x0200, 0x020f).w(m_k051316, FUNC(k051316_device::ctrl_w));
-	map(0x0300, 0x030f).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
+	map(0x0300, 0x030f).rw(m_k053244, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w));
 	map(0x0800, 0x0fff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write));
 	map(0x0800, 0x0fff).view(m_zoomroms_view);
 	m_zoomroms_view[0](0x0800, 0x0fff).r(m_k051316, FUNC(k051316_device::rom_r));
-	map(0x1000, 0x17ff).rw(m_k053244, FUNC(k05324x_device::k053245_r), FUNC(k05324x_device::k053245_w));
+	map(0x1000, 0x17ff).rw(m_k053244, FUNC(k053244_device::k053245_r), FUNC(k053244_device::k053245_w));
 	map(0x1800, 0x1fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x2000, 0x3aff).ram();
 	map(0x4000, 0x7fff).bankr(m_mainbank);
@@ -353,10 +353,7 @@ void rollerg_state::rollerg(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240); // from CCU
 	screen.set_screen_update(FUNC(rollerg_state::screen_update));
 	screen.set_palette("palette");
 
@@ -364,17 +361,17 @@ void rollerg_state::rollerg(machine_config &config)
 
 	K053244(config, m_k053244, 24_MHz_XTAL);
 	m_k053244->set_palette("palette");
-	m_k053244->set_offsets(12*8 - 3, -1);
+	m_k053244->set_offsets(-3, -1);
 	m_k053244->set_sprite_callback(FUNC(rollerg_state::sprite_callback));
 
 	K051316(config, m_k051316, 24_MHz_XTAL / 2);
 	m_k051316->set_palette("palette");
-	m_k051316->set_offsets(14*8 + 6, 1);
+	m_k051316->set_offsets(6 + 16, 1);
 	m_k051316->set_zoom_callback(FUNC(rollerg_state::zoom_callback));
 
-	k053252_device &k053252(K053252(config, "k053252", 3'000'000 * 2));
+	k053252_device &k053252(K053252(config, "k053252", 24_MHz_XTAL / 4));
 	k053252.int1_ack().set_inputline(m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
-	k053252.set_offsets(14*8, 2*8);
+	k053252.set_offsets(16, 16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

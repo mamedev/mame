@@ -561,10 +561,10 @@ static INPUT_PORTS_START( cuebrickj )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")    /* 0xa0003 */
-	KONAMI8_B123_UNK(1) // button1 = move, button2 = warp, button3 = stop
+	KONAMI8_MONO_4WAY_B123_UNK // button1 = move, button2 = warp, button3 = stop
 
 	PORT_START("P2")    /* 0xa0005 */
-	KONAMI8_B123_UNK(2)
+	KONAMI8_COCKTAIL_4WAY_B123_UNK
 
 	PORT_START("P3")    /* 0xa0007 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -597,7 +597,7 @@ static INPUT_PORTS_START( cuebrickj )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Upright Controls" ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" ) PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
@@ -665,7 +665,7 @@ void twin16_state::twin16(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8);
+	m_screen->set_raw(XTAL(18'432'000)/3, 384, 0, 40*8, 264, 2*8, 30*8);
 	m_screen->set_screen_update(FUNC(twin16_state::screen_update_twin16));
 	m_screen->screen_vblank().set(FUNC(twin16_state::screen_vblank_twin16));
 	m_screen->set_palette(m_palette);
@@ -718,7 +718,7 @@ void fround_state::fround(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8);
+	m_screen->set_raw(XTAL(18'432'000)/3, 384, 0, 40*8, 264, 2*8, 30*8);
 	m_screen->set_screen_update(FUNC(twin16_state::screen_update_twin16));
 	m_screen->screen_vblank().set(FUNC(twin16_state::screen_vblank_twin16));
 	m_screen->set_palette(m_palette);
@@ -751,14 +751,14 @@ void fround_state::fround(machine_config &config)
 void twin16_state::miaj(machine_config &config)
 {
 	twin16(config);
-	m_screen->set_raw(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8);
+	m_screen->set_raw(XTAL(18'432'000)/3, 384, 1*8, 39*8, 264, 2*8, 30*8);
 }
 
 void cuebrickj_state::cuebrickj(machine_config &config)
 {
 	twin16(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cuebrickj_state::cuebrickj_main_map);
-	m_screen->set_raw(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8);
+	m_screen->set_raw(XTAL(18'432'000)/3, 384, 1*8, 39*8, 264, 2*8, 30*8);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 

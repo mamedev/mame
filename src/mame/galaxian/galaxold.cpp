@@ -2497,6 +2497,29 @@ ROM_START( drivfrct )
 	ROM_LOAD( "tbp28s42.bin", 0x0100, 0x0200, CRC(9b8f310a) SHA1(8e17cc1adf441aec56d98d0809e1359d5175e8ed) )
 ROM_END
 
+ROM_START( drivfrcsgb )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "df2.7h", 0x0000, 0x0800, CRC(f8272d64) SHA1(a9c309f0fccb9976a1d1b7c87f1e6f09a7b5f524) )
+	ROM_CONTINUE(       0x4000, 0x0800 )
+	ROM_LOAD( "df3.7k", 0x0800, 0x0800, CRC(bd06af8b) SHA1(268df1e1ce1969c36dea7e3dfcc9ae8da32e1432) )
+	ROM_CONTINUE(       0x4800, 0x0800 )
+	ROM_LOAD( "df4.7m", 0x2000, 0x0800, CRC(753c2b39) SHA1(e60960af58bb8e63d687310bc262e2c639ff0d89) )
+	ROM_CONTINUE(       0x6000, 0x0800 )
+	ROM_LOAD( "df1.7f", 0x2800, 0x0800, CRC(7a784097) SHA1(de1df0018172ff2a5152c29996ff817d67f5388f) )
+	ROM_CONTINUE(       0x6800, 0x0800 )
+
+	ROM_REGION( 0x4000, "gfx1", 0 ) // not dumped for this set
+	ROM_LOAD( "dfgj2.bin", 0x0000, 0x1000, BAD_DUMP CRC(8e19f1e7) SHA1(addd5add2117ef29ce38c0c80584e5d481b9d820) )
+	ROM_LOAD( "dfgj1.bin", 0x1000, 0x1000, BAD_DUMP CRC(86b60ca8) SHA1(be266e2d69e12a196c2195d48b495c0fb9ef8a43) )
+	ROM_LOAD( "dfgl2.bin", 0x2000, 0x1000, BAD_DUMP CRC(ea5e9959) SHA1(6b638d22adf19224cf741458c8ad34d7f7e17e58) )
+	ROM_LOAD( "dfgl1.bin", 0x3000, 0x1000, BAD_DUMP CRC(b7ed195c) SHA1(81b2b444153dacb962a33a5d86a280ed5088637a) )
+
+	// piggy-backed colour PROMs
+	ROM_REGION( 0x0040, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "top.clr", 0x0000, 0x0020, BAD_DUMP CRC(3110ddae) SHA1(53b2e1cc07915592f6c868131ec296c63a407f04) )
+	ROM_LOAD( "bot.clr", 0x0020, 0x0020, BAD_DUMP CRC(0f0782af) SHA1(32c0dd09ead5c70cee2657e9cb8cb9fcf54c5a6a) )
+ROM_END
+
 ROM_START( racknrol ) // has an AY-3-8910 on main pcb, but is unused? SN76489AN on daughterboard is used.
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "horz_p.bin",   0x0000, 0x1000, CRC(32ca5b43) SHA1(f3e7662f947dcdd80f6eae4f002d2fe64a825aff) )
@@ -2653,6 +2676,7 @@ GAME( 1984, drivfrct,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_ini
 GAME( 1985, drivfrcb,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "bootleg (Elsys Software)",                            "Driving Force (Galaxian conversion bootleg)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1985, drivfrcsg, drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "Shinkai Inc. (Seatongrove UK, Ltd. license)",         "Driving Force (Galaxian conversion, Seatongrove UK, E-0010)", MACHINE_SUPPORTS_SAVE ) // assume they got permission through Magic, not directly from Shinkai
 GAME( 1985, drivfrcsga,drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "Shinkai Inc. (Seatongrove UK, Ltd. license)",         "Driving Force (Galaxian conversion, Seatongrove UK, E-0237)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
+GAME( 1985, drivfrcsgb,drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "Shinkai Inc. (Seatongrove UK, Ltd. license)",         "Driving Force (Galaxian conversion, Seatongrove UK)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1986, racknrol,  0,        racknrol,  racknrol,  galaxold_state, empty_init,     ROT0,   "Senko Industries (Status license from Shinkai Inc.)", "Rack + Roll",                                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1986, hexpool,   racknrol, racknrol,  racknrol,  galaxold_state, empty_init,     ROT90,  "Senko Industries (Shinkai Inc. license)",             "Hex Pool (Shinkai)",                                          MACHINE_SUPPORTS_SAVE ) // still has Senko logo in gfx rom
 GAME( 1985, hexpoola,  racknrol, hexpoola,  racknrol,  galaxold_state, empty_init,     ROT90,  "Senko Industries",                                    "Hex Pool (Senko)",                                            MACHINE_SUPPORTS_SAVE )

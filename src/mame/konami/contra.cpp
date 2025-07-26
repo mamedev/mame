@@ -205,7 +205,6 @@ private:
 	template <uint8_t Which> void vram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void cram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void flipscreen_w(int state);
-	template <uint8_t Which> void dirtytiles();
 
 	template <uint8_t Which> void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -321,15 +320,18 @@ TILE_GET_INFO_MEMBER(contra_state::get_tx_tile_info)
 
 void contra_state::video_start()
 {
-	m_k007121[0]->set_spriteram(m_spriteram[0]);
-	m_k007121[1]->set_spriteram(m_spriteram[1]);
-
 	m_tilemap[0] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(contra_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap[1] = &machine().tilemap().create(*m_k007121[1], tilemap_get_info_delegate(*this, FUNC(contra_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap[2] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(contra_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
+
+	m_k007121[0]->register_tilemap(m_tilemap[0]);
+	m_k007121[1]->register_tilemap(m_tilemap[1]);
+	m_k007121[0]->register_tilemap(m_tilemap[2]);
+	m_k007121[0]->set_spriteram(m_spriteram[0]);
+	m_k007121[1]->set_spriteram(m_spriteram[1]);
 }
 
 
@@ -357,14 +359,6 @@ template <uint8_t Which>
 void contra_state::flipscreen_w(int state)
 {
 	m_tilemap[Which]->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-}
-
-template <uint8_t Which>
-void contra_state::dirtytiles()
-{
-	m_tilemap[Which]->mark_all_dirty();
-	if (Which == 0)
-		m_tilemap[2]->mark_all_dirty();
 }
 
 
@@ -619,11 +613,9 @@ void contra_state::contra(machine_config &config)
 	m_k007121[0]->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121[0]->set_flipscreen_cb().set(FUNC(contra_state::flipscreen_w<0>));
 	m_k007121[0]->set_flipscreen_cb().append(FUNC(contra_state::flipscreen_w<2>));
-	m_k007121[0]->set_dirtytiles_cb(FUNC(contra_state::dirtytiles<0>));
 
 	K007121(config, m_k007121[1], 0, gfx_contra_2, m_palette, m_screen);
 	m_k007121[1]->set_flipscreen_cb().set(FUNC(contra_state::flipscreen_w<1>));
-	m_k007121[1]->set_dirtytiles_cb(FUNC(contra_state::dirtytiles<1>));
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

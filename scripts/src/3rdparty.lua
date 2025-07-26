@@ -917,7 +917,7 @@ elseif _OPTIONS["vs"]=="intel-15" then
 end
 	configuration { }
 		defines {
-			"Z7_PPMD_SUPPPORT",
+			"Z7_PPMD_SUPPORT",
 			"Z7_ST",
 		}
 
@@ -1635,9 +1635,6 @@ end
 		if _OPTIONS["USE_WAYLAND"]=="1" then
 			defines {
 				"WL_EGL_PLATFORM=1",
-			}
-			buildoptions {
-				backtick(pkgconfigcmd() .. " --cflags wayland-egl-backend"),
 			}
 		end
 	end

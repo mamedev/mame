@@ -18,6 +18,78 @@ kimtape -m -a0 -da1 a1.bin a1.wav
 
 <softwarelist name="kim1_cass" description="KIM-1 cassettes">
 
+	<software name="baseball">
+		<description>Baseball</description>
+		<year>1979</year>
+		<publisher>Robert Leedom</publisher>
+		<info name="usage" value="Loads in 3 parts. ID 01, ID 02, ID 03, GO 0200" />
+		<part name="cass" interface="kim1_cass">
+			<dataarea name="cass" size="26518684">
+				<rom name="baseball.wav" size="26518684" crc="01e1f702" sha1="7ed49cc17781ca2abfb6496071a88fb8c1f17137"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="focal">
+		<description>FOCAL-65 (V3D)</description>
+		<year>1977</year>
+		<publisher>Aresco</publisher>
+		<info name="usage" value="terminal, Loads in 2 parts. ID 01, ID 02, GO 2000" />
+		<part name="cass" interface="kim1_cass">
+			<dataarea name="cass" size="16230584">
+				<rom name="focal.wav" size="16230584" crc="e8eb2679" sha1="7ef83fa37077987551e4e48f16ba1494b5d827e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hexpawn">
+		<description>Hexpawn</description>
+		<year>1978</year>
+		<publisher>Robert Leedom</publisher>
+		<info name="usage" value="ID 01, GO 0100" />
+		<part name="cass" interface="kim1_cass">
+			<dataarea name="cass" size="2361357">
+				<rom name="hexpawn.wav" size="2361357" crc="2a0810be" sha1="c0656f9e99b071396263d98bbc87d2de9cd68e72"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kimbasic">
+		<description>MOS TECH 6502 BASIC 9-digit v1.1</description>
+		<year>1977</year>
+		<publisher>Microsoft Co.</publisher>
+		<info name="usage" value="terminal, ID 01, GO 4065" />
+		<part name="cass" interface="kim1_cass">
+			<dataarea name="cass" size="23219181">
+				<rom name="kim basic 911.wav" size="23219181" crc="72470b66" sha1="0d4c00bde405ea491f27b1fffee7f07d45ee09a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kb6" cloneof="kimbasic">
+		<description>MOS TECH 6502 BASIC 6-digit</description>
+		<year>1977</year>
+		<publisher>Microsoft Co.</publisher>
+		<info name="usage" value="terminal, ID 01, GO 3D73" />
+		<part name="cass" interface="kim1_cass">
+			<dataarea name="cass" size="21267405">
+				<rom name="kim basic 6.wav" size="21267405" crc="0ba87eaa" sha1="46f2f23a9a41a9fe95080c87acd7bc8929161717"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microade">
+		<description>Micro-ADE</description>
+		<year>1977</year>
+		<publisher>MicroWare Ltd</publisher>
+		<info name="usage" value="terminal, ID 01, GO 2000" />
+		<part name="cass" interface="kim1_cass">
+			<dataarea name="cass" size="10984941">
+				<rom name="microade.wav" size="10984941" crc="defbe148" sha1="40ce84727d65f195aa1ef451714781c78b1d2785"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mchess">
 		<description>Microchess</description>
 		<year>1976</year>

@@ -64,7 +64,7 @@ void m92_state::spritecontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	// offset5: ?
 
 	/* Sprite control - display all sprites, or partial list */
-	if (offset==2 && ACCESSING_BITS_0_7)
+	if (offset == 2 && ACCESSING_BITS_0_7)
 	{
 		if ((data & 0xff) == 8)
 			m_sprite_list = (((0x100 - m_spritecontrol[0]) & 0xff) * 4);
@@ -75,7 +75,7 @@ void m92_state::spritecontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 
 	/* Sprite buffer - the data written doesn't matter (confirmed by several games) */
-	if (offset==4)
+	if (offset == 4)
 	{
 		/* this implementation is not accurate: still some delayed sprites in gunforc2 (might be another issue?) */
 		m_spriteram->copy();
@@ -120,10 +120,10 @@ void m92_state::videocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	/*
 	    fedc ba98 7654 3210
 	    .x.. x... .xx. ....   always 0?
-	    x... .... .... ....   disable tiles?? (but that breaks mysticri)
+	    x... .... .... ....   video off? (but that breaks mysticri)
 	    ..xx .... .... ....   ? only written at POST - otherwise always 2
 	    .... .xxx .... ....   ? only written at POST - otherwise always 0
-	    .... .... x... ....   disable sprites??
+	    .... .... x... ....   disable sprites
 	    .... .... ...x ....   ?
 	    .... .... .... x...   ?
 	    .... .... .... .x..   ? maybe more palette banks?
@@ -226,7 +226,7 @@ void m92_state::master_control_w(offs_t offset, uint16_t data, uint16_t mem_mask
 			break;
 
 		case 3:
-			m_raster_irq_position = m_pf_master_control[3] - 128;
+			m_raster_irq_position = (m_pf_master_control[3] & 0x1ff) - 128;
 			m_upd71059c->ir2_w(0);
 			break;
 	}
@@ -234,18 +234,13 @@ void m92_state::master_control_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 /*****************************************************************************/
 
-VIDEO_START_MEMBER(m92_state,m92)
+void m92_state::video_start()
 {
 	m_spritebuffer_timer = timer_alloc(FUNC(m92_state::spritebuffer_done), this);
 
 	memset(m_pf_master_control, 0, sizeof(m_pf_master_control));
-	m_videocontrol = 0;
-	m_sprite_list = 0;
-	m_raster_irq_position = 0;
-	m_sprite_buffer_busy = 0;
-	m_palette_bank = 0;
-
 	memset(&m_pf_layer, 0, sizeof(m_pf_layer));
+
 	for (int laynum = 0; laynum < 3; laynum++)
 	{
 		M92_pf_layer_info *layer = &m_pf_layer[laynum];
@@ -295,9 +290,9 @@ VIDEO_START_MEMBER(m92_state,m92)
 	save_item(NAME(m_paletteram));
 }
 
-VIDEO_START_MEMBER(m92_state,ppan)
+void ppan_state::video_start()
 {
-	VIDEO_START_CALL_MEMBER(m92);
+	m92_state::video_start();
 
 	for (int laynum = 0; laynum < 3; laynum++)
 	{
@@ -385,7 +380,7 @@ void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 }
 
 // This needs a lot of work...
-void m92_state::ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void ppan_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint16_t *source = m_spriteram->live(); // sprite buffer control is never triggered
 	int offs, layer;
@@ -462,9 +457,6 @@ void m92_state::ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void m92_state::m92_update_scroll_positions()
 {
-	int laynum;
-	int i;
-
 	/*  Playfield 3 rowscroll data is 0xdfc00 - 0xdffff
 	    Playfield 2 rowscroll data is 0xdf800 - 0xdfbff
 	    Playfield 1 rowscroll data is 0xdf400 - 0xdf7ff
@@ -476,7 +468,7 @@ void m92_state::m92_update_scroll_positions()
 
 	*/
 
-	for (laynum = 0; laynum < 3; laynum++)
+	for (int laynum = 0; laynum < 3; laynum++)
 	{
 		M92_pf_layer_info *layer = &m_pf_layer[laynum];
 
@@ -486,7 +478,7 @@ void m92_state::m92_update_scroll_positions()
 
 			layer->tmap->set_scroll_rows(512);
 			layer->wide_tmap->set_scroll_rows(512);
-			for (i = 0; i < 512; i++)
+			for (int i = 0; i < 512; i++)
 			{
 				layer->tmap->set_scrollx(i, scrolldata[i]);
 				layer->wide_tmap->set_scrollx(i, scrolldata[i]);
@@ -507,7 +499,7 @@ void m92_state::m92_update_scroll_positions()
 
 /*****************************************************************************/
 
-void m92_state::m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void m92_state::m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if ((~m_pf_master_control[2] >> 4) & 1)
 	{
@@ -531,34 +523,32 @@ void m92_state::m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap,const
 
 uint32_t m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen.priority().fill(0, cliprect);
-	bitmap.fill(0, cliprect);
-	m92_update_scroll_positions();
-	m92_draw_tiles(screen, bitmap, cliprect);
-
-	draw_sprites(screen, bitmap, cliprect);
-
 	/* Flipscreen appears hardwired to the dipswitch - strange */
 	if (m_dsw->read() & 0x100)
 		flip_screen_set(0);
 	else
 		flip_screen_set(1);
+
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(0, cliprect);
+
+	m92_update_scroll_positions();
+	m92_draw_tiles(screen, bitmap, cliprect);
+
+	if (~m_videocontrol & 0x80)
+		draw_sprites(screen, bitmap, cliprect);
+
 	return 0;
 }
 
-uint32_t m92_state::screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m92_state::screen_update_nbbatman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen.priority().fill(0, cliprect);
-	bitmap.fill(0, cliprect);
-	m92_update_scroll_positions();
-	m92_draw_tiles(screen, bitmap, cliprect);
+	// nbbatman is the only game using this flag to turn off video? (normally, games just disable each tile layer)
+	if (m_videocontrol & 0x8000)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
 
-	ppan_draw_sprites(screen, bitmap, cliprect);
-
-	/* Flipscreen appears hardwired to the dipswitch - strange */
-	if (m_dsw->read() & 0x100)
-		flip_screen_set(0);
-	else
-		flip_screen_set(1);
-	return 0;
+	return screen_update_m92(screen, bitmap, cliprect);
 }

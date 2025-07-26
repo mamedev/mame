@@ -2,7 +2,7 @@
 // copyright-holders:
 
 /*
-Banpresto medal games with Seibu customs
+Banpresto M68K-based medal games with Seibu customs
 
 Confirmed games (but there are probably several more):
 Terebi Denwa Doraemon

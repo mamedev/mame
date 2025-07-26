@@ -3438,6 +3438,8 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/teletex800.h",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.h",
+		MAME_DIR .. "src/devices/bus/rs232/votraxtnt.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/votraxtnt.h",
 		MAME_DIR .. "src/devices/bus/rs232/xvd701.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/xvd701.h",
 	}
@@ -4986,10 +4988,10 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/spectrum/ay/slot.h,BUSES["AY_SLOT"] = true
+--@src/devices/bus/spectrum/ay/slot.h,BUSES["SPECTRUM_AY"] = true
 ---------------------------------------------------
 
-if (BUSES["AY_SLOT"]~=null) then
+if (BUSES["SPECTRUM_AY"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/spectrum/ay/slot.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/ay/slot.h",
@@ -5000,10 +5002,24 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/spectrum/zxbus/bus.h,BUSES["ZXBUS"] = true
+--@src/devices/bus/spectrum/dma/slot.h,BUSES["SPECTRUM_DMA"] = true
 ---------------------------------------------------
 
-if (BUSES["ZXBUS"]~=null) then
+if (BUSES["SPECTRUM_DMA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/spectrum/dma/slot.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/dma/slot.h",
+		MAME_DIR .. "src/devices/bus/spectrum/dma/cards.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/dma/cards.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/spectrum/zxbus/bus.h,BUSES["SPECTRUM_ZXBUS"] = true
+---------------------------------------------------
+
+if (BUSES["SPECTRUM_ZXBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/spectrum/zxbus/bus.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/zxbus/bus.h",

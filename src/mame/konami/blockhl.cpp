@@ -137,7 +137,6 @@ uint32_t blockhl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	screen.priority().fill(0, cliprect);
 
-	m_k052109->tilemap_update();
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0); // tile 2
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 1); // tile 1
 	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);

@@ -100,7 +100,6 @@ private:
 	uint8_t m_sign[4]{};
 
 	template <uint8_t Which> void flipscreen_w(int state);
-	template <uint8_t Which> void dirtytiles();
 	void bankselect_w(uint8_t data);
 
 	void coin_counter_w(uint8_t data);

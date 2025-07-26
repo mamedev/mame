@@ -141,7 +141,7 @@ int k055555_device::K055555_get_palette_index(int idx)
 
 
 
-DEFINE_DEVICE_TYPE(K055555, k055555_device, "k055555", "K055555 Priority Encoder")
+DEFINE_DEVICE_TYPE(K055555, k055555_device, "k055555", "Konami 055555 Priority Encoder")
 
 k055555_device::k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K055555, tag, owner, clock)

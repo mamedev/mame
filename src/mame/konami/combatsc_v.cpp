@@ -232,9 +232,6 @@ TILE_GET_INFO_MEMBER(combatscb_state::get_text_info)
 
 void combatsc_state::video_start()
 {
-	m_k007121[0]->set_spriteram(m_videoram[0] + 0x1000);
-	m_k007121[1]->set_spriteram(m_videoram[1] + 0x1000);
-
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_tile_info0)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_k007121[1], tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_textlayer = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_text_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -244,6 +241,12 @@ void combatsc_state::video_start()
 	m_textlayer->set_transparent_pen(0);
 
 	m_textlayer->set_scroll_rows(32);
+
+	m_k007121[0]->register_tilemap(m_bg_tilemap[0]);
+	m_k007121[1]->register_tilemap(m_bg_tilemap[1]);
+	m_k007121[0]->register_tilemap(m_textlayer);
+	m_k007121[0]->set_spriteram(m_videoram[0] + 0x1000);
+	m_k007121[1]->set_spriteram(m_videoram[1] + 0x1000);
 }
 
 void combatscb_state::video_start()

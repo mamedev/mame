@@ -274,6 +274,29 @@ private:
 };
 
 
+class nes_vt_tvmjfc_state : public nes_vt_state
+{
+public:
+	nes_vt_tvmjfc_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_state(mconfig, type, tag),
+		m_mj_panel_index(0),
+		m_mj_panel(*this, "MJ%u", 0U)
+	{ }
+
+	void nes_vt_tvmjfc(machine_config& config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+	virtual uint8_t in1_r() override;
+	virtual void in0_w(uint8_t data) override;
+
+private:
+	uint8_t m_mj_panel_index;
+	required_ioport_array<10> m_mj_panel;
+};
+
+
 uint8_t nes_vt_base_state::vt_rom_r(offs_t offset)
 {
 	return m_prgrom[offset];
@@ -484,6 +507,40 @@ void nes_vt_ablpinb_state::in0_w(uint8_t data)
 
 	m_ablpinb_in0_val = data;
 	logerror("in0_w %02x\n", data);
+}
+
+
+void nes_vt_tvmjfc_state::machine_start()
+{
+	nes_vt_base_state::machine_start();
+
+	save_item(NAME(m_mj_panel_index));
+}
+
+
+uint8_t nes_vt_tvmjfc_state::in1_r()
+{
+	uint8_t panel_data = m_mj_panel_index >= 10 ? 0xff : m_mj_panel[m_mj_panel_index]->read();
+	if (m_previous_port0 & 0x02)
+	{
+		// "B" side of input matrix: 4B -> bit 4; 2B -> bit 3; 3B -> bit 2; 1B -> bit 1
+		return (panel_data & 0xf0) >> 3;
+	}	
+	else
+	{
+		// "A" side of input matrix: 4A -> bit 4; 2A -> bit 3; 3A -> bit 2; 1A -> bit 1
+		return (panel_data & 0x0f) << 1;
+	}
+}
+
+void nes_vt_tvmjfc_state::in0_w(uint8_t data)
+{
+	if (data & 0x01)
+		m_mj_panel_index = 0;
+	else if (!(data & 0x02) && (m_previous_port0 & 0x02))
+		m_mj_panel_index++;
+
+	m_previous_port0 = data;
 }
 
 
@@ -999,6 +1056,79 @@ static INPUT_PORTS_START( timetp36 )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+// Mahjong controller: ES-MJB08 LB090728
+// Input matrix mostly matches silkscreen labels on solder side. Each button feed into "KP6401" 32-pin rectangular ASIC (or MCU?) glob @ U2.
+// The program reencodes key presses to emulate the Famicom mahjong controller.
+static INPUT_PORTS_START( tvmjfc )
+	PORT_START("IO0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IO1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("MJ0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B ) // [3A/D1]
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_A ) // [2A/D1]
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) // "GANG" [4A/D1]
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) // "CHI" [3B/D1]
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("MJ1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // pon
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) // "JIAO" [3A/D2; remapped to 1A/D5]
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_NAME("%p Mahjong N/Start") // "N/決定" [2A/D2]
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("MJ2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("MJ3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_D ) // [3A/D4]
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_G ) // [2A/D4]
+	PORT_BIT( 0x18, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_J ) // [3B/D4]
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("MJ4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // reach
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) // performs "select" function when pressed together with I, but this seems like a glitch
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("MJ5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_L ) // [1A/D6]
+	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) // "PENG" [3B/D6; remapped to 1A/D2]
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("MJ6")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_F ) // [2A/D7]
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_H ) // [4A/D7]
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_E ) // [4B/D7]
+
+	PORT_START("MJ7")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_K ) // [3B/D8]
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("MJ8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SELECT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_C ) // [3A/D9]
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) // [2A/D9]
+	PORT_BIT( 0x18, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_M ) // [3B/D9]
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) // [4B/D9]
+
+	PORT_START("MJ9")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) // read but discarded
+INPUT_PORTS_END
 
 
 
@@ -1543,5 +1673,5 @@ CONS( 201?, ppgc200g,   0,         0,  nes_vt_pal_8mb, nes_vt, nes_vt_state, emp
 CONS( 201?, dgun2869,  0,         0,  nes_vt_16mb,     nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Retro Micro Controller - 220 Built-In Video Games (DGUN-2869)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, dgun2959,  0,         0,  nes_vt_pal_16mb, nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Plug And Play 220 Game Retro Controller (DGUN-2959)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// needs inputs - unit is a Mahjong controller.  This is said to be a hack(?) of a Famicom game (unless it was licensed by the original developer)
-CONS( 200?, tvmjfc,    0,        0,  nes_vt_2mb,    nes_vt, nes_vt_state, empty_init, "bootleg?", "TV Mahjong Game (VTxx hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )	
+// This is a hack of Ide Yosuke Meijin no Jissen Mahjong for the Famicom (unless it was licensed by the original developer)
+CONS( 200?, tvmjfc,    0,        0,  nes_vt_2mb,    tvmjfc, nes_vt_tvmjfc_state, empty_init, "bootleg?", "TV Mahjong Game (VTxx hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )	

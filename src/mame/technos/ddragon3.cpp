@@ -218,14 +218,14 @@ void ddragon3_state::ddragon3_vreg_w(offs_t offset, uint16_t data, uint16_t mem_
 
 void ddragon3_state::irq6_ack_w(uint16_t data)
 {
-	//  this gets written to on startup and at the end of IRQ6
+	// this gets written to on startup and at the end of IRQ6
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
 
 void ddragon3_state::irq5_ack_w(uint16_t data)
 {
-	//  this gets written to on startup and at the end of IRQ5 (input port read)
+	// this gets written to on startup and at the end of IRQ5 (input port read)
 	m_maincpu->set_input_line(5, CLEAR_LINE);
 }
 
@@ -360,6 +360,7 @@ void wwfwfest_state::main_map(address_map &map)
 	map(0x100000, 0x100007).rw(FUNC(wwfwfest_state::ddragon3_scroll_r), FUNC(wwfwfest_state::ddragon3_scroll_w));
 	map(0x10000a, 0x10000b).w(FUNC(wwfwfest_state::wwfwfest_flipscreen_w));
 	map(0x140000, 0x140003).w(FUNC(wwfwfest_state::wwfwfest_irq_ack_w));
+	map(0x140008, 0x140009).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x14000c, 0x14000d).w(FUNC(wwfwfest_state::wwfwfest_soundwrite));
 	map(0x140011, 0x140011).w(FUNC(wwfwfest_state::wwfwfest_priority_w));
 	map(0x140020, 0x140021).portr("P1");
@@ -821,17 +822,17 @@ void ddragon3_state::machine_reset()
 
 void ddragon3_state::ddragon3(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddragon3_state::ddragon3_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon3_state::ddragon3_scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ddragon3_state::sound_map);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248);   /* HTOTAL and VTOTAL are guessed */
+	m_screen->set_raw(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248); // HTOTAL and VTOTAL are guessed
 	m_screen->set_screen_update(FUNC(ddragon3_state::screen_update_ddragon3));
 	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	m_screen->set_palette(m_palette);
@@ -841,20 +842,20 @@ void ddragon3_state::ddragon3(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2151_device &ym2151(YM2151(config, "ym2151", XTAL(3'579'545)));
+	ym2151_device &ym2151(YM2151(config, "ym2151", 3.579545_MHz_XTAL));
 	ym2151.irq_handler().set_inputline(m_audiocpu, 0);
-	ym2151.add_route(0, "speaker", 0.50, 0);
-	ym2151.add_route(1, "speaker", 0.50, 1);
+	ym2151.add_route(0, "speaker", 0.25, 0);
+	ym2151.add_route(1, "speaker", 0.25, 1);
 
 	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH);
-	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.50, 0);
-	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.50, 1);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.75, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.75, 1);
 }
 
 void ddragon3_state::ddragon3b(machine_config &config)
@@ -881,54 +882,56 @@ void ddragon3_state::ctribe(machine_config &config)
 
 	ym2151_device &ym2151(*subdevice<ym2151_device>("ym2151"));
 	ym2151.reset_routes();
-	ym2151.add_route(0, "speaker", 1.20, 0);
-	ym2151.add_route(1, "speaker", 1.20, 1);
+	ym2151.add_route(0, "speaker", 0.60, 0);
+	ym2151.add_route(1, "speaker", 0.60, 1);
 
 	m_oki->reset_routes();
-	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
-	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.40, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.40, 1);
 }
 
 
 void wwfwfest_state::wwfwfest(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 24_MHz_XTAL / 2);  /* 24 crystal, 12 rated chip */
+	// basic machine hardware
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2); // 24 crystal, 12 rated chip
 	m_maincpu->set_addrmap(AS_PROGRAM, &wwfwfest_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon3_state::ddragon3_scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wwfwfest_state::sound_map);
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248);   /* HTOTAL and VTOTAL are guessed */
+	m_screen->set_raw(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248); // HTOTAL and VTOTAL are guessed
 	m_screen->set_screen_update(FUNC(wwfwfest_state::screen_update_wwfwfest));
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wwfwfest);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 8192);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2151_device &ym2151(YM2151(config, "ym2151", XTAL(3'579'545)));
+	ym2151_device &ym2151(YM2151(config, "ym2151", 3.579545_MHz_XTAL));
 	ym2151.irq_handler().set_inputline(m_audiocpu, 0);
-	ym2151.add_route(0, "mono", 0.45);
-	ym2151.add_route(1, "mono", 0.45);
+	ym2151.add_route(0, "mono", 0.33);
+	ym2151.add_route(1, "mono", 0.33);
 
-	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.90); /* Verified - Pin 7 tied to +5VDC */
+	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH); // Verified - Pin 7 tied to +5VDC
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.66);
 }
 
 void wwfwfest_state::wwfwfstb(machine_config &config)
 {
 	wwfwfest(config);
+
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	MCFG_VIDEO_START_OVERRIDE(wwfwfest_state,wwfwfstb)
 }
 
@@ -1501,17 +1504,17 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, ddragon3,  0,        ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3: The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3j, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3: The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3p, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3: The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3b, ddragon3, ddragon3b, ddragon3b, ddragon3_state, empty_init, ROT0, "bootleg",                         "Double Dragon 3: The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3,  0,         ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3: The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3j, ddragon3,  ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3: The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3p, ddragon3,  ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3: The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3b, ddragon3,  ddragon3b, ddragon3b, ddragon3_state, empty_init, ROT0, "bootleg",                         "Double Dragon 3: The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, ctribe,    0,        ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 2, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeua,  ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 2, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeu1,  ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribej,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (Japan, rev 2)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeb,   ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeb2,  ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribe,    0,         ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 2, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeua,  ctribe,    ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 2, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeu1,  ctribe,    ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribej,   ctribe,    ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (Japan, rev 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeb,   ctribe,    ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeb2,  ctribe,    ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 2)",    MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, wwfwfest,   0,        wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (World)",      MACHINE_SUPPORTS_SAVE ) // Euro label but shows FBI "Winners Don't Do drugs" logo
 GAME( 1991, wwfwfestu,  wwfwfest, wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan",                 "WWF WrestleFest (US, rev 2)",  MACHINE_SUPPORTS_SAVE )

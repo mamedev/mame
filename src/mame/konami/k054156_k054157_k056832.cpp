@@ -182,7 +182,7 @@ ones.  The other 7 words are ignored.  Global scrollx is ignored.
 
 
 
-DEFINE_DEVICE_TYPE(K056832, k056832_device, "k056832", "K056832 Tilemap Generator")
+DEFINE_DEVICE_TYPE(K056832, k056832_device, "k056832", "Konami 056832 Tilemap Generator")
 
 k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, K056832, tag, owner, clock),

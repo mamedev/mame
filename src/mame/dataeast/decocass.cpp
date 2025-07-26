@@ -287,10 +287,10 @@ static INPUT_PORTS_START( cocean1a ) /* 10 */
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Key Switch Credit" )                     PORT_DIPLOCATION("SW2:1,2")   /* Unknown */
-	PORT_DIPSETTING(    0x03, "1 Coin 10 Credits" )
-	PORT_DIPSETTING(    0x02, "1 Coin 20 Credits" )
-	PORT_DIPSETTING(    0x01, "1 Coin 50 Credits" )
-	PORT_DIPSETTING(    0x00, "1 Coin 100 Credits" )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_100C ) )
 	PORT_DIPNAME( 0x04, 0x04, "Game Select" )                           PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "1 to 8 Lines" )
 	PORT_DIPSETTING(    0x00, "Center Line" )

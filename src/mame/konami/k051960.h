@@ -36,6 +36,7 @@ public:
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
 	auto k051937_shadow_mode() { return m_shadow_config_cb.bind(); }
+	void set_priority_shadows(bool pri) { m_priority_shadows = pri; }
 
 	/*
 	The sprite callback is passed:
@@ -90,6 +91,7 @@ private:
 	u8 m_control;
 	emu_timer *m_sprites_busy;
 	u8 m_shadow_config;
+	bool m_priority_shadows;
 
 	u8 k051960_fetchromdata(offs_t offset);
 

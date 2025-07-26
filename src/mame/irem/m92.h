@@ -51,13 +51,11 @@ public:
 	void m92_banked(machine_config &config);
 	void inthunt(machine_config &config);
 	void lethalth(machine_config &config);
-	void ppan(machine_config &config);
 	void hook(machine_config &config);
 	void psoldier(machine_config &config);
 	void rtypeleo(machine_config &config);
 	void gunforc2(machine_config &config);
 	void geostorma(machine_config &config);
-	void nbbatman2bl(machine_config &config);
 	void bmaster(machine_config &config);
 	void nbbatman(machine_config &config);
 	void uccops(machine_config &config);
@@ -72,7 +70,10 @@ public:
 
 	int sprite_busy_r();
 
-private:
+protected:
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { m_sprite_buffer_busy = 1; }
+
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<uint16_t> m_vram_data;
 	required_shared_ptr<uint16_t> m_spritecontrol;
@@ -88,7 +89,7 @@ private:
 	required_ioport m_dsw;
 
 	emu_timer *m_spritebuffer_timer = nullptr;
-	uint32_t m_raster_irq_position = 0;
+	int32_t m_raster_irq_position = -1;
 	uint16_t m_videocontrol = 0;
 	uint8_t m_sprite_buffer_busy = 0;
 	M92_pf_layer_info m_pf_layer[3];
@@ -110,15 +111,12 @@ private:
 	void oki_bank_w(uint16_t data);
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	DECLARE_MACHINE_RESET(m92);
-	DECLARE_VIDEO_START(m92);
-	DECLARE_VIDEO_START(ppan);
 	uint32_t screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nbbatman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void m92_update_scroll_positions();
-	void m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void lethalth_map(address_map &map) ATTR_COLD;
 	void m92_map(address_map &map) ATTR_COLD;
@@ -127,11 +125,44 @@ private:
 	void m92_base_map(address_map &map) ATTR_COLD;
 	void m92_portmap(address_map &map) ATTR_COLD;
 	void majtitl2_map(address_map &map) ATTR_COLD;
-	void nbbatman2bl_map(address_map &map) ATTR_COLD;
-	void ppan_portmap(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(spritebuffer_done);
+};
+
+
+// Peter Pan (bootleg of Hook, different sprite hardware)
+class ppan_state : public m92_state
+{
+public:
+	ppan_state(const machine_config &mconfig, device_type type, const char *tag) :
+		m92_state(mconfig, type, tag)
+	{ }
+
+	void ppan(machine_config &config);
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+private:
+	void ppan_portmap(address_map &map) ATTR_COLD;
+};
+
+
+// Ninja Baseball Bat Man II (bootleg, very different hardware)
+class nbb2b_state : public m92_state
+{
+public:
+	nbb2b_state(const machine_config &mconfig, device_type type, const char *tag) :
+		m92_state(mconfig, type, tag)
+	{ }
+
+	void nbbatman2bl(machine_config &config);
+
+private:
+	void nbbatman2bl_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_IREM_M92_H

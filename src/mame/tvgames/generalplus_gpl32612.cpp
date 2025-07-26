@@ -302,6 +302,22 @@ ROM_START( anpanm19 )
 	ROM_LOAD( "25l1280.u3", 0x0000, 0x1000000, CRC(7932fb3e) SHA1(a381eeba5357fe71e4d6081b9b91b57e5705f7f1) )
 ROM_END
 
+ROM_START( pdcm2 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x84000000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "k9gag08u0m.u3", 0x0000, 0x84000000, CRC(88d9c107) SHA1(0b70962ecddf3a8a748b7af5e81cffb365f704e2) )
+ROM_END
+
+ROM_START( arcadege )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x8400000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg0s3eta00.u3", 0x0000, 0x8400000, CRC(9b4db25e) SHA1(7e3d7e15f2592efd98027440c3761179c95e4417) )
+ROM_END
+
 
 void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
@@ -378,3 +394,22 @@ CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_g
 // ROM has 'GPNandTag2' header rather than the usual
 // 鬼滅の刃 全集中パッド（グリーン)
 CONS( 2021, dmnslayg,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Bandai",        "Demon Slayer: Kimetsu no Yaiba Zenshuuchuu Pad (green ver.) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+/* PCB is marked as M2-SPG48-GPG35-V30 2009-08-11
+
+SoC appears to be
+CONNY CNT61623P-003A-QL172
+MD481P
+0917
+
+(could be a rebranded GPL32 series, ROM has GPNand header)
+
+there is also a
+GPY0201A
+
+*/
+
+CONS( 2009, pdcm2,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VideoJet / Conny",        "PDC M2",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses a GPL32600A-003A-QL141
+CONS( 200?, arcadege,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Millennium 2000 GmbH",        "Millennium Arcade Genius SE",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

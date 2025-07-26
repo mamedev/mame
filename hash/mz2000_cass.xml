@@ -46,6 +46,24 @@ TODO:
 
 <!-- !Games -->
 
+	<software name="amtennis" supported="yes">
+		<description>Amateur Tennis</description>
+		<year>1982</year>
+		<publisher>Carry Lab</publisher>
+		<notes><![CDATA[
+Sets back color = 1 (blue) over blue text in color mode, incompatible? (verify)
+]]></notes>
+		<info name="usage" value="IPL" />
+		<info name="serial" value="CG-75"/>
+		<info name="alt_title" value="アマテニス"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4042286">
+				<!-- .mzt to .wav converted -->
+				<rom name="cg-75.wav" size="4042286" crc="d4a5b5a3" sha1="3ca52d1a7c3c765b32de005202d5ce3fce6032af" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bombrman" supported="no">
 		<description>Bomber Man</description>
 		<year>1983</year>
@@ -76,10 +94,56 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 		</part>
 	</software>
 
+	<software name="doordoor" supported="partial">
+		<description>Door Door</description>
+		<year>1983</year>
+		<publisher>Enix</publisher>
+		<notes><![CDATA[
+Runs too fast, particularly when there's only one enemy on screen (verify)
+Provided sheet page shows game in Color, is it the purpose of side B? (verify)
+]]></notes>
+		<info name="usage" value="mz1z002 MON" />
+		<info name="serial" value="E-G014"/>
+		<info name="alt_title" value="ドアドア" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3834030">
+				<!-- .mzt to .wav converted -->
+				<rom name="e-g014.wav" size="3834030" crc="f1e236db" sha1="b332d179c96cf57a8b73efaf2bac6bbb16f655b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flibact" supported="no">
+		<description>Flight Simulator &amp; Bacteria</description>
+		<year>1982?</year>
+		<publisher>Carry Lab</publisher>
+		<notes><![CDATA[
+Flight Simulator: not extensively tested, understand control scheme
+Bacteria: goes in Monitor TS-2000, fails to load second part
+]]></notes>
+		<info name="usage" value="IPL" />
+		<info name="serial" value="PP-1"/>
+		<info name="alt_title" value="フライトシミュレータ一 &amp; バクテリア" />
+		<!-- No explicit side letters, just the game name in Jp -->
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Flight Simulator"/>
+			<dataarea name="cass" size="2925686">
+				<rom name="pp-1_flight-simulator.wav" size="2925686" crc="f60c1324" sha1="0e75339a45abeb511ce48b2f382b00e7511f6e2e"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Bacteria"/>
+			<dataarea name="cass" size="2799636">
+				<rom name="pp-1_bacteria.wav" size="2799636" crc="a0d25dad" sha1="0a9412dda9b2eda2695fcd4ad4b6d4ca76f7b418"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="harvestc" supported="no">
-		<description>Harvest (Color?)</description>
-		<year>19??</year>
+		<description>Harvest (Color)</description>
+		<year>1983?</year>
 		<publisher>マイクロネット (Micronet)</publisher>
+		<info name="usage" value="mz1z002 MON" />
 		<sharedfeat name="compatibility" value="COLOR"/>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="47808">
@@ -88,10 +152,11 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 		</part>
 	</software>
 
-	<software name="harvestg" supported="no">
-		<description>Harvest (Green?)</description>
-		<year>19??</year>
+	<software name="harvestg" cloneof="harvestc" supported="no">
+		<description>Harvest (Monochrome)</description>
+		<year>1983?</year>
 		<publisher>マイクロネット (Micronet)</publisher>
+		<info name="usage" value="mz1z002 MON" />
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="47808">
 				<rom name="harvest_green.mzt" size="47808" crc="fe0b6a0b" sha1="5ba88252496cc12a1f9807b36a664aa32d7dc1a4" />
@@ -156,6 +221,7 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 		<year>1983</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<part name="cass1" interface="mz_cass">
+			<!-- baddump: missing Monitor TS-2000 bootstrap (in the original .mtw as raw binary) -->
 			<dataarea name="cass" size="3676194">
 				<rom name="jelda.wav" size="3676194" crc="5812e3f2" sha1="d751932064f53a764b756846393526dd511f5cff" status="baddump" />
 			</dataarea>
@@ -169,6 +235,7 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 		<year>1984</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<part name="cass1" interface="mz_cass">
+			<!-- baddump: missing Monitor TS-2000 bootstrap (in the original .mtw as raw binary) -->
 			<dataarea name="cass" size="6435154">
 				<rom name="jelda2.wav" size="6435154" crc="b7d61f11" sha1="8ff3932682e70f74f5d542059450e1a83b987c6a" status="baddump" />
 			</dataarea>
@@ -191,6 +258,22 @@ Loading error, boots with Z80 clock set at 3.2 MHz (80%)
 		</part>
 	</software>
 
+	<software name="kyofual" supported="yes">
+		<description>Kyofu no Alien</description>
+		<year>1982?</year>
+		<publisher>Carry Lab</publisher>
+		<info name="usage" value="mz1z002 MON" />
+		<info name="serial" value="CG-30"/>
+		<info name="alt_title" value="恐怖のエイリアン"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1835692">
+				<!-- .mzt to .wav converted -->
+				<!-- <rom name="cg-30.wav" size="1835692" crc="371cf080" sha1="5b84658ffe5475bb851860ea918e14162f6771b2" /> -->
+				<!-- NOTE: this is the only RevengeOfTheHubz dump that actually works in .mzt only (?) -->
+				<rom name="cg-30.mzt" size="7809" crc="668ae553" sha1="ce6dcc3d2931e5f1e337bec3ee1b8ff318e30b06" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="powrfail" supported="no">
 		<description>Power Fail</description>
@@ -208,6 +291,39 @@ CHECK SUM ERROR
 		</part>
 	</software>
 
+	<software name="puckman" supported="no">
+		<description>Puck Man</description>
+		<year>1982</year>
+		<publisher>Carry Lab</publisher>
+		<notes><![CDATA[
+Gets stuck during loading
+]]></notes>
+		<info name="usage" value="mz1z002 MON" />
+		<info name="serial" value="CG-29"/>
+		<info name="alt_title" value="パックマン"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2772284">
+				<!-- .mzt to .wav converted -->
+				<rom name="cg-29.wav" size="2772284" crc="7f8325d8" sha1="ff34f3159d07b0c281b660852d1b407a7fcc66d4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacebee" supported="yes">
+		<description>Space Bee</description>
+		<year>1982</year>
+		<publisher>Carry Lab</publisher>
+		<info name="usage" value="IPL" />
+		<info name="serial" value="CG-39"/>
+		<info name="alt_title" value="スペースビー"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2464686">
+				<!-- .mzt to .wav converted -->
+				<rom name="cg-39.wav" size="2464686" crc="79651365" sha1="af85fbd36f7291bb6f77026870e1970198fcdfab" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thespidr" supported="no">
 		<description>The Spider</description>
 		<year>1983</year>
@@ -220,6 +336,21 @@ CHECK SUM ERROR
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="3149100">
 				<rom name="wb-1006.wav" size="3149100" crc="eec8674f" sha1="231d55c6cbb48fe88676fec31f014c6002788b5f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spydaisn" supported="yes">
+		<description>Spy Daisakusen</description>
+		<year>1982</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="usage" value="mz1z001 LOAD" />
+		<info name="serial" value="CG-75"/>
+		<info name="alt_title" value="アマテニス"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5464539">
+				<!-- .mzt to .wav converted -->
+				<rom name="k28h5013.flac" size="5464539" crc="6b10e3f7" sha1="3a9b1d1ec98fac3e1faf79dc524f0476ddb31434" />
 			</dataarea>
 		</part>
 	</software>
@@ -267,5 +398,25 @@ CHECK SUM ERROR
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="walkwan" supported="yes">
+		<description>Walk Wan</description>
+		<year>1982</year>
+		<publisher>Tecno Soft</publisher>
+		<notes><![CDATA[
+Has issues displaying title screen in color mode, incompatible? (verify)
+]]></notes>
+		<info name="usage" value="mz1z002 LOAD" />
+		<info name="serial" value="TM2-005"/>
+		<info name="alt_title" value="ウオークワン"/>
+		<sharedfeat name="compatibility" value="MONO"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2808920">
+				<!-- .mzt to .wav converted -->
+				<rom name="tm2-005.wav" size="2808920" crc="7e1b4fbe" sha1="62feba7d00fd5df883830c6913afd979b43411df" />
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>

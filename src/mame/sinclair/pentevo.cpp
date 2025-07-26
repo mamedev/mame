@@ -515,19 +515,9 @@ void pentevo_state::spi_miso_w(u8 data)
 
 u8 pentevo_state::gluk_data_r(offs_t offset)
 {
-	if (m_glukrs->is_active())
-	{
-		if (m_gluk_ext == 2)
-			return m_keyboard->read();
-		else if (m_glukrs->address_r() == 0x0a)
-			return 0x20 | (m_glukrs->data_r() & 0x0f);
-		else if (m_glukrs->address_r() == 0x0b)
-			return 0x02 | (m_glukrs->data_r() & 0x04);
-		else if (m_glukrs->address_r() == 0x0c)
-			return 0x10;
-		else if (m_glukrs->address_r() == 0x0d)
-			return 0x80;
-	}
+	if (m_glukrs->is_active() && (m_gluk_ext == 2))
+		return m_keyboard->read();
+
 	return m_glukrs->data_r(); // returns 0xff if inactive
 }
 
@@ -536,26 +526,24 @@ void pentevo_state::gluk_data_w(offs_t offset, u8 data)
 	if (!m_glukrs->is_active())
 		return;
 
-	u8 addr = m_glukrs->address_r();
+	const u8 addr = m_glukrs->address_r();
 	if (addr >= 0xf0 && addr <= 0xf0)
 	{
 		m_gluk_ext = data;
 		u8 m_fx[0xf] = {0x00};
 		if (data == 0 || data == 1) // BASECONF_VERSION + BOOTLOADER_VERSION
 		{
-			strcpy((char *)m_fx, "M.A.M.E.");
+			strcpy((char *)m_fx, "MAME");
 			PAIR16 m_ver;
-			m_ver.w = ((22 << 9) | (9 << 5) | 3); // y.m.d
+			m_ver.w = ((25 << 9) | (7 << 5) | 31); // y.m.d
 			m_fx[0x0c] = m_ver.b.l;
 			m_fx[0x0d] = m_ver.b.h;
 		}
 
 		for (u8 i = 0; i < 0xf; i++)
 		{
-			m_glukrs->address_w(0xf0 + i);
-			m_glukrs->data_w(m_fx[i]);
+			m_glukrs->write_direct(0xf0 + i, m_fx[i]);
 		}
-		m_glukrs->address_w(addr);
 	}
 	else
 	{

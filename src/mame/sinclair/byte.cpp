@@ -85,8 +85,11 @@ void byte_state::map_io(address_map &map)
 
 u8 byte_state::kbd_fe_r(offs_t offset)
 {
-	if (is_contended(offset)) content_early();
-	content_early(1);
+	if (!machine().side_effects_disabled())
+	{
+		if (is_contended(offset)) content_early();
+		content_early(1);
+	}
 
 	u8 lines = offset >> 8;
 	u8 data = 0xff;
