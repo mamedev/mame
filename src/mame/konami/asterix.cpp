@@ -5,8 +5,12 @@
 Asterix
 Konami GX068 PCB
 
+OSC: 32MHz & 24MHz
+CPU: MC68000P12, Z84C0006PEC
+Konami custom: 054358, 054156, 054157, 053251, 053244, 053245, 053260
+
 TODO:
-- Verify clocks, PCB has 2 OSCs. 32MHz & 24MHz
+- verify clocks and video timing
 
 ***************************************************************************/
 
@@ -383,7 +387,7 @@ void asterix_state::asterix(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &asterix_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(asterix_state::asterix_interrupt));
 
-	Z80(config, m_audiocpu, 32_MHz_XTAL / 4); // 8MHz Z80E ??
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 4); // 6MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &asterix_state::sound_map);
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
