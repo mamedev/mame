@@ -543,39 +543,42 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<!-- boot OK -->
-	<software name="acecomb2">
+	<software name="acecomb2_us" cloneof="acecomb2">
 		<!--
-		Original images (Redump)
+		http://redump.org/disc/3415
 		<rom name="Ace Combat 2 (USA).cue" size="84" crc="22809b6a" sha1="4c3d61ca7b95708714738b1a6e341948cfac6745"/>
 		<rom name="Ace Combat 2 (USA).bin" size="580760544" crc="852e5ded" sha1="a441bb9ace9434a6d05d9e846d2b23b9523e2867"/>
 		-->
 		<description>Ace Combat 2 (USA)</description>
 		<year>1997</year>
 		<publisher>Namco Hometek</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00404"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="ace combat 2 (usa)" sha1="01161beb471048151c5c0923760e430a90872a3d"/>
+				<disk name="Ace Combat 2 (USA)" sha1="80a5aaf5c4d0fac0cf46cebd8a54b8a9eb14e604"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- boot OK -->
-	<software name="acecomb3">
-		<!-- Original images (Redump)
+	<software name="acecomb3_us" cloneof="acecomb3">
+		<!--
+		http://redump.org/disc/13105
 		<rom name="Ace Combat 3 - Electrosphere (USA).cue" size="100" crc="b8624d3d" sha1="387418c52e2b7bf02f7187e31274ecff67ce59d5"/>
 		<rom name="Ace Combat 3 - Electrosphere (USA).bin" size="644977200" crc="a9dbe00f" sha1="9b690c02cdb7754f2fa478c4974ec69600f2f269"/>
 		-->
-		<description>Ace Combat 3 - Electrosphere (USA)</description>
+		<description>Ace Combat 3: Electrosphere (USA)</description>
 		<year>1999</year>
-		<publisher>Namco Hometek</publisher>
+		<publisher>Namco</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00972"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="ace combat 3 - electrosphere (usa)" sha1="409f53ba089186b59d308b7c161ef4fe225ac254"/>
+				<disk name="Ace Combat 3 - Electrosphere (USA)" sha1="9579e5d056d01e82679b350e89ff329f603e418b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -610,36 +613,42 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="actbass">
-		<!-- Original images (Redump)
+	<software name="actbass_us" cloneof="actbass">
+		<!--
+		http://redump.org/disc/11669
 		<rom name="Action Bass (USA).cue" size="83" crc="d5b1c996" sha1="d9679f8edd4825e9815f133f1b9f76378dd09014"/>
 		<rom name="Action Bass (USA).bin" size="171900624" crc="6796d740" sha1="dd12151ef5a9bb8bf6ef9d41d9847341e4dd44e1"/>
 		-->
 		<description>Action Bass (USA)</description>
 		<year>2000</year>
-		<publisher>Take-Two Interactive Software</publisher>
+		<publisher>Take-Two Interactive</publisher>
+		<info name="developer" value="Vingt-et-un Systems"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-01248"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="action bass (usa)" sha1="69f3d407cf78cc5aef730e5cd656cfae17affb94"/>
+				<disk name="Action Bass (USA)" sha1="c05deccf73c1c73fbc15ca97d6133ea332fb8a14"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="actionmn">
-		<!-- Original images (Redump)
+	<software name="actionmn_us" cloneof="actionmn">
+		<!-- 
+		http://redump.org/disc/10647
 		<rom name="Action Man - Operation Extreme (USA).cue" size="102" crc="cf924cc1" sha1="bd6fbb3575f9a2d3072f2a76de2cbb52f8f4e377"/>
 		<rom name="Action Man - Operation Extreme (USA).bin" size="553089264" crc="9d4dbbcb" sha1="d0e4834cb0ee6aca998223c8068872972da1c869"/>
 		-->
-		<description>Action Man - Operation Extreme (USA)</description>
+		<description>Action Man - Operation eXtreme (USA)</description>
 		<year>2000</year>
 		<publisher>Hasbro Interactive</publisher>
+		<info name="developer" value="Interactive Studios"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00887"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="action man - operation extreme (usa)" sha1="4192c86e903bd5d4ac4b004f05851961f76206d2"/>
+				<disk name="Action Man - Operation Extreme (USA)" sha1="52170ed7d2390e094dbcd49ece3df8660dcd9a49"/>
 			</diskarea>
 		</part>
 	</software>
@@ -663,8 +672,9 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="adidas">
-		<!-- Original images (Redump)
+	<software name="adidas_us" cloneof="adidas" supported="no">
+		<!--
+		http://redump.org/disc/16589
 		<rom name="Adidas Power Soccer (USA).cue" size="458" crc="7d82f282" sha1="492f177c0b0290c7dbd02f851b6307e46e15f974"/>
 		<rom name="Adidas Power Soccer (USA) (Track 1).bin" size="515506656" crc="86794679" sha1="bd8755ef1b00c18b417394b84ca28b5a51967c95"/>
 		<rom name="Adidas Power Soccer (USA) (Track 2).bin" size="43770720" crc="38238ea6" sha1="265db818f73c0995aa1217e80b3b3c3139db0428"/>
@@ -674,11 +684,16 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<description>Adidas Power Soccer (USA)</description>
 		<year>1996</year>
 		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+The game freezes when loading (after the intro)
+]]></notes>
+		<info name="developer" value="Psygnosis"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SCUS-94502"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="adidas power soccer (usa)" sha1="57d61fc072374600d3df4303359d68c9f81138de"/>
+				<disk name="Adidas Power Soccer (USA)" sha1="f62226496c6e15726bf6cc342b3f7d66a63044ed"/>
 			</diskarea>
 		</part>
 	</software>
@@ -36493,7 +36508,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Official U.S. PlayStation Magazine Demo Disc 43 (USA) (No EDC) (Track 5).bin" size="3520944" crc="4e399fa1" sha1="b41cd8b9b8159017f04cd76b4ceb3a1062a3477a"/>
 		<rom name="Official U.S. PlayStation Magazine Demo Disc 43 (USA) (No EDC) (Track 6).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>Official U.S. PlayStation Magazine Demo Disc 43 (USA, No EDC)</description>
+		<description>Official U.S. PlayStation Magazine Demo Disc 43 (USA) (no EDC)</description>
 		<year>2001</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94634"/>
@@ -36515,7 +36530,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Official U.S. PlayStation Magazine Demo Disc 43 (USA) (EDC) (Track 5).bin" size="3520944" crc="4e399fa1" sha1="b41cd8b9b8159017f04cd76b4ceb3a1062a3477a"/>
 		<rom name="Official U.S. PlayStation Magazine Demo Disc 43 (USA) (EDC) (Track 6).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>Official U.S. PlayStation Magazine Demo Disc 43 (USA, EDC)</description>
+		<description>Official U.S. PlayStation Magazine Demo Disc 43 (USA) (with EDC)</description>
 		<year>2001</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94634"/>
@@ -37382,6 +37397,262 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="acecombt" cloneof="aircombt">
+		<!--
+		http://redump.org/disc/1691/
+		<rom name="Ace Combat (Japan).cue" size="7101" crc="a7a2d0f4" sha1="9230a58f78ddfe09a72cbeba40c447dd845b5501"/>
+		<rom name="Ace Combat (Japan) (Track 01).bin" size="106138704" crc="e57e6e46" sha1="3563f0a9a5c5dec04588347214483f7e8af2cd8e"/>
+		<rom name="Ace Combat (Japan) (Track 02).bin" size="36738240" crc="e6604b54" sha1="f2868a668beeb5b709afac84d14555fd50372041"/>
+		<rom name="Ace Combat (Japan) (Track 03).bin" size="28652064" crc="b18c652d" sha1="62fc6f4574f6cd05412460bffa8a6c71d68f90eb"/>
+		<rom name="Ace Combat (Japan) (Track 04).bin" size="27024480" crc="fd6529d3" sha1="632313b0e7de9d4f87ffe853f65943b8fe15ebfc"/>
+		<rom name="Ace Combat (Japan) (Track 05).bin" size="28993104" crc="f71fe9c4" sha1="1c924e33b0183ed0e4f7213dfba903a6ff7b7cfe"/>
+		<rom name="Ace Combat (Japan) (Track 06).bin" size="13373472" crc="fd8c35df" sha1="70d8b090774191b5e22cc265fdfd4b9bb476a155"/>
+		<rom name="Ace Combat (Japan) (Track 07).bin" size="21010416" crc="7937b637" sha1="198e26e3c16495ed00ff27004ea75c0183fff163"/>
+		<rom name="Ace Combat (Japan) (Track 08).bin" size="29425872" crc="e84043cf" sha1="72daa305a67a920909dcb18af4e6c9e6abf10204"/>
+		<rom name="Ace Combat (Japan) (Track 09).bin" size="31634400" crc="70e129c6" sha1="909b416fcbb83a7c590cc97ad0309464de167b30"/>
+		<rom name="Ace Combat (Japan) (Track 10).bin" size="26391792" crc="73ac9def" sha1="21d8cf0dfceecc17ecb958b6bf9799895f87cef2"/>
+		<rom name="Ace Combat (Japan) (Track 11).bin" size="21946512" crc="de0fa43e" sha1="0fc0b8580200d4e72b37f3f2778163f108844fab"/>
+		<rom name="Ace Combat (Japan) (Track 12).bin" size="15066912" crc="b067eb09" sha1="df716bba8ef894eb57792879229b2019622aa59b"/>
+		<rom name="Ace Combat (Japan) (Track 13).bin" size="15172752" crc="59efad88" sha1="7b79eb67e3205623653ebdfb30f5aae411f91de3"/>
+		<rom name="Ace Combat (Japan) (Track 14).bin" size="2253216" crc="6325eb0a" sha1="4c297ef440556ea34bfccd9bd5af31bdf4484d26"/>
+		<rom name="Ace Combat (Japan) (Track 15).bin" size="12103392" crc="9e063251" sha1="4de8924fbd50846dfac165daa1961b40dd8517c6"/>
+		<rom name="Ace Combat (Japan) (Track 16).bin" size="2471952" crc="4058386a" sha1="a6268a8d77d1238d3ebbb859031a826ed53e72a3"/>
+		<rom name="Ace Combat (Japan) (Track 17).bin" size="21417312" crc="4e808c90" sha1="6b7380ab04dc0b3e6a465e94abf4ad2f626b4bf8"/>
+		<rom name="Ace Combat (Japan) (Track 18).bin" size="26709312" crc="101c6976" sha1="e8828fa899d1946bd1ea69ccd65547ddd373ddf8"/>
+		<rom name="Ace Combat (Japan) (Track 19).bin" size="9175152" crc="dbd916ca" sha1="fed3c81ab2046787b4020531d92f46fac7f0ae1c"/>
+		<rom name="Ace Combat (Japan) (Track 20).bin" size="16061808" crc="1bf98118" sha1="078e39531684272903d3eb4aafdd31b989675fd2"/>
+		<rom name="Ace Combat (Japan) (Track 21).bin" size="2775360" crc="6c254834" sha1="4baa057175777ac899032192ccbc39295b20f40a"/>
+		<rom name="Ace Combat (Japan) (Track 22).bin" size="1147776" crc="8aae87d1" sha1="cf7dd4c7cd35476ded88f604e85ee9236ba2e3da"/>
+		<rom name="Ace Combat (Japan) (Track 23).bin" size="2105040" crc="eb78944b" sha1="c9576bdc8bdf73f256808a883e6b7daaa6c66556"/>
+		<rom name="Ace Combat (Japan) (Track 24).bin" size="1147776" crc="11133ce5" sha1="11fa285e225a93063890481d81fb3d2e96335683"/>
+		<rom name="Ace Combat (Japan) (Track 25).bin" size="1846320" crc="7f3709ac" sha1="1d04eefcd5c0178e38c72f587f51cf8aaf611d05"/>
+		<rom name="Ace Combat (Japan) (Track 26).bin" size="1192464" crc="9bcb2928" sha1="ee5d4369f95d106faa045ae6b8898e26265bb5b8"/>
+		<rom name="Ace Combat (Japan) (Track 27).bin" size="1150128" crc="b3735a67" sha1="1966f4a4aefd7e2462476acbd4ad86aef53146ea"/>
+		<rom name="Ace Combat (Japan) (Track 28).bin" size="2243808" crc="a2f89695" sha1="2eb425b4265de08e6ed5971628dc099acc734291"/>
+		<rom name="Ace Combat (Japan) (Track 29).bin" size="1514688" crc="aeda8a6b" sha1="9f48166062a4e29f548a1231e8cb50e1d251d1c2"/>
+		<rom name="Ace Combat (Japan) (Track 30).bin" size="2907072" crc="d7e9dbbc" sha1="6a55683bec61d0ea4abdd1ca443b3a5b6d67f9e7"/>
+		<rom name="Ace Combat (Japan) (Track 31).bin" size="2145024" crc="07116b29" sha1="677391b7f58e9bf22caa38726cf0ce7971bc296a"/>
+		<rom name="Ace Combat (Japan) (Track 32).bin" size="1147776" crc="4567d162" sha1="63cfce6a894f361d11484f7d0d3f717e53c0beae"/>
+		<rom name="Ace Combat (Japan) (Track 33).bin" size="1161888" crc="2dc65e7c" sha1="b1a50baf0bcbf510fb4f858ecfaa41c110294aa7"/>
+		<rom name="Ace Combat (Japan) (Track 34).bin" size="2036832" crc="e73d96e3" sha1="1ce2f0ed5c83e5feb0ce03c6219c59cbbb7c8427"/>
+		<rom name="Ace Combat (Japan) (Track 35).bin" size="1190112" crc="e7c897cc" sha1="2316f0988e96166980504896f36184f3afcb47fa"/>
+		<rom name="Ace Combat (Japan) (Track 36).bin" size="1698144" crc="64c1b3c7" sha1="c6813c2db55175d28462298b0a2cb21afa19a1b8"/>
+		<rom name="Ace Combat (Japan) (Track 37).bin" size="4370016" crc="6c5117e0" sha1="6a2dea25522ef46de2b65d8dc1ba45491149f233"/>
+		<rom name="Ace Combat (Japan) (Track 38).bin" size="1147776" crc="5f560df7" sha1="1e63a3c893c10557dfba70d5bccacd34c7cf4b95"/>
+		<rom name="Ace Combat (Japan) (Track 39).bin" size="1333584" crc="5953a590" sha1="2d2afb9a8ffb6bbb62864b0cc6e2c9b7acb7b0cd"/>
+		<rom name="Ace Combat (Japan) (Track 40).bin" size="1851024" crc="ddced3a7" sha1="250a1a449dafd96ff915e2797ca039874b7dc1d5"/>
+		<rom name="Ace Combat (Japan) (Track 41).bin" size="1147776" crc="e9473517" sha1="795d09fb292b7c598988eb7fb7182d08d68ac8d8"/>
+		<rom name="Ace Combat (Japan) (Track 42).bin" size="1147776" crc="d3dba64b" sha1="7a4cc713157994a3b90b853d0e6c33cd0c24cae1"/>
+		<rom name="Ace Combat (Japan) (Track 43).bin" size="4235952" crc="4c1f8962" sha1="2b1a3c8f76e68d3d423b81b1ac26797a442e20a0"/>
+		<rom name="Ace Combat (Japan) (Track 44).bin" size="2330832" crc="2ac449a1" sha1="d107d3290e203b01a72cea241d39fc4d877f08b1"/>
+		<rom name="Ace Combat (Japan) (Track 45).bin" size="1147776" crc="1a8dd5bd" sha1="822a999f89d6d8bd001c0cb7f25ef368ee7059a9"/>
+		<rom name="Ace Combat (Japan) (Track 46).bin" size="1183056" crc="14949216" sha1="f373b8ef003f56b69e63b382158b9593757f7436"/>
+		<rom name="Ace Combat (Japan) (Track 47).bin" size="3229296" crc="5e4a84d8" sha1="7d8e75995fd4dcea4ae728345636cc37ae076ecf"/>
+		<rom name="Ace Combat (Japan) (Track 48).bin" size="1147776" crc="f803e31c" sha1="bc64abb228025b6d15e7b458ac0aa13e800a71bc"/>
+		<rom name="Ace Combat (Japan) (Track 49).bin" size="2613072" crc="49e4e3f3" sha1="94756a349674ca84c1166ab099cf728a64320762"/>
+		<rom name="Ace Combat (Japan) (Track 50).bin" size="1147776" crc="95f930a9" sha1="3b760c45abad3b385d6adf21da0fd946f494d502"/>
+		<rom name="Ace Combat (Japan) (Track 51).bin" size="1905120" crc="c773efa2" sha1="d6785861aa3f8cbb923c572bdf29c6637ca5398e"/>
+		<rom name="Ace Combat (Japan) (Track 52).bin" size="1350048" crc="db8c1eef" sha1="aa78a1bea5c8d94b9be3ad440b37c0d793c0e860"/>
+		<rom name="Ace Combat (Japan) (Track 53).bin" size="1147776" crc="7f9cec6f" sha1="251603cb0b437cdc2bee48f6872b1083cdd48238"/>
+		<rom name="Ace Combat (Japan) (Track 54).bin" size="1147776" crc="83e91720" sha1="0a41ee59aaf610dce3108a4822372781acf3f677"/>
+		<rom name="Ace Combat (Japan) (Track 55).bin" size="1150128" crc="c0f1a962" sha1="d4923027288040fde405470d9f9a1b3eaf767519"/>
+		<rom name="Ace Combat (Japan) (Track 56).bin" size="1150128" crc="0301987b" sha1="fb871082c45b47315948f35e5e72a13b2feb05c6"/>
+		<rom name="Ace Combat (Japan) (Track 57).bin" size="1178352" crc="dbf35e36" sha1="29ec4551096c038436f92962983d453f5aba3d75"/>
+		<rom name="Ace Combat (Japan) (Track 58).bin" size="2196768" crc="b64928fa" sha1="10e7395f83b758fdfe49cc99e815ee637d2241c8"/>
+		<rom name="Ace Combat (Japan) (Track 59).bin" size="1190112" crc="d45922f7" sha1="6acf92b0c350db98beafac389d51602deb4d539b"/>
+		<rom name="Ace Combat (Japan) (Track 60).bin" size="1484112" crc="5e029cf7" sha1="69ce8ef6ae3b043d3417b0bd0fdf3ca3c8bc4a58"/>
+		<rom name="Ace Combat (Japan) (Track 61).bin" size="3532704" crc="3389aac7" sha1="7cecef95f3affa36dcb05166e5a02de54ecdf336"/>
+		<rom name="Ace Combat (Japan) (Track 62).bin" size="2100336" crc="b15ec2c2" sha1="ba80e7e73aa3f6c43084ce4f9e7c316018692cd9"/>
+		<rom name="Ace Combat (Japan) (Track 63).bin" size="42796992" crc="df07e201" sha1="56cbbf607b9f3c4fe620bb6f6a84349a349a755a"/>
+		-->
+		<description>Ace Combat (Japan)</description>
+		<year>1995</year>
+		<publisher>Namco Hometek</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="Japanese"/>
+		<info name="release" value="19950630"/>
+		<info name="serial" value="SLPS-00061, SLPS-91005"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ace Combat (Japan)" sha1="24246f8d7ec82fed76abfa12b8f49e49c5900bf9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="acecomb2_jp" cloneof="acecomb2">
+		<!--
+		http://redump.org/disc/271
+		<rom name="Ace Combat 2 (Japan).cue" size="86" crc="2d68070c" sha1="a83b1eda1e94076e4d608d75b5cbf3d383d78654"/>
+		<rom name="Ace Combat 2 (Japan).bin" size="580273680" crc="2f645ad6" sha1="311e51e978b26c971196cae2571b858e72c6d983"/>
+		-->
+		<description>Ace Combat 2 (Japan)</description>
+		<year>1997</year>
+		<publisher>Namco</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="Japanese"/>
+		<info name="serial" value="SLPS-00830"/>
+		<info name="speech" value="English" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ace Combat 2 (Japan)" sha1="316f297951be4506e8bdf51cecac789e0764bed7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="acecomb2_jp1" cloneof="acecomb2">
+		<!--
+		http://redump.org/disc/2707
+		<rom name="Ace Combat 2 (Japan) (Rev 1).cue" size="94" crc="88674451" sha1="abbe669ce3d639194f772f3f26df7e03042507fe"/>
+		<rom name="Ace Combat 2 (Japan) (Rev 1).bin" size="580271328" crc="0eef1401" sha1="0c556057cda63d629f8950265016de8e27c6ab2f"/>
+		-->
+		<description>Ace Combat 2 (Japan, rev. 1) (PlayStation the Best)</description>
+		<year>1999</year>
+		<publisher>Namco</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="Japanese"/>
+		<info name="serial" value="SLPS-91146"/>
+		<info name="speech" value="English" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ace Combat 2 (Japan) (rev. 1)" sha1="6dd4db78769058ae1cb4d80fc36ceedec39122e4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="acecomb3_jp" cloneof="acecomb3">
+		<!--
+		http://redump.org/disc/3175
+		<rom name="Ace Combat 3 - Electrosphere (Japan) (Disc 1).cue" size="111" crc="21f422b9" sha1="845170f8bc921eedd471c93c50c660935788c791"/>
+		<rom name="Ace Combat 3 - Electrosphere (Japan) (Disc 1).bin" size="716240448" crc="b6faa72c" sha1="3b7f4def50008736370e83107a0d50246c1c0aa4"/>
+		
+		http://redump.org/disc/3176
+		<rom name="Ace Combat 3 - Electrosphere (Japan) (Disc 2).cue" size="111" crc="20a90468" sha1="5aae7e3f872aff697cf909fbaa692030849bf1b0"/>
+		<rom name="Ace Combat 3 - Electrosphere (Japan) (Disc 2).bin" size="723766848" crc="c740c3ff" sha1="c86ee2f1970cc06c466a5555c8fe66c4f63a3ee7"/>
+		-->
+		<description>Ace Combat 3: Electrosphere (Japan)</description>
+		<year>1999</year>
+		<publisher>Namco</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="Japanese"/>
+		<info name="serial" value="SLPS-02020 / SLPS-02021 / SLPS-91214 / SLPS-91215"/>
+		<info name="speech" value="Japanese" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ace Combat 3 - Electrosphere (Japan) (Disc 1)" sha1="e2c1981d5c3e3c10bd283826571783a8f3f44d34"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ace Combat 3 - Electrosphere (Japan) (Disc 2)" sha1="f304f25f8aafd137aacf46bf39b5fa336e387256"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="acecomb3_jp1" cloneof="acecomb3">
+		<!--
+		http://redump.org/disc/582
+		<rom name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 1) (Rev 1).cue" size="125" crc="a8961273" sha1="8dbc7fb3680f066b496ab813597ce2301cf11cf9"/>
+		<rom name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 1) (Rev 1).bin" size="716287488" crc="ccdda3b5" sha1="8c6d58308eb389a7b18bc213a6d1e23d14fd3c10"/>
+		
+		http://redump.org/disc/584
+		<rom name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 2) (Rev 1).cue" size="125" crc="433c5ace" sha1="01ede4ca12e86e45624480f7514e37fbf1bec9b6"/>
+		<rom name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 2) (Rev 1).bin" size="723813888" crc="b86e0f52" sha1="a23e046b1eb695e02d214d269fca70dbe0a437f7"/>
+		-->
+		<description>Ace Combat 3: Electrosphere (Japan, rev. 1)</description>
+		<year>1999</year>
+		<publisher>Namco</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="Japanese"/>
+		<info name="serial" value="SCPS-45397 / SCPS-45398"/>
+		<info name="speech" value="Japanese" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 1) (Rev 1)" sha1="2932b1ba9307840a6a561bd66819b169715a61dd"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 2) (Rev 1)" sha1="5df1f20ab18c4473784613303f9077941f08b040"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="acecomb3da_jp" cloneof="acecomb3">
+		<!--
+		http://redump.org/disc/52896
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan).cue" size="2558" crc="c172edf9" sha1="062485585a9d6b25256085d98dd83c2bf5494a49"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 01).bin" size="189738192" crc="d6636cac" sha1="168761ee81417fde52845faf7d8ec1141c26c97d"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 02).bin" size="7578144" crc="dd1c2f0b" sha1="15e1a7409114304653159a82156d5301ca006e9e"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 03).bin" size="15600816" crc="988d22a5" sha1="1b011c680727ebffc65b74312070a32a9df310f1"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 04).bin" size="30239664" crc="ae4c854d" sha1="7b0de490599970b2ff1b92c4bcd74f87c5a18b1a"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 05).bin" size="34047552" crc="71e4b0f7" sha1="5b3b36f2fea4acdf291c3d8188d7e08d010cd7f8"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 06).bin" size="26111904" crc="392813e5" sha1="2655ddde639afa07958c1293a99fdbcbb73a3ddf"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 07).bin" size="30667728" crc="13191328" sha1="b895542ce8fdede698d113948ea015d527cf21fb"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 08).bin" size="24020976" crc="6137c2e6" sha1="4bcab9780733d26f0eb7b7037f5cedc8b587ce05"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 09).bin" size="23552928" crc="c1cbac5f" sha1="4339f149cd25a747940e84e5572189f6bae27fb5"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 10).bin" size="32358816" crc="6bf24960" sha1="d39579c124a47a19b36639761c1581551792d1eb"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 11).bin" size="22863792" crc="3dbb911b" sha1="38a994f0546473382b735dd666fbefddec4454ae"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 12).bin" size="28129920" crc="525b1ddd" sha1="f9a3912ebd06a766a9430bdf69acea37af217be8"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 13).bin" size="33062064" crc="2884a6c3" sha1="61cf3423a5d67360c25652abc821f6dff54a47cc"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 14).bin" size="29781024" crc="5ee633f5" sha1="66ef5382f4b236c76bc6089af75c0b21865494ff"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 15).bin" size="23362416" crc="4b8be2b0" sha1="757e60ea242cd81f216dc7d29826501bacde76e6"/>
+		<rom name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan) (Track 16).bin" size="33908784" crc="857edda8" sha1="28a06c34d53442f736fed283c086340d7c56321e"/>
+		-->
+		<description>Ace Combat 3: Electrosphere (Direct Audio with AppenDisc) (Japan)</description>
+		<year>1999</year>
+		<publisher>Namco</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="Japanese"/>
+		<info name="serial" value="SLPM-80453"/>
+		<info name="speech" value="Japanese" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ace Combat 3 - Electrosphere - Direct Audio with AppenDisc (Japan)" sha1="fb4ebde7044c90c6beabe512921e0f7d2f694604"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="aconcagu" supported="no">
+		<!--
+		http://redump.org/disc/14630
+		<rom name="Aconcagua (Japan) (Disc 1).cue" size="92" crc="f601804b" sha1="069467f35825092dc5fc5e8dc2ff1d8bc3933199"/>
+		<rom name="Aconcagua (Japan) (Disc 1).bin" size="665006832" crc="c262518d" sha1="ea94e096e687c8e8a7c3c99dcdc36d99cd27d8f1"/>
+
+		http://redump.org/disc/14629
+		<rom name="Aconcagua (Japan) (Disc 2).cue" size="92" crc="f75ca69a" sha1="1265ef3a1cac866405c8a50d0780bbd954092c3f"/>
+		<rom name="Aconcagua (Japan) (Disc 2).bin" size="725476752" crc="28783402" sha1="4150b207318d7f5376e43f6301552b28cbee6169"/>
+		-->
+		<description>Aconcagua (Japan)</description>
+		<year>2000</year>
+		<publisher>Sony</publisher>
+		<notes><![CDATA[
+The game only boot on PAL
+]]></notes>
+		<info name="alt_title" value="アコンカグア"/>
+		<info name="developer" value="Sony"/>
+		<info name="language" value="Japanese"/>
+		<info name="release" value="20000601" />
+		<info name="serial" value="SCPS-10131 / SCPS-10132" />
+		<info name="speech" value="English"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Aconcagua (Japan) (Disc 1)" sha1="57ace3a37619ac37a4fb75de599858590b9e2b78"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Aconcagua (Japan) (Disc 2)" sha1="52cc3ce95fdd70ea05653df526a1a89c0f2f8380"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="actgolf_jp" cloneof="actgolf">
 		<!--
 		redump.org/disc/32490
@@ -37400,6 +37671,47 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Actua Golf (Japan)" sha1="6e74c663af2d33f71ad08b686ebb90663554b9a9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="actbass_jp" cloneof="actbass">
+		<!--
+		http://redump.org/disc/39491
+		<rom name="Action Bass (Japan).cue" size="85" crc="10046e54" sha1="67d79df0eab30eadc987803df2cee6a8726a8fc4"/>
+		<rom name="Action Bass (Japan).bin" size="169750896" crc="235db629" sha1="8526c226b1a47286ccdc1bbe9dc1569ab89b8990"/>
+		-->
+		<description>Action Bass (Japan)</description>
+		<year>1999</year>
+		<publisher>Syscom Entertainment</publisher>
+		<info name="developer" value="Vingt-et-un"/>
+		<info name="language" value="English"/>
+		<info name="serial" value="SLPS-02482"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Action Bass (Japan)" sha1="faf9f588b57340bea2ba4dbb6237b035e14624f7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="airracec">
+		<!--
+		http://redump.org/disc/11035
+		<rom name="AirRace Championship (Japan).cue" size="226" crc="53fd7b94" sha1="073fa73b6ad9ecd93341c4d61d508d75aa450636"/>
+		<rom name="AirRace Championship (Japan) (Track 1).bin" size="582985536" crc="0b749aa9" sha1="c651e847f69edf2c4fbeb8a32577d27ce34e6077"/>
+		<rom name="AirRace Championship (Japan) (Track 2).bin" size="2020368" crc="2896211e" sha1="ba97d343824bf559953d1fc0a6c868aedcbe29d4"/>
+		-->
+		<description>AirRace Championship (Japan)</description>
+		<year>1999</year>
+		<publisher>Xing Entertainment</publisher>
+		<info name="developer" value="Xing Entertainment"/>
+		<info name="language" value="English"/>
+		<info name="serial" value="SLPS-01879"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="AirRace Championship (Japan)" sha1="74f6d9150d6ab868c55db706f115fe56a77ebfb8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -37879,89 +38191,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="acecombt" cloneof="aircombt">
-		<!--
-		http://redump.org/disc/1691/
-		<rom name="Ace Combat (Japan).cue" size="7101" crc="a7a2d0f4" sha1="9230a58f78ddfe09a72cbeba40c447dd845b5501"/>
-		<rom name="Ace Combat (Japan) (Track 01).bin" size="106138704" crc="e57e6e46" sha1="3563f0a9a5c5dec04588347214483f7e8af2cd8e"/>
-		<rom name="Ace Combat (Japan) (Track 02).bin" size="36738240" crc="e6604b54" sha1="f2868a668beeb5b709afac84d14555fd50372041"/>
-		<rom name="Ace Combat (Japan) (Track 03).bin" size="28652064" crc="b18c652d" sha1="62fc6f4574f6cd05412460bffa8a6c71d68f90eb"/>
-		<rom name="Ace Combat (Japan) (Track 04).bin" size="27024480" crc="fd6529d3" sha1="632313b0e7de9d4f87ffe853f65943b8fe15ebfc"/>
-		<rom name="Ace Combat (Japan) (Track 05).bin" size="28993104" crc="f71fe9c4" sha1="1c924e33b0183ed0e4f7213dfba903a6ff7b7cfe"/>
-		<rom name="Ace Combat (Japan) (Track 06).bin" size="13373472" crc="fd8c35df" sha1="70d8b090774191b5e22cc265fdfd4b9bb476a155"/>
-		<rom name="Ace Combat (Japan) (Track 07).bin" size="21010416" crc="7937b637" sha1="198e26e3c16495ed00ff27004ea75c0183fff163"/>
-		<rom name="Ace Combat (Japan) (Track 08).bin" size="29425872" crc="e84043cf" sha1="72daa305a67a920909dcb18af4e6c9e6abf10204"/>
-		<rom name="Ace Combat (Japan) (Track 09).bin" size="31634400" crc="70e129c6" sha1="909b416fcbb83a7c590cc97ad0309464de167b30"/>
-		<rom name="Ace Combat (Japan) (Track 10).bin" size="26391792" crc="73ac9def" sha1="21d8cf0dfceecc17ecb958b6bf9799895f87cef2"/>
-		<rom name="Ace Combat (Japan) (Track 11).bin" size="21946512" crc="de0fa43e" sha1="0fc0b8580200d4e72b37f3f2778163f108844fab"/>
-		<rom name="Ace Combat (Japan) (Track 12).bin" size="15066912" crc="b067eb09" sha1="df716bba8ef894eb57792879229b2019622aa59b"/>
-		<rom name="Ace Combat (Japan) (Track 13).bin" size="15172752" crc="59efad88" sha1="7b79eb67e3205623653ebdfb30f5aae411f91de3"/>
-		<rom name="Ace Combat (Japan) (Track 14).bin" size="2253216" crc="6325eb0a" sha1="4c297ef440556ea34bfccd9bd5af31bdf4484d26"/>
-		<rom name="Ace Combat (Japan) (Track 15).bin" size="12103392" crc="9e063251" sha1="4de8924fbd50846dfac165daa1961b40dd8517c6"/>
-		<rom name="Ace Combat (Japan) (Track 16).bin" size="2471952" crc="4058386a" sha1="a6268a8d77d1238d3ebbb859031a826ed53e72a3"/>
-		<rom name="Ace Combat (Japan) (Track 17).bin" size="21417312" crc="4e808c90" sha1="6b7380ab04dc0b3e6a465e94abf4ad2f626b4bf8"/>
-		<rom name="Ace Combat (Japan) (Track 18).bin" size="26709312" crc="101c6976" sha1="e8828fa899d1946bd1ea69ccd65547ddd373ddf8"/>
-		<rom name="Ace Combat (Japan) (Track 19).bin" size="9175152" crc="dbd916ca" sha1="fed3c81ab2046787b4020531d92f46fac7f0ae1c"/>
-		<rom name="Ace Combat (Japan) (Track 20).bin" size="16061808" crc="1bf98118" sha1="078e39531684272903d3eb4aafdd31b989675fd2"/>
-		<rom name="Ace Combat (Japan) (Track 21).bin" size="2775360" crc="6c254834" sha1="4baa057175777ac899032192ccbc39295b20f40a"/>
-		<rom name="Ace Combat (Japan) (Track 22).bin" size="1147776" crc="8aae87d1" sha1="cf7dd4c7cd35476ded88f604e85ee9236ba2e3da"/>
-		<rom name="Ace Combat (Japan) (Track 23).bin" size="2105040" crc="eb78944b" sha1="c9576bdc8bdf73f256808a883e6b7daaa6c66556"/>
-		<rom name="Ace Combat (Japan) (Track 24).bin" size="1147776" crc="11133ce5" sha1="11fa285e225a93063890481d81fb3d2e96335683"/>
-		<rom name="Ace Combat (Japan) (Track 25).bin" size="1846320" crc="7f3709ac" sha1="1d04eefcd5c0178e38c72f587f51cf8aaf611d05"/>
-		<rom name="Ace Combat (Japan) (Track 26).bin" size="1192464" crc="9bcb2928" sha1="ee5d4369f95d106faa045ae6b8898e26265bb5b8"/>
-		<rom name="Ace Combat (Japan) (Track 27).bin" size="1150128" crc="b3735a67" sha1="1966f4a4aefd7e2462476acbd4ad86aef53146ea"/>
-		<rom name="Ace Combat (Japan) (Track 28).bin" size="2243808" crc="a2f89695" sha1="2eb425b4265de08e6ed5971628dc099acc734291"/>
-		<rom name="Ace Combat (Japan) (Track 29).bin" size="1514688" crc="aeda8a6b" sha1="9f48166062a4e29f548a1231e8cb50e1d251d1c2"/>
-		<rom name="Ace Combat (Japan) (Track 30).bin" size="2907072" crc="d7e9dbbc" sha1="6a55683bec61d0ea4abdd1ca443b3a5b6d67f9e7"/>
-		<rom name="Ace Combat (Japan) (Track 31).bin" size="2145024" crc="07116b29" sha1="677391b7f58e9bf22caa38726cf0ce7971bc296a"/>
-		<rom name="Ace Combat (Japan) (Track 32).bin" size="1147776" crc="4567d162" sha1="63cfce6a894f361d11484f7d0d3f717e53c0beae"/>
-		<rom name="Ace Combat (Japan) (Track 33).bin" size="1161888" crc="2dc65e7c" sha1="b1a50baf0bcbf510fb4f858ecfaa41c110294aa7"/>
-		<rom name="Ace Combat (Japan) (Track 34).bin" size="2036832" crc="e73d96e3" sha1="1ce2f0ed5c83e5feb0ce03c6219c59cbbb7c8427"/>
-		<rom name="Ace Combat (Japan) (Track 35).bin" size="1190112" crc="e7c897cc" sha1="2316f0988e96166980504896f36184f3afcb47fa"/>
-		<rom name="Ace Combat (Japan) (Track 36).bin" size="1698144" crc="64c1b3c7" sha1="c6813c2db55175d28462298b0a2cb21afa19a1b8"/>
-		<rom name="Ace Combat (Japan) (Track 37).bin" size="4370016" crc="6c5117e0" sha1="6a2dea25522ef46de2b65d8dc1ba45491149f233"/>
-		<rom name="Ace Combat (Japan) (Track 38).bin" size="1147776" crc="5f560df7" sha1="1e63a3c893c10557dfba70d5bccacd34c7cf4b95"/>
-		<rom name="Ace Combat (Japan) (Track 39).bin" size="1333584" crc="5953a590" sha1="2d2afb9a8ffb6bbb62864b0cc6e2c9b7acb7b0cd"/>
-		<rom name="Ace Combat (Japan) (Track 40).bin" size="1851024" crc="ddced3a7" sha1="250a1a449dafd96ff915e2797ca039874b7dc1d5"/>
-		<rom name="Ace Combat (Japan) (Track 41).bin" size="1147776" crc="e9473517" sha1="795d09fb292b7c598988eb7fb7182d08d68ac8d8"/>
-		<rom name="Ace Combat (Japan) (Track 42).bin" size="1147776" crc="d3dba64b" sha1="7a4cc713157994a3b90b853d0e6c33cd0c24cae1"/>
-		<rom name="Ace Combat (Japan) (Track 43).bin" size="4235952" crc="4c1f8962" sha1="2b1a3c8f76e68d3d423b81b1ac26797a442e20a0"/>
-		<rom name="Ace Combat (Japan) (Track 44).bin" size="2330832" crc="2ac449a1" sha1="d107d3290e203b01a72cea241d39fc4d877f08b1"/>
-		<rom name="Ace Combat (Japan) (Track 45).bin" size="1147776" crc="1a8dd5bd" sha1="822a999f89d6d8bd001c0cb7f25ef368ee7059a9"/>
-		<rom name="Ace Combat (Japan) (Track 46).bin" size="1183056" crc="14949216" sha1="f373b8ef003f56b69e63b382158b9593757f7436"/>
-		<rom name="Ace Combat (Japan) (Track 47).bin" size="3229296" crc="5e4a84d8" sha1="7d8e75995fd4dcea4ae728345636cc37ae076ecf"/>
-		<rom name="Ace Combat (Japan) (Track 48).bin" size="1147776" crc="f803e31c" sha1="bc64abb228025b6d15e7b458ac0aa13e800a71bc"/>
-		<rom name="Ace Combat (Japan) (Track 49).bin" size="2613072" crc="49e4e3f3" sha1="94756a349674ca84c1166ab099cf728a64320762"/>
-		<rom name="Ace Combat (Japan) (Track 50).bin" size="1147776" crc="95f930a9" sha1="3b760c45abad3b385d6adf21da0fd946f494d502"/>
-		<rom name="Ace Combat (Japan) (Track 51).bin" size="1905120" crc="c773efa2" sha1="d6785861aa3f8cbb923c572bdf29c6637ca5398e"/>
-		<rom name="Ace Combat (Japan) (Track 52).bin" size="1350048" crc="db8c1eef" sha1="aa78a1bea5c8d94b9be3ad440b37c0d793c0e860"/>
-		<rom name="Ace Combat (Japan) (Track 53).bin" size="1147776" crc="7f9cec6f" sha1="251603cb0b437cdc2bee48f6872b1083cdd48238"/>
-		<rom name="Ace Combat (Japan) (Track 54).bin" size="1147776" crc="83e91720" sha1="0a41ee59aaf610dce3108a4822372781acf3f677"/>
-		<rom name="Ace Combat (Japan) (Track 55).bin" size="1150128" crc="c0f1a962" sha1="d4923027288040fde405470d9f9a1b3eaf767519"/>
-		<rom name="Ace Combat (Japan) (Track 56).bin" size="1150128" crc="0301987b" sha1="fb871082c45b47315948f35e5e72a13b2feb05c6"/>
-		<rom name="Ace Combat (Japan) (Track 57).bin" size="1178352" crc="dbf35e36" sha1="29ec4551096c038436f92962983d453f5aba3d75"/>
-		<rom name="Ace Combat (Japan) (Track 58).bin" size="2196768" crc="b64928fa" sha1="10e7395f83b758fdfe49cc99e815ee637d2241c8"/>
-		<rom name="Ace Combat (Japan) (Track 59).bin" size="1190112" crc="d45922f7" sha1="6acf92b0c350db98beafac389d51602deb4d539b"/>
-		<rom name="Ace Combat (Japan) (Track 60).bin" size="1484112" crc="5e029cf7" sha1="69ce8ef6ae3b043d3417b0bd0fdf3ca3c8bc4a58"/>
-		<rom name="Ace Combat (Japan) (Track 61).bin" size="3532704" crc="3389aac7" sha1="7cecef95f3affa36dcb05166e5a02de54ecdf336"/>
-		<rom name="Ace Combat (Japan) (Track 62).bin" size="2100336" crc="b15ec2c2" sha1="ba80e7e73aa3f6c43084ce4f9e7c316018692cd9"/>
-		<rom name="Ace Combat (Japan) (Track 63).bin" size="42796992" crc="df07e201" sha1="56cbbf607b9f3c4fe620bb6f6a84349a349a755a"/>
-		-->
-		<description>Ace Combat (Japan)</description>
-		<year>1995</year>
-		<publisher>Namco Hometek</publisher>
-		<info name="developer" value="Namco"/>
-		<info name="language" value="Japanese"/>
-		<info name="release" value="19950630"/>
-		<info name="serial" value="SLPS-00061, SLPS-91005"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="Ace Combat (Japan)" sha1="24246f8d7ec82fed76abfa12b8f49e49c5900bf9"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- boot OK -->
 	<software name="acid">
 		<!--
@@ -37979,35 +38208,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="acid (japan) (slps-02119)" sha1="7a9be5ec10cd928a5dcad61ba200c8908abc8ba4" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- boot OK -->
-	<software name="aconcagu">
-		<!--
-		Unknown source
-		<rom name="Aconcagua (Japan) (Disc 1) [SCPS-10131].bin" size="665006832" crc="fdb6cf3f" sha1="05e574afd7acc08851f4cce77bcbc508ff40694e"/>
-		<rom name="Aconcagua (Japan) (Disc 1) [SCPS-10131].cue" size="105" crc="ce6b4daa" sha1="0143eedd437ca28c4ca8cc7a02178d76341fd697"/>
-
-		<rom name="Aconcagua (Japan) (Disc 2) [SCPS-10132].bin" size="725476752" crc="272d1274" sha1="91559ea21cfd32042c97c288b1d7e2c58392bc17"/>
-		<rom name="Aconcagua (Japan) (Disc 2) [SCPS-10132].cue" size="105" crc="10a4259d" sha1="bcfc0b46d133922f6936e33ed4279874dd4159b8"/>
-		-->
-		<description>Aconcagua (Japan)</description>
-		<year>2000</year>
-		<publisher>SCEI</publisher>
-		<info name="serial" value="SCPS-10131~SCPS-10132" />
-		<info name="release" value="20000601" />
-		<info name="alt_title" value="アコンカグア"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom1" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="aconcagua (japan) (disc 1) [scps-10131]" sha1="04b6f23a8e3731d5326680813f4df4e4685bf294" status="baddump"/>
-			</diskarea>
-		</part>
-		<part name="cdrom2" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="aconcagua (japan) (disc 2) [scps-10132]" sha1="fd3aa83644bd035b383e304de5b9810928bb6659" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -60306,6 +60506,199 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="a2racer">
+		<!--
+		http://redump.org/disc/18700/
+		<rom name="A2 Racer - Europa Tour (Netherlands).cue" size="1423" crc="88bca47b" sha1="3cad9bd17f8f3aefddf8adc40d6110c985eacc90"/>
+		<rom name="A2 Racer - Europa Tour (Netherlands) (Track 01).bin" size="112039872" crc="0a9a490e" sha1="7585131d4ad8556fecb84730c91f02c1122299a0"/>
+		<rom name="A2 Racer - Europa Tour (Netherlands) (Track 02).bin" size="10953264" crc="d5754a6d" sha1="5d8fc55934c8c862d71520b8fab1100145cc0a51"/>
+		<rom name="A2 Racer - Europa Tour (Netherlands) (Track 03).bin" size="7413504" crc="0637fba6" sha1="15a3a66a72797e19e7154db02b2af2288c29a2bf"/>
+		<rom name="A2 Racer - Europa Tour (Netherlands) (Track 04).bin" size="6613824" crc="a31cac70" sha1="d9c2c29155e1b9d11c02682b6031f6128412cfd5"/>
+		<rom name="A2 Racer - Europa Tour (Netherlands) (Track 05).bin" size="6990144" crc="9d25b3c4" sha1="b44a481562fa92f716254c2b08da58b2cf9c13c9"/>
+		<rom name="A2 Racer - Europa Tour (Netherlands) (Track 06).bin" size="7272384" crc="45d7f7bb" sha1="7394575abb63b3c8ca300facc923c5b8a1f9cee3"/>
+		<rom name="A2 Racer - Europa Tour (Netherlands) (Track 07).bin" size="8824704" crc="3de2289e" sha1="df1680ada8857606e62098d9112ae7026a16d800"/>
+		<rom name="A2 Racer - Europa Tour (Netherlands) (Track 08).bin" size="7103040" crc="0d1bb2ca" sha1="b7c36d5e5858629bf438ed5166d5a7758176328e"/>
+		<rom name="A2 Racer - Europa Tour (Netherlands) (Track 09).bin" size="6545616" crc="9e1a2d05" sha1="8839431c74087fe7f254af60fa4f5806a708f7ad"/>
+		<rom name="A2 Racer - Europa Tour (Netherlands) (Track 10).bin" size="6846672" crc="b5d0706e" sha1="50b92dafabb4a0b4e207ac8205d01c871d97e1ab"/>
+		<rom name="A2 Racer - Europa Tour (Netherlands) (Track 11).bin" size="32104800" crc="9b94ea54" sha1="bd1fde88c2b79e3cf8821c969373460d51f3155a"/>
+		-->
+		<description>A2 Racer: Europa Tour (Netherlands)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts"/>
+		<info name="language" value="Dutch"/>
+		<info name="serial" value="SLES-02695"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="A2 Racer - Europa Tour (Netherlands)" sha1="e1153247747521e799d3a612a926c147f028413b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="acecomb2">
+		<!--
+		http://redump.org/disc/27255
+		<rom name="Ace Combat 2 (Europe).cue" size="87" crc="28e7db3e" sha1="4bb2d90ae08650d1667ff1ea667d6dfecc5f8767"/>
+		<rom name="Ace Combat 2 (Europe).bin" size="580831104" crc="c8dd9a12" sha1="ba42b2b1486715ef87ef9615d9f29b2eeba28b32"/>
+		-->
+		<description>Ace Combat 2 (Europe)</description>
+		<year>1997</year>
+		<publisher>Sony</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="English"/>
+		<info name="serial" value="SCES-00699"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ace Combat 2 (Europe)" sha1="5a30c1ad100fc8452c7ab839d3d6229d0762745f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="acecomb2_fr" cloneof="acecomb2">
+		<!--
+		http://redump.org/disc/27814
+		<rom name="Ace Combat 2 (France).cue" size="87" crc="0eef6a3b" sha1="90b5e8abfea7ac73409f5f05a67104997f4d7c41"/>
+		<rom name="Ace Combat 2 (France).bin" size="581028672" crc="9ca78f07" sha1="638e7e1edb006a07554629cd2eb74af6d7c8ef95"/>
+		-->
+		<description>Ace Combat 2 (France)</description>
+		<year>1997</year>
+		<publisher>Sony</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="French"/>
+		<info name="serial" value="SCES-00901"/>
+		<info name="speech" value="English" />
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ace Combat 2 (France)" sha1="7a34c01808705f531c893cde030dc0984f773437"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="acecomb2_de" cloneof="acecomb2">
+		<!--
+		http://redump.org/disc/15498
+		<rom name="Ace Combat 2 (Germany).cue" size="88" crc="d5fa28d7" sha1="3a7dc766bac07c2754fdc998fb74483fde62b0ce"/>
+		<rom name="Ace Combat 2 (Germany).bin" size="581038080" crc="96b3dbe6" sha1="500a51f90ebf3128b90bd9c388b11f09c8b176f8"/>
+		-->
+		<description>Ace Combat 2 (Germany)</description>
+		<year>1997</year>
+		<publisher>Sony</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="German"/>
+		<info name="serial" value="SCES-00902"/>
+		<info name="speech" value="English" />
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ace Combat 2 (Germany)" sha1="90dc0518f4dcbd564e4037682585d4f47120351c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="acecomb3">
+		<!--
+		http://redump.org/disc/2
+		<rom name="Ace Combat 3 - Electrosphere (Europe) (En,Fr,De,Es,It).cue" size="120" crc="92b3ff37" sha1="5cc0e2d25792ae13ec7dab7b2ee8974c700c3337"/>
+		<rom name="Ace Combat 3 - Electrosphere (Europe) (En,Fr,De,Es,It).bin" size="470999760" crc="91cad2df" sha1="8c215d983ad7d7f5f8aa122981cbd79d846532ec"/>
+		-->
+		<description>Ace Combat 3: Electrosphere (Europe)</description>
+		<year>2000</year>
+		<publisher>Sony</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="serial" value="SCES-02066"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ace Combat 3 - Electrosphere (Europe) (En,Fr,De,Es,It)" sha1="312a3dbf5734d12af214e648b12c4e9af6667720"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="actbass">
+		<!--
+		http://redump.org/disc/1274
+		<rom name="Action Bass (Europe).cue" size="86" crc="4d6a6e91" sha1="51eeee5db1e336c2e5629cc3b05162b0edddfb24"/>
+		<rom name="Action Bass (Europe).bin" size="171905328" crc="6c8e92d5" sha1="18a7fa2146b29dcf7b892dcb6f87e4b31862e27d"/>
+		-->
+		<description>Action Bass (Europe)</description>
+		<year>2000</year>
+		<publisher>Take-Two Interactive</publisher>
+		<info name="developer" value="Vingt-et-un"/>
+		<info name="language" value="English"/>
+		<info name="serial" value="SLES-03105"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Action Bass (Europe)" sha1="5aaa3dbea79753ba38bab41bba40ff6d3a22dc54"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="actionmn2">
+		<!--
+		http://redump.org/disc/7505
+		<rom name="Action Man - Destruction X (Europe) (En,Fr,De,Es,It).cue" size="118" crc="c40e057b" sha1="011eb99c82ca398273c0c87295561eef5ad7c202"/>
+		<rom name="Action Man - Destruction X (Europe) (En,Fr,De,Es,It).bin" size="506507904" crc="0c793c93" sha1="cc050c5bcbac11040c657947ecc8ea45f555ebbe"/>
+		-->
+		<description>Action Man - Destruction X (Europe)</description>
+		<year>2001</year>
+		<publisher>3DO / Hasbro Interactive</publisher>
+		<info name="developer" value="Blitz Games"/>
+		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="serial" value="SLES-03083"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Action Man - Destruction X (Europe) (En,Fr,De,Es,It)" sha1="832a7d1483837319b6527ddc42eed85c6f1b296b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="actionmn">
+		<!--
+		http://redump.org/disc/3337
+		<rom name="Action Man - Mission Xtreme (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi).cue" size="134" crc="9627581c" sha1="71cf902e43cc04279490996b6c1b4a08778e196c"/>
+		<rom name="Action Man - Mission Xtreme (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi).bin" size="552705888" crc="01b94ff1" sha1="3cc7c5994cd9af5c177f2b766449bee1e79d8e39"/>
+		-->
+		<description>Action Man - Mission Xtreme (Europe)</description>
+		<year>2000</year>
+		<publisher>Hasbro Interactive</publisher>
+		<info name="developer" value="Interactive Studios"/>
+		<info name="language" value="Danish/Dutch/English/Finnish/French/German/Italian/Norwegian/Spanish/Swedish"/>
+		<info name="serial" value="SLES-01761"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Action Man - Mission Xtreme (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi)" sha1="6fd3474d4d93cb6c03d27bddd1b209141bac19fa"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="actionmn_a" cloneof="actionmn">
+		<!--
+		http://redump.org/disc/33226
+		<rom name="Action Man - Mission Xtreme (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi) (EDC).cue" size="140" crc="d0fe6b50" sha1="e42e554d8d0beebd0df85315219d9b21483e44b9"/>
+		<rom name="Action Man - Mission Xtreme (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi) (EDC).bin" size="552705888" crc="34eedfb3" sha1="0b259a00da8ff2f7d3c3da7eb7954e2b30dd0730"/>
+		-->
+		<description>Action Man - Mission Xtreme (Europe) (with EDC)</description>
+		<year>2000</year>
+		<publisher>Hasbro Interactive</publisher>
+		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="developer" value="Interactive Studios"/>
+		<info name="language" value="Danish/Dutch/English/Finnish/French/German/Italian/Norwegian/Spanish/Swedish"/>
+		<info name="serial" value="SLES-01761#"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Action Man - Mission Xtreme (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi) (EDC)" sha1="c6d8382e68d8dd830d435de2835a13c61f2e9fd1"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="actgolf">
 		<!--
 		redump.org/disc/26887
@@ -60360,7 +60753,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Actua Golf 3 (Europe)</description>
 		<year>1998</year>
 		<publisher>Gremlin Graphics</publisher>
-		<notes>Scrambled graphics when shooting the ball</notes>
+		<notes><![CDATA[
+Scrambled graphics when shooting the ball
+]]></notes>
 		<info name="developer" value="Gremlin Graphics"/>
 		<info name="language" value="English" />
 		<info name="serial" value="SLES-01042"/>
@@ -60368,6 +60763,77 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Actua Golf 3 (Europe)" sha1="4081d7f5dfdfc9c319ecdb34fdaf132dbbca2f0c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="adidas" supported= "no">
+		<!--
+		http://redump.org/disc/1283
+		<rom name="Adidas Power Soccer (Europe) (En,Fr,De,Es,It).cue" size="538" crc="855c07d2" sha1="cc1c9d8f758f5b5c091e121b20de94159885b031"/>
+		<rom name="Adidas Power Soccer (Europe) (En,Fr,De,Es,It) (Track 1).bin" size="516115824" crc="4d359eb9" sha1="20f8f17c2ea76da36da85402980568679f99170a"/>
+		<rom name="Adidas Power Soccer (Europe) (En,Fr,De,Es,It) (Track 2).bin" size="43770720" crc="1034724f" sha1="c8bca8677c75c88c35d06f56e3996af4f879f82b"/>
+		<rom name="Adidas Power Soccer (Europe) (En,Fr,De,Es,It) (Track 3).bin" size="40101600" crc="945ffdc2" sha1="4b1a6e38c6353123b917d702cbd9adbb5357c875"/>
+		<rom name="Adidas Power Soccer (Europe) (En,Fr,De,Es,It) (Track 4).bin" size="33031488" crc="c0d56881" sha1="27cb5e362fac2d04f1a6004578b4d1ce4c369f88"/>
+		-->
+		<description>Adidas Power Soccer (Europe)</description>
+		<year>1996</year>
+		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+The game freezes when loading (after the intro)
+]]></notes>
+		<info name="developer" value="Psygnosis"/>
+		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="serial" value="SLES-00189"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Adidas Power Soccer (Europe) (En,Fr,De,Es,It)" sha1="e90c095ad2a72ae63f4fe36b38462b0e6ca6a90d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="adidas2">
+		<!--
+		http://redump.org/disc/11320
+		<rom name="Adidas Power Soccer 2 (Europe) (En,Fr,De,Es,It,Nl).cue" size="270" crc="276a17c4" sha1="07cc6624737fde3dc6477f1a6797b585f223b1d2"/>
+		<rom name="Adidas Power Soccer 2 (Europe) (En,Fr,De,Es,It,Nl) (Track 1).bin" size="580892256" crc="da1723d5" sha1="812a954b2d5bf402b52b29fa27d138d3d1cd61af"/>
+		<rom name="Adidas Power Soccer 2 (Europe) (En,Fr,De,Es,It,Nl) (Track 2).bin" size="33908784" crc="857edda8" sha1="28a06c34d53442f736fed283c086340d7c56321e"/>
+		-->
+		<description>Adidas Power Soccer 2 (Europe)</description>
+		<year>1997</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Shen Technologies"/>
+		<info name="language" value="Dutch/English/French/German/Italian/Spanish"/>
+		<info name="serial" value="SLES-00857"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Adidas Power Soccer 2 (Europe) (En,Fr,De,Es,It,Nl)" sha1="f8cb7bbfccc88879e72d551406e9c1a9b543d131"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="afl99" supported="partial">
+		<!--
+		http://redump.org/disc/31412
+		<rom name="AFL 99 (Australia).cue" size="206" crc="f4d35903" sha1="05b938e10dac51deaecc6d28099d99b3d8c8e3b9"/>
+		<rom name="AFL 99 (Australia) (Track 1).bin" size="338015328" crc="fc2a5352" sha1="12aa2564f32874b3054b67b7fb62999794875b64"/>
+		<rom name="AFL 99 (Australia) (Track 2).bin" size="33508944" crc="82ccd767" sha1="26cd8247c03111249119495f64923196f85bc74e"/>
+		-->
+		<description>AFL '99 (Australia)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+During gameplay, the commentary speech audio is playing too fast
+]]></notes>
+		<info name="developer" value="Electronic Arts"/>
+		<info name="language" value="English"/>
+		<info name="serial" value="SLES-01875"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="AFL 99 (Australia)" sha1="f4a6fb58cfde4b9cdfb67ca44fdf561fbf67c824"/>
 			</diskarea>
 		</part>
 	</software>
@@ -60410,6 +60876,26 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="action replay 2 version 2.23 (europe) (en,fr,de,it) (disc 2) (bonus psone codes) (unl)" sha1="0b9dc08b337fc82620540a87165299013bb6dbe1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="anastasia">
+		<!--
+		http://redump.org/disc/6713
+		<rom name="Anastasia (Europe) (En,Fr,De,Nl).cue" size="98" crc="d4be8b7e" sha1="fdea7b6c93669a23f5de2e16a563bf857b72fd20"/>
+		<rom name="Anastasia (Europe) (En,Fr,De,Nl).bin" size="512759520" crc="30735008" sha1="70afcc8eb81584ac18d52f08a77f63e803cd822d"/>
+		-->
+		<description>Anastasia (Europe)</description>
+		<year>2001</year>
+		<publisher>Midas Interactive</publisher>
+		<info name="developer" value="The Code Monkeys"/>
+		<info name="language" value="Dutch/English/French/German"/>
+		<info name="serial" value="SLES-02961"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Anastasia (Europe) (En,Fr,De,Nl)" sha1="fbefa124869a040d653301ee7ebc08d75e5e537d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -60582,9 +61068,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Air Combat (Europe) (EDC) (Track 62).bin" size="2100336" crc="7d423523" sha1="2d5cc1e3e8ffa44789f305517b5d5adcba39fc31"/>
 		<rom name="Air Combat (Europe) (EDC) (Track 63).bin" size="42796992" crc="bfdf8a56" sha1="7d5b95a36a5194f6391dd57a234a515db2e671da"/>
 		-->
-		<description>Air Combat (Europe) (EDC)</description>
+		<description>Air Combat (Europe) (with EDC)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
+		<info name="copy_protection" value="Error Detection and Correction"/>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="English"/>
 		<info name="serial" value="SCES-00007#"/>
@@ -61365,7 +61852,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<!-- http://redump.org/disc/19601/ -->
 	<software name="micromc3e" cloneof="micromc3">
-		<description>Micro Machines V3 (Europe, EDC)</description>
+		<description>Micro Machines V3 (Europe) (with EDC)</description>
 		<year>1997</year>
 		<publisher>The Codemasters Software Company</publisher>
 		<info name="serial" value="SLES-00016#"/>
