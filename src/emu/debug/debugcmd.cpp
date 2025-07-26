@@ -460,7 +460,11 @@ void debugger_commands::execute_print(const std::vector<std::string_view> &param
 
 	// then print each one
 	for (int i = 0; i < params.size(); i++)
+	{
+		if (i)
+			m_console.printf(" ");
 		m_console.printf("%X", values[i]);
+	}
 	m_console.printf("\n");
 }
 
