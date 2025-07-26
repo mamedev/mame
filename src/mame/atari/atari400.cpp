@@ -275,6 +275,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_pia(*this, "pia")
 		, m_dac(*this, "dac")
+		, m_sio(*this, "sio")
 		, m_region_maincpu(*this, "maincpu")
 		, m_cartleft(*this, "cartleft")
 		, m_cart_rd4_view(*this, "cart_rd4_view")
@@ -331,6 +332,7 @@ protected:
 	optional_device<ram_device> m_ram;
 	optional_device<pia6821_device> m_pia;
 	optional_device<dac_bit_interface> m_dac;
+	optional_device<a8sio_device> m_sio;
 	required_memory_region m_region_maincpu;
 	optional_device<a800_cart_slot_device> m_cartleft;
 	memory_view m_cart_rd4_view, m_cart_rd5_view;
@@ -1729,6 +1731,9 @@ void a400_state::machine_start()
 {
 	save_item(NAME(m_cart_rd4_enabled));
 	save_item(NAME(m_cart_rd5_enabled));
+
+	if (m_sio.found())
+		m_sio->ready_w(1);
 }
 
 void a1200xl_state::machine_start()
@@ -2027,8 +2032,8 @@ void a400_state::atari_common(machine_config &config)
 	m_pokey->pot_r<5>().set(m_ctrl[2], FUNC(vcs_control_port_device::read_pot_x));
 	m_pokey->pot_r<6>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_y));
 	m_pokey->pot_r<7>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_x));
-	m_pokey->oclk_w().set("sio", FUNC(a8sio_device::clock_out_w));
-	m_pokey->sod_w().set("sio", FUNC(a8sio_device::data_out_w));
+	m_pokey->oclk_w().set(m_sio, FUNC(a8sio_device::clock_out_w));
+	m_pokey->sod_w().set(m_sio, FUNC(a8sio_device::data_out_w));
 
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.03);
 
@@ -2049,12 +2054,12 @@ void a400_state::atari_common(machine_config &config)
 	m_pia->writepa_handler().set(FUNC(a400_state::djoy_0_1_w));
 	m_pia->readpb_handler().set(FUNC(a400_state::djoy_2_3_r));
 	m_pia->writepb_handler().set(FUNC(a400_state::djoy_2_3_w));
-	m_pia->ca2_handler().set("sio", FUNC(a8sio_device::motor_w));
-	m_pia->cb2_handler().set("sio", FUNC(a8sio_device::command_w));
+	m_pia->ca2_handler().set(m_sio, FUNC(a8sio_device::motor_w));
+	m_pia->cb2_handler().set(m_sio, FUNC(a8sio_device::command_w));
 	m_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_pia->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	a8sio_device &sio(A8SIO(config, "sio", "fdc"));
+	a8sio_device &sio(A8SIO(config, m_sio, "fdc"));
 	//sio.clock_in().set(m_pokey, FUNC(pokey_device::bclk_w));
 	sio.data_in().set(m_pokey, FUNC(pokey_device::sid_w));
 	sio.proceed().set(m_pia, FUNC(pia6821_device::ca1_w));
