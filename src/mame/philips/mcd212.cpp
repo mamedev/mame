@@ -318,6 +318,17 @@ int mcd212_device::get_border_width()
 	return width;
 }
 
+uint32_t mcd212_device::get_backdrop_plane() {
+	if (BIT(m_image_coding_method, ICM_EV_BIT))
+	{
+		return 0; // External Video Background. Default to Black since there is no DVC.
+	}
+	else
+	{
+		return s_4bpp_color[m_backdrop_color];
+	}
+}
+
 template <int Path>
 void mcd212_device::process_ica()
 {
@@ -664,7 +675,7 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 	{
 		if (transparent_a[x] && transparent_b[x])
 		{
-			out[x] = s_4bpp_color[m_backdrop_color];
+			out[x] = get_backdrop_plane();
 			continue;
 		}
 		uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
@@ -727,7 +738,7 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 		if (!invert)
 			return; // Normal Blink
 		else
-			color_index = ~color_index & 0xf; // Inverted Color Blink
+			color_index = color_index ^ 0x7; // Inverted Color Blink. MCD212 Section 7.5
 	}
 
 	const uint16_t cursor_x = m_cursor_position & 0x3ff;
