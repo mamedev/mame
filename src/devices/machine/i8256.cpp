@@ -34,6 +34,16 @@ void i8256_device::device_start()
 	save_item(NAME(m_mode));
 	save_item(NAME(m_port1_control));
 	save_item(NAME(m_interrupts));
+	save_item(NAME(m_current_interrupt_level));
+	save_item(NAME(m_rx_buffer));
+	save_item(NAME(m_tx_buffer));
+	save_item(NAME(m_port1_int));
+	save_item(NAME(m_port2_int));
+	save_item(NAME(m_timers[0]));
+	save_item(NAME(m_timers[1]));
+	save_item(NAME(m_timers[2]));
+	save_item(NAME(m_timers[3]));
+	save_item(NAME(m_timers[4]));
 	save_item(NAME(m_status));
 
 	m_timer = timer_alloc(FUNC(i8256_device::timer_check), this);
@@ -51,15 +61,16 @@ void i8256_device::device_reset()
 	m_tx_buffer = 0;
 	m_rx_buffer = 0;
 
+	m_port1_int = 0;
+    m_port2_int = 0;
+
 	m_timers[0] = 0;
 	m_timers[1] = 0;
 	m_timers[2] = 0;
 	m_timers[3] = 0;
 	m_timers[4] = 0;
 
-	m_status = 0x30; // TRE and TBE
-	m_port1_int = 0;
-    m_port2_int = 0;
+	m_status = 0x30; // TRE and TBE	
 
 	m_timer->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
 }
