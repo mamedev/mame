@@ -98,6 +98,8 @@ uint8_t i8256_device::read(offs_t offset)
 			return m_command3 & 0x76; // When command Register 3 is read, bits 0, 3, and 7 will always be zero.
 		case I8256_REG_MODE:
            return m_mode;
+		case I8256_REG_PORT1C:
+            return m_port1_control;
 		case I8256_REG_INTEN:
 			return m_interrupts;
 		case I8256_REG_INTAD:
@@ -105,8 +107,6 @@ uint8_t i8256_device::read(offs_t offset)
 			return m_current_interrupt_level*4;
 		case I8256_REG_BUFFER:
 			return m_rx_buffer;
-		case I8256_REG_PORT1C:
-            return m_port1_control;
 		case I8256_REG_PORT1:
 			return m_port1_int;
 		case I8256_REG_PORT2:
