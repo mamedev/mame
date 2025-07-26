@@ -72,7 +72,7 @@ private:
 	required_device<i8256_device> m_uart;
 	required_device<i8279_device> m_kdc;
 	required_ioport m_dsw;
-	output_finder<8> m_digits;
+	output_finder<16> m_digits;
 	output_finder<88> m_lamps;
 	required_device<beep_device> m_beep;
 	emu_timer *m_sound_timer;
@@ -262,9 +262,11 @@ void stella8085_state::output_digit(uint8_t i, uint8_t data)
     };
 
     if (i > 7) {
-        uint8_t lower_bcd = data & 0x0F;
+        uint8_t debug = data & 0x0F;
+		uint8_t cash = data & 0xF0;
 
-        m_digits[i - 8] = bcd_to_7seg[lower_bcd];
+        m_digits[i - 8] = bcd_to_7seg[debug];
+		m_digits[i] = bcd_to_7seg[cash];
     }
 }
 
