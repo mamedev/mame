@@ -192,6 +192,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(serout_ready_irq);
 	TIMER_CALLBACK_MEMBER(serout_complete_irq);
+	TIMER_CALLBACK_MEMBER(serout_transmit_bit);
 	TIMER_CALLBACK_MEMBER(serin_ready_irq);
 	TIMER_CALLBACK_MEMBER(sync_write);
 	TIMER_CALLBACK_MEMBER(sync_pot);
@@ -320,6 +321,7 @@ private:
 
 	emu_timer *m_serout_ready_timer;
 	emu_timer *m_serout_complete_timer;
+	emu_timer *m_serout_bit_timer;
 	emu_timer *m_serin_ready_timer;
 };
 
