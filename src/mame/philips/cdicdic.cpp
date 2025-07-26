@@ -310,7 +310,7 @@ void cdicdic_device::decode_xa_mono(int16_t *cdic_xa_last, const uint8_t *xa, in
 	}
 }
 
-void cdicdic_device::decode_xa_mono8(int16_t *cdic_xa_last, const unsigned char *xa, signed short *dp)
+void cdicdic_device::decode_xa_mono8(int16_t *cdic_xa_last, const uint8_t *xa, int16_t*dp)
 {
 	for (int32_t b = 0; b < 18; b++)
 	{
@@ -418,8 +418,8 @@ void cdicdic_device::play_raw_group(const uint8_t *data)
 
 void cdicdic_device::play_xa_group(const uint8_t coding, const uint8_t *data)
 {
-	static const uint16_t s_4bit_header_offsets[8] = { 0, 1, 2, 3, 8, 9, 10, 11 };
-	static const uint16_t s_8bit_header_offsets[4] = { 0, 1, 2, 3 };
+	static const uint16_t s_4bit_header_offsets[8] = { 4, 5, 6, 7, 12, 13, 14, 15 };
+	static const uint16_t s_8bit_header_offsets[4] = { 4, 5, 6, 7 };
 	static const uint16_t s_4bit_data_offsets[8] = { 16, 16, 17, 17, 18, 18, 19, 19 };
 	static const uint16_t s_8bit_data_offsets[4] = { 16, 17, 18, 19 };
 
