@@ -78,9 +78,8 @@ private:
 
 	void program_map(address_map &map) ATTR_COLD;
 	void large_program_map(address_map &map) ATTR_COLD;
-	void excellent_program_map(address_map &map) ATTR_COLD;
-	void rtc62421_io_map(address_map &map) ATTR_COLD;
-	void mc146818_io_map(address_map &map) ATTR_COLD;
+	void small_program_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	// I8279 Interface
 	uint8_t kbd_rl_r();
@@ -111,7 +110,7 @@ void stella8085_state::machine_start()
 void stella8085_state::program_map(address_map &map)
 {
 	map(0x0000, 0x8fff).rom(); // ICE6, ICD6, ICC5
-	map(0x9000, 0x90ff).ram(); // ??
+	map(0x9000, 0x933f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 	map(0xa000, 0xafff).ram(); // ??
 	map(0xc000, 0xc7ff).ram(); // ICC6
 }
@@ -123,32 +122,20 @@ void stella8085_state::large_program_map(address_map &map)
 	map(0xa000, 0xffff).rom(); // ICD6
 }
 
-void stella8085_state::excellent_program_map(address_map &map)
+void stella8085_state::small_program_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 }
 
-void stella8085_state::rtc62421_io_map(address_map &map)
-{
-	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write)); //Y5
-	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write)); //Y6
-	map(0x70, 0x70).w(FUNC(stella8085_state::io70));
-	map(0x71, 0x71).w(FUNC(stella8085_state::io71));
-	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
-	// map(0x80, 0x8f) //Y8 ICC5 empty socket
-	map(0x90, 0x9f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
-
-}
-
-void stella8085_state::mc146818_io_map(address_map &map)
+void stella8085_state::io_map(address_map &map)
 {
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x70, 0x70).w(FUNC(stella8085_state::io70));
 	map(0x71, 0x71).w(FUNC(stella8085_state::io71));
 	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
+	// 0x73 SOMETHING write only, probably extra lamps
 	// map(0x80, 0x8f) //Y8 ICC5 empty socket
-	map(0x90, 0x9f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 }
 
 /*********************************************
@@ -513,7 +500,7 @@ void stella8085_state::dicemstr(machine_config &config)
 {
 	I8085A(config, m_maincpu, 10.240_MHz_XTAL / 2); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::large_program_map);
-	m_maincpu->set_addrmap(AS_IO, &stella8085_state::rtc62421_io_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_map);
 
 	I8256(config, m_uart, 10.240_MHz_XTAL / 2); // divider not verified
 
@@ -534,7 +521,7 @@ void stella8085_state::doppelpot(machine_config &config)
 {
 	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_map);
-	m_maincpu->set_addrmap(AS_IO, &stella8085_state::mc146818_io_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_map);
 
 	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
@@ -557,7 +544,7 @@ void stella8085_state::doppelpot(machine_config &config)
 void stella8085_state::excellent(machine_config &config)
 {
 	doppelpot(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::excellent_program_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::small_program_map);
 }
 
 
