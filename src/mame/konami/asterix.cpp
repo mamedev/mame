@@ -133,14 +133,14 @@ uint32_t asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind1
 	{
 		m_k056832->set_layer_offs(0, -7 - 176, 0);
 		m_k056832->set_layer_offs(1, -5 - 176, 0);
-		m_k056832->set_layer_offs(2, -7 - 176, 0);
+		m_k056832->set_layer_offs(2, -3 - 176, 0);
 		m_k056832->set_layer_offs(3, -1 - 176, 0);
 	}
 	else
 	{
 		m_k056832->set_layer_offs(0, -7, 0);
 		m_k056832->set_layer_offs(1, -5, 0);
-		m_k056832->set_layer_offs(2, -7, 0);
+		m_k056832->set_layer_offs(2, -3, 0);
 		m_k056832->set_layer_offs(3, -1, 0);
 	}
 
