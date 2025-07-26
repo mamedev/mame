@@ -49,13 +49,13 @@ class pluto6_calypso32_device : public device_t, public pluto6_expansion_card_in
 {
 	public:
 		pluto6_calypso32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	
+
 	protected:
 		pluto6_calypso32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 		virtual void device_start() override ATTR_COLD {};
 		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	
+
 	private:
 		required_device<mb86292_device> m_gpu;
 		required_device<ram_device> m_vram;

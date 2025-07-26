@@ -41,6 +41,17 @@ TODO:
 #define VERBOSE         (0)
 #include "logmacro.h"
 
+
+namespace {
+
+[[maybe_unused]] constexpr int16_t clip_int16(int32_t sample)
+{
+	return int16_t(std::clamp<int32_t>(sample, -32768, 32767));
+}
+
+} // anonymous namespace
+
+
 // device type definition
 DEFINE_DEVICE_TYPE(CDI_CDIC, cdicdic_device, "cdicdic", "CD-i CDIC")
 
@@ -256,27 +267,15 @@ const uint8_t cdicdic_device::s_sector_scramble[2448] =
 //  MEMBER FUNCTIONS
 //**************************************************************************
 
-int16_t clip_int16(int32_t sample) {
-	if (sample < -32768)
-		return -32768;
-	else if (sample > 32767)
-		return 32767;
-	return sample;
-}
-
-inline void rotate_samples(int16_t val, int16_t& a, int16_t& b, int16_t& output) {
-	b = a;
-	a = val;
-	output = a;
-}
-void cdicdic_device::decode_xa_unit(const uint8_t param, int16_t sample, int16_t& sample0, int16_t& sample1, int16_t& out_buffer)
+void cdicdic_device::decode_xa_unit(const uint8_t param, int16_t sample, int16_t &sample0, int16_t &sample1, int16_t &out_buffer)
 {
-	const int16_t* filter = s_xa_filter_coef[(param >> 4) & 3];
-	uint8_t range = (param & 0xf);
-	sample = (sample>>range) + ((filter[0] * sample0 + filter[1] * sample1 + 128) >> 8);
+	int16_t const *const filter = s_xa_filter_coef[(param >> 4) & 3];
+	uint8_t const range = (param & 0xf);
+	sample = (sample >> range) + ((filter[0] * sample0 + filter[1] * sample1 + 128) >> 8);
 
-	//int16_t sample16 = clip_int16(sample);
-	rotate_samples(sample, sample0, sample1, out_buffer);
+	//int16_t const sample16 = clip_int16(sample);
+	sample1 = std::exchange(sample0, sample);
+	out_buffer = sample0;
 }
 
 void cdicdic_device::decode_xa_mono(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp)
@@ -310,7 +309,7 @@ void cdicdic_device::decode_xa_mono(int16_t *cdic_xa_last, const uint8_t *xa, in
 	}
 }
 
-void cdicdic_device::decode_xa_mono8(int16_t *cdic_xa_last, const uint8_t *xa, int16_t*dp)
+void cdicdic_device::decode_xa_mono8(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp)
 {
 	for (int32_t b = 0; b < 18; b++)
 	{
@@ -383,10 +382,10 @@ void cdicdic_device::decode_xa_stereo8(int16_t *cdic_xa_last, const uint8_t *xa,
 
 void cdicdic_device::decode_8bit_xa_unit(int channel, uint8_t param, const uint8_t *data, int16_t *out_buffer)
 {
-	int16_t* old_samples = &m_xa_last[channel << 1];
+	int16_t *const old_samples = &m_xa_last[channel << 1];
 	for (int i = 0; i < 28; i++)
 	{
-		int16_t sample = (*data)<<8;
+		int16_t sample = int16_t(uint16_t(*data) << 8);
 		decode_xa_unit(param, sample, old_samples[0], old_samples[1], out_buffer[i]);
 		data += 4;
 	}
@@ -394,10 +393,10 @@ void cdicdic_device::decode_8bit_xa_unit(int channel, uint8_t param, const uint8
 
 void cdicdic_device::decode_4bit_xa_unit(int channel, uint8_t param, const uint8_t *data, uint8_t shift, int16_t *out_buffer)
 {
-	int16_t* old_samples = &m_xa_last[channel << 1];
+	int16_t *const old_samples = &m_xa_last[channel << 1];
 	for (int i = 0; i < 28; i++)
 	{
-		int16_t sample = ((*data >> shift) & 0xf)<<12;
+		int16_t sample = int16_t(uint16_t((*data >> shift) & 0xf) << 12);
 		decode_xa_unit(param, sample, old_samples[0], old_samples[1], out_buffer[i]);
 		data += 4;
 	}
@@ -408,7 +407,7 @@ void cdicdic_device::play_raw_group(const uint8_t *data)
 	int16_t samples[28];
 	for (int i = 0; i < 28; i++)
 	{
-		samples[i] = (int16_t)((data[1] << 8) | data[0]);
+		samples[i] = int16_t((uint16_t(data[1]) << 8) | data[0]);
 		data += 4;
 	}
 

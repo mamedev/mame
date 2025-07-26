@@ -5,17 +5,17 @@
 #include "pl6_fpga.h"
 
 
-#define LOG_FPGA  	(1U << 1)
-#define LOG_OUTPUTS	(1U << 2)
-#define LOG_LAMPS	(1U << 3)
-#define LOG_UART	(1U << 4)
+#define LOG_FPGA    (1U << 1)
+#define LOG_OUTPUTS (1U << 2)
+#define LOG_LAMPS   (1U << 3)
+#define LOG_UART    (1U << 4)
 #define VERBOSE     ( LOG_FPGA | LOG_UART )
 
 #include "logmacro.h"
 
-#define LOGFPGA(...)     	LOGMASKED(LOG_FPGA, __VA_ARGS__)
+#define LOGFPGA(...)        LOGMASKED(LOG_FPGA, __VA_ARGS__)
 #define LOGOUTPUTS(...)     LOGMASKED(LOG_OUTPUTS, __VA_ARGS__)
-#define LOGLAMPS(...)     	LOGMASKED(LOG_LAMPS, __VA_ARGS__)
+#define LOGLAMPS(...)       LOGMASKED(LOG_LAMPS, __VA_ARGS__)
 
 static const char *const PL6_ROUTE_NAMES[][16] = {
 	{"BACTA Port (B)"},
@@ -32,13 +32,13 @@ static const char *const PL6_ROUTE_NAMES[][16] = {
 //  FPGA Registers
 //************************************
 
-uint8_t pl6fpga_device::xcra_read(){ 
+uint8_t pl6fpga_device::xcra_read(){
 	if(!machine().side_effects_disabled()) LOGFPGA( "%s: xcra_read( %02x )\n", this->machine().describe_context(), xcra_reg );
 	// xcra & 0x1 is hard reset
 	return xcra_reg;
 }
 
-void pl6fpga_device::xcra_write(uint8_t data){ 
+void pl6fpga_device::xcra_write(uint8_t data){
 	LOGFPGA( "%s: xcra_write( %02x )\n", this->machine().describe_context(), data );
 	xcra_reg = data;
 }
@@ -60,7 +60,7 @@ void pl6fpga_device::sfxr2_write(uint16_t data){
 
 void pl6fpga_device::xmpx_write(uint8_t data){
 	LOGLAMPS("%s: xmpx_write( %02x )\n", this->machine().describe_context(), data );
-	mpx_row = ((data + 1) & 0xF);	// Lamp(0,0) starts at 0x0F. Dunno why.
+	mpx_row = ((data + 1) & 0xF);   // Lamp(0,0) starts at 0x0F. Dunno why.
 }
 
 void pl6fpga_device::aux_write(offs_t offset, uint8_t data)
@@ -88,14 +88,14 @@ void pl6fpga_device::lamp_write(offs_t offset, uint32_t data)
 	// 15-23: LED Display x+0
 	// 24-31: LED Display x+1
 	// Offset 0-7: Light on period 0 - 7
-	
+
 	LOGLAMPS( "%s: lamp_write_input( %02x, %08x )\n", this->machine().describe_context(), offset, data );
-	
+
 	if(mpx_regs[mpx_row][offset] != data){
 		mpx_regs[mpx_row][offset] = data;
 
-		// As light period is stored across the 8 registers, 
-		//	its required to cycle through them.
+		// As light period is stored across the 8 registers,
+		//  its required to cycle through them.
 		for(int i = 0; i < 32; i++){
 			// i = Bit in reg number 0-7
 			int lampval = 0;
@@ -104,7 +104,7 @@ void pl6fpga_device::lamp_write(offs_t offset, uint32_t data)
 				if(mpx_regs[mpx_row][r] & (1 << i)) lampval++;
 			}
 			if(i < 16){
-				if(xcra_reg & MPX_EN) lamp_cb((16 * mpx_row) + i, lampval);	
+				if(xcra_reg & MPX_EN) lamp_cb((16 * mpx_row) + i, lampval);
 			}
 			else {
 				if(xcra_reg & MPX_EN) led_cb((16 * mpx_row) + (i - 16), lampval);
@@ -162,9 +162,9 @@ void pl6fpga_device::map_uart_endpoint(uint8_t device, uint8_t route){
 		return;
 	}
 
-	// 
+	//
 	//for(int i = 0; i < device_invalid; i++){
-	//	if(uart_route_map[i] == route) uart_route_map[i] = endpoint_invalid;
+	//  if(uart_route_map[i] == route) uart_route_map[i] = endpoint_invalid;
 	//}
 	uart_route_map[device] = route;
 }
@@ -172,15 +172,15 @@ void pl6fpga_device::map_uart_endpoint(uint8_t device, uint8_t route){
 void pl6fpga_device::uart_txd(uint8_t device, int state){
 	if(device >= device_invalid) return;
 	switch (uart_route_map[device]){
-		case endpoint_rs232a: m_rs232a->write_txd(state); break; 
-		case endpoint_bacta: m_bacta->write_txd(state); break; 
-		case endpoint_rs232c: m_rs232c->write_txd(state); break; 
-		case endpoint_rs232d: m_rs232d->write_txd(state); break; 
-		case endpoint_cctalk1: m_cctalk1->write_txd(state); break; 
-		case endpoint_cctalk2: m_cctalk2->write_txd(state); break; 
-		case endpoint_ttl: m_serttl->write_txd(state); break; 
+		case endpoint_rs232a: m_rs232a->write_txd(state); break;
+		case endpoint_bacta: m_bacta->write_txd(state); break;
+		case endpoint_rs232c: m_rs232c->write_txd(state); break;
+		case endpoint_rs232d: m_rs232d->write_txd(state); break;
+		case endpoint_cctalk1: m_cctalk1->write_txd(state); break;
+		case endpoint_cctalk2: m_cctalk2->write_txd(state); break;
+		case endpoint_ttl: m_serttl->write_txd(state); break;
 		case endpoint_rs485: m_rs485->write_txd(state); break;
-		default: break; 
+		default: break;
 	}
 }
 
@@ -221,9 +221,9 @@ void pl6fpga_device::developer_map(address_map &map)
 	map(0x0800, 0x081f).w(FUNC(pl6fpga_device::lamp_write));
 	// UART
 	map(0x1002, 0x1002).rw(FUNC(pl6fpga_device::xfpurt0_read), FUNC(pl6fpga_device::xfpurt0_write));
-	//map(0x1003, 0x1003).w(FUNC(pl6fpga_device::fpuart0_rx));?							// FPUART0 RX
+	//map(0x1003, 0x1003).w(FUNC(pl6fpga_device::fpuart0_rx));?                         // FPUART0 RX
 	map(0x1006, 0x1006).rw(FUNC(pl6fpga_device::xfpurt1_read), FUNC(pl6fpga_device::xfpurt1_write));
-	//map(0x1007, 0x1007).w(FUNC(pl6fpga_device::fpuart1_rx));?							// FPUART1 RX
+	//map(0x1007, 0x1007).w(FUNC(pl6fpga_device::fpuart1_rx));?                         // FPUART1 RX
 	// DUART
 	map(0x1010, 0x101f).rw(FUNC(pl6fpga_device::duart_r), FUNC(pl6fpga_device::duart_w));
 	// IO
@@ -238,13 +238,13 @@ void pl6fpga_device::betcom_map(address_map &map){
 }
 
 void pl6fpga_device::jpm_map(address_map &map){
-	map(0x0010, 0x0010).rw(FUNC(pl6fpga_device::xcra_read), FUNC(pl6fpga_device::xcra_write)); 	// ?
+	map(0x0010, 0x0010).rw(FUNC(pl6fpga_device::xcra_read), FUNC(pl6fpga_device::xcra_write));  // ?
 	//map(0x0011, 0x0011).rw(FUNC(pl6fpga_device::), FUNC(pl6fpga_device::));
 	map(0x0018, 0x0018).w(FUNC(pl6fpga_device::crcchk_write));
-	map(0x0900, 0x091f).w(FUNC(pl6fpga_device::lamp_write));	// ?
-	map(0x1900, 0x1903).rw(FUNC(pl6fpga_device::input_r), FUNC(pl6fpga_device::output_write));		// ?
-	map(0x1904, 0x1904).w(FUNC(pl6fpga_device::xmpx_write));	// ?
-	map(0x1a00, 0x1a07).w(FUNC(pl6fpga_device::aux_write));		// ?
+	map(0x0900, 0x091f).w(FUNC(pl6fpga_device::lamp_write));    // ?
+	map(0x1900, 0x1903).rw(FUNC(pl6fpga_device::input_r), FUNC(pl6fpga_device::output_write));      // ?
+	map(0x1904, 0x1904).w(FUNC(pl6fpga_device::xmpx_write));    // ?
+	map(0x1a00, 0x1a07).w(FUNC(pl6fpga_device::aux_write));     // ?
 }
 
 //************************************
@@ -300,7 +300,7 @@ void pl6fpga_device::set_fpga_type(int type){
 		}
 	}
 }
-	
+
 void pl6fpga_device::device_start(){
 	save_item(NAME(xcra_reg));
 	save_item(NAME(xuctrl_reg));
@@ -376,8 +376,8 @@ INPUT_PORTS_START(pluto6_fpga)
 	PORT_BIT( 0x01010101, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10101010, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Meter Sense")
 	PORT_BIT( 0x02020202, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("SW3")
-	PORT_BIT( 0x04040404, IP_ACTIVE_LOW, IPT_UNKNOWN )	// MPX Test?
-	PORT_BIT( 0x08080808, IP_ACTIVE_LOW, IPT_UNKNOWN )	// MPX Test?
+	PORT_BIT( 0x04040404, IP_ACTIVE_LOW, IPT_UNKNOWN )  // MPX Test?
+	PORT_BIT( 0x08080808, IP_ACTIVE_LOW, IPT_UNKNOWN )  // MPX Test?
 INPUT_PORTS_END
 
 ioport_constructor pl6fpga_device::device_input_ports() const

@@ -7,24 +7,24 @@ Heber Pluto 6 PIC18 Customer Security Device
 The CSD is used as part of the security, anti-tampering and system controller functions within the Pluto 6.
 When the pluto 6 is powered down, a Varta 3.3V Ni-MH battery keeps the PIC18 running in a lower power state.
 Is this state, the CSD does the following:
-	* Keeps the RTC running.
-	* Reads 4 inputs (called power down inputs) and logs the state of them if they change with a timestamp.
-	* Retains any current logs.
+    * Keeps the RTC running.
+    * Reads 4 inputs (called power down inputs) and logs the state of them if they change with a timestamp.
+    * Retains any current logs.
 
 When the Pluto 6 is powered up, it does the following:
-	* Go into a fully powered state
-	* Load the encrypted FPGA bitstream using the CPLD to decrypt it.
-	* Release reset on the CPU.
-	* Read and supply the following over I2C:
-		* Stake and Percentage dongles
-		* 2x 8-Way DIP switches
-		* PIC18 Revision
-		* PIC18 Signature
-	
-	TODO:
-		* _almost_ everything.
-		* "upload" FPGA bitstream
-		* Hold CPU in reset?
+    * Go into a fully powered state
+    * Load the encrypted FPGA bitstream using the CPLD to decrypt it.
+    * Release reset on the CPU.
+    * Read and supply the following over I2C:
+        * Stake and Percentage dongles
+        * 2x 8-Way DIP switches
+        * PIC18 Revision
+        * PIC18 Signature
+
+    TODO:
+        * _almost_ everything.
+        * "upload" FPGA bitstream
+        * Hold CPU in reset?
 */
 
 #ifndef MAME_MACHINE_PL6_PIC_H
@@ -37,7 +37,7 @@ When the Pluto 6 is powered up, it does the following:
 
 INPUT_PORTS_EXTERN(pluto6_csd_pic);
 
-class pl6pic_device : 
+class pl6pic_device :
 	public device_t,
 	public i2c_hle_interface,
 	public device_rtc_interface
@@ -63,7 +63,7 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(heartbeat_callback);
-	
+
 	uint8_t m_rtc_minute;
 	uint8_t m_rtc_hour;
 	uint8_t m_rtc_day;

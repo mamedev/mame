@@ -852,7 +852,7 @@ void pasopia7_state::p7_base(machine_config &config)
 	PASOPIA_PAC2(config, m_pac2, pac2_default_devices, nullptr);
 
 	SOFTWARE_LIST(config, "cass_list").set_original("pasopia7_cass");
-//	SOFTWARE_LIST(config, "flop_list").set_original("pasopia7_flop");
+//  SOFTWARE_LIST(config, "flop_list").set_original("pasopia7_flop");
 }
 
 void pasopia7_state::p7_raster(machine_config &config)

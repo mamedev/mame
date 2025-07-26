@@ -387,7 +387,7 @@ bool spectrum_128_state::is_contended(offs_t offset) {
 		|| ((offset >= 0xc000 && offset <= 0xffff) && (pg & 1)); // Memory pages 1,3,5 and 7 are contended
 }
 
-u8* spectrum_128_state::snow_pattern1_base(u8 i_reg)
+u8 *spectrum_128_state::snow_pattern1_base(u8 i_reg)
 {
 	const bool is_alt_scr_selected = BIT(m_port_7ffd_data, 3);
 	const bool is_alt_scr = i_reg & 0x80;

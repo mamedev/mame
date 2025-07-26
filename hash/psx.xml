@@ -634,7 +634,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 	</software>
 
 	<software name="actionmn_us" cloneof="actionmn">
-		<!-- 
+		<!--
 		http://redump.org/disc/10647
 		<rom name="Action Man - Operation Extreme (USA).cue" size="102" crc="cf924cc1" sha1="bd6fbb3575f9a2d3072f2a76de2cbb52f8f4e377"/>
 		<rom name="Action Man - Operation Extreme (USA).bin" size="553089264" crc="9d4dbbcb" sha1="d0e4834cb0ee6aca998223c8068872972da1c869"/>
@@ -37527,7 +37527,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		http://redump.org/disc/3175
 		<rom name="Ace Combat 3 - Electrosphere (Japan) (Disc 1).cue" size="111" crc="21f422b9" sha1="845170f8bc921eedd471c93c50c660935788c791"/>
 		<rom name="Ace Combat 3 - Electrosphere (Japan) (Disc 1).bin" size="716240448" crc="b6faa72c" sha1="3b7f4def50008736370e83107a0d50246c1c0aa4"/>
-		
+
 		http://redump.org/disc/3176
 		<rom name="Ace Combat 3 - Electrosphere (Japan) (Disc 2).cue" size="111" crc="20a90468" sha1="5aae7e3f872aff697cf909fbaa692030849bf1b0"/>
 		<rom name="Ace Combat 3 - Electrosphere (Japan) (Disc 2).bin" size="723766848" crc="c740c3ff" sha1="c86ee2f1970cc06c466a5555c8fe66c4f63a3ee7"/>
@@ -37557,7 +37557,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		http://redump.org/disc/582
 		<rom name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 1) (Rev 1).cue" size="125" crc="a8961273" sha1="8dbc7fb3680f066b496ab813597ce2301cf11cf9"/>
 		<rom name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 1) (Rev 1).bin" size="716287488" crc="ccdda3b5" sha1="8c6d58308eb389a7b18bc213a6d1e23d14fd3c10"/>
-		
+
 		http://redump.org/disc/584
 		<rom name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 2) (Rev 1).cue" size="125" crc="433c5ace" sha1="01ede4ca12e86e45624480f7514e37fbf1bec9b6"/>
 		<rom name="Ace Combat 3 - Electrosphere (Japan, Asia) (Disc 2) (Rev 1).bin" size="723813888" crc="b86e0f52" sha1="a23e046b1eb695e02d214d269fca70dbe0a437f7"/>

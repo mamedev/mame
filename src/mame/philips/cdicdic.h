@@ -190,7 +190,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_ram;
 	std::unique_ptr<int16_t[]> m_samples[2];
 
-	void decode_xa_unit(const uint8_t param, int16_t sample, int16_t& sample0, int16_t& sample1, int16_t& out_buffer);
+	void decode_xa_unit(const uint8_t param, int16_t sample, int16_t &sample0, int16_t &sample1, int16_t &out_buffer);
 	void decode_8bit_xa_unit(int channel, uint8_t param, const uint8_t *data, int16_t *out_buffer);
 	void decode_4bit_xa_unit(int channel, uint8_t param, const uint8_t *data, uint8_t shift, int16_t *out_buffer);
 	void play_raw_group(const uint8_t *data);

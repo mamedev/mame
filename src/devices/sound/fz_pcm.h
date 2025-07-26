@@ -14,7 +14,7 @@ class fz_pcm_device : public device_t,
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	fz_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fz_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 
@@ -90,7 +90,7 @@ private:
 	void update_pending_irq();
 	void voice_cmd(unsigned cmd);
 
-	sound_stream* m_stream;
+	sound_stream *m_stream;
 
 	devcb_write_line m_irq_cb;
 	emu_timer *m_irq_timer;

@@ -205,8 +205,8 @@ private:
 
 	u8 bootstrap_r(offs_t offset);
 	void bootstrap_w(offs_t offset, u8 data);
-	template<u8 Bank> u8 ram_r(offs_t offset);
-	template<u8 Bank> void ram_w(offs_t offset, u8 data);
+	template <u8 Bank> u8 ram_r(offs_t offset);
+	template <u8 Bank> void ram_w(offs_t offset, u8 data);
 	void vram_w(offs_t offset, u8 data);
 	void update_int(bool recalculate);
 	u8 isa_r(offs_t offset);
@@ -1160,7 +1160,7 @@ void sprinter_state::bootstrap_w(offs_t offset, u8 data)
 	}
 }
 
-template<u8 Bank> u8 sprinter_state::ram_r(offs_t offset)
+template <u8 Bank> u8 sprinter_state::ram_r(offs_t offset)
 {
 	static_assert(Bank < 4, "unexpected bank number");
 
@@ -1172,7 +1172,7 @@ template<u8 Bank> u8 sprinter_state::ram_r(offs_t offset)
 		: reinterpret_cast<u8 *>(m_bank_ram[Bank]->base())[offset & 0x3fff];
 }
 
-template<u8 Bank> void sprinter_state::ram_w(offs_t offset, u8 data)
+template <u8 Bank> void sprinter_state::ram_w(offs_t offset, u8 data)
 {
 	static_assert(Bank < 4, "unexpected bank number");
 
@@ -1259,7 +1259,7 @@ void sprinter_state::isa_w(offs_t offset, u8 data)
 			m_isa[BIT(ctrl, 1)]->io_w((m_isa_addr_ext << 14) | offset, data);
 		else
 			// as far as no connected memory yet, nop write and avoid log about unmapped mem
-			(void)0; //m_isa[BIT(ctrl, 1)]->mem_w((m_isa_addr_ext << 14) | offset, data);
+			/*m_isa[BIT(ctrl, 1)]->mem_w((m_isa_addr_ext << 14) | offset, data)*/;
 	}
 }
 

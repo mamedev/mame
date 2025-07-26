@@ -909,7 +909,7 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 	mixer_input->set_route_gain(0, m_left_mixer, 0, -gain_left);
 	mixer_input->set_route_gain(0, m_right_mixer, 0, -gain_right);
 	LOGMASKED(LOG_MIX, "Gain update for %s - left: %f, right: %f\n",
-	          MIXER_CHANNEL_NAMES[channel], gain_left, gain_right);
+			  MIXER_CHANNEL_NAMES[channel], gain_left, gain_right);
 
 	if (channel == MIX_CLICK)
 	{

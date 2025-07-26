@@ -4,7 +4,7 @@
 #include "serialvfd.h"
 #include "emu.h"
 
-#define LOG_VFD  	(1U << 1)
+#define LOG_VFD     (1U << 1)
 //#define VERBOSE     ( LOG_VFD )
 
 #include "logmacro.h"
@@ -27,7 +27,7 @@ void serial_vfd_device::write_clock(bool state){
 				if(m_bitCount >= 8){
 					m_bitCount = 0;
 					run_command();
-					m_cmd = 0x00;	
+					m_cmd = 0x00;
 				}
 			}
 			m_lastClock = m_clock;
@@ -54,7 +54,7 @@ void serial_vfd_device::write_reset(bool state){
 		m_cmd = 0x00;
 		// Reset doesn't actually seem to clear the display.
 		//for(int i = 0; i < 16; i++){
-		//	m_vfd[i] = 0x0000;
+		//  m_vfd[i] = 0x0000;
 		//}
 	}
 }

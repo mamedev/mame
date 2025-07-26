@@ -45,7 +45,7 @@ license:CC0-1.0
 		<disk state="0"><color red="0.25" green="0.1" blue="0.0" /></disk>
 		<disk state="1"><color red="1.0" green="0.75" blue="0.1" /></disk>
 	</element>
-	
+
 	<element name="led">
 		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
@@ -81,7 +81,7 @@ license:CC0-1.0
 		</repeat>
 		<repeat count="16">
 			<param name="lednum" start="0" increment="1" />
-			<param name="ledx" start="0" increment="22" />	
+			<param name="ledx" start="0" increment="22" />
 			<element name="led~lednum~" ref="led" state="0">
 				<bounds x="~ledx~" y="625" width="20" height="32"/>
 			</element>

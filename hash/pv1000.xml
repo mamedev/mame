@@ -379,6 +379,6 @@ Undumped carts:
 				<rom name="mazy2.rom" size="0x4000" crc="6e6f9694" sha1="c8c678aec84c181ca7f2dfa155fc211f51832e15"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>

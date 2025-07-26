@@ -134,7 +134,7 @@ protected:
 	virtual bool is_vram_write(offs_t offset);
 	void content_early(s8 shift = 0);
 	void content_late();
-	virtual u8* snow_pattern1_base(u8 i_reg);
+	virtual u8 *snow_pattern1_base(u8 i_reg);
 
 	void spectrum_refresh_w(offs_t offset, uint8_t data);
 	void spectrum_nomreq(offs_t offset, uint8_t data);

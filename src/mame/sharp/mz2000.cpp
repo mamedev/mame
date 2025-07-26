@@ -181,7 +181,7 @@ public:
 
 protected:
 	virtual void draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-//	virtual void draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+//  virtual void draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 

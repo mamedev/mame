@@ -13,7 +13,7 @@
     Rewrite and modernization in progress by R. Belmont
     Addition of the duart compatible 68340 serial module support by Edstrom
     Support for the Exar XR68C681 by Joseph Zatarski (July of 2018)
-	Support for Freescale/NXP ColdFire UART module by NaokiS (June 2025)
+    Support for Freescale/NXP ColdFire UART module by NaokiS (June 2025)
 
     The main incompatibility between the 2681 and 68681 (Signetics and Motorola each
     manufactured both versions of the chip) is that the 68681 has a R/W input and
@@ -43,10 +43,10 @@
     or CRB registers. Writing the commands to either register affects the whole
     DUART, not just one channel. Resetting the DUART also leaves low power mode.
 
-	On the ColdFire MCF5206e, the UART modules are essentially just a pair of 
-	MC68681s with only the A port visible and no counter/timer. The ACR on the 
-	coldfire uarts shoud be updated to reflect this. Additionally, the 
-	Buad Rate Generator prescaler reg should be used to set the buad.
+    On the ColdFire MCF5206e, the UART modules are essentially just a pair of
+    MC68681s with only the A port visible and no counter/timer. The ACR on the
+    coldfire uarts shoud be updated to reflect this. Additionally, the
+    Buad Rate Generator prescaler reg should be used to set the buad.
 */
 
 #include "emu.h"
@@ -301,7 +301,7 @@ void mcf5206e_uart_device::device_reset()
 	duart_base_device::device_reset();
 
 	IVR = 0x0f;  /* Interrupt Vector Register */
-	UBG = 0x00;	 /* UART Buad Rate Generator Register */
+	UBG = 0x00;  /* UART Buad Rate Generator Register */
 	m_read_vector = false;
 }
 
@@ -590,7 +590,7 @@ uint8_t mcf5206e_uart_device::read(offs_t offset)
 	case 0x0d: /* UIP */
 		r = duart_base_device::read(offset);
 		break;
-	
+
 	case 0x06: /* UBG Buad Generator Prescale MSB */
 	LOG("%s: Reading mcf5206e (%s) reg %x (%s)\n", this->machine().describe_context(), tag(), offset, mcf5206e_duart_reg_read_names[offset]);
 		r = (UBG & 0xFF00) >> 8;
@@ -600,7 +600,7 @@ uint8_t mcf5206e_uart_device::read(offs_t offset)
 		r = (UBG & 0x00FF);
 		break;
 
-	case 0x0c:	/* UIVR */
+	case 0x0c:  /* UIVR */
 	LOG("%s: Reading mcf5206e (%s) reg %x (%s)\n", this->machine().describe_context(), tag(), offset, mcf5206e_duart_reg_read_names[offset]);
 		r = IVR;
 		break;
@@ -794,7 +794,7 @@ void mcf5206e_uart_device::write(offs_t offset, uint8_t data)
 	case 0x01: /* UCSR */
 	case 0x02: /* UCR */
 	case 0x03: /* UTB */
-	case 0x04: /* ACR */	// <-- TODO: This needs changing as ACR on ColdFire only handles interrupt enable for CTS
+	case 0x04: /* ACR */    // <-- TODO: This needs changing as ACR on ColdFire only handles interrupt enable for CTS
 	case 0x05: /* IMR */
 	case 0x0e: /* Set Output Port (RTS) Bit */
 	case 0x0f: /* Reset Output Port (RTS) Bit */

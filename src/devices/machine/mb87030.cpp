@@ -384,7 +384,7 @@ void mb87030_device::step(bool timeout)
 
 		if (m_scsi_phase != (ctrl & S_PHASE_MASK)) {
 			LOG("SCSI phase change during transfer\n");
-			m_ints |= (INTS_SERVICE_REQUIRED | INTS_COMMAND_COMPLETE);
+			m_ints |= INTS_SERVICE_REQUIRED | INTS_COMMAND_COMPLETE;
 			m_ssts &= ~SSTS_SPC_BUSY;
 			scsi_bus->data_w(scsi_refid, 0);
 			update_ints();
@@ -585,8 +585,7 @@ void mb87030_device::scmd_w(uint8_t data)
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_scmd = data;
 
-	if (!(m_sctl & SCTL_RESET_AND_DISABLE))
-	{
+	if (!(m_sctl & SCTL_RESET_AND_DISABLE)) {
 		scsi_set_ctrl((m_scmd & SCMD_RST_OUT) ? S_RST : 0, S_RST);
 	}
 
