@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca
+// copyright-holders: Roberto Fresca
 /******************************************************************************
 
   Good Luck II
@@ -170,7 +170,7 @@
   DIP switches banks #3 and #2). Is not used as sound device, at least for
   Good Luck II.
 
-  There are pieces of code that initialize 2x PIA 6821, that are not included
+  There are pieces of code that initialize two PIAs 6821, that are not included
   in the PCB. Seems a leftover. Also the program try to handle a suppossed lamps
   system through these 'phantom' PIAs...
 
@@ -183,6 +183,8 @@
 
   TODO:
 
+  - Get a good dump of the unkyungyu program (we have only the 2nd half)
+  - Hook the OKI 6295 ADPCM samples system for unkyungyu.
   - Figure out the remaining DIP switches.
   - Nothing at all... :)
 
@@ -269,8 +271,8 @@ TILE_GET_INFO_MEMBER(gluck2_state::get_tile_info)
 */
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
-	int bank = ((attr & 0xc0) >> 5 ) + ((attr & 0x02) >> 1 );   /* bits 1-6-7 handle the gfx banks */
-	int color = (attr & 0x3c) >> 2;                             /* bits 2-3-4-5 handle the color */
+	int bank = ((attr & 0xc0) >> 5 ) + ((attr & 0x02) >> 1 );   // bits 1-6-7 handle the gfx banks
+	int color = (attr & 0x3c) >> 2;                             // bits 2-3-4-5 handle the color
 
 	tileinfo.set(bank, code, color, 0);
 }
@@ -303,11 +305,11 @@ void gluck2_state::counters_w(uint8_t data)
     xxx- x--x   seems unused...
 
 */
-	data = data ^ 0xff; // inverted
+	data = data ^ 0xff;  // inverted
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* coins */
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);  /* notes */
-	machine().bookkeeping().coin_counter_w(2, data & 0x04);  /* payout */
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);  // coins
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);  // notes
+	machine().bookkeeping().coin_counter_w(2, data & 0x04);  // payout
 }
 
 
@@ -320,9 +322,9 @@ void gluck2_state::gluck2_map(address_map &map)
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x084b).noprw(); /* see below */
-	map(0x1000, 0x13ff).ram().w(FUNC(gluck2_state::videoram_w)).share("videoram"); /* 6116 #1 (2K x 8) RAM (only 1st half used) */
-	map(0x1800, 0x1bff).ram().w(FUNC(gluck2_state::colorram_w)).share("colorram"); /* 6116 #2 (2K x 8) RAM (only 1st half used) */
+	map(0x0844, 0x084b).noprw();  // see below
+	map(0x1000, 0x13ff).ram().w(FUNC(gluck2_state::videoram_w)).share("videoram");  // 6116 #1 (2K x 8) RAM (only 1st half used)
+	map(0x1800, 0x1bff).ram().w(FUNC(gluck2_state::colorram_w)).share("colorram");  // 6116 #2 (2K x 8) RAM (only 1st half used)
 	map(0x2000, 0x2000).portr("SW1");
 	map(0x2d00, 0x2d01).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x3400, 0x3400).portr("IN0");
@@ -483,48 +485,48 @@ static GFXDECODE_START( gfx_gluck2 )
 	GFXDECODE_ENTRY( "gfx", 0x3800, tilelayout, 0, 16 )
 GFXDECODE_END
 
+
 /*********************************************
 *              Machine Drivers               *
 *********************************************/
 
 void gluck2_state::gluck2(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, MASTER_CLOCK/16); /* guess */
+	// basic machine hardware
+	M6502(config, m_maincpu, MASTER_CLOCK / 16);  // guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &gluck2_state::gluck2_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 
-/* CRTC Register:  00   01   02   03   04   05   06
-   CRTC Value   : 0x27 0x20 0x23 0x03 0x26 0x00 0x20
-*/
-	screen.set_size((39+1)*8, (38+1)*8);                /* from MC6845 init, registers 00 & 04. (value - 1) */
-	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);  /* from MC6845 init, registers 01 & 06. */
+//  CRTC Register:  00   01   02   03   04   05   06
+//  CRTC Value   : 0x27 0x20 0x23 0x03 0x26 0x00 0x20
+	screen.set_size((39+1)*8, (38+1)*8);           // from MC6845 init, registers 00 & 04 (value - 1)
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);  // from MC6845 init, registers 01 & 06
 	screen.set_screen_update(FUNC(gluck2_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gluck2);
 	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
 
-	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16));    /* guess */
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 16));  // guess
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay8910(AY8910(config, "ay8910", MASTER_CLOCK/8));    /* guess */
+	ay8910_device &ay8910(AY8910(config, "ay8910", MASTER_CLOCK / 8));  // guess
 	ay8910.port_a_read_callback().set_ioport("SW3");
 	ay8910.port_b_read_callback().set_ioport("SW2");
-/*  Output ports have a minimal activity during init.
-    They seems unused (at least for Good Luck II)
-*/
+//  Output ports have a minimal activity during init.
+//    They seems unused (at least for Good Luck II)
+
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	YM2413(config, "ymsnd", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -550,6 +552,44 @@ ROM_START( gluck2 )
 	ROM_LOAD( "v3.u25",  0x0200, 0x0100, CRC(a4d2c9c3) SHA1(a799875b8b92391696419081244da2e56216e024) )
 ROM_END
 
+/*
+
+  Unknown YungYu game
+  Possible title:
+
+  Tè jiǎng
+  特奖
+
+  This means "Special Bonus"
+
+  The program ROM it's underdumped and lacks of the first half.
+  The device has no marks at all, and need to be identified.
+  Dumped as 27256, you can get the second half of the program.
+  Dumped as 27128, you can get the last quarter.
+  Dumped as 27512, you get all garbage, 99.8% of FF's.
+
+*/
+ROM_START( unkyungyu )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // prg rom lacks of the first half
+	ROM_LOAD( "tejiang.u7",  0x8000, 0x8000, BAD_DUMP CRC(0eefe5e3) SHA1(56f398afdd603e4a4bbd9f9c0bc759bf0fb351f9) )
+
+	ROM_REGION( 0x18000, "gfx", 0 )
+	ROM_LOAD( "3.u33",  0x00000, 0x4000, CRC(dedd9eeb) SHA1(14a81a3c98b10e996f0b340ce18df627d0cd7f3d) )
+	ROM_FILL(           0x04000, 0x4000, 0xff )  // filling the holes for compatibility
+	ROM_LOAD( "2.u32",  0x08000, 0x4000, CRC(0bcc2939) SHA1(8ff116acec6d75016788aa591c1dd61572366dd7) )
+	ROM_FILL(           0x0c000, 0x4000, 0xff )  // filling the holes for compatibility
+	ROM_LOAD( "1.u31",  0x10000, 0x4000, CRC(64e96912) SHA1(889ac676e4b57c5c616a0caa77553fd8a9cb488b) )
+	ROM_FILL(           0x14000, 0x4000, 0xff )  // filling the holes for compatibility
+
+	ROM_REGION( 0x0300, "proms", 0 )    // RGB
+	ROM_LOAD( "1.u27",  0x0000, 0x0100, CRC(1aa5479f) SHA1(246cc99e7b351d5546060807b8a0b8acfe2f8e39) )
+	ROM_LOAD( "2.u26",  0x0100, 0x0100, CRC(8da53489) SHA1(b90f5dd4bc5b64009e8bfad8f79f23d4020e537b) )
+	ROM_LOAD( "3.u25",  0x0200, 0x0100, CRC(a4d2c9c3) SHA1(a799875b8b92391696419081244da2e56216e024) )
+
+	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_LOAD( "prog.u2", 0x00000, 0x20000, CRC(7185dc79) SHA1(db01a5221f423137f89b04c0607b5c93d2a795f3) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -557,5 +597,6 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME    PARENT  MACHINE   INPUT   STATE         INIT        ROT    COMPANY          FULLNAME       FLAGS...
-GAME( 1992, gluck2, 0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Good Luck II", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  MACHINE   INPUT   STATE         INIT        ROT    COMPANY          FULLNAME                FLAGS...
+GAME( 1992, gluck2,    0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Good Luck II",          MACHINE_SUPPORTS_SAVE )
+GAME( 1992, unkyungyu, 0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Unknown YungYu game",   MACHINE_NOT_WORKING )
