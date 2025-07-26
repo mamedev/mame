@@ -107,7 +107,7 @@
 #define VERBOSE_IRQ     (1U << 5)
 #define VERBOSE_SERIN   (1U << 6)
 #define VERBOSE_SEROUT  (1U << 7)
-#define VERBOSE         (VERBOSE_SERIN | VERBOSE_SEROUT)
+#define VERBOSE         (0)
 
 #include "logmacro.h"
 
