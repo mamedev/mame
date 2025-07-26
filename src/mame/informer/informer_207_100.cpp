@@ -237,5 +237,4 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE           INPUT             CLASS                   INIT        COMPANY     FULLNAME            FLAGS
-COMP( 1983, in207100, 0,       0,      informer_207_100, informer_207_100, informer_207_100_state, empty_init, "Informer", "Informer 207/100", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, in207100, 0, 0, informer_207_100, informer_207_100, informer_207_100_state, empty_init, "Informer Computer Terminals", "Informer 207/100", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
