@@ -281,51 +281,37 @@ void cdicdic_device::decode_xa_unit(const uint8_t param, int16_t sample, int16_t
 
 void cdicdic_device::decode_xa_mono(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp)
 {
-	int16_t l0 = cdic_xa_last[0];
-	int16_t l1 = cdic_xa_last[1];
-
 	for (int32_t b = 0; b < 18; b++)
 	{
 		for (int32_t s = 0; s < 4; s++)
 		{
 			uint8_t flags = xa[4 + (s << 1)];
-			uint8_t filter = (flags >> 4) & 3;
-			int16_t f0 = s_xa_filter_coef[filter][0];
-			int16_t f1 = s_xa_filter_coef[filter][1];
 
 			for (int32_t i = 0; i < 28; i++)
 			{
 				//int16_t sample = ((*data) & 0xf) << 12;
 				int16_t d = (xa[16 + (i << 2) + s] & 0xf) << 12;
-				decode_xa_unit(flags, d, l0, l1, dp[0]);
+				decode_xa_unit(flags, d, cdic_xa_last[0], cdic_xa_last[1], dp[0]);
 				dp++;
 			}
 
 			flags = xa[5 + (s << 1)];
-			filter = flags >> 4;
-			f0 = s_xa_filter_coef[filter][0];
-			f1 = s_xa_filter_coef[filter][1];
 
 			for (int32_t i = 0; i < 28; i++)
 			{
 				//int16_t sample = (*data >> 4) << 12;
 				int16_t d = (xa[16 + (i << 2) + s] >> 4) << 12;
-				decode_xa_unit(flags, d, l0, l1, dp[0]);
+				decode_xa_unit(flags, d, cdic_xa_last[0], cdic_xa_last[1], dp[0]);
 				dp++;
 			}
 		}
 
 		xa += 128;
 	}
-
-	cdic_xa_last[0] = l0;
-	cdic_xa_last[1] = l1;
 }
 
 void cdicdic_device::decode_xa_mono8(int16_t *cdic_xa_last, const unsigned char *xa, signed short *dp)
 {
-	int16_t l0 = cdic_xa_last[0];
-	int16_t l1 = cdic_xa_last[1];
 	for (int32_t b = 0; b < 18; b++)
 	{
 		for (int32_t s = 0; s < 4; s++)
@@ -334,25 +320,17 @@ void cdicdic_device::decode_xa_mono8(int16_t *cdic_xa_last, const unsigned char 
 			for (int32_t i = 0; i < 28; i++)
 			{
 				int16_t d = (xa[16 + (i << 2) + s] << 8);
-				decode_xa_unit(flags, d, l0, l1, dp[0]);
+				decode_xa_unit(flags, d, cdic_xa_last[0], cdic_xa_last[1], dp[0]);
 				dp++;
 			}
 		}
 
 		xa += 128;
 	}
-
-	cdic_xa_last[0] = l0;
-	cdic_xa_last[1] = l1;
 }
 
 void cdicdic_device::decode_xa_stereo(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp)
 {
-	int16_t l0 = cdic_xa_last[0];
-	int16_t l1 = cdic_xa_last[1];
-	int16_t l2 = cdic_xa_last[2];
-	int16_t l3 = cdic_xa_last[3];
-
 	for (int32_t b = 0; b < 18; b++)
 	{
 		for (int32_t s = 0; s < 4; s++)
@@ -364,31 +342,21 @@ void cdicdic_device::decode_xa_stereo(int16_t *cdic_xa_last, const uint8_t *xa, 
 			{
 				int16_t d = xa[16 + (i << 2) + s];
 				int16_t d0 = (d & 0xf) << 12;
-				decode_xa_unit(flags0, d0, l0, l1, dp[0]);
+				decode_xa_unit(flags0, d0, cdic_xa_last[0], cdic_xa_last[1], dp[0]);
 				dp++;
 
 				int16_t d1 = (d >> 4) << 12;
-				decode_xa_unit(flags1, d1, l2, l3, dp[0]);
+				decode_xa_unit(flags1, d1, cdic_xa_last[2], cdic_xa_last[3], dp[0]);
 				dp++;
 			}
 		}
 
 		xa += 128;
 	}
-
-	cdic_xa_last[0] = l0;
-	cdic_xa_last[1] = l1;
-	cdic_xa_last[2] = l2;
-	cdic_xa_last[3] = l3;
 }
 
 void cdicdic_device::decode_xa_stereo8(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp)
 {
-	int16_t l0 = cdic_xa_last[0];
-	int16_t l1 = cdic_xa_last[1];
-	int16_t l2 = cdic_xa_last[2];
-	int16_t l3 = cdic_xa_last[3];
-
 	for (int32_t b = 0; b < 18; b++)
 	{
 		for (int32_t s = 0; s < 4; s += 2)
@@ -400,22 +368,16 @@ void cdicdic_device::decode_xa_stereo8(int16_t *cdic_xa_last, const uint8_t *xa,
 			{
 				int16_t d0 = (xa[16 + (i << 2) + s + 0] << 8);
 
-				decode_xa_unit(flags0, d0, l0, l1, dp[0]);
+				decode_xa_unit(flags0, d0, cdic_xa_last[0], cdic_xa_last[1], dp[0]);
 				dp++;
 
 				int16_t d1 = (xa[16 + (i << 2) + s + 1] << 8);
-				decode_xa_unit(flags1, d1, l2, l3, dp[0]);
+				decode_xa_unit(flags1, d1, cdic_xa_last[2], cdic_xa_last[3], dp[0]);
 				dp++;
 			}
 		}
-
 		xa += 128;
 	}
-
-	cdic_xa_last[0] = l0;
-	cdic_xa_last[1] = l1;
-	cdic_xa_last[2] = l2;
-	cdic_xa_last[3] = l3;
 }
 
 
