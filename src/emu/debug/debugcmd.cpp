@@ -3916,8 +3916,8 @@ void debugger_commands::execute_symlist(const std::vector<std::string_view> &par
 	device_t *cpu = nullptr;
 	symbol_table *symtable;
 
-	// default to CPU "0" if none specified
-	if (!m_console.validate_cpu_parameter(params.empty() ? "0" : params[0], cpu))
+	// default to visible CPU if none specified
+	if (!m_console.validate_cpu_parameter(params.empty() ? std::string_view() : params[0], cpu))
 	{
 		if (!params.empty())
 			return; // explicitly specified CPU is invalid
