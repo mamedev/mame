@@ -13,10 +13,19 @@ zxbus_adapter_device::zxbus_adapter_device(const machine_config &mconfig, const 
 {
 }
 
+void zxbus_adapter_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->space(isa8_device::AS_ISA_IO).install_view(0x0000, 0xffff, m_isa_io_view);
+	}
+}
+
 void zxbus_adapter_device::device_start()
 {
 	set_isa_device();
-	m_isa->space(isa8_device::AS_ISA_IO).install_view(0x0000, 0xffff, m_isa_io_view);
+	remap(AS_IO, 0, 0xffff);
+
 	m_zxbus->set_io_space(m_isa_io_view[0], m_isa_io_view[0]);
 	m_isa_io_view.select(0);
 }
