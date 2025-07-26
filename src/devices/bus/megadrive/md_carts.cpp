@@ -87,4 +87,5 @@ void md_cart(device_slot_interface &device)
 
 
 	device.option_add_internal("rom_nbajam_alt",  MD_EEPROM_NBAJAM_ALT);
+	device.option_add_internal("rom_paprium",  MD_ROM_PAPRIUM);
 }
