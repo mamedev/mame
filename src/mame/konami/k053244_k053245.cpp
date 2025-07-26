@@ -434,7 +434,7 @@ void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		if (flipscreenX)
 		{
-			ox = 512 - ox;
+			ox = 320 - ox;
 			if (!mirrorx)
 				flipx = !flipx;
 		}
