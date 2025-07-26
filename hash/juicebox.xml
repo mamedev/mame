@@ -5,8 +5,7 @@ license:CC0-1.0
 -->
 <softwarelist name="juicebox" description="Mattel Juice Box SmartMedia Flash ROM">
 
-<!-- The .smc files in this are the raw dumps dumps, but with a 0x400 byte custom header (with the first 2 bytes being the flash ident code, and rest unused)
-     This appears to be a custom standard, enforced by smartmed.cpp -->
+<!-- This list uses raw flash ROM dumps, without the .smc format header at the start -->
 
 <!--
 
@@ -19,51 +18,72 @@ license:CC0-1.0
    The flash ROMs on these cartridges look to be deteriorating, each will likely need verifying against multiple cartridges to verify the integrity of
    the data.
 
-   H2679 - Ed, Edd n Eddy Episode #39
+   H26xx/H27xx coded carts
+
+*  H2679 - Ed, Edd n Eddy Episode #39
+   H2680
+*  H2681 - Juice Box Music Video (Avril Lavigne, The Calling, Clay Aiken)
    H2682 - Juiceware Animated Assortment
 *V H2683 - Codename: Kids Next Door Volume 1
    H2684 - Ed, Edd n Eddy Volume 1
 *V H2685 - Yu-Gi-Oh! Volume 1
 *  H2686 - Winx Club Volume 1
    H2687 - The Grim Adventures of Billy and Mandy Volume 1
-   H2688 - Vans Triple Crown Volume 1 (BMX)
-   H2689 - Vans Triple Crown Volume 2 (Skateboarding)
+*  H2688 - Vans Triple Crown Volume 1 (BMX)
+*  H2689 - Vans Triple Crown Volume 2 (Skateboarding)
 *  H2690 - Vans Pipeline Masters Volume 1
-*  H2692 - Teenage Mutant Ninja Turtles Volume 1
+   H2691 - Courage - The Cowardly Dog Volume 1
+*V H2692 - Teenage Mutant Ninja Turtles Volume 1
+   H2693
    H2694 - Trading Spaces Volume 1
+   H2695
+   H2696
 *  H2697 - Megas XLR Volume 1
    H2698 - WWE Rey Mysterio Volume 1
    H2699 - Motocycle Mania 1 Volume 1
    H2700 - Powerpuff Girls Volume 1
    H2701 - Dexter's Laboratory Volume 1
    H2702 - WWE Chris Benoit Volume 1
+   H2703
+   H2704
+   H2705
    H2706 - MyScene Jammin in Jamaica Volume 1
    H2707 - MyScene Masquerade Madness
    H2708 - WWE Eugene Volume 1
-*  H2709 - Juice Box Music Video (Liz Phair, Stacie Orrico, Skye Sweetnam)
-*B H6226 - Juice Box Music Video (Ashlee Simpson, The Cure, Vanessa Carlton, fan_3, Ashlee Simpson)
-*  H6228 - Juice Box Music Video (Avril Lavine, The Calling, Clay Miken, Ruben Studdard)
+*V H2709 - Juice Box Music Video (Liz Phair, Stacie Orrico, Skye Sweetnam)
+
+   H62xx carts
+
+*  H6226 - Juice Box Music Video (Ashlee Simpson, The Cure, Vanessa Carlton, fan_3, Ashlee Simpson)
+*  H6228 - Juice Box Music Video (Avril Lavigne, The Calling, Clay Aiken, Ruben Studdard)
 *  H6230A- Juice Box Music Video (Baha Men, Jump5, Jump5, Beu Sisters, ZOEgirl)
 *  H6232 - Juice Box Music Video (Zoegirl, Jump5, Jump5, Baha Men, Atomic Kitten)
    H6233 - Kenny Chesney - 'Live Those Songs', 'No Shoes, No Shirt, No Problems', 'I Go Back'  Sara Evans - 'Suds in the Bucket, Martina McBride - 'This One's For The Girls'
    H6234 - Juice Box Music Video (Ashlee Simpson, Ashlee Simpson) (same 2 Ashlee Simpson songs as H6226, but without other tracks)
+*  H6247 - Dexter's Laboratory Episode 51
    H6248 - Codename: Kids Next Door - Episode #19
-   H6254 - Juice Box Music Video (Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1) (include 'the making of' for Skye Sweetnam Tangled Up in Me)
-*  H6258 - Winx Club Episode 103
+*  H6254 - Juice Box Music Video (Liz Phair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1) (include 'the making of' for Skye Sweetnam Tangled Up in Me)
+*V H6258 - Winx Club Episode 103
    H6259 - SonicX Episode 3: Missile Wrist Rampage
-*  H6260 - Teenage Mutant Ninja Turtles Episode 36
+*V H6260 - Teenage Mutant Ninja Turtles Episode 36
+
+   H74xx carts
 
 *  H7416 - Streetball Classics Volume 1
    H7417 - Streetball Classics Volume 2
 
-*  H8084 - Yu-Gi-Oh! Episode 175
+   H80xx carts
+
+*V H8084 - Yu-Gi-Oh! Episode 175
    H8085 - Good Times with Carey Hart
-*  H8143 - Yu-Gi-Oh! Episode 176
+*V H8143 - Yu-Gi-Oh! Episode 176
+
+   unknown series carts
 
          - Johnny Bravo Vol 1
          - Brett Favre - The Field General
-   H269x - Courage - The Cowardly Dog Volume 1
-         - Dexter's Laboratory Episode 51
+
+
 
   (many still missing from this list)
 
@@ -75,14 +95,16 @@ license:CC0-1.0
 	The Shredder Strikes Part II
 	-->
 	<!-- PVPlayer Build of Aug 07 2004 at 14:25:28 -->
-	<software name="tmnt1" supported="partial">
+	<software name="tmnt1">
 		<description>Teenage Mustant Ninja Turtles Volume 1 (H2692)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H2692" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_tmnt_vol1_h2692_matrix11247_9875.smc" size="0x2100400" crc="dccdff36" sha1="57332cd1fc90cdb6433af79f1f27863e3f68cdf2" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="jb_tmnt_vol1_h2692_matrix11247_9875.bin" size="0x2100000" crc="5c8397ce" sha1="3e8176dc7fee178eb6e0887df3020f846093be7d" />
 			</dataarea>
 		</part>
 	</software>
@@ -93,14 +115,16 @@ license:CC0-1.0
 	Operation: F.U.T.U.R.E
 	-->
 	<!-- PVPlayer Build of Aug 11 2004 at 15:14:03 -->
-	<software name="knd1" supported="partial">
+	<software name="knd1">
 		<description>Codename: Kids Next Door Volume 1 (H2683)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H2683" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="kidsnedo.smc" size="0x2100400" crc="e917e1f2" sha1="42c56a8b9a2ae076956b98e8bd71e1dfd841d002" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="kidsnedo.bin" size="0x2100000" crc="6959890a" sha1="8e931aed515ea9aadcf86800885f05ee29c7d846" />
 			</dataarea>
 		</part>
 	</software>
@@ -111,14 +135,16 @@ license:CC0-1.0
 	Friends Till The End - Part IV
 	-->
 	<!-- PVPlayer Build of Aug 11 2004 at 15:14:03 -->
-	<software name="yugiv1" supported="partial">
+	<software name="yugiv1">
 		<description>Yu-Gi-Oh! Volume 1 (H2685)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H2685" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="yugioh.smc" size="0x2100400" crc="0a97c7d6" sha1="1b2375c9ef1bbd5cae0c3f0ac20511a36523e86a" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="yugioh.bin" size="0x2100000" crc="8ad9af2e" sha1="e2fa9a89874d791d218d55f9896dec1ff70773ee" />
 			</dataarea>
 		</part>
 	</software>
@@ -130,14 +156,16 @@ license:CC0-1.0
 	Crash Dummies: Ruff Driving (bonus)
 	-->
 	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
-	<software name="tmnte36" supported="partial">
+	<software name="tmnte36">
 		<description>Teenage Mustant Ninja Turtles Episode 36 (H6260)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H6260" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_tmnt_ep36_h6260_matrix11247_9875.smc" size="0x2100400" crc="a494fe28" sha1="5c64f229979823276ca5da95e4c4c395b85242b9" offset="0x00000"/>
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="jb_tmnt_ep36_h6260_matrix11247_9875.bin" size="0x2100000" crc="24da96d0" sha1="6c21686765d360b2c112c74c4de174f1028e2407" offset="0x00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -151,14 +179,16 @@ license:CC0-1.0
 	Ruben Studdard - Superstar
 	-->
 	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
-	<software name="jbm_6228" supported="partial">
+	<software name="jbm_6228">
 		<description>Juicebox Music Video - Avril Lavigne, The Calling, Avril Lavigne, Clay Aiken, Ruben Studdard (H6228)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H6228" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_musicvideo_h6228_matrix11247_9875.smc" size="0x2100400" crc="0bd04da3" sha1="8a05663e0d3c40ac963ca1b1a41339cfa5142694" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="jb_musicvideo_h6228_matrix11247_9875.bin" size="0x2100000" crc="8b9e255b" sha1="1a84dcbe1e059e585ec1debaab544c2dccba7bbd" />
 			</dataarea>
 		</part>
 	</software>
@@ -170,14 +200,16 @@ license:CC0-1.0
 	Skye Sweetnam - Tangled Up In Me
 	-->
 	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
-	<software name="jbm_2709" supported="partial">
+	<software name="jbm_2709">
 		<description>Juicebox Music Video - Liz Phair, Stacie Orrico, Skye Sweetnam (H2709)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H2709" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_musicvideo_h2709_matrix11252_9873.smc" size="0x1080400" crc="d9ff5ee4" sha1="fdcb32a7ff8534357521f340ec16b01ec887de5c" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x73"/>
+			<dataarea name="rom" size="0x1080000">
+				<rom name="jb_musicvideo_h2709_matrix11252_9873.bin" size="0x1080000" crc="48910290" sha1="b5ea79aadc144d90829b0f1c3eb27284a202330a" />
 			</dataarea>
 		</part>
 	</software>
@@ -191,27 +223,32 @@ license:CC0-1.0
 	Atomic Kitten - Eternal Flame
 	-->
 	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
-	<software name="jbm_6232" supported="partial">
+	<software name="jbm_6232">
 		<description>Juicebox Music Video - ZOEgirl, Jump5, Jump5, Baha Men, Atomic Kitten (H6232)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H6232" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_musicvideo_h6232_matrix11247_9875.smc" size="0x2100400" crc="27b85bb6" sha1="673937106788dd6c4a3647454f4583e97eb2d1a9" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="jb_musicvideo_h6232_matrix11247_9875.bin" size="0x2100000" crc="a7f6334e" sha1="24a39418c9742605d3c8890345d496a9046615eb" />
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
-	<software name="winxe103" supported="partial">
+	<!-- also seen on a 32Mbyte ROM <rom name="h6258.bin" size="0x2100000" crc="ca34d4e9" sha1="e7ee85edc0fe7ae13fc76af0af2a59d01bb0ced4" /> -->
+	<software name="winxe103">
 		<description>Winx Club Episode 103 (H6258)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H6258" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_winxclub_ep103_h6258_matrix11252_9873.smc" size="0x1080400" crc="d7e370ba" sha1="b24a9e1b1a7c3a830976cc6c28451cec9eefa31d" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x73"/>
+			<dataarea name="rom" size="0x1080000">
+				<rom name="jb_winxclub_ep103_h6258_matrix11252_9873.bin" size="0x1080000" crc="468d2cce" sha1="2c0140ccce60ce8877d8dc632de5d3ee5d7dfb10" />
 			</dataarea>
 		</part>
 	</software>
@@ -221,14 +258,16 @@ license:CC0-1.0
 	Friends 'Til The End - Part I
 	-->
 	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
-	<software name="yugie175" supported="partial">
+	<software name="yugie175">
 		<description>Yu-Gi-Oh! Episode 175 (H8084)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H8084" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_yugioh_ep175_h8084_matrix11252_9873.smc" size="0x1080400" crc="04b2c825" sha1="977e9c20384bdbc65c2b90ed32d09624e95a0e0a" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x73"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="jb_yugioh_ep175_h8084_matrix11252_9873.bin" size="0x1080000" crc="95dc9451" sha1="18cdd8b574ecb7377cc881f03d5a938b6fe66974" />
 			</dataarea>
 		</part>
 	</software>
@@ -238,39 +277,45 @@ license:CC0-1.0
 	Friends 'Til The End - Part II
 	-->
 	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
-	<software name="yugie176" supported="partial">
+	<software name="yugie176">
 		<description>Yu-Gi-Oh! Episode 176 (H8143)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H8143" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_yugioh_ep176_h8143_matrix11252_9873.smc" size="0x1080400" crc="f1a0edd4" sha1="553e74100f9969117f0240f98e84515823cce108" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x73"/>
+			<dataarea name="rom" size="0x1080000">
+				<rom name="jb_yugioh_ep176_h8143_matrix11252_9873.bin" size="0x1080000" crc="60ceb1a0" sha1="0e42fde6a7e0cda72c8497470986d2fcb0fe2ffd" />
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
-	<software name="plmv1" supported="partial">
+	<software name="plmv1">
 		<description>Vans Pipeline Masters Volume 1 (H2690)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H2690" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_pipelinemasters_vol1_h2690_matrix11247_9875.smc" size="0x2100400" crc="e8cca1d4" sha1="5cd2b29bc28d20d9c9b455edb750fbbb530b8e5b" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="jb_pipelinemasters_vol1_h2690_matrix11247_9875.bin" size="0x2100000" crc="6882c92c" sha1="ecde1ba0a9ac80346db4cf66abcbb81c1fb5a3b3" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sbcv1" supported="partial">
+	<software name="sbcv1">
 		<description>Streetball Classics Volume 1 (H7416)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H7416" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_streetball-classics-vol1_h7416_matrix11247_9875.smc" size="0x2100400" crc="ada20763" sha1="b973e18d390a7d1a530e3737562722f96163d593" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="jb_streetball-classics-vol1_h7416_matrix11247_9875.bin" size="0x2100000" crc="2dec6f9b" sha1="dfe2a1f9387c4c3df6820d53021250130c0d5c85" />
 			</dataarea>
 		</part>
 	</software>
@@ -280,14 +325,16 @@ license:CC0-1.0
 	Test Drive
 	All I Wanted Was A Slushie
 	-->
-	<software name="megasv1" supported="partial">
+	<software name="megasv1">
 		<description>Megas XLR Volume 1 (H2697)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H2697" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_megas-xlr_vol1_h2697_matrix11247_9875.smc" size="0x2100400" crc="385b0402" sha1="fd761af3c8eaa522db0b4c224d37440d47c26c8a" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="jb_megas-xlr_vol1_h2697_matrix11247_9875.bin" size="0x2100000" crc="b8156cfa" sha1="41275ac8cb244d9e80d3f166f1ea34d5e21d8e0c" />
 			</dataarea>
 		</part>
 	</software>
@@ -298,14 +345,16 @@ license:CC0-1.0
 	More Than High School
 	-->
 	<!-- PVPlayer Build of Aug 11 2004 at 15:14:03 -->
-	<software name="winxv1" supported="partial">
+	<software name="winxv1">
 		<description>Winx Club Volume 1 (H2686)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H2686" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_winxclub_vol1_h2686_matrix11247_9875.smc" size="0x2100400" crc="0d8e6f6d" sha1="f45cd8cdbd7b0d28a2bd5a2503bae52190112db6" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="jb_winxclub_vol1_h2686_matrix11247_9875.bin" size="0x2100000" crc="8dc00795" sha1="40d179e4141dc83108ac549b2d482ef65670f022" />
 			</dataarea>
 		</part>
 	</software>
@@ -319,14 +368,16 @@ license:CC0-1.0
 	ZOEgirl - Dismissed
 	-->
 	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
-	<software name="jbm_6230a" supported="partial">
+	<software name="jbm_6230a">
 		<description>Juicebox Music Video - Baha Men, Jump5, Jump5, Beu Sisters, ZOEgirl (H6230A)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H6230A" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_musicvideo_h6230a_matrix11247_9875.smc" size="0x2100400" crc="d8ce26c4" sha1="02b3bdec5ba1002264663e79ecbe2444a92efdfc" />
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="jb_musicvideo_h6230a_matrix11247_9875.bin" size="0x2100000" crc="58804e3c" sha1="a8b888e78bd5c8f3961f71e1deebc2e8995e3981" />
 			</dataarea>
 		</part>
 	</software>
@@ -340,15 +391,116 @@ license:CC0-1.0
 	Ashlee Simpson - Pieces of Me
 	-->
 	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
-	<software name="jbm_6226" supported="partial">
+	<software name="jbm_6226">
 		<description>Juicebox Music Video - Ashlee Simpson, The Cure, Vanessa Carlton, fan_3, Ashlee Simpson (H6226)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H6226" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
 				<!-- start of The Cure song has corrupt video, so might still be bad -->
-				<rom name="jb_musicvideo_h6226_matrix11247_9875.smc" size="0x2100400" crc="c53ed7ac" sha1="c91eaaf3bdfba2badf4498d419dbc0bca8c89bac" status="baddump" />
+				<!--<rom name="jb_musicvideo_h6226_matrix11247_9875.bin" size="0x2100000" crc="4570bf54" sha1="a77449136ecccd08c98128215302c701269e886f" status="baddump" />-->
+				<rom name="h6226.bin" size="0x2100000" crc="e4b5d8fb" sha1="a437e80a53bcb6f89c110cca8008159f0df7abcf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ededd39">
+		<description>Ed, Edd n Eddy - Episode 39 (H2679)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2679" />
+		<part name="memc" interface="sm_memc">
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x73"/>
+			<dataarea name="rom" size="0x1080000">
+				<rom name="h2679.bin" size="0x1080000" crc="f093d257" sha1="a6cf725f1da4946fe4c6138b34f12cd5df221c43" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dexlab51">
+		<description>Dexter's Laboratory - Episode 51 (H6247)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H6247" />
+		<part name="memc" interface="sm_memc">
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x73"/>
+			<dataarea name="rom" size="0x1080000">
+				<rom name="h6247.bin" size="0x1080000" crc="31fd2902" sha1="5d28ea98665bd99fc8c9b460f0cccd7a566ec6ee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vans1">
+		<description>Vans Triple Crown Volume 1 (BMX) (H2688)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2688" />
+		<part name="memc" interface="sm_memc">
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="h2688.bin" size="0x2100000" crc="c463b055" sha1="735e0a5c411673c69b9105f1e4a78be8ecfb565a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vans2">
+		<description>Vans Triple Crown Volume 2 (Skateboarding) (H2689)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2689" />
+		<part name="memc" interface="sm_memc">
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="h2689.bin" size="0x2100000" crc="16d12a69" sha1="eb20b42dac9df39b5943f0f485826d011a3d93a2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
+	Avril Lavigne - My Happy Ending
+	The Calling - Our Lives
+	Clay Aiken - Invisible
+	-->
+	<software name="h2681">
+		<description>Juicebox Music Video - Avril Lavigne, The Calling, Clay Aiken (H2681)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2689" />
+		<part name="memc" interface="sm_memc">
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="h2681.bin" size="0x2100000" crc="d66dbe5b" sha1="4eff67088294efb40f6596a643b4084ab8dc4084" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
+	Liz Phair - Extraordinary
+	Stacie Orrico - Stuck
+	Skye Sweetnam - Tangled Up In Me
+	Zoegirl - You Get Me
+	The Making of Tangled Up In Me
+	-->
+	<software name="h6254">
+		<description>Juicebox Music Video - Liz Phair, Stacie Orrico, Skye Sweetnam, Zoegirl (H6254)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2689" />
+		<part name="memc" interface="sm_memc">
+			<feature name="nandtype1" value="0x98"/>
+			<feature name="nandtype2" value="0x75"/>
+			<dataarea name="rom" size="0x2100000">
+				<rom name="h6254-0971g1.bin" size="0x2100000" crc="0f96880b" sha1="283eee7df7a152eb7f71ad9f94f73900e090df45" />
 			</dataarea>
 		</part>
 	</software>
