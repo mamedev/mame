@@ -122,6 +122,15 @@ license:CC0-1.0
 			<bounds x="385" y="75" width="5" height="5" />
 		</element>
 
+		<!-- coin return button -->
+		<element name="lamp36" ref="indicator_red">
+			<bounds x="400" y="45" width="5" height="15" />
+		</element>
+
+		<element name="lamp37" ref="indicator_red">
+			<bounds x="400" y="65" width="5" height="15" />
+		</element>
+
 <!-- lampZEILESPALTE -->
 
 <!-- left panel -->
