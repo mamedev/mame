@@ -261,6 +261,7 @@ private:
 	u8      m_z80_data;
 	bool    m_z80_wait;
 	u8      m_wait_ticks_count;
+	u8      m_z80_data_odd;
 	std::list<std::pair<u16, u16>> m_ints;
 	u8      m_joy1_ctrl;
 	u8      m_joy2_ctrl;
@@ -1015,6 +1016,10 @@ void sprinter_state::check_accel(bool is_read, offs_t offset, u8 &data)
 		if (data == 0x1f && is_ram)
 			data = 0x0f;
 		m_in_out_cmd = false;
+	}
+
+	if (~offset & 1) {
+		m_z80_data_odd = data;
 	}
 
 	const bool accel_go_case = m_access_state == ACCEL_OFF && !m_z80_m1 && m_acc_dir && acc_ena();
