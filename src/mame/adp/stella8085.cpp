@@ -176,7 +176,7 @@ void stella8085_state::machine2_w(uint8_t data)
 
 void stella8085_state::kbd_sl_w(uint8_t data)
 {
-	m_kbd_sl = data & 0x07;
+	m_kbd_sl = data;
 
 	if ( BIT(m_dsw->read(),0))
 		m_maincpu->set_input_line(I8085_RST75_LINE, BIT(data,3) ? ASSERT_LINE : CLEAR_LINE);
@@ -231,7 +231,6 @@ void stella8085_state::disp_w(uint8_t data)
 		for (int i = 0; i < 8; i++)
 		{
 			uint8_t lamp_index = (m_kbd_sl * 10) + i;
-			osd_printf_error("lamp %02d\n",lamp_index);
 			bool lamp_value = BIT(data, i);
 			m_lamps[lamp_index] = lamp_value;
 		}
