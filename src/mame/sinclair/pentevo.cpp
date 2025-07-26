@@ -751,7 +751,7 @@ void pentevo_state::pentevo(machine_config &config)
 
 ROM_START( pentevo )
 	ROM_REGION(0x090000, "maincpu", ROMREGION_ERASEFF)
-	ROM_DEFAULT_BIOS("v0.59.13")
+	ROM_DEFAULT_BIOS("v0.60.02")
 
 	// http://svn.zxevo.ru/revision.php?repname=pentevo&path=%2From%2Fzxevo_fe.rom
 	ROM_SYSTEM_BIOS(0, "v0.59.02fe", "ERS v0.59.02 (FE), NEO-DOS v0.53")
@@ -766,6 +766,10 @@ ROM_START( pentevo )
 	ROMX_LOAD( "zxevo_05913.rom", 0x010000, 0x80000, CRC(b75bf957) SHA1(6880493ee248cad1f82683f8b9cc69fb78fe5682), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(5, "v0.59.13fe", "ERS v0.59.13 (FE), NEO-DOS v0.58")
 	ROMX_LOAD( "zxevo_05913fe.rom", 0x010000, 0x80000, CRC(a4de8eb8) SHA1(508667d5ef42a1d0353866f3a1de4e61a230fc86), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "v0.60.02", "ERS v0.60.02, NEO-DOS v0.60")
+	ROMX_LOAD( "zxevo_06002.rom", 0x010000, 0x80000, CRC(0c828b6c) SHA1(c70361b98f2d42d4ab60a63139bb1de4eecd6dd1), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(7, "v0.60.02fe", "ERS v0.60.02 (FE), NEO-DOS v0.60")
+	ROMX_LOAD( "zxevo_06002fe.rom", 0x010000, 0x80000, CRC(b7ac7a2d) SHA1(5a86046d12d4aad52947caec8550db605b37ca29), ROM_BIOS(7))
 
 	// http://svn.zxevo.ru/revision.php?repname=pentevo&path=%2Fcfgs%2Fstandalone_base_trdemu%2Ftrunk%2Fzxevo_fw.bin&rev=994&peg=1021
 	ROM_REGION(0x0C280, "fw", ROMREGION_ERASEFF)
