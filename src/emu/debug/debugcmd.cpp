@@ -28,6 +28,7 @@
 #include "softlist.h"
 
 #include "corestr.h"
+#include "multibyte.h"
 
 #include <algorithm>
 #include <cctype>
@@ -2011,6 +2012,9 @@ void debugger_commands::execute_rewind(const std::vector<std::string_view> &para
 
 void debugger_commands::execute_save(int spacenum, const std::vector<std::string_view> &params)
 {
+	if (execute_save_try_memory(params))
+		return;
+
 	u64 offset, endoffset, length;
 	address_space *space;
 
@@ -2097,31 +2101,42 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 	m_console.printf("Data saved successfully\n");
 }
 
-
 /*-------------------------------------------------
-    execute_saveregion - execute the save command on region memory
+    execute_savememory - execute the save command on memory
 -------------------------------------------------*/
 
-void debugger_commands::execute_saveregion(const std::vector<std::string_view> &params)
+bool debugger_commands::execute_save_try_memory(const std::vector<std::string_view> &params)
 {
-	u64 offset, length;
-	memory_region *region;
+	u64 offset = u64(-1);
+	memory_region *region = nullptr;
+	memory_share *share = nullptr;
+	if (!m_console.validate_address_with_memory_parameter(params[1], offset, region, share))
+		return false; // not memory case
 
-	// validate parameters
-	if (!m_console.validate_number_parameter(params[1], offset))
-		return;
-	if (!m_console.validate_number_parameter(params[2], length))
-		return;
-	if (!m_console.validate_memory_region_parameter(params[3], region))
-		return;
+	u64 length;
+	if (offset == u64(-1) || !m_console.validate_number_parameter(params[2], length) || (region == nullptr && share == nullptr))
+		return true;
 
-	if (offset >= region->bytes())
+	u32 msize;
+	u8 *base;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+	}
+
+	if (offset >= msize)
 	{
 		m_console.printf("Invalid offset\n");
-		return;
+		return true;
 	}
-	if ((length <= 0) || ((length + offset) >= region->bytes()))
-		length = region->bytes() - offset;
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
 
 	// open the file
 	std::string const filename(params[0]);
@@ -2129,12 +2144,24 @@ void debugger_commands::execute_saveregion(const std::vector<std::string_view> &
 	if (!f)
 	{
 		m_console.printf("Error opening file '%s'\n", params[0]);
-		return;
+		return true;
 	}
-	fwrite(region->base() + offset, 1, length, f);
+	fwrite(base + offset, 1, length, f);
 
 	fclose(f);
 	m_console.printf("Data saved successfully\n");
+
+	return true;
+}
+
+
+/*-------------------------------------------------
+    execute_saveregion - execute the save command on region memory
+-------------------------------------------------*/
+
+void debugger_commands::execute_saveregion(const std::vector<std::string_view> &params)
+{
+	execute_save(-1, std::vector<std::string_view>{ params[0], std::string(params[1]) + std::string(params[3]) + ".m", params[2] });
 }
 
 
@@ -2144,6 +2171,9 @@ void debugger_commands::execute_saveregion(const std::vector<std::string_view> &
 
 void debugger_commands::execute_load(int spacenum, const std::vector<std::string_view> &params)
 {
+	if (execute_load_try_memory(params))
+		return;
+
 	u64 offset, endoffset, length = 0;
 	address_space *space;
 
@@ -2251,31 +2281,43 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 		m_console.printf("Data loaded successfully to memory : 0x%X to 0x%X\n", offset, i-1);
 }
 
-
 /*-------------------------------------------------
-    execute_loadregion - execute the load command on region memory
+    execute_loadmemory - execute the load command on memory
 -------------------------------------------------*/
 
-void debugger_commands::execute_loadregion(const std::vector<std::string_view> &params)
+bool debugger_commands::execute_load_try_memory(const std::vector<std::string_view> &params)
 {
-	u64 offset, length;
-	memory_region *region;
+	u64 offset = u64(-1);
+	memory_region *region = nullptr;
+	memory_share *share = nullptr;
+	if (!m_console.validate_address_with_memory_parameter(params[1], offset, region, share))
+		return false; // not memory case
 
+	u64 length;
 	// validate parameters
-	if (!m_console.validate_number_parameter(params[1], offset))
-		return;
-	if (!m_console.validate_number_parameter(params[2], length))
-		return;
-	if (!m_console.validate_memory_region_parameter(params[3], region))
-		return;
+	if (offset == u64(-1) || !m_console.validate_number_parameter(params[2], length) || (region == nullptr && share == nullptr))
+		return true;
 
-	if (offset >= region->bytes())
+	u32 msize;
+	u8 *base;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+	}
+
+	if (offset >= msize)
 	{
 		m_console.printf("Invalid offset\n");
-		return;
+		return true;
 	}
-	if ((length <= 0) || ((length + offset) >= region->bytes()))
-		length = region->bytes() - offset;
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
 
 	// open the file
 	std::string filename(params[0]);
@@ -2283,7 +2325,7 @@ void debugger_commands::execute_loadregion(const std::vector<std::string_view> &
 	if (!f)
 	{
 		m_console.printf("Error opening file '%s'\n", params[0]);
-		return;
+		return true;
 	}
 
 	fseek(f, 0L, SEEK_END);
@@ -2294,10 +2336,22 @@ void debugger_commands::execute_loadregion(const std::vector<std::string_view> &
 	if (length >= size)
 		length = size;
 
-	fread(region->base() + offset, 1, length, f);
+	fread(base + offset, 1, length, f);
 
 	fclose(f);
 	m_console.printf("Data loaded successfully to memory : 0x%X to 0x%X\n", offset, offset + length - 1);
+
+	return true;
+}
+
+
+/*-------------------------------------------------
+    execute_loadregion - execute the load command on region memory
+-------------------------------------------------*/
+
+void debugger_commands::execute_loadregion(const std::vector<std::string_view> &params)
+{
+	execute_load(-1, std::vector<std::string_view>{ params[0], std::string(params[1]) + std::string(params[3]) + ".m", params[2] });
 }
 
 
@@ -2307,6 +2361,9 @@ void debugger_commands::execute_loadregion(const std::vector<std::string_view> &
 
 void debugger_commands::execute_dump(int spacenum, const std::vector<std::string_view> &params)
 {
+	if (execute_dump_try_memory(params))
+		return;
+
 	// validate parameters
 	address_space *space;
 	u64 offset;
@@ -2464,6 +2521,172 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 	m_console.printf("Data dumped successfully\n");
 }
 
+/*-------------------------------------------------
+    execute_dumpmemory - execute the dump command on memory
+-------------------------------------------------*/
+
+bool debugger_commands::execute_dump_try_memory(const std::vector<std::string_view> &params)
+{
+	u64 offset = u64(-1);
+	memory_region *region = nullptr;
+	memory_share *share = nullptr;
+	if (!m_console.validate_address_with_memory_parameter(params[1], offset, region, share))
+		return false; // not memory case
+
+	u64 length;
+	if (offset == u64(-1) || !m_console.validate_number_parameter(params[2], length) || (region == nullptr && share == nullptr))
+		return true;
+
+	u64 width = 0;
+	if (params.size() > 3 && !m_console.validate_number_parameter(params[3], width))
+		return true;
+
+	bool ascii = true;
+	if (params.size() > 4 && !m_console.validate_boolean_parameter(params[4], ascii))
+		return true;
+
+	u64 rowsize = 16;
+	if (params.size() > 5 && !m_console.validate_number_parameter(params[5], rowsize))
+		return true;
+
+	int shift = 0;
+	u64 granularity = shift >= 0 ? 1 : 1 << -shift;
+
+	u32 msize;
+	u8 *base;
+	bool be;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+		be = region->endianness() == ENDIANNESS_BIG;
+		if (width == 0)
+			width = region->bytewidth();
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+		be = share->endianness() == ENDIANNESS_BIG;
+		if (width == 0)
+			width = share->bytewidth();
+	}
+
+	if (offset >= msize)
+	{
+		m_console.printf("Invalid offset\n");
+		return true;
+	}
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
+
+	// further validation
+	if (width != 1 && width != 2 && width != 4 && width != 8)
+	{
+		m_console.printf("Invalid width! (must be 1,2,4 or 8)\n");
+		return true;
+	}
+	if (width < granularity)
+	{
+		m_console.printf("Invalid width! (must be at least %d)\n", granularity);
+		return true;
+	}
+	if (rowsize == 0 || (rowsize % width) != 0)
+	{
+		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", width);
+		return true;
+	}
+
+	u64 endoffset = offset + length - 1;
+
+	// open the file
+	std::string filename(params[0]);
+	FILE *const f = fopen(filename.c_str(), "w");
+	if (!f)
+	{
+		m_console.printf("Error opening file '%s'\n", params[0]);
+		return true;
+	}
+
+	// now write the data out
+	util::ovectorstream output;
+	output.reserve(200);
+
+	const unsigned delta = (shift >= 0) ? (width << shift) : (width >> -shift);
+
+	for (u64 i = offset; i <= endoffset; i += rowsize)
+	{
+		output.clear();
+		output.rdbuf()->clear();
+
+		// print the address
+		util::stream_format(output, "%0*X: ", 8, i);
+
+		// print the bytes
+		for (u64 j = 0; j < rowsize; j += delta)
+		{
+			if (i + j <= endoffset)
+			{
+				switch (width)
+				{
+				case 8:
+					util::stream_format(output, " %016X", get_u64be(&base[i+j]));
+					break;
+				case 4:
+					util::stream_format(output, " %08X", get_u32be(&base[i+j]));
+					break;
+				case 2:
+					util::stream_format(output, " %04X", get_u16be(&base[i+j]));
+					break;
+				case 1:
+					util::stream_format(output, " %02X", base[i+j]);
+					break;
+				}
+			}
+			else
+				util::stream_format(output, " %*s", width * 2, "");
+		}
+
+		// print the ASCII
+		if (ascii)
+		{
+			util::stream_format(output, "  ");
+			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j += delta)
+			{
+				u64 data = 0;
+				switch (width)
+				{
+				case 8:
+					data = get_u64be(&base[i+j]);
+					break;
+				case 4:
+					data = get_u32be(&base[i+j]);
+					break;
+				case 2:
+					data = get_u16be(&base[i+j]);
+					break;
+				case 1:
+					data = base[i+j];
+					break;
+				}
+				for (unsigned int b = 0; b != width; b++) {
+					u8 byte = data >> (8 * (be ? (width-1-b) : b));
+					util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
+				}
+			}
+		}
+
+		// output the result
+		auto const &text = output.vec();
+		fprintf(f, "%.*s\n", int(unsigned(text.size())), &text[0]);
+	}
+
+	// close the file
+	fclose(f);
+	m_console.printf("Data dumped successfully\n");
+
+	return true;
+}
 
 //-------------------------------------------------
 //  execute_strdump - execute the strdump command
@@ -2471,6 +2694,9 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 
 void debugger_commands::execute_strdump(int spacenum, const std::vector<std::string_view> &params)
 {
+	if (execute_strdump_try_memory(params))
+		return;
+
 	// validate parameters
 	u64 offset;
 	if (!m_console.validate_number_parameter(params[1], offset))
@@ -2639,6 +2865,187 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 	// close the file
 	fclose(f);
 	m_console.printf("Data dumped successfully\n");
+}
+
+/*-------------------------------------------------
+    execute_strdumpmemory - execute the strdump command on memory
+-------------------------------------------------*/
+
+bool debugger_commands::execute_strdump_try_memory(const std::vector<std::string_view> &params)
+{
+	u64 offset = u64(-1);
+	memory_region *region = nullptr;
+	memory_share *share = nullptr;
+	if (!m_console.validate_address_with_memory_parameter(params[1], offset, region, share))
+		return false; // not memory case
+
+	u64 length;
+	if (offset == u64(-1) || !m_console.validate_number_parameter(params[2], length) || (region == nullptr && share == nullptr))
+		return true;
+
+	u64 term = 0;
+	if (params.size() > 3 && !m_console.validate_number_parameter(params[3], term))
+		return true;
+
+	// further validation
+	if (term >= 0x100 && term != u64(-0x80))
+	{
+		m_console.printf("Invalid termination character\n");
+		return true;
+	}
+
+	// open the file
+	std::string filename(params[0]);
+	FILE *f = fopen(filename.c_str(), "w");
+	if (!f)
+	{
+		m_console.printf("Error opening file '%s'\n", params[0]);
+		return true;
+	}
+
+	u32 msize;
+	u8 *base;
+	bool be;
+	u64 width;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+		be = region->endianness() == ENDIANNESS_BIG;
+		width = region->bytewidth();
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+		be = share->endianness() == ENDIANNESS_BIG;
+		width = share->bytewidth();
+	}
+
+	if (offset >= msize)
+	{
+		m_console.printf("Invalid offset\n");
+		return true;
+	}
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
+
+	// now write the data out
+	util::ovectorstream output;
+	output.reserve(200);
+
+	bool terminated = true;
+	while (length-- != 0)
+	{
+		if (terminated)
+		{
+			terminated = false;
+			output.clear();
+			output.rdbuf()->clear();
+
+			// print the address
+			util::stream_format(output, "%0*X: \"", 8, offset);
+		}
+
+		// get the character data
+		u64 data = 0;
+		offs_t curaddr = offset;
+		switch (width)
+		{
+		case 1:
+			data = base[curaddr];
+			break;
+
+		case 2:
+			data = be ? get_u16be(&base[curaddr]) : get_u16le(&base[curaddr]);
+			break;
+
+		case 4:
+			data = be ? get_u32be(&base[curaddr]) : get_u32le(&base[curaddr]);
+			break;
+
+		case 8:
+			data = be ? get_u64be(&base[curaddr]) : get_u64le(&base[curaddr]);
+			break;
+		}
+
+		// print the characters
+		for (int n = 0; n < width; n++)
+		{
+			// check for termination within word
+			if (terminated)
+			{
+				terminated = false;
+
+				// output the result
+				auto const &text = output.vec();
+				fprintf(f, "%.*s\"\n", int(unsigned(text.size())), &text[0]);
+				output.clear();
+				output.rdbuf()->clear();
+
+				// print the address
+				util::stream_format(output, "%0*X.%d: \"", 8, offset, n);
+			}
+
+			u8 ch = data & 0xff;
+			data >>= 8;
+
+			// check for termination
+			if (term == u64(-0x80))
+			{
+				if (BIT(ch, 7))
+				{
+					terminated = true;
+					ch &= 0x7f;
+				}
+			}
+			else if (ch == term)
+			{
+				terminated = true;
+				continue;
+			}
+
+			// check for non-ASCII characters
+			if (ch < 0x20 || ch >= 0x7f)
+			{
+				// use special or octal escape
+				if (ch >= 0x07 && ch <= 0x0d)
+					util::stream_format(output, "\\%c", "abtnvfr"[ch - 0x07]);
+				else
+					util::stream_format(output, "\\%03o", ch);
+			}
+			else
+			{
+				if (ch == '"' || ch == '\\')
+					output << '\\';
+				output << char(ch);
+			}
+		}
+
+		if (terminated)
+		{
+			// output the result
+			auto const &text = output.vec();
+			fprintf(f, "%.*s\"\n", int(unsigned(text.size())), &text[0]);
+			output.clear();
+			output.rdbuf()->clear();
+		}
+
+		offset += width;
+	}
+
+	if (!terminated)
+	{
+		// output the result
+		auto const &text = output.vec();
+		fprintf(f, "%.*s\"\\\n", int(unsigned(text.size())), &text[0]);
+	}
+
+	// close the file
+	fclose(f);
+	m_console.printf("Data dumped successfully\n");
+
+	return true;
 }
 
 
@@ -3143,6 +3550,9 @@ void debugger_commands::execute_cheatundo(const std::vector<std::string_view> &p
 
 void debugger_commands::execute_find(int spacenum, const std::vector<std::string_view> &params)
 {
+	if (execute_find_try_memory(params))
+		return;
+
 	u64 offset, length;
 	address_space *space;
 
@@ -3266,6 +3676,140 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 		m_console.printf("Not found\n");
 }
 
+/*-------------------------------------------------
+    execute_findmemory - execute the find command on memory
+-------------------------------------------------*/
+
+bool debugger_commands::execute_find_try_memory(const std::vector<std::string_view> &params)
+{
+	u64 offset = u64(-1);
+	memory_region *region = nullptr;
+	memory_share *share = nullptr;
+	if (!m_console.validate_address_with_memory_parameter(params[0], offset, region, share))
+		return false; // not memory case
+
+	u64 length;
+	if (offset == u64(-1) || !m_console.validate_number_parameter(params[1], length) || (region == nullptr && share == nullptr))
+		return true;
+
+	u32 msize;
+	u8 *base;
+	bool be;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+		be = region->endianness() == ENDIANNESS_BIG;
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+		be = share->endianness() == ENDIANNESS_BIG;
+	}
+
+	if (offset >= msize)
+	{
+		m_console.printf("Invalid offset\n");
+		return true;
+	}
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
+
+	// further validation
+	u64 const endoffset = offset + length - 1;
+	int cur_data_size = 1;
+
+	// parse the data parameters
+	u64 data_to_find[256];
+	u8 data_size[256];
+	int data_count = 0;
+	for (int i = 2; i < params.size(); i++)
+	{
+		std::string_view pdata = params[i];
+
+		if (!pdata.empty() && pdata.front() == '"' && pdata.back() == '"') // check for a string
+		{
+			auto const pdatalen = params[i].length() - 1;
+			for (int j = 1; j < pdatalen; j++)
+			{
+				data_to_find[data_count] = pdata[j];
+				data_size[data_count++] = 1;
+			}
+		}
+		else // otherwise, validate as a number
+		{
+			// check for a 'b','w','d',or 'q' prefix
+			data_size[data_count] = cur_data_size;
+			if (pdata.length() >= 2)
+			{
+				if (tolower(u8(pdata[0])) == 'b' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 1; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'w' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 2; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'd' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 4; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'q' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 8; pdata.remove_prefix(2); }
+			}
+
+			// look for a wildcard
+			if (pdata == "?")
+				data_size[data_count++] |= 0x10;
+
+			// otherwise, validate as a number
+			else if (!m_console.validate_number_parameter(pdata, data_to_find[data_count++]))
+				return true;
+		}
+	}
+
+	// now search
+	int found = 0;
+	for (u64 i = offset; i <= endoffset; i += data_size[0])
+	{
+		int suboffset = 0;
+		bool match = true;
+
+		// find the entire string
+		for (int j = 0; j < data_count && match; j++)
+		{
+			offs_t address = i + suboffset;
+			switch (data_size[j])
+			{
+			case 1:
+				match = u8(data_to_find[j]) == base[address];
+				break;
+
+			case 2:
+				match = u16(data_to_find[j]) == (be ? get_u16be(&base[address]) : get_u16le(&base[address]));
+				break;
+
+			case 4:
+				match = u32(data_to_find[j]) == (be ? get_u32be(&base[address]) : get_u32le(&base[address]));
+				break;
+
+			case 8:
+				match = u64(data_to_find[j]) == (be ? get_u64be(&base[address]) : get_u64le(&base[address]));
+				break;
+
+			default:
+				// all other cases are wildcards
+				break;
+			}
+			suboffset += data_size[j] & 0x0f;
+		}
+
+		// did we find it?
+		if (match)
+		{
+			found++;
+			m_console.printf("Found at %04X\n", i);
+		}
+	}
+
+	// print something if not found
+	if (found == 0)
+		m_console.printf("Not found\n");
+
+	return true;
+}
+
 
 //-------------------------------------------------
 //  execute_fill - execute the fill command
@@ -3273,6 +3817,9 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 
 void debugger_commands::execute_fill(int spacenum, const std::vector<std::string_view> &params)
 {
+	if (execute_fill_try_memory(params))
+		return;
+
 	u64 offset, length;
 	address_space *space;
 
@@ -3373,6 +3920,139 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 				count -= fill_data_size[j];
 		}
 	}
+}
+
+/*-------------------------------------------------
+    execute_fillmemory - execute the fill command on memory
+-------------------------------------------------*/
+
+bool debugger_commands::execute_fill_try_memory(const std::vector<std::string_view> &params)
+{
+	u64 offset = u64(-1);
+	memory_region *region = nullptr;
+	memory_share *share = nullptr;
+	if (!m_console.validate_address_with_memory_parameter(params[0], offset, region, share))
+		return false; // not memory case
+
+	u64 length;
+	if (offset == u64(-1) || !m_console.validate_number_parameter(params[1], length) || (region == nullptr && share == nullptr))
+		return true;
+
+	u32 msize;
+	u8 *base;
+	bool be;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+		be = region->endianness() == ENDIANNESS_BIG;
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+		be = share->endianness() == ENDIANNESS_BIG;
+	}
+
+	if (offset >= msize)
+	{
+		m_console.printf("Invalid offset\n");
+		return true;
+	}
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
+
+	// further validation
+	int cur_data_size = 1;
+
+	// parse the data parameters
+	u64 fill_data[256];
+	u8 fill_data_size[256];
+	int data_count = 0;
+	for (int i = 2; i < params.size(); i++)
+	{
+		std::string_view pdata = params[i];
+
+		// check for a string
+		if (!pdata.empty() && pdata.front() == '"' && pdata.back() == '"')
+		{
+			auto const pdatalen = pdata.length() - 1;
+			for (int j = 1; j < pdatalen; j++)
+			{
+				fill_data[data_count] = pdata[j];
+				fill_data_size[data_count++] = 1;
+			}
+		}
+
+		// otherwise, validate as a number
+		else
+		{
+			// check for a 'b','w','d',or 'q' prefix
+			fill_data_size[data_count] = cur_data_size;
+			if (pdata.length() >= 2)
+			{
+				if (tolower(u8(pdata[0])) == 'b' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 1; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'w' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 2; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'd' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 4; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'q' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 8; pdata.remove_prefix(2); }
+			}
+
+			// validate as a number
+			if (!m_console.validate_number_parameter(pdata, fill_data[data_count++]))
+				return true;
+		}
+	}
+	if (data_count == 0)
+		return true;
+
+	// now fill memory
+	u64 count = length;
+	while (count != 0)
+	{
+		// write the entire string
+		for (int j = 0; j < data_count; j++)
+		{
+			offs_t address = offset;
+			switch (fill_data_size[j])
+			{
+			case 1:
+				base[address] = u8(fill_data[j]);
+				break;
+
+			case 2:
+				if (be)
+					put_u16be(&base[address], u16(fill_data[j]));
+				else
+					put_u16le(&base[address], u16(fill_data[j]));
+				break;
+
+			case 4:
+				if (be)
+					put_u32be(&base[address], u32(fill_data[j]));
+				else
+					put_u32le(&base[address], u32(fill_data[j]));
+				break;
+
+			case 8:
+				if (be)
+					put_u64be(&base[address], u64(fill_data[j]));
+				else
+					put_u64le(&base[address], u64(fill_data[j]));
+				break;
+			}
+
+			offset += fill_data_size[j];
+			if (count <= fill_data_size[j])
+			{
+				count = 0;
+				break;
+			}
+			else
+				count -= fill_data_size[j];
+		}
+	}
+
+	return true;
 }
 
 
