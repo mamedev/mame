@@ -416,6 +416,10 @@ void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		else
 			zoomx = zoomy;
 
+		// limit to maximum 1024x512 (see asterix konami logo)
+		zoomx = std::min(zoomx, 0x400000 / w);
+		zoomy = std::min(zoomy, 0x200000 / h);
+
 		ox = m_buffer[offs+3] + spriteoffsX;
 		oy = m_buffer[offs+2];
 

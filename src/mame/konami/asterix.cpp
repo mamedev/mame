@@ -6,10 +6,7 @@ Asterix
 Konami GX068 PCB
 
 TODO:
- - the konami logo: in the original the outline is drawn, then there's a slight
-   delay of 1 or 2 seconds, then it fills from the top to the bottom with the
-   colour, including the word "Konami"
- - Verify clocks, PCB has 2 OSCs. 32MHz & 24MHz
+- Verify clocks, PCB has 2 OSCs. 32MHz & 24MHz
 
 ***************************************************************************/
 
@@ -382,11 +379,11 @@ void asterix_state::machine_reset()
 void asterix_state::asterix(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000)/2); // 12MHz
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2); // 12MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &asterix_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(asterix_state::asterix_interrupt));
 
-	Z80(config, m_audiocpu, XTAL(32'000'000)/4); // 8MHz Z80E ??
+	Z80(config, m_audiocpu, 32_MHz_XTAL / 4); // 8MHz Z80E ??
 	m_audiocpu->set_addrmap(AS_PROGRAM, &asterix_state::sound_map);
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
@@ -414,9 +411,11 @@ void asterix_state::asterix(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", XTAL(32'000'000)/8).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1); // 4MHz
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32_MHz_XTAL / 8)); // 4MHz
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(1, "speaker", 1.0, 1);
 
-	k053260_device &k053260(K053260(config, "k053260", XTAL(32'000'000)/8)); // 4MHz
+	k053260_device &k053260(K053260(config, "k053260", 32_MHz_XTAL / 8)); // 4MHz
 	k053260.add_route(0, "speaker", 0.75, 0);
 	k053260.add_route(1, "speaker", 0.75, 1);
 	k053260.sh1_cb().set(FUNC(asterix_state::z80_nmi_w));
