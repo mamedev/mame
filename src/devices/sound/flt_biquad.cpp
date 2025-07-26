@@ -442,6 +442,101 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_diff_bandpass_ca
 }
 
 
+/* RC-based band-pass filters:
+ *
+ * RR variation: the two resistors are connected to each other:
+ *
+ *   Vin -- C1 -- R1 -+-----+- Vout
+ *                    |     |
+ *                    R2    C2
+ *                    |     |
+ *                   GND  (V)GND
+ *
+ *
+ * CC variation: The two capacitors are connected to each other:
+ *
+ *   Vin -- R1 -+- C2 -+- Vout
+ *              |      |
+ *              C1     R2
+ *              |      |
+ *             GND   (V)GND
+ *
+ * (V)GND could be a virtual ground.
+ *
+ * BPF transfer function: H(s) = (A * s) / (s ^ 2 + B * s + C)
+ * In the RR configuration, we have:
+ *   A = 1 / (R1 * C2)
+ *   B = (R1 * C1 + R2 * C2 + R2 * C1) / (R1 * R2 * C1 * C2)
+ *   C = 1 / (R1 * R2 * C1 * C2)
+ * In the CC configuration, we have:
+ *   A = 1 / (R1 * C1)
+ *   B = (R1 * C1 + R2 * C2 + R1 * C2) / (R1 * R2 * C1 * C2)
+ *   C = 1 / (R1 * R2 * C1 * C2)
+ * From the standard transfer function for BPFs, we have:
+ *   A = gain * (w / Q)
+ *   B = w / Q
+ *   C = w ^ 2
+ * The calculations of Fc, Q and gain in the *_calc functions below are derived
+ * from the equations above, with some algebra.
+ */
+
+filter_biquad_device& filter_biquad_device::rc_rr_bandpass_setup(double r1, double r2, double c1, double c2)
+{
+	return setup(rc_rr_bandpass_calc(r1, r2, c1, c2));
+}
+
+void filter_biquad_device::rc_rr_bandpass_modify(double r1, double r2, double c1, double c2)
+{
+	modify(rc_rr_bandpass_calc(r1, r2, c1, c2));
+}
+
+filter_biquad_device::biquad_params filter_biquad_device::rc_rr_bandpass_calc(double r1, double r2, double c1, double c2)
+{
+	if ((r1 == 0) || (r2 == 0) || (c1 == 0) || (c2 == 0))
+	{
+		fatalerror("filter_biquad_device::rc_rr_bandpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, c1: %f, c2: %f", r1, r2, c1, c2);
+	}
+	const double x = sqrt(r1 * r2 * c1 * c2);
+	const double y = r1 * c1 + r2 * c2 + r2 * c1;
+	const double z = r2 * c1;
+	filter_biquad_device::biquad_params p;
+	p.type = filter_biquad_device::biquad_type::BANDPASS;
+	p.fc = 1.0 / (2.0 * M_PI * x);
+	p.q = x / y;
+	p.gain = z / y;
+	LOGMASKED(LOG_SETUP, "filter_biquad_device::rc_rr_bandpass_calc(%f %f %f %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, c1, c2, p.fc, p.q, p.gain);
+	return p;
+}
+
+filter_biquad_device& filter_biquad_device::rc_cc_bandpass_setup(double r1, double r2, double c1, double c2)
+{
+	return setup(rc_cc_bandpass_calc(r1, r2, c1, c2));
+}
+
+void filter_biquad_device::rc_cc_bandpass_modify(double r1, double r2, double c1, double c2)
+{
+	modify(rc_cc_bandpass_calc(r1, r2, c1, c2));
+}
+
+filter_biquad_device::biquad_params filter_biquad_device::rc_cc_bandpass_calc(double r1, double r2, double c1, double c2)
+{
+	if ((r1 == 0) || (r2 == 0) || (c1 == 0) || (c2 == 0))
+	{
+		fatalerror("filter_biquad_device::rc_cc_bandpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, c1: %f, c2: %f", r1, r2, c1, c2);
+	}
+	const double x = sqrt(r1 * r2 * c1 * c2);
+	const double y = r1 * c1 + r2 * c2 + r1 * c2;
+	const double z = r2 * c2;
+	filter_biquad_device::biquad_params p;
+	p.type = filter_biquad_device::biquad_type::BANDPASS;
+	p.fc = 1.0 / (2.0 * M_PI * x);
+	p.q = x / y;
+	p.gain = z / y;
+	LOGMASKED(LOG_SETUP, "filter_biquad_device::rc_cc_bandpass_calc(%f %f %f %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, c1, c2, p.fc, p.q, p.gain);
+	return p;
+}
+
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
