@@ -67,12 +67,13 @@ protected:
 private:
 	uint8_t m_digit = 0U;
 	uint8_t m_kbd_sl = 0x00;
+	bool m_kbd_bd = false;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8256_device> m_uart;
 	required_device<i8279_device> m_kdc;
 	required_ioport m_dsw;
 	output_finder<8> m_digits;
-	output_finder<64> m_lamps;
+	output_finder<88> m_lamps;
 	required_device<beep_device> m_beep;
 	emu_timer *m_sound_timer;
 
@@ -89,6 +90,7 @@ private:
 	// I8279 Interface
 	uint8_t kbd_rl_r();
 	void kbd_sl_w(uint8_t data);
+	void kbd_bd_w(uint8_t data);
 	void disp_w(uint8_t data);
 	void rst65_w(uint8_t state);
 	void output_digit(uint8_t i, uint8_t data);
@@ -182,6 +184,11 @@ void stella8085_state::kbd_sl_w(uint8_t data)
 		m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
+void stella8085_state::kbd_bd_w(uint8_t data)
+{
+	m_kbd_bd = data;
+}
+
 uint8_t stella8085_state::kbd_rl_r()
 {
 	uint8_t ret = 0xFF;
@@ -220,10 +227,11 @@ uint8_t stella8085_state::kbd_rl_r()
 
 void stella8085_state::disp_w(uint8_t data)
 {
-	if (m_kbd_sl < 4) {
+	if (m_kbd_sl < 8) {
 		for (int i = 0; i < 8; i++)
 		{
 			uint8_t lamp_index = (m_kbd_sl * 10) + i;
+			osd_printf_error("lamp %02d\n",lamp_index);
 			bool lamp_value = BIT(data, i);
 			m_lamps[lamp_index] = lamp_value;
 		}
@@ -561,6 +569,7 @@ void stella8085_state::doppelpot(machine_config &config)
 
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
+	m_kdc->out_bd_callback().set(FUNC(stella8085_state::kbd_bd_w));
 	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));
 	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));
 	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
