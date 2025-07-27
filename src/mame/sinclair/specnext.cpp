@@ -892,8 +892,8 @@ void specnext_state::update_video_mode()
 	const int top = m_video_timings.min_vactive;
 	const int width = (m_video_timings.max_hc + 1) << 1;
 	const int height = m_video_timings.max_vc + 1;
-	m_clip256x192 = rectangle(left, left + (256 << 1), top, top + 192);
-	m_clip320x256 = rectangle(left - (32 << 1), left + ((256 + 32) << 1), top - 32, top + 192 + 32);
+	m_clip256x192 = rectangle(left, left + (256 << 1) - 1, top, top + 192 - 1);
+	m_clip320x256 = rectangle(left - (32 << 1), left + ((256 + 32) << 1) - 1, top - 32, top + 192 + 32 - 1);
 
 	m_screen->configure(width, height
 		, is_hdmi
