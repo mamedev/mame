@@ -150,10 +150,10 @@ protected:
 	void CDD_Resume();
 	void CDD_FF();
 	void CDD_RW();
-	void CDD_Open(void);
-	void CDD_Close(void);
+	void CDD_OpenTray(void);
+	void CDD_CloseTray(void);
 	void CDD_Init(void);
-	void CDD_Default(void);
+	void CDD_Unknown(u8 which);
 	void CDD_Reset(void);
 	void CDC_Reset(void);
 	void lc89510_Reset(void);
