@@ -12712,6 +12712,53 @@ ROM_START( kmhpan )
 	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // borrowed from goldnpkr for now, just to see something
 ROM_END
 
+// ICP PCBs with daughterboard 137 F40
+ROM_START( unkicpf40 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "137_7_10b_sub.bin",   0x6000, 0x1000, CRC(698a04c1) SHA1(f3e3cfef5ef3d517b2c1550c85d0be09f1fa17b1) )
+	ROM_LOAD( "137_8_10b_sub.bin",   0x7000, 0x0800, CRC(d5c43fce) SHA1(6797d9cd485791dba8be0d2136b6f713f9e2908e) )
+	ROM_CONTINUE(                    0x5800, 0x0800 )
+	ROM_LOAD( "r-300_f40_5_sub.bin", 0x5000, 0x0800, CRC(04c8797d) SHA1(ff20bab51ddff2cdce55a104f2ec536e38e42605) )
+	ROM_CONTINUE(                    0x7800, 0x0800 )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "34.8a", 0x2000, 0x1000, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1", 0x2800, 0x1000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "137_82s131_bprom.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+ROM_END
+
+// ICP PCBs with daughterboard F80
+ROM_START( unkicpf80 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "7_sub.bin",     0x6000, 0x1000, CRC(1075c73a) SHA1(6949b103e9a72dd688348359ce1b3c9c61911121) )
+	ROM_LOAD( "8_sub.bin",     0x7000, 0x0800, CRC(ac08a967) SHA1(1063751f8224ba66c3182d47011b9d779f06349f) )
+	ROM_CONTINUE(              0x5800, 0x0800 )
+	ROM_LOAD( "9_f80_sub.bin", 0x5000, 0x0800, CRC(98d16359) SHA1(fa6b6da54a1bb819627073d5330c0c3e1f207bb4) )
+	ROM_CONTINUE(              0x7800, 0x0800 )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "4.8a", 0x1000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_LOAD( "3.7a", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//	ROM_CONTINUE(           0x0000, 0x0100 )
+ROM_END
+
+
 /*********************************************
 *                Driver Init                 *
 *********************************************/
@@ -13423,6 +13470,10 @@ GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespe
 GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Roulette (ICP-1 PCB)",                    0 )  // password protected
 
 GAME(  199?, kmhpan,    0,        kmhpan,   kmhpan,   goldnpkr_state, empty_init,    ROT0,   "PAN Electronics",          "Kaimen Hu (PAN Electronics)",             MACHINE_NOT_WORKING )
+
+GAMEL( 198?, unkicpf40, 0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "ICP",                      "Unknown ICP F40 (PCB 137)",               MACHINE_NOT_WORKING,  layout_goldnpkr )
+GAMEL( 198?, unkicpf80, 0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "ICP",                      "Unknown ICP F80",                         MACHINE_NOT_WORKING,  layout_goldnpkr )
+
 
 /*************************************** SETS W/IRQ0 ***************************************/
 
