@@ -280,8 +280,6 @@ void sega_segacd_device::device_add_mconfig(machine_config &config)
 	m_scdcpu->set_addrmap(AS_PROGRAM, &sega_segacd_device::segacd_map);
 	m_scdcpu->set_irq_acknowledge_callback(FUNC(sega_segacd_device::segacd_sub_int_callback));
 
-	LC89510(config, "cdc", 0); // cd controller
-
 	// temporary until things are cleaned up
 	LC89510_TEMP(config, m_lc89510_temp, 0); // cd controller
 	m_lc89510_temp->set_cdc_do_dma_callback(FUNC(sega_segacd_device::SegaCD_CDC_Do_DMA)); // hack

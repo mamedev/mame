@@ -7,9 +7,9 @@
 #pragma once
 
 #include "cpu/m68000/m68000.h"
-#include "machine/lc89510.h"
-#include "megacdcd.h"
 #include "sound/rf5c68.h"
+
+#include "megacdcd.h"
 #include "screen.h"
 #include "tilemap.h"
 
