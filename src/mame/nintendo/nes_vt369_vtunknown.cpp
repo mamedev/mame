@@ -1038,6 +1038,12 @@ ROM_START( jl2050 )
 	ROM_LOAD( "jl2050.u5", 0x00000, 0x1000000, CRC(f96c5c02) SHA1(c7d0b57c2622b5213d3c7e6532495d9da74d4b01) )
 ROM_END
 
+ROM_START( supr200 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "w25q64jv.u1", 0x00000, 0x800000, CRC(89b6f026) SHA1(4ba21d3d803984a9a6daf24f91cb429f566a2f4c) )
+ROM_END
+
+
 ROM_START( dgun2572 )
 	ROM_REGION( 0x2000000, "mainrom", 0 ) // extra pins on subboard not marked
 	ROM_LOAD( "dreamgearwgun.bin", 0x00000, 0x2000000, CRC(92b55c75) SHA1(c7b2319e304a4bf480b5dcd4f24af2e6ba834d0d) )
@@ -1275,6 +1281,9 @@ CONS( 200?, mc_110cb,  0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, 
 CONS( 200?, mc_138cb,  0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, jl2050,    0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "LexiBook / JungleTac / NiceCode",  "Cyber Console Center 200-in-1 (JL2050)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// the menus are very different to the plug-in TV version found in ppgc200g
+CONS( 201?, supr200,    0,        0,  vt36x_swap_8mb, vt369, vt36x_state, empty_init, "Fizz Creations",  "Supreme 200 (handheld)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // GB-50 console supports loading games from SD card (not emulated), main ROM is QSPI flash
 // Games loaded from SD card are loaded into the QSPI flash at 0x800000 - dump is from a clean factory console
