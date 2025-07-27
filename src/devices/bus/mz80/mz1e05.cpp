@@ -14,10 +14,38 @@ The density control register is not documented.
 #include "emu.h"
 #include "mz1e05.h"
 
+#include "imagedev/floppy.h"
+#include "machine/wd_fdc.h"
 #include "softlist_dev.h"
 
-// device type definition
-DEFINE_DEVICE_TYPE(MZ1E05, mz1e05_device, "mz1e05", "MZ-1E05 FDD Interface")
+namespace {
+
+class mz1e05_device : public device_t, public device_mz80_exp_interface
+{
+public:
+	// device type constructor
+	mz1e05_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// device_mz80_exp_interface implementation
+	virtual void io_map(address_map &map) override ATTR_COLD;
+
+private:
+	void dm_w(u8 data);
+	void hs_w(u8 data);
+	void fm_w(u8 data);
+
+	required_device<wd_fdc_device_base> m_fdc;
+	required_device_array<floppy_connector, 4> m_fdd;
+
+	u8 m_dm;
+	u8 m_hs;
+};
 
 mz1e05_device::mz1e05_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MZ1E05, tag, owner, clock)
@@ -100,3 +128,8 @@ void mz1e05_device::fm_w(u8 data)
 {
 	m_fdc->dden_w(BIT(data, 0));
 }
+
+} // anonymous namespace
+
+// device type definition
+DEFINE_DEVICE_TYPE_PRIVATE(MZ1E05, device_mz80_exp_interface, mz1e05_device, "mz1e05", "MZ-1E05 FDD Interface")
