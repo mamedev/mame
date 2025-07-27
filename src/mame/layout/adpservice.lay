@@ -11,6 +11,15 @@ license:CC0-1.0
 		</rect>
 	</element>
 
+	<element name="green_led" defstate="0">
+		<rect state="0">
+			<color red="0" green="0.2" blue="0" />
+		</rect>
+		<rect state="1">
+			<color red="0" green="0.8" blue="0" />
+		</rect>
+	</element>
+
 	<element name="button_service">
     	<rect>
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -58,72 +67,31 @@ license:CC0-1.0
 		</element>
 
 
-<!-- bottom panel LZ0 -->
-		<!-- Tasten -->
-		<element ref="button_service" inputtag="TZ6" inputmask="0x80">
-			<bounds x="15" y="60" width="15" height="15" />
-		</element>
+		<!-- keys -->
+    <repeat count="2">
+        <param name="y" start="60" increment="20" />
+        <param name="row" start="6" increment="1" />
+        <repeat count="8">
+                <param name="btnx" start="15" increment="20" />
+                <param name="mask" start="0x80" rshift="1" />
+                <element ref="button_service" inputtag="TZ~row~" inputmask="~mask~">
+                    <bounds x="~btnx~" y="~y~" width="15" height="15" />
+                </element>
+        </repeat>
+    </repeat>
 
-        <element ref="button_service" inputtag="TZ6" inputmask="0x40">
-			<bounds x="35" y="60" width="15" height="15" />
-		</element>
-
-        <element ref="button_service" inputtag="TZ6" inputmask="0x20">
-			<bounds x="55" y="60" width="15" height="15" />
-		</element>
-
-        <element ref="button_service" inputtag="TZ6" inputmask="0x10">
-			<bounds x="75" y="60" width="15" height="15" />
-		</element>
-
-        <element ref="button_service" inputtag="TZ6" inputmask="0x08">
-			<bounds x="95" y="60" width="15" height="15" />
-		</element>
-
-        <element ref="button_service" inputtag="TZ6" inputmask="0x04">
-			<bounds x="115" y="60" width="15" height="15" />
-		</element>
-
-        <element ref="button_service" inputtag="TZ6" inputmask="0x02">
-			<bounds x="135" y="60" width="15" height="15" />
-		</element>
-
-        <element ref="button_service" inputtag="TZ6" inputmask="0x01">
-			<bounds x="155" y="60" width="15" height="15" />
-		</element>
-
-
-        <element ref="button_service" inputtag="TZ7" inputmask="0x80">
-			<bounds x="15" y="80" width="15" height="15" />
-		</element>
-
-        <element ref="button_service" inputtag="TZ7" inputmask="0x40">
-			<bounds x="35" y="80" width="15" height="15" />
-		</element>
-
-        <element ref="button_service" inputtag="TZ7" inputmask="0x20">
-			<bounds x="55" y="80" width="15" height="15" />
-		</element>
-
-        <element ref="button_service" inputtag="TZ7" inputmask="0x10">
-			<bounds x="75" y="80" width="15" height="15" />
-		</element>
-
-        <element ref="button_service" inputtag="TZ7" inputmask="0x08">
-			<bounds x="95" y="80" width="15" height="15" />
-		</element>
-
-        <element ref="button_service" inputtag="TZ7" inputmask="0x04">
-			<bounds x="115" y="80" width="15" height="15" />
-		</element>
-
-        <element ref="button_service" inputtag="TZ7" inputmask="0x02">
-			<bounds x="135" y="80" width="15" height="15" />
-		</element>
-
-        <element ref="button_service" inputtag="TZ7" inputmask="0x01">
-			<bounds x="155" y="80" width="15" height="15" />
-		</element>
+<!-- debug-->
+    <repeat count="8">
+    <param name="z" start="0" increment="1" />
+    <param name="x" start="0" increment="2" />
+        <repeat count="8">
+        <param name="s" start="0" increment="1" />
+        <param name="y" start="10" increment="2" />
+            <element name="lamp~z~~s~" ref="green_led">
+			    <bounds x="~x~" y="~y~" width="1" height="1" />
+		    </element>
+        </repeat>
+    </repeat>
 
 	</view>
 </mamelayout>
