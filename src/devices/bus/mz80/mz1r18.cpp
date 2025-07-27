@@ -2,7 +2,10 @@
 // copyright-holders:AJR
 /**************************************************************************************************
 
-Sharp MZ-1R18 64KB RAM Disk (for MZ-800)
+Sharp MZ-1R18 RAM File Board
+
+This 64KB RAM disk is specific to one dedicated slot on the MZ-800, likely because that slot
+supplies its DRAMs with the Z80-generated refresh strobe not ordinarily present on the bus.
 
 List of all ICs:    8x M5K4164AP-15
                     4x M74LS193P
@@ -23,7 +26,7 @@ List of all ICs:    8x M5K4164AP-15
 #include "logmacro.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(MZ1R18, mz1r18_device, "mz1r18", "Sharp MZ-1R18 RAM Disk")
+DEFINE_DEVICE_TYPE(MZ1R18, mz1r18_device, "mz1r18", "Sharp MZ-1R18 RAM File")
 
 mz1r18_device::mz1r18_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MZ1R18, tag, owner, clock)
