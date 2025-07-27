@@ -1055,6 +1055,12 @@ ROM_START( gon100 )
 	ROM_IGNORE(0x300)
 ROM_END
 
+ROM_START( d12power )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "25q128.u2", 0x00000, 0x1000000, CRC(02650ad4) SHA1(ca346409e11732d97b892c356fc5da61dc16ab01) )
+ROM_END
+
+
 ROM_START( dgun2572 )
 	ROM_REGION( 0x2000000, "mainrom", 0 ) // extra pins on subboard not marked
 	ROM_LOAD( "dreamgearwgun.bin", 0x00000, 0x2000000, CRC(92b55c75) SHA1(c7b2319e304a4bf480b5dcd4f24af2e6ba834d0d) )
@@ -1299,6 +1305,8 @@ CONS( 201?, supr200,    0,        0,  vt36x_swap_8mb, vt369, vt36x_state, empty_
 CONS( 201?, tiger108,  0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "Zebra AS / Tiger Retail", "Spillekonsol Game console - 108-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 201?, gon100,    0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "Game On 100-in-1", MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 201?, d12power,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "SZDiiER", "Power - Charging and playing games (D12) (816-in-1)", MACHINE_IMPERFECT_GRAPHICS )
 
 // GB-50 console supports loading games from SD card (not emulated), main ROM is QSPI flash
 // Games loaded from SD card are loaded into the QSPI flash at 0x800000 - dump is from a clean factory console

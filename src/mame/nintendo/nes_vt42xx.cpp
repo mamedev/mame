@@ -90,6 +90,7 @@ public:
 	void init_rfcp168();
 	void init_g9_666();
 	void init_hhgc319();
+	void init_bl339();
 
 protected:
 	uint8_t vt_rom_banked_r(offs_t offset);
@@ -544,6 +545,20 @@ void nes_vt42xx_state::init_hhgc319()
 		put_u16le(&romdata[i], bitswap<16>(get_u16le(&romdata[i]), 15, 14, 6, 5, 3, 2, 9, 8, 7, 13, 12, 4, 11, 10, 1, 0));
 }
 
+void nes_vt42xx_state::init_bl339()
+{
+	init_rfcp168();
+
+	// Even more pairs of address and data lines to swap here (but not the same lines as hhgc319)...
+	uint8_t *romdata = memregion("mainrom")->base();
+	for (offs_t i = 0; i < 0x1000000; i += 0x1000)
+		std::swap_ranges(&romdata[i + 0x400], &romdata[i + 0x800], &romdata[i + 0x800]);
+	for (offs_t i = 0; i < 0x1000000; i += 0x10)
+		std::swap_ranges(&romdata[i + 0x04], &romdata[i + 0x08], &romdata[i + 0x08]);
+	for (offs_t i = 0; i < 0x1000000; i += 2)
+		put_u16le(&romdata[i], bitswap<16>(get_u16le(&romdata[i]), 15, 7, 13, 4, 3, 10, 2, 1, 14, 6, 5, 12, 11, 9, 8, 0));
+}
+
 } // anonymous namespace
 
 
@@ -558,8 +573,8 @@ CONS( 201?, g5_500,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, ini
 // highly scrambled
 CONS( 201?, hhgc319,  0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_hhgc319, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// very similar menus etc. to hhgc319, but claims 20 more games, different scramble?
-CONS( 201?, bl339,    0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "BaoBaoLong", "Handheld Game Console 339-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+// very similar menus etc. to hhgc319, but claims 20 more games, different scramble
+CONS( 201?, bl339,    0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_bl339, "BaoBaoLong", "Handheld Game Console 339-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs well, only issues in SMB3 which crashes
 CONS( 2017, bittboy,  0,  0,  nes_vt42xx_bitboy_2x16mb, nes_vt42xx, nes_vt42xx_bitboy_state, empty_init, "BittBoy",   "BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (2x 16mbyte banks)
