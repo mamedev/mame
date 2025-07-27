@@ -21,6 +21,10 @@ Features (TS-Configuration):
 
 - DRAM-to-Device, Device-to-DRAM and DRAM-to-DRAM DMA Controller
 
+Revisions:
+    tsconf: Initial release for ZX Evolution baser on Altera's FPGA 50K
+    tsconf2: Requires 100K FPGA and has extra feature set like 'Copper'
+
 Refs:
 TsConf: https://github.com/tslabs/zx-evo/blob/master/pentevo/docs/TSconf/tsconf_en.md
         https://github.com/tslabs/zx-evo/raw/master/pentevo/docs/TSconf/TSconf.xls
@@ -332,6 +336,18 @@ void tsconf_state::tsconf(machine_config &config)
 	SOFTWARE_LIST(config, "betadisc_list_tsconf").set_original("tsconf_betadisc_flop");
 }
 
+
+void tsconf_state::tsconf2(machine_config &config)
+{
+	tsconf(config);
+	TSCONF_COPPER(config, m_copper, 28_MHz_XTAL);
+	m_copper->out_wreg_cb().set(FUNC(tsconf_state::tsconf_port_xxaf_w));
+	m_copper->set_in_until_pos_cb(FUNC(tsconf_state::copper_until_pos_r));
+
+	m_dma->on_ready_callback().append(m_copper, FUNC(tsconf_copper_device::dma_ready_w));
+}
+
+
 ROM_START(tsconf)
 	ROM_REGION(0x080000, "maincpu", ROMREGION_ERASEFF) // ROM: 32 * 16KB
 	ROM_DEFAULT_BIOS("v2407")
@@ -346,5 +362,18 @@ ROM_START(tsconf)
 	ROM_LOAD( "cram-init.bin", 0, 0x200, CRC(8b96ffb7) SHA1(4dbd22f4312251e922911a01526cbfba77a122fc))
 ROM_END
 
-//    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
-COMP( 2011, tsconf, spec128,    0,      tsconf,     tsconf,     tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution: TS-Configuration",   MACHINE_SUPPORTS_SAVE)
+ROM_START(tsconf2)
+	ROM_REGION(0x080000, "maincpu", ROMREGION_ERASEFF) // ROM: 32 * 16KB
+	ROM_DEFAULT_BIOS("v2407")
+
+	ROM_SYSTEM_BIOS(0, "v2407", "Update 24.07.28")
+	ROMX_LOAD("ts-bios.240728.rom", 0, 0x10000, CRC(19f8ad7b) SHA1(9cee82d4a6212686358a50b0fd5a2981b3323ab6), ROM_BIOS(0))
+
+	ROM_REGION(0x200, "cram_init", ROMREGION_ERASEFF)
+	ROM_LOAD( "cram-init.bin", 0, 0x200, CRC(8b96ffb7) SHA1(4dbd22f4312251e922911a01526cbfba77a122fc))
+ROM_END
+
+
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
+COMP( 2011, tsconf,     spec128,    0,      tsconf,     tsconf,     tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution: TS-Configuration",   MACHINE_SUPPORTS_SAVE)
+COMP( 2024, tsconf2,    spec128,    0,      tsconf2,    tsconf,     tsconf_state,   empty_init, "TS-Labs",          "EvoMAX3: TS-Configuration 2",      MACHINE_SUPPORTS_SAVE)
