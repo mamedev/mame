@@ -343,6 +343,14 @@ ROM_START(dphh8630)
 	ROM_LOAD("bg25q16.bin", 0x000000, 0x200000, CRC(277850d5) SHA1(740087842e1e63bf99b4ca9c1b2053361f267269))
 ROM_END
 
+ROM_START(dphh8633)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("25lq032.u2", 0x000000, 0x400000, CRC(45b8609a) SHA1(d03615a68465a1a365ba07db0b352424680d62d0) )
+ROM_END
+
 ROM_START(dgun2953)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
@@ -361,11 +369,20 @@ ROM_END
 
 ROM_START(retro150)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	// might not be correct for this set, as it doesn't boot
+	// not correct for this
 	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("p25d32sh.u2", 0x000000, 0x400000, CRC(294290aa) SHA1(078892b2bb10e347ed07273bafed486e0f52c909) )
+ROM_END
+
+ROM_START(retro150a)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
+	// not correct for this
+	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("by25q32ess.bin", 0x000000, 0x400000, CRC(ef9e8091) SHA1(5b924d5fd4419956d49379a695b87435df7a1155) )
 ROM_END
 
 ROM_START(supreme)
@@ -404,7 +421,7 @@ CONS( 201?, mc_cb203,      0,       0,      bbl380,   bbl380, bbl380_state, empt
 
 // newer releases (more heavily censored, for export markets?) internal ROM was changed for these
 
-CONS( 201?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 230-in-1 - Model 8630 / Model 8633", MACHINE_IMPERFECT_SOUND ) // sometimes sold as PCP.  Model 8630/8633 are same ROM, different case
+CONS( 201?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 230-in-1 - Model 8630", MACHINE_IMPERFECT_SOUND ) // sometimes sold as PCP
 
 CONS( 201?, rhhc152,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Orb", "Retro Handheld Console 152-in-1", MACHINE_IMPERFECT_SOUND ) // looks like a mini GameBoy - 'Over 150 games' on box
 
@@ -421,6 +438,9 @@ CONS( 201?, supreme,       0,       0,      bbl380,   bbl380, bbl380_state, empt
 CONS( 2019, pg118,         0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Pocket Game / Game Computer", "Pocket Game 118-in-1 / Game Computer 118-in-1", MACHINE_NOT_WORKING )
 // also has the 0xE4 XOR, also doesn't currently boot
 CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet", MACHINE_NOT_WORKING )
-// for the UK market, but does't boot either
-CONS( 201?, retro150,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// for the UK market, but doesn't boot either
+CONS( 201?, retro150,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1) (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, retro150a,     retro150,0,      bbl380,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1) (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+// it is unclear if dphh8633 refers to the case style, rather than the software, as the dphh8630 set was also noted as previously being found in an 8633 unit
+CONS( 201?, dphh8633,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 268-in-1 - Model 8633", MACHINE_NOT_WORKING )
