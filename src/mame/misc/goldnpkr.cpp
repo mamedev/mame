@@ -12712,6 +12712,36 @@ ROM_START( kmhpan )
 	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // borrowed from goldnpkr for now, just to see something
 ROM_END
 
+// Unknown golden poker type game.
+// Wing 8510-A / W90-3 PCB
+ROM_START( unkwingpkr )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // unknown running in Wing W90 hardware 
+	ROM_LOAD( "4.12a", 0x2000, 0x2000, CRC(119e4f06) SHA1(d520aa1a862b93d5f9d2f8acf127842bb5441831) )
+
+	ROM_LOAD( "5.16a", 0x4000, 0x1000, CRC(5d974b4d) SHA1(1e14a0076e59d3bfd70921d18f8ca81cfecf61e0) )
+	ROM_CONTINUE(      0x6000, 0x1000 )
+	ROM_LOAD( "6.17a", 0x5000, 0x1000, CRC(84c6a3cd) SHA1(41fda1f76318771fe8bc475edd25b3c9540b6167) )
+	ROM_CONTINUE(      0x7000, 0x1000 )
+	
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x4000, 0x0000 )
+	ROM_LOAD( "3.6a",  0x4000, 0x2000, CRC(b7425e3a) SHA1(ec118389cadc026d19f13fda8ed31b586914c7f3) )
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "2.4a",  0x0000, 0x2000, CRC(f475b43e) SHA1(b09544828a75c592e27fdc69646b594cbfcf0483) ) 
+	ROM_LOAD( "1.2a",  0x2000, 0x2000, CRC(b85e1275) SHA1(1de37c634643e5ddde0a16a80a9c16625bebfb08) )
+	ROM_COPY( "gfx1",  0x4800, 0x4000, 0x0800 ) 
+
+	ROM_REGION( 0x0100, "proms", 0 )  // borrowed from parent, for now...
+	ROM_LOAD( "tbp24s10n.7d",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+
+	ROM_REGION( 0x0300, "proms2", 0 )  // the real ones...
+	ROM_LOAD( "r_82s129an.1c", 0x0000, 0x0100, CRC(2a16af3f) SHA1(4fd31a8e8c2cc4b548336438c407bb76548097ee) )
+	ROM_LOAD( "g_82s129an.2c", 0x0000, 0x0100, CRC(4b7d0f43) SHA1(523ccf38ad954d959d6bb862eb8358d180d4b4aa) )
+	ROM_LOAD( "b_82s129an.3c", 0x0000, 0x0100, CRC(8c16681d) SHA1(fb3507dfbf2bdd5552e0024152e63e3408f435eb) )
+ROM_END
+
+
 // ICP PCBs with daughterboard 137 F40
 ROM_START( unkicpf40 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -13471,8 +13501,10 @@ GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init
 
 GAME(  199?, kmhpan,    0,        kmhpan,   kmhpan,   goldnpkr_state, empty_init,    ROT0,   "PAN Electronics",          "Kaimen Hu (PAN Electronics)",             MACHINE_NOT_WORKING )
 
-GAMEL( 198?, unkicpf40, 0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "ICP",                      "Unknown ICP F40 (PCB 137)",               MACHINE_NOT_WORKING,  layout_goldnpkr )
-GAMEL( 198?, unkicpf80, 0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "ICP",                      "Unknown ICP F80",                         MACHINE_NOT_WORKING,  layout_goldnpkr )
+GAME(  198?, unkwingpkr,goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Unknown poker (Wing 8510-A / W90-3 PCB)", MACHINE_NOT_WORKING )
+
+GAMEL( 198?, unkicpf40, 0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Unknown ICP F40 (PCB 137)",               MACHINE_NOT_WORKING,  layout_goldnpkr )
+GAMEL( 198?, unkicpf80, 0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Unknown ICP F80",                         MACHINE_NOT_WORKING,  layout_goldnpkr )
 
 
 /*************************************** SETS W/IRQ0 ***************************************/
