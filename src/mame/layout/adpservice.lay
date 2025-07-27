@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+	<element name="static_black">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="button_service">
+    	<rect>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.2" />
+		</led7seg>
+	</element>
+
+
+	<view name="Internal Layout">
+		<bounds left="0" right="180" top="0" bottom="100" />
+		<element ref="static_black">
+			<bounds left="0" right="180" top="0" bottom="100" />
+		</element>
+
+<!-- debug display -->
+		<element name="digit15" ref="digit">
+			<bounds x="30" y="10" width="15" height="20" />
+		</element>
+		<element name="digit14" ref="digit">
+			<bounds x="45" y="10" width="15" height="20" />
+		</element>
+		<element name="digit13" ref="digit">
+			<bounds x="60" y="10" width="15" height="20" />
+		</element>
+		<element name="digit12" ref="digit">
+			<bounds x="75" y="10" width="15" height="20" />
+		</element>
+
+		<element name="digit11" ref="digit">
+			<bounds x="100" y="10" width="15" height="20" />
+		</element>
+		<element name="digit10" ref="digit">
+			<bounds x="115" y="10" width="15" height="20" />
+		</element>
+		<element name="digit9" ref="digit">
+			<bounds x="130" y="10" width="15" height="20" />
+		</element>
+		<element name="digit8" ref="digit">
+			<bounds x="145" y="10" width="15" height="20" />
+		</element>
+
+
+<!-- bottom panel LZ0 -->
+		<!-- Tasten -->
+		<element ref="button_service" inputtag="TZ6" inputmask="0x80">
+			<bounds x="15" y="60" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ6" inputmask="0x40">
+			<bounds x="35" y="60" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ6" inputmask="0x20">
+			<bounds x="55" y="60" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ6" inputmask="0x10">
+			<bounds x="75" y="60" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ6" inputmask="0x08">
+			<bounds x="95" y="60" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ6" inputmask="0x04">
+			<bounds x="115" y="60" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ6" inputmask="0x02">
+			<bounds x="135" y="60" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ6" inputmask="0x01">
+			<bounds x="155" y="60" width="15" height="15" />
+		</element>
+
+
+        <element ref="button_service" inputtag="TZ7" inputmask="0x80">
+			<bounds x="15" y="80" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ7" inputmask="0x40">
+			<bounds x="35" y="80" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ7" inputmask="0x20">
+			<bounds x="55" y="80" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ7" inputmask="0x10">
+			<bounds x="75" y="80" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ7" inputmask="0x08">
+			<bounds x="95" y="80" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ7" inputmask="0x04">
+			<bounds x="115" y="80" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ7" inputmask="0x02">
+			<bounds x="135" y="80" width="15" height="15" />
+		</element>
+
+        <element ref="button_service" inputtag="TZ7" inputmask="0x01">
+			<bounds x="155" y="80" width="15" height="15" />
+		</element>
+
+	</view>
+</mamelayout>
