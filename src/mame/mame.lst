@@ -35591,6 +35591,7 @@ mc_9x6ss
 mc_hh210
 retro400
 rfcp168
+s10fake
 
 @source:nintendo/nss.cpp
 nss
