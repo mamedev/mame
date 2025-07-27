@@ -441,7 +441,7 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 
 	// sound hardware
 	AY_SLOT(config, "ay_slot", X1_128_SINCLAIR / 20, default_ay_slot_devices, "ay_ay8912")
-		.add_route(ALL_OUTPUTS, "mono", 0.25);
+		.add_route(ALL_OUTPUTS, "speakers", 0.25);
 
 	// expansion port
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, spec128_expansion_devices, nullptr);

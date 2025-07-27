@@ -307,7 +307,7 @@ void tsconf_state::tsconf(machine_config &config)
 	m_dma->on_ready_callback().set(FUNC(tsconf_state::dma_ready));
 
 	BETA_DISK(config, m_beta, 0);
-	SPEAKER(config, "speakers", 2).front();
+	SPEAKER(config.replace(), "speakers", 2).front();
 
 	AY_SLOT(config.replace(), "ay_slot", 14_MHz_XTAL / 8, default_ay_slot_devices, "ay_ym2149")
 		.add_route(0, "speakers", 0.50, 0)
@@ -315,7 +315,7 @@ void tsconf_state::tsconf(machine_config &config)
 		.add_route(1, "speakers", 0.25, 1)
 		.add_route(2, "speakers", 0.50, 1);
 
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speakers", 0.75);
 
 	PALETTE(config, "palette", palette_device::BLACK, 256);
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);
