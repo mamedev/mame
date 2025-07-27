@@ -139,6 +139,7 @@ protected:
 		MC_OP_SHIFT          = 20,
 
 		CSR1R_PA             = 0x20,        // Parity
+		CSR1R_PA_BIT         = 5,
 		CSR1R_DA             = 0x80,        // Display Active
 
 		CSR1W_BE             = 0x0001,      // Bus Error

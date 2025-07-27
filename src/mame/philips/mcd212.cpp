@@ -965,12 +965,17 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	bool transparent_a[768];
 	bool transparent_b[768];
 
-	int scanline = screen.vpos();
+	if (screen.vpos() >= m_total_height)
+	{
+		return 0; // Do nothing on the extended rows.
+	}
 
+	int scanline = screen.vpos();
+	
 	// Process VSR and mix if we're in the visible region
 	if (scanline >= m_ica_height)
 	{
-		uint32_t *out = &bitmap.pix(scanline);
+		uint32_t *out = &bitmap.pix(((scanline-m_ica_height) << 1)+m_ica_height);
 
 		bool draw_line = true;
 		if (!BIT(m_dcr[0], DCR_FD_BIT) && BIT(m_csrw[0], CSR1W_ST_BIT))
@@ -1030,6 +1035,9 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 			draw_cursor(out);
 		}
+		// Duplicate lines. This is a placeholder for later interlace support.
+		uint32_t* out2 = &bitmap.pix(((scanline - m_ica_height) << 1) + m_ica_height + 1);
+		memcpy(out2, out, 768*4);
 	}
 
 	// Toggle frame parity at the end of the visible frame (even in non-interlaced mode).
