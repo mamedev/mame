@@ -239,7 +239,7 @@ uint8_t stellafr_state::mux_r()
 	bool emp = false;
 	bool ma = false;
 	bool st = false;
-	bool t = false;
+	bool t = false; // main buttons in
 	bool t2 = false;
 	bool emp2 = false;
 	bool li2 = false;
@@ -266,8 +266,8 @@ void stellafr_state::mux_w(uint8_t data)
 	bool enme2  = BIT(data,1);
 	bool aw     = BIT(data,2);
 	bool aw2    = BIT(data,3);
-	bool enanz  = BIT(data,4);
-	bool enmux  = BIT(data,5);
+	bool enanz  = BIT(data,4); //enable 7seg
+	bool enmux  = BIT(data,5); //enable lamps/buttons
 	bool enanz2 = BIT(data,6);
 	bool enmux2 = BIT(data,7);
 
@@ -290,8 +290,8 @@ void stellafr_state::mux2_w(uint8_t data)
 	bool ma2   = BIT(data,1);
 	bool me    = BIT(data,2);
 	bool data3 = BIT(data,3);
-	bool anz   = BIT(data,4);
-	bool mux   = BIT(data,5);
+	bool anz   = BIT(data,4); //main 7seg led out
+	bool mux   = BIT(data,5); //main lamps out
 	bool anz2  = BIT(data,6);
 	bool mux2  = BIT(data,7);
 
