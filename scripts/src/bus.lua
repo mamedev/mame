@@ -2177,6 +2177,10 @@ end
 
 if (BUSES["MZ80"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/mz80/ar_romcard.cpp",
+		MAME_DIR .. "src/devices/bus/mz80/ar_romcard.h",
+		MAME_DIR .. "src/devices/bus/mz80/mz1e05.cpp",
+		MAME_DIR .. "src/devices/bus/mz80/mz1e05.h",
 		MAME_DIR .. "src/devices/bus/mz80/mz1e30.cpp",
 		MAME_DIR .. "src/devices/bus/mz80/mz1e30.h",
 		MAME_DIR .. "src/devices/bus/mz80/mz1e35.cpp",

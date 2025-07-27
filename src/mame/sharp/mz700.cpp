@@ -448,7 +448,8 @@ void mz800_state::mz800(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	MZ80_EXP_SLOT(config, "exp", mz800_exp_devices, nullptr).set_iospace(m_maincpu, AS_IO);
+	MZ80_EXP_SLOT(config, "exp1", mz800_exp_devices, nullptr).set_iospace(m_maincpu, AS_IO);
+	MZ80_EXP_SLOT(config, "exp2", mz800_exp_devices, nullptr).set_iospace(m_maincpu, AS_IO);
 }
 
 
