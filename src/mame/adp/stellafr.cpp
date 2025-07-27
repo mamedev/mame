@@ -97,6 +97,9 @@ Connectors:
 #include "sound/dac.h"
 #include "speaker.h"
 
+#define VERBOSE 1
+#include "logmacro.h"
+
 #include "stellafr.lh"
 
 namespace {
@@ -216,8 +219,8 @@ private:
 
 	uint8_t m_mux_data;
 
-	uint16_t mux_r();
-	void mux_w(uint16_t data);
+	uint8_t mux_r();
+	void mux_w(uint8_t data);
 	void mux2_w(uint8_t data);
 	void duart_output_w(uint8_t data);
 	void ay8910_portb_w(uint8_t data);
@@ -228,26 +231,79 @@ private:
 };
 
 
-uint16_t stellafr_state::mux_r()
+uint8_t stellafr_state::mux_r()
 {
 	// U10
-	uint16_t data = 0xffff;
 
-	// data &= ~(BIT(m_in0->read(), m_mux_data) ? 0x0000 : 0x0004);
+	bool li = false;
+	bool emp = false;
+	bool ma = false;
+	bool st = false;
+	bool t = false;
+	bool t2 = false;
+	bool emp2 = false;
+	bool li2 = false;
+
+	uint8_t data = 0x00;
+
+	if (li)   data |= (1 << 0);
+    if (emp)  data |= (1 << 1);
+    if (ma)   data |= (1 << 2);
+    if (st)   data |= (1 << 3);
+    if (t)    data |= (1 << 4);
+    if (t2)   data |= (1 << 5);
+    if (emp2) data |= (1 << 6);
+    if (li2)  data |= (1 << 7);
 
 	return data;
 }
 
-void stellafr_state::mux_w(uint16_t data)
+void stellafr_state::mux_w(uint8_t data)
 {
 	//m_mux_data++;
 	//m_mux_data &= 0x0f;
+	bool enma   = BIT(data,0);
+	bool enme2  = BIT(data,1);
+	bool aw     = BIT(data,2);
+	bool aw2    = BIT(data,3);
+	bool enanz  = BIT(data,4);
+	bool enmux  = BIT(data,5);
+	bool enanz2 = BIT(data,6);
+	bool enmux2 = BIT(data,7);
+
+	LOG("\nmux_w()\n");
+	LOG("EnMa         %d\n",enma);
+	LOG("EnME2        %d\n",enme2);
+	LOG("IOB3/AW/TXDB %d\n",aw);
+	LOG("AW2          %d\n",aw2);
+	LOG("EnANZ        %d\n",enanz);
+	LOG("EnMUX/MUXMA  %d\n",enmux);
+	LOG("EnANZ2       %d\n",enanz2);
+	LOG("EnMUX2       %d\n",enmux2);
 	// U5
 }
 
 void stellafr_state::mux2_w(uint8_t data)
 {
 	// U1
+	bool ma1   = BIT(data,0);
+	bool ma2   = BIT(data,1);
+	bool me    = BIT(data,2);
+	bool data3 = BIT(data,3);
+	bool anz   = BIT(data,4);
+	bool mux   = BIT(data,5);
+	bool anz2  = BIT(data,6);
+	bool mux2  = BIT(data,7);
+
+	LOG("\nmux2_w()\n");
+	LOG("1MA      %d\n",ma1);
+	LOG("2MA      %d\n",ma2);
+	LOG("ME       %d\n",me);
+	LOG("Data3OUT %d\n",data3);
+	LOG("ANZ      %d\n",anz);
+	LOG("MUX      %d\n",mux);
+	LOG("ANZ2     %d\n",anz2);
+	LOG("MUX2     %d\n",mux2);
 }
 
 void stellafr_state::duart_output_w(uint8_t data)
@@ -337,7 +393,7 @@ ROM_START( allfred )
 ROM_END
 
 ROM_START( big_jackpot )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "big_jackpot_f1_pr_1.u2", 0x00000, 0x8000, CRC(94a14d8e) SHA1(3c4abdad8e38102278920b0f35a8ab3f7a4f2142) )
 	ROM_LOAD16_BYTE( "big_jackpot_f1_pr_2.u6", 0x00001, 0x8000, CRC(51f8ab0b) SHA1(1cb2aa40922956d93605c77862f0fd6f38595eb8) )
 ROM_END
@@ -349,7 +405,7 @@ ROM_START( disc_bonus )
 ROM_END
 
 ROM_START( disc_jackpot )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "disc_jackpot_f2_pr.1.u2", 0x00000, 0x8000, CRC(5af04926) SHA1(7e10ddd1f068565854c245e39f73faf0685e4bf3) )
 	ROM_LOAD16_BYTE( "disc_jackpot_f2_pr.2.u6", 0x00001, 0x8000, CRC(95a7f938) SHA1(2d14da419d89fd26ea3245fbe24cafa346fecdca) )
 ROM_END
