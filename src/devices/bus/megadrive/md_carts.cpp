@@ -9,13 +9,14 @@
 #include "emu.h"
 #include "md_carts.h"
 
-#include "rom.h"
-#include "svp.h"
-#include "sk.h"
-#include "ggenie.h"
 #include "eeprom.h"
+#include "ggenie.h"
 #include "jcart.h"
+#include "rom.h"
+#include "sk.h"
 #include "stm95.h"
+#include "svp.h"
+#include "titan.h"
 
 
 void md_cart(device_slot_interface &device)
@@ -85,6 +86,7 @@ void md_cart(device_slot_interface &device)
 	device.option_add_internal("rom_tekkensp",  MD_ROM_TEKKENSP);
 	device.option_add_internal("rom_topf",  MD_ROM_TOPF);
 
+	device.option_add_internal("rom_titan", MD_ROM_TITAN);
 
 	device.option_add_internal("rom_nbajam_alt",  MD_EEPROM_NBAJAM_ALT);
 }
