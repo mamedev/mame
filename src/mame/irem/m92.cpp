@@ -14,8 +14,8 @@
     Undercover Cops (World)                          M92-E-B   (c) 1992 Irem Corp
     Undercover Cops (US)                             M92-E-B   (c) 1992 Irem America Corp
     Undercover Cops (Japan)                          M92-E-B   (c) 1992 Irem Corp
-    Undercover Cops - Alpha Renewal Version (World)  M92-E-B   (c) 1992 Irem Corp
-    Undercover Cops - Alpha Renewal Version (US)     M92-E-B   (c) 1992 Irem America Corp
+    Undercover Cops Alpha: Renewal Version (World)   M92-E-B   (c) 1992 Irem Corp
+    Undercover Cops Alpha: Renewal Version (US)      M92-E-B   (c) 1992 Irem America Corp
     Mystic Riders (World)                            M92-B-B   (c) 1992 Irem Corp
     Mahou Keibitai Gun Hohki (Japan)                 M92-B-B   (c) 1992 Irem Corp
     Major Title 2 (World)                            M92-B-F   (c) 1992 Irem Corp
@@ -916,10 +916,7 @@ void m92_state::m92(machine_config &config)
 	BUFFERED_SPRITERAM16(config, "spriteram");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(512, 256);
-	m_screen->set_visarea(80, 511-112, 8, 247); /* 320 x 240 */
+	m_screen->set_raw(XTAL(26'666'666)/4, 424, 80, 400, 262, 8, 248); /* 320 x 240 */
 	m_screen->set_screen_update(FUNC(m92_state::screen_update_m92));
 	m_screen->set_palette(m_palette);
 
@@ -1163,84 +1160,10 @@ ROM_START( crossbld ) // M92-D-A  05C4230A1 ROM board
 ROM_END
 
 
-ROM_START( skingame ) // M92-B-F  05C04171F1 ROM board
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "is-h0-d.ic34", 0x00001, 0x40000, CRC(80940abb) SHA1(7af5b667383f40987cc8190d81937410ea2c0301) )
-	ROM_LOAD16_BYTE( "is-l0-d.ic31", 0x00000, 0x40000, CRC(b84beed6) SHA1(b026a68623d7d96545a4b01770fc6cdd2a0ed0f4) )
-	ROM_LOAD16_BYTE( "is-h1.ic33",   0x80001, 0x40000, CRC(9ba8e1f2) SHA1(ae86697a97223d236e2e6dd33ddb8105b9f926cb) )
-	ROM_LOAD16_BYTE( "is-l1.ic32",   0x80000, 0x40000, CRC(e4e00626) SHA1(e8c6c7ad6a367da4036915a155c8695ad90ae47b) )
-
-	ROM_REGION( 0x20000, "soundcpu", 0 )
-	ROM_LOAD16_BYTE( "mt2_sh0-.ic14",  0x00001, 0x10000, CRC(1ecbea43) SHA1(8d66ef419f75569f2c83a89c3985742b8a47914f) )
-	ROM_LOAD16_BYTE( "mt2_sl0-.ic17",  0x00000, 0x10000, CRC(8fd5b531) SHA1(92cae3f6dac7f89b559063de3be2f38587536b65) )
-
-	ROM_REGION( 0x100000, "gfx1", 0 ) // Tiles
-	ROM_LOAD( "hr0.ic9",  0x000000, 0x40000, CRC(7e61e4b5) SHA1(d0164862937bd506e701777c51dea1ddb3e2eda4) )
-	ROM_LOAD( "hr1.ic10", 0x040000, 0x40000, CRC(0a667564) SHA1(d122e0619ae5cc0202f30270933784c954eb1e5d) )
-	ROM_LOAD( "hr2.ic11", 0x080000, 0x40000, CRC(5eb44312) SHA1(75b584b63d4f4f2236a679235461f11004aa317f) )
-	ROM_LOAD( "hr3.ic12", 0x0c0000, 0x40000, CRC(f2866294) SHA1(75e0071bf6282c93034dc7e73466af0f51046d01) )
-
-	ROM_REGION( 0x400000, "gfx2", 0 ) // Sprites
-	ROM_LOAD( "k30.ic42", 0x000000, 0x100000, CRC(8c9a2678) SHA1(e8ed119c16ddd59af9e83d243e7be25974f7cbf8) )
-	ROM_LOAD( "k31.ic43", 0x100000, 0x100000, CRC(5455df78) SHA1(9e49bde1d5a310ff611932c3429601fbddf3a7b1) )
-	ROM_LOAD( "k32.ic44", 0x200000, 0x100000, CRC(3a258c41) SHA1(1d93fcd01728929848b782870f80a8cd0af44796) )
-	ROM_LOAD( "k33.ic45", 0x300000, 0x100000, CRC(c1e91a14) SHA1(1f0dbd99d8c5067dc3f8795fc3f1bd4466f64156) )
-
-	ROM_REGION( 0x80000, "irem", 0 ) // Samples
-	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
-
-	ROM_REGION( 0x2000, "eeprom", 0 ) // D28C64C-20 EEPROM
-	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
-
-	ROM_REGION( 0x0c00, "plds", 0 )
-	ROM_LOAD( "m92_a-3m-.ic11",  0x0000, 0x0117, CRC(fc718efe) SHA1(d554dd74cecd95754a1e6e24c6a207d6d3428253) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "m92_a-7j-.ic41",  0x0200, 0x0117, CRC(5730b25a) SHA1(1877b807f6a94f6d515afc940e1d615a453490fd) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "m92_a-9j-.ic51",  0x0400, 0x0117, CRC(92d477cf) SHA1(6a1e9bfdb367384e8611f46300f378730817514b) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "mt2_b-2l-.ic7",   0x0600, 0x0117, CRC(3bab14ee) SHA1(312d19cd1a6ef636495bb9a3294261c10bab3a56) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "m92_b-7h-d.ic47", 0x0800, 0x0117, CRC(59d86225) SHA1(9202bcf962f63edc0ef273f102c38337e90449cc) ) // PAL16L8 - bruteforced
-ROM_END
-
 ROM_START( majtitl2 ) // M92-B-F  05C04171F1 ROM board
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "mt2_h0-b.ic34", 0x00001, 0x40000, CRC(b163b12e) SHA1(cdb01a5266bd11f4cff1cb5c05cf24de13a527b2) )
 	ROM_LOAD16_BYTE( "mt2_l0-b.ic31", 0x00000, 0x40000, CRC(6f3b5d9d) SHA1(a39f25f29195023fb507dc9ffbfcbd57a4e6b30a) )
-	ROM_LOAD16_BYTE( "mt2_h1-.ic33",  0x80001, 0x40000, CRC(9ba8e1f2) SHA1(ae86697a97223d236e2e6dd33ddb8105b9f926cb) )
-	ROM_LOAD16_BYTE( "mt2_l1-.ic32",  0x80000, 0x40000, CRC(e4e00626) SHA1(e8c6c7ad6a367da4036915a155c8695ad90ae47b) )
-
-	ROM_REGION( 0x20000, "soundcpu", 0 )
-	ROM_LOAD16_BYTE( "mt2_sh0-.ic14",  0x00001, 0x10000, CRC(1ecbea43) SHA1(8d66ef419f75569f2c83a89c3985742b8a47914f) )
-	ROM_LOAD16_BYTE( "mt2_sl0-.ic17",  0x00000, 0x10000, CRC(8fd5b531) SHA1(92cae3f6dac7f89b559063de3be2f38587536b65) )
-
-	ROM_REGION( 0x100000, "gfx1", 0 ) // Tiles
-	ROM_LOAD( "hr0.ic9",  0x000000, 0x40000, CRC(7e61e4b5) SHA1(d0164862937bd506e701777c51dea1ddb3e2eda4) )
-	ROM_LOAD( "hr1.ic10", 0x040000, 0x40000, CRC(0a667564) SHA1(d122e0619ae5cc0202f30270933784c954eb1e5d) )
-	ROM_LOAD( "hr2.ic11", 0x080000, 0x40000, CRC(5eb44312) SHA1(75b584b63d4f4f2236a679235461f11004aa317f) )
-	ROM_LOAD( "hr3.ic12", 0x0c0000, 0x40000, CRC(f2866294) SHA1(75e0071bf6282c93034dc7e73466af0f51046d01) )
-
-	ROM_REGION( 0x400000, "gfx2", 0 ) // Sprites
-	ROM_LOAD( "k30.ic42", 0x000000, 0x100000, CRC(8c9a2678) SHA1(e8ed119c16ddd59af9e83d243e7be25974f7cbf8) )
-	ROM_LOAD( "k31.ic43", 0x100000, 0x100000, CRC(5455df78) SHA1(9e49bde1d5a310ff611932c3429601fbddf3a7b1) )
-	ROM_LOAD( "k32.ic44", 0x200000, 0x100000, CRC(3a258c41) SHA1(1d93fcd01728929848b782870f80a8cd0af44796) )
-	ROM_LOAD( "k33.ic45", 0x300000, 0x100000, CRC(c1e91a14) SHA1(1f0dbd99d8c5067dc3f8795fc3f1bd4466f64156) )
-
-	ROM_REGION( 0x80000, "irem", 0 ) // Samples
-	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
-
-	ROM_REGION( 0x2000, "eeprom", 0 ) // D28C64C-20 EEPROM
-	ROM_LOAD( "mt2eep.ic30",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
-
-	ROM_REGION( 0x0c00, "plds", 0 )
-	ROM_LOAD( "m92_a-3m-.ic11",  0x0000, 0x0117, CRC(fc718efe) SHA1(d554dd74cecd95754a1e6e24c6a207d6d3428253) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "m92_a-7j-.ic41",  0x0200, 0x0117, CRC(5730b25a) SHA1(1877b807f6a94f6d515afc940e1d615a453490fd) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "m92_a-9j-.ic51",  0x0400, 0x0117, CRC(92d477cf) SHA1(6a1e9bfdb367384e8611f46300f378730817514b) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "mt2_b-2l-.ic7",   0x0600, 0x0117, CRC(3bab14ee) SHA1(312d19cd1a6ef636495bb9a3294261c10bab3a56) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "m92_b-7h-d.ic47", 0x0800, 0x0117, CRC(59d86225) SHA1(9202bcf962f63edc0ef273f102c38337e90449cc) ) // PAL16L8 - bruteforced
-ROM_END
-
-ROM_START( majtitl2b ) // M92-B-F  05C04171F1 ROM board
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "mt2_h0-e.ic34", 0x00001, 0x40000, CRC(f6c3a28c) SHA1(27ef76c120d27119830e6b17353d2a6412cbcbbe) )
-	ROM_LOAD16_BYTE( "mt2_l0-e.ic31", 0x00000, 0x40000, CRC(0a061384) SHA1(b033215bb99e645a00e7a364cebb895432917fd4) )
 	ROM_LOAD16_BYTE( "mt2_h1-.ic33",  0x80001, 0x40000, CRC(9ba8e1f2) SHA1(ae86697a97223d236e2e6dd33ddb8105b9f926cb) )
 	ROM_LOAD16_BYTE( "mt2_l1-.ic32",  0x80000, 0x40000, CRC(e4e00626) SHA1(e8c6c7ad6a367da4036915a155c8695ad90ae47b) )
 
@@ -1312,6 +1235,43 @@ ROM_START( majtitl2a ) // M92-B-F  05C04171F1 ROM board
 	ROM_LOAD( "m92_b-7h-d.ic47", 0x0800, 0x0117, CRC(59d86225) SHA1(9202bcf962f63edc0ef273f102c38337e90449cc) ) // PAL16L8 - bruteforced
 ROM_END
 
+ROM_START( majtitl2b ) // M92-B-F  05C04171F1 ROM board
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mt2_h0-e.ic34", 0x00001, 0x40000, CRC(f6c3a28c) SHA1(27ef76c120d27119830e6b17353d2a6412cbcbbe) )
+	ROM_LOAD16_BYTE( "mt2_l0-e.ic31", 0x00000, 0x40000, CRC(0a061384) SHA1(b033215bb99e645a00e7a364cebb895432917fd4) )
+	ROM_LOAD16_BYTE( "mt2_h1-.ic33",  0x80001, 0x40000, CRC(9ba8e1f2) SHA1(ae86697a97223d236e2e6dd33ddb8105b9f926cb) )
+	ROM_LOAD16_BYTE( "mt2_l1-.ic32",  0x80000, 0x40000, CRC(e4e00626) SHA1(e8c6c7ad6a367da4036915a155c8695ad90ae47b) )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE( "mt2_sh0-.ic14",  0x00001, 0x10000, CRC(1ecbea43) SHA1(8d66ef419f75569f2c83a89c3985742b8a47914f) )
+	ROM_LOAD16_BYTE( "mt2_sl0-.ic17",  0x00000, 0x10000, CRC(8fd5b531) SHA1(92cae3f6dac7f89b559063de3be2f38587536b65) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) // Tiles
+	ROM_LOAD( "hr0.ic9",  0x000000, 0x40000, CRC(7e61e4b5) SHA1(d0164862937bd506e701777c51dea1ddb3e2eda4) )
+	ROM_LOAD( "hr1.ic10", 0x040000, 0x40000, CRC(0a667564) SHA1(d122e0619ae5cc0202f30270933784c954eb1e5d) )
+	ROM_LOAD( "hr2.ic11", 0x080000, 0x40000, CRC(5eb44312) SHA1(75b584b63d4f4f2236a679235461f11004aa317f) )
+	ROM_LOAD( "hr3.ic12", 0x0c0000, 0x40000, CRC(f2866294) SHA1(75e0071bf6282c93034dc7e73466af0f51046d01) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) // Sprites
+	ROM_LOAD( "k30.ic42", 0x000000, 0x100000, CRC(8c9a2678) SHA1(e8ed119c16ddd59af9e83d243e7be25974f7cbf8) )
+	ROM_LOAD( "k31.ic43", 0x100000, 0x100000, CRC(5455df78) SHA1(9e49bde1d5a310ff611932c3429601fbddf3a7b1) )
+	ROM_LOAD( "k32.ic44", 0x200000, 0x100000, CRC(3a258c41) SHA1(1d93fcd01728929848b782870f80a8cd0af44796) )
+	ROM_LOAD( "k33.ic45", 0x300000, 0x100000, CRC(c1e91a14) SHA1(1f0dbd99d8c5067dc3f8795fc3f1bd4466f64156) )
+
+	ROM_REGION( 0x80000, "irem", 0 ) // Samples
+	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
+
+	ROM_REGION( 0x2000, "eeprom", 0 ) // D28C64C-20 EEPROM
+	ROM_LOAD( "mt2eep.ic30",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
+
+	ROM_REGION( 0x0c00, "plds", 0 )
+	ROM_LOAD( "m92_a-3m-.ic11",  0x0000, 0x0117, CRC(fc718efe) SHA1(d554dd74cecd95754a1e6e24c6a207d6d3428253) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_a-7j-.ic41",  0x0200, 0x0117, CRC(5730b25a) SHA1(1877b807f6a94f6d515afc940e1d615a453490fd) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_a-9j-.ic51",  0x0400, 0x0117, CRC(92d477cf) SHA1(6a1e9bfdb367384e8611f46300f378730817514b) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "mt2_b-2l-.ic7",   0x0600, 0x0117, CRC(3bab14ee) SHA1(312d19cd1a6ef636495bb9a3294261c10bab3a56) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_b-7h-d.ic47", 0x0800, 0x0117, CRC(59d86225) SHA1(9202bcf962f63edc0ef273f102c38337e90449cc) ) // PAL16L8 - bruteforced
+ROM_END
+
 ROM_START( majtitl2j ) // M92-B-F  05C04171F1 ROM board
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "mt2_h0.ic34",   0x00001, 0x40000, CRC(8a8d71ad) SHA1(8c45d947d15eb3a2c2584c9e1cd0e42988955905) )
@@ -1340,6 +1300,43 @@ ROM_START( majtitl2j ) // M92-B-F  05C04171F1 ROM board
 
 	ROM_REGION( 0x2000, "eeprom", 0 ) // D28C64C-20 EEPROM
 	ROM_LOAD( "mt2eep.ic30",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
+
+	ROM_REGION( 0x0c00, "plds", 0 )
+	ROM_LOAD( "m92_a-3m-.ic11",  0x0000, 0x0117, CRC(fc718efe) SHA1(d554dd74cecd95754a1e6e24c6a207d6d3428253) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_a-7j-.ic41",  0x0200, 0x0117, CRC(5730b25a) SHA1(1877b807f6a94f6d515afc940e1d615a453490fd) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_a-9j-.ic51",  0x0400, 0x0117, CRC(92d477cf) SHA1(6a1e9bfdb367384e8611f46300f378730817514b) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "mt2_b-2l-.ic7",   0x0600, 0x0117, CRC(3bab14ee) SHA1(312d19cd1a6ef636495bb9a3294261c10bab3a56) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_b-7h-d.ic47", 0x0800, 0x0117, CRC(59d86225) SHA1(9202bcf962f63edc0ef273f102c38337e90449cc) ) // PAL16L8 - bruteforced
+ROM_END
+
+ROM_START( skingame ) // M92-B-F  05C04171F1 ROM board
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "is-h0-d.ic34", 0x00001, 0x40000, CRC(80940abb) SHA1(7af5b667383f40987cc8190d81937410ea2c0301) )
+	ROM_LOAD16_BYTE( "is-l0-d.ic31", 0x00000, 0x40000, CRC(b84beed6) SHA1(b026a68623d7d96545a4b01770fc6cdd2a0ed0f4) )
+	ROM_LOAD16_BYTE( "is-h1.ic33",   0x80001, 0x40000, CRC(9ba8e1f2) SHA1(ae86697a97223d236e2e6dd33ddb8105b9f926cb) )
+	ROM_LOAD16_BYTE( "is-l1.ic32",   0x80000, 0x40000, CRC(e4e00626) SHA1(e8c6c7ad6a367da4036915a155c8695ad90ae47b) )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE( "mt2_sh0-.ic14",  0x00001, 0x10000, CRC(1ecbea43) SHA1(8d66ef419f75569f2c83a89c3985742b8a47914f) )
+	ROM_LOAD16_BYTE( "mt2_sl0-.ic17",  0x00000, 0x10000, CRC(8fd5b531) SHA1(92cae3f6dac7f89b559063de3be2f38587536b65) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) // Tiles
+	ROM_LOAD( "hr0.ic9",  0x000000, 0x40000, CRC(7e61e4b5) SHA1(d0164862937bd506e701777c51dea1ddb3e2eda4) )
+	ROM_LOAD( "hr1.ic10", 0x040000, 0x40000, CRC(0a667564) SHA1(d122e0619ae5cc0202f30270933784c954eb1e5d) )
+	ROM_LOAD( "hr2.ic11", 0x080000, 0x40000, CRC(5eb44312) SHA1(75b584b63d4f4f2236a679235461f11004aa317f) )
+	ROM_LOAD( "hr3.ic12", 0x0c0000, 0x40000, CRC(f2866294) SHA1(75e0071bf6282c93034dc7e73466af0f51046d01) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) // Sprites
+	ROM_LOAD( "k30.ic42", 0x000000, 0x100000, CRC(8c9a2678) SHA1(e8ed119c16ddd59af9e83d243e7be25974f7cbf8) )
+	ROM_LOAD( "k31.ic43", 0x100000, 0x100000, CRC(5455df78) SHA1(9e49bde1d5a310ff611932c3429601fbddf3a7b1) )
+	ROM_LOAD( "k32.ic44", 0x200000, 0x100000, CRC(3a258c41) SHA1(1d93fcd01728929848b782870f80a8cd0af44796) )
+	ROM_LOAD( "k33.ic45", 0x300000, 0x100000, CRC(c1e91a14) SHA1(1f0dbd99d8c5067dc3f8795fc3f1bd4466f64156) )
+
+	ROM_REGION( 0x80000, "irem", 0 ) // Samples
+	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
+
+	ROM_REGION( 0x2000, "eeprom", 0 ) // D28C64C-20 EEPROM
+	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "m92_a-3m-.ic11",  0x0000, 0x0117, CRC(fc718efe) SHA1(d554dd74cecd95754a1e6e24c6a207d6d3428253) ) // PAL16L8 - bruteforced
@@ -2599,8 +2596,8 @@ GAME( 1991, thndblst,    lethalth, lethalth,      thndblst,  m92_state,   empty_
 GAME( 1992, uccops,      0,        uccops,        uccops,    m92_state,   empty_init, ROT0,   "Irem",         "Undercover Cops (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, uccopsu,     uccops,   uccops,        uccops,    m92_state,   empty_init, ROT0,   "Irem",         "Undercover Cops (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, uccopsj,     uccops,   uccops,        uccops,    m92_state,   empty_init, ROT0,   "Irem",         "Undercover Cops (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, uccopsar,    uccops,   uccops,        uccops,    m92_state,   empty_init, ROT0,   "Irem",         "Undercover Cops - Alpha Renewal Version (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, uccopsaru,   uccops,   uccops,        uccops,    m92_state,   empty_init, ROT0,   "Irem America", "Undercover Cops - Alpha Renewal Version (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, uccopsar,    uccops,   uccops,        uccops,    m92_state,   empty_init, ROT0,   "Irem",         "Undercover Cops Alpha: Renewal Version (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, uccopsaru,   uccops,   uccops,        uccops,    m92_state,   empty_init, ROT0,   "Irem America", "Undercover Cops Alpha: Renewal Version (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 GAME( 1992, mysticri,    0,        mysticri,      mysticri,  m92_state,   empty_init, ROT0,   "Irem",         "Mystic Riders (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1992, gunhohki,    mysticri, mysticri,      mysticri,  m92_state,   empty_init, ROT0,   "Irem",         "Mahou Keibitai Gun Hohki (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
@@ -2608,9 +2605,9 @@ GAME( 1992, gunhohki,    mysticri, mysticri,      mysticri,  m92_state,   empty_
 // main code is also significantly different to the supported original set, so it might just be a legitimate early revision on a cheap board
 GAME( 1992, mysticrib,   mysticri, mysticri,      mysticri,  m92_state,   empty_init, ROT0,   "Irem",         "Mystic Riders (bootleg?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1992, majtitl2,    0,        majtitl2,      majtitl2,  m92_state,   init_bank,  ROT0,   "Irem",         "Major Title 2 (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // Nanao 08J27291A7 017 9227NK700 sound CPU
-GAME( 1992, majtitl2a,   majtitl2, majtitl2a,     majtitl2,  m92_state,   init_bank,  ROT0,   "Irem",         "Major Title 2 (World, set 1, alt sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // same as set 1 but for the Nanao 08J27291A6 016 9217NK700 sound CPU
-GAME( 1992, majtitl2b,   majtitl2, majtitl2,      majtitl2,  m92_state,   init_bank,  ROT0,   "Irem",         "Major Title 2 (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1992, majtitl2,    0,        majtitl2,      majtitl2,  m92_state,   init_bank,  ROT0,   "Irem",         "Major Title 2 (World, set 1, 017 sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // Nanao 08J27291A7 017 9227NK700 sound CPU
+GAME( 1992, majtitl2a,   majtitl2, majtitl2a,     majtitl2,  m92_state,   init_bank,  ROT0,   "Irem",         "Major Title 2 (World, set 2, 016 sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // same as above, but for the Nanao 08J27291A6 016 9217NK700 sound CPU
+GAME( 1992, majtitl2b,   majtitl2, majtitl2,      majtitl2,  m92_state,   init_bank,  ROT0,   "Irem",         "Major Title 2 (World, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1992, majtitl2j,   majtitl2, majtitl2,      majtitl2,  m92_state,   init_bank,  ROT0,   "Irem",         "Major Title 2 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1992, skingame,    majtitl2, majtitl2,      majtitl2,  m92_state,   init_bank,  ROT0,   "Irem America", "The Irem Skins Game (US set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, skingame2,   majtitl2, majtitl2,      majtitl2,  m92_state,   init_bank,  ROT0,   "Irem America", "The Irem Skins Game (US set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
@@ -2640,5 +2637,5 @@ GAME( 1993, psoldier,    ssoldier, psoldier,      psoldier,  m92_state,   empty_
 GAME( 1994, dsoccr94j,   dsoccr94, dsoccr94j,     dsoccr94j, m92_state,   init_bank,  ROT0,   "Irem",         "Dream Soccer '94 (Japan, M92 hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 GAME( 1994, gunforc2,    0,        gunforc2,      gunforc2,  m92_state,   init_bank,  ROT0,   "Irem",         "Gun Force II (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1994, geostorm,    gunforc2, gunforc2,      gunforc2,  m92_state,   init_bank,  ROT0,   "Irem",         "Geo Storm (Japan, 014 custom sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1994, geostorma,   gunforc2, geostorma,     gunforc2,  m92_state,   init_bank,  ROT0,   "Irem",         "Geo Storm (Japan, 026 custom sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, geostorm,    gunforc2, gunforc2,      gunforc2,  m92_state,   init_bank,  ROT0,   "Irem",         "Geo Storm (Japan, 014 sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, geostorma,   gunforc2, geostorma,     gunforc2,  m92_state,   init_bank,  ROT0,   "Irem",         "Geo Storm (Japan, 026 sound CPU)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
