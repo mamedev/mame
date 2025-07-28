@@ -315,6 +315,14 @@ ROM_START( intrtvg )
 	DISK_IMAGE( "interactivetv", 0, SHA1(7061e28c4560b763bda1157036b79c726387e430) )
 ROM_END
 
+ROM_START( ardancem )
+	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(ba2cdacd) SHA1(d47829ee5310140665146262a44e0ba91942f25c) )
+
+	DISK_REGION( "sdcard" ) // 16GB SD Card
+	DISK_IMAGE( "ardancemat", 0, SHA1(df8cb065f5ce0ca863b205549ecc4c27647f9954) )
+ROM_END
+
 
 ROM_START( pdcm2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
@@ -409,6 +417,8 @@ CONS( 201?, smatomo,         0,        0,      gpl32612, gpl32612, generalplus_g
 
 // very generic packaging, boots from SPI, has game data on SD card (mostly NES games)
 CONS( 202?, intrtvg,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "<unknown>",     "Interactive TV Game",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// seems to be from the same manufacturer as the above, also very generic packaging (similar SD card content to above, including NES games, but with some extra music/videos for the dance part)
+CONS( 202?, ardancem,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "<unknown>",     "AR Dance Mat",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now
 // ROM has 'GPNandTag2' header rather than the usual
