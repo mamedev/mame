@@ -99,8 +99,11 @@ private:
 	void io00(uint8_t data) ATTR_COLD;
 	void io70(uint8_t data) ATTR_COLD;
 	void io71(uint8_t data) ATTR_COLD;
-	uint8_t io91() ATTR_COLD;
 	void sounddev(uint8_t data) ATTR_COLD;
+	void io73(uint8_t data) ATTR_COLD;
+	uint8_t io9r() ATTR_COLD;
+	void io9w(uint8_t data) ATTR_COLD;
+	
 	void makesound(uint8_t tone, uint8_t octave, uint8_t length);
 	int soundfreq(uint8_t channel, uint8_t clockdiv);
 	TIMER_CALLBACK_MEMBER(sound_stop);
@@ -148,9 +151,9 @@ void stella8085_state::io_map(address_map &map)
 	map(0x70, 0x70).w(FUNC(stella8085_state::io70));
 	map(0x71, 0x71).w(FUNC(stella8085_state::io71));
 	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
-	// 0x73 SOMETHING write only, probably extra lamps
+	map(0x73, 0x73).w(FUNC(stella8085_state::io73)); // probably extra lamps
 	// map(0x80, 0x8f) //Y8 ICC5 empty socket
-	map(0x91, 0x91).r(FUNC(stella8085_state::io91)); //Y9 wired to rtc circuits but somehow memory mapped in hardware
+	map(0x90, 0x9f).rw(FUNC(stella8085_state::io9r),FUNC(stella8085_state::io9w)); //Y9 wired to rtc circuits but somehow memory mapped in hardware
 }
 
 /*********************************************
@@ -293,9 +296,14 @@ void stella8085_state::io00(uint8_t data)
 	; //old boards
 }
 
-uint8_t stella8085_state::io91()
+uint8_t stella8085_state::io9r()
 {
 	return 0xff; //old boards
+}
+
+void stella8085_state::io9w(uint8_t data)
+{
+	; //old boards
 }
 
 void stella8085_state::io70(uint8_t data)
@@ -352,6 +360,11 @@ void stella8085_state::sounddev(uint8_t data)
 	uint8_t length = data & 0x30;
 	uint8_t octave = data & 0xC0;
 	makesound(tone, octave, 60*(length+1)); // 60 is not correct
+}
+
+void stella8085_state::io73(uint8_t data)
+{
+	; //old boards
 }
 
 void stella8085_state::makesound(uint8_t tone, uint8_t octave, uint8_t length)
@@ -705,6 +718,12 @@ ROM_START( kniffi )
 	ROM_LOAD( "kniffi.icd6", 0x8000, 0x8000, CRC(1c129cec) SHA1(bad22f18b94c16dba36995ff8daf4d48f4d082a2) )
 ROM_END
 
+ROM_START( macao )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mega_macao_f1_1.ice6", 0x0000, 0x8000, CRC(b16c9349) SHA1(f07c3dd215bccab088741f95972489284d6a4db9) )
+	ROM_LOAD( "mega_macao_f1_2.icd6", 0x8000, 0x8000, CRC(4df216e6) SHA1(28b3ad213f3af9a472c5e7de1c139399677dd825) )
+ROM_END
+
 ROM_START( rasant )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rasant_pr_1.ice6", 0x0000, 0x8000, CRC(6abef716) SHA1(8ef2999f6c72f7fb134bfa4ad72ab7be7d12af27) )
@@ -733,6 +752,7 @@ GAMEL( 1987, supermultib, 0, doppelpot, dicemstr, stella8085_state, empty_init, 
 GAMEL( 1989, disc3000,    0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 3000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1998, glucksstern, 0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern",    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1988, juwel,       0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    "Juwel",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1991, macao,       0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "Macao",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1992, karoas,      0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Karo As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 // 'STELLA DICE MASTER F2' and 'COPYRIGHT BY ADP LUEBBECKE GERMANY 1993' in ROM
 GAMEL( 1993, dicemstr,    0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Stella", "Dice Master",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
