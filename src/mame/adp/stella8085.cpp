@@ -632,6 +632,16 @@ ROM_START( doppelstart )
     ROM_LOAD( "doppel_start_eprom6_2732.bin", 0x7000, 0x1000, CRC(1b988121) SHA1(7886ad67d62db61588640f95efc679bc26220691) )
 ROM_END
 
+ROM_START( disc )
+	ROM_REGION( 0x8000, "maincpu", 0 ) // Assuming a total size for all ROMs combined
+	ROM_LOAD( "disc_eprom1_2732.bin", 0x0000, 0x1000, CRC(b9d1f518) SHA1(3a49b248eeb77767e8274a8be523678d7b4aa7d0) )
+	ROM_LOAD( "disc_eprom2_2732.bin", 0x1000, 0x1000, CRC(f55fba7c) SHA1(941f2653cb48836bb46f0903f64c3e9d32e67f46) )
+	ROM_LOAD( "disc_eprom3_2732.bin", 0x2000, 0x1000, CRC(bd05e77a) SHA1(9e2b5ad6de3eb36cb1f588906a2a10e512b79ce8) )
+	ROM_LOAD( "disc_eprom4_2732.bin", 0x3000, 0x1000, CRC(fa8dfac6) SHA1(7e8ba772218f4344070c4fa7e7bc5606b004ddc7) )
+	ROM_LOAD( "disc_eprom5_2732.bin", 0x4000, 0x1000, CRC(d036733c) SHA1(f2912f9090b3737ddd1c0702f30a6817fd36ec2c) )
+	ROM_LOAD( "disc_eprom6_2732.bin", 0x7000, 0x1000, CRC(d94d5f6e) SHA1(a27df116478b776c549c392297ffa4fdbb073514) )
+ROM_END
+
 ROM_START( disc2000 )
 	ROM_REGION( 0x9000, "maincpu", 0 )
 	ROM_LOAD( "disc2000.ice6", 0x0000, 0x4000, CRC(53a66005) SHA1(a5bb63abe8eb631a0fb09496ef6e0ee6c713985c) )
@@ -710,6 +720,7 @@ ROM_END
 } // anonymous namespace
 
 GAMEL( 1982, excellent,   0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1984, disc,        0, excellent, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1985, doppelstart, 0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelstart",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1986, doppelpot,   0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1986, elitedisc,   0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )

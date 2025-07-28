@@ -460,6 +460,7 @@ servicet
 
 @source:adp/stella8085.cpp
 dicemstr
+disc
 disc2000
 disc2001
 disc3000
