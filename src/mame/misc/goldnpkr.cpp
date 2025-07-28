@@ -2002,7 +2002,6 @@ void goldnpkr_state::kmhpan_map(address_map &map)
 
 void goldnpkr_state::unkicpf40_map(address_map &map)
 {
-//	map.global_mask(0x7fff);
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -2010,7 +2009,10 @@ void goldnpkr_state::unkicpf40_map(address_map &map)
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
-	map(0x6000, 0xffff).rom();  // uses some sort of bankswitching
+	map(0x2000, 0x2000).portr("SWA");
+	map(0x6000, 0x7fff).rom();  // bankswitched through 74ls154
+	map(0xa000, 0xa000).portr("SWB");
+	map(0xe000, 0xffff).rom();  // bankswitched through 74ls154
 }
 
 
@@ -4756,9 +4758,9 @@ static INPUT_PORTS_START( unkicpf40 )  // ICP-1 w/daughterboard
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Fever" )             PORT_DIPLOCATION("SWB:6")
+	PORT_DIPSETTING(    0x20, "37" )
+	PORT_DIPSETTING(    0x00, "137" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -12848,7 +12850,7 @@ ROM_END
   No lamps support.
 
   TODO:
-  - 2x DIP switches banks support.
+  - Figure out the missing DIP switchs fuctions.
   - Figure out hyperactivity on the PIA0 line CA2.
 
 */
@@ -12878,7 +12880,7 @@ ROM_END
   No lamps support.
 
   TODO:
-  - 2x DIP switches banks support.
+  - Figure out the missing DIP switchs fuctions.
   - Figure out hyperactivity on the PIA0 line CA2.
 
 */
