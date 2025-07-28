@@ -6,7 +6,7 @@
     CD-i MCD212 Video Decoder and System Controller emulation
     -------------------
 
-    written by Ryan Holtz
+    written by Ryan Holtz, Vincent.Halver
 
 
 *******************************************************************************
@@ -330,13 +330,13 @@ template <int Path>
 void mcd212_device::process_ica()
 {
 	uint16_t *ica = Path ? m_planeb.target() : m_planea.target();
-	uint32_t addr = 0x200;
-	uint32_t cmd = 0;
-
 	const int max_to_process = m_ica_height * 120;
+	// LCT depends on the current frame parity
+	uint32_t addr = (BIT(m_csrr[0], CSR1R_PA_BIT) == 0) ? 0x200 : 0x202;
+	
 	for (int i = 0; i < max_to_process; i++)
 	{
-		cmd = ica[addr++] << 16;
+		uint32_t cmd = ica[addr++] << 16;
 		cmd |= ica[addr++];
 		switch ((cmd & 0xff000000) >> 24)
 		{
@@ -975,7 +975,9 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	// Process VSR and mix if we're in the visible region
 	if (scanline >= m_ica_height)
 	{
-		uint32_t *out = &bitmap.pix(((scanline-m_ica_height) << 1)+m_ica_height);
+		uint32_t bitmap_line = ((scanline - m_ica_height) << 1) + m_ica_height;
+		uint32_t *out = &bitmap.pix(bitmap_line + (!BIT(m_csrr[0], CSR1R_PA_BIT)));
+		uint32_t* out2 = &bitmap.pix(bitmap_line + (BIT(m_csrr[0], CSR1R_PA_BIT)));
 
 		bool draw_line = true;
 		if (!BIT(m_dcr[0], DCR_FD_BIT) && BIT(m_csrw[0], CSR1W_ST_BIT))
@@ -1035,9 +1037,9 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 			draw_cursor(out);
 		}
-		// Duplicate lines. This is a placeholder for later interlace support.
-		uint32_t* out2 = &bitmap.pix(((scanline - m_ica_height) << 1) + m_ica_height + 1);
-		memcpy(out2, out, 768*4);
+
+		memcpy(out2, m_interlace_field[scanline], 768 * sizeof(uint32_t));
+		memcpy(m_interlace_field[scanline], out, 768 * sizeof(uint32_t));
 	}
 
 	// Toggle frame parity at the end of the visible frame (even in non-interlaced mode).
@@ -1128,6 +1130,9 @@ void mcd212_device::device_reset()
 	m_ica_height = 32;
 	m_total_height = 312;
 	m_blink_time = 0;
+	for (int i = 0; i < 312; i++) {
+		std::fill_n(m_interlace_field[i], 768, 0);
+	}
 
 	m_int_callback(CLEAR_LINE);
 
@@ -1206,6 +1211,8 @@ void mcd212_device::device_start()
 
 	save_item(NAME(m_blink_time));
 	save_item(NAME(m_blink_active));
+
+	save_item(NAME(m_interlace_field));
 
 	m_dca_timer = timer_alloc(FUNC(mcd212_device::dca_tick), this);
 	m_dca_timer->adjust(attotime::never);
