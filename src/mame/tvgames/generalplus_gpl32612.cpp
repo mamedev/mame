@@ -302,6 +302,11 @@ ROM_START( anpanm19 )
 	ROM_LOAD( "25l1280.u3", 0x0000, 0x1000000, CRC(7932fb3e) SHA1(a381eeba5357fe71e4d6081b9b91b57e5705f7f1) )
 ROM_END
 
+ROM_START( smatomo )
+	ROM_REGION(  0x400000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx25l3206e.ic3", 0x0000, 0x400000, CRC(fb4d1684) SHA1(98cecd7ead52118028cb3a1de71cb3528cd81be5) )
+ROM_END
+
 ROM_START( pdcm2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
@@ -389,6 +394,9 @@ CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_g
 
 // uses GPL32610 - 「それいけ！アンパンマン」スポーツ育脳マット
 CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "JoyPalette",        "Anpanman: Sports Ikunou Mat (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
+CONS( 201?, smatomo,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Smatomo (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now
 // ROM has 'GPNandTag2' header rather than the usual
