@@ -186,7 +186,7 @@ ROM_END
 // dates for each of these taken from back of case, are the DX versions different software or just different accessories?
 
 // 2018 version is a square device - Sumikko Gurashi - Sumikko Atsume (すみっコぐらし すみっコあつめ)
-// it runs on different hardware!
+// see evolution_handheld.cpp
 
 // 2019 version is house shaped device - すみっコぐらし すみっコさがし
 CONS( 2019, sanxpet,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
