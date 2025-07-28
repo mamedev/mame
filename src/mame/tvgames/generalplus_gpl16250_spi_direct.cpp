@@ -284,4 +284,5 @@ CONS(2021, punirune, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi
 CONS( 2021, smkcatch, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi - Sumikko Catch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // or Sumikko Gurashi - Sumikko Catch DX (すみっコぐらし すみっコキャッチDX) = Sumikko Catch with pouch and strap
 
-CONS( 201?, dsgnpal, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "Tomy", "Kiratto Puri Chan Pretty Chan Design Palette (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// there seem to be different versions of this available, is the software the same?
+CONS( 201?, dsgnpal, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "Tomy", "Kiratto Pri-Chan Design Palette (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
