@@ -1665,7 +1665,7 @@ CONS( 200?, dgun2500,  0,  0,  nes_vt_16mb, nes_vt, nes_vt_state, empty_init, "d
 
 // available in a number of colours, with various brands, but likely all the same.
 // This was a red coloured pad, contains various unlicensed bootleg reskinned NES game eg Blob Buster is a hack of Dig Dug 2 and there are also hacks of Xevious, Donkey Kong Jr, Donkey Kong 3 and many others.
-// Also available in handheld form where Supreme 200 is also shown on the main menu background
+// Also available in handheld form where Supreme 200 is also shown on the main menu background (see vt369 driver)
 // unclear if this is VT03 or VT09, the boot logo needs either VT09 or PAL mode for the DMA to be correct, dump is from a PAL unit
 CONS( 201?, ppgc200g,   0,         0,  nes_vt_pal_8mb, nes_vt, nes_vt_state, empty_init, "Fizz Creations", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
 

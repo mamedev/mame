@@ -35510,6 +35510,7 @@ typo240
 36pcase
 168pcase
 240in1ar
+d12power
 denv150
 dgun2561
 dgun2572
@@ -35520,6 +35521,7 @@ egame150
 gb50_150
 gbox2020
 gcs2mgp
+gon100
 gtct885
 hkb502
 hkb502a
@@ -35564,9 +35566,11 @@ red5mam
 rtvgc300
 rtvgc300fz
 sealvt
+supr200
 sy888b
 sy889
 tetrtin
+tiger108
 tup240
 unk128vt
 unkra200
@@ -35575,6 +35579,7 @@ zonefusn
 
 @source:nintendo/nes_vt42xx.cpp
 bittboy
+bl339
 fapocket
 g5_500
 g9_666
@@ -35589,6 +35594,7 @@ mc_9x6ss
 mc_hh210
 retro400
 rfcp168
+s10fake
 
 @source:nintendo/nss.cpp
 nss
@@ -47092,10 +47098,12 @@ arcade10
 bbl380
 dgun2953
 dphh8630
+dphh8633
 mc_cb203
 pg118
 ragc153
 retro150
+retro150a
 rhhc152
 supreme
 toumapet
