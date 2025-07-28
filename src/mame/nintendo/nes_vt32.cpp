@@ -450,7 +450,7 @@ ROM_END
 
 ROM_START( retror30 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "S29GL032N90TFI03.u2", 0x00000, 0x400000, CRC(1109f66c) SHA1(73ca34ce07a1a8782226bd74b1ae43fc6d7126e1) )
+	ROM_LOAD( "s29gl032n90tfi03.u2", 0x00000, 0x400000, CRC(dfb89ef7) SHA1(401539b73521e018e3af70b8019e6b59ba67fcad) )
 ROM_END
 
 
@@ -480,7 +480,8 @@ CONS( 201?, mymman,    0,  0,  nes_vt32_8mb, nes_vt32, nes_vt32_unk_state, empty
 // most games work, a few minor graphical issues common to the same games in other units
 CONS( 202?, typo240,   0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "Typo", "Vintage Gamer 240-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2021, retror30,  0,  0,  nes_vt32_32mb,      nes_vt32, nes_vt32_unk_state, empty_init, "Orb Gaming", "Retro Racer (30-in-1)", MACHINE_IMPERFECT_GRAPHICS )
+// speed challenge doesn't work (mapper emulation? or wrong driver?)
+CONS( 2021, retror30,  0,  0,  nes_vt32_32mb,      nes_vt32, nes_vt32_unk_state, empty_init, "Orb Gaming", "Retro Racer (30-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // there's also a 250+ version of the unit below at least
 CONS( 2018, goretrop,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
