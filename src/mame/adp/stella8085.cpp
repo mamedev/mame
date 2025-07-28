@@ -134,8 +134,10 @@ void stella8085_state::large_program_map(address_map &map)
 
 void stella8085_state::small_program_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();
-	map(0x7000, 0x7fff).ram();
+	map(0x0000, 0x4fff).rom();
+	map(0x5000, 0x5fff).ram();
+	map(0x6000, 0x633f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
+	map(0x7000, 0x7fff).rom();
 }
 
 void stella8085_state::io_map(address_map &map)
@@ -621,13 +623,13 @@ ROM_START( doppelpot )
 ROM_END
 
 ROM_START( doppelstart )
-    ROM_REGION( 0x6000, "maincpu", 0 )
+    ROM_REGION( 0x8000, "maincpu", 0 )
     ROM_LOAD( "doppel_start_eprom1_2732.bin", 0x0000, 0x1000, CRC(0a90cc49) SHA1(87a2aaa85ecf0525473d02a2121d13c6615b7188) )
     ROM_LOAD( "doppel_start_eprom2_2732.bin", 0x1000, 0x1000, CRC(720c4262) SHA1(da7f6a399093e4596d84798423201e1445ac38a1) )
     ROM_LOAD( "doppel_start_eprom3_2732.bin", 0x2000, 0x1000, CRC(1d26e43a) SHA1(389a5398536097c3dc3e084f4635908aad17c62d) )
     ROM_LOAD( "doppel_start_eprom4_2732.bin", 0x3000, 0x1000, CRC(d0fa1fdd) SHA1(c56df831c0c112762636675a60a76a0f00732ab2) )
     ROM_LOAD( "doppel_start_eprom5_2732.bin", 0x4000, 0x1000, CRC(40079325) SHA1(9e9f5e3853b3b75c89cd9086814f8a762cc3643b) )
-    ROM_LOAD( "doppel_start_eprom6_2732.bin", 0x5000, 0x1000, CRC(1b988121) SHA1(7886ad67d62db61588640f95efc679bc26220691) )
+    ROM_LOAD( "doppel_start_eprom6_2732.bin", 0x7000, 0x1000, CRC(1b988121) SHA1(7886ad67d62db61588640f95efc679bc26220691) )
 ROM_END
 
 ROM_START( disc2000 )
@@ -655,7 +657,7 @@ ROM_START( elitedisc )
 ROM_END
 
 ROM_START( excellent )
-	ROM_REGION( 0x6000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "excellent.ice5", 0x0800, 0x0800, CRC(b4c573b5) SHA1(5b01b68b8abd48bd293bc9aa507c3285a6e7550f) BAD_DUMP ) // underdumped
 	ROM_LOAD( "excellent.ice6", 0x1800, 0x0800, CRC(f1d53581) SHA1(7aef66149f3427b287d3e9d86cc198dc1ed40d7c) BAD_DUMP ) // underdumped
 	ROM_LOAD( "excellent.icd5", 0x2800, 0x0800, CRC(912a5f59) SHA1(3df3ca7eaef8de8e13e93f6a1e6975f8da7ed7a1) BAD_DUMP ) // underdumped
