@@ -206,4 +206,4 @@ CONS( 2019, tomyegg,         0,        0,      gp327902, gp327902, generalplus_g
 // Powder Pink (パウダーピンク)
 // Mint Blue (ミントブルー).
 
-CONS( 2021, chikawac,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Chikawa Camera De Ya -! (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, chikawac,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Chiikawa Camera De Ya-! (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
