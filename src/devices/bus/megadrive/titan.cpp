@@ -7,7 +7,7 @@ Titan Overdrive 2 mapper
 https://plutiedev.com/beyond-4mb
 
 TODO:
-- is SSF2 mapper actually 100% compatible with this?
+- This is same as SSF2 mapper, merge at cart slot rewrite;
 
 **************************************************************************************************/
 
@@ -39,7 +39,7 @@ uint16_t md_rom_titan_device::read(offs_t offset)
 		const u32 bank_mask = 0x3ffff;
 		const u32 bank_mult = 0x40000;
 		//if (bank_offset != 0)
-		//	printf("%08x %d %08x\n", offset * 2, bank_offset, m_rom_size);
+		//  printf("%08x %d %08x\n", offset * 2, bank_offset, m_rom_size);
 		return m_rom[((offset & bank_mask) | (m_bank[bank_offset] * bank_mult)) & (m_rom_size - 1)];
 	}
 

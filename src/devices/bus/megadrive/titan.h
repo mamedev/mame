@@ -6,16 +6,15 @@
 #pragma once
 
 #include "md_slot.h"
-#include "rom.h"
 
 class md_rom_titan_device : public device_t,
-						    public device_md_cart_interface
+							public device_md_cart_interface
 {
 public:
 	md_rom_titan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-//	md_rom_titan_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+//  md_rom_titan_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual uint16_t read(offs_t offset) override;
