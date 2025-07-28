@@ -96,8 +96,10 @@ private:
 	void rst65_w(uint8_t state);
 	void output_digit(uint8_t i, uint8_t data);
 
+	void io00(uint8_t data) ATTR_COLD;
 	void io70(uint8_t data) ATTR_COLD;
 	void io71(uint8_t data) ATTR_COLD;
+	uint8_t io91() ATTR_COLD;
 	void sounddev(uint8_t data) ATTR_COLD;
 	void makesound(uint8_t tone, uint8_t octave, uint8_t length);
 	int soundfreq(uint8_t channel, uint8_t clockdiv);
@@ -132,11 +134,13 @@ void stella8085_state::large_program_map(address_map &map)
 
 void stella8085_state::small_program_map(address_map &map)
 {
-	map(0x0000, 0x4fff).rom();
+	map(0x0000, 0x5fff).rom();
+	map(0x7000, 0x7fff).ram();
 }
 
 void stella8085_state::io_map(address_map &map)
 {
+	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x70, 0x70).w(FUNC(stella8085_state::io70));
@@ -144,7 +148,7 @@ void stella8085_state::io_map(address_map &map)
 	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
 	// 0x73 SOMETHING write only, probably extra lamps
 	// map(0x80, 0x8f) //Y8 ICC5 empty socket
-	// map(0x9?, 0x9?) //Y9 wired to rtc circuits but somehow memory mapped in hardware
+	map(0x91, 0x91).r(FUNC(stella8085_state::io91)); //Y9 wired to rtc circuits but somehow memory mapped in hardware
 }
 
 /*********************************************
@@ -220,7 +224,7 @@ uint8_t stella8085_state::kbd_rl_r()
 		ret = ioport("TZ7")->read();
 		break;
 	default:
-		LOG("read unmapped line %02x\n", m_kbd_sl);
+		//LOG("read unmapped line %02x\n", m_kbd_sl);
 		break;
 	}
 	return ret;
@@ -280,6 +284,16 @@ TIMER_CALLBACK_MEMBER( stella8085_state::sound_stop )
 void stella8085_state::rst65_w(uint8_t state)
 {
 	m_maincpu->set_input_line(I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void stella8085_state::io00(uint8_t data)
+{
+	; //old boards
+}
+
+uint8_t stella8085_state::io91()
+{
+	return 0xff; //old boards
 }
 
 void stella8085_state::io70(uint8_t data)
@@ -606,6 +620,16 @@ ROM_START( doppelpot )
 	ROM_LOAD( "doppelpot.icc5", 0x8000, 0x1000, CRC(135dac6b) SHA1(10873ee64579245eac7069bf84d61550684e67de) )
 ROM_END
 
+ROM_START( doppelstart )
+    ROM_REGION( 0x6000, "maincpu", 0 )
+    ROM_LOAD( "doppel_start_eprom1_2732.bin", 0x0000, 0x1000, CRC(0a90cc49) SHA1(87a2aaa85ecf0525473d02a2121d13c6615b7188) )
+    ROM_LOAD( "doppel_start_eprom2_2732.bin", 0x1000, 0x1000, CRC(720c4262) SHA1(da7f6a399093e4596d84798423201e1445ac38a1) )
+    ROM_LOAD( "doppel_start_eprom3_2732.bin", 0x2000, 0x1000, CRC(1d26e43a) SHA1(389a5398536097c3dc3e084f4635908aad17c62d) )
+    ROM_LOAD( "doppel_start_eprom4_2732.bin", 0x3000, 0x1000, CRC(d0fa1fdd) SHA1(c56df831c0c112762636675a60a76a0f00732ab2) )
+    ROM_LOAD( "doppel_start_eprom5_2732.bin", 0x4000, 0x1000, CRC(40079325) SHA1(9e9f5e3853b3b75c89cd9086814f8a762cc3643b) )
+    ROM_LOAD( "doppel_start_eprom6_2732.bin", 0x5000, 0x1000, CRC(1b988121) SHA1(7886ad67d62db61588640f95efc679bc26220691) )
+ROM_END
+
 ROM_START( disc2000 )
 	ROM_REGION( 0x9000, "maincpu", 0 )
 	ROM_LOAD( "disc2000.ice6", 0x0000, 0x4000, CRC(53a66005) SHA1(a5bb63abe8eb631a0fb09496ef6e0ee6c713985c) )
@@ -631,7 +655,7 @@ ROM_START( elitedisc )
 ROM_END
 
 ROM_START( excellent )
-	ROM_REGION( 0x5000, "maincpu", 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "excellent.ice5", 0x0800, 0x0800, CRC(b4c573b5) SHA1(5b01b68b8abd48bd293bc9aa507c3285a6e7550f) BAD_DUMP ) // underdumped
 	ROM_LOAD( "excellent.ice6", 0x1800, 0x0800, CRC(f1d53581) SHA1(7aef66149f3427b287d3e9d86cc198dc1ed40d7c) BAD_DUMP ) // underdumped
 	ROM_LOAD( "excellent.icd5", 0x2800, 0x0800, CRC(912a5f59) SHA1(3df3ca7eaef8de8e13e93f6a1e6975f8da7ed7a1) BAD_DUMP ) // underdumped
@@ -684,6 +708,7 @@ ROM_END
 } // anonymous namespace
 
 GAMEL( 1982, excellent,   0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1985, doppelstart, 0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelstart",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1986, doppelpot,   0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1986, elitedisc,   0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1986, rasant,      0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Venus",  "Rasant",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
