@@ -19393,6 +19393,26 @@ newbrain
 newbraina
 newbrainmd
 
+@source:handheld/st2302u_bbl_rom.cpp
+bbl338
+class200
+dphh8213
+
+@source:handheld/st2302u_bbl_spi.cpp
+arcade10
+bbl380
+dgun2953
+dphh8630
+dphh8633
+mc_cb203
+pg118
+ragc153
+retro150
+retro150a
+rhhc152
+supreme
+toumapet
+
 @source:handheld/chessking.cpp
 chesskng
 
@@ -47088,26 +47108,6 @@ lx_jg7415
 lx_jg7410
 zonemini
 react
-
-@source:tvgames/st2302u_bbl_rom.cpp
-bbl338
-class200
-dphh8213
-
-@source:tvgames/st2302u_bbl_spi.cpp
-arcade10
-bbl380
-dgun2953
-dphh8630
-dphh8633
-mc_cb203
-pg118
-ragc153
-retro150
-retro150a
-rhhc152
-supreme
-toumapet
 
 @source:tvgames/titan_soc.cpp
 colecofl
