@@ -240,7 +240,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::scanline_interrupt)
 
 /*****************************************************************************/
 
-void m92_state::coincounter_w(uint8_t data)
+void m92_state::coincounter_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -249,7 +249,7 @@ void m92_state::coincounter_w(uint8_t data)
 	/* Bit 0x40 set in Blade Master test mode input check */
 }
 
-void m92_state::bankswitch_w(uint8_t data)
+void m92_state::bankswitch_w(u8 data)
 {
 	m_mainbank->set_entry((data & 0x06) >> 1);
 	if (data & 0xf9)
@@ -262,14 +262,14 @@ int m92_state::sprite_busy_r()
 }
 
 template<int Layer>
-void m92_state::pf_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void m92_state::pf_control_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_pf_layer[Layer].control[offset]);
 }
 
 /*****************************************************************************/
 
-void m92_state::sound_reset_w(uint16_t data)
+void m92_state::sound_reset_w(u16 data)
 {
 	if (m_soundcpu)
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
@@ -352,7 +352,7 @@ void m92_state::m92_banked_portmap(address_map &map)
 	map(0x20, 0x20).w(FUNC(m92_state::bankswitch_w));
 }
 
-void m92_state::oki_bank_w(uint16_t data)
+void m92_state::oki_bank_w(u16 data)
 {
 	m_oki->set_rom_bank((data+1) & 0x3); // +1?
 }
@@ -2569,7 +2569,7 @@ ROM_END
 /* has bankswitching */
 void m92_state::init_bank()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	u8 *ROM = memregion("maincpu")->base();
 
 	m_mainbank->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 }

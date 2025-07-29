@@ -53,7 +53,7 @@ TIMER_CALLBACK_MEMBER(m92_state::spritebuffer_done)
 }
 
 
-void m92_state::spritecontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void m92_state::spritecontrol_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_spritecontrol[offset]);
 	// offset0: sprite list size (negative)
@@ -89,7 +89,7 @@ void m92_state::spritecontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 //  logerror("%s: spritecontrol_w %08x %08x\n",m_maincpu->pc(),offset,data);
 }
 
-void m92_state::videocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void m92_state::videocontrol_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_videocontrol);
 	/*
@@ -138,12 +138,12 @@ void m92_state::videocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 //  logerror("%s: videocontrol_w %d = %02x\n",m_maincpu->pc(),offset,data);
 }
 
-uint16_t m92_state::paletteram_r(offs_t offset)
+u16 m92_state::paletteram_r(offs_t offset)
 {
 	return m_paletteram[offset | (m_palette_bank << 10)];
 }
 
-void m92_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void m92_state::paletteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_palette->write16(offset | (m_palette_bank << 10), data, mem_mask);
 }
@@ -170,7 +170,7 @@ TILE_GET_INFO_MEMBER(m92_state::get_pf_tile_info)
 
 /*****************************************************************************/
 
-void m92_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void m92_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram_data[offset]);
 
@@ -188,9 +188,9 @@ void m92_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 /*****************************************************************************/
 
-void m92_state::master_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void m92_state::master_control_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	uint16_t old = m_pf_master_control[offset];
+	u16 old = m_pf_master_control[offset];
 	M92_pf_layer_info *layer;
 
 	COMBINE_DATA(&m_pf_master_control[offset]);
@@ -310,7 +310,7 @@ void ppan_state::video_start()
 
 void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *source = m_spriteram->buffer();
+	u16 *source = m_spriteram->buffer();
 
 	for (int layer = 0; layer < 8; layer++)
 	{
@@ -382,7 +382,7 @@ void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 // This needs a lot of work...
 void ppan_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *source = m_spriteram->live(); // sprite buffer control is never triggered
+	u16 *source = m_spriteram->live(); // sprite buffer control is never triggered
 	int offs, layer;
 
 	for (layer = 0; layer < 8; layer++)
@@ -474,7 +474,7 @@ void m92_state::m92_update_scroll_positions()
 
 		if (m_pf_master_control[laynum] & 0x40)
 		{
-			const uint16_t *scrolldata = m_vram_data + (0xf400 + 0x400 * laynum) / 2;
+			const u16 *scrolldata = m_vram_data + (0xf400 + 0x400 * laynum) / 2;
 
 			layer->tmap->set_scroll_rows(512);
 			layer->wide_tmap->set_scroll_rows(512);
@@ -521,7 +521,7 @@ void m92_state::m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap, cons
 }
 
 
-uint32_t m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Flipscreen appears hardwired to the dipswitch - strange */
 	if (m_dsw->read() & 0x100)
@@ -541,7 +541,7 @@ uint32_t m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-uint32_t m92_state::screen_update_nbbatman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 m92_state::screen_update_nbbatman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// nbbatman is the only game using this flag to turn off video? (normally, games just disable each tile layer)
 	if (m_videocontrol & 0x8000)

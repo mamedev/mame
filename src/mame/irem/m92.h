@@ -24,8 +24,8 @@ struct M92_pf_layer_info
 {
 	tilemap_t *tmap = nullptr;
 	tilemap_t *wide_tmap = nullptr;
-	uint16_t vram_base = 0;
-	uint16_t control[4]{};
+	u16 vram_base = 0;
+	u16 control[4]{};
 };
 
 class m92_state : public driver_device
@@ -75,8 +75,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD { m_sprite_buffer_busy = 1; }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
-	required_shared_ptr<uint16_t> m_vram_data;
-	required_shared_ptr<uint16_t> m_spritecontrol;
+	required_shared_ptr<u16> m_vram_data;
+	required_shared_ptr<u16> m_spritecontrol;
 	required_device<cpu_device> m_maincpu;
 	optional_device<v35_device> m_soundcpu;
 	optional_device<okim6295_device> m_oki;
@@ -89,30 +89,30 @@ protected:
 	required_ioport m_dsw;
 
 	emu_timer *m_spritebuffer_timer = nullptr;
-	int32_t m_raster_irq_position = -1;
-	uint16_t m_videocontrol = 0;
-	uint8_t m_sprite_buffer_busy = 0;
+	s32 m_raster_irq_position = -1;
+	u16 m_videocontrol = 0;
+	u8 m_sprite_buffer_busy = 0;
 	M92_pf_layer_info m_pf_layer[3];
-	uint16_t m_pf_master_control[4]{};
-	int32_t m_sprite_list = 0;
-	uint8_t m_palette_bank = 0;
-	std::vector<uint16_t> m_paletteram;
+	u16 m_pf_master_control[4]{};
+	s32 m_sprite_list = 0;
+	u8 m_palette_bank = 0;
+	std::vector<u16> m_paletteram;
 
-	void coincounter_w(uint8_t data);
-	void bankswitch_w(uint8_t data);
-	void sound_reset_w(uint16_t data);
-	void spritecontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void videocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t paletteram_r(offs_t offset);
-	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	template<int Layer> void pf_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void master_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void oki_bank_w(uint16_t data);
+	void coincounter_w(u8 data);
+	void bankswitch_w(u8 data);
+	void sound_reset_w(u16 data);
+	void spritecontrol_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void videocontrol_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 paletteram_r(offs_t offset);
+	void paletteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	template<int Layer> void pf_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void master_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void oki_bank_w(u16 data);
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	DECLARE_MACHINE_RESET(m92);
-	uint32_t screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_nbbatman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_nbbatman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void m92_update_scroll_positions();
