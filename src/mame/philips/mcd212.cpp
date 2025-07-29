@@ -1038,8 +1038,15 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			draw_cursor(out);
 		}
 
-		memcpy(out2, m_interlace_field[scanline], 768 * sizeof(uint32_t));
-		memcpy(m_interlace_field[scanline], out, 768 * sizeof(uint32_t));
+		if (BIT(m_dcr[0], DCR_SM_BIT)) {
+			// Interlace Output
+			memcpy(out2, m_interlace_field[scanline], 768 * sizeof(uint32_t));
+			memcpy(m_interlace_field[scanline], out, 768 * sizeof(uint32_t));
+		}
+		else {
+			// Single Field Output (duplicate lines)
+			memcpy(out2, out, 768 * sizeof(uint32_t));
+		}
 	}
 
 	// Toggle frame parity at the end of the visible frame (even in non-interlaced mode).
