@@ -33,7 +33,7 @@ NOTE: There is also a newer version of the Smart Cycle with 3D games, this howev
 
 <softwarelist name="smartcycle_cart" description="Fisher Price Smart Cycle cartridges">
 
-	<software name="sc0308" supported="no">
+	<software name="dinos" supported="no">
 		<description>Discover the Dinosaurs (0308)</description>
 		<year>2006</year>
 		<publisher>Fisher Price</publisher>
@@ -44,52 +44,7 @@ NOTE: There is also a newer version of the Smart Cycle with 3D games, this howev
 		</part>
 	</software>
 
-	<software name="sc0608" supported="no">
-		<description>Learning Adventure (0608)</description>
-		<year>2006</year>
-		<publisher>Fisher Price</publisher>
-		<part name="cart" interface="smartcycle_cart">
-			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
-				<rom name="0608.bin" size="0x800000" crc="167b2069" sha1="af5056db116020fd3096794a6166f0f13184a5df"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sc1410" supported="no">
-		<description>The Penguins of Madagascar (1410)</description>
-		<year>2009</year>
-		<publisher>Fisher Price</publisher>
-		<part name="cart" interface="smartcycle_cart">
-			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
-				<rom name="1410.bin" size="0x800000" crc="01eccc39" sha1="33cf330c3523343ec857a779a22d498215cb2362"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sc2108" supported="no"> <!-- VBL interrupt is turned off and never back on? -->
-		<description>Scooby-Doo! (2108)</description>
-		<year>2007</year>
-		<publisher>Fisher Price</publisher>
-		<part name="cart" interface="smartcycle_cart">
-			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
-				<rom name="2108.bin" size="0x800000" crc="050c1806" sha1="0ac208781ef2172a1a3c6a974825d5f80e3ef291"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="n5992" supported="no">
-		<description>Dora l'Exploratrice - Dora L'Aventure de l'Amitié (France)</description>
-		<year>2008</year>
-		<publisher>Fisher Price</publisher>
-		<info name="serial" value="N5992" />
-		<part name="cart" interface="smartcycle_cart">
-			<dataarea name="rom" size="0x800000">
-				<rom name="N5992 - Dora l'Exploratrice - Dora L'Aventure de l'Amitie (FR).u1" size="0x800000" crc="fa590280" sha1="5767536e1781fee06c52671bc7ca7b639a99e50b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="n5993" cloneof="sc0308" supported="no">
+	<software name="dinosfr" cloneof="dinos" supported="no">
 		<description>À la Découverte des Dinosaures (France)</description>
 		<year>2008</year>
 		<publisher>Fisher Price</publisher>
@@ -101,7 +56,64 @@ NOTE: There is also a newer version of the Smart Cycle with 3D games, this howev
 		</part>
 	</software>
 
-	<software name="n5994" supported="no"> <!-- VBL interrupt is turned off and never back on? -->
+	<software name="learnadv" supported="no">
+		<description>Learning Adventure (0608)</description>
+		<year>2006</year>
+		<publisher>Fisher Price</publisher>
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
+				<rom name="0608.bin" size="0x800000" crc="167b2069" sha1="af5056db116020fd3096794a6166f0f13184a5df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pengmad" supported="no"> <!-- VBL interrupt is turned off and never back on? and other IRQ issues? -->
+		<description>The Penguins of Madagascar (1410)</description>
+		<year>2009</year>
+		<publisher>Fisher Price</publisher>
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
+				<rom name="1410.bin" size="0x800000" crc="01eccc39" sha1="33cf330c3523343ec857a779a22d498215cb2362"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scooby" supported="no"> <!-- VBL interrupt is turned off and never back on? -->
+		<description>Scooby-Doo! (2108)</description>
+		<year>2007</year>
+		<publisher>Fisher Price</publisher>
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
+				<rom name="2108.bin" size="0x800000" crc="050c1806" sha1="0ac208781ef2172a1a3c6a974825d5f80e3ef291"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dora" supported="no"> <!-- might not be UK specific, packaging had 'color' spelling -->
+		<description>Dora the Explorer - Friendship Adventure (UK)</description>
+		<year>2006</year>
+		<publisher>Fisher Price</publisher>
+		<info name="serial" value="K6689" />
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="K6689 - Dora the Explorer - Friendship Adventure (UK).bin" size="0x800000" crc="569acece" sha1="c774da691bb1d5e3ae900449be24e1e598764f26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorafr" cloneof="dora" supported="no">
+		<description>Dora l'Exploratrice - Dora L'Aventure de l'Amitié (France)</description>
+		<year>2008</year>
+		<publisher>Fisher Price</publisher>
+		<info name="serial" value="N5992" />
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="N5992 - Dora l'Exploratrice - Dora L'Aventure de l'Amitie (FR).u1" size="0x800000" crc="fa590280" sha1="5767536e1781fee06c52671bc7ca7b639a99e50b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hotwfr" supported="no"> <!-- VBL interrupt is turned off and never back on? -->
 		<description>Hot Wheels - Pédale à Toute Vitesse (France)</description>
 		<year>2008</year>
 		<publisher>Fisher Price</publisher>
@@ -109,6 +121,30 @@ NOTE: There is also a newer version of the Smart Cycle with 3D games, this howev
 		<part name="cart" interface="smartcycle_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="N5994 - Hot Wheels - Pedale a Toute Vitesse (FR).u1" size="0x800000" crc="31ded61d" sha1="1e639f3521ab1b5261b618ab4a40ea4099326af9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongeb" supported="no"> <!-- might not be UK specific, packaging had 'color' spelling --> <!-- VBL interrupt is turned off and never back on? -->
+		<description>Spongebob Squarepants - Ocean Adventure (UK)</description>
+		<year>2007</year>
+		<publisher>Fisher Price</publisher>
+		<info name="serial" value="K6690" />
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="K6690 - Spongebob Squarepants - Ocean Adventure (UK).bin" size="0x800000" crc="dde4d2d6" sha1="88751c6f57c323f18d3eee89430f32977339398e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barbie" supported="no"> <!-- might not be UK specific, packaging had 'color' spelling --> <!-- VBL interrupt is turned off and never back on? -->
+		<description>Barbie - Fairytopia (UK)</description>
+		<year>2007</year>
+		<publisher>Fisher Price</publisher>
+		<info name="serial" value="L0544" />
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="L0544 - Barbie - Fairytopia (UK).bin" size="0x800000" crc="453268e1" sha1="4d9b3f27d7b1923178c047945b5598556275a19c"/>
 			</dataarea>
 		</part>
 	</software>
