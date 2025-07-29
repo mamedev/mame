@@ -38,7 +38,6 @@ public:
 		m_spritecontrol(*this, "spritecontrol"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -79,7 +78,6 @@ protected:
 	required_shared_ptr<u16> m_spritecontrol;
 	required_device<cpu_device> m_maincpu;
 	optional_device<v35_device> m_soundcpu;
-	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -108,7 +106,6 @@ protected:
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<int Layer> void pf_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void master_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void oki_bank_w(u16 data);
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	DECLARE_MACHINE_RESET(m92);
 	u32 screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -131,12 +128,13 @@ protected:
 };
 
 
-// Peter Pan (bootleg of Hook, different sprite hardware)
+// Peter Pan (bootleg of Hook, OKI sound, different sprite hardware)
 class ppan_state : public m92_state
 {
 public:
 	ppan_state(const machine_config &mconfig, device_type type, const char *tag) :
-		m92_state(mconfig, type, tag)
+		m92_state(mconfig, type, tag),
+		m_oki(*this, "oki")
 	{ }
 
 	void ppan(machine_config &config);
@@ -147,6 +145,8 @@ protected:
 	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
+	required_device<okim6295_device> m_oki;
+
 	void ppan_portmap(address_map &map) ATTR_COLD;
 };
 

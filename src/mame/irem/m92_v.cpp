@@ -379,76 +379,69 @@ void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 	}
 }
 
-// This needs a lot of work...
 void ppan_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u16 *source = m_spriteram->live(); // sprite buffer control is never triggered
-	int offs, layer;
+	const int limit = (source[0] & 0xff) * 4;
 
-	for (layer = 0; layer < 8; layer++)
+	for (int offs = 4; offs <= limit; )
 	{
-		for (offs = 0; offs < m_sprite_list; )
+		int x = source[offs+3] & 0x1ff;
+		int y = source[offs+0] & 0x1ff;
+		int code = source[offs+1];
+		int color = source[offs+2] & 0x007f;
+		int pri = (~source[offs+2] >> 6) & 2;
+		int flipx = (source[offs+2] >> 8) & 1;
+		int flipy = (source[offs+2] >> 9) & 1;
+		int numcols = 1 << ((source[offs+0] >> 11) & 3);
+		int numrows = 1 << ((source[offs+0] >> 9) & 3);
+
+		offs += 4 * numcols;
+
+		y = 384 - 16 - y - 7;
+		y -= 128;
+		if (y < 0) y += 512;
+
+		if (flipx) x += 16 * (numcols - 1);
+
+		for (int col = 0; col < numcols; col++)
 		{
-			int x = source[offs+3] & 0x1ff;
-			int y = source[offs+0] & 0x1ff;
-			int code = source[offs+1];
-			int color = source[offs+2] & 0x007f;
-			int pri = (~source[offs+2] >> 6) & 2;
-			int curlayer = (source[offs+0] >> 13) & 7;
-			int flipx = (source[offs+2] >> 8) & 1;
-			int flipy = (source[offs+2] >> 9) & 1;
-			int numcols = 1 << ((source[offs+0] >> 11) & 3);
-			int numrows = 1 << ((source[offs+0] >> 9) & 3);
-			int row, col, s_ptr;
+			int s_ptr = 8 * col;
+			if (!flipy) s_ptr += numrows - 1;
 
-			offs += 4 * numcols;
-			if (layer != curlayer) continue;
-
-			y = 384 - 16 - y - 7;
-			y -= 128;
-			if (y < 0) y += 512;
-
-			if (flipx) x += 16 * (numcols - 1);
-
-			for (col = 0; col < numcols; col++)
+			for (int row = 0; row < numrows; row++)
 			{
-				s_ptr = 8 * col;
-				if (!flipy) s_ptr += numrows - 1;
-
-				for (row = 0; row < numrows; row++)
+				if (flip_screen())
 				{
-					if (flip_screen())
-					{
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
-								code + s_ptr, color, !flipx, !flipy,
-								464 - x, 240 - (y - row * 16),
-								screen.priority(), pri, 0);
+					m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+							code + s_ptr, color, !flipx, !flipy,
+							464 - x, 240 - (y - row * 16),
+							screen.priority(), pri, 0);
 
-						// wrap around x
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
-								code + s_ptr, color, !flipx, !flipy,
-								464 - x + 512, 240 - (y - row * 16),
-								screen.priority(), pri, 0);
-					}
-					else
-					{
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
-								code + s_ptr, color, flipx, flipy,
-								x, y - row * 16,
-								screen.priority(), pri, 0);
-
-						// wrap around x
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
-								code + s_ptr, color, flipx, flipy,
-								x - 512, y - row * 16,
-								screen.priority(), pri, 0);
-					}
-					if (flipy) s_ptr++;
-					else s_ptr--;
+					// wrap around x
+					m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+							code + s_ptr, color, !flipx, !flipy,
+							464 - x + 512, 240 - (y - row * 16),
+							screen.priority(), pri, 0);
 				}
-				if (flipx) x -= 16;
-				else x += 16;
+				else
+				{
+					m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+							code + s_ptr, color, flipx, flipy,
+							x, y - row * 16,
+							screen.priority(), pri, 0);
+
+					// wrap around x
+					m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+							code + s_ptr, color, flipx, flipy,
+							x - 512, y - row * 16,
+							screen.priority(), pri, 0);
+				}
+				if (flipy) s_ptr++;
+				else s_ptr--;
 			}
+			if (flipx) x -= 16;
+			else x += 16;
 		}
 	}
 }

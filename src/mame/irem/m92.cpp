@@ -352,11 +352,6 @@ void m92_state::m92_banked_portmap(address_map &map)
 	map(0x20, 0x20).w(FUNC(m92_state::bankswitch_w));
 }
 
-void m92_state::oki_bank_w(u16 data)
-{
-	m_oki->set_rom_bank((data+1) & 0x3); // +1?
-}
-
 void ppan_state::ppan_portmap(address_map &map)
 {
 	map(0x00, 0x01).portr("P1_P2");
@@ -364,7 +359,7 @@ void ppan_state::ppan_portmap(address_map &map)
 	map(0x02, 0x02).w(FUNC(ppan_state::coincounter_w));
 	map(0x04, 0x05).portr("DSW");
 	map(0x06, 0x07).portr("P3_P4");
-	map(0x10, 0x11).w(FUNC(ppan_state::oki_bank_w));
+	map(0x10, 0x10).lw8(NAME([this] (u8 data) { m_oki->set_rom_bank(data & 3); }));
 	map(0x18, 0x18).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x80, 0x87).w(FUNC(ppan_state::pf_control_w<0>));
@@ -1756,13 +1751,13 @@ ROM_START( ppan )
 
 	ROM_REGION( 0x100000, "oki", 0) // OKI Samples copied here
 	ROM_COPY( "okidata",  0x000000, 0x000000, 0x20000 )
-	ROM_COPY( "okidata",  0x000000, 0x020000, 0x20000 )
+	ROM_COPY( "okidata",  0x020000, 0x020000, 0x20000 )
 	ROM_COPY( "okidata",  0x000000, 0x040000, 0x20000 )
-	ROM_COPY( "okidata",  0x020000, 0x060000, 0x20000 )
+	ROM_COPY( "okidata",  0x040000, 0x060000, 0x20000 )
 	ROM_COPY( "okidata",  0x000000, 0x080000, 0x20000 )
-	ROM_COPY( "okidata",  0x040000, 0x0a0000, 0x20000 )
+	ROM_COPY( "okidata",  0x060000, 0x0a0000, 0x20000 )
 	ROM_COPY( "okidata",  0x000000, 0x0c0000, 0x20000 )
-	ROM_COPY( "okidata",  0x060000, 0x0e0000, 0x20000 )
+	ROM_COPY( "okidata",  0x000000, 0x0e0000, 0x20000 )
 ROM_END
 
 
@@ -2570,16 +2565,8 @@ ROM_END
 void m92_state::init_bank()
 {
 	u8 *ROM = memregion("maincpu")->base();
-
 	m_mainbank->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 }
-
-/* TODO: figure out actual address map and other differences from real Irem h/w */
-/*
-void ppan_state::init_ppan()
-{
-}
-*/
 
 /***************************************************************************/
 
