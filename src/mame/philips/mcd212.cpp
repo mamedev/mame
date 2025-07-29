@@ -667,6 +667,10 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 	if (icmB == ICM_CLUT4) {
 		mosaic_count_b >>= 1;
 	}
+	// If PAL and 'Standard' bit set, insert a 24px border on the left/right
+	uint32_t offset = (!BIT(m_dcr[0], DCR_CF_BIT) || BIT(m_csrw[0], CSR1W_ST_BIT)) ? 24 : 0;
+	std::fill_n(out, offset, s_4bpp_color[0]);
+	out += offset;
 
 	for (int x = 0; x < width; x++)
 	{
@@ -994,12 +998,6 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		if (draw_line)
 		{
-			// If PAL and 'Standard' bit set, insert a 24px border on the left/right
-			if (!BIT(m_dcr[0], DCR_CF_BIT) || BIT(m_csrw[0], CSR1W_ST_BIT))
-			{
-				std::fill_n(out, 24, s_4bpp_color[0]);
-				out += 24;
-			}
 
 			process_vsr<0>(plane_a, transparent_a);
 			process_vsr<1>(plane_b, transparent_b);
