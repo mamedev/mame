@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_TVGAMES_BL_HANDHELDS_LCDC_H
-#define MAME_TVGAMES_BL_HANDHELDS_LCDC_H
+#ifndef MAME_HANDHELD_BL_HANDHELDS_LCDC_H
+#define MAME_HANDHELD_BL_HANDHELDS_LCDC_H
 
 #pragma once
 
@@ -34,4 +34,4 @@ private:
 
 };
 
-#endif // MAME_TVGAMES_BL_HANDHELDS_LCDC_H
+#endif // MAME_HANDHELD_BL_HANDHELDS_LCDC_H
