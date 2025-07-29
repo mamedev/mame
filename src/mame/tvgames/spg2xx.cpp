@@ -3034,6 +3034,16 @@ ROM_START( smartcyc )
 	/* no system ROM, all game data is on cartridges */
 ROM_END
 
+ROM_START( spidm2 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "spiderman2.bin", 0x000000, 0x400000, CRC(7ed425d8) SHA1(25b2078cdc83f5b54425a863336424c56ff20121) )
+ROM_END
+
+ROM_START( dinothun )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "dinothunder.bin", 0x000000, 0x400000, CRC(03e82604) SHA1(c39d72aa8a0750ee38ab01b317e77a46e1d6004e) )
+ROM_END
+
 void spg2xx_game_state::init_crc()
 {
 	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
@@ -3267,3 +3277,7 @@ CONS( 2007, lpetshop,   0,        0, lpetshop,  lpetshop,  spg2xx_game_lpetshop_
 CONS( 2005, barbpet,    0,        0, spg2xx,    barbpet,   spg2xx_game_state,               empty_init, "Mattel",                                              "Barbie: I Love Pets - Pet Rescue", MACHINE_IMPERFECT_SOUND )
 
 CONS( 200?, smartcyc,   0,        0, smartcycle, smartcyc, spg2xx_game_smartcycle_state,    empty_init, "Fisher Price",                                        "Smart Cycle", MACHINE_NOT_WORKING )
+
+CONS( 2004, spidm2,     0,        0, spg2xx,    spg2xx,   spg2xx_game_state,                empty_init, "N-Vision",                                            "Spider-Man 2 Web Action", MACHINE_NOT_WORKING )
+
+CONS( 2004, dinothun,   0,        0, spg2xx,    spg2xx,   spg2xx_game_state,                empty_init, "N-Vision / Toy Quest",                                "Power Rangers Dino Thunder: Thunder Action", MACHINE_NOT_WORKING )
