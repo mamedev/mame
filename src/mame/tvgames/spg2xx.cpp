@@ -1344,6 +1344,26 @@ static INPUT_PORTS_START( tmntbftc )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spidm2 )
+	PORT_START("P1") // the motion controls seem to map to simple button presses
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Hand Punch")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Web")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Right Hand Punch")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Swing")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Jump")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Kick")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Pause")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( rocksock )
 	PORT_START("P1")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3278,6 +3298,6 @@ CONS( 2005, barbpet,    0,        0, spg2xx,    barbpet,   spg2xx_game_state,   
 
 CONS( 200?, smartcyc,   0,        0, smartcycle, smartcyc, spg2xx_game_smartcycle_state,    empty_init, "Fisher Price",                                        "Smart Cycle", MACHINE_NOT_WORKING )
 
-CONS( 2004, spidm2,     0,        0, spg2xx,    spg2xx,   spg2xx_game_state,                empty_init, "N-Vision",                                            "Spider-Man 2 Web Action", MACHINE_NOT_WORKING )
+CONS( 2004, spidm2,     0,        0, spg2xx,     spidm2,   spg2xx_game_state,               empty_init, "N-Vision",                                            "Spider-Man 2 Web Action", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2004, dinothun,   0,        0, spg2xx,    spg2xx,   spg2xx_game_state,                empty_init, "N-Vision / Toy Quest",                                "Power Rangers Dino Thunder: Thunder Action", MACHINE_NOT_WORKING )
