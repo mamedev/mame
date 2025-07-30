@@ -837,14 +837,13 @@ void specnext_state::memory_change(u16 port, u8 data) // port_memory_change_dly
 
 void specnext_state::update_video_mode()
 {
-	const u16 MUST_BE_447 = 455; // FIXME reconfigure screen width to lower value than present makes bgfx crash
 	std::string machine_name;
 	if (BIT(m_nr_03_machine_timing, 2))
 	{
 		machine_name = "Pentagon";
 		m_video_timings = // Pentagon is always 50 Hz
 		{
-			0, 448 + 3 - 12, 16, 47, 63, 128, MUST_BE_447,
+			0, 448 + 3 - 12, 16, 47, 63, 128, 447,
 			0, 319, 1, 14, 15, 80, 319,
 			76, 435, 24, 311, 24 + 0
 		};
@@ -874,7 +873,7 @@ void specnext_state::update_video_mode()
 		if (!m_nr_05_5060)
 			m_video_timings = // 48K 50 Hz
 			{
-				0, 128 + 0 - 12, 16, 47, 95, 128, MUST_BE_447,
+				0, 128 + 0 - 12, 16, 47, 95, 128, 447,
 				0, 0, 1, 4, 7, 64, 311,
 				80, 439, 16, 303, 16 + 4
 			};
