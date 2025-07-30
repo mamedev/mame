@@ -340,6 +340,14 @@ ROM_START( arcadege )
 	ROM_LOAD( "tc58nvg0s3eta00.u3", 0x0000, 0x8400000, CRC(9b4db25e) SHA1(7e3d7e15f2592efd98027440c3761179c95e4417) )
 ROM_END
 
+ROM_START( bnaidoll )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x22000000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg2s0hta00.bin", 0x0000, 0x22000000, CRC(6cfa4600) SHA1(152c04532ae2587dea590d169e87534924f5ea89) )
+ROM_END
+
 
 void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
@@ -443,3 +451,6 @@ CONS( 2009, pdcm2,           0,        0,      gpl32612, gpl32612, generalplus_g
 
 // uses a GPL32600A-003A-QL141
 CONS( 200?, arcadege,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Millennium 2000 GmbH",        "Millennium Arcade Genius SE",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses a GP326813
+CONS( 2020, bnaidoll,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Benesse Corporation",        "Benesse AI Doll",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
