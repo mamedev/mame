@@ -204,7 +204,7 @@ ROM_START( pljh )
 	ROM_LOAD( "93c46", 0x00, 0x80, NO_DUMP )
 ROM_END
 
-// 金钻石 (Jīn Zuàn Shí)
+// 金钻石 (Jīn Zuànshí)
 ROM_START( jzuanshi )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "3.u11", 0x00000, 0x20000, NO_DUMP ) // was stripped from the PCB
@@ -303,4 +303,4 @@ GAME( 2005, bbddz,    0, sealy, djddz, sealy_z80_state, init_djddz, ROT0, "Sealy
 GAME( 200?, ddz2,     0, sealy, djddz, sealy_z80_state, empty_init, ROT0, "Sealy", "Dou Dizhu II",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 200?, djddz,    0, sealy, djddz, sealy_z80_state, init_djddz, ROT0, "Sealy", "Dingji Dou Dizhu",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2000, pljh,     0, sealy, djddz, sealy_z80_state, empty_init, ROT0, "Sealy", "Piaoliang Jinhua",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2003, jzuanshi, 0, sealy, djddz, sealy_z80_state, empty_init, ROT0, "Sealy", "Jin Zuan Shi",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, jzuanshi, 0, sealy, djddz, sealy_z80_state, empty_init, ROT0, "Sealy", "Jin Zuanshi",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -24105,12 +24105,12 @@ hb_ydd
 hb_ydda
 
 @source:jpm/pluto6.cpp
-pl6_atw
-pl6_cm
-pl6_demo
+//pl6_atw
+//pl6_cm
+//pl6_demo
 pl6_kfp
 pl6_lgk
-tijkpots
+//tijkpots
 
 @source:kaneko/airbustr.cpp
 airbustr

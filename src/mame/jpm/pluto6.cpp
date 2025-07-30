@@ -203,8 +203,8 @@ public:
 	{ }
 
 	void pluto6_dev(machine_config &config);
-	void pluto6_betcom(machine_config &config);
-	void pluto6_jpmrom(machine_config &config);
+	[[maybe_unused]] void pluto6_betcom(machine_config &config);
+	[[maybe_unused]] void pluto6_jpmrom(machine_config &config);
 
 	// FPGA
 	uint32_t input_callback(offs_t offset);
@@ -590,6 +590,7 @@ ROM_START( pl6_lgk )
 	DISK_IMAGE( "pl6_lgk", 0, SHA1(7d8631a4e336e93c9bfddf9166a22b756d8382fc) )
 ROM_END
 
+#if 0
 ROM_START( pl6_cm )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "60a8_b1.u1", 0x00000, 0x40000, CRC(1e9bbb77) SHA1(a93b89856f41cfe477a2791ca22c25e8249ab496) )
@@ -615,6 +616,7 @@ ROM_START( pl6_demo )
 	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "pl6demo_cf", 0, SHA1(a97e0af3b35d02b014d98b48977c4a2584271f20) )
 ROM_END
+#endif
 
 /*
 ROM_START( pl6vdemo )
@@ -634,6 +636,7 @@ ROM_START( pl6ddemo )
 ROM_END
 */
 
+#if 0
 ROM_START( tijkpots )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "tisland.u1", 0x00000, 0x80000, CRC(E4B67B94) SHA1(d88019190989e92e1538a9abd6e1ef3c3bb89146))
@@ -641,15 +644,16 @@ ROM_START( tijkpots )
 	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "pl6_tisl", 0, NO_DUMP )
 ROM_END
+#endif
 
 } // anonymous namespace
 
 GAME( 2014, pl6_kfp, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "G Squared", "Kung Fu Pounda", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2014, pl6_atw, 0, pluto6_jpmrom, pluto6, pluto6_state, empty_init, ROT0, "JPM", "Around The World", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+//GAME( 2014, pl6_atw, 0, pluto6_jpmrom, pluto6, pluto6_state, empty_init, ROT0, "JPM", "Around The World", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 2014, pl6_lgk, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "Betcom", "Let's Get Kraken", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2014, tijkpots, 0, pluto6_betcom, pluto6, pluto6_state, empty_init, ROT0, "Betcom", "Treasure Island Jackpots", MACHINE_MECHANICAL )
+//GAME( 2014, tijkpots, 0, pluto6_betcom, pluto6, pluto6_state, empty_init, ROT0, "Betcom", "Treasure Island Jackpots", MACHINE_MECHANICAL )
 //GAME( 2004, pl6_fant, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "JPM", "Fabtaztec", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2004, pl6_cm, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "JPM", "Crystal Maze" , MACHINE_NOT_WORKING )
-GAME( 2000, pl6_demo, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "Heber", "Pluto 6 Devkit/Evaluation Board", MACHINE_NOT_WORKING )
+//GAME( 2004, pl6_cm, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "JPM", "Crystal Maze" , MACHINE_NOT_WORKING )
+//GAME( 2000, pl6_demo, 0, pluto6_dev, pluto6, pluto6_state, empty_init, ROT0, "Heber", "Pluto 6 Devkit/Evaluation Board", MACHINE_NOT_WORKING )
 //GAME( 2000, pl6vdemo, 0, pluto6v_dev, pluto6, pluto6_state, empty_init, ROT0, "Heber", "Pluto 6 Devkit/Evaluation Board Video Demo", MACHINE_NOT_WORKING )
 //GAME( 2000, pl6ddemo, 0, pluto6dv_dev, pluto6, pluto6_state, empty_init, ROT0, "Heber", "Pluto 6 Devkit/Evaluation Board Dual Video Demo", MACHINE_NOT_WORKING )

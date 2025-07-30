@@ -84,4 +84,4 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 2021, myaatari,      0,              0,      myaatari, myaatari, myaatari_state, empty_init, "DreamGear", "My Arcade Atari (DGUNL-7013, Micro Player Pro)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, myaatari,      0,              0,      myaatari, myaatari, myaatari_state, empty_init, "dreamGEAR", "My Arcade Atari (DGUNL-7013, Micro Player Pro)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
