@@ -454,4 +454,4 @@ CONS( 200?, arcadege,           0,        0,      gpl32612, gpl32612, generalplu
 
 // uses a GP326813
 // 学習おうえんAI★ミラクルロボ
-CONS( 2020, airobo,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Benesse Corporation",        "Gakushou Ouen AI Miracle Robo",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2020, airobo,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Benesse Corporation",        "Gakushuu Ouen AI Miracle Robo",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
