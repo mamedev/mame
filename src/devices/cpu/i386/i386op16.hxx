@@ -2965,7 +2965,7 @@ void i386_device::i386_groupF7_16()        // Opcode 0xf7
 				if( src ) {
 					remainder = quotient % (int32_t)(int16_t)src;
 					result = quotient / (int32_t)(int16_t)src;
-					if( result > 0xffff ) {
+					if( result > 0x7fff || result < -0x8000 ) {
 						/* TODO: Divide error */
 					} else {
 						REG16(DX) = (uint16_t)remainder;
