@@ -170,7 +170,7 @@
   DIP switches banks #3 and #2). Is not used as sound device, at least for
   Good Luck II.
 
-  There are pieces of code that initialize two PIAs 6821, that are not included
+  There are pieces of code that initialize two PIA 6821s, that are not included
   in the PCB. Seems a leftover. Also the program try to handle a suppossed lamps
   system through these 'phantom' PIAs...
 
