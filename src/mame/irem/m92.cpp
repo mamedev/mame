@@ -56,16 +56,27 @@ BTANB:
     Gunforce:
     - Sound sometimes partially dies on level 3, where the waterfall sound doesn't
       stop looping and it drowns out explosion/shot sound effects.
-    - Water doesn't animate properly at the start of level 5 (it works ok if you
-      use cheats to jump straight to this level, related to actual MAME bug below?)
+    - Water usually doesn't animate properly at the start of level 5, see:
+
+      0D307: mov     aw,[6210h] ; 6210h = frame counter
+      0D30A: shr     aw,3h
+      0D30D: mov     dl,3h
+      0D30F: divu    dl ; (frame >> 3) / 3 (opcode = F6 F2)
+
+      It adds the remainder to the water tiles offset. If the divu overflows, water
+      animation stops. But every 0x800 frames, the water animates for about a second.
+      It works ok in MAME if you use cheats to jump straight to this level, the reason
+      is because frame counter is smaller than 0x1800.
 
 TODO:
     All games:
     - Flip screen/Cocktail Mode is unsupported (offsetted screens)
 
     Gunforce:
-    - Water doesn't appear at the start of level 5 (but it always appears if you
-      cheat and jump straight to the level). Almost certainly a CPU core bug.
+    - Water usually doesn't appear at the start of level 5, it's related to the
+      BTANB above: register contents after divu overflow is undefined. MAME does
+      not modify AH/AL when that happens, as described in the V33 specs. But
+      apparently that's not how it works on the real CPU?
 
     Irem Skins:
     - EEPROM load/save not yet implemented - when done, MT2EEP should
