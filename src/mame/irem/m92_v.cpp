@@ -46,7 +46,7 @@
 
 /*****************************************************************************/
 
-void m92_state::sprite_dma()
+void m92_state::sprite_dma(int amount)
 {
 	u16 src_objbank = m_videocontrol << 7 & 0x400;
 	u16 *source = &m_spriteram[src_objbank];
@@ -54,7 +54,6 @@ void m92_state::sprite_dma()
 
 	const bool sort = BIT(m_dmacontrol[2], 0);
 	const bool skip_layer7 = !BIT(m_dmacontrol[2], 3);
-	const int limit = (0x100 - (m_dmacontrol[0] & 0xff)) * 4;
 
 	// copy sprites, optionally sort by layer
 	for (int layer = 0; layer < 8; layer++)
@@ -70,7 +69,7 @@ void m92_state::sprite_dma()
 					m_spriteram_buffer[dest_offs + i] = source[offs + i];
 
 				dest_offs += 4 * numcols;
-				if (dest_offs >= limit)
+				if (dest_offs >= amount)
 					return;
 			}
 		}
@@ -126,13 +125,13 @@ void m92_state::dmacontrol_w(offs_t offset, u16 data, u16 mem_mask)
 
 		if (m_dmacontrol[0] & 0xff)
 		{
-			clocks += 0x400;
-			sprite_dma();
+			int amount = (0x100 - (m_dmacontrol[0] & 0xff)) * 4;
+			clocks += amount;
+			sprite_dma(amount);
 		}
 
-		/* Pixel clock source is 26.6666MHz (some boards 27MHz??), up to 0x800 words to copy
-		from memory to the buffer.  It seems safe to assume 1 word can be copied per clock. */
-		m_dma_timer->adjust(m_screen->pixel_period() / 4 * clocks);
+		// assume it can transfer 1 word per 2*pixel clock
+		m_dma_timer->adjust(m_screen->pixel_period() / 2 * clocks);
 
 		m_dma_busy = 0;
 		m_upd71059c->ir1_w(0);
@@ -440,9 +439,9 @@ void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 void ppan_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u16 *source = m_spriteram; // sprite buffer control is never triggered
-	const int limit = (source[0] & 0xff) * 4;
+	const int amount = (source[0] & 0xff) * 4;
 
-	for (int offs = 4; offs <= limit; )
+	for (int offs = 4; offs <= amount; )
 	{
 		int x = source[offs+3] & 0x1ff;
 		int y = source[offs+0] & 0x1ff;

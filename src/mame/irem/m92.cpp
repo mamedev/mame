@@ -30,8 +30,8 @@
     In The Hunt (World)                              M92-E-B   (c) 1993 Irem Corp
     In The Hunt (USA)                                M92-E-B   (c) 1993 Irem Corp
     Kaitei Daisensou (Japan)                         M92-E-B   (c) 1993 Irem Corp
-    Ninja Baseball Batman (World)                    M92-F-A   (c) 1993 Irem Corp (also on M92-Z-B)
-    Ninja Baseball Batman (USA)                      M92-F-A   (c) 1993 Irem America Corp
+    Ninja Baseball Bat Man (World)                   M92-F-A   (c) 1993 Irem Corp (also on M92-Z-B)
+    Ninja Baseball Bat Man (USA)                     M92-F-A   (c) 1993 Irem America Corp
     Yakyuu Kakutou League-Man (Japan)                M92-F-A   (c) 1993 Irem Corp (also on M92-Z-C)
     Superior Soldiers (US)                           M92-B-G   (c) 1993 Irem Corp
     Perfect Soldiers (Japan)                         M92-B-G   (c) 1993 Irem Corp
@@ -47,33 +47,39 @@ System notes:
     Irem Skins Game has an eeprom and ticket payout(?).
     R-Type Leo & Lethal Thunder have a memory card.
 
-    Many games use raster IRQ's for special video effects, eg,
-        * Scrolling water in Undercover Cops
-        * Score display in R-Type Leo
+    Many games use raster IRQ's for special video effects, eg.
+    - Scrolling water in Undercover Cops
+    - Score display in R-Type Leo
+    - A lot in Ninja Baseball Bat Man
 
-Glitch list!
+BTANB:
+    Gunforce:
+    - Sound sometimes partially dies on level 3, where the waterfall sound doesn't
+      stop looping and it drowns out explosion/shot sound effects.
+    - Water doesn't animate properly at the start of level 5 (it works ok if you
+      use cheats to jump straight to this level, related to actual MAME bug below?)
 
+TODO:
     All games:
-        Flip screen/Cocktail Mode is unsupported (offsetted screens)
+    - Flip screen/Cocktail Mode is unsupported (offsetted screens)
 
     Gunforce:
-        Animated water sometimes doesn't appear on level 5 (but it
-        always appears if you cheat and jump straight to the level).
-        Almost certainly a core bug.
+    - Water doesn't appear at the start of level 5 (but it always appears if you
+      cheat and jump straight to the level). Almost certainly a CPU core bug.
 
     Irem Skins:
-        - EEPROM load/save not yet implemented - when done, MT2EEP should
-          be removed from the ROM definition. (?)
+    - EEPROM load/save not yet implemented - when done, MT2EEP should
+      be removed from the ROM definition. (?)
 
     (0.141 update: at least following two seems fixed from a lot of time ... -AS)
     Perfect Soldiers:
-        Shortly into the fight, the sound CPU enters a tight loop, continuously
-        writing to the status port and with interrupts disabled. I don't see how
-        it is supposed to get out of that loop. Maybe it's not supposed to enter
-        it at all?
+    - Shortly into the fight, the sound CPU enters a tight loop, continuously
+      writing to the status port and with interrupts disabled. I don't see how
+      it is supposed to get out of that loop. Maybe it's not supposed to enter
+      it at all?
 
     Dream Soccer 94:
-        Slight priority problems when goal scoring animation is played
+    - Slight priority problems when goal scoring animation is played
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
     Thanks to Chris Hardy and Olli Bergmann too!
@@ -92,7 +98,7 @@ Major Title 2                 1992  Rev 3.44 M92
 Hook                          1992  Rev 3.45 M92
 R-Type Leo                    1992  Rev 3.45 M92
 In The Hunt                   1993  Rev 3.45 M92
-Ninja Baseball Batman         1993  Rev 3.50 M92
+Ninja Baseball Bat Man        1993  Rev 3.50 M92
 Perfect Soldiers              1993  Rev 3.50 M92
 World PK Soccer               1995  Rev 3.51 M92
 Fire Barrel                   1993  Rev 3.52 M92
