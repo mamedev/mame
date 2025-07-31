@@ -81,6 +81,9 @@ void k054539_device::init_flags(int _flags)
 
 void k054539_device::set_gain(int channel, double _gain)
 {
+	if (started())
+		stream->update();
+
 	if(_gain >= 0)
 		gain[channel] = _gain;
 }
@@ -340,6 +343,8 @@ void k054539_device::init_chip()
 
 void k054539_device::write(offs_t offset, u8 data)
 {
+	stream->update();
+
 	if(0) {
 		int voice, reg;
 
@@ -486,12 +491,15 @@ u8 k054539_device::read(offs_t offset)
 			return res;
 		} else
 			return 0;
+
 	case 0x22c:
 		break;
+
 	default:
 		LOG("K054539 read %03x\n", offset);
 		break;
 	}
+
 	return regs[offset];
 }
 
