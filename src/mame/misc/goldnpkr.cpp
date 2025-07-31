@@ -366,7 +366,7 @@
 
   * Casino Poker
 
-  Bipolar PROM 24sa10 is filled with 0x09, so has at least
+  Bipolar PROM 24SA10 is filled with 0x09, so has at least
   fixed bits 0 and 3 along the whole data. Needs a redump using a supported
   EEPROM programmer.
 
@@ -380,93 +380,92 @@
   One for settings, and other just for bookkeeping.
 
   Here the original Service Card (in German), and the English translation:
-   _____________________________________     _____________________________________
-  |                                     |   |                                     |
+
+  .-------------------------------------.   .-------------------------------------.
   |          SERVICE ANLEITUNG          |   |           SERVICE MANUAL            |
-  |   _____________   _____________     |   |   _____________   _____________     |
-  |  |  +-------+  | |  +-------+  |    |   |  |  +-------+  | |  +-------+  |    |
+  |  .-------------. .-------------.    |   |  .-------------. .-------------.    |
+  |  |  .-------.  | |  .-------.  |    |   |  |  .-------.  | |  .-------.  |    |
   |  |  |0000000|  | |  |0000000|  |    |   |  |  |0000000|  | |  |0000000|  |    |
-  |  |  +-------+  | |  +-------+  |    |   |  |  +-------+  | |  +-------+  |    |
+  |  |  '-------'  | |  '-------'  |    |   |  |  '-------'  | |  '-------'  |    |
   |  |             | |             |    |   |  |             | |             |    |
   |  |             | |             |    |   |  |             | |             |    |
   |  |             | |             |    |   |  |             | |             |    |
-  |  | +---------+ | |+-----------+|    |   |  | +---------+ | |+-----------+|    |
+  |  | .---------. | |.-----------.|    |   |  | .---------. | |.-----------.|    |
   |  | |Einnahmen| | ||Kredit Off ||    |   |  | |Earnings | | ||Credit Off ||    |
-  |  | +---------+ | |+-----------+|    |   |  | +---------+ | |+-----------+|    |
+  |  | '---------' | |'-----------'|    |   |  | '---------' | |'-----------'|    |
   |  |             | |             |    |   |  |             | |             |    |
-  |  |_____________| |_____________|    |   |  |_____________| |_____________|    |
+  |  '-------------' '-------------'    |   |  '-------------' '-------------'    |
   |                                     |   |                                     |
   |  Zaehler zeigen volle DM-Betraege   |   |     METER SHOW FULL DM-AMOUNTS      |
   |                                     |   |                                     |
-  |       _____            _____        |   |       _____            _____        |
-  |      |     |     |    |     |       |   |      |     |     |    |     |       |
+  |      .-----.     |    .-----.       |   |      .-----.     |    .-----.       |
   |      | SW  |     |    | RT  |       |   |      | SW  |     |    | RT  |       |
-  |      |_____|     |    |_____|       |   |      |_____|     |    |_____|       |
-  |                  |                  |   |                  |                  |
+  |      |     |     |    |     |       |   |      |     |     |    |     |       |
+  |      '-----'     |    '-----'       |   |      '-----'     |    '-----'       |
   |      SERVICE     |     METER        |   |      SERVICE     |     METER        |
   |                  |                  |   |                  |                  |
-  |    +---------+   | ZEIGT DIE        |   |    +---------+   | SHOWS THE        |
-  |    |  LEARN  |   | ELEKT. ZAEHLER-  |   |    |  LEARN  |   | ELECTRONIC METER-|
-  |    +---------+   | STAENDE UND      |   |    +---------+   | READING AND      |
-  |                  | STATISTIK AN     |   |                  | STATISTIC        |
+  |    .---------.   | ZEIGT DIE        |   |    .---------.   | SHOWS THE        |
+  |    |  LEARN  |   | ELEKT. ZAEHLER-  |   |    |  LEARN  |   | ELECTRONIC       |
+  |    '---------'   | STAENDE UND      |   |    '---------'   | METER-READING    |
+  |                  | STATISTIK AN     |   |                  | AND STATISTIC    |
   |   PROGRAMMIER.   |                  |   |   PROGRAMMING    |                  |
   |   DER KREDIT-    |                  |   |   THE CREDIT-    |                  |
-  |   EINGAENGE UND  +------------------|   |   INPUT AND      +------------------|
+  |   EINGAENGE UND  |------------------|   |   INPUT AND      |------------------|
   |   GEWINNQUOTE    |                  |   |   PROFIT SHARE   |                  |
   |                  |    < POT >       |   |                  |    < POT >       |
-  |    +---------+   |  +         -     |   |    +---------+   |  +         -     |
+  |    .---------.   |  +         -     |   |    .---------.   |  +         -     |
   |    |   NEU   |   |  LAUTSTAERKE     |   |    |   NEW   |   |  SOUND VOLUME    |
-  |    +---------+   |                  |   |    +---------+   |                  |
+  |    '---------'   |                  |   |    '---------'   |                  |
   |                  |                  |   |                  |                  |
   |   SETZT DIE      |                  |   |   RESET THE      |                  |
   |   ELEKT. ZAEHLER |    < POT >       |   |   ELECTRONIC     |    < POT >       |
   |   ZURUECK        |                  |   |   COUNTER        |                  |
-  |                  | BLAU<->SCHWARZ   |   |                  | BLUE <-> BLACK   |
-  |    +---------+   | HINTERGRUND      |   |    +---------+   | BACKGROUND       |
+  |                  | BLAU <-> SCHWARZ |   |                  | BLUE <-> BLACK   |
+  |    .---------.   | HINTERGRUND      |   |    .---------.   | BACKGROUND       |
   |    |  TEST   |   |                  |   |    |  TEST   |   |                  |
-  |    +---------+   |                  |   |    +---------+   |                  |
+  |    '---------'   |                  |   |    '---------'   |                  |
   |                  |                  |   |                  |                  |
   |   CPU, TASTATUR  |                  |   |   CPU, KEYBOARD  |                  |
   |   UND LAMPEN     |                  |   |   AND LAMPS      |                  |
   |   TEST           |                  |   |   TEST           |                  |
   |   GITTERMUSTER   |                  |   |   LATTICE DESIGN |                  |
   |                  |                  |   |                  |                  |
-  |    +---------+   |                  |   |    +---------+   |                  |
+  |    .---------.   |                  |   |    .---------.   |                  |
   |    |  RESET  |   |                  |   |    |  RESET  |   |                  |
-  |    +---------+   |                  |   |    +---------+   |                  |
+  |    '---------'   |                  |   |    '---------'   |                  |
   |                  |                  |   |                  |                  |
   |   LOESCHT ALLES  |                  |   |    DELETE ALL    |                  |
   |                  |                  |   |                  |                  |
   |------------------+------------------|   |------------------+------------------|
-  |        DIPSWITCHEINSTELLUNG         |   |        DIPSWITCH SETTINGS           |
+  |        DIPSWITCHEINSTELLUNG         |   |        DIP SWITCHES SETTINGS        |
   |                                     |   |                                     |
   |            ON      OFF              |   |            ON      OFF              |
-  |           +-----------+             |   |           +-----------+             |
-  |           | +-------+ |             |   |           | +-------+ |             |
+  |           .-----------.             |   |           .-----------.             |
+  |           | .-------. |             |   |           | .-------. |             |
   |       ON  | |###|   |8|             |   |       ON  | |###|   |8|             |
-  |           | +---+---+ |             |   |           | +---+---+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |       ON  | |###|   | |             |   |       ON  | |###|   | |             |
-  |           | +-------+ |             |   |           | +-------+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |           | |   |###| |             |   |           | |   |###| |             |
-  |           | +---+---+ |             |   |           | +---+---+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |           | |   |###| |             |   |           | |   |###| |             |
-  |           | +-------+ |             |   |           | +-------+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |R-FLUSH EIN| |###|   | |R-FLUSH AUS  |   | R-FLUSH ON| |###|   | |R-FLUSH OFF  |
-  |           | +---+---+ |             |   |           | +---+---+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |           | |###|   | |             |   |           | |###|   | |             |
-  |           | +-------+ |             |   |           | +-------+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |           | |   |###| |AUSZAHLUNG   |   |           | |   |###| |PAYOUT       |
-  |           | +---+---+ |             |   |           | +---+---+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |           | |###|   |1|AUSZAHLUNG   |   |           | |###|   |1|PAYOUT       |
-  |           | +-------+ |             |   |           | +-------+ |             |
-  |           +-----------+             |   |           +-----------+             |
+  |           | '-------' |             |   |           | '-------' |             |
+  |           '-----------'             |   |           '-----------'             |
   |                                     |   |                                     |
-  |  0=WENIG GEWINNE    1=STANDARD      |   |  0=LITTLE GAININGS   1=DEFAULT      |
-  |  2=MEHR GEWINNE     3=VIELE GEWIN.  |   |  2=MORE GAININGS    3=MANY GAININGS |
+  | 0 = WENIG GEWINNE   1 = STANDARD    |   | 0 = LITTLE GAININGS  1 = DEFAULT    |
+  | 2 = MEHR GEWINNE    3 = VIELE GEWIN |   | 2 = MORE GAININGS    3 = MANY GAINS |
   |                                     |   |                                     |
   |                                     |   |                                     |
   |   PM 1987 - BECK D-6330 WETZLAR     |   |   PM 1987 - BECK D-6330 WETZLAR     |
-  |_____________________________________|   |_____________________________________|
+  '-------------------------------------'   '-------------------------------------'
 
 
   * Royale
@@ -901,8 +900,55 @@
      CPU (01-21) --'    '-----------------'           CPU (01-21) --'    '-----------------'
 
 
-************************************************************************************
+*********************************************************************************************
 
+  Wing W90-3 system
+  -----------------
+
+  This system is built on the Golden Poker hardware platform, with several key enhancements:
+
+  ROM Configuration:
+
+  The board features 5 sockets compatible with 2732 or 2764 program ROMs.
+  Each ROM's output enable (OE) pin is connected to a 74LS138 decoder, which dynamically
+  switches ROM banks by enabling/disabling individual devices based on the higher CPU
+  address lines as the selector.
+
+  Sound System:
+
+  Utilizes two SN76489AN Programmable Sound Generators (PSGs), with the second being an
+  adition not present in the original design.
+  Currently supported games initialize both PSGs at addresses 2400h and 2800h, though only
+  the one at 2400h is actively used.
+  A READY line, tied to PIA1 port A, is monitored to ensure proper system operation.
+
+  Color System:
+
+  Includes three N82S129AN bipolar PROMs, one for each R-G-B channel, enabling an extended
+  color palette. This design supports banked or enhanced graphics by leveraging the additional
+  palette capabilities.
+
+
+  Hardware Notes:
+
+  PCB is etched "WING 8510-A" and "W90-3"
+
+  - CPU:            1x UM6502.
+  - Video:          1x MC68B45.
+  - RAM:            1x HM6116LP-3, 1x TMS4016-20
+  - I/O             2x EF6821 PIAs.
+  - PRG ROMs:       5x 2732/2764 sockets.
+  - GFX ROMs:       3x 2716/2732/2764 sockets.
+  - Bipolar PROMs   3x N82S129AN (R-G-B).
+  - Sound:          2x SN76489AN. (one is not present).
+
+  - 1x 10 MHz Xtal.
+  - 1x 8 DIP switches bank.
+  - 1x (reset?) simple switch.
+  - 2x (22 + 10 pins) edge connector.
+
+
+*********************************************************************************************
 
   -----------------------------------------------
   ***  Memory Map (pmpoker/goldnpkr hardware) ***
