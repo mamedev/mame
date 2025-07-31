@@ -125,7 +125,7 @@ void k054539_device::sound_stream_update(sound_stream &stream)
 			lval = rval = 0;
 		rbase[reverb_pos] = 0;
 
-		for(int ch=0; ch<8; ch++)
+		for(int ch=0; ch<8; ch++) {
 			if(BIT(regs[0x22c], ch)) {
 				unsigned char *base1 = regs + 0x20*ch;
 				unsigned char *base2 = regs + 0x200 + 0x2*ch;
@@ -294,6 +294,8 @@ void k054539_device::sound_stream_update(sound_stream &stream)
 					base1[0x0e] = cur_pos>>16 & 0xff;
 				}
 			}
+		}
+
 		reverb_pos = (reverb_pos + 1) & 0x1fff;
 		stream.put_int(0, sample, lval, 32768);
 		stream.put_int(1, sample, rval, 32768);

@@ -20,8 +20,8 @@
 
 DEFINE_DEVICE_TYPE(K054338, k054338_device, "k054338", "Konami 054338 Mixer")
 
-k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K054338, tag, owner, clock),
+k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, K054338, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_alpha_inv(0),
 	m_k055555(*this, finder_base::DUMMY_TAG)
@@ -67,12 +67,11 @@ u16 k054338_device::register_r(offs_t offset)
 
 void k054338_device::update_all_shadows(int rushingheroes_hack, palette_device &palette)
 {
-	int i, d;
 	int noclip = m_regs[K338_REG_CONTROL] & K338_CTL_CLIPSL;
 
-	for (i = 0; i < 9; i++)
+	for (int i = 0; i < 9; i++)
 	{
-		d = m_regs[K338_REG_SHAD1R + i] & 0x1ff;
+		int d = m_regs[K338_REG_SHAD1R + i] & 0x1ff;
 		if (d >= 0x100) d -= 0x200;
 		m_shd_rgb[i] = d;
 	}
@@ -148,10 +147,10 @@ int k054338_device::set_alpha_level(int pblend)
 	if (!pblend) return 255;
 
 	// sanitize input
-	pblend &= 0b11;
+	pblend &= 3;
 
 	const u8 mixset = m_regs[K338_REG_PBLEND + (pblend >> 1 & 1)] >> (~pblend << 3 & 8);
-	int mixlv  = mixset & 0x1f;
+	int mixlv = mixset & 0x1f;
 
 	if (m_alpha_inv) mixlv = 0x1f - mixlv;
 
