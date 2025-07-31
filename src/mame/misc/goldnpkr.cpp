@@ -13148,9 +13148,8 @@ ROM_END
 
 void goldnpkr_state::init_vkdlsa()
 {
-	/* $e097-e098, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e097-e098, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13160,9 +13159,8 @@ void goldnpkr_state::init_vkdlsa()
 
 void goldnpkr_state::init_vkdlsb()
 {
-	/* $e87b-e87c, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e87b-e87c, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13172,9 +13170,8 @@ void goldnpkr_state::init_vkdlsb()
 
 void goldnpkr_state::init_vkdlsc()
 {
-	/* $453a-453b, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $453a-453b, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13184,9 +13181,8 @@ void goldnpkr_state::init_vkdlsc()
 
 void goldnpkr_state::init_vkdlsww()
 {
-	/* $f2c9-f2ca, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $f2c9-f2ca, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13196,9 +13192,8 @@ void goldnpkr_state::init_vkdlsww()
 
 void goldnpkr_state::init_vkdlswwa()
 {
-	/* $df80-df81, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $df80-df81, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13208,9 +13203,8 @@ void goldnpkr_state::init_vkdlswwa()
 
 void goldnpkr_state::init_vkdlswwc()
 {
-	/* $e42f-e430, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e42f-e430, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13220,9 +13214,8 @@ void goldnpkr_state::init_vkdlswwc()
 
 void goldnpkr_state::init_vkdlswwd()
 {
-	/* $e442-e443, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e442-e443, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13232,9 +13225,8 @@ void goldnpkr_state::init_vkdlswwd()
 
 void goldnpkr_state::init_vkdlswwh()
 {
-	/* $e4d5-e4d6, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e4d5-e4d6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13244,9 +13236,8 @@ void goldnpkr_state::init_vkdlswwh()
 
 void goldnpkr_state::init_vkdlswwl()
 {
-	/* $e87c-e87d, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e87c-e87d, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13256,9 +13247,8 @@ void goldnpkr_state::init_vkdlswwl()
 
 void goldnpkr_state::init_vkdlswwo()
 {
-	/* $e7d5-e7d6, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e7d5-e7d6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13268,9 +13258,8 @@ void goldnpkr_state::init_vkdlswwo()
 
 void goldnpkr_state::init_vkdlswwp()
 {
-	/* $e7d9-e7da, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e7d9-e7da, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13280,9 +13269,8 @@ void goldnpkr_state::init_vkdlswwp()
 
 void goldnpkr_state::init_vkdlswwr()
 {
-	/* $e7f7-e7f8, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e7f7-e7f8, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13292,9 +13280,8 @@ void goldnpkr_state::init_vkdlswwr()
 
 void goldnpkr_state::init_vkdlswws()
 {
-	/* $e8a5-e8a6, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e8a5-e8a6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13304,9 +13291,8 @@ void goldnpkr_state::init_vkdlswws()
 
 void goldnpkr_state::init_vkdlswwt()
 {
-	/* $e955-e956, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e955-e956, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13316,9 +13302,8 @@ void goldnpkr_state::init_vkdlswwt()
 
 void goldnpkr_state::init_vkdlswwu()
 {
-	/* $ee6b-ee6c, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $ee6b-ee6c, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13328,9 +13313,8 @@ void goldnpkr_state::init_vkdlswwu()
 
 void goldnpkr_state::init_vkdlswwv()
 {
-	/* $f052-f053, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $f052-f053, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
