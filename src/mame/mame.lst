@@ -43032,6 +43032,9 @@ biortmfp
 bitgrpha
 bitgrphb
 
+@source:skeleton/blaucds32.cpp
+blaucds32
+
 @source:skeleton/bolsaint.cpp
 bolsaint
 
