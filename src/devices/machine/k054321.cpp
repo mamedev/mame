@@ -81,7 +81,9 @@ void k054321_device::device_start()
 
 void k054321_device::device_reset()
 {
+	m_active = 0;
 	m_volume = 0;
+	propagate_volume();
 }
 
 void k054321_device::device_add_mconfig(machine_config &config)
