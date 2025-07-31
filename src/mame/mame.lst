@@ -19916,6 +19916,9 @@ talkingfb
 @source:handheld/teammate.cpp
 teammate
 
+@source:handheld/vegaplus.cpp
+vegaplus
+
 @source:handheld/wildfire.cpp
 wildfire
 
@@ -35497,6 +35500,7 @@ dgunl3202
 fcpocket
 goretrop
 lxpcli
+lxpcpp
 lxpcsp
 matet100
 matet220
@@ -35504,6 +35508,7 @@ matet300
 myaasa
 myaass
 mymman
+retror30
 rminitv
 typo240
 
@@ -43252,6 +43257,7 @@ waveterm
 
 @source:skeleton/evolution_handheld.cpp
 evolhh
+smkatsum
 
 @source:skeleton/extrema_m27sv.cpp
 multgmxl
@@ -46654,6 +46660,7 @@ teentit
 tsbuzz
 
 @source:tvgames/generalplus_gp327902.cpp
+chikawac
 sanxpet
 sanxpeta
 tomyegg
@@ -46735,8 +46742,10 @@ bfmpac
 bfpacman
 bfspyhnt
 bftetris
+dsgnpal
 punirune
 siddr
+smkcatch
 wiwcs
 
 @source:tvgames/generalplus_gpl162xx_lcdtype.cpp
@@ -46745,9 +46754,12 @@ pcp8728
 bkid218
 
 @source:tvgames/generalplus_gpl32612.cpp
+airobo
 anpanm19
 arcadege
+ardancem
 dmnslayg
+intrtvg
 jak_swbstrik
 jak_tmnthp
 jak_dchp
@@ -46758,6 +46770,7 @@ kidizmp
 pdcm2
 pocketmp
 pocketmr
+smatomo
 zippity
 zippityuk
 
@@ -46787,6 +46800,7 @@ afbp4
 rs70_648
 
 @source:tvgames/myaatari.cpp
+kuniotv
 myaatari
 
 @source:tvgames/pubint_storyreader.cpp
@@ -46842,6 +46856,7 @@ comil
 ddr33v
 decathln
 decathlna
+dinothun
 dmbtjunc
 doraglob
 doraglobf
@@ -46886,6 +46901,7 @@ rocksock
 senspeed
 senwfit
 smartcyc
+spidm2
 swclone
 tiktokmm
 tmntbftc
