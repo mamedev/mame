@@ -19916,6 +19916,9 @@ talkingfb
 @source:handheld/teammate.cpp
 teammate
 
+@source:handheld/vegaplus.cpp
+vegaplus
+
 @source:handheld/wildfire.cpp
 wildfire
 
