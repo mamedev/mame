@@ -97,6 +97,8 @@ ROM_START(lotoplayb)
 	ROM_LOAD("lp_vii_sch_mostra_11302_68705p3s.bin", 0x0000, 0x0800, CRC(61b426d3) SHA1(b66dc6c382a04d8cdbaee342f179ce80abfd3c71))
 ROM_END
 
+// Sets with PIC16C54.
+
 ROM_START(lotoplayp)
 	ROM_REGION(0x1fff, "maincpu", 0)
 	ROM_LOAD("loto_play_ff46_pic16c54.bin",          0x0000, 0x1fff, CRC(8840349d) SHA1(e9dcc572c7b577618ddda06be1538be69eb15584))
