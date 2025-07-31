@@ -182,7 +182,6 @@ private:
 	memory_share_creator<uint8_t> m_bkungfu_tileram;
 
 	required_region_ptr<uint8_t> m_blitterdatarom;
-
 };
 
 
@@ -226,7 +225,8 @@ uint8_t m62_bkungfu_state::bkungfu_blitter_r(offs_t offset)
 	// it also checks 0102, 0106, 0118, 011c before sending command 0x0c to draw high score data?
 	// we initialize these to 0xfe when the MCU is 'reset'
 
-	logerror("%s: bkungfu_blitter_r %04x\n", machine().describe_context(), offset);
+	if (!machine().side_effects_disabled())
+		logerror("%s: bkungfu_blitter_r %04x\n", machine().describe_context(), offset);
 
 	return m_blittercmdram[offset];
 }
@@ -241,7 +241,7 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, 
 		return;
 
 	uint16_t data_address;
-	uint8_t* dataptr;
+	const uint8_t *dataptr;
 
 	uint8_t poslow_attr;
 	uint8_t poshigh_attr;
@@ -265,7 +265,6 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, 
 		col_attr = 4;
 	}
 
-
 	uint8_t blitdat = dataptr[data_address++];
 	while (blitdat != 0x00)
 	{
@@ -283,7 +282,6 @@ void m62_bkungfu_state::bkungfu_blitter_draw_text_inner(uint16_t blitterromptr, 
 		else
 		{
 			uint16_t position = (m_blittercmdram[poshigh_attr] << 8) | m_blittercmdram[poslow_attr];
-
 
 			bkungfu_blitter_tilemap_w((position) & 0xfff, blitdat);
 			bkungfu_blitter_tilemap_w((position + 1) & 0xfff, m_blittercmdram[col_attr]);
@@ -331,10 +329,10 @@ void m62_bkungfu_state::bkungfu_blitter_draw_4_tile_column_row(int column, int r
 
 	for (int i = 0; i < 8; i += 2)
 	{
-		m_bkungfu_tileram[offset+i] = tile;
-		m_bkungfu_tileram[offset+i+1] = attr;
+		m_bkungfu_tileram[offset + i] = tile;
+		m_bkungfu_tileram[offset + i + 1] = attr;
 
-		m_bg_tilemap->mark_tile_dirty((offset+i) >> 1);
+		m_bg_tilemap->mark_tile_dirty((offset + i) >> 1);
 
 	}
 }
@@ -498,8 +496,8 @@ void m62_bkungfu_state::bkungfu_blitter_set_player_energy(int x, int y, uint8_t 
 	if (num > 8)
 		return;
 
-	uint8_t energy_table_player[9] = { 0xc2, 0xcb, 0xca, 0xc9, 0xc8, 0xc7, 0xc6, 0xc5, 0xc4 };
-	uint8_t energy_table_boss[9] = { 0xc2, 0xd3, 0xd2, 0xd1, 0xd0, 0xcf, 0xce, 0xcd, 0xcc };
+	constexpr uint8_t energy_table_player[9] = { 0xc2, 0xcb, 0xca, 0xc9, 0xc8, 0xc7, 0xc6, 0xc5, 0xc4 };
+	constexpr uint8_t energy_table_boss[9] = { 0xc2, 0xd3, 0xd2, 0xd1, 0xd0, 0xcf, 0xce, 0xcd, 0xcc };
 
 	int position = (y * 0x40) + x; // 0x40 tiles per line
 	position <<= 1; // 2 bytes per entry in tilemap
