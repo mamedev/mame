@@ -22,13 +22,9 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K054539, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
-	, m_flags(0)
-	, m_reverb_pos(0)
-	, m_cur_ptr(0)
-	, m_rom_addr(0)
+	, m_flags(RESET_FLAGS)
 	, m_stream(nullptr)
 	, m_timer(nullptr)
-	, m_timer_state(0)
 	, m_timer_handler(*this)
 	, m_apan_cb(*this)
 {
@@ -78,6 +74,9 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 
 void k054539_device::init_flags(int flags)
 {
+	if(started())
+		m_stream->update();
+
 	m_flags = flags;
 }
 
@@ -323,6 +322,8 @@ void k054539_device::init_chip()
 
 	m_reverb_pos = 0;
 	m_cur_ptr = 0;
+	m_rom_addr = 0;
+	m_timer_state = 0;
 	memset(&m_ram[0], 0, 0x8000);
 
 	m_stream = stream_alloc(0, 2, clock() / 384);
@@ -351,9 +352,9 @@ void k054539_device::write(offs_t offset, u8 data)
 
 		/* The K054539 has behavior like many other wavetable chips including
 		   the Ensoniq 550x and Gravis GF-1: if a voice is active, writing
-		   to it's current position is silently ignored.
+		   to its current position is silently ignored.
 
-		   Dadandaan depends on this or the vocals go wrong.
+		   Dadandarn depends on this or the vocals go wrong.
 		*/
 		if(offset < 8*0x20)
 		{
@@ -504,8 +505,6 @@ void k054539_device::device_start()
 	// resolve delegates
 	m_apan_cb.resolve();
 
-	m_flags = RESET_FLAGS;
-
 	/*
 	    I've tried various equations on volume control but none worked consistently.
 	    The upper four channels in most MW/GX games simply need a significant boost
@@ -514,7 +513,7 @@ void k054539_device::device_start()
 	    values smaller than those of the hihats. Needless to say the two K054539 chips
 	    in Mystic Warriors are completely out of balance. Rather than forcing a
 	    "one size fits all" function to the voltab the current invert exponential
-	    appraoch seems most appropriate.
+	    approach seems most appropriate.
 	*/
 	// Factor the 1/4 for the number of channels in the volume (1/8 is too harsh, 1/2 gives clipping)
 	// vol=0 -> no attenuation, vol=0x40 -> -36dB
@@ -541,7 +540,7 @@ void k054539_device::device_reset()
 	m_regs[0x22c] = 0;
 	m_regs[0x22f] = 0;
 	memset(&m_ram[0], 0, 0x8000);
-	m_timer->enable(false);
+	m_timer->adjust(attotime::never);
 }
 
 
