@@ -163,13 +163,14 @@ void stella8085_state::io_map(address_map &map)
 
 uint8_t stella8085_state::lw_r()
 {
-	// SPIN!! :D
-	return 0x0F;
+	// SPIN?
+	return 0xFF;
 }
 
 void stella8085_state::machine1_w(uint8_t data)
 {
 	// SPIN!! :D
+	LOG("M1 A %d B %d\n",BIT(0,data),BIT(1,data));
 	;
 }
 
@@ -598,7 +599,7 @@ void stella8085_state::doppelpot(machine_config &config)
 
 	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
-	m_uart->out_p2_callback().set(FUNC(stella8085_state::machine1_w));
+	m_uart->out_p2_callback().set(FUNC(stella8085_state::machine1_w)); //M1-4
     m_uart->in_p1_callback().set(FUNC(stella8085_state::lw_r));
     m_uart->out_p1_callback().set(FUNC(stella8085_state::machine2_w));
 
