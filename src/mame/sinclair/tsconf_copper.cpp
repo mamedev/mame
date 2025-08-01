@@ -60,7 +60,7 @@ void tsconf_copper_device::cl_data_w(u16 addr, u8 data)
 
 void tsconf_copper_device::dma_ready_w(int status)
 {
-	if(m_en && (status & 1) && (m_cl_data[m_pc] & 0xff0f) == 0b1111'0100'0000'0001)
+	if(m_en && (status & 1) && (m_cl_data[m_pc] & 0xffff) == 0b1111'1011'1111'0001)
 	{
 		++m_pc;
 		m_timer->adjust(attotime::from_hz(clock()), 0);
@@ -85,7 +85,22 @@ TIMER_CALLBACK_MEMBER(tsconf_copper_device::timer_callback)
 				++m_pc;
 				break;
 
-			case 0b0100: // WAIT
+			case 0b0111: // WAITX
+				if (param == 0b1111'0111)
+					++m_pc;
+				else
+				{
+					const u8 x = data & 0xff;
+					if (x < 224)
+						m_timer->adjust(m_in_until_pos_cb(0x8000 | x), 0b1111'0111);
+					else
+						m_timer->reset();
+					return;
+				}
+				break;
+
+			case 0b1011: // WAITY
+				if (BIT(data, 4, 4) == 0b1111) // WAIT event
 				{
 					const u8 event = data & 0x0f;
 					if (event == param)
@@ -112,25 +127,10 @@ TIMER_CALLBACK_MEMBER(tsconf_copper_device::timer_callback)
 
 						}
 					}
+					break;
 				}
-				break;
-
-			case 0b0111: // WAITX
-				if (param == 0b1111'0111)
-					++m_pc;
-				else
-				{
-					const u8 x = data & 0xff;
-					if (x < 224)
-						m_timer->adjust(m_in_until_pos_cb(0x8000 | x), 0b1111'0111);
-					else
-						m_timer->reset();
-					return;
-				}
-				break;
-
-			case 0b1010: // WAITY
-			case 0b1011:
+				[[fallthrough]];
+			case 0b1010:
 				if (param == 0b1111'1010)
 					++m_pc;
 				else

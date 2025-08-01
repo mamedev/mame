@@ -125,7 +125,6 @@ void tsconfdma_device::start_tx(u8 task, bool s_align, bool d_align, bool align_
 
 	m_tx_block_num = 0;
 	m_tx_block = 0;
-	// Below is not precise. Clock must match but amount of cycles available depends how much left after screen line rendering based on presented tiles/sprites.
 	m_dma_clock->adjust(attotime::from_ticks(1, clock() / 6), 0, attotime::from_ticks(1, clock() / 6));
 }
 
