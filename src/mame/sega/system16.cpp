@@ -3687,6 +3687,9 @@ ROM_START( ddcrewbl )
 	ROM_LOAD16_BYTE( "14.bin", 0x240000, 0x20000, CRC(8780712e) SHA1(05ab2f7b108e0ae139237665da14f33132fb555e) )
 	ROM_LOAD16_BYTE( "18.bin", 0x240001, 0x20000, CRC(94b69d68) SHA1(e49ac664f4a5576737db9b9a7eee34b8c5fcd333) )
 
+	ROM_REGION( 0x1000, "pic", ROMREGION_ERASE00 )
+	ROM_LOAD( "pic16c57", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0xc0000, "tiles", 0 ) // same as original
 	ROM_LOAD( "fac-03.bin", 0x00000, 0x40000, CRC(2228cd88) SHA1(5774bb6a401c3da05c5f3c9d3996b20bb3713cb2) )
 	ROM_LOAD( "fac-02.bin", 0x40000, 0x40000, CRC(edba8e10) SHA1(25a2833ead4ca363802ddc2eb97c40976502921a) )
@@ -3721,6 +3724,10 @@ ROM_START( cltchitrbl ) // same PCB as ddcrewbl
 	ROM_LOAD16_BYTE( "6.prg", 0x200000, 0x10000, CRC(d62845fc) SHA1(92bd3b2a6f9e78c1a1e93e6f8ea887ab2fd440c3) ) // x1xxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "8.prg", 0x200001, 0x10000, CRC(bd0d1c7d) SHA1(6a3d2740e0547ad634dc5cac5e00b5ad877d0b55) ) // x1xxxxxxxxxxxxxx = 0xFF
 
+	ROM_REGION( 0x1000, "pic", ROMREGION_ERASE00 )
+	ROM_LOAD( "pic16c57", 0x0000, 0x1000, NO_DUMP )
+
+	
 	ROM_REGION( 0xc0000, "tiles", 0 ) // same as original, but for very minor differences in 1.gfx1
 	ROM_LOAD( "3.gfx1", 0x000000, 0x40000, CRC(0451f5f3) SHA1(5069edddf29a8190a73dc467b91ffcb80348aff6) )
 	ROM_LOAD( "2.gfx1", 0x040000, 0x40000, CRC(d7bd63fe) SHA1(ea5cf70db1303dd4564215fde824305637b97d05) )
@@ -4015,6 +4022,18 @@ void segas1x_bootleg_state::init_ddcrewbl()
 	init_common();
 }
 
+void segas1x_bootleg_state::init_bloxeedbl()
+{
+	init_common();
+	init_sys18bl_oki();
+
+	// HACK: patch out undumped MCU handshake for now
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	rom[0x508 / 2] = 0x6100;
+	rom[0x50a / 2] = 0x020a;
+}
+
 
 void segas1x_bootleg_state::altbeastbl_gfx_w(offs_t offset, uint16_t data)
 {
@@ -4155,4 +4174,4 @@ GAME( 1989, shdancbl,    shdancer,  shdancbl,      shdancbl, segas1x_bootleg_sta
 GAME( 1989, shdancbla,   shdancer,  shdancbla,     shdancbl, segas1x_bootleg_state,  init_shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, ddcrewbl,    ddcrew,    ddcrewbl,      ddcrewbl, segas1x_bootleg_state,  init_ddcrewbl,   ROT0,   "bootleg", "D. D. Crew (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 GAME( 1990, cltchitrbl,  cltchitr,  ddcrewbl,      ddcrewbl, segas1x_bootleg_state,  init_ddcrewbl,   ROT0,   "bootleg", "Clutch Hitter (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
-GAME( 1990, bloxeedbl,   bloxeed,   bloxeedbl,     tetris,   segas1x_bootleg_state,  init_sys18bl_oki,ROT0,   "bootleg (Impeuropex)", "Bloxeed (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // P8749H MCU isn't dumped, used for protection?
+GAME( 1990, bloxeedbl,   bloxeed,   bloxeedbl,     tetris,   segas1x_bootleg_state,  init_bloxeedbl,  ROT0,   "bootleg (Impeuropex)", "Bloxeed (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // P8749H MCU isn't dumped, used for protection
