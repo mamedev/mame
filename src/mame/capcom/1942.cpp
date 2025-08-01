@@ -198,25 +198,18 @@ void _1942_state::bankswitch_w(uint8_t data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::scanline)
 {
+	// interrupts at scanline specified in PROM
 	int scanline = param;
+	uint8_t irq = m_irqprom[scanline & 0xff];
 
-	if (scanline == 0x2c) // audio irq point 1
-		m_audiocpu->set_input_line(0, HOLD_LINE);
+	// RST 08h at scanline 0x6d (writes to the soundlatch and drives freeze dip-switch)
+	// RST 10h at scanline 0xf0 (vblank)
+	if (irq & 8)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, (irq & 1) ? 0xcf : 0xd7);
 
-	if (scanline == 0x6d) // periodic irq (writes to the soundlatch and drives freeze dip-switch), + audio irq point 2
-	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* Z80 - RST 08h */
+	// 4 audio interrupts per frame
+	if (irq & 4)
 		m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
-
-	if (scanline == 0xaf) // audio irq point 3
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-
-	if (scanline == 0xf0) // vblank-out irq, audio irq point 4
-	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h - vblank */
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
 }
 
 
@@ -732,11 +725,13 @@ ROM_START( 1942 )
 	ROM_REGION( 0x0100, "sprprom", 0 )
 	ROM_LOAD( "sb-8.k3",  0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "sb-1.k6",  0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing */
+
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "sb-2.d1",  0x0000, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
 	ROM_LOAD( "sb-3.d2",  0x0100, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
-	ROM_LOAD( "sb-1.k6",  0x0200, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "sb-9.m11", 0x0300, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0200, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
 ROM_START( 1942a )
@@ -781,11 +776,13 @@ ROM_START( 1942a )
 	ROM_REGION( 0x0100, "sprprom", 0 )
 	ROM_LOAD( "sb-8.k3",  0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "sb-1.k6",  0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing */
+
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "sb-2.d1",  0x0000, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
 	ROM_LOAD( "sb-3.d2",  0x0100, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
-	ROM_LOAD( "sb-1.k6",  0x0200, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "sb-9.m11", 0x0300, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0200, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
 /* this is the same as the 1942a set, but with a different rom arrangement (larger roms), it appears to be a common bootleg */
@@ -827,11 +824,13 @@ ROM_START( 1942abl )
 	ROM_REGION( 0x0100, "sprprom", 0 )
 	ROM_LOAD( "sb-8.k3",  0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "sb-1.k6",  0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing */
+
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "sb-2.d1",  0x0000, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
 	ROM_LOAD( "sb-3.d2",  0x0100, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
-	ROM_LOAD( "sb-1.k6",  0x0200, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "sb-9.m11", 0x0300, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0200, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
 /* set contained only three program ROMs, other ROMs should be checked against a real PCB */
@@ -877,11 +876,13 @@ ROM_START( 1942h )
 	ROM_REGION( 0x0100, "sprprom", 0 )
 	ROM_LOAD( "sb-8.k3",  0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "sb-1.k6",  0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing */
+
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "sb-2.d1",  0x0000, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
 	ROM_LOAD( "sb-3.d2",  0x0100, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
-	ROM_LOAD( "sb-1.k6",  0x0200, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "sb-9.m11", 0x0300, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0200, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
 ROM_START( 1942b )
@@ -926,11 +927,13 @@ ROM_START( 1942b )
 	ROM_REGION( 0x0100, "sprprom", 0 )
 	ROM_LOAD( "sb-8.k3",  0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "sb-1.k6",  0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing */
+
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "sb-2.d1",  0x0000, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
 	ROM_LOAD( "sb-3.d2",  0x0100, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
-	ROM_LOAD( "sb-1.k6",  0x0200, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "sb-9.m11", 0x0300, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0200, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
 ROM_START( 1942w )
@@ -975,11 +978,13 @@ ROM_START( 1942w )
 	ROM_REGION( 0x0100, "sprprom", 0 )
 	ROM_LOAD( "sb-8.k3",  0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "sb-1.k6",  0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing */
+
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "sb-2.d1",  0x0000, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
 	ROM_LOAD( "sb-3.d2",  0x0100, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
-	ROM_LOAD( "sb-1.k6",  0x0200, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "sb-9.m11", 0x0300, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0200, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
 
