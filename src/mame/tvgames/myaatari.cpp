@@ -91,7 +91,7 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 2021, myaatari,      0,              0,      myaatari, myaatari, myaatari_state, empty_init, "DreamGear", "My Arcade Atari (DGUNL-7013, Micro Player Pro)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, myaatari,      0,              0,      myaatari, myaatari, myaatari_state, empty_init, "dreamGEAR", "My Arcade Atari (DGUNL-7013, Micro Player Pro)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // HDMI stick, runs the Famicom titles using an emulator
 CONS( 2021, kuniotv,       0,              0,      myaatari, myaatari, myaatari_state, empty_init, "Lithon", "Kunio-kun TV (5-in-1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
