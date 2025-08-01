@@ -523,8 +523,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(commando_state::scanline)
 	const int scanline = param;
 	const uint8_t irq = m_irqprom[scanline & 0xff];
 
-	// RST 08h at scanline 115 (unused)
-	// RST 10h at scanline 246 (vblank)
+	// RST 08h at scanline 109 (unused)
+	// RST 10h at scanline 240 (vblank)
 	if (irq & 8)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc7 | (irq << 3 & 0x18));
 
