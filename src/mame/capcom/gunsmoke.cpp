@@ -96,15 +96,16 @@ class gunsmoke_state : public driver_device
 public:
 	gunsmoke_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_scrollx(*this, "scrollx"),
 		m_scrolly(*this, "scrolly"),
 		m_spriteram(*this, "spriteram"),
-		m_mainbank(*this, "mainbank"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_mainbank(*this, "mainbank")
 	{ }
 
 	void gunsmoke(machine_config &config);
@@ -115,6 +116,12 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
 	// memory pointers
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -122,11 +129,6 @@ private:
 	required_shared_ptr<uint8_t> m_scrolly;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_memory_bank m_mainbank;
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -554,13 +556,15 @@ void gunsmoke_state::machine_reset()
 void gunsmoke_state::gunsmoke(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 12_MHz_XTAL / 4);   // 3 MHz Verified on PCB by jotego
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // 3 MHz Verified on PCB by jotego
 	m_maincpu->set_addrmap(AS_PROGRAM, &gunsmoke_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gunsmoke_state::irq0_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 12_MHz_XTAL / 4));  // 3 MHz, actually inside a 85H001 CAPCOM custom
-	audiocpu.set_addrmap(AS_PROGRAM, &gunsmoke_state::sound_map);
-	audiocpu.set_periodic_int(FUNC(gunsmoke_state::irq0_line_hold), attotime::from_ticks(384*262/4, 12_MHz_XTAL / 2));
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 4); // 3 MHz, actually inside a 85H001 CAPCOM custom
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gunsmoke_state::sound_map);
+
+	const attotime audio_irq_period = attotime::from_ticks(384 * 262 / 4, 12_MHz_XTAL / 2);
+	m_audiocpu->set_periodic_int(FUNC(gunsmoke_state::irq0_line_hold), audio_irq_period);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
