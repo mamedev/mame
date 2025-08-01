@@ -150,7 +150,7 @@ enum
 	PORT_B_DOOR_SOUT
 };
 
-// U1 and U5 handle outputs
+// outputs
 enum
 {
 	U1_1MA,
@@ -175,7 +175,7 @@ enum
 	U5_EMUX2
 };
 
-// U10 handles inputs
+// inputs
 enum
 {
 	U10_OUTLI,
@@ -233,8 +233,6 @@ private:
 
 uint8_t stellafr_state::mux_r()
 {
-	// U10
-
 	bool li = false;
 	bool emp = false;
 	bool ma = false;
@@ -280,12 +278,10 @@ void stellafr_state::mux_w(uint8_t data)
 	LOG("EnMUX/MUXMA  %d\n",enmux);
 	LOG("EnANZ2       %d\n",enanz2);
 	LOG("EnMUX2       %d\n",enmux2);
-	// U5
 }
 
 void stellafr_state::mux2_w(uint8_t data)
 {
-	// U1
 	bool ma1   = BIT(data,U1_1MA);
 	bool ma2   = BIT(data,U1_2MA);
 	bool me    = BIT(data,U1_ME);
