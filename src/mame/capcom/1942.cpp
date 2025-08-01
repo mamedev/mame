@@ -199,13 +199,13 @@ void _1942_state::bankswitch_w(uint8_t data)
 TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::scanline)
 {
 	// interrupts at scanline specified in PROM
-	int scanline = param;
-	uint8_t irq = m_irqprom[scanline & 0xff];
+	const int scanline = param;
+	const uint8_t irq = m_irqprom[(scanline - 6) & 0xff];
 
-	// RST 08h at scanline 0x6d (writes to the soundlatch and drives freeze dip-switch)
-	// RST 10h at scanline 0xf0 (vblank)
+	// RST 08h at scanline 115 (writes to the soundlatch and drives freeze dip-switch)
+	// RST 10h at scanline 246 (vblank)
 	if (irq & 8)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, (irq & 1) ? 0xcf : 0xd7);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc7 | (irq << 3 & 0x18));
 
 	// 4 audio interrupts per frame
 	if (irq & 4)
@@ -592,10 +592,10 @@ void _1942_state::_1942(machine_config &config)
 	Z80(config, m_maincpu, MAIN_CPU_CLOCK);    /* 3 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_1942_state::_1942_map);
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(_1942_state::scanline), "screen", 0, 1);
-
 	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);  /* 3 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &_1942_state::sound_map);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(_1942_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1942);
@@ -603,7 +603,7 @@ void _1942_state::_1942(machine_config &config)
 	PALETTE(config, m_palette, FUNC(_1942_state::_1942_palette), 64*4+4*32*8+16*16, 256);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK/2, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	m_screen->set_raw(MASTER_CLOCK/2, 384, 128, 0, 262, 16+6, 240+6); // hsync is 50..77, vsync is 257..259
 	m_screen->set_screen_update(FUNC(_1942_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -662,7 +662,7 @@ void _1942p_state::_1942p(machine_config &config)
 	PALETTE(config, m_palette, FUNC(_1942p_state::_1942p_palette), 0x500, 0x400);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK/2, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	m_screen->set_raw(MASTER_CLOCK/2, 384, 128, 0, 262, 16+6, 240+6); // hsync is 50..77, vsync is 257..259
 	m_screen->set_screen_update(FUNC(_1942p_state::screen_update));
 	m_screen->set_palette(m_palette);
 

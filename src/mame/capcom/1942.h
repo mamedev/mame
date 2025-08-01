@@ -67,13 +67,13 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_fg_videoram;
 	required_shared_ptr<uint8_t> m_bg_videoram;
 	optional_region_ptr<uint8_t> m_irqprom;
 
-	/* video-related */
+	// video-related
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
 	int m_palette_bank = 0;
