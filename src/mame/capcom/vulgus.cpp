@@ -236,11 +236,6 @@ void vulgus_state::video_start()
 
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 47);
 
-	m_bg_tilemap->set_scrolldx(128, 128);
-	m_bg_tilemap->set_scrolldy(6, 6);
-	m_fg_tilemap->set_scrolldx(128, 128);
-	m_fg_tilemap->set_scrolldy(6, 6);
-
 	save_item(NAME(m_palette_bank));
 }
 
@@ -326,7 +321,7 @@ void vulgus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		if (row == 2) row = 3;
 
 		for (; row >= 0; row--)
-			gfx->transpen(bitmap, cliprect, code + row, color, flip, flip, sx + 128, sy + 6 + 16 * row * dir, 15);
+			gfx->transpen(bitmap, cliprect, code + row, color, flip, flip, sx, sy + 16 * row * dir, 15);
 	}
 }
 
@@ -347,7 +342,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vulgus_state::scanline)
 {
 	// interrupts at scanline specified in PROM
 	const int scanline = param;
-	const uint8_t irq = m_irqprom[(scanline - 6) & 0xff];
+	const uint8_t irq = m_irqprom[scanline & 0xff];
 
 	// RST 08h at scanline 115 (unused)
 	// RST 10h at scanline 246 (vblank)
@@ -611,7 +606,7 @@ void vulgus_state::vulgus(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(12_MHz_XTAL / 2, 384, 128, 0, 262, 16+6, 240+6); // hsync is 50..77, vsync is 257..259
+	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(vulgus_state::screen_update));
 	screen.set_palette(m_palette);
 

@@ -306,11 +306,6 @@ void commando_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(commando_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(commando_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_bg_tilemap->set_scrolldx(128, 128);
-	m_bg_tilemap->set_scrolldy(6, 6);
-	m_fg_tilemap->set_scrolldx(128, 128);
-	m_fg_tilemap->set_scrolldy(6, 6);
-
 	m_fg_tilemap->set_transparent_pen(3);
 }
 
@@ -339,7 +334,7 @@ void commando_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 
 		if (bank < 3)
-			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx + 128, sy + 6, 15);
+			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 15);
 	}
 }
 
@@ -526,7 +521,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(commando_state::scanline)
 {
 	// interrupts at scanline specified in PROM
 	const int scanline = param;
-	const uint8_t irq = m_irqprom[(scanline - 6) & 0xff];
+	const uint8_t irq = m_irqprom[scanline & 0xff];
 
 	// RST 08h at scanline 115 (unused)
 	// RST 10h at scanline 246 (vblank)
@@ -575,7 +570,7 @@ void commando_state::commando(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MAIN / 2, 384, 128, 0, 262, 16+6, 240+6); // hsync is 50..77, vsync is 257..259
+	screen.set_raw(MAIN / 2, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(commando_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);

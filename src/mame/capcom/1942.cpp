@@ -200,7 +200,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::scanline)
 {
 	// interrupts at scanline specified in PROM
 	const int scanline = param;
-	const uint8_t irq = m_irqprom[(scanline - 6) & 0xff];
+	const uint8_t irq = m_irqprom[scanline & 0xff];
 
 	// RST 08h at scanline 115 (writes to the soundlatch and drives freeze dip-switch)
 	// RST 10h at scanline 246 (vblank)
@@ -603,7 +603,7 @@ void _1942_state::_1942(machine_config &config)
 	PALETTE(config, m_palette, FUNC(_1942_state::_1942_palette), 64*4+4*32*8+16*16, 256);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK/2, 384, 128, 0, 262, 16+6, 240+6); // hsync is 50..77, vsync is 257..259
+	m_screen->set_raw(MASTER_CLOCK/2, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	m_screen->set_screen_update(FUNC(_1942_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -662,7 +662,7 @@ void _1942p_state::_1942p(machine_config &config)
 	PALETTE(config, m_palette, FUNC(_1942p_state::_1942p_palette), 0x500, 0x400);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK/2, 384, 128, 0, 262, 16+6, 240+6); // hsync is 50..77, vsync is 257..259
+	m_screen->set_raw(MASTER_CLOCK/2, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	m_screen->set_screen_update(FUNC(_1942p_state::screen_update));
 	m_screen->set_palette(m_palette);
 
