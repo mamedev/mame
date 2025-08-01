@@ -97,7 +97,7 @@ Connectors:
 #include "sound/dac.h"
 #include "speaker.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 #include "stellafr.lh"
@@ -246,14 +246,14 @@ uint8_t stellafr_state::mux_r()
 
 	uint8_t data = 0x00;
 
-	if (li)   data |= (1 << 0);
-    if (emp)  data |= (1 << 1);
-    if (ma)   data |= (1 << 2);
-    if (st)   data |= (1 << 3);
-    if (t)    data |= (1 << 4);
-    if (t2)   data |= (1 << 5);
-    if (emp2) data |= (1 << 6);
-    if (li2)  data |= (1 << 7);
+	if (li)   data |= (1 << U10_OUTLI);
+    if (emp)  data |= (1 << U10_OUTEMP);
+    if (ma)   data |= (1 << U10_OUTMA);
+    if (st)   data |= (1 << U10_OUTST);
+    if (t)    data |= (1 << U10_OUTT);
+    if (t2)   data |= (1 << U10_OUTT2);
+    if (emp2) data |= (1 << U10_EMP2);
+    if (li2)  data |= (1 << U10_LI2);
 
 	return data;
 }
@@ -262,14 +262,14 @@ void stellafr_state::mux_w(uint8_t data)
 {
 	//m_mux_data++;
 	//m_mux_data &= 0x0f;
-	bool enma   = BIT(data,0);
-	bool enme2  = BIT(data,1);
-	bool aw     = BIT(data,2);
-	bool aw2    = BIT(data,3);
-	bool enanz  = BIT(data,4); //enable 7seg
-	bool enmux  = BIT(data,5); //enable lamps/buttons
-	bool enanz2 = BIT(data,6);
-	bool enmux2 = BIT(data,7);
+	bool enma   = BIT(data,U5_ENM);
+	bool enme2  = BIT(data,U5_ENME2);
+	bool aw     = BIT(data,U5_AW);
+	bool aw2    = BIT(data,U5_AW2);
+	bool enanz  = BIT(data,U5_ENSTANZ); //enable 7seg
+	bool enmux  = BIT(data,U5_MUXMA); //enable lamps/buttons
+	bool enanz2 = BIT(data,U5_EANZ2);
+	bool enmux2 = BIT(data,U5_EMUX2);
 
 	LOG("\nmux_w()\n");
 	LOG("EnMa         %d\n",enma);
@@ -286,14 +286,14 @@ void stellafr_state::mux_w(uint8_t data)
 void stellafr_state::mux2_w(uint8_t data)
 {
 	// U1
-	bool ma1   = BIT(data,0);
-	bool ma2   = BIT(data,1);
-	bool me    = BIT(data,2);
-	bool data3 = BIT(data,3);
-	bool anz   = BIT(data,4); //main 7seg led out
-	bool mux   = BIT(data,5); //main lamps out
-	bool anz2  = BIT(data,6);
-	bool mux2  = BIT(data,7);
+	bool ma1   = BIT(data,U1_1MA);
+	bool ma2   = BIT(data,U1_2MA);
+	bool me    = BIT(data,U1_ME);
+	bool data3 = BIT(data,U1_D3OUT);
+	bool anz   = BIT(data,U1_ANZ); //main 7seg led out
+	bool mux   = BIT(data,U1_MUX); //main lamps out
+	bool anz2  = BIT(data,U1_ANZME2);
+	bool mux2  = BIT(data,U1_MUX2);
 
 	LOG("\nmux2_w()\n");
 	LOG("1MA      %d\n",ma1);
