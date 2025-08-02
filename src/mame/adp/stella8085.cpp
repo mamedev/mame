@@ -622,6 +622,15 @@ void stella8085_state::excellent(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::small_program_map);
 }
 
+ROM_START( bahia )
+    ROM_REGION( 0x8000, "maincpu", 0 )
+    ROM_LOAD( "bahia_pr1", 0x0000, 0x1000, CRC(41e7f89c) SHA1(933334e2f78a91e24ec0132b8e7757da5a9d2e02) )
+    ROM_LOAD( "bahia_pr2", 0x1000, 0x1000, CRC(ab06262a) SHA1(435f16002054f010e1349f2dbc998a2e5eb50c70) )
+    ROM_LOAD( "bahia_pr3", 0x2000, 0x1000, CRC(6aecba71) SHA1(5a522329b0aeb7707014f3879adfbaf963aed27d) )
+    ROM_LOAD( "bahia_pr4", 0x3000, 0x1000, CRC(bf6a989f) SHA1(bdd24b82f6f60ac42f83e5c4b68607c14929028f) )
+    ROM_LOAD( "bahia_pr5", 0x4000, 0x1000, CRC(70622047) SHA1(a4e33bfd56c862ca2b130a96828d9d15eae7a5b2) )
+    ROM_LOAD( "bahia_pr6", 0x7000, 0x1000, CRC(0373bee7) SHA1(4c0a31feab21872fee7ecd6a04933c0df050b99f) )
+ROM_END
 
 ROM_START( dicemstr ) // curiously hand-written stickers say F3 but strings in ROM are F2
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -647,7 +656,7 @@ ROM_START( doppelstart )
 ROM_END
 
 ROM_START( disc )
-	ROM_REGION( 0x8000, "maincpu", 0 ) // Assuming a total size for all ROMs combined
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "disc_eprom1_2732.bin", 0x0000, 0x1000, CRC(b9d1f518) SHA1(3a49b248eeb77767e8274a8be523678d7b4aa7d0) )
 	ROM_LOAD( "disc_eprom2_2732.bin", 0x1000, 0x1000, CRC(f55fba7c) SHA1(941f2653cb48836bb46f0903f64c3e9d32e67f46) )
 	ROM_LOAD( "disc_eprom3_2732.bin", 0x2000, 0x1000, CRC(bd05e77a) SHA1(9e2b5ad6de3eb36cb1f588906a2a10e512b79ce8) )
@@ -740,6 +749,7 @@ ROM_END
 } // anonymous namespace
 
 GAMEL( 1982, excellent,   0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1983, bahia,       0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Bahia",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1984, disc,        0, excellent, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1985, doppelstart, 0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelstart",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1986, doppelpot,   0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
