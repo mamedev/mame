@@ -4422,7 +4422,6 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 		</part>
 	</software>
 
-	<!--  -->
 	<software name="bgorillaa" cloneof="bgorilla" supported="partial">
 		<description>Battle Gorilla (alt)</description>
 		<year>1988</year>
@@ -34659,7 +34658,6 @@ To test Jast Sound: during gameplay press * numpad then enter twice (first comma
 		<!-- PC8801 -->
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="天使たちの午後"/>
-		<!--  -->
 		<info name="usage" value="Uses optional Jast Sound, enable it by -centronics covox"/>
 		<!--combined image-->
 		<!--rom name="tenshi-tachi no gogo.d88" size="827952" crc="44b55927" sha1="81579d738bc062538459c10cf0980eef9a8971f1"/-->
@@ -49111,7 +49109,6 @@ Doesn't load, throws "Bad allocation table" with a Disk Basic FILES command, is 
 		</part>
 	</software>
 
-	<!--  -->
 	<software name="fanteatra" cloneof="fanteatr" supported="no">
 		<description>Fantastic Eaters (alt)</description>
 		<year>19??</year>
