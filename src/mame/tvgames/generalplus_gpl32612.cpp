@@ -302,6 +302,28 @@ ROM_START( anpanm19 )
 	ROM_LOAD( "25l1280.u3", 0x0000, 0x1000000, CRC(7932fb3e) SHA1(a381eeba5357fe71e4d6081b9b91b57e5705f7f1) )
 ROM_END
 
+ROM_START( smatomo )
+	ROM_REGION(  0x400000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx25l3206e.ic3", 0x0000, 0x400000, CRC(fb4d1684) SHA1(98cecd7ead52118028cb3a1de71cb3528cd81be5) )
+ROM_END
+
+ROM_START( intrtvg )
+	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
+
+	DISK_REGION( "sdcard" ) // 4GB SD Card
+	DISK_IMAGE( "interactivetv", 0, SHA1(7061e28c4560b763bda1157036b79c726387e430) )
+ROM_END
+
+ROM_START( ardancem )
+	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(ba2cdacd) SHA1(d47829ee5310140665146262a44e0ba91942f25c) )
+
+	DISK_REGION( "sdcard" ) // 16GB SD Card
+	DISK_IMAGE( "ardancemat", 0, SHA1(df8cb065f5ce0ca863b205549ecc4c27647f9954) )
+ROM_END
+
+
 ROM_START( pdcm2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
@@ -316,6 +338,14 @@ ROM_START( arcadege )
 
 	ROM_REGION( 0x8400000, "nand", ROMREGION_ERASE00 )
 	ROM_LOAD( "tc58nvg0s3eta00.u3", 0x0000, 0x8400000, CRC(9b4db25e) SHA1(7e3d7e15f2592efd98027440c3761179c95e4417) )
+ROM_END
+
+ROM_START( airobo )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x22000000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg2s0hta00.bin", 0x0000, 0x22000000, CRC(6cfa4600) SHA1(152c04532ae2587dea590d169e87534924f5ea89) )
 ROM_END
 
 
@@ -390,6 +420,14 @@ CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_g
 // uses GPL32610 - 「それいけ！アンパンマン」スポーツ育脳マット
 CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "JoyPalette",        "Anpanman: Sports Ikunou Mat (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+// unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
+CONS( 201?, smatomo,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Smatomo (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// very generic packaging, boots from SPI, has game data on SD card (mostly NES games)
+CONS( 202?, intrtvg,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "Interactive Game Console (Model B608, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// also very generic packaging, similar SD card content to above, including NES games, but with some extra music/videos for the dance part
+CONS( 202?, ardancem,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Dance Mat (Model DM02, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
 // unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now
 // ROM has 'GPNandTag2' header rather than the usual
 // 鬼滅の刃 全集中パッド（グリーン)
@@ -413,3 +451,7 @@ CONS( 2009, pdcm2,           0,        0,      gpl32612, gpl32612, generalplus_g
 
 // uses a GPL32600A-003A-QL141
 CONS( 200?, arcadege,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Millennium 2000 GmbH",        "Millennium Arcade Genius SE",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses a GP326813
+// 学習おうえんAI★ミラクルロボ
+CONS( 2020, airobo,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Benesse Corporation",        "Gakushuu Ouen AI Miracle Robo",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

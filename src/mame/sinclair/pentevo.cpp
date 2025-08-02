@@ -733,7 +733,7 @@ void pentevo_state::pentevo(machine_config &config)
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(pentevo_state::spi_miso_w));
 
-	SPEAKER(config, "speakers", 2).front();
+	SPEAKER(config.replace(), "speakers", 2).front();
 
 	AY_SLOT(config.replace(), "ay_slot", 14_MHz_XTAL / 8, default_ay_slot_devices, "ay_ym2149")
 		.add_route(0, "speakers", 0.50, 0)

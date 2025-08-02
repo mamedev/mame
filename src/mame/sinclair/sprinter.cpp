@@ -1984,7 +1984,7 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->zc_callback<0>().append(m_maincpu, FUNC(z84c015_device::txcb_w));
 	m_maincpu->zc_callback<2>().set(m_maincpu, FUNC(z84c015_device::trg3));
 
-	SPEAKER(config, "speakers", 2).front();
+	SPEAKER(config.replace(), "speakers", 2).front();
 
 	config.device_remove("ay_slot");
 	AY8910(config, "ay8912", X_SP / 24)

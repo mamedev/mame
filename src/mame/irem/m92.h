@@ -100,7 +100,7 @@ protected:
 	void coincounter_w(u8 data);
 	void bankswitch_w(u8 data);
 	void sound_reset_w(u16 data);
-	void sprite_dma();
+	void sprite_dma(int amount);
 	void dmacontrol_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void videocontrol_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 spriteram_r(offs_t offset);

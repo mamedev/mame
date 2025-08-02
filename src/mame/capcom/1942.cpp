@@ -198,25 +198,18 @@ void _1942_state::bankswitch_w(uint8_t data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::scanline)
 {
-	int scanline = param;
+	// interrupts at scanline specified in PROM
+	const int scanline = param;
+	const uint8_t irq = m_irqprom[scanline & 0xff];
 
-	if (scanline == 0x2c) // audio irq point 1
-		m_audiocpu->set_input_line(0, HOLD_LINE);
+	// RST 08h at scanline 109 (writes to the soundlatch and drives freeze dip-switch)
+	// RST 10h at scanline 240 (vblank)
+	if (irq & 8)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc7 | (irq << 3 & 0x18));
 
-	if (scanline == 0x6d) // periodic irq (writes to the soundlatch and drives freeze dip-switch), + audio irq point 2
-	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* Z80 - RST 08h */
+	// 4 audio interrupts per frame
+	if (irq & 4)
 		m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
-
-	if (scanline == 0xaf) // audio irq point 3
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-
-	if (scanline == 0xf0) // vblank-out irq, audio irq point 4
-	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h - vblank */
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
 }
 
 
@@ -599,10 +592,10 @@ void _1942_state::_1942(machine_config &config)
 	Z80(config, m_maincpu, MAIN_CPU_CLOCK);    /* 3 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_1942_state::_1942_map);
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(_1942_state::scanline), "screen", 0, 1);
-
 	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);  /* 3 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &_1942_state::sound_map);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(_1942_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1942);
@@ -610,7 +603,7 @@ void _1942_state::_1942(machine_config &config)
 	PALETTE(config, m_palette, FUNC(_1942_state::_1942_palette), 64*4+4*32*8+16*16, 256);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK/2, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	m_screen->set_raw(MASTER_CLOCK/2, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	m_screen->set_screen_update(FUNC(_1942_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -669,7 +662,7 @@ void _1942p_state::_1942p(machine_config &config)
 	PALETTE(config, m_palette, FUNC(_1942p_state::_1942p_palette), 0x500, 0x400);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK/2, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	m_screen->set_raw(MASTER_CLOCK/2, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	m_screen->set_screen_update(FUNC(_1942p_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -732,11 +725,13 @@ ROM_START( 1942 )
 	ROM_REGION( 0x0100, "sprprom", 0 )
 	ROM_LOAD( "sb-8.k3",  0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "sb-1.k6",  0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing */
+
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "sb-2.d1",  0x0000, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
 	ROM_LOAD( "sb-3.d2",  0x0100, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
-	ROM_LOAD( "sb-1.k6",  0x0200, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "sb-9.m11", 0x0300, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0200, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
 ROM_START( 1942a )
@@ -781,11 +776,13 @@ ROM_START( 1942a )
 	ROM_REGION( 0x0100, "sprprom", 0 )
 	ROM_LOAD( "sb-8.k3",  0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "sb-1.k6",  0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing */
+
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "sb-2.d1",  0x0000, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
 	ROM_LOAD( "sb-3.d2",  0x0100, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
-	ROM_LOAD( "sb-1.k6",  0x0200, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "sb-9.m11", 0x0300, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0200, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
 /* this is the same as the 1942a set, but with a different rom arrangement (larger roms), it appears to be a common bootleg */
@@ -827,11 +824,13 @@ ROM_START( 1942abl )
 	ROM_REGION( 0x0100, "sprprom", 0 )
 	ROM_LOAD( "sb-8.k3",  0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "sb-1.k6",  0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing */
+
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "sb-2.d1",  0x0000, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
 	ROM_LOAD( "sb-3.d2",  0x0100, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
-	ROM_LOAD( "sb-1.k6",  0x0200, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "sb-9.m11", 0x0300, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0200, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
 /* set contained only three program ROMs, other ROMs should be checked against a real PCB */
@@ -877,11 +876,13 @@ ROM_START( 1942h )
 	ROM_REGION( 0x0100, "sprprom", 0 )
 	ROM_LOAD( "sb-8.k3",  0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "sb-1.k6",  0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing */
+
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "sb-2.d1",  0x0000, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
 	ROM_LOAD( "sb-3.d2",  0x0100, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
-	ROM_LOAD( "sb-1.k6",  0x0200, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "sb-9.m11", 0x0300, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0200, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
 ROM_START( 1942b )
@@ -926,11 +927,13 @@ ROM_START( 1942b )
 	ROM_REGION( 0x0100, "sprprom", 0 )
 	ROM_LOAD( "sb-8.k3",  0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "sb-1.k6",  0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing */
+
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "sb-2.d1",  0x0000, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
 	ROM_LOAD( "sb-3.d2",  0x0100, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
-	ROM_LOAD( "sb-1.k6",  0x0200, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "sb-9.m11", 0x0300, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0200, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
 ROM_START( 1942w )
@@ -975,11 +978,13 @@ ROM_START( 1942w )
 	ROM_REGION( 0x0100, "sprprom", 0 )
 	ROM_LOAD( "sb-8.k3",  0x0000, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "sb-1.k6",  0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing */
+
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "sb-2.d1",  0x0000, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
 	ROM_LOAD( "sb-3.d2",  0x0100, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
-	ROM_LOAD( "sb-1.k6",  0x0200, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
-	ROM_LOAD( "sb-9.m11", 0x0300, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0200, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
 

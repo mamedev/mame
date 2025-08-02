@@ -421,12 +421,24 @@ static INPUT_PORTS_START( mephisto )
 	PORT_CONFSETTING(    0x04, "2nd Model (4.194MHz)" )
 	PORT_CONFSETTING(    0x08, "3rd Model (2 XTALs)" )
 
+	PORT_START("PIECE")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("RES") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brikett_state::reset_button), 0)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mephistoj )
+static INPUT_PORTS_START( mephisto2 )
 	PORT_INCLUDE( mephisto )
+
+	PORT_MODIFY("PIECE")
+	PORT_CONFNAME( 0x01, 0x00, "Piece Notation" )
+	PORT_CONFSETTING(    0x01, DEF_STR( English ) ) // KQRBNP
+	PORT_CONFSETTING(    0x00, DEF_STR( German ) ) // KDTLSB
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mephistoj )
+	PORT_INCLUDE( mephisto2 )
 
 	PORT_MODIFY("IN.4") // 1 XTAL
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -436,7 +448,7 @@ static INPUT_PORTS_START( mephistoj )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mephistoe2 )
-	PORT_INCLUDE( mephisto )
+	PORT_INCLUDE( mephisto2 )
 
 	PORT_START("IN.5") // optional
 	PORT_CONFNAME( 0x01, 0x01, "ESB 6000 Board" )
@@ -492,6 +504,7 @@ void brikett_state::mephistoj(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &brikett_state::mephistoj_io);
 	m_maincpu->clear_cb().set(FUNC(brikett_state::clear_r));
 	m_maincpu->q_cb().set(m_display, FUNC(mephisto_display1_device::common_w));
+	m_maincpu->ef4_cb().set_ioport("PIECE"); // hardwired
 
 	const attotime irq_period = attotime::from_ticks(0x10000, 4.194304_MHz_XTAL); // through SAJ300T
 	CLOCK(config, m_irq_clock).set_period(irq_period);
@@ -681,12 +694,12 @@ ROM_END
 //    YEAR  NAME         PARENT      COMPAT  MACHINE      INPUT        STATE          INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1980, mephisto,    0,          0,      mephisto,    mephisto,    brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1981, mephisto1x,  0,          0,      mephisto2,   mephisto,    brikett_state, empty_init, "Hegener + Glaser", "Mephisto 1X", MACHINE_SUPPORTS_SAVE ) // France
+SYST( 1981, mephisto1x,  0,          0,      mephisto2,   mephisto2,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto 1X", MACHINE_SUPPORTS_SAVE ) // France
 SYST( 1982, mephistoj,   0,          0,      mephistoj,   mephistoj,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto Junior (1982 version)", MACHINE_SUPPORTS_SAVE ) // there's also a "Mephisto Junior" from 1990
 
-SYST( 1981, mephisto2,   0,          0,      mephisto2,   mephisto,    brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1981, mephisto2a,  mephisto2,  0,      mephisto2,   mephisto,    brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1981, mephisto2b,  mephisto2,  0,      mephisto2,   mephisto,    brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, mephisto2,   0,          0,      mephisto2,   mephisto2,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, mephisto2a,  mephisto2,  0,      mephisto2,   mephisto2,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, mephisto2b,  mephisto2,  0,      mephisto2,   mephisto2,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 3)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1981, mephistoe2,  0,          0,      mephistoe2,  mephistoe2,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II (ESB 6000 board)", MACHINE_SUPPORTS_SAVE )
 SYST( 1981, mephistoe2a, mephistoe2, 0,      mephistoe2a, mephistoe2a, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II (ESB II board)", MACHINE_SUPPORTS_SAVE )

@@ -444,6 +444,7 @@ void mz800_state::mz800(machine_config &config)
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set("z80pio", FUNC(z80pio_device::strobe_b)).invert();
 
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);

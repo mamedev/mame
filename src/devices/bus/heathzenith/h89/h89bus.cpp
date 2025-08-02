@@ -189,7 +189,7 @@ h89bus::addr_ranges device_heath_io_decoder_interface::scan_io_decoder_rom(u8 se
 		}
 		else if (found)
 		{
-			ranges.push_back(std::make_pair(first, last));
+			ranges.emplace_back(first, last);
 			found = false;
 		}
 	}
@@ -197,7 +197,7 @@ h89bus::addr_ranges device_heath_io_decoder_interface::scan_io_decoder_rom(u8 se
 	// make sure to include any ranges that extend to the end.
 	if (found)
 	{
-		ranges.push_back(std::make_pair(first, last));
+		ranges.emplace_back(first, last);
 	}
 
 	return ranges;

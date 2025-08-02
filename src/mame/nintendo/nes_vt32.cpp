@@ -438,10 +438,22 @@ ROM_START( lxpcli )
 	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(9df963c6) SHA1(e5cc7b48c31b761bb74b3e5e1563a16a0cefa272) )
 ROM_END
 
+ROM_START( lxpcpp )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(75728b87) SHA1(4b6d8cfd19ea5160f5486a4bd72c8cc708716d2c) )
+ROM_END
+
 ROM_START( typo240 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "240nes.u2", 0x00000, 0x1000000, CRC(d709f66c) SHA1(73ca34ce07a1a8782226bd74b1ae43fc6d7126e1) ) // s29gl128p90tfcr1
 ROM_END
+
+ROM_START( retror30 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl032n90tfi03.u2", 0x00000, 0x400000, CRC(dfb89ef7) SHA1(401539b73521e018e3af70b8019e6b59ba67fcad) )
+ROM_END
+
+
 
 } // anonymous namespace
 
@@ -468,6 +480,9 @@ CONS( 201?, mymman,    0,  0,  nes_vt32_8mb, nes_vt32, nes_vt32_unk_state, empty
 // most games work, a few minor graphical issues common to the same games in other units
 CONS( 202?, typo240,   0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "Typo", "Vintage Gamer 240-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
+// speed challenge doesn't work
+CONS( 2021, retror30,  0,  0,  nes_vt32_32mb,      nes_vt32, nes_vt32_unk_state, empty_init, "Orb Gaming", "Retro Racer (30-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
 // there's also a 250+ version of the unit below at least
 CONS( 2018, goretrop,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
 
@@ -486,3 +501,10 @@ CONS( 2016, fcpocket,  0,  0,  nes_vt32_4x16mb,   nes_vt32_fp, nes_vt32_unk_stat
 // aside from the boot screens these have no theming and all contain a barely disguised bootleg version of Nintendo's Pinball in the Games section
 CONS( 2020, lxpcsp,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Marvel Spider-Man", MACHINE_NOT_WORKING )
 CONS( 2020, lxpcli,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Lilo & Stitch", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcpp,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Paw Patrol", MACHINE_NOT_WORKING )
+// Power Console - Gabby's Dollhouse
+// Power Console - Disney Princess
+// Power Console - Frozen
+// Power Console - Generic EN/FR model
+// Power Console - Generic EN/ES model
+// Power Console - Generic EN/DE model

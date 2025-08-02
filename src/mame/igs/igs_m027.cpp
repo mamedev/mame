@@ -3775,7 +3775,7 @@ ROM_START( tshs ) // IGS PCB-0312-00. 2 banks of 8 switches. 1 PPI. IGS3590 + NT
 	ROM_LOAD( "u4", 0x00000, 0x80000, CRC(2588e70a) SHA1(cc4b17d61d5af4642191d7f9a9b40a57e81ce192) ) // no label
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "igs_t3702_anim_v100.u6", 0x00000, 0x80000, CRC(07294995) SHA1(47e0f33d6fa7447415b4af7d28c1af9c011b2f9e) )
+	ROM_LOAD( "igs_t3702_text_v100.u6", 0x00000, 0x80000, CRC(07294995) SHA1(47e0f33d6fa7447415b4af7d28c1af9c011b2f9e) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "igs_a3701_anim_v100.u8", 0x000000, 0x400000, CRC(bed56f35) SHA1(5a29d2a39fd997ed9ef0ec695c63629ee2303ce2) ) // FIXED BITS (xxxxxxxx0xxxxxxx)

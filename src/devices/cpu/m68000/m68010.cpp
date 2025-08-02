@@ -14,7 +14,7 @@ std::unique_ptr<util::disasm_interface> m68010_device::create_disassembler()
 
 
 m68010_device::m68010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_musashi_device(mconfig, tag, owner, clock, M68010, 16,24)
+	: m68010_device(mconfig, M68010, tag, owner, clock)
 {
 }
 

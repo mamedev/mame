@@ -14,8 +14,7 @@
 
 #pragma once
 
-class serial_vfd_device :
-	public device_t
+class serial_vfd_device : public device_t
 {
 public:
 	serial_vfd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -51,7 +50,6 @@ private:
 	uint16_t m_buff[16];
 
 	void run_command();
-
 };
 
 DECLARE_DEVICE_TYPE(SERIAL_VFD, serial_vfd_device)

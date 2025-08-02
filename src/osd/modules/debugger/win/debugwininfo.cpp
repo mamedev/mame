@@ -82,10 +82,9 @@ void debugwin_info::destroy()
 }
 
 
-bool debugwin_info::has_focus() const
+bool debugwin_info::owns_window(HWND win) const
 {
-	HWND focus_hwnd = GetFocus();
-	return m_wnd == focus_hwnd || IsChild(m_wnd, focus_hwnd);
+	return (win == m_wnd) || IsChild(m_wnd, win);
 }
 
 

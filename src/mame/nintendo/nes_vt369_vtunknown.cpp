@@ -1166,15 +1166,6 @@ CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, em
     (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB, different menus)
     Lexibook Console Colour - Barbie
 
-    (Handheld units, charged via USB-C, more educational focused, contain bootleg NES Pinball game in games section)
-    Power Console - Gabby's Dollhouse
-    Power Console - Disney Princess
-    Power Console - Stitch
-    Power Console - Frozen
-    Power Console - Generic EN/FR model
-    Power Console - Generic EN/ES model
-    Power Console - Generic EN/DE model
-    Power Console - Paw Patrol
 
     (units for use with TV)
     Lexibook Retro TV Game Console (300 Games) - Cars
@@ -1249,7 +1240,7 @@ CONS( 200?, tup240,     lpgm240,  0,  vt36x_swap_8mb,        vt369, vt36x_state,
 
 // VT369, but doesn't use most features
 CONS( 201?, unkra200,   mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "<unknown>",    "200 in 1 Retro Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 201?, dgun2577,   mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "DreamGear",    "My Arcade Retro Machine 200-in-1 (DGUN-2577)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, dgun2577,   mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "dreamGEAR",    "My Arcade Retro Machine 200-in-1 (DGUN-2577)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 201?, lxcyber,    mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "Lexibook",     "Cyber Arcade 200-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
  // menu is protected with code from extra ROM
 CONS( 201?, gtct885,    mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "Gaming Tech",  "Gaming Tech CT-885", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
@@ -1272,7 +1263,7 @@ CONS( 201?, lxcap,    0,      0,  vt36x_8mb, vt369, vt36x_tetrtin_state, empty_i
 CONS( 2022, nesvt270,    0,  0,  vt36x_16mb, vt369, vt36x_state, empty_init, "<unknown>", "unknown VT3xx based 270-in-1 (BL-867 PCB03)", MACHINE_NOT_WORKING )
 
 // VT369, but doesn't use most features
-CONS( 201?, myarccn,   0, 0,  vt36x_1mb, vt369, vt36x_state, empty_init, "DreamGear", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, myarccn,   0, 0,  vt36x_1mb, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // confirmed VT369, uses more features (including sound CPU)
 CONS( 201?, denv150,   0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

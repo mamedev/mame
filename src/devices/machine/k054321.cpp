@@ -81,7 +81,9 @@ void k054321_device::device_start()
 
 void k054321_device::device_reset()
 {
+	m_active = 0;
 	m_volume = 0;
+	propagate_volume();
 }
 
 void k054321_device::device_add_mconfig(machine_config &config)
@@ -125,8 +127,8 @@ void k054321_device::dummy_w(u8 data)
 
 void k054321_device::propagate_volume()
 {
-	double vol = pow(2, (m_volume - 40)/10.0);
+	float vol = powf(2.0f, (m_volume - 40)/10.0f);
 
-	m_speaker->set_input_gain(0, m_active & 2 ? vol * m_left_gain : 0.0);
-	m_speaker->set_input_gain(1, m_active & 1 ? vol * m_right_gain : 0.0);
+	m_speaker->set_input_gain(0, m_active & 2 ? vol * m_left_gain : 0.0f);
+	m_speaker->set_input_gain(1, m_active & 1 ? vol * m_right_gain : 0.0f);
 }

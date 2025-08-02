@@ -2191,7 +2191,7 @@ ROM_START( sstar97b )
 	ROM_LOAD16_BYTE( "bor_dun_5.u22", 0x40001, 0x20000, BAD_DUMP CRC(ca17a632) SHA1(d491310ccdbe9b59a1e607f9254646f20700d79d) )
 ROM_END
 
-// 钻石 II (Zuàn Shí II)
+// 钻石 II (Zuànshí II)
  // Has Bordun sticker on PCB and logo in game, but is it an original reskin or a hack?
 ROM_START( zuanshi2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2708,7 +2708,7 @@ GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miacti
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
 GAME( 199?, sstar97a,  sstar97,  sstar97,  sstar97,  skylncr_state,  init_sstar97a,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V168A)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, sstar97b,  sstar97,  sstar97,  sstar97b, skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153A)",   MACHINE_SUPPORTS_SAVE )
-GAME( 199?, zuanshi2,  sstar97,  sstar97,  sstar97b, skylncr_state,  empty_init,     ROT0, "Bordun International", "Zuan Shi II (version V153A)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 199?, zuanshi2,  sstar97,  sstar97,  sstar97b, skylncr_state,  empty_init,     ROT0, "Bordun International", "Zuanshi II (version V153A)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 199?, sstar97jb, sstar97,  sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 Jianan Ban",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
 GAME( 199?, hongmayi,  0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "bootleg",              "Hong Mayi",                                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption
 GAME( 199?, dbsha,     0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "bootleg",              "Da Bai Sha",                                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption

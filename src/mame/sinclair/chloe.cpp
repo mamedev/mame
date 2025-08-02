@@ -935,17 +935,17 @@ void chloe_state::chloe(machine_config &config)
 	PALETTE(config, m_palette, FUNC(chloe_state::spectrum_palette), 256);
 	SCREEN_ULA_PLUS(config, m_ula, 0).set_raster_offset(SCR_256x192.left(), SCR_256x192.top()).set_palette(m_palette->device().tag(), 0x000, 0x000);
 
-	SPEAKER(config, "speaker2", 2).front();
+	SPEAKER(config.replace(), "speakers", 2).front();
 
 	AY_SLOT(config.replace(), "ay_slot", 28_MHz_XTAL / 16, default_ay_slot_devices, "ay_turbosound")
-		.add_route(0, "speaker2", 0.50, 0)
-		.add_route(2, "speaker2", 0.25, 0)
-		.add_route(2, "speaker2", 0.25, 1)
-		.add_route(1, "speaker2", 0.50, 1);
+		.add_route(0, "speakers", 0.50, 0)
+		.add_route(2, "speakers", 0.25, 0)
+		.add_route(2, "speakers", 0.25, 1)
+		.add_route(1, "speakers", 0.50, 1);
 
 	DAC_8BIT_R2R(config, m_covox, 0)
-		.add_route(ALL_OUTPUTS, "speaker2", 0.75, 0)
-		.add_route(ALL_OUTPUTS, "speaker2", 0.75, 1);
+		.add_route(ALL_OUTPUTS, "speakers", 0.75, 0)
+		.add_route(ALL_OUTPUTS, "speakers", 0.75, 1);
 
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
