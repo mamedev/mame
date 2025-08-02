@@ -169,15 +169,12 @@ uint8_t stella8085_state::lw_r()
 
 void stella8085_state::machine1_w(uint8_t data)
 {
-	// SPIN!! :D
-	LOG("M1 A %d B %d\n",BIT(0,data),BIT(1,data));
-	;
+	popmessage("M1 A %d B %d\nM2 A %d B %d\nM3 A %d B %d\nM4 A %d B %d",BIT(0,data),BIT(1,data),BIT(2,data),BIT(3,data),BIT(4,data),BIT(5,data),BIT(6,data),BIT(7,data));
 }
 
 void stella8085_state::machine2_w(uint8_t data)
 {
-	// SPIN!! :D
-	;
+	popmessage("M5 A %d B %d\nM6 A %d B %d",BIT(4,data),BIT(5,data),BIT(6,data),BIT(7,data));
 }
 
 /*********************************************
