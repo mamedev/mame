@@ -344,7 +344,7 @@ void stella8085_state::io71(uint8_t data)
 
 	//rst55_w(rs);
 	if (gong)
-		LOG("GONG!!!!\n");
+		popmessage("GONG");
 	if (d60)
 		LOG("activating D60\n");
 	m_beep->set_output_gain(ALL_OUTPUTS,!dg);
