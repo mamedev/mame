@@ -126,6 +126,7 @@ public:
 		m_palette(*this, "palette"),
 		m_videoview0(*this, "videoview0"),
 		m_videoview1(*this, "videoview1"),
+		m_spriteram(*this, "spriteram"),
 		m_mainbank(*this, "mainbank"),
 		m_eeprom_out(*this, "EEPROMOUT")
 	{ }
@@ -161,12 +162,11 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	// views
+	// memory
 	memory_view m_videoview0;
 	memory_view m_videoview1;
-
+	required_shared_ptr<uint8_t> m_spriteram;
 	required_memory_bank m_mainbank;
-
 	required_ioport m_eeprom_out;
 
 	void eeprom_w(uint8_t data);
@@ -373,13 +373,12 @@ void vendetta_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankr(m_mainbank);
 	map(0x2000, 0x3fff).ram();
-
-	// what is the desired effect of overlapping these memory regions anyway?
 	map(0x4000, 0x7fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 
 	map(0x4000, 0x4fff).view(m_videoview0);
 	m_videoview0[0](0x4000, 0x4fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
-	m_videoview0[1](0x4000, 0x4fff).rw(m_k053246, FUNC(k053247_device::k053247_r), FUNC(k053247_device::k053247_w));
+	m_videoview0[1](0x4000, 0x4fff).ram().share(m_spriteram);
+
 	map(0x5f80, 0x5f9f).m(m_k054000, FUNC(k054000_device::map));
 	map(0x5fa0, 0x5faf).w(m_k053251, FUNC(k053251_device::write));
 	map(0x5fb0, 0x5fb7).w(m_k053246, FUNC(k053247_device::k053246_w));
@@ -395,21 +394,23 @@ void vendetta_state::main_map(address_map &map)
 	map(0x5fe6, 0x5fe7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
 	map(0x5fe8, 0x5fe9).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x5fea, 0x5fea).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+
 	map(0x6000, 0x6fff).view(m_videoview1);
 	m_videoview1[0](0x6000, 0x6fff).rw(FUNC(vendetta_state::K052109_r), FUNC(vendetta_state::K052109_w));
 	m_videoview1[1](0x6000, 0x6fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+
 	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
 }
 
 void vendetta_state::esckids_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();                         // 053248 64K SRAM
-	// what is the desired effect of overlapping these memory regions anyway?
 	map(0x2000, 0x5fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));            // 052109 (Tilemap)
 
-	map(0x2000, 0x2fff).view(m_videoview0);    // 052109 (Tilemap) 0x0000-0x0fff - 052109 (Tilemap)
+	map(0x2000, 0x2fff).view(m_videoview0);    // 052109 (Tilemap) 0x0000-0x0fff
 	m_videoview0[0](0x2000, 0x2fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
-	m_videoview0[1](0x2000, 0x2fff).rw(m_k053246, FUNC(k053247_device::k053247_r), FUNC(k053247_device::k053247_w));
+	m_videoview0[1](0x2000, 0x2fff).ram().share(m_spriteram);
+
 	map(0x3f80, 0x3f80).portr("P1");
 	map(0x3f81, 0x3f81).portr("P2");
 	map(0x3f82, 0x3f82).portr("P3");             // ???  (But not used)
@@ -425,9 +426,11 @@ void vendetta_state::esckids_map(address_map &map)
 	map(0x3fd6, 0x3fd7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)); // Sound
 	map(0x3fd8, 0x3fd9).r(m_k053246, FUNC(k053247_device::k053246_r));                // Sprite
 	map(0x3fda, 0x3fda).nopw();                // Not Emulated (Watchdog ???)
+
 	map(0x4000, 0x4fff).view(m_videoview1);    // Tilemap mask ROM bank selector (mask ROM Test)
 	m_videoview1[0](0x4000, 0x4fff).rw(FUNC(vendetta_state::K052109_r), FUNC(vendetta_state::K052109_w));
 	m_videoview1[1](0x4000, 0x4fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+
 	map(0x6000, 0x7fff).bankr(m_mainbank);                    // 053248 '975r01' 1M ROM (Banked)
 	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);  // 053248 '975r01' 1M ROM (0x18000-0x1ffff)
 }
@@ -564,7 +567,16 @@ void vendetta_state::vblank_irq(int state)
 
 		// OBJ DMA enabled
 		if (m_k053246->k053246_is_irq_enabled())
+		{
+			// TODO: implement sprite dma in k053246_k053247_k055673.cpp
+			uint16_t *dst;
+			m_k053246->k053247_get_ram(&dst);
+
+			for (int i = 0; i < 0x800; i++)
+				*dst++ = m_spriteram[i * 2] << 8 | m_spriteram[i * 2 + 1];
+
 			m_obj_busy->adjust(attotime::from_usec(250));
+		}
 	}
 }
 
@@ -622,7 +634,6 @@ void vendetta_state::vendetta(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240); // measured 59.17
 	m_screen->set_screen_update(FUNC(vendetta_state::screen_update));
 	m_screen->set_palette(m_palette);

@@ -461,6 +461,7 @@ uint32_t rungun_state::screen_update_rng_dual_right(screen_device &screen, bitma
 
 void rungun_state::sprite_dma_trigger(void)
 {
+	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
 	uint32_t src_address;
 
 	if (m_single_screen_mode)

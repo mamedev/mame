@@ -373,6 +373,7 @@ void moo_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void moo_state::moo_objdma()
 {
+	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
 	int num_inactive;
 	uint16_t *src, *dst;
 	int counter = m_k053246->k053247_get_dy();

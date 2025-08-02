@@ -409,6 +409,7 @@ void xexex_state::k053247_scattered_word_w(offs_t offset, uint16_t data, uint16_
 
 void xexex_state::xexex_objdma(int limiter)
 {
+	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
 	int counter, num_inactive;
 	uint16_t *src, *dst;
 

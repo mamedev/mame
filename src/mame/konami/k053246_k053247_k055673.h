@@ -240,9 +240,7 @@ public:
 				pri,
 				zcode, alpha, drawmode,
 				gx_objzbuf, gx_shdzbuf,
-				0, nullptr
-				);
-
+				0, nullptr);
 		}
 		else /* non-GX */
 		{
@@ -283,10 +281,7 @@ public:
 				0,
 				0, 0, 0,
 				nullptr, nullptr,
-				primask,whichtable
-				);
-
-
+				primask,whichtable);
 		}
 	}
 
@@ -312,7 +307,7 @@ public:
 		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
 		int zw,zh;
-		int  fx, fy, sx, sy;
+		int fx, fy, sx, sy;
 		int tempcode;
 
 		for (int y=0; y<height; y++)

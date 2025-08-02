@@ -357,13 +357,14 @@ void gijoe_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-void gijoe_state::gijoe_objdma(  )
+void gijoe_state::gijoe_objdma()
 {
+	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
 	uint16_t *src_head, *src_tail, *dst_head, *dst_tail;
 
 	src_head = m_spriteram;
 	src_tail = m_spriteram + 255 * 8;
-	m_k053246->k053247_get_ram( &dst_head);
+	m_k053246->k053247_get_ram(&dst_head);
 	dst_tail = dst_head + 255 * 8;
 
 	for (; src_head <= src_tail; src_head += 8)
