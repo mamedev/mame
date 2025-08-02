@@ -61,9 +61,7 @@ uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)
 	if(id != 2)
 	{
 		data = nscsi_full_device::scsi_get_data(id, pos);
-	}
-	else
-	{
+	} else {
 		int clba = lba + pos / bytes_per_sector;
 		if(clba != cur_lba) {
 			cur_lba = clba;
@@ -120,9 +118,7 @@ void nscsi_harddisk_device::scsi_command()
 		if(image->read(lba, block)) {
 			scsi_data_in(2, blocks*bytes_per_sector);
 			scsi_status_complete(SS_GOOD);
-		}
-		else
-		{
+		} else {
 			scsi_status_complete(SS_CHECK_CONDITION);
 			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
 		}
@@ -139,9 +135,7 @@ void nscsi_harddisk_device::scsi_command()
 		if(image->write(lba, block)) {
 			scsi_data_out(2, blocks*bytes_per_sector);
 			scsi_status_complete(SS_GOOD);
-		}
-		else
-		{
+		} else {
 			scsi_status_complete(SS_CHECK_CONDITION);
 			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
 		}

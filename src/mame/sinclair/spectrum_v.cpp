@@ -316,7 +316,7 @@ void spectrum_state::spectrum_refresh_w(offs_t offset, uint8_t data)
 	if (snow_pattern == 1)
 	{
 		const u8 r = (offset + 1) & 0x7f; // R must be already incremented during refresh. Consider z80 update.
-		const u8* base = snow_pattern1_base(i);
+		const u8 *const base = snow_pattern1_base(i);
 		m_screen_location[px_addr_hi | addr_lo] = base[px_addr_hi | r];
 		m_screen_location[attr_addr_hi | addr_lo] = base[attr_addr_hi | r];
 	}
@@ -333,7 +333,7 @@ void spectrum_state::spectrum_refresh_w(offs_t offset, uint8_t data)
 	m_screen_location[attr_addr_hi | addr_lo] = attr_tmp;
 }
 
-u8* spectrum_state::snow_pattern1_base(u8 i_reg)
+u8 *spectrum_state::snow_pattern1_base(u8 i_reg)
 {
 	return m_screen_location;
 }

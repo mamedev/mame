@@ -5,7 +5,7 @@
 
 #include "pl6_pic.h"
 
-#define LOG_PIC  	(1U << 1)
+#define LOG_PIC     (1U << 1)
 #define VERBOSE     ( LOG_PIC )
 
 #include "logmacro.h"
@@ -34,16 +34,16 @@ void pl6pic_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 
 void pl6pic_device::device_start()
 {
-    // Heartbeat LED flash
-    m_timer = timer_alloc(FUNC(pl6pic_device::heartbeat_callback), this);
-    m_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
-    save_item(NAME(m_heartbeat));
+	// Heartbeat LED flash
+	m_timer = timer_alloc(FUNC(pl6pic_device::heartbeat_callback), this);
+	m_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	save_item(NAME(m_heartbeat));
 	m_hb_led.resolve();
 }
 
 TIMER_CALLBACK_MEMBER(pl6pic_device::heartbeat_callback)
 {
-    if(m_heartbeat) m_heartbeat = 0;
+	if(m_heartbeat) m_heartbeat = 0;
 	else m_heartbeat = 1;
 	m_hb_led = m_heartbeat;
 }

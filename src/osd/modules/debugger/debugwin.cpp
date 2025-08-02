@@ -236,17 +236,16 @@ void debugger_windows::debugger_update()
 	if (!winwindow_has_focus() && m_machine && !m_machine->debugger().cpu().is_stopped() && (m_machine->phase() == machine_phase::RUNNING))
 	{
 		// check to see if a debugger window has focus
-		if (std::any_of(m_window_list.begin(), m_window_list.end(), [](auto const& window) { return window->has_focus(); }))
+		HWND const focuswnd = GetFocus();
+		if (std::any_of(m_window_list.begin(), m_window_list.end(), [focuswnd] (auto const &window) { return window->owns_window(focuswnd); }))
 		{
 			// see if the interrupt key is pressed and break if it is
 			if (seq_pressed())
 			{
-				HWND const focuswnd = GetFocus();
-
 				m_machine->debugger().debug_break();
 
 				// if we were focused on some window's edit box, reset it to default
-				for (auto& info : m_window_list)
+				for (auto &info : m_window_list)
 					info->restore_field(focuswnd);
 			}
 		}

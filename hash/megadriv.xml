@@ -31879,7 +31879,7 @@ No BGMs
 		<publisher>Electronic Arts</publisher>
 		<!-- TODO: starts off with music off (still coming from the dump?) -->
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sram"/>
+			<feature name="slot" value="rom_tplay96"/>
 			<!-- baddump: Sports non-default save, "Ghetto USA" instead of NY Yankees -->
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="triple play '96 (usa).bin" size="4194304" crc="f1748e91" sha1="c0981b524d5e1c5368f9e74a4ce9c57d87fe323a" status="baddump"/>
@@ -31895,7 +31895,7 @@ No BGMs
 		<publisher>Electronic Arts</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sram"/>
+			<feature name="slot" value="rom_tplay96"/>
 			<!-- baddump: Sports non-default save, "TODDs Team" instead of San Francisco -->
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="triple play gold (usa).bin" size="4194304" crc="bbe69017" sha1="007bee242384db1887c5831657470584ff77a163" status="baddump"/>
@@ -37500,6 +37500,8 @@ Black screen
 		<publisher>Titan</publisher>
 		<notes><![CDATA[
 Most effects fails
+Crashes at the very end
+https://jsgroth.dev/blog/posts/titan-overdrive/
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x400000">
@@ -37515,12 +37517,13 @@ Most effects fails
 		<year>2017</year>
 		<publisher>Titan</publisher>
 		<notes><![CDATA[
-Punts to a 0d2 B50D stack trace screen
-Tries to jump to jsr $a385b86.l (?) at PC=0x38b0, must be using its own mapper rather than ssf2
+Most effects fails
+https://jsgroth.dev/blog/posts/titan-overdrive-2-part-1/
+https://jsgroth.dev/blog/posts/titan-overdrive-2-part-2/
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_ssf2"/>
+			<feature name="slot" value="rom_titan"/>
 			<dataarea name="rom" width="16" endianness="big" size="16777216">
 				<rom name="titan-overdrive2.bin" size="8386056" crc="f0429fd6" sha1="603db0a214ee50c6c11e15c0d1d3bba919116d07" offset="00000"/>
 			</dataarea>

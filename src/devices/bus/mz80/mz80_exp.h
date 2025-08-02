@@ -77,6 +77,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(MZ80_EXP_SLOT, mz80_exp_slot_device)
 
+void mz800_exp_devices(device_slot_interface &device);
 void mz2500_exp_devices(device_slot_interface &device);
 
-#endif // MAME_MACHINE_PC8801_mz80_exp_H
+#endif // MAME_BUS_MZ80_MZ80_EXP_H

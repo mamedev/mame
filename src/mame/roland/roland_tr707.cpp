@@ -262,7 +262,6 @@ private:
 	static inline constexpr double VBE = 0.6;  // BJT base-emitter voltage drop.
 	static inline constexpr u16 MAX_CYMBAL_COUNTER = 0x8000;
 
-	static filter_biquad_device::biquad_params rc_bpf(double r1, double r2, double c1, double c2, bool crrc);
 	static double mux_dac_v(double v_eg, u8 data);
 
 	void advance_sample_w(offs_t offset, u16 data);
@@ -602,7 +601,7 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	for (int i = 0; i < MC_COUNT; ++i)
 	{
 		FILTER_BIQUAD(config, m_voice_bpf[i]);
-		m_voice_bpf[i]->setup(rc_bpf(bpf_comps[i][0], bpf_comps[i][1], bpf_comps[i][2], bpf_comps[i][3], false));
+		m_voice_bpf[i]->rc_cc_bandpass_setup(bpf_comps[i][0], bpf_comps[i][1], bpf_comps[i][2], bpf_comps[i][3]);
 		voices[i]->add_route(0, m_voice_bpf[i], 1.0);
 
 		FILTER_VOLUME(config, m_level[i]);
@@ -622,8 +621,8 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	// making it to the left and right output sockets.
 	auto &left_bpf = FILTER_BIQUAD(config, "left_out_bpf");
 	auto &right_bpf = FILTER_BIQUAD(config, "right_out_bpf");
-	left_bpf.setup(rc_bpf(RES_K(1), RES_K(47), CAP_U(10), CAP_U(0.01), true));  // R114, R112, C79, C76
-	right_bpf.setup(rc_bpf(RES_K(1), RES_K(47), CAP_U(10), CAP_U(0.01), true));  // R113, R111, C80, C77
+	left_bpf.rc_rr_bandpass_setup(RES_K(1), RES_K(47), CAP_U(10), CAP_U(0.01));  // R114, R112, C79, C76
+	right_bpf.rc_rr_bandpass_setup(RES_K(1), RES_K(47), CAP_U(10), CAP_U(0.01));  // R113, R111, C80, C77
 	m_left_mixer->add_route(0, left_bpf, 1.0);
 	m_right_mixer->add_route(0, right_bpf, 1.0);
 
@@ -653,49 +652,6 @@ void tr707_audio_device::device_reset()
 	update_master_volume();
 	for (int channel = 0; channel < MC_COUNT; ++channel)
 		update_mix(channel);
-}
-
-// Biquad parameters for an RC-based bandpass filter.
-// crrc == true:
-//   Vin -- C1 -- R1 -+---+- Vout
-//                    |   |
-//                    R2  C2
-//                    |   |
-//                   GND  GND
-// crrc == false:
-//   Vin -- R1 -+- C2 -+- Vout
-//              |      |
-//              C1     R2
-//              |      |
-//             GND    GND
-// TODO: move to sound/flt_biquad.
-filter_biquad_device::biquad_params tr707_audio_device::rc_bpf(double r1, double r2, double c1, double c2, bool crrc)
-{
-	// BPF transfer function: H(s) = (A * s) / (s ^ 2 + B * s + C)
-	// In the C-R-R-C configuration, we have:
-	//   A = 1 / (R1 * C2)
-	//   B = (R1 * C1 + R2 * C2 + R2 * C1) / (R1 * R2 * C1 * C2)
-	//   C = 1 / (R1 * R2 * C1 * C2)
-	// In the R-C-C-R configuration, we have:
-	//   A = 1 / (R1 * C1)
-	//   B = (R1 * C1 + R2 * C2 + R1 * C2) / (R1 * R2 * C1 * C2)
-	//   C = 1 / (R1 * R2 * C1 * C2)
-	// From the standard transfer function for BPFs, we have:
-	//   A = gain * (w / Q)
-	//   B = w / Q
-	//   C = w ^ 2
-	// The calculations of Fc, Q and gain below are derived from the
-	// equations above, with some algebra.
-
-	const double x = sqrt(r1 * r2 * c1 * c2);
-	const double y = crrc ? (r1 * c1 + r2 * c2 + r2 * c1) : (r1 * c1 + r2 * c2 + r1 * c2);
-	const double z = crrc ? (r2 * c1) : (r2 * c2);
-	filter_biquad_device::biquad_params params;
-	params.type = filter_biquad_device::biquad_type::BANDPASS;
-	params.fc = 1.0 / (2.0 * M_PI * x);
-	params.q = x / y;
-	params.gain = z / y;
-	return params;
 }
 
 // Computes the output voltage of the mux DAC circuit, given the voltage at the

@@ -83,7 +83,7 @@ void mcd212_device::update_matte_arrays()
 				case 0: // Disregard all commands in higher registers. See 5.10.2
 					matte_idx[matte] = 8;
 					break;
-				case 1: case 2:	case 3: case 5: case 7: case 10: case 11: // Not used
+				case 1: case 2: case 3: case 5: case 7: case 10: case 11: // Not used
 					break;
 				case 4: case 6: // Change weight of plane (A or B)
 					latched_wf[BIT(matte_op, 1)] = get_weight_factor(matte_idx[matte]);
@@ -318,15 +318,12 @@ int mcd212_device::get_border_width()
 	return width;
 }
 
-uint32_t mcd212_device::get_backdrop_plane() {
+uint32_t mcd212_device::get_backdrop_plane()
+{
 	if (BIT(m_image_coding_method, ICM_EV_BIT))
-	{
 		return 0; // External Video Background. Default to Black since there is no DVC.
-	}
 	else
-	{
 		return s_4bpp_color[m_backdrop_color];
-	}
 }
 
 template <int Path>
@@ -664,12 +661,10 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 	uint8_t *weight_b = &m_weight_factor[1][0];
 
 	// Console Verified. CLUT4 pixels are drawn in pairs during VSR. So the mosaic here is halved.
-	if (icmA == ICM_CLUT4) {
+	if (icmA == ICM_CLUT4)
 		mosaic_count_a >>= 1;
-	}
-	if (icmB == ICM_CLUT4) {
+	if (icmB == ICM_CLUT4)
 		mosaic_count_b >>= 1;
-	}
 
 	for (int x = 0; x < width; x++)
 	{

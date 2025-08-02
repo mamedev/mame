@@ -1,55 +1,55 @@
 // license:BSD-3-Clause
 // copyright-holders: NaokiS
 /*
-	Heber Pluto 6 FPGA
+    Heber Pluto 6 FPGA
 
-	The FPGA is the backbone of the Pluto 6 system and handles a lot of items.
+    The FPGA is the backbone of the Pluto 6 system and handles a lot of items.
 
-	Primarially it handles:
-		* Part of the initial boot security in conjunction with the Pluto 6 CPLD.
-		* Multiplexed inputs (32 or 64 through expansion)
-		* Multiplexed lamps (256 or 512 through expansion)
-		* Multiplexed LEDs (256 or 512 through expansion)
-		* Register to I2S conversion
-		* DMA requests for the DAC. This is probably an internally set timer at a fixed freq.
-		* 2x UART controllers (probably styled on mc68681s for programmer convenience)
-		* UART route mapping (all UART output ports are configurable)
-		* Part of the game protection
-		* GPU syncronisation
+    Primarially it handles:
+        * Part of the initial boot security in conjunction with the Pluto 6 CPLD.
+        * Multiplexed inputs (32 or 64 through expansion)
+        * Multiplexed lamps (256 or 512 through expansion)
+        * Multiplexed LEDs (256 or 512 through expansion)
+        * Register to I2S conversion
+        * DMA requests for the DAC. This is probably an internally set timer at a fixed freq.
+        * 2x UART controllers (probably styled on mc68681s for programmer convenience)
+        * UART route mapping (all UART output ports are configurable)
+        * Part of the game protection
+        * GPU syncronisation
 
-	Essentially, if you don't unlock it with a specific 256 byte (?), CRC obfuscated key,
-	 you won't be able to do much of anything with the ColdFire, just read the CF card, PIC18
-	 and the I2C bus, everything else is locked out.
-	
-	TODO:
-		* Sound
-		* UART
-		* GPU Sync (?)
-		* "receive" FPGA bitstream from PIC18
-		* Should outputs be implemented directly in here, rather than a call back?
+    Essentially, if you don't unlock it with a specific 256 byte (?), CRC obfuscated key,
+     you won't be able to do much of anything with the ColdFire, just read the CF card, PIC18
+     and the I2C bus, everything else is locked out.
 
-	"Bitstream" mappings:
-		Each manufacturer could have their own bitstream made which would rearrange the register
-		mapping, and change the CRC encoding and unlock key. It's possible this could be changed
-		between games but it seems mostly just manufacturer based on a brief glance. To add a 
-		mapping into this device, add a read and write function call and then add the manufacturer/ID
-		to the PlutoFPGA enum. Finally make sure to update the dev_r and dev_w functions so that 
-		the mapping can be used.
+    TODO:
+        * Sound
+        * UART
+        * GPU Sync (?)
+        * "receive" FPGA bitstream from PIC18
+        * Should outputs be implemented directly in here, rather than a call back?
 
-		It's possible that extra features could exist in some bitstreams, but it's unlikely this
-		would have been done. Heber did a good job of shoehorning as much as they could into the chip.
+    "Bitstream" mappings:
+        Each manufacturer could have their own bitstream made which would rearrange the register
+        mapping, and change the CRC encoding and unlock key. It's possible this could be changed
+        between games but it seems mostly just manufacturer based on a brief glance. To add a
+        mapping into this device, add a read and write function call and then add the manufacturer/ID
+        to the PlutoFPGA enum. Finally make sure to update the dev_r and dev_w functions so that
+        the mapping can be used.
 
-		Supported bitstreams:
-			* Developer 	- Note: Has no protection check, no CRC/key upload is needed.
-			* Betcom		- Partial mapping
-			* Top Dog		- Unimplemented
-			* Astra			- Unimplemented
-			* JPM			- Unimplemented
+        It's possible that extra features could exist in some bitstreams, but it's unlikely this
+        would have been done. Heber did a good job of shoehorning as much as they could into the chip.
 
-	Notes:
-		FPGA UART routing is currently split into two functions. This is mainly due to the fact
-			the FPGA has different register offsets for port 0 and port 1. ColdFire UART and the DUART
-			share a common register and thus function.
+        Supported bitstreams:
+            * Developer     - Note: Has no protection check, no CRC/key upload is needed.
+            * Betcom        - Partial mapping
+            * Top Dog       - Unimplemented
+            * Astra         - Unimplemented
+            * JPM           - Unimplemented
+
+    Notes:
+        FPGA UART routing is currently split into two functions. This is mainly due to the fact
+            the FPGA has different register offsets for port 0 and port 1. ColdFire UART and the DUART
+            share a common register and thus function.
 */
 
 #ifndef MAME_MACHINE_PL6_FPGA_H
@@ -149,12 +149,12 @@ private:
 	void uart_rxd(uint8_t device, int state);
 
 	uint8_t uart_route_map[6] = {
-		endpoint_invalid,	// ColdFire 0
-		endpoint_invalid,	// ColdFire 1
-		endpoint_invalid,	// FPGA UART 0
-		endpoint_invalid,	// FPGA UART 1
-		endpoint_invalid,	// DUART 0
-		endpoint_invalid	// DUART 1
+		endpoint_invalid,   // ColdFire 0
+		endpoint_invalid,   // ColdFire 1
+		endpoint_invalid,   // FPGA UART 0
+		endpoint_invalid,   // FPGA UART 1
+		endpoint_invalid,   // DUART 0
+		endpoint_invalid    // DUART 1
 	};
 
 	devcb_read32 input_cb;
@@ -170,15 +170,15 @@ private:
 	required_ioport m_in1;
 
 	enum{
-		GSYNC_EN 	= 0x10,
-		MPX_EN 		= 0x20,
-		FINT_EN 	= 0x40,
-		SFX_EN 		= 0x80
+		GSYNC_EN    = 0x10,
+		MPX_EN      = 0x20,
+		FINT_EN     = 0x40,
+		SFX_EN      = 0x80
 	};
 
 	// FPGA
 	int fpga_type;
-	
+
 	uint8_t xcra_reg;
 	uint8_t xuctrl_reg;
 	uint8_t xdurt_reg;
@@ -186,8 +186,8 @@ private:
 	uint8_t xfpurt1_reg;
 
 	// Lamps
-	uint8_t mpx_row;				// 0x00-0x0F range
-	uint32_t mpx_regs[16][8];		// MPX Lamp/LED state and period data.
+	uint8_t mpx_row;                // 0x00-0x0F range
+	uint32_t mpx_regs[16][8];       // MPX Lamp/LED state and period data.
 
 	// Mappings
 	void developer_map(address_map &map);
@@ -225,14 +225,14 @@ private:
 	void map_uart_endpoint(uint8_t device, uint8_t route);
 
 	enum {
-		endpoint_bacta 		= 0x00,
-		endpoint_rs232a 	= 0x01,
-		endpoint_rs232c 	= 0x02,
-		endpoint_rs232d 	= 0x03,
-		endpoint_cctalk1 	= 0x04,
-		endpoint_cctalk2 	= 0x05,
-		endpoint_ttl		= 0x06,
-		endpoint_rs485		= 0x07,
+		endpoint_bacta      = 0x00,
+		endpoint_rs232a     = 0x01,
+		endpoint_rs232c     = 0x02,
+		endpoint_rs232d     = 0x03,
+		endpoint_cctalk1    = 0x04,
+		endpoint_cctalk2    = 0x05,
+		endpoint_ttl        = 0x06,
+		endpoint_rs485      = 0x07,
 		endpoint_invalid
 	};
 

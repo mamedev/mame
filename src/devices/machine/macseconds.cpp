@@ -8,10 +8,10 @@
     (seconds since 1/1/1904 at midnight).
 */
 
-#include "dirtc.h"
-
 #include "emu.h"
 #include "macseconds.h"
+
+#include "dirtc.h"
 
 macseconds_interface::macseconds_interface()
 {
@@ -35,8 +35,7 @@ u32 macseconds_interface::get_local_seconds(system_time &systime)
 {
 	const system_time::full_time &time = systime.local_time;
 
-	return get_seconds(time.year - 2000, time.month + 1, time.mday, time.weekday + 1, time.hour,
-							  time.minute, time.second);
+	return get_seconds(time.year - 2000, time.month + 1, time.mday, time.weekday + 1, time.hour, time.minute, time.second);
 }
 
 u32 macseconds_interface::get_seconds(int year, int month, int day, int day_of_week, int hour, int minute, int second)

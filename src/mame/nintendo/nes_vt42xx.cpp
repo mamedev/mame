@@ -90,6 +90,7 @@ public:
 	void init_rfcp168();
 	void init_g9_666();
 	void init_hhgc319();
+	void init_bl339();
 
 protected:
 	uint8_t vt_rom_banked_r(offs_t offset);
@@ -419,6 +420,11 @@ ROM_START( rfcp168 )
 	ROM_LOAD( "winbond_w29gl128c.bin", 0x00000, 0x1000000, CRC(d11caf71) SHA1(64b269cee30a51549a2d0491bbeed07751771559) ) // ROM verified on 2 units
 ROM_END
 
+ROM_START( s10fake )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "s29gl064a90tfir4.bin", 0x00000, 0x800000, CRC(8ba78851) SHA1(d482fc56efbbdf6ff890b775144fd49ecaa1b539) )
+ROM_END
+
 ROM_START( g9_666 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "666in1.u1", 0x00000, 0x1000000, CRC(e3a98465) SHA1(dfec3e74e36aef9bfa57ec530c37642015569dc5) )
@@ -433,6 +439,12 @@ ROM_START( hhgc319 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl128n10tfi01.u3", 0x000000, 0x1000000, CRC(4b51125f) SHA1(bab3981ae1652cf6620c7c6769a6729a1e4d588f) )
 ROM_END
+
+ROM_START( bl339 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128n10tfi01.u3", 0x000000, 0x1000000, CRC(291cbd8c) SHA1(0b40b15dd8ba895e7fcaa806c9b6fd7309b37ff5) )
+ROM_END
+
 
 ROM_START( bittboy )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
@@ -538,10 +550,27 @@ void nes_vt42xx_state::init_hhgc319()
 		put_u16le(&romdata[i], bitswap<16>(get_u16le(&romdata[i]), 15, 14, 6, 5, 3, 2, 9, 8, 7, 13, 12, 4, 11, 10, 1, 0));
 }
 
+void nes_vt42xx_state::init_bl339()
+{
+	init_rfcp168();
+
+	// Even more pairs of address and data lines to swap here (but not the same lines as hhgc319)...
+	uint8_t *romdata = memregion("mainrom")->base();
+	for (offs_t i = 0; i < 0x1000000; i += 0x1000)
+		std::swap_ranges(&romdata[i + 0x400], &romdata[i + 0x800], &romdata[i + 0x800]);
+	for (offs_t i = 0; i < 0x1000000; i += 0x10)
+		std::swap_ranges(&romdata[i + 0x04], &romdata[i + 0x08], &romdata[i + 0x08]);
+	for (offs_t i = 0; i < 0x1000000; i += 2)
+		put_u16le(&romdata[i], bitswap<16>(get_u16le(&romdata[i]), 15, 7, 13, 4, 3, 10, 2, 1, 14, 6, 5, 12, 11, 9, 8, 0));
+}
+
 } // anonymous namespace
 
 
 CONS( 201?, rfcp168,  0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_rfcp168, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
+
+// there are other S10 units available.  Rather than duplicate entries, this one contains many entries which simply aren't the games they claim, and aren't on the unit at all (eg. Exerion)
+CONS( 202?, s10fake,   0,  0,  nes_vt42xx_8mb, nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "S10 Handheld Game Console (520-in-1, fake entries)", MACHINE_NOT_WORKING )
 
 // many duplicates, real game count to be confirmed, graphical issues in some games
 CONS( 202?, g9_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
@@ -551,6 +580,9 @@ CONS( 201?, g5_500,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, ini
 
 // highly scrambled
 CONS( 201?, hhgc319,  0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_hhgc319, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// very similar menus etc. to hhgc319, but claims 20 more games, different scramble
+CONS( 201?, bl339,    0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_bl339, "BaoBaoLong", "Handheld Game Console 339-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs well, only issues in SMB3 which crashes
 CONS( 2017, bittboy,  0,  0,  nes_vt42xx_bitboy_2x16mb, nes_vt42xx, nes_vt42xx_bitboy_state, empty_init, "BittBoy",   "BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (2x 16mbyte banks)

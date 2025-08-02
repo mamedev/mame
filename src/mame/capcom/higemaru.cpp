@@ -8,9 +8,11 @@ Capcom 84603-1 PCB
 
 driver by Mirko Buffoni
 
-
 Press Player 1 Button 1 during boot sequence to enter the "test mode".
 Use Player 1 joystick and button, then press START1 to go to next screen.
+
+BTANB:
+- low-pitch buzz at titlescreen after inserting coin
 
 ****************************************************************************/
 
@@ -43,12 +45,13 @@ class higemaru_state : public driver_device
 public:
 	higemaru_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_irqprom(*this, "irqprom")
 	{ }
 
 	void higemaru(machine_config &config);
@@ -57,15 +60,16 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	// memory pointers
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_spriteram;
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_region_ptr<uint8_t> m_irqprom;
 
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -220,13 +224,16 @@ uint32_t higemaru_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 TIMER_DEVICE_CALLBACK_MEMBER(higemaru_state::scanline)
 {
-	int scanline = param;
+	// interrupts at scanline specified in PROM
+	const int scanline = param;
+	const uint8_t irq = m_irqprom[scanline & 0xff];
 
-	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   // Z80 - RST 08h - vblank
+	// RST 08h at scanline 109
+	// RST 10h at scanline 240 (vblank)
+	if (irq & 8)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc7 | (irq << 3 & 0x18));
 
-	if(scanline == 0) // unknown irq event, does various stuff like copying the spriteram
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   // Z80 - RST 10h
+	// irq & 4 = audiocpu interrupts, but unused here
 }
 
 
@@ -363,16 +370,14 @@ GFXDECODE_END
 void higemaru_state::higemaru(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(12'000'000) / 4);  // 3 MHz Sharp LH0080A Z80A-CPU-D
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // 3 MHz Sharp LH0080A Z80A-CPU-D
 	m_maincpu->set_addrmap(AS_PROGRAM, &higemaru_state::program_map);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(higemaru_state::scanline), "screen", 0, 1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 262, 16, 240);
 	screen.set_screen_update(FUNC(higemaru_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -383,9 +388,8 @@ void higemaru_state::higemaru(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	AY8910(config, "ay2", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay1", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 /***************************************************************************
@@ -408,12 +412,14 @@ ROM_START( higemaru )
 	ROM_LOAD( "hg1.c14", 0x0000, 0x2000, CRC(ef4c2f5d) SHA1(247ce819cdc4ed4ec99c25c9006bac1911354bc8) )
 	ROM_LOAD( "hg2.e14", 0x2000, 0x2000, CRC(9133f804) SHA1(93661c028709a7134537321e52da85e3c0f917ba) )
 
-	ROM_REGION( 0x0420, "proms", 0 )
+	ROM_REGION( 0x0100, "irqprom", 0 )
+	ROM_LOAD( "hgb4.l9", 0x0000, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) ) // interrupt timing (not used)
+
+	ROM_REGION( 0x0320, "proms", 0 )
 	ROM_LOAD( "hgb3.l6", 0x0000, 0x0020, CRC(629cebd8) SHA1(c28cd0f341f4f1c7be97f4d8c289860db8ac0857) ) // palette
 	ROM_LOAD( "hgb5.m4", 0x0020, 0x0100, CRC(dbaa4443) SHA1(cca2f9b187abd735f2309b38570edcd745042b3e) ) // char lookup table
 	ROM_LOAD( "hgb1.h7", 0x0120, 0x0100, CRC(07c607ce) SHA1(c048602d62f47129152bbc7ccd38627d78a4392f) ) // sprite lookup table
-	ROM_LOAD( "hgb4.l9", 0x0220, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) ) // interrupt timing (not used)
-	ROM_LOAD( "hgb2.k7", 0x0320, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) ) // video timing? (not used)
+	ROM_LOAD( "hgb2.k7", 0x0220, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) ) // video timing? (not used)
 ROM_END
 
 } // anonymous namespace

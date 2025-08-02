@@ -66,9 +66,19 @@ void mz80_exp_device::device_start()
 
 // slot devices
 
+#include "ar_romcard.h"
+#include "mz1e05.h"
 #include "mz1e30.h"
 #include "mz1e35.h"
+#include "mz1r18.h"
 #include "mz1r37.h"
+
+void mz800_exp_devices(device_slot_interface &device)
+{
+	device.option_add("mz1e05", MZ1E05);
+	device.option_add("mz1r18", MZ1R18);
+	device.option_add("romcard", AR_ROMCARD);
+}
 
 void mz2500_exp_devices(device_slot_interface &device)
 {

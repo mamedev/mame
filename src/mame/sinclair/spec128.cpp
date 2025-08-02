@@ -387,7 +387,7 @@ bool spectrum_128_state::is_contended(offs_t offset) {
 		|| ((offset >= 0xc000 && offset <= 0xffff) && (pg & 1)); // Memory pages 1,3,5 and 7 are contended
 }
 
-u8* spectrum_128_state::snow_pattern1_base(u8 i_reg)
+u8 *spectrum_128_state::snow_pattern1_base(u8 i_reg)
 {
 	const bool is_alt_scr_selected = BIT(m_port_7ffd_data, 3);
 	const bool is_alt_scr = i_reg & 0x80;
@@ -441,7 +441,7 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 
 	// sound hardware
 	AY_SLOT(config, "ay_slot", X1_128_SINCLAIR / 20, default_ay_slot_devices, "ay_ay8912")
-		.add_route(ALL_OUTPUTS, "mono", 0.25);
+		.add_route(ALL_OUTPUTS, "speakers", 0.25);
 
 	// expansion port
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, spec128_expansion_devices, nullptr);

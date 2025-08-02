@@ -828,7 +828,7 @@ CONS( 1997, bandggcn,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, i
 
 // uses a mouse and buttons (no keyboard)
 // テレビであそぼう! ミッキー&ミニー マウスキッズ
-CONS( 1997, mousekid,    0,  0,  nes_sh6578,     bancook, nes_sh6578_state, init_nes_sh6578, "Tomy", "Terebi de Asobou! Mickey & Minnie Mouse Kids (Japan)", MACHINE_NOT_WORKING )
+CONS( 1997, mousekid,    0,  0,  nes_sh6578,     bancook, nes_sh6578_state, init_nes_sh6578, "Tomy", "TV de Asobou! Mickey & Minnie Mouse Kids (Japan)", MACHINE_NOT_WORKING )
 
 // おジャ魔女どれみのTVでマジカルクッキング
 CONS( 2001, bancook,     0,  0,  nes_sh6578,     bancook,    nes_sh6578_state, init_nes_sh6578, "Bandai", "Ojamajo Doremi no TV de Magical Cooking (Japan)", MACHINE_NOT_WORKING )
