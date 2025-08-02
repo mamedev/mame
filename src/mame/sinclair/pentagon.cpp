@@ -203,7 +203,7 @@ void pentagon_state::pentagon(machine_config &config)
 
 	BETA_DISK(config, m_beta, 0);
 
-	SPEAKER(config, "speakers", 2).front();
+	SPEAKER(config.replace(), "speakers", 2).front();
 
 	AY_SLOT(config.replace(), "ay_slot", 14_MHz_XTAL / 8, default_ay_slot_devices, "ay_ay8912")
 		.add_route(0, "speakers", 0.50, 0)

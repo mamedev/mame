@@ -272,6 +272,7 @@ static const md_slot slot_list[] =
 	{ SRAM_ARG96, "rom_sram_arg96" },
 	{ TEKKENSP, "rom_tekkesp" },
 	{ TOPFIGHTER, "rom_topf" },
+	{ TITAN, "rom_titan" },
 
 	{ SEGA_SRAM_FULLPATH, "rom_sram" },
 	{ SEGA_SRAM_FALLBACK, "rom_sramsafe" }
@@ -374,7 +375,7 @@ std::error_condition base_md_cart_slot_device::load_list()
 		m_type = md_get_pcb_id(slot_name);
 
 	// handle mirroring of ROM, unless it's SSF2 or Pier Solar
-	if (m_type != SSF2 && m_type != PSOLAR && m_type != CM_2IN1)
+	if (m_type != SSF2 && m_type != PSOLAR && m_type != CM_2IN1 && m_type != TITAN)
 		m_cart->rom_map_setup(length);
 
 	return std::error_condition();
@@ -518,7 +519,7 @@ std::error_condition base_md_cart_slot_device::load_nonlist()
 	m_type = get_cart_type(ROM, tmplen - offset);
 
 	// handle mirroring of ROM, unless it's SSF2 or Pier Solar
-	if (m_type != SSF2 && m_type != PSOLAR)
+	if (m_type != SSF2 && m_type != PSOLAR && m_type != CM_2IN1 && m_type != TITAN)
 		m_cart->rom_map_setup(len);
 
 

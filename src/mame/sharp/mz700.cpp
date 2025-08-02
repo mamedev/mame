@@ -444,11 +444,13 @@ void mz800_state::mz800(machine_config &config)
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set("z80pio", FUNC(z80pio_device::strobe_b)).invert();
 
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	MZ80_EXP_SLOT(config, "exp", mz800_exp_devices, nullptr).set_iospace(m_maincpu, AS_IO);
+	MZ80_EXP_SLOT(config, "exp1", mz800_exp_devices, nullptr).set_iospace(m_maincpu, AS_IO);
+	MZ80_EXP_SLOT(config, "exp2", mz800_exp_devices, nullptr).set_iospace(m_maincpu, AS_IO);
 }
 
 
@@ -475,7 +477,14 @@ ROM_END
 
 ROM_START( mz800 )
 	ROM_REGION( 0x4000, "monitor", 0 )
-	ROM_LOAD( "mz800.rom", 0x0000, 0x4000, CRC(600d17e1) SHA1(950ce4b51429916f8036e41ba6130fac149b36e4) )
+	ROM_SYSTEM_BIOS( 0, "9z504m", "Monitor 9Z-504M" )
+	ROMX_LOAD( "mz800.rom", 0x0000, 0x4000, CRC(600d17e1) SHA1(950ce4b51429916f8036e41ba6130fac149b36e4), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "willy", "Willy's MZ-800 Monitor (English)" )
+	ROMX_LOAD( "800willy_en.rom", 0x0000, 0x4000, CRC(f98b4bea) SHA1(84a0316a3a52e6ad5c9d0f1c7365fca06f069566), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "willyg", "Willy's MZ-800 Monitor (German)" )
+	ROMX_LOAD( "800willy_ge.rom", 0x0000, 0x4000, CRC(2471034f) SHA1(68d988c816b644b4e52d2474a9159311d47c3790), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "willyj", "Willy's MZ-800 Monitor (Japanese)" )
+	ROMX_LOAD( "800willy_jap.rom", 0x0000, 0x4000, CRC(92bbf0a3) SHA1(02647816cc33ba2162f84997974f7fe3bab1323a), ROM_BIOS(3) )
 ROM_END
 
 ROM_START( mz1500 )

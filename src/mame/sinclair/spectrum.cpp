@@ -775,8 +775,8 @@ void spectrum_state::spectrum_common(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_spectrum);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER(config, "speakers").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "speakers", 0.50);
 	static const double speaker_levels[4] = { 0.0, 0.33, 0.66, 1.0 };
 	m_speaker->set_levels(4, speaker_levels);
 
@@ -801,7 +801,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(tzx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->add_route(ALL_OUTPUTS, "speakers", 0.05);
 	m_cassette->set_interface("spectrum_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("spectrum_cass");

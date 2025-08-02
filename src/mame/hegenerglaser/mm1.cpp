@@ -203,6 +203,11 @@ static INPUT_PORTS_START( mm1 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("A / 1")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("F / 6 / Queen")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("B / 2 / Pawn")
+
+	PORT_START("PIECE")
+	PORT_CONFNAME( 0x01, 0x00, "Piece Notation" )
+	PORT_CONFSETTING(    0x01, DEF_STR( English ) ) // KQRBNP
+	PORT_CONFSETTING(    0x00, DEF_STR( German ) ) // KDTLSB
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mirage )
@@ -272,6 +277,7 @@ void mm1_state::mm1(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mm1_map);
+	m_maincpu->ef1_cb().set_ioport("PIECE"); // hardwired
 
 	MEPHISTO_SENSORS_BOARD(config.replace(), m_board);
 	m_board->set_delay(attotime::from_msec(200));

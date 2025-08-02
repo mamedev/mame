@@ -19916,6 +19916,9 @@ talkingfb
 @source:handheld/teammate.cpp
 teammate
 
+@source:handheld/vegaplus.cpp
+vegaplus
+
 @source:handheld/wildfire.cpp
 wildfire
 
@@ -24105,12 +24108,12 @@ hb_ydd
 hb_ydda
 
 @source:jpm/pluto6.cpp
-pl6_atw
-pl6_cm
-pl6_demo
+//pl6_atw
+//pl6_cm
+//pl6_demo
 pl6_kfp
 pl6_lgk
-tijkpots
+//tijkpots
 
 @source:kaneko/airbustr.cpp
 airbustr
@@ -28293,6 +28296,7 @@ teamht
 minigolf
 minigolfa
 minigolfb
+minigolfct
 nametune
 nametunea
 nstocker
@@ -31224,9 +31228,12 @@ sloco93a
 super21p
 super98
 superdbl
+unkicpf40
+unkicpf80
 videtrna
 videtron
 videtron2
+wing90pkr
 witchcrd
 witchcrda
 witchcrdb
@@ -35493,6 +35500,7 @@ dgunl3202
 fcpocket
 goretrop
 lxpcli
+lxpcpp
 lxpcsp
 matet100
 matet220
@@ -35500,6 +35508,7 @@ matet300
 myaasa
 myaass
 mymman
+retror30
 rminitv
 typo240
 
@@ -35507,6 +35516,7 @@ typo240
 36pcase
 168pcase
 240in1ar
+d12power
 denv150
 dgun2561
 dgun2572
@@ -35517,6 +35527,7 @@ egame150
 gb50_150
 gbox2020
 gcs2mgp
+gon100
 gtct885
 hkb502
 hkb502a
@@ -35561,9 +35572,11 @@ red5mam
 rtvgc300
 rtvgc300fz
 sealvt
+supr200
 sy888b
 sy889
 tetrtin
+tiger108
 tup240
 unk128vt
 unkra200
@@ -35572,6 +35585,7 @@ zonefusn
 
 @source:nintendo/nes_vt42xx.cpp
 bittboy
+bl339
 fapocket
 g5_500
 g9_666
@@ -35586,6 +35600,7 @@ mc_9x6ss
 mc_hh210
 retro400
 rfcp168
+s10fake
 
 @source:nintendo/nss.cpp
 nss
@@ -41854,6 +41869,7 @@ bayrouteb1
 bayrouteb2
 beautyb
 bloxeedbl
+cltchitrbl
 ddcrewbl
 dduxbl
 eswatbl
@@ -43021,6 +43037,9 @@ biortmfp
 bitgrpha
 bitgrphb
 
+@source:skeleton/blaucds32.cpp
+blaucds32
+
 @source:skeleton/bolsaint.cpp
 bolsaint
 
@@ -43238,6 +43257,7 @@ waveterm
 
 @source:skeleton/evolution_handheld.cpp
 evolhh
+smkatsum
 
 @source:skeleton/extrema_m27sv.cpp
 multgmxl
@@ -46283,6 +46303,7 @@ bgareggat
 bgareggat2
 bgareggatw
 kingdmgp
+kingdmgpbl
 mahoudai
 shippumd
 sstriker
@@ -46640,6 +46661,7 @@ teentit
 tsbuzz
 
 @source:tvgames/generalplus_gp327902.cpp
+chikawac
 sanxpet
 sanxpeta
 tomyegg
@@ -46721,8 +46743,10 @@ bfmpac
 bfpacman
 bfspyhnt
 bftetris
+dsgnpal
 punirune
 siddr
+smkcatch
 wiwcs
 
 @source:tvgames/generalplus_gpl162xx_lcdtype.cpp
@@ -46731,9 +46755,12 @@ pcp8728
 bkid218
 
 @source:tvgames/generalplus_gpl32612.cpp
+airobo
 anpanm19
 arcadege
+ardancem
 dmnslayg
+intrtvg
 jak_swbstrik
 jak_tmnthp
 jak_dchp
@@ -46744,6 +46771,7 @@ kidizmp
 pdcm2
 pocketmp
 pocketmr
+smatomo
 zippity
 zippityuk
 
@@ -46773,6 +46801,7 @@ afbp4
 rs70_648
 
 @source:tvgames/myaatari.cpp
+kuniotv
 myaatari
 
 @source:tvgames/pubint_storyreader.cpp
@@ -46828,6 +46857,7 @@ comil
 ddr33v
 decathln
 decathlna
+dinothun
 dmbtjunc
 doraglob
 doraglobf
@@ -46872,6 +46902,7 @@ rocksock
 senspeed
 senwfit
 smartcyc
+spidm2
 swclone
 tiktokmm
 tmntbftc
@@ -47088,10 +47119,12 @@ arcade10
 bbl380
 dgun2953
 dphh8630
+dphh8633
 mc_cb203
 pg118
 ragc153
 retro150
+retro150a
 rhhc152
 supreme
 toumapet

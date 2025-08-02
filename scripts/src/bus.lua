@@ -2177,6 +2177,10 @@ end
 
 if (BUSES["MZ80"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/mz80/ar_romcard.cpp",
+		MAME_DIR .. "src/devices/bus/mz80/ar_romcard.h",
+		MAME_DIR .. "src/devices/bus/mz80/mz1e05.cpp",
+		MAME_DIR .. "src/devices/bus/mz80/mz1e05.h",
 		MAME_DIR .. "src/devices/bus/mz80/mz1e30.cpp",
 		MAME_DIR .. "src/devices/bus/mz80/mz1e30.h",
 		MAME_DIR .. "src/devices/bus/mz80/mz1e35.cpp",
@@ -3367,6 +3371,8 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_rx80.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/epson_rx80.h",
+		MAME_DIR .. "src/devices/bus/centronics/mz1p16.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/mz1p16.h",
 		MAME_DIR .. "src/devices/bus/centronics/nec_p72.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/nec_p72.h",
 		MAME_DIR .. "src/devices/bus/centronics/nlq401.cpp",
@@ -3809,6 +3815,10 @@ if (BUSES["MEGADRIVE"]~=null) then
 		MAME_DIR .. "src/devices/bus/megadrive/stm95.h",
 		MAME_DIR .. "src/devices/bus/megadrive/svp.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/svp.h",
+		MAME_DIR .. "src/devices/bus/megadrive/titan.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/titan.h",
+		MAME_DIR .. "src/devices/bus/megadrive/tplay96.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/tplay96.h",
 	}
 end
 

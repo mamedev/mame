@@ -13,7 +13,7 @@ license:CC0-1.0
 	<!-- only the single known cart exists for this system -->
 
 	<software name="ver1" supported="no">
-		<description>Duel Masters: Duel Station Ver.1</description>
+		<description>Duel Masters: Duel Station Senyō Cartridge Ver.1</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="デュエルマスターズ　デュエルステーション専用カートリッジ　Ver.1" />

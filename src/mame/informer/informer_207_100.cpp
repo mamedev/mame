@@ -12,7 +12,7 @@
     - R6545-1AP CRTC
     - MC2681P DUART
     - MC68B50P ACIA
-    - M58321 RTC
+    - M58321 RTC (TBD: how this is used?)
     - 19.7184 MHz XTAL, 3.6864 MHz XTAL
 
 ***************************************************************************/
@@ -25,6 +25,7 @@
 #include "machine/input_merger.h"
 #include "machine/mc68681.h"
 #include "machine/msm58321.h"
+#include "machine/nvram.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
@@ -49,7 +50,8 @@ public:
 		m_duart(*this, "duart"),
 		m_acia(*this, "acia"),
 		m_rtc(*this, "rtc"),
-		m_ram(*this, "ram"),
+		m_vram(*this, "vram"),
+		m_rom(*this, "maincpu"),
 		m_chargen(*this, "chargen")
 	{ }
 
@@ -60,15 +62,20 @@ protected:
 	void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<mc6809e_device> m_maincpu;
 	required_device<r6545_1_device> m_crtc;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<scn2681_device> m_duart;
 	required_device<acia6850_device> m_acia;
 	required_device<msm58321_device> m_rtc;
-	required_shared_ptr<uint8_t> m_ram;
+	required_shared_ptr<uint8_t> m_vram;
+	required_region_ptr<uint8_t> m_rom;
 	required_region_ptr<uint8_t> m_chargen;
+
+	void misc_output_w(uint8_t data);
+	void unk_output_w(uint8_t data);
+	uint8_t vector_r(offs_t offset);
 
 	void mem_map(address_map &map) ATTR_COLD;
 
@@ -83,11 +90,17 @@ private:
 
 void informer_207_100_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x27ff).ram().share("ram");
+	map(0x0000, 0x0fff).ram().share("vram");
+	map(0x1000, 0x17ff).ram().share("nvram");
+	map(0x1800, 0x27ff).ram();
+	map(0x2800, 0x2800).nopr(); // dummy reads
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
+	map(0xff00, 0xff7f).unmaprw();
 	map(0xff00, 0xff0f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
-	map(0xff20, 0xff20).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0xff21, 0xff21).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xff10, 0xff10).w(FUNC(informer_207_100_state::misc_output_w));
+	map(0xff14, 0xff14).w(FUNC(informer_207_100_state::unk_output_w));
+	map(0xff20, 0xff20).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0xff21, 0xff21).w(m_crtc, FUNC(mc6845_device::register_w));
 	map(0xff40, 0xff41).w(m_acia, FUNC(acia6850_device::write));
 	map(0xff42, 0xff43).r(m_acia, FUNC(acia6850_device::read));
 }
@@ -116,8 +129,8 @@ MC6845_UPDATE_ROW( informer_207_100_state::crtc_update_row )
 
 	for (int x = 0; x < x_count; x++)
 	{
-//      uint8_t attr = m_ram[ma + x * 2 + 0];
-		uint8_t code = m_ram[ma + x * 2 + 1];
+//      uint8_t attr = m_vram[((ma + x) & 0x7ff) * 2 + 0];
+		uint8_t code = m_vram[((ma + x) & 0x7ff) * 2 + 1];
 		uint8_t data = m_chargen[(code << 4) + ra];
 
 		if (x == cursor_x)
@@ -165,6 +178,24 @@ void informer_207_100_state::machine_reset()
 {
 }
 
+void informer_207_100_state::misc_output_w(uint8_t data)
+{
+	logerror("%s: Writing $%02X to $FF10\n", machine().describe_context(), data);
+}
+
+void informer_207_100_state::unk_output_w(uint8_t data)
+{
+	logerror("%s: Writing $%02X to $FF14\n", machine().describe_context(), data);
+}
+
+uint8_t informer_207_100_state::vector_r(offs_t offset)
+{
+	// FIRQ handler seems not to explicitly acknowledge the interrupt, so do it implicitly here
+	if (!BIT(offset, 3))
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	return m_rom[offset & 0x7fff];
+}
+
 
 //**************************************************************************
 //  MACHINE DEFINTIONS
@@ -174,6 +205,9 @@ void informer_207_100_state::informer_207_100(machine_config &config)
 {
 	MC6809E(config, m_maincpu, 19.7184_MHz_XTAL / 10); // clock divisor guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &informer_207_100_state::mem_map);
+	m_maincpu->interrupt_vector_read().set(FUNC(informer_207_100_state::vector_r));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
@@ -207,6 +241,7 @@ void informer_207_100_state::informer_207_100(machine_config &config)
 	m_crtc->set_char_width(10);
 	m_crtc->set_on_update_addr_change_callback(FUNC(informer_207_100_state::crtc_addr));
 	m_crtc->set_update_row_callback(FUNC(informer_207_100_state::crtc_update_row));
+	m_crtc->out_vsync_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 

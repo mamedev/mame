@@ -2177,7 +2177,7 @@ void i386_device::i386_groupF6_8()         // Opcode 0xf6
 				if( src ) {
 					remainder = quotient % (int16_t)(int8_t)src;
 					result = quotient / (int16_t)(int8_t)src;
-					if( result > 0xff ) {
+					if( result > 0x7f || result < -0x80 ) {
 						/* TODO: Divide error */
 					} else {
 						REG8(AH) = (uint8_t)remainder & 0xff;

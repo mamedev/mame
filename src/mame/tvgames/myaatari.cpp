@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: David Haywood
 
+// CPU/SoC is simply marked "3805"
 
 #include "emu.h"
 
@@ -82,6 +83,15 @@ ROM_START( myaatari )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( kuniotv )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "s29gl064n90tfi04.u2", 0x000000, 0x0800000, CRC(f26cd4a2) SHA1(92b7af5ecb8b58065cfa39cac77e32242383af78) )
+	ROM_IGNORE(0x100)
+ROM_END
+
 } // anonymous namespace
 
-CONS( 2021, myaatari,      0,              0,      myaatari, myaatari, myaatari_state, empty_init, "DreamGear", "My Arcade Atari (DGUNL-7013, Micro Player Pro)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, myaatari,      0,              0,      myaatari, myaatari, myaatari_state, empty_init, "dreamGEAR", "My Arcade Atari (DGUNL-7013, Micro Player Pro)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// HDMI stick, runs the Famicom titles using an emulator
+CONS( 2021, kuniotv,       0,              0,      myaatari, myaatari, myaatari_state, empty_init, "Lithon", "Kunio-kun TV (5-in-1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -224,6 +224,17 @@ ROM_START( punirune )
 	ROM_LOAD16_WORD_SWAP( "25l64.ic103", 0x0000, 0x800000, CRC(0737edc0) SHA1(fce19d91a0522a75e676197fb18645b8c6a273b8) )
 ROM_END
 
+ROM_START( smkcatch )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "gpr25l64.u2", 0x0000, 0x800000,  CRC(e2f52c4a) SHA1(f79862d27152cff8f96151c672d9762a3897a593) )
+ROM_END
+
+ROM_START( dsgnpal )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "gpr25l64.ic2", 0x0000, 0x800000, CRC(a1017ea8) SHA1(bd4b553ff71e763cd3fd726c49f5408eac3b7984) )
+ROM_END
+
+
 void generalplus_gpspi_direct_game_state::init_fif()
 {
 	uint16_t* spirom16 = (uint16_t*)memregion("maincpu:spidirect")->base();
@@ -257,9 +268,21 @@ CONS(2018, bfdigdug, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_d
 CONS(2019, bfspyhnt, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Spy Hunter (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2019, bftetris, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Tetris (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-// unclear if colour matches, but there are multiple generations of these at least
-// uses PUNIRUNZU_MAIN_V3 pcb, uses a GPL95101 series chip, might not fit here but does run direct from SPI
-CONS(2021, punirune, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Punirunes (Europe, pastel blue)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // probably not identical hardware, encryption is different, but it does seem to still be a 'direct access' SPI ROM case
 CONS(201?, siddr,    0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_siddr, "Super Impulse", "Dance Dance Revolution - Broadwalk Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+
+// games below use GPL95101 series chips, which might be different but are definitely unSP2.0 chips that run from SPI directly
+
+// unclear if colour matches, but there are multiple generations of these at least
+// uses PUNIRUNZU_MAIN_V3 pcb
+CONS(2021, punirune, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Punirunes (Europe, pastel blue)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// 2020 (device) / 2021 (box) version of Sumikko Gurashi a cloud shaped device
+// Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)
+CONS( 2021, smkcatch, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi - Sumikko Catch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// or Sumikko Gurashi - Sumikko Catch DX (すみっコぐらし すみっコキャッチDX) = Sumikko Catch with pouch and strap
+
+// there seem to be different versions of this available, is the software the same?
+CONS( 201?, dsgnpal, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, empty_init,  "Tomy", "Kiratto Pri-Chan Design Palette (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

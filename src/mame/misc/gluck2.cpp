@@ -170,7 +170,7 @@
   DIP switches banks #3 and #2). Is not used as sound device, at least for
   Good Luck II.
 
-  There are pieces of code that initialize two PIAs 6821, that are not included
+  There are pieces of code that initialize two PIA 6821s, that are not included
   in the PCB. Seems a leftover. Also the program try to handle a suppossed lamps
   system through these 'phantom' PIAs...
 
@@ -599,4 +599,4 @@ ROM_END
 
 //    YEAR  NAME       PARENT  MACHINE   INPUT   STATE         INIT        ROT    COMPANY          FULLNAME                FLAGS...
 GAME( 1992, gluck2,    0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Good Luck II",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, unkyungyu, 0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Unknown YungYu game",   MACHINE_NOT_WORKING )
+GAME( 1992, unkyungyu, 0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "unknown YungYu game",   MACHINE_NOT_WORKING )

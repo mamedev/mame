@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders: NaokiS
 
-#include "serialvfd.h"
 #include "emu.h"
+#include "serialvfd.h"
 
 #define LOG_VFD     (1U << 1)
 //#define VERBOSE     ( LOG_VFD )

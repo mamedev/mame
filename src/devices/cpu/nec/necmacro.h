@@ -163,8 +163,9 @@
 #define DIVUB                                               \
 	uresult = Wreg(AW);                                 \
 	uresult2 = uresult % tmp;                               \
-	if ((uresult /= tmp) > 0xff) {                          \
-		nec_interrupt(NEC_DIVIDE_VECTOR, BRK); break;                            \
+	uresult /= tmp; \
+	if (uresult > 0xff) {                          \
+		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);                            \
 	} else {                                                \
 		Breg(AL) = uresult;                             \
 		Breg(AH) = uresult2;                            \
@@ -173,8 +174,9 @@
 #define DIVB                                                \
 	result = (int16_t)Wreg(AW);                           \
 	result2 = result % (int16_t)((int8_t)tmp);                  \
-	if ((result /= (int16_t)((int8_t)tmp)) > 0xff) {            \
-		nec_interrupt(NEC_DIVIDE_VECTOR, BRK); break;                            \
+	result /= (int16_t)((int8_t)tmp); \
+	if (result > 0x7f || result < -0x7f) {            \
+		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);                            \
 	} else {                                                \
 		Breg(AL) = result;                              \
 		Breg(AH) = result2;                             \
@@ -183,8 +185,9 @@
 #define DIVUW                                               \
 	uresult = (((uint32_t)Wreg(DW)) << 16) | Wreg(AW);\
 	uresult2 = uresult % tmp;                               \
-	if ((uresult /= tmp) > 0xffff) {                        \
-		nec_interrupt(NEC_DIVIDE_VECTOR, BRK); break;                            \
+	uresult /= tmp; \
+	if (uresult > 0xffff) {                        \
+		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);                            \
 	} else {                                                \
 		Wreg(AW)=uresult;                               \
 		Wreg(DW)=uresult2;                              \
@@ -193,8 +196,9 @@
 #define DIVW                                                \
 	result = ((uint32_t)Wreg(DW) << 16) + Wreg(AW);   \
 	result2 = result % (int32_t)((int16_t)tmp);                 \
-	if ((result /= (int32_t)((int16_t)tmp)) > 0xffff) {         \
-		nec_interrupt(NEC_DIVIDE_VECTOR, BRK); break;                            \
+	result /= (int32_t)((int16_t)tmp); \
+	if (result > 0x7fff || result < -0x7fff) {         \
+		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);                            \
 	} else {                                                \
 		Wreg(AW)=result;                                \
 		Wreg(DW)=result2;                               \

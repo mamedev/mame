@@ -661,12 +661,11 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 	uint8_t *weight_b = &m_weight_factor[1][0];
 
 	// Console Verified. CLUT4 pixels are drawn in pairs during VSR. So the mosaic here is halved.
-	if (icmA == ICM_CLUT4) {
+	if (icmA == ICM_CLUT4)
 		mosaic_count_a >>= 1;
-	}
-	if (icmB == ICM_CLUT4) {
+	if (icmB == ICM_CLUT4)
 		mosaic_count_b >>= 1;
-	}
+
 	// If PAL and 'Standard' bit set, insert a 24px border on the left/right
 	uint32_t offset = (!BIT(m_dcr[0], DCR_CF_BIT) || BIT(m_csrw[0], CSR1W_ST_BIT)) ? 24 : 0;
 	std::fill_n(out, offset, s_4bpp_color[0]);

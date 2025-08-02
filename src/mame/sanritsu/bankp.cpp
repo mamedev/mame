@@ -529,15 +529,15 @@ void bankp_state::bankp(machine_config &config)
 	// Video timing
 	// PCB measured: H = 15.61khz V = 60.99hz, +/- 0.01hz
 	// --> VTOTAL should be OK, HTOTAL not 100% certain
-	static constexpr XTAL PIXEL_CLOCK = 15.46848_MHz_XTAL / 3;
+	constexpr XTAL PIXEL_CLOCK = 15.46848_MHz_XTAL / 3;
 
-	static constexpr int HTOTAL  = 330;
-	static constexpr int HBEND   = 0 + 3 * 8;
-	static constexpr int HBSTART = 224 + 3 * 8;
+	constexpr int HTOTAL  = 330;
+	constexpr int HBEND   = 0 + 3 * 8;
+	constexpr int HBSTART = 224 + 3 * 8;
 
-	static constexpr int VTOTAL  = 256;
-	static constexpr int VBEND   = 0 + 2 * 8;
-	static constexpr int VBSTART = 224 + 2 * 8;
+	constexpr int VTOTAL  = 256;
+	constexpr int VBEND   = 0 + 2 * 8;
+	constexpr int VBSTART = 224 + 2 * 8;
 
 	// basic machine hardware
 	Z80(config, m_maincpu, 15.46848_MHz_XTAL / 6);
