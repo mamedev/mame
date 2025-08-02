@@ -102,7 +102,7 @@
 
 void tutankhm_state::vblank_irq(int state)
 {
-	/* flip flops cause the interrupt to be signalled every other frame */
+	// flip flops cause the interrupt to be signalled every other frame
 	if (state)
 	{
 		m_irq_toggle ^= 1;
@@ -177,11 +177,11 @@ void tutankhm_state::main_map(address_map &map)
 	//0x8720 -> Custom 084 F3 Pin 20
 	map(0x8120, 0x8120).mirror(0x000f).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	//0x8740 -> Custom 089 D9 Pin 11 - Unknown, not used
-	map(0x8160, 0x8160).mirror(0x000f).portr("DSW2"); /* DSW2 (inverted bits) */
-	map(0x8180, 0x8180).mirror(0x000f).portr("IN0");  /* IN0 I/O: Coin slots, service, 1P/2P buttons */
-	map(0x81a0, 0x81a0).mirror(0x000f).portr("IN1");  /* IN1: Player 1 I/O */
-	map(0x81c0, 0x81c0).mirror(0x000f).portr("IN2");  /* IN2: Player 2 I/O */
-	map(0x81e0, 0x81e0).mirror(0x000f).portr("DSW1"); /* DSW1 (inverted bits) */
+	map(0x8160, 0x8160).mirror(0x000f).portr("DSW2"); // DSW2 (inverted bits)
+	map(0x8180, 0x8180).mirror(0x000f).portr("IN0");  // IN0 I/O: Coin slots, service, 1P/2P buttons
+	map(0x81a0, 0x81a0).mirror(0x000f).portr("IN1");  // IN1: Player 1 I/O
+	map(0x81c0, 0x81c0).mirror(0x000f).portr("IN2");  // IN2: Player 2 I/O
+	map(0x81e0, 0x81e0).mirror(0x000f).portr("DSW1"); // DSW1 (inverted bits)
 	map(0x8200, 0x8207).mirror(0x00f8).nopr().w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x8300, 0x8300).mirror(0x00ff).w(FUNC(tutankhm_state::bankselect_w));
 	map(0x8600, 0x8600).mirror(0x00ff).w(FUNC(tutankhm_state::sound_on_w));
@@ -243,7 +243,7 @@ static INPUT_PORTS_START( tutankhm )
 
 	PORT_START("DSW1")
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "No Coin B", SW1)
-	/* "No Coin B" = coins produce sound, but no effect on coin counter */
+	// "No Coin B" = coins produce sound, but no effect on coin counter
 
 	PORT_START("STARS")
 	PORT_CONFNAME( 0x01, 0x01, "Starfield selection" )
@@ -282,8 +282,8 @@ void tutankhm_state::machine_reset()
 
 void tutankhm_state::tutankhm(machine_config &config)
 {
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, XTAL(18'432'000)/12);   /* 1.5 MHz ??? */
+	// basic machine hardware
+	MC6809E(config, m_maincpu, XTAL(18'432'000)/12);   // 1.5 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &tutankhm_state::main_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // C3
@@ -298,7 +298,7 @@ void tutankhm_state::tutankhm(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
 	PALETTE(config, m_palette).set_format(1, tutankhm_state::raw_to_rgb_func, 16);
@@ -306,10 +306,10 @@ void tutankhm_state::tutankhm(machine_config &config)
 	m_screen->set_screen_update(FUNC(tutankhm_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(tutankhm_state::vblank_irq));
 
-	/* sound hardware */
+	// sound hardware
 	TIMEPLT_AUDIO(config, m_timeplt_audio);
 
-	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
+	// blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF
 	TIMER(config, "stars").configure_periodic(FUNC(tutankhm_state::scramble_stars_blink_timer), PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001));
 }
 
@@ -328,15 +328,15 @@ void tutankhm_state::tutankhm(machine_config &config)
 */
 
 ROM_START( tutankhm )
-	/* ROMS located on the  KT-3203-1B board. */
-	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )      /* 64k for M6809 CPU code + 64k for ROM banks */
-	ROM_LOAD( "m1.1h", 0x0a000, 0x1000, CRC(da18679f) SHA1(8d2a3665db937d0e1d19300ae22277d9db61fcbc) ) /* program ROMs */
+	// ROMS located on the KT-3203-1B board.
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )      // 64k for M6809 CPU code + 64k for ROM banks
+	ROM_LOAD( "m1.1h", 0x0a000, 0x1000, CRC(da18679f) SHA1(8d2a3665db937d0e1d19300ae22277d9db61fcbc) ) // program ROMs
 	ROM_LOAD( "m2.2h", 0x0b000, 0x1000, CRC(a0f02c85) SHA1(29a78b3ffd6b597772953543b02dd59acf5af38c) )
-	ROM_LOAD( "3j.3h", 0x0c000, 0x1000, CRC(ea03a1ab) SHA1(27a3cca0595bac642caaf9ee2f276814442c8721) ) /* Name guessed */
+	ROM_LOAD( "3j.3h", 0x0c000, 0x1000, CRC(ea03a1ab) SHA1(27a3cca0595bac642caaf9ee2f276814442c8721) ) // Name guessed
 	ROM_LOAD( "m4.4h", 0x0d000, 0x1000, CRC(bd06fad0) SHA1(bd10bbb413d8dd362072522e902575d819fa8336) )
 	ROM_LOAD( "m5.5h", 0x0e000, 0x1000, CRC(bf9fd9b0) SHA1(458ea2ff5eedaaa02e32444dd6004d2eaadbdeab) )
-	ROM_LOAD( "j6.6h", 0x0f000, 0x1000, CRC(fe079c5b) SHA1(0757490aaa1cea4f4bbe1230d811a0d917f59e52) ) /* Name guessed */
-	ROM_LOAD( "c1.1i", 0x10000, 0x1000, CRC(7eb59b21) SHA1(664d3e08df0f3d6690838810b6fe273eec3b7821) ) /* graphic ROMs (banked) -- only 9 of 12 are filled */
+	ROM_LOAD( "j6.6h", 0x0f000, 0x1000, CRC(fe079c5b) SHA1(0757490aaa1cea4f4bbe1230d811a0d917f59e52) ) // Name guessed
+	ROM_LOAD( "c1.1i", 0x10000, 0x1000, CRC(7eb59b21) SHA1(664d3e08df0f3d6690838810b6fe273eec3b7821) ) // graphic ROMs (banked) -- only 9 of 12 are filled
 	ROM_LOAD( "c2.2i", 0x11000, 0x1000, CRC(6615eff3) SHA1(e8455eab03f66642880595cfa0e9be285bf9fad0) )
 	ROM_LOAD( "c3.3i", 0x12000, 0x1000, CRC(a10d4444) SHA1(683899e1014ee075b16d9d2610c3c5b5c4efedb6) )
 	ROM_LOAD( "c4.4i", 0x13000, 0x1000, CRC(58cd143c) SHA1(e4ab27c09858cede478f4ed3ac6d7392e383a470) )
@@ -345,10 +345,10 @@ ROM_START( tutankhm )
 	ROM_LOAD( "c7.7i", 0x16000, 0x1000, CRC(afd0a81f) SHA1(cf10308a0fa4ffabd0deeb186b5602468028ff92) )
 	ROM_LOAD( "c8.8i", 0x17000, 0x1000, CRC(dabb609b) SHA1(773b99b670db41a9de58d14b51f81ce0c446ca84) )
 	ROM_LOAD( "c9.9i", 0x18000, 0x1000, CRC(8ea9c6a6) SHA1(fe1b299f8760fc5418179d3569932ee2c4dff461) )
-	/* the other banks (1900-1fff) are empty */
+	// the other banks (1900-1fff) are empty
 
-	/* ROMS located on the KT-5112-2B board. */
-	ROM_REGION(  0x3000, "timeplt_audio:tpsound", ROMREGION_ERASE00 ) /* 12k for Z80 sound CPU code */
+	// ROMS located on the KT-5112-2B board.
+	ROM_REGION(  0x3000, "timeplt_audio:tpsound", ROMREGION_ERASE00 ) // 12k for Z80 sound CPU code
 	ROM_LOAD( "s1.7a", 0x0000, 0x1000, CRC(b52d01fa) SHA1(9b6cf9ea51d3a87c174f34d42a4b1b5f38b48723) )
 	ROM_LOAD( "s2.8a", 0x1000, 0x1000, CRC(9db5c0ce) SHA1(b5bc1d89a7f7d7a0baae64390c37ee11f69a0e76) )
 ROM_END
@@ -378,15 +378,15 @@ TUTANKHAM   RA1 10E (25)  1982   STERN    (in socket 8A)
 
 */
 ROM_START( tutankhms )
-	/* ROMS located on the KT-3203-1B board. */
-	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )      /* 64k for M6809 CPU code + 64k for ROM banks */
-	ROM_LOAD( "m1.1h", 0x0a000, 0x1000, CRC(da18679f) SHA1(8d2a3665db937d0e1d19300ae22277d9db61fcbc) ) /* program ROMs */
+	// ROMS located on the KT-3203-1B board.
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )      // 64k for M6809 CPU code + 64k for ROM banks
+	ROM_LOAD( "m1.1h", 0x0a000, 0x1000, CRC(da18679f) SHA1(8d2a3665db937d0e1d19300ae22277d9db61fcbc) ) // program ROMs
 	ROM_LOAD( "m2.2h", 0x0b000, 0x1000, CRC(a0f02c85) SHA1(29a78b3ffd6b597772953543b02dd59acf5af38c) )
 	ROM_LOAD( "3a.3h", 0x0c000, 0x1000, CRC(2d62d7b1) SHA1(910718f36735f2614cda0c3a1abdfa995d82dbd2) )
 	ROM_LOAD( "m4.4h", 0x0d000, 0x1000, CRC(bd06fad0) SHA1(bd10bbb413d8dd362072522e902575d819fa8336) )
 	ROM_LOAD( "m5.5h", 0x0e000, 0x1000, CRC(bf9fd9b0) SHA1(458ea2ff5eedaaa02e32444dd6004d2eaadbdeab) )
 	ROM_LOAD( "a6.6h", 0x0f000, 0x1000, CRC(c43b3865) SHA1(3112cf831c5b6318337e591ccb0003aeab722652) )
-	ROM_LOAD( "c1.1i", 0x10000, 0x1000, CRC(7eb59b21) SHA1(664d3e08df0f3d6690838810b6fe273eec3b7821) ) /* graphic ROMs (banked) -- only 9 of 12 are filled */
+	ROM_LOAD( "c1.1i", 0x10000, 0x1000, CRC(7eb59b21) SHA1(664d3e08df0f3d6690838810b6fe273eec3b7821) ) // graphic ROMs (banked) -- only 9 of 12 are filled
 	ROM_LOAD( "c2.2i", 0x11000, 0x1000, CRC(6615eff3) SHA1(e8455eab03f66642880595cfa0e9be285bf9fad0) )
 	ROM_LOAD( "c3.3i", 0x12000, 0x1000, CRC(a10d4444) SHA1(683899e1014ee075b16d9d2610c3c5b5c4efedb6) )
 	ROM_LOAD( "c4.4i", 0x13000, 0x1000, CRC(58cd143c) SHA1(e4ab27c09858cede478f4ed3ac6d7392e383a470) )
@@ -395,15 +395,47 @@ ROM_START( tutankhms )
 	ROM_LOAD( "c7.7i", 0x16000, 0x1000, CRC(afd0a81f) SHA1(cf10308a0fa4ffabd0deeb186b5602468028ff92) )
 	ROM_LOAD( "c8.8i", 0x17000, 0x1000, CRC(dabb609b) SHA1(773b99b670db41a9de58d14b51f81ce0c446ca84) )
 	ROM_LOAD( "c9.9i", 0x18000, 0x1000, CRC(8ea9c6a6) SHA1(fe1b299f8760fc5418179d3569932ee2c4dff461) )
-	/* the other banks (1900-1fff) are empty */
+	// the other banks (1900-1fff) are empty
 
-	/* ROMS located on the KT-5112-2B board. */
-	ROM_REGION(  0x3000, "timeplt_audio:tpsound", ROMREGION_ERASE00 ) /* 12k for Z80 sound CPU code */
+	// ROMS located on the KT-5112-2B board.
+	ROM_REGION(  0x3000, "timeplt_audio:tpsound", ROMREGION_ERASE00 ) // 12k for Z80 sound CPU code
 	ROM_LOAD( "s1.7a", 0x0000, 0x1000, CRC(b52d01fa) SHA1(9b6cf9ea51d3a87c174f34d42a4b1b5f38b48723) )
 	ROM_LOAD( "s2.8a", 0x1000, 0x1000, CRC(9db5c0ce) SHA1(b5bc1d89a7f7d7a0baae64390c37ee11f69a0e76) )
 ROM_END
 
 
+/*
+    Tutankham bootleg.
+
+    CPU/Video Board: TK-707A
+    Sound Board:     TK-707B
+*/
+
+ROM_START( tutankhmb )
+	// ROMS located on the TK-707A board.
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )      // 64k for M6809 CPU code + 64k for ROM banks
+	ROM_LOAD( "t1.1h", 0x0a000, 0x1000, CRC(37794533) SHA1(cd69b625bfb0ffa54bd07528967edcba64375d15) ) // program ROMs
+	ROM_LOAD( "t2.2h", 0x0b000, 0x1000, CRC(a0f02c85) SHA1(29a78b3ffd6b597772953543b02dd59acf5af38c) )
+	ROM_LOAD( "t3.3h", 0x0c000, 0x1000, CRC(0c41e644) SHA1(01b3bd6decfff21dbd7c5c799a3e077a157ca13b) )
+	ROM_LOAD( "t4.4h", 0x0d000, 0x1000, CRC(bd06fad0) SHA1(bd10bbb413d8dd362072522e902575d819fa8336) )
+	ROM_LOAD( "t5.5h", 0x0e000, 0x1000, CRC(bf9fd9b0) SHA1(458ea2ff5eedaaa02e32444dd6004d2eaadbdeab) )
+	ROM_LOAD( "t6.6h", 0x0f000, 0x1000, CRC(39cd1b22) SHA1(fe93ffd1f9e17a7d54235f20f62fb7958c5e35b8) )
+	ROM_LOAD( "t7.1i", 0x10000, 0x1000, CRC(55deafe2) SHA1(15475346b009936a4c17bf0b334a8e3f43b6c903) ) // graphic ROMs (banked) -- only 9 of 12 are filled
+	ROM_LOAD( "t8.2i", 0x11000, 0x1000, CRC(6615eff3) SHA1(e8455eab03f66642880595cfa0e9be285bf9fad0) )
+	ROM_LOAD( "t9.3i", 0x12000, 0x1000, CRC(a10d4444) SHA1(683899e1014ee075b16d9d2610c3c5b5c4efedb6) )
+	ROM_LOAD( "t10.4i", 0x13000, 0x1000, CRC(58cd143c) SHA1(e4ab27c09858cede478f4ed3ac6d7392e383a470) )
+	ROM_LOAD( "t11.5i", 0x14000, 0x1000, CRC(d7e7ae95) SHA1(7068797770a6c42dc733b253bf6b7376eb6e071e) )
+	ROM_LOAD( "t12.6i", 0x15000, 0x1000, CRC(dcde1109) SHA1(737b5a715e7705db9d38507d5c9f4b2d52c2c08f) )
+	ROM_LOAD( "t13.7i", 0x16000, 0x1000, CRC(c7250b9a) SHA1(fb7b00dcd1361e2d0e20801b439734e13ca68f94) )
+	ROM_LOAD( "t14.8i", 0x17000, 0x1000, CRC(685a623e) SHA1(6879edbc3ef0a854d08a8c2d9850970c2a54162f) )
+	ROM_LOAD( "t15.9i", 0x18000, 0x1000, CRC(8ea9c6a6) SHA1(fe1b299f8760fc5418179d3569932ee2c4dff461) )
+	// the other banks (1900-1fff) are empty
+
+	// ROMS located on the TK-707B board.
+	ROM_REGION(  0x3000, "timeplt_audio:tpsound", ROMREGION_ERASE00 ) // 12k for Z80 sound CPU code
+	ROM_LOAD( "t16.7a", 0x0000, 0x1000, CRC(b52d01fa) SHA1(9b6cf9ea51d3a87c174f34d42a4b1b5f38b48723) )
+	ROM_LOAD( "t17.8a", 0x1000, 0x1000, CRC(9db5c0ce) SHA1(b5bc1d89a7f7d7a0baae64390c37ee11f69a0e76) )
+ROM_END
 
 /*************************************
  *
@@ -411,5 +443,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, tutankhm_state, empty_init, ROT90, "Konami", "Tutankham", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1982, tutankhms,tutankhm, tutankhm, tutankhm, tutankhm_state, empty_init, ROT90, "Konami (Stern Electronics license)", "Tutankham (Stern Electronics)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1982, tutankhm,  0,        tutankhm, tutankhm, tutankhm_state, empty_init, ROT90, "Konami",                             "Tutankham",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1982, tutankhms, tutankhm, tutankhm, tutankhm, tutankhm_state, empty_init, ROT90, "Konami (Stern Electronics license)", "Tutankham (Stern Electronics)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1982, tutankhmb, tutankhm, tutankhm, tutankhm, tutankhm_state, empty_init, ROT90, "bootleg",                            "Tutankham (bootleg)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
