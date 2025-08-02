@@ -160,49 +160,57 @@
 #define SHRA_BYTE(c) CLK(c); dst = ((int8_t)dst) >> (c-1);  m_CarryVal = dst & 0x1;    dst = ((int8_t)((BYTE)dst)) >> 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
 #define SHRA_WORD(c) CLK(c); dst = ((int16_t)dst) >> (c-1); m_CarryVal = dst & 0x1;    dst = ((int16_t)((WORD)dst)) >> 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
 
-#define DIVUB                                               \
+#define DIVUB {                                               \
 	uresult = Wreg(AW);                                 \
 	uresult2 = uresult % tmp;                               \
 	uresult /= tmp; \
-	if (uresult > 0xff) {                          \
+	bool overflow = uresult > 0xff; \
+	if (overflow)                          \
 		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);                            \
-	} else {                                                \
+	if (!overflow || m_chip_type == V33_TYPE) {                           \
 		Breg(AL) = uresult;                             \
 		Breg(AH) = uresult2;                            \
-	}
+	} \
+}
 
-#define DIVB                                                \
+#define DIVB {                                               \
 	result = (int16_t)Wreg(AW);                           \
 	result2 = result % (int16_t)((int8_t)tmp);                  \
 	result /= (int16_t)((int8_t)tmp); \
-	if (result > 0x7f || result < -0x7f) {            \
+	bool overflow = result > 0x7f || result < -0x7f; \
+	if (overflow)            \
 		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);                            \
-	} else {                                                \
+	if (!overflow || m_chip_type == V33_TYPE) {                           \
 		Breg(AL) = result;                              \
 		Breg(AH) = result2;                             \
-	}
+	} \
+}
 
-#define DIVUW                                               \
+#define DIVUW {                                              \
 	uresult = (((uint32_t)Wreg(DW)) << 16) | Wreg(AW);\
 	uresult2 = uresult % tmp;                               \
 	uresult /= tmp; \
-	if (uresult > 0xffff) {                        \
+	bool overflow = uresult > 0xffff; \
+	if (overflow)                        \
 		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);                            \
-	} else {                                                \
+	if (!overflow || m_chip_type == V33_TYPE) {                           \
 		Wreg(AW)=uresult;                               \
 		Wreg(DW)=uresult2;                              \
-	}
+	} \
+}
 
-#define DIVW                                                \
+#define DIVW {                                               \
 	result = ((uint32_t)Wreg(DW) << 16) + Wreg(AW);   \
 	result2 = result % (int32_t)((int16_t)tmp);                 \
 	result /= (int32_t)((int16_t)tmp); \
-	if (result > 0x7fff || result < -0x7fff) {         \
+	bool overflow = result > 0x7fff || result < -0x7fff; \
+	if (overflow)         \
 		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);                            \
-	} else {                                                \
+	if (!overflow || m_chip_type == V33_TYPE) {                           \
 		Wreg(AW)=result;                                \
 		Wreg(DW)=result2;                               \
-	}
+	} \
+}
 
 #define ADD4S {                                             \
 	int i,v1,v2,result;                                     \

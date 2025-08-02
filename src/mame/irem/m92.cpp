@@ -65,18 +65,14 @@ BTANB:
 
       It adds the remainder to the water tiles offset. If the divu overflows, water
       animation stops. But every 0x800 frames, the water animates for about a second.
-      It works ok in MAME if you use cheats to jump straight to this level, the reason
-      is because frame counter is smaller than 0x1800.
 
 TODO:
     All games:
     - Flip screen/Cocktail Mode is unsupported (offsetted screens)
 
     Gunforce:
-    - Water usually doesn't appear at the start of level 5, it's related to the
-      BTANB above: register contents after divu overflow is undefined. MAME does
-      not modify AH/AL when that happens, as described in the V33 specs. But
-      apparently that's not how it works on the real CPU?
+    - Water BTANB mentioned above does not happen. MAME V33 stores the correct divu
+      result (although truncated), a real V33 stores an intermediate result.
 
     Irem Skins:
     - EEPROM load/save not yet implemented - when done, MT2EEP should
