@@ -37529,4 +37529,23 @@ https://jsgroth.dev/blog/posts/titan-overdrive-2-part-2/
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- https://github.com/Stephane-D/SGDK/releases/tag/v1.62 -->
+	<software name="sgdk_bap" supported="partial">
+		<description>SGDK Bad Apple PV demo (v1.62)</description>
+		<!-- header with (c) 2020 but release happened in 2021, also repeated at demo end -->
+		<year>2021</year>
+		<publisher>SGDK</publisher>
+		<notes><![CDATA[
+Crashes at startup with megadriv (verify)
+]]></notes>
+		<!-- <sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/> -->
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_titan"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x1000000">
+				<rom name="sgdk_bad_apple.bin" size="0x980000" crc="ab53f304" sha1="56c927144438d0581baa88141ff2258c8d1e4e6b" offset="00000"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
