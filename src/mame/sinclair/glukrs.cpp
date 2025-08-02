@@ -11,6 +11,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "osdcore.h"
 #include "glukrs.h"
 
 glukrs_device::glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -25,7 +26,7 @@ void glukrs_device::device_validity_check(validity_checker &valid) const
 	mc146818_device::device_validity_check(valid);
 
 	if (clock() != 32'768)
-		osd_printf_error("Clock %u is different from expected 32'768\n", clock());
+		osd_printf_warning("Clock %u is different from expected 32'768\n", clock());
 }
 
 void glukrs_device::device_start()
