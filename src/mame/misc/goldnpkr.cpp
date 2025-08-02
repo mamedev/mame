@@ -1200,6 +1200,7 @@ protected:
 	void witchcrd_palette(palette_device &palette) const;
 	void super21p_palette(palette_device &palette) const;
 	void wing_w90_palette(palette_device &palette) const;
+	void kmhpan_palette(palette_device &palette) const;
 
 	void goldnpkr_base(machine_config &config);
 
@@ -1223,10 +1224,12 @@ private:
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(super21p_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wing_w90_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(kmhpan_get_bg_tile_info);
 	void goldnpkr_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(wcrdxtnd);
 	DECLARE_VIDEO_START(super21p);
 	DECLARE_VIDEO_START(wing_w90);
+	DECLARE_VIDEO_START(kmhpan);
 	void wcrdxtnd_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(mondial);
 	DECLARE_MACHINE_START(lespendu);
@@ -1412,6 +1415,26 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::wing_w90_get_bg_tile_info)
 	tileinfo.set(bank, code, color, 0);
 }
 
+TILE_GET_INFO_MEMBER(goldnpkr_state::kmhpan_get_bg_tile_info)
+{
+/* 8 graphics banks system...
+
+    - bits -
+    7654 3210
+    --xx xx--   tiles color.
+    -x-- --xx   tiles bank.
+    x--- ----   unused.
+*/
+
+	int attr = m_colorram[tile_index];
+	int code = ((attr & 1) << 8) | m_videoram[tile_index];
+	int bank = (attr & 0x03) + ((attr & 0x40) >> 4);
+	int color = (attr & 0x3c) >> 2;
+
+	tileinfo.set(bank, code, color, 0);
+}
+
+
 void goldnpkr_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -1432,11 +1455,18 @@ VIDEO_START_MEMBER(goldnpkr_state, wing_w90)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::wing_w90_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
+VIDEO_START_MEMBER(goldnpkr_state, kmhpan)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::kmhpan_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+
 uint32_t goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
+
 
 void goldnpkr_state::goldnpkr_palette(palette_device &palette) const
 {
@@ -1616,6 +1646,11 @@ void goldnpkr_state::wing_w90_palette(palette_device &palette) const
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
+}
+
+void goldnpkr_state::kmhpan_palette(palette_device &palette) const
+{
+  // empty for testing purposes...
 }
 
 
@@ -2101,9 +2136,9 @@ void goldnpkr_state::kmhpan_map(address_map &map)
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
-	//map(0x2000, 0x2000).r // ??
+	map(0x2000, 0x2000).portr("SW1");
 	map(0x2400, 0x2400).w("sn", FUNC(sn76489a_device::write));
-	//map(0x2800, 0x2800).w // SN76489AN, initialized but not present on PCB? not written during gameplay
+//	map(0x2800, 0x2800).w  // SN76489AN, initialized but not present on PCB. not written during gameplay
 	map(0x4000, 0x7fff).rom();
 	map(0xc000, 0xffff).rom();  // extended rom space
 }
@@ -4817,9 +4852,30 @@ static INPUT_PORTS_START( kmhpan ) // TODO: verify inputs
 	PORT_INCLUDE( goldnpkr )
 
 	PORT_MODIFY("SW1")
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4") // Game specifically checks for this to be off
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x01, 0x01, "Bet Increment" )     PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x01, "Normal" )
+	PORT_DIPSETTING(    0x00, "Direct" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:2")  // nothing
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Double-Up 7" )       PORT_DIPLOCATION("SWA:3")
+	PORT_DIPSETTING(    0x04, "Even" )
+	PORT_DIPSETTING(    0x00, "Lose" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:4")  // double up y/n (disabled)
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:5")  // one pair y/n (disabled)
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Payout Mode" )       PORT_DIPLOCATION("SWA:6")
+	PORT_DIPSETTING(    0x20, "Keyout" )
+	PORT_DIPSETTING(    0x00, "Hopper" )	
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:7")  // game mode (disabled)
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Royal Flush" )       PORT_DIPLOCATION("SWA:8")
+	PORT_DIPSETTING(    0x80, "Lose" )
+	PORT_DIPSETTING(    0x00, "Ok" )
 INPUT_PORTS_END
 
 
@@ -5015,6 +5071,17 @@ GFXDECODE_END
 static GFXDECODE_START( gfx_lespendu )
 	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 0, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_kmhpan )
+	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 8, 16 )
 GFXDECODE_END
 
 
@@ -5581,9 +5648,14 @@ void goldnpkr_state::kmhpan(machine_config &config)
 
 	m_pia[1]->writepa_handler().remove();
 
+	// video hardware
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, kmhpan)
+	m_palette->set_init(FUNC(goldnpkr_state::kmhpan_palette));
+	m_gfxdecode->set_info(gfx_kmhpan);
+
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SN76489A(config, "sn", CPU_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.5); // divider unknown
+	SN76489A(config, "sn", MASTER_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.5); // divider unknown
 }
 
 void goldnpkr_state::unkicpf40(machine_config &config)
@@ -12967,40 +13039,80 @@ ROM_START( icproul )
 	ROM_LOAD( "n82s129an.bin", 0x0000, 0x0100, CRC(1a30bdd8) SHA1(d0a020e9604e8e0920a4500e02770db6c639bace) )
 ROM_END
 
-// PCB serigraphed PAN 电子 (PAN diànzǐ)
-// G65SC02P-2, 10 MHz XTAL, EF6821P, MC68B21P, HD46505SP-2, SN76489AN, bank of 8 switches, reset button
+/*
+  "开门胡" (kāi mén hú)
+
+  Mahjong-themed poker game.
+
+  The title is a term from Chinese Mahjong, specifically in certain regional rulesets
+  (like Hong Kong Mahjong or Sichuan Mahjong).
+
+  The literal Translation is "Open the door and win" (开门 = open door; 胡 = win).
+  In the mahjong game, a player can declare a winning hand (胡牌, hú pái) immediately
+  after drawing their first tile (before making any discards or melds).
+
+  Also called "Fast Ron". It's considered a rare and lucky move, often rewarded
+  with extra points or special payouts.
+
+
+  PCB serigraphed PAN 电子 (PAN diànzǐ)
+
+  G65SC02P-2 CPU.
+  10 MHz XTAL.
+  EF6821P & MC68B21P PIAs.
+  HD46505SP-2 CRTC.
+  SN76489AN.
+  1 bank of 8 DIP switches.
+  Reset button.
+
+*/
 ROM_START( kmhpan )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "main-prog.bin", 0x00000, 0x10000, CRC(1f96ec9f) SHA1(fb2f7e725af888b371e314a8f482c9acdf9a5894) )
 
-	// TODO: correct GFX ROMs' loading
-	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "kai-1.bin", 0x0000, 0x2000, CRC(825ec1ac) SHA1(6771b5f696e53222fb69e464e03935978e43cafb) ) // BADADDR         x-xxxxxxxxxxxxx
-	ROM_CONTINUE(          0x0000, 0x2000 )
-	ROM_CONTINUE(          0x0000, 0x2000 )
-	ROM_CONTINUE(          0x0000, 0x2000 )
-	ROM_LOAD( "kai-2.bin", 0x2000, 0x2000, CRC(22a51cf2) SHA1(a158acb450f1bfbc26384a3136fed4c268213de6) ) // BADADDR         x-xxxxxxxxxxxxx
-	ROM_CONTINUE(          0x2000, 0x2000 )
-	ROM_CONTINUE(          0x2000, 0x2000 )
-	ROM_CONTINUE(          0x2000, 0x2000 )
-	ROM_LOAD( "kai-3.bin", 0x4000, 0x2000, CRC(2ffd4c95) SHA1(c239213203bf7c5fc6336b3ef8e33904c4c1bcf2) ) // BADADDR         x-xxxxxxxxxxxxx
-	ROM_CONTINUE(          0x4000, 0x2000 )
-	ROM_CONTINUE(          0x4000, 0x2000 )
-	ROM_CONTINUE(          0x4000, 0x2000 )
+	ROM_REGION( 0x18000, "gfxpool", 0 )
+	ROM_LOAD( "kai-1.bin",  0x00000, 0x8000, CRC(825ec1ac) SHA1(6771b5f696e53222fb69e464e03935978e43cafb) )
+	ROM_LOAD( "kai-2.bin",  0x08000, 0x8000, CRC(22a51cf2) SHA1(a158acb450f1bfbc26384a3136fed4c268213de6) )
+	ROM_LOAD( "kai-3.bin",  0x10000, 0x8000, CRC(2ffd4c95) SHA1(c239213203bf7c5fc6336b3ef8e33904c4c1bcf2) )
 
-	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_COPY( "gfx1", 0x5000, 0x0000, 0x1000 )
-	ROM_FILL(         0x1000, 0x5000, 0x0000 )
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool",    0x04000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool",    0x0c000, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool",    0x14000, 0x1000, 0x0800 ) // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "gfxpool",    0x04800, 0x0000, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool",    0x0c800, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool",    0x14800, 0x1000, 0x0800 ) // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "gfxpool",    0x05000, 0x0000, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool",    0x0d000, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool",    0x15000, 0x1000, 0x0800 ) // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // title
+	ROM_COPY( "gfxpool",    0x05800, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool",    0x0d800, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool",    0x15800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+	ROM_LOAD( "kmhpan_nvram.bin", 0x0000, 0x0800, CRC(e412ee68) SHA1(5423352ea926fd3e052615706c1fafafb4333a14) )
 
 	// these two ROMs each contain just 0x100 of data from 0x4000 to 0x40ff and another 0x100 from 0x7000 to 0x70ff
 	// PROMs substitutes?
-	ROM_REGION( 0x10000, "unkroms", 0 )
+	ROM_REGION( 0x10000, "pal_eproms", 0 )
 	ROM_LOAD( "pan_dianzi_f.bin", 0x0000, 0x8000, CRC(e6a1907c) SHA1(b5497fd45a9416d926cde856292504c793b9fa2a) ) // M27C256B
 	ROM_LOAD( "pan_dianzi_g.bin", 0x8000, 0x8000, CRC(6ff231b7) SHA1(82da7b4c577669d261a181b4cc1fc91cd56763d3) ) // M27C256B
 
-	ROM_REGION( 0x0100, "proms", ROMREGION_ERASE00 ) // not identified / dumped yet
-	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // borrowed from goldnpkr for now, just to see something
+	ROM_REGION( 0x0300, "proms2", ROMREGION_ERASE00 )
+	ROM_COPY( "pal_eproms", 0x4000, 0x0000, 0x0100 )
+	ROM_COPY( "pal_eproms", 0x7000, 0x0100, 0x0100 )
+	ROM_COPY( "pal_eproms", 0xc000, 0x0200, 0x0100 )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "bprom.bin",     0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // borrowed from Golden Poker, seems to match
 ROM_END
+
 
 // Golden Poker type game.
 // Wing 8510-A / W90-3 PCB
@@ -13031,7 +13143,7 @@ ROM_START( wing90pkr )
 	ROM_IGNORE(                0x0800 )
 
 	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
-	ROM_LOAD( "w90_nvram.bin", 0x00, 0x800, CRC(fe25e24a) SHA1(350f715abc40dbd1803ce33f527df203d9a05549) )
+	ROM_LOAD( "w90_nvram.bin", 0x0000, 0x0800, CRC(fe25e24a) SHA1(350f715abc40dbd1803ce33f527df203d9a05549) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "r_82s129an.1c", 0x0000, 0x0100, CRC(2a16af3f) SHA1(4fd31a8e8c2cc4b548336438c407bb76548097ee) )
@@ -13797,7 +13909,7 @@ GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespe
 
 GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Roulette (ICP-1 PCB)",                    0 )  // password protected
 
-GAME(  199?, kmhpan,    0,        kmhpan,   kmhpan,   goldnpkr_state, empty_init,    ROT0,   "PAN Electronics",          "Kaimen Hu (PAN Electronics)",             MACHINE_NOT_WORKING )
+GAME(  199?, kmhpan,    0,        kmhpan,   kmhpan,   goldnpkr_state, empty_init,    ROT0,   "PAN Electronics",          "Kai Men Hu (PAN Electronics)",            MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
 
 GAME(  198?, wing90pkr, goldnpkr, wing_w90, wing_w90, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Wing W90 poker (Wing 8510-A W90-3 PCB)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )  // bad gfx dump
 
