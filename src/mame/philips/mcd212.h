@@ -139,6 +139,7 @@ protected:
 		MC_OP_SHIFT          = 20,
 
 		CSR1R_PA             = 0x20,        // Parity
+		CSR1R_PA_BIT         = 5,
 		CSR1R_DA             = 0x80,        // Display Active
 
 		CSR1W_BE             = 0x0001,      // Bus Error
@@ -230,6 +231,8 @@ protected:
 
 	required_shared_ptr<uint16_t> m_planea;
 	required_shared_ptr<uint16_t> m_planeb;
+
+	uint32_t m_interlace_field[312][768];
 
 	// internal state
 	bool m_matte_flag[2][768]{};
