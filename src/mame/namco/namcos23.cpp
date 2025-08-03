@@ -1437,6 +1437,8 @@ struct namcos23_render_entry
 {
 	int type;
 	u16 absolute_priority;
+	u16 tx;
+	u16 ty;
 	u16 model_blend_factor;
 	u16 camera_power;
 	u16 camera_ambient;
@@ -1804,6 +1806,8 @@ protected:
 	void c435_scaling_set();
 	void c435_model_blend_factor_set();
 	void c435_absolute_priority_set();
+	void c435_tx_set();
+	void c435_ty_set();
 	void c435_camera_power_set();
 	void c435_camera_ambient_set();
 	void c435_render();
@@ -1897,6 +1901,8 @@ protected:
 	emu_timer *m_subcpu_scanline_off_timer;
 
 	u16 m_absolute_priority;
+	u16 m_tx;
+	u16 m_ty;
 	u16 m_model_blend_factor;
 	u16 m_camera_power;
 	u16 m_camera_ambient;
@@ -2655,6 +2661,8 @@ void namcos23_state::c435_state_set(u16 type, const u16 *param)
 		re->fade_flags = m_c404.fade_flags;
 		re->absolute_priority = m_absolute_priority;
 		re->model_blend_factor = 0;
+		re->tx = 0;
+		re->ty = 0;
 		re->camera_power = m_camera_power;
 		re->camera_ambient = m_camera_ambient;
 		if (m_c435.buffer[0] == 0x4f38)
@@ -2734,6 +2742,8 @@ void namcos23_state::c435_state_set(u16 type, const u16 *param)
 		re->type = IMMEDIATE;
 		re->absolute_priority = m_absolute_priority;
 		re->model_blend_factor = 0;
+		re->tx = 0;
+		re->ty = 0;
 		re->camera_power = m_camera_power;
 		re->camera_ambient = m_camera_ambient;
 		/*
@@ -2814,6 +2824,8 @@ void namcos23_state::c435_state_set(u16 type, const u16 *param)
 		re->type = IMMEDIATE;
 		re->absolute_priority = m_absolute_priority;
 		re->model_blend_factor = 0;
+		re->tx = 0;
+		re->ty = 0;
 		re->camera_power = m_camera_power;
 		re->camera_ambient = m_camera_ambient;
 		re->immediate.type  =  param[ 0];
@@ -2894,6 +2906,16 @@ void namcos23_state::c435_absolute_priority_set() // 4.1
 	m_absolute_priority = m_c435.buffer[1];
 }
 
+void namcos23_state::c435_tx_set() // 4.2
+{
+	m_tx = m_c435.buffer[1];
+}
+
+void namcos23_state::c435_ty_set() // 4.3
+{
+	m_ty = m_c435.buffer[1];
+}
+
 void namcos23_state::c435_model_blend_factor_set() // 4.5
 {
 	m_model_blend_factor = m_c435.buffer[1];
@@ -2916,8 +2938,9 @@ void namcos23_state::c435_render() // 8
 		LOGMASKED(LOG_RENDER_ERR, "%04x %04x %04x %04x %04x\n", m_c435.buffer[0], m_c435.buffer[1], m_c435.buffer[2], m_c435.buffer[3], m_c435.buffer[4]);
 
 	render_t &render = m_render;
-	bool use_scaling = BIT(m_c435.buffer[0], 7);
-	bool transpose = BIT(m_c435.buffer[0], 6);
+	const bool scroll = BIT(m_c435.buffer[0], 9);
+	const bool use_scaling = BIT(m_c435.buffer[0], 7);
+	const bool transpose = BIT(m_c435.buffer[0], 6);
 
 	if (render.count[render.cur] >= RENDER_MAX_ENTRIES)
 	{
@@ -2936,6 +2959,8 @@ void namcos23_state::c435_render() // 8
 	re->model.transpose = transpose;
 	re->absolute_priority = m_absolute_priority;
 	re->model_blend_factor = m_model_blend_factor;
+	re->tx = scroll ? m_tx : 0;
+	re->ty = scroll ? m_ty : 0;
 	re->camera_power = m_camera_power;
 	re->camera_ambient = m_camera_ambient;
 	re->model.light_vector[0] = m_light_vector[0];
@@ -3042,6 +3067,12 @@ void namcos23_state::c435_pio_w(offs_t offset, u16 data)
 		{
 		case 0x0100:
 			c435_absolute_priority_set();
+			break;
+		case 0x0200:
+			c435_tx_set();
+			break;
+		case 0x0300:
+			c435_ty_set();
 			break;
 		case 0x0400:
 			c435_scaling_set();
@@ -3826,8 +3857,8 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 			pv[i].x = x;
 			pv[i].y = y;
 			pv[i].p[0] = z;
-			pv[i].p[1] = (((v1 >> 20) & 0xf00) | ((v2 >> 24) & 0xff)) + (stencil_enabled ? 0 : 0.5);
-			pv[i].p[2] = (((v1 >> 16) & 0xf00) | ((v3 >> 24) & 0xff)) + (stencil_enabled ? 0 : 0.5);
+			pv[i].p[1] = (((v1 >> 20) & 0xf00) | ((v2 >> 24) & 0xff)) + (stencil_enabled ? 0 : 0.5) + re->tx;
+			pv[i].p[2] = (((v1 >> 16) & 0xf00) | ((v3 >> 24) & 0xff)) + (stencil_enabled ? 0 : 0.5) + re->ty;
 			pv[i].p[3] = 64;
 
 			static const u8 LIGHT_SHIFTS[4] = { 24, 16,  8,  0 };
@@ -3974,6 +4005,7 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 			}
 
 			zsort = std::clamp(zsort, 0, 0x1fffff);
+			absolute_priority &= 7;
 			zsort |= (absolute_priority << 21);
 			p->zkey = zsort;
 
@@ -4101,6 +4133,8 @@ void gorgon_state::render_run(screen_device &screen, bitmap_rgb32 &bitmap)
 			re->fade_flags = m_c404.fade_flags;
 			re->absolute_priority = m_absolute_priority;
 			re->model_blend_factor = 0;
+			re->tx = 0;
+			re->ty = 0;
 			re->sprite.zcoord = ((m_c404.sprites[i].d[0] << 16) | m_c404.sprites[i].d[1]) & 0x00ffffff;
 			re->sprite.xpos = (s16)data[0] - deltax;
 			re->sprite.ypos = (s16)data[2] - deltay;
@@ -5162,6 +5196,8 @@ void namcos23_state::direct_buf_w(offs_t offset, u16 data, u16 mem_mask)
 		re->fade_flags = m_c404.fade_flags;
 		re->absolute_priority = m_absolute_priority;
 		re->model_blend_factor = 0;
+		re->tx = 0;
+		re->ty = 0;
 		memcpy(re->direct.d, m_c435.direct_buf, sizeof(m_c435.direct_buf));
 		render.count[render.cur]++;
 
@@ -5251,6 +5287,8 @@ void namcos23_state::ctl_direct_poly_w(offs_t offset, u16 data)
 				re->fade_flags = m_c404.fade_flags;
 				re->absolute_priority = m_absolute_priority;
 				re->model_blend_factor = 0;
+				re->tx = 0;
+				re->ty = 0;
 				memcpy(re->direct.d, m_c435.direct_buf, sizeof(m_c435.direct_buf));
 				render.count[render.cur]++;
 			}
@@ -5970,6 +6008,8 @@ void namcos23_state::machine_start()
 	save_item(NAME(m_proj_matrix_line));
 
 	save_item(NAME(m_absolute_priority));
+	save_item(NAME(m_tx));
+	save_item(NAME(m_ty));
 	save_item(NAME(m_model_blend_factor));
 	save_item(NAME(m_camera_power));
 	save_item(NAME(m_camera_ambient));
@@ -6047,6 +6087,12 @@ void namcos23_state::machine_reset()
 	m_c435.direct_buf_open = false;
 	memset(m_proj_matrix, 0, sizeof(float) * 24);
 	m_proj_matrix_line = 0;
+	m_absolute_priority = 0;
+	m_tx = 0;
+	m_ty = 0;
+	m_model_blend_factor = 0;
+	m_camera_power = 0;
+	m_camera_ambient = 0;
 
 	memset(m_c404.rowscroll, 0, sizeof(m_c404.rowscroll));
 	m_c404.lastrow = 0;
