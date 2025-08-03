@@ -84,6 +84,14 @@ void namcos2_state::machine_start()
 	save_item(NAME(m_sendval));
 }
 
+void suzuka8h_state::machine_start()
+{
+	namcos2_state::machine_start();
+
+	// resolve outputs
+	m_out_digit.resolve();
+}
+
 void gollygho_state::machine_start()
 {
 	namcos2_state::machine_start();
