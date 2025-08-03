@@ -231,7 +231,6 @@ private:
 	uint16_t glfgreat_rom_r(offs_t offset);
 	void glfgreat_122000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t glfgreat_ball_r();
-	void glfgreat_sound_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(glfgreat_get_roz_tile_info);
 	DECLARE_VIDEO_START(glfgreat);
@@ -383,13 +382,6 @@ void tmnt2_state::k053244_word_noA1_w(offs_t offset, uint16_t data, uint16_t mem
 		m_k053245->k053244_w(offset, (data >> 8) & 0xff);
 	if (ACCESSING_BITS_0_7)
 		m_k053245->k053244_w(offset + 1, data & 0xff);
-}
-
-
-
-void glfgreat_state::glfgreat_sound_w(offs_t offset, uint8_t data)
-{
-	m_k053260->main_write(offset, data);
 }
 
 
@@ -1272,7 +1264,7 @@ void glfgreat_state::glfgreat_main_map(address_map &map)
 	map(0x122000, 0x122001).w(FUNC(glfgreat_state::glfgreat_122000_w));
 	map(0x123000, 0x123000).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 	map(0x124000, 0x124001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x125000, 0x125003).r(m_k053260, FUNC(k053260_device::main_read)).umask16(0xff00).w(FUNC(glfgreat_state::glfgreat_sound_w)).umask16(0xff00);
+	map(0x125000, 0x125003).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0xff00);
 	map(0x200000, 0x207fff).rw(FUNC(glfgreat_state::k052109_word_noA12_r), FUNC(glfgreat_state::k052109_word_noA12_w));
 	map(0x300000, 0x3fffff).r(FUNC(glfgreat_state::glfgreat_rom_r));
 }
