@@ -181,10 +181,13 @@ TIMER_CALLBACK_MEMBER(k053260_device::update_state_outputs)
 
 void k053260_device::tim2_count() {
 	bool over = m_tim2>=111;
-	if(over) {
+	if (over)
+	{
 		m_tim2 = 0;
 		m_tim2_cb(ASSERT_LINE);
-	} else {
+	}
+	else
+	{
 		m_tim2++;
 		m_tim2_cb(CLEAR_LINE);
 	}
