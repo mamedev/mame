@@ -68,7 +68,7 @@ private:
 	u8           m_keyon;
 	u8           m_mode;
 	u32          m_timer_state;
-	u32          m_tim2;
+	u32          m_tim2_count;
 
 	// per voice state
 	class KDSC_Voice

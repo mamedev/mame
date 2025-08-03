@@ -101,7 +101,7 @@ k053260_device::k053260_device(const machine_config &mconfig, const char *tag, d
 	, m_keyon(0)
 	, m_mode(0)
 	, m_timer_state(0)
-	, m_tim2(0)
+	, m_tim2_count(0)
 	, m_voice{ { *this }, { *this }, { *this }, { *this } }
 {
 	std::fill(std::begin(m_portdata), std::end(m_portdata), 0);
@@ -121,7 +121,7 @@ void k053260_device::device_start()
 	save_item(NAME(m_keyon));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_timer_state));
-	save_item(NAME(m_tim2));
+	save_item(NAME(m_tim2_count));
 
 	for (int i = 0; i < 4; i++)
 		m_voice[i].voice_start(i);
@@ -171,10 +171,26 @@ TIMER_CALLBACK_MEMBER(k053260_device::update_state_outputs)
 {
 	switch (m_timer_state)
 	{
-		case 0: m_sh1_cb(ASSERT_LINE); break;
-		case 1: m_sh1_cb(CLEAR_LINE); tim2_count(); break;
-		case 2: m_sh2_cb(ASSERT_LINE); break;
-		case 3: m_sh2_cb(CLEAR_LINE); break;
+		case 0:
+			if (!m_sh1_cb.isunset())
+				m_sh1_cb(ASSERT_LINE);
+			break;
+
+		case 1:
+			if (!m_sh1_cb.isunset())
+				m_sh1_cb(CLEAR_LINE);
+			tim2_count();
+			break;
+
+		case 2:
+			if (!m_sh2_cb.isunset())
+				m_sh2_cb(ASSERT_LINE);
+			break;
+
+		case 3:
+			if (!m_sh2_cb.isunset())
+				m_sh2_cb(CLEAR_LINE);
+			break;
 	}
 	m_timer_state = (m_timer_state+1) & 3;
 }
@@ -186,17 +202,14 @@ TIMER_CALLBACK_MEMBER(k053260_device::update_state_outputs)
 // hence the pin name TIM2 and also the signal name 2MS seen in glfgreat schematics.
 void k053260_device::tim2_count()
 {
-	bool over = m_tim2 >= 111;
-	if (over)
+	m_tim2_count++;
+	if (m_tim2_count >= 112)
 	{
-		m_tim2 = 0;
+		m_tim2_count = 0;
 		m_tim2_cb(ASSERT_LINE);
 	}
-	else
-	{
-		m_tim2++;
+	else if (m_tim2_count == 1)
 		m_tim2_cb(CLEAR_LINE);
-	}
 }
 
 u8 k053260_device::main_read(offs_t offset)
