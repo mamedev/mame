@@ -26,7 +26,6 @@ TODO:
   1. putting to MAX power on green causes the game to return an incorrect
      value a.k.a. it detects a bunker/rough/water hazard;
   2. top/back spins doesn't have any effect in-game;
-- glfgreat: serious sound cut off -> "it's in the" ... "water"
 - prmrsocr: when the field rotates before the penalty kicks, parts of the
   053936 tilemap that shouldn't be seen are visible. Maybe the tilemap ROM is
   banked, or there are controls to clip the visible region (registers 0x06 and
@@ -232,7 +231,6 @@ private:
 	uint16_t glfgreat_rom_r(offs_t offset);
 	void glfgreat_122000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t glfgreat_ball_r();
-	void glfgreat_sound_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(glfgreat_get_roz_tile_info);
 	DECLARE_VIDEO_START(glfgreat);
@@ -387,16 +385,6 @@ void tmnt2_state::k053244_word_noA1_w(offs_t offset, uint16_t data, uint16_t mem
 }
 
 
-
-void glfgreat_state::glfgreat_sound_w(offs_t offset, uint8_t data)
-{
-	m_k053260->main_write(offset, data);
-
-	if (offset)
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
-}
-
-
 void prmrsocr_state::prmrsocr_sound_irq_w(uint16_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
@@ -420,7 +408,6 @@ void tmnt2_state::z80_nmi_w(int state)
 	if (state && !m_nmi_blocked->enabled())
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
-
 
 uint16_t tmnt2_state::punkshot_kludge_r()
 {
@@ -1277,7 +1264,7 @@ void glfgreat_state::glfgreat_main_map(address_map &map)
 	map(0x122000, 0x122001).w(FUNC(glfgreat_state::glfgreat_122000_w));
 	map(0x123000, 0x123000).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 	map(0x124000, 0x124001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x125000, 0x125003).r(m_k053260, FUNC(k053260_device::main_read)).umask16(0xff00).w(FUNC(glfgreat_state::glfgreat_sound_w)).umask16(0xff00);
+	map(0x125000, 0x125003).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0xff00);
 	map(0x200000, 0x207fff).rw(FUNC(glfgreat_state::k052109_word_noA12_r), FUNC(glfgreat_state::k052109_word_noA12_w));
 	map(0x300000, 0x3fffff).r(FUNC(glfgreat_state::glfgreat_rom_r));
 }
@@ -2499,6 +2486,7 @@ void glfgreat_state::glfgreat(machine_config &config)
 	m_k053260->add_route(0, "speaker", 1.0, 1);
 	m_k053260->add_route(1, "speaker", 1.0, 0);
 	m_k053260->sh1_cb().set(FUNC(glfgreat_state::z80_nmi_w));
+	m_k053260->tim2_cb().set_inputline(m_audiocpu, 0, HOLD_LINE);
 }
 
 void prmrsocr_state::machine_start()
@@ -3873,9 +3861,9 @@ GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  tmnt2_state,    empty_in
 GAME( 1991, blswhstla,   blswhstl, blswhstl, blswhstl,  tmnt2_state,    empty_init, ROT90,  "Konami",  "Bells & Whistles (Asia, version M)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  tmnt2_state,    empty_init, ROT90,  "Konami",  "Detana!! Twin Bee (Japan, version J)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  glfgreat_state, empty_init, ROT0,   "Konami",  "Golfing Greats (World, version L)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1991, glfgreatu,   glfgreat, glfgreat, glfgreatu, glfgreat_state, empty_init, ROT0,   "Konami",  "Golfing Greats (US, version K)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, glfgreat_state, empty_init, ROT0,   "Konami",  "Golfing Greats (Japan, version J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  glfgreat_state, empty_init, ROT0,   "Konami",  "Golfing Greats (World, version L)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1991, glfgreatu,   glfgreat, glfgreat, glfgreatu, glfgreat_state, empty_init, ROT0,   "Konami",  "Golfing Greats (US, version K)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, glfgreat_state, empty_init, ROT0,   "Konami",  "Golfing Greats (Japan, version J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Ninja Turtles: Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt2_state,    empty_init, ROT0,   "Konami",  "Teenage Mutant Ninja Turtles: Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
