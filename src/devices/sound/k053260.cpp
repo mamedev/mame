@@ -184,7 +184,8 @@ TIMER_CALLBACK_MEMBER(k053260_device::update_state_outputs)
 // least. These counters together produce a count that is 112 times slower than
 // the SH1 pin, taking it down from 56kHz to 500Hz. The period of 500Hz is 2ms,
 // hence the pin name TIM2 and also the signal name 2MS seen in glfgreat schematics.
-void k053260_device::tim2_count() {
+void k053260_device::tim2_count()
+{
 	bool over = m_tim2 >= 111;
 	if (over)
 	{
