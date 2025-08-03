@@ -48,6 +48,7 @@ protected:
 	virtual void rom_bank_pre_change() override;
 
 	TIMER_CALLBACK_MEMBER(update_state_outputs);
+
 private:
 	// Pan multipliers
 	static const int pan_mul[8][2];
@@ -66,8 +67,8 @@ private:
 	u8           m_portdata[4];
 	u8           m_keyon;
 	u8           m_mode;
-	int          m_timer_state;
-	int          m_tim2;
+	u32          m_timer_state;
+	u32          m_tim2;
 
 	// per voice state
 	class KDSC_Voice
