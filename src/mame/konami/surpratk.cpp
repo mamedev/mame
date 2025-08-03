@@ -2,11 +2,13 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-    Surprise Attack (Konami GX911) (c) 1990 Konami
+Surprise Attack (Konami GX911) (c) 1990 Konami
+Very similar to Parodius
 
-    Very similar to Parodius
+driver by Nicola Salmoria
 
-    driver by Nicola Salmoria
+TODO:
+- like with lethalen, sprite shadows should be cyan, see stage 3 windows
 
 ***************************************************************************/
 

@@ -218,8 +218,8 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_selected_page(0),
 	m_selected_page_x4096(0),
 	m_linemap_enabled(0),
-	m_use_ext_linescroll(0),
-	m_uses_tile_banks(0),
+	m_use_ext_linescroll(false),
+	m_uses_tile_banks(false),
 	m_cur_tile_bank(0),
 	m_k055555(*this, finder_base::DUMMY_TAG)
 {
@@ -342,8 +342,8 @@ void k056832_device::device_start()
 	memset(m_regs,     0x00, sizeof(m_regs) );
 	memset(m_regsb,    0x00, sizeof(m_regsb) );
 
-/* TODO: understand which elements MUST be init here (to keep correct layer
-   associations) and which ones can can be init at RESET, if any */
+	/* TODO: understand which elements MUST be init here (to keep correct layer
+	associations) and which ones can can be init at RESET, if any */
 
 	create_gfx();
 
@@ -459,9 +459,7 @@ void k056832_device::update_page_layout( )
 
 int k056832_device::get_lookup( int bits )
 {
-	int res;
-
-	res = (m_regs[0x1c] >> (bits << 2)) & 0x0f;
+	int res = (m_regs[0x1c] >> (bits << 2)) & 0x0f;
 
 	if (m_uses_tile_banks)   /* Asterix */
 		res |= m_cur_tile_bank << 4;
@@ -581,7 +579,7 @@ void k056832_device::change_rombank( )
 
 void k056832_device::set_tile_bank( int bank )
 {
-	m_uses_tile_banks = 1;
+	m_uses_tile_banks = true;
 
 	if (m_cur_tile_bank != bank)
 	{
@@ -594,12 +592,6 @@ void k056832_device::set_tile_bank( int bank )
 	}
 
 	change_rombank();
-}
-
-/* call if a game uses external linescroll */
-void k056832_device::SetExtLinescroll( )
-{
-	m_use_ext_linescroll = 1;
 }
 
 /* generic helper routine for ROM checksumming */
@@ -1311,25 +1303,25 @@ void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bi
 	}
 	if (flipy)
 		sdat_adv = -sdat_adv;
-/*
-if (scrollmode==2)
-{
-printf("%08x    %08x    %08x\n",layer,scrollbank<<12,m_lsram_page[layer][1]>>1);
-printf("\n000-100:\n");
-for (int zz=0x000; zz<0x100; zz++)
-    printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
-printf("\n100-200:\n");
-for (int zz=0x100; zz<0x200; zz++)
-    printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
-printf("\n200-300:\n");
-for (int zz=0x200; zz<0x300; zz++)
-    printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
-printf("\n300-400:\n");
-for (int zz=0x300; zz<0x400; zz++)
-    printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
-printf("\nend\n");
-}
-*/
+	/*
+	if (scrollmode == 2)
+	{
+		printf("%08x    %08x    %08x\n",layer,scrollbank<<12,m_lsram_page[layer][1]>>1);
+		printf("\n000-100:\n");
+		for (int zz=0x000; zz<0x100; zz++)
+			printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
+		printf("\n100-200:\n");
+		for (int zz=0x100; zz<0x200; zz++)
+			printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
+		printf("\n200-300:\n");
+		for (int zz=0x200; zz<0x300; zz++)
+			printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
+		printf("\n300-400:\n");
+		for (int zz=0x300; zz<0x400; zz++)
+			printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
+		printf("\nend\n");
+	}
+	*/
 	last_active = m_active_layer;
 	new_colorbase = (m_k055555 != nullptr) ? m_k055555->K055555_get_palette_index(layer) : 0;
 
@@ -1403,13 +1395,13 @@ printf("\nend\n");
 			if (!flipy)
 				sdat_start = dy;
 			else
-				/*
-				    doesn't work with Metamorphic Force and Martial Champion (software Y-flipped) but
-				    LE2U (naturally Y-flipped) seems to expect this condition as an override.
+			{
+				// doesn't work with Metamorphic Force and Martial Champion (software Y-flipped) but
+				// LE2U (naturally Y-flipped) seems to expect this condition as an override.
 
-				    sdat_start = K056832_PAGE_HEIGHT-1 -dy;
-				*/
-			sdat_start = K056832_PAGE_HEIGHT - 1;
+				//sdat_start = K056832_PAGE_HEIGHT-1 -dy;
+				sdat_start = K056832_PAGE_HEIGHT - 1;
+			}
 
 			if (scrollmode == 2) { sdat_start &= ~7; line_starty -= dy & 7; }
 		}
@@ -1473,7 +1465,7 @@ printf("\nend\n");
 
 				drawrect.min_y = (dminy < cminy ) ? cminy : dminy;
 				drawrect.max_y = (dmaxy > cmaxy ) ? cmaxy : dmaxy;
-// printf("%04x  %04x\n",layer,flipy);
+				// printf("%04x  %04x\n",layer,flipy);
 				// in xexex: K056832_DRAW_FLAG_MIRROR != flipy
 				if ((scrollmode == 2) && (flags & K056832_DRAW_FLAG_MIRROR) && (flipy))
 					dx = ((int)p_scroll_data[sdat_offs + 0x1e0 + 14]<<16 | (int)p_scroll_data[sdat_offs + 0x1e0 + 15]) + corr;
@@ -1892,7 +1884,6 @@ u16 k056832_device::b_word_r(offs_t offset)
 /*                                                                         */
 /***************************************************************************/
 
-
 void k056832_device::create_gfx()
 {
 	int gfx_index = 0;
@@ -1973,8 +1964,6 @@ void k056832_device::create_gfx()
 		8*8*4 // Increment
 	};
 
-
-
 	/* handle the various graphics formats */
 	i = (m_big) ? 8 : 16;
 
@@ -2032,8 +2021,6 @@ void k056832_device::create_gfx()
 
 	m_num_gfx_banks = m_rombase.bytes() / 0x2000;
 	m_cur_gfx_banks = 0;
-	m_use_ext_linescroll = 0;
-	m_uses_tile_banks = 0;
 }
 
 
@@ -2041,7 +2028,6 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 {
 	if (m_page_tile_mode[page]) return(0);
 	if (!m_linemap_enabled) return(1);
-
 
 	{
 		tilemap_t *tmap;
@@ -2309,13 +2295,13 @@ void k056832_device::m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap,
 		if (!flipy)
 			sdat_start = dy;
 		else
-			/*
-			    doesn't work with Metamorphic Force and Martial Champion (software Y-flipped) but
-			    LE2U (naturally Y-flipped) seems to expect this condition as an override.
+		{
+			// doesn't work with Metamorphic Force and Martial Champion (software Y-flipped) but
+			// LE2U (naturally Y-flipped) seems to expect this condition as an override.
 
-			    sdat_start = K056832_PAGE_HEIGHT-1 -dy;
-			*/
+			//sdat_start = K056832_PAGE_HEIGHT-1 -dy;
 			sdat_start = K056832_PAGE_HEIGHT-1;
+		}
 
 		if (scrollmode == 2) { sdat_start &= ~7; line_starty -= dy & 7; }
 	}
