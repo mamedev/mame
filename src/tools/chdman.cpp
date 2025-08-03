@@ -1768,11 +1768,33 @@ static void do_info(parameters_map &params)
 
 static void do_verify(parameters_map &params)
 {
-	// parse out input files
 	bool fix_sha1 = params.find(OPTION_FIX) != params.end();
+	// parse out input files
 	chd_file input_parent_chd;
 	chd_file input_chd;
-	parse_input_chd_parameters(params, input_chd, input_parent_chd, fix_sha1);
+	{
+		// process input parent file
+		auto input_chd_parent_str = params.find(OPTION_INPUT_PARENT);
+		if (input_chd_parent_str != params.end())
+		{
+			std::error_condition err = input_parent_chd.open(*input_chd_parent_str->second);
+			if (err)
+				report_error(1, "Error opening parent CHD file (%s): %s", *input_chd_parent_str->second, err.message());
+		}
+
+		// process input file
+		auto input_chd_str = params.find(OPTION_INPUT);
+		if (input_chd_str != params.end())
+		{
+			const uint32_t openflags = fix_sha1 ? (OPEN_FLAG_READ | OPEN_FLAG_WRITE) : OPEN_FLAG_READ;
+			util::core_file::ptr file;
+			std::error_condition err = util::core_file::open(*input_chd_str->second, openflags, file);
+			if (!err)
+				err = input_chd.open(std::move(file), false, input_parent_chd.opened() ? &input_parent_chd : nullptr);
+			if (err)
+				report_error(1, "Error opening CHD file (%s): %s", *input_chd_str->second, err.message());
+		}
+	}
 
 	// only makes sense for compressed CHDs with valid SHA-1's
 	if (!input_chd.compressed())
