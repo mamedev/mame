@@ -31,8 +31,9 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
-	auto sh1_cb() { return m_sh1_cb.bind(); }
-	auto sh2_cb() { return m_sh2_cb.bind(); }
+	auto sh1_cb()  { return m_sh1_cb.bind();  }
+	auto sh2_cb()  { return m_sh2_cb.bind();  }
+	auto tim2_cb() { return m_tim2_cb.bind(); }
 
 protected:
 	// device-level overrides
@@ -47,7 +48,6 @@ protected:
 	virtual void rom_bank_pre_change() override;
 
 	TIMER_CALLBACK_MEMBER(update_state_outputs);
-
 private:
 	// Pan multipliers
 	static const int pan_mul[8][2];
@@ -55,6 +55,8 @@ private:
 	// Sample hold lines callbacks (often used for interrupts)
 	devcb_write_line m_sh1_cb;
 	devcb_write_line m_sh2_cb;
+	devcb_write_line m_tim2_cb; // tim2 output (2ms period)
+	void tim2_count();
 
 	// configuration
 	sound_stream *m_stream;
@@ -65,6 +67,7 @@ private:
 	u8           m_keyon;
 	u8           m_mode;
 	int          m_timer_state;
+	int          m_tim2;
 
 	// per voice state
 	class KDSC_Voice
