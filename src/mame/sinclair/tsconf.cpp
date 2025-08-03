@@ -375,5 +375,5 @@ ROM_END
 
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
-COMP( 2011, tsconf,     spec128,    0,      tsconf,     tsconf,     tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution: TS-Configuration",   MACHINE_SUPPORTS_SAVE)
-COMP( 2024, tsconf2,    spec128,    0,      tsconf2,    tsconf,     tsconf_state,   empty_init, "TS-Labs",          "EvoMAX3: TS-Configuration 2",      MACHINE_SUPPORTS_SAVE)
+COMP( 2011, tsconf,     0,          0,      tsconf,     tsconf,     tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution: TS-Configuration",   MACHINE_SUPPORTS_SAVE)
+COMP( 2024, tsconf2,    tsconf,     0,      tsconf2,    tsconf,     tsconf_state,   empty_init, "TS-Labs",          "EvoMAX3: TS-Configuration 2",      MACHINE_SUPPORTS_SAVE)
