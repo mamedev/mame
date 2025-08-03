@@ -1835,7 +1835,6 @@ static void do_verify(parameters_map &params)
 				// fix it if requested
 				if (fix_sha1)
 				{
-					input_chd.set_raw_sha1(computed_sha1);
 					std::error_condition err = input_chd.set_raw_sha1(computed_sha1);
 					if (err)
 						report_error(1, "Error updating SHA1: %s", err.message());
