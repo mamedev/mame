@@ -1769,9 +1769,10 @@ static void do_info(parameters_map &params)
 static void do_verify(parameters_map &params)
 {
 	// parse out input files
+	bool fix_sha1 = params.find(OPTION_FIX) != params.end();
 	chd_file input_parent_chd;
 	chd_file input_chd;
-	parse_input_chd_parameters(params, input_chd, input_parent_chd);
+	parse_input_chd_parameters(params, input_chd, input_parent_chd, fix_sha1);
 
 	// only makes sense for compressed CHDs with valid SHA-1's
 	if (!input_chd.compressed())
@@ -1808,7 +1809,7 @@ static void do_verify(parameters_map &params)
 		util::stream_format(std::cerr, "              actual SHA1 = %s\n", computed_sha1.as_string());
 
 		// fix it if requested; this also fixes the overall one so we don't need to do any more
-		if (params.find(OPTION_FIX) != params.end())
+		if (fix_sha1)
 		{
 			std::error_condition err = input_chd.set_raw_sha1(computed_sha1);
 			if (err)
@@ -1832,7 +1833,7 @@ static void do_verify(parameters_map &params)
 				util::stream_format(std::cerr, "                  actual SHA1 = %s\n", computed_overall_sha1.as_string());
 
 				// fix it if requested
-				if (params.find(OPTION_FIX) != params.end())
+				if (fix_sha1)
 				{
 					input_chd.set_raw_sha1(computed_sha1);
 					std::error_condition err = input_chd.set_raw_sha1(computed_sha1);
