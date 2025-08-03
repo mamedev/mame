@@ -4986,6 +4986,79 @@ static INPUT_PORTS_START( wing_w90 )  // wing w90-3 pcb
 	PORT_DIPSETTING(    0x00, "Ok" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( unkicpetg )  // ICP-1 w/daughterboard
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Coinage Set") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(3) PORT_NAME("Note In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x10, 0x10, "Minimum Hand" )      PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, "2 Pair" )
+	PORT_DIPSETTING(    0x00, "Jacks or Better" )
+	PORT_DIPNAME( 0x20, 0x20, "Frequency" )         PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, "50Hz." )
+	PORT_DIPSETTING(    0x00, "60Hz." )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SWB")
+	PORT_DIPNAME( 0x07, 0x07, "Game Type" )         PORT_DIPLOCATION("SWB:1,2,3")
+	PORT_DIPSETTING(    0x07, "Normal" )
+	PORT_DIPSETTING(    0x06, "Turbo" )
+	PORT_DIPSETTING(    0x05, "Turbo-GT 8-Bet" )
+	PORT_DIPSETTING(    0x03, "Ex-Turbo 16-Bet" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Royal Flush Value" ) PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(    0x80, "500" )
+	PORT_DIPSETTING(    0x00, "1000" )
+INPUT_PORTS_END
+
 
 /*********************************************
 *              Graphics Layouts              *
@@ -13192,7 +13265,7 @@ ROM_START( unkicpf80 )
 	ROM_LOAD( "9_f80_sub.bin", 0xf000, 0x1000, CRC(98d16359) SHA1(fa6b6da54a1bb819627073d5330c0c3e1f207bb4) )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(          0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_FILL(         0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
 	ROM_LOAD( "4.8a", 0x1000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // char ROM
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
@@ -13204,6 +13277,41 @@ ROM_START( unkicpf80 )
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
 //	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
 //	ROM_CONTINUE(           0x0000, 0x0100 )
+ROM_END
+
+/*
+  EX-TURBO-GT poker
+  ICP PCBs with daughterboard.
+
+  Game type selectable via DIP switches.
+
+  * Normal mode.
+  * Turbo mode.
+  * Turbo-GT 8-Bet mode.
+  * EX-Turbo 16-Bet mode.
+
+*/
+ROM_START( unkicpetg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a.bin", 0x6000, 0x1000, CRC(bb8092f2) SHA1(47dbe72bf76cf99d94471691deb1d8dc67f87ef3) )
+	ROM_LOAD( "b.bin", 0x7000, 0x1000, CRC(ead750c8) SHA1(1754c7069ccb8b3460a84886e818eb240474d791) )
+	ROM_LOAD( "c.bin", 0xf000, 0x1000, CRC(3ed958af) SHA1(b7fcedc840919bee9d42d7501c66930a3c53ff83) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(         0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "4.8a", 0x1000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_LOAD( "3.7a", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+	ROM_LOAD( "unkicpetg_nvram.bin", 0x0000, 0x0800, CRC(aed44123) SHA1(d7993de94654ec70ff9fdcabf27c6fdafae89485) )
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+	ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 
@@ -13907,6 +14015,7 @@ GAME(  198?, wing90pkr, goldnpkr, wing_w90, wing_w90, goldnpkr_state, empty_init
 
 GAME(  198?, unkicpf40, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F40 poker (137 Fever, 10 bet)",       0 )
 GAME(  198?, unkicpf80, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F80 poker (137 Fever, 50 bet)",       0 )
+GAME(  198?, unkicpetg, 0,        unkicpf40, unkicpetg, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP EX-Turbo-GT poker",                   0 )
 
 
 /*************************************** SETS W/IRQ0 ***************************************/
