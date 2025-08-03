@@ -176,7 +176,6 @@ protected:
 	void k053244_word_noA1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_arm_nmi_w(uint8_t data);
 	void z80_nmi_w(int state);
-	void z80_int_w(int state);
 	uint16_t punkshot_kludge_r();
 	uint16_t ssriders_protection_r(address_space &space);
 	void ssriders_protection_w(address_space &space, offs_t offset, uint16_t data);
@@ -417,11 +416,6 @@ void tmnt2_state::z80_nmi_w(int state)
 {
 	if (state && !m_nmi_blocked->enabled())
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
-void tmnt2_state::z80_int_w(int state)
-{
-	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
 uint16_t tmnt2_state::punkshot_kludge_r()
@@ -2501,7 +2495,7 @@ void glfgreat_state::glfgreat(machine_config &config)
 	m_k053260->add_route(0, "speaker", 1.0, 1);
 	m_k053260->add_route(1, "speaker", 1.0, 0);
 	m_k053260->sh1_cb().set(FUNC(glfgreat_state::z80_nmi_w));
-	m_k053260->tim2_cb().set(FUNC(glfgreat_state::z80_int_w));
+	m_k053260->tim2_cb().set_inputline(m_audiocpu, 0, HOLD_LINE);
 }
 
 void prmrsocr_state::machine_start()
