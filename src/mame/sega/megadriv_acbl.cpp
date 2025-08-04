@@ -384,6 +384,8 @@ void songjang_state::songjang_map(address_map &map)
 
 	// shuifeng
 	map(0x45bdb2, 0x45bdb3).w(FUNC(songjang_state::protval_w)); // used with 0x465461 read
+	map(0x45bdf2, 0x45bdf3).w(FUNC(songjang_state::protval_w)); // used with 0x465461 read, when exiting service mode, but colours go bad anyway?
+
 	map(0x465460, 0x465461).r(FUNC(songjang_state::protval_r)); // used with 0x45bdb3 write
 	map(0x467470, 0x467471).r(FUNC(songjang_state::protval_r)); // used with 0x45bdb3 write
 
@@ -633,9 +635,9 @@ uint16_t songjang_state::unhandled_protval_r()
 	return m_protval;
 }
 
-void songjang_state::unhandled_protval_w(uint16_t data)
+void songjang_state::unhandled_protval_w(offs_t offset, uint16_t data)
 {
-	popmessage("%s: unhandled protval_w %04x\n", machine().describe_context(), data);
+	popmessage("%s: unhandled protval_w %08x %04x\n", machine().describe_context(), 0x400000 + (offset * 2) , data);
 	m_protval = data & 0xff00;
 }
 

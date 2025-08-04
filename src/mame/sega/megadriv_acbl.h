@@ -177,7 +177,7 @@ protected:
 
 private:
 	uint16_t unhandled_protval_r();
-	void unhandled_protval_w(uint16_t data);
+	void unhandled_protval_w(offs_t offset, uint16_t data);
 
 	uint16_t protval_r();
 	void protval_w(uint16_t data);
