@@ -242,9 +242,6 @@ TODO:
 
 - maybe some sprite placement issues (more likely due to zoom)
 
-- sprite shadows should be cyan, so: only the red channel should be reduced, green
-  and blue are unchanged
-
 
 BTANB:
 
@@ -295,6 +292,7 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* video-related */
@@ -322,6 +320,7 @@ private:
 	uint8_t guns_r(offs_t offset);
 	uint8_t gunsaux_r();
 	void palette_control_w(offs_t offset, uint8_t data);
+	void palette_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank(int state);
 	K053244_CB_MEMBER(sprite_callback);
@@ -331,6 +330,15 @@ private:
 	void le_sound(address_map &map) ATTR_COLD;
 };
 
+
+void lethal_state::video_start()
+{
+	const uint32_t num_colors = m_palette->entries() / 2;
+
+	// add our own shadow table, since shadows are cyan instead of default
+	for (int i = 0; i < num_colors; i++)
+		m_palette->shadow_table()[i] = i + num_colors;
+}
 
 K053244_CB_MEMBER(lethal_state::sprite_callback)
 {
@@ -390,6 +398,16 @@ void lethal_state::palette_control_w(offs_t offset, uint8_t data)
 			m_back_colorbase = ((data >> 4) & 0x7) * 1024 + 1023;
 			break;
 	}
+}
+
+void lethal_state::palette_w(offs_t offset, uint8_t data)
+{
+	m_palette->write8(offset, data);
+
+	// update shadow pen
+	rgb_t color = m_palette->pen_color(offset / 2);
+	color.set_r(color.r() * PALETTE_DEFAULT_SHADOW_FACTOR);
+	m_palette->set_pen_color(offset / 2 + m_palette->entries() / 2, color);
 }
 
 uint32_t lethal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -546,7 +564,7 @@ void lethal_state::bank4000_map(address_map &map)
 	map(0xa000, 0xbfff).mirror(0x4000).unmaprw(); // .r(m_k056832, FUNC(k056832_device::rom_byte_r));
 
 	// CBNK = 1; partially overlaid when VRD = 1
-	map(0x4000, 0x7fff).mirror(0x8000).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x4000, 0x7fff).mirror(0x8000).ram().w(FUNC(lethal_state::palette_w)).share("palette");
 }
 
 void lethal_state::le_sound(address_map &map)
@@ -676,9 +694,8 @@ void lethal_state::lethalen(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(lethal_state::vblank));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x2000 * 2); // custom shadows
 	m_palette->enable_shadows();
-	m_palette->enable_highlights();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(lethal_state::tile_callback));
