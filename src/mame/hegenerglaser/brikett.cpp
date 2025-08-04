@@ -26,7 +26,7 @@ Hardware notes:
 - CDP1802ACE @ 3.579MHz or 4.194MHz (chess clock runs faster on 4.194MHz)
 - 2*MWS5114E or 2*TC5514P (1KBx4 RAM)
 - optional bridge at _EF4 to GND for English piece notation (this is enabled
-  in the export version of Mephisto ESB II)
+  in the export version of Mephisto ESB II, as shown in the English manual)
 
 3rd model (later Mephisto II, Mephisto III): (listed differences)
 - PCB label: DH 4005-101 01
