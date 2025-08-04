@@ -2,11 +2,12 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-IBM ThinkPad 600 series
+IBM ThinkPad 6xx and 7xx series.
+More info from IBM: https://psref.lenovo.com/syspool/Sys/PDF/withdrawnbook/twbook.pdf
 
 TODO:
 - Intel e28f004b5t80 flash ROM;
-- RTC (what's the CMOS here?);
+- RTC (DS17485S-5);
 - keyboard (thru H8/3437);
 
 ===================================================================================================
@@ -14,18 +15,36 @@ TODO:
 The IBM ThinkPad 600 series was a series of notebook computers introduced in 1998 by IBM as an lighter and
 slimmer alternative to the 770 series. Three models were produced, the 600, 600E, and 600X.
 
+Hardware for the 600X model.
+  Main PCB:
+    -Intel Pentium III 650 Mobile MMC-2 (PMM65002101AB).
+       There were options for Pentium III at either 450 MHz, 500 MHz, or 650 MHz.
+    -Intel PCIset FW82371MB (PCI-TO-ISA / IDE XCELERATOR PIIX4).
+    -NeoMagic MagicMedia 256ZX NM2360A-A.
+    -Crystal CS4624-CQ (CrystalClear SoundFusion PCI Audio Accelerator).
+    -Crystal CS4297A-JQZ (CrystalClear SoundFusion Audio Codec).
+    -National Semiconductor PC97338VJG (ACPI 1.0 and PC98/99 Compliant SuperI/O).
+    -Hitachi HD64F3437TF.
+    -Texas Instruments TI PCI1450GJG (PC Card Controller).
+    -Atmel 24RF08CT (SEEPROM).
+    -Other chips: IMI-SG577DYB, TI SN75LVDS84, 4 x IBM 0364164PT3B (64 MB of RAM on the motherboard),
+                  IBM 20H2987, IBM 10L3953, Motorola MC145583V, Maxim MAX1632EAI, etc.
+   Enhanced video PCB:
+    -Chrontel CH7004C-T (Digital PC to TV Encoder with Macrovision).
+
 Hardware for the 600E model.
   Main PCB:
     -Intel Pentium II 366 Mobile MMC-2 (PMG36602002AA).
-       There were options for Pentium II at either 300 MHz, 366 MHz, or 400 MHz
+       There were options for Pentium II at either 300 MHz, 366 MHz, or 400 MHz.
     -Texas Instruments PCIbus SN104698GFN.
-    -Intel PCIset FW82371EB (PCI-TO-ISA / IDE XCELERATOR PIIX4)
+    -Intel PCIset FW82371EB (PCI-TO-ISA / IDE XCELERATOR PIIX4).
     -NeoMagic MagicMedia 256AV NM2200C-A.
     -Crystal CS4610C-CQ (CrystalClear SoundFusion PCI Audio Accelerator).
     -Crystal CS4239-KQ (CrystalClear Portable ISA Audio System).
     -National Semiconductor PC97338VJG (ACPI 1.0 and PC98/99 Compliant SuperI/O).
     -Hitachi HD64F3437TF.
     -Atmel 24C01A (SEEPROM).
+    -Dallas DS17485S-5 (real-time clock/calendar).
     -Other chips: IMI-SG577DYB, TI SN75LVDS84, 4 x IBM 0364164PT3B (64 MB of RAM on the motherboard),
                   IBM 20H2987, IBM 10L3953, Motorola MC145583V, Maxim MAX1632EAI, etc.
    Modem PCB:
@@ -46,6 +65,7 @@ Hardware for the 600 model.
     -National Semiconductor PC97338VJG (ACPI 1.0 and PC98/99 Compliant SuperI/O).
     -Hitachi HD64F3437TF.
     -Atmel 24C01A (SEEPROM).
+    -Dallas DS17485S-5 (real-time clock/calendar).
     -Other chips: IMI-SG571BYB, TI SN75LVDS84, 4 x Mitsubishi M5M4V64S40ATP (64 MB of RAM on the motherboard),
                   IBM 20H2987, IBM 10L3932, Maxim MAX1631EAI, etc.
    Modem PCB (same as 600E model):
@@ -54,6 +74,86 @@ Hardware for the 600 model.
     -Atmel ATF1500AL.
     -TI TCM320AC36C (Voice-Band Audio Processor [VBAPE]).
     -Large BGA chip silkscreened "IPI I8L7360 F27904A".
+
+IBM ThinkPad 760 was a notebook computer introduced in 1995 by IBM as part of the ThinkPad 700-series.
+Eleven models were produced: 760C, 760CD, 760L, 760LD, 760E, 760ED, 760EL, 760ELD, 760XL, 760XD, and 760D/L.
+
+Hardware for the 760XD model.
+  CPU PCB:
+    -Intel Mobile Pentium MMX 166 (TT80503166).
+    -Two Samsung KM732V589T-15 (Cache SRAM, 32KX32).
+    -One IDT 71V256 (Lower Power 3.3V CMOS Fast SRAM 256K [32K x 8-Bit]).
+  RAM PCB:
+    -Four on-board Toshiba TC51V18165CFTS-60 (1M X 16 EDO DRAM).
+    -Two DIMM slots.
+  Main PCB:
+    -Intel PCIset SB82437MX.
+    -Intel PCIset SB82371FB.
+    -Two Intel PCIset FA82438MX.
+    -W48C60-402G.
+    -Four M5M4V18165CTTP (1M x 16 EDO DRAM).
+    -Dallas DS17485S-5 (real-time clock/calendar).
+    -NEC 53G9037.
+    -NEC 53G9038.
+    -IBM 89G7219.
+    -IBM 20H2888.
+    -IBM 94G0207.
+    -HD6433436A18F (mask ROM, IBM-branded).
+    -Maxim MAX3243CAI.
+    -C46CM6 (SEEPROM, for BIOS settings).
+    -Texas Instruments PCIbus PCI1130PDV.
+    -Texas Instruments 90G9510.
+    -Intel Flash E28F004 (BIOS).
+  Video PCB:
+    -NEC 53G9037.
+    -IBM 20H2929.
+    -IBM 03H9515.
+    -Trident Cyber9385T.
+    -Two National Semiconductor DS90CF561MTD (LVDS 18-Bit Color Flat Panel Display [FPD] Link).
+    -Six KM416V256DT-L6 (256K x 16Bit CMOS Dynamic RAM with Fast Page Mode).
+    -AD722JR (RGB to NTSC/PAL Encoder).
+    -Philips SAA7110A WP.
+  Sound PCB:
+    -HM62W4032HFP25.
+    -Crystal CS4218-KQ.
+    -Texas Instruments TCM320AC36C (Voice-Band Audio Processor).
+  Two separate small PCBs with two IR transceivers.
+
+
+IBM ThinkPad 770 was a laptop designed and manufactured by IBM targeted for the business, enterprise and professional user.
+It was the last lineup in the ThinkPad 700-series, succeeding the 760 as the high-end laptop of the ThinkPad lineup. 
+The line was produced from October 1997 to May 2000, and eventually replaced by the ThinkPad models A20m and A20p.
+
+Hardware for the 770Z model.
+
+  Main PCB:
+    -Intel Mobile Pentium II 366 MMC-2 (PMG36602002AA).
+    -Texas Instruments PCIbus SN104698GFN.
+    -Intel PCIset FW82371EB (PCI-TO-ISA / IDE XCELERATOR PIIX4)
+    -Crystal CS4610C-CQ (CrystalClear SoundFusion PCI Audio Accelerator).
+    -Crystal CS4239-KQ (CrystalClear Portable ISA Audio System).
+    -National Semiconductor PC97338VJG (ACPI 1.0 and PC98/99 Compliant SuperI/O).
+    -Hitachi HD64F3437TF (near a 33.868 MHz xtal).
+    -Atmel 24C01A (SEEPROM).
+    -Dallas DS17485S-5 (real-time clock/calendar).
+    -Other chips: NEC-J 1K3153 919LW, National SemiconductorLMC6034IM, IBM 20H2987
+                  IBM 10L3953, IMI SSC660EYB, IMI SG577DYB
+   Modem PCB:
+    -IBM 3780i Mwave DSP.
+    -Epson 11J9289.
+    -Five AS7C3256-15TC (RAM).
+    -Atmel ATF1500AL.
+    -TI TCM320AC36C (Voice-Band Audio Processor [VBAPE]).
+   Video PCB:
+    -Trident Cyber9397DVD.
+    -Two KM4132G512TQ-8.
+   DVD and enhaced video PCB.
+    -IBM MPEGCD1MPFC21C (near a 27 MHz xtal).
+    -Analog Devices ADV7175AKS (integrated digital video encoder).
+    -M5M4V16S40CTP.
+    -CS8404A-CS.
+    -Philips SAA7111A (video input processor).
+
 
 **************************************************************************************************/
 
@@ -67,6 +167,7 @@ Hardware for the 600 model.
 #include "bus/rs232/terminal.h"
 #include "cpu/h8/h83337.h"
 #include "cpu/i386/i386.h"
+#include "machine/ds17x85.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/i82443bx_host.h"
@@ -153,9 +254,11 @@ static void isa_internal_devices(device_slot_interface &device)
 void thinkpad600_state::thinkpad600_base(machine_config &config)
 {
 	// TODO: move away, maps on MB resource, bump to H83437
-	h83337_device &mcu(H83337(config, "mcu", XTAL(16'000'000))); // Actually an Hitachi HD64F3437TF, unknown clock
+	h83337_device &mcu(H83337(config, "mcu", 10_MHz_XTAL)); // Actually an Hitachi HD64F3437TF
 	mcu.set_addrmap(AS_PROGRAM, &thinkpad600_state::mcu_map);
 //  mcu.set_disable();
+
+	DS17485(config, "rtc", 16'000'000); // Dallas DS17485S-5, unknown clock
 }
 
 void thinkpad600_state::thinkpad600e(machine_config &config)
@@ -207,7 +310,7 @@ void thinkpad600_state::thinkpad600e(machine_config &config)
 
 void thinkpad600_state::thinkpad600(machine_config &config)
 {
-	PENTIUM2(config, m_maincpu, 300'000'000); // Intel Pentium II 300 Mobile MMC-1 (PMD30005002AA)
+	PENTIUM2(config, m_maincpu, 300'000'000); // Intel Pentium II 300 Mobile MMC-1 (PMD30005002AA) on the 600 model
 	m_maincpu->set_disable();
 
 	// TODO: fill me, uses earlier PIIX4 AB
@@ -216,6 +319,31 @@ void thinkpad600_state::thinkpad600(machine_config &config)
 	thinkpad600_base(config);
 }
 
+
+ROM_START(thinkpad760xd)
+	ROM_REGION( 0x80000, "pci:07.0", 0 )
+	ROM_LOAD( "e28f004_89g8164_rev37_h1897m.u17",      0x00000, 0x80000, CRC(6092594f) SHA1(25681e4952a432e1170f69ae75f3260245b6b44b) ) // BIOS
+
+	ROM_REGION( 0x0f780, "mcu", 0)
+	ROM_LOAD( "ibm_hd6433436a18f_40h8792.u39",         0x00000, 0x0f780, NO_DUMP ) // Mask ROM, undumped
+
+	ROM_REGION( 0x00080, "seeprom", 0)
+	ROM_LOAD( "st93c46c.u30",                          0x00000, 0x00080, CRC(22cac7b5) SHA1(ee48ecf5d59e243e9afb0ca7e41ed8437eec8097) ) // BIOS settings
+ROM_END
+
+ROM_START(thinkpad600)
+	ROM_REGION( 0x80000, "pci:07.0", 0 )
+	ROM_LOAD( "tms28f004b_18l9949_rev16-i2298m.u76",   0x00000, 0x80000, CRC(00a52b32) SHA1(08db425b8edb3a036f22beb588caa6f050fc8eb2) )
+
+	ROM_REGION(0x0f780, "mcu", 0)
+	ROM_LOAD( "hd64f3437tf_10l9950_rev08_i2798m.u32",  0x00000, 0x0f780, CRC(546ec51c) SHA1(5d9b4be590307c4059ff11c434d0901819427649) )
+
+	ROM_REGION(0x00080, "seeprom", 0)
+	ROM_LOAD( "atmel_24c01a.u49",                      0x00000, 0x00080, CRC(9a2e2a18) SHA1(29e2832c97bc93debb4fb09fcbed582335b57efe) ) // BIOS settings
+
+	ROM_REGION(0x00c39, "plds", 0)
+	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
+ROM_END
 
 ROM_START(thinkpad600e)
 	ROM_REGION( 0x80000, "bios", 0 )
@@ -233,7 +361,7 @@ ROM_START(thinkpad600e)
 	ROM_LOAD( "hd64f3437tf-10l1057_rev04_h0499m.u39",  0x00000, 0x0f780, CRC(c21c928b) SHA1(33e3e6966f003655ffc2f3ac07772d2d3245740d) )
 
 	ROM_REGION(0x00080, "seeprom", 0)
-	ROM_LOAD( "atmel_24c01a.u98",                      0x00000, 0x00080, CRC(7ce51001) SHA1(6f25666373a6373ce0014c04df73a066f4da938b) )
+	ROM_LOAD( "atmel_24c01a.u98",                      0x00000, 0x00080, CRC(7ce51001) SHA1(6f25666373a6373ce0014c04df73a066f4da938b) ) // BIOS settings
 
 	ROM_REGION(0x00420, "seeprom2", 0)
 	ROM_LOAD( "at24rf08bt.u99",                        0x00000, 0x00420, CRC(c7ce9600) SHA1(4e6ed66250fed838614c3f1f6044fd9a19a2d0de) )
@@ -242,15 +370,29 @@ ROM_START(thinkpad600e)
 	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
 ROM_END
 
-ROM_START(thinkpad600)
-	ROM_REGION( 0x80000,  "pci:07.0", 0 )
-	ROM_LOAD( "tms28f004b_18l9949_rev16-i2298m.u76",   0x00000, 0x80000, CRC(00a52b32) SHA1(08db425b8edb3a036f22beb588caa6f050fc8eb2) )
+ROM_START(thinkpad600x)
+	ROM_REGION( 0x80000, "pci:07.0", 0 )
+	ROM_LOAD( "e28f004b5t80_08k3492_rev25_b0800m.u36", 0x00000, 0x80000, CRC(5c64ef91) SHA1(1aa2d68aff96c1ccc6859c5480fcfc5e73ab250d) )
 
 	ROM_REGION(0x0f780, "mcu", 0)
-	ROM_LOAD( "hd64f3437tf_10l9950_rev08_i2798m.u32",  0x00000, 0x0f780, CRC(546ec51c) SHA1(5d9b4be590307c4059ff11c434d0901819427649) )
+	ROM_LOAD( "hd64f3437tf_08k3493_rev05_b1100m.u75",  0x00000, 0xc000,  CRC(99d21cad) SHA1(92a2809e5c7ca3a63489f9cd1c9a7dc57c6a1343) )
 
 	ROM_REGION(0x00080, "seeprom", 0)
-	ROM_LOAD( "atmel_24c01a.u49",                      0x00000, 0x00080, CRC(9a2e2a18) SHA1(29e2832c97bc93debb4fb09fcbed582335b57efe) )
+	ROM_LOAD( "atmel24rf08ct.u79",                     0x00000, 0x00080, NO_DUMP ) // BIOS settings
+ROM_END
+
+ROM_START(thinkpad770z)
+	ROM_REGION( 0x80000, "pci:07.0", 0 )
+	ROM_LOAD( "e28f004b5t80-10l1055-rev09-d0999m.u59", 0x00000, 0x80000, CRC(f9f255c5) SHA1(ee209802d08c6498a42e52c5c45ce469dc095ad4) )
+
+	ROM_REGION(0x0f780, "mcu", 0)
+	ROM_LOAD( "hd64f3437tf-10l1049-rev05-e2699m.u10",  0x00000, 0x0f780, CRC(c1bad151) SHA1(73d0d1b15c083a18aff6b80188443b0dc1d976c3) )
+
+	ROM_REGION(0x00080, "seeprom", 0)
+	ROM_LOAD( "atmel24c01a.u94",                       0x00000, 0x00080, CRC(7ce51001) SHA1(6f25666373a6373ce0014c04df73a066f4da938b) ) // BIOS settings
+
+	ROM_REGION(0x00420, "seeprom2", 0)
+	ROM_LOAD( "una-at24rf08bt.bin",                    0x00000, 0x00420, CRC(9ccddd43) SHA1(262af18b5649b01f70ef1587a14405f8f6cd8fe2) )
 
 	ROM_REGION(0x00c39, "plds", 0)
 	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
@@ -258,6 +400,9 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR, NAME,         PARENT, COMPAT, MACHINE,      INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,        FLAGS
-COMP( 1999, thinkpad600e, 0,      0,      thinkpad600e, thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600E", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, thinkpad600,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR, NAME,          PARENT, COMPAT, MACHINE,      INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,         FLAGS
+COMP( 1995, thinkpad760xd, 0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 760XD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, thinkpad600,   0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, thinkpad600e,  0,      0,      thinkpad600e, thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600E",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, thinkpad600x,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600X",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, thinkpad770z,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 770Z",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
