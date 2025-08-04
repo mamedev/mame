@@ -151,7 +151,7 @@ void pentevo_state::atm_update_io()
 {
 	if (BIT(m_port_bf_data, 0) || is_dos_active())
 	{
-		m_io_view.select(0);
+		m_io_view.select(1);
 		if (m_beta_drive_selected && m_beta_drive_virtual == m_beta_drive_selected)
 			m_io_dos_view.disable();
 		else
@@ -161,7 +161,7 @@ void pentevo_state::atm_update_io()
 	}
 	else
 	{
-		m_io_view.disable();
+		m_io_view.select(0);
 		if (BIT(m_port_eff7_data, 7))
 			m_glukrs->enable();
 		else
@@ -595,28 +595,32 @@ void pentevo_state::pentevo_io(address_map &map)
 	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
 	map(0x001f, 0x001f).mirror(0xff00).lr8(NAME([]() -> u8 { return 0x00; })); // TODO Kepmston Joystick
 
-	// PORTS: Shadow
 	map(0x0000, 0xffff).view(m_io_view);
-	m_io_view[0](0x0000, 0xffff).view(m_io_dos_view);
+	m_io_view[0];
+
+	// PORTS: Shadow
+	m_io_view[1](0x0000, 0xffff).view(m_io_dos_view);
 	m_io_dos_view[0](0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
 	m_io_dos_view[0](0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
 	m_io_dos_view[0](0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
 	m_io_dos_view[0](0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
 	m_io_dos_view[0](0x00ff, 0x00ff).select(0xff00).r(m_beta, FUNC(beta_disk_device::state_r));
 
-	m_io_view[0](0x00ff, 0x00ff).select(0xff00).w(FUNC(pentevo_state::atm_port_ff_w));
-	m_io_view[0](0x0077, 0x0077).select(0xff00).lr8(NAME([]() { return 0xff; })).w(FUNC(pentevo_state::atm_port_77_w));
-	m_io_view[0](0x3ff7, 0x3ff7).select(0xc000).w(FUNC(pentevo_state::atm_port_f7_w));      // ATM
-	m_io_view[0](0x37f7, 0x37f7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_7f7_w)); // PENTEVO
-	m_io_view[0](0x3bf7, 0x3bf7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_bf7_w)); // RO
+	m_io_view[1](0x00ff, 0x00ff).select(0xff00).w(FUNC(pentevo_state::atm_port_ff_w));
+	m_io_view[1](0x0077, 0x0077).select(0xff00).lr8(NAME([]() { return 0xff; })).w(FUNC(pentevo_state::atm_port_77_w));
+	m_io_view[1](0x3ff7, 0x3ff7).select(0xc000).w(FUNC(pentevo_state::atm_port_f7_w));      // ATM
+	m_io_view[1](0x37f7, 0x37f7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_7f7_w)); // PENTEVO
+	m_io_view[1](0x3bf7, 0x3bf7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_bf7_w)); // RO
 
 	// SPI
-	m_io_view[0](0x0057, 0x0057).select(0xff00)
+	m_io_view[1](0x0057, 0x0057).select(0xff00)
 		.lw8(NAME([this](offs_t offset, u8 data) { if (BIT(offset, 15)) spi_port_77_w(offset, data); else spi_port_57_w(offset, data); }));
 
 	// Gluk
-	m_io_view[0](0xdef7, 0xdef7).lw8(NAME([this](offs_t offset, u8 data) { m_glukrs->address_w(data); } ));
-	m_io_view[0](0xbef7, 0xbef7).rw(FUNC(pentevo_state::gluk_data_r), FUNC(pentevo_state::gluk_data_w));
+	m_io_view[1](0xdef7, 0xdef7).lw8(NAME([this](offs_t offset, u8 data) { m_glukrs->address_w(data); } ));
+	m_io_view[1](0xbef7, 0xbef7).rw(FUNC(pentevo_state::gluk_data_r), FUNC(pentevo_state::gluk_data_w));
+
+	subdevice<zxbus_device>("zxbus")->set_io_space(m_io_view[0], m_io_view[1]);
 }
 
 void pentevo_state::init_mem_write()
@@ -744,8 +748,7 @@ void pentevo_state::pentevo(machine_config &config)
 	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 3);
 
 	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	zxbus.set_iospace("maincpu", AS_IO);
-	ZXBUS_SLOT(config, "zxbus1", 0, "zxbus", zxbus_cards, nullptr);
+	ZXBUS_SLOT(config, "zxbus1", 0, zxbus, zxbus_cards, nullptr);
 }
 
 
