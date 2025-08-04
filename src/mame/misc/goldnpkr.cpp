@@ -2404,11 +2404,10 @@ static INPUT_PORTS_START( pottnpkr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings (optional)") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Coupon (Note In)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Coin In") PORT_IMPULSE(3)
-//* PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Weight (Coupon In)") PORT_CODE(KEYCODE_H) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -13314,6 +13313,30 @@ ROM_START( unkicpetg )
 	ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
+// Unknown Turbo Poker
+// Design and shape close to Witch Card.
+ROM_START( gp_turbo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "turbo_7.bin", 0x2000, 0x1000, CRC(c9a059be) SHA1(b77953cfd86d079f7be86f85e9e3e289372e34ca) )
+	ROM_LOAD( "turbo_8.bin", 0x3000, 0x1000, CRC(5ccfb5cc) SHA1(ea9dafb41a4f206ad32f1a66d0eb4a79f8f3b7b0) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "ic7_0.bin",  0x2000, 0x1000, CRC(1090e7f0) SHA1(26a7fc8853debb9a759811d7fee39410614c3895) )    // char ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "ic2_7.bin",  0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "ic3_8.bin",  0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "ic5_9.bin",  0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+	ROM_LOAD( "gp_turbo_nvram.bin", 0x0000, 0x0800, CRC(4e5fa405) SHA1(287f26240128f3aa4af936fb51bf1488da32462a) )
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+	ROM_CONTINUE(           0x0000, 0x0100 )
+ROM_END
+
 
 /*********************************************
 *                Driver Init                 *
@@ -13871,6 +13894,7 @@ GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )
 GAMEL( 198?, adpoker,   0,        pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "Amstar?",                  "Amstar Draw Poker",                          0,                layout_goldnpkr )
+GAMEL( 198?, gp_turbo,  0,        pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Unknown Turbo Poker",                        0,                layout_goldnpkr )
 
 GAMEL( 1990, bsuerte,   0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",              0,                layout_goldnpkr )
 GAMEL( 1991, bsuertea,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",              0,                layout_goldnpkr )
