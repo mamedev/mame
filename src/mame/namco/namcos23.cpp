@@ -3542,7 +3542,22 @@ void namcos23_state::render_direct_poly(const namcos23_render_entry *re)
 			p->pv[j].y = ((s16)src[3] + 240);
 		}
 
-		p->zkey = polyshift | (re->absolute_priority << 21);
+		int zsort = 0;
+		if (zsort > 0x1fffff) zsort = 0x1fffff;
+
+		int absolute_priority = re->absolute_priority & 7;
+		if (BIT(polyshift, 21))
+			zsort = polyshift & 0x1fffff;
+		else
+		{
+			zsort += BIT(polyshift, 17) ? (polyshift | 0xfffc0000) : (polyshift & 0x0001ffff);
+			absolute_priority += (polyshift & 0x1c0000) >> 18;
+		}
+
+		zsort = std::clamp(zsort, 0, 0x1fffff);
+		zsort |= (absolute_priority << 21);
+		p->zkey = zsort;
+
 		p->rd.machine = &machine();
 		p->rd.texture_lookup = render_texture_lookup;
 		p->rd.stencil_lookup = render_stencil_lookup_always;
@@ -4005,7 +4020,6 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 			}
 
 			zsort = std::clamp(zsort, 0, 0x1fffff);
-			absolute_priority &= 7;
 			zsort |= (absolute_priority << 21);
 			p->zkey = zsort;
 
