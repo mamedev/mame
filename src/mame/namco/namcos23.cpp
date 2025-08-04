@@ -7945,6 +7945,9 @@ ROM_START( downhill ) // Dump has been reprogrammed on blank flash ROMs and test
 	ROM_LOAD( "dh1cglm.5k",   0x000000, 0x800000, CRC(5d9a5e35) SHA1(d746abb45f04aa4eb9d43d9c79051e71bf024e38) )
 	ROM_LOAD( "dh1ccrl.7m",   0x000000, 0x400000, CRC(65c857df) SHA1(5d67b17cf272f042b4264d9871d6e4088c20b788) )
 	ROM_LOAD( "dh1ccrh.7k",   0x000000, 0x200000, CRC(f21c482d) SHA1(bfcead2ff3d10f996ac0bf81470d050bd6374156) )
+
+	ROM_REGION( 0x010000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x010000, CRC(1195e532) SHA1(1c88b2d83c290f79e9505dda5beb4ae3a85d5d30) )
 ROM_END
 
 
@@ -7991,6 +7994,9 @@ ROM_START( downhillu )
 	ROM_LOAD( "dh1cglm.5k",   0x000000, 0x800000, CRC(5d9a5e35) SHA1(d746abb45f04aa4eb9d43d9c79051e71bf024e38) )
 	ROM_LOAD( "dh1ccrl.7m",   0x000000, 0x400000, CRC(65c857df) SHA1(5d67b17cf272f042b4264d9871d6e4088c20b788) )
 	ROM_LOAD( "dh1ccrh.7k",   0x000000, 0x200000, CRC(f21c482d) SHA1(bfcead2ff3d10f996ac0bf81470d050bd6374156) )
+
+	ROM_REGION( 0x010000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x010000, CRC(1195e532) SHA1(1c88b2d83c290f79e9505dda5beb4ae3a85d5d30) )
 ROM_END
 
 
