@@ -372,11 +372,22 @@ void songjang_state::songjang_map(address_map &map)
 
 	map(0x01c000, 0x01cfff).nopw(); // writes to ROM area, buggy code?
 
+	// fallthrough for unhandled cases, as the protection in this area just seems to expect readbacks of data written
+	// but at a different address, maybe hardcoded per game in one of the custom programmed chips?
+	map(0x400000, 0x4fffff).rw(FUNC(songjang_state::unhandled_protval_r), FUNC(songjang_state::unhandled_protval_w));
+
+	// songjang
 	map(0x412302, 0x412303).w(FUNC(songjang_state::protval_w)); // used with 0x432100 read
 	map(0x426800, 0x426801).r(FUNC(songjang_state::protval_r)); // used with 0x468202 write
 	map(0x432100, 0x432101).r(FUNC(songjang_state::protval_r)); // used with 0x412302 write
 	map(0x468202, 0x468203).w(FUNC(songjang_state::protval_w)); // used with 0x426800 read
 
+	// shuifeng
+	map(0x45bdb2, 0x45bdb3).w(FUNC(songjang_state::protval_w)); // used with 0x465461 read
+	map(0x465460, 0x465461).r(FUNC(songjang_state::protval_r)); // used with 0x45bdb3 write
+	map(0x467470, 0x467471).r(FUNC(songjang_state::protval_r)); // used with 0x45bdb3 write
+
+	// both
 	map(0x70001c, 0x70001d).r(FUNC(songjang_state::sj_70001c_r));
 }
 
@@ -616,6 +627,18 @@ uint16_t jzth_state::bl_710000_r()
 	return ret;
 }
 
+uint16_t songjang_state::unhandled_protval_r()
+{
+	popmessage("%s: unhandled protval_r\n", machine().describe_context());
+	return m_protval;
+}
+
+void songjang_state::unhandled_protval_w(uint16_t data)
+{
+	popmessage("%s: unhandled protval_w %04x\n", machine().describe_context(), data);
+	m_protval = data & 0xff00;
+}
+
 uint16_t songjang_state::protval_r()
 {
 	logerror("%s: protval_r\n", machine().describe_context());
@@ -632,6 +655,12 @@ uint16_t songjang_state::sj_70001c_r()
 {
 	logerror("%s: reading from sj_70001c_r\n", machine().describe_context());
 	return 0x0002;
+}
+
+uint16_t shuifeng_state::sj_70001c_r()
+{
+	logerror("%s: reading from sj_70001c_r\n", machine().describe_context());
+	return 0x0031;
 }
 
 /*************************************
@@ -2057,6 +2086,17 @@ ROM_START( songjang )
 	ROM_LOAD( "rom.u3", 0x00000, 0x80000, CRC(44287ab4) SHA1(42de2010e73c036a2a0e01c9dd3c1c8aef1a54a1) )
 ROM_END
 
+ROM_START( shuifeng )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "shuihufengyunzhuan.u5", 0x000000, 0x080000, CRC(73208a1a) SHA1(1eff253fe48f9e553a238c4cfd41cc5e5839393f) )
+	ROM_LOAD16_BYTE( "shuihufengyunzhuan.u4", 0x000001, 0x080000, CRC(e633c02c) SHA1(7ff1091a5b2e7d5e0e616509854fa0058d3cdcf7) )
+	ROM_LOAD16_BYTE( "shuihufengyunzhuan.u8", 0x100000, 0x080000, CRC(31814eb0) SHA1(3a6b13931d02a0c3b8bd97dc51ac5771a97bd092) )
+	ROM_LOAD16_BYTE( "shuihufengyunzhuan.u7", 0x100001, 0x080000, CRC(51caef9f) SHA1(252dbb29ae878aaf28cb4586e02d823296eaf378) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) // only one bank (2nd half is blank)
+	ROM_LOAD( "shuihufengyunzhuan-oki.u3", 0x00000, 0x80000, CRC(44287ab4) SHA1(42de2010e73c036a2a0e01c9dd3c1c8aef1a54a1) )
+ROM_END
+
 /*************************************
  *
  *  Game driver(s)
@@ -2088,4 +2128,7 @@ GAME( 2000, puckpkmn,  0,        puckpkmn,  puckpkmn, puckpkmn_state, init_puckp
 GAME( 2000, jingling,  puckpkmn, jingling,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "IBS Co. Ltd", "Jingling Jiazu Genie 2000",             0 )
 GAME( 2000, puckpkmnb, puckpkmn, puckpkmnb, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "bootleg",     "Puckman Pockimon Genie 2000 (bootleg)", 0 )
 GAME( 2000, jzth,      0,        jzth,      jzth,     jzth_state,     init_puckpkmn, ROT0, "<unknown>",   "Juezhan Tianhuang",                     MACHINE_IMPERFECT_SOUND )
-GAME( 200?, songjang,  0,        songjang,  songjang, songjang_state, init_puckpkmn, ROT0, "WAH LAP",     "Songjiangyanyi Final",                  MACHINE_NOT_WORKING )
+
+// some corruption on cutscenes between levels, emulation bug or glitch in the original conversion?
+GAME( 200?, songjang,  0,        songjang,  songjang, songjang_state, init_puckpkmn, ROT0, "WAH LAP",     "Songjiangyanyi Final",                  MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, shuifeng,  0,        songjang,  jzth,     shuifeng_state, init_puckpkmn, ROT0, "WAH LAP",     "Shuihu Feng Yun Zhuan",                 MACHINE_IMPERFECT_GRAPHICS )

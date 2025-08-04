@@ -165,7 +165,10 @@ private:
 class songjang_state : public puckpkmn_state
 {
 public:
-	using puckpkmn_state::puckpkmn_state;
+	songjang_state(const machine_config &mconfig, device_type type, const char *tag) :
+		puckpkmn_state(mconfig, type, tag)
+	{
+	}
 
 	void songjang(machine_config &config) ATTR_COLD;
 
@@ -173,15 +176,31 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
+	uint16_t unhandled_protval_r();
+	void unhandled_protval_w(uint16_t data);
+
 	uint16_t protval_r();
 	void protval_w(uint16_t data);
 
-	uint16_t sj_70001c_r();
+	virtual uint16_t sj_70001c_r();
 
 	void songjang_map(address_map &map) ATTR_COLD;
 
 	uint16_t m_protval;
 };
+
+class shuifeng_state : public songjang_state
+{
+public:
+	shuifeng_state(const machine_config &mconfig, device_type type, const char *tag) :
+		songjang_state(mconfig, type, tag)
+	{
+	}
+
+private:
+	virtual uint16_t sj_70001c_r() override;
+};
+
 
 
 #endif // MAME_SEGA_MEGADRIV_ACBL_H
