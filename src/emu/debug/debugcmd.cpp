@@ -3913,33 +3913,20 @@ void debugger_commands::execute_memdump(const std::vector<std::string_view> &par
 
 void debugger_commands::execute_symlist(const std::vector<std::string_view> &params)
 {
+	// get the specified CPU or default to the visible CPU
 	device_t *cpu = nullptr;
-	symbol_table *symtable;
-
-	// default to visible CPU if none specified
-	if (!m_console.validate_cpu_parameter(params.empty() ? std::string_view() : params[0], cpu))
-	{
-		if (!params.empty())
-			return; // explicitly specified CPU is invalid
-
-		// somehow CPU "0" is invalid, so just stick with global symbol table
-		symtable = &m_machine.debugger().cpu().global_symtable();
-	}
-	else
-	{
-		symtable = &cpu->debug()->symtable();
-	}
+	if (params.empty())
+		cpu = m_console.get_visible_cpu();
+	else if (!m_console.validate_cpu_parameter(params[0], cpu))
+		return;
 
 	// unknown tag if CPU is invalid
 	const char *cpu_tag = cpu ? cpu->tag() : ":?";
 
 	// traverse symbol_table parent chain, printing each table's symbols in its own block
-	for (; symtable != nullptr; symtable = symtable->parent())
+	auto *symtable = cpu ? &cpu->debug()->symtable() : &m_console.visible_symtable();
+	for ( ; symtable; symtable = params.empty() ? symtable->parent() : nullptr)
 	{
-		// skip globals if user explicitly requested CPU
-		if (symtable->type() == symbol_table::BUILTIN_GLOBALS && !params.empty())
-			continue;
-
 		if (symtable->entries().size() == 0)
 			continue;
 
@@ -3975,7 +3962,7 @@ void debugger_commands::execute_symlist(const std::vector<std::string_view> &par
 				[] (const char *item1, const char *item2) { return strcmp(item1, item2) < 0; });
 
 		// iterate over symbols and print them
-		for (const char * symname : namelist)
+		for (const char *symname : namelist)
 		{
 			symbol_entry const *const entry = symtable->find(symname);
 			assert(entry != nullptr);
@@ -3984,12 +3971,6 @@ void debugger_commands::execute_symlist(const std::vector<std::string_view> &par
 				m_console.printf("  (read-only)");
 			m_console.printf("\n");
 		}
-	}
-	if (params.empty())
-	{
-		m_console.printf(
-			"\nTo view the symbols for a particular CPU, try symlist <cpu>,\n"
-			"where <cpu> is the ID number or tag for a CPU.\n");
 	}
 }
 
