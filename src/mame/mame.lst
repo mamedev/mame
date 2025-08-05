@@ -40232,14 +40232,8 @@ barek2mb
 barek3mb
 barek3mba
 bk3ssrmb
-jingling
 jparkmb
-jzth
 mk3mdb
-puckpkmn
-puckpkmnb
-shuifeng
-songjang
 sonic2mb
 sonic3mb
 srmdb
@@ -40283,6 +40277,14 @@ reactmd
 @source:sega/megadriv_vt_hybrid.cpp
 sarc110
 sarc110a
+
+@source:sega/megadriv_ybox.cpp
+jingling
+jzth
+puckpkmn
+puckpkmnb
+shuifeng
+songjang
 
 @source:sega/megaplay.cpp
 megaplay
