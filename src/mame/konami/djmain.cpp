@@ -255,6 +255,7 @@ void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect
 		color = (m_obj_ram[offs + 3] >> 16) & 15;
 
 		for (x = 0; x < size; x++)
+		{
 			for (y = 0; y < size; y++)
 			{
 				int c = code;
@@ -276,26 +277,24 @@ void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect
 					int zw = ox + (((x + 1) * xscale + (1 << 11)) >> 12) - sx;
 					int zh = oy + (((y + 1) * yscale + (1 << 11)) >> 12) - sy;
 
-
-								m_gfxdecode->gfx(0)->zoom_transpen(bitmap,
-								cliprect,
-								c,
-								color,
-								flipx,
-								flipy,
-								sx,
-								sy,
-								(zw << 16) / 16,
-								(zh << 16) / 16,
-								0);
+					m_gfxdecode->gfx(0)->zoom_transpen(bitmap,
+							cliprect,
+							c,
+							color,
+							flipx,
+							flipy,
+							sx,
+							sy,
+							zw << 12,
+							zh << 12,
+							0);
 				}
 				else
 				{
 					int sx = ox + (x << 4);
 					int sy = oy + (y << 4);
 
-
-							m_gfxdecode->gfx(0)->transpen(bitmap,
+					m_gfxdecode->gfx(0)->transpen(bitmap,
 							cliprect,
 							c,
 							color,
@@ -306,6 +305,7 @@ void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect
 							0);
 				}
 			}
+		}
 	}
 }
 
