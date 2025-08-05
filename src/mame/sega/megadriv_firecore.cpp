@@ -31,6 +31,7 @@ public:
 
 	void megadriv_firecore_3button_ntsc(machine_config &config);
 	void megadriv_firecore_3button_pal(machine_config &config);
+	void megadriv_firecore_6button_ntsc(machine_config &config);
 
 	void init_atgame40();
 	void init_dcat();
@@ -131,6 +132,32 @@ INPUT_PORTS_START( mympac )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( firecore_6button )
+	PORT_INCLUDE( md_common )
+
+	PORT_MODIFY("PAD1") // Extra buttons for Joypad 1 (6 button + start + mode)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("%p Z")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("%p Y")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("%p X")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SELECT )  PORT_PLAYER(1) PORT_NAME("%p Mode")
+
+	PORT_MODIFY("PAD2") // Extra buttons for Joypad 2 (6 button + start + mode)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("%p Z")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("%p Y")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("%p X")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SELECT )  PORT_PLAYER(2) PORT_NAME("%p Mode")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( msi_6button )
+	PORT_INCLUDE( firecore_6button )
+
+	PORT_MODIFY("PAD2") // no 2nd pad
+	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("RESET") // RESET button on controller to the left of START
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1) PORT_NAME("Reset")
+INPUT_PORTS_END
+
 void megadriv_b010xx_select_state::machine_start()
 {
 	md_ctrl_state::machine_start();
@@ -165,6 +192,15 @@ void megadriv_b010xx_select_state::megadriv_firecore_3button_pal(machine_config 
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_b010xx_select_state::megadriv_firecore_map);
 }
+
+void megadriv_b010xx_select_state::megadriv_firecore_6button_ntsc(machine_config &config)
+{
+	megadriv_firecore_3button_ntsc(config);
+
+	ctrl1_6button(config);
+	ctrl2_6button(config);
+}
+
 
 ROM_START( matet )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -316,6 +352,12 @@ ROM_START(mdhh100)
 	ROM_LOAD16_WORD_SWAP( "s29gl01gp11tfir1.u13", 0x0000,  0x8000000, CRC(564ab33a) SHA1(e455aaa9ed6f302d1ebe55b5202f983af612c415) )
 ROM_END
 
+ROM_START( msi_sf2 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "29lv320.bin", 0x000000, 0x400000, CRC(465b12f0) SHA1(7a058f6feb4f08f56ae0f7369c2ca9a9fe2ed40e) )
+ROM_END
+
+
 void megadriv_b010xx_select_state::init_atgame40()
 {
 	m_romsize = memregion("maincpu")->bytes();
@@ -373,3 +415,6 @@ CONS( 200?, dcat16,       0,        0,      megadriv_firecore_3button_ntsc, fire
 CONS( 201?, mahg156,      0,        0,      megadriv_firecore_3button_ntsc, firecore_3button,       megadriv_b010xx_select_state, init_mdhh100, "<unknown>",   "Mini Arcade Handheld Game Console 2.8 Inch Screen Built in 156 Retro Games (Mega Drive handheld)",  MACHINE_NOT_WORKING )
 // game-boy like handheld, pink in colour, 6 button controller (+ home select, start, vol buttons)
 CONS( 201?, mdhh100,      0,        0,      megadriv_firecore_3button_ntsc, firecore_3button,       megadriv_b010xx_select_state, init_mdhh100, "<unknown>",   "unknown 100-in-1 handheld (Mega Drive based)",  MACHINE_NOT_WORKING )
+
+// From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
+CONS( 2018, msi_sf2,   0,        0, megadriv_firecore_6button_ntsc, msi_6button,         megadriv_b010xx_select_state, init_megadriv,    "MSI / Capcom / Sega",            "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", 0)

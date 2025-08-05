@@ -582,14 +582,6 @@ ROM_START( rad_mncr )
 	ROM_LOAD16_WORD_SWAP( "radica_menacer.bin", 0x000000, 0x100000, CRC(5f9ef4a4) SHA1(f28350e7325cb7469d760d97ee452a9d846eb3d4) )
 ROM_END
 
-ROM_START( msi_sf2 )
-	ROM_REGION( 0x400000, "maincpu", 0 )
-	// The first part of the ROM seems to be a boot ROM for the enhanced MD clone menus, even if it does nothing here
-	// and is probably leftover from one of the multigame systems, hacked to only launch one game. We should emulate it...
-	// .. but the game ROM starts at 0xc8000 so we can cheat for now
-	ROM_LOAD16_WORD_SWAP( "29lv320.bin", 0x000000, 0xc8000, CRC(465b12f0) SHA1(7a058f6feb4f08f56ae0f7369c2ca9a9fe2ed40e) )
-	ROM_CONTINUE(0x00000,0x338000)
-ROM_END
 
 ROM_START( dgunl3227 )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -759,14 +751,10 @@ CONS( 2004, rad_mncr,  0,        0, megadriv_radica_3button_ntsc, radica_3button
 // 仮面ライダー龍騎 サバイバルファイト
 CONS( 2002, banmrid,    0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Bandai",                     "Kamen Rider Ryuki: Survival Fight (Japan)", MACHINE_NOT_WORKING )
 
-// From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
-// TODO: move out of here eventually once the enhanced MD part is emulated rather than bypassed (it's probably the same as the 145-in-1 multigame unit, but modified to only include this single game)
-CONS( 2018, msi_sf2,   0,        0, megadriv_radica_6button_ntsc, msi_6button,         megadriv_radica_state, init_megadriv,    "MSI / Capcom / Sega",            "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", 0)
-
 // Are these (dgunl3227, ra145) actually emulation based? there is a block of 0x40000 bytes at the start of the ROM that doesn't
 // appear to be used, very similar in both units.  Banking also seems entirely illogical unless something else is managing it.
 // The menu code in both seems to have the same origin, containing a bunch of unused pirate versions of MD games.
-// The version of SF2 in the 'ra145' unit is the same as the one in the MSI unit above, and expects region to report US even
+// The version of SF2 in the 'ra145' unit is the same as the one in the MSI unit, and expects region to report US even
 // when some of the units run at PAL speed?
 // It is also confirmed from real hardware videos that these units do not have the usual sprite limits (so masking effect on Sonic title screen fails)
 
@@ -774,6 +762,5 @@ CONS( 2018, msi_sf2,   0,        0, megadriv_radica_6button_ntsc, msi_6button,  
 // the parent set has updated software explaining how to insert coins in Pac-Man as well as an updated copyright string
 CONS( 2018, dgunl3227,  0,        0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227)", 0 )
 CONS( 2018, dgunl3227a, dgunl3227,0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227, older)", 0 )
-
 
 CONS( 2018, ra145,     0,        0, megadriv_ra145_ntsc, msi_6button,           megadriv_ra145_state, init_ra145,        "<unknown>",            "Retro Arcade 16 Bits Classic Edition Mini TV Game Console - 145 Classic Games - TV Arcade Plug and Play (Mega Drive bootlegs)", MACHINE_NOT_WORKING )
