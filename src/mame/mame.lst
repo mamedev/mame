@@ -20832,6 +20832,7 @@ slqz3
 tct2p
 tripslot
 tshs
+tshs101
 tswxp
 xypdk
 zhongguo
@@ -43845,6 +43846,9 @@ yizhix
 
 @source:skeleton/xbase09.cpp
 xbase09
+
+@source:skeleton/xinyun.cpp
+hongmxy
 
 @source:skeleton/xor100.cpp
 xor100
