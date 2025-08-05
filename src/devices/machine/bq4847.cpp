@@ -31,6 +31,7 @@
 #include "logmacro.h"
 
 // device type definition
+DEFINE_DEVICE_TYPE(BQ4802, bq4802_device, "bq4802", "Benchmarq BQ4802 RTC")
 DEFINE_DEVICE_TYPE(BQ4845, bq4845_device, "bq4845", "Benchmarq BQ4845 RTC")
 DEFINE_DEVICE_TYPE(BQ4847, bq4847_device, "bq4847", "Benchmarq BQ4847 RTC")
 
@@ -51,7 +52,7 @@ enum
 	reg_interrupts,         // 0  0  0  0 AIE  PIE   PWRIE ABE    0x00 on powerup
 	reg_flags,              // 0  0  0  0  AF   PF    PWRF BVF    0x00 after reading
 	reg_control,            // 0  0  0  0 UTI STOP* 24/12* DSE
-	reg_unused              // 0x00
+	reg_century             // 0x00-0x99
 };
 
 enum
@@ -101,7 +102,11 @@ bq4845_device::bq4845_device(const machine_config& mconfig, const char* tag, dev
 	: bq4847_device(mconfig, BQ4845, tag, owner, clock)
 {
 }
-
+bq4802_device::bq4802_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+	: bq4847_device(mconfig, BQ4845, tag, owner, clock)
+{
+	set_has_century(true);
+}
 // device_rtc_interface
 
 void bq4847_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
@@ -112,10 +117,15 @@ void bq4847_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 			(((hour % 24) >= 12) ? 0x80 : 0x00) | convert_to_bcd((hour % 12) ? (hour % 12) : 12);
 		m_register[reg_minutes] = convert_to_bcd(minute);
 		m_register[reg_seconds] = convert_to_bcd(second);
-		m_register[reg_year] = convert_to_bcd(year);
+		m_register[reg_year] = convert_to_bcd(year%100);
 		m_register[reg_month] = convert_to_bcd(month);
 		m_register[reg_date] = convert_to_bcd(day);
 		m_register[reg_days] = convert_to_bcd(day_of_week);
+		if (has_century)
+		{
+			m_register[reg_century] = convert_to_bcd(year / 100);
+		}
+
 	}
 
 	// Clear the saved flags (TODO: check that flags set before power down, or during battery backup are lost)
@@ -183,16 +193,26 @@ TIMER_CALLBACK_MEMBER(bq4847_device::update_callback)
 	if (carry)
 		advance_days_bcd();
 
-	LOGMASKED(LOG_CLOCK, "%s 20%02x-%02x-%02x %02x:%02x:%02x\n",
-		dow[m_register[reg_days] - 1], m_register[reg_year], m_register[reg_month], m_register[reg_date],
-		m_register[reg_hours], m_register[reg_minutes], m_register[reg_seconds]);
+	if (!has_century)
+	{
+		LOGMASKED(LOG_CLOCK, "%s 20%02x-%02x-%02x %02x:%02x:%02x\n",
+			dow[m_register[reg_days] - 1], m_register[reg_year], m_register[reg_month], m_register[reg_date],
+			m_register[reg_hours], m_register[reg_minutes], m_register[reg_seconds]);
+	}
+	else
+	{
+		LOGMASKED(LOG_CLOCK, "%s %02x%02x-%02x-%02x %02x:%02x:%02x\n",
+			dow[m_register[reg_days] - 1], m_register[reg_century], m_register[reg_year], m_register[reg_month], m_register[reg_date],
+			m_register[reg_hours], m_register[reg_minutes], m_register[reg_seconds]);
+	}
+
 
 	if (newsec)
 	{
 		if ((m_register[reg_control] & CONTROL_UTI) == 0)
 		{
 			LOGMASKED(LOG_TRANSFER, "Transfer to external regs\n");
-			for (int i = reg_seconds; i < reg_unused; i++)
+			for (int i = reg_seconds; i < reg_century + 1; i++)
 			{
 				if (is_clock_register(i)) m_userbuffer[i] = m_register[i];
 			}
@@ -289,8 +309,12 @@ void bq4847_device::advance_days_bcd()
 		if (m_register[reg_month] == 0x13)
 		{
 			m_register[reg_month] = 0x01;
-			increment_bcd(m_register[reg_year], 0xff, 0);
+			carry = increment_bcd(m_register[reg_year], 0xff, 0);
 		}
+	}
+	if (has_century && carry)
+	{
+		increment_bcd(m_register[reg_century], 0xff, 1);
 	}
 }
 
@@ -313,8 +337,8 @@ uint8_t bq4847_device::read(offs_t address)
 	}
 	else if (regnum >= reg_interrupts && regnum <= reg_control)
 		value &= 0xf;
-	else if (regnum == reg_unused)
-		value = 0;  // Reg 15 is locked to 0 in BQ4847
+	else if (regnum == reg_century)
+		value = has_century? m_register[reg_century]: 0;  // Reg 15 is locked to 0 in BQ4847
 
 	LOGMASKED(LOG_REG, "Reg %d -> %02x\n", regnum, value);
 
@@ -358,7 +382,7 @@ void bq4847_device::write(offs_t address, uint8_t data)
 		if (uti_set && !uti_set_now && m_writing)
 		{
 			LOGMASKED(LOG_TRANSFER, "Transfer to internal regs\n");
-			for (int i = reg_seconds; i < reg_unused; i++)
+			for (int i = reg_seconds; i < reg_century + 1; i++)
 			{
 				if (is_clock_register(i)) m_register[i] = m_userbuffer[i];
 			}
@@ -372,7 +396,7 @@ bool bq4847_device::is_clock_register(int regnum)
 {
 	return (regnum == reg_seconds || regnum == reg_minutes || regnum == reg_hours ||
 		regnum == reg_date || regnum == reg_days || regnum == reg_month
-		|| regnum == reg_year);
+		|| regnum == reg_year || regnum == reg_century);
 }
 
 void bq4847_device::set_periodic_timer()
