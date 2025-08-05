@@ -15,51 +15,14 @@
 
 namespace {
 
-class megadriv_unksoc_state_base : public md_ctrl_state
-{
-public:
-	megadriv_unksoc_state_base(const machine_config &mconfig, device_type type, const char *tag) :
-		md_ctrl_state(mconfig, type, tag),
-		m_bank(0),
-		m_externalbank(0),
-		m_romsize(0x400000),
-		m_rom(*this, "maincpu")
-	{ }
-
-protected:
-	virtual uint16_t read(offs_t offset);
-	uint16_t read_a13(offs_t offset);
-
-	virtual void megadriv_unksoc_map(address_map &map) ATTR_COLD;
-
-	void unksoc_base_map(address_map &map) ATTR_COLD;
-
-	int m_bank;
-	int m_externalbank;
-	int m_romsize;
-
-	required_region_ptr<uint16_t> m_rom;
-};
-
-
-
-class megadriv_unksoc_state : public megadriv_unksoc_state_base
-{
-public:
-	megadriv_unksoc_state(const machine_config& mconfig, device_type type, const char* tag) :
-		megadriv_unksoc_state_base(mconfig, type, tag)
-	{ }
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-};
-
-class megadriv_dgunl_state : public megadriv_unksoc_state
+class megadriv_dgunl_state : public md_ctrl_state
 {
 public:
 	megadriv_dgunl_state(const machine_config& mconfig, device_type type, const char* tag) :
-		megadriv_unksoc_state(mconfig, type, tag)
+		md_ctrl_state(mconfig, type, tag),
+		m_bank(0),
+		m_romsize(0x400000),
+		m_rom(*this, "maincpu")
 	{ }
 
 	void megadriv_dgunl_ntsc(machine_config &config);
@@ -68,15 +31,22 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual uint16_t read(offs_t offset);
 
 	uint16_t m_a1630a = 0;
+	uint32_t m_bank;
+	uint32_t m_romsize;
 
 private:
 	uint16_t read_a16300(offs_t offset, uint16_t mem_mask);
 	uint16_t read_a16302(offs_t offset, uint16_t mem_mask);
 	virtual void write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask);
 
-	virtual void megadriv_unksoc_map(address_map &map) override ATTR_COLD;
+	void megadriv_unksoc_map(address_map &map) ATTR_COLD;
+
+	required_region_ptr<uint16_t> m_rom;
 };
 
 
@@ -98,21 +68,6 @@ private:
 	virtual void write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask) override;
 };
 
-
-
-void megadriv_unksoc_state_base::unksoc_base_map(address_map &map)
-{
-	megadriv_68k_base_map(map);
-
-	map(0x000000, 0x3fffff).r(FUNC(megadriv_unksoc_state_base::read)); // Cartridge Program ROM
-}
-
-void megadriv_unksoc_state_base::megadriv_unksoc_map(address_map &map)
-{
-	unksoc_base_map(map);
-
-	map(0xa13000, 0xa130ff).r(FUNC(megadriv_unksoc_state_base::read_a13));
-}
 
 uint16_t megadriv_dgunl_state::read_a16300(offs_t offset, uint16_t mem_mask)
 {
@@ -320,7 +275,9 @@ void megadriv_ra145_state::write_a1630a(offs_t offset, uint16_t data, uint16_t m
 
 void megadriv_dgunl_state::megadriv_unksoc_map(address_map &map)
 {
-	unksoc_base_map(map);
+	megadriv_68k_base_map(map);
+
+	map(0x000000, 0x3fffff).r(FUNC(megadriv_dgunl_state::read)); // Cartridge Program ROM
 
 	map(0xa16300, 0xa16301).r(FUNC(megadriv_dgunl_state::read_a16300));
 	map(0xa16302, 0xa16303).r(FUNC(megadriv_dgunl_state::read_a16302));
@@ -328,23 +285,11 @@ void megadriv_dgunl_state::megadriv_unksoc_map(address_map &map)
 	map(0xa1630a, 0xa1630b).w(FUNC(megadriv_dgunl_state::write_a1630a));
 }
 
-uint16_t megadriv_unksoc_state_base::read(offs_t offset)
+uint16_t megadriv_dgunl_state::read(offs_t offset)
 {
 	return m_rom[(((m_bank * 0x10000) + (offset << 1)) & (m_romsize - 1))/2];
 }
 
-uint16_t megadriv_unksoc_state_base::read_a13(offs_t offset)
-{
-	if (offset < 0x80)
-		m_bank = offset & 0x3f;
-
-	// low bit gets set when selecting cannon fodder or mega lo mania in the rad_ssoc set, pointing to the wrong area, but rad_gen1 needs it for the menu
-	// as they're standalones it could just be different logic
-	if (m_bank != 0x3f)
-		m_bank &= 0x3e;
-
-	return 0;
-}
 
 static INPUT_PORTS_START( unksoc_6button )
 	PORT_INCLUDE( md_common )
@@ -362,7 +307,7 @@ static INPUT_PORTS_START( unksoc_6button )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SELECT )  PORT_PLAYER(2) PORT_NAME("%p Mode")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( msi_6button )
+static INPUT_PORTS_START( ra145_6button )
 	PORT_INCLUDE( unksoc_6button )
 
 	PORT_MODIFY("PAD2") // no 2nd pad
@@ -394,37 +339,27 @@ static INPUT_PORTS_START( dgunl_1player )
 INPUT_PORTS_END
 
 
-void megadriv_unksoc_state::machine_start()
-{
-	megadriv_unksoc_state_base::machine_start();
-
-	m_vdp->stop_timers();
-
-	save_item(NAME(m_bank));
-}
-
 void megadriv_dgunl_state::machine_start()
 {
-	megadriv_unksoc_state::machine_start();
-
+	md_ctrl_state::machine_start();
+	m_vdp->stop_timers();
 	m_a1630a = 0;
 
+	save_item(NAME(m_bank));
 	save_item(NAME(m_a1630a));
 }
 
+void megadriv_dgunl_state::machine_reset()
+{
+	m_bank = 0;
+	md_ctrl_state::machine_reset();
+}
 
 void megadriv_ra145_state::machine_reset()
 {
 	m_bank = 4;
-	megadriv_unksoc_state_base::machine_reset();
+	md_ctrl_state::machine_reset();
 }
-
-void megadriv_unksoc_state::machine_reset()
-{
-	m_bank = 0;
-	megadriv_unksoc_state_base::machine_reset();
-}
-
 
 void megadriv_dgunl_state::megadriv_dgunl_ntsc(machine_config &config)
 {
@@ -573,4 +508,4 @@ void megadriv_ra145_state::init_ra145()
 CONS( 2018, dgunl3227,  0,        0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227)", 0 )
 CONS( 2018, dgunl3227a, dgunl3227,0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227, older)", 0 )
 
-CONS( 2018, ra145,     0,        0, megadriv_ra145_ntsc, msi_6button,           megadriv_ra145_state, init_ra145,        "<unknown>",            "Retro Arcade 16 Bits Classic Edition Mini TV Game Console - 145 Classic Games - TV Arcade Plug and Play (Mega Drive bootlegs)", MACHINE_NOT_WORKING )
+CONS( 2018, ra145,      0,        0, megadriv_ra145_ntsc, ra145_6button,         megadriv_ra145_state, init_ra145,        "<unknown>",            "Retro Arcade 16 Bits Classic Edition Mini TV Game Console - 145 Classic Games - TV Arcade Plug and Play (Mega Drive bootlegs)", MACHINE_NOT_WORKING )
