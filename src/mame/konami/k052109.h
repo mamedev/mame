@@ -25,7 +25,7 @@ public:
 
 	// configuration
 	auto irq_handler() { return m_irq_handler.bind(); }
-	auto firq_handler() { return m_firq_handler.bind(); }
+	//auto firq_handler() { return m_firq_handler.bind(); } // unused
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
 	/*
@@ -52,7 +52,7 @@ public:
 
 	void set_rmrd_line(int state) { m_rmrd_line = state; }
 	int get_rmrd_line() { return m_rmrd_line; }
-	void tilemap_update();
+	void update_scroll();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags = 0, uint8_t priority = 0, uint8_t priority_mask = 0xff);
 	void mark_tilemap_dirty(uint8_t tmap_num);
 
@@ -98,6 +98,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
+	TILE_BLITTER_MEMBER(tile_blitter);
 
 	void get_tile_info(tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2);
 	void tileflip_reset();

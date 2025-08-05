@@ -11,7 +11,7 @@
 #include "k056800.h"
 
 
-DEFINE_DEVICE_TYPE(K056800, k056800_device, "k056800", "K056800 MIRAC")
+DEFINE_DEVICE_TYPE(K056800, k056800_device, "k056800", "Konami 056800 MIRAC")
 
 
 //-------------------------------------------------

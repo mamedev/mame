@@ -55,7 +55,7 @@
 DEFINE_DEVICE_TYPE(MD_STD_EEPROM,      md_std_eeprom_device,      "md_std_eeprom",      "MD Standard cart + EEPROM")
 DEFINE_DEVICE_TYPE(MD_EEPROM_NBAJAM,   md_eeprom_nbajam_device,   "md_eeprom_nbajam",   "MD NBA Jam")
 DEFINE_DEVICE_TYPE(MD_EEPROM_NBAJAMTE, md_eeprom_nbajamte_device, "md_eeprom_nbajamte", "MD NBA Jam TE") // and a few more
-DEFINE_DEVICE_TYPE(MD_EEPROM_NFLQB,    md_eeprom_nflqb_device,    "md_eeprom_nflqb",    "MD NFL Quarterback 96")
+DEFINE_DEVICE_TYPE(MD_EEPROM_NFLQB96,  md_eeprom_nflqb96_device,  "md_eeprom_nflqb96",  "MD NFL Quarterback 96")
 DEFINE_DEVICE_TYPE(MD_EEPROM_CSLAM,    md_eeprom_cslam_device,    "md_eeprom_cslam",    "MD College Slam")
 DEFINE_DEVICE_TYPE(MD_EEPROM_NHLPA,    md_eeprom_nhlpa_device,    "md_eeprom_nhlpa",    "MD NHLPA 93")
 DEFINE_DEVICE_TYPE(MD_EEPROM_BLARA,    md_eeprom_blara_device,    "md_eeprom_blara",    "MD Brian Lara")
@@ -84,8 +84,8 @@ md_eeprom_nbajamte_device::md_eeprom_nbajamte_device(const machine_config &mconf
 {
 }
 
-md_eeprom_nflqb_device::md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: md_std_eeprom_device(mconfig, MD_EEPROM_NFLQB, tag, owner, clock)
+md_eeprom_nflqb96_device::md_eeprom_nflqb96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_eeprom_device(mconfig, MD_EEPROM_NFLQB96, tag, owner, clock)
 {
 }
 
@@ -121,12 +121,13 @@ void md_std_eeprom_device::device_add_mconfig(machine_config &config)
 
 void md_eeprom_nbajam_device::device_add_mconfig(machine_config &config)
 {
+	// nflqb uses a 24LC02B
 	I2C_24C02(config, m_i2cmem);
 }
 
 void md_eeprom_nbajamte_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C01(config, m_i2cmem);
+	I2C_24C04(config, m_i2cmem); // 24LC04B
 }
 
 void md_eeprom_cslam_device::device_add_mconfig(machine_config &config)
@@ -134,7 +135,7 @@ void md_eeprom_cslam_device::device_add_mconfig(machine_config &config)
 	I2C_24C64(config, m_i2cmem);
 }
 
-void md_eeprom_nflqb_device::device_add_mconfig(machine_config &config)
+void md_eeprom_nflqb96_device::device_add_mconfig(machine_config &config)
 {
 	I2C_24C16(config, m_i2cmem);
 }
@@ -286,7 +287,7 @@ void md_eeprom_cslam_device::write(offs_t offset, uint16_t data, uint16_t mem_ma
 }
 
 // same as NBAJAMTE above... derived class?
-uint16_t md_eeprom_nflqb_device::read(offs_t offset)
+uint16_t md_eeprom_nflqb96_device::read(offs_t offset)
 {
 	if (offset == 0x200000/2)
 	{
@@ -299,14 +300,21 @@ uint16_t md_eeprom_nflqb_device::read(offs_t offset)
 		return 0xffff;
 }
 
-void md_eeprom_nflqb_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
+void md_eeprom_nflqb96_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
-		m_i2c_clk = BIT(data, 8);
-		m_i2c_mem = BIT(data, 0);
-		m_i2cmem->write_scl(m_i2c_clk);
-		m_i2cmem->write_sda(m_i2c_mem);
+		if(ACCESSING_BITS_8_15)
+		{
+			m_i2c_clk = BIT(data, 8);
+			m_i2cmem->write_scl(m_i2c_clk);
+		}
+
+		if(ACCESSING_BITS_0_7)
+		{
+			m_i2c_mem = BIT(data, 0);
+			m_i2cmem->write_sda(m_i2c_mem);
+		}
 	}
 }
 

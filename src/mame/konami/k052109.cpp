@@ -100,13 +100,11 @@ probably applies to tilemap writes.
                     1 = 64 (actually 40) columns
            ---xx--- layer B row scroll
            --x----- layer B column scroll
-           suratk sets this register to 0x70 during the second boss to produce a rotating star field,
-           using X and Y scroll at the same time. In MAME, the corners don't scroll, but on the PCB,
-           the effect definitely applies there (at least seen under the 2nd N of P2 INSERT COIN). The
-           game only modifies Y scroll 0x23-0x32, no columns after that. Maybe bit 6 has a meaning?
+           suratk sets this register to 0x70 during the second boss to produce a rotating
+           star field, using X and Y scroll at the same time. Bit 6 probably has no meaning.
            glfgreat sets it to 0x30 when showing the leader board
-           mariorou sets it to 0x36 when ingame, while actually does per-row scroll for layer A and
-           per-column scroll for layer B.
+           mariorou sets it to 0x36 when ingame, while actually does per-row scroll for layer A
+           and per-column scroll for layer B.
 1d00     : bit 0 = NMI enable/acknowledge
          : bit 1 = FIRQ enable/acknowledge
          : bit 2 = IRQ enable/acknowledge
@@ -148,7 +146,7 @@ to go through the chip (8 bits at a time, even on 68000-based systems).
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(K052109, k052109_device, "k052109", "K052109 Tilemap Generator")
+DEFINE_DEVICE_TYPE(K052109, k052109_device, "k052109", "Konami 052109 Tilemap Generator")
 
 const gfx_layout k052109_device::charlayout =
 {
@@ -267,6 +265,9 @@ void k052109_device::device_start()
 	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k052109_device::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k052109_device::get_tile_info2)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
+	m_tilemap[1]->set_blitter(tilemap_blitter_delegate(*this, FUNC(k052109_device::tile_blitter)));
+	m_tilemap[2]->set_blitter(tilemap_blitter_delegate(*this, FUNC(k052109_device::tile_blitter)));
+
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
@@ -314,6 +315,9 @@ void k052109_device::vblank_callback(screen_device &screen, bool state)
 {
 	if (state && BIT(m_irq_control, 2))
 		m_irq_handler(ASSERT_LINE);
+
+	if (!state)
+		update_scroll();
 }
 
 TIMER_CALLBACK_MEMBER(k052109_device::firq_scanline)
@@ -341,21 +345,34 @@ u8 k052109_device::read(offs_t offset)
 		if ((offset & 0x1fff) >= 0x1800)
 		{
 			if (offset >= 0x180c && offset < 0x1834)
-			{   /* A y scroll */    }
+			{
+				// A y scroll
+			}
 			else if (offset >= 0x1a00 && offset < 0x1c00)
-			{   /* A x scroll */    }
+			{
+				// A x scroll
+			}
 			else if (offset == 0x1d00)
-			{   /* read for bitwise operations before writing */    }
+			{
+				// read for bitwise operations before writing
+			}
 			else if (offset >= 0x380c && offset < 0x3834)
-			{   /* B y scroll */    }
+			{
+				// B y scroll
+			}
 			else if (offset >= 0x3a00 && offset < 0x3c00)
-			{   /* B x scroll */    }
-			//else logerror("%s: read from unknown 052109 address %04x\n",machine().describe_context(),offset);
+			{
+				// B x scroll
+			}
+			else
+			{
+				//logerror("%s: read from unknown 052109 address %04x\n",machine().describe_context(),offset);
+			}
 		}
 
 		return m_ram[offset];
 	}
-	else    /* Punk Shot and TMNT read from 0000-1fff, Aliens from 2000-3fff */
+	else // Punk Shot and TMNT read from 0000-1fff, Aliens from 2000-3fff
 	{
 		assert(m_char_rom.found());
 
@@ -363,7 +380,7 @@ u8 k052109_device::read(offs_t offset)
 		int color = m_romsubbank;
 		int flags = 0;
 		int priority = 0;
-		int bank = m_charrombank[(color & 0x0c) >> 2] >> 2;   /* discard low bits (TMNT) */
+		int bank = m_charrombank[(color & 0x0c) >> 2] >> 2; // discard low bits (TMNT)
 		int addr;
 
 		bank |= (m_charrombank_2[(color & 0x0c) >> 2] >> 2); // Surprise Attack uses this 2nd bank in the rom test
@@ -384,22 +401,26 @@ u8 k052109_device::read(offs_t offset)
 
 void k052109_device::write(offs_t offset, u8 data)
 {
-	if ((offset & 0x1fff) < 0x1800) /* tilemap RAM */
+	if ((offset & 0x1fff) < 0x1800) // tilemap RAM
 	{
 		if (offset >= 0x4000)
-			m_has_extra_video_ram = 1;  /* kludge for X-Men */
+			m_has_extra_video_ram = 1; // kludge for X-Men
 
 		m_ram[offset] = data;
 		m_tilemap[(offset & 0x1800) >> 11]->mark_tile_dirty(offset & 0x7ff);
 	}
-	else    /* control registers */
+	else // control registers
 	{
 		m_ram[offset] = data;
 
 		if (offset >= 0x180c && offset < 0x1834)
-		{   /* A y scroll */    }
+		{
+			// A y scroll
+		}
 		else if (offset >= 0x1a00 && offset < 0x1c00)
-		{   /* A x scroll */    }
+		{
+			// A x scroll
+		}
 		else if (offset == 0x1c00)
 		{
 			m_addrmap = data;
@@ -460,17 +481,13 @@ void k052109_device::write(offs_t offset, u8 data)
 		else if (offset == 0x1e80)
 		{
 			//if ((data & 0xfe)) logerror("%s: 052109 register 1e80 = %02x\n",machine().describe_context(),data);
-			m_tilemap[0]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_tilemap[1]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_tilemap[2]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			if (m_tileflip_enable != ((data & 0x06) >> 1))
+			if ((m_tileflip_enable & 0x06) != (data & 0x06))
 			{
-				m_tileflip_enable = ((data & 0x06) >> 1);
-
-				m_tilemap[0]->mark_all_dirty();
-				m_tilemap[1]->mark_all_dirty();
-				m_tilemap[2]->mark_all_dirty();
+				for (int i = 0; i < 3; i++)
+					m_tilemap[i]->mark_all_dirty();
 			}
+			m_tileflip_enable = data & 0x07;
+			tileflip_reset();
 		}
 		else if (offset == 0x1f00)
 		{
@@ -496,9 +513,13 @@ void k052109_device::write(offs_t offset, u8 data)
 			}
 		}
 		else if (offset >= 0x380c && offset < 0x3834)
-		{   /* B y scroll */    }
+		{
+			// B y scroll
+		}
 		else if (offset >= 0x3a00 && offset < 0x3c00)
-		{   /* B x scroll */    }
+		{
+			// B x scroll
+		}
 		else if (offset == 0x3d80) // Surprise Attack uses offset 0x3d80 in rom test
 		{
 			// mirroring this write, breaks Surprise Attack in game tilemaps
@@ -511,12 +532,15 @@ void k052109_device::write(offs_t offset, u8 data)
 			m_charrombank_2[2] = data & 0x0f;
 			m_charrombank_2[3] = (data >> 4) & 0x0f;
 		}
-		//else logerror("%s: write %02x to unknown 052109 address %04x\n",machine().describe_context(),data,offset);
+		else
+		{
+			//logerror("%s: write %02x to unknown 052109 address %04x\n",machine().describe_context(),data,offset);
+		}
 	}
 }
 
 
-void k052109_device::tilemap_update()
+void k052109_device::update_scroll()
 {
 
 #if 0
@@ -599,7 +623,7 @@ void k052109_device::tilemap_update()
 			}
 		}
 
-		// mixed scroll
+		// mixed scroll (handled in tile_blitter)
 		else
 		{
 			m_tilemap[t]->set_scroll_rows(rows);
@@ -632,6 +656,13 @@ void k052109_device::mark_tilemap_dirty(uint8_t tmap_num)
 	m_tilemap[tmap_num]->mark_all_dirty();
 }
 
+void k052109_device::tileflip_reset()
+{
+	u32 flip = BIT(m_tileflip_enable, 0) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0;
+	for (int i = 0; i < 3; i++)
+		m_tilemap[i]->set_flip(flip);
+}
+
 
 /***************************************************************************
 
@@ -658,7 +689,7 @@ void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int laye
 	int flags = 0;
 	int priority = 0;
 	int bank = m_charrombank[(color & 0x0c) >> 2];
-	if (!BIT(m_addrmap,6))
+	if (!BIT(m_addrmap, 6))
 	{
 		color = (color & 0xf3) | ((bank & 0x03) << 2);
 	}
@@ -670,11 +701,11 @@ void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int laye
 	m_k052109_cb(layer, bank, &code, &color, &flags, &priority);
 
 	/* if the callback set flip X but it is not enabled, turn it off */
-	if (!(m_tileflip_enable & 1))
+	if (!BIT(m_tileflip_enable, 1))
 		flags &= ~TILE_FLIPX;
 
 	/* if flip Y is enabled and the attribute but is set, turn it on */
-	if (flipy && (m_tileflip_enable & 2))
+	if (flipy && BIT(m_tileflip_enable, 2))
 		flags |= TILE_FLIPY;
 
 	tileinfo.set(0, code, color, flags);
@@ -697,11 +728,45 @@ TILE_GET_INFO_MEMBER(k052109_device::get_tile_info2)
 }
 
 
-void k052109_device::tileflip_reset()
+// blitter callback for mixed col+rowscroll
+
+TILE_BLITTER_MEMBER(k052109_device::tile_blitter)
 {
-	int data = m_ram[0x1e80];
-	m_tilemap[0]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	m_tilemap[1]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	m_tilemap[2]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	m_tileflip_enable = ((data & 0x06) >> 1);
+	// standard scrolling
+	if (tilemap.scroll_rows() == 1 || tilemap.scroll_cols() == 1)
+		return false;
+
+	assert(tilemap.scroll_cols() == 0x40);
+
+	int rowheight = tilemap.height() / tilemap.scroll_rows();
+	rectangle rect;
+
+	// iterate over rows in the tilemap
+	for (int currow = 0; currow < tilemap.height(); currow += rowheight)
+	{
+		s32 scrollx = rowscroll[currow / rowheight];
+
+		u32 scrollxi = tilemap.scrollx(currow / rowheight) & ~7;
+		if (~tilemap.flip() & TILEMAP_FLIPX)
+			scrollxi = -scrollxi;
+
+		// iterate over columns in the tilemap
+		for (int curcol = 0; curcol < tilemap.width(); curcol += 8)
+		{
+			s32 scrolly = colscroll[(scrollxi + curcol) >> 3 & 0x3f];
+
+			// iterate to handle wraparound
+			for (int xpos = scrollx - tilemap.width(); xpos <= cliprect.right(); xpos += tilemap.width())
+			{
+				for (int ypos = scrolly - tilemap.height(); ypos <= cliprect.bottom(); ypos += tilemap.height())
+				{
+					// update the cliprect just for this block
+					rect.set(curcol + xpos, curcol + xpos + 7, currow, currow + rowheight - 1);
+					blit(rect, xpos, ypos);
+				}
+			}
+		}
+	}
+
+	return true;
 }

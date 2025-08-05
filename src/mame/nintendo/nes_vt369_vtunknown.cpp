@@ -23,6 +23,8 @@
 #include "emu.h"
 #include "nes_vt369_vtunknown_soc.h"
 
+#include "multibyte.h"
+
 namespace {
 
 class vt369_base_state : public driver_device
@@ -94,6 +96,7 @@ public:
 	void vt_external_space_map_512kbyte(address_map &map) ATTR_COLD;
 
 	void init_lxcmcypp();
+	void init_dgun2572();
 
 protected:
 	u8 vt_rom_banked_r(offs_t offset);
@@ -114,12 +117,14 @@ public:
 	void vt36x_4mb(machine_config& config);
 	void vt36x_8mb(machine_config& config);
 	void vt36x_16mb(machine_config& config);
+	void vt36x_16mb_sdcard(machine_config& config);
 	void vt36x_32mb(machine_config& config);
 	void vt36x_32mb_2banks_lexi(machine_config& config);
 	void vt36x_32mb_2banks_lexi300(machine_config& config);
 
 	void vt36x_swap(machine_config& config);
 	void vt36x_swap_2mb(machine_config& config);
+	void vt36x_swap_4mb(machine_config& config);
 	void vt36x_swap_8mb(machine_config& config);
 	void vt36x_swap_16mb(machine_config& config);
 	void vt36x_swap_512kb(machine_config& config);
@@ -131,6 +136,7 @@ public:
 	void vt36x_altswap_32mb_4banks_red5mam(machine_config& config);
 
 	void vt36x_vibesswap_16mb(machine_config& config);
+	void vt36x_gbox2020_16mb(machine_config& config);
 
 	void vt369_unk(machine_config& config);
 	void vt369_unk_1mb(machine_config& config);
@@ -385,6 +391,12 @@ void vt36x_state::vt36x_swap_2mb(machine_config &config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_2mbyte);
 }
 
+void vt36x_state::vt36x_swap_4mb(machine_config &config)
+{
+	vt36x_swap(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_4mbyte);
+}
+
 void vt36x_state::vt36x_swap_8mb(machine_config &config)
 {
 	vt36x_swap(config);
@@ -442,9 +454,20 @@ void vt36x_state::vt36x_vibesswap_16mb(machine_config &config)
 
 	VT369_SOC_INTROM_VIBESSWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
+	//m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
+	m_soc->force_bad_dma();
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
+}
+
+void vt36x_state::vt36x_gbox2020_16mb(machine_config &config)
+{
+	vt36x_swap_16mb(config);
+
+	VT369_SOC_INTROM_GBOX2020(config.replace(), m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_8mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
 }
 
 
@@ -467,6 +490,12 @@ void vt36x_state::vt36x_8mb(machine_config& config)
 }
 
 void vt36x_state::vt36x_16mb(machine_config& config)
+{
+	vt36x(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
+}
+
+void vt36x_state::vt36x_16mb_sdcard(machine_config& config)
 {
 	vt36x(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
@@ -946,6 +975,11 @@ ROM_START( 168pcase )
 	ROM_LOAD( "25q32.u7", 0x000000, 0x400000, CRC(98e8e97a) SHA1(fd516ef2819a597130f5f7ace9a7838cb99ab08a) )
 ROM_END
 
+ROM_START( gbox2020 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "fgb2020.bin", 0x00000, 0x1000000, CRC(a685d943) SHA1(9b272daccd8fe244c910f031466a4fedd83d5236) ) // flash ROM
+ROM_END
+
 ROM_START( vibes240 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	// wouldn't read consistently
@@ -984,6 +1018,60 @@ ROM_START( rbbrite )
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( mc_89in1 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "89in1.bin", 0x00000, 0x400000, CRC(b97f8ce5) SHA1(1a8e67f2b58a671ceec2b0ed18ec5954a71ae63a) )
+ROM_END
+
+ROM_START( mc_110cb )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "29w320dt.bin", 0x00000, 0x400000, CRC(a4bed7eb) SHA1(f1aa89916264ba781d3f1390a2336ef42129b607) )
+ROM_END
+
+ROM_START( mc_138cb )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "138-in-1 coolbaby, coolboy rs-5, pcb060-10009011v1.3.bin", 0x00000, 0x400000, CRC(6b5b1a1a) SHA1(2df0cd717bd0de0b0c973ac356426ddbb0d736fa) )
+ROM_END
+
+ROM_START( jl2050 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "jl2050.u5", 0x00000, 0x1000000, CRC(f96c5c02) SHA1(c7d0b57c2622b5213d3c7e6532495d9da74d4b01) )
+ROM_END
+
+ROM_START( supr200 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "w25q64jv.u1", 0x00000, 0x800000, CRC(89b6f026) SHA1(4ba21d3d803984a9a6daf24f91cb429f566a2f4c) )
+ROM_END
+
+ROM_START( tiger108 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "p25d32sh.u3", 0x00000, 0x400000, CRC(9d5112a3) SHA1(96a66b5b2c4e1fdc00b54951f867f7cc2a1a2a4a) )
+	ROM_IGNORE(0x300)
+ROM_END
+
+ROM_START( gon100 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "p25d32sh.bin", 0x00000, 0x400000, CRC(cd8a07c3) SHA1(4f5afc711eb214fbaad95b71087b9f50cf31345f) )
+	ROM_IGNORE(0x300)
+ROM_END
+
+ROM_START( d12power )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "25q128.u2", 0x00000, 0x1000000, CRC(02650ad4) SHA1(ca346409e11732d97b892c356fc5da61dc16ab01) )
+ROM_END
+
+
+ROM_START( dgun2572 )
+	ROM_REGION( 0x2000000, "mainrom", 0 ) // extra pins on subboard not marked
+	ROM_LOAD( "dreamgearwgun.bin", 0x00000, 0x2000000, CRC(92b55c75) SHA1(c7b2319e304a4bf480b5dcd4f24af2e6ba834d0d) )
+ROM_END
+
+
+ROM_START( gb50_150 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "w25q128jvsiq.bin", 0x00000, 0x1000000, CRC(3cc43fcb) SHA1(6c5e09fadb14e99e6db8c316026d124326a90557) )
+ROM_END
+
 
 void vt369_state::init_lxcmcypp()
 {
@@ -993,6 +1081,20 @@ void vt369_state::init_lxcmcypp()
 	for (int i = 0; i < size; i++)
 	{
 		ROM[i] = bitswap<16>(ROM[i], 4, 5, 6, 7, 0, 1, 2, 3, 12, 13, 14, 15, 8, 9, 10, 11);
+	}
+}
+
+void vt369_state::init_dgun2572()
+{
+	u8 *rom = memregion("mainrom")->base();
+	for (offs_t base = 0; base < 0x2000000; base += 0x200)
+	{
+		std::vector<u8> orig(&rom[base], &rom[base + 0x200]);
+		for (offs_t offset = 0; offset < 0x200; offset += 2)
+		{
+			u16 data = get_u16le(&orig[bitswap<8>(offset, 6, 1, 8, 3, 4, 5, 2, 7) << 1]);
+			put_u16le(&rom[base + offset], bitswap<16>(data, 15, 14, 13, 12, 11, 10, 1, 8, 7, 6, 5, 4, 0, 2, 9, 3));
+		}
 	}
 }
 
@@ -1064,15 +1166,6 @@ CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, em
     (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB, different menus)
     Lexibook Console Colour - Barbie
 
-    (Handheld units, charged via USB-C, more educational focused, contain bootleg NES Pinball game in games section)
-    Power Console - Gabby's Dollhouse
-    Power Console - Disney Princess
-    Power Console - Stitch
-    Power Console - Frozen
-    Power Console - Generic EN/FR model
-    Power Console - Generic EN/ES model
-    Power Console - Generic EN/DE model
-    Power Console - Paw Patrol
 
     (units for use with TV)
     Lexibook Retro TV Game Console (300 Games) - Cars
@@ -1092,6 +1185,8 @@ CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, em
 CONS( 200?, zonefusn,  0,         0,  vt36x_16mb,     vt369, vt36x_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_NOT_WORKING )
 // same as above but without Jungle's Soft boot logo? model number taken from cover of manual
 CONS( 200?, sealvt,    zonefusn,  0,  vt36x_16mb,     vt369, vt36x_state, empty_init, "Lexibook / Sit Up Limited / Jungle's Soft", "Seal 30-in-1 (VT based, Model FN098134)",  MACHINE_NOT_WORKING )
+
+CONS( 201?, dgun2572, 0,  0,  vt36x_32mb, vt369, vt36x_state, init_dgun2572, "dreamGEAR", "My Arcade Wireless Video Game Station 200-in-1 (DGUN-2572)", MACHINE_NOT_WORKING )
 
 // NOT SPI roms, altswap sets code starts with '6a'
 
@@ -1115,8 +1210,15 @@ CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb, vt369, vt36x_state, empty
 * below are VT369? games that use flash ROM
 *****************************************************************************/
 
+// different SoC (and language select music) from 2019 version, opcodes are scrambled
+CONS( 2020, gbox2020, gbox2019, 0, vt36x_gbox2020_16mb, vt369, vt36x_state, empty_init, "Sup", "Game Box 400 in 1 (2020 PCB)", MACHINE_NOT_WORKING )
+
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
+// boots with bad colors
 CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// has extra protection?
+CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
 
 /*****************************************************************************
 * below are VT369 games that use SQI / SPI ROM
@@ -1127,7 +1229,7 @@ CONS( 2017, sy889,      0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init,
 CONS( 2016, sy888b,     0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "SY Corp",   "SY-888B 288 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
 
 // Same hardware as SY-889
-CONS( 201?, mc_cb280,   0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, mc_cb280,   0,        0,  vt36x_swap_4mb, vt369, vt36x_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Plays intro music but then crashes. same hardware as SY-88x but uses more features
 CONS( 2016, mog_m320,   0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
@@ -1138,7 +1240,7 @@ CONS( 200?, tup240,     lpgm240,  0,  vt36x_swap_8mb,        vt369, vt36x_state,
 
 // VT369, but doesn't use most features
 CONS( 201?, unkra200,   mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "<unknown>",    "200 in 1 Retro Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 201?, dgun2577,   mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "DreamGear",    "My Arcade Retro Machine 200-in-1 (DGUN-2577)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, dgun2577,   mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "dreamGEAR",    "My Arcade Retro Machine 200-in-1 (DGUN-2577)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 201?, lxcyber,    mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "Lexibook",     "Cyber Arcade 200-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
  // menu is protected with code from extra ROM
 CONS( 201?, gtct885,    mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "Gaming Tech",  "Gaming Tech CT-885", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
@@ -1161,17 +1263,14 @@ CONS( 201?, lxcap,    0,      0,  vt36x_8mb, vt369, vt36x_tetrtin_state, empty_i
 CONS( 2022, nesvt270,    0,  0,  vt36x_16mb, vt369, vt36x_state, empty_init, "<unknown>", "unknown VT3xx based 270-in-1 (BL-867 PCB03)", MACHINE_NOT_WORKING )
 
 // VT369, but doesn't use most features
-CONS( 201?, myarccn,   0, 0,  vt36x_1mb, vt369, vt36x_state, empty_init, "DreamGear", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, myarccn,   0, 0,  vt36x_1mb, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // confirmed VT369, uses more features (including sound CPU)
 CONS( 201?, denv150,   0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 201?, egame150,  denv150,  0,  vt36x_8mb, vt369, vt36x_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, egame150,  denv150,  0,  vt36x_swap_8mb, vt369, vt36x_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uncertain, uses SPI ROM so probably VT369, has extra protection? (but RAM test goes up to 0x2000, over the internal ROM area?)
-CONS( 2017, otrail,     0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-// has extra protection?
-CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
+CONS( 2017, otrail,     0,        0,  vt36x_1mb, vt369, vt36x_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // seems to be running the NES version of Pac-Man with some extra splash screens, has extra protection
 CONS( 2021, pactin,     0,        0,  vt36x_1mb, vt369, vt36x_tetrtin_state, empty_init, "Fizz Creations", "Pac-Man Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
@@ -1181,3 +1280,26 @@ CONS( 2021, tetrtin,    0,        0,  vt36x_1mb, vt369, vt36x_tetrtin_state, emp
 // uses a low res display (so vt3xx?)
 CONS( 2021, matet10,   0,        0,  vt36x_swap_2mb, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7083, Pixel Pocket, with 10 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2021, matetsl,   0,        0,  vt36x_swap_512kb, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Tetris (Slurpee)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // no bonus games on this model
+
+// Runs well, all games seem to work
+CONS( 201?, mc_89in1,  0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "89 in 1 Mini Game Console (060-92023011V1.0)", MACHINE_IMPERFECT_GRAPHICS )
+
+// both offer chinese or english menus
+CONS( 200?, mc_110cb,  0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "CoolBoy", "110 in 1 CoolBaby (CoolBoy RS-1S)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_138cb,  0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 200?, jl2050,    0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "LexiBook / JungleTac / NiceCode",  "Cyber Console Center 200-in-1 (JL2050)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// the menus are very different to the plug-in TV version found in ppgc200g
+CONS( 201?, supr200,    0,        0,  vt36x_swap_8mb, vt369, vt36x_state, empty_init, "Fizz Creations",  "Supreme 200 (handheld)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 201?, tiger108,  0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "Zebra AS / Tiger Retail", "Spillekonsol Game console - 108-in-1", MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 201?, gon100,    0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "Game On 100-in-1", MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 201?, d12power,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "SZDiiER", "Power - Charging and playing games (D12) (416-in-1)", MACHINE_IMPERFECT_GRAPHICS )
+
+// GB-50 console supports loading games from SD card (not emulated), main ROM is QSPI flash
+// Games loaded from SD card are loaded into the QSPI flash at 0x800000 - dump is from a clean factory console
+// PCB is marked "389" so possibly VT389 but VT369 string in a debug message in firmware
+CONS( 2019, gb50_150,  0,        0,  vt36x_16mb_sdcard, vt369, vt36x_state, empty_init, "<unknown>",  "GB-50 Retro Station Pocket System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

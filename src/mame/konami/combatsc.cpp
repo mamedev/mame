@@ -141,14 +141,6 @@ void combatsc_state::flipscreen_w(int state)
 		m_textlayer->set_flip(flip);
 }
 
-template <uint8_t Which>
-void combatsc_state::dirtytiles()
-{
-	m_bg_tilemap[Which]->mark_all_dirty();
-	if (Which == 0)
-		m_textlayer->mark_all_dirty();
-}
-
 void combatsc_base_state::vreg_w(uint8_t data)
 {
 	if (data != m_vreg)
@@ -692,11 +684,9 @@ void combatsc_state::combatsc(machine_config &config)
 	K007121(config, m_k007121[0], 0, gfx_combatsc_1, m_palette, m_screen);
 	m_k007121[0]->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121[0]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<0>));
-	m_k007121[0]->set_dirtytiles_cb(FUNC(combatsc_state::dirtytiles<0>));
 
 	K007121(config, m_k007121[1], 0, gfx_combatsc_2, m_palette, m_screen);
 	m_k007121[1]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<1>));
-	m_k007121[1]->set_dirtytiles_cb(FUNC(combatsc_state::dirtytiles<1>));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

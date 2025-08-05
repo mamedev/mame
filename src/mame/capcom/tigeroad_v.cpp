@@ -13,7 +13,6 @@ void tigeroad_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
 void tigeroad_state::videoctrl_w(u8 data)
 {
 	// bit 1 flips screen
-
 	if (flip_screen() != (data & 0x02))
 	{
 		flip_screen_set(data & 0x02);
@@ -21,7 +20,6 @@ void tigeroad_state::videoctrl_w(u8 data)
 	}
 
 	// bit 2 selects bg char bank
-
 	u8 bank = (data & 0x04) >> 2;
 
 	if (m_bgcharbank != bank)
@@ -38,7 +36,6 @@ void tigeroad_state::videoctrl_w(u8 data)
 	}
 
 	// bits 6-7 are coin counters
-
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);
 	machine().bookkeeping().coin_counter_w(1, data & 0x80);
 }
@@ -105,11 +102,6 @@ void tigeroad_state::video_start()
 	m_bg_tilemap->set_transmask(1, 0x1ff, 0xfe00);
 
 	m_fg_tilemap->set_transparent_pen(3);
-
-	m_bg_tilemap->set_scrolldx(128, 128);
-	m_bg_tilemap->set_scrolldy(  6,   6);
-	m_fg_tilemap->set_scrolldx(128, 128);
-	m_fg_tilemap->set_scrolldy(  6,   6);
 
 	save_item(NAME(m_bgcharbank));
 }

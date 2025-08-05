@@ -56,6 +56,8 @@ public:
 	void m68k_a15104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t m68k_m_commsram_r(offs_t offset);
 	void m68k_m_commsram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sync_commsram_w(s32 param);
+
 	uint16_t pwm_r(offs_t offset);
 	void pwm_w(offs_t offset, uint16_t data);
 	void m68k_pwm_w(offs_t offset, uint16_t data);
@@ -88,7 +90,6 @@ public:
 
 	void render_videobuffer_to_screenbuffer_helper(int scanline);
 	void render_videobuffer_to_screenbuffer(int x, uint32_t priority, uint32_t &lineptr);
-	int sh2_master_pwmint_enable = 0, sh2_slave_pwmint_enable = 0;
 
 	void check_framebuffer_swap(bool enabled);
 	void check_irqs();
@@ -162,6 +163,7 @@ private:
 	int m_sh2_master_vint_enable = 0, m_sh2_slave_vint_enable = 0;
 	int m_sh2_master_hint_enable = 0, m_sh2_slave_hint_enable = 0;
 	int m_sh2_master_cmdint_enable = 0, m_sh2_slave_cmdint_enable = 0;
+	int m_sh2_master_pwmint_enable = 0, m_sh2_slave_pwmint_enable = 0;
 	int m_sh2_hint_in_vbl = 0;
 	int m_sh2_master_vint_pending = 0;
 	int m_sh2_slave_vint_pending = 0;

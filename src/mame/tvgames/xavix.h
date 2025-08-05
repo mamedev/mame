@@ -679,6 +679,14 @@ protected:
 
 	bool m_allow_superxavix_extra_rom_sprites; // config does not need saving
 
+	uint8_t superxavix_read_extended_io0(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io0 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[0]->read(); }
+	uint8_t superxavix_read_extended_io1(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io1 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[1]->read(); }
+	uint8_t superxavix_read_extended_io2(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io2 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[2]->read(); }
+
+	void superxavix_write_extended_io0(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io0 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
+	void superxavix_write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io1 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
+	void superxavix_write_extended_io2(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io2 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
+
 private:
 	void ext_segment_regs_w(offs_t offset, uint8_t data);
 	void superxavix_plt_flush_w(uint8_t data);
@@ -724,14 +732,6 @@ private:
 	void extended_extbus_reg0_w(uint8_t data);
 	void extended_extbus_reg1_w(uint8_t data);
 	void extended_extbus_reg2_w(uint8_t data);
-
-	uint8_t superxavix_read_extended_io0(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io0 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[0]->read(); }
-	uint8_t superxavix_read_extended_io1(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io1 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[1]->read(); }
-	uint8_t superxavix_read_extended_io2(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io2 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[2]->read(); }
-
-	void superxavix_write_extended_io0(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io0 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
-	void superxavix_write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io1 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
-	void superxavix_write_extended_io2(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: superxavix_write_extended_io2 %02x (mask %02x)\n", machine().describe_context(), data, mem_mask); }
 
 	void draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -862,16 +862,7 @@ protected:
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
 };
 
-class xavix_duelmast_state : public xavix_i2c_state
-{
-public:
-	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
-	{ }
 
-protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
-};
 
 class xavix_i2c_tomshoot_state : public xavix_i2c_state
 {
@@ -1159,6 +1150,23 @@ protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
+};
+
+class xavix_duelmast_state : public xavix_i2c_cart_state
+{
+public:
+	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_cart_state(mconfig, type, tag)
+	{
+		m_cartlimit = 0x800000;
+	}
+
+	void duelmast(machine_config &config);
+
+protected:
+	virtual uint8_t read_io1(uint8_t direction) override;
+
+	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
 };
 
 class xavix_popira2_cart_state : public xavix_cart_state

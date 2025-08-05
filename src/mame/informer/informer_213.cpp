@@ -488,6 +488,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT   COMPAT  MACHINE       INPUT         CLASS               INIT        COMPANY     FULLNAME           FLAGS
-COMP( 1990, in213  , 0,       0,      informer_213, informer_213, informer_213_state, empty_init, "Informer", "Informer 213",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1992, in213ae, 0,       0,      informer_213, informer_213, informer_213_state, empty_init, "Informer", "Informer 213 AE", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1990, in213  , 0, 0, informer_213, informer_213, informer_213_state, empty_init, "Informer Computer Terminals", "Informer 213",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1992, in213ae, 0, 0, informer_213, informer_213, informer_213_state, empty_init, "Informer Computer Terminals", "Informer 213 AE", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

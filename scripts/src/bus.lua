@@ -2177,10 +2177,16 @@ end
 
 if (BUSES["MZ80"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/mz80/ar_romcard.cpp",
+		MAME_DIR .. "src/devices/bus/mz80/ar_romcard.h",
+		MAME_DIR .. "src/devices/bus/mz80/mz1e05.cpp",
+		MAME_DIR .. "src/devices/bus/mz80/mz1e05.h",
 		MAME_DIR .. "src/devices/bus/mz80/mz1e30.cpp",
 		MAME_DIR .. "src/devices/bus/mz80/mz1e30.h",
 		MAME_DIR .. "src/devices/bus/mz80/mz1e35.cpp",
 		MAME_DIR .. "src/devices/bus/mz80/mz1e35.h",
+		MAME_DIR .. "src/devices/bus/mz80/mz1r18.cpp",
+		MAME_DIR .. "src/devices/bus/mz80/mz1r18.h",
 		MAME_DIR .. "src/devices/bus/mz80/mz1r37.cpp",
 		MAME_DIR .. "src/devices/bus/mz80/mz1r37.h",
 		MAME_DIR .. "src/devices/bus/mz80/mz80_exp.cpp",
@@ -3365,6 +3371,8 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_rx80.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/epson_rx80.h",
+		MAME_DIR .. "src/devices/bus/centronics/mz1p16.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/mz1p16.h",
 		MAME_DIR .. "src/devices/bus/centronics/nec_p72.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/nec_p72.h",
 		MAME_DIR .. "src/devices/bus/centronics/nlq401.cpp",
@@ -3436,6 +3444,8 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/teletex800.h",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.h",
+		MAME_DIR .. "src/devices/bus/rs232/votraxtnt.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/votraxtnt.h",
 		MAME_DIR .. "src/devices/bus/rs232/xvd701.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/xvd701.h",
 	}
@@ -3805,6 +3815,10 @@ if (BUSES["MEGADRIVE"]~=null) then
 		MAME_DIR .. "src/devices/bus/megadrive/stm95.h",
 		MAME_DIR .. "src/devices/bus/megadrive/svp.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/svp.h",
+		MAME_DIR .. "src/devices/bus/megadrive/titan.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/titan.h",
+		MAME_DIR .. "src/devices/bus/megadrive/tplay96.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/tplay96.h",
 	}
 end
 
@@ -4984,10 +4998,10 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/spectrum/ay/slot.h,BUSES["AY_SLOT"] = true
+--@src/devices/bus/spectrum/ay/slot.h,BUSES["SPECTRUM_AY"] = true
 ---------------------------------------------------
 
-if (BUSES["AY_SLOT"]~=null) then
+if (BUSES["SPECTRUM_AY"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/spectrum/ay/slot.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/ay/slot.h",
@@ -4998,10 +5012,24 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/spectrum/zxbus/bus.h,BUSES["ZXBUS"] = true
+--@src/devices/bus/spectrum/dma/slot.h,BUSES["SPECTRUM_DMA"] = true
 ---------------------------------------------------
 
-if (BUSES["ZXBUS"]~=null) then
+if (BUSES["SPECTRUM_DMA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/spectrum/dma/slot.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/dma/slot.h",
+		MAME_DIR .. "src/devices/bus/spectrum/dma/cards.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/dma/cards.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/spectrum/zxbus/bus.h,BUSES["SPECTRUM_ZXBUS"] = true
+---------------------------------------------------
+
+if (BUSES["SPECTRUM_ZXBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/spectrum/zxbus/bus.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/zxbus/bus.h",

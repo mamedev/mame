@@ -916,20 +916,6 @@ static void astra_addresslines( uint16_t* src, size_t srcsize, int small )
 void pluto5_state::init_hb()
 {
 	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
-
-	#if 0
-	{
-		uint8_t* ROM = memregion( "maincpu" )->base();
-		char filename[256];
-		sprintf(filename,"%s", machine().system().name);
-		FILE *fp = fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(ROM,  memregion( "maincpu" )->bytes(), 1, fp);
-			fclose(fp);
-		}
-	}
-	#endif
 }
 
 } // anonymous namespace

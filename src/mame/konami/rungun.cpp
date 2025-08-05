@@ -461,6 +461,7 @@ uint32_t rungun_state::screen_update_rng_dual_right(screen_device &screen, bitma
 
 void rungun_state::sprite_dma_trigger(void)
 {
+	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
 	uint32_t src_address;
 
 	if (m_single_screen_mode)
@@ -699,8 +700,8 @@ void rungun_state::rng(machine_config &config)
 	// BGM, volumes handtuned to make SFXs audible (still not 100% right tho)
 	K054539(config, m_k054539[1], 18.432_MHz_XTAL);
 	m_k054539[1]->set_device_rom_tag("k054539");
-	m_k054539[1]->add_route(0, "speaker", 0.6, 0);
-	m_k054539[1]->add_route(1, "speaker", 0.6, 1);
+	m_k054539[1]->add_route(0, "speaker", 0.6, 1);
+	m_k054539[1]->add_route(1, "speaker", 0.6, 0);
 }
 
 // for dual-screen output Run and Gun requires the video de-multiplexer board connected to the Jamma output, this gives you 2 Jamma connectors, one for each screen.

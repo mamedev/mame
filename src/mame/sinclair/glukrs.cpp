@@ -3,7 +3,7 @@
 /***************************************************************************
 
   Mr Gluk Reset Service
-  TODO implementation must be based on KR512VI1 clone MC146818
+  KR512VI1 clone MC146818
 
   Refs:
   https://zxart.ee/spa/software/prikladnoe-po/electronics/pzu/mr-gluk-reset-service-663/mr-gluk-reset-service-663/action:viewFile/id:250389/fileId:814961/
@@ -13,46 +13,29 @@
 #include "emu.h"
 #include "glukrs.h"
 
-glukrs_device::glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GLUKRS, tag, owner, clock),
-	  device_rtc_interface(mconfig, *this),
-	  m_nvram(*this, "nvram") {}
-
-void glukrs_device::device_add_mconfig(machine_config &config)
+glukrs_device::glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: mc146818_device(mconfig, GLUKRS, tag, owner, 32'768)
 {
-  NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+	m_tuc = 1984;
+	set_24hrs(true);
 }
 
 void glukrs_device::device_start()
 {
+	mc146818_device::device_start();
+
 	save_item(NAME(m_glukrs_active));
-	save_item(NAME(m_address));
-
-  m_nvram->set_base(&m_cmos, sizeof(m_cmos));
-
-  m_timer = timer_alloc(FUNC(glukrs_device::timer_callback), this);
-  m_timer->adjust(attotime::from_hz(clock() / XTAL(32'768)), 0, attotime::from_hz(clock() / XTAL(32'768)));
 }
 
 void glukrs_device::device_reset()
 {
-  m_glukrs_active = false;
-}
+	m_data[REG_A] &= ~(REG_A_DV2 | REG_A_DV1 | REG_A_DV2);
+	m_data[REG_A] |= REG_A_DV1;
+	mc146818_device::device_reset();
 
-void glukrs_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
-{
-  m_cmos[0x00] = convert_to_bcd(second);
-  m_cmos[0x02] = convert_to_bcd(minute);
-  m_cmos[0x04] = convert_to_bcd(hour);
-  m_cmos[0x06] = convert_to_bcd(day_of_week);
-  m_cmos[0x07] = convert_to_bcd(day);
-  m_cmos[0x08] = convert_to_bcd(month);
-  m_cmos[0x09] = convert_to_bcd(year % 100);
-}
+	update_timer();
 
-TIMER_CALLBACK_MEMBER(glukrs_device::timer_callback)
-{
-  advance_seconds();
+	m_glukrs_active = false;
 }
 
 // device type definition

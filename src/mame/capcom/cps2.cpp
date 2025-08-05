@@ -545,12 +545,6 @@ Notes:
 
 Known problems with this driver.
 
-  - Rasters are not correctly emulated in places where more than one split happens
-    per frame. A known place where this problem happens is during Shuma-Gorath's
-    Chaos Dimension super move in both MSH and MSHVSF. The screen should split into
-    around 6 or more strips and then scroll the gfx inside those strips up and down
-    alternatly (as one stip moves gfx up the next strip moves the gfx down).
-
   - The network adapter used in Super Street Fighter II: The Tournament Battle is
     not currently emulated though the ports it uses are setup in the memory map.
 
@@ -562,10 +556,10 @@ Known problems with this driver.
     hardware when timing is not based on Vsync (ssf2 and ssf2t for example). It is
     possible that what is slowing the cpu is read/write wait states when accessing
     RAM areas. This would mean that in places where lots of opcodes are being used
-    in connetion with data registers only the code would end up running to slow.
+    in connection with data registers only the code would end up running to slow.
 
   - Giga Wing's sprites are 1 frame out when compared to background scrolling. See
-    the explanation above for the most likley cause of this problem.
+    the explanation above for the most likely cause of this problem.
 
   - Progear slows down more than it should when compared to real hardware. See
     the explanation above for the most likely cause of this problem.
@@ -696,7 +690,6 @@ private:
 	uint16_t cps2_qsound_volume_r();
 	uint16_t joy_or_paddle_r();
 	uint16_t joy_or_paddle_ecofghtr_r();
-	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
 	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
 
 	void cps2_objram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -710,7 +703,7 @@ private:
 	virtual void find_last_sprite() override;
 	void cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks);
 	void cps2_set_sprite_priorities();
-	void cps2_objram_latch();
+	void cps2_objram_latch(int state);
 	uint16_t *cps2_objbase();
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	uint32_t screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -924,7 +917,6 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 				SX,SY, screen.priority(),primasks[priority],15);                 \
 }
 
-	int i;
 	uint16_t *base = m_cps2_buffered_obj.get();
 	int xoffs = 64 - m_output[CPS2_OBJ_XOFFS /2];
 	int yoffs = 16 - m_output[CPS2_OBJ_YOFFS /2];
@@ -936,7 +928,7 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 	}
 #endif
 
-	for (i = m_cps2_last_sprite_offset; i >= 0; i -= 4)
+	for (int i = m_cps2_last_sprite_offset; i >= 0; i -= 4)
 	{
 		int x = base[i + 0];
 		int y = base[i + 1];
@@ -1026,8 +1018,8 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 							sy = (y + nys * 16 + yoffs) & 0x3ff;
 
 							DRAWSPRITE(
-//                                      code + nxs + 0x10 * nys,
-									(code & ~0xf) + ((code + nxs) & 0xf) + 0x10 * nys,  //  pgear fix
+									//code + nxs + 0x10 * nys,
+									(code & ~0xf) + ((code + nxs) & 0xf) + 0x10 * nys, // pgear fix
 									(col & 0x1f),
 									0,0,
 									sx,sy);
@@ -1123,62 +1115,13 @@ void cps2_state::cps2_set_sprite_priorities()
 	m_pri_ctrl = m_output[CPS2_OBJ_PRI /2];
 }
 
-void cps2_state::cps2_objram_latch()
+void cps2_state::cps2_objram_latch(int state)
 {
-	cps2_set_sprite_priorities();
-	memcpy(m_cps2_buffered_obj.get(), cps2_objbase(), m_cps2_obj_size);
-}
-
-
-
-/*************************************
- *
- *  Interrupt generation
- *
- *************************************/
-
-TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
-{
-	// Direct irq line connection, IPL1 is vblank, IPL2 is some sort of scanline interrupt.
-	if (param == 0)
-		m_scancalls = 0;
-
-	if (m_cps_b_regs[0x10 / 2] & 0x8000)
-		m_cps_b_regs[0x10 / 2] &= 0x1ff;
-
-	if (m_cps_b_regs[0x12 / 2] & 0x8000)
-		m_cps_b_regs[0x12 / 2] &= 0x1ff;
-
-//  popmessage("%04x %04x - %04x %04x",m_scanline1,m_scanline2,m_cps_b_regs[0x10/2],m_cps_b_regs[0x12/2]);
-
-	// Raster effects
-	if (m_scanline1 == param || (m_scanline1 < param && !m_scancalls))
+	if (state)
 	{
-		m_cps_b_regs[0x10/2] = 0;
-		m_maincpu->set_input_line(2, HOLD_LINE);
-		m_screen->update_partial(param);
-		m_scancalls++;
-//      popmessage("IRQ4 scancounter = %04i", param);
+		cps2_set_sprite_priorities();
+		memcpy(m_cps2_buffered_obj.get(), cps2_objbase(), m_cps2_obj_size);
 	}
-
-	// Raster effects
-	if(m_scanline2 == param || (m_scanline2 < param && !m_scancalls))
-	{
-		m_cps_b_regs[0x12 / 2] = 0;
-		m_maincpu->set_input_line(2, HOLD_LINE);
-		m_screen->update_partial(param);
-		m_scancalls++;
-//      popmessage("IRQ4 scancounter = %04i", param);
-	}
-
-	if (param == 240)  // VBlank
-	{
-		m_cps_b_regs[0x10 / 2] = m_scanline1;
-		m_cps_b_regs[0x12 / 2] = m_scanline2;
-		m_maincpu->set_input_line(1, HOLD_LINE);
-		cps2_objram_latch();
-	}
-//  popmessage("Raster calls = %i", m_scancalls);
 }
 
 
@@ -1299,11 +1242,10 @@ uint16_t cps2_state::cps2_qsound_volume_r()
 
 	if (m_comm && m_comm->comm_enabled())
 		return 0x2021; // SSF2TB doesn't have a digital slider in the test screen
+	else if (m_cps2disabledigitalvolume)
+		return 0xd000; // Digital display isn't shown in test mode
 	else
-		if (m_cps2disabledigitalvolume)
-			return 0xd000; // Digital display isn't shown in test mode
-		else
-			return result;
+		return result;
 }
 
 
@@ -1874,16 +1816,19 @@ MACHINE_START_MEMBER(cps2_state,cps2)
 void cps2_state::cps2(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, XTAL(16'000'000));
+	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::cps2_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cps2_state::decrypted_opcodes_map);
-	m_maincpu->set_interrupt_mixer(false);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps2_state::cpu_space_map);
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::cps2_interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::raster_scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, XTAL(8'000'000));
+	Z80(config, m_audiocpu, 8_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps2_state::qsound_sub_map);
-	m_audiocpu->set_periodic_int(FUNC(cps2_state::irq0_line_hold), attotime::from_hz(250)); // measured
+
+	const attotime audio_irq_period = attotime::from_hz(8_MHz_XTAL / 32000); // measured
+	m_audiocpu->set_periodic_int(FUNC(cps2_state::irq0_line_hold), audio_irq_period);
 
 	MCFG_MACHINE_START_OVERRIDE(cps2_state, cps2)
 
@@ -1895,6 +1840,7 @@ void cps2_state::cps2(machine_config &config)
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
 	m_screen->set_screen_update(FUNC(cps2_state::screen_update_cps2));
 	m_screen->screen_vblank().set(FUNC(cps2_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(cps2_state::cps2_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -1941,7 +1887,7 @@ void cps2_state::gigaman2(machine_config &config)
 	// gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
 	config.device_remove("qsound");
 
-	OKIM6295(config, m_oki, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
 	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
 }
@@ -10956,14 +10902,7 @@ void cps2_state::init_digital_volume()
 void cps2_state::init_cps2_video()
 {
 	cps2_gfx_decode();
-
-	m_scanline1 = 262;
-	m_scanline2 = 262;
-	m_scancalls = 0;
-	m_last_sprite_offset = 0;
-	m_cps2_last_sprite_offset = 0;
-	m_pri_ctrl = 0;
-	m_objram_bank = 0;
+	init_rasters(); // cps1.cpp
 }
 
 

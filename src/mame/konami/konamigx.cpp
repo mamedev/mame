@@ -3994,7 +3994,6 @@ MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 	if (m_soundcpu) m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	if (m_dasp) m_dasp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-
 	// [HACK] This shouldn't be necessary
 	if (!strcmp(machine().system().name, "tkmmpzdm"))
 	{
@@ -4029,8 +4028,6 @@ MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 		!strcmp(setname, "le2u")||
 		!strcmp(setname, "le2j"))
 		m_k055555->K055555_write_reg(K55_INPUT_ENABLES, 1); // it doesn't turn on the video output at first for the test screens, maybe it should default to ON for all games
-
-
 }
 
 struct GXGameInfoT

@@ -89,14 +89,12 @@ private:
 	template <uint8_t Which> void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	template <uint8_t Which> void flipscreen_w(int state) { m_tilemap[Which]->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0); }
 	template <uint8_t Which> void pf_video_w(offs_t offset, uint8_t data);
 	void gfxbank_w(uint8_t data) { m_gfx_bank = data; }
 	uint8_t gfxbank_r() { return m_gfx_bank; }
 	void bankswitch_w(uint8_t data);
 	void soundirq_w(uint8_t data);
-
-	template <uint8_t Which> void flipscreen_w(int state) { m_tilemap[Which]->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0); }
-	template <uint8_t Which> void dirtytiles() { m_tilemap[Which]->mark_all_dirty(); }
 
 	void sound_bank_w(uint8_t data);
 	void volume_callback(uint8_t data);
@@ -178,14 +176,16 @@ TILE_GET_INFO_MEMBER(hcastle_state::get_tile_info)
 
 void hcastle_state::video_start()
 {
-	m_k007121[0]->set_spriteram(m_spriteram[0]);
-	m_k007121[1]->set_spriteram(m_spriteram[1]);
-
 	// 0 = FG, 1 = BG
 	m_tilemap[0] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(hcastle_state::get_tile_info<0>)), tilemap_mapper_delegate(*this, FUNC(hcastle_state::tilemap_scan)), 8, 8, 64, 32);
 	m_tilemap[1] = &machine().tilemap().create(*m_k007121[1], tilemap_get_info_delegate(*this, FUNC(hcastle_state::get_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(hcastle_state::tilemap_scan)), 8, 8, 64, 32);
 
 	m_tilemap[0]->set_transparent_pen(0);
+
+	m_k007121[0]->register_tilemap(m_tilemap[0]);
+	m_k007121[1]->register_tilemap(m_tilemap[1]);
+	m_k007121[0]->set_spriteram(m_spriteram[0]);
+	m_k007121[1]->set_spriteram(m_spriteram[1]);
 }
 
 
@@ -452,11 +452,9 @@ void hcastle_state::hcastle(machine_config &config)
 	K007121(config, m_k007121[0], 0, gfx_hcastle_1, m_palette, "screen");
 	m_k007121[0]->set_irq_cb().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 	m_k007121[0]->set_flipscreen_cb().set(FUNC(hcastle_state::flipscreen_w<0>));
-	m_k007121[0]->set_dirtytiles_cb(FUNC(hcastle_state::dirtytiles<0>));
 
 	K007121(config, m_k007121[1], 0, gfx_hcastle_2, m_palette, "screen");
 	m_k007121[1]->set_flipscreen_cb().set(FUNC(hcastle_state::flipscreen_w<1>));
-	m_k007121[1]->set_dirtytiles_cb(FUNC(hcastle_state::dirtytiles<1>));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

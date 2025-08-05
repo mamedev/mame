@@ -331,10 +331,26 @@ ROM_START( dorapdc )
 	ROM_LOAD16_WORD_SWAP( "pdc_dora_5030.bin", 0x000000, 0x800000, CRC(cea549ad) SHA1(b6ac8ea186d7c624451dd6121932cecb38c1f25f) )
 ROM_END
 
+ROM_START( vjpp1 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "29lv160.u2", 0x000000, 0x200000, CRC(acadbcc3) SHA1(3cf6fddcfdd1f858e775976f690b32deef1de67f) )
+ROM_END
+
 ROM_START( vjpp2 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "29lv320at.u2", 0x000000, 0x400000, CRC(de2592eb) SHA1(9b537205808c502cf872e62f9701357ef8e28f3c) )
 ROM_END
+
+ROM_START( vjpp3 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "29lv320.u2", 0x000000, 0x400000, CRC(f664d3f4) SHA1(59279e54e5d9ac2f956241e78dffe526b5de14fd) )
+ROM_END
+
+ROM_START( vjpp4 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "29lv160.u2", 0x000000, 0x200000, CRC(2272f1f4) SHA1(0ffb606d4ac93da27a671b369800ea71e68452f3) )
+ROM_END
+
 
 } // anonymous namespace
 
@@ -370,4 +386,10 @@ CONS( 2013, tmntpdc,  0,        0, pdc100,      pdc100,       spg2xx_pdc_game_st
 
 CONS( 2013, dorapdc,  0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Dora l'exploratrice - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
 
+CONS( 200?, vjpp1,    0,        0, pdc100,      vjpp2,        spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Plug Play TV Games 1 (4-in-1) (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
+
 CONS( 200?, vjpp2,    0,        0, pdc100,      vjpp2,        spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Plug Play TV Games 2 (4-in-1) (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 200?, vjpp3,    0,        0, pdc100,      vjpp2,        spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Plug Play TV Games 3 (4-in-1) (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 200?, vjpp4,    0,        0, pdc100,      vjpp2,        spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Plug Play TV Games 4 (4-in-1) (VideoJet, France)", MACHINE_IMPERFECT_SOUND )

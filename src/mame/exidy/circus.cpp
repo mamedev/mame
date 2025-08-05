@@ -118,7 +118,7 @@ void circus_state::main_map(address_map &map)
 {
 	// 5M0-1
 	map(0x0000, 0x01ff).mirror(0x1e00).ram().share(m_ram);
-	map(0x1000, 0x1fff).rom();
+	map(0x1000, 0x1fff).rom().region("maincpu", 0);
 	// 5MLS
 	map(0x2000, 0x2000).mirror(0x0fff).w(FUNC(circus_state::clown_x_w));
 	map(0x3000, 0x3000).mirror(0x0fff).w(FUNC(circus_state::clown_y_w));
@@ -132,7 +132,7 @@ void circus_state::main_map(address_map &map)
 	map(0xc000, 0xc000).mirror(0x0fff).portr("DSW");
 	map(0xd000, 0xd000).mirror(0x0fff).r(FUNC(circus_state::paddle_r));
 	// 5E-F
-	map(0xe000, 0xefff).mirror(0x1000).rom().region("maincpu", 0x1000);
+	map(0xe000, 0xefff).mirror(0x1000).rom().region("maincpu", 0);
 }
 
 
@@ -454,15 +454,15 @@ void ripcord_state::ripcord(machine_config &config)
 *******************************************************************************/
 
 ROM_START( circus )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // code
-	ROM_LOAD( "9004a.1a",   0x1000, 0x0200, CRC(7654ea75) SHA1(fa29417618157002b8ecb21f4c15104c8145a742) )
-	ROM_LOAD( "9005.2a",    0x1200, 0x0200, CRC(b8acdbc5) SHA1(634bb11089f7a57a316b6829954cc4da4523f267) )
-	ROM_LOAD( "9006.3a",    0x1400, 0x0200, CRC(901dfff6) SHA1(c1f48845456e88d54981608afd00ddb92d97da99) )
-	ROM_LOAD( "9007.5a",    0x1600, 0x0200, CRC(9dfdae38) SHA1(dc59a5f90a5a49fa071aada67eda768d3ecef010) )
-	ROM_LOAD( "9008.6a",    0x1800, 0x0200, CRC(c8681cf6) SHA1(681cfea75bee8a86f9f4645e6c6b94b44762dae9) )
-	ROM_LOAD( "9009.7a",    0x1a00, 0x0200, CRC(585f633e) SHA1(46133409f42e8cbc095dde576ce07d97b235972d) )
-	ROM_LOAD( "9010.8a",    0x1c00, 0x0200, CRC(69cc409f) SHA1(b77289e62313e8535ce40686df7238aa9c0035bc) )
-	ROM_LOAD( "9011.9a",    0x1e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
+	ROM_REGION( 0x1000, "maincpu", 0 ) // code
+	ROM_LOAD( "9004a.1a",   0x0000, 0x0200, CRC(7654ea75) SHA1(fa29417618157002b8ecb21f4c15104c8145a742) )
+	ROM_LOAD( "9005.2a",    0x0200, 0x0200, CRC(b8acdbc5) SHA1(634bb11089f7a57a316b6829954cc4da4523f267) )
+	ROM_LOAD( "9006.3a",    0x0400, 0x0200, CRC(901dfff6) SHA1(c1f48845456e88d54981608afd00ddb92d97da99) )
+	ROM_LOAD( "9007.5a",    0x0600, 0x0200, CRC(9dfdae38) SHA1(dc59a5f90a5a49fa071aada67eda768d3ecef010) )
+	ROM_LOAD( "9008.6a",    0x0800, 0x0200, CRC(c8681cf6) SHA1(681cfea75bee8a86f9f4645e6c6b94b44762dae9) )
+	ROM_LOAD( "9009.7a",    0x0a00, 0x0200, CRC(585f633e) SHA1(46133409f42e8cbc095dde576ce07d97b235972d) )
+	ROM_LOAD( "9010.8a",    0x0c00, 0x0200, CRC(69cc409f) SHA1(b77289e62313e8535ce40686df7238aa9c0035bc) )
+	ROM_LOAD( "9011.9a",    0x0e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "9003.4c",    0x0000, 0x0200, CRC(6efc315a) SHA1(d5a4a64a901853fff56df3c65512afea8336aad2) )
@@ -479,15 +479,15 @@ ROM_START( circus )
 ROM_END
 
 ROM_START( circuso ) // older set, there exist several bootlegs identical to this set with unlabeled roms/proms; as a bootleg this was found both on a PCB and a PROMs blister, labeled 'Circus - punteggio basso' ('Circus - low scoring')
-	ROM_REGION( 0x10000, "maincpu", 0 ) // code
-	ROM_LOAD( "9004.1a",    0x1000, 0x0200, CRC(68e710ba) SHA1(63957802f8db3b4ac7bbab83376771ce1744c6b3) )
-	ROM_LOAD( "9005.2a",    0x1200, 0x0200, CRC(b8acdbc5) SHA1(634bb11089f7a57a316b6829954cc4da4523f267) )
-	ROM_LOAD( "9006.3a",    0x1400, 0x0200, CRC(901dfff6) SHA1(c1f48845456e88d54981608afd00ddb92d97da99) )
-	ROM_LOAD( "9007.5a",    0x1600, 0x0200, CRC(9dfdae38) SHA1(dc59a5f90a5a49fa071aada67eda768d3ecef010) )
-	ROM_LOAD( "9008.6a",    0x1800, 0x0200, CRC(c8681cf6) SHA1(681cfea75bee8a86f9f4645e6c6b94b44762dae9) )
-	ROM_LOAD( "9009.7a",    0x1a00, 0x0200, CRC(585f633e) SHA1(46133409f42e8cbc095dde576ce07d97b235972d) )
-	ROM_LOAD( "9010.8a",    0x1c00, 0x0200, CRC(69cc409f) SHA1(b77289e62313e8535ce40686df7238aa9c0035bc) )
-	ROM_LOAD( "9011.9a",    0x1e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
+	ROM_REGION( 0x1000, "maincpu", 0 ) // code
+	ROM_LOAD( "9004.1a",    0x0000, 0x0200, CRC(68e710ba) SHA1(63957802f8db3b4ac7bbab83376771ce1744c6b3) )
+	ROM_LOAD( "9005.2a",    0x0200, 0x0200, CRC(b8acdbc5) SHA1(634bb11089f7a57a316b6829954cc4da4523f267) )
+	ROM_LOAD( "9006.3a",    0x0400, 0x0200, CRC(901dfff6) SHA1(c1f48845456e88d54981608afd00ddb92d97da99) )
+	ROM_LOAD( "9007.5a",    0x0600, 0x0200, CRC(9dfdae38) SHA1(dc59a5f90a5a49fa071aada67eda768d3ecef010) )
+	ROM_LOAD( "9008.6a",    0x0800, 0x0200, CRC(c8681cf6) SHA1(681cfea75bee8a86f9f4645e6c6b94b44762dae9) )
+	ROM_LOAD( "9009.7a",    0x0a00, 0x0200, CRC(585f633e) SHA1(46133409f42e8cbc095dde576ce07d97b235972d) )
+	ROM_LOAD( "9010.8a",    0x0c00, 0x0200, CRC(69cc409f) SHA1(b77289e62313e8535ce40686df7238aa9c0035bc) )
+	ROM_LOAD( "9011.9a",    0x0e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "9003.4c",    0x0000, 0x0200, CRC(6efc315a) SHA1(d5a4a64a901853fff56df3c65512afea8336aad2) )
@@ -504,15 +504,15 @@ ROM_START( circuso ) // older set, there exist several bootlegs identical to thi
 ROM_END
 
 ROM_START( springbd )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // code
-	ROM_LOAD( "93448.1a",   0x1000, 0x0200, CRC(44d65ccd) SHA1(0eb2515444486a4656a4accec555501e75b39a74) )
-	ROM_LOAD( "93448.2a",   0x1200, 0x0200, CRC(b8acdbc5) SHA1(634bb11089f7a57a316b6829954cc4da4523f267) )
-	ROM_LOAD( "93448.3a",   0x1400, 0x0200, CRC(f2e25f7a) SHA1(6441e39fc7f710442dd6a3a047826862b0481c58) )
-	ROM_LOAD( "93448.5a",   0x1600, 0x0200, CRC(9dfdae38) SHA1(dc59a5f90a5a49fa071aada67eda768d3ecef010) )
-	ROM_LOAD( "93448.6a",   0x1800, 0x0200, CRC(c8681cf6) SHA1(681cfea75bee8a86f9f4645e6c6b94b44762dae9) )
-	ROM_LOAD( "93448.7a",   0x1a00, 0x0200, CRC(585f633e) SHA1(46133409f42e8cbc095dde576ce07d97b235972d) )
-	ROM_LOAD( "93448.8a",   0x1c00, 0x0200, CRC(d7c0dc05) SHA1(cc6f7d16ca4be74370c305c34aa1a2e338d2c41f) )
-	ROM_LOAD( "93448.9a",   0x1e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
+	ROM_REGION( 0x1000, "maincpu", 0 ) // code
+	ROM_LOAD( "93448.1a",   0x0000, 0x0200, CRC(44d65ccd) SHA1(0eb2515444486a4656a4accec555501e75b39a74) )
+	ROM_LOAD( "93448.2a",   0x0200, 0x0200, CRC(b8acdbc5) SHA1(634bb11089f7a57a316b6829954cc4da4523f267) )
+	ROM_LOAD( "93448.3a",   0x0400, 0x0200, CRC(f2e25f7a) SHA1(6441e39fc7f710442dd6a3a047826862b0481c58) )
+	ROM_LOAD( "93448.5a",   0x0600, 0x0200, CRC(9dfdae38) SHA1(dc59a5f90a5a49fa071aada67eda768d3ecef010) )
+	ROM_LOAD( "93448.6a",   0x0800, 0x0200, CRC(c8681cf6) SHA1(681cfea75bee8a86f9f4645e6c6b94b44762dae9) )
+	ROM_LOAD( "93448.7a",   0x0a00, 0x0200, CRC(585f633e) SHA1(46133409f42e8cbc095dde576ce07d97b235972d) )
+	ROM_LOAD( "93448.8a",   0x0c00, 0x0200, CRC(d7c0dc05) SHA1(cc6f7d16ca4be74370c305c34aa1a2e338d2c41f) )
+	ROM_LOAD( "93448.9a",   0x0e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "93448.4c",   0x0000, 0x0200, CRC(6efc315a) SHA1(d5a4a64a901853fff56df3c65512afea8336aad2) )
@@ -529,15 +529,15 @@ ROM_START( springbd )
 ROM_END
 
 ROM_START( robotbwl )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // code
-	ROM_LOAD( "4020.1a",  0xf000, 0x0200, CRC(df387a0b) SHA1(97291f1a93cbbff987b0fbc16c2e87ad0db96e12) ) // these are all N82S141N BPROMs
-	ROM_LOAD( "4021.2a",  0xf200, 0x0200, CRC(c948274d) SHA1(1bf8c6e994d601d4e6d30ca2a9da97e140ff5eee) )
-	ROM_LOAD( "4022.3a",  0xf400, 0x0200, CRC(8fdb3ec5) SHA1(a9290edccb8f75e7ec91416d46617516260d5944) )
-	ROM_LOAD( "4023.5a",  0xf600, 0x0200, CRC(ba9a6929) SHA1(9cc6e85431b5d82bf3a624f7b35ddec399ad6c80) )
-	ROM_LOAD( "4024.6a",  0xf800, 0x0200, CRC(16fd8480) SHA1(935bb0c87d25086f326571c83f94f831b1a8b036) )
-	ROM_LOAD( "4025.7a",  0xfa00, 0x0200, CRC(4cadbf06) SHA1(380c10aa83929bfbfd89facb252e68c307545755) )
-	ROM_LOAD( "4026a.8a", 0xfc00, 0x0200, CRC(bc809ed3) SHA1(2bb4cdae8c9619eebea30cc323960a46a509bb58) )
-	ROM_LOAD( "4027b.9a", 0xfe00, 0x0200, CRC(07487e27) SHA1(b5528fb3fec474df2b66f36e28df13a7e81f9ce3) )
+	ROM_REGION( 0x1000, "maincpu", 0 ) // code
+	ROM_LOAD( "4020.1a",  0x0000, 0x0200, CRC(df387a0b) SHA1(97291f1a93cbbff987b0fbc16c2e87ad0db96e12) ) // these are all N82S141N BPROMs
+	ROM_LOAD( "4021.2a",  0x0200, 0x0200, CRC(c948274d) SHA1(1bf8c6e994d601d4e6d30ca2a9da97e140ff5eee) )
+	ROM_LOAD( "4022.3a",  0x0400, 0x0200, CRC(8fdb3ec5) SHA1(a9290edccb8f75e7ec91416d46617516260d5944) )
+	ROM_LOAD( "4023.5a",  0x0600, 0x0200, CRC(ba9a6929) SHA1(9cc6e85431b5d82bf3a624f7b35ddec399ad6c80) )
+	ROM_LOAD( "4024.6a",  0x0800, 0x0200, CRC(16fd8480) SHA1(935bb0c87d25086f326571c83f94f831b1a8b036) )
+	ROM_LOAD( "4025.7a",  0x0a00, 0x0200, CRC(4cadbf06) SHA1(380c10aa83929bfbfd89facb252e68c307545755) )
+	ROM_LOAD( "4026a.8a", 0x0c00, 0x0200, CRC(bc809ed3) SHA1(2bb4cdae8c9619eebea30cc323960a46a509bb58) )
+	ROM_LOAD( "4027b.9a", 0x0e00, 0x0200, CRC(07487e27) SHA1(b5528fb3fec474df2b66f36e28df13a7e81f9ce3) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "4010.4c",  0x0000, 0x0200, CRC(a5f7acb9) SHA1(556dd34d0fa50415b128477e208e96bf0c050c2c) ) // these are all N82S141N BPROMs
@@ -554,15 +554,15 @@ ROM_START( robotbwl )
 ROM_END
 
 ROM_START( trapeze ) // loose roms labelled with pencil
-	ROM_REGION( 0x10000, "maincpu", 0 ) // code
-	ROM_LOAD( "9004.1a",    0x1000, 0x0200, CRC(fe55a601) SHA1(f23955b4f2d00567f94f96741dc5bfb048a263a2) )
-	ROM_LOAD( "9005.2a",    0x1200, 0x0200, CRC(37948b8d) SHA1(77d9932f4f853a7fb754f9b8fad2e38577077d79) )
-	ROM_LOAD( "9008.3a",    0x1400, 0x0200, CRC(b6c2e1cb) SHA1(a40a1c1b3b780949cc64f8e5ca408619d58437ba) ) // mislabelled?
-	ROM_LOAD( "9009.5a",    0x1600, 0x0200, CRC(875fd035) SHA1(1435f42dad56a18bf967cbc962d74bd2be511f62) ) // mislabelled?
-	ROM_LOAD( "9006.6a",    0x1800, 0x0200, CRC(3572445f) SHA1(78f58c603df5deb483ca80ae6972d6e9ed4a3b96) ) // mislabelled?
-	ROM_LOAD( "9007.7a",    0x1a00, 0x0200, CRC(7d26899b) SHA1(8845383edfdd26cc6c817e5c5b86f12d26914904) ) // mislabelled?
-	ROM_LOAD( "9010.8a",    0x1c00, 0x0200, CRC(7114d163) SHA1(bb301703cc9856c167cd67c825b99fb286f29498) )
-	ROM_LOAD( "9011.9a",    0x1e00, 0x0200, CRC(325a2b38) SHA1(fb4cd885f7202a23ac5d8119b91eaf2c80af5e17) )
+	ROM_REGION( 0x1000, "maincpu", 0 ) // code
+	ROM_LOAD( "9004.1a",    0x0000, 0x0200, CRC(fe55a601) SHA1(f23955b4f2d00567f94f96741dc5bfb048a263a2) )
+	ROM_LOAD( "9005.2a",    0x0200, 0x0200, CRC(37948b8d) SHA1(77d9932f4f853a7fb754f9b8fad2e38577077d79) )
+	ROM_LOAD( "9008.3a",    0x0400, 0x0200, CRC(b6c2e1cb) SHA1(a40a1c1b3b780949cc64f8e5ca408619d58437ba) ) // mislabelled?
+	ROM_LOAD( "9009.5a",    0x0600, 0x0200, CRC(875fd035) SHA1(1435f42dad56a18bf967cbc962d74bd2be511f62) ) // mislabelled?
+	ROM_LOAD( "9006.6a",    0x0800, 0x0200, CRC(3572445f) SHA1(78f58c603df5deb483ca80ae6972d6e9ed4a3b96) ) // mislabelled?
+	ROM_LOAD( "9007.7a",    0x0a00, 0x0200, CRC(7d26899b) SHA1(8845383edfdd26cc6c817e5c5b86f12d26914904) ) // mislabelled?
+	ROM_LOAD( "9010.8a",    0x0c00, 0x0200, CRC(7114d163) SHA1(bb301703cc9856c167cd67c825b99fb286f29498) )
+	ROM_LOAD( "9011.9a",    0x0e00, 0x0200, CRC(325a2b38) SHA1(fb4cd885f7202a23ac5d8119b91eaf2c80af5e17) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "9003.4c",    0x0000, 0x0200, CRC(e46eae6c) SHA1(0da9e92ef63c793792c0ec2801475fd860f86cec) )
@@ -579,15 +579,15 @@ ROM_START( trapeze ) // loose roms labelled with pencil
 ROM_END
 
 ROM_START( crash )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // code
-	ROM_LOAD( "crash.a1",   0x1000, 0x0200, CRC(b9571203) SHA1(1299e476598d07a67aa1640f3320de1198280296) )
-	ROM_LOAD( "crash.a2",   0x1200, 0x0200, CRC(b4581a95) SHA1(b3662bda5013443a56eabbe21fefa91e255e18e7) )
-	ROM_LOAD( "crash.a3",   0x1400, 0x0200, CRC(597555ae) SHA1(39a6d10e229be0e0d52b1061f2aa2f678b351f0b) )
-	ROM_LOAD( "crash.a4",   0x1600, 0x0200, CRC(0a15d69f) SHA1(c3a7b5ce4406cce511108e5c015b1dd5587b75ed) )
-	ROM_LOAD( "crash.a5",   0x1800, 0x0200, CRC(a9c7a328) SHA1(2f21ee58ba117bf4fe9101373c55449217a08da6) )
-	ROM_LOAD( "crash.a6",   0x1a00, 0x0200, CRC(c7d62d27) SHA1(974800cbeba2f2d0d796200d235371e2ce3a1d28) )
-	ROM_LOAD( "crash.a7",   0x1c00, 0x0200, CRC(5e5af244) SHA1(9ea27241a5ac97b260599d56f60bf9ec3ffcac7f) )
-	ROM_LOAD( "crash.a8",   0x1e00, 0x0200, CRC(3dc50839) SHA1(5782ea7d70e5cbe8b8245ed1075ce92b57cc6ddf) )
+	ROM_REGION( 0x1000, "maincpu", 0 ) // code
+	ROM_LOAD( "crash.a1",   0x0000, 0x0200, CRC(b9571203) SHA1(1299e476598d07a67aa1640f3320de1198280296) )
+	ROM_LOAD( "crash.a2",   0x0200, 0x0200, CRC(b4581a95) SHA1(b3662bda5013443a56eabbe21fefa91e255e18e7) )
+	ROM_LOAD( "crash.a3",   0x0400, 0x0200, CRC(597555ae) SHA1(39a6d10e229be0e0d52b1061f2aa2f678b351f0b) )
+	ROM_LOAD( "crash.a4",   0x0600, 0x0200, CRC(0a15d69f) SHA1(c3a7b5ce4406cce511108e5c015b1dd5587b75ed) )
+	ROM_LOAD( "crash.a5",   0x0800, 0x0200, CRC(a9c7a328) SHA1(2f21ee58ba117bf4fe9101373c55449217a08da6) )
+	ROM_LOAD( "crash.a6",   0x0a00, 0x0200, CRC(c7d62d27) SHA1(974800cbeba2f2d0d796200d235371e2ce3a1d28) )
+	ROM_LOAD( "crash.a7",   0x0c00, 0x0200, CRC(5e5af244) SHA1(9ea27241a5ac97b260599d56f60bf9ec3ffcac7f) )
+	ROM_LOAD( "crash.a8",   0x0e00, 0x0200, CRC(3dc50839) SHA1(5782ea7d70e5cbe8b8245ed1075ce92b57cc6ddf) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "crash.c4",   0x0000, 0x0200, CRC(ba16f9e8) SHA1(fdbf8d36993196552ddb7729750420f8e31eee70) )
@@ -600,10 +600,9 @@ ROM_START( crash )
 ROM_END
 
 ROM_START( crasha )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // code
-	ROM_LOAD( "nsa7.a8",    0x1000, 0x0800, CRC(2e47c5ee) SHA1(4712ec3080ce3797420266d6efb26e7d146a965a) )
-	ROM_LOAD( "nsa3.a4",    0x1800, 0x0800, CRC(11c8c461) SHA1(197b903ad7626a4055530c8c9c99299ffd94cd37) )
-	ROM_RELOAD(             0xf800, 0x0800 ) /* for the reset and interrupt vectors */
+	ROM_REGION( 0x1000, "maincpu", 0 ) // code
+	ROM_LOAD( "nsa7.a8",    0x0000, 0x0800, CRC(2e47c5ee) SHA1(4712ec3080ce3797420266d6efb26e7d146a965a) )
+	ROM_LOAD( "nsa3.a4",    0x0800, 0x0800, CRC(11c8c461) SHA1(197b903ad7626a4055530c8c9c99299ffd94cd37) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "nsc2.c2",    0x0000, 0x0800, CRC(a16cd133) SHA1(a3ec34b7f9e58948b2ce45261f05071e2ef7427f) )
@@ -613,15 +612,15 @@ ROM_START( crasha )
 ROM_END
 
 ROM_START( smash )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // code
-	ROM_LOAD( "smash.a1",   0x1000, 0x0200, CRC(b9571203) SHA1(1299e476598d07a67aa1640f3320de1198280296) )
-	ROM_LOAD( "smash.a2",   0x1200, 0x0200, CRC(b4581a95) SHA1(b3662bda5013443a56eabbe21fefa91e255e18e7) )
-	ROM_LOAD( "smash.a3",   0x1400, 0x0200, CRC(597555ae) SHA1(39a6d10e229be0e0d52b1061f2aa2f678b351f0b) )
-	ROM_LOAD( "smash.a4",   0x1600, 0x0200, CRC(0a15d69f) SHA1(c3a7b5ce4406cce511108e5c015b1dd5587b75ed) )
-	ROM_LOAD( "smash.a5",   0x1800, 0x0200, CRC(a9c7a328) SHA1(2f21ee58ba117bf4fe9101373c55449217a08da6) )
-	ROM_LOAD( "smash.a6",   0x1a00, 0x0200, CRC(c7d62d27) SHA1(974800cbeba2f2d0d796200d235371e2ce3a1d28) )
-	ROM_LOAD( "smash.a7",   0x1c00, 0x0200, CRC(5e5af244) SHA1(9ea27241a5ac97b260599d56f60bf9ec3ffcac7f) )
-	ROM_LOAD( "smash.a8",   0x1e00, 0x0200, CRC(3dc50839) SHA1(5782ea7d70e5cbe8b8245ed1075ce92b57cc6ddf) )
+	ROM_REGION( 0x1000, "maincpu", 0 ) // code
+	ROM_LOAD( "smash.a1",   0x0000, 0x0200, CRC(b9571203) SHA1(1299e476598d07a67aa1640f3320de1198280296) )
+	ROM_LOAD( "smash.a2",   0x0200, 0x0200, CRC(b4581a95) SHA1(b3662bda5013443a56eabbe21fefa91e255e18e7) )
+	ROM_LOAD( "smash.a3",   0x0400, 0x0200, CRC(597555ae) SHA1(39a6d10e229be0e0d52b1061f2aa2f678b351f0b) )
+	ROM_LOAD( "smash.a4",   0x0600, 0x0200, CRC(0a15d69f) SHA1(c3a7b5ce4406cce511108e5c015b1dd5587b75ed) )
+	ROM_LOAD( "smash.a5",   0x0800, 0x0200, CRC(a9c7a328) SHA1(2f21ee58ba117bf4fe9101373c55449217a08da6) )
+	ROM_LOAD( "smash.a6",   0x0a00, 0x0200, CRC(c7d62d27) SHA1(974800cbeba2f2d0d796200d235371e2ce3a1d28) )
+	ROM_LOAD( "smash.a7",   0x0c00, 0x0200, CRC(5e5af244) SHA1(9ea27241a5ac97b260599d56f60bf9ec3ffcac7f) )
+	ROM_LOAD( "smash.a8",   0x0e00, 0x0200, CRC(3dc50839) SHA1(5782ea7d70e5cbe8b8245ed1075ce92b57cc6ddf) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "smash.c4",   0x0000, 0x0200, CRC(442500e5) SHA1(c54ebd5ccee096d8eed4153f623adc4e655b3909) )
@@ -634,15 +633,15 @@ ROM_START( smash )
 ROM_END
 
 ROM_START( ripcord )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // code
-	ROM_LOAD( "9027.1a",    0x1000, 0x0200, CRC(56b8dc06) SHA1(5432e4f2e321805a8dc9cfce20b8372793a9a4dd) )
-	ROM_LOAD( "9028.2a",    0x1200, 0x0200, CRC(a8a78a30) SHA1(e6ddcba608f9b34e07a5402872793dafe5054156) )
-	ROM_LOAD( "9029.4a",    0x1400, 0x0200, CRC(fc5c8e07) SHA1(4784a868491393f42520f6609266ffab21661ec3) )
-	ROM_LOAD( "9030.5a",    0x1600, 0x0200, CRC(b496263c) SHA1(36321aa6d18e7c35461c1d445d2682d61279a8c7) )
-	ROM_LOAD( "9031.6a",    0x1800, 0x0200, CRC(cdc7d46e) SHA1(369bb119320cd737641a5bf64d51c9b552578f8a) )
-	ROM_LOAD( "9032.7a",    0x1a00, 0x0200, CRC(a6588bec) SHA1(76321ab29329b6291e4d4731bb445a6ac4ce2d86) )
-	ROM_LOAD( "9033.8a",    0x1c00, 0x0200, CRC(fd49b806) SHA1(5205ee8e9cec53be6e79e0183bc1e9d96c8c2e55) )
-	ROM_LOAD( "9034.9a",    0x1e00, 0x0200, CRC(7caf926d) SHA1(f51d010ce1909e21e04313e4262c70ab948c14e0) )
+	ROM_REGION( 0x1000, "maincpu", 0 ) // code
+	ROM_LOAD( "9027.1a",    0x0000, 0x0200, CRC(56b8dc06) SHA1(5432e4f2e321805a8dc9cfce20b8372793a9a4dd) )
+	ROM_LOAD( "9028.2a",    0x0200, 0x0200, CRC(a8a78a30) SHA1(e6ddcba608f9b34e07a5402872793dafe5054156) )
+	ROM_LOAD( "9029.4a",    0x0400, 0x0200, CRC(fc5c8e07) SHA1(4784a868491393f42520f6609266ffab21661ec3) )
+	ROM_LOAD( "9030.5a",    0x0600, 0x0200, CRC(b496263c) SHA1(36321aa6d18e7c35461c1d445d2682d61279a8c7) )
+	ROM_LOAD( "9031.6a",    0x0800, 0x0200, CRC(cdc7d46e) SHA1(369bb119320cd737641a5bf64d51c9b552578f8a) )
+	ROM_LOAD( "9032.7a",    0x0a00, 0x0200, CRC(a6588bec) SHA1(76321ab29329b6291e4d4731bb445a6ac4ce2d86) )
+	ROM_LOAD( "9033.8a",    0x0c00, 0x0200, CRC(fd49b806) SHA1(5205ee8e9cec53be6e79e0183bc1e9d96c8c2e55) )
+	ROM_LOAD( "9034.9a",    0x0e00, 0x0200, CRC(7caf926d) SHA1(f51d010ce1909e21e04313e4262c70ab948c14e0) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
 	ROM_LOAD( "9026.5c",    0x0000, 0x0200, CRC(06e7adbb) SHA1(0c119743eacc30d6d9eb50dfee0746b69bb17377) )

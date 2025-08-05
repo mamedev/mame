@@ -216,6 +216,7 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 	m_output_type(LEGACY_LINEAR),
 	m_serout_ready_timer(nullptr),
 	m_serout_complete_timer(nullptr),
+	m_serout_bit_timer(nullptr),
 	m_serin_ready_timer(nullptr)
 {
 }
@@ -303,6 +304,7 @@ void pokey_device::device_start()
 
 	m_serout_ready_timer = timer_alloc(FUNC(pokey_device::serout_ready_irq), this);
 	m_serout_complete_timer = timer_alloc(FUNC(pokey_device::serout_complete_irq), this);
+	m_serout_bit_timer = timer_alloc(FUNC(pokey_device::serout_transmit_bit), this);
 	m_serin_ready_timer = timer_alloc(FUNC(pokey_device::serin_ready_irq), this);
 
 	save_item(STRUCT_MEMBER(m_channel, m_borrow_cnt));
@@ -412,6 +414,10 @@ void pokey_device::device_clock_changed()
 
 TIMER_CALLBACK_MEMBER(pokey_device::serout_ready_irq)
 {
+	if (!(m_SKCTL & SK_TWOTONE))
+		m_sod_w_cb(0);
+	m_oclk_w_cb(1);
+
 	m_IRQST &= ~IRQ_SEROC;
 	if (m_IRQEN & IRQ_SEROR)
 	{
@@ -423,6 +429,9 @@ TIMER_CALLBACK_MEMBER(pokey_device::serout_ready_irq)
 
 TIMER_CALLBACK_MEMBER(pokey_device::serout_complete_irq)
 {
+	if (!(m_SKCTL & SK_TWOTONE) && (m_SKCTL & SK_BREAK))
+		m_sod_w_cb(0);
+
 	// Completion flag is set regardless of IRQEN
 	m_IRQST |= IRQ_SEROC;
 	if (m_IRQEN & IRQ_SEROC)
@@ -430,6 +439,13 @@ TIMER_CALLBACK_MEMBER(pokey_device::serout_complete_irq)
 		LOG_IRQ("POKEY SEROC IRQ raised\n");
 		m_irq_w_cb(ASSERT_LINE);
 	}
+}
+
+TIMER_CALLBACK_MEMBER(pokey_device::serout_transmit_bit)
+{
+	if (!(m_SKCTL & SK_TWOTONE))
+		m_sod_w_cb(m_serout_shift & 1);
+	m_oclk_w_cb(1);
 }
 
 TIMER_CALLBACK_MEMBER(pokey_device::serin_ready_irq)
@@ -1242,27 +1258,20 @@ void pokey_device::process_serout()
 		{
 			// Output start bit and reload the shift register
 			LOG_SEROUT("SEROUT transmitting start bit of %02x @ %s\n", m_SEROUT, machine().time().to_string());
-			if (!(m_SKCTL & SK_TWOTONE))
-				m_sod_w_cb(0);
-			m_oclk_w_cb(1);
 			m_serout_shift = (m_SEROUT << 1) | (1 << 9);
 			m_serout_full = false;
 			m_serout_ready_timer->adjust(attotime::zero);
 		}
 		else
-		{
-			if (!(m_SKCTL & SK_TWOTONE) && (m_SKCTL & SK_BREAK))
-				m_sod_w_cb(0);
 			m_serout_complete_timer->adjust(attotime::zero);
-		}
 	}
 	else
 	{
+		bool last_sod = m_serout_shift & 1;
 		m_serout_shift >>= 1;
 		LOG_SEROUT("SEROUT transmitting %d bit @ %s\n", m_serout_shift & 1, machine().time().to_string());
-		if (!(m_SKCTL & SK_TWOTONE))
-			m_sod_w_cb(m_serout_shift & 1);
-		m_oclk_w_cb(1);
+		if (last_sod != (m_serout_shift & 1))
+			m_serout_bit_timer->adjust(attotime::zero);
 	}
 }
 

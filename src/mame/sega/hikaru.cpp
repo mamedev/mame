@@ -15,7 +15,7 @@ and this system is said to be one of the most expensive arcade boards developed 
 The games on this system include....
 Air Trix                     (C) Sega, 2001
 Brave Fire Fighters          (C) Sega, 1999
-*Cyber Troopers Virtual On 4 (C) Sega, 2001
+Cyber Troopers Virtual On 4  (C) Sega, 2001
 Nascar Arcade                (C) Sega, 2000
 Planet Harriers              (C) Sega, 2001
 Star Wars Racer Arcade       (C) Sega, 2000
@@ -958,7 +958,7 @@ void hikaru_state::localbus_map(address_map& map)
 uint16_t hikaru_state::prot_ram_r(uint32_t addr)
 {
 	u16 val = space_6154->read_word(0x0a000000 + (addr & 0x7fff) * 2);
-	return (val >> 8) | (val << 8);
+	return swapendian_int16(val);
 }
 
 void hikaru_state::localbus_map_5881(address_map& map)
@@ -1067,10 +1067,8 @@ void hikaru_state::hikaru(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_raw(51894580 / 2, 818, 158, 798, 528, 36, 516); // 31KHz mode
+	//screen.set_raw(31996040 / 2, 639, 120, 616, 416, 29, 406); // 24KHz mode
 	screen.set_screen_update(FUNC(hikaru_state::screen_update_hikaru));
 
 	SPEAKER(config, "speaker", 2).front();
@@ -1412,6 +1410,39 @@ ROM_START( sgnascaro )
 	ROM_PARAMETER( ":rom_board:key", "56dedf33" )
 ROM_END
 
+// ROM board: 834-14247, main board: 833-14246-01 VOF
+ROM_START( von4 )
+	HIKARU_BIOS
+	HIKARU_EEPROM
+
+	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
+	ROM_LOAD32_WORD( "epr-23766e.ic29", 0x0000000, 0x0400000, CRC(188e93bc) SHA1(87488bb15e0ecc7d9d38ca151c2579bf4ca6bf4b) )
+	ROM_LOAD32_WORD( "epr-23767e.ic30", 0x0000002, 0x0400000, CRC(d39e7ff1) SHA1(1081d607a955e28abe5d2e1185bad85cc5cf09dd) )
+	ROM_LOAD32_WORD( "epr-23768a.ic31", 0x1000000, 0x0400000, CRC(2e1b3812) SHA1(6217763295a9ee0268033074639a9cd9bd0d0eaa) )
+	ROM_LOAD32_WORD( "epr-23769a.ic32", 0x1000002, 0x0400000, CRC(34e95687) SHA1(ba7749165e177c2aa4cfc8f6b4221e6f3e84a9de) )
+
+	// ROM board using 128M TSOP48 mask ROMs
+	ROM_REGION32_LE( 0x10000000, "user2", ROMREGION_ERASE00)
+	ROM_LOAD32_WORD( "mpr-23750.ic37", 0x0000000, 0x1000000, CRC(2e40b246) SHA1(3393626787c5481d69cb4973662b28df49f96e25) )
+	ROM_LOAD32_WORD( "mpr-23751.ic38", 0x0000002, 0x1000000, CRC(f345e8b3) SHA1(b5992a12586caef5db9ac3e4cbcf3a5eb0fcee7e) )
+	ROM_LOAD32_WORD( "mpr-23752.ic41", 0x2000000, 0x1000000, CRC(2b8c33e1) SHA1(5616b28edf6ced64468b160dbf29bc6ea21b7e5d) )
+	ROM_LOAD32_WORD( "mpr-23753.ic42", 0x2000002, 0x1000000, CRC(9e928f82) SHA1(05f667d61bbc6c06c2a44073c7c46e67cd361f5c) )
+	ROM_LOAD32_WORD( "mpr-23754.ic45", 0x4000000, 0x1000000, CRC(a7129d77) SHA1(50a6386a67097e8b9227f057b2e14097f96f548c) )
+	ROM_LOAD32_WORD( "mpr-23755.ic46", 0x4000002, 0x1000000, CRC(fbfc0470) SHA1(7293b95f19a10cb008763f10b8901c1d4a9454bf) )
+	ROM_LOAD32_WORD( "mpr-23756.ic49", 0x6000000, 0x1000000, CRC(c5e9abb1) SHA1(385f966ec1d17fa5fb2cb5c68aa22e38db279008) )
+	ROM_LOAD32_WORD( "mpr-23757.ic50", 0x6000002, 0x1000000, CRC(c8f1316e) SHA1(4d5eed238d4ac242e05d8beac4fd8391ccfbae17) )
+	ROM_LOAD32_WORD( "mpr-23758.ic53", 0x8000000, 0x1000000, CRC(054e408a) SHA1(da394e8a58e4676dc2b8869a0a48964f80455323) )
+	ROM_LOAD32_WORD( "mpr-23759.ic54", 0x8000002, 0x1000000, CRC(e49c6ed7) SHA1(8435ff9f7aee9a6f64f036587b6c5787e911c0ea) )
+	ROM_LOAD32_WORD( "mpr-23760.ic57", 0xa000000, 0x1000000, CRC(261c24d0) SHA1(5d49273e48c6e65888cd883441d56234c1cdbe55) )
+	ROM_LOAD32_WORD( "mpr-23761.ic58", 0xa000002, 0x1000000, CRC(be3681fa) SHA1(9ae095b09de8f249f9104089788a91c15ea59a4e) )
+	ROM_LOAD32_WORD( "mpr-23762.ic61", 0xc000000, 0x1000000, CRC(d3aa6caf) SHA1(275adfe5a18bfd53b7e3a108f8cd2728ece9b32d) )
+	ROM_LOAD32_WORD( "mpr-23763.ic62", 0xc000002, 0x1000000, CRC(648aecb0) SHA1(09e3e6cb83599b7b3918d7016f77b304dc07106e) )
+	ROM_LOAD32_WORD( "mpr-23764.ic65", 0xe000000, 0x1000000, CRC(0aa472aa) SHA1(e56b62a80703a6b742f5dd4d85bb8d004e80e30a) )
+	ROM_LOAD32_WORD( "mpr-23765.ic66", 0xe000002, 0x1000000, CRC(d904250f) SHA1(d428484c11862c9829e4fe700fe806d64fae5845) )
+
+	ROM_PARAMETER( ":segam2crypt:key", "-1" )  // 315-5881 not populated
+ROM_END
+
 // HIKARU CHECK ROM BD, 837-13766
 // Development ROM board type, looks same as Type 2/837-13403/171-7640B but have ZIF sockets instead of Mask ROMs and socketed 315-5881 chip.
 ROM_START( hikcheck )
@@ -1456,3 +1487,4 @@ GAME( 2000, sgnascar,  hikaru,   hikaru,      hikaru, hikaru_state, init_hikaru,
 GAME( 2000, sgnascaro, sgnascar, hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Electronic Arts", "NASCAR Arcade (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2000, pharrier,  hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2000, swracer,   hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Star Wars: Racer Arcade", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2001, von4,      hikaru,   hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Hitmaker", "Cyber Troopers Virtual-On 4 Force (Rev E)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

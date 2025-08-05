@@ -37,7 +37,7 @@
 //#include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(K054000, k054000_device, "k054000", "K054000 Protection")
+DEFINE_DEVICE_TYPE(K054000, k054000_device, "k054000", "Konami 054000 Protection")
 
 k054000_device::k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K054000, tag, owner, clock)

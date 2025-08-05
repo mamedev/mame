@@ -28,8 +28,6 @@ public:
 protected:
 	memory_bank_array_creator<1> m_bank_rom;
 	memory_bank_array_creator<4> m_bank_ram;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	virtual void video_start() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
@@ -40,6 +38,7 @@ protected:
 
 	virtual bool is_contended(offs_t offset) override;
 	virtual bool is_vram_write(offs_t offset) override;
+	virtual u8 *snow_pattern1_base(u8 i_reg) override;
 
 	template <u8 Bank>
 	void spectrum_128_ram_w(offs_t offset, u8 data);

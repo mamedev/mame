@@ -485,17 +485,18 @@ void scorpion_state::scorpion(machine_config &config)
 	m_maincpu->set_m1_map(&scorpion_state::scorpion_switch);
 	m_maincpu->set_io_map(&scorpion_state::scorpion_io);
 	m_maincpu->set_vblank_int("screen", FUNC(scorpion_state::scorpion_interrupt));
+	m_maincpu->refresh_cb().remove();
 	m_maincpu->nomreq_cb().remove();
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_scorpion);
 
-	SPEAKER(config, "speaker2", 2).front();
+	SPEAKER(config.replace(), "speakers", 2).front();
 
 	AY_SLOT(config, "ay_slot", 14_MHz_XTAL / 8, default_ay_slot_devices, "ay_ay8912") // BAC
-		.add_route(1, "speaker2", 0.50, 0)
-		.add_route(0, "speaker2", 0.25, 0)
-		.add_route(0, "speaker2", 0.25, 1)
-		.add_route(2, "speaker2", 0.50, 1);
+		.add_route(1, "speakers", 0.50, 0)
+		.add_route(0, "speakers", 0.25, 0)
+		.add_route(0, "speakers", 0.25, 1)
+		.add_route(2, "speakers", 0.50, 1);
 
 	BETA_DISK(config, m_beta, 0);
 

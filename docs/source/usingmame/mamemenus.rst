@@ -357,10 +357,10 @@ independent effect chain is applied for each emulated sound output device.
 The effect chain itself is not configurable.  It always consists of these four
 effects, in this order:
 
-* Filter
+* Filters
 * Compressor
 * Reverb
-* Parametric equaliser
+* Equalizer
 
 When editing parameters for an output device’s effect chain, inherited default
 parameter values are showing dimmed, while parameter values set for that chain
@@ -373,13 +373,24 @@ by output device chains.  When editing the **Default** chain, you can restore
 the built-in default value for a parameter by pressing the UI Clear key
 (Del/Delete/Forward Delete on the keyboard by default).
 
+By default, the high-pass filter is enabled, with minimal cutoff frequency for
+DC offset removal.  All other effects are bypassed (technically, the equalizer
+effect is active too, but all bands are set to 0 dB so it's still turned off).
+
 The Audio Effects menu also allows you to configure the algorithm used for audio
 sample rate conversion.  The default **LoFi** algorithm has modest CPU
-requirements.  The **HQ** algorithm provides higher quality sample rate
-conversion at the expense of requiring substantially higher CPU performance.
-The **HQ** algorithm has additional parameters.  Increasing the latency can
-improve quality.  Increasing the filter length or phases can improve quality at
-the expense of higher CPU performance requirements.
+requirements.  The recommended **HQ** algorithm provides higher quality sample
+rate conversion at the expense of requiring substantially higher CPU
+performance.
+
+The **HQ** algorithm has additional parameters.  Increasing the **HQ latency**
+can improve quality.  If it's increased too much and multiple sound chips are
+used, the latencies will stack up and you will end up with too much lag at the
+end.  When decreasing the latency below 1 ms, the resampler will lose its
+potential (in fact, it will sound similar to MAME's lower quality resampler from
+before version 0.278).  Increasing the **HQ filter max size** or **HQ filter max
+phases** can improve quality at the expense of higher CPU performance
+requirements.
 
 
 Filter effect
@@ -397,7 +408,7 @@ may be surprising or undesirable.
 
 
 Compressor effect
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 This effect provides dynamic range compression (it is based on a
 reimplementation of Alain Paul’s Versatile Compressor).  Dynamic range
@@ -407,12 +418,14 @@ quiet sounds more audible over background noise.
 
 The parameters are:
 
+Threshold
+    The level at which the amplification fully stops.
+Ratio
+    The maximum amplification.
 Attack
     The reaction time to loud sounds to reduce the amplification.
 Release
     The reaction time to allow the amplification to go back up.
-Ratio
-    The maximum amplification.
 Input gain
     The amplification level at the input.
 Output gain
@@ -420,8 +433,6 @@ Output gain
 Convexity
     The shape of the relationship between distance to the threshold and ratio
     value.  Higher values give a steeper shape.
-Threshold
-    The level at which the amplification fully stops.
 Channel link
     At 100%, all channels of an output device are amplified identically, while
     at 0% they are fully independent.  Intermediate values give intermediate
@@ -436,14 +447,19 @@ Ceiling
     The maximum level allowed just before the output amplification.  Causes
     soft clipping at that level.
 
+By setting **Attack** to 0 ms, **Release** to Infinite, and **Ratio** to
+Infinity:1, the compressor will turn into a brickwall limiter (leave the
+advanced settings to default).  If you increase **Input gain** on top of that,
+with a **Threshold** of eg. -3 dB, it will act like a dynamic normalizer.
+
 
 Reverb effect
 ~~~~~~~~~~~~~
 
-Not implemented yet.
+Not documented yet.
 
 
-Equaliser effect
+Equalizer effect
 ~~~~~~~~~~~~~~~~
 
 A five-band parametric equalizer, allowing to amplify or attenuate specific

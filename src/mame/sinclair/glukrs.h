@@ -6,38 +6,31 @@
 
 #pragma once
 
-#include "machine/nvram.h"
-#include "dirtc.h"
+#include "machine/mc146818.h"
 
-class glukrs_device : public device_t,
-					  public device_rtc_interface
+
+class glukrs_device : public mc146818_device
 {
 public:
-	glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32'768);
+	glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void enable() { m_glukrs_active = true; }
 	void disable() { m_glukrs_active = false; }
 	bool is_active() { return m_glukrs_active; }
-	u8 address_r() { return m_glukrs_active ? m_address : 0xff; }
-	void address_w(u8 address) { if (m_glukrs_active) m_address = address; }
-	u8 data_r() { return m_glukrs_active ? m_cmos[m_address] : 0xff; }
-	void data_w(u8 data) { if (m_glukrs_active) { m_cmos[m_address] = data; } }
 
-	TIMER_CALLBACK_MEMBER(timer_callback);
+	u8 address_r() { return m_glukrs_active ? mc146818_device::get_address() : 0xff; }
+	virtual void address_w(u8 address) override { if (m_glukrs_active) mc146818_device::address_w(address); }
+	virtual u8 data_r() override { return m_glukrs_active ? mc146818_device::data_r() : 0xff; }
+	virtual void data_w(u8 data) override { if (m_glukrs_active) { mc146818_device::data_w(data); } }
 
 protected:
-	void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;
-	void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+
+	virtual int data_size() const override { return 0xff; }
 
 private:
 	bool m_glukrs_active;
-	u8 m_address;
-
-	u8 m_cmos[0x100];
-	required_device<nvram_device> m_nvram;
-	emu_timer *m_timer;
 };
 
 DECLARE_DEVICE_TYPE(GLUKRS, glukrs_device)

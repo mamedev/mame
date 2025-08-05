@@ -341,7 +341,7 @@ ROM_START( revx )
 	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u54.u54",  0x00003, 0x80000, CRC(24471269) SHA1(262345bd147402100785459af422dafd1c562787) )
 
 	ROM_REGION( 0x2000, "pic", 0 )
-	ROM_LOAD( "419_revolution-x_u444.u444", 0x0000000, 0x2000, BAD_DUMP CRC(517e0110) SHA1(cd603c66794ff426dd2994fc1a0c0c8e6bbd864b) ) // manually restored
+	ROM_LOAD( "419_revolution-x_u444.u444", 0x0000, 0x2000, CRC(7df57330) SHA1(fa6733972f45d90563c184b6735da7a40cee1bf2) )
 
 	ROM_REGION( 0x1000000, "video", 0 )
 	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u120.u120", 0x0000000, 0x80000, CRC(523af1f0) SHA1(a67c0fd757e860fc1c1236945952a295b4d5df5a) )
@@ -408,7 +408,7 @@ ROM_START( revxp5 )
 	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u54.u54",  0x00003, 0x80000, CRC(fd684c31) SHA1(db3453792e4d9fc375297d030f0b3f9cc3cad925) )
 
 	ROM_REGION( 0x2000, "pic", 0 )
-	ROM_LOAD( "419_revolution-x_u444.u444", 0x0000000, 0x2000, BAD_DUMP CRC(517e0110) SHA1(cd603c66794ff426dd2994fc1a0c0c8e6bbd864b) ) // manually restored
+	ROM_LOAD( "419_revolution-x_u444.u444", 0x0000, 0x2000, CRC(7df57330) SHA1(fa6733972f45d90563c184b6735da7a40cee1bf2) )
 
 	ROM_REGION( 0x1000000, "video", 0 )
 	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u120.u120", 0x0000000, 0x80000, CRC(523af1f0) SHA1(a67c0fd757e860fc1c1236945952a295b4d5df5a) )

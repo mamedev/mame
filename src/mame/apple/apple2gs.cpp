@@ -386,6 +386,8 @@ private:
 	void bank1_0000_sh_w(offs_t offset, u8 data);
 	u8 bank1_c000_r(offs_t offset);
 	void bank1_c000_w(offs_t offset, u8 data);
+	u8 expandedram_r(offs_t offset);
+	void expandedram_w(offs_t offset, u8 data);
 	void a2bus_irq_w(int state);
 	void a2bus_nmi_w(int state);
 	void a2bus_inh_w(int state);
@@ -447,7 +449,7 @@ private:
 
 	// Sound GLU variables
 	u8 m_sndglu_ctrl = 0;
-	int m_sndglu_addr = 0;
+	u16 m_sndglu_addr = 0;
 	int m_sndglu_dummy_read = 0;
 
 	// Key GLU variables
@@ -897,6 +899,10 @@ void apple2gs_state::machine_reset()
 	// reset the slots
 	m_a2bus->reset_bus();
 
+	// Apple-specific initial state
+	m_scc->ctsa_w(0);
+	m_scc->dcda_w(0);
+
 	// with all the banking reset, now reset the CPU
 	m_maincpu->reset();
 
@@ -1057,7 +1063,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 			raise_irq(IRQS_VBL);
 		}
 
-		m_adbmicro->set_input_line(0, ASSERT_LINE);
+		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, ASSERT_LINE);
 
 		m_clock_frame++;
 
@@ -1097,7 +1103,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	}
 	else if (scanline == (192+BORDER_TOP+1))
 	{
-		m_adbmicro->set_input_line(1, ASSERT_LINE);
+		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, CLEAR_LINE);
 	}
 }
 
@@ -2493,6 +2499,34 @@ void apple2gs_state::c800_w(offs_t offset, u8 data)
 	}
 }
 
+/* for < 14MB RAM, returns the bank number on reads >= 8MB */
+u8 apple2gs_state::expandedram_r(offs_t offset)
+{
+	offset += 0x020000;
+
+	if (offset >= m_ram_size)
+	{
+		if (offset >= 0x800000)
+		{
+			return offset >> 16;
+		}
+
+		return 0;
+	}
+
+	return m_ram_ptr[offset];
+}
+
+void apple2gs_state::expandedram_w(offs_t offset, u8 data)
+{
+	offset += 0x20000;
+
+	if (offset < m_ram_size)
+	{
+		m_ram_ptr[offset] = data;
+	}
+}
+
 u8 apple2gs_state::inh_r(offs_t offset)
 {
 	if (m_inh_slot != -1)
@@ -3286,6 +3320,8 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	m_e0_4000bank[2](0x4000, 0xbfff).rw(FUNC(apple2gs_state::e0ram_r<0x4000>), FUNC(apple2gs_state::e1ram_w<0x4000>));
 	m_e0_4000bank[3](0x4000, 0xbfff).rw(FUNC(apple2gs_state::e1ram_r<0x4000>), FUNC(apple2gs_state::e1ram_w<0x4000>));
 
+	map(0x020000, 0xdfffff).rw(FUNC(apple2gs_state::expandedram_r), FUNC(apple2gs_state::expandedram_w));
+
 	map(0xe0c000, 0xe0c07f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
 	map(0xe0c080, 0xe0c0ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
 	map(0xe0c100, 0xe0c2ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
@@ -3668,6 +3704,12 @@ void apple2gs_state::keyglu_regen_irqs()
 	{
 		bIRQ = true;
 	}
+
+	if ((m_glu_regs[GLU_KG_STATUS] & KGS_MOUSEX_FULL) && (m_glu_regs[GLU_SYSSTAT] & GLU_STATUS_MOUSEIRQEN))
+	{
+		bIRQ = true;
+	}
+
 	if (bIRQ)
 	{
 		raise_irq(IRQS_ADB);
@@ -3832,18 +3874,19 @@ void apple2gs_state::apple2gs(machine_config &config)
 	PALETTE(config, "palette", FUNC(apple2gs_state::palette_init), 256);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER(config, "a2speaker").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "a2speaker", 1.00);
 
-	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "ensoniq", 4).corners();
 	ES5503(config, m_doc, A2GS_7M);
-	m_doc->set_channels(2);
+	m_doc->set_channels(4);
 	m_doc->set_addrmap(0, &apple2gs_state::a2gs_es5503_map);
 	m_doc->irq_func().set(FUNC(apple2gs_state::doc_irq_w));
 	m_doc->adc_func().set(FUNC(apple2gs_state::doc_adc_read));
-	// IIgs Tech Node #19 says even channels are right, odd are left, and 80s/90s stereo cards followed that.
-	m_doc->add_route(0, "speaker", 1.0, 1);
-	m_doc->add_route(1, "speaker", 1.0, 0);
+	m_doc->add_route(0, "ensoniq", 1.0, 0);
+	m_doc->add_route(1, "ensoniq", 1.0, 1);
+	m_doc->add_route(2, "ensoniq", 1.0, 2);
+	m_doc->add_route(3, "ensoniq", 1.0, 3);
 
 	/* RAM */
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);

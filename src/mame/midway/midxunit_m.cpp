@@ -300,7 +300,7 @@ void midxunit_state::security_clock_w(offs_t offset, uint32_t data, uint32_t mem
 
 /*************************************
  *
- *  DMA registers (inverted word select)
+ *  DMA registers
  *
  *************************************/
 
@@ -308,8 +308,7 @@ uint32_t midxunit_state::dma_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 
-	if (ACCESSING_BITS_16_31)
-		result |= m_video->dma_r(offset * 2);
+	result |= m_video->dma_r(offset * 2);
 	if (ACCESSING_BITS_0_15)
 		result |= uint32_t(m_video->dma_r(offset * 2 + 1)) << 16;
 
@@ -319,8 +318,7 @@ uint32_t midxunit_state::dma_r(offs_t offset, uint32_t mem_mask)
 
 void midxunit_state::dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (ACCESSING_BITS_16_31)
-		m_video->dma_w(offset * 2, data & 0xffff);
+	m_video->dma_w(offset * 2, data & 0xffff);
 	if (ACCESSING_BITS_0_15)
 		m_video->dma_w(offset * 2 + 1, data >> 16);
 }

@@ -304,7 +304,7 @@ void rampart_state::main_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x140000, 0x141fff).mirror(0x43e000).bankr(m_slapstic_bank);
 	map(0x200000, 0x21ffff).ram().share(m_bitmap);
-	map(0x220000, 0x3bffff).nopw();    // the code blasts right through this when initializing
+	map(0x220000, 0x3bffff).nopw(); // the code blasts right through this when initializing
 	map(0x3c0000, 0x3c07ff).mirror(0x019800).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0x3e0000, 0x3e07ff).mirror(0x010000).ram().share("mob");
 	map(0x3e0800, 0x3e3f3f).mirror(0x010000).ram();
@@ -335,7 +335,7 @@ void rampart_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( rampart )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) // alternate button1
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) // right place alt (N/C)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -353,7 +353,7 @@ static INPUT_PORTS_START( rampart )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3) // alternate button2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED ) // right rotate alt (N/C)
 	PORT_SERVICE( 0x0800, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -377,7 +377,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ramprt2p )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) // alternate button1
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Players ) )
 	PORT_DIPSETTING(    0x0000, "2")
@@ -397,7 +397,7 @@ static INPUT_PORTS_START( ramprt2p )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3) // alternate button2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0800, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 

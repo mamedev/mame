@@ -3267,7 +3267,7 @@ ROM_START( wrally2c ) // Program ROMs from 12/Jun/1995, graphics ROMs from 04/Ju
 	ROM_LOAD( "mu8_668b_palf20l8.bin",  0x000, 0x144, CRC(4145d424) SHA1(0e6b5074a9c576645b24351a14890438109b0813) )
 ROM_END
 
-ROM_START( wrally2d ) // Program ROMs from 09/Jun/1995, graphics ROMs from 04/Jun/1995
+ROM_START( wrally2d ) // Program ROMs from 09/Jun/1995, graphics ROMs from 04/Jun/1995 (but incorrect?, gives bad sounds)
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "wr2_e_f1d9_9-6_27c040.bin", 0x000000, 0x080000, CRC(3de4dbfe) SHA1(2e278ba06ded2de7880703220d3c87ae4b3b17d9) )
 	ROM_LOAD16_BYTE( "wr2_o_080e_9-6_27c040.bin", 0x000001, 0x080000, CRC(6652ebd9) SHA1(0714cfdaa0b50c74eae4eb863994e2053f1799c8) )
@@ -3284,12 +3284,12 @@ ROM_START( wrally2d ) // Program ROMs from 09/Jun/1995, graphics ROMs from 04/Ju
 	ROM_REGION( 0x0a00000, "gfx", 0 ) // GFX + Sound
 	ROM_LOAD( "wr2_16_00_c846_4-6_27c040.bin", 0x0000000, 0x0080000, CRC(76b9e7a4) SHA1(164b68a15b0e23b2a14e4b9763ca2f9fc517aa95) )
 	ROM_LOAD( "wr2_17_01_7913_4-6_27c040.bin", 0x0080000, 0x0080000, CRC(c1ec0745) SHA1(a6c3ce9c889e6a53f4155f54d6655825af34a35b) )
-	ROM_LOAD( "wr2.18d",                       0x0100000, 0x0080000, CRC(e3617814) SHA1(9f9514052bb07d7e243f33b11bae409a444b7d9f) )    // Sound only
-	ROM_LOAD( "wr2.19d",                       0x0180000, 0x0080000, CRC(2dae988c) SHA1(a585e10b0e1519b828738b0b90698f8600082250) )    // Sound only
+	ROM_LOAD( "wr2.18d",                       0x0100000, 0x0080000, BAD_DUMP CRC(e3617814) SHA1(9f9514052bb07d7e243f33b11bae409a444b7d9f) )    // Sound only - must be incorrect, title screen announcement comes from here
+	ROM_LOAD( "wr2.19d",                       0x0180000, 0x0080000, BAD_DUMP CRC(2dae988c) SHA1(a585e10b0e1519b828738b0b90698f8600082250) )    // Sound only
 	ROM_LOAD( "wr2_9_10_3334_4-6_27c040.bin",  0x0200000, 0x0080000, CRC(abf2c077) SHA1(3b505f2b6a008d96e7a10f1641d3d51802bedadd) )
 	ROM_LOAD( "wr2_10_11_8573_4-6_27c040.bin", 0x0280000, 0x0080000, CRC(5db67eb3) SHA1(faa58dafa26befb3291e5185ee04c39ce3b45b3f) )
-	ROM_LOAD( "wr2.11d",                       0x0300000, 0x0080000, CRC(ae66b97c) SHA1(bd0eba0b1c77864e06a9e136cfd834b35f200683) )    // Sound only
-	ROM_LOAD( "wr2.12d",                       0x0380000, 0x0080000, CRC(6dbdaa95) SHA1(f23df65e3df92d79f7b1e99d611c067a79fc849a) )    // Sound only
+	ROM_LOAD( "wr2.11d",                       0x0300000, 0x0080000, BAD_DUMP CRC(ae66b97c) SHA1(bd0eba0b1c77864e06a9e136cfd834b35f200683) )    // Sound only
+	ROM_LOAD( "wr2.12d",                       0x0380000, 0x0080000, BAD_DUMP CRC(6dbdaa95) SHA1(f23df65e3df92d79f7b1e99d611c067a79fc849a) )    // Sound only
 	ROM_LOAD( "wr2_1_20_b950_4-6_27c040.bin",  0x0400000, 0x0080000, CRC(0e089410) SHA1(b2ad3b8be486017ec7bfc96c7a79974cfd9ea42f) )
 	ROM_LOAD( "wr2_2_21_fdc3_4-6_27c040.bin",  0x0480000, 0x0080000, CRC(9c2a723c) SHA1(5259c8fa1ad73518e89a8df6e76a565b8f8799e3) )
 	ROM_FILL(                                  0x0500000, 0x0100000, 0x00 )         // Empty
@@ -3319,7 +3319,7 @@ GAME( 1995, wrally2,     0,         wrally2,          wrally2,  wrally2_state,  
 GAME( 1995, wrally2a,    wrally2,   wrally2,          wrally2,  wrally2_state,  init_wrally2,   ROT0, "Gaelco", "World Rally 2: Twin Racing (version 26-06, checksum 3EDB, mask ROM version)", 0 ) // 26/Jun/1995
 GAME( 1995, wrally2b,    wrally2,   wrally2,          wrally2,  wrally2_state,  empty_init,     ROT0, "Gaelco", "World Rally 2: Twin Racing (version 26-06, checksum 3EDB)",                   0 ) // 26/Jun/1995
 GAME( 1995, wrally2c,    wrally2,   wrally2,          wrally2,  wrally2_state,  empty_init,     ROT0, "Gaelco", "World Rally 2: Twin Racing (version 09-06, checksum 7BE1)",                   0 ) // 12/Jun/1995 (but version 09/Jun on screen)
-GAME( 1995, wrally2d,    wrally2,   wrally2,          wrally2,  wrally2_state,  empty_init,     ROT0, "Gaelco", "World Rally 2: Twin Racing (version 09-06, checksum 50A2)",                   0 ) // 09/Jun/1995
+GAME( 1995, wrally2d,    wrally2,   wrally2,          wrally2,  wrally2_state,  empty_init,     ROT0, "Gaelco", "World Rally 2: Twin Racing (version 09-06, checksum 50A2)",                   MACHINE_IMPERFECT_SOUND ) // 09/Jun/1995
 
 GAME( 1996, touchgo,     0,         touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (World, checksum 059D0235)",             0 ) // 05/Feb/1996
 GAME( 1995, touchgoa,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (World, checksum 05A0C7FB)",             0 ) // 11/Dec/1995

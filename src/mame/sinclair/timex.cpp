@@ -681,6 +681,8 @@ void ts2068_state::ts2068(machine_config &config)
 {
 	spectrum_128(config);
 
+	config.device_remove("dma");
+
 	Z80(config.replace(), m_maincpu, XTAL(14'112'000) / 4); // From Schematic; 3.528 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &ts2068_state::ts2068_mem);
 	m_maincpu->set_addrmap(AS_IO, &ts2068_state::ts2068_io);
@@ -696,7 +698,7 @@ void ts2068_state::ts2068(machine_config &config)
 
 	// sound
 	AY_SLOT(config.replace(), "ay_slot", XTAL(14'112'000) / 8, default_ay_slot_devices, "ay_ay8912") // From Schematic; 1.764 MHz
-		.add_route(ALL_OUTPUTS, "mono", 0.25);
+		.add_route(ALL_OUTPUTS, "speakers", 0.25);
 
 	// cartridge
 	GENERIC_CARTSLOT(config, "dockslot", generic_plain_slot, "timex_cart", "dck,bin").set_device_load(FUNC(ts2068_state::cart_load));

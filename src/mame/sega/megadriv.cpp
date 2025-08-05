@@ -245,9 +245,8 @@ uint16_t md_base_state::m68k_version_read()
 	  D0 : Bit 0 of version number
 	*/
 	LOG("%s: read version register\n", machine().describe_context());
-	// Version number contained in bits 3-0
-	// TODO: non-TMSS BIOSes must return 0 here
-	uint16_t const retdata = m_version_hi_nibble | 0x01;
+	// Version number contained in bits 3-0 (TMSS)
+	uint16_t const retdata = m_version_hi_nibble | m_version_lo_nibble;
 
 	return retdata | (retdata << 8);
 }
@@ -616,10 +615,13 @@ uint8_t md_base_state::megadriv_z80_unmapped_read()
 void md_base_state::megadriv_z80_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankrw("bank1").mirror(0x2000); // RAM can be accessed by the 68k
-	map(0x4000, 0x4003).rw(m_ymsnd, FUNC(ym_generic_device::read), FUNC(ym_generic_device::write));
+	// mirror required by d_titov2
+	map(0x4000, 0x4003).mirror(0x1ffc).rw(m_ymsnd, FUNC(ym_generic_device::read), FUNC(ym_generic_device::write));
 
-	map(0x6000, 0x6000).w(FUNC(md_base_state::megadriv_z80_z80_bank_w));
-	map(0x6001, 0x6001).w(FUNC(md_base_state::megadriv_z80_z80_bank_w)); // wacky races uses this address
+	// wackyrac uses $6001
+	// d_titov2 uses the full range
+	// TODO: are reads just open bus or ...?
+	map(0x6000, 0x60ff).w(FUNC(md_base_state::megadriv_z80_z80_bank_w));
 
 	map(0x6100, 0x7eff).r(FUNC(md_base_state::megadriv_z80_unmapped_read));
 
@@ -956,6 +958,8 @@ void md_base_state::megadriv_init_common()
 	save_pointer(NAME(m_genz80.z80_prgram), 0x2000);
 
 	m_maincpu->set_tas_write_callback(*this, FUNC(md_base_state::megadriv_tas_callback));
+
+	m_version_lo_nibble = 0;
 }
 
 void md_base_state::init_megadriv()

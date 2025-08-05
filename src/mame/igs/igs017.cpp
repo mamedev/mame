@@ -2452,7 +2452,7 @@ void igs017_state::starzan_io(address_map &map)
 	map(0x9000, 0x9000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
-// cpoker2, happyksl, starzan
+// cpoker2, happyskl, starzan
 void igs017_state::starzan_counter_w(u8 data)
 {
 	//                                        BIT(data, 0)   // always on in cpoker2/happyskl?
@@ -2496,7 +2496,7 @@ void igs017_state::starzan_mux_map(address_map &map)
 }
 
 
-// happyksl
+// happyskl
 
 void igs017_state::happyskl_map(address_map &map)
 {
@@ -3924,7 +3924,7 @@ static INPUT_PORTS_START( mgdh )
 	PORT_DIPSETTING(    0x60, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 9C_1C ) )
-	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
@@ -4216,10 +4216,10 @@ static INPUT_PORTS_START( tarzan )
 	PORT_DIPSETTING( 0x0c, DEF_STR(1C_2C) )
 	PORT_DIPSETTING( 0x0a, DEF_STR(1C_4C) )
 	PORT_DIPSETTING( 0x08, DEF_STR(1C_5C) )
-	PORT_DIPSETTING( 0x06, "1 Coin/10 Credits" )
-	PORT_DIPSETTING( 0x04, "1 Coin/20 Credits" )
-	PORT_DIPSETTING( 0x02, "1 Coin/50 Credits" )
-	PORT_DIPSETTING( 0x00, "1 Coin/100 Credits" )
+	PORT_DIPSETTING( 0x06, DEF_STR(1C_10C) )
+	PORT_DIPSETTING( 0x04, DEF_STR(1C_20C) )
+	PORT_DIPSETTING( 0x02, DEF_STR(1C_50C) )
+	PORT_DIPSETTING( 0x00, DEF_STR(1C_100C) )
 	PORT_DIPNAME( 0x30, 0x30, "Key-In Rate" )                           PORT_DIPLOCATION("SW1:5,6")   // 开分比率
 	PORT_DIPSETTING( 0x30, "100" )
 	PORT_DIPSETTING( 0x20, "200" )
@@ -4675,7 +4675,7 @@ void igs017_state::tarzan(machine_config &config)
 	base_machine_oki(config, 16_MHz_XTAL / 16);
 
 	HD64180RP(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::iqblocka_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::happyskl_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::tarzan_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &igs017_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
@@ -4710,7 +4710,7 @@ void igs017_state::starzan(machine_config &config)
 	base_machine_oki(config, 16_MHz_XTAL / 16);
 
 	HD64180RP(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::iqblocka_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::happyskl_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::starzan_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &igs017_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);

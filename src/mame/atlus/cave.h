@@ -13,6 +13,7 @@
 
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/tmap038.h"
@@ -29,6 +30,7 @@ public:
 		, m_oki(*this, "oki%u", 1)
 		, m_int_timer(*this, "int_timer")
 		, m_eeprom(*this, "eeprom")
+		, m_hopper(*this, "hopper")
 		, m_gfxdecode(*this, "gfxdecode.%u", 0U)
 		, m_spr_gfxdecode(*this, "spr_gfxdecode.%u", 0U)
 		, m_screen(*this, "screen.%u", 0U)
@@ -44,8 +46,6 @@ public:
 		, m_okiregion(*this, "oki%u", 1)
 	{ }
 
-	int korokoro_hopper_r();
-	int tjumpman_hopper_r();
 	int paccarn_bet4_r();
 	int paccarn_bet8_r();
 
@@ -88,6 +88,7 @@ protected:
 	optional_device_array<okim6295_device, 2> m_oki;
 	required_device<timer_device> m_int_timer;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device<ticket_dispenser_device> m_hopper;
 	optional_device_array<gfxdecode_device, 4> m_gfxdecode;
 	optional_device_array<gfxdecode_device, 4> m_spr_gfxdecode;
 	optional_device_array<screen_device, 4> m_screen;
@@ -181,13 +182,9 @@ protected:
 	u8        m_unknown_irq = 0U;
 	u8        m_agallet_vblank_irq = 0U;
 
-	// game specific
-	// korokoro
+	int       m_rasflag = 0;
+	int       m_old_rasflag = 0;
 	u16       m_leds[2]{};
-	u8        m_hopper = 0;
-
-	int m_rasflag = 0;
-	int m_old_rasflag = 0;
 
 	void (cave_state::*m_get_sprite_info)(int chip);
 	void (cave_state::*m_sprite_draw)(int chip, int priority);

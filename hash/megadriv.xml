@@ -6109,7 +6109,8 @@ Unsupported [Menacer] peripheral
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="NFLクォーターバッククラブ'95"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_nbajamte"/>
+			<!-- TODO: works with rom_nbajam_alt with i2c reads at bit 0 -->
+			<feature name="slot" value="rom_nbajam"/>
 			<feature name="pcb" value="670127 REV 1"/>
 			<feature name="u1" value="NFL QBC"/>
 			<feature name="u2" value="24LC02B/P"/>
@@ -31878,7 +31879,7 @@ No BGMs
 		<publisher>Electronic Arts</publisher>
 		<!-- TODO: starts off with music off (still coming from the dump?) -->
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sram"/>
+			<feature name="slot" value="rom_tplay96"/>
 			<!-- baddump: Sports non-default save, "Ghetto USA" instead of NY Yankees -->
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="triple play '96 (usa).bin" size="4194304" crc="f1748e91" sha1="c0981b524d5e1c5368f9e74a4ce9c57d87fe323a" status="baddump"/>
@@ -31894,7 +31895,7 @@ No BGMs
 		<publisher>Electronic Arts</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sram"/>
+			<feature name="slot" value="rom_tplay96"/>
 			<!-- baddump: Sports non-default save, "TODDs Team" instead of San Francisco -->
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="triple play gold (usa).bin" size="4194304" crc="bbe69017" sha1="007bee242384db1887c5831657470584ff77a163" status="baddump"/>
@@ -37499,6 +37500,8 @@ Black screen
 		<publisher>Titan</publisher>
 		<notes><![CDATA[
 Most effects fails
+Crashes at the very end
+https://jsgroth.dev/blog/posts/titan-overdrive/
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x400000">
@@ -37514,15 +37517,35 @@ Most effects fails
 		<year>2017</year>
 		<publisher>Titan</publisher>
 		<notes><![CDATA[
-Punts to a 0d2 B50D stack trace screen
-Tries to jump to jsr $a385b86.l (?) at PC=0x38b0, must be using its own mapper rather than ssf2
+Most effects fails
+https://jsgroth.dev/blog/posts/titan-overdrive-2-part-1/
+https://jsgroth.dev/blog/posts/titan-overdrive-2-part-2/
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_ssf2"/>
+			<feature name="slot" value="rom_titan"/>
 			<dataarea name="rom" width="16" endianness="big" size="16777216">
 				<rom name="titan-overdrive2.bin" size="8386056" crc="f0429fd6" sha1="603db0a214ee50c6c11e15c0d1d3bba919116d07" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- https://github.com/Stephane-D/SGDK/releases/tag/v1.62 -->
+	<software name="sgdk_bap" supported="partial">
+		<description>SGDK Bad Apple PV demo (v1.62)</description>
+		<!-- header with (c) 2020 but release happened in 2021, also repeated at demo end -->
+		<year>2021</year>
+		<publisher>SGDK</publisher>
+		<notes><![CDATA[
+Crashes at startup with megadriv (verify)
+]]></notes>
+		<!-- <sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/> -->
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_titan"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x1000000">
+				<rom name="sgdk_bad_apple.bin" size="0x980000" crc="ab53f304" sha1="56c927144438d0581baa88141ff2258c8d1e4e6b" offset="00000"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

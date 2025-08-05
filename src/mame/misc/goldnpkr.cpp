@@ -366,7 +366,7 @@
 
   * Casino Poker
 
-  Bipolar PROM 24sa10 is filled with 0x09, so has at least
+  Bipolar PROM 24SA10 is filled with 0x09, so has at least
   fixed bits 0 and 3 along the whole data. Needs a redump using a supported
   EEPROM programmer.
 
@@ -380,93 +380,92 @@
   One for settings, and other just for bookkeeping.
 
   Here the original Service Card (in German), and the English translation:
-   _____________________________________     _____________________________________
-  |                                     |   |                                     |
+
+  .-------------------------------------.   .-------------------------------------.
   |          SERVICE ANLEITUNG          |   |           SERVICE MANUAL            |
-  |   _____________   _____________     |   |   _____________   _____________     |
-  |  |  +-------+  | |  +-------+  |    |   |  |  +-------+  | |  +-------+  |    |
+  |  .-------------. .-------------.    |   |  .-------------. .-------------.    |
+  |  |  .-------.  | |  .-------.  |    |   |  |  .-------.  | |  .-------.  |    |
   |  |  |0000000|  | |  |0000000|  |    |   |  |  |0000000|  | |  |0000000|  |    |
-  |  |  +-------+  | |  +-------+  |    |   |  |  +-------+  | |  +-------+  |    |
+  |  |  '-------'  | |  '-------'  |    |   |  |  '-------'  | |  '-------'  |    |
   |  |             | |             |    |   |  |             | |             |    |
   |  |             | |             |    |   |  |             | |             |    |
   |  |             | |             |    |   |  |             | |             |    |
-  |  | +---------+ | |+-----------+|    |   |  | +---------+ | |+-----------+|    |
+  |  | .---------. | |.-----------.|    |   |  | .---------. | |.-----------.|    |
   |  | |Einnahmen| | ||Kredit Off ||    |   |  | |Earnings | | ||Credit Off ||    |
-  |  | +---------+ | |+-----------+|    |   |  | +---------+ | |+-----------+|    |
+  |  | '---------' | |'-----------'|    |   |  | '---------' | |'-----------'|    |
   |  |             | |             |    |   |  |             | |             |    |
-  |  |_____________| |_____________|    |   |  |_____________| |_____________|    |
+  |  '-------------' '-------------'    |   |  '-------------' '-------------'    |
   |                                     |   |                                     |
   |  Zaehler zeigen volle DM-Betraege   |   |     METER SHOW FULL DM-AMOUNTS      |
   |                                     |   |                                     |
-  |       _____            _____        |   |       _____            _____        |
-  |      |     |     |    |     |       |   |      |     |     |    |     |       |
+  |      .-----.     |    .-----.       |   |      .-----.     |    .-----.       |
   |      | SW  |     |    | RT  |       |   |      | SW  |     |    | RT  |       |
-  |      |_____|     |    |_____|       |   |      |_____|     |    |_____|       |
-  |                  |                  |   |                  |                  |
+  |      |     |     |    |     |       |   |      |     |     |    |     |       |
+  |      '-----'     |    '-----'       |   |      '-----'     |    '-----'       |
   |      SERVICE     |     METER        |   |      SERVICE     |     METER        |
   |                  |                  |   |                  |                  |
-  |    +---------+   | ZEIGT DIE        |   |    +---------+   | SHOWS THE        |
-  |    |  LEARN  |   | ELEKT. ZAEHLER-  |   |    |  LEARN  |   | ELECTRONIC METER-|
-  |    +---------+   | STAENDE UND      |   |    +---------+   | READING AND      |
-  |                  | STATISTIK AN     |   |                  | STATISTIC        |
+  |    .---------.   | ZEIGT DIE        |   |    .---------.   | SHOWS THE        |
+  |    |  LEARN  |   | ELEKT. ZAEHLER-  |   |    |  LEARN  |   | ELECTRONIC       |
+  |    '---------'   | STAENDE UND      |   |    '---------'   | METER-READING    |
+  |                  | STATISTIK AN     |   |                  | AND STATISTIC    |
   |   PROGRAMMIER.   |                  |   |   PROGRAMMING    |                  |
   |   DER KREDIT-    |                  |   |   THE CREDIT-    |                  |
-  |   EINGAENGE UND  +------------------|   |   INPUT AND      +------------------|
+  |   EINGAENGE UND  |------------------|   |   INPUT AND      |------------------|
   |   GEWINNQUOTE    |                  |   |   PROFIT SHARE   |                  |
   |                  |    < POT >       |   |                  |    < POT >       |
-  |    +---------+   |  +         -     |   |    +---------+   |  +         -     |
+  |    .---------.   |  +         -     |   |    .---------.   |  +         -     |
   |    |   NEU   |   |  LAUTSTAERKE     |   |    |   NEW   |   |  SOUND VOLUME    |
-  |    +---------+   |                  |   |    +---------+   |                  |
+  |    '---------'   |                  |   |    '---------'   |                  |
   |                  |                  |   |                  |                  |
   |   SETZT DIE      |                  |   |   RESET THE      |                  |
   |   ELEKT. ZAEHLER |    < POT >       |   |   ELECTRONIC     |    < POT >       |
   |   ZURUECK        |                  |   |   COUNTER        |                  |
-  |                  | BLAU<->SCHWARZ   |   |                  | BLUE <-> BLACK   |
-  |    +---------+   | HINTERGRUND      |   |    +---------+   | BACKGROUND       |
+  |                  | BLAU <-> SCHWARZ |   |                  | BLUE <-> BLACK   |
+  |    .---------.   | HINTERGRUND      |   |    .---------.   | BACKGROUND       |
   |    |  TEST   |   |                  |   |    |  TEST   |   |                  |
-  |    +---------+   |                  |   |    +---------+   |                  |
+  |    '---------'   |                  |   |    '---------'   |                  |
   |                  |                  |   |                  |                  |
   |   CPU, TASTATUR  |                  |   |   CPU, KEYBOARD  |                  |
   |   UND LAMPEN     |                  |   |   AND LAMPS      |                  |
   |   TEST           |                  |   |   TEST           |                  |
   |   GITTERMUSTER   |                  |   |   LATTICE DESIGN |                  |
   |                  |                  |   |                  |                  |
-  |    +---------+   |                  |   |    +---------+   |                  |
+  |    .---------.   |                  |   |    .---------.   |                  |
   |    |  RESET  |   |                  |   |    |  RESET  |   |                  |
-  |    +---------+   |                  |   |    +---------+   |                  |
+  |    '---------'   |                  |   |    '---------'   |                  |
   |                  |                  |   |                  |                  |
   |   LOESCHT ALLES  |                  |   |    DELETE ALL    |                  |
   |                  |                  |   |                  |                  |
   |------------------+------------------|   |------------------+------------------|
-  |        DIPSWITCHEINSTELLUNG         |   |        DIPSWITCH SETTINGS           |
+  |        DIPSWITCHEINSTELLUNG         |   |        DIP SWITCHES SETTINGS        |
   |                                     |   |                                     |
   |            ON      OFF              |   |            ON      OFF              |
-  |           +-----------+             |   |           +-----------+             |
-  |           | +-------+ |             |   |           | +-------+ |             |
+  |           .-----------.             |   |           .-----------.             |
+  |           | .-------. |             |   |           | .-------. |             |
   |       ON  | |###|   |8|             |   |       ON  | |###|   |8|             |
-  |           | +---+---+ |             |   |           | +---+---+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |       ON  | |###|   | |             |   |       ON  | |###|   | |             |
-  |           | +-------+ |             |   |           | +-------+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |           | |   |###| |             |   |           | |   |###| |             |
-  |           | +---+---+ |             |   |           | +---+---+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |           | |   |###| |             |   |           | |   |###| |             |
-  |           | +-------+ |             |   |           | +-------+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |R-FLUSH EIN| |###|   | |R-FLUSH AUS  |   | R-FLUSH ON| |###|   | |R-FLUSH OFF  |
-  |           | +---+---+ |             |   |           | +---+---+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |           | |###|   | |             |   |           | |###|   | |             |
-  |           | +-------+ |             |   |           | +-------+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |           | |   |###| |AUSZAHLUNG   |   |           | |   |###| |PAYOUT       |
-  |           | +---+---+ |             |   |           | +---+---+ |             |
+  |           | |---+---| |             |   |           | |---+---| |             |
   |           | |###|   |1|AUSZAHLUNG   |   |           | |###|   |1|PAYOUT       |
-  |           | +-------+ |             |   |           | +-------+ |             |
-  |           +-----------+             |   |           +-----------+             |
+  |           | '-------' |             |   |           | '-------' |             |
+  |           '-----------'             |   |           '-----------'             |
   |                                     |   |                                     |
-  |  0=WENIG GEWINNE    1=STANDARD      |   |  0=LITTLE GAININGS   1=DEFAULT      |
-  |  2=MEHR GEWINNE     3=VIELE GEWIN.  |   |  2=MORE GAININGS    3=MANY GAININGS |
+  | 0 = WENIG GEWINNE   1 = STANDARD    |   | 0 = LITTLE GAININGS  1 = DEFAULT    |
+  | 2 = MEHR GEWINNE    3 = VIELE GEWIN |   | 2 = MORE GAININGS    3 = MANY GAINS |
   |                                     |   |                                     |
   |                                     |   |                                     |
   |   PM 1987 - BECK D-6330 WETZLAR     |   |   PM 1987 - BECK D-6330 WETZLAR     |
-  |_____________________________________|   |_____________________________________|
+  '-------------------------------------'   '-------------------------------------'
 
 
   * Royale
@@ -901,8 +900,55 @@
      CPU (01-21) --'    '-----------------'           CPU (01-21) --'    '-----------------'
 
 
-************************************************************************************
+*********************************************************************************************
 
+  Wing W90-3 system
+  -----------------
+
+  This system is built on the Golden Poker hardware platform, with several key enhancements:
+
+  ROM Configuration:
+
+  The board features 5 sockets compatible with 2732 or 2764 program ROMs.
+  Each ROM's output enable (OE) pin is connected to a 74LS138 decoder, which dynamically
+  switches ROM banks by enabling/disabling individual devices based on the higher CPU
+  address lines as the selector.
+
+  Sound System:
+
+  Utilizes two SN76489AN Programmable Sound Generators (PSGs), with the second being an
+  adition not present in the original design.
+  Currently supported games initialize both PSGs at addresses 2400h and 2800h, though only
+  the one at 2400h is actively used.
+  A READY line, tied to PIA1 port A, is monitored to ensure proper system operation.
+
+  Color System:
+
+  Includes three N82S129AN bipolar PROMs, one for each R-G-B channel, enabling an extended
+  color palette. This design supports banked or enhanced graphics by leveraging the additional
+  palette capabilities.
+
+
+  Hardware Notes:
+
+  PCB is etched "WING 8510-A" and "W90-3"
+
+  - CPU:            1x UM6502.
+  - Video:          1x MC68B45.
+  - RAM:            1x HM6116LP-3, 1x TMS4016-20
+  - I/O             2x EF6821 PIAs.
+  - PRG ROMs:       5x 2732/2764 sockets.
+  - GFX ROMs:       3x 2716/2732/2764 sockets.
+  - Bipolar PROMs   3x N82S129AN (R-G-B).
+  - Sound:          2x SN76489AN. (one is not present).
+
+  - 1x 10 MHz Xtal.
+  - 1x 8 DIP switches bank.
+  - 1x (reset?) simple switch.
+  - 2x (22 + 10 pins) edge connector.
+
+
+*********************************************************************************************
 
   -----------------------------------------------
   ***  Memory Map (pmpoker/goldnpkr hardware) ***
@@ -1028,6 +1074,7 @@
 
 #include "emu.h"
 
+#include "cpu/m6502/g65sc02.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6805/m68705.h"
@@ -1040,6 +1087,7 @@
 #include "machine/timekpr.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
+#include "sound/sn76496.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
@@ -1076,6 +1124,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_hopper(*this, "hopper"),
 		m_ay8910(*this, "ay8910"),
+		m_snsnd(*this, "snsnd"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -1099,6 +1148,9 @@ public:
 	void lespendu(machine_config &config);
 	void icproul(machine_config &config);
 	void glfever(machine_config &config);
+	void kmhpan(machine_config &config);
+	void unkicpf40(machine_config &config);
+	void wing_w90(machine_config &config);
 
 	void init_vkdlswwh();
 	void init_icp1db();
@@ -1147,6 +1199,7 @@ protected:
 
 	void witchcrd_palette(palette_device &palette) const;
 	void super21p_palette(palette_device &palette) const;
+	void wing_w90_palette(palette_device &palette) const;
 
 	void goldnpkr_base(machine_config &config);
 
@@ -1162,15 +1215,20 @@ private:
 	uint8_t goldnpkr_mux_port_r();
 	void mux_port_w(uint8_t data);
 	uint8_t ay8910_data_r();
+	uint8_t snsnd_ready_r();
 	void ay8910_data_w(uint8_t data);
 	void ay8910_control_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(super21p_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(wing_w90_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(kmhpan_get_bg_tile_info);
 	void goldnpkr_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(wcrdxtnd);
 	DECLARE_VIDEO_START(super21p);
+	DECLARE_VIDEO_START(wing_w90);
+	DECLARE_VIDEO_START(kmhpan);
 	void wcrdxtnd_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(mondial);
 	DECLARE_MACHINE_START(lespendu);
@@ -1195,11 +1253,15 @@ private:
 	void icp_ext_map(address_map &map) ATTR_COLD;
 	void lespendu_map(address_map &map) ATTR_COLD;
 	void glfever_map(address_map &map) ATTR_COLD;
+	void kmhpan_map(address_map &map) ATTR_COLD;
+	void unkicpf40_map(address_map &map) ATTR_COLD;
+	void wing_w90_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	optional_device<ticket_dispenser_device> m_hopper;
 	optional_device<ay8910_device> m_ay8910;
+	optional_device<sn76489a_device> m_snsnd;
 	output_finder<9> m_lamps;
 
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -1330,6 +1392,48 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::super21p_get_bg_tile_info)
 */
 }
 
+TILE_GET_INFO_MEMBER(goldnpkr_state::wing_w90_get_bg_tile_info)
+{
+/*  - bits -
+    7654 3210
+    --xx xx--   tiles color.
+    ---- --x-   tiles bank.
+    ---- ---x   tiles extended address (MSB).
+    xx-- ----   unused.
+*/
+
+	int attr = m_colorram[tile_index];
+
+	int code = ((attr & 0x01) << 8) | m_videoram[tile_index];
+	int bank = (attr & 0x02) >> 1;      // bit 1 switch the gfx banks
+	int color = (attr & 0x3c) >> 2;     // bits 2-3-4-5 for color
+
+	if (attr & 0x01)
+		bank = 1;
+
+	tileinfo.set(bank, code, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(goldnpkr_state::kmhpan_get_bg_tile_info)
+{
+/* 8 graphics banks system...
+
+    - bits -
+    7654 3210
+    --xx xx--   tiles color.
+    -x-- --xx   tiles bank.
+    x--- ----   unused.
+*/
+
+	int attr = m_colorram[tile_index];
+	int code = ((attr & 1) << 8) | m_videoram[tile_index];
+	int bank = (attr & 0x03) + ((attr & 0x40) >> 4);
+	int color = (attr & 0x3c) >> 2;
+
+	tileinfo.set(bank, code, color, 0);
+}
+
+
 void goldnpkr_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -1345,11 +1449,23 @@ VIDEO_START_MEMBER(goldnpkr_state, super21p)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::super21p_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
+VIDEO_START_MEMBER(goldnpkr_state, wing_w90)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::wing_w90_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+VIDEO_START_MEMBER(goldnpkr_state, kmhpan)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::kmhpan_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+
 uint32_t goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
+
 
 void goldnpkr_state::goldnpkr_palette(palette_device &palette) const
 {
@@ -1369,7 +1485,7 @@ void goldnpkr_state::goldnpkr_palette(palette_device &palette) const
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		constexpr int intenmin = 0xe0;
+		constexpr int intenmin = 0xd0;
 //      constexpr int intenmin = 0xc2;    // 2.5 Volts (75.757575% of the whole range)
 		constexpr int intenmax = 0xff;    // 3.3 Volts (the whole range)
 
@@ -1510,10 +1626,37 @@ void goldnpkr_state::super21p_palette(palette_device &palette) const
 	}
 }
 
+void goldnpkr_state::wing_w90_palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		// red component
+		int const r = color_prom[i] * 0x10;
+
+		// green component
+		int const g = color_prom[i + 256] * 0x10;
+
+		// blue component
+		int const b = color_prom[i + 512] * 0x10;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
 
 /*******************************************
 *               R/W Handlers               *
 *******************************************/
+
+uint8_t goldnpkr_state::snsnd_ready_r()
+{
+	logerror("snsnd_ready_r():%02x\n", m_snsnd->ready_r());
+	return 0xfe + m_snsnd->ready_r();
+};
 
 /* Inputs (buttons) are multiplexed.
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
@@ -1528,6 +1671,7 @@ uint8_t goldnpkr_state::goldnpkr_mux_port_r()
 		case 0x20: return ioport("IN0-1")->read();
 		case 0x40: return ioport("IN0-2")->read();
 		case 0x80: return ioport("IN0-3")->read();
+		case 0x00: return 0x1f;  // needed for the ICP + F40/80 DB
 
 		// royale selector writes 3F-2F-1F-0F.
 		// worth to split a whole machine driver just for this?
@@ -1977,6 +2121,53 @@ void goldnpkr_state::glfever_map(address_map &map)
 	map(0xf000, 0xffff).rom();  // extended rom space
 }
 
+void goldnpkr_state::kmhpan_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x2000).portr("SW1");
+	map(0x2400, 0x2400).w("sn", FUNC(sn76489a_device::write));
+//	map(0x2800, 0x2800).w  // SN76489AN, initialized but not present on PCB. not written during gameplay
+	map(0x4000, 0x7fff).rom();
+	map(0xc000, 0xffff).rom();  // extended rom space
+}
+
+void goldnpkr_state::unkicpf40_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x2000).portr("SWA");
+	map(0x4000, 0x7fff).rom();  // bankswitched through 74ls154
+	map(0xa000, 0xa000).portr("SWB");
+	map(0xc000, 0xffff).rom();  // bankswitched through 74ls154
+}
+
+void goldnpkr_state::wing_w90_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x2000).portr("SW1");
+	map(0x2400, 0x2400).w("snsnd", FUNC(sn76489_device::write));  // SN76489AN PSG
+//	map(0x2800, 0x2800).w();  // Initializes another SN76489, not present in the PCB, and then no activity
+	map(0x4000, 0x7fff).rom();  // bankswitched through 74ls154
+	map(0xc000, 0xffff).rom();  // bankswitched through 74ls154
+}
+
 
 void blitz_state::megadpkr_map(address_map &map)
 {
@@ -2213,11 +2404,10 @@ static INPUT_PORTS_START( pottnpkr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings (optional)") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Coupon (Note In)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Coin In") PORT_IMPULSE(3)
-//* PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Weight (Coupon In)") PORT_CODE(KEYCODE_H) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -4651,6 +4841,224 @@ static INPUT_PORTS_START( potnpkro )  // ICP-1 w/daughterboard
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( kmhpan )
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x01, 0x01, "Autohold" )            PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Coinage Multiplier" )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, "x1" )
+	PORT_DIPSETTING(    0x00, "x10" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coinage ) )    PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x00, "1 Note: 10 Credits" )
+	PORT_DIPSETTING(    0x20, "1 Note: 50 Credits" )
+	PORT_DIPSETTING(    0x40, "1 Note: 100 Credits" )
+	PORT_DIPSETTING(    0x60, "1 Note: 120 Credits" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( unkicpf40 )  // ICP-1 w/daughterboard
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(3) PORT_NAME("Note In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SWB")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Fever" )             PORT_DIPLOCATION("SWB:6")
+	PORT_DIPSETTING(    0x20, "37" )
+	PORT_DIPSETTING(    0x00, "137" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( wing_w90 )  // wing w90-3 pcb
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Coinage Set") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(3) PORT_NAME("Note In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x01, 0x01, "Bet Increment" )     PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x01, "Normal" )
+	PORT_DIPSETTING(    0x00, "Direct" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:2")  // nothing
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Double-Up 7" )       PORT_DIPLOCATION("SWA:3")
+	PORT_DIPSETTING(    0x04, "Even" )
+	PORT_DIPSETTING(    0x00, "Lose" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:4")  // double up y/n (disabled)
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:5")  // one pair y/n (disabled)
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Double-Up Lose" )    PORT_DIPLOCATION("SWA:6")
+	PORT_DIPSETTING(    0x20, "At 7" )
+	PORT_DIPSETTING(    0x00, "At 5" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:7")  // game mode (disabled)
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Royal Flush" )       PORT_DIPLOCATION("SWA:8")
+	PORT_DIPSETTING(    0x80, "Lose" )
+	PORT_DIPSETTING(    0x00, "Ok" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( unkicpetg )  // ICP-1 w/daughterboard
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Coinage Set") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(3) PORT_NAME("Note In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x10, 0x10, "Minimum Hand" )      PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, "2 Pair" )
+	PORT_DIPSETTING(    0x00, "Jacks or Better" )
+	PORT_DIPNAME( 0x20, 0x20, "Frequency" )         PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, "50Hz." )
+	PORT_DIPSETTING(    0x00, "60Hz." )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWA:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SWB")
+	PORT_DIPNAME( 0x07, 0x07, "Game Type" )         PORT_DIPLOCATION("SWB:1,2,3")
+	PORT_DIPSETTING(    0x07, "Normal" )
+	PORT_DIPSETTING(    0x06, "Turbo" )
+	PORT_DIPSETTING(    0x05, "Turbo-GT 8-Bet" )
+	PORT_DIPSETTING(    0x03, "Ex-Turbo 16-Bet" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SWB:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Royal Flush Value" ) PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(    0x80, "500" )
+	PORT_DIPSETTING(    0x00, "1000" )
+INPUT_PORTS_END
+
+
 /*********************************************
 *              Graphics Layouts              *
 *********************************************/
@@ -4728,6 +5136,17 @@ GFXDECODE_END
 static GFXDECODE_START( gfx_lespendu )
 	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 0, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_kmhpan )
+	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 8, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 8, 16 )
 GFXDECODE_END
 
 
@@ -5283,6 +5702,56 @@ void goldnpkr_state::glfever(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void goldnpkr_state::kmhpan(machine_config &config)
+{
+	goldnpkr_base(config);
+
+	G65SC02(config.replace(), m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::kmhpan_map);
+
+	m_pia[1]->writepa_handler().remove();
+
+	// video hardware
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, kmhpan)
+	m_gfxdecode->set_info(gfx_kmhpan);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SN76489A(config, "sn", MASTER_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.5); // divider unknown
+}
+
+void goldnpkr_state::unkicpf40(machine_config &config)
+{
+	goldnpkr_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::unkicpf40_map);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+
+void goldnpkr_state::wing_w90(machine_config &config)
+{
+	goldnpkr_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::wing_w90_map);
+	
+	PIA6821(config.replace(), m_pia[1]);
+	m_pia[1]->readpa_handler().set(FUNC(goldnpkr_state::snsnd_ready_r));
+	m_pia[1]->writepa_handler().remove();
+	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
+
+	// video hardware
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, wing_w90)
+	PALETTE(config.replace(), m_palette, FUNC(goldnpkr_state::wing_w90_palette), 256);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SN76489A(config, m_snsnd, MASTER_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
 
 
@@ -12634,6 +13103,240 @@ ROM_START( icproul )
 	ROM_LOAD( "n82s129an.bin", 0x0000, 0x0100, CRC(1a30bdd8) SHA1(d0a020e9604e8e0920a4500e02770db6c639bace) )
 ROM_END
 
+/*
+  "开门胡" (kāi mén hú)
+
+  Mahjong-themed poker game.
+
+  The title is a term from Chinese Mahjong, specifically in certain regional rulesets
+  (like Hong Kong Mahjong or Sichuan Mahjong).
+
+  The literal Translation is "Open the door and win" (开门 = open door; 胡 = win).
+  In the mahjong game, a player can declare a winning hand (胡牌, hú pái) immediately
+  after drawing their first tile (before making any discards or melds).
+
+  Also called "Fast Ron". It's considered a rare and lucky move, often rewarded
+  with extra points or special payouts.
+
+
+  PCB serigraphed PAN 电子 (PAN diànzǐ)
+
+  G65SC02P-2 CPU.
+  10 MHz XTAL.
+  EF6821P & MC68B21P PIAs.
+  HD46505SP-2 CRTC.
+  SN76489AN.
+  1 bank of 8 DIP switches.
+  Reset button.
+
+*/
+ROM_START( kmhpan )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "main-prog.bin", 0x00000, 0x10000, CRC(1f96ec9f) SHA1(fb2f7e725af888b371e314a8f482c9acdf9a5894) )
+
+	ROM_REGION( 0x18000, "gfxpool", 0 )
+	ROM_LOAD( "kai-1.bin", 0x00000, 0x8000, CRC(825ec1ac) SHA1(6771b5f696e53222fb69e464e03935978e43cafb) )
+	ROM_LOAD( "kai-2.bin", 0x08000, 0x8000, CRC(22a51cf2) SHA1(a158acb450f1bfbc26384a3136fed4c268213de6) )
+	ROM_LOAD( "kai-3.bin", 0x10000, 0x8000, CRC(2ffd4c95) SHA1(c239213203bf7c5fc6336b3ef8e33904c4c1bcf2) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool",   0x04000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool",   0x0c000, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool",   0x14000, 0x1000, 0x0800 ) // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "gfxpool",   0x04800, 0x0000, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool",   0x0c800, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool",   0x14800, 0x1000, 0x0800 ) // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "gfxpool",   0x05000, 0x0000, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool",   0x0d000, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool",   0x15000, 0x1000, 0x0800 ) // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // title
+	ROM_COPY( "gfxpool",   0x05800, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool",   0x15800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool",   0x0d800, 0x1000, 0x0800 ) // src-dest-size (empty)
+
+	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+	ROM_LOAD( "kmhpan_nvram.bin", 0x0000, 0x0800, CRC(e412ee68) SHA1(5423352ea926fd3e052615706c1fafafb4333a14) )
+
+	// these two ROMs each contain just 0x100 of data from 0x4000 to 0x40ff and another 0x100 from 0x7000 to 0x70ff
+	// PROMs substitutes?
+	ROM_REGION( 0x10000, "pal_eproms", 0 )
+	ROM_LOAD( "pan_dianzi_f.bin", 0x0000, 0x8000, CRC(e6a1907c) SHA1(b5497fd45a9416d926cde856292504c793b9fa2a) ) // M27C256B
+	ROM_LOAD( "pan_dianzi_g.bin", 0x8000, 0x8000, CRC(6ff231b7) SHA1(82da7b4c577669d261a181b4cc1fc91cd56763d3) ) // M27C256B
+
+	ROM_REGION( 0x0300, "pal_data", ROMREGION_ERASE00 )
+	ROM_COPY( "pal_eproms", 0x4000, 0x0000, 0x0100 )
+	ROM_COPY( "pal_eproms", 0x7000, 0x0100, 0x0100 )
+	ROM_COPY( "pal_eproms", 0xc000, 0x0200, 0x0100 )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "bprom.bin",  0x0000, 0x0100, BAD_DUMP CRC(2cd71239) SHA1(6289123684799ae6f350793d6cea9cb22c19df9b) )  // not dumped, modded golden poker one
+ROM_END
+
+
+// Golden Poker type game.
+// Wing 8510-A / W90-3 PCB
+ROM_START( wing90pkr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4.12a", 0x4000, 0x1000, CRC(119e4f06) SHA1(d520aa1a862b93d5f9d2f8acf127842bb5441831) )
+	ROM_CONTINUE(      0xd000, 0x1000 )
+	ROM_LOAD( "5.16a", 0x6000, 0x1000, CRC(5d974b4d) SHA1(1e14a0076e59d3bfd70921d18f8ca81cfecf61e0) )
+	ROM_CONTINUE(      0xe000, 0x1000 )
+	ROM_LOAD( "6.17a", 0x7000, 0x1000, CRC(84c6a3cd) SHA1(41fda1f76318771fe8bc475edd25b3c9540b6167) )
+	ROM_CONTINUE(      0xf000, 0x1000 )
+
+    // ROM 3-6a is bad. Should have the jokers missing bitplane at 1000-17FF, but it's not there
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x1000, 0x0000 )
+	ROM_LOAD( "3.6a",  0x1000, 0x0800, BAD_DUMP CRC(efff6f44) SHA1(270dec73cbd86016bdb4c79cfd27dfaf9ce0c986) )
+	ROM_IGNORE(                0x1800 )
+
+	ROM_REGION( 0x3000, "gfx2", 0 )  // The third graphics bitplane of the jokers is missing.
+	ROM_LOAD( "1.2a",  0x0000, 0x0800, CRC(b85e1275) SHA1(1de37c634643e5ddde0a16a80a9c16625bebfb08) )
+	ROM_CONTINUE(      0x0000, 0x1000 )
+	ROM_IGNORE(                0x0800 )
+	ROM_LOAD( "2.4a",  0x1000, 0x0800, CRC(f475b43e) SHA1(b09544828a75c592e27fdc69646b594cbfcf0483) ) 
+	ROM_CONTINUE(      0x1000, 0x1000 )
+	ROM_IGNORE(                0x0800 )
+	ROM_LOAD( "3.6a",  0x2000, 0x0800, BAD_DUMP CRC(efff6f44) SHA1(270dec73cbd86016bdb4c79cfd27dfaf9ce0c986) )
+	ROM_CONTINUE(      0x2000, 0x1000 )
+	ROM_IGNORE(                0x0800 )
+
+	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+	ROM_LOAD( "w90_nvram.bin", 0x0000, 0x0800, CRC(fe25e24a) SHA1(350f715abc40dbd1803ce33f527df203d9a05549) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "r_82s129an.1c", 0x0000, 0x0100, CRC(2a16af3f) SHA1(4fd31a8e8c2cc4b548336438c407bb76548097ee) )
+	ROM_LOAD( "g_82s129an.2c", 0x0100, 0x0100, CRC(4b7d0f43) SHA1(523ccf38ad954d959d6bb862eb8358d180d4b4aa) )
+	ROM_LOAD( "b_82s129an.3c", 0x0200, 0x0100, CRC(8c16681d) SHA1(fb3507dfbf2bdd5552e0024152e63e3408f435eb) )
+ROM_END
+
+
+/*
+  ICP PCBs with daughterboard F40
+  (137 fever, 10 bet)
+
+  No lamps support.
+
+  TODO:
+  - Figure out the missing DIP switchs fuctions.
+  - Figure out hyperactivity on the PIA0 line CA2.
+
+*/
+ROM_START( unkicpf40 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "137_7_10b_sub.bin",   0x6000, 0x1000, CRC(698a04c1) SHA1(f3e3cfef5ef3d517b2c1550c85d0be09f1fa17b1) )
+	ROM_LOAD( "137_8_10b_sub.bin",   0x7000, 0x1000, CRC(d5c43fce) SHA1(6797d9cd485791dba8be0d2136b6f713f9e2908e) )
+	ROM_LOAD( "r-300_f40_5_sub.bin", 0xf000, 0x1000, CRC(04c8797d) SHA1(ff20bab51ddff2cdce55a104f2ec536e38e42605) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "34.8a", 0x2000, 0x1000, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1", 0x2800, 0x1000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "137_82s131_bprom.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+ROM_END
+
+/*
+  ICP PCBs with daughterboard F80
+  (137 fever, 50 bet)
+
+  No lamps support.
+
+  TODO:
+  - Figure out the missing DIP switchs fuctions.
+  - Figure out hyperactivity on the PIA0 line CA2.
+
+*/
+ROM_START( unkicpf80 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "7_sub.bin",     0x6000, 0x1000, CRC(1075c73a) SHA1(6949b103e9a72dd688348359ce1b3c9c61911121) )
+	ROM_LOAD( "8_sub.bin",     0x7000, 0x1000, CRC(ac08a967) SHA1(1063751f8224ba66c3182d47011b9d779f06349f) )
+	ROM_LOAD( "9_f80_sub.bin", 0xf000, 0x1000, CRC(98d16359) SHA1(fa6b6da54a1bb819627073d5330c0c3e1f207bb4) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(         0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "4.8a", 0x1000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_LOAD( "3.7a", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//	ROM_CONTINUE(           0x0000, 0x0100 )
+ROM_END
+
+/*
+  EX-TURBO-GT poker
+  ICP PCBs with daughterboard.
+
+  Game type selectable via DIP switches.
+
+  * Normal mode.
+  * Turbo mode.
+  * Turbo-GT 8-Bet mode.
+  * EX-Turbo 16-Bet mode.
+
+*/
+ROM_START( unkicpetg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a.bin", 0x6000, 0x1000, CRC(bb8092f2) SHA1(47dbe72bf76cf99d94471691deb1d8dc67f87ef3) )
+	ROM_LOAD( "b.bin", 0x7000, 0x1000, CRC(ead750c8) SHA1(1754c7069ccb8b3460a84886e818eb240474d791) )
+	ROM_LOAD( "c.bin", 0xf000, 0x1000, CRC(3ed958af) SHA1(b7fcedc840919bee9d42d7501c66930a3c53ff83) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(         0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "4.8a", 0x1000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_LOAD( "3.7a", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+	ROM_LOAD( "unkicpetg_nvram.bin", 0x0000, 0x0800, CRC(aed44123) SHA1(d7993de94654ec70ff9fdcabf27c6fdafae89485) )
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+	ROM_CONTINUE(           0x0000, 0x0100 )
+ROM_END
+
+// Unknown Turbo Poker
+// Design and shape close to Witch Card.
+ROM_START( gp_turbo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "turbo_7.bin", 0x2000, 0x1000, CRC(c9a059be) SHA1(b77953cfd86d079f7be86f85e9e3e289372e34ca) )
+	ROM_LOAD( "turbo_8.bin", 0x3000, 0x1000, CRC(5ccfb5cc) SHA1(ea9dafb41a4f206ad32f1a66d0eb4a79f8f3b7b0) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "ic7_0.bin",  0x2000, 0x1000, CRC(1090e7f0) SHA1(26a7fc8853debb9a759811d7fee39410614c3895) )    // char ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "ic2_7.bin",  0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "ic3_8.bin",  0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "ic5_9.bin",  0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+	ROM_LOAD( "gp_turbo_nvram.bin", 0x0000, 0x0800, CRC(4e5fa405) SHA1(287f26240128f3aa4af936fb51bf1488da32462a) )
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+	ROM_CONTINUE(           0x0000, 0x0100 )
+ROM_END
+
 
 /*********************************************
 *                Driver Init                 *
@@ -12680,9 +13383,8 @@ ROM_END
 
 void goldnpkr_state::init_vkdlsa()
 {
-	/* $e097-e098, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e097-e098, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12692,9 +13394,8 @@ void goldnpkr_state::init_vkdlsa()
 
 void goldnpkr_state::init_vkdlsb()
 {
-	/* $e87b-e87c, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e87b-e87c, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12704,9 +13405,8 @@ void goldnpkr_state::init_vkdlsb()
 
 void goldnpkr_state::init_vkdlsc()
 {
-	/* $453a-453b, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $453a-453b, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12716,9 +13416,8 @@ void goldnpkr_state::init_vkdlsc()
 
 void goldnpkr_state::init_vkdlsww()
 {
-	/* $f2c9-f2ca, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $f2c9-f2ca, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12728,9 +13427,8 @@ void goldnpkr_state::init_vkdlsww()
 
 void goldnpkr_state::init_vkdlswwa()
 {
-	/* $df80-df81, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $df80-df81, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12740,9 +13438,8 @@ void goldnpkr_state::init_vkdlswwa()
 
 void goldnpkr_state::init_vkdlswwc()
 {
-	/* $e42f-e430, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e42f-e430, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12752,9 +13449,8 @@ void goldnpkr_state::init_vkdlswwc()
 
 void goldnpkr_state::init_vkdlswwd()
 {
-	/* $e442-e443, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e442-e443, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12764,9 +13460,8 @@ void goldnpkr_state::init_vkdlswwd()
 
 void goldnpkr_state::init_vkdlswwh()
 {
-	/* $e4d5-e4d6, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e4d5-e4d6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12776,9 +13471,8 @@ void goldnpkr_state::init_vkdlswwh()
 
 void goldnpkr_state::init_vkdlswwl()
 {
-	/* $e87c-e87d, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e87c-e87d, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12788,9 +13482,8 @@ void goldnpkr_state::init_vkdlswwl()
 
 void goldnpkr_state::init_vkdlswwo()
 {
-	/* $e7d5-e7d6, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e7d5-e7d6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12800,9 +13493,8 @@ void goldnpkr_state::init_vkdlswwo()
 
 void goldnpkr_state::init_vkdlswwp()
 {
-	/* $e7d9-e7da, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e7d9-e7da, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12812,9 +13504,8 @@ void goldnpkr_state::init_vkdlswwp()
 
 void goldnpkr_state::init_vkdlswwr()
 {
-	/* $e7f7-e7f8, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e7f7-e7f8, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12824,9 +13515,8 @@ void goldnpkr_state::init_vkdlswwr()
 
 void goldnpkr_state::init_vkdlswws()
 {
-	/* $e8a5-e8a6, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e8a5-e8a6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12836,9 +13526,8 @@ void goldnpkr_state::init_vkdlswws()
 
 void goldnpkr_state::init_vkdlswwt()
 {
-	/* $e955-e956, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $e955-e956, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12848,9 +13537,8 @@ void goldnpkr_state::init_vkdlswwt()
 
 void goldnpkr_state::init_vkdlswwu()
 {
-	/* $ee6b-ee6c, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $ee6b-ee6c, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -12860,9 +13548,8 @@ void goldnpkr_state::init_vkdlswwu()
 
 void goldnpkr_state::init_vkdlswwv()
 {
-	/* $f052-f053, NOPing the BNE-->KILL
-	   after compare with Dallas TK data
-	*/
+	// $f052-f053, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -13207,6 +13894,7 @@ GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )
 GAMEL( 198?, adpoker,   0,        pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "Amstar?",                  "Amstar Draw Poker",                          0,                layout_goldnpkr )
+GAMEL( 198?, gp_turbo,  0,        pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Unknown Turbo Poker",                        0,                layout_goldnpkr )
 
 GAMEL( 1990, bsuerte,   0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",              0,                layout_goldnpkr )
 GAMEL( 1991, bsuertea,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",              0,                layout_goldnpkr )
@@ -13345,6 +14033,14 @@ GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespe
 
 GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Roulette (ICP-1 PCB)",                    0 )  // password protected
 
+GAME(  199?, kmhpan,    0,        kmhpan,   kmhpan,   goldnpkr_state, empty_init,    ROT0,   "PAN Electronics",          "Kai Men Hu (PAN Electronics)",            MACHINE_IMPERFECT_COLORS )  // needs proper palette decoding
+
+GAME(  198?, wing90pkr, goldnpkr, wing_w90, wing_w90, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Wing W90 poker (Wing 8510-A W90-3 PCB)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )  // bad gfx dump
+
+GAME(  198?, unkicpf40, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F40 poker (137 Fever, 10 bet)",       0 )
+GAME(  198?, unkicpf80, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F80 poker (137 Fever, 50 bet)",       0 )
+GAME(  198?, unkicpetg, 0,        unkicpf40, unkicpetg, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP EX-Turbo-GT poker",                   0 )
+
 
 /*************************************** SETS W/IRQ0 ***************************************/
 
@@ -13365,4 +14061,4 @@ GAME(  1990, maxidpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init
 /*************************************** SETS W/R6511 ***************************************/
 
 GAME(  1989, olym65wc,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Wild Card (Olympic Games, v2.0)",                              MACHINE_NOT_WORKING )
-GAME(  1989, olym65bj,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Black jack (Olympic Games, v5.04, upgrade kit for Wild Card)", MACHINE_NOT_WORKING )
+GAME(  1989, olym65bj,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Black Jack (Olympic Games, v5.04, upgrade kit for Wild Card)", MACHINE_NOT_WORKING )

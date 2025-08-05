@@ -2741,7 +2741,7 @@ void i386_device::i386_groupF7_32()        // Opcode 0xf7
 				if( src ) {
 					remainder = quotient % (uint64_t)src;
 					result = quotient / (uint64_t)src;
-					if( result > 0xffffffff ) {
+					if( result > 0xffffffffULL ) {
 						/* TODO: Divide error */
 					} else {
 						REG32(EDX) = (uint32_t)remainder;
@@ -2769,7 +2769,7 @@ void i386_device::i386_groupF7_32()        // Opcode 0xf7
 				if( src ) {
 					remainder = quotient % (int64_t)(int32_t)src;
 					result = quotient / (int64_t)(int32_t)src;
-					if( result > 0xffffffff ) {
+					if( result > 0x7fffffffLL || result < -0x80000000LL ) {
 						/* TODO: Divide error */
 					} else {
 						REG32(EDX) = (uint32_t)remainder;

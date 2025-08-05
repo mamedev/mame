@@ -2396,14 +2396,22 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 {
 	int saveflags = inst.flags() != 0;
 
-	Gp tempreg = esi; // TODO: try to avoid collision with reglo and reghi?
+	Gp tempreg = esi;
+	if ((reglo == tempreg) || (reghi == tempreg))
+		tempreg = edi;
+	if ((reglo == tempreg) || (reghi == tempreg))
+		tempreg = ebp;
+	assert(reglo != tempreg);
+	assert(reghi != tempreg);
 	a.push(tempreg);
 
 	if (param.is_immediate())
 	{
 		int count = param.immediate() & 63;
 		if (!inst.flags() && count == 0)
-			;// skip
+		{
+			// skip
+		}
 		else
 		{
 			while (count >= 32)
@@ -2514,14 +2522,22 @@ void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 {
 	int saveflags = inst.flags() != 0;
 
-	Gp tempreg = esi; // TODO: try to avoid collision with reglo and reghi?
+	Gp tempreg = esi;
+	if ((reglo == tempreg) || (reghi == tempreg))
+		tempreg = edi;
+	if ((reglo == tempreg) || (reghi == tempreg))
+		tempreg = ebp;
+	assert(reglo != tempreg);
+	assert(reghi != tempreg);
 	a.push(tempreg);
 
 	if (param.is_immediate())
 	{
 		int count = param.immediate() & 63;
 		if (!inst.flags() && count == 0)
-			;// skip
+		{
+			// skip
+		}
 		else
 		{
 			while (count >= 32)
@@ -4575,9 +4591,9 @@ void drcbe_x86::op_roland(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp const dstreg = dstp.select_register(eax, shiftp, maskp);
 
-	// 32-bit form
 	if (inst.size() == 4)
 	{
+		// 32-bit form
 		emit_mov_r32_p32(a, dstreg, srcp);                                              // mov   dstreg,srcp
 		shift_op_param(a, Inst::kIdRol, inst.size(), dstreg, shiftp,                                 // rol   dstreg,shiftp
 			[inst](Assembler &a, Operand const &dst, be_parameter const &src)
@@ -4601,10 +4617,9 @@ void drcbe_x86::op_roland(Assembler &a, const instruction &inst)
 			});
 		emit_mov_p32_r32(a, dstp, dstreg);                                              // mov   dstp,dstreg
 	}
-
-	// 64-bit form
 	else if (inst.size() == 8)
 	{
+		// 64-bit form
 		emit_mov_r64_p64(a, dstreg, edx, srcp);                                         // mov   edx:dstreg,srcp
 		emit_rol_r64_p64(a, dstreg, edx, shiftp, inst);                                 // rol   edx:dstreg,shiftp
 		emit_and_r64_p64(a, dstreg, edx, maskp, inst);                                  // and   edx:dstreg,maskp
@@ -6144,39 +6159,48 @@ void drcbe_x86::op_shl(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp const dstreg = dstp.select_register(eax, src2p);
 
-	// 32-bit form
 	if (inst.size() == 4)
 	{
-		// dstp == src1p in memory
+		// 32-bit form
 		if (dstp.is_memory() && dstp == src1p)
-			shift_op_param(a, Inst::kIdShl, inst.size(), MABS(dstp.memory(), 4), src2p,              // shl   [dstp],src2p
-				[inst](Assembler &a, Operand const &dst, be_parameter const &src)
-				{
-					// optimize zero case
-					return (!inst.flags() && !src.immediate());
-				}, true);
-
-		// general case
+		{
+			// dstp == src1p in memory
+			shift_op_param(a, Inst::kIdShl, inst.size(), MABS(dstp.memory(), 4), src2p,
+					[inst](Assembler &a, Operand const &dst, be_parameter const &src)
+					{
+						// optimize zero case
+						return (!inst.flags() && !src.immediate());
+					}, inst.flags() != 0);
+		}
 		else
 		{
-			emit_mov_r32_p32(a, dstreg, src1p);                                         // mov   dstreg,src1p
-			shift_op_param(a, Inst::kIdShl, inst.size(), dstreg, src2p,                              // shl   dstreg,src2p
-				[inst](Assembler &a, Operand const &dst, be_parameter const &src)
-				{
-					// optimize zero case
-					return (!inst.flags() && !src.immediate());
-				}, true);
-			emit_mov_p32_r32(a, dstp, dstreg);                                          // mov   dstp,dstreg
+			// general case
+			emit_mov_r32_p32(a, dstreg, src1p);
+			shift_op_param(a, Inst::kIdShl, inst.size(), dstreg, src2p,
+					[inst](Assembler &a, Operand const &dst, be_parameter const &src)
+					{
+						// optimize zero case
+						return (!inst.flags() && !src.immediate());
+					}, inst.flags() != 0);
+			emit_mov_p32_r32(a, dstp, dstreg);
 		}
 	}
-
-	// 64-bit form
 	else if (inst.size() == 8)
 	{
-		// general case
-		emit_mov_r64_p64(a, dstreg, edx, src1p);                                        // mov   edx:dstreg,[src1p]
-		emit_shl_r64_p64(a, dstreg, edx, src2p, inst);                                  // shl   edx:dstreg,src2p
-		emit_mov_p64_r64(a, dstp, dstreg, edx);                                         // mov   dstp,edx:dstreg
+		// 64-bit form
+		if (src2p.is_immediate_value(32) && !inst.flags())
+		{
+			// shift by 32 bits
+			emit_mov_r32_p32(a, edx, src1p);
+			a.xor_(dstreg, dstreg);
+		}
+		else
+		{
+			// general case
+			emit_mov_r64_p64(a, dstreg, edx, src1p);
+			emit_shl_r64_p64(a, dstreg, edx, src2p, inst);
+		}
+		emit_mov_p64_r64(a, dstp, dstreg, edx);
 	}
 }
 
@@ -6210,7 +6234,7 @@ void drcbe_x86::op_shr(Assembler &a, const instruction &inst)
 				{
 					// optimize zero case
 					return (!inst.flags() && !src.immediate());
-				}, true);
+				}, inst.flags() != 0);
 
 		// general case
 		else
@@ -6221,7 +6245,7 @@ void drcbe_x86::op_shr(Assembler &a, const instruction &inst)
 				{
 					// optimize zero case
 					return (!inst.flags() && !src.immediate());
-				}, true);
+				}, inst.flags() != 0);
 			emit_mov_p32_r32(a, dstp, dstreg);                                          // mov   dstp,dstreg
 		}
 	}

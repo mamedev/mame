@@ -57,7 +57,7 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<address_map_bank_device> m_bank0000;
 	required_device<k052109_device> m_k052109;
-	required_device<k05324x_device> m_k053245;
+	required_device<k053244_device> m_k053245;
 	required_device<k053251_device> m_k053251;
 
 	required_memory_bank m_mainbank;
@@ -77,7 +77,7 @@ private:
 	void sound_arm_nmi_w(uint8_t data);
 	void z80_nmi_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	K05324X_CB_MEMBER(sprite_callback);
+	K053244_CB_MEMBER(sprite_callback);
 	K052109_CB_MEMBER(tile_callback);
 	void banking_callback(uint8_t data);
 
@@ -105,7 +105,7 @@ K052109_CB_MEMBER(parodius_state::tile_callback)
 
 ***************************************************************************/
 
-K05324X_CB_MEMBER(parodius_state::sprite_callback)
+K053244_CB_MEMBER(parodius_state::sprite_callback)
 {
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
@@ -142,8 +142,6 @@ uint32_t parodius_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		if (m_layer_colorbase[i] != prev_colorbase)
 			m_k052109->mark_tilemap_dirty(i);
 	}
-
-	m_k052109->tilemap_update();
 
 	// sort layers and draw
 	int layer[3];
@@ -225,13 +223,13 @@ void parodius_state::main_map(address_map &map)
 	map(0x2000, 0x5fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 	map(0x2000, 0x27ff).view(m_view_2000);
 	m_view_2000[0](0x2000, 0x27ff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
-	m_view_2000[1](0x2000, 0x27ff).rw(m_k053245, FUNC(k05324x_device::k053245_r), FUNC(k05324x_device::k053245_w));
+	m_view_2000[1](0x2000, 0x27ff).rw(m_k053245, FUNC(k053244_device::k053245_r), FUNC(k053244_device::k053245_w));
 	map(0x3f8c, 0x3f8c).portr("P1");
 	map(0x3f8d, 0x3f8d).portr("P2");
 	map(0x3f8e, 0x3f8e).portr("DSW3");
 	map(0x3f8f, 0x3f8f).portr("DSW1");
 	map(0x3f90, 0x3f90).portr("DSW2");
-	map(0x3fa0, 0x3faf).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
+	map(0x3fa0, 0x3faf).rw(m_k053245, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w));
 	map(0x3fb0, 0x3fbf).w(m_k053251, FUNC(k053251_device::write));
 	map(0x3fc0, 0x3fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(parodius_state::_3fc0_w));
 	map(0x3fc4, 0x3fc4).w(FUNC(parodius_state::videobank_w));

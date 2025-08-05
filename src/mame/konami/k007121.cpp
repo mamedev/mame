@@ -53,8 +53,10 @@ outputs:
 - color code to be output on screen (COA0-COA6)
 
 
-control registers
+control registers:
+
 000:          scroll x (low 8 bits)
+
 001: -------x scroll x (high bit, if tilemap width > 256)
      ------x- enable row/colscroll instead of normal scroll (combatsc)
      -----x-- if above is enabled: 0 = rowscroll, 1 = colscroll
@@ -62,7 +64,9 @@ control registers
               school where tilemap #2 is overlayed on front and doesn't scroll.
               The 32 lines of the front layer can be individually turned on or
               off using the second 32 bytes of scroll RAM.
+
 002:          scroll y
+
 003: -------x bit 13 of the tile code
      ------x- unknown (contra)
      -----x-- might be sprite / tilemap priority (0 = sprites have priority)
@@ -84,10 +88,12 @@ control registers
               visible area from 256 to 240 pixels. This is used by combatsc on
               the scrolling stages, and by labyrunr on the title screen.
      x------- unknown (contra)
+
 004: ----xxxx bits 9-12 of the tile code. Only the bits enabled by the following
               mask are actually used, and replace the ones selected by register
               005.
      xxxx---- mask enabling the above bits
+
 005: selects where in the attribute byte to pick bits 9-12 of the tile code,
      output to pins R12-R15. The bit of the attribute byte to use is the
      specified bit (0-3) + 3, that is one of bits 3-6. Bit 7 is hardcoded as
@@ -97,6 +103,7 @@ control registers
      ----xx-- attribute bit to use for tile code bit 10
      --xx---- attribute bit to use for tile code bit 11
      xx------ attribute bit to use for tile code bit 12
+
 006: ----xxxx select additional effect for bits 3-6 of the tile attribute (the
               same ones indexed by register 005). Note that an attribute bit
               can therefore be used at the same time to be BOTH a tile code bit
@@ -113,6 +120,7 @@ control registers
               to place soldiers behind the stand.
               Use in labyrunr has not been investigated yet.
      --xx---- palette bank (both tiles and sprites, see contra)
+
 007: -------x nmi enable
      ------x- irq enable
      -----x-- firq enable
@@ -122,7 +130,7 @@ control registers
 TODO:
 - Move tilemap(s) emulation from drivers to this device.
 - As noted above, the maximum number of 64-pixel sprite blocks is 264. MAME
-  doesn't emulate partial sprites at the end of the spritelist. Is's not
+  doesn't emulate partial sprites at the end of the spritelist. It's not
   expected any game relies on this.
 
 BTANB:
@@ -137,10 +145,9 @@ BTANB:
 #include "konami_helper.h"
 
 #include "screen.h"
-#include "tilemap.h"
 
 
-DEFINE_DEVICE_TYPE(K007121, k007121_device, "k007121", "K007121 Sprite/Tilemap Controller")
+DEFINE_DEVICE_TYPE(K007121, k007121_device, "k007121", "Konami 007121 Video Controller")
 
 k007121_device::k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K007121, tag, owner, clock)
@@ -152,7 +159,6 @@ k007121_device::k007121_device(const machine_config &mconfig, const char *tag, d
 	, m_irq_cb(*this)
 	, m_firq_cb(*this)
 	, m_nmi_cb(*this)
-	, m_dirtytiles_cb(*this)
 {
 }
 
@@ -162,8 +168,6 @@ k007121_device::k007121_device(const machine_config &mconfig, const char *tag, d
 
 void k007121_device::device_start()
 {
-	m_dirtytiles_cb.resolve();
-
 	save_item(NAME(m_ctrlram));
 	save_item(NAME(m_scrollram));
 	save_item(NAME(m_flipscreen));
@@ -198,8 +202,11 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 
 	// associated tilemap(s) should be marked dirty if any of these registers changed
 	static const uint8_t dirtymask[8] = { 0x00, 0x00, 0x00, 0x01, 0xff, 0xff, 0x3f, 0x00 };
-	if ((data ^ m_ctrlram[offset]) & dirtymask[offset] && !m_dirtytiles_cb.isnull())
-		m_dirtytiles_cb();
+	if ((data ^ m_ctrlram[offset]) & dirtymask[offset])
+	{
+		for (auto &tilemap : m_tilemaps)
+			tilemap->mark_all_dirty();
+	}
 
 	if (offset == 7)
 	{
@@ -438,7 +445,7 @@ TIMER_CALLBACK_MEMBER(k007121_device::scanline)
 	if (scanline == 240)
 	{
 		// FIRQ once every other frame
-		if (BIT(m_ctrlram[7], 1) && screen().frame_number() & 1)
+		if (BIT(m_ctrlram[7], 2) && screen().frame_number() & 1)
 			m_firq_cb(ASSERT_LINE);
 
 		if (BIT(m_ctrlram[7], 1))

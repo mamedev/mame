@@ -213,7 +213,7 @@ void excal_state::excal(machine_config &config)
 	m_ptm->irq_callback().set_inputline(m_maincpu, M68K_IRQ_4);
 
 	PIA6821(config, m_pia);
-	m_pia->writepa_handler().set(m_display, FUNC(mephisto_display1_device::strobe_w)).bit(0);
+	m_pia->writepa_handler().set(m_display, FUNC(mephisto_display1_device::common_w)).bit(0);
 	m_pia->writepa_handler().append(m_dac, FUNC(dac_1bit_device::write)).bit(1);
 
 	MEPHISTO_SENSORS_BOARD(config, m_board);
