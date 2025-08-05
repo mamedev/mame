@@ -40340,6 +40340,9 @@ mympac
 mypac
 mypaca
 mysinv
+reactmd
+sarc110
+sarc110a
 
 @source:sega/megadriv_rad.cpp
 banmrid
@@ -40367,13 +40370,6 @@ ra145
 @source:sega/megadriv_sunmix.cpp
 sbubsm
 topshoot
-
-@source:sega/megadriv_sunplus_hybrid.cpp
-reactmd
-
-@source:sega/megadriv_vt_hybrid.cpp
-sarc110
-sarc110a
 
 @source:sega/megadriv_ybox.cpp
 jingling

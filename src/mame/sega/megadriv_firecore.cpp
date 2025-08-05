@@ -36,6 +36,8 @@ public:
 	void init_atgame40();
 	void init_dcat();
 	void init_mdhh100();
+	void init_sarc110();
+	void init_reactmd();
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -357,11 +359,61 @@ ROM_START( msi_sf2 )
 	ROM_LOAD16_WORD_SWAP( "29lv320.bin", 0x000000, 0x400000, CRC(465b12f0) SHA1(7a058f6feb4f08f56ae0f7369c2ca9a9fe2ed40e) )
 ROM_END
 
+ROM_START( reactmd )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 ) // this contains the MD games and main boot menu
+	ROM_LOAD16_WORD_SWAP( "reactormd.bin", 0x0000, 0x2000000, CRC(fe9664a4) SHA1(d475b524f576c9d1d90aed20c7467cc652396baf) )
+
+	ROM_REGION( 0x4000000, "sunplus", ROMREGION_ERASE00 ) // this contains the SunPlus games
+	ROM_LOAD16_WORD_SWAP( "reactor_md_sunplus-full.bin", 0x0000, 0x4000000, CRC(843aa58c) SHA1(07cdc6d4aa0057939c145ece01a9aca73c7f1f2b) )
+	ROM_IGNORE(0x4000000) // the 2nd half of the ROM can't be accessed by the PCB (address line tied low) (contains garbage? data)
+ROM_END
+
+ROM_START( sarc110 )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) // Mega Drive part
+	ROM_LOAD16_WORD_SWAP( "superarcade.bin", 0x000000, 0x1000000, CRC(be732867) SHA1(3857b2fbddd6a548c81caf64122e47a0df079be5) )
+
+	ROM_REGION( 0x400000, "mainrom", 0 ) // VT02/03 part
+	ROM_LOAD( "ic1.prg", 0x00000, 0x400000, CRC(de76f71f) SHA1(ff6b37a76c6463af7ae901918fc008b4a2863951) )
+ROM_END
+
+ROM_START( sarc110a )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) // Mega Drive part
+	ROM_LOAD16_WORD_SWAP( "superarcade.bin", 0x000000, 0x1000000, CRC(be732867) SHA1(3857b2fbddd6a548c81caf64122e47a0df079be5) )
+
+	ROM_REGION( 0x400000, "mainrom", 0 ) // VT02/03 part
+	ROM_LOAD( "ic1_ver2.prg", 0x00000, 0x400000, CRC(b97a0dc7) SHA1(bace32d73184df914113de5336e29a7a6f4c03fa) )
+ROM_END
 
 void megadriv_b010xx_select_state::init_atgame40()
 {
 	m_romsize = memregion("maincpu")->bytes();
 	init_megadrie();
+}
+
+void megadriv_b010xx_select_state::init_sarc110()
+{
+	m_romsize = memregion("maincpu")->bytes();
+	m_externalbank = 0x800000;
+	init_megadrie();
+}
+
+void megadriv_b010xx_select_state::init_reactmd()
+{
+	m_romsize = memregion("maincpu")->bytes();
+	m_externalbank = 0x1800000;
+	init_megadrie();
+
+	// decryption of the SunPlus part
+	uint16_t *ROM = (uint16_t*)memregion("sunplus")->base();
+	int size = memregion("sunplus")->bytes();
+
+	for (int i = 0; i < size/2; i++)
+	{
+		ROM[i] = bitswap<16>(ROM[i], 15, 13, 14, 12,  7,  6,  5,  4,
+									 11, 10, 9,  8,   3,  1,  2,  0);
+
+		ROM[i] = ROM[i] ^ 0xa5a5;
+	}
 }
 
 void megadriv_b010xx_select_state::init_dcat()
@@ -393,28 +445,35 @@ void megadriv_b010xx_select_state::init_mdhh100()
 // due to differences in the SoC compared to real MD hardware (including sound + new video modes) these have been left
 // as NOT WORKING for now although some games run to a degree
 
-CONS( 2021, mypac,     0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Pac-Man (DGUNL-4198, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
-CONS( 2021, mypaca,    mypac,    0, megadriv_firecore_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Pac-Man (DGUNL-4194, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mypac,     0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,           "dreamGEAR", "My Arcade Pac-Man (DGUNL-4198, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mypaca,    mypac,    0, megadriv_firecore_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,           "dreamGEAR", "My Arcade Pac-Man (DGUNL-4194, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
-CONS( 2021, mympac,    0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Ms. Pac-Man (DGUNL-7010, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mympac,    0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,           "dreamGEAR", "My Arcade Ms. Pac-Man (DGUNL-7010, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
 // menu uses unsupported extended mode
-CONS( 2021, mygalag,   0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Galaga (DGUNL-4195, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )
-CONS( 2021, mygalaga,  mygalag,  0, megadriv_firecore_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Galaga (DGUNL-4199, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mygalag,   0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,           "dreamGEAR", "My Arcade Galaga (DGUNL-4195, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mygalaga,  mygalag,  0, megadriv_firecore_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,           "dreamGEAR", "My Arcade Galaga (DGUNL-4199, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
-CONS( 2021, mysinv,    0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Space Invaders (DGUNL-7006, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT90 )
+CONS( 2021, mysinv,    0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,           "dreamGEAR", "My Arcade Space Invaders (DGUNL-7006, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT90 )
 
-CONS( 2012, atgame40,  0,        0, megadriv_firecore_3button_pal,  firecore_3button, megadriv_b010xx_select_state, init_atgame40, "AtGames",               "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)
+CONS( 2012, atgame40,  0,        0, megadriv_firecore_3button_pal,   firecore_3button, megadriv_b010xx_select_state, init_atgame40, "AtGames",   "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)
 
-CONS( 2021, matet,      0,        0, megadriv_firecore_3button_ntsc,  firecore_3button, megadriv_b010xx_select_state, init_megadriv, "dreamGEAR",            "My Arcade Tetris (DGUNL-7028, Pocket Player Pro)", MACHINE_NOT_WORKING)
-CONS( 2021, mateta,     matet,    0, megadriv_firecore_3button_ntsc,  firecore_3button, megadriv_b010xx_select_state, init_megadriv, "dreamGEAR",            "My Arcade Tetris (DGUNL-7025, Micro Player Pro)", MACHINE_NOT_WORKING)
+CONS( 2021, matet,     0,        0, megadriv_firecore_3button_ntsc,  firecore_3button, megadriv_b010xx_select_state, init_megadriv, "dreamGEAR", "My Arcade Tetris (DGUNL-7028, Pocket Player Pro)", MACHINE_NOT_WORKING)
+CONS( 2021, mateta,    matet,    0, megadriv_firecore_3button_ntsc,  firecore_3button, megadriv_b010xx_select_state, init_megadriv, "dreamGEAR", "My Arcade Tetris (DGUNL-7025, Micro Player Pro)", MACHINE_NOT_WORKING)
 
 // has an SD card slot?
-CONS( 200?, dcat16,       0,        0,      megadriv_firecore_3button_ntsc, firecore_3button,       megadriv_b010xx_select_state, init_dcat, "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )
+CONS( 200?, dcat16,    0,        0, megadriv_firecore_3button_ntsc,  firecore_3button, megadriv_b010xx_select_state, init_dcat,     "Firecore",  "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )
 // seems to be based on the AT games units, requires custom mode for menu?
-CONS( 201?, mahg156,      0,        0,      megadriv_firecore_3button_ntsc, firecore_3button,       megadriv_b010xx_select_state, init_mdhh100, "<unknown>",   "Mini Arcade Handheld Game Console 2.8 Inch Screen Built in 156 Retro Games (Mega Drive handheld)",  MACHINE_NOT_WORKING )
+CONS( 201?, mahg156,   0,        0, megadriv_firecore_3button_ntsc,  firecore_3button, megadriv_b010xx_select_state, init_mdhh100,  "<unknown>", "Mini Arcade Handheld Game Console 2.8 Inch Screen Built in 156 Retro Games (Mega Drive handheld)",  MACHINE_NOT_WORKING )
 // game-boy like handheld, pink in colour, 6 button controller (+ home select, start, vol buttons)
-CONS( 201?, mdhh100,      0,        0,      megadriv_firecore_3button_ntsc, firecore_3button,       megadriv_b010xx_select_state, init_mdhh100, "<unknown>",   "unknown 100-in-1 handheld (Mega Drive based)",  MACHINE_NOT_WORKING )
+CONS( 201?, mdhh100,   0,        0, megadriv_firecore_3button_ntsc,  firecore_3button, megadriv_b010xx_select_state, init_mdhh100,  "<unknown>", "unknown 100-in-1 handheld (Mega Drive based)",  MACHINE_NOT_WORKING )
 
 // From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
-CONS( 2018, msi_sf2,   0,        0, megadriv_firecore_6button_ntsc, msi_6button,         megadriv_b010xx_select_state, init_megadriv,    "MSI / Capcom / Sega",            "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", 0)
+CONS( 2018, msi_sf2,   0,        0, megadriv_firecore_6button_ntsc,  msi_6button,      megadriv_b010xx_select_state, init_megadriv, "MSI / Capcom / Sega", "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", 0)
+
+// Two systems in one unit - Firecore Genesis and SunPlus
+CONS( 2009, reactmd,   0,        0, megadriv_firecore_3button_pal,   firecore_3button, megadriv_b010xx_select_state, init_reactmd,  "AtGames / Sega / Waixing", "Reactor MD (Firecore/SunPlus hybrid, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// Two systems in one unit - Firecore Genesis and VT02/VT03
+CONS( 200?, sarc110,   0,        0, megadriv_firecore_3button_pal,   firecore_3button, megadriv_b010xx_select_state, init_sarc110,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 1)", MACHINE_NOT_WORKING)
+CONS( 200?, sarc110a,  sarc110,  0, megadriv_firecore_3button_pal,   firecore_3button, megadriv_b010xx_select_state, init_sarc110,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 2)", MACHINE_NOT_WORKING)
