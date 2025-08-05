@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood,Stephane Humbert
+// copyright-holders:Luca Elia, David Haywood
+
 /***************************************************************************
 
 Puckman Pockimon
