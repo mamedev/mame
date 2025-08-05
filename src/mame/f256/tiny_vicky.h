@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Daniel Tremblay
 #ifndef MAME_F256_TINY_VICKY_H
 #define MAME_F256_TINY_VICKY_H
 

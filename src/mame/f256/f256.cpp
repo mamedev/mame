@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Daniel Tremblay
 #include "emu.h"
 #include "f256.h"
 
@@ -57,21 +59,25 @@ f256_state::f256_state(const machine_config &mconfig, device_type type, const ch
 void f256_state::f256k(machine_config &config)
 {
     W65C02(config, m_maincpu, MASTER_CLOCK/4);
+    m_maincpu->set_addrmap(AS_PROGRAM, &f256_state::program_map);
+
     RAM(config, m_ram).set_default_size("512k").set_default_value(0x0);
     RAM(config, m_iopage0).set_default_size("8k").set_default_value(0x0);
     RAM(config, m_iopage1).set_default_size("8k").set_default_value(0x0);
     RAM(config, m_iopage2).set_default_size("8k").set_default_value(0x0);
     RAM(config, m_iopage3).set_default_size("8k").set_default_value(0x0);
+
     SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-    BQ4802(config, m_rtc, MASTER_CLOCK / 1000);  // RTC clock in kHz
-
-    m_maincpu->set_addrmap(AS_PROGRAM, &f256_state::program_map);
-
     m_screen->set_refresh_hz(60); // Refresh rate (e.g., 60Hz)
     m_screen->set_size(800,525);
     //m_screen->set_visarea(160, 799, 45, 524);  // this is how it should reall work, but the screen ends up offset
     m_screen->set_visarea(0, 639, 0, 479);
     m_screen->set_screen_update(m_video, FUNC(tiny_vicky_video_device::screen_update));
+    
+    BQ4802(config, m_rtc, MASTER_CLOCK / 1000);  // RTC clock in kHz
+    //set interrupt handler for the RTC
+    m_rtc->int_handler().set(FUNC(f256_state::rtc_interrupt_handler));
+    
     TINY_VICKY(config, m_video, MASTER_CLOCK);
     m_video->sof_irq_handler().set(FUNC(f256_state::sof_interrtupt));
     m_video->sol_irq_handler().set(FUNC(f256_state::sol_interrtupt));
@@ -88,6 +94,7 @@ void f256_state::f256k(machine_config &config)
     // initialize the PS2 mouse
     PC_KBDC(config, m_ps2_keyboard, XTAL(32'768));
     HLE_PS2_MOUSE(config, m_mouse, XTAL(32'768));
+    m_mouse->set_pc_kbdc(m_ps2_keyboard);
 
     MOS6522(config, m_via6522_1, MASTER_CLOCK / 4);  // Keyboard XTAL(14'318'181)/14)
     m_via6522_1->readpa_handler().set(FUNC(f256_state::via1_system_porta_r));
@@ -98,32 +105,30 @@ void f256_state::f256k(machine_config &config)
     m_via6522_1->cb2_handler().set(FUNC(f256_state::via1_cb2_write));
     m_via6522_1->irq_handler().set(FUNC(f256_state::via1_interrupt));
 
-    SN76489(config, m_sn0, MUSIC_CLOCK / 4);
-    SN76489(config, m_sn1, MUSIC_CLOCK / 4);
-    YMF262(config, m_opl3, MUSIC_CLOCK);
-    MOS6581(config, m_sid0, MUSIC_CLOCK/14);
-    MOS6581(config, m_sid1, MUSIC_CLOCK/14);
-
-    SPEAKER(config, "lspeaker").front_left();
-    SPEAKER(config, "rspeaker").front_right();
     // Mix PSG
+    SN76489(config, m_sn0, MUSIC_CLOCK / 4);
     m_sn0->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
     m_sn0->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+    SN76489(config, m_sn1, MUSIC_CLOCK / 4);
     m_sn1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
     m_sn1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
+    YMF262(config, m_opl3, MUSIC_CLOCK);
     m_opl3->add_route(0, "lspeaker", 1.0);
 	m_opl3->add_route(1, "rspeaker", 1.0);
 	m_opl3->add_route(2, "lspeaker", 1.0);
 	m_opl3->add_route(3, "rspeaker", 1.0);
+
     // The SIDs are very noisy
+    MOS6581(config, m_sid0, MUSIC_CLOCK/14);
     m_sid0->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
     m_sid0->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+    MOS6581(config, m_sid1, MUSIC_CLOCK/14);
     m_sid1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
     m_sid1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
-    //set interrupt handler for the RTC
-    m_rtc->int_handler().set(FUNC(f256_state::rtc_interrupt_handler));
+    SPEAKER(config, "lspeaker").front_left();
+    SPEAKER(config, "rspeaker").front_right();
 
     // Add an SD card device
     SPI_SDCARD(config, m_sdcard, 0);
@@ -134,9 +139,10 @@ void f256_state::f256k(machine_config &config)
         m_in_latch |= state;
     });
 
-    m_mouse->set_pc_kbdc(m_ps2_keyboard);
+    
     NS16550(config, m_uart, MASTER_CLOCK);
 
+    // The IEC interface is not yet implemented
     // cbm_iec_slot_device::add(config, m_iec, "c1581");
 	// m_iec->srq_callback().set(FUNC(f256_state::iec_srq_w));
 	// m_iec->data_callback().set(FUNC(f256_state::iec_data_w));
