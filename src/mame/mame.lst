@@ -40330,6 +40330,8 @@ twinktmb
 atgame40
 dcat16
 mahg156
+matet
+mateta
 mdhh100
 msi_sf2
 mygalag
@@ -40341,14 +40343,9 @@ mysinv
 
 @source:sega/megadriv_rad.cpp
 banmrid
-dgunl3227
-dgunl3227a
-matet
-mateta
 mdtvp1j
 mdtvp2j
 mdtvp3j
-ra145
 rad_gen1
 rad_gen2
 rad_md1
@@ -40361,6 +40358,11 @@ rad_sf2uk
 rad_sonic
 rad_sonicuk
 rad_ssoc
+
+@source:sega/megadriv_unksoc.cpp
+dgunl3227
+dgunl3227a
+ra145
 
 @source:sega/megadriv_sunmix.cpp
 sbubsm
