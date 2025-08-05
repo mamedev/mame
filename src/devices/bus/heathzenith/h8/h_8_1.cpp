@@ -10,8 +10,6 @@
 
 #include "h_8_1.h"
 
-#include "machine/ram.h"
-
 namespace {
 
 class h_8_1_device : public device_t, public device_h8bus_card_interface

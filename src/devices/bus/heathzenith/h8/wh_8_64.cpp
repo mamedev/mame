@@ -10,8 +10,6 @@
 
 #include "wh_8_64.h"
 
-#include "machine/ram.h"
-
 #include <vector>
 #include <algorithm>
 
