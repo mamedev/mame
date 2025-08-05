@@ -2,12 +2,12 @@
 // copyright-holders:David Haywood
 
 /*
-	Are these (dgunl3227, ra145) actually emulation based? there is a block of 0x40000 bytes at the start of the ROM that doesn't
-	appear to be used, very similar in both units.  Banking also seems entirely illogical unless something else is managing it.
-	The menu code in both seems to have the same origin, containing a bunch of unused pirate versions of MD games.
-	The version of SF2 in the 'ra145' unit is the same as the one in the MSI unit, and expects region to report US even
-	when some of the units run at PAL speed?
-	It is also confirmed from real hardware videos that these units do not have the usual sprite limits (so masking effect on Sonic title screen fails)
+    Are these (dgunl3227, ra145) actually emulation based? there is a block of 0x40000 bytes at the start of the ROM that doesn't
+    appear to be used, very similar in both units.  Banking also seems entirely illogical unless something else is managing it.
+    The menu code in both seems to have the same origin, containing a bunch of unused pirate versions of MD games.
+    The version of SF2 in the 'ra145' unit is the same as the one in the MSI unit, and expects region to report US even
+    when some of the units run at PAL speed?
+    It is also confirmed from real hardware videos that these units do not have the usual sprite limits (so masking effect on Sonic title screen fails)
 */
 
 #include "emu.h"

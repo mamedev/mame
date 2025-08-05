@@ -4,10 +4,10 @@
 /*
     Firecore / RedKid 'Mega Drive' and 'Genesis' bootleg/clone based systems.
 
-	Firecore offers some extended video modes over a regular Mega Drive
-	The YM/FM implementation in the chip has a number of flaws, MAME's older
-	YM/FM core was closer, but still 'too good' in many situations.  Some
-	software written for Firecore relies on these flaws to sound correct.
+    Firecore offers some extended video modes over a regular Mega Drive
+    The YM/FM implementation in the chip has a number of flaws, MAME's older
+    YM/FM core was closer, but still 'too good' in many situations.  Some
+    software written for Firecore relies on these flaws to sound correct.
 
 */
 
