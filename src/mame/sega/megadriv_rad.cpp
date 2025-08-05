@@ -22,7 +22,6 @@ public:
 	megadriv_radica_state_base(const machine_config &mconfig, device_type type, const char *tag) :
 		md_ctrl_state(mconfig, type, tag),
 		m_bank(0),
-		m_externalbank(0),
 		m_romsize(0x400000),
 		m_rom(*this, "maincpu")
 	{ }
@@ -36,7 +35,6 @@ protected:
 	void radica_base_map(address_map &map) ATTR_COLD;
 
 	int m_bank;
-	int m_externalbank;
 	int m_romsize;
 
 	required_region_ptr<uint16_t> m_rom;
