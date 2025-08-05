@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-/***************************************************************************
+/*******************************************************************************
 
 Asterix
 Konami GX068 PCB
@@ -12,7 +12,11 @@ Konami custom: 054358, 054156, 054157, 053251, 053244, 053245, 053260
 TODO:
 - verify clocks and video timing
 
-***************************************************************************/
+BTANB:
+- although not 100% identical to MAME, there are 1px line gaps at several frames
+  during title screen scaling animation (both horizontal and vertical)
+
+*******************************************************************************/
 
 #include "emu.h"
 

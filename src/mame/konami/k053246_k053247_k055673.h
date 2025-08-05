@@ -223,10 +223,11 @@ public:
 			oy -= m_dy;
 		}
 
+		// the coordinates given are for the *center* of the sprite
 		ox -= (zoomx * width) >> 13;
 		oy -= (zoomy * height) >> 13;
 
-		if (gx_objzbuf && gx_shdzbuf) /* GX  */
+		if (gx_objzbuf && gx_shdzbuf) // GX
 		{
 			k053247_draw_yxloop_gx(bitmap, cliprect,
 				code,
@@ -242,7 +243,7 @@ public:
 				gx_objzbuf, gx_shdzbuf,
 				0, nullptr);
 		}
-		else /* non-GX */
+		else // non-GX
 		{
 			u8* whichtable = drawmode_table;
 			if (color == -1)
@@ -397,7 +398,7 @@ public:
 								color,
 								fx,fy,
 								sx,sy,
-								(zw << 16) >> 4,(zh << 16) >> 4,
+								zw << 12,zh << 12,
 								screen().priority(),primask,
 								whichtable);
 					}
@@ -421,7 +422,7 @@ public:
 									color,
 									fx,!fy,
 									sx,sy,
-									(zw << 16) >> 4,(zh << 16) >> 4,
+									zw << 12,zh << 12,
 									screen().priority(),primask,
 									whichtable);
 						}
