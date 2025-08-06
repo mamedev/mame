@@ -1179,6 +1179,8 @@ public:
 	void init_op5cards();
 	void init_olym65();
 	void init_glfev();
+	void init_ped42_90();
+	void init_ped42_95();
 
 	uint8_t pottnpkr_mux_port_r();
 	void lamps_a_w(uint8_t data);
@@ -13355,6 +13357,41 @@ ROM_START( gp_jpn22 )
 	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+ROM_START( gp_ped42_90 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gp_ped42.a",    0x6000, 0x1000, CRC(e583e157) SHA1(331f68ac4c5458722848ad8e2e28caf759c2106a) )
+	ROM_LOAD( "gp_ped42.b90",  0x7000, 0x1000, CRC(c00e909c) SHA1(38265e4ef9b77c3426ac1714db0f5e46bd34730c) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "u38_5a.bin", 0x4000, 0x2000, CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char ROM
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "u43_2a.bin", 0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "u40_4a.bin", 0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1",   0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+ROM_START( gp_ped42_95 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gp_ped42.a",    0x6000, 0x1000, CRC(e583e157) SHA1(331f68ac4c5458722848ad8e2e28caf759c2106a) )
+	ROM_LOAD( "gp_ped42.b95",  0x7000, 0x1000, CRC(2c409398) SHA1(ce53abe90638095c6e7a0ddcc74e19f3e611d6ff) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "u38_5a.bin", 0x4000, 0x2000, CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char ROM
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "u43_2a.bin", 0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "u40_4a.bin", 0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1",   0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
 
 /*********************************************
 *                Driver Init                 *
@@ -13869,6 +13906,26 @@ void goldnpkr_state::init_glfev()
 	ROM[0xf7d7] = 0xea;
 }
 
+void goldnpkr_state::init_ped42_90()
+{
+// breaking the protection halt
+
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	ROM[0x7ef5] = 0x00;
+	ROM[0x7ef6] = 0xf0;
+}
+
+void goldnpkr_state::init_ped42_95()
+{
+// breaking the protection halt
+
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	ROM[0x7ef5] = 0x00;
+	ROM[0x7ef6] = 0xf0;
+}
+
 
 } // anonymous namespace
 
@@ -13886,7 +13943,6 @@ GAMEL( 1983, goldnpke,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 1983, goldnpkf,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Intercoast (bootleg)",     "Golden Poker Double Up (bootleg, set 4)",    0,                layout_goldnpkr )
 GAMEL( 1983, goldnpkg,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg, set 5)",    0,                layout_goldnpkr )
 GAMEL( 1983, goldnpkh,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (tearoom*sara hack)", 0,                layout_goldnpkr )
-GAMEL( 198?, gp_jpn22,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Unknown Golden Poker (Japan Ver. 2.2)",      0 )  // no lamps
 
 GAMEL( 198?, videtron,  0,        goldnpkr, videtron, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 1)",    0,                layout_goldnpkr )
 GAMEL( 198?, videtron2, videtron, goldnpkr, videtron, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 2)",    0,                layout_goldnpkr )
@@ -14059,6 +14115,10 @@ GAME(  198?, wing90pkr, goldnpkr, wing_w90, wing_w90, goldnpkr_state, empty_init
 GAME(  198?, unkicpf40, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F40 poker (137 Fever, 10 bet)",       0 )
 GAME(  198?, unkicpf80, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F80 poker (137 Fever, 50 bet)",       0 )
 GAME(  198?, unkicpetg, 0,        unkicpf40, unkicpetg, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP EX-Turbo-GT poker",                   0 )
+
+GAME(  198?, gp_jpn22,  goldnpkr, goldnpkr,  goldnpkr,  goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Unknown Golden Poker (Japan Ver. 2.2)",   0 )  // no lamps
+GAMEL( 198?, gp_ped42_90, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42_90, ROT0, "<unknown>",                "Unknown Golden Poker (PED 90%)",          0,         layout_goldnpkr )
+GAMEL( 198?, gp_ped42_95, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42_95, ROT0, "<unknown>",                "Unknown Golden Poker (PED 95%)",          MACHINE_NOT_WORKING, layout_goldnpkr )
 
 
 /*************************************** SETS W/IRQ0 ***************************************/
