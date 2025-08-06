@@ -101,7 +101,7 @@ TODO:
 - Protection in magibomb sets with simpler encryption (writes to $a0101x, $a11100, etc.). Some sets appear to work fine regardless, others freeze.
 - Find source of level 2 interrupt (sprite DMA end?).
 - magibomb_br44, westvent: need a redump of one of the program ROMs.
-- hacher, keno21, winbingo_gm051: need a redump of the sprite ROMs.
+- hacher, winbingo_gm051: need a redump of the sprite ROMs.
 - gostopac: needs verifying of inputs, outputs and layout. Sound doesn't seem 100% correct (Oki banking problem?)
 - monkeyl and clones: need verifying of inputs, outputs and layout.
 - speedmst and clones: need verifying of inputs, outputs and layout.
@@ -3290,7 +3290,7 @@ ROM_START( keno21 )
 
 	ROM_REGION( 0x1000000, "sprites", 0 )
 	ROM_LOAD( "rom3.u26", 0x000000, 0x200000, CRC(bb4e024c) SHA1(036a237ab994041e21b76eda7363656b29fd1299) ) // MX29F1610MC
-	ROM_LOAD( "rom4.u24", 0x200000, 0x200000, BAD_DUMP CRC(924537f8) SHA1(06966601bf25fed2d9125b6acef65fd4eaab9f26) ) // MX29F1610MC, seems corrupt
+	ROM_LOAD( "rom4.u24", 0x200000, 0x200000, CRC(0c4ed024) SHA1(273490805accd33f7b4960ae8b49067a168864dd) ) // MX29F1610MC
 	ROM_RELOAD(           0x400000, 0x200000 )
 	ROM_RELOAD(           0x600000, 0x200000 )
 	ROM_RELOAD(           0x800000, 0x200000 )
@@ -3355,7 +3355,7 @@ ROM_START( monkeyl )
 
 	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_m.l._aa.21.a.u26", 0x00000, 0x20000, CRC(2286237f) SHA1(cbf6589fe3eedd9482f8ba01c4510a5699085e69) ) // F29C51001T
-	ROM_LOAD16_BYTE( "1_m.l._aa.21.a.u25", 0x00001, 0x20000, CRC(0612f893) SHA1(6300d9defc75b1b09fad31f719c841c728fe3ff6) ) // F29C51001T
+	ROM_LOAD16_BYTE( "2_m.l._aa.21.a.u25", 0x00001, 0x20000, CRC(0612f893) SHA1(6300d9defc75b1b09fad31f719c841c728fe3ff6) ) // F29C51001T
 
 	ROM_REGION( 0x1000000, "sprites", 0 )
 	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) ) // the "U26" marking is present twice (should have been U31?)
@@ -3382,7 +3382,7 @@ ROM_START( monkeyl_aa13b ) // MIN BET 1-XXX, % = LEVELS 1-8
 
 	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_m.l._aa.13.b.u26", 0x00000, 0x20000, CRC(0ff56936) SHA1(70f9cf3b6b71514b2401b7a516ae85ad86b5321f) ) // F29C51001T
-	ROM_LOAD16_BYTE( "1_m.l._aa.13.b.u25", 0x00001, 0x20000, CRC(d261b6ed) SHA1(347feb51b67cd0e0faeff98fa023b3f4a8cb9c32) ) // F29C51001T
+	ROM_LOAD16_BYTE( "2_m.l._aa.13.b.u25", 0x00001, 0x20000, CRC(d261b6ed) SHA1(347feb51b67cd0e0faeff98fa023b3f4a8cb9c32) ) // F29C51001T
 
 	ROM_REGION( 0x1000000, "sprites", 0 )
 	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) ) // the "U26" marking is present twice (should have been U31?)
@@ -3436,7 +3436,7 @@ ROM_START( monkeyl_aa21c )
 
 	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
 	ROM_LOAD16_BYTE( "1_m.l._aa.21.c.u26", 0x00000, 0x20000, CRC(482303fd) SHA1(494df379dd4436546e2ce03194ac2f214a91bd92) ) // F29C51001T
-	ROM_LOAD16_BYTE( "1_m.l._aa.21.c.u25", 0x00001, 0x20000, CRC(ccb3392e) SHA1(2ea301ae857f4360012f3adfc96b66319503a033) ) // F29C51001T
+	ROM_LOAD16_BYTE( "2_m.l._aa.21.c.u25", 0x00001, 0x20000, CRC(ccb3392e) SHA1(2ea301ae857f4360012f3adfc96b66319503a033) ) // F29C51001T
 
 	ROM_REGION( 0x1000000, "sprites", 0 )
 	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) ) // the "U26" marking is present twice (should have been U31?)
@@ -3536,6 +3536,33 @@ ROM_START( monkeyl_a11 )
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "monkeyl_a12_cpucode.key", 0x00, 0x02, CRC(0a1ca7a5) SHA1(ee39ae96a7cec3da2b8f66e5b605e13eed9c0f32) )
+ROM_END
+
+ROM_START( monkeyl_aa20a )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "1_m.l._aa.20.a.u26", 0x00000, 0x20000, CRC(abba523b) SHA1(75d9a2dbd74beab246d87898a2b8d94e3ba22244) )
+	ROM_LOAD16_BYTE( "2_m.l._aa.20.a.u25", 0x00001, 0x20000, CRC(08908785) SHA1(221323ad35617ef9ef50180f2c3762a8fd62b622) )
+
+	ROM_REGION( 0x1000000, "sprites", 0 )
+	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) ) // the "U26" marking is present twice (should have been U31?)
+	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(9d26fa05) SHA1(571f5515411e504bf7661b8b5d358dc6c55e6fbe) )
+	ROM_RELOAD(                  0x400000, 0x200000 )
+	ROM_RELOAD(                  0x600000, 0x200000 )
+	ROM_RELOAD(                  0x800000, 0x200000 )
+	ROM_RELOAD(                  0xa00000, 0x200000 )
+	ROM_RELOAD(                  0xc00000, 0x200000 )
+	ROM_RELOAD(                  0xe00000, 0x200000 )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_ml_e1.0.u33", 0x00000, 0x80000, CRC(62122100) SHA1(519df7825ab62f0648192e6b1760dd9cc5ec7f9f) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(8f406753) SHA1(3a7893452e6bc6d4f78e8d5be7fb3e6b3cdc9bbe) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "monkeyl_aa21c_cpucode.key", 0x00, 0x02, CRC(0a1ca7a5) SHA1(ee39ae96a7cec3da2b8f66e5b605e13eed9c0f32) )
 ROM_END
 
 
@@ -4286,6 +4313,7 @@ GAME(  2004,  monkeyl_aa13b,   monkeyl,  monkeyl,         magibomb_aa72d, zoo_st
 GAME(  2005,  monkeyl_aa21b,   monkeyl,  monkeyl,         magibomb_aa72d, zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.21.B)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 25/05/2005 11:18
 GAME(  2007,  monkeyl_aa21c,   monkeyl,  monkeyl,         magibomb_aa72d, zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.21.C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 05/03/2007 10:40
 GAME(  2013,  monkeyl_en20b,   monkeyl,  monkeyl_en20b,   magibomb_aa72d, zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. EN.20.B)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 24/03/2013 17:42
+GAME(  2004,  monkeyl_aa20a,   monkeyl,  monkeyl,         magibomb_aa72d, zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.20.A)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 1/06/2004 10:51
 GAMEL( 2004,  speedmst,        0,        speedmst,        dinodino,       zoo_state,       init_px005,     ROT0, "D2 Enterprises",               "Speed Master (D2.01.C, Apr 29 2004)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // Apr 29 2004 16:29:35
 GAMEL( 2003,  speedmst_d14,    speedmst, speedmst,        dinodino,       zoo_state,       init_px005,     ROT0, "D2 Enterprises",               "Speed Master (D1.4, May 23 2003)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // May 23 2003 16:38:02
 GAMEL( 2003,  speedmst_d201ca, speedmst, speedmst,        dinodino,       zoo_state,       init_px005,     ROT0, "D2 Enterprises",               "Speed Master (D2.01.C, Apr 28 2004)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // Apr 28 2004 17:21:26
