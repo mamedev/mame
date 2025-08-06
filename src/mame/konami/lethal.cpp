@@ -419,7 +419,6 @@ uint32_t lethal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		m_k056832->set_layer_offs(1, -2 - 167, 0);
 		m_k056832->set_layer_offs(2, 0 - 167, 0);
 		m_k056832->set_layer_offs(3, 2 - 167, 0);
-		m_k053244->set_offsets(0, 0);
 	}
 	else
 	{
@@ -427,8 +426,12 @@ uint32_t lethal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		m_k056832->set_layer_offs(1, -2, 0);
 		m_k056832->set_layer_offs(2, 0, 0);
 		m_k056832->set_layer_offs(3, 2, 0);
-		m_k053244->set_offsets(-1, 0);
 	}
+
+	if (m_k056832->read_register(0x0) & 0x20)
+		m_k053244->set_offsets(0, 1);
+	else
+		m_k053244->set_offsets(0, -1);
 
 	bitmap.fill(m_back_colorbase, cliprect);
 	screen.priority().fill(0, cliprect);
