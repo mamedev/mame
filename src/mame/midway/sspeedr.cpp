@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Stefan Jokisch
+// copyright-holders: Stefan Jokisch
+
 /***************************************************************************
 
 Taito / Midway Super Speed Race driver
@@ -10,15 +11,351 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "sspeedr.h"
+
 #include "nl_sspeedr.h"
-#include "speaker.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/netlist.h"
 #include "machine/watchdog.h"
+
+#include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 #include "sspeedr.lh"
+
+
+namespace {
+
+class sspeedr_state : public driver_device
+{
+public:
+	sspeedr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_pedal_bit(*this, "sound_nl:pedal_bit_%u", 0U)
+		, m_hi_shift(*this, "sound_nl:hi_shift")
+		, m_lo_shift(*this, "sound_nl:lo_shift")
+		, m_boom(*this, "sound_nl:boom")
+		, m_engine_sound_off(*this, "sound_nl:engine_sound_off")
+		, m_noise_cr(*this, "sound_nl:noise_cr%u", 1U)
+		, m_silence(*this, "sound_nl:silence")
+		, m_track(*this, "track")
+		, m_digits(*this, "digit%u", 0U)
+		, m_lampgo(*this, "lampGO")
+		, m_lampep(*this, "lampEP")
+	{ }
+
+	void sspeedr(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device_array<netlist_mame_logic_input_device, 4> m_pedal_bit;
+	required_device<netlist_mame_logic_input_device> m_hi_shift;
+	required_device<netlist_mame_logic_input_device> m_lo_shift;
+	required_device<netlist_mame_logic_input_device> m_boom;
+	required_device<netlist_mame_logic_input_device> m_engine_sound_off;
+	required_device_array<netlist_mame_logic_input_device, 2> m_noise_cr;
+	required_device<netlist_mame_logic_input_device> m_silence;
+	required_region_ptr<uint8_t> m_track;
+	output_finder<26> m_digits;
+	output_finder<> m_lampgo;
+	output_finder<> m_lampep;
+
+
+	uint8_t m_toggle = 0;
+	uint16_t m_driver_horz = 0;
+	uint8_t m_driver_vert = 0;
+	uint8_t m_driver_pic = 0;
+	uint16_t m_drones_horz = 0;
+	uint8_t m_drones_vert[3]{};
+	uint8_t m_drones_mask = 0;
+	uint16_t m_track_horz = 0;
+	uint8_t m_track_vert[2]{};
+	uint8_t m_track_ice = 0;
+
+	void int_ack_w(uint8_t data);
+	void lamp_w(uint8_t data);
+	void time_w(offs_t offset, uint8_t data);
+	void score_w(offs_t offset, uint8_t data);
+	void sound1_w(uint8_t data);
+	void sound2_w(uint8_t data);
+	void driver_horz_w(uint8_t data);
+	void driver_horz_2_w(uint8_t data);
+	void driver_vert_w(uint8_t data);
+	void driver_pic_w(uint8_t data);
+	void drones_horz_w(uint8_t data);
+	void drones_horz_2_w(uint8_t data);
+	void drones_mask_w(uint8_t data);
+	void drones_vert_w(offs_t offset, uint8_t data);
+	void track_horz_w(uint8_t data);
+	void track_horz_2_w(uint8_t data);
+	void track_vert_w(offs_t offset, uint8_t data);
+	void track_ice_w(uint8_t data);
+	void palette(palette_device &palette) const ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_vblank(int state);
+	void draw_track(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_drones(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_driver(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
+};
+
+
+void sspeedr_state::driver_horz_w(uint8_t data)
+{
+	m_driver_horz = (m_driver_horz & 0x100) | data;
+}
+
+
+void sspeedr_state::driver_horz_2_w(uint8_t data)
+{
+	m_driver_horz = (m_driver_horz & 0xff) | ((data & 1) << 8);
+}
+
+
+void sspeedr_state::driver_vert_w(uint8_t data)
+{
+	m_driver_vert = data;
+}
+
+
+void sspeedr_state::driver_pic_w(uint8_t data)
+{
+	m_driver_pic = data & 0x1f;
+}
+
+
+void sspeedr_state::drones_horz_w(uint8_t data)
+{
+	m_drones_horz = (m_drones_horz & 0x100) | data;
+}
+
+
+void sspeedr_state::drones_horz_2_w(uint8_t data)
+{
+	m_drones_horz = (m_drones_horz & 0xff) | ((data & 1) << 8);
+}
+
+
+void sspeedr_state::drones_mask_w(uint8_t data)
+{
+	m_drones_mask = data & 0x3f;
+}
+
+
+void sspeedr_state::drones_vert_w(offs_t offset, uint8_t data)
+{
+	m_drones_vert[offset] = data;
+}
+
+
+void sspeedr_state::track_horz_w(uint8_t data)
+{
+	m_track_horz = (m_track_horz & 0x100) | data;
+}
+
+
+void sspeedr_state::track_horz_2_w(uint8_t data)
+{
+	m_track_horz = (m_track_horz & 0xff) | ((data & 1) << 8);
+}
+
+
+void sspeedr_state::track_vert_w(offs_t offset, uint8_t data)
+{
+	m_track_vert[offset] = data & 0x7f;
+}
+
+
+void sspeedr_state::track_ice_w(uint8_t data)
+{
+	m_track_ice = data & 0x07;
+}
+
+
+void sspeedr_state::draw_track(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+	{
+		unsigned counter_x = x + m_track_horz + 0x50;
+
+		int flag = 0;
+
+		if (m_track_ice & 2)
+		{
+			flag = 1;
+		}
+		else if (m_track_ice & 4)
+		{
+			if (m_track_ice & 1)
+			{
+				flag = (counter_x <= 0x1ff);
+			}
+			else
+			{
+				flag = (counter_x >= 0x200);
+			}
+		}
+
+		if (counter_x >= 0x200)
+		{
+			counter_x -= 0x1c8;
+		}
+
+		int y = cliprect.min_y;
+
+		// upper landscape
+		for (; y < m_track_vert[0] && y <= cliprect.max_y; y++)
+		{
+			unsigned const counter_y = y - m_track_vert[0];
+
+			int const offset =
+				((counter_y & 0x1f) << 3) |
+				((counter_x & 0x1c) >> 2) |
+				((counter_x & 0xe0) << 3);
+
+			if (counter_x & 2)
+			{
+				bitmap.pix(y, x) = m_track[offset] >> 4;
+			}
+			else
+			{
+				bitmap.pix(y, x) = m_track[offset] & 0xf;
+			}
+		}
+
+		// street
+		for (; y < 128 + m_track_vert[1] && y <= cliprect.max_y; y++)
+		{
+			bitmap.pix(y, x) = flag ? 15 : 0;
+		}
+
+		// lower landscape
+		for (; y <= cliprect.max_y; y++)
+		{
+			unsigned const counter_y = y - m_track_vert[1];
+
+			int const offset =
+				((counter_y & 0x1f) << 3) |
+				((counter_x & 0x1c) >> 2) |
+				((counter_x & 0xe0) << 3);
+
+			if (counter_x & 2)
+			{
+				bitmap.pix(y, x) = m_track[offset] >> 4;
+			}
+			else
+			{
+				bitmap.pix(y, x) = m_track[offset] & 0xf;
+			}
+		}
+	}
+}
+
+
+void sspeedr_state::draw_drones(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	static const uint8_t code[6] =
+	{
+		0xf, 0x4, 0x3, 0x9, 0x7, 0xc
+	};
+
+	for (int i = 0; i < 6; i++)
+	{
+		if ((m_drones_mask >> i) & 1)
+		{
+			continue;
+		}
+
+		int x = (code[i] << 5) - m_drones_horz - 0x50;
+
+		if (x <= -32)
+		{
+			x += 0x1c8;
+		}
+
+		int const y = 0xf0 - m_drones_vert[i >> 1];
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				code[i] ^ m_toggle,
+				0,
+				0, 0,
+				x,
+				y, 0);
+	}
+}
+
+
+void sspeedr_state::draw_driver(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (!(m_driver_pic & 0x10))
+	{
+		return;
+	}
+
+	int x = 0x1e0 - m_driver_horz - 0x50;
+
+	if (x <= -32)
+	{
+		x += 0x1c8;
+	}
+
+	int const y = 0xf0 - m_driver_vert;
+
+	m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
+			m_driver_pic,
+			0,
+			0, 0,
+			x,
+			y, 0);
+}
+
+
+void sspeedr_state::video_start()
+{
+	m_toggle = 0;
+
+	save_item(NAME(m_toggle));
+	save_item(NAME(m_driver_horz));
+	save_item(NAME(m_driver_vert));
+	save_item(NAME(m_driver_pic));
+	save_item(NAME(m_drones_horz));
+	save_item(NAME(m_drones_vert));
+	save_item(NAME(m_drones_mask));
+	save_item(NAME(m_track_horz));
+	save_item(NAME(m_track_vert));
+	save_item(NAME(m_track_ice));
+}
+
+
+uint32_t sspeedr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	draw_track(bitmap, cliprect);
+	draw_drones(bitmap, cliprect);
+	draw_driver(bitmap, cliprect);
+	return 0;
+}
+
+
+void sspeedr_state::screen_vblank(int state)
+{
+	// rising edge
+	if (state)
+	{
+		m_toggle ^= 1;
+	}
+}
 
 
 void sspeedr_state::machine_start()
@@ -58,7 +395,7 @@ void sspeedr_state::lamp_w(uint8_t data)
 {
 	m_lampgo = BIT(data, 0);
 	m_lampep = BIT(data, 1);
-	machine().bookkeeping().coin_counter_w(0, data & 8);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 3));
 }
 
 
@@ -83,10 +420,8 @@ void sspeedr_state::sound1_w(uint8_t data)
 
 	// Bits 0-3 (PEDAL_BIT0 to PEDAL_BIT3): accelerator pedal position
 	// Sets the frequency and volume of the engine sound oscillators.
-	m_pedal_bit0->write_line(BIT(data, 0));
-	m_pedal_bit1->write_line(BIT(data, 1));
-	m_pedal_bit2->write_line(BIT(data, 2));
-	m_pedal_bit3->write_line(BIT(data, 3));
+	for (int i = 0; i < 4; i++)
+		m_pedal_bit[i]->write_line(BIT(data, i));
 
 	// Bit 4 (HI SHIFT): set when gearshift is in high gear
 	// Modifies the engine sound to be lower pitched at a given speed and
@@ -116,13 +451,13 @@ void sspeedr_state::sound2_w(uint8_t data)
 
 	// Bit 2 (NOISE CR 1): tire squealing sound
 	// Set to activate "tire squeal" noise from noise generator.
-	m_noise_cr_1->write_line(BIT(data, 2));
+	m_noise_cr[0]->write_line(BIT(data, 2));
 
 	// Bit 3 (NOISE CR 2): secondary crash noise
 	// Set to activate high-pitched screeching hiss that accompanies BOOM
 	// when the the car crashes. In Super Speed Race, the BOOM and NOISE
 	// CR 2 effects play simultaneously.
-	m_noise_cr_2->write_line(BIT(data, 3));
+	m_noise_cr[1]->write_line(BIT(data, 3));
 
 	// Bit 4 (SILENCE): mute all sound when game is not running.
 	m_silence->write_line(BIT(data, 4));
@@ -254,7 +589,7 @@ void sspeedr_state::sspeedr(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(14.318181_MHz_XTAL / 2, 456, 0, 376, 264, 0, 248);
 	screen.set_screen_update(FUNC(sspeedr_state::screen_update));
@@ -264,24 +599,24 @@ void sspeedr_state::sspeedr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sspeedr);
 	PALETTE(config, m_palette, FUNC(sspeedr_state::palette), 16);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(sspeedr))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit0", "I_PEDAL_BIT0", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit1", "I_PEDAL_BIT1", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit2", "I_PEDAL_BIT2", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit3", "I_PEDAL_BIT3", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:hi_shift", "I_HI_SHIFT", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:lo_shift", "I_LO_SHIFT", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:boom", "I_BOOM", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:engine_sound_off", "I_ENGINE_SOUND_OFF", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_1", "I_NOISE_CR_1", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_2", "I_NOISE_CR_2", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:silence", "I_SILENCE", 0);
+	NETLIST_LOGIC_INPUT(config, m_pedal_bit[0], "I_PEDAL_BIT0", 0);
+	NETLIST_LOGIC_INPUT(config, m_pedal_bit[1], "I_PEDAL_BIT1", 0);
+	NETLIST_LOGIC_INPUT(config, m_pedal_bit[2], "I_PEDAL_BIT2", 0);
+	NETLIST_LOGIC_INPUT(config, m_pedal_bit[3], "I_PEDAL_BIT3", 0);
+	NETLIST_LOGIC_INPUT(config, m_hi_shift, "I_HI_SHIFT", 0);
+	NETLIST_LOGIC_INPUT(config, m_lo_shift, "I_LO_SHIFT", 0);
+	NETLIST_LOGIC_INPUT(config, m_boom, "I_BOOM", 0);
+	NETLIST_LOGIC_INPUT(config, m_engine_sound_off, "I_ENGINE_SOUND_OFF", 0);
+	NETLIST_LOGIC_INPUT(config, m_noise_cr[0], "I_NOISE_CR_1", 0);
+	NETLIST_LOGIC_INPUT(config, m_noise_cr[1], "I_NOISE_CR_2", 0);
+	NETLIST_LOGIC_INPUT(config, m_silence, "I_SILENCE", 0);
 
 	// Audio output is from an LM3900 op-amp whose output has a
 	// peak-to-peak range of about 12 volts, centered on 6 volts.
@@ -306,6 +641,8 @@ ROM_START( sspeedr )
 	ROM_REGION( 0x0800, "track", 0 )
 	ROM_LOAD( "ssrm762c.l3", 0x0000, 0x0800, CRC(ebaad3ee) SHA1(54ac994b505d20c75cf07a4f68da12360ee00153) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, sspeedr_state, empty_init, ROT270, "Taito (Midway license)", "Super Speed Race", MACHINE_SUPPORTS_SAVE, layout_sspeedr )

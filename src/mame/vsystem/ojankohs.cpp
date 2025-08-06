@@ -1,5 +1,6 @@
 // license: BSD-3-Clause
 // copyright-holders: Takahiro Nogi, Uki, Dirk Best
+
 /***************************************************************************
 
     Video System Mahjong hardware
@@ -27,13 +28,470 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ojankohs.h"
+
+#include "vsystem_gga.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "vsystem_gga.h"
+#include "sound/msm5205.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class ojankohs_state : public driver_device
+{
+public:
+	ojankohs_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ojankohs_state(mconfig, type, tag, 0x1000, 0x800)
+	{ }
+
+	void ojankohs(machine_config &config) ATTR_COLD;
+
+protected:
+	ojankohs_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t vramsize, uint32_t pramsize) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram", vramsize, ENDIANNESS_LITTLE),
+		m_colorram(*this, "colorram", 0x1000, ENDIANNESS_LITTLE),
+		m_paletteram(*this, "paletteram", pramsize, ENDIANNESS_LITTLE),
+		m_mainbank(*this, "mainbank"),
+		m_maincpu(*this, "maincpu"),
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_coin(*this, "coin"),
+		m_inputs_p1(*this, "p1_%u", 0U),
+		m_inputs_p2(*this, "p2_%u", 0U),
+		m_inputs_p1_extra(*this, "p1_4"),
+		m_inputs_p2_extra(*this, "p2_4"),
+		m_dsw(*this, "dsw%u", 1U)
+	{ }
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	void common_state_saving() ATTR_COLD;
+
+	// memory pointers
+	memory_share_creator<uint8_t> m_videoram;
+	memory_share_creator<uint8_t> m_colorram;
+	memory_share_creator<uint8_t> m_paletteram;
+	required_memory_bank m_mainbank;
+
+	// video-related
+	tilemap_t *m_tilemap = nullptr;
+	bitmap_ind16 m_tmpbitmap;
+	uint8_t m_gfxreg = 0;
+	uint8_t m_flipscreen = 0;
+	uint8_t m_flipscreen_old = 0;
+	int16_t m_scrollx = 0;
+	int16_t m_scrolly = 0;
+	uint8_t m_screen_refresh = 0;
+
+	// misc
+	uint8_t m_port_select = 0;
+	uint8_t m_adpcm_reset = 0;
+	int m_adpcm_data = 0;
+	uint8_t m_vclk_left = 0;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<msm5205_device> m_msm;
+	optional_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	// I/O ports
+	required_ioport m_coin;
+	required_ioport_array<4> m_inputs_p1;
+	required_ioport_array<4> m_inputs_p2;
+	optional_ioport m_inputs_p1_extra;
+	optional_ioport m_inputs_p2_extra;
+	required_ioport_array<2> m_dsw;
+
+
+	void rombank_w(uint8_t data);
+	void msm5205_w(uint8_t data);
+	void port_select_w(uint8_t data);
+	uint8_t keymatrix_p1_r();
+	uint8_t keymatrix_p2_r();
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void flipscreen_w(uint8_t data);
+	void adpcm_reset_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void adpcm_int(int state);
+
+private:
+	void palette_w(offs_t offset, uint8_t data);
+	uint8_t dipsw1_r();
+	uint8_t dipsw2_r();
+	void gfxreg_w(uint8_t data);
+
+	void io_map(address_map &map) ATTR_COLD;
+	void map(address_map &map) ATTR_COLD;
+};
+
+class ojankoy_state : public ojankohs_state
+{
+public:
+	ojankoy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ojankohs_state(mconfig, type, tag, 0x2000, 0x800)
+	{ }
+
+	void ojankoy(machine_config &config) ATTR_COLD;
+
+protected:
+	ojankoy_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t vramsize, uint32_t pramsize) :
+		ojankohs_state(mconfig, type, tag, vramsize, pramsize)
+	{ }
+
+	virtual void video_start() override ATTR_COLD;
+
+	void map(address_map &map) ATTR_COLD;
+
+	void rombank_adpcm_reset_w(uint8_t data);
+
+private:
+	void coinctr_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void palette(palette_device &palette) const ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+};
+
+class ccasino_state : public ojankoy_state
+{
+public:
+	ccasino_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ojankoy_state(mconfig, type, tag, 0x2000, 0x800),
+		m_extra_dsw(*this, "dsw%u", 3U)
+	{ }
+
+	void ccasino(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override  ATTR_COLD { ojankohs_state::machine_start(); }
+
+private:
+	required_ioport_array<2> m_extra_dsw;
+
+	uint8_t dipsw3_r();
+	uint8_t dipsw4_r();
+	void coinctr_w(uint8_t data);
+	void palette_w(offs_t offset, uint8_t data);
+	void io_map(address_map &map) ATTR_COLD;
+};
+
+class ojankoc_state : public ojankohs_state
+{
+public:
+	ojankoc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ojankohs_state(mconfig, type, tag, 0x8000, 0x20)
+	{ }
+
+	void ojankoc(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	void ctrl_w(uint8_t data);
+	uint8_t keymatrix_p1_r();
+	uint8_t keymatrix_p2_r();
+	void palette_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void flipscreen(uint8_t data);
+	void io_map(address_map &map) ATTR_COLD;
+	void map(address_map &map) ATTR_COLD;
+};
+
+
+/******************************************************************************
+
+    Palette system
+
+******************************************************************************/
+
+void ojankoy_state::palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0 = BIT(color_prom[0], 2);
+		int bit1 = BIT(color_prom[0], 3);
+		int bit2 = BIT(color_prom[0], 4);
+		int bit3 = BIT(color_prom[0], 5);
+		int bit4 = BIT(color_prom[0], 6);
+		int const r = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
+
+		bit0 = BIT(color_prom[palette.entries()], 5);
+		bit1 = BIT(color_prom[palette.entries()], 6);
+		bit2 = BIT(color_prom[palette.entries()], 7);
+		bit3 = BIT(color_prom[0], 0);
+		bit4 = BIT(color_prom[0], 1);
+		int const g = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
+
+		bit0 = BIT(color_prom[palette.entries()], 0);
+		bit1 = BIT(color_prom[palette.entries()], 1);
+		bit2 = BIT(color_prom[palette.entries()], 2);
+		bit3 = BIT(color_prom[palette.entries()], 3);
+		bit4 = BIT(color_prom[palette.entries()], 4);
+		int const b = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+		color_prom++;
+	}
+}
+
+void ojankohs_state::palette_w(offs_t offset, uint8_t data)
+{
+	m_paletteram[offset] = data;
+
+	offset &= 0x7fe;
+
+	int const r = (m_paletteram[offset + 0] & 0x7c) >> 2;
+	int const g = ((m_paletteram[offset + 0] & 0x03) << 3) | ((m_paletteram[offset + 1] & 0xe0) >> 5);
+	int const b = (m_paletteram[offset + 1] & 0x1f) >> 0;
+
+	m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+}
+
+void ccasino_state::palette_w(offs_t offset, uint8_t data)
+{
+	offset = bitswap<11>(offset, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
+
+	m_paletteram[offset] = data;
+
+	offset &= 0x7fe;
+
+	int const r = (m_paletteram[offset + 0] & 0x7c) >> 2;
+	int const g = ((m_paletteram[offset + 0] & 0x03) << 3) | ((m_paletteram[offset + 1] & 0xe0) >> 5);
+	int const b = (m_paletteram[offset + 1] & 0x1f) >> 0;
+
+	m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+}
+
+void ojankoc_state::palette_w(offs_t offset, uint8_t data)
+{
+	if (m_paletteram[offset] != data)
+	{
+		m_paletteram[offset] = data;
+		m_screen_refresh = 1;
+
+		int const color = (m_paletteram[offset & 0x1e] << 8) | m_paletteram[offset | 0x01];
+
+		int const r = (color >> 10) & 0x1f;
+		int const g = (color >>  5) & 0x1f;
+		int const b = (color >>  0) & 0x1f;
+
+		m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	}
+}
+
+
+/******************************************************************************
+
+    Tilemap system
+
+******************************************************************************/
+
+void ojankohs_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
+}
+
+void ojankohs_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
+}
+
+void ojankohs_state::gfxreg_w(uint8_t data)
+{
+	if (m_gfxreg != data)
+	{
+		m_gfxreg = data;
+		m_tilemap->mark_all_dirty();
+	}
+}
+
+void ojankohs_state::flipscreen_w(uint8_t data)
+{
+	if (m_flipscreen != BIT(data, 0))
+	{
+		m_flipscreen = BIT(data, 0);
+
+		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+
+		if (m_flipscreen)
+		{
+			m_scrollx = -0xe0;
+			m_scrolly = -0x20;
+		}
+		else
+		{
+			m_scrollx = 0;
+			m_scrolly = 0;
+		}
+	}
+}
+
+TILE_GET_INFO_MEMBER(ojankohs_state::get_tile_info)
+{
+	int tile = m_videoram[tile_index] | ((m_colorram[tile_index] & 0x0f) << 8);
+	int color = (m_colorram[tile_index] & 0xe0) >> 5;
+
+	if (m_colorram[tile_index] & 0x10)
+	{
+		tile |= (m_gfxreg & 0x07) << 12;
+		color |= (m_gfxreg & 0xe0) >> 2;
+	}
+
+	tileinfo.set(0, tile, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(ojankoy_state::get_tile_info)
+{
+	int const tile = m_videoram[tile_index] | (m_videoram[tile_index + 0x1000] << 8);
+	int const color = m_colorram[tile_index] & 0x3f;
+	int const flipx = ((m_colorram[tile_index] & 0x40) >> 6) ? TILEMAP_FLIPX : 0;
+	int const flipy = ((m_colorram[tile_index] & 0x80) >> 7) ? TILEMAP_FLIPY : 0;
+
+	tileinfo.set(0, tile, color, (flipx | flipy));
+}
+
+
+/******************************************************************************
+
+    Pixel system
+
+******************************************************************************/
+
+void ojankoc_state::flipscreen(uint8_t data)
+{
+	m_flipscreen = BIT(data, 7);
+
+	if (m_flipscreen == m_flipscreen_old)
+		return;
+
+	for (int y = 0; y < 0x40; y++)
+	{
+		for (int x = 0; x < 0x100; x++)
+		{
+			uint8_t color1 = m_videoram[0x0000 + ((y * 256) + x)];
+			uint8_t color2 = m_videoram[0x3fff - ((y * 256) + x)];
+			videoram_w(0x0000 + ((y * 256) + x), color2);
+			videoram_w(0x3fff - ((y * 256) + x), color1);
+
+			color1 = m_videoram[0x4000 + ((y * 256) + x)];
+			color2 = m_videoram[0x7fff - ((y * 256) + x)];
+			videoram_w(0x4000 + ((y * 256) + x), color2);
+			videoram_w(0x7fff - ((y * 256) + x), color1);
+		}
+	}
+
+	m_flipscreen_old = m_flipscreen;
+}
+
+void ojankoc_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+
+	uint8_t color1 = m_videoram[offset & 0x3fff];
+	uint8_t color2 = m_videoram[offset | 0x4000];
+
+	uint8_t y = offset >> 6;
+	uint8_t x = (offset & 0x3f) << 2;
+	uint8_t xx = 0;
+
+	if (m_flipscreen)
+	{
+		x = 0xfc - x;
+		y = 0xff - y;
+		xx = 3;
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		uint8_t color = ((color1 & 0x01) >> 0) | ((color1 & 0x10) >> 3) | ((color2 & 0x01) << 2) | ((color2 & 0x10) >> 1);
+
+		uint8_t px = x + (i ^ xx);
+		uint8_t py = y;
+
+		m_tmpbitmap.pix(py, px) = color;
+
+		color1 >>= 1;
+		color2 >>= 1;
+	}
+}
+
+
+/******************************************************************************
+
+    Start the video hardware emulation
+
+******************************************************************************/
+
+void ojankohs_state::video_start()
+{
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ojankohs_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+}
+
+void ojankoy_state::video_start()
+{
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ojankoy_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+}
+
+void ojankoc_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_tmpbitmap);
+
+	save_item(NAME(m_tmpbitmap));
+}
+
+
+/******************************************************************************
+
+    Display refresh
+
+******************************************************************************/
+
+uint32_t ojankohs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_tilemap->set_scrollx(0, m_scrollx);
+	m_tilemap->set_scrolly(0, m_scrolly);
+
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+uint32_t ojankoc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (m_screen_refresh)
+	{
+		// redraw bitmap
+		for (int offs = 0; offs < 0x8000; offs++)
+		{
+			videoram_w(offs, m_videoram[offs]);
+		}
+		m_screen_refresh = 0;
+	}
+
+	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
 
 
 void ojankohs_state::rombank_w(uint8_t data)
@@ -978,6 +1436,8 @@ ROM_START( ojankocb ) // VS6-0501 PCB, has a big metal box, under which there is
 	ROM_LOAD( "9.1m", 0x48000, 0x8000, CRC(2bf88eda) SHA1(55de96d057a0f35d9e74455444751f217aa4741e) )
 	ROM_LOAD( "0.1n", 0x50000, 0x8000, CRC(5665016e) SHA1(0f7f0a8e55e93bcb3060c91d9704905a6e827250) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1986, ojankoc,  0,       ojankoc,  ojankoc,  ojankoc_state,  empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3, set 1)", MACHINE_SUPPORTS_SAVE )
