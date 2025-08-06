@@ -64,6 +64,7 @@ private:
 	required_device<sn76489_device> m_sn0, m_sn1;
 	required_device<ymf262_device> m_opl3;
 	required_device<mos6581_device> m_sid0, m_sid1;
+	required_ioport m_joy1, m_joy2;
 
 	required_device<tiny_vicky_video_device> m_video;
 	//required_device<cbm_iec_device> m_iec;

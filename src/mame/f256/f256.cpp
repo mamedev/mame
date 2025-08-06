@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "f256.h"
 
-#include "cpu/m6502/w65c02.h"
+#include "cpu/m6502/w65c02s.h"
 #include "tiny_vicky.h"
 
 /**
@@ -41,6 +41,8 @@ f256_state::f256_state(const machine_config &mconfig, device_type type, const ch
     , m_opl3(*this, "ymf262")
     , m_sid0(*this, "sid_0")
     , m_sid1(*this, "sid_1")
+    , m_joy1(*this, "JOY1")
+    , m_joy2(*this, "JOY2")
 
     , m_video(*this, "tiny_vicky")
     //, m_iec(*this, "iec_bus")
@@ -58,7 +60,7 @@ f256_state::f256_state(const machine_config &mconfig, device_type type, const ch
 
 void f256_state::f256k(machine_config &config)
 {
-    W65C02(config, m_maincpu, MASTER_CLOCK/4);
+    W65C02S(config, m_maincpu, MASTER_CLOCK/4);
     m_maincpu->set_addrmap(AS_PROGRAM, &f256_state::program_map);
 
     RAM(config, m_ram).set_default_size("512k").set_default_value(0x0);
@@ -82,7 +84,7 @@ void f256_state::f256k(machine_config &config)
     m_video->sof_irq_handler().set(FUNC(f256_state::sof_interrtupt));
     m_video->sol_irq_handler().set(FUNC(f256_state::sol_interrtupt));
 
-    MOS6522(config, m_via6522_0, MASTER_CLOCK / 4);  // Atari Joysticks
+    W65C22S(config, m_via6522_0, MASTER_CLOCK / 4);  // Atari Joysticks
 	m_via6522_0->readpa_handler().set(FUNC(f256_state::via0_system_porta_r));
 	m_via6522_0->readpb_handler().set(FUNC(f256_state::via0_system_portb_r));
 	m_via6522_0->writepa_handler().set(FUNC(f256_state::via0_system_porta_w));
@@ -1762,7 +1764,7 @@ TIMER_CALLBACK_MEMBER(f256_state::timer1)
 u8 f256_state::via0_system_porta_r()
 {
     //logerror("VIA #0 Port A Read ioport JOY2: %02X\n", data);
-    return ioport("JOY2")->read();
+    return m_joy2->read();
 }
 u8 f256_state::via0_system_portb_r()
 {
@@ -1845,7 +1847,7 @@ void f256_state::via1_system_porta_w(u8 data)
     m_via_keyboard_port_a = data;
     m_via_keyboard_port_b = 0xFF;
     // scan each keyboard row
-    u8 joy1 = ioport("JOY1")->read();
+    u8 joy1 = m_joy1->read();
     m_via_joy1 = joy1 | 0x80;
     for (int r = 0; r < 8; r++)
     {
