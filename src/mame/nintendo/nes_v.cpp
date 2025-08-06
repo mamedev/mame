@@ -11,11 +11,6 @@
 #include "emu.h"
 #include "nes.h"
 
-void nes_state::video_reset()
-{
-	m_ppu->set_vidaccess_callback(*this, FUNC(nes_state::nes_ppu_vidaccess));
-}
-
 void nes_state::video_start()
 {
 	m_last_frame_flip =  0;

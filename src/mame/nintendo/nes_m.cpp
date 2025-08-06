@@ -16,12 +16,6 @@
     FUNCTIONS
 ***************************************************************************/
 
-// to be probably removed (it does nothing since a long time)
-int nes_state::nes_ppu_vidaccess( int address, int data )
-{
-	return data;
-}
-
 //-------------------------------------------------
 //  machine_reset
 //-------------------------------------------------

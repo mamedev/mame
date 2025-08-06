@@ -59,15 +59,12 @@ public:
 		m_prg_bank(*this, "prg%u", 0U)
 	{ }
 
-	int nes_ppu_vidaccess(int address, int data);
-
 	uint8_t fc_in0_r();
 	uint8_t fc_in1_r();
 	void fc_in0_w(uint8_t data);
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	virtual void video_reset() override ATTR_COLD;
 	uint32_t screen_update_nes(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank_nes(int state);
 
