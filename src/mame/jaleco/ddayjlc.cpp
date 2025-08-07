@@ -593,15 +593,15 @@ void ddayjlc_state::dma_w(u8 data)
 void ddayjlc_state::ddayjlc(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/3);
+	Z80(config, m_maincpu, 12_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddayjlc_state::main_map);
 
-	Z80(config, m_audiocpu, 12000000/4);
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ddayjlc_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	I8257(config, m_dma, 12000000/3);
+	I8257(config, m_dma, 12_MHz_XTAL / 3);
 	m_dma->out_hrq_cb().set(FUNC(ddayjlc_state::hrq_w));
 	m_dma->in_memr_cb().set(FUNC(ddayjlc_state::dma_mem_r));
 	m_dma->out_memw_cb().set(FUNC(ddayjlc_state::dma_mem_w));
@@ -626,11 +626,11 @@ void ddayjlc_state::ddayjlc(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ay8910_device &ay1(AY8910(config, "ay1", 12000000/6));
+	ay8910_device &ay1(AY8910(config, "ay1", 12_MHz_XTAL / 8));
 	ay1.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	AY8910(config, "ay2", 12000000/6).add_route(ALL_OUTPUTS, "mono", 1.0);
+	AY8910(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
