@@ -7,7 +7,7 @@ D-DAY   (c)Jaleco 1984
 TODO:
 - unused upper sprite color bank;
 - improve sound comms, sometimes BGM becomes silent;
-- identify & dump MCU;
+- identify protection chip;
 
 --------------------------------------------------------------------------------
 Is it 1984 or 1987 game ?
@@ -256,7 +256,8 @@ uint32_t dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bit
 /*
     Protection device
 
-    24 pin IC with scratched surface, probably a mcu
+    24 pin IC with scratched surface, not an MCU.
+	Die has label "4828A", CD4828A or TC4828A is not known not exist.
 
     Pinout:
 
@@ -307,7 +308,7 @@ void dday_state::prot_w(offs_t offset, uint8_t data)
 
 void dday_state::char_bank_w(uint8_t data)
 {
-	m_char_bank = BIT(data,0);
+	m_char_bank = BIT(data, 0);
 	m_fg_tilemap->mark_all_dirty();
 	if(data & 0xfe)
 		logerror("Warning: char_bank_w with %02x\n",data);
@@ -487,17 +488,6 @@ static INPUT_PORTS_START( dday )
 	PORT_DIPSETTING(    0xf8, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	2,
-	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-	8*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -510,9 +500,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_dday )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0x000, 16 ) // upper 16 colors are unused
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0x000, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0x100, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0x000, 16 ) // upper 16 colors are unused
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x2_planar, 0x000, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x2_planar, 0x100, 16 )
 GFXDECODE_END
 
 void dday_state::vblank_irq(int state)
@@ -633,9 +623,9 @@ void dday_state::dday(machine_config &config)
 
 	ay8910_device &ay1(AY8910(config, "ay1", 12_MHz_XTAL / 8));
 	ay1.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	AY8910(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
+	AY8910(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -656,12 +646,12 @@ ROM_START( ddayjlc )
 	ROM_LOAD( "19", 0x6000, 0x2000, CRC(5816f947) SHA1(2236bed3e82980d3e7de3749aef0fbab042086e6) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "14", 0x1000, 0x1000, CRC(2c0e9bbe) SHA1(e34ab774d2eb17ddf51af513dbcaa0c51f8dcbf7) )
-	ROM_LOAD( "15", 0x0000, 0x1000, CRC(a6eeaa50) SHA1(052cd3e906ca028e6f55d0caa1e1386482684cbf) )
+	ROM_LOAD( "14", 0x0000, 0x1000, CRC(2c0e9bbe) SHA1(e34ab774d2eb17ddf51af513dbcaa0c51f8dcbf7) )
+	ROM_LOAD( "15", 0x1000, 0x1000, CRC(a6eeaa50) SHA1(052cd3e906ca028e6f55d0caa1e1386482684cbf) )
 
 	ROM_REGION( 0x2000, "gfx3", 0 )
-	ROM_LOAD( "12", 0x1000, 0x1000, CRC(7f7afe80) SHA1(e8a549b8a8985c61d3ba452e348414146f2bc77e) )
-	ROM_LOAD( "13", 0x0000, 0x1000, CRC(f169b93f) SHA1(fb0617162542d688503fc6618dd430308e259455) )
+	ROM_LOAD( "12", 0x0000, 0x1000, CRC(7f7afe80) SHA1(e8a549b8a8985c61d3ba452e348414146f2bc77e) )
+	ROM_LOAD( "13", 0x1000, 0x1000, CRC(f169b93f) SHA1(fb0617162542d688503fc6618dd430308e259455) )
 
 	ROM_REGION( 0xc0000, "terrain", 0 )
 	ROM_LOAD( "5",  0x00000, 0x2000, CRC(299b05f2) SHA1(3c1804bccb514bada4bed68a6af08db63a8f1b19) )
@@ -696,12 +686,12 @@ ROM_START( ddayjlca )
 	ROM_LOAD( "19", 0x6000, 0x2000, CRC(5816f947) SHA1(2236bed3e82980d3e7de3749aef0fbab042086e6) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "14", 0x1000, 0x1000, CRC(2c0e9bbe) SHA1(e34ab774d2eb17ddf51af513dbcaa0c51f8dcbf7) )
-	ROM_LOAD( "15", 0x0000, 0x1000, CRC(a6eeaa50) SHA1(052cd3e906ca028e6f55d0caa1e1386482684cbf) )
+	ROM_LOAD( "14", 0x0000, 0x1000, CRC(2c0e9bbe) SHA1(e34ab774d2eb17ddf51af513dbcaa0c51f8dcbf7) )
+	ROM_LOAD( "15", 0x1000, 0x1000, CRC(a6eeaa50) SHA1(052cd3e906ca028e6f55d0caa1e1386482684cbf) )
 
 	ROM_REGION( 0x2000, "gfx3", 0 )
-	ROM_LOAD( "12", 0x1000, 0x1000, CRC(7f7afe80) SHA1(e8a549b8a8985c61d3ba452e348414146f2bc77e) )
-	ROM_LOAD( "13", 0x0000, 0x1000, CRC(f169b93f) SHA1(fb0617162542d688503fc6618dd430308e259455) )
+	ROM_LOAD( "12", 0x0000, 0x1000, CRC(7f7afe80) SHA1(e8a549b8a8985c61d3ba452e348414146f2bc77e) )
+	ROM_LOAD( "13", 0x1000, 0x1000, CRC(f169b93f) SHA1(fb0617162542d688503fc6618dd430308e259455) )
 
 	ROM_REGION( 0xc0000, "terrain", 0 )
 	ROM_LOAD( "5",  0x00000, 0x2000, CRC(299b05f2) SHA1(3c1804bccb514bada4bed68a6af08db63a8f1b19) )
