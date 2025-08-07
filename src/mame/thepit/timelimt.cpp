@@ -10,8 +10,7 @@ driver by Ernesto Corvi
 
 Notes:
 - sprite colors are wrong (missing colortable?)
-- driver should probably be merged with venture/suprridr.cpp and
-  thepit/thepit.cpp
+- driver should probably be merged with taito/roundup.cpp (and taito/suprridr.cpp)
 - unused color bank for tilemaps? (colors 0x10-0x1f & 0x30-0x3f)
 - verify clocks, they're currently borrowed from thepit, maincpu clock
   used to be 5MHz in older MAME versions but that's doubtful

@@ -3,7 +3,7 @@
 
 /***************************************************************************
 
-The Pit/Round Up/Intrepid/Super Mouse memory map (preliminary)
+Round Up/The Pit/Intrepid/Super Mouse memory map (preliminary)
 
 Driver by Zsolt Vasvari
 
@@ -170,10 +170,10 @@ Player 2 and Player 1 share the same controls !
 
 namespace {
 
-class thepit_state : public driver_device
+class roundup_state : public driver_device
 {
 public:
-	thepit_state(const machine_config &mconfig, device_type type, const char *tag) :
+	roundup_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -193,7 +193,7 @@ public:
 	void dockmanb(machine_config &config) ATTR_COLD;
 	void intrepid(machine_config &config) ATTR_COLD;
 	void thepit(machine_config &config) ATTR_COLD;
-	void fitter(machine_config &config) ATTR_COLD;
+	void roundup(machine_config &config) ATTR_COLD;
 	void theportr(machine_config &config) ATTR_COLD;
 
 protected:
@@ -244,7 +244,7 @@ private:
 	TILE_GET_INFO_MEMBER(solid_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	void thepit_palette(palette_device &palette) const ATTR_COLD;
+	void roundup_palette(palette_device &palette) const ATTR_COLD;
 	void suprmous_palette(palette_device &palette) const ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -259,11 +259,11 @@ private:
 	void theportr_main_map(address_map &map) ATTR_COLD;
 };
 
-class rtriv_state : public thepit_state
+class rtriv_state : public roundup_state
 {
 public:
 	rtriv_state(const machine_config &mconfig, device_type type, const char *tag) :
-		thepit_state(mconfig, type, tag),
+		roundup_state(mconfig, type, tag),
 		m_questions(*this, "questions")
 	{ }
 
@@ -301,7 +301,7 @@ private:
 
 ***************************************************************************/
 
-void thepit_state::thepit_palette(palette_device &palette) const
+void roundup_state::roundup_palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 
@@ -341,7 +341,7 @@ void thepit_state::thepit_palette(palette_device &palette) const
 
 ***************************************************************************/
 
-void thepit_state::suprmous_palette(palette_device &palette) const
+void roundup_state::suprmous_palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 
@@ -368,7 +368,7 @@ void thepit_state::suprmous_palette(palette_device &palette) const
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(thepit_state::solid_get_tile_info)
+TILE_GET_INFO_MEMBER(roundup_state::solid_get_tile_info)
 {
 	uint8_t const back_color = (m_colorram[tile_index] & 0x70) >> 4;
 	int const priority = (back_color != 0) && ((m_colorram[tile_index] & 0x80) == 0);
@@ -378,7 +378,7 @@ TILE_GET_INFO_MEMBER(thepit_state::solid_get_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(thepit_state::get_tile_info)
+TILE_GET_INFO_MEMBER(roundup_state::get_tile_info)
 {
 	uint8_t const fore_color = m_colorram[tile_index] % m_gfxdecode->gfx(0)->colors();
 	uint8_t const code = m_videoram[tile_index];
@@ -393,11 +393,11 @@ TILE_GET_INFO_MEMBER(thepit_state::get_tile_info)
  *
  *************************************/
 
-void thepit_state::video_start()
+void roundup_state::video_start()
 {
-	m_solid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(thepit_state::solid_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_solid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(roundup_state::solid_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(thepit_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(roundup_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap->set_transparent_pen(0);
 
 	m_solid_tilemap->set_scroll_cols(32);
@@ -405,7 +405,7 @@ void thepit_state::video_start()
 
 	m_dummy_tile = make_unique_clear<uint8_t[]>(8 * 8);
 
-	m_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thepit_state::vsync_callback), this));
+	m_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(roundup_state::vsync_callback), this));
 
 	save_item(NAME(m_graphics_bank));
 	save_item(NAME(m_flip_x));
@@ -420,14 +420,14 @@ void thepit_state::video_start()
  *
  *************************************/
 
-void thepit_state::videoram_w(offs_t offset, uint8_t data)
+void roundup_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
 
-void thepit_state::colorram_w(offs_t offset, uint8_t data)
+void roundup_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -435,7 +435,7 @@ void thepit_state::colorram_w(offs_t offset, uint8_t data)
 }
 
 
-void thepit_state::flip_screen_x_w(int state)
+void roundup_state::flip_screen_x_w(int state)
 {
 	m_flip_x = state;
 
@@ -448,7 +448,7 @@ void thepit_state::flip_screen_x_w(int state)
 }
 
 
-void thepit_state::flip_screen_y_w(int state)
+void roundup_state::flip_screen_y_w(int state)
 {
 	m_flip_y = state;
 
@@ -461,7 +461,7 @@ void thepit_state::flip_screen_y_w(int state)
 }
 
 
-void thepit_state::intrepid_graphics_bank_w(int state)
+void roundup_state::intrepid_graphics_bank_w(int state)
 {
 	m_graphics_bank = state;
 
@@ -469,7 +469,7 @@ void thepit_state::intrepid_graphics_bank_w(int state)
 }
 
 
-uint8_t thepit_state::input_port_0_r()
+uint8_t roundup_state::input_port_0_r()
 {
 	/* Read either the real or the fake input ports depending on the
 	   horizontal flip switch. (This is how the real PCB does it) */
@@ -484,16 +484,14 @@ uint8_t thepit_state::input_port_0_r()
  *
  *************************************/
 
-void thepit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_draw)
+void roundup_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_draw)
 {
 	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		if (((m_spriteram[offs + 2] & 0x08) >> 3) == priority_to_draw)
 		{
 			if ((m_spriteram[offs + 0] == 0) || (m_spriteram[offs + 3] == 0))
-			{
 				continue;
-			}
 
 			uint8_t y = 240 - m_spriteram[offs];
 			uint8_t x = m_spriteram[offs + 3] + 1;
@@ -530,11 +528,9 @@ void thepit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 }
 
 
-uint32_t thepit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t roundup_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	// I have a feeling sprite area masking should be done based on tile attributes, not a custom cliprect.
-
 	rectangle spriterect;
 	if (m_flip_x)
 		spriterect.set(0*8, 30*8-2, 2*8, 30*8-1);
@@ -565,7 +561,7 @@ uint32_t thepit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-uint32_t thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t roundup_state::screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle spriterect;
 	if (m_flip_y)
@@ -603,43 +599,43 @@ uint32_t thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind
 }
 
 
-void thepit_state::machine_start()
+void roundup_state::machine_start()
 {
 	save_item(NAME(m_nmi_mask));
 }
 
 void rtriv_state::machine_start()
 {
-	thepit_state::machine_start();
+	roundup_state::machine_start();
 
 	save_item(NAME(m_question_address));
 	save_item(NAME(m_question_rom));
 	save_item(NAME(m_remap_address));
 }
 
-uint8_t thepit_state::intrepid_colorram_mirror_r(offs_t offset)
+uint8_t roundup_state::intrepid_colorram_mirror_r(offs_t offset)
 {
 	return m_colorram[offset];
 }
 
-void thepit_state::coin_lockout_w(int state)
+void roundup_state::coin_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
 }
 
-void thepit_state::sound_enable_w(int state)
+void roundup_state::sound_enable_w(int state)
 {
 	machine().sound().system_mute(!state);
 }
 
-void thepit_state::nmi_mask_w(int state)
+void roundup_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void thepit_state::vblank_w(int state)
+void roundup_state::vblank_w(int state)
 {
 	if (state)
 	{
@@ -650,12 +646,12 @@ void thepit_state::vblank_w(int state)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(thepit_state::vsync_callback)
+TIMER_CALLBACK_MEMBER(roundup_state::vsync_callback)
 {
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(thepit_state::vsync_int_ack)
+IRQ_CALLBACK_MEMBER(roundup_state::vsync_int_ack)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
@@ -665,7 +661,6 @@ IRQ_CALLBACK_MEMBER(thepit_state::vsync_int_ack)
 /*
     Romar Triv questions read handler
 */
-
 
 uint8_t rtriv_state::question_r(offs_t offset)
 {
@@ -692,40 +687,40 @@ uint8_t rtriv_state::question_r(offs_t offset)
 }
 
 
-void thepit_state::thepit_main_map(address_map &map)
+void roundup_state::thepit_main_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).mirror(0x0400).ram().w(FUNC(thepit_state::colorram_w)).share(m_colorram);
-	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(thepit_state::videoram_w)).share(m_videoram);
+	map(0x8800, 0x8bff).mirror(0x0400).ram().w(FUNC(roundup_state::colorram_w)).share(m_colorram);
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(roundup_state::videoram_w)).share(m_videoram);
 	map(0x9800, 0x983f).mirror(0x0700).ram().share(m_attributesram);
 	map(0x9840, 0x985f).ram().share(m_spriteram);
 	map(0x9860, 0x98ff).ram();
-	map(0xa000, 0xa000).r(FUNC(thepit_state::input_port_0_r)).nopw(); // Not hooked up according to the schematics
+	map(0xa000, 0xa000).r(FUNC(roundup_state::input_port_0_r)).nopw(); // Not hooked up according to the schematics
 	map(0xa800, 0xa800).portr("IN1");
 	map(0xb000, 0xb000).portr("DSW");
 	map(0xb000, 0xb007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
-void thepit_state::desertdan_main_map(address_map &map)
+void roundup_state::desertdan_main_map(address_map &map)
 {
 	thepit_main_map(map);
 
 	map(0x0000, 0x7fff).rom();
 }
 
-void thepit_state::intrepid_main_map(address_map &map)
+void roundup_state::intrepid_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8c00, 0x8fff).r(FUNC(thepit_state::intrepid_colorram_mirror_r)).w(FUNC(thepit_state::colorram_w)); /* mirror for intrepi2 */
-	map(0x9000, 0x93ff).ram().w(FUNC(thepit_state::videoram_w)).share(m_videoram);
-	map(0x9400, 0x97ff).ram().w(FUNC(thepit_state::colorram_w)).share(m_colorram);
+	map(0x8c00, 0x8fff).r(FUNC(roundup_state::intrepid_colorram_mirror_r)).w(FUNC(roundup_state::colorram_w)); /* mirror for intrepi2 */
+	map(0x9000, 0x93ff).ram().w(FUNC(roundup_state::videoram_w)).share(m_videoram);
+	map(0x9400, 0x97ff).ram().w(FUNC(roundup_state::colorram_w)).share(m_colorram);
 	map(0x9800, 0x983f).mirror(0x0700).ram().share(m_attributesram);
 	map(0x9840, 0x985f).ram().share(m_spriteram);
 	map(0x9860, 0x98ff).ram();
-	map(0xa000, 0xa000).r(FUNC(thepit_state::input_port_0_r));
+	map(0xa000, 0xa000).r(FUNC(roundup_state::input_port_0_r));
 	map(0xa800, 0xa800).portr("IN1");
 	map(0xb000, 0xb000).portr("DSW");
 	map(0xb000, 0xb007).w(m_mainlatch, FUNC(ls259_device::write_d0));
@@ -739,16 +734,16 @@ void rtriv_state::rtriv_main_map(address_map &map)
 	map(0x4000, 0x4fff).r(FUNC(rtriv_state::question_r));
 }
 
-void thepit_state::dockmanb_main_map(address_map &map)
+void roundup_state::dockmanb_main_map(address_map &map)
 {
 	intrepid_main_map(map);
 
-	map(0x8800, 0x8bff).ram().w(FUNC(thepit_state::colorram_w)).share(m_colorram); // moved here from 0x9400-0x97ff
+	map(0x8800, 0x8bff).ram().w(FUNC(roundup_state::colorram_w)).share(m_colorram); // moved here from 0x9400-0x97ff
 	map(0x8c00, 0x8fff).unmaprw();
 	map(0x9400, 0x97ff).unmaprw();
 }
 
-void thepit_state::theportr_main_map(address_map &map)
+void roundup_state::theportr_main_map(address_map &map)
 {
 	dockmanb_main_map(map);
 
@@ -756,14 +751,14 @@ void thepit_state::theportr_main_map(address_map &map)
 	map(0x8000, 0x87ff).unmaprw();
 }
 
-void thepit_state::audio_map(address_map &map)
+void roundup_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x3800, 0x3bff).ram();
 }
 
 
-void thepit_state::audio_io_map(address_map &map)
+void roundup_state::audio_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
@@ -1192,7 +1187,7 @@ static const gfx_layout suprmous_spritelayout =
 };
 
 
-static GFXDECODE_START( gfx_thepit )
+static GFXDECODE_START( gfx_roundup )
 	GFXDECODE_ENTRY( "gfx", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx", 0, spritelayout, 0, 8 )
 GFXDECODE_END
@@ -1210,39 +1205,26 @@ static GFXDECODE_START( gfx_suprmous )
 GFXDECODE_END
 
 
-void thepit_state::thepit(machine_config &config)
+void roundup_state::roundup(machine_config &config)
 {
-	constexpr XTAL MASTER_CLOCK = 18.432_MHz_XTAL;
-	constexpr XTAL SOUND_CLOCK = 10_MHz_XTAL;
-	constexpr XTAL PIXEL_CLOCK = MASTER_CLOCK / 3;
-
-	// H counts from 128->511, HBLANK starts at 128 and ends at 256
-	constexpr int HTOTAL = 384;
-	constexpr int HBEND = 0; // 256
-	constexpr int HBSTART = 256; // 128
-
-	constexpr int VTOTAL = 264;
-	constexpr int VBEND = 16;
-	constexpr int VBSTART = 224 + 16;
-
 	// basic machine hardware
-	Z80(config, m_maincpu, PIXEL_CLOCK / 2); // 3.072 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::thepit_main_map);
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 3 / 2); // 3.072 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &roundup_state::thepit_main_map);
 
-	Z80(config, m_audiocpu, SOUND_CLOCK / 4); // 2.5 MHz
-	m_audiocpu->set_addrmap(AS_PROGRAM, &thepit_state::audio_map);
-	m_audiocpu->set_addrmap(AS_IO, &thepit_state::audio_io_map);
-	m_audiocpu->set_irq_acknowledge_callback(FUNC(thepit_state::vsync_int_ack));
+	Z80(config, m_audiocpu, 10_MHz_XTAL / 4); // 2.5 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &roundup_state::audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &roundup_state::audio_io_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(roundup_state::vsync_int_ack));
 
 	config.set_maximum_quantum(attotime::from_hz(3000));
 
 	LS259(config, m_mainlatch); // IC42
-	m_mainlatch->q_out_cb<0>().set(FUNC(thepit_state::nmi_mask_w));
-	m_mainlatch->q_out_cb<2>().set_nop(); // marked "LOCK OUT" on Centuri schematic but never written
-	m_mainlatch->q_out_cb<3>().set(FUNC(thepit_state::sound_enable_w));
-	m_mainlatch->q_out_cb<6>().set(FUNC(thepit_state::flip_screen_x_w));
+	m_mainlatch->q_out_cb<0>().set(FUNC(roundup_state::nmi_mask_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(roundup_state::coin_lockout_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(roundup_state::sound_enable_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(roundup_state::flip_screen_x_w));
 	m_mainlatch->q_out_cb<6>().append(m_inputmux, FUNC(ls157_x2_device::select_w));
-	m_mainlatch->q_out_cb<7>().set(FUNC(thepit_state::flip_screen_y_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(roundup_state::flip_screen_y_w));
 
 	LS157_X2(config, m_inputmux); // IC5 (0-3) & IC6 (4-7)
 	m_inputmux->a_in_callback().set_ioport("IN0");
@@ -1251,54 +1233,53 @@ void thepit_state::thepit(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_thepit);
-	PALETTE(config, m_palette, FUNC(thepit_state::thepit_palette), 32+8);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_roundup);
+	PALETTE(config, m_palette, FUNC(roundup_state::roundup_palette), 32+8);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	screen.set_screen_update(FUNC(thepit_state::screen_update));
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 224 + 16); // H counts from 128->511, HBLANK starts at 128 and ends at 256
+	screen.set_screen_update(FUNC(roundup_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(thepit_state::vblank_w));
+	screen.screen_vblank().set(FUNC(roundup_state::vblank_w));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ay8910_device &ay1(AY8910(config, "ay1", PIXEL_CLOCK/4));
+	ay8910_device &ay1(AY8910(config, "ay1", 18.432_MHz_XTAL / 3 / 4));
 	ay1.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	AY8910(config, "ay2", PIXEL_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay2", 18.432_MHz_XTAL / 3 / 4).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-void thepit_state::fitter(machine_config &config)
+void roundup_state::thepit(machine_config &config)
 {
-	thepit(config);
-	m_mainlatch->q_out_cb<2>().set(FUNC(thepit_state::coin_lockout_w));
+	roundup(config);
+	m_mainlatch->q_out_cb<2>().set_nop(); // marked "LOCK OUT" on Centuri schematic but never written
 }
 
-void thepit_state::desertdn(machine_config &config)
+void roundup_state::desertdn(machine_config &config)
 {
-	fitter(config);
+	roundup(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::desertdan_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roundup_state::desertdan_main_map);
 
 	// video hardware
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(thepit_state::screen_update_desertdan));
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(roundup_state::screen_update_desertdan));
 
 	m_gfxdecode->set_info(gfx_intrepid);
 }
 
-void thepit_state::intrepid(machine_config &config)
+void roundup_state::intrepid(machine_config &config)
 {
-	fitter(config);
+	roundup(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::intrepid_main_map);
-
-	m_mainlatch->q_out_cb<5>().set(FUNC(thepit_state::intrepid_graphics_bank_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &roundup_state::intrepid_main_map);
+	m_mainlatch->q_out_cb<5>().set(FUNC(roundup_state::intrepid_graphics_bank_w));
 
 	// video hardware
 	m_gfxdecode->set_info(gfx_intrepid);
@@ -1307,30 +1288,27 @@ void thepit_state::intrepid(machine_config &config)
 void rtriv_state::rtriv(machine_config &config)
 {
 	intrepid(config);
-
 	m_maincpu->set_addrmap(AS_PROGRAM, &rtriv_state::rtriv_main_map);
 }
 
-void thepit_state::dockmanb(machine_config &config)
+void roundup_state::dockmanb(machine_config &config)
 {
 	intrepid(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::dockmanb_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roundup_state::dockmanb_main_map);
 }
 
-void thepit_state::theportr(machine_config &config)
+void roundup_state::theportr(machine_config &config)
 {
 	dockmanb(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::theportr_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roundup_state::theportr_main_map);
 }
 
-void thepit_state::suprmous(machine_config &config)
+void roundup_state::suprmous(machine_config &config)
 {
 	intrepid(config);
 
 	// video hardware
-	m_palette->set_init(FUNC(thepit_state::suprmous_palette));
+	m_palette->set_init(FUNC(roundup_state::suprmous_palette));
 	m_gfxdecode->set_info(gfx_suprmous);
 }
 
@@ -1897,38 +1875,38 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1981, roundup,    0,        fitter,   roundup,  thepit_state, empty_init, ROT90, "Taito Corporation (Amenip/Centuri license)",  "Round-Up", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fitter,     roundup,  fitter,   fitter,   thepit_state, empty_init, ROT90, "Taito Corporation",                           "Fitter", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fitterbl,   roundup,  fitter,   fitter,   thepit_state, empty_init, ROT90, "bootleg",                                     "Fitter (bootleg of Round-Up)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ttfitter,   roundup,  fitter,   fitter,   thepit_state, empty_init, ROT90, "Taito Corporation",                           "T.T Fitter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, roundup,    0,        roundup,  roundup,  roundup_state, empty_init, ROT90, "Taito Corporation (Amenip/Centuri license)",  "Round-Up", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fitter,     roundup,  roundup,  fitter,   roundup_state, empty_init, ROT90, "Taito Corporation",                           "Fitter", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fitterbl,   roundup,  roundup,  fitter,   roundup_state, empty_init, ROT90, "bootleg",                                     "Fitter (bootleg of Round-Up)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ttfitter,   roundup,  roundup,  fitter,   roundup_state, empty_init, ROT90, "Taito Corporation",                           "T.T Fitter (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, thepit,     0,        thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics",                           "The Pit", MACHINE_SUPPORTS_SAVE ) // AW == Andy Walker
-GAME( 1982, thepitu1,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, thepitu2,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 2)", MACHINE_SUPPORTS_SAVE ) // Bally PCB
-GAME( 1982, thepitu3,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, thepitj,    thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Taito license)",           "The Pit (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, thehole,    thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "bootleg",                                     "The Hole (bootleg of The Pit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thepit,     0,        thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics",                           "The Pit", MACHINE_SUPPORTS_SAVE ) // AW == Andy Walker
+GAME( 1982, thepitu1,   thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thepitu2,   thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 2)", MACHINE_SUPPORTS_SAVE ) // Bally PCB
+GAME( 1982, thepitu3,   thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thepitj,    thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "Zilec Electronics (Taito license)",           "The Pit (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thehole,    thepit,   thepit,   thepit,   roundup_state, empty_init, ROT90, "bootleg",                                     "The Hole (bootleg of The Pit)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, dockman,    0,        intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dockmanb,   dockman,  dockmanb, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dockmanc,   dockman,  dockmanb, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // one GFX ROM is bad
-GAME( 1982, portman,    dockman,  intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, portmanj,   dockman,  intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Port Man (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, theportr,   dockman,  theportr, dockman,  thepit_state, empty_init, ROT90, "bootleg",                                     "The Porter (bootleg of Port Man)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PROM has been dumped, but colours seem wrong
+GAME( 1982, dockman,    0,        intrepid, dockman,  roundup_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dockmanb,   dockman,  dockmanb, dockman,  roundup_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dockmanc,   dockman,  dockmanb, dockman,  roundup_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // one GFX ROM is bad
+GAME( 1982, portman,    dockman,  intrepid, dockman,  roundup_state, empty_init, ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, portmanj,   dockman,  intrepid, dockman,  roundup_state, empty_init, ROT90, "Taito Corporation",                           "Port Man (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, theportr,   dockman,  theportr, dockman,  roundup_state, empty_init, ROT90, "bootleg",                                     "The Porter (bootleg of Port Man)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PROM has been dumped, but colours seem wrong
 
-GAME( 1982, suprmous,   0,        suprmous, suprmous, thepit_state, empty_init, ROT90, "Taito Corporation",                           "Super Mouse", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, funnymou,   suprmous, suprmous, suprmous, thepit_state, empty_init, ROT90, "Taito Corporation (Chuo Co. Ltd license)",    "Funny Mouse (Japan)", MACHINE_SUPPORTS_SAVE ) // Taito PCB
+GAME( 1982, suprmous,   0,        suprmous, suprmous, roundup_state, empty_init, ROT90, "Taito Corporation",                           "Super Mouse", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, funnymou,   suprmous, suprmous, suprmous, roundup_state, empty_init, ROT90, "Taito Corporation (Chuo Co. Ltd license)",    "Funny Mouse (Japan)", MACHINE_SUPPORTS_SAVE ) // Taito PCB
 
-GAME( 1982, machomou,   0,        suprmous, suprmous, thepit_state, empty_init, ROT90, "Techstar",                                    "Macho Mouse", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, machomou,   0,        suprmous, suprmous, roundup_state, empty_init, ROT90, "Techstar",                                    "Macho Mouse", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, desertdn,   0,        desertdn, desertdn, thepit_state, empty_init, ROT0,  "Kawakusu (Video Optics license)",             "Desert Dan", MACHINE_SUPPORTS_SAVE ) // export version of Gonta Road-Rush (gfx still contains part of "RUSH")
+GAME( 1982, desertdn,   0,        desertdn, desertdn, roundup_state, empty_init, ROT0,  "Kawakusu (Video Optics license)",             "Desert Dan", MACHINE_SUPPORTS_SAVE ) // export version of Gonta Road-Rush (gfx still contains part of "RUSH")
 
-GAME( 1983, intrepid,   0,        intrepid, intrepid, thepit_state, empty_init, ROT90, "Nova Games Ltd.",                             "Intrepid (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, intrepid2,  intrepid, intrepid, intrepid, thepit_state, empty_init, ROT90, "Nova Games Ltd.",                             "Intrepid (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb,  intrepid, intrepid, intrepidb,thepit_state, empty_init, ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb3, intrepid, intrepid, intrepidb,thepit_state, empty_init, ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb2, intrepid, intrepid, intrepidb,thepit_state, empty_init, ROT90, "bootleg (Loris)",                             "Intrepid (Loris bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, intrepid,   0,        intrepid, intrepid, roundup_state, empty_init, ROT90, "Nova Games Ltd.",                             "Intrepid (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, intrepid2,  intrepid, intrepid, intrepid, roundup_state, empty_init, ROT90, "Nova Games Ltd.",                             "Intrepid (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb,  intrepid, intrepid, intrepidb,roundup_state, empty_init, ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb3, intrepid, intrepid, intrepidb,roundup_state, empty_init, ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb2, intrepid, intrepid, intrepidb,roundup_state, empty_init, ROT90, "bootleg (Loris)",                             "Intrepid (Loris bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, zaryavos,   0,        intrepid, intrepid, thepit_state, empty_init, ROT90, "Nova Games of Canada",                        "Zarya Vostoka", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, zaryavos,   0,        intrepid, intrepid, roundup_state, empty_init, ROT90, "Nova Games of Canada",                        "Zarya Vostoka", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 198?, rtriv,      0,        rtriv,    rtriv,    rtriv_state,  empty_init, ROT90, "Romar",                                       "Romar Triv", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, rtriv,      0,        rtriv,    rtriv,    rtriv_state,   empty_init, ROT90, "Romar",                                       "Romar Triv", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

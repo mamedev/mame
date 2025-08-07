@@ -19,7 +19,7 @@
         * what are the writes to $08DB and $08E8 for?
           (guess: a discrete sound effect)
 
-    ** driver should probably be merged with timelimt.cpp
+    ** driver should probably be merged with with roundup.cpp (and misc/timelimt.cpp)
 
 ****************************************************************************
 
@@ -196,8 +196,8 @@ TILE_GET_INFO_MEMBER(suprridr_state::get_fg_tile_info)
 
 void suprridr_state::video_start()
 {
-	m_fg_tilemap          = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprridr_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
-	m_bg_tilemap          = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprridr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprridr_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprridr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 	m_bg_tilemap_noscroll = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprridr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_fg_tilemap->set_transparent_pen(0);
