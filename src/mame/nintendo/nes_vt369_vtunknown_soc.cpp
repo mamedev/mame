@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_SWAP,   vt369_soc_introm_swap_device,   "vt3
 DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_ALTSWAP,vt369_soc_introm_altswap_device,"vt369_soc_altswap", "VT369 series System on a Chip (with D1/D4 opcode swapping)")
 DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_VIBESSWAP,vt369_soc_introm_vibesswap_device,"vt369_soc_vibesswap", "VT369 series System on a Chip (with D4/D5 opcode swapping)")
 DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_GBOX2020,vt369_soc_introm_gbox2020_device,"vt369_soc_gbox2020", "VT369 series System on a Chip (with D6/D7 + D1/D2 opcode swapping)")
-DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_S10SWAP,vt369_soc_introm_s10swap_device,"vt369_soc_s10swap", "VT369 series System on a Chip (with D1/D5 opcode swapping)")
+DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_S10SWAP,vt369_soc_introm_s10swap_device,"vt369_soc_s10swap", "VT369 series System on a Chip (with D4/D5 + D1/D2 opcode swapping)")
 
 // uncertain
 DEFINE_DEVICE_TYPE(VT3XX_SOC, vt3xx_soc_base_device,          "vt3xx_unknown_soc_cy", "VT3xx series System on a Chip (CY)")
