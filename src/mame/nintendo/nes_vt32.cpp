@@ -401,11 +401,6 @@ ROM_START( mymman )
 	ROM_IGNORE(0x100)
 ROM_END
 
-ROM_START( goretrop )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "goretroportable.bin", 0x00000, 0x2000000, CRC(e7279dd3) SHA1(5f096ce22e46f112c2cc6588cb1c527f4f0430b5) )
-ROM_END
-
 ROM_START( fcpocket )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl01gp.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) ) // 2nd half = 0x00 (so 64MByte of content)
@@ -482,9 +477,6 @@ CONS( 202?, typo240,   0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empt
 
 // speed challenge doesn't work
 CONS( 2021, retror30,  0,  0,  nes_vt32_32mb,      nes_vt32, nes_vt32_unk_state, empty_init, "Orb Gaming", "Retro Racer (30-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-// there's also a 250+ version of the unit below at least
-CONS( 2018, goretrop,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
 
 // Some games (eg F22) are scrambled like in myaass
 // These use a 16x16x8bpp packed tile mode for the main menu which seems more like a VT3xx feature, but VT3xx extended video regs not written?

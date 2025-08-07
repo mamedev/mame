@@ -420,11 +420,6 @@ ROM_START( rfcp168 )
 	ROM_LOAD( "winbond_w29gl128c.bin", 0x00000, 0x1000000, CRC(d11caf71) SHA1(64b269cee30a51549a2d0491bbeed07751771559) ) // ROM verified on 2 units
 ROM_END
 
-ROM_START( s10fake )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "s29gl064a90tfir4.bin", 0x00000, 0x800000, CRC(8ba78851) SHA1(d482fc56efbbdf6ff890b775144fd49ecaa1b539) )
-ROM_END
-
 ROM_START( g9_666 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "666in1.u1", 0x00000, 0x1000000, CRC(e3a98465) SHA1(dfec3e74e36aef9bfa57ec530c37642015569dc5) )
@@ -568,9 +563,6 @@ void nes_vt42xx_state::init_bl339()
 
 
 CONS( 201?, rfcp168,  0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_rfcp168, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
-
-// there are other S10 units available.  Rather than duplicate entries, this one contains many entries which simply aren't the games they claim, and aren't on the unit at all (eg. Exerion)
-CONS( 202?, s10fake,   0,  0,  nes_vt42xx_8mb, nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "S10 Handheld Game Console (520-in-1, fake entries)", MACHINE_NOT_WORKING )
 
 // many duplicates, real game count to be confirmed, graphical issues in some games
 CONS( 202?, g9_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

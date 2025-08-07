@@ -97,6 +97,7 @@ public:
 
 	void init_lxcmcypp();
 	void init_dgun2572();
+	void init_s10fake();
 
 protected:
 	u8 vt_rom_banked_r(offs_t offset);
@@ -137,11 +138,12 @@ public:
 
 	void vt36x_vibesswap_16mb(machine_config& config);
 	void vt36x_gbox2020_16mb(machine_config& config);
+	void vt36x_s10swap_8mb(machine_config& config);
 
 	void vt369_unk(machine_config& config);
 	void vt369_unk_1mb(machine_config& config);
 	void vt369_unk_16mb(machine_config& config);
-
+	void vt369_unk_32mb(machine_config& config);
 };
 
 class vt36x_tetrtin_state : public vt36x_state
@@ -360,6 +362,12 @@ void vt36x_state::vt369_unk_1mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_1mbyte);
 }
 
+void vt36x_state::vt369_unk_32mb(machine_config& config)
+{
+	vt369_unk(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_32mbyte);
+}
+
 
 // New mystery handheld architecture, VTxx derived
 void vt36x_state::vt36x(machine_config &config)
@@ -468,6 +476,17 @@ void vt36x_state::vt36x_gbox2020_16mb(machine_config &config)
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
+}
+
+void vt36x_state::vt36x_s10swap_8mb(machine_config &config)
+{
+	vt36x_swap_8mb(config);
+
+	VT369_SOC_INTROM_S10SWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
+	m_soc->force_bad_dma();
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_8mbyte);
 }
 
 
@@ -1018,6 +1037,16 @@ ROM_START( rbbrite )
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( goretrop )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "goretroportable.bin", 0x00000, 0x2000000, CRC(e7279dd3) SHA1(5f096ce22e46f112c2cc6588cb1c527f4f0430b5) )
+ROM_END
+
+ROM_START( s10fake )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "s29gl064a90tfir4.bin", 0x00000, 0x800000, CRC(8ba78851) SHA1(d482fc56efbbdf6ff890b775144fd49ecaa1b539) )
+ROM_END
+
 ROM_START( mc_89in1 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "89in1.bin", 0x00000, 0x400000, CRC(b97f8ce5) SHA1(1a8e67f2b58a671ceec2b0ed18ec5954a71ae63a) )
@@ -1095,6 +1124,16 @@ void vt369_state::init_dgun2572()
 			u16 data = get_u16le(&orig[bitswap<8>(offset, 6, 1, 8, 3, 4, 5, 2, 7) << 1]);
 			put_u16le(&rom[base + offset], bitswap<16>(data, 15, 14, 13, 12, 11, 10, 1, 8, 7, 6, 5, 4, 0, 2, 9, 3));
 		}
+	}
+}
+
+void vt369_state::init_s10fake()
+{
+	uint8_t *romdata = memregion("mainrom")->base();
+	for (offs_t i = 0; i < 0x800000; i += 2)
+	{
+		uint16_t w = get_u16le(&romdata[i]);
+		put_u16le(&romdata[i], (w & 0xf9f9) | (w & 0x0600) >> 8 | (w & 0x0006) << 8);
 	}
 }
 
@@ -1186,6 +1225,8 @@ CONS( 200?, zonefusn,  0,         0,  vt36x_16mb,     vt369, vt36x_state, empty_
 // same as above but without Jungle's Soft boot logo? model number taken from cover of manual
 CONS( 200?, sealvt,    zonefusn,  0,  vt36x_16mb,     vt369, vt36x_state, empty_init, "Lexibook / Sit Up Limited / Jungle's Soft", "Seal 30-in-1 (VT based, Model FN098134)",  MACHINE_NOT_WORKING )
 
+// possibly VT269; contains high-resolution versions of classic NES games
+// sub-CPU hangs on unemulated $2117 register and later uses vtsetdbk to switch opcode encryption
 CONS( 201?, dgun2572, 0,  0,  vt36x_32mb, vt369, vt36x_state, init_dgun2572, "dreamGEAR", "My Arcade Wireless Video Game Station 200-in-1 (DGUN-2572)", MACHINE_NOT_WORKING )
 
 // NOT SPI roms, altswap sets code starts with '6a'
@@ -1219,6 +1260,14 @@ CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, em
 
 // has extra protection?
 CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
+
+// there's also a 250+ version of the unit below at least; protection(?) is similar to rbbrite
+CONS( 2018, goretrop,  0,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
+
+// all games after the first 180 listed on the menu are duplicates. BTANB: games 501-520 are mislabeled duplicates: e.g., "511. Exerion" actually loads Pac-Man.
+// unused routines suggest this was originally developed for nes_vt42xx.cpp hardware (cf. g9_666, g5_500 with the same bitswap)
+// there are other S10 units available
+CONS( 202?, s10fake,   0,  0,  vt36x_s10swap_8mb, vt369, vt36x_state, init_s10fake, "<unknown>", "S10 Handheld Game Console (520-in-1, fake entries)", MACHINE_NOT_WORKING )
 
 /*****************************************************************************
 * below are VT369 games that use SQI / SPI ROM
