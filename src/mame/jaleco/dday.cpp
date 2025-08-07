@@ -9,13 +9,17 @@ TODO:
 - improve sound comms, sometimes BGM becomes silent;
 - identify & dump MCU;
 
--------------------------------------------------------
+--------------------------------------------------------------------------------
 Is it 1984 or 1987 game ?
 There's text inside rom "1987.07    BY  ELS"
 
+Trivia: E.L.S. = the subcontractor that also developed Commando for Sega (the coin
+sound effect is the same as well if you overclock the AY a bit). Jaleco Top Roller
+is also by them.
+
 $842f = lives
 
--------------------------------------------------------
+--------------------------------------------------------------------------------
 
     CPU  : Z80
     Sound: Z80 AY-3-8910(x2)
@@ -524,6 +528,7 @@ void dday_state::machine_start()
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_main_nmi_enable));
 	save_item(NAME(m_prot_addr));
+	save_item(NAME(m_dma_latch));
 }
 
 void dday_state::machine_reset()
@@ -533,6 +538,7 @@ void dday_state::machine_reset()
 	m_sound_nmi_enable = false;
 	m_main_nmi_enable = false;
 	m_prot_addr = 0;
+	m_dma_latch = 0;
 }
 
 void dday_state::dday_palette(palette_device &palette) const
@@ -671,7 +677,7 @@ ROM_START( ddayjlc )
 	ROM_LOAD( "5p.bin",  0x00100, 0x0100, CRC(4fd96b26) SHA1(0fb9928ab6c4ee937cefcf82145a4c9d43ca8517) ) // background color lower data
 	ROM_LOAD( "4m.bin",  0x00200, 0x0100, CRC(e0ab9a8f) SHA1(77010c4039f9d408f40cea079c1ef56132ddbd2b) ) // sprite color upper data
 	ROM_LOAD( "5n.bin",  0x00300, 0x0100, CRC(61d85970) SHA1(189e9da3dade54936872b80893b1318e5fbfbe5e) ) // background color upper data
-	ROM_LOAD( "3l.bin",  0x00400, 0x0100, CRC(da6fe846) SHA1(e8386cf7f552facf2d1a5b7b63ca3d2f1801d215) ) // unknown
+	ROM_LOAD( "3l.bin",  0x00400, 0x0100, CRC(da6fe846) SHA1(e8386cf7f552facf2d1a5b7b63ca3d2f1801d215) ) // foreground tile color indices
 ROM_END
 
 ROM_START( ddayjlca )
@@ -711,7 +717,7 @@ ROM_START( ddayjlca )
 	ROM_LOAD( "5p.bin",  0x00100, 0x0100, CRC(4fd96b26) SHA1(0fb9928ab6c4ee937cefcf82145a4c9d43ca8517) ) // background color lower data
 	ROM_LOAD( "4m.bin",  0x00200, 0x0100, CRC(e0ab9a8f) SHA1(77010c4039f9d408f40cea079c1ef56132ddbd2b) ) // sprite color upper data
 	ROM_LOAD( "5n.bin",  0x00300, 0x0100, CRC(61d85970) SHA1(189e9da3dade54936872b80893b1318e5fbfbe5e) ) // background color upper data
-	ROM_LOAD( "3l.bin",  0x00400, 0x0100, CRC(da6fe846) SHA1(e8386cf7f552facf2d1a5b7b63ca3d2f1801d215) ) // unknown
+	ROM_LOAD( "3l.bin",  0x00400, 0x0100, CRC(da6fe846) SHA1(e8386cf7f552facf2d1a5b7b63ca3d2f1801d215) ) // foreground tile color indices
 ROM_END
 
 
