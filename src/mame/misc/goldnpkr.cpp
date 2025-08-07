@@ -13491,14 +13491,49 @@ ROM_END
 
   Sets:
   
-  137dash     DASH!                 1996/11/18,  AVANTY  50 BET SPECIAL
+  dash_a37    DASH! A37             1998/10/22   VER OCT 22, 98
+  dash_a37b   DASH! A37             1996/11/18,  AVANTY  50 BET SPECIAL
   lfhouse     Lucky Full House      1996/02/01 ver 1.16, DATA ver 1.05
   dynchance   Dynamic Chance        type-3.0 1992/08/29  PART 1-2
   dynchancf   Dynamic Chance(alt)   type-3.0 1992/08/29  PART 1-2  (only 4 bytes of difference)
   dynplus     Dynamic Plus One      1997/01/13, SP TYPE Ver 1.10
 
 */
-ROM_START( 137dash )
+ROM_START( dash_a37 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dash_a37.5e", 0x8000, 0x8000, CRC(4365cfc9) SHA1(37d0acb6bab5776b842aab5e5fe8e13d7209a2ca) )
+
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "nosticker.5l", 0x0000, 0x4000, CRC(0426b77b) SHA1(f4844873ddd0bb6d7727c8be637130c5de97c671) )
+	ROM_IGNORE(                       0x4000 )
+	ROM_LOAD( "nosticker.5n", 0x4000, 0x4000, CRC(16d9fc6c) SHA1(51977d34c4b79080d0c8959e83c5e444b5924478) )
+	ROM_IGNORE(                       0x4000 )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(71b04758) SHA1(09f4dc2ded3466880622e2416787a47ca8886fd4) )
+ROM_END
+
+ROM_START( dash_a37b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "137dash.5e", 0x8000, 0x8000, CRC(7feb8d8c) SHA1(a7f7c4eaa5d688adc235e7fc4fb24351ef0a8633) )
 
@@ -14390,7 +14425,8 @@ GAME(  1987, gp_ped42_80, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped
 GAME(  1987, gp_ped42_70, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 70%)",          0 )  // no lamps
 
 // DEP 9801 encrypted platform...
-GAME(  1996, 137dash,   0,         dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "137 Dash! (Avanty, 50 bet special)",         MACHINE_NOT_WORKING )
+GAME(  1998, dash_a37,  0,         dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dash! (A37, ver 1998/10/22)",                MACHINE_NOT_WORKING )
+GAME(  1996, dash_a37b, dash_a37,  dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dash! (A37, ver 1996/11/18)",                MACHINE_NOT_WORKING )
 GAME(  1996, lfhouse,   0,         dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
 GAME(  1992, dynchance, 0,         dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2)",         MACHINE_NOT_WORKING )
 GAME(  1992, dynchancf, dynchance, dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2, alt)",    MACHINE_NOT_WORKING )
