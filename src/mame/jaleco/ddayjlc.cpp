@@ -5,8 +5,6 @@
 D-DAY   (c)Jaleco 1984
 
 TODO:
-- text colors most likely are hardwired but iirc hi score text has a different color?
-  Needs a reference shot;
 - unused upper sprite color bank;
 - improve sound comms, sometimes BGM becomes silent;
 - identify & dump MCU;
@@ -58,10 +56,12 @@ $842f = lives
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/i8257.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -75,16 +75,17 @@ class ddayjlc_state : public driver_device
 public:
 	ddayjlc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_mainram(*this, "mainram"),
-		m_spriteram(*this, "spriteram"),
-		m_videoram(*this, "videoram"),
-		m_bgvram(*this, "bgram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_dma(*this, "dma")
+		m_dma(*this, "dma"),
+		m_mainram(*this, "mainram"),
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_bgvram(*this, "bgram"),
+		m_proms(*this, "proms")
 	{ }
 
 	void ddayjlc(machine_config &config);
@@ -117,11 +118,20 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<i8257_device> m_dma;
+
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_bgvram;
+	required_region_ptr<uint8_t> m_proms;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap = nullptr;
@@ -133,14 +143,6 @@ private:
 	bool       m_sound_nmi_enable = false;
 	bool       m_main_nmi_enable = false;
 	uint8_t    m_prot_addr = 0;
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<i8257_device> m_dma;
 
 	uint8_t dma_mem_r(offs_t offset);
 	void dma_mem_w(offs_t offset, u8 data);
@@ -173,9 +175,10 @@ TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_bg)
 
 TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_fg)
 {
-	int code = m_videoram[tile_index] + (m_char_bank << 8);
+	uint16_t code = m_videoram[tile_index] + (m_char_bank << 8);
+	uint8_t color = m_proms[0x400 | (tile_index >> 2 & 0xe0) | (tile_index & 0x1f)];
 
-	tileinfo.set(1, code, 0, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 void ddayjlc_state::video_start()
@@ -500,7 +503,7 @@ static const gfx_layout spritelayout =
 
 static GFXDECODE_START( gfx_ddayjlc )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0x000, 16 ) // upper 16 colors are unused
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0x200,  1 )
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0x000, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0x100, 16 )
 GFXDECODE_END
 
@@ -534,12 +537,11 @@ void ddayjlc_state::machine_reset()
 
 void ddayjlc_state::ddayjlc_palette(palette_device &palette) const
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
 	for (int i = 0; i < 0x200; i++)
 	{
 		int bit0, bit1, bit2;
 
-		int const val = (color_prom[i + 0x000]) | (color_prom[i + 0x200] << 4);
+		int const val = (m_proms[i + 0x000]) | (m_proms[i + 0x200] << 4);
 
 		bit0 = 0;
 		bit1 = BIT(val, 6);
@@ -556,25 +558,17 @@ void ddayjlc_state::ddayjlc_palette(palette_device &palette) const
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
-
-	// text colors, almost likely hardwired
-	palette.set_pen_color(0x200, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(0x201, rgb_t(0xff, 0x00, 0x00));
-	palette.set_pen_color(0x202, rgb_t(0x00, 0x97, 0x97));
-	palette.set_pen_color(0x203, rgb_t(0xff, 0xff, 0xff));
 }
 
 uint8_t ddayjlc_state::dma_mem_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-
 	return program.read_byte(offset);
 }
 
 void ddayjlc_state::dma_mem_w(offs_t offset, u8 data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-
 	program.write_byte(offset, data);
 }
 
@@ -626,7 +620,7 @@ void ddayjlc_state::ddayjlc(machine_config &config)
 	screen.screen_vblank().set(FUNC(ddayjlc_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddayjlc);
-	PALETTE(config, m_palette, FUNC(ddayjlc_state::ddayjlc_palette), 0x200+4);
+	PALETTE(config, m_palette, FUNC(ddayjlc_state::ddayjlc_palette), 0x200);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -742,5 +736,5 @@ void ddayjlc_state::init_ddayjlc()
 } // anonymous namespace
 
 
-GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc_state, init_ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ddayjlca, ddayjlc, ddayjlc, ddayjlc, ddayjlc_state, init_ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc_state, init_ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ddayjlca, ddayjlc, ddayjlc, ddayjlc, ddayjlc_state, init_ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
