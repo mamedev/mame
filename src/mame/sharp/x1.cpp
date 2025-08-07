@@ -2233,8 +2233,7 @@ void x1_state::x1(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", x1_floppies, "525dd", x1_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", x1_floppies, "525dd", x1_state::floppy_formats).enable_sound(true);
 
-	SOFTWARE_LIST(config, "flop_list").set_original("x1_flop");
-
+	// TODO: convert to CZ- expansion unit, verify compatibility with x68k if any.
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "x1_cart", "bin,rom");
 
 	SPEAKER(config, "speaker", 2).front();
@@ -2252,10 +2251,12 @@ void x1_state::x1(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.10, 1);
 	m_cassette->set_interface("x1_cass");
 
-	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
-
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1_state::sub_keyboard_cb), attotime::from_hz(250));
 	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1_state::cmt_seek_cb), attotime::from_hz(16));
+
+	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("x1_flop");
+	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("x1");
 }
 
 void x1turbo_state::x1turbo(machine_config &config)

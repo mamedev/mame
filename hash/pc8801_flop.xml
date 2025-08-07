@@ -14628,20 +14628,6 @@ ExtractDisk  [02]"Gradius改       " -> "gradius kai_02.d88"
 		</part>
 	</software>
 
-	<software name="gruppe">
-		<description>Gruppe</description>
-		<year>1985</year>
-		<publisher>SPS</publisher>
-		<!-- PC8801 -->
-		<info name="release" value="198504xx"/>
-		<info name="alt_title" value="ぐるっぺ"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="349392">
-				<rom name="gruppe.d88" size="349392" crc="d7efdc5d" sha1="ab4da770fae54f306bfdc8fc9df3c52f3b4a1a65"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="guinsaga" supported="yes">
 		<description>Guin Saga - Hyoto no Kamen</description>
 		<year>1987</year>
@@ -18990,20 +18976,6 @@ Has serious [3301] corruption in gameplay
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="kisei.d88" size="348848" crc="4b0bf9fd" sha1="6f28ffcf0003fee1bc1cfc439c58c45385eb5d62"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kitahei">
-		<description>Kitahei</description>
-		<year>1985</year>
-		<publisher>SPS</publisher>
-		<!-- PC8801 -->
-		<info name="release" value="198509xx"/>
-		<info name="alt_title" value="棋太平"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="349392">
-				<rom name="kitahei.d88" size="349392" crc="53ae4f58" sha1="bbdff7ac4d6a844580bb06accb1d8d88759b8ae9"/>
 			</dataarea>
 		</part>
 	</software>
