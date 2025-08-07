@@ -54,7 +54,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_bgdata_rom(*this, "bgdata"),
-		m_terrain_rom(*this, "terrain_info"),
+		m_terrain_rom(*this, "terrain"),
 		m_inputs(*this, "IN%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -699,8 +699,8 @@ void fcombat_state::init_fcombat()
 	}
 
 	src = &temp[0];
-	dst = memregion("terrain_info")->base();
-	length = memregion("terrain_info")->bytes();
+	dst = memregion("terrain")->base();
+	length = memregion("terrain")->bytes();
 	memcpy(src, dst, length);
 
 	for (u32 oldaddr = 0; oldaddr < 32; oldaddr++)
@@ -732,7 +732,7 @@ ROM_START( fcombat )
 	ROM_REGION( 0x04000, "bgdata", 0 )
 	ROM_LOAD( "fcombat5.l3",  0x00000, 0x4000, CRC(96194ca7) SHA1(087d6ac8f93f087cb5e378dbe9a8cfcffa2cdddc) )
 
-	ROM_REGION( 0x04000, "terrain_info", 0 )
+	ROM_REGION( 0x04000, "terrain", 0 )
 	ROM_LOAD( "fcombat4.p3",  0x00000, 0x4000, CRC(efe098ab) SHA1(fe64a5e9170835d242368109b1b221b0f8090e7e) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
