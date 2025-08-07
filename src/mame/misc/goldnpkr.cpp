@@ -1151,6 +1151,7 @@ public:
 	void kmhpan(machine_config &config);
 	void unkicpf40(machine_config &config);
 	void wing_w90(machine_config &config);
+	void dep_9801(machine_config &config);
 
 	void init_vkdlswwh();
 	void init_icp1db();
@@ -1257,6 +1258,7 @@ private:
 	void kmhpan_map(address_map &map) ATTR_COLD;
 	void unkicpf40_map(address_map &map) ATTR_COLD;
 	void wing_w90_map(address_map &map) ATTR_COLD;
+	void dep_9801_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -2167,6 +2169,18 @@ void goldnpkr_state::wing_w90_map(address_map &map)
 //	map(0x2800, 0x2800).w();  // Initializes another SN76489, not present in the PCB, and then no activity
 	map(0x4000, 0x7fff).rom();  // bankswitched through 74ls154
 	map(0xc000, 0xffff).rom();  // bankswitched through 74ls154
+}
+
+void goldnpkr_state::dep_9801_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0xffff).rom();
 }
 
 
@@ -5150,6 +5164,13 @@ static GFXDECODE_START( gfx_kmhpan )
 	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 8, 16 )
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_dep_9801 )
+	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 0, 16 )
+GFXDECODE_END
+
 
 /**********************************************************
 *                 Discrete Sound Routines                 *
@@ -5792,6 +5813,21 @@ void blitz_state::megadpkr(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goldnpkr);
 	PALETTE(config, m_palette, FUNC(blitz_state::witchcrd_palette), 256);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void goldnpkr_state::dep_9801(machine_config &config)
+{
+	goldnpkr_base(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::dep_9801_map);
+
+	// video hardware
+	m_gfxdecode->set_info(gfx_dep_9801);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -13446,6 +13482,194 @@ ROM_START( gp_ped42_70 )
 	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+/*
+  DEP 9801 3 encrypted platform.
+
+  Rockwell unknown CPU.
+  Unknown DIL40 IC.
+  Two 32k GFX ROMS
+  4 GFX banks shuffled inside.
+  Encrypted program ROM.
+
+  Sets:
+  
+  137dash     DASH!                 1996/11/18,  AVANTY  50 BET SPECIAL
+  lfhouse     Lucky Full House      1996/02/01 ver 1.16, DATA ver 1.05
+  dynchance   Dynamic Chance        type-3.0 1992/08/29  PART 1-2
+  dynchancf   Dynamic Chance(alt)   type-3.0 1992/08/29  PART 1-2  (only 4 bytes of difference)
+  dynplus     Dynamic Plus One      1997/01/13, SP TYPE Ver 1.10
+
+*/
+ROM_START( 137dash )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "137dash.5e", 0x8000, 0x8000, CRC(7feb8d8c) SHA1(a7f7c4eaa5d688adc235e7fc4fb24351ef0a8633) )
+
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "nosticker.5l", 0x0000, 0x4000, CRC(0426b77b) SHA1(f4844873ddd0bb6d7727c8be637130c5de97c671) )
+	ROM_IGNORE(                       0x4000 )
+	ROM_LOAD( "nosticker.5n", 0x4000, 0x4000, CRC(16d9fc6c) SHA1(51977d34c4b79080d0c8959e83c5e444b5924478) )
+	ROM_IGNORE(                       0x4000 )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(71b04758) SHA1(09f4dc2ded3466880622e2416787a47ca8886fd4) )
+ROM_END
+
+ROM_START( lfhouse )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lf2_i220.5e", 0x8000, 0x8000, CRC(ff975444) SHA1(c13042b6a90a08304e4fcb7c683926b28f14a771) )
+
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "1.5l", 0x0000, 0x4000, CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
+	ROM_IGNORE(               0x4000 )
+	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
+	ROM_IGNORE(               0x4000 )
+	
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
+ROM_END
+
+ROM_START( dynchance )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dc1.5e", 0x8000, 0x8000, CRC(24912d1a) SHA1(7b956487b76564adb30475360ae6c27f7a4e0c9c) )
+
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "mk2.5l", 0x0000, 0x4000, CRC(ac69168b) SHA1(cc425aea0bc7ac5337bb79c8a63176621c8606f5) )
+	ROM_IGNORE(                 0x4000 )
+	ROM_LOAD( "mk3.5n", 0x4000, 0x4000, CRC(3f6c00cb) SHA1(fd45a515a068bf6e2dfa95d411029da0f2eb512c) )
+	ROM_IGNORE(                 0x4000 )
+	
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "7116.2m", 0x0000, 0x0200, CRC(d85503d9) SHA1(a80dc287c05c286837938071afe35b0a6a11765f) )
+ROM_END
+
+ROM_START( dynchancf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dp1.i223.bin", 0x8000, 0x8000, CRC(ee722c55) SHA1(924444e5c07a2b521386cf36a54be31bfbfe612c) )
+
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "mk2.5l", 0x0000, 0x4000, CRC(ac69168b) SHA1(cc425aea0bc7ac5337bb79c8a63176621c8606f5) )
+	ROM_IGNORE(                 0x4000 )
+	ROM_LOAD( "mk3.5n", 0x4000, 0x4000, CRC(3f6c00cb) SHA1(fd45a515a068bf6e2dfa95d411029da0f2eb512c) )
+	ROM_IGNORE(                 0x4000 )
+	
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "7116.2m", 0x0000, 0x0200, CRC(d85503d9) SHA1(a80dc287c05c286837938071afe35b0a6a11765f) )
+ROM_END
+
+ROM_START( dynplus )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dc1.i227.bin", 0x8000, 0x8000, CRC(75b97ef9) SHA1(3a92695b8db680f0e49e3b1d6fcba1d6e1400c6b) )
+
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "mk2.5l", 0x0000, 0x4000, CRC(ac69168b) SHA1(cc425aea0bc7ac5337bb79c8a63176621c8606f5) )
+	ROM_IGNORE(                 0x4000 )
+	ROM_LOAD( "mk3.5n", 0x4000, 0x4000, CRC(3f6c00cb) SHA1(fd45a515a068bf6e2dfa95d411029da0f2eb512c) )
+	ROM_IGNORE(                 0x4000 )
+	
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "7116.2m", 0x0000, 0x0200, CRC(d85503d9) SHA1(a80dc287c05c286837938071afe35b0a6a11765f) )
+ROM_END
+
 
 /*********************************************
 *                Driver Init                 *
@@ -14166,6 +14390,13 @@ GAME(  1987, gp_ped42_90, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped
 GAME(  1987, gp_ped42_85, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 85%)",          0 )  // no lamps
 GAME(  1987, gp_ped42_80, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 80%)",          0 )  // no lamps
 GAME(  1987, gp_ped42_70, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 70%)",          0 )  // no lamps
+
+// DEP 9801 encrypted platform...
+GAME(  1996, 137dash,   0,         dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "137 Dash! (Avanty, 50 bet special)",         MACHINE_NOT_WORKING )
+GAME(  1996, lfhouse,   0,         dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
+GAME(  1992, dynchance, 0,         dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2)",         MACHINE_NOT_WORKING )
+GAME(  1992, dynchancf, dynchance, dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2, alt)",    MACHINE_NOT_WORKING )
+GAME(  1997, dynplus,   dynchance, dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dynamic Plus One (SP Type ver 1.10)",        MACHINE_NOT_WORKING )
 
 
 /*************************************** SETS W/IRQ0 ***************************************/
