@@ -13141,19 +13141,17 @@ ROM_START( icproul )
 ROM_END
 
 /*
-  "开门胡" (kāi mén hú)
+  "开门胡" (Kāimén Hú)
 
   Mahjong-themed poker game.
 
-  The title is a term from Chinese Mahjong, specifically in certain regional rulesets
-  (like Hong Kong Mahjong or Sichuan Mahjong).
+  The title of the game means winning with your starting hand, without
+  needing to play or draw tiles/cards.  It was originally used in the
+  context of mahjong, but it's also used for games like draw poker.
 
-  The literal Translation is "Open the door and win" (开门 = open door; 胡 = win).
-  In the mahjong game, a player can declare a winning hand (胡牌, hú pái) immediately
-  after drawing their first tile (before making any discards or melds).
-
-  Also called "Fast Ron". It's considered a rare and lucky move, often rewarded
-  with extra points or special payouts.
+  开门 refers to deciding where to start dealing from the wall based on
+  the roll of the dice at the start of a hand (literally "open gate"),
+  and 胡 is called when forming a winning hand.
 
 
   PCB serigraphed PAN 电子 (PAN diànzǐ)
@@ -14375,7 +14373,7 @@ GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespe
 
 GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Roulette (ICP-1 PCB)",                    0 )  // password protected
 
-GAME(  199?, kmhpan,    0,        kmhpan,   kmhpan,   goldnpkr_state, empty_init,    ROT0,   "PAN Electronics",          "Kai Men Hu (PAN Electronics)",            MACHINE_IMPERFECT_COLORS )  // needs proper palette decoding
+GAME(  199?, kmhpan,    0,        kmhpan,   kmhpan,   goldnpkr_state, empty_init,    ROT0,   "PAN Electronics",          "Kaimen Hu (PAN Electronics)",             MACHINE_IMPERFECT_COLORS )  // needs proper palette decoding
 
 GAME(  198?, wing90pkr, goldnpkr, wing_w90, wing_w90, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Wing W90 poker (Wing 8510-A W90-3 PCB)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )  // bad gfx dump
 

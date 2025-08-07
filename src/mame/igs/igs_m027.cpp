@@ -4138,8 +4138,8 @@ GAME(  2005, xypdk,         0,        xypdk,        lhzb4,         igs_m027_stat
 GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 GAMEL( 2005, ccly,          crzybugs, ccly,         ccly,          igs_m027_state, init_ccly,     ROT0, "IGS", "Chong Chong Leyuan (V100CN)", MACHINE_NOT_WORKING, layout_ccly )
 GAME(  2001, cjsxp,         0,        ccly,         ccly,          igs_m027_state, init_klxyj,    ROT0, "IGS", "Huangpai Zuqiu Plus / Chaoji Shuangxing Plus (V103CN)", MACHINE_NOT_WORKING ) // inputs, outputs, Oki ROM bank
-GAME(  2000, tshs,          0,        zhongguo,     zhongguo,      igs_m027_state, init_slqz3,    ROT0, "IGS", "Tian Sheng Hao Shou (V201CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs, outputs
-GAME(  2000, tshs101,       tshs,     tshs101,      ccly,          igs_m027_state, init_slqz3,    ROT0, "IGS", "Tian Sheng Hao Shou (V101CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs, outputs, unemulated sound chips
+GAME(  2000, tshs,          0,        zhongguo,     zhongguo,      igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V201CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs, outputs
+GAME(  2000, tshs101,       tshs,     tshs101,      ccly,          igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V101CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs, outputs, unemulated sound chips
 GAME(  2006, tswxp,         0,        tct2p,        tct2p,         igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian Jiaqiang Ban (V101CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs, outputs, Oki ROM bank
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )

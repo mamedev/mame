@@ -2532,13 +2532,13 @@ void drcbe_arm64::op_loads(a64::Assembler &a, const uml::instruction &inst)
 
 		// immediate index
 		if (size == SIZE_BYTE)
-			emit_ldrsb_mem(a, dstreg.x(), memptr);
+			emit_ldrsb_mem(a, dstreg, memptr);
 		else if (size == SIZE_WORD)
-			emit_ldrsh_mem(a, dstreg.x(), memptr);
-		else if (size == SIZE_DWORD)
-			emit_ldrsw_mem(a, dstreg.x(), memptr);
+			emit_ldrsh_mem(a, dstreg, memptr);
+		else if ((size == SIZE_DWORD) && (inst.size() == 8))
+			emit_ldrsw_mem(a, dstreg, memptr);
 		else
-			emit_ldr_mem(a, dstreg.x(), memptr);
+			emit_ldr_mem(a, dstreg, memptr);
 	}
 	else
 	{
@@ -2551,7 +2551,7 @@ void drcbe_arm64::op_loads(a64::Assembler &a, const uml::instruction &inst)
 			a.ldrsb(dstreg, mem);
 		else if (size == SIZE_WORD)
 			a.ldrsh(dstreg, mem);
-		else if (size == SIZE_DWORD && inst.size() == 8)
+		else if ((size == SIZE_DWORD) && (inst.size() == 8))
 			a.ldrsw(dstreg, mem);
 		else
 			a.ldr(dstreg, mem);
