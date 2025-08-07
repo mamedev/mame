@@ -1,7 +1,7 @@
 // license:CC0-1.0
 // copyright-holders:Colin Douglas Howell
-#ifndef MAME_MIDWAY_NL_SSPEEDR_H
-#define MAME_MIDWAY_NL_SSPEEDR_H
+#ifndef MAME_TAITO_NL_SSPEEDR_H
+#define MAME_TAITO_NL_SSPEEDR_H
 
 #pragma once
 
@@ -9,4 +9,4 @@
 
 NETLIST_EXTERNAL(sspeedr)
 
-#endif // MAME_MIDWAY_NL_SSPEEDR_H
+#endif // MAME_TAITO_NL_SSPEEDR_H
