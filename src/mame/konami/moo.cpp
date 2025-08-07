@@ -352,19 +352,19 @@ uint16_t moo_state::control2_r()
 
 void moo_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/* bit 0  is data */
-	/* bit 1  is cs (active low) */
-	/* bit 2  is clock (active high) */
-	/* bit 5  is enable irq 5 (unconfirmed) */
-	/* bit 8  is enable sprite ROM reading */
-	/* bit 10 is watchdog */
-	/* bit 11 is enable irq 4 (unconfirmed) */
+	// bit 0  is data
+	// bit 1  is cs (active low)
+	// bit 2  is clock (active high)
+	// bit 5  is enable irq 5 (unconfirmed)
+	// bit 8  is enable sprite ROM reading
+	// bit 10 is watchdog
+	// bit 11 is enable irq 4 (unconfirmed)
 
 	COMBINE_DATA(&m_cur_control2);
 
 	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 
-	if (data & 0x100)
+	if (m_cur_control2 & 0x100)
 		m_k053246->k053246_set_objcha_line(ASSERT_LINE);
 	else
 		m_k053246->k053246_set_objcha_line(CLEAR_LINE);

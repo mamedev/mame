@@ -893,7 +893,6 @@ ROM_START( contrabj )
 	ROM_LOAD( "a13.14p",     0x60000, 0x10000, CRC(2b513d12) SHA1(152ebd849751cc2e95513134ce773a6b2eeb320e) )
 	// This last section, 0x70000-0x7ffff is empty
 
-
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )    // 007121 #0 sprite lookup table
 	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    // 007121 #0 char lookup table
@@ -930,7 +929,6 @@ ROM_START( contrabj1 )
 	ROM_LOAD( "a12.14n",     0x50000, 0x10000, CRC(d0be7ec2) SHA1(5aa829b8ffbe3f5f92ba672b1c24bfb7836ba1a3) )
 	ROM_LOAD( "a13.14p",     0x60000, 0x10000, CRC(2b513d12) SHA1(152ebd849751cc2e95513134ce773a6b2eeb320e) )
 	// This last section, 0x70000-0x7ffff is empty
-
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )    // 007121 #0 sprite lookup table

@@ -3,7 +3,7 @@
 /*
 
 Konami 007121
-------
+-------------
 This is an interesting beast. It is an evolution of the 005885, with more
 features. Many games use two of these in pair.
 It manages sprites and two 32x32 tilemaps. The tilemaps can be joined to form
