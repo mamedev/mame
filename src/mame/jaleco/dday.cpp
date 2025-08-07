@@ -70,10 +70,10 @@ $842f = lives
 
 namespace {
 
-class ddayjlc_state : public driver_device
+class dday_state : public driver_device
 {
 public:
-	ddayjlc_state(const machine_config &mconfig, device_type type, const char *tag) :
+	dday_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -88,9 +88,9 @@ public:
 		m_proms(*this, "proms")
 	{ }
 
-	void ddayjlc(machine_config &config);
+	void dday(machine_config &config);
 
-	void init_ddayjlc();
+	void init_dday();
 	ioport_value prot_r();
 
 protected:
@@ -112,8 +112,8 @@ private:
 	void flip_screen_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
-	void ddayjlc_palette(palette_device &palette) const;
-	uint32_t screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void dday_palette(palette_device &palette) const;
+	uint32_t screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
@@ -162,7 +162,7 @@ private:
  *
  *******************************/
 
-TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_bg)
+TILE_GET_INFO_MEMBER(dday_state::get_tile_info_bg)
 {
 	uint8_t attr = m_bgvram[tile_index + 0x400];
 	int code = m_bgvram[tile_index] + ((attr & 0x08) << 5);
@@ -173,7 +173,7 @@ TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_bg)
 	tileinfo.set(2, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_fg)
+TILE_GET_INFO_MEMBER(dday_state::get_tile_info_fg)
 {
 	uint16_t code = m_videoram[tile_index] + (m_char_bank << 8);
 	uint8_t color = m_proms[0x400 | (tile_index >> 2 & 0xe0) | (tile_index & 0x1f)];
@@ -181,10 +181,10 @@ TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_fg)
 	tileinfo.set(1, code, color, 0);
 }
 
-void ddayjlc_state::video_start()
+void dday_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ddayjlc_state::get_tile_info_bg)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ddayjlc_state::get_tile_info_fg)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dday_state::get_tile_info_bg)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dday_state::get_tile_info_fg)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -199,7 +199,7 @@ void ddayjlc_state::video_start()
      ---- xxxx color offset
  [3] xxxx xxxx X offset
  ***************************/
-void ddayjlc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void dday_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (uint16_t i = 0; i < 0x400; i += 4)
 	{
@@ -223,7 +223,7 @@ void ddayjlc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-void ddayjlc_state::draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void dday_state::draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -235,7 +235,7 @@ void ddayjlc_state::draw_foreground(screen_device &screen, bitmap_ind16 &bitmap,
 	m_fg_tilemap->draw(screen, bitmap, opaque_rect, TILEMAP_DRAW_OPAQUE, 0);
 }
 
-uint32_t ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x100, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_OPAQUE, 0);
@@ -289,17 +289,17 @@ static const uint8_t prot_data[0x10] =
 	0x03, 0x01, 0x00, 0x03
 };
 
-ioport_value ddayjlc_state::prot_r()
+ioport_value dday_state::prot_r()
 {
 	return prot_data[m_prot_addr];
 }
 
-void ddayjlc_state::prot_w(offs_t offset, uint8_t data)
+void dday_state::prot_w(offs_t offset, uint8_t data)
 {
 	m_prot_addr = (m_prot_addr & (~(1 << offset))) | ((data & 1) << offset);
 }
 
-void ddayjlc_state::char_bank_w(uint8_t data)
+void dday_state::char_bank_w(uint8_t data)
 {
 	m_char_bank = BIT(data,0);
 	m_fg_tilemap->mark_all_dirty();
@@ -307,7 +307,7 @@ void ddayjlc_state::char_bank_w(uint8_t data)
 		logerror("Warning: char_bank_w with %02x\n",data);
 }
 
-void ddayjlc_state::bgvram_w(offs_t offset, uint8_t data)
+void dday_state::bgvram_w(offs_t offset, uint8_t data)
 {
 	if (!offset)
 		m_bg_tilemap->set_scrollx(0, data + 8);
@@ -316,38 +316,38 @@ void ddayjlc_state::bgvram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-void ddayjlc_state::vram_w(offs_t offset, uint8_t data)
+void dday_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-void ddayjlc_state::sound_nmi_w(uint8_t data)
+void dday_state::sound_nmi_w(uint8_t data)
 {
 	m_sound_nmi_enable = BIT(data, 0);
 	if (!m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void ddayjlc_state::main_nmi_w(uint8_t data)
+void dday_state::main_nmi_w(uint8_t data)
 {
 	m_main_nmi_enable = BIT(data, 0);
 	if (!m_main_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void ddayjlc_state::bg0_w(uint8_t data)
+void dday_state::bg0_w(uint8_t data)
 {
 	m_bgadr = (m_bgadr & 0xfe) | (data & 1);
 }
 
-void ddayjlc_state::bg1_w(uint8_t data)
+void dday_state::bg1_w(uint8_t data)
 {
 	m_bgadr = (m_bgadr & 0xfd) | ((data & 1) << 1);
 }
 
-void ddayjlc_state::bg2_w(uint8_t data)
+void dday_state::bg2_w(uint8_t data)
 {
 	m_bgadr = (m_bgadr & 0xfb) | ((data & 1) << 2);
 	if (m_bgadr > 2)
@@ -356,40 +356,40 @@ void ddayjlc_state::bg2_w(uint8_t data)
 	membank("bank1")->set_entry(m_bgadr);
 }
 
-void ddayjlc_state::sound_w(uint8_t data)
+void dday_state::sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-void ddayjlc_state::flip_screen_w(uint8_t data)
+void dday_state::flip_screen_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
 }
 
-void ddayjlc_state::main_map(address_map &map)
+void dday_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram().share("mainram");
 	map(0x9000, 0x93ff).ram().share("spriteram");
-	map(0x9400, 0x97ff).ram().w(FUNC(ddayjlc_state::vram_w)).share("videoram");
-	map(0x9800, 0x9fff).ram().w(FUNC(ddayjlc_state::bgvram_w)).share("bgram"); /* 9800-981f - videoregs */
+	map(0x9400, 0x97ff).ram().w(FUNC(dday_state::vram_w)).share("videoram");
+	map(0x9800, 0x9fff).ram().w(FUNC(dday_state::bgvram_w)).share("bgram"); /* 9800-981f - videoregs */
 	map(0xa000, 0xdfff).bankr("bank1").nopw();
 	map(0xe000, 0xe008).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
-	map(0xf000, 0xf000).w(FUNC(ddayjlc_state::sound_w));
+	map(0xf000, 0xf000).w(FUNC(dday_state::sound_w));
 	map(0xf100, 0xf100).nopw(); // sound related (f/f irq trigger?)
-	map(0xf080, 0xf080).portr("P2").w(FUNC(ddayjlc_state::char_bank_w));
-	map(0xf081, 0xf081).w(FUNC(ddayjlc_state::flip_screen_w));
+	map(0xf080, 0xf080).portr("P2").w(FUNC(dday_state::char_bank_w));
+	map(0xf081, 0xf081).w(FUNC(dday_state::flip_screen_w));
 	// fn originally marked "LMSR"
 	map(0xf083, 0xf083).lw8(NAME([this] (u8 data) {
 		m_dma->dreq1_w(BIT(data, 0));
 		m_dma->dreq0_w(BIT(data, 0));
 	}));
-	map(0xf084, 0xf084).w(FUNC(ddayjlc_state::bg0_w));
-	map(0xf085, 0xf085).w(FUNC(ddayjlc_state::bg1_w));
-	map(0xf086, 0xf086).w(FUNC(ddayjlc_state::bg2_w));
-	map(0xf101, 0xf101).w(FUNC(ddayjlc_state::main_nmi_w));
-	map(0xf102, 0xf105).w(FUNC(ddayjlc_state::prot_w));
+	map(0xf084, 0xf084).w(FUNC(dday_state::bg0_w));
+	map(0xf085, 0xf085).w(FUNC(dday_state::bg1_w));
+	map(0xf086, 0xf086).w(FUNC(dday_state::bg2_w));
+	map(0xf101, 0xf101).w(FUNC(dday_state::main_nmi_w));
+	map(0xf102, 0xf105).w(FUNC(dday_state::prot_w));
 	map(0xf000, 0xf000).portr("P1");
 	map(0xf100, 0xf100).portr("SYSTEM");
 	map(0xf180, 0xf180).portr("DSW1");
@@ -397,7 +397,7 @@ void ddayjlc_state::main_map(address_map &map)
 }
 
 
-void ddayjlc_state::sound_map(address_map &map)
+void dday_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
@@ -405,10 +405,10 @@ void ddayjlc_state::sound_map(address_map &map)
 	map(0x4000, 0x4000).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x5000, 0x5000).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x6000, 0x6000).w("ay2", FUNC(ay8910_device::address_w));
-	map(0x7000, 0x7000).w(FUNC(ddayjlc_state::sound_nmi_w));
+	map(0x7000, 0x7000).w(FUNC(dday_state::sound_nmi_w));
 }
 
-static INPUT_PORTS_START( ddayjlc )
+static INPUT_PORTS_START( dday )
 	// TODO: uses single input side for upright, dual for cocktail
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -436,7 +436,7 @@ static INPUT_PORTS_START( ddayjlc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ddayjlc_state::prot_r))
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(dday_state::prot_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
@@ -501,13 +501,13 @@ static const gfx_layout spritelayout =
 	16*16,
 };
 
-static GFXDECODE_START( gfx_ddayjlc )
+static GFXDECODE_START( gfx_dday )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0x000, 16 ) // upper 16 colors are unused
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0x000, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0x100, 16 )
 GFXDECODE_END
 
-void ddayjlc_state::vblank_irq(int state)
+void dday_state::vblank_irq(int state)
 {
 	if (state && m_main_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -517,7 +517,7 @@ void ddayjlc_state::vblank_irq(int state)
 }
 
 
-void ddayjlc_state::machine_start()
+void dday_state::machine_start()
 {
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_bgadr));
@@ -526,7 +526,7 @@ void ddayjlc_state::machine_start()
 	save_item(NAME(m_prot_addr));
 }
 
-void ddayjlc_state::machine_reset()
+void dday_state::machine_reset()
 {
 	m_char_bank = 0;
 	m_bgadr = 0;
@@ -535,7 +535,7 @@ void ddayjlc_state::machine_reset()
 	m_prot_addr = 0;
 }
 
-void ddayjlc_state::ddayjlc_palette(palette_device &palette) const
+void dday_state::dday_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 0x200; i++)
 	{
@@ -560,19 +560,19 @@ void ddayjlc_state::ddayjlc_palette(palette_device &palette) const
 	}
 }
 
-uint8_t ddayjlc_state::dma_mem_r(offs_t offset)
+uint8_t dday_state::dma_mem_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	return program.read_byte(offset);
 }
 
-void ddayjlc_state::dma_mem_w(offs_t offset, u8 data)
+void dday_state::dma_mem_w(offs_t offset, u8 data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.write_byte(offset, data);
 }
 
-void ddayjlc_state::hrq_w(int state)
+void dday_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
 
@@ -580,33 +580,33 @@ void ddayjlc_state::hrq_w(int state)
 	m_dma->hlda_w(state);
 }
 
-u8 ddayjlc_state::dma_r()
+u8 dday_state::dma_r()
 {
 	return m_dma_latch;
 }
 
-void ddayjlc_state::dma_w(u8 data)
+void dday_state::dma_w(u8 data)
 {
 	m_dma_latch = data;
 }
 
-void ddayjlc_state::ddayjlc(machine_config &config)
+void dday_state::dday(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 12_MHz_XTAL / 3);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ddayjlc_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dday_state::main_map);
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &ddayjlc_state::sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dday_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	I8257(config, m_dma, 12_MHz_XTAL / 3);
-	m_dma->out_hrq_cb().set(FUNC(ddayjlc_state::hrq_w));
-	m_dma->in_memr_cb().set(FUNC(ddayjlc_state::dma_mem_r));
-	m_dma->out_memw_cb().set(FUNC(ddayjlc_state::dma_mem_w));
-	m_dma->in_ior_cb<1>().set(FUNC(ddayjlc_state::dma_r));
-	m_dma->out_iow_cb<0>().set(FUNC(ddayjlc_state::dma_w));
+	m_dma->out_hrq_cb().set(FUNC(dday_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(dday_state::dma_mem_r));
+	m_dma->out_memw_cb().set(FUNC(dday_state::dma_mem_w));
+	m_dma->in_ior_cb<1>().set(FUNC(dday_state::dma_r));
+	m_dma->out_iow_cb<0>().set(FUNC(dday_state::dma_w));
 	m_dma->set_reverse_rw_mode(true);
 
 	/* video hardware */
@@ -615,12 +615,12 @@ void ddayjlc_state::ddayjlc(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(ddayjlc_state::screen_update_ddayjlc));
+	screen.set_screen_update(FUNC(dday_state::screen_update_dday));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(ddayjlc_state::vblank_irq));
+	screen.screen_vblank().set(FUNC(dday_state::vblank_irq));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddayjlc);
-	PALETTE(config, m_palette, FUNC(ddayjlc_state::ddayjlc_palette), 0x200);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dday);
+	PALETTE(config, m_palette, FUNC(dday_state::dday_palette), 0x200);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -715,7 +715,7 @@ ROM_START( ddayjlca )
 ROM_END
 
 
-void ddayjlc_state::init_ddayjlc()
+void dday_state::init_dday()
 {
 	std::vector<uint8_t> temp(0x10000);
 	uint8_t *src = &temp[0];
@@ -736,5 +736,5 @@ void ddayjlc_state::init_ddayjlc()
 } // anonymous namespace
 
 
-GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc_state, init_ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ddayjlca, ddayjlc, ddayjlc, ddayjlc, ddayjlc_state, init_ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ddayjlc,  0,    dday, dday, dday_state, init_dday, ROT90, "Jaleco", "D-Day (Jaleco, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ddayjlca, dday, dday, dday, dday_state, init_dday, ROT90, "Jaleco", "D-Day (Jaleco, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
