@@ -138,7 +138,7 @@ void editwin_info::save_configuration_to_node(util::xml::data_node &node)
 {
 	debugwin_info::save_configuration_to_node(node);
 
-	util::xml::data_node *const hist = node.add_child(NODE_WINDOW_HISTORY, nullptr);
+	util::xml::data_node *const hist = node.add_child(NODE_WINDOW_HISTORY);
 	if (hist)
 	{
 		for (auto it = m_history.crbegin(); m_history.crend() != it; ++it)

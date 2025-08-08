@@ -331,7 +331,7 @@ void debugview_info::save_configuration_to_node(util::xml::data_node &node)
 {
 	if (m_view->cursor_supported())
 	{
-		util::xml::data_node *const selection = node.add_child(NODE_WINDOW_SELECTION, nullptr);
+		util::xml::data_node *const selection = node.add_child(NODE_WINDOW_SELECTION);
 		if (selection)
 		{
 			debug_view_xy const pos = m_view->cursor_position();
@@ -341,7 +341,7 @@ void debugview_info::save_configuration_to_node(util::xml::data_node &node)
 		}
 	}
 
-	util::xml::data_node *const scroll = node.add_child(NODE_WINDOW_SCROLL, nullptr);
+	util::xml::data_node *const scroll = node.add_child(NODE_WINDOW_SCROLL);
 	if (scroll)
 	{
 		debug_view_xy const origin = m_view->visible_position();

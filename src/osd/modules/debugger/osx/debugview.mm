@@ -524,7 +524,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	if (view->cursor_supported())
 	{
-		util::xml::data_node *const selection = node->add_child(osd::debugger::NODE_WINDOW_SELECTION, nullptr);
+		util::xml::data_node *const selection = node->add_child(osd::debugger::NODE_WINDOW_SELECTION);
 		if (selection)
 		{
 			debug_view_xy const pos = view->cursor_position();
@@ -534,7 +534,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		}
 	}
 
-	util::xml::data_node *const scroll = node->add_child(osd::debugger::NODE_WINDOW_SCROLL, nullptr);
+	util::xml::data_node *const scroll = node->add_child(osd::debugger::NODE_WINDOW_SCROLL);
 	if (scroll)
 	{
 		NSRect const visible = [self visibleRect];

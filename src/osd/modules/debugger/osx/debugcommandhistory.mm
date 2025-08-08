@@ -114,7 +114,7 @@
 
 
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
-	util::xml::data_node *const hist = node->add_child(osd::debugger::NODE_WINDOW_HISTORY, nullptr);
+	util::xml::data_node *const hist = node->add_child(osd::debugger::NODE_WINDOW_HISTORY);
 	if (hist) {
 		for (NSInteger i = [history count]; 0 < i; --i)
 			hist->add_child(osd::debugger::NODE_HISTORY_ITEM, [[history objectAtIndex:(i - 1)] UTF8String]);

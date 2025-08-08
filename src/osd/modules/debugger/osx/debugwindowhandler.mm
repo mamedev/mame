@@ -276,7 +276,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	if (m == machine)
 	{
 		util::xml::data_node *parentnode = (util::xml::data_node *)[[[notification userInfo] objectForKey:@"MAMEDebugParentNode"] pointerValue];
-		util::xml::data_node *node = parentnode->add_child(osd::debugger::NODE_WINDOW, nullptr);
+		util::xml::data_node *node = parentnode->add_child(osd::debugger::NODE_WINDOW);
 		if (node)
 			[self saveConfigurationToNode:node];
 	}
