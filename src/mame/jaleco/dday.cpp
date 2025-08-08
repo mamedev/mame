@@ -8,7 +8,7 @@ TODO:
 - unused upper sprite color bank;
 - improve sound comms, sometimes BGM becomes silent, very hard to repro;
 - insert coin sound volume cuts;
-- identify protection chip, see preliminary pinout below;
+- emulate protection properly (with a m54824p_device)
 
 --------------------------------------------------------------------------------
 Is it 1984 or 1987 game ?
@@ -269,35 +269,40 @@ u32 dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, 
     Protection device
 
     24 pin IC with scratched surface (like Exerion's "ICX"), not an MCU.
-    Die has label "4828A"; could this be Mitsubishi M54828P (frequency counter with 5-digit FLT display driver)?
+    Die has label "4828A".
+
+    It's a Mitsubishi M54828P (M54824P family).
+    A frequency counter with 5-digit FLT display driver.
+
+	It writes to S1-S4, and reads digit segments (two of b/c/e/g?)
 
     Pinout:
 
-     1 - vcc
-     2 - ?
-     3 - I/O (input)
-     4 - I/O (input)
-     5 - I/O (input)
-     6 - I/O (input)
-     7 - vcc
-     8 - xtal
-     9 - ?
-    10 - gnd
-    11 - ?
-    12 - ?
-    13 - I/O (input)
-    14 - ?
-    15 - I/O (input)
-    16 - ?
-    17 - ?
-    18 - I/O (input)
-    19 - ?
-    20 - ?
-    21 - I/O (input)
-    22 - ?
-    23 - ?
-    24 - ?
+     1 - Vcc
+     2 - fc - count input
+     3 - S4 \
+     4 - S3  \ preset selection
+     5 - S2  /
+     6 - S1 /
+     7 - brightness control
+     8 - X-IN  \ osc circuit
+     9 - X-OUT /
+    10 - GND
+    11 - TEST
+    12 - seg A
 
+    13 - seg B
+    14 - digit 1
+    15 - seg C
+    16 - digit 2
+    17 - seg D
+    18 - seg E
+    19 - digit 3
+    20 - seg F
+    21 - digit 4
+    22 - seg G
+    23 - digit 5
+    24 - seg DP
 */
 
 static const u8 prot_data[0x10] =
