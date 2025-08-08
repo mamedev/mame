@@ -1690,7 +1690,9 @@ void dkong_state::dkong_base(machine_config &config)
 	m_dma8257->out_memw_cb().set(FUNC(dkong_state::memory_write_byte));
 	m_dma8257->in_ior_cb<1>().set(FUNC(dkong_state::p8257_ctl_r));
 	m_dma8257->out_iow_cb<0>().set(FUNC(dkong_state::p8257_ctl_w));
-	m_dma8257->set_reverse_rw_mode(1); // why?
+	m_dma8257->set_reverse_rw_mode(true); // why?
+
+	config.set_maximum_quantum(attotime::from_hz(60000)); // for I8257
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
