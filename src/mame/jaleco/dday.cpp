@@ -124,7 +124,7 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 
-	/* devices */
+	// devices
 	required_device<z80_device> m_maincpu;
 	required_device<z80_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -134,22 +134,23 @@ private:
 	required_device<i8257_device> m_dma;
 	required_memory_bank m_bank;
 
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<u8> m_mainram;
 	required_shared_ptr<u8> m_spriteram;
 	required_shared_ptr<u8> m_videoram;
 	required_shared_ptr<u8> m_bgvram;
 	required_region_ptr<u8> m_proms;
 
-	/* video-related */
+	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
 	u8 m_char_bank = 0;
 	u8 m_bgadr = 0;
 
-	/* misc */
+	// misc
 	bool m_main_nmi_enable = false;
 	bool m_sound_nmi_enable = false;
+	bool m_sound_irq_clock = false;
 	u8 m_prot_addr = 0;
 
 	u8 dma_mem_r(offs_t offset);
@@ -366,7 +367,10 @@ void dday_state::bg2_w(u8 data)
 
 void dday_state::sound_irq_w(u8 data)
 {
-	m_audiocpu->set_input_line(0, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+	// 7474 to audiocpu irq? (pulse is too short for direct assert/clear)
+	if (!BIT(data, 0) && m_sound_irq_clock)
+			m_audiocpu->set_input_line(0, HOLD_LINE);
+	m_sound_irq_clock = BIT(data, 0);
 }
 
 void dday_state::flip_screen_w(u8 data)
@@ -380,7 +384,7 @@ void dday_state::main_map(address_map &map)
 	map(0x8000, 0x8fff).ram().share("mainram");
 	map(0x9000, 0x93ff).ram().share("spriteram");
 	map(0x9400, 0x97ff).ram().w(FUNC(dday_state::vram_w)).share("videoram");
-	map(0x9800, 0x9fff).ram().w(FUNC(dday_state::bgvram_w)).share("bgram"); /* 9800-981f - videoregs */
+	map(0x9800, 0x9fff).ram().w(FUNC(dday_state::bgvram_w)).share("bgram"); // 9800-981f - videoregs
 	map(0xa000, 0xdfff).bankr("bank").nopw();
 	map(0xe000, 0xe008).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0xf000, 0xf000).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -517,6 +521,7 @@ void dday_state::machine_start()
 	save_item(NAME(m_bgadr));
 	save_item(NAME(m_main_nmi_enable));
 	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_sound_irq_clock));
 	save_item(NAME(m_prot_addr));
 	save_item(NAME(m_dma_latch));
 }
@@ -527,6 +532,7 @@ void dday_state::machine_reset()
 	m_bgadr = 0;
 	m_sound_nmi_enable = false;
 	m_main_nmi_enable = false;
+	m_sound_irq_clock = false;
 	m_prot_addr = 0;
 	m_dma_latch = 0;
 }
@@ -580,7 +586,7 @@ void dday_state::dma_w(u8 data)
 
 void dday_state::dday(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 12_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dday_state::main_map);
 	m_maincpu->busack_cb().set(m_dma, FUNC(i8257_device::hlda_w));
@@ -598,7 +604,7 @@ void dday_state::dday(machine_config &config)
 	m_dma->out_iow_cb<0>().set(FUNC(dday_state::dma_w));
 	m_dma->set_reverse_rw_mode(true);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -611,6 +617,7 @@ void dday_state::dday(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dday);
 	PALETTE(config, m_palette, FUNC(dday_state::dday_palette), 0x200);
 
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
