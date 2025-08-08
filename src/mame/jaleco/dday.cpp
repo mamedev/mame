@@ -82,6 +82,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_dma(*this, "dma"),
@@ -104,21 +105,21 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	void prot_w(offs_t offset, uint8_t data);
-	void char_bank_w(uint8_t data);
-	void bgvram_w(offs_t offset, uint8_t data);
-	void vram_w(offs_t offset, uint8_t data);
-	void sound_nmi_enable_w(uint8_t data);
-	void main_nmi_enable_w(uint8_t data);
-	void bg0_w(uint8_t data);
-	void bg1_w(uint8_t data);
-	void bg2_w(uint8_t data);
-	void sound_irq_w(uint8_t data);
-	void flip_screen_w(uint8_t data);
+	void prot_w(offs_t offset, u8 data);
+	void char_bank_w(u8 data);
+	void bgvram_w(offs_t offset, u8 data);
+	void vram_w(offs_t offset, u8 data);
+	void sound_nmi_enable_w(u8 data);
+	void main_nmi_enable_w(u8 data);
+	void bg0_w(u8 data);
+	void bg1_w(u8 data);
+	void bg2_w(u8 data);
+	void sound_irq_w(u8 data);
+	void flip_screen_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	void dday_palette(palette_device &palette) const;
-	uint32_t screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
@@ -127,31 +128,32 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<z80_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<i8257_device> m_dma;
 	required_memory_bank m_bank;
 
 	/* memory pointers */
-	required_shared_ptr<uint8_t> m_mainram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_bgvram;
-	required_region_ptr<uint8_t> m_proms;
+	required_shared_ptr<u8> m_mainram;
+	required_shared_ptr<u8> m_spriteram;
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_bgvram;
+	required_region_ptr<u8> m_proms;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap = nullptr;
-	tilemap_t  *m_fg_tilemap = nullptr;
-	int32_t    m_char_bank = 0;
-	int32_t    m_bgadr = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	u8 m_char_bank = 0;
+	u8 m_bgadr = 0;
 
 	/* misc */
-	bool       m_main_nmi_enable = false;
-	bool       m_sound_nmi_enable = false;
-	bool       m_sound_irq_clock = false;
-	uint8_t    m_prot_addr = 0;
+	bool m_main_nmi_enable = false;
+	bool m_sound_nmi_enable = false;
+	bool m_sound_irq_clock = false;
+	u8 m_prot_addr = 0;
 
-	uint8_t dma_mem_r(offs_t offset);
+	u8 dma_mem_r(offs_t offset);
 	void dma_mem_w(offs_t offset, u8 data);
 	u8 dma_r();
 	void dma_w(u8 data);
@@ -170,19 +172,19 @@ private:
 
 TILE_GET_INFO_MEMBER(dday_state::get_tile_info_bg)
 {
-	uint8_t attr = m_bgvram[tile_index + 0x400];
+	u8 attr = m_bgvram[tile_index + 0x400];
 	int code = m_bgvram[tile_index] + ((attr & 0x08) << 5);
 	int color = (attr & 0x7);
 	color |= (attr & 0x40) >> 3;
 
-	tileinfo.category = BIT(attr,7);
+	tileinfo.category = BIT(attr, 7);
 	tileinfo.set(2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(dday_state::get_tile_info_fg)
 {
-	uint16_t code = m_videoram[tile_index] + (m_char_bank << 8);
-	uint8_t color = m_proms[0x400 | (tile_index >> 2 & 0xe0) | (tile_index & 0x1f)];
+	u16 code = m_videoram[tile_index] + (m_char_bank << 8);
+	u8 color = m_proms[0x400 | (tile_index >> 2 & 0xe0) | (tile_index & 0x1f)];
 
 	tileinfo.set(1, code, color, 0);
 }
@@ -207,15 +209,15 @@ void dday_state::video_start()
  ***************************/
 void dday_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (uint16_t i = 0; i < 0x400; i += 4)
+	for (u16 i = 0; i < 0x400; i += 4)
 	{
-		uint8_t  flags = m_spriteram[i + 2];
-		uint8_t  y = 256 - m_spriteram[i + 0] - 8;
-		uint16_t code = m_spriteram[i + 1];
-		uint8_t  x = m_spriteram[i + 3] - 16;
-		uint8_t  xflip = (flags & 0x80) >> 7;
-		uint8_t  yflip = (code & 0x80) >> 7;
-		uint8_t  color = flags & 0xf;
+		u8 flags = m_spriteram[i + 2];
+		u8 y = 256 - m_spriteram[i + 0] - 8;
+		u16 code = m_spriteram[i + 1];
+		u8 x = m_spriteram[i + 3] - 16;
+		u8 xflip = (flags & 0x80) >> 7;
+		u8 yflip = (code & 0x80) >> 7;
+		u8 color = flags & 0xf;
 
 		code = (code & 0x7f) | ((flags & 0x30) << 3);
 
@@ -241,7 +243,7 @@ void dday_state::draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, co
 	m_fg_tilemap->draw(screen, bitmap, opaque_rect, TILEMAP_DRAW_OPAQUE, 0);
 }
 
-uint32_t dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x100, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_OPAQUE, 0);
@@ -288,7 +290,7 @@ uint32_t dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bit
 
 */
 
-static const uint8_t prot_data[0x10] =
+static const u8 prot_data[0x10] =
 {
 	0x02, 0x02, 0x02, 0x02,
 	0x02, 0x00, 0x02, 0x00,
@@ -301,12 +303,12 @@ ioport_value dday_state::prot_r()
 	return prot_data[m_prot_addr];
 }
 
-void dday_state::prot_w(offs_t offset, uint8_t data)
+void dday_state::prot_w(offs_t offset, u8 data)
 {
 	m_prot_addr = (m_prot_addr & (~(1 << offset))) | ((data & 1) << offset);
 }
 
-void dday_state::char_bank_w(uint8_t data)
+void dday_state::char_bank_w(u8 data)
 {
 	m_char_bank = BIT(data, 0);
 	m_fg_tilemap->mark_all_dirty();
@@ -314,7 +316,7 @@ void dday_state::char_bank_w(uint8_t data)
 		logerror("Warning: char_bank_w with %02x\n",data);
 }
 
-void dday_state::bgvram_w(offs_t offset, uint8_t data)
+void dday_state::bgvram_w(offs_t offset, u8 data)
 {
 	if (!offset)
 		m_bg_tilemap->set_scrollx(0, data + 8);
@@ -323,38 +325,38 @@ void dday_state::bgvram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-void dday_state::vram_w(offs_t offset, uint8_t data)
+void dday_state::vram_w(offs_t offset, u8 data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-void dday_state::sound_nmi_enable_w(uint8_t data)
+void dday_state::sound_nmi_enable_w(u8 data)
 {
 	m_sound_nmi_enable = BIT(data, 0);
 	if (!m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void dday_state::main_nmi_enable_w(uint8_t data)
+void dday_state::main_nmi_enable_w(u8 data)
 {
 	m_main_nmi_enable = BIT(data, 0);
 	if (!m_main_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void dday_state::bg0_w(uint8_t data)
+void dday_state::bg0_w(u8 data)
 {
 	m_bgadr = (m_bgadr & 0xfe) | (data & 1);
 }
 
-void dday_state::bg1_w(uint8_t data)
+void dday_state::bg1_w(u8 data)
 {
 	m_bgadr = (m_bgadr & 0xfd) | ((data & 1) << 1);
 }
 
-void dday_state::bg2_w(uint8_t data)
+void dday_state::bg2_w(u8 data)
 {
 	m_bgadr = (m_bgadr & 0xfb) | ((data & 1) << 2);
 	if (m_bgadr > 2)
@@ -363,15 +365,15 @@ void dday_state::bg2_w(uint8_t data)
 	m_bank->set_entry(m_bgadr);
 }
 
-void dday_state::sound_irq_w(uint8_t data)
+void dday_state::sound_irq_w(u8 data)
 {
 	// 7474 to audiocpu irq? (pulse is too short for direct assert/clear)
 	if (!BIT(data, 0) && m_sound_irq_clock)
-		m_audiocpu->set_input_line(0, HOLD_LINE);
+			m_audiocpu->set_input_line(0, HOLD_LINE);
 	m_sound_irq_clock = BIT(data, 0);
 }
 
-void dday_state::flip_screen_w(uint8_t data)
+void dday_state::flip_screen_w(u8 data)
 {
 	flip_screen_set(data & 1);
 }
@@ -385,8 +387,7 @@ void dday_state::main_map(address_map &map)
 	map(0x9800, 0x9fff).ram().w(FUNC(dday_state::bgvram_w)).share("bgram"); /* 9800-981f - videoregs */
 	map(0xa000, 0xdfff).bankr("bank").nopw();
 	map(0xe000, 0xe008).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
-	map(0xf000, 0xf000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf100, 0xf100).w(FUNC(dday_state::sound_irq_w));
+	map(0xf000, 0xf000).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf080, 0xf080).portr("P2").w(FUNC(dday_state::char_bank_w));
 	map(0xf081, 0xf081).w(FUNC(dday_state::flip_screen_w));
 	// fn originally marked "LMSR"
@@ -397,10 +398,9 @@ void dday_state::main_map(address_map &map)
 	map(0xf084, 0xf084).w(FUNC(dday_state::bg0_w));
 	map(0xf085, 0xf085).w(FUNC(dday_state::bg1_w));
 	map(0xf086, 0xf086).w(FUNC(dday_state::bg2_w));
+	map(0xf100, 0xf100).portr("SYSTEM").w(FUNC(dday_state::sound_irq_w));
 	map(0xf101, 0xf101).w(FUNC(dday_state::main_nmi_enable_w));
 	map(0xf102, 0xf105).w(FUNC(dday_state::prot_w));
-	map(0xf000, 0xf000).portr("P1");
-	map(0xf100, 0xf100).portr("SYSTEM");
 	map(0xf180, 0xf180).portr("DSW1");
 	map(0xf200, 0xf200).portr("DSW2");
 }
@@ -562,7 +562,7 @@ void dday_state::dday_palette(palette_device &palette) const
 	}
 }
 
-uint8_t dday_state::dma_mem_r(offs_t offset)
+u8 dday_state::dma_mem_r(offs_t offset)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	return program.read_byte(offset);
@@ -605,14 +605,14 @@ void dday_state::dday(machine_config &config)
 	m_dma->set_reverse_rw_mode(true);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(dday_state::screen_update_dday));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(dday_state::vblank_irq));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(dday_state::screen_update_dday));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(dday_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dday);
 	PALETTE(config, m_palette, FUNC(dday_state::dday_palette), 0x200);
@@ -712,15 +712,15 @@ ROM_END
 
 void dday_state::init_dday()
 {
-	std::vector<uint8_t> temp(0x10000);
-	uint8_t *src = &temp[0];
-	uint8_t *dst = memregion("gfx1")->base();
-	uint32_t length = memregion("gfx1")->bytes();
+	std::vector<u8> temp(0x10000);
+	u8 *src = &temp[0];
+	u8 *dst = memregion("gfx1")->base();
+	u32 length = memregion("gfx1")->bytes();
 	memcpy(src, dst, length);
 
-	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
+	for (u32 oldaddr = 0; oldaddr < length; oldaddr++)
 	{
-		uint32_t newadr = (oldaddr & 0x4007) | (oldaddr >> 10 & 0x8) | (oldaddr << 1 & 0x3ff0);
+		u32 newadr = (oldaddr & 0x4007) | (oldaddr >> 10 & 0x8) | (oldaddr << 1 & 0x3ff0);
 		dst[newadr] = src[oldaddr];
 	}
 
