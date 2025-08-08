@@ -260,7 +260,7 @@ u32 dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, 
     Protection device
 
     24 pin IC with scratched surface (like Exerion's "ICX"), not an MCU.
-    Die has label "4828A"; could this be Mitsubishi M54828P (frequency counter with 5-digit VFD driver)?
+    Die has label "4828A"; could this be Mitsubishi M54828P (frequency counter with 5-digit FLT display driver)?
 
     Pinout:
 
@@ -733,5 +733,5 @@ void dday_state::init_dday()
 } // anonymous namespace
 
 
-GAME( 1984, ddayjlc,  0,    dday, dday, dday_state, init_dday, ROT90, "Jaleco", "D-Day (Jaleco, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ddayjlca, dday, dday, dday, dday_state, init_dday, ROT90, "Jaleco", "D-Day (Jaleco, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ddayjlc,  0,       dday, dday, dday_state, init_dday, ROT90, "Jaleco", "D-Day (Jaleco, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ddayjlca, ddayjlc, dday, dday, dday_state, init_dday, ROT90, "Jaleco", "D-Day (Jaleco, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
