@@ -64,7 +64,7 @@ public:
 	void set_visible(bool visible) { m_visible = visible; }
 	void set_screen(screen_device *screen) { m_screen = screen; }
 	//void setxy(float x, float y);
-	void set_bitmap_name(const char *name);
+	void set_bitmap_name(std::string_view name);
 	void set_default_bitmap();
 
 	// updates

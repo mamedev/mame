@@ -207,7 +207,7 @@ file::ptr file::string_read(const char *string, parse_options const *opts)
 void file::write(util::core_file &file) const
 {
 	// ensure this is a root node
-	assert(!get_name());
+	assert(name().empty());
 
 	// output a simple header
 	file.printf("<?xml version=\"1.0\"?>\n");
@@ -234,12 +234,12 @@ data_node::data_node()
 {
 }
 
-data_node::data_node(data_node *parent, const char *name, const char *value)
+data_node::data_node(data_node *parent, std::string_view name, std::string_view value)
 	: line(0)
 	, m_next(nullptr)
 	, m_first_child(nullptr)
 	, m_name(name)
-	, m_value(value ? value : "")
+	, m_value(value)
 	, m_parent(parent)
 	, m_attributes()
 {
@@ -266,18 +266,6 @@ void data_node::free_children()
 		nchild = m_first_child->get_next_sibling();
 		delete m_first_child;
 	}
-}
-
-
-void data_node::set_value(char const *value)
-{
-	m_value.assign(value ? value : "");
-}
-
-
-void data_node::append_value(char const *value, int length)
-{
-	m_value.append(value, length);
 }
 
 
@@ -329,12 +317,12 @@ std::size_t data_node::count_attributes() const
 //  tag
 //-------------------------------------------------
 
-data_node *data_node::get_child(const char *name)
+data_node *data_node::get_child(std::string_view name)
 {
 	return m_first_child ? m_first_child->get_sibling(name) : nullptr;
 }
 
-data_node const *data_node::get_child(const char *name) const
+data_node const *data_node::get_child(std::string_view name) const
 {
 	return m_first_child ? m_first_child->get_sibling(name) : nullptr;
 }
@@ -363,12 +351,12 @@ data_node const *data_node::find_first_matching_child(const char *name, const ch
 //  specified tag
 //-------------------------------------------------
 
-data_node *data_node::get_next_sibling(const char *name)
+data_node *data_node::get_next_sibling(std::string_view name)
 {
 	return m_next ? m_next->get_sibling(name) : nullptr;
 }
 
-data_node const *data_node::get_next_sibling(const char *name) const
+data_node const *data_node::get_next_sibling(std::string_view name) const
 {
 	return m_next ? m_next->get_sibling(name) : nullptr;
 }
@@ -396,21 +384,15 @@ data_node const *data_node::find_next_matching_sibling(const char *name, const c
 //  given node
 //-------------------------------------------------
 
-data_node *data_node::add_child(const char *name, const char *value)
+data_node *data_node::add_child(std::string_view name, std::string_view value)
 {
-	if (!name || !*name)
+	if (name.empty())
 		return nullptr;
 
 	// new element: create a new node
 	data_node *node;
 	try { node = new data_node(this, name, value); }
 	catch (...) { return nullptr; }
-
-	if (!node->get_name() || (!node->get_value() && value))
-	{
-		delete node;
-		return nullptr;
-	}
 
 	// add us to the end of the list of siblings
 	data_node **pnode;
@@ -426,7 +408,7 @@ data_node *data_node::add_child(const char *name, const char *value)
 //  the specified type; if not found, add one
 //-------------------------------------------------
 
-data_node *data_node::get_or_add_child(const char *name, const char *value)
+data_node *data_node::get_or_add_child(std::string_view name, std::string_view value)
 {
 	// find the child first
 	data_node *const child = m_first_child->get_sibling(name);
@@ -441,14 +423,14 @@ data_node *data_node::get_or_add_child(const char *name, const char *value)
 // recursively copy as child of another node
 data_node *data_node::copy_into(data_node &parent) const
 {
-	data_node *const result = parent.add_child(get_name(), get_value());
+	data_node *const result = parent.add_child(name(), value());
 	result->m_attributes = m_attributes;
 
 	data_node *dst = result;
 	data_node const *src = get_first_child();
 	while (src && (&parent != dst))
 	{
-		dst = dst->add_child(src->get_name(), src->get_value());
+		dst = dst->add_child(src->name(), src->value());
 		dst->m_attributes = src->m_attributes;
 		data_node const *next = src->get_first_child();
 		if (next)
@@ -517,20 +499,20 @@ void data_node::delete_node()
 //  the specified node with the specified tag
 //-------------------------------------------------
 
-data_node *data_node::get_sibling(const char *name)
+data_node *data_node::get_sibling(std::string_view name)
 {
 	// loop over siblings and find a matching name
 	for (data_node *node = this; node; node = node->get_next_sibling())
-		if (strcmp(node->get_name(), name) == 0)
+		if (node->name() == name)
 			return node;
 	return nullptr;
 }
 
-data_node const *data_node::get_sibling(const char *name) const
+data_node const *data_node::get_sibling(std::string_view name) const
 {
 	// loop over siblings and find a matching name
 	for (data_node const *node = this; node; node = node->get_next_sibling())
-		if (strcmp(node->get_name(), name) == 0)
+		if (node->name() == name)
 			return node;
 	return nullptr;
 }
@@ -548,7 +530,7 @@ data_node *data_node::find_matching_sibling(const char *name, const char *attrib
 	for (data_node *node = this; node; node = node->get_next_sibling())
 	{
 		// can pass nullptr as a wildcard for the node name
-		if (!name || !strcmp(name, node->get_name()))
+		if (!name || node->name() == name)
 		{
 			// find a matching attribute
 			attribute_node const *const attr = node->get_attribute(attribute);
@@ -565,7 +547,7 @@ data_node const *data_node::find_matching_sibling(const char *name, const char *
 	for (data_node const *node = this; node; node = node->get_next_sibling())
 	{
 		// can pass nullptr as a wildcard for the node name
-		if (!name || !strcmp(name, node->get_name()))
+		if (!name || node->name() == name)
 		{
 			// find a matching attribute
 			attribute_node const *const attr = node->get_attribute(attribute);
@@ -582,7 +564,7 @@ data_node const *data_node::find_matching_sibling(const char *name, const char *
 //  XML ATTRIBUTE MANAGEMENT
 //**************************************************************************
 
-bool data_node::has_attribute(const char *attribute) const
+bool data_node::has_attribute(std::string_view attribute) const
 {
 	return get_attribute(attribute) != nullptr;
 }
@@ -593,20 +575,20 @@ bool data_node::has_attribute(const char *attribute) const
 //  specified attribute, or nullptr if not found
 //-------------------------------------------------
 
-data_node::attribute_node *data_node::get_attribute(const char *attribute)
+data_node::attribute_node *data_node::get_attribute(std::string_view attribute)
 {
 	// loop over attributes and find a match
 	for (attribute_node &anode : m_attributes)
-		if (strcmp(anode.name.c_str(), attribute) == 0)
+		if (anode.name == attribute)
 			return &anode;
 	return nullptr;
 }
 
-data_node::attribute_node const *data_node::get_attribute(const char *attribute) const
+data_node::attribute_node const *data_node::get_attribute(std::string_view attribute) const
 {
 	// loop over attributes and find a match
 	for (attribute_node const &anode : m_attributes)
-		if (strcmp(anode.name.c_str(), attribute) == 0)
+		if (anode.name == attribute)
 			return &anode;
 	return nullptr;
 }
@@ -618,9 +600,9 @@ data_node::attribute_node const *data_node::get_attribute(const char *attribute)
 //  if not found, return = nullptr
 //-------------------------------------------------
 
-std::string const *data_node::get_attribute_string_ptr(const char *attribute) const
+std::string const *data_node::get_attribute_string_ptr(std::string_view attribute) const
 {
-	attribute_node const *attr = get_attribute(attribute);
+	attribute_node const *const attr = get_attribute(attribute);
 	return attr ? &attr->value : nullptr;
 }
 
@@ -631,10 +613,10 @@ std::string const *data_node::get_attribute_string_ptr(const char *attribute) co
 //  found, return = the provided default
 //-------------------------------------------------
 
-const char *data_node::get_attribute_string(const char *attribute, const char *defvalue) const
+std::string_view data_node::get_attribute_string(std::string_view attribute, std::string_view defvalue) const
 {
-	attribute_node const *attr = get_attribute(attribute);
-	return attr ? attr->value.c_str() : defvalue;
+	attribute_node const *const attr = get_attribute(attribute);
+	return attr ? attr->value : defvalue;
 }
 
 
@@ -644,9 +626,9 @@ const char *data_node::get_attribute_string(const char *attribute, const char *d
 //  found, return = the provided default
 //-------------------------------------------------
 
-long long data_node::get_attribute_int(const char *attribute, long long defvalue) const
+long long data_node::get_attribute_int(std::string_view attribute, long long defvalue) const
 {
-	attribute_node const *attr = get_attribute(attribute);
+	attribute_node const *const attr = get_attribute(attribute);
 	if (!attr)
 		return defvalue;
 	std::string const &string = attr->value;
@@ -688,7 +670,7 @@ long long data_node::get_attribute_int(const char *attribute, long long defvalue
 //  format of the given integer attribute
 //-------------------------------------------------
 
-data_node::int_format data_node::get_attribute_int_format(const char *attribute) const
+data_node::int_format data_node::get_attribute_int_format(std::string_view attribute) const
 {
 	attribute_node const *attr = get_attribute(attribute);
 	if (!attr)
@@ -712,9 +694,9 @@ data_node::int_format data_node::get_attribute_int_format(const char *attribute)
 //  found, return = the provided default
 //-------------------------------------------------
 
-float data_node::get_attribute_float(const char *attribute, float defvalue) const
+float data_node::get_attribute_float(std::string_view attribute, float defvalue) const
 {
-	attribute_node const *attr = get_attribute(attribute);
+	attribute_node const *const attr = get_attribute(attribute);
 	if (!attr)
 		return defvalue;
 
@@ -730,12 +712,10 @@ float data_node::get_attribute_float(const char *attribute, float defvalue) cons
 //  string value on the node
 //-------------------------------------------------
 
-void data_node::set_attribute(const char *name, const char *value)
+void data_node::set_attribute(std::string_view name, std::string_view value)
 {
-	attribute_node *anode;
-
 	// first find an existing one to replace
-	anode = get_attribute(name);
+	attribute_node *const anode = get_attribute(name);
 
 	if (anode != nullptr)
 	{
@@ -755,9 +735,9 @@ void data_node::set_attribute(const char *name, const char *value)
 //  integer value on the node
 //-------------------------------------------------
 
-void data_node::set_attribute_int(const char *name, long long value)
+void data_node::set_attribute_int(std::string_view name, long long value)
 {
-	set_attribute(name, string_format(std::locale::classic(), "%d", value).c_str());
+	set_attribute(name, string_format(std::locale::classic(), "%d", value));
 }
 
 
@@ -766,9 +746,9 @@ void data_node::set_attribute_int(const char *name, long long value)
 //  float value on the node
 //-------------------------------------------------
 
-void data_node::set_attribute_float(const char *name, float value)
+void data_node::set_attribute_float(std::string_view name, float value)
 {
-	set_attribute(name, string_format(std::locale::classic(), "%f", value).c_str());
+	set_attribute(name, string_format(std::locale::classic(), "%f", value));
 }
 
 
@@ -866,7 +846,7 @@ static void expat_element_start(void *data, const XML_Char *name, const XML_Char
 	int attr;
 
 	// add a new child node to the current node
-	newnode = (*curnode)->add_child(name, nullptr);
+	newnode = (*curnode)->add_child(name, std::string_view());
 	if (newnode == nullptr)
 		return;
 
@@ -891,7 +871,7 @@ static void expat_data(void *data, const XML_Char *s, int len)
 {
 	auto *info = (parse_info *) data;
 	data_node **curnode = &info->curnode;
-	(*curnode)->append_value(s, len);
+	(*curnode)->append_value(std::string_view(s, len));
 }
 
 
@@ -924,7 +904,7 @@ static void expat_element_end(void *data, const XML_Char *name)
 //  given node
 //-------------------------------------------------
 
-void data_node::add_attribute(const char *name, const char *value)
+void data_node::add_attribute(std::string_view name, std::string_view value)
 {
 	try
 	{
@@ -950,7 +930,7 @@ void data_node::add_attribute(const char *name, const char *value)
 
 void data_node::write_recursive(int indent, util::core_file &file) const
 {
-	if (!get_name())
+	if (name().empty())
 	{
 		// root node doesn't generate tag
 		for (data_node const *child = this->get_first_child(); child; child = child->get_next_sibling())
@@ -959,7 +939,7 @@ void data_node::write_recursive(int indent, util::core_file &file) const
 	else
 	{
 		// output this tag
-		file.printf("%*s<%s", indent, "", get_name());
+		file.printf("%*s<%s", indent, "", name());
 
 		// output any attributes, escaping as necessary
 		for (attribute_node const &anode : m_attributes)
@@ -969,7 +949,7 @@ void data_node::write_recursive(int indent, util::core_file &file) const
 			file.puts("\"");
 		}
 
-		if (!get_first_child() && !get_value())
+		if (!get_first_child() && value().empty())
 		{
 			// if there are no children and no value, end the tag here
 			file.printf(" />\n");
@@ -995,7 +975,7 @@ void data_node::write_recursive(int indent, util::core_file &file) const
 			}
 
 			// write a closing tag
-			file.printf("%*s</%s>\n", indent, "", get_name());
+			file.printf("%*s</%s>\n", indent, "", name());
 		}
 	}
 }

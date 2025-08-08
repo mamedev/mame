@@ -65,7 +65,7 @@ bool editwin_info::restore_field(HWND wnd)
 {
 	if (wnd == m_editwnd)
 	{
-		set_editwnd_text(m_edit_defstr.c_str());
+		set_editwnd_text(m_edit_defstr);
 		editwnd_select_all();
 		return true;
 	}
@@ -89,7 +89,7 @@ void editwin_info::set_editwnd_bounds(RECT const &bounds)
 }
 
 
-void editwin_info::set_editwnd_text(char const *text)
+void editwin_info::set_editwnd_text(std::string_view text)
 {
 	auto tc_buffer = osd::text::to_tstring(text);
 	SendMessage(m_editwnd, WM_SETTEXT, WPARAM(0), LPARAM(tc_buffer.c_str()));
@@ -119,11 +119,11 @@ void editwin_info::restore_configuration_from_node(util::xml::data_node const &n
 		util::xml::data_node const *item = hist->get_child(NODE_HISTORY_ITEM);
 		while (item)
 		{
-			if (item->get_value() && *item->get_value())
+			if (!item->value().empty())
 			{
 				while (m_history.size() >= HISTORY_LENGTH)
 					m_history.pop_back();
-				m_history.emplace_front(osd::text::to_tstring(item->get_value()));
+				m_history.emplace_front(osd::text::to_tstring(item->value()));
 			}
 			item = item->get_next_sibling(NODE_HISTORY_ITEM);
 		}
@@ -142,7 +142,7 @@ void editwin_info::save_configuration_to_node(util::xml::data_node &node)
 	if (hist)
 	{
 		for (auto it = m_history.crbegin(); m_history.crend() != it; ++it)
-			hist->add_child(NODE_HISTORY_ITEM, osd::text::from_tstring(*it).c_str());
+			hist->add_child(NODE_HISTORY_ITEM, osd::text::from_tstring(*it));
 	}
 }
 
@@ -255,7 +255,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 						if (_tcslen(buffer) > 0)
 						{
 							set_ignore_char_lparam(lparam);
-							set_editwnd_text(m_edit_defstr.c_str());
+							set_editwnd_text(m_edit_defstr);
 							editwnd_select_all();
 						}
 					}

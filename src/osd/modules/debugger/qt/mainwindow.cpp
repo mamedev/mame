@@ -166,7 +166,9 @@ void MainWindow::restoreConfiguration(util::xml::data_node const &node)
 
 	debug_view_disasm &dasmview = *m_dasmFrame->view()->view<debug_view_disasm>();
 
-	restoreState(QByteArray::fromPercentEncoding(node.get_attribute_string("qtwindowstate", "")));
+	using namespace std::literals;
+	std::string const *const qtwindowstate = node.get_attribute_string_ptr("qtwindowstate"sv);
+	restoreState(QByteArray::fromPercentEncoding(qtwindowstate ? qtwindowstate->c_str() : ""));
 
 	auto const rightbar = node.get_attribute_int(ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmview.right_column());
 	QActionGroup *const rightBarGroup = findChild<QActionGroup *>("rightbargroup");

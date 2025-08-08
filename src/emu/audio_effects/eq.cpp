@@ -91,39 +91,41 @@ void audio_effect_eq::reset_all()
 
 void audio_effect_eq::config_load(util::xml::data_node const *ef_node)
 {
-	if(ef_node->has_attribute("mode")) {
-		m_mode = ef_node->get_attribute_int("mode", 0);
+	using namespace std::literals;
+
+	if(ef_node->has_attribute("mode"sv)) {
+		m_mode = ef_node->get_attribute_int("mode"sv, 0);
 		m_isset_mode = true;
 	} else
 		reset_mode();
 
-	if(ef_node->has_attribute("low_shelf")) {
-		m_low_shelf = ef_node->get_attribute_int("low_shelf", 0);
+	if(ef_node->has_attribute("low_shelf"sv)) {
+		m_low_shelf = ef_node->get_attribute_int("low_shelf"sv, 0);
 		m_isset_low_shelf = true;
 	} else
 		reset_low_shelf();
 
-	if(ef_node->has_attribute("high_shelf")) {
-		m_high_shelf = ef_node->get_attribute_int("high_shelf", 0);
+	if(ef_node->has_attribute("high_shelf"sv)) {
+		m_high_shelf = ef_node->get_attribute_int("high_shelf"sv, 0);
 		m_isset_high_shelf = true;
 	} else
 		reset_high_shelf();
 
 	for(u32 band = 0; band != BANDS; band++) {
 		if(ef_node->has_attribute(util::string_format("f%d", band+1).c_str())) {
-			m_f[band] = ef_node->get_attribute_int(util::string_format("f%d", band+1).c_str(), 0);
+			m_f[band] = ef_node->get_attribute_int(util::string_format("f%d", band+1), 0);
 			m_isset_f[band] = true;
 		} else
 			reset_f(band);
 
 		if(ef_node->has_attribute(util::string_format("q%d", band+1).c_str())) {
-			m_q[band] = ef_node->get_attribute_float(util::string_format("q%d", band+1).c_str(), 0);
+			m_q[band] = ef_node->get_attribute_float(util::string_format("q%d", band+1), 0);
 			m_isset_q[band] = true;
 		} else
 			reset_q(band);
 
 		if(ef_node->has_attribute(util::string_format("db%d", band+1).c_str())) {
-			m_db[band] = ef_node->get_attribute_float(util::string_format("db%d", band+1).c_str(), 0);
+			m_db[band] = ef_node->get_attribute_float(util::string_format("db%d", band+1), 0);
 			m_isset_db[band] = true;
 		} else
 			reset_db(band);
@@ -135,19 +137,20 @@ void audio_effect_eq::config_load(util::xml::data_node const *ef_node)
 
 void audio_effect_eq::config_save(util::xml::data_node *ef_node) const
 {
+	using namespace std::literals;
 	if(m_isset_mode)
-		ef_node->set_attribute_int("mode", m_mode);
+		ef_node->set_attribute_int("mode"sv, m_mode);
 	if(m_isset_low_shelf)
-		ef_node->set_attribute_int("low_shelf", m_low_shelf);
+		ef_node->set_attribute_int("low_shelf"sv, m_low_shelf);
 	if(m_isset_high_shelf)
-		ef_node->set_attribute_int("high_shelf", m_high_shelf);
+		ef_node->set_attribute_int("high_shelf"sv, m_high_shelf);
 	for(u32 band = 0; band != BANDS; band++) {
 		if(m_isset_f[band])
-			ef_node->set_attribute_int(util::string_format("f%d", band+1).c_str(), m_f[band]);
+			ef_node->set_attribute_int(util::string_format("f%d", band+1), m_f[band]);
 		if(m_isset_q[band])
-			ef_node->set_attribute_float(util::string_format("q%d", band+1).c_str(), m_q[band]);
+			ef_node->set_attribute_float(util::string_format("q%d", band+1), m_q[band]);
 		if(m_isset_db[band])
-			ef_node->set_attribute_float(util::string_format("db%d", band+1).c_str(), m_db[band]);
+			ef_node->set_attribute_float(util::string_format("db%d", band+1), m_db[band]);
 	}
 }
 

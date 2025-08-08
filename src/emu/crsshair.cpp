@@ -142,7 +142,7 @@ render_crosshair::~render_crosshair()
 //  set_bitmap_name - change the bitmap name
 //-------------------------------------------------
 
-void render_crosshair::set_bitmap_name(const char *name)
+void render_crosshair::set_bitmap_name(std::string_view name)
 {
 	// update bitmap if name has changed
 	bool changed = name != m_name;
@@ -458,10 +458,12 @@ void crosshair_manager::config_load(config_type cfg_type, config_level cfg_level
 	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
+	using namespace std::literals;
+
 	// loop and get player crosshair info
-	for (util::xml::data_node const *crosshairnode = parentnode->get_child("crosshair"); crosshairnode; crosshairnode = crosshairnode->get_next_sibling("crosshair"))
+	for (util::xml::data_node const *crosshairnode = parentnode->get_child("crosshair"sv); crosshairnode; crosshairnode = crosshairnode->get_next_sibling("crosshair"sv))
 	{
-		int const player = crosshairnode->get_attribute_int("player", -1);
+		int const player = crosshairnode->get_attribute_int("player"sv, -1);
 
 		// check to make sure we have a valid player
 		if (player >= 0 && player < MAX_PLAYERS)
@@ -471,7 +473,7 @@ void crosshair_manager::config_load(config_type cfg_type, config_level cfg_level
 			if (crosshair.is_used())
 			{
 				// get, check, and store visibility mode
-				int const mode = crosshairnode->get_attribute_int("mode", CROSSHAIR_VISIBILITY_DEFAULT);
+				int const mode = crosshairnode->get_attribute_int("mode"sv, CROSSHAIR_VISIBILITY_DEFAULT);
 				if (mode >= CROSSHAIR_VISIBILITY_OFF && mode <= CROSSHAIR_VISIBILITY_AUTO)
 				{
 					crosshair.set_mode(u8(mode));
@@ -480,16 +482,16 @@ void crosshair_manager::config_load(config_type cfg_type, config_level cfg_level
 				}
 
 				// get and store crosshair pic name
-				crosshair.set_bitmap_name(crosshairnode->get_attribute_string("pic", ""));
+				crosshair.set_bitmap_name(crosshairnode->get_attribute_string("pic"sv));
 			}
 		}
 	}
 
 	// get, check, and store auto visibility time
-	util::xml::data_node const *crosshairnode = parentnode->get_child("autotime");
+	util::xml::data_node const *crosshairnode = parentnode->get_child("autotime"sv);
 	if (crosshairnode)
 	{
-		int const auto_time = crosshairnode->get_attribute_int("val", CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT);
+		int const auto_time = crosshairnode->get_attribute_int("val"sv, CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT);
 		if ((auto_time >= CROSSHAIR_VISIBILITY_AUTOTIME_MIN) && (auto_time <= CROSSHAIR_VISIBILITY_AUTOTIME_MAX))
 			m_auto_time = u8(auto_time);
 	}
@@ -509,6 +511,8 @@ void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *
 	if (cfg_type != config_type::SYSTEM)
 		return;
 
+	using namespace std::literals;
+
 	for (int player = 0; player < MAX_PLAYERS; player++)
 	{
 		const render_crosshair &crosshair = *m_crosshair[player];
@@ -516,24 +520,24 @@ void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *
 		if (crosshair.is_used())
 		{
 			// create a node
-			util::xml::data_node *const crosshairnode = parentnode->add_child("crosshair", nullptr);
+			util::xml::data_node *const crosshairnode = parentnode->add_child("crosshair"sv);
 
 			if (crosshairnode != nullptr)
 			{
 				bool changed = false;
 
-				crosshairnode->set_attribute_int("player", player);
+				crosshairnode->set_attribute_int("player"sv, player);
 
 				if (crosshair.mode() != CROSSHAIR_VISIBILITY_DEFAULT)
 				{
-					crosshairnode->set_attribute_int("mode", crosshair.mode());
+					crosshairnode->set_attribute_int("mode"sv, crosshair.mode());
 					changed = true;
 				}
 
 				// only save graphic name if not the default
 				if (*crosshair.bitmap_name() != '\0')
 				{
-					crosshairnode->set_attribute("pic", crosshair.bitmap_name());
+					crosshairnode->set_attribute("pic"sv, crosshair.bitmap_name());
 					changed = true;
 				}
 
@@ -548,8 +552,8 @@ void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *
 	if (m_auto_time != CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT)
 	{
 		// create a node
-		util::xml::data_node *const crosshairnode = parentnode->add_child("autotime", nullptr);
+		util::xml::data_node *const crosshairnode = parentnode->add_child("autotime"sv);
 		if (crosshairnode)
-			crosshairnode->set_attribute_int("val", m_auto_time);
+			crosshairnode->set_attribute_int("val"sv, m_auto_time);
 	}
 }

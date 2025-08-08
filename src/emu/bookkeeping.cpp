@@ -107,18 +107,20 @@ void bookkeeping_manager::config_load(config_type cfg_type, config_level cfg_lev
 	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
+	using namespace std::literals;
+
 	// iterate over coins nodes
-	for (util::xml::data_node const *coinnode = parentnode->get_child("coins"); coinnode; coinnode = coinnode->get_next_sibling("coins"))
+	for (util::xml::data_node const *coinnode = parentnode->get_child("coins"sv); coinnode; coinnode = coinnode->get_next_sibling("coins"sv))
 	{
-		int index = coinnode->get_attribute_int("index", -1);
+		int index = coinnode->get_attribute_int("index"sv, -1);
 		if (index >= 0 && index < COIN_COUNTERS)
-			m_coin_count[index] = coinnode->get_attribute_int("number", 0);
+			m_coin_count[index] = coinnode->get_attribute_int("number"sv, 0);
 	}
 
 	// get the single tickets node
-	util::xml::data_node const *const ticketnode = parentnode->get_child("tickets");
+	util::xml::data_node const *const ticketnode = parentnode->get_child("tickets"sv);
 	if (ticketnode)
-		m_dispensed_tickets = ticketnode->get_attribute_int("number", 0);
+		m_dispensed_tickets = ticketnode->get_attribute_int("number"sv, 0);
 }
 
 
@@ -129,6 +131,8 @@ void bookkeeping_manager::config_load(config_type cfg_type, config_level cfg_lev
 
 void bookkeeping_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
+	using namespace std::literals;
+
 	// only save system-specific data
 	if (cfg_type != config_type::SYSTEM)
 		return;
@@ -138,11 +142,11 @@ void bookkeeping_manager::config_save(config_type cfg_type, util::xml::data_node
 	{
 		if (m_coin_count[i] != 0)
 		{
-			util::xml::data_node *const coinnode = parentnode->add_child("coins", nullptr);
+			util::xml::data_node *const coinnode = parentnode->add_child("coins"sv);
 			if (coinnode)
 			{
-				coinnode->set_attribute_int("index", i);
-				coinnode->set_attribute_int("number", m_coin_count[i]);
+				coinnode->set_attribute_int("index"sv, i);
+				coinnode->set_attribute_int("number"sv, m_coin_count[i]);
 			}
 		}
 	}
@@ -150,9 +154,9 @@ void bookkeeping_manager::config_save(config_type cfg_type, util::xml::data_node
 	// output tickets
 	if (m_dispensed_tickets != 0)
 	{
-		util::xml::data_node *const tickets = parentnode->add_child("tickets", nullptr);
+		util::xml::data_node *const tickets = parentnode->add_child("tickets"sv);
 		if (tickets)
-			tickets->set_attribute_int("number", m_dispensed_tickets);
+			tickets->set_attribute_int("number"sv, m_dispensed_tickets);
 	}
 }
 

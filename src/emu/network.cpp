@@ -44,26 +44,25 @@ void network_manager::config_load(config_type cfg_type, config_level cfg_level, 
 {
 	if ((cfg_type == config_type::SYSTEM) && parentnode)
 	{
-		for (util::xml::data_node const *node = parentnode->get_child("device"); node; node = node->get_next_sibling("device"))
+		using namespace std::literals;
+		for (util::xml::data_node const *node = parentnode->get_child("device"sv); node; node = node->get_next_sibling("device"sv))
 		{
-			const char *tag = node->get_attribute_string("tag", nullptr);
-
-			if ((tag != nullptr) && (tag[0] != '\0'))
+			std::string_view tag = node->get_attribute_string("tag"sv);
+			if (!tag.empty())
 			{
 				for (device_network_interface &network : network_interface_enumerator(machine().root_device()))
 				{
-					if (!strcmp(tag, network.device().tag())) {
-						int interface = node->get_attribute_int("interface", 0);
+					if (tag == network.device().tag()) {
+						int interface = node->get_attribute_int("interface"sv, 0);
 						network.set_interface(interface);
-						const char *mac_addr = node->get_attribute_string("mac", nullptr);
-						if (mac_addr != nullptr && strlen(mac_addr) == 17) {
+						std::string const *mac_addr = node->get_attribute_string_ptr("mac"sv);
+						if (mac_addr && mac_addr->length() == 17) {
 							uint8_t mac[6];
 							unsigned int mac_num[6];
-							sscanf(mac_addr, "%02x:%02x:%02x:%02x:%02x:%02x", &mac_num[0], &mac_num[1], &mac_num[2], &mac_num[3], &mac_num[4], &mac_num[5]);
+							sscanf(mac_addr->c_str(), "%02x:%02x:%02x:%02x:%02x:%02x", &mac_num[0], &mac_num[1], &mac_num[2], &mac_num[3], &mac_num[4], &mac_num[5]);
 							for (int i = 0; i<6; i++) mac[i] = mac_num[i];
 							network.set_mac(mac);
 						}
-
 					}
 				}
 			}
@@ -83,16 +82,17 @@ void network_manager::config_save(config_type cfg_type, util::xml::data_node *pa
 	{
 		for (device_network_interface &network : network_interface_enumerator(machine().root_device()))
 		{
-			util::xml::data_node *const node = parentnode->add_child("device", nullptr);
+			using namespace std::literals;
+			util::xml::data_node *const node = parentnode->add_child("device"sv);
 			if (node)
 			{
-				node->set_attribute("tag", network.device().tag());
-				node->set_attribute_int("interface", network.get_interface());
+				node->set_attribute("tag"sv, network.device().tag());
+				node->set_attribute_int("interface"sv, network.get_interface());
 				const std::array<u8, 6> &mac = network.get_mac();
 				const std::string mac_addr = util::string_format(
 						"%02x:%02x:%02x:%02x:%02x:%02x",
 						mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-				node->set_attribute("mac", mac_addr.c_str());
+				node->set_attribute("mac"sv, mac_addr);
 			}
 		}
 	}

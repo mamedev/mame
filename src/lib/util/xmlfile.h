@@ -78,11 +78,11 @@ public:
 
 	/* ----- XML node management ----- */
 
-	char const *get_name() const { return m_name.empty() ? nullptr : m_name.c_str(); }
+	const std::string &name() const { return m_name; }
 
-	char const *get_value() const { return m_value.empty() ? nullptr : m_value.c_str(); }
-	void set_value(char const *value);
-	void append_value(char const *value, int length);
+	const std::string &value() const { return m_value; }
+	void set_value(std::string_view value) { m_value.assign(value); }
+	void append_value(std::string_view value) { m_value.append(value); }
 	void trim_whitespace();
 
 	data_node *get_parent() { return m_parent; }
@@ -97,8 +97,8 @@ public:
 	data_node const *get_first_child() const { return m_first_child; }
 
 	// find the first child with the given tag
-	data_node *get_child(const char *name);
-	data_node const *get_child(const char *name) const;
+	data_node *get_child(std::string_view name);
+	data_node const *get_child(std::string_view name) const;
 
 	// find the first child with the given tag and/or attribute/value pair
 	data_node *find_first_matching_child(const char *name, const char *attribute, const char *matchval);
@@ -109,18 +109,18 @@ public:
 	data_node const *get_next_sibling() const { return m_next; }
 
 	// find the next sibling with the given tag
-	data_node *get_next_sibling(const char *name);
-	data_node const *get_next_sibling(const char *name) const;
+	data_node *get_next_sibling(std::string_view name);
+	data_node const *get_next_sibling(std::string_view name) const;
 
 	// find the next sibling with the given tag and/or attribute/value pair
 	data_node *find_next_matching_sibling(const char *name, const char *attribute, const char *matchval);
 	data_node const *find_next_matching_sibling(const char *name, const char *attribute, const char *matchval) const;
 
 	// add a new child node
-	data_node *add_child(const char *name, const char *value);
+	data_node *add_child(std::string_view name, std::string_view value = std::string_view());
 
 	// either return an existing child node or create one if it doesn't exist
-	data_node *get_or_add_child(const char *name, const char *value);
+	data_node *get_or_add_child(std::string_view name, std::string_view value = std::string_view());
 
 	// recursively copy as child of another node
 	data_node *copy_into(data_node &parent) const;
@@ -132,34 +132,34 @@ public:
 	/* ----- XML attribute management ----- */
 
 	// return whether a node has the specified attribute
-	bool has_attribute(const char *attribute) const;
+	bool has_attribute(std::string_view attribute) const;
 
 	// return a pointer to the string value of an attribute, or nullptr if not present
-	std::string const *get_attribute_string_ptr(const char *attribute) const;
+	std::string const *get_attribute_string_ptr(std::string_view attribute) const;
 
-	// return the string value of an attribute, or the specified default if not present
-	const char *get_attribute_string(const char *attribute, const char *defvalue) const;
+	// return the string value of an attribute, or the specified default or empty string if not present
+	std::string_view get_attribute_string(std::string_view attribute, std::string_view defvalue = std::string_view()) const;
 
 	// return the integer value of an attribute, or the specified default if not present
-	long long get_attribute_int(const char *attribute, long long defvalue) const;
+	long long get_attribute_int(std::string_view attribute, long long defvalue) const;
 
 	// return the format of the given integer attribute
-	int_format get_attribute_int_format(const char *attribute) const;
+	int_format get_attribute_int_format(std::string_view attribute) const;
 
 	// return the float value of an attribute, or the specified default if not present
-	float get_attribute_float(const char *attribute, float defvalue) const;
+	float get_attribute_float(std::string_view attribute, float defvalue) const;
 
 	// set the string value of an attribute
-	void set_attribute(const char *name, const char *value);
+	void set_attribute(std::string_view name, std::string_view value);
 
 	// set the integer value of an attribute
-	void set_attribute_int(const char *name, long long value);
+	void set_attribute_int(std::string_view name, long long value);
 
 	// set the float value of an attribute
-	void set_attribute_float(const char *name, float value);
+	void set_attribute_float(std::string_view name, float value);
 
 	// add an attribute even if an attribute with the same name already exists
-	void add_attribute(const char *name, const char *value);
+	void add_attribute(std::string_view name, std::string_view value);
 
 
 
@@ -184,20 +184,20 @@ private:
 	};
 
 
-	data_node(data_node *parent, const char *name, const char *value);
+	data_node(data_node *parent, std::string_view name, std::string_view value);
 
 	data_node(data_node const &) = delete;
 	data_node(data_node &&) = delete;
 	data_node &operator=(data_node &&) = delete;
 	data_node &operator=(data_node const &) = delete;
 
-	data_node *get_sibling(const char *name);
-	data_node const *get_sibling(const char *name) const;
+	data_node *get_sibling(std::string_view name);
+	data_node const *get_sibling(std::string_view name) const;
 	data_node *find_matching_sibling(const char *name, const char *attribute, const char *matchval);
 	data_node const *find_matching_sibling(const char *name, const char *attribute, const char *matchval) const;
 
-	attribute_node *get_attribute(const char *attribute);
-	attribute_node const *get_attribute(const char *attribute) const;
+	attribute_node *get_attribute(std::string_view attribute);
+	attribute_node const *get_attribute(std::string_view attribute) const;
 
 	void free_children();
 

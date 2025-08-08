@@ -278,9 +278,9 @@ void MemoryWindow::restoreConfiguration(util::xml::data_node const &node)
 	memView.set_chunks_per_row(chunks);
 
 	util::xml::data_node const *const expression = node.get_child(NODE_WINDOW_EXPRESSION);
-	if (expression && expression->get_value())
+	if (expression && !expression->value().empty())
 	{
-		m_inputEdit->setText(QString::fromUtf8(expression->get_value()));
+		m_inputEdit->setText(QString::fromUtf8(expression->value().c_str()));
 		expressionSubmitted();
 	}
 

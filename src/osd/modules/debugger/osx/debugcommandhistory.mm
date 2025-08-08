@@ -128,10 +128,10 @@
 	if (hist) {
 		util::xml::data_node const *item = hist->get_child(osd::debugger::NODE_HISTORY_ITEM);
 		while (item) {
-			if (item->get_value() && *item->get_value()) {
+			if (!item->value().empty()) {
 				while ([history count] >= length)
 					[history removeLastObject];
-				[history insertObject:[NSString stringWithUTF8String:item->get_value()] atIndex:0];
+				[history insertObject:[NSString stringWithUTF8String:item->value().c_str()] atIndex:0];
 			}
 			item = item->get_next_sibling(osd::debugger::NODE_HISTORY_ITEM);
 		}

@@ -1307,6 +1307,8 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 	if(!parentnode)
 		return;
 
+	using namespace std::literals;
+
 	switch(cfg_type) {
 	case config_type::INIT:
 		break;
@@ -1317,11 +1319,11 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 	case config_type::DEFAULT: {
 		// In the global config, get the default effect chain configuration
 
-		util::xml::data_node const *efl_node = parentnode->get_child("audio_effects");
+		util::xml::data_node const *efl_node = parentnode->get_child("audio_effects"sv);
 		if(efl_node) {
-			for(util::xml::data_node const *ef_node = efl_node->get_child("effect"); ef_node != nullptr; ef_node = ef_node->get_next_sibling("effect")) {
-				unsigned int id = ef_node->get_attribute_int("step", 0);
-				std::string type = ef_node->get_attribute_string("type", "");
+			for(util::xml::data_node const *ef_node = efl_node->get_child("effect"sv); ef_node != nullptr; ef_node = ef_node->get_next_sibling("effect"sv)) {
+				unsigned int id = ef_node->get_attribute_int("step"sv, 0);
+				std::string_view type = ef_node->get_attribute_string("type"sv);
 				if(id >= 1 && id <= m_default_effects.size() && audio_effect::effect_names[m_default_effects[id-1]->type()] == type) {
 					m_default_effects[id-1]->config_load(ef_node);
 					default_effect_changed(id-1);
@@ -1330,14 +1332,14 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 		}
 
 		// and the resampler configuration
-		util::xml::data_node const *rs_node = parentnode->get_child("resampler");
+		util::xml::data_node const *rs_node = parentnode->get_child("resampler"sv);
 		if(rs_node) {
-			m_resampler_hq_latency = rs_node->get_attribute_float("hq_latency", default_resampler_hq_latency());
-			m_resampler_hq_length = rs_node->get_attribute_int("hq_length", default_resampler_hq_length());
-			m_resampler_hq_phases = rs_node->get_attribute_int("hq_phases", default_resampler_hq_phases());
+			m_resampler_hq_latency = rs_node->get_attribute_float("hq_latency"sv, default_resampler_hq_latency());
+			m_resampler_hq_length = rs_node->get_attribute_int("hq_length"sv, default_resampler_hq_length());
+			m_resampler_hq_phases = rs_node->get_attribute_int("hq_phases"sv, default_resampler_hq_phases());
 
 			// this also applies the hq settings if resampler is hq
-			set_resampler_type(rs_node->get_attribute_int("type", default_resampler_type()));
+			set_resampler_type(rs_node->get_attribute_int("type"sv, default_resampler_type()));
 		}
 		break;
 	}
@@ -1346,14 +1348,14 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 		// In the per-driver file, get the specific configuration for everything
 
 		// Effects configuration
-		for(util::xml::data_node const *efl_node = parentnode->get_child("audio_effects"); efl_node != nullptr; efl_node = efl_node->get_next_sibling("audio_effects")) {
-			std::string speaker_tag = efl_node->get_attribute_string("tag", "");
+		for(util::xml::data_node const *efl_node = parentnode->get_child("audio_effects"sv); efl_node != nullptr; efl_node = efl_node->get_next_sibling("audio_effects"sv)) {
+			std::string_view speaker_tag = efl_node->get_attribute_string("tag"sv);
 			for(auto &speaker : m_speakers)
 				if(speaker.m_dev.tag() == speaker_tag) {
 					auto &eff = speaker.m_effects;
-					for(util::xml::data_node const *ef_node = efl_node->get_child("effect"); ef_node != nullptr; ef_node = ef_node->get_next_sibling("effect")) {
-						unsigned int id = ef_node->get_attribute_int("step", 0);
-						std::string type = ef_node->get_attribute_string("type", "");
+					for(util::xml::data_node const *ef_node = efl_node->get_child("effect"sv); ef_node != nullptr; ef_node = ef_node->get_next_sibling("effect"sv)) {
+						unsigned int id = ef_node->get_attribute_int("step"sv, 0);
+						std::string_view type = ef_node->get_attribute_string("type"sv);
 						if(id >= 1 && id <= m_default_effects.size() && audio_effect::effect_names[eff[id-1].m_effect->type()] == type)
 							eff[id-1].m_effect->config_load(ef_node);
 					}
@@ -1363,40 +1365,41 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 
 		// All levels
 		if(!machine().options().volume()) {
-			const util::xml::data_node *lv_node = parentnode->get_child("master_volume");
+			const util::xml::data_node *lv_node = parentnode->get_child("master_volume"sv);
 			if(lv_node)
-				m_master_gain = lv_node->get_attribute_float("gain", 1.0);
+				m_master_gain = lv_node->get_attribute_float("gain"sv, 1.0);
 		}
 
-		for(const util::xml::data_node *lv_node = parentnode->get_child("device_volume"); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_volume")) {
-			std::string device_tag = lv_node->get_attribute_string("device", "");
+		for(const util::xml::data_node *lv_node = parentnode->get_child("device_volume"sv); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_volume"sv)) {
+			std::string_view device_tag = lv_node->get_attribute_string("device"sv);
 			device_sound_interface *intf = dynamic_cast<device_sound_interface *>(m_machine.root_device().subdevice(device_tag));
 			if(intf)
-				intf->set_user_output_gain(lv_node->get_attribute_float("gain", 1.0));
+				intf->set_user_output_gain(lv_node->get_attribute_float("gain"sv, 1.0));
 		}
 
-		for(const util::xml::data_node *lv_node = parentnode->get_child("device_channel_volume"); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_channel_volume")) {
-			std::string device_tag = lv_node->get_attribute_string("device", "");
-			int channel = lv_node->get_attribute_int("channel", -1);
+		for(const util::xml::data_node *lv_node = parentnode->get_child("device_channel_volume"sv); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_channel_volume"sv)) {
+			std::string_view device_tag = lv_node->get_attribute_string("device"sv);
+			int channel = lv_node->get_attribute_int("channel"sv, -1);
 			device_sound_interface *intf = dynamic_cast<device_sound_interface *>(m_machine.root_device().subdevice(device_tag));
 			if(intf && channel >= 0 && channel < intf->outputs())
-				intf->set_user_output_gain(channel, lv_node->get_attribute_float("gain", 1.0));
+				intf->set_user_output_gain(channel, lv_node->get_attribute_float("gain"sv, 1.0));
 		}
 
 
 		// Mapping configuration
 		m_configs.clear();
-		for(util::xml::data_node const *node = parentnode->get_child("sound_map"); node != nullptr; node = node->get_next_sibling("sound_map")) {
-			m_configs.emplace_back(config_mapping{ node->get_attribute_string("tag", "") });
+		for(util::xml::data_node const *node = parentnode->get_child("sound_map"sv); node != nullptr; node = node->get_next_sibling("sound_map"sv)) {
+			if(std::string const *tag = node->get_attribute_string_ptr("tag"sv))
+				m_configs.emplace_back(config_mapping{ *tag });
 			auto &config = m_configs.back();
-			for(util::xml::data_node const *nmap = node->get_child("node_mapping"); nmap != nullptr; nmap = nmap->get_next_sibling("node_mapping"))
-				config.m_node_mappings.emplace_back(nmap->get_attribute_string("node", ""), nmap->get_attribute_float("db", 0));
-			for(util::xml::data_node const *cmap = node->get_child("channel_mapping"); cmap != nullptr; cmap = cmap->get_next_sibling("channel_mapping")) {
+			for(util::xml::data_node const *nmap = node->get_child("node_mapping"sv); nmap != nullptr; nmap = nmap->get_next_sibling("node_mapping"sv))
+				config.m_node_mappings.emplace_back(nmap->get_attribute_string("node"sv), nmap->get_attribute_float("db"sv, 0));
+			for(util::xml::data_node const *cmap = node->get_child("channel_mapping"sv); cmap != nullptr; cmap = cmap->get_next_sibling("channel_mapping"sv)) {
 				config.m_channel_mappings.emplace_back(
-						cmap->get_attribute_int("guest_channel", 0),
-						cmap->get_attribute_string("node", ""),
-						cmap->get_attribute_int("node_channel", 0),
-						cmap->get_attribute_float("db", 0));
+						cmap->get_attribute_int("guest_channel"sv, 0),
+						cmap->get_attribute_string("node"sv, ""sv),
+						cmap->get_attribute_int("node_channel"sv, 0),
+						cmap->get_attribute_float("db"sv, 0));
 			}
 		}
 		break;
@@ -1415,6 +1418,7 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 
 void sound_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
+	using namespace std::literals;
 	switch(cfg_type) {
 	case config_type::INIT:
 		break;
@@ -1424,12 +1428,12 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 
 	case config_type::DEFAULT: {
 		// In the global config, save the default effect chain configuration
-		util::xml::data_node *const efl_node = parentnode->add_child("audio_effects", nullptr);
+		util::xml::data_node *const efl_node = parentnode->add_child("audio_effects"sv);
 		for(u32 ei = 0; ei != m_default_effects.size(); ei++) {
 			const audio_effect *e = m_default_effects[ei].get();
-			util::xml::data_node *const ef_node = efl_node->add_child("effect", nullptr);
-			ef_node->set_attribute_int("step", ei+1);
-			ef_node->set_attribute("type", audio_effect::effect_names[e->type()]);
+			util::xml::data_node *const ef_node = efl_node->add_child("effect"sv);
+			ef_node->set_attribute_int("step"sv, ei+1);
+			ef_node->set_attribute("type"sv, audio_effect::effect_names[e->type()]);
 			e->config_save(ef_node);
 		}
 
@@ -1438,11 +1442,11 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 				m_resampler_hq_length != default_resampler_hq_length() ||
 				m_resampler_hq_phases != default_resampler_hq_phases()) {
 
-			util::xml::data_node *const rs_node = parentnode->add_child("resampler", nullptr);
-			rs_node->set_attribute_int("type", m_resampler_type);
-			rs_node->set_attribute_float("hq_latency", m_resampler_hq_latency);
-			rs_node->set_attribute_int("hq_length", m_resampler_hq_length);
-			rs_node->set_attribute_int("hq_phases", m_resampler_hq_phases);
+			util::xml::data_node *const rs_node = parentnode->add_child("resampler"sv);
+			rs_node->set_attribute_int("type"sv, m_resampler_type);
+			rs_node->set_attribute_float("hq_latency"sv, m_resampler_hq_latency);
+			rs_node->set_attribute_int("hq_length"sv, m_resampler_hq_length);
+			rs_node->set_attribute_int("hq_phases"sv, m_resampler_hq_phases);
 		}
 		break;
 	}
@@ -1452,37 +1456,37 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 
 		// Effects configuration
 		for(const auto &speaker : m_speakers) {
-			util::xml::data_node *const efl_node = parentnode->add_child("audio_effects", nullptr);
-			efl_node->set_attribute("tag", speaker.m_dev.tag());
+			util::xml::data_node *const efl_node = parentnode->add_child("audio_effects"sv);
+			efl_node->set_attribute("tag"sv, speaker.m_dev.tag());
 			for(u32 ei = 0; ei != speaker.m_effects.size(); ei++) {
 				const audio_effect *e = speaker.m_effects[ei].m_effect.get();
-				util::xml::data_node *const ef_node = efl_node->add_child("effect", nullptr);
-				ef_node->set_attribute_int("step", ei+1);
-				ef_node->set_attribute("type", audio_effect::effect_names[e->type()]);
+				util::xml::data_node *const ef_node = efl_node->add_child("effect");
+				ef_node->set_attribute_int("step"sv, ei+1);
+				ef_node->set_attribute("type"sv, audio_effect::effect_names[e->type()]);
 				e->config_save(ef_node);
 			}
 		}
 
 		// All levels
 		if(m_master_gain != 1.0 && m_master_gain != osd::db_to_linear(machine().options().volume())) {
-			util::xml::data_node *const lv_node = parentnode->add_child("master_volume", nullptr);
-			lv_node->set_attribute_float("gain", m_master_gain);
+			util::xml::data_node *const lv_node = parentnode->add_child("master_volume"sv);
+			lv_node->set_attribute_float("gain"sv, m_master_gain);
 		}
 		for(device_sound_interface &snd : sound_interface_enumerator(m_machine.root_device())) {
 			// Don't add microphones, speakers or devices without outputs
 			if(dynamic_cast<sound_io_device *>(&snd) || !snd.outputs())
 				continue;
 			if(snd.user_output_gain() != 1.0) {
-				util::xml::data_node *const lv_node = parentnode->add_child("device_volume", nullptr);
-				lv_node->set_attribute("device", snd.device().tag());
-				lv_node->set_attribute_float("gain", snd.user_output_gain());
+				util::xml::data_node *const lv_node = parentnode->add_child("device_volume"sv);
+				lv_node->set_attribute("device"sv, snd.device().tag());
+				lv_node->set_attribute_float("gain"sv, snd.user_output_gain());
 			}
 			for(int channel = 0; channel != snd.outputs(); channel ++)
 				if(snd.user_output_gain(channel) != 1.0) {
-					util::xml::data_node *const lv_node = parentnode->add_child("device_channel_volume", nullptr);
-					lv_node->set_attribute("device", snd.device().tag());
-					lv_node->set_attribute_int("channel", channel);
-					lv_node->set_attribute_float("gain", snd.user_output_gain(channel));
+					util::xml::data_node *const lv_node = parentnode->add_child("device_channel_volume"sv);
+					lv_node->set_attribute("device"sv, snd.device().tag());
+					lv_node->set_attribute_int("channel"sv, channel);
+					lv_node->set_attribute_float("gain"sv, snd.user_output_gain(channel));
 				}
 		}
 
@@ -1490,19 +1494,19 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 		auto output_one = [this, parentnode](sound_io_device &dev) {
 			for(const auto &config : m_configs)
 				if(config.m_name == dev.tag()) {
-					util::xml::data_node *const sp_node = parentnode->add_child("sound_map", nullptr);
-					sp_node->set_attribute("tag", dev.tag());
+					util::xml::data_node *const sp_node = parentnode->add_child("sound_map"sv);
+					sp_node->set_attribute("tag"sv, dev.tag());
 					for(const auto &nmap : config.m_node_mappings) {
-						util::xml::data_node *const node = sp_node->add_child("node_mapping", nullptr);
-						node->set_attribute("node", nmap.first.c_str());
-						node->set_attribute_float("db", nmap.second);
+						util::xml::data_node *const node = sp_node->add_child("node_mapping"sv);
+						node->set_attribute("node"sv, nmap.first);
+						node->set_attribute_float("db"sv, nmap.second);
 					}
 					for(const auto &cmap : config.m_channel_mappings) {
-						util::xml::data_node *const node = sp_node->add_child("channel_mapping", nullptr);
-						node->set_attribute_int("guest_channel", std::get<0>(cmap));
-						node->set_attribute("node", std::get<1>(cmap).c_str());
-						node->set_attribute_int("node_channel", std::get<2>(cmap));
-						node->set_attribute_float("db", std::get<3>(cmap));
+						util::xml::data_node *const node = sp_node->add_child("channel_mapping"sv);
+						node->set_attribute_int("guest_channel"sv, std::get<0>(cmap));
+						node->set_attribute("node"sv, std::get<1>(cmap));
+						node->set_attribute_int("node_channel"sv, std::get<2>(cmap));
+						node->set_attribute_float("db"sv, std::get<3>(cmap));
 					}
 					return;
 				}

@@ -275,7 +275,7 @@ void WindowQt::restoreConfiguration(util::xml::data_node const &node)
 
 void WindowQt::saveConfiguration(util::xml::data_node &parentnode)
 {
-	util::xml::data_node *const node = parentnode.add_child(NODE_WINDOW, nullptr);
+	util::xml::data_node *const node = parentnode.add_child(NODE_WINDOW);
 	if (node)
 		saveConfigurationToNode(*node);
 }
@@ -379,11 +379,11 @@ void CommandHistory::restoreConfigurationFromNode(util::xml::data_node const &no
 		util::xml::data_node const *itemnode = historynode->get_child(NODE_HISTORY_ITEM);
 		while (itemnode)
 		{
-			if (itemnode->get_value() && *itemnode->get_value())
+			if (!itemnode->value().empty())
 			{
 				while (m_history.size() >= CAPACITY)
 					m_history.pop_back();
-				m_history.push_front(QString::fromUtf8(itemnode->get_value()));
+				m_history.push_front(QString::fromUtf8(itemnode->value().c_str()));
 			}
 			itemnode = itemnode->get_next_sibling(NODE_HISTORY_ITEM);
 		}
@@ -393,7 +393,7 @@ void CommandHistory::restoreConfigurationFromNode(util::xml::data_node const &no
 
 void CommandHistory::saveConfigurationToNode(util::xml::data_node &node)
 {
-	util::xml::data_node *const historynode = node.add_child(NODE_WINDOW_HISTORY, nullptr);
+	util::xml::data_node *const historynode = node.add_child(NODE_WINDOW_HISTORY);
 	if (historynode)
 	{
 		for (auto it = m_history.crbegin(); m_history.crend() != it; ++it)
