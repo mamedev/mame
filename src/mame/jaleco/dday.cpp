@@ -258,8 +258,8 @@ u32 dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, 
 /*
     Protection device
 
-    24 pin IC with scratched surface, not an MCU.
-	Die has label "4828A", CD4828A or TC4828A is not known not exist.
+    24 pin IC with scratched surface (like Exerion's "ICX"), not an MCU.
+    Die has label "4828A"; could this be Mitsubishi M54828P (frequency driver with 5-digit segment display)?
 
     Pinout:
 

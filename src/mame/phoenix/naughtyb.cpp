@@ -141,6 +141,7 @@ uint8_t naughtyb_state::dsw0_port_r()
    If the values all match then it will jump to 0x0011 instead of 0x0009 (refresh instead of reset)
    Paul Priest: tourniquet@mameworld.net */
 
+// Protection devices are Oki MSM5500RS (IC99A) and Mitsubishi M54824P (IC99B).
 
 uint8_t naughtyb_state::popflame_protection_r()/* Not used by bootleg/hack */
 {
