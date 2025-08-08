@@ -302,108 +302,112 @@ void bbl380_state::bbl380(machine_config &config)
 	// Several other LCDC models are identified by ragc153 and dphh8630
 }
 
+// internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+#define INTERNAL_ROM_TYPE1 \
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF) \
+	ROM_LOAD("st2x_internal_type1.bin", 0x002000, 0x002000, CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941))
+
+// internal OTPROM BIOS, dumped from retro150a PCB, 6000-7fff range
+#define INTERNAL_ROM_TYPE2 \
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF) \
+	ROM_LOAD("st2x_internal_type2.bin", 0x002000, 0x002000, BAD_DUMP CRC(32d96794) SHA1(9d7e3e284f1656d8b2f7dae754cab1f82b3a1d61)) /* could still have some errors, double check! */
+
+
+// sets with unknown version of internal ROM
+
 ROM_START(bbl380)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("bbl380_st2205u.bin", 0x000000, 0x004000, NO_DUMP) // internal OTPROM BIOS (addresses are different from other sets)
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
-	ROM_LOAD("bbl 380 180 in 1.bin", 0x000000, 0x400000, CRC(146c88da) SHA1(7f18526a6d8cf991f86febce3418d35aac9f49ad) BAD_DUMP)
+	ROM_LOAD("bbl 380 180 in 1.bin", 0x000000, 0x400000, BAD_DUMP CRC(146c88da) SHA1(7f18526a6d8cf991f86febce3418d35aac9f49ad))
 	// 0x0022XX, 0x0026XX, 0x002AXX, 0x002CXX, 0x002DXX, 0x0031XX, 0x0036XX, etc. should not be FF fill
 ROM_END
 
 ROM_START(mc_cb203)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("bbl380_st2205u.bin", 0x000000, 0x004000, NO_DUMP) // internal OTPROM BIOS (addresses are different from other sets, including bbl380)
+	ROM_LOAD("cb230_st2205u.bin", 0x000000, 0x004000, NO_DUMP) // internal OTPROM BIOS (addresses are different from other sets, including bbl380)
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("s25fl032.bin", 0x000000, 0x400000, CRC(33c4e67b) SHA1(5787db4c8ce4c2569a5f9e9054cbb1944c1b3092))
 ROM_END
 
+// sets with 1nd version of internal ROM
+
 ROM_START(rhhc152)
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+	INTERNAL_ROM_TYPE1
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("152_mk25q32amg_ef4016.bin", 0x000000, 0x400000, CRC(5f553895) SHA1(cd21c6ff225e0455531f6b1d9f1c66a284948516))
 ROM_END
 
 ROM_START(ragc153)
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+	INTERNAL_ROM_TYPE1
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("25q32ams.bin", 0x000000, 0x400000, CRC(de328d73) SHA1(d17b97e9057be4add68b9f5a26e04c9f0a139673)) // first 0x100 bytes would read as 0xff at regular speed, but give valid looking consistent data at a slower rate
 ROM_END
 
 ROM_START(dphh8630)
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+	INTERNAL_ROM_TYPE1
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("bg25q16.bin", 0x000000, 0x200000, CRC(277850d5) SHA1(740087842e1e63bf99b4ca9c1b2053361f267269))
 ROM_END
 
-ROM_START(dphh8633)
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
-
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
-	ROM_LOAD("25lq032.u2", 0x000000, 0x400000, CRC(45b8609a) SHA1(d03615a68465a1a365ba07db0b352424680d62d0) )
-ROM_END
-
 ROM_START(dgun2953)
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+	INTERNAL_ROM_TYPE1
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("dg160_25x32v_ef3016.bin", 0x000000, 0x400000, CRC(2e993bac) SHA1(4b310e326a47df1980aeef38aa9a59018d7fe76f))
 ROM_END
 
 ROM_START(arcade10)
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+	INTERNAL_ROM_TYPE1
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("25q40.bin", 0x000000, 0x080000, CRC(62784666) SHA1(ba1a4abed0a41b2fb3868543306243e68ea6b2e1))
 ROM_END
 
+ROM_START(supreme)
+	INTERNAL_ROM_TYPE1
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("25q32.bin", 0x000000, 0x400000, CRC(93072a3d) SHA1(9f8770839032922e64d5ddd8864441357623c45f))
+ROM_END
+
+// sets with 2nd version of internal ROM
+
+ROM_START(dphh8633)
+	INTERNAL_ROM_TYPE2
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("25lq032.u2", 0x000000, 0x400000, CRC(45b8609a) SHA1(d03615a68465a1a365ba07db0b352424680d62d0) )
+ROM_END
+
 ROM_START(retro150)
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	// not correct for this
-	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+	INTERNAL_ROM_TYPE2
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("p25d32sh.u2", 0x000000, 0x400000, CRC(294290aa) SHA1(078892b2bb10e347ed07273bafed486e0f52c909) )
 ROM_END
 
 ROM_START(retro150a)
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	// not correct for this
-	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+	INTERNAL_ROM_TYPE2
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("by25q32ess.bin", 0x000000, 0x400000, CRC(ef9e8091) SHA1(5b924d5fd4419956d49379a695b87435df7a1155) )
 ROM_END
 
-ROM_START(supreme)
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
-
-	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
-	ROM_LOAD("25q32.bin", 0x000000, 0x400000, CRC(93072a3d) SHA1(9f8770839032922e64d5ddd8864441357623c45f))
-ROM_END
-
 ROM_START(pg118)
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB (not right for this set), 6000-7fff range
+	INTERNAL_ROM_TYPE2
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("25vq32.bin", 0x000000, 0x400000, CRC(e99f1621) SHA1(f907c36a1a884d892331b7de294a8fd58f7bf9d5) )
 ROM_END
 
 ROM_START(toumapet)
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB (not right for this set), 6000-7fff range
+	INTERNAL_ROM_TYPE2 // still does't boot with this one, is it different internal ROM again, or just different mappings?
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("p25d32sh.bin", 0x000000, 0x400000, CRC(25498f00) SHA1(c5c410e29f540d7f1fd4bbb333467f8a3eaccc15) )
@@ -434,7 +438,6 @@ CONS( 201?, arcade10,      0,       0,      bbl380,   bbl380, bbl380_state, empt
 CONS( 201?, supreme,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Fizz Creations", "Arcade Classics Mini Handheld Arcade (Supreme 150)", MACHINE_IMPERFECT_SOUND )
 
 // these are for the Japanese market, the ROM is the same between the Pocket Game and Game Computer but the form factor is different.
-// they have the 0xE4 XOR on the SPI data like many of the above units, but don't currently boot - need to verify if the internal ROM part should be the same or not
 CONS( 2019, pg118,         0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Pocket Game / Game Computer", "Pocket Game 118-in-1 / Game Computer 118-in-1", MACHINE_NOT_WORKING )
 // also has the 0xE4 XOR, also doesn't currently boot
 CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet", MACHINE_NOT_WORKING )
