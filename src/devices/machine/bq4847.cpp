@@ -103,7 +103,7 @@ bq4845_device::bq4845_device(const machine_config& mconfig, const char* tag, dev
 {
 }
 bq4802_device::bq4802_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-	: bq4847_device(mconfig, BQ4845, tag, owner, clock)
+	: bq4847_device(mconfig, BQ4802, tag, owner, clock)
 {
 	set_has_century(true);
 }
