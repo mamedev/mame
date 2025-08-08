@@ -597,10 +597,7 @@ void blueprnt_state::blueprnt(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(10_MHz_XTAL / 2, 320, 0, 256, 264, 16, 240); // verified from Midway schematics
 	screen.set_screen_update(FUNC(blueprnt_state::screen_update));
 	screen.set_palette(m_palette);
 
