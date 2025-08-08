@@ -111,6 +111,7 @@ TODO:
 - zulu: needs verifying of inputs, outputs and layout.
 - westvent and clones: needs verifying of inputs, outputs and layout.
 - keno21: doesn't manage to read the CPU code. bp 1160,1,{D5=0x2188;g} for now to go further.
+- crzcircus: needs verifying of inputs, outputs and layout.
 
 magibomb sets Q/A as of 18.07.2025:
 MAGIC BOMB\A3.0 (magibomb_a30 run protected)
@@ -370,9 +371,10 @@ public:
 		m_cpucode_out(*this, "CPUCODE_OUT")
 	{ }
 
-	void hacher(machine_config &config) ATTR_COLD;
+	void crzcircus(machine_config &config) ATTR_COLD;
 	void dinodino(machine_config &config) ATTR_COLD;
 	void gostopac(machine_config &config) ATTR_COLD;
+	void hacher(machine_config &config) ATTR_COLD;
 	void hapfarm(machine_config &config) ATTR_COLD;
 	void hapfarm_in0102b(machine_config &config) ATTR_COLD;
 	void keno21(machine_config &config) ATTR_COLD;
@@ -416,6 +418,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_1_2_scanline_cb);
 
+	void crzcircus_map(address_map &map) ATTR_COLD;
 	void dinodino_map(address_map &map) ATTR_COLD;
 	void gostopac_map(address_map &map) ATTR_COLD;
 	void hacher_map(address_map &map) ATTR_COLD;
@@ -1180,8 +1183,8 @@ void zoo_state::speedmst_map(address_map &map)
 	map(0x88a000, 0x88a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0x890000, 0x890001).portr("EEPROM_IN");
 	map(0x8a0000, 0x8a0001).portr("CPUCODE_IN");
+	map(0x8b0001, 0x8b0001).w(FUNC(zoo_state::oki_bank_w));
 	map(0x8c0001, 0x8c0001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	//map(0x??0001, 0x??0001).w(FUNC(zoo_state::oki_bank_w))
 }
 
 void zoo_state::wwitch_map(address_map &map)
@@ -1272,6 +1275,24 @@ void zoo_state::westvent_map(address_map &map)
 	map(0xc00000, 0xc00001).portr("CPUCODE_IN");
 	map(0xd80000, 0xd801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
+}
+
+void zoo_state::crzcircus_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
+	map(0xa00001, 0xa00001).w(FUNC(zoo_state::oki_bank_w));
+	map(0xa80001, 0xa80001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xb00000, 0xb00001).portr("CPUCODE_IN");
+	map(0xb80000, 0xb80fff).ram().share(m_spriteram);
+	map(0xb82000, 0xb82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
+	map(0xb84000, 0xb84001).portr("INPUTS");
+	map(0xb88001, 0xb88001).w(FUNC(zoo_state::eeprom_w));
+	map(0xb8a000, 0xb8a001).w(FUNC(zoo_state::magibomb_outputs_w));
+	map(0xb8e000, 0xb8e001).portr("EEPROM_IN");
+	map(0xc00000, 0xc00001).nopr().w(FUNC(zoo_state::screen_enable_w)).umask16(0x00ff);
+	map(0xd00000, 0xd03fff).ram().share("nvram"); // battery
+	map(0xd80000, 0xd801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
 void astoneag_state::astoneag_map(address_map &map)
@@ -1780,6 +1801,12 @@ void zoo_state::westvent(machine_config &config)
 {
 	winbingo(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::westvent_map);
+}
+
+void zoo_state::crzcircus(machine_config &config)
+{
+	westvent(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::crzcircus_map);
 }
 
 void astoneag_state::ramdac_map(address_map &map)
@@ -3215,6 +3242,36 @@ ROM_START( astoneag )
 	ROM_LOAD( "astoneag_cpucode.key", 0x00, 0x02, CRC(fd3642ce) SHA1(8b4e630e114f36c9c15b1a6e6185156786ec9502) )
 ROM_END
 
+/*
+PCB VGA L1.1 CS350P027
+
+V102PX-012
+V06 0430 x2
+F02 2005-02-18
+*/
+ROM_START( astoneag_aa05h )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "1_s.a.aa.05.h.rom1.u28", 0x00000, 0x20000, CRC(90d57d2f) SHA1(a90449cf0a72a0a0d4e0762dcc773ab3bb6e1657) )
+	ROM_LOAD16_BYTE( "2_s.a.aa.05.h.rom2.u29", 0x00001, 0x20000, CRC(9e6aab79) SHA1(7c43c500bf3066a9eddac58eec27ae837d94de38) )
+
+	ROM_REGION( 0x2000000, "sprites", 0 ) // 16 x 32 tiles !! Not dumped for this set but seem correct
+	ROM_LOAD16_BYTE( "29f1610.rom4", 0x0000000, 0x200000, CRC(1affd8db) SHA1(2523f156933c61d36b6646944b5da874f8424864) )
+	ROM_LOAD16_BYTE( "29f1610.rom5", 0x0000001, 0x200000, CRC(2b77d827) SHA1(b082254e1c8a7945e2a406b1b937a763b30cb496) )
+	ROM_LOAD16_BYTE( "29f1610.rom3", 0x1000000, 0x200000, CRC(8d4e66f0) SHA1(744f83b35684aa6653b0d93b303f2914cd0250ba) )
+	ROM_LOAD16_BYTE( "29f1610.rom6", 0x1000001, 0x200000, CRC(eb8ee0e7) SHA1(c6c973460ca96b54151f7523f6afc0184b8fbd40) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_s.a._en.01.rom7", 0x00000, 0x80000, CRC(1b13b0c2) SHA1(d6d8c8070ba146b444958fa0b896cebc12b32f5c) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u15", 0x00, 0x80, CRC(39b9b320) SHA1(d41f583fed297a2e4ba895a529701b17de1d7287) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "astoneag_aa05h_cpucode.key", 0x00, 0x02, CRC(ece19f31) SHA1(2ca65113bea133e99e1ee6de62dfd5076f7962d2) )
+ROM_END
+
 /***************************************************************************
 
 Dino Dino
@@ -3794,6 +3851,43 @@ ROM_START( hapfarm_in0102b )
 	ROM_LOAD( "hapfarm_in0102b_cpucode.key", 0x00, 0x02, CRC(3e92abb0) SHA1(8e0eb6b43a45a4a4d402d06c32a25b64c7503f0c) ) // TODO: is this needed? game doesn't seem to check it
 ROM_END
 
+/***************************************************************************
+
+Crazy Circus
+Astro Corp.
+
+***************************************************************************/
+
+/*
+PCB ASTRO _o  CS350P032
+
+V102PX-001
+V07 0610
+F01 2007-06-12
+*/
+ROM_START( crzcircus )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "1_crazy_circus_us.01.7.u26", 0x00000, 0x20000, CRC(f6e85e79) SHA1(6d491e27735b1ca8bceb5ec05c07b1229a30fe9f) )
+	ROM_LOAD16_BYTE( "2_crazy_circus_us.01.7.u25", 0x00001, 0x20000, CRC(c17f1fad) SHA1(20511e8933854782d0ea4f0afdb9844496777cee) )
+
+	ROM_REGION( 0x1000000, "sprites", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx29f1610mc_middle.u51", 0x0000000, 0x200000, CRC(9e790804) SHA1(87ecf27ab965cd1d3049d9f88a0a6dc8c0b73e08) )
+	ROM_LOAD( "mx29f1610mc_top.u30",    0x0800000, 0x200000, CRC(ffa4405f) SHA1(6632b5fe8b1791a2c3762278b3b0c7fda3b7e401) )
+	// ROM 7 not populated
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_crazy_circus.rom5", 0x00000, 0x80000, CRC(4585da76) SHA1(b6cc051d14b378632269b51302e98f42bba4bddb) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(d2d64727) SHA1(53a66c4c807de7685b8064d131e16ca219d66aec) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "crzcircus_cpucode.key", 0x00, 0x02, CRC(ab1539f0) SHA1(051861faa374e2de66f629b3789bdfb04c80e138) )
+ROM_END
+
+
 void astrocorp_state::init_showhand()
 {
 #if 0
@@ -4288,7 +4382,9 @@ GAMEL( 2002,  magibomb_nb45,   magibomb, magibomb_nb45,   magibomb,       magibo
 
 // Heavier encryption
 GAMEL( 2005,  astoneag,        0,        astoneag,        astoneag,       astoneag_state,  init_astoneag,  ROT0, "Astro Corp.",                  "Stone Age (Astro, Ver. EN.03.A, 2005/02/21)",  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_astoneag )
+GAMEL( 2007,  astoneag_aa05h,  astoneag, astoneag,        astoneag,       astoneag_state,  init_astoneag,  ROT0, "Astro Corp.",                  "Stone Age (Astro, Ver. AA.05.H, 2007/03/15)",  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_astoneag )
 GAMEL( 2006,  cptshark,        0,        winbingo,        winbingo,       zoo_state,       init_px006,     ROT0, "Astro Corp. / American Alpha", "Captain Shark (Ver. CS.01.6, Apr 21 2006)",    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_winbingo ) // 13:50:11 Apr 21 2006
+GAME(  2007,  crzcircus,       0,        crzcircus,       winbingo,       zoo_state,       init_px001,     ROT0, "Astro Corp.",                  "Crazy Circus (Ver. US.01.7)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Dec 25 2007
 GAMEL( 2005,  dinodino,        0,        dinodino,        dinodino,       zoo_state,       init_px010,     ROT0, "Astro Corp.",                  "Dino Dino (Ver. A1.1, 01/13/2005)",            MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_dinodino ) // 13/01.2005 10:59
 GAME(  2004,  gostopac,        0,        gostopac,        dinodino,       zoo_state,       init_gostopac,  ROT0, "Astro Corp.",                  "Go & Stop (Ver. EN1.10)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME ( 2008,  hapfarm,         0,        hapfarm,         magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. US.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/16
