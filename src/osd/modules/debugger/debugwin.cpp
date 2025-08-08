@@ -433,7 +433,7 @@ void debugger_windows::config_save(config_type cfgtype, util::xml::data_node *pa
 	{
 		parentnode->set_attribute_int(debugger::ATTR_DEBUGGER_SAVE_WINDOWS, m_save_windows ? 1 : 0);
 		parentnode->set_attribute_int(debugger::ATTR_DEBUGGER_GROUP_WINDOWS, m_group_windows_setting ? 1 : 0);
-		util::xml::data_node *const colors = parentnode->add_child(debugger::NODE_COLORS, nullptr);
+		util::xml::data_node *const colors = parentnode->add_child(debugger::NODE_COLORS);
 		if (colors)
 			colors->set_attribute_int(debugger::ATTR_COLORS_THEME, m_metrics->get_color_theme());
 	}
