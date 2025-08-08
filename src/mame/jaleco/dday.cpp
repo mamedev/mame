@@ -174,8 +174,8 @@ private:
 TILE_GET_INFO_MEMBER(dday_state::get_tile_info_bg)
 {
 	u8 attr = m_bgvram[tile_index + 0x400];
-	int code = m_bgvram[tile_index] + ((attr & 0x08) << 5);
-	int color = (attr & 0x7);
+	u16 code = m_bgvram[tile_index] + ((attr & 0x08) << 5);
+	u8 color = (attr & 0x7);
 	color |= (attr & 0x40) >> 3;
 
 	tileinfo.category = BIT(attr, 7);
@@ -215,7 +215,7 @@ void dday_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		u8 flags = m_spriteram[i + 2];
 		u8 y = 256 - m_spriteram[i + 0] - 8;
 		u16 code = m_spriteram[i + 1];
-		u8 x = m_spriteram[i + 3] - 16;
+		u8 x = m_spriteram[i + 3] - 8;
 		u8 xflip = (flags & 0x80) >> 7;
 		u8 yflip = (code & 0x80) >> 7;
 		u8 color = flags & 0xf;
@@ -236,17 +236,26 @@ void dday_state::draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, co
 {
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	rectangle opaque_rect(cliprect.min_x, cliprect.min_x + 16, cliprect.min_y, cliprect.max_y);
+	const rectangle &visarea = screen.visible_area();
+	rectangle opaque_rect = cliprect;
+
+	// top opaque part
+	opaque_rect.min_x = visarea.min_x;
+	opaque_rect.max_x = visarea.min_x + 16;
+	opaque_rect &= cliprect;
 	m_fg_tilemap->draw(screen, bitmap, opaque_rect, TILEMAP_DRAW_OPAQUE, 0);
 
-	opaque_rect.min_x = cliprect.max_x - 16;
-	opaque_rect.max_x = cliprect.max_x;
+	// bottom opaque part
+	opaque_rect.min_x = visarea.max_x - 16;
+	opaque_rect.max_x = visarea.max_x;
+	opaque_rect &= cliprect;
 	m_fg_tilemap->draw(screen, bitmap, opaque_rect, TILEMAP_DRAW_OPAQUE, 0);
 }
 
 u32 dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x100, cliprect);
+
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
@@ -320,7 +329,7 @@ void dday_state::char_bank_w(u8 data)
 void dday_state::bgvram_w(offs_t offset, u8 data)
 {
 	if (!offset)
-		m_bg_tilemap->set_scrollx(0, data + 8);
+		m_bg_tilemap->set_scrollx(0, data);
 
 	m_bgvram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
