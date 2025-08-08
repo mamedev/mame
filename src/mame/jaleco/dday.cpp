@@ -150,7 +150,6 @@ private:
 	/* misc */
 	bool m_main_nmi_enable = false;
 	bool m_sound_nmi_enable = false;
-	bool m_sound_irq_clock = false;
 	u8 m_prot_addr = 0;
 
 	u8 dma_mem_r(offs_t offset);
@@ -367,10 +366,7 @@ void dday_state::bg2_w(u8 data)
 
 void dday_state::sound_irq_w(u8 data)
 {
-	// 7474 to audiocpu irq? (pulse is too short for direct assert/clear)
-	if (!BIT(data, 0) && m_sound_irq_clock)
-			m_audiocpu->set_input_line(0, HOLD_LINE);
-	m_sound_irq_clock = BIT(data, 0);
+	m_audiocpu->set_input_line(0, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void dday_state::flip_screen_w(u8 data)
@@ -521,7 +517,6 @@ void dday_state::machine_start()
 	save_item(NAME(m_bgadr));
 	save_item(NAME(m_main_nmi_enable));
 	save_item(NAME(m_sound_nmi_enable));
-	save_item(NAME(m_sound_irq_clock));
 	save_item(NAME(m_prot_addr));
 	save_item(NAME(m_dma_latch));
 }
@@ -532,7 +527,6 @@ void dday_state::machine_reset()
 	m_bgadr = 0;
 	m_sound_nmi_enable = false;
 	m_main_nmi_enable = false;
-	m_sound_irq_clock = false;
 	m_prot_addr = 0;
 	m_dma_latch = 0;
 }
@@ -587,7 +581,7 @@ void dday_state::dma_w(u8 data)
 void dday_state::dday(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12_MHz_XTAL / 3);
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dday_state::main_map);
 	m_maincpu->busack_cb().set(m_dma, FUNC(i8257_device::hlda_w));
 
@@ -596,7 +590,7 @@ void dday_state::dday(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	I8257(config, m_dma, 12_MHz_XTAL / 3);
+	I8257(config, m_dma, 12_MHz_XTAL / 4);
 	m_dma->out_hrq_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->in_memr_cb().set(FUNC(dday_state::dma_mem_r));
 	m_dma->out_memw_cb().set(FUNC(dday_state::dma_mem_w));
