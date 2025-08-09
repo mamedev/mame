@@ -361,7 +361,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="3x3eyes">
+	<software name="3x3eyes" supported="no">
 		<!-- http://redump.org/disc/10136/
 		<rom name="Seima Densetsu 3x3 Eyes (Japan).cue" size="5904" crc="caaaf2ac" />
 		<rom name="Seima Densetsu 3x3 Eyes (Japan) (Track 01).bin" size="310675680" crc="4811e91c" />
@@ -415,6 +415,9 @@ See: http://rawdump.net/
 		<description>Seima Densetsu 3x3 Eyes (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+]]></notes>
 		<info name="serial" value="G-6007"/>
 		<info name="release" value="19930723"/>
 		<info name="alt_title" value="聖魔伝説 3×3EYES"/>
@@ -476,6 +479,7 @@ See: http://rawdump.net/
 		<publisher>CRI</publisher>
 		<info name="serial" value="T-68014"/>
 		<info name="release" value="19921218"/>
+		<info name="usage" value="Supports XE-1AP"/>
 		<info name="alt_title" value="アフターバーナーⅢ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -620,7 +624,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="ah3ts">
+	<software name="ah3ts" cloneof="thawk" supported="no">
 		<!-- http://redump.org/disc/3280/
 		<rom name="AH3 - ThunderStrike (USA).cue" size="1422" crc="d83f8b35" />
 		<rom name="AH3 - ThunderStrike (USA) (Track 01).bin" size="147500976" crc="6ea8ee5b" />
@@ -639,6 +643,9 @@ See: http://rawdump.net/
 		<description>AH3 - ThunderStrike (USA)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
+		<notes><![CDATA[
+Buggy ROZ drawing in minimap (raster effect?)
+]]></notes>
 		<info name="release" value="199310xx" />
 		<info name="serial" value="T-60055"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -650,7 +657,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="aislelrd">
+	<software name="aislelrd" supported="no">
 		<!-- source toseciso
 		<rom name="Aisle Lord (1992)(Wolf Team)(NTSC)(Jp)[!].cue" size="2345" crc="0f61b7b9" />
 		<rom name="Aisle Lord (1992)(Wolf Team)(NTSC)(Jp)(Track 01 of 17)[!].iso" size="108869632" crc="6abfddfc" />
@@ -674,6 +681,9 @@ See: http://rawdump.net/
 		<description>Aisle Lord (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+]]></notes>
 		<info name="serial" value="T-32044"/>
 		<info name="release" value="19920529"/>
 		<info name="alt_title" value="アイルロード"/>
@@ -685,7 +695,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="alshark">
+	<software name="alshark" supported="no">
 		<!-- source toseciso
 		<rom name="Alshark (1993)(Polydor K.K.)(NTSC)(JP)[!].cue" size="5009" crc="2ded8ede" />
 		<rom name="Alshark (1993)(Polydor K.K.)(NTSC)(JP)(Track 01 of 36)[!].iso" size="23838720" crc="c31174f8" />
@@ -728,6 +738,9 @@ See: http://rawdump.net/
 		<description>Alshark (Japan)</description>
 		<year>1993</year>
 		<publisher>Polydor K.K.</publisher>
+		<notes><![CDATA[
+Offset [redbook] playback for dialogues
+]]></notes>
 		<info name="serial" value="T-92014"/>
 		<info name="release" value="19931126"/>
 		<info name="alt_title" value="アルシャーク"/>
@@ -939,7 +952,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="arslan">
+	<software name="arslan" supported="no">
 		<!-- source toseciso
 		<rom name="Arislan Senki - The Heroic Legend of Arslan (1993)(Sega)(NTSC)(JP)[!].cue" size="9858" crc="ed8657b6" />
 		<rom name="Arislan Senki - The Heroic Legend of Arslan (1993)(Sega)(NTSC)(JP)(Track 01 of 59)[!].iso" size="22022144" crc="79ea9df3" />
@@ -1005,6 +1018,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Arslan Senki - The Heroic Legend of Arslan (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+]]></notes>
 		<info name="serial" value="G-6028"/>
 		<info name="release" value="19931119"/>
 		<info name="alt_title" value="アルスラーン戦記"/>
@@ -1016,7 +1032,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="ax101">
+	<software name="ax101" supported="no">
 		<!-- http://redump.org/disc/22471/
 		<rom name="A-X-101 (USA) (RE).cue" size="229" crc="5dd5c2a1" md5="f63325683f0f7b7275c15ae5c1c243ee" sha1="7cb650ee451960270fcd5d975f05bf5f623fda5c"/>
 		<rom name="A-X-101 (USA) (RE) (Track 1).bin" size="623183568" crc="79b56a2b" md5="99ba20207299eef713900a60aea08243" sha1="6c354622c69d9494c216129e0a8fb12fbc24c165"/>
@@ -1025,6 +1041,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>A/X-101 (USA)</description>
 		<year>1994</year>
 		<publisher>Absolute Entertainment</publisher>
+		<notes><![CDATA[
+Off-sync [RF5C164] cfr. starting a game
+Too slow during gameplay
+]]></notes>
 		<info name="serial" value="T-86015"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -1035,7 +1055,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="ax101j" cloneof="ax101">
+	<software name="ax101j" cloneof="ax101" supported="no">
 		<!-- http://redump.org/disc/1785/
 		<rom name="AX-101 (Japan).cue" size="198" crc="6c514d73" />
 		<rom name="AX-101 (Japan) (Track 1).bin" size="615817104" crc="03cbf674" />
@@ -1044,6 +1064,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>AX-101 (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Off-sync [RF5C164] cfr. starting a game
+Too slow during gameplay
+]]></notes>
 		<info name="serial" value="G-6031"/>
 		<info name="release" value="19940325"/>
 		<info name="alt_title" value="AX-101"/>
@@ -1187,7 +1211,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="batlfant">
+	<software name="batlfant" cloneof="revoveng">
 		<!-- source toseciso
 		<rom name="Battle Fantasy (1994)(Micronet)(NTSC)(JP)[!].cue" size="6372" crc="a323dd1c" />
 		<rom name="Battle Fantasy (1994)(Micronet)(NTSC)(JP)(Track 01 of 45)[!].iso" size="18720768" crc="0e09dfdc" />
@@ -1452,7 +1476,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="beast2">
+	<software name="beast2" supported="partial">
 		<!-- http://redump.org/disc/3793/
 		<rom name="Shadow of the Beast II (Europe).cue" size="1872" crc="ae5d5ef4" />
 		<rom name="Shadow of the Beast II (Europe) (Track 01).bin" size="24051552" crc="7e722ab6" />
@@ -1474,6 +1498,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Shadow of the Beast II (Europe)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Minor [VDP] backdrop and HP indicator flickering for split frames
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="T-113045-50 21"/>
@@ -1483,7 +1510,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="beast2j" cloneof="beast2">
+	<software name="beast2j" cloneof="beast2" supported="partial">
 		<!-- http://redump.org/disc/3117/
 		<rom name="Shadow of the Beast II - Juushin no Jubaku (Japan).cue" size="2012" crc="6b67e248" />
 		<rom name="Shadow of the Beast II - Juushin no Jubaku (Japan) (Track 01).bin" size="29976240" crc="0330e73d" />
@@ -1504,6 +1531,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Shadow of the Beast II - Juushin no Jubaku (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
+		<notes><![CDATA[
+Minor [VDP] backdrop and HP indicator flickering for split frames
+]]></notes>
 		<info name="serial" value="T-60034"/>
 		<info name="release" value="19940729"/>
 		<info name="alt_title" value="シャドー・オブ・ザ・ビーストII 獣神の呪縛"/>
@@ -1516,7 +1546,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="beast2u" cloneof="beast2">
+	<software name="beast2u" cloneof="beast2" supported="partial">
 		<!-- Source: TruRip
 		<rom name="Media (CD-ROM)\Shadow of the Beast II (1994)(Psygnosis)(US).ccd" size="2966" crc="9790f581" md5="ff343a76ba42eb3f200d42754e9478b8" sha1="9d57f681cdc0a46cd94069835a38f0e0b6b359b3"/>
 		<rom name="Media (CD-ROM)\Shadow of the Beast II (1994)(Psygnosis)(US).img" size="456043392" crc="2b254a45" md5="72b829b71e339377ccf973219ff91c1f" sha1="3f02dab2d0e451af263e16042dc6417eca82121b"/>
@@ -1525,6 +1555,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Shadow of the Beast II (USA)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+Minor [VDP] backdrop and HP indicator flickering for split frames
+]]></notes>
 		<info name="serial" value="T-113045"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -1626,7 +1659,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Blackhole Assault (Europe) (Track 22).bin" size="35143584" crc="9a1ad459" />
 		<rom name="Blackhole Assault (Europe) (Track 23).bin" size="33944064" crc="21c676b8" />
 		-->
-		<description>Blackhole Assault (Europe)</description>
+		<description>Black Hole Assault (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4405"/>
@@ -1635,6 +1668,47 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 			<feature name="cd_matrix" value="MK-4405P-00046-R1M"/>
 			<diskarea name="cdrom">
 				<disk name="blackhole assault (europe)" sha1="398803262717642a8aab1676933d5e41f3136fee"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="blackhu" cloneof="blackh">
+		<!-- http://redump.org/disc/21449/
+		<rom name="Blackhole Assault (USA).cue" size="2259" crc="c3d6a886" md5="e79d9728b736bbd2a0fc0614d1eb9e93" sha1="b5e11b0fddf9d6d98496cb3f0426a1ada72c4f69"/>
+		<rom name="Blackhole Assault (USA) (Track 01).bin" size="13857984" crc="e311d117" md5="2b3d92c12c7c4dee8155a4ee0c020fa4" sha1="6adad838067910c31d7f2b8a6bcc88285cbf194d"/>
+		<rom name="Blackhole Assault (USA) (Track 02).bin" size="15440880" crc="186016f0" md5="1dbca6d2a1781f09f28b12e7ad756f64" sha1="a136a50b25a41f7935bda491a7fd211bce522331"/>
+		<rom name="Blackhole Assault (USA) (Track 03).bin" size="30820608" crc="98219d48" md5="1ed7ddb82557ea06df1f4a76e061be40" sha1="0d5edc18fd2ef2e5fe456156fe1bacb2dd90ed4e"/>
+		<rom name="Blackhole Assault (USA) (Track 04).bin" size="16268784" crc="7793d428" md5="1211ed08587a3807581755aeb859f1fe" sha1="b747fea35b21f63589460f4d5ab26bd9cb709227"/>
+		<rom name="Blackhole Assault (USA) (Track 05).bin" size="17522400" crc="dd187576" md5="6ba7c7b08a865a4ba0af011f6ce24111" sha1="709351b96c14c85d9bb859cb4f2a936c0fcd138c"/>
+		<rom name="Blackhole Assault (USA) (Track 06).bin" size="20819904" crc="c29eb3a3" md5="797d91af144437b2d43c53eae3beef35" sha1="1fd1080f1dfddeea6655dea766df48fb50365e3c"/>
+		<rom name="Blackhole Assault (USA) (Track 07).bin" size="29900976" crc="2315941f" md5="3707f977de73847afc1bd6234e352946" sha1="1450ad8bdbd6bea2497e1f4c000092b189980611"/>
+		<rom name="Blackhole Assault (USA) (Track 08).bin" size="20958672" crc="82d2299f" md5="be20435d9a638418c20d10079b5b7fd1" sha1="4d096d5a6ab77713931fe3fe365222f97d245da4"/>
+		<rom name="Blackhole Assault (USA) (Track 09).bin" size="23536464" crc="3daf1596" md5="b9ce505e4af3aeecb0d62463c6d0ff29" sha1="d5a100fbafc8b6f74cef248331501bc9c26307a8"/>
+		<rom name="Blackhole Assault (USA) (Track 10).bin" size="26050752" crc="7f5b3a46" md5="66fc59baf01e1dea956d81074d0af08d" sha1="7aa66b16ba55d58c57498be6011cdb2b6a17cf73"/>
+		<rom name="Blackhole Assault (USA) (Track 11).bin" size="18957120" crc="6c32f8e3" md5="6aac64b32af97dd3cbc5225904f495dd" sha1="e9e3e3aa5b12a8f06c5e7a7cab68b0c15814551c"/>
+		<rom name="Blackhole Assault (USA) (Track 12).bin" size="13596912" crc="9326368f" md5="2cd24aa6d571bac5480b02715748bddc" sha1="b14b7f8721cb5a9f43a26c07f97e449b228181a5"/>
+		<rom name="Blackhole Assault (USA) (Track 13).bin" size="15817200" crc="267796c5" md5="ad72c50a88ab90cffdb3fb82185b2119" sha1="10fd2a6ce0d2c952aae226d1f9a19043f9d20984"/>
+		<rom name="Blackhole Assault (USA) (Track 14).bin" size="23750496" crc="6f39ff34" md5="ef154ab1c9a2a27f075fb8d66956a970" sha1="f1c7e4d36e6aa06908aba9f8b0deb22a439e0db8"/>
+		<rom name="Blackhole Assault (USA) (Track 15).bin" size="10997952" crc="9eb977fa" md5="fd20001dff3d53c709b5934c58940f05" sha1="0fa80117a024fd689126f783ebb1893595084033"/>
+		<rom name="Blackhole Assault (USA) (Track 16).bin" size="48190128" crc="791c9763" md5="be1756f5f0a753d760d2230dc94e73af" sha1="580dc9cf321ba5e438cb7c18ac885133b8cf58c6"/>
+		<rom name="Blackhole Assault (USA) (Track 17).bin" size="5981136" crc="f68a32f1" md5="38c9cc76b9bdc04e6a13e0fbbbdd2a9f" sha1="36410f0233f4762479c5773fc51623502377e8f0"/>
+		<rom name="Blackhole Assault (USA) (Track 18).bin" size="19733280" crc="96a7cf42" md5="2ae749fb1ce48365401a80862c60438a" sha1="44b76c286189f38d4780cad143f59f8a5b6f2d7a"/>
+		<rom name="Blackhole Assault (USA) (Track 19).bin" size="42867552" crc="129a2a58" md5="882688ce244cc2c0c535cfe10edd0a0a" sha1="69bbf5ef0a28a4ef89c0659e577089c0be33a113"/>
+		<rom name="Blackhole Assault (USA) (Track 20).bin" size="35312928" crc="3d9c671f" md5="178f2a03ce620783701bb12a88e2c31e" sha1="51f1f85484e0f98839b8e9dc80993a3d7626e231"/>
+		<rom name="Blackhole Assault (USA) (Track 21).bin" size="14608272" crc="83bd59af" md5="cc764e95215195ef0ea43379e9deaeae" sha1="f31bff517cd0b71dcfff909b9ec52af8a2793769"/>
+		<rom name="Blackhole Assault (USA) (Track 22).bin" size="35143584" crc="37eb34f2" md5="46549941403c51ed98b8c2ed1faad2ac" sha1="e3005fec46b714ea410c163ea9e532eb5ea11c20"/>
+		<rom name="Blackhole Assault (USA) (Track 23).bin" size="33946416" crc="78a93630" md5="d4eeca95d170bd4433d2223902f989df" sha1="e2c37e519e7caf9352adef7546a15c2405d81a4a"/>
+		-->
+		<description>Black Hole Assault (USA)</description>
+		<year>1993</year>
+		<publisher>Bignet</publisher>
+		<info name="alt_title" value="Blackhole Assault (Box)" />
+		<info name="serial" value="PN-6400"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="CDAC-031700 1"/>
+			<diskarea name="cdrom">
+				<disk name="black hole assault (usa)" sha1="e7533c9de5cea95b3d3ddbcc19d0002aa4fabb2b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1681,51 +1755,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="blackhu" cloneof="blackh">
-		<!-- http://redump.org/disc/21449/
-		<rom name="Blackhole Assault (USA).cue" size="2259" crc="c3d6a886" md5="e79d9728b736bbd2a0fc0614d1eb9e93" sha1="b5e11b0fddf9d6d98496cb3f0426a1ada72c4f69"/>
-		<rom name="Blackhole Assault (USA) (Track 01).bin" size="13857984" crc="e311d117" md5="2b3d92c12c7c4dee8155a4ee0c020fa4" sha1="6adad838067910c31d7f2b8a6bcc88285cbf194d"/>
-		<rom name="Blackhole Assault (USA) (Track 02).bin" size="15440880" crc="186016f0" md5="1dbca6d2a1781f09f28b12e7ad756f64" sha1="a136a50b25a41f7935bda491a7fd211bce522331"/>
-		<rom name="Blackhole Assault (USA) (Track 03).bin" size="30820608" crc="98219d48" md5="1ed7ddb82557ea06df1f4a76e061be40" sha1="0d5edc18fd2ef2e5fe456156fe1bacb2dd90ed4e"/>
-		<rom name="Blackhole Assault (USA) (Track 04).bin" size="16268784" crc="7793d428" md5="1211ed08587a3807581755aeb859f1fe" sha1="b747fea35b21f63589460f4d5ab26bd9cb709227"/>
-		<rom name="Blackhole Assault (USA) (Track 05).bin" size="17522400" crc="dd187576" md5="6ba7c7b08a865a4ba0af011f6ce24111" sha1="709351b96c14c85d9bb859cb4f2a936c0fcd138c"/>
-		<rom name="Blackhole Assault (USA) (Track 06).bin" size="20819904" crc="c29eb3a3" md5="797d91af144437b2d43c53eae3beef35" sha1="1fd1080f1dfddeea6655dea766df48fb50365e3c"/>
-		<rom name="Blackhole Assault (USA) (Track 07).bin" size="29900976" crc="2315941f" md5="3707f977de73847afc1bd6234e352946" sha1="1450ad8bdbd6bea2497e1f4c000092b189980611"/>
-		<rom name="Blackhole Assault (USA) (Track 08).bin" size="20958672" crc="82d2299f" md5="be20435d9a638418c20d10079b5b7fd1" sha1="4d096d5a6ab77713931fe3fe365222f97d245da4"/>
-		<rom name="Blackhole Assault (USA) (Track 09).bin" size="23536464" crc="3daf1596" md5="b9ce505e4af3aeecb0d62463c6d0ff29" sha1="d5a100fbafc8b6f74cef248331501bc9c26307a8"/>
-		<rom name="Blackhole Assault (USA) (Track 10).bin" size="26050752" crc="7f5b3a46" md5="66fc59baf01e1dea956d81074d0af08d" sha1="7aa66b16ba55d58c57498be6011cdb2b6a17cf73"/>
-		<rom name="Blackhole Assault (USA) (Track 11).bin" size="18957120" crc="6c32f8e3" md5="6aac64b32af97dd3cbc5225904f495dd" sha1="e9e3e3aa5b12a8f06c5e7a7cab68b0c15814551c"/>
-		<rom name="Blackhole Assault (USA) (Track 12).bin" size="13596912" crc="9326368f" md5="2cd24aa6d571bac5480b02715748bddc" sha1="b14b7f8721cb5a9f43a26c07f97e449b228181a5"/>
-		<rom name="Blackhole Assault (USA) (Track 13).bin" size="15817200" crc="267796c5" md5="ad72c50a88ab90cffdb3fb82185b2119" sha1="10fd2a6ce0d2c952aae226d1f9a19043f9d20984"/>
-		<rom name="Blackhole Assault (USA) (Track 14).bin" size="23750496" crc="6f39ff34" md5="ef154ab1c9a2a27f075fb8d66956a970" sha1="f1c7e4d36e6aa06908aba9f8b0deb22a439e0db8"/>
-		<rom name="Blackhole Assault (USA) (Track 15).bin" size="10997952" crc="9eb977fa" md5="fd20001dff3d53c709b5934c58940f05" sha1="0fa80117a024fd689126f783ebb1893595084033"/>
-		<rom name="Blackhole Assault (USA) (Track 16).bin" size="48190128" crc="791c9763" md5="be1756f5f0a753d760d2230dc94e73af" sha1="580dc9cf321ba5e438cb7c18ac885133b8cf58c6"/>
-		<rom name="Blackhole Assault (USA) (Track 17).bin" size="5981136" crc="f68a32f1" md5="38c9cc76b9bdc04e6a13e0fbbbdd2a9f" sha1="36410f0233f4762479c5773fc51623502377e8f0"/>
-		<rom name="Blackhole Assault (USA) (Track 18).bin" size="19733280" crc="96a7cf42" md5="2ae749fb1ce48365401a80862c60438a" sha1="44b76c286189f38d4780cad143f59f8a5b6f2d7a"/>
-		<rom name="Blackhole Assault (USA) (Track 19).bin" size="42867552" crc="129a2a58" md5="882688ce244cc2c0c535cfe10edd0a0a" sha1="69bbf5ef0a28a4ef89c0659e577089c0be33a113"/>
-		<rom name="Blackhole Assault (USA) (Track 20).bin" size="35312928" crc="3d9c671f" md5="178f2a03ce620783701bb12a88e2c31e" sha1="51f1f85484e0f98839b8e9dc80993a3d7626e231"/>
-		<rom name="Blackhole Assault (USA) (Track 21).bin" size="14608272" crc="83bd59af" md5="cc764e95215195ef0ea43379e9deaeae" sha1="f31bff517cd0b71dcfff909b9ec52af8a2793769"/>
-		<rom name="Blackhole Assault (USA) (Track 22).bin" size="35143584" crc="37eb34f2" md5="46549941403c51ed98b8c2ed1faad2ac" sha1="e3005fec46b714ea410c163ea9e532eb5ea11c20"/>
-		<rom name="Blackhole Assault (USA) (Track 23).bin" size="33946416" crc="78a93630" md5="d4eeca95d170bd4433d2223902f989df" sha1="e2c37e519e7caf9352adef7546a15c2405d81a4a"/>
-		-->
-		<description>Black Hole Assault (USA)</description>
-		<year>1993</year>
-		<publisher>Bignet</publisher>
-		<info name="alt_title" value="Blackhole Assault (Box)" />
-		<info name="serial" value="PN-6400"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
-			<feature name="cd_matrix" value="CDAC-031700 1"/>
-			<diskarea name="cdrom">
-				<disk name="black hole assault (usa)" sha1="e7533c9de5cea95b3d3ddbcc19d0002aa4fabb2b"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Sourced from the hiddenpalace forums - http://hiddenpalace.org/forums/viewtopic.php?t=2880 -->
 	<!-- Marked as bad dump as it's an MP3-based dump -->
 	<software name="blackhup" cloneof="blackh">
-		<description>Blackhole Assault (USA, prototype 19920210)</description>
+		<description>Black Hole Assault (USA, prototype 19920210)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -1848,7 +1881,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="bouncers">
+	<software name="bouncers" supported="no">
 		<!-- http://redump.org/disc/28028/
 		<rom name="Bouncers (USA).cue" size="954" crc="bca37abb" md5="1cb86ee3ddcc8999d32bb181d0981098" sha1="5292fcb4cfb13cca0111c7c6c95e2a2e5e8affce"/>
 		<rom name="Bouncers (USA) (Track 1).bin" size="238344624" crc="c89a9298" md5="c0ec4fd23f12188cafef26f6158d7937" sha1="f4bca7e9a8e3383f5e2cf69bfb379867a521750c"/>
@@ -1864,6 +1897,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Bouncers (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Major [VDP] corruption during gameplay
+]]></notes>
 		<info name="release" value="199412xx" />
 		<info name="serial" value="4908"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -2388,6 +2424,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Cosmic Fantasy Stories (Japan)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
+		<notes><![CDATA[
+Glitchy [VDP] tiles for split frames during FMV (verify, likely btanb)
+]]></notes>
 		<info name="serial" value="T-49014"/>
 		<info name="release" value="19920327"/>
 		<info name="alt_title" value="コズミックファンタジー Stories"/>
@@ -2400,7 +2439,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="champs94">
+	<software name="champs94" cloneof="sensible" supported="partial">
 		<!-- Source: TruRip
 		<rom name="Media (CD-ROM)\Championship Soccer &apos;94 (1994)(Sony Imagesoft)(US).ccd" size="15559" crc="2a045e57" md5="1a7ed3eae49fd8d150e683d5763c8bfe" sha1="9b184230999074191e5030a13b39893cbc005205"/>
 		<rom name="Media (CD-ROM)\Championship Soccer &apos;94 (1994)(Sony Imagesoft)(US).img" size="344854944" crc="b11061b6" md5="83afac7f6886c1b77e1557d95b924983" sha1="dc7cc40fce9de63cfe96e6f8c44ac6e384b7b467"/>
@@ -2409,6 +2448,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Championship Soccer '94 (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
+		<notes><![CDATA[
+Essentially requires [SRAM cart] for saving (124 blocks)
+]]></notes>
 		<info name="serial" value="T-93185"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -2538,7 +2580,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	It was however scrapped before it was published. In 2002, Good Deal Games released a set of reproduction
 	discs based off a beta prototype build. This is a dump from one of those reproduction discs.
 	-->
-	<software name="citizenx">
+	<software name="citizenx" supported="partial">
 		<!-- Source: TOSEC-ISO
 		<rom name="Citizen X Beta (2002)(Good Deal Games - Oldergames)(NTSC)(US)[!][unreleased beta].cue" size="170" crc="71c85c20" />
 		<rom name="Citizen X Beta (2002)(Good Deal Games - Oldergames)(NTSC)(US)[!][unreleased beta].iso" size="329457664" crc="36c21367" />
@@ -2546,6 +2588,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Citizen X (USA, prototype)</description>
 		<year>2002</year>
 		<publisher>Good Deal Games</publisher>
+		<notes><![CDATA[
+Stuck glitchy [VDP] tiles during FMVs in gameplay
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2620,7 +2665,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="cobracom">
+	<software name="cobracom" supported="no">
 		<!-- http://redump.org/disc/4099/
 		<rom name="Cobra Command (Europe).cue" size="214" crc="e9a17dc7" />
 		<rom name="Cobra Command (Europe) (Track 1).bin" size="256344480" crc="4b176df2" />
@@ -2629,6 +2674,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Cobra Command (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="4402"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -2640,7 +2688,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<!-- Do both coincide with redump.org disk? -->
-	<software name="cobracoma" cloneof="cobracom">
+	<software name="cobracoma" cloneof="cobracom" supported="no">
 		<!-- source toseciso
 		<rom name="Cobra Command (1993)(Sega)(PAL)[!][MK-4402P-00032 2].cue" size="301" crc="fecb8132" />
 		<rom name="Cobra Command (1993)(Sega)(PAL)(Track 1 of 2)[!][MK-4402P-00032 2].iso" size="223211520" crc="e16f37d4" />
@@ -2649,6 +2697,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Cobra Command (Europe) [MK-4402P-00032 2]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="4402"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -2659,7 +2710,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="cobracomb" cloneof="cobracom">
+	<software name="cobracomb" cloneof="cobracom" supported="no">
 		<!-- source toseciso
 		<rom name="Cobra Command (1993)(Sega)(PAL)[!][MK-4402P-00032-R1M].cue" size="305" crc="e995cc3f" />
 		<rom name="Cobra Command (1993)(Sega)(PAL)(Track 1 of 2)[!][MK-4402P-00032-R1M].iso" size="223211520" crc="e16f37d4" />
@@ -2668,6 +2719,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Cobra Command (Europe) [MK-4402P-00032-R1M]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="4402"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -2678,7 +2732,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="cobracomu" cloneof="cobracom">
+	<software name="cobracomu" cloneof="cobracom" supported="no">
 		<!-- http://redump.org/disc/3883/
 		<rom name="Cobra Command (USA).cue" size="208" crc="2ffd0c2c" />
 		<rom name="Cobra Command (USA) (Track 1).bin" size="256344480" crc="a2093c3c" />
@@ -2687,6 +2741,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Cobra Command (USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="4402"/>
 		<info name="release" value="199211xx" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -2830,7 +2887,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="corpse">
+	<software name="corpse" supported="no">
 		<!-- http://redump.org/disc/16156/
 		<rom name="Corpse Killer (Europe).cue" size="214" crc="a144d63b" />
 		<rom name="Corpse Killer (Europe) (Track 1).bin" size="626234112" crc="60cf5a65" />
@@ -2839,6 +2896,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Corpse Killer (Europe)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Uses port 2 for navigating in main menu, press/release cycles too fast.
+Optional [Menacer] or [Justifier] support
+]]></notes>
 		<info name="serial" value="T-162055-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -2874,7 +2935,7 @@ Requires [32X] add-on
 		</part>
 	</software>
 
-	<software name="corpseu" cloneof="corpse">
+	<software name="corpseu" cloneof="corpse" supported="no">
 		<!-- Source: TOSEC-ISO
 		<rom name="Corpse Killer (1994)(Digital Pictures)(NTSC)(US)[!].cue" size="299" crc="fbd181bc" />
 		<rom name="Corpse Killer (1994)(Digital Pictures)(NTSC)(US)(Track 1 of 2)[!].iso" size="545292288" crc="f74e6863" />
@@ -2883,6 +2944,10 @@ Requires [32X] add-on
 		<description>Corpse Killer (USA)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Uses port 2 for navigating in main menu, press/release cycles too fast.
+Optional [Menacer] or [Justifier] support
+]]></notes>
 		<info name="release" value="199411xx" />
 		<info name="serial" value="T-162055"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -2893,7 +2958,7 @@ Requires [32X] add-on
 		</part>
 	</software>
 
-	<software name="cpatrol">
+	<software name="cpatrol" supported="partial">
 		<!-- Source: TruRip
 		<rom name="Media (CD-ROM)\Crime Patrol (1994)(American Laser Games)(US).ccd" size="935" crc="7933aeee" md5="a277484e7b59d61dc88eace77c786fb9" sha1="d3372533a744e57b88d374b760a6411f8aec4eae"/>
 		<rom name="Media (CD-ROM)\Crime Patrol (1994)(American Laser Games)(US).img" size="282661008" crc="19476f80" md5="4438092b9d5208651f827a438104250a" sha1="cfbb47d3546733e26ec3a87992f5943454d0928e"/>
@@ -2902,7 +2967,11 @@ Requires [32X] add-on
 		<description>Crime Patrol (USA)</description>
 		<year>1994</year>
 		<publisher>American Laser Games</publisher>
+		<notes><![CDATA[
+Optional [Menacer] or [Justifier] support
+]]></notes>
 		<info name="serial" value="T-111055"/>
+		<info name="usage" value="Supports -ctrl2 mouseus"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<feature name="peripheral" value="menacer" />
@@ -2933,7 +3002,7 @@ Requires [32X] add-on
 		</part>
 	</software>
 
-	<software name="cyborg9">
+	<software name="cyborg9" supported="partial">
 		<!-- http://redump.org/disc/3143/
 		<rom name="Cyborg 009 (Japan).cue" size="3711" crc="35f389fe" />
 		<rom name="Cyborg 009 (Japan) (Track 01).bin" size="15694896" crc="4fc4da73" />
@@ -2973,6 +3042,10 @@ Requires [32X] add-on
 		<description>Cyborg 009 (Japan)</description>
 		<year>1993</year>
 		<publisher>Nihon Telenet</publisher>
+		<notes><![CDATA[
+Missing some [SFX]s during gameplay, most notably player shot
+Offset [redbook] playback during cutscenes, with lip sync drift
+]]></notes>
 		<info name="serial" value="T-49054"/>
 		<info name="release" value="19930730"/>
 		<info name="alt_title" value="サイボーグ009"/>
@@ -2985,7 +3058,7 @@ Requires [32X] add-on
 		</part>
 	</software>
 
-	<software name="daihoush">
+	<software name="daihoush" supported="partial">
 		<!-- source toseciso
 		<rom name="Daihoushinden (1995)(Victor)(NTSC)(JP)[!].cue" size="827" crc="a4140523" />
 		<rom name="Daihoushinden (1995)(Victor)(NTSC)(JP)(Track 1 of 6)[!].iso" size="336377856" crc="76de0bb7" />
@@ -2998,6 +3071,9 @@ Requires [32X] add-on
 		<description>Daihoushinden (Japan)</description>
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
+		<notes><![CDATA[
+Essentially requires [SRAM cart] for saving (120 blocks)
+]]></notes>
 		<info name="serial" value="T-60024"/>
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="大封神伝"/>
@@ -3125,7 +3201,7 @@ Requires [32X] add-on
 		</part>
 	</software>
 
-	<software name="deathbrn">
+	<software name="deathbrn" supported="partial">
 		<!-- source toseciso
 		<rom name="Death Bringer - Himerata Monshou - The Knight of Darkness (1992)(Riot)(NTSC)(JP)[!].cue" size="2539" crc="bfe0cdad" />
 		<rom name="Death Bringer - Himerata Monshou - The Knight of Darkness (1992)(Riot)(NTSC)(JP)(Track 01 of 14)[!].iso" size="33028096" crc="0c5673d5" />
@@ -3146,6 +3222,9 @@ Requires [32X] add-on
 		<description>Death Bringer - Himerata Monshou - The Knight of Darkness (Japan)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
+		<notes><![CDATA[
+Essentially requires [SRAM cart] for saving (125 blocks)
+]]></notes>
 		<info name="serial" value="T-49034"/>
 		<info name="release" value="19920417"/>
 		<info name="alt_title" value="デスブリンガー 秘められた紋章"/>
@@ -3175,7 +3254,7 @@ Requires [32X] add-on
 		</part>
 	</software>
 
-	<software name="dennin">
+	<software name="dennin" cloneof="roboales">
 		<!-- http://redump.org/disc/1634/
 		<rom name="Dennin Aleste - Nobunaga and His Ninja Force (Japan).cue" size="3657" crc="d1585b2f" />
 		<rom name="Dennin Aleste - Nobunaga and His Ninja Force (Japan) (Track 01).bin" size="15005760" crc="2bba56f5" />
@@ -3219,7 +3298,7 @@ Requires [32X] add-on
 		</part>
 	</software>
 
-	<software name="detonatr">
+	<software name="detonatr" supported="partial">
 		<!-- http://redump.org/disc/10137/
 		<rom name="Detonator Orgun (Japan).cue" size="1280" crc="80377bef" />
 		<rom name="Detonator Orgun (Japan) (Track 01).bin" size="48540576" crc="0856b08f" />
@@ -3237,6 +3316,9 @@ Requires [32X] add-on
 		<description>Detonator Orgun (Japan)</description>
 		<year>1992</year>
 		<publisher>Hot-B</publisher>
+		<notes><![CDATA[
+Optional [SRAM cart] for saving, select 2 at startup.
+]]></notes>
 		<info name="serial" value="T-28014"/>
 		<info name="release" value="19920731"/>
 		<info name="alt_title" value="デトネイター・オーガン"/>
@@ -3249,7 +3331,7 @@ Requires [32X] add-on
 		</part>
 	</software>
 
-	<software name="devastat">
+	<software name="devastat" supported="no">
 		<!-- http://redump.org/disc/3158/
 		<rom name="Devastator (Japan).cue" size="1225" crc="40c82789" />
 		<rom name="Devastator (Japan) (Track 01).bin" size="189074928" crc="55438f4a" />
@@ -3267,6 +3349,9 @@ Requires [32X] add-on
 		<description>Devastator (Japan)</description>
 		<year>1993</year>
 		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="T-32074"/>
 		<info name="release" value="19930528"/>
 		<info name="alt_title" value="デバステイター"/>
@@ -3389,7 +3474,7 @@ Requires [32X] add-on
 		</part>
 	</software>
 
-	<software name="dmaster2">
+	<software name="dmaster2" supported="partial">
 		<!-- source toseciso
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(JVC)(PAL)[!].cue" size="940" crc="1421ca7f" />
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(JVC)(PAL)(Track 1 of 7)[!].iso" size="26404864" crc="8cac3d01" />
@@ -3400,9 +3485,13 @@ Requires [32X] add-on
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(JVC)(PAL)(Track 6 of 7)[!].wav" size="51689948" crc="0883d15f" />
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(JVC)(PAL)(Track 7 of 7)[!].wav" size="2923580" crc="048d98fd" />
 		-->
-		<description>Dungeon Master II - Skullkeep v1.0 (Europe)</description>
+		<description>Dungeon Master II: Skullkeep (Europe, v1.0)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
+		<notes><![CDATA[
+Essentially requires [SRAM cart] for saving (100 blocks)
+Black screen at startup if mouse connected to -ctrl2
+]]></notes>
 		<info name="serial" value="T-60085-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -3412,7 +3501,7 @@ Requires [32X] add-on
 		</part>
 	</software>
 
-	<software name="dmaster2j" cloneof="dmaster2">
+	<software name="dmaster2j" cloneof="dmaster2" supported="partial">
 		<!-- source toseciso
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(Victor)(NTSC)(JP)[!].cue" size="1111" crc="09079f1b" />
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(Victor)(NTSC)(JP)(Track 1 of 7)[!].iso" size="11874304" crc="dff4905d" />
@@ -3423,9 +3512,13 @@ Requires [32X] add-on
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(Victor)(NTSC)(JP)(Track 6 of 7)[!].wav" size="51689948" crc="a9380c6b" />
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(Victor)(NTSC)(JP)(Track 7 of 7)[!].wav" size="2940044" crc="aeadf2f5" />
 		-->
-		<description>Dungeon Master II - Skullkeep (Japan, v1.0)</description>
+		<description>Dungeon Master II: Skullkeep (Japan, v1.0)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
+		<notes><![CDATA[
+Essentially requires [SRAM cart] for saving (100 blocks)
+Black screen at startup if mouse connected to -ctrl2
+]]></notes>
 		<info name="serial" value="T-60144"/>
 		<info name="release" value="19940325"/>
 		<info name="alt_title" value="ダンジョンマスターII スカルキープ"/>
@@ -3438,7 +3531,7 @@ Requires [32X] add-on
 	</software>
 
 	<!-- TOSEC marks this as v1.0. Is there any indication that there is another version? -->
-	<software name="dmaster2u" cloneof="dmaster2">
+	<software name="dmaster2u" cloneof="dmaster2" supported="partial">
 		<!-- Source: TOSEC-ISO
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(JVC)(NTSC)(US)[!].cue" size="1090" crc="8a1bb2f8" />
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(JVC)(NTSC)(US)(Track 1 of 7)[!].iso" size="26404864" crc="62679809" />
@@ -3449,9 +3542,13 @@ Requires [32X] add-on
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(JVC)(NTSC)(US)(Track 6 of 7)[!].wav" size="51689948" crc="2c083214" />
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(JVC)(NTSC)(US)(Track 7 of 7)[!].wav" size="2942396" crc="2850e487" />
 		-->
-		<description>Dungeon Master II - Skullkeep (USA)</description>
+		<description>Dungeon Master II: Skullkeep (USA, v1.0)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
+		<notes><![CDATA[
+Essentially requires [SRAM cart] for saving (100 blocks)
+Black screen at startup if mouse connected to -ctrl2
+]]></notes>
 		<info name="serial" value="T-60085"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -3536,7 +3633,7 @@ Requires [32X] add-on
 		</part>
 	</software>
 
-	<software name="dracunl">
+	<software name="dracunl" supported="no">
 		<!-- http://redump.org/disc/16084/
 		     http://redump.org/disc/16085/
 		<rom name="Dracula Unleashed (Europe) (Disc 1).cue" size="240" crc="b99128f2" />
@@ -3550,6 +3647,9 @@ Requires [32X] add-on
 		<description>Dracula Unleashed (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="MK-4420-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom1" interface="cdrom">
@@ -3732,7 +3832,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="earnest">
+	<software name="earnest" supported="no">
 		<!-- http://redump.org/disc/1737/
 		<rom name="Earnest Evans (Japan).cue" size="2882" crc="688b4a76" />
 		<rom name="Earnest Evans (Japan) (Track 01).bin" size="5207328" crc="8438f16a" />
@@ -3764,6 +3864,9 @@ Requires [disc swap]
 		<description>Earnest Evans (Japan)</description>
 		<year>1991</year>
 		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+]]></notes>
 		<info name="serial" value="T-32014"/>
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="アーネストエバンス"/>
@@ -3875,7 +3978,9 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="eccoj" cloneof="ecco">
+	<!-- https://segaretro.org/Ecco_the_Dolphin_CD -->
+	<!-- Own release, different than Western hence parent set -->
+	<software name="eccoj">
 		<!-- source toseciso
 		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 1 of 2)[!][Ecco the Dolphin].cue" size="2789" crc="bcb8fae9" />
 		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 1 of 2)(Track 01 of 16)[!][Ecco the Dolphin].iso" size="51910656" crc="b83895f7" />
@@ -3895,16 +4000,43 @@ Requires [disc swap]
 		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 1 of 2)(Track 15 of 16)[!][Ecco the Dolphin].wav" size="59016428" crc="91778a50" />
 		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 1 of 2)(Track 16 of 16)[!][Ecco the Dolphin].wav" size="40350956" crc="4c9dcf9a" />
 		-->
-		<description>Ecco the Dolphin CD (Japan, Disc 1 - Ecco the Dolphin)</description>
+		<description>Ecco the Dolphin CD (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6041"/>
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="エコー・ザ・ドルフィンCD"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Ecco the Dolphin" />
 			<diskarea name="cdrom">
 				<disk name="ecco the dolphin cd (1995)(sega)(ntsc)(jp)(disc 1 of 2)[ecco the dolphin]" sha1="efc86eeefd7c25dbd9f9301850db79212e53252e"/>
+			</diskarea>
+		</part>
+		<!-- source toseciso
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)[!][Ecco the Dolphin II].cue" size="3014" crc="6e907051" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 01 of 17)[!][Ecco the Dolphin II].iso" size="131043328" crc="c34475f0" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 02 of 17)[!][Ecco the Dolphin II].wav" size="50005916" crc="4a8c1687" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 03 of 17)[!][Ecco the Dolphin II].wav" size="48622940" crc="bc438d4e" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 04 of 17)[!][Ecco the Dolphin II].wav" size="40393292" crc="7acfc255" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 05 of 17)[!][Ecco the Dolphin II].wav" size="39744140" crc="f823c375" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 06 of 17)[!][Ecco the Dolphin II].wav" size="37415660" crc="cb2a3d5b" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 07 of 17)[!][Ecco the Dolphin II].wav" size="37248668" crc="23e12f0b" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 08 of 17)[!][Ecco the Dolphin II].wav" size="35755148" crc="0a8a88af" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 09 of 17)[!][Ecco the Dolphin II].wav" size="34986044" crc="7b778aad" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 10 of 17)[!][Ecco the Dolphin II].wav" size="30253820" crc="2969b127" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 11 of 17)[!][Ecco the Dolphin II].wav" size="29595260" crc="32101179" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 12 of 17)[!][Ecco the Dolphin II].wav" size="28913180" crc="f5e5a1b4" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 13 of 17)[!][Ecco the Dolphin II].wav" size="23910476" crc="6816f61f" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 14 of 17)[!][Ecco the Dolphin II].wav" size="15596156" crc="7907bc58" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 15 of 17)[!][Ecco the Dolphin II].wav" size="4438268" crc="2ec7620f" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 16 of 17)[!][Ecco the Dolphin II].wav" size="49128620" crc="1b3d0b81" />
+		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 17 of 17)[!][Ecco the Dolphin II].wav" size="10816892" crc="3e9c92a6" />
+		-->
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Ecco the Dolphin II" />
+			<diskarea name="cdrom">
+				<disk name="ecco the dolphin cd (1995)(sega)(ntsc)(jp)(disc 2 of 2)[ecco the dolphin ii]" sha1="06100e6a07e30a7d075b99ffb4455f4ee069fc83"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3972,41 +4104,6 @@ Requires [disc swap]
 			<feature name="cd_matrix" value="CDD6956 MK-4441P-00318"/>
 			<diskarea name="cdrom">
 				<disk name="ecco - the tides of time (europe) (en,fr,de,es)" sha1="6eb9d229b1425bed9e7657d11649f32523012346"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="ecco2j" cloneof="ecco2">
-		<!-- source toseciso
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)[!][Ecco the Dolphin II].cue" size="3014" crc="6e907051" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 01 of 17)[!][Ecco the Dolphin II].iso" size="131043328" crc="c34475f0" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 02 of 17)[!][Ecco the Dolphin II].wav" size="50005916" crc="4a8c1687" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 03 of 17)[!][Ecco the Dolphin II].wav" size="48622940" crc="bc438d4e" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 04 of 17)[!][Ecco the Dolphin II].wav" size="40393292" crc="7acfc255" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 05 of 17)[!][Ecco the Dolphin II].wav" size="39744140" crc="f823c375" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 06 of 17)[!][Ecco the Dolphin II].wav" size="37415660" crc="cb2a3d5b" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 07 of 17)[!][Ecco the Dolphin II].wav" size="37248668" crc="23e12f0b" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 08 of 17)[!][Ecco the Dolphin II].wav" size="35755148" crc="0a8a88af" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 09 of 17)[!][Ecco the Dolphin II].wav" size="34986044" crc="7b778aad" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 10 of 17)[!][Ecco the Dolphin II].wav" size="30253820" crc="2969b127" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 11 of 17)[!][Ecco the Dolphin II].wav" size="29595260" crc="32101179" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 12 of 17)[!][Ecco the Dolphin II].wav" size="28913180" crc="f5e5a1b4" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 13 of 17)[!][Ecco the Dolphin II].wav" size="23910476" crc="6816f61f" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 14 of 17)[!][Ecco the Dolphin II].wav" size="15596156" crc="7907bc58" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 15 of 17)[!][Ecco the Dolphin II].wav" size="4438268" crc="2ec7620f" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 16 of 17)[!][Ecco the Dolphin II].wav" size="49128620" crc="1b3d0b81" />
-		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 17 of 17)[!][Ecco the Dolphin II].wav" size="10816892" crc="3e9c92a6" />
-		-->
-		<description>Ecco the Dolphin CD (Japan, Disc 2 - Ecco the Dolphin II)</description>
-		<year>1995</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="G-6041"/>
-		<info name="release" value="19950224"/>
-		<info name="alt_title" value="エコー・ザ・ドルフィンCD"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="ecco the dolphin cd (1995)(sega)(ntsc)(jp)(disc 2 of 2)[ecco the dolphin ii]" sha1="06100e6a07e30a7d075b99ffb4455f4ee069fc83"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4347,7 +4444,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="eyebehol">
+	<software name="eyebehol" supported="partial">
 		<!-- source toseciso
 		<rom name="Eye of the Beholder (1994)(Sega)(PAL)[!].cue" size="6491" crc="09b28480" />
 		<rom name="Eye of the Beholder (1994)(Sega)(PAL)(Track 01 of 56)[!].iso" size="23156736" crc="c67016f2" />
@@ -4410,8 +4507,12 @@ Requires [disc swap]
 		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Essentially requires [SRAM cart] for saving (125 blocks)
+]]></notes>
 		<info name="serial" value="4655"/>
 		<info name="alt_title" value="Advanced Dungeons &amp; Dragons - Eye of the Beholder (Box)"/>
+		<info name="usage" value="Supports mouse in -ctrl2"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4420,7 +4521,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="eyebeholj" cloneof="eyebehol">
+	<software name="eyebeholj" cloneof="eyebehol" supported="partial">
 		<!-- source toseciso
 		<rom name="Eye of the Beholder (1994)(Pony Canyon)(NTSC)(JP)[!].cue" size="8405" crc="72d263ee" />
 		<rom name="Eye of the Beholder (1994)(Pony Canyon)(NTSC)(JP)(Track 01 of 56)[!].iso" size="23156736" crc="02ae16e8" />
@@ -4483,9 +4584,13 @@ Requires [disc swap]
 		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder (Japan)</description>
 		<year>1994</year>
 		<publisher>Pony Canyon</publisher>
+		<notes><![CDATA[
+Essentially requires [SRAM cart] for saving (125 blocks)
+]]></notes>
 		<info name="serial" value="T-75014"/>
 		<info name="release" value="19940422"/>
 		<info name="alt_title" value="アイ・オブ・ザ・ビホルダー"/>
+		<info name="usage" value="Supports mouse in -ctrl2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4494,7 +4599,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="eyebeholu" cloneof="eyebehol">
+	<software name="eyebeholu" cloneof="eyebehol" supported="partial">
 		<!-- http://redump.org/disc/22369/
 		<rom name="Eye of the Beholder (USA).cue" size="6702" crc="4c545624" md5="f5d15d77b39cdef246063c21eaf9a23f" sha1="ed3ae15a3ca73bf4ff996414c92e8e201cb1ba85"/>
 		<rom name="Eye of the Beholder (USA) (Track 01).bin" size="26594064" crc="8d298aab" md5="8a2b792d3d8793b736983cdaf8c44b2c" sha1="41dc4540f4337119e74c205940f56cf796e77946"/>
@@ -4557,8 +4662,12 @@ Requires [disc swap]
 		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Essentially requires [SRAM cart] for saving (125 blocks)
+]]></notes>
 		<info name="alt_title" value="Advanced Dungeons &amp; Dragons - Eye of the Beholder (Box)"/>
 		<info name="serial" value="4655"/>
+		<info name="usage" value="Supports mouseus in -ctrl2"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="CDAC-070100 2"/>
@@ -4609,7 +4718,7 @@ Requires [disc swap]
 		<rom name="Formula One World Championship - Beyond the Limit (1994)(Sega)(PAL)(Track 36 of 37)[!].wav" size="15271580" crc="f452270f" />
 		<rom name="Formula One World Championship - Beyond the Limit (1994)(Sega)(PAL)(Track 37 of 37)[!].wav" size="43269788" crc="e4aa19ca" />
 		-->
-		<description>Formula One World Championship - Beyond the Limit (Europe)</description>
+		<description>Formula One World Championship: Beyond the Limit (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4608"/>
@@ -4662,7 +4771,7 @@ Requires [disc swap]
 		<rom name="Formula One World Championship - Beyond the Limit (USA) (Track 36).bin" size="15271536" crc="41e6545b" md5="35aaddea9531c0d8babc9962f3523ba6" sha1="81b3c1aaf5a71596bec360fda33d33f4f236add4"/>
 		<rom name="Formula One World Championship - Beyond the Limit (USA) (Track 37).bin" size="43269744" crc="004c2d09" md5="44ba3b056ca15cbf0daf424754c3cfcf" sha1="db96d8487f58a4943762e69e0bab4987bbc168fb"/>
 		-->
-		<description>Formula One World Championship - Beyond the Limit (USA)</description>
+		<description>Formula One World Championship: Beyond the Limit (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4608"/>
@@ -5424,7 +5533,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		<rom name="FIFA International Soccer - Championship Edition (1994)(EA Sports)(PAL)(M4)(Track 45 of 46)[!].wav" size="4769900" crc="55bb0071" />
 		<rom name="FIFA International Soccer - Championship Edition (1994)(EA Sports)(PAL)(M4)(Track 46 of 46)[!].wav" size="2152124" crc="26f538b1" />
 		-->
-		<description>FIFA International Soccer - Championship Edition (Europe)</description>
+		<description>FIFA International Soccer: Championship Edition (Europe)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-50055-50"/>
@@ -5454,7 +5563,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		<rom name="Sega Pro CD - Issue 43 (1995)(Paragon Publishing)(PAL)(GB)(M4)(Track 13 of 14)[!][demo - FIFA International Soccer - CE].wav" size="4769900" crc="5b548696" />
 		<rom name="Sega Pro CD - Issue 43 (1995)(Paragon Publishing)(PAL)(GB)(M4)(Track 14 of 14)[!][demo - FIFA International Soccer - CE].wav" size="2504924" crc="70dcbb79" />
 		-->
-		<description>FIFA International Soccer - CE (Europe, demo) [Sega Pro CD - issue 43]</description>
+		<description>FIFA International Soccer: Championship Edition (Europe, demo) [Sega Pro CD - issue 43]</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5483,7 +5592,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		<rom name="Mega Power - Issue 13 - Disc 06 (1994)(Paragon Publishing)(PAL)(GB)(M4)(Track 13 of 14)[!][demo - FIFA International Soccer - CE].wav" size="4769900" crc="4a61841d" />
 		<rom name="Mega Power - Issue 13 - Disc 06 (1994)(Paragon Publishing)(PAL)(GB)(M4)(Track 14 of 14)[!][demo - FIFA International Soccer - CE].wav" size="2152124" crc="6b57a164" />
 		-->
-		<description>FIFA International Soccer - CE (Europe, demo) [Mega Power - issue 13]</description>
+		<description>FIFA International Soccer: Championship Edition (Europe, demo) [Mega Power - issue 13]</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5557,7 +5666,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		</part>
 	</software>
 
-	<software name="flashb">
+	<software name="flashb" supported="partial">
 		<!-- Source: TOSEC-ISO
 		<rom name="Flashback - The Quest for Identity (1994)(Sega)(NTSC)(US)[!].cue" size="1409" crc="9002b722" />
 		<rom name="Flashback - The Quest for Identity (1994)(Sega)(NTSC)(US)(Track 1 of 9)[!].iso" size="233951232" crc="912b9a7a" />
@@ -5573,6 +5682,9 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		<description>Flashback - The Quest for Identity (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Glitchy FMV after game start
+]]></notes>
 		<info name="serial" value="4448"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -5582,7 +5694,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		</part>
 	</software>
 
-	<software name="flashbd" cloneof="flashb"> <!-- no full version -->
+	<software name="flashbd" cloneof="flashb" supported="partial"> <!-- no full version -->
 		<!-- Unknown source
 		<rom name="Sega Pro CD - Issue 42 (1995)(Paragon Publishing)(PAL)(GB)[!][demo - Flashback - The Quest for Identity].cue" size="582" crc="5207b995" />
 		<rom name="Sega Pro CD - Issue 42 (1995)(Paragon Publishing)(PAL)(GB)(Track 1 of 3)[!][demo - Flashback - The Quest for Identity].iso" size="57065472" crc="24a325a2" />
@@ -5592,6 +5704,9 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		<description>Flashback - The Quest for Identity (Europe, demo) [Sega Pro CD - issue 42]</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
+		<notes><![CDATA[
+Glitchy FMV after game start
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5653,7 +5768,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 	</software>
 
 	<!-- This game was only found bundled in a so called "Double Deal"-pack together with Bram Stoker's Dracula. They did not share discs. -->
-	<software name="franken">
+	<software name="franken" supported="no">
 		<!-- http://redump.org/disc/29310/
 		<rom name="Mary Shelly's Frankenstein (USA).cue" size="864" crc="2ae072d4" md5="6216258ed40c3e715a0c527917ca11fd" sha1="36056af8bde3373be357af806235d75b4212b696"/>
 		<rom name="Mary Shelly's Frankenstein (USA) (Track 1).bin" size="107023056" crc="9b13990d" md5="4efa6263bd572ac2ac709d0dc74f5692" sha1="aebc3b15f006341969e4bc0170368bb4a57a5896"/>
@@ -5667,6 +5782,9 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		<description>Mary Shelley's Frankenstein (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
+		<notes><![CDATA[
+All FMVs are severely glitched
+]]></notes>
 		<info name="serial" value="T-93155"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -5754,7 +5872,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		<rom name="Wakusei Woodstock - Funky Horror Band (Japan) (Track 4).bin" size="33812352" crc="ba656829" />
 		<rom name="Wakusei Woodstock - Funky Horror Band (Japan) (Track 5).bin" size="49968240" crc="678ce0ca" />
 		-->
-		<description>Wakusei Woodstock - Funky Horror Band (Japan)</description>
+		<description>Wakusei Woodstock: Funky Horror Band (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6001"/>
@@ -5931,7 +6049,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		</part>
 	</software>
 
-	<software name="garousp">
+	<software name="garousp" cloneof="fatfursp">
 		<!-- http://redump.org/disc/3156/
 		<rom name="Garou Densetsu Special (Japan).cue" size="4732" crc="a1d75963" />
 		<rom name="Garou Densetsu Special (Japan) (Track 01).bin" size="15826608" crc="9cab4019" />
@@ -5988,7 +6106,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		</part>
 	</software>
 
-	<software name="genchohi">
+	<software name="genchohi" supported="partial">
 		<!-- source toseciso
 		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (1993)(KOEI)(NTSC)(JP)[!].cue" size="15215" crc="661532e9" />
 		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (1993)(KOEI)(NTSC)(JP)(Track 01 of 90)[!].iso" size="9979904" crc="35729e14" />
@@ -6085,6 +6203,9 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Essentially requires [SRAM cart] for saving (118 blocks)
+]]></notes>
 		<info name="serial" value="T-76034"/>
 		<info name="release" value="19930924"/>
 		<info name="alt_title" value="蒼き狼と白き牝鹿・元朝秘史"/>
@@ -6117,7 +6238,7 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		</part>
 	</software>
 
-	<software name="gztexas">
+	<software name="gztexas" supported="no">
 		<!-- http://redump.org/disc/17595/
 		     http://redump.org/disc/17596/
 		<rom name="Ground Zero Texas (Europe) (Disc 1).cue" size="240" crc="2743534d" />
@@ -6131,6 +6252,9 @@ Has optional unemulated [32X] mode, which in turn needs [disc swap]
 		<description>Ground Zero Texas (Europe)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-93145-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom1" interface="cdrom">
@@ -6205,20 +6329,20 @@ Requires [disc swap]
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Disc 1" />
-			<diskarea name="cdrom1">
+			<diskarea name="cdrom">
 				<disk name="ground zero texas (usa, alt) (disc 1)" sha1="cb019a26b3edec7a8f0119d74a0991aa5b258313"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="Disc 2" />
 			<feature name="cd_matrix" value="CDAC-053300 2"/>
-			<diskarea name="cdrom2">
+			<diskarea name="cdrom">
 				<disk name="ground zero texas (usa, alt) (disc 2)" sha1="4b3ebe516e2047d4df38590e0badf372262fa435"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="heavenly">
+	<software name="heavenly" cloneof="f1btl">
 		<!-- http://redump.org/disc/1738/
 		<rom name="Heavenly Symphony (Japan).cue" size="4422" crc="c406b0cd" />
 		<rom name="Heavenly Symphony (Japan) (Track 01).bin" size="202761216" crc="41aafac7" />
@@ -6259,7 +6383,7 @@ Requires [disc swap]
 		<rom name="Heavenly Symphony (Japan) (Track 36).bin" size="14866992" crc="108f5a17" />
 		<rom name="Heavenly Symphony (Japan) (Track 37).bin" size="43267392" crc="e55cb55b" />
 		-->
-		<description>Heavenly Symphony (Japan)</description>
+		<description>Heavenly Symphony: Formula One World Championship 1993 (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6034"/>
@@ -6274,7 +6398,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="heavenlydemo" cloneof="heavenly">
+	<software name="heavenlydemo">
 		<!-- http://redump.org/disc/70721/
 		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo).cue" size="6110" crc="7096405f" />
 		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 01).bin" size="202408416" crc="9b3fb252" />
@@ -6315,7 +6439,7 @@ Requires [disc swap]
 		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 36).bin" size="14866992" crc="108f5a17" />
 		<rom name="Heavenly Symphony - Formula One World Championship 1993 (Japan) (Demo) (Track 37).bin" size="43267392" crc="e55cb55b" />
 		-->
-		<description>Heavenly Symphony - Formula One World Championship 1993 Hibaihin (Japan)</description>
+		<description>Heavenly Symphony: Formula One World Championship 1993 Hibaihin (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SG-6034"/>
@@ -6485,7 +6609,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="holmes2">
+	<software name="holmes2" supported="no">
 		<!-- source toseciso
 		<rom name="Sherlock Holmes - Consulting Detective Vol. II v1.0 (1993)(Sega)(PAL)(Disc 1 of 2)[!].cue" size="367" crc="a03d0997" />
 		<rom name="Sherlock Holmes - Consulting Detective Vol. II v1.0 (1993)(Sega)(PAL)(Disc 1 of 2)(Track 1 of 2)[!].iso" size="460951552" crc="01a897fa" />
@@ -6495,9 +6619,12 @@ Requires [disc swap]
 		<rom name="Sherlock Holmes - Consulting Detective Vol. II v1.0 (1993)(Sega)(PAL)(Disc 2 of 2)(Track 1 of 2)[!].iso" size="284045312" crc="a1947c65" />
 		<rom name="Sherlock Holmes - Consulting Detective Vol. II v1.0 (1993)(Sega)(PAL)(Disc 2 of 2)(Track 2 of 2)[!].wav" size="10584044" crc="1055b6a1" />
 		-->
-		<description>Sherlock Holmes - Consulting Detective Vol. II v1.0 (Europe)</description>
+		<description>Sherlock Holmes - Consulting Detective Vol. II (Europe, v1.0)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="4653"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom1" interface="cdrom">
@@ -6828,7 +6955,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="jagxj220">
+	<software name="jagxj220" supported="no">
 		<!-- http://redump.org/disc/4297/
 		<rom name="Jaguar XJ220 (Europe) (En,Ja).cue" size="1594" crc="606ee5ca" />
 		<rom name="Jaguar XJ220 (Europe) (En,Ja) (Track 01).bin" size="12042240" crc="1b5e8d8e" />
@@ -6848,6 +6975,9 @@ Requires [disc swap]
 		<description>Jaguar XJ220 (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Side objects all draws in a stretched form
+]]></notes>
 		<info name="serial" value="4602"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -6858,7 +6988,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="jagxj220j" cloneof="jagxj220">
+	<software name="jagxj220j" cloneof="jagxj220" supported="no">
 		<!-- http://redump.org/disc/10140/
 		<rom name="Jaguar XJ220 (Japan) (En,Ja).cue" size="1581" crc="b84b6a6a" />
 		<rom name="Jaguar XJ220 (Japan) (En,Ja) (Track 01).bin" size="12042240" crc="3ebc3c2e" />
@@ -6878,6 +7008,9 @@ Requires [disc swap]
 		<description>Jaguar XJ220 (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
+		<notes><![CDATA[
+Side objects all draws in a stretched form
+]]></notes>
 		<info name="serial" value="T-60094"/>
 		<info name="release" value="19930326"/>
 		<info name="alt_title" value="ジャガーXJ220"/>
@@ -6890,7 +7023,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="jagxj220u" cloneof="jagxj220">
+	<software name="jagxj220u" cloneof="jagxj220" supported="no">
 		<!-- Source: TOSEC-ISO
 		<rom name="Jaguar XJ220 (1993)(JVC)(NTSC)(US)[!].cue" size="1760" crc="58a6b2df" />
 		<rom name="Jaguar XJ220 (1993)(JVC)(NTSC)(US)(Track 01 of 13)[!].iso" size="10485760" crc="c7b67d60" />
@@ -6910,6 +7043,9 @@ Requires [disc swap]
 		<description>Jaguar XJ220 (USA)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
+		<notes><![CDATA[
+Side objects all draws in a stretched form
+]]></notes>
 		<info name="release" value="199303xx" />
 		<info name="serial" value="T-6406"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -6956,7 +7092,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="jeopardy">
+	<software name="jeopardy" supported="no">
 		<!-- http://redump.org/disc/28627/
 		<rom name="Jeopardy! (USA).cue" size="309" crc="6c28da39" md5="43ccd1f797fb9d76824fcec13693f90d" sha1="d6cac996cac2f558349818e901dfbd38731d6156"/>
 		<rom name="Jeopardy! (USA) (Track 1).bin" size="95540592" crc="ea4c7949" md5="679d176e4f96fd7413beb7fc8986a0e7" sha1="e2efaf03f631e5e623db94ff66a44c33642fcd0f"/>
@@ -6966,6 +7102,9 @@ Requires [disc swap]
 		<description>Jeopardy! (USA)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
+		<notes><![CDATA[
+Hangs at start of a game, after entering name
+]]></notes>
 		<info name="serial" value="T-93095"/>
 		<info name="release" value="199311xx" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -7009,17 +7148,18 @@ Requires [disc swap]
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Requires [disc swap]
+Severe GFX glitches
 ]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Disc 1" />
-			<diskarea name="cdrom1">
+			<diskarea name="cdrom">
 				<disk name="johnny mnemonic (usa, prototype) (disc 1)" sha1="bd222aee2d7ebaf9524db3fc3cbc3d9782504d92" status="baddump"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="Disc 2" />
-			<diskarea name="cdrom2">
+			<diskarea name="cdrom">
 				<disk name="johnny mnemonic (usa, prototype) (disc 2)" sha1="e2f626d382b861043fbedddacf948d59cce1f290" status="baddump"/>
 			</diskarea>
 		</part>
@@ -7235,7 +7375,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="kamenrzo">
+	<software name="kamenrzo" supported="no">
 		<!-- Source: TOSEC-ISO
 		<rom name="Masked Rider, The - Kamen Rider ZO (1994)(Sega)(NTSC)(US)[!].cue" size="785" crc="3feca100" />
 		<rom name="Masked Rider, The - Kamen Rider ZO (1994)(Sega)(NTSC)(US)(Track 1 of 5)[!].iso" size="384094208" crc="350ac4fd" />
@@ -7247,6 +7387,9 @@ Requires [disc swap]
 		<description>The Masked Rider - Kamen Rider ZO (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="4444"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -7256,7 +7399,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="kamenrzoj" cloneof="kamenrzo">
+	<software name="kamenrzoj" cloneof="kamenrzo" supported="no">
 		<!-- http://redump.org/disc/1996/
 		<rom name="Kamen Rider ZO (Japan).cue" size="562" crc="664ab999" />
 		<rom name="Kamen Rider ZO (Japan) (Track 1).bin" size="449996400" crc="a21571de" />
@@ -7268,6 +7411,9 @@ Requires [disc swap]
 		<description>Kamen Rider ZO (Japan)</description>
 		<year>1994</year>
 		<publisher>Toei Animation</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="T-141013"/>
 		<info name="release" value="19940513"/>
 		<info name="alt_title" value="仮面ライダーZO"/>
@@ -7395,6 +7541,9 @@ Requires [disc swap]
 		<description>Keiou Yuugekitai (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
+		<notes><![CDATA[
+Offset [redbook] playback during cutscenes, with lip sync drift
+]]></notes>
 		<info name="serial" value="T-60114"/>
 		<info name="release" value="19930806"/>
 		<info name="alt_title" value="慶応遊撃隊"/>
@@ -7514,7 +7663,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="kriskrosu" cloneof="kriskros">
+	<software name="kriskrosu" cloneof="kriskros" supported="no">
 		<!-- Source: TOSEC-ISO
 		<rom name="Kris Kross (1992)(Sony Imagesoft)(NTSC)(US)[!].cue" size="135" crc="c958c6ce" />
 		<rom name="Kris Kross (1992)(Sony Imagesoft)(NTSC)(US)[!].iso" size="335626240" crc="af0beabc" />
@@ -7522,6 +7671,9 @@ Requires [disc swap]
 		<description>Kris Kross (USA)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
+		<notes><![CDATA[
+Jump music video start stuttering at 1:30
+]]></notes>
 		<info name="serial" value="T-6202"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -7600,6 +7752,10 @@ Requires [disc swap]
 		<description>Lethal Enforcers II - Gun Fighters (Europe)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Black screen
+Optionally uses [Justifier] gun
+]]></notes>
 		<info name="serial" value="T-95025-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -7610,7 +7766,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="le2d" cloneof="le2">
+	<software name="le2d" cloneof="le2" supported="no">
 		<!-- Unknown source
 		<rom name="Lethal Enforcers II - Gun Fighters (demo) (1994)(Konami)(PAL)[!][Mega Power - Issue 19].cue" size="2481" crc="bfede23a" />
 		<rom name="Lethal Enforcers II - Gun Fighters (demo) (1994)(Konami)(PAL)(Track 01 of 15)[!][Mega Power - Issue 19].iso" size="4831232" crc="48c34fab" />
@@ -7632,6 +7788,10 @@ Requires [disc swap]
 		<description>Lethal Enforcers II - Gun Fighters (Europe, demo) [Mega Power - issue 19]</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Black screen
+Optionally uses [Justifier] gun
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7640,7 +7800,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="le2j" cloneof="le2">
+	<software name="le2j" cloneof="le2" supported="no">
 		<!-- source toseciso
 		<rom name="Lethal Enforcers II - The Western (1994)(Konami)(NTSC)(JP)(en)[!].cue" size="3754" crc="1ddd64c8" />
 		<rom name="Lethal Enforcers II - The Western (1994)(Konami)(NTSC)(JP)(en)(Track 01 of 23)[!].iso" size="12926976" crc="b9cd527b" />
@@ -7670,6 +7830,10 @@ Requires [disc swap]
 		<description>Lethal Enforcers II - The Western (Japan)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Black screen
+Optionally uses [Justifier] gun
+]]></notes>
 		<info name="serial" value="T-95034"/>
 		<info name="release" value="19941125"/>
 		<info name="alt_title" value="リーサルエンフォーサーズII ザ・ウエスタン"/>
@@ -7681,7 +7845,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="le2u" cloneof="le2">
+	<software name="le2u" cloneof="le2" supported="no">
 		<!-- http://redump.org/disc/21451/
 		<rom name="Lethal Enforcers II - Gun Fighters (USA).cue" size="3087" crc="9b8fce6d" md5="d89875f4fc90228b467b5dda0fbf8418" sha1="e3905d6ff2c3e14bf565f79b76b5d08aa1278dfb"/>
 		<rom name="Lethal Enforcers II - Gun Fighters (USA) (Track 01).bin" size="14845824" crc="a84c7a5d" md5="a0a816b6efccb7a04d413230429272ca" sha1="06b1f47f29b9c441c9a046b728f7f1b6b809c6fe"/>
@@ -7711,6 +7875,10 @@ Requires [disc swap]
 		<description>Lethal Enforcers II - Gun Fighters (USA)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Black screen
+Optionally uses [Justifier] gun
+]]></notes>
 		<info name="serial" value="T-95025"/>
 		<info name="release" value="19941124" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -7722,7 +7890,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="lethalen">
+	<software name="lethalen" supported="partial">
 		<!-- source toseciso
 		<rom name="Lethal Enforcers (1993)(Konami)(PAL)[!].cue" size="3156" crc="2c706ede" />
 		<rom name="Lethal Enforcers (1993)(Konami)(PAL)(Track 01 of 23)[!].iso" size="8792064" crc="5c66ede8" />
@@ -7752,6 +7920,9 @@ Requires [disc swap]
 		<description>Lethal Enforcers (Europe)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Optionally uses [Justifier] gun
+]]></notes>
 		<info name="serial" value="T-95015-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -7761,7 +7932,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="lethalenj" cloneof="lethalen">
+	<software name="lethalenj" cloneof="lethalen" supported="partial">
 		<!-- source toseciso
 		<rom name="Lethal Enforcers (1993)(Konami)(NTSC)(JP)(en)[!].cue" size="3363" crc="f53989d5" />
 		<rom name="Lethal Enforcers (1993)(Konami)(NTSC)(JP)(en)(Track 01 of 23)[!].iso" size="8792064" crc="0e04969a" />
@@ -7791,6 +7962,9 @@ Requires [disc swap]
 		<description>Lethal Enforcers (Japan)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Optionally uses [Justifier] gun
+]]></notes>
 		<info name="serial" value="T-95014"/>
 		<info name="release" value="19931029"/>
 		<info name="alt_title" value="リーサルエンフォーサーズ"/>
@@ -7802,7 +7976,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="lethalenu" cloneof="lethalen">
+	<software name="lethalenu" cloneof="lethalen" supported="partial">
 		<!-- http://redump.org/disc/21495/
 		<rom name="Lethal Enforcers (USA).cue" size="2673" crc="944dadcd" />
 		<rom name="Lethal Enforcers (USA) (Track 01).bin" size="10097136" crc="964be602" />
@@ -7832,6 +8006,9 @@ Requires [disc swap]
 		<description>Lethal Enforcers (USA)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Optionally uses [Justifier] gun
+]]></notes>
 		<info name="serial" value="T-95015"/>
 		<info name="release" value="199311xx" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -7844,7 +8021,7 @@ Requires [disc swap]
 	</software>
 
 	<!-- This version was bundled with the Justifier light-gun. -->
-	<software name="lethalenua" cloneof="lethalen">
+	<software name="lethalenua" cloneof="lethalen" supported="partial">
 		<!-- http://redump.org/disc/24562/
 		<rom name="Lethal Enforcers (USA) (U12).cue" size="2811" crc="dcc52475" md5="c492454ec35d0cbf0fa50f84e25aad8e" sha1="f87d1195088fd80df3058e6300a1f0ca57b14f88"/>
 		<rom name="Lethal Enforcers (USA) (U12) (Track 01).bin" size="10097136" crc="964be602" md5="f247062b06390e39d0a7e01998bc5d22" sha1="91c34f86a1607ddd4088f7b1e36dbd383ef3e0cf"/>
@@ -7874,6 +8051,9 @@ Requires [disc swap]
 		<description>Lethal Enforcers (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Optionally uses [Justifier] gun
+]]></notes>
 		<info name="serial" value="T-95015"/>
 		<info name="release" value="199311xx" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -8079,7 +8259,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="lunar">
+	<software name="lunar" supported="no">
 		<!-- http://redump.org/disc/29312/
 		<rom name="Lunar - The Silver Star (USA).cue" size="6430" crc="b8f7f6cb" />
 		<rom name="Lunar - The Silver Star (USA) (Track 01).bin" size="12752544" crc="079e5831" />
@@ -8137,7 +8317,11 @@ Requires [disc swap]
 		-->
 		<description>Lunar - The Silver Star (USA)</description>
 		<year>1993</year>
-		<publisher>Game Arts</publisher>
+		<publisher>Working Designs</publisher>
+		<notes><![CDATA[
+Title screen GFXs glitches out depending on where opening FMV is skipped
+First gameplay screen is severely glitched (side effect of above?)
+]]></notes>
 		<info name="serial" value="T-127015"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -8148,7 +8332,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="lunarj" cloneof="lunar">
+	<software name="lunarj" cloneof="lunar" supported="no">
 		<!-- http://redump.org/disc/1636/
 		<rom name="Lunar - The Silver Star (Japan).cue" size="6534" crc="36b473ba" />
 		<rom name="Lunar - The Silver Star (Japan) (Track 01).bin" size="32989152" crc="90aa9eef" />
@@ -8207,6 +8391,9 @@ Requires [disc swap]
 		<description>Lunar - The Silver Star (Japan)</description>
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
+		<notes><![CDATA[
+(same as lunar)
+]]></notes>
 		<info name="serial" value="T-45014"/>
 		<info name="release" value="19920626"/>
 		<info name="alt_title" value="ルナ ザ・シルバースター"/>
@@ -8219,7 +8406,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="lunarja" cloneof="lunar">
+	<software name="lunarja" cloneof="lunar" supported="no">
 		<!-- source toseciso
 		<rom name="Lunar - The Silver Star (1992)(Game Arts)(NTSC)(JP)[!][T-45014P-00017-R2M].cue" size="8949" crc="833ce071" />
 		<rom name="Lunar - The Silver Star (1992)(Game Arts)(NTSC)(JP)(Track 01 of 52)[!][T-45014P-00017-R2M].iso" size="28725248" crc="a89042ce" />
@@ -8278,6 +8465,9 @@ Requires [disc swap]
 		<description>Lunar - The Silver Star (Japan, R2)</description>
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
+		<notes><![CDATA[
+(same as lunar)
+]]></notes>
 		<info name="serial" value="T-45014"/>
 		<info name="release" value="19920626"/>
 		<info name="alt_title" value="ルナ ザ・シルバースター"/>
@@ -8291,7 +8481,7 @@ Requires [disc swap]
 	</software>
 
 	<!-- one of these probably matches the REDUMP set -->
-	<software name="lunarjb" cloneof="lunar">
+	<software name="lunarjb" cloneof="lunar" supported="no">
 		<!-- source toseciso
 		<rom name="Lunar - The Silver Star (1992)(Game Arts)(NTSC)(JP)[!][T-45014P-00017-R1M].cue" size="8949" crc="6a20fea1" />
 		<rom name="Lunar - The Silver Star (1992)(Game Arts)(NTSC)(JP)(Track 01 of 52)[!][T-45014P-00017-R1M].iso" size="28725248" crc="a89042ce" />
@@ -8350,6 +8540,9 @@ Requires [disc swap]
 		<description>Lunar - The Silver Star (Japan, R1M)</description>
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
+		<notes><![CDATA[
+(same as lunar)
+]]></notes>
 		<info name="serial" value="T-45014"/>
 		<info name="release" value="19920626"/>
 		<info name="alt_title" value="ルナ ザ・シルバースター"/>
@@ -8371,7 +8564,7 @@ Requires [disc swap]
 		-->
 		<description>Lunar - Eternal Blue (USA)</description>
 		<year>1995</year>
-		<publisher>Game Arts</publisher>
+		<publisher>Working Designs</publisher>
 		<info name="serial" value="T-127045"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -8414,7 +8607,7 @@ Requires [disc swap]
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 3 of 4)[!][T-45074P-00271A-R1M].wav" size="11769452" crc="da19c77a" />
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 4 of 4)[!][T-45074P-00271A-R1M].wav" size="1608812" crc="c980f230" />
 		-->
-		<description>Lunar - Eternal Blue (Japan, set 3)</description>
+		<description>Lunar - Eternal Blue (Japan, set 2)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
@@ -8437,7 +8630,7 @@ Requires [disc swap]
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 3 of 4)[!][T-45074P-00271-R1M].wav" size="11769452" crc="022a2281" />
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 4 of 4)[!][T-45074P-00271-R1M].wav" size="1608812" crc="794d7aa9" />
 		-->
-		<description>Lunar - Eternal Blue (Japan, set 2)</description>
+		<description>Lunar - Eternal Blue (Japan, set 3)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
@@ -8452,6 +8645,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
+	<!-- TODO: merge with a lunar2j option -->
 	<software name="lunar2jbonus" cloneof="lunar2">
 		<!-- source toseciso
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(Jp)[!][Premium CD][audio cd].cue" size="753" crc="7c1d7a67" />
@@ -8493,7 +8687,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="maddog">
+	<software name="maddog" supported="partial">
 		<!-- http://redump.org/disc/28030/
 		<rom name="Mad Dog McCree (USA).cue" size="803" crc="4251b074" md5="e51a141b968be4d4cd6e7a4f19142826" sha1="c7c3b770b43b05c28758165a47514bef1daf0da0"/>
 		<rom name="Mad Dog McCree (USA) (Track 1).bin" size="242677008" crc="662784f2" md5="5cd92d667e9d71251441950f505c1414" sha1="add89b1c071c9ba60d75f1a864e54b7da542fb81"/>
@@ -8507,7 +8701,11 @@ Requires [disc swap]
 		<description>Mad Dog McCree (USA)</description>
 		<year>1993</year>
 		<publisher>American Laser Games</publisher>
+		<notes><![CDATA[
+Optional [Menacer] or [Justifier] support
+]]></notes>
 		<info name="serial" value="T-111015"/>
+		<info name="usage" value="Supports -ctrl2 mouseus"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="SEGAT111015 R1D MFD BY JVC"/>
@@ -8517,7 +8715,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="maddog2">
+	<software name="maddog2" supported="partial">
 		<!-- Source: TruRip
 		<rom name="Media (CD-ROM)\Mad Dog II - The Lost Gold (1995)(American Laser Games)(US).ccd" size="933" crc="72acc415" md5="fea43d6145a158386865b30cfd3b4201" sha1="0d8e24b6a61b78c80f6643f285bb0d49805953c8"/>
 		<rom name="Media (CD-ROM)\Mad Dog II - The Lost Gold (1995)(American Laser Games)(US).img" size="265434960" crc="e91838b8" md5="a5baff7c9153898972a268698e2faef5" sha1="57a3de846fa7556016cae0571e8b3e1947d31fa0"/>
@@ -8526,7 +8724,11 @@ Requires [disc swap]
 		<description>Mad Dog II - The Lost Gold (USA)</description>
 		<year>1994</year>
 		<publisher>American Laser Games</publisher>
+		<notes><![CDATA[
+Optional [Menacer] or [Justifier] support
+]]></notes>
 		<info name="serial" value="T-111065"/>
+		<info name="usage" value="Supports -ctrl2 mouseus"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -8535,7 +8737,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="mansion">
+	<software name="mansion" cloneof="mystmans">
 		<!-- http://redump.org/disc/17254/
 		<rom name="Mansion of Hidden Souls (USA).cue" size="228" crc="0811c359" />
 		<rom name="Mansion of Hidden Souls (USA) (Track 1).bin" size="605141376" crc="6576ae2c" />
@@ -8546,6 +8748,7 @@ Requires [disc swap]
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="T-23015"/>
 		<info name="release" value="199402xx" />
+		<info name="usage" value="Supports -ctrl2 mouseus"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="SEGAT23015 R1D MFD BY JVC"/>
@@ -8556,7 +8759,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="marko">
+	<software name="marko" supported="no">
 		<!-- source toseciso
 		<rom name="Marko's Magic Football (1994)(Domark)(PAL)(M4)[!].cue" size="2504" crc="4ef6cfb8" />
 		<rom name="Marko's Magic Football (1994)(Domark)(PAL)(M4)(Track 01 of 17)[!].iso" size="14073856" crc="249a0886" />
@@ -8580,6 +8783,11 @@ Requires [disc swap]
 		<description>Marko's Magic Football (Europe)</description>
 		<year>1994</year>
 		<publisher>Domark</publisher>
+		<notes><![CDATA[
+Corrupt palette on pre-title screen credits
+Glitchy map screen
+Heavy raster effect issues during gameplay
+]]></notes>
 		<info name="serial" value="T-88025-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -8595,7 +8803,7 @@ Requires [disc swap]
 	released a set of reproduction discs based off a prototype US build. This is a dump from one
 	of those reproduction discs.
 	-->
-	<software name="markou" cloneof="marko">
+	<software name="markou" cloneof="marko" supported="no">
 		<!-- Source: TOSEC-ISO
 		<rom name="Marko (2003)(Good Deal Games - Oldergames)(NTSC)(US)(Track 01 of 17)[!].iso" size="14084096" crc="a09067a7" md5="65b2486ba4d411469354a7b826e156a9" sha1="a82a886682fce1fba4fcb7e24b92a9f605270ae8"/>
 		<rom name="Marko (2003)(Good Deal Games - Oldergames)(NTSC)(US)(Track 02 of 17)[!].wav" size="47602172" crc="78a76448" md5="b08a10599931c1c5654d25398191d37e" sha1="7d8f1b17e54c7ba61e8e9d2132ee73fd6dae294c"/>
@@ -8619,6 +8827,11 @@ Requires [disc swap]
 		<description>Marko (USA, prototype)</description>
 		<year>200?</year>
 		<publisher>Good Deal Games</publisher>
+		<notes><![CDATA[
+Corrupt palette on pre-title screen credits
+Glitchy map screen
+Heavy raster effect issues during gameplay
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -8644,7 +8857,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="megarace">
+	<software name="megarace" supported="partial">
 		<!-- Source: TOSEC-ISO
 		<rom name="MegaRace (1993)(Software Toolworks)(NTSC)(US)[!].cue" size="293" crc="a06f1f73" />
 		<rom name="MegaRace (1993)(Software Toolworks)(NTSC)(US)(Track 1 of 2)[!].iso" size="512356352" crc="90dbacef" />
@@ -8653,6 +8866,10 @@ Requires [disc swap]
 		<description>MegaRace (USA)</description>
 		<year>1993</year>
 		<publisher>The Software Toolworks</publisher>
+		<notes><![CDATA[
+Optional subtitles doesn't sync to Lance Boyle speech
+Occasional minor GFX garbage strips on opponent sprites (verify)
+]]></notes>
 		<info name="serial" value="T-87025"/>
 		<info name="release" value="199312xx" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -8868,7 +9085,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="mightmg3">
+	<software name="mightmg3" supported="partial">
 		<!-- source toseciso
 		<rom name="Might and Magic III - Isles of Terra (1993)(CRI)(NTSC)(JP)[!].cue" size="7319" crc="fefc00b2" />
 		<rom name="Might and Magic III - Isles of Terra (1993)(CRI)(NTSC)(JP)(Track 01 of 46)[!].iso" size="22312960" crc="6c82daa3" />
@@ -8918,12 +9135,18 @@ Requires [disc swap]
 		<rom name="Might and Magic III - Isles of Terra (1993)(CRI)(NTSC)(JP)(Track 45 of 46)[!].wav" size="11978780" crc="265ffd1b" />
 		<rom name="Might and Magic III - Isles of Terra (1993)(CRI)(NTSC)(JP)(Track 46 of 46)[!].wav" size="37799036" crc="0b0dd512" />
 		-->
-		<description>Might and Magic III - Isles of Terra (Japan)</description>
+		<description>Might and Magic III: Isles of Terra (Japan)</description>
 		<year>1993</year>
 		<publisher>CRI</publisher>
+		<notes><![CDATA[
+Essentially requires [SRAM cart] for saving (125 blocks)
+Offset [redbook] playback for intro FMV
+Optional [mouse] is too slow
+]]></notes>
 		<info name="serial" value="T-68024"/>
 		<info name="release" value="19931126"/>
 		<info name="alt_title" value="マイト アンド マジックIII: Isles of Terra"/>
+		<info name="usage" value="Supports -ctrl2 mouse"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -8932,7 +9155,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="mk">
+	<software name="mk" supported="no">
 		<!-- http://redump.org/disc/7847/
 		<rom name="Mortal Kombat (Europe).cue" size="2002" crc="c1c7dd5f" />
 		<rom name="Mortal Kombat (Europe) (Track 01).bin" size="37516752" crc="509c1303" />
@@ -8960,6 +9183,10 @@ Requires [disc swap]
 		<description>Mortal Kombat (Europe)</description>
 		<year>1994</year>
 		<publisher>Arena</publisher>
+		<notes><![CDATA[
+Glitchy odd lines on logos FMV
+Either crashes or have more or less severe GFX glitches during gameplay
+]]></notes>
 		<info name="serial" value="T-81025-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -8970,7 +9197,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="mkj" cloneof="mk">
+	<software name="mkj" cloneof="mk" supported="no">
 		<!-- source toseciso
 		<rom name="Mortal Kombat (1994)(Acclaim)(NTSC)(JP)(en)[!].cue" size="3029" crc="59185e4e" />
 		<rom name="Mortal Kombat (1994)(Acclaim)(NTSC)(JP)(en)(Track 01 of 21)[!].iso" size="32667648" crc="e2220577" />
@@ -8998,6 +9225,10 @@ Requires [disc swap]
 		<description>Mortal Kombat (Japan)</description>
 		<year>1994</year>
 		<publisher>Acclaim Japan</publisher>
+		<notes><![CDATA[
+Glitchy odd lines on logos FMV
+Either crashes or have more or less severe GFX glitches during gameplay
+]]></notes>
 		<info name="serial" value="T-81014"/>
 		<info name="release" value="19940603"/>
 		<info name="alt_title" value="モータルコンバット 完全版"/>
@@ -9009,7 +9240,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="mku" cloneof="mk">
+	<software name="mku" cloneof="mk" supported="no">
 		<!-- http://redump.org/disc/2173/
 		<rom name="Mortal Kombat (USA).cue" size="2376" crc="4e47aa2c" />
 		<rom name="Mortal Kombat (USA) (Track 01).bin" size="37516752" crc="a14a402f" />
@@ -9037,6 +9268,11 @@ Requires [disc swap]
 		<description>Mortal Kombat (USA)</description>
 		<year>1994</year>
 		<publisher>Arena</publisher>
+		<notes><![CDATA[
+Glitchy odd lines on logos FMV
+Either crashes or have more or less severe GFX glitches during gameplay
+https://mametesters.org/view.php?id=7509
+]]></notes>
 		<info name="serial" value="T-81025"/>
 		<info name="release" value="199404xx" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -9258,7 +9494,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="mmpr">
+	<software name="mmpr" supported="partial">
 		<!-- source toseciso
 		<rom name="Mighty Morphin Power Rangers (1994)(Sega)(PAL)[!].cue" size="295" crc="8142aaf7" />
 		<rom name="Mighty Morphin Power Rangers (1994)(Sega)(PAL)(Track 1 of 2)[!].iso" size="405338112" crc="d2724dd9" />
@@ -9267,6 +9503,9 @@ Requires [disc swap]
 		<description>Mighty Morphin Power Rangers (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Glitchy tile in border area (verify)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -9275,7 +9514,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="mmpru" cloneof="mmpr">
+	<software name="mmpru" cloneof="mmpr" supported="partial">
 		<!-- http://redump.org/disc/19474/
 		<rom name="Mighty Morphin Power Rangers (USA).cue" size="261" crc="bd9ee789" md5="99b64ed4df709f6c01076333c506bc6b" sha1="87262cbc791ef6018748ac2b654c5f56b50f59e6"/>
 		<rom name="Mighty Morphin Power Rangers (USA) (Track 1).bin" size="465155040" crc="a7cf6c1b" md5="8ce1c15622e66652b85efdd7732f16bc" sha1="a93a3d0e8d065909dbe5b657796642b88dfc0d3b"/>
@@ -9284,6 +9523,9 @@ Requires [disc swap]
 		<description>Saban's Mighty Morphin Power Rangers (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Glitchy tile in border area (verify)
+]]></notes>
 		<info name="serial" value="4442"/>
 		<info name="release" value="19950502" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -9331,6 +9573,7 @@ Requires [disc swap]
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-60035"/>
 		<info name="release" value="199212xx" />
+		<info name="usage" value="Supports -ctrl2 mouse"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="SEGAT60035RE R1C MFD BY JVC"/>
@@ -9377,6 +9620,7 @@ Requires [disc swap]
 		<info name="serial" value="T-60044"/>
 		<info name="release" value="19930923"/>
 		<info name="alt_title" value="モンキー・アイランド ユーレイ海賊大騒動!"/>
+		<info name="usage" value="Supports -ctrl2 mouse"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -9385,7 +9629,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="mypaint">
+	<software name="mypaint" supported="partial">
 		<!-- Source: TruRip
 		<rom name="Media (CD-ROM)\My Paint - The Animated Paint Program (1994)(Saddleback Graphics)(US).ccd" size="2200" crc="875860ea" md5="10a674734693eb53c6357bbba348bea6" sha1="25aaa211701aab9f12eb4298ed295b517570dda8"/>
 		<rom name="Media (CD-ROM)\My Paint - The Animated Paint Program (1994)(Saddleback Graphics)(US).img" size="618129120" crc="230b6eb4" md5="2882efcf37028bb0ec08127db027d69e" sha1="cbed6edca283b529a2b7d59941b75bb79be8fd76"/>
@@ -9394,8 +9638,12 @@ Requires [disc swap]
 		<description>My Paint (USA)</description>
 		<year>1993</year>
 		<publisher>Saddleback Graphics</publisher>
+		<notes><![CDATA[
+Black screen at startup if mouse connected to -ctrl2
+]]></notes>
 		<info name="alt_title" value="My Paint - The Animated Paint Program (Box)" />
 		<info name="serial" value="T-109015"/>
+		<info name="usage" value="Supports -ctrl2 mouseus"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -9414,6 +9662,7 @@ Requires [disc swap]
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4430"/>
+		<info name="usage" value="Supports -ctrl2 mouse"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -9434,6 +9683,7 @@ Requires [disc swap]
 		<info name="serial" value="G-6027"/>
 		<info name="release" value="19931210"/>
 		<info name="alt_title" value="夢見館の物語"/>
+		<info name="usage" value="Supports -ctrl2 mouse"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="G-6027P-00142-R1M V"/>
@@ -9773,7 +10023,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="ninjawar">
+	<software name="ninjawar" supported="partial">
 		<!-- source toseciso
 		<rom name="Ninjawarriors, The (1993)(Taito)(NTSC)(JP)(en)[!].cue" size="2945" crc="51c1f55e" />
 		<rom name="Ninjawarriors, The (1993)(Taito)(NTSC)(JP)(en)(Track 01 of 20)[!].iso" size="12410880" crc="da5f9be0" />
@@ -9797,9 +10047,12 @@ Requires [disc swap]
 		<rom name="Ninjawarriors, The (1993)(Taito)(NTSC)(JP)(en)(Track 19 of 20)[!].wav" size="1775804" crc="9bab569b" />
 		<rom name="Ninjawarriors, The (1993)(Taito)(NTSC)(JP)(en)(Track 20 of 20)[!].wav" size="1298348" crc="5981f196" />
 		-->
-		<description>The Ninjawarriors (Japan)</description>
+		<description>The Ninja Warriors (Japan)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
+		<notes><![CDATA[
+Glitchy GFXs when selecting ZUNTATA option
+]]></notes>
 		<info name="serial" value="T-11024"/>
 		<info name="release" value="19930312"/>
 		<info name="alt_title" value="ニンジャウォーリアーズ"/>
@@ -9811,7 +10064,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="nobuhao">
+	<software name="nobuhao" supported="no">
 		<!-- source toseciso
 		<rom name="Nobunaga no Yabou - Haouden (1994)(KOEI)(NTSC)(JP)[!].cue" size="1968" crc="5c643cef" />
 		<rom name="Nobunaga no Yabou - Haouden (1994)(KOEI)(NTSC)(JP)(Track 01 of 13)[!].iso" size="8796160" crc="93bb153f" />
@@ -9828,9 +10081,12 @@ Requires [disc swap]
 		<rom name="Nobunaga no Yabou - Haouden (1994)(KOEI)(NTSC)(JP)(Track 12 of 13)[!].wav" size="38147132" crc="4a99b106" />
 		<rom name="Nobunaga no Yabou - Haouden (1994)(KOEI)(NTSC)(JP)(Track 13 of 13)[!].wav" size="20309564" crc="f05b24f0" />
 		-->
-		<description>Nobunaga no Yabou - Haouden (Japan)</description>
+		<description>Nobunaga no Yabou: Haouden (Japan)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Refuses to run without a [SRAM cart] (471 blocks!)
+]]></notes>
 		<info name="serial" value="T-76024"/>
 		<info name="release" value="19940325"/>
 		<info name="alt_title" value="信長の野望・覇王伝"/>
@@ -9854,16 +10110,13 @@ Requires [disc swap]
 		<info name="serial" value="T-77014"/>
 		<info name="release" value="19911214"/>
 		<info name="alt_title" value="ノスタルジア1907"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<feature name="cd_matrix" value="T-77014P-00006-R1K V"/>
+			<feature name="part_id" value="Original Sound Track Ver.2."/>
 			<diskarea name="cdrom">
 				<disk name="nostalgia 1907 (japan)" sha1="c6718f18b5720b3c48abf9c8accdf6d7572e4a63"/>
 			</diskarea>
 		</part>
-	</software>
-
-	<software name="nost1907bonus" cloneof="nost1907">
 		<!-- source toseciso
 		<rom name="Nostalgia 1907 in North Atlantic Sea (1991)(Takeru)(NTSC)(Jp)[!][Original Sound Track Ver. 2][audio cd].cue" size="2969" crc="3fc1b976" />
 		<rom name="Nostalgia 1907 in North Atlantic Sea (1991)(Takeru)(NTSC)(Jp)(Track 01 of 15)[!][Original Sound Track Ver. 2][audio cd].wav" size="29769308" crc="fd99238a" />
@@ -9882,11 +10135,10 @@ Requires [disc swap]
 		<rom name="Nostalgia 1907 in North Atlantic Sea (1991)(Takeru)(NTSC)(Jp)(Track 14 of 15)[!][Original Sound Track Ver. 2][audio cd].wav" size="20655308" crc="ee061041" />
 		<rom name="Nostalgia 1907 in North Atlantic Sea (1991)(Takeru)(NTSC)(Jp)(Track 15 of 15)[!][Original Sound Track Ver. 2][audio cd].wav" size="24021020" crc="b25d006c" />
 		-->
-		<description>Nostalgia 1907 in North Atlantic Sea - Original Sound Track Ver. 2 (Japan) [CD-Audio]</description>
-		<year>1992</year>
-		<publisher>Takeru</publisher>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom2" interface="cdrom">
+			<!-- https://segaretro.org/File:NOSTALGIA_MCD_JP_Disc2.jpg -->
+			<feature name="cd_matrix" value="TKR91002AA110A"/>
+			<feature name="part_id" value="Original Sound Track Ver.2."/>
 			<diskarea name="cdrom">
 				<disk name="nostalgia 1907 in north atlantic sea - original sound track ver. 2 (1991)(takeru)(jp)[cd-audio]" sha1="412a33f70581ae445681a39897e42ea9fbf60c50"/>
 			</diskarea>
@@ -9945,7 +10197,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="nstriker">
+	<software name="nstriker" supported="partial">
 		<!-- http://redump.org/disc/17390/
 		<rom name="Night Striker (Japan, Korea).cue" size="4779" crc="9fef22f7" />
 		<rom name="Night Striker (Japan, Korea) (Track 01).bin" size="15605520" crc="184fb14e" />
@@ -9991,6 +10243,10 @@ Requires [disc swap]
 		<description>Night Striker (Japan, Korea)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
+		<notes><![CDATA[
+Offset [redbook] at game start, "good luck" gets cut off
+XE-1AP seemingly supported in -ctrl2 and in input test, except it won't be recognized in gameplay (verify)
+]]></notes>
 		<info name="serial" value="T-11014"/>
 		<info name="release" value="19930528"/>
 		<info name="alt_title" value="ナイトストライカー"/>
@@ -10003,7 +10259,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="ntrap">
+	<software name="ntrap" supported="no">
 		<!-- source redump.org
 		<rom name="Night Trap (Europe) (Disc 1).cue" size="226" crc="0377a0b6" />
 		<rom name="Night Trap (Europe) (Disc 1) (Track 1).bin" size="615939408" crc="793bdf64" />
@@ -10016,6 +10272,9 @@ Requires [disc swap]
 		<description>Night Trap (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="4903"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom1" interface="cdrom">
@@ -10066,7 +10325,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="ntrap32u" cloneof="ntrap">
+	<software name="ntrap32u" cloneof="ntrap" supported="no">
 		<!-- http://redump.org/disc/17550/
 		     http://redump.org/disc/17551/
 		<rom name="Night Trap (USA) (Disc 1) (32X).cue" size="232" crc="40b701ce" />
@@ -10105,7 +10364,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="ntrapfr" cloneof="ntrap">
+	<software name="ntrapfr" cloneof="ntrap" supported="no">
 		<!-- source toseciso
 		<rom name="Night Trap (1993)(Sega)(PAL)(FR)(Disc 1 of 2)[!].cue" size="293" crc="bcb42683" />
 		<rom name="Night Trap (1993)(Sega)(PAL)(FR)(Disc 1 of 2)(Track 1 of 2)[!].iso" size="536166400" crc="8e4d62aa" />
@@ -10118,6 +10377,9 @@ Requires [disc swap]
 		<description>Night Trap (France)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="4903-09"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom1" interface="cdrom">
@@ -10292,7 +10554,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="panic">
+	<software name="panic" supported="partial">
 		<!-- Source: TruRip
 		<rom name="Media (CD-ROM)\Panic! (1994)(Data East)(US).ccd" size="7912" crc="805608ba" md5="afb8050c793cd95449da3903bbdb964d" sha1="26a878790ceab4a61ceed96d05176c8f9504af61"/>
 		<rom name="Media (CD-ROM)\Panic! (1994)(Data East)(US).img" size="587567232" crc="f5002a24" md5="7ffd4ffea20a08bf1a7f514ff6dc0958" sha1="31ac39d0b204cb9d9a5efb49ee4ccdbca3499e3e"/>
@@ -10301,6 +10563,10 @@ Requires [disc swap]
 		<description>Panic! (USA)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
+		<notes><![CDATA[
+First part of intro FMV gets greyed out
+offset [redbook] in intro
+]]></notes>
 		<info name="serial" value="T-13015"/>
 		<info name="release" value="199406xx" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -10502,7 +10768,7 @@ Requires [disc swap]
 		-->
 		<description>Popful Mail (USA)</description>
 		<year>1995</year>
-		<publisher>Sega</publisher>
+		<publisher>Working Designs</publisher>
 		<info name="serial" value="T-127035"/>
 		<info name="release" value="19950223" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -10687,7 +10953,8 @@ Requires [disc swap]
 	</software>
 
 	<!-- This game was only found bundled in a so called "Double Deal"-pack together with Microcosm. They did not share discs. -->
-	<software name="prime">
+	<!-- TODO: merge/derive from Microcosm? -->
+	<software name="prime" supported="partial">
 		<!-- Source: TOSEC-ISO
 		<rom name="Ultraverse Prime (1994)(Sony Imagesoft)(NTSC)(US)[!].cue" size="2405" crc="77e4ce3a" />
 		<rom name="Ultraverse Prime (1994)(Sony Imagesoft)(NTSC)(US)(Track 01 of 16)[!].iso" size="51888128" crc="704e3f06" />
@@ -10710,6 +10977,9 @@ Requires [disc swap]
 		<description>Ultraverse Prime (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
+		<notes><![CDATA[
+Doesn't mask bad graphics on bottom during gameplay
+]]></notes>
 		<info name="serial" value="T-93325"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -10719,7 +10989,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="prizefig">
+	<software name="prizefig" supported="no">
 		<!-- source toseciso
 		<rom name="Prize Fighter (1993)(Sega)(PAL)(Disc 1 of 2)[!].cue" size="291" crc="80c5d0ca" />
 		<rom name="Prize Fighter (1993)(Sega)(PAL)(Disc 1 of 2)(Track 1 of 2)[!].iso" size="357476352" crc="c0a355cd" />
@@ -10732,6 +11002,10 @@ Requires [disc swap]
 		<description>Prize Fighter (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+Glitchy tiles spawning on all FMVs and main menu
+]]></notes>
 		<info name="serial" value="4206"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom1" interface="cdrom">
@@ -10761,6 +11035,7 @@ Requires [disc swap]
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Requires [disc swap]
+Glitchy tiles spawning on all FMVs and main menu
 ]]></notes>
 		<info name="serial" value="G-6037"/>
 		<info name="release" value="19950324"/>
@@ -10794,6 +11069,7 @@ Requires [disc swap]
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Requires [disc swap]
+Glitchy tiles spawning on all FMVs and main menu
 ]]></notes>
 		<info name="serial" value="MK-4206"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -10873,7 +11149,7 @@ Requires [disc swap]
 		<year>2010</year>
 		<publisher>WaterMelon</publisher>
 		<notes><![CDATA[
-No support for Mega CD cart slots
+No support for [cart] slot in Mega CD
 ]]></notes>
 		<info name="serial" value="T-574013, T-574016, T-574016-50"/>
 		<info name="release" value="20101214" />
@@ -10888,7 +11164,7 @@ No support for Mega CD cart slots
 		</part>
 	</software>
 
-	<software name="psychic3">
+	<software name="psychic3" supported="no">
 		<!-- source toseciso
 		<rom name="Psychic Detective Series vol.3 - AYA (1993)(Data West)(NTSC)(JP)[!].cue" size="1146" crc="a10fe2a2" />
 		<rom name="Psychic Detective Series vol.3 - AYA (1993)(Data West)(NTSC)(JP)(Track 1 of 7)[!].iso" size="32634880" crc="4602b34e" />
@@ -10902,6 +11178,9 @@ No support for Mega CD cart slots
 		<description>Psychic Detective Series vol.3 - AYA (Japan)</description>
 		<year>1993</year>
 		<publisher>Data West</publisher>
+		<notes><![CDATA[
+Black screen after boot, [Sub CPU] expects an irq?
+]]></notes>
 		<info name="serial" value="T-64024"/>
 		<info name="release" value="19930103"/>
 		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.3 AYA"/>
@@ -10913,7 +11192,6 @@ No support for Mega CD cart slots
 		</part>
 	</software>
 
-	<!-- Disc hangs after booting. -->
 	<software name="psychic3demo" cloneof="psychic3" supported="no">
 		<!-- Source: Redump
 		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Demo).cue" size="274" crc="12b48e06" />
@@ -10923,6 +11201,9 @@ No support for Mega CD cart slots
 		<description>Psychic Detective Series vol.3 - AYA Auto Demo (Japan)</description>
 		<year>1993</year>
 		<publisher>Data West</publisher>
+		<notes><![CDATA[
+Black screen after boot, [Sub CPU] expects an irq?
+]]></notes>
 		<info name="serial" value="T-84024 DWMD2905"/>
 		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.3 AYA AUTO DEMO"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -10934,7 +11215,7 @@ No support for Mega CD cart slots
 		</part>
 	</software>
 
-	<software name="psychic4">
+	<software name="psychic4" supported="no">
 		<!-- source toseciso
 		<rom name="Psychic Detective Series vol.4 - Orgel (1993)(Data West)(NTSC)(JP)[!].cue" size="1160" crc="c79a1ec1" />
 		<rom name="Psychic Detective Series vol.4 - Orgel (1993)(Data West)(NTSC)(JP)(Track 1 of 7)[!].iso" size="140118016" crc="ca1c5712" />
@@ -10948,6 +11229,9 @@ No support for Mega CD cart slots
 		<description>Psychic Detective Series vol.4 - Orgel (Japan)</description>
 		<year>1993</year>
 		<publisher>Data West</publisher>
+		<notes><![CDATA[
+Black screen after boot, [Sub CPU] expects an irq?
+]]></notes>
 		<info name="serial" value="T-64034"/>
 		<info name="release" value="19931210"/>
 		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.4 オルゴール"/>
@@ -10959,7 +11243,7 @@ No support for Mega CD cart slots
 		</part>
 	</software>
 
-	<software name="psygnosd">
+	<software name="psygnosd" supported="no">
 		<!-- Unknown source
 		<rom name="Mega Power - Issue 06 - Disc 02 (1994)(Paragon Publishing)(PAL)(GB)[!][demos - Microcosm, Puggsy, Wiz 'N' Liz].cue" size="3125" crc="527b3444" />
 		<rom name="Mega Power - Issue 06 - Disc 02 (1994)(Paragon Publishing)(PAL)(GB)(Track 01 of 15)[!][demos - Microcosm, Puggsy, Wiz 'N' Liz].iso" size="82132992" crc="bb65d138" />
@@ -10981,6 +11265,13 @@ No support for Mega CD cart slots
 		<description>Microcosm, Puggsy and Wiz 'N' Liz (Europe, demo) [Mega Power - issue 06]</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
+		<!-- TODO: Is the dump just bad? -->
+		<notes><![CDATA[
+Puggsy: glitchy odd lines on intro FMV
+Microcosm: intro FMV runs too slow
+Wiz N Liz: hangs after starting from main menu
+Sunscreem FMV: glitchy odd lines
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -10989,7 +11280,7 @@ No support for Mega CD cart slots
 		</part>
 	</software>
 
-	<software name="puggsy">
+	<software name="puggsy" supported="partial">
 		<!-- source toseciso
 		<rom name="Puggsy (1993)(Psygnosis)(PAL)[!].cue" size="2865" crc="96984da3" />
 		<rom name="Puggsy (1993)(Psygnosis)(PAL)(Track 01 of 22)[!].iso" size="91049984" crc="bea38697" />
@@ -11018,6 +11309,9 @@ No support for Mega CD cart slots
 		<description>Puggsy (Europe)</description>
 		<year>1993</year>
 		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+Glitchy odd lines on FMVs
+]]></notes>
 		<info name="serial" value="T-113035-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -11027,7 +11321,7 @@ No support for Mega CD cart slots
 		</part>
 	</software>
 
-	<software name="puggsyu" cloneof="puggsy">
+	<software name="puggsyu" cloneof="puggsy" supported="partial">
 		<!-- http://redump.org/disc/4106/
 		<rom name="Puggsy (USA).cue" size="2336" crc="890dbfbb" />
 		<rom name="Puggsy (USA) (Track 01).bin" size="104388816" crc="88336725" />
@@ -11056,6 +11350,9 @@ No support for Mega CD cart slots
 		<description>Puggsy (USA)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+Glitchy odd lines on FMVs
+]]></notes>
 		<info name="serial" value="T-113035"/>
 		<info name="release" value="19940106" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -11067,7 +11364,7 @@ No support for Mega CD cart slots
 		</part>
 	</software>
 
-	<software name="quizss">
+	<software name="quizss" supported="partial">
 		<!-- http://redump.org/disc/1657/
 		<rom name="Quiz Scramble Special (Japan) (Rev B).cue" size="5394" crc="32fb3613" />
 		<rom name="Quiz Scramble Special (Japan) (Rev B) (Track 01).bin" size="28261632" crc="24f14a3d" />
@@ -11115,6 +11412,9 @@ No support for Mega CD cart slots
 		<description>Quiz Scramble Special (Japan, rev. B)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Offset [redbook] playback during cutscenes, with lip sync drift
+]]></notes>
 		<info name="serial" value="G-6003"/>
 		<info name="release" value="19920529"/>
 		<info name="alt_title" value="クイズスクランブルスペシャル"/>
@@ -11128,7 +11428,7 @@ No support for Mega CD cart slots
 	</software>
 
 	<!-- one of these probably matches the REDUMP image-->
-	<software name="quizssa" cloneof="quizss">
+	<software name="quizssa" cloneof="quizss" supported="partial">
 		<!-- source toseciso
 		<rom name="Quiz Scramble Special (1992)(Sega)(NTSC)(JP)[!][G-6003P-00014B-R1M].cue" size="6770" crc="77c402ec" />
 		<rom name="Quiz Scramble Special (1992)(Sega)(NTSC)(JP)(Track 01 of 41)[!][G-6003P-00014B-R1M].iso" size="24608768" crc="bf09f1f2" />
@@ -11176,6 +11476,9 @@ No support for Mega CD cart slots
 		<description>Quiz Scramble Special (Japan, R1M)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Offset [redbook] playback during cutscenes, with lip sync drift
+]]></notes>
 		<info name="serial" value="G-6003"/>
 		<info name="release" value="19920529"/>
 		<info name="alt_title" value="クイズスクランブルスペシャル"/>
@@ -11188,7 +11491,7 @@ No support for Mega CD cart slots
 		</part>
 	</software>
 
-	<software name="quizssb" cloneof="quizss">
+	<software name="quizssb" cloneof="quizss" supported="partial">
 		<!-- source toseciso
 		<rom name="Quiz Scramble Special (1992)(Sega)(NTSC)(JP)[!][G-6003P-00014B-R2M].cue" size="6770" crc="0cfc674d" />
 		<rom name="Quiz Scramble Special (1992)(Sega)(NTSC)(JP)(Track 01 of 41)[!][G-6003P-00014B-R2M].iso" size="24608768" crc="bf09f1f2" />
@@ -11236,6 +11539,9 @@ No support for Mega CD cart slots
 		<description>Quiz Scramble Special (Japan, R2M)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Offset [redbook] playback during cutscenes, with lip sync drift
+]]></notes>
 		<info name="serial" value="G-6003"/>
 		<info name="release" value="19920529"/>
 		<info name="alt_title" value="クイズスクランブルスペシャル"/>
@@ -11297,7 +11603,7 @@ No support for Mega CD cart slots
 		</part>
 	</software>
 
-	<software name="radrex">
+	<software name="radrex" supported="no">
 		<!-- Source: TOSEC-ISO
 		<rom name="Radical Rex (1994)(Activision)(NTSC)(US)[!].cue" size="1556" crc="ab6dd03e" />
 		<rom name="Radical Rex (1994)(Activision)(NTSC)(US)(Track 01 of 11)[!].iso" size="9512960" crc="f217c891" />
@@ -11315,6 +11621,9 @@ No support for Mega CD cart slots
 		<description>Radical Rex (USA)</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Black screen with continous track 1 access
+]]></notes>
 		<info name="serial" value="T-130026"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -11362,7 +11671,7 @@ No support for Mega CD cart slots
 		</part>
 	</software>
 
-	<software name="ranma">
+	<software name="ranma" supported="partial">
 		<!-- http://redump.org/disc/1660/
 		<rom name="Ranma 1-2 - Byakuranaika (Japan).cue" size="3157" crc="3a971b70" />
 		<rom name="Ranma 1-2 - Byakuranaika (Japan) (Track 01).bin" size="49519008" crc="a92a2dc5" />
@@ -11394,6 +11703,9 @@ No support for Mega CD cart slots
 		<description>Ranma ½ - Byakuranaika (Japan)</description>
 		<year>1993</year>
 		<publisher>NCS</publisher>
+		<notes><![CDATA[
+Offset [redbook] playback during intro FMV, with lip sync drift
+]]></notes>
 		<info name="serial" value="T-25014"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="らんま½ 白蘭愛歌"/>
@@ -11431,7 +11743,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="rdf">
+	<software name="rdf" supported="partial">
 		<!-- http://redump.org/disc/21450/
 		<rom name="RDF - Global Conflict (USA).cue" size="852" crc="29c93c89" md5="66072c384f42e3a2d08458dfa51d0f13" sha1="0ff3b55ddaf143adf19b72e007481bec8b555dd8"/>
 		<rom name="RDF - Global Conflict (USA) (Track 1).bin" size="256711392" crc="dcfb7926" md5="e7081e9e9d13cd14103ece2c6e665b08" sha1="f262c98ffa79ebb3e7e9155de467c87d45e55f81"/>
@@ -11445,6 +11757,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>RDF - Global Conflict (USA)</description>
 		<year>1994</year>
 		<publisher>Absolute Entertainment</publisher>
+		<notes><![CDATA[
+Plays back bogus [redbook] with hiccups during briefing FMVs
+]]></notes>
 		<info name="serial" value="T-86025"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -11455,7 +11770,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="revninja">
+	<software name="revninja" supported="no">
 		<!-- http://redump.org/disc/17202/
 		<rom name="Revenge of the Ninja (USA).cue" size="582" crc="fd8526de" />
 		<rom name="Revenge of the Ninja (USA) (Track 1).bin" size="325801392" crc="33c4b555" />
@@ -11467,6 +11782,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Revenge of the Ninja (USA)</description>
 		<year>1993</year>
 		<publisher>Renovation</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="T-49035"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -11549,7 +11867,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Rise of the Dragon - A Blade Hunter Mystery (Japan) (Track 4).bin" size="24124464" crc="0278c2fd" />
 		<rom name="Rise of the Dragon - A Blade Hunter Mystery (Japan) (Track 5).bin" size="29235360" crc="93ba211d" />
 		-->
-		<description>Rise of the Dragon - A Blade Hunter Mystery (Japan)</description>
+		<description>Rise of the Dragon: A Blade Hunter Mystery (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6002"/>
@@ -11682,7 +12000,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="roboalesu" cloneof="roboales">
+	<software name="roboalesu" cloneof="roboales" supported="partial">
 		<!-- Source: TruRip
 		<rom name="Media (CD-ROM)\Robo Aleste (1993)(Tengen)(US).ccd" size="3305" crc="3eab9ae9" md5="5675955d6c124331a366287300859872" sha1="6c40ec6b2ae3ecc69834ed0e838de152125f9f5c"/>
 		<rom name="Media (CD-ROM)\Robo Aleste (1993)(Tengen)(US).img" size="554573376" crc="31d53199" md5="27ced75cb7b67d3da1d11f237f112d2e" sha1="5e349a7647687c886412bf1e61e60087fd73c544"/>
@@ -11691,6 +12009,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Robo Aleste (USA)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
+		<notes><![CDATA[
+[VDP] sprite mask on top bar doesn't work properly (specific to this version)
+]]></notes>
 		<info name="serial" value="T-48015"/>
 		<info name="release" value="199308xx" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -11701,7 +12022,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="salesman">
+	<software name="salesman" supported="partial">
 		<!-- source toseciso
 		<rom name="Warau Salesman (1993)(Sega)(NTSC)(JP)[!].cue" size="413" crc="a41d3029" />
 		<rom name="Warau Salesman (1993)(Sega)(NTSC)(JP)(Track 1 of 3)[!].iso" size="307593216" crc="24f74d74" />
@@ -11711,6 +12032,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Warau Salesman (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Misbehaves during opening, runs too fast, ROZ stretches past the intended place
+]]></notes>
 		<info name="serial" value="G-6006"/>
 		<info name="release" value="19930917"/>
 		<info name="alt_title" value="笑ゥせぇるすまん"/>
@@ -11860,7 +12184,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="sangoku3">
+	<software name="sangoku3" supported="partial">
 		<!-- http://redump.org/disc/1630/
 		<rom name="Sangokushi III (Japan).cue" size="5832" crc="1748f5b9" />
 		<rom name="Sangokushi III (Japan) (Track 01).bin" size="11160240" crc="5e0d844c" />
@@ -11917,6 +12241,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Sangokushi III (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Cannot save without a [SRAM cart] (631 blocks!)
+]]></notes>
 		<info name="serial" value="T-76014"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="三國志III"/>
@@ -12322,6 +12649,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Sensible Soccer (Europe)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
+		<notes><![CDATA[
+Essentially requires [SRAM cart] for saving (124 blocks)
+Offset [redbook] playback during gameplay
+]]></notes>
 		<info name="serial" value="T-93185-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -12431,7 +12762,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Mega Power - Issue 12 - Disc 05 (1994-06-23)(Paragon Publishing)(PAL)(GB)(M4)(Track 95 of 96)[!][demo - Sensible Soccer v1.08].wav" size="40021676" crc="995261d2" />
 		<rom name="Mega Power - Issue 12 - Disc 05 (1994-06-23)(Paragon Publishing)(PAL)(GB)(M4)(Track 96 of 96)[!][demo - Sensible Soccer v1.08].wav" size="1230140" crc="e257eba0" />
 		-->
-		<description>Sensible Soccer v1.08 (Europe, demo) [Mega Power - Issue 12, Sega Pro CD - issue 44]</description>
+		<description>Sensible Soccer (Europe, demo v1.08) [Mega Power - Issue 12, Sega Pro CD - issue 44]</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -12452,6 +12783,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Shadowrun (Japan)</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
+		<notes><![CDATA[
+Cannot select anything but new game in main menu (confirmed btanb, just requires a save in SRAM)
+]]></notes>
 		<info name="serial" value="T-66024"/>
 		<info name="release" value="19950223"/>
 		<info name="alt_title" value="シャドウラン"/>
@@ -12463,7 +12797,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="shinfrce">
+	<software name="shinfrce" supported="partial">
 		<!-- source toseciso
 		<rom name="Shining Force CD (1995)(Sega)(PAL)[!].cue" size="3971" crc="a3c2bb82" />
 		<rom name="Shining Force CD (1995)(Sega)(PAL)(Track 01 of 35)[!].iso" size="59789312" crc="48da591f" />
@@ -12505,6 +12839,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Shining Force CD (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [SRAM cart] for playing final scenario
+]]></notes>
 		<info name="serial" value="4656"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -12514,7 +12851,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="shinfrcej" cloneof="shinfrce">
+	<software name="shinfrcej" cloneof="shinfrce" supported="partial">
 		<!-- http://redump.org/disc/1938/
 		<rom name="Shining Force CD (Japan).cue" size="4147" crc="51bef593" />
 		<rom name="Shining Force CD (Japan) (Track 01).bin" size="68664288" crc="4dd14b8b" />
@@ -12556,6 +12893,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Shining Force CD (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [SRAM cart] for playing final scenario
+]]></notes>
 		<info name="serial" value="G-6036"/>
 		<info name="release" value="19940722"/>
 		<info name="alt_title" value="シャイニング・フォースCD"/>
@@ -12568,7 +12908,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="shinfrceu" cloneof="shinfrce">
+	<software name="shinfrceu" cloneof="shinfrce" supported="partial">
 		<!-- http://redump.org/disc/2702/
 		<rom name="Shining Force CD (USA).cue" size="4054" crc="ede67263" />
 		<rom name="Shining Force CD (USA) (Track 01).bin" size="68666640" crc="a85fa1a0" />
@@ -12610,6 +12950,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Shining Force CD (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [SRAM cart] for playing final scenario
+]]></notes>
 		<info name="serial" value="MK-4656"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -12619,7 +12962,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="shinfrceua" cloneof="shinfrce">
+	<software name="shinfrceua" cloneof="shinfrce" supported="partial">
 		<!-- http://redump.org/disc/3875/
 		<rom name="Shining Force CD (USA) (Alt).cue" size="4264" crc="d7af633d" />
 		<rom name="Shining Force CD (USA) (Alt) (Track 01).bin" size="68666640" crc="a85fa1a0" />
@@ -12661,6 +13004,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Shining Force CD (USA, alt)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [SRAM cart] for playing final scenario
+]]></notes>
 		<info name="serial" value="MK-4656"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -12685,7 +13031,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="shinmt">
+	<software name="shinmt" supported="partial">
 		<!-- http://redump.org/disc/10143/
 		<rom name="Shin Megami Tensei (Japan).cue" size="3491" crc="8b795266" />
 		<rom name="Shin Megami Tensei (Japan) (Track 01).bin" size="68633712" crc="4fbbcf95" />
@@ -12721,6 +13067,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Shin Megami Tensei (Japan)</description>
 		<year>1994</year>
 		<publisher>SIMS</publisher>
+		<notes><![CDATA[
+Essentially requires [SRAM cart] for saving (100 blocks)
+]]></notes>
 		<info name="serial" value="T-44044"/>
 		<info name="release" value="19940225"/>
 		<info name="alt_title" value="真・女神転生"/>
@@ -12893,8 +13242,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<!-- Disc does not boot due to improper mastering. More info can be found at the Redump link. -->
-	<software name="silpheedjdemo" cloneof="silpheed" supported="no">
+	<software name="silpheedjdemo" supported="no">
 		<!-- http://redump.org/disc/39378/
 		<rom name="Silpheed (Japan) (Demo).cue" size="216" crc="84cd95f7" />
 		<rom name="Silpheed (Japan) (Demo) (Track 1).bin" size="369174624" crc="70ab8271" />
@@ -12903,6 +13251,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Silpheed Hibaihin (Japan)</description>
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
+		<notes><![CDATA[
+Disc does not boot due to improper mastering. More info can be found at the Redump link.
+]]></notes>
 		<info name="serial" value="ST-45054"/>
 		<info name="alt_title" value="シルフィード 非売品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -12914,7 +13265,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="silpheedjdemof" cloneof="silpheed" supported="no">
+	<software name="silpheedjdemof" cloneof="silpheedjdemo" supported="no">
 		<!-- http://redump.org/disc/39383/
 		<rom name="Silpheed (Japan) (Demo) (Fixed Dump).cue" size="242" crc="87d9d2bb" />
 		<rom name="Silpheed (Japan) (Demo) (Fixed Dump) (Track 1).bin" size="369174624" crc="6b59f551" />
@@ -12923,6 +13274,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Silpheed Hibaihin (Japan, fixed)</description>
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
+		<notes><![CDATA[
+Manually fixed silpheedjdemo image.
+Non-playable stages desyncs with CPU controlled inputs (verify)
+]]></notes>
 		<info name="serial" value="ST-45054"/>
 		<info name="alt_title" value="シルフィード 非売品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -12960,7 +13315,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="simearth">
+	<software name="simearth" supported="partial">
 		<!-- source toseciso
 		<rom name="SimEarth (1993)(Sega)(NTSC)(JP)[!].cue" size="2909" crc="42fbdea2" />
 		<rom name="SimEarth (1993)(Sega)(NTSC)(JP)(Track 01 of 22)[!].iso" size="7634944" crc="bf542c7d" />
@@ -12989,6 +13344,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>SimEarth (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [SRAM cart] for saving
+]]></notes>
 		<info name="serial" value="G-6008"/>
 		<info name="release" value="19930312"/>
 		<info name="alt_title" value="シムアース"/>
@@ -13000,10 +13358,16 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
+	<!-- https://segaretro.org/SING!!_Sega_Game_Music_Presented_by_B.B._Queens -->
+	<!-- https://vgmdb.net/album/2070 -->
+	<!-- Hybrid Mega-CD/Audio CD, contains Teddy Boy Blues as first track. -->
 	<software name="sing">
-		<description>Sing! Teddyboy Blues [MP3-sourced]</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<description>SING!! Sega Game Music Presented by B.B. Queens (Japan)</description>
+		<year>1992</year>
+		<publisher>Sega / BMG Victor</publisher>
+		<info name="serial" value="BVRR-1"/>
+		<info name="release" value="19920726" />
+		<!-- ISBN: 4-988017-034569 -->
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -13012,7 +13376,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="slamcity">
+	<software name="slamcity" supported="no">
 		<!-- source toseciso
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(PAL)(Disc 1 of 4)[!][Fingers].cue" size="365" crc="a2931b18" />
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(PAL)(Disc 1 of 4)(Track 1 of 2)[!][Fingers].iso" size="511188992" crc="f800c7d9" />
@@ -13033,6 +13397,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Slam City with Scottie Pippen (Europe)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-162035-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom1" interface="cdrom">
@@ -13164,7 +13531,7 @@ Requires [disc swap]
 	</software>
 
 	<!-- why only 2 discs? -->
-	<software name="slamcitya" cloneof="slamcity">
+	<software name="slamcitya" cloneof="slamcity" supported="no">
 		<!-- source redump.org
 		<rom name="Slam City with Scottie Pippen (Europe) (Disc 1).cue" size="264" crc="0b845292" />
 		<rom name="Slam City with Scottie Pippen (Europe) (Disc 1) (Track 1).bin" size="587068608" crc="44dbbfbd" />
@@ -13177,6 +13544,9 @@ Requires [disc swap]
 		<description>Slam City with Scottie Pippen (Europe, alt)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-162035-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom1" interface="cdrom">
@@ -13245,28 +13615,28 @@ Requires [disc swap]
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Disc 1 - Fingers" />
 			<feature name="cd_matrix" value="GW 02711.1 RE-1 SRCR##01"/>
-			<diskarea name="cdrom1">
+			<diskarea name="cdrom">
 				<disk name="slam city with scottie pippen (usa, alt) (disc 1)" sha1="637ceb49d6e9ff89009b26d848b6097a54969d65"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="Disc 2 - Juice" />
 			<feature name="cd_matrix" value="GW 02711.2 RE-1 SRCR**01"/>
-			<diskarea name="cdrom2">
+			<diskarea name="cdrom">
 				<disk name="slam city with scottie pippen (usa, alt) (disc 2)" sha1="e5cc52a7686824b14ee471682f30b0b4a09dbe97"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="cdrom">
 			<feature name="part_id" value="Disc 3 - Mad Dog" />
 			<feature name="cd_matrix" value="GW 02711.3 RE-1 SRCR##01"/>
-			<diskarea name="cdrom3">
+			<diskarea name="cdrom">
 				<disk name="slam city with scottie pippen (usa, alt) (disc 3)" sha1="6d144435110bc0fcd97313c75dbb56f472e4e123"/>
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="cdrom">
 			<feature name="part_id" value="Disc 4 - Smash" />
 			<feature name="cd_matrix" value="GW 02711.4 RE-1 SRCR##01"/>
-			<diskarea name="cdrom4">
+			<diskarea name="cdrom">
 				<disk name="slam city with scottie pippen (usa, alt) (disc 4)" sha1="ddffdf4dd92fcb3f93f285ff24384815ba401cab"/>
 			</diskarea>
 		</part>
@@ -13367,7 +13737,8 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="snatcher">
+	<!-- Omake: digit KONAMI as pass code in Jordan's computer for uncensored version (?) -->
+	<software name="snatcher" supported="partial">
 		<!-- source toseciso
 		<rom name="Snatcher (1994)(Konami)(PAL)[!].cue" size="2714" crc="49267bb9" />
 		<rom name="Snatcher (1994)(Konami)(PAL)(Track 01 of 21)[!].iso" size="114716672" crc="7b7ccda4" />
@@ -13395,6 +13766,9 @@ Requires [disc swap]
 		<description>Snatcher (Europe)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Optional [Justifier] support
+]]></notes>
 		<info name="serial" value="T-95035-05"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -13404,7 +13778,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="snatcheru" cloneof="snatcher">
+	<software name="snatcheru" cloneof="snatcher" supported="partial">
 		<!-- http://redump.org/disc/20559/
 		<rom name="Snatcher (USA).cue" size="2271" crc="13845fdf" md5="fe305d5467811e10fee501bc9135efb5" sha1="c6bdafb2bdb8b2558c8104549cbfdd9ef9a1817f"/>
 		<rom name="Snatcher (USA) (Track 01).bin" size="131744928" crc="13ad0387" md5="8a4f5185fa0754e073e331bebd91bbb4" sha1="1f4164205ed736a0d9a03eb7972868e9aa737d35"/>
@@ -13432,6 +13806,9 @@ Requires [disc swap]
 		<description>Snatcher (USA)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Optional [Justifier] support
+]]></notes>
 		<info name="serial" value="T-95035"/>
 		<info name="release" value="19941130" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -13443,7 +13820,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="solfeace">
+	<software name="solfeace" supported="no">
 		<!-- http://redump.org/disc/4100/
 		<rom name="Sol-Feace (Europe).cue" size="2016" crc="cfc94dfb" />
 		<rom name="Sol-Feace (Europe) (Track 01).bin" size="6319824" crc="46429d5f" />
@@ -13468,6 +13845,10 @@ Requires [disc swap]
 		<description>Sol-Feace (Europe)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+Will black screen on FMV anyway
+]]></notes>
 		<info name="serial" value="4130"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -13478,7 +13859,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="solfeacea" cloneof="solfeace">
+	<software name="solfeacea" cloneof="solfeace" supported="no">
 		<!-- source toseciso
 		<rom name="Sol-Feace (1993)(Sega)(PAL)[!][MK-4130P-00033 2].cue" size="2633" crc="11076960" />
 		<rom name="Sol-Feace (1993)(Sega)(PAL)(Track 01 of 18)[!][MK-4130P-00033 2].iso" size="5502976" crc="40b7f113" />
@@ -13503,6 +13884,10 @@ Requires [disc swap]
 		<description>Sol-Feace (Europe) [MK-4130P-00033 2]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+Will black screen on FMV anyway
+]]></notes>
 		<info name="serial" value="4130"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -13513,7 +13898,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="solfeaceb" cloneof="solfeace">
+	<software name="solfeaceb" cloneof="solfeace" supported="no">
 		<!-- source toseciso
 		<rom name="Sol-Feace (1993)(Sega)(PAL)[!][MK-4130P-00033-R1M].cue" size="2669" crc="938bbf26" />
 		<rom name="Sol-Feace (1993)(Sega)(PAL)(Track 01 of 18)[!][MK-4130P-00033-R1M].iso" size="5502976" crc="40b7f113" />
@@ -13538,6 +13923,10 @@ Requires [disc swap]
 		<description>Sol-Feace (Europe) [MK-4130P-00033-R1M]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+Will black screen on FMV anyway
+]]></notes>
 		<info name="serial" value="4130"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -13548,7 +13937,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="solfeacej" cloneof="solfeace">
+	<software name="solfeacej" cloneof="solfeace" supported="no">
 		<!-- http://redump.org/disc/3113/
 		<rom name="Sol-Feace (Japan).cue" size="2446" crc="e3bf68e3" />
 		<rom name="Sol-Feace (Japan) (Track 01).bin" size="4097184" crc="03c0bd53" />
@@ -13577,6 +13966,9 @@ Requires [disc swap]
 		<description>Sol-Feace (Japan)</description>
 		<year>1991</year>
 		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+]]></notes>
 		<info name="serial" value="T-32024"/>
 		<info name="release" value="19911212"/>
 		<info name="alt_title" value="ソル・フィース"/>
@@ -13590,7 +13982,7 @@ Requires [disc swap]
 	</software>
 
 	<!-- This game was only ever bundled together with a Sega-CD device. -->
-	<software name="solfeaceu" cloneof="solfeace">
+	<software name="solfeaceu" cloneof="solfeace" supported="no">
 		<!-- http://redump.org/disc/24480/
 		<rom name="Sol-Feace (USA) (RE2).cue" size="2093" crc="c5a409c6" md5="ffdcd949f1487eab3d8f4c8ce67da61e" sha1="db492dbb3499a4d617cc1c706d6c9c4400d51565"/>
 		<rom name="Sol-Feace (USA) (RE2) (Track 01).bin" size="6326880" crc="12d07dc0" md5="81b8e0b7d4ae4bf1c89c1c8afdef9a90" sha1="76425f2e2f8812da76beba73837a8f5f7a9b759e"/>
@@ -13615,6 +14007,10 @@ Requires [disc swap]
 		<description>Sol-Feace (USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+Will black screen on FMV anyway
+]]></notes>
 		<info name="release" value="19921015" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -14165,7 +14561,7 @@ Requires [disc swap]
 		<rom name="SoulStar (USA) (Track 16).bin" size="39080832" crc="b9f12444" md5="58d1b13d21520e0681e1b5a9a1b4a3ad" sha1="74a77a937c355afc01a103a5fd2f084f3d1e795e"/>
 		<rom name="SoulStar (USA) (Track 17).bin" size="2116800" crc="5f94801f" md5="0a9970a5df95362c07c685e41389f312" sha1="dba7e5eae9aa1e9f080b7e3e986cfc9c4bc1accd"/>
 		-->
-		<description>Soul Star (USA)</description>
+		<description>SoulStar (USA)</description>
 		<year>1994</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="T-115035"/>
@@ -14231,7 +14627,7 @@ Requires [disc swap]
 		<rom name="Amazing Spider-Man Vs. The Kingpin, The (Europe) (Track 12).bin" size="28717920" crc="e6bf1188" />
 		<rom name="Amazing Spider-Man Vs. The Kingpin, The (Europe) (Track 13).bin" size="7949760" crc="43a5fee0" />
 		-->
-		<description>The Amazing Spider-Man Vs. The Kingpin (Europe)</description>
+		<description>The Amazing Spider-Man vs. The Kingpin (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4412"/>
@@ -14399,7 +14795,7 @@ Requires [disc swap]
 		<rom name="StarBlade (1994)(Sega)(PAL)(Track 1 of 2)[!].iso" size="406351872" crc="cd983063" />
 		<rom name="StarBlade (1994)(Sega)(PAL)(Track 2 of 2)[!].wav" size="1528844" crc="d1c13a6a" />
 		-->
-		<description>StarBlade (Europe)</description>
+		<description>Starblade (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4284"/>
@@ -14438,7 +14834,7 @@ Requires [disc swap]
 		<rom name="Starblade (USA) (Track 1).bin" size="466669728" crc="1bc4b93f" md5="243ca56356fa83632a80b9e5d9f5ad74" sha1="3ea7411b78dce9c03beff78a450480d53b7127e3"/>
 		<rom name="Starblade (USA) (Track 2).bin" size="1528800" crc="9265e140" md5="745b11da19fa5137a007a990eec3515e" sha1="e6251cae47325e237b59a849b3513516a5b1f4ea"/>
 		-->
-		<description>StarBlade (USA)</description>
+		<description>Starblade (USA)</description>
 		<year>1994</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="T-14025"/>
@@ -14474,7 +14870,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="stellarf">
+	<software name="stellarf" supported="no">
 		<!-- http://redump.org/disc/3903/
 		<rom name="Stellar-Fire (USA).cue" size="2355" crc="a95a065f" />
 		<rom name="Stellar-Fire (USA) (Track 01).bin" size="99252048" crc="2e3ef2e4" />
@@ -14502,6 +14898,9 @@ Requires [disc swap]
 		<description>Stellar-Fire (USA)</description>
 		<year>1993</year>
 		<publisher>Dynamix</publisher>
+		<notes><![CDATA[
+Heavy graphic trails during gameplay
+]]></notes>
 		<info name="serial" value="T-110025"/>
 		<info name="release" value="199312xx" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14567,7 +14966,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="supremew">
+	<software name="supremew" supported="no">
 		<!-- source toseciso
 		<rom name="Supreme Warrior - Ying Heung (1994)(Digital Pictures)(PAL)(Disc 1 of 2)[!][Fire & Earth].cue" size="373" crc="ffe13a10" />
 		<rom name="Supreme Warrior - Ying Heung (1994)(Digital Pictures)(PAL)(Disc 1 of 2)(Track 1 of 2)[!][Fire & Earth].iso" size="428421120" crc="9bcc82f2" />
@@ -14580,6 +14979,9 @@ Requires [disc swap]
 		<description>Supreme Warrior - Ying Heung (Europe)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-162045-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom1" interface="cdrom">
@@ -14678,6 +15080,7 @@ Requires [disc swap]
 		<publisher>Digital Pictures</publisher>
 		<notes><![CDATA[
 Requires [disc swap]
+Changes language from English to Cantonese after losing a life
 ]]></notes>
 		<info name="serial" value="T-162045"/>
 		<info name="alt_title" value="Supreme Warrior - Ying Heung (Box)" />
@@ -14759,7 +15162,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		</part>
 	</software>
 
-	<software name="swchess">
+	<software name="swchess" supported="no">
 		<!-- source toseciso
 		<rom name="Software Toolworks' Star Wars Chess, The (1994)(Mindscape)(PAL)[!].cue" size="329" crc="18762ac0" />
 		<rom name="Software Toolworks' Star Wars Chess, The (1994)(Mindscape)(PAL)(Track 1 of 2)[!].iso" size="227407872" crc="07d08ba5" />
@@ -14768,6 +15171,9 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<description>The Software Toolworks' Star Wars Chess (Europe)</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
+		<notes><![CDATA[
+Can crash after battle animation
+]]></notes>
 		<info name="serial" value="T-158025-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -14777,7 +15183,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		</part>
 	</software>
 
-	<software name="swchessu" cloneof="swchess">
+	<software name="swchessu" cloneof="swchess" supported="no">
 		<!-- http://redump.org/disc/21448/
 		<rom name="Software Toolworks' Star Wars Chess, The (USA).cue" size="262" crc="eddd396f" md5="2c12f949441867e21c6dccb35b89358b" sha1="035cdc6ea08fa0a16cb356faea54951c8bcc6131"/>
 		<rom name="Software Toolworks' Star Wars Chess, The (USA) (Track 1).bin" size="261163728" crc="bea83946" md5="0f93cd21e33e1cd30a98bd6d7d080639" sha1="d8f5c2f22cb27b00efd5679a1a1c8cad799dc97d"/>
@@ -14786,6 +15192,9 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<description>The Software Toolworks' Star Wars Chess (USA)</description>
 		<year>1994</year>
 		<publisher>The Software Toolworks</publisher>
+		<notes><![CDATA[
+Can crash after battle animation
+]]></notes>
 		<info name="serial" value="T-87035"/>
 		<info name="release" value="199405xx" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -14796,7 +15205,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		</part>
 	</software>
 
-	<software name="switch">
+	<software name="switch" cloneof="panic" supported="partial">
 		<!-- http://redump.org/disc/2628/
 		<rom name="Switch (Japan).cue" size="4996" crc="78993adf" />
 		<rom name="Switch (Japan) (Track 01).bin" size="253884288" crc="09aceef5" />
@@ -14849,6 +15258,10 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<description>Switch (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+First part of intro FMV gets greyed out
+offset [redbook] in intro
+]]></notes>
 		<info name="serial" value="G-6009"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="スイッチ"/>
@@ -15126,7 +15539,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		</part>
 	</software>
 
-	<software name="tenbu">
+	<software name="tenbu" supported="no">
 		<!-- http://redump.org/disc/1994/
 		<rom name="Tenbu Mega CD Special (Japan).cue" size="1089" crc="79c8ab53" />
 		<rom name="Tenbu Mega CD Special (Japan) (Track 1).bin" size="216478080" crc="c4127fc0" />
@@ -15142,37 +15555,36 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<description>Tenbu Mega CD Special (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+Hangs after title
+]]></notes>
 		<info name="serial" value="T-32084"/>
 		<info name="release" value="19921225"/>
 		<info name="alt_title" value="天舞メガCDスペシャル"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<feature name="cd_matrix" value="T-32084P-00044-R1M V"/>
 			<diskarea name="cdrom">
 				<disk name="tenbu mega cd special (japan)" sha1="e973a5a3d51455b394eecccd99c7b62d407c1a82"/>
 			</diskarea>
 		</part>
-	</software>
-
-	<software name="tenbubonus" cloneof="tenbu">
-		<!-- source toseciso
-		<rom name="Tenbu Mega CD Special (1992)(Wolf Team)(NTSC)(Jp)[!][audio cd].cue" size="316" crc="6d4e8500" />
-		<rom name="Tenbu Mega CD Special (1992)(Wolf Team)(NTSC)(Jp)(Track 1 of 2)[!][audio cd].wav" size="39765308" crc="0a7b2e1e" />
-		<rom name="Tenbu Mega CD Special (1992)(Wolf Team)(NTSC)(Jp)(Track 2 of 2)[!][audio cd].wav" size="47239964" crc="d41f2e03" />
-		-->
-		<description>Tenbu Mega CD Special (Japan) [CD-Audio]</description>
-		<year>1992</year>
-		<publisher>Wolf Team</publisher>
-		<info name="serial" value="T-32084"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom2" interface="cdrom">
+			<!-- Mini CD with "Tenbu" and "Tenbu (Karaoke)" audio tracks -->
+			<!-- source toseciso
+			<rom name="Tenbu Mega CD Special (1992)(Wolf Team)(NTSC)(Jp)[!][audio cd].cue" size="316" crc="6d4e8500" />
+			<rom name="Tenbu Mega CD Special (1992)(Wolf Team)(NTSC)(Jp)(Track 1 of 2)[!][audio cd].wav" size="39765308" crc="0a7b2e1e" />
+			<rom name="Tenbu Mega CD Special (1992)(Wolf Team)(NTSC)(Jp)(Track 2 of 2)[!][audio cd].wav" size="47239964" crc="d41f2e03" />
+			-->
+			<feature name="cd_matrix" value="T-32084-B"/>
+			<feature name="part_id" value="Audio Mini CD"/>
 			<diskarea name="cdrom">
 				<disk name="tenbu mega cd special (1992)(wolf team)(jp)[tenbu mega cd special, t-32084][cd-audio]" sha1="816cfd9864245f68d1eec716d54d882b448f349f"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="tenkafub">
+	<software name="tenkafub" supported="partial">
 		<!-- http://redump.org/disc/1620/
 		<rom name="Tenkafubu - Eiyuutachi no Houkou (Japan).cue" size="2547" crc="0d10e057" />
 		<rom name="Tenkafubu - Eiyuutachi no Houkou (Japan) (Track 01).bin" size="120457680" crc="487c1c68" />
@@ -15198,6 +15610,9 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<description>Tenkafubu - Eiyuutachi no Houkou (Japan)</description>
 		<year>1991</year>
 		<publisher>Game Arts</publisher>
+		<notes><![CDATA[
+Cuts off Game Arts sample at intro FMV [redbook]
+]]></notes>
 		<info name="serial" value="T-45024"/>
 		<info name="release" value="19911228"/>
 		<info name="alt_title" value="天下布武 英雄たちの咆哮"/>
@@ -15264,7 +15679,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		</part>
 	</software>
 
-	<software name="thawk">
+	<software name="thawk" supported="no">
 		<!-- http://redump.org/disc/7218/
 		<rom name="Thunderhawk (Europe) (En,Fr,De,Es).cue" size="1530" crc="03b7f9a4" />
 		<rom name="Thunderhawk (Europe) (En,Fr,De,Es) (Track 01).bin" size="147500976" crc="1894660a" />
@@ -15283,6 +15698,9 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<description>Thunderhawk (Europe)</description>
 		<year>1993</year>
 		<publisher>Core Design</publisher>
+		<notes><![CDATA[
+Buggy ROZ drawing in minimap (raster effect?)
+]]></notes>
 		<info name="serial" value="T-115015-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -15293,7 +15711,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		</part>
 	</software>
 
-	<software name="thawka" cloneof="thawk">
+	<software name="thawka" cloneof="thawk" supported="no">
 		<!-- source toseciso
 		<rom name="Thunderhawk (1993)(Core)(PAL)(M4)[!][SEGAT115015RE R5C].cue" size="1841" crc="3b158641" />
 		<rom name="Thunderhawk (1993)(Core)(PAL)(M4)(Track 01 of 12)[!][SEGAT115015RE R5C].iso" size="128436224" crc="30d2752e" />
@@ -15312,6 +15730,9 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<description>Thunderhawk (Europe) [SEGAT115015RE R5C]</description>
 		<year>1993</year>
 		<publisher>Core Design</publisher>
+		<notes><![CDATA[
+Buggy ROZ drawing in minimap (raster effect?)
+]]></notes>
 		<info name="serial" value="T-115015-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -15322,7 +15743,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		</part>
 	</software>
 
-	<software name="thawkb" cloneof="thawk">
+	<software name="thawkb" cloneof="thawk" supported="no">
 		<!-- source toseciso
 		<rom name="Thunderhawk (1993)(Core)(PAL)(M4)[!][SEGAT115015RE R4C].cue" size="1841" crc="290582af" />
 		<rom name="Thunderhawk (1993)(Core)(PAL)(M4)(Track 01 of 12)[!][SEGAT115015RE R4C].iso" size="128436224" crc="30d2752e" />
@@ -15341,6 +15762,9 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<description>Thunderhawk (Europe) [SEGAT115015RE R4C]</description>
 		<year>1993</year>
 		<publisher>Core Design</publisher>
+		<notes><![CDATA[
+Buggy ROZ drawing in minimap (raster effect?)
+]]></notes>
 		<info name="serial" value="T-115015-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -15351,7 +15775,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		</part>
 	</software>
 
-	<software name="thawkd" cloneof="thawk">
+	<software name="thawkd" cloneof="thawk" supported="no">
 		<!-- Unknown source
 		<rom name="Thunderhawk (demo) (1993)(Core)(PAL)(M4)[!][Mega Power - Issue 04].cue" size="746" crc="75c2a149" />
 		<rom name="Thunderhawk (demo) (1993)(Core)(PAL)(M4)(Track 1 of 5)[!][Mega Power - Issue 04].iso" size="12961792" crc="82b72ba5" />
@@ -15363,6 +15787,9 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<description>Thunderhawk (Europe, demo) [Mega Power - issue 04]</description>
 		<year>1993</year>
 		<publisher>Core</publisher>
+		<notes><![CDATA[
+Buggy ROZ drawing in minimap (raster effect?)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -15371,7 +15798,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		</part>
 	</software>
 
-	<software name="thawkda" cloneof="thawk">
+	<software name="thawkda" cloneof="thawk" supported="no">
 		<!-- Unknown source
 		<rom name="Thunderhawk (demo) (1993)(Core)(PAL)[!].cue" size="499" crc="7e69a3a3" />
 		<rom name="Thunderhawk (demo) (1993)(Core)(PAL)(Track 1 of 4)[!].iso" size="24791040" crc="dc6c148e" />
@@ -15382,6 +15809,9 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<description>Thunderhawk (Europe, demo)</description>
 		<year>1993</year>
 		<publisher>Core</publisher>
+		<notes><![CDATA[
+Buggy ROZ drawing in minimap (raster effect?)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -15390,7 +15820,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		</part>
 	</software>
 
-	<software name="thawkj" cloneof="thawk">
+	<software name="thawkj" cloneof="thawk" supported="no">
 		<!-- http://redump.org/disc/15427/
 		<rom name="Thunderhawk (Japan).cue" size="1236" crc="f4ae0600" />
 		<rom name="Thunderhawk (Japan) (Track 01).bin" size="104504064" crc="590bda55" />
@@ -15408,6 +15838,9 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<description>Thunderhawk (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
+		<notes><![CDATA[
+Buggy ROZ drawing in minimap (raster effect?)
+]]></notes>
 		<info name="serial" value="T-60134"/>
 		<info name="release" value="19930917"/>
 		<info name="alt_title" value="サンダーホーク"/>
@@ -15420,7 +15853,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		</part>
 	</software>
 
-	<software name="thawkjdemo" cloneof="thawk">
+	<software name="thawkjdemo" cloneof="thawk" supported="no">
 		<!-- http://redump.org/disc/42759/
 		<rom name="Thunderhawk (Japan) (Demo).cue" size="365" crc="9a4d410f" />
 		<rom name="Thunderhawk (Japan) (Demo) (Track 1).bin" size="23204832" crc="be4dae9e" />
@@ -15430,6 +15863,9 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<description>Thunderhawk Hibaihin (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
+		<notes><![CDATA[
+Buggy ROZ drawing in minimap (raster effect?)
+]]></notes>
 		<info name="serial" value="CDS-10002"/>
 		<info name="alt_title" value="サンダーホーク 非売品"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -15482,14 +15918,15 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		</part>
 	</software>
 
+	<!-- https://segaretro.org/Timecop -->
 	<software name="timecop">
 		<!-- Unknown source
 		<rom name="Time Cop (PAL, Beta, Complete).cue" size="606" crc="7677dfb6" />
 		<rom name="Time Cop (PAL, Beta, Complete).bin" size="201693408" crc="8b53e357" />
 		-->
-		<description>Time Cop (Europe, prototype)</description>
+		<description>Timecop (Europe, prototype)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>JVC Musical Industries</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -15504,9 +15941,9 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<rom name="Sega Pro CD - Issue 45 (1995)(Paragon Publishing)(PAL)(GB)(Track 1 of 2)[!][demo - TimeCop].iso" size="4452352" crc="e20df99b" />
 		<rom name="Sega Pro CD - Issue 45 (1995)(Paragon Publishing)(PAL)(GB)(Track 2 of 2)[!][demo - TimeCop].wav" size="12740828" crc="c84ee4bc" />
 		-->
-		<description>TimeCop (Europe, demo) [Sega Pro CD - issue 45]</description>
+		<description>Timecop (Europe, demo) [Sega Pro CD - issue 45]</description>
 		<year>1995</year>
-		<publisher>JVC</publisher>
+		<publisher>JVC Musical Industries</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -15516,7 +15953,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 	</software>
 
 	<software name="timecope" cloneof="timecop">
-		<description>Time Cop (Europe, early prototype)</description>
+		<description>Timecop (Europe, early prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -15564,7 +16001,7 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		</part>
 	</software>
 
-	<software name="timegal">
+	<software name="timegal" supported="no">
 		<!-- http://redump.org/disc/7848/
 		<rom name="Time Gal (Europe).cue" size="204" crc="70dba7fd" />
 		<rom name="Time Gal (Europe) (Track 1).bin" size="298936848" crc="d59965e8" />
@@ -15573,6 +16010,9 @@ Requires [32X] add-on, game asks you to plug it in if not present
 		<description>Time Gal (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="4417"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -15607,7 +16047,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="timegalu" cloneof="timegal">
+	<software name="timegalu" cloneof="timegal" supported="no">
 		<!-- http://redump.org/disc/625/
 		<rom name="Time Gal (USA).cue" size="198" crc="27b9ee28" />
 		<rom name="Time Gal (USA) (Track 1).bin" size="298936848" crc="2941c00f" />
@@ -15616,6 +16056,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Time Gal (USA)</description>
 		<year>1993</year>
 		<publisher>Renovation</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="T-6214"/>
 		<info name="release" value="199305xx" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -15646,7 +16089,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="tstormfx">
+	<software name="tstormfx" cloneof="cobracom" supported="no">
 		<!-- http://redump.org/disc/1995/
 		<rom name="Thunder Storm FX (Japan).cue" size="218" crc="aa9ff0ed" />
 		<rom name="Thunder Storm FX (Japan) (Track 1).bin" size="259446768" crc="5512fd9c" />
@@ -15655,6 +16098,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Thunder Storm FX (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+Black screen, requires sub CPU to be overclocked by 1.5x (likely)
+]]></notes>
 		<info name="serial" value="T-32064"/>
 		<info name="release" value="19920828"/>
 		<info name="alt_title" value="サンダーストームFX"/>
@@ -15667,16 +16114,20 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<!-- one of these probably matches the redmup dump -->
-	<software name="tstormfxa" cloneof="tstormfx">
+	<!-- one of these probably matches the redump dump -->
+	<software name="tstormfxa" cloneof="cobracom" supported="no">
 		<!-- source toseciso
 		<rom name="Thunder Storm FX (1992)(Wolf Team)(NTSC)(JP)(en)[!][T32064P-00022-R1M].cue" size="337" crc="f1ebb25c" />
 		<rom name="Thunder Storm FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 1 of 2)[!][T32064P-00022-R1M].iso" size="225912832" crc="70370315" />
 		<rom name="Thunder Storm FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 2 of 2)[!][T32064P-00022-R1M].wav" size="1300700" crc="39b15913" />
 		-->
 		<description>Thunder Storm FX (Japan, R1)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
+		<year>1992</year>
+		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+Black screen, requires sub CPU to be overclocked by 1.5x (likely)
+]]></notes>
 		<info name="serial" value="T-32064"/>
 		<info name="release" value="19920828"/>
 		<info name="alt_title" value="サンダーストームFX"/>
@@ -15689,7 +16140,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="tstormfxb" cloneof="tstormfx">
+	<software name="tstormfxb" cloneof="cobracom" supported="no">
 		<!-- source toseciso
 		<rom name="Thunder Storm FX (1992)(Wolf Team)(NTSC)(JP)(en)[!][T32064P-00022-R2M].cue" size="337" crc="94a23b1f" />
 		<rom name="Thunder Storm FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 1 of 2)[!][T32064P-00022-R2M].iso" size="225912832" crc="70370315" />
@@ -15698,6 +16149,10 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Thunder Storm FX (Japan, R2)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+Black screen, requires sub CPU to be overclocked by 1.5x (likely)
+]]></notes>
 		<info name="serial" value="T-32064"/>
 		<info name="release" value="19920828"/>
 		<info name="alt_title" value="サンダーストームFX"/>
@@ -15710,7 +16165,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="uruseiya">
+	<software name="uruseiya" supported="partial">
 		<!-- http://redump.org/disc/3157/
 		<rom name="Urusei Yatsura - Dear My Friends (Japan).cue" size="384" crc="6947c2fa" />
 		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Track 1).bin" size="383653536" crc="187ce23e" />
@@ -15720,6 +16175,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Urusei Yatsura - Dear My Friends (Japan)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
+		<notes><![CDATA[
+Hangs at Game Arts copyright screen if optional [mouse] is connected
+]]></notes>
 		<info name="serial" value="T-45064"/>
 		<info name="release" value="19940415"/>
 		<info name="alt_title" value="うる星やつら ディア マイ フレンズ"/>
@@ -15940,7 +16398,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="whoshot">
+	<software name="whoshot" supported="partial">
 		<!-- http://redump.org/disc/3303/
 		<rom name="Who Shot Johnny Rock (USA).cue" size="222" crc="b288f6df" />
 		<rom name="Who Shot Johnny Rock (USA) (Track 1).bin" size="248963904" crc="704bb4ba" />
@@ -15949,7 +16407,11 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Who Shot Johnny Rock? (USA)</description>
 		<year>1994</year>
 		<publisher>American Laser Games</publisher>
+		<notes><![CDATA[
+Optional [Menacer] or [Justifier] support
+]]></notes>
 		<info name="serial" value="T-111045"/>
+		<info name="usage" value="Supports -ctrl2 mouseus"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="SEGAT111045 R1H MFD BY JVC"/>
@@ -16075,7 +16537,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="winpost">
+	<software name="winpost" supported="partial">
 		<!-- http://redump.org/disc/1637/
 		<rom name="Winning Post (Japan).cue" size="2167" crc="0a09b085" />
 		<rom name="Winning Post (Japan) (Track 01).bin" size="10252368" crc="db23bafd" />
@@ -16101,6 +16563,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Winning Post (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Cannot save without a [SRAM cart] (621 blocks!)
+]]></notes>
 		<info name="serial" value="T-76044"/>
 		<info name="release" value="19930917"/>
 		<info name="alt_title" value="ウイニングポスト"/>
@@ -16159,7 +16624,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 	</software>
 
 	<software name="wmcol">
-		<description>WonderMega Collection - Game Garden [MP3-sourced]</description>
+		<description>WonderMega Collection - Game Garden (Japan)</description>
 		<year>19??</year>
 		<publisher>Victor Entertainment</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -16209,7 +16674,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 34).bin" size="5738880" crc="92ee9a3c" />
 		<rom name="WonderMega Collection (Japan) (Rev 2) (Track 35).bin" size="3154032" crc="b70def8c" />
 		-->
-		<description>WonderMega Collection - Game Garden (alt)</description>
+		<description>WonderMega Collection - Game Garden (Japan, alt)</description>
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="CDS-135"/>
@@ -16472,30 +16937,11 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 -->
 
 	<!--
-	This is strictly not a Sega CD, but an Audio CD bundled together with the Sega CD hardware.
-	It's listed here until it can be properly sorted.
-	-->
-	<software name="hothits">
-		<!-- Source: TOSEC-ISO -->
-		<description>Hot Hits - Adventurous New Music Sampler (USA)</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="MK-4129 / OPCD-1630"/>
-		<info name="release" value="19921015" />
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="hot hits - adventurous new music sampler (usa)" sha1="0a83a39a37faf3f7338d7926ac3e22471319a433"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!--
 	This is strictly not a Sega CD, but an Audio CD bundled together with the JVC X'Eye hardware.
 	It's listed here until it can be properly sorted. It's marked as a bad dump because chdman
 	currently can not handle the CD+G properties of the disc.
 	-->
-	<software name="karaoke">
+	<software name="karaoke" supported="no">
 		<!-- Source: TruRip
 		<rom name="Media (CD-ROM)\Karaoke CD G (Bundled with JVC X&apos;Eye RG-M10BU) (1993)(Sega)(US) - [Audio].ccd" size="1561" crc="41c1be6f" md5="7d2415cbf196df0a213f8472a8706d54" sha1="6565b50431b5cb58f766982c7b27c90ec0c6547a"/>
 		<rom name="Media (CD-ROM)\Karaoke CD G (Bundled with JVC X&apos;Eye RG-M10BU) (1993)(Sega)(US) - [Audio].img" size="267269520" crc="68bcd928" md5="2cf5f893b50e29cd304555f43e05f2de" sha1="4e2c95692a880365c1c4303bbae9d0c2f75a2b19"/>
@@ -16504,6 +16950,9 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Karaoke - JVC CD+G Karaoke - Top Hit Sampler (USA)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
+		<notes><![CDATA[
+CD+G support missing
+]]></notes>
 		<info name="serial" value="ACDG-GP1"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -16513,27 +16962,40 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
+	<!-- https://segaretro.org/Rock_Paintings/Hot_Hits -->
 	<!--
 	This is strictly not a Sega CD, but an Audio CD bundled together with the Sega-CD hardware.
 	It's listed here until it can be properly sorted. It's marked as a bad dump because chdman
 	currently can not handle the CD+G properties of the disc.
 	-->
-	<software name="rockpint">
+	<software name="rockpint" supported="partial">
 		<!-- Source: TruRip
 		<rom name="Media (CD-ROM)\Rock Paintings - CD G Sampler &amp; Hot Hits - Adventurous New Music Sampler (Double Pack) (1992)(Sega of America)(US) - (Disc 1 of 2) [Rock Paintings - CD+G Sampler][Audio].ccd" size="2967" crc="76c7834b" md5="f58abbf361f5647fe5e611629de8218b" sha1="55c99aad214768bbdf64e71bb108c8cdca6fd182"/>
 		<rom name="Media (CD-ROM)\Rock Paintings - CD G Sampler &amp; Hot Hits - Adventurous New Music Sampler (Double Pack) (1992)(Sega of America)(US) - (Disc 1 of 2) [Rock Paintings - CD+G Sampler][Audio].img" size="428964816" crc="84ff7c4b" md5="ce772878abd6b77536b71c73874d792b" sha1="0096c569810afb6b4a5fc3f90486c7ebc3edd254"/>
 		<rom name="Media (CD-ROM)\Rock Paintings - CD G Sampler &amp; Hot Hits - Adventurous New Music Sampler (Double Pack) (1992)(Sega of America)(US) - (Disc 1 of 2) [Rock Paintings - CD+G Sampler][Audio].sub" size="17508768" crc="f27504d8" md5="6a63cdc2326efa24d432016dd4aaeb7a" sha1="6dcee30867677bb8e4f6bbebca71d20a5ff3ea85"/>
 		-->
-		<description>Rock Paintings (USA)</description>
+		<description>Rock Paintings / Hot Hits: Adventurous New Music Sampler (USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="MK-4128 / WCM-9201"/>
+		<notes><![CDATA[
+Rock Paintings: CD+G support missing
+]]></notes>
+		<!-- TODO: WCM is for CD+G, OPCD for audio CD -->
+		<info name="serial" value="MK-4128 / WCM-9201 / OPCD-1630"/>
 		<info name="release" value="19921015" />
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Rock Paintings"/>
 			<diskarea name="cdrom">
 				<disk name="rock paintings (usa)" sha1="614f3f8e89e4b91923ff69719c38baef679f8e8d" status="baddump" />
 			</diskarea>
 		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- NOTE: no "Hot Hits" on CD front -->
+			<feature name="part_id" value="Adventurous New Music"/>
+			<diskarea name="cdrom">
+				<disk name="hot hits - adventurous new music sampler (usa)" sha1="0a83a39a37faf3f7338d7926ac3e22471319a433"/>
+			</diskarea>
+		</part>
 	</software>
+
 </softwarelist>
