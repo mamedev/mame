@@ -112,19 +112,19 @@ void audio_effect_eq::config_load(util::xml::data_node const *ef_node)
 		reset_high_shelf();
 
 	for(u32 band = 0; band != BANDS; band++) {
-		if(ef_node->has_attribute(util::string_format("f%d", band+1).c_str())) {
+		if(ef_node->has_attribute(util::string_format("f%d", band+1))) {
 			m_f[band] = ef_node->get_attribute_int(util::string_format("f%d", band+1), 0);
 			m_isset_f[band] = true;
 		} else
 			reset_f(band);
 
-		if(ef_node->has_attribute(util::string_format("q%d", band+1).c_str())) {
+		if(ef_node->has_attribute(util::string_format("q%d", band+1))) {
 			m_q[band] = ef_node->get_attribute_float(util::string_format("q%d", band+1), 0);
 			m_isset_q[band] = true;
 		} else
 			reset_q(band);
 
-		if(ef_node->has_attribute(util::string_format("db%d", band+1).c_str())) {
+		if(ef_node->has_attribute(util::string_format("db%d", band+1))) {
 			m_db[band] = ef_node->get_attribute_float(util::string_format("db%d", band+1), 0);
 			m_isset_db[band] = true;
 		} else
