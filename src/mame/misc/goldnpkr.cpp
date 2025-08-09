@@ -13929,13 +13929,41 @@ ROM_START( gp_ped42_70 )
 ROM_END
 
 /*
-  DEP 9801 3 encrypted platform.
+  DEP 9801 M encrypted platform.
 
-  Rockwell unknown CPU.
-  Unknown DIL40 IC.
-  Two 32k GFX ROMS
-  4 GFX banks shuffled inside.
-  Encrypted program ROM.
+  1x R6502P
+  2x MC68B21 PIAs
+  1x MC6845P CRTC
+  1x 27C256 (program ROM)
+  2x 27C256 (graphics ROM)
+  1x MB7116 Bipolar PROM
+  1x Unknown DIL40 IC...
+  3x DIP switches banks
+
+  Unknown IC partial pinout:
+
+                     .-----\ /-----.
+                   --|01         40|-- VCC
+    DSW #1 (input) --|02         39|--
+    DSW #2 (input) --|03         38|-- BUS A14
+    DSW #3 (input) --|04         37|-- BUS A13
+    DSW #4 (input) --|05         36|-- BUS A12
+            BUS D7 --|06         35|-- BUS A11
+            BUS D5 --|07         34|-- BUS A10
+            BUS D3 --|08         33|-- BUS A9
+            BUS D2 --|09         32|-- BUS A8
+                   --|10         31|--
+                   --|11         30|--
+                   --|12         29|--
+                   --|13         28|--
+                   --|14         27|--
+                   --|15         26|--
+                   --|16         25|-- BUS A6
+                   --|17         24|-- BUS A2
+  6502 IRQ --- PAL --|18         23|-- BUS A1
+  6845 CLK ----------|19         22|-- BUS A0
+               GND --|20         21|--
+                     '-------------'
 
   Sets:
   
