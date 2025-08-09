@@ -79,7 +79,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	[[maybe_unused]] void cpu_map(address_map &map) ATTR_COLD;
+	void cpu_map(address_map &map) ATTR_COLD;
 	void iop_map(address_map &map) ATTR_COLD;
 	void iop_vector_map(address_map &map) ATTR_COLD;
 
@@ -135,8 +135,18 @@ protected:
 	void ipenixp_w(offs_t offset, u8 data); // IPENICP/IPENIHP
 	void ipclixp_w(offs_t offset, u8 data);	// IPCLICP/IPCLIHP
 
-
 	void timer(s32 param);
+
+	// CPU platform hardware
+	u32 cpstat_r();
+	u32 wrbeadr_r();
+	void cpenipty_w(u32 data);
+	void cpenitmr_w(u32 data);
+	void cpintxp_w(offs_t offset, u32 data);
+	void mapvec_w(u32 data);
+	void cpenihp_w(offs_t offset, u32 data);
+	void cpclixp_w(offs_t offset, u32 data);
+	void cpuled_w(offs_t offset, u32 data);
 
 	// devices
 	required_device<r3000a_device> m_cpu;
@@ -210,6 +220,25 @@ void news_38xx_state::init_common()
 
 void news_38xx_state::cpu_map(address_map &map)
 {
+	map.global_mask(0x1fffffff); // A28-A0 are connected
+
+	// 0x00000000 - 0x07ffffff: RAM
+	// 0x08000000 - 0x0fffffff: RAM test and set
+	// 0x10000000 - 0x17ffffff: UBUS I/O
+	// 0x18000000 - 0x1fffffff: CPU Port
+
+	// All registers below this line are 32 bit registers, LSB 1 = Set, 0 = Reset
+	// All are reset on CPURESET (todo: check schematic)
+	// TODO: mirror writes only to satisfy 0x18xxxx00 mapping
+	map(0x18000000, 0x18000003).r(FUNC(news_38xx_state::cpstat_r));
+	map(0x18000000, 0x18000003).w(FUNC(news_38xx_state::cpenipty_w));
+	map(0x18000004, 0x18000007).w(FUNC(news_38xx_state::cpenitmr_w)); // todo: check schematic to see if same timer as IOP or not
+	map(0x18000020, 0x18000027).w(FUNC(news_38xx_state::cpintxp_w));
+	map(0x18000040, 0x18000043).w(FUNC(news_38xx_state::mapvec_w));
+	map(0x18000044, 0x18000047).w(FUNC(news_38xx_state::cpenihp_w));
+	map(0x18000060, 0x18000067).w(FUNC(news_38xx_state::cpclixp_w));
+	map(0x18000080, 0x18000087).w(FUNC(news_38xx_state::cpuled_w));
+	map(0x1c000000, 0x1c000003).r(FUNC(news_38xx_state::wrbeadr_r));
 }
 
 void news_38xx_state::iop_map(address_map &map)
@@ -243,9 +272,9 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x24000000, 0x24000007).m(m_fdc, FUNC(n82077aa_device::map));
 	map(0x24000105, 0x24000105).rw(m_fdc, FUNC(n82077aa_device::dma_r), FUNC(n82077aa_device::dma_w));
 
-	// 0x26040000 // centronics data
-	// 0x26040001 centronics strobe
-	// 0x26040002 centronics IRQ clear
+	// 0x26040000 // Centronics data
+	// 0x26040001 Centronics strobe
+	// 0x26040002 Centronics IRQ clear
 	map(0x26040003, 0x26040003).lw8([this](u8 data) { m_inten |= 0x02; }, "cie_w");
 
 	map(0x26080000, 0x26080007).m(m_scsi[0], FUNC(cxd1180_device::map));
@@ -387,6 +416,7 @@ void news_38xx_state::xpustart_w(offs_t offset, u8 data)
 	// offset 1 = start running UPU (UBUS bus master, expansion slot A?)
 	LOG("%cPUSTART = 0x%x\n", !offset ? 'C' : 'H', data);
 	if (!offset) {
+		// TODO: reset CPU platform registers here?
 		m_cpu->set_input_line(INPUT_LINE_HALT, data ? 0 : 1);
 	} else {
 		if (data) fatalerror("Tried to start UPU without UPU installed!");
@@ -412,6 +442,59 @@ void news_38xx_state::ipclixp_w(offs_t offset, u8 data)
 	// offset 0 = Clear level 4 IRQ from CPU
 	// offset 1 = Clear level 4 IRQ from UPU
 	LOG("IPCLI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
+}
+
+u32 news_38xx_state::cpstat_r()
+{
+	LOG("CPSTAT read 0x%x\n"); // CPU status
+	return 0;
+}
+
+u32 news_38xx_state::wrbeadr_r()
+{
+	LOG("WRBEADR read 0x%x\n"); // Write bus error address
+	return 0;
+}
+
+void news_38xx_state::cpenipty_w(u32 data)
+{
+	LOG("CPENIPTY = 0x%x\n", data); // parity error irq enable
+}
+
+void news_38xx_state::cpenitmr_w(u32 data)
+{
+	LOG("CPENITMR = 0x%x\n", data); // 100Hz timer irq enable
+}
+
+void news_38xx_state::cpintxp_w(offs_t offset, u32 data)
+{
+	// 0x18xxxx20: CPINTIP (Send IRQ to IOP)
+	// 0x18xxxx24: CPINTHP (Send IRQ to UPU)
+	LOG("CPINT%cP = 0x%x\n", !offset ? 'I' : 'H', data);
+}
+
+void news_38xx_state::mapvec_w(u32 data)
+{
+	LOG("MAPVEC = 0x%x\n", data); // 1 = normal operation, 0 = map reset vector 0x1fc00000 to 0x00c00000 in RAM
+}
+
+void news_38xx_state::cpenihp_w(offs_t offset, u32 data)
+{
+	LOG("CPENIHP = 0x%x\n", data); // 1 = enable interrupt from UPU, 0 = disable but not clear
+}
+
+void news_38xx_state::cpclixp_w(offs_t offset, u32 data)
+{
+	// 0x18xxxx60: CPCLIIP (clear interrupt from IOP)
+	// 0x18xxxx64: CPCLIHP (clear interrupt from UPU)
+	LOG("CPCLI%cP = 0x%x\n", !offset ? 'I' : 'H', data);
+}
+
+void news_38xx_state::cpuled_w(offs_t offset, u32 data)
+{
+	// 0x18xxxx80: CPULED0
+	// 0x18xxxx84: CPULED1
+	LOG("CPULED%01d = 0x%x\n", offset, data);
 }
 
 void news_scsi_devices(device_slot_interface &device)
