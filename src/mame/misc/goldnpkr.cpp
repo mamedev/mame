@@ -13350,10 +13350,30 @@ ROM_END
 
 /*
   The following are programs that fit
-  the ICP + f80 system. Most of them
-  looks like hacks to change functionality.
+  the ICP + f40 / f80 systems. Some of them
+  looks like hacks and some real programs
+  to change different game functionalities.
 
 */  
+
+ROM_START( icpf40_01 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "137_7_10b_sub.bin",   0x6000, 0x1000, CRC(698a04c1) SHA1(f3e3cfef5ef3d517b2c1550c85d0be09f1fa17b1) )
+	ROM_LOAD( "137_8_10b_sub.bin",   0x7000, 0x1000, CRC(d5c43fce) SHA1(6797d9cd485791dba8be0d2136b6f713f9e2908e) )
+	ROM_LOAD( "137fv_10yen_f40.bin", 0xf000, 0x1000, CRC(17974f36) SHA1(14f4780977fd35d0dafc204b9e4408aefe0cc8e1) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "34.8a", 0x2000, 0x1000, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1", 0x2800, 0x1000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "137_82s131_bprom.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+ROM_END
 
 ROM_START( icpf80_01 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -14879,6 +14899,7 @@ GAME(  198?, unkicpf40, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_in
 GAME(  198?, unkicpf80, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F80 poker (137 Fever, 50 bet)",       0 )
 GAME(  198?, unkicpetg, 0,        unkicpf40, unkicpetg, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP EX-Turbo-GT poker",                   0 )
 
+GAME(  198?, icpf40_01, unkicpf40, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F40 poker (137fv_10yen_f40, autostart)", 0 )
 GAME(  198?, icpf80_01, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_50_100)",              0 )
 GAME(  198?, icpf80_02, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9.bin)",               0 )
 GAME(  198?, icpf80_03, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_0jap)",              0 )
