@@ -458,6 +458,10 @@
 ***********************************************************************************
 
 
+  [2025/08/08]
+
+  - Added dump for Fruit Poker (V.Swe 1.74) (AMA-8000-2).
+
   [2012/08/15]
 
   - Added dynamic length to the color PROMs decode routines based on ROM region length.
@@ -500,6 +504,8 @@
   - Color decode routines.
   - Remaining sound devices.
   - Hopper as device... ;)
+  - Fruit Poker: Isn't hooked up correctly and decryption is not figured out yet. 
+      Doesn't seem to boot. Stuck at grey screen.
 
 
 ***********************************************************************************/
@@ -1092,15 +1098,15 @@ ROM_START( fpoker )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
-	ROM_LOAD( "F.Poker VSwe 1 74_O_8312.i6", 0x00000, 0x40000, CRC(c8c175d6) SHA1(60fb6d1c02bfb6055d1fc4b5b4608ddd1fd59e81) )
+	ROM_LOAD( "f.poker_vswe_1.74-o-8312.i6", 0x00000, 0x40000, CRC(c8c175d6) SHA1(60fb6d1c02bfb6055d1fc4b5b4608ddd1fd59e81) )
 
 	ROM_REGION( 0x180000, "chars", 0 )
-	ROM_LOAD( "F.Poker VSwe ZG 1.i17", 0x100000, 0x80000, CRC(c1c64e76) SHA1(58b12ab68953f55021482be5be74883591ae0dc2) )
-	ROM_LOAD( "F.Poker VSwe ZG 2.i18", 0x080000, 0x80000, CRC(12193406) SHA1(dc73c610c35520b8e404e6988e816d83babed7d7) )
-	ROM_LOAD( "F.Poker VSwe ZG 3.i33", 0x000000, 0x80000, CRC(1983dc06) SHA1(3b72058491ef93bc0d5e37a573132e11fcc753ec) )
+	ROM_LOAD( "f.poker_vswe_zg_1.i17", 0x100000, 0x80000, CRC(c1c64e76) SHA1(58b12ab68953f55021482be5be74883591ae0dc2) )
+	ROM_LOAD( "f.poker_vswe_zg_2.i18", 0x080000, 0x80000, CRC(12193406) SHA1(dc73c610c35520b8e404e6988e816d83babed7d7) )
+	ROM_LOAD( "f.poker_vswe_zg_3.i33", 0x000000, 0x80000, CRC(1983dc06) SHA1(3b72058491ef93bc0d5e37a573132e11fcc753ec) )
 
 	ROM_REGION( 0x20000, "proms", 0 )
-	ROM_LOAD( "IV.i35", 0x00000, 0x20000, CRC(9769e278) SHA1(519078db2e0405e641d66410b42fa5ccd8521c53) )
+	ROM_LOAD( "iv.i35", 0x00000, 0x20000, CRC(9769e278) SHA1(519078db2e0405e641d66410b42fa5ccd8521c53) )
 ROM_END
 
 
@@ -1453,7 +1459,7 @@ void amaticmg_state::init_am_mg5hu()
 
 /*     YEAR  NAME      PARENT    MACHINE    INPUT     STATE           INIT              ROT    COMPANY                FULLNAME                        FLAGS                                                                                                                       LAYOUT */
 GAMEL( 1996, suprstar, 0,        amaticmg,  amaticmg, amaticmg_state, init_ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING,                                                                              layout_suprstar )
-GAME(  2004, fpoker,   0,        amaticmg4, amaticmg, amaticmg_state, init_ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Fruit Poker (V.Swe 1.74)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2004, fpoker,   0,        amaticmg4, amaticmg, amaticmg_state, init_ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Fruit Poker (V.Swe 1.74)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg24,  0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg24a, 0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_1_x, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Stm 2.7)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg3,   0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
