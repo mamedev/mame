@@ -86,38 +86,40 @@ void audio_effect_filter::reset_all()
 
 void audio_effect_filter::config_load(util::xml::data_node const *ef_node)
 {
-	if(ef_node->has_attribute("lowpass_active")) {
-		m_lowpass_active = ef_node->get_attribute_int("lowpass_active", 0);
+	using namespace std::literals;
+
+	if(ef_node->has_attribute("lowpass_active"sv)) {
+		m_lowpass_active = ef_node->get_attribute_int("lowpass_active"sv, 0);
 		m_isset_lowpass_active = true;
 	} else
 		reset_lowpass_active();
 
-	if(ef_node->has_attribute("fl")) {
-		m_fl = ef_node->get_attribute_int("fl", 0);
+	if(ef_node->has_attribute("fl"sv)) {
+		m_fl = ef_node->get_attribute_int("fl"sv, 0);
 		m_isset_fl = true;
 	} else
 		reset_fl();
 
-	if(ef_node->has_attribute("ql")) {
-		m_ql = ef_node->get_attribute_float("ql", 0);
+	if(ef_node->has_attribute("ql"sv)) {
+		m_ql = ef_node->get_attribute_float("ql"sv, 0);
 		m_isset_ql = true;
 	} else
 		reset_ql();
 
-	if(ef_node->has_attribute("highpass_active")) {
-		m_highpass_active = ef_node->get_attribute_int("highpass_active", 0);
+	if(ef_node->has_attribute("highpass_active"sv)) {
+		m_highpass_active = ef_node->get_attribute_int("highpass_active"sv, 0);
 		m_isset_highpass_active = true;
 	} else
 		reset_highpass_active();
 
-	if(ef_node->has_attribute("fh")) {
-		m_fh = ef_node->get_attribute_int("fh", 0);
+	if(ef_node->has_attribute("fh"sv)) {
+		m_fh = ef_node->get_attribute_int("fh"sv, 0);
 		m_isset_fh = true;
 	} else
 		reset_fh();
 
-	if(ef_node->has_attribute("qh")) {
-		m_qh = ef_node->get_attribute_float("qh", 0);
+	if(ef_node->has_attribute("qh"sv)) {
+		m_qh = ef_node->get_attribute_float("qh"sv, 0);
 		m_isset_qh = true;
 	} else
 		reset_qh();
@@ -128,18 +130,20 @@ void audio_effect_filter::config_load(util::xml::data_node const *ef_node)
 
 void audio_effect_filter::config_save(util::xml::data_node *ef_node) const
 {
+	using namespace std::literals;
+
 	if(m_isset_lowpass_active)
-		ef_node->set_attribute_int("lowpass_active", m_lowpass_active);
+		ef_node->set_attribute_int("lowpass_active"sv, m_lowpass_active);
 	if(m_isset_fl)
-		ef_node->set_attribute_int("fl", m_fl);
+		ef_node->set_attribute_int("fl"sv, m_fl);
 	if(m_isset_ql)
-		ef_node->set_attribute_float("ql", m_ql);
+		ef_node->set_attribute_float("ql"sv, m_ql);
 	if(m_isset_highpass_active)
-		ef_node->set_attribute_int("highpass_active", m_highpass_active);
+		ef_node->set_attribute_int("highpass_active"sv, m_highpass_active);
 	if(m_isset_fh)
-		ef_node->set_attribute_int("fh", m_fh);
+		ef_node->set_attribute_int("fh"sv, m_fh);
 	if(m_isset_qh)
-		ef_node->set_attribute_float("qh", m_qh);
+		ef_node->set_attribute_float("qh"sv, m_qh);
 }
 
 void audio_effect_filter::default_changed()

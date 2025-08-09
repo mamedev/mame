@@ -21,80 +21,82 @@ audio_effect_compressor::audio_effect_compressor(speaker_device *speaker, u32 sa
 
 void audio_effect_compressor::config_load(util::xml::data_node const *ef_node)
 {
-	if(ef_node->has_attribute("mode")) {
-		m_mode = ef_node->get_attribute_int("mode", 0);
+	using namespace std::literals;
+
+	if(ef_node->has_attribute("mode"sv)) {
+		m_mode = ef_node->get_attribute_int("mode"sv, 0);
 		m_isset_mode = true;
 	} else
 		reset_mode();
 
-	if(ef_node->has_attribute("attack")) {
-		m_attack = ef_node->get_attribute_float("attack", 0);
+	if(ef_node->has_attribute("attack"sv)) {
+		m_attack = ef_node->get_attribute_float("attack"sv, 0);
 		m_isset_attack = true;
 	} else
 		reset_attack();
 
-	if(ef_node->has_attribute("release")) {
-		m_release = ef_node->get_attribute_float("release", 0);
+	if(ef_node->has_attribute("release"sv)) {
+		m_release = ef_node->get_attribute_float("release"sv, 0);
 		m_isset_release = true;
 	} else
 		reset_release();
 
-	if(ef_node->has_attribute("ratio")) {
-		m_ratio = ef_node->get_attribute_float("ratio", 0);
+	if(ef_node->has_attribute("ratio"sv)) {
+		m_ratio = ef_node->get_attribute_float("ratio"sv, 0);
 		m_isset_ratio = true;
 	} else
 		reset_ratio();
 
-	if(ef_node->has_attribute("input_gain")) {
-		m_input_gain = ef_node->get_attribute_float("input_gain", 0);
+	if(ef_node->has_attribute("input_gain"sv)) {
+		m_input_gain = ef_node->get_attribute_float("input_gain"sv, 0);
 		m_isset_input_gain = true;
 	} else
 		reset_input_gain();
 
-	if(ef_node->has_attribute("output_gain")) {
-		m_output_gain = ef_node->get_attribute_float("output_gain", 0);
+	if(ef_node->has_attribute("output_gain"sv)) {
+		m_output_gain = ef_node->get_attribute_float("output_gain"sv, 0);
 		m_isset_output_gain = true;
 	} else
 		reset_output_gain();
 
-	if(ef_node->has_attribute("convexity")) {
-		m_convexity = ef_node->get_attribute_float("convexity", 0);
+	if(ef_node->has_attribute("convexity"sv)) {
+		m_convexity = ef_node->get_attribute_float("convexity"sv, 0);
 		m_isset_convexity = true;
 	} else
 		reset_convexity();
 
-	if(ef_node->has_attribute("threshold")) {
-		m_threshold = ef_node->get_attribute_float("threshold", 0);
+	if(ef_node->has_attribute("threshold"sv)) {
+		m_threshold = ef_node->get_attribute_float("threshold"sv, 0);
 		m_isset_threshold = true;
 	} else
 		reset_threshold();
 
-	if(ef_node->has_attribute("channel_link")) {
-		m_channel_link = ef_node->get_attribute_float("channel_link", 0);
+	if(ef_node->has_attribute("channel_link"sv)) {
+		m_channel_link = ef_node->get_attribute_float("channel_link"sv, 0);
 		m_isset_channel_link = true;
 	} else
 		reset_channel_link();
 
-	if(ef_node->has_attribute("feedback")) {
-		m_feedback = ef_node->get_attribute_float("feedback", 0);
+	if(ef_node->has_attribute("feedback"sv)) {
+		m_feedback = ef_node->get_attribute_float("feedback"sv, 0);
 		m_isset_feedback = true;
 	} else
 		reset_feedback();
 
-	if(ef_node->has_attribute("inertia")) {
-		m_inertia = ef_node->get_attribute_float("inertia", 0);
+	if(ef_node->has_attribute("inertia"sv)) {
+		m_inertia = ef_node->get_attribute_float("inertia"sv, 0);
 		m_isset_inertia = true;
 	} else
 		reset_inertia();
 
-	if(ef_node->has_attribute("inertia_decay")) {
-		m_inertia_decay = ef_node->get_attribute_float("inertia_decay", 0);
+	if(ef_node->has_attribute("inertia_decay"sv)) {
+		m_inertia_decay = ef_node->get_attribute_float("inertia_decay"sv, 0);
 		m_isset_inertia_decay = true;
 	} else
 		reset_inertia_decay();
 
-	if(ef_node->has_attribute("ceiling")) {
-		m_ceiling = ef_node->get_attribute_float("ceiling", 0);
+	if(ef_node->has_attribute("ceiling"sv)) {
+		m_ceiling = ef_node->get_attribute_float("ceiling"sv, 0);
 		m_isset_ceiling = true;
 	} else
 		reset_ceiling();
@@ -102,32 +104,34 @@ void audio_effect_compressor::config_load(util::xml::data_node const *ef_node)
 
 void audio_effect_compressor::config_save(util::xml::data_node *ef_node) const
 {
+	using namespace std::literals;
+
 	if(m_isset_mode)
-		ef_node->set_attribute_int("mode", m_mode);
+		ef_node->set_attribute_int("mode"sv, m_mode);
 	if(m_isset_attack)
-		ef_node->set_attribute_float("attack", m_attack);
+		ef_node->set_attribute_float("attack"sv, m_attack);
 	if(m_isset_release)
-		ef_node->set_attribute_float("release", m_release);
+		ef_node->set_attribute_float("release"sv, m_release);
 	if(m_isset_ratio)
-		ef_node->set_attribute_float("ratio", m_ratio);
+		ef_node->set_attribute_float("ratio"sv, m_ratio);
 	if(m_isset_input_gain)
-		ef_node->set_attribute_float("input_gain", m_input_gain);
+		ef_node->set_attribute_float("input_gain"sv, m_input_gain);
 	if(m_isset_output_gain)
-		ef_node->set_attribute_float("output_gain", m_output_gain);
+		ef_node->set_attribute_float("output_gain"sv, m_output_gain);
 	if(m_isset_convexity)
-		ef_node->set_attribute_float("convexity", m_convexity);
+		ef_node->set_attribute_float("convexity"sv, m_convexity);
 	if(m_isset_threshold)
-		ef_node->set_attribute_float("threshold", m_threshold);
+		ef_node->set_attribute_float("threshold"sv, m_threshold);
 	if(m_isset_channel_link)
-		ef_node->set_attribute_float("channel_link", m_channel_link);
+		ef_node->set_attribute_float("channel_link"sv, m_channel_link);
 	if(m_isset_feedback)
-		ef_node->set_attribute_float("feedback", m_feedback);
+		ef_node->set_attribute_float("feedback"sv, m_feedback);
 	if(m_isset_inertia)
-		ef_node->set_attribute_float("inertia", m_inertia);
+		ef_node->set_attribute_float("inertia"sv, m_inertia);
 	if(m_isset_inertia_decay)
-		ef_node->set_attribute_float("inertia_decay", m_inertia_decay);
+		ef_node->set_attribute_float("inertia_decay"sv, m_inertia_decay);
 	if(m_isset_ceiling)
-		ef_node->set_attribute_float("ceiling", m_ceiling);
+		ef_node->set_attribute_float("ceiling"sv, m_ceiling);
 }
 
 void audio_effect_compressor::default_changed()

@@ -2007,36 +2007,38 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 	}
 	else // generate default layouts for larger numbers of screens
 	{
+		using namespace std::literals;
+
 		util::xml::file::ptr const root(util::xml::file::create());
 		if (!root)
 			throw emu_fatalerror("Couldn't create XML document??");
-		util::xml::data_node *const layoutnode(root->add_child("mamelayout", nullptr));
+		util::xml::data_node *const layoutnode(root->add_child("mamelayout"sv));
 		if (!layoutnode)
 			throw emu_fatalerror("Couldn't create XML node??");
-		layoutnode->set_attribute_int("version", 2);
+		layoutnode->set_attribute_int("version"sv, 2);
 
 		// generate individual physical aspect views
 		for (unsigned i = 0; screens.size() > i; ++i)
 		{
-			util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
+			util::xml::data_node *const viewnode(layoutnode->add_child("view"sv));
 			if (!viewnode)
 				throw emu_fatalerror("Couldn't create XML node??");
 			viewnode->set_attribute(
-					"name",
+					"name"sv,
 					util::string_format(
 						_("view-name", "Screen %1$u Standard (%2$u:%3$u)"),
-						i, screens[i].physical_x(), screens[i].physical_y()).c_str());
-			util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
+						i, screens[i].physical_x(), screens[i].physical_y()));
+			util::xml::data_node *const screennode(viewnode->add_child("screen"sv));
 			if (!screennode)
 				throw emu_fatalerror("Couldn't create XML node??");
-			screennode->set_attribute_int("index", i);
-			util::xml::data_node *const boundsnode(screennode->add_child("bounds", nullptr));
+			screennode->set_attribute_int("index"sv, i);
+			util::xml::data_node *const boundsnode(screennode->add_child("bounds"sv));
 			if (!boundsnode)
 				throw emu_fatalerror("Couldn't create XML node??");
-			boundsnode->set_attribute_int("x", 0);
-			boundsnode->set_attribute_int("y", 0);
-			boundsnode->set_attribute_int("width", screens[i].physical_x());
-			boundsnode->set_attribute_int("height", screens[i].physical_y());
+			boundsnode->set_attribute_int("x"sv, 0);
+			boundsnode->set_attribute_int("y"sv, 0);
+			boundsnode->set_attribute_int("width"sv, screens[i].physical_x());
+			boundsnode->set_attribute_int("height"sv, screens[i].physical_y());
 		}
 
 		// generate individual pixel aspect views
@@ -2044,63 +2046,63 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		{
 			if (!screens[i].square())
 			{
-				util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
+				util::xml::data_node *const viewnode(layoutnode->add_child("view"sv));
 				if (!viewnode)
 					throw emu_fatalerror("Couldn't create XML node??");
 				viewnode->set_attribute(
-						"name",
+						"name"sv,
 						util::string_format(
 							_("view-name", "Screen %1$u Pixel Aspect (%2$u:%3$u)"),
-							i, screens[i].native_x(), screens[i].native_y()).c_str());
-				util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
+							i, screens[i].native_x(), screens[i].native_y()));
+				util::xml::data_node *const screennode(viewnode->add_child("screen"sv));
 				if (!screennode)
 					throw emu_fatalerror("Couldn't create XML node??");
-				screennode->set_attribute_int("index", i);
-				util::xml::data_node *const boundsnode(screennode->add_child("bounds", nullptr));
+				screennode->set_attribute_int("index"sv, i);
+				util::xml::data_node *const boundsnode(screennode->add_child("bounds"sv));
 				if (!boundsnode)
 					throw emu_fatalerror("Couldn't create XML node??");
-				boundsnode->set_attribute_int("x", 0);
-				boundsnode->set_attribute_int("y", 0);
-				boundsnode->set_attribute_int("width", screens[i].native_x());
-				boundsnode->set_attribute_int("height", screens[i].native_y());
+				boundsnode->set_attribute_int("x"sv, 0);
+				boundsnode->set_attribute_int("y"sv, 0);
+				boundsnode->set_attribute_int("width"sv, screens[i].native_x());
+				boundsnode->set_attribute_int("height"sv, screens[i].native_y());
 			}
 		}
 
 		// generate the fake cocktail view for single-screen systems
 		if (screens.size() == 1U)
 		{
-			util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
+			util::xml::data_node *const viewnode(layoutnode->add_child("view"sv));
 			if (!viewnode)
 				throw emu_fatalerror("Couldn't create XML node??");
-			viewnode->set_attribute("name", _("view-name", "Cocktail"));
+			viewnode->set_attribute("name"sv, _("view-name", "Cocktail"));
 
-			util::xml::data_node *const mirrornode(viewnode->add_child("screen", nullptr));
+			util::xml::data_node *const mirrornode(viewnode->add_child("screen"sv));
 			if (!mirrornode)
 				throw emu_fatalerror("Couldn't create XML node??");
-			mirrornode->set_attribute_int("index", 0);
-			util::xml::data_node *const mirrorbounds(mirrornode->add_child("bounds", nullptr));
+			mirrornode->set_attribute_int("index"sv, 0);
+			util::xml::data_node *const mirrorbounds(mirrornode->add_child("bounds"sv));
 			if (!mirrorbounds)
 				throw emu_fatalerror("Couldn't create XML node??");
-			mirrorbounds->set_attribute_int("x", 0);
-			mirrorbounds->set_attribute_float("y", (-0.01 * (std::min)(screens[0].physical_x(), screens[0].physical_y())) - screens[0].physical_y());
-			mirrorbounds->set_attribute_int("width", screens[0].physical_x());
-			mirrorbounds->set_attribute_int("height", screens[0].physical_y());
-			util::xml::data_node *const flipper(mirrornode->add_child("orientation", nullptr));
+			mirrorbounds->set_attribute_int("x"sv, 0);
+			mirrorbounds->set_attribute_float("y"sv, (-0.01 * (std::min)(screens[0].physical_x(), screens[0].physical_y())) - screens[0].physical_y());
+			mirrorbounds->set_attribute_int("width"sv, screens[0].physical_x());
+			mirrorbounds->set_attribute_int("height"sv, screens[0].physical_y());
+			util::xml::data_node *const flipper(mirrornode->add_child("orientation"sv));
 			if (!flipper)
 				throw emu_fatalerror("Couldn't create XML node??");
-			flipper->set_attribute_int("rotate", 180);
+			flipper->set_attribute_int("rotate"sv, 180);
 
-			util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
+			util::xml::data_node *const screennode(viewnode->add_child("screen"sv));
 			if (!screennode)
 				throw emu_fatalerror("Couldn't create XML node??");
-			screennode->set_attribute_int("index", 0);
-			util::xml::data_node *const screenbounds(screennode->add_child("bounds", nullptr));
+			screennode->set_attribute_int("index"sv, 0);
+			util::xml::data_node *const screenbounds(screennode->add_child("bounds"sv));
 			if (!screenbounds)
 				throw emu_fatalerror("Couldn't create XML node??");
-			screenbounds->set_attribute_int("x", 0);
-			screenbounds->set_attribute_int("y", 0);
-			screenbounds->set_attribute_int("width", screens[0].physical_x());
-			screenbounds->set_attribute_int("height", screens[0].physical_y());
+			screenbounds->set_attribute_int("x"sv, 0);
+			screenbounds->set_attribute_int("y"sv, 0);
+			screenbounds->set_attribute_int("width"sv, screens[0].physical_x());
+			screenbounds->set_attribute_int("height"sv, screens[0].physical_y());
 		}
 
 		// generate tiled views if the supplied artwork doesn't provide a view of all screens
@@ -2131,7 +2133,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			std::vector<std::pair<float, float> > sizes(screens.size());
 			std::transform(screens.begin(), screens.end(), sizes.begin(), [] (screen_info const &s) { return s.tiled_size(); });
 			auto const generate_view =
-					[&layoutnode, &screens, &widths, &heights, &sizes] (char const *title, unsigned columns, bool gapless, auto &&mapper)
+					[&layoutnode, &screens, &widths, &heights, &sizes] (std::string_view title, unsigned columns, bool gapless, auto &&mapper)
 					{
 						// calculate necessary widths/heights of rows/columns restricting screens to unit square
 						assert(0U < columns);
@@ -2162,10 +2164,10 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 						}
 
 						// actually generate elements
-						util::xml::data_node *viewnode = layoutnode->add_child("view", nullptr);
+						util::xml::data_node *viewnode = layoutnode->add_child("view"sv);
 						if (!viewnode)
 							throw emu_fatalerror("Couldn't create XML node??");
-						viewnode->set_attribute("name", title);
+						viewnode->set_attribute("name"sv, title);
 						float ypos(0.0F);
 						for (unsigned y = 0U; rows > y; ypos += heights[y] + spacing, ++y)
 						{
@@ -2175,17 +2177,17 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 								int const i(mapper(x, y));
 								if (0 <= i)
 								{
-									util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
+									util::xml::data_node *const screennode(viewnode->add_child("screen"sv));
 									if (!screennode)
 										throw emu_fatalerror("Couldn't create XML node??");
-									screennode->set_attribute_int("index", i);
-									util::xml::data_node *const boundsnode(screennode->add_child("bounds", nullptr));
+									screennode->set_attribute_int("index"sv, i);
+									util::xml::data_node *const boundsnode(screennode->add_child("bounds"sv));
 									if (!boundsnode)
 										throw emu_fatalerror("Couldn't create XML node??");
-									boundsnode->set_attribute_float("x", xpos + ((widths[x] - sizes[i].first) / 2));
-									boundsnode->set_attribute_float("y", ypos + ((heights[y] - sizes[i].second) / 2));
-									boundsnode->set_attribute_float("width", sizes[i].first);
-									boundsnode->set_attribute_float("height", sizes[i].second);
+									boundsnode->set_attribute_float("x"sv, xpos + ((widths[x] - sizes[i].first) / 2));
+									boundsnode->set_attribute_float("y"sv, ypos + ((heights[y] - sizes[i].second) / 2));
+									boundsnode->set_attribute_float("width"sv, sizes[i].first);
+									boundsnode->set_attribute_float("height"sv, sizes[i].second);
 								}
 							}
 						}
@@ -2204,38 +2206,38 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 				float const height1(float(screens[1].physical_y()) / screens[1].physical_x());
 				float const minor_dim((std::max)((std::min)(height0, 1.0F), (std::min)(height1, 1.0F)));
 
-				util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
+				util::xml::data_node *const viewnode(layoutnode->add_child("view"sv));
 				if (!viewnode)
 					throw emu_fatalerror("Couldn't create XML node??");
-				viewnode->set_attribute("name", _("view-name", "Cocktail"));
+				viewnode->set_attribute("name"sv, _("view-name", "Cocktail"));
 
-				util::xml::data_node *const mirrornode(viewnode->add_child("screen", nullptr));
+				util::xml::data_node *const mirrornode(viewnode->add_child("screen"sv));
 				if (!mirrornode)
 					throw emu_fatalerror("Couldn't create XML node??");
-				mirrornode->set_attribute_int("index", 1);
-				util::xml::data_node *const mirrorbounds(mirrornode->add_child("bounds", nullptr));
+				mirrornode->set_attribute_int("index"sv, 1);
+				util::xml::data_node *const mirrorbounds(mirrornode->add_child("bounds"sv));
 				if (!mirrorbounds)
 					throw emu_fatalerror("Couldn't create XML node??");
-				mirrorbounds->set_attribute_int("x", 0);
-				mirrorbounds->set_attribute_float("y", (-0.01 * minor_dim) - height1);
-				mirrorbounds->set_attribute_int("width", 1);
-				mirrorbounds->set_attribute_float("height", height1);
-				util::xml::data_node *const flipper(mirrornode->add_child("orientation", nullptr));
+				mirrorbounds->set_attribute_int("x"sv, 0);
+				mirrorbounds->set_attribute_float("y"sv, (-0.01 * minor_dim) - height1);
+				mirrorbounds->set_attribute_int("width"sv, 1);
+				mirrorbounds->set_attribute_float("height"sv, height1);
+				util::xml::data_node *const flipper(mirrornode->add_child("orientation"sv));
 				if (!flipper)
 					throw emu_fatalerror("Couldn't create XML node??");
-				flipper->set_attribute_int("rotate", 180);
+				flipper->set_attribute_int("rotate"sv, 180);
 
-				util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
+				util::xml::data_node *const screennode(viewnode->add_child("screen"sv));
 				if (!screennode)
 					throw emu_fatalerror("Couldn't create XML node??");
-				screennode->set_attribute_int("index", 0);
-				util::xml::data_node *const screenbounds(screennode->add_child("bounds", nullptr));
+				screennode->set_attribute_int("index"sv, 0);
+				util::xml::data_node *const screenbounds(screennode->add_child("bounds"sv));
 				if (!screenbounds)
 					throw emu_fatalerror("Couldn't create XML node??");
-				screenbounds->set_attribute_int("x", 0);
-				screenbounds->set_attribute_int("y", 0);
-				screenbounds->set_attribute_int("width", 1);
-				screenbounds->set_attribute_float("height", height0);
+				screenbounds->set_attribute_int("x"sv, 0);
+				screenbounds->set_attribute_int("y"sv, 0);
+				screenbounds->set_attribute_int("width"sv, 1);
+				screenbounds->set_attribute_float("height"sv, height0);
 			}
 
 			// generate tiled views
@@ -2246,7 +2248,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 				if (!remainder || (((majdim + 1) / 2) <= remainder))
 				{
 					generate_view(
-							util::string_format(_("view-name", u8"%1$u×%2$u Left-to-Right, Top-to-Bottom"), majdim, mindim).c_str(),
+							util::string_format(_("view-name", u8"%1$u×%2$u Left-to-Right, Top-to-Bottom"), majdim, mindim),
 							majdim,
 							false,
 							[&screens, majdim] (unsigned x, unsigned y)
@@ -2255,7 +2257,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 								return (screens.size() > i) ? int(i) : -1;
 							});
 					generate_view(
-							util::string_format(_("view-name", u8"%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"), majdim, mindim).c_str(),
+							util::string_format(_("view-name", u8"%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"), majdim, mindim),
 							majdim,
 							true,
 							[&screens, majdim] (unsigned x, unsigned y)
@@ -2264,7 +2266,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 								return (screens.size() > i) ? int(i) : -1;
 							});
 					generate_view(
-							util::string_format(_("view-name", u8"%1$u×%2$u Top-to-Bottom, Left-to-Right"), mindim, majdim).c_str(),
+							util::string_format(_("view-name", u8"%1$u×%2$u Top-to-Bottom, Left-to-Right"), mindim, majdim),
 							mindim,
 							false,
 							[&screens, majdim] (unsigned x, unsigned y)
@@ -2273,7 +2275,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 								return (screens.size() > i) ? int(i) : -1;
 							});
 					generate_view(
-							util::string_format(_("view-name", u8"%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"), mindim, majdim).c_str(),
+							util::string_format(_("view-name", u8"%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"), mindim, majdim),
 							mindim,
 							true,
 							[&screens, majdim] (unsigned x, unsigned y)
@@ -2875,13 +2877,15 @@ void render_target::config_load(util::xml::data_node const *targetnode)
 	// TODO: consider option priority - command line should take precedence over CFG
 	// not practical at the moment because view selection options are in the OSD layer
 
+	using namespace std::literals;
+
 	// find the view
-	const char *viewname = targetnode->get_attribute_string("view", nullptr);
-	if (viewname)
+	std::string_view const viewname = targetnode->get_attribute_string("view"sv);
+	if (!viewname.empty())
 	{
 		for (unsigned viewnum = 0; m_views.size() > viewnum; viewnum++)
 		{
-			if (!strcmp(viewname, view_name(viewnum)))
+			if (viewname == view_name(viewnum))
 			{
 				set_view(viewnum);
 				break;
@@ -2890,12 +2894,12 @@ void render_target::config_load(util::xml::data_node const *targetnode)
 	}
 
 	// modify the artwork config
-	int const zoom = targetnode->get_attribute_int("zoom", -1);
+	int const zoom = targetnode->get_attribute_int("zoom"sv, -1);
 	if (zoom == 0 || zoom == 1)
 		set_zoom_to_screen(zoom);
 
 	// apply orientation
-	int rotate = targetnode->get_attribute_int("rotate", -1);
+	int rotate = targetnode->get_attribute_int("rotate"sv, -1);
 	if (rotate != -1)
 	{
 		if (rotate == 90)
@@ -2918,20 +2922,20 @@ void render_target::config_load(util::xml::data_node const *targetnode)
 	}
 
 	// apply per-view settings
-	for (util::xml::data_node const *viewnode = targetnode->get_child("view"); viewnode; viewnode = viewnode->get_next_sibling("view"))
+	for (util::xml::data_node const *viewnode = targetnode->get_child("view"sv); viewnode; viewnode = viewnode->get_next_sibling("view"sv))
 	{
-		char const *const viewname = viewnode->get_attribute_string("name", nullptr);
-		if (!viewname)
+		std::string_view const viewname = viewnode->get_attribute_string("name"sv);
+		if (viewname.empty())
 			continue;
 
 		auto const view = std::find_if(m_views.begin(), m_views.end(), [viewname] (auto const &x) { return x.first.name() == viewname; });
 		if (m_views.end() == view)
 			continue;
 
-		for (util::xml::data_node const *vistogglenode = viewnode->get_child("collection"); vistogglenode; vistogglenode = vistogglenode->get_next_sibling("collection"))
+		for (util::xml::data_node const *vistogglenode = viewnode->get_child("collection"sv); vistogglenode; vistogglenode = vistogglenode->get_next_sibling("collection"sv))
 		{
-			char const *const vistogglename = vistogglenode->get_attribute_string("name", nullptr);
-			if (!vistogglename)
+			std::string_view const vistogglename = vistogglenode->get_attribute_string("name"sv);
+			if (vistogglename.empty())
 				continue;
 
 			auto const &vistoggles = view->first.visibility_toggles();
@@ -2939,7 +2943,7 @@ void render_target::config_load(util::xml::data_node const *targetnode)
 			if (vistoggles.end() == vistoggle)
 				continue;
 
-			int const enable = vistogglenode->get_attribute_int("visible", -1);
+			int const enable = vistogglenode->get_attribute_int("visible"sv, -1);
 			if (0 <= enable)
 			{
 				if (enable)
@@ -2967,22 +2971,23 @@ void render_target::config_load(util::xml::data_node const *targetnode)
 
 bool render_target::config_save(util::xml::data_node &targetnode)
 {
+	using namespace std::literals;
 	bool changed = false;
 
 	// output the basics
-	targetnode.set_attribute_int("index", index());
+	targetnode.set_attribute_int("index"sv, index());
 
 	// output the view
 	if (&current_view() != m_base_view)
 	{
-		targetnode.set_attribute("view", current_view().name().c_str());
+		targetnode.set_attribute("view"sv, current_view().name());
 		changed = true;
 	}
 
 	// output the layer config
 	if (m_layerconfig != m_base_layerconfig)
 	{
-		targetnode.set_attribute_int("zoom", m_layerconfig.zoom_to_screen());
+		targetnode.set_attribute_int("zoom"sv, m_layerconfig.zoom_to_screen());
 		changed = true;
 	}
 
@@ -2997,7 +3002,7 @@ bool render_target::config_save(util::xml::data_node &targetnode)
 		else if (orientation_add(ROT270, m_base_orientation) == m_orientation)
 			rotate = 270;
 		assert(rotate != 0);
-		targetnode.set_attribute_int("rotate", rotate);
+		targetnode.set_attribute_int("rotate"sv, rotate);
 		changed = true;
 	}
 
@@ -3015,12 +3020,12 @@ bool render_target::config_save(util::xml::data_node &targetnode)
 				{
 					if (!viewnode)
 					{
-						viewnode = targetnode.add_child("view", nullptr);
-						viewnode->set_attribute("name", view.first.name().c_str());
+						viewnode = targetnode.add_child("view"sv);
+						viewnode->set_attribute("name"sv, view.first.name());
 					}
-					util::xml::data_node *const vistogglenode = viewnode->add_child("collection", nullptr);
-					vistogglenode->set_attribute("name", toggle.name().c_str());
-					vistogglenode->set_attribute_int("visible", BIT(view.second, i));
+					util::xml::data_node *const vistogglenode = viewnode->add_child("collection"sv);
+					vistogglenode->set_attribute("name"sv, toggle.name());
+					vistogglenode->set_attribute_int("visible"sv, BIT(view.second, i));
 					changed = true;
 				}
 				++i;
@@ -3589,27 +3594,29 @@ void render_manager::config_load(config_type cfg_type, config_level cfg_level, u
 		return;
 	}
 
+	using namespace std::literals;
+
 	// check the UI target
-	util::xml::data_node const *const uinode = parentnode->get_child("interface");
+	util::xml::data_node const *const uinode = parentnode->get_child("interface"sv);
 	if (uinode)
 	{
-		render_target *const target = target_by_index(uinode->get_attribute_int("target", 0));
+		render_target *const target = target_by_index(uinode->get_attribute_int("target"sv, 0));
 		if (target)
 			set_ui_target(*target);
 	}
 
 	// iterate over target nodes
-	for (util::xml::data_node const *targetnode = parentnode->get_child("target"); targetnode; targetnode = targetnode->get_next_sibling("target"))
+	for (util::xml::data_node const *targetnode = parentnode->get_child("target"sv); targetnode; targetnode = targetnode->get_next_sibling("target"sv))
 	{
-		render_target *const target = target_by_index(targetnode->get_attribute_int("index", -1));
+		render_target *const target = target_by_index(targetnode->get_attribute_int("index"sv, -1));
 		if (target && !target->hidden())
 			target->config_load(targetnode);
 	}
 
 	// iterate over screen nodes
-	for (util::xml::data_node const *screennode = parentnode->get_child("screen"); screennode; screennode = screennode->get_next_sibling("screen"))
+	for (util::xml::data_node const *screennode = parentnode->get_child("screen"sv); screennode; screennode = screennode->get_next_sibling("screen"sv))
 	{
-		int const index = screennode->get_attribute_int("index", -1);
+		int const index = screennode->get_attribute_int("index"sv, -1);
 		render_container *container = nullptr;
 		if (index >= 0 && index < m_screen_container_list.size())
 			container = &*std::next(m_screen_container_list.begin(), index);
@@ -3620,15 +3627,15 @@ void render_manager::config_load(config_type cfg_type, config_level cfg_level, u
 			render_container::user_settings settings = container->get_user_settings();
 
 			// fetch color controls
-			settings.m_brightness = screennode->get_attribute_float("brightness", settings.m_brightness);
-			settings.m_contrast = screennode->get_attribute_float("contrast", settings.m_contrast);
-			settings.m_gamma = screennode->get_attribute_float("gamma", settings.m_gamma);
+			settings.m_brightness = screennode->get_attribute_float("brightness"sv, settings.m_brightness);
+			settings.m_contrast = screennode->get_attribute_float("contrast"sv, settings.m_contrast);
+			settings.m_gamma = screennode->get_attribute_float("gamma"sv, settings.m_gamma);
 
 			// fetch positioning controls
-			settings.m_xoffset = screennode->get_attribute_float("hoffset", settings.m_xoffset);
-			settings.m_xscale = screennode->get_attribute_float("hstretch", settings.m_xscale);
-			settings.m_yoffset = screennode->get_attribute_float("voffset", settings.m_yoffset);
-			settings.m_yscale = screennode->get_attribute_float("vstretch", settings.m_yscale);
+			settings.m_xoffset = screennode->get_attribute_float("hoffset"sv, settings.m_xoffset);
+			settings.m_xscale = screennode->get_attribute_float("hstretch"sv, settings.m_xscale);
+			settings.m_yoffset = screennode->get_attribute_float("voffset"sv, settings.m_yoffset);
+			settings.m_yscale = screennode->get_attribute_float("vstretch"sv, settings.m_yscale);
 
 			// set the new values
 			container->set_user_settings(settings);
@@ -3644,6 +3651,8 @@ void render_manager::config_load(config_type cfg_type, config_level cfg_level, u
 
 void render_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
+	using namespace std::literals;
+
 	// we only save system-specific configuration
 	if (cfg_type != config_type::SYSTEM)
 		return;
@@ -3652,9 +3661,9 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 	if (m_ui_target->index() != 0)
 	{
 		// create a node for it
-		util::xml::data_node *const uinode = parentnode->add_child("interface", nullptr);
+		util::xml::data_node *const uinode = parentnode->add_child("interface"sv);
 		if (uinode != nullptr)
-			uinode->set_attribute_int("target", m_ui_target->index());
+			uinode->set_attribute_int("target"sv, m_ui_target->index());
 	}
 
 	// iterate over targets
@@ -3669,7 +3678,7 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 		else if (!target->hidden())
 		{
 			// create a node
-			util::xml::data_node *const targetnode = parentnode->add_child("target", nullptr);
+			util::xml::data_node *const targetnode = parentnode->add_child("target"sv);
 			if (targetnode && !target->config_save(*targetnode))
 				targetnode->delete_node();
 		}
@@ -3680,57 +3689,57 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 	for (render_container &container : m_screen_container_list)
 	{
 		// create a node
-		util::xml::data_node *const screennode = parentnode->add_child("screen", nullptr);
+		util::xml::data_node *const screennode = parentnode->add_child("screen"sv);
 		if (screennode != nullptr)
 		{
 			bool changed = false;
 
 			// output the basics
-			screennode->set_attribute_int("index", scrnum);
+			screennode->set_attribute_int("index"sv, scrnum);
 
 			render_container::user_settings const settings = container.get_user_settings();
 
 			// output the color controls
 			if (settings.m_brightness != machine().options().brightness())
 			{
-				screennode->set_attribute_float("brightness", settings.m_brightness);
+				screennode->set_attribute_float("brightness"sv, settings.m_brightness);
 				changed = true;
 			}
 
 			if (settings.m_contrast != machine().options().contrast())
 			{
-				screennode->set_attribute_float("contrast", settings.m_contrast);
+				screennode->set_attribute_float("contrast"sv, settings.m_contrast);
 				changed = true;
 			}
 
 			if (settings.m_gamma != machine().options().gamma())
 			{
-				screennode->set_attribute_float("gamma", settings.m_gamma);
+				screennode->set_attribute_float("gamma"sv, settings.m_gamma);
 				changed = true;
 			}
 
 			// output the positioning controls
 			if (settings.m_xoffset != 0.0f)
 			{
-				screennode->set_attribute_float("hoffset", settings.m_xoffset);
+				screennode->set_attribute_float("hoffset"sv, settings.m_xoffset);
 				changed = true;
 			}
 
 			if (settings.m_xscale != 1.0f)
 			{
-				screennode->set_attribute_float("hstretch", settings.m_xscale);
+				screennode->set_attribute_float("hstretch"sv, settings.m_xscale);
 				changed = true;
 			}
 
 			if (settings.m_yoffset != 0.0f)
 			{
-				screennode->set_attribute_float("voffset", settings.m_yoffset);
+				screennode->set_attribute_float("voffset"sv, settings.m_yoffset);
 				changed = true;
 			}
 
 			if (settings.m_yscale != 1.0f)
 			{
-				screennode->set_attribute_float("vstretch", settings.m_yscale);
+				screennode->set_attribute_float("vstretch"sv, settings.m_yscale);
 				changed = true;
 			}
 

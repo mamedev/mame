@@ -280,7 +280,7 @@ bool debugwin_info::handle_key(WPARAM wparam, LPARAM lparam)
 
 void debugwin_info::save_configuration(util::xml::data_node &parentnode)
 {
-	util::xml::data_node *const node = parentnode.add_child(NODE_WINDOW, nullptr);
+	util::xml::data_node *const node = parentnode.add_child(NODE_WINDOW);
 	if (node)
 		save_configuration_to_node(*node);
 }

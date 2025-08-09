@@ -130,19 +130,19 @@ void image_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 {
 	if ((cfg_type == config_type::SYSTEM) && parentnode)
 	{
-		for (util::xml::data_node const *node = parentnode->get_child("device"); node; node = node->get_next_sibling("device"))
+		using namespace std::literals;
+		for (util::xml::data_node const *node = parentnode->get_child("device"sv); node; node = node->get_next_sibling("device"sv))
 		{
-			const char *const dev_instance = node->get_attribute_string("instance", nullptr);
-
-			if ((dev_instance != nullptr) && (dev_instance[0] != '\0'))
+			const std::string_view dev_instance = node->get_attribute_string("instance"sv);
+			if (!dev_instance.empty())
 			{
 				for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 				{
-					if (!strcmp(dev_instance, image.instance_name().c_str()))
+					if (dev_instance == image.instance_name())
 					{
-						const char *const working_directory = node->get_attribute_string("directory", nullptr);
-						if (working_directory != nullptr)
-							image.set_working_directory(std::string_view(working_directory));
+						const std::string_view working_directory = node->get_attribute_string("directory"sv);
+						if (!working_directory.empty())
+							image.set_working_directory(working_directory);
 					}
 				}
 			}
@@ -162,13 +162,14 @@ void image_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 	{
 		for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 		{
-			const char *const dev_instance = image.instance_name().c_str();
+			const std::string_view dev_instance = image.instance_name();
 
-			util::xml::data_node *const node = parentnode->add_child("device", nullptr);
+			using namespace std::literals;
+			util::xml::data_node *const node = parentnode->add_child("device"sv);
 			if (node != nullptr)
 			{
-				node->set_attribute("instance", dev_instance);
-				node->set_attribute("directory", image.working_directory().c_str());
+				node->set_attribute("instance"sv, dev_instance);
+				node->set_attribute("directory"sv, image.working_directory());
 			}
 		}
 	}
