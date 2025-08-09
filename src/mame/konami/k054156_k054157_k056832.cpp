@@ -1088,118 +1088,101 @@ template<class BitmapClass>
 int k056832_device::update_linemap( screen_device &screen, BitmapClass &bitmap, int page, int flags )
 {
 	if (m_page_tile_mode[page])
-		return(0);
+		return 0;
 	if (!m_linemap_enabled)
-		return(1);
+		return 1;
 
+	tilemap_t *tmap;
+	uint32_t *dirty;
+	int all_dirty;
+	uint8_t *xprdata;
+
+	tmap = m_tilemap[page];
+	bitmap_ind8 &xprmap = tmap->flagsmap();
+	xprdata = tmap->tile_flags();
+
+	dirty = m_line_dirty[page];
+	all_dirty = m_all_lines_dirty[page];
+
+	if (all_dirty)
 	{
-		tilemap_t *tmap;
-		uint32_t *dirty;
-		int all_dirty;
-		uint8_t *xprdata;
+		dirty[7] = dirty[6] = dirty[5] = dirty[4] = dirty[3] = dirty[2] = dirty[1] = dirty[0] = 0;
+		m_all_lines_dirty[page] = 0;
 
-		tmap = m_tilemap[page];
-		bitmap_ind8 &xprmap  = tmap->flagsmap();
-		xprdata = tmap->tile_flags();
-
-		dirty = m_line_dirty[page];
-		all_dirty = m_all_lines_dirty[page];
-
-		if (all_dirty)
-		{
-			dirty[7] = dirty[6] = dirty[5] = dirty[4] = dirty[3] = dirty[2] = dirty[1] = dirty[0] = 0;
-			m_all_lines_dirty[page] = 0;
-
-			// force tilemap into a clean, static state
-			tmap->mark_all_dirty();
-			tmap->pixmap();                     // dummy call to reset tile_dirty_map
-			xprmap.fill(0);                     // reset pixel transparency_bitmap;
-			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);   // reset tile transparency_data;
-		}
-		else
-		{
-			if (!(dirty[0] | dirty[1] | dirty[2] | dirty[3] | dirty[4] | dirty[5] | dirty[6] | dirty[7]))
-				return 0;
-		}
-
-#if 0   /* this code is broken.. really broken .. gijoe uses it for some line/column scroll style effects (lift level of attract mode)
-            we REALLY shouldn't be writing directly back into the pixmap, surely this should
-            be done when rendering instead
-
-        */
-		{
-			bitmap_ind16 *pixmap;
-
-			uint8_t code_transparent, code_opaque;
-			const pen_t *pal_ptr;
-			const uint8_t  *src_ptr;
-			uint8_t  *xpr_ptr;
-			uint16_t *dst_ptr;
-			uint16_t pen, basepen;
-			int count, src_pitch, src_modulo;
-			int dst_pitch;
-			int line;
-			gfx_element *src_gfx;
-			int offs, mask;
-
-			#define LINE_WIDTH 512
-
-			#define DRAW_PIX(N) \
-				pen = src_ptr[N]; \
-				if (pen) \
-				{ pen += basepen; xpr_ptr[count+N] = TILEMAP_PIXEL_LAYER0; dst_ptr[count+N] = pen; } else \
-				{ xpr_ptr[count+N] = 0; }
-
-			pixmap  = m_pixmap[page];
-			pal_ptr = machine().pens;
-			src_gfx = gfx(m_gfx_num);
-			src_pitch  = src_gfx->rowbytes();
-			src_modulo = src_gfx->char_modulo;
-			dst_pitch  = pixmap->rowpixels;
-
-			for (line = 0; line < 256; line++)
-			{
-				tile_data tileinfo = {0};
-
-				dst_ptr = &pixmap->pix(line);
-				xpr_ptr = &xprmap.pix(line);
-
-				if (!all_dirty)
-				{
-					offs = line >> 5;
-					mask = 1 << (line & 0x1f);
-					if (!(dirty[offs] & mask)) continue;
-					dirty[offs) ^= mask;
-				}
-
-				for (count = 0; count < LINE_WIDTH; count += 8)
-				{
-					get_tile_info(&tileinfo, line, page);
-					basepen = tileinfo.palette_base;
-					code_transparent = tileinfo.category;
-					code_opaque = code_transparent | TILEMAP_PIXEL_LAYER0;
-
-					src_ptr = tileinfo.pen_data + count * 8;//src_base + ((tileinfo.tile_number & ~7) << 6);
-
-					DRAW_PIX(0)
-					DRAW_PIX(1)
-					DRAW_PIX(2)
-					DRAW_PIX(3)
-					DRAW_PIX(4)
-					DRAW_PIX(5)
-					DRAW_PIX(6)
-					DRAW_PIX(7)
-				}
-			}
-
-			#undef LINE_WIDTH
-			#undef DRAW_PIX
-		}
-#endif
-
+		// force tilemap into a clean, static state
+		tmap->mark_all_dirty();
+		tmap->pixmap();                     // dummy call to reset tile_dirty_map
+		xprmap.fill(0);                     // reset pixel transparency_bitmap;
+		memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);   // reset tile transparency_data;
+	}
+	else
+	{
+		if (!(dirty[0] | dirty[1] | dirty[2] | dirty[3] | dirty[4] | dirty[5] | dirty[6] | dirty[7]))
+			return 0;
 	}
 
-	return(0);
+#if 0
+	// this code is broken.. really broken..
+	// gijoe uses it for some line/column scroll style effects (lift level of attract mode)
+	//
+	// We REALLY shouldn't be writing directly back into the pixmap, surely this should
+	// be done when rendering instead.
+	bitmap_ind16 *pixmap;
+
+	const uint8_t *src_ptr;
+	const uint8_t *src_base;
+	uint8_t *xpr_ptr;
+	uint16_t *dst_ptr;
+	uint16_t pen, basepen;
+	gfx_element *src_gfx;
+
+	#define DRAW_PIX(N) \
+		pen = src_ptr[N]; \
+		if (pen) \
+		{ pen += basepen; xpr_ptr[count+N] = TILEMAP_PIXEL_LAYER0; dst_ptr[count+N] = pen; } else \
+		{ xpr_ptr[count+N] = 0; }
+
+	pixmap = m_pixmap[page];
+	src_gfx = gfx(m_gfx_num);
+	src_base = src_gfx->get_data(0);
+
+	for (int line = 0; line < 256; line++)
+	{
+		if (!all_dirty)
+		{
+			uint8_t offs = line >> 5;
+			uint32_t mask = 1 << (line & 0x1f);
+			if (!(dirty[offs] & mask)) continue;
+			dirty[offs] ^= mask;
+		}
+
+		tile_data tileinfo = {0};
+		tileinfo.decoder = this;
+		get_tile_info(tileinfo, line, page);
+		basepen = tileinfo.palette_base;
+
+		dst_ptr = &pixmap->pix(line);
+		xpr_ptr = &xprmap.pix(line);
+
+		for (int count = 0; count < 512; count += 8)
+		{
+			src_ptr = src_base + ((tileinfo.code & ~7) << 6) + count;
+
+			DRAW_PIX(0)
+			DRAW_PIX(1)
+			DRAW_PIX(2)
+			DRAW_PIX(3)
+			DRAW_PIX(4)
+			DRAW_PIX(5)
+			DRAW_PIX(6)
+			DRAW_PIX(7)
+		}
+	}
+
+	#undef DRAW_PIX
+#endif
+
+	return 0;
 }
 
 template<class BitmapClass>
@@ -2022,116 +2005,102 @@ void k056832_device::create_gfx()
 
 int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb32 &bitmap, int page, int flags)
 {
-	if (m_page_tile_mode[page]) return(0);
-	if (!m_linemap_enabled) return(1);
+	if (m_page_tile_mode[page])
+		return 0;
+	if (!m_linemap_enabled)
+		return 1;
 
+	tilemap_t *tmap;
+	uint32_t *dirty;
+	int all_dirty;
+	uint8_t *xprdata;
+
+	tmap = m_tilemap[page];
+	bitmap_ind8 &xprmap = tmap->flagsmap();
+	xprdata = tmap->tile_flags();
+
+	dirty = m_line_dirty[page];
+	all_dirty = m_all_lines_dirty[page];
+
+	if (all_dirty)
 	{
-		tilemap_t *tmap;
-		uint32_t *dirty;
-		int all_dirty;
-		uint8_t *xprdata;
+		dirty[7] = dirty[6] = dirty[5] = dirty[4] = dirty[3] = dirty[2] = dirty[1] = dirty[0] = 0;
+		m_all_lines_dirty[page] = 0;
 
-		tmap = m_tilemap[page];
-		bitmap_ind8 &xprmap  = tmap->flagsmap();
-		xprdata = tmap->tile_flags();
-
-		dirty = m_line_dirty[page];
-		all_dirty = m_all_lines_dirty[page];
-
-		if (all_dirty)
-		{
-			dirty[7]=dirty[6]=dirty[5]=dirty[4]=dirty[3]=dirty[2]=dirty[1]=dirty[0] = 0;
-			m_all_lines_dirty[page] = 0;
-
-			// force tilemap into a clean, static state
-			tmap->mark_all_dirty();
-			tmap->pixmap();                     // dummy call to reset tile_dirty_map
-			xprmap.fill(0);                     // reset pixel transparency_bitmap;
-			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);   // reset tile transparency_data;
-		}
-		else
-		{
-			if (!(dirty[0]|dirty[1]|dirty[2]|dirty[3]|dirty[4]|dirty[5]|dirty[6]|dirty[7])) return(0);
-		}
-
-#if 0   /* this code is broken.. really broken .. gijoe uses it for some line/column scroll style effects (lift level of attract mode)
-            we REALLY shouldn't be writing directly back into the pixmap, surely this should
-            be done when rendering instead
-
-        */
-		{
-			bitmap_ind16 *pixmap;
-
-			uint8_t code_transparent, code_opaque;
-			const pen_t *pal_ptr;
-			const uint8_t  *src_ptr;
-			uint8_t  *xpr_ptr;
-			uint16_t *dst_ptr;
-			uint16_t pen, basepen;
-			int count, src_pitch, src_modulo;
-			int dst_pitch;
-			int line;
-			gfx_element *src_gfx;
-			int offs, mask;
-
-			#define LINE_WIDTH 512
-
-			#define DRAW_PIX(N) \
-				pen = src_ptr[N]; \
-				if (pen) \
-				{ pen += basepen; xpr_ptr[count+N] = TILEMAP_PIXEL_LAYER0; dst_ptr[count+N] = pen; } else \
-				{ xpr_ptr[count+N] = 0; }
-
-			pixmap  = m_pixmap[page];
-			pal_ptr    = machine().pens;
-			src_gfx    = gfx(m_gfx_num);
-			src_pitch  = src_gfx->rowbytes();
-			src_modulo = src_gfx->char_modulo;
-			dst_pitch  = pixmap->rowpixels;
-
-			for (line=0; line<256; line++)
-			{
-				tile_data tileinfo = {0};
-
-				dst_ptr = &pixmap->pix(line);
-				xpr_ptr = &xprmap.pix(line);
-
-				if (!all_dirty)
-				{
-					offs = line >> 5;
-					mask = 1 << (line & 0x1f);
-					if (!(dirty[offs] & mask)) continue;
-					dirty[offs) ^= mask;
-				}
-
-				for (count = 0; count < LINE_WIDTH; count+=8)
-				{
-					get_tile_info(machine, &tileinfo, line, page);
-					basepen = tileinfo.palette_base;
-					code_transparent = tileinfo.category;
-					code_opaque = code_transparent | TILEMAP_PIXEL_LAYER0;
-
-					src_ptr = tileinfo.pen_data + count*8;//src_base + ((tileinfo.tile_number & ~7) << 6);
-
-					DRAW_PIX(0)
-					DRAW_PIX(1)
-					DRAW_PIX(2)
-					DRAW_PIX(3)
-					DRAW_PIX(4)
-					DRAW_PIX(5)
-					DRAW_PIX(6)
-					DRAW_PIX(7)
-				}
-			}
-
-			#undef LINE_WIDTH
-			#undef DRAW_PIX
-		}
-#endif
-
+		// force tilemap into a clean, static state
+		tmap->mark_all_dirty();
+		tmap->pixmap();                     // dummy call to reset tile_dirty_map
+		xprmap.fill(0);                     // reset pixel transparency_bitmap;
+		memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);   // reset tile transparency_data;
+	}
+	else
+	{
+		if (!(dirty[0] | dirty[1] | dirty[2] | dirty[3] | dirty[4] | dirty[5] | dirty[6] | dirty[7]))
+			return 0;
 	}
 
-	return(0);
+#if 0
+	// this code is broken.. really broken..
+	// gijoe uses it for some line/column scroll style effects (lift level of attract mode)
+	//
+	// We REALLY shouldn't be writing directly back into the pixmap, surely this should
+	// be done when rendering instead.
+	bitmap_ind16 *pixmap;
+
+	const uint8_t *src_ptr;
+	const uint8_t *src_base;
+	uint8_t *xpr_ptr;
+	uint16_t *dst_ptr;
+	uint16_t pen, basepen;
+	gfx_element *src_gfx;
+
+	#define DRAW_PIX(N) \
+		pen = src_ptr[N]; \
+		if (pen) \
+		{ pen += basepen; xpr_ptr[count+N] = TILEMAP_PIXEL_LAYER0; dst_ptr[count+N] = pen; } else \
+		{ xpr_ptr[count+N] = 0; }
+
+	pixmap = m_pixmap[page];
+	src_gfx = gfx(m_gfx_num);
+	src_base = src_gfx->get_data(0);
+
+	for (int line = 0; line < 256; line++)
+	{
+		if (!all_dirty)
+		{
+			uint8_t offs = line >> 5;
+			uint32_t mask = 1 << (line & 0x1f);
+			if (!(dirty[offs] & mask)) continue;
+			dirty[offs] ^= mask;
+		}
+
+		tile_data tileinfo = {0};
+		tileinfo.decoder = this;
+		get_tile_info(tileinfo, line, page);
+		basepen = tileinfo.palette_base;
+
+		dst_ptr = &pixmap->pix(line);
+		xpr_ptr = &xprmap.pix(line);
+
+		for (int count = 0; count < 512; count += 8)
+		{
+			src_ptr = src_base + ((tileinfo.code & ~7) << 6) + count;
+
+			DRAW_PIX(0)
+			DRAW_PIX(1)
+			DRAW_PIX(2)
+			DRAW_PIX(3)
+			DRAW_PIX(4)
+			DRAW_PIX(5)
+			DRAW_PIX(6)
+			DRAW_PIX(7)
+		}
+	}
+
+	#undef DRAW_PIX
+#endif
+
+	return 0;
 }
 
 void k056832_device::m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority)
