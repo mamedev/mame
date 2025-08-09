@@ -1121,8 +1121,7 @@ int k056832_device::update_linemap( screen_device &screen, BitmapClass &bitmap, 
 			return 0;
 	}
 
-#if 0
-	// this code is broken.. really broken..
+	// this code is hacky...
 	// gijoe uses it for some line/column scroll style effects (lift level of attract mode)
 	//
 	// We REALLY shouldn't be writing directly back into the pixmap, surely this should
@@ -1130,7 +1129,6 @@ int k056832_device::update_linemap( screen_device &screen, BitmapClass &bitmap, 
 	bitmap_ind16 *pixmap;
 
 	const uint8_t *src_ptr;
-	const uint8_t *src_base;
 	uint8_t *xpr_ptr;
 	uint16_t *dst_ptr;
 	uint16_t pen, basepen;
@@ -1144,7 +1142,6 @@ int k056832_device::update_linemap( screen_device &screen, BitmapClass &bitmap, 
 
 	pixmap = m_pixmap[page];
 	src_gfx = gfx(m_gfx_num);
-	src_base = src_gfx->get_data(0);
 
 	for (int line = 0; line < 256; line++)
 	{
@@ -1166,7 +1163,8 @@ int k056832_device::update_linemap( screen_device &screen, BitmapClass &bitmap, 
 
 		for (int count = 0; count < 512; count += 8)
 		{
-			src_ptr = src_base + ((tileinfo.code & ~7) << 6) + count;
+			src_ptr = src_gfx->get_data((tileinfo.code & ~7) | (count >> 6));
+			src_ptr += count & 0x3f;
 
 			DRAW_PIX(0)
 			DRAW_PIX(1)
@@ -1180,7 +1178,6 @@ int k056832_device::update_linemap( screen_device &screen, BitmapClass &bitmap, 
 	}
 
 	#undef DRAW_PIX
-#endif
 
 	return 0;
 }
@@ -2039,8 +2036,7 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 			return 0;
 	}
 
-#if 0
-	// this code is broken.. really broken..
+	// this code is hacky...
 	// gijoe uses it for some line/column scroll style effects (lift level of attract mode)
 	//
 	// We REALLY shouldn't be writing directly back into the pixmap, surely this should
@@ -2048,7 +2044,6 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 	bitmap_ind16 *pixmap;
 
 	const uint8_t *src_ptr;
-	const uint8_t *src_base;
 	uint8_t *xpr_ptr;
 	uint16_t *dst_ptr;
 	uint16_t pen, basepen;
@@ -2062,7 +2057,6 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 
 	pixmap = m_pixmap[page];
 	src_gfx = gfx(m_gfx_num);
-	src_base = src_gfx->get_data(0);
 
 	for (int line = 0; line < 256; line++)
 	{
@@ -2084,7 +2078,8 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 
 		for (int count = 0; count < 512; count += 8)
 		{
-			src_ptr = src_base + ((tileinfo.code & ~7) << 6) + count;
+			src_ptr = src_gfx->get_data((tileinfo.code & ~7) | (count >> 6));
+			src_ptr += count & 0x3f;
 
 			DRAW_PIX(0)
 			DRAW_PIX(1)
@@ -2098,7 +2093,6 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 	}
 
 	#undef DRAW_PIX
-#endif
 
 	return 0;
 }
