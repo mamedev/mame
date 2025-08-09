@@ -8045,7 +8045,7 @@ ROM_END
 
 ROM_START( crszonev4a )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 8 megs for main R4650 code */
-	ROM_LOAD16_WORD_SWAP( "cszo4vera.ic4", 0x000000, 0x800000, CRC(cabee8c3) SHA1(4887b8550038c072f988c5999d57ec40e82e4072) )
+	ROM_LOAD16_WORD_SWAP( "cszo4vera.ic4", 0x000000, 0x800000, CRC(3755b402) SHA1(e169fded9d136af7ce6997868629eed5196b8cdd) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic1", 0x000000, 0x080000, CRC(c790743b) SHA1(5fa7b83a7a1b1105a3aa0870b782cf2741b7d11c) )
@@ -8143,7 +8143,7 @@ ROM_END
 
 ROM_START( crszonev3b2 )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 8 megs for main R4650 code */
-	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic4", 0x000000, 0x800000, CRC(3755b402) SHA1(e169fded9d136af7ce6997868629eed5196b8cdd) ) // sldh
+	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic4", 0x000000, 0x800000, CRC(cabee8c3) SHA1(4887b8550038c072f988c5999d57ec40e82e4072) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic1", 0x000000, 0x080000, CRC(c790743b) SHA1(5fa7b83a7a1b1105a3aa0870b782cf2741b7d11c) )
@@ -8347,8 +8347,8 @@ GAME( 1997, rapidrvrp,   rapidrvr, rapidrvr,    rapidrvrp, rapidrvr_state,      
 GAME( 1997, finfurl,     0,        finfurl,     finfurl,   gorgon_state,         empty_init,  ROT0, "Namco", "Final Furlong (World, FF2 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, downhill,    0,        downhill,    downhill,  namcos23_state,       empty_init,  ROT0, "Namco", "Downhill Bikers (World, DH2 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, downhillu,   downhill, downhill,    downhill,  namcos23_state,       empty_init,  ROT0, "Namco", "Downhill Bikers (US, DH3 Ver. A)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgo,     0,        motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (US, MG3 Ver. A)",        GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgov2a,  motoxgo,  motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgo,     0,        motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (World, MG3 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov2a,  motoxgo,  motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (US, MG2 Ver. A)",        GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, motoxgov1a,  motoxgo,  motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state,       empty_init,  ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state,       empty_init,  ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
