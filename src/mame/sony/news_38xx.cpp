@@ -7,11 +7,11 @@
  * Sources:
  *
  * TODO:
- *   - r3000 cpu
  *   - misc control registers and leds
  *   - slots/graphics
  *   - sound
  *   - centronics
+ *   - Floppy support (it is broken right now)
  */
 
 #include "emu.h"
@@ -75,8 +75,8 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	// address maps
 	void cpu_map(address_map &map) ATTR_COLD;
@@ -216,6 +216,9 @@ void news_38xx_state::init_common()
 {
 	// HACK: hardwire the rate
 	m_fdc->set_rate(500000);
+
+	// TODO: the mirror 0x08000000 here is NOT enough - the mirror is "test and set" memory, which means there may be special arbitration
+	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), 0x00000000, m_ram->pointer());
 }
 
 void news_38xx_state::cpu_map(address_map &map)
@@ -239,6 +242,15 @@ void news_38xx_state::cpu_map(address_map &map)
 	map(0x18000060, 0x18000067).w(FUNC(news_38xx_state::cpclixp_w));
 	map(0x18000080, 0x18000087).w(FUNC(news_38xx_state::cpuled_w));
 	map(0x1c000000, 0x1c000003).r(FUNC(news_38xx_state::wrbeadr_r));
+
+	// TODO: what is the proper end address here?
+	map(0x1fc00000, 0x1fc1ffff).lr8(NAME([this] (const offs_t offset) {
+		// RAM endianness is an issue because RAM is installed with install_ram.
+		// Therefore, go straight to the memory bus (technically its own bus, but we can go via IOP as a hack)
+		const u8 data = m_iop->space(0).read_byte(0xc00000 + offset);
+		// LOG("ram r 0x%08x -> 0x%08x\n", offset, data);
+		return data;
+	}));
 }
 
 void news_38xx_state::iop_map(address_map &map)
@@ -267,7 +279,7 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x22800018, 0x22800019).w(FUNC(news_38xx_state::ipclixp_w));
 
 	map(0x23000000, 0x23000000).r(FUNC(news_38xx_state::intst_r));
-	// 0x23800000 // inter-processor interrupt status -> bit 0 = CPU, bit 1 = UPU
+	map(0x23800000, 0x23800000).lr8(NAME([] {return 1; })); // inter-processor interrupt status -> bit 0 = CPU, bit 1 = UPU TODO: don't hardcode to CPU
 
 	map(0x24000000, 0x24000007).m(m_fdc, FUNC(n82077aa_device::map));
 	map(0x24000105, 0x24000105).rw(m_fdc, FUNC(n82077aa_device::dma_r), FUNC(n82077aa_device::dma_w));
@@ -337,6 +349,7 @@ void news_38xx_state::int_check_iop()
 
 		if (m_int_state[i] != int_state)
 		{
+			LOG("int 0x%x changed to 0x%x\n", i, int_state);
 			m_int_state[i] = int_state;
 			m_iop->set_input_line(intst_line[i], int_state);
 		}
@@ -372,6 +385,7 @@ void news_38xx_state::romdis_w(u8 data)
 {
 	LOG("ROMDIS = 0x%x (%s)\n", data, machine().describe_context());
 	if (data) {
+		// TODO: the mirror 0x08000000 here is NOT enough - the mirror is "test and set" memory, which means there may be special arbitration
 		m_iop->space(0).install_ram(0x00000000, m_ram->mask(), 0x00000000, m_ram->pointer());
 	}
 	else {
@@ -387,7 +401,7 @@ void news_38xx_state::ptycken_w(u8 data)
 
 void news_38xx_state::timeren_w(u8 data)
 {
-	LOG("timeren_w 0x%02x\n", data);
+	// LOG("timeren_w 0x%02x\n", data);
 
 	m_timer->set_param(data);
 
@@ -407,7 +421,7 @@ void news_38xx_state::astintr_w(u8 data)
 
 void news_38xx_state::iopled_w(offs_t offset, u8 data)
 {
-	LOG("IOPLED%01d = 0x%x\n", offset, data);
+	// LOG("IOPLED%01d = 0x%x\n", offset, data);
 }
 
 void news_38xx_state::xpustart_w(offs_t offset, u8 data)
@@ -418,6 +432,7 @@ void news_38xx_state::xpustart_w(offs_t offset, u8 data)
 	if (!offset) {
 		// TODO: reset CPU platform registers here?
 		m_cpu->set_input_line(INPUT_LINE_HALT, data ? 0 : 1);
+		if (data) machine().debug_break();
 	} else {
 		if (data) fatalerror("Tried to start UPU without UPU installed!");
 	}
@@ -435,6 +450,18 @@ void news_38xx_state::ipenixp_w(offs_t offset, u8 data)
 	// offset 0 = Enable level 4 IRQ from CPU (writing 0 will not clear IRQ)
 	// offset 1 = Enable level 4 IRQ from UPU (writing 0 will not clear IRQ)
 	LOG("IPENI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
+	if (!offset)
+	{
+		if (data)
+		{
+			m_inten |= 1 << static_cast<unsigned>(iop_irq_number::IPC);
+		}
+		else
+		{
+			m_inten &= ~(1 << static_cast<unsigned>(iop_irq_number::IPC));
+		}
+		int_check_iop();
+	}
 }
 
 void news_38xx_state::ipclixp_w(offs_t offset, u8 data)
@@ -442,6 +469,11 @@ void news_38xx_state::ipclixp_w(offs_t offset, u8 data)
 	// offset 0 = Clear level 4 IRQ from CPU
 	// offset 1 = Clear level 4 IRQ from UPU
 	LOG("IPCLI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
+	if (!offset)
+	{
+		m_intst &= ~(1 << static_cast<unsigned>(iop_irq_number::IPC));
+		int_check_iop();
+	}
 }
 
 u32 news_38xx_state::cpstat_r()
@@ -468,13 +500,18 @@ void news_38xx_state::cpenitmr_w(u32 data)
 
 void news_38xx_state::cpintxp_w(offs_t offset, u32 data)
 {
-	// 0x18xxxx20: CPINTIP (Send IRQ to IOP)
+	// 0x18xxxx20:
 	// 0x18xxxx24: CPINTHP (Send IRQ to UPU)
 	LOG("CPINT%cP = 0x%x\n", !offset ? 'I' : 'H', data);
+	if (!offset) // CPINTIP (Send IRQ to IOP)
+	{
+		irq_w<iop_irq_number::IPC>(1);
+	}
 }
 
 void news_38xx_state::mapvec_w(u32 data)
 {
+	// TODO: how much gets mapped?
 	LOG("MAPVEC = 0x%x\n", data); // 1 = normal operation, 0 = map reset vector 0x1fc00000 to 0x00c00000 in RAM
 }
 
@@ -494,7 +531,7 @@ void news_38xx_state::cpuled_w(offs_t offset, u32 data)
 {
 	// 0x18xxxx80: CPULED0
 	// 0x18xxxx84: CPULED1
-	LOG("CPULED%01d = 0x%x\n", offset, data);
+	// LOG("CPULED%01d = 0x%x\n", offset, data);
 }
 
 void news_scsi_devices(device_slot_interface &device)
