@@ -296,7 +296,7 @@ void tsconf_state::tsconf(machine_config &config)
 
 	m_ram->set_default_size("4096K").set_default_value(0x00); // must be random but 0x00 behaves better than 0xff in tested software
 
-	GLUKRS(config, m_glukrs);
+	GLUKRS(config, m_glukrs, 32.768_kHz_XTAL);
 
 	TSCONF_DMA(config, m_dma, 28_MHz_XTAL);
 	m_dma->in_mreq_callback().set(FUNC(tsconf_state::ram_read16));
