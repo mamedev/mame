@@ -121,10 +121,21 @@ protected:
 		PERR = 5    // Main memory parity error
 	};
 
-	u32 bus_error_r();
-	void timer_w(u8 data);
-	void timer(s32 param);
+	// IOP platform hardware
+	u32 iop_bus_error_r();
 	void poweron_w(u8 data);
+	void romdis_w(u8 data);
+	void ptycken_w(u8 data);
+	void timeren_w(u8 data);
+	void softintr_w(u8 data);
+	void astintr_w(u8 data);
+	void iopled_w(offs_t offset, u8 data); // IOPLED0/IOPLED1
+	void xpustart_w(offs_t offset, u8 data); // CPUSTART/HPUSTART
+	void ipintxp_w(offs_t offset, u8 data); // IPINTCP/IPINTHP
+	void ipenixp_w(offs_t offset, u8 data); // IPENICP/IPENIHP
+	void ipclixp_w(offs_t offset, u8 data);	// IPCLICP/IPCLIHP
+
+	void timer(s32 param);
 
 	// devices
 //  required_device<r3000a_device> m_cpu;
@@ -205,24 +216,20 @@ void news_38xx_state::iop_map(address_map &map)
 
 	map(0x20000000, 0x2000ffff).rom().region("eprom", 0).mirror(0x1fff0000);
 
+	// IOP Control Registers
 	map(0x22000000, 0x22000000).w(FUNC(news_38xx_state::poweron_w));
-	map(0x22000001, 0x22000001).lw8([this](u8 data) { m_iop->space(0).install_ram(0x00000000, m_ram->mask(), 0x00000000, m_ram->pointer()); }, "ram_enable");
-	map(0x22000002, 0x22000002).lw8([this](u8 data) { m_inten |= 0x80; }, "pie_w");
-	map(0x22000003, 0x22000003).w(FUNC(news_38xx_state::timer_w));
-	// 0x22000004 // soft interrupt
-	// 0x22000005 // ast interrupt
-	// 0x22000006 // iopled 0
-	// 0x22000007 // iopled 1
+	map(0x22000001, 0x22000001).w(FUNC(news_38xx_state::romdis_w));
+	map(0x22000002, 0x22000002).w(FUNC(news_38xx_state::ptycken_w));
+	map(0x22000003, 0x22000003).w(FUNC(news_38xx_state::timeren_w));
+	map(0x22000004, 0x22000004).w(FUNC(news_38xx_state::softintr_w));
+	map(0x22000005, 0x22000005).w(FUNC(news_38xx_state::astintr_w));
+	map(0x22000006, 0x22000007).w(FUNC(news_38xx_state::iopled_w));
 
-	// 0x22800000-0x2280001f Inter-processor Control Registers
-	// 0x22800000 CPUSTART -> Run the main CPU
-	// 0x22800000 HPUSTART -> Run the UPU (UBUS bus master, expansion slot A??)
-	// 0x22800008 IPINTCP  -> Send level 2 IRQ to CPU
-	// 0x22800009 IPINTHP  -> Send level 2 IRQ to UPU
-	// 0x22800010 IPENICP  -> Enable level 4 IRQ from CPU (writing 0 will not clear IRQ)
-	// 0x22800011 IPENIHP  -> Enable level 4 IRQ from UPU (writing 0 will not clear IRQ)
-	// 0x22800018 IPCLICP  -> Clear level 4 IRQ from CPU
-	// 0x22800019 IPCLIHP  -> Clear level 4 IRQ from UPU
+	// Inter-Processor Control Registers
+	map(0x22800000, 0x22800001).w(FUNC(news_38xx_state::xpustart_w));
+	map(0x22800008, 0x22800009).w(FUNC(news_38xx_state::ipintxp_w));
+	map(0x22800010, 0x22800011).w(FUNC(news_38xx_state::ipenixp_w));
+	map(0x22800018, 0x22800019).w(FUNC(news_38xx_state::ipclixp_w));
 
 	map(0x23000000, 0x23000000).r(FUNC(news_38xx_state::intst_r));
 	// 0x23800000 // inter-processor interrupt status -> bit 0 = CPU, bit 1 = UPU
@@ -258,7 +265,7 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x2c000000, 0x2c0000ff).rom().region("idrom", 0);
 	map(0x2c000100, 0x2c000103).portr("SW1");
 
-	map(0x2e000000, 0x2effffff).r(FUNC(news_38xx_state::bus_error_r)).mirror(0x10000000); // Expansion I/O and mirror
+	map(0x2e000000, 0x2effffff).r(FUNC(news_38xx_state::iop_bus_error_r)).mirror(0x10000000); // Expansion I/O and mirror
 }
 
 void news_38xx_state::iop_vector_map(address_map &map)
@@ -301,7 +308,7 @@ void news_38xx_state::int_check_iop()
 	}
 }
 
-u32 news_38xx_state::bus_error_r()
+u32 news_38xx_state::iop_bus_error_r()
 {
 	if (!machine().side_effects_disabled())
 		m_iop->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -309,15 +316,7 @@ u32 news_38xx_state::bus_error_r()
 	return 0;
 }
 
-void news_38xx_state::timer_w(u8 data)
-{
-	LOG("timer_w 0x%02x\n", data);
 
-	m_timer->set_param(data);
-
-	if (!data)
-		m_iop->set_input_line(INPUT_LINE_IRQ6, CLEAR_LINE);
-}
 
 void news_38xx_state::timer(s32 param)
 {
@@ -325,7 +324,9 @@ void news_38xx_state::timer(s32 param)
 		m_iop->set_input_line(INPUT_LINE_IRQ6, ASSERT_LINE);
 }
 
-void news_38xx_state::poweron_w(uint8_t data)
+
+// TODO: Add and unify logging for all of these, add a unique log level for IOP registers, and add machine context
+void news_38xx_state::poweron_w(u8 data)
 {
 	LOG("Write POWERON = 0x%x (%s)\n", data, machine().describe_context());
 
@@ -333,6 +334,72 @@ void news_38xx_state::poweron_w(uint8_t data)
 	{
 		machine().schedule_exit();
 	}
+}
+
+void news_38xx_state::romdis_w(u8 data)
+{
+	// TODO: implement behavior based on data
+	LOG("ROMDIS = 0x%x (%s)\n", data, machine().describe_context());
+	m_iop->space(0).install_ram(0x00000000, m_ram->mask(), 0x00000000, m_ram->pointer());
+}
+
+void news_38xx_state::ptycken_w(u8 data)
+{
+	// TODO: this is not complete
+	m_inten |= 0x80;
+}
+
+void news_38xx_state::timeren_w(u8 data)
+{
+	LOG("timeren_w 0x%02x\n", data);
+
+	m_timer->set_param(data);
+
+	if (!data)
+		m_iop->set_input_line(INPUT_LINE_IRQ6, CLEAR_LINE);
+}
+
+void news_38xx_state::softintr_w(u8 data)
+{
+	LOG("SOFTINTR = 0x%x\n", data);
+}
+
+void news_38xx_state::astintr_w(u8 data)
+{
+	LOG("ASTINTR = 0x%x\n", data);
+}
+
+void news_38xx_state::iopled_w(offs_t offset, u8 data)
+{
+	LOG("IOPLED%01d = 0x%x\n", offset, data);
+}
+
+void news_38xx_state::xpustart_w(offs_t offset, u8 data)
+{
+	// offset 0 = start running main CPU
+	// offset 1 = start running UPU (UBUS bus master, expansion slot A?)
+	LOG("%cPUSTART = 0x%x\n", !offset ? 'C' : 'H', data);
+}
+
+void news_38xx_state::ipintxp_w(offs_t offset, u8 data)
+{
+	// offset 0 = Send level 2 IRQ to CPU
+	// offset 1 = Send level 2 IRQ to UPU
+	LOG("IPINT%cP = 0x%x\n", !offset ? 'C' : 'H', data);
+}
+
+void news_38xx_state::ipenixp_w(offs_t offset, u8 data)
+{
+	// offset 0 = Enable level 4 IRQ from CPU (writing 0 will not clear IRQ)
+	// offset 1 = Enable level 4 IRQ from UPU (writing 0 will not clear IRQ)
+	LOG("IPENI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
+}
+
+void news_38xx_state::ipclixp_w(offs_t offset, u8 data)
+{
+	// offset 0 = Clear level 4 IRQ from CPU
+	// offset 1 = Clear level 4 IRQ from UPU
+	LOG("IPCLI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
 }
 
 void news_scsi_devices(device_slot_interface &device)
