@@ -4186,6 +4186,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/i8256.h,MACHINES["I8256"] = true
+---------------------------------------------------
+
+if (MACHINES["I8256"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i8256.cpp",
+		MAME_DIR .. "src/devices/machine/i8256.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ncr5380.h,MACHINES["NCR5380"] = true
 ---------------------------------------------------
 
