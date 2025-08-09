@@ -202,5 +202,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2001, ufo7, 0, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // UFO Catch 7 V20011112 in string in ROM
-GAME( 2004, ufo7, 0, segaufoh8, ufo7s, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 Second", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) //
+GAME( 2001, ufo7,  0, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // UFO Catch 7 V20011112 in string in ROM
+GAME( 2004, ufo7s, 0, segaufoh8, ufo7s, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 Second", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) //
