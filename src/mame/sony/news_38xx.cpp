@@ -54,7 +54,7 @@ class news_38xx_state : public driver_device
 public:
 	news_38xx_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
-//      , m_cpu(*this, "cpu")
+		, m_cpu(*this, "cpu")
 		, m_iop(*this, "iop")
 		, m_ram(*this, "ram")
 		, m_dma(*this, "dma%u", 0U)
@@ -135,10 +135,11 @@ protected:
 	void ipenixp_w(offs_t offset, u8 data); // IPENICP/IPENIHP
 	void ipclixp_w(offs_t offset, u8 data);	// IPCLICP/IPCLIHP
 
+
 	void timer(s32 param);
 
 	// devices
-//  required_device<r3000a_device> m_cpu;
+	required_device<r3000a_device> m_cpu;
 	required_device<m68030_device> m_iop;
 	required_device<ram_device> m_ram;
 	required_device_array<dmac_0266_device, 2> m_dma;
@@ -197,6 +198,8 @@ void news_38xx_state::machine_reset()
 	m_iop->space(0).install_rom(0x00000000, 0x0000ffff, m_eprom);
 
 	m_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
+
+	m_cpu->set_input_line(INPUT_LINE_HALT, 1);
 }
 
 void news_38xx_state::init_common()
@@ -212,6 +215,9 @@ void news_38xx_state::cpu_map(address_map &map)
 void news_38xx_state::iop_map(address_map &map)
 {
 	map.global_mask(0x3fffffff); // A29-A0 are connected
+
+	// TODO: RAM test-and-set mirror
+
 	map(0x18000000, 0x1803ffff).ram(); // IOP ram
 
 	map(0x20000000, 0x2000ffff).rom().region("eprom", 0).mirror(0x1fff0000);
@@ -335,9 +341,13 @@ void news_38xx_state::poweron_w(u8 data)
 
 void news_38xx_state::romdis_w(u8 data)
 {
-	// TODO: implement behavior based on data
 	LOG("ROMDIS = 0x%x (%s)\n", data, machine().describe_context());
-	m_iop->space(0).install_ram(0x00000000, m_ram->mask(), 0x00000000, m_ram->pointer());
+	if (data) {
+		m_iop->space(0).install_ram(0x00000000, m_ram->mask(), 0x00000000, m_ram->pointer());
+	}
+	else {
+		// TODO: re-map EPROM
+	}
 }
 
 void news_38xx_state::ptycken_w(u8 data)
@@ -376,6 +386,11 @@ void news_38xx_state::xpustart_w(offs_t offset, u8 data)
 	// offset 0 = start running main CPU
 	// offset 1 = start running UPU (UBUS bus master, expansion slot A?)
 	LOG("%cPUSTART = 0x%x\n", !offset ? 'C' : 'H', data);
+	if (!offset) {
+		m_cpu->set_input_line(INPUT_LINE_HALT, data ? 0 : 1);
+	} else {
+		if (data) fatalerror("Tried to start UPU without UPU installed!");
+	}
 }
 
 void news_38xx_state::ipintxp_w(offs_t offset, u8 data)
@@ -407,9 +422,9 @@ void news_scsi_devices(device_slot_interface &device)
 
 void news_38xx_state::common(machine_config &config)
 {
-	//R3000A(config, m_cpu, 25_MHz_XTAL, 32768, 32768);
-	//m_cpu->set_addrmap(AS_PROGRAM, &news_38xx_state::cpu_map);
-	//m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
+	R3000A(config, m_cpu, 25_MHz_XTAL, 32768, 32768);
+	m_cpu->set_addrmap(AS_PROGRAM, &news_38xx_state::cpu_map);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
 
 	M68030(config, m_iop, 50_MHz_XTAL / 2);
 	m_iop->set_addrmap(AS_PROGRAM, &news_38xx_state::iop_map);
