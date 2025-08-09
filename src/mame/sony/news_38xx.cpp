@@ -316,14 +316,11 @@ u32 news_38xx_state::iop_bus_error_r()
 	return 0;
 }
 
-
-
 void news_38xx_state::timer(s32 param)
 {
 	if (param)
 		m_iop->set_input_line(INPUT_LINE_IRQ6, ASSERT_LINE);
 }
-
 
 // TODO: Add and unify logging for all of these, add a unique log level for IOP registers, and add machine context
 void news_38xx_state::poweron_w(u8 data)
