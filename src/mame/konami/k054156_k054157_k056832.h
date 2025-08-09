@@ -92,7 +92,7 @@ public:
 	int  get_layer_association();
 	void set_layer_offs(int layer, int offsx, int offsy);
 	void set_lsram_page(int logical_page, int physical_page, int physical_offset);
-	void linemap_enable(int enable);
+	void linemap_enable(bool enable);
 	int  is_irq_enabled(int irqline);
 	void read_avac(int *mode, int *data);
 	int  read_register(int regnum);
@@ -157,7 +157,7 @@ private:
 	int       m_active_layer;
 	int       m_selected_page;
 	int       m_selected_page_x4096;
-	int       m_linemap_enabled;
+	bool      m_linemap_enabled;
 	bool      m_use_ext_linescroll;
 	bool      m_uses_tile_banks;
 	int       m_cur_tile_bank;
