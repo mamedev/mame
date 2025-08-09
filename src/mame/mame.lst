@@ -31202,6 +31202,7 @@ gp_ped42_85
 gp_ped42_90
 gp_ped42_95
 gp_turbo
+icp_etg
 icpf40_01
 icpf40_02
 icpf80_01
@@ -31272,7 +31273,9 @@ sloco93a
 super21p
 super98
 superdbl
-unkicpetg
+techtrna
+techtrnb
+techtrnc
 unkicpf40
 unkicpf80
 videtrna
