@@ -51,8 +51,11 @@ public:
 		m_djmain_hack = djmain_hack;
 	}
 
-	// call if a game uses external linescroll
+	// call if a game uses external linescroll (currently, only lethalen)
 	void set_ext_linescroll(bool state) { m_use_ext_linescroll = state; }
+
+	// call if a game uses linemap rendering (currently, only gijoe)
+	void set_linemap_enable(bool enable) { m_linemap_enabled = enable; }
 
 	u16 ram_word_r(offs_t offset);
 	void ram_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -92,7 +95,6 @@ public:
 	int  get_layer_association();
 	void set_layer_offs(int layer, int offsx, int offsy);
 	void set_lsram_page(int logical_page, int physical_page, int physical_offset);
-	void linemap_enable(bool enable);
 	int  is_irq_enabled(int irqline);
 	void read_avac(int *mode, int *data);
 	int  read_register(int regnum);

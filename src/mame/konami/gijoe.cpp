@@ -529,7 +529,7 @@ void gijoe_state::gijoe(machine_config &config)
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(gijoe_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
-	m_k056832->linemap_enable(true);
+	m_k056832->set_linemap_enable(true);
 	m_k056832->set_palette(m_palette);
 
 	K053246(config, m_k053246, 0);

@@ -1803,11 +1803,6 @@ void k056832_device::set_lsram_page( int logical_page, int physical_page, int ph
 	m_lsram_page[logical_page][1] = physical_offset;
 }
 
-void k056832_device::linemap_enable( bool enable )
-{
-	m_linemap_enabled = enable;
-}
-
 int k056832_device::is_irq_enabled( int irqline )
 {
 	return(m_regs[0x06/2] & (1 << irqline & 7));
