@@ -233,6 +233,7 @@ void specpls3_state::plus3_update_memory()
 		m_bank_ram[3]->set_entry(ram_page);
 		LOG("RAM at 0xc000: %02x\n", ram_page);
 	}
+	m_ula->bank3_pg_w(m_bank_ram[3]->entry());
 }
 
 
@@ -310,9 +311,6 @@ void specpls3_state::port_1ffd_w(offs_t offset, uint8_t data)
 void specpls3_state::video_start()
 {
 	spectrum_128_state::video_start();
-	m_contention_pattern = {1, 0, 7, 6, 5, 4, 3, 2};
-	m_contention_offset = 1;
-	m_border4t_render_at = 5;
 }
 
 /* ports are not decoded full.
@@ -336,6 +334,16 @@ void specpls3_state::plus3_mem(address_map &map)
 	map(0x8000, 0xbfff).rw(FUNC(specpls3_state::spectrum_128_ram_r<2>), FUNC(specpls3_state::spectrum_128_ram_w<2>));
 	map(0xc000, 0xffff).rw(FUNC(specpls3_state::spectrum_128_ram_r<3>), FUNC(specpls3_state::spectrum_128_ram_w<3>));
 }
+
+INPUT_PORTS_START( spec_plus2a )
+	PORT_INCLUDE( spec_plus )
+
+	PORT_MODIFY("CONFIG")
+	PORT_CONFNAME( 0x80, 0x00, "Hardware Version" )
+	PORT_CONFSETTING(    0x00, "Issue 2" )
+	PORT_CONFSETTING(    0x80, "Issue 3" )
+	PORT_BIT(0x7f, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
 
 void specpls3_state::machine_start()
 {
@@ -379,13 +387,6 @@ void specpls3_state::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_IPF_FORMAT);
 }
 
-bool specpls3_state::is_contended(offs_t offset)
-{
-	u8 bank = m_bank_ram[3]->entry();
-	return spectrum_state::is_contended(offset)
-		|| ((offset >= 0xc000 && offset <= 0xffff) && (bank & 4)); // Memory banks 4, 5, 6 and 7 are contended
-}
-
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
@@ -413,6 +414,10 @@ void specpls3_state::spectrum_plus2(machine_config &config)
 	m_maincpu->nomreq_cb().remove();
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(specpls3);
+
+	SPECTRUM_ULA_PLUS2A(config.replace(), m_ula);
+	m_ula->set_z80(m_maincpu);
+	m_ula->set_screen(m_screen, get_screen_area());
 
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, specpls3_expansion_devices, nullptr);
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -519,10 +524,10 @@ ROM_START(sp3eata)
 	ROMX_LOAD("3ezxaes.rom",0x10000,0x10000, CRC(8f0ae91a) SHA1(71693e18b30c90914be58cba26682ca025c924ea), ROM_BIOS(1))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT      CLASS           INIT        COMPANY        FULLNAME                         FLAGS */
-COMP( 1987, specpl2a, 0,        0,     spectrum_plus2, spec_plus, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +2a",              0 )
-COMP( 1987, specpls3, specpl2a, 0,     spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3",               0 )
-COMP( 2000, specpl3e, 0,        0,     spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3e",              MACHINE_UNOFFICIAL )
-COMP( 2002, sp3e8bit, 0,        0,     spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3e 8bit IDE",     MACHINE_UNOFFICIAL )
-COMP( 2002, sp3eata,  0,        0,     spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3e 8bit ZXATASP", MACHINE_UNOFFICIAL )
-COMP( 2002, sp3ezcf,  0,        0,     spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3e 8bit ZXCF",    MACHINE_UNOFFICIAL )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT       CLASS           INIT        COMPANY        FULLNAME                         FLAGS */
+COMP( 1987, specpl2a, 0,        0,     spectrum_plus2, spec_plus2a, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +2a",              0 )
+COMP( 1987, specpls3, specpl2a, 0,     spectrum_plus3, spec_plus2a, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3",               0 )
+COMP( 2000, specpl3e, 0,        0,     spectrum_plus3, spec_plus2a, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3e",              MACHINE_UNOFFICIAL )
+COMP( 2002, sp3e8bit, 0,        0,     spectrum_plus3, spec_plus2a, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3e 8bit IDE",     MACHINE_UNOFFICIAL )
+COMP( 2002, sp3eata,  0,        0,     spectrum_plus3, spec_plus2a, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3e 8bit ZXATASP", MACHINE_UNOFFICIAL )
+COMP( 2002, sp3ezcf,  0,        0,     spectrum_plus3, spec_plus2a, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3e 8bit ZXCF",    MACHINE_UNOFFICIAL )
