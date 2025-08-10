@@ -50,7 +50,7 @@ public:
 		, m_bank1_view(*this, "bank1_view")
 		, m_regs_map(*this, "regs_map")
 		, m_palette(*this, "palette")
-		, m_ula(*this, "ula")
+		, m_ula_scr(*this, "ula_scr")
 		, m_sdcard(*this, "sdcard")
 		, m_io_line(*this, "IO_LINE%u", 0U)
 		, m_io_mouse(*this, "mouse_input%u", 1U)
@@ -103,7 +103,7 @@ private:
 	memory_view m_bank0_view, m_bank1_view;
 	required_device<address_map_bank_device> m_regs_map;
 	required_device<device_palette_interface> m_palette;
-	required_device<screen_ula_plus_device> m_ula;
+	required_device<screen_ula_plus_device> m_ula_scr;
 	required_device<spi_sdcard_device> m_sdcard;
 	required_ioport_array<8> m_io_line;
 	required_ioport_array<3> m_io_mouse;
@@ -139,7 +139,7 @@ private:
 void chloe_state::update_memory()
 {
 	m_screen->update_now();
-	m_ula->ula_shadow_en_w(BIT(m_port_7ffd_data, 3));
+	m_ula_scr->ula_shadow_en_w(BIT(m_port_7ffd_data, 3));
 
 	const bool ext = BIT(m_port_ff_data, 7); // 0 - DOC 7xxxx=28+; 1 - EXT 6xxxx=24+
 	m_bank0_view.disable();
@@ -225,10 +225,10 @@ u32 chloe_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	clip256x192 &= cliprect;
 
 	screen.priority().fill(0, cliprect);
-	m_ula->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
+	m_ula_scr->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
 
 	const bool flash = u64(screen.frame_number() / m_frame_invert_count) & 1;
-	m_ula->draw(screen, bitmap, clip256x192, flash, 0);
+	m_ula_scr->draw(screen, bitmap, clip256x192, flash, 0);
 
 	return 0;
 }
@@ -246,7 +246,7 @@ void chloe_state::port_7ffd_w(u8 data)
 
 void chloe_state::port_ff_w(u8 data)
 {
-	m_ula->port_ff_reg_w(data);
+	m_ula_scr->port_ff_reg_w(data);
 
 	m_port_ff_data = data;
 	update_memory();
@@ -525,7 +525,7 @@ void chloe_state::map_io(address_map &map)
 			}
 			else if ((m_palpen_selected & 0xc0) == 0x40)
 			{
-				m_ula->ulap_en_w(data & 1);
+				m_ula_scr->ulap_en_w(data & 1);
 			}
 		}));
 	map(0xfc3b, 0xfc3b).lrw8(NAME([this]() { return m_reg_selected; })
@@ -889,10 +889,9 @@ GFXDECODE_END
 void chloe_state::video_start()
 {
 	spectrum_128_state::video_start();
-	m_contention_pattern = {}; // Has no contention
 
 	const u8 *ram = m_ram->pointer();
-	m_ula->set_host_ram_ptr(ram);
+	m_ula_scr->set_host_ram_ptr(ram);
 }
 
 
@@ -931,9 +930,10 @@ void chloe_state::chloe(machine_config &config)
 	m_screen->set_raw(25.175_MHz_XTAL, CYCLES_HORIZ, CYCLES_VERT, SCR_FULL); // VGA
 	m_screen->set_screen_update(FUNC(chloe_state::screen_update));
 	m_screen->set_no_palette();
-
 	PALETTE(config, m_palette, FUNC(chloe_state::spectrum_palette), 256);
-	SCREEN_ULA_PLUS(config, m_ula, 0).set_raster_offset(SCR_256x192.left(), SCR_256x192.top()).set_palette(m_palette->device().tag(), 0x000, 0x000);
+	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
+
+	SCREEN_ULA_PLUS(config, m_ula_scr, 0).set_raster_offset(SCR_256x192.left(), SCR_256x192.top()).set_palette(m_palette->device().tag(), 0x000, 0x000);
 
 	SPEAKER(config.replace(), "speakers", 2).front();
 
