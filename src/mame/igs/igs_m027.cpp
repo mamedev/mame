@@ -3025,7 +3025,7 @@ ROM_START( tshs ) // IGS PCB-0267. See above for PCB layout
 
 	ROM_REGION( 0x480000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "igs_a3701_anim_v100.u17", 0x000000, 0x400000, CRC(bed56f35) SHA1(5a29d2a39fd997ed9ef0ec695c63629ee2303ce2) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
-	ROM_LOAD( "u18",                     0x400000, 0x080000, NO_DUMP )
+	ROM_LOAD( "u18",                     0x400000, 0x080000, CRC(fb2e91a8) SHA1(29b2f0ce3749539cbe4cfb5c40b240cc7f6147f1) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "v102cn.u14", 0x00000, 0x80000, CRC(fc055df1) SHA1(8ed0334a3947833a6192e6d4ea9678d8facea119) )
