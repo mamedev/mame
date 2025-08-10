@@ -31,8 +31,7 @@ Notes on version letters:
 
 E  = Export (It displays a "Outside USA use only" message)
 R  = ?? (In some games, it displays value of winning combinations, see e.g. fb4 Ver. R vs. Ver. LT)
-LT = ?? (It displays a "PT/TKT" message, so maybe it has a minimum amount of points
-     needed to get a ticket)
+LT = Limit Win version with 5 different TX-XT options
 XT = Texas XT / Arkansas / Iowa
 N  = ??
 B  = High Bonus Version
