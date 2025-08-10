@@ -13924,6 +13924,28 @@ ROM_START( gp_turboa )
 	ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
+ROM_START( gp_turbob )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "15_60.bin",    0x2000, 0x1000, CRC(55d191ec) SHA1(41ffcb48750f63f41c94031e9740da9f1935fef1) )
+	ROM_LOAD( "50square.bin", 0x3000, 0x1000, CRC(b945a91d) SHA1(7cc913d271d492b4c38a4a2e698f07adf371831e) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "ic7_0.bin",  0x2000, 0x1000, CRC(1090e7f0) SHA1(26a7fc8853debb9a759811d7fee39410614c3895) )    // char ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "ic2_7.bin",  0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "ic3_8.bin",  0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "ic5_9.bin",  0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+	ROM_LOAD( "gp_turbo_nvram.bin", 0x0000, 0x0800, CRC(4e5fa405) SHA1(287f26240128f3aa4af936fb51bf1488da32462a) )
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+	ROM_CONTINUE(           0x0000, 0x0100 )
+ROM_END
+
 ROM_START( gp_jpn22 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ver2.2_7.bin",  0x6000, 0x1000, CRC(9880b2dd) SHA1(7a3a3997f2ba64cc3ce01ad71fa98fead4c256a0) )
@@ -15060,6 +15082,7 @@ GAMEL( 198?, techtrnb,  unkicpf80, unkicpf40, icp_etg,   goldnpkr_state, empty_i
 
 GAME(  198?, gp_turbo,  0,         pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 1)",             0 )  // no lamps
 GAME(  198?, gp_turboa, gp_turbo,  pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 2)",             0 )  // no lamps
+GAME(  198?, gp_turbob, gp_turbo,  pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 3)",             0 )  // no lamps
 GAME(  198?, gp_jpn22,  goldnpkr,  goldnpkr,  goldnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Golden Poker (Japan Ver. 2.2)",   0 )  // no lamps
 GAME(  1987, gp_ped42_95, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 95%)",          0 )  // no lamps
 GAME(  1987, gp_ped42_90, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 90%)",          0 )  // no lamps
