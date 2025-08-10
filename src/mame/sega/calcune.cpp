@@ -52,8 +52,8 @@ private:
 	int m_vdp_state = 0;
 
 	void vdp_sndirqline_callback_genesis_z80(int state);
-	void vdp_lv6irqline_callback_genesis_68k(int state);
-	void vdp_lv4irqline_callback_genesis_68k(int state);
+	void vdp_vint_cb(int state);
+	void vdp_hint_cb(int state);
 
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 
@@ -226,7 +226,7 @@ void calcune_state::vdp_sndirqline_callback_genesis_z80(int state)
 {
 }
 
-void calcune_state::vdp_lv6irqline_callback_genesis_68k(int state)
+void calcune_state::vdp_vint_cb(int state)
 {
 	// this looks odd but is the logic the Genesis code requires
 	if (state == ASSERT_LINE)
@@ -235,7 +235,7 @@ void calcune_state::vdp_lv6irqline_callback_genesis_68k(int state)
 		m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
-void calcune_state::vdp_lv4irqline_callback_genesis_68k(int state)
+void calcune_state::vdp_hint_cb(int state)
 {
 	// this looks odd but is the logic the Genesis code requires
 	if (state == ASSERT_LINE)
@@ -271,8 +271,8 @@ void calcune_state::calcune(machine_config &config)
 	SEGA315_5313(config, m_vdp[0], OSC1_CLOCK, m_maincpu);
 	m_vdp[0]->set_is_pal(false);
 	m_vdp[0]->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));
-	m_vdp[0]->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
-	m_vdp[0]->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp[0]->vint_cb().set(FUNC(calcune_state::vdp_vint_cb));
+	m_vdp[0]->hint_cb().set(FUNC(calcune_state::vdp_hint_cb));
 	m_vdp[0]->set_alt_timing(1);
 	m_vdp[0]->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
 	m_vdp[0]->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
@@ -281,8 +281,8 @@ void calcune_state::calcune(machine_config &config)
 	m_vdp[1]->set_is_pal(false);
 //  are these not hooked up or should they OR with the other lines?
 //  m_vdp[1]->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));
-//  m_vdp[1]->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
-//  m_vdp[1]->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
+//  m_vdp[1]->vint_cb().set(FUNC(calcune_state::vdp_vint_cb));
+//  m_vdp[1]->hint_cb().set(FUNC(calcune_state::vdp_hint_cb));
 	m_vdp[1]->set_alt_timing(1);
 	m_vdp[1]->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
 	m_vdp[1]->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);

@@ -1886,8 +1886,8 @@ void segac2_state::segac(machine_config &config)
 	SEGA315_5313(config, m_vdp, XL2_CLOCK, m_maincpu);
 	m_vdp->set_is_pal(false);
 	m_vdp->snd_irq().set(FUNC(segac2_state::vdp_sndirqline_callback_c2));
-	m_vdp->lv6_irq().set(FUNC(segac2_state::vdp_lv6irqline_callback_c2));
-	m_vdp->lv4_irq().set(FUNC(segac2_state::vdp_lv4irqline_callback_c2));
+	m_vdp->vint_cb().set(FUNC(segac2_state::vdp_lv6irqline_callback_c2));
+	m_vdp->hint_cb().set(FUNC(segac2_state::vdp_lv4irqline_callback_c2));
 	m_vdp->set_alt_timing(1);
 	m_vdp->set_screen("screen");
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.50);

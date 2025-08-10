@@ -591,24 +591,32 @@ void sega315_5313_device::vdp_set_register(int regnum, u8 value)
 		// but delayed a bit.
 		// Note that irq 6 is masked for about 5 frames, leaving the assumption that it mustn't
 		// be left on during all this time.
-		if (m_irq4_pending)
+		if (m_irq4_pending && MEGADRIVE_REG0_IRQ4_ENABLE)
 		{
-			if (MEGADRIVE_REG0_IRQ4_ENABLE)
-				m_lv4irqline_callback(true);
-			else
-				m_lv4irqline_callback(false);
+			m_irq4_on_timer->adjust(attotime::from_ticks(16, clock() / 4));
+//			if (MEGADRIVE_REG0_IRQ4_ENABLE)
+//				m_lv4irqline_callback(true);
+//			else
+//				m_lv4irqline_callback(false);
 		}
+		else
+			m_lv4irqline_callback(false);
+
 	}
 
 	if (regnum == 0x01)
 	{
-		if (m_irq6_pending)
+		if (m_irq6_pending && MEGADRIVE_REG01_IRQ6_ENABLE)
 		{
-			if (MEGADRIVE_REG01_IRQ6_ENABLE)
-				m_lv6irqline_callback(true);
-			else
-				m_lv6irqline_callback(false);
+			m_irq6_on_timer->adjust(attotime::from_ticks(16, clock() / 4));
+
+//			if (MEGADRIVE_REG01_IRQ6_ENABLE)
+//				m_lv6irqline_callback(true);
+//			else
+//				m_lv6irqline_callback(false);
 		}
+		else
+			m_lv6irqline_callback(false);
 	}
 
 //  if (regnum == 0x0a)
@@ -2254,7 +2262,7 @@ void sega315_5313_device::vdp_handle_scanline_callback(int scanline)
 		if (get_scanline_counter() == m_irq6_scanline)
 		{
 		//  osd_printf_debug("x %d", get_scanline_counter());
-			m_irq6_on_timer->adjust(attotime::from_usec(6));
+			m_irq6_on_timer->adjust(attotime::from_ticks(16, clock() / 4));
 			m_irq6_pending = 1;
 			m_vblank_flag = 1;
 
@@ -2277,7 +2285,7 @@ void sega315_5313_device::vdp_handle_scanline_callback(int scanline)
 				if (MEGADRIVE_REG0_IRQ4_ENABLE)
 				{
 					// TODO: arbitrary timing
-					m_irq4_on_timer->adjust(attotime::from_usec(1));
+					m_irq4_on_timer->adjust(attotime::from_ticks(16, clock() / 4));
 					//osd_printf_debug("irq4 on scanline %d reload %d\n", get_scanline_counter(), MEGADRIVE_REG0A_HINT_VALUE);
 				}
 				else
@@ -2320,7 +2328,7 @@ void sega315_5313_device::vdp_handle_eof()
 
 	m_vblank_flag = 0;
 	// Not here, breaks warlock
-	//m_irq6_pending = 0;
+//	m_irq6_pending = 0;
 
 	/* Set it to -1 here, so it becomes 0 when the first timer kicks in */
 	if (!m_use_alt_timing) m_scanline_counter = -1;
