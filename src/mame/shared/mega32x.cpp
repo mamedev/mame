@@ -345,7 +345,7 @@ uint16_t sega_32x_device::m68k_a15106_r()
 
 	retval = m_a15106_reg;
 
-	if (m_fifo_block_a_full && m_fifo_block_b_full) retval |= 0x8080;
+	if (m_fifo[0].full() && m_fifo[1].full()) retval |= 0x8080;
 
 	return retval;
 }
@@ -373,12 +373,10 @@ void sega_32x_device::m68k_a15106_w(address_space &space, offs_t offset, uint16_
 
 		if((m_a15106_reg & 4) == 0) // clears the FIFO state
 		{
-			m_current_fifo_block = m_fifo_block_a;
-			m_current_fifo_readblock = m_fifo_block_b;
-			m_current_fifo_write_pos = 0;
-			m_current_fifo_read_pos = 0;
-			m_fifo_block_a_full = 0;
-			m_fifo_block_b_full = 0;
+			m_fifo[0].clear();
+			m_fifo[1].clear();
+			m_fifo_write_block = 0;
+			m_fifo_read_block = 0;
 		}
 
 		//logerror("m68k_a15106_w %04x\n", data);
@@ -423,45 +421,18 @@ uint16_t sega_32x_device::dreq_common_r(address_space &space, offs_t offset)
 				return 0xffff;
 			}
 
-			uint16_t retdat = m_current_fifo_readblock[m_current_fifo_read_pos];
-
-			m_current_fifo_read_pos++;
-
-		//  logerror("reading FIFO!\n");
-
-			if (m_current_fifo_readblock == m_fifo_block_a && !m_fifo_block_a_full)
-				logerror("Fifo block a isn't filled!\n");
-
-			if (m_current_fifo_readblock == m_fifo_block_b && !m_fifo_block_b_full)
-				logerror("%s Fifo block b isn't filled!\n", machine().describe_context());
-
-
-			if (m_current_fifo_read_pos==4)
+			if (m_fifo[m_fifo_read_block].empty())
 			{
-				if (m_current_fifo_readblock == m_fifo_block_a)
-				{
-					m_fifo_block_a_full = 0;
+				logerror("Attempt to read FIFO while empty %c!\n", m_fifo_read_block ? 'B' : 'A');
+				return 0xffff;
+			}
 
-					if (m_fifo_block_b_full)
-					{
-						m_current_fifo_readblock = m_fifo_block_b;
-						m_current_fifo_block = m_fifo_block_a;
-					}
+			uint16_t retdat = m_fifo[m_fifo_read_block].dequeue();
 
-					m_current_fifo_read_pos = 0;
-				}
-				else if (m_current_fifo_readblock == m_fifo_block_b)
-				{
-					m_fifo_block_b_full = 0;
-
-					if (m_fifo_block_a_full)
-					{
-						m_current_fifo_readblock = m_fifo_block_a;
-						m_current_fifo_block = m_fifo_block_b;
-					}
-
-					m_current_fifo_read_pos = 0;
-				}
+			if (m_fifo[m_fifo_read_block].empty())
+			{
+				m_fifo_read_block ^= 1;
+				//m_main_cpu->resume(1);
 			}
 
 			return retdat;
@@ -527,15 +498,11 @@ void sega_32x_device::dreq_common_w(address_space &space, offs_t offset, uint16_
 				return;
 			}
 
-			if (m_current_fifo_block==m_fifo_block_a && m_fifo_block_a_full)
+			if (m_fifo[m_fifo_write_block].full())
 			{
-				logerror("attempt to write to Full Fifo block a!\n");
-				return;
-			}
-
-			if (m_current_fifo_block==m_fifo_block_b && m_fifo_block_b_full)
-			{
-				logerror("attempt to write to Full Fifo block b!\n");
+				logerror("Attempt to write with FIFO full block %c!\n", m_fifo_write_block ? 'B' : 'A');
+				m_main_cpu->defer_access();
+				//m_main_cpu->suspend_until_trigger(1, true);
 				return;
 			}
 
@@ -553,42 +520,22 @@ void sega_32x_device::dreq_common_w(address_space &space, offs_t offset, uint16_
 				return;
 			}
 
-			m_current_fifo_block[m_current_fifo_write_pos] = data;
-			m_current_fifo_write_pos++;
+			m_fifo[m_fifo_write_block].enqueue(data);
 			m_dreq_size --;
 
-			if (m_current_fifo_write_pos==4)
+			if (m_fifo[m_fifo_write_block].full())
 			{
-				if (m_current_fifo_block==m_fifo_block_a)
-				{
-					m_fifo_block_a_full = 1;
-					if (!m_fifo_block_b_full)
-					{
-						m_current_fifo_block = m_fifo_block_b;
-						m_current_fifo_readblock = m_fifo_block_a;
-						// incase we have a stalled DMA in progress, let the SH2 know there is data available
-						m_master_cpu->sh2_notify_dma_data_available();
-						m_slave_cpu->sh2_notify_dma_data_available();
-
-					}
-					m_current_fifo_write_pos = 0;
-				}
-				else
-				{
-					m_fifo_block_b_full = 1;
-
-					if (!m_fifo_block_a_full)
-					{
-						m_current_fifo_block = m_fifo_block_a;
-						m_current_fifo_readblock = m_fifo_block_b;
-						// incase we have a stalled DMA in progress, let the SH2 know there is data available
-						m_master_cpu->sh2_notify_dma_data_available();
-						m_slave_cpu->sh2_notify_dma_data_available();
-					}
-
-					m_current_fifo_write_pos = 0;
-				}
+				m_fifo_write_block ^= 1;
+				m_master_cpu->sh2_notify_dma_data_available();
+				m_slave_cpu->sh2_notify_dma_data_available();
 			}
+
+			//if (m_fifo[0].full() && m_fifo[1].full())
+			//{
+			//  //m_fifo_read_block ^= 1;
+			//	//m_master_cpu->sh2_notify_dma_data_available();
+			//	//m_slave_cpu->sh2_notify_dma_data_available();
+			//}
 
 			break;
 	}
@@ -1560,10 +1507,10 @@ SH2_DMA_FIFO_DATA_AVAILABLE_CB(sega_32x_device::_32x_fifo_available_callback)
 {
 	if (src==0x4012)
 	{
-		if (m_current_fifo_readblock==m_fifo_block_a && m_fifo_block_a_full)
+		if (!m_fifo[0].empty() && m_fifo_read_block == 0)
 			return 1;
 
-		if (m_current_fifo_readblock==m_fifo_block_b && m_fifo_block_b_full)
+		if (!m_fifo[1].empty() && m_fifo_read_block == 1)
 			return 1;
 
 		return 0;
@@ -1724,6 +1671,7 @@ void sega_32x_device::device_add_mconfig(machine_config &config)
 	// (update: actually fixed by using synchronize in comms space)
 	// sharrierju: "press start button" will flicker at /512 onward
 	// chaotixju: hangs after sega logo at /256
+	// twcmd: expects /64 after FIFO rewrite
 
 	// some games appear to dislike 'perfect' levels of interleave, probably due to
 	// non-emulated cache, ram waitstates and other issues?
@@ -1807,12 +1755,10 @@ void sega_32x_device::device_reset()
 	m_32x_displaymode = 0;
 	m_32x_240mode = 0;
 
-	m_current_fifo_block = m_fifo_block_a;
-	m_current_fifo_readblock = m_fifo_block_b;
-	m_current_fifo_write_pos = 0;
-	m_current_fifo_read_pos = 0;
-	m_fifo_block_a_full = 0;
-	m_fifo_block_b_full = 0;
+	m_fifo[0].clear();
+	m_fifo[1].clear();
+	m_fifo_write_block = 0;
+	m_fifo_read_block = 0;
 
 	m_32x_hcount_compare_val = -1;
 	m_32x_hcount_reg = 0;
