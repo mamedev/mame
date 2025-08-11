@@ -186,8 +186,9 @@ void stella8085_state::kbd_sl_w(uint8_t data)
 {
 	m_kbd_sl = data;
 
+	// SL3 connected through CD4093 NAND to DIP switch connected to RST75
 	if ( BIT(m_dsw->read(),0))
-		m_maincpu->set_input_line(I8085_RST75_LINE, BIT(data,3) ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(I8085_RST75_LINE, BIT(data,3) ? CLEAR_LINE : ASSERT_LINE);
 	else
 		m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
@@ -333,7 +334,7 @@ void stella8085_state::io70(uint8_t data)
 
 void stella8085_state::io71(uint8_t data)
 {
-	//const bool rs = BIT(data,0);
+	const bool rs = BIT(data,0);
 	const bool gong = BIT(data,1);
 	const bool dg = BIT(data,2);
 	const bool ug = BIT(data,3);
@@ -342,7 +343,12 @@ void stella8085_state::io71(uint8_t data)
 	const bool dm = BIT(data,6);
 	const bool um = BIT(data,7);
 
-	//rst55_w(rs);
+	// IO 71 D0 connected through CD4013 flipflop to DIP switch connected to RST55
+	if ( BIT(m_dsw->read(),3))
+		m_maincpu->set_input_line(I8085_RST55_LINE, rs ? CLEAR_LINE : ASSERT_LINE);
+	else
+		m_maincpu->set_input_line(I8085_RST55_LINE, CLEAR_LINE);
+
 	if (gong)
 		popmessage("GONG");
 	if (d60)
@@ -437,13 +443,12 @@ static INPUT_PORTS_START( dicemstr )
 	PORT_DIPNAME(0x02, 0x00, "8085 HOLD")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x02, DEF_STR(On))
-	PORT_DIPNAME(0x04, 0x00, "8085 RST55")
+	PORT_DIPNAME(0x04, 0x00, "8085 Reset")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x04, DEF_STR(On))
-	PORT_DIPNAME(0x08, 0x08, "8085 Reset")
+	PORT_DIPNAME(0x08, 0x08, "8085 RST55")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x08, DEF_STR(On))
-	
+	PORT_DIPSETTING(0x04, DEF_STR(On))
 
 	PORT_START("TZ0") //TASTEN
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -498,10 +503,10 @@ static INPUT_PORTS_START( disc )
 	PORT_DIPNAME(0x02, 0x00, "8085 HOLD")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x02, DEF_STR(On))
-	PORT_DIPNAME(0x04, 0x00, "8085 RST55")
+	PORT_DIPNAME(0x04, 0x00, "8085 Reset")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x04, DEF_STR(On))
-	PORT_DIPNAME(0x08, 0x08, "8085 Reset")
+	PORT_DIPNAME(0x08, 0x08, "8085 RST55")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x08, DEF_STR(On))
 
