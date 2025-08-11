@@ -73,16 +73,18 @@ public:
 	TIMER_CALLBACK_MEMBER(irq4_on_timer_callback);
 	void vdp_handle_eof();
 	void device_reset_old();
-	void vdp_clear_irq6_pending() { m_irq6_pending = 0; }
-	void vdp_clear_irq4_pending()
+	void irq_ack()
 	{
 		if (m_irq6_pending)
 		{
 			m_irq6_pending = 0;
-			m_lv4irqline_callback(true);
+			m_lv6irqline_callback(false);
 		}
-		else
+		else if (m_irq4_pending)
+		{
 			m_irq4_pending = 0;
+			m_lv4irqline_callback(false);
+		}
 	}
 
 	// set some VDP variables at start (shall be moved to a device interface?)

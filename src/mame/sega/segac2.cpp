@@ -1837,10 +1837,11 @@ void segac2_state::vdp_lv4irqline_callback_c2(int state)
 }
 
 /* Callback when the 68k takes an IRQ */
+// TODO: update using cpu_space_map
 IRQ_CALLBACK_MEMBER(segac2_state::int_callback)
 {
 	if (irqline == 4)
-		m_vdp->vdp_clear_irq4_pending();
+		m_vdp->irq_ack();
 
 	return (0x60 + irqline * 4) / 4; // vector address
 }
