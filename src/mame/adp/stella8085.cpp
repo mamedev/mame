@@ -163,8 +163,18 @@ void stella8085_state::io_map(address_map &map)
 
 uint8_t stella8085_state::lw_r()
 {
-	// SPIN?
-	return 0xFF;
+	// wheel light sensors
+
+	// LIW1
+	// LIW2
+	// LIW3
+	// LIW4
+	//M5A out
+	//M5B out
+	//P1.6 is always low
+	// LIW5
+
+	return 0xBF;
 }
 
 void stella8085_state::machine1_w(uint8_t data)
@@ -174,7 +184,7 @@ void stella8085_state::machine1_w(uint8_t data)
 
 void stella8085_state::machine2_w(uint8_t data)
 {
-	popmessage("M5 A %d B %d\nM6 A %d B %d",BIT(4,data),BIT(5,data),BIT(6,data),BIT(7,data));
+	popmessage("M5 A %d B %d",BIT(4,data),BIT(5,data));
 }
 
 /*********************************************
