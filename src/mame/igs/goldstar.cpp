@@ -15599,6 +15599,81 @@ ROM_START( lucky8o )
 	ROM_LOAD( "g13", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
+ROM_START( lucky8p )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512.bin", 0x00000, 0x10000, CRC(6b7d70be) SHA1(d6520f2da2b74eae02b6ee3375fe982c358dc927) )
+
+	// only the program ROM was provided, with no indication of the other ROMs / PROMs. Using bog-standard lucky8 ones for now
+	ROM_REGION( 0x18000, "gfx1", 0 ) // may be wrong, see missing GFX on title screen
+	ROM_LOAD( "5.h7",   0x00000, 0x8000, BAD_DUMP CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "6.h8",   0x08000, 0x8000, BAD_DUMP CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "7.h10",  0x10000, 0x8000, BAD_DUMP CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.h1",   0x0000, 0x2000, BAD_DUMP CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.h3",   0x2000, 0x2000, BAD_DUMP CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.h4",   0x4000, 0x2000, BAD_DUMP CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.h5",   0x6000, 0x2000, BAD_DUMP CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12",   0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "prom4", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "g14", 0x0000, 0x0100, BAD_DUMP CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "g13", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+/*
+  Lucky 8 Lines
+  W-4 hardware, Wing
+
+  The first program ROM is like the original
+  but with a jump patched.
+
+  The second one has a lot of data and more
+  strings after the string "You Lose", instead
+  of the original one that after the string
+  all bytes are FFs...
+
+*/
+ROM_START( lucky8q )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "48_red.bin",    0x0000, 0x4000, CRC(30718aa5) SHA1(0ce1d24a074d2b815640f43fd42a883aae1078c3) )
+	ROM_LOAD( "29r.27-28.bin", 0x4000, 0x4000, CRC(04172172) SHA1(9217003f1203d9501889832fc1f7304917a6d155) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "6",  0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "7",  0x10000, 0x8000, CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1",   0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2",   0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3",   0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4",   0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "prom4", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "g14", 0x0000, 0x0100, CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+
+ROM_END
+
+
 /*
 Super Dragon by OCT
 
@@ -15638,35 +15713,6 @@ ROM_START( superdrg )
 	ROM_LOAD( "dra.u49",  0x000, 0x200, CRC(2da522a7) SHA1(432a6463d1ad39644a9e7094dd6d2d9e604dfc55) ) // AM27S13PC
 ROM_END
 
-ROM_START( lucky8p )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "27c512.bin", 0x00000, 0x10000, CRC(6b7d70be) SHA1(d6520f2da2b74eae02b6ee3375fe982c358dc927) )
-
-	// only the program ROM was provided, with no indication of the other ROMs / PROMs. Using bog-standard lucky8 ones for now
-	ROM_REGION( 0x18000, "gfx1", 0 ) // may be wrong, see missing GFX on title screen
-	ROM_LOAD( "5.h7",   0x00000, 0x8000, BAD_DUMP CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
-	ROM_LOAD( "6.h8",   0x08000, 0x8000, BAD_DUMP CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
-	ROM_LOAD( "7.h10",  0x10000, 0x8000, BAD_DUMP CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
-
-	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "1.h1",   0x0000, 0x2000, BAD_DUMP CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
-	ROM_LOAD( "2.h3",   0x2000, 0x2000, BAD_DUMP CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
-	ROM_LOAD( "3.h4",   0x4000, 0x2000, BAD_DUMP CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
-	ROM_LOAD( "4.h5",   0x6000, 0x2000, BAD_DUMP CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
-
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "d12",   0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
-	ROM_LOAD( "prom4", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
-
-	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
-
-	ROM_REGION( 0x100, "unkprom", 0 )
-	ROM_LOAD( "g14", 0x0000, 0x0100, BAD_DUMP CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
-
-	ROM_REGION( 0x20, "unkprom2", 0 )
-	ROM_LOAD( "g13", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
-ROM_END
 
 /*
   Only the subboard available (Z80, ROM, 2 stickered chips (sanded),
@@ -24313,6 +24359,7 @@ GAMEL( 1989, lucky8m,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_luck
 GAMEL( 1989, lucky8n,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8n,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 13)",                               0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 1988, lucky8o,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines (set 14, W-4, Yamate)",                  0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 1988, lucky8p,    lucky8,   lucky8p,  lucky8,   wingco_state,   init_lucky8p,   ROT0, "bootleg (Cleco)",   "New Lucky 8 Lines (set 15, W-4, Cleco bootleg)",           MACHINE_IMPERFECT_GRAPHICS, layout_lucky8 ) // 2 control sets, missing GFX on title screen (wrong GFX ROMs)
+GAMEL( 1988, lucky8q,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 16, W-4)",                          0,                     layout_lucky8 )
 GAMEL( 198?, ns8lines,   0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1985, ns8linesa,  ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,   ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
