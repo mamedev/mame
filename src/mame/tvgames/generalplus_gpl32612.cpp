@@ -307,6 +307,11 @@ ROM_START( smatomo )
 	ROM_LOAD( "mx25l3206e.ic3", 0x0000, 0x400000, CRC(fb4d1684) SHA1(98cecd7ead52118028cb3a1de71cb3528cd81be5) )
 ROM_END
 
+ROM_START( tamameet )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q64.u3", 0x0000, 0x800000, CRC(f15507f8) SHA1(356cb1bd68169eb747898325eacfd7590dbe9f9c) )
+ROM_END
+
 ROM_START( intrtvg )
 	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
@@ -455,3 +460,6 @@ CONS( 200?, arcadege,           0,        0,      gpl32612, gpl32612, generalplu
 // uses a GP326813
 // 学習おうえんAI★ミラクルロボ
 CONS( 2020, airobo,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Benesse Corporation",        "Gakushuu Ouen AI Miracle Robo",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPE13101A
+CONS( 2018, tamameet,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tamagotchi Meets (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
