@@ -14003,6 +14003,24 @@ ROM_START( gp_ped42_95 )
 	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+ROM_START( gp_ped42_95a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gp_ped42.a",    0x6000, 0x1000, CRC(e583e157) SHA1(331f68ac4c5458722848ad8e2e28caf759c2106a) )
+	ROM_LOAD( "4_a_8.bin",     0x7000, 0x1000, CRC(5e5afaa6) SHA1(4d4abfcbc51d23c166959c5aa087971b75024f0a) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "u38_5a.bin", 0x4000, 0x2000, CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char ROM
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "u43_2a.bin", 0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "u40_4a.bin", 0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1",   0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
 ROM_START( gp_ped42_90 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gp_ped42.a",    0x6000, 0x1000, CRC(e583e157) SHA1(331f68ac4c5458722848ad8e2e28caf759c2106a) )
@@ -15106,11 +15124,12 @@ GAME(  198?, gp_turbo,  0,         pottnpkr,  pottnpkr,  goldnpkr_state, empty_i
 GAME(  198?, gp_turboa, gp_turbo,  pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 2)",             0 )  // no lamps
 GAME(  198?, gp_turbob, gp_turbo,  pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 3)",             0 )  // no lamps
 GAME(  198?, gp_jpn22,  goldnpkr,  goldnpkr,  goldnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Golden Poker (Japan Ver. 2.2)",   0 )  // no lamps
-GAME(  1987, gp_ped42_95, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 95%)",          0 )  // no lamps
-GAME(  1987, gp_ped42_90, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 90%)",          0 )  // no lamps
-GAME(  1987, gp_ped42_85, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 85%)",          0 )  // no lamps
-GAME(  1987, gp_ped42_80, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 80%)",          0 )  // no lamps
-GAME(  1987, gp_ped42_70, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 70%)",          0 )  // no lamps
+GAME(  1987, gp_ped42_95,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 95%, set 1)",   0 )  // no lamps
+GAME(  1987, gp_ped42_95a, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 95%, set 2)",   0 )  // no lamps
+GAME(  1987, gp_ped42_90, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 90%)",          0 )  // no lamps
+GAME(  1987, gp_ped42_85, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 85%)",          0 )  // no lamps
+GAME(  1987, gp_ped42_80, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 80%)",          0 )  // no lamps
+GAME(  1987, gp_ped42_70, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 70%)",          0 )  // no lamps
 
 // DEP 9801 encrypted platform...
 GAME(  1998, dash_a37,  0,         dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dash! (A37, ver 1998/10/22)",                MACHINE_NOT_WORKING )
