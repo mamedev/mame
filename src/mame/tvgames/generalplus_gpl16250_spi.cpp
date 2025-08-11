@@ -159,6 +159,14 @@ ROM_START( pokegach )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
 
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l12835f.u4", 0x0000, 0x1000000, CRC(85bc9716) SHA1(3de7f0fd92e8f6084eb0b82ec293be3166c800ac) )
+ROM_END
+
+ROM_START( pokegac2 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "red_mx25l6445e.u4", 0x0000, 0x800000, CRC(f20bb213) SHA1(787ae27e36352525e6ffebe25da4329cb156b219) )
 
@@ -166,7 +174,7 @@ ROM_START( pokegach )
 	ROM_LOAD16_WORD_SWAP( "red_ft24c16a.u9", 0x000, 0x800, CRC(2abcf4d4) SHA1(5227e868f93205a069bc49c30792a9b95c8f0efc) )
 ROM_END
 
-ROM_START( pokegachy )
+ROM_START( pokegac2y )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
 
@@ -254,8 +262,11 @@ CONS(2015, anpanm15, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gps
 
 CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2015, pokegach,  0,        0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Tomy", "Pokegacha V2 Red (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2015, pokegachy, pokegach, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Tomy", "Pokegacha V2 Yellow (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2015, pokegach,  0,        0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Tomy", "Pokegacha (20150902, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// the 2nd release comes in 2 colours and they can communicate?
+CONS(2015, pokegac2,  0,        0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Tomy", "Pokegacha V2 Red (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2015, pokegac2y, pokegach, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Tomy", "Pokegacha V2 Yellow (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // This can be found listed as a ZHISHAN / Aojiao / Bornkid 32 Bit Preloaded 139-in-1 Handheld Game Console
 // but these just seem to be brands, manufacturer is unknown.
