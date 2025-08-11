@@ -657,5 +657,5 @@ CONS( 2017, parcade,       0,       0,      generalplus_gpl_unknown,   generalpl
 CONS( 2019, taturtf,       0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Super Impulse", "Teenage Mutant Ninja Turtles - Turtle Fighter (Tiny Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Probably not identical hardware, but still not direct mapped SPI.  External ROM after 0x3000 is encrypted (maybe decrypted in software) seems to have jumps to internal ROM
-CONS(2021, siddr,          0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, init_siddr, "Super Impulse", "Dance Dance Revolution - Broadwalk Arcade", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, siddr,         0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, init_siddr, "Super Impulse", "Dance Dance Revolution - Broadwalk Arcade", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

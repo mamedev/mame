@@ -236,6 +236,15 @@ ROM_START( punij2pk )
 	ROM_LOAD16_WORD_SWAP( "japan_v2pcb_pink_gpr25l64.ic103", 0x0000, 0x800000, CRC(7ae9f009) SHA1(d762634a0442ff231837f9481a1203933c070df0) )
 ROM_END
 
+ROM_START( punifrnd )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "25oh64.ic3", 0x0000, 0x800000, CRC(622ca9b3) SHA1(4206393a4458ffcdb63352e743481865532fe8b5) )
+ROM_END
+
+ROM_START( pokgoget )
+	ROM_REGION16_BE(0x2000000, "maincpu:spidirect", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l25645g.u1", 0x0000, 0x2000000, CRC(a76ae22f) SHA1(3fa5eeedb3fe343a7707d76710298377b22b0681) )
+ROM_END
 
 ROM_START( smkcatch )
 	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
@@ -286,6 +295,12 @@ CONS(2021, punij1pu, punirune, 0, generalplus_gpspi_direct, bfspyhnt, generalplu
 
 // the case on these is similar to the above, but the text is in Japanese, uses PUNIRUNZU_MAIN_V2 on pcb
 CONS(2021, punij2pk, punirune, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_V2, pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// has a link feature
+CONS(2021, punifrnd, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Punirunes Friendship (hot pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// Pokemon ガチッとゲットだぜ! モンスターボール 
+CONS(2021, pokgoget, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Pokemon Go! Get It! (210406, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 
 // 2020 (device) / 2021 (box) version of Sumikko Gurashi a cloud shaped device
