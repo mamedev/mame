@@ -96,4 +96,4 @@ CONS( 2006, evolhh,      0,       0,      evolhh, evolhh, evolution_handheldgame
 CONS( 2018, smkatsum,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "San-X / Tomy", "Sumikko Gurashi - Sumikko Atsume (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a pink 'for girls' unit, exists in other colours, software likely the same
 
 // おしりたんてい ププッとかいけつゲーム
-CONS( 2020, buttdtct,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Tomy", "Butt Detective Handheld (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a pink 'for girls' unit, exists in other colours, software likely the same
+CONS( 2020, buttdtct,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Tomy", "Oshiri Tantei - Puputto Kaiketsu Game (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a pink 'for girls' unit, exists in other colours, software likely the same
