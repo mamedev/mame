@@ -322,6 +322,11 @@ ROM_START( saikyopc )
 	ROM_LOAD( "25l12833f.u6", 0x0000, 0x1000000, CRC(5b870182) SHA1(909d2834875484f8369cfbce2c51fa27c0a3d973) )
 ROM_END
 
+ROM_START( tmydistb )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l64.u5", 0x0000, 0x800000, CRC(01e5a892) SHA1(b9164173e707eb69cd7d50ce69f3368de7e7390f) )
+ROM_END
+
 ROM_START( intrtvg )
 	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
@@ -474,6 +479,10 @@ CONS( 2020, airobo,             0,        0,      gpl32612, gpl32612, generalplu
 // uses GPE13101A
 CONS( 2018, tamameet,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tamagotchi Meets (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+// uses a glob CPU
 CONS( 2021, chiikpc,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Chiikawa Learning PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+// uses a glob CPU
 CONS( 2020, saikyopc,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Saikyououzukan Learning PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+CONS( 2020, tmydistb,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Tomy",        "Disney Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
