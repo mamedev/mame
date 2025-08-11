@@ -30,14 +30,15 @@ Notes on version letters:
 -------------------------
 
 E  = Export (It displays a "Outside USA use only" message)
-R  = ?? (In some games, it displays value of winning combinations, see e.g. fb4 Ver. R vs. Ver. LT)
+R  = Regular
 LT = Limit Win version with 5 different TX-XT options
 XT = Texas XT / Arkansas / Iowa
-N  = ??
+N  = No Reel Spin
 B  = High Bonus Version
-SH = ??
+SH = Skill Hold
 T  = 10 Times (Bonus game every ten times, see bonus table)
-
+Q  = ??
+S  = SPECIAL. Modify "Feel of playing"
 
 2009-08 FP: Reworked parent/clone relationships so that parent is the higher revision and/or the
 Export version. Also, I tried to standardize setnames by using the following convention:
