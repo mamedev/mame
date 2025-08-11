@@ -26,10 +26,9 @@
         MEM   |   -
         ALTER |   =
 
-        Addresses must have all 6 digits entered.
-        Data must have all 3 digits entered.
-        System has a short beep for each key, and a slightly longer beep
-            for each group of 3 digits. The largest number allowed is 377 (=0xFF).
+        Addresses must have all 6 digits entered. Data must have all 3 digits entered.
+        System has a short beep for each key, and a slightly longer beep for each
+        group of 3 digits. The largest number allowed is octal 377 (=256/0xFF).
 
     Test Paste:
         -041000=123 245 333 144 255 366 077=-041000

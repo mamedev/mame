@@ -109,7 +109,7 @@ h8bus_device::h8bus_device(const machine_config &mconfig, const char *tag, devic
 h8bus_device::h8bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_mem_config("mem", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(FUNC(h8bus_device::mem_map), this))
+	, m_mem_config("mem", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(h8bus_device::mem_map), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(h8bus_device::io_map), this))
 	, m_p1_card(nullptr)
 	, m_p2_card(nullptr)
@@ -122,6 +122,8 @@ h8bus_device::~h8bus_device()
 
 void h8bus_device::device_start()
 {
+	this->space(AS_PROGRAM).specific(m_mem);
+	this->space(AS_IO).specific(m_io);
 }
 
 void h8bus_device::device_reset()

@@ -16,7 +16,6 @@
       P10          Reserved for Expansion connector/HA-8-8 Extended Configuration Option
 
 
-
     pin         P1 - P10
   --------------------------------
     49  -------   +8V
@@ -190,6 +189,9 @@ protected:
 
 	h8bus_device &h8bus() { assert(m_h8bus); return *m_h8bus; }
 
+	memory_access<16, 0, 0, (endianness_t)0>::specific get_mem();
+	memory_access<8, 0, 0, (endianness_t)0>::specific get_io();
+
 	const char *m_h8bus_slottag;
 	u8 m_slot_num;
 
@@ -324,6 +326,9 @@ private:
 	address_space_config const m_mem_config;
 	address_space_config const m_io_config;
 
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_mem;
+	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
+
 	std::vector<std::reference_wrapper<device_h8bus_card_interface>> m_device_list;
 
 	device_h8bus_p1_card_interface *m_p1_card;
@@ -384,6 +389,16 @@ inline void device_h8bus_card_interface::set_slot_hold(int state)
 inline void device_h8bus_card_interface::set_slot_rom_disable(int state)
 {
 	h8bus().set_disable_rom_line(m_slot_num, state);
+}
+
+inline memory_access<16, 0, 0, (endianness_t)0>::specific device_h8bus_card_interface::get_mem()
+{
+	return h8bus().m_mem;
+}
+
+inline memory_access<8, 0, 0, (endianness_t)0>::specific device_h8bus_card_interface::get_io()
+{
+	return h8bus().m_io;
 }
 
 inline void device_h8bus_p1_card_interface::set_p201_reset(int state)

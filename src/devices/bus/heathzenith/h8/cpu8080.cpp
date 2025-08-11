@@ -98,10 +98,10 @@ private:
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
-	void bus_mem_w(offs_t offset, u8 data) { h8bus().space(AS_PROGRAM).write_byte(offset, data); }
-	u8 bus_mem_r(offs_t offset) { return h8bus().space(AS_PROGRAM).read_byte(offset); }
-	void bus_io_w(offs_t offset, u8 data) { h8bus().space(AS_IO).write_byte(offset, data); }
-	u8 bus_io_r(offs_t offset) { return h8bus().space(AS_IO).read_byte(offset); }
+	void bus_mem_w(offs_t offset, u8 data) { get_mem().write_byte(offset, data); }
+	u8 bus_mem_r(offs_t offset) { return get_mem().read_byte(offset); }
+	void bus_io_w(offs_t offset, u8 data) { get_io().write_byte(offset, data); }
+	u8 bus_io_r(offs_t offset) { return get_io().read_byte(offset); }
 
 	required_device<i8080_cpu_device>  m_maincpu;
 	required_device<heath_intr_socket> m_intr_socket;
@@ -214,7 +214,6 @@ void h_8_cpu_8080_device::p201_int2_w(int state)
 void h_8_cpu_8080_device::handle_int1()
 {
 	m_intr_socket->set_irq_level(1, (m_p201_int1 || m_bus_int1) ? ASSERT_LINE : CLEAR_LINE);
-
 }
 
 void h_8_cpu_8080_device::handle_int2()
@@ -235,9 +234,8 @@ void h_8_cpu_8080_device::mem_map(address_map &map)
 	// default mem access to h8bus
 	map(0x0000, 0xffff).rw(FUNC(h_8_cpu_8080_device::bus_mem_r), FUNC(h_8_cpu_8080_device::bus_mem_w));
 
-	map(0x0000, 0x0fff).rom(); // main rom
-	map(0x1400, 0x17ff).ram(); // fdc ram
-	map(0x1800, 0x1fff).rom(); // fdc rom
+	// main rom
+	map(0x0000, 0x0fff).rom().region("maincpu", 0).unmapw();
 }
 
 void h_8_cpu_8080_device::io_map(address_map &map)
@@ -254,8 +252,9 @@ void h_8_cpu_8080_device::io_map(address_map &map)
 ROM_START( h8 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 
-	// H17 fdc bios - needed by bios2&3
-	ROM_LOAD( "2716_444-19_h17.rom", 0x1800, 0x0800,     CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+	// H17 fdc bios - needed by bios2&3 this is on a separate card, keeping it documented here until that
+	// card is implemented.
+	//ROM_LOAD( "2716_444-19_h17.rom", 0x1800, 0x0800,     CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
 
 	ROM_SYSTEM_BIOS(0, "bios0", "Standard")
 	ROMX_LOAD( "2708_444-13_pam8.rom", 0x0000, 0x0400,   CRC(e0745513) SHA1(0e170077b6086be4e5cd10c17e012c0647688c39), ROM_BIOS(0) )
@@ -269,10 +268,10 @@ ROM_START( h8 )
 	ROM_SYSTEM_BIOS(3, "bios3", "Disk OS Alt")
 	ROMX_LOAD( "2732_444-70_xcon8.rom", 0x0000, 0x1000,  CRC(b04368f4) SHA1(965244277a3a8039a987e4c3593b52196e39b7e7), ROM_BIOS(3) )
 
-	// this one runs off into the weeds
-	// - it is for the ZA-8-6 Z-80 replacement CPU card, keeping it here, until that card is implemented.
-	ROM_SYSTEM_BIOS(4, "bios4", "not working")
-	ROMX_LOAD( "2732_444-140_pam37.rom", 0x0000, 0x1000, CRC(53a540db) SHA1(90082d02ffb1d27e8172b11fff465bd24343486e), ROM_BIOS(4) )
+	// this one runs off into the weeds, because it is for the HA-8-6 Z-80 replacement CPU card, keeping it documented here, until
+	// that card is implemented.
+	// ROM_SYSTEM_BIOS(4, "bios4", "not working")
+	// ROMX_LOAD( "2732_444-140_pam37.rom", 0x0000, 0x1000, CRC(53a540db) SHA1(90082d02ffb1d27e8172b11fff465bd24343486e), ROM_BIOS(4) )
 ROM_END
 
 static INPUT_PORTS_START( cpu_8080_jumpers )
