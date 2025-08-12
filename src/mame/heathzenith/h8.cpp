@@ -57,15 +57,20 @@ public:
 	h8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_h8bus(*this, "h8bus")
+		, m_p1(*this, "p1")
+		, m_p2(*this, "p2")
 		{}
 
 	void h8(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void device_config_complete() override  ATTR_COLD;
 
 private:
 	required_device<h8bus_device> m_h8bus;
+	required_device<h8bus_slot_device> m_p1;
+	required_device<h8bus_slot_device> m_p2;
 };
 
 // Input ports
@@ -76,12 +81,24 @@ void h8_state::machine_start()
 {
 }
 
+void h8_state::device_config_complete()
+{
+	device_p201_p1_card_interface *p1 = dynamic_cast<device_p201_p1_card_interface *>(m_p1.lookup()->get_card_device());
+	device_p201_p2_card_interface *p2 = dynamic_cast<device_p201_p2_card_interface *>(m_p2.lookup()->get_card_device());
+
+	p1->p201_reset_cb().set(*p2, FUNC(device_p201_p2_card_interface::p201_reset_w));
+	p1->p201_int1_cb().set(*p2, FUNC(device_p201_p2_card_interface::p201_int1_w));
+	p1->p201_int2_cb().set(*p2, FUNC(device_p201_p2_card_interface::p201_int2_w));
+
+	p2->p201_inte_cb().set(*p1, FUNC(device_p201_p1_card_interface::p201_inte_w));
+}
+
 void h8_state::h8(machine_config &config)
 {
 	H8BUS(config, m_h8bus, 0);
 
-	H8BUS_SLOT(config,  "p1", "h8bus", h8_p1_cards,  "fp");
-	H8BUS_SLOT(config,  "p2", "h8bus", h8_p2_cards,  "cpu8080");
+	H8BUS_SLOT(config,  m_p1, "h8bus", h8_p1_cards,  "fp");
+	H8BUS_SLOT(config,  m_p2, "h8bus", h8_p2_cards,  "cpu8080");
 	H8BUS_SLOT(config,  "p3", "h8bus", h8_cards,     "wh_8_64");
 	H8BUS_SLOT(config,  "p4", "h8bus", h8_cards,     nullptr);
 	H8BUS_SLOT(config,  "p5", "h8bus", h8_cards,     nullptr);

@@ -121,7 +121,7 @@
 
   P201 Cable
 
-  Between P1 and P2 was a cable labeled P201 in the schematics. This connected
+  Between P1 and P2 is a cable labeled P201 in the schematics. This connects
   the Front Panel(P1) card to the CPU board(P2), providing dedicated signal lines
   between the two boards.
 
@@ -169,7 +169,7 @@ public:
 	virtual void rom_disable_w(int state) {}
 
 	void set_h8bus_tag(h8bus_device *h8bus, const char *slottag) { m_h8bus = h8bus; m_h8bus_slottag = slottag; }
-	void set_slot_num(u8 slot_num) { m_slot_num = slot_num; }
+	void set_index(u8 index) { m_index = index; }
 
 protected:
 	device_h8bus_card_interface(const machine_config &mconfig, device_t &device);
@@ -193,42 +193,47 @@ protected:
 	memory_access<8, 0, 0, (endianness_t)0>::specific get_io();
 
 	const char *m_h8bus_slottag;
-	u8 m_slot_num;
+	u8 m_index;
 
 private:
 	h8bus_device *m_h8bus;
 };
 
-class device_h8bus_p1_card_interface : public device_h8bus_card_interface
+class device_p201_p1_card_interface : public device_interface
 {
 public:
-	virtual ~device_h8bus_p1_card_interface();
+	virtual ~device_p201_p1_card_interface();
 
-	virtual void p201_inte(int state) {}
+	auto p201_reset_cb() { return m_p201_reset.bind(); }
+	auto p201_int1_cb() { return m_p201_int1.bind(); }
+	auto p201_int2_cb() { return m_p201_int2.bind(); }
+
+	virtual void p201_inte_w(int state) {};
 
 protected:
-	device_h8bus_p1_card_interface(const machine_config &mconfig, device_t &device);
+	device_p201_p1_card_interface(device_t &device, device_type type, const char *tag);
 
-	void set_p201_reset(int state);
-	void set_p201_int1(int state);
-	void set_p201_int2(int state);
+	devcb_write_line m_p201_reset;
+	devcb_write_line m_p201_int1;
+	devcb_write_line m_p201_int2;
 };
 
 
-class device_h8bus_p2_card_interface : public device_h8bus_card_interface
+class device_p201_p2_card_interface : public device_interface
 {
 public:
-	virtual ~device_h8bus_p2_card_interface();
+	virtual ~device_p201_p2_card_interface();
 
-	// signals from P201 cable
-	virtual void p201_reset_w(int state) {}
-	virtual void p201_int1_w(int state) {}
-	virtual void p201_int2_w(int state) {}
+	auto p201_inte_cb() { return m_p201_inte.bind(); }
+
+	virtual void p201_reset_w(int state) {};
+	virtual void p201_int1_w(int state) {};
+	virtual void p201_int2_w(int state) {};
 
 protected:
-	device_h8bus_p2_card_interface(const machine_config &mconfig, device_t &device);
+	device_p201_p2_card_interface(device_t &device, device_type type, const char *tag);
 
-	void set_p201_inte(int state);
+	devcb_write_line m_p201_inte;
 };
 
 
@@ -271,8 +276,6 @@ class h8bus_device : public device_t, public device_memory_interface
 {
 	friend class h8bus_slot_device;
 	friend class device_h8bus_card_interface;
-	friend class device_h8bus_p1_card_interface;
-	friend class device_h8bus_p2_card_interface;
 
 public:
 	h8bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -330,65 +333,62 @@ private:
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	std::vector<std::reference_wrapper<device_h8bus_card_interface>> m_device_list;
-
-	device_h8bus_p1_card_interface *m_p1_card;
-	device_h8bus_p2_card_interface *m_p2_card;
 };
 
 
 inline void device_h8bus_card_interface::set_slot_int1(int state)
 {
-	h8bus().set_int1_line(m_slot_num, state);
+	h8bus().set_int1_line(m_index, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_int2(int state)
 {
-	h8bus().set_int2_line(m_slot_num, state);
+	h8bus().set_int2_line(m_index, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_int3(int state)
 {
-	h8bus().set_int3_line(m_slot_num, state);
+	h8bus().set_int3_line(m_index, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_int4(int state)
 {
-	h8bus().set_int4_line(m_slot_num, state);
+	h8bus().set_int4_line(m_index, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_int5(int state)
 {
-	h8bus().set_int5_line(m_slot_num, state);
+	h8bus().set_int5_line(m_index, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_int6(int state)
 {
-	h8bus().set_int6_line(m_slot_num, state);
+	h8bus().set_int6_line(m_index, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_int7(int state)
 {
-	h8bus().set_int7_line(m_slot_num, state);
+	h8bus().set_int7_line(m_index, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_m1(int state)
 {
-	h8bus().set_m1_line(m_slot_num, state);
+	h8bus().set_m1_line(m_index, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_reset(int state)
 {
-	h8bus().set_reset_line(m_slot_num, state);
+	h8bus().set_reset_line(m_index, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_hold(int state)
 {
-	h8bus().set_hold_line(m_slot_num, state);
+	h8bus().set_hold_line(m_index, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_rom_disable(int state)
 {
-	h8bus().set_disable_rom_line(m_slot_num, state);
+	h8bus().set_disable_rom_line(m_index, state);
 }
 
 inline memory_access<16, 0, 0, (endianness_t)0>::specific device_h8bus_card_interface::get_mem()
@@ -401,25 +401,6 @@ inline memory_access<8, 0, 0, (endianness_t)0>::specific device_h8bus_card_inter
 	return h8bus().m_io;
 }
 
-inline void device_h8bus_p1_card_interface::set_p201_reset(int state)
-{
-	h8bus().set_p201_reset(state);
-}
-
-inline void device_h8bus_p1_card_interface::set_p201_int1(int state)
-{
-	h8bus().set_p201_int1(state);
-}
-
-inline void device_h8bus_p1_card_interface::set_p201_int2(int state)
-{
-	h8bus().set_p201_int2(state);
-}
-
-inline void device_h8bus_p2_card_interface::set_p201_inte(int state)
-{
-	h8bus().set_p201_inte(state);
-}
 
 DECLARE_DEVICE_TYPE(H8BUS, h8bus_device)
 

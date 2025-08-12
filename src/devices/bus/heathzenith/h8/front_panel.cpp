@@ -34,13 +34,13 @@
 #endif
 
 
-class front_panel_device : public device_t, public device_h8bus_p1_card_interface
+class front_panel_device : public device_t, public device_h8bus_card_interface, public device_p201_p1_card_interface
 {
 public:
 	front_panel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void m1_w(int state) override;
-	virtual void p201_inte(int state) override;
+	virtual void p201_inte_w(int state) override;
 
 	DECLARE_INPUT_CHANGED_MEMBER(button_0);
 
@@ -78,7 +78,8 @@ protected:
 
 front_panel_device::front_panel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, H8BUS_FRONT_PANEL, tag, owner, 0)
-	, device_h8bus_p1_card_interface(mconfig, *this)
+	, device_h8bus_card_interface(mconfig, *this)
+	, device_p201_p1_card_interface(*this, H8BUS_FRONT_PANEL, tag)
 	, m_beep(*this, "beeper")
 	, m_io_keyboard(*this, "X%u", 0U)
 	, m_digits(*this, "digit%u", 0U)
@@ -109,13 +110,13 @@ void front_panel_device::m1_w(int state)
 
 			if (m_ic108b)
 			{
-				set_p201_int2(ASSERT_LINE);
+				m_p201_int2(ASSERT_LINE);
 			}
 		}
 	}
 }
 
-void front_panel_device::p201_inte(int state)
+void front_panel_device::p201_inte_w(int state)
 {
 	// Operate the ION LED
 	m_ion_led = !state;
@@ -176,7 +177,7 @@ void front_panel_device::portf0_w(u8 data)
 	LOGPORTW("%s: val: 0x%02x\n", FUNCNAME, data);
 
 	// writes to this port always turn off int10
-	set_p201_int1(CLEAR_LINE);
+	m_p201_int1(CLEAR_LINE);
 
 	m_digit = data & 0xf;
 	if (m_digit)
@@ -202,7 +203,7 @@ void front_panel_device::portf0_w(u8 data)
 		{
 			m_ic108a = true;
 			m_ic108b = false;
-			set_p201_int2(CLEAR_LINE);
+			m_p201_int2(CLEAR_LINE);
 		}
 	}
 }
@@ -261,16 +262,16 @@ INPUT_CHANGED_MEMBER(front_panel_device::button_0)
 
 		if (BIT(data, 5))
 		{
-			set_p201_reset(ASSERT_LINE);
+			m_p201_reset(ASSERT_LINE);
 		}
 		else if (BIT(data, 6))
 		{
-			set_p201_int1(ASSERT_LINE);
+			m_p201_int1(ASSERT_LINE);
 		}
 		else
 		{
-			set_p201_reset(CLEAR_LINE);
-			set_p201_int1(CLEAR_LINE);
+			m_p201_reset(CLEAR_LINE);
+			m_p201_int1(CLEAR_LINE);
 		}
 	}
 }
@@ -343,7 +344,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(front_panel_device::h8_irq_pulse)
 {
 	if (m_allow_int1)
 	{
-		set_p201_int1(ASSERT_LINE);
+		m_p201_int1(ASSERT_LINE);
 	}
 }
 

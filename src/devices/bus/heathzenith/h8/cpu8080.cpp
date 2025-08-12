@@ -62,7 +62,7 @@
 
 namespace {
 
-class h_8_cpu_8080_device : public device_t, public device_h8bus_p2_card_interface
+class h_8_cpu_8080_device : public device_t, public device_h8bus_card_interface, public device_p201_p2_card_interface
 {
 public:
 
@@ -118,7 +118,8 @@ private:
 
 h_8_cpu_8080_device::h_8_cpu_8080_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, H8BUS_CPU_8080, tag, owner, 0)
-	, device_h8bus_p2_card_interface(mconfig, *this)
+	, device_h8bus_card_interface(mconfig, *this)
+	, device_p201_p2_card_interface(*this, H8BUS_CPU_8080, tag)
 	, m_maincpu(*this, "maincpu")
 	, m_intr_socket(*this, "intr_socket")
 	, m_config(*this, "CONFIG")
@@ -127,7 +128,7 @@ h_8_cpu_8080_device::h_8_cpu_8080_device(const machine_config &mconfig, const ch
 
 void h_8_cpu_8080_device::h8_inte_callback(int state)
 {
-	set_p201_inte(state);
+	m_p201_inte(state);
 }
 
 void h_8_cpu_8080_device::h8_status_callback(u8 data)

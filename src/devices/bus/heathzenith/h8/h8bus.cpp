@@ -13,9 +13,6 @@
 
 #include "h8bus.h"
 
-#include <cstring>
-#include <cstdlib>
-
 #define LOG_INIT (1U << 1)    // Shows register setup
 
 //#define VERBOSE (LOG_INIT)
@@ -49,21 +46,25 @@ void device_h8bus_card_interface::interface_pre_start()
 	}
 }
 
-device_h8bus_p1_card_interface::device_h8bus_p1_card_interface(const machine_config &mconfig, device_t &device):
-	device_h8bus_card_interface(mconfig, device)
+device_p201_p1_card_interface::device_p201_p1_card_interface(device_t &device, device_type type, const char *tag)
+	: device_interface(device, tag)
+	, m_p201_reset(*this)
+	, m_p201_int1(*this)
+	, m_p201_int2(*this)
 {
 }
 
-device_h8bus_p1_card_interface::~device_h8bus_p1_card_interface()
+device_p201_p1_card_interface::~device_p201_p1_card_interface()
 {
 }
 
-device_h8bus_p2_card_interface::device_h8bus_p2_card_interface(const machine_config &mconfig, device_t &device) :
-	device_h8bus_card_interface(mconfig, device)
+device_p201_p2_card_interface::device_p201_p2_card_interface(device_t &device, device_type type, const char *tag)
+	: device_interface(device, tag)
+	, m_p201_inte(*this)
 {
 }
 
-device_h8bus_p2_card_interface::~device_h8bus_p2_card_interface()
+device_p201_p2_card_interface::~device_p201_p2_card_interface()
 {
 }
 
@@ -93,8 +94,8 @@ void h8bus_slot_device::device_resolve_objects()
 	if (dev)
 	{
 		dev->set_h8bus_tag(m_h8bus.target(), m_h8bus_slottag);
-		unsigned slot_num = m_h8bus->add_h8bus_card(*dev);
-		dev->set_slot_num(slot_num);
+		unsigned index = m_h8bus->add_h8bus_card(*dev);
+		dev->set_index(index);
 	}
 }
 
@@ -111,8 +112,6 @@ h8bus_device::h8bus_device(const machine_config &mconfig, device_type type, cons
 	, device_memory_interface(mconfig, *this)
 	, m_mem_config("mem", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(h8bus_device::mem_map), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(h8bus_device::io_map), this))
-	, m_p1_card(nullptr)
-	, m_p2_card(nullptr)
 {
 }
 
@@ -159,28 +158,17 @@ device_memory_interface::space_config_vector h8bus_device::memory_space_config()
 u8 h8bus_device::add_h8bus_card(device_h8bus_card_interface &card)
 {
 	m_device_list.emplace_back(card);
-	char* endptr;
-	long slot_num = strtol(&card.m_h8bus_slottag[1], &endptr, 10) - 1;
+	int index = m_device_list.size() - 1;
 
-	if (slot_num < 0 || slot_num >= 31)
+	if (index > 31)
 	{
-		// if unable to determine slot number based on tag, set it to 31,
-		// so it will be in range.
-		slot_num = 31;
+		// ensure index is in range.
+		index = 31;
 	}
 
-	LOGINIT("%s: added card to slot %d, tag: %s\n", FUNCNAME, slot_num, card.m_h8bus_slottag);
+	LOGINIT("%s: added card to index: %d, tag: %s\n", FUNCNAME, index, card.m_h8bus_slottag);
 
-	if (strcmp(card.m_h8bus_slottag, "p1") == 0)
-	{
-		m_p1_card = (device_h8bus_p1_card_interface*) &card;
-	}
-	else if (strcmp(card.m_h8bus_slottag, "p2") == 0)
-	{
-		m_p2_card = (device_h8bus_p2_card_interface*) &card;
-	}
-
-	return slot_num;
+	return index;
 }
 
 bool h8bus_device::update_line_states(u32 &states, unsigned index, int state)
@@ -349,24 +337,4 @@ void h8bus_device::set_disable_rom_line(unsigned index, int state)
 			entry.rom_disable_w(m_disable_rom_slot_states ? 1 : 0);
 		}
 	}
-}
-
-void h8bus_device::set_p201_inte(int state)
-{
-	m_p1_card->p201_inte(state);
-}
-
-void h8bus_device::set_p201_reset(int state)
-{
-	m_p2_card->p201_reset_w(state);
-}
-
-void h8bus_device::set_p201_int1(int state)
-{
-	m_p2_card->p201_int1_w(state);
-}
-
-void h8bus_device::set_p201_int2(int state)
-{
-	m_p2_card->p201_int2_w(state);
 }

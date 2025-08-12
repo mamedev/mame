@@ -37,7 +37,7 @@ void h8_p10_cards(device_slot_interface &device)
 
 void h8_cards(device_slot_interface &device)
 {
-	device.option_add("h_8_1",       H8BUS_H_8_1);
-	device.option_add("h_8_5",       H8BUS_H_8_5);
-	device.option_add("wh_8_64",     H8BUS_WH_8_64);
+	device.option_add("h_8_1",   H8BUS_H_8_1);
+	device.option_add("h_8_5",   H8BUS_H_8_5);
+	device.option_add("wh_8_64", H8BUS_WH_8_64);
 }
