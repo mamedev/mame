@@ -2,16 +2,26 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * Sony NEWS NWS-38xx.
+ * Sony NEWS NWS-38xx workstations
+ *
+ * The NWS-3800 series was the last model of NEWS workstation to use the original NWS-8xx/9xx architecture of
+ * having a CPU running NEWS-OS (handling the processing of user code) and a CPU running a separate OS (iopboot/rtx/mrx)
+ * to handle system I/O. Unlike the 8xx/9xx and 18xx/19xx, the NWS-3800 is a mixed architecture system. It uses a MIPS
+ * R3000 CPU for NEWS-OS and user programs, and a 68030 running rtx (NEWS-OS 3) or mrx (NEWS-OS 4) as the IOP.
+ *
+ * Known NWS-3800 configurations
+ *  - TODO
  *
  * Sources:
+ *  - NWS-3840/3860 Service Guide
+ *  - http://bitsavers.org/pdf/sony/news/Sony_NEWS_Technical_Manual_3ed_199103.pdf
+ *  - https://katsu.watanabe.name/doc/sonynews/model.html
  *
  * TODO:
- *   - misc control registers and leds
- *   - slots/graphics
+ *   - slots (I/O expansion and UBUS expansion)
+ *   - graphics
  *   - sound
  *   - centronics
- *   - Floppy support (it is broken right now)
  */
 
 #include "emu.h"
@@ -206,6 +216,7 @@ protected:
 	// CPU platform hardware
 	u32 cpstat_r();
 	u32 wrbeadr_r();
+	u8 boot_vector_r(offs_t offset);
 	void cpenipty_w(u32 data);
 	void cpenitmr_w(u32 data);
 	void cpintxp_w(offs_t offset, u32 data);
@@ -236,10 +247,11 @@ protected:
 
 	emu_timer *m_timer = nullptr;
 
-	bool m_scc_irq_state = false;
+	bool m_mapvec = false;
 
 	// IOP IRQ state
 	const std::map<int, std::vector<iop_irq>> iop_irq_line_map;
+	bool m_scc_irq_state = false;
 	uint32_t m_iop_intst = 0;
 	uint32_t m_iop_inten = 0;
 
@@ -307,19 +319,7 @@ void news_38xx_state::cpu_map(address_map &map)
 	map(0x1c000000, 0x1c000003).r(FUNC(news_38xx_state::wrbeadr_r));
 
 	// TODO: what is the proper end address here?
-	map(0x1fc00000, 0x1fc1ffff).lr8(NAME([this] (const offs_t offset) {
-		// RAM endianness is an issue because RAM is installed with install_ram.
-		// Therefore, go straight to the memory bus (technically its own bus, but we can go via IOP as a hack)
-		// TODO: pick one of the following instead of doing this
-		//       A) figure out the correct way to deal with the endianness issue
-		//       B) Replace this with a memory_access::specific
-		//       C) Use an accessor function for RAM along with a memory_access cache to avoid endianness mismatch
-
-		// TODO: return 0, ff, or bus error if mapping isn't enabled. which one?
-		const u8 data = m_iop->space(0).read_byte(0xc00000 + offset);
-		// LOG("ram r 0x%08x -> 0x%08x\n", offset, data);
-		return data;
-	}));
+	map(0x1fc00000, 0x1fc1ffff).r(FUNC(news_38xx_state::boot_vector_r));
 }
 
 void news_38xx_state::iop_map(address_map &map)
@@ -758,6 +758,27 @@ u32 news_38xx_state::wrbeadr_r()
 	return 0;
 }
 
+u8 news_38xx_state::boot_vector_r(offs_t offset)
+{
+	// RAM endianness is an issue because RAM is installed with install_ram.
+	// Therefore, go straight to the memory bus (technically its own bus, but we can go via IOP as a hack)
+	// TODO: pick one of the following instead of doing this
+	//       A) figure out the correct way to deal with the endianness issue
+	//       B) Replace this with a memory_access::specific
+	//       C) Use an accessor function for RAM along with a memory_access cache to avoid endianness mismatch
+
+	// TODO: return 0, ff, or bus error if mapping isn't enabled. which one?
+
+	if (!m_mapvec)
+	{
+		constexpr u32 BOOT_VECTOR_BASE = 0xc00000;
+		return m_cpu->space(0).read_byte(BOOT_VECTOR_BASE + offset);
+	}
+
+	// This probably just causes a bus error or similar in reality
+	fatalerror("CPU tried to read from boot vector space without MAPVEC!");
+}
+
 void news_38xx_state::cpenipty_w(u32 data)
 {
 	LOG("CPENIPTY = 0x%x\n", data); // parity error irq enable
@@ -789,8 +810,9 @@ void news_38xx_state::cpintxp_w(offs_t offset, u32 data)
 void news_38xx_state::mapvec_w(u32 data)
 {
 	// 1 = normal operation, 0 = map CPU reset vector 0x1fc00000 to 0x00c00000 in RAM
-	// TODO: how much gets mapped? also need to actually implement this rather than hacking it in
+	// Like other CPU control registers, this defaults to 0.
 	LOG("(%s) MAPVEC = 0x%x\n", machine().describe_context(), data);
+	m_mapvec = data > 0;
 }
 
 void news_38xx_state::cpclixp_w(offs_t offset, u32 data)
@@ -820,9 +842,9 @@ void news_scsi_devices(device_slot_interface &device)
 
 void news_38xx_state::common(machine_config &config)
 {
-	R3000A(config, m_cpu, 25_MHz_XTAL, 32768, 32768);
+	R3000A(config, m_cpu, 25_MHz_XTAL, 65536, 65536);
 	m_cpu->set_addrmap(AS_PROGRAM, &news_38xx_state::cpu_map);
-	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4); // TODO: FPA IRQ?
 
 	M68030(config, m_iop, 50_MHz_XTAL / 2);
 	m_iop->set_addrmap(AS_PROGRAM, &news_38xx_state::iop_map);
