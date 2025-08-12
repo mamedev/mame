@@ -51,6 +51,9 @@ Parts:
  X                    - 8MHz xtal
  3V Bat             - Lithium 3V power module
 
+ Both the ROMs and the RAMs are interleaved and there's board variants,
+ that replace the SRAM with ST M48Z08 timekeepers and omit the large battery.
+
 Video Board:
 ------------
  ____________________________________________________________
