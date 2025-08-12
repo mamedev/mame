@@ -585,12 +585,11 @@ void sega315_5313_device::vdp_set_register(int regnum, u8 value)
 	{
 	//osd_printf_debug("setting reg 0, irq enable is now %d\n", MEGADRIVE_REG0_IRQ4_ENABLE);
 
-		// fatalrew and sesame are very fussy about pending interrupts.
-		// Former in particular will quickly enable both after the EA logo (cfr. killshow at PC=0x2267a),
-		// and irq 6 will jump to illegal addresses because the correlated routine isn't set in stack
-		// but delayed a bit.
-		// Note that irq 6 is masked for about 5 frames, leaving the assumption that it mustn't
-		// be left on during all this time.
+		// fatalrew/killshow and sesame are very fussy about pending interrupts.
+		// https://jsgroth.dev/blog/posts/emulator-bugs-fatal-rewind/
+		// https://gendev.spritesmind.net/forum/viewtopic.php?t=2202
+		// this gets 1 cycle delay on both HINT and VINT for gen_test_int_delay.bin
+		// TODO: first time around said test prints HINT=20, pressing start gives the correct value
 		if (m_irq4_pending && MEGADRIVE_REG0_IRQ4_ENABLE)
 		{
 			m_irq4_on_timer->adjust(attotime::from_ticks(16, clock() / 4));
@@ -2284,7 +2283,6 @@ void sega315_5313_device::vdp_handle_scanline_callback(int scanline)
 
 				if (MEGADRIVE_REG0_IRQ4_ENABLE)
 				{
-					// TODO: arbitrary timing
 					m_irq4_on_timer->adjust(attotime::from_ticks(16, clock() / 4));
 					//osd_printf_debug("irq4 on scanline %d reload %d\n", get_scanline_counter(), MEGADRIVE_REG0A_HINT_VALUE);
 				}
