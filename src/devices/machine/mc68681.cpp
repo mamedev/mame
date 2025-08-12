@@ -1809,6 +1809,7 @@ void duart_channel::write_CR(uint8_t data)
 			m_uart->clear_ISR_bits(INT_TXRDYA);
 		else
 			m_uart->clear_ISR_bits(INT_TXRDYB);
+		transmit_register_reset();
 	}
 
 	update_interrupts();
