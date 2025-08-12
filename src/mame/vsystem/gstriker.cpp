@@ -706,12 +706,10 @@ void gstriker_state::gstriker(machine_config &config)
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	// DE-9 port
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "loopback"));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
 	rs232.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
 
-	// slave sends 0xca, master receives it and sends a 0x0d ACK back.
-	// writing latter to $200063 while in slave mode will pass the serial check
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 20_MHz_XTAL / 32)); // assume ~38400 baud
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));

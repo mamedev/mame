@@ -11,11 +11,6 @@
     - f1gp2's hardware is very similar to Lethal Crash Race, main difference
       being an extra 68000.
 
-    TODO:
-    - Hook up link for Multi Player game mode. Currently they boot with
-      link set to multiple, but the ID changes every boot (and will black
-      out if a multiplayer game is started).
-
     f1gp:
     - gfxctrl register not understood - handling of fg/sprite priority to fix
       "continue" screen is just a kludge.
@@ -86,8 +81,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_acia(*this, "acia"),
-		m_rs232a(*this, "rs232a"),
-		m_rs232b(*this, "rs232b"),
+		m_rs232_out(*this, "com_out"),
+		m_rs232_in(*this, "com_in"),
 		m_rozgfxram(*this, "rozgfxram"),
 		m_spr_old(*this, "vsystem_spr_old%u", 1U)
 	{ }
@@ -124,8 +119,8 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch; // not f1gpbl
 	required_device<acia6850_device> m_acia;
-	optional_device<rs232_port_device> m_rs232a;
-	optional_device<rs232_port_device> m_rs232b;
+	required_device<rs232_port_device> m_rs232_out;
+	required_device<rs232_port_device> m_rs232_in;
 
 	void sh_bankswitch_w(uint8_t data);
 	uint8_t soundlatch_pending_r();
@@ -840,17 +835,16 @@ void f1gp_state::f1gp(machine_config &config)
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
-	m_acia->txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_acia->txd_handler().set("com_out", FUNC(rs232_port_device::write_txd));
 
 	// dual DE-9 ports
 	// COM-IN (inner) and COM-OUT (outer) according to manual
-	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "loopback"));
-	rs232a.rxd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
-	rs232a.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
+	rs232_port_device &rs232out(RS232_PORT(config, "com_out", default_rs232_devices, nullptr));
+	rs232out.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
 
-	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "loopback"));
-	rs232b.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
-	rs232b.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
+	rs232_port_device &rs232in(RS232_PORT(config, "com_in", default_rs232_devices, nullptr));
+	rs232in.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
+	rs232in.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 20_MHz_XTAL / 32)); // assume ~38400 baud
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
@@ -912,11 +906,21 @@ void f1gp_state::f1gpbl(machine_config &config)
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
-	m_acia->txd_handler().set("acia", FUNC(acia6850_device::write_rxd)); // loopback for now
+	m_acia->txd_handler().set("com_out", FUNC(rs232_port_device::write_txd));
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 1'000'000)); // guessed
+	// dual DE-9 ports
+	// COM-IN (inner) and COM-OUT (outer) according to manual
+	rs232_port_device &rs232out(RS232_PORT(config, "com_out", default_rs232_devices, nullptr));
+	rs232out.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
+
+	rs232_port_device &rs232in(RS232_PORT(config, "com_in", default_rs232_devices, nullptr));
+	rs232in.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
+	rs232in.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
+
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 20_MHz_XTAL / 32)); // assume ~38400 baud
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
+
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
