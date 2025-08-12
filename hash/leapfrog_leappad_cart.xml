@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad / CocoPad cartridges">
+<softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad / CocoPad / Benesse Qpad cartridges">
 
 	<software name="tiggerbnca" cloneof="tiggerbnc" supported="no">
 		<description>Disney's Bounce, Tigger, Bounce (UK)</description>
@@ -1514,6 +1514,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Benesse Qpad cartridges -->
+	
 	<software name="gogogoj" supported="no">
 		<description>Go!Go!Go! (Japan)</description>
 		<year>2002</year>
