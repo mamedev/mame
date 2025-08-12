@@ -266,35 +266,43 @@ void news_38xx_state::machine_start()
 	//m_led.resolve();
 
 	m_net_ram = std::make_unique<u16[]>(8192);
-
 	save_pointer(NAME(m_net_ram), 8192);
 
-	// TODO: save states and state clearing for new IRQ stuff
-	// save_item(NAME(m_intst));
-	// save_item(NAME(m_inten));
+	save_item(NAME(m_mapvec));
+	save_item(NAME(m_scc_irq_state));
+	save_item(NAME(m_iop_intst));
+	save_item(NAME(m_iop_inten));
+	save_item(NAME(m_cpu_intst));
+	save_item(NAME(m_cpu_inten));
 
 	m_timer = timer_alloc(FUNC(news_38xx_state::timer), this);
-
-	// m_intst = 0;
-	// m_inten = 0x6d;
-	m_scc_irq_state = false;
 }
 
 void news_38xx_state::machine_reset()
 {
-	// eprom is mapped at 0 after reset
+	// For the IOP, EPROM is mapped at 0 after reset
 	m_iop->space(0).install_rom(0x00000000, 0x0000ffff, m_eprom);
 
 	m_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
 
+	// CPU does not run until the IOP tells it to
 	m_cpu->set_input_line(INPUT_LINE_HALT, 1);
+
+	// Clear platform hardware state
+	m_mapvec = false;
+	m_scc_irq_state = false;
+	m_cpu_intst = 0;
+	m_cpu_inten = 0;
+	m_iop_intst = 0;
+	m_iop_inten = 0;
 }
 
 void news_38xx_state::init_common()
 {
-	// HACK: hardwire the rate
+	// HACK: hardwire the rate TODO: does the index pulse divide control this?
 	m_fdc->set_rate(500000);
 
+	// RAM is always mapped for the CPU, since the MIPS boot vector is well above the max RAM value
 	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
 }
 
@@ -307,7 +315,6 @@ void news_38xx_state::cpu_map(address_map &map)
 	// 0x10000000 - 0x17ffffff: UBUS I/O
 
 	// All registers below this line are 32 bit registers, LSB 1 = Set, 0 = Reset
-	// All are reset on CPURESET (todo: check schematic)
 	map(0x18000000, 0x18000003).r(FUNC(news_38xx_state::cpstat_r));
 	map(0x18000000, 0x18000003).w(FUNC(news_38xx_state::cpenipty_w)).mirror(0xffff00);
 	map(0x18000004, 0x18000007).w(FUNC(news_38xx_state::cpenitmr_w)).mirror(0xffff00); // todo: check schematic to see if same timer as IOP or not
@@ -669,12 +676,11 @@ void news_38xx_state::ptycken_w(u8 data)
 
 void news_38xx_state::timeren_w(u8 data)
 {
+	iop_inten_w<iop_irq::TIMER>(data > 0);
 	if (!data)
 	{
 		iop_irq_w<iop_irq::TIMER>(0);
 	}
-
-	iop_inten_w<iop_irq::TIMER>(data > 0);
 }
 
 void news_38xx_state::astintr_w(u8 data)
@@ -767,31 +773,32 @@ u8 news_38xx_state::boot_vector_r(offs_t offset)
 	//       B) Replace this with a memory_access::specific
 	//       C) Use an accessor function for RAM along with a memory_access cache to avoid endianness mismatch
 
-	// TODO: return 0, ff, or bus error if mapping isn't enabled. which one?
-
 	if (!m_mapvec)
 	{
 		constexpr u32 BOOT_VECTOR_BASE = 0xc00000;
 		return m_cpu->space(0).read_byte(BOOT_VECTOR_BASE + offset);
 	}
 
-	// This probably just causes a bus error or similar in reality
+	// In reality, this probably just causes a bus error, returns 0x0/0xff, or something like that
 	fatalerror("CPU tried to read from boot vector space without MAPVEC!");
 }
 
 void news_38xx_state::cpenipty_w(u32 data)
 {
-	LOG("CPENIPTY = 0x%x\n", data); // parity error irq enable
+	cpu_inten_w<cpu_irq::PERR>(data > 0);
+	if (!data)
+	{
+		cpu_irq_w<cpu_irq::PERR>(0);
+	}
 }
 
 void news_38xx_state::cpenitmr_w(u32 data)
 {
+	cpu_inten_w<cpu_irq::TIMER>(data > 0);
 	if (!data)
 	{
 		cpu_irq_w<cpu_irq::TIMER>(0);
 	}
-
-	cpu_inten_w<cpu_irq::TIMER>(data > 0);
 }
 
 void news_38xx_state::cpintxp_w(offs_t offset, u32 data)
@@ -836,6 +843,7 @@ void news_38xx_state::cpuled_w(offs_t offset, u32 data)
 
 void news_scsi_devices(device_slot_interface &device)
 {
+	// TODO: tape
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("cdrom", NSCSI_CDROM);
 }
@@ -898,6 +906,7 @@ void news_38xx_state::common(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi bus 0 and devices
+	// TODO: tape
 	NSCSI_BUS(config, m_scsibus[0]);
 	NSCSI_CONNECTOR(config, "scsi0:0", news_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi0:1", news_scsi_devices, nullptr);
