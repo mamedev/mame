@@ -196,6 +196,9 @@ public:
 	void init_xypdk() ATTR_COLD;
 	void init_ccly() ATTR_COLD;
 	void init_tswxp() ATTR_COLD;
+	void init_royal5p() ATTR_COLD;
+	void init_jhg3d() ATTR_COLD;
+	void init_gonefsh() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -4113,6 +4116,27 @@ void igs_m027_state::init_tswxp()
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
+void igs_m027_state::init_royal5p()
+{
+	royal5p_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
+void igs_m027_state::init_jhg3d()
+{
+	jhg3d_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
+void igs_m027_state::init_gonefsh()
+{
+	gonefsh_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
 } // anonymous namespace
 
 
@@ -4179,9 +4203,9 @@ GAME(  200?, luckycrs,      0,        m027_1ppi<false>, base,     igs_m027_state
 GAME(  2003, amazoni2,      0,        m027_1ppi<false>, base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
 GAME(  2002, sdwx,          0,        m027_1ppi<false>, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME(  2001, cjdh6th,       0,        m027_1ppi<false>, base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Chaoji Daheng 6th", MACHINE_NOT_WORKING )
-GAME(  200?, royal5p,       0,        m027_1ppi<false>, base,     igs_m027_state, empty_init,    ROT0, "IGS", "Royal 5+ (V101US)", MACHINE_NOT_WORKING )
-GAME(  200?, jhg3d,         0,        m027_1ppi<false>, base,     igs_m027_state, empty_init,    ROT0, "IGS", "Jin Huangguan 3-dai (V445CN)", MACHINE_NOT_WORKING )
-GAME(  200?, gonefsh,       0,        m027_1ppi<false>, base,     igs_m027_state, empty_init,    ROT0, "IGS", "Gone Fishing (V602US)", MACHINE_NOT_WORKING )
+GAME(  2005, royal5p,       0,        m027_1ppi<false>, base,     igs_m027_state, init_royal5p,  ROT0, "IGS", "Royal 5+ (V101US)", MACHINE_NOT_WORKING )
+GAME(  200?, jhg3d,         0,        m027_1ppi<false>, base,     igs_m027_state, init_jhg3d,    ROT0, "IGS", "Jin Huangguan 3-dai (V445CN)", MACHINE_NOT_WORKING )
+GAME(  2002, gonefsh,       0,        m027_1ppi<false>, base,     igs_m027_state, init_gonefsh,  ROT0, "IGS", "Gone Fishing (V602US)", MACHINE_NOT_WORKING )
 
 // these have an IGS025 protection device instead of the 8255
 GAME(  200?, gonefsh2,      0,        m027_noppi<false>,base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )
