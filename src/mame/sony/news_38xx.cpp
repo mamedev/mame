@@ -299,13 +299,13 @@ void news_38xx_state::cpu_map(address_map &map)
 	// All are reset on CPURESET (todo: check schematic)
 	// TODO: mirror writes only to satisfy 0x18xxxx00 mapping
 	map(0x18000000, 0x18000003).r(FUNC(news_38xx_state::cpstat_r));
-	map(0x18000000, 0x18000003).w(FUNC(news_38xx_state::cpenipty_w));
-	map(0x18000004, 0x18000007).w(FUNC(news_38xx_state::cpenitmr_w)); // todo: check schematic to see if same timer as IOP or not
-	map(0x18000020, 0x18000027).w(FUNC(news_38xx_state::cpintxp_w));
-	map(0x18000040, 0x18000043).w(FUNC(news_38xx_state::mapvec_w));
-	map(0x18000044, 0x18000047).w(FUNC(news_38xx_state::cpu_inten_w<cpu_irq::UBUS>));
-	map(0x18000060, 0x18000067).w(FUNC(news_38xx_state::cpclixp_w));
-	map(0x18000080, 0x18000087).w(FUNC(news_38xx_state::cpuled_w));
+	map(0x18000000, 0x18000003).w(FUNC(news_38xx_state::cpenipty_w)).mirror(0xffff00);
+	map(0x18000004, 0x18000007).w(FUNC(news_38xx_state::cpenitmr_w)).mirror(0xffff00); // todo: check schematic to see if same timer as IOP or not
+	map(0x18000020, 0x18000027).w(FUNC(news_38xx_state::cpintxp_w)).mirror(0xffff00);
+	map(0x18000040, 0x18000043).w(FUNC(news_38xx_state::mapvec_w)).mirror(0xffff00);
+	map(0x18000044, 0x18000047).w(FUNC(news_38xx_state::cpu_inten_w<cpu_irq::UBUS>)).mirror(0xffff00);
+	map(0x18000060, 0x18000067).w(FUNC(news_38xx_state::cpclixp_w)).mirror(0xffff00);
+	map(0x18000080, 0x18000087).w(FUNC(news_38xx_state::cpuled_w)).mirror(0xffff00);
 	map(0x1c000000, 0x1c000003).r(FUNC(news_38xx_state::wrbeadr_r));
 
 	// TODO: what is the proper end address here?
@@ -621,7 +621,7 @@ void news_38xx_state::romdis_w(u8 data)
 
 void news_38xx_state::ptycken_w(u8 data)
 {
-	iop_inten_w<iop_irq::PERR>(data);
+	iop_inten_w<iop_irq::PERR>(data > 0);
 	if (!data)
 	{
 		iop_irq_w<iop_irq::PERR>(0);
@@ -635,8 +635,7 @@ void news_38xx_state::timeren_w(u8 data)
 		iop_irq_w<iop_irq::TIMER>(0);
 	}
 
-	iop_inten_w<iop_irq::TIMER>(data);
-	m_timer->set_param(data);
+	iop_inten_w<iop_irq::TIMER>(data > 0);
 }
 
 void news_38xx_state::astintr_w(u8 data)
@@ -685,11 +684,11 @@ void news_38xx_state::ipenixp_w(offs_t offset, u8 data)
 	LOG("IPENI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
 	if (!offset)
 	{
-		iop_inten_w<iop_irq::CPU>(data);
+		iop_inten_w<iop_irq::CPU>(data > 0);
 	}
 	else
 	{
-		iop_inten_w<iop_irq::UBUS>(data);
+		iop_inten_w<iop_irq::UBUS>(data > 0);
 	}
 }
 
@@ -728,7 +727,12 @@ void news_38xx_state::cpenipty_w(u32 data)
 
 void news_38xx_state::cpenitmr_w(u32 data)
 {
-	LOG("CPENITMR = 0x%x\n", data); // 100Hz timer irq enable
+	if (!data)
+	{
+		cpu_irq_w<cpu_irq::TIMER>(0);
+	}
+
+	cpu_inten_w<cpu_irq::TIMER>(data > 0);
 }
 
 void news_38xx_state::cpintxp_w(offs_t offset, u32 data)
@@ -746,14 +750,15 @@ void news_38xx_state::cpintxp_w(offs_t offset, u32 data)
 
 void news_38xx_state::mapvec_w(u32 data)
 {
-	// TODO: how much gets mapped?
-	LOG("MAPVEC = 0x%x\n", data); // 1 = normal operation, 0 = map reset vector 0x1fc00000 to 0x00c00000 in RAM
+	// 1 = normal operation, 0 = map CPU reset vector 0x1fc00000 to 0x00c00000 in RAM
+	// TODO: how much gets mapped? also need to actually implement this rather than hacking it in
+	LOG("(%s) MAPVEC = 0x%x\n", machine().describe_context(), data);
 }
 
 void news_38xx_state::cpclixp_w(offs_t offset, u32 data)
 {
 	// Clear interrupt from IOP or UPU
-	LOG("CPCLI%cP = 0x%x\n", !offset ? 'I' : 'H', data);
+	LOG("(%s) CPCLI%cP = 0x%x\n", machine().describe_context(), !offset ? 'I' : 'H', data);
 	if (!offset)
 	{
 		cpu_irq_w<cpu_irq::IOP>(0);
@@ -803,7 +808,7 @@ void news_38xx_state::common(machine_config &config)
 		[this](const int state)
 		{
 			m_scc_irq_state = static_cast<bool>(state);
-			iop_irq_w<iop_irq::SCC>(state);
+			iop_irq_w<iop_irq::SCC>(state != 0);
 		});
 
 	// scc channel A
