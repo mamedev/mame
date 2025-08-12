@@ -1521,7 +1521,7 @@ license:CC0-1.0
 		<!-- no obvious serial or label on ROM, 066 (or 990) is stamped on PCB though -->
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="go!go!go!_red.bin" size="0x400000" crc="988a39ee" sha1="621e1459db8a11152d384d9d9c7d7a43b31859ff" />
+				<rom name="gogogo_red.bin" size="0x400000" crc="988a39ee" sha1="621e1459db8a11152d384d9d9c7d7a43b31859ff" />
 			</dataarea>
 		</part>
 	</software>
