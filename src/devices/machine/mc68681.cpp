@@ -1331,6 +1331,7 @@ duart_channel::duart_channel(const machine_config &mconfig, const char *tag, dev
 	, m_tx_data_in_buffer(false)
 	, m_tx_break(false)
 	, m_bits_transmitted(255)
+	, m_tx_enabled(false)
 {
 	std::fill_n(&rx_fifo[0], MC68681_RX_FIFO_SIZE + 1, 0);
 }
@@ -1357,6 +1358,7 @@ void duart_channel::device_start()
 	save_item(NAME(m_tx_data_in_buffer));
 	save_item(NAME(m_tx_break));
 	save_item(NAME(m_bits_transmitted));
+	save_item(NAME(m_tx_enabled));
 }
 
 void duart_channel::device_reset()
@@ -1430,9 +1432,12 @@ void duart_channel::tra_complete()
 {
 	if (!(SR & STATUS_TRANSMITTER_READY))
 	{
-		transmit_register_setup(m_tx_data);
-		m_bits_transmitted = 0;
-		m_tx_data_in_buffer = false;
+		if (m_tx_data_in_buffer)
+		{
+			transmit_register_setup(m_tx_data);
+			m_bits_transmitted = 0;
+			m_tx_data_in_buffer = false;
+		}
 	}
 	else
 	{
@@ -1472,7 +1477,7 @@ void duart_channel::tra_callback()
 	}
 
 	// TxRDY is not set until the end of start bit time
-	if (++m_bits_transmitted > 1 && !m_tx_data_in_buffer)
+	if (++m_bits_transmitted > 1 && !m_tx_data_in_buffer && m_tx_enabled)
 	{
 		SR |= STATUS_TRANSMITTER_READY;
 		update_interrupts();
@@ -1737,6 +1742,7 @@ void duart_channel::write_CR(uint8_t data)
 		transmit_register_reset();
 		m_bits_transmitted = 255;
 		m_tx_data_in_buffer = false;
+		m_tx_enabled = false;
 		break;
 	case 4: /* Reset Error Status */
 		SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR | STATUS_OVERRUN_ERROR);
@@ -1796,6 +1802,7 @@ void duart_channel::write_CR(uint8_t data)
 	{
 		SR |= STATUS_TRANSMITTER_READY | STATUS_TRANSMITTER_EMPTY;
 		m_tx_data_in_buffer = false;
+		m_tx_enabled = true;
 		if (m_ch == 0)
 			m_uart->set_ISR_bits(INT_TXRDYA);
 		else
@@ -1805,6 +1812,7 @@ void duart_channel::write_CR(uint8_t data)
 	{
 		SR &= ~(STATUS_TRANSMITTER_READY | STATUS_TRANSMITTER_EMPTY);
 		m_tx_data_in_buffer = false;
+		m_tx_enabled = false;
 		if (m_ch == 0)
 			m_uart->clear_ISR_bits(INT_TXRDYA);
 		else
