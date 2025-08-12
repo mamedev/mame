@@ -45,8 +45,9 @@
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_TIMER (1U << 2)
 #define LOG_LED (1U << 3)
+#define LOG_TAS (1U << 4)
 
-#define VERBOSE (LOG_GENERAL|LOG_INTERRUPT)
+#define VERBOSE (LOG_GENERAL|LOG_INTERRUPT|LOG_TAS)
 #include "logmacro.h"
 
 
@@ -89,7 +90,6 @@ public:
 			{INPUT_LINE_IRQ4, cpu_irq::WRBERR},
 			{INPUT_LINE_IRQ5, cpu_irq::PERR}
 		})
-//      , m_vram(*this, "vram")
 //      , m_led(*this, "led%u", 0U)
 	{
 	}
@@ -113,7 +113,9 @@ public:
 	void init_common();
 
 protected:
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
+	// Hardware-enforced test-and-set access to RAM
+	u32 ram_tas_r(offs_t offset, u32 mem_mask);
+	void ram_tas_w(offs_t offset, u32 data, u32 mem_mask);
 
 	u8 intst_r();
 	u8 iop_ipc_intst_r();
@@ -228,7 +230,6 @@ protected:
 	required_device_array<nscsi_bus_device, 2> m_scsibus;
 
 	required_region_ptr<u32> m_eprom;
-	//required_shared_ptr<u32> m_vram;
 	//output_finder<4> m_led;
 
 	std::unique_ptr<u16[]> m_net_ram;
@@ -282,22 +283,19 @@ void news_38xx_state::init_common()
 	// HACK: hardwire the rate
 	m_fdc->set_rate(500000);
 
-	// TODO: the mirror 0x08000000 here is NOT enough - the mirror is "test and set" memory, which means there may be special arbitration
-	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), 0x08000000, m_ram->pointer());
+	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
 }
 
 void news_38xx_state::cpu_map(address_map &map)
 {
 	map.global_mask(0x1fffffff); // A28-A0 are connected
 
-	// 0x00000000 - 0x07ffffff: RAM
-	// 0x08000000 - 0x0fffffff: RAM test and set
+	map(0x08000000, 0x0fffffff).rw(FUNC(news_38xx_state::ram_tas_r), FUNC(news_38xx_state::ram_tas_w));
+
 	// 0x10000000 - 0x17ffffff: UBUS I/O
-	// 0x18000000 - 0x1fffffff: CPU Port
 
 	// All registers below this line are 32 bit registers, LSB 1 = Set, 0 = Reset
 	// All are reset on CPURESET (todo: check schematic)
-	// TODO: mirror writes only to satisfy 0x18xxxx00 mapping
 	map(0x18000000, 0x18000003).r(FUNC(news_38xx_state::cpstat_r));
 	map(0x18000000, 0x18000003).w(FUNC(news_38xx_state::cpenipty_w)).mirror(0xffff00);
 	map(0x18000004, 0x18000007).w(FUNC(news_38xx_state::cpenitmr_w)).mirror(0xffff00); // todo: check schematic to see if same timer as IOP or not
@@ -328,7 +326,7 @@ void news_38xx_state::iop_map(address_map &map)
 {
 	map.global_mask(0x3fffffff); // A29-A0 are connected
 
-	// TODO: RAM test-and-set mirror
+	map(0x08000000, 0x0fffffff).rw(FUNC(news_38xx_state::ram_tas_r), FUNC(news_38xx_state::ram_tas_w));
 
 	map(0x18000000, 0x1803ffff).ram(); // IOP ram
 	map(0x20000000, 0x2000ffff).rom().region("eprom", 0).mirror(0x1fff0000);
@@ -397,6 +395,46 @@ void news_38xx_state::iop_vector_map(address_map &map)
 	map(0xffffffff, 0xffffffff).lr8(NAME([] { return m68000_base_device::autovector(7); }));
 }
 
+u32 news_38xx_state::ram_tas_r(offs_t offset, u32 mem_mask)
+{
+	const u32 current_value = m_iop->space(0).read_dword(offset << 2);
+	if (machine().side_effects_disabled())
+	{
+		return current_value;
+	}
+
+	if (mem_mask != 0xffffffff)
+	{
+		fatalerror("%s tried to acquire lock with unaligned memory access!", machine().describe_context());
+	}
+
+	if (current_value == 0)
+	{
+		LOGMASKED(LOG_TAS, "%s acquired lock at offset 0x%x\n", machine().describe_context(), offset << 2);
+	}
+
+	// TODO: what is the actual value written by the hardware?
+	//		 Both vmunix and mrx appear to use bltz (r3k)/bmi (030) instructions, at least during boot
+	m_cpu->space(0).write_dword(offset << 2, 0x80000000); // TODO: fix usage of ->space
+	return current_value;
+}
+
+void news_38xx_state::ram_tas_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (data && !machine().side_effects_disabled())
+	{
+		fatalerror("lock released by %s with non-zero data!", machine().describe_context());
+	}
+
+	if (mem_mask != 0xffffffff)
+	{
+		fatalerror("%s tried to release lock with unaligned memory access!", machine().describe_context());
+	}
+
+	LOGMASKED(LOG_TAS, "%s releasing lock at offset 0x%x\n", machine().describe_context(), offset << 2);
+	m_cpu->space(0).write_dword(offset << 2, data); // TODO: fix usage of ->space
+}
+
 u8 news_38xx_state::intst_r()
 {
 	const u8 iop_status = is_iop_irq_set<iop_irq::PERR>() << 7 |
@@ -407,12 +445,14 @@ u8 news_38xx_state::intst_r()
 	                      is_iop_irq_set<iop_irq::FDCIRQ>() << 2 |
 	                      is_iop_irq_set<iop_irq::PARALLEL>() << 1 |
 	                      is_iop_irq_set<iop_irq::SLOT>();
+	LOGMASKED(LOG_INTERRUPT, "%s intst_r: 0x%x\n", machine().describe_context(), iop_status);
 	return iop_status;
 }
 
 u8 news_38xx_state::iop_ipc_intst_r()
 {
 	const u8 iop_status = is_iop_irq_set<iop_irq::UBUS>() << 1 | is_iop_irq_set<iop_irq::CPU>();
+	LOGMASKED(LOG_INTERRUPT, "%s iop_ipc_intst_r: 0x%x\n", machine().describe_context(), iop_status);
 	return iop_status;
 }
 
@@ -611,8 +651,7 @@ void news_38xx_state::romdis_w(u8 data)
 {
 	LOG("ROMDIS = 0x%x (%s)\n", data, machine().describe_context());
 	if (data) {
-		// TODO: the mirror 0x08000000 here is NOT enough - the mirror is "test and set" memory, which means there may be special arbitration
-		m_iop->space(0).install_ram(0x00000000, m_ram->mask(), 0x08000000, m_ram->pointer());
+		m_iop->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
 	}
 	else {
 		// TODO: re-map EPROM
@@ -657,7 +696,6 @@ void news_38xx_state::xpustart_w(offs_t offset, u8 data)
 	if (!offset) {
 		// TODO: reset CPU platform registers here?
 		m_cpu->set_input_line(INPUT_LINE_HALT, data ? 0 : 1);
-		if (data) machine().debug_break();
 	} else {
 		if (data) fatalerror("Tried to start UPU without UPU installed!");
 	}
@@ -666,7 +704,7 @@ void news_38xx_state::xpustart_w(offs_t offset, u8 data)
 void news_38xx_state::ipintxp_w(offs_t offset, u8 data)
 {
 	// Send interrupt to CPU or UPU
-	LOG("IPINT%cP = 0x%x\n", !offset ? 'C' : 'H', data);
+	LOGMASKED(LOG_INTERRUPT, "IPINT%cP = 0x%x\n", !offset ? 'C' : 'H', data);
 	if (!offset)
 	{
 		cpu_irq_w<cpu_irq::IOP>(1);
@@ -681,7 +719,7 @@ void news_38xx_state::ipenixp_w(offs_t offset, u8 data)
 {
 	// Enable or disable interrupts from CPU or UPU
 	// TODO: this doesn't need to be it's own function anymore
-	LOG("IPENI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
+	LOGMASKED(LOG_INTERRUPT, "IPENI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
 	if (!offset)
 	{
 		iop_inten_w<iop_irq::CPU>(data > 0);
@@ -696,7 +734,7 @@ void news_38xx_state::ipclixp_w(offs_t offset, u8 data)
 {
 	// Clear interrupt from CPU or UPU
 	// TODO: this doesn't need to be its own function anymore
-	LOG("IPCLI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
+	LOGMASKED(LOG_INTERRUPT, "IPCLI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
 	if (!offset)
 	{
 		iop_irq_w<iop_irq::CPU>(0);
@@ -710,7 +748,7 @@ void news_38xx_state::ipclixp_w(offs_t offset, u8 data)
 u32 news_38xx_state::cpstat_r()
 {
 	const u8 cpu_status = is_cpu_irq_set<cpu_irq::UBUS>() << 1 | is_cpu_irq_set<cpu_irq::IOP>();
-	LOG("CPSTAT read 0x%x\n", cpu_status);
+	LOGMASKED(LOG_INTERRUPT, "%s cpstat_r 0x%x\n", machine().describe_context(), cpu_status);
 	return cpu_status;
 }
 
@@ -737,7 +775,7 @@ void news_38xx_state::cpenitmr_w(u32 data)
 
 void news_38xx_state::cpintxp_w(offs_t offset, u32 data)
 {
-	LOG("CPINT%cP = 0x%x\n", !offset ? 'I' : 'H', data);
+	LOGMASKED(LOG_INTERRUPT, "CPINT%cP = 0x%x\n", !offset ? 'I' : 'H', data);
 	if (!offset)
 	{
 		iop_irq_w<iop_irq::CPU>(1);
@@ -758,7 +796,7 @@ void news_38xx_state::mapvec_w(u32 data)
 void news_38xx_state::cpclixp_w(offs_t offset, u32 data)
 {
 	// Clear interrupt from IOP or UPU
-	LOG("(%s) CPCLI%cP = 0x%x\n", machine().describe_context(), !offset ? 'I' : 'H', data);
+	LOGMASKED(LOG_INTERRUPT, "(%s) CPCLI%cP = 0x%x\n", machine().describe_context(), !offset ? 'I' : 'H', data);
 	if (!offset)
 	{
 		cpu_irq_w<cpu_irq::IOP>(0);
@@ -827,7 +865,7 @@ void news_38xx_state::common(machine_config &config)
 	m_scc->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
 	m_scc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
-	AM7990(config, m_net);
+	AM7990(config, m_net, 10_MHz_XTAL); // TODO: find actual crystal
 	m_net->intr_out().set(FUNC(news_38xx_state::iop_irq_w<iop_irq::LANCE>)).invert();
 	m_net->dma_in().set([this](const offs_t offset) { return m_net_ram[offset >> 1]; });
 	m_net->dma_out().set([this](const offs_t offset, const u16 data, const u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset >> 1]); });
