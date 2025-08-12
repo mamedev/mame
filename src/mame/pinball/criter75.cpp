@@ -119,9 +119,6 @@ void criter75_state::criter75(machine_config &config)
 }
 
 ROM_START( criter75 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-	// There's no CPU ROMs
-
 	ROM_REGION( 0x0800, "proms", ROMREGION_ERASE00 )
 	ROM_LOAD( "criteum_75-e_7611.a10", 0x0000, 0x0100, CRC(2db62f9c) SHA1(6736a3be190480e8519c6f61fd1a66e42bd2be71) )
 	ROM_LOAD( "criteum_75-e_7611.a9",  0x0000, 0x0100, CRC(23ee855e) SHA1(3c1f2b4e7db577e65b7e66f6fcc91b60d934962b) )
