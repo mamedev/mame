@@ -40,14 +40,19 @@
 #include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
 
-#include "machine/input_merger.h"
 #include "imagedev/floppy.h"
 
-#define VERBOSE 1
+#define LOG_INTERRUPT (1U << 1)
+#define LOG_TIMER (1U << 2)
+#define LOG_LED (1U << 3)
+
+#define VERBOSE (LOG_GENERAL|LOG_INTERRUPT)
 #include "logmacro.h"
 
 
 namespace {
+
+using namespace std::literals::string_view_literals;
 
 class news_38xx_state : public driver_device
 {
@@ -66,8 +71,24 @@ public:
 		, m_scsi(*this, "scsi%u:7:cxd1180", 0U)
 		, m_serial(*this, "serial%u", 0U)
 		, m_scsibus(*this, "scsi%u", 0U)
-		, m_serial_irq(*this, "serial_irq")
 		, m_eprom(*this, "eprom")
+		, iop_irq_line_map({
+			{INPUT_LINE_IRQ1, {iop_irq::AST}},
+			{INPUT_LINE_IRQ2, {iop_irq::SOFTINTR}},
+			{INPUT_LINE_IRQ3, {iop_irq::FDCIRQ, iop_irq::PARALLEL, iop_irq::SLOT}},
+			{INPUT_LINE_IRQ4, {iop_irq::LANCE, iop_irq::SCSI0, iop_irq::SCSI1, iop_irq::CPU, iop_irq::UBUS}},
+			{INPUT_LINE_IRQ5, {iop_irq::SCC, iop_irq::KEYBOARD, iop_irq::MOUSE}},
+			{INPUT_LINE_IRQ6, {iop_irq::TIMER}},
+			{INPUT_LINE_IRQ7, {iop_irq::FDCDRQ, iop_irq::PERR}}
+		})
+		, cpu_irq_line_map({
+			{INPUT_LINE_IRQ0, cpu_irq::UBUS},
+			{INPUT_LINE_IRQ1, cpu_irq::IOP},
+			{INPUT_LINE_IRQ2, cpu_irq::TIMER},
+			{INPUT_LINE_IRQ3, cpu_irq::FPA},
+			{INPUT_LINE_IRQ4, cpu_irq::WRBERR},
+			{INPUT_LINE_IRQ5, cpu_irq::PERR}
+		})
 //      , m_vram(*this, "vram")
 //      , m_led(*this, "led%u", 0U)
 	{
@@ -94,24 +115,55 @@ public:
 protected:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
-	// INTST only has some of the IRQ status info
-	u8 intst_r() { return m_intst & 0x7f; } // TODO: distinguish between FDCDRQ and PERR since this reg only has PERR
+	u8 intst_r();
+	u8 iop_ipc_intst_r();
 
-	enum class iop_irq_number : unsigned
+	// Not all IRQs feed into the status register directly
+	// Because we have to handle IRQ data being stored everywhere and/or apply filtering to the status register,
+	// apply the same strategy used in news_68k_iop, which also had to deal with this problem.
+	enum class iop_irq : unsigned
 	{
-		SLOT   = 0,   // Expansion I/O bus interrupts
-		PARALLEL = 1, // Centronics interface
-		FDC    = 2,   // FDCIRQ
-		LANCE  = 3,   // Ethernet controller interrupts
-		IPC    = 4,   // CPU and UBUS interrupts
-		SCSI1  = 5,   // SCSI bus 0 interrupts
-		SCSI0  = 6,   // SCSI bus 1 interrupts
-		PERR = 7  // Main memory parity error
+		AST,
+		SOFTINTR,
+		FDCIRQ,
+		PARALLEL,
+		SLOT,
+		LANCE,
+		SCSI0,
+		SCSI1,
+		CPU,
+		UBUS,
+		SCC,
+		KEYBOARD,
+		MOUSE,
+		TIMER,
+		FDCDRQ,
+		PERR
 	};
-	template <iop_irq_number Number> void irq_w(int state);
+
+	static constexpr std::array iop_irq_names = {
+		"AST"sv, "SOFTINTR"sv, "FDCIRQ"sv, "PARALLEL"sv, "SLOT"sv, "LANCE"sv, "SCSI0"sv, "SCSI1"sv, "CPU"sv, "UBUS"sv,
+		"SCC"sv, "KEYBOARD"sv, "MOUSE"sv, "TIMER"sv, "FDCDRQ"sv, "PERR"sv
+	};
+	static constexpr uint32_t iop_nmi_mask = 1 << static_cast<uint32_t>(iop_irq::FDCDRQ) |
+	                                         1 << static_cast<uint32_t>(iop_irq::SCC) |
+	                                         1 << static_cast<uint32_t>(iop_irq::SCSI0) |
+	                                         1 << static_cast<uint32_t>(iop_irq::SCSI1) |
+	                                         1 << static_cast<uint32_t>(iop_irq::LANCE) |
+	                                         1 << static_cast<uint32_t>(iop_irq::FDCIRQ) |
+	                                         1 << static_cast<uint32_t>(iop_irq::SLOT) |
+	                                         1 << static_cast<uint32_t>(iop_irq::SOFTINTR) |
+	                                         1 << static_cast<uint32_t>(iop_irq::AST);
+
+	template<iop_irq Number>
+	void iop_irq_w(u8 state); // TODO: see if template deduction can work for having irq_w overloaded
+	template<iop_irq Number>
+	void iop_inten_w(uint8_t state);
+	template<iop_irq Number>
+	bool is_iop_irq_set();
 	void int_check_iop();
 
-	enum class cpu_irq_number : unsigned
+	enum class cpu_irq : unsigned
 	{
 		UBUS = 0,   // Interprocessor communication interrupt from UPU
 		IOP = 1,    // Interprocessor communication interrupt from IOP
@@ -121,13 +173,25 @@ protected:
 		PERR = 5    // Main memory parity error
 	};
 
+	static constexpr std::array cpu_irq_names = {"UBUS"sv, "IOP"sv, "TIMER"sv, "FPA"sv, "WRBERR"sv, "PERR"sv};
+	static constexpr uint32_t cpu_nmi_mask = 1 << static_cast<uint32_t>(cpu_irq::WRBERR) |
+	                                         1 << static_cast<uint32_t>(cpu_irq::FPA) |
+	                                         1 << static_cast<uint32_t>(cpu_irq::IOP);
+
+	template <cpu_irq Number>
+	void cpu_irq_w(u8 state);
+	template <cpu_irq Number>
+	void cpu_inten_w(uint8_t state);
+	template<cpu_irq Number>
+	bool is_cpu_irq_set();
+	void int_check_cpu();
+
 	// IOP platform hardware
 	u32 iop_bus_error_r();
 	void poweron_w(u8 data);
 	void romdis_w(u8 data);
 	void ptycken_w(u8 data);
 	void timeren_w(u8 data);
-	void softintr_w(u8 data);
 	void astintr_w(u8 data);
 	void iopled_w(offs_t offset, u8 data); // IOPLED0/IOPLED1
 	void xpustart_w(offs_t offset, u8 data); // CPUSTART/HPUSTART
@@ -135,7 +199,7 @@ protected:
 	void ipenixp_w(offs_t offset, u8 data); // IPENICP/IPENIHP
 	void ipclixp_w(offs_t offset, u8 data);	// IPCLICP/IPCLIHP
 
-	void timer(s32 param);
+	TIMER_CALLBACK_MEMBER(timer);
 
 	// CPU platform hardware
 	u32 cpstat_r();
@@ -144,7 +208,6 @@ protected:
 	void cpenitmr_w(u32 data);
 	void cpintxp_w(offs_t offset, u32 data);
 	void mapvec_w(u32 data);
-	void cpenihp_w(offs_t offset, u32 data);
 	void cpclixp_w(offs_t offset, u32 data);
 	void cpuled_w(offs_t offset, u32 data);
 
@@ -164,8 +227,6 @@ protected:
 	required_device_array<rs232_port_device, 2> m_serial;
 	required_device_array<nscsi_bus_device, 2> m_scsibus;
 
-	required_device<input_merger_device> m_serial_irq;
-
 	required_region_ptr<u32> m_eprom;
 	//required_shared_ptr<u32> m_vram;
 	//output_finder<4> m_led;
@@ -174,11 +235,17 @@ protected:
 
 	emu_timer *m_timer = nullptr;
 
-	u8 m_intst = 0;
-	u8 m_inten = 0;
-
-	bool m_int_state[3]{};
 	bool m_scc_irq_state = false;
+
+	// IOP IRQ state
+	const std::map<int, std::vector<iop_irq>> iop_irq_line_map;
+	uint32_t m_iop_intst = 0;
+	uint32_t m_iop_inten = 0;
+
+	// CPU IRQ state
+	const std::map<int, cpu_irq> cpu_irq_line_map;
+	uint32_t m_cpu_intst = 0;
+	uint32_t m_cpu_inten = 0;
 };
 
 void news_38xx_state::machine_start()
@@ -189,16 +256,14 @@ void news_38xx_state::machine_start()
 
 	save_pointer(NAME(m_net_ram), 8192);
 
-	save_item(NAME(m_intst));
-	save_item(NAME(m_inten));
-	save_item(NAME(m_int_state));
+	// TODO: save states and state clearing for new IRQ stuff
+	// save_item(NAME(m_intst));
+	// save_item(NAME(m_inten));
 
 	m_timer = timer_alloc(FUNC(news_38xx_state::timer), this);
 
-	m_intst = 0;
-	m_inten = 0x6d;
-	for (bool &int_state : m_int_state)
-		int_state = false;
+	// m_intst = 0;
+	// m_inten = 0x6d;
 	m_scc_irq_state = false;
 }
 
@@ -218,7 +283,7 @@ void news_38xx_state::init_common()
 	m_fdc->set_rate(500000);
 
 	// TODO: the mirror 0x08000000 here is NOT enough - the mirror is "test and set" memory, which means there may be special arbitration
-	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), 0x00000000, m_ram->pointer());
+	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), 0x08000000, m_ram->pointer());
 }
 
 void news_38xx_state::cpu_map(address_map &map)
@@ -238,7 +303,7 @@ void news_38xx_state::cpu_map(address_map &map)
 	map(0x18000004, 0x18000007).w(FUNC(news_38xx_state::cpenitmr_w)); // todo: check schematic to see if same timer as IOP or not
 	map(0x18000020, 0x18000027).w(FUNC(news_38xx_state::cpintxp_w));
 	map(0x18000040, 0x18000043).w(FUNC(news_38xx_state::mapvec_w));
-	map(0x18000044, 0x18000047).w(FUNC(news_38xx_state::cpenihp_w));
+	map(0x18000044, 0x18000047).w(FUNC(news_38xx_state::cpu_inten_w<cpu_irq::UBUS>));
 	map(0x18000060, 0x18000067).w(FUNC(news_38xx_state::cpclixp_w));
 	map(0x18000080, 0x18000087).w(FUNC(news_38xx_state::cpuled_w));
 	map(0x1c000000, 0x1c000003).r(FUNC(news_38xx_state::wrbeadr_r));
@@ -247,6 +312,12 @@ void news_38xx_state::cpu_map(address_map &map)
 	map(0x1fc00000, 0x1fc1ffff).lr8(NAME([this] (const offs_t offset) {
 		// RAM endianness is an issue because RAM is installed with install_ram.
 		// Therefore, go straight to the memory bus (technically its own bus, but we can go via IOP as a hack)
+		// TODO: pick one of the following instead of doing this
+		//       A) figure out the correct way to deal with the endianness issue
+		//       B) Replace this with a memory_access::specific
+		//       C) Use an accessor function for RAM along with a memory_access cache to avoid endianness mismatch
+
+		// TODO: return 0, ff, or bus error if mapping isn't enabled. which one?
 		const u8 data = m_iop->space(0).read_byte(0xc00000 + offset);
 		// LOG("ram r 0x%08x -> 0x%08x\n", offset, data);
 		return data;
@@ -260,7 +331,6 @@ void news_38xx_state::iop_map(address_map &map)
 	// TODO: RAM test-and-set mirror
 
 	map(0x18000000, 0x1803ffff).ram(); // IOP ram
-
 	map(0x20000000, 0x2000ffff).rom().region("eprom", 0).mirror(0x1fff0000);
 
 	// IOP Control Registers
@@ -268,7 +338,7 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x22000001, 0x22000001).w(FUNC(news_38xx_state::romdis_w));
 	map(0x22000002, 0x22000002).w(FUNC(news_38xx_state::ptycken_w));
 	map(0x22000003, 0x22000003).w(FUNC(news_38xx_state::timeren_w));
-	map(0x22000004, 0x22000004).w(FUNC(news_38xx_state::softintr_w));
+	map(0x22000004, 0x22000004).w(FUNC(news_38xx_state::iop_irq_w<iop_irq::SOFTINTR>));
 	map(0x22000005, 0x22000005).w(FUNC(news_38xx_state::astintr_w));
 	map(0x22000006, 0x22000007).w(FUNC(news_38xx_state::iopled_w));
 
@@ -278,8 +348,9 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x22800010, 0x22800011).w(FUNC(news_38xx_state::ipenixp_w));
 	map(0x22800018, 0x22800019).w(FUNC(news_38xx_state::ipclixp_w));
 
+	// IOP and Inter-Processor Interrupt Status Registers
 	map(0x23000000, 0x23000000).r(FUNC(news_38xx_state::intst_r));
-	map(0x23800000, 0x23800000).lr8(NAME([] {return 1; })); // inter-processor interrupt status -> bit 0 = CPU, bit 1 = UPU TODO: don't hardcode to CPU
+	map(0x23800000, 0x23800000).r(FUNC(news_38xx_state::iop_ipc_intst_r));
 
 	map(0x24000000, 0x24000007).m(m_fdc, FUNC(n82077aa_device::map));
 	map(0x24000105, 0x24000105).rw(m_fdc, FUNC(n82077aa_device::dma_r), FUNC(n82077aa_device::dma_w));
@@ -287,7 +358,7 @@ void news_38xx_state::iop_map(address_map &map)
 	// 0x26040000 // Centronics data
 	// 0x26040001 Centronics strobe
 	// 0x26040002 Centronics IRQ clear
-	map(0x26040003, 0x26040003).lw8([this](u8 data) { m_inten |= 0x02; }, "cie_w");
+	map(0x26040003, 0x26040003).w(FUNC(news_38xx_state::iop_inten_w<iop_irq::PARALLEL>));
 
 	map(0x26080000, 0x26080007).m(m_scsi[0], FUNC(cxd1180_device::map));
 	map(0x260c0000, 0x260c0007).m(m_scsi[1], FUNC(cxd1180_device::map));
@@ -326,32 +397,180 @@ void news_38xx_state::iop_vector_map(address_map &map)
 	map(0xffffffff, 0xffffffff).lr8(NAME([] { return m68000_base_device::autovector(7); }));
 }
 
-template <news_38xx_state::iop_irq_number Number> void news_38xx_state::irq_w(int state)
+u8 news_38xx_state::intst_r()
 {
-	LOG("irq number %d state %d\n",  static_cast<unsigned>(Number), state);
+	const u8 iop_status = is_iop_irq_set<iop_irq::PERR>() << 7 |
+	                      is_iop_irq_set<iop_irq::SCSI0>() << 6 |
+	                      is_iop_irq_set<iop_irq::SCSI1>() << 5 |
+	                      (is_iop_irq_set<iop_irq::CPU>() || is_iop_irq_set<iop_irq::UBUS>()) << 4 |
+	                      is_iop_irq_set<iop_irq::LANCE>() << 3 |
+	                      is_iop_irq_set<iop_irq::FDCIRQ>() << 2 |
+	                      is_iop_irq_set<iop_irq::PARALLEL>() << 1 |
+	                      is_iop_irq_set<iop_irq::SLOT>();
+	return iop_status;
+}
+
+u8 news_38xx_state::iop_ipc_intst_r()
+{
+	const u8 iop_status = is_iop_irq_set<iop_irq::UBUS>() << 1 | is_iop_irq_set<iop_irq::CPU>();
+	return iop_status;
+}
+
+template<news_38xx_state::iop_irq Number>
+void news_38xx_state::iop_irq_w(u8 state)
+{
+	if (Number != iop_irq::TIMER)
+	{
+		LOGMASKED(LOG_INTERRUPT, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
+		          iop_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+	}
+	else
+	{
+		LOGMASKED(LOG_TIMER, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
+				  iop_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+	}
 
 	if (state)
-		m_intst |= 1U << static_cast<unsigned>(Number);
+	{
+		m_iop_intst |= 1U << static_cast<u32>(Number);
+	}
 	else
-		m_intst &= ~(1U << static_cast<unsigned>(Number));
+	{
+		m_iop_intst &= ~(1U << static_cast<u32>(Number));
+	}
 
 	int_check_iop();
 }
 
+template<news_38xx_state::iop_irq Number>
+void news_38xx_state::iop_inten_w(uint8_t state)
+{
+	if (Number != iop_irq::TIMER)
+	{
+		LOGMASKED(LOG_INTERRUPT, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
+		          iop_irq_names[static_cast<unsigned>(Number)], state ? "enabled" : "disabled");
+	}
+	else
+	{
+		LOGMASKED(LOG_TIMER, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
+			iop_irq_names[static_cast<unsigned>(Number)], state ? "enabled" : "disabled");
+	}
+
+	if (state)
+	{
+		m_iop_inten |= 1 << static_cast<u32>(Number);
+	}
+	else
+	{
+		m_iop_inten &= ~(1 << static_cast<u32>(Number));
+	}
+
+	int_check_iop();
+}
+
+template<news_38xx_state::iop_irq Number>
+bool news_38xx_state::is_iop_irq_set()
+{
+	return BIT(m_iop_intst, static_cast<u32>(Number));
+}
+
 void news_38xx_state::int_check_iop()
 {
-	static int constexpr intst_line[] = { INPUT_LINE_IRQ7, INPUT_LINE_IRQ4, INPUT_LINE_IRQ3 };
-	static u8 constexpr intst_mask[] = { 0x80, 0x78, 0x07 };
-
-	for (unsigned i = 0; i < std::size(m_int_state); i++)
+	const uint32_t active_irq = m_iop_intst & (m_iop_inten | iop_nmi_mask);
+	for (const auto& [input_line, irq_inputs] : iop_irq_line_map)
 	{
-		bool const int_state = m_intst & m_inten & intst_mask[i];
-
-		if (m_int_state[i] != int_state)
+		// Calculate state of input pin (logical OR of all attached inputs)
+		bool state = false;
+		for (auto irq_input : irq_inputs)
 		{
-			LOG("int 0x%x changed to 0x%x\n", i, int_state);
-			m_int_state[i] = int_state;
-			m_iop->set_input_line(intst_line[i], int_state);
+			state |= active_irq & 1 << static_cast<u32>(irq_input);
+		}
+
+		// Update input pin status if it has changed
+		if (m_iop->input_line_state(input_line) != state) {
+			if (input_line != INPUT_LINE_IRQ6)
+			{
+				LOGMASKED(LOG_INTERRUPT, "Setting IOP input line %d to %d\n", input_line, state ? 1 : 0);
+			}
+
+			m_iop->set_input_line(input_line, state ? 1 : 0);
+		}
+	}
+}
+
+template <news_38xx_state::cpu_irq Number>
+void news_38xx_state::cpu_irq_w(u8 state)
+{
+	if (Number != cpu_irq::TIMER)
+	{
+		LOGMASKED(LOG_INTERRUPT, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
+		          cpu_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+	}
+	else
+	{
+		LOGMASKED(LOG_TIMER, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
+		  cpu_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+	}
+
+	if (state)
+	{
+		m_cpu_intst |= 1U << static_cast<u32>(Number);
+	}
+	else
+	{
+		m_cpu_intst &= ~(1U << static_cast<u32>(Number));
+	}
+
+	int_check_cpu();
+}
+
+template<news_38xx_state::cpu_irq Number>
+void news_38xx_state::cpu_inten_w(uint8_t state)
+{
+	if (Number != cpu_irq::TIMER)
+	{
+		LOGMASKED(LOG_INTERRUPT, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
+		          cpu_irq_names[static_cast<unsigned>(Number)], state ? "enabled" : "disabled");
+	}
+	else
+	{
+		LOGMASKED(LOG_TIMER, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
+		  cpu_irq_names[static_cast<unsigned>(Number)], state ? "enabled" : "disabled");
+	}
+
+	if (state)
+	{
+		m_cpu_inten |= 1 << static_cast<u32>(Number);
+	}
+	else
+	{
+		m_cpu_inten &= ~(1 << static_cast<u32>(Number));
+	}
+
+	int_check_cpu();
+}
+
+template<news_38xx_state::cpu_irq Number>
+bool news_38xx_state::is_cpu_irq_set()
+{
+	return BIT(m_cpu_intst, static_cast<u32>(Number));
+}
+
+void news_38xx_state::int_check_cpu()
+{
+	const uint32_t active_irq = m_cpu_intst & (m_cpu_inten | cpu_nmi_mask);
+	for (const auto& [input_line, irq_input] : cpu_irq_line_map)
+	{
+		// Update input pin status if it has changed
+		const bool state = BIT(active_irq, static_cast<uint32_t>(irq_input));
+		if (m_cpu->input_line_state(input_line) != state)
+		{
+			if (input_line != INPUT_LINE_IRQ2)
+			{
+				LOGMASKED(LOG_INTERRUPT, "Setting CPU input line %d to %d\n", input_line, state ? 1 : 0);
+			}
+
+			m_cpu->set_input_line(input_line, state ? 1 : 0);
 		}
 	}
 }
@@ -364,10 +583,17 @@ u32 news_38xx_state::iop_bus_error_r()
 	return 0;
 }
 
-void news_38xx_state::timer(s32 param)
+TIMER_CALLBACK_MEMBER(news_38xx_state::timer)
 {
-	if (param)
-		m_iop->set_input_line(INPUT_LINE_IRQ6, ASSERT_LINE);
+	if (m_iop_inten & 1 << static_cast<u32>(iop_irq::TIMER))
+	{
+		iop_irq_w<iop_irq::TIMER>(1);
+	}
+
+	if (m_cpu_inten & 1 << static_cast<u32>(cpu_irq::TIMER))
+	{
+		cpu_irq_w<cpu_irq::TIMER>(1);
+	}
 }
 
 // TODO: Add and unify logging for all of these, add a unique log level for IOP registers, and add machine context
@@ -375,7 +601,7 @@ void news_38xx_state::poweron_w(u8 data)
 {
 	LOG("Write POWERON = 0x%x (%s)\n", data, machine().describe_context());
 
-	if (!data && !machine().side_effects_disabled())
+	if (!machine().side_effects_disabled() && !data)
 	{
 		machine().schedule_exit();
 	}
@@ -386,7 +612,7 @@ void news_38xx_state::romdis_w(u8 data)
 	LOG("ROMDIS = 0x%x (%s)\n", data, machine().describe_context());
 	if (data) {
 		// TODO: the mirror 0x08000000 here is NOT enough - the mirror is "test and set" memory, which means there may be special arbitration
-		m_iop->space(0).install_ram(0x00000000, m_ram->mask(), 0x00000000, m_ram->pointer());
+		m_iop->space(0).install_ram(0x00000000, m_ram->mask(), 0x08000000, m_ram->pointer());
 	}
 	else {
 		// TODO: re-map EPROM
@@ -395,33 +621,33 @@ void news_38xx_state::romdis_w(u8 data)
 
 void news_38xx_state::ptycken_w(u8 data)
 {
-	// TODO: this is not complete
-	m_inten |= 0x80;
+	iop_inten_w<iop_irq::PERR>(data);
+	if (!data)
+	{
+		iop_irq_w<iop_irq::PERR>(0);
+	}
 }
 
 void news_38xx_state::timeren_w(u8 data)
 {
-	// LOG("timeren_w 0x%02x\n", data);
-
-	m_timer->set_param(data);
-
 	if (!data)
-		m_iop->set_input_line(INPUT_LINE_IRQ6, CLEAR_LINE);
-}
+	{
+		iop_irq_w<iop_irq::TIMER>(0);
+	}
 
-void news_38xx_state::softintr_w(u8 data)
-{
-	LOG("SOFTINTR = 0x%x\n", data);
+	iop_inten_w<iop_irq::TIMER>(data);
+	m_timer->set_param(data);
 }
 
 void news_38xx_state::astintr_w(u8 data)
 {
 	LOG("ASTINTR = 0x%x\n", data);
+	// TODO: how to trigger AST IRQ when IOP enters user mode? No easy injection point like my experiments with NWS800
 }
 
 void news_38xx_state::iopled_w(offs_t offset, u8 data)
 {
-	// LOG("IOPLED%01d = 0x%x\n", offset, data);
+	LOGMASKED(LOG_LED, "IOPLED%01d = 0x%x\n", offset, data);
 }
 
 void news_38xx_state::xpustart_w(offs_t offset, u8 data)
@@ -440,46 +666,53 @@ void news_38xx_state::xpustart_w(offs_t offset, u8 data)
 
 void news_38xx_state::ipintxp_w(offs_t offset, u8 data)
 {
-	// offset 0 = Send level 2 IRQ to CPU
-	// offset 1 = Send level 2 IRQ to UPU
+	// Send interrupt to CPU or UPU
 	LOG("IPINT%cP = 0x%x\n", !offset ? 'C' : 'H', data);
+	if (!offset)
+	{
+		cpu_irq_w<cpu_irq::IOP>(1);
+	}
+	else
+	{
+		fatalerror("IOP tried to interrupt UPU without UPU installed!");
+	}
 }
 
 void news_38xx_state::ipenixp_w(offs_t offset, u8 data)
 {
-	// offset 0 = Enable level 4 IRQ from CPU (writing 0 will not clear IRQ)
-	// offset 1 = Enable level 4 IRQ from UPU (writing 0 will not clear IRQ)
+	// Enable or disable interrupts from CPU or UPU
+	// TODO: this doesn't need to be it's own function anymore
 	LOG("IPENI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
 	if (!offset)
 	{
-		if (data)
-		{
-			m_inten |= 1 << static_cast<unsigned>(iop_irq_number::IPC);
-		}
-		else
-		{
-			m_inten &= ~(1 << static_cast<unsigned>(iop_irq_number::IPC));
-		}
-		int_check_iop();
+		iop_inten_w<iop_irq::CPU>(data);
+	}
+	else
+	{
+		iop_inten_w<iop_irq::UBUS>(data);
 	}
 }
 
 void news_38xx_state::ipclixp_w(offs_t offset, u8 data)
 {
-	// offset 0 = Clear level 4 IRQ from CPU
-	// offset 1 = Clear level 4 IRQ from UPU
+	// Clear interrupt from CPU or UPU
+	// TODO: this doesn't need to be its own function anymore
 	LOG("IPCLI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
 	if (!offset)
 	{
-		m_intst &= ~(1 << static_cast<unsigned>(iop_irq_number::IPC));
-		int_check_iop();
+		iop_irq_w<iop_irq::CPU>(0);
+	}
+	else
+	{
+		iop_irq_w<iop_irq::UBUS>(0);
 	}
 }
 
 u32 news_38xx_state::cpstat_r()
 {
-	LOG("CPSTAT read 0x%x\n"); // CPU status
-	return 0;
+	const u8 cpu_status = is_cpu_irq_set<cpu_irq::UBUS>() << 1 | is_cpu_irq_set<cpu_irq::IOP>();
+	LOG("CPSTAT read 0x%x\n", cpu_status);
+	return cpu_status;
 }
 
 u32 news_38xx_state::wrbeadr_r()
@@ -500,12 +733,14 @@ void news_38xx_state::cpenitmr_w(u32 data)
 
 void news_38xx_state::cpintxp_w(offs_t offset, u32 data)
 {
-	// 0x18xxxx20:
-	// 0x18xxxx24: CPINTHP (Send IRQ to UPU)
 	LOG("CPINT%cP = 0x%x\n", !offset ? 'I' : 'H', data);
-	if (!offset) // CPINTIP (Send IRQ to IOP)
+	if (!offset)
 	{
-		irq_w<iop_irq_number::IPC>(1);
+		iop_irq_w<iop_irq::CPU>(1);
+	}
+	else
+	{
+		fatalerror("CPU tried to interrupt UPU without UPU installed!");
 	}
 }
 
@@ -515,23 +750,23 @@ void news_38xx_state::mapvec_w(u32 data)
 	LOG("MAPVEC = 0x%x\n", data); // 1 = normal operation, 0 = map reset vector 0x1fc00000 to 0x00c00000 in RAM
 }
 
-void news_38xx_state::cpenihp_w(offs_t offset, u32 data)
-{
-	LOG("CPENIHP = 0x%x\n", data); // 1 = enable interrupt from UPU, 0 = disable but not clear
-}
-
 void news_38xx_state::cpclixp_w(offs_t offset, u32 data)
 {
-	// 0x18xxxx60: CPCLIIP (clear interrupt from IOP)
-	// 0x18xxxx64: CPCLIHP (clear interrupt from UPU)
+	// Clear interrupt from IOP or UPU
 	LOG("CPCLI%cP = 0x%x\n", !offset ? 'I' : 'H', data);
+	if (!offset)
+	{
+		cpu_irq_w<cpu_irq::IOP>(0);
+	}
+	else
+	{
+		cpu_irq_w<cpu_irq::UBUS>(0);
+	}
 }
 
 void news_38xx_state::cpuled_w(offs_t offset, u32 data)
 {
-	// 0x18xxxx80: CPULED0
-	// 0x18xxxx84: CPULED1
-	// LOG("CPULED%01d = 0x%x\n", offset, data);
+	LOGMASKED(LOG_LED, "CPULED%01d = 0x%x\n", offset, data);
 }
 
 void news_scsi_devices(device_slot_interface &device)
@@ -563,15 +798,12 @@ void news_38xx_state::common(machine_config &config)
 	DMAC_0266(config, m_dma[1], 0);
 	m_dma[1]->set_bus(m_iop, 0);
 
-	INPUT_MERGER_ANY_HIGH(config, m_serial_irq);
-	m_serial_irq->output_handler().set_inputline(m_iop, INPUT_LINE_IRQ5);
-
 	SCC85C30(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_int_callback().set(
-		[this](int state)
+		[this](const int state)
 		{
-			m_scc_irq_state = bool(state);
-			m_serial_irq->in_w<2>(state);
+			m_scc_irq_state = static_cast<bool>(state);
+			iop_irq_w<iop_irq::SCC>(state);
 		});
 
 	// scc channel A
@@ -591,13 +823,13 @@ void news_38xx_state::common(machine_config &config)
 	m_scc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
 	AM7990(config, m_net);
-	m_net->intr_out().set(FUNC(news_38xx_state::irq_w<iop_irq_number::LANCE>)).invert();
-	m_net->dma_in().set([this](offs_t offset) { return m_net_ram[offset >> 1]; });
-	m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset >> 1]); });
+	m_net->intr_out().set(FUNC(news_38xx_state::iop_irq_w<iop_irq::LANCE>)).invert();
+	m_net->dma_in().set([this](const offs_t offset) { return m_net_ram[offset >> 1]; });
+	m_net->dma_out().set([this](const offs_t offset, const u16 data, const u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset >> 1]); });
 
 	N82077AA(config, m_fdc, 16_MHz_XTAL, n82077aa_device::mode_t::PS2);
-	m_fdc->intrq_wr_callback().set(FUNC(news_38xx_state::irq_w<iop_irq_number::FDC>));
-	m_fdc->drq_wr_callback().set(FUNC(news_38xx_state::irq_w<iop_irq_number::PERR>)); // TODO: don't just use PERR here
+	m_fdc->intrq_wr_callback().set(FUNC(news_38xx_state::iop_irq_w<iop_irq::FDCIRQ>));
+	m_fdc->drq_wr_callback().set(FUNC(news_38xx_state::iop_irq_w<iop_irq::FDCDRQ>));
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi bus 0 and devices
@@ -616,7 +848,7 @@ void news_38xx_state::common(machine_config &config)
 		{
 			auto &adapter = downcast<cxd1180_device &>(*device);
 
-			adapter.irq_handler().set(*this, FUNC(news_38xx_state::irq_w<iop_irq_number::SCSI0>));
+			adapter.irq_handler().set(*this, FUNC(news_38xx_state::iop_irq_w<iop_irq::SCSI0>));
 			adapter.irq_handler().append(m_dma[0], FUNC(dmac_0266_device::eop_w));
 			adapter.drq_handler().set(m_dma[0], FUNC(dmac_0266_device::req_w));
 
@@ -641,7 +873,7 @@ void news_38xx_state::common(machine_config &config)
 		{
 			auto &adapter = downcast<cxd1180_device &>(*device);
 
-			adapter.irq_handler().set(*this, FUNC(news_38xx_state::irq_w<iop_irq_number::SCSI1>));
+			adapter.irq_handler().set(*this, FUNC(news_38xx_state::iop_irq_w<iop_irq::SCSI1>));
 			adapter.irq_handler().append(m_dma[1], FUNC(dmac_0266_device::eop_w));
 			adapter.drq_handler().set(m_dma[1], FUNC(dmac_0266_device::req_w));
 
@@ -651,8 +883,8 @@ void news_38xx_state::common(machine_config &config)
 		});
 
 	NEWS_HID_HLE(config, m_hid);
-	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(m_serial_irq, FUNC(input_merger_device::in_w<0>));
-	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(m_serial_irq, FUNC(input_merger_device::in_w<1>));
+	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(*this, FUNC(news_38xx_state::iop_irq_w<iop_irq::KEYBOARD>));
+	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(*this, FUNC(news_38xx_state::iop_irq_w<iop_irq::MOUSE>));
 
 	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("RISC");
 }
