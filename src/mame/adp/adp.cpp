@@ -697,8 +697,8 @@ ROM_START( funlddlx )
 
 	ROM_REGION( 0x40000, "nvram", 0 )
 	//nvram - 16 bit - taken from parent
-	ROM_LOAD16_BYTE( "m48z08post.bin", 0x0000, 0x20000, CRC(89705c86) SHA1(e5b57ab26a5034349ee61b8821d1ae64e2dd45f4) )
-	ROM_LOAD16_BYTE( "m48z08posz.bin", 0x0001, 0x20000, CRC(66e00617) SHA1(74abbf8fae63f88f9dcbe9c72ff3d2f2fbf9cd87) )
+	ROM_LOAD16_BYTE( "nvram_even.u5", 0x0000, 0x20000, CRC(66e00617) SHA1(74abbf8fae63f88f9dcbe9c72ff3d2f2fbf9cd87) )
+	ROM_LOAD16_BYTE( "nvram_odd.u8", 0x0001, 0x20000, CRC(89705c86) SHA1(e5b57ab26a5034349ee61b8821d1ae64e2dd45f4) )
 ROM_END
 
 ROM_START( funlddlx2 )
@@ -712,8 +712,8 @@ ROM_START( funlddlx2 )
 
 	ROM_REGION( 0x40000, "nvram", 0 )
 	//nvram - 16 bit - taken from parent
-	ROM_LOAD16_BYTE( "m48z08post.bin", 0x0000, 0x20000, CRC(89705c86) SHA1(e5b57ab26a5034349ee61b8821d1ae64e2dd45f4) )
-	ROM_LOAD16_BYTE( "m48z08posz.bin", 0x0001, 0x20000, CRC(66e00617) SHA1(74abbf8fae63f88f9dcbe9c72ff3d2f2fbf9cd87) )
+	ROM_LOAD16_BYTE( "nvram_even.u5", 0x0000, 0x20000, CRC(66e00617) SHA1(74abbf8fae63f88f9dcbe9c72ff3d2f2fbf9cd87) )
+	ROM_LOAD16_BYTE( "nvram_odd.u8", 0x0001, 0x20000, CRC(89705c86) SHA1(e5b57ab26a5034349ee61b8821d1ae64e2dd45f4) )
 ROM_END
 
 ROM_START( funlddlx4 )
@@ -726,9 +726,9 @@ ROM_START( funlddlx4 )
 	ROM_LOAD16_BYTE( "flv_f1_ii.bin", 0x00001, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
 
 	ROM_REGION( 0x40000, "nvram", 0 )
-	//nvram - 16 bit
-	ROM_LOAD16_BYTE( "m48z08post.bin", 0x0001, 0x20000, CRC(89705c86) SHA1(e5b57ab26a5034349ee61b8821d1ae64e2dd45f4) )
-	ROM_LOAD16_BYTE( "m48z08posz.bin", 0x0000, 0x20000, CRC(66e00617) SHA1(74abbf8fae63f88f9dcbe9c72ff3d2f2fbf9cd87) )
+	//nvram - 16 bit	
+	ROM_LOAD16_BYTE( "nvram_even.u5", 0x0000, 0x20000, CRC(66e00617) SHA1(74abbf8fae63f88f9dcbe9c72ff3d2f2fbf9cd87) )
+	ROM_LOAD16_BYTE( "nvram_odd.u8", 0x0001, 0x20000, CRC(89705c86) SHA1(e5b57ab26a5034349ee61b8821d1ae64e2dd45f4) )
 ROM_END
 
 ROM_START( fstation )
