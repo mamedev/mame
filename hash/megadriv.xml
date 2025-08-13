@@ -2712,10 +2712,13 @@ No [VDP] sprites
 
 
 <!-- This board contains no SRAM, despite the header reporting 16k of battery -->
-	<software name="espnnflp" cloneof="espnnfl" supported="no"> <!-- it freezes at head/tail -->
+	<software name="espnnflp" cloneof="espnnfl" supported="no">
 		<description>ESPN Sunday Night NFL (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
+		<notes><![CDATA[
+Black screen after head/tails, reads at $d68000 (?)
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="u1" value="TC57400AD-120"/>
@@ -6632,6 +6635,9 @@ Unsupported [Menacer] peripheral
 		<description>PGA Tour Golf II for use with the Personal Trainer</description>
 		<year>1995</year>
 		<publisher>HeartBeat Corp</publisher>
+		<notes><![CDATA[
+Unemulated HeartBeat peripheral
+]]></notes>
 		<info name="usage" value="Requires HeartBeat Personal Trainer activity tracker"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom"/>
@@ -10820,6 +10826,9 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Addams Family (USA, prototype, alt)</description>
 		<year>1994</year>
 		<publisher>Flying Edge</publisher>
+		<notes><![CDATA[
+Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="addams family, the (usa) (beta) (alt).bin" size="1048576" crc="3a173e1f" sha1="632b321b860021f8a473fccc7bf8a03bd9c2d581"/>
@@ -12592,6 +12601,9 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>Beavis and Butt-Head (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Viacom New Media</publisher>
+		<notes><![CDATA[
+Black screen, keeps accessing [VDP] with an illegal D3=0xffffffff, eventually crashes
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="beavis and butt-head (usa) (beta).bin" size="2097152" crc="81ed5335" sha1="f9ed871867f543a8d94c47270cd530a5ca410664"/>
@@ -15889,6 +15901,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		</part>
 	</software>
 
+	<!-- TODO: all non-working asteborg entries needs their own mapper -->
 	<software name="asteborg" supported="no">
 		<description>Demons of Asteborg (demo 20210913)</description>
 		<year>2021</year>

@@ -138,11 +138,11 @@ void wd7600_device::device_start()
 	m_space->install_rom(0x000c0000, 0x000cffff, m_isa);
 
 	// install BIOS ROM at cpu initial pc
-	m_space->install_rom(0x000f0000, 0x000fffff, &m_bios[0x10000]);
+	m_space->install_rom(0x000e0000, 0x000fffff, &m_bios[0x00000]);
 	if(m_space->addrmask() == 0xffffffff)  // 32-bit address space only
-		m_space->install_rom(0xffff0000, 0xffffffff, &m_bios[0x10000]);
+		m_space->install_rom(0xfffe0000, 0xffffffff, &m_bios[0x00000]);
 	else
-		m_space->install_rom(0x00ff0000, 0x00ffffff, &m_bios[0x10000]);
+		m_space->install_rom(0x00fe0000, 0x00ffffff, &m_bios[0x00000]);
 
 	// install i/o accesses
 	if (m_space_io->data_width() == 16)

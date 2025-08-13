@@ -2,26 +2,42 @@
 // copyright-holders:
 /**************************************************************************************************
 
-Sega TeraDrive
+Sega Teradrive
 
-IBM PS/2 Model 30 + Sega Mega Drive
+IBM PS/2 Model 30 (PS/55 5510Z) + Japanese Sega Mega Drive (TMSS MD1 VA3 or VA4)
+
+References:
+- https://www.retrodev.com/blastem/trac/wiki/TeradriveHardwareNotes
+- https://plutiedev.com/cartridge-slot
+- https://plutiedev.com/mirror/teradrive-hardware-info
+
+NOTES (MD side):
+- 16 KiB of Z80 RAM (vs. 8 of stock)
+- 128 KiB of VDP RAM (vs. 64)
+- 68k can switch between native 7.67 MHz or 10 MHz
+- has discrete YM3438 in place of YM2612
 
 TODO:
-- Throws "102 TIMER FAIL"
+- Throws "304 Keyboard clock HI";
 - Many unknown ports;
-- MD side;
+- IBM 79F2661 bus switch;
+- MD side, as a testbed for rewriting base HW;
 
 **************************************************************************************************/
 
 #include "emu.h"
+
+#include "bus/isa/isa_cards.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i86/i286.h"
 #include "cpu/i386/i386.h"
 #include "machine/at.h"
 #include "machine/ram.h"
-#include "bus/isa/isa_cards.h"
-#include "bus/pc_kbd/keyboards.h"
-#include "bus/pc_kbd/pc_kbdc.h"
+#include "machine/wd7600.h"
+
 #include "softlist_dev.h"
+#include "speaker.h"
 
 namespace {
 
@@ -31,22 +47,52 @@ public:
 	teradrive_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_mb(*this, "mb")
+		, m_chipset(*this, "chipset")
 		, m_ram(*this, RAM_TAG)
+		, m_isabus(*this, "isabus")
+		, m_speaker(*this, "speaker")
 	{ }
-	required_device<i80286_cpu_device> m_maincpu;
-	required_device<at_mb_device> m_mb;
-	required_device<ram_device> m_ram;
 
 	void teradrive(machine_config &config);
 	void at_softlists(machine_config &config);
-	void teradrive_io(address_map &map) ATTR_COLD;
-	void teradrive_map(address_map &map) ATTR_COLD;
+	void x86_io(address_map &map) ATTR_COLD;
+	void x86_map(address_map &map) ATTR_COLD;
 
 protected:
 	void machine_start() override ATTR_COLD;
 
 private:
+	required_device<i80286_cpu_device> m_maincpu;
+	required_device<wd7600_device> m_chipset;
+	required_device<ram_device> m_ram;
+	required_device<isa16_device> m_isabus;
+	required_device<speaker_sound_device> m_speaker;
+
+	u16 wd7600_ior(offs_t offset)
+	{
+		if (offset < 4)
+			return m_isabus->dack_r(offset);
+		else
+			return m_isabus->dack16_r(offset);
+	}
+	void wd7600_iow(offs_t offset, u16 data)
+	{
+		if (offset < 4)
+			m_isabus->dack_w(offset, data);
+		else
+			m_isabus->dack16_w(offset, data);
+	}
+	void wd7600_hold(int state)
+	{
+		// halt cpu
+		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+
+		// and acknowledge hold
+		m_chipset->hlda_w(state);
+	}
+	void wd7600_tc(offs_t offset, uint8_t data) { m_isabus->eop_w(offset, data); }
+	void wd7600_spkr(int state) { m_speaker->level_w(state); }
+
 	u16 m_heartbeat = 0;
 };
 
@@ -63,18 +109,16 @@ void teradrive_state::at_softlists(machine_config &config)
 //  TODO: Teradrive SW list
 }
 
-void teradrive_state::teradrive_map(address_map &map)
+void teradrive_state::x86_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x09ffff).bankrw("bank10");
-	map(0x0e0000, 0x0fffff).rom().region("bios", 0);
-	map(0xfe0000, 0xffffff).rom().region("bios", 0);
+	// map(0x000ce000, 0x000cffff) bus switch memory window (in ISA space)
 }
 
-void teradrive_state::teradrive_io(address_map &map)
+void teradrive_state::x86_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
+//	map(0x1160, 0x1167) comms
 	map(0xfc72, 0xfc73).lr16(
 		NAME([this] () {
 			u16 res = m_heartbeat & 0x8000;
@@ -86,67 +130,146 @@ void teradrive_state::teradrive_io(address_map &map)
 	);
 }
 
+//void teradrive_state::md_68k_map(address_map &map)
+//{
+//	map(0x000000, 0x7fffff).view(m_cart_view);
+	// when /CART pin is low
+//	m_cart_view[0](0x000000, 0x3fffff).m(m_cart, FUNC(...::cart_map));
+//	m_cart_view[0](0x000000, 0x003fff).view(m_tmss_view);
+//	m_tmss_view[0](0x000000, 0x003fff).rom().region("tmss", 0);
+//	m_cart_view[0](0x400000, 0x7fffff).m(m_exp, FUNC(...::expansion_map));
+
+	// /CART high (matters for MCD SRAM at very least)
+//	m_cart_view[1](0x000000, 0x3fffff).m(m_exp, FUNC(...::expansion_map));
+//	m_cart_view[1](0x400000, 0x7fffff).m(m_cart, FUNC(...::cart_map));
+//	m_cart_view[1](0x400000, 0x403fff).view(m_tmss_view);
+//	m_tmss_view[0](0x400000, 0x403fff).rom().region("tmss", 0);
+
+//	map(0x800000, 0x9fffff) unmapped or 32X
+//	map(0xa00000, 0xa07eff).mirror(0x8000) Z80 address space
+//	map(0xa07f00, 0xa07fff).mirror(0x8000) Z80 VDP space (freezes machine if accessed from 68k)
+//	map(0xa10000, 0xa100ff) I/O
+//	map(0xa11000, 0xa110ff) memory mode register
+//	map(0xa11100, 0xa111ff) Z80 BUSREQ/BUSACK
+//	map(0xa11200, 0xa112ff) Z80 RESET
+//	map(0xa11300, 0xa113ff) <open bus>
+
+//	map(0xa11400, 0xa1dfff) <unmapped> (no DTACK generation, freezes machine without additional HW)
+//	map(0xa12000, 0xa120ff).m(m_exp, FUNC(...::fdc_map));
+//	map(0xa13000, 0xa130ff).m(m_cart, FUNC(...::time_map));
+//	map(0xa14000, 0xa14003) TMSS lock
+//	map(0xa15100, 0xa153ff) 32X registers if present, <unmapped> otherwise
+//	map(0xae0000, 0xae0003) Teradrive bus switch registers
+//	map(0xaf0000, 0xafffff) Teradrive I/O space window
+//	map(0xb00000, 0xbfffff) Teradrive memory mapped space window
+//	map(0xc00000, 0xdfffff) VDP and PSG (with mirrors and holes)
+//	map(0xe00000, 0xffffff) Work RAM (with mirrors)
+//}
+
 void teradrive_state::machine_start()
 {
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-
-	/* managed RAM */
-	membank("bank10")->set_base(m_ram->pointer());
-
-	if (m_ram->size() > 0xa0000)
-	{
-		offs_t ram_limit = 0x100000 + m_ram->size() - 0xa0000;
-		space.install_ram(0x100000,  ram_limit - 1, m_ram->pointer() + 0xa0000);
-	}
 }
 
 void teradrive_state::teradrive(machine_config &config)
 {
-	/* basic machine hardware */
+	// TODO: Western Digital chipset
 	I80286(config, m_maincpu, XTAL(10'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &teradrive_state::teradrive_map);
-	m_maincpu->set_addrmap(AS_IO, &teradrive_state::teradrive_io);
-	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
-	m_maincpu->shutdown_callback().set("mb", FUNC(at_mb_device::shutdown));
+	m_maincpu->set_addrmap(AS_PROGRAM, &teradrive_state::x86_map);
+	m_maincpu->set_addrmap(AS_IO, &teradrive_state::x86_io);
+	m_maincpu->set_irq_acknowledge_callback("chipset", FUNC(wd7600_device::intack_cb));
 
-	AT_MB(config, m_mb);
-	m_mb->kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_mb->kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
+	// WD76C10LP system controller
+	// WD76C30 peripheral controller
+	WD7600(config, m_chipset, 50_MHz_XTAL / 2);
+	m_chipset->set_cputag(m_maincpu);
+	m_chipset->set_isatag("isa");
+	m_chipset->set_ramtag(m_ram);
+	m_chipset->set_biostag("bios");
+	m_chipset->set_keybctag("keybc");
+	m_chipset->hold_callback().set(FUNC(teradrive_state::wd7600_hold));
+	m_chipset->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_chipset->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_chipset->cpureset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	m_chipset->a20m_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
+	// isa dma
+	m_chipset->ior_callback().set(FUNC(teradrive_state::wd7600_ior));
+	m_chipset->iow_callback().set(FUNC(teradrive_state::wd7600_iow));
+	m_chipset->tc_callback().set(FUNC(teradrive_state::wd7600_tc));
+	// speaker
+	m_chipset->spkr_callback().set(FUNC(teradrive_state::wd7600_spkr));
 
-	config.set_maximum_quantum(attotime::from_hz(60));
+	// on board devices
+	ISA16(config, m_isabus, 0);
+	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
+	m_isabus->set_iospace(m_maincpu, AS_IO);
+	m_isabus->iochck_callback().set(m_chipset, FUNC(wd7600_device::iochck_w));
+	m_isabus->irq2_callback().set(m_chipset, FUNC(wd7600_device::irq09_w));
+	m_isabus->irq3_callback().set(m_chipset, FUNC(wd7600_device::irq03_w));
+	m_isabus->irq4_callback().set(m_chipset, FUNC(wd7600_device::irq04_w));
+	m_isabus->irq5_callback().set(m_chipset, FUNC(wd7600_device::irq05_w));
+	m_isabus->irq6_callback().set(m_chipset, FUNC(wd7600_device::irq06_w));
+	m_isabus->irq7_callback().set(m_chipset, FUNC(wd7600_device::irq07_w));
+	m_isabus->irq10_callback().set(m_chipset, FUNC(wd7600_device::irq10_w));
+	m_isabus->irq11_callback().set(m_chipset, FUNC(wd7600_device::irq11_w));
+	m_isabus->irq12_callback().set(m_chipset, FUNC(wd7600_device::irq12_w));
+	m_isabus->irq14_callback().set(m_chipset, FUNC(wd7600_device::irq14_w));
+	m_isabus->irq15_callback().set(m_chipset, FUNC(wd7600_device::irq15_w));
+	m_isabus->drq0_callback().set(m_chipset, FUNC(wd7600_device::dreq0_w));
+	m_isabus->drq1_callback().set(m_chipset, FUNC(wd7600_device::dreq1_w));
+	m_isabus->drq2_callback().set(m_chipset, FUNC(wd7600_device::dreq2_w));
+	m_isabus->drq3_callback().set(m_chipset, FUNC(wd7600_device::dreq3_w));
+	m_isabus->drq5_callback().set(m_chipset, FUNC(wd7600_device::dreq5_w));
+	m_isabus->drq6_callback().set(m_chipset, FUNC(wd7600_device::dreq6_w));
+	m_isabus->drq7_callback().set(m_chipset, FUNC(wd7600_device::dreq7_w));
 
-	at_softlists(config);
+	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));
+	keybc.hot_res().set("chipset", FUNC(wd7600_device::kbrst_w));
+	keybc.gate_a20().set("chipset", FUNC(wd7600_device::gatea20_w));
+	keybc.kbd_irq().set("chipset", FUNC(wd7600_device::irq01_w));
+	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
+
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
+	pc_kbdc.out_clock_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_clk_w));
+	pc_kbdc.out_data_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_data_w));
 
 	// FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "vga", true);
-	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, "fdc", false);
-	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, "ide", false);
-	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, "comat", false);
+	// WD76C20
+	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdcsmc", true);
+	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "ide", true);
+	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
+	// TODO: really WD90C10
+	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "wd90c11_lr", true);
 
-	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84));
-	kbd.out_clock_cb().set(m_mb, FUNC(at_mb_device::kbd_clk_w));
-	kbd.out_data_cb().set(m_mb, FUNC(at_mb_device::kbd_data_w));
-
-	/* internal ram */
+	// 2.5MB is the max
 	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("640K,2688K");
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	at_softlists(config);
 }
 
 ROM_START( teradrive )
-	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD( "bios-27c010.bin", 0x00000, 0x20000, CRC(32642518) SHA1(6bb6d0325b8e4150c4258fd16f3a870b92e88f75))
 
 	ROM_REGION16_LE(0x100000, "romdisk", 0)
 	// contains bootable PC-DOS 3.x + a MENU.EXE
 	ROM_LOAD( "tru-27c800.bin", 0x00000, 0x100000,  CRC(c2fe9c9e) SHA1(06ec0461dab425f41fb5c3892d9beaa8fa53bbf1))
 
+	// TODO: don't need this mapping
+	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
+
 	// MD 68k initial boot code, "TERA286 INITIALIZE" in header
 	// shows Sega logo + TMSS "produced by" + 1990 copyright at bottom if loaded thru megadrij
 	// + non-canonical accesses in $a***** range
+	// TODO: it's actually in romdisk space at $43000, remove me
 	ROM_REGION16_BE(0x4000, "tmss", ROMREGION_ERASEFF)
 	ROM_LOAD( "tera_tmss.bin", 0x0000,  0x1000, CRC(424a9d11) SHA1(1c470a9a8d0b211c5feea1c1c2376aa1f7934b16) )
 ROM_END
 
 } // anonymous namespace
 
-COMP( 1991, teradrive, 0, 0,       teradrive, 0, teradrive_state, empty_init, "Sega / International Business Machines", "TeraDrive (Japan)", MACHINE_NOT_WORKING )
-
+COMP( 1991, teradrive, 0, 0,       teradrive, 0, teradrive_state, empty_init, "Sega / International Business Machines", "Teradrive (Japan)", MACHINE_NOT_WORKING )
