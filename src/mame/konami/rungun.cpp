@@ -687,8 +687,6 @@ void rungun_state::rng(machine_config &config)
 
 	K054321(config, m_k054321, "speaker");
 
-	// FIXME: no 18.432 MHz XTAL present on PCB (should these use 32_MHz_XTAL / 2 instead?)
-
 	// SFX
 	K054539(config, m_k054539[0], 18.432_MHz_XTAL);
 	m_k054539[0]->set_device_rom_tag("k054539");
