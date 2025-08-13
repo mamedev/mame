@@ -20470,6 +20470,7 @@ poker21
 @source:igs/goldstar.cpp
 3cdpoker
 3cdpokera
+alienatt
 amaztsk
 animalhs
 animalhsa
@@ -32687,8 +32688,15 @@ ch2000c2
 ch2000d1
 ch2000d2
 ch2000o
+ch2000o10
 ch2000o2
 ch2000o3
+ch2000o4
+ch2000o5
+ch2000o6
+ch2000o7
+ch2000o8
+ch2000o9
 ch2000v1
 ch2000v2
 classice
@@ -32696,6 +32704,7 @@ classice1
 classice2
 classiced1
 classiced2
+classiceo
 classicev
 classicev1
 classicev2
@@ -32709,6 +32718,7 @@ dvislando
 fb2gen
 fb2genc1
 fb2genc2
+fb2gencq
 fb2gend1
 fb2gend2
 fb2geno
@@ -32720,6 +32730,7 @@ fb2ndc2
 fb2ndd1
 fb2ndd2
 fb2ndo
+fb2ndo1
 fb2ndv1
 fb2ndv2
 fb3g
@@ -32776,6 +32787,7 @@ mcircus
 moneymac
 moneymacd1
 moneymacd2
+moneymaco
 moneymacv1
 moneymacv2
 parrot3

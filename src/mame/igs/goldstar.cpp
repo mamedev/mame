@@ -409,6 +409,7 @@ public:
 	void nfm(machine_config &config) ATTR_COLD;
 	void super7(machine_config &config) ATTR_COLD;
 
+	void init_alienatt() ATTR_COLD;
 	void init_animalhs() ATTR_COLD;
 	void init_chthree() ATTR_COLD;
 	void init_cll() ATTR_COLD;
@@ -21560,6 +21561,32 @@ ROM_START( cmtetriskr )
 ROM_END
 
 
+ROM_START( alienatt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27512.bin", 0x00000, 0x10000, CRC(c2ddc454) SHA1(dcd98f7b49982328e38d30cdf1ce9e0e992998f6) ) // on sub board
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000, 0x8000, CRC(83438662) SHA1(0fa1b3ff5a9530147e7803223c519a1ab5d9d61e) )
+	ROM_LOAD( "6.u11", 0x08000, 0x8000, CRC(70119d48) SHA1(e9f80c2e1d1855c741b008fa4f3a80362ef10ba1) )
+	ROM_LOAD( "5.u4",  0x10000, 0x8000, CRC(293569a1) SHA1(9af143e27518921cd178af9bed42054c3ae76dd5) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(77f75764) SHA1(86cfde4c94354eb7adf93f4400053a58c5823b58) )
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(e917cf87) SHA1(cb7881bd59d9497cce1bb14237d16a1001fb2200) )
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(0976ef6f) SHA1(379901829f9e25a6b48ccc42867cff26ea167ec8) )
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(e562458f) SHA1(678794f968407e31527b10d69c4b4618e5c20517) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u53", 0x00000, 0x10000, CRC(c5d1c9ac) SHA1(87d1a2e0b6e1198941efa8130cc2e2c14361ef07) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u43", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
 /********************** Flaming 7, from Cyberdyne Systems, Inc. ***********************
 
   Flaming 7.
@@ -24156,6 +24183,14 @@ void cmaster_state::init_super7()
 	m_palette->update();
 }
 
+void cmaster_state::init_alienatt()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int a = 0; a < 0xc000; a++)
+		rom[a] = bitswap<8>(rom[a] ^ 0x59, 3, 1, 5, 0, 6, 7, 4, 2);
+}
+
 void cmaster_state::init_animalhs()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -24310,6 +24345,7 @@ GAMEL( 1991, cmv4zg,     cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_ini
 GAMEL( 1991, cmv4zga,    cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 2)",  MACHINE_NOT_WORKING, layout_cmv4 ) // needs correct I/O, maybe slightly protected
 GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
+GAMEL( 199?, alienatt,   cmaster,  cm,       cmaster,  cmaster_state,  init_alienatt,  ROT0, "bootleg",           "Allien Attack",                               MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 
 GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1998, jkrmast,    0,        jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // needs correct FG colors and controls

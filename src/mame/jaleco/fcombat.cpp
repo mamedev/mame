@@ -11,10 +11,7 @@ TS 2004.10.22.
 
 (press buttons 1+2 at the same time, to release 'army' ;)
 
-TODO:
-- verify sprite colors, not many PCB references online, but comparing with
-  the small amount of photos that are there, they match
-
+Colors match available references (i.e. https://www.youtube.com/watch?v=kMfaYrmoOc4)
 
 PCB Notes:
 
@@ -119,7 +116,7 @@ private:
 
 
 // this is copied from Exerion, but it should be correct
-static constexpr XTAL MASTER_CLOCK = 20_MHz_XTAL;
+static constexpr XTAL MASTER_CLOCK = 19.968_MHz_XTAL;
 static constexpr XTAL CPU_CLOCK    = MASTER_CLOCK / 6;
 static constexpr XTAL AY8910_CLOCK = CPU_CLOCK / 2;
 static constexpr XTAL PIXEL_CLOCK  = MASTER_CLOCK / 3;
@@ -491,32 +488,33 @@ static INPUT_PORTS_START( fcombat )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START("DSW0")      // dip switches (0xe100)
-	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Lives ) )
+	PORT_START("DSW0")      // 8-position DIP switch (0xe100)
+	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Lives ) )       PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x03, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPSETTING(    0x07, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x05, "5" ) // duplicate
+	PORT_DIPSETTING(    0x06, "5" ) // duplicate
+	PORT_DIPSETTING(    0x07, "Infinite (Cheat)") // probably really 254 or 255
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x08, "20000" )
 	PORT_DIPSETTING(    0x10, "30000" )
 	PORT_DIPSETTING(    0x18, "40000" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )     PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START("DSW1")      // dip switches/VBLANK (0xe200)
+	PORT_START("DSW1")      // 4-position DIP switch / VBLANK (0xe200)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
-	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )     PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
@@ -525,7 +523,8 @@ static INPUT_PORTS_START( fcombat )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )        PORT_DIPLOCATION("SW2:4")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fcombat_state::coin_inserted), 0)

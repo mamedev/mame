@@ -219,9 +219,10 @@ private:
 };
 
 
-static constexpr XTAL MASTER_CLOCK = XTAL(19'968'000);   // verified on PCB
+static constexpr XTAL MASTER_CLOCK = XTAL(19'968'000);   // verified on PCB. Also seen 20 MHz on some PCBs
 static constexpr XTAL CPU_CLOCK    = MASTER_CLOCK / 6;
 static constexpr XTAL AY8910_CLOCK = CPU_CLOCK / 2;
+// static constexpr XTAL PROTECTION_CHIP_CLOCK  = MASTER_CLOCK / 12;
 static constexpr XTAL PIXEL_CLOCK  = MASTER_CLOCK / 3;
 static constexpr int HCOUNT_START  = 0x58;
 static constexpr int HTOTAL        = 512 - HCOUNT_START;
@@ -734,8 +735,8 @@ static INPUT_PORTS_START( exerion )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Lives ) )
+	PORT_START("DSW0")      // 8-position DIP switch
+	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Lives ) )       PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
@@ -744,23 +745,23 @@ static INPUT_PORTS_START( exerion )
 	PORT_DIPSETTING(    0x05, "5" )                         // duplicated setting
 	PORT_DIPSETTING(    0x06, "5" )                         // duplicated setting
 	PORT_DIPSETTING(    0x07, "254 (Cheat)")
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x08, "20000" )
 	PORT_DIPSETTING(    0x10, "30000" )
 	PORT_DIPSETTING(    0x18, "40000" )
-	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Difficulty ) )       // see notes
+	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW1:6,7") // see notes
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )     PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START("DSW1")
+	PORT_START("DSW1")      // 4-position DIP switch / VBLANK
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
-	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )          // see notes
+	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )     PORT_DIPLOCATION("SW2:1,2,3") // see notes
 	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
@@ -769,7 +770,8 @@ static INPUT_PORTS_START( exerion )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )        PORT_DIPLOCATION("SW2:4")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(exerion_state::coin_inserted), 0)
