@@ -575,15 +575,13 @@ INPUT_PORTS_END
 
 void abc1600_state::update_br()
 {
-	// disabled since this breaks the systest, should use 68000 BR line instead
-	if (!m_dmadis)
-	{
-		//m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-	}
-	else
-	{
-		//m_maincpu->set_input_line(INPUT_LINE_HALT, m_dbrq0 || m_dbrq1 || m_dbrq2);
-	}
+	// _BR = !_DMADIS || (_DBRQ0 || _DBRQ1 || _DBRQ2)
+	// _IOC = IORQ delayed by 1 clock, or IORQ preceded by 1 clock on MINT2 or MINT5 
+	// _BGACK = !_BR && !_BG && _IOC
+	// DMA0.BAI = _BGACK
+
+	// workaround for floppy DMA, this should use the 68000 BR line instead
+	m_dma0->bai_w(!m_dmadis || m_dbrq0 || m_dbrq1 || m_dbrq2);
 }
 
 void abc1600_state::update_pren0(int state)
@@ -894,13 +892,6 @@ void abc1600_state::machine_reset()
 
 	// clear NMI
 	m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
-
-	// reset devices
-	m_mac->reset();
-	m_maincpu->reset();
-	m_cio->reset();
-	m_scc->reset();
-	m_kb->reset();
 }
 
 
