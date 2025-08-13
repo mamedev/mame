@@ -44,6 +44,155 @@ TODO:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+/*
+ * ISA16 IBM 79F2661 "bus switch"
+ *
+ */
+
+class isa16_ibm_79f2661 : public device_t, public device_isa16_card_interface
+{
+public:
+	// construction/destruction
+	isa16_ibm_79f2661(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T> void set_romdisk_tag(T &&tag) { m_romdisk.set_tag(std::forward<T>(tag)); }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	required_memory_region m_romdisk;
+	memory_bank_creator m_rom_window_bank;
+
+	void io_map(address_map &map) ATTR_COLD;
+
+	void remap(int space_id, offs_t start, offs_t end) override;
+
+	u8 m_rom_bank = 0;
+	u8 m_rom_address = 0x0e;
+	u8 m_reg_1163 = 0;
+	u8 m_reg_1164 = 0;
+	u16 m_68k_address = 0;
+};
+
+DEFINE_DEVICE_TYPE(ISA16_IBM_79F2661, isa16_ibm_79f2661, "isa16_ibm_79f2661", "ISA16 IBM 79F2661 \"bus switch\"")
+
+isa16_ibm_79f2661::isa16_ibm_79f2661(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ISA16_IBM_79F2661, tag, owner, clock)
+	, device_isa16_card_interface(mconfig, *this)
+	, m_romdisk(*this, finder_base::DUMMY_TAG)
+	, m_rom_window_bank(*this, "rom_window_bank")
+{
+}
+
+void isa16_ibm_79f2661::device_start()
+{
+	set_isa_device();
+	m_rom_window_bank->configure_entries(0, 0x100, m_romdisk->base(), 0x2000);
+}
+
+void isa16_ibm_79f2661::device_reset()
+{
+	m_rom_bank = 0;
+	m_rom_address = 0x0e;
+	m_reg_1163 = 0;
+	m_reg_1164 = 0;
+	m_68k_address = 0;
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa16_ibm_79f2661::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		u32 base_addr = (m_rom_address << 12) | 0xc0000;
+		//printf("%08x %02x\n", base_addr, m_rom_bank);
+		m_isa->install_bank(base_addr, base_addr | 0x1fff, m_rom_window_bank);
+	}
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x1160, 0x1167, *this, &isa16_ibm_79f2661::io_map);
+	}
+}
+
+// +$1160 base
+//	map(0x1160, 0x1160) romdisk bank * 0x2000, r/w
+//	map(0x1161, 0x1161) <undefined>?
+//	map(0x1162, 0x1162) romdisk segment start in ISA space (val & 0x1e | 0xc0)
+//	map(0x1163, 0x1163) comms and misc handshake bits, partially reflected on 68k $ae0001 register
+//	map(0x1164, 0x1164) boot control
+//	map(0x1165, 0x1165) switches/bus timeout/TMSS unlock (r/o)
+//	map(0x1166, 0x1167) 68k address space select & 0xffffe * 0x2000, r/w
+void isa16_ibm_79f2661::io_map(address_map &map)
+{
+	map(0x00, 0x00).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_rom_bank;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_rom_bank = data;
+			m_rom_window_bank->set_entry(m_rom_bank);
+			remap(AS_PROGRAM, 0, 0xfffff);
+		})
+	);
+	map(0x01, 0x01).lr8(
+		NAME([this] (offs_t offset) {
+			logerror("%s: $1161 undefined access\n", machine().describe_context());
+			return 0xff;
+		})
+	);
+
+	map(0x02, 0x02).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_rom_address | 0xc0;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_rom_address = data & 0x1e;
+			remap(AS_PROGRAM, 0, 0xfffff);
+		})
+	);
+	map(0x03, 0x03).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_reg_1163;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_reg_1163 = data;
+		})
+	);
+	map(0x04, 0x04).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_reg_1164;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_reg_1164 = data;
+		})
+	);
+/*
+ * xx-- ---- <unknown, other bus error?>
+ * --x- ---- TMSS unlocked
+ * ---- x--- bus timeout on 68k space access from 286
+ * ---- -x-- video switch (0) "video" (1) RGB
+ * ---- ---x MD/PC switch (0) MD boot (1) PC boot
+ */
+	map(0x05, 0x05).lr8(
+		NAME([] (offs_t offset) {
+			return 1 | 4;
+		})
+	);
+	map(0x06, 0x07).lrw16(
+		NAME([this] (offs_t offset) {
+			return m_68k_address;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			COMBINE_DATA(&m_68k_address);
+			m_68k_address &= 0xffffe;
+		})
+	);
+}
+
+
 namespace {
 
 class teradrive_state : public driver_device
@@ -99,6 +248,8 @@ private:
 	void wd7600_spkr(int state) { m_speaker->level_w(state); }
 
 	u16 m_heartbeat = 0;
+
+	static void romdisk_config(device_t *device);
 };
 
 void teradrive_state::at_softlists(machine_config &config)
@@ -118,21 +269,12 @@ void teradrive_state::x86_map(address_map &map)
 {
 	map.unmap_value_high();
 	// map(0x000ce000, 0x000cffff) bus switch memory window (in ISA space)
-	map(0x000ce000, 0x000cffff).rom().region("romdisk", 0);
+	//map(0x000ce000, 0x000cffff).rom().region("romdisk", 0);
 }
 
 void teradrive_state::x86_io(address_map &map)
 {
 	map.unmap_value_high();
-//	map(0x1160, 0x1167) bus switch map
-//	map(0x1160, 0x1160) romdisk bank * 0x2000, r/w
-//	map(0x1161, 0x1161) <undefined>?
-//	map(0x1162, 0x1162) romdisk segment start in ISA space (val & 0x1e | 0xc0)
-//	map(0x1163, 0x1163) comms and misc handshake bits, partially reflected on 68k $ae0001 register
-//	map(0x1164, 0x1164) boot control
-//	map(0x1165, 0x1165) switches/bus timeout/TMSS unlock (r/o)
-//	map(0x1166, 0x1167) 68k address space select & 0xffffe * 0x2000, r/w
-
 	// TODO: what's the origin of this?
 	map(0xfc72, 0xfc73).lr16(
 		NAME([this] () {
@@ -186,6 +328,18 @@ void teradrive_state::x86_io(address_map &map)
 void teradrive_state::machine_start()
 {
 }
+
+void teradrive_isa_cards(device_slot_interface &device)
+{
+	device.option_add_internal("bus_switch", ISA16_IBM_79F2661);
+}
+
+void teradrive_state::romdisk_config(device_t *device)
+{
+	isa16_ibm_79f2661 &bus_switch = *downcast<isa16_ibm_79f2661 *>(device);
+	bus_switch.set_romdisk_tag("romdisk");
+}
+
 
 void teradrive_state::teradrive(machine_config &config)
 {
@@ -249,7 +403,7 @@ void teradrive_state::teradrive(machine_config &config)
 	pc_kbdc.out_clock_cb().set("keybc", FUNC(ps2_keyboard_controller_device::kbd_clk_w));
 	pc_kbdc.out_data_cb().set("keybc", FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
-	// FIXME: determine ISA bus clock
+	// FIXME: determine ISA bus clock, unverified configuration
 	// WD76C20
 	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdcsmc", true);
 	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
@@ -257,6 +411,7 @@ void teradrive_state::teradrive(machine_config &config)
 	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
 	// TODO: really WD90C10
 	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "wd90c11_lr", true);
+	ISA16_SLOT(config, "board6", 0, "isabus", teradrive_isa_cards, "bus_switch", true).set_option_machine_config("bus_switch", romdisk_config);
 
 	// 2.5MB is the max
 	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("640K,2688K");
@@ -271,7 +426,7 @@ ROM_START( teradrive )
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD( "bios-27c010.bin", 0x00000, 0x20000, CRC(32642518) SHA1(6bb6d0325b8e4150c4258fd16f3a870b92e88f75))
 
-	ROM_REGION16_LE(0x200000, "romdisk", ROMREGION_ERASEFF)
+	ROM_REGION16_LE(0x200000, "board6:romdisk", ROMREGION_ERASEFF)
 	// contains bootable PC-DOS 3.x + a MENU.EXE
 	ROM_LOAD( "tru-27c800.bin", 0x00000, 0x100000,  CRC(c2fe9c9e) SHA1(06ec0461dab425f41fb5c3892d9beaa8fa53bbf1))
 
