@@ -248,6 +248,7 @@ protected:
 	emu_timer *m_timer = nullptr;
 
 	bool m_mapvec = false;
+	u32 m_wrbeadr = 0;
 
 	// IOP IRQ state
 	const std::map<int, std::vector<iop_irq>> iop_irq_line_map;
@@ -269,6 +270,7 @@ void news_38xx_state::machine_start()
 	save_pointer(NAME(m_net_ram), 8192);
 
 	save_item(NAME(m_mapvec));
+	save_item(NAME(m_wrbeadr));
 	save_item(NAME(m_scc_irq_state));
 	save_item(NAME(m_iop_intst));
 	save_item(NAME(m_iop_inten));
@@ -290,6 +292,7 @@ void news_38xx_state::machine_reset()
 
 	// Clear platform hardware state
 	m_mapvec = false;
+	m_wrbeadr = 0;
 	m_scc_irq_state = false;
 	m_cpu_intst = 0;
 	m_cpu_inten = 0;
@@ -317,7 +320,7 @@ void news_38xx_state::cpu_map(address_map &map)
 	// All registers below this line are 32 bit registers, LSB 1 = Set, 0 = Reset
 	map(0x18000000, 0x18000003).r(FUNC(news_38xx_state::cpstat_r));
 	map(0x18000000, 0x18000003).w(FUNC(news_38xx_state::cpenipty_w)).mirror(0xffff00);
-	map(0x18000004, 0x18000007).w(FUNC(news_38xx_state::cpenitmr_w)).mirror(0xffff00); // todo: check schematic to see if same timer as IOP or not
+	map(0x18000004, 0x18000007).w(FUNC(news_38xx_state::cpenitmr_w)).mirror(0xffff00);
 	map(0x18000020, 0x18000027).w(FUNC(news_38xx_state::cpintxp_w)).mirror(0xffff00);
 	map(0x18000040, 0x18000043).w(FUNC(news_38xx_state::mapvec_w)).mirror(0xffff00);
 	map(0x18000044, 0x18000047).w(FUNC(news_38xx_state::cpu_inten_w<cpu_irq::UBUS>)).mirror(0xffff00);
@@ -363,7 +366,7 @@ void news_38xx_state::iop_map(address_map &map)
 	// 0x26040000 // Centronics data
 	// 0x26040001 Centronics strobe
 	// 0x26040002 Centronics IRQ clear
-	map(0x26040003, 0x26040003).w(FUNC(news_38xx_state::iop_inten_w<iop_irq::PARALLEL>));
+	// map(0x26040003, 0x26040003).w(FUNC(news_38xx_state::iop_inten_w<iop_irq::PARALLEL>));
 
 	map(0x26080000, 0x26080007).m(m_scsi[0], FUNC(cxd1180_device::map));
 	map(0x260c0000, 0x260c0007).m(m_scsi[1], FUNC(cxd1180_device::map));
@@ -632,6 +635,8 @@ u32 news_38xx_state::iop_bus_error_r()
 
 TIMER_CALLBACK_MEMBER(news_38xx_state::timer)
 {
+	// WSC-PARK generates a 100Hz IRQ for the IOP when the timer is enabled and feeds the 100Hz clock for the CPU
+	// to the CPINTR PAL that generates the CPU IRQ when CPENITMR is set.
 	if (m_iop_inten & 1 << static_cast<u32>(iop_irq::TIMER))
 	{
 		iop_irq_w<iop_irq::TIMER>(1);
@@ -700,7 +705,7 @@ void news_38xx_state::xpustart_w(offs_t offset, u8 data)
 	// offset 1 = start running UPU (UBUS bus master, expansion slot A?)
 	LOG("%cPUSTART = 0x%x\n", !offset ? 'C' : 'H', data);
 	if (!offset) {
-		// TODO: reset CPU platform registers here?
+		// TODO: reset CPU platform registers here? make reset_cpu_port() function or something
 		m_cpu->set_input_line(INPUT_LINE_HALT, data ? 0 : 1);
 	} else {
 		if (data) fatalerror("Tried to start UPU without UPU installed!");
@@ -760,8 +765,9 @@ u32 news_38xx_state::cpstat_r()
 
 u32 news_38xx_state::wrbeadr_r()
 {
-	LOG("WRBEADR read 0x%x\n"); // Write bus error address
-	return 0;
+	// Last write bus error address
+	LOG("WRBEADR read 0x%x\n", m_wrbeadr);
+	return m_wrbeadr;
 }
 
 u8 news_38xx_state::boot_vector_r(offs_t offset)
