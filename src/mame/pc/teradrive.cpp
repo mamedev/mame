@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 /**************************************************************************************************
 
 Sega Teradrive
@@ -24,7 +24,7 @@ NOTES (MD side):
 
 TODO:
 - Many unknown ports;
-- IBM 79F2661 ISA bus switch, motherboard resource also shared with undumped 5510Z Japanese DOS/V);
+- Pulls VGA EGASW low (PR11) after setup mode, causing mono colors (shared issue with megapc);
 - "TIMER FAIL" when exiting from setup menu;
 - MD side, as a testbed for rewriting base HW;
 
@@ -46,6 +46,8 @@ TODO:
 
 /*
  * ISA16 IBM 79F2661 "bus switch"
+ *
+ * Motherboard resource also shared with undumped 5510Z Japanese DOS/V
  *
  */
 

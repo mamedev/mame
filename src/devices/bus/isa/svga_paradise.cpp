@@ -342,11 +342,14 @@ void isa16_wd90c11_lr_device::device_add_mconfig(machine_config &config)
 	m_vga->set_screen("screen");
 	// 512KB (+ option for 1MB? Verify with interlace)
 	m_vga->set_vram_size(0x100000);
+	// required by megapc and teradrive for color
+	m_vga->read_cnf15_callback().set_constant(1);
 }
 
 void isa16_wd90c11_lr_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(wd90c11a_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(wd90c11a_vga_device::io_map));
+	map(0x46e8, 0x46e8).w(m_vga, FUNC(wd90c11a_vga_device::mode_setup_w));
 }
 
 void isa16_wd90c11_lr_device::device_start()
@@ -356,7 +359,7 @@ void isa16_wd90c11_lr_device::device_start()
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
 
 	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(wd90c11a_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(wd90c11a_vga_device::mem_w)));
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_wd90c11_lr_device::io_isa_map);
+	m_isa->install_device(0x0000, 0xffff, *this, &isa16_wd90c11_lr_device::io_isa_map);
 }
 
 /******************
