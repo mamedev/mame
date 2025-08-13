@@ -272,9 +272,8 @@ protected:
 	void recompute_palette_tables();
 
 	void vdp_sndirqline_callback_c2(int state);
-	void vdp_lv6irqline_callback_c2(int state);
-	void vdp_lv4irqline_callback_c2(int state);
-	IRQ_CALLBACK_MEMBER(int_callback);
+	void vdp_vint_cb(int state);
+	void vdp_hint_cb(int state);
 
 	uint8_t io_portc_r();
 	void io_portd_w(uint8_t data);
@@ -311,6 +310,8 @@ protected:
 
 	void segac_map(address_map &map) ATTR_COLD;
 	void segac2_map(address_map &map) ATTR_COLD;
+
+	void cpu_space_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -1822,27 +1823,34 @@ void segac2_state::vdp_sndirqline_callback_c2(int state)
 }
 
 // the line usually used to drive irq6 is not connected
-void segac2_state::vdp_lv6irqline_callback_c2(int state)
+void segac2_state::vdp_vint_cb(int state)
 {
 	//
 }
 
 // the scanline interrupt seems connected as usual
-void segac2_state::vdp_lv4irqline_callback_c2(int state)
+void segac2_state::vdp_hint_cb(int state)
 {
-	if (state == ASSERT_LINE)
-		m_maincpu->set_input_line(4, HOLD_LINE);
-	else
-		m_maincpu->set_input_line(4, CLEAR_LINE);
+	m_maincpu->set_input_line(4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-/* Callback when the 68k takes an IRQ */
-IRQ_CALLBACK_MEMBER(segac2_state::int_callback)
+void segac2_state::cpu_space_map(address_map &map)
 {
-	if (irqline == 4)
-		m_vdp->vdp_clear_irq4_pending();
-
-	return (0x60 + irqline * 4) / 4; // vector address
+	map(0xfffff3, 0xfffff3).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 25; }));
+	// TODO: IPL0 (external irq tied to VDP IE2)
+	map(0xfffff5, 0xfffff5).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 26; }));
+	map(0xfffff7, 0xfffff7).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 27; }));
+	map(0xfffff9, 0xfffff9).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 {
+		m_vdp->irq_ack();
+		return 28;
+	}));
+	map(0xfffffb, 0xfffffb).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 29; }));
+	// TODO: still connected to VDP?
+	map(0xfffffd, 0xfffffd).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 {
+		//m_vdp->irq_ack();
+		return 30;
+	}));
+	map(0xffffff, 0xffffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 31; }));
 }
 
 
@@ -1868,7 +1876,7 @@ void segac2_state::segac(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XL2_CLOCK/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segac2_state::segac_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(segac2_state::int_callback));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &segac2_state::cpu_space_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
@@ -1886,8 +1894,8 @@ void segac2_state::segac(machine_config &config)
 	SEGA315_5313(config, m_vdp, XL2_CLOCK, m_maincpu);
 	m_vdp->set_is_pal(false);
 	m_vdp->snd_irq().set(FUNC(segac2_state::vdp_sndirqline_callback_c2));
-	m_vdp->lv6_irq().set(FUNC(segac2_state::vdp_lv6irqline_callback_c2));
-	m_vdp->lv4_irq().set(FUNC(segac2_state::vdp_lv4irqline_callback_c2));
+	m_vdp->vint_cb().set(FUNC(segac2_state::vdp_vint_cb));
+	m_vdp->hint_cb().set(FUNC(segac2_state::vdp_hint_cb));
 	m_vdp->set_alt_timing(1);
 	m_vdp->set_screen("screen");
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -1919,6 +1927,7 @@ void segac2_state::segac2(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segac2_state::segac2_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &segac2_state::cpu_space_map);
 	subdevice<sega_315_5296_device>("io")->out_cnt1_callback().set(m_upd7759, FUNC(upd7759_device::reset_w));
 
 	/* sound hardware */

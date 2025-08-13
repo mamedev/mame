@@ -736,40 +736,35 @@ void md_base_state::vdp_sndirqline_callback_genesis_z80(int state)
 	}
 }
 
-// this comes from the vdp, and is connected to 68k irq level 6 (main vbl interrupt)
-void md_core_state::vdp_lv6irqline_callback_genesis_68k(int state)
+// this comes from the vdp, and is connected to 68k irq level 6 (IPL2, main vbl interrupt)
+void md_core_state::vdp_vint_cb(int state)
 {
-	if (state == ASSERT_LINE)
-		m_maincpu->set_input_line(6, HOLD_LINE);
-	else
-		m_maincpu->set_input_line(6, CLEAR_LINE);
+	m_maincpu->set_input_line(6, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-// this comes from the vdp, and is connected to 68k irq level 4 (raster interrupt)
-void md_core_state::vdp_lv4irqline_callback_genesis_68k(int state)
+// this comes from the vdp, and is connected to 68k irq level 4 (IPL1, raster interrupt)
+void md_core_state::vdp_hint_cb(int state)
 {
-	if (state == ASSERT_LINE)
-		m_maincpu->set_input_line(4, HOLD_LINE);
-	else
-		m_maincpu->set_input_line(4, CLEAR_LINE);
+	m_maincpu->set_input_line(4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-/* Callback when the 68k takes an IRQ */
-IRQ_CALLBACK_MEMBER(md_core_state::genesis_int_callback)
+void md_core_state::cpu_space_map(address_map &map)
 {
-	if (irqline==4)
-	{
-		m_vdp->vdp_clear_irq4_pending();
-	}
-
-	if (irqline==6)
-	{
-		m_vdp->vdp_clear_irq6_pending();
-	}
-
-	return (0x60+irqline*4)/4; // vector address
+	map(0xfffff3, 0xfffff3).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 25; }));
+	// TODO: IPL0 (external irq tied to VDP IE2)
+	map(0xfffff5, 0xfffff5).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 26; }));
+	map(0xfffff7, 0xfffff7).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 27; }));
+	map(0xfffff9, 0xfffff9).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 {
+		m_vdp->irq_ack();
+		return 28;
+	}));
+	map(0xfffffb, 0xfffffb).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 29; }));
+	map(0xfffffd, 0xfffffd).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 {
+		m_vdp->irq_ack();
+		return 30;
+	}));
+	map(0xffffff, 0xffffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 31; }));
 }
-
 
 void md_core_state::megadriv_timers(machine_config &config)
 {
@@ -779,15 +774,15 @@ void md_core_state::megadriv_timers(machine_config &config)
 void md_core_state::md_core_ntsc(machine_config &config)
 {
 	M68000(config, m_maincpu, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
-	m_maincpu->set_irq_acknowledge_callback(FUNC(md_core_state::genesis_int_callback));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &md_core_state::cpu_space_map);
 	// IRQs are handled via the timers
 
 	megadriv_timers(config);
 
 	SEGA315_5313(config, m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
 	m_vdp->set_is_pal(false);
-	m_vdp->lv6_irq().set(FUNC(md_core_state::vdp_lv6irqline_callback_genesis_68k));
-	m_vdp->lv4_irq().set(FUNC(md_core_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp->vint_cb().set(FUNC(md_core_state::vdp_vint_cb));
+	m_vdp->hint_cb().set(FUNC(md_core_state::vdp_hint_cb));
 	m_vdp->set_screen("megadriv");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -803,15 +798,15 @@ void md_core_state::md_core_ntsc(machine_config &config)
 void md_core_state::md_core_pal(machine_config &config)
 {
 	M68000(config, m_maincpu, MASTER_CLOCK_PAL / 7); // 7.67 MHz
-	m_maincpu->set_irq_acknowledge_callback(FUNC(md_core_state::genesis_int_callback));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &md_core_state::cpu_space_map);
 	// IRQs are handled via the timers
 
 	megadriv_timers(config);
 
 	SEGA315_5313(config, m_vdp, MASTER_CLOCK_PAL, m_maincpu);
 	m_vdp->set_is_pal(true);
-	m_vdp->lv6_irq().set(FUNC(md_core_state::vdp_lv6irqline_callback_genesis_68k));
-	m_vdp->lv4_irq().set(FUNC(md_core_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp->vint_cb().set(FUNC(md_core_state::vdp_vint_cb));
+	m_vdp->hint_cb().set(FUNC(md_core_state::vdp_hint_cb));
 	m_vdp->set_screen("megadriv");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
