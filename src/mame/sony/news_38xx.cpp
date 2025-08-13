@@ -850,11 +850,11 @@ void news_scsi_devices(device_slot_interface &device)
 
 void news_38xx_state::common(machine_config &config)
 {
-	R3000A(config, m_cpu, 25_MHz_XTAL, 65536, 65536);
+	R3000A(config, m_cpu, 40_MHz_XTAL / 2, 65536, 65536); // 40MHz goes into the R3000 pkg, but is divided internally to 20MHz
 	m_cpu->set_addrmap(AS_PROGRAM, &news_38xx_state::cpu_map);
 	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4); // TODO: FPA IRQ?
 
-	M68030(config, m_iop, 50_MHz_XTAL / 2);
+	M68030(config, m_iop, 40_MHz_XTAL / 2);
 	m_iop->set_addrmap(AS_PROGRAM, &news_38xx_state::iop_map);
 	m_iop->set_addrmap(m68000_base_device::AS_CPU_SPACE, &news_38xx_state::iop_vector_map);
 
@@ -895,12 +895,12 @@ void news_38xx_state::common(machine_config &config)
 	m_scc->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
 	m_scc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
-	AM7990(config, m_net, 10_MHz_XTAL); // TODO: find actual crystal
+	AM7990(config, m_net, 20_MHz_XTAL / 2);
 	m_net->intr_out().set(FUNC(news_38xx_state::iop_irq_w<iop_irq::LANCE>)).invert();
 	m_net->dma_in().set([this](const offs_t offset) { return m_net_ram[offset >> 1]; });
 	m_net->dma_out().set([this](const offs_t offset, const u16 data, const u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset >> 1]); });
 
-	N82077AA(config, m_fdc, 16_MHz_XTAL, n82077aa_device::mode_t::PS2);
+	N82077AA(config, m_fdc, 24_MHz_XTAL, n82077aa_device::mode_t::PS2);
 	m_fdc->intrq_wr_callback().set(FUNC(news_38xx_state::iop_irq_w<iop_irq::FDCIRQ>));
 	m_fdc->drq_wr_callback().set(FUNC(news_38xx_state::iop_irq_w<iop_irq::FDCDRQ>));
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
@@ -921,6 +921,7 @@ void news_38xx_state::common(machine_config &config)
 		[this](device_t *device)
 		{
 			auto &adapter = downcast<cxd1180_device &>(*device);
+			adapter.set_clock(20_MHz_XTAL / 2);
 
 			adapter.irq_handler().set(*this, FUNC(news_38xx_state::iop_irq_w<iop_irq::SCSI0>));
 			adapter.irq_handler().append(m_dma[0], FUNC(dmac_0266_device::eop_w));
@@ -946,6 +947,7 @@ void news_38xx_state::common(machine_config &config)
 		[this](device_t *device)
 		{
 			auto &adapter = downcast<cxd1180_device &>(*device);
+			adapter.set_clock(20_MHz_XTAL / 2);
 
 			adapter.irq_handler().set(*this, FUNC(news_38xx_state::iop_irq_w<iop_irq::SCSI1>));
 			adapter.irq_handler().append(m_dma[1], FUNC(dmac_0266_device::eop_w));
