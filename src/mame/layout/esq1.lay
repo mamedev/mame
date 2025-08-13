@@ -393,7 +393,7 @@ license:CC0-1.0
 	<element ref="grey_button" inputtag="COL6" inputmask="0x04"><!-- Split/Layer --><bounds x="1132" y="137" width="20" height="9"/></element>
 
 	<repeat count="5">
-		<param name="n" start="0" increment="1" />
+		<param name="n" start="1" increment="1" />
 		<param name="c" start="-227" increment="301" />
 		<param name="cs" start="-201" increment="301" />
 		<param name="d" start="-184" increment="301" />
@@ -431,7 +431,7 @@ license:CC0-1.0
 		<element ref="black_key" inputtag="INTERNAL_KBD~n~" inputmask="0x400"><!-- A# / Bb key --><bounds x="~as~" y="257" width="27" height="158"/></element>
 	</repeat>
 
-	<element ref="white_key" inputtag="INTERNAL_KBD5" inputmask="0x001"><!-- C5 key  --><bounds x="1278" y="257" width="39" height="250"/></element>
+	<element ref="white_key" inputtag="INTERNAL_KBD6" inputmask="0x001"><!-- C6 key  --><bounds x="1278" y="257" width="39" height="250"/></element>
 
 
 <!-- Separators: -->
