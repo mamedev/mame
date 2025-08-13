@@ -295,109 +295,37 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="650" y="350" width="99" height="20" />
 		</element>
 
-		<element name="pc11" ref="bit_lamp" inputtag="PC" inputmask="0x800">
-			<bounds x="440" y="240" width="20" height="20" />
-		</element>
 
-		<element name="pc10" ref="bit_lamp" inputtag="PC" inputmask="0x400">
-			<bounds x="465" y="240" width="20" height="20" />
-		</element>
+		<!-- Lamps for Instruction Address
+		     (PC = "Program Counter" = "Endereço de Instrução") -->
 
-		<element name="pc9" ref="bit_lamp" inputtag="PC" inputmask="0x200">
-			<bounds x="490" y="240" width="20" height="20" />
-		</element>
-
-		<element name="pc8" ref="bit_lamp" inputtag="PC" inputmask="0x100">
-			<bounds x="515" y="240" width="20" height="20" />
-		</element>
-
-		<element name="pc7" ref="bit_lamp" inputtag="PC" inputmask="0x080">
-			<bounds x="540" y="240" width="20" height="20" />
-		</element>
-
-		<element name="pc6" ref="bit_lamp" inputtag="PC" inputmask="0x040">
-			<bounds x="565" y="240" width="20" height="20" />
-		</element>
-
-		<element name="pc5" ref="bit_lamp" inputtag="PC" inputmask="0x020">
-			<bounds x="590" y="240" width="20" height="20" />
-		</element>
-
-		<element name="pc4" ref="bit_lamp" inputtag="PC" inputmask="0x010">
-			<bounds x="615" y="240" width="20" height="20" />
-		</element>
-
-		<element name="pc3" ref="bit_lamp" inputtag="PC" inputmask="0x008">
-			<bounds x="640" y="240" width="20" height="20" />
-		</element>
-
-		<element name="pc2" ref="bit_lamp" inputtag="PC" inputmask="0x004">
-			<bounds x="665" y="240" width="20" height="20" />
-		</element>
-
-		<element name="pc1" ref="bit_lamp" inputtag="PC" inputmask="0x002">
-			<bounds x="690" y="240" width="20" height="20" />
-		</element>
-
-		<element name="pc0" ref="bit_lamp" inputtag="PC" inputmask="0x001">
-			<bounds x="715" y="240" width="20" height="20" />
-		</element>
+		<repeat count="12">
+			<param name="lamp_x" start="762" increment="28"/>
+			<param name="lamp_id" start="11" increment="-1"/>
+			<param name="mask" start="0x800" rshift="1" />
+			<element name="pc~lamp_id~" ref="bit_lamp" inputtag="PC" inputmask="~mask~">
+				<bounds x="~lamp_x~" y="190" width="11" height="11" />
+			</element>
+		</repeat>
 
 		<element ref="str_pc">
 			<bounds x="450" y="270" width="299" height="20" />
 		</element>
 
-		<element name="mem_addr11" ref="bit_lamp" inputtag="mem_addr" inputmask="0x800">
-			<bounds x="440" y="140" width="20" height="20" />
-		</element>
 
-		<element name="mem_addr10" ref="bit_lamp" inputtag="mem_addr" inputmask="0x400">
-			<bounds x="465" y="140" width="20" height="20" />
-		</element>
-
-		<element name="mem_addr9" ref="bit_lamp" inputtag="mem_addr" inputmask="0x200">
-			<bounds x="490" y="140" width="20" height="20" />
-		</element>
-
-		<element name="mem_addr8" ref="bit_lamp" inputtag="mem_addr" inputmask="0x100">
-			<bounds x="515" y="140" width="20" height="20" />
-		</element>
-
-		<element name="mem_addr7" ref="bit_lamp" inputtag="mem_addr" inputmask="0x080">
-			<bounds x="540" y="140" width="20" height="20" />
-		</element>
-
-		<element name="mem_addr6" ref="bit_lamp" inputtag="mem_addr" inputmask="0x040">
-			<bounds x="565" y="140" width="20" height="20" />
-		</element>
-
-		<element name="mem_addr5" ref="bit_lamp" inputtag="mem_addr" inputmask="0x020">
-			<bounds x="590" y="140" width="20" height="20" />
-		</element>
-
-		<element name="mem_addr4" ref="bit_lamp" inputtag="mem_addr" inputmask="0x010">
-			<bounds x="615" y="140" width="20" height="20" />
-		</element>
-
-		<element name="mem_addr3" ref="bit_lamp" inputtag="mem_addr" inputmask="0x008">
-			<bounds x="640" y="140" width="20" height="20" />
-		</element>
-
-		<element name="mem_addr2" ref="bit_lamp" inputtag="mem_addr" inputmask="0x004">
-			<bounds x="665" y="140" width="20" height="20" />
-		</element>
-
-		<element name="mem_addr1" ref="bit_lamp" inputtag="mem_addr" inputmask="0x002">
-			<bounds x="690" y="140" width="20" height="20" />
-		</element>
-
-		<element name="mem_addr0" ref="bit_lamp" inputtag="mem_addr" inputmask="0x001">
-			<bounds x="715" y="140" width="20" height="20" />
-		</element>
+		<repeat count="12">
+			<param name="lamp_x" start="762" increment="28"/>
+			<param name="lamp_id" start="11" increment="-1"/>
+			<param name="mask" start="0x800" rshift="1" />
+			<element name="mem_addr~lamp_id~" ref="bit_lamp" inputtag="mem_addr" inputmask="~mask~">
+				<bounds x="~lamp_x~" y="74" width="11" height="11" />
+			</element>
+		</repeat>
 
 		<element ref="str_mem_addr">
 			<bounds x="450" y="170" width="299" height="20" />
 		</element>
+
 
 		<element name="NORMAL" ref="button" inputtag="BUTTONS" inputmask="0x001">
 			<bounds x="40" y="640" width="40" height="40" />
