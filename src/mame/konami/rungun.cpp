@@ -640,11 +640,11 @@ void rungun_state::machine_reset()
 void rungun_state::rng(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);
+	M68000(config, m_maincpu, 32_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rungun_state::rungun_map);
 	m_maincpu->set_vblank_int("screen", FUNC(rungun_state::rng_interrupt));
 
-	Z80(config, m_soundcpu, 8000000);
+	Z80(config, m_soundcpu, 32_MHz_XTAL / 4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &rungun_state::rungun_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); // higher if sound stutters
@@ -656,10 +656,7 @@ void rungun_state::rng(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_refresh_hz(59.185606);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(88, 88+416-1, 24, 24+224-1);
+	m_screen->set_raw(32_MHz_XTAL / 4, 512, 88, 88+416, 264, 24, 24+224);
 	m_screen->set_screen_update(FUNC(rungun_state::screen_update_rng));
 	m_screen->set_palette(m_palette);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
@@ -677,7 +674,7 @@ void rungun_state::rng(machine_config &config)
 	m_k055673->set_palette(m_palette);
 	m_k055673->set_screen(m_screen);
 
-	K053252(config, m_k053252, 16000000/2);
+	K053252(config, m_k053252, 32_MHz_XTAL / 4);
 	m_k053252->set_offsets(9*8, 24);
 	m_k053252->set_screen("screen");
 
@@ -689,6 +686,8 @@ void rungun_state::rng(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	K054321(config, m_k054321, "speaker");
+
+	// FIXME: no 18.432 MHz XTAL present on PCB (should these use 32_MHz_XTAL / 2 instead?)
 
 	// SFX
 	K054539(config, m_k054539[0], 18.432_MHz_XTAL);
@@ -715,10 +714,7 @@ void rungun_state::rng_dual(machine_config &config)
 
 	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
 	screen2.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen2.set_refresh_hz(59.185606);
-	screen2.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen2.set_size(64*8, 32*8);
-	screen2.set_visarea(88, 88+416-1, 24, 24+224-1);
+	screen2.set_raw(32_MHz_XTAL / 4, 512, 88, 88+416, 264, 24, 24+224);
 	screen2.set_screen_update(FUNC(rungun_state::screen_update_rng_dual_right));
 	screen2.set_palette(m_palette2);
 
