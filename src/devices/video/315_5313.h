@@ -75,6 +75,8 @@ public:
 	void device_reset_old();
 	void irq_ack()
 	{
+		if (!machine().side_effects_disabled())
+			return;
 		if (m_irq6_pending)
 		{
 			m_irq6_pending = 0;

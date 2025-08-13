@@ -721,6 +721,7 @@ void at_state::pc40iii(machine_config &config)
 	subdevice<isa16_slot_device>("isa1")->set_default_option("vga"); // should be onboard Paradise VGA, see ROM declarations
 }
 
+// TODO: move to own driver
 void megapc_state::megapc(machine_config &config)
 {
 	i386sx_device &maincpu(I386SX(config, m_maincpu, 50_MHz_XTAL / 2));
@@ -778,16 +779,19 @@ void megapc_state::megapc(machine_config &config)
 	// ISA cards
 	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, nullptr, false);
 
-	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));
+	ps2_keyboard_controller_device &keybc(PS2_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));
 	keybc.hot_res().set("wd7600", FUNC(wd7600_device::kbrst_w));
 	keybc.gate_a20().set("wd7600", FUNC(wd7600_device::gatea20_w));
 	keybc.kbd_irq().set("wd7600", FUNC(wd7600_device::irq01_w));
 	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
+	// TODO: likely wants IBM keyboard as per Teradrive
 	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
-	pc_kbdc.out_clock_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_clk_w));
-	pc_kbdc.out_data_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_data_w));
+	pc_kbdc.out_clock_cb().set("keybc", FUNC(ps2_keyboard_controller_device::kbd_clk_w));
+	pc_kbdc.out_data_cb().set("keybc", FUNC(ps2_keyboard_controller_device::kbd_data_w));
+
+	// TODO: mouse port
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,8M,15M,16M");

@@ -162,7 +162,7 @@ private:
 	required_device<ds12885_device> m_rtc;
 
 	required_device<device_memory_interface> m_cpu;
-	required_device<at_keyboard_controller_device> m_keybc;
+	required_device<ps2_keyboard_controller_device> m_keybc;
 	required_device<ram_device> m_ram;
 	required_region_ptr<uint8_t> m_bios;
 	required_region_ptr<uint8_t> m_isa;

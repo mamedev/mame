@@ -10,6 +10,8 @@ References:
 - https://www.retrodev.com/blastem/trac/wiki/TeradriveHardwareNotes
 - https://plutiedev.com/cartridge-slot
 - https://plutiedev.com/mirror/teradrive-hardware-info
+- https://github.com/RetroSwimAU/TeradriveCode
+- https://www.youtube.com/watch?v=yjg3gmTo4WA
 
 NOTES (MD side):
 - 16 KiB of Z80 RAM (vs. 8 of stock)
@@ -46,7 +48,7 @@ class teradrive_state : public driver_device
 public:
 	teradrive_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
+		, m_x86cpu(*this, "x86cpu")
 		, m_chipset(*this, "chipset")
 		, m_ram(*this, RAM_TAG)
 		, m_isabus(*this, "isabus")
@@ -55,14 +57,14 @@ public:
 
 	void teradrive(machine_config &config);
 	void at_softlists(machine_config &config);
-	void x86_io(address_map &map) ATTR_COLD;
-	void x86_map(address_map &map) ATTR_COLD;
 
 protected:
 	void machine_start() override ATTR_COLD;
 
+	void x86_io(address_map &map) ATTR_COLD;
+	void x86_map(address_map &map) ATTR_COLD;
 private:
-	required_device<i80286_cpu_device> m_maincpu;
+	required_device<i80286_cpu_device> m_x86cpu;
 	required_device<wd7600_device> m_chipset;
 	required_device<ram_device> m_ram;
 	required_device<isa16_device> m_isabus;
@@ -85,12 +87,12 @@ private:
 	void wd7600_hold(int state)
 	{
 		// halt cpu
-		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+		m_x86cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 		// and acknowledge hold
 		m_chipset->hlda_w(state);
 	}
-	void wd7600_tc(offs_t offset, uint8_t data) { m_isabus->eop_w(offset, data); }
+	void wd7600_tc(offs_t offset, u8 data) { m_isabus->eop_w(offset, data); }
 	void wd7600_spkr(int state) { m_speaker->level_w(state); }
 
 	u16 m_heartbeat = 0;
@@ -172,25 +174,24 @@ void teradrive_state::machine_start()
 
 void teradrive_state::teradrive(machine_config &config)
 {
-	// TODO: Western Digital chipset
-	I80286(config, m_maincpu, XTAL(10'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &teradrive_state::x86_map);
-	m_maincpu->set_addrmap(AS_IO, &teradrive_state::x86_io);
-	m_maincpu->set_irq_acknowledge_callback("chipset", FUNC(wd7600_device::intack_cb));
+	I80286(config, m_x86cpu, XTAL(10'000'000));
+	m_x86cpu->set_addrmap(AS_PROGRAM, &teradrive_state::x86_map);
+	m_x86cpu->set_addrmap(AS_IO, &teradrive_state::x86_io);
+	m_x86cpu->set_irq_acknowledge_callback("chipset", FUNC(wd7600_device::intack_cb));
 
 	// WD76C10LP system controller
 	// WD76C30 peripheral controller
 	WD7600(config, m_chipset, 50_MHz_XTAL / 2);
-	m_chipset->set_cputag(m_maincpu);
+	m_chipset->set_cputag(m_x86cpu);
 	m_chipset->set_isatag("isa");
 	m_chipset->set_ramtag(m_ram);
 	m_chipset->set_biostag("bios");
 	m_chipset->set_keybctag("keybc");
 	m_chipset->hold_callback().set(FUNC(teradrive_state::wd7600_hold));
-	m_chipset->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_chipset->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_chipset->cpureset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
-	m_chipset->a20m_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
+	m_chipset->nmi_callback().set_inputline(m_x86cpu, INPUT_LINE_NMI);
+	m_chipset->intr_callback().set_inputline(m_x86cpu, INPUT_LINE_IRQ0);
+	m_chipset->cpureset_callback().set_inputline(m_x86cpu, INPUT_LINE_RESET);
+	m_chipset->a20m_callback().set_inputline(m_x86cpu, INPUT_LINE_A20);
 	// isa dma
 	m_chipset->ior_callback().set(FUNC(teradrive_state::wd7600_ior));
 	m_chipset->iow_callback().set(FUNC(teradrive_state::wd7600_iow));
@@ -200,8 +201,8 @@ void teradrive_state::teradrive(machine_config &config)
 
 	// on board devices
 	ISA16(config, m_isabus, 0);
-	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
-	m_isabus->set_iospace(m_maincpu, AS_IO);
+	m_isabus->set_memspace(m_x86cpu, AS_PROGRAM);
+	m_isabus->set_iospace(m_x86cpu, AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(wd7600_device::iochck_w));
 	m_isabus->irq2_callback().set(m_chipset, FUNC(wd7600_device::irq09_w));
 	m_isabus->irq3_callback().set(m_chipset, FUNC(wd7600_device::irq03_w));
@@ -222,16 +223,17 @@ void teradrive_state::teradrive(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(wd7600_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(wd7600_device::dreq7_w));
 
-	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));
+	// NOTE: wants IBM BIOS over IBM keyboard only
+	ps2_keyboard_controller_device &keybc(PS2_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));
 	keybc.hot_res().set("chipset", FUNC(wd7600_device::kbrst_w));
 	keybc.gate_a20().set("chipset", FUNC(wd7600_device::gatea20_w));
 	keybc.kbd_irq().set("chipset", FUNC(wd7600_device::irq01_w));
 	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
-	pc_kbdc.out_clock_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_clk_w));
-	pc_kbdc.out_data_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_data_w));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84));
+	pc_kbdc.out_clock_cb().set("keybc", FUNC(ps2_keyboard_controller_device::kbd_clk_w));
+	pc_kbdc.out_data_cb().set("keybc", FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
 	// FIXME: determine ISA bus clock
 	// WD76C20
