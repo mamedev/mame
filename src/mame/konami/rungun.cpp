@@ -708,11 +708,19 @@ void rungun_state::rng_dual(machine_config &config)
 {
 	rng(config);
 
+	// FIXME: raw parameters cause graphics to desync in dual configuration
+	m_screen->set_refresh_hz(59.185606);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(88, 88+416-1, 24, 24+224-1);
 	m_screen->set_screen_update(FUNC(rungun_state::screen_update_rng_dual_left));
 
 	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
 	screen2.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen2.set_raw(32_MHz_XTAL / 4, 512, 88, 88+416, 264, 24, 24+224);
+	screen2.set_refresh_hz(59.185606);
+	screen2.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen2.set_size(64*8, 32*8);
+	screen2.set_visarea(88, 88+416-1, 24, 24+224-1);
 	screen2.set_screen_update(FUNC(rungun_state::screen_update_rng_dual_right));
 	screen2.set_palette(m_palette2);
 
