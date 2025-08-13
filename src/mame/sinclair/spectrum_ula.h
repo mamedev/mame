@@ -37,6 +37,8 @@ public:
 	virtual u8 get_irq_ext_length() { return 0; }
 	virtual u8 get_border_chunk_size() { return 1; }
 	virtual u8 get_btime() { return 0; }
+	virtual u8 get_atime_left() { return 0; }
+	virtual u8 get_atime_right() { return 0; }
 	virtual s8 get_raster_contention_offset() { return 0; }
 
 protected:
@@ -77,6 +79,8 @@ public:
 	virtual u8 get_irq_ext_length() override { return m_is_timings_late; };
 	virtual u8 get_border_chunk_size() override { return 8; }
 	virtual u8 get_btime() override { return m_btime; }
+	virtual u8 get_atime_left() override { return m_atime_left; }
+	virtual u8 get_atime_right() override { return m_atime_right; }
 	virtual s8 get_raster_contention_offset() override { return m_base_offset + m_is_timings_late; }
 
 protected:
@@ -89,6 +93,8 @@ protected:
 
 	u8 m_pattern[8];
 	u8 m_btime; // Pixel offset in 16px chunk (8T) when current [b]order attribute is applied.
+	u8 m_atime_left; // Pixel offset when [a]ttribute is applied on the left side.
+	u8 m_atime_right; // Pixel offset when [a]ttribute is applied on the right side.
 	s8 m_base_offset; // Defines offset in CPU cycles from screen left side. Early model (48/128/+2) typically use -1, later (+2A/+3) +1
 
 	u64 m_video_line_clocks;
