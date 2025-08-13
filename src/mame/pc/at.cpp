@@ -359,17 +359,22 @@ void at_state::ficpio_io(address_map &map)
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
+// TODO: verify and remove these hacks once triple fault is fixed
 void megapc_state::init_megapc()
 {
 	uint8_t* ROM = memregion("bios")->base();
-	ROM[0x19145] = 0x45;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
+	// HACK: keyboard checks
+	ROM[0x19145] = 0x45;
+	// To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
 void megapc_state::init_megapcpl()
 {
 	uint8_t* ROM = memregion("bios")->base();
-	ROM[0x187b1] = 0x55;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
+	// HACK: keyboard checks
+	ROM[0x187b1] = 0x55;
+	// To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
@@ -379,7 +384,9 @@ void at_vrom_fix_state::init_megapcpla()
 
 	init_at_common(0xa0000);
 
-	ROM[0x33c2a] = 0x45;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
+	// HACK: keyboard checks
+	ROM[0x33c2a] = 0x45;
+	// To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0x3af37] = 0x45;
 	ROM[0x3cf1b] = 0x54;  // this will allow the keyboard to work during the POST memory test
 	ROM[0x3fffe] = 0x1c;
@@ -413,10 +420,12 @@ void megapc_state::wd7600_hold(int state)
 
 void megapc_state::megapc_map(address_map &map)
 {
+	map.unmap_value_high();
 }
 
 void megapc_state::megapcpl_map(address_map &map)
 {
+	map.unmap_value_high();
 }
 
 void megapc_state::megapc_io(address_map &map)
@@ -731,7 +740,6 @@ void megapc_state::megapc(machine_config &config)
 
 	WD7600(config, m_wd7600, 50_MHz_XTAL / 2);
 	m_wd7600->set_cputag(m_maincpu);
-	m_wd7600->set_isatag("isa");
 	m_wd7600->set_ramtag(m_ram);
 	m_wd7600->set_biostag("bios");
 	m_wd7600->set_keybctag("keybc");
@@ -1425,7 +1433,6 @@ ROM_END
 
 // Amstrad MegaPC
 ROM_START( megapc )
-	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "41651-bios lo.u18",  0x00000, 0x10000, CRC(1e9bd3b7) SHA1(14fd39ec12df7fae99ccdb0484ee097d93bf8d95))
 	ROM_LOAD16_BYTE( "211253-bios hi.u19", 0x00001, 0x10000, CRC(6acb573f) SHA1(376d483db2bd1c775d46424e1176b24779591525))
@@ -1433,7 +1440,6 @@ ROM_END
 
 // Amstrad MegaPC Plus
 ROM_START( megapcpl )
-	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "41652.u18",  0x00000, 0x10000, CRC(6f5b9a1c) SHA1(cae981a35a01234fcec99a96cb38075d7bf23474))
 	ROM_LOAD16_BYTE( "486slc.u19", 0x00001, 0x10000, CRC(6fb7e3e9) SHA1(c439cb5a0d83176ceb2a3555e295dc1f84d85103))

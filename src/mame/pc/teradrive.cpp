@@ -13,6 +13,9 @@ References:
 - https://github.com/RetroSwimAU/TeradriveCode
 - https://www.youtube.com/watch?v=yjg3gmTo4WA
 
+NOTES (PC side):
+- F1 at POST will bring a setup menu (currently locked?);
+
 NOTES (MD side):
 - 16 KiB of Z80 RAM (vs. 8 of stock)
 - 128 KiB of VDP RAM (vs. 64)
@@ -20,9 +23,9 @@ NOTES (MD side):
 - has discrete YM3438 in place of YM2612
 
 TODO:
-- Throws "304 Keyboard clock HI";
 - Many unknown ports;
-- IBM 79F2661 bus switch;
+- IBM 79F2661 ISA bus switch, motherboard resource also shared with undumped 5510Z Japanese DOS/V);
+- "TIMER FAIL" when exiting from setup menu;
 - MD side, as a testbed for rewriting base HW;
 
 **************************************************************************************************/
@@ -33,7 +36,7 @@ TODO:
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i86/i286.h"
-#include "cpu/i386/i386.h"
+//#include "cpu/i386/i386.h"
 #include "machine/at.h"
 #include "machine/ram.h"
 #include "machine/wd7600.h"
@@ -115,12 +118,22 @@ void teradrive_state::x86_map(address_map &map)
 {
 	map.unmap_value_high();
 	// map(0x000ce000, 0x000cffff) bus switch memory window (in ISA space)
+	map(0x000ce000, 0x000cffff).rom().region("romdisk", 0);
 }
 
 void teradrive_state::x86_io(address_map &map)
 {
 	map.unmap_value_high();
-//	map(0x1160, 0x1167) comms
+//	map(0x1160, 0x1167) bus switch map
+//	map(0x1160, 0x1160) romdisk bank * 0x2000, r/w
+//	map(0x1161, 0x1161) <undefined>?
+//	map(0x1162, 0x1162) romdisk segment start in ISA space (val & 0x1e | 0xc0)
+//	map(0x1163, 0x1163) comms and misc handshake bits, partially reflected on 68k $ae0001 register
+//	map(0x1164, 0x1164) boot control
+//	map(0x1165, 0x1165) switches/bus timeout/TMSS unlock (r/o)
+//	map(0x1166, 0x1167) 68k address space select & 0xffffe * 0x2000, r/w
+
+	// TODO: what's the origin of this?
 	map(0xfc72, 0xfc73).lr16(
 		NAME([this] () {
 			u16 res = m_heartbeat & 0x8000;
@@ -162,8 +175,10 @@ void teradrive_state::x86_io(address_map &map)
 //	map(0xa14000, 0xa14003) TMSS lock
 //	map(0xa15100, 0xa153ff) 32X registers if present, <unmapped> otherwise
 //	map(0xae0000, 0xae0003) Teradrive bus switch registers
-//	map(0xaf0000, 0xafffff) Teradrive I/O space window
-//	map(0xb00000, 0xbfffff) Teradrive memory mapped space window
+	// TODO: verify requiring swapped endianness
+//	map(0xaf0000, 0xafffff).m(m_isabus, FUNC(isa16_device::io16_swap_r), FUNC(isa16_device::io16_swap_w));
+	// NOTE: actually bank selectable from $ae0003 in 1 MiB units
+//	map(0xb00000, 0xbfffff).m(m_isabus, FUNC(isa16_device::mem16_swap_r), FUNC(isa16_device::mem16_swap_w));
 //	map(0xc00000, 0xdfffff) VDP and PSG (with mirrors and holes)
 //	map(0xe00000, 0xffffff) Work RAM (with mirrors)
 //}
@@ -183,7 +198,6 @@ void teradrive_state::teradrive(machine_config &config)
 	// WD76C30 peripheral controller
 	WD7600(config, m_chipset, 50_MHz_XTAL / 2);
 	m_chipset->set_cputag(m_x86cpu);
-	m_chipset->set_isatag("isa");
 	m_chipset->set_ramtag(m_ram);
 	m_chipset->set_biostag("bios");
 	m_chipset->set_keybctag("keybc");
@@ -257,12 +271,9 @@ ROM_START( teradrive )
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD( "bios-27c010.bin", 0x00000, 0x20000, CRC(32642518) SHA1(6bb6d0325b8e4150c4258fd16f3a870b92e88f75))
 
-	ROM_REGION16_LE(0x100000, "romdisk", 0)
+	ROM_REGION16_LE(0x200000, "romdisk", ROMREGION_ERASEFF)
 	// contains bootable PC-DOS 3.x + a MENU.EXE
 	ROM_LOAD( "tru-27c800.bin", 0x00000, 0x100000,  CRC(c2fe9c9e) SHA1(06ec0461dab425f41fb5c3892d9beaa8fa53bbf1))
-
-	// TODO: don't need this mapping
-	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
 
 	// MD 68k initial boot code, "TERA286 INITIALIZE" in header
 	// shows Sega logo + TMSS "produced by" + 1990 copyright at bottom if loaded thru megadrij

@@ -44,7 +44,6 @@ public:
 
 	// inline configuration
 	template <typename T> void set_cputag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_isatag(T &&tag) { m_isa.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_biostag(T &&tag) { m_bios.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_keybctag(T &&tag) { m_keybc.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_ramtag(T &&tag) { m_ram.set_tag(std::forward<T>(tag)); }
@@ -165,7 +164,6 @@ private:
 	required_device<ps2_keyboard_controller_device> m_keybc;
 	required_device<ram_device> m_ram;
 	required_region_ptr<uint8_t> m_bios;
-	required_region_ptr<uint8_t> m_isa;
 
 	offs_t page_offset();
 	void set_dma_channel(int channel, bool state);

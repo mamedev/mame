@@ -100,7 +100,6 @@ wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, dev
 	m_keybc(*this, finder_base::DUMMY_TAG),
 	m_ram(*this, finder_base::DUMMY_TAG),
 	m_bios(*this, finder_base::DUMMY_TAG),
-	m_isa(*this, finder_base::DUMMY_TAG),
 	m_portb(0x0f),
 	m_iochck(1),
 	m_nmi_mask(1),
@@ -135,7 +134,7 @@ void wd7600_device::device_start()
 	// install video BIOS (we should use the VGA BIOS at the beginning of the system BIOS ROM, but that gives a
 	// blank display (but still runs))
 	//m_space->install_rom(0x000c0000, 0x000cffff, &m_bios[0x00000]);
-	m_space->install_rom(0x000c0000, 0x000cffff, m_isa);
+	//m_space->install_rom(0x000c0000, 0x000cffff, m_isa);
 
 	// install BIOS ROM at cpu initial pc
 	m_space->install_rom(0x000e0000, 0x000fffff, &m_bios[0x00000]);
