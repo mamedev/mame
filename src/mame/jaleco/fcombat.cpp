@@ -11,7 +11,10 @@ TS 2004.10.22.
 
 (press buttons 1+2 at the same time, to release 'army' ;)
 
-Colors match available references (i.e. https://www.youtube.com/watch?v=kMfaYrmoOc4)
+TODO:
+- verify video timing, it's around 58.5Hz when compared to this video:
+  https://www.youtube.com/watch?v=kMfaYrmoOc4
+
 
 PCB Notes:
 
@@ -48,14 +51,16 @@ class fcombat_state : public driver_device
 public:
 	fcombat_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_bgdata_rom(*this, "bgdata"),
 		m_terrain_rom(*this, "terrain"),
-		m_inputs(*this, "IN%u", 0U),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_inputs(*this, "IN%u", 0U)
 	{ }
 
 	void fcombat(machine_config &config);
@@ -69,6 +74,13 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+
 	// memory pointers
 	required_shared_ptr<u8> m_videoram;
 	required_shared_ptr<u8> m_spriteram;
@@ -90,11 +102,6 @@ private:
 	u8 m_tx = 0;
 	u8 m_ty = 0;
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-
 	u8 protection_r();
 	u8 port01_r();
 	void e900_w(u8 data);
@@ -114,19 +121,6 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// this is copied from Exerion, but it should be correct
-static constexpr XTAL MASTER_CLOCK = 19.968_MHz_XTAL;
-static constexpr XTAL CPU_CLOCK    = MASTER_CLOCK / 6;
-static constexpr XTAL AY8910_CLOCK = CPU_CLOCK / 2;
-static constexpr XTAL PIXEL_CLOCK  = MASTER_CLOCK / 3;
-static constexpr int HCOUNT_START  = 0x58;
-static constexpr int HTOTAL        = 512 - HCOUNT_START;
-static constexpr int HBEND         = 12 * 8;  // ??
-static constexpr int HBSTART       = 52 * 8;  // ??
-static constexpr int VTOTAL        = 256;
-static constexpr int VBEND         = 16;
-static constexpr int VBSTART       = 240;
 
 
 /***************************************************************************
@@ -589,17 +583,20 @@ void fcombat_state::machine_start()
 void fcombat_state::fcombat(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, CPU_CLOCK);
+	Z80(config, m_maincpu, 20_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcombat_state::main_map);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", CPU_CLOCK));
-	audiocpu.set_addrmap(AS_PROGRAM, &fcombat_state::audio_map);
+	Z80(config, m_audiocpu, 20_MHz_XTAL / 6);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fcombat_state::audio_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	screen.set_screen_update(FUNC(fcombat_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.5); // approximation
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(12*8, 52*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(fcombat_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fcombat);
 	PALETTE(config, m_palette, FUNC(fcombat_state::fcombat_palette), 256 * 3, 32);
@@ -609,9 +606,9 @@ void fcombat_state::fcombat(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2149(config, "ay1", AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
-	YM2149(config, "ay2", AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
-	YM2149(config, "ay3", AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
+	YM2149(config, "ay1", 20_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.25);
+	YM2149(config, "ay2", 20_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.25);
+	YM2149(config, "ay3", 20_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
