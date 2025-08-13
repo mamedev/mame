@@ -28533,4 +28533,203 @@ license:CC0-1.0
 			<dataarea name="nvram" size="0x8000" />
 		</part>
 	</software>
+
+	<!-- Super Mario Bros. Mini on GitHub: https://github.com/Mico27/SuperMarioBrosMini
+
+	     All ROM images were downloaded from the GitHub releases page.
+	-->
+	<software name="smbmini">
+		<description>Super Mario Bros. Mini (v2.0.8)</description>
+		<year>2024</year>
+		<publisher>Mico27</publisher>
+		<info name="release" value="20241120" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="SuperMarioBrosMini.gb" size="2097152" crc="c2bfe433" sha1="c9eee8d916390e3bd6142370de4d9fe501fd44a8" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="smbmini207" cloneof="smbmini">
+		<description>Super Mario Bros. Mini (v2.0.7)</description>
+		<year>2024</year>
+		<publisher>Micro27</publisher>
+		<info name="release" value="20241112" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="SuperMarioBrosMini.gb" size="2097152" crc="f50ee02c" sha1="f01983381be22973c289690cc1bb068294b4b28c" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="smbmini206" cloneof="smbmini">
+		<description>Super Mario Bros. Mini (v2.0.6)</description>
+		<year>2024</year>
+		<publisher>Micro27</publisher>
+		<info name="release" value="20241102" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="SuperMarioBrosMini.gb" size="2097152" crc="9d42c762" sha1="784e563c4e66f27d84c181650a39be6d7f3b9429" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="smbmini205" cloneof="smbmini">
+		<description>Super Mario Bros. Mini (v2.0.5)</description>
+		<year>2024</year>
+		<publisher>Micro27</publisher>
+		<info name="release" value="20241102" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="SuperMarioBrosMini.gb" size="2097152" crc="bf2ce7b7" sha1="a0958a1cd5b279984b3cc54602df453193088425" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="smbmini204" cloneof="smbmini">
+		<description>Super Mario Bros. Mini (v2.0.4)</description>
+		<year>2024</year>
+		<publisher>Micro27</publisher>
+		<info name="release" value="20241030" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="SuperMarioBrosMini.gb" size="2097152" crc="6eb7bf49" sha1="6c70bf7ec4911c08a2364fba0a7ef114c50519b5" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="smbmini203" cloneof="smbmini">
+		<description>Super Mario Bros. Mini (v2.0.3)</description>
+		<year>2024</year>
+		<publisher>Micro27</publisher>
+		<info name="release" value="20241029" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="SuperMarioBrosMini.gb" size="2097152" crc="e95dd63b" sha1="76dfad666d1669b4916d872a5587e222de3632a1" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="smbmini202" cloneof="smbmini">
+		<description>Super Mario Bros. Mini (v2.0.2)</description>
+		<year>2024</year>
+		<publisher>Micro27</publisher>
+		<info name="release" value="20241028" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="SuperMarioBrosMini.gb" size="2097152" crc="1b5a3936" sha1="50ff764fd2357ffd2a477ffe698bf122ac98d5db" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="smbmini201" cloneof="smbmini">
+		<description>Super Mario Bros. Mini (v2.0.1)</description>
+		<year>2024</year>
+		<publisher>Micro27</publisher>
+		<info name="release" value="20241026" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="SuperMarioBrosMini.gb" size="2097152" crc="5bcbd303" sha1="7f14089f5b4e5c8f278ca20a14205361b9dcdf66" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="smbmini200" cloneof="smbmini">
+		<description>Super Mario Bros. Mini (v2.0.0)</description>
+		<year>2024</year>
+		<publisher>Micro27</publisher>
+		<info name="release" value="20241026" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="SuperMarioBrosMini.gb" size="2097152" crc="89105d14" sha1="edad2d93bf395f48a9184704f9e6b0970b8d0cfa" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="smbmini103" cloneof="smbmini">
+		<description>Super Mario Bros. Mini (v1.0.3)</description>
+		<year>2024</year>
+		<publisher>Micro27</publisher>
+		<info name="release" value="20241007" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="SuperMarioBrosMini.gb" size="1048576" crc="fe2bfa0a" sha1="46a9795cb1adf5242ffd34b06fa23b5c39815fca" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="smbmini102" cloneof="smbmini">
+		<description>Super Mario Bros. Mini (v1.0.2)</description>
+		<year>2024</year>
+		<publisher>Micro27</publisher>
+		<info name="release" value="20241006" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="SuperMarioBrosMini.gb" size="1048576" crc="7d30a1d3" sha1="dbfbc0bdfa80ad3bb2aff3a5359f872d9b30c60d" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="smbmini101" cloneof="smbmini">
+		<description>Super Mario Bros. Mini (v1.0.1)</description>
+		<year>2024</year>
+		<publisher>Micro27</publisher>
+		<info name="release" value="20241005" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="SuperMarioBrosMini.gb" size="1048576" crc="9e27eeeb" sha1="bb74bfc6fd6edfb6d7d8a1fd01b84047b4ae82fd" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="smbmini100" cloneof="smbmini">
+		<description>Super Mario Bros. Mini (v1.0.0)</description>
+		<year>2024</year>
+		<publisher>Micro27</publisher>
+		<info name="release" value="20241002" />
+		<sharedfeat name="compatibility" value="GBC" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="SuperMarioBrosMini.gb" size="1048576" crc="79ca4ac0" sha1="bbc8f13f2191dd53741fe70554613ccb2c5552ab" />
+			</dataarea>
+			<dataarea name="nvram" size="0x8000" />
+		</part>
+	</software>
 </softwarelist>
