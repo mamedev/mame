@@ -180,7 +180,7 @@ void spectrum_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 
 		u16 hpos = cliprect.left();
 		u16 x = hpos - get_screen_area().left();
 		bool chunk_right = x & 8;
-		if (x % 8 <= (chunk_right ? 0 : 4))
+		if (x % 8 <= (chunk_right ? m_ula->get_atime_right() : m_ula->get_atime_left()))
 		{
 			u8 shift = x % 8;
 			x -= shift;
@@ -198,7 +198,7 @@ void spectrum_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 
 		u8 *attr = &m_screen_location[0x1800 | (((y & 0xf8) << 2) | (x >> 3))];
 		u16 *pix = &(bitmap.pix(vpos, hpos));
 
-		while ((hpos + (chunk_right ? 0 : 4)) <= cliprect.right())
+		while ((hpos + (chunk_right ? m_ula->get_atime_right() : m_ula->get_atime_left())) <= cliprect.right())
 		{
 			u16 ink = ((*attr >> 3) & 0x08) | (*attr & 0x07);
 			u16 pap = (*attr >> 3) & 0x0f;

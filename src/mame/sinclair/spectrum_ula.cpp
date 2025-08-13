@@ -182,6 +182,8 @@ spectrum_ula_48k_device::spectrum_ula_48k_device(const machine_config &mconfig, 
 	const u8 pattern[] = {6, 5, 4, 3, 2, 1, 0, 0};
 	memcpy(m_pattern, pattern, 8);
 	m_btime = 2;
+	m_atime_left = 4;
+	m_atime_right = 0;
 	m_base_offset = -1;
 }
 
@@ -199,7 +201,9 @@ spectrum_ula_128k_device::spectrum_ula_128k_device(const machine_config &mconfig
 	const u8 pattern[] = {6, 5, 4, 3, 2, 1, 0, 0};
 	memcpy(m_pattern, pattern, 8);
 	m_btime = 3;
-	m_base_offset = -3;
+	m_atime_left = 4;
+	m_atime_right = 0;
+	m_base_offset = -1; // leave it one for now, but according to Timings_Test it must be -3
 }
 
 bool spectrum_ula_128k_device::is_contended(offs_t offset)
@@ -217,6 +221,8 @@ spectrum_ula_plus2a_device::spectrum_ula_plus2a_device(const machine_config &mco
 	const u8 pattern[] = {1, 0, 7, 6, 5, 4, 3, 2};
 	memcpy(m_pattern, pattern, 8);
 	m_btime = 5;
+	m_atime_left = 4;
+	m_atime_right = 0;
 	m_base_offset = 1;
 }
 
