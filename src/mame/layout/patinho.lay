@@ -18,8 +18,8 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<disk state="0"><color red="0.05" green="0.2" blue="0.05" /></disk>
 	</element>
 
-	<element name="rectangle">
-		<rect><color red="0.3" green="0.9" blue="0.6" /></rect>
+	<element name="panel_background">
+		<rect><color red="0.47" green="0.64" blue="0.51" /></rect>
 	</element>
 
 	<element name="str_flags_t">
@@ -110,15 +110,13 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 
 <!-- define background -->
 
-	<view name="Front panel">
-		<screen index="0">
-			<bounds left="0" top="0" right="1000" bottom="1000" />
-		</screen>
+	<view name="Default layout">
+		<bounds x="0" y="0" width="1280" height="1200" />
 
 <!-- define lamps -->
 
-		<element ref="rectangle">
-			<bounds x="150" y="100" width="625" height="450" />
+		<element ref="panel_background">
+			<bounds x="-33" y="-980" width="1343" height="2218" />
 		</element>
 
 		<element name="mem_data7" ref="bit_lamp" inputtag="mem_data" inputmask="0x080">
