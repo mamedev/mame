@@ -359,25 +359,23 @@ void at_state::ficpio_io(address_map &map)
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
-// TODO: verify and remove these hacks once triple fault is fixed
 void megapc_state::init_megapc()
 {
-	uint8_t* ROM = memregion("bios")->base();
-	// HACK: keyboard checks
-	ROM[0x19145] = 0x45;
+//	uint8_t* ROM = memregion("bios")->base();
+//	ROM[0x19145] = 0x45;
 	// To be removed when the keyboard controller from the MegaPC is dumped
-	ROM[0x1fea0] = 0x20;  // to correct checksum
+//	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
 void megapc_state::init_megapcpl()
 {
-	uint8_t* ROM = memregion("bios")->base();
-	// HACK: keyboard checks
-	ROM[0x187b1] = 0x55;
+//	uint8_t* ROM = memregion("bios")->base();
+//	ROM[0x187b1] = 0x55;
 	// To be removed when the keyboard controller from the MegaPC is dumped
-	ROM[0x1fea0] = 0x20;  // to correct checksum
+//	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
+// TODO: verify and remove this hack
 void at_vrom_fix_state::init_megapcpla()
 {
 	uint8_t* ROM = memregion("bios")->base();
@@ -779,11 +777,13 @@ void megapc_state::megapc(machine_config &config)
 	m_isabus->drq6_callback().set(m_wd7600, FUNC(wd7600_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_wd7600, FUNC(wd7600_device::dreq7_w));
 
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdcsmc", true); // FIXME: determine ISA bus clock
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdcsmc", true);
 	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "ide", true);
 	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
-	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "vga", true);
+	// WD90C11A-LR
+	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "wd90c11_lr", true);
 	// ISA cards
 	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, nullptr, false);
 
@@ -794,8 +794,8 @@ void megapc_state::megapc(machine_config &config)
 	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
-	// TODO: likely wants IBM keyboard as per Teradrive
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
+	// NOTE: wants an IBM keyboard
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84));
 	pc_kbdc.out_clock_cb().set("keybc", FUNC(ps2_keyboard_controller_device::kbd_clk_w));
 	pc_kbdc.out_data_cb().set("keybc", FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
