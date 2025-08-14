@@ -150,7 +150,6 @@ GFXDECODE_END
 void tsconf_state::video_start()
 {
 	spectrum_128_state::video_start();
-	m_contention_pattern = {}; // disable inherited contention
 
 	m_ts_tilemap[TM_TS_CHAR] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_txt)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
@@ -323,6 +322,8 @@ void tsconf_state::tsconf(machine_config &config)
 	m_screen->set_no_palette();
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tsconf);
+	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
+
 	RAM(config, m_cram).set_default_size("512").set_default_value(0);
 	RAM(config, m_sfile).set_default_size("512").set_default_value(0); // 85*6
 

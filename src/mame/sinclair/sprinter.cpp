@@ -1621,7 +1621,6 @@ void sprinter_state::video_start()
 
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sprinter_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
-	m_contention_pattern = {};
 	init_taps();
 
 	m_acc_timer = timer_alloc(FUNC(sprinter_state::acc_tick), this);
@@ -1960,6 +1959,7 @@ void sprinter_state::sprinter(machine_config &config)
 	m_screen->set_screen_update(FUNC(sprinter_state::screen_update));
 
 	PALETTE(config, "palette", palette_device::BLACK).set_entries(256 * 8);
+	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
 	PC_KBDC(config, m_kbd, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
 	m_kbd->out_data_cb().set(m_maincpu, FUNC(z84c015_device::rxa_w)); // KBD_DATR
