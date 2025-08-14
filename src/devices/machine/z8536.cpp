@@ -200,6 +200,12 @@ u8 cio_base_device::read_register(offs_t offset)
 
 	switch (offset)
 	{
+	case PORT_C_DATA_PATH_POLARITY:
+	case PORT_C_DATA_DIRECTION:
+	case PORT_C_SPECIAL_IO_CONTROL:
+		data = 0xf0 | (m_register[offset] & 0x0f);
+		break;
+
 	case PORT_A_DATA:
 		// TODO: take data path polarity into account
 		data = m_output[PORT_A];
