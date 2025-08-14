@@ -310,7 +310,7 @@ void bbl380_state::bbl380(machine_config &config)
 // internal OTPROM BIOS, dumped from retro150a PCB, 6000-7fff range
 #define INTERNAL_ROM_TYPE2 \
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF) \
-	ROM_LOAD("st2x_internal_type2.bin", 0x002000, 0x002000, BAD_DUMP CRC(32d96794) SHA1(9d7e3e284f1656d8b2f7dae754cab1f82b3a1d61)) /* could still have some errors, double check! */
+	ROM_LOAD("st2x_internal_type2.bin", 0x002000, 0x002000, CRC(32d96794) SHA1(9d7e3e284f1656d8b2f7dae754cab1f82b3a1d61))
 
 
 // sets with unknown version of internal ROM
