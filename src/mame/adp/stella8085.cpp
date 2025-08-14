@@ -39,7 +39,7 @@ Nova Kniffi reference: https://www.youtube.com/watch?v=YBq2Z1irXek
 #include "adpservice.lh"
 #include "disc2000.lh"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 namespace {
@@ -334,7 +334,7 @@ void stella8085_state::io70(uint8_t data)
 	machine().bookkeeping().coin_counter_w(5,sz); // game counter
 
 	if (d6) {
-		;//m_icl8b = true;
+		;//LOG("Short test\n");
 	}
 
 	if (pa7) {
@@ -349,7 +349,7 @@ void stella8085_state::io71(uint8_t data)
 	const bool dg = BIT(data,2);
 	const bool ug = BIT(data,3);
 	const bool ds = BIT(data,4);
-	const bool d60 = BIT(data,5);
+	const bool us = BIT(data,5);
 	const bool dm = BIT(data,6);
 	const bool um = BIT(data,7);
 
@@ -361,8 +361,8 @@ void stella8085_state::io71(uint8_t data)
 
 	if (gong)
 		popmessage("GONG");
-	if (d60)
-		LOG("activating D60\n");
+	if (us)
+		LOG("activating US\n");
 	m_beep->set_output_gain(ALL_OUTPUTS,!dg);
 	if (ug || ds || dm || um)
 		LOG("UG %d DS %d DM %d UM %d\n", ug,ds,dm,um);
