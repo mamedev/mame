@@ -297,7 +297,7 @@ CONS(2021, punij1pu, punirune, 0, generalplus_gpspi_direct, bfspyhnt, generalplu
 CONS(2021, punij2pk, punirune, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_V2, pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // has a link feature
-CONS(2021, punifrnd, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Punirunes Friendship (hot pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punifrnd, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", u8"Punirunes Punitomo Tsūshin (hot pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // Pokemon ガチッとゲットだぜ! モンスターボール 
 CONS(2021, pokgoget, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Pokemon Go! Get It! (210406, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
