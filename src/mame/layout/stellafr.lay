@@ -9,6 +9,15 @@ license:CC0-1.0
 		<disk state="0"><color red="0.17" green="0.015" blue="0.02" /></disk>
 	</element>
 
+	<element name="green_led" defstate="0">
+		<rect state="0">
+			<color red="0" green="0.2" blue="0" />
+		</rect>
+		<rect state="1">
+			<color red="0" green="0.8" blue="0" />
+		</rect>
+	</element>
+
 <!-- define elements -->
 	<element name="static_black">
 		<rect>
@@ -23,9 +32,9 @@ license:CC0-1.0
 	</element>
 
 	<view name="Internal Layout">
-		<bounds left="0" right="110" top="0" bottom="40" />
+		<bounds left="0" right="110" top="0" bottom="50" />
 		<element ref="static_black">
-			<bounds left="0" right="110" top="0" bottom="40" />
+			<bounds left="0" right="110" top="0" bottom="50" />
 		</element>
 
 <!-- left panel -->
@@ -65,5 +74,20 @@ license:CC0-1.0
 		<element name="led1" ref="led_red">
 			<bounds left="50" right="55" top="30" bottom="35" />
 		</element>
+
+<!-- debug-->
+    <repeat count="12">
+    <param name="s" start="0" increment="1" />
+    <param name="x" start="0" increment="2" />
+        <repeat count="8">
+        <param name="z" start="0" increment="1" />
+        <param name="y" start="30" increment="2" />
+            <element name="lamp~z~~s~" ref="green_led">
+			    <bounds x="~x~" y="~y~" width="1" height="1" />
+		    </element>
+        </repeat>
+    </repeat>
+
+
 	</view>
 </mamelayout>

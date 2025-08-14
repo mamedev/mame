@@ -153,26 +153,26 @@ enum
 // outputs
 enum
 {
-	U1_1MA,
+	U1_1MA, //shared with output to service keyboard
 	U1_2MA,
 	U1_ME,
 	U1_D3OUT,
-	U1_ANZ,
-	U1_MUX,
-	U1_ANZME2,
+	U1_ANZ1,
+	U1_MUX1,
+	U1_ANZ2,
 	U1_MUX2
 };
 
 enum
 {
-	U5_ENM,
-	U5_ENME2,
-	U5_AW,
+	U5_EN1MA, //shared with output to coin unit 1
+	U5_EN2MA,
+	U5_AW1,
 	U5_AW2,
-	U5_ENSTANZ,
-	U5_MUXMA,
-	U5_EANZ2,
-	U5_EMUX2
+	U5_ENANZ1, //shared with output to service keyboard
+	U5_ENMUX1,
+	U5_ENANZ2, //shared with output to coin unit 2
+	U5_ENMUX2
 };
 
 // inputs
@@ -198,6 +198,7 @@ public:
 		m_nvram(*this, "nvram"),
 		m_dac(*this, "dac"),
 		m_digits(*this, "digit%u", 0U),
+		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U),
 		m_in0(*this, "IN0")
 	{ }
@@ -214,16 +215,25 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<ad7224_device> m_dac;
 	output_finder<8> m_digits;
+	output_finder<128> m_lamps;
 	output_finder<2> m_leds;
 	required_ioport m_in0;
 
-	uint8_t m_mux_data;
+	uint8_t m_ma1;
+	uint8_t m_ma2;
+	uint8_t m_me;
+	uint8_t m_data3;
+	uint8_t m_anz1;
+	uint16_t m_mux1;
+	uint8_t m_anz2;
+	uint8_t m_mux2;
 
 	uint8_t mux_r();
 	void mux_w(uint8_t data);
 	void mux2_w(uint8_t data);
 	void duart_output_w(uint8_t data);
 	void ay8910_portb_w(uint8_t data);
+	void lamps_w(uint8_t row, uint16_t data);
 
 	void mem_map(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
@@ -256,50 +266,53 @@ uint8_t stellafr_state::mux_r()
 	return data;
 }
 
+void stellafr_state::lamps_w(uint8_t row, uint16_t data)
+{
+	LOG("Row %d\n",row);
+	for (int i = 0; i < 8; i++)
+	{
+		uint8_t lamp_index = (row * 10) + i;
+		bool lamp_value = BIT(data, i);
+		m_lamps[lamp_index] = lamp_value;
+	}
+}
+
 void stellafr_state::mux_w(uint8_t data)
 {
-	//m_mux_data++;
-	//m_mux_data &= 0x0f;
-	bool enma   = BIT(data,U5_ENM);
-	bool enme2  = BIT(data,U5_ENME2);
-	bool aw     = BIT(data,U5_AW);
+	bool enma1  = BIT(data,U5_EN1MA);
+	bool enma2  = BIT(data,U5_EN2MA);
+	bool aw1    = BIT(data,U5_AW1);
 	bool aw2    = BIT(data,U5_AW2);
-	bool enanz  = BIT(data,U5_ENSTANZ); //enable 7seg
-	bool enmux  = BIT(data,U5_MUXMA); //enable lamps/buttons
-	bool enanz2 = BIT(data,U5_EANZ2);
-	bool enmux2 = BIT(data,U5_EMUX2);
+	bool enanz1 = BIT(data,U5_ENANZ1); //enable 7seg
+	bool enmux1 = BIT(data,U5_ENMUX1); //enable lamps/buttons
+	bool enanz2 = BIT(data,U5_ENANZ2);
+	bool enmux2 = BIT(data,U5_ENMUX2);
 
-	LOG("\nmux_w()\n");
-	LOG("EnMa         %d\n",enma);
-	LOG("EnME2        %d\n",enme2);
-	LOG("IOB3/AW/TXDB %d\n",aw);
-	LOG("AW2          %d\n",aw2);
-	LOG("EnANZ        %d\n",enanz);
-	LOG("EnMUX/MUXMA  %d\n",enmux);
-	LOG("EnANZ2       %d\n",enanz2);
-	LOG("EnMUX2       %d\n",enmux2);
+	if (enma1);// LOG("1MA %d\n",m_ma1);
+	if (enma1);// LOG("ME %d\n",m_me);
+	if (enma2);// LOG("2MA %d\n",m_ma2);
+	if (enanz1);// LOG("ANZ1 %d\n",m_anz1); //main 7seg led out
+	if (enanz1);// LOG("ST %d\n",m_ma1);
+	if (enmux1) lamps_w((m_mux1 >> 12) & 0x07, m_mux1 & 0x0FFF); //main lamps out
+	if (enanz2);// LOG("ANZ2 %d\n",m_anz2);
+	if (enmux2);// LOG("MUX2 %d\n",m_mux2);
+	if (aw1) ;
+	if (aw2) ;
+	
 }
 
 void stellafr_state::mux2_w(uint8_t data)
 {
-	bool ma1   = BIT(data,U1_1MA);
-	bool ma2   = BIT(data,U1_2MA);
-	bool me    = BIT(data,U1_ME);
-	bool data3 = BIT(data,U1_D3OUT);
-	bool anz   = BIT(data,U1_ANZ); //main 7seg led out
-	bool mux   = BIT(data,U1_MUX); //main lamps out
-	bool anz2  = BIT(data,U1_ANZME2);
-	bool mux2  = BIT(data,U1_MUX2);
-
-	LOG("\nmux2_w()\n");
-	LOG("1MA      %d\n",ma1);
-	LOG("2MA      %d\n",ma2);
-	LOG("ME       %d\n",me);
-	LOG("Data3OUT %d\n",data3);
-	LOG("ANZ      %d\n",anz);
-	LOG("MUX      %d\n",mux);
-	LOG("ANZ2     %d\n",anz2);
-	LOG("MUX2     %d\n",mux2);
+	// anz goes into one 74hc4094
+	// mux has 2 chained for lamp cols 0 - 11, 3 bits for lz encoded and EnSDAp
+	m_ma1   = (m_ma1   << 1) | BIT(data,U1_1MA);
+	m_ma2   = (m_ma2   << 1) | BIT(data,U1_2MA);
+	m_me    = (m_me    << 1) | BIT(data,U1_ME);
+	m_data3 = (m_data3 << 1) | BIT(data,U1_D3OUT);
+	m_anz1  = (m_anz1  << 1) | BIT(data,U1_ANZ1);
+	m_mux1  = (m_mux1  << 1) | BIT(data,U1_MUX1);
+	m_anz2  = (m_anz2  << 1) | BIT(data,U1_ANZ2);
+	m_mux2  = (m_mux2  << 1) | BIT(data,U1_MUX2);
 }
 
 void stellafr_state::duart_output_w(uint8_t data)
@@ -336,13 +349,14 @@ void stellafr_state::fc7_map(address_map &map)
 void stellafr_state::machine_start()
 {
 	m_digits.resolve();
+	m_lamps.resolve();
 	m_leds.resolve();
-	save_item(NAME(m_mux_data));
+	save_item(NAME(m_mux1));
 }
 
 void stellafr_state::machine_reset()
 {
-	m_mux_data = 0;
+	m_mux1 = 0;
 }
 
 static INPUT_PORTS_START( stellafr )
