@@ -55,6 +55,7 @@ public:
 	{ }
 
 	void bbl380(machine_config &config);
+	void bbl380_menuprot(machine_config &config);
 	void bbl380_24mhz(machine_config &config);
 
 private:
@@ -263,9 +264,17 @@ static INPUT_PORTS_START(bbl380)
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("A")
 	PORT_BIT(0x06, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(bbl380_prot)
+	PORT_INCLUDE(bbl380)
+
+	PORT_MODIFY("IN1")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", FUNC(bl_handhelds_menucontrol_device::data_r))
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", FUNC(bl_handhelds_menucontrol_device::status_r))
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 void bbl380_state::bbl380_do_maincpu_config()
@@ -274,7 +283,6 @@ void bbl380_state::bbl380_do_maincpu_config()
 	m_maincpu->in_pa_callback().set_ioport("IN0");
 	m_maincpu->in_pb_callback().set_ioport("IN1");
 	m_maincpu->out_pa_callback().set(FUNC(bbl380_state::output_w));
-	m_maincpu->out_pb_callback().set(FUNC(bbl380_state::output2_w));
 	//m_maincpu->spi_in_callback().set(FUNC(bbl380_state::spi_r)); 	// TODO, hook these up properly
 	//m_maincpu->spi_out_callback().set(FUNC(bbl380_state::spi_w));
 
@@ -304,6 +312,12 @@ void bbl380_state::bbl380(machine_config &config)
 	// LCD controller seems to be either Sitronix ST7735R or (if RDDID bytes match) Ilitek ILI9163C
 	// (SoC's built-in LCDC is unused or nonexistent?)
 	// Several other LCDC models are identified by ragc153 and dphh8630
+}
+
+void bbl380_state::bbl380_menuprot(machine_config &config)
+{
+	bbl380(config);
+	m_maincpu->out_pb_callback().set(FUNC(bbl380_state::output2_w));
 }
 
 void bbl380_state::bbl380_24mhz(machine_config &config)
@@ -436,17 +450,17 @@ CONS( 201?, mc_cb203,      0,       0,      bbl380,   bbl380, bbl380_state, empt
 
 // newer releases (more heavily censored, for export markets?) internal ROM was changed for these
 
-CONS( 201?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 230-in-1 - Model 8630", MACHINE_IMPERFECT_SOUND ) // sometimes sold as PCP
+CONS( 201?, dphh8630,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 230-in-1 - Model 8630", MACHINE_IMPERFECT_SOUND ) // sometimes sold as PCP
 
-CONS( 201?, rhhc152,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Orb", "Retro Handheld Console 152-in-1", MACHINE_IMPERFECT_SOUND ) // looks like a mini GameBoy - 'Over 150 games' on box
+CONS( 201?, rhhc152,       0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Orb", "Retro Handheld Console 152-in-1", MACHINE_IMPERFECT_SOUND ) // looks like a mini GameBoy - 'Over 150 games' on box
 
-CONS( 201?, ragc153,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Orb", "Retro Arcade Game Controller 153-in-1", MACHINE_IMPERFECT_SOUND ) // looks like a Game & Watch
+CONS( 201?, ragc153,       0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Orb", "Retro Arcade Game Controller 153-in-1", MACHINE_IMPERFECT_SOUND ) // looks like a Game & Watch
 
-CONS( 201?, dgun2953,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "dreamGEAR", "My Arcade Gamer Mini 160-in-1 (DGUN-2953)", MACHINE_IMPERFECT_SOUND )
+CONS( 201?, dgun2953,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "dreamGEAR", "My Arcade Gamer Mini 160-in-1 (DGUN-2953)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 201?, arcade10,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Fizz Creations", "Mini Arcade Console (Arcade 10-in-1)", MACHINE_IMPERFECT_SOUND )
+CONS( 201?, arcade10,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Fizz Creations", "Mini Arcade Console (Arcade 10-in-1)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 201?, supreme,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Fizz Creations", "Arcade Classics Mini Handheld Arcade (Supreme 150)", MACHINE_IMPERFECT_SOUND )
+CONS( 201?, supreme,       0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Fizz Creations", "Arcade Classics Mini Handheld Arcade (Supreme 150)", MACHINE_IMPERFECT_SOUND )
 
 // releases with different internal ROM, these currently have rendering issues for unknown reasons
 
@@ -454,9 +468,9 @@ CONS( 201?, supreme,       0,       0,      bbl380,   bbl380, bbl380_state, empt
 CONS( 201?, retro150,      0,       0,      bbl380_24mhz,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1) (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, retro150a,     retro150,0,      bbl380_24mhz,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1) (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // these are for the Japanese market, the ROM is the same between the Pocket Game and Game Computer but the form factor is different.
-CONS( 2019, pg118,         0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Pocket Game / Game Computer", "Pocket Game 118-in-1 / Game Computer 118-in-1", MACHINE_NOT_WORKING )
+CONS( 2019, pg118,         0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Pocket Game / Game Computer", "Pocket Game 118-in-1 / Game Computer 118-in-1", MACHINE_NOT_WORKING )
 // it is unclear if dphh8633 refers to the case style, rather than the software, as the dphh8630 set was also noted as previously being found in an 8633 unit
-CONS( 201?, dphh8633,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 268-in-1 - Model 8633", MACHINE_NOT_WORKING )
+CONS( 201?, dphh8633,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 268-in-1 - Model 8633", MACHINE_NOT_WORKING )
 
 // also has the 0xE4 XOR, also doesn't currently boot, could be yet another internal ROM
 CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet", MACHINE_NOT_WORKING )
