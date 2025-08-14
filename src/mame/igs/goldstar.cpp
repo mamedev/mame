@@ -15751,6 +15751,47 @@ ROM_END
 
 
 /*
+
+  Lucky 8 Lines with Tetris front game.
+
+  Runs on W-4 hardware with a daughterboard with program,
+  a C8051F310 (8051) MCU, a 16l8 PLD, and a 4 DIP switches bank.
+
+*/
+ROM_START( lucky8tet )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w4-tet-p097-9_sub-pcb.u7", 0x00000, 0x10000, CRC(779db23e) SHA1(8a629d0e0bd57268e3b2a89bf1e5ed0d664f13c8) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )  // C8051F310 binary
+	ROM_LOAD( "mcu.bin", 0x0000, 0x054a, CRC(bc70cd9d) SHA1(2edd27b0bb2e846778aacaadd843186097a049a1) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "w45.bin",  0x00000, 0x8000, CRC(9af48a18) SHA1(ca2cc5cb184ee7c849c68bdbb61d1f78d3af6f63) )
+	ROM_LOAD( "w46.bin",  0x08000, 0x8000, CRC(63d851ec) SHA1(feaceada081f32d4161f1e04b10f32584ddf0f3d) )
+	ROM_LOAD( "w47.bin",  0x10000, 0x8000, CRC(f285300a) SHA1(875c19cc50fc870ddd50f731d9bee8b11d15a8d3) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1",  0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2",  0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3",  0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12",   0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "prom4", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "g14", 0x0000, 0x0100, CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+
+/*
 Super Dragon by OCT
 
 PCB is etched
@@ -24677,6 +24718,7 @@ GAMEL( 198?, cmtetrisd,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmt
 GAMEL( 1997, crazybon,   0,        crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 1)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
 GAMEL( 1997, crazybona,  crazybon, crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 2)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon )
 GAMEL( 1997, crazybonb,  crazybon, crazybonb, pkrmast,  cmaster_state,  init_crazybonb, ROT0, "bootleg (TV Games)",      "Crazy Bonus 2002 (Ver. 1, set 3)",                                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS, layout_crazybon ) // F.B. & POKER 94, VER.1 in NVRAM, decryption seems ok, possibly needs proper memory map
+GAMEL( 1988, lucky8tet,  lucky8,   lucky8,    lucky8,   wingco_state,   empty_init,     ROT0, "bootleg",                 "Tetris + New Lucky 8 Lines (W-4 + W4BET-VID sub board with MCU)",          MACHINE_NOT_WORKING,                            layout_lucky8 )
 
 /* other possible stealth sets:
  - cmv4a    ---> see the 1fxx zone. put a bp in 1f9f to see the loop.
