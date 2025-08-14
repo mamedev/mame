@@ -288,17 +288,26 @@ void stellafr_state::mux_w(uint8_t data)
 	bool enanz2 = BIT(data,U5_ENANZ2);
 	bool enmux2 = BIT(data,U5_ENMUX2);
 
-	if (enma1);// LOG("1MA %d\n",m_ma1);
-	if (enma1);// LOG("ME %d\n",m_me);
-	if (enma2);// LOG("2MA %d\n",m_ma2);
-	if (enanz1);// LOG("ANZ1 %d\n",m_anz1); //main 7seg led out
-	if (enanz1);// LOG("ST %d\n",m_ma1);
-	if (enmux1) lamps_w((m_mux1 >> 12) & 0x07, m_mux1 & 0x0FFF); //main lamps out
-	if (enanz2);// LOG("ANZ2 %d\n",m_anz2);
-	if (enmux2);// LOG("MUX2 %d\n",m_mux2);
-	if (aw1) ;
-	if (aw2) ;
-	
+	if (enma1)
+		; // LOG("1MA %d\n",m_ma1);
+	if (enma1)
+		; // LOG("ME %d\n",m_me);
+	if (enma2)
+		; // LOG("2MA %d\n",m_ma2);
+	if (enanz1)
+		; // LOG("ANZ1 %d\n",m_anz1); //main 7seg led out
+	if (enanz1)
+		; // LOG("ST %d\n",m_ma1);
+	if (enmux1)
+		lamps_w((m_mux1 >> 12) & 0x07, m_mux1 & 0x0FFF); //main lamps out
+	if (enanz2)
+		; // LOG("ANZ2 %d\n",m_anz2);
+	if (enmux2)
+		; // LOG("MUX2 %d\n",m_mux2);
+	if (aw1)
+		;
+	if (aw2)
+		;
 }
 
 void stellafr_state::mux2_w(uint8_t data)
