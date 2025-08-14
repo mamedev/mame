@@ -98,6 +98,8 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// internal helpers
+	void set_busrq(int state);
+	void update_bao();
 	void enable();
 	void disable();
 	u8 num_follow() const noexcept { return m_num_follow; }
@@ -156,6 +158,7 @@ private:
 
 	int  m_wait;
 	int  m_waits_extra;
+	int  m_busrq;
 	int  m_busrq_ack;
 	bool m_is_pulse;
 	u8   m_latch;
