@@ -83,14 +83,21 @@ void h8_state::machine_start()
 
 void h8_state::device_config_complete()
 {
-	device_p201_p1_card_interface *p1 = dynamic_cast<device_p201_p1_card_interface *>(m_p1.lookup()->get_card_device());
-	device_p201_p2_card_interface *p2 = dynamic_cast<device_p201_p2_card_interface *>(m_p2.lookup()->get_card_device());
+	auto p1_lookup = m_p1.lookup()->get_card_device();
+	auto p2_lookup = m_p2.lookup()->get_card_device();
 
-	p1->p201_reset_cb().set(*p2, FUNC(device_p201_p2_card_interface::p201_reset_w));
-	p1->p201_int1_cb().set(*p2, FUNC(device_p201_p2_card_interface::p201_int1_w));
-	p1->p201_int2_cb().set(*p2, FUNC(device_p201_p2_card_interface::p201_int2_w));
+	// avoid crash when there isn't a card installed in either slot.
+	if (p1_lookup && p2_lookup)
+	{
+		device_p201_p1_card_interface *p1 = dynamic_cast<device_p201_p1_card_interface *>(p1_lookup);
+		device_p201_p2_card_interface *p2 = dynamic_cast<device_p201_p2_card_interface *>(p2_lookup);
 
-	p2->p201_inte_cb().set(*p1, FUNC(device_p201_p1_card_interface::p201_inte_w));
+		p1->p201_reset_cb().set(*p2, FUNC(device_p201_p2_card_interface::p201_reset_w));
+		p1->p201_int1_cb().set(*p2, FUNC(device_p201_p2_card_interface::p201_int1_w));
+		p1->p201_int2_cb().set(*p2, FUNC(device_p201_p2_card_interface::p201_int2_w));
+
+		p2->p201_inte_cb().set(*p1, FUNC(device_p201_p1_card_interface::p201_inte_w));
+	}
 }
 
 void h8_state::h8(machine_config &config)

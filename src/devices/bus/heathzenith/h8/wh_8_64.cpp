@@ -41,9 +41,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	std::vector<int> get_addr(u8 sw);
-
-	void install_mem_bank(u8 bank);
+	std::vector<int> get_addr(u8 sw) ATTR_COLD;
+	void install_mem_bank(u8 bank) ATTR_COLD;
 
 	bool m_installed;
 
@@ -75,21 +74,12 @@ void wh_8_64_device::device_reset()
 	{
 		ioport_value const config(m_config->read());
 
-		if (BIT(config, 0))
+		for (int i = 0; i < 4; i++)
 		{
-			install_mem_bank(0);
-		}
-		if (BIT(config, 1))
-		{
-			install_mem_bank(1);
-		}
-		if (BIT(config, 2))
-		{
-			install_mem_bank(2);
-		}
-		if (BIT(config, 3))
-		{
-			install_mem_bank(3);
+			if (BIT(config, i))
+			{
+				install_mem_bank(i);
+			}
 		}
 
 		m_installed = true;
@@ -102,7 +92,8 @@ std::vector<int> wh_8_64_device::get_addr(u8 sw)
 
 	u8 sw_value = m_sw[sw]->read();
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++)
+	{
 		if (BIT(sw_value, i))
 		{
 			result.push_back(i * 0x2000);
