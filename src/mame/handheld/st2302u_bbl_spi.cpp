@@ -55,10 +55,13 @@ public:
 	{ }
 
 	void bbl380(machine_config &config);
+	void bbl380_24mhz(machine_config &config);
 
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void bbl380_do_maincpu_config();
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -265,27 +268,28 @@ static INPUT_PORTS_START(bbl380)
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-void bbl380_state::bbl380(machine_config &config)
+void bbl380_state::bbl380_do_maincpu_config()
 {
-	ST2302U(config, m_maincpu, 32000000); // unknown clock; type not confirmed
 	m_maincpu->set_addrmap(AS_DATA, &bbl380_state::bbl380_map);
 	m_maincpu->in_pa_callback().set_ioport("IN0");
 	m_maincpu->in_pb_callback().set_ioport("IN1");
-
-
 	m_maincpu->out_pa_callback().set(FUNC(bbl380_state::output_w));
 	m_maincpu->out_pb_callback().set(FUNC(bbl380_state::output2_w));
-	// TODO, hook these up properly
-	//m_maincpu->spi_in_callback().set(FUNC(bbl380_state::spi_r));
+	//m_maincpu->spi_in_callback().set(FUNC(bbl380_state::spi_r)); 	// TODO, hook these up properly
 	//m_maincpu->spi_out_callback().set(FUNC(bbl380_state::spi_w));
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
 	m_maincpu->add_route(0, "mono", 1.00);
 	m_maincpu->add_route(1, "mono", 1.00);
 	m_maincpu->add_route(2, "mono", 1.00);
 	m_maincpu->add_route(3, "mono", 1.00);
+}
 
+void bbl380_state::bbl380(machine_config &config)
+{
+	ST2302U(config, m_maincpu, 32000000);  // 32Mhz clock correct for music tempo. SoC type not confirmed
+	SPEAKER(config, "mono").front_center();
+
+	bbl380_do_maincpu_config();
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD); // TFT color LCD
 	m_screen->set_refresh_hz(60);
@@ -300,6 +304,13 @@ void bbl380_state::bbl380(machine_config &config)
 	// LCD controller seems to be either Sitronix ST7735R or (if RDDID bytes match) Ilitek ILI9163C
 	// (SoC's built-in LCDC is unused or nonexistent?)
 	// Several other LCDC models are identified by ragc153 and dphh8630
+}
+
+void bbl380_state::bbl380_24mhz(machine_config &config)
+{
+	bbl380(config);
+	ST2302U(config.replace(), m_maincpu, 24000000); // 24Mhz clock correct for music tempo. SoC type not confirmed
+	bbl380_do_maincpu_config();
 }
 
 // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
@@ -437,13 +448,16 @@ CONS( 201?, arcade10,      0,       0,      bbl380,   bbl380, bbl380_state, empt
 
 CONS( 201?, supreme,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Fizz Creations", "Arcade Classics Mini Handheld Arcade (Supreme 150)", MACHINE_IMPERFECT_SOUND )
 
+// releases with different internal ROM, these currently have rendering issues for unknown reasons
+
+// for the UK market, runs at a slightly slower clock
+CONS( 201?, retro150,      0,       0,      bbl380_24mhz,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1) (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, retro150a,     retro150,0,      bbl380_24mhz,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1) (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // these are for the Japanese market, the ROM is the same between the Pocket Game and Game Computer but the form factor is different.
 CONS( 2019, pg118,         0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Pocket Game / Game Computer", "Pocket Game 118-in-1 / Game Computer 118-in-1", MACHINE_NOT_WORKING )
-// also has the 0xE4 XOR, also doesn't currently boot
-CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet", MACHINE_NOT_WORKING )
-// for the UK market, but doesn't boot either
-CONS( 201?, retro150,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1) (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 201?, retro150a,     retro150,0,      bbl380,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1) (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
 // it is unclear if dphh8633 refers to the case style, rather than the software, as the dphh8630 set was also noted as previously being found in an 8633 unit
 CONS( 201?, dphh8633,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 268-in-1 - Model 8633", MACHINE_NOT_WORKING )
+
+// also has the 0xE4 XOR, also doesn't currently boot, could be yet another internal ROM
+CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet", MACHINE_NOT_WORKING )
+
