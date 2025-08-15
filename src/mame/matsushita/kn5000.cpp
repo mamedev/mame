@@ -95,6 +95,7 @@ public:
 		, m_maincpu_latch(*this, "maincpu_latch")
 		, m_subcpu_latch(*this, "subcpu_latch")
 		, m_fdc(*this, "fdc")
+		, m_com_select(*this, "COM_SELECT")
 		, m_CPL_SEG(*this, "CPL_SEG%u", 0U)
 		, m_CPR_SEG(*this, "CPR_SEG%u", 0U)
 		, m_checking_device_led_cn11(*this, "checking_device_led_cn11")
@@ -114,6 +115,7 @@ private:
 	required_device<generic_latch_8_device> m_maincpu_latch;
 	required_device<generic_latch_8_device> m_subcpu_latch;
 	required_device<upd72067_device> m_fdc;
+	required_ioport m_com_select;
 	required_ioport_array<11> m_CPL_SEG; // buttons on "Control Panel Left" PCB
 	required_ioport_array<11> m_CPR_SEG; // buttons on "Control Panel Right" PCB
 	output_finder<> m_checking_device_led_cn11;
@@ -712,12 +714,12 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 5 = (input) COM.PC1
 	//   bit 6 = (input) COM.MAC
 	//   bit 7 = (input) COM.MIDI
-	// TODO: m_maincpu->portz_read().set([this] {
-	// TODO:    return ioport("COM_SELECT")->read() | (m_sstat << 2);
-	// TODO: });
-	// TODO: m_maincpu->portz_write().set([this] (u8 data) {
-	// TODO:    m_mstat = data & 3;
-	// TODO: });
+	m_maincpu->portz_read().set([this] {
+		return m_com_select->read() | (m_sstat << 2);
+	});
+	m_maincpu->portz_write().set([this] (u8 data) {
+		m_mstat = data & 3;
+	});
 
 
 	// RX0/TX0 = MRXD/MTXD
