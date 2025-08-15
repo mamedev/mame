@@ -1517,9 +1517,10 @@ license:CC0-1.0
 	<!-- Benesse Qpad cartridges -->
 	
 	<software name="gogogoj" supported="no">
-		<description>Go!Go!Go! (Japan)</description>
+		<description>Hirogaru Sekai-e Go! Go! Go! (Japan)</description>
 		<year>2002</year>
 		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="広がる世界へ GO!GO!GO!" />
 		<!-- no obvious serial or label on ROM, 066 (or 990) is stamped on PCB though -->
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x400000">
@@ -1529,9 +1530,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="lgengj" supported="no">
-		<description>Let's Go English! (Japan)</description>
+		<description>Kagayaku Kimi no Mirai-e Let's Go English! (Japan)</description>
 		<year>2003</year>
 		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="輝くキミの未来へ Let's Go English!" />
 		<!-- no obvious serial or label anywhere -->
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<dataarea name="rom" size="0x400000">

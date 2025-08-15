@@ -477,12 +477,16 @@ CONS( 200?, arcadege,           0,        0,      gpl32612, gpl32612, generalplu
 CONS( 2020, airobo,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Benesse Corporation",        "Gakushuu Ouen AI Miracle Robo",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPE13101A
+// たまごっち みーつ  (there appear to be many units in this series, ROM data could differ, this was from a light blue 'hearts and rainbows' themed unit with no subtitles)
 CONS( 2018, tamameet,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tamagotchi Meets (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses a glob CPU
+// ちいかわラーニングパソコン
 CONS( 2021, chiikpc,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Chiikawa Learning PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses a glob CPU
-CONS( 2020, saikyopc,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Saikyououzukan Learning PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// 学びの最強王になれ! 最強王図鑑パソコン
+CONS( 2020, saikyopc,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Manabi no Sai-Kyo-Oh ni Nare! Sai-Kyo-Oh Zukan PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-CONS( 2020, tmydistb,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Tomy",        "Disney Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// ディズニー&ディズニー／ピクサーキャラクターズ できた!がいっぱい ドリームトイパッド
+CONS( 2020, tmydistb,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Tomy",          "Disney & Disney/Pixar Characters Dekita! ga Ippai Dream Toy Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
