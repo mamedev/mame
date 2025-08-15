@@ -1872,13 +1872,11 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			break;
 
 		case 0x54:  // set page 1
-			m_video->page2_w(false);
 			m_video->scr_w(0);
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
-			m_video->page2_w(true);
 			m_video->scr_w(1);
 			auxbank_update();
 			break;
