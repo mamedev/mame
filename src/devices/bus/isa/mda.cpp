@@ -466,7 +466,7 @@ MC6845_UPDATE_ROW(isa8_hercules_device::update_row)
 	if (m_mode & MODE_GFX)
 	{
 		// graphics, 720x348 pixels, 2 x 32KiB pages
-		u8 const *vram = &m_vram[((m_mode & MODE_PG1) ? 0x8000 : 0x0000) | ((ra & 0x03) << 13) + ma * 2];
+		u8 const *vram = &m_vram[((m_mode & MODE_PG1) ? 0x8000 : 0x0000) | (((ra & 0x03) << 13) + ma * 2)];
 		u32 *pixel = &bitmap.pix(y);
 
 		for (int i = 0; i < x_count; i++)
