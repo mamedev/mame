@@ -1235,24 +1235,24 @@ ROM_END
 
 ROM_START( sgaltropa )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "10.3s", 0x0000, 0x4000, CRC(81377872) SHA1(d0c3d81b170ef468bf74f4dd82ef3348359ac511) )
-	ROM_LOAD( "9.3r",  0x4000, 0x4000, CRC(af9fc41e) SHA1(ebb44a5f51cf82ce9aef88f1c9fd85168d75f21b) )
+	ROM_LOAD( "m10.3s", 0x0000, 0x4000, CRC(81377872) SHA1(d0c3d81b170ef468bf74f4dd82ef3348359ac511) )
+	ROM_LOAD( "m9.3r",  0x4000, 0x4000, CRC(af9fc41e) SHA1(ebb44a5f51cf82ce9aef88f1c9fd85168d75f21b) )
 
 	ROM_REGION( 0x4000, "subrom", 0 )
-	ROM_LOAD( "1.3a",  0x0000, 0x4000, CRC(e3c0afa4) SHA1(a2d7046966abffeb94670feb744e855e4722fa02) )
+	ROM_LOAD( "m1dot.3a", 0x0000, 0x4000, CRC(e3c0afa4) SHA1(a2d7046966abffeb94670feb744e855e4722fa02) )
 
 	ROM_REGION( 0xc000, "samples", 0 )
-	ROM_LOAD( "2.3b",  0x4000, 0x4000, CRC(1723d18d) SHA1(8447c8838941559e5496d2e0834884c27a46375c) )
-	ROM_LOAD( "3.3c",  0x8000, 0x4000, CRC(cdb2057b) SHA1(e60b46813e082ede0694f28f0c2c7a7fdf323ac9) )
+	ROM_LOAD( "m2.3b", 0x4000, 0x4000, CRC(1723d18d) SHA1(8447c8838941559e5496d2e0834884c27a46375c) )
+	ROM_LOAD( "m3.3c", 0x8000, 0x4000, CRC(cdb2057b) SHA1(e60b46813e082ede0694f28f0c2c7a7fdf323ac9) )
 
 	ROM_REGION( 0x80000, "gfx", ROMREGION_ERASEFF )
-	ROM_LOAD( "4.3e",  0x00000, 0x08000, CRC(e10a3c91) SHA1(f77f85527afd59d57cd9cf1deb68c22e35722c78) )
-	ROM_LOAD( "7.3k",  0x10000, 0x08000, CRC(bd76eb88) SHA1(43cc8269a539153601619381c5dd0c50dd8d6a00) )
-	ROM_LOAD( "5.3f",  0x20000, 0x08000, CRC(c18c06fc) SHA1(18e57a5016eecf5da4a09b9182c99ee82f11c22c) )
+	ROM_LOAD( "m4.3e", 0x00000, 0x08000, CRC(e10a3c91) SHA1(f77f85527afd59d57cd9cf1deb68c22e35722c78) )
+	ROM_LOAD( "m7.3k", 0x10000, 0x08000, CRC(bd76eb88) SHA1(43cc8269a539153601619381c5dd0c50dd8d6a00) )
+	ROM_LOAD( "m5.3f", 0x20000, 0x08000, CRC(c18c06fc) SHA1(18e57a5016eecf5da4a09b9182c99ee82f11c22c) )
 	// next two are unconfirmed
-	ROM_LOAD( "6.3h",  0x30000, 0x08000, CRC(571e5f93) SHA1(ef9e27a2121a0d63ac9aa5e4168c73c39d06c60a) )
+	ROM_LOAD( "m6.3h", 0x30000, 0x08000, CRC(571e5f93) SHA1(ef9e27a2121a0d63ac9aa5e4168c73c39d06c60a) )
 	ROM_RELOAD(        0x08000, 0x08000 ) // attract mode, after a demo match
-	ROM_LOAD( "8.3n",  0x40000, 0x08000, CRC(5029a16f) SHA1(a89ac8283b3e487d9be5f1a8a1e37ba0bf0cd654) )
+	ROM_LOAD( "m8.3n", 0x40000, 0x08000, CRC(5029a16f) SHA1(a89ac8283b3e487d9be5f1a8a1e37ba0bf0cd654) )
 	ROM_RELOAD(        0x18000, 0x08000 ) // gal select
 	// debug code, to be removed at some point
 	ROM_FILL(          0x28000, 0x08000, 0x33 )
@@ -1336,15 +1336,15 @@ void nightgal_state::init_ngalsumr()
 
 
 /* Type 1 HW */
-GAME( 1984, nightgal, 0,        royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ナイトギャル
-GAME( 1984, ngtbunny, 0,        royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ナイトバニー
-GAME( 1984, royalngt, ngtbunny, royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Royal Denshi", "Royal Night (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ロイヤルナイト
-GAME( 1984, royalqn,  0,        royalqn,  sexygal, nightgal_state, init_royalqn,  ROT0, "Royal Denshi", "Royal Queen (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ロイヤルクイーン
+GAME( 1984, nightgal,  0,        royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ナイトギャル
+GAME( 1984, ngtbunny,  0,        royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ナイトバニー
+GAME( 1984, royalngt,  ngtbunny, royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Royal Denshi", "Royal Night (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ロイヤルナイト
+GAME( 1984, royalqn,   0,        royalqn,  sexygal, nightgal_state, init_royalqn,  ROT0, "Royal Denshi", "Royal Queen (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ロイヤルクイーン
 /* Type 2 HW */
-GAME( 1985, sexygal,  0,        sexygal,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // セクシーギャル
-GAME( 1985, sweetgal, sexygal,  sweetgal, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // スイートギャル
+GAME( 1985, sexygal,   0,        sexygal,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // セクシーギャル
+GAME( 1985, sweetgal,  sexygal,  sweetgal, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // スイートギャル
 /* Type 3 HW */
-GAME( 1985, ngalsumr, 0,        ngalsumr, sexygal, nightgal_state, init_ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer (Japan 850702 NGS 0-01)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // ナイトギャルサマー
+GAME( 1985, ngalsumr,  0,        ngalsumr, sexygal, nightgal_state, init_ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer (Japan 850702 NGS 0-01)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // ナイトギャルサマー
 /* Type 4 HW */
-GAME( 1985, sgaltrop, 0,        sgaltrop, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal Tropical (Japan 850805 SXG T-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sgaltropa,sgaltrop,        sgaltrop, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal Tropical (Japan 85080a5 SXG T-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sgaltrop,  0,        sgaltrop, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal Tropical (Japan 850805 SXG T-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sgaltropa, sgaltrop, sgaltrop, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal Tropical (Japan 850715 SXG T-01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
