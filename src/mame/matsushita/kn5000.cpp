@@ -649,7 +649,7 @@ void kn5000_state::kn5000(machine_config &config)
 
 	// MAINCPU PORT 7:
 	//   bit 5 (~BUSRQ pin): RY/~BY pin of maincpu ROMs
-	m_maincpu->port7_read().set([] { return (1 << 5); }); // checked at EF3735 (v10 ROM)
+	m_maincpu->port7_read().set_constant(1 << 5); // checked at EF3735 (v10 ROM)
 
 
 	// MAINCPU PORT 8:
