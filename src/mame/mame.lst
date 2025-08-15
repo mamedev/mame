@@ -37267,6 +37267,9 @@ videopacp
 p2000m
 p2000t
 
+@source:philips/patgen.cpp
+pm5644g913
+
 @source:philips/philipsbo.cpp
 pbo
 
