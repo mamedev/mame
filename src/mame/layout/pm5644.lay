@@ -18,9 +18,9 @@
 
 
     <view name="Internal Layout">
-        <bounds left="0" right="100" top="0" bottom="40" />
+        <bounds left="0" right="20" top="0" bottom="5" />
         <element ref="background">
-            <bounds left="0" right="170" top="0" bottom="40" />
+            <bounds left="0" right="20" top="0" bottom="5" />
         </element>
 
         <repeat count="8">
@@ -28,7 +28,7 @@
             <param name="x" start="0" increment="2" />
             <repeat count="3">
                 <param name="r" start="0" increment="1" />
-                <param name="y" start="10" increment="2" />
+                <param name="y" start="0" increment="2" />
                 <element name="led~r~~c~" ref="ledr">
                     <bounds x="~x~" y="~y~" width="1" height="1" />
                 </element>
