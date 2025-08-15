@@ -11265,7 +11265,7 @@ u8 lostreas_state::read_k()
 // inputs
 
 /* physical button layout and labels are like this:
-  (note: Canadian version differs slightly to accomodoate dual-language)
+  (note: Canadian version differs slightly to accommodate dual-language)
 
     [N-S(gold)]    [1] [2] [3]    [AIR]
     [E-W(gold)]    [4] [5] [6]    [UP]
