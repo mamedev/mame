@@ -3206,7 +3206,7 @@ static INPUT_PORTS_START( cmv4_dsw2 )
 	PORT_DIPSETTING(    0x10, "500" )
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "Unlimited" )
-	PORT_DIPNAME( 0x20, 0x02, "100+ Odds Sound" )           PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "100+ Odds Sound" )           PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Key In Type" )               PORT_DIPLOCATION("DSW2:7")
@@ -23520,7 +23520,7 @@ void wingco_state::init_lucky8p()
 void wingco_state::init_lucky8r()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	
+
 	// bypass protection
 	rom[0x4340] = 0x20;
 	rom[0x4364] = 0x08;
@@ -23534,7 +23534,7 @@ void wingco_state::init_lucky8r()
 void wingco_state::init_lucky8s()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	
+
 	// bypass protection
 	rom[0x4772] = 0x08;
 	rom[0x47a8] = 0x02;

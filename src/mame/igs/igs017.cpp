@@ -3694,7 +3694,7 @@ static INPUT_PORTS_START( mgcs )
 	PORT_DIPNAME( 0x10, 0x10, "Credit Limit" )                          PORT_DIPLOCATION("SW1:5")     // 進分上限
 	PORT_DIPSETTING(    0x10, "500" )
 	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x80, 0x03, "Double Up Jackpot" )                     PORT_DIPLOCATION("SW1:8")     // 比倍爆機
+	PORT_DIPNAME( 0x80, 0x80, "Double Up Jackpot" )                     PORT_DIPLOCATION("SW1:8")     // 比倍爆機
 	PORT_DIPSETTING(    0x80, "1000" )
 	PORT_DIPSETTING(    0x00, "2000" )
 
