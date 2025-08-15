@@ -531,7 +531,6 @@ template <a2_video_device::model Model, bool Invert, bool Flip>
 void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	uint8_t const *const aux_page = m_aux_ptr ? m_aux_ptr : m_ram_ptr;
-
 	uint32_t const start_address = use_page_2() ? 0x0800 : 0x0400;
 
 	beginrow = (std::max)(beginrow, cliprect.top());
@@ -592,6 +591,8 @@ template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, t
 
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
+	unsigned const start_address = use_page_2() ? 0x4000 : 0x2000;
+
 	beginrow = (std::max)(beginrow, cliprect.top());
 	endrow = (std::min)(endrow, cliprect.bottom());
 	int const startcol = (cliprect.left() / 14);
@@ -599,8 +600,6 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	// B&W/Green/Amber monitor, CEC mono HGR mode, or IIgs $C021 monochrome HGR
 	bool const monochrome = monochrome_monitor() || m_monohgr || (m_monochrome & 0x80);
-
-	unsigned const start_address = use_page_2() ? 0x4000 : 0x2000;
 
 	// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
 	uint8_t const bit7_mask = m_dhires ? 0 : 0x80;
@@ -648,13 +647,13 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	int const page = use_page_2() ? 0x4000 : 0x2000;
 	int const rgbmode = rgb_monitor() ? m_rgbmode : -1;
 
-	// B&W/Green/Amber monitor, IIgs force-monochrome-DHR setting, or IIe RGB card monochrome DHR
-	bool const monochrome = monochrome_monitor() || (m_newvideo & 0x20) || rgbmode == 0;
-
 	beginrow = (std::max)(beginrow, cliprect.top());
 	endrow = (std::min)(endrow, cliprect.bottom());
 	int const startcol = (cliprect.left() / 14);
 	int const stopcol = (cliprect.right() / 14) + 1;
+
+	// B&W/Green/Amber monitor, IIgs force-monochrome-DHR setting, or IIe RGB card monochrome DHR
+	bool const monochrome = monochrome_monitor() || (m_newvideo & 0x20) || rgbmode == 0;
 
 	uint8_t const *const vram = &m_ram_ptr[page];
 	uint8_t const *const vaux = (m_aux_ptr ? m_aux_ptr : vram) + page;
