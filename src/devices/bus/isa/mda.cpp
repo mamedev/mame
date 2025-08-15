@@ -112,23 +112,14 @@ static std::tuple<unsigned, unsigned> decode_colors(u8 att, bool const blink)
 	case 0x88:
 		// no display
 		return std::tuple<unsigned, unsigned>(0, 0);
-		break;
 	case 0x70:
+	case 0x78:
 		// reverse: black on green
 		return std::tuple<unsigned, unsigned>(0, 2);
-		break;
-	case 0x78:
-		// reverse: dark green on green
-		return std::tuple<unsigned, unsigned>(1, 2);
-		break;
 	case 0xf0:
+	case 0xf8:
 		// reverse: black on bright green (or green if blinking enabled)
 		return std::tuple<unsigned, unsigned>(0, blink ? 2 : 3);
-		break;
-	case 0xf8:
-		// reverse: dark green on bright green (or green if blinking enabled)
-		return std::tuple<unsigned, unsigned>(1, blink ? 2 : 3);
-		break;
 	default:
 		// default: green or bright green on black
 		return std::tuple<unsigned, unsigned>(BIT(att, 3) ? 3 : 2, 0);
