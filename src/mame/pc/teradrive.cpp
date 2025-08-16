@@ -14,7 +14,7 @@ References:
 - https://www.youtube.com/watch?v=yjg3gmTo4WA
 
 NOTES (PC side):
-- F1 at POST will bring a setup menu (currently locked?);
+- F1 at POST will bring a setup menu;
 
 NOTES (MD side):
 - 16 KiB of Z80 RAM (vs. 8 of stock)
@@ -23,9 +23,12 @@ NOTES (MD side):
 - has discrete YM3438 in place of YM2612
 
 TODO:
-- Many unknown ports;
-- Pulls VGA EGASW low (PR11) after setup mode, causing mono colors (shared issue with megapc);
-- "TIMER FAIL" when exiting from setup menu;
+- keyboard issues on Sega menu (hold arrow and press enter to go to floppy loading);
+- "TIMER FAIL" when exiting from setup menu (keyboard?);
+- RAM size always gets detected as 2560K;
+- Quadtel EMM driver fails recognizing WD76C10 chipset with j4.0 driver disk;
+- doesn't recognize HDD mounted (insthdd.bat fails on chkdsk, BIOS can't read existing HDD images)
+  Attached disk is a WDL-330PS with no geometry info available;
 - MD side, as a testbed for rewriting base HW;
 
 **************************************************************************************************/
@@ -270,8 +273,6 @@ void teradrive_state::at_softlists(machine_config &config)
 void teradrive_state::x86_map(address_map &map)
 {
 	map.unmap_value_high();
-	// map(0x000ce000, 0x000cffff) bus switch memory window (in ISA space)
-	//map(0x000ce000, 0x000cffff).rom().region("romdisk", 0);
 }
 
 void teradrive_state::x86_io(address_map &map)
@@ -415,7 +416,7 @@ void teradrive_state::teradrive(machine_config &config)
 	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "wd90c11_lr", true);
 	ISA16_SLOT(config, "board6", 0, "isabus", teradrive_isa_cards, "bus_switch", true).set_option_machine_config("bus_switch", romdisk_config);
 
-	// 2.5MB is the max
+	// 2.5MB is the max allowed by the BIOS (even if WD chipset can do more)
 	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("640K,2688K");
 
 	SPEAKER(config, "mono").front_center();
@@ -440,6 +441,21 @@ ROM_START( teradrive )
 	ROM_LOAD( "tera_tmss.bin", 0x0000,  0x1000, CRC(424a9d11) SHA1(1c470a9a8d0b211c5feea1c1c2376aa1f7934b16) )
 ROM_END
 
+ROM_START( teradrive3 )
+	// TODO: may just be a BIOS dump that needs to be trimmed
+	ROM_REGION(0x80000, "rawbios", 0)
+	ROM_LOAD( "model3.bin", 0x00000, 0x80000, CRC(dc757cb3) SHA1(c1489cc2d554fc62f986464604f7f7fbb219b438))
+
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_COPY("rawbios", 0x60000, 0x00000, 0x20000)
+
+	ROM_REGION16_LE(0x200000, "board6:romdisk", ROMREGION_ERASEFF)
+	// contains bootable PC-DOS 3.x + a MENU.EXE
+	ROM_LOAD( "tru-27c800.bin", 0x00000, 0x100000,  CRC(c2fe9c9e) SHA1(06ec0461dab425f41fb5c3892d9beaa8fa53bbf1))
+ROM_END
+
+
 } // anonymous namespace
 
-COMP( 1991, teradrive, 0, 0,       teradrive, 0, teradrive_state, empty_init, "Sega / International Business Machines", "Teradrive (Japan)", MACHINE_NOT_WORKING )
+COMP( 1991, teradrive,  0,         0,       teradrive, 0, teradrive_state, empty_init, "Sega / International Business Machines", "Teradrive (Japan, Model 2)", MACHINE_NOT_WORKING )
+COMP( 1991, teradrive3, teradrive, 0,       teradrive, 0, teradrive_state, empty_init, "Sega / International Business Machines", "Teradrive (Japan, Model 3)", MACHINE_NOT_WORKING )
