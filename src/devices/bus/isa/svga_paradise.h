@@ -21,15 +21,16 @@ public:
 	// construction/destruction
 	isa16_pvga1a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void remap(int space_id, offs_t start, offs_t end) override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	void io_isa_map(address_map &map) ATTR_COLD;
 
@@ -37,6 +38,7 @@ private:
 	required_device<pvga1a_vga_device> m_vga;
 };
 
+// TODO: exists in isa8 format too
 class isa16_pvga1a_jk_device :
 		public device_t,
 		public device_isa16_card_interface
@@ -48,10 +50,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	void io_isa_map(address_map &map) ATTR_COLD;
 
@@ -70,10 +75,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	void io_isa_map(address_map &map) ATTR_COLD;
 
@@ -95,10 +103,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	void io_isa_map(address_map &map) ATTR_COLD;
 
@@ -117,11 +128,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 	void io_isa_map(address_map &map) ATTR_COLD;
 
 private:
@@ -139,11 +152,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 	void io_isa_map(address_map &map) ATTR_COLD;
 
 private:
@@ -158,16 +173,16 @@ public:
 	// construction/destruction
 	isa16_wd90c31_lr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void remap(int space_id, offs_t start, offs_t end) override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 	void io_isa_map(address_map &map) ATTR_COLD;
 
 private:
@@ -185,11 +200,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 	void io_isa_map(address_map &map) ATTR_COLD;
 
 private:
@@ -207,11 +224,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 	void io_isa_map(address_map &map) ATTR_COLD;
 
 private:
@@ -229,11 +248,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 	void io_isa_map(address_map &map) ATTR_COLD;
 
 private:
