@@ -27,7 +27,7 @@ TODO:
 - "TIMER FAIL" when exiting from setup menu (keyboard?);
 - RAM size always gets detected as 2560K;
 - Quadtel EMM driver fails recognizing WD76C10 chipset with j4.0 driver disk;
-- doesn't recognize HDD mounted (insthdd.bat fails on chkdsk, BIOS can't read existing HDD images)
+- Cannot HDD format with floppy insthdd.bat, cannot boot from HDD (needs floppy first).
   Attached disk is a WDL-330PS with no geometry info available;
 - MD side, as a testbed for rewriting base HW;
 
@@ -410,11 +410,13 @@ void teradrive_state::teradrive(machine_config &config)
 	// WD76C20
 	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdcsmc", true);
 	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
-	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "ide", true);
+	// TODO: should be ST-506 option, not IDE
+	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "side116", true);
 	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
 	// TODO: really WD90C10
 	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "wd90c11_lr", true);
 	ISA16_SLOT(config, "board6", 0, "isabus", teradrive_isa_cards, "bus_switch", true).set_option_machine_config("bus_switch", romdisk_config);
+	ISA16_SLOT(config, "isa1",   0, "isabus", pc_isa16_cards, nullptr, false);
 
 	// 2.5MB is the max allowed by the BIOS (even if WD chipset can do more)
 	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("640K,2688K");
