@@ -15,20 +15,18 @@ V109 Y Luminance
 V201 V Chrominance
 V203 V Chrominance
 V301 U Chrominance
-V303 U Chromninance
+V303 U Chrominance
 
+TODO: add GAL logic to route the ROMs to the DAC and output that onto a screen
 */
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/saa1043.h"
 
-#include "speaker.h"
-
 #include "pm5644.lh"
 
-#define VERBOSE 1
-//#define LOG_OUTPUT_FUNC osd_printf_info
+//#define VERBOSE 1
 #include "logmacro.h"
 
 namespace {
@@ -213,8 +211,6 @@ void patgen_state::patgen(machine_config &config)
 
 	saa1043_device &saa1043(SAA1043(config, "saa1043", XTAL(5'000'000)));
 	saa1043.ri_callback().set_inputline(m_maincpu, MCS51_INT1_LINE);
-
-	SPEAKER(config, "mono").front_center();
 
 	config.set_default_layout(layout_pm5644);
 }
@@ -413,10 +409,10 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 1989, pm5644g00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL-G 4:3 Colour Circle)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-SYST( 1989, pm5644g913,  0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL-G 4:3 Indian Head)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-SYST( 1989, pm5644g924,  0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL 16:9 Colour Circle Rev 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-SYST( 1989, pm5644g924b, pm5644g924,  0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL 16:9 Colour Circle Rev 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-SYST( 1989, pm5644l00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (SECAM 4:3 Colour Circle)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-SYST( 1989, pm5644m00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (NTSC 4:3 Colour Circle)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-SYST( 1989, pm5644p00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL-M 4:3 Colour Circle)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST( 1989, pm5644g00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL-G 4:3 Colour Circle)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+SYST( 1989, pm5644g913,  0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL-G 4:3 Indian Head)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+SYST( 1989, pm5644g924,  0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL 16:9 Colour Circle Rev 1)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+SYST( 1989, pm5644g924b, pm5644g924,  0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL 16:9 Colour Circle Rev 2)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+SYST( 1989, pm5644l00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (SECAM 4:3 Colour Circle)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+SYST( 1989, pm5644m00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (NTSC 4:3 Colour Circle)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+SYST( 1989, pm5644p00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL-M 4:3 Colour Circle)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
