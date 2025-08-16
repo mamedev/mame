@@ -1081,6 +1081,7 @@ void wd_fdc_device_base::interrupt_start()
 		// when a force interrupt command is issued and there is no
 		// currently running command, return the status type 1 bits
 		status_type_1 = true;
+		drop_drq();
 	}
 
 	intrq_cond = command & 0x0f;
