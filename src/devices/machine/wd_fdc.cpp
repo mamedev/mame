@@ -355,8 +355,15 @@ void wd_fdc_device_base::command_end()
 		if (!t_cmd->enabled()) {
 			status &= ~S_BUSY;
 		}
-		intrq = true;
-		intrq_cb(intrq);
+		// TBD: lost data should probably negate DRQ (and definitely shouldn't inhibit INTRQ), but when exactly?
+		if(drq && (status & S_LOST)) {
+			drq = false;
+			drq_cb(false);
+		}
+		if(!drq) {
+			intrq = true;
+			intrq_cb(intrq);
+		}
 	}
 }
 
@@ -1074,7 +1081,6 @@ void wd_fdc_device_base::interrupt_start()
 		// when a force interrupt command is issued and there is no
 		// currently running command, return the status type 1 bits
 		status_type_1 = true;
-		drop_drq();
 	}
 
 	intrq_cond = command & 0x0f;
@@ -1282,9 +1288,9 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 	else
 	{
 		intrq_cond = 0;
-		drop_drq();
 		// set busy, then set a timer to process the command
 		status |= S_BUSY;
+		drop_drq();
 		delay_cycles(t_cmd, dden ? delay_command_commit*2 : delay_command_commit);
 	}
 }
@@ -2350,6 +2356,11 @@ void wd_fdc_device_base::set_drq()
 void wd_fdc_device_base::drop_drq()
 {
 	if(drq) {
+		// HACK: delay INTRQ until last byte is read (should that perhaps inhibit command completion instead?)
+		if(!(status & S_BUSY) && !intrq) {
+			intrq = true;
+			intrq_cb(intrq);
+		}
 		drq = false;
 		drq_cb(false);
 	}
