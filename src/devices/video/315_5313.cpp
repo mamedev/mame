@@ -2264,7 +2264,6 @@ void sega315_5313_device::vdp_handle_scanline_callback(int scanline)
 			m_irq6_on_timer->adjust(attotime::from_ticks(16, clock() / 4));
 			m_irq6_pending = 1;
 			m_vblank_flag = 1;
-
 		}
 
 	//  if (get_scanline_counter() == 0) m_irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
