@@ -225,6 +225,100 @@
   1x 2x36 contacts edge connector.
 
 
+  ------------------------------------------------
+	 Fruit Poker (AMA-8000-2)
+  ------------------------------------------------
+
+  PCB Layout:
+			  ________________________________________________________________________
+			 | |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | |
+   __________| |  |  |  |  |  |  |  |  |36x2 edge connector |  |  |  |  |  |  |  |  | |__________
+  |  _______________________                                                                     |
+  | |   :::::::::::::::::   |                                                                    |
+  | |___________ ___________|                                                                    |
+  |  __________   __________                                                         __________  |
+  | |ULN 2803A | |TD62083AP |                                                       |TD62083AP | |
+  | |__________| |__________|                                                       |__________| |
+  |                                                                                              |
+  |    __________________________    __________________________    __________________________    |
+  |   |        NEC JAPAN         |  |        NEC JAPAN         |  |        NEC JAPAN         |   |
+  |   |        D71055C           |  |        D71055C           |  |        D71055C           |   |
+  |   |        9806LDW08         |  |        9806LDW08         |  |        9806LDW08         |   |
+  |   |                          |  |                          |  |                          |   |
+  |   |__________________________|  |__________________________|  |__________________________|   |
+  |                                                                                              |
+  |      DIP1                                     __________                                     |
+  |   __________                                 |   XTAL   |    _______________                 |
+  |  | 12345678 |                                |  16 Mhz  |   |    KS8001     |                |
+  |  |__________|                                |__________|   |               |                |
+  |                                                             |               |                |
+  |                                                             |_______________|                |
+  |   _________________________            __________________                                    |
+  |  |AMATIC                   |          |                  |             ___   __              |
+  |  |Lfnd. Nr. 98.2400462     |          |      ALTERA      |            | A | |B |             |
+  |  |Type: 80-O               |          |                  |            |___| |__|             |
+  |  |Datum: 13.12.04          |          |    CY7C346B-     |                                   |
+  |  |_________________________|          |      35JC        |      ____                         |
+  |                                       |    F  02 0121    |     /    \                        |
+  |   ___________________                 |     618146       |    |  ?   |     ____              |
+  |  |F.Poker VSwe       |                |                  |    |      |    /    \             |
+  |  |1.74/O/8312        |  __________    |                  |     \____/    | Pot  |            |
+  |  |                   | |HY62256A  |   |                  |               |      |            |
+  |  |___________________| |__________|   |__________________|                \____/             |
+  |                                                                                              |
+  |                                                      __   __   __________                    |
+  |   ___        ____     __________              ___   |D | |E | |HC573A    |                   |
+  |  |SW |      /    \   |DS1236    |            | C |  |  | |  | |__________|     __      __    |
+  |  |   |     | Batt |  |__________|            |   |  |__| |__|                 |  |    |  |   |
+  |  |___|     | ery  |                          |___|                            |H |    |H |   |
+  |             \____/                       __   __   __   __   __   __          |  |    |  |   |
+  |   _______________________               |G | |G | |G | |G | |G | |G |         |  |    |  |   |
+  |  |   :::::::::::::::::   |              |  | |  | |  | |  | |  | |  |         |__|    |__|   |
+  |  |___________ ___________|              |__| |__| |__| |__| |__| |__|                        |
+  |     _______                  __      __                                                      |
+  |    |       |                |  |    |  |                                         _______     |
+  |    |MC68B  |                |J |    |F |                                        |       |    |
+  |    |    45P|   ________     |  |    |  |                                        |       |    |
+  |    |       |  |LS157   |    |  |    |  |    _______    _______    _______       |       |    |
+  |    | 2JR5  |  |________|    |__|    |__|   |       |  |       |  |       |      |       |    |
+  |    |       |              _______          |F.Poker|  |F.Poker|  |F.Poker|      |  IV   |    |
+  |    |       |   ________  |       |   __    |   VSwe|  |   VSwe|  |   VSwe|      |       |    |
+  |    |CTCTAB |  |LS157   | |HY6264A|  |  |   |       |  |       |  |       |      |       |    |
+  |    |  9735 |  |________| | LP-70 |  |F |   |  ZG3  |  |  ZG2  |  |  ZG1  |      |27C1024|    |
+  |    |       |             |       |  |  |   |       |  |       |  |       |      |       |    |
+  |    |       |   ________  | 9814B |  |  |   |       |  |       |  |       |      |       |    |
+  |    |       |  |LS157   | | KOREA |  |__|   |       |  |       |  |       |      |       |    |
+  |    |       |  |________| |       |         |       |  |       |  |       |      |       |    |
+  |    |       |             |       |   __    |       |  |       |  |       |      |       |    |
+  |    |       |   ________  |       |  |I |   |_______|  |_______|  |_______|      |       |    |
+  |    |       |  |LS157   | |       |  |  |                              ______    |       |    |
+  |    |_______|  |________| |_______|  |__|                             |ALS174|   |       |    |
+  |                                                                      |______|   |_______|    |
+  |                                              AMA 8000 - 2 REV. 3                             |
+  |______________________________________________________________________________________________|
+
+  A = Y3014B
+  B = LM358
+  C = 14538B
+  D = HC133
+  E = HC04A
+  F = HC374
+  G = LS194A
+  H = HCT273
+  I = HC174
+  J = 74HC244A
+
+  DIP1:
+   ___________________
+  | ON                |
+  |  _______________  |
+  | |_|_|_|_|_|_|_|_| |
+  | |#|#|#|#|#|#|#|#| |
+  | |_______________| |
+  |  1 2 3 4 5 6 7 8  |
+  |___________________|
+
+
 ***********************************************************************************
 
 
@@ -363,6 +457,10 @@
 
 ***********************************************************************************
 
+
+  [2025/08/08]
+
+  - Added dump for Fruit Poker (V.Swe 1.74) (AMA-8000-2).
 
   [2012/08/15]
 
@@ -986,6 +1084,29 @@ ROM_START( suprstar )
 	ROM_LOAD( "n82s147a.bin", 0x0000, 0x0200, CRC(dfeabd11) SHA1(21e8bbcf4aba5e4d672e5585890baf8c5bc77c98) )
 ROM_END
 
+/*
+  1x 40-pin custom CPU labeled:
+
+     Amatic
+     Lfnd. Nr. 98.2400462
+     Type:     80-O
+     Datum:    13.12.04
+*/
+ROM_START( fpoker )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
+	ROM_LOAD( "f.poker_vswe_1.74-o-8312.i6", 0x00000, 0x40000, CRC(c8c175d6) SHA1(60fb6d1c02bfb6055d1fc4b5b4608ddd1fd59e81) )
+
+	ROM_REGION( 0x180000, "chars", 0 )
+	ROM_LOAD( "f.poker_vswe_zg_1.i17", 0x100000, 0x80000, CRC(c1c64e76) SHA1(58b12ab68953f55021482be5be74883591ae0dc2) )
+	ROM_LOAD( "f.poker_vswe_zg_2.i18", 0x080000, 0x80000, CRC(12193406) SHA1(dc73c610c35520b8e404e6988e816d83babed7d7) )
+	ROM_LOAD( "f.poker_vswe_zg_3.i33", 0x000000, 0x80000, CRC(1983dc06) SHA1(3b72058491ef93bc0d5e37a573132e11fcc753ec) )
+
+	ROM_REGION( 0x20000, "proms", 0 )
+	ROM_LOAD( "iv.i35", 0x00000, 0x20000, CRC(9769e278) SHA1(519078db2e0405e641d66410b42fa5ccd8521c53) )
+ROM_END
+
 
 //******** Multi Game sets ********
 
@@ -1336,6 +1457,7 @@ void amaticmg_state::init_am_mg5hu()
 
 /*     YEAR  NAME      PARENT    MACHINE    INPUT     STATE           INIT              ROT    COMPANY                FULLNAME                        FLAGS                                                                                                                       LAYOUT */
 GAMEL( 1996, suprstar, 0,        amaticmg,  amaticmg, amaticmg_state, init_ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING,                                                                              layout_suprstar )
+GAME(  2004, fpoker,   0,        amaticmg4, amaticmg, amaticmg_state, init_ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Fruit Poker (V.Swe 1.74)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg24,  0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg24a, 0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_1_x, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Stm 2.7)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg3,   0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
