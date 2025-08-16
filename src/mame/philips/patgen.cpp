@@ -413,7 +413,7 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 1989, pm5644g00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL-G 4:3 Colour circle)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST( 1989, pm5644g00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL-G 4:3 Colour Circle)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 SYST( 1989, pm5644g913,  0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL-G 4:3 Indian Head)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 SYST( 1989, pm5644g924,  0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL 16:9 Colour Circle Rev 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 SYST( 1989, pm5644g924b, pm5644g924,  0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL 16:9 Colour Circle Rev 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
