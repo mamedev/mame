@@ -3073,11 +3073,14 @@ Black screen after head/tails, reads at $d68000 (?)
 	</software>
 
 
-<!-- Only Euro is confirmed -->
-	<software name="fatalrew" supported="yes">
+	<!-- Only Euro is confirmed -->
+	<software name="fatalrew" supported="partial">
 		<description>Fatal Rewind (Europe, USA, rev. A)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Crashes with NTSC machines after EOA logo (verify)
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWB SC40X1 REV B"/>
 			<feature name="u1" value="FATAL REWIND FAT04"/>  <!-- location not really marked on PCB, using u1 for consistency -->
