@@ -102,6 +102,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	TIMER_CALLBACK_MEMBER(toggle_ri);
 	TIMER_CALLBACK_MEMBER(toggle_v2);
 
 private:

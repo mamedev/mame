@@ -31,6 +31,7 @@ void saa1043_device::device_start()
 	m_h = attotime::from_ticks(320, clock() * 2);
 	m_line_count = s_line_counts[m_type];
 
+	m_timers[OUT_RI] = timer_alloc(FUNC(saa1043_device::toggle_ri), this);
 	m_timers[OUT_V2] = timer_alloc(FUNC(saa1043_device::toggle_v2), this);
 	m_timers[OUT_V2]->adjust(m_h * 6, 1);
 }
@@ -41,7 +42,17 @@ void saa1043_device::device_reset()
 	{
 		m_outputs[i](CLEAR_LINE);
 	}
+	m_outputs[OUT_RI](ASSERT_LINE);
 	m_outputs[OUT_V2](ASSERT_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(saa1043_device::toggle_ri)
+{
+	m_outputs[OUT_RI](1 - param);
+	if (param)
+		m_timers[OUT_RI]->adjust(m_h * (m_line_count - 9), 0);
+	else
+		m_timers[OUT_RI]->adjust(m_h * 9, 1);
 }
 
 TIMER_CALLBACK_MEMBER(saa1043_device::toggle_v2)

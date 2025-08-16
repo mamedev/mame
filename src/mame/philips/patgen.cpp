@@ -21,6 +21,8 @@ V303 U Chromninance
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/saa1043.h"
+
 #include "speaker.h"
 
 #include "pm5644.lh"
@@ -78,7 +80,7 @@ void patgen_state::i80c31_io(address_map &map)
 
 void patgen_state::i80c31_data(address_map &map)
 {
-	//
+	map(0x000, 0x1FF).ram();
 }
 
 u8 patgen_state::i80c31_p1_r()
@@ -86,8 +88,9 @@ u8 patgen_state::i80c31_p1_r()
 	m_port1 = ioport("DSW")->read();
 	//P1.4 2-WIRE SELECT
 	//P1.5 FIELD1
-	//P1.6 SCL
-	//P1.7 SDA
+	m_port1 = m_port1 | 0xC0;
+	//P1.6 SCL pullup
+	//P1.7 SDA pullup
 	return m_port1;
 }
 
@@ -202,6 +205,9 @@ void patgen_state::patgen(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &patgen_state::i80c31_data);
 	m_maincpu->set_addrmap(AS_IO, &patgen_state::i80c31_io);
 	m_maincpu->port_in_cb<1>().set(FUNC(patgen_state::i80c31_p1_r));
+
+	saa1043_device &saa1043(SAA1043(config, "saa1043", XTAL(5'000'000)));
+	saa1043.ri_callback().set_inputline(m_maincpu, MCS51_INT1_LINE);
 
 	SPEAKER(config, "mono").front_center();
 
