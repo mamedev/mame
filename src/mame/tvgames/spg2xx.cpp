@@ -3370,4 +3370,4 @@ CONS( 2004, spidm2,     0,        0, spg2xx,     spidm2,   spg2xx_game_state,   
 CONS( 2004, dinothun,   0,        0, spg2xx,    spg2xx,    spg2xx_game_state,               empty_init, "N-Vision / Toy Quest",                                "Power Rangers Dino Thunder: Thunder Action", MACHINE_NOT_WORKING )
 
 // this Japan version uses different banking to spg2xx_pdc.cpp so is in here instead
-CONS( 2006, pdcj,       0,        0, pdcj,      pdcj,      spg2xx_game_pdcj_state,          empty_init,   "Conny / Takara",                                    "PDC - Pocket Dream Console (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, pdcj,       0,        0, pdcj,      pdcj,      spg2xx_game_pdcj_state,          empty_init, "Conny / Takara",                                      "PDC - Pocket Dream Console (Japan)", MACHINE_IMPERFECT_SOUND )
