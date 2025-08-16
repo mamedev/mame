@@ -119,7 +119,7 @@ void patgen_state::led_w(offs_t offset, uint8_t data)
 	{
 		uint8_t led_index = ((offset & 0x0F) * 10) + i;
 		bool led_value = BIT(data, i);
-		m_leds[led_index] = led_value;
+		m_leds[led_index] = !led_value;
 	}
 }
 
