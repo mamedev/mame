@@ -127,32 +127,34 @@ video_manager::video_manager(running_machine &machine)
 
 	if (m_snap_native)
 	{
+		using namespace std::literals;
+
 		// the native target is hard-coded to our internal layout and has all options disabled
 		util::xml::file::ptr const root(util::xml::file::create());
 		if (!root)
 			throw emu_fatalerror("Couldn't create XML document??");
-		util::xml::data_node *const layoutnode(root->add_child("mamelayout", nullptr));
+		util::xml::data_node *const layoutnode(root->add_child("mamelayout"sv));
 		if (!layoutnode)
 			throw emu_fatalerror("Couldn't create XML node??");
-		layoutnode->set_attribute_int("version", 2);
+		layoutnode->set_attribute_int("version"sv, 2);
 
 		for (unsigned i = 0; screen_count > i; ++i)
 		{
-			util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
+			util::xml::data_node *const viewnode(layoutnode->add_child("view"sv));
 			if (!viewnode)
 				throw emu_fatalerror("Couldn't create XML node??");
-			viewnode->set_attribute("name", util::string_format("s%1$u", i).c_str());
-			util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
+			viewnode->set_attribute("name"sv, util::string_format("s%1$u", i));
+			util::xml::data_node *const screennode(viewnode->add_child("screen"sv));
 			if (!screennode)
 				throw emu_fatalerror("Couldn't create XML node??");
-			screennode->set_attribute_int("index", i);
-			util::xml::data_node *const boundsnode(screennode->add_child("bounds", nullptr));
+			screennode->set_attribute_int("index"sv, i);
+			util::xml::data_node *const boundsnode(screennode->add_child("bounds"sv));
 			if (!boundsnode)
 				throw emu_fatalerror("Couldn't create XML node??");
-			boundsnode->set_attribute_int("left", 0);
-			boundsnode->set_attribute_int("top", 0);
-			boundsnode->set_attribute_int("right", 1);
-			boundsnode->set_attribute_int("bottom", 1);
+			boundsnode->set_attribute_int("left"sv, 0);
+			boundsnode->set_attribute_int("top"sv, 0);
+			boundsnode->set_attribute_int("right"sv, 1);
+			boundsnode->set_attribute_int("bottom"sv, 1);
 		}
 
 		m_snap_target = machine.render().target_alloc(*root, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);

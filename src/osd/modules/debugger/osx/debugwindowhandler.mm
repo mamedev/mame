@@ -276,7 +276,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	if (m == machine)
 	{
 		util::xml::data_node *parentnode = (util::xml::data_node *)[[[notification userInfo] objectForKey:@"MAMEDebugParentNode"] pointerValue];
-		util::xml::data_node *node = parentnode->add_child(osd::debugger::NODE_WINDOW, nullptr);
+		util::xml::data_node *node = parentnode->add_child(osd::debugger::NODE_WINDOW);
 		if (node)
 			[self saveConfigurationToNode:node];
 	}
@@ -501,8 +501,8 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 - (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
 	[super restoreConfigurationFromNode:node];
 	util::xml::data_node const *const expr = node->get_child(osd::debugger::NODE_WINDOW_EXPRESSION);
-	if (expr && expr->get_value())
-		[self setExpression:[NSString stringWithUTF8String:expr->get_value()]];
+	if (expr && !expr->value().empty())
+		[self setExpression:[NSString stringWithUTF8String:expr->value().c_str()]];
 	[history restoreConfigurationFromNode:node];
 }
 

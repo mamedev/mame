@@ -7,6 +7,8 @@
 
 #include "windowqt.h"
 
+#include <string_view>
+
 
 namespace osd::debugger::qt {
 
@@ -21,7 +23,7 @@ public:
 	DeviceInformationWindow(DebuggerQt &debugger, device_t *device = nullptr, QWidget* parent=nullptr);
 	virtual ~DeviceInformationWindow();
 
-	void set_device(const char *tag);
+	void set_device(std::string_view tag);
 
 	virtual void restoreConfiguration(util::xml::data_node const &node) override;
 

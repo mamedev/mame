@@ -728,9 +728,11 @@ void chain_manager::restore_slider_settings(int32_t id, std::vector<std::vector<
 
 void chain_manager::load_config(util::xml::data_node const &windownode)
 {
+	using namespace std::literals;
+
 	// treat source INI files or more specific as higher priority than CFG
 	// FIXME: leaky abstraction - this depends on a front-end implementation detail
-	bool const persist = windownode.get_attribute_int("persist", 1) != 0;
+	bool const persist = windownode.get_attribute_int("persist"sv, 1) != 0;
 	bool const default_chains = (OPTION_PRIORITY_NORMAL + 5) > m_options.get_entry(OSDOPTION_BGFX_SCREEN_CHAINS)->priority();
 	bool const explicit_chains = !persist && !default_chains && *m_options.bgfx_screen_chains();
 
@@ -744,14 +746,14 @@ void chain_manager::load_config(util::xml::data_node const &windownode)
 	else
 	{
 		bool changed = false;
-		util::xml::data_node const *screennode = windownode.get_child("screen");
+		util::xml::data_node const *screennode = windownode.get_child("screen"sv);
 		while (screennode)
 		{
-			auto const index = screennode->get_attribute_int("index", -1);
+			auto const index = screennode->get_attribute_int("index"sv, -1);
 			if ((0 <= index) && (m_screen_count > index))
 			{
-				char const *const chainname = screennode->get_attribute_string("chain", nullptr);
-				if (chainname)
+				std::string_view const chainname = screennode->get_attribute_string("chain"sv);
+				if (!chainname.empty())
 				{
 					auto const found = std::find_if(
 							m_available_chains.begin(),
@@ -769,7 +771,7 @@ void chain_manager::load_config(util::xml::data_node const &windownode)
 				}
 			}
 
-			screennode = screennode->get_next_sibling("screen");
+			screennode = screennode->get_next_sibling("screen"sv);
 		}
 
 		if (changed)
@@ -777,23 +779,23 @@ void chain_manager::load_config(util::xml::data_node const &windownode)
 	}
 
 	// now apply slider settings for screens with chains matching config
-	util::xml::data_node const *screennode = windownode.get_child("screen");
+	util::xml::data_node const *screennode = windownode.get_child("screen"sv);
 	while (screennode)
 	{
-		auto const index = screennode->get_attribute_int("index", -1);
+		auto const index = screennode->get_attribute_int("index"sv, -1);
 		if ((0 <= index) && (m_screen_count > index) && (m_screen_chains.size() > index))
 		{
 			bgfx_chain *const chain = m_screen_chains[index];
-			char const *const chainname = screennode->get_attribute_string("chain", nullptr);
-			if (chain && chainname && (m_available_chains[m_current_chain[index]].m_name == chainname))
+			std::string_view const chainname = screennode->get_attribute_string("chain"sv);
+			if (chain && !chainname.empty() && (m_available_chains[m_current_chain[index]].m_name == chainname))
 			{
 				auto const &sliders = chain->sliders();
 
-				util::xml::data_node const *slidernode = screennode->get_child("slider");
+				util::xml::data_node const *slidernode = screennode->get_child("slider"sv);
 				while (slidernode)
 				{
-					char const *const slidername = slidernode->get_attribute_string("name", nullptr);
-					if (slidername)
+					std::string_view const slidername = slidernode->get_attribute_string("name"sv);
+					if (!slidername.empty())
 					{
 						auto const found = std::find_if(
 								sliders.begin(),
@@ -808,24 +810,24 @@ void chain_manager::load_config(util::xml::data_node const &windownode)
 							case bgfx_slider::SLIDER_INT:
 								{
 									slider_state const &core = *slider.core_slider();
-									int32_t const val = slidernode->get_attribute_int("value", core.defval);
+									int32_t const val = slidernode->get_attribute_int("value"sv, core.defval);
 									slider.update(nullptr, std::clamp(val, core.minval, core.maxval));
 								}
 								break;
 							default:
 								{
-									float const val = slidernode->get_attribute_float("value", slider.default_value());
+									float const val = slidernode->get_attribute_float("value"sv, slider.default_value());
 									slider.import(std::clamp(val, slider.min_value(), slider.max_value()));
 								}
 							}
 						}
 					}
 
-					slidernode = slidernode->get_next_sibling("slider");
+					slidernode = slidernode->get_next_sibling("slider"sv);
 				}
 			}
 		}
-		screennode = screennode->get_next_sibling("screen");
+		screennode = screennode->get_next_sibling("screen"sv);
 	}
 }
 
@@ -834,8 +836,10 @@ void chain_manager::save_config(util::xml::data_node &parentnode)
 	if (!needs_sliders())
 		return;
 
-	util::xml::data_node *const windownode = parentnode.add_child("window", nullptr);
-	windownode->set_attribute_int("index", m_window_index);
+	using namespace std::literals;
+
+	util::xml::data_node *const windownode = parentnode.add_child("window"sv);
+	windownode->set_attribute_int("index"sv, m_window_index);
 
 	for (size_t index = 0; index < m_screen_chains.size() && index < m_screen_count; index++)
 	{
@@ -843,9 +847,9 @@ void chain_manager::save_config(util::xml::data_node &parentnode)
 		if (!chain)
 			continue;
 
-		util::xml::data_node *const screennode = windownode->add_child("screen", nullptr);
-		screennode->set_attribute_int("index", index);
-		screennode->set_attribute("chain", m_available_chains[m_current_chain[index]].m_name.c_str());
+		util::xml::data_node *const screennode = windownode->add_child("screen"sv);
+		screennode->set_attribute_int("index"sv, index);
+		screennode->set_attribute("chain"sv, m_available_chains[m_current_chain[index]].m_name);
 
 		for (bgfx_slider *slider : chain->sliders())
 		{
@@ -853,16 +857,16 @@ void chain_manager::save_config(util::xml::data_node &parentnode)
 			if (val == slider->core_slider()->defval)
 				continue;
 
-			util::xml::data_node *const slidernode = screennode->add_child("slider", nullptr);
-			slidernode->set_attribute("name", slider->name().c_str());
+			util::xml::data_node *const slidernode = screennode->add_child("slider"sv);
+			slidernode->set_attribute("name"sv, slider->name());
 			switch (slider->type())
 			{
 			case bgfx_slider::SLIDER_INT_ENUM:
 			case bgfx_slider::SLIDER_INT:
-				slidernode->set_attribute_int("value", val);
+				slidernode->set_attribute_int("value"sv, val);
 				break;
 			default:
-				slidernode->set_attribute_float("value", slider->value());
+				slidernode->set_attribute_float("value"sv, slider->value());
 			}
 		}
 	}

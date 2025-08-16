@@ -138,16 +138,17 @@ bool debugger_cpu::comment_save()
 	try
 	{
 		// create a comment node
-		util::xml::data_node *const commentnode = root->add_child("mamecommentfile", nullptr);
+		using namespace std::literals;
+		util::xml::data_node *const commentnode = root->add_child("mamecommentfile"sv);
 		if (commentnode == nullptr)
 			throw emu_exception();
-		commentnode->set_attribute_int("version", COMMENT_VERSION);
+		commentnode->set_attribute_int("version"sv, COMMENT_VERSION);
 
 		// create a system node
-		util::xml::data_node *const systemnode = commentnode->add_child("system", nullptr);
+		util::xml::data_node *const systemnode = commentnode->add_child("system"sv);
 		if (systemnode == nullptr)
 			throw emu_exception();
-		systemnode->set_attribute("name", m_machine.system().name);
+		systemnode->set_attribute("name"sv, m_machine.system().name);
 
 		// for each device
 		bool found_comments = false;
@@ -155,10 +156,10 @@ bool debugger_cpu::comment_save()
 			if (device.debug() && device.debug()->comment_count() > 0)
 			{
 				// create a node for this device
-				util::xml::data_node *const curnode = systemnode->add_child("cpu", nullptr);
+				util::xml::data_node *const curnode = systemnode->add_child("cpu"sv);
 				if (curnode == nullptr)
 					throw emu_exception();
-				curnode->set_attribute("tag", device.tag());
+				curnode->set_attribute("tag"sv, device.tag());
 
 				// export the comments
 				if (!device.debug()->comment_export(*curnode))
@@ -206,30 +207,32 @@ bool debugger_cpu::comment_load(bool is_inline)
 	util::xml::file::ptr const root = util::xml::file::read(file, nullptr);
 	try
 	{
+		using namespace std::literals;
+
 		// read the file
 		if (!root)
 			throw emu_exception();
 
 		// find the config node
-		util::xml::data_node const *const commentnode = root->get_child("mamecommentfile");
+		util::xml::data_node const *const commentnode = root->get_child("mamecommentfile"sv);
 		if (commentnode == nullptr)
 			throw emu_exception();
 
 		// validate the config data version
-		int version = commentnode->get_attribute_int("version", 0);
+		int version = commentnode->get_attribute_int("version"sv, 0);
 		if (version != COMMENT_VERSION)
 			throw emu_exception();
 
 		// check to make sure the file is applicable
-		util::xml::data_node const *const systemnode = commentnode->get_child("system");
-		const char *const name = systemnode->get_attribute_string("name", "");
-		if (strcmp(name, m_machine.system().name) != 0)
+		util::xml::data_node const *const systemnode = commentnode->get_child("system"sv);
+		std::string_view name = systemnode->get_attribute_string("name"sv);
+		if (name != m_machine.system().name)
 			throw emu_exception();
 
 		// iterate over devices
-		for (util::xml::data_node const *cpunode = systemnode->get_child("cpu"); cpunode; cpunode = cpunode->get_next_sibling("cpu"))
+		for (util::xml::data_node const *cpunode = systemnode->get_child("cpu"sv); cpunode; cpunode = cpunode->get_next_sibling("cpu"sv))
 		{
-			const char *cputag_name = cpunode->get_attribute_string("tag", "");
+			std::string_view cputag_name = cpunode->get_attribute_string("tag"sv);
 			device_t *device = m_machine.root_device().subdevice(cputag_name);
 			if (device != nullptr)
 			{
@@ -1751,12 +1754,13 @@ bool device_debug::comment_export(util::xml::data_node &curnode)
 	// iterate through the comments
 	for (const auto & elem : m_comment_set)
 	{
-		util::xml::data_node *datanode = curnode.add_child("comment", elem.m_text.c_str());
+		using namespace std::literals;
+		util::xml::data_node *datanode = curnode.add_child("comment"sv, elem.m_text);
 		if (datanode == nullptr)
 			return false;
-		datanode->set_attribute_int("address", elem.m_address);
-		datanode->set_attribute_int("color", elem.m_color);
-		datanode->set_attribute("crc", string_format("%08X", elem.m_crc).c_str());
+		datanode->set_attribute_int("address"sv, elem.m_address);
+		datanode->set_attribute_int("color"sv, elem.m_color);
+		datanode->set_attribute("crc"sv, util::string_format("%08X", elem.m_crc));
 	}
 	return true;
 }
@@ -1769,21 +1773,24 @@ bool device_debug::comment_export(util::xml::data_node &curnode)
 
 bool device_debug::comment_import(util::xml::data_node const &cpunode, bool is_inline)
 {
+	using namespace std::literals;
+
 	// iterate through nodes
-	for (util::xml::data_node const *datanode = cpunode.get_child("comment"); datanode; datanode = datanode->get_next_sibling("comment"))
+	for (util::xml::data_node const *datanode = cpunode.get_child("comment"sv); datanode; datanode = datanode->get_next_sibling("comment"sv))
 	{
 		// extract attributes
-		offs_t address = datanode->get_attribute_int("address", 0);
-		rgb_t color = datanode->get_attribute_int("color", 0);
+		offs_t address = datanode->get_attribute_int("address"sv, 0);
+		rgb_t color = datanode->get_attribute_int("color"sv, 0);
 
-		u32 crc;
-		sscanf(datanode->get_attribute_string("crc", nullptr), "%08X", &crc);
+		u32 crc = 0;
+		if (std::string const *const crcstr = datanode->get_attribute_string_ptr("crc"sv))
+			sscanf(crcstr->c_str(), "%08X", &crc);
 
 		// add the new comment
 		if(is_inline == true)
-			m_comment_set.insert(dasm_comment(address, crc, datanode->get_value(), color));
+			m_comment_set.insert(dasm_comment(address, crc, datanode->value().c_str(), color));
 		else
-			m_device.machine().debugger().console().printf(" %08X - %s\n", address, datanode->get_value());
+			m_device.machine().debugger().console().printf(" %08X - %s\n", address, datanode->value());
 	}
 	return true;
 }
