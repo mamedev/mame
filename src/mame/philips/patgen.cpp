@@ -47,11 +47,17 @@ private:
 	void i80c31_io(address_map &map) ATTR_COLD;
 	void i80c31_prg(address_map &map) ATTR_COLD;
 
-    void led_w(offs_t offset, uint8_t data);
-	void key_row_w(u8 data);
+	u8 i80c31_p1_r();
 	u8 keyboard_r();
 
-	required_device<cpu_device> m_maincpu;
+    void led_w(offs_t offset, uint8_t data);
+	void control_w(uint8_t data);
+	void ch1_w(uint8_t data);
+	void ch23_w(uint8_t data);
+
+	u8 m_port1;
+
+	required_device<i80c31_device> m_maincpu;
 	output_finder<28> m_leds;
 };
 
@@ -62,14 +68,48 @@ void patgen_state::i80c31_prg(address_map &map)
 
 void patgen_state::i80c31_io(address_map &map)
 {
-    map(0x4000, 0x4002).w(FUNC(patgen_state::led_w));
-    map(0x4000, 0x4000).r(FUNC(patgen_state::keyboard_r));
+	map(0x8000, 0x8000).r(FUNC(patgen_state::keyboard_r));
+
+    map(0x8000, 0x8002).w(FUNC(patgen_state::led_w));
+	map(0x8004, 0x8004).w(FUNC(patgen_state::control_w));
+	map(0x8005, 0x8005).w(FUNC(patgen_state::ch1_w));
+	map(0x8006, 0x8006).w(FUNC(patgen_state::ch23_w));
+    
     //map(0x6000, 0x6000).w(FUNC(patgen_state::sig_latch_w)); // extra latch outputs
 }
 
 void patgen_state::i80c31_data(address_map &map)
 {
 	//map(0x0000, 0x1FFF).ram();
+}
+
+u8 patgen_state::i80c31_p1_r()
+{
+	m_port1 = ioport("DSW")->read();
+	//P1.4 2-WIRE SELECT
+	//P1.5 FIELD1
+	//P1.6 SCL
+	//P1.7 SDA
+	return m_port1;
+}
+
+u8 patgen_state::keyboard_r()
+{
+	u8 col0 = ioport("COL0")->read();
+	u8 col1 = ioport("COL1")->read();
+	u8 col2 = ioport("COL2")->read();
+	u8 col3 = ioport("COL3")->read();
+
+	u8 kb_state = col0 && col1 && col2 && col3;
+
+	if (col1 != 0xFF)
+		kb_state = kb_state & 0xDF;
+	if (col2 != 0xFF)
+		kb_state = kb_state & 0xBF;
+	if (col3 != 0xFF)
+		kb_state = kb_state & 0x7F;
+
+    return kb_state;
 }
 
 void patgen_state::led_w(offs_t offset, uint8_t data)
@@ -82,16 +122,25 @@ void patgen_state::led_w(offs_t offset, uint8_t data)
 	}
 }
 
-u8 patgen_state::keyboard_r()
+void patgen_state::control_w(uint8_t data)
 {
-    u8 kb_state = 0xff;
 
-    return kb_state;
+}
+
+void patgen_state::ch1_w(uint8_t data)
+{
+
+}
+
+void patgen_state::ch23_w(uint8_t data)
+{
+
 }
 
 void patgen_state::machine_start()
 {
 	m_leds.resolve();
+	m_port1 = 0x00;
 }
 
 void patgen_state::machine_reset()
@@ -115,34 +164,34 @@ static INPUT_PORTS_START( patgen )
 	// D7 goes low when 1 5 9 13 17 are pressed
 
 	PORT_START("COL0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S4-A") PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S8-A") PORT_CODE(KEYCODE_8)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S12-A") PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("VERT ID SELECT")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("SW")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S4-A")  PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S8-A")  PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S12-A") PORT_CODE(KEYCODE_C) //unpopulated
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1)  PORT_NAME("VERT ID SELECT")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2)  PORT_NAME("SW")
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("COL1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S3-A") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S7-A") PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S11-A") PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S3-A")  PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S7-A")  PORT_CODE(KEYCODE_7) //unpopulated
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S11-A") PORT_CODE(KEYCODE_B) //unpopulated
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S15-A") PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("COL2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S2-A") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S6-A") PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S10-A") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S14-A") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S16-A") PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S2-A")  PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S6-A")  PORT_CODE(KEYCODE_6) //unpopulated
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S10-A") PORT_CODE(KEYCODE_A) //unpopulated
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S14-A") PORT_CODE(KEYCODE_E) //unpopulated
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S16-A") PORT_CODE(KEYCODE_G) //unpopulated
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("COL3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S1-A") PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S5-A") PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S9-A") PORT_CODE(KEYCODE_9)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S13-A") PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S1-A")  PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S5-A")  PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S9-A")  PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S13-A") PORT_CODE(KEYCODE_D) //unpopulated
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S17-A") PORT_CODE(KEYCODE_H)
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -154,6 +203,7 @@ void patgen_state::patgen(machine_config &config)
     m_maincpu->set_addrmap(AS_PROGRAM, &patgen_state::i80c31_prg);
 	m_maincpu->set_addrmap(AS_DATA, &patgen_state::i80c31_data);
 	m_maincpu->set_addrmap(AS_IO, &patgen_state::i80c31_io);
+	m_maincpu->port_in_cb<1>().set(FUNC(patgen_state::i80c31_p1_r));
 
 	SPEAKER(config, "mono").front_center();
 
