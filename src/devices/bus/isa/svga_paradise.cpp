@@ -384,6 +384,7 @@ void isa16_wd90c11_lr_device::device_add_mconfig(machine_config &config)
 	m_vga->set_vram_size(0x100000);
 	// required by megapc and teradrive for color
 	m_vga->read_cnf15_callback().set_constant(1);
+	m_vga->cnf_write_ddr_callback().set_constant(0x7f);
 }
 
 void isa16_wd90c11_lr_device::io_isa_map(address_map &map)
