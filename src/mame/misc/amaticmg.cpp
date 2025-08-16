@@ -256,7 +256,7 @@
   |   _________________________            __________________                                    |
   |  |AMATIC                   |          |                  |             ___   __              |
   |  |Lfnd. Nr. 98.2400462     |          |      ALTERA      |            | A | |B |             |
-  |  |Type: 80-0               |          |                  |            |___| |__|             |
+  |  |Type: 80-O               |          |                  |            |___| |__|             |
   |  |Datum: 13.12.04          |          |    CY7C346B-     |                                   |
   |  |_________________________|          |      35JC        |      ____                         |
   |                                       |    F  02 0121    |     /    \                        |
@@ -284,7 +284,7 @@
   |    |       |              _______          |F.Poker|  |F.Poker|  |F.Poker|      |  IV   |    |
   |    |       |   ________  |       |   __    |   VSwe|  |   VSwe|  |   VSwe|      |       |    |
   |    |CTCTAB |  |LS157   | |HY6264A|  |  |   |       |  |       |  |       |      |       |    |
-  |    |  9735 |  |________| | LP-70 |  |F |   |  ZG1  |  |  ZG2  |  |  ZG3  |      |27C1024|    |
+  |    |  9735 |  |________| | LP-70 |  |F |   |  ZG3  |  |  ZG2  |  |  ZG1  |      |27C1024|    |
   |    |       |             |       |  |  |   |       |  |       |  |       |      |       |    |
   |    |       |   ________  | 9814B |  |  |   |       |  |       |  |       |      |       |    |
   |    |       |  |LS157   | | KOREA |  |__|   |       |  |       |  |       |      |       |    |
@@ -504,8 +504,6 @@
   - Color decode routines.
   - Remaining sound devices.
   - Hopper as device... ;)
-  - Fruit Poker: Isn't hooked up correctly and decryption is not figured out yet. 
-      Doesn't seem to boot. Stuck at grey screen.
 
 
 ***********************************************************************************/
@@ -1091,7 +1089,7 @@ ROM_END
 
      Amatic
      Lfnd. Nr. 98.2400462
-     Type:     80-0
+     Type:     80-O
      Datum:    13.12.04
 */
 ROM_START( fpoker )
