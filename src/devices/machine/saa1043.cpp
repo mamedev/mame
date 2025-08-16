@@ -32,6 +32,7 @@ void saa1043_device::device_start()
 	m_line_count = s_line_counts[m_type];
 
 	m_timers[OUT_RI] = timer_alloc(FUNC(saa1043_device::toggle_ri), this);
+	m_timers[OUT_RI]->adjust(m_h * 6, 1);
 	m_timers[OUT_V2] = timer_alloc(FUNC(saa1043_device::toggle_v2), this);
 	m_timers[OUT_V2]->adjust(m_h * 6, 1);
 }
