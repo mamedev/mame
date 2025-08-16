@@ -44,7 +44,7 @@
 		</text>
 	</element>
 
-    <element name="button">
+    <element name="button" defstate="0">
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6" />
             <bounds x="0" y="1" width="1" height="1" />
@@ -69,7 +69,7 @@
 		</text>
 	</element>
 
-    <element name="button1">
+    <element name="button1" defstate="0">
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6" />
             <bounds x="0" y="1" width="1" height="1" />
@@ -94,7 +94,7 @@
 		</text>
 	</element>
 
-    <element name="button2">
+    <element name="button2" defstate="0">
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6" />
             <bounds x="0" y="1" width="1" height="1" />
@@ -119,7 +119,7 @@
 		</text>
 	</element>
 
-    <element name="button3">
+    <element name="button3" defstate="0">
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6" />
             <bounds x="0" y="1" width="1" height="1" />
@@ -144,7 +144,7 @@
 		</text>
 	</element>
 
-    <element name="button4">
+    <element name="button4" defstate="0">
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6" />
             <bounds x="0" y="1" width="1" height="1" />
@@ -165,7 +165,7 @@
 		</text>
 	</element>
 
-    <element name="button5">
+    <element name="button5" defstate="0">
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6" />
             <bounds x="0" y="1" width="1" height="1" />
@@ -190,7 +190,7 @@
 		</text>
 	</element>
 
-    <element name="button6">
+    <element name="button6" defstate="0">
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6" />
             <bounds x="0" y="1" width="1" height="1" />
@@ -215,7 +215,7 @@
 		</text>
 	</element>
 
-    <element name="button7">
+    <element name="button7" defstate="0">
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6" />
             <bounds x="0" y="1" width="1" height="1" />
@@ -240,7 +240,7 @@
 		</text>
 	</element>
 
-    <element name="button8">
+    <element name="button8" defstate="0">
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6" />
             <bounds x="0" y="1" width="1" height="1" />
@@ -261,7 +261,7 @@
 		</text>
 	</element>
 
-    <element name="button9">
+    <element name="button9" defstate="0">
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6" />
             <bounds x="0" y="1" width="1" height="1" />
@@ -282,7 +282,7 @@
 		</text>
 	</element>
 
-    <element name="button10">
+    <element name="button10" defstate="0">
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6" />
             <bounds x="0" y="1" width="1" height="1" />
@@ -314,7 +314,7 @@
             <bounds x="1" y="0" width="16" height="1" />
         </element>
 
-        <element name="ledpw" ref="ledg" defstate="1">
+        <element name="ledpw" ref="ledg" defstate="0">
             <bounds x="5" y="2" width="1" height="1" />
         </element>
 
@@ -348,35 +348,35 @@
         </element>
 
 
-        <element name="led00" inputtag="COL3" inputmask="0x01" ref="button1">
+        <element name="led0" inputtag="COL3" inputmask="0x01" ref="button1">
             <bounds x="24" y="1" width="1" height="2" />
         </element>
 
-        <element name="led01" inputtag="COL2" inputmask="0x01" ref="button2">
+        <element name="led1" inputtag="COL2" inputmask="0x01" ref="button2">
             <bounds x="25" y="1" width="1" height="2" />
         </element>
 
-        <element name="led02" inputtag="COL1" inputmask="0x01" ref="button3">
+        <element name="led2" inputtag="COL1" inputmask="0x01" ref="button3">
             <bounds x="26" y="1" width="1" height="2" />
         </element>
 
-        <element name="led03" inputtag="COL0" inputmask="0x01" ref="button4">
+        <element name="led3" inputtag="COL0" inputmask="0x01" ref="button4">
             <bounds x="27" y="1" width="1" height="2" />
         </element>
 
-        <element name="led04" inputtag="COL3" inputmask="0x02" ref="button5">
+        <element name="led4" inputtag="COL3" inputmask="0x02" ref="button5">
             <bounds x="28" y="1" width="1" height="2" />
         </element>
 
-        <element name="led05" inputtag="COL2" inputmask="0x02" ref="button6">
+        <element name="led5" inputtag="COL2" inputmask="0x02" ref="button6">
             <bounds x="29" y="1" width="1" height="2" />
         </element>
 
-        <element name="led06" inputtag="COL1" inputmask="0x02" ref="button7">
+        <element name="led6" inputtag="COL1" inputmask="0x02" ref="button7">
             <bounds x="30" y="1" width="1" height="2" />
         </element>
 
-        <element name="led07" inputtag="COL0" inputmask="0x02" ref="button8">
+        <element name="led7" inputtag="COL0" inputmask="0x02" ref="button8">
             <bounds x="31" y="1" width="1" height="2" />
         </element>
 
