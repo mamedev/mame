@@ -104,11 +104,6 @@ Variants: T denotes an active 8.4" display, C a passive 9.5" color display. 3560
 
 #include "emu.h"
 
-/* mingw-gcc defines this */
-#ifdef i386
-#undef i386
-#endif /* i386 */
-
 #include "bus/isa/isa_cards.h"
 #include "bus/lpci/pci.h"
 #include "bus/lpci/vt82c505.h"
