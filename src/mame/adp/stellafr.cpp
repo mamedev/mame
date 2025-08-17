@@ -255,13 +255,13 @@ uint8_t stellafr_state::mux_r()
 	uint8_t data = 0x00;
 
 	if (li)   data |= (1 << U10_OUTLI);
-    if (emp)  data |= (1 << U10_OUTEMP);
-    if (ma)   data |= (1 << U10_OUTMA);
-    if (st)   data |= (1 << U10_OUTST);
-    if (t)    data |= (1 << U10_OUTT);
-    if (t2)   data |= (1 << U10_OUTT2);
-    if (emp2) data |= (1 << U10_EMP2);
-    if (li2)  data |= (1 << U10_LI2);
+	if (emp)  data |= (1 << U10_OUTEMP);
+	if (ma)   data |= (1 << U10_OUTMA);
+	if (st)   data |= (1 << U10_OUTST);
+	if (t)    data |= (1 << U10_OUTT);
+	if (t2)   data |= (1 << U10_OUTT2);
+	if (emp2) data |= (1 << U10_EMP2);
+	if (li2)  data |= (1 << U10_LI2);
 
 	return data;
 }
