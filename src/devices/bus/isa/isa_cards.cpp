@@ -119,11 +119,11 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("num9rev",ISA8_NUM_9_REV);
 	device.option_add("com", ISA8_COM);
 	device.option_add("comat", ISA8_COM_AT);
+	device.option_add("fdc", ISA8_FDC_SUPERIO);
 	device.option_add("fdc_xt", ISA8_FDC_XT);
 	device.option_add("fdc_at", ISA8_FDC_AT);
 	device.option_add("fdc_smc", ISA8_FDC_SMC);
 	device.option_add("fdc_ps2", ISA8_FDC_PS2);
-	device.option_add("fdc_superio", ISA8_FDC_SUPERIO);
 	device.option_add("fdc344", ISA8_FDC344);
 	device.option_add("fdcmag", ISA8_FDCMAG);
 	device.option_add("wdxt_gen", ISA8_WDXT_GEN);
@@ -165,6 +165,10 @@ void pc_isa16_cards(device_slot_interface &device)
 {
 	// any 8-bit card also works in a 16-bit slot
 	pc_isa8_cards(device);
+	device.option_replace("fdc", ISA8_FDC_AT);
+	device.option_remove("fdc_at");
+	device.option_add("fdc_superio", ISA8_FDC_SUPERIO);
+
 	// 16-bit
 	device.option_add("ide", ISA16_IDE);
 	device.option_add("ne2000", NE2000);
