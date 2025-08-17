@@ -218,7 +218,7 @@ void quizpani_state::program_map(address_map &map)
 	map(0x110000, 0x113fff).ram().w(FUNC(quizpani_state::bg_videoram_w)).share(m_bg_videoram);
 	map(0x11c000, 0x11ffff).ram().w(FUNC(quizpani_state::txt_videoram_w)).share(m_txt_videoram);
 	map(0x180000, 0x18ffff).ram();
-	map(0x200000, 0x3fffff).rom();
+	map(0x200000, 0x33ffff).rom();
 }
 
 
@@ -436,7 +436,7 @@ void quizpani_state::quizpani(machine_config &config)
 }
 
 ROM_START( quizpani )
-	ROM_REGION( 0x400000, "maincpu", 0 ) // 68000
+	ROM_REGION( 0x340000, "maincpu", 0 ) // 68000
 	ROM_LOAD16_WORD_SWAP( "93094-51.127", 0x000000, 0x080000, CRC(2b7a29d4) SHA1(f87b875e69410745ee46d5d94b6c28e5417afb0d) )
 	// No even ROM
 	ROM_LOAD16_BYTE( "93094-52.126",      0x200001, 0x080000, CRC(0617524e) SHA1(91ab5cb8a605c37c92632cf007ddb67172cc9863) )
@@ -463,7 +463,7 @@ ROM_START( quizpani )
 ROM_END
 
 ROM_START( quizpanir )
-	ROM_REGION( 0x400000, "maincpu", 0 ) // 68000
+	ROM_REGION( 0x340000, "maincpu", 0 ) // 68000
 	ROM_LOAD16_WORD_SWAP( "127",   0x000000, 0x080000, CRC(f6b100a2) SHA1(c424f966536e6678a246629ec6e272618dfd2e99) ) // unreadable label
 	// No even ROM
 	ROM_LOAD16_BYTE( "qzc-52.126", 0x200001, 0x080000, CRC(97cbf439) SHA1(d7b8cef2cb0e5f57566d55e81cd717c401c11b4f) ) // 1111xxxxxxxxxxxxxxx = 0xFF
