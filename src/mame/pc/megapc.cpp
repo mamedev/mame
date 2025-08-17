@@ -143,7 +143,7 @@ void megapc_state::megapc(machine_config &config)
 	m_isabus->drq7_callback().set(m_wd7600, FUNC(wd7600_device::dreq7_w));
 
 	// FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdcsmc", true);
+	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdc_smc", true);
 	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "ide", true);
 	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);

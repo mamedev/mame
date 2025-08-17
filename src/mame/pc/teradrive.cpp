@@ -412,7 +412,7 @@ void teradrive_state::teradrive(machine_config &config)
 
 	// FIXME: determine ISA bus clock, unverified configuration
 	// WD76C20
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdcsmc", true);
+	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdc_smc", true);
 	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
 	// TODO: should be ST-506 option, not IDE
 	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "side116", true);

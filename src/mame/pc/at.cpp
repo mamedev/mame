@@ -532,7 +532,7 @@ void at_state::at386(machine_config &config)
 
 	// on-board devices
 	// FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true);
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc_smc", true);
 	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "ide", true);
 	ISA16_SLOT(config, "board4", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
@@ -573,7 +573,7 @@ void at_state::at486(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on-board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true); // FIXME: deteremine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc_smc", true); // FIXME: deteremine ISA bus clock
 	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "ide", true);
 	ISA16_SLOT(config, "board4", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
@@ -646,7 +646,7 @@ void at_vrom_fix_state::megapcpla(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc_smc", true); // FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "ide", true);
 	ISA16_SLOT(config, "board4", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
@@ -688,7 +688,7 @@ void at_state::ficpio2(machine_config &config)
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M");
 
 	// on board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc_smc", true); // FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
 
