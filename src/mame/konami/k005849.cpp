@@ -10,8 +10,8 @@ It has similarities with the newer Konami 007121.
 
 control registers:
 
-000:          scroll x? (always 0)
-001:          scroll y? (always 0)
+000:          scroll y? (always 0)
+001:          scroll x? (always 0)
 
 002: -------x scroll x high bit? (always 0)
      ------x- enable row/colscroll instead of normal scroll
