@@ -103,7 +103,7 @@ private:
 	void io73(uint8_t data) ATTR_COLD;
 	uint8_t io9r() ATTR_COLD;
 	void io9w(uint8_t data) ATTR_COLD;
-	
+
 	void makesound(uint8_t tone, uint8_t octave, uint8_t length);
 	int soundfreq(uint8_t channel, uint8_t clockdiv);
 	TIMER_CALLBACK_MEMBER(sound_stop);
@@ -260,7 +260,7 @@ void stella8085_state::disp_w(uint8_t data)
 
 void stella8085_state::output_digit(uint8_t i, uint8_t data)
 {
-    // Seven-segment encoding for digits 0-9 (abcdefg, no decimal point)
+	// Seven-segment encoding for digits 0-9 (abcdefg, no decimal point)
 	static const uint8_t bcd_to_7seg[16] = {
 		0x3F, // 0: 0b00111111
 		0x06, // 1: 0b00000110
@@ -273,21 +273,21 @@ void stella8085_state::output_digit(uint8_t i, uint8_t data)
 		0x7F, // 8: 0b01111111
 		0x6F, // 9: 0b01101111
 
-    	0x77, // A: 0b01110111
-    	0x7C, // B: 0b01111100
-    	0x39, // C: 0b00111001
-    	0x5E, // D: 0b01011110
-    	0x79, // E: 0b01111001
-    	0x71  // F: 0b01110001
+		0x77, // A: 0b01110111
+		0x7C, // B: 0b01111100
+		0x39, // C: 0b00111001
+		0x5E, // D: 0b01011110
+		0x79, // E: 0b01111001
+		0x71  // F: 0b01110001
 	};
 
-    if (i > 7) {
-        uint8_t debug = data & 0x0F;
+	if (i > 7) {
+		uint8_t debug = data & 0x0F;
 		uint8_t cash = data >> 4;
 
-        m_digits[i - 8] = bcd_to_7seg[debug];
+		m_digits[i - 8] = bcd_to_7seg[debug];
 		m_digits[i] = bcd_to_7seg[cash];
-    }
+	}
 }
 
 TIMER_CALLBACK_MEMBER( stella8085_state::sound_stop )
@@ -545,7 +545,7 @@ static INPUT_PORTS_START( disc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("DM 1.00")  //LIA2 COIN I
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("DM 2.00")  //LIA3 COIN I
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("DM 5.00")  //LIA4 COIN I
-	
+
 	PORT_START("TZ3") //ZUSATZ-EINGAENGE
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) // Risiko Leiter 1
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) // Risiko Leiter 2
@@ -553,7 +553,7 @@ static INPUT_PORTS_START( disc )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Serienuebernahme
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Rueckfuehrung
-	
+
 	PORT_START("TZ4") //MATRIX-EINGAENGE
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -613,8 +613,8 @@ void stella8085_state::doppelpot(machine_config &config)
 	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
 	m_uart->out_p2_callback().set(FUNC(stella8085_state::machine1_w)); //M1-4
-    m_uart->in_p1_callback().set(FUNC(stella8085_state::lw_r));
-    m_uart->out_p1_callback().set(FUNC(stella8085_state::machine2_w));
+	m_uart->in_p1_callback().set(FUNC(stella8085_state::lw_r));
+	m_uart->out_p1_callback().set(FUNC(stella8085_state::machine2_w));
 
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
@@ -639,13 +639,13 @@ void stella8085_state::excellent(machine_config &config)
 }
 
 ROM_START( bahia )
-    ROM_REGION( 0x8000, "maincpu", 0 )
-    ROM_LOAD( "bahia_pr1", 0x0000, 0x1000, CRC(41e7f89c) SHA1(933334e2f78a91e24ec0132b8e7757da5a9d2e02) )
-    ROM_LOAD( "bahia_pr2", 0x1000, 0x1000, CRC(ab06262a) SHA1(435f16002054f010e1349f2dbc998a2e5eb50c70) )
-    ROM_LOAD( "bahia_pr3", 0x2000, 0x1000, CRC(6aecba71) SHA1(5a522329b0aeb7707014f3879adfbaf963aed27d) )
-    ROM_LOAD( "bahia_pr4", 0x3000, 0x1000, CRC(bf6a989f) SHA1(bdd24b82f6f60ac42f83e5c4b68607c14929028f) )
-    ROM_LOAD( "bahia_pr5", 0x4000, 0x1000, CRC(70622047) SHA1(a4e33bfd56c862ca2b130a96828d9d15eae7a5b2) )
-    ROM_LOAD( "bahia_pr6", 0x7000, 0x1000, CRC(0373bee7) SHA1(4c0a31feab21872fee7ecd6a04933c0df050b99f) )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "bahia_pr1", 0x0000, 0x1000, CRC(41e7f89c) SHA1(933334e2f78a91e24ec0132b8e7757da5a9d2e02) )
+	ROM_LOAD( "bahia_pr2", 0x1000, 0x1000, CRC(ab06262a) SHA1(435f16002054f010e1349f2dbc998a2e5eb50c70) )
+	ROM_LOAD( "bahia_pr3", 0x2000, 0x1000, CRC(6aecba71) SHA1(5a522329b0aeb7707014f3879adfbaf963aed27d) )
+	ROM_LOAD( "bahia_pr4", 0x3000, 0x1000, CRC(bf6a989f) SHA1(bdd24b82f6f60ac42f83e5c4b68607c14929028f) )
+	ROM_LOAD( "bahia_pr5", 0x4000, 0x1000, CRC(70622047) SHA1(a4e33bfd56c862ca2b130a96828d9d15eae7a5b2) )
+	ROM_LOAD( "bahia_pr6", 0x7000, 0x1000, CRC(0373bee7) SHA1(4c0a31feab21872fee7ecd6a04933c0df050b99f) )
 ROM_END
 
 ROM_START( dicemstr ) // curiously hand-written stickers say F3 but strings in ROM are F2
@@ -662,13 +662,13 @@ ROM_START( doppelpot )
 ROM_END
 
 ROM_START( doppelstart )
-    ROM_REGION( 0x8000, "maincpu", 0 )
-    ROM_LOAD( "doppel_start_eprom1_2732.bin", 0x0000, 0x1000, CRC(0a90cc49) SHA1(87a2aaa85ecf0525473d02a2121d13c6615b7188) )
-    ROM_LOAD( "doppel_start_eprom2_2732.bin", 0x1000, 0x1000, CRC(720c4262) SHA1(da7f6a399093e4596d84798423201e1445ac38a1) )
-    ROM_LOAD( "doppel_start_eprom3_2732.bin", 0x2000, 0x1000, CRC(1d26e43a) SHA1(389a5398536097c3dc3e084f4635908aad17c62d) )
-    ROM_LOAD( "doppel_start_eprom4_2732.bin", 0x3000, 0x1000, CRC(d0fa1fdd) SHA1(c56df831c0c112762636675a60a76a0f00732ab2) )
-    ROM_LOAD( "doppel_start_eprom5_2732.bin", 0x4000, 0x1000, CRC(40079325) SHA1(9e9f5e3853b3b75c89cd9086814f8a762cc3643b) )
-    ROM_LOAD( "doppel_start_eprom6_2732.bin", 0x7000, 0x1000, CRC(1b988121) SHA1(7886ad67d62db61588640f95efc679bc26220691) )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "doppel_start_eprom1_2732.bin", 0x0000, 0x1000, CRC(0a90cc49) SHA1(87a2aaa85ecf0525473d02a2121d13c6615b7188) )
+	ROM_LOAD( "doppel_start_eprom2_2732.bin", 0x1000, 0x1000, CRC(720c4262) SHA1(da7f6a399093e4596d84798423201e1445ac38a1) )
+	ROM_LOAD( "doppel_start_eprom3_2732.bin", 0x2000, 0x1000, CRC(1d26e43a) SHA1(389a5398536097c3dc3e084f4635908aad17c62d) )
+	ROM_LOAD( "doppel_start_eprom4_2732.bin", 0x3000, 0x1000, CRC(d0fa1fdd) SHA1(c56df831c0c112762636675a60a76a0f00732ab2) )
+	ROM_LOAD( "doppel_start_eprom5_2732.bin", 0x4000, 0x1000, CRC(40079325) SHA1(9e9f5e3853b3b75c89cd9086814f8a762cc3643b) )
+	ROM_LOAD( "doppel_start_eprom6_2732.bin", 0x7000, 0x1000, CRC(1b988121) SHA1(7886ad67d62db61588640f95efc679bc26220691) )
 ROM_END
 
 ROM_START( disc )
