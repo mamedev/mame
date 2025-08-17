@@ -36800,8 +36800,6 @@ mba032q
 mbc18nb
 mbc28
 md4duvc
-megapc
-megapcpl
 megapcpla
 micral45
 mijx30gp
@@ -37047,6 +37045,10 @@ iskr1031
 @source:pc/mc1502.cpp
 mc1502
 pk88
+
+@source:pc/megapc.cpp
+megapc
+megapcpl
 
 @source:pc/nforcepc.cpp
 nforcepc
