@@ -13844,41 +13844,41 @@ Optional [Justifier] support
 		</part>
 	</software>
 
-	<software name="snatcherp" cloneof="snatcher" supported="no">
+	<software name="snatcherp" cloneof="snatcher" supported="partial">
 		<!-- http://redump.org/disc/62657/
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07).cue" size="2754" crc="434dc733" md5="7703524a2d2c3ec9a7053508c3cd2c83" sha1="2681293dcb1b0d096fdf57752430856ecc03467b"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 01).bin" size="131744928" crc="b6f1932e" md5="44b57d67b3e216e77d6357abb3e4627f" sha1="606dc65dba04fd95097d0cfc8fed22de7122d786"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 02).bin" size="1164240" crc="d00f54c4" md5="cc325c2484ff41e7d4b0e9060894146b" sha1="ac73d5629875586db0a5d776a13beef377d9a854"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 03).bin" size="23802240" crc="40a49fba" md5="786b30a8b252a61fc91bbabcf4685edb" sha1="43f02ad9d970492426732bfede4c76a0cbf202a2"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 04).bin" size="48345360" crc="e6043e39" md5="6230808a2c1f340f8415cdc49326e155" sha1="ce50b9dad31f960905c5c8d105051b65d45bcada"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 05).bin" size="3716160" crc="c32e9ebe" md5="80ef48d3a8cd6d6d8cf7db175656571a" sha1="9e1374fc524759ba8ceccebad4047e136852fcd4"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 06).bin" size="12740784" crc="a7705e57" md5="03be927bbc866c3158a5a7af03634505" sha1="0310fe11504dc05388a5e025ae1ca0af4fe0e0d6"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 07).bin" size="29404704" crc="fccd71c5" md5="e4d03194b32eca0edb65b92f1f5299a7" sha1="8a124916025294432adee4dd75baf9082d5d7f7b"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 08).bin" size="37843680" crc="2b5cf3d5" md5="749bea144eb88ee76cd19fc93a89adbb" sha1="4d7411ec40205baf5c294f7e16813de8eb493f4b"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 09).bin" size="15412656" crc="afe3dcbf" md5="091c2fe24eee2cc5969a5fd0a4775c10" sha1="697295e985cefec143a2981734d3f93066f16dc7"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 10).bin" size="22769712" crc="9832f63e" md5="f275214198e76b425f76b825fb870dc5" sha1="a27713205d8fac230e54c51cfd773762eb4b5d23"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 11).bin" size="19164096" crc="4150d5c5" md5="7cac1aca396c2b7891d4f86652c1b51e" sha1="00e8f43bf89470b7cbd596c93ef57dcb198d6223"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 12).bin" size="47576256" crc="d6bb6cba" md5="533669bf6b1b22bce349e31d1328be18" sha1="17664b3ab873cb71c158f9df4d28b77fc6620138"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 13).bin" size="20278944" crc="477d9244" md5="f30b732535691c71494c4ab54c375cd3" sha1="a8d0eb4929d5560e631500734e0b309dbc2d5bd9"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 14).bin" size="14445984" crc="749b2596" md5="1af1918aa779911eca30a92ca28bdc05" sha1="ee02d2d226d1a668b11f9b73daaf713212e0492b"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 15).bin" size="13778016" crc="a8562533" md5="48c5cfedac8956afde3e5fb4965deeb2" sha1="644ec8b9ed2e35f00fc40bda24f39f442f72a4e2"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 16).bin" size="3027024" crc="71af88c7" md5="774de00f0effe67e1d2079efbdfc13b5" sha1="1bc854049cbd19f5c5c91eff71731c8a5f844f29"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 17).bin" size="17461248" crc="562edc62" md5="44e8f8cf01786be03858961bdb103c73" sha1="49802ef9c3a3e18dd8e9853e45c8b13069f0a538"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 18).bin" size="8314320" crc="f0a265b6" md5="6a83142465025eb01057686d903893ad" sha1="f0c798e93f582e18209d47631f2e84da2bf008cf"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 19).bin" size="74551344" crc="97dca941" md5="4dc8d5aa81c4a76a951cc92d2e845bfd" sha1="768066f720bd2a57a060097b4bc8c9a19c5d2dab"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 20).bin" size="5844720" crc="b5341397" md5="006364d3667b62b2371a85a2dca67ed5" sha1="5d9fa0f6b1f5e3611df29159cb9d7ce132ae6fb1"/>
-		<rom name="Snatcher (Europe) (Beta) (1994-10-07) (Track 21).bin" size="73805760" crc="cde0a9e4" md5="f22950f393f8d0829a556ff5685a4ce9" sha1="6144d301e257da0709dddaf7df9ad510006a015e"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07).cue" size="2754" crc="a285b223" md5="e020d9136d1b7d69d8a2e71b64a3613c" sha1="2e3b0743e1ab99f62413a1a2889c37b87f9999df"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 01).bin" size="131744928" crc="b6f1932e" md5="44b57d67b3e216e77d6357abb3e4627f" sha1="606dc65dba04fd95097d0cfc8fed22de7122d786"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 02).bin" size="1164240" crc="d00f54c4" md5="cc325c2484ff41e7d4b0e9060894146b" sha1="ac73d5629875586db0a5d776a13beef377d9a854"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 03).bin" size="23802240" crc="40a49fba" md5="786b30a8b252a61fc91bbabcf4685edb" sha1="43f02ad9d970492426732bfede4c76a0cbf202a2"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 04).bin" size="48345360" crc="e6043e39" md5="6230808a2c1f340f8415cdc49326e155" sha1="ce50b9dad31f960905c5c8d105051b65d45bcada"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 05).bin" size="3716160" crc="c32e9ebe" md5="80ef48d3a8cd6d6d8cf7db175656571a" sha1="9e1374fc524759ba8ceccebad4047e136852fcd4"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 06).bin" size="12740784" crc="a7705e57" md5="03be927bbc866c3158a5a7af03634505" sha1="0310fe11504dc05388a5e025ae1ca0af4fe0e0d6"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 07).bin" size="29404704" crc="fccd71c5" md5="e4d03194b32eca0edb65b92f1f5299a7" sha1="8a124916025294432adee4dd75baf9082d5d7f7b"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 08).bin" size="37843680" crc="2b5cf3d5" md5="749bea144eb88ee76cd19fc93a89adbb" sha1="4d7411ec40205baf5c294f7e16813de8eb493f4b"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 09).bin" size="15412656" crc="afe3dcbf" md5="091c2fe24eee2cc5969a5fd0a4775c10" sha1="697295e985cefec143a2981734d3f93066f16dc7"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 10).bin" size="22769712" crc="9832f63e" md5="f275214198e76b425f76b825fb870dc5" sha1="a27713205d8fac230e54c51cfd773762eb4b5d23"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 11).bin" size="19164096" crc="4150d5c5" md5="7cac1aca396c2b7891d4f86652c1b51e" sha1="00e8f43bf89470b7cbd596c93ef57dcb198d6223"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 12).bin" size="47576256" crc="d6bb6cba" md5="533669bf6b1b22bce349e31d1328be18" sha1="17664b3ab873cb71c158f9df4d28b77fc6620138"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 13).bin" size="20278944" crc="477d9244" md5="f30b732535691c71494c4ab54c375cd3" sha1="a8d0eb4929d5560e631500734e0b309dbc2d5bd9"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 14).bin" size="14445984" crc="749b2596" md5="1af1918aa779911eca30a92ca28bdc05" sha1="ee02d2d226d1a668b11f9b73daaf713212e0492b"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 15).bin" size="13778016" crc="a8562533" md5="48c5cfedac8956afde3e5fb4965deeb2" sha1="644ec8b9ed2e35f00fc40bda24f39f442f72a4e2"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 16).bin" size="3027024" crc="71af88c7" md5="774de00f0effe67e1d2079efbdfc13b5" sha1="1bc854049cbd19f5c5c91eff71731c8a5f844f29"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 17).bin" size="17461248" crc="562edc62" md5="44e8f8cf01786be03858961bdb103c73" sha1="49802ef9c3a3e18dd8e9853e45c8b13069f0a538"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 18).bin" size="8314320" crc="f0a265b6" md5="6a83142465025eb01057686d903893ad" sha1="f0c798e93f582e18209d47631f2e84da2bf008cf"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 19).bin" size="74551344" crc="97dca941" md5="4dc8d5aa81c4a76a951cc92d2e845bfd" sha1="768066f720bd2a57a060097b4bc8c9a19c5d2dab"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 20).bin" size="5844720" crc="b5341397" md5="006364d3667b62b2371a85a2dca67ed5" sha1="5d9fa0f6b1f5e3611df29159cb9d7ce132ae6fb1"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 21).bin" size="73805760" crc="cde0a9e4" md5="f22950f393f8d0829a556ff5685a4ce9" sha1="6144d301e257da0709dddaf7df9ad510006a015e"/>
 		-->
-		<description>Snatcher (Europe, prototype 19941007)</description>
+		<description>Snatcher (USA, prototype 19941007)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<notes><![CDATA[
-Does not boot. Disc is PAL but has NTSC-J region set in its header data.
+Optional [Justifier] support
 ]]></notes>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="snatcher (europe) (prototype 19941007)" sha1="6ed7458b427ebfd5b61bce5b7e87f1351e9c8201"/>
+				<disk name="snatcher (usa) (prototype 19941007)" sha1="6ed7458b427ebfd5b61bce5b7e87f1351e9c8201"/>
 			</diskarea>
 		</part>
 	</software>
