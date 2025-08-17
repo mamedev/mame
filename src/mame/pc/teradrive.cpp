@@ -25,7 +25,7 @@ NOTES (MD side):
 TODO:
 - keyboard issues on Sega menu (hold arrow and press enter to go to floppy loading);
 - "TIMER FAIL" when exiting from setup menu (keyboard?);
-- RAM size always gets detected as 2560K;
+- RAM size always gets detected as 2560K even when it's not (from chipset?);
 - Quadtel EMM driver fails recognizing WD76C10 chipset with j4.0 driver disk;
 - Cannot HDD format with floppy insthdd.bat, cannot boot from HDD (needs floppy first).
   Attached disk is a WDL-330PS with no geometry info available;
@@ -406,6 +406,10 @@ void teradrive_state::teradrive(machine_config &config)
 	pc_kbdc.out_clock_cb().set("keybc", FUNC(ps2_keyboard_controller_device::kbd_clk_w));
 	pc_kbdc.out_data_cb().set("keybc", FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
+	pc_kbdc_device &aux_con(PC_KBDC(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
+	aux_con.out_clock_cb().set("keybc", FUNC(ps2_keyboard_controller_device::aux_clk_w));
+	aux_con.out_data_cb().set("keybc", FUNC(ps2_keyboard_controller_device::aux_data_w));
+
 	// FIXME: determine ISA bus clock, unverified configuration
 	// WD76C20
 	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdcsmc", true);
@@ -419,7 +423,8 @@ void teradrive_state::teradrive(machine_config &config)
 	ISA16_SLOT(config, "isa1",   0, "isabus", pc_isa16_cards, nullptr, false);
 
 	// 2.5MB is the max allowed by the BIOS (even if WD chipset can do more)
-	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("640K,2688K");
+	// TODO: pcdos5v garbles font loading with 1664K, which should be the actual default
+	RAM(config, RAM_TAG).set_default_size("2688K").set_extra_options("640K,1664K");
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
