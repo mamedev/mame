@@ -1843,6 +1843,18 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="svellas">
+		<description>Svellas</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="megacart" />
+			<dataarea name="rom" size="9259">
+				<rom name="svellas.rom" size="9259" crc="3244546f" sha1="366dbc7552fd0a9e13b88a95b74141e81e0114ec" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thexder">
 		<description>Thexder</description>
 		<year>2012</year>
