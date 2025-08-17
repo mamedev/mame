@@ -5,7 +5,7 @@
 #include "stcart.h"
 
 #include "replay.h"
-
+#include "rom.h"
 
 DEFINE_DEVICE_TYPE(STCART_CONNECTOR, stcart_connector, "stcart_connector", "Atari ST cartridge connector")
 
@@ -29,6 +29,7 @@ void stcart_connector::map(address_space_installer &space)
 void stcart_intf(device_slot_interface &device)
 {
 	device.option_add("replay", ST_REPLAY);
+	device.option_add("rom", ST_ROM);
 }
 
 device_stcart_interface::device_stcart_interface(const machine_config &mconfig, device_t &device) :
