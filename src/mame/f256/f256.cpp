@@ -24,10 +24,7 @@ f256_state::f256_state(const machine_config &mconfig, device_type type, const ch
     driver_device(mconfig, type, tag)
     , m_maincpu(*this, MAINCPU_TAG)
     , m_ram(*this, RAM_TAG)
-    , m_iopage0(*this, IOPAGE0_TAG)
-    , m_iopage1(*this, IOPAGE1_TAG)
-    , m_iopage2(*this, IOPAGE2_TAG)
-    , m_iopage3(*this, IOPAGE3_TAG)
+    , m_iopage(*this, "iopage%u", 0U)
     , m_rom(*this, ROM_TAG)
     , m_font(*this, FONT_TAG)
     , m_screen(*this, SCREEN_TAG)
@@ -64,10 +61,10 @@ void f256_state::f256k(machine_config &config)
     m_maincpu->set_addrmap(AS_PROGRAM, &f256_state::program_map);
 
     RAM(config, m_ram).set_default_size("512k").set_default_value(0x0);
-    RAM(config, m_iopage0).set_default_size("8k").set_default_value(0x0);
-    RAM(config, m_iopage1).set_default_size("8k").set_default_value(0x0);
-    RAM(config, m_iopage2).set_default_size("8k").set_default_value(0x0);
-    RAM(config, m_iopage3).set_default_size("8k").set_default_value(0x0);
+    for (auto &iopage : m_iopage) 
+    {
+        RAM(config, iopage).set_default_size("8k").set_default_value(0x0);
+    }
 
     SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
     m_screen->set_refresh_hz(60); // Refresh rate (e.g., 60Hz)
@@ -171,10 +168,10 @@ void f256_state::program_map(address_map &map)
 
 void f256_state::data_map(address_map &map)
 {
-    map(0x0000, 0x1FFF).ram().share(IOPAGE0_TAG);
-    map(0x0000, 0x1FFF).ram().share(IOPAGE1_TAG);
-    map(0x0000, 0x1FFF).ram().share(IOPAGE2_TAG);
-    map(0x0000, 0x1FFF).ram().share(IOPAGE3_TAG);
+    map(0x0000, 0x1FFF).ram().share("iopage0");
+    map(0x0000, 0x1FFF).ram().share("iopage1");
+    map(0x0000, 0x1FFF).ram().share("iopage2");
+    map(0x0000, 0x1FFF).ram().share("iopage3");
 }
 
 u8   f256_state::lut_r(offs_t offset)
@@ -375,7 +372,7 @@ u8   f256_state::mem_r(offs_t offset)
                             case 0xD65B:
                                 return (m_timer1_val >> 16) & 0xFF;
                         }
-                        return m_iopage0->read(adj_addr - 0xC000);
+                        return m_iopage[0]->read(adj_addr - 0xC000);
                     }
                     else if (adj_addr >= 0xD660 && adj_addr < 0xD670)
                     {
@@ -459,7 +456,7 @@ u8   f256_state::mem_r(offs_t offset)
                             case 0xD6A0:
                                 return m_sdcard->get_card_present() ? 0x10:0;
                             case 0xD6A1:
-                                return m_iopage0->read(0xD6A1 - 0xC000);
+                                return m_iopage[0]->read(0xD6A1 - 0xC000);
                             case 0xD6A4:
                                 if (m_rng_enabled)
                                 {
@@ -588,7 +585,7 @@ u8   f256_state::mem_r(offs_t offset)
                             case 0xB:
                                 return (m_addition_result >> 24) & 0xFF;
                         }
-                        return m_iopage0->read(adj_addr - 0xC000);
+                        return m_iopage[0]->read(adj_addr - 0xC000);
                     }
                     else if (adj_addr >= 0xDF00 && adj_addr < 0xE000)
                     {
@@ -599,20 +596,20 @@ u8   f256_state::mem_r(offs_t offset)
                         }
                         else
                         {
-                            return m_iopage0->read(adj_addr - 0xC000);
+                            return m_iopage[0]->read(adj_addr - 0xC000);
                         }
                     }
                     // Stick everything else in Vicky
                     // (adj_addr >= 0xC000 && adj_addr < 0xD400) ||  // gamma, mouse graphics, vicky registers, bitmaps, tiles
                     // (adj_addr >= 0xD800 && adj_addr < 0xD880) ||  // text colors
                     // (adj_addr >= 0xD900 && adj_addr < 0xDB00)     // sprite registers
-                    return m_iopage0->read(adj_addr - 0xC000);
+                    return m_iopage[0]->read(adj_addr - 0xC000);
                 case 1:
-                    return m_iopage1->read(adj_addr - 0xC000);
+                    return m_iopage[1]->read(adj_addr - 0xC000);
                 case 2:
-                    return m_iopage2->read(adj_addr - 0xC000);
+                    return m_iopage[2]->read(adj_addr - 0xC000);
                 case 3:
-                    return m_iopage3->read(adj_addr - 0xC000);
+                    return m_iopage[3]->read(adj_addr - 0xC000);
             }
         }
         offs_t address = (bank << 13) + low_addr;
@@ -667,7 +664,7 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                 m_screen->set_visarea(0, 639, 0, 479);
                                 m_screen->set_size(800,525);
                             }
-                            m_iopage0->write(0xD001 - 0xC000, data);
+                            m_iopage[0]->write(0xD001 - 0xC000, data);
                         }
                         else if (adj_addr >= 0xD400 && adj_addr < 0xD419)
                         {
@@ -787,7 +784,7 @@ void f256_state::mem_w(offs_t offset, u8 data)
                         {
                             // Timers
                             logerror("Writing to Timer Register: %X, %02X\n", adj_addr, data);
-                            m_iopage0->write(adj_addr - 0xC000, data);
+                            m_iopage[0]->write(adj_addr - 0xC000, data);
                             switch(adj_addr)
                             {
                                 case 0xD650:
@@ -796,9 +793,9 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                     if ((data & 0x1) == 1)
                                     {
 
-                                        uint32_t timer0_cmp = m_iopage0->read(0xD655 - 0xC000) +
-                                            (m_iopage0->read(0xD656 - 0xC000) << 8) +
-                                            (m_iopage0->read(0xD657 - 0xC000) << 16);
+                                        uint32_t timer0_cmp = m_iopage[0]->read(0xD655 - 0xC000) +
+                                            (m_iopage[0]->read(0xD656 - 0xC000) << 8) +
+                                            (m_iopage[0]->read(0xD657 - 0xC000) << 16);
                                         logerror("Start Timer0: %06X\n", timer0_cmp);
                                         attotime period = attotime::from_double((double)(timer0_cmp - m_timer0_load)/(double)25'175'000);
                                         m_timer0->adjust(period, 0, period);
@@ -822,8 +819,8 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                 case 0xD652:
                                 case 0xD653:
                                     // writing to these registers sets the load value
-                                    m_timer0_load = m_iopage0->read(0xD651 - 0xC000) + (m_iopage0->read(0xD652 - 0xC000) << 8) +
-                                            (m_iopage0->read(0xD653 - 0xC000) << 16);
+                                    m_timer0_load = m_iopage[0]->read(0xD651 - 0xC000) + (m_iopage[0]->read(0xD652 - 0xC000) << 8) +
+                                            (m_iopage[0]->read(0xD653 - 0xC000) << 16);
                                     break;
                                 case 0xD658:
                                     // Timer1 is based on the Start of Frame - so it's very slow
@@ -831,7 +828,7 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                     {
                                         logerror("Start Timer1 %X, %X\n", data, m_timer1_val);
                                         // Get the frame frequency from video
-                                        int frame_freq = (m_iopage0->read(0xD001 - 0xC000) & 1) == 1? 70: 60;
+                                        int frame_freq = (m_iopage[0]->read(0xD001 - 0xC000) & 1) == 1? 70: 60;
                                         m_timer1->adjust(attotime::from_hz(XTAL(frame_freq)), 0, attotime::from_hz(XTAL(frame_freq)));
                                     }
                                     else
@@ -855,8 +852,8 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                 case 0xD65A:
                                 case 0xD65B:
                                     // writing to these registers sets the load value
-                                    m_timer1_load = m_iopage0->read(0xD659 - 0xC000) + (m_iopage0->read(0xD65A - 0xC000) << 8) +
-                                            (m_iopage0->read(0xD65B - 0xC000) << 16);
+                                    m_timer1_load = m_iopage[0]->read(0xD659 - 0xC000) + (m_iopage[0]->read(0xD65A - 0xC000) << 8) +
+                                            (m_iopage[0]->read(0xD65B - 0xC000) << 16);
                                     break;
                             }
                         }
@@ -978,7 +975,7 @@ void f256_state::mem_w(offs_t offset, u8 data)
                             {
                                 case 0xD6A1:
                                     // mix the PSG or SID based on the value
-                                    m_iopage0->write(0xD6A1 - 0xC000, data);
+                                    m_iopage[0]->write(0xD6A1 - 0xC000, data);
                                     if ((data & 4) == 0)
                                     {
                                         // PSG mix - both outputs to both speakers
@@ -1128,7 +1125,7 @@ void f256_state::mem_w(offs_t offset, u8 data)
                             u8 block = (adj_addr - 0xDE00) >> 2;
                             if (adj_addr < 0xDE10)
                             {
-                                m_iopage0->write(adj_addr - 0xC000, data);
+                                m_iopage[0]->write(adj_addr - 0xC000, data);
                             }
                             switch (block)
                             {
@@ -1148,7 +1145,7 @@ void f256_state::mem_w(offs_t offset, u8 data)
                         {
                             // DMA
                             logerror("DMA Write %04X %02X\n", adj_addr, data);
-                            m_iopage0->write(adj_addr - 0xC000, data);
+                            m_iopage[0]->write(adj_addr - 0xC000, data);
                             if ((adj_addr - 0xDF00) == 0)
                             {
                                     // control register - when start and enabled are set start DMA operation
@@ -1188,18 +1185,18 @@ void f256_state::mem_w(offs_t offset, u8 data)
                             // (adj_addr >= 0xD900 && adj_addr < 0xDB00)     // sprite registers
                         else
                         {
-                            m_iopage0->write(adj_addr - 0xC000, data);
+                            m_iopage[0]->write(adj_addr - 0xC000, data);
                         }
 
                         break;
                     case 1:
-                        m_iopage1->write(adj_addr - 0xC000, data);
+                        m_iopage[1]->write(adj_addr - 0xC000, data);
                         break;
                     case 2:
-                        m_iopage2->write(adj_addr - 0xC000, data);
+                        m_iopage[2]->write(adj_addr - 0xC000, data);
                         break;
                     case 3:
-                        m_iopage3->write(adj_addr - 0xC000, data);
+                        m_iopage[3]->write(adj_addr - 0xC000, data);
                         break;
                 }
             }
@@ -1315,15 +1312,15 @@ void f256_state::iec_clk_w(int state)
 //-------------------------------------------------
 void f256_state::unsignedMultiplier(int baseAddr)
 {
-    uint16_t acc1 = (m_iopage0->read(baseAddr + 1) << 8) + m_iopage0->read(baseAddr);
-    uint16_t acc2 = (m_iopage0->read(baseAddr + 3) << 8) + m_iopage0->read(baseAddr + 2);
+    uint16_t acc1 = (m_iopage[0]->read(baseAddr + 1) << 8) + m_iopage[0]->read(baseAddr);
+    uint16_t acc2 = (m_iopage[0]->read(baseAddr + 3) << 8) + m_iopage[0]->read(baseAddr + 2);
     m_multiplication_result = acc1 * acc2;
 }
 
 void f256_state::unsignedDivider(int baseAddr)
 {
-    uint16_t acc1 = (m_iopage0->read(baseAddr + 1) << 8) + m_iopage0->read(baseAddr);
-    uint16_t acc2 = (m_iopage0->read(baseAddr + 3) << 8) + m_iopage0->read(baseAddr + 2);
+    uint16_t acc1 = (m_iopage[0]->read(baseAddr + 1) << 8) + m_iopage[0]->read(baseAddr);
+    uint16_t acc2 = (m_iopage[0]->read(baseAddr + 3) << 8) + m_iopage[0]->read(baseAddr + 2);
     if (acc1 != 0)
     {
         m_division_result= acc2 / acc1;
@@ -1333,10 +1330,10 @@ void f256_state::unsignedDivider(int baseAddr)
 
 void f256_state::unsignedAdder(int baseAddr)
 {
-    int acc1 = (m_iopage0->read(baseAddr + 3) << 24) + (m_iopage0->read(baseAddr + 2) << 16) +
-        (m_iopage0->read(baseAddr + 1) << 8) + m_iopage0->read(baseAddr);
-    int acc2 = (m_iopage0->read(baseAddr + 7) << 24) + (m_iopage0->read(baseAddr + 6) << 16) +
-        (m_iopage0->read(baseAddr + 5) << 8) + m_iopage0->read(baseAddr + 4);
+    int acc1 = (m_iopage[0]->read(baseAddr + 3) << 24) + (m_iopage[0]->read(baseAddr + 2) << 16) +
+        (m_iopage[0]->read(baseAddr + 1) << 8) + m_iopage[0]->read(baseAddr);
+    int acc2 = (m_iopage[0]->read(baseAddr + 7) << 24) + (m_iopage[0]->read(baseAddr + 6) << 16) +
+        (m_iopage[0]->read(baseAddr + 5) << 8) + m_iopage[0]->read(baseAddr + 4);
     m_addition_result = acc1 + acc2;
 }
 
@@ -1354,11 +1351,11 @@ uint8_t f256_state::get_random()
 void f256_state::perform2DFillDMA()
 {
 
-    uint8_t fill_byte = m_iopage0->read(0xDF01 - 0xC000);
-    uint32_t dest_addr = ((m_iopage0->read(0xDF0A) & 0x7) << 16) + (m_iopage0->read(0xDF09) << 8) + m_iopage0->read(0xDF08);
-    uint16_t width_2D = (m_iopage0->read(0xDF0D - 0xC000) << 8) + m_iopage0->read(0xDF0C - 0xC000);
-    uint16_t height_2D = (m_iopage0->read(0xDF0F - 0xC000) << 8) + m_iopage0->read(0xDF0E - 0xC000);
-    uint16_t dest_stride = (m_iopage0->read(0xDF13 - 0xC000) << 8) + m_iopage0->read(0xDF12 - 0xC000);
+    uint8_t fill_byte = m_iopage[0]->read(0xDF01 - 0xC000);
+    uint32_t dest_addr = ((m_iopage[0]->read(0xDF0A) & 0x7) << 16) + (m_iopage[0]->read(0xDF09) << 8) + m_iopage[0]->read(0xDF08);
+    uint16_t width_2D = (m_iopage[0]->read(0xDF0D - 0xC000) << 8) + m_iopage[0]->read(0xDF0C - 0xC000);
+    uint16_t height_2D = (m_iopage[0]->read(0xDF0F - 0xC000) << 8) + m_iopage[0]->read(0xDF0E - 0xC000);
+    uint16_t dest_stride = (m_iopage[0]->read(0xDF13 - 0xC000) << 8) + m_iopage[0]->read(0xDF12 - 0xC000);
     //logerror("2D Fill DMA: DEST: %X, W: %X, H: %X\n", dest_addr, width_2D, height_2D);
     for (int y = 0; y < height_2D; y++)
     {
@@ -1370,20 +1367,20 @@ void f256_state::perform2DFillDMA()
 }
 void f256_state::performLinearFillDMA()
 {
-    uint8_t fill_byte = m_iopage0->read(0xDF01 - 0xC000);
-    uint32_t dest_addr = ((m_iopage0->read(0xDF0A) & 0x7) << 16) + (m_iopage0->read(0xDF09) << 8) + m_iopage0->read(0xDF08);
-    uint32_t count = ((m_iopage0->read(0xDF0E) & 0x7) << 16) + (m_iopage0->read(0xDF0D) << 8) + m_iopage0->read(0xDF0C);
+    uint8_t fill_byte = m_iopage[0]->read(0xDF01 - 0xC000);
+    uint32_t dest_addr = ((m_iopage[0]->read(0xDF0A) & 0x7) << 16) + (m_iopage[0]->read(0xDF09) << 8) + m_iopage[0]->read(0xDF08);
+    uint32_t count = ((m_iopage[0]->read(0xDF0E) & 0x7) << 16) + (m_iopage[0]->read(0xDF0D) << 8) + m_iopage[0]->read(0xDF0C);
     //logerror("Linear Fill DMA DEST: %X, LEN: %X\n", dest_addr, count);
     memset(m_ram->pointer() + dest_addr, fill_byte, count);
 }
 void f256_state::perform2DDMA()
 {
-    uint32_t src_addr = ((m_iopage0->read(0xDF06) & 0x7) << 16) + (m_iopage0->read(0xDF05) << 8) + m_iopage0->read(0xDF04);
-    uint32_t dest_addr = ((m_iopage0->read(0xDF0A) & 0x7) << 16) + (m_iopage0->read(0xDF09) << 8) + m_iopage0->read(0xDF08);
-    uint16_t width_2D = (m_iopage0->read(0xDF0D - 0xC000) << 8) + m_iopage0->read(0xDF0C - 0xC000);
-    uint16_t height_2D = (m_iopage0->read(0xDF0F - 0xC000) << 8) + m_iopage0->read(0xDF0E - 0xC000);
-    uint16_t src_stride = (m_iopage0->read(0xDF11 - 0xC000) << 8) + m_iopage0->read(0xDF10 - 0xC000);
-    uint16_t dest_stride = (m_iopage0->read(0xDF13 - 0xC000) << 8) + m_iopage0->read(0xDF12 - 0xC000);
+    uint32_t src_addr = ((m_iopage[0]->read(0xDF06) & 0x7) << 16) + (m_iopage[0]->read(0xDF05) << 8) + m_iopage[0]->read(0xDF04);
+    uint32_t dest_addr = ((m_iopage[0]->read(0xDF0A) & 0x7) << 16) + (m_iopage[0]->read(0xDF09) << 8) + m_iopage[0]->read(0xDF08);
+    uint16_t width_2D = (m_iopage[0]->read(0xDF0D - 0xC000) << 8) + m_iopage[0]->read(0xDF0C - 0xC000);
+    uint16_t height_2D = (m_iopage[0]->read(0xDF0F - 0xC000) << 8) + m_iopage[0]->read(0xDF0E - 0xC000);
+    uint16_t src_stride = (m_iopage[0]->read(0xDF11 - 0xC000) << 8) + m_iopage[0]->read(0xDF10 - 0xC000);
+    uint16_t dest_stride = (m_iopage[0]->read(0xDF13 - 0xC000) << 8) + m_iopage[0]->read(0xDF12 - 0xC000);
     //logerror("2D Copy DMA, SRC: %X, DEST: %X, W: %X H: %X, SRC_STR: %X, DEST_STR: %X\n", src_addr, dest_addr,
     //    width_2D, height_2D, src_stride, dest_stride);
     for (int y = 0; y < height_2D; y++)
@@ -1397,9 +1394,9 @@ void f256_state::perform2DDMA()
 }
 void f256_state::performLinearDMA()
 {
-    uint32_t src_addr = ((m_iopage0->read(0xDF06) & 0x7) << 16) + (m_iopage0->read(0xDF05) << 8) + m_iopage0->read(0xDF04);
-    uint32_t dest_addr = ((m_iopage0->read(0xDF0A) & 0x7) << 16) + (m_iopage0->read(0xDF09) << 8) + m_iopage0->read(0xDF08);
-    uint32_t count = ((m_iopage0->read(0xDF0E) & 0x7) << 16) + (m_iopage0->read(0xDF0D) << 8) + m_iopage0->read(0xDF0C);
+    uint32_t src_addr = ((m_iopage[0]->read(0xDF06) & 0x7) << 16) + (m_iopage[0]->read(0xDF05) << 8) + m_iopage[0]->read(0xDF04);
+    uint32_t dest_addr = ((m_iopage[0]->read(0xDF0A) & 0x7) << 16) + (m_iopage[0]->read(0xDF09) << 8) + m_iopage[0]->read(0xDF08);
+    uint32_t count = ((m_iopage[0]->read(0xDF0E) & 0x7) << 16) + (m_iopage[0]->read(0xDF0D) << 8) + m_iopage[0]->read(0xDF0C);
     //logerror("Linear Copy DMA SRC: %X, DEST: %X, LEN: %X\n", src_addr, dest_addr, count);
     memcpy(m_ram->pointer() + dest_addr, m_ram->pointer() + src_addr, count);
 }
@@ -1413,10 +1410,10 @@ void f256_state::device_start()
 	driver_device::device_start();
     reset_mmu();
     // TODO: Copy the font from file to IO Page 1
-    //memcpy(m_iopage1, m_font, 0x800);
+    //memcpy(m_iopage[1], m_font, 0x800);
     for (int i=0;i<0x800;i++)
     {
-        m_iopage1->write(i, m_font->as_u8(i));
+        m_iopage[1]->write(i, m_font->as_u8(i));
     }
     // Copy the gamma correction table
     uint8_t gamma_1_8[] = {
@@ -1438,10 +1435,10 @@ void f256_state::device_start()
         0xf6, 0xf7, 0xf7, 0xf8, 0xf8, 0xf9, 0xf9, 0xfa, 0xfb, 0xfb, 0xfc, 0xfc, 0xfd, 0xfd, 0xfe, 0xff
     };
 
-    memcpy(m_iopage0->pointer(), gamma_1_8, 256);
-    memcpy(m_iopage0->pointer() + 0x400, gamma_1_8, 256);
-    memcpy(m_iopage0->pointer() + 0x800, gamma_1_8, 256);
-    m_video->set_videoram(m_ram->pointer(), m_iopage0->pointer(), m_iopage1->pointer(), m_iopage2->pointer(), m_iopage3->pointer());
+    memcpy(m_iopage[0]->pointer(), gamma_1_8, 256);
+    memcpy(m_iopage[0]->pointer() + 0x400, gamma_1_8, 256);
+    memcpy(m_iopage[0]->pointer() + 0x800, gamma_1_8, 256);
+    m_video->set_videoram(m_ram->pointer(), m_iopage[0]->pointer(), m_iopage[1]->pointer(), m_iopage[2]->pointer(), m_iopage[3]->pointer());
     m_video->start();
 
     // set the current time on the RTC device
@@ -1622,7 +1619,7 @@ TIMER_CALLBACK_MEMBER(f256_state::spi_clock)
 TIMER_CALLBACK_MEMBER(f256_state::timer0)
 {
     logerror("Timer0 reached value: %06X\n", m_timer0_load);
-    uint8_t reg_t0 = m_iopage0->read(0xD650 - 0xC000);
+    uint8_t reg_t0 = m_iopage[0]->read(0xD650 - 0xC000);
     if ((reg_t0 & 0x80) !=0)
     {
         timer0_interrupt_handler(1);
@@ -1630,14 +1627,14 @@ TIMER_CALLBACK_MEMBER(f256_state::timer0)
 }
 // TIMER_CALLBACK_MEMBER(f256_state::timer0)
 // {
-//     uint8_t reg_t0 = m_iopage0->read(0xD650 - 0xC000);
-//     uint32_t cmp = m_iopage0->read(0xD655 - 0xC000) + (m_iopage0->read(0xD656 - 0xC000) << 8) +
-//             (m_iopage0->read(0xD657 - 0xC000) << 16);
+//     uint8_t reg_t0 = m_iopage[0]->read(0xD650 - 0xC000);
+//     uint32_t cmp = m_iopage[0]->read(0xD655 - 0xC000) + (m_iopage[0]->read(0xD656 - 0xC000) << 8) +
+//             (m_iopage[0]->read(0xD657 - 0xC000) << 16);
 
 //     // if timer as reached value, then execute the action
 //     if (m_timer0_eq == 1)
 //     {
-//         int8_t action = m_iopage0->read(0xD654 - 0xC000);
+//         int8_t action = m_iopage[0]->read(0xD654 - 0xC000);
 //         if (action & 1)
 //         {
 //             logerror("TIMER0 Cleared\n");
@@ -1696,14 +1693,14 @@ TIMER_CALLBACK_MEMBER(f256_state::timer0)
 // This timer is much slower than Timer0, so we can use single increments
 TIMER_CALLBACK_MEMBER(f256_state::timer1)
 {
-    uint8_t reg_t1 = m_iopage0->read(0xD658 - 0xC000);
-    uint32_t cmp = m_iopage0->read(0xD65D - 0xC000) + (m_iopage0->read(0xD65E - 0xC000) << 8) +
-            (m_iopage0->read(0xD65F - 0xC000) << 16);
+    uint8_t reg_t1 = m_iopage[0]->read(0xD658 - 0xC000);
+    uint32_t cmp = m_iopage[0]->read(0xD65D - 0xC000) + (m_iopage[0]->read(0xD65E - 0xC000) << 8) +
+            (m_iopage[0]->read(0xD65F - 0xC000) << 16);
     logerror("TIMER1 event %06X CMP: %06X\n", m_timer1_val, cmp);
     // if timer as reached value, then execute the action
     if (m_timer1_eq == 1)
     {
-        int8_t action = m_iopage0->read(0xD65C - 0xC000);
+        int8_t action = m_iopage[0]->read(0xD65C - 0xC000);
         if (action & 1)
         {
             logerror("TIMER1 Cleared\n");
