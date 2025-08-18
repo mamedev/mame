@@ -24,7 +24,7 @@ f256_state::f256_state(const machine_config &mconfig, device_type type, const ch
     driver_device(mconfig, type, tag)
     , m_maincpu(*this, MAINCPU_TAG)
     , m_ram(*this, RAM_TAG)
-    , m_iopage(*this, "iopage%u", 0U)
+    , m_iopage(*this, IOPAGE_TAG "%u", 0U)
     , m_rom(*this, ROM_TAG)
     , m_font(*this, FONT_TAG)
     , m_screen(*this, SCREEN_TAG)
@@ -168,10 +168,10 @@ void f256_state::program_map(address_map &map)
 
 void f256_state::data_map(address_map &map)
 {
-    map(0x0000, 0x1FFF).ram().share("iopage0");
-    map(0x0000, 0x1FFF).ram().share("iopage1");
-    map(0x0000, 0x1FFF).ram().share("iopage2");
-    map(0x0000, 0x1FFF).ram().share("iopage3");
+    map(0x0000, 0x1FFF).ram().share(IOPAGE_TAG "0");
+    map(0x0000, 0x1FFF).ram().share(IOPAGE_TAG "1");
+    map(0x0000, 0x1FFF).ram().share(IOPAGE_TAG "2");
+    map(0x0000, 0x1FFF).ram().share(IOPAGE_TAG "3");
 }
 
 u8   f256_state::lut_r(offs_t offset)
