@@ -8741,8 +8741,8 @@ static INPUT_PORTS_START( daimyojn )
 	PORT_DIPSETTING(    0x04, "Every 500 coins" )                                                          // 500コイン毎
 	PORT_DIPSETTING(    0x03, "Every 700 coins" )                                                          // 700コイン毎
 	PORT_DIPSETTING(    0x02, "Every 1000 coins" )                                                         // 1000コイン毎
-//  PORT_DIPSETTING(    0x01, "Every 1000 coins" )
-//  PORT_DIPSETTING(    0x00, "Every 1000 coins" )
+    PORT_DIPSETTING(    0x01, "Every 1000 coins" )
+    PORT_DIPSETTING(    0x00, "Every 1000 coins" )
 	PORT_DIPNAME( 0x08, 0x08, "Yakuman Chances Per Cycle" )          PORT_DIPLOCATION("DIP-SW3:4")         // 役満チャンスの回数設定周期毎に
 	PORT_DIPSETTING(    0x08, "1" )                                                                        // 1回
 	PORT_DIPSETTING(    0x00, "2" )                                                                        // 2回
@@ -8750,9 +8750,9 @@ static INPUT_PORTS_START( daimyojn )
 	PORT_DIPSETTING(    0x10, DEF_STR(No) )                                                                // 不許可
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                               // 許可
 	PORT_DIPNAME( 0x20, 0x20, "Super Time Trial Frequency" )         PORT_DIPLOCATION("DIP-SW3:6")         // スーパータイムトライルの出没率
-	PORT_DIPSETTING(    0x20, DEF_STR(Normal) )                                                            // 通常
+	PORT_DIPSETTING(    0x20, "Normal" )                                                                  // 通常
 	PORT_DIPSETTING(    0x00, "Somewhat common" )                                                          // やや多い
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Unknown) )                     PORT_DIPLOCATION("DIP-SW3:7")
+	PORT_DIPNAME( 0x40, 0x40, "Fever Rush Rate" )                     PORT_DIPLOCATION("DIP-SW3:7")
 	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP-SW3:8")                                                       // ＯＦＦ固定
@@ -8782,17 +8782,17 @@ static INPUT_PORTS_START( daimyojn )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Flip_Screen) )                 PORT_DIPLOCATION("DIP-SW1:10")
 	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR(Unknown) )                     PORT_DIPLOCATION("DIP-SW2:9,10")      // FIXME: illegible
-	PORT_DIPSETTING(    0x0c, "A?" )                                                                       // FIXME: illegible
-	PORT_DIPSETTING(    0x08, "B?" )                                                                       // FIXME: illegible
-	PORT_DIPSETTING(    0x04, "C?" )                                                                       // FIXME: illegible
-	PORT_DIPSETTING(    0x00, "D?" )                                                                       // FIXME: illegible
+	PORT_DIPNAME( 0x0c, 0x08, "Computer Strength" )                     PORT_DIPLOCATION("DIP-SW2:9,10")      // コンピューターの強さ[放铳パターンの確率]
+	PORT_DIPSETTING(    0x0c, "Very Strong" )                                                                // 強い   (CUT)	
+	PORT_DIPSETTING(    0x08, "Strong" )                                                                       //やや強い(1/8)//中等强度
+	PORT_DIPSETTING(    0x04, "Normal" )                                                                       //  普通  (1/4)
+	PORT_DIPSETTING(    0x00, "Weak" )                                                                       // 弱い (1/2)
 	PORT_DIPNAME( 0x10, 0x10, "Game Style" )                         PORT_DIPLOCATION("DIP-SW3:9")         // ゲームスタイル
 	PORT_DIPSETTING(    0x10, "Credits" )                                                                  // クレジット
 	PORT_DIPSETTING(    0x00, "Credits with timer" )                                                       // クレジットタイマー
 	PORT_DIPNAME( 0x20, 0x20, "Game Start Method" )                  PORT_DIPLOCATION("DIP-SW3:10")        // ゲームスタート時のスタート方式
 	PORT_DIPSETTING(    0x20, DEF_STR(Normal) )                                                            // 通常
-	PORT_DIPSETTING(    0x00, "Automatic minimum bet" )                                                    // FIXME: illegible - when SW3:9 is set to Credits with timer, you can only take the minimum bet by pressing start
+	PORT_DIPSETTING(    0x00, "Standard Type" )                                                    //タイプ 標準設定// FIXME: illegible - when SW3:9 is set to Credits with timer, you can only take the minimum bet by pressing start
 	PORT_DIPNAME( 0x40, 0x40, "Game Mode" )                          PORT_DIPLOCATION("DIP-SW4:9")         // タイプ設定
 	PORT_DIPSETTING(    0x40, "Coin Pool" )                                                                // コインプール
 	PORT_DIPSETTING(    0x00, "Medal/Credits with timer" )
