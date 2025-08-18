@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-copyright-holders:Felipe Sanches
+copyright-holders:Felipe Sanches, Nicoly Sampaio
 
 Front panel of the Patinho Feio mini-computer with clickable buttons, switches and lamps.
 -->
@@ -14,8 +14,39 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 	</element>
 
 	<element name="button" defstate="0">
-		<disk state="1"><color red="0.10" green="0.70" blue="0.10" /></disk>
-		<disk state="0"><color red="0.05" green="0.2" blue="0.05" /></disk>
+		<disk state="1"><color red="0" green="1" blue="0" /></disk>
+		<disk state="0"><color red="0" green="0.5" blue="0" /></disk>
+	</element>
+	<element name="button_border">
+		<disk><color red="0" green="0.32" blue="0" /></disk>
+	</element>
+	<element name="button_surrond">
+		<disk><color red="0.04" green="0.09" blue="0.1" /></disk>
+	</element>
+	<element name="button_surrond_border">
+		<disk><color red="0" green="0" blue="0" /></disk>
+	</element>
+
+	<element name="sqr_button" defstate="0">
+		<rect state="1"><color red="1" green="1" blue="1" /></rect>
+		<rect state="0"><color red="1" green="1" blue="1" /></rect>
+	</element>
+	<element name="sqr_button_border">
+		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
+	</element>
+	<element name="sqr_button_surrond">
+		<rect><color red="0.3" green="0.3" blue="0.3" /></rect>
+	</element>
+	<element name="sqr_button_surrond_border">
+		<rect><color red="0" green="0" blue="0" /></rect>
+	</element>
+
+	<element name="line">
+		<rect><color red="0" green="0" blue="0" /></rect>
+	</element>
+
+	<element name="rect">
+		<rect><color red="0.83" green="0.33" blue="0" /></rect>
 	</element>
 
 	<element name="panel_background">
@@ -119,199 +150,9 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="-33" y="-980" width="1343" height="2218" />
 		</element>
 
-		<element name="mem_data7" ref="bit_lamp" inputtag="mem_data" inputmask="0x080">
-			<bounds x="190" y="440" width="20" height="20" />
+		<element ref="rect">
+			<bounds x="158" y="65" width="369" height="73" />
 		</element>
-
-		<element name="mem_data6" ref="bit_lamp" inputtag="mem_data" inputmask="0x040">
-			<bounds x="215" y="440" width="20" height="20" />
-		</element>
-
-		<element name="mem_data5" ref="bit_lamp" inputtag="mem_data" inputmask="0x020">
-			<bounds x="240" y="440" width="20" height="20" />
-		</element>
-
-		<element name="mem_data4" ref="bit_lamp" inputtag="mem_data" inputmask="0x010">
-			<bounds x="265" y="440" width="20" height="20" />
-		</element>
-
-		<element name="mem_data3" ref="bit_lamp" inputtag="mem_data" inputmask="0x008">
-			<bounds x="290" y="440" width="20" height="20" />
-		</element>
-
-		<element name="mem_data2" ref="bit_lamp" inputtag="mem_data" inputmask="0x004">
-			<bounds x="315" y="440" width="20" height="20" />
-		</element>
-
-		<element name="mem_data1" ref="bit_lamp" inputtag="mem_data" inputmask="0x002">
-			<bounds x="340" y="440" width="20" height="20" />
-		</element>
-
-		<element name="mem_data0" ref="bit_lamp" inputtag="mem_data" inputmask="0x001">
-			<bounds x="365" y="440" width="20" height="20" />
-		</element>
-
-		<element ref="str_mem_data">
-			<bounds x="200" y="470" width="200" height="20" />
-		</element>
-
-		<element name="opcode7" ref="bit_lamp" inputtag="opcode" inputmask="0x080">
-			<bounds x="190" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode6" ref="bit_lamp" inputtag="opcode" inputmask="0x040">
-			<bounds x="215" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode5" ref="bit_lamp" inputtag="opcode" inputmask="0x020">
-			<bounds x="240" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode4" ref="bit_lamp" inputtag="opcode" inputmask="0x010">
-			<bounds x="265" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode3" ref="bit_lamp" inputtag="opcode" inputmask="0x008">
-			<bounds x="290" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode2" ref="bit_lamp" inputtag="opcode" inputmask="0x004">
-			<bounds x="315" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode1" ref="bit_lamp" inputtag="opcode" inputmask="0x002">
-			<bounds x="340" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode0" ref="bit_lamp" inputtag="opcode" inputmask="0x001">
-			<bounds x="365" y="340" width="20" height="20" />
-		</element>
-
-		<element ref="str_opcode">
-			<bounds x="200" y="370" width="200" height="20" />
-		</element>
-
-		<element name="acc7" ref="bit_lamp" inputtag="ACC" inputmask="0x080">
-			<bounds x="190" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc6" ref="bit_lamp" inputtag="ACC" inputmask="0x040">
-			<bounds x="215" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc5" ref="bit_lamp" inputtag="ACC" inputmask="0x020">
-			<bounds x="240" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc4" ref="bit_lamp" inputtag="ACC" inputmask="0x010">
-			<bounds x="265" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc3" ref="bit_lamp" inputtag="ACC" inputmask="0x008">
-			<bounds x="290" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc2" ref="bit_lamp" inputtag="ACC" inputmask="0x004">
-			<bounds x="315" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc1" ref="bit_lamp" inputtag="ACC" inputmask="0x002">
-			<bounds x="340" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc0" ref="bit_lamp" inputtag="ACC" inputmask="0x001">
-			<bounds x="365" y="240" width="20" height="20" />
-		</element>
-
-		<element ref="str_acc">
-			<bounds x="200" y="270" width="200" height="20" />
-		</element>
-
-		<element name="rc11" ref="bit_lamp" inputtag="RC" inputmask="0x800">
-			<bounds x="440" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc10" ref="bit_lamp" inputtag="RC" inputmask="0x400">
-			<bounds x="465" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc9" ref="bit_lamp" inputtag="RC" inputmask="0x200">
-			<bounds x="490" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc8" ref="bit_lamp" inputtag="RC" inputmask="0x100">
-			<bounds x="515" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc7" ref="bit_lamp" inputtag="RC" inputmask="0x080">
-			<bounds x="540" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc6" ref="bit_lamp" inputtag="RC" inputmask="0x040">
-			<bounds x="565" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc5" ref="bit_lamp" inputtag="RC" inputmask="0x020">
-			<bounds x="590" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc4" ref="bit_lamp" inputtag="RC" inputmask="0x010">
-			<bounds x="615" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc3" ref="bit_lamp" inputtag="RC" inputmask="0x008">
-			<bounds x="640" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc2" ref="bit_lamp" inputtag="RC" inputmask="0x004">
-			<bounds x="665" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc1" ref="bit_lamp" inputtag="RC" inputmask="0x002">
-			<bounds x="690" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc0" ref="bit_lamp" inputtag="RC" inputmask="0x001">
-			<bounds x="715" y="490" width="20" height="20" />
-		</element>
-
-		<element ref="str_rc">
-			<bounds x="450" y="520" width="299" height="20" />
-		</element>
-
-		<element name="flags1" ref="bit_lamp" inputtag="FLAGS" inputmask="0x002">
-			<bounds x="465" y="310" width="20" height="20" />
-		</element>
-
-		<element name="flags0" ref="bit_lamp" inputtag="FLAGS" inputmask="0x001">
-			<bounds x="690" y="310" width="20" height="20" />
-		</element>
-
-		<element ref="str_flags_t">
-			<bounds x="400" y="350" width="199" height="20" />
-		</element>
-
-		<element ref="str_flags_v">
-			<bounds x="650" y="350" width="99" height="20" />
-		</element>
-
-
-		<!-- Lamps for Instruction Address
-		     (PC = "Program Counter" = "Endereço de Instrução") -->
-
-		<repeat count="12">
-			<param name="lamp_x" start="762" increment="28"/>
-			<param name="lamp_id" start="11" increment="-1"/>
-			<param name="mask" start="0x800" rshift="1" />
-			<element name="pc~lamp_id~" ref="bit_lamp" inputtag="PC" inputmask="~mask~">
-				<bounds x="~lamp_x~" y="190" width="11" height="11" />
-			</element>
-		</repeat>
-
-		<element ref="str_pc">
-			<bounds x="450" y="270" width="299" height="20" />
-		</element>
-
 
 		<repeat count="12">
 			<param name="lamp_x" start="762" increment="28"/>
@@ -323,89 +164,372 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		</repeat>
 
 		<element ref="str_mem_addr">
-			<bounds x="450" y="170" width="299" height="20" />
+			<bounds x="840" y="121" width="195" height="18" />
 		</element>
 
+		<repeat count="12">
+			<param name="lamp_x" start="762" increment="28"/>
+			<param name="lamp_id" start="11" increment="-1"/>
+			<param name="mask" start="0x800" rshift="1" />
+			<element name="pc~lamp_id~" ref="bit_lamp" inputtag="PC" inputmask="~mask~">
+				<bounds x="~lamp_x~" y="190" width="11" height="11" />
+			</element>
+		</repeat>
 
+		<element ref="str_pc">
+			<bounds x="823" y="237" width="214" height="18" />
+		</element>
+
+		<element name="flags1" ref="bit_lamp" inputtag="FLAGS" inputmask="0x002">
+			<bounds x="765" y="272" width="11" height="11" />
+		</element>
+
+		<element ref="str_flags_t">
+			<bounds x="722" y="301" width="106" height="18" />
+		</element>
+
+		<element name="flags0" ref="bit_lamp" inputtag="FLAGS" inputmask="0x001">
+			<bounds x="1069" y="272" width="11" height="11" />
+		</element>
+
+		<element ref="str_flags_v">
+			<bounds x="1052" y="301" width="57" height="18" />
+		</element>
+
+		<repeat count="12">
+			<param name="lamp_x" start="762" increment="28"/>
+			<param name="lamp_id" start="11" increment="-1"/>
+			<param name="mask" start="0x800" rshift="1" />
+			<element name="rc~lamp_id~" ref="bit_lamp" inputtag="rc" inputmask="~mask~">
+				<bounds x="~lamp_x~" y="480" width="11" height="11" />
+			</element>
+		</repeat>
+
+		<element ref="str_rc">
+			<bounds x="830" y="529" width="215" height="18" />
+		</element>
+
+		<repeat count="8">
+			<param name="lamp_x" start="233" increment="28"/>
+			<param name="lamp_id" start="7" increment="-1"/>
+			<param name="mask" start="0x800" rshift="1" />
+			<element name="acc~lamp_id~" ref="bit_lamp" inputtag="ACC" inputmask="~mask~">
+				<bounds x="~lamp_x~" y="190" width="11" height="11" />
+			</element>
+		</repeat>
+
+		<element ref="str_acc">
+			<bounds x="273" y="239" width="140" height="18" />
+		</element>
+
+		<repeat count="8">
+			<param name="lamp_x" start="233" increment="28"/>
+			<param name="lamp_id" start="7" increment="-1"/>
+			<param name="mask" start="0x800" rshift="1" />
+			<element name="opcode~lamp_id~" ref="bit_lamp" inputtag="opcode" inputmask="~mask~">
+				<bounds x="~lamp_x~" y="310" width="11" height="11" />
+			</element>
+		</repeat>
+
+		<element ref="str_opcode">
+			<bounds x="251" y="356" width="193" height="18" />
+		</element>
+
+		<repeat count="8">
+			<param name="lamp_x" start="233" increment="28"/>
+			<param name="lamp_id" start="7" increment="-1"/>
+			<param name="mask" start="0x800" rshift="1" />
+			<element name="mem_data~lamp_id~" ref="bit_lamp" inputtag="mem_data" inputmask="~mask~">
+				<bounds x="~lamp_x~" y="430" width="11" height="11" />
+			</element>
+		</repeat>
+
+		<element ref="str_mem_data">
+			<bounds x="242" y="476" width="216" height="18" />
+		</element>
+
+		<element ref="rect">
+			<bounds x="788" y="672" width="174" height="39" />
+		</element>
+
+		<element ref="rect">
+			<bounds x="1020" y="672" width="174" height="39" />
+		</element>
+
+		<element name="NORMAL" ref="button_surrond_border">
+			<bounds x="93" y="994" width="42" height="42" />
+		</element>
+		<element name="NORMAL" ref="button_surrond">
+			<bounds x="95" y="996" width="38" height="38" />
+		</element>
+		<element name="NORMAL" ref="button_border">
+			<bounds x="97" y="998" width="34" height="34" />
+		</element>
 		<element name="NORMAL" ref="button" inputtag="BUTTONS" inputmask="0x001">
-			<bounds x="40" y="640" width="40" height="40" />
+			<bounds x="99" y="1000" width="30" height="30" />
 		</element>
 
 		<element ref="str_NORMAL">
-			<bounds x="12" y="610" width="150" height="20" />
+			<bounds x="90" y="963" width="60" height="18" />
 		</element>
 
+		<element name="CICLOUNICO" ref="button_surrond_border">
+			<bounds x="200" y="994" width="42" height="42"  />
+		</element>
+		<element name="CICLOUNICO" ref="button_surrond">
+			<bounds x="202" y="996" width="38" height="38" />
+		</element>
+		<element name="CICLOUNICO" ref="button_border">
+			<bounds x="204" y="998" width="34" height="34" />
+		</element>
 		<element name="CICLOUNICO" ref="button" inputtag="BUTTONS" inputmask="0x002">
-			<bounds x="190" y="640" width="40" height="40" />
+			<bounds x="206" y="1000" width="30" height="30" />
 		</element>
 
 		<element ref="str_CICLOUNICO">
-			<bounds x="162" y="610" width="150" height="20" />
+			<bounds x="185" y="963" width="72" height="18" />
 		</element>
 
+		<element name="INSTRUCAOUNICA" ref="button_surrond_border">
+			<bounds x="310" y="994" width="42" height="42"  />
+		</element>
+		<element name="INSTRUCAOUNICA" ref="button_surrond">
+			<bounds x="313" y="996" width="38" height="38" />
+		</element>
+		<element name="INSTRUCAOUNICA" ref="button_border">
+			<bounds x="315" y="998" width="34" height="34" />
+		</element>
 		<element name="INSTRUCAOUNICA" ref="button" inputtag="BUTTONS" inputmask="0x004">
-			<bounds x="340" y="640" width="40" height="40" />
+			<bounds x="317" y="1000" width="30" height="30" />
 		</element>
 
 		<element ref="str_INSTRUCAOUNICA">
-			<bounds x="312" y="610" width="150" height="20" />
+			<bounds x="294" y="961" width="68" height="22" />
 		</element>
 
+		<element ref="rect">
+			<bounds x="382" y="944" width="311" height="68" />
+		</element>
+
+		<element name="ENDERECAMENTO" ref="button_surrond_border">
+			<bounds x="413" y="994" width="42" height="42"  />
+		</element>
+		<element name="ENDERECAMENTO" ref="button_surrond">
+			<bounds x="415" y="996" width="38" height="38" />
+		</element>
+		<element name="ENDERECAMENTO" ref="button_border">
+			<bounds x="417" y="998" width="34" height="34" />
+		</element>
 		<element name="ENDERECAMENTO" ref="button" inputtag="BUTTONS" inputmask="0x008">
-			<bounds x="490" y="640" width="40" height="40" />
+			<bounds x="419" y="1000" width="30" height="30" />
 		</element>
 
 		<element ref="str_ENDERECAMENTO">
-			<bounds x="462" y="610" width="150" height="20" />
+			<bounds x="397" y="963" width="70" height="18" />
 		</element>
 
+		<element name="ARMAZENAMENTO" ref="button_surrond_border">
+			<bounds x="520" y="994" width="42" height="42"  />
+		</element>
+		<element name="ARMAZENAMENTO" ref="button_surrond">
+			<bounds x="522" y="996" width="38" height="38" />
+		</element>
+		<element name="ARMAZENAMENTO" ref="button_border">
+			<bounds x="524" y="998" width="34" height="34" />
+		</element>
 		<element name="ARMAZENAMENTO" ref="button" inputtag="BUTTONS" inputmask="0x010">
-			<bounds x="640" y="640" width="40" height="40" />
+			<bounds x="526" y="1000" width="30" height="30" />
 		</element>
 
 		<element ref="str_ARMAZENAMENTO">
-			<bounds x="612" y="610" width="150" height="20" />
+			<bounds x="501" y="963" width="72" height="18" />
 		</element>
 
+		<element name="EXPOSICAO" ref="button_surrond_border">
+			<bounds x="626" y="994" width="42" height="42"  />
+		</element>
+		<element name="EXPOSICAO" ref="button_surrond">
+			<bounds x="628" y="996" width="38" height="38" />
+		</element>
+		<element name="EXPOSICAO" ref="button_border">
+			<bounds x="630" y="998" width="34" height="34" />
+		</element>
 		<element name="EXPOSICAO" ref="button" inputtag="BUTTONS" inputmask="0x020">
-			<bounds x="790" y="640" width="40" height="40" />
+			<bounds x="632" y="1000" width="30" height="30" />
 		</element>
 
 		<element ref="str_EXPOSICAO">
-			<bounds x="762" y="610" width="150" height="20" />
+			<bounds x="614" y="963" width="68" height="18" />
 		</element>
 
+		<element name="ESPERA" ref="button_surrond_border">
+			<bounds x="915" y="994" width="42" height="42"  />
+		</element>
+		<element name="ESPERA" ref="button_surrond">
+			<bounds x="917" y="996" width="38" height="38" />
+		</element>
+		<element name="ESPERA" ref="button_border">
+			<bounds x="919" y="998" width="34" height="34" />
+		</element>
 		<element name="ESPERA" ref="button" inputtag="BUTTONS" inputmask="0x040">
-			<bounds x="340" y="740" width="40" height="40" />
+			<bounds x="921" y="1000" width="30" height="30" />
 		</element>
 
 		<element ref="str_ESPERA">
-			<bounds x="308" y="710" width="166" height="20" />
+			<bounds x="912" y="963" width="58" height="18" />
 		</element>
 
+		<element name="INTERRUPCAO" ref="button_surrond_border">
+			<bounds x="1022" y="994" width="42" height="42"  />
+		</element>
+		<element name="INTERRUPCAO" ref="button_surrond">
+			<bounds x="1024" y="996" width="38" height="38" />
+		</element>
+		<element name="INTERRUPCAO" ref="button_border">
+			<bounds x="1026" y="998" width="34" height="34" />
+		</element>
 		<element name="INTERRUPCAO" ref="button" inputtag="BUTTONS" inputmask="0x080">
-			<bounds x="506" y="740" width="40" height="40" />
+			<bounds x="1028" y="1000" width="30" height="30" />
 		</element>
 
 		<element ref="str_INTERRUPCAO">
-			<bounds x="474" y="710" width="166" height="20" />
+			<bounds x="1005" y="963" width="74" height="18" />
 		</element>
 
-		<element name="PARTIDA" ref="button" inputtag="BUTTONS" inputmask="0x100">
-			<bounds x="673" y="740" width="40" height="40" />
+		<element name="PARTIDA" ref="sqr_button_surrond_border">
+			<bounds x="1120" y="992" width="56" height="46"  />
+		</element>
+		<element name="PARTIDA" ref="sqr_button_surrond">
+			<bounds x="1125" y="996" width="48" height="38" />
+		</element>
+		<element name="PARTIDA" ref="sqr_button_border">
+			<bounds x="1129" y="1000" width="40" height="30" />
+		</element>
+		<element name="PARTIDA" ref="sqr_button" inputtag="BUTTONS" inputmask="0x100">
+			<bounds x="1133" y="1004" width="32" height="22" />
 		</element>
 
 		<element ref="str_PARTIDA">
-			<bounds x="641" y="710" width="166" height="20" />
+			<bounds x="1119" y="962" width="66" height="20" />
 		</element>
 
+		<element name="PREPARACAO" ref="button_surrond_border">
+			<bounds x="1128" y="1092" width="42" height="42"  />
+		</element>
+		<element name="PREPARACAO" ref="button_surrond">
+			<bounds x="1130" y="1094" width="38" height="38" />
+		</element>
+		<element name="PREPARACAO" ref="button_border">
+			<bounds x="1132" y="1096" width="34" height="34" />
+		</element>
 		<element name="PREPARACAO" ref="button" inputtag="BUTTONS" inputmask="0x200">
-			<bounds x="840" y="740" width="40" height="40" />
+			<bounds x="1134" y="1098" width="30" height="30" />
 		</element>
 
 		<element ref="str_PREPARACAO">
-			<bounds x="808" y="710" width="166" height="20" />
+			<bounds x="1114" y="1154" width="68" height="18" />
 		</element>
 
+<!-- define horizontal lines -->
+		<element ref="line">
+			<bounds x="68" y="38" width="1177" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="525" y="80" width="220" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="1089" y="80" width="157" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="32" y="97" width="126" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="109" y="121" width="49" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="109" y="195" width="116" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="447" y="195" width="308" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="1089" y="195" width="157" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="109" y="315" width="116" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="447" y="315" width="428" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="955" y="328" width="291" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="577" y="344" width="298" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="109" y="415" width="74" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="183" y="435" width="42" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="447" y="435" width="130" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="68" y="451" width="115" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="577" y="486" width="178" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="32" y="527" width="545" height="4" />
+		</element>
+
+<!-- define vertical lines -->
+		<element ref="line">
+			<bounds x="32" y="97" width="4" height="430" />
+		</element>
+
+		<element ref="line">
+			<bounds x="68" y="38" width="4" height="413" />
+		</element>
+
+		<element ref="line">
+			<bounds x="109" y="121" width="4" height="294" />
+		</element>
+
+		<element ref="line">
+			<bounds x="183" y="415" width="4" height="40" />
+		</element>
+
+		<element ref="line">
+			<bounds x="577" y="80" width="4" height="236" />
+		</element>
+
+		<element ref="line">
+			<bounds x="577" y="344" width="4" height="187" />
+		</element>
+
+		<element ref="line">
+			<bounds x="1246" y="38" width="4" height="295" />
+		</element>
 	</view>
 </mamelayout>
