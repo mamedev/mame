@@ -35,6 +35,7 @@
 #define FLASH_TAG                   "flash"
 #define VICKY_VIDEO_TAG             "vicky"
 #define SCREEN_TAG                  "screen"
+#define VIA_TAG                     "via6522"
 
 class f256_state : public driver_device
 {
@@ -57,11 +58,11 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<bq4802_device> m_rtc;
 	required_ioport_array<8> m_keyboard; // the number 8 will require 8 COL
-	required_device<via6522_device> m_via6522_0, m_via6522_1;
-	required_device<sn76489_device> m_sn0, m_sn1;
+	required_device_array<via6522_device, 2> m_via6522;
+	required_device_array<sn76489_device, 2> m_sn;
 	required_device<ymf262_device> m_opl3;
-	required_device<mos6581_device> m_sid0, m_sid1;
-	required_ioport m_joy1, m_joy2;
+	required_device_array<mos6581_device, 2> m_sid;
+	required_ioport_array<2> m_joy;
 
 	required_device<tiny_vicky_video_device> m_video;
 	//required_device<cbm_iec_device> m_iec;

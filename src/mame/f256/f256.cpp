@@ -30,16 +30,12 @@ f256_state::f256_state(const machine_config &mconfig, device_type type, const ch
     , m_screen(*this, SCREEN_TAG)
     , m_rtc(*this, "rtc")
     , m_keyboard(*this, "ROW%u", 0)  // this, with the 8 array, requires 8 ROW of INPUTs
-    , m_via6522_0(*this, "via6522_0")
-	, m_via6522_1(*this, "via6522_1")
+    , m_via6522(*this, VIA_TAG "%u", 0U)
 
-    , m_sn0(*this, "sn76489_0")
-    , m_sn1(*this, "sn76489_1")
+    , m_sn(*this, "sn76489_%u", 0U)
     , m_opl3(*this, "ymf262")
-    , m_sid0(*this, "sid_0")
-    , m_sid1(*this, "sid_1")
-    , m_joy1(*this, "JOY1")
-    , m_joy2(*this, "JOY2")
+    , m_sid(*this, "sid_%u", 0U)
+    , m_joy(*this, "JOY%u", 1U)
 
     , m_video(*this, "tiny_vicky")
     //, m_iec(*this, "iec_bus")
@@ -81,51 +77,59 @@ void f256_state::f256k(machine_config &config)
     m_video->sof_irq_handler().set(FUNC(f256_state::sof_interrtupt));
     m_video->sol_irq_handler().set(FUNC(f256_state::sol_interrtupt));
 
-    W65C22S(config, m_via6522_0, MASTER_CLOCK / 4);  // Atari Joysticks
-	m_via6522_0->readpa_handler().set(FUNC(f256_state::via0_system_porta_r));
-	m_via6522_0->readpb_handler().set(FUNC(f256_state::via0_system_portb_r));
-	m_via6522_0->writepa_handler().set(FUNC(f256_state::via0_system_porta_w));
-	m_via6522_0->writepb_handler().set(FUNC(f256_state::via0_system_portb_w));
-    m_via6522_0->ca2_handler().set(FUNC(f256_state::via0_ca2_write));
-    m_via6522_0->cb2_handler().set(FUNC(f256_state::via0_cb2_write));
-    m_via6522_0->irq_handler().set(FUNC(f256_state::via0_interrupt));
+    // VIA are used to implement the keyboard and Atari-style joysticks polling
+    for (auto &via655: m_via6522)
+    {
+        W65C22S(config, via655, MASTER_CLOCK / 4);  // Atari Joysticks
+    }
+    // The functions for VIA 0 and VIA 1 are different as they poll different devices
+    m_via6522[0]->readpa_handler().set(FUNC(f256_state::via0_system_porta_r));
+    m_via6522[0]->readpb_handler().set(FUNC(f256_state::via0_system_portb_r));
+    m_via6522[0]->writepa_handler().set(FUNC(f256_state::via0_system_porta_w));
+    m_via6522[0]->writepb_handler().set(FUNC(f256_state::via0_system_portb_w));
+    m_via6522[0]->ca2_handler().set(FUNC(f256_state::via0_ca2_write));
+    m_via6522[0]->cb2_handler().set(FUNC(f256_state::via0_cb2_write));
+    m_via6522[0]->irq_handler().set(FUNC(f256_state::via0_interrupt));
+
+    m_via6522[1]->readpa_handler().set(FUNC(f256_state::via1_system_porta_r));
+    m_via6522[1]->readpb_handler().set(FUNC(f256_state::via1_system_portb_r));
+    m_via6522[1]->writepa_handler().set(FUNC(f256_state::via1_system_porta_w));
+    m_via6522[1]->writepb_handler().set(FUNC(f256_state::via1_system_portb_w));
+    m_via6522[1]->ca2_handler().set(FUNC(f256_state::via1_ca2_write));
+    m_via6522[1]->cb2_handler().set(FUNC(f256_state::via1_cb2_write));
+    m_via6522[1]->irq_handler().set(FUNC(f256_state::via1_interrupt));
 
     // initialize the PS2 mouse
     PC_KBDC(config, m_ps2_keyboard, XTAL(32'768));
     HLE_PS2_MOUSE(config, m_mouse, XTAL(32'768));
     m_mouse->set_pc_kbdc(m_ps2_keyboard);
+    
 
-    MOS6522(config, m_via6522_1, MASTER_CLOCK / 4);  // Keyboard XTAL(14'318'181)/14)
-    m_via6522_1->readpa_handler().set(FUNC(f256_state::via1_system_porta_r));
-	m_via6522_1->readpb_handler().set(FUNC(f256_state::via1_system_portb_r));
-	m_via6522_1->writepa_handler().set(FUNC(f256_state::via1_system_porta_w));
-	m_via6522_1->writepb_handler().set(FUNC(f256_state::via1_system_portb_w));
-    m_via6522_1->ca2_handler().set(FUNC(f256_state::via1_ca2_write));
-    m_via6522_1->cb2_handler().set(FUNC(f256_state::via1_cb2_write));
-    m_via6522_1->irq_handler().set(FUNC(f256_state::via1_interrupt));
+    // There are two PSG sound chips
+    for (auto &sn: m_sn)
+    {
+        SN76489(config, sn, MUSIC_CLOCK / 4);
+        sn->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+        sn->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+    }
 
-    // Mix PSG
-    SN76489(config, m_sn0, MUSIC_CLOCK / 4);
-    m_sn0->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-    m_sn0->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-    SN76489(config, m_sn1, MUSIC_CLOCK / 4);
-    m_sn1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-    m_sn1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-
+    // Single OPL3 sound chip
     YMF262(config, m_opl3, MUSIC_CLOCK);
     m_opl3->add_route(0, "lspeaker", 1.0);
 	m_opl3->add_route(1, "rspeaker", 1.0);
 	m_opl3->add_route(2, "lspeaker", 1.0);
 	m_opl3->add_route(3, "rspeaker", 1.0);
 
-    // The SIDs are very noisy
-    MOS6581(config, m_sid0, MUSIC_CLOCK/14);
-    m_sid0->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-    m_sid0->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-    MOS6581(config, m_sid1, MUSIC_CLOCK/14);
-    m_sid1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-    m_sid1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-
+    // There are two SID sound chips
+    // Try to figure out why the SID are so noisy
+    for (auto &sid: m_sid)
+    {
+        MOS6581(config, sid, MUSIC_CLOCK/14);
+        sid->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+        sid->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+    }
+    
+    // Mix all sound chips
     SPEAKER(config, "lspeaker").front_left();
     SPEAKER(config, "rspeaker").front_right();
 
@@ -527,12 +531,12 @@ u8   f256_state::mem_r(offs_t offset)
                     else if (adj_addr >= 0xDB00 && adj_addr < 0xDB10)
                     {
                         // VIA1 - Keyboard for F256K
-                        return m_via6522_1->read(adj_addr - 0xDB00);
+                        return m_via6522[1]->read(adj_addr - 0xDB00);
                     }
                     else if (adj_addr >= 0xDC00 && adj_addr < 0xDC10)
                     {
                         // VIA0 - Atari Joystick
-                        return m_via6522_0->read(adj_addr - 0xDC00);
+                        return m_via6522[0]->read(adj_addr - 0xDC00);
                     }
                     else if (adj_addr >= 0xDD00 && adj_addr < 0xDD20)
                     {
@@ -669,13 +673,13 @@ void f256_state::mem_w(offs_t offset, u8 data)
                         else if (adj_addr >= 0xD400 && adj_addr < 0xD419)
                         {
                             // SID 0
-                            m_sid0->write(adj_addr - 0xD400, data);
+                            m_sid[0]->write(adj_addr - 0xD400, data);
 
                         }
                         else if (adj_addr >= 0xD500 && adj_addr < 0xD519)
                         {
                             // SID 1
-                            m_sid1->write(adj_addr - 0xD500, data);
+                            m_sid[1]->write(adj_addr - 0xD500, data);
                         }
                         else if (adj_addr >= 0xD580 && adj_addr < 0xD583)
                         {
@@ -700,20 +704,20 @@ void f256_state::mem_w(offs_t offset, u8 data)
                         {
                             // PSG
                             logerror("PSG Left Write: %02X\n", data);
-                            m_sn0->write(data);
+                            m_sn[0]->write(data);
                         }
                         else if (adj_addr == 0xD608)
                         {
                             // PSG
                             logerror("PSG Both Write: %02X\n", data);
-                            m_sn0->write(data);
-                            m_sn1->write(data);
+                            m_sn[0]->write(data);
+                            m_sn[1]->write(data);
                         }
                         else if (adj_addr == 0xD610)
                         {
                             // PSG
                             logerror("PSG Right Write: %02X\n", data);
-                            m_sn1->write(data);
+                            m_sn[1]->write(data);
                         }
                         else if (adj_addr >= 0xD620 && adj_addr < 0xD630)
                         {
@@ -979,37 +983,37 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                     if ((data & 4) == 0)
                                     {
                                         // PSG mix - both outputs to both speakers
-                                        m_sn0->reset_routes();
-                                        m_sn1->reset_routes();
-                                        m_sn0->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-                                        m_sn0->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-                                        m_sn1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-                                        m_sn1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+                                        m_sn[0]->reset_routes();
+                                        m_sn[1]->reset_routes();
+                                        m_sn[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+                                        m_sn[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+                                        m_sn[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+                                        m_sn[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
                                     }
                                     else
                                     {
                                         // PSG0 to left, PSG1 to right
-                                        m_sn0->reset_routes();
-                                        m_sn1->reset_routes();
-                                        m_sn0->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-                                        m_sn1->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+                                        m_sn[0]->reset_routes();
+                                        m_sn[1]->reset_routes();
+                                        m_sn[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+                                        m_sn[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
                                     }
                                     if ((data & 8) == 0)
                                     {
                                         // SID mix -
-                                        m_sid0->reset_routes();
-                                        m_sid1->reset_routes();
-                                        m_sid0->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-                                        m_sid0->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-                                        m_sid1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-                                        m_sid1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+                                        m_sid[0]->reset_routes();
+                                        m_sid[1]->reset_routes();
+                                        m_sid[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+                                        m_sid[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+                                        m_sid[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+                                        m_sid[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
                                     }
                                     else
                                     {
-                                        m_sid0->reset_routes();
-                                        m_sid1->reset_routes();
-                                        m_sid0->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-                                        m_sid1->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+                                        m_sid[0]->reset_routes();
+                                        m_sid[1]->reset_routes();
+                                        m_sid[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+                                        m_sid[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
                                     }
                                     break;
                                 case 0xD6A4:
@@ -1070,12 +1074,12 @@ void f256_state::mem_w(offs_t offset, u8 data)
                         else if (adj_addr >= 0xDB00 && adj_addr < 0xDC00)
                         {
                             // VIA1 - Keyboard for F256K
-                            m_via6522_1->write(adj_addr - 0xDB00, data);
+                            m_via6522[1]->write(adj_addr - 0xDB00, data);
                         }
                         else if (adj_addr >= 0xDC00 && adj_addr < 0xDD00)
                         {
                             // VIA0 - Atari Joystick
-                            m_via6522_0->write(adj_addr - 0xDC00, data);
+                            m_via6522[0]->write(adj_addr - 0xDC00, data);
                         }
                         else if (adj_addr >= 0xDD00 && adj_addr < 0xDD20)
                         {
@@ -1449,18 +1453,18 @@ void f256_state::device_start()
     m_rtc->set_current_time(stnow);
 
     // Initialize the VIA0
-    m_via6522_0->write(via6522_device::VIA_DDRB, 0xFF);  // DDRB
-    m_via6522_0->write(via6522_device::VIA_DDRA, 0xFF);  // DDRA
-    m_via6522_0->write(via6522_device::VIA_PB,   0xFF);  // JOYSTICK 2
-    m_via6522_0->write(via6522_device::VIA_PA,   0xFF);  // JOYSTICK 1
-    m_via6522_0->write(via6522_device::VIA_DDRB, 0);     // DDRB
-    m_via6522_0->write(via6522_device::VIA_DDRA, 0);     // DDRA
+    m_via6522[0]->write(via6522_device::VIA_DDRB, 0xFF);  // DDRB
+    m_via6522[0]->write(via6522_device::VIA_DDRA, 0xFF);  // DDRA
+    m_via6522[0]->write(via6522_device::VIA_PB,   0xFF);  // JOYSTICK 2
+    m_via6522[0]->write(via6522_device::VIA_PA,   0xFF);  // JOYSTICK 1
+    m_via6522[0]->write(via6522_device::VIA_DDRB, 0);     // DDRB
+    m_via6522[0]->write(via6522_device::VIA_DDRA, 0);     // DDRA
 
     // Initialize the VIA1
-    m_via6522_1->write(via6522_device::VIA_PB, 0);
-    m_via6522_1->write(via6522_device::VIA_PA, 0);
-    m_via6522_1->write(via6522_device::VIA_DDRB, 0);     // DDRB
-    m_via6522_1->write(via6522_device::VIA_DDRA, 0);     // DDRA
+    m_via6522[1]->write(via6522_device::VIA_PB, 0);
+    m_via6522[1]->write(via6522_device::VIA_PA, 0);
+    m_via6522[1]->write(via6522_device::VIA_DDRB, 0);     // DDRB
+    m_via6522[1]->write(via6522_device::VIA_DDRA, 0);     // DDRA
 
     // Initialize SD Card / SPI clock
     m_spi_clock = timer_alloc(FUNC(f256_state::spi_clock), this);
@@ -1483,8 +1487,8 @@ void f256_state::device_reset()
 {
 	driver_device::device_reset();
     reset_mmu();
-    m_via6522_0->reset();
-	m_via6522_1->reset();
+    m_via6522[0]->reset();
+    m_via6522[1]->reset();
 
     m_opl3->reset();
     m_sdcard->reset();
@@ -1495,10 +1499,10 @@ void f256_state::device_reset()
     spi_sd_enabled = 0;
     m_mouse->reset();
 
-    m_sid0->reset();
-    m_sid1->reset();
-    m_sn0->reset();
-    m_sn1->reset();
+    m_sid[0]->reset();
+    m_sid[1]->reset();
+    m_sn[0]->reset();
+    m_sn[1]->reset();
     //m_iec->reset();
     m_uart->reset();
 
@@ -1761,7 +1765,7 @@ TIMER_CALLBACK_MEMBER(f256_state::timer1)
 u8 f256_state::via0_system_porta_r()
 {
     //logerror("VIA #0 Port A Read ioport JOY2: %02X\n", data);
-    return m_joy2->read();
+    return m_joy[1]->read();
 }
 u8 f256_state::via0_system_portb_r()
 {
@@ -1772,23 +1776,23 @@ void f256_state::via0_system_porta_w(u8 data)
 {
     //logerror("VIA #0 Port A Write: %02X\n", data);
     // writing should only be done if DDR allows it
-    m_via6522_0->write_pa(data);
+    m_via6522[0]->write_pa(data);
 }
 void f256_state::via0_system_portb_w(u8 data)
 {
     //logerror("VIA #0 Port B Write: %02X\n", data);
     // writing should only be done if DDR allows it
-    m_via6522_0->write_pb(data);
+    m_via6522[0]->write_pb(data);
 }
 void f256_state::via0_ca2_write(u8 value)
 {
     //logerror("Write to VIA0 - CA2 %02X\n", value);
-    m_via6522_0->write_ca2(value);
+    m_via6522[0]->write_ca2(value);
 }
 void f256_state::via0_cb2_write(u8 value)
 {
     //logerror("Write to VIA0 - CB2 %02X\n", value);
-    m_via6522_0->write_cb2(value);
+    m_via6522[0]->write_cb2(value);
 }
 
 static INPUT_PORTS_START(f256k_mouse)
@@ -1844,7 +1848,7 @@ void f256_state::via1_system_porta_w(u8 data)
     m_via_keyboard_port_a = data;
     m_via_keyboard_port_b = 0xFF;
     // scan each keyboard row
-    u8 joy1 = m_joy1->read();
+    u8 joy1 = m_joy[0]->read();
     m_via_joy1 = joy1 | 0x80;
     for (int r = 0; r < 8; r++)
     {
@@ -1863,22 +1867,22 @@ void f256_state::via1_system_porta_w(u8 data)
             }
         }
     }
-    m_via6522_1->write_pa(m_via_keyboard_port_a);
-    m_via6522_0->write_pb(m_via_joy1);
+    m_via6522[1]->write_pa(m_via_keyboard_port_a);
+    m_via6522[0]->write_pb(m_via_joy1);
 }
 // Read keyboard as columns
 void f256_state::via1_system_portb_w(u8 data)
 {
     m_via_keyboard_port_b = data;
-    m_via6522_1->write_pb(data);
+    m_via6522[1]->write_pb(data);
 }
 void f256_state::via1_ca2_write(u8 value)
 {
-    m_via6522_1->write_ca2(value);
+    m_via6522[1]->write_ca2(value);
 }
 void f256_state::via1_cb2_write(u8 value)
 {
-    m_via6522_1->write_cb2(value);
+    m_via6522[1]->write_cb2(value);
 }
 
 static INPUT_PORTS_START(f256k)
