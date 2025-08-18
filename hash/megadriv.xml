@@ -19167,7 +19167,7 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
-	<software name="hyokkohj" supported="partial">
+	<software name="hyokkohj">
 		<description>Hyokkori Hyoutan-jima - Daitouryou o Mezase! (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -36050,9 +36050,15 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 
 <!-- This is the System Cart of the Magistr 16 computer, needs emulation of the system -->
 	<software name="magist16" supported="no">
-		<description>Magistr 16 (Russia)</description>
-		<year>199?</year>
+		<!-- Obuchayushchii kartridzh? -->
+		<description>Magistr 16 Learning Set (Russia)</description>
+		<!-- Either 2001 or 2002 -->
+		<year>200?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Magistr_16
+Throws error #100A at boot (has BASIC strings, may require keyboard with [VDP] irq 2)
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="magistr 16.bin" size="4194304" crc="2488e685" sha1="6568b3a4e096159776ef8687a80d43589741fd60"/>
