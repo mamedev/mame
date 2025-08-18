@@ -17185,6 +17185,7 @@ void wingco_state::init_magoddsc()
 
 
 // is this a bootleg board?
+// also found with correctly sized program ROMs on a 03/25/93 DREAM97-1 PCB
 ROM_START( magodds )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "8_p6_d12.512", 0x00000, 0x08000, CRC(6978c662) SHA1(cfdbcdcd4085c264e1d0ad4f18160b40d2d4e406) )
