@@ -18928,6 +18928,9 @@ xorworlda
 xorwldms
 xorwldmsa
 
+@source:galaxian/119.cpp
+sega119
+
 @source:galaxian/dambustr.cpp
 dambustr
 dambustra
@@ -40186,9 +40189,6 @@ ddz2
 djddz
 jzuanshi
 pljh
-
-@source:sega/119.cpp
-sega119
 
 @source:sega/angelkds.cpp
 angelkds

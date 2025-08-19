@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// seems quite galaxian-like?, does this fit in an existing driver?
+// the hardware is quite galaxian-like, is it worth doing it as a derived class instead?
 
 #include "emu.h"
 
@@ -20,6 +20,7 @@ public:
 	sega119_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
+		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
@@ -33,6 +34,7 @@ protected:
 
 private:
 	required_shared_ptr<u8> m_fgram;
+	required_shared_ptr<u8> m_spriteram;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -41,12 +43,39 @@ private:
 	void unk_b000_w(u8 data);
 
 	void fgram_w(offs_t offset, u8 data);
+
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void prg_map(address_map &map) ATTR_COLD;
 
 	u8 m_bankdata;
 };
+
+
+void sega119_state::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const int hoffset = 1;
+
+	for (int sprnum = 7; sprnum >= 0; sprnum--)
+	{
+		const uint8_t *base = &m_spriteram[sprnum * 4];
+		uint8_t sy = 240 - base[0];
+		uint16_t code = base[1] & 0x3f;
+		uint8_t flipx = base[1] & 0x40;
+		uint8_t flipy = base[1] & 0x80;
+		uint8_t color = base[2] & 7;
+		uint8_t sx = base[3] + hoffset;
+
+		/* draw */
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		code + 0x40, color,
+		flipx, flipy,
+		sx, sy, 0);
+	}
+}
+
 
 TILE_GET_INFO_MEMBER(sega119_state::get_fg_tile_info)
 {
@@ -71,6 +100,7 @@ void sega119_state::fgram_w(offs_t offset, u8 data)
 uint32_t sega119_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	sprites_draw(bitmap, cliprect);
 	return 0;
 }
 
@@ -78,7 +108,9 @@ void sega119_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().w(FUNC(sega119_state::fgram_w)).share(m_fgram);
-	map(0x9000, 0x90ff).ram(); // sprites (galaxian-like?)
+	map(0x9000, 0x903f).ram(); // tile attribute ram
+	map(0x9040, 0x907f).ram().share("spriteram");
+	map(0x9080, 0x90ff).ram(); // 0x9080 / 0x9081 are accessed
 
 	map(0xb000, 0xb000).portr("UNK").w(FUNC(sega119_state::unk_b000_w));
 	map(0xb001, 0xb001).portr("UNK2");
@@ -192,7 +224,7 @@ static const gfx_layout charlayout =
 {
 	8,8,
 	RGN_FRAC(1,3),
-	2,
+	3,
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ STEP8(0,1) },
 	{ STEP8(0,8) },
@@ -203,7 +235,7 @@ static const gfx_layout spritelayout =
 {
 	16,16,
 	RGN_FRAC(1,3),
-	2,
+	3,
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ STEP8(0,1), STEP8(8*8,1) },
 	{ STEP8(0,8), STEP8(16*8,8) },
