@@ -1,12 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// the hardware is quite galaxian-like (background + sprites)
+// the hardware is quite galaxian-like (background + sprites + bullets)
+// but tiles are 3bpp, not 2bpp, and there is extra sound hardware
+// 
 // is it worth doing it as a derived class instead?
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "video/resnet.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -23,8 +26,10 @@ public:
 		m_bgram(*this, "bgram"),
 		m_bgram_attr(*this, "bgram_attr"),
 		m_spriteram(*this, "spriteram"),
+		m_bulletram(*this, "bulletram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{ }
 
 	void sega119(machine_config &config);
@@ -38,10 +43,14 @@ private:
 	required_shared_ptr<u8> m_bgram;
 	required_shared_ptr<u8> m_bgram_attr;
 	required_shared_ptr<u8> m_spriteram;
+	required_shared_ptr<u8> m_bulletram;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	tilemap_t *m_bg_tilemap = nullptr;
+
+	void galaxian_palette(palette_device &palette);
 
 	void unk_b000_w(u8 data);
 
@@ -79,6 +88,7 @@ void sega119_state::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 		sx, sy, 0);
 	}
 }
+
 
 void sega119_state::bgram_attr_w(offs_t offset, u8 data)
 {
@@ -123,12 +133,54 @@ uint32_t sega119_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
+#define RGB_MAXIMUM         224
+
+void sega119_state::galaxian_palette(palette_device &palette)
+{
+	// taken from galaxian
+	const uint8_t *color_prom = memregion("proms")->base();
+	static const int rgb_resistances[3] = { 1000, 470, 220 };
+
+	double rweights[3], gweights[3], bweights[2];
+	compute_resistor_weights(0, RGB_MAXIMUM, -1.0,
+			3, &rgb_resistances[0], rweights, 470, 0,
+			3, &rgb_resistances[0], gweights, 470, 0,
+			2, &rgb_resistances[1], bweights, 470, 0);
+
+	// decode the palette first
+	int const len = memregion("proms")->bytes();
+	for (int i = 0; i < len; i++)
+	{
+		uint8_t bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
+
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
+
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_weights(bweights, bit0, bit1);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
 void sega119_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().w(FUNC(sega119_state::bgram_w)).share(m_bgram);
 	map(0x9000, 0x903f).ram().w(FUNC(sega119_state::bgram_attr_w)).share(m_bgram_attr);
-	map(0x9040, 0x907f).ram().share("spriteram");
+	map(0x9040, 0x905f).ram().share("spriteram");
+	map(0x9060, 0x907f).ram().share("bulletram");
 	map(0x9080, 0x90ff).ram(); // 0x9080 / 0x9081 are accessed
 
 	map(0xb000, 0xb000).portr("UNK").w(FUNC(sega119_state::unk_b000_w));
@@ -242,8 +294,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_sega119 )
-	GFXDECODE_ENTRY( "tiles", 0, charlayout, 0, 16 )
-	GFXDECODE_ENTRY( "tiles", 0, spritelayout, 0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, charlayout, 0, 4 )
+	GFXDECODE_ENTRY( "tiles", 0, spritelayout, 0, 4 )
 GFXDECODE_END
 
 void sega119_state::machine_start()
@@ -272,8 +324,10 @@ void sega119_state::sega119(machine_config &config)
 	screen.set_screen_update(FUNC(sega119_state::screen_update));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_sega119);
-	PALETTE(config, "palette").set_entries(0x1000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sega119);
+
+	PALETTE(config, m_palette).set_entries(0x1000);
+	m_palette->set_init(FUNC(sega119_state::galaxian_palette));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -290,16 +344,20 @@ ROM_START( sega119 )
 
 	ROM_REGION( 0x6000, "tiles", 0 )
 	ROM_LOAD( "119_5.bin",   0x0000, 0x2000, CRC(1b08c881) SHA1(b372d614ec41cff49d6ff1c2256170c15069bd55) )
-	ROM_LOAD( "119_6.bin",   0x2000, 0x2000, CRC(1a7490a4) SHA1(e74141b04ffb63e5cc434fbce89ac0c51e79330f) )
-	ROM_LOAD( "119_7.bin",   0x4000, 0x2000, CRC(fcff7f59) SHA1(87a4668ef0c28091c895b0aeae4d4c486396e549) )
+	ROM_LOAD( "119_6.bin",   0x4000, 0x2000, CRC(1a7490a4) SHA1(e74141b04ffb63e5cc434fbce89ac0c51e79330f) )
+	ROM_LOAD( "119_7.bin",   0x2000, 0x2000, CRC(fcff7f59) SHA1(87a4668ef0c28091c895b0aeae4d4c486396e549) )
 
 	ROM_REGION( 0x6000, "audiocpu", 0 ) // another z80
 	ROM_LOAD( "119_8.bin",   0x0000, 0x2000, CRC(6570149c) SHA1(b139edbe7bd2f965804b0c850f87e2ef8e418256) )
 
 	ROM_REGION( 0x6000, "samples", 0 ) // samples for MC1408P8
-	ROM_LOAD( "119_9.bin",   0x0000, 0x2000, BAD_DUMP CRC(b917e2c2) SHA1(8acd598b898204e18a4cfccc40720d149f401b42) ) //  FIXED BITS (xxxx1xxx)
+	ROM_LOAD( "119_9.bin",   0x0000, 0x2000, BAD_DUMP CRC(b917e2c2) SHA1(8acd598b898204e18a4cfccc40720d149f401b42) ) //  FIXED BITS (xxxx1xxx) (but always reads the same?)
 
-	// colour PROMs?
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "119_6331.bin",   0x00, 0x20, CRC(b73e79f3) SHA1(8345d45699c51a90c1d2743623b923531a577993) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "119_7502.bin",   0x00, 0x20, CRC(52bdbe39) SHA1(e6f126e22944b698bea599760a79bd5cfa8f0d1f) ) // ?? hopefully just video timing, not a bad read
 ROM_END
 
 } // anonymous namespace
