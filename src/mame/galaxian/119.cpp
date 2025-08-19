@@ -54,27 +54,52 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<mc1408_device> m_dac;
 
 	u8 m_bankdata = 0;
+	bool m_sound_nmi_enable = false;
 
 	void extend_sprite_info(const u8 *base, u8 *sx, u8 *sy, u8 *flipx, u8 *flipy, u16 *code, u8 *color);
 	void extend_tile_info(u16 *code, u8 *color, u8 attrib, u8 x, u8 y);
 
 	void tilebanks_flipscreen_w(u8 data);
+	void sound_nmi_enable_w(u8 data);
 
 	void prg_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void sound_io_map(address_map &map) ATTR_COLD;
+
+	INTERRUPT_GEN_MEMBER(sound_nmi);
 };
+
+void sega119_state::tilebanks_flipscreen_w(u8 data)
+{
+	// ---- bbff
+	// bb = sprite and tile banks, uncertain which is which
+	// ff = flipscreen (could be separate sprite/tile flip, or separate x/y flip, we treat it as the latter)
+
+	if ((data ^ m_bankdata) & 0x08)
+		m_bg_tilemap->mark_all_dirty();
+	m_bankdata = data;
+
+	m_flipscreen_x = data & 0x01;
+	m_flipscreen_y = data & 0x02;
+	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
+}
+
+void sega119_state::sound_nmi_enable_w(u8 data)
+{
+	m_sound_nmi_enable = BIT(data, 6);
+}
 
 void sega119_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x9000, 0x90ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x8000, 0x83ff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9000, 0x90ff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 
 	map(0xa000, 0xa000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb000, 0xb000).portr("IN0").w(FUNC(sega119_state::tilebanks_flipscreen_w));
@@ -95,59 +120,43 @@ void sega119_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w(m_ay8910[0], FUNC(ay8910_device::data_address_w));
+	map(0x02, 0x02).w(FUNC(sega119_state::sound_nmi_enable_w)); // same as 0x04?
 	map(0x03, 0x03).w(m_dac, FUNC(mc1408_device::write));
-	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); // irq ack?
-}
-
-void sega119_state::tilebanks_flipscreen_w(u8 data)
-{
-	// ---- bbff
-	// bb = sprite and tile banks, uncertain which is which
-	// ff = flipscreen (could be separate sprite/tile flip, or separate x/y flip, we treat it as the latter)
-
-	if (data & 0xf0)
-		popmessage("%02x", data);
-
-	m_bankdata = data;
-	m_bg_tilemap->mark_all_dirty();
-
-	m_flipscreen_x = data & 0x01;
-	m_flipscreen_y = data & 0x02;
-	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(sega119_state::sound_nmi_enable_w));
 }
 
 static INPUT_PORTS_START( sega119 )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // game speed is not driven by interrupts, polls bit in port
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x0c, "2" )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x04, "5" )
 	PORT_DIPSETTING(    0x00, "Free" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
@@ -164,24 +173,24 @@ static INPUT_PORTS_START( sega119 )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x01, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPSETTING(    0x05, "5" )
-	PORT_DIPSETTING(    0x06, "6" )
-	PORT_DIPSETTING(    0x07, "7" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x08, "1" )
-	PORT_DIPSETTING(    0x10, "2" )
-	PORT_DIPSETTING(    0x18, "3" )
-	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPSETTING(    0x28, "5" )
-	PORT_DIPSETTING(    0x30, "6" )
-	PORT_DIPSETTING(    0x38, "7" )
-	PORT_DIPNAME( 0x40, 0x40, "DSW2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
@@ -221,18 +230,31 @@ void sega119_state::machine_start()
 	galaxian_state::machine_start();
 
 	save_item(NAME(m_bankdata));
+	save_item(NAME(m_sound_nmi_enable));
+}
+
+void sega119_state::machine_reset()
+{
+	galaxian_state::machine_reset();
+
+	m_sound_nmi_enable = false;
+}
+
+INTERRUPT_GEN_MEMBER(sega119_state::sound_nmi)
+{
+	if (m_sound_nmi_enable)
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void sega119_state::extend_sprite_info(const u8 *base, u8 *sx, u8 *sy, u8 *flipx, u8 *flipy, u16 *code, u8 *color)
 {
-	*code += 0x40;
+	*code |= 0x40;
 	if (m_bankdata & 0x04)
-		*code += 0x80;
+		*code |= 0x80;
 }
 
 void sega119_state::extend_tile_info(u16 *code, u8 *color, u8 attrib, u8 x, u8 y)
 {
-	// might not be correct, see level 3
 	if (m_bankdata & 0x08)
 		*code |= 0x200;
 }
@@ -245,7 +267,7 @@ void sega119_state::sega119(machine_config &config)
 	// nmi is unused (just returns) timing is done by polling vblank
 
 	Z80(config, m_audiocpu, 8_MHz_XTAL/2);
-	m_audiocpu->set_periodic_int(FUNC(sega119_state::nmi_line_pulse), attotime::from_hz(8_MHz_XTAL/0x800));
+	m_audiocpu->set_periodic_int(FUNC(sega119_state::sound_nmi), attotime::from_hz(8_MHz_XTAL/0x800));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sega119_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &sega119_state::sound_io_map);
 
@@ -300,13 +322,13 @@ ROM_START( sega119 )
 	ROM_LOAD( "119_9.bin",   0x2000, 0x2000, BAD_DUMP CRC(b917e2c2) SHA1(8acd598b898204e18a4cfccc40720d149f401b42) ) // FIXED BITS (xxxx1xxx) (but always reads the same?)
 
 	ROM_REGION( 0x20, "proms", 0 )
-	ROM_LOAD( "119_6331.bin",   0x00, 0x20, CRC(b73e79f3) SHA1(8345d45699c51a90c1d2743623b923531a577993) )
+	ROM_LOAD( "119_6331.bin", 0x00, 0x20, CRC(b73e79f3) SHA1(8345d45699c51a90c1d2743623b923531a577993) )
 
 	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "119_7502.bin",   0x00, 0x20, CRC(52bdbe39) SHA1(e6f126e22944b698bea599760a79bd5cfa8f0d1f) ) // ?? hopefully just video timing, not a bad read
+	ROM_LOAD( "119_7502.bin", 0x00, 0x20, CRC(52bdbe39) SHA1(e6f126e22944b698bea599760a79bd5cfa8f0d1f) ) // ?? hopefully just video timing, not a bad read
 ROM_END
 
 } // anonymous namespace
 
 // all tiles are upside down in ROM, but handled by flipscreen
-GAME( 1986, sega119, 0, sega119, sega119, sega119_state, init_119, ROT0, "Coreland / Sega", "119 (bootleg?)", MACHINE_NOT_WORKING )
+GAME( 1986, sega119, 0, sega119, sega119, sega119_state, init_119, ROT0, "Coreland / Sega", "119 (bootleg?)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
