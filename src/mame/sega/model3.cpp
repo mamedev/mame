@@ -23,7 +23,7 @@
   * scuddxo - lots of GFX problems, hangs after a few seconds in test mode and in game.
   * scudplus/scudplusa - works
     lostwsga - works
-    vs215 - works
+    vs215 - works, can hang during gameplay (verify, may be fixed with scan timer rollover fix)
     lemans24 - works
     vs29815 - massive memory trashing and page faults
 
@@ -34,14 +34,14 @@
     srally2p/srally2pa/sraly2dx - needs specific JTAG patch / bypass
     von2/von2a/von2o/von254g - works
     fvipers2 - crashes after player selection
-    vs298 - works, hangs with an onscreen error code
-    vs299/vs2v991 - works
+    vs298 - hangs with an onscreen "unknown error code" during attract, polygon covers most of the 3d.
+    vs299/vs2v991 - works, polygon covers most of the 3d.
     oceanhun - works
     lamachin - works
 
-  * dayto2pe - bug in DRC MMU page-fault handling, causes infinite loop at PC:0x2270 (or debug assert)
-  * daytona2 - As above
-    spikeout/spikeofe - As above.
+  * dayto2pe - works
+  * daytona2 - works
+    spikeout/spikeofe - works, severe texture glitches (mip mapping?)
  ** dirtdvls/dirtdvlau/dirtdvlj/dirtdvlu - works
     swtrilgy - works, black screen in service mode
     swtrilga - doesn't pass "Wait Setup the Feedback Leaver"
@@ -1287,10 +1287,8 @@ TIMER_CALLBACK_MEMBER(model3_state::real3d_dma_timer_callback)
     Un-syncing the interrupts breaks the progress bar in magtruck
 */
 
-TIMER_CALLBACK_MEMBER(model3_state::model3_scan_timer_tick)
+TIMER_CALLBACK_MEMBER(model3_state::scan_timer_tick)
 {
-	m_scan_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 1), m_screen->vpos() + 1);
-
 	int scanline = param;
 
 	if (scanline == 384)
@@ -1302,6 +1300,11 @@ TIMER_CALLBACK_MEMBER(model3_state::model3_scan_timer_tick)
 		//if ((scanline & 0x1) == 0)
 			set_irq_line(0x0c, ASSERT_LINE);
 	}
+
+	scanline ++;
+	scanline %= m_screen->height();
+
+	m_scan_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 MACHINE_START_MEMBER(model3_state,model3_10)
@@ -1310,7 +1313,7 @@ MACHINE_START_MEMBER(model3_state,model3_10)
 
 	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
 	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
-	m_scan_timer = timer_alloc(FUNC(model3_state::model3_scan_timer_tick), this);
+	m_scan_timer = timer_alloc(FUNC(model3_state::scan_timer_tick), this);
 }
 MACHINE_START_MEMBER(model3_state,model3_15)
 {
@@ -1318,7 +1321,7 @@ MACHINE_START_MEMBER(model3_state,model3_15)
 
 	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
 	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
-	m_scan_timer = timer_alloc(FUNC(model3_state::model3_scan_timer_tick), this);
+	m_scan_timer = timer_alloc(FUNC(model3_state::scan_timer_tick), this);
 }
 MACHINE_START_MEMBER(model3_state,model3_20)
 {
@@ -1326,7 +1329,7 @@ MACHINE_START_MEMBER(model3_state,model3_20)
 
 	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
 	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
-	m_scan_timer = timer_alloc(FUNC(model3_state::model3_scan_timer_tick), this);
+	m_scan_timer = timer_alloc(FUNC(model3_state::scan_timer_tick), this);
 }
 MACHINE_START_MEMBER(model3_state,model3_21)
 {
@@ -1334,7 +1337,7 @@ MACHINE_START_MEMBER(model3_state,model3_21)
 
 	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
 	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
-	m_scan_timer = timer_alloc(FUNC(model3_state::model3_scan_timer_tick), this);
+	m_scan_timer = timer_alloc(FUNC(model3_state::scan_timer_tick), this);
 }
 
 void model3_state::model3_init(int step)
