@@ -530,6 +530,7 @@ public:
 		goldstar_state(mconfig, type, tag),
 		m_fl7w4_id(*this, "fl7w4_id"),
 		m_mcu(*this, "mcu"),
+		m_tmcu(*this, "tmcu"),
 		m_nvram(*this, "nvram")
 	{ }
 
@@ -552,6 +553,7 @@ public:
 	void super972(machine_config &config) ATTR_COLD;
 	void superdrg(machine_config &config) ATTR_COLD;
 	void wcat3(machine_config &config) ATTR_COLD;
+	void lucky8tet(machine_config &config) ATTR_COLD;
 
 	void init_cb2() ATTR_COLD;
 	void init_flam7_tw() ATTR_COLD;
@@ -570,6 +572,7 @@ public:
 	void init_super972() ATTR_COLD;
 	void init_wcat() ATTR_COLD;
 	void init_wcat3() ATTR_COLD;
+	void init_l8tet() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -601,6 +604,16 @@ private:
 	uint32_t screen_update_mbstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void masked_irq(int state);
+	
+	void z80_io_w(offs_t offset, uint8_t data);
+	uint8_t z80_io_r(offs_t offset);
+	void tmcu_io_w(offs_t offset, uint8_t data);
+	uint8_t tmcu_io_r(offs_t offset);
+	void tmcu_p1_out(uint8_t data);
+	uint8_t m_z80_io_c0;
+	uint8_t tetin3_r();
+
+	
 
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
 	//virtual void machine_start() override { goldstar_state::machine_start(); m_tile_bank = 0; }
@@ -608,10 +621,14 @@ private:
 private:
 	optional_device<ds2401_device> m_fl7w4_id;
 	optional_device<m68705p_device> m_mcu;
+	optional_device<i80c51_device> m_tmcu;
 	optional_shared_ptr<uint8_t> m_nvram;
 
 	uint8_t m_nmi_enable = 0U;
 	uint8_t m_vidreg = 0U;
+	uint8_t m_tcount = 0;
+	bool m_z80_p02 = false;
+	uint8_t m_mcu_p1;
 
 	void animalw_map(address_map &map) ATTR_COLD;
 	void animalwa_map(address_map &map) ATTR_COLD;
@@ -625,6 +642,9 @@ private:
 	void superdrg_map(address_map &map) ATTR_COLD;
 	void superdrg_opcodes_map(address_map &map) ATTR_COLD;
 	void wcat3_map(address_map &map) ATTR_COLD;
+	void lucky8tet_ioport(address_map &map) ATTR_COLD;
+	void tmcu_program_map(address_map &map) ATTR_COLD;
+	void tmcu_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -3094,6 +3114,24 @@ void unkch_state::bonusch_portmap(address_map &map)
 	map(0x60, 0x60).portr("IN3");
 }
 
+
+void wingco_state::lucky8tet_ioport(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(FUNC(wingco_state::z80_io_r), FUNC(wingco_state::z80_io_w));
+}
+
+void wingco_state::tmcu_program_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("tmcu",0);
+}
+
+void wingco_state::tmcu_io_map(address_map &map)
+{
+	map(0x0000, 0x01ff).rw(FUNC(wingco_state::tmcu_io_r), FUNC(wingco_state::tmcu_io_w));
+}
+
+
 void goldstar_state::feverch_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -5123,7 +5161,7 @@ static INPUT_PORTS_START( cb3a )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lucky8 )
-	PORT_START("IN0")  // d800
+	PORT_START("IN0")  // b800
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_B) PORT_NAME("P1 - Big / Switch Controls")
@@ -5133,7 +5171,7 @@ static INPUT_PORTS_START( lucky8 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_N) PORT_NAME("P1 - Small / Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("P1 - Start")
 
-	PORT_START("IN1")  // d801
+	PORT_START("IN1")  // b801
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_CODE(KEYCODE_G) PORT_NAME("P2 - Big / Switch Controls")
@@ -5143,7 +5181,7 @@ static INPUT_PORTS_START( lucky8 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_CODE(KEYCODE_H) PORT_NAME("P2 - Small / Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_CODE(KEYCODE_S) PORT_NAME("P2 - Start")
 
-	PORT_START("IN2")  // d802
+	PORT_START("IN2")  // b802
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5153,7 +5191,7 @@ static INPUT_PORTS_START( lucky8 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")  // d810
+	PORT_START("IN3")  // b810
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin B")
@@ -5163,7 +5201,7 @@ static INPUT_PORTS_START( lucky8 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
 
-	PORT_START("IN4")  // d811
+	PORT_START("IN4")  // b811
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -10064,6 +10102,30 @@ static INPUT_PORTS_START( ttactoe )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( lucky8tet )
+	PORT_INCLUDE( lucky8 )
+
+	PORT_MODIFY("IN3")  // b810
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("Switch to Tetris")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Switch to Lucky 8 Lines")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Tetris Coin In")
+
+	PORT_MODIFY("IN4")  // b811
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )
+ 	
+	PORT_START("DB_DIP") 
+	PORT_DIPNAME(0x03, 0x03, "Max Bet")   PORT_DIPLOCATION("DB_DIP:1,2")  // MCU port 3.0-3.1
+	PORT_DIPSETTING(0x00, "8")
+	PORT_DIPSETTING(0x01, "16")
+	PORT_DIPSETTING(0x02, "32")
+	PORT_DIPSETTING(0x03, "64")
+	PORT_DIPNAME(0x0c, 0x0c, "DIP2 (TBD)") PORT_DIPLOCATION("DB_DIP:3,4")  // MCU port 0.2-0.3
+	PORT_DIPSETTING(0x00, "0")
+	PORT_DIPSETTING(0x04, "1")
+	PORT_DIPSETTING(0x08, "2")
+	PORT_DIPSETTING(0x0c, "3")
+INPUT_PORTS_END
+
 
 /*****************************************************
 *            Graphics Layouts & Decode               *
@@ -10727,6 +10789,79 @@ void wingco_state::ay8910_outputa_w(uint8_t data)
 void wingco_state::ay8910_outputb_w(uint8_t data)
 {
 	//popmessage("ay8910_outputb_w %02x", data);
+}
+
+
+uint8_t wingco_state::tetin3_r()
+{
+	uint8_t ret = ioport("IN3")->read();
+
+	if(ret == 0xfe)  // r > LUCKY TO TETRIS 
+	{
+		if(m_tcount++ == 2)
+		{
+			m_z80_p02 = true;
+			m_tcount = 0;
+		}
+		ret = 0xfe;
+	}
+
+	if(ret == 0xfd)  // t > TETRIS TO LUCKY 
+	{
+		if(m_tcount++ == 2)
+		{
+			m_z80_p02 = false;
+			m_tcount = 0;
+		}
+		ret = 0xfd;
+	}
+	return ret;
+}
+
+uint8_t wingco_state::z80_io_r(offs_t offset)
+{
+	if(offset == 0x01)
+		return  0x00;  // si retorno distinto de cero inhibe el game swap (comprobado) Asigan un input toggle para darle funcionalidad.
+
+	if(offset == 0x02)
+		return  m_z80_p02;
+
+	if(offset == 0x32)
+		return  00;
+
+	if(offset == 0xc0)
+	{
+		logerror("z80_io_r: offset:%02x\n", offset); 
+		return  m_z80_io_c0;
+	}
+
+//	logerror("z80_io_r: offset:%02x\n", offset);  // investigar funcionalidad ports 0x31, 0x32, 0xc0.
+	return machine().rand() & 0x0f;
+}
+
+void wingco_state::z80_io_w(offs_t offset, uint8_t data)
+{
+	if(offset == 0xc0)
+		m_z80_io_c0 = data;
+	logerror("Z80_io_w(): offset:%02x - data: %02x\n", offset, data);  // investigar funcionalidad port 0xc0
+}
+
+void wingco_state::tmcu_io_w(offs_t offset, uint8_t data)
+{
+	if ((offset != 0x122) & (offset != 0x123)) 
+	logerror("tmcu_io Write: Offs:%04x - Data:%02x\n", offset, data);
+}
+
+uint8_t wingco_state::tmcu_io_r(offs_t offset)
+{
+	return 0x00;
+}
+
+void wingco_state::tmcu_p1_out(uint8_t data)
+{
+	m_mcu_p1 = data;
+//	logerror("MCU Port1:%02x\n", tmcu_p1_out);
+
 }
 
 
@@ -12050,6 +12185,27 @@ void goldstar_state::feverch(machine_config &config)
 	SN76489A(config, "sn1", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80);  // actually SN76489AN, clock not verified
 	SN76489A(config, "sn2", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80);  // actually SN76489AN, clock not verified
 	SN76489A(config, "sn3", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80);  // actually SN76489AN, clock not verified
+}
+
+
+void wingco_state::lucky8tet(machine_config &config)
+{
+	lucky8(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_IO, &wingco_state::lucky8tet_ioport);
+
+	I80C51(config, m_tmcu, 24'500'000);  // Internal Clock
+	m_tmcu->set_addrmap(AS_PROGRAM, &wingco_state::tmcu_program_map);
+	m_tmcu->set_addrmap(AS_IO, &wingco_state::tmcu_io_map);
+
+	m_tmcu->port_out_cb<1>().set(FUNC(wingco_state::tmcu_p1_out));
+
+	m_tmcu->port_in_cb<3>().set_ioport("DB_DIP").mask(0x0f);  // P3.0-P3.3  I8255A(config.replace(), m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set(FUNC(wingco_state::tetin3_r));
+	m_ppi[1]->in_pb_callback().set_ioport("IN4");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW1");
+
 }
 
 
@@ -15762,7 +15918,7 @@ ROM_START( lucky8tet )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w4-tet-p097-9_sub-pcb.u7", 0x00000, 0x10000, CRC(779db23e) SHA1(8a629d0e0bd57268e3b2a89bf1e5ed0d664f13c8) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )  // C8051F310 binary
+	ROM_REGION( 0x2000, "tmcu", 0 )  // C8051F310 binary
 	ROM_LOAD( "mcu.bin", 0x0000, 0x054a, CRC(bc70cd9d) SHA1(2edd27b0bb2e846778aacaadd843186097a049a1) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -23521,7 +23677,7 @@ void wingco_state::init_lucky8p()
 void wingco_state::init_lucky8r()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-
+	
 	// bypass protection
 	rom[0x4340] = 0x20;
 	rom[0x4364] = 0x08;
@@ -23535,7 +23691,7 @@ void wingco_state::init_lucky8r()
 void wingco_state::init_lucky8s()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-
+	
 	// bypass protection
 	rom[0x4772] = 0x08;
 	rom[0x47a8] = 0x02;
@@ -24403,6 +24559,17 @@ void cmaster_state::init_cmezspina()
 	init_cmv4();
 }
 
+// tetris + lucky 8 lines
+void wingco_state::init_l8tet()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0x120e] = 0x00;   // skip bet protection
+	rom[0x01c9] = 0x68;   // alt mcu protection
+	rom[0x788f] = 0x20;   // alt mcu protection
+
+}
+
 
 } // anonymous namespace
 
@@ -24549,9 +24716,9 @@ GAMEL( 198?, ns8lines,   0,        lucky8,   lucky8b,  wingco_state,   empty_ini
 GAMEL( 1985, ns8linesa,  ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,   ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8linewa,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 1985, ns8linewb,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus, Yamate, 1985)", 0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 1988, ns8linewc,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus, Yamate, 1988, set 1)", 0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 1988, ns8linewd,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus, Yamate, 1988, set 2)", 0,                     layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1985, ns8linewb,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus, Yamate, 1985)", 0,        layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1988, ns8linewc,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus, Yamate, 1988, set 1)", 0, layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1988, ns8linewd,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus, Yamate, 1988, set 2)", 0, layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1989, f16s8l,     lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Leisure Ent",       "F-16 Super 8 Lines",                                       MACHINE_NOT_WORKING,   layout_lucky8 ) // needs I/O check, seems mostly playable
 GAMEL( 1991, nd8lines,   lucky8,   nd8lines, nd8lines, wingco_state,   init_nd8lines,  ROT0, "Yamate (bootleg)",  "New Draw 8 Lines (Version 2.1)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND, layout_lucky8 ) // PROM decode wrong, SN emits terrible sound, inputs not done yet
 GAMEL( 198?, super972,   ns8lines, super972, ns8linwa, wingco_state,   init_super972,  ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8p1 )  // decrypted, needs correct inputs
@@ -24719,7 +24886,7 @@ GAMEL( 198?, cmtetrisd,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmt
 GAMEL( 1997, crazybon,   0,        crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 1)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
 GAMEL( 1997, crazybona,  crazybon, crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 2)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon )
 GAMEL( 1997, crazybonb,  crazybon, crazybonb, pkrmast,  cmaster_state,  init_crazybonb, ROT0, "bootleg (TV Games)",      "Crazy Bonus 2002 (Ver. 1, set 3)",                                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS, layout_crazybon ) // F.B. & POKER 94, VER.1 in NVRAM, decryption seems ok, possibly needs proper memory map
-GAMEL( 1988, lucky8tet,  lucky8,   lucky8,    lucky8,   wingco_state,   empty_init,     ROT0, "bootleg",                 "Tetris + New Lucky 8 Lines (W-4 + W4BET-VID sub board with MCU)",          MACHINE_NOT_WORKING,                            layout_lucky8 )
+GAMEL( 1988, lucky8tet,  lucky8,   lucky8tet, lucky8tet, wingco_state,  init_l8tet,     ROT0, "bootleg",                 "Tetris + New Lucky 8 Lines (W-4 + W4BET-VID sub board with MCU)",          MACHINE_UNEMULATED_PROTECTION,                  layout_lucky8p1 )
 
 /* other possible stealth sets:
  - cmv4a    ---> see the 1fxx zone. put a bp in 1f9f to see the loop.
