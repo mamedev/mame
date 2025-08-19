@@ -3,20 +3,18 @@
 
 // the hardware is quite galaxian-like (background + sprites + bullets)
 // but tiles are 3bpp, not 2bpp, and there is extra sound hardware
-// 
+//
 // TODO:
-// - sound
 // - bullets sometimes get stuck on screen (and need verifying)
 // - sometimes killed by something invisible?
 // - remaining dipswitches
 
 #include "emu.h"
-
 #include "galaxian.h"
 
-#include "speaker.h"
-
 #include "cpu/z80/z80.h"
+
+#include "speaker.h"
 
 namespace {
 
@@ -24,7 +22,8 @@ class sega119_state : public galaxian_state
 {
 public:
 	sega119_state(const machine_config &mconfig, device_type type, const char *tag) :
-		galaxian_state(mconfig, type, tag)
+		galaxian_state(mconfig, type, tag),
+		m_dac(*this, "dac")
 	{ }
 
 	void sega119(machine_config &config);
@@ -35,14 +34,18 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
+	required_device<mc1408_device> m_dac;
+
+	u8 m_bankdata = 0;
+
 	void extend_sprite_info(const u8 *base, u8 *sx, u8 *sy, u8 *flipx, u8 *flipy, u16 *code, u8 *color);
 	void extend_tile_info(u16 *code, u8 *color, u8 attrib, u8 x, u8 y);
 
 	void tilebanks_flipscreen_w(u8 data);
 
 	void prg_map(address_map &map) ATTR_COLD;
-
-	u8 m_bankdata;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
 };
 
 void sega119_state::prg_map(address_map &map)
@@ -51,14 +54,27 @@ void sega119_state::prg_map(address_map &map)
 	map(0x8000, 0x83ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
 	map(0x9000, 0x90ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 
-	map(0xa000, 0xa000).nopw(); // soundlatch?
-
+	map(0xa000, 0xa000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb000, 0xb000).portr("IN0").w(FUNC(sega119_state::tilebanks_flipscreen_w));
 	map(0xb001, 0xb001).portr("IN1");
 	map(0xb002, 0xb002).portr("DSW1");
 	map(0xb003, 0xb003).portr("DSW2");
 
 	map(0xe000, 0xefff).ram();
+}
+
+void sega119_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x83ff).ram();
+}
+
+void sega119_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(m_ay8910[0], FUNC(ay8910_device::data_address_w));
+	map(0x03, 0x03).w(m_dac, FUNC(mc1408_device::write));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); // irq ack?
 }
 
 void sega119_state::tilebanks_flipscreen_w(u8 data)
@@ -182,7 +198,7 @@ GFXDECODE_END
 void sega119_state::machine_start()
 {
 	galaxian_state::machine_start();
-	m_bankdata = 0;
+
 	save_item(NAME(m_bankdata));
 }
 
@@ -206,7 +222,12 @@ void sega119_state::sega119(machine_config &config)
 	Z80(config, m_maincpu, GALAXIAN_PIXEL_CLOCK/3/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sega119_state::prg_map);
 	// nmi is unused (just returns) timing is done by polling vblank
-	
+
+	Z80(config, m_audiocpu, 8_MHz_XTAL/2);
+	m_audiocpu->set_periodic_int(FUNC(sega119_state::nmi_line_pulse), attotime::from_hz(8_MHz_XTAL/0x800));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sega119_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &sega119_state::sound_io_map);
+
 	//WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8); // does it exist on this hardware?
 
 	// video hardware
@@ -218,11 +239,19 @@ void sega119_state::sega119(machine_config &config)
 	m_screen->set_screen_update(FUNC(sega119_state::screen_update_galaxian));
 	m_screen->screen_vblank().set(FUNC(sega119_state::vblank_interrupt_w));
 
-	// sound hardware
-	SPEAKER(config, "speaker").front_center();
-
 	set_left_sprite_clip(0);
 	set_right_sprite_clip(0);
+
+	// sound hardware
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
+
+	SPEAKER(config, "speaker").front_center();
+
+	AY8910(config, m_ay8910[0], 8_MHz_XTAL/4);
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.5);
+
+	MC1408(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void sega119_state::init_119()
@@ -245,11 +274,9 @@ ROM_START( sega119 )
 	ROM_LOAD( "119_6.bin",   0x4000, 0x2000, CRC(1a7490a4) SHA1(e74141b04ffb63e5cc434fbce89ac0c51e79330f) )
 	ROM_LOAD( "119_7.bin",   0x2000, 0x2000, CRC(fcff7f59) SHA1(87a4668ef0c28091c895b0aeae4d4c486396e549) )
 
-	ROM_REGION( 0x6000, "audiocpu", 0 ) // another z80
+	ROM_REGION( 0x4000, "audiocpu", 0 )
 	ROM_LOAD( "119_8.bin",   0x0000, 0x2000, CRC(6570149c) SHA1(b139edbe7bd2f965804b0c850f87e2ef8e418256) )
-
-	ROM_REGION( 0x6000, "samples", 0 ) // samples for MC1408P8
-	ROM_LOAD( "119_9.bin",   0x0000, 0x2000, BAD_DUMP CRC(b917e2c2) SHA1(8acd598b898204e18a4cfccc40720d149f401b42) ) //  FIXED BITS (xxxx1xxx) (but always reads the same?)
+	ROM_LOAD( "119_9.bin",   0x2000, 0x2000, BAD_DUMP CRC(b917e2c2) SHA1(8acd598b898204e18a4cfccc40720d149f401b42) ) // FIXED BITS (xxxx1xxx) (but always reads the same?)
 
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "119_6331.bin",   0x00, 0x20, CRC(b73e79f3) SHA1(8345d45699c51a90c1d2743623b923531a577993) )
