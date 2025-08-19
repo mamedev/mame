@@ -252,10 +252,15 @@ license:CC0-1.0
 	<element name="t4_text"><text string="T4"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 	<element name="envelope_parameters_text"><text string="Envelope Parameters"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 
-	<element name="vfd0" defstate="0">
+	<element name="vfd" defstate="0">
 		<led14segsc>
 			<color red="0.45" green="1.0" blue="0.95" />
 		</led14segsc>
+	</element>
+
+	<element name="underline" defstate="0">
+		<rect state="0"><color red="0.06" green="0.12" blue="0.10" /></rect>
+		<rect state="1"><color red="0.45" green="1.00" blue="0.95" /></rect>
 	</element>
 
 <!-- build layout -->
@@ -295,12 +300,19 @@ license:CC0-1.0
 		<element ref="screen_border"><bounds x="266" y="56" width="421" height="60"/></element>
 		<repeat count="2">
 			<param name="s" start="0" increment="40" />
-			<param name="y" start="70" increment="19" />
+			<param name="su" start="80" increment="40" />
+			<param name="y" start="70" increment="20" />
+			<param name="yu" start="83" increment="20" />
 			<repeat count="40">
 				<param name="n" start="~s~" increment="1" />
+				<param name="u" start="~su~" increment="1" />
 				<param name="x" start="277" increment="10" />
-				<element name="vfd~n~" ref="vfd0">
-					<bounds x="~x~" y="~y~" width="9" height="15" />
+				<param name="xu" start="278" increment="10" />
+				<element name="vfd~n~" ref="vfd">
+					<bounds x="~x~" y="~y~" width="9" height="12" />
+				</element>
+				<element name="vfd~u~" ref="underline">
+					<bounds x="~xu~" y="~yu~" width="7" height="1" />
 				</element>
 			</repeat>
 		</repeat>
