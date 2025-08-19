@@ -4,7 +4,11 @@
 // the hardware is quite galaxian-like (background + sprites + bullets)
 // but tiles are 3bpp, not 2bpp, and there is extra sound hardware
 // 
-// is it worth doing it as a derived class instead?
+// TODO:
+// - sound
+// - bullets sometimes get stuck on screen (and need verifying)
+// - sometimes killed by something invisible?
+// - remaining dipswitches
 
 #include "emu.h"
 
