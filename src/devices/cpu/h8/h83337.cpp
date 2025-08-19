@@ -24,10 +24,14 @@ DEFINE_DEVICE_TYPE(H83336, h83336_device, "h83336", "Hitachi H8/3336")
 DEFINE_DEVICE_TYPE(H83337, h83337_device, "h83337", "Hitachi H8/3337")
 
 
-h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
-	h8_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83337_device::map), this)),
+h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate, u32 start) :
+	h8_device(mconfig, type, tag, owner, clock, map_delegate),
+	m_scl_w(*this),
+	m_sda_w(*this),
+	m_sda_r(*this, 1),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
+	m_i2c(*this, "i2c"),
 	m_port1(*this, "port1"),
 	m_port2(*this, "port2"),
 	m_port3(*this, "port3"),
@@ -42,7 +46,13 @@ h83337_device::h83337_device(const machine_config &mconfig, device_type type, co
 	m_timer16(*this, "timer16"),
 	m_timer16_0(*this, "timer16:0"),
 	m_watchdog(*this, "watchdog"),
+	m_sci0_i2c_view(*this, "sci0_i2c_view"),
 	m_ram_start(start)
+{
+}
+
+h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
+	h83337_device(mconfig, H83337, tag, owner, clock, address_map_constructor(FUNC(h83337_device::map), this), 0xf780)
 {
 }
 
@@ -97,8 +107,8 @@ void h83337_device::map(address_map &map)
 	map(0xffb9, 0xffb9).rw(m_port6, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(0xffba, 0xffba).rw(m_port5, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffbb, 0xffbb).rw(m_port6, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xffbd, 0xffbd).rw(m_port8, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
-	map(0xffbe, 0xffbe).rw(m_port7, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
+	map(0xffbd, 0xffbd).w(m_port8, FUNC(h8_port_device::ddr_w));
+	map(0xffbe, 0xffbe).r(m_port7, FUNC(h8_port_device::port_r));
 	map(0xffbf, 0xffbf).rw(m_port8, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffc0, 0xffc0).rw(m_port9, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(0xffc1, 0xffc1).rw(m_port9, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
@@ -119,12 +129,17 @@ void h83337_device::map(address_map &map)
 	map(0xffd2, 0xffd3).rw(m_timer8_1, FUNC(h8_timer8_channel_device::tcor_r), FUNC(h8_timer8_channel_device::tcor_w));
 	map(0xffd4, 0xffd4).rw(m_timer8_1, FUNC(h8_timer8_channel_device::tcnt_r), FUNC(h8_timer8_channel_device::tcnt_w));
 
-	map(0xffd8, 0xffd8).rw(m_sci[0], FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
-	map(0xffd9, 0xffd9).rw(m_sci[0], FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
-	map(0xffda, 0xffda).rw(m_sci[0], FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
-	map(0xffdb, 0xffdb).rw(m_sci[0], FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
-	map(0xffdc, 0xffdc).rw(m_sci[0], FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
-	map(0xffdd, 0xffdd).r(m_sci[0], FUNC(h8_sci_device::rdr_r));
+	map(0xffd8, 0x0ffdf).view(m_sci0_i2c_view);
+	m_sci0_i2c_view[0](0xffd8, 0xffd8).rw(m_sci[0], FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
+	m_sci0_i2c_view[0](0xffd9, 0xffd9).rw(m_sci[0], FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
+	m_sci0_i2c_view[0](0xffda, 0xffda).rw(m_sci[0], FUNC(h8_sci_device::scr_r), FUNC(h8_sci_device::scr_w));
+	m_sci0_i2c_view[0](0xffdb, 0xffdb).rw(m_sci[0], FUNC(h8_sci_device::tdr_r), FUNC(h8_sci_device::tdr_w));
+	m_sci0_i2c_view[0](0xffdc, 0xffdc).rw(m_sci[0], FUNC(h8_sci_device::ssr_r), FUNC(h8_sci_device::ssr_w));
+	m_sci0_i2c_view[0](0xffdd, 0xffdd).r(m_sci[0], FUNC(h8_sci_device::rdr_r));
+	m_sci0_i2c_view[1](0xffd8, 0xffd8).rw(m_i2c, FUNC(h8_i2c_device::iccr_r), FUNC(h8_i2c_device::iccr_w));
+	m_sci0_i2c_view[1](0xffd9, 0xffd9).rw(m_i2c, FUNC(h8_i2c_device::icsr_r), FUNC(h8_i2c_device::icsr_w));
+	m_sci0_i2c_view[1](0xffde, 0xffde).rw(m_i2c, FUNC(h8_i2c_device::icdr_r), FUNC(h8_i2c_device::icdr_w));
+	m_sci0_i2c_view[1](0xffdf, 0xffdf).rw(m_i2c, FUNC(h8_i2c_device::icmr_sar_r), FUNC(h8_i2c_device::icmr_sar_w));
 
 	map(0xffe0, 0xffe7).r(m_adc, FUNC(h8_adc_device::addr8_r));
 	map(0xffe8, 0xffe8).rw(m_adc, FUNC(h8_adc_device::adcsr_r), FUNC(h8_adc_device::adcsr_w));
@@ -137,6 +152,12 @@ void h83337_device::device_add_mconfig(machine_config &config)
 {
 	H8_INTC(config, m_intc, *this);
 	H8_ADC_3337(config, m_adc, *this, m_intc, 35);
+
+	H8_I2C(config, m_i2c);
+	m_i2c->scl_cb().set([this](int state) { m_scl_w(state); });
+	m_i2c->sda_cb().set([this](int state) { m_sda_w(state); });
+	m_i2c->sda_out_cb().set([this]() { return m_sda_r(); });
+
 	H8_PORT(config, m_port1, *this, h8_device::PORT_1, 0x00, 0x00);
 	H8_PORT(config, m_port2, *this, h8_device::PORT_2, 0x00, 0x00);
 	H8_PORT(config, m_port3, *this, h8_device::PORT_3, 0x00, 0x00);
@@ -224,6 +245,7 @@ void h83337_device::device_reset()
 	m_wscr = 0x08;
 	m_stcr = 0x00;
 	m_syscr = 0x09;
+	m_sci0_i2c_view.select(0);
 }
 
 u8 h83337_device::syscr_r()
@@ -260,6 +282,12 @@ void h83337_device::stcr_w(u8 data)
 	// ICKS0/1
 	m_timer8_0->set_extra_clock_bit(BIT(data, 0));
 	m_timer8_1->set_extra_clock_bit(BIT(data, 1));
+
+	// IICE (enable access to I2C registers in place of SCI0)
+	if (BIT(data, 4))
+		m_sci0_i2c_view.select(1);
+	else
+		m_sci0_i2c_view.select(0);
 
 	m_stcr = data;
 }
