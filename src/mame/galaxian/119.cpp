@@ -198,30 +198,19 @@ static INPUT_PORTS_START( sega119 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
 	{ STEP8(0,1), STEP8(8*8,1) },
 	{ STEP8(0,8), STEP8(16*8,8) },
 	16*16
 };
 
 static GFXDECODE_START( gfx_sega119 )
-	GFXDECODE_SCALE( "tiles", 0, charlayout, 0, 4, GALAXIAN_XSCALE, 1)
+	GFXDECODE_SCALE( "tiles", 0, gfx_8x8x3_planar, 0, 4, GALAXIAN_XSCALE, 1)
 	GFXDECODE_SCALE( "tiles", 0, spritelayout, 0, 4, GALAXIAN_XSCALE, 1)
 GFXDECODE_END
 
@@ -262,12 +251,12 @@ void sega119_state::extend_tile_info(u16 *code, u8 *color, u8 attrib, u8 x, u8 y
 void sega119_state::sega119(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, GALAXIAN_PIXEL_CLOCK/3/2);
+	Z80(config, m_maincpu, GALAXIAN_PIXEL_CLOCK / 3 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sega119_state::prg_map);
-	// nmi is unused (just returns) timing is done by polling vblank
+	// nmi is unused (just returns), timing is done by polling vblank
 
 	Z80(config, m_audiocpu, 8_MHz_XTAL/2);
-	m_audiocpu->set_periodic_int(FUNC(sega119_state::sound_nmi), attotime::from_hz(8_MHz_XTAL/0x800));
+	m_audiocpu->set_periodic_int(FUNC(sega119_state::sound_nmi), attotime::from_hz(8_MHz_XTAL / 0x800));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sega119_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &sega119_state::sound_io_map);
 
@@ -291,7 +280,7 @@ void sega119_state::sega119(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 
-	AY8910(config, m_ay8910[0], 8_MHz_XTAL/4);
+	AY8910(config, m_ay8910[0], 8_MHz_XTAL / 4);
 	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	MC1408(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5);
@@ -306,26 +295,26 @@ void sega119_state::init_119()
 }
 
 ROM_START( sega119 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "119_4.bin",   0x0000, 0x2000, CRC(b614229e) SHA1(06d0b17f5ff12222c74ff9325c21268bef25446e) )
-	ROM_LOAD( "119_3.bin",   0x2000, 0x2000, CRC(d2a984bf) SHA1(d2d5a83deff894978394461f8779d296b855971f) )
-	ROM_LOAD( "119_2.bin",   0x4000, 0x2000, CRC(d96611bc) SHA1(fffb516f00e747931941844b5358fe46d656bfb8) )
-	ROM_LOAD( "119_1.bin",   0x6000, 0x2000, CRC(368723e2) SHA1(515724eed41138e2e852f53d63f9a226584126f5) )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "119_4", 0x0000, 0x2000, CRC(b614229e) SHA1(06d0b17f5ff12222c74ff9325c21268bef25446e) )
+	ROM_LOAD( "119_3", 0x2000, 0x2000, CRC(d2a984bf) SHA1(d2d5a83deff894978394461f8779d296b855971f) )
+	ROM_LOAD( "119_2", 0x4000, 0x2000, CRC(d96611bc) SHA1(fffb516f00e747931941844b5358fe46d656bfb8) )
+	ROM_LOAD( "119_1", 0x6000, 0x2000, CRC(368723e2) SHA1(515724eed41138e2e852f53d63f9a226584126f5) )
 
 	ROM_REGION( 0x6000, "tiles", 0 )
-	ROM_LOAD( "119_5.bin",   0x0000, 0x2000, CRC(1b08c881) SHA1(b372d614ec41cff49d6ff1c2256170c15069bd55) )
-	ROM_LOAD( "119_6.bin",   0x4000, 0x2000, CRC(1a7490a4) SHA1(e74141b04ffb63e5cc434fbce89ac0c51e79330f) )
-	ROM_LOAD( "119_7.bin",   0x2000, 0x2000, CRC(fcff7f59) SHA1(87a4668ef0c28091c895b0aeae4d4c486396e549) )
+	ROM_LOAD( "119_6", 0x0000, 0x2000, CRC(1a7490a4) SHA1(e74141b04ffb63e5cc434fbce89ac0c51e79330f) )
+	ROM_LOAD( "119_7", 0x2000, 0x2000, CRC(fcff7f59) SHA1(87a4668ef0c28091c895b0aeae4d4c486396e549) )
+	ROM_LOAD( "119_5", 0x4000, 0x2000, CRC(1b08c881) SHA1(b372d614ec41cff49d6ff1c2256170c15069bd55) )
 
 	ROM_REGION( 0x4000, "audiocpu", 0 )
-	ROM_LOAD( "119_8.bin",   0x0000, 0x2000, CRC(6570149c) SHA1(b139edbe7bd2f965804b0c850f87e2ef8e418256) )
-	ROM_LOAD( "119_9.bin",   0x2000, 0x2000, BAD_DUMP CRC(b917e2c2) SHA1(8acd598b898204e18a4cfccc40720d149f401b42) ) // FIXED BITS (xxxx1xxx) (but always reads the same?)
+	ROM_LOAD( "119_8", 0x0000, 0x2000, CRC(6570149c) SHA1(b139edbe7bd2f965804b0c850f87e2ef8e418256) )
+	ROM_LOAD( "119_9", 0x2000, 0x2000, BAD_DUMP CRC(b917e2c2) SHA1(8acd598b898204e18a4cfccc40720d149f401b42) ) // FIXED BITS (xxxx1xxx) (but always reads the same?)
 
 	ROM_REGION( 0x20, "proms", 0 )
-	ROM_LOAD( "119_6331.bin", 0x00, 0x20, CRC(b73e79f3) SHA1(8345d45699c51a90c1d2743623b923531a577993) )
+	ROM_LOAD( "6331", 0x00, 0x20, CRC(b73e79f3) SHA1(8345d45699c51a90c1d2743623b923531a577993) )
 
 	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "119_7502.bin", 0x00, 0x20, CRC(52bdbe39) SHA1(e6f126e22944b698bea599760a79bd5cfa8f0d1f) ) // ?? hopefully just video timing, not a bad read
+	ROM_LOAD( "7502", 0x00, 0x20, CRC(52bdbe39) SHA1(e6f126e22944b698bea599760a79bd5cfa8f0d1f) ) // ?? hopefully just video timing, not a bad read
 ROM_END
 
 } // anonymous namespace
