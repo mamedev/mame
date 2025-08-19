@@ -29,36 +29,17 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 private:
+	void extend_sprite_info(const u8 *base, u8 *sx, u8 *sy, u8 *flipx, u8 *flipy, u16 *code, u8 *color);
+	void extend_tile_info(u16 *code, u8 *color, u8 attrib, u8 x, u8 y);
 
-	void unk_b000_w(u8 data);
-
-//	void sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-//	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tilebanks_flipscreen_w(u8 data);
 
 	void prg_map(address_map &map) ATTR_COLD;
 
 	u8 m_bankdata;
 };
-
-void sega119_state::video_start()
-{
-	galaxian_state::video_start();
-}
-
-/*
-uint32_t sega119_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	galaxian_state::screen_update(screen, bitmap, cliprect);
-
-//	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-//	sprites_draw(bitmap, cliprect);
-	return 0;
-}
-*/
 
 void sega119_state::prg_map(address_map &map)
 {
@@ -68,29 +49,34 @@ void sega119_state::prg_map(address_map &map)
 
 	map(0xa000, 0xa000).nopw(); // soundlatch?
 
-	map(0xb000, 0xb000).portr("UNK").w(FUNC(sega119_state::unk_b000_w));
-	map(0xb001, 0xb001).portr("UNK2");
+	map(0xb000, 0xb000).portr("IN0").w(FUNC(sega119_state::tilebanks_flipscreen_w));
+	map(0xb001, 0xb001).portr("IN1");
 	map(0xb002, 0xb002).portr("DSW1");
 	map(0xb003, 0xb003).portr("DSW2");
 
 	map(0xe000, 0xefff).ram();
 }
 
-void sega119_state::unk_b000_w(u8 data)
+void sega119_state::tilebanks_flipscreen_w(u8 data)
 {
 	// ---- bbff
 	// bb = sprite and tile banks, uncertain which is which
-	// ff = flipscreen, again probably one bit for sprites, one for tiles, but both used at once
+	// ff = flipscreen (could be separate sprite/tile flip, or separate x/y flip, we treat it as the latter)
 
 	if (data & 0xf0)
 		popmessage("%02x", data);
 
 	m_bankdata = data;
 	m_bg_tilemap->mark_all_dirty();
+
+	m_flipscreen_x = data & 0x01;
+	m_flipscreen_y = data & 0x02;
+	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
+
 }
 
 static INPUT_PORTS_START( sega119 )
-	PORT_START("UNK")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -100,7 +86,7 @@ static INPUT_PORTS_START( sega119 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 
-	PORT_START("UNK2")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -196,9 +182,18 @@ void sega119_state::machine_start()
 	save_item(NAME(m_bankdata));
 }
 
-void sega119_state::machine_reset()
+void sega119_state::extend_sprite_info(const u8 *base, u8 *sx, u8 *sy, u8 *flipx, u8 *flipy, u16 *code, u8 *color)
 {
-	galaxian_state::machine_reset();
+	*code += 0x40;
+	if (m_bankdata & 0x04)
+		*code += 0x80;
+}
+
+void sega119_state::extend_tile_info(u16 *code, u8 *color, u8 attrib, u8 x, u8 y)
+{
+	// might not be correct, see level 3
+	if (m_bankdata & 0x08)
+		*code |= 0x200;
 }
 
 void sega119_state::sega119(machine_config &config)
@@ -206,8 +201,9 @@ void sega119_state::sega119(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, GALAXIAN_PIXEL_CLOCK/3/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sega119_state::prg_map);
-
-	//WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
+	// nmi is unused (just returns) timing is done by polling vblank
+	
+	//WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8); // does it exist on this hardware?
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sega119);
@@ -220,11 +216,17 @@ void sega119_state::sega119(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
+
+	set_left_sprite_clip(0);
+	set_right_sprite_clip(0);
 }
 
 void sega119_state::init_119()
 {
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
+
+	m_extend_sprite_info_ptr = extend_sprite_info_delegate(&sega119_state::extend_sprite_info, this);
+	m_extend_tile_info_ptr = extend_tile_info_delegate(&sega119_state::extend_tile_info, this);
 }
 
 ROM_START( sega119 )
@@ -254,5 +256,5 @@ ROM_END
 
 } // anonymous namespace
 
-// ROT180 is unusual, but all tiles are flipped in ROM
-GAME( 1986, sega119, 0, sega119, sega119, sega119_state, init_119, ROT180, "Sega / Coreland", "119", MACHINE_NOT_WORKING )
+// all tiles are upside down in ROM, but handled by flipscreen
+GAME( 1986, sega119, 0, sega119, sega119, sega119_state, init_119, ROT0, "Sega / Coreland", "119", MACHINE_NOT_WORKING )
