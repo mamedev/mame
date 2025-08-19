@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// the hardware is quite galaxian-like, is it worth doing it as a derived class instead?
+// the hardware is quite galaxian-like (background + sprites)
+// is it worth doing it as a derived class instead?
 
 #include "emu.h"
 
@@ -19,7 +20,8 @@ class sega119_state : public driver_device
 public:
 	sega119_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_fgram(*this, "fgram"),
+		m_bgram(*this, "bgram"),
+		m_bgram_attr(*this, "bgram_attr"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode")
@@ -33,18 +35,20 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	required_shared_ptr<u8> m_fgram;
+	required_shared_ptr<u8> m_bgram;
+	required_shared_ptr<u8> m_bgram_attr;
 	required_shared_ptr<u8> m_spriteram;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	void unk_b000_w(u8 data);
 
-	void fgram_w(offs_t offset, u8 data);
+	void bgram_attr_w(offs_t offset, u8 data);
+	void bgram_w(offs_t offset, u8 data);
 
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -76,10 +80,24 @@ void sega119_state::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-
-TILE_GET_INFO_MEMBER(sega119_state::get_fg_tile_info)
+void sega119_state::bgram_attr_w(offs_t offset, u8 data)
 {
-	int code = m_fgram[tile_index];
+	m_bgram_attr[offset] = data;
+
+	if ((offset & 0x01) == 0)
+	{
+		m_bg_tilemap->set_scrolly(offset >> 1, data);
+	}
+	else
+	{
+		for (offset >>= 1; offset < 0x0400; offset += 32)
+			m_bg_tilemap->mark_tile_dirty(offset);
+	}
+}
+
+TILE_GET_INFO_MEMBER(sega119_state::get_bg_tile_info)
+{
+	int code = m_bgram[tile_index];
 	tileinfo.set(0,
 				 code + ((m_bankdata & 0x08) ? 0x200 : 0x000), // might be bit 0x04, 2 bits flip at the same time, one is probably sprite bank
 				 0,
@@ -88,18 +106,19 @@ TILE_GET_INFO_MEMBER(sega119_state::get_fg_tile_info)
 
 void sega119_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sega119_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sega119_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_scroll_cols(32);
 }
 
-void sega119_state::fgram_w(offs_t offset, u8 data)
+void sega119_state::bgram_w(offs_t offset, u8 data)
 {
-	m_fgram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset);
+	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 uint32_t sega119_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	sprites_draw(bitmap, cliprect);
 	return 0;
 }
@@ -107,8 +126,8 @@ uint32_t sega119_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 void sega119_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().w(FUNC(sega119_state::fgram_w)).share(m_fgram);
-	map(0x9000, 0x903f).ram(); // tile attribute ram
+	map(0x8000, 0x87ff).ram().w(FUNC(sega119_state::bgram_w)).share(m_bgram);
+	map(0x9000, 0x903f).ram().w(FUNC(sega119_state::bgram_attr_w)).share(m_bgram_attr);
 	map(0x9040, 0x907f).ram().share("spriteram");
 	map(0x9080, 0x90ff).ram(); // 0x9080 / 0x9081 are accessed
 
@@ -124,7 +143,7 @@ void sega119_state::unk_b000_w(u8 data)
 {
 	//popmessage("%02x", data);
 	m_bankdata = data;
-	m_fg_tilemap->mark_all_dirty();
+	m_bg_tilemap->mark_all_dirty();
 }
 
 static INPUT_PORTS_START( sega119 )
