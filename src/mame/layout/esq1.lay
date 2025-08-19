@@ -8,13 +8,27 @@ license:CC0-1.0
 
 <!-- define elements -->
 
+	<element name="down_arrow">
+		<image><data><![CDATA[
+			<svg width="9" height="5">
+				<path fill="#fff" d="M 0,0 l 4.5,5 4.5,-5 z" />
+			</svg>
+		]]></data></image>
+	</element>
+
 	<element name="oscillators_diagram">
 		<image><data><![CDATA[
 			<svg width="285" height="58">
+				<!-- Arrows -->
+				<path fill="#fecb24"
+					d="
+						M 0,9 l 3,5 3,-5 z
+						M 53,8 l 1.5,6 -5.5,-2 z
+					" />
+
+				<!-- Lines -->
 				<path fill="none" stroke="#fecb24" strokeWidth="1"
 					d="
-						m 0,9 l 3,5 3,-5
-						m 48,-1 l 1.5,6 -5.5,-2
 						M 30,3 h 14 l 23,23 h 10
 						m 52,6 h -9 l -25,25 h -65
 						m 156,-25 h 99
@@ -28,7 +42,7 @@ license:CC0-1.0
 	<element name="envelope_diagram">
 		<image><data><![CDATA[
 			<svg width="87" height="62">
-				<path fill="none" stroke="#ffffff" strokeWidth="1"
+				<path fill="none" stroke="#fff" strokeWidth="1"
 					d="
 						M 5,31 L 21,1 38,40 51,22 H 72 L 78,31
 						M 87,31 H 0
@@ -183,8 +197,6 @@ license:CC0-1.0
 
 	<element name="compare_text"><text string="Compare"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 	<element name="write_text"><text string="Write"><color red="0.83" green="0.86" blue="0.83" /></text></element>
-	<element name="up_arrow_text"><text string="▲"><color red="0.83" green="0.86" blue="0.83" /></text></element>
-	<element name="down_arrow_text"><text string="▼"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 
 	<element name="master_text"><text string="Master"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 	<element name="storage_text"><text string="Storage"><color red="0.83" green="0.86" blue="0.83" /></text></element>
@@ -514,8 +526,10 @@ license:CC0-1.0
 		<element ref="compare_text"><bounds x="113" y="19" width="24" height="6"/></element>
 		<element ref="write_text"><bounds x="162" y="19" width="16" height="6"/></element>
 
-		<element ref="up_arrow_text"><bounds x="121" y="92" width="9" height="8"/></element>
-		<element ref="down_arrow_text"><bounds x="121" y="130" width="9" height="8"/></element>
+		<!-- up   -->
+		<element ref="down_arrow"><orientation rotate="180"/><bounds x="121" y="92" width="9" height="5"/></element>
+		<!-- down -->
+		<element ref="down_arrow"><bounds x="121" y="130" width="9" height="5"/></element>
 
 <!-- SEQUENCER: -->
 		<element ref="master_text"><bounds x="824" y="20" width="19" height="6"/></element>
