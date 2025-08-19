@@ -1,13 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: Olivier Galibert
 
-// Generic ST Rom cartridge
-
-// A 8-bit mono DAC and a 8-bit mono ADC on a cartridge, with a vague
-// lowpass filter.
-
-// A peculiarity of the ST cartridge port is that it's readonly.  So
-// writing to the DAC is done by reading at an appropriate address.
+// Generic ST ROM cartridge
 
 #include "emu.h"
 #include "rom.h"
@@ -31,6 +25,7 @@ protected:
 	virtual bool is_creatable() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *file_extensions() const noexcept override { return "bin,rom,stc"; }
+	virtual const char *image_interface() const noexcept override { return "st_cart"; }
 	virtual const char *image_type_name() const noexcept override { return "romimage"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "rom"; }
 	virtual std::pair<std::error_condition, std::string> call_load() override;

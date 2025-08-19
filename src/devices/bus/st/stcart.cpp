@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
+// A peculiarity of the ST cartridge port is that it's readonly. So
+// writing (i.e. ROM banking or replay DAC) is done by reading
+// at an appropriate address (strobe).
+
 #include "emu.h"
 #include "stcart.h"
 
