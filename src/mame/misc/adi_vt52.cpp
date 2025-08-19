@@ -17,7 +17,6 @@
     - 2x10 position DIP switch
 
     TODO:
-    - Scrolling is broken
     - VRAM bit 7 is unknown
     - Unknown DIP switch settings
     - Replace HLE serial keyboard
@@ -101,13 +100,13 @@ private:
 void adi_vt52_state::mem_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x0003).rw("mos6551", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0x0040, 0x0040).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0x0041, 0x0041).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0080, 0x00ff).mirror(0x100).m("riot", FUNC(mos6532_device::ram_map));
-	map(0x0280, 0x029f).m("riot", FUNC(mos6532_device::io_map));
-	map(0x2000, 0x27ff).ram().share("vram");
-	map(0x4000, 0x4001).rw("mc6850", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x0000, 0x0003).rw(m_mos6551, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x0040, 0x0040).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x0041, 0x0041).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0080, 0x00ff).mirror(0x100).m(m_riot, FUNC(mos6532_device::ram_map));
+	map(0x0280, 0x029f).m(m_riot, FUNC(mos6532_device::io_map));
+	map(0x2000, 0x27ff).mirror(0x800).ram().share("vram");
+	map(0x4000, 0x4001).rw(m_mc6850, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x7000, 0x7fff).rom().region("maincpu", 0);
 }
 
@@ -118,14 +117,16 @@ void adi_vt52_state::mem_map(address_map &map)
 
 static INPUT_PORTS_START( adi_vt52 )
 	PORT_START("dip1") // might be dip2
-	PORT_DIPUNKNOWN(0x01, IP_ACTIVE_LOW) PORT_NAME("DIP1-1")
-	PORT_DIPUNKNOWN(0x02, IP_ACTIVE_LOW) PORT_NAME("DIP1-2")
-	PORT_DIPUNKNOWN(0x04, IP_ACTIVE_LOW) PORT_NAME("DIP1-3")
-	PORT_DIPUNKNOWN(0x08, IP_ACTIVE_LOW) PORT_NAME("DIP1-4")
-	PORT_DIPUNKNOWN(0x10, IP_ACTIVE_LOW) PORT_NAME("DIP1-5")
-	PORT_DIPUNKNOWN(0x20, IP_ACTIVE_LOW) PORT_NAME("DIP1-6")
-	PORT_DIPUNKNOWN(0x40, IP_ACTIVE_LOW) PORT_NAME("DIP1-7")
-	PORT_DIPUNKNOWN(0x80, IP_ACTIVE_LOW) PORT_NAME("DIP1-8")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, IP_ACTIVE_LOW, "DIP1:1") PORT_NAME("DIP1-1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, IP_ACTIVE_LOW, "DIP1:2") PORT_NAME("DIP1-2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, IP_ACTIVE_LOW, "DIP1:3") PORT_NAME("DIP1-3") // when set, vram bit 7 set for unwritten areas
+	PORT_DIPUNKNOWN_DIPLOC(0x08, IP_ACTIVE_LOW, "DIP1:4") PORT_NAME("DIP1-4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, IP_ACTIVE_LOW, "DIP1:5") PORT_NAME("DIP1-5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, IP_ACTIVE_LOW, "DIP1:6") PORT_NAME("DIP1-6")
+	PORT_DIPNAME(0x40, 0x00, "Local Echo") PORT_DIPLOCATION("DIP1:7")
+	PORT_DIPSETTING(0x00, DEF_STR( On ))
+	PORT_DIPSETTING(0x40, DEF_STR( Off ))
+	PORT_DIPUNKNOWN_DIPLOC(0x80, IP_ACTIVE_LOW, "DIP1:8") PORT_NAME("DIP1-8")
 
 	PORT_START("dip2") // might be dip1
 	PORT_DIPNAME(0x0f, 0x0e, "Baud Rate") PORT_DIPLOCATION("DIP2:1,2,3,4")
@@ -152,7 +153,7 @@ static INPUT_PORTS_START( adi_vt52 )
 	PORT_DIPNAME(0x40, 0x40, "Parity") PORT_DIPLOCATION("DIP2:7")
 	PORT_DIPSETTING(0x00, "Odd")
 	PORT_DIPSETTING(0x40, "Even")
-	PORT_DIPUNKNOWN(0x80, IP_ACTIVE_LOW) PORT_NAME("DIP2-8") PORT_DIPLOCATION("DIP2:8")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, IP_ACTIVE_LOW, "DIP2:8") PORT_NAME("DIP2-8")
 INPUT_PORTS_END
 
 
@@ -307,4 +308,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME  FLAGS
-COMP( 1984, adi_vt52, 0,      0,      adi_vt52, adi_vt52, adi_vt52_state, empty_init, "ADI",   "VT52",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, adi_vt52, 0,      0,      adi_vt52, adi_vt52, adi_vt52_state, empty_init, "ADI",   "VT52",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
