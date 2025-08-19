@@ -184,6 +184,8 @@ void sega119_state::prg_map(address_map &map)
 	map(0x9060, 0x907f).ram().share("bulletram");
 	map(0x9080, 0x90ff).ram(); // 0x9080 / 0x9081 are accessed
 
+	map(0xa000, 0xa000).nopw(); // soundlatch?
+
 	map(0xb000, 0xb000).portr("UNK").w(FUNC(sega119_state::unk_b000_w));
 	map(0xb001, 0xb001).portr("UNK2");
 	map(0xb002, 0xb002).portr("DSW1");
@@ -194,6 +196,10 @@ void sega119_state::prg_map(address_map &map)
 
 void sega119_state::unk_b000_w(u8 data)
 {
+	// ---- bbff
+	// bb = sprite and tile banks, uncertain which is which
+	// ff = flipscreen, again probably one bit for sprites, one for tiles, but both used at once
+
 	//popmessage("%02x", data);
 	m_bankdata = data;
 	m_bg_tilemap->mark_all_dirty();
@@ -241,7 +247,7 @@ static INPUT_PORTS_START( sega119 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -321,7 +327,7 @@ void sega119_state::sega119(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(256, 256);
-	screen.set_visarea(0, 256-1, 16, 256-1);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
 	screen.set_screen_update(FUNC(sega119_state::screen_update));
 	screen.set_palette("palette");
 
