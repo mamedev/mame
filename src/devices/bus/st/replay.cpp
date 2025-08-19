@@ -6,9 +6,6 @@
 // A 8-bit mono DAC and a 8-bit mono ADC on a cartridge, with a vague
 // lowpass filter.
 
-// A peculiarity of the ST cartridge port is that it's readonly.  So
-// writing to the DAC is done by reading at an appropriate address.
-
 #include "emu.h"
 #include "replay.h"
 
@@ -58,7 +55,8 @@ st_replay_device::~st_replay_device()
 
 u16 st_replay_device::dac_w(offs_t data)
 {
-	m_dac->write(data);
+	if (!machine().side_effects_disabled())
+		m_dac->write(data);
 	return 0xffff;
 }
 
