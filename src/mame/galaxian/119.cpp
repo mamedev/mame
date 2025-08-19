@@ -78,12 +78,12 @@ void sega119_state::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 		uint16_t code = base[1] & 0x3f;
 		uint8_t flipx = base[1] & 0x40;
 		uint8_t flipy = base[1] & 0x80;
-		uint8_t color = base[2] & 7;
+		uint8_t color = base[2] & 7; // 0x3
 		uint8_t sx = base[3] + hoffset;
 
 		/* draw */
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-		code + 0x40, color,
+		code + 0x40 + ((m_bankdata & 0x04) ? 0x80 : 0x000), color,
 		flipx, flipy,
 		sx, sy, 0);
 	}
