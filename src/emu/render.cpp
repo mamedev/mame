@@ -76,9 +76,10 @@ enum
 };
 
 
-enum
+enum  // for render_container::item::m_type
 {
 	CONTAINER_ITEM_LINE = 0,
+	CONTAINER_ITEM_VECTOR,
 	CONTAINER_ITEM_QUAD,
 	CONTAINER_ITEM_MAX
 };
@@ -657,6 +658,19 @@ void render_container::add_line(float x0, float y0, float x1, float y1, float wi
 
 
 //-------------------------------------------------
+//  add_vector - add a vector item to this container
+//-------------------------------------------------
+
+void render_container::add_vector(float x0, float y0, float x1, float y1, float width, rgb_t argb, double draw_duration, u32 flags)
+{
+	item &newitem = add_generic(CONTAINER_ITEM_VECTOR, x0, y0, x1, y1, argb);
+	newitem.m_width = width;
+	newitem.m_draw_duration = draw_duration;
+	newitem.m_flags = flags;
+}
+
+
+//-------------------------------------------------
 //  add_quad - add a quad item to this container
 //-------------------------------------------------
 
@@ -798,6 +812,7 @@ render_container::item &render_container::add_generic(u8 type, float x0, float y
 	newitem->m_internal = 0;
 	newitem->m_width = 0;
 	newitem->m_texture = nullptr;
+	newitem->m_draw_duration = 0;
 
 	// add the item to the container
 	return m_itemlist.append(*newitem);
@@ -2551,6 +2566,35 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 				}
 				break;
 
+			case CONTAINER_ITEM_VECTOR:
+				// adjust the color for brightness/contrast/gamma
+				prim->color.a = container.apply_brightness_contrast_gamma_fp(prim->color.a);
+				prim->color.r = container.apply_brightness_contrast_gamma_fp(prim->color.r);
+				prim->color.g = container.apply_brightness_contrast_gamma_fp(prim->color.g);
+				prim->color.b = container.apply_brightness_contrast_gamma_fp(prim->color.b);
+
+				// set the vector type
+				prim->type = render_primitive::VECTOR;
+				prim->flags |= PRIMFLAG_TYPE_VECTOR;
+
+				// scale the width by the minimum of X/Y scale factors
+				prim->width = curitem.width() * std::min(container_xform.xscale, container_xform.yscale);
+				prim->flags |= curitem.flags();
+
+				// copy vector-specific properties
+				prim->draw_duration = curitem.draw_duration();
+
+				// clip the primitive
+				if (!m_transform_container)// && PRIMFLAG_GET_VECTOR(curitem.flags()))
+				{
+					clipped = render_clip_line(prim->bounds, root_cliprect);
+				}
+				else
+				{
+					clipped = render_clip_line(prim->bounds, cliprect);
+				}
+				break;
+
 			case CONTAINER_ITEM_QUAD:
 				// set the quad type
 				prim->type = render_primitive::QUAD;
@@ -3257,6 +3301,9 @@ void render_target::add_clear_and_optimize_primitive_list(render_primitive_list 
 		switch (prim.type)
 		{
 			case render_primitive::LINE:
+				goto done;
+
+			case render_primitive::VECTOR:
 				goto done;
 
 			case render_primitive::QUAD:
