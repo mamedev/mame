@@ -31,17 +31,19 @@ NOTES (MD side):
 - 128 KiB of VDP RAM (vs. 64)
 - 68k can switch between native 7.67 MHz or 10 MHz
 - has discrete YM3438 in place of YM2612
-- focus 3 is the current default for MD side
+- Mega CD expansion port working with DIY extension cable, 32x needs at least a passive cart adapter
+- focus 3 in debugger is the current default for MD side
 
 TODO:
 - "TIMER FAIL" when exiting from setup menu (keyboard?);
 - RAM size always gets detected as 2560K even when it's not (from chipset?);
 - Quadtel EMM driver fails recognizing WD76C10 chipset with j4.0 driver disk;
+- 286 card comms errors out at DOS/V bootstrap, may require VDP vint pending status;
 - Cannot HDD format with floppy insthdd.bat, cannot boot from HDD (needs floppy first).
   Attached disk is a WDL-330PS with no geometry info available;
 - ISA16 needs a way to install 16-bit handlers for 68k accesses to work
   (matters for pzlcnst game.exe, that will access VDP ports from 286);
-- MD side, as a testbed for rewriting base HW;
+- MD side, as a testbed for rewriting base HW (in particular cart slot and VDP);
 - hookup MD control ports (needs sega/mdioport.h to be moved out);
 - SEGA TERADRIVE テラドライブ ユーザーズマニュアル known to exist (not scanned yet)
 
@@ -168,15 +170,15 @@ void isa16_ibm_79f2661::md_mem_map(address_map &map)
 			m_md_space->write_byte((offset) + (m_68k_address << 12), data);
 		})
 	);
-//	map(0x0000, 0x1fff).lrw16(
-//		NAME([this] (offs_t offset, u16 mem_mask) {
-//			printf("%05x & %08x\n", (offset << 1) + (m_68k_address << 12), mem_mask);
-//			return swapendian_int16(m_md_space->read_word((offset << 1) + (m_68k_address << 12), swapendian_int16(mem_mask)));
-//		}),
-//		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
-//			m_md_space->write_word((offset << 1) + (m_68k_address << 12), swapendian_int16(data), swapendian_int16(mem_mask));
-//		})
-//	);
+//  map(0x0000, 0x1fff).lrw16(
+//      NAME([this] (offs_t offset, u16 mem_mask) {
+//          printf("%05x & %08x\n", (offset << 1) + (m_68k_address << 12), mem_mask);
+//          return swapendian_int16(m_md_space->read_word((offset << 1) + (m_68k_address << 12), swapendian_int16(mem_mask)));
+//      }),
+//      NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+//          m_md_space->write_word((offset << 1) + (m_68k_address << 12), swapendian_int16(data), swapendian_int16(mem_mask));
+//      })
+//  );
 }
 
 void isa16_ibm_79f2661::remap(int space_id, offs_t start, offs_t end)
@@ -300,7 +302,7 @@ void isa16_ibm_79f2661::io_map(address_map &map)
 			COMBINE_DATA(&m_68k_address);
 			m_68k_address &= 0xffffe;
 			//if (m_68k_view)
-			//	remap(AS_PROGRAM, 0, 0xfffff);
+			//  remap(AS_PROGRAM, 0, 0xfffff);
 		})
 	);
 }
@@ -409,10 +411,12 @@ private:
 	u8 m_isa_address_bank = 0;
 	u8 m_68k_hs = 0;
 	std::unique_ptr<u8[]> m_sound_program;
+
 	bool m_z80_reset = false;
 	bool m_z80_busrq = false;
-	void flush_z80_state();
 	u32 m_z80_main_address = 0;
+
+	void flush_z80_state();
 };
 
 void teradrive_state::x86_map(address_map &map)
@@ -472,7 +476,7 @@ void teradrive_state::md_68k_map(address_map &map)
 	map(0xa00000, 0xa07fff).view(m_md_68k_sound_view);
 	m_md_68k_sound_view[0](0xa00000, 0xa07fff).m(*this, FUNC(teradrive_state::md_68k_z80_map));
 //  map(0xa07f00, 0xa07fff) Z80 VDP space (freezes machine if accessed from 68k)
-//  map(0xa08000, 0xa0ffff) Z80 68k window (assume no DTACK)
+//  map(0xa08000, 0xa0ffff) Z80 68k window (assume no DTACK), or just mirror of above according to TD HW notes?
 //  map(0xa10000, 0xa100ff) I/O
 	map(0xa10000, 0xa100ff).noprw();
 //  map(0xa11000, 0xa110ff) memory mode register
@@ -566,8 +570,8 @@ void teradrive_state::md_cpu_space_map(address_map &map)
 	map(0xfffff5, 0xfffff5).before_time(m_md68kcpu, FUNC(m68000_device::vpa_sync)).after_delay(m_md68kcpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 26; }));
 	map(0xfffff7, 0xfffff7).before_time(m_md68kcpu, FUNC(m68000_device::vpa_sync)).after_delay(m_md68kcpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 27; }));
 	// TODO: IPL1
-	map(0xfffff9, 0xfffff9).before_time(m_md68kcpu, FUNC(m68000_device::vpa_sync)).after_delay(m_md68kcpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 {
-		//m_md_vdp->irq_ack();
+	map(0xfffff9, 0xfffff9).before_time(m_md68kcpu, FUNC(m68000_device::vpa_sync)).after_delay(m_md68kcpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 {
+		m_md_vdp->irq_ack();
 		return 28;
 	}));
 	map(0xfffffb, 0xfffffb).before_time(m_md68kcpu, FUNC(m68000_device::vpa_sync)).after_delay(m_md68kcpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 29; }));
@@ -755,7 +759,8 @@ void teradrive_state::at_softlists(machine_config &config)
 
 //  TODO: MD portion
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv").set_filter("NTSC-J");
-//  TODO: Teradrive SW list
+	SOFTWARE_LIST(config, "td_disk_list").set_original("teradrive_flop");
+//  TODO: Teradrive HDD SW list
 }
 
 void teradrive_state::teradrive(machine_config &config)
@@ -863,31 +868,31 @@ void teradrive_state::teradrive(machine_config &config)
 	YM7101(config, m_md_vdp, md_master_xtal / 4);
 	m_md_vdp->set_screen(m_mdscreen);
 	m_md_vdp->vint_cb().set_inputline(m_md68kcpu, 6);
-//	m_md_vdp->hint_cb().set_inputline(m_md68kcpu, 4);
+//  m_md_vdp->hint_cb().set_inputline(m_md68kcpu, 4);
 	m_md_vdp->sint_cb().set_inputline(m_mdz80cpu, INPUT_LINE_IRQ0);
 	m_md_vdp->add_route(ALL_OUTPUTS, "md_speaker", 0.50, 0);
 	m_md_vdp->add_route(ALL_OUTPUTS, "md_speaker", 0.50, 1);
 
-//	SMS_CONTROL_PORT(config, m_ctrl_ports[0], sms_control_port_devices, SMS_CTRL_OPTION_MD_PAD);
-//	m_ctrl_ports[0]->th_handler().set(m_ioports[0], FUNC(megadrive_io_port_device::th_w));
-//	m_ctrl_ports[0]->set_screen(m_screen);
+//  SMS_CONTROL_PORT(config, m_ctrl_ports[0], sms_control_port_devices, SMS_CTRL_OPTION_MD_PAD);
+//  m_ctrl_ports[0]->th_handler().set(m_ioports[0], FUNC(megadrive_io_port_device::th_w));
+//  m_ctrl_ports[0]->set_screen(m_screen);
 //
-//	m_ioports[0]->set_in_handler(m_ctrl_ports[0], FUNC(sms_control_port_device::in_r));
-//	m_ioports[0]->set_out_handler(m_ctrl_ports[0], FUNC(sms_control_port_device::out_w));
+//  m_ioports[0]->set_in_handler(m_ctrl_ports[0], FUNC(sms_control_port_device::in_r));
+//  m_ioports[0]->set_out_handler(m_ctrl_ports[0], FUNC(sms_control_port_device::out_w));
 //
-//	SMS_CONTROL_PORT(config, m_ctrl_ports[1], sms_control_port_devices, SMS_CTRL_OPTION_MD_PAD);
-//	m_ctrl_ports[1]->th_handler().set(m_ioports[1], FUNC(megadrive_io_port_device::th_w));
-//	m_ctrl_ports[1]->set_screen(m_screen);
+//  SMS_CONTROL_PORT(config, m_ctrl_ports[1], sms_control_port_devices, SMS_CTRL_OPTION_MD_PAD);
+//  m_ctrl_ports[1]->th_handler().set(m_ioports[1], FUNC(megadrive_io_port_device::th_w));
+//  m_ctrl_ports[1]->set_screen(m_screen);
 //
-//	m_ioports[1]->set_in_handler(m_ctrl_ports[1], FUNC(sms_control_port_device::in_r));
-//	m_ioports[1]->set_out_handler(m_ctrl_ports[1], FUNC(sms_control_port_device::out_w));
+//  m_ioports[1]->set_in_handler(m_ctrl_ports[1], FUNC(sms_control_port_device::in_r));
+//  m_ioports[1]->set_out_handler(m_ctrl_ports[1], FUNC(sms_control_port_device::out_w));
 //
-//	SMS_CONTROL_PORT(config, m_ctrl_ports[2], sms_control_port_devices, nullptr);
-//	m_ctrl_ports[2]->th_handler().set(m_ioports[2], FUNC(megadrive_io_port_device::th_w));
-//	m_ctrl_ports[2]->set_screen(m_screen);
+//  SMS_CONTROL_PORT(config, m_ctrl_ports[2], sms_control_port_devices, nullptr);
+//  m_ctrl_ports[2]->th_handler().set(m_ioports[2], FUNC(megadrive_io_port_device::th_w));
+//  m_ctrl_ports[2]->set_screen(m_screen);
 //
-//	m_ioports[2]->set_in_handler(m_ctrl_ports[2], FUNC(sms_control_port_device::in_r));
-//	m_ioports[2]->set_out_handler(m_ctrl_ports[2], FUNC(sms_control_port_device::out_w));
+//  m_ioports[2]->set_in_handler(m_ctrl_ports[2], FUNC(sms_control_port_device::in_r));
+//  m_ioports[2]->set_out_handler(m_ctrl_ports[2], FUNC(sms_control_port_device::out_w));
 
 	// TODO: vestigial
 	GENERIC_CARTSLOT(config, m_md_cart, generic_plain_slot, "megadriv_cart");
