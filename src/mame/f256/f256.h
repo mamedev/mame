@@ -95,8 +95,8 @@ private:
 	void mem_w(offs_t offset, u8 data);
 
 	// screen update
-	void sof_interrtupt(int state);
-	void sol_interrtupt(int state);
+	void sof_interrupt(int state);
+	void sol_interrupt(int state);
 	void rtc_interrupt_handler(int state);
 	void via0_interrupt(int state);
 	void via1_interrupt(int state);

@@ -52,7 +52,7 @@ enum
 	reg_interrupts,         // 0  0  0  0 AIE  PIE   PWRIE ABE    0x00 on powerup
 	reg_flags,              // 0  0  0  0  AF   PF    PWRF BVF    0x00 after reading
 	reg_control,            // 0  0  0  0 UTI STOP* 24/12* DSE
-	reg_century             // 0x00-0x99
+	reg_century,            // 0x00-0x99
 };
 
 enum
@@ -89,7 +89,8 @@ bq4847_device::bq4847_device(const machine_config& mconfig, device_type type, co
 	m_int_state(1),
 	m_rst_state(1),
 	m_wdi_state(-1),
-	m_writing(false)
+	m_writing(false),
+	m_century(false)
 {
 }
 
@@ -102,10 +103,11 @@ bq4845_device::bq4845_device(const machine_config& mconfig, const char* tag, dev
 	: bq4847_device(mconfig, BQ4845, tag, owner, clock)
 {
 }
+
 bq4802_device::bq4802_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
 	: bq4847_device(mconfig, BQ4802, tag, owner, clock)
 {
-	set_has_century(true);
+	set_century(true);
 }
 // device_rtc_interface
 
@@ -121,7 +123,7 @@ void bq4847_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 		m_register[reg_month] = convert_to_bcd(month);
 		m_register[reg_date] = convert_to_bcd(day);
 		m_register[reg_days] = convert_to_bcd(day_of_week);
-		if (has_century)
+		if (m_century)
 		{
 			m_register[reg_century] = convert_to_bcd(year / 100);
 		}
@@ -193,7 +195,7 @@ TIMER_CALLBACK_MEMBER(bq4847_device::update_callback)
 	if (carry)
 		advance_days_bcd();
 
-	if (!has_century)
+	if (!m_century)
 	{
 		LOGMASKED(LOG_CLOCK, "%s 20%02x-%02x-%02x %02x:%02x:%02x\n",
 			dow[m_register[reg_days] - 1], m_register[reg_year], m_register[reg_month], m_register[reg_date],
@@ -312,7 +314,7 @@ void bq4847_device::advance_days_bcd()
 			carry = increment_bcd(m_register[reg_year], 0xff, 0);
 		}
 	}
-	if (has_century && carry)
+	if (m_century && carry)
 	{
 		increment_bcd(m_register[reg_century], 0xff, 1);
 	}
@@ -338,7 +340,7 @@ uint8_t bq4847_device::read(offs_t address)
 	else if (regnum >= reg_interrupts && regnum <= reg_control)
 		value &= 0xf;
 	else if (regnum == reg_century)
-		value = has_century? m_register[reg_century]: 0;  // Reg 15 is locked to 0 in BQ4847
+		value = m_century? m_register[reg_century]: 0;  // Reg 15 is locked to 0 in BQ4847
 
 	LOGMASKED(LOG_REG, "Reg %d -> %02x\n", regnum, value);
 

@@ -31,9 +31,9 @@ public:
 
 	void write_wdi(int state); // watchdog disabled if wdi pin is left floating
 
-	void set_has_century(bool value)
+	void set_century(bool value)
 	{
-		has_century = value;
+		m_century = value;
 	}
 
 protected:
@@ -50,7 +50,7 @@ protected:
 	virtual bool nvram_write(util::write_stream& file) override;
 
 	// device_rtc_interface
-	virtual bool rtc_feature_y2k() const override { return has_century; }
+	virtual bool rtc_feature_y2k() const override { return m_century; }
 	virtual bool rtc_feature_leap_year() const override { return true; }
 	virtual bool rtc_battery_backed() const override { return true; }
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
@@ -89,7 +89,7 @@ private:
 	int m_rst_state;
 	int m_wdi_state;
 	bool m_writing;
-	bool has_century = false;
+	bool m_century;
 };
 
 class bq4845_device : public bq4847_device

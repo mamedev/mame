@@ -74,8 +74,8 @@ void f256_state::f256k(machine_config &config)
     m_rtc->int_handler().set(FUNC(f256_state::rtc_interrupt_handler));
     
     TINY_VICKY(config, m_video, MASTER_CLOCK);
-    m_video->sof_irq_handler().set(FUNC(f256_state::sof_interrtupt));
-    m_video->sol_irq_handler().set(FUNC(f256_state::sol_interrtupt));
+    m_video->sof_irq_handler().set(FUNC(f256_state::sof_interrupt));
+    m_video->sol_irq_handler().set(FUNC(f256_state::sol_interrupt));
 
     // VIA are used to implement the keyboard and Atari-style joysticks polling
     for (auto &via655: m_via6522)
@@ -125,8 +125,8 @@ void f256_state::f256k(machine_config &config)
     for (auto &sid: m_sid)
     {
         MOS6581(config, sid, MUSIC_CLOCK/14);
-        sid->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-        sid->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+        sid->add_route(ALL_OUTPUTS, "lspeaker", 0.25, 0);
+        sid->add_route(ALL_OUTPUTS, "rspeaker", 0.25, 0);
     }
     
     // Mix all sound chips
@@ -1003,17 +1003,17 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                         // SID mix -
                                         m_sid[0]->reset_routes();
                                         m_sid[1]->reset_routes();
-                                        m_sid[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-                                        m_sid[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-                                        m_sid[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-                                        m_sid[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+                                        m_sid[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25, 0);
+                                        m_sid[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25, 0);
+                                        m_sid[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25, 0);
+                                        m_sid[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25, 0);
                                     }
                                     else
                                     {
                                         m_sid[0]->reset_routes();
                                         m_sid[1]->reset_routes();
-                                        m_sid[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-                                        m_sid[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+                                        m_sid[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5, 0);
+                                        m_sid[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5, 0);
                                     }
                                     break;
                                 case 0xD6A4:
@@ -1515,7 +1515,7 @@ void f256_state::device_reset()
 //-------------------------------------------------
 //  Interrupts
 //-------------------------------------------------
-void f256_state::sof_interrtupt(int state)
+void f256_state::sof_interrupt(int state)
 {
     if (state) // && ((m_interrupt_masks[1] & 0x01) == 0))
     {
@@ -1524,7 +1524,7 @@ void f256_state::sof_interrtupt(int state)
         m_maincpu->set_input_line(M6502_IRQ_LINE, state);
     }
 }
-void f256_state::sol_interrtupt(int state)
+void f256_state::sol_interrupt(int state)
 {
     if (state && ((m_interrupt_masks[1] & 0x02) == 0))
     {
