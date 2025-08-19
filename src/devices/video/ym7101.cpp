@@ -29,11 +29,13 @@ ym7101_device::ym7101_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, YM7101, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
+	, device_mixer_interface(mconfig, *this)
 	, m_space_vram_config("videoram", ENDIANNESS_BIG, 8, 17, 0, address_map_constructor(FUNC(ym7101_device::vram_map), this))
 	, m_space_regs_config("regs", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(ym7101_device::regs_map), this))
 	, m_vint_callback(*this)
 //	, m_hint_callback(*this)
 	, m_sint_callback(*this)
+	, m_psg(*this, "psg")
 {
 }
 
@@ -46,6 +48,11 @@ void ym7101_device::device_reset()
 {
 	m_ie0 = false;
 	m_scan_timer->adjust(screen().time_until_pos(224), 224);
+}
+
+void ym7101_device::device_add_mconfig(machine_config &config)
+{
+	SEGAPSG(config, m_psg, DERIVED_CLOCK(4, 15)).add_route(ALL_OUTPUTS, *this, 1.0, 0);
 }
 
 device_memory_interface::space_config_vector ym7101_device::memory_space_config() const
@@ -76,6 +83,7 @@ void ym7101_device::if_map(address_map &map)
 			}
 		})
 	);
+	map(0x11, 0x11).mirror(6).w(m_psg, FUNC(segapsg_device::write));
 }
 
 void ym7101_device::vram_map(address_map &map)

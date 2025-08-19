@@ -7,14 +7,15 @@
 #pragma once
 
 #include "machine/timer.h"
-//#include "sound/sn76496.h"
+#include "sound/sn76496.h"
 
 #include "emupal.h"
 #include "screen.h"
 
 class ym7101_device : public device_t,
-						public device_memory_interface,
-						public device_video_interface
+                      public device_memory_interface,
+                      public device_video_interface,
+                      public device_mixer_interface
 {
 public:
 	ym7101_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -47,6 +48,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -59,6 +61,8 @@ private:
 	devcb_write_line m_vint_callback;
 //	devcb_write_line m_hint_callback;
 	devcb_write_line m_sint_callback;
+
+	required_device<segapsg_device> m_psg;
 
 	TIMER_CALLBACK_MEMBER(scan_timer_callback);
 	emu_timer *m_scan_timer;

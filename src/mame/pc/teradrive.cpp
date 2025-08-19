@@ -250,7 +250,7 @@ void isa16_ibm_79f2661::io_map(address_map &map)
 			return (m_reg_1163 & 0xcf) | (m_reg_1163_read_cb() & 0x30);
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			logerror("$1163: %02x\n", data);
+			//logerror("$1163: %02x\n", data);
 			if (BIT(data, 1) != BIT(m_reg_1163, 1))
 			{
 				m_68k_view = !!BIT(data, 1);
@@ -474,17 +474,20 @@ void teradrive_state::md_68k_map(address_map &map)
 //  map(0xa07f00, 0xa07fff) Z80 VDP space (freezes machine if accessed from 68k)
 //  map(0xa08000, 0xa0ffff) Z80 68k window (assume no DTACK)
 //  map(0xa10000, 0xa100ff) I/O
+	map(0xa10000, 0xa100ff).noprw();
 //  map(0xa11000, 0xa110ff) memory mode register
 //  map(0xa11100, 0xa111ff) Z80 BUSREQ/BUSACK
 	map(0xa11100, 0xa11101).lrw16(
 		NAME([this] (offs_t offset, u16 mem_mask) {
-			u16 res = (m_z80_busrq || m_z80_reset) << 8;
-			return res;
+			u16 res = (!m_z80_busrq || m_z80_reset) ^ 1;
+			return (res << 8) | (res);
 		}),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			//printf("%04x %04x\n", data, mem_mask);
 			if (!ACCESSING_BITS_0_7)
 			{
-				m_z80_busrq = !!BIT(~data, 8);
+				// HACK: pzlcnst snded.exe writes a word, again ISA16 ...
+				//m_z80_busrq = !!BIT(~data, 8);
 			}
 			else if (!ACCESSING_BITS_8_15)
 			{
@@ -580,7 +583,7 @@ void teradrive_state::flush_z80_state()
 {
 	m_mdz80cpu->set_input_line(INPUT_LINE_RESET, m_z80_reset ? ASSERT_LINE : CLEAR_LINE);
 	m_mdz80cpu->set_input_line(Z80_INPUT_LINE_BUSRQ, m_z80_busrq ? CLEAR_LINE : ASSERT_LINE);
-	if (!m_z80_reset && !m_z80_busrq)
+	if (m_z80_reset || !m_z80_busrq)
 		m_md_68k_sound_view.select(0);
 	else
 		m_md_68k_sound_view.disable();
@@ -862,6 +865,8 @@ void teradrive_state::teradrive(machine_config &config)
 	m_md_vdp->vint_cb().set_inputline(m_md68kcpu, 6);
 //	m_md_vdp->hint_cb().set_inputline(m_md68kcpu, 4);
 	m_md_vdp->sint_cb().set_inputline(m_mdz80cpu, INPUT_LINE_IRQ0);
+	m_md_vdp->add_route(ALL_OUTPUTS, "md_speaker", 0.50, 0);
+	m_md_vdp->add_route(ALL_OUTPUTS, "md_speaker", 0.50, 1);
 
 //	SMS_CONTROL_PORT(config, m_ctrl_ports[0], sms_control_port_devices, SMS_CTRL_OPTION_MD_PAD);
 //	m_ctrl_ports[0]->th_handler().set(m_ioports[0], FUNC(megadrive_io_port_device::th_w));
