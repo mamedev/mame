@@ -1,13 +1,35 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+/*
 
-// the hardware is quite galaxian-like (background + sprites + bullets)
-// but tiles are 3bpp, not 2bpp, and there is extra sound hardware
-//
-// TODO:
-// - bullets sometimes get stuck on screen (and need verifying)
-// - sometimes killed by something invisible?
-// - remaining dipswitches
+Coreland / Sega 119
+
+Main PCB:
+- 18.432MHz XTAL, NEC D780-C
+- 4*2764 ROM (program data), 3*2764 ROM (gfx data), 2*6331-1N (PROM)
+- 3*TC5517AP (2Kx8), 2*NMC2148 (1Kx4)
+- unpopulated Alpha Denshi 8302 protection MCU with support chips
+- 2*8-pos DSW
+
+Sound PCB:
+- 8MHz XTAL, NEC D780-C
+- AY-3-8910, DAC0808LCN MC1408P8
+- 2*2764 ROM, HM6116LP-4 (2Kx8)
+- 8-pos DSW (why?)
+
+Dumped from a bootleg PCB (no Sega labels anywhere), although there's a small
+possibility that the ROMs were unmodified. It's more likely that the genuine PCB
+has the protection MCU.
+
+The hardware is quite galaxian-like (background + sprites + bullets) but tiles
+are 3bpp, not 2bpp, and there is extra sound hardware
+
+TODO:
+- bullets sometimes get stuck on screen (and need verifying)
+- sometimes killed by something invisible?
+- remaining dipswitches
+
+*/
 
 #include "emu.h"
 #include "galaxian.h"
@@ -92,7 +114,6 @@ void sega119_state::tilebanks_flipscreen_w(u8 data)
 	m_flipscreen_x = data & 0x01;
 	m_flipscreen_y = data & 0x02;
 	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
-
 }
 
 static INPUT_PORTS_START( sega119 )
@@ -249,9 +270,9 @@ void sega119_state::sega119(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	AY8910(config, m_ay8910[0], 8_MHz_XTAL/4);
-	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.5);
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MC1408(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MC1408(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void sega119_state::init_119()
@@ -288,4 +309,4 @@ ROM_END
 } // anonymous namespace
 
 // all tiles are upside down in ROM, but handled by flipscreen
-GAME( 1986, sega119, 0, sega119, sega119, sega119_state, init_119, ROT0, "Sega / Coreland", "119", MACHINE_NOT_WORKING )
+GAME( 1986, sega119, 0, sega119, sega119, sega119_state, init_119, ROT0, "Coreland / Sega", "119 (bootleg?)", MACHINE_NOT_WORKING )
