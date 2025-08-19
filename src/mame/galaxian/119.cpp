@@ -8,31 +8,24 @@
 
 #include "emu.h"
 
-#include "cpu/z80/z80.h"
-#include "video/resnet.h"
+#include "galaxian.h"
 
-#include "emupal.h"
-#include "screen.h"
 #include "speaker.h"
-#include "tilemap.h"
+
+#include "cpu/z80/z80.h"
 
 namespace {
 
-class sega119_state : public driver_device
+class sega119_state : public galaxian_state
 {
 public:
 	sega119_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_bgram(*this, "bgram"),
-		m_bgram_attr(*this, "bgram_attr"),
-		m_spriteram(*this, "spriteram"),
-		m_bulletram(*this, "bulletram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		galaxian_state(mconfig, type, tag)
 	{ }
 
 	void sega119(machine_config &config);
+
+	void init_119();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -40,149 +33,38 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	required_shared_ptr<u8> m_bgram;
-	required_shared_ptr<u8> m_bgram_attr;
-	required_shared_ptr<u8> m_spriteram;
-	required_shared_ptr<u8> m_bulletram;
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-
-	tilemap_t *m_bg_tilemap = nullptr;
-
-	void galaxian_palette(palette_device &palette);
 
 	void unk_b000_w(u8 data);
 
-	void bgram_attr_w(offs_t offset, u8 data);
-	void bgram_w(offs_t offset, u8 data);
+//	void sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+//	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-
-	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void prg_map(address_map &map) ATTR_COLD;
 
 	u8 m_bankdata;
 };
 
-
-void sega119_state::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	const int hoffset = 1;
-
-	for (int sprnum = 7; sprnum >= 0; sprnum--)
-	{
-		const uint8_t *base = &m_spriteram[sprnum * 4];
-		uint8_t sy = 240 - base[0];
-		uint16_t code = base[1] & 0x3f;
-		uint8_t flipx = base[1] & 0x40;
-		uint8_t flipy = base[1] & 0x80;
-		uint8_t color = base[2] & 7; // 0x3
-		uint8_t sx = base[3] + hoffset;
-
-		/* draw */
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-		code + 0x40 + ((m_bankdata & 0x04) ? 0x80 : 0x000), color,
-		flipx, flipy,
-		sx, sy, 0);
-	}
-}
-
-
-void sega119_state::bgram_attr_w(offs_t offset, u8 data)
-{
-	m_bgram_attr[offset] = data;
-
-	if ((offset & 0x01) == 0)
-	{
-		m_bg_tilemap->set_scrolly(offset >> 1, data);
-	}
-	else
-	{
-		for (offset >>= 1; offset < 0x0400; offset += 32)
-			m_bg_tilemap->mark_tile_dirty(offset);
-	}
-}
-
-TILE_GET_INFO_MEMBER(sega119_state::get_bg_tile_info)
-{
-	int code = m_bgram[tile_index];
-	uint8_t attrib = m_bgram_attr[(tile_index & 0x1f) * 2 + 1];
-	tileinfo.set(0,
-				 code + ((m_bankdata & 0x08) ? 0x200 : 0x000), // might be bit 0x04, 2 bits flip at the same time, one is probably sprite bank
-				 attrib & 0x3,
-				 0);
-}
-
 void sega119_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sega119_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap->set_scroll_cols(32);
+	galaxian_state::video_start();
 }
 
-void sega119_state::bgram_w(offs_t offset, u8 data)
+/*
+uint32_t sega119_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_bgram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
+	galaxian_state::screen_update(screen, bitmap, cliprect);
 
-uint32_t sega119_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	sprites_draw(bitmap, cliprect);
+//	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+//	sprites_draw(bitmap, cliprect);
 	return 0;
 }
-
-#define RGB_MAXIMUM         224
-
-void sega119_state::galaxian_palette(palette_device &palette)
-{
-	// taken from galaxian
-	const uint8_t *color_prom = memregion("proms")->base();
-	static const int rgb_resistances[3] = { 1000, 470, 220 };
-
-	double rweights[3], gweights[3], bweights[2];
-	compute_resistor_weights(0, RGB_MAXIMUM, -1.0,
-			3, &rgb_resistances[0], rweights, 470, 0,
-			3, &rgb_resistances[0], gweights, 470, 0,
-			2, &rgb_resistances[1], bweights, 470, 0);
-
-	// decode the palette first
-	int const len = memregion("proms")->bytes();
-	for (int i = 0; i < len; i++)
-	{
-		uint8_t bit0, bit1, bit2;
-
-		// red component
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_weights(rweights, bit0, bit1, bit2);
-
-		// green component
-		bit0 = BIT(color_prom[i], 3);
-		bit1 = BIT(color_prom[i], 4);
-		bit2 = BIT(color_prom[i], 5);
-		int const g = combine_weights(gweights, bit0, bit1, bit2);
-
-		// blue component
-		bit0 = BIT(color_prom[i], 6);
-		bit1 = BIT(color_prom[i], 7);
-		int const b = combine_weights(bweights, bit0, bit1);
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
-	}
-}
+*/
 
 void sega119_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().w(FUNC(sega119_state::bgram_w)).share(m_bgram);
-	map(0x9000, 0x903f).ram().w(FUNC(sega119_state::bgram_attr_w)).share(m_bgram_attr);
-	map(0x9040, 0x905f).ram().share("spriteram");
-	map(0x9060, 0x907f).ram().share("bulletram");
-	map(0x9080, 0x90ff).ram(); // 0x9080 / 0x9081 are accessed
+	map(0x8000, 0x83ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9000, 0x90ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 
 	map(0xa000, 0xa000).nopw(); // soundlatch?
 
@@ -200,7 +82,9 @@ void sega119_state::unk_b000_w(u8 data)
 	// bb = sprite and tile banks, uncertain which is which
 	// ff = flipscreen, again probably one bit for sprites, one for tiles, but both used at once
 
-	//popmessage("%02x", data);
+	if (data & 0xf0)
+		popmessage("%02x", data);
+
 	m_bankdata = data;
 	m_bg_tilemap->mark_all_dirty();
 }
@@ -301,45 +185,46 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_sega119 )
-	GFXDECODE_ENTRY( "tiles", 0, charlayout, 0, 4 )
-	GFXDECODE_ENTRY( "tiles", 0, spritelayout, 0, 4 )
+	GFXDECODE_SCALE( "tiles", 0, charlayout, 0, 4, GALAXIAN_XSCALE, 1)
+	GFXDECODE_SCALE( "tiles", 0, spritelayout, 0, 4, GALAXIAN_XSCALE, 1)
 GFXDECODE_END
 
 void sega119_state::machine_start()
 {
+	galaxian_state::machine_start();
 	m_bankdata = 0;
 	save_item(NAME(m_bankdata));
 }
 
 void sega119_state::machine_reset()
 {
+	galaxian_state::machine_reset();
 }
 
 void sega119_state::sega119(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 4'000'000); // ? MHz
+	Z80(config, m_maincpu, GALAXIAN_PIXEL_CLOCK/3/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sega119_state::prg_map);
-	//m_maincpu->set_vblank_int("screen", FUNC(sega119_state::nmi_line_pulse)); // NMI is just a retn, so might not be used
+
+	//WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 256-1, 16, 256-16-1);
-	screen.set_screen_update(FUNC(sega119_state::screen_update));
-	screen.set_palette("palette");
-
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sega119);
+	PALETTE(config, m_palette, FUNC(sega119_state::galaxian_palette), 32);
 
-	PALETTE(config, m_palette).set_entries(0x1000);
-	m_palette->set_init(FUNC(sega119_state::galaxian_palette));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
+	m_screen->set_screen_update(FUNC(sega119_state::screen_update_galaxian));
+	m_screen->screen_vblank().set(FUNC(sega119_state::vblank_interrupt_w));
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "speaker").front_center();
+}
 
-	// MC1408P8 DAC
+void sega119_state::init_119()
+{
+	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
 }
 
 ROM_START( sega119 )
@@ -370,4 +255,4 @@ ROM_END
 } // anonymous namespace
 
 // ROT180 is unusual, but all tiles are flipped in ROM
-GAME( 1986, sega119, 0, sega119, sega119, sega119_state, empty_init, ROT180, "Sega / Coreland", "119", MACHINE_NOT_WORKING )
+GAME( 1986, sega119, 0, sega119, sega119, sega119_state, init_119, ROT180, "Sega / Coreland", "119", MACHINE_NOT_WORKING )
