@@ -108,9 +108,10 @@ void sega119_state::bgram_attr_w(offs_t offset, u8 data)
 TILE_GET_INFO_MEMBER(sega119_state::get_bg_tile_info)
 {
 	int code = m_bgram[tile_index];
+	uint8_t attrib = m_bgram_attr[(tile_index & 0x1f) * 2 + 1];
 	tileinfo.set(0,
 				 code + ((m_bankdata & 0x08) ? 0x200 : 0x000), // might be bit 0x04, 2 bits flip at the same time, one is probably sprite bank
-				 0,
+				 attrib & 0x3,
 				 0);
 }
 
