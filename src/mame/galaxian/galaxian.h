@@ -338,6 +338,7 @@ protected:
 	void set_x_scale(uint8_t scale) { m_x_scale = scale; }
 	void set_h0_start(uint8_t start) { m_h0_start = start; }
 	void set_left_sprite_clip(uint8_t clip) { m_leftspriteclip = clip; }
+	void set_right_sprite_clip(uint8_t clip) { m_rightspriteclip = clip; }
 
 	void amigo2_map(address_map &map) ATTR_COLD;
 	void anteaterg_map(address_map &map) ATTR_COLD;
@@ -460,6 +461,7 @@ protected:
 	rgb_t m_bullet_color[8];
 	uint8_t m_gfxbank[5]{};
 	uint8_t m_leftspriteclip = 16;
+	uint8_t m_rightspriteclip = 16;
 };
 
 
