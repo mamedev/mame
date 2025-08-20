@@ -56,6 +56,8 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+	virtual void sprites_clip(screen_device &screen, rectangle &cliprect) override;
+
 private:
 	required_device<mc1408_device> m_dac;
 
@@ -74,6 +76,55 @@ private:
 
 	INTERRUPT_GEN_MEMBER(sound_nmi);
 };
+
+void sega119_state::machine_start()
+{
+	galaxian_state::machine_start();
+
+	save_item(NAME(m_bankdata));
+	save_item(NAME(m_sound_nmi_enable));
+}
+
+void sega119_state::machine_reset()
+{
+	galaxian_state::machine_reset();
+
+	m_sound_nmi_enable = false;
+}
+
+INTERRUPT_GEN_MEMBER(sega119_state::sound_nmi)
+{
+	if (m_sound_nmi_enable)
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+void sega119_state::extend_sprite_info(const u8 *base, u8 *sx, u8 *sy, u8 *flipx, u8 *flipy, u16 *code, u8 *color)
+{
+	if (m_flipscreen_x)
+		*sx -= 2;
+
+	if (m_bankdata & 0x04)
+		*code |= 0xc0;
+	else
+		*code |= 0x40;
+}
+
+void sega119_state::extend_tile_info(u16 *code, u8 *color, u8 attrib, u8 x, u8 y)
+{
+	if (m_bankdata & 0x08)
+		*code |= 0x200;
+}
+
+void sega119_state::sprites_clip(screen_device &screen, rectangle &cliprect)
+{
+	rectangle clip = screen.visible_area();
+	if (m_flipscreen_x)
+		clip.min_x += (64 * m_x_scale);
+	else
+		clip.max_x -= (64 * m_x_scale);
+
+	cliprect &= clip;
+}
 
 void sega119_state::tilebanks_flipscreen_w(u8 data)
 {
@@ -214,40 +265,6 @@ static GFXDECODE_START( gfx_sega119 )
 	GFXDECODE_SCALE( "tiles", 0, spritelayout, 0, 4, GALAXIAN_XSCALE, 1)
 GFXDECODE_END
 
-void sega119_state::machine_start()
-{
-	galaxian_state::machine_start();
-
-	save_item(NAME(m_bankdata));
-	save_item(NAME(m_sound_nmi_enable));
-}
-
-void sega119_state::machine_reset()
-{
-	galaxian_state::machine_reset();
-
-	m_sound_nmi_enable = false;
-}
-
-INTERRUPT_GEN_MEMBER(sega119_state::sound_nmi)
-{
-	if (m_sound_nmi_enable)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
-void sega119_state::extend_sprite_info(const u8 *base, u8 *sx, u8 *sy, u8 *flipx, u8 *flipy, u16 *code, u8 *color)
-{
-	*code |= 0x40;
-	if (m_bankdata & 0x04)
-		*code |= 0x80;
-}
-
-void sega119_state::extend_tile_info(u16 *code, u8 *color, u8 attrib, u8 x, u8 y)
-{
-	if (m_bankdata & 0x08)
-		*code |= 0x200;
-}
-
 void sega119_state::sega119(machine_config &config)
 {
 	// basic machine hardware
@@ -270,9 +287,6 @@ void sega119_state::sega119(machine_config &config)
 	m_screen->set_raw(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
 	m_screen->set_screen_update(FUNC(sega119_state::screen_update_galaxian));
 	m_screen->screen_vblank().set(FUNC(sega119_state::vblank_interrupt_w));
-
-	set_left_sprite_clip(0);
-	set_right_sprite_clip(0);
 
 	// sound hardware
 	GENERIC_LATCH_8(config, m_soundlatch);

@@ -7930,7 +7930,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::timefgtr_scanline)
 	// change spriteram base per each 64-line part of the screen
 	if ((split & 0x3f) == 0)
 	{
-//      m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 		m_sprites_base = 0x40 | (split << 2 & 0x300);
 	}
@@ -8168,8 +8167,6 @@ void namenayo_state::namenayo(machine_config &config)
 	m_palette->set_entries(64);
 
 	m_gfxdecode->set_info(gfx_namenayo);
-
-	set_left_sprite_clip(0);
 }
 
 // TODO: should be derived from theend, re-sort machine configs later
