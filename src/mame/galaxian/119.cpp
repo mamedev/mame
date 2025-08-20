@@ -40,15 +40,15 @@ TODO:
 
 namespace {
 
-class sega119_state : public galaxian_state
+class _119_state : public galaxian_state
 {
 public:
-	sega119_state(const machine_config &mconfig, device_type type, const char *tag) :
+	_119_state(const machine_config &mconfig, device_type type, const char *tag) :
 		galaxian_state(mconfig, type, tag),
 		m_dac(*this, "dac")
 	{ }
 
-	void sega119(machine_config &config);
+	void _119(machine_config &config);
 
 	void init_119();
 
@@ -77,7 +77,7 @@ private:
 	INTERRUPT_GEN_MEMBER(sound_nmi);
 };
 
-void sega119_state::machine_start()
+void _119_state::machine_start()
 {
 	galaxian_state::machine_start();
 
@@ -85,20 +85,20 @@ void sega119_state::machine_start()
 	save_item(NAME(m_sound_nmi_enable));
 }
 
-void sega119_state::machine_reset()
+void _119_state::machine_reset()
 {
 	galaxian_state::machine_reset();
 
 	m_sound_nmi_enable = false;
 }
 
-INTERRUPT_GEN_MEMBER(sega119_state::sound_nmi)
+INTERRUPT_GEN_MEMBER(_119_state::sound_nmi)
 {
 	if (m_sound_nmi_enable)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void sega119_state::extend_sprite_info(const u8 *base, u8 *sx, u8 *sy, u8 *flipx, u8 *flipy, u16 *code, u8 *color)
+void _119_state::extend_sprite_info(const u8 *base, u8 *sx, u8 *sy, u8 *flipx, u8 *flipy, u16 *code, u8 *color)
 {
 	if (m_flipscreen_x)
 		*sx -= 2;
@@ -109,13 +109,13 @@ void sega119_state::extend_sprite_info(const u8 *base, u8 *sx, u8 *sy, u8 *flipx
 		*code |= 0x40;
 }
 
-void sega119_state::extend_tile_info(u16 *code, u8 *color, u8 attrib, u8 x, u8 y)
+void _119_state::extend_tile_info(u16 *code, u8 *color, u8 attrib, u8 x, u8 y)
 {
 	if (m_bankdata & 0x08)
 		*code |= 0x200;
 }
 
-void sega119_state::sprites_clip(screen_device &screen, rectangle &cliprect)
+void _119_state::sprites_clip(screen_device &screen, rectangle &cliprect)
 {
 	rectangle clip = screen.visible_area();
 	if (m_flipscreen_x)
@@ -126,7 +126,7 @@ void sega119_state::sprites_clip(screen_device &screen, rectangle &cliprect)
 	cliprect &= clip;
 }
 
-void sega119_state::tilebanks_flipscreen_w(u8 data)
+void _119_state::tilebanks_flipscreen_w(u8 data)
 {
 	// ---- bbff
 	// bb = sprite and tile banks, uncertain which is which
@@ -141,19 +141,19 @@ void sega119_state::tilebanks_flipscreen_w(u8 data)
 	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 }
 
-void sega119_state::sound_nmi_enable_w(u8 data)
+void _119_state::sound_nmi_enable_w(u8 data)
 {
 	m_sound_nmi_enable = BIT(data, 6);
 }
 
-void sega119_state::prg_map(address_map &map)
+void _119_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x83ff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
 	map(0x9000, 0x90ff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 
 	map(0xa000, 0xa000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xb000, 0xb000).portr("IN0").w(FUNC(sega119_state::tilebanks_flipscreen_w));
+	map(0xb000, 0xb000).portr("IN0").w(FUNC(_119_state::tilebanks_flipscreen_w));
 	map(0xb001, 0xb001).portr("IN1");
 	map(0xb002, 0xb002).portr("DSW1");
 	map(0xb003, 0xb003).portr("DSW2");
@@ -161,22 +161,22 @@ void sega119_state::prg_map(address_map &map)
 	map(0xe000, 0xefff).ram();
 }
 
-void sega119_state::sound_map(address_map &map)
+void _119_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x83ff).ram();
 }
 
-void sega119_state::sound_io_map(address_map &map)
+void _119_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w(m_ay8910[0], FUNC(ay8910_device::data_address_w));
-	map(0x02, 0x02).w(FUNC(sega119_state::sound_nmi_enable_w)); // same as 0x04?
+	map(0x02, 0x02).w(FUNC(_119_state::sound_nmi_enable_w)); // same as 0x04?
 	map(0x03, 0x03).w(m_dac, FUNC(mc1408_device::write));
-	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(sega119_state::sound_nmi_enable_w));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(_119_state::sound_nmi_enable_w));
 }
 
-static INPUT_PORTS_START( sega119 )
+static INPUT_PORTS_START( 119 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
@@ -260,33 +260,33 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( gfx_sega119 )
+static GFXDECODE_START( gfx_119 )
 	GFXDECODE_SCALE( "tiles", 0, gfx_8x8x3_planar, 0, 4, GALAXIAN_XSCALE, 1)
 	GFXDECODE_SCALE( "tiles", 0, spritelayout, 0, 4, GALAXIAN_XSCALE, 1)
 GFXDECODE_END
 
-void sega119_state::sega119(machine_config &config)
+void _119_state::_119(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, GALAXIAN_PIXEL_CLOCK / 3 / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sega119_state::prg_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &_119_state::prg_map);
 	// nmi is unused (just returns), timing is done by polling vblank
 
 	Z80(config, m_audiocpu, 8_MHz_XTAL/2);
-	m_audiocpu->set_periodic_int(FUNC(sega119_state::sound_nmi), attotime::from_hz(8_MHz_XTAL / 0x800));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &sega119_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &sega119_state::sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(_119_state::sound_nmi), attotime::from_hz(8_MHz_XTAL / 0x800));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &_119_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &_119_state::sound_io_map);
 
 	//WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8); // does it exist on this hardware?
 
 	// video hardware
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sega119);
-	PALETTE(config, m_palette, FUNC(sega119_state::galaxian_palette), 32);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_119);
+	PALETTE(config, m_palette, FUNC(_119_state::galaxian_palette), 32);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
-	m_screen->set_screen_update(FUNC(sega119_state::screen_update_galaxian));
-	m_screen->screen_vblank().set(FUNC(sega119_state::vblank_interrupt_w));
+	m_screen->set_screen_update(FUNC(_119_state::screen_update_galaxian));
+	m_screen->screen_vblank().set(FUNC(_119_state::vblank_interrupt_w));
 
 	// sound hardware
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -300,15 +300,15 @@ void sega119_state::sega119(machine_config &config)
 	MC1408(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
-void sega119_state::init_119()
+void _119_state::init_119()
 {
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
 
-	m_extend_sprite_info_ptr = extend_sprite_info_delegate(&sega119_state::extend_sprite_info, this);
-	m_extend_tile_info_ptr = extend_tile_info_delegate(&sega119_state::extend_tile_info, this);
+	m_extend_sprite_info_ptr = extend_sprite_info_delegate(&_119_state::extend_sprite_info, this);
+	m_extend_tile_info_ptr = extend_tile_info_delegate(&_119_state::extend_tile_info, this);
 }
 
-ROM_START( sega119 )
+ROM_START( 119 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "119_4", 0x0000, 0x2000, CRC(b614229e) SHA1(06d0b17f5ff12222c74ff9325c21268bef25446e) )
 	ROM_LOAD( "119_3", 0x2000, 0x2000, CRC(d2a984bf) SHA1(d2d5a83deff894978394461f8779d296b855971f) )
@@ -334,4 +334,4 @@ ROM_END
 } // anonymous namespace
 
 // all tiles are upside down in ROM, but handled by flipscreen
-GAME( 1986, sega119, 0, sega119, sega119, sega119_state, init_119, ROT0, "Coreland / Sega", "119 (bootleg?)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, 119, 0, _119, 119, _119_state, init_119, ROT0, "Coreland / Sega", "119 (bootleg?)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
