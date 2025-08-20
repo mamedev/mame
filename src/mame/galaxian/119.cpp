@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /*
 
-Coreland / Sega 119
+Coreland / Sega 119 (C) 1986, limited release
 
 Main PCB:
 - 18.432MHz XTAL, NEC D780-C
@@ -22,12 +22,14 @@ the ROMs were unmodified. The MCU appears to be unpopulated on the genuine PCB t
 If you look closely at the PCB photo ( https://www.higenekodo.jp/untiku/119.htm ),
 the protusions of 3 of the support chips aren't there.
 
-The hardware is quite galaxian-like (background + sprites + bullets) but tiles
-are 3bpp, not 2bpp, and there is extra sound hardware
+The hardware is quite Galaxian-like (background + sprites + bullets) but tiles
+are 3bpp, not 2bpp, and there is extra sound hardware. The hardware is outdated
+for 1986, it's rumoured that the game is actually from 1983 (see Sega PCB label).
 
 TODO:
 - Sometimes killed by something invisible at the top-right of the 1st stage? It's
   not a hidden sprite, and whatever's there can't be defeated by spraying water.
+  Suspected BTANB considering the game's unpolished state, needs PCB verification.
 - bullets sometimes get stuck on screen (and need verifying)
 - remaining dipswitches
 
@@ -336,4 +338,4 @@ ROM_END
 } // anonymous namespace
 
 // all tiles are upside down in ROM, but handled by flipscreen
-GAME( 1986, 119, 0, _119, 119, _119_state, init_119, ROT0, "Coreland / Sega", "119 (bootleg?)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, 119, 0, _119, 119, _119_state, init_119, ROT0, "Coreland / Sega", "119 (bootleg?)", MACHINE_SUPPORTS_SAVE )
