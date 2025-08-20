@@ -118,8 +118,10 @@ Notes:
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -133,58 +135,229 @@ class jollyjgr_state : public driver_device
 public:
 	jollyjgr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_bm_palette(*this, "bm_palette"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
 		m_bitmap(*this, "bitmap"),
-		m_bulletram(*this, "bulletram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_bm_palette(*this, "bm_palette")
+		m_bulletram(*this, "bulletram")
 	{ }
 
 	void fspider(machine_config &config);
 	void jollyjgr(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 private:
-	/* memory pointers */
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<palette_device> m_bm_palette;
+
+	// memory pointers
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_bitmap;
 	optional_shared_ptr<uint8_t> m_bulletram;
 
-	/* video-related */
-	tilemap_t  *m_bg_tilemap = nullptr;
+	// misc
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_nmi_enable = 0;
+	uint8_t m_flip_x = 0;
+	uint8_t m_flip_y = 0;
+	uint8_t m_bitmap_disable = 0;
+	uint8_t m_tilemap_bank = 0;
+	uint8_t m_pri = 0;
 
-	/* misc */
-	uint8_t      m_nmi_enable = 0;
-	uint8_t      m_flip_x = 0;
-	uint8_t      m_flip_y = 0;
-	uint8_t      m_bitmap_disable = 0;
-	uint8_t      m_tilemap_bank = 0;
-	uint8_t      m_pri = 0;
 	void jollyjgr_videoram_w(offs_t offset, uint8_t data);
 	void jollyjgr_attrram_w(offs_t offset, uint8_t data);
 	void jollyjgr_misc_w(uint8_t data);
 	void jollyjgr_coin_lookout_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 	void jollyjgr_palette(palette_device &palette) const;
 	uint32_t screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void draw_bitmap( bitmap_rgb32 &bitmap );
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<palette_device> m_bm_palette;
+
 	void fspider_map(address_map &map) ATTR_COLD;
 	void jollyjgr_map(address_map &map) ATTR_COLD;
 };
+
+
+/*************************************
+ *
+ *  Video emulation
+ *
+ *************************************/
+
+/* tilemap / sprites palette */
+void jollyjgr_state::jollyjgr_palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < 32; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
+		bit0 = BIT(*color_prom, 6);
+		bit1 = BIT(*color_prom, 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
+
+		palette.set_pen_color(i, rgb_t(r,g,b));
+		color_prom++;
+	}
+}
+
+/* Tilemap is the same as in Galaxian */
+TILE_GET_INFO_MEMBER(jollyjgr_state::get_bg_tile_info)
+{
+	int color = m_colorram[((tile_index & 0x1f) << 1) | 1] & 7;
+	int region = (m_tilemap_bank & 0x20) ? 2 : 0;
+	tileinfo.set(region, m_videoram[tile_index], color, 0);
+}
+
+void jollyjgr_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jollyjgr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_cols(32);
+}
+
+void jollyjgr_state::draw_bitmap(bitmap_rgb32 &bitmap)
+{
+	int count = 0;
+	for (int y = 0; y < 256; y++)
+	{
+		for (int x = 0; x < 256 / 8; x++)
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				int const bit0 = BIT(m_bitmap[count], i);
+				int const bit1 = BIT(m_bitmap[count + 0x2000], i);
+				int const bit2 = BIT(m_bitmap[count + 0x4000], i);
+				int const color = bit0 | (bit1 << 1) | (bit2 << 2);
+
+				if (color)
+				{
+					if (m_flip_x && m_flip_y)
+						bitmap.pix(y, x * 8 + i) = m_bm_palette->pen_color(color);
+					else if (m_flip_x && !m_flip_y)
+						bitmap.pix(255 - y, x * 8 + i) = m_bm_palette->pen_color(color);
+					else if (!m_flip_x && m_flip_y)
+						bitmap.pix(y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
+					else
+						bitmap.pix(255 - y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
+				}
+			}
+
+			count++;
+		}
+	}
+}
+
+uint32_t jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_bm_palette->pen_color(0), cliprect);
+
+	if (m_pri) // used in Frog & Spiders level 3
+	{
+		if (!(m_bitmap_disable))
+			draw_bitmap(bitmap);
+
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	}
+	else
+	{
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+		if(!(m_bitmap_disable))
+			draw_bitmap(bitmap);
+	}
+
+	// Sprites are the same as in Galaxian
+	for (int offs = 0; offs < 0x40; offs += 4)
+	{
+		int sx = m_spriteram[offs + 3] + 1;
+		int sy = m_spriteram[offs];
+		int flipx = m_spriteram[offs + 1] & 0x40;
+		int flipy = m_spriteram[offs + 1] & 0x80;
+		int code = m_spriteram[offs + 1] & 0x3f;
+		int color = m_spriteram[offs + 2] & 7;
+
+		if (m_flip_x)
+		{
+			sx = 240 - sx;
+			flipx = !flipx;
+		}
+
+		if (m_flip_y)
+			flipy = !flipy;
+		else
+			sy = 240 - sy;
+
+		if (offs < 3 * 4)
+			sy++;
+
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+				code,color,
+				flipx,flipy,
+				sx,sy,0);
+	}
+
+	return 0;
+}
+
+uint32_t jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	// Draw bg and sprites
+	screen_update_jollyjgr(screen, bitmap, cliprect);
+
+	// Draw bullets
+	// 16 bytes, 2 bytes per bullet (y,x). 2 player bullets, 6 enemy bullets.
+	// Assume bullets look the same as on Galaxian hw, so simply 4 pixels. Colours are unknown.
+	for (int offs = 0; offs < 0x10; offs += 2)
+	{
+		uint8_t sy = ~m_bulletram[offs];
+		uint8_t sx = ~m_bulletram[offs | 1];
+		uint16_t bc = (offs < 4) ?
+			7: // player, white
+			3; // enemy, yellow
+
+		if (m_flip_y) sy ^= 0xff;
+		if (m_flip_x) sx += 8;
+
+		for (int x = sx - 4; x < sx; x++)
+		{
+			if (cliprect.contains(x, sy))
+				bitmap.pix(sy, x) = m_bm_palette->pen_color(bc);
+		}
+	}
+
+	return 0;
+}
 
 
 /*************************************
@@ -203,10 +376,8 @@ void jollyjgr_state::jollyjgr_attrram_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{
-		/* color change */
-		int i;
-
-		for (i = offset >> 1; i < 0x0400; i += 32)
+		// color change
+		for (int i = offset >> 1; i < 0x0400; i += 32)
 			m_bg_tilemap->mark_tile_dirty(i);
 	}
 	else
@@ -242,6 +413,7 @@ void jollyjgr_state::jollyjgr_coin_lookout_w(uint8_t data)
 
 	/* bits 4, 5, 6 and 7 are used too */
 }
+
 
 /*************************************
  *
@@ -286,7 +458,6 @@ void jollyjgr_state::fspider_map(address_map &map)
 	map(0x98b0, 0x9bff).ram(); // ?
 	map(0xa000, 0xffff).ram().share("bitmap");
 }
-
 
 
 /*************************************
@@ -446,169 +617,6 @@ static INPUT_PORTS_START( fspider )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
 INPUT_PORTS_END
 
-/*************************************
- *
- *  Video emulation
- *
- *************************************/
-
-/* tilemap / sprites palette */
-void jollyjgr_state::jollyjgr_palette(palette_device &palette) const
-{
-	const uint8_t *color_prom = memregion("proms")->base();
-
-	for (int i = 0; i < 32; i++)
-	{
-		int bit0, bit1, bit2;
-
-		// red component
-		bit0 = BIT(*color_prom, 0);
-		bit1 = BIT(*color_prom, 1);
-		bit2 = BIT(*color_prom, 2);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		// green component
-		bit0 = BIT(*color_prom, 3);
-		bit1 = BIT(*color_prom, 4);
-		bit2 = BIT(*color_prom, 5);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		// blue component
-		bit0 = BIT(*color_prom, 6);
-		bit1 = BIT(*color_prom, 7);
-		int const b = 0x52 * bit0 + 0xad * bit1;
-
-		palette.set_pen_color(i, rgb_t(r,g,b));
-		color_prom++;
-	}
-}
-
-/* Tilemap is the same as in Galaxian */
-TILE_GET_INFO_MEMBER(jollyjgr_state::get_bg_tile_info)
-{
-	int color = m_colorram[((tile_index & 0x1f) << 1) | 1] & 7;
-	int region = (m_tilemap_bank & 0x20) ? 2 : 0;
-	tileinfo.set(region, m_videoram[tile_index], color, 0);
-}
-
-void jollyjgr_state::video_start()
-{
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jollyjgr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-
-	m_bg_tilemap->set_transparent_pen(0);
-	m_bg_tilemap->set_scroll_cols(32);
-}
-
-void jollyjgr_state::draw_bitmap(bitmap_rgb32 &bitmap)
-{
-	int count = 0;
-	for (int y = 0; y < 256; y++)
-	{
-		for (int x = 0; x < 256 / 8; x++)
-		{
-			for (int i = 0; i < 8; i++)
-			{
-				int const bit0 = BIT(m_bitmap[count], i);
-				int const bit1 = BIT(m_bitmap[count + 0x2000], i);
-				int const bit2 = BIT(m_bitmap[count + 0x4000], i);
-				int const color = bit0 | (bit1 << 1) | (bit2 << 2);
-
-				if (color)
-				{
-					if (m_flip_x && m_flip_y)
-						bitmap.pix(y, x * 8 + i) = m_bm_palette->pen_color(color);
-					else if (m_flip_x && !m_flip_y)
-						bitmap.pix(255 - y, x * 8 + i) = m_bm_palette->pen_color(color);
-					else if (!m_flip_x && m_flip_y)
-						bitmap.pix(y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
-					else
-						bitmap.pix(255 - y, 255 - x * 8 - i) = m_bm_palette->pen_color(color);
-				}
-			}
-
-			count++;
-		}
-	}
-}
-
-uint32_t jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(m_bm_palette->pen_color(0), cliprect);
-
-	if (m_pri) //used in Frog & Spiders level 3
-	{
-		if (!(m_bitmap_disable))
-			draw_bitmap(bitmap);
-
-		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	}
-	else
-	{
-		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-		if(!(m_bitmap_disable))
-			draw_bitmap(bitmap);
-	}
-
-	// Sprites are the same as in Galaxian
-	for (int offs = 0; offs < 0x40; offs += 4)
-	{
-		int sx = m_spriteram[offs + 3] + 1;
-		int sy = m_spriteram[offs];
-		int flipx = m_spriteram[offs + 1] & 0x40;
-		int flipy = m_spriteram[offs + 1] & 0x80;
-		int code = m_spriteram[offs + 1] & 0x3f;
-		int color = m_spriteram[offs + 2] & 7;
-
-		if (m_flip_x)
-		{
-			sx = 240 - sx;
-			flipx = !flipx;
-		}
-
-		if (m_flip_y)
-			flipy = !flipy;
-		else
-			sy = 240 - sy;
-
-		if (offs < 3 * 4)
-			sy++;
-
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-				code,color,
-				flipx,flipy,
-				sx,sy,0);
-	}
-	return 0;
-}
-
-uint32_t jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	// Draw bg and sprites
-	screen_update_jollyjgr(screen, bitmap, cliprect);
-
-	/* Draw bullets
-	16 bytes, 2 bytes per bullet (y,x). 2 player bullets, 6 enemy bullets.
-	Assume bullets to look the same as on Galaxian hw,
-	that is, simply 4 pixels. Colours are unknown. */
-	for (int offs=0;offs<0x10;offs+=2) {
-		uint8_t sy=~m_bulletram[offs];
-		uint8_t sx=~m_bulletram[offs|1];
-		uint16_t bc=(offs<4)?
-			7: // player, white
-			3; // enemy, yellow
-
-		if (m_flip_y) sy^=0xff;
-		if (m_flip_x) sx+=8;
-
-		if (sy>=cliprect.min_y && sy<=cliprect.max_y)
-			for (int x=sx-4;x<sx;x++)
-				if (x>=cliprect.min_x && x<=cliprect.max_x)
-					bitmap.pix(sy, x) = m_bm_palette->pen_color(bc);
-	}
-
-	return 0;
-}
 
 /*************************************
  *
@@ -671,26 +679,18 @@ void jollyjgr_state::machine_start()
 
 void jollyjgr_state::machine_reset()
 {
-	m_nmi_enable = 0;
-	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	m_flip_x = 0;
-	m_flip_y = 0;
-	m_bitmap_disable = 0;
-	m_tilemap_bank = 0;
+	jollyjgr_misc_w(0);
 }
 
 void jollyjgr_state::jollyjgr(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(18'000'000)/6);  /* 3MHz verified */
+	// basic machine hardware
+	Z80(config, m_maincpu, 18_MHz_XTAL / 6); // 3MHz verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &jollyjgr_state::jollyjgr_map);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.18);     /* 59.1864Hz measured */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(256, 256);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(18_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240); // measured 59.1864Hz
 	screen.set_screen_update(FUNC(jollyjgr_state::screen_update_jollyjgr));
 	screen.screen_vblank().set(FUNC(jollyjgr_state::vblank_irq));
 
@@ -698,10 +698,10 @@ void jollyjgr_state::jollyjgr(machine_config &config)
 	PALETTE(config, m_palette, FUNC(jollyjgr_state::jollyjgr_palette), 32); // tilemap and sprites
 	PALETTE(config, m_bm_palette, palette_device::RGB_3BIT); // bitmap
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "aysnd", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.45); /* 1.7897725MHz verified */
+	AY8910(config, "aysnd", 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "mono", 0.5); // 1.7897725MHz verified
 }
 
 void jollyjgr_state::fspider(machine_config &config)
@@ -711,6 +711,7 @@ void jollyjgr_state::fspider(machine_config &config)
 
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(jollyjgr_state::screen_update_fspider));
 }
+
 
 /*************************************
  *
@@ -756,10 +757,10 @@ ROM_START( fspiderb )
 	ROM_RELOAD(         0x1000, 0x1000 )
 
 	ROM_REGION( 0x4000, "gfx_bank", 0 )
-	ROM_LOAD(  "8.1c",   0x0000, 0x1000, CRC(4e39abad) SHA1(225a2a08a7afe404e6b74789aab8c97a39a21214) )
-	ROM_LOAD(  "9.2c",   0x1000, 0x1000, CRC(04dd1604) SHA1(9e686b09e2fc59fa879fd62982adb1c681f3eb73) )
-	ROM_LOAD( "10.5h",   0x2000, 0x1000, CRC(d4bce323) SHA1(f49df8318aa9e8bd49fad1931480dfd483a0248a) )
-	ROM_LOAD( "11.7h",   0x3000, 0x1000, CRC(7ab56309) SHA1(b43f542a7359c3a4ccf6f116e3a84bd13af6876f) )
+	ROM_LOAD( "8.1c",   0x0000, 0x1000, CRC(4e39abad) SHA1(225a2a08a7afe404e6b74789aab8c97a39a21214) )
+	ROM_LOAD( "9.2c",   0x1000, 0x1000, CRC(04dd1604) SHA1(9e686b09e2fc59fa879fd62982adb1c681f3eb73) )
+	ROM_LOAD( "10.5h",  0x2000, 0x1000, CRC(d4bce323) SHA1(f49df8318aa9e8bd49fad1931480dfd483a0248a) )
+	ROM_LOAD( "11.7h",  0x3000, 0x1000, CRC(7ab56309) SHA1(b43f542a7359c3a4ccf6f116e3a84bd13af6876f) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_COPY( "gfx_bank", 0x0000, 0x0000, 0x800)
