@@ -17,16 +17,18 @@ Sound PCB:
 - 2*2764 ROM, HM6116LP-4 (2Kx8)
 - 8-pos DSW (why?)
 
-Dumped from a bootleg PCB (no Sega labels anywhere), although there's a small
-possibility that the ROMs were unmodified. It's more likely that the genuine PCB
-has the protection MCU.
+Dumped from a bootleg PCB (no Sega labels anywhere), although it's possible that
+the ROMs were unmodified. The MCU appears to be unpopulated on the genuine PCB too:
+If you look closely at the PCB photo ( https://www.higenekodo.jp/untiku/119.htm ),
+the protusions of 3 of the support chips aren't there.
 
 The hardware is quite galaxian-like (background + sprites + bullets) but tiles
 are 3bpp, not 2bpp, and there is extra sound hardware
 
 TODO:
+- Sometimes killed by something invisible at the top-right of the 1st stage? It's
+  not a hidden sprite, and whatever's there can't be defeated by spraying water.
 - bullets sometimes get stuck on screen (and need verifying)
-- sometimes killed by something invisible?
 - remaining dipswitches
 
 */
