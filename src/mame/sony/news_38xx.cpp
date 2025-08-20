@@ -951,7 +951,7 @@ void news_38xx_state::common(machine_config &config)
 
 	// scsi bus 1 and devices
 	NSCSI_BUS(config, m_scsibus[1]);
-	NSCSI_CONNECTOR(config, "scsi1:0", news_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi1:0", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:1", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:2", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:3", news_scsi_devices, nullptr);
