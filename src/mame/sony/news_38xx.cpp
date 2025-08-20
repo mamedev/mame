@@ -127,8 +127,9 @@ protected:
 	u32 ram_tas_r(offs_t offset, u32 mem_mask);
 	void ram_tas_w(offs_t offset, u32 data, u32 mem_mask);
 
-	u8 intst_r();
+	u8 iop_intst_r();
 	u8 iop_ipc_intst_r();
+	u8 park_status_r();
 
 	// Not all IRQs feed into the status register directly
 	// Because we have to handle IRQ data being stored everywhere and/or apply filtering to the status register,
@@ -357,16 +358,17 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x22800018, 0x22800019).w(FUNC(news_38xx_state::ipclixp_w));
 
 	// IOP and Inter-Processor Interrupt Status Registers
-	map(0x23000000, 0x23000000).r(FUNC(news_38xx_state::intst_r));
+	map(0x23000000, 0x23000000).r(FUNC(news_38xx_state::iop_intst_r));
 	map(0x23800000, 0x23800000).r(FUNC(news_38xx_state::iop_ipc_intst_r));
 
 	map(0x24000000, 0x24000007).m(m_fdc, FUNC(n82077aa_device::map));
 	map(0x24000105, 0x24000105).rw(m_fdc, FUNC(n82077aa_device::dma_r), FUNC(n82077aa_device::dma_w));
 
-	// 0x26040000 // Centronics data
-	// 0x26040001 Centronics strobe
-	// 0x26040002 Centronics IRQ clear
-	// map(0x26040003, 0x26040003).w(FUNC(news_38xx_state::iop_inten_w<iop_irq::PARALLEL>));
+	// TODO: fully implement centronics port
+	map(0x26040000, 0x26040000).lw8(NAME([this] (u8 data) { LOG("parallel data w 0x%x\n", data); }));
+	map(0x26040001, 0x26040001).lw8(NAME([this] (u8 data) { LOG("parallel strobe w 0x%x\n", data); }));
+	map(0x26040002, 0x26040002).lw8(NAME([this] (u8) { iop_irq_w<iop_irq::PARALLEL>(0);}));
+	map(0x26040003, 0x26040003).w(FUNC(news_38xx_state::iop_inten_w<iop_irq::PARALLEL>));
 
 	map(0x26080000, 0x26080007).m(m_scsi[0], FUNC(cxd1180_device::map));
 	map(0x260c0000, 0x260c0007).m(m_scsi[1], FUNC(cxd1180_device::map));
@@ -382,7 +384,8 @@ void news_38xx_state::iop_map(address_map &map)
 	// 0x262c0000 // audio
 
 	map(0x26300000, 0x26300003).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
-	// 0x26340000 // park status (SCC and parallel info, TODO: double-check that park has this)
+
+	map(0x26340000, 0x26340000).r(FUNC(news_38xx_state::park_status_r));
 	// 0x26380000 // divide fdd index pulse for ECMA format (1 = 1/2x 0 = 1x)
 
 	map(0x28000000, 0x28000017).m(m_dma[0], FUNC(dmac_0266_device::map));
@@ -391,7 +394,7 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x2c000000, 0x2c0000ff).rom().region("idrom", 0);
 	map(0x2c000100, 0x2c000103).portr("SW1");
 
-	map(0x2e000000, 0x2effffff).r(FUNC(news_38xx_state::iop_bus_error_r)).mirror(0x10000000); // Expansion I/O and mirror
+	map(0x2e000000, 0x2effffff).r(FUNC(news_38xx_state::iop_bus_error_r)).mirror(0x10000000); // Expansion I/O
 }
 
 void news_38xx_state::iop_vector_map(address_map &map)
@@ -445,7 +448,7 @@ void news_38xx_state::ram_tas_w(offs_t offset, u32 data, u32 mem_mask)
 	m_cpu->space(0).write_dword(offset << 2, data); // TODO: fix usage of ->space
 }
 
-u8 news_38xx_state::intst_r()
+u8 news_38xx_state::iop_intst_r()
 {
 	const u8 iop_status = is_iop_irq_set<iop_irq::PERR>() << 7 |
 	                      is_iop_irq_set<iop_irq::SCSI0>() << 6 |
@@ -455,7 +458,7 @@ u8 news_38xx_state::intst_r()
 	                      is_iop_irq_set<iop_irq::FDCIRQ>() << 2 |
 	                      is_iop_irq_set<iop_irq::PARALLEL>() << 1 |
 	                      is_iop_irq_set<iop_irq::SLOT>();
-	LOGMASKED(LOG_INTERRUPT, "%s intst_r: 0x%x\n", machine().describe_context(), iop_status);
+	LOGMASKED(LOG_INTERRUPT, "%s iop_intst_r: 0x%x\n", machine().describe_context(), iop_status);
 	return iop_status;
 }
 
@@ -464,6 +467,14 @@ u8 news_38xx_state::iop_ipc_intst_r()
 	const u8 iop_status = is_iop_irq_set<iop_irq::UBUS>() << 1 | is_iop_irq_set<iop_irq::CPU>();
 	LOGMASKED(LOG_INTERRUPT, "%s iop_ipc_intst_r: 0x%x\n", machine().describe_context(), iop_status);
 	return iop_status;
+}
+
+u8 news_38xx_state::park_status_r()
+{
+	// TODO: other bits in this register
+	const u8 park_status = !is_iop_irq_set<iop_irq::PARALLEL>() << 3;
+	LOGMASKED(LOG_INTERRUPT, "%s park_status_r: 0x%x\n", machine().describe_context(), park_status);
+	return park_status;
 }
 
 template<news_38xx_state::iop_irq Number>
