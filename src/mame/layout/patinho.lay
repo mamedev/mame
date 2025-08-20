@@ -8,6 +8,17 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 
 <mamelayout version="2">
 
+	<element name="ula">
+		<image><data><![CDATA[
+			<svg width="210" height="270">
+				<path
+					fill="#a11022" stroke="#000" strokeWidth="10"
+					d="m 5,5 v 120 l 85,10 -85,10 v 120 l 200,-40 v -180 z"
+				/>
+			</svg>
+		]]></data></image>
+	</element>
+
 	<element name="bit_lamp" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.1" /></disk>
 		<disk state="0"><color red="0.3" green="0.02" blue="0.02" /></disk>
@@ -531,5 +542,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<element ref="line">
 			<bounds x="1246" y="38" width="4" height="295" />
 		</element>
+
+		<element ref="ula"><bounds x="875" y="278" width="81" height="104" /></element>
 	</view>
 </mamelayout>
