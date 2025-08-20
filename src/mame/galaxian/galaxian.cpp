@@ -15514,7 +15514,7 @@ ROM_START( astroamb ) // ROMs verified on two different PCBs
 	ROM_LOAD( "82s123.6l", 0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
-ROM_START( seainv ) // base PCB + MEC-4-2 ROM PCB
+ROM_START( seainv ) // International Scientific base PCB + MEC-4-2 ROM PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.b1",  0x0000, 0x0800, CRC(0ed16457) SHA1(38b4991396fa0c82ba48ca972bfc5939fa8b275b) )
 	ROM_LOAD( "2.b23", 0x0800, 0x0800, CRC(7ae91ab4) SHA1(20a25f28641b6e50e1e179c631a2b1800dde9cc0) )
