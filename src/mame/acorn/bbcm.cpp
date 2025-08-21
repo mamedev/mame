@@ -67,7 +67,7 @@ public:
 	void mpc900gx(machine_config &config);
 	void se3010(machine_config &config);
 
-	static void mpc_prisma_default(device_t *device);
+	//static void mpc_prisma_default(device_t *device);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -954,11 +954,11 @@ void bbcm_state::ht280(machine_config &config)
 }
 
 
-void bbcm_state::mpc_prisma_default(device_t* device)
-{
-	device->subdevice<bbc_1mhzbus_slot_device>("1mhzbus")->set_default_option("awhd");
-	device->subdevice<bbc_1mhzbus_slot_device>("1mhzbus")->set_fixed(true);
-}
+//void bbcm_state::mpc_prisma_default(device_t* device)
+//{
+//	device->subdevice<bbc_1mhzbus_slot_device>("1mhzbus")->set_default_option("awhd");
+//	device->subdevice<bbc_1mhzbus_slot_device>("1mhzbus")->set_fixed(true);
+//}
 
 
 void bbcm_state::mpc800(machine_config &config)
