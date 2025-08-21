@@ -5903,6 +5903,38 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/heathzenith/h8/h8bus.h,BUSES["H8BUS"] = true
+---------------------------------------------------
+
+if (BUSES["H8BUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/cards.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/cards.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/cpu8080.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/cpu8080.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/front_panel.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/front_panel.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h8bus.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h8bus.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_1.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_1.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_5.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_5.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_64.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_64.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/heathzenith/h8/front_panel.cpp", GEN_DIR .. "emu/layout/h8_fp.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "h8_fp"),
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.h,BUSES["HEATH_INTR_SOCKET"] = true
 ---------------------------------------------------
 
