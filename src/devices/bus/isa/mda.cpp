@@ -5,9 +5,6 @@
  * IBM Monochrome Display and Printer Adapter (MDA)
  * Hercules Graphics Card (HGC)
  * EC1840.0002 (MDA)
- *
- * TODO:
- *  - EC1840 testing
  */
 
 #include "emu.h"
@@ -95,9 +92,6 @@ protected:
 
 	u8 m_mode;   // mode control register
 	u8 m_status; // status register
-
-	// internal state
-	u8 m_frame;
 };
 
 DEFINE_DEVICE_TYPE_PRIVATE(ISA8_MDA, device_isa8_card_interface, isa8_mda_device, "isa_ibm_mda", "IBM Monochrome Display and Printer Adapter")
@@ -187,7 +181,6 @@ void isa8_mda_device::device_add_mconfig(machine_config &config)
 			else
 				m_status &= ~STATUS_HSYNC;
 		});
-	m_crtc->out_vsync_callback().set([this](int state) { m_frame += state; });
 
 	GFXDECODE(config, m_gfx, *this, gfx_mda);
 
@@ -201,7 +194,6 @@ void isa8_mda_device::device_start()
 
 	save_item(NAME(m_mode));
 	save_item(NAME(m_status));
-	save_item(NAME(m_frame));
 
 	// allow derived devices to allocate vram
 	if (!m_vram)
@@ -232,7 +224,6 @@ void isa8_mda_device::device_reset()
 {
 	m_mode = 0;
 	m_status = 0xf0;
-	m_frame = 0;
 }
 
 void isa8_mda_device::isa_pio_map(address_map &map)
@@ -294,11 +285,11 @@ MC6845_UPDATE_ROW(isa8_mda_device::update_row)
 		}
 
 		// blink characters every 16 frames
-		if ((m_frame & 0x10) && blink && BIT(att, 7))
+		if ((m_screen->frame_number() & 0x10) && blink && BIT(att, 7))
 			data = 0;
 
 		// blink cursor every 8 frames
-		if ((i == cursor_x) && (m_frame & 0x08))
+		if ((i == cursor_x) && (m_screen->frame_number() & 0x08))
 		{
 			duplicate = true;
 			data = 0xff;
@@ -375,7 +366,7 @@ void isa8_hercules_device::device_add_mconfig(machine_config &config)
 {
 	isa8_mda_device::device_add_mconfig(config);
 
-	m_crtc->out_vsync_callback().append(
+	m_crtc->out_vsync_callback().set(
 		[this](int state)
 		{
 			if (state)
@@ -530,9 +521,6 @@ private:
 
 	u8 m_mode;   // mode control register
 	u8 m_status; // status register
-
-	// internal state
-	u8 m_frame;
 };
 
 DEFINE_DEVICE_TYPE_PRIVATE(ISA8_EC1840_0002, device_isa8_card_interface, isa8_ec1840_0002_device, "ec1840_0002", "EC1840.0002 (MDA)")
@@ -556,7 +544,6 @@ void isa8_ec1840_0002_device::device_add_mconfig(machine_config &config)
 			else
 				m_status &= ~STATUS_HSYNC;
 		});
-	m_crtc->out_vsync_callback().set([this](int state) { m_frame += state; });
 }
 
 void isa8_ec1840_0002_device::device_start()
@@ -568,7 +555,6 @@ void isa8_ec1840_0002_device::device_start()
 
 	save_item(NAME(m_mode));
 	save_item(NAME(m_status));
-	save_item(NAME(m_frame));
 
 	save_pointer(NAME(m_vram), 0x1000);
 	save_pointer(NAME(m_font), 0x2000);
@@ -597,7 +583,6 @@ void isa8_ec1840_0002_device::device_reset()
 {
 	m_mode = 0;
 	m_status = 0xf0;
-	m_frame = 0;
 }
 
 void isa8_ec1840_0002_device::isa_pio_map(address_map &map)
@@ -653,11 +638,11 @@ MC6845_UPDATE_ROW(isa8_ec1840_0002_device::update_row)
 			data = 0xff;
 
 		// blink characters every 16 frames
-		if ((m_frame & 0x10) && blink && BIT(att, 7))
+		if ((m_screen->frame_number() & 0x10) && blink && BIT(att, 7))
 			data = 0;
 
 		// blink cursor every 8 frames
-		if ((i == cursor_x) && (m_frame & 0x08))
+		if ((i == cursor_x) && (m_screen->frame_number() & 0x08))
 			data = 0xff;
 
 		*pixel++ = pen_color(BIT(data, 7) ? fg : bg);
