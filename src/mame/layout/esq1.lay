@@ -278,8 +278,9 @@ license:CC0-1.0
 
 <!-- build layout -->
 
-	<view name="Default Layout">
-		<bounds left="0" right="1280" y="-100" height="640"/>
+	<group name="full">
+		<bounds x="-495" y="-100" width="1843" height="640"/>
+
 		<element ref="dark_grey_rect"><bounds x="-460" y="-87" width="1777" height="85"/></element> <!-- rear -->
 		<element ref="panel_sheet"><bounds x="-460" y="0" width="1777" height="188"/></element> <!-- main portion of control panel -->
 		<element ref="dark_grey_rect"><bounds x="-460" y="190" width="1777" height="55"/></element> <!-- middle -->
@@ -588,6 +589,28 @@ license:CC0-1.0
 		<element ref="programmer_title"><bounds x="453" y="169" width="48" height="8"/></element>
 		<element ref="sequencer_title"><bounds x="859" y="169" width="42" height="9"/></element>
 		<element ref="voice_title"><bounds x="1057" y="169" width="23" height="8"/></element>
+	</group>
+
+	<view name="Default Layout">
+		<bounds left="0" right="1280" y="-100" height="640"/>
+
+		<group ref="full"><bounds x="-495" y="-100" width="1843" height="640"/></group>
+	</view>
+
+	<view name="Full Unit">
+		<group ref="full"><bounds x="-495" y="-100" width="1843" height="640"/></group>
+	</view>
+
+	<view name="VFD close-up">
+		<bounds x="0" y="-100" width="700" height="400"/>
+
+		<group ref="full"><bounds x="-495" y="-100" width="1843" height="640"/></group>
+	</view>
+
+	<view name="Sequencer and Voice">
+		<bounds x="780" y="-100" width="520" height="400"/>
+
+		<group ref="full"><bounds x="-495" y="-100" width="1843" height="640"/></group>
 	</view>
 
 	<script><![CDATA[
