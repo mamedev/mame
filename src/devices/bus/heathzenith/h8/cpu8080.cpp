@@ -98,14 +98,17 @@ private:
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
-	void bus_mem_w(offs_t offset, u8 data) { get_mem().write_byte(offset, data); }
-	u8 bus_mem_r(offs_t offset) { return get_mem().read_byte(offset); }
-	void bus_io_w(offs_t offset, u8 data) { get_io().write_byte(offset, data); }
-	u8 bus_io_r(offs_t offset) { return get_io().read_byte(offset); }
+	void bus_mem_w(offs_t offset, u8 data) { m_mem.write_byte(offset, data); }
+	u8 bus_mem_r(offs_t offset) { return m_mem.read_byte(offset); }
+	void bus_io_w(offs_t offset, u8 data) { m_io.write_byte(offset, data); }
+	u8 bus_io_r(offs_t offset) { return m_io.read_byte(offset); }
 
 	required_device<i8080_cpu_device>  m_maincpu;
 	required_device<heath_intr_socket> m_intr_socket;
 	required_ioport                    m_config;
+
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_mem;
+	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific  m_io;
 
 	bool m_m1_state;
 	bool m_allow_bus_int1;
@@ -119,7 +122,7 @@ private:
 h_8_cpu_8080_device::h_8_cpu_8080_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, H8BUS_CPU_8080, tag, owner, 0)
 	, device_h8bus_card_interface(mconfig, *this)
-	, device_p201_p2_card_interface(*this, H8BUS_CPU_8080, tag)
+	, device_p201_p2_card_interface(*this, tag)
 	, m_maincpu(*this, "maincpu")
 	, m_intr_socket(*this, "intr_socket")
 	, m_config(*this, "CONFIG")
@@ -305,6 +308,9 @@ void h_8_cpu_8080_device::device_start()
 	save_item(NAME(m_bus_int1));
 	save_item(NAME(m_bus_int2));
 
+	h8bus().space(AS_PROGRAM).specific(m_mem);
+	h8bus().space(AS_IO).specific(m_io);
+
 	h8bus().set_clock(m_maincpu->clock());
 }
 
@@ -331,7 +337,7 @@ void h_8_cpu_8080_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &h_8_cpu_8080_device::io_map);
 	m_maincpu->out_status_func().set(FUNC(h_8_cpu_8080_device::h8_status_callback));
 	m_maincpu->out_inte_func().set(FUNC(h_8_cpu_8080_device::h8_inte_callback));
-	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
+	m_maincpu->set_irq_acknowledge_callback(m_intr_socket, FUNC(heath_intr_socket::irq_callback));
 
 	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, nullptr);
 	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

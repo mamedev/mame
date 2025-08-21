@@ -83,6 +83,7 @@ void h8_state::machine_start()
 
 void h8_state::device_config_complete()
 {
+	// Connect up the p201 cable between p1 and p2 boards. This is separate from the h8bus.
 	auto p1_lookup = m_p1.lookup()->get_card_device();
 	auto p2_lookup = m_p2.lookup()->get_card_device();
 

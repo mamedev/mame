@@ -189,9 +189,6 @@ protected:
 
 	h8bus_device &h8bus() { assert(m_h8bus); return *m_h8bus; }
 
-	memory_access<16, 0, 0, (endianness_t)0>::specific get_mem();
-	memory_access<8, 0, 0, (endianness_t)0>::specific get_io();
-
 	const char *m_h8bus_slottag;
 	u8 m_index;
 
@@ -211,7 +208,7 @@ public:
 	virtual void p201_inte_w(int state) {};
 
 protected:
-	device_p201_p1_card_interface(device_t &device, device_type type, const char *tag);
+	device_p201_p1_card_interface(device_t &device, const char *tag);
 
 	devcb_write_line m_p201_reset;
 	devcb_write_line m_p201_int1;
@@ -231,7 +228,7 @@ public:
 	virtual void p201_int2_w(int state) {};
 
 protected:
-	device_p201_p2_card_interface(device_t &device, device_type type, const char *tag);
+	device_p201_p2_card_interface(device_t &device, const char *tag);
 
 	devcb_write_line m_p201_inte;
 };
@@ -329,9 +326,6 @@ private:
 	address_space_config const m_mem_config;
 	address_space_config const m_io_config;
 
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_mem;
-	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
-
 	std::vector<std::reference_wrapper<device_h8bus_card_interface>> m_device_list;
 };
 
@@ -390,17 +384,6 @@ inline void device_h8bus_card_interface::set_slot_rom_disable(int state)
 {
 	h8bus().set_disable_rom_line(m_index, state);
 }
-
-inline memory_access<16, 0, 0, (endianness_t)0>::specific device_h8bus_card_interface::get_mem()
-{
-	return h8bus().m_mem;
-}
-
-inline memory_access<8, 0, 0, (endianness_t)0>::specific device_h8bus_card_interface::get_io()
-{
-	return h8bus().m_io;
-}
-
 
 DECLARE_DEVICE_TYPE(H8BUS, h8bus_device)
 

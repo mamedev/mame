@@ -79,7 +79,7 @@ protected:
 front_panel_device::front_panel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, H8BUS_FRONT_PANEL, tag, owner, 0)
 	, device_h8bus_card_interface(mconfig, *this)
-	, device_p201_p1_card_interface(*this, H8BUS_FRONT_PANEL, tag)
+	, device_p201_p1_card_interface(*this, tag)
 	, m_beep(*this, "beeper")
 	, m_io_keyboard(*this, "X%u", 0U)
 	, m_digits(*this, "digit%u", 0U)

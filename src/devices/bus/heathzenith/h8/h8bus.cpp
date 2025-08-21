@@ -46,7 +46,7 @@ void device_h8bus_card_interface::interface_pre_start()
 	}
 }
 
-device_p201_p1_card_interface::device_p201_p1_card_interface(device_t &device, device_type type, const char *tag)
+device_p201_p1_card_interface::device_p201_p1_card_interface(device_t &device, const char *tag)
 	: device_interface(device, tag)
 	, m_p201_reset(*this)
 	, m_p201_int1(*this)
@@ -58,7 +58,7 @@ device_p201_p1_card_interface::~device_p201_p1_card_interface()
 {
 }
 
-device_p201_p2_card_interface::device_p201_p2_card_interface(device_t &device, device_type type, const char *tag)
+device_p201_p2_card_interface::device_p201_p2_card_interface(device_t &device, const char *tag)
 	: device_interface(device, tag)
 	, m_p201_inte(*this)
 {
@@ -121,8 +121,6 @@ h8bus_device::~h8bus_device()
 
 void h8bus_device::device_start()
 {
-	this->space(AS_PROGRAM).specific(m_mem);
-	this->space(AS_IO).specific(m_io);
 }
 
 void h8bus_device::device_reset()
