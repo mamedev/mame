@@ -16128,7 +16128,17 @@ ROM_END
   A900 2nd generation.
 
   Chinese bootleg with new features
-  like a cross bonus and other enhacements.
+  like cross bonus, bell bonus, and other enhacements.
+
+  教育部書函                  Ministry of Education official letter/document
+  台(86)社五字第 86075244 號   Taiwan (86) Social [Department] five-character No. 86075244
+
+  (86 = year 86 in the Minguo calendar = 1997 AD)
+
+  "五字"     classification code (literally "five-character" document type)
+  "第 … 號"  document number
+
+  未查禁機種   Not listed as a prohibited model/machine
 
 */
 ROM_START( lucky8t )
@@ -24800,7 +24810,7 @@ GAMEL( 1988, lucky8p,    lucky8,   lucky8p,  lucky8,   wingco_state,   init_luck
 GAMEL( 1988, lucky8q,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 16, W-4)",                          0,                     layout_lucky8 )
 GAMEL( 1987, lucky8r,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8r,   ROT0, "TQ System",         "New Lucky 8 Lines (set 17, W-4, turbo, protected)",        0,                     layout_lucky8 )    // shift left registers protection
 GAMEL( 1988, lucky8s,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8s,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 18, W-4, bingo/fever, protected)",  0,                     layout_lucky8 )    // shift left registers protection
-GAMEL( 199?, lucky8t,    lucky8,   lucky8,   lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg (Bigico)",  "New Lucky 8 Lines (A900 2nd gen, Cross Bonus)",            0,                     layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1997, lucky8t,    lucky8,   lucky8,   lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg (Bigico)",  "New Lucky 8 Lines (A900 2nd gen, Cross and Bell Bonus)",   0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8lines,   0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1985, ns8linesa,  ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,   ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
