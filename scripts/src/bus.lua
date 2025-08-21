@@ -877,6 +877,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/bbc/vsp/slot.h,BUSES["BBC_VSP"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_VSP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/vsp/slot.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/vsp/slot.h",
+		MAME_DIR .. "src/devices/bus/bbc/vsp/speech.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/vsp/speech.h",
+		MAME_DIR .. "src/devices/bus/bbc/vsp/sweetalker.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/vsp/sweetalker.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bw2/exp.h,BUSES["BW2"] = true
 ---------------------------------------------------
 
