@@ -26,16 +26,16 @@
  *  Gx970 Pop'n Stage EX (2000.03)
  *
  *  Chips:
- *  15a:    MC68EC020FG25
- *  25b:    001642
+ *  15a:    MC68EC020FG25 @ 16 MHz
+ *  25b:    001642 (sprites, misc)
  *  18d:    055555 (priority encoder)
- *   5f:    056766 (sprites)
+ *   5f:    056766 (color DAC)
  *  18f:    056832 (tiles)
  *  22f:    058143 = 054156 (tiles)
  *  12j:    058141 = 054539 (x2) (2 sound chips in one)
  *
- *  TODO:
- *  - correct FPS
+ *  Vsync: 57.99667Hz
+ *  Hsync: 24.24kHz
  *
  */
 
@@ -82,10 +82,6 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
 
 
 namespace {
-
-#define DISABLE_VB_INT  (!(m_v_ctrl & 0x8000))
-#define NUM_SPRITES (0x800 / 16)
-#define NUM_LAYERS  2
 
 class djmain_state : public driver_device
 {
@@ -157,7 +153,7 @@ private:
 	uint32_t screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
 	void ide_interrupt(int state);
-	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	K056832_CB_MEMBER(tile_callback);
 	void k054539_map(address_map &map) ATTR_COLD;
 	void maincpu_djmain(address_map &map) ATTR_COLD;
@@ -194,8 +190,10 @@ private:
 };
 
 
-void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void djmain_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	static constexpr int NUM_SPRITES = 128;
+
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];
 
@@ -324,19 +322,18 @@ void djmain_state::video_start()
 uint32_t djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int enables = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
-	int pri[NUM_LAYERS + 1];
-	int order[NUM_LAYERS + 1];
-	int i, j;
+	int pri[3];
+	int order[3];
 
-	for (i = 0; i < NUM_LAYERS; i++)
+	for (int i = 0; i < 2; i++)
 		pri[i] = m_k055555->K055555_read_register(K55_PRIINP_0 + i * 3);
-	pri[i] = m_k055555->K055555_read_register(K55_PRIINP_10);
+	pri[2] = m_k055555->K055555_read_register(K55_PRIINP_10);
 
-	for (i = 0; i < NUM_LAYERS + 1; i++)
+	for (int i = 0; i < 3; i++)
 		order[i] = i;
 
-	for (i = 0; i < NUM_LAYERS; i++)
-		for (j = i + 1; j < NUM_LAYERS + 1; j++)
+	for (int i = 0; i < 2; i++)
+		for (int j = i + 1; j < 3; j++)
 			if (pri[order[i]] > pri[order[j]])
 			{
 				int temp = order[i];
@@ -347,11 +344,11 @@ uint32_t djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 
 
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	for (i = 0; i < NUM_LAYERS + 1; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		int layer = order[i];
 
-		if (layer == NUM_LAYERS)
+		if (layer == 2)
 		{
 			if (enables & K55_INP_SUB2)
 				draw_sprites(bitmap, cliprect);
@@ -462,7 +459,7 @@ void djmain_state::v_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		mem_mask >>= 16;
 		COMBINE_DATA(&m_v_ctrl);
 
-		if (m_pending_vb_int && !(!(m_v_ctrl & 0x8000))) // #define DISABLE_VB_INT  (!(m_v_ctrl & 0x8000))
+		if (BIT(m_v_ctrl, 15) && m_pending_vb_int)
 		{
 			m_pending_vb_int = 0;
 			m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
@@ -621,16 +618,14 @@ void djmain_state::unknownc02000_w(offs_t offset, uint32_t data, uint32_t mem_ma
 
 INTERRUPT_GEN_MEMBER(djmain_state::vb_interrupt)
 {
-	m_pending_vb_int = 0;
-
-	if (DISABLE_VB_INT)
+	if (BIT(m_v_ctrl, 15))
 	{
-		m_pending_vb_int = 1;
-		return;
+		//logerror("V-Blank interrupt\n");
+		device.execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
+		m_pending_vb_int = 0;
 	}
-
-	//logerror("V-Blank interrupt\n");
-	device.execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
+	else
+		m_pending_vb_int = 1;
 }
 
 
@@ -1681,10 +1676,7 @@ void djmain_state::djmainj(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(58);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 64*8);
-	screen.set_visarea(12, 512-12-1, 0, 384-1);
+	screen.set_raw(32_MHz_XTAL / 2, 660, 12, 12+488, 418, 0, 384);
 	screen.set_screen_update(FUNC(djmain_state::screen_update_djmain));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4440 / 4);
