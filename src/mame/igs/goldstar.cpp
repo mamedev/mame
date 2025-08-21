@@ -535,7 +535,6 @@ public:
 	{ }
 
 	void animalw(machine_config &config) ATTR_COLD;
-	void animalwa(machine_config &config) ATTR_COLD;
 	void bingowng(machine_config &config) ATTR_COLD;
 	void bingownga(machine_config &config) ATTR_COLD;
 	void flam7_tw(machine_config &config) ATTR_COLD;
@@ -545,6 +544,7 @@ public:
 	void lucky8f(machine_config &config) ATTR_COLD;
 	void lucky8k(machine_config &config) ATTR_COLD;
 	void lucky8p(machine_config &config) ATTR_COLD;
+	void lucky8tet(machine_config &config) ATTR_COLD;
 	void luckybar(machine_config &config) ATTR_COLD;
 	void luckylad(machine_config &config) ATTR_COLD;
 	void magodds(machine_config &config) ATTR_COLD;
@@ -553,7 +553,6 @@ public:
 	void super972(machine_config &config) ATTR_COLD;
 	void superdrg(machine_config &config) ATTR_COLD;
 	void wcat3(machine_config &config) ATTR_COLD;
-	void lucky8tet(machine_config &config) ATTR_COLD;
 
 	void init_cb2() ATTR_COLD;
 	void init_flam7_tw() ATTR_COLD;
@@ -631,10 +630,10 @@ private:
 	uint8_t m_mcu_p1;
 
 	void animalw_map(address_map &map) ATTR_COLD;
-	void animalwa_map(address_map &map) ATTR_COLD;
 	void flaming7_map(address_map &map) ATTR_COLD;
 	void lucky8_map(address_map &map) ATTR_COLD;
 	void lucky8p_map(address_map &map) ATTR_COLD;
+	void lucky8tet_ioport(address_map &map) ATTR_COLD;
 	void luckybar_map(address_map &map) ATTR_COLD;
 	void magodds_map(address_map &map) ATTR_COLD;
 	void mbstar_map(address_map &map) ATTR_COLD;
@@ -642,7 +641,6 @@ private:
 	void superdrg_map(address_map &map) ATTR_COLD;
 	void superdrg_opcodes_map(address_map &map) ATTR_COLD;
 	void wcat3_map(address_map &map) ATTR_COLD;
-	void lucky8tet_ioport(address_map &map) ATTR_COLD;
 	void tmcu_program_map(address_map &map) ATTR_COLD;
 	void tmcu_io_map(address_map &map) ATTR_COLD;
 };
@@ -2604,13 +2602,6 @@ void wingco_state::animalw_map(address_map &map)
 	map(0xe000, 0xefff).rom().region("maincpu", 0x3000);
 }
 
-void wingco_state::animalwa_map(address_map &map)
-{
-	lucky8_map(map);
-
-	map(0xc000, 0xcfff).rom().region("maincpu", 0x6000);
-	map(0xd000, 0xdfff).rom().region("maincpu", 0x7000);
-}
 
 void wingco_state::nd8lines_map(address_map &map)
 {
@@ -5527,6 +5518,7 @@ static INPUT_PORTS_START( ns8linew )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( animalw )
 	PORT_INCLUDE( ns8linew)
 
@@ -5537,6 +5529,86 @@ static INPUT_PORTS_START( animalw )
 	PORT_MODIFY("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( lucky8t )
+	PORT_INCLUDE( ns8linew)
+
+	PORT_MODIFY("IN1")  // b801 - No P2 Controls...
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// expects the b802 bit2 and b811 bit1 ACTIVE_HIGH or it won't boot
+	PORT_MODIFY("IN2")  // b802
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Stop3 / Right")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Stop2 / Bonus Game")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Stop1 / Left")
+
+	PORT_MODIFY("IN3")  // b810 - Money in
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Stop All");
+
+	PORT_MODIFY("IN4")  // b811
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Max Bet" )                   PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, "64" )
+	PORT_DIPSETTING(    0x00, "120" )
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW1:3")
+	PORT_DIPNAME( 0x18, 0x18, "Double-Up Game Pay Rate" )   PORT_DIPLOCATION("DSW1:4,5")    // OK
+	PORT_DIPSETTING(    0x18, "60%" )
+	PORT_DIPSETTING(    0x10, "70%" )
+	PORT_DIPSETTING(    0x08, "80%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0x20, 0x20, "Reel Speed" )                PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x20, "Normal" )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0xc0, 0x00, "Special Odds?" )             PORT_DIPLOCATION("DSW1:7,8")    // not checked
+	PORT_DIPSETTING(    0xc0, "None" )
+	PORT_DIPSETTING(    0xb0, "Limited to x300 (x1000)" )
+	PORT_DIPSETTING(    0x40, "Limited to x500 (x5000)" )
+	PORT_DIPSETTING(    0x00, "Limited to x1000 (x10000)" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x01, "Main Game Pay Rate" )    PORT_DIPLOCATION("DSW2:1,2")  // OK
+	PORT_DIPSETTING(    0x03, "60%" )
+	PORT_DIPSETTING(    0x02, "70%" )
+	PORT_DIPSETTING(    0x01, "80%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0x04, 0x04, "Double Up Game" )        PORT_DIPLOCATION("DSW2:3")    // OK, use stop buttons to play
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW2:8")
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW3:8")
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" )       PORT_DIPLOCATION("DSW4:1,2")  // OK
+	PORT_DIPSETTING(    0x03, "100" )
+	PORT_DIPSETTING(    0x00, "500" )
+	PORT_DIPSETTING(    0x02, "1000" )
+	PORT_DIPSETTING(    0x01, "3000" )
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW4:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW4:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW4:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW4:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW4:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW4:8")
+INPUT_PORTS_END
+
 
 // TODO: everything
 static INPUT_PORTS_START( superdrg )
@@ -11512,13 +11584,6 @@ void wingco_state::animalw(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::animalw_map);
 }
 
-void wingco_state::animalwa(machine_config &config)
-{
-	lucky8(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::animalwa_map);
-}
-
 void wingco_state::super972(machine_config &config)
 {
 	lucky8(config);
@@ -16058,9 +16123,32 @@ ROM_START( animalw ) // big CPU block marked GPS Game Power System
 	ROM_LOAD( "dm74s288.u69", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
-ROM_START( animalwa )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+/*
+  Lucky 8 Lines
+  A900 2nd generation.
+
+  Chinese bootleg with new features
+  like a cross bonus and other enhacements.
+
+*/
+ROM_START( lucky8t )
+	ROM_REGION( 0x10000, "brickrom", 0 )
 	ROM_LOAD( "rom9.u91",  0x0000, 0x8000, CRC(1a2edd86) SHA1(562975eda8e01beb97a48b78b069d8f426e63713) )
+
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	//                      source   dest    size
+	ROM_COPY( "brickrom",   0x0000, 0x0000, 0x5000 )    // to 0000-4fff
+	ROM_COPY( "brickrom",   0x5000, 0x5000, 0x0800 )    // to 5000-57ff
+	ROM_COPY( "brickrom",   0x6800, 0x5800, 0x0800 )    // to 5800-5fff
+	ROM_COPY( "brickrom",   0x5000, 0x6000, 0x0800 )    // to 6000-67ff
+	ROM_COPY( "brickrom",   0x5800, 0x6800, 0x0800 )    // to 6800-6fff
+	ROM_COPY( "brickrom",   0x7000, 0x7000, 0x0800 )    // to 7000-77ff
+	ROM_COPY( "brickrom",   0x7800, 0x7800, 0x0800 )    // to 7800-7fff
+
+	ROM_COPY( "brickrom",   0x6000, 0xc000, 0x0800 )    // to c000-c7ff
+	ROM_COPY( "brickrom",   0x6800, 0xc800, 0x0800 )    // to c800-cfff
+	ROM_COPY( "brickrom",   0x7000, 0xd000, 0x0800 )    // to d000-d7ff
+	ROM_COPY( "brickrom",   0x7800, 0xd800, 0x0800 )    // to d800-dfff
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "rom7.u22",  0x00000, 0x8000, CRC(5b06e957) SHA1(f8499eec69079588b6d6dc4d486bd8b089be8795) )
@@ -24712,6 +24800,7 @@ GAMEL( 1988, lucky8p,    lucky8,   lucky8p,  lucky8,   wingco_state,   init_luck
 GAMEL( 1988, lucky8q,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 16, W-4)",                          0,                     layout_lucky8 )
 GAMEL( 1987, lucky8r,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8r,   ROT0, "TQ System",         "New Lucky 8 Lines (set 17, W-4, turbo, protected)",        0,                     layout_lucky8 )    // shift left registers protection
 GAMEL( 1988, lucky8s,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8s,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 18, W-4, bingo/fever, protected)",  0,                     layout_lucky8 )    // shift left registers protection
+GAMEL( 199?, lucky8t,    lucky8,   lucky8,   lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg (Bigico)",  "New Lucky 8 Lines (A900 2nd gen, Cross Bonus)",            0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8lines,   0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1985, ns8linesa,  ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,   ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
@@ -24733,7 +24822,6 @@ GAME(  198?, ladylinre,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_lady
 GAME ( 1992?,wcat,       0,        wcat3,    lucky8b,  wingco_state,   init_wcat,      ROT0, "Excel",             "Wild Cat",                                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs correct GFX ROMs, I/O, etc
 GAME(  1995, wcat3,      0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // decryption partially wrong, needs soft resets before running. Bad PROM decode
 GAMEL( 199?, animalw,    0,        animalw,  animalw,  wingco_state,   empty_init,     ROT0, "GPS",               "Animal Wonders (ver A900 66)",                             MACHINE_NOT_WORKING,   layout_lucky8 )    // inputs / DIPs need to be checked
-GAMEL( 199?, animalwa,   animalw,  animalwa, animalw,  wingco_state,   empty_init,     ROT0, "bootleg (Bigico)",  "Animal Wonders (ver A900, Bicigo bootleg)",                MACHINE_NOT_WORKING,   layout_lucky8 )    // doesn't boot
 GAMEL( 199?, animalwbl,  animalw,  lucky8,   animalw,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900, bootleg)",                       MACHINE_NOT_WORKING,   layout_lucky8 )    // inputs / DIPs need to be checked
 GAMEL( 1989, cb2,        0,        lucky8,   lucky8,   wingco_state,   init_cb2,       ROT0, "Dyna",              "Cherry Bonus II (V2.00 06/01)",                            MACHINE_NOT_WORKING,   layout_lucky8 )    // I/O need to be checked, seems reasonably working
 GAMEL( 1990, cbaai,      0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "bootleg (A.A.I.)",  "Cherry Bonus (A.A.I. bootleg)",                            MACHINE_NOT_WORKING,   layout_lucky8 )    // jumps to 0xf430 but there's nothing there?
