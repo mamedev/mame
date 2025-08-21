@@ -210,6 +210,19 @@
   layers. I strongly suspect there is a register to adjust the layer position.
 
 
+  * New Lucky 8 Lines (A900 2nd gen, Cross and Bell Bonus)
+  
+  This game has new features.
+  The game has stops buttons (stops 1-2-3, and stop all) to stop the reels.
+
+  Once you win a game, press STOP 2 to enter the bonus stage / double up,
+  and then use STOP 1 & STOP 3 to choose left or right.
+
+  If you get 3 "BAR3" with at least 32 bets, you'll get the bonus listed on lower left.
+
+  To enter the Cross Bonus (JP Chance) you need to bet at least 32 credits.
+
+
 ***************************************************************************/
 
 
