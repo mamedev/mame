@@ -90,6 +90,10 @@ license:CC0-1.0
 		<rect><color red="0.13" green="0.13" blue="0.15" /></rect>
 	</element>
 
+	<element name="wheel-body">
+		<rect><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+
 	<element name="panel_sheet">
 		<rect><color red="0.17" green="0.17" blue="0.18"/></rect>
 	</element>
@@ -104,6 +108,12 @@ license:CC0-1.0
 
 	<element name="black-rect">
 		<rect><color red="0.0" green="0.0" blue="0.0"/></rect>
+	</element>
+
+	<element name="wheel-knob">
+		<rect>
+			<color red="0" green="0" blue="0"/>
+		</rect>
 	</element>
 
 	<element name="slider-knob">
@@ -146,9 +156,23 @@ license:CC0-1.0
 		</element>
 		<element ref="slider_ticks"><bounds x="0" y="0" width="46" height="94"/></element>
 		<element id="slider_knob_~slider_id~" ref="slider-knob">
-			<animate inputtag="slider_p~slider_id~" inputmask="0x7f"/>
+			<animate inputtag="~port_name~" inputmask="0x7f"/>
 			<bounds state="100" x="9" y="11" width="29" height="16"/>
 			<bounds state="0" x="9" y="66" width="29" height="16"/>
+		</element>
+	</group>
+
+	<group name="wheel">
+		<element ref="wheel-body">
+			<bounds x="12" y="0" width="23" height="94"/>
+		</element>
+		<element id="slider_~slider_id~" ref="invisible-rect">
+			<bounds x="12" y="10" width="23" height="77"/>
+		</element>
+		<element id="slider_knob_~slider_id~" ref="wheel-knob">
+			<animate inputtag="~port_name~" inputmask="0x7f"/>
+			<bounds state="100" x="12" y="11" width="23" height="16"/>
+			<bounds state="0" x="12" y="66" width="23" height="16"/>
 		</element>
 	</group>
 
@@ -288,8 +312,20 @@ license:CC0-1.0
 		<element ref="panel_sheet"><bounds x="-460" y="257" width="297" height="246"/></element>  <!-- pitch & mod side-panel -->
 		<element ref="dark_grey_rect"><bounds x="-490" y="-95" width="27" height="620"/></element> <!-- left border -->
 		<element ref="dark_grey_rect"><bounds x="1320" y="-95" width="27" height="620"/></element> <!-- right border -->
-		<element ref="dark_grey_rect"><bounds x="-390" y="310" width="24" height="145"/></element> <!-- pitch wheel -->
-		<element ref="dark_grey_rect"><bounds x="-315" y="310" width="24" height="145"/></element> <!-- mod wheel -->
+
+<!-- PITCH WHEEL: -->
+		<param name="slider_id" value="pitch_wheel"/>
+		<param name="port_name" value="pitch_wheel"/>
+		<group ref="wheel">
+			<bounds x="-390" y="310" width="24" height="145"/>
+		</group>
+
+<!-- MOD WHEEL: -->
+		<param name="slider_id" value="mod_wheel"/>
+		<param name="port_name" value="mod_wheel"/>
+		<group ref="wheel">
+			<bounds x="-315" y="310" width="24" height="145"/>
+		</group>
 
 		<element ref="oscillators_diagram"><bounds x="966" y="29" width="285" height="58"/></element>
 		<element ref="sync_text"><bounds x="951" y="45" width="14" height="6"/></element>
@@ -336,21 +372,18 @@ license:CC0-1.0
 		<element ref="dark_grey_rect"><bounds x="-226" y="55" width="100" height="30"/></element>
 
 
-<!-- VOLUME and DATA ENTRY SLIDERS: -->
-		<repeat count="2">
-			<param name="slider_x" start="-60" increment="220"/>
-			<param name="slider_id" start="1" increment="1"/>
-			<group ref="slider">
-				<bounds x="~slider_x~" y="53" width="47" height="93"/>
-			</group>
-		</repeat>
-
+<!-- VOLUME SLIDER: -->
+		<param name="slider_id" value="volume"/>
+		<param name="port_name" value="volume_slider"/>
+		<group ref="slider">
+			<bounds x="-60" y="53" width="47" height="93"/>
+		</group>
 
 <!-- BANKS: -->
 		<element ref="yellow_button" inputtag="COL0" inputmask="0x01"><!-- SEQ    --><bounds x="20" y="26" width="20" height="9"/></element>
-		<element ref="grey_button" inputtag="COL0" inputmask="0x02"><!-- CART A --><bounds x="20" y="63" width="20" height="9"/></element>
-		<element ref="grey_button" inputtag="COL0" inputmask="0x04"><!-- CART B --><bounds x="20" y="100" width="20" height="9"/></element>
-		<element ref="grey_button" inputtag="COL0" inputmask="0x08"><!-- INT    --><bounds x="20" y="137" width="20" height="9"/></element>
+		<element ref="grey_button" inputtag="COL0" inputmask="0x02"><!--   CART A --><bounds x="20" y="63" width="20" height="9"/></element>
+		<element ref="grey_button" inputtag="COL0" inputmask="0x04"><!--   CART B --><bounds x="20" y="100" width="20" height="9"/></element>
+		<element ref="grey_button" inputtag="COL0" inputmask="0x08"><!--   INT    --><bounds x="20" y="137" width="20" height="9"/></element>
 
 		<element ref="grey_button" inputtag="COL0" inputmask="0x10"><!-- 1 / SEQ 1 --><bounds x="58" y="26" width="20" height="9"/></element>
 		<element ref="grey_button" inputtag="COL0" inputmask="0x20"><!-- 2 / SEQ 2 --><bounds x="58" y="63" width="20" height="9"/></element>
@@ -363,6 +396,13 @@ license:CC0-1.0
 
 		<element ref="white_button" inputtag="COL1" inputmask="0x02"><!-- Data Up   --><bounds x="115" y="100" width="20" height="9"/></element>
 		<element ref="white_button" inputtag="COL1" inputmask="0x04"><!-- Data Down --><bounds x="115" y="137" width="20" height="9"/></element>
+
+<!-- DATA ENTRY SLIDER: -->
+		<param name="slider_id" value="data_entry"/>
+		<param name="port_name" value="data_entry_slider"/>
+		<group ref="slider">
+			<bounds x="160" y="53" width="47" height="93"/>
+		</group>
 
 <!-- PROGRAMMER: -->
 		<element ref="grey_button" inputtag="COL1" inputmask="0x10"><!-- UPPER 1 --><bounds x="350" y="26" width="20" height="9"/></element>
@@ -619,9 +659,10 @@ license:CC0-1.0
 				for view_name, view in pairs(file.views) do
 					install_slider_callbacks(view)
 
-					for i = 1, 2 do
-						add_vertical_slider(view, "slider_" .. i, "slider_knob_" .. i, "slider_p" .. i)
-					end
+					add_vertical_slider(view, "slider_volume", "slider_knob_volume", "volume_slider")
+					add_vertical_slider(view, "slider_data_entry", "slider_knob_data_entry", "data_entry_slider")
+					add_vertical_slider(view, "slider_pitch_wheel", "slider_knob_pitch_wheel", "pitch_wheel")
+					add_vertical_slider(view, "slider_mod_wheel", "slider_knob_mod_wheel", "mod_wheel")
 
 					-- TODO: Display a warning about how to enable sliders
 					-- view.items["warning"]:set_state(0)
