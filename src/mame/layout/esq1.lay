@@ -176,6 +176,8 @@ license:CC0-1.0
 		</element>
 	</group>
 
+	<element name="screw_head"><disk><color red="0.25" green="0.25" blue="0.25" /></disk></element>
+
 	<element name="power_text"><text string="POWER"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 	<element name="line_text"><text string="LINE"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 	<element name="fuse_text"><text string="FUSE"><color red="0.83" green="0.86" blue="0.83" /></text></element>
@@ -515,6 +517,16 @@ license:CC0-1.0
 		<element ref="white_rect"><bounds x="265" y="163" width="422" height="4"/></element>
 		<element ref="white_rect"><bounds x="822" y="163" width="114" height="4"/></element>
 		<element ref="white_rect"><bounds x="982" y="163" width="170" height="4"/></element>
+		<element ref="white_rect"><bounds x="-460" y="480" width="226" height="3"/></element>
+
+<!-- A few screws: -->
+		<element ref="screw_head"><bounds x="-456" y="-65" width="10" height="10"/></element>
+		<element ref="screw_head"><bounds x="-456" y="200" width="10" height="10"/></element>
+		<element ref="screw_head"><bounds x="1303" y="-65" width="10" height="10"/></element>
+		<element ref="screw_head"><bounds x="1303" y="200" width="10" height="10"/></element>
+		<element ref="screw_head"><bounds x="-454" y="273" width="10" height="10"/></element>
+		<element ref="screw_head"><bounds x="-454" y="476" width="10" height="10"/></element>
+
 
 <!-- Text labels: -->
 
