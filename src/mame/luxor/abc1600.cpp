@@ -38,14 +38,10 @@
 
     - abcenix panics while booting after commit 78661e9aa92c7e43c9a96039e7dfb3dabc79a287
     - systest1600 failures
-        - CIO timer
-        - RTC (seconds advance too slowly)
-        - DMA
-    - bootpar writes console bauds without high order byte (9600=>128)
+        - CIO timer (works if CIO clock is 4219000)
+        - DMA (expects to read 0xff from 0x18000..)
     - loadsys1 core dump (/etc/mkfs -b 1024 -v 69000 /dev/sa40)
     - crashes after reset
-    - CIO
-        - optimize timers!
     - connect RS-232 printer port
     - Z80 SCC/DART interrupt chain
     - [:2a:chb] - TX FIFO is full, discarding data
@@ -910,6 +906,7 @@ void abc1600_state::abc1600(machine_config &config)
 	M68008(config, m_maincpu, 64_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc1600_state::abc1600_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &abc1600_state::cpu_space_map);
+	//m_maincpu->out_bg_callback().set(FUNC(abc1600_state::bg_w));
 
 	// video hardware
 	ABC1600_MOVER(config, ABC1600_MOVER_TAG, 0);
@@ -1072,6 +1069,9 @@ ROM_START( abc1600 )
 	ROM_LOAD( "1024 6490353-01.12e", 0x514, 0x104, CRC(67f1328a) SHA1(b585495fe14a7ae2fbb29f722dca106d59325002) ) // X36 CHANNEL SELECT TIMER
 	ROM_LOAD( "1025 6490354-01.6e",  0x618, 0x104, CRC(9bda0468) SHA1(ad373995dcc18532274efad76fa80bd13c23df25) ) // X36 Z80A-DMA INTERFACER
 	ROM_LOAD( "1031", 0x71c, 0x144, CRC(0aedc9fc) SHA1(2cbbc7d5cb16b410d296062feb77ed26ff01af24) ) // NS32081 IN ABC1600
+
+	ROM_REGION( 0x20, NMC9306_TAG, 0 )
+	ROM_LOAD( "nmc9306.14c", 0x00, 0x20, CRC(1cb59b6e) SHA1(3c955a667034db86fa1b848f0c0317157a3a48f6) )
 ROM_END
 
 

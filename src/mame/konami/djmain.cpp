@@ -1672,9 +1672,7 @@ void djmain_state::machine_reset()
 void djmain_state::djmainj(machine_config &config)
 {
 	/* basic machine hardware */
-	// popn3 works 9.6 MHz or slower in some songs */
-	//M68EC020(config, m_maincpu, 18432000/2);    /*  9.216 MHz!? */
-	M68EC020(config, m_maincpu, 32000000/4);   /*  8.000 MHz!? */
+	M68EC020(config, m_maincpu, 32_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &djmain_state::maincpu_djmainj);
 	m_maincpu->set_vblank_int("screen", FUNC(djmain_state::vb_interrupt));
 
@@ -1702,12 +1700,12 @@ void djmain_state::djmainj(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	k054539_device &k054539_1(K054539(config, "k054539_1", XTAL(18'432'000)));
+	k054539_device &k054539_1(K054539(config, "k054539_1", 18.432_MHz_XTAL));
 	k054539_1.set_addrmap(0, &djmain_state::k054539_map);
 	k054539_1.add_route(0, "speaker", 1.0, 0);
 	k054539_1.add_route(1, "speaker", 1.0, 1);
 
-	k054539_device &k054539_2(K054539(config, "k054539_2", XTAL(18'432'000)));
+	k054539_device &k054539_2(K054539(config, "k054539_2", 18.432_MHz_XTAL));
 	k054539_2.set_addrmap(0, &djmain_state::k054539_map);
 	k054539_2.add_route(0, "speaker", 1.0, 0);
 	k054539_2.add_route(1, "speaker", 1.0, 1);
@@ -2638,7 +2636,7 @@ GAME( 1998, popn1k,   popn1,    djmaina, popn1,     djmain_state, init_beatmania
 GAME( 1998, popn1j,   popn1,    djmainj, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver JA-A, HDD 1.00)", 0 )
 GAME( 1999, popn2,    0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", 0 )
 GAME( 1999, popn3,    0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 3 (ver JA-A)", 0 )
-// Pop'n Stage
+
 GAME( 1999, popnstex, 0,        djmainj, popnstex,  djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Stage EX (ver JB-A)", 0 )
 
 // for reference, these sets have not been verified

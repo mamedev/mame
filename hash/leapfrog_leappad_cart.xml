@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad / CocoPad cartridges">
+<softwarelist name="leapfrog_leappad_cart" description="LeapFrog LeapPad / CocoPad / Benesse Qpad cartridges">
 
 	<software name="tiggerbnca" cloneof="tiggerbnc" supported="no">
 		<description>Disney's Bounce, Tigger, Bounce (UK)</description>
@@ -1034,6 +1034,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="minnatana" cloneof="minnatan" supported="no">
+		<description>Minna de tanoshiku! CoCoPad (Otameshi soft) (Japan, older)</description>
+		<year>2002</year>
+		<publisher>LeapFrog / Sega Toys</publisher>
+		<info name="alt_title" value="みんなでたのしく！ココパッド　おためしソフト" />
+		<info name="serial" value="9P4-0092A"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="9p4-0092a.u1" size="0x200000" crc="02871b3d" sha1="fa16a444bdf14d4f50ab1e2de28acb0b5ecabdd8" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="bennyeng2" supported="no">
 		<description>Benny and Friends English Book Vol. 2 -Majo to taiketsu! Daibouken- (Japan)</description>
 		<year>2002</year>
@@ -1497,6 +1510,34 @@ license:CC0-1.0
 			<feature name="pcb" value="57000+003+7238"/>
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-12814.bin" size="0x400000" crc="2707fd55" sha1="e73e5d551c7a8e29e1aa49b968c4de142b72aa25" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Benesse Qpad cartridges -->
+	
+	<software name="gogogoj" supported="no">
+		<description>Hirogaru Sekai-e Go! Go! Go! (Japan)</description>
+		<year>2002</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="広がる世界へ GO!GO!GO!" />
+		<!-- no obvious serial or label on ROM, 066 (or 990) is stamped on PCB though -->
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="gogogo_red.bin" size="0x400000" crc="988a39ee" sha1="621e1459db8a11152d384d9d9c7d7a43b31859ff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lgengj" supported="no">
+		<description>Kagayaku Kimi no Mirai-e Let's Go English! (Japan)</description>
+		<year>2003</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="輝くキミの未来へ Let's Go English!" />
+		<!-- no obvious serial or label anywhere -->
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="letsgoenglish.bin" size="0x400000" crc="69c5dc8a" sha1="49857adf4e96fca7346f74de849373c1fd2a711e" />
 			</dataarea>
 		</part>
 	</software>

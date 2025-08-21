@@ -11,10 +11,6 @@ TS 2004.10.22.
 
 (press buttons 1+2 at the same time, to release 'army' ;)
 
-TODO:
-- verify video timing, it's around 58.5Hz when compared to this video:
-  https://www.youtube.com/watch?v=kMfaYrmoOc4
-
 
 PCB Notes:
 
@@ -27,7 +23,11 @@ Other: Unmarked 24 pin near ROMs 2 & 3 (maybe same protection chip as dday?)
 
 RAM: 6116 (x3)
 
-X-TAL: 20 MHz
+X-TAL: 20 MHz (also seen with 19.968 MHz)
+
+Video measurements (from a board with a 19.968MHz XTAL):
+HSync: 14.84948kHz
+VSync: 58.00548Hz
 
 */
 
@@ -583,18 +583,17 @@ void fcombat_state::machine_start()
 void fcombat_state::fcombat(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 20_MHz_XTAL / 6);
+	constexpr XTAL MASTER_CLOCK = 19.968_MHz_XTAL; // also seen with 20_MHz_XTAL
+
+	Z80(config, m_maincpu, MASTER_CLOCK / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcombat_state::main_map);
 
-	Z80(config, m_audiocpu, 20_MHz_XTAL / 6);
+	Z80(config, m_audiocpu, MASTER_CLOCK / 6);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcombat_state::audio_map);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(58.5); // approximation
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(12*8, 52*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(MASTER_CLOCK / 3, 448, 96, 96+320, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(fcombat_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -606,9 +605,9 @@ void fcombat_state::fcombat(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2149(config, "ay1", 20_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.25);
-	YM2149(config, "ay2", 20_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.25);
-	YM2149(config, "ay3", 20_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.25);
+	YM2149(config, "ay1", MASTER_CLOCK / 12).add_route(ALL_OUTPUTS, "mono", 0.25);
+	YM2149(config, "ay2", MASTER_CLOCK / 12).add_route(ALL_OUTPUTS, "mono", 0.25);
+	YM2149(config, "ay3", MASTER_CLOCK / 12).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 

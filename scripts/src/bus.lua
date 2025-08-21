@@ -5958,5 +5958,7 @@ if (BUSES["STCART_CONNECTOR"]~=null) then
 		MAME_DIR .. "src/devices/bus/st/stcart.h",
 		MAME_DIR .. "src/devices/bus/st/replay.cpp",
 		MAME_DIR .. "src/devices/bus/st/replay.h",
+		MAME_DIR .. "src/devices/bus/st/rom.cpp",
+		MAME_DIR .. "src/devices/bus/st/rom.h",
 	}
 end

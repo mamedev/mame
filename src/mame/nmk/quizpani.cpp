@@ -46,6 +46,10 @@ Stephh's notes (based on the games M68000 code and some tests) :
     Furthermore, there is no wait after the values are displayed, and after the 'rts'
     instruction at 0x0083a4, PC branches back to 0x000000 ! Leftover from another game ?
 
+TODO:
+- quizpanir: implement hopper, complete controls and DIP definitions
+- quizpanir: title screen doesn't show, although it's in GFX ROM
+
 *************************************************************************/
 
 #include "emu.h"
@@ -74,7 +78,7 @@ public:
 		m_txt_videoram(*this, "txt_videoram")
 	{ }
 
-	void quizpani(machine_config &config);
+	void quizpani(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -95,6 +99,7 @@ private:
 	void bg_videoram_w(offs_t offset, uint16_t data);
 	void txt_videoram_w(offs_t offset, uint16_t data);
 	void tilesbank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void flipscreen_w(uint16_t data);
 
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(bg_tile_info);
@@ -161,6 +166,14 @@ void quizpani_state::tilesbank_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	}
 }
 
+void quizpani_state::flipscreen_w(uint16_t data)
+{
+	flip_screen_set(BIT(data, 0));
+
+	if (data & 0xfffe)
+		logerror("flipscreen_w unknown bits set: %04x\n", data);
+}
+
 void quizpani_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quizpani_state::bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(quizpani_state::bg_scan)), 16, 16, 256, 32);
@@ -193,15 +206,15 @@ void quizpani_state::program_map(address_map &map)
 	map(0x100002, 0x100003).portr("P1_P2");
 	map(0x100008, 0x100009).portr("DSW1");
 	map(0x10000a, 0x10000b).portr("DSW2");
-	map(0x100014, 0x100015).nopw(); // screen flipping?
-	map(0x100016, 0x100017).nopw(); // IRQ enable?
+	map(0x100014, 0x100015).w(FUNC(quizpani_state::flipscreen_w));
+	//map(0x100016, 0x100017).nopw(); // IRQ enable?
 	map(0x100018, 0x100019).w(FUNC(quizpani_state::tilesbank_w));
 	map(0x104001, 0x104001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x104020, 0x104027).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
 	map(0x108000, 0x1083ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x108400, 0x1085ff).nopw();
 	map(0x10c000, 0x10c007).ram().share(m_scrollreg);
-	map(0x10c008, 0x10c403).nopw();
+	//map(0x10c008, 0x10c403).nopw();
 	map(0x110000, 0x113fff).ram().w(FUNC(quizpani_state::bg_videoram_w)).share(m_bg_videoram);
 	map(0x11c000, 0x11ffff).ram().w(FUNC(quizpani_state::txt_videoram_w)).share(m_txt_videoram);
 	map(0x180000, 0x18ffff).ram();
@@ -265,10 +278,10 @@ static INPUT_PORTS_START( quizpani )
 	PORT_DIPNAME( 0x0002, 0x0002, "Buttons Layout" )        // check code at 0x005d80
 	PORT_DIPSETTING(      0x0002, DEF_STR( Standard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Alternate ) )
-	PORT_DIPNAME( 0x0004, 0x0018, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( Medium ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( Medium ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Lives ) )
 	PORT_DIPSETTING(      0x0000, "1" )
@@ -304,6 +317,91 @@ static INPUT_PORTS_START( quizpani )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
+
+// TODO: possibly incomplete
+static INPUT_PORTS_START( quizpanir )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // TODO: check order
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1_P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) // bet column 1
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) // bet column 2
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) // bet column 3
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) // bet column 4
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) // bet column 5
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON6 ) // bet column 6
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON7 ) // hopper related. "Out of medal" if pressed
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Demo_Sounds ) ) // ok
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) ) // ok
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static GFXDECODE_START( gfx_quizpani )
 	GFXDECODE_ENTRY( "bgtiles", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 )
@@ -364,7 +462,33 @@ ROM_START( quizpani )
 	ROM_LOAD( "qz8.121", 0x200, 0x100, CRC(b4c19741) SHA1(a6d3686bad6ef2336463b89bc2d249003d9b4bcc) ) // Vertical video timing (unused in emulation for now)
 ROM_END
 
+ROM_START( quizpanir )
+	ROM_REGION( 0x340000, "maincpu", 0 ) // 68000
+	ROM_LOAD16_WORD_SWAP( "127",   0x000000, 0x080000, CRC(f6b100a2) SHA1(c424f966536e6678a246629ec6e272618dfd2e99) ) // unreadable label
+	// No even ROM
+	ROM_LOAD16_BYTE( "qzc-52.126", 0x200001, 0x080000, CRC(97cbf439) SHA1(d7b8cef2cb0e5f57566d55e81cd717c401c11b4f) ) // 1111xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "93090-11.2",  0x000000, 0x100000, CRC(4b3ab155) SHA1(fc1210853ca262c42b927689cb8f04aca15de7d6) )
+	ROM_LOAD( "93090-12.1",  0x100000, 0x100000, CRC(3f2ebfa5) SHA1(1c935d566f3980483356264a9216f9bf298bb815) )
+
+	ROM_REGION( 0x200000, "text", ROMREGION_ERASE00 )
+	ROM_LOAD( "10",          0x000000, 0x080000, CRC(e40e2c53) SHA1(f2d997c9b80cd96d07398d98152399968a3aa62b) ) // unreadable label
+	ROM_LOAD( "93090-22.9",  0x100000, 0x100000, CRC(93382cd3) SHA1(6527e92f696c21aae65d008bb237231eaba7a105) )
+
+	ROM_REGION( 0x340000, "oki", 0 )
+	ROM_LOAD( "93090-31.58", 0x040000, 0x100000, CRC(1cce0e13) SHA1(43816762e7907a8ff4b5a7b8da9f799b5baa64d5) )
+	ROM_LOAD( "93090-32.57", 0x140000, 0x100000, CRC(5d38f62e) SHA1(22fe95de6e1de1be0cec73b8163ab4283f2b8186) )
+	ROM_LOAD( "93090-4.56",  0x240000, 0x100000, CRC(ee370ed6) SHA1(9b1edfada5805014aa23d28d0c70227728b0e04f) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "qz6.88",  0x000, 0x100, CRC(19dbbad2) SHA1(ebf7950d1869ca3bc1e72228505fbc17d095746a) ) // unknown
+	ROM_LOAD( "qz7.99",  0x100, 0x100, CRC(1f802af1) SHA1(617bb7e5105ac202b5a8cf83c8c66178b91099e0) ) // Horizontal video timing (unused in emulation for now)
+	ROM_LOAD( "qz8.121", 0x200, 0x100, CRC(b4c19741) SHA1(a6d3686bad6ef2336463b89bc2d249003d9b4bcc) ) // Vertical video timing (unused in emulation for now)
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1993, quizpani, 0, quizpani, quizpani, quizpani_state, empty_init, ROT0, "NMK", "Quiz Panicuru Fantasy", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, quizpani,  0, quizpani, quizpani,  quizpani_state, empty_init, ROT0, "NMK", "Quiz Panicuru Fantasy",        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, quizpanir, 0, quizpani, quizpanir, quizpani_state, empty_init, ROT0, "NMK", "Medal Quiz Panicuru Roulette", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

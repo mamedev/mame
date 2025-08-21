@@ -611,7 +611,7 @@ static INPUT_PORTS_START ( by35_os35 )
 	PORT_DIPSETTING(    0x0d, "1 Coin/13 Credits")
 	PORT_DIPSETTING(    0x0e, "1 Coin/14 Credits")
 	PORT_DIPSETTING(    0x0f, "1 Coin/15 Credits")
-	PORT_DIPNAME( 0x30, 0x60, "Score Level Award")      PORT_DIPLOCATION("SW2:!5,!6") // s21, s22
+	PORT_DIPNAME( 0x30, 0x30, "Score Level Award")      PORT_DIPLOCATION("SW2:!5,!6") // s21, s22
 	PORT_DIPSETTING(    0x00, "Nothing")
 	PORT_DIPSETTING(    0x10, "1 Credit")
 	PORT_DIPSETTING(    0x20, "2 Credits")

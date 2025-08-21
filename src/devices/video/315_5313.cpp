@@ -572,6 +572,10 @@ void sega315_5313_device::data_port_w(int data)
 
 void sega315_5313_device::vdp_set_register(int regnum, u8 value)
 {
+	// in mode 4 all writes beyond register 10 are ignored
+	// bassmpro relies on this at Sega startup logo
+	if (!BIT(m_regs[0x01], 2) && regnum > 10)
+		return;
 	m_regs[regnum] = value;
 
 //  if (regnum == 1)
@@ -2264,7 +2268,6 @@ void sega315_5313_device::vdp_handle_scanline_callback(int scanline)
 			m_irq6_on_timer->adjust(attotime::from_ticks(16, clock() / 4));
 			m_irq6_pending = 1;
 			m_vblank_flag = 1;
-
 		}
 
 	//  if (get_scanline_counter() == 0) m_irq4counter = MEGADRIVE_REG0A_HINT_VALUE;

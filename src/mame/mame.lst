@@ -18142,6 +18142,7 @@ d9flower
 d9flowera
 specd9
 specd9105g
+starball
 
 @source:excellent/gcpinbal.cpp
 gcpinbal
@@ -18686,6 +18687,9 @@ blmbycar
 blmbycaru
 watrball
 
+@source:gaelco/ds5002fp_programmer.cpp
+gaelcods
+
 @source:gaelco/gaelco.cpp
 bigkarnk
 bigkarnka
@@ -18923,6 +18927,9 @@ xorworlda
 @source:gaelco/xorworld_ms.cpp
 xorwldms
 xorwldmsa
+
+@source:galaxian/119.cpp
+119
 
 @source:galaxian/dambustr.cpp
 dambustr
@@ -19182,6 +19189,7 @@ scramce
 scrammr
 scrampt
 scramrf
+seainv
 sfx
 sgalwars
 sirio2
@@ -28179,6 +28187,7 @@ moonbasea
 orbite
 ozmawars
 ozmawars2
+ozmawars3
 ozmawarsmr
 polaris
 polarisa
@@ -29392,6 +29401,9 @@ sp_zigzgk
 sp_zigzgl
 sp_zigzgm
 
+@source:misc/adi_vt52.cpp
+adi_vt52
+
 @source:misc/age_candy.cpp
 age_cand
 
@@ -29406,10 +29418,12 @@ am_mg31i
 am_mg33i
 am_mg34i
 am_mg35i
-am_mg3a
+am_mg3g
+am_mg3ga
 am_mg4sk
 am_mg4v
 am_mg5hu
+fpoker
 suprstar
 
 @source:misc/amerihok.cpp
@@ -32241,6 +32255,7 @@ npmillen
 npotogib
 nppopeye
 nprsp
+npspscv
 npscv1
 npskv
 npsprg98
@@ -35219,6 +35234,7 @@ royalngt
 royalqn
 sexygal
 sgaltrop
+sgaltropa
 sweetgal
 
 @source:nichibutsu/niyanpai.cpp
@@ -36055,6 +36071,7 @@ quizdna
 
 @source:nmk/quizpani.cpp
 quizpani
+quizpanir
 
 @source:nokia/dbox.cpp
 dbox
@@ -36460,6 +36477,7 @@ mspacmab
 mspacmab2
 mspacmab3
 mspacmab4
+mspacmab5
 mspacman
 mspacmanbcc
 mspacmanbco
@@ -36789,8 +36807,6 @@ mba032q
 mbc18nb
 mbc28
 md4duvc
-megapc
-megapcpl
 megapcpla
 micral45
 mijx30gp
@@ -37037,6 +37053,10 @@ iskr1031
 mc1502
 pk88
 
+@source:pc/megapc.cpp
+megapc
+megapcpl
+
 @source:pc/nforcepc.cpp
 nforcepc
 
@@ -37199,6 +37219,7 @@ t1000tx
 
 @source:pc/teradrive.cpp
 teradrive
+teradrive3
 
 @source:pc/tetriskr.cpp
 tetriskr
@@ -43142,6 +43163,15 @@ busicom
 @source:skeleton/c2color.cpp
 c2color
 
+@source:skeleton/cadillacjack_mc68340.cpp
+bestnudg
+ffruit
+gldtouch
+gldtouch239
+silverb5
+southgld
+southgld114
+
 @source:skeleton/camirf1.cpp
 camirf1
 
@@ -43337,6 +43367,7 @@ microtrol
 waveterm
 
 @source:skeleton/evolution_handheld.cpp
+buttdtct
 evolhh
 smkatsum
 
@@ -44624,6 +44655,7 @@ jankenmn
 
 @source:sunwise/jankmg2.cpp
 jankmg2
+ppresent
 
 @source:svi/svi318.cpp
 svi318
@@ -46820,6 +46852,9 @@ anpanm15
 bk139in1
 bkrankp
 lxcyrace
+pokegac2
+pokegac2y
+pokegach
 prailpls
 
 @source:tvgames/generalplus_gpl16250_spi_direct.cpp
@@ -46831,8 +46866,13 @@ bfpacman
 bfspyhnt
 bftetris
 dsgnpal
+pokgoget
+punifrnd
+punij1m
+punij1pk
+punij1pu
+punij2pk
 punirune
-siddr
 smkcatch
 wiwcs
 
@@ -46846,6 +46886,7 @@ airobo
 anpanm19
 arcadege
 ardancem
+chiikpc
 dmnslayg
 intrtvg
 jak_swbstrik
@@ -46858,13 +46899,17 @@ kidizmp
 pdcm2
 pocketmp
 pocketmr
+saikyopc
 smatomo
+tamameet
+tmydistb
 zippity
 zippityuk
 
 @source:tvgames/generalplus_gpl_unknown.cpp
 mapacman
 parcade
+siddr
 tagalaga
 taspinv
 taturtf
@@ -46979,6 +47024,7 @@ mpntbalt
 mylpony
 ordentv
 pballpup
+pdcj
 prail
 rad_crik
 rad_fb2

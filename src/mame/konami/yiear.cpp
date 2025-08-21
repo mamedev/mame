@@ -103,6 +103,7 @@ Sound: VLM5030 at 7B
 #include "trackfld_a.h"
 
 #include "cpu/m6809/m6809.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
@@ -170,7 +171,7 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
-	INTERRUPT_GEN_MEMBER(nmi_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map) ATTR_COLD;
@@ -236,21 +237,25 @@ void yiear_state::videoram_w(offs_t offset, uint8_t data)
 void yiear_state::control_w(uint8_t data)
 {
 	// bit 0 flips screen
-	if (flip_screen() != (data & 0x01))
+	if (flip_screen() != BIT(data, 0))
 	{
-		flip_screen_set(data & 0x01);
+		flip_screen_set(BIT(data, 0));
 		machine().tilemap().mark_all_dirty();
 	}
 
 	// bit 1 is NMI enable
-	m_nmi_enable = data & 0x02;
+	if (m_nmi_enable && !BIT(data, 1))
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_nmi_enable = BIT(data, 1);
 
 	// bit 2 is IRQ enable
-	m_irq_enable = data & 0x04;
+	if (m_irq_enable && !BIT(data, 2))
+		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	m_irq_enable = BIT(data, 2);
 
 	// bits 3 and 4 are coin counters
-	machine().bookkeeping().coin_counter_w(0, data & 0x08);
-	machine().bookkeeping().coin_counter_w(1, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 3));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 4));
 }
 
 TILE_GET_INFO_MEMBER(yiear_state::get_bg_tile_info)
@@ -326,14 +331,14 @@ void yiear_state::vlm5030_control_w(uint8_t data)
 void yiear_state::vblank_irq(int state)
 {
 	if (state && m_irq_enable)
-		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
-INTERRUPT_GEN_MEMBER(yiear_state::nmi_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(yiear_state::nmi_interrupt)
 {
 	if (m_nmi_enable)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -472,29 +477,31 @@ GFXDECODE_END
 
 void yiear_state::machine_start()
 {
+	m_irq_enable = 0;
+	m_nmi_enable = 0;
+
+	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_nmi_enable));
 }
 
 void yiear_state::machine_reset()
 {
-	m_nmi_enable = 0;
+	control_w(0); // LS273 reset
 }
 
 void yiear_state::yiear(machine_config &config)
 {
 	// basic machine hardware
-	MC6809E(config, m_maincpu, XTAL(18'432'000)/12);   // verified on PCB
+	MC6809E(config, m_maincpu, 18.432_MHz_XTAL / 12);   // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &yiear_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(yiear_state::nmi_interrupt), attotime::from_hz(480)); // music tempo (correct frequency unknown)
+
+	TIMER(config, "16v").configure_scanline(FUNC(yiear_state::nmi_interrupt), "screen", 16, 32); // music tempo
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60.58);   // verified on PCB
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(yiear_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(yiear_state::vblank_irq));
@@ -507,9 +514,9 @@ void yiear_state::yiear(machine_config &config)
 
 	TRACKFLD_AUDIO(config, m_audio, 0, finder_base::DUMMY_TAG, m_vlm);
 
-	SN76489A(config, m_sn, XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "mono", 1.0); // clock verified on PCB
+	SN76489A(config, m_sn, 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.0); // clock verified on PCB
 
-	VLM5030(config, m_vlm, XTAL(3'579'545));   // verified on PCB
+	VLM5030(config, m_vlm, 3.579545_MHz_XTAL);   // verified on PCB
 	m_vlm->set_addrmap(0, &yiear_state::vlm_map);
 	m_vlm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }

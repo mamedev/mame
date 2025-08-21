@@ -307,6 +307,26 @@ ROM_START( smatomo )
 	ROM_LOAD( "mx25l3206e.ic3", 0x0000, 0x400000, CRC(fb4d1684) SHA1(98cecd7ead52118028cb3a1de71cb3528cd81be5) )
 ROM_END
 
+ROM_START( tamameet )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q64.u3", 0x0000, 0x800000, CRC(f15507f8) SHA1(356cb1bd68169eb747898325eacfd7590dbe9f9c) )
+ROM_END
+
+ROM_START( chiikpc )
+	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25l12833f.u6", 0x0000, 0x1000000, CRC(bde74209) SHA1(8a91554ae653f4ed54fd354049c32b545e4d359d) )
+ROM_END
+
+ROM_START( saikyopc )
+	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25l12833f.u6", 0x0000, 0x1000000, CRC(5b870182) SHA1(909d2834875484f8369cfbce2c51fa27c0a3d973) )
+ROM_END
+
+ROM_START( tmydistb )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l64.u5", 0x0000, 0x800000, CRC(01e5a892) SHA1(b9164173e707eb69cd7d50ce69f3368de7e7390f) )
+ROM_END
+
 ROM_START( intrtvg )
 	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
@@ -455,3 +475,18 @@ CONS( 200?, arcadege,           0,        0,      gpl32612, gpl32612, generalplu
 // uses a GP326813
 // 学習おうえんAI★ミラクルロボ
 CONS( 2020, airobo,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Benesse Corporation",        "Gakushuu Ouen AI Miracle Robo",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPE13101A
+// たまごっち みーつ  (there appear to be many units in this series, ROM data could differ, this was from a light blue 'hearts and rainbows' themed unit with no subtitles)
+CONS( 2018, tamameet,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tamagotchi Meets (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses a glob CPU
+// ちいかわラーニングパソコン
+CONS( 2021, chiikpc,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Chiikawa Learning PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses a glob CPU
+// 学びの最強王になれ! 最強王図鑑パソコン
+CONS( 2020, saikyopc,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Manabi no Sai-Kyo-Oh ni Nare! Sai-Kyo-Oh Zukan PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// ディズニー&ディズニー／ピクサーキャラクターズ できた!がいっぱい ドリームトイパッド
+CONS( 2020, tmydistb,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Tomy",          "Disney & Disney/Pixar Characters Dekita! ga Ippai Dream Toy Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
