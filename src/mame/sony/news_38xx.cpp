@@ -21,7 +21,6 @@
  *   - slots (I/O expansion and UBUS expansion)
  *   - graphics
  *   - sound
- *   - centronics
  */
 
 #include "emu.h"
@@ -46,6 +45,7 @@
 
 // busses and connectors
 #include "machine/nscsi_bus.h"
+#include "bus/centronics/ctronics.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
@@ -57,7 +57,7 @@
 #define LOG_LED (1U << 3)
 #define LOG_TAS (1U << 4)
 
-#define VERBOSE (LOG_GENERAL|LOG_INTERRUPT|LOG_TAS)
+#define VERBOSE (LOG_GENERAL|LOG_INTERRUPT)
 #include "logmacro.h"
 
 
@@ -68,6 +68,8 @@ using namespace std::literals::string_view_literals;
 class news_38xx_state : public driver_device
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
+
 	news_38xx_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
@@ -82,6 +84,8 @@ public:
 		, m_scsi(*this, "scsi%u:7:cxd1180", 0U)
 		, m_serial(*this, "serial%u", 0U)
 		, m_scsibus(*this, "scsi%u", 0U)
+		, m_parallel(*this, "parallel")
+		, m_parallel_data(*this, "parallel_data")
 		, m_eprom(*this, "eprom")
 		, iop_irq_line_map({
 			{INPUT_LINE_IRQ1, {iop_irq::AST}},
@@ -240,6 +244,8 @@ protected:
 
 	required_device_array<rs232_port_device, 2> m_serial;
 	required_device_array<nscsi_bus_device, 2> m_scsibus;
+	required_device<centronics_device> m_parallel;
+	optional_device<output_latch_device> m_parallel_data;
 
 	required_region_ptr<u32> m_eprom;
 	//output_finder<4> m_led;
@@ -364,9 +370,15 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x24000000, 0x24000007).m(m_fdc, FUNC(n82077aa_device::map));
 	map(0x24000105, 0x24000105).rw(m_fdc, FUNC(n82077aa_device::dma_r), FUNC(n82077aa_device::dma_w));
 
-	// TODO: fully implement centronics port
-	map(0x26040000, 0x26040000).lw8(NAME([this] (u8 data) { LOG("parallel data w 0x%x\n", data); }));
-	map(0x26040001, 0x26040001).lw8(NAME([this] (u8 data) { LOG("parallel strobe w 0x%x\n", data); }));
+	map(0x26040000, 0x26040000).lw8(NAME([this] (u8 data) {
+		LOG("parallel data w 0x%x\n", data);
+		m_parallel_data->write(data);
+	}));
+	map(0x26040001, 0x26040001).lw8(NAME([this] (u8 data) {
+		LOG("parallel strobe w 0x%x\n", data);
+		m_parallel->write_strobe(data > 0);
+	}));
+	// TODO: parallel interrupt
 	map(0x26040002, 0x26040002).lw8(NAME([this] (u8) { iop_irq_w<iop_irq::PARALLEL>(0);}));
 	map(0x26040003, 0x26040003).w(FUNC(news_38xx_state::iop_inten_w<iop_irq::PARALLEL>));
 
@@ -426,7 +438,7 @@ u32 news_38xx_state::ram_tas_r(offs_t offset, u32 mem_mask)
 		LOGMASKED(LOG_TAS, "%s acquired lock at offset 0x%x\n", machine().describe_context(), offset << 2);
 	}
 
-	// TODO: what is the actual value written by the hardware?
+	// TODO: what is the actual value written by the hardware? Is it OR'd with the contents?
 	//		 Both vmunix and mrx appear to use bltz (r3k)/bmi (030) instructions, at least during boot
 	m_cpu->space(0).write_dword(offset << 2, 0x80000000); // TODO: fix usage of ->space
 	return current_value;
@@ -974,6 +986,14 @@ void news_38xx_state::common(machine_config &config)
 			subdevice<dmac_0266_device>(":dma1")->dma_r_cb().set(adapter, FUNC(cxd1180_device::dma_r));
 			subdevice<dmac_0266_device>(":dma1")->dma_w_cb().set(adapter, FUNC(cxd1180_device::dma_w));
 		});
+
+	CENTRONICS(config, m_parallel, centronics_devices, nullptr);
+	// TODO: what is hooked up to the below? Check the schematic
+	// m_parallel->busy_handler();
+	// m_parallel->ack_handler();
+
+	OUTPUT_LATCH(config, m_parallel_data);
+	m_parallel->set_output_latch(*m_parallel_data);
 
 	NEWS_HID_HLE(config, m_hid);
 	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(*this, FUNC(news_38xx_state::iop_irq_w<iop_irq::KEYBOARD>));
