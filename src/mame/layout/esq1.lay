@@ -11,7 +11,7 @@ license:CC0-1.0
 	<element name="down_arrow">
 		<image><data><![CDATA[
 			<svg width="9" height="5">
-				<path fill="#fff" d="M 0,0 l 4.5,5 4.5,-5 z" />
+				<path fill="#d4dad3" d="M 0,0 l 4.5,5 4.5,-5 z" />
 			</svg>
 		]]></data></image>
 	</element>
@@ -42,7 +42,7 @@ license:CC0-1.0
 	<element name="envelope_diagram">
 		<image><data><![CDATA[
 			<svg width="87" height="62">
-				<path fill="none" stroke="#fff" stroke-width="1"
+				<path fill="none" stroke="#d4dad3" stroke-width="1"
 					d="
 						M 5,31 L 21,1 38,40 51,22 H 72 L 78,31
 						M 87,31 H 0
@@ -130,7 +130,7 @@ license:CC0-1.0
 	<element name="slider_ticks">
 		<image><data><![CDATA[
 			<svg width="46" height="93">
-				<path fill="none" stroke="#fff" stroke-width="1"
+				<path fill="none" stroke="#d4dad3" stroke-width="1"
 					d="
 						M  0,18 h 9 m 28,0 h 9
 						m -46,9 h 9 m 28,0 h 9
@@ -195,7 +195,7 @@ license:CC0-1.0
 
 
 	<!--<element name="ensoniq_logo"><text string="ensoniq"><color red="0.83" green="0.86" blue="0.83" /></text></element>-->
-	<element name="esq1_logo"><text string="ESQ 1"><color red="0.83" green="0.86" blue="0.83" /></text></element>
+	<element name="esq1_logo"><text string="ESQ-1"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 	<element name="dwsynth_title"><text string="Digital Wave Synthesizer"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 	<element name="cartridge_text"><text string="Program Cartridge"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 	<element name="pitch_text"><text string="PITCH"><color red="0.83" green="0.86" blue="0.83" /></text></element>
@@ -634,7 +634,7 @@ license:CC0-1.0
 		<element ref="split_layer_text2"><bounds x="1133" y="130" width="18" height="6"/></element>
 
 		<element ref="esq1_logo"><bounds x="-410" y="119" width="153" height="40"/></element>
-		<element ref="dwsynth_title"><bounds x="-412" y="169" width="154" height="12"/></element>
+		<element ref="dwsynth_title"><bounds x="-412" y="169" width="154" height="16"/></element>
 		<element ref="volume_title"><bounds x="-62" y="169" width="28" height="8"/></element>
 		<element ref="banks_title"><bounds x="38" y="169" width="22" height="8"/></element>
 		<element ref="data_entry_title"><bounds x="130" y="169" width="41" height="8"/></element>
