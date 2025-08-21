@@ -203,7 +203,6 @@ uint8_t servicet_state::port1_r()
 void servicet_state::port1_w(uint8_t data)
 {
 	m_port1 = data;
-	popmessage("p3 %02X",data);
 }
 
 uint8_t servicet_state::port3_r()
@@ -230,8 +229,24 @@ uint8_t servicet_state::bus_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	// LCD is mapped to addresses where A6:A4 = 111 (0x70-0x7f)
-	if ((offset & 0x70) == 0x70)
+	switch (offset & 0x70)
+	{
+	case 0x40: //Y4 U20 OE
+	{
+		popmessage("Read GSG");
+		break;
+	}
+	case 0x50: //Y5 U19 OE
+	{
+		popmessage("Read scrambled GSG");
+		break;
+	}
+	case 0x60: //Y6 U13 PL
+	{
+		popmessage("Read GSG out");
+		break;
+	}
+	case 0x70: //Y7 LCD
 	{
 		// RS and RW are A1 and A0
 		bool rs = BIT(offset, 1);
@@ -250,19 +265,36 @@ uint8_t servicet_state::bus_r(offs_t offset)
 		{
 			data = m_lcd_data;
 		}
+		break;
 	}
-	else
+	default:
 	{
-		//LOG("Bus read: %02X to %04X\n", offset);
+		//LOG("Bus read: from %04X\n", offset);
 	}
-
+	}
 	return data;
 }
 
 void servicet_state::bus_w(offs_t offset, uint8_t data)
 {
-	// LCD is mapped to addresses where A6:A4 = 111 (0x70-0x7f)
-	if ((offset & 0x70) == 0x70)
+	switch (offset & 0x70)
+	{
+	case 0x40: //Y4 U20 OE
+	{
+		popmessage("Write GSG in %02X",data);
+		break;
+	}
+	case 0x50: //Y5 U19 OE
+	{
+		popmessage("Write scrambled GSG in %02X",data);
+		break;
+	}
+	case 0x60: //Y6 U13 PL
+	{
+		popmessage("Write GSG out %02X",data);
+		break;
+	}
+	case 0x70: //Y7 LCD
 	{
 		// RS and RW are A1 and A0
 		bool rs = BIT(offset, 1);
@@ -280,13 +312,10 @@ void servicet_state::bus_w(offs_t offset, uint8_t data)
 			m_lcd->e_w(0);
 		}
 	}
-	else if (offset == 0x4000)
+	default:
 	{
-		//LOG("GSG write: %02X \n", data, offset);
+		//popmessage("Bus write: %02X to %04X\n", data, offset);
 	}
-	else
-	{
-		//LOG("Bus write: %02X to %04X\n", data, offset);
 	}
 }
 
