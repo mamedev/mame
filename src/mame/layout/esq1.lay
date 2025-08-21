@@ -616,15 +616,16 @@ license:CC0-1.0
 	<script><![CDATA[
 		file:set_resolve_tags_callback(
 			function()
-				local view = file.views["Default Layout"]
-				install_slider_callbacks(view)
+				for view_name, view in pairs(file.views) do
+					install_slider_callbacks(view)
 
-				for i = 1, 2 do
-					add_vertical_slider(view, "slider_" .. i, "slider_knob_" .. i, "slider_p" .. i)
+					for i = 1, 2 do
+						add_vertical_slider(view, "slider_" .. i, "slider_knob_" .. i, "slider_p" .. i)
+					end
+
+					-- TODO: Display a warning about how to enable sliders
+					-- view.items["warning"]:set_state(0)
 				end
-
-				-- TODO: Display a warning about how to enable sliders
-				-- view.items["warning"]:set_state(0)
 			end)
 
 		-----------------------------------------------------------------------
