@@ -56,13 +56,16 @@ TODO:
 
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/megadrive/ctrl/mdioport.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
-//#include "bus/sms_ctrl/smsctrl.h"
+#include "bus/sms_ctrl/controllers.h"
+#include "bus/sms_ctrl/smsctrl.h"
 #include "cpu/i86/i286.h"
 //#include "cpu/i386/i386.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "machine/wd7600.h"
 #include "sound/spkrdev.h"
@@ -330,7 +333,8 @@ public:
 		, m_md_vdp(*this, "md_vdp")
 		, m_opn(*this, "opn")
 		, m_md_68k_sound_view(*this, "md_68k_sound_view")
-		//, m_md_ctrl_ports(*this, { "md_ctrl1", "md_ctrl2", "md_exp" })
+		, m_md_ctrl_ports(*this, { "md_ctrl1", "md_ctrl2", "md_exp" })
+		, m_md_ioports(*this, "md_ioport%u", 1U)
 	{ }
 
 	void teradrive(machine_config &config);
@@ -402,7 +406,8 @@ private:
 	required_device<ym7101_device> m_md_vdp;
 	required_device<ym_generic_device> m_opn;
 	memory_view m_md_68k_sound_view;
-	//optional_device_array<sms_control_port_device, 3> m_md_ctrl_ports;
+	required_device_array<sms_control_port_device, 3> m_md_ctrl_ports;
+	required_device_array<megadrive_io_port_device, 3> m_md_ioports;
 
 	// TODO: main PC screen can also swap the VGA with this
 	// (roughly #5801 and #11343 league)
@@ -478,7 +483,25 @@ void teradrive_state::md_68k_map(address_map &map)
 //  map(0xa07f00, 0xa07fff) Z80 VDP space (freezes machine if accessed from 68k)
 //  map(0xa08000, 0xa0ffff) Z80 68k window (assume no DTACK), or just mirror of above according to TD HW notes?
 //  map(0xa10000, 0xa100ff) I/O
-	map(0xa10000, 0xa100ff).noprw();
+	map(0xa10002, 0xa10007).lrw16(
+		NAME([this] (offs_t offset) {
+			u16 res = m_md_ioports[offset]->data_r();
+			return (res) | (res << 8);
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			m_md_ioports[offset]->data_w(uint8_t(data));
+		})
+	);
+	map(0xa10008, 0xa1000d).lrw16(
+		NAME([this] (offs_t offset) {
+			u16 res = m_md_ioports[offset]->ctrl_r();
+			return (res) | (res << 8);
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			m_md_ioports[offset]->ctrl_w(uint8_t(data));
+		})
+	);
+	// TODO: rx/tx hooks
 //  map(0xa11000, 0xa110ff) memory mode register
 //  map(0xa11100, 0xa111ff) Z80 BUSREQ/BUSACK
 	map(0xa11100, 0xa11101).lrw16(
@@ -873,26 +896,28 @@ void teradrive_state::teradrive(machine_config &config)
 	m_md_vdp->add_route(ALL_OUTPUTS, "md_speaker", 0.50, 0);
 	m_md_vdp->add_route(ALL_OUTPUTS, "md_speaker", 0.50, 1);
 
-//  SMS_CONTROL_PORT(config, m_ctrl_ports[0], sms_control_port_devices, SMS_CTRL_OPTION_MD_PAD);
-//  m_ctrl_ports[0]->th_handler().set(m_ioports[0], FUNC(megadrive_io_port_device::th_w));
-//  m_ctrl_ports[0]->set_screen(m_screen);
-//
-//  m_ioports[0]->set_in_handler(m_ctrl_ports[0], FUNC(sms_control_port_device::in_r));
-//  m_ioports[0]->set_out_handler(m_ctrl_ports[0], FUNC(sms_control_port_device::out_w));
-//
-//  SMS_CONTROL_PORT(config, m_ctrl_ports[1], sms_control_port_devices, SMS_CTRL_OPTION_MD_PAD);
-//  m_ctrl_ports[1]->th_handler().set(m_ioports[1], FUNC(megadrive_io_port_device::th_w));
-//  m_ctrl_ports[1]->set_screen(m_screen);
-//
-//  m_ioports[1]->set_in_handler(m_ctrl_ports[1], FUNC(sms_control_port_device::in_r));
-//  m_ioports[1]->set_out_handler(m_ctrl_ports[1], FUNC(sms_control_port_device::out_w));
-//
-//  SMS_CONTROL_PORT(config, m_ctrl_ports[2], sms_control_port_devices, nullptr);
-//  m_ctrl_ports[2]->th_handler().set(m_ioports[2], FUNC(megadrive_io_port_device::th_w));
-//  m_ctrl_ports[2]->set_screen(m_screen);
-//
-//  m_ioports[2]->set_in_handler(m_ctrl_ports[2], FUNC(sms_control_port_device::in_r));
-//  m_ioports[2]->set_out_handler(m_ctrl_ports[2], FUNC(sms_control_port_device::out_w));
+	auto &hl(INPUT_MERGER_ANY_HIGH(config, "hl"));
+	// TODO: to VDP
+	hl.output_handler().set_inputline(m_md68kcpu, 2);
+
+	MEGADRIVE_IO_PORT(config, m_md_ioports[0], 0);
+	m_md_ioports[0]->hl_handler().set("hl", FUNC(input_merger_device::in_w<0>));
+
+	MEGADRIVE_IO_PORT(config, m_md_ioports[1], 0);
+	m_md_ioports[1]->hl_handler().set("hl", FUNC(input_merger_device::in_w<1>));
+
+	MEGADRIVE_IO_PORT(config, m_md_ioports[2], 0);
+	m_md_ioports[2]->hl_handler().set("hl", FUNC(input_merger_device::in_w<2>));
+
+	for (int N = 0; N < 3; N++)
+	{
+		SMS_CONTROL_PORT(config, m_md_ctrl_ports[N], sms_control_port_devices, N != 2 ? SMS_CTRL_OPTION_MD_PAD : nullptr);
+		m_md_ctrl_ports[N]->th_handler().set(m_md_ioports[N], FUNC(megadrive_io_port_device::th_w));
+		m_md_ctrl_ports[N]->set_screen(m_mdscreen);
+
+		m_md_ioports[N]->set_in_handler(m_md_ctrl_ports[N], FUNC(sms_control_port_device::in_r));
+  		m_md_ioports[N]->set_out_handler(m_md_ctrl_ports[N], FUNC(sms_control_port_device::out_w));
+	}
 
 	// TODO: vestigial
 	GENERIC_CARTSLOT(config, m_md_cart, generic_plain_slot, "megadriv_cart");

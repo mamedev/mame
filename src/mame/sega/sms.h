@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include "mdioport.h"
-
+#include "bus/megadrive/ctrl/mdioport.h"
 #include "bus/sega8/sega8_slot.h"
 #include "bus/sg1000_exp/sg1000exp.h"
 #include "bus/sms_ctrl/smsctrl.h"
