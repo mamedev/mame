@@ -642,12 +642,6 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 
 INPUT_CHANGED_MEMBER(esq1_state::internal_kbd_key_stroke)
 {
-	/*
-	FIXME:  This only works after I select an instrument
-		via a virtual MIDI keyboard connected to MAME.
-		Then, the internal keyboard starts playing sounds
-		when clicking on the keys via the .lay file.
-	*/
 	if (oldval == 0 && newval == 1)
 	{
 		send_through_panel((u8)param);
