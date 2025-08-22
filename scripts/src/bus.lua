@@ -1972,6 +1972,22 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/keytronic/keytronic.h,BUSES["KEYTRONIC"] = true
+---------------------------------------------------
+
+if (BUSES["KEYTRONIC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/keytronic/kay_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/keytronic/kay_kbd.h",
+		MAME_DIR .. "src/devices/bus/keytronic/keytronic.cpp",
+		MAME_DIR .. "src/devices/bus/keytronic/keytronic.h",
+		MAME_DIR .. "src/devices/bus/keytronic/keytronic_l2207.cpp",
+		MAME_DIR .. "src/devices/bus/keytronic/keytronic_l2207.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/mpf1/slot.h,BUSES["MPF1"] = true
 ---------------------------------------------------
 

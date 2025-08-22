@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "kay_kbd.h"
 
+#include "cpu/mcs48/mcs48.h"
+#include "sound/spkrdev.h"
 #include "speaker.h"
 
 #define LOG_TXD     (1U << 1)
@@ -110,14 +112,47 @@ MCU, but we don't have a dump for it.
 */
 
 
-DEFINE_DEVICE_TYPE(KAYPRO_10_KEYBOARD, kaypro_10_keyboard_device, "kaypro10kbd", "Kaypro 10 Keyboard")
-
-
 namespace {
+
+class kaypro_10_keyboard_device : public device_t, public device_keytronic_interface
+{
+public:
+	kaypro_10_keyboard_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			std::uint32_t clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+
+	virtual void ser_in_w(int state) override { m_txd = state ? 1U : 0U; }
+
+	uint8_t p1_r();
+	uint8_t p2_r();
+	void p2_w(uint8_t data);
+	int t1_r();
+	uint8_t bus_r();
+	void bus_w(uint8_t data);
+
+private:
+	required_device<i8049_device>           m_mcu;
+	required_device<speaker_sound_device>   m_bell;
+	required_ioport_array<16>               m_matrix;
+	required_ioport                         m_modifiers;
+	output_finder<>                         m_led_caps_lock;
+
+	std::uint8_t        m_txd;
+	std::uint8_t        m_bus;
+};
+
 
 ROM_START(kaypro_10_keyboard)
 	ROM_REGION(0x0800, "mcu", 0)
-	ROM_LOAD("m5l8049.bin", 0x0000, 0x0800, CRC(dc772f80) SHA1(aa7cd3f476466203294675d56098dff45952b9b0))
+	ROM_LOAD("3-z0300-08049.bin", 0x0000, 0x0800, CRC(dc772f80) SHA1(aa7cd3f476466203294675d56098dff45952b9b0)) // NEC D8049; identical dump also extracted from M5L8049
 ROM_END
 
 INPUT_PORTS_START(kaypro_keyboard_typewriter)
@@ -324,8 +359,6 @@ INPUT_PORTS_END
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';')  PORT_CHAR('+')
 INPUT_PORTS_END
 
-} // anonymous namespace
-
 
 kaypro_10_keyboard_device::kaypro_10_keyboard_device(
 		machine_config const &mconfig,
@@ -333,12 +366,12 @@ kaypro_10_keyboard_device::kaypro_10_keyboard_device(
 		device_t *owner,
 		std::uint32_t clock)
 	: device_t(mconfig, KAYPRO_10_KEYBOARD, tag, owner, clock)
+	, device_keytronic_interface(mconfig, *this)
 	, m_mcu(*this, "mcu")
 	, m_bell(*this, "bell")
 	, m_matrix(*this, "ROW.%X", 0)
 	, m_modifiers(*this, "MOD")
 	, m_led_caps_lock(*this, "led_caps_lock")
-	, m_rxd_cb(*this)
 	, m_txd(1U)
 	, m_bus(0U)
 {
@@ -407,7 +440,7 @@ void kaypro_10_keyboard_device::p2_w(uint8_t data)
 	}
 
 	m_bell->level_w(BIT(data, 5));
-	m_rxd_cb(BIT(data, 7));
+	ser_out_w(BIT(data, 7));
 }
 
 int kaypro_10_keyboard_device::t1_r()
@@ -426,3 +459,8 @@ void kaypro_10_keyboard_device::bus_w(uint8_t data)
 		m_led_caps_lock = BIT(data, 4);
 	m_bus = data;
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(KAYPRO_10_KEYBOARD, device_keytronic_interface, kaypro_10_keyboard_device, "kaypro10kbd", "Kaypro 10 Keyboard")
