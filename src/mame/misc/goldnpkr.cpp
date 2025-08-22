@@ -15065,7 +15065,7 @@ GAME(  198?, genie,     0,        genie,    genie,    goldnpkr_state, empty_init
 GAME(  198?, geniea,    genie,    geniea,   geniea,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Genie (ICP-1, set 2)",                    0 )
 GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
 GAMEL( 1984, bonuspkr,  0,        goldnpkr, bonuspkr, goldnpkr_state, init_bonuspkr, ROT0,   "Galanthis Inc.",           "Bonus Poker",                             0,                layout_goldnpkr )
-GAMEL( 198?, jkrbonus,  0,        goldnpkr, jkrbonus, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Bonus",                             MACHINE_NOT_WORKING, layout_goldnpkr ) // second bank of DIPs not implemented
+GAMEL( 1982?, jkrbonus,  0,        goldnpkr, jkrbonus, goldnpkr_state, empty_init,    ROT0,   "Seta?",                "Joker Bonus",                             MACHINE_NOT_WORKING, layout_goldnpkr ) // second bank of DIPs not implemented
 
 GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
 GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )                // lacks of 2nd program ROM.
