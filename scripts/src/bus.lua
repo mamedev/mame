@@ -1977,6 +1977,8 @@ end
 
 if (BUSES["KEYTRONIC"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/keytronic/informer_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/keytronic/informer_kbd.h",
 		MAME_DIR .. "src/devices/bus/keytronic/kay_kbd.cpp",
 		MAME_DIR .. "src/devices/bus/keytronic/kay_kbd.h",
 		MAME_DIR .. "src/devices/bus/keytronic/keytronic.cpp",

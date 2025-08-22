@@ -85,6 +85,8 @@ DECLARE_DEVICE_TYPE(KEYTRONIC_CONNECTOR, keytronic_connector_device)
 
 // supported keyboards
 void ascii_terminal_keyboards(device_slot_interface &device);
+void informer_207_100_keyboards(device_slot_interface &device);
+void informer_213_keyboards(device_slot_interface &device);
 void kaypro_keyboards(device_slot_interface &device);
 
 //**************************************************************************

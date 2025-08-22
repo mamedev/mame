@@ -63,12 +63,25 @@ device_keytronic_interface::~device_keytronic_interface()
 //  KEYBOARD OPTIONS
 //**************************************************************************
 
+#include "informer_kbd.h"
 #include "kay_kbd.h"
 #include "keytronic_l2207.h"
 
 void ascii_terminal_keyboards(device_slot_interface &device)
 {
 	device.option_add("l2207", KEYTRONIC_L2207);
+}
+
+void informer_207_100_keyboards(device_slot_interface &device)
+{
+	device.option_add("in207100", INFORMER_207_100_KBD); // I207DEC
+	device.option_add("in213", INFORMER_213_KBD); // I207IBM
+	device.option_add("l2207", KEYTRONIC_L2207); // DEC 203 (doesn't work reliably on 207/100 except with clear NVRAM)
+}
+
+void informer_213_keyboards(device_slot_interface &device)
+{
+	device.option_add("in213", INFORMER_213_KBD);
 }
 
 void kaypro_keyboards(device_slot_interface &device)
