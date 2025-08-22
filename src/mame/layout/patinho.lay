@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-copyright-holders:Felipe Sanches, Nicoly Sampaio
+copyright-holders:Felipe Sanches, Nicoly Sampaio, Felipe Nascimento
 
 Front panel of the Patinho Feio mini-computer with clickable buttons, switches and lamps.
 -->
@@ -12,9 +12,142 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<image><data><![CDATA[
 			<svg width="210" height="270">
 				<path
-					fill="#a11022" stroke="#000" strokeWidth="10"
+					fill="#a11022" stroke="#000" stroke-width="10"
 					d="m 5,5 v 120 l 85,10 -85,10 v 120 l 200,-40 v -180 z"
 				/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_rect">
+		<image><data><![CDATA[
+			<svg width="78" height="70">
+				<path
+					fill="#598162" stroke="#000" stroke-width="1"
+					d="m 38,0 v 16.5 m -37.5,0 v 53 h 77 v -53 z"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_01">
+		<image><data><![CDATA[
+			<svg width="383" height="34">
+				<path
+					fill="none" stroke="#000" stroke-width="1"
+					d="
+					m 8.5,0.5 h -8 v 33 h 78
+					m 211,0 h 93 v -33 h -8"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_02">
+		<image><data><![CDATA[
+			<svg width="238" height="34">
+				<path
+					fill="none" stroke="#000" stroke-width="1"
+					d="
+					m 8.5,0.5 h -8 v 33 h 15
+					m 207,0 h 15 v -33 h -8"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_03">
+		<image><data><![CDATA[
+			<svg width="351" height="34">
+				<path
+					fill="none" stroke="#000" stroke-width="1"
+					d="
+					m 8.5,0.5 h -8 v 33 h 15
+					m 320,0 h 15 v -33 h -8"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_04">
+		<image><data><![CDATA[
+			<svg width="405" height="147">
+				<path
+					fill="none" stroke="#000" stroke-width="1"
+					d="
+					m 213.5,30.5 v -30 h 149 v 12
+					m -169,18 v -30 h -135 v 13
+					m 106,103 h -56 v 30 h 9
+					m 167,0 h 6 v -30 h -46 v -12
+					m -134,-63 h 9 v -18 h -119 v 18 h 9
+					m 386,0 h 9 v -18 h -76 v 18 h 9" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_05">
+		<image><data><![CDATA[
+			<svg width="186" height="93">
+				<path
+					fill="none" stroke="#000" stroke-width="1"
+					d="
+					m 128,0.5 h -7 l -18,31
+					m -46,-31 h 7 l 18,31"/>
+				<path
+					fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" 
+					d="m 14,91 h -12 v -47 h 182 v 47 h -12"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_06">
+		<image><data><![CDATA[
+			<svg width="226" height="34">
+				<path
+					fill="none" stroke="#000" stroke-width="4"
+					d="
+					m 141,9 v -7 h -84 v 7
+					m -55,8 v 17
+					m 222,-34 v 32 h -112 v -7"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_07">
+		<image><data><![CDATA[
+			<svg width="338" height="34">
+				<path
+					fill="none" stroke="#000" stroke-width="4"
+					d="
+					m 336,0 v 32 h -112 v -6
+					m -137,-17 v -7 h -85 v 30 h 112 v -6
+					m 139,-17 v -7 h -84 v 7"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="left_arrow">
+		<image><data><![CDATA[
+			<svg width="22" height="14">
+				<path
+					style="fill:#000"
+					d="m 22,0 v 14 l -22,-7 z"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="right_arrow">
+		<image><data><![CDATA[
+			<svg width="22" height="14">
+				<path
+					style="fill:#000"
+					d="m 0,14 v -14 l 22,7 z"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="down_arrow">
+		<image><data><![CDATA[
+			<svg width="14" height="22">
+				<path
+					style="fill:#000"
+					d="m 0,0 h 14 l -7,22 z" />
 			</svg>
 		]]></data></image>
 	</element>
@@ -50,6 +183,10 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 	</element>
 	<element name="sqr_button_surrond_border">
 		<rect><color red="0" green="0" blue="0" /></rect>
+	</element>
+
+	<element name="circle">
+		<disk><color red="0" green="0" blue="0" /></disk>
 	</element>
 
 	<element name="line">
@@ -514,6 +651,101 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="32" y="527" width="545" height="4" />
 		</element>
 
+<!-- define 'FASES DE OPERACAO' horizontal lines -->
+		<element ref="line">
+			<bounds x="72" y="568" width="95" height="1" />
+		</element>
+		
+		<element ref="line">
+			<bounds x="422" y="568" width="95" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="72" y="617" width="56" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="194" y="617" width="56" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="250" y="617" width="44" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="382" y="617" width="44" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="428" y="617" width="8" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="509" y="617" width="8" height="1" />
+		</element>
+
+		<repeat count="5">
+			<param name="line1_x" start="72" increment="89"/>
+			<param name="line2_x" start="127" increment="89"/>
+			<element ref="line">
+				<bounds x="~line1_x~" y="634" width="33" height="1" />
+			</element>
+			<element ref="line">
+				<bounds x="~line2_x~" y="634" width="34" height="1" />
+			</element>
+			<element ref="line">
+				<bounds x="~line1_x~" y="669" width="89" height="1" />
+			</element>
+		</repeat>
+
+		<element ref="line">
+			<bounds x="118" y="706" width="133" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="336" y="706" width="133" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="118" y="726" width="77" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="217" y="726" width="77" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="293" y="726" width="77" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="392" y="726" width="77" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="72" y="760" width="445" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="565" y="634" width="6" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="621" y="634" width="6" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="565" y="669" width="62" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="674" y="634" width="4" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="732" y="634" width="4" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="674" y="669" width="62" height="1" />
+		</element>
+
 <!-- define vertical lines -->
 		<element ref="line">
 			<bounds x="32" y="97" width="4" height="430" />
@@ -543,6 +775,334 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="1246" y="38" width="4" height="295" />
 		</element>
 
+<!-- define 'FASES DE OPERACAO' vertical lines -->
+		<element ref="line">
+			<bounds x="72" y="568" width="1" height="49" />
+		</element>
+
+		<element ref="line">
+			<bounds x="517" y="568" width="1" height="49" />
+		</element>
+
+		<element ref="line">
+			<bounds x="72" y="617" width="1" height="17" />
+		</element>
+
+		<element ref="line">
+			<bounds x="250" y="617" width="1" height="17" />
+		</element>
+
+		<element ref="line">
+			<bounds x="428" y="617" width="1" height="17" />
+		</element>
+
+		<element ref="line">
+			<bounds x="517" y="617" width="1" height="17" />
+		</element>
+
+		<repeat count="6">
+			<param name="line1_x" start="72" increment="89"/>
+			<element ref="line">
+				<bounds x="~line1_x~" y="634" width="1" height="35" />
+			</element>
+		</repeat>
+
+		<element ref="line">
+			<bounds x="72" y="669" width="1" height="91" />
+		</element>
+
+		<element ref="line">
+			<bounds x="517" y="669" width="1" height="91" />
+		</element>
+
+		<element ref="line">
+			<bounds x="118" y="706" width="1" height="20" />
+		</element>
+
+		<element ref="line">
+			<bounds x="469" y="706" width="1" height="20" />
+		</element>
+
+		<element ref="line">
+			<bounds x="118" y="726" width="1" height="34" />
+		</element>
+
+		<element ref="line">
+			<bounds x="293" y="726" width="1" height="34" />
+		</element>
+
+		<element ref="line">
+			<bounds x="469" y="726" width="1" height="34" />
+		</element>
+
+		<element ref="line">
+			<bounds x="565" y="634" width="1" height="35" />
+		</element>
+		<element ref="line">
+			<bounds x="627" y="634" width="1" height="35" />
+		</element>
+
+		<element ref="line">
+			<bounds x="674" y="634" width="1" height="35" />
+		</element>
+		<element ref="line">
+			<bounds x="736" y="634" width="1" height="35" />
+		</element>
+
+<!-- define 'ENTRADA MANUAL DE DADOS' horizontal lines -->
+
+		<repeat count="12">
+			<param name="line1_x" start="123" increment="85"/>
+			<element ref="line">
+				<bounds x="~line1_x~" y="845" width="86" height="1" />
+			</element>
+		</repeat>
+
+		<element ref="line">
+			<bounds x="123" y="788" width="32" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="176" y="788" width="64" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="262" y="788" width="64" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="346" y="788" width="32" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="378" y="788" width="32" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="432" y="788" width="64" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="517" y="788" width="64" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="602" y="788" width="32" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="633" y="788" width="32" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="687" y="788" width="64" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="772" y="788" width="64" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="857" y="788" width="32" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="889" y="788" width="32" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="942" y="788" width="64" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="1027" y="788" width="64" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="1112" y="788" width="32" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="123" y="884" width="342" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="803" y="884" width="342" height="4" />
+		</element>
+
+<!-- define 'ENTRADA MANUAL DE DADOS' vertical lines -->
+		<repeat count="13">
+			<param name="line1_x" start="123" increment="85"/>
+			<element ref="line">
+				<bounds x="~line1_x~" y="788" width="1" height="58" />
+			</element>
+		</repeat>
+
+		<element ref="line">
+			<bounds x="123" y="788" width="4" height="100" />
+		</element>
+		<element ref="line">
+			<bounds x="1143" y="788" width="4" height="100" />
+		</element>
+
+		<element ref="line">
+			<bounds x="376" y="788" width="4" height="10" />
+		</element>
+		<element ref="line">
+			<bounds x="632" y="788" width="4" height="10" />
+		</element>
+		<element ref="line">
+			<bounds x="887" y="788" width="4" height="10" />
+		</element>
+
+		<element ref="line">
+			<bounds x="462" y="875" width="4" height="12" />
+		</element>
+		<element ref="line">
+			<bounds x="803" y="875" width="4" height="12" />
+		</element>
+
+<!-- define circles -->
+		<element ref="circle">
+			<bounds x="573" y="74" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="1241" y="74" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="106" y="190" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="573" y="190" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="1241" y="190" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="106" y="310" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="573" y="310" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="573" y="430" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="573" y="482" width="11" height="11" />
+		</element>
+
+<!-- define panel diagrams -->
+		<element ref="diagram_rect">
+			<bounds x="123" y="195" width="78" height="70" />
+		</element>
+
+		<element ref="diagram_01">
+			<bounds x="152" y="130" width="383" height="34" />
+		</element>
+
+		<repeat count="3">
+			<param name="diagram_y" start="210" increment="120"/>
+			<element ref="diagram_02">
+				<bounds x="218" y="~diagram_y~" width="238" height="34" />
+			</element>
+		</repeat>
+
+		<element ref="diagram_03">
+			<bounds x="748" y="94" width="351" height="34" />
+		</element>
+		<element ref="diagram_03">
+			<bounds x="748" y="210" width="351" height="34" />
+		</element>
+		<element ref="diagram_03">
+			<bounds x="748" y="500" width="351" height="34" />
+		</element>
+
+		<element ref="diagram_04">
+			<bounds x="712" y="265" width="405" height="147" />
+		</element>
+
 		<element ref="ula"><bounds x="875" y="278" width="81" height="104" /></element>
+
+		<element ref="diagram_05">
+			<bounds x="782" y="624" width="186" height="93" />
+		</element>
+
+		<element ref="diagram_05">
+			<bounds x="1014" y="624" width="186" height="93" />
+		</element>
+
+		<repeat count="3">
+			<param name="diagram_y" start="180" increment="120"/>
+			<element ref="diagram_06">
+				<bounds x="225" y="~diagram_y~" width="226" height="34" />
+			</element>
+		</repeat>
+
+		<element ref="diagram_07">
+			<bounds x="755" y="63" width="338" height="34" />
+		</element>
+		<element ref="diagram_07">
+			<bounds x="755" y="180" width="338" height="34" />
+		</element>
+		<element ref="diagram_07">
+			<bounds x="755" y="469" width="338" height="34" />
+		</element>
+
+	<!-- define arrows -->
+
+		<element ref="down_arrow">
+			<bounds x="63" y="375" width="14" height="22" />
+		</element>
+		<element ref="down_arrow">
+			<bounds x="104" y="375" width="14" height="22" />
+		</element>
+
+
+		<element ref="left_arrow">
+			<bounds x="538" y="75" width="22" height="14" />
+		</element>
+		<element ref="left_arrow">
+			<bounds x="622" y="75" width="22" height="14" />
+		</element>
+		<element ref="left_arrow">
+			<bounds x="1148" y="75" width="22" height="14" />
+		</element>
+
+		<element ref="left_arrow">
+			<bounds x="622" y="190" width="22" height="14" />
+		</element>
+		<element ref="left_arrow">
+			<bounds x="1148" y="190" width="22" height="14" />
+		</element>
+
+		<element ref="left_arrow">
+			<bounds x="622" y="480" width="22" height="14" />
+		</element>
+
+		<element ref="left_arrow">
+			<bounds x="479" y="522" width="22" height="14" />
+		</element>
+
+
+		<element ref="right_arrow">
+			<bounds x="203" y="190" width="22" height="14" />
+		</element>
+		<element ref="right_arrow">
+			<bounds x="504" y="190" width="22" height="14" />
+		</element>
+
+		<element ref="right_arrow">
+			<bounds x="203" y="310" width="22" height="14" />
+		</element>
+		<element ref="right_arrow">
+			<bounds x="504" y="310" width="22" height="14" />
+		</element>
+		<element ref="right_arrow">
+			<bounds x="629" y="310" width="22" height="14" />
+		</element>
+		
+		<element ref="right_arrow">
+			<bounds x="629" y="339" width="22" height="14" />
+		</element>
+
+		<element ref="right_arrow">
+			<bounds x="504" y="430" width="22" height="14" />
+		</element>
+
 	</view>
 </mamelayout>
