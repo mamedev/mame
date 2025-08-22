@@ -3,7 +3,7 @@
 /*
  *  Beatmania DJ Main Board (GQ753)
  *
- *  Product numbers:
+ *  Product numbers: (x: Q = full cabinet, C = conversion kit)
  *  GQ753 beatmania (first release in 1997.12)
  *  Gx853 beatmania 2nd MIX (1998.03)
  *  Gx825 beatmania 3rd MIX (1998.09)
@@ -19,10 +19,10 @@
  *  GxC01 beatmania THE FINAL (2002.07))
  *
  *  Gx803 Pop'n Music (1998.09)
- *  GC831 Pop'n Music 2 (1999.04)
+ *  Gx831 Pop'n Music 2 (1999.04)
  *  Gx980 Pop'n Music 3 (1999.09)
  *
- *  GQ970 Pop'n Stage (1999.11)
+ *  Gx970 Pop'n Stage (1999.11)
  *  Gx970 Pop'n Stage EX (2000.03)
  *
  *  Chips:
