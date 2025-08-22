@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
-// thanks-to: Mask of Destiny
+// thanks-to: Mask of Destiny, Nemesis, Sik
 /**************************************************************************************************
 
 Sega Teradrive
@@ -351,6 +351,7 @@ protected:
 	void md_cpu_space_map(address_map &map);
 	void md_68k_z80_map(address_map &map) ATTR_COLD;
 	void md_z80_map(address_map &map) ATTR_COLD;
+	void md_ioctrl_map(address_map &map) ATTR_COLD;
 private:
 	required_device<i80286_cpu_device> m_x86cpu;
 	required_device<wd7600_device> m_chipset;
@@ -483,25 +484,8 @@ void teradrive_state::md_68k_map(address_map &map)
 //  map(0xa07f00, 0xa07fff) Z80 VDP space (freezes machine if accessed from 68k)
 //  map(0xa08000, 0xa0ffff) Z80 68k window (assume no DTACK), or just mirror of above according to TD HW notes?
 //  map(0xa10000, 0xa100ff) I/O
-	map(0xa10002, 0xa10007).lrw16(
-		NAME([this] (offs_t offset) {
-			u16 res = m_md_ioports[offset]->data_r();
-			return (res) | (res << 8);
-		}),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
-			m_md_ioports[offset]->data_w(uint8_t(data));
-		})
-	);
-	map(0xa10008, 0xa1000d).lrw16(
-		NAME([this] (offs_t offset) {
-			u16 res = m_md_ioports[offset]->ctrl_r();
-			return (res) | (res << 8);
-		}),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
-			m_md_ioports[offset]->ctrl_w(uint8_t(data));
-		})
-	);
-	// TODO: rx/tx hooks
+	map(0xa10000, 0xa100ff).m(*this, FUNC(teradrive_state::md_ioctrl_map));
+
 //  map(0xa11000, 0xa110ff) memory mode register
 //  map(0xa11100, 0xa111ff) Z80 BUSREQ/BUSACK
 	map(0xa11100, 0xa11101).lrw16(
@@ -584,6 +568,28 @@ void teradrive_state::md_68k_map(address_map &map)
 //  map(0xc00000, 0xdfffff) VDP and PSG (with mirrors and holes)
 	map(0xc00000, 0xc0001f).m(m_md_vdp, FUNC(ym7101_device::if_map));
 	map(0xe00000, 0xe0ffff).mirror(0x1f0000).ram(); // Work RAM, usually accessed at $ff0000
+}
+
+// $a10000 base
+void teradrive_state::md_ioctrl_map(address_map &map)
+{
+	// version, should be 0 for Teradrive, bit 5 for expansion bus not connected yet
+	map(0x00, 0x01).lr8(NAME([] () { return 1 << 5; }));
+	map(0x02, 0x03).rw(m_md_ioports[0], FUNC(megadrive_io_port_device::data_r), FUNC(megadrive_io_port_device::data_w)).umask16(0xffff);
+	map(0x04, 0x05).rw(m_md_ioports[1], FUNC(megadrive_io_port_device::data_r), FUNC(megadrive_io_port_device::data_w)).umask16(0xffff);
+	map(0x06, 0x07).rw(m_md_ioports[2], FUNC(megadrive_io_port_device::data_r), FUNC(megadrive_io_port_device::data_w)).umask16(0xffff);
+	map(0x08, 0x09).rw(m_md_ioports[0], FUNC(megadrive_io_port_device::ctrl_r), FUNC(megadrive_io_port_device::ctrl_w)).umask16(0xffff);
+	map(0x0a, 0x0b).rw(m_md_ioports[1], FUNC(megadrive_io_port_device::ctrl_r), FUNC(megadrive_io_port_device::ctrl_w)).umask16(0xffff);
+	map(0x0c, 0x0d).rw(m_md_ioports[2], FUNC(megadrive_io_port_device::ctrl_r), FUNC(megadrive_io_port_device::ctrl_w)).umask16(0xffff);
+	map(0x0e, 0x0f).rw(m_md_ioports[0], FUNC(megadrive_io_port_device::txdata_r), FUNC(megadrive_io_port_device::txdata_w)).umask16(0xffff);
+	map(0x10, 0x11).r(m_md_ioports[0], FUNC(megadrive_io_port_device::rxdata_r)).umask16(0xffff);
+	map(0x12, 0x13).rw(m_md_ioports[0], FUNC(megadrive_io_port_device::s_ctrl_r), FUNC(megadrive_io_port_device::s_ctrl_w)).umask16(0xffff);
+	map(0x14, 0x15).rw(m_md_ioports[1], FUNC(megadrive_io_port_device::txdata_r), FUNC(megadrive_io_port_device::txdata_w)).umask16(0xffff);
+	map(0x16, 0x17).r(m_md_ioports[1], FUNC(megadrive_io_port_device::rxdata_r)).umask16(0xffff);
+	map(0x18, 0x19).rw(m_md_ioports[1], FUNC(megadrive_io_port_device::s_ctrl_r), FUNC(megadrive_io_port_device::s_ctrl_w)).umask16(0xffff);
+	map(0x1a, 0x1b).rw(m_md_ioports[2], FUNC(megadrive_io_port_device::txdata_r), FUNC(megadrive_io_port_device::txdata_w)).umask16(0xffff);
+	map(0x1c, 0x1d).r(m_md_ioports[2], FUNC(megadrive_io_port_device::rxdata_r)).umask16(0xffff);
+	map(0x1e, 0x1f).rw(m_md_ioports[2], FUNC(megadrive_io_port_device::s_ctrl_r), FUNC(megadrive_io_port_device::s_ctrl_w)).umask16(0xffff);
 }
 
 void teradrive_state::md_cpu_space_map(address_map &map)
