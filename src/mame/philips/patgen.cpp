@@ -411,8 +411,8 @@ ROM_END
 
 SYST( 1989, pm5644g00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL-G 4:3 Colour Circle)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
 SYST( 1989, pm5644g913,  0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL-G 4:3 Indian Head)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
-SYST( 1989, pm5644g924,  0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL 16:9 Colour Circle Rev 1)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
-SYST( 1989, pm5644g924b, pm5644g924,  0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL 16:9 Colour Circle Rev 2)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+SYST( 1989, pm5644g924,  pm5644g924b, 0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL 16:9 Colour Circle Rev 1)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+SYST( 1989, pm5644g924b, 0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL 16:9 Colour Circle Rev 2)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
 SYST( 1989, pm5644l00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (SECAM 4:3 Colour Circle)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
 SYST( 1989, pm5644m00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (NTSC 4:3 Colour Circle)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
 SYST( 1989, pm5644p00,   0,           0, patgen, patgen, patgen_state, empty_init, "Philips", "PM 5644 color pattern generator (PAL-M 4:3 Colour Circle)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
