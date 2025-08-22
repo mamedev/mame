@@ -265,10 +265,15 @@ void generalplus_gpspi_direct_game_state::init_fif()
 		spirom16[i] = bitswap<16>(spirom16[i] ^ 0xdd0d,
 			3, 1, 11, 9, 6, 14, 0, 2, 8, 7, 13, 15, 4, 5, 12, 10);
 	}
+
+	// the games upload some self-check code to 0x100 in RAM, it's unclear what it is checking, skip it for now
+	// goto mr -> nop
+	if (spirom16[0x00d8] == 0xf161) spirom16[0x00d8] = 0xf165; // fixitflx, bfpacman, bfmpac
+	if (spirom16[0x00ac] == 0xf161) spirom16[0x00ac] = 0xf165; // wiwcs, bfgalaga, bfdigdug, bfspyhnt
+	if (spirom16[0x00a2] == 0xf161) spirom16[0x00a2] = 0xf165; // bftetris
 }
 
 } // anonymous namespace
-
 
 CONS(2017, fixitflx, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Fix It Felix Jr. (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2018, wiwcs,    0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Where in the World Is Carmen Sandiego? (handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -278,9 +283,6 @@ CONS(2017, bfgalaga, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_d
 CONS(2018, bfdigdug, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Dig Dug (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2019, bfspyhnt, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Spy Hunter (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2019, bftetris, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Tetris (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-
-
-
 
 // games below use GPL95101 series chips, which might be different but are definitely unSP2.0 chips that run from SPI directly
 
