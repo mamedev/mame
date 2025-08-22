@@ -18,8 +18,8 @@
  *  GxB07 beatmania 7th MIX (2002.01)
  *  GxC01 beatmania THE FINAL (2002.07))
  *
- *  Gx803 Pop'n Music 1 (1998.09)
- *  Gx831 Pop'n Music 2 (1999.04)
+ *  Gx803 Pop'n Music (1998.09)
+ *  GC831 Pop'n Music 2 (1999.04)
  *  Gx980 Pop'n Music 3 (1999.09)
  *
  *  GQ970 Pop'n Stage (1999.11)
