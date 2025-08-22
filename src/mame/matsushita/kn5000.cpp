@@ -7,7 +7,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "bus/technics/hdae5000.h"
+#include "bus/technics/kn5000/hdae5000.h"
 #include "cpu/tlcs900/tmp94c241.h"
 #include "imagedev/floppy.h"
 #include "machine/gen_latch.h"
