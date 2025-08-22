@@ -48,6 +48,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
 
 #include "imagedev/floppy.h"
@@ -254,6 +255,11 @@ protected:
 
 	emu_timer *m_timer = nullptr;
 
+	// IOP hardware
+	bool m_parallel_busy = false;
+	bool m_parallel_fault = false;
+
+	// CPU hardware
 	bool m_mapvec = false;
 	u32 m_wrbeadr = 0;
 
@@ -276,6 +282,8 @@ void news_38xx_state::machine_start()
 	m_net_ram = std::make_unique<u16[]>(8192);
 	save_pointer(NAME(m_net_ram), 8192);
 
+	save_item(NAME(m_parallel_busy));
+	save_item(NAME(m_parallel_fault));
 	save_item(NAME(m_mapvec));
 	save_item(NAME(m_wrbeadr));
 	save_item(NAME(m_scc_irq_state));
@@ -376,9 +384,8 @@ void news_38xx_state::iop_map(address_map &map)
 	}));
 	map(0x26040001, 0x26040001).lw8(NAME([this] (u8 data) {
 		LOG("parallel strobe w 0x%x\n", data);
-		m_parallel->write_strobe(data > 0);
+		m_parallel->write_strobe(!data);
 	}));
-	// TODO: parallel interrupt
 	map(0x26040002, 0x26040002).lw8(NAME([this] (u8) { iop_irq_w<iop_irq::PARALLEL>(0);}));
 	map(0x26040003, 0x26040003).w(FUNC(news_38xx_state::iop_inten_w<iop_irq::PARALLEL>));
 
@@ -483,8 +490,13 @@ u8 news_38xx_state::iop_ipc_intst_r()
 
 u8 news_38xx_state::park_status_r()
 {
-	// TODO: other bits in this register
-	const u8 park_status = !is_iop_irq_set<iop_irq::PARALLEL>() << 3;
+	const u8 park_status = static_cast<u8>(m_parallel_fault) << 6 |
+	                       static_cast<u8>(m_serial[0]->dsr_r()) << 5 |
+	                       static_cast<u8>(m_parallel_busy) << 4 |
+	                       static_cast<u8>(!is_iop_irq_set<iop_irq::PARALLEL>()) << 3 |
+	                       static_cast<u8>(m_serial[0]->ri_r()) << 2 |
+	                       static_cast<u8>(m_serial[1]->dsr_r()) << 1 |
+	                       static_cast<u8>(m_serial[1]->ri_r());
 	LOGMASKED(LOG_INTERRUPT, "%s park_status_r: 0x%x\n", machine().describe_context(), park_status);
 	return park_status;
 }
@@ -875,6 +887,7 @@ void news_scsi_devices(device_slot_interface &device)
 	// TODO: tape
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("tape", NSCSI_TAPE);
 }
 
 void news_38xx_state::common(machine_config &config)
@@ -935,14 +948,13 @@ void news_38xx_state::common(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi bus 0 and devices
-	// TODO: tape
 	NSCSI_BUS(config, m_scsibus[0]);
 	NSCSI_CONNECTOR(config, "scsi0:0", news_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi0:1", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:2", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:3", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:4", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi0:5", news_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi0:5", news_scsi_devices, "tape");
 	NSCSI_CONNECTOR(config, "scsi0:6", news_scsi_devices, nullptr);
 
 	// scsi bus 0 host adapter
@@ -956,7 +968,6 @@ void news_38xx_state::common(machine_config &config)
 			adapter.irq_handler().append(m_dma[0], FUNC(dmac_0266_device::eop_w));
 			adapter.drq_handler().set(m_dma[0], FUNC(dmac_0266_device::req_w));
 
-			//subdevice<dmac_0266_device>(":dma0")->out_eop_cb().set(adapter, FUNC(cxd1180_device::eop_w));
 			subdevice<dmac_0266_device>(":dma0")->dma_r_cb().set(adapter, FUNC(cxd1180_device::dma_r));
 			subdevice<dmac_0266_device>(":dma0")->dma_w_cb().set(adapter, FUNC(cxd1180_device::dma_w));
 		});
@@ -982,15 +993,31 @@ void news_38xx_state::common(machine_config &config)
 			adapter.irq_handler().append(m_dma[1], FUNC(dmac_0266_device::eop_w));
 			adapter.drq_handler().set(m_dma[1], FUNC(dmac_0266_device::req_w));
 
-			//subdevice<dmac_0266_device>(":dma1")->out_eop_cb().set(adapter, FUNC(cxd1180_device::eop_w));
 			subdevice<dmac_0266_device>(":dma1")->dma_r_cb().set(adapter, FUNC(cxd1180_device::dma_r));
 			subdevice<dmac_0266_device>(":dma1")->dma_w_cb().set(adapter, FUNC(cxd1180_device::dma_w));
 		});
 
 	CENTRONICS(config, m_parallel, centronics_devices, nullptr);
-	// TODO: what is hooked up to the below? Check the schematic
-	// m_parallel->busy_handler();
-	// m_parallel->ack_handler();
+	// Note: printing works, but I'm not sure how accurate triggering the IRQ on each edge is.
+	// NEWS-OS properly checks the PARK status before taking action, but this might not be what real hw does
+	m_parallel->busy_handler().set([this](const int status) {
+		const bool new_status = status;
+		if (m_parallel_busy != new_status)
+		{
+			LOG("Parallel busy changed to %s", new_status ? "H" : "L");
+			m_parallel_busy = new_status;
+			iop_irq_w<iop_irq::PARALLEL>(1);
+		}
+	});
+	m_parallel->fault_handler().set([this](const int status) {
+		const bool new_status = status;
+		if (m_parallel_fault != new_status)
+		{
+			LOG("Parallel fault changed to %s", new_status ? "H" : "L");
+			m_parallel_fault = !new_status;
+			iop_irq_w<iop_irq::PARALLEL>(1);
+		}
+	});
 
 	OUTPUT_LATCH(config, m_parallel_data);
 	m_parallel->set_output_latch(*m_parallel_data);
@@ -1009,7 +1036,7 @@ void news_38xx_state::nws3860(machine_config &config)
 
 ROM_START(nws3860)
 	ROM_REGION32_BE(0x10000, "eprom", 0)
-	ROM_SYSTEM_BIOS(0, "nws3860", "NWS-3860 v1.6")
+	ROM_SYSTEM_BIOS(0, "nws3860", "SONY NET WORK STATION MC68030 Monitor Release 1.6")
 	ROMX_LOAD("mpu_10__ver.1.6__1990_sony.ic159", 0x00000, 0x10000, CRC(542e21b8) SHA1(631dca1f3446761973073f5c32c1a0aeba538c2c), ROM_BIOS(0))
 
 	ROM_REGION32_BE(0x100, "idrom", 0)
