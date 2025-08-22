@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
 /*
- *  Beatmania DJ Main Board (GX753)
+ *  Beatmania DJ Main Board (GQ753)
  *
  *  Product numbers:
  *  GQ753 beatmania (first release in 1997.12)
@@ -27,7 +27,7 @@
  *
  *  Chips:
  *  15a:    MC68EC020FG25 @ 16 MHz
- *  25b:    001642 (sprites, misc)
+ *  25b:    001642 or KS10101 (sprites, misc)
  *  18d:    055555 (priority encoder)
  *   5f:    056766 (color DAC)
  *  18f:    056832 (tiles)
@@ -659,7 +659,7 @@ void djmain_state::maincpu_djmain(address_map &map)
 	map(0x480000, 0x48443f).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");       // COLOR RAM
 	map(0x500000, 0x57ffff).rw(FUNC(djmain_state::sndram_r), FUNC(djmain_state::sndram_w));               // SOUND RAM
 	map(0x580000, 0x58003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));      // VIDEO REG (tilemap)
-	map(0x590000, 0x590007).w(FUNC(djmain_state::unknown590000_w));                  // ??
+	map(0x590000, 0x590007).w(FUNC(djmain_state::unknown590000_w));                  // M66011FP?
 	map(0x5a0000, 0x5a005f).w(m_k055555, FUNC(k055555_device::K055555_long_w));                  // 055555: priority encoder
 	map(0x5b0000, 0x5b04ff).rw("k054539_1", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask32(0xff00ff00);
 	map(0x5b0000, 0x5b04ff).rw("k054539_2", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask32(0x00ff00ff);
