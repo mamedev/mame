@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_KEYTRONIC_INFORMER_KBD_H
-#define MAME_KEYTRONIC_INFORMER_KBD_H
+#ifndef MAME_BUS_KEYTRONIC_INFORMER_KBD_H
+#define MAME_BUS_KEYTRONIC_INFORMER_KBD_H
 
 #pragma once
 
@@ -18,4 +18,4 @@
 DECLARE_DEVICE_TYPE(INFORMER_207_100_KBD, device_keytronic_interface)
 DECLARE_DEVICE_TYPE(INFORMER_213_KBD, device_keytronic_interface)
 
-#endif // MAME_KEYTRONIC_INFORMER_KBD_H
+#endif // MAME_BUS_KEYTRONIC_INFORMER_KBD_H
