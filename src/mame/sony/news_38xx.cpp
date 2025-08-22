@@ -216,6 +216,7 @@ protected:
 	void ipintxp_w(offs_t offset, u8 data); // IPINTCP/IPINTHP
 	void ipenixp_w(offs_t offset, u8 data); // IPENICP/IPENIHP
 	void ipclixp_w(offs_t offset, u8 data);	// IPCLICP/IPCLIHP
+	void index_divide_w(offs_t offset, u8 data);
 
 	TIMER_CALLBACK_MEMBER(timer);
 
@@ -317,7 +318,7 @@ void news_38xx_state::machine_reset()
 
 void news_38xx_state::init_common()
 {
-	// HACK: hardwire the rate TODO: does the index pulse divide control this?
+	// HACK: hardwire the rate
 	m_fdc->set_rate(500000);
 
 	// RAM is always mapped for the CPU, since the MIPS boot vector is well above the max RAM value
@@ -405,7 +406,8 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x26300000, 0x26300003).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
 
 	map(0x26340000, 0x26340000).r(FUNC(news_38xx_state::park_status_r));
-	// 0x26380000 // divide fdd index pulse for ECMA format (1 = 1/2x 0 = 1x)
+
+	map(0x26380000, 0x26380000).w(FUNC(news_38xx_state::index_divide_w));
 
 	map(0x28000000, 0x28000017).m(m_dma[0], FUNC(dmac_0266_device::map));
 	map(0x2a000000, 0x2a000017).m(m_dma[1], FUNC(dmac_0266_device::map));
@@ -789,6 +791,12 @@ void news_38xx_state::ipclixp_w(offs_t offset, u8 data)
 	{
 		iop_irq_w<iop_irq::UBUS>(0);
 	}
+}
+
+void news_38xx_state::index_divide_w(offs_t offset, u8 data)
+{
+	// TODO: what to do with this?
+	LOG("(%s) Set divide index to %s\n", machine().describe_context(), data ? "0.5x" : "1x");
 }
 
 u32 news_38xx_state::cpstat_r()
