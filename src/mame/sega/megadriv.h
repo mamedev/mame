@@ -109,8 +109,6 @@ protected:
 	uint8_t megadriv_z80_unmapped_read();
 	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
 
-	void vdp_sndirqline_callback_genesis_z80(int state);
-
 	void megadriv_stop_scanline_timer();
 
 	void md_ntsc(machine_config &config);
