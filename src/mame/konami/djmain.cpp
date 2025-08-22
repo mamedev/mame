@@ -2616,10 +2616,10 @@ GAME( 2001, bm6thmix,  0,        djmainj, bm6thmix,  djmain_state, init_bm6thmix
 GAME( 2001, bm7thmix,  0,        djmainj, bm6thmix,  djmain_state, init_bm7thmix,  ROT0, "Konami", "beatmania 7th MIX (ver JA-B)", 0 )
 GAME( 2002, bmfinal,   0,        djmainj, bm6thmix,  djmain_state, init_bmfinal,   ROT0, "Konami", "beatmania THE FINAL (ver JA-A)", 0 )
 
-GAME( 1998, popn1,     0,        djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver TA-A, HDD 1.01)", 0 )
-GAME( 1998, popn1a,    popn1,    djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver AA-A, HDD 1.00)", 0 )
-GAME( 1998, popn1k,    popn1,    djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver KA-A, HDD 1.01)", 0 ) // KA-A based on filenames provided, no warning message
-GAME( 1998, popn1j,    popn1,    djmainj, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver JA-A, HDD 1.00)", 0 )
+GAME( 1998, popn1,     0,        djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music (ver TA-A, HDD 1.01)", 0 )
+GAME( 1998, popn1a,    popn1,    djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music (ver AA-A, HDD 1.00)", 0 )
+GAME( 1998, popn1k,    popn1,    djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music (ver KA-A, HDD 1.01)", 0 ) // KA-A based on filenames provided, no warning message
+GAME( 1998, popn1j,    popn1,    djmainj, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music (ver JA-A, HDD 1.00)", 0 )
 GAME( 1999, popn2,     0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", 0 )
 GAME( 1999, popn3,     0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 3 (ver JA-A)", 0 )
 
