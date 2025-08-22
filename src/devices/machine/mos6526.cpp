@@ -488,12 +488,13 @@ void mos6526_device::update_interrupt()
 		m_icr |= ICR_TA;
 	}
 
-	if (m_tb_out && !m_icr_read)
+	// cpm68k-amiga doesn't want icr_read (it masks in IMR, tight loop otherwise)
+	if (m_tb_out) //&& !m_icr_read)
 	{
 		m_icr |= ICR_TB;
 	}
 
-	m_icr_read = false;
+//	m_icr_read = false;
 }
 
 
@@ -690,7 +691,7 @@ void mos6526_device::device_reset()
 	m_ir1 = 0;
 	m_icr = 0;
 	m_imr = 0;
-	m_icr_read = false;
+//	m_icr_read = false;
 
 	m_pc = 1;
 	m_flag = 1;
@@ -898,7 +899,7 @@ uint8_t mos6526_device::read(offs_t offset)
 		if (machine().side_effects_disabled() || !m_icr)
 			return data;
 
-		m_icr_read = true;
+		//m_icr_read = true;
 
 		m_ir0 = 0;
 		m_ir1 = 0;

@@ -152,7 +152,7 @@ protected:
 	int m_ir1;
 	uint8_t m_icr;
 	uint8_t m_imr;
-	bool m_icr_read;
+//	bool m_icr_read;
 
 	// peripheral ports
 	int m_pc;
