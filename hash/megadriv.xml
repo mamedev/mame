@@ -2189,6 +2189,96 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		</part>
 	</software>
 
+	<software name="devwill">
+		<description>Devwill Too MD</description>
+		<year>2019</year>
+		<publisher>Mega Cat Studios</publisher>
+		<info name="developer" value="Mangangá Team" />
+		<info name="language" value="English" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Devwill Too.bin" size="4194304" crc="34031793" sha1="b4acee3bf9053a76f70f0cb6229d72346610e92f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="devwill_pt" cloneof="devwill">
+		<description>Devwill Too MD (Portuguese)</description>
+		<year>2019</year>
+		<publisher>Mega Cat Studios</publisher>
+		<info name="developer" value="Mangangá Team" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="Devwill Too MD (World) (Pt-BR).bin" size="4194304" crc="7748c2df" sha1="1057beec9661d9ade4351d08ac9a7bcf36b190df" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="devwilldg" cloneof="devwill">
+		<description>Devwill Too MD (English, digital release)</description>
+		<year>2019</year>
+		<publisher>Itch.io</publisher>
+		<info name="developer" value="Mangangá Team" />
+		<info name="language" value="English" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3538944">
+				<rom name="Devwill Too MD (World) (Digital).bin" size="3538944" crc="25736e4f" sha1="0d94389305c0ef13b694327ef4fb80d2700b391c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="devwilldg_pt" cloneof="devwill">
+		<description>Devwill Too MD (Portuguese, digital release)</description>
+		<year>2019</year>
+		<publisher>Itch.io</publisher>
+		<info name="developer" value="Mangangá Team" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3538944">
+				<rom name="Devwill Too MD (World) (Pt-BR) (Digital).bin" size="3538944" crc="c14fc0d4" sha1="bb37a1b58eda33b6ce108e770fda389476b328cf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="devwill_d1" cloneof="devwill">
+		<description>Devwill Too MD (demo v1)</description>
+		<year>2019</year>
+		<publisher>Mangangá Team</publisher>
+		<info name="developer" value="Mangangá Team" />
+		<info name="language" value="English" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1966080">
+				<rom name="devwill too demonstracao.bin" size="1966080" crc="c53c9cee" sha1="fcb54d04dbb5e44f7727ef189e830a1fb48e6058" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="devwill_d2" cloneof="devwill">
+		<description>Devwill Too MD (demo v2)</description>
+		<year>2019</year>
+		<publisher>Mangangá Team</publisher>
+		<info name="developer" value="Mangangá Team" />
+		<info name="language" value="English" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1966080">
+				<rom name="Devwill-Too-MD_Demo-V2.bin" size="1966080" crc="7e1f260c" sha1="468ec80143806f0d697ff40c5ce19b681bb23c1f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="devwillpr">
+		<description>Devwill Too - Prologue</description>
+		<year>2021</year>
+		<publisher>Itch.io</publisher>
+		<info name="developer" value="Mangangá Team" />
+		<info name="language" value="English/Portuguese (Brazil)" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="3168608">
+				<rom name="Devwill Too Prologue (ENG - PTBR).bin" size="3168608" crc="736a07e2" sha1="5cb22aadeba74ea155be1eb846a428bd665d5a16" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- Both Euro and USA confirmed -->
 	<software name="dicktr">
@@ -8075,6 +8165,19 @@ Unemulated HeartBeat peripheral
 	</software>
 
 
+	<software name="sovietbg">
+		<description>Sovietborgs (demo)</description>
+		<year>2025</year>
+		<publisher>Retro Sumus</publisher>
+		<info name="language" value="English" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2752512">
+				<rom name="sovietborgs-demo.bin" size="2752512" crc="e11938d4" sha1="ecd9dc5b87124ad9fe134b80a23062c5fa811608" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Only Euro and Jpn are confirmed -->
 <!-- USA has been found on a 171-5702 PCB with two chips MPR-12360 T23 + MPR-12361 T24, but needs to be verified -->
 	<software name="sharrier">
@@ -13748,169 +13851,349 @@ No [VDP] sprites
 	</software>
 
 	<software name="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.5, English)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="English" />
+		<info name="version" value="0.8.5 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-en.bin" size="4194304" crc="75c4bc1d" sha1="527faa9ce836cd900e29559ad51b6eda28cf5835" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory085_br" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.5, Portuguese Brazil)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="version" value="0.8.5 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-br.bin" size="4194304" crc="138e52b9" sha1="ef47fc0a5cf6d8bcd99f3abdeb7033dbe4adc580" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory085_de" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.5, German)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="German" />
+		<info name="version" value="0.8.5 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-de.bin" size="4194304" crc="3c249258" sha1="3d7736b4b48b1567cd3648bcc18a87292c6e256b" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory085_es" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.5, Spanish)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Spanish" />
+		<info name="version" value="0.8.5 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-es.bin" size="4194304" crc="471a20b8" sha1="3485725a8186e8b74f490ec46c045bd2075774e5" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory085_fi" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.5, Finnish)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Finnish" />
+		<info name="version" value="0.8.5 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-fi.bin" size="4194304" crc="0f09b3ef" sha1="bc5b30ac1634c5bd4fb7210801237a8e94b7cec5" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory085_fr" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.5, French)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="French" />
+		<info name="version" value="0.8.5 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-fr.bin" size="4194304" crc="9df9b830" sha1="f9158a4644b3234e667274ec98fd8f0bad0e24a3" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory085_it" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.5, Italian)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Italian" />
+		<info name="version" value="0.8.5 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-it.bin" size="4194304" crc="3bba32e1" sha1="c69c71d150981eca3f75bbef92d3e84f37b1bd51" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory085_ja" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.5, Japanese)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Japanese" />
+		<info name="version" value="0.8.5 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ja.bin" size="4194304" crc="649348a2" sha1="62b9dc5e472b675516cd1fd75d40d489b50183a7" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory085_ko" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.5, Korean)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Korean" />
+		<info name="version" value="0.8.5 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ko.bin" size="4194304" crc="b4a41427" sha1="b6b7de9262beeb77ebb9701dc74a10ee4a591d9a" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory085_pt" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.5, Portuguese)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="version" value="0.8.5 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-pt.bin" size="4194304" crc="b55866d9" sha1="a0b896e0098026ffdf20f2a626f224a16a024fd6" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory085_ru" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.5, Russian)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Russian" />
+		<info name="version" value="0.8.5 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-ru.bin" size="4194304" crc="c8fc8114" sha1="57f02cc25bda2935706c03c6826a52121ed3cfcd" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory085_zh" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.5, Chinese)</description>
+		<year>2025</year>
+		<publisher>Andrew DeRosier</publisher>
+		<info name="language" value="Chinese" />
+		<info name="version" value="0.8.5 2025.08" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="doukutsu-zh.bin" size="4194304" crc="d66a325e" sha1="080b383f3fd0ec5bece38db80658848aff83783b" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavestory080_en" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.8.0, English)</description>
 		<year>2022</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="English" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-en.bin" size="4194304" crc="d476a108" sha1="79c6833b187a02a51f6eccf9283e4d82cca877b5" />
+				<rom name="doukutsu-en (v0.8.0).bin" size="4194304" crc="d476a108" sha1="79c6833b187a02a51f6eccf9283e4d82cca877b5" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cavestory_zh" cloneof="cavestory">
+	<software name="cavestory080_zh" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Chinese)</description>
 		<year>2022</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="Chinese" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-zh.bin" size="4194304" crc="0c1517fc" sha1="da7286cdc75f6e3846f8351abf9325fdbdc687a8" />
+				<rom name="doukutsu-zh (v0.8.0).bin" size="4194304" crc="0c1517fc" sha1="da7286cdc75f6e3846f8351abf9325fdbdc687a8" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cavestory_fr" cloneof="cavestory">
+	<software name="cavestory080_fr" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.8.0, French)</description>
 		<year>2022</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="French" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-fr.bin" size="4194304" crc="f00a8d9f" sha1="d1b89e2e364cd595b5d4c6a2e417f7b79337378a" />
+				<rom name="doukutsu-fr (v0.8.0).bin" size="4194304" crc="f00a8d9f" sha1="d1b89e2e364cd595b5d4c6a2e417f7b79337378a" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cavestory_de" cloneof="cavestory">
+	<software name="cavestory080_de" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.8.0, German)</description>
 		<year>2022</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="German" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-de.bin" size="4194304" crc="a04d7b69" sha1="b0ba518ee523fec58bfbcdd2685f507e288b6c14" />
+				<rom name="doukutsu-de (v0.8.0).bin" size="4194304" crc="a04d7b69" sha1="b0ba518ee523fec58bfbcdd2685f507e288b6c14" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cavestory_it" cloneof="cavestory">
+	<software name="cavestory080_it" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Italian)</description>
 		<year>2022</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="Italian" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-it.bin" size="4194304" crc="8ec855f9" sha1="34d95d7d0278cb9b7479c262a019692b09e13533" />
+				<rom name="doukutsu-it (v0.8.0).bin" size="4194304" crc="8ec855f9" sha1="34d95d7d0278cb9b7479c262a019692b09e13533" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cavestory_ja" cloneof="cavestory">
+	<software name="cavestory080_ja" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Japanese)</description>
 		<year>2022</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="Japanese" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-ja.bin" size="4194304" crc="21acbe48" sha1="a22a72b38c02b777729cb158ed4d4564dbdd1cd3" />
+				<rom name="doukutsu-ja (v0.8.0).bin" size="4194304" crc="21acbe48" sha1="a22a72b38c02b777729cb158ed4d4564dbdd1cd3" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cavestory_ko" cloneof="cavestory">
+	<software name="cavestory080_ko" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Korean)</description>
 		<year>2022</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="Korean" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-ko.bin" size="4194304" crc="0e411955" sha1="910948d9187d0f11e811ff09d94bcb8977d612ce" />
+				<rom name="doukutsu-ko (v0.8.0).bin" size="4194304" crc="0e411955" sha1="910948d9187d0f11e811ff09d94bcb8977d612ce" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cavestory_pt" cloneof="cavestory">
+	<software name="cavestory080_pt" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Portuguese)</description>
 		<year>2022</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="Portuguese" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-pt.bin" size="4194304" crc="965704dd" sha1="da54faea4f7b2ec6822e710ba200890653dcee79" />
+				<rom name="doukutsu-pt (v0.8.0).bin" size="4194304" crc="965704dd" sha1="da54faea4f7b2ec6822e710ba200890653dcee79" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cavestory_br" cloneof="cavestory">
-		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Portuguese-Brazil)</description>
+	<software name="cavestory080_br" cloneof="cavestory">
+		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Portuguese Brazil)</description>
 		<year>2022</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="Portuguese (Brazil)" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-br.bin" size="4194304" crc="4b52107a" sha1="4dc22a573c82c8d3403a0ccb062ba489fd0af70b" />
+				<rom name="doukutsu-br (v0.8.0).bin" size="4194304" crc="4b52107a" sha1="4dc22a573c82c8d3403a0ccb062ba489fd0af70b" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cavestory_es" cloneof="cavestory">
+	<software name="cavestory080_es" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.8.0, Spanish)</description>
 		<year>2022</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="Spanish" />
 		<info name="version" value="0.8.0 2022.02" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="doukutsu-es.bin" size="4194304" crc="06405697" sha1="481683730b0496af80f28441aec2a31525c45519" />
+				<rom name="doukutsu-es (v0.8.0).bin" size="4194304" crc="06405697" sha1="481683730b0496af80f28441aec2a31525c45519" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cavestory070" cloneof="cavestory">
+	<software name="cavestory070_en" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.7.0, English)</description>
 		<year>2020</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="English" />
 		<info name="version" value="0.7.0 - Test build Sep 15 2020" />
 		<part name="cart" interface="megadriv_cart">
@@ -13926,7 +14209,7 @@ No [VDP] sprites
 	<software name="cavestory070_fr" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.7.0, French)</description>
 		<year>2020</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="French" />
 		<info name="version" value="0.7.0" />
 		<part name="cart" interface="megadriv_cart">
@@ -13942,7 +14225,7 @@ No [VDP] sprites
 	<software name="cavestory070_it" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.7.0, Italian)</description>
 		<year>2020</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="Italian" />
 		<info name="version" value="0.7.0" />
 		<part name="cart" interface="megadriv_cart">
@@ -13958,7 +14241,7 @@ No [VDP] sprites
 	<software name="cavestory070_pt" cloneof="cavestory">
 		<description>Cave Story - Doukutsu Monogatari (v0.7.0, Portuguese)</description>
 		<year>2020</year>
-		<publisher>Studio Pixel</publisher>
+		<publisher>Andrew DeRosier</publisher>
 		<info name="language" value="Portuguese" />
 		<info name="version" value="0.7.0" />
 		<part name="cart" interface="megadriv_cart">
@@ -20254,8 +20537,20 @@ Black screen
 		</part>
 	</software>
 
-	<software name="kirito">
-		<description>Kirito - The Game (demo)</description>
+	<software name="kiritotg">
+		<description>Kirito - The Game (demo 1.1)</description>
+		<year>2024</year>
+		<publisher>Tulfared</publisher>
+		<info name="language" value="English/French" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2228224">
+				<rom name="rom_demo_ktg_d11.bin" size="2228224" crc="03b9a3be" sha1="50f51e180cc1877ebeae366435f6fbbd35068232" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kiritotg_d10" cloneof="kiritotg">
+		<description>Kirito - The Game (demo 1.0)</description>
 		<year>2024</year>
 		<publisher>Tulfared</publisher>
 		<info name="language" value="English/French" />
@@ -33287,7 +33582,7 @@ Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
 
 	<software name="wondlib" supported="no">
 		<description>Wonder Library (Japan)</description>
-		<year>199?</year>
+		<year>1993</year>
 		<publisher>Victor</publisher>
 		<notes><![CDATA[
 Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
