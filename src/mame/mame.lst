@@ -43105,6 +43105,9 @@ asma3k
 @source:skeleton/am1000.cpp
 am1000
 
+@source:skeleton/amusement_6502.cpp
+unkamus
+
 @source:skeleton/antonelli_hd6305.cpp
 anto2495
 anto2614
