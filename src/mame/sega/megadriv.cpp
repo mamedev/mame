@@ -807,7 +807,7 @@ void md_core_state::md_core_pal(machine_config &config)
 
 void md_base_state::megadriv_ioports(machine_config &config)
 {
-	// TODO: this latches video counters as well as setting interrupt level 2
+	// TODO: this latches video counters as well as setting interrupt level 2 (thru VDP)
 	auto &hl(INPUT_MERGER_ANY_HIGH(config, "hl"));
 	hl.output_handler().set_inputline(m_maincpu, 2);
 
