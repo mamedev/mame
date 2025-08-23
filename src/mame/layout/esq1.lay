@@ -27,7 +27,7 @@ license:CC0-1.0
 					" />
 
 				<!-- Lines -->
-				<path fill="none" stroke="#fecb24" strokeWidth="1"
+				<path fill="none" stroke="#fecb24" stroke-width="1"
 					d="
 						M 30,3 h 14 l 23,23 h 10
 						m 52,6 h -9 l -25,25 h -65
@@ -42,7 +42,7 @@ license:CC0-1.0
 	<element name="envelope_diagram">
 		<image><data><![CDATA[
 			<svg width="87" height="62">
-				<path fill="none" stroke="#fff" strokeWidth="1"
+				<path fill="none" stroke="#fff" stroke-width="1"
 					d="
 						M 5,31 L 21,1 38,40 51,22 H 72 L 78,31
 						M 87,31 H 0
@@ -130,7 +130,7 @@ license:CC0-1.0
 	<element name="slider_ticks">
 		<image><data><![CDATA[
 			<svg width="46" height="93">
-				<path fill="none" stroke="#fff" strokeWidth="1"
+				<path fill="none" stroke="#fff" stroke-width="1"
 					d="
 						M  0,18 h 9 m 28,0 h 9
 						m -46,9 h 9 m 28,0 h 9
