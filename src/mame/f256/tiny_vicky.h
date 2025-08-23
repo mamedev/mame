@@ -3,8 +3,8 @@
 #ifndef MAME_F256_TINY_VICKY_H
 #define MAME_F256_TINY_VICKY_H
 
-#define CHAR_HEIGHT     8
-#define CHAR_WIDTH      8
+#define MAME_F256_CHAR_HEIGHT     8
+#define MAME_F256_CHAR_WIDTH      8
 
 //#include <atomic>
 
@@ -12,8 +12,6 @@ class tiny_vicky_video_device : public device_t
 {
 public:
     tiny_vicky_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-    tiny_vicky_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
-    //tiny_vicky_video_device() = default;
 
     // screen update
     uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -47,6 +45,7 @@ public:
         return m_sol_irq_handler.bind();
     };
 protected:
+    tiny_vicky_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
     // device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

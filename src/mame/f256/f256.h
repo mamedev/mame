@@ -101,8 +101,8 @@ private:
 	void via0_interrupt(int state);
 	void via1_interrupt(int state);
 	uint8_t m_interrupt_reg[3] = { 0, 0 ,0};
-	uint8_t m_interrupt_masks[3] = { 0xFF, 0xFF, 0xFF};
-	uint8_t m_interrupt_edge[3] = { 0xFF, 0xFF, 0xFF};
+	uint8_t m_interrupt_masks[3] = { 0xff, 0xff, 0xff};
+	uint8_t m_interrupt_edge[3] = { 0xff, 0xff, 0xff};
 	uint8_t m_interrupt_polarity[3] = {0, 0, 0};
 
 	// VIA0 - Atari joystick functions
@@ -114,9 +114,9 @@ private:
 	void via0_cb2_write(u8 data);
 
 	// VIA1 - Internal Keyboard
-	uint8_t m_via_keyboard_port_a = 0xFF;
-	uint8_t m_via_keyboard_port_b = 0xFF;
-	uint8_t m_via_joy1 = 0xFF;
+	uint8_t m_via_keyboard_port_a = 0xff;
+	uint8_t m_via_keyboard_port_b = 0xff;
+	uint8_t m_via_joy1 = 0xff;
 
 	u8 via1_system_porta_r();
 	u8 via1_system_portb_r();

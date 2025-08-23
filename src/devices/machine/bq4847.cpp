@@ -75,7 +75,7 @@ enum
 //  Constructors for basetype
 //-------------------------------------------------
 
-bq4847_device::bq4847_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock)
+bq4847_device::bq4847_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	device_rtc_interface(mconfig, *this),
@@ -94,17 +94,17 @@ bq4847_device::bq4847_device(const machine_config& mconfig, device_type type, co
 {
 }
 
-bq4847_device::bq4847_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+bq4847_device::bq4847_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bq4847_device(mconfig, BQ4847, tag, owner, clock)
 {
 }
 
-bq4845_device::bq4845_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+bq4845_device::bq4845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bq4847_device(mconfig, BQ4845, tag, owner, clock)
 {
 }
 
-bq4802_device::bq4802_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+bq4802_device::bq4802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bq4847_device(mconfig, BQ4802, tag, owner, clock)
 {
 	set_century(true);
@@ -119,7 +119,7 @@ void bq4847_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 			(((hour % 24) >= 12) ? 0x80 : 0x00) | convert_to_bcd((hour % 12) ? (hour % 12) : 12);
 		m_register[reg_minutes] = convert_to_bcd(minute);
 		m_register[reg_seconds] = convert_to_bcd(second);
-		m_register[reg_year] = convert_to_bcd(year%100);
+		m_register[reg_year] = convert_to_bcd(year % 100);
 		m_register[reg_month] = convert_to_bcd(month);
 		m_register[reg_date] = convert_to_bcd(day);
 		m_register[reg_days] = convert_to_bcd(day_of_week);
@@ -144,7 +144,7 @@ void bq4847_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 	// What about the DSE flag?
 }
 
-bool bq4847_device::increment_bcd(uint8_t& bcdnumber, uint8_t limit, uint8_t min)
+bool bq4847_device::increment_bcd(uint8_t &bcdnumber, uint8_t limit, uint8_t min)
 {
 	if (bcdnumber >= limit)
 	{

@@ -31,11 +31,6 @@ public:
 
 	void write_wdi(int state); // watchdog disabled if wdi pin is left floating
 
-	void set_century(bool value)
-	{
-		m_century = value;
-	}
-
 protected:
 	bq4847_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 32768);
 
@@ -54,6 +49,10 @@ protected:
 	virtual bool rtc_feature_leap_year() const override { return true; }
 	virtual bool rtc_battery_backed() const override { return true; }
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+	void set_century(bool value)
+	{
+		m_century = value;
+	}
 
 private:
 	optional_memory_region m_region;
@@ -95,14 +94,16 @@ private:
 class bq4845_device : public bq4847_device
 {
 public:
-	bq4845_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	bq4845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
+
 class bq4802_device : public bq4847_device
 {
 public:
-	bq4802_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	bq4802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 private:
 };
+
 DECLARE_DEVICE_TYPE(BQ4802, bq4802_device)
 DECLARE_DEVICE_TYPE(BQ4845, bq4845_device)
 DECLARE_DEVICE_TYPE(BQ4847, bq4847_device)

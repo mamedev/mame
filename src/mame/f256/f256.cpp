@@ -2,9 +2,10 @@
 // copyright-holders:Daniel Tremblay
 #include "emu.h"
 #include "f256.h"
-
-#include "cpu/m6502/w65c02s.h"
 #include "tiny_vicky.h"
+#include "cpu/m6502/w65c02s.h"
+
+
 
 /**
  *
@@ -57,7 +58,7 @@ void f256_state::f256k(machine_config &config)
     m_maincpu->set_addrmap(AS_PROGRAM, &f256_state::program_map);
 
     RAM(config, m_ram).set_default_size("512k").set_default_value(0x0);
-    for (auto &iopage : m_iopage) 
+    for (auto &iopage : m_iopage)
     {
         RAM(config, iopage).set_default_size("8k").set_default_value(0x0);
     }
@@ -68,11 +69,11 @@ void f256_state::f256k(machine_config &config)
     //m_screen->set_visarea(160, 799, 45, 524);  // this is how it should reall work, but the screen ends up offset
     m_screen->set_visarea(0, 639, 0, 479);
     m_screen->set_screen_update(m_video, FUNC(tiny_vicky_video_device::screen_update));
-    
+
     BQ4802(config, m_rtc, MASTER_CLOCK / 1000);  // RTC clock in kHz
     //set interrupt handler for the RTC
     m_rtc->int_handler().set(FUNC(f256_state::rtc_interrupt_handler));
-    
+
     TINY_VICKY(config, m_video, MASTER_CLOCK);
     m_video->sof_irq_handler().set(FUNC(f256_state::sof_interrupt));
     m_video->sol_irq_handler().set(FUNC(f256_state::sol_interrupt));
@@ -103,7 +104,7 @@ void f256_state::f256k(machine_config &config)
     PC_KBDC(config, m_ps2_keyboard, XTAL(32'768));
     HLE_PS2_MOUSE(config, m_mouse, XTAL(32'768));
     m_mouse->set_pc_kbdc(m_ps2_keyboard);
-    
+
 
     // There are two PSG sound chips
     for (auto &sn: m_sn)
@@ -128,7 +129,7 @@ void f256_state::f256k(machine_config &config)
         sid->add_route(ALL_OUTPUTS, "lspeaker", 0.25, 0);
         sid->add_route(ALL_OUTPUTS, "rspeaker", 0.25, 0);
     }
-    
+
     // Mix all sound chips
     SPEAKER(config, "lspeaker").front_left();
     SPEAKER(config, "rspeaker").front_right();
@@ -136,13 +137,14 @@ void f256_state::f256k(machine_config &config)
     // Add an SD card device
     SPI_SDCARD(config, m_sdcard, 0);
 	m_sdcard->set_prefer_sdhc();
-    m_sdcard->spi_miso_callback().set([this](int state) {
+    m_sdcard->spi_miso_callback().set([this](int state)
+    {
         //m_in_bit = state;
         m_in_latch <<= 1;
         m_in_latch |= state;
     });
 
-    
+
     NS16550(config, m_uart, MASTER_CLOCK);
 
     // The IEC interface is not yet implemented
@@ -166,16 +168,16 @@ void f256_state::program_map(address_map &map)
 {
     // the address range 0:F
     // 0: LUT Edit $80 allows writing to 8 to F, LUT Select 0 to 3
-    map(0x0000, 0x000F).rw(FUNC(f256_state::lut_r), FUNC(f256_state::lut_w));
-    map(0x0010, 0xFFFF).rw(FUNC(f256_state::mem_r), FUNC(f256_state::mem_w));
+    map(0x0000, 0x000f).rw(FUNC(f256_state::lut_r), FUNC(f256_state::lut_w));
+    map(0x0010, 0xffff).rw(FUNC(f256_state::mem_r), FUNC(f256_state::mem_w));
 };
 
 void f256_state::data_map(address_map &map)
 {
-    map(0x0000, 0x1FFF).ram().share(IOPAGE_TAG "0");
-    map(0x0000, 0x1FFF).ram().share(IOPAGE_TAG "1");
-    map(0x0000, 0x1FFF).ram().share(IOPAGE_TAG "2");
-    map(0x0000, 0x1FFF).ram().share(IOPAGE_TAG "3");
+    map(0x0000, 0x1fff).ram().share(IOPAGE_TAG "0");
+    map(0x0000, 0x1fff).ram().share(IOPAGE_TAG "1");
+    map(0x0000, 0x1fff).ram().share(IOPAGE_TAG "2");
+    map(0x0000, 0x1fff).ram().share(IOPAGE_TAG "3");
 }
 
 u8   f256_state::lut_r(offs_t offset)
@@ -245,7 +247,7 @@ u8   f256_state::mem_r(offs_t offset)
     uint8_t mmu = m_mmu_reg & 3;
     uint16_t adj_addr = offset + 0x10;
     uint8_t slot = adj_addr >> 13;
-    uint16_t low_addr = adj_addr & 0x1FFF;
+    uint16_t low_addr = adj_addr & 0x1fff;
     uint8_t bank = mmu_lut[mmu * 8 + slot];
 
     // fslot < 0x40 is RAM, greater is FLASH/ROM
@@ -258,62 +260,62 @@ u8   f256_state::mem_r(offs_t offset)
             {
                 case 0:
                     // here we have a number of devices to read
-                    if (adj_addr >= 0xD018 && adj_addr < 0xD01C)
+                    if (adj_addr >= 0xd018 && adj_addr < 0xd01c)
                     {
                         // return Vicky's scan line and colum
                         uint16_t line = m_screen->hpos();
                         //uint16_t column = m_video->column();
                         logerror("Scanline Addr: %04X, Line: %04X\n", adj_addr, line);
-                        switch (adj_addr - 0xD018)
+                        switch (adj_addr - 0xd018)
                         {
                             case 0:
-                                return 0; //column & 0xFF;
+                                return 0; //column & 0xff;
                             case 1:
                                 return 0; // (column >> 8);
                             case 2:
-                                return line & 0xFF;
+                                return line & 0xff;
                             case 3:
                                 return (line >> 8);
                         }
 
                     }
-                    else if (adj_addr >= 0xD400 && adj_addr < 0xD580)
+                    else if (adj_addr >= 0xd400 && adj_addr < 0xd580)
                     {
                         // SID
                         return 0;
                     }
-                    else if (adj_addr >= 0xD580 && adj_addr < 0xD583)
+                    else if (adj_addr >= 0xd580 && adj_addr < 0xd583)
                     {
                         // OPL3
                         return 0;
                     }
-                    else if (adj_addr >= 0xD600 && adj_addr < 0xD620)
+                    else if (adj_addr >= 0xd600 && adj_addr < 0xd620)
                     {
                         // PSG - left channel D600, right channel D610 - both D608
                         return 0;
                     }
-                    else if (adj_addr >= 0xD620 && adj_addr < 0xD630)
+                    else if (adj_addr >= 0xd620 && adj_addr < 0xd630)
                     {
                         // logerror("CODEC Read Addr: %04X\n", adj_addr);
-                        uint16_t base = adj_addr - 0xD620;
+                        uint16_t base = adj_addr - 0xd620;
                         return m_codec[base];
                     }
-                    else if (adj_addr >= 0xD630 && adj_addr < 0xD640)
+                    else if (adj_addr >= 0xd630 && adj_addr < 0xd640)
                     {
                         // UART
-                        uint8_t v_uart = m_uart->ins8250_r(adj_addr - 0xD630);
+                        uint8_t v_uart = m_uart->ins8250_r(adj_addr - 0xd630);
                         logerror("UART Read %X %02X\n", adj_addr, v_uart);
                         return v_uart;
                     }
-                    else if (adj_addr >= 0xD640 && adj_addr < 0xD64F)
+                    else if (adj_addr >= 0xd640 && adj_addr < 0xd64f)
                     {
                         // PS2
                         logerror("PS/2 Read %04X\n", adj_addr);
-                        switch(adj_addr - 0xD640)
+                        switch(adj_addr - 0xd640)
                         {
                             case 0:
                             case 1:
-                                return m_ps2[adj_addr - 0xD640];
+                                return m_ps2[adj_addr - 0xd640];
                             case 2:
                             {
                                 // Read from the keyboard fifo
@@ -352,78 +354,78 @@ u8   f256_state::mem_r(offs_t offset)
                                 return ((K_AK ? 0x80:0) + (M_AK ? 0x20 : 0) + (msQLen == 0 ? 2 : 0) + (kbQLen == 0? 1 : 0));
                         }
 
-                        return m_ps2[adj_addr - 0xD640];
+                        return m_ps2[adj_addr - 0xd640];
                     }
-                    else if (adj_addr >= 0xD650 && adj_addr < 0xD660)
+                    else if (adj_addr >= 0xd650 && adj_addr < 0xd660)
                     {
                         // Timers
                         switch (adj_addr)
                         {
-                            case 0xD650:
+                            case 0xd650:
                                 return m_timer0_eq;
-                            case 0xD651:
-                                return m_timer0_val & 0xFF;
-                            case 0xD652:
-                                return (m_timer0_val >> 8) & 0xFF;
-                            case 0xD653:
-                                return (m_timer0_val >> 16) & 0xFF;
-                            case 0xD658:
+                            case 0xd651:
+                                return m_timer0_val & 0xff;
+                            case 0xd652:
+                                return (m_timer0_val >> 8) & 0xff;
+                            case 0xd653:
+                                return (m_timer0_val >> 16) & 0xff;
+                            case 0xd658:
                                 return m_timer1_eq;
-                            case 0xD659:
-                                return m_timer1_val & 0xFF;
-                            case 0xD65A:
-                                return (m_timer1_val >> 8) & 0xFF;
-                            case 0xD65B:
-                                return (m_timer1_val >> 16) & 0xFF;
+                            case 0xd659:
+                                return m_timer1_val & 0xff;
+                            case 0xd65a:
+                                return (m_timer1_val >> 8) & 0xff;
+                            case 0xd65b:
+                                return (m_timer1_val >> 16) & 0xff;
                         }
-                        return m_iopage[0]->read(adj_addr - 0xC000);
+                        return m_iopage[0]->read(adj_addr - 0xc000);
                     }
-                    else if (adj_addr >= 0xD660 && adj_addr < 0xD670)
+                    else if (adj_addr >= 0xd660 && adj_addr < 0xd670)
                     {
                         // Interrupt Registers
                         logerror("Interrupt Registers Read: %04X\n", adj_addr);
                         switch (adj_addr)
                         {
-                            case 0xD660:
+                            case 0xd660:
                                 return m_interrupt_reg[0]; // int_pending_0
-                            case 0xD661:
+                            case 0xd661:
                                 return m_interrupt_reg[1]; // int_pending_1
-                            case 0xD662:
+                            case 0xd662:
                                 return m_interrupt_reg[2]; // int_pending_2
-                            case 0xD663:
+                            case 0xd663:
                                 return 0;
-                            case 0xD664:
+                            case 0xd664:
                                 return m_interrupt_polarity[0]; // int_polarity_0
-                            case 0xD665:
+                            case 0xd665:
                                 return m_interrupt_polarity[1]; // int_polarity_1
-                            case 0xD666:
+                            case 0xd666:
                                 return m_interrupt_polarity[2]; // int_polarity_2
-                            case 0xD667:
+                            case 0xd667:
                                 return 0;
-                            case 0xD668:
+                            case 0xd668:
                                 return m_interrupt_edge[0]; // int_edge_0
-                            case 0xD669:
+                            case 0xd669:
                                 return m_interrupt_edge[1]; // int_edge_1
-                            case 0xD66A:
+                            case 0xd66a:
                                 return m_interrupt_edge[2]; // int_edge_2
-                            case 0xD66B:
+                            case 0xd66b:
                                 return 0;
-                            case 0xD66C:
+                            case 0xd66c:
                                 return m_interrupt_masks[0];
-                            case 0xD66D:
+                            case 0xd66d:
                                 return m_interrupt_masks[1];
-                            case 0xD66E:
+                            case 0xd66e:
                                 return m_interrupt_masks[2];
-                            case 0xD66F:
+                            case 0xd66f:
                                 return 0;
 
                         }
                     }
-                    else if (adj_addr >= 0xD680 && adj_addr < 0xD682)
+                    else if (adj_addr >= 0xd680 && adj_addr < 0xd682)
                     {
                         //IEC
-                        logerror("Reading from IEC Reg: %X", adj_addr - 0xD680);
-                        switch (adj_addr - 0xD680)
+                        logerror("Reading from IEC Reg: %X", adj_addr - 0xd680);
+                        switch (adj_addr - 0xd680)
                         {
                             case 0:
                                 logerror(", data: %02X\n", m_iec_in);
@@ -440,180 +442,180 @@ u8   f256_state::mem_r(offs_t offset)
                                 return m_iec_out;
                         }
                     }
-                    else if (adj_addr >= 0xD690 && adj_addr < 0xD6A0)
+                    else if (adj_addr >= 0xd690 && adj_addr < 0xd6a0)
                     {
                         // RTC
                         logerror("RTC Read %04X\n", adj_addr);
-                        return m_rtc->read(adj_addr - 0xDC90);
+                        return m_rtc->read(adj_addr - 0xdc90);
                     }
-                    else if (adj_addr >= 0xD6A0 && adj_addr < 0xD6C0)
+                    else if (adj_addr >= 0xd6a0 && adj_addr < 0xd6c0)
                     {
                         // System Control Registers
                         // D6A0 - buzzer and LED controls - including RESET bit
                         // D6A1 - sound mixer
-                        // D6A2 - Set to 0xDE to enable software reset
-                        // D6A3 - Set to 0xAD to enable software reset
+                        // D6A2 - Set to 0xde to enable software reset
+                        // D6A3 - Set to 0xad to enable software reset
                         // D6A4 - D6A6 : Random Number generator
                         // D6A7 - Macine ID - For the F256, the machine ID will be 0x02. For the F256k, the machine ID will be 0x12.
                         logerror("System Register Read %04X\n", adj_addr);
                         switch (adj_addr){
-                            case 0xD6A0:
+                            case 0xd6a0:
                                 return m_sdcard->get_card_present() ? 0x10:0;
-                            case 0xD6A1:
-                                return m_iopage[0]->read(0xD6A1 - 0xC000);
-                            case 0xD6A4:
+                            case 0xd6a1:
+                                return m_iopage[0]->read(0xd6a1 - 0xc000);
+                            case 0xd6a4:
                                 if (m_rng_enabled)
                                 {
-                                    return get_random() & 0xFF;
+                                    return get_random() & 0xff;
                                 }
                                 else
                                 {
-                                    return m_seed & 0xFF;
+                                    return m_seed & 0xff;
                                 }
-                            case 0xD6A5:
+                            case 0xd6a5:
                                 if (m_rng_enabled)
                                 {
-                                    return get_random() & 0xFF;
+                                    return get_random() & 0xff;
                                 }
                                 else
                                 {
-                                    return (m_seed >> 8) & 0xFF;
+                                    return (m_seed >> 8) & 0xff;
                                 }
-                            case 0xD6A6:
+                            case 0xd6a6:
                                 return m_rng_enabled ? 0x80: 0;
-                            case 0xD6A7:
+                            case 0xd6a7:
                                 return 0x12;  // F256K ID
-                            case 0XD6A8:
+                            case 0xd6a8:
                                 return 'A';
-                            case 0XD6A9:
+                            case 0xd6a9:
                                 return '0';
-                            case 0XD6AA:
+                            case 0xd6aa:
                                 return 1;
-                            case 0XD6AB:
+                            case 0xd6ab:
                                 return 1;
-                            case 0XD6AC:
+                            case 0xd6ac:
                                 return 0;
-                            case 0XD6AD:
+                            case 0xd6ad:
                                 return 0x14;
-                            case 0XD6AE:
+                            case 0xd6ae:
                                 return 0;
-                            case 0XD6AF:
+                            case 0xd6af:
                                 return 0;
                         }
 
                     }
                     // mouse registers
-                    // else if (adj_addr >= 0xD6E0 && adj_addr < 0xD6E9)
+                    // else if (adj_addr >= 0xd6e0 && adj_addr < 0xd6e9)
                     // {
                     //     switch (adj_addr)
                     //     {
-                    //         case 0xD6E0:
+                    //         case 0xd6e0:
                     //             return (m_mouse_mode << 1) + m_mouse_enabled ? 1 : 0;
                     //             break;
-                    //         case 0xD6E2:
-                    //             return m_mouse_x & 0xFF;
-                    //         case 0xD6E3:
-                    //             return (m_mouse_x >> 8) & 0xFF;
-                    //         case 0xD6E4:
-                    //             return m_mouse_y & 0xFF;
-                    //         case 0xD6E5:
-                    //             return (m_mouse_y >> 8) & 0xFF;
+                    //         case 0xd6e2:
+                    //             return m_mouse_x & 0xff;
+                    //         case 0xd6e3:
+                    //             return (m_mouse_x >> 8) & 0xff;
+                    //         case 0xd6e4:
+                    //             return m_mouse_y & 0xff;
+                    //         case 0xd6e5:
+                    //             return (m_mouse_y >> 8) & 0xff;
 
                     //         default:
                     //             break;
                     //     }
                     // }
-                    else if (adj_addr >= 0xD880 && adj_addr < 0xD8C0)
+                    else if (adj_addr >= 0xd880 && adj_addr < 0xd8c0)
                     {
                         // NES
-                        return 0xFF;
+                        return 0xff;
                     }
-                    else if (adj_addr >= 0xDB00 && adj_addr < 0xDB10)
+                    else if (adj_addr >= 0xdb00 && adj_addr < 0xdb10)
                     {
                         // VIA1 - Keyboard for F256K
-                        return m_via6522[1]->read(adj_addr - 0xDB00);
+                        return m_via6522[1]->read(adj_addr - 0xdB00);
                     }
-                    else if (adj_addr >= 0xDC00 && adj_addr < 0xDC10)
+                    else if (adj_addr >= 0xdc00 && adj_addr < 0xdc10)
                     {
                         // VIA0 - Atari Joystick
-                        return m_via6522[0]->read(adj_addr - 0xDC00);
+                        return m_via6522[0]->read(adj_addr - 0xdc00);
                     }
-                    else if (adj_addr >= 0xDD00 && adj_addr < 0xDD20)
+                    else if (adj_addr >= 0xdd00 && adj_addr < 0xdd20)
                     {
                         // SD Card
-                        //m_sdcard->(adj_addr - 0xDD00);
+                        //m_sdcard->(adj_addr - 0xdd00);
                         // logerror("Reading SD Card: %04X\n", adj_addr);
                         switch (adj_addr)
                         {
-                            case 0xDD00:
+                            case 0xdd00:
                             {
                                 // bit 7 is the busy state
                                 u8 spi_reg = (m_spi_clock_cycles > 0 ? 0x80 : 0x00) + (spi_sd_enabled ? 1 : 0); // TODO add clock bits
                                 //logerror("Read SD 0: %02X\n", spi_reg);
                                 return spi_reg;
                             }
-                            case 0xDD01:
+                            case 0xdd01:
                                 //logerror("Read SD 1: %02X\n", m_in_latch);
                                 return m_in_latch;
                             default:
-                                return 0xFF;
+                                return 0xff;
                         }
                     }
-                    else if (adj_addr >= 0xDE00 && adj_addr < 0xDE20)
+                    else if (adj_addr >= 0xde00 && adj_addr < 0xde20)
                     {
                         // Math Coprocessor
-                        switch (adj_addr - 0xDE10)
+                        switch (adj_addr - 0xde10)
                         {
                             case 0:
-                                return m_multiplication_result & 0xFF;
+                                return m_multiplication_result & 0xff;
                             case 1:
-                                return (m_multiplication_result >> 8) & 0xFF;
+                                return (m_multiplication_result >> 8) & 0xff;
                             case 2:
-                                return (m_multiplication_result >> 16) & 0xFF;
+                                return (m_multiplication_result >> 16) & 0xff;
                             case 3:
-                                return (m_multiplication_result >> 24) & 0xFF;
+                                return (m_multiplication_result >> 24) & 0xff;
                             case 4:
-                                return m_division_result & 0xFF;
+                                return m_division_result & 0xff;
                             case 5:
-                                return (m_division_result >> 8) & 0xFF;
+                                return (m_division_result >> 8) & 0xff;
                             case 6:
-                                return m_division_remainder & 0xFF;
+                                return m_division_remainder & 0xff;
                             case 7:
-                                return (m_division_remainder >> 8) & 0xFF;
+                                return (m_division_remainder >> 8) & 0xff;
                             case 8:
-                                return m_addition_result & 0xFF;
+                                return m_addition_result & 0xff;
                             case 9:
-                                return (m_addition_result >> 8) & 0xFF;
-                            case 0xA:
-                                return (m_addition_result >> 16) & 0xFF;
-                            case 0xB:
-                                return (m_addition_result >> 24) & 0xFF;
+                                return (m_addition_result >> 8) & 0xff;
+                            case 0xa:
+                                return (m_addition_result >> 16) & 0xff;
+                            case 0xb:
+                                return (m_addition_result >> 24) & 0xff;
                         }
-                        return m_iopage[0]->read(adj_addr - 0xC000);
+                        return m_iopage[0]->read(adj_addr - 0xc000);
                     }
-                    else if (adj_addr >= 0xDF00 && adj_addr < 0xE000)
+                    else if (adj_addr >= 0xdf00 && adj_addr < 0xe000)
                     {
                         // DMA
-                        if (adj_addr == 0xDF01)
+                        if (adj_addr == 0xdf01)
                         {
                             return m_dma_status;
                         }
                         else
                         {
-                            return m_iopage[0]->read(adj_addr - 0xC000);
+                            return m_iopage[0]->read(adj_addr - 0xc000);
                         }
                     }
                     // Stick everything else in Vicky
-                    // (adj_addr >= 0xC000 && adj_addr < 0xD400) ||  // gamma, mouse graphics, vicky registers, bitmaps, tiles
-                    // (adj_addr >= 0xD800 && adj_addr < 0xD880) ||  // text colors
-                    // (adj_addr >= 0xD900 && adj_addr < 0xDB00)     // sprite registers
-                    return m_iopage[0]->read(adj_addr - 0xC000);
+                    // (adj_addr >= 0xc000 && adj_addr < 0xd400) ||  // gamma, mouse graphics, vicky registers, bitmaps, tiles
+                    // (adj_addr >= 0xd800 && adj_addr < 0xd880) ||  // text colors
+                    // (adj_addr >= 0xd900 && adj_addr < 0xdb00)     // sprite registers
+                    return m_iopage[0]->read(adj_addr - 0xc000);
                 case 1:
-                    return m_iopage[1]->read(adj_addr - 0xC000);
+                    return m_iopage[1]->read(adj_addr - 0xc000);
                 case 2:
-                    return m_iopage[2]->read(adj_addr - 0xC000);
+                    return m_iopage[2]->read(adj_addr - 0xc000);
                 case 3:
-                    return m_iopage[3]->read(adj_addr - 0xC000);
+                    return m_iopage[3]->read(adj_addr - 0xc000);
             }
         }
         offs_t address = (bank << 13) + low_addr;
@@ -624,7 +626,7 @@ u8   f256_state::mem_r(offs_t offset)
         offs_t address = (bank << 13) + low_addr;
         return m_rom->as_u8(address);
     }
-    else if (bank < 0xA0)
+    else if (bank < 0xa0)
     {
         // this is now trying to read expansion RAM/Flash - NOT IMPLEMENTED
     }
@@ -637,7 +639,7 @@ void f256_state::mem_w(offs_t offset, u8 data)
     uint8_t mmu = m_mmu_reg & 3;
     uint16_t adj_addr = offset + 0x10;
     uint8_t slot = adj_addr >> 13;
-    uint16_t low_addr = adj_addr & 0x1FFF;
+    uint16_t low_addr = adj_addr & 0x1fff;
     uint8_t old, combo;
 
     uint8_t bank = mmu_lut[mmu * 8 + slot];
@@ -653,7 +655,7 @@ void f256_state::mem_w(offs_t offset, u8 data)
                 {
                     case 0:
                         // here we have a number of devices to write
-                        if (adj_addr == 0xD001)
+                        if (adj_addr == 0xd001)
                         {
                             logerror("Change Resolution %04X %02X\n", adj_addr, data);
                             if ((data & 0x1) != 0 )
@@ -668,62 +670,65 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                 m_screen->set_visarea(0, 639, 0, 479);
                                 m_screen->set_size(800,525);
                             }
-                            m_iopage[0]->write(0xD001 - 0xC000, data);
+                            m_iopage[0]->write(0xd001 - 0xc000, data);
                         }
-                        else if (adj_addr >= 0xD400 && adj_addr < 0xD419)
+                        else if (adj_addr >= 0xd400 && adj_addr < 0xd419)
                         {
                             // SID 0
-                            m_sid[0]->write(adj_addr - 0xD400, data);
+                            m_sid[0]->write(adj_addr - 0xd400, data);
 
                         }
-                        else if (adj_addr >= 0xD500 && adj_addr < 0xD519)
+                        else if (adj_addr >= 0xd500 && adj_addr < 0xd519)
                         {
                             // SID 1
-                            m_sid[1]->write(adj_addr - 0xD500, data);
+                            m_sid[1]->write(adj_addr - 0xd500, data);
                         }
-                        else if (adj_addr >= 0xD580 && adj_addr < 0xD583)
+                        else if (adj_addr >= 0xd580 && adj_addr < 0xd583)
                         {
                             // OPL3
                             switch(adj_addr)
                             {
-                                case 0xD580:
+                                case 0xd580:
                                     m_opl3_reg = data;
                                     m_opl3->address_w(data);
                                     break;
-                                case 0xD581:
+                                case 0xd581:
                                     //m_opl3->write(m_opl3_reg, data);
-                                    if (m_opl3_reg > 0xFF) { m_opl3->data_hi_w(data);} else { m_opl3->data_w(data);}
+                                    if (m_opl3_reg > 0xff)
+                                    {
+                                        m_opl3->data_hi_w(data);} else { m_opl3->data_w(data);
+                                    }
                                     break;
-                                case 0xD582:
+                                case 0xd582:
                                     m_opl3_reg = 0x100 + data;
                                     m_opl3->address_hi_w(data);
                                     break;
                             }
                         }
-                        else if (adj_addr == 0xD600)
+                        else if (adj_addr == 0xd600)
                         {
                             // PSG
                             logerror("PSG Left Write: %02X\n", data);
                             m_sn[0]->write(data);
                         }
-                        else if (adj_addr == 0xD608)
+                        else if (adj_addr == 0xd608)
                         {
                             // PSG
                             logerror("PSG Both Write: %02X\n", data);
                             m_sn[0]->write(data);
                             m_sn[1]->write(data);
                         }
-                        else if (adj_addr == 0xD610)
+                        else if (adj_addr == 0xd610)
                         {
                             // PSG
                             logerror("PSG Right Write: %02X\n", data);
                             m_sn[1]->write(data);
                         }
-                        else if (adj_addr >= 0xD620 && adj_addr < 0xD630)
+                        else if (adj_addr >= 0xd620 && adj_addr < 0xd630)
                         {
                             // Codec
                             logerror("CODEC Write %04X %02X\n", adj_addr, data);
-                            uint16_t base = adj_addr-0xD620;
+                            uint16_t base = adj_addr-0xd620;
                             m_codec[base] = data;
                             // the program is telling the codec to start
                             if ((base == 2) && ((data & 1) == 1))
@@ -732,17 +737,17 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                 this->machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(f256_state::codec_done), this), 1);   // timer_alloc(timer_expired_delegate(FUNC(f256_state::timer), this));
                             }
                         }
-                        else if (adj_addr >= 0xD630 && adj_addr < 0xD640)
+                        else if (adj_addr >= 0xd630 && adj_addr < 0xd640)
                         {
                             // UART
                             logerror("UART Writing %X %02X\n", adj_addr, data);
-                            m_uart->ins8250_w(adj_addr - 0xD630, data);
+                            m_uart->ins8250_w(adj_addr - 0xd630, data);
                         }
-                        else if (adj_addr >= 0xD640 && adj_addr < 0xD64F)
+                        else if (adj_addr >= 0xd640 && adj_addr < 0xd64f)
                         {
                             // PS/2 Keyboard
                             logerror("PS/2 Write %04X %02X\n", adj_addr, data);
-                            uint16_t delta = adj_addr-0xD640;
+                            uint16_t delta = adj_addr-0xd640;
                             m_ps2[delta] = data;
                             // Only addresses 0 and 1 are writable
                             if (delta == 0)
@@ -784,22 +789,22 @@ void f256_state::mem_w(offs_t offset, u8 data)
 
                             }
                         }
-                        else if (adj_addr >= 0xD650 && adj_addr < 0xD660)
+                        else if (adj_addr >= 0xd650 && adj_addr < 0xd660)
                         {
                             // Timers
                             logerror("Writing to Timer Register: %X, %02X\n", adj_addr, data);
-                            m_iopage[0]->write(adj_addr - 0xC000, data);
+                            m_iopage[0]->write(adj_addr - 0xc000, data);
                             switch(adj_addr)
                             {
-                                case 0xD650:
+                                case 0xd650:
                                     // Timer0 is based on Master Clock and causes some slow down.
                                     // I'm computing the next period and avoiding increments by one.
                                     if ((data & 0x1) == 1)
                                     {
 
-                                        uint32_t timer0_cmp = m_iopage[0]->read(0xD655 - 0xC000) +
-                                            (m_iopage[0]->read(0xD656 - 0xC000) << 8) +
-                                            (m_iopage[0]->read(0xD657 - 0xC000) << 16);
+                                        uint32_t timer0_cmp = m_iopage[0]->read(0xd655 - 0xc000) +
+                                            (m_iopage[0]->read(0xd656 - 0xc000) << 8) +
+                                            (m_iopage[0]->read(0xd657 - 0xc000) << 16);
                                         logerror("Start Timer0: %06X\n", timer0_cmp);
                                         attotime period = attotime::from_double((double)(timer0_cmp - m_timer0_load)/(double)25'175'000);
                                         m_timer0->adjust(period, 0, period);
@@ -819,20 +824,20 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                         m_timer0_val = m_timer0_load;
                                     }
                                     break;
-                                case 0xD651:
-                                case 0xD652:
-                                case 0xD653:
+                                case 0xd651:
+                                case 0xd652:
+                                case 0xd653:
                                     // writing to these registers sets the load value
-                                    m_timer0_load = m_iopage[0]->read(0xD651 - 0xC000) + (m_iopage[0]->read(0xD652 - 0xC000) << 8) +
-                                            (m_iopage[0]->read(0xD653 - 0xC000) << 16);
+                                    m_timer0_load = m_iopage[0]->read(0xd651 - 0xc000) + (m_iopage[0]->read(0xd652 - 0xc000) << 8) +
+                                            (m_iopage[0]->read(0xd653 - 0xc000) << 16);
                                     break;
-                                case 0xD658:
+                                case 0xd658:
                                     // Timer1 is based on the Start of Frame - so it's very slow
                                     if ((data & 0x1) == 1)
                                     {
                                         logerror("Start Timer1 %X, %X\n", data, m_timer1_val);
                                         // Get the frame frequency from video
-                                        int frame_freq = (m_iopage[0]->read(0xD001 - 0xC000) & 1) == 1? 70: 60;
+                                        int frame_freq = (m_iopage[0]->read(0xd001 - 0xc000) & 1) == 1? 70: 60;
                                         m_timer1->adjust(attotime::from_hz(XTAL(frame_freq)), 0, attotime::from_hz(XTAL(frame_freq)));
                                     }
                                     else
@@ -852,22 +857,22 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                         logerror("Timer1 value = %06X\n", m_timer1_val);
                                     }
                                     break;
-                                case 0xD659:
-                                case 0xD65A:
-                                case 0xD65B:
+                                case 0xd659:
+                                case 0xd65a:
+                                case 0xd65b:
                                     // writing to these registers sets the load value
-                                    m_timer1_load = m_iopage[0]->read(0xD659 - 0xC000) + (m_iopage[0]->read(0xD65A - 0xC000) << 8) +
-                                            (m_iopage[0]->read(0xD65B - 0xC000) << 16);
+                                    m_timer1_load = m_iopage[0]->read(0xd659 - 0xc000) + (m_iopage[0]->read(0xd65a - 0xc000) << 8) +
+                                            (m_iopage[0]->read(0xd65b - 0xc000) << 16);
                                     break;
                             }
                         }
-                        else if (adj_addr >= 0xD660 && adj_addr < 0xD670)
+                        else if (adj_addr >= 0xd660 && adj_addr < 0xd670)
                         {
                             // Interrupt Registers
                             logerror("Interrupt Register Write: %04X with %02X\n", adj_addr, data);
                             switch (adj_addr)
                             {
-                                case 0xD660:
+                                case 0xd660:
                                     // int_pending_0
                                     old = m_interrupt_reg[0];
                                     combo = old & data;
@@ -877,7 +882,7 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                     }
 
                                     break;
-                                case 0xD661:
+                                case 0xd661:
                                     // int_pending_1
                                     old = m_interrupt_reg[1];
                                     combo = old & data;
@@ -886,7 +891,7 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                         m_interrupt_reg[1] = old & ~combo;
                                     }
                                     break;
-                                case 0xD662:
+                                case 0xd662:
                                     // int_pending_2
                                     old = m_interrupt_reg[2];
                                     combo = old & data;
@@ -895,46 +900,46 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                         m_interrupt_reg[2] = old & ~combo;
                                     }
                                     break;
-                                case 0xD663:
+                                case 0xd663:
                                     break;
-                                case 0xD664:
+                                case 0xd664:
                                     // int_polarity_0
                                     m_interrupt_polarity[0] = data;
                                     break;
-                                case 0xD665:
+                                case 0xd665:
                                     // int_polarity_1
                                     m_interrupt_polarity[1] = data;
                                     break;
-                                case 0xD666:
+                                case 0xd666:
                                     // int_polarity_2
                                     m_interrupt_polarity[2] = data;
                                     break;
-                                case 0xD667:
+                                case 0xd667:
                                     break;
-                                case 0xD668:
+                                case 0xd668:
                                     // int_edge_0
                                     m_interrupt_edge[0] = data;
                                     break;
-                                case 0xD669:
+                                case 0xd669:
                                     // int_edge_1
                                     m_interrupt_edge[1] = data;
                                     break;
-                                case 0xD66A:
+                                case 0xd66a:
                                     // int_edge_2
                                     m_interrupt_edge[2] = data;
                                     break;
-                                case 0xD66B:
+                                case 0xd66b:
                                     break;
-                                case 0xD66C:
+                                case 0xd66c:
                                     m_interrupt_masks[0] = data;
                                     break;
-                                case 0xD66D:
+                                case 0xd66d:
                                     m_interrupt_masks[1] = data;
                                     break;
-                                case 0xD66E:
+                                case 0xd66e:
                                     m_interrupt_masks[2] = data;
                                     break;
-                                case 0xD66F:
+                                case 0xd66f:
                                     break;
 
                             }
@@ -944,11 +949,11 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                 m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
                             }
                         }
-                        //IEC  - 0xD680 is not writable
-                        else if (adj_addr >= 0xD680 && adj_addr < 0xD682)
+                        //IEC  - 0xd680 is not writable
+                        else if (adj_addr >= 0xd680 && adj_addr < 0xd682)
                         {
                             logerror("Writing to IEC reg %X %02X\n", adj_addr, data);
-                            if (adj_addr == 0xD681)
+                            if (adj_addr == 0xd681)
                             {
                                 m_iec_out = data;
                                 // Bit 6 is RESET
@@ -961,25 +966,25 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                 // m_iec->host_srq_w((data & 0x80) >> 7);
 
                                 // fake the bus
-                                m_iec_in &= 0xFE;
+                                m_iec_in &= 0xfe;
                                 m_iec_in |= (data & 1);
                             }
                         }
-                        else if (adj_addr >= 0xD690 && adj_addr < 0xD6A0)
+                        else if (adj_addr >= 0xd690 && adj_addr < 0xd6a0)
                         {
                             // RTC
                             logerror("RTC Write %04X %02X\n", adj_addr, data);
-                            m_rtc->write(adj_addr - 0xDC90, data);
+                            m_rtc->write(adj_addr - 0xdc90, data);
                         }
-                        else if (adj_addr >= 0xD6A0 && adj_addr < 0xD6A7)
+                        else if (adj_addr >= 0xd6a0 && adj_addr < 0xd6a7)
                         {
                             // RNG
                             logerror("RNG Write %04X %02X\n", adj_addr, data);
                             switch (adj_addr)
                             {
-                                case 0xD6A1:
+                                case 0xd6a1:
                                     // mix the PSG or SID based on the value
-                                    m_iopage[0]->write(0xD6A1 - 0xC000, data);
+                                    m_iopage[0]->write(0xd6a1 - 0xc000, data);
                                     if ((data & 4) == 0)
                                     {
                                         // PSG mix - both outputs to both speakers
@@ -1016,15 +1021,15 @@ void f256_state::mem_w(offs_t offset, u8 data)
                                         m_sid[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5, 0);
                                     }
                                     break;
-                                case 0xD6A4:
-                                    m_seed &= 0xFF00; // zero the low byte
+                                case 0xd6a4:
+                                    m_seed &= 0xff00; // zero the low byte
                                     m_seed |= data;   // set the low byte
                                     break;
-                                case 0xD6A5:
-                                    m_seed &= 0xFF;   // zero the high byte
+                                case 0xd6a5:
+                                    m_seed &= 0xff;   // zero the high byte
                                     m_seed |= (data << 8);  // set the high byte
                                     break;
-                                case 0xD6A6:
+                                case 0xd6a6:
                                     m_rng_enabled = (data & 1);
                                     if ((data & 2) != 0)
                                     {
@@ -1034,32 +1039,32 @@ void f256_state::mem_w(offs_t offset, u8 data)
                             }
                         }
                         // mouse registers
-                        // else if (adj_addr >= 0xD6E0 && adj_addr < 0xD6E9)
+                        // else if (adj_addr >= 0xd6e0 && adj_addr < 0xd6e9)
                         // {
                         //     switch (adj_addr)
                         //     {
-                        //         case 0xD6E0:
+                        //         case 0xd6e0:
                         //             m_mouse_enabled = (data & 1) != 0;
                         //             m_mouse_mode = (data >> 1) & 1;
                         //             break;
-                        //         case 0xD6E2:
+                        //         case 0xd6e2:
                         //             // keep the high byte
-                        //             m_mouse_x &= 0xFF00;
+                        //             m_mouse_x &= 0xff00;
                         //             m_mouse_x |= data;
                         //             break;
-                        //         case 0xD6E3:
+                        //         case 0xd6e3:
                         //             // keep the low byte
-                        //             m_mouse_x &= 0xFF;
+                        //             m_mouse_x &= 0xff;
                         //             m_mouse_x |= data << 8;
                         //             break;
-                        //         case 0xD6E4:
+                        //         case 0xd6e4:
                         //             // keep the high byte
-                        //             m_mouse_y &= 0xFF00;
+                        //             m_mouse_y &= 0xff00;
                         //             m_mouse_y |= data;
                         //             break;
-                        //         case 0xD6E5:
+                        //         case 0xd6e5:
                         //             // keep the low byte
-                        //             m_mouse_y &= 0xFF;
+                        //             m_mouse_y &= 0xff;
                         //             m_mouse_y |= data << 8;
                         //             break;
 
@@ -1067,24 +1072,24 @@ void f256_state::mem_w(offs_t offset, u8 data)
                         //             break;
                         //     }
                         // }
-                        else if (adj_addr >= 0xD880 && adj_addr < 0xD8C0)
+                        else if (adj_addr >= 0xd880 && adj_addr < 0xd8c0)
                         {
-                            // NES - only address 0xD8800 is writable
+                            // NES - only address 0xd8800 is writable
                         }
-                        else if (adj_addr >= 0xDB00 && adj_addr < 0xDC00)
+                        else if (adj_addr >= 0xdb00 && adj_addr < 0xdc00)
                         {
                             // VIA1 - Keyboard for F256K
-                            m_via6522[1]->write(adj_addr - 0xDB00, data);
+                            m_via6522[1]->write(adj_addr - 0xdb00, data);
                         }
-                        else if (adj_addr >= 0xDC00 && adj_addr < 0xDD00)
+                        else if (adj_addr >= 0xdc00 && adj_addr < 0xdd00)
                         {
                             // VIA0 - Atari Joystick
-                            m_via6522[0]->write(adj_addr - 0xDC00, data);
+                            m_via6522[0]->write(adj_addr - 0xdc00, data);
                         }
-                        else if (adj_addr >= 0xDD00 && adj_addr < 0xDD20)
+                        else if (adj_addr >= 0xdd00 && adj_addr < 0xdd20)
                         {
                             // SD Card
-                            switch(adj_addr - 0xDD00)
+                            switch(adj_addr - 0xdd00)
                             {
                                 case 0:
                                     // When bit is set, clock is 400kHz - 0= 12.5 MHz
@@ -1123,34 +1128,34 @@ void f256_state::mem_w(offs_t offset, u8 data)
                             // $DDA0 - $DDBF - MIDI UART (Fixed @ 31,250Baud)
                             // $DDC0 - $DDDF - Master SPI Interface to Supervisor (RP2040)*
                         }
-                        else if (adj_addr >= 0xDE00 && adj_addr < 0xDE20)
+                        else if (adj_addr >= 0xde00 && adj_addr < 0xde20)
                         {
                             // Math Coprocessor - 4 blocks
-                            u8 block = (adj_addr - 0xDE00) >> 2;
-                            if (adj_addr < 0xDE10)
+                            u8 block = (adj_addr - 0xde00) >> 2;
+                            if (adj_addr < 0xde10)
                             {
-                                m_iopage[0]->write(adj_addr - 0xC000, data);
+                                m_iopage[0]->write(adj_addr - 0xc000, data);
                             }
                             switch (block)
                             {
                                 case 0:
-                                    unsignedMultiplier(0xDE00 - 0xC000);
+                                    unsignedMultiplier(0xde00 - 0xc000);
                                     break;
                                 case 1:
-                                    unsignedDivider(0xDE04 - 0xC000);
+                                    unsignedDivider(0xde04 - 0xc000);
                                     break;
                                 case 2:
                                 case 3:
-                                    unsignedAdder(0xDE08 - 0xC000);
+                                    unsignedAdder(0xde08 - 0xc000);
                                     break;
                             }
                         }
-                        else if (adj_addr >= 0xDF00 && adj_addr < 0xE000)
+                        else if (adj_addr >= 0xdf00 && adj_addr < 0xe000)
                         {
                             // DMA
                             logerror("DMA Write %04X %02X\n", adj_addr, data);
-                            m_iopage[0]->write(adj_addr - 0xC000, data);
-                            if ((adj_addr - 0xDF00) == 0)
+                            m_iopage[0]->write(adj_addr - 0xc000, data);
+                            if ((adj_addr - 0xdf00) == 0)
                             {
                                     // control register - when start and enabled are set start DMA operation
                                     if ((data & 0x81) == 0x81)
@@ -1184,23 +1189,23 @@ void f256_state::mem_w(offs_t offset, u8 data)
                             }
                         }
                         // stick everything else in Vicky
-                            // (adj_addr >= 0xC000 && adj_addr < 0xD400) ||  // gamma, mouse graphics, vicky registers, bitmaps, tiles
-                            // (adj_addr >= 0xD800 && adj_addr < 0xD880) ||  // text colors
-                            // (adj_addr >= 0xD900 && adj_addr < 0xDB00)     // sprite registers
+                            // (adj_addr >= 0xc000 && adj_addr < 0xd400) ||  // gamma, mouse graphics, vicky registers, bitmaps, tiles
+                            // (adj_addr >= 0xd800 && adj_addr < 0xd880) ||  // text colors
+                            // (adj_addr >= 0xd900 && adj_addr < 0xdB00)     // sprite registers
                         else
                         {
-                            m_iopage[0]->write(adj_addr - 0xC000, data);
+                            m_iopage[0]->write(adj_addr - 0xc000, data);
                         }
 
                         break;
                     case 1:
-                        m_iopage[1]->write(adj_addr - 0xC000, data);
+                        m_iopage[1]->write(adj_addr - 0xc000, data);
                         break;
                     case 2:
-                        m_iopage[2]->write(adj_addr - 0xC000, data);
+                        m_iopage[2]->write(adj_addr - 0xc000, data);
                         break;
                     case 3:
-                        m_iopage[3]->write(adj_addr - 0xC000, data);
+                        m_iopage[3]->write(adj_addr - 0xc000, data);
                         break;
                 }
             }
@@ -1347,7 +1352,7 @@ void f256_state::unsignedAdder(int baseAddr)
 uint8_t f256_state::get_random()
 {
     uint8_t m_random = rand();
-    return m_random & 0xFF;
+    return m_random & 0xff;
 }
 //-------------------------------------------------
 //  DMA Methods
@@ -1355,11 +1360,11 @@ uint8_t f256_state::get_random()
 void f256_state::perform2DFillDMA()
 {
 
-    uint8_t fill_byte = m_iopage[0]->read(0xDF01 - 0xC000);
-    uint32_t dest_addr = ((m_iopage[0]->read(0xDF0A) & 0x7) << 16) + (m_iopage[0]->read(0xDF09) << 8) + m_iopage[0]->read(0xDF08);
-    uint16_t width_2D = (m_iopage[0]->read(0xDF0D - 0xC000) << 8) + m_iopage[0]->read(0xDF0C - 0xC000);
-    uint16_t height_2D = (m_iopage[0]->read(0xDF0F - 0xC000) << 8) + m_iopage[0]->read(0xDF0E - 0xC000);
-    uint16_t dest_stride = (m_iopage[0]->read(0xDF13 - 0xC000) << 8) + m_iopage[0]->read(0xDF12 - 0xC000);
+    uint8_t fill_byte = m_iopage[0]->read(0xdf01 - 0xc000);
+    uint32_t dest_addr = ((m_iopage[0]->read(0xdf0a) & 0x7) << 16) + (m_iopage[0]->read(0xdf09) << 8) + m_iopage[0]->read(0xdf08);
+    uint16_t width_2D = (m_iopage[0]->read(0xdf0d - 0xc000) << 8) + m_iopage[0]->read(0xdf0c - 0xc000);
+    uint16_t height_2D = (m_iopage[0]->read(0xdf0f - 0xc000) << 8) + m_iopage[0]->read(0xdf0e - 0xc000);
+    uint16_t dest_stride = (m_iopage[0]->read(0xdf13 - 0xc000) << 8) + m_iopage[0]->read(0xdf12 - 0xc000);
     //logerror("2D Fill DMA: DEST: %X, W: %X, H: %X\n", dest_addr, width_2D, height_2D);
     for (int y = 0; y < height_2D; y++)
     {
@@ -1371,20 +1376,20 @@ void f256_state::perform2DFillDMA()
 }
 void f256_state::performLinearFillDMA()
 {
-    uint8_t fill_byte = m_iopage[0]->read(0xDF01 - 0xC000);
-    uint32_t dest_addr = ((m_iopage[0]->read(0xDF0A) & 0x7) << 16) + (m_iopage[0]->read(0xDF09) << 8) + m_iopage[0]->read(0xDF08);
-    uint32_t count = ((m_iopage[0]->read(0xDF0E) & 0x7) << 16) + (m_iopage[0]->read(0xDF0D) << 8) + m_iopage[0]->read(0xDF0C);
+    uint8_t fill_byte = m_iopage[0]->read(0xdf01 - 0xc000);
+    uint32_t dest_addr = ((m_iopage[0]->read(0xdf0a) & 0x7) << 16) + (m_iopage[0]->read(0xdf09) << 8) + m_iopage[0]->read(0xdf08);
+    uint32_t count = ((m_iopage[0]->read(0xdf0e) & 0x7) << 16) + (m_iopage[0]->read(0xdf0d) << 8) + m_iopage[0]->read(0xdf0c);
     //logerror("Linear Fill DMA DEST: %X, LEN: %X\n", dest_addr, count);
     memset(m_ram->pointer() + dest_addr, fill_byte, count);
 }
 void f256_state::perform2DDMA()
 {
-    uint32_t src_addr = ((m_iopage[0]->read(0xDF06) & 0x7) << 16) + (m_iopage[0]->read(0xDF05) << 8) + m_iopage[0]->read(0xDF04);
-    uint32_t dest_addr = ((m_iopage[0]->read(0xDF0A) & 0x7) << 16) + (m_iopage[0]->read(0xDF09) << 8) + m_iopage[0]->read(0xDF08);
-    uint16_t width_2D = (m_iopage[0]->read(0xDF0D - 0xC000) << 8) + m_iopage[0]->read(0xDF0C - 0xC000);
-    uint16_t height_2D = (m_iopage[0]->read(0xDF0F - 0xC000) << 8) + m_iopage[0]->read(0xDF0E - 0xC000);
-    uint16_t src_stride = (m_iopage[0]->read(0xDF11 - 0xC000) << 8) + m_iopage[0]->read(0xDF10 - 0xC000);
-    uint16_t dest_stride = (m_iopage[0]->read(0xDF13 - 0xC000) << 8) + m_iopage[0]->read(0xDF12 - 0xC000);
+    uint32_t src_addr = ((m_iopage[0]->read(0xdf06) & 0x7) << 16) + (m_iopage[0]->read(0xdf05) << 8) + m_iopage[0]->read(0xdf04);
+    uint32_t dest_addr = ((m_iopage[0]->read(0xdf0a) & 0x7) << 16) + (m_iopage[0]->read(0xdf09) << 8) + m_iopage[0]->read(0xdf08);
+    uint16_t width_2D = (m_iopage[0]->read(0xdf0d - 0xc000) << 8) + m_iopage[0]->read(0xdf0c - 0xc000);
+    uint16_t height_2D = (m_iopage[0]->read(0xdf0f - 0xc000) << 8) + m_iopage[0]->read(0xdf0e - 0xc000);
+    uint16_t src_stride = (m_iopage[0]->read(0xdf11 - 0xc000) << 8) + m_iopage[0]->read(0xdf10 - 0xc000);
+    uint16_t dest_stride = (m_iopage[0]->read(0xdf13 - 0xc000) << 8) + m_iopage[0]->read(0xdf12 - 0xc000);
     //logerror("2D Copy DMA, SRC: %X, DEST: %X, W: %X H: %X, SRC_STR: %X, DEST_STR: %X\n", src_addr, dest_addr,
     //    width_2D, height_2D, src_stride, dest_stride);
     for (int y = 0; y < height_2D; y++)
@@ -1398,9 +1403,9 @@ void f256_state::perform2DDMA()
 }
 void f256_state::performLinearDMA()
 {
-    uint32_t src_addr = ((m_iopage[0]->read(0xDF06) & 0x7) << 16) + (m_iopage[0]->read(0xDF05) << 8) + m_iopage[0]->read(0xDF04);
-    uint32_t dest_addr = ((m_iopage[0]->read(0xDF0A) & 0x7) << 16) + (m_iopage[0]->read(0xDF09) << 8) + m_iopage[0]->read(0xDF08);
-    uint32_t count = ((m_iopage[0]->read(0xDF0E) & 0x7) << 16) + (m_iopage[0]->read(0xDF0D) << 8) + m_iopage[0]->read(0xDF0C);
+    uint32_t src_addr = ((m_iopage[0]->read(0xdf06) & 0x7) << 16) + (m_iopage[0]->read(0xdf05) << 8) + m_iopage[0]->read(0xdf04);
+    uint32_t dest_addr = ((m_iopage[0]->read(0xdf0a) & 0x7) << 16) + (m_iopage[0]->read(0xdf09) << 8) + m_iopage[0]->read(0xdf08);
+    uint32_t count = ((m_iopage[0]->read(0xdf0e) & 0x7) << 16) + (m_iopage[0]->read(0xdf0d) << 8) + m_iopage[0]->read(0xdf0c);
     //logerror("Linear Copy DMA SRC: %X, DEST: %X, LEN: %X\n", src_addr, dest_addr, count);
     memcpy(m_ram->pointer() + dest_addr, m_ram->pointer() + src_addr, count);
 }
@@ -1413,12 +1418,9 @@ void f256_state::device_start()
 {
 	driver_device::device_start();
     reset_mmu();
-    // TODO: Copy the font from file to IO Page 1
-    //memcpy(m_iopage[1], m_font, 0x800);
-    for (int i=0;i<0x800;i++)
-    {
-        m_iopage[1]->write(i, m_font->as_u8(i));
-    }
+    // Copy the font from file to IO Page 1
+    memcpy(m_iopage[1]->pointer(), m_font->base(), 0x800);
+
     // Copy the gamma correction table
     uint8_t gamma_1_8[] = {
         0x00, 0x0b, 0x11, 0x15, 0x19, 0x1c, 0x1f, 0x22, 0x25, 0x27, 0x2a, 0x2c, 0x2e, 0x30, 0x32, 0x34,
@@ -1453,10 +1455,10 @@ void f256_state::device_start()
     m_rtc->set_current_time(stnow);
 
     // Initialize the VIA0
-    m_via6522[0]->write(via6522_device::VIA_DDRB, 0xFF);  // DDRB
-    m_via6522[0]->write(via6522_device::VIA_DDRA, 0xFF);  // DDRA
-    m_via6522[0]->write(via6522_device::VIA_PB,   0xFF);  // JOYSTICK 2
-    m_via6522[0]->write(via6522_device::VIA_PA,   0xFF);  // JOYSTICK 1
+    m_via6522[0]->write(via6522_device::VIA_DDRB, 0xff);  // DDRB
+    m_via6522[0]->write(via6522_device::VIA_DDRA, 0xff);  // DDRA
+    m_via6522[0]->write(via6522_device::VIA_PB,   0xff);  // JOYSTICK 2
+    m_via6522[0]->write(via6522_device::VIA_PA,   0xff);  // JOYSTICK 1
     m_via6522[0]->write(via6522_device::VIA_DDRB, 0);     // DDRB
     m_via6522[0]->write(via6522_device::VIA_DDRA, 0);     // DDRA
 
@@ -1623,7 +1625,7 @@ TIMER_CALLBACK_MEMBER(f256_state::spi_clock)
 TIMER_CALLBACK_MEMBER(f256_state::timer0)
 {
     logerror("Timer0 reached value: %06X\n", m_timer0_load);
-    uint8_t reg_t0 = m_iopage[0]->read(0xD650 - 0xC000);
+    uint8_t reg_t0 = m_iopage[0]->read(0xd650 - 0xc000);
     if ((reg_t0 & 0x80) !=0)
     {
         timer0_interrupt_handler(1);
@@ -1631,14 +1633,14 @@ TIMER_CALLBACK_MEMBER(f256_state::timer0)
 }
 // TIMER_CALLBACK_MEMBER(f256_state::timer0)
 // {
-//     uint8_t reg_t0 = m_iopage[0]->read(0xD650 - 0xC000);
-//     uint32_t cmp = m_iopage[0]->read(0xD655 - 0xC000) + (m_iopage[0]->read(0xD656 - 0xC000) << 8) +
-//             (m_iopage[0]->read(0xD657 - 0xC000) << 16);
+//     uint8_t reg_t0 = m_iopage[0]->read(0xd650 - 0xc000);
+//     uint32_t cmp = m_iopage[0]->read(0xd655 - 0xc000) + (m_iopage[0]->read(0xd656 - 0xc000) << 8) +
+//             (m_iopage[0]->read(0xd657 - 0xc000) << 16);
 
 //     // if timer as reached value, then execute the action
 //     if (m_timer0_eq == 1)
 //     {
-//         int8_t action = m_iopage[0]->read(0xD654 - 0xC000);
+//         int8_t action = m_iopage[0]->read(0xd654 - 0xc000);
 //         if (action & 1)
 //         {
 //             logerror("TIMER0 Cleared\n");
@@ -1676,9 +1678,9 @@ TIMER_CALLBACK_MEMBER(f256_state::timer0)
 //             // down
 //             m_timer0_val--;
 //             // roll over to 24 bits
-//             if (m_timer0_val == 0xFFFF'FFFF)
+//             if (m_timer0_val == 0xffff'ffff)
 //             {
-//                 m_timer0_val = 0xFF'FFFF;
+//                 m_timer0_val = 0xff'ffff;
 //             }
 //             if (m_timer0_val == cmp)
 //             {
@@ -1697,14 +1699,14 @@ TIMER_CALLBACK_MEMBER(f256_state::timer0)
 // This timer is much slower than Timer0, so we can use single increments
 TIMER_CALLBACK_MEMBER(f256_state::timer1)
 {
-    uint8_t reg_t1 = m_iopage[0]->read(0xD658 - 0xC000);
-    uint32_t cmp = m_iopage[0]->read(0xD65D - 0xC000) + (m_iopage[0]->read(0xD65E - 0xC000) << 8) +
-            (m_iopage[0]->read(0xD65F - 0xC000) << 16);
+    uint8_t reg_t1 = m_iopage[0]->read(0xd658 - 0xc000);
+    uint32_t cmp = m_iopage[0]->read(0xd65d - 0xc000) + (m_iopage[0]->read(0xd65e - 0xc000) << 8) +
+            (m_iopage[0]->read(0xd65f - 0xc000) << 16);
     logerror("TIMER1 event %06X CMP: %06X\n", m_timer1_val, cmp);
     // if timer as reached value, then execute the action
     if (m_timer1_eq == 1)
     {
-        int8_t action = m_iopage[0]->read(0xD65C - 0xC000);
+        int8_t action = m_iopage[0]->read(0xd65c - 0xc000);
         if (action & 1)
         {
             logerror("TIMER1 Cleared\n");
@@ -1742,9 +1744,9 @@ TIMER_CALLBACK_MEMBER(f256_state::timer1)
             // down
             m_timer1_val--;
             // roll over to 24 bits
-            if (m_timer1_val == 0xFFFF'FFFF)
+            if (m_timer1_val == 0xffff'ffff)
             {
-                m_timer1_val = 0xFF'FFFF;
+                m_timer1_val = 0xff'ffff;
             }
             if (m_timer1_val == cmp)
             {
@@ -1846,7 +1848,7 @@ void f256_state::via1_system_porta_w(u8 data)
     //logerror("VIA1 Write Port A - %02X\n", data);
 
     m_via_keyboard_port_a = data;
-    m_via_keyboard_port_b = 0xFF;
+    m_via_keyboard_port_b = 0xff;
     // scan each keyboard row
     u8 joy1 = m_joy[0]->read();
     m_via_joy1 = joy1 | 0x80;
@@ -1856,7 +1858,7 @@ void f256_state::via1_system_porta_w(u8 data)
         if (BIT(data, r) == 0)
         {
             uint16_t kbval = m_keyboard[r]->read();
-            m_via_keyboard_port_b &= (kbval & 0xFF);
+            m_via_keyboard_port_b &= (kbval & 0xff);
             if (r == 6 || r == 0)
             {
                 if (BIT(kbval,8) == 0)
@@ -1979,18 +1981,18 @@ ROM_START(f256k)
     ROM_LOAD("sb01.bin",             0x08'4000, 0x2000, CRC(21f06e73) SHA1(bbeefb52d4b126b61367169c21599180f3358af7))
     ROM_LOAD("sb02.bin",             0x08'6000, 0x2000, CRC(6ed611b9) SHA1(4a03aa286f6274e6974a3cecdedad651a58f5fb1))
     ROM_LOAD("sb03.bin",             0x08'8000, 0x2000, CRC(653f849d) SHA1(65942d98f26b86499e6359170aa2d0c6e16124ff))
-    ROM_LOAD("sb04.bin",             0x08'A000, 0x2000, CRC(f4aa6049) SHA1(11f02fee6ec412f0c96b27b0b149f72cf1770d15))
-    ROM_LOAD("dos.bin",              0x08'C000, 0x2000, CRC(f3673c4e) SHA1(9c6b70067d7195d4a6bbd7f379b8e5382bf8cc1b))
-    ROM_LOAD("pexec.bin",            0x08'E000, 0x2000, CRC(937c1374) SHA1(40566a51d2ef7321a42fe926b03dee3571c78202))
+    ROM_LOAD("sb04.bin",             0x08'a000, 0x2000, CRC(f4aa6049) SHA1(11f02fee6ec412f0c96b27b0b149f72cf1770d15))
+    ROM_LOAD("dos.bin",              0x08'c000, 0x2000, CRC(f3673c4e) SHA1(9c6b70067d7195d4a6bbd7f379b8e5382bf8cc1b))
+    ROM_LOAD("pexec.bin",            0x08'e000, 0x2000, CRC(937c1374) SHA1(40566a51d2ef7321a42fe926b03dee3571c78202))
 	ROM_LOAD("3b.bin",               0x0F'6000, 0x2000, CRC(7c5d2f27) SHA1(bd1ece74b02a210cfe5a1ed15a0febefc39a1861))
     ROM_LOAD("3c.bin",               0x0F'8000, 0x2000, CRC(2e2295d1) SHA1(9049b83d4506b49701669c335ded2879c7992751))
-    ROM_LOAD("3d.bin",               0x0F'A000, 0x2000, CRC(97743cb7) SHA1(693fa7762528eca6a75c9ea30a603dadc4d55cf9))
-    ROM_LOAD("3e.bin",               0x0F'C000, 0x2000, CRC(9012398f) SHA1(4ae1e37aa3ad4c2b498bf1797d591d7fa25a9d43))
-    ROM_LOAD("3f.bin",               0x0F'E000, 0x2000, CRC(b9ddda5e) SHA1(2f21ef84a269cc2ed25c6441c9451f61dbb5b285))
+    ROM_LOAD("3d.bin",               0x0F'a000, 0x2000, CRC(97743cb7) SHA1(693fa7762528eca6a75c9ea30a603dadc4d55cf9))
+    ROM_LOAD("3e.bin",               0x0F'c000, 0x2000, CRC(9012398f) SHA1(4ae1e37aa3ad4c2b498bf1797d591d7fa25a9d43))
+    ROM_LOAD("3f.bin",               0x0F'e000, 0x2000, CRC(b9ddda5e) SHA1(2f21ef84a269cc2ed25c6441c9451f61dbb5b285))
     ROM_LOAD("docs_superbasic1.bin", 0x09'6000, 0x2000, CRC(ad6398cd) SHA1(d926ae72f8f3af2a0b15ac165bc680db2e647740))
     ROM_LOAD("docs_superbasic2.bin", 0x09'8000, 0x2000, CRC(3cf07824) SHA1(b92e88a99ccf51461f45d317e3e555c5d62792eb))
-    ROM_LOAD("docs_superbasic3.bin", 0x09'A000, 0x2000, CRC(838cb5df) SHA1(103b182ad76c185c4a779f4865c48c5fc71e2a14))
-    ROM_LOAD("docs_superbasic4.bin", 0x09'C000, 0x2000, CRC(bf7841b9) SHA1(7dcbf77c46d680a1c47ac11ed871b832a1479e8e))
+    ROM_LOAD("docs_superbasic3.bin", 0x09'a000, 0x2000, CRC(838cb5df) SHA1(103b182ad76c185c4a779f4865c48c5fc71e2a14))
+    ROM_LOAD("docs_superbasic4.bin", 0x09'c000, 0x2000, CRC(bf7841b9) SHA1(7dcbf77c46d680a1c47ac11ed871b832a1479e8e))
     ROM_LOAD("help.bin",             0x09'4000, 0x2000, CRC(b7d63466) SHA1(bd1dafb5849dee61fd48ece16a409e56de62f464))
 
     // Load the file manager application
@@ -1999,9 +2001,9 @@ ROM_START(f256k)
     ROM_LOAD("fm.02",              0x0A'4000, 0x2000, CRC(9c90cf7d) SHA1(0ed0a09f7bb1eeb0a99141e9d4625d027448b7ea))
     ROM_LOAD("fm.03",              0x0A'6000, 0x2000, CRC(7dfe0934) SHA1(48d2aa2f4c926f7a81e9eab312883e4e573e7cd9))
     ROM_LOAD("fm.04",              0x0A'8000, 0x2000, CRC(3bc5832d) SHA1(5a8491e4c6e4e56e4017ece97615f7eb5aa928e3))
-    ROM_LOAD("fm.05",              0x0A'A000, 0x2000, CRC(48dcadc7) SHA1(52e051d5e8446deddfc469f7aed0f18fb2483715))
-    ROM_LOAD("fm.06",              0x0A'C000, 0x2000, CRC(035c3c8a) SHA1(649601087b7b95a4f432f362428e98291648434c))
-    ROM_LOAD("fm.07",              0x0A'E000, 0x2000, CRC(76f749d4) SHA1(a3e7e881f4c4fd39c94385de2c8d7546a2239d96))
+    ROM_LOAD("fm.05",              0x0A'a000, 0x2000, CRC(48dcadc7) SHA1(52e051d5e8446deddfc469f7aed0f18fb2483715))
+    ROM_LOAD("fm.06",              0x0A'c000, 0x2000, CRC(035c3c8a) SHA1(649601087b7b95a4f432f362428e98291648434c))
+    ROM_LOAD("fm.07",              0x0A'e000, 0x2000, CRC(76f749d4) SHA1(a3e7e881f4c4fd39c94385de2c8d7546a2239d96))
 
     ROM_REGION(0x0800,FONT_TAG,0)
     ROM_LOAD("f256jr_font_micah_jan25th.bin", 0x0000, 0x0800, CRC(6d66da85) SHA1(377dc27ff3a4ae2d80d740b2d16373f8e639eef6))
