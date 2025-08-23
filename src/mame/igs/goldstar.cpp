@@ -211,7 +211,7 @@
 
 
   * New Lucky 8 Lines (A900 2nd gen, Cross and Bell Bonus)
-
+  
   This game has new features.
   The game has stops buttons (stops 1-2-3, and stop all) to stop the reels.
 
@@ -558,6 +558,7 @@ public:
 	void lucky8f(machine_config &config) ATTR_COLD;
 	void lucky8k(machine_config &config) ATTR_COLD;
 	void lucky8p(machine_config &config) ATTR_COLD;
+	void lucky8t(machine_config &config) ATTR_COLD;
 	void lucky8tet(machine_config &config) ATTR_COLD;
 	void luckybar(machine_config &config) ATTR_COLD;
 	void luckylad(machine_config &config) ATTR_COLD;
@@ -617,7 +618,7 @@ private:
 	uint32_t screen_update_mbstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void masked_irq(int state);
-
+	
 	void z80_io_w(offs_t offset, uint8_t data);
 	uint8_t z80_io_r(offs_t offset);
 	void tmcu_io_w(offs_t offset, uint8_t data);
@@ -626,7 +627,7 @@ private:
 	uint8_t m_z80_io_c0;
 	uint8_t tetin3_r();
 
-
+	
 
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
 	//virtual void machine_start() override { goldstar_state::machine_start(); m_tile_bank = 0; }
@@ -790,6 +791,7 @@ void wingco_state::machine_start()
 
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_vidreg));
+	m_ticket_dispenser->motor_w(0);
 }
 
 void unkch_state::machine_start()
@@ -2954,7 +2956,7 @@ void unkch_state::coincount_w(uint8_t data)
 
 */
 
-	m_ticket_dispenser->motor_w(BIT(data, 7));
+	m_ticket_dispenser->motor_w(!BIT(data, 7));
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);  // Credit counter
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);  // Key In counter
@@ -5210,7 +5212,7 @@ static INPUT_PORTS_START( lucky8 )
 	PORT_START("IN4")  // b811
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Out / Attendant")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper")
@@ -5534,20 +5536,8 @@ static INPUT_PORTS_START( ns8linew )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( animalw )
-	PORT_INCLUDE( ns8linew)
-
-	// expects the following two bits ACTIVE_HIGH or it won't boot
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_MODIFY("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-
 static INPUT_PORTS_START( lucky8t )
-	PORT_INCLUDE( ns8linew)
+	PORT_INCLUDE( lucky8 )
 
 	PORT_MODIFY("IN1")  // b801 - No P2 Controls...
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5555,16 +5545,16 @@ static INPUT_PORTS_START( lucky8t )
 	// code expects the b802h bit2 and b811h bit0 ACTIVE HIGH, and b811h bit3 ACTIVE LOW to boot the game.
 	PORT_MODIFY("IN2")  // b802
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )  // code checks if high to boot
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Stop3 / Right")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Stop2 / Bonus Game")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Stop1 / Left")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Stop3 (Right)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Stop2 (Bonus Game)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Stop1 (Left)")
 
 	PORT_MODIFY("IN3")  // b810
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Stop All");
 
 	PORT_MODIFY("IN4")  // b811
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )  // code checks if high to boot
-//  PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )  // code checks if low to boot
 
 	PORT_MODIFY("DSW1")
@@ -6013,8 +6003,8 @@ static INPUT_PORTS_START( luckylad )  // CHECK & FIX ME
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )	
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Out / Attendant")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -10202,8 +10192,8 @@ static INPUT_PORTS_START( lucky8tet )
 
 	//PORT_MODIFY("IN4")  // b811
 	//PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )
-
-	PORT_START("DB_DIP")
+ 	
+	PORT_START("DB_DIP") 
 	PORT_DIPNAME(0x03, 0x03, "Max Bet")   PORT_DIPLOCATION("DB_DIP:1,2")  // MCU port 3.0-3.1
 	PORT_DIPSETTING(0x00, "8")
 	PORT_DIPSETTING(0x01, "16")
@@ -10869,8 +10859,8 @@ void wingco_state::system_outputc_w(uint8_t data)
 
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-
-	m_ticket_dispenser->motor_w(BIT(data, 5));
+	
+	m_ticket_dispenser->motor_w(!BIT(data, 7));
 }
 
 void wingco_state::ay8910_outputa_w(uint8_t data)
@@ -10888,7 +10878,7 @@ uint8_t wingco_state::tetin3_r()
 {
 	uint8_t ret = ioport("IN3")->read();
 
-	if(ret == 0xfe)  // r > LUCKY TO TETRIS
+	if(ret == 0xfe)  // r > LUCKY TO TETRIS 
 	{
 		if(m_tcount++ == 2)
 		{
@@ -10898,7 +10888,7 @@ uint8_t wingco_state::tetin3_r()
 		ret = 0xfe;
 	}
 
-	if(ret == 0xfd)  // t > TETRIS TO LUCKY
+	if(ret == 0xfd)  // t > TETRIS TO LUCKY 
 	{
 		if(m_tcount++ == 2)
 		{
@@ -10923,11 +10913,11 @@ uint8_t wingco_state::z80_io_r(offs_t offset)
 
 	if(offset == 0xc0)
 	{
-		logerror("z80_io_r: offset:%02x\n", offset);
+		logerror("z80_io_r: offset:%02x\n", offset); 
 		return  m_z80_io_c0;
 	}
 
-//  logerror("z80_io_r: offset:%02x\n", offset);  // investigar funcionalidad ports 0x31, 0x32, 0xc0.
+//	logerror("z80_io_r: offset:%02x\n", offset);  // investigar funcionalidad ports 0x31, 0x32, 0xc0.
 	return machine().rand() & 0x0f;
 }
 
@@ -10940,7 +10930,7 @@ void wingco_state::z80_io_w(offs_t offset, uint8_t data)
 
 void wingco_state::tmcu_io_w(offs_t offset, uint8_t data)
 {
-	if ((offset != 0x122) & (offset != 0x123))
+	if ((offset != 0x122) & (offset != 0x123)) 
 	logerror("tmcu_io Write: Offs:%04x - Data:%02x\n", offset, data);
 }
 
@@ -10952,7 +10942,7 @@ uint8_t wingco_state::tmcu_io_r(offs_t offset)
 void wingco_state::tmcu_p1_out(uint8_t data)
 {
 	m_mcu_p1 = data;
-//  logerror("MCU Port1:%02x\n", tmcu_p1_out);
+//	logerror("MCU Port1:%02x\n", tmcu_p1_out);
 
 }
 
@@ -11600,12 +11590,22 @@ void wingco_state::luckylad(machine_config &config)
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 }
 
+void wingco_state::lucky8t(machine_config &config)
+{
+	lucky8(config);
+
+	SN76489(config.replace(), "snsnd", 0);  // unused device
+}
+
 void wingco_state::animalw(machine_config &config)
 {
 	lucky8(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::animalw_map);
+
+	SN76489(config.replace(), "snsnd", 0);  // unused device
 }
+
 
 void wingco_state::super972(machine_config &config)
 {
@@ -20496,7 +20496,7 @@ ROM_START( jpknight )  // D9503 DYNA
 	ROM_LOAD( "jpk_1d.d9", 0x00000, 0x40000, CRC(620d041a) SHA1(b146acac5ddc163a78685b4cc2837422c7799206) )
 	ROM_RELOAD(            0x40000, 0x40000 )
 
-	ROM_REGION( 0x200, "proms", 0 )
+	ROM_REGION( 0x200, "proms", 0 ) // not dumped yet
 	ROM_LOAD( "82s135.c9",  0x000, 0x100, CRC(f062d00c) SHA1(9600317958e79839caecffb98307d7cf6a15e715) )
 	ROM_LOAD( "82s135.c11", 0x100, 0x100, CRC(17c615a5) SHA1(d7bf23402e9da25bc6d9c27f5ceb27f3143caae4) )
 ROM_END
@@ -23801,7 +23801,7 @@ void wingco_state::init_lucky8p()
 void wingco_state::init_lucky8r()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-
+	
 	// bypass protection
 	rom[0x4340] = 0x20;
 	rom[0x4364] = 0x08;
@@ -23815,7 +23815,7 @@ void wingco_state::init_lucky8r()
 void wingco_state::init_lucky8s()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-
+	
 	// bypass protection
 	rom[0x4772] = 0x08;
 	rom[0x47a8] = 0x02;
@@ -24836,7 +24836,7 @@ GAMEL( 1988, lucky8p,    lucky8,   lucky8p,  lucky8,   wingco_state,   init_luck
 GAMEL( 1988, lucky8q,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 16, W-4)",                          0,                     layout_lucky8 )
 GAMEL( 1987, lucky8r,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8r,   ROT0, "TQ System",         "New Lucky 8 Lines (set 17, W-4, turbo, protected)",        0,                     layout_lucky8 )    // shift left registers protection
 GAMEL( 1988, lucky8s,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8s,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 18, W-4, bingo/fever, protected)",  0,                     layout_lucky8 )    // shift left registers protection
-GAME(  1997, lucky8t,    lucky8,   lucky8,   lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg (Bigico)",  "New Lucky 8 Lines (A900 2nd gen, Cross and Bell Bonus)",   0 )                                       // only 1 control set, no lamps except 2 leftovers...
+GAME(  1997, lucky8t,    lucky8,   lucky8t,  lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg (Bigico)",  "New Lucky 8 Lines (A900 2nd gen, Cross and Bell Bonus)",   0 )                                       // only 1 control set, no lamps except 2 leftovers...
 GAMEL( 198?, ns8lines,   0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1985, ns8linesa,  ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,   ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
@@ -24857,8 +24857,8 @@ GAME(  198?, ladylinrd,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_lady
 GAME(  198?, ladylinre,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinre, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            0 )
 GAME ( 1992?,wcat,       0,        wcat3,    lucky8b,  wingco_state,   init_wcat,      ROT0, "Excel",             "Wild Cat",                                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs correct GFX ROMs, I/O, etc
 GAME(  1995, wcat3,      0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // decryption partially wrong, needs soft resets before running. Bad PROM decode
-GAMEL( 199?, animalw,    0,        animalw,  animalw,  wingco_state,   empty_init,     ROT0, "GPS",               "Animal Wonders (ver A900 66)",                             MACHINE_NOT_WORKING,   layout_lucky8 )    // inputs / DIPs need to be checked
-GAMEL( 199?, animalwbl,  animalw,  lucky8,   animalw,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900, bootleg)",                       MACHINE_NOT_WORKING,   layout_lucky8 )    // inputs / DIPs need to be checked
+GAMEL( 199?, animalw,    0,        animalw,  lucky8t,  wingco_state,   empty_init,     ROT0, "GPS",               "Animal Wonders (ver A900 66)",                             0,                     layout_lucky8p1 )    // DIPs need to be checked
+GAMEL( 199?, animalwbl,  animalw,  lucky8t,  lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900, bootleg)",                       0,                     layout_lucky8p1 )    // DIPs need to be checked
 GAMEL( 1989, cb2,        0,        lucky8,   lucky8,   wingco_state,   init_cb2,       ROT0, "Dyna",              "Cherry Bonus II (V2.00 06/01)",                            MACHINE_NOT_WORKING,   layout_lucky8 )    // I/O need to be checked, seems reasonably working
 GAMEL( 1990, cbaai,      0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "bootleg (A.A.I.)",  "Cherry Bonus (A.A.I. bootleg)",                            MACHINE_NOT_WORKING,   layout_lucky8 )    // jumps to 0xf430 but there's nothing there?
 GAMEL( 199?, ttactoe,    0,        lucky8,   ttactoe,  wingco_state,   empty_init,     ROT0, "bootleg (Sundance)","Tic Tac Toe (Sundance bootleg of New Lucky 8 Lines)",      0,                     layout_lucky8 )    // needs more DSW figured out
