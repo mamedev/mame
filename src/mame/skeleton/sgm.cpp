@@ -171,7 +171,21 @@ ROM_START( wpddz )
 	ROM_LOAD( "flash.u21", 0x000000, 0x200000, CRC(e0813bdb) SHA1(41b487da6bfbfb231a0c7297d5a4955a5d4019ff) )
 ROM_END
 
+// 大家斗地主 (Dàjiā Dòu Dìzhǔ)
+ROM_START( dajiaddz )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "internal_rom", 0x00000, 0x20000, NO_DUMP ) // TODO: verify this theory
+
+	ROM_REGION( 0x800000, "gfx", 0 )
+	ROM_LOAD( "flash.u15", 0x000000, 0x400000, CRC(ee18d724) SHA1(9b52c3b5b476e67ab3acf3790439e1666bf0ba48) )
+	ROM_LOAD( "flash.u16", 0x400000, 0x400000, CRC(0dc983a7) SHA1(673db79c162657f2262b08dc474dfdf2326ee3a9) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "flash.u21", 0x000000, 0x200000, CRC(e0813bdb) SHA1(41b487da6bfbfb231a0c7297d5a4955a5d4019ff) ) // same as wpddz
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 2004?, wpddz, 0, wpddz, wpddz, sgm_state, empty_init, ROT0, "SGM", "Wang Pai Dou Dizhou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004?, wpddz,    0, wpddz, wpddz, sgm_state, empty_init, ROT0, "SGM", "Wang Pai Dou Dizhou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?,  dajiaddz, 0, wpddz, wpddz, sgm_state, empty_init, ROT0, "SGM", "Dajia Dou Dizhou",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
