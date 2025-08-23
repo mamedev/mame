@@ -11,7 +11,7 @@ license:CC0-1.0
 	<element name="down_arrow">
 		<image><data><![CDATA[
 			<svg width="9" height="5">
-				<path fill="#fff" d="M 0,0 l 4.5,5 4.5,-5 z" />
+				<path fill="#d4dad3" d="M 0,0 l 4.5,5 4.5,-5 z" />
 			</svg>
 		]]></data></image>
 	</element>
@@ -42,7 +42,7 @@ license:CC0-1.0
 	<element name="envelope_diagram">
 		<image><data><![CDATA[
 			<svg width="87" height="62">
-				<path fill="none" stroke="#fff" strokeWidth="1"
+				<path fill="none" stroke="#d4dad3" strokeWidth="1"
 					d="
 						M 5,31 L 21,1 38,40 51,22 H 72 L 78,31
 						M 87,31 H 0
@@ -85,6 +85,58 @@ license:CC0-1.0
 				<path
 					fill="#36dbe9" stroke="none"
 					d="m 222,0 h 39 l -19.5,32.5 z"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="ensoniq_logo">
+		<image><data><![CDATA[
+			<svg width="423" height="69">
+				<g fill="#d4dad3" fill-rule="evenodd">
+					<!-- e -->
+					<path transform="translate(69, 56)" d="
+						m 0,-12 v 12 h -52 c -4,0 -8,-4 -8,-8 v -28 c 0,-4 4,-8 8,-8 h 44 c 4,0 8,4 8,8 v 20 h -48 v 2 c 0,1 0,2 2,2 z
+						m -48,-14 v -4 c 0,-1 0,-2 2,-2 h 32 c 2,0 2,1 2,2 v 4 z" />
+
+					<!-- n -->
+					<path transform="translate(73.33, 56)" d="
+						m 0,0 h 12 v -30 c 0,-1 0,-2 2,-2 h 32 c 2,0 2,1 2,2 v 30 h 12 v -36 c 0,-4 -4,-8 -8,-8 h -35 c -2,0 -2,0 -5,2 v -2 h -12 z" />
+
+					<!-- s -->
+					<path transform="translate(197.33, 56)" d="
+						m 0,-44 h -52 c -4,0 -8,4 -8,8 v 12 c 0,4 4,8 8,8 h 38 c 1,0 2,1 2,2 0,1 -1,2 -2,2 h -46 v 12 h 52
+						c 4,0 8,-4 8,-8 v -12 c 0,-4 -4,-8 -8,-8 h -38 c -1,0 -2,-1 -2,-2 0,-1 1,-2 2,-2 h 46 z" />
+
+					<!-- o -->
+					<path transform="translate(209.33, 56)" d="
+						m 0,-44 h 44 c 4,0 8,4 8,8 v 28 c 0,5 -4,8 -8,8 h -44 c -4,0 -8,-4 -8,-8 v -28 c 0,-4 4,-8 8,-8 z
+						m 4,30 v -16 c 0,-1 0,-2 2,-2 h 32 c 2,0 2,1 2,2 v 16 c 0,1 0,2 -2,2 h -32 c -2,0 -2,-1 -2,-2 z" />
+
+					<!-- n -->
+					<path transform="translate(265.33, 56)" d="
+						m 0,0 h 12 v -30 c 0,-1 0,-2 2,-2 h 32 c 2,0 2,1 2,2 v 30 h 12 v -36 c 0,-4 -4,-8 -8,-8 h -35 c -2,0 -2,0 -5,2 v -2 h -12 z" />
+
+					<!-- i -->
+					<path transform="translate(329.33, 56)" d="
+						m 0,-44 h 12 v 44 h -12 z
+						m 0,-2 h 12 v -10 h -12 z" />
+
+					<!-- q -->
+					<g transform="translate(353.33, 56)">
+						<!-- body -->
+						<path d="
+							m 0,-44 h 44 c 4,0 8,4 8,8 v 28 c 0,5 -4,8 -8,8 h -44 c -4,0 -8,-4 -8,-8 v -28 c 0,-4 4,-8 8,-8 z
+							m 4,30 v -16 c 0,-1 0,-2 2,-2 h 32 c 2,0 2,1 2,2 v 16 c 0,1 0,2 -2,2 h -32 c -2,0 -2,-1 -2,-2 z" />
+
+						<!-- tail -->
+						<path d="M 27.33,-13.66 l 7.5,-9.33 25.75,20.66 -7.5,9.33 z" />
+					</g>
+				</g>
+
+				<!-- outline around the name: -->
+				<path fill="none" stroke="#d4dad3" stroke-width="6" d="
+					m 348,3 h 63 c 5,0 9,4 9,9 v 45 c 0,5 -4,9 -9,9
+					H 12 c -5,0 -9,-4 -9,-9 V 12 C 3,7 7,3 12,3 h 312" />
 			</svg>
 		]]></data></image>
 	</element>
@@ -166,7 +218,7 @@ license:CC0-1.0
 	<element name="slider_ticks">
 		<image><data><![CDATA[
 			<svg width="46" height="93">
-				<path fill="none" stroke="#fff" strokeWidth="1"
+				<path fill="none" stroke="#d4dad3" strokeWidth="1"
 					d="
 						M  0,18 h 9 m 28,0 h 9
 						m -46,9 h 9 m 28,0 h 9
@@ -229,7 +281,6 @@ license:CC0-1.0
 	<element name="right_rear_text"><text string="RIGHT"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 	<element name="audio_out_text"><text string="AUDIO OUT"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 
-	<!--<element name="ensoniq_logo"><text string="ensoniq"><color red="0.83" green="0.86" blue="0.83" /></text></element>-->
 	<element name="dwsynth_title"><text string="Digital Wave Synthesizer"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 	<element name="cartridge_text"><text string="Program Cartridge"><color red="0.83" green="0.86" blue="0.83" /></text></element>
 	<element name="pitch_text"><text string="PITCH"><color red="0.83" green="0.86" blue="0.83" /></text></element>
@@ -585,7 +636,7 @@ license:CC0-1.0
 		<element ref="white_rect"><bounds x="843" y="-65" width="74" height="1"/></element>
 		<element ref="audio_out_text"><bounds x="863" y="-62" width="34" height="6"/></element>
 
-		<!--<element ref="ensoniq_logo"><bounds x="1089" y="-65" width="129" height="26"/></element>-->
+		<element ref="ensoniq_logo"><bounds x="1089" y="-65" width="129" height="26"/></element>
 
 <!-- Left side of the panel: -->
 		<element ref="cartridge_text"><bounds x="-195" y="88" width="67" height="8"/></element>
