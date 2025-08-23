@@ -963,7 +963,7 @@ void teradrive_state::teradrive(machine_config &config)
 		m_md_ctrl_ports[N]->set_screen(m_mdscreen);
 
 		m_md_ioports[N]->set_in_handler(m_md_ctrl_ports[N], FUNC(sms_control_port_device::in_r));
-  		m_md_ioports[N]->set_out_handler(m_md_ctrl_ports[N], FUNC(sms_control_port_device::out_w));
+		m_md_ioports[N]->set_out_handler(m_md_ctrl_ports[N], FUNC(sms_control_port_device::out_w));
 	}
 
 	// TODO: vestigial

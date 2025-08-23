@@ -2135,7 +2135,7 @@ void goldnpkr_state::kmhpan_map(address_map &map)
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW1");
 	map(0x2400, 0x2400).w("sn", FUNC(sn76489a_device::write));
-//	map(0x2800, 0x2800).w  // SN76489AN, initialized but not present on PCB. not written during gameplay
+//  map(0x2800, 0x2800).w  // SN76489AN, initialized but not present on PCB. not written during gameplay
 	map(0x4000, 0x7fff).rom();
 	map(0xc000, 0xffff).rom();  // extended rom space
 }
@@ -2166,7 +2166,7 @@ void goldnpkr_state::wing_w90_map(address_map &map)
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW1");
 	map(0x2400, 0x2400).w("snsnd", FUNC(sn76489_device::write));  // SN76489AN PSG
-//	map(0x2800, 0x2800).w();  // Initializes another SN76489, not present in the PCB, and then no activity
+//  map(0x2800, 0x2800).w();  // Initializes another SN76489, not present in the PCB, and then no activity
 	map(0x4000, 0x7fff).rom();  // bankswitched through 74ls154
 	map(0xc000, 0xffff).rom();  // bankswitched through 74ls154
 }
@@ -5761,7 +5761,7 @@ void goldnpkr_state::wing_w90(machine_config &config)
 	goldnpkr_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::wing_w90_map);
-	
+
 	PIA6821(config.replace(), m_pia[1]);
 	m_pia[1]->readpa_handler().set(FUNC(goldnpkr_state::snsnd_ready_r));
 	m_pia[1]->writepa_handler().remove();
@@ -13224,7 +13224,7 @@ ROM_START( wing90pkr )
 	ROM_LOAD( "6.17a", 0x7000, 0x1000, CRC(84c6a3cd) SHA1(41fda1f76318771fe8bc475edd25b3c9540b6167) )
 	ROM_CONTINUE(      0xf000, 0x1000 )
 
-    // ROM 3-6a is bad. Should have the jokers missing bitplane at 1000-17FF, but it's not there
+	// ROM 3-6a is bad. Should have the jokers missing bitplane at 1000-17FF, but it's not there
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_FILL(          0x0000, 0x1000, 0x0000 )
 	ROM_LOAD( "3.6a",  0x1000, 0x0800, BAD_DUMP CRC(efff6f44) SHA1(270dec73cbd86016bdb4c79cfd27dfaf9ce0c986) )
@@ -13234,7 +13234,7 @@ ROM_START( wing90pkr )
 	ROM_LOAD( "1.2a",  0x0000, 0x0800, CRC(b85e1275) SHA1(1de37c634643e5ddde0a16a80a9c16625bebfb08) )
 	ROM_CONTINUE(      0x0000, 0x1000 )
 	ROM_IGNORE(                0x0800 )
-	ROM_LOAD( "2.4a",  0x1000, 0x0800, CRC(f475b43e) SHA1(b09544828a75c592e27fdc69646b594cbfcf0483) ) 
+	ROM_LOAD( "2.4a",  0x1000, 0x0800, CRC(f475b43e) SHA1(b09544828a75c592e27fdc69646b594cbfcf0483) )
 	ROM_CONTINUE(      0x1000, 0x1000 )
 	ROM_IGNORE(                0x0800 )
 	ROM_LOAD( "3.6a",  0x2000, 0x0800, BAD_DUMP CRC(efff6f44) SHA1(270dec73cbd86016bdb4c79cfd27dfaf9ce0c986) )
@@ -13309,8 +13309,8 @@ ROM_START( unkicpf80 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 
@@ -13319,7 +13319,7 @@ ROM_END
   the ICP + f40 / f80 systems. Some of them
   looks like hacks and some real programs
   to change different game functionalities.
-  
+
   They add new features like FEVER function,
   Auto Start, or different bet ammounts using
   the hold buttons.
@@ -13400,8 +13400,8 @@ ROM_START( icpf80_01 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_02 )
@@ -13421,8 +13421,8 @@ ROM_START( icpf80_02 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_03 )
@@ -13442,8 +13442,8 @@ ROM_START( icpf80_03 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_04 )
@@ -13463,8 +13463,8 @@ ROM_START( icpf80_04 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_05 )
@@ -13484,8 +13484,8 @@ ROM_START( icpf80_05 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_06 )
@@ -13505,8 +13505,8 @@ ROM_START( icpf80_06 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_07 )
@@ -13526,8 +13526,8 @@ ROM_START( icpf80_07 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_08 )
@@ -13547,8 +13547,8 @@ ROM_START( icpf80_08 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_09 )
@@ -13568,8 +13568,8 @@ ROM_START( icpf80_09 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_10 )
@@ -13589,8 +13589,8 @@ ROM_START( icpf80_10 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_11 )
@@ -13610,8 +13610,8 @@ ROM_START( icpf80_11 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_12 )
@@ -13631,8 +13631,8 @@ ROM_START( icpf80_12 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_13 )
@@ -13652,8 +13652,8 @@ ROM_START( icpf80_13 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_14 )
@@ -13673,8 +13673,8 @@ ROM_START( icpf80_14 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_15 )
@@ -13694,8 +13694,8 @@ ROM_START( icpf80_15 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_16 )
@@ -13715,8 +13715,8 @@ ROM_START( icpf80_16 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_17 )
@@ -13736,8 +13736,8 @@ ROM_START( icpf80_17 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_18 )
@@ -13757,8 +13757,8 @@ ROM_START( icpf80_18 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_19 )
@@ -13778,8 +13778,8 @@ ROM_START( icpf80_19 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_20 )
@@ -13799,8 +13799,8 @@ ROM_START( icpf80_20 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_21 )
@@ -13820,8 +13820,8 @@ ROM_START( icpf80_21 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 
@@ -13865,7 +13865,7 @@ ROM_START( techtrna )
 	ROM_LOAD( "ex_7.bin",   0x6000, 0x1000, CRC(c7d57797) SHA1(2050654860145c64533d5a16ad7076f7ae01b48c) )
 	ROM_LOAD( "ex_8.bin",   0x7000, 0x1000, CRC(e5985cf1) SHA1(e35fbbe5a620a6cf2a0f79416ef9728ad46033db) )
 	ROM_LOAD( "ex_red.bin", 0xf000, 0x1000, CRC(91a3a5e9) SHA1(febd6057be8c91dc9ed916e2bf015b1d5ea61d36) )
-	
+
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_FILL(         0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
 	ROM_LOAD( "4.8a", 0x1000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // char ROM
@@ -14131,11 +14131,11 @@ ROM_END
                      '-------------'
 
   Sets:
-  
+
   dash_a37    DASH! A37             1998/10/22   VER OCT 22, 98
   dash_a37b   DASH! A37             1996/11/18,  AVANTY  50 BET SPECIAL
   lfhouse     Lucky Full House      1996/02/01 ver 1.16, DATA ver 1.05
-  lfhouseb    Lucky Full House      1994/08/26 ver 1.15, DATA ver 1.04 
+  lfhouseb    Lucky Full House      1994/08/26 ver 1.15, DATA ver 1.04
   dynchance   Dynamic Chance        type-3.0 1992/08/29  PART 1-2
   dynchancf   Dynamic Chance(alt)   type-3.0 1992/08/29  PART 1-2  (only 4 bytes of difference)
   dynplus     Dynamic Plus One      1997/01/13, SP TYPE Ver 1.10
@@ -14218,7 +14218,7 @@ ROM_START( lfhouse )
 	ROM_IGNORE(               0x4000 )
 	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
 	ROM_IGNORE(               0x4000 )
-	
+
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
 	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
 	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
@@ -14252,7 +14252,7 @@ ROM_START( lfhouseb )
 	ROM_IGNORE(               0x4000 )
 	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
 	ROM_IGNORE(               0x4000 )
-	
+
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
 	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
 	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
@@ -14286,7 +14286,7 @@ ROM_START( dynchance )
 	ROM_IGNORE(                 0x4000 )
 	ROM_LOAD( "mk3.5n", 0x4000, 0x4000, CRC(3f6c00cb) SHA1(fd45a515a068bf6e2dfa95d411029da0f2eb512c) )
 	ROM_IGNORE(                 0x4000 )
-	
+
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
 	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (data)
 	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (data)
@@ -14320,7 +14320,7 @@ ROM_START( dynchancf )
 	ROM_IGNORE(                 0x4000 )
 	ROM_LOAD( "mk3.5n", 0x4000, 0x4000, CRC(3f6c00cb) SHA1(fd45a515a068bf6e2dfa95d411029da0f2eb512c) )
 	ROM_IGNORE(                 0x4000 )
-	
+
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
 	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (data)
 	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (data)
@@ -14354,7 +14354,7 @@ ROM_START( dynplus )
 	ROM_IGNORE(                 0x4000 )
 	ROM_LOAD( "mk3.5n", 0x4000, 0x4000, CRC(3f6c00cb) SHA1(fd45a515a068bf6e2dfa95d411029da0f2eb512c) )
 	ROM_IGNORE(                 0x4000 )
-	
+
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
 	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (data)
 	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (data)

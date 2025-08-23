@@ -53,7 +53,7 @@ protected:
 	optional_ioport m_io_reset;
 
 private:
-//	IRQ_CALLBACK_MEMBER(genesis_int_callback);
+//  IRQ_CALLBACK_MEMBER(genesis_int_callback);
 	void cpu_space_map(address_map &map);
 
 	void vdp_vint_cb(int state);

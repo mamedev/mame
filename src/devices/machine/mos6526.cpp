@@ -494,7 +494,7 @@ void mos6526_device::update_interrupt()
 		m_icr |= ICR_TB;
 	}
 
-//	m_icr_read = false;
+//  m_icr_read = false;
 }
 
 
@@ -691,7 +691,7 @@ void mos6526_device::device_reset()
 	m_ir1 = 0;
 	m_icr = 0;
 	m_imr = 0;
-//	m_icr_read = false;
+//  m_icr_read = false;
 
 	m_pc = 1;
 	m_flag = 1;

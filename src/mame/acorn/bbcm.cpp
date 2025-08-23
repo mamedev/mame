@@ -956,8 +956,8 @@ void bbcm_state::ht280(machine_config &config)
 
 //void bbcm_state::mpc_prisma_default(device_t* device)
 //{
-//	device->subdevice<bbc_1mhzbus_slot_device>("1mhzbus")->set_default_option("awhd");
-//	device->subdevice<bbc_1mhzbus_slot_device>("1mhzbus")->set_fixed(true);
+//  device->subdevice<bbc_1mhzbus_slot_device>("1mhzbus")->set_default_option("awhd");
+//  device->subdevice<bbc_1mhzbus_slot_device>("1mhzbus")->set_fixed(true);
 //}
 
 

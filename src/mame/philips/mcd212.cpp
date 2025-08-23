@@ -333,7 +333,7 @@ void mcd212_device::process_ica()
 	const int max_to_process = m_ica_height * 120;
 	// LCT depends on the current frame parity
 	uint32_t addr = (BIT(m_csrr[0], CSR1R_PA_BIT) == 0) ? 0x200 : 0x202;
-	
+
 	for (int i = 0; i < max_to_process; i++)
 	{
 		uint32_t cmd = ica[addr++] << 16;
@@ -974,7 +974,7 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	}
 
 	int scanline = screen.vpos();
-	
+
 	// Process VSR and mix if we're in the visible region
 	if (scanline >= m_ica_height)
 	{

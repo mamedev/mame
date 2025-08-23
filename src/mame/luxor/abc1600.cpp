@@ -572,7 +572,7 @@ INPUT_PORTS_END
 void abc1600_state::update_br()
 {
 	// _BR = !_DMADIS || (_DBRQ0 || _DBRQ1 || _DBRQ2)
-	// _IOC = IORQ delayed by 1 clock, or IORQ preceded by 1 clock on MINT2 or MINT5 
+	// _IOC = IORQ delayed by 1 clock, or IORQ preceded by 1 clock on MINT2 or MINT5
 	// _BGACK = !_BR && !_BG && _IOC
 	// DMA0.BAI = _BGACK
 
