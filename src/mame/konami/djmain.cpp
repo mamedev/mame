@@ -16,7 +16,7 @@
  *  GxA05 beatmania CORE REMIX (2000.11)
  *  GxA21 beatmania 6th MIX (2001.07)
  *  GxB07 beatmania 7th MIX (2002.01)
- *  GxC01 beatmania THE FINAL (2002.07))
+ *  GxC01 beatmania THE FINAL (2002.07)
  *
  *  Gx803 Pop'n Music (1998.09)
  *  Gx831 Pop'n Music 2 (1999.04)
