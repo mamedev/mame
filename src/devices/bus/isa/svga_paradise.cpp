@@ -353,12 +353,18 @@ void isa16_wd90c00_jk_device::remap(int space_id, offs_t start, offs_t end)
  *
  *****************/
 
-isa16_wd90c11_lr_device::isa16_wd90c11_lr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISA16_WD90C11_LR, tag, owner, clock),
-	device_isa16_card_interface(mconfig, *this),
-	m_vga(*this, "vga")
+isa16_wd90c11_lr_device::isa16_wd90c11_lr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: isa16_wd90c11_lr_device(mconfig, ISA16_WD90C11_LR, tag, owner, clock)
 {
 }
+
+isa16_wd90c11_lr_device::isa16_wd90c11_lr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_isa16_card_interface(mconfig, *this)
+	, m_vga(*this, "vga")
+{
+}
+
 
 ROM_START( wd90c11_lr )
 	ROM_REGION(0x8000,"vga_rom", ROMREGION_ERASE00)

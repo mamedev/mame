@@ -35,17 +35,14 @@ NOTES (MD side):
 - focus 3 in debugger is the current default for MD side
 
 TODO:
-- "TIMER FAIL" when exiting from setup menu (keyboard?);
 - RAM size always gets detected as 2560K even when it's not (from chipset?);
-- Quadtel EMM driver fails recognizing WD76C10 chipset with j4.0 driver disk;
+- Quadtel EMM driver fails recognizing WD76C10 chipset with drv4;
 - 286 card comms errors out at DOS/V bootstrap, may require VDP vint pending status;
 - Cannot HDD format with floppy insthdd.bat, cannot boot from HDD (needs floppy first).
   Attached disk is a WDL-330PS with no geometry info available;
-- ISA16 needs a way to install 16-bit handlers for 68k accesses to work
-  (matters for pzlcnst game.exe, that will access VDP ports from 286);
-- MD side, as a testbed for rewriting base HW (in particular cart slot and VDP);
-- hookup MD control ports (needs sega/mdioport.h to be moved out);
+- MD side cart slot, expansion bay and VDP rewrites (WIP);
 - SEGA TERADRIVE テラドライブ ユーザーズマニュアル known to exist (not scanned yet)
+- "TIMER FAIL" when exiting from F1 setup menu (keyboard? reset from chipset?);
 
 **************************************************************************************************/
 
@@ -56,6 +53,7 @@ TODO:
 
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/isa/svga_paradise.h"
 #include "bus/megadrive/ctrl/mdioport.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
@@ -162,26 +160,35 @@ void isa16_ibm_79f2661::device_reset()
 	remap(AS_IO, 0, 0xffff);
 }
 
-// TODO: ISA has no method for 16-bit installs!
+// TODO: prettier method for ISA16 memory swap
 void isa16_ibm_79f2661::md_mem_map(address_map &map)
 {
-	map(0x0000, 0x1fff).lrw8(
-		NAME([this] (offs_t offset) {
-			return m_md_space->read_byte((offset) + (m_68k_address << 12));
+	map(0x0000, 0x1fff).lrw16(
+		NAME([this] (offs_t offset, u16 mem_mask) {
+			const u32 base_address = (offset << 1) + (m_68k_address << 12);
+			if (!ACCESSING_BITS_0_7)
+			{
+				u8 res = m_md_space->read_byte(base_address ^ 1);
+				return (u16)(res | (res << 8));
+			}
+			else if (!ACCESSING_BITS_8_15)
+			{
+				u8 res = m_md_space->read_byte(base_address);
+				return (u16)(res | (res << 8));
+			}
+
+			return m_md_space->read_word(base_address, mem_mask);
 		}),
-		NAME([this] (offs_t offset, u8 data) {
-			m_md_space->write_byte((offset) + (m_68k_address << 12), data);
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			const u32 base_address = (offset << 1) + (m_68k_address << 12);
+			if (!ACCESSING_BITS_0_7)
+				m_md_space->write_byte(base_address ^ 1, data >> 8);
+			else if (!ACCESSING_BITS_8_15)
+				m_md_space->write_byte(base_address, data);
+			else
+				m_md_space->write_word(base_address, data, mem_mask);
 		})
 	);
-//  map(0x0000, 0x1fff).lrw16(
-//      NAME([this] (offs_t offset, u16 mem_mask) {
-//          printf("%05x & %08x\n", (offset << 1) + (m_68k_address << 12), mem_mask);
-//          return swapendian_int16(m_md_space->read_word((offset << 1) + (m_68k_address << 12), swapendian_int16(mem_mask)));
-//      }),
-//      NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
-//          m_md_space->write_word((offset << 1) + (m_68k_address << 12), swapendian_int16(data), swapendian_int16(mem_mask));
-//      })
-//  );
 }
 
 void isa16_ibm_79f2661::remap(int space_id, offs_t start, offs_t end)
@@ -192,7 +199,7 @@ void isa16_ibm_79f2661::remap(int space_id, offs_t start, offs_t end)
 
 		if (m_68k_view)
 		{
-			m_isa->install_memory(base_addr, base_addr | 0x1fff, *this, &isa16_ibm_79f2661::md_mem_map);
+			m_isa->install_memory(base_addr, base_addr | 0x1fff, *this, &isa16_ibm_79f2661::md_mem_map, 0xffff);
 		}
 		else
 		{
@@ -308,6 +315,41 @@ void isa16_ibm_79f2661::io_map(address_map &map)
 			//  remap(AS_PROGRAM, 0, 0xfffff);
 		})
 	);
+}
+
+/*
+ * ISA16 WD90C10
+ *
+ * On motherboard, VGA ROM is in BIOS region and unmapped on ISA memory
+ *
+ */
+
+// TODO: really WD90C10
+class isa16_wd90c10_romless_device : public isa16_wd90c11_lr_device
+{
+public:
+	isa16_wd90c10_romless_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
+DEFINE_DEVICE_TYPE(ISA16_WD90C10_ROMLESS,  isa16_wd90c10_romless_device,  "wd90c10_romless",  "Western Digital WD90C10 ROM-less VGA")
+
+// NOTE: it will still try to map a ROM during setup mode
+ROM_START( wd90c10_romless )
+	ROM_REGION(0x8000,"vga_rom", ROMREGION_ERASE00)
+ROM_END
+
+const tiny_rom_entry *isa16_wd90c10_romless_device::device_rom_region() const
+{
+	return ROM_NAME( wd90c10_romless );
+}
+
+
+isa16_wd90c10_romless_device::isa16_wd90c10_romless_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: isa16_wd90c11_lr_device(mconfig, ISA16_WD90C10_ROMLESS, tag, owner, clock)
+{
 }
 
 
@@ -497,8 +539,7 @@ void teradrive_state::md_68k_map(address_map &map)
 			//printf("%04x %04x\n", data, mem_mask);
 			if (!ACCESSING_BITS_0_7)
 			{
-				// HACK: pzlcnst snded.exe writes a word, again ISA16 ...
-				//m_z80_busrq = !!BIT(~data, 8);
+				m_z80_busrq = !!BIT(~data, 8);
 			}
 			else if (!ACCESSING_BITS_8_15)
 			{
@@ -775,6 +816,7 @@ void teradrive_state::machine_reset()
 void teradrive_isa_cards(device_slot_interface &device)
 {
 	device.option_add_internal("bus_switch", ISA16_IBM_79F2661);
+	device.option_add_internal("wd90c10_romless", ISA16_WD90C10_ROMLESS);
 }
 
 void teradrive_state::at_softlists(machine_config &config)
@@ -865,8 +907,7 @@ void teradrive_state::teradrive(machine_config &config)
 	// TODO: should be ESDI built-in interface on riser with IBM WDL-330PS 3.5" HDD, not IDE
 	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "side116", true);
 	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
-	// TODO: really WD90C10
-	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "wd90c11_lr", true);
+	ISA16_SLOT(config, "board5", 0, "isabus", teradrive_isa_cards, "wd90c10_romless", true);
 	ISA16_SLOT(config, "board6", 0, "isabus", teradrive_isa_cards, "bus_switch", true).set_option_machine_config("bus_switch", romdisk_config);
 	ISA16_SLOT(config, "isa1",   0, "isabus", pc_isa16_cards, nullptr, false);
 
