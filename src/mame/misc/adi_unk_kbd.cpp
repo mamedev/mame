@@ -282,17 +282,12 @@ int adi_unk_kbd_device::t1_r()
 
 uint8_t adi_unk_kbd_device::bus_r()
 {
+	uint16_t selected_rows = (m_key_row_p2 << 8 | m_key_row_p1) >> 1;
 	uint8_t data = 0xff;
 
-	// read keys selected by port 1 (bit 1 to 7)
-	for (unsigned i = 1; i < 8; i++)
-		if (BIT(m_key_row_p1, i) == 0)
-			data &= m_keys[i - 1]->read();
-
-	// read keys selected by port 2 (bit 0 to 6)
-	for (unsigned i = 0; i < 7; i++)
-		if (BIT(m_key_row_p2, i) == 0)
-			data &= m_keys[i + 7]->read();
+	for (unsigned i = 0; i < 14; i++)
+		if (BIT(selected_rows, i) == 0)
+			data &= m_keys[i]->read();
 
 	return data;
 }
