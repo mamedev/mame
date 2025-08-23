@@ -211,7 +211,7 @@
 
 
   * New Lucky 8 Lines (A900 2nd gen, Cross and Bell Bonus)
-  
+
   This game has new features.
   The game has stops buttons (stops 1-2-3, and stop all) to stop the reels.
 
@@ -617,7 +617,7 @@ private:
 	uint32_t screen_update_mbstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void masked_irq(int state);
-	
+
 	void z80_io_w(offs_t offset, uint8_t data);
 	uint8_t z80_io_r(offs_t offset);
 	void tmcu_io_w(offs_t offset, uint8_t data);
@@ -626,7 +626,7 @@ private:
 	uint8_t m_z80_io_c0;
 	uint8_t tetin3_r();
 
-	
+
 
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
 	//virtual void machine_start() override { goldstar_state::machine_start(); m_tile_bank = 0; }
@@ -5564,7 +5564,7 @@ static INPUT_PORTS_START( lucky8t )
 
 	PORT_MODIFY("IN4")  // b811
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )  // code checks if high to boot
-//	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+//  PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )  // code checks if low to boot
 
 	PORT_MODIFY("DSW1")
@@ -10202,8 +10202,8 @@ static INPUT_PORTS_START( lucky8tet )
 
 	//PORT_MODIFY("IN4")  // b811
 	//PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )
- 	
-	PORT_START("DB_DIP") 
+
+	PORT_START("DB_DIP")
 	PORT_DIPNAME(0x03, 0x03, "Max Bet")   PORT_DIPLOCATION("DB_DIP:1,2")  // MCU port 3.0-3.1
 	PORT_DIPSETTING(0x00, "8")
 	PORT_DIPSETTING(0x01, "16")
@@ -10869,7 +10869,7 @@ void wingco_state::system_outputc_w(uint8_t data)
 
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	
+
 	m_ticket_dispenser->motor_w(BIT(data, 5));
 }
 
@@ -10888,7 +10888,7 @@ uint8_t wingco_state::tetin3_r()
 {
 	uint8_t ret = ioport("IN3")->read();
 
-	if(ret == 0xfe)  // r > LUCKY TO TETRIS 
+	if(ret == 0xfe)  // r > LUCKY TO TETRIS
 	{
 		if(m_tcount++ == 2)
 		{
@@ -10898,7 +10898,7 @@ uint8_t wingco_state::tetin3_r()
 		ret = 0xfe;
 	}
 
-	if(ret == 0xfd)  // t > TETRIS TO LUCKY 
+	if(ret == 0xfd)  // t > TETRIS TO LUCKY
 	{
 		if(m_tcount++ == 2)
 		{
@@ -10923,11 +10923,11 @@ uint8_t wingco_state::z80_io_r(offs_t offset)
 
 	if(offset == 0xc0)
 	{
-		logerror("z80_io_r: offset:%02x\n", offset); 
+		logerror("z80_io_r: offset:%02x\n", offset);
 		return  m_z80_io_c0;
 	}
 
-//	logerror("z80_io_r: offset:%02x\n", offset);  // investigar funcionalidad ports 0x31, 0x32, 0xc0.
+//  logerror("z80_io_r: offset:%02x\n", offset);  // investigar funcionalidad ports 0x31, 0x32, 0xc0.
 	return machine().rand() & 0x0f;
 }
 
@@ -10940,7 +10940,7 @@ void wingco_state::z80_io_w(offs_t offset, uint8_t data)
 
 void wingco_state::tmcu_io_w(offs_t offset, uint8_t data)
 {
-	if ((offset != 0x122) & (offset != 0x123)) 
+	if ((offset != 0x122) & (offset != 0x123))
 	logerror("tmcu_io Write: Offs:%04x - Data:%02x\n", offset, data);
 }
 
@@ -10952,7 +10952,7 @@ uint8_t wingco_state::tmcu_io_r(offs_t offset)
 void wingco_state::tmcu_p1_out(uint8_t data)
 {
 	m_mcu_p1 = data;
-//	logerror("MCU Port1:%02x\n", tmcu_p1_out);
+//  logerror("MCU Port1:%02x\n", tmcu_p1_out);
 
 }
 
@@ -11495,7 +11495,7 @@ void wingco_state::lucky8(machine_config &config)
 	aysnd.port_a_write_callback().set(FUNC(wingco_state::ay8910_outputa_w));
 	aysnd.port_b_write_callback().set(FUNC(wingco_state::ay8910_outputb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-	
+
 	// payout hardware
 	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(200));
 }
@@ -20496,9 +20496,9 @@ ROM_START( jpknight )  // D9503 DYNA
 	ROM_LOAD( "jpk_1d.d9", 0x00000, 0x40000, CRC(620d041a) SHA1(b146acac5ddc163a78685b4cc2837422c7799206) )
 	ROM_RELOAD(            0x40000, 0x40000 )
 
-	ROM_REGION( 0x200, "proms", 0 ) // not dumped yet
-	ROM_LOAD( "82s135.c8",  0x000, 0x100, BAD_DUMP CRC(4b715969) SHA1(9429dc8698f4ff9195e5e975e62546b7b7e2f856) )
-	ROM_LOAD( "82s135.c9",  0x100, 0x100, BAD_DUMP CRC(85883486) SHA1(adcee60f6fc1e8a75c529951df9e5e1ee277e131) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s135.c9",  0x000, 0x100, CRC(f062d00c) SHA1(9600317958e79839caecffb98307d7cf6a15e715) )
+	ROM_LOAD( "82s135.c11", 0x100, 0x100, CRC(17c615a5) SHA1(d7bf23402e9da25bc6d9c27f5ceb27f3143caae4) )
 ROM_END
 
 /*
@@ -23801,7 +23801,7 @@ void wingco_state::init_lucky8p()
 void wingco_state::init_lucky8r()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	
+
 	// bypass protection
 	rom[0x4340] = 0x20;
 	rom[0x4364] = 0x08;
@@ -23815,7 +23815,7 @@ void wingco_state::init_lucky8r()
 void wingco_state::init_lucky8s()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	
+
 	// bypass protection
 	rom[0x4772] = 0x08;
 	rom[0x47a8] = 0x02;

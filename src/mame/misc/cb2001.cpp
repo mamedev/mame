@@ -1758,9 +1758,9 @@ ROM_START( nmondop ) // DYNA D9702 PCB; DYNA NMP V0.6I in bookkeeping screen
 	ROM_REGION( 0x080000, "gfx", 0 )
 	ROM_LOAD( "nmp1i.12a", 0x000000, 0x80000, CRC(291ca4d1) SHA1(404439c0e73098e253160af1d36f7ceb7f98f49d) )
 
-	ROM_REGION( 0x400, "proms", 0 ) // not dumped yet
-	ROM_LOAD( "82s147.9b",  0x000, 0x200, BAD_DUMP CRC(6c90f6a2) SHA1(f3f592954000d189ded0ed8c6c4444ace0b616a4) )
-	ROM_LOAD( "82s147.11b", 0x200, 0x200, BAD_DUMP CRC(e5aa3ec7) SHA1(675711dd6788b3d0c37573b49b6297cbcd8c8209) )
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "9b",  0x000, 0x100, CRC(d31a9e0a) SHA1(7a72df263cd75d7b83ec74e8d272447f609e6ef6) )
+	ROM_LOAD( "11b", 0x100, 0x100, CRC(cf66ea05) SHA1(5cab7cf203b2b5987c4ae27a3baa61f3bb088872) )
 ROM_END
 
 
@@ -1800,4 +1800,4 @@ GAME( 1997, cb5_11,       cb5,       cb5,       cb5,       cb2001_state, init_sm
 GAME( 1998, mystjb,       0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Mystery J & B (V1.3G)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, tripjack,     0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Triple Jack (V1.6G)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, crzybell,     0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Crazy Bell (V1.2D)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, nmondop,      0,         cb2001,    cb2001,    cb2001_state, empty_init,         ROT0, "Dyna",  "New Mondo Plus (V0.6I)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, nmondop,      0,         cb2001,    cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",  "New Mondo Plus (V0.6I)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
