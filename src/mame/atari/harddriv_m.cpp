@@ -93,7 +93,8 @@ void harddriv_state::device_reset()
 	{
 		/* ensure the ADSP isn’t running while we modify DM */
 		m_adsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
+		
+		/* write 0x5555 across the entire 0x2000-word DM space */
 		address_space &adsp_dm = m_adsp->space(AS_DATA);
 		for (int a = 0; a < 0x2000; a++)
 			adsp_dm.write_word(a, 0x5555, 0xffff);
