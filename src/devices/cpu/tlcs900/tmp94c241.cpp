@@ -17,28 +17,6 @@
 // device type definition
 DEFINE_DEVICE_TYPE(TMP94C241, tmp94c241_device, "tmp94c241", "Toshiba TMP94C241")
 
-enum
-{
-	INTE45,
-	INTE67,
-	INTE89,
-	INTEAB,
-	INTET01,
-	INTET23,
-	INTET45,
-	INTET67,
-	INTET89,
-	INTETAB,
-	INTES0,
-	INTES1,
-	INTETC01,
-	INTETC23,
-	INTETC45,
-	INTETC67,
-	INTE0AD,
-	INTNMWDT
-};
-
 static const struct {
 	uint8_t reg;
 	uint8_t iff;
@@ -122,9 +100,6 @@ tmp94c241_device::tmp94c241_device(const machine_config &mconfig, const char *ta
 	m_t16_cap{ 0, 0, 0, 0, 0, 0, 0, 0 },
 	m_timer_16{ 0, 0, 0, 0 },
 	m_watchdog_mode(0),
-	m_serial_control{ 0, 0 },
-	m_serial_mode{ 0, 0 },
-	m_baud_rate{ 0, 0 },
 	m_od_enable(0),
 	m_ad_mode1(0),
 	m_ad_mode2(0),
@@ -138,7 +113,8 @@ tmp94c241_device::tmp94c241_device(const machine_config &mconfig, const char *ta
 	m_mamr{ 0, 0, 0, 0, 0, 0 },
 	m_dram_refresh{ 0, 0 },
 	m_dram_access{ 0, 0 },
-	m_da_drive(0)
+	m_da_drive(0),
+	m_serial(*this, "serial%u", 0U)
 {
 }
 
@@ -194,9 +170,6 @@ void tmp94c241_device::device_start()
 	save_item(NAME(m_taffcr));
 	save_item(NAME(m_t16run));
 	save_item(NAME(m_watchdog_mode));
-	save_item(NAME(m_serial_control));
-	save_item(NAME(m_serial_mode));
-	save_item(NAME(m_baud_rate));
 	save_item(NAME(m_od_enable));
 	save_item(NAME(m_ad_mode1));
 	save_item(NAME(m_ad_mode2));
@@ -279,12 +252,6 @@ void tmp94c241_device::device_reset()
 	std::fill_n(&m_timer_8[0], 4, 0x00);
 	std::fill_n(&m_timer_16[0], 4, 0x00);
 	m_watchdog_mode = 0x80;
-	for (int i = 0; i < 2; i++)
-	{
-		m_serial_control[i] &= 0x80;
-		m_serial_mode[i] &= 0x80;
-		m_baud_rate[i] = 0x00;
-	}
 	m_od_enable = 0x00;
 	m_ad_mode1 = 0x00;
 	m_ad_mode2 = 0x00;
@@ -303,6 +270,10 @@ void tmp94c241_device::device_reset()
 	std::fill_n(&m_dram_refresh[0], 2, 0x00);
 	std::fill_n(&m_dram_access[0], 2, 0x80);
 	m_da_drive = 0x00;
+
+	m_int_reg[INTES0] |= 0x80;
+	m_int_reg[INTES1] |= 0x80;
+	m_check_irqs = 1;
 }
 
 uint8_t tmp94c241_device::inte_r(offs_t offset)
@@ -695,61 +666,6 @@ void tmp94c241_device::wdcr_w(uint8_t data)
 {
 }
 
-template <uint8_t Channel>
-uint8_t tmp94c241_device::scNbuf_r()
-{
-	return 0;
-}
-
-template <uint8_t Channel>
-void tmp94c241_device::scNbuf_w(uint8_t data)
-{
-	// Fake finish sending data
-	m_int_reg[(Channel == 0) ? INTES0 : INTES1] |= 0x80;
-	m_check_irqs = 1;
-	logerror("sc%dbuf write: %02X\n", Channel, data);
-	//machine().debugger().debug_break();
-}
-
-template <uint8_t Channel>
-uint8_t tmp94c241_device::scNcr_r()
-{
-	uint8_t reg = m_serial_control[Channel];
-	if (!machine().side_effects_disabled())
-		m_serial_control[Channel] &= 0xe3;
-	return reg;
-}
-
-template <uint8_t Channel>
-void tmp94c241_device::scNcr_w(uint8_t data)
-{
-	m_serial_control[Channel] = data;
-}
-
-template <uint8_t Channel>
-uint8_t tmp94c241_device::scNmod_r()
-{
-	return m_serial_mode[Channel];
-}
-
-template <uint8_t Channel>
-void tmp94c241_device::scNmod_w(uint8_t data)
-{
-	m_serial_mode[Channel] = data;
-}
-
-template <uint8_t Channel>
-uint8_t tmp94c241_device::brNcr_r()
-{
-	return m_baud_rate[Channel];
-}
-
-template <uint8_t Channel>
-void tmp94c241_device::brNcr_w(uint8_t data)
-{
-	m_baud_rate[Channel] = data;
-}
-
 uint8_t tmp94c241_device::ode_r()
 {
 	return m_od_enable;
@@ -842,8 +758,19 @@ void tmp94c241_device::port_cr_w(uint8_t data)
 template <uint8_t P>
 void tmp94c241_device::port_fc_w(uint8_t data)
 {
+	if (P == PORT_F)
+	{
+		logerror("PORT FUNCTION F: %02X\n", data);
+	}
 	m_port_function[P] = data;
 }
+
+void tmp94c241_device::device_add_mconfig(machine_config &mconfig)
+{
+	TMP94C241_SERIAL(mconfig, m_serial[0], 0, DERIVED_CLOCK(1, 1));
+	TMP94C241_SERIAL(mconfig, m_serial[1], 1, DERIVED_CLOCK(1, 1));
+}
+
 
 //**************************************************************************
 //  INTERNAL REGISTERS
@@ -939,14 +866,14 @@ void tmp94c241_device::internal_mem(address_map &map)
 	map(0x0000c6, 0x0000c7).r(FUNC(tmp94c241_device::cap_r<CAPB>));
 	map(0x0000c8, 0x0000c8).rw(FUNC(tmp94c241_device::tamod_r), FUNC(tmp94c241_device::tamod_w));
 	map(0x0000c9, 0x0000c9).rw(FUNC(tmp94c241_device::taffcr_r), FUNC(tmp94c241_device::taffcr_w));
-	map(0x0000d0, 0x0000d0).rw(FUNC(tmp94c241_device::scNbuf_r<0>), FUNC(tmp94c241_device::scNbuf_w<0>));
-	map(0x0000d1, 0x0000d1).rw(FUNC(tmp94c241_device::scNcr_r<0>), FUNC(tmp94c241_device::scNcr_w<0>));
-	map(0x0000d2, 0x0000d2).rw(FUNC(tmp94c241_device::scNmod_r<0>), FUNC(tmp94c241_device::scNmod_w<0>));
-	map(0x0000d3, 0x0000d3).rw(FUNC(tmp94c241_device::brNcr_r<0>), FUNC(tmp94c241_device::brNcr_w<0>));
-	map(0x0000d4, 0x0000d4).rw(FUNC(tmp94c241_device::scNbuf_r<1>), FUNC(tmp94c241_device::scNbuf_w<1>));
-	map(0x0000d5, 0x0000d5).rw(FUNC(tmp94c241_device::scNcr_r<1>), FUNC(tmp94c241_device::scNcr_w<1>));
-	map(0x0000d6, 0x0000d6).rw(FUNC(tmp94c241_device::scNmod_r<1>), FUNC(tmp94c241_device::scNmod_w<1>));
-	map(0x0000d7, 0x0000d7).rw(FUNC(tmp94c241_device::brNcr_r<1>), FUNC(tmp94c241_device::brNcr_w<1>));
+	map(0x0000d0, 0x0000d0).rw(m_serial[0], FUNC(tmp94c241_serial_device::scNbuf_r), FUNC(tmp94c241_serial_device::scNbuf_w));
+	map(0x0000d1, 0x0000d1).rw(m_serial[0], FUNC(tmp94c241_serial_device::scNcr_r), FUNC(tmp94c241_serial_device::scNcr_w));
+	map(0x0000d2, 0x0000d2).rw(m_serial[0], FUNC(tmp94c241_serial_device::scNmod_r), FUNC(tmp94c241_serial_device::scNmod_w));
+	map(0x0000d3, 0x0000d3).rw(m_serial[0], FUNC(tmp94c241_serial_device::brNcr_r), FUNC(tmp94c241_serial_device::brNcr_w));
+	map(0x0000d4, 0x0000d4).rw(m_serial[1], FUNC(tmp94c241_serial_device::scNbuf_r), FUNC(tmp94c241_serial_device::scNbuf_w));
+	map(0x0000d5, 0x0000d5).rw(m_serial[1], FUNC(tmp94c241_serial_device::scNcr_r), FUNC(tmp94c241_serial_device::scNcr_w));
+	map(0x0000d6, 0x0000d6).rw(m_serial[1], FUNC(tmp94c241_serial_device::scNmod_r), FUNC(tmp94c241_serial_device::scNmod_w));
+	map(0x0000d7, 0x0000d7).rw(m_serial[1], FUNC(tmp94c241_serial_device::brNcr_r), FUNC(tmp94c241_serial_device::brNcr_w));
 	map(0x0000e0, 0x0000f0).rw(FUNC(tmp94c241_device::inte_r), FUNC(tmp94c241_device::inte_w));
 	map(0x0000f6, 0x0000f6).w(FUNC(tmp94c241_device::iimc_w));
 	map(0x0000f7, 0x0000f7).rw(FUNC(tmp94c241_device::intnmwdt_r), FUNC(tmp94c241_device::intnmwdt_w));
@@ -1123,10 +1050,17 @@ void tmp94c241_device::tlcs900_handle_timers()
 					uint8_t operating_mode,
 					bool invert)
 			{
+				bool match;
 				for ( ; m_timer_change[timer_index] > 0; m_timer_change[timer_index]--)
 				{
 					m_timer_8[timer_index]++;
-					if (m_timer_8[timer_index] == m_treg_8[timer_reg])
+					match = m_timer_8[timer_index] == m_treg_8[timer_reg];
+					if (timer_index == 1)
+					{
+						m_serial[0]->TO2_trigger(match);
+						m_serial[1]->TO2_trigger(match);
+					}
+					if (match)
 					{
 						if (BIT(timer_index, 0) == 0)
 						{
