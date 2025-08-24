@@ -103,7 +103,7 @@ void harddriv_state::device_reset()
 	}
 
 	/* Handshake defaults: keep everything deasserted; crucially, g68irqs = 0
-	   (your DS-IV test tail shows g68irqs=0, gfirqs=0). */
+	   (The DS-IV test tail shows g68irqs=0, gfirqs=0). */
 	m_ds3_gcmd     = 0;
 	m_ds3_gflag    = 0;
 	m_ds3_g68flag  = 0;
