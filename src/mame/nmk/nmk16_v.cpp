@@ -94,8 +94,7 @@ void nmk16_state::video_init()
 	save_pointer(NAME(m_spriteram_old2), 0x1000/2);
 	save_item(NAME(m_bgbank));
 	save_item(NAME(m_mustang_bg_xscroll));
-	save_item(NAME(m_scroll[0]));
-	save_item(NAME(m_scroll[1]));
+	save_item(NAME(m_scroll));
 	save_item(NAME(m_vscroll));
 	save_item(NAME(m_tilerambank));
 }
@@ -112,7 +111,7 @@ VIDEO_START_MEMBER(nmk16_state, bioship)
 	m_tx_tilemap->set_transparent_pen(15);
 
 	video_init();
-	m_bioship_background_bank=0;
+	m_bioship_background_bank = 0;
 	save_item(NAME(m_bioship_background_bank));
 	m_bg_tilemap[0]->set_scrolldx(92, 92);
 	m_bg_tilemap[1]->set_scrolldx(92, 92);
@@ -209,7 +208,7 @@ void nmk16_state::mustang_scroll_w(u16 data)
 	switch (data & 0xff00)
 	{
 		case 0x0000:
-			m_mustang_bg_xscroll = (m_mustang_bg_xscroll & 0x00ff) | ((data & 0x00ff)<<8);
+			m_mustang_bg_xscroll = (m_mustang_bg_xscroll & 0x00ff) | ((data & 0x00ff) << 8);
 			break;
 
 		case 0x0100:
@@ -226,20 +225,20 @@ void nmk16_state::mustang_scroll_w(u16 data)
 			break;
 	}
 
-	m_bg_tilemap[0]->set_scrollx(0,m_mustang_bg_xscroll);
+	m_bg_tilemap[0]->set_scrollx(0, m_mustang_bg_xscroll);
 }
 
 void nmk16_state::bjtwin_scroll_w(offs_t offset, u8 data)
 {
-	m_bg_tilemap[0]->set_scrolly(0,-data);
+	m_bg_tilemap[0]->set_scrolly(0, -data);
 }
 
 void nmk16_state::vandyke_scroll_w(offs_t offset, u16 data)
 {
 	m_vscroll[offset] = data;
 
-	m_bg_tilemap[0]->set_scrollx(0,m_vscroll[0] * 256 + (m_vscroll[1] >> 8));
-	m_bg_tilemap[0]->set_scrolly(0,m_vscroll[2] * 256 + (m_vscroll[3] >> 8));
+	m_bg_tilemap[0]->set_scrollx(0, m_vscroll[0] * 256 + (m_vscroll[1] >> 8));
+	m_bg_tilemap[0]->set_scrolly(0, m_vscroll[2] * 256 + (m_vscroll[3] >> 8));
 }
 
 void nmk16_state::vandykeb_scroll_w(offs_t offset, u16 data, u16 mem_mask)
@@ -252,21 +251,21 @@ void nmk16_state::vandykeb_scroll_w(offs_t offset, u16 data, u16 mem_mask)
 	case 6: COMBINE_DATA(&m_vscroll[0]); break;
 	}
 
-	m_bg_tilemap[0]->set_scrollx(0,m_vscroll[0] * 256 + (m_vscroll[1] >> 8));
-	m_bg_tilemap[0]->set_scrolly(0,m_vscroll[2] * 256 + (m_vscroll[3] >> 8));
+	m_bg_tilemap[0]->set_scrollx(0, m_vscroll[0] * 256 + (m_vscroll[1] >> 8));
+	m_bg_tilemap[0]->set_scrolly(0, m_vscroll[2] * 256 + (m_vscroll[3] >> 8));
 }
 
 void nmk16_state::manybloc_scroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_gunnail_scrollram[offset]);
 
-	m_bg_tilemap[0]->set_scrollx(0,m_gunnail_scrollram[0x82/2]);
-	m_bg_tilemap[0]->set_scrolly(0,m_gunnail_scrollram[0xc2/2]);
+	m_bg_tilemap[0]->set_scrollx(0, m_gunnail_scrollram[0x82/2]);
+	m_bg_tilemap[0]->set_scrolly(0, m_gunnail_scrollram[0xc2/2]);
 }
 
 void nmk16_state::flipscreen_w(u8 data)
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(BIT(data, 0));
 	m_spritegen->set_flip_screen(flip_screen());
 }
 
@@ -292,7 +291,7 @@ void nmk16_state::raphero_scroll_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_gunnail_scrollram[offset]);
 	if ((m_bgvideoram[0].bytes() > 0x4000) && (offset == 0))
 	{
-		int newbank = (m_gunnail_scrollram[0] >> 12) & ((m_bgvideoram[0].bytes() >> 14) - 1);
+		const int newbank = (m_gunnail_scrollram[0] >> 12) & ((m_bgvideoram[0].bytes() >> 14) - 1);
 		if (m_tilerambank != newbank)
 		{
 			m_tilerambank = newbank;
@@ -343,13 +342,13 @@ void nmk16_state::get_colour_6bit(u32 &colour, u32 &pri_mask)
 
 void nmk16_state::get_sprite_flip(u16 attr, int &flipx, int &flipy, int &code)
 {
-	flipy = (attr & 0x200) >> 9;
-	flipx = (attr & 0x100) >> 8;
+	flipy = BIT(attr, 9);
+	flipx = BIT(attr, 8);
 }
 
 void nmk16_state::get_flip_extcode_powerins(u16 attr, int &flipx, int &flipy, int &code)
 {
-	flipx = (attr & 0x1000) >> 12;
+	flipx = BIT(attr, 12);
 	code = (code & 0x7fff) | ((attr & 0x100) << 7);
 }
 
@@ -425,7 +424,7 @@ u32 nmk16_state::screen_update_tharrier(screen_device &screen, bitmap_ind16 &bit
 {
 	screen.priority().fill(0, cliprect);
 	/* I think the protection device probably copies this to the regs... */
-	u16 tharrier_scroll = m_mainram[0x9f00/2];
+	const u16 tharrier_scroll = m_mainram[0x9f00/2];
 
 	m_bg_tilemap[0]->set_scrollx(0, tharrier_scroll);
 
@@ -459,7 +458,7 @@ void nmk16_state::screen_vblank_powerins_bootleg(int state)
 	{
 		m_maincpu->set_input_line(4, HOLD_LINE);
 		// bootlegs don't have DMA?
-		memcpy(m_spriteram_old2.get(),m_spriteram_old.get(), 0x1000);
+		memcpy(m_spriteram_old2.get(), m_spriteram_old.get(), 0x1000);
 		memcpy(m_spriteram_old.get(), m_mainram + m_sprdma_base / 2, 0x1000);
 	}
 }
@@ -511,8 +510,8 @@ void afega_state::video_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	screen.priority().fill(0, cliprect);
 	if (dsw_flipscreen)
 	{
-		flip_screen_x_set(~m_dsw_io[0]->read() & 0x0100);
-		flip_screen_y_set(~m_dsw_io[0]->read() & 0x0200);
+		flip_screen_x_set(BIT(~m_dsw_io[0]->read(), 8));
+		flip_screen_y_set(BIT(~m_dsw_io[0]->read(), 9));
 	}
 
 	m_bg_tilemap[0]->set_scrollx(0, m_afega_scroll[0][1] + xoffset);
@@ -531,8 +530,8 @@ void afega_state::video_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 void afega_state::redhawki_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
-	m_bg_tilemap[0]->set_scrollx(0, m_afega_scroll[1][0]&0xff);
-	m_bg_tilemap[0]->set_scrolly(0, m_afega_scroll[1][1]&0xff);
+	m_bg_tilemap[0]->set_scrollx(0, m_afega_scroll[1][0] & 0xff);
+	m_bg_tilemap[0]->set_scrolly(0, m_afega_scroll[1][1] & 0xff);
 
 	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
 

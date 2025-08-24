@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_CBMIEC_C1626_H
-#define MAME_BUS_CBMIEC_C1626_H
+#ifndef MAME_BUS_CBMIEC_C1526_H
+#define MAME_BUS_CBMIEC_C1526_H
 
 #pragma once
 
@@ -82,4 +82,4 @@ DECLARE_DEVICE_TYPE(C1526, c1526_device)
 DECLARE_DEVICE_TYPE(C4023, c4023_device)
 
 
-#endif // MAME_BUS_CBMIEC_C1626_H
+#endif // MAME_BUS_CBMIEC_C1526_H

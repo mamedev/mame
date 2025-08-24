@@ -47,8 +47,8 @@ public:
 		m_tilegen(*this, "tilegen%u", 1U),
 		m_spritegen(*this, "spritegen"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram16(*this, "spriteram16", 0x800, ENDIANNESS_BIG) { }
-
+		m_spriteram16(*this, "spriteram16", 0x800, ENDIANNESS_BIG)
+	{ }
 
 	void actfancr(machine_config &config);
 
@@ -81,8 +81,8 @@ public:
 		actfancr_state(mconfig, type, tag),
 		m_p(*this, "P%u", 1U),
 		m_dsw(*this, "DSW%u", 1U),
-		m_system(*this, "SYSTEM") { }
-
+		m_system(*this, "SYSTEM")
+	{ }
 
 	void triothep(machine_config &config);
 
@@ -134,7 +134,7 @@ uint8_t triothep_state::control_r()
 		case 1: return m_p[1]->read();
 		case 2: return m_dsw[0]->read();
 		case 3: return m_dsw[1]->read();
-		case 4: return m_system->read();    // VBL
+		case 4: return m_system->read(); // VBL
 	}
 
 	return 0xff;
@@ -234,7 +234,7 @@ static INPUT_PORTS_START( actfancr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2")

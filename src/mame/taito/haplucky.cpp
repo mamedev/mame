@@ -183,4 +183,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, haplucky, 0, haplucky, haplucky, haplucky_state, empty_init, ROT0, "Taito Corporation", "Happy Lucky!", MACHINE_IS_SKELETON )
+GAME( 1985, haplucky, 0, haplucky, haplucky, haplucky_state, empty_init, ROT0, "Taito Corporation", "Happy Lucky!", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -65,7 +65,7 @@ specnext_tiles_device &specnext_tiles_device::set_palette(const char *tag, u16 b
 TILE_GET_INFO_MEMBER(specnext_tiles_device::get_tile_info)
 {
 	const bool attr_in_map = BIT(~m_control, 5);
-	const u8 *data = &m_tiles_info[tile_index << attr_in_map];
+	const u8 *data = &m_tiles_info[tile_index << (attr_in_map ? 1 : 0)];
 	u8 attr = attr_in_map ? *(data + attr_in_map) : m_default_flags;
 	u16 code = *data;
 

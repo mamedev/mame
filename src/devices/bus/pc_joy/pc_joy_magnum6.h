@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_BUS_PC_JOY_MAGNUM6_H
-#define MAME_BUS_PC_JOY_MAGNUM6_H
+#ifndef MAME_BUS_PC_JOY_PC_JOY_MAGNUM6_H
+#define MAME_BUS_PC_JOY_PC_JOY_MAGNUM6_H
 
 #include "pc_joy.h"
 
@@ -21,4 +21,4 @@ public:
 
 DECLARE_DEVICE_TYPE(PC_MAGNUM6_PAD, pc_joy_magnum6_device)
 
-#endif // MAME_BUS_PC_JOY_MAGNUM6_H
+#endif // MAME_BUS_PC_JOY_PC_JOY_MAGNUM6_H

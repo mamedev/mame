@@ -102,8 +102,8 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT          COMPANY             FULLNAME                     FLAGS */
-COMP( 1991, alcat258,  0,      0,      terminal, terminal, terminal_state, empty_init, "Alcatel",            "Terminatel 258",         MACHINE_IS_SKELETON )
-COMP( 1992, loewed,    0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multitel D",             MACHINE_IS_SKELETON )
-COMP( 1988, loewe715,  0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multicom 715L",          MACHINE_IS_SKELETON )
-COMP( 1987, 7951om,    0,      0,      terminal, terminal, terminal_state, empty_init, "Mera-Elzab",         "7951om",                 MACHINE_IS_SKELETON )
-COMP( 1992, teleguide, 0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe / Televerket", "Teleguide",              MACHINE_IS_SKELETON )
+COMP( 1991, alcat258,  0,      0,      terminal, terminal, terminal_state, empty_init, "Alcatel",            "Terminatel 258",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1992, loewed,    0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multitel D",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1988, loewe715,  0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multicom 715L",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1987, 7951om,    0,      0,      terminal, terminal, terminal_state, empty_init, "Mera-Elzab",         "7951om",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1992, teleguide, 0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe / Televerket", "Teleguide",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

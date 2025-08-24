@@ -38,7 +38,7 @@ Designer Mach IV Master 2325 (model 6129) overview:
 #include "emu.h"
 
 #include "cpu/m6502/r65c02.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/w65c02.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
 #include "machine/clock.h"
@@ -286,7 +286,7 @@ INPUT_PORTS_END
 void desdis_state::fdes2100d(machine_config &config)
 {
 	// basic machine hardware
-	M65C02(config, m_maincpu, 6_MHz_XTAL); // W65C02P-6
+	W65C02(config, m_maincpu, 6_MHz_XTAL); // W65C02P-6
 	m_maincpu->set_addrmap(AS_PROGRAM, &desdis_state::fdes2100d_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz

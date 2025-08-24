@@ -23,7 +23,7 @@ public:
 	}
 	void set_tmap3_half_height() { m_tmap3_half_height = true; }
 
-	typedef delegate<void(uint16_t, int*, int*)> c123_tilemap_delegate;
+	typedef delegate<void(uint16_t, int&, int&)> c123_tilemap_delegate;
 	void set_tile_callback(c123_tilemap_delegate tilemap_cb) { m_tilemapinfo.cb = tilemap_cb; }
 
 	// 16 bit handlers

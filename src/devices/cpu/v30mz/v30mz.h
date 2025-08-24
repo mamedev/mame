@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol,Bryan McPhail
-#ifndef MAME_CPU_V32MZ_V30MZ_H
-#define MAME_CPU_V32MZ_V30MZ_H
+#ifndef MAME_CPU_V30MZ_V30MZ_H
+#define MAME_CPU_V30MZ_V30MZ_H
 
 #include "cpu/nec/necdasm.h"
 
@@ -229,4 +229,4 @@ protected:
 	uint16_t m_debugger_temp;
 };
 
-#endif // MAME_CPU_V32MZ_V30MZ_H
+#endif // MAME_CPU_V30MZ_V30MZ_H

@@ -13,8 +13,10 @@
 	function xcode9.XCBuildConfiguration_Project(tr, prj, cfg)
 		local options = xcode8.XCBuildConfiguration_Project(tr, prj, cfg)
 
-		if cfg.flags.Cpp17 or cfg.flags.CppLatest then
+		if cfg.flags.Cpp17 then
 			options.CLANG_CXX_LANGUAGE_STANDARD = "c++17"
+		elseif cfg.flags.Cpp20 or cfg.flags.CppLatest then
+			options.CLANG_CXX_LANGUAGE_STANDARD = "c++20"
 		end
 
 		return table.merge(options, {

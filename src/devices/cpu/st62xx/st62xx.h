@@ -30,8 +30,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_CPU_ST62XX_H
-#define MAME_CPU_ST62XX_H
+#ifndef MAME_CPU_ST62XX_ST62XX_H
+#define MAME_CPU_ST62XX_ST62XX_H
 
 #pragma once
 
@@ -308,4 +308,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(ST6228, st6228_device)
 
-#endif // MAME_CPU_ST62XX_H
+#endif // MAME_CPU_ST62XX_ST62XX_H

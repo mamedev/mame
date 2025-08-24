@@ -18,8 +18,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_MACHINE_74153_H
-#define MAME_DEVICES_MACHINE_74153_H
+#ifndef MAME_MACHINE_74153_H
+#define MAME_MACHINE_74153_H
 
 #pragma once
 
@@ -83,4 +83,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TTL153, ttl153_device)
 
-#endif // MAME_DEVICES_MACHINE_74153_H
+#endif // MAME_MACHINE_74153_H

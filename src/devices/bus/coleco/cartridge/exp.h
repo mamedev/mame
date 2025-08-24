@@ -25,8 +25,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_COLECO_EXP_H
-#define MAME_BUS_COLECO_EXP_H
+#ifndef MAME_BUS_COLECO_CARTRIDGE_EXP_H
+#define MAME_BUS_COLECO_CARTRIDGE_EXP_H
 
 #pragma once
 
@@ -113,4 +113,4 @@ DECLARE_DEVICE_TYPE(COLECOVISION_CARTRIDGE_SLOT, colecovision_cartridge_slot_dev
 
 void colecovision_cartridges(device_slot_interface &device);
 
-#endif // MAME_BUS_COLECO_EXP_H
+#endif // MAME_BUS_COLECO_CARTRIDGE_EXP_H

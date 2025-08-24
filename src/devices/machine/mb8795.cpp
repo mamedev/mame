@@ -65,8 +65,6 @@ void mb8795_device::device_reset()
 
 	txlen = rxlen = txcount = 0;
 
-	set_promisc(true);
-
 	start_send();
 }
 

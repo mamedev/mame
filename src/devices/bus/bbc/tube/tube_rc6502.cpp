@@ -135,8 +135,8 @@ void bbc_tube_rc6502_device::device_add_mconfig(machine_config &config)
 	add_common_devices(config);
 
 	TUBE(config, m_ula);
-	m_ula->pnmi_handler().set_inputline(m_maincpu, M65C02_NMI_LINE);
-	m_ula->pirq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
+	m_ula->pnmi_handler().set_inputline(m_maincpu, W65C02_NMI_LINE);
+	m_ula->pirq_handler().set_inputline(m_maincpu, W65C02_IRQ_LINE);
 	m_ula->prst_handler().set(FUNC(bbc_tube_rc6502_device::prst_w));
 }
 

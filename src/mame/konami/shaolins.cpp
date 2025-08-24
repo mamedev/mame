@@ -181,6 +181,7 @@ private:
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
+
 void shaolins_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
@@ -312,10 +313,10 @@ void shaolins_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			sy--;
 
 		m_gfxdecode->gfx(1)->transmask(bitmap, cliprect,
-			code, color,
-			flipx, flipy,
-			sx, sy,
-			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, m_palettebank << 5));
+				code, color,
+				flipx, flipy,
+				sx, sy,
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, m_palettebank << 5));
 	}
 }
 
@@ -331,11 +332,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(shaolins_state::interrupt)
 {
 	int const scanline = param;
 
+	// vblank interrupt
 	if (scanline == 240)
-			m_maincpu->set_input_line(0, HOLD_LINE);
-	else if ((scanline % 32) == 0)
-		if (m_nmi_enable & 0x02)
-			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_maincpu->set_input_line(0, HOLD_LINE);
+
+	// NMI from 16V
+	if ((scanline & 0x1f) == 0x10 && m_nmi_enable & 0x02)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -505,23 +508,17 @@ GFXDECODE_END
 
 void shaolins_state::shaolins(machine_config &config)
 {
-	static constexpr XTAL MASTER_CLOCK = XTAL(18'432'000);
-
 	// basic machine hardware
-	MC6809E(config, m_maincpu, MASTER_CLOCK / 12);        // verified on PCB
+	MC6809E(config, m_maincpu, 18.432_MHz_XTAL / 12); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &shaolins_state::prg_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(shaolins_state::interrupt), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(60);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	// Pixel clock is / 3 the master clock (6'144'000)
 	// Refresh rate is 60.606060 Hz, with 40 vblank lines
-	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 256, 264, 16, 240);
+	m_screen->set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(shaolins_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -531,21 +528,11 @@ void shaolins_state::shaolins(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, "sn1", MASTER_CLOCK / 12).add_route(ALL_OUTPUTS, "mono", 1.0);        // verified on PCB
-
-	SN76489A(config, "sn2", MASTER_CLOCK / 6).add_route(ALL_OUTPUTS, "mono", 1.0);        // verified on PCB
+	// also seen with SN76489 instead of SN76489A on a bootleg board
+	SN76489A(config, "sn1", 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.0); // verified on PCB
+	SN76489A(config, "sn2", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 1.0); // verified on PCB
 }
 
-#if 0 // a bootleg board was found with downgraded sound hardware, but is otherwise the same
-void shaolins_state::shaolinb(machine_config &config)
-{
-	shaolins(config);
-
-	SN76489(config.replace(), "sn1", MASTER_CLOCK / 12).add_route(ALL_OUTPUTS, "mono", 1.0); // only type verified on PCB
-
-	SN76489(config.replace(), "sn2", MASTER_CLOCK / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
-}
-#endif
 
 /***************************************************************************
 

@@ -130,7 +130,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
 	void kingdrby_palette(palette_device &palette) const;
 	void kingdrbb_palette(palette_device &palette) const;
-	uint32_t screen_update_kingdrby(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void cowrace_sound_io(address_map &map) ATTR_COLD;
@@ -274,7 +274,7 @@ void kingdrby_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	}
 }
 
-uint32_t kingdrby_state::screen_update_kingdrby(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t kingdrby_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const rectangle &visarea = screen.visible_area();
 	rectangle clip;
@@ -560,7 +560,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) //2p hopper i/o
 
 	PORT_START("IN1")   // ppi0 (5001)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) //?
 	PORT_DIPNAME( 0x02, 0x02, "IN1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -743,7 +743,7 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN1")   // ppi0 (5001)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) //?
 	PORT_DIPNAME( 0x02, 0x02, "IN1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1010,7 +1010,7 @@ void kingdrby_state::kingdrby(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 0, 224-1);    /* controlled by CRTC */
-	screen.set_screen_update(FUNC(kingdrby_state::screen_update_kingdrby));
+	screen.set_screen_update(FUNC(kingdrby_state::screen_update));
 
 	mc6845_device &crtc(MC6845(config, "crtc", CLK_1/32));  /* 53.333 Hz. guess */
 	crtc.set_screen("screen");

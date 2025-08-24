@@ -91,4 +91,4 @@ ROM_END
     Drivers
 ***************************************************************************/
 
-SYST( 1982, tr606, 0, 0, tr606, tr606, tr606_state, empty_init, "Roland", "TR-606 Drumatix", MACHINE_IS_SKELETON )
+SYST( 1982, tr606, 0, 0, tr606, tr606, tr606_state, empty_init, "Roland", "TR-606 Drumatix", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

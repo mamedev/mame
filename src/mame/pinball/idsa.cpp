@@ -356,20 +356,19 @@ void idsa_state::idsa(machine_config &config)
 
 	/* sound hardware */
 	genpin_audio(config);
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	SP0256(config, m_speech, 3120000); // unknown variant
-	m_speech->add_route(ALL_OUTPUTS, "lspeaker", 1.5);
+	m_speech->add_route(ALL_OUTPUTS, "speaker", 1.5, 0);
 
 	ay8910_device &aysnd1(AY8910(config, "aysnd1", 2000000));  // 2Mhz according to pinmame, schematic omits the clock line
 	aysnd1.port_a_write_callback().set(FUNC(idsa_state::ay1_a_w));
 	aysnd1.port_b_write_callback().set(FUNC(idsa_state::ay1_b_w));
-	aysnd1.add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	aysnd1.add_route(ALL_OUTPUTS, "speaker", 0.75, 0);
 
 	ay8910_device &aysnd2(AY8910(config, "aysnd2", 2000000));
 	aysnd2.port_a_write_callback().set(FUNC(idsa_state::ay2_a_w));
 	aysnd2.port_b_write_callback().set(FUNC(idsa_state::ay2_b_w));
-	aysnd2.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	aysnd2.add_route(ALL_OUTPUTS, "speaker", 0.75, 1);
 }
 
 void idsa_state::bsktbllp(machine_config &config)
@@ -410,5 +409,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1985, v1,       0, idsa,     idsa, idsa_state, empty_init, ROT0, "IDSA", "V.1",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, bsktbllp, 0, bsktbllp, idsa, idsa_state, empty_init, ROT0, "IDSA", "Basket Ball", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, v1,       0, idsa,     idsa, idsa_state, empty_init, ROT0, "IDSA", "V.1",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1987, bsktbllp, 0, bsktbllp, idsa, idsa_state, empty_init, ROT0, "IDSA", "Basket Ball", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

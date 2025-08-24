@@ -79,4 +79,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1998, pdt3100, 0, 0, pdt3100, pdt3100, pdt3100_state, empty_init, "Symbol", "PDT 3100 (v1.10-00)", MACHINE_IS_SKELETON)
+COMP(1998, pdt3100, 0, 0, pdt3100, pdt3100, pdt3100_state, empty_init, "Symbol", "PDT 3100 (v1.10-00)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

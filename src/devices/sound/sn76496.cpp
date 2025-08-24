@@ -231,9 +231,7 @@ void sn76496_base_device::device_start()
 
 	m_sound = stream_alloc(0, (m_stereo? 2:1), sample_rate);
 
-	for (int i = 0; i < 4; i++) m_volume[i] = 0;
-
-	m_last_register = m_sega_style_psg?3:0; // Sega VDP PSG defaults to selected period reg for 2nd channel
+	m_last_register = m_sega_style_psg ? 3 :0; // Sega VDP PSG defaults to selected period reg for 2nd channel
 	for (int i = 0; i < 8; i+=2)
 	{
 		m_register[i] = 0;
@@ -243,8 +241,8 @@ void sn76496_base_device::device_start()
 	for (int i = 0; i < 4; i++)
 	{
 		m_output[i] = 0;
-		m_period[i] = 0;
-		m_count[i] = 0;
+		m_period[i] = 0x3ff;
+		m_count[i] = 0x3ff;
 	}
 
 	m_RNG = m_feedback_mask;
@@ -273,6 +271,9 @@ void sn76496_base_device::device_start()
 		out /= 1.258925412; /* = 10 ^ (2/20) = 2dB */
 	}
 	m_vol_table[15] = 0;
+
+	for (int i = 0; i < 4; i++)
+		m_volume[i] = m_vol_table[8];
 
 	m_ready_state = true;
 
@@ -365,16 +366,14 @@ inline bool sn76496_base_device::in_noise_mode()
 	return ((m_register[6] & 4)!=0);
 }
 
-void sn76496_base_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void sn76496_base_device::sound_stream_update(sound_stream &stream)
 {
 	int i;
-	auto *lbuffer = &outputs[0];
-	auto *rbuffer = m_stereo ? &outputs[1] : nullptr;
 
 	int16_t out;
 	int16_t out2 = 0;
 
-	for (int sampindex = 0; sampindex < lbuffer->samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		// clock chip once
 		if (m_current_clock > 0) // not ready for new divided clock
@@ -440,9 +439,9 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream, std::vector<
 
 		if (m_negate) { out = -out; out2 = -out2; }
 
-		lbuffer->put_int(sampindex, out, 32768);
+		stream.put_int(0, sampindex, out, 32768);
 		if (m_stereo)
-			rbuffer->put_int(sampindex, out2, 32768);
+			stream.put_int(1, sampindex, out2, 32768);
 	}
 }
 

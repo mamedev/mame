@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Aaron Giles, Alex W. Jackson
-#ifndef MAME_NAMCO_C45_H
-#define MAME_NAMCO_C45_H
+#ifndef MAME_NAMCO_NAMCO_C45ROAD_H
+#define MAME_NAMCO_NAMCO_C45ROAD_H
 
 #pragma once
 
@@ -69,4 +69,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NAMCO_C45_ROAD, namco_c45_road_device)
 
-#endif // MAME_NAMCO_C45_H
+#endif // MAME_NAMCO_NAMCO_C45ROAD_H

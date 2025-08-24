@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_NES_CTRL_BANDAIHS
-#define MAME_BUS_NES_CTRL_BANDAIHS
+#ifndef MAME_BUS_NES_CTRL_BANDAIHS_H
+#define MAME_BUS_NES_CTRL_BANDAIHS_H
 
 #pragma once
 
@@ -50,4 +50,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NES_BANDAIHS, nes_bandaihs_device)
 
-#endif // MAME_BUS_NES_CTRL_BANDAIHS
+#endif // MAME_BUS_NES_CTRL_BANDAIHS_H

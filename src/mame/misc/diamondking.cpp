@@ -411,7 +411,7 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME         PARENT       MACHINE      INPUT        CLASS              INIT        ROT   COMPANY           FULLNAME                               FLAGS
-GAME(2001, caribe,      0,           ss1b550base, caribe,      ss1b550base_state, empty_init, ROT0, "SegaSA / Sonic", "Caribe",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, diamondking, 0,           diamondking, diamondking, diamondking_state, empty_init, ROT0, "SegaSA / Sonic", "Diamond King (with Euro support)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, diamondkinp, diamondking, diamondking, diamondking, diamondking_state, empty_init, ROT0, "SegaSA / Sonic", "Diamond King (without Euro support)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(19??, goldenchip,  0,           ss1b202base, goldenchip,  ss1b202base_state, empty_init, ROT0, "SegaSA / Sonic", "Golden Chip",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(2001, caribe,      0,           ss1b550base, caribe,      ss1b550base_state, empty_init, ROT0, "SegaSA / Sonic", "Caribe",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, diamondking, 0,           diamondking, diamondking, diamondking_state, empty_init, ROT0, "SegaSA / Sonic", "Diamond King (with Euro support)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, diamondkinp, diamondking, diamondking, diamondking, diamondking_state, empty_init, ROT0, "SegaSA / Sonic", "Diamond King (without Euro support)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(19??, goldenchip,  0,           ss1b202base, goldenchip,  ss1b202base_state, empty_init, ROT0, "SegaSA / Sonic", "Golden Chip",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

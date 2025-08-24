@@ -178,4 +178,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1976, fonz, 0, segattl, 0, segattl_state, empty_init, ROT0, "Sega", "Fonz", MACHINE_IS_SKELETON )
+GAME( 1976, fonz, 0, segattl, 0, segattl_state, empty_init, ROT0, "Sega", "Fonz", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

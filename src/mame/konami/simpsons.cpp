@@ -113,6 +113,8 @@ Notes:
 #include "emupal.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 
 namespace {
 
@@ -121,53 +123,53 @@ class simpsons_state : public driver_device
 public:
 	simpsons_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_palette_view(*this, "palette_view"),
-		m_video_view(*this, "video_view"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k052109(*this, "k052109"),
 		m_k053246(*this, "k053246"),
-		m_k053251(*this, "k053251")
+		m_k053251(*this, "k053251"),
+		m_mainbank(*this, "mainbank"),
+		m_audiobank(*this, "audiobank"),
+		m_io_eepromout(*this, "EEPROMOUT"),
+		m_palette_view(*this, "palette_view"),
+		m_video_view(*this, "video_view")
 	{ }
 
 	void simpsons(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void bank0000_map(address_map &map) ATTR_COLD;
-	void bank2000_map(address_map &map) ATTR_COLD;
-	void main_map(address_map &map) ATTR_COLD;
-	void z80_map(address_map &map) ATTR_COLD;
-
-	TIMER_CALLBACK_MEMBER(dma_start);
-	TIMER_CALLBACK_MEMBER(dma_end);
-
-	/* memory pointers */
-	std::unique_ptr<uint16_t[]>   m_spriteram;
-
-	/* video-related */
-	int        m_sprite_colorbase = 0;
-	int        m_layer_colorbase[3]{};
-	int        m_layerpri[3]{};
-	emu_timer *m_dma_start_timer;
-	emu_timer *m_dma_end_timer;
-
-	/* misc */
-	int        m_firq_enabled = 0;
-	emu_timer *m_nmi_blocked;
-
-	/* views */
-	memory_view m_palette_view;
-	memory_view m_video_view;
-
+private:
 	/* devices */
 	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k052109_device> m_k052109;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
+	required_memory_bank m_mainbank;
+	required_memory_bank m_audiobank;
+	required_ioport m_io_eepromout;
+
+	/* memory pointers */
+	std::unique_ptr<uint16_t[]>   m_spriteram;
+
+	/* video-related */
+	int32_t    m_sprite_colorbase = 0;
+	int32_t    m_layer_colorbase[3]{};
+	int32_t    m_layerpri[3]{};
+	emu_timer *m_dma_start_timer;
+	emu_timer *m_dma_end_timer;
+
+	/* misc */
+	bool       m_firq_enabled = false;
+	emu_timer *m_nmi_blocked;
+
+	/* views */
+	memory_view m_palette_view;
+	memory_view m_video_view;
+
 	void z80_bankswitch_w(uint8_t data);
 	void z80_arm_nmi_w(uint8_t data);
 	void eeprom_w(uint8_t data);
@@ -185,6 +187,12 @@ private:
 	K052109_CB_MEMBER(tile_callback);
 	void banking_callback(u8 data);
 	K053246_CB_MEMBER(sprite_callback);
+
+	TIMER_CALLBACK_MEMBER(dma_start);
+	TIMER_CALLBACK_MEMBER(dma_end);
+
+	void main_map(address_map &map) ATTR_COLD;
+	void z80_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -210,7 +218,7 @@ K052109_CB_MEMBER(simpsons_state::tile_callback)
 
 K053246_CB_MEMBER(simpsons_state::sprite_callback)
 {
-	int pri = (*color & 0x0f80) >> 6;   /* ??????? */
+	int const pri = (*color & 0x0f80) >> 6;   /* ??????? */
 
 	if (pri <= m_layerpri[2])
 		*priority_mask = 0;
@@ -243,9 +251,9 @@ void simpsons_state::k052109_w(offs_t offset, uint8_t data)
 
 uint8_t simpsons_state::k053247_r(offs_t offset)
 {
-	int offs = offset >> 1;
+	int const offs = offset >> 1;
 
-	if (offset & 1)
+	if (BIT(offset, 0))
 		return(m_spriteram[offs] & 0xff);
 	else
 		return(m_spriteram[offs] >> 8);
@@ -253,21 +261,21 @@ uint8_t simpsons_state::k053247_r(offs_t offset)
 
 void simpsons_state::k053247_w(offs_t offset, uint8_t data)
 {
-	int offs = offset >> 1;
+	int const offs = offset >> 1;
 
-	if (offset & 1)
+	if (BIT(offset, 0))
 		m_spriteram[offs] = (m_spriteram[offs] & 0xff00) | data;
 	else
 		m_spriteram[offs] = (m_spriteram[offs] & 0x00ff) | (data << 8);
 }
 
-void simpsons_state::video_bank_select( int bank )
+void simpsons_state::video_bank_select(int bank)
 {
-	if(bank & 1)
+	if (BIT(bank, 0))
 		m_palette_view.select(0);
 	else
 		m_palette_view.disable();
-	m_video_view.select((bank >> 1) & 1);
+	m_video_view.select(BIT(bank, 1));
 }
 
 
@@ -280,22 +288,27 @@ void simpsons_state::video_bank_select( int bank )
 
 uint32_t simpsons_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layer[3], bg_colorbase;
-
-	bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+	// update color info and refresh tilemaps
+	static const int K053251_CI[3] = { k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
+	int const bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
 	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
-	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
-	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI3);
-	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI4);
 
-	m_k052109->tilemap_update();
+	for (int i = 0; i < 3; i++)
+	{
+		int const prev_colorbase = m_layer_colorbase[i];
+		m_layer_colorbase[i] = m_k053251->get_palette_index(K053251_CI[i]);
 
-	layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
-	layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI3);
-	layer[2] = 2;
-	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI4);
+		if (m_layer_colorbase[i] != prev_colorbase)
+			m_k052109->mark_tilemap_dirty(i);
+	}
+
+	// sort layers and draw
+	int layer[3]{};
+	for (int i = 0; i < 3; i++)
+	{
+		layer[i] = i;
+		m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
+	}
 
 	konami_sortlayers3(layer, m_layerpri);
 
@@ -322,11 +335,11 @@ void simpsons_state::eeprom_w(uint8_t data)
 	if (data == 0xff)
 		return;
 
-	ioport("EEPROMOUT")->write(data, 0xff);
+	m_io_eepromout->write(data, 0xff);
 
 	video_bank_select(data & 0x03);
 
-	m_firq_enabled = data & 0x04;
+	m_firq_enabled = BIT(data, 2);
 	if (!m_firq_enabled)
 		m_maincpu->set_input_line(KONAMI_FIRQ_LINE, CLEAR_LINE);
 }
@@ -340,14 +353,14 @@ void simpsons_state::eeprom_w(uint8_t data)
 void simpsons_state::coin_counter_w(uint8_t data)
 {
 	/* bit 0,1 coin counters */
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	/* bit 2 selects mono or stereo sound */
 	/* bit 3 = enable char ROM reading through the video RAM */
-	m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	m_k052109->set_rmrd_line(BIT(data, 3));
 	/* bit 4 = INIT (unknown) */
 	/* bit 5 = enable sprite ROM reading */
-	m_k053246->k053246_set_objcha_line((~data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	m_k053246->k053246_set_objcha_line(BIT(~data, 5));
 }
 
 uint8_t simpsons_state::sound_interrupt_r()
@@ -367,17 +380,17 @@ uint8_t simpsons_state::sound_interrupt_r()
 
 void simpsons_state::banking_callback(u8 data)
 {
-	membank("bank1")->set_entry(data & 0x3f);
+	m_mainbank->set_entry(data & 0x3f);
 }
 
 void simpsons_state::machine_start()
 {
 	m_spriteram = make_unique_clear<uint16_t[]>(0x1000 / 2);
 
-	membank("bank1")->configure_entries(0, 64, memregion("maincpu")->base(), 0x2000);
+	m_mainbank->configure_entries(0, 64, memregion("maincpu")->base(), 0x2000);
 
-	membank("bank2")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0);
-	membank("bank2")->configure_entries(2, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
+	m_audiobank->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0);
+	m_audiobank->configure_entries(2, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_firq_enabled));
 	save_item(NAME(m_sprite_colorbase));
@@ -399,11 +412,11 @@ void simpsons_state::machine_reset()
 	}
 
 	m_sprite_colorbase = 0;
-	m_firq_enabled = 0;
+	m_firq_enabled = false;
 
 	/* init the default banks */
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
+	m_mainbank->set_entry(0);
+	m_audiobank->set_entry(0);
 	video_bank_select(0);
 
 	m_dma_start_timer->adjust(attotime::never);
@@ -446,13 +459,13 @@ void simpsons_state::main_map(address_map &map)
 	m_video_view[1](0x2000, 0x2fff).rw(FUNC(simpsons_state::k053247_r), FUNC(simpsons_state::k053247_w));
 	m_video_view[1](0x3000, 0x3fff).ram();
 	map(0x4000, 0x5fff).ram();
-	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x6000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom().region("maincpu", 0x78000);
 }
 
 void simpsons_state::z80_bankswitch_w(uint8_t data)
 {
-	membank("bank2")->set_entry(data & 7);
+	m_audiobank->set_entry(data & 7);
 }
 
 
@@ -491,7 +504,7 @@ void simpsons_state::z80_nmi_w(int state)
 void simpsons_state::z80_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank2");
+	map(0x8000, 0xbfff).bankr(m_audiobank);
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xfa00, 0xfa00).w(FUNC(simpsons_state::z80_arm_nmi_w));
@@ -585,26 +598,28 @@ INPUT_PORTS_END
 
 void simpsons_state::object_dma()
 {
-	int counter, num_inactive;
-	uint16_t *src, *dst;
-
+	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
+	uint16_t *dst;
 	m_k053246->k053247_get_ram(&dst);
 
-	src = m_spriteram.get();
-	num_inactive = counter = 256;
+	uint16_t const *src = m_spriteram.get();
+	int num_inactive = 256;
 
-	do {
-		if ((*src & 0x8000) && (*src & 0xff))
+	for (int counter = 256; counter; --counter)
+	{
+		if (BIT(*src, 15) && (*src & 0xff))
 		{
-			memcpy(dst, src, 0x10);
-			dst += 8;
+			dst = std::copy_n(src, 8, dst);
 			num_inactive--;
 		}
 		src += 8;
 	}
-	while (--counter);
 
-	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
+	while (num_inactive--)
+	{
+		*dst = 0;
+		dst += 8;
+	}
 }
 
 INTERRUPT_GEN_MEMBER(simpsons_state::periodic_irq)
@@ -612,67 +627,65 @@ INTERRUPT_GEN_MEMBER(simpsons_state::periodic_irq)
 	if (m_k053246->k053246_is_irq_enabled())
 	{
 		object_dma();
-		m_dma_start_timer->adjust(attotime::from_ticks(256, XTAL(24'000'000)/4));
-		m_dma_end_timer->adjust(attotime::from_ticks(256+2048, XTAL(24'000'000)/4));
+		m_dma_start_timer->adjust(attotime::from_ticks(256, 24_MHz_XTAL / 4));
+		m_dma_end_timer->adjust(attotime::from_ticks(256 + 2048, 24_MHz_XTAL / 4));
 	}
 }
 
 void simpsons_state::simpsons(machine_config &config)
 {
-	/* basic machine hardware */
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
+	// basic machine hardware
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 053248, the clock input is 12MHz, and internal CPU divider of 4
 	m_maincpu->set_addrmap(AS_PROGRAM, &simpsons_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(simpsons_state::periodic_irq)); /* IRQ triggered by the 052109, FIRQ by the sprite hardware */
+	m_maincpu->set_vblank_int("screen", FUNC(simpsons_state::periodic_irq)); // IRQ triggered by the 052109, FIRQ by the sprite hardware
 	m_maincpu->line().set(FUNC(simpsons_state::banking_callback));
 
-	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &simpsons_state::z80_map);   /* NMIs are generated by the 053260 */
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // verified on pcb
+	m_audiocpu->set_addrmap(AS_PROGRAM, &simpsons_state::z80_map); // NMIs are generated by the 053260
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 
 	// Screen timings generated by the 051962, probably not programmable (except maybe between 6 and 8MHz)
 	// 6MHz dot clock
 	// horizontal: 16 cycles front porch, 32 cycles sync, 16 cycles back porch
 	// vertical: 16 lines front porch, 8 lines sync, 16 lines back porch
-	screen.set_raw(XTAL(24'000'000)/4, 384, 0+16, 320-16, 264, 0, 224);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_screen_update(FUNC(simpsons_state::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows().enable_hilights();
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows().enable_highlights();
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_xy_offset(-96, -16);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(simpsons_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246, 24_MHz_XTAL);
 	m_k053246->set_sprite_callback(FUNC(simpsons_state::sprite_callback));
-	m_k053246->set_config(NORMAL_PLANE_ORDER, -43, 39);
+	m_k053246->set_config(NORMAL_PLANE_ORDER, -43, 23);
 	m_k053246->set_palette("palette");
 
 	K053251(config, m_k053251, 0);
 
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	// sound hardware
+	SPEAKER(config, "speaker", 2).front();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
-	ymsnd.add_route(0, "lspeaker", 1.0);    /* only left channel is connected */
-	ymsnd.add_route(0, "rspeaker", 1.0);
-	ymsnd.add_route(1, "lspeaker", 0.0);
-	ymsnd.add_route(1, "rspeaker", 0.0);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL)); // verified on pcb
+	ymsnd.add_route(0, "speaker", 0.5, 0); // only left channel is connected
+	ymsnd.add_route(0, "speaker", 0.5, 1);
+	ymsnd.add_route(1, "speaker", 0.0, 0);
+	ymsnd.add_route(1, "speaker", 0.0, 1);
 
-	k053260_device &k053260(K053260(config, "k053260", XTAL(3'579'545))); /* verified on pcb */
-	k053260.add_route(0, "lspeaker", 1.00);
-	k053260.add_route(1, "rspeaker", 1.00);
+	k053260_device &k053260(K053260(config, "k053260", 3.579545_MHz_XTAL)); // verified on pcb
+	k053260.add_route(0, "speaker", 0.5, 0);
+	k053260.add_route(1, "speaker", 0.5, 1);
 	k053260.sh1_cb().set(FUNC(simpsons_state::z80_nmi_w));
 }
 
@@ -712,7 +725,7 @@ ROM_START( simpsons ) /* World 4 Player */
 	ROM_LOAD( "simpsons.12c.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )
 ROM_END
 
-ROM_START( simpsons4pe ) /* World 4 Player, later? (by use of later leters) */
+ROM_START( simpsons4pe ) /* World 4 Player, later? (by use of later letters) */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "072-g02.16c", 0x00000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
 	ROM_LOAD( "072-g01.17c", 0x20000, 0x20000, CRC(9f843def) SHA1(858432b59101b0577c5cec6ac0c7c20ab0780c9a) )

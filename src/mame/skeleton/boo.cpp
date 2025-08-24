@@ -169,4 +169,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2000, boo1000, 0, boo, boo, boo_state, empty_init, ROT0, "JK Amusement", "Boo 1000", MACHINE_IS_SKELETON )
+GAME( 2000, boo1000, 0, boo, boo, boo_state, empty_init, ROT0, "JK Amusement", "Boo 1000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -1093,6 +1093,7 @@ void ht1130_device::execute_run()
 {
 	if (m_inhalt)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}

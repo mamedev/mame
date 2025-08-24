@@ -359,7 +359,7 @@ protected:
 	void out_txd_cb(int state);
 	void out_rts_cb(int state);
 	void out_dtr_cb(int state);
-	void set_ready(bool ready);
+	void update_wait_ready();
 	bool receive_allowed() const;
 	virtual bool transmit_allowed() const;
 
@@ -371,6 +371,7 @@ protected:
 	void queue_received(uint16_t data, uint32_t error);
 	void advance_rx_fifo();
 	uint8_t get_special_rx_mask() const;
+	void update_rx_int();
 
 	bool is_tx_idle() const;
 	void transmit_enable();

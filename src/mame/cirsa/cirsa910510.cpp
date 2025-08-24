@@ -203,6 +203,6 @@ ROM_END
 } // Anonymous namespace
 
 // This has mechanical reels and small LED displays, some other titles have an auxiliary video PCB
-GAME( 199?, minimony,  0,        cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, minimonya, minimony, cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money (set 2, v1.5?)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, minimonyb, minimony, cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money (set 3, v1.4?)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, minimony,  0,        cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, minimonya, minimony, cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money (set 2, v1.5?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, minimonyb, minimony, cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money (set 3, v1.4?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

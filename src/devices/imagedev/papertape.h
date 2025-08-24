@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_PAPERTAPE_H
-#define MAME_DEVICES_IMAGEDEV_PAPERTAPE_H
+#ifndef MAME_IMAGEDEV_PAPERTAPE_H
+#define MAME_IMAGEDEV_PAPERTAPE_H
 
 #pragma once
 
@@ -68,4 +68,4 @@ protected:
 	paper_tape_punch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 };
 
-#endif // MAME_DEVICES_IMAGEDEV_PAPERTAPE_H
+#endif // MAME_IMAGEDEV_PAPERTAPE_H

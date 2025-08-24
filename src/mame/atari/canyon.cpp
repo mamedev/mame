@@ -315,7 +315,7 @@ static INPUT_PORTS_START( canyon )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Hiscore Reset") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT ) /* SLAM */
 
@@ -416,12 +416,11 @@ void canyon_state::canyon(machine_config &config)
 	PALETTE(config, m_palette, FUNC(canyon_state::palette), 4);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DISCRETE(config, m_discrete, canyon_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
+	m_discrete->add_route(0, "speaker", 1.0, 0);
+	m_discrete->add_route(1, "speaker", 1.0, 1);
 }
 
 

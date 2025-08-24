@@ -48,4 +48,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 2004?, vngrdmk1, 0, 0, vanguardmk1, vanguardmk1, vanguardmk1_state, empty_init, "EOD Performance Inc.", "Vanguard MK1", MACHINE_IS_SKELETON_MECHANICAL )
+SYST( 2004?, vngrdmk1, 0, 0, vanguardmk1, vanguardmk1, vanguardmk1_state, empty_init, "EOD Performance Inc.", "Vanguard MK1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

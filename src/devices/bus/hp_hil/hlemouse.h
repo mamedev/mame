@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sven Schnelle
-#ifndef MAME_DEVICES_HP_HIL_HLEMOUSE_H
-#define MAME_DEVICES_HP_HIL_HLEMOUSE_H
+#ifndef MAME_BUS_HP_HIL_HLEMOUSE_H
+#define MAME_BUS_HP_HIL_HLEMOUSE_H
 
 #pragma once
 
@@ -47,4 +47,4 @@ public:
 
 DECLARE_DEVICE_TYPE_NS(HP_46060B_MOUSE, bus::hp_hil, hle_hp_46060b_device);
 
-#endif // MAME_DEVICES_HP_HIL_HLEMOUSE_H
+#endif // MAME_BUS_HP_HIL_HLEMOUSE_H

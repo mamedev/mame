@@ -1132,22 +1132,22 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_DIPSETTING(    0x0f, "A: 1 Coin/10 Credits; B: 1 Coin/50 Credits;  R: 1 Pulse/100 Credits" )
 	// DIPs 5-8 handle the Coin C coinage
 	PORT_DIPNAME( 0xf0, 0xf0, "Coinage C" )             PORT_DIPLOCATION("DSW2:5,6,7,8")
-	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, "5 Coins/2 Credits" )     // 2.5 coins per credit
+	PORT_DIPSETTING(    0x20, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xb0, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(    0xc0, "1 Coin/20 Credits" )
-	PORT_DIPSETTING(    0xd0, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_25C ) )
 	PORT_DIPSETTING(    0xe0, "1 Coin/40 Credits" )
-	PORT_DIPSETTING(    0xf0, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_50C ) )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x00, "Bet Max" )                       PORT_DIPLOCATION("DSW3:1")
@@ -1691,6 +1691,39 @@ ROM_START( lucky74b )
 	ROM_LOAD( "luckyprom.c7",   0x0500, 0x0100, CRC(e62fd192) SHA1(86a189df2e2ccef6bd2a4e6d969e777fbba8cdf7) )
 ROM_END
 
+// PCB is very similar to Lucky 74, but it only has 4 PROMs
+// title can be seen in GFX ROMs
+ROM_START( lucky88w )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a001.r1", 0x0000, 0x4000, NO_DUMP ) // internal ROM
+
+	ROM_REGION( 0x20000, "fgtiles", 0 )
+	ROM_LOAD( "1.e1", 0x00000, 0x8000, CRC(d8f25ced) SHA1(da2570b4f7050a471f4eb409fdf60c1bbc3d0308) )
+	ROM_LOAD( "2.f1", 0x08000, 0x8000, CRC(2096aaeb) SHA1(3a9fcedc4c07fc75923a71e8216b69f9b92082a2) )
+	ROM_LOAD( "3.h1", 0x10000, 0x8000, CRC(9e49f254) SHA1(14e6bec46fcb83206d0a612081ea92b3ede3e31d) )
+	ROM_LOAD( "4.j1", 0x18000, 0x8000, CRC(dcf3d00e) SHA1(b9fca336dc39c93ea9254c027260e35994d56193) )
+
+	ROM_REGION( 0x10000, "bgtiles", 0 )
+	ROM_LOAD( "17.f3", 0x00000, 0x4000, CRC(0b106f4f) SHA1(d2b4f5cc540af2af9c7af87b03b06529ffbdd825) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x4000 )
+	ROM_LOAD( "16.e3", 0x04000, 0x4000, CRC(2a9bcb30) SHA1(dc847ff021971a76016c9cd1c05d28518339a704) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x4000 )
+	ROM_LOAD( "18.h3", 0x08000, 0x4000, CRC(fbf2b129) SHA1(df607adaaa943586909c7d966b73398850ed34d3) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x4000 )
+	ROM_LOAD( "19.j3", 0x0c000, 0x4000, CRC(d2cf3fb1) SHA1(9f58b9b5284ecdfbf7ee63b45ffbc40d323e7382) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x4000 )
+
+	ROM_REGION( 0x20000, "adpcm", 0 )
+	ROM_LOAD( "5.l1", 0x00000, 0x10000, CRC(43f72252) SHA1(b0828443b2f03fbfbd84be8b5f6287783e62c19e) )
+	ROM_FILL(         0x10000, 0x10000, 0xff ) // empty socket
+
+	ROM_REGION( 0x0600, "proms", ROMREGION_ERASE00 ) // TODO: will need own palette decode
+	ROM_LOAD( "prom.f6", 0x0000, 0x0100, CRC(cc4d8f01) SHA1(41cb61dc0a84f62948ddc9007c96756880bb8497) )
+	ROM_LOAD( "prom.h6", 0x0100, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "prom.j6", 0x0200, 0x0100, CRC(68cf4ac0) SHA1(decc8b092036cfe113435857f8f561d427204554) )
+	ROM_LOAD( "prom.k6", 0x0300, 0x0100, CRC(021ee22f) SHA1(79c1f8cceba382b9c7c27a31934a70e9e421780a) )
+ROM_END
+
 /*
 
     Exciting Black Jack.
@@ -1751,8 +1784,9 @@ ROM_END
 *                Game Drivers                *
 **********************************************/
 
-//     YEAR  NAME      PARENT   MACHINE  INPUT     STATS          INIT        ROT   COMPANY            FULLNAME                    FLAGS                                        LAYOUT
-GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", MACHINE_SUPPORTS_SAVE,                       layout_lucky74 )
-GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74a, lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 3)", MACHINE_SUPPORTS_SAVE,                       layout_lucky74 )
-GAMEL( 1988, lucky74b, lucky74, lucky74, lucky74,  lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_lucky74 )
-GAME(  1989, excitbj,  0,       lucky74, excitbj,  lucky74_state, empty_init, ROT0, "Sega",           "Exciting Black Jack",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//     YEAR  NAME      PARENT   MACHINE  INPUT     STATS          INIT        ROT   COMPANY            FULLNAME                     FLAGS                                        LAYOUT
+GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)",  MACHINE_SUPPORTS_SAVE,                       layout_lucky74 )
+GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74a, lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 3)",  MACHINE_SUPPORTS_SAVE,                       layout_lucky74 )
+GAMEL( 1988, lucky74b, lucky74, lucky74, lucky74,  lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_lucky74 )
+GAME(  1988, lucky88w, 0,       lucky74, lucky74,  lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 88 (Wing)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // undumped internal ROM
+GAME(  1989, excitbj,  0,       lucky74, excitbj,  lucky74_state, empty_init, ROT0, "Sega",           "Exciting Black Jack",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

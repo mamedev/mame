@@ -9,6 +9,58 @@
     Yamaha YGV625 sprite processor and CRTC
     OKI M9810 sound
 
+    Many series of games were done on this platform. As of now, games
+    for the following series have been dumped:
+
+    ??? means cart code not verified
+    *** means no versions dumped + cart code non verified
+
+    "for girls series"
+    GA4004-0 - Wan Wan Dash           - ワンワンダッシュ
+    GB4004-0 - Docchi Fighter         - ドッチファイター
+*** GC4004-0 - Kingyo Carnival        - 金魚カーニバル
+    GD4004-0 - Mogu Mogu Hammer       - モグモグハンマー
+*** GE4004-0 - Ninniki Ninja Battle   - ニンニキ忍者バトル
+*** GF4004-0 - Waku Waku Diving       - わくわくダイビング
+*** GG4004-0 - Shippe Jungle          - しっぺジャングル
+*** GH4004-0 - Katori Pachin          - 蚊とりパッチン
+    more?
+
+    "kids medal series"
+    KA4004-0 - Wanikko Punch          - ワニッコパンチ
+    KB4004-0 - Boo Boo Donpatchi      - ブーブードンパッチ
+    KC4004-0 - Fisherman Battle       - フィッシャーマンバトル
+    KD4004-0 - Haunted Hunter         - ホーンテッドハンター
+    KE4004-0 - Zenigata Ponta         - 銭形ポン太
+    KF4004-0 - Rodeo King             - ロデオキング
+    KG4004-0 - Dojokko Tsukami        - どじょっ子つかみ
+    KH4004-0 - Katori Attack          - 蚊とりアタック
+*** KI4004-0 - ??? (maybe unreleased) - ???
+    KJ4004-0 - Shippe Champion        - しっぺチャンピオン
+*** KK4004-0 - ??? (maybe unreleased) - ???
+    KL4004-0 - Wanpaku Pirates        - わんぱくパイレーツ
+    KM4004-0 - Itazura Cockroach      - いたずらコックローチ
+    more?
+
+    "kids and kiddy series"
+    YA4004-0 - Acchi Muite Hoi Battle - あっちむいてホイバトル
+*** YB4004-0 - Yubi Zumou Senshuken   - 指ずもう選手権
+*** YC4004-0 - Dekopin Janken         - デコピンじゃんけん
+*** YD4004-0 - Tsuna Hiki Champ       - つなひきチャンプ
+    YE4004-0 - Chanbara Kids          - チャンバラキッズ
+*** YF4004-0 - Baba Nuki Shiyouze!    - ばばぬきしようぜ!
+*** YG4004-0 - Gachinko Ude Zumou     - ガチンコ腕ずもう
+*** YH4004-0 - Jarinko Kenshi         - じゃりんこ拳士
+    more?
+
+    Other series for which hardware hasn't been verified to be the same are:
+    'family amusement series'
+    'kids medal twin series'
+    'KW series'
+    'mass medal series'
+    'new kids series'
+
+
     For mmhammer:
     NMI vector is valid but doesn't return (error handler?)
     Timer/counter B0 IRQ vector is valid and runs
@@ -146,9 +198,11 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/okim9810.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
 
 namespace {
 
@@ -246,12 +300,11 @@ void amuzy_state::amuzy(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(amuzy_state::scanline), m_screen, 0, 1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM9810(config, m_oki, XTAL(4'096'000));
-	m_oki->add_route(0, "lspeaker", 1.00);
-	m_oki->add_route(1, "rspeaker", 1.00);
+	m_oki->add_route(0, "speaker", 1.00, 0);
+	m_oki->add_route(1, "speaker", 1.00, 1);
 }
 
 static INPUT_PORTS_START( amuzy )
@@ -375,7 +428,7 @@ ROM_START( wwdash )
 	ROM_LOAD( "s29al016d70tfi01.u3", 0x000000, 0x200000, CRC(cd66dc10) SHA1(76051b248882f7b5c0adfd0ae62283a16d440523) )
 ROM_END
 
-ROM_START( boobood ) // ブーブードンパッチ, HA9019-0
+ROM_START( boobood ) // HA9019-0
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD16_WORD_SWAP( "29f400.u1", 0x000000, 0x080000, CRC(79411d05) SHA1(31727db741aa14224e60d7baa817081ba272c8cf) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
 
@@ -386,7 +439,7 @@ ROM_START( boobood ) // ブーブードンパッチ, HA9019-0
 	ROM_LOAD( "29lv160.u3", 0x000000, 0x200000, CRC(684523f0) SHA1(ca96918abde4ec63f33d82cf30b121f2ac05f68d) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
-ROM_START( fishbatl ) // フィッシャーマンバトル, HA9008-0
+ROM_START( fishbatl ) // HA9008-0
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD16_WORD_SWAP( "29f400.u1", 0x000000, 0x080000, CRC(9d6a8322) SHA1(4819370bb1f092f1c018353f153e623e0297a263) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
 
@@ -397,7 +450,7 @@ ROM_START( fishbatl ) // フィッシャーマンバトル, HA9008-0
 	ROM_LOAD( "29lv160.u3", 0x000000, 0x200000, CRC(dc8f6b48) SHA1(75f92d38b1e716e3c1c0cdb25f444671789dd23a) )
 ROM_END
 
-ROM_START( wanpakup ) // わんぱくパイレーツ, HA9020-0
+ROM_START( wanpakup ) // HA9020-0
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD16_WORD_SWAP( "29f400.u1", 0x000000, 0x080000, CRC(8280d58f) SHA1(2be99ae6ddae795495a09fcbab55c880a0adb890) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
@@ -408,14 +461,100 @@ ROM_START( wanpakup ) // わんぱくパイレーツ, HA9020-0
 	ROM_LOAD( "29lv160.u3", 0x000000, 0x200000, CRC(91fe39d5) SHA1(e900824a9edc47edb9444812daa2e416f8365e0c) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
 
+ROM_START( wanpunch ) // HA9008-0
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "u1", 0x000000, 0x080000, CRC(822c8b08) SHA1(685a0aaa4bb71c75706a97f270e229d89fb26fbf) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(52862706) SHA1(a8ea16bafccad0cddcfa238402268bd8a2d4788b) )
+
+	ROM_REGION(0x200000, "gfx", 0 )
+	ROM_LOAD( "u3", 0x000000, 0x200000, CRC(48c3eee9) SHA1(291aaf0ffd5c46ed84e616508cff7c930790660a) )
+ROM_END
+
+ROM_START( hhunter ) // HA9008-0
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "u1", 0x000000, 0x080000, CRC(3fbee974) SHA1(093f3a50ab867c88f6093f7e704c9e4e3b916fa0) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(b95a7b36) SHA1(7604c6df90836656fd1c861748a7a9035d7818c2) )
+
+	ROM_REGION(0x200000, "gfx", 0 )
+	ROM_LOAD( "u3", 0x000000, 0x200000, CRC(766ab340) SHA1(aa0b857ec5da879c33c678aa9f0d4e0d8dca65bf) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+ROM_END
+
+ROM_START( rodeokng ) // HA9019-0
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "u1", 0x000000, 0x080000, CRC(2a91d532) SHA1(7770be6297196f8c7e525e10a244cf416759d0b7) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(d636a639) SHA1(35aba71c0a10762cd91dda4d08a711768d74679a) )
+
+	ROM_REGION(0x200000, "gfx", 0 )
+	ROM_LOAD( "u3", 0x000000, 0x200000, CRC(3072eeed) SHA1(dab01071f4dc7131f7e78972c9a9042a2e8ac6d6) )
+ROM_END
+
+ROM_START( dojokkot ) // HA9020-0
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "u1", 0x000000, 0x080000, CRC(38873dce) SHA1(36f1372dd80a9354209e5e274ebdff93a81d626d) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(00756334) SHA1(747c5873f4b8a04b1956b447575a27ae23c57457) )
+
+	ROM_REGION(0x200000, "gfx", 0 )
+	ROM_LOAD( "u3", 0x000000, 0x200000, CRC(1123e2ce) SHA1(b702230d2494ecda9d90c42f87ab2396c316552d) )
+ROM_END
+
+ROM_START( itazurac ) // HA9022-0
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "u1", 0x000000, 0x080000, CRC(3262a286) SHA1(d5cf6749269e59c54c544ab6a0c324cf4dab176a) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	// this ROM wouldn't read consistently: most times it gave 0x88 and sometimes 0x00 at offset 0. Here we go with 0x88.
+	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(5103b215) SHA1(5fe42bd0d29d2cfc9e0d35162ee15e3ff55c4bcb) )
+
+	ROM_REGION(0x200000, "gfx", 0 )
+	ROM_LOAD( "u3", 0x000000, 0x200000, CRC(76ce7b79) SHA1(749bc519cf66c0aec615881824e417719af78d2b) )
+ROM_END
+
+ROM_START( katori ) // HA9020-0
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "29f400.u1", 0x000000, 0x080000, CRC(34b03727) SHA1(16d18ff7d322f1c1b297de89de3737d407c5a27e) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "29f016.u2", 0x000000, 0x200000, CRC(ee7f2bb6) SHA1(1638d5196499fd3669a97fc9e64adacf59bc6108) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION(0x200000, "gfx", 0 )
+	ROM_LOAD( "mx29lv160.u3", 0x000000, 0x200000, CRC(f57c33f6) SHA1(3d5dd858e94156c4c7b1f6b8934b0f7667fd66ad) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+ROM_END
+
+ROM_START( cbkids )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "mbm29f400ta.u1", 0x000000, 0x080000, BAD_DUMP CRC(21052f87) SHA1(b6cb2bf704abc0f5298b3f8f91398c9f4b47a7eb) ) // always gives a different read
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "mbm29f016a.u2", 0x000000, 0x200000, CRC(7faf5c9f) SHA1(c080de0eb6500bca995c23c0f348dc44696e6966) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_LOAD( "mx29lv160db.u3", 0x000000, 0x200000, CRC(6971d7cf) SHA1(81206a6f54180965570ccfc830083b582764aeb8) )
+ROM_END
+
 }   // anonymous namespace
 
+
 GAME( 2005, boobood,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Boo Boo Donpatchi (Japan, ver 1.01)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, dojokkot,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Dojokko Tsukami (Japan, ver 1.02)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2005, fishbatl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Fisherman Battle (Japan, ver 1.03)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, hhunter,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Haunted Hunter (Japan, ver 1.00)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, katori,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Katori Attack (Japan, ver 1.03)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, rodeokng,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Rodeo King (Japan, ver 1.00)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, wanpunch,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wanikko Punch (Japan, ver 1.20)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2005, zenponta,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Zenigata Ponta (Japan, ver 1.02)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2006, amhbattl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Acchi Muite Hoi Battle (Japan, ver 1.04)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2006, wanpakup,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wanpaku Pirates (Japan, ver 1.00)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2007, cbkids,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Chanbara Kids (Japan)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Docchi Fighter (Japan, ver 1.02)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2007, itazurac,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Itazura Cockroach (Japan, ver 1.02)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2007, wwdash,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wan Wan Dash (Japan, ver 1.01)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2008, mmhammer,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Mogu Mogu Hammer (Japan, ver 1.01)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2008, shpchamp,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Shippe Champion (Japan, ver 1.02)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

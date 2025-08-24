@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_NES_CTRL_ROB
-#define MAME_BUS_NES_CTRL_ROB
+#ifndef MAME_BUS_NES_CTRL_ROB_H
+#define MAME_BUS_NES_CTRL_ROB_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NES_ROB, nes_rob_device)
 
-#endif // MAME_BUS_NES_CTRL_ROB
+#endif // MAME_BUS_NES_CTRL_ROB_H

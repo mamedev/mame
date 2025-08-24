@@ -69,4 +69,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(2002, triumec, 0, 0, trium, trium, trium_state, empty_init, "Mitsubishi", "Trium Eclipse", MACHINE_IS_SKELETON)
+SYST(2002, triumec, 0, 0, trium, trium, trium_state, empty_init, "Mitsubishi", "Trium Eclipse", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

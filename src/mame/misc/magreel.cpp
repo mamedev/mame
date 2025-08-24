@@ -211,4 +211,4 @@ void magreel_state::init_magreel()
 
 } // anonymous namespace
 
-GAME( 199?, magreel, 0, magreel, magreel, magreel_state, init_magreel, ROT0, "Play System", "Magic Reels", MACHINE_IS_SKELETON )
+GAME( 199?, magreel, 0, magreel, magreel, magreel_state, init_magreel, ROT0, "Play System", "Magic Reels", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

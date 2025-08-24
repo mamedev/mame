@@ -89,8 +89,7 @@ void actions_atj2279b_state::actions_atj2279b(machine_config &config)
 	screen.set_visarea(0, 1280-1, 0, 720-1); // resolution unconfirmed (possibly 1080p as well, but this is unlikely)
 	screen.set_screen_update(FUNC(actions_atj2279b_state::screen_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 ROM_START( rbitgen )
@@ -104,4 +103,4 @@ ROM_END
 
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
-CONS( 2016, rbitgen,      0,       0,      actions_atj2279b, actions_atj2279b, actions_atj2279b_state, empty_init, "Retro-Bit", "Generations (Retro-Bit)", MACHINE_IS_SKELETON )
+CONS( 2016, rbitgen,      0,       0,      actions_atj2279b, actions_atj2279b, actions_atj2279b_state, empty_init, "Retro-Bit", "Generations (Retro-Bit)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

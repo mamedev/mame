@@ -9,9 +9,10 @@ license:CC0-1.0
 <softwarelist name="fidel_scc" description="Fidelity SCC modules">
 
 	<software name="cb9">
-		<description>Challenger Book Openings 1</description>
+		<description>Book Openings 1</description>
 		<year>1982</year>
 		<publisher>Fidelity Electronics</publisher>
+		<info name="serial" value="CB9"/>
 		<part name="cart" interface="fidel_scc">
 			<dataarea name="rom" size="0x2000">
 				<rom name="cb9.bin" offset="0x0000" size="0x2000" crc="421147e8" sha1="ccf62f6f218e8992baf30973fe41b35e14a1cc1a" /> <!-- 101-1050a01? -->
@@ -20,9 +21,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="cb16">
-		<description>Challenger Book Openings 2 (set 1)</description>
+		<description>Book Openings 2 (set 1)</description>
 		<year>1982</year>
 		<publisher>Fidelity Electronics</publisher>
+		<info name="serial" value="CB16"/>
 		<part name="cart" interface="fidel_scc">
 			<dataarea name="rom" size="0x4000">
 				<rom name="cb16_b.bin" offset="0x0000" size="0x2000" crc="591b3e4a" sha1="f75ae850f2f70808b5423f847ff12ee890752bf8" />
@@ -32,13 +34,70 @@ license:CC0-1.0
 	</software>
 
 	<software name="cb16a" cloneof="cb16"> <!-- dumped from a PC16, only 1 byte difference -->
-		<description>Challenger Book Openings 2 (set 2)</description>
+		<description>Book Openings 2 (set 2)</description>
 		<year>1982</year>
 		<publisher>Fidelity Electronics</publisher>
+		<info name="serial" value="CB16"/>
 		<part name="cart" interface="fidel_scc">
 			<dataarea name="rom" size="0x4000">
 				<rom name="101-1042a01" offset="0x0000" size="0x2000" crc="591b3e4a" sha1="f75ae850f2f70808b5423f847ff12ee890752bf8" /> <!-- MK36A33N-5 -->
 				<rom name="101-1042a02" offset="0x2000" size="0x2000" crc="3c0ad4a9" sha1="f651d96778b7109eba73740176da489d90a71271" /> <!-- MK36A34N-5 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="encyclop"> <!-- dumped from an unofficial Peter Reckwitz cartridge with Chess Encyclopedia and Sicilian Variation -->
+		<description>Chess Encyclopedia</description>
+		<year>1984</year>
+		<publisher>Fidelity Electronics</publisher>
+		<info name="serial" value="EO*"/> <!-- EOA-EOE -->
+		<info name="usage" value="Requires 7seg display for full support." />
+		<part name="cart1" interface="fidel_scc">
+			<feature name="part_id" value="Volume A"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="a2.bin" offset="0x0000" size="0x2000" crc="680bdcb7" sha1="3987f5538687a630464ffba661d425f2a670bae1" />
+				<rom name="a1.bin" offset="0x2000" size="0x2000" crc="5324511a" sha1="864919e0b0d315154a5024b31fbec0b41ea8ef00" />
+			</dataarea>
+		</part>
+		<part name="cart2" interface="fidel_scc">
+			<feature name="part_id" value="Volume B"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="b2.bin" offset="0x0000" size="0x2000" crc="572bbafc" sha1="67e326b46607fa8736190bc8fe173e4d182b660b" />
+				<rom name="b1.bin" offset="0x2000" size="0x2000" crc="fecc41e4" sha1="287f4a77a21396df88e0998fb73f92b6b671c781" />
+			</dataarea>
+		</part>
+		<part name="cart3" interface="fidel_scc">
+			<feature name="part_id" value="Volume C"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="c2.bin" offset="0x0000" size="0x2000" crc="caab05bd" sha1="77b3ea2ecda9a8599c67dddc9bab46f1aa0333c6" />
+				<rom name="c1.bin" offset="0x2000" size="0x2000" crc="ed8c39fa" sha1="6a623ad8cb82b2542965247b8606abfc69cf1b83" />
+			</dataarea>
+		</part>
+		<part name="cart4" interface="fidel_scc">
+			<feature name="part_id" value="Volume D"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="d2.bin" offset="0x0000" size="0x2000" crc="44b85f2e" sha1="c00c13fb9e3f677f3410af1abc2e4c8f5f262735" />
+				<rom name="d1.bin" offset="0x2000" size="0x2000" crc="75ce4a05" sha1="4b6a48822a8b4df675c971a8d243e5fbba3d02a2" />
+			</dataarea>
+		</part>
+		<part name="cart5" interface="fidel_scc">
+			<feature name="part_id" value="Volume E"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="e2.bin" offset="0x0000" size="0x2000" crc="706c4c1f" sha1="bdb67ff7b3b0a6669d558fe12c8bab73ac78b51a" />
+				<rom name="e1.bin" offset="0x2000" size="0x2000" crc="8e9ec38f" sha1="f6ed89466502f107bc57698858d617cad527eb7f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sicilian"> <!-- dumped from an unofficial Peter Reckwitz cartridge with Chess Encyclopedia and Sicilian Variation -->
+		<description>Sicilian Variation (prototype)</description>
+		<year>1983</year>
+		<publisher>Fidelity Electronics</publisher>
+		<info name="serial" value="DVC"/>
+		<part name="cart" interface="fidel_scc">
+			<dataarea name="rom" size="0x4000">
+				<rom name="f2.bin" offset="0x0000" size="0x2000" crc="b7a2ab54" sha1="67d22f64b89f8f741eb2135bc537bc959d20dc7f" />
+				<rom name="f1.bin" offset="0x2000" size="0x2000" crc="0b906a0e" sha1="686990ff434f050d6cada6c278ab8c2dd24555a3" />
 			</dataarea>
 		</part>
 	</software>

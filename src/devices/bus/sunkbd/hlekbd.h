@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_DEVICES_SUNKBD_HLEKBD_H
-#define MAME_DEVICES_SUNKBD_HLEKBD_H
+#ifndef MAME_BUS_SUNKBD_HLEKBD_H
+#define MAME_BUS_SUNKBD_HLEKBD_H
 
 #pragma once
 
@@ -114,4 +114,4 @@ DECLARE_DEVICE_TYPE_NS(SUN_TYPE5_GB_HLE_KEYBOARD, bus::sunkbd, hle_device_base)
 DECLARE_DEVICE_TYPE_NS(SUN_TYPE5_SE_HLE_KEYBOARD, bus::sunkbd, hle_device_base)
 DECLARE_DEVICE_TYPE_NS(SUN_TYPE5_JP_HLE_KEYBOARD, bus::sunkbd, hle_device_base)
 
-#endif // MAME_DEVICES_SUNKBD_HLEKBD_H
+#endif // MAME_BUS_SUNKBD_HLEKBD_H

@@ -662,7 +662,7 @@
         SSI Poker (v4.0)
 
     - Added a list of official/unofficial games, and their states.
-    - Fixed a bug introduced when extended the color PROM region to eliminate colortable lenght.
+    - Fixed a bug introduced when extended the color PROM region to eliminate colortable length.
     - Other changes/fixes.
     - Updated technical notes.
 
@@ -1923,7 +1923,7 @@ static INPUT_PORTS_START( comg208 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt (Clr.Credits)") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )         PORT_NAME("Tilt (Clr.Credits)")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2732,7 +2732,7 @@ static INPUT_PORTS_START( hotline ) // nudge bingo
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Tilt") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play (Bet)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3019,7 +3019,7 @@ static INPUT_PORTS_START( comg157 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_T) PORT_NAME("Tilt")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                   PORT_NAME("Play (Bet)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )                  PORT_NAME("Big")
@@ -3135,7 +3135,7 @@ static INPUT_PORTS_START( comg159 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt")         PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
@@ -3216,7 +3216,7 @@ static INPUT_PORTS_START( comg170 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt")         PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
@@ -3297,7 +3297,7 @@ static INPUT_PORTS_START( comg172 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt")         PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
@@ -3399,9 +3399,9 @@ static INPUT_PORTS_START( elgrande )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )           PORT_CONDITION("FRQ", 0x40, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x08, "1 Coin/10 Credits" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, "1 Coin/25 Credits" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
-	PORT_DIPSETTING(    0x08, "1 Coin/50 Credits" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_10C ) )          PORT_CONDITION("FRQ", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_25C ) )          PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_50C ) )          PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
 	PORT_DIPNAME( 0x30, 0x20, "Minimum Winning Hand")
 	PORT_DIPSETTING(    0x20, "Jacks or Better" )
 	PORT_DIPSETTING(    0x30, "Queens or Better" )
@@ -3506,9 +3506,9 @@ static INPUT_PORTS_START( jjpoker )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )           PORT_CONDITION("FRQ", 0x40, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x08, "1 Coin/10 Credits" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, "1 Coin/25 Credits" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
-	PORT_DIPSETTING(    0x08, "1 Coin/50 Credits" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_10C ) )          PORT_CONDITION("FRQ", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_25C ) )          PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_50C ) )          PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
 	PORT_DIPNAME( 0x30, 0x20, "Minimum Winning Hand")
 	PORT_DIPSETTING(    0x20, "Jacks or Better" )
 	PORT_DIPSETTING(    0x30, "Queens or Better" )
@@ -3698,7 +3698,7 @@ static INPUT_PORTS_START( comg204 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt")         PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -4106,7 +4106,7 @@ static INPUT_PORTS_START( pixels )  // sys905
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Tilt")   PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("Female") PORT_CODE(KEYCODE_F)
@@ -4215,7 +4215,7 @@ static INPUT_PORTS_START( pix903 )  // Pixels, sys903
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt/Clear") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )         PORT_NAME("Tilt/Clear") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play/Bet")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Female") PORT_CODE(KEYCODE_F)
@@ -4902,6 +4902,27 @@ ROM_START( comg079 )  // Cal Omega v7.9 (Arcade Poker)
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "clrprom_7.9.u28", 0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
+
+ROM_START( comg079b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "du_6502_u2.u2",   0x00000, 0x08000, CRC(fb457628) SHA1(a826e989e4d1eeb30d352202d69b22a1c8b12292) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_LOAD( "du_6502_u21.u21",  0x0000, 0x0800, CRC(86825527) SHA1(278d58d92962be783462c4b18c3b9c72b8754531) )
+	ROM_IGNORE(                           0x7800)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "du_6502_u23.u23",  0x0000, 0x0800, CRC(ccfe2548) SHA1(5d4cab918a241e4f39df4255f403f558cee3c379) )
+	ROM_IGNORE(                           0x7800)
+	ROM_LOAD( "du_6502_u22.u22",  0x0800, 0x0800, CRC(5a96ce64) SHA1(fe18cea01d6bef5b4efcbf930469a3f1104d06d2) )
+	ROM_IGNORE(                           0x7800)
+	// From COMG079 Romset
+	ROM_LOAD( "pkcga.u68",  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "82s129.u28", 0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
+ROM_END
+
 
 ROM_START( comg080 )  // Cal Omega v8.0 (Arcade Black Jack)
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6216,6 +6237,7 @@ void calomega_state::init_any()
 GAME(  1981, comg074,  0,        sys903,   comg074,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.4 (Gaming Poker, W.Export)",    MACHINE_SUPPORTS_SAVE )
 GAME(  1981, comg076,  0,        sys903,   comg076,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.6 (Arcade Poker)",              MACHINE_SUPPORTS_SAVE )
 GAME(  1981, comg079,  0,        sys903,   comg076,  calomega_state, init_comg079, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.9 (Arcade Poker)",              MACHINE_SUPPORTS_SAVE )    // bad dump
+GAME(  1981, comg079b, comg079,  sys903,   comg076,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.9b (Arcade Poker, bootleg?)",   MACHINE_SUPPORTS_SAVE )
 GAME(  1981, comg080,  0,        sys903,   arcadebj, calomega_state, init_comg080, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 8.0 (Arcade Black Jack)",         MACHINE_SUPPORTS_SAVE )    // bad dump
 GAMEL( 1981, comg094,  0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                      MACHINE_SUPPORTS_SAVE,                        layout_kenokb )
 GAME(  1982, comg107,  0,        sys903,   biggame,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7c (Big Game)",                MACHINE_SUPPORTS_SAVE )

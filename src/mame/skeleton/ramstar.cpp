@@ -205,4 +205,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, ramstar, 0, ramstar, ramstar, ramstar_state, empty_init, ROT0, "Ram Star", "unknown Ram Star multi-game (version 80.1)", MACHINE_IS_SKELETON )
+GAME( 1991, ramstar, 0, ramstar, ramstar, ramstar_state, empty_init, ROT0, "Ram Star", "unknown Ram Star multi-game (version 80.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

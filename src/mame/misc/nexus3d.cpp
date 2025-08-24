@@ -379,5 +379,5 @@ void nexus3d_state::init_acheartf()
 } // anonymous namespace
 
 
-GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, init_acheart,  ROT0, "Examu", "Arcana Heart",      MACHINE_IS_SKELETON )
-GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, init_acheartf, ROT0, "Examu", "Arcana Heart Full", MACHINE_IS_SKELETON )
+GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, init_acheart,  ROT0, "Examu", "Arcana Heart",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, init_acheartf, ROT0, "Examu", "Arcana Heart Full", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

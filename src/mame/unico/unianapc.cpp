@@ -102,5 +102,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2002, dhunting,  0,   unianapc, unianapc, unianapc_state, empty_init, ROT0, "Game Box Entertainment", "Dream Hunting (US)",  MACHINE_IS_SKELETON ) // Ver 1007?
-GAME( 2003, hogwild,   0,   unianapc, unianapc, unianapc_state, empty_init, ROT0, "Uniana",                 "Hog Wild (US)",       MACHINE_IS_SKELETON ) // Ver.00.26.b?
+GAME( 2002, dhunting,  0,   unianapc, unianapc, unianapc_state, empty_init, ROT0, "Game Box Entertainment", "Dream Hunting (US)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Ver 1007?
+GAME( 2003, hogwild,   0,   unianapc, unianapc, unianapc_state, empty_init, ROT0, "Uniana",                 "Hog Wild (US)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Ver.00.26.b?

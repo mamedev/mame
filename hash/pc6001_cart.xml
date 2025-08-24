@@ -31,6 +31,34 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Cart back has a date code of 57.10.12, Showa 57 is 1982 -->
+	<software name="turpina" cloneof="turpin" supported="yes">
+		<description>Turpin (1982-10-12)</description>
+		<year>1982</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="5200003"/>
+		<info name="alt_title" value="ターピン"/>
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="turpin-pc-6001.bin" size="4096" crc="e1c4676c" sha1="09ca64e9c79b18fcd322c6676d12710ba095054d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cart back has a date code of 58.01.29, Showa 58 is 1983 -->
+	<software name="turpin" supported="yes">
+		<description>Turpin (1983-01-29)</description>
+		<year>1983</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="5200003"/>
+		<info name="alt_title" value="ターピン"/>
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="turpin (konami) (japan) [_] [rev b].rom" size="4096" crc="22365086" sha1="93c0c1fb4cec973b063122ad2c7e6a8e1ce4c314"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Has missing text (uses raster effect) -->
 	<software name="tutankhm" supported="partial">
 		<description>Tutankham</description>

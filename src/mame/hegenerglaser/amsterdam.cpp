@@ -15,7 +15,8 @@ Dallas 68020:
 - rest is similar to 16-bit version
 
 TODO:
-- waitstates, same as glasgow.cpp
+- does it have DTACK wait states? surely the PCB supports LDS/UDS wait states
+  just like Glasgow, but it's probably disabled due to faster EPROMs
 
 *******************************************************************************/
 
@@ -70,29 +71,26 @@ private:
 	u8 keys_r();
 };
 
-INPUT_CHANGED_MEMBER(amsterdam_state::reset_button)
-{
-	// RES buttons in serial tied to CPU RESET
-	if (m_reset->read() == 3)
-	{
-		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		m_display->reset();
-	}
-}
-
 
 
 /*******************************************************************************
     I/O
 *******************************************************************************/
 
+INPUT_CHANGED_MEMBER(amsterdam_state::reset_button)
+{
+	// RES buttons in serial tied to CPU RESET
+	if (m_reset->read() == 3)
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
 void amsterdam_state::led_w(offs_t offset, u8 data)
 {
 	// d0-d7: board leds
 	m_board->led_w(data);
 
-	// a8: lcd strobe
-	m_display->strobe_w(BIT(offset, 7));
+	// a8: lcd common
+	m_display->common_w(BIT(offset, 7));
 }
 
 void amsterdam_state::dac_w(u8 data)
@@ -103,8 +101,8 @@ void amsterdam_state::dac_w(u8 data)
 
 u8 amsterdam_state::keys_r()
 {
-	// lcd strobe is shared with keypad select
-	return m_keys[m_display->strobe_r()]->read();
+	// lcd common is shared with keypad select
+	return m_keys[m_display->common_r()]->read();
 }
 
 

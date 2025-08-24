@@ -2,9 +2,11 @@
 // copyright-holders:Curt Coder, Angelo Salese
 /*
 
-    http://www2.odn.ne.jp/~haf09260/Pc80/EnrPc.htm
-    http://home1.catvmics.ne.jp/~kanemoto/n80/inside.html
-    http://www.geocities.jp/retro_zzz/machines/nec/8001/index.html
+References:
+- http://www2.odn.ne.jp/~haf09260/Pc80/EnrPc.htm
+- http://home1.catvmics.ne.jp/~kanemoto/n80/inside.html
+- http://www.geocities.jp/retro_zzz/machines/nec/8001/index.html
+- https://oldcrap.org/2024/07/08/nec-pc-8001/
 
 */
 
@@ -670,14 +672,13 @@ void pc8001_state::machine_start()
 	{
 	case 16*1024:
 		membank("bank3")->configure_entry(0, ram);
-		program.unmap_readwrite(0x6000, 0xbfff);
 		program.unmap_readwrite(0x8000, 0xbfff);
 		program.install_readwrite_bank(0xc000, 0xffff, membank("bank3"));
 		break;
 
 	case 32*1024:
 		membank("bank3")->configure_entry(0, ram);
-		program.unmap_readwrite(0x6000, 0xbfff);
+		program.unmap_readwrite(0x8000, 0xbfff);
 		program.install_readwrite_bank(0x8000, 0xffff, membank("bank3"));
 		break;
 
@@ -812,13 +813,20 @@ void pc8001mk2sr_state::pc8001mk2sr(machine_config &config)
 
 ROM_START( pc8001 )
 	ROM_REGION( 0x8000, Z80_TAG, ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("v110")
 	// PCB pictures shows divided by 3 ROMs (and 4th socket unpopulated)
+	// D2364C ROMs from a pc8001b PCB:
+	// - p12019-106.ic10 072NBASIC
+	// - p11219-105.ic11 073NBASIC
+	// - p12029-106.ic12 171NBASIC
 	ROM_SYSTEM_BIOS( 0, "v101", "N-BASIC v1.01" )
 	ROMX_LOAD( "n80v101.rom", 0x00000, 0x6000, BAD_DUMP CRC(a2cc9f22) SHA1(6d2d838de7fea20ddf6601660d0525d5b17bf8a3), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v102", "N-BASIC v1.02" )
 	ROMX_LOAD( "n80v102.rom", 0x00000, 0x6000, BAD_DUMP CRC(ed01ca3f) SHA1(b34a98941499d5baf79e7c0e5578b81dbede4a58), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v110", "N-BASIC v1.10" )
 	ROMX_LOAD( "n80v110.rom", 0x00000, 0x6000, BAD_DUMP CRC(1e02d93f) SHA1(4603cdb7a3833e7feb257b29d8052c872369e713), ROM_BIOS(2) )
+	// empty socket, cfr. notes in header for usage instructions
+	ROM_LOAD_OPTIONAL( "exprom.ic13", 0x6000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x800, CGROM_TAG, 0)
 	ROM_LOAD( "font.rom", 0x000, 0x800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
@@ -846,6 +854,7 @@ ROM_START( pc8001mk2sr )
 	ROM_REGION (0x10000, N80SR_ROM_TAG, ROMREGION_ERASEFF )
 	// N80SR-BASIC v1.0
 	ROM_LOAD( "n80_3.rom",    0x0000, 0xa000, BAD_DUMP CRC(d99ef247) SHA1(9bfa5009d703cd31caa734d932d2a847d74cbfa6) )
+	// TODO: empty socket at ic77
 
 	ROM_REGION( 0x2000, CGROM_TAG, 0)
 	ROM_LOAD( "font80sr.rom", 0x000000, 0x001000, CRC(784c0b17) SHA1(565dc8e5e46b1633cb434d12b4d8b3a662546b33) )

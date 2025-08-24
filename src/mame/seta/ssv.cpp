@@ -165,6 +165,8 @@ Notes:
 #include "emu.h"
 #include "ssv.h"
 
+#include "mahjong.h"
+
 #include "cpu/v810/v810.h"
 #include "cpu/v60/v60.h"
 #include "machine/nvram.h"
@@ -345,49 +347,17 @@ void drifto94_state::dsp_data_map(address_map &map)
 	map(0x0000, 0x07ff).rom().region("dspdata", 0);
 }
 
-uint16_t drifto94_state::dsp_dr_r()
-{
-	return m_dsp->snesdsp_read(true);
-}
-
-void drifto94_state::dsp_dr_w(uint16_t data)
-{
-	m_dsp->snesdsp_write(true, data);
-}
-
-uint16_t drifto94_state::dsp_r(offs_t offset)
+uint8_t drifto94_state::dsp_r(offs_t offset)
 {
 	const uint16_t temp = m_dsp->dataram_r(offset / 2);
-	uint16_t res;
-
-	if (BIT(offset, 0))
-	{
-		res = temp >> 8;
-	}
-	else
-	{
-		res = temp & 0xff;
-	}
-
-	return res;
+	const uint8_t shift = BIT(offset, 0) << 3;
+	return (temp >> shift) & 0xff;
 }
 
-void drifto94_state::dsp_w(offs_t offset, uint16_t data)
+void drifto94_state::dsp_w(offs_t offset, uint8_t data)
 {
-	uint16_t temp = m_dsp->dataram_r(offset / 2);
-
-	if (BIT(offset, 0))
-	{
-		temp &= 0xff;
-		temp |= data << 8;
-	}
-	else
-	{
-		temp &= 0xff00;
-		temp |= data;
-	}
-
-	m_dsp->dataram_w(offset / 2, temp);
+	const uint8_t shift = BIT(offset, 0) << 3;
+	m_dsp->dataram_w(offset / 2, (uint16_t(data) << 8) | data, uint16_t(0xff) << shift);
 }
 
 /***************************************************************************
@@ -436,8 +406,8 @@ void drifto94_state::drifto94_map(address_map &map)
 	ssv_map(map, 0xc00000);
 //  map(0x210002, 0x210003).nopw();                                      // ? 1 at the start
 	map(0x400000, 0x47ffff).nopw();                                       // ?
-	map(0x480000, 0x480001).rw(FUNC(drifto94_state::dsp_dr_r), FUNC(drifto94_state::dsp_dr_w));
-	map(0x482000, 0x482fff).rw(FUNC(drifto94_state::dsp_r), FUNC(drifto94_state::dsp_w));
+	map(0x480000, 0x480000).rw(m_dsp, FUNC(upd96050_device::data_r), FUNC(upd96050_device::data_w));
+	map(0x482000, 0x482fff).rw(FUNC(drifto94_state::dsp_r), FUNC(drifto94_state::dsp_w)).umask16(0x00ff);
 	map(0x483000, 0x485fff).nopw();                                        // ?
 	map(0x500000, 0x500001).nopw();                                        // ??
 	map(0x510000, 0x510001).r(FUNC(drifto94_state::drifto94_unknown_r));                       // ??
@@ -511,12 +481,12 @@ uint16_t ssv_state::hypreact_input_r()
 {
 	const uint16_t input_sel = *m_input_sel;
 
-	uint16_t result = 0xffff;
+	uint16_t result = 0x3f;
 	if (BIT(input_sel, 0)) result &= m_io_key[0]->read();
 	if (BIT(input_sel, 1)) result &= m_io_key[1]->read();
 	if (BIT(input_sel, 2)) result &= m_io_key[2]->read();
 	if (BIT(input_sel, 3)) result &= m_io_key[3]->read();
-	return result;
+	return result | 0x00c0;
 }
 
 void ssv_state::hypreact_map(address_map &map)
@@ -641,12 +611,12 @@ uint16_t ssv_state::srmp4_input_r()
 {
 	const uint16_t input_sel = *m_input_sel;
 
-	uint16_t result = 0xffff;
-	if (BIT(input_sel, 1)) result &= m_io_key[0]->read();
-	if (BIT(input_sel, 2)) result &= m_io_key[1]->read();
-	if (BIT(input_sel, 3)) result &= m_io_key[2]->read();
-	if (BIT(input_sel, 4)) result &= m_io_key[3]->read();
-	return result;
+	uint16_t result = 0x3f;
+	if (BIT(input_sel, 1)) result &= m_io_key[3]->read();
+	if (BIT(input_sel, 2)) result &= m_io_key[2]->read();
+	if (BIT(input_sel, 3)) result &= m_io_key[1]->read();
+	if (BIT(input_sel, 4)) result &= m_io_key[0]->read();
+	return bitswap<6>(result, 0, 1, 2, 3, 4, 5) | 0xffc0;
 }
 
 void ssv_state::srmp4_map(address_map &map)
@@ -663,6 +633,18 @@ void ssv_state::srmp4_map(address_map &map)
 /***************************************************************************
                             Super Real Mahjong P7
 ***************************************************************************/
+
+uint16_t ssv_state::srmp7_input_r()
+{
+	const uint16_t input_sel = *m_input_sel;
+
+	uint16_t result = 0x3f;
+	if (BIT(input_sel, 1)) result &= m_io_key[2]->read();
+	if (BIT(input_sel, 2)) result &= m_io_key[1]->read();
+	if (BIT(input_sel, 3)) result &= m_io_key[0]->read();
+	if (BIT(input_sel, 4)) result &= m_io_key[3]->read();
+	return bitswap<6>(result, 0, 1, 2, 3, 4, 5) | 0x00c0;
+}
 
 /*
     Interrupts aren't supported by the chip emulator yet
@@ -693,7 +675,7 @@ void ssv_state::srmp7_map(address_map &map)
 	map(0x300076, 0x300077).r(FUNC(ssv_state::srmp7_irqv_r));                      // Sound
 //  0x540000, 0x540003, related to lev 5 irq?
 	map(0x580000, 0x580001).w(FUNC(ssv_state::srmp7_sound_bank_w));               // Sound Bank
-	map(0x600000, 0x600001).r(FUNC(ssv_state::srmp4_input_r));                     // Inputs
+	map(0x600000, 0x600001).r(FUNC(ssv_state::srmp7_input_r));                     // Inputs
 	map(0x680000, 0x680001).writeonly().share(m_input_sel); // Inputs
 }
 
@@ -783,8 +765,8 @@ void drifto94_state::twineag2_map(address_map &map)
 	ssv_map(map, 0xe00000);
 	map(0x010000, 0x03ffff).ram();                         // More RAM
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r)); // Watchdog (also value is cmp.b with mem 8)
-	map(0x480000, 0x480001).rw(FUNC(drifto94_state::dsp_dr_r), FUNC(drifto94_state::dsp_dr_w));
-	map(0x482000, 0x482fff).rw(FUNC(drifto94_state::dsp_r), FUNC(drifto94_state::dsp_w));
+	map(0x480000, 0x480000).rw(m_dsp, FUNC(upd96050_device::data_r), FUNC(upd96050_device::data_w));
+	map(0x482000, 0x482fff).rw(FUNC(drifto94_state::dsp_r), FUNC(drifto94_state::dsp_w)).umask16(0x00ff);
 }
 
 
@@ -1019,45 +1001,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ssv_mahjong )
 	PORT_INCLUDE(ssv_joystick)
 
-	PORT_START("KEY0")  // IN5 - $800002(0)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY1")  // IN6 - $800002(1)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")  // IN7 - $800002(2)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")  // IN8 - $800002(3)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE(mahjong_matrix_1p) // IN5-IN8 - $800002
+	PORT_MODIFY("KEY1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) // uses bet button, but not the rest of the gambling controls
 INPUT_PORTS_END
 
 
@@ -1473,38 +1419,9 @@ static INPUT_PORTS_START( hypreact )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT     )
 	PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_START("KEY0")  // IN5 - $c00000(0)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1  )
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY1")  // IN6 - $c00000(1)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")  // IN7 - $c00000(2)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")  // IN8 - $c00000(3)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE(mahjong_matrix_1p)  // IN5-IN8 - $c00000
+	PORT_MODIFY("KEY1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) // uses bet button, but not the rest of the gambling controls
 INPUT_PORTS_END
 
 
@@ -1548,37 +1465,7 @@ static INPUT_PORTS_START( hypreac2 )
 	PORT_DIPSETTING(      0x0000, "MASTER" )
 	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_LOW, "DSWB:8" )
 
-	PORT_START("KEY0")  // IN5 - $500000(0)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1  )
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY1")  // IN6 - $500000(1)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")  // IN7 - $500000(2)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")  // IN8 - $500000(3)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE(mahjong_matrix_1p)  // IN5-IN8 - $c00000
 INPUT_PORTS_END
 
 
@@ -1634,7 +1521,9 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( janjans2 )
-	PORT_INCLUDE(ssv_mahjong)
+	PORT_INCLUDE(ssv_joystick)
+
+	PORT_INCLUDE(mahjong_matrix_1p) // IN5-IN8 - $800002
 
 	PORT_MODIFY("DSW1") // IN0 - $210002
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "DSW1:1" )
@@ -2055,45 +1944,7 @@ static INPUT_PORTS_START( srmp7 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // tested
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_START("KEY0")  // IN6 - $600000(0)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY1")  // IN7 - $600000(1)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")  // IN8 - $600000(2)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")  // IN5 - $600000(3)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE(mahjong_matrix_1p) // IN5-IN8 - $800002
 INPUT_PORTS_END
 
 
@@ -2475,7 +2326,7 @@ static const gfx_layout layout_16x8x8_ram =
 };
 
 static GFXDECODE_START( gfx_eaglshot )
-	GFXDECODE_ENTRY( nullptr, 0, layout_16x8x8_ram, 0, 0x8000/64 ) // [0] Sprites (256 colors, decoded from RAM)
+	GFXDECODE_RAM( nullptr, 0, layout_16x8x8_ram, 0, 0x8000/64 ) // [0] Sprites (256 colors, decoded from RAM)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_gdfs )
@@ -2594,8 +2445,7 @@ void ssv_state::ssv(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x8000);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ES5506(config, m_ensoniq, SSV_MASTER_CLOCK);
 	m_ensoniq->set_region0("ensoniq.0");
@@ -2603,8 +2453,8 @@ void ssv_state::ssv(machine_config &config)
 	m_ensoniq->set_region2("ensoniq.2");
 	m_ensoniq->set_region3("ensoniq.3");
 	m_ensoniq->set_channels(1);
-	m_ensoniq->add_route(0, "lspeaker", 0.075);
-	m_ensoniq->add_route(1, "rspeaker", 0.075);
+	m_ensoniq->add_route(0, "speaker", 0.075, 0);
+	m_ensoniq->add_route(1, "speaker", 0.075, 1);
 }
 
 void drifto94_state::drifto94(machine_config &config)
@@ -4798,7 +4648,7 @@ ROM_END
 
 ***************************************************************************/
 
-//    year   rom        clone     machine   inputs    init                           monitor manufacturer          title                                                                     flags
+//    year   rom        clone     machine   inputs    init                                monitor manufacturer                                title                                                                     flags
 
 GAME( 1993,  dynagear,  0,        dynagear, dynagear, ssv_state,      init_ssv,           ROT0,   "Sammy",                                    "Dyna Gear",                                                              MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 

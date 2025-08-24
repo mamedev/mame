@@ -52,7 +52,7 @@ public:
 	// Audio In pin, an analog value of the audio waveform being pushed to the chip.
 	// TODO: this is not hooked up or implemented yet, and this should really be handled as an
 	// input stream from a separate DAC device, not a value push function at all.
-	//void audio_in_w(stream_buffer::sample_t data);
+	//void audio_in_w(sound_stream::sample_t data);
 
 	// sets the buffered digit (0 or 1), common to all chips. TODO: replace all use of this with
 	// digin_cb once implemented
@@ -74,7 +74,7 @@ protected:
 	//virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// callbacks
 	devcb_write_line m_clock_state_push_cb; // TODO: get rid of this, if you use it you should feel bad
@@ -90,8 +90,6 @@ protected:
 	bool m_last_clock_state;
 	bool m_buffered_bit;
 	uint8_t m_shiftreg;
-	stream_buffer::sample_t m_curr_sample;
-	stream_buffer::sample_t m_next_sample;
 	uint32_t m_samples_generated;
 
 	// specific internal handler overrides, overridden by each chip
@@ -131,7 +129,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// callbacks
 	devcb_write_line m_agc_push_cb;
@@ -146,6 +144,7 @@ protected:
 	// internal state
 	int32_t m_sylfilter;
 	int32_t m_intfilter;
+	int16_t m_next_sample;
 	bool m_agc;
 	bool m_buffered_fzq;
 
@@ -180,7 +179,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// const coefficients defined by constructor; should these be adjustable by the user or externally defined,
 	// as they are implemented using a set of two small lowpass filters outside the chip?
@@ -189,8 +188,10 @@ protected:
 	const double m_leak;
 
 	// internal state
-	double m_sylfilter_d;
-	double m_intfilter_d;
+	double m_sylfilter;
+	double m_intfilter;
+	sound_stream::sample_t m_curr_sample;
+	sound_stream::sample_t m_next_sample;
 
 	// internal handlers
 	virtual void process_bit(bool bit, bool clock_state) override;

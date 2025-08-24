@@ -141,4 +141,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP(1986, adds2020, 0, 0, adds2020, adds2020, adds2020_state, empty_init, "Applied Digital Data Systems", "ADDS 2020", MACHINE_IS_SKELETON)
+COMP(1986, adds2020, 0, 0, adds2020, adds2020, adds2020_state, empty_init, "Applied Digital Data Systems", "ADDS 2020", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

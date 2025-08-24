@@ -229,5 +229,5 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1997, beezerk, 0, base, beezerk, vlc34010_state, empty_init, ROT0, "VLT Inc.", "Bee-Zerk",              MACHINE_IS_SKELETON ) // copyright in ROM is VLT instead of VLC, dump came as BeeZerk, but probably a multigame
-GAME( 2000, vlcunk,  0, base, beezerk, vlc34010_state, empty_init, ROT0, "VLC Inc.", "unknown VLC multigame", MACHINE_IS_SKELETON )
+GAME( 1997, beezerk, 0, base, beezerk, vlc34010_state, empty_init, ROT0, "VLT Inc.", "Bee-Zerk",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // copyright in ROM is VLT instead of VLC, dump came as BeeZerk, but probably a multigame
+GAME( 2000, vlcunk,  0, base, beezerk, vlc34010_state, empty_init, ROT0, "VLC Inc.", "unknown VLC multigame", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

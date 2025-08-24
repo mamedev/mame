@@ -357,12 +357,13 @@ void lr35902_cpu_device::execute_run()
 				/* Fetch and count cycles */
 				bool was_halted = (m_enable & HALTED);
 				check_interrupts();
-				debugger_instruction_hook(m_PC);
 				if ( m_enable & HALTED ) {
+					debugger_wait_hook();
 					cycles_passed(m_has_halt_bug ? 2 : 4);
 					m_execution_state = 1;
 					m_entering_halt = false;
 				} else {
+					debugger_instruction_hook(m_PC);
 					if (was_halted) {
 						m_PC++;
 					} else {

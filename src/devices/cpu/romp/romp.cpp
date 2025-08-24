@@ -122,6 +122,7 @@ void romp_device::execute_run()
 
 		if (m_branch_state == WAIT)
 		{
+			debugger_wait_hook();
 			m_icount = 0;
 			return;
 		}

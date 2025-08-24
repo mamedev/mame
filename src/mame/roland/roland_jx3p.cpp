@@ -271,6 +271,6 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1983, jx3p,  0, 0, jx3p,  jx3p,  roland_jx3p_state, empty_init, "Roland", "JX-3P Programmable Preset Polyphonic Synthesizer", MACHINE_IS_SKELETON)
-SYST(1984, mks30, 0, 0, mks30, mks30, roland_jx3p_state, empty_init, "Roland", "MKS-30 Planet-S MIDI Sound Module",                MACHINE_IS_SKELETON)
-SYST(1984, gr700, 0, 0, gr700, mks30, roland_jx3p_state, empty_init, "Roland", "GR-700 Guitar Synthesizer",                        MACHINE_IS_SKELETON)
+SYST(1983, jx3p,  0, 0, jx3p,  jx3p,  roland_jx3p_state, empty_init, "Roland", "JX-3P Programmable Preset Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1984, mks30, 0, 0, mks30, mks30, roland_jx3p_state, empty_init, "Roland", "MKS-30 Planet-S MIDI Sound Module",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1984, gr700, 0, 0, gr700, mks30, roland_jx3p_state, empty_init, "Roland", "GR-700 Guitar Synthesizer",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

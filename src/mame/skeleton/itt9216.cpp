@@ -108,4 +108,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1986, itt9216, 0, 0, itt9216, itt9216, itt9216_state, empty_init, "ITT Courier", "ITT 9216-X", MACHINE_IS_SKELETON)
+COMP(1986, itt9216, 0, 0, itt9216, itt9216, itt9216_state, empty_init, "ITT Courier", "ITT 9216-X", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

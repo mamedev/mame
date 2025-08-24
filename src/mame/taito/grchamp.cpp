@@ -110,7 +110,7 @@ void grchamp_state::machine_start()
 	save_item(NAME(m_collmode));
 }
 
-	void grchamp_state::machine_reset()
+void grchamp_state::machine_reset()
 {
 	m_soundnmi->in_w<0>(0); // disable sound nmi
 	/* if the coin system is 1 way, lock Coin B (Page 40) */
@@ -365,13 +365,11 @@ void grchamp_state::cpu1_outputs_w(offs_t offset, uint8_t data)
 
 uint8_t grchamp_state::get_pc3259_bits(int offs)
 {
-	int bits;
-
 	/* force a partial update to the current position */
 	m_screen->update_partial(m_screen->vpos());
 
 	/* get the relevant 4 bits */
-	bits = (m_collide >> (offs*4)) & 0x0f;
+	uint8_t bits = (m_collide >> (offs*4)) & 0x0f;
 
 	/* replicate to both nibbles */
 	return bits | (bits << 4);
@@ -440,6 +438,7 @@ uint8_t grchamp_state::main_to_sub_comm_r(offs_t offset)
  *  Sound port handlers
  *
  *************************************/
+
 TIMER_CALLBACK_MEMBER(grchamp_state::soundlatch_w_cb)
 {
 	if (m_soundlatch_flag && (m_soundlatch_data != param))
@@ -949,6 +948,6 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1981, grchamp,        0, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
+GAMEL( 1981, grchamp,  0,       grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
 GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp ) // uses different ports. Bad dump?
 GAMEL( 1981, grchampb, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )

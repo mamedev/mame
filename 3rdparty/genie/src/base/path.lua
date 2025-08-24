@@ -172,6 +172,10 @@
 		return path.hasextension(fname, { ".h", ".hh", ".hpp", ".hxx" })
 	end
 
+	function path.iscppmodule(fname)
+		return path.hasextension(fname, { ".ixx", ".cppm" })
+	end
+
 	function path.isappxmanifest(fname)
 		return path.hasextension(fname, ".appxmanifest")
 	end
@@ -192,6 +196,11 @@
 		return path.hasextension(fname, ".vala")
 	end
 
+	function path.isgresource(fname)
+		local ending = ".gresource.xml"
+		return ending == "" or fname:sub(-#ending) == ending
+	end
+
 	function path.isswiftfile(fname)
 		return path.hasextension(fname, ".swift")
 	end
@@ -208,6 +217,7 @@
 	function path.issourcefilevs(fname)
 		return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c++", ".c" })
 			or path.iscxfile(fname)
+			or path.iscppmodule(fname)
 	end
 
 --

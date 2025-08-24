@@ -1,5 +1,5 @@
 // license:CC0-1.0
-// copyright-holders:Ryan Holtz, Ivan Vangelista
+// copyright-holders:Ryan Holtz
 //
 // Netlist for Atari's Flyball
 //

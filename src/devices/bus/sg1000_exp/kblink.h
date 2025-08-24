@@ -9,8 +9,8 @@ is supported by the game F-16 Fighting Falcon for its 2 players mode.
 
 **********************************************************************/
 
-#ifndef MAME_BUS_SG1000_EXP_SK1100_KBLINK_H
-#define MAME_BUS_SG1000_EXP_SK1100_KBLINK_H
+#ifndef MAME_BUS_SG1000_EXP_KBLINK_H
+#define MAME_BUS_SG1000_EXP_KBLINK_H
 
 #pragma once
 
@@ -81,4 +81,4 @@ private:
 DECLARE_DEVICE_TYPE(SK1100_LINK_CABLE, sk1100_link_cable_device)
 
 
-#endif // MAME_BUS_SG1000_EXP_SK1100_KBLINK_H
+#endif // MAME_BUS_SG1000_EXP_KBLINK_H

@@ -157,7 +157,10 @@ u32 vme_bus_device::read_iack(address_space &space, offs_t offset, u32 mem_mask)
 {
 	if (!device().machine().side_effects_disabled())
 	{
-		LOG("read_iack 0x%08x mem_mask 0x%08x (%s)\n", offset, mem_mask, machine().describe_context());
+		// decode the interrupt number from address lines A03-A01
+		unsigned const irq = BIT(offset, 1, 3);
+
+		LOG("read_iack 0x%08x mem_mask 0x%08x /IRQ%u /IACKIN asserted (%s)\n", offset, mem_mask, irq, machine().describe_context());
 
 		// enable interrupt acknowledge daisy chain
 		m_iack = true;
@@ -169,22 +172,24 @@ u32 vme_bus_device::read_iack(address_space &space, offs_t offset, u32 mem_mask)
 // generate bus errors on unmapped read cycles
 u32 vme_bus_device::read_berr(address_space &space, offs_t offset, u32 mem_mask)
 {
+	u32 const data = space.unmap();
+
 	if (!device().machine().side_effects_disabled())
 	{
-		LOG("read_berr 0x%08x mem_mask 0x%08x (%s)\n", offset << 2, mem_mask, machine().describe_context());
+		LOG("read_berr %s 0x%08x data 0x%08x mem_mask 0x%08x /BERR asserted (%s)\n", space.name(), offset << 2, data, mem_mask, machine().describe_context());
 
 		m_berr(0);
 	}
 
-	return space.unmap();
+	return data;
 }
 
 // generate bus errors on unmapped write cycles
-void vme_bus_device::write_berr(offs_t offset, u32 data, u32 mem_mask)
+void vme_bus_device::write_berr(address_space &space, offs_t offset, u32 data, u32 mem_mask)
 {
 	if (!device().machine().side_effects_disabled())
 	{
-		LOG("write_berr 0x%08x data 0x%08x mem_mask 0x%08x (%s)\n", offset << 2, data, mem_mask, machine().describe_context());
+		LOG("write_berr %s 0x%08x data 0x%08x mem_mask 0x%08x /BERR asserted (%s)\n", space.name(), offset << 2, data, mem_mask, machine().describe_context());
 
 		m_berr(0);
 	}
@@ -223,7 +228,7 @@ template <unsigned I> void vme_bus_device::irq_w(int state)
 	// update line state
 	if (irq_active ^ bool(m_irq_count[I - 1]))
 	{
-		LOG("irq %d state %d\n", I, state);
+		LOG("bus /IRQ%u %s\n", I, state ? "cleared" : "asserted");
 		m_irq[I - 1](state);
 	}
 }
@@ -239,8 +244,14 @@ template void vme_bus_device::irq_w<7>(int state);
 vme_slot_device::vme_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, VME_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
-	, m_bus(*this, owner->tag())
 {
+}
+
+void vme_slot_device::device_config_complete()
+{
+	device_vme_card_interface *const card(dynamic_cast<device_vme_card_interface *>(get_card_device()));
+	if (card && owner())
+		card->set_bus(*dynamic_cast<vme_bus_device *>(owner()));
 }
 
 void vme_slot_device::device_start()
@@ -252,27 +263,13 @@ void vme_slot_device::device_start()
 
 device_vme_card_interface::device_vme_card_interface(machine_config const &mconfig, device_t &device)
 	: device_interface(device, "vme")
-	, m_slot(dynamic_cast<vme_slot_device *>(device.owner()))
+	, m_bus(nullptr)
 	, m_berr(*this)
+	, m_irq(*this)
 	, m_iack(*this, 0)
 	, m_irq_active(0)
 	, m_master(false)
 {
-}
-
-void device_vme_card_interface::interface_config_complete()
-{
-	// route bus errors to the card when it is the bus master
-	if (m_slot) // HACK: avoid breaking listxml until proper fix can be identified
-	m_slot->berr().append(
-		[this](int state)
-		{
-			if (m_master)
-			{
-				LOG("vme berr %d\n", state);
-				m_berr(state);
-			}
-		});
 }
 
 void device_vme_card_interface::interface_post_start()
@@ -298,17 +295,42 @@ void device_vme_card_interface::interface_post_start()
 			 * chain input (/IACKIN) is asserted and this device is asserting
 			 * the interrupt number being acknowledged.
 			 */
-			if (m_slot->iackin_r() && BIT(m_irq_active, irq))
+			if (!m_bus->iackin_r() && BIT(m_irq_active, irq))
 			{
 				// deassert interrupt acknowledge daisy chain output
-				m_slot->iackout_w(1);
+				m_bus->iackout_w(1);
 
 				// read and return the interrupting device status/ID
 				data = m_iack(irq);
 
-				LOG("vme iack irq %d status 0x%08x (%s)\n", irq, data, device().machine().describe_context());
+				LOG("vme iack irq %u status 0x%08x /IACKOUT deasserted (%s)\n", irq, data, device().machine().describe_context());
 			}
 		});
+}
+
+void device_vme_card_interface::set_bus(vme_bus_device &bus)
+{
+	m_bus = &bus;
+
+	// route incoming bus errors to a card only when it is the bus master
+	m_bus->berr().append(
+		[this](int state)
+		{
+			if (m_master)
+			{
+				LOG("vme incoming /BERR %s\n", state ? "cleared" : "asserted");
+				m_berr(state);
+			}
+		});
+
+	// route incoming interrupt requests to all cards
+	m_bus->irq<1>().append([this](int state) { LOG("vme incoming /IRQ1 %s\n", state ? "cleared" : "asserted"); m_irq[0](state); });
+	m_bus->irq<2>().append([this](int state) { LOG("vme incoming /IRQ2 %s\n", state ? "cleared" : "asserted"); m_irq[1](state); });
+	m_bus->irq<3>().append([this](int state) { LOG("vme incoming /IRQ3 %s\n", state ? "cleared" : "asserted"); m_irq[2](state); });
+	m_bus->irq<4>().append([this](int state) { LOG("vme incoming /IRQ4 %s\n", state ? "cleared" : "asserted"); m_irq[3](state); });
+	m_bus->irq<5>().append([this](int state) { LOG("vme incoming /IRQ5 %s\n", state ? "cleared" : "asserted"); m_irq[4](state); });
+	m_bus->irq<6>().append([this](int state) { LOG("vme incoming /IRQ6 %s\n", state ? "cleared" : "asserted"); m_irq[5](state); });
+	m_bus->irq<7>().append([this](int state) { LOG("vme incoming /IRQ7 %s\n", state ? "cleared" : "asserted"); m_irq[6](state); });
 }
 
 template <unsigned I> void device_vme_card_interface::vme_irq_w(int state)
@@ -316,7 +338,7 @@ template <unsigned I> void device_vme_card_interface::vme_irq_w(int state)
 	// check whether the interrupt state has changed
 	if (BIT(m_irq_active, I) == state)
 	{
-		LOG("vme irq %d state %d\n", I, state);
+		LOG("vme_irq_w outgoing /IRQ%u %s\n", I, state ? "cleared" : "asserted");
 
 		// record device interrupt state
 		if (!state)
@@ -325,7 +347,7 @@ template <unsigned I> void device_vme_card_interface::vme_irq_w(int state)
 			m_irq_active &= ~(1U << I);
 
 		// update the bus irq state
-		m_slot->irq_w<I>(state);
+		m_bus->irq_w<I>(state);
 	}
 }
 

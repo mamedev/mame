@@ -3,8 +3,8 @@
 
 // Nippon Steel Corp NN71003F mpeg audio decoder
 
-#ifndef DEVICES_SOUND_NN71003F_H
-#define DEVICES_SOUND_NN71003F_H
+#ifndef MAME_SOUND_NN71003F_H
+#define MAME_SOUND_NN71003F_H
 
 #pragma once
 
@@ -29,7 +29,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	devcb_write_line m_miso;
@@ -39,4 +39,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NN71003F, nn71003f_device)
 
-#endif
+#endif // MAME_SOUND_NN71003F_H

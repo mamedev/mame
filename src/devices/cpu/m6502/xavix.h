@@ -192,10 +192,10 @@ protected:
 	void set_databank(uint8_t bank);
 	uint8_t get_databank();
 
-	void write_special_stack(uint8_t data);
+	void write_special_stack(uint32_t addr, uint8_t data);
 	void dec_special_stack();
 	void inc_special_stack();
-	uint8_t read_special_stack();
+	uint8_t read_special_stack(uint32_t addr);
 
 	/* we store the additional 'codebank' used for far calls in a different, private stack
 	   this seems to be neccessary for 'rad_hnt2' not to crash when bringing up the calibration / score table screens
@@ -211,6 +211,16 @@ protected:
 	uint8_t read_zeropage(uint32_t addr);
 	void write_zeropage(uint32_t addr, uint8_t val);
 
+	// Some original XaviX games seemed to suggest that the extra byte of the far calls went to a different
+	// stack, but dblmouse on suprtvpc does direct stack manipulation which challenges this assumption.
+	// It could be a SuperXaviX vs XaviX differences however, so currently leaving this as a toggle for testing.
+	//
+	// pausing in rad_hnt2 (press shift when on the map) is broken without this logic as the stack becomes too
+	// big with the extra bytes
+	//
+	// we currently use the private stack for regular XaviX but not for the later CPUs, however the root cause
+	// of needing it for regular XaviX could be somewhere else
+	bool m_use_private_stack_for_extra_callf_byte = true;
 };
 
 enum {

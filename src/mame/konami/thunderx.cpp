@@ -192,6 +192,7 @@ K052109_CB_MEMBER(scontra_state::gbusters_tile_callback)
 	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
+
 /***************************************************************************
 
   Callbacks for the K051960
@@ -225,8 +226,6 @@ K051960_CB_MEMBER(thunderx_state_base::sprite_callback)
 
 uint32_t thunderx_state_base::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
 	screen.priority().fill(0, cliprect);
 
 	// The background color is always from layer 1
@@ -780,6 +779,13 @@ void thunderx_state_base::machine_start()
 	m_palette->set_shadow_factor(7.0/8.0);
 }
 
+void thunderx_state::machine_start()
+{
+	thunderx_state_base::machine_start();
+
+	m_thunderx_firq_timer = timer_alloc(FUNC(thunderx_state::thunderx_firq_cb), this);
+}
+
 void thunderx_state_base::machine_reset()
 {
 	m_rombank->set_entry(0);
@@ -791,33 +797,30 @@ void thunderx_state_base::machine_reset()
 void thunderx_state_base::common(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); // 052001 (verified on PCB)
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 052001 (verified on PCB)
 	m_maincpu->set_addrmap(AS_PROGRAM, &thunderx_state_base::scontra_map);
 
-	Z80(config, m_audiocpu, XTAL(3'579'545)); // verified on PCB
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &thunderx_state_base::thunderx_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.17); // verified on PCB
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1); // verified on scontra and thunderx PCBs
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // verified on scontra and thunderx PCBs
 	screen.set_screen_update(FUNC(thunderx_state_base::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0); // 051961 on Super Contra and Thunder Cross schematics
+	K052109(config, m_k052109, 24_MHz_XTAL); // 051961 on Super Contra and Thunder Cross schematics
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(thunderx_state_base::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(thunderx_state_base::sprite_callback));
@@ -827,27 +830,8 @@ void thunderx_state_base::common(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 1.0).add_route(1, "mono", 1.0);  /* verified on pcb */
-}
-
-void scontra_state::scontra(machine_config &config)
-{
-	common(config);
-
-	m_audiocpu->set_addrmap(AS_PROGRAM, &scontra_state::scontra_sound_map);
-
-	K007232(config, m_k007232, XTAL(3'579'545)); // verified on PCB
-	m_k007232->port_write().set(FUNC(scontra_state::volume_callback));
-	m_k007232->add_route(0, "mono", 0.20);
-	m_k007232->add_route(1, "mono", 0.20);
-}
-
-
-void thunderx_state::machine_start()
-{
-	thunderx_state_base::machine_start();
-
-	m_thunderx_firq_timer = timer_alloc(FUNC(thunderx_state::thunderx_firq_cb), this);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL)); /* verified on pcb */
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void thunderx_state::thunderx(machine_config &config)
@@ -860,6 +844,17 @@ void thunderx_state::thunderx(machine_config &config)
 	m_maincpu->line().set_membank(m_rombank).mask(0x0f);
 
 	m_k052109->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
+
+void scontra_state::scontra(machine_config &config)
+{
+	common(config);
+
+	m_audiocpu->set_addrmap(AS_PROGRAM, &scontra_state::scontra_sound_map);
+
+	K007232(config, m_k007232, 3.579545_MHz_XTAL); // verified on PCB
+	m_k007232->port_write().set(FUNC(scontra_state::volume_callback));
+	m_k007232->add_route(ALL_OUTPUTS, "mono", 0.1);
 }
 
 void scontra_state::gbusters(machine_config &config)
@@ -1173,8 +1168,8 @@ ROM_END
 
 ROM_START( gbustersa )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
-	ROM_LOAD( "878_02.k13", 0x00000, 0x10000, CRC(57178414) SHA1(89b1403158f6ce18706c8a941109554d03cf77d9) ) /* unknown region/version leter */
-	ROM_LOAD( "878_03.k15", 0x10000, 0x10000, CRC(6c59e660) SHA1(66a92eb8a93c9f542489fa31bec6ed1819d174da) ) /* unknown region/version leter */
+	ROM_LOAD( "878_02.k13", 0x00000, 0x10000, CRC(57178414) SHA1(89b1403158f6ce18706c8a941109554d03cf77d9) ) /* unknown region/version letter */
+	ROM_LOAD( "878_03.k15", 0x10000, 0x10000, CRC(6c59e660) SHA1(66a92eb8a93c9f542489fa31bec6ed1819d174da) ) /* unknown region/version letter */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "878h01.f8", 0x00000, 0x08000, CRC(96feafaa) SHA1(8b6547e610cb4fa1c1f5bf12cb05e9a12a353903) )
@@ -1224,11 +1219,13 @@ ROM_END
 
 GAME( 1988, scontra,   0,        scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra (set 1)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1988, scontraa,  scontra,  scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra (set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, scontraj,  scontra,  scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra - Alien no Gyakushuu (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, scontraj,  scontra,  scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra: Alien no Gyakushuu (Japan)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1988, thunderx,  0,        thunderx, thunderx, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderxa, thunderx, thunderx, thunderx, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderxb, thunderx, thunderx, thunderx, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (Japan)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1988, gbusters,  0,        gbusters, gbusters, scontra_state,  empty_init, ROT90, "Konami", "Gang Busters (set 1)",  MACHINE_SUPPORTS_SAVE ) // N02 & J03 program ROMs
 GAME( 1988, gbustersa, gbusters, gbusters, gbusters, scontra_state,  empty_init, ROT90, "Konami", "Gang Busters (set 2)",  MACHINE_SUPPORTS_SAVE ) // unknown region program ROMs
 GAME( 1988, crazycop,  gbusters, gbusters, gbusters, scontra_state,  empty_init, ROT90, "Konami", "Crazy Cop (Japan)",     MACHINE_SUPPORTS_SAVE ) // M02 & J03 program ROMs

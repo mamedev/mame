@@ -7,22 +7,14 @@
 
 Emulation by Bryan McPhail, mish@tendril.co.uk
 
-Notes:
+TODO:
 - Schematics show a palette/work RAM bank selector, but this doesn't seem
   to be used?
 
-- Devastators: has player-trench collision detection issues, player isn't
-  supposed to go through them.
-
-- Devastators: sprite zooming for the planes in level 2 is particularly bad.
-
-- Devastators: title screen white backdrop is always supposed to flicker,
-  it currently does that only from second/fourth attract cycles (supposed to always
-  flicker from PCB video);
-
 Both games run on Konami's PWB351024A PCB
-  The Main Event uses a uPD7759 + 640KHz resonator plus sample ROM, for Devastators this area is unpopulated
-  Devastators uses a YM2151 + YM3012 and the 051733, for The Main Event these chips are unpopulated
+  The Main Event uses a uPD7759 + 640KHz resonator plus sample ROM, for
+  Devastators this area is unpopulated Devastators uses a YM2151 + YM3012
+  and the 051733, for The Main Event these chips are unpopulated
 
 ***************************************************************************/
 
@@ -38,6 +30,8 @@ Both games run on Konami's PWB351024A PCB
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
+#include "machine/watchdog.h"
 #include "sound/k007232.h"
 #include "sound/upd7759.h"
 #include "sound/ymopm.h"
@@ -116,7 +110,7 @@ private:
 	void sh_irqcontrol_w(uint8_t data);
 	void sh_bankswitch_w(uint8_t data);
 	uint8_t sh_busy_r();
-	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K052109_CB_MEMBER(tile_callback);
@@ -135,21 +129,12 @@ public:
 
 	void devstors(machine_config &config);
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
 private:
-	// misc
-	uint8_t m_nmi_enable = 0;
-
-	void nmienable_w(uint8_t data);
 	void sh_irqcontrol_w(uint8_t data);
 	void sh_bankswitch_w(uint8_t data);
-	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vblank_w(int state);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 
@@ -222,8 +207,6 @@ K051960_CB_MEMBER(devstors_state::sprite_callback)
 
 uint32_t mainevt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
 	screen.priority().fill(0, cliprect);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 1, 2); // low priority part of layer
@@ -236,25 +219,11 @@ uint32_t mainevt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 uint32_t devstors_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
 	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 	return 0;
-}
-
-
-void devstors_state::nmienable_w(uint8_t data)
-{
-	m_nmi_enable = data;
-}
-
-void devstors_state::vblank_w(int state)
-{
-	if (state && m_nmi_enable)
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -362,9 +331,9 @@ void mainevt_state::main_map(address_map &map)
 
 	map(0x1f80, 0x1f80).w(FUNC(mainevt_state::bankswitch_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write)); // probably
-	map(0x1f88, 0x1f88).w(FUNC(mainevt_state::sh_irqtrigger_w));  // probably
-	map(0x1f8c, 0x1f8d).nopw();    // ???
-	map(0x1f90, 0x1f90).w(FUNC(mainevt_state::coin_w));   // coin counters + lamps
+	map(0x1f88, 0x1f88).w(FUNC(mainevt_state::sh_irqtrigger_w)); // probably
+	map(0x1f8c, 0x1f8c).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
+	map(0x1f90, 0x1f90).w(FUNC(mainevt_state::coin_w)); // coin counters + lamps
 
 	map(0x1f94, 0x1f94).portr("SYSTEM");
 	map(0x1f95, 0x1f95).portr("P1");
@@ -388,8 +357,9 @@ void devstors_state::main_map(address_map &map)
 
 	map(0x1f80, 0x1f80).w(FUNC(devstors_state::bankswitch_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write)); // probably
-	map(0x1f88, 0x1f88).w(FUNC(devstors_state::sh_irqtrigger_w));  // probably
-	map(0x1f90, 0x1f90).w(FUNC(devstors_state::coin_w));   // coin counters + lamps
+	map(0x1f88, 0x1f88).w(FUNC(devstors_state::sh_irqtrigger_w)); // probably
+	map(0x1f8c, 0x1f8c).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
+	map(0x1f90, 0x1f90).w(FUNC(devstors_state::coin_w)); // coin counters + lamps
 
 	map(0x1f94, 0x1f94).portr("SYSTEM");
 	map(0x1f95, 0x1f95).portr("P1");
@@ -398,7 +368,6 @@ void devstors_state::main_map(address_map &map)
 	map(0x1f98, 0x1f98).portr("DSW3");
 	map(0x1f9b, 0x1f9b).portr("DSW2");
 	map(0x1fa0, 0x1fbf).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));
-	map(0x1fb2, 0x1fb2).w(FUNC(devstors_state::nmienable_w));
 
 	map(0x4000, 0x5dff).ram();
 	map(0x5e00, 0x5fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
@@ -601,27 +570,21 @@ void mainevt_state::machine_reset()
 	sh_irqcontrol_w(0);
 }
 
-void devstors_state::machine_start()
+TIMER_DEVICE_CALLBACK_MEMBER(mainevt_state::sound_timer_irq)
 {
-	base_state::machine_start();
+	int scanline = param;
 
-	save_item(NAME(m_nmi_enable));
-}
-
-void devstors_state::machine_reset()
-{
-	m_nmi_enable = 0;
-}
-
-INTERRUPT_GEN_MEMBER(mainevt_state::sound_timer_irq)
-{
-	if (m_sound_irq_mask)
+	// 8 interrupts per frame
+	if ((scanline & 0x1f) == 0x10 && m_sound_irq_mask)
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-INTERRUPT_GEN_MEMBER(devstors_state::sound_timer_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(devstors_state::sound_timer_irq)
 {
-	if (m_sound_irq_mask)
+	int scanline = param;
+
+	// 4 interrupts per frame
+	if ((scanline & 0x3f) == 0x20 && m_sound_irq_mask)
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -631,17 +594,15 @@ void mainevt_state::mainevt(machine_config &config)
 	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // E & Q generated by 052109
 	m_maincpu->set_addrmap(AS_PROGRAM, &mainevt_state::main_map);
 
-	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);  /* 3.579545 MHz */
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mainevt_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(mainevt_state::sound_timer_irq), attotime::from_hz(8 * 60));  // ???
+	TIMER(config, "scantimer").configure_scanline(FUNC(mainevt_state::sound_timer_irq), "screen", 0, 1);
+
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  screen.set_size(64*8, 32*8);
-//  screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
-	screen.set_raw(XTAL(24'000'000) / 3, 528, 14 * 8, (64 - 14) * 8, 256, 16, 240); // same hardware as Devastators so assume 59.17
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240); // same hardware as Devastators so assume 59.17
 	screen.set_screen_update(FUNC(mainevt_state::screen_update));
 	screen.set_palette("palette");
 
@@ -681,18 +642,16 @@ void devstors_state::devstors(machine_config &config)
 
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &devstors_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(devstors_state::sound_timer_irq), attotime::from_hz(4 * 60)); // ???
+	TIMER(config, "scantimer").configure_scanline(FUNC(devstors_state::sound_timer_irq), "screen", 0, 1);
+
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  screen.set_size(64*8, 32*8);
-//  screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
-	screen.set_raw(XTAL(24'000'000) / 3, 528, 13 * 8, (64 - 13) * 8, 256, 16, 240); // measured 59.17
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+24, 320-8, 264, 16, 240); // measured 59.17
 	screen.set_screen_update(FUNC(devstors_state::screen_update));
 	screen.set_palette("palette");
-	screen.screen_vblank().set(FUNC(devstors_state::vblank_w));
+	screen.screen_vblank().set("k051733", FUNC(k051733_device::nmiclock_w));
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 256).enable_shadows();
 
@@ -707,14 +666,17 @@ void devstors_state::devstors(machine_config &config)
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(devstors_state::sprite_callback));
 
-	K051733(config, "k051733", 0);
+	k051733_device &k051733(K051733(config, "k051733", 24_MHz_XTAL / 2));
+	k051733.set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.add_route(0, "mono", 0.30);
+	ymsnd.add_route(1, "mono", 0.30);
 
 	K007232(config, m_k007232, 3.579545_MHz_XTAL);
 	m_k007232->port_write().set(FUNC(devstors_state::volume_callback));
@@ -729,7 +691,6 @@ void devstors_state::devstors(machine_config &config)
   Game driver(s)
 
 ***************************************************************************/
-
 
 ROM_START( mainevt )    // 4 players - English title screen - No "Warning" message in the ROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -967,8 +928,9 @@ GAME( 1988, mainevt,   0,        mainevt,  mainevt,     mainevt_state,  empty_in
 GAME( 1988, mainevto,  mainevt,  mainevt,  mainevt,     mainevt_state,  empty_init, ROT0,  "Konami", "The Main Event (4 Players ver. F)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mainevt2p, mainevt,  mainevt,  mainev2p,    mainevt_state,  empty_init, ROT0,  "Konami", "The Main Event (2 Players ver. X)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ringohja,  mainevt,  mainevt,  mainev2p,    mainevt_state,  empty_init, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors,  0,        devstors, devstors,    devstors_state, empty_init, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, devstorsx, devstors, devstors, devstors_ct, devstors_state, empty_init, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, devstorsv, devstors, devstors, devstors,    devstors_state, empty_init, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, devstors2, devstors, devstors, devstors_ct, devstors_state, empty_init, ROT90, "Konami", "Devastators (ver. 2)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, garuka,    devstors, devstors, devstors_ct, devstors_state, empty_init, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+
+GAME( 1988, devstors,  0,        devstors, devstors,    devstors_state, empty_init, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstorsx, devstors, devstors, devstors_ct, devstors_state, empty_init, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstorsv, devstors, devstors, devstors,    devstors_state, empty_init, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors2, devstors, devstors, devstors_ct, devstors_state, empty_init, ROT90, "Konami", "Devastators (ver. 2)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, garuka,    devstors, devstors, devstors_ct, devstors_state, empty_init, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE )

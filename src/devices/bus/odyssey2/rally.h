@@ -14,5 +14,6 @@
 #include "slot.h"
 
 DECLARE_DEVICE_TYPE(O2_ROM_RALLY, device_o2_cart_interface)
+DECLARE_DEVICE_TYPE(O2_ROM_TESTPL, device_o2_cart_interface)
 
 #endif // MAME_BUS_ODYSSEY2_RALLY_H

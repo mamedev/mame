@@ -50,8 +50,8 @@ void isa16_ide_device::ide_interrupt(int state)
 void isa16_ide_device::cdrom_headphones(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	cdda->add_route(0, "^^lheadphone", 1.0);
-	cdda->add_route(1, "^^rheadphone", 1.0);
+	cdda->add_route(0, "^^headphone", 1.0, 0);
+	cdda->add_route(1, "^^headphone", 1.0, 1);
 }
 
 static INPUT_PORTS_START( ide )
@@ -76,8 +76,7 @@ void isa16_ide_device::device_add_mconfig(machine_config &config)
 	IDE_CONTROLLER(config, m_ide).options(ata_devices, "hdd", nullptr, false);
 	m_ide->irq_handler().set(FUNC(isa16_ide_device::ide_interrupt));
 
-	SPEAKER(config, "lheadphone").front_left();
-	SPEAKER(config, "rheadphone").front_right();
+	SPEAKER(config, "headphone", 2).front();
 
 	m_ide->slot(0).set_option_machine_config("cdrom", cdrom_headphones);
 	m_ide->slot(1).set_option_machine_config("cdrom", cdrom_headphones);

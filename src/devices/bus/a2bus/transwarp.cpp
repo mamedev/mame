@@ -22,7 +22,7 @@
 #include "emu.h"
 #include "transwarp.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 
 
 //**************************************************************************
@@ -65,7 +65,7 @@ private:
 	uint8_t dma_r(offs_t offset);
 	void dma_w(offs_t offset, uint8_t data);
 
-	void m65c02_mem(address_map &map) ATTR_COLD;
+	void w65c02_mem(address_map &map) ATTR_COLD;
 
 	void hit_slot(int slot);
 	void hit_slot_joy();
@@ -77,7 +77,7 @@ private:
 
 DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_TRANSWARP, device_a2bus_card_interface, a2bus_transwarp_device, "a2twarp", "Applied Engineering TransWarp")
 
-void a2bus_transwarp_device::m65c02_mem(address_map &map)
+void a2bus_transwarp_device::w65c02_mem(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(a2bus_transwarp_device::dma_r), FUNC(a2bus_transwarp_device::dma_w));
 }
@@ -169,8 +169,8 @@ ioport_constructor a2bus_transwarp_device::device_input_ports() const
 
 void a2bus_transwarp_device::device_add_mconfig(machine_config &config)
 {
-	M65C02(config, m_ourcpu, DERIVED_CLOCK(1, 2));
-	m_ourcpu->set_addrmap(AS_PROGRAM, &a2bus_transwarp_device::m65c02_mem);
+	W65C02(config, m_ourcpu, DERIVED_CLOCK(1, 2));
+	m_ourcpu->set_addrmap(AS_PROGRAM, &a2bus_transwarp_device::w65c02_mem);
 }
 
 //**************************************************************************

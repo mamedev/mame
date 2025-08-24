@@ -122,7 +122,8 @@
 		"amd64",
 		"ppc64",
 		"powerpc64",
-		"sparc64"
+		"sparc64",
+		"arm64"
 	}
 
 	function os.is64bit()

@@ -104,8 +104,7 @@ void ct909e_megatrix_state::megatrix(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(ct909e_megatrix_state::screen_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 ROM_START( megatrix )
@@ -116,4 +115,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2007, megatrix,    0,       0,      megatrix, megatrix, ct909e_megatrix_state, empty_init, "<unknown>", "MeGaTrix (Spain)", MACHINE_IS_SKELETON )
+CONS( 2007, megatrix,    0,       0,      megatrix, megatrix, ct909e_megatrix_state, empty_init, "<unknown>", "MeGaTrix (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

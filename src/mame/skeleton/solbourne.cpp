@@ -56,4 +56,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 198?, sols5e, 0, 0, solbourne, solbourne, solbourne_state, empty_init, "Solbourne Computer Inc", "Series 5E Computer Workstation", MACHINE_IS_SKELETON )
+COMP( 198?, sols5e, 0, 0, solbourne, solbourne, solbourne_state, empty_init, "Solbourne Computer Inc", "Series 5E Computer Workstation", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

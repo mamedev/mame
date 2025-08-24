@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  Seiko Epson E0C6S46 MCU
+  Seiko Epson E0C6S46 family
 
 */
 
@@ -10,6 +10,19 @@
 #define MAME_CPU_E0C6200_E0C6S46_H
 
 #include "e0c6200.h"
+
+// for the 2 K input ports, use set_input_line(line, state)
+enum
+{
+	E0C6S46_LINE_K00 = 0,
+	E0C6S46_LINE_K01,
+	E0C6S46_LINE_K02,
+	E0C6S46_LINE_K03,
+	E0C6S46_LINE_K10,
+	E0C6S46_LINE_K11,
+	E0C6S46_LINE_K12,
+	E0C6S46_LINE_K13
+};
 
 enum
 {
@@ -28,28 +41,13 @@ enum
 	E0C6S46_PORT_P3X
 };
 
-// for the 2 K input ports, use set_input_line(line, state)
-enum
-{
-	E0C6S46_LINE_K00 = 0,
-	E0C6S46_LINE_K01,
-	E0C6S46_LINE_K02,
-	E0C6S46_LINE_K03,
-	E0C6S46_LINE_K10,
-	E0C6S46_LINE_K11,
-	E0C6S46_LINE_K12,
-	E0C6S46_LINE_K13
-};
-
-
-// lcd driver
-#define E0C6S46_PIXEL_UPDATE(name) void name(bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state)
+// no pinout diagram here, refer to the manual
 
 
 class e0c6s46_device : public e0c6200_cpu_device
 {
 public:
-	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state)> pixel_update_delegate;
+	using pixel_delegate = device_delegate<void (int &dx, int &dy)>;
 
 	e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -60,14 +58,24 @@ public:
 	template <std::size_t Port> auto read_p() { return m_read_p[Port].bind(); }
 	template <std::size_t Port> auto write_p() { return m_write_p[Port].bind(); }
 
-	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb.set(std::forward<T>(args)...); }
+	// LCD segment outputs: COM0-COM15 as a0-a3, SEG0-SEGx as a4-a10
+	auto write_segs() { return m_write_segs.bind(); }
 
-	u8 io_r(offs_t offset);
-	void io_w(offs_t offset, u8 data);
+	// LCD contrast (adjusts VL pins overall voltage level)
+	auto write_contrast() { return m_write_contrast.bind(); }
 
+	// screen update (optional)
+	const u8 *lcd_buffer() { return &m_render_buf[0]; } // get intermediate LCD pixel buffer
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	template <typename... T> void set_pixel_callback(T &&... args) { m_pixel_cb.set(std::forward<T>(args)...); } // transform pixel x/y
+
+	// OSC3 (set fast oscillator, via resistor)
+	void set_osc3(u32 osc) { m_osc3 = osc; }
+
 protected:
+	e0c6s46_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor program, address_map_constructor data);
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -77,21 +85,31 @@ protected:
 	virtual void execute_one() override;
 	virtual bool check_interrupt() override;
 
-	void e0c6s46_data(address_map &map) ATTR_COLD;
-	void e0c6s46_program(address_map &map) ATTR_COLD;
+	u8 io_r(offs_t offset);
+	void io_w(offs_t offset, u8 data);
+
+	required_shared_ptr_array<u8, 2> m_vram;
 
 private:
-	required_shared_ptr<u8> m_vram1;
-	required_shared_ptr<u8> m_vram2;
+	void program_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	u8 m_irqflag[6];
 	u8 m_irqmask[6];
 	u8 m_osc;
 	u8 m_svd;
 
+	// lcd driver
 	u8 m_lcd_control;
 	u8 m_lcd_contrast;
-	pixel_update_delegate m_pixel_update_cb;
+	devcb_write8 m_write_segs;
+	devcb_write8 m_write_contrast;
+
+	emu_timer *m_lcd_driver;
+	TIMER_CALLBACK_MEMBER(lcd_driver_cb);
+
+	std::unique_ptr<u8[]> m_render_buf;
+	pixel_delegate m_pixel_cb;
 
 	// i/o ports
 	devcb_write8::array<5> m_write_r;
@@ -141,6 +159,7 @@ private:
 	u8 m_bz_43_on;
 	u8 m_bz_freq;
 	u8 m_bz_envelope;
+	u8 m_bz_envelope_count;
 	u8 m_bz_duty_ratio;
 	u8 m_bz_1shot_on;
 	bool m_bz_1shot_running;
@@ -151,9 +170,27 @@ private:
 	void schedule_buzzer();
 	void reset_buzzer();
 	void clock_bz_1shot();
+	void clock_bz_envelope();
+	void reset_bz_envelope();
+
+	u32 m_osc1;
+	u32 m_osc3;
+	emu_timer *m_osc_change;
+	TIMER_CALLBACK_MEMBER(osc_change);
+};
+
+class e0c6s48_device : public e0c6s46_device
+{
+public:
+	e0c6s48_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+private:
+	void program_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 };
 
 
 DECLARE_DEVICE_TYPE(E0C6S46, e0c6s46_device)
+DECLARE_DEVICE_TYPE(E0C6S48, e0c6s48_device)
 
 #endif // MAME_CPU_E0C6200_E0C6S46_H

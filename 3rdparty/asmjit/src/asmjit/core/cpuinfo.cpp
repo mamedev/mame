@@ -16,10 +16,6 @@
   #endif
 #endif // ASMJIT_ARCH_X86
 
-#if !defined(_WIN32)
-  #include <unistd.h>
-#endif
-
 #if ASMJIT_ARCH_ARM
   // Required by various utilities that are required by features detection.
   #if !defined(_WIN32)
@@ -52,6 +48,17 @@
     #include <machine/cpu.h>
   #endif
 #endif // ASMJIT_ARCH_ARM
+
+#if !defined(_WIN32) && (ASMJIT_ARCH_X86 || ASMJIT_ARCH_ARM)
+  #include <unistd.h>
+#endif
+
+// Unfortunately when compiling in C++11 mode MSVC would warn about unused functions as
+// [[maybe_unused]] attribute is not used in that case (it's used only by C++17 mode and later).
+#if defined(_MSC_VER)
+  #pragma warning(push)
+  #pragma warning(disable: 4505) // unreferenced local function has been removed.
+#endif // _MSC_VER
 
 ASMJIT_BEGIN_NAMESPACE
 
@@ -198,7 +205,7 @@ static ASMJIT_FAVOR_SIZE void simplifyCpuBrand(char* s) noexcept {
     if (!c)
       break;
 
-    if (!(c == ' ' && (prev == '@' || s[1] == ' ' || s[1] == '@'))) {
+    if (!(c == ' ' && (prev == '@' || s[1] == ' ' || s[1] == '@' || s[1] == '\0'))) {
       *d++ = c;
       prev = c;
     }
@@ -1996,5 +2003,9 @@ const CpuInfo& CpuInfo::host() noexcept {
 
   return cpuInfoGlobal;
 }
+
+#if defined(_MSC_VER)
+  #pragma warning(pop)
+#endif // _MSC_VER
 
 ASMJIT_END_NAMESPACE

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_ELECTRON_M2105_M
-#define MAME_BUS_ELECTRON_M2105_M
+#ifndef MAME_BUS_ELECTRON_M2105_H
+#define MAME_BUS_ELECTRON_M2105_H
 
 #pragma once
 
@@ -59,5 +59,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ELECTRON_M2105, electron_m2105_device)
 
-
-#endif // MAME_BUS_ELECTRON_M2105_M
+#endif // MAME_BUS_ELECTRON_M2105_H

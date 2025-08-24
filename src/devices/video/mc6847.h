@@ -258,7 +258,7 @@ protected:
 	character_map m_character_map;
 	artifacter m_artifacter;
 
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
@@ -368,34 +368,34 @@ protected:
 			/* graphics */
 			switch(mode & (MODE_GM2|MODE_GM1|MODE_GM0))
 			{
-				case 0:
-					emit_graphics<2, xscale * 4>(data, length, pixels, (mode & MODE_CSS) ? 4 : 0, palette);
-					result = length * 8 * xscale * 2;
-					break;
+			case 0:
+				emit_graphics<2, xscale * 4>(data, length, pixels, (mode & MODE_CSS) ? 4 : 0, palette);
+				result = length * 8 * xscale * 2;
+				break;
 
-				case MODE_GM0:
-				case MODE_GM1|MODE_GM0:
-				case MODE_GM2|MODE_GM0:
-					emit_graphics<1, xscale * 2>(data, length, pixels, (mode & MODE_CSS) ? 10 : 8, palette);
-					result = length * 8 * xscale * 2;
-					break;
+			case MODE_GM0:
+			case MODE_GM1|MODE_GM0:
+			case MODE_GM2|MODE_GM0:
+				emit_graphics<1, xscale * 2>(data, length, pixels, (mode & MODE_CSS) ? 10 : 8, palette);
+				result = length * 8 * xscale * 2;
+				break;
 
-				case MODE_GM1:
-				case MODE_GM2:
-				case MODE_GM2|MODE_GM1:
-					emit_graphics<2, xscale * 2>(data, length, pixels, (mode & MODE_CSS) ? 4 : 0, palette);
-					result = length * 8 * xscale;
-					break;
+			case MODE_GM1:
+			case MODE_GM2:
+			case MODE_GM2|MODE_GM1:
+				emit_graphics<2, xscale * 2>(data, length, pixels, (mode & MODE_CSS) ? 4 : 0, palette);
+				result = length * 8 * xscale;
+				break;
 
-				case MODE_GM2|MODE_GM1|MODE_GM0:
-					emit_graphics<1, xscale * 1>(data, length, pixels, (mode & MODE_CSS) ? 10 : 8, palette);
-					result = length * 8 * xscale;
-					break;
+			case MODE_GM2|MODE_GM1|MODE_GM0:
+				emit_graphics<1, xscale * 1>(data, length, pixels, (mode & MODE_CSS) ? 10 : 8, palette);
+				result = length * 8 * xscale;
+				break;
 
-				default:
-					/* should not get here */
-					fatalerror("Should not get here\n");
-					break;
+			default:
+				/* should not get here */
+				fatalerror("Should not get here\n");
+				break;
 			}
 		}
 		else if (!m_charrom_cb.isnull() && ((mode & (MODE_AG|MODE_AS|MODE_INTEXT)) == MODE_INTEXT))
@@ -417,6 +417,17 @@ protected:
 		return result;
 	}
 
+protected:
+	double m_tpfs;
+	bool m_pal;
+	const uint16_t m_lines_top_border;
+	const uint16_t m_lines_until_vblank;
+	const uint16_t m_lines_until_retrace;
+
+	bool is_top_pal_padding_line(int scanline) const;
+	bool is_bottom_pal_padding_line(int scanline) const;
+	bool is_pal_padding_line(int scanline) const;
+
 private:
 	enum scanline_zone
 	{
@@ -432,10 +443,6 @@ private:
 	emu_timer *m_hsync_off_timer;
 	emu_timer *m_fsync_timer;
 
-protected:
-	const double m_tpfs;
-
-private:
 	// incidentals
 	const int m_divider;
 	const int m_field_sync_falling_edge_scanline;
@@ -446,13 +453,6 @@ private:
 	bool m_recording_scanline;
 	const bool m_supports_partial_body_scanlines;
 
-protected:
-	const bool m_pal;
-	const uint16_t m_lines_top_border;
-	const uint16_t m_lines_until_vblank;
-	const uint16_t m_lines_until_retrace;
-
-private:
 	// video state
 	uint16_t m_physical_scanline;
 	uint16_t m_logical_scanline;
@@ -470,11 +470,6 @@ private:
 
 	// debugging
 	std::string scanline_zone_string(scanline_zone zone) const;
-
-protected:
-	bool is_top_pal_padding_line(int scanline) const;
-	bool is_bottom_pal_padding_line(int scanline) const;
-	bool is_pal_padding_line(int scanline) const;
 };
 
 // actual base class for MC6847 family of devices
@@ -507,7 +502,7 @@ public:
 protected:
 	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs, bool pal);
 
-	// device-level overrides
+	// device_t overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -603,45 +598,25 @@ private:
 //  VARIATIONS
 //**************************************************************************
 
-class mc6847_ntsc_device : public mc6847_base_device
+class mc6847_device : public mc6847_base_device
 {
 public:
-	mc6847_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc6847_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool pal = false);
 };
 
-class mc6847_pal_device : public mc6847_base_device
+class mc6847y_device : public mc6847_base_device
 {
 public:
-	mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc6847y_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool pal = false);
 };
 
-class mc6847y_ntsc_device : public mc6847_base_device
+class mc6847t1_device : public mc6847_base_device
 {
 public:
-	mc6847y_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-class mc6847y_pal_device : public mc6847_base_device
-{
-public:
-	mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-class mc6847t1_ntsc_device : public mc6847_base_device
-{
-public:
-	mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc6847t1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool pal = false);
 
 protected:
-	mc6847t1_ntsc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs, bool pal);
-
 	virtual uint8_t border_value(uint8_t mode) override;
-};
-
-class mc6847t1_pal_device : public mc6847t1_ntsc_device
-{
-public:
-	mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class s68047_device : public mc6847_base_device
@@ -664,17 +639,14 @@ private:
 class m5c6847p1_device : public mc6847_base_device
 {
 public:
-	m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool pal = false);
 };
 
 
-DECLARE_DEVICE_TYPE(MC6847_NTSC,   mc6847_ntsc_device)
-DECLARE_DEVICE_TYPE(MC6847_PAL,    mc6847_pal_device)
-DECLARE_DEVICE_TYPE(MC6847Y_NTSC,  mc6847y_ntsc_device)
-DECLARE_DEVICE_TYPE(MC6847Y_PAL,   mc6847y_pal_device)
-DECLARE_DEVICE_TYPE(MC6847T1_NTSC, mc6847t1_ntsc_device)
-DECLARE_DEVICE_TYPE(MC6847T1_PAL,  mc6847t1_pal_device)
-DECLARE_DEVICE_TYPE(S68047,        s68047_device)
-DECLARE_DEVICE_TYPE(M5C6847P1,     m5c6847p1_device)
+DECLARE_DEVICE_TYPE(MC6847,    mc6847_device)
+DECLARE_DEVICE_TYPE(MC6847Y,   mc6847y_device)
+DECLARE_DEVICE_TYPE(MC6847T1,  mc6847t1_device)
+DECLARE_DEVICE_TYPE(S68047,    s68047_device)
+DECLARE_DEVICE_TYPE(M5C6847P1, m5c6847p1_device)
 
 #endif // MAME_VIDEO_MC6847_H

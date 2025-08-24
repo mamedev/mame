@@ -210,7 +210,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	struct filter {
@@ -341,7 +341,7 @@ void esq1_filters::device_start()
 		recalc_filter(elem);
 }
 
-void esq1_filters::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void esq1_filters::sound_stream_update(sound_stream &stream)
 {
 /*  if(0) {
         for(int i=0; i<8; i++)
@@ -353,11 +353,11 @@ void esq1_filters::sound_stream_update(sound_stream &stream, std::vector<read_st
         fprintf(stderr, "\n");
     }*/
 
-	for(int i=0; i<outputs[0].samples(); i++) {
+	for(int i=0; i<stream.samples(); i++) {
 		double l=0, r=0;
 		for(int j=0; j<8; j++) {
 			filter &f = filters[j];
-			double x = inputs[j].get(i);
+			double x = stream.get(j, i);
 			double y = (x*f.a[0]
 						+ f.x[0]*f.a[1] + f.x[1]*f.a[2] + f.x[2]*f.a[3] + f.x[3]*f.a[4]
 						- f.y[0]*f.b[1] - f.y[1]*f.b[2] - f.y[2]*f.b[3] - f.y[3]*f.b[4]) / f.b[0];
@@ -379,8 +379,8 @@ void esq1_filters::sound_stream_update(sound_stream &stream, std::vector<read_st
 //      r *= 6553;
 		l *= 2;
 		r *= 2;
-		outputs[0].put_clamp(i, l, 1.0);
-		outputs[1].put_clamp(i, r, 1.0);
+		stream.put_clamp(0, i, l, 1.0);
+		stream.put_clamp(1, i, r, 1.0);
 	}
 }
 
@@ -631,12 +631,11 @@ void esq1_state::esq1(machine_config &config)
 
 	midiout_slot(MIDI_PORT(config, "mdout"));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ESQ1_FILTERS(config, m_filters);
-	m_filters->add_route(0, "lspeaker", 1.0);
-	m_filters->add_route(1, "rspeaker", 1.0);
+	m_filters->add_route(0, "speaker", 1.0, 0);
+	m_filters->add_route(1, "speaker", 1.0, 1);
 
 	ES5503(config, m_es5503, 8_MHz_XTAL);
 	m_es5503->set_channels(8);
@@ -696,9 +695,24 @@ static INPUT_PORTS_START( esq1 )
 INPUT_PORTS_END
 
 ROM_START( esq1 )
+	ROM_DEFAULT_BIOS("v3.5")
+
 	ROM_REGION(0x10000, "osrom", 0)
-	ROM_LOAD( "3p5lo.bin",    0x0000, 0x8000, CRC(ed001ad8) SHA1(14d1150bccdbc15d90567cf1812aacdb3b6ee882) )
-	ROM_LOAD( "3p5hi.bin",    0x8000, 0x8000, CRC(332c572f) SHA1(ddb4f62807eb2ab29e5ac6b5d209d2ecc74cf806) )
+	ROM_SYSTEM_BIOS(0, "v3.5", "Version 3.5")
+	ROMX_LOAD("3p5lo.bin",    0x0000, 0x8000, CRC(ed001ad8) SHA1(14d1150bccdbc15d90567cf1812aacdb3b6ee882), ROM_BIOS(0))
+	ROMX_LOAD( "3p5hi.bin",    0x8000, 0x8000, CRC(332c572f) SHA1(ddb4f62807eb2ab29e5ac6b5d209d2ecc74cf806), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "v2.2", "Version 2.2")
+	ROMX_LOAD("2p2lo.bin",    0x0000, 0x8000, CRC(ea11eca4) SHA1(6a1f026f1371514664ac5d7ea87729c3038ac735), ROM_BIOS(1))
+	ROMX_LOAD( "2p2hi.bin",    0x8000, 0x8000, CRC(78ed71a5) SHA1(9a6c715fbba0f2d1afce2171f791affb4887a0bc), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "v2.0", "Version 2.0")
+	ROMX_LOAD("2p0lo.bin",    0x0000, 0x8000, CRC(3b701b08) SHA1(62f92e50ca6a68cfa87613d637e8c73938e62fd6), ROM_BIOS(2))
+	ROMX_LOAD( "2p0hi.bin",    0x8000, 0x8000, CRC(10b0f436) SHA1(f6ae76d4d42056c00577e131ee85527386f04649), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "v1.7", "Version 1.7")
+	ROMX_LOAD("1p7lo.bin",    0x0000, 0x8000, CRC(cc67d98a) SHA1(fda181aec18621499171d7090454c6d60625ec85), ROM_BIOS(3))
+	ROMX_LOAD( "1p7hi.bin",    0x8000, 0x8000, CRC(59b2f8d1) SHA1(eb82936f01f379c23df6523cddbac4c7c21b2d22), ROM_BIOS(3))
 
 	ROM_REGION(0x20000, "es5503", 0)
 	ROM_LOAD( "esq1wavlo.bin", 0x0000, 0x8000, CRC(4d04ac87) SHA1(867b51229b0a82c886bf3b216aa8893748236d8b) )

@@ -10,11 +10,13 @@
 
 #pragma once
 
+#include "cpu/z80/z80.h"
 #include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -61,8 +63,8 @@ private:
 	bool       m_msm_play_lo_nibble = false;
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<z80_device> m_maincpu;
+	required_device<z80_device> m_audiocpu;
 	required_device_array<ay8910_device, 2> m_ay;
 	optional_device<ls157_device> m_adpcm_select;
 	optional_device<msm5205_device> m_msm;
@@ -87,7 +89,7 @@ private:
 	uint32_t screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
-	INTERRUPT_GEN_MEMBER(sound_int);
+	INTERRUPT_GEN_MEMBER(sound_nmi);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int dx, int dy);
 	void decrypt_code();
 	void msmint(int state);

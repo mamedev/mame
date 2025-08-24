@@ -314,4 +314,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS           INIT           COMPANY    FULLNAME         FLAGS
-COMP( 1987, tosh1000, ibm5150, 0,      tosh1000, 0,     tosh1000_state, init_tosh1000, "Toshiba", "Toshiba T1000", MACHINE_IS_SKELETON )
+COMP( 1987, tosh1000, ibm5150, 0,      tosh1000, 0,     tosh1000_state, init_tosh1000, "Toshiba", "Toshiba T1000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

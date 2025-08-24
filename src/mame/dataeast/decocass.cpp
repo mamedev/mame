@@ -211,7 +211,7 @@ static INPUT_PORTS_START( decocass )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )                      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW2") /* Start with all Unknown as each can change per game, except for Country Code */
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1")        /* Most Dipswitch Settings sheets show this as "Number of Players" (Lives) */
@@ -287,10 +287,10 @@ static INPUT_PORTS_START( cocean1a ) /* 10 */
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Key Switch Credit" )                     PORT_DIPLOCATION("SW2:1,2")   /* Unknown */
-	PORT_DIPSETTING(    0x03, "1 Coin 10 Credits" )
-	PORT_DIPSETTING(    0x02, "1 Coin 20 Credits" )
-	PORT_DIPSETTING(    0x01, "1 Coin 50 Credits" )
-	PORT_DIPSETTING(    0x00, "1 Coin 100 Credits" )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_100C ) )
 	PORT_DIPNAME( 0x04, 0x04, "Game Select" )                           PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "1 to 8 Lines" )
 	PORT_DIPSETTING(    0x00, "Center Line" )
@@ -995,10 +995,10 @@ static const gfx_layout objlayout =
 };
 
 static GFXDECODE_START( gfx_decocass )
-	GFXDECODE_ENTRY( nullptr, 0x6000, charlayout,       0, 4 )  /* char set #1 */
-	GFXDECODE_ENTRY( nullptr, 0x6000, spritelayout,     0, 4 )  /* sprites */
-	GFXDECODE_ENTRY( nullptr, 0xd000, tilelayout,       0, 8 )  /* background tiles */
-	GFXDECODE_ENTRY( nullptr, 0xd800, objlayout,        0, 64 )  /* object */
+	GFXDECODE_RAM( nullptr, 0x6000, charlayout,       0, 4 )  /* char set #1 */
+	GFXDECODE_RAM( nullptr, 0x6000, spritelayout,     0, 4 )  /* sprites */
+	GFXDECODE_RAM( nullptr, 0xd000, tilelayout,       0, 8 )  /* background tiles */
+	GFXDECODE_RAM( nullptr, 0xd800, objlayout,        0, 64 )  /* object */
 GFXDECODE_END
 
 void decocass_state::decocass_palette(palette_device &palette) const

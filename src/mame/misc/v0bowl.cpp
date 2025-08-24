@@ -159,4 +159,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, v0bowl,  0,   v0bowl,  v0bowl, v0bowl_state, empty_init, ROT0, "A1 Amusement One",      "unknown VRender0+ bowling game", MACHINE_IS_SKELETON ) // Return Bowl?
+GAME( 200?, v0bowl,  0,   v0bowl,  v0bowl, v0bowl_state, empty_init, ROT0, "A1 Amusement One",      "unknown VRender0+ bowling game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Return Bowl?

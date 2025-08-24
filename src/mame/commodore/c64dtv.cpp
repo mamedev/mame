@@ -82,4 +82,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-CONS( 2005, c64dtv, 0, 0, c64dtv, c64dtv, c64dtv_state, empty_init, "The Toy:Lobster Company", "Commodore 64 Direct-to-TV (Version 2 050711) (PAL)", MACHINE_IS_SKELETON )
+CONS( 2005, c64dtv, 0, 0, c64dtv, c64dtv, c64dtv_state, empty_init, "The Toy:Lobster Company", "Commodore 64 Direct-to-TV (Version 2 050711) (PAL)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

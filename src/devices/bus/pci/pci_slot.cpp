@@ -128,6 +128,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("vision968",      VISION968_PCI);
 	device.option_add("virge",          VIRGE_PCI);
 	device.option_add("virgedx",        VIRGEDX_PCI);
+	device.option_add("virgevx",        VIRGEVX_PCI);
 	device.option_add("mga2064w",       MGA2064W);
 	device.option_add("promotion3210",  PROMOTION3210);
 	device.option_add("gd5446",         GD5446_PCI);

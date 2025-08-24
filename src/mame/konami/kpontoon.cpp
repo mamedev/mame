@@ -387,8 +387,7 @@ void kpontoon_state::kpontoon(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_pontoon);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	K053246(config, m_k053246, 0);
 	//m_k053246.set_sprite_callback(FUNC(kpontoon_state::sprite_callback));
@@ -398,8 +397,8 @@ void kpontoon_state::kpontoon(machine_config &config)
 	K054539(config, m_k054539, 18.432_MHz_XTAL);
 	m_k054539->set_device_rom_tag("k054539");
 	m_k054539->timer_handler().set(FUNC(kpontoon_state::k054539_nmi_gen));
-	m_k054539->add_route(0, "rspeaker", 0.75);
-	m_k054539->add_route(1, "lspeaker", 0.75);
+	m_k054539->add_route(0, "speaker", 0.75, 1);
+	m_k054539->add_route(1, "speaker", 0.75, 0);
 }
 
 
@@ -431,4 +430,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1993, kpontoon,  0, kpontoon, kpontoon, kpontoon_state, empty_init, ROT0, "Konami", "Pontoon (Konami)", MACHINE_IS_SKELETON )
+GAME( 1993, kpontoon,  0, kpontoon, kpontoon, kpontoon_state, empty_init, ROT0, "Konami", "Pontoon (Konami)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

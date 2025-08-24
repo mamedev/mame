@@ -536,7 +536,7 @@ u8 ibm5100_state::nxr_r()
 			 * giving 64KiB. Even and odd bytes are selected by a flip-flop
 			 * which is toggled with each read.
 			 */
-			data = BIT(m_nxr[rs][m_nxr_address >> basic], (m_nxr_ff & NXR_B0) ? 0 : 8, 8);
+			data = BIT(m_nxr[rs][m_nxr_address >> (basic ? 1 : 0)], (m_nxr_ff & NXR_B0) ? 0 : 8, 8);
 		}
 
 		// always increment address for BASIC, only on odd bytes for APL

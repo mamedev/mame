@@ -148,13 +148,12 @@ void konmedalppc_state::konmedalppc(machine_config &config)
 
 	K057714(config, m_gcu, 0).set_screen("screen");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
 	ymz.set_addrmap(0, &konmedalppc_state::ymz280b_map);
-	ymz.add_route(1, "lspeaker", 1.0);
-	ymz.add_route(0, "rspeaker", 1.0);
+	ymz.add_route(1, "speaker", 1.0, 0);
+	ymz.add_route(0, "speaker", 1.0, 1);
 }
 
 ROM_START( turfwld3 )

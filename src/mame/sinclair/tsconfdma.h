@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_SINCLAIR_TSCONF_DMA_H
-#define MAME_SINCLAIR_TSCONF_DMA_H
+#ifndef MAME_SINCLAIR_TSCONFDMA_H
+#define MAME_SINCLAIR_TSCONFDMA_H
 
 #pragma once
 
@@ -48,6 +48,9 @@ protected:
 	devcb_write_line m_on_ready_cb;
 
 private:
+	int do_read();
+	int do_write();
+
 	TIMER_CALLBACK_MEMBER(dma_clock);
 
 	u8 m_ready;
@@ -68,10 +71,7 @@ private:
 	bool m_align_s;
 	bool m_align_d;
 	bool m_asz;
-	u16 m_align;
-	u32 m_m1;
-	u32 m_m2;
 };
 
 DECLARE_DEVICE_TYPE(TSCONF_DMA, tsconfdma_device)
-#endif // MAME_SINCLAIR_TSCONF_DMA_H
+#endif // MAME_SINCLAIR_TSCONFDMA_H

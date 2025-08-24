@@ -8,8 +8,8 @@
  *
  *****************************************************************************/
 
-#ifndef MAME_CPU_UPD7810_UPD7810DASM_H
-#define MAME_CPU_UPD7810_UPD7810DASM_H
+#ifndef MAME_CPU_UPD7810_UPD7810_DASM_H
+#define MAME_CPU_UPD7810_UPD7810_DASM_H
 
 #pragma once
 
@@ -288,4 +288,4 @@ public:
 	virtual ~upd78c05_disassembler() = default;
 };
 
-#endif
+#endif // MAME_CPU_UPD7810_UPD7810_DASM_H

@@ -220,5 +220,5 @@ ROM_END
 
 } // anonymous namespace
 
-COMP( 1995, iqunlim,         0, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited",           MACHINE_IS_SKELETON) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.
-COMP( 1995, iqunlimgr, iqunlim, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited (Germany)", MACHINE_IS_SKELETON) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.
+COMP( 1995, iqunlim,         0, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.
+COMP( 1995, iqunlimgr, iqunlim, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.

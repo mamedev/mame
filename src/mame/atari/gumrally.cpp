@@ -141,4 +141,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1990, gumrally, 0, gumrally, gumrally, gumrally_state, empty_init, ROT0, "Atari Games", "Gumball Rally", MACHINE_IS_SKELETON_MECHANICAL ) // year taken from labels on OKI ROMs
+GAME( 1990, gumrally, 0, gumrally, gumrally, gumrally_state, empty_init, ROT0, "Atari Games", "Gumball Rally", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // year taken from labels on OKI ROMs

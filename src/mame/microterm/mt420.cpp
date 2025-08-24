@@ -176,4 +176,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP(1986, mt420, 0, 0, mt420, mt420, mt420_state, empty_init, "Micro-Term", "Micro-Term 420", MACHINE_IS_SKELETON)
+COMP(1986, mt420, 0, 0, mt420, mt420, mt420_state, empty_init, "Micro-Term", "Micro-Term 420", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

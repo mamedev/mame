@@ -70,15 +70,13 @@ void channelf_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void channelf_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void channelf_sound_device::sound_stream_update(sound_stream &stream)
 {
 	uint32_t mask = 0, target = 0;
-	auto &buffer = outputs[0];
 
 	switch( m_sound_mode )
 	{
 		case 0: /* sound off */
-			buffer.fill(0);
 			return;
 
 		case 1: /* high tone (2V) - 1000Hz */
@@ -95,12 +93,12 @@ void channelf_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 			break;
 	}
 
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		if ((m_forced_ontime > 0) || ((m_sample_counter & mask) == target))   //  change made for improved sound
-			buffer.put_int(sampindex, m_envelope, 32768);
+			stream.put_int(0, sampindex, m_envelope, 32768);
 		else
-			buffer.put(sampindex, 0);
+			stream.put(1, sampindex, 0);
 		m_sample_counter += m_incr;
 		m_envelope *= m_decay_mult;
 		if (m_forced_ontime > 0)          //  added for improved sound

@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_ATA_IDEHD_H
-#define MAME_BUS_ATA_IDEHD_H
+#ifndef MAME_BUS_ATA_HDD_H
+#define MAME_BUS_ATA_HDD_H
 
 #pragma once
 
@@ -89,4 +89,4 @@ private:
 DECLARE_DEVICE_TYPE(IDE_HARDDISK, ide_hdd_device)
 DECLARE_DEVICE_TYPE(ATA_CF, ata_cf_device)
 
-#endif // MAME_BUS_ATA_IDEHD_H
+#endif // MAME_BUS_ATA_HDD_H

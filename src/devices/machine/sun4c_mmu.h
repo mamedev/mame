@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_SUN4C_MMU_H
+#define MAME_MACHINE_SUN4C_MMU_H
 
-#ifndef DEVICE_MACHINE_SUN4C_MMU_H
-#define DEVICE_MACHINE_SUN4C_MMU_H
+#pragma once
 
 #include "cpu/sparc/sparc_intf.h"
 #include "machine/ram.h"
@@ -211,4 +211,4 @@ public:
 DECLARE_DEVICE_TYPE(SUN4_MMU, sun4_mmu_device)
 DECLARE_DEVICE_TYPE(SUN4C_MMU, sun4c_mmu_device)
 
-#endif // DEVICE_MACHINE_SUN4C_MMU_H
+#endif // MAME_MACHINE_SUN4C_MMU_H

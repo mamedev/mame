@@ -92,7 +92,7 @@ At a minimum, the class must include a constructor and an enum picking up the co
 
 If the CPU has its own dispatch table, the class must also include the declaration (but not definition) of **disasm_entries**, **do_exec_full** and **do_exec_partial**, the declaration and definition of **disasm_disassemble** (identical for all classes but refers to the class-specific **disasm_entries** array) and include the .inc file (which provides the missing definitions). Support for the generation must also be added to CPU.mak.
 
-If the CPU has in addition its own opcodes, their declaration must be done through a macro, see f.i. m65c02. The .inc file will provide the definitions.
+If the CPU has in addition its own opcodes, their declaration must be done through a macro, see e.g. m65c02. The .inc file will provide the definitions.
 
 
 Dispatch tables
@@ -365,7 +365,7 @@ A negative icount means that the CPU won't be able to do anything for some time 
 Multi-dispatch variants
 -----------------------
 
-Some variants currently in the process of being supported change instruction set depending on an internal flag, either switching to a 16-bits mode or changing some register accesses to memory accesses. This is handled by having multiple dispatch tables for the CPU, the d<CPU>.lst not being 257 entries anymore but 256*n+1. The variable **inst_state_base** must select which instruction table to use at a given time. It must be a multiple of 256, and is in fact simply OR-ed to the first instruction byte to get the dispatch table index (aka inst_state).
+Some variants currently in the process of being supported change instruction set depending on an internal flag, either switching to a 16-bit mode or changing some register accesses to memory accesses. This is handled by having multiple dispatch tables for the CPU, the d<CPU>.lst not being 257 entries anymore but 256*n+1. The variable **inst_state_base** must select which instruction table to use at a given time. It must be a multiple of 256, and is in fact simply OR-ed to the first instruction byte to get the dispatch table index (aka inst_state).
 
 Current TO-DO:
 --------------

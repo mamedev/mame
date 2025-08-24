@@ -83,6 +83,8 @@ enum
 	TEKKENSP,                    /* Tekken Special */
 	TOPFIGHTER,                  /* Top Fighter 2000 MK VIII */
 
+	TITAN,
+
 	// when loading from fullpath, we need to treat SRAM in custom way
 	SEGA_SRAM_FULLPATH,
 	SEGA_SRAM_FALLBACK

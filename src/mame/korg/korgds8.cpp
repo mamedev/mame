@@ -233,12 +233,11 @@ void korg_ds8_state::ds8(machine_config &config)
 	lcdc.set_lcd_size(2, 40);
 	lcdc.set_pixel_update_cb(FUNC(korg_ds8_state::lcd_pixel_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2164_device &fm(YM2164(config, "fm", 3.579545_MHz_XTAL)); // YM2164 + YM3012
-	fm.add_route(0, "lspeaker", 1.00);
-	fm.add_route(1, "rspeaker", 1.00);
+	fm.add_route(0, "speaker", 1.00, 0);
+	fm.add_route(1, "speaker", 1.00, 1);
 }
 
 void korg_ds8_state::korg707(machine_config &config)
@@ -267,5 +266,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1986, ds8,     0, 0, ds8,     ds8, korg_ds8_state, empty_init, "Korg", "DS-8 Digital Synthesizer",    MACHINE_IS_SKELETON)
-SYST(1987, korg707, 0, 0, korg707, ds8, korg_ds8_state, empty_init, "Korg", "707 Performing Synthesizer", MACHINE_IS_SKELETON)
+SYST(1986, ds8,     0, 0, ds8,     ds8, korg_ds8_state, empty_init, "Korg", "DS-8 Digital Synthesizer",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1987, korg707, 0, 0, korg707, ds8, korg_ds8_state, empty_init, "Korg", "707 Performing Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

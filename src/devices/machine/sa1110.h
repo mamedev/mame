@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_SA1110
-#define MAME_MACHINE_SA1110
+#ifndef MAME_MACHINE_SA1110_H
+#define MAME_MACHINE_SA1110_H
 
 #pragma once
 
@@ -905,4 +905,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SA1110_PERIPHERALS, sa1110_periphs_device)
 
-#endif // MAME_MACHINE_SA1110
+#endif // MAME_MACHINE_SA1110_H

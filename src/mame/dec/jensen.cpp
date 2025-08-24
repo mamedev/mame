@@ -304,6 +304,6 @@ ROM_END
 }
 
 /*    YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS         INIT         COMPANY  FULLNAME                  FLAGS */
-COMP( 1993,  d2k300axp, 0,      0,      d2k300axp, 0,     jensen_state, init_common, "DEC",   "DEC 2000 Model 300 AXP", MACHINE_IS_SKELETON)
-COMP( 1993,  d2k500axp, 0,      0,      d2k500axp, 0,     jensen_state, init_common, "DEC",   "DEC 2000 Model 500 AXP", MACHINE_IS_SKELETON)
-COMP( 1993,  dpcaxp150, 0,      0,      dpcaxp150, 0,     jensen_state, init_common, "DEC",   "DECpc AXP 150",          MACHINE_IS_SKELETON)
+COMP( 1993,  d2k300axp, 0,      0,      d2k300axp, 0,     jensen_state, init_common, "DEC",   "DEC 2000 Model 300 AXP", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP( 1993,  d2k500axp, 0,      0,      d2k500axp, 0,     jensen_state, init_common, "DEC",   "DEC 2000 Model 500 AXP", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP( 1993,  dpcaxp150, 0,      0,      dpcaxp150, 0,     jensen_state, init_common, "DEC",   "DECpc AXP 150",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

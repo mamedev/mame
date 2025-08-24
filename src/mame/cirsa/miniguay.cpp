@@ -216,4 +216,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1986, miniguay, 0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Guay VD", MACHINE_IS_SKELETON_MECHANICAL ) // VD stands for "Version Displays".
+GAME( 1986, miniguay, 0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Guay VD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // VD stands for "Version Displays".

@@ -158,4 +158,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, cncchess3, 0,      0,      cncchess3, cncchess3, cchess3_state, empty_init, "Conic", "Computer Chess (Conic, model 7013)", MACHINE_SUPPORTS_SAVE | MACHINE_IS_SKELETON )
+SYST( 1981, cncchess3, 0,      0,      cncchess3, cncchess3, cchess3_state, empty_init, "Conic", "Computer Chess (Conic, model 7013)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

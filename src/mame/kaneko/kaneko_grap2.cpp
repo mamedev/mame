@@ -8,9 +8,6 @@
 //       lots of unknowns, both here and in rendering / mixing 3 chips in gp3
 
 
-
-
-
 #include "emu.h"
 #include "kaneko_grap2.h"
 
@@ -83,7 +80,7 @@ uint16_t kaneko_grap2_device::regs1_r(offs_t offset, uint16_t mem_mask)
 
 		case 0xb:
 		{
-			m_regs1_i^=1;
+			m_regs1_i ^= 1;
 			if (m_regs1_i) return 0xfffe;
 			else return 0xffff;
 		}
@@ -91,7 +88,6 @@ uint16_t kaneko_grap2_device::regs1_r(offs_t offset, uint16_t mem_mask)
 		default:
 			logerror("%s: regs1_r %02x %04x\n", machine().describe_context(), offset, mem_mask);
 			break;
-
 	}
 
 	return 0x0000;
@@ -99,63 +95,59 @@ uint16_t kaneko_grap2_device::regs1_r(offs_t offset, uint16_t mem_mask)
 
 
 
-void kaneko_grap2_device::do_rle(uint32_t address)
+void kaneko_grap2_device::do_rle(uint32_t address, uint32_t dstaddress)
 {
 	int rle_count = 0;
 	int normal_count = 0;
-	uint32_t dstaddress = 0;
+	uint8_t data;
 
-	uint8_t thebyte;
-
-	while (dstaddress<0x40000)
+	while (dstaddress < 0x40000)
 	{
-		if (rle_count==0 && normal_count==0) // we need a new code byte
+		if (rle_count == 0 && normal_count == 0) // we need a new code byte
 		{
-			thebyte = read_byte(address);
+			data = read_byte(address);
 
-			if ((thebyte & 0x80)) // stream of normal bytes follows
+			if ((data & 0x80)) // stream of normal bytes follows
 			{
-				normal_count = (thebyte & 0x7f)+1;
+				normal_count = (data & 0x7f) + 1;
 				address++;
 			}
 			else // rle block
 			{
-				rle_count = (thebyte & 0x7f)+1;
+				rle_count = (data & 0x7f) + 1;
 				address++;
 			}
 		}
 		else if (rle_count)
 		{
-			thebyte = read_byte(address);
-			m_framebuffer[dstaddress] = thebyte;
+			data = read_byte(address);
+			m_framebuffer[dstaddress] = data;
 			dstaddress++;
 			rle_count--;
 
-			if (rle_count==0)
+			if (rle_count == 0)
 			{
 				address++;
 			}
 		}
 		else if (normal_count)
 		{
-			thebyte = read_byte(address);
-			m_framebuffer[dstaddress] = thebyte;
+			data = read_byte(address);
+			m_framebuffer[dstaddress] = data;
 			dstaddress++;
 			normal_count--;
 			address++;
-
 		}
 	}
-
 }
 
 
 void kaneko_grap2_device::regs1_go_w(uint16_t data)
 {
-	uint32_t address = m_regs1_address_regs[1]| (m_regs1_address_regs[0]<<16);
+	uint32_t address = m_regs1_address_regs[1] | (m_regs1_address_regs[0] << 16);
+	uint32_t dstaddress = (data & 0x1ff) | ((m_regs2 & 0x1ff) << 9);
 
-//  printf("regs1_go_w? %08x\n",address );
-	if ((data==0x2000) || (data==0x3000)) do_rle(address);
+	if ((data & 0xf000) == 0x3000) do_rle(address, dstaddress);
 }
 
 

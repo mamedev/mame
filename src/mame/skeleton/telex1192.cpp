@@ -87,4 +87,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1989, telex1192, 0, 0, telex1192, telex1192, telex1192_state, empty_init, "Memorex Telex", "Telex 1192", MACHINE_IS_SKELETON)
+COMP(1989, telex1192, 0, 0, telex1192, telex1192, telex1192_state, empty_init, "Memorex Telex", "Telex 1192", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

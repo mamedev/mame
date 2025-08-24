@@ -373,9 +373,9 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2002, kpython,          0,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Konami Python BIOS",                            MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
-GAME(2002, dogstdx,    kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "dogstation Deluxe",                             MACHINE_IS_SKELETON)
-GAME(2002, pesta,      kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Pro Evolution Soccer The Arcade (ver EAA)",     MACHINE_IS_SKELETON)
-GAME(2002, wswe,       kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_IS_SKELETON)
-GAME(2003, wswe2k3,    kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003",  MACHINE_IS_SKELETON)
-GAME(2003, popn9,      kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Pop'n Music 9 (ver JAB)",                       MACHINE_IS_SKELETON)
+GAME(2002, kpython,          0,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Konami Python BIOS",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT)
+GAME(2002, dogstdx,    kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "dogstation Deluxe",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2002, pesta,      kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Pro Evolution Soccer The Arcade (ver EAA)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2002, wswe,       kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2003, wswe2k3,    kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2003, popn9,      kpython,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Pop'n Music 9 (ver JAB)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

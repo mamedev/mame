@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_SEGACONS_MDCONSOLE_H
-#define MAME_SEGACONS_MDCONSOLE_H
+#ifndef MAME_SEGA_MDCONSOLE_H
+#define MAME_SEGA_MDCONSOLE_H
 
 #pragma once
 
@@ -31,11 +31,11 @@ public:
 	void init_genesis();
 	void init_md_eur();
 	void init_md_jpn();
+	void init_genesis_tmss();
 
 	void md_32x(machine_config &config);
 	void genesis_32x(machine_config &config);
 	void mdj_32x(machine_config &config);
-	void dcat16_megadriv(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -64,10 +64,6 @@ private:
 
 	uint16_t tmss_r(offs_t offset);
 	void tmss_swap_w(uint16_t data);
-
-	void dcat16_megadriv_base(machine_config &config);
-
-	void dcat16_megadriv_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -115,4 +111,4 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 };
 
-#endif // MAME_SEGACONS_MDCONSOLE_H
+#endif // MAME_SEGA_MDCONSOLE_H

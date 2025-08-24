@@ -199,8 +199,7 @@ void vl70_state::vl70(machine_config &config)
 
 	MULCD(config, m_lcd);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DSPV(config, m_dspv);
 	MEG(config, m_meg);

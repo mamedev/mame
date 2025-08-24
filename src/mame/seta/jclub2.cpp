@@ -1190,11 +1190,10 @@ void jclub2o_state::jclub2o(machine_config &config)
 	config.set_default_layout(layout_jclub2o);
 
 	// TODO: Mono?
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	m_soundcpu->add_route(0, "lspeaker", 1.0);
-	m_soundcpu->add_route(1, "rspeaker", 1.0);
+	m_soundcpu->add_route(0, "speaker", 1.0, 0);
+	m_soundcpu->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -1234,12 +1233,11 @@ void jclub2_state::jclub2(machine_config &config)
 
 	// sound hardware
 	// TODO: Mono?
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	st0032_sound_device &st0032_snd(ST0032_SOUND(config, "st0032_snd", XTAL(42'954'545) / 3)); // 14.318181MHz (42.954545MHz / 3)
-	st0032_snd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	st0032_snd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	st0032_snd.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	st0032_snd.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 

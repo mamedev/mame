@@ -151,4 +151,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT  CLASS             INIT        COMPANY                FULLNAME                  FLAGS
-COMP( 1993, free120, 0,      0,      freedom120, 0,     freedom120_state, empty_init, "Liberty Electronics", "Freedom 120/Aspect 100", MACHINE_IS_SKELETON )
+COMP( 1993, free120, 0,      0,      freedom120, 0,     freedom120_state, empty_init, "Liberty Electronics", "Freedom 120/Aspect 100", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

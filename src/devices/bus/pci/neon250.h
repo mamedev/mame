@@ -1,8 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:
-
-#ifndef MAME_VIDEO_NEON250_H
-#define MAME_VIDEO_NEON250_H
+#ifndef MAME_BUS_PCI_NEON250_H
+#define MAME_BUS_PCI_NEON250_H
 
 #pragma once
 
@@ -51,4 +50,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NEON250,   neon250_device)
 
-#endif // MAME_VIDEO_NEON250_H
+#endif // MAME_BUS_PCI_NEON250_H

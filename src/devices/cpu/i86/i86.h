@@ -290,7 +290,6 @@ protected:
 	uint32_t  m_int_vector;
 	uint32_t  m_pending_irq;
 	uint32_t  m_nmi_state;
-	uint32_t  m_irq_state;
 	uint8_t   m_no_interrupt;
 	uint8_t   m_fire_trap;
 	uint8_t   m_test_state;

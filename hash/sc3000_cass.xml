@@ -3,7 +3,31 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="sc3000_cass" description="Sega Computer 3000 cassettes">
+<softwarelist name="sc3000_cass" description="Sega SC-3000 cassettes">
+
+	<software name="addition">
+		<description>Addition Tutor</description>
+		<year>1983</year>
+		<publisher>John Sands Electronics</publisher>
+		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="4454040">
+				<rom name="Addition_Tutor.wav" size="4454040" crc="5c3ec6bc" sha1="9b39f9b7b24952bc2699a73b144352eb72d68f28"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ausgknow">
+		<description>Australian General Knowledge Tutor</description>
+		<year>1984</year>
+		<publisher>John Sands Electronics</publisher>
+		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="4979510">
+				<rom name="Australian_General_knowledge_Tutor.wav" size="4979510" crc="98bf965e" sha1="618f961691a4f149a68cf95eaacaa96efd44e521"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="bastow">
 		<description>The Secret of Bastow Manor</description>
@@ -40,7 +64,7 @@ license:CC0-1.0
 	<software name="cityland">
 		<description>City Lander</description>
 		<year>198?</year>
-		<publisher>Grandstand</publisher>
+		<publisher>Grandstand Leisure</publisher>
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="7141680">
@@ -49,10 +73,53 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="columbia">
+		<description>Columbia</description>
+		<year>1984</year>
+		<publisher>Sprites</publisher>
+		<info name="author" value="Thierry Vanbaelinghem" />
+		<info name="serial" value="YE 003" />
+		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="5048058">
+				<rom name="Colombia_RewriteB.wav" size="5048058" crc="8521d137" sha1="fdf55d919fa878d94ae7d526fdf12fbac98758b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="creation">
+		<description>Creation des Sprites</description>
+		<year>1984</year>
+		<publisher>Sprites</publisher>
+		<info name="alt_title" value="Creations de Dessins" />
+		<info name="author" value="Ari Concept" />
+		<info name="serial" value="YE 001" />
+		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="4529142">
+				<rom name="Creation_Des_Sprites_mono.wav" size="4529142" crc="3ea7395b" sha1="95dc324f26b48e8042def30bee3242a67ad533b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crocky">
+		<description>Crocky</description>
+		<year>1984</year>
+		<publisher>Loriciels</publisher>
+		<info name="author" value="Alain Kerautret, Gilles Gameiro" />
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1984" />
+		<info name="usage" value="Requires BASIC Level 3 cartridge (export version only)" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="4972158">
+				<rom name="Crocky.wav" size="4972158" crc="24d62355" sha1="f91382534f24b70f9af64910081e3eabc88ba325"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dragonq">
 		<description>Dragonquest</description>
 		<year>1984</year>
-		<publisher>John Sands</publisher>
+		<publisher>John Sands Electronics</publisher>
 		<info name="author" value="Hercules Gunter" />
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
@@ -77,7 +144,8 @@ license:CC0-1.0
 	<software name="environd">
 		<description>Environoid</description>
 		<year>1984</year>
-		<publisher>John Sands</publisher>
+		<publisher>John Sands Electronics</publisher>
+		<info name="developer" value="Programming Concepts" />
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="9565890">
@@ -86,10 +154,28 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="fvj">
+		<description>Faites Vos Jeux - Niveau 1</description>
+		<year>1984</year>
+		<publisher>Distribution &amp; Services</publisher>
+		<info name="author" value="M-A &amp; G. Letraublon" />
+		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<part name="cass1" interface="sc3000_cass">
+			<dataarea name="cass" size="16923822">
+				<rom name="faitesvosjeuxA.wav" size="16923822" crc="720f3832" sha1="ba054c8d0e046d90e75a8eb49533aecc6198d57d"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="sc3000_cass">
+			<dataarea name="cass" size="16299398">
+				<rom name="faitesvosjeuxB.wav" size="16299398" crc="aa49827d" sha1="7493e0ac5de63aa5ff4e3e7c7bc6a41f7e7b5764"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="help">
 		<description>Help</description>
 		<year>1984</year>
-		<publisher>Grandstand</publisher>
+		<publisher>Grandstand Leisure</publisher>
 		<info name="author" value="Michael Howard" />
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
@@ -102,12 +188,60 @@ license:CC0-1.0
 	<software name="house">
 		<description>The House</description>
 		<year>1984</year>
-		<publisher>Grandstand</publisher>
+		<publisher>Grandstand Leisure</publisher>
 		<info name="author" value="Michael Howard" />
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="25191280">
 				<rom name="TheHouse.wav" size="25191280" crc="85b183d2" sha1="a222e8763a357b4f962b207b6c7d4b73bbc841a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indjaune">
+		<description>Indiana Jaune &amp; Super Lab</description>
+		<year>1984</year>
+		<publisher>Sprites</publisher>
+		<info name="author" value="Sophie Vataux" />
+		<info name="serial" value="YE 002" />
+		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<part name="cass1" interface="sc3000_cass">
+			<feature name="part_id" value="Side 1: Indiana Jaune"/>
+			<dataarea name="cass" size="4107578">
+				<rom name="Indiana_Jaune.wav" size="4107578" crc="68c26219" sha1="5e1a9d5d1788917b28a57dd04c06277b9c633bda"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="sc3000_cass">
+			<feature name="part_id" value="Side 2: Super Lab"/>
+			<dataarea name="cass" size="3653262">
+				<rom name="Super_Lab.wav" size="3653262" crc="5806e6a4" sha1="0c5409f2ce2c3e1c6f20699f2e371a1708936b82"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kamikaze">
+		<description>Kamikaze</description>
+		<year>1984</year>
+		<publisher>Loriciels</publisher>
+		<info name="author" value="Pascal Pellier" />
+		<info name="notice" value="COPYRIGHT LORICIELS Avril 1984" />
+		<info name="usage" value="Requires BASIC Level 3 cartridge (export version only)" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="3602926">
+				<rom name="Kamikaze.wav" size="3602926" crc="939ff913" sha1="a7228514e5770da4dfa147c718594f0b5042a217"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keyboard">
+		<description>Keyboard Learning Program</description>
+		<year>1983</year>
+		<publisher>John Sands Electronics</publisher>
+		<info name="alt_title" value="An Introduction to the John Sands Sega SC-3000" />
+		<info name="usage" value="Requires BASIC Level 3 cartridge (export version only)" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="4959424">
+				<rom name="Keyboard_Learning_Program.wav" size="4959424" crc="0f46a379" sha1="900fd1142caaabf3f4cb4d37013176fb1122bae3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -156,6 +290,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="moniteur">
+		<description>Moniteur Désassembleur</description>
+		<year>1984</year>
+		<publisher>Loriciels</publisher>
+		<info name="author" value="Pascal Pellier" />
+		<info name="notice" value="COPYRIGHT LORICIELS Mars 1984" />
+		<info name="usage" value="Requires BASIC Level 3 cartridge (export version only)" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="3482862">
+				<rom name="Moniteur_Desassembleur.wav" size="3482862" crc="1ad31dc9" sha1="629bb1f4d8254c10c697ef4ff530c4aca8f20067"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="quikdraw">
 		<description>Quick Draw</description>
 		<year>198?</year>
@@ -168,14 +316,120 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Tape read error -->
+	<software name="reversi" supported="no">
+		<description>Reversi Champion</description>
+		<year>1983</year>
+		<publisher>Loriciels</publisher>
+		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="2834680">
+				<rom name="Reversi_Champion.wav" size="2834680" crc="52327f55" sha1="aeb4d83ab9d2891479ebea784835c7701c87f78c" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sconqst">
 		<description>Solar Conquest</description>
 		<year>1984</year>
-		<publisher>John Sands</publisher>
+		<publisher>John Sands Electronics</publisher>
+		<info name="developer" value="Programming Concepts" />
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="14320112">
 				<rom name="SolarConquest.wav" size="14320112" crc="7c3653f9" sha1="0c74aabf394f4d765df130a93625c1db72189d98"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scquiz">
+		<description>Pre-School Shape and Colour Quiz</description>
+		<year>198?</year>
+		<publisher>Grandstand Leisure</publisher>
+		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="3191168">
+				<rom name="Shapes_&amp;_Colors_Quiz.wav" size="3191168" crc="9aaeaa05" sha1="ff561fff322cff804195bf05f6384231a384e898"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skullisl">
+		<description>Skull Island</description>
+		<year>1984</year>
+		<publisher>Dotsoft</publisher>
+		<info name="developer" value="Softgold" />
+		<info name="usage" value="Requires BASIC Level 3 cartridge (export version only)" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="15220728">
+				<rom name="Skull_Island.wav" size="15220728" crc="61978ba3" sha1="47419434a3780e2d756c9dfb6694a88045df82d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subtract">
+		<description>Subtraction Tutor</description>
+		<year>198?</year>
+		<publisher>Grandstand Leisure</publisher>
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="4270120">
+				<rom name="substraction.wav" size="4270120" crc="aa24027f" sha1="d9925d0e4488cfdb5fcb28255f44d2fb2660fac1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="st1">
+		<description>Supertape 1</description>
+		<!-- Compilation of 6 educational programs -->
+		<year>1984</year>
+		<publisher>John Sands Electronics</publisher>
+		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<part name="cass1" interface="sc3000_cass">
+			<feature name="part_id" value="Keyboard Learning Program"/>
+			<dataarea name="cass" size="4900792">
+				<rom name="SuperTape_01.wav" size="4900792" crc="af026ba7" sha1="c50f85d452bd4de06b6bd7f25c890a31039bf995"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="sc3000_cass">
+			<feature name="part_id" value="Australian General Knowledge Tutor"/>
+			<dataarea name="cass" size="4805576">
+				<rom name="SuperTape_02.wav" size="4805576" crc="a176f422" sha1="5e77c353ad1015122beb56063afd1ebc9a469e3d"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="sc3000_cass">
+			<feature name="part_id" value="Learn the Alphabet"/>
+			<dataarea name="cass" size="5305850">
+				<rom name="SuperTape_03.wav" size="5305850" crc="24e011b1" sha1="20c4e121ff28dbc18382ad9272951883c8001641"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="sc3000_cass">
+			<feature name="part_id" value="Spelling Tutor"/>
+			<dataarea name="cass" size="4515720">
+				<rom name="SuperTape_04.wav" size="4515720" crc="98ba3d86" sha1="884017c8c3bd1be53dddb382ca19cd2c6fc2900d"/>
+			</dataarea>
+		</part>
+		<part name="cass5" interface="sc3000_cass">
+			<feature name="part_id" value="Australian Geography Tutor"/>
+			<dataarea name="cass" size="4846432">
+				<rom name="SuperTape_05.wav" size="4846432" crc="bfc0f010" sha1="06d9920844c7e56e521244ecf7d8d8e23c1804dc"/>
+			</dataarea>
+		</part>
+		<part name="cass6" interface="sc3000_cass">
+			<feature name="part_id" value="Multiplication Tutor"/>
+			<dataarea name="cass" size="4490792">
+				<rom name="SuperTape_06.wav" size="4490792" crc="d60fe513" sha1="9a8e35546d07e2e5236b7286cea71fc5414cf731"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telecran">
+		<description>Télécran</description>
+		<year>198?</year>
+		<publisher>Yeno</publisher>
+		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="4617958">
+				<rom name="telecran8bits_mono.wav" size="4617958" crc="5e08305f" sha1="88ad29cecff2fae98f9e81ec9d6fde3136bb2229"/>
 			</dataarea>
 		</part>
 	</software>
@@ -214,6 +468,18 @@ license:CC0-1.0
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="31128834">
 				<rom name="vortex blaster 2.wav" size="31128834" crc="242851df" sha1="5a0be3c35317ff39e2e687c72bb1ea73e3b6cd28"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="watchmed">
+		<description>Watch Me Draw</description>
+		<year>1984</year>
+		<publisher>John Sands Electronics</publisher>
+		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<part name="cass" interface="sc3000_cass">
+			<dataarea name="cass" size="6622356">
+				<rom name="Watch_Me_Draw.wav" size="6622356" crc="69ad3e0f" sha1="5f9ccd506e7579f6b5a5ba15b8f54b16e10059ce"/>
 			</dataarea>
 		</part>
 	</software>

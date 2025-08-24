@@ -1110,5 +1110,5 @@ ROM_END
 /***********************************************************************
     Machine definitions
 ***********************************************************************/
-GAME( 1984, starridr,   0,        starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (REV 1)",   MACHINE_IS_SKELETON )
-GAME( 1984, starridrp3, starridr, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (PROTO 3)", MACHINE_IS_SKELETON )
+GAME( 1984, starridr,   0,        starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (REV 1)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, starridrp3, starridr, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (PROTO 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

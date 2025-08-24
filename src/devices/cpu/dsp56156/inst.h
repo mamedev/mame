@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#ifndef DSP56156_INSTRUCTION_H
-#define DSP56156_INSTRUCTION_H
+#ifndef MAME_CPU_DSP56156_INST_H
+#define MAME_CPU_DSP56156_INST_H
+
+#pragma once
 
 #include "opcode.h"
 #include "tables.h"
@@ -13,8 +15,8 @@
 //
 // An Instruction is the base class all regular ops inherit from.
 //
-namespace DSP_56156
-{
+namespace DSP_56156 {
+
 #define UNIMPLEMENTED_OPCODE() osd_printf_error("Unimplemented opcode:  PC=%04x | %s;\n", PC, __PRETTY_FUNCTION__);
 
 class Opcode;
@@ -3482,5 +3484,6 @@ private:
 	reg_id m_source2;
 };
 
-}
-#endif
+} // namespace DSP_56156
+
+#endif // MAME_CPU_DSP56156_INST_H

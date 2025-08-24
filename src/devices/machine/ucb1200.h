@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_UCB1200
-#define MAME_MACHINE_UCB1200
+#ifndef MAME_MACHINE_UCB1200_H
+#define MAME_MACHINE_UCB1200_H
 
 #pragma once
 
@@ -144,4 +144,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(UCB1200, ucb1200_device)
 
-#endif // MAME_MACHINE_UCB1200
+#endif // MAME_MACHINE_UCB1200_H

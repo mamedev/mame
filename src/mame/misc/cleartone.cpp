@@ -107,4 +107,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 198?, bnstlkr, 0, cleartone, cleartone, cleartone_state, empty_init, ROT0, "Cleartone Leisure Ltd.", "Bonus Talker", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, bnstlkr, 0, cleartone, cleartone, cleartone_state, empty_init, ROT0, "Cleartone Leisure Ltd.", "Bonus Talker", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

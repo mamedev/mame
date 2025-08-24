@@ -6,8 +6,8 @@
 
  **********************************************************************/
 
-#ifndef MAME_BUS_ISA_LBA_ENHANCER_H
-#define MAME_BUS_ISA_LBA_ENHANCER_H
+#ifndef MAME_BUS_ISA_LBAENHANCER_H
+#define MAME_BUS_ISA_LBAENHANCER_H
 
 #pragma once
 
@@ -41,4 +41,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ISA8_LBA_ENHANCER, lba_enhancer_device)
 
-#endif // MAME_BUS_ISA_LBA_ENHANCER_H
+#endif // MAME_BUS_ISA_LBAENHANCER_H

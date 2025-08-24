@@ -400,8 +400,8 @@ void tourvision_state::tourvision(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tourvision_state::pce_io);
 	m_maincpu->port_in_cb().set(FUNC(tourvision_state::pce_joystick_r));
 	m_maincpu->port_out_cb().set(FUNC(tourvision_state::pce_joystick_w));
-	m_maincpu->add_route(0, "lspeaker", 1.00);
-	m_maincpu->add_route(1, "rspeaker", 1.00);
+	m_maincpu->add_route(0, "speaker", 1.00, 0);
+	m_maincpu->add_route(1, "speaker", 1.00, 1);
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -430,8 +430,7 @@ void tourvision_state::tourvision(machine_config &config)
 	i8155.out_pc_callback().set(FUNC(tourvision_state::tourvision_i8155_c_w));
 	i8155.out_to_callback().set(FUNC(tourvision_state::tourvision_timer_out));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "tourvision_cart", "bin"));
 	cartslot.set_device_load(FUNC(tourvision_state::cart_load));

@@ -118,4 +118,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 2007?, gogostrk, 0, paokaipc, gogostrk, paokaipc_state, empty_init, ROT0, "American Alpha / Paokai", "Go Go Strike", MACHINE_IS_SKELETON ) // motherboard is dated 2006, if the CF card string is a date it's 2007
+GAME( 2007?, gogostrk, 0, paokaipc, gogostrk, paokaipc_state, empty_init, ROT0, "American Alpha / Paokai", "Go Go Strike", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // motherboard is dated 2006, if the CF card string is a date it's 2007

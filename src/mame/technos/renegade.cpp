@@ -464,11 +464,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::interrupt)
 {
 	int const scanline = param;
 
-	// NMI  8 lines before vsync
+	// NMI: 8 lines before vsync
 	if (scanline == 265)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-	// IRQ  16 clocks per frame: once every 16 lines, but increases to 24 lines during vblank
+	// IRQ: 16 clocks per frame: once every 16 lines, but increases to 24 lines during vblank
 	// (lines 16,40,56,72,88,104,120,136,152,168,184,200,216,232,248,264)
 	if (scanline == 0x10 || (scanline > 0x20 && (scanline & 0xf) == 8))
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -561,7 +561,7 @@ static INPUT_PORTS_START( renegade )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Right Attack")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Right Attack")
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(renegade_state::mcu_status_r))
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("DSW1")  /* DIP1 */

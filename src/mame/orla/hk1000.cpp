@@ -146,4 +146,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(198?, hk1000, 0, 0, hk1000, hk1000, hk1000_state, empty_init, "Orla", "HK1000", MACHINE_IS_SKELETON)
+SYST(198?, hk1000, 0, 0, hk1000, hk1000, hk1000_state, empty_init, "Orla", "HK1000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

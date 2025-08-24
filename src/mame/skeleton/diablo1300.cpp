@@ -39,7 +39,7 @@ There are many options that comes with the Diablo 1300 series and while many are
 interconnected by a backplane. The backplane has well defined slots for each type of cards and there are also many external cables
 between the cards, sensors and motors of the printer. The backplane consists of up to 8 female connectors for 56 signals card edge
 connectors numbered A-H ordered in two rows, D,C,B,A on top with the fans to the left and H,G,F,E bellow. The signals are routed as
-needed and the slots are NOT generic, a specific card goes in at a specific slot but can be interchanged to accomodate improved
+needed and the slots are NOT generic, a specific card goes in at a specific slot but can be interchanged to accommodate improved
 performance or replaced for repair. Slots E and F are used for feature expansions such as serial, network cards etc.
 
 The slots are populated as follows:
@@ -209,4 +209,4 @@ ROM_END
 
 
 //   YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY               FULLNAME
-COMP(1976, diablo, 0,      0,      diablo1300, diablo1300, diablo1300_state, empty_init, "Diablo Systems Inc", "Diablo HyType II Series 1300 CPU", MACHINE_IS_SKELETON)
+COMP(1976, diablo, 0,      0,      diablo1300, diablo1300, diablo1300_state, empty_init, "Diablo Systems Inc", "Diablo HyType II Series 1300 CPU", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

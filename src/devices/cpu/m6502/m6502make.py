@@ -85,6 +85,7 @@ def save_opcodes(f, device, opcodes):
         for ins in instructions:
             line_type = identify_line_type(ins)
             if line_type == "EAT":
+                emit(f, "\tdebugger_wait_hook();")
                 emit(f, "\ticount = 0;")
                 emit(f, "\tinst_substate = %d;" % substate)
                 emit(f, "\treturn;")
@@ -114,6 +115,7 @@ def save_opcodes(f, device, opcodes):
         for ins in instructions:
             line_type = identify_line_type(ins)
             if line_type == "EAT":
+                emit(f, "\tdebugger_wait_hook();")
                 emit(f, "\ticount = 0;")
                 emit(f, "\tinst_substate = %d;" % substate)
                 emit(f, "\treturn;")

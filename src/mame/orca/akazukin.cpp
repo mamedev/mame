@@ -342,4 +342,3 @@ ROM_END
 
 // written as "Akazukin" on title screen & instruction panel flyer.
 GAME( 1983, akazukin, 0, akazukin, akazukin, akazukin_state, empty_init, ROT0, "Sigma", "Akazukin (Japan)", MACHINE_SUPPORTS_SAVE )
-

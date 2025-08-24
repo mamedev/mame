@@ -58,8 +58,6 @@ Known Issues:
 #include "speaker.h"
 
 
-
-
 int twin16_state::spriteram_process_enable()
 {
 	return (m_CPUA_register & 0x40) == 0;
@@ -133,6 +131,7 @@ void fround_state::fround_CPU_register_w(offs_t offset, uint16_t data, uint16_t 
 	*/
 	uint16_t old = m_CPUA_register;
 	COMBINE_DATA(&m_CPUA_register);
+
 	if (m_CPUA_register != old)
 	{
 		if ((old & 0x08) == 0 && (m_CPUA_register & 0x08))
@@ -171,7 +170,7 @@ void twin16_state::sound_map(address_map &map)
 	map(0xd000, 0xd000).w(m_upd7759, FUNC(upd7759_device::port_w));
 	map(0xe000, 0xe000).w(FUNC(twin16_state::upd_start_w));
 	map(0xf000, 0xf000).r(FUNC(twin16_state::upd_busy_r)); // miaj writes 0 to it
-	}
+}
 
 void twin16_state::main_map(address_map &map)
 {
@@ -562,10 +561,10 @@ static INPUT_PORTS_START( cuebrickj )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")    /* 0xa0003 */
-	KONAMI8_B123_UNK(1) // button1 = move, button2 = warp, button3 = stop
+	KONAMI8_MONO_4WAY_B123_UNK // button1 = move, button2 = warp, button3 = stop
 
 	PORT_START("P2")    /* 0xa0005 */
-	KONAMI8_B123_UNK(2)
+	KONAMI8_COCKTAIL_4WAY_B123_UNK
 
 	PORT_START("P3")    /* 0xa0007 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -598,7 +597,7 @@ static INPUT_PORTS_START( cuebrickj )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Upright Controls" ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" ) PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
@@ -666,7 +665,7 @@ void twin16_state::twin16(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8);
+	m_screen->set_raw(XTAL(18'432'000)/3, 384, 0, 40*8, 264, 2*8, 30*8);
 	m_screen->set_screen_update(FUNC(twin16_state::screen_update_twin16));
 	m_screen->screen_vblank().set(FUNC(twin16_state::screen_vblank_twin16));
 	m_screen->set_palette(m_palette);
@@ -678,23 +677,22 @@ void twin16_state::twin16(machine_config &config)
 	m_palette->enable_shadows();
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
 
 	K007232(config, m_k007232, XTAL(3'579'545));
 	m_k007232->port_write().set(FUNC(twin16_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.12); // estimated with gradius2 OST
-	m_k007232->add_route(0, "rspeaker", 0.12);
-	m_k007232->add_route(1, "lspeaker", 0.12);
-	m_k007232->add_route(1, "rspeaker", 0.12);
+	m_k007232->add_route(0, "speaker", 0.12, 0); // estimated with gradius2 OST
+	m_k007232->add_route(0, "speaker", 0.12, 1);
+	m_k007232->add_route(1, "speaker", 0.12, 0);
+	m_k007232->add_route(1, "speaker", 0.12, 1);
 
 	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.20);
-	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.20);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.20, 0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.20, 1);
 }
 
 void twin16_state::devilw(machine_config &config)
@@ -720,7 +718,7 @@ void fround_state::fround(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8);
+	m_screen->set_raw(XTAL(18'432'000)/3, 384, 0, 40*8, 264, 2*8, 30*8);
 	m_screen->set_screen_update(FUNC(twin16_state::screen_update_twin16));
 	m_screen->screen_vblank().set(FUNC(twin16_state::screen_vblank_twin16));
 	m_screen->set_palette(m_palette);
@@ -732,36 +730,35 @@ void fround_state::fround(machine_config &config)
 	m_palette->enable_shadows();
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
 
 	K007232(config, m_k007232, XTAL(3'579'545));
 	m_k007232->port_write().set(FUNC(twin16_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.12);
-	m_k007232->add_route(0, "rspeaker", 0.12);
-	m_k007232->add_route(1, "lspeaker", 0.12);
-	m_k007232->add_route(1, "rspeaker", 0.12);
+	m_k007232->add_route(0, "speaker", 0.12, 0);
+	m_k007232->add_route(0, "speaker", 0.12, 1);
+	m_k007232->add_route(1, "speaker", 0.12, 0);
+	m_k007232->add_route(1, "speaker", 0.12, 1);
 
 	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.20);
-	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.20);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.20, 0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.20, 1);
 }
 
 void twin16_state::miaj(machine_config &config)
 {
 	twin16(config);
-	m_screen->set_raw(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8);
+	m_screen->set_raw(XTAL(18'432'000)/3, 384, 1*8, 39*8, 264, 2*8, 30*8);
 }
 
 void cuebrickj_state::cuebrickj(machine_config &config)
 {
 	twin16(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cuebrickj_state::cuebrickj_main_map);
-	m_screen->set_raw(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8);
+	m_screen->set_raw(XTAL(18'432'000)/3, 384, 1*8, 39*8, 264, 2*8, 30*8);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
@@ -1273,17 +1270,17 @@ GAME( 1987, devilw,    0,        devilw,    devilw,    twin16_state,    init_twi
 GAME( 1987, majuu,     devilw,   devilw,    devilw,    twin16_state,    init_twin16,    ROT0,   "Konami", "Majuu no Ohkoku", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, darkadv,   devilw,   devilw,    darkadv,   twin16_state,    init_twin16,    ROT0,   "Konami", "Dark Adventure", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, vulcan,    0,        twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (New)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vulcana,   vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (Old)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vulcanb,   vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (Oldest)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gradius2,  vulcan,   twin16,    gradius2,  twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gradius2a, vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gradius2b, vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Older Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vulcan,    0,        twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (new)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vulcana,   vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (old)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vulcanb,   vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gradius2,  vulcan,   twin16,    gradius2,  twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II: GOFER no Yabou (Japan, new)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gradius2a, vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II: GOFER no Yabou (Japan, old)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gradius2b, vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II: GOFER no Yabou (Japan, older)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, fround,    0,        fround,    fround,    fround_state,    init_fround,    ROT0,   "Konami", "The Final Round (version M)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, froundl,   fround,   fround,    fround,    fround_state,    init_fround,    ROT0,   "Konami", "The Final Round (version L)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, hpuncher,  fround,   twin16,    fround,    twin16_state,    init_twin16,    ROT0,   "Konami", "Hard Puncher (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, miaj,      mia,      miaj,      miaj,      twin16_state,    init_twin16,    ROT0,   "Konami", "M.I.A. - Missing in Action (version R) (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, miaj,      mia,      miaj,      miaj,      twin16_state,    init_twin16,    ROT0,   "Konami", "M.I.A.: Missing in Action (Japan, version R)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, cuebrickj, cuebrick, cuebrickj, cuebrickj, cuebrickj_state, init_cuebrickj, ROT0,   "Konami", "Cue Brick (Japan)", MACHINE_SUPPORTS_SAVE )

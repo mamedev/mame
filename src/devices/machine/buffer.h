@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef MAME_DEVICES_MACHINE_BUFFER_H
-#define MAME_DEVICES_MACHINE_BUFFER_H
+#ifndef MAME_MACHINE_BUFFER_H
+#define MAME_MACHINE_BUFFER_H
+
+#pragma once
 
 class input_buffer_device : public device_t
 {
@@ -27,4 +29,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(INPUT_BUFFER, input_buffer_device)
 
-#endif // MAME_DEVICES_MACHINE_BUFFER_H
+#endif // MAME_MACHINE_BUFFER_H

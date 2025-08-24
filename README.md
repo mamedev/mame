@@ -1,32 +1,31 @@
+# MAME
 
-# **MAME** #
-
-[![Join the chat at https://gitter.im/mamedev/mame](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mamedev/mame?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Continuous integration build status:
-
-| OS/Compiler                 | Status        |
-| --------------------------- |:-------------:|
-| Linux/clang and GCC         | ![CI (Linux)](https://github.com/mamedev/mame/workflows/CI%20(Linux)/badge.svg) |
-| Windows/MinGW GCC and clang | ![CI (Windows)](https://github.com/mamedev/mame/workflows/CI%20(Windows)/badge.svg) |
-| macOS/clang                 | ![CI (macOS)](https://github.com/mamedev/mame/workflows/CI%20(macOS)/badge.svg) |
-| UI Translations             | ![Compile UI translations](https://github.com/mamedev/mame/workflows/Compile%20UI%20translations/badge.svg) |
-| Documentation               | ![Build documentation](https://github.com/mamedev/mame/workflows/Build%20documentation/badge.svg) |
-| BGFX Shaders                | ![Rebuild BGFX shaders](https://github.com/mamedev/mame/workflows/Rebuild%20BGFX%20shaders/badge.svg) |
-
-Static analysis status for entire build (except for third-party parts of project):
-
-[![Coverity Scan Status](https://scan.coverity.com/projects/5727/badge.svg?flat=1)](https://scan.coverity.com/projects/mame-emulator)
-
-What is MAME?
-=============
+## What is MAME?
 
 MAME is a multi-purpose emulation framework.
 
 MAME's purpose is to preserve decades of software history. As electronic technology continues to rush forward, MAME prevents this important "vintage" software from being lost and forgotten. This is achieved by documenting the hardware and how it functions. The source code to MAME serves as this documentation. The fact that the software is usable serves primarily to validate the accuracy of the documentation (how else can you prove that you have recreated the hardware faithfully?). Over time, MAME (originally stood for Multiple Arcade Machine Emulator) absorbed the sister-project MESS (Multi Emulator Super System), so MAME now documents a wide variety of (mostly vintage) computers, video game consoles and calculators, in addition to the arcade video games that were its initial focus.
 
-How to compile?
-===============
+## Where can I find out more?
+
+* [Official MAME Development Team Site](https://www.mamedev.org/) (includes binary downloads, wiki, forums, and more)
+* [MAME Testers](https://mametesters.org/) (official bug tracker for MAME)
+
+### Community
+
+* [MAME Forums on bannister.org](https://forums.bannister.org/ubbthreads.php?ubb=cfrm&c=5)
+* [r/MAME](https://www.reddit.com/r/MAME/) on Reddit
+* [MAMEWorld Forums](https://www.mameworld.info/ubbthreads/)
+
+## Development
+
+![Alt](https://repobeats.axiom.co/api/embed/8461d8ae4630322dafc736fc25782de214b49630.svg "Repobeats analytics image")
+
+### CI status and code scanning
+
+[![CI (Linux)](https://github.com/mamedev/mame/workflows/CI%20(Linux)/badge.svg)](https://github.com/mamedev/mame/actions/workflows/ci-linux.yml) [![CI (Windows](https://github.com/mamedev/mame/workflows/CI%20(Windows)/badge.svg)](https://github.com/mamedev/mame/actions/workflows/ci-windows.yml) [![CI (macOS)](https://github.com/mamedev/mame/workflows/CI%20(macOS)/badge.svg)](https://github.com/mamedev/mame/actions/workflows/ci-macos.yml) [![Compile UI translations](https://github.com/mamedev/mame/workflows/Compile%20UI%20translations/badge.svg)](https://github.com/mamedev/mame/actions/workflows/language.yml) [![Build documentation](https://github.com/mamedev/mame/workflows/Build%20documentation/badge.svg)](https://github.com/mamedev/mame/actions/workflows/docs.yml)  [![Coverity Scan Status](https://scan.coverity.com/projects/5727/badge.svg?flat=1)](https://scan.coverity.com/projects/mame-emulator)
+
+### How to compile?
 
 If you're on a UNIX-like system (including Linux and macOS), it could be as easy as typing
 
@@ -52,27 +51,15 @@ Visual Studio builds are also possible, but you still need [build environment](h
 In order to generate solution and project files just run:
 
 ```
-make vs2019
+make vs2022
 ```
 or use this command to build it directly using msbuild
 
 ```
-make vs2019 MSBUILD=1
+make vs2022 MSBUILD=1
 ```
 
-
-Where can I find out more?
-=============
-
-* [Official MAME Development Team Site](https://www.mamedev.org/) (includes binary downloads, wiki, forums, and more)
-* [Official MESS Wiki](http://mess.redump.net/)
-* [MAME Testers](https://mametesters.org/) (official bug tracker for MAME and MESS)
-
-
-Contributing
-=============
-
-## Coding standard
+### Coding standard
 
 MAME source code should be viewed and edited with your editor set to use four spaces per tab. Tabs are used for initial indentation of lines, with one tab used per indentation level. Spaces are used for other alignment within a line.
 
@@ -82,9 +69,7 @@ All contributors need to either add a standard header for license info (on new f
 
 See more specific [C++ Coding Guidelines](https://docs.mamedev.org/contributing/cxx.html) on our documentation web site.
 
-
-License
-=======
+## License
 
 The MAME project as a whole is made available under the terms of the
 [GNU General Public License, version 2](http://opensource.org/licenses/GPL-2.0)
@@ -99,10 +84,10 @@ Please note that MAME is a registered trademark of Gregory Ember, and permission
 is required to use the "MAME" name, logo, or wordmark.
 
 <a href="http://opensource.org/licenses/GPL-2.0" target="_blank">
-<img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
+<img align="right" width="100" src="https://opensource.org/wp-content/uploads/2009/06/OSIApproved.svg">
 </a>
 
-    Copyright (c) 1997-2024  MAMEdev and contributors
+    Copyright (c) 1997-2025  MAMEdev and contributors
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License version 2, as provided in
@@ -113,4 +98,4 @@ is required to use the "MAME" name, logo, or wordmark.
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
     more details.
 
-Please see COPYING for more details.
+Please see [COPYING](COPYING) for more details.

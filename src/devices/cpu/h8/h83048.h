@@ -12,7 +12,7 @@
     H8/3044         32K         2K
     H8/3045         64K         2K
     H8/3047         96K         4K
-    H8/3048        192K         4K
+    H8/3048        128K         4K
 
     The 3394, 3396, and 3997 variants are the mask-rom versions.
 

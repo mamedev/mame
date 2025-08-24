@@ -342,7 +342,7 @@ static INPUT_PORTS_START( orbit )
 	PORT_DIPNAME( 0x40, 0x40, "DIAG TEST" ) // should be off
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ))
 	PORT_DIPSETTING( 0x00, DEF_STR( On ))
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("BUTTONS")   // 2800
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Game 7 / Strong Gravity") PORT_CODE(KEYCODE_7_PAD)
@@ -471,12 +471,11 @@ void orbit_state::orbit(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DISCRETE(config, m_discrete, orbit_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
+	m_discrete->add_route(0, "speaker", 1.0, 0);
+	m_discrete->add_route(1, "speaker", 1.0, 1);
 }
 
 

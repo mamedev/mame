@@ -9,15 +9,15 @@
  *
  **************************************************************************/
 
-#ifndef MAME_MACHINE_PXA255
-#define MAME_MACHINE_PXA255
+#ifndef MAME_MACHINE_PXA255_H
+#define MAME_MACHINE_PXA255_H
 
 #pragma once
 
 #include "cpu/arm7/arm7.h"
 #include "sound/dmadac.h"
 #include "emupal.h"
-
+#include "screen.h"
 
 class pxa255_periphs_device : public device_t
 {
@@ -469,6 +469,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	std::unique_ptr<u32[]> m_lcd_palette; // 0x100
 	std::unique_ptr<u8[]> m_lcd_framebuffer; // 0x100000
@@ -477,4 +478,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(PXA255_PERIPHERALS, pxa255_periphs_device)
 
-#endif // MAME_MACHINE_PXA255
+#endif // MAME_MACHINE_PXA255_H

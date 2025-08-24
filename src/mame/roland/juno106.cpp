@@ -169,5 +169,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1984, juno106, 0, 0, juno106, juno106, juno106_state, empty_init, "Roland", "Juno-106 Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
-SYST(1985, mks7,    0, 0, mks7,    mks7,    juno106_state, empty_init, "Roland", "MKS-7 Super Quartet",                          MACHINE_IS_SKELETON)
+SYST(1984, juno106, 0, 0, juno106, juno106, juno106_state, empty_init, "Roland", "Juno-106 Programmable Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1985, mks7,    0, 0, mks7,    mks7,    juno106_state, empty_init, "Roland", "MKS-7 Super Quartet",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

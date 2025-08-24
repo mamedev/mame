@@ -51,14 +51,13 @@ void roland_u20_state::u20(machine_config &config)
 
 	//R15239124(config, "keyscan", 12_MHz_XTAL);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	MB87419_MB87420(config, m_pcm, 32.768_MHz_XTAL);
 	m_pcm->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
 	m_pcm->set_device_rom_tag("waverom");
-	m_pcm->add_route(0, "lspeaker", 1.0);
-	m_pcm->add_route(1, "rspeaker", 1.0);
+	m_pcm->add_route(0, "speaker", 1.0, 0);
+	m_pcm->add_route(1, "speaker", 1.0, 1);
 }
 
 void roland_u20_state::u220(machine_config &config)
@@ -104,5 +103,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1989, u20,  0, 0, u20,  u20, roland_u20_state, empty_init, "Roland", "U-20 RS-PCM Keyboard", MACHINE_IS_SKELETON)
-SYST(1989, u220, 0, 0, u220, u20, roland_u20_state, empty_init, "Roland", "U-220 RS-PCM Sound Module", MACHINE_IS_SKELETON)
+SYST(1989, u20,  0, 0, u20,  u20, roland_u20_state, empty_init, "Roland", "U-20 RS-PCM Keyboard", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1989, u220, 0, 0, u220, u20, roland_u20_state, empty_init, "Roland", "U-220 RS-PCM Sound Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

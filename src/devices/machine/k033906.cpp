@@ -15,7 +15,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(K033906, k033906_device, "k033906", "K033906 PCI bridge")
+DEFINE_DEVICE_TYPE(K033906, k033906_device, "k033906", "Konami 033906 PCI bridge")
 
 //-------------------------------------------------
 //  k033906_device - constructor

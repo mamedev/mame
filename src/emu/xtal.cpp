@@ -83,6 +83,7 @@ const double XTAL::known_xtals[] = {
 	  2'250'000, // 2.25_MHz_XTAL          Resonator - YM2154 on Yamaha PSR-60 & PSR-70
 	  2'376'000, // 2.376_MHz_XTAL         CIT-101 keyboard
 	  2'457'600, // 2.4576_MHz_XTAL        Atari ST MFP
+	  2'470'000, // 2.47_MHz_XTAL          CSA2.47MG ceramic oscillator - Casio CZ-1
 	  2'500'000, // 2.5_MHz_XTAL           Janken Man units
 	  2'600'000, // 2.6_MHz_XTAL           Sharp PC-1500
 	  2'700'000, // 2.7_MHz_XTAL           Resonator - YM2154 on Yamaha RX15
@@ -119,6 +120,8 @@ const double XTAL::known_xtals[] = {
 	  4'433'619, // 4.433619_MHz_XTAL      PAL color subcarrier (technically 4.43361875mhz)
 	  4'608'000, // 4.608_MHz_XTAL         Luxor ABC-77 keyboard (Keytronic custom part #48-300-107 is equivalent)
 	  4'915'200, // 4.9152_MHz_XTAL        -
+	  4'946'800, // 4.9468_MHz_XTAL        Casio CPS-2000
+	  4'946'864, // 4.946864_MHz_XTAL      Casiotone 8000
 	  4'952'000, // 4.952_MHz_XTAL         IGS M036 based mahjong games, for TT5665 sound chip
 	  5'000'000, // 5_MHz_XTAL             Mutant Night
 	  5'068'800, // 5.0688_MHz_XTAL        Usually used as MC2661 or COM8116 baud rate clock
@@ -131,6 +134,7 @@ const double XTAL::known_xtals[] = {
 	  5'659'200, // 5.6592_MHz_XTAL        Digilog 320 dot clock
 	  5'670'000, // 5.67_MHz_XTAL          RCA CDP1869 NTSC dot clock
 	  5'714'300, // 5.7143_MHz_XTAL        Cidelsa Destroyer, TeleVideo serial keyboards
+	  5'760'000, // 5.760_MHz_XTAL         ADI unknown keyboard
 	  5'856'000, // 5.856_MHz_XTAL         HP 3478A Multimeter
 	  5'911'000, // 5.911_MHz_XTAL         Philips Videopac Plus G7400
 	  5'990'400, // 5.9904_MHz_XTAL        Luxor ABC 800 keyboard (Keytronic custom part #48-300-008 is equivalent)
@@ -151,6 +155,7 @@ const double XTAL::known_xtals[] = {
 	  7'987'000, // 7.987_MHz_XTAL         PC9801-86 YM2608 clock
 	  7'995'500, // 7.9955_MHz_XTAL        Used on Electronic Devices Italy Galaxy Gunners sound board
 	  8'000'000, // 8_MHz_XTAL             Extremely common, used on 100's of PCBs
+	  8'053'000, // 8.053_MHz_XTAL         Mad Motor
 	  8'200'000, // 8.2_MHz_XTAL           Universal Mr. Do - Model 8021 PCB
 	  8'388'000, // 8.388_MHz_XTAL         Nintendo Game Boy Color
 	  8'448'000, // 8.448_MHz_XTAL         Banpresto's Note Chance - Used to drive OKI M6295 chips, usually with /8 divider
@@ -197,6 +202,7 @@ const double XTAL::known_xtals[] = {
 	 10'920'000, // 10.92_MHz_XTAL         ADDS Viewpoint 60, Viewpoint A2
 	 11'000'000, // 11_MHz_XTAL            Mario I8039 sound
 	 11'004'000, // 11.004_MHz_XTAL        TI 911 VDT
+	 11'055'000, // 11.055_MHz_XTAL        Atari Tank 8
 	 11'059'200, // 11.0592_MHz_XTAL       Used with MCS-51 to generate common baud rates
 	 11'200'000, // 11.2_MHz_XTAL          New York, New York
 	 11'289'000, // 11.289_MHz_XTAL        Vanguard
@@ -361,6 +367,7 @@ const double XTAL::known_xtals[] = {
 	 24'000'000, // 24_MHz_XTAL            Mario, 80's Data East games, 80's Konami games
 	 24'073'400, // 24.0734_MHz_XTAL       DEC Rainbow 100
 	 24'167'829, // 24.167829_MHz_XTAL     Neo Geo AES rev. 3-3 and later (~1536x NTSC line rate)
+	 24'180'000, // 24.18_MHz_XTAL         Gemini Wing bootleg
 	 24'270'000, // 24.27_MHz_XTAL         CIT-101XL
 	 24'300'000, // 24.3_MHz_XTAL          ADM 36 132-column display clock
 	 24'576'000, // 24.576_MHz_XTAL        Pole Position h/w, Model 3 CPU board
@@ -385,10 +392,11 @@ const double XTAL::known_xtals[] = {
 	 26'666'666, // 26.666666_MHz_XTAL     Irem M92 but most use 27MHz
 	 26'670'000, // 26.670_MHz_XTAL        Namco EVA
 	 26'686'000, // 26.686_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips
+	 26'800'000, // 26.8_MHz_XTAL          SAA7110 TV decoder
 	 26'824'000, // 26.824_MHz_XTAL        Astro Corp.'s Zoo
 	 26'880'000, // 26.88_MHz_XTAL         Roland RF5C36/SA-16 clock (30000 * 896)
 	 26'989'200, // 26.9892_MHz_XTAL       TeleVideo 965
-	 27'000'000, // 27_MHz_XTAL            Some Banpresto games macrossp, Irem M92 and 90's Toaplan games
+	 27'000'000, // 27_MHz_XTAL            Some Banpresto games macrossp, Irem M92 and 90's Toaplan games, Pinnacle Zoran based PCI cards
 	 27'164'000, // 27.164_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips
 	 27'210'900, // 27.2109_MHz_XTAL       LA Girl
 	 27'562'000, // 27.562_MHz_XTAL        Visual 220
@@ -398,6 +406,7 @@ const double XTAL::known_xtals[] = {
 	 28'224'000, // 28.224_MHz_XTAL        Roland JD-800
 	 28'322'000, // 28.322_MHz_XTAL        Saitek RISC 2500, Mephisto Montreux
 	 28'375'160, // 28.37516_MHz_XTAL      Amiga PAL systems
+	 28'432'000, // 28.432_MHz_XTAL        Fuuki FG-3J MAIN-J PCB
 	 28'475'000, // 28.475_MHz_XTAL        CoCo 3 PAL
 	 28'480'000, // 28.48_MHz_XTAL         Chromatics CGC-7900
 	 28'636'000, // 28.636_MHz_XTAL        Super Kaneko Nova System
@@ -455,6 +464,7 @@ const double XTAL::known_xtals[] = {
 	 42'105'200, // 42.1052_MHz_XTAL       NEC PC-88xx
 	 42'954'545, // 42.954545_MHz_XTAL     CPS3 (12x NTSC subcarrier)
 	 43'320'000, // 43.32_MHz_XTAL         DEC VT420
+	 44'000'000, // 44_MHz_XTAL            VGame slots
 	 44'100'000, // 44.1_MHz_XTAL          Subsino's Bishou Jan
 	 44'236'800, // 44.2368_MHz_XTAL       ReCo6502, Fortune 32:16
 	 44'452'800, // 44.4528_MHz_XTAL       TeleVideo 965
@@ -470,6 +480,7 @@ const double XTAL::known_xtals[] = {
 	 48'556'800, // 48.5568_MHz_XTAL       Wyse WY-85
 	 48'654'000, // 48.654_MHz_XTAL        Qume QVT-201
 	 48'660'000, // 48.66_MHz_XTAL         Zaxxon
+	 48'940'000, // 48.94_MHz_XTAL         Queen Bee New
 	 49'152'000, // 49.152_MHz_XTAL        Used on some Namco PCBs, Baraduke h/w, System 21, Super System 22
 	 49'423'500, // 49.4235_MHz_XTAL       Wyse WY-185
 	 50'000'000, // 50_MHz_XTAL            Williams/Midway T/W/V-unit system
@@ -484,6 +495,7 @@ const double XTAL::known_xtals[] = {
 	 53'693'175, // 53.693175_MHz_XTAL     PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier)
 	 54'000'000, // 54_MHz_XTAL            Taito JC
 	 55'000'000, // 55_MHz_XTAL            Eolith Vega
+	 56'000'000, // 56_MHz_XTAL            ARM7500 based Belatra slot machines
 	 57'272'727, // 57.272727_MHz_XTAL     Psikyo SH2 with /2 divider (16x NTSC subcarrier)
 	 57'283'200, // 57.2832_MHz_XTAL       Macintosh IIci RBV, 15-inch portrait display
 	 58'000'000, // 58_MHz_XTAL            Magic Reel (Play System)
@@ -497,6 +509,7 @@ const double XTAL::known_xtals[] = {
 	 66'666'700, // 66.6667_MHz_XTAL       Later Midway games
 	 67'737'600, // 67.7376_MHz_XTAL       PSX-based h/w, Sony ZN1-2-based
 	 68'850'000, // 68.85_MHz_XTAL         Wyse WY-50
+	 69'196'800, // 69.1968_MHz_XTAL       DEC VCB0x/VAXstation dot clock
 	 69'551'990, // 69.55199_MHz_XTAL      Sharp X68000 31.5kHz video
 	 72'000'000, // 72_MHz_XTAL            Aristocrat MKV
 	 72'576'000, // 72.576_MHz_XTAL        Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede"

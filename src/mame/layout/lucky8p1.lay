@@ -5,8 +5,8 @@ license:CC0-1.0
 <mamelayout version="2">
 
 <!--
-        New Lucky 8 Lines (1 player) control panel.
-        Written by Roberto Fresca.
+    New Lucky 8 Lines (1 player) control panel.
+	Written by Roberto Fresca.
 -->
 
 	<element name="Bet" defstate="0">
@@ -89,22 +89,20 @@ license:CC0-1.0
 	</element>
 
 
-	<element name="cpanel" />
+	<element name="cpanel">
+		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
+	</element>
 
 	<element name="cpanel1">
-		<rect><color red="0.20" green="0.20" blue="0.20" /></rect>
+		<rect><color red="0.07" green="0.07" blue="0.07" /></rect>
 	</element>
 
 	<element name="cpanel2">
-		<rect><color red="0.15" green="0.15" blue="0.15" /></rect>
+		<rect><color red="0.05" green="0.05" blue="0.05" /></rect>
 	</element>
 
 	<element name="cpanel3">
-		<rect><color red="0.10" green="0.10" blue="0.10" /></rect>
-	</element>
-
-	<element name="cpanel4">
-		<rect><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><color red="0.03" green="0.03" blue="0.03" /></rect>
 	</element>
 
 
@@ -116,8 +114,7 @@ license:CC0-1.0
 		<element ref="cpanel1"><bounds left="0" right="4" top="3.01" bottom="3.39" /></element>
 		<element ref="cpanel2"><bounds left="0" right="4" top="3.02" bottom="3.38" /></element>
 		<element ref="cpanel3"><bounds left="0" right="4" top="3.03" bottom="3.37" /></element>
-		<element ref="cpanel4"><bounds left="0" right="4" top="3.04" bottom="3.36" /></element>
-		<element ref="cpanel"><bounds left="0" right="4" top="3.05" bottom="3.35" /></element>
+		<element ref="cpanel"><bounds left="0" right="4" top="3.04" bottom="3.36" /></element>
 
 
 		<element name="lamp3" ref="Bet_B" inputtag="IN0" inputmask="0x20">

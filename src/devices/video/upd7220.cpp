@@ -346,7 +346,12 @@ inline void upd7220_device::dequeue(uint8_t *data, int *flag)
 
 inline void upd7220_device::update_vsync_timer(int state)
 {
-	int next_y = state ? (m_vs + m_vbp) : 0;
+	const int vert_mult = (m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON ? 2 : 1;
+
+	// page 6-68, route vsync so that top is start of back porch, end is at sync time
+	// (at bottom of MAME vpos() mechanism)
+	// - pc9801:lemmings and pc9801:spindiz2 cares
+	int next_y = state ? 0 : (m_vbp + m_al + m_vfp) * vert_mult;
 
 	attotime duration = screen().time_until_pos(next_y, 0);
 
@@ -360,10 +365,11 @@ inline void upd7220_device::update_vsync_timer(int state)
 
 inline void upd7220_device::update_hsync_timer(int state)
 {
+	const int horiz_mult = (m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS ? 16 : 8;
 	int y = screen().vpos();
 
-	int next_x = state ? m_hs : 0;
-	int next_y = state ? y : ((y + 1) % m_al);
+	int next_x = state ? m_hs * horiz_mult : 0;
+	int next_y = state ? y : ((y + 1) % (m_vs + m_vbp + m_al + m_vfp - 1));
 
 	attotime duration = screen().time_until_pos(next_y, next_x);
 
@@ -391,6 +397,11 @@ inline void upd7220_device::update_blank_timer(int state)
 //-------------------------------------------------
 //  recompute_parameters -
 //-------------------------------------------------
+
+void upd7220_device::device_clock_changed()
+{
+	recompute_parameters();
+}
 
 inline void upd7220_device::recompute_parameters()
 {
@@ -425,6 +436,7 @@ inline void upd7220_device::recompute_parameters()
 	if (m_m)
 	{
 		screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+		screen().reset_origin();
 
 		update_hsync_timer(0);
 		update_vsync_timer(0);
@@ -452,7 +464,7 @@ inline void upd7220_device::reset_figs_param()
 	m_figs.m_dm = 0xffff;
 	m_figs.m_gd = 0;
 	m_figs.m_figure_type = 0;
-	m_pattern = 0xffff;
+	m_pattern = (m_ra[8]) | (m_ra[9] << 8);
 }
 
 
@@ -462,7 +474,7 @@ inline void upd7220_device::reset_figs_param()
 inline uint16_t upd7220_device::read_vram()
 {
 	uint16_t const data = readword(m_ead);
-	m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+	m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * get_pitch());
 	m_ead &= 0x3ffff;
 
 	return data;
@@ -582,7 +594,7 @@ inline void upd7220_device::wdat(uint8_t type, uint8_t mod)
 	for(int i = 0; i < m_figs.m_dc + 1; i++)
 	{
 		write_vram(type, mod, result);
-		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * get_pitch());
 		m_ead &= 0x3ffff;
 	}
 }
@@ -613,6 +625,19 @@ inline void upd7220_device::get_graphics_partition(int index, uint32_t *sad, uin
 	*wd = BIT(m_ra[(index * 4) + 3], 7);
 }
 
+/*
+ * experimental, for non-canonical stuff such as PC9821 PEGC
+ */
+std::tuple<u32, u16, u8> upd7220_device::get_area_partition_props(int line)
+{
+	uint32_t sad;
+	uint16_t len;
+	int im, wd;
+	// TODO: multiareas (pc9821:skinpan title)
+	get_graphics_partition(0, &sad, &len, &im, &wd);
+
+	return std::make_tuple(sad, m_pitch, im);
+}
 
 
 //**************************************************************************
@@ -1678,7 +1703,7 @@ void upd7220_device::dack_w(uint8_t data)
 		{
 			m_dma_data = ((m_dma_data & 0xff) | data << 8) & m_mask;
 			write_vram(m_dma_type, m_dma_mod, m_dma_data);
-			m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+			m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * get_pitch());
 			m_ead &= 0x3ffff;
 		}
 		else
@@ -1689,13 +1714,13 @@ void upd7220_device::dack_w(uint8_t data)
 	case 2:
 		m_dma_data = data & (m_mask & 0xff);
 		write_vram(m_dma_type, m_dma_mod, m_dma_data);
-		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * get_pitch());
 		m_ead &= 0x3ffff;
 		break;
 	case 3:
 		m_dma_data = (data << 8) & (m_mask & 0xff00);
 		write_vram(m_dma_type, m_dma_mod, m_dma_data);
-		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * get_pitch());
 		m_ead &= 0x3ffff;
 		break;
 	default:
@@ -1826,7 +1851,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 	uint8_t interlace = ((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON) ? 1 : 0;
 	uint8_t zoom = m_disp + 1;
 
-	LOGAREA("FRAME=%d MODE=%02x FORCE BITMAP=%d ZOOM=%02x\n", screen().frame_number(), m_mode, force_bitmap, zoom);
+	LOGAREA("FRAME=%d MODE=%02x FORCE BITMAP=%d ZOOM=%02x PITCH=%d\n", screen().frame_number(), m_mode, force_bitmap, zoom, m_pitch);
 
 	for(int area = 0; area < 4; area++)
 	{
@@ -1834,16 +1859,19 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 
 		LOGAREA("%s: AREA=%d BSY=%4d SAD=%06x len=%04x im=%d wd=%d\n", this->tag(), area, bsy, sad, len, im, wd);
 
+		// pc9821:aitd (256 color mode) and pc9821:os2warp3 (16, installation screens) wants this shift
+		const u8 pitch_shift = force_bitmap ? im : mixed;
+
 		if(im || force_bitmap)
 		{
 			// according to documentation only areas 0-1-2 can be drawn in bitmap mode
 			// - pc98:quarth definitely needs area 2 for player section.
-            // - pc98:steamhea wants area 3 for scrolling and dialogue screens to work together,
-            //   contradicting the doc. Fixed in 7220A or applies just for mixed mode?
+			// - pc98:steamhea wants area 3 for scrolling and dialogue screens to work together,
+			//   contradicting the doc. Fixed in 7220A or applies just for mixed mode?
 			// TODO: what happens if combined area size is smaller than display height?
 			// documentation suggests that it should repeat from area 0, needs real HW verification (no known SW do it).
 			if (area >= 3 && !force_bitmap)
-                break;
+				break;
 
 			// pc98:madoum1-3 sets up ALL areas to a length of 0 after initial intro screen.
 			// madoum1: area 0 sad==0 on gameplay (PC=0x955e7), sad==0xaa0 on second intro screen (tower) then intentionally scrolls up and back to initial position.
@@ -1861,14 +1889,14 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				// pc98 quarth doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
 				// pc98 xevious wants the pitch to be fixed at 80, and wants bsy to be /1
 				// pc98 dbuster contradicts with Xevious with regards of the pitch tho ...
-				uint32_t const addr = (sad & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch >> mixed));
+				uint32_t const addr = (sad & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch >> pitch_shift));
 				for(int z = 0; z <= m_disp; ++z)
 				{
 					int yval = (y*zoom)+z + (bsy + m_vbp);
 					// pc9801:duel sets up bitmap layer with height 384 vs. 400 of text layer
 					// so we scissor here, interlace wants it bumped x2 (microbx2)
-					if(yval <= cliprect.bottom() && (yval - m_vbp) < m_al << interlace)
-						draw_graphics_line(bitmap, addr, yval, wd, mixed);
+					if(yval >= cliprect.top() && yval <= cliprect.bottom() && (yval - m_vbp) < m_al << interlace)
+						draw_graphics_line(bitmap, addr, yval, wd, pitch_shift);
 				}
 			}
 		}

@@ -142,4 +142,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992, hclimber, 0, m102, m102, m102_state, empty_init, ROT0, "Irem", "Hill Climber", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, hclimber, 0, m102, m102, m102_state, empty_init, ROT0, "Irem", "Hill Climber", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

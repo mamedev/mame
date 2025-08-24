@@ -1,8 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-
-#ifndef MAME_BUS_PCI_OTI_SPITFIRE_PCI_H
-#define MAME_BUS_PCI_OTI_SPITFIRE_PCI_H
+#ifndef MAME_BUS_PCI_OTI_SPITFIRE_H
+#define MAME_BUS_PCI_OTI_SPITFIRE_H
 
 #pragma once
 
@@ -45,4 +44,4 @@ private:
 
 DECLARE_DEVICE_TYPE(OTI64111_PCI, oti64111_pci_device)
 
-#endif // MAME_BUS_PCI_OTI_SPITFIRE_PCI_H
+#endif // MAME_BUS_PCI_OTI_SPITFIRE_H

@@ -64,6 +64,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_protrom(*this, "prot")
 		, m_spriteram(*this, "spriteram")
 		, m_videoram(*this, "videoram")
 		, m_xscroll(*this, "xscroll")
@@ -132,6 +133,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
+	optional_region_ptr<uint8_t> m_protrom;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_xscroll;
@@ -370,8 +372,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(markham_state::strnskil_scanline)
 
 uint8_t markham_state::banbam_protection_r()
 {
-	const uint8_t *prot_rom = (const uint8_t *)memregion("mcu_rom")->base();
-
 	const uint8_t init = m_packet_buffer[0] & 0x0f;
 	uint8_t comm = m_packet_buffer[1] & 0xf0;
 	uint8_t arg = m_packet_buffer[1] & 0x0f;
@@ -387,11 +387,11 @@ uint8_t markham_state::banbam_protection_r()
 		{
 		case 0x30:
 			// palette/gfx select
-			arg = prot_rom[0x799 + (arg * 4)];
+			arg = m_protrom[0x799 + (arg * 4)];
 			break;
 		case 0x40:
 			// palette/gfx select
-			arg = prot_rom[0x7C5 + (arg * 4)];
+			arg = m_protrom[0x7c5 + (arg * 4)];
 			break;
 		case 0x60:
 			// enemy wave timer trigger
@@ -546,7 +546,7 @@ static INPUT_PORTS_START( markham )
 	PORT_DIPNAME( 0x08, 0x00, "Coin Chutes" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "Individual" )
 	PORT_DIPSETTING(    0x08, "Common" )
-	PORT_DIPNAME( 0xf0, 0x00, "Coin1 / Coin2" ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x00, "1C 1C / 1C 1C" )
 	PORT_DIPSETTING(    0x10, "2C 1C / 2C 1C" )
 	PORT_DIPSETTING(    0x20, "2C 1C / 1C 3C" )
@@ -626,7 +626,7 @@ static INPUT_PORTS_START( strnskil )
 	PORT_DIPNAME( 0x08, 0x00, "Coin Chutes" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "Individual" )
 	PORT_DIPSETTING(    0x08, "Common" )
-	PORT_DIPNAME( 0xf0, 0x00, "Coin1 / Coin2" ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x00, "1C 1C / 1C 1C" )
 	PORT_DIPSETTING(    0x10, "2C 1C / 2C 1C" )
 	PORT_DIPSETTING(    0x20, "2C 1C / 1C 3C" )
@@ -715,7 +715,7 @@ static INPUT_PORTS_START( banbam )
 	PORT_DIPNAME(0x08,  0x00, "Coin Chutes") PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "Individual")
 	PORT_DIPSETTING(    0x08, "Common")
-	PORT_DIPNAME( 0xf0, 0x00, "Coin1 / Coin2" ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x00, "1C 1C / 1C 1C" )
 	PORT_DIPSETTING(    0x10, "2C 1C / 2C 1C" )
 	PORT_DIPSETTING(    0x20, "2C 1C / 1C 3C" )
@@ -892,16 +892,16 @@ void markham_state::banbam(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &markham_state::banbam_master_map);
 
 	MB8841(config, m_mcu, CPU_CLOCK/2); /* 4.000MHz */
-	// m_mcu->read_k().set(FUNC(markham_state::mcu_portk_r));
+	// m_mcu->read_k().set(FUNC(markham_state::mcu_port_k_r));
 	// m_mcu->write_o().set(FUNC(markham_state::mcu_port_o_w));
 	// m_mcu->write_p().set(FUNC(markham_state::mcu_port_p_w));
 	// m_mcu->read_r<0>().set(FUNC(markham_state::mcu_port_r0_r));
-	// m_mcu->write_r<0>().set(FUNC(markham_state::mcu_port_r0_w));
 	// m_mcu->read_r<1>().set(FUNC(markham_state::mcu_port_r1_r));
-	// m_mcu->write_r<1>().set(FUNC(markham_state::mcu_port_r1_w));
 	// m_mcu->read_r<2>().set(FUNC(markham_state::mcu_port_r2_r));
-	// m_mcu->write_r<2>().set(FUNC(markham_state::mcu_port_r2_w));
 	// m_mcu->read_r<3>().set(FUNC(markham_state::mcu_port_r3_r));
+	// m_mcu->write_r<0>().set(FUNC(markham_state::mcu_port_r0_w));
+	// m_mcu->write_r<1>().set(FUNC(markham_state::mcu_port_r1_w));
+	// m_mcu->write_r<2>().set(FUNC(markham_state::mcu_port_r2_w));
 	// m_mcu->write_r<3>().set(FUNC(markham_state::mcu_port_r3_w));
 	m_mcu->set_disable();
 }
@@ -1013,6 +1013,12 @@ ROM_START( banbam )
 	ROM_REGION( 0x10000, "subcpu", 0 ) /* sub CPU */
 	ROM_LOAD( "ban-rom1.ic2",    0x0000, 0x2000, CRC(e36009f6) SHA1(72c485e8c19fbfc9c850094cfd87f1055154c0c5) )
 
+	ROM_REGION(0x800, "mcu", 0) /* Fujitsu MB8841 4-Bit MCU internal ROM */
+	ROM_LOAD( "sun-8212.ic3",    0x000,  0x800,  CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa) )
+
+	ROM_REGION( 0x2000, "prot", 0 ) /* protection, data used with Fujitsu MB8841 4-Bit MCU */
+	ROM_LOAD( "ban-rom12.ic2",   0x0000, 0x2000, CRC(044bb2f6) SHA1(829b2152740061e0506c7504885d8404fb8fe360) )
+
 	ROM_REGION( 0x6000, "gfx1", 0 ) /* sprite */
 	ROM_LOAD( "ban-rom6.ic90",   0x0000, 0x2000, CRC(41fc44df) SHA1(1c4f21cdc423078fab58370d5245a13292bf7fe6) )
 	ROM_LOAD( "ban-rom7.ic92",   0x2000, 0x2000, CRC(8b429c5b) SHA1(505796eac2c8dd84f9ed29a6227b3243f81ec072) )
@@ -1032,12 +1038,6 @@ ROM_START( banbam )
 
 	ROM_REGION( 0x0100, "scroll_prom", 0 ) /* scroll control PROM */
 	ROM_LOAD( "16-6.59",         0x0000, 0x0100, CRC(ec4faf5b) SHA1(7ebbf50807d04105ebadec91bded069408e399ba) ) /* Prom type 24s10 */
-
-	ROM_REGION( 0x2000, "mcu_rom", 0 ) /* protection, data used with Fujitsu MB8841 4-Bit MCU */
-	ROM_LOAD( "ban-rom12.ic2",   0x0000, 0x2000, CRC(044bb2f6) SHA1(829b2152740061e0506c7504885d8404fb8fe360) )
-
-	ROM_REGION(0x800, "mcu", 0) /* Fujitsu MB8841 4-Bit MCU internal ROM */
-	ROM_LOAD( "sun-8212.ic3",    0x000,  0x800,  CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa) )
 ROM_END
 
 ROM_START( pettanp )
@@ -1050,6 +1050,12 @@ ROM_START( pettanp )
 
 	ROM_REGION( 0x10000, "subcpu", 0 ) /* sub CPU */
 	ROM_LOAD( "tvg1-16.2",    0x0000, 0x2000, CRC(e36009f6) SHA1(72c485e8c19fbfc9c850094cfd87f1055154c0c5) )
+
+	ROM_REGION(0x800, "mcu", 0) /* Fujitsu MB8841 4-Bit MCU internal ROM */
+	ROM_LOAD( "sun-8212.ic3", 0x000,  0x800,  NO_DUMP ) // very much likely to be same as banbam and arabian
+
+	ROM_REGION( 0x1000, "prot", 0 ) /* protection data used with Fujitsu MB8841 4-Bit MCU */
+	ROM_LOAD( "tvg12-16.2",   0x0000, 0x1000, CRC(3abc6ba8) SHA1(15e0b0f9d068f6094e2be4f4f1dea0ff6e85686b) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 ) /* sprite */
 	ROM_LOAD( "tvg6-16.90",   0x0000, 0x2000, CRC(6905d9d5) SHA1(586bf72bab5ab6e3e319c925decc16d7f3711af1) )
@@ -1070,12 +1076,6 @@ ROM_START( pettanp )
 
 	ROM_REGION( 0x0100, "scroll_prom", 0 ) /* scroll control PROM */
 	ROM_LOAD( "16-6.59",      0x0000, 0x0100, CRC(ec4faf5b) SHA1(7ebbf50807d04105ebadec91bded069408e399ba) ) /* Prom type 24s10 */
-
-	ROM_REGION( 0x1000, "mcu_rom", 0 ) /* protection data used with Fujitsu MB8841 4-Bit MCU */
-	ROM_LOAD( "tvg12-16.2",   0x0000, 0x1000, CRC(3abc6ba8) SHA1(15e0b0f9d068f6094e2be4f4f1dea0ff6e85686b) )
-
-	ROM_REGION(0x800, "mcu", 0) /* Fujitsu MB8841 4-Bit MCU internal ROM */
-	ROM_LOAD( "sun-8212.ic3", 0x000,  0x800,  NO_DUMP ) // very much likely to be same as banbam and arabian
 ROM_END
 
 } // anonymous namespace

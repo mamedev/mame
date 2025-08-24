@@ -351,7 +351,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( compan3 )
 	PORT_INCLUDE( turbo16k )
 
-	PORT_MODIFY("FREQ") // default to 8MHz
+	PORT_MODIFY("FREQ") // modify default to 8MHz
 	PORT_CONFNAME( 0x88, 0x08, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turbo16k_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "4MHz (unofficial)" )
 	PORT_CONFSETTING(    0x08, "8MHz (Companion III, Express 16K)" )
@@ -391,7 +391,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tmate )
 	PORT_INCLUDE( conquist )
 
-	PORT_MODIFY("FREQ") // default to 8MHz
+	PORT_MODIFY("FREQ") // modify default to 8MHz
 	PORT_CONFNAME( 0x88, 0x08, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(turbo16k_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x08, "8MHz (Team-Mate)" )
 	PORT_CONFSETTING(    0x80, "12MHz (Conquistador)" )

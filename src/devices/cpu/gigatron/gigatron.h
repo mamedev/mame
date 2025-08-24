@@ -11,8 +11,8 @@
  *
  *****************************************************************************/
 
-#ifndef MAME_CPU_GTRON_H
-#define MAME_CPU_GTRON_H
+#ifndef MAME_CPU_GIGATRON_GIGATRON_H
+#define MAME_CPU_GIGATRON_GIGATRON_H
 
 #pragma once
 
@@ -34,23 +34,23 @@ public:
 	auto ir_cb() { return m_ir_cb.bind(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 7; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_state_interface overrides
+	// device_state_interface implementation
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
 	void reset_cpu();
@@ -92,7 +92,4 @@ private:
 
 DECLARE_DEVICE_TYPE(GTRON, gigatron_cpu_device)
 
-
-
-#endif // MAME_CPU_GTRON_H
-
+#endif // MAME_CPU_GIGATRON_GIGATRON_H

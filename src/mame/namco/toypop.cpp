@@ -36,41 +36,46 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 namespace {
-
-#define MASTER_CLOCK XTAL(6'144'000)
 
 class namcos16_state : public driver_device
 {
 public:
 	namcos16_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_master_cpu(*this,"maincpu"),
-		m_slave_cpu(*this, "slave"),
-		m_sound_cpu(*this, "audiocpu"),
+		m_maincpu(*this,"maincpu"),
+		m_subcpu(*this, "sub"),
+		m_soundcpu(*this, "soundcpu"),
 		m_namco15xx(*this, "namco"),
 		m_namco58xx(*this, "58xx"),
 		m_namco56xx_1(*this, "56xx_1"),
 		m_namco56xx_2(*this, "56xx_2"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_master_workram(*this, "master_workram"),
-		m_slave_sharedram(*this, "slave_sharedram"),
+		m_spriteram(*this, "spriteram"),
+		m_sharedram(*this, "sharedram"),
 		m_bgvram(*this, "bgvram"),
-		m_fgvram(*this, "fgvram"),
-		m_fgattr(*this, "fgattr")
+		m_txvram(*this, "txvram"),
+		m_io_dsw(*this, "DSW%u", 1U)
 	{
 	}
 
-	void toypop(machine_config &config);
-	void liblrabl(machine_config &config);
+	void toypop(machine_config &config) ATTR_COLD;
+	void liblrabl(machine_config &config) ATTR_COLD;
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_master_cpu;
-	required_device<cpu_device> m_slave_cpu;
-	required_device<cpu_device> m_sound_cpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_soundcpu;
 
 	required_device<namco_15xx_device> m_namco15xx;
 	required_device<namco58xx_device> m_namco58xx;
@@ -79,61 +84,57 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<uint8_t> m_master_workram;
-	required_shared_ptr<uint8_t> m_slave_sharedram;
-	required_shared_ptr<uint16_t> m_bgvram;
-	required_shared_ptr<uint8_t> m_fgvram;
-	required_shared_ptr<uint8_t> m_fgattr;
+	required_shared_ptr<u8> m_spriteram;
+	required_shared_ptr<u8> m_sharedram;
+	required_shared_ptr<u16> m_bgvram;
+	required_shared_ptr<u8> m_txvram;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_ioport_array<2> m_io_dsw;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(master_scanline);
-	void slave_vblank_irq(int state);
+	tilemap_t *m_tx_tilemap;
+	u8 m_pal_bank = 0;
 
-	uint8_t irq_enable_r();
-	void irq_disable_w(uint8_t data);
-	void irq_ctrl_w(offs_t offset, uint8_t data);
+	bool m_main_irq_enable = false;
+	bool m_sub_irq_enable = false;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(main_scanline);
+	void vblank_irq(int state);
+
+	u8 irq_enable_r();
+	void irq_disable_w(u8 data);
+	void irq_ctrl_w(offs_t offset, u8 data);
+	template <unsigned Which> u8 dip_l();
+	template <unsigned Which> u8 dip_h();
+	void pal_bank_w(offs_t offset, u8 data);
+	void flip(u8 data);
+	void sub_halt_ctrl_w(offs_t offset, u8 data);
+	u8 sharedram_r(offs_t offset);
+	void sharedram_w(offs_t offset, u8 data);
+	void sub_irq_enable_w(offs_t offset, u16 data);
+	void sound_halt_ctrl_w(offs_t offset, u8 data);
+
+	void txvram_w(offs_t offset, u8 data);
+	u8 bg_rmw_r(offs_t offset);
+	void bg_rmw_w(offs_t offset, u8 data);
+
 	void toypop_palette(palette_device &palette) const;
-	uint8_t dipA_l();
-	uint8_t dipA_h();
-	uint8_t dipB_l();
-	uint8_t dipB_h();
-	//void out_coin0(uint8_t data);
-	//void out_coin1(uint8_t data);
-	void pal_bank_w(offs_t offset, uint8_t data);
-	void flip(uint8_t data);
-	void slave_halt_ctrl_w(offs_t offset, uint8_t data);
-	uint8_t slave_shared_r(offs_t offset);
-	void slave_shared_w(offs_t offset, uint8_t data);
-	void slave_irq_enable_w(offs_t offset, uint16_t data);
-	void sound_halt_ctrl_w(offs_t offset, uint8_t data);
-	uint8_t bg_rmw_r(offs_t offset);
-	void bg_rmw_w(offs_t offset, uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void master_liblrabl_map(address_map &map) ATTR_COLD;
-	void master_toypop_map(address_map &map) ATTR_COLD;
-	void namcos16_master_base_map(address_map &map) ATTR_COLD;
-	void slave_map(address_map &map) ATTR_COLD;
+	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, bool flip);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bool flip);
+
+	void liblrabl_main_map(address_map &map) ATTR_COLD;
+	void main_base_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
-
-	// driver_device overrides
-//  virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
-//  virtual void video_start() override ATTR_COLD;
-
-	bool m_master_irq_enable = false;
-	bool m_slave_irq_enable = false;
-	uint8_t m_pal_bank = 0;
-
-	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip);
-	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip);
-	void legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip);
+	void sub_map(address_map &map) ATTR_COLD;
+	void toypop_main_map(address_map &map) ATTR_COLD;
 };
 
 void namcos16_state::toypop_palette(palette_device &palette) const
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	u8 const *const color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 256; i++)
 	{
@@ -168,7 +169,7 @@ void namcos16_state::toypop_palette(palette_device &palette) const
 		palette.set_pen_indirect(i + 1*256, (color_prom[i + 0x300] & 0x0f) | 0xf0);
 
 		// sprites
-		uint8_t const entry = color_prom[i + 0x500];
+		u8 const entry = color_prom[i + 0x500];
 		palette.set_pen_indirect(i + 2*256, entry);
 	}
 
@@ -180,20 +181,46 @@ void namcos16_state::toypop_palette(palette_device &palette) const
 	}
 }
 
-void namcos16_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip)
+TILE_GET_INFO_MEMBER(namcos16_state::get_tile_info)
 {
-	uint16_t const pal_base = 0x300 + (m_pal_bank << 4);
-	uint32_t const src_base = 0x200/2;
-	uint16_t const src_pitch = 288 / 2;
+	const u32 code = m_txvram[tile_index];
+	const u32 color = (m_txvram[tile_index + 0x400] & 0x3f) + (m_pal_bank << 6);
+	tileinfo.set(0, code, color, 0);
+}
+
+/* convert from 32x32 to 36x28 */
+TILEMAP_MAPPER_MEMBER(namcos16_state::tilemap_scan)
+{
+	row += 2;
+	col -= 2;
+	if (col & 0x20)
+		return row + ((col & 0x1f) << 5);
+	else
+		return col + (row << 5);
+}
+
+void namcos16_state::video_start()
+{
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(namcos16_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(namcos16_state::tilemap_scan)), 8, 8, 36, 28);
+	m_tx_tilemap->set_transparent_pen(0);
+
+	save_item(NAME(m_pal_bank));
+}
+
+void namcos16_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, bool flip)
+{
+	u16 const pal_base = 0x300 + (m_pal_bank << 4);
+	u32 const src_base = 0x200/2;
+	u16 const src_pitch = 288 / 2;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint16_t const *src = &m_bgvram[y * src_pitch + cliprect.min_x + src_base];
-		uint16_t *dst = &bitmap.pix(flip ? (cliprect.max_y - y) : y, flip ? cliprect.max_x : cliprect.min_x);
+		u16 const *src = &m_bgvram[y * src_pitch + cliprect.min_x + src_base];
+		u16 *dst = &bitmap.pix(flip ? (cliprect.max_y - y) : y, flip ? cliprect.max_x : cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			uint32_t const srcpix = *src++;
+			u32 const srcpix = *src++;
 			int const idx1 = ((srcpix >> 8) & 0xf) + pal_base;
 			int const idx2 = (srcpix & 0xf) + pal_base;
 			if (!flip)
@@ -210,76 +237,37 @@ void namcos16_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 	}
 }
 
-void namcos16_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip)
-{
-	gfx_element *const gfx_0 = m_gfxdecode->gfx(0);
-
-	for (int count = 0; count < 32*32; count++)
-	{
-		int const xoffs(count >> 5);
-		int const yoffs(count & 0x1f);
-		int x;// = (count % 32);
-		int y; //= count / 32;
-
-		if (count < 64)
-		{
-			x = 34 + xoffs;
-			y = yoffs - 2;
-		}
-		else if (count >= 32*30)
-		{
-			x = xoffs - 30;
-			y = yoffs - 2;
-		}
-		else
-		{
-			x = 2 + yoffs;
-			y = xoffs - 2;
-		}
-
-		uint16_t tile = m_fgvram[count];
-		uint8_t color = (m_fgattr[count] & 0x3f) + (m_pal_bank << 6);
-
-		gfx_0->transpen(bitmap, cliprect, tile, color, flip, flip, (flip ? 35-x : x)*8, (flip ? 27-y : y)*8, 0);
-	}
-}
-
 // TODO: this is likely to be a lot more complex, and maybe is per scanline too
-void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip)
+void namcos16_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip)
 {
-	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
-	int count;
-	uint8_t *base_spriteram = m_master_workram;
-	const uint16_t bank1 = 0x0800;
-	const uint16_t bank2 = 0x1000;
+	gfx_element *const gfx_1 = m_gfxdecode->gfx(1);
+	u16 const bank1 = 0x0800;
+	u16 const bank2 = 0x1000;
 
-
-	for (count=0x780;count<0x800;count+=2)
+	static const int gfx_offs[2][2] =
 	{
-		bool enabled = (base_spriteram[count+bank2+1] & 2) == 0;
-
-		if(enabled == false)
+		{ 0, 1 },
+		{ 2, 3 }
+	};
+	for (int count = 0x780; count < 0x800; count += 2)
+	{
+		if (BIT(m_spriteram[count+bank2+1], 1))
 			continue;
 
-		static const int gfx_offs[2][2] =
-		{
-			{ 0, 1 },
-			{ 2, 3 }
-		};
-		uint8_t tile = base_spriteram[count];
-		uint8_t color = base_spriteram[count+1];
-		int x = base_spriteram[count+bank1+1] + (base_spriteram[count+bank2+1] << 8);
+		u8 tile = m_spriteram[count];
+		u8 const color = m_spriteram[count+1];
+		int x = m_spriteram[count+bank1+1] + (m_spriteram[count+bank2+1] << 8);
 		x -= 71;
 
-		int y = base_spriteram[count+bank1+0];
+		int y = m_spriteram[count+bank1+0];
 		y += 7;
 		// TODO: actually m_screen.height()
 		y = 224 - y;
 
-		bool fx = (base_spriteram[count+bank2] & 1) == 1;
-		bool fy = (base_spriteram[count+bank2] & 2) == 2;
-		uint8_t width = ((base_spriteram[count+bank2] & 4) >> 2) + 1;
-		uint8_t height = ((base_spriteram[count+bank2] & 8) >> 3) + 1;
+		bool fx = (m_spriteram[count+bank2] & 1) == 1;
+		bool fy = (m_spriteram[count+bank2] & 2) == 2;
+		u8 const width = ((m_spriteram[count+bank2] & 4) >> 2) + 1;
+		u8 const height = ((m_spriteram[count+bank2] & 8) >> 3) + 1;
 
 		tile &= ~(width - 1);
 		tile &= ~((height - 1) << 1);
@@ -291,120 +279,128 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		}
 
 		if (height == 2)
-			y -=16;
+			y -= 16;
 
-		for (int yi=0; yi<height; yi++)
+		for (int yi = 0; yi < height; yi++)
 		{
-			for(int xi=0; xi<width; xi++)
+			for(int xi = 0; xi < width; xi++)
 			{
-				uint16_t sprite_offs = tile + gfx_offs[yi ^ ((height - 1) * fy)][xi ^ ((width - 1) * fx)];
-				gfx_1->transmask(bitmap,cliprect,sprite_offs,color,fx,fy,x + xi*16,y + yi *16,m_palette->transpen_mask(*gfx_1, color, 0xff));
+				u16 const sprite_offs = tile + gfx_offs[yi ^ ((height - 1) * fy)][xi ^ ((width - 1) * fx)];
+				gfx_1->transmask(bitmap, cliprect,
+					sprite_offs,
+					color,
+					fx, fy,
+					x + xi * 16, y + yi * 16,
+					m_palette->transpen_mask(*gfx_1, color, 0xff));
 			}
 		}
 	}
 }
 
-uint32_t namcos16_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+u32 namcos16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool const flip = flip_screen();
-	legacy_bg_draw(bitmap,cliprect,flip);
-	legacy_fg_draw(bitmap,cliprect,flip);
-	legacy_obj_draw(bitmap,cliprect,flip);
+	draw_background(bitmap, cliprect, flip);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, flip);
 	return 0;
 }
 
-uint8_t namcos16_state::irq_enable_r()
+u8 namcos16_state::irq_enable_r()
 {
-	m_master_irq_enable = true;
+	if (!machine().side_effects_disabled())
+		m_main_irq_enable = true;
 	return 0;
 }
 
-void namcos16_state::irq_disable_w(uint8_t data)
+void namcos16_state::irq_disable_w(u8 data)
 {
-	m_master_irq_enable = false;
+	m_main_irq_enable = false;
 }
 
 
-void namcos16_state::irq_ctrl_w(offs_t offset, uint8_t data)
+void namcos16_state::irq_ctrl_w(offs_t offset, u8 data)
 {
-	m_master_irq_enable = (offset & 0x0800) ? false : true;
+	m_main_irq_enable = BIT(~offset, 11);
 }
 
-void namcos16_state::slave_halt_ctrl_w(offs_t offset, uint8_t data)
+void namcos16_state::sub_halt_ctrl_w(offs_t offset, u8 data)
 {
-	m_slave_cpu->set_input_line(INPUT_LINE_RESET,offset & 0x800 ? ASSERT_LINE : CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(offset, 11));
 }
 
-void namcos16_state::sound_halt_ctrl_w(offs_t offset, uint8_t data)
+void namcos16_state::sound_halt_ctrl_w(offs_t offset, u8 data)
 {
-	m_sound_cpu->set_input_line(INPUT_LINE_RESET,offset & 0x800 ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, BIT(offset, 11));
 }
 
-uint8_t namcos16_state::slave_shared_r(offs_t offset)
+u8 namcos16_state::sharedram_r(offs_t offset)
 {
-	return m_slave_sharedram[offset];
+	return m_sharedram[offset];
 }
 
-void namcos16_state::slave_shared_w(offs_t offset, uint8_t data)
+void namcos16_state::sharedram_w(offs_t offset, u8 data)
 {
-	m_slave_sharedram[offset] = data;
+	m_sharedram[offset] = data;
 }
 
-void namcos16_state::slave_irq_enable_w(offs_t offset, uint16_t data)
+void namcos16_state::sub_irq_enable_w(offs_t offset, u16 data)
 {
-	m_slave_irq_enable = (offset & 0x40000) ? false : true;
+	m_sub_irq_enable = BIT(~offset, 18);
 }
 
-uint8_t namcos16_state::bg_rmw_r(offs_t offset)
+u8 namcos16_state::bg_rmw_r(offs_t offset)
 {
-	uint8_t res;
-
-	res = 0;
+	u8 res = 0;
 	// note: following offset is written as offset * 2
 	res |= (m_bgvram[offset] & 0x0f00) >> 4;
 	res |= (m_bgvram[offset] & 0x000f);
 	return res;
 }
 
-void namcos16_state::bg_rmw_w(offs_t offset, uint8_t data)
+void namcos16_state::bg_rmw_w(offs_t offset, u8 data)
 {
 	// note: following offset is written as offset * 2
 	m_bgvram[offset] = (data & 0xf) | ((data & 0xf0) << 4);
 }
 
-uint8_t namcos16_state::dipA_l() { return ioport("DSW1")->read(); }                // dips A
-uint8_t namcos16_state::dipA_h() { return ioport("DSW1")->read() >> 4; }           // dips A
-uint8_t namcos16_state::dipB_l() { return ioport("DSW2")->read(); }                // dips B
-uint8_t namcos16_state::dipB_h() { return ioport("DSW2")->read() >> 4; }           // dips B
-
-void namcos16_state::flip(uint8_t data)
+void namcos16_state::txvram_w(offs_t offset, u8 data)
 {
-	flip_screen_set(data & 1);
+	m_txvram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-void namcos16_state::pal_bank_w(offs_t offset, uint8_t data)
+template <unsigned Which> u8 namcos16_state::dip_l() { return m_io_dsw[Which]->read(); }
+template <unsigned Which> u8 namcos16_state::dip_h() { return m_io_dsw[Which]->read() >> 4; }
+
+void namcos16_state::flip(u8 data)
 {
-	m_pal_bank = offset & 1;
+	flip_screen_set(BIT(data, 0));
 }
 
-void namcos16_state::namcos16_master_base_map(address_map &map)
+void namcos16_state::pal_bank_w(offs_t offset, u8 data)
 {
-	map(0x0000, 0x03ff).ram().share("fgvram");
-	map(0x0400, 0x07ff).ram().share("fgattr");
-	map(0x0800, 0x1fff).ram().share("master_workram");
-	map(0x2800, 0x2fff).ram().share("slave_sharedram");
+	m_pal_bank = BIT(offset, 0);
+	m_tx_tilemap->mark_all_dirty();
+}
+
+void namcos16_state::main_base_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().w(FUNC(namcos16_state::txvram_w)).share(m_txvram);
+	map(0x0800, 0x1fff).ram().share(m_spriteram);
+	map(0x2800, 0x2fff).ram().share(m_sharedram);
 
 	// 0x6000 - 0x7fff i/o specific, guessing PAL controlled.
 
-	map(0x8000, 0x8fff).w(FUNC(namcos16_state::slave_halt_ctrl_w));
+	map(0x8000, 0xffff).rom().region("maincpu", 0);
+	map(0x8000, 0x8fff).w(FUNC(namcos16_state::sub_halt_ctrl_w));
 	map(0x9000, 0x9fff).w(FUNC(namcos16_state::sound_halt_ctrl_w));
 	map(0xa000, 0xa001).w(FUNC(namcos16_state::pal_bank_w));
-	map(0x8000, 0xffff).rom().region("master_rom", 0);
 }
 
-void namcos16_state::master_liblrabl_map(address_map &map)
+void namcos16_state::liblrabl_main_map(address_map &map)
 {
-	namcos16_master_base_map(map);
+	main_base_map(map);
 	map(0x6000, 0x63ff).rw(m_namco15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));
 	map(0x6800, 0x680f).rw(m_namco58xx, FUNC(namco58xx_device::read), FUNC(namco58xx_device::write));
 	map(0x6810, 0x681f).rw(m_namco56xx_1, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
@@ -412,9 +408,9 @@ void namcos16_state::master_liblrabl_map(address_map &map)
 	map(0x7000, 0x7fff).nopr().w(FUNC(namcos16_state::irq_ctrl_w));
 }
 
-void namcos16_state::master_toypop_map(address_map &map)
+void namcos16_state::toypop_main_map(address_map &map)
 {
-	namcos16_master_base_map(map);
+	main_base_map(map);
 	map(0x6000, 0x600f).rw(m_namco58xx, FUNC(namco58xx_device::read), FUNC(namco58xx_device::write));
 	map(0x6010, 0x601f).rw(m_namco56xx_1, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
 	map(0x6020, 0x602f).rw(m_namco56xx_2, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
@@ -422,20 +418,20 @@ void namcos16_state::master_toypop_map(address_map &map)
 	map(0x7000, 0x7000).rw(FUNC(namcos16_state::irq_enable_r), FUNC(namcos16_state::irq_disable_w));
 }
 
-void namcos16_state::slave_map(address_map &map)
+void namcos16_state::sub_map(address_map &map)
 {
-	map(0x000000, 0x007fff).rom().region("slave_rom", 0);
+	map(0x000000, 0x007fff).rom().region("sub", 0);
 	map(0x080000, 0x0bffff).ram();
-	map(0x100000, 0x100fff).rw(FUNC(namcos16_state::slave_shared_r), FUNC(namcos16_state::slave_shared_w)).umask16(0x00ff);
+	map(0x100000, 0x100fff).rw(FUNC(namcos16_state::sharedram_r), FUNC(namcos16_state::sharedram_w)).umask16(0x00ff);
 	map(0x180000, 0x187fff).rw(FUNC(namcos16_state::bg_rmw_r), FUNC(namcos16_state::bg_rmw_w));
-	map(0x190000, 0x1dffff).ram().share("bgvram");
-	map(0x300000, 0x3fffff).w(FUNC(namcos16_state::slave_irq_enable_w));
+	map(0x190000, 0x1dffff).ram().share(m_bgvram);
+	map(0x300000, 0x3fffff).w(FUNC(namcos16_state::sub_irq_enable_w));
 }
 
 void namcos16_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x03ff).rw(m_namco15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));
-	map(0xe000, 0xffff).rom().region("sound_rom", 0);
+	map(0xe000, 0xffff).rom().region("soundcpu", 0);
 }
 
 
@@ -487,10 +483,10 @@ static INPUT_PORTS_START( liblrabl )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWA:6,5,4")
 	// bonus scores for common
-	PORT_DIPSETTING(    0x1c, "40k 120k 200k 400k 600k 1m" )
-	PORT_DIPSETTING(    0x0c, "40k 140k 250k 400k 700k 1m" )
+	PORT_DIPSETTING(    0x1c, "40k 120k 200k 400k 600k 1M" )
+	PORT_DIPSETTING(    0x0c, "40k 140k 250k 400k 700k 1M" )
 	// bonus scores for 1, 2 or 3 lives
-	PORT_DIPSETTING(    0x14, "50k 150k 300k 500k 700k 1m" ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x14, "50k 150k 300k 500k 700k 1M" ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
 	PORT_DIPSETTING(    0x04, "40k 120k and every 120k" )    PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
 	PORT_DIPSETTING(    0x18, "40k 150k and every 150k" )    PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
 	PORT_DIPSETTING(    0x08, "50k 150k 300k" )              PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
@@ -637,10 +633,10 @@ static const gfx_layout charlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	2,
-	{ 0, 4 },
-	{ 8*8+0, 8*8+1, 8*8+2, 8*8+3, 0, 1, 2, 3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8
+	{ STEP2(0, 4) },
+	{ STEP4(8*8, 1), STEP4(0, 1) },
+	{ STEP8(0, 8) },
+	8*8*2
 };
 
 static const gfx_layout spritelayout =
@@ -648,36 +644,40 @@ static const gfx_layout spritelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	2,
-	{ 0, 4 },
-	{ 0, 1, 2, 3, 8*8, 8*8+1, 8*8+2, 8*8+3, 16*8+0, 16*8+1, 16*8+2, 16*8+3,
-	24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	32 * 8, 33 * 8, 34 * 8, 35 * 8, 36 * 8, 37 * 8, 38 * 8, 39 * 8 },
-	64*8
+	{ STEP2(0, 4) },
+	{ STEP4(0, 1), STEP4(8*8, 1), STEP4(16*8, 1), STEP4(24*8, 1) },
+	{ STEP8(0, 8), STEP8(32*8, 8) },
+	16*16*2
 };
 
 static GFXDECODE_START( gfx_toypop )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 128 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 128*4,  64 )
+	GFXDECODE_ENTRY( "tiles",   0, charlayout,       0, 128 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 128*4,  64 )
 GFXDECODE_END
+
+void namcos16_state::machine_start()
+{
+	save_item(NAME(m_main_irq_enable));
+	save_item(NAME(m_sub_irq_enable));
+}
 
 void namcos16_state::machine_reset()
 {
-	m_master_irq_enable = false;
-	m_slave_irq_enable = false;
-	m_slave_cpu->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
-	m_sound_cpu->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
+	m_main_irq_enable = false;
+	m_sub_irq_enable = false;
+	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::master_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::main_scanline)
 {
-	int scanline = param;
+	int const scanline = param;
 
-	if(scanline == 224 && m_master_irq_enable == true)
-		m_master_cpu->set_input_line(M6809_IRQ_LINE,HOLD_LINE);
+	if (scanline == 224 && m_main_irq_enable)
+		m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 
 	// TODO: definitely can't fire from this, presume that a command send has a timing response ...
-	if(scanline == 0)
+	if (scanline == 0)
 	{
 		if (!m_namco58xx->read_reset_line())
 			m_namco58xx->customio_run();
@@ -690,24 +690,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::master_scanline)
 	}
 }
 
-void namcos16_state::slave_vblank_irq(int state)
+void namcos16_state::vblank_irq(int state)
 {
-	if (state && m_slave_irq_enable == true)
-		m_slave_cpu->set_input_line(6, HOLD_LINE);
+	if (state && m_sub_irq_enable)
+		m_subcpu->set_input_line(6, HOLD_LINE);
 }
 
 void namcos16_state::liblrabl(machine_config &config)
 {
-	MC6809E(config, m_master_cpu, MASTER_CLOCK/4);
-	m_master_cpu->set_addrmap(AS_PROGRAM, &namcos16_state::master_liblrabl_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(namcos16_state::master_scanline), "screen", 0, 1);
+	constexpr XTAL MASTER_CLOCK = XTAL(6'144'000);
 
-	M68000(config, m_slave_cpu, MASTER_CLOCK);
-	m_slave_cpu->set_addrmap(AS_PROGRAM, &namcos16_state::slave_map);
+	MC6809E(config, m_maincpu, MASTER_CLOCK / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos16_state::liblrabl_main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(namcos16_state::main_scanline), "screen", 0, 1);
 
-	MC6809E(config, m_sound_cpu, MASTER_CLOCK/4);
-	m_sound_cpu->set_addrmap(AS_PROGRAM, &namcos16_state::sound_map);
-	m_sound_cpu->set_periodic_int(FUNC(namcos16_state::irq0_line_hold), attotime::from_hz(60));
+	M68000(config, m_subcpu, MASTER_CLOCK);
+	m_subcpu->set_addrmap(AS_PROGRAM, &namcos16_state::sub_map);
+
+	MC6809E(config, m_soundcpu, MASTER_CLOCK / 4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &namcos16_state::sound_map);
+	m_soundcpu->set_periodic_int(FUNC(namcos16_state::irq0_line_hold), attotime::from_hz(60));
 
 	NAMCO_58XX(config, m_namco58xx, 0);
 	m_namco58xx->in_callback<0>().set_ioport("COINS");
@@ -716,10 +718,10 @@ void namcos16_state::liblrabl(machine_config &config)
 	m_namco58xx->in_callback<3>().set_ioport("BUTTONS");
 
 	NAMCO_56XX(config, m_namco56xx_1, 0);
-	m_namco56xx_1->in_callback<0>().set(FUNC(namcos16_state::dipA_h));
-	m_namco56xx_1->in_callback<1>().set(FUNC(namcos16_state::dipB_l));
-	m_namco56xx_1->in_callback<2>().set(FUNC(namcos16_state::dipB_h));
-	m_namco56xx_1->in_callback<3>().set(FUNC(namcos16_state::dipA_l));
+	m_namco56xx_1->in_callback<0>().set(FUNC(namcos16_state::dip_h<0>));
+	m_namco56xx_1->in_callback<1>().set(FUNC(namcos16_state::dip_l<1>));
+	m_namco56xx_1->in_callback<2>().set(FUNC(namcos16_state::dip_h<1>));
+	m_namco56xx_1->in_callback<3>().set(FUNC(namcos16_state::dip_l<0>));
 	m_namco56xx_1->out_callback<0>().set(FUNC(namcos16_state::flip));
 
 	NAMCO_56XX(config, m_namco56xx_2, 0);
@@ -728,17 +730,17 @@ void namcos16_state::liblrabl(machine_config &config)
 	m_namco56xx_2->in_callback<3>().set_ioport("SERVICE");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MASTER_CLOCK,384,0,288,264,0,224); // derived from Galaxian HW, 60.606060
+	screen.set_raw(MASTER_CLOCK, 384, 0, 288, 264, 0, 224); // derived from Galaxian HW, 60.606060
 	screen.set_screen_update(FUNC(namcos16_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(namcos16_state::slave_vblank_irq));
+	screen.screen_vblank().set(FUNC(namcos16_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toypop);
 	PALETTE(config, m_palette, FUNC(namcos16_state::toypop_palette), 128*4 + 64*4 + 16*2, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	NAMCO_15XX(config, m_namco15xx, 24000);
+	NAMCO_15XX(config, m_namco15xx, MASTER_CLOCK / 256);
 	m_namco15xx->set_voices(8);
 	m_namco15xx->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -746,26 +748,26 @@ void namcos16_state::liblrabl(machine_config &config)
 void namcos16_state::toypop(machine_config &config)
 {
 	liblrabl(config);
-	m_master_cpu->set_addrmap(AS_PROGRAM, &namcos16_state::master_toypop_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos16_state::toypop_main_map);
 }
 
 
 ROM_START( liblrabl )
-	ROM_REGION( 0x8000, "master_rom", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "5b.rom",   0x0000, 0x4000, CRC(da7a93c2) SHA1(fe4a02cdab66722eb7b8cf58825f899b1949a6a2) )
 	ROM_LOAD( "5c.rom",   0x4000, 0x4000, CRC(6cae25dc) SHA1(de74317a7d5de1865d096c377923a764be5e6879) )
 
-	ROM_REGION( 0x2000, "sound_rom", 0 )
+	ROM_REGION( 0x2000, "soundcpu", 0 )
 	ROM_LOAD( "2c.rom",   0x0000, 0x2000, CRC(7c09e50a) SHA1(5f004d60bbb7355e008a9cda137b28bc2192b8ef) )
 
-	ROM_REGION16_BE( 0x8000, "slave_rom", 0 )
+	ROM_REGION16_BE( 0x8000, "sub", 0 )
 	ROM_LOAD16_BYTE("8c.rom",    0x0000, 0x4000, CRC(a00cd959) SHA1(cc5621103c31cfbc65941615cab391db0f74e6ce) )
 	ROM_LOAD16_BYTE("10c.rom",   0x0001, 0x4000, CRC(09ce209b) SHA1(2ed46d6592f8227bac8ab54963d9a300706ade47) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "tiles", 0 )
 	ROM_LOAD( "5p.rom",   0x0000, 0x2000, CRC(3b4937f0) SHA1(06d9de576f1c2262c34aeb91054e68c9298af688) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "9t.rom",   0x0000, 0x4000, CRC(a88e24ca) SHA1(eada133579f19de09255084dcdc386311606a335) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
@@ -780,21 +782,21 @@ ROM_START( liblrabl )
 ROM_END
 
 ROM_START( toypop )
-	ROM_REGION( 0x8000, "master_rom", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "tp1-2.5b", 0x0000, 0x4000, CRC(87469620) SHA1(2ee257486c9c044386ac7d0cd4a90583eaeb3e97) )
 	ROM_LOAD( "tp1-1.5c", 0x4000, 0x4000, CRC(dee2fd6e) SHA1(b2c12008d6d3e7544ba3c12a52a6abf9181842c8) )
 
-	ROM_REGION( 0x2000, "sound_rom", 0 )
+	ROM_REGION( 0x2000, "soundcpu", 0 )
 	ROM_LOAD( "tp1-3.2c", 0x0000, 0x2000, CRC(5f3bf6e2) SHA1(d1b3335661b9b23cb10001416c515b77b5e783e9) )
 
-	ROM_REGION16_BE( 0x8000, "slave_rom", 0 )
+	ROM_REGION16_BE( 0x8000, "sub", 0 )
 	ROM_LOAD16_BYTE("tp1-4.8c",  0x0000, 0x4000, CRC(76997db3) SHA1(5023a2f20a5f2c9baff130f6832583493c71f883) )
 	ROM_LOAD16_BYTE("tp1-5.10c", 0x0001, 0x4000, CRC(37de8786) SHA1(710365e34c05d01815844c414518f93234b6160b) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "tiles", 0 )
 	ROM_LOAD( "tp1-7.5p", 0x0000, 0x2000, CRC(95076f9e) SHA1(1e3d32b21f6d46591ec3921aba51f672d64a9023) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "tp1-6.9t", 0x0000, 0x4000, CRC(481ffeaf) SHA1(c51735ad3a1dbb46ad414408b54554e9223b2219) )
 
 	ROM_REGION( 0x0600, "proms", 0 )

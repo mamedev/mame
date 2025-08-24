@@ -95,7 +95,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_pre_change() override;
@@ -106,7 +106,7 @@ protected:
 	public:
 		okim_voice();
 		void generate_audio(device_rom_interface &rom,
-							std::vector<write_stream_view> &buffers,
+							sound_stream &stream,
 							const uint8_t global_volume,
 							const uint8_t filter_type);
 

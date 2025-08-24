@@ -310,5 +310,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1985, champion, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Champion 85",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, redbarnp, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Red Baron (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, champion, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Champion 85",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1985, redbarnp, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Red Baron (Pinball)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

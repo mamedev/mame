@@ -376,7 +376,7 @@ static INPUT_PORTS_START( kzaurus )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x07, 0x07, "Coin Slot 1" )   PORT_DIPLOCATION("SW1:1,2,3")
-	PORT_DIPSETTING(    0x00, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
@@ -662,12 +662,11 @@ void konmedal68k_state::kzaurus(machine_config &config)
 	K055555(config, m_k055555, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YMZ280B(config, m_ymz, XTAL(33'868'800)/2); // 33.8688 MHz xtal verified on PCB
-	m_ymz->add_route(0, "lspeaker", 0.75);
-	m_ymz->add_route(1, "rspeaker", 0.75);
+	m_ymz->add_route(0, "speaker", 0.75, 0);
+	m_ymz->add_route(1, "speaker", 0.75, 1);
 }
 
 void konmedal68k_state::koropens(machine_config &config)
@@ -811,7 +810,7 @@ ROM_START(spcpokan)
 	ROM_LOAD("642-a06-14n.bin", 0x000000, 0x080000, CRC(ebcc67cf) SHA1(b2efd41438fa562e8545695b09d124c730a9c8d3))
 	ROM_LOAD("642-a07-17n.bin", 0x080000, 0x080000, CRC(80da3c5e) SHA1(843db853958ed994185e9d3a156014466e080863))
 	ROM_LOAD("642-a08-19n.bin", 0x100000, 0x080000, CRC(cfaeba54) SHA1(83a8a7b6a4cfa26d2c804a26d7ab17ed376625f4))
-	ROM_LOAD("642-a09-22n.bin", 0x180000, 0x080000, BAD_DUMP CRC(8b01e2cb) SHA1(8a15c2462f0a35136386eeba0d926349fb9f5cf9)) // byte sum should be f9c7, is f9c8 so POST fails
+	ROM_LOAD("642-a09-22n.bin", 0x180000, 0x080000, CRC(8b01e2cb) SHA1(8a15c2462f0a35136386eeba0d926349fb9f5cf9))
 
 	ROM_REGION(0x200000, "ymz", 0)
 	ROM_LOAD("642-a01-2f.bin", 0x000000, 0x080000, CRC(2096c185) SHA1(948ec4bc3896fae5d1f7c478ee7fafd25ef30b74))

@@ -35,13 +35,12 @@ private:
 
 	uint8_t K_r();
 	uint8_t R0_r();
-	void O_w(uint8_t data);
+	void O_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 	void R1_w(uint8_t data);
-	TIMER_CALLBACK_MEMBER( write_sync );
+	TIMER_CALLBACK_MEMBER(write_sync);
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_54XX, namco_54xx_device)
-
 
 
 /* discrete nodes */

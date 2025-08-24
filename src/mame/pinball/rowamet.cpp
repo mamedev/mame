@@ -326,4 +326,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(198?, heavymtl, 0, rowamet, rowamet, rowamet_state, empty_init, ROT0, "Rowamet", "Heavy Metal", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(198?, heavymtl, 0, rowamet, rowamet, rowamet_state, empty_init, ROT0, "Rowamet", "Heavy Metal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

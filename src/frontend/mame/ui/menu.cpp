@@ -667,7 +667,9 @@ void menu::draw(uint32_t flags)
 
 	// compute top/left of inner menu area by centering
 	float const visible_left = (1.0F - visible_width) * 0.5F;
-	m_items_top = std::round((((1.0F - visible_main_menu_height - visible_extra_menu_height) * 0.5F) + top_extra_menu_height) * float(m_last_size.second)) / float(m_last_size.second);
+	m_items_top = ((1.0F - visible_main_menu_height - visible_extra_menu_height) * 0.5F) + top_extra_menu_height;
+	if (m_last_size.second != 0)
+		m_items_top = std::round(m_items_top * float(m_last_size.second)) / float(m_last_size.second);
 
 	// first add us a box
 	float const x1 = visible_left - lr_border();

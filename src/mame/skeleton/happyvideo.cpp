@@ -105,4 +105,4 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT  MACHINE    INPUT      CLASS            INIT        ROT   COMPANY                 FULLNAME       FLAGS
-GAME( 20??, hppyvideo, 0,      hppyvideo, hppyvideo, hppyvideo_state, empty_init, ROT0, "Leyaoyao Happy Kids?", "Happy Video", MACHINE_IS_SKELETON )
+GAME( 20??, hppyvideo, 0,      hppyvideo, hppyvideo, hppyvideo_state, empty_init, ROT0, "Leyaoyao Happy Kids?", "Happy Video", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

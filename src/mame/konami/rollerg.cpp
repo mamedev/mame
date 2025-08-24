@@ -54,7 +54,7 @@ public:
 		m_zoomroms_view(*this, "zoomroms_view")
 	{ }
 
-	void rollerg(machine_config &config);
+	void rollerg(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -64,7 +64,7 @@ private:
 	// devices
 	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<k05324x_device> m_k053244;
+	required_device<k053244_device> m_k053244;
 	required_device<k051316_device> m_k051316;
 
 	required_memory_bank m_mainbank;
@@ -79,9 +79,8 @@ private:
 	void sound_arm_nmi_w(uint8_t data);
 	void z80_nmi_w(int state);
 	uint8_t pip_r();
-	void irq_ack_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	K05324X_CB_MEMBER(sprite_callback);
+	K053244_CB_MEMBER(sprite_callback);
 	K051316_CB_MEMBER(zoom_callback);
 
 	void main_map(address_map &map) ATTR_COLD;
@@ -95,7 +94,7 @@ private:
 
 ***************************************************************************/
 
-K05324X_CB_MEMBER(rollerg_state::sprite_callback)
+K053244_CB_MEMBER(rollerg_state::sprite_callback)
 {
 	enum { sprite_colorbase = 256 / 16 };
 #if 0
@@ -194,11 +193,11 @@ void rollerg_state::main_map(address_map &map)
 	map(0x0061, 0x0061).r(FUNC(rollerg_state::pip_r));             // ?????
 	map(0x0100, 0x010f).rw("k053252", FUNC(k053252_device::read), FUNC(k053252_device::write));      // 053252?
 	map(0x0200, 0x020f).w(m_k051316, FUNC(k051316_device::ctrl_w));
-	map(0x0300, 0x030f).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
+	map(0x0300, 0x030f).rw(m_k053244, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w));
 	map(0x0800, 0x0fff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write));
 	map(0x0800, 0x0fff).view(m_zoomroms_view);
 	m_zoomroms_view[0](0x0800, 0x0fff).r(m_k051316, FUNC(k051316_device::rom_r));
-	map(0x1000, 0x17ff).rw(m_k053244, FUNC(k05324x_device::k053245_r), FUNC(k05324x_device::k053245_w));
+	map(0x1000, 0x17ff).rw(m_k053244, FUNC(k053244_device::k053245_r), FUNC(k053244_device::k053245_w));
 	map(0x1800, 0x1fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x2000, 0x3aff).ram();
 	map(0x4000, 0x7fff).bankr(m_mainbank);
@@ -320,11 +319,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void rollerg_state::irq_ack_w(int state)
-{
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-}
-
 void rollerg_state::machine_start()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -359,28 +353,25 @@ void rollerg_state::rollerg(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240); // from CCU
 	screen.set_screen_update(FUNC(rollerg_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024).enable_shadows();
 
-	K053244(config, m_k053244, 0);
+	K053244(config, m_k053244, 24_MHz_XTAL);
 	m_k053244->set_palette("palette");
 	m_k053244->set_offsets(-3, -1);
 	m_k053244->set_sprite_callback(FUNC(rollerg_state::sprite_callback));
 
-	K051316(config, m_k051316, 0);
+	K051316(config, m_k051316, 24_MHz_XTAL / 2);
 	m_k051316->set_palette("palette");
-	m_k051316->set_offsets(22, 1);
+	m_k051316->set_offsets(6 + 16, 1);
 	m_k051316->set_zoom_callback(FUNC(rollerg_state::zoom_callback));
 
-	k053252_device &k053252(K053252(config, "k053252", 3000000 * 2));
-	k053252.int1_ack().set(FUNC(rollerg_state::irq_ack_w));
-	k053252.set_offsets(14*8, 2*8);
+	k053252_device &k053252(K053252(config, "k053252", 24_MHz_XTAL / 4));
+	k053252.int1_ack().set_inputline(m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
+	k053252.set_offsets(16, 16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -438,6 +429,25 @@ ROM_START( rollergj )
 	ROM_LOAD( "999h09.c5",  0x000000, 0x080000, CRC(c5188783) SHA1(d9ab69e4197ba2b42e3b0bb713236c8037fc2ab3) )
 ROM_END
 
+ROM_START( rollerga )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "g7", 0x00000, 0x20000, CRC(5475c39a) SHA1(7867173245c90b6196dd1c3618217735f81e963f) ) // blank label
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "e11", 0x0000, 0x8000, CRC(1fcfb22f) SHA1(ef058a7de6ba7cf310b91975345113acc6078f8a) ) // blank label
+
+	ROM_REGION( 0x200000, "k053244", 0 ) // sprites
+	ROM_LOAD32_WORD( "999h06.k2", 0x000000, 0x100000, CRC(eda05130) SHA1(b52073a4a4651035d5f1e112601ceb2d004b2143) )
+	ROM_LOAD32_WORD( "999h05.k8", 0x000002, 0x100000, CRC(5f321c7d) SHA1(d60a3480891b83ac109f2fecfe2b958bac310c15) )
+
+	ROM_REGION( 0x080000, "k051316", 0 ) // zoom
+	ROM_LOAD( "999h03.d23", 0x000000, 0x040000, CRC(ea1edbd2) SHA1(a17d19f873384287e1e47222d46274e7408b40d4) )
+	ROM_LOAD( "999h04.f23", 0x040000, 0x040000, CRC(c1a35355) SHA1(615606d30500a8f2be19171893e985b085fff2fc) )
+
+	ROM_REGION( 0x80000, "k053260", 0 ) // samples
+	ROM_LOAD( "999h09.c5",  0x000000, 0x080000, CRC(c5188783) SHA1(d9ab69e4197ba2b42e3b0bb713236c8037fc2ab3) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -449,3 +459,4 @@ ROM_END
 
 GAME( 1991, rollerg,  0,       rollerg, rollerg, rollerg_state, empty_init, ROT0, "Konami", "Rollergames (US)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1991, rollergj, rollerg, rollerg, rollerg, rollerg_state, empty_init, ROT0, "Konami", "Rollergames (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rollerga, rollerg, rollerg, rollerg, rollerg_state, empty_init, ROT0, "Konami", "Rollergames (Asia)",  MACHINE_SUPPORTS_SAVE )

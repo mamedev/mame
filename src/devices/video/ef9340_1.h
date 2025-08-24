@@ -40,8 +40,7 @@
 */
 
 
-class ef9340_1_device : public device_t,
-						public device_video_interface
+class ef9340_1_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction

@@ -27,7 +27,7 @@ public:
 		, m_oki(*this, "oki%u", 1)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_key(*this, "KEY.%u", 0)
+		, m_key(*this, "KEY%u", 0)
 		, m_special(*this, "SPECIAL")
 		, m_z80_bank(*this, "z80_bank")
 		, m_soundflash1(*this, "soundflash1")

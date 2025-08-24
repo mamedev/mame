@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_MICRODRV_H
-#define MAME_DEVICES_IMAGEDEV_MICRODRV_H
+#ifndef MAME_IMAGEDEV_MICRODRV_H
+#define MAME_IMAGEDEV_MICRODRV_H
 
 #pragma once
 
@@ -85,4 +85,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MICRODRIVE, microdrive_image_device)
 
-#endif // MAME_DEVICES_IMAGEDEV_MICRODRV_H
+#endif // MAME_IMAGEDEV_MICRODRV_H

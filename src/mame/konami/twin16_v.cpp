@@ -17,8 +17,6 @@
 #include "twin16.h"
 
 
-
-
 enum
 {
 	TWIN16_SCREEN_FLIPY = 0x01,
@@ -64,11 +62,6 @@ void twin16_state::zipram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_gfxdecode->gfx(1)->mark_dirty(offset / 16);
 }
 
-void twin16_state::twin16_postload()
-{
-	m_gfxdecode->gfx(1)->mark_all_dirty();
-}
-
 void fround_state::gfx_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int changed = 0;
@@ -103,12 +96,12 @@ void twin16_state::video_register_w(offs_t offset, uint16_t data, uint16_t mem_m
 		case 0:
 		{
 			int old = m_video_register;
-			COMBINE_DATA( &m_video_register );
+			COMBINE_DATA(&m_video_register);
 			int changed = old ^ m_video_register;
 			if (changed & (TWIN16_SCREEN_FLIPX | TWIN16_SCREEN_FLIPY))
 			{
-				int flip = (m_video_register&TWIN16_SCREEN_FLIPX) ? TILEMAP_FLIPX : 0;
-				flip |= (m_video_register&TWIN16_SCREEN_FLIPY) ? TILEMAP_FLIPY : 0;
+				int flip = (m_video_register & TWIN16_SCREEN_FLIPX) ? TILEMAP_FLIPX : 0;
+				flip |= (m_video_register & TWIN16_SCREEN_FLIPY) ? TILEMAP_FLIPY : 0;
 				machine().tilemap().set_flip_all(flip);
 			}
 			if (changed & TWIN16_TILE_FLIPY)
@@ -119,22 +112,22 @@ void twin16_state::video_register_w(offs_t offset, uint16_t data, uint16_t mem_m
 			break;
 		}
 
-		case 1: COMBINE_DATA( &m_scrollx[0] ); break;
-		case 2: COMBINE_DATA( &m_scrolly[0] ); break;
+		case 1: COMBINE_DATA(&m_scrollx[0]); break;
+		case 2: COMBINE_DATA(&m_scrolly[0]); break;
 		case 3:
-			COMBINE_DATA( &m_scrollx[1] );
+			COMBINE_DATA(&m_scrollx[1]);
 			m_scroll_tmap[0]->set_scrollx(0, m_scrollx[1]);
 			break;
 		case 4:
-			COMBINE_DATA( &m_scrolly[1] );
+			COMBINE_DATA(&m_scrolly[1]);
 			m_scroll_tmap[0]->set_scrolly(0, m_scrolly[1]);
 			break;
 		case 5:
-			COMBINE_DATA( &m_scrollx[2] );
+			COMBINE_DATA(&m_scrollx[2]);
 			m_scroll_tmap[1]->set_scrollx(0, m_scrollx[2]);
 			break;
 		case 6:
-			COMBINE_DATA( &m_scrolly[2] );
+			COMBINE_DATA(&m_scrolly[2]);
 			m_scroll_tmap[1]->set_scrolly(0, m_scrolly[2]);
 			break;
 
@@ -200,7 +193,7 @@ TIMER_CALLBACK_MEMBER(twin16_state::sprite_tick)
 	m_sprite_busy = 0;
 }
 
-int twin16_state::set_sprite_timer(  )
+int twin16_state::set_sprite_timer()
 {
 	if (m_sprite_busy) return 1;
 
@@ -211,7 +204,7 @@ int twin16_state::set_sprite_timer(  )
 	return 0;
 }
 
-void twin16_state::spriteram_process(  )
+void twin16_state::spriteram_process()
 {
 	uint16_t *spriteram16 = m_spriteram->live();
 	uint16_t dx = m_scrollx[0];
@@ -221,17 +214,17 @@ void twin16_state::spriteram_process(  )
 	const uint16_t *finish = &spriteram16[0x1800];
 
 	set_sprite_timer();
-	memset(&spriteram16[0x1800],0xff,0x800*sizeof(uint16_t));
+	memset(&spriteram16[0x1800], 0xff, 0x800 * sizeof(uint16_t));
 
-	while( source<finish )
+	while (source<finish)
 	{
 		uint16_t priority = source[0];
-		if( priority & 0x8000 )
+		if (priority & 0x8000)
 		{
-			uint16_t *dest = &spriteram16[0x1800|(priority&0xff)<<2];
+			uint16_t *dest = &spriteram16[0x1800|(priority & 0xff) << 2];
 
-			uint32_t xpos = (0x10000*source[4])|source[5];
-			uint32_t ypos = (0x10000*source[6])|source[7];
+			uint32_t xpos = (0x10000 * source[4]) | source[5];
+			uint32_t ypos = (0x10000 * source[6]) | source[7];
 
 			/* notes on sprite attributes:
 
@@ -248,11 +241,11 @@ void twin16_state::spriteram_process(  )
 
 			fround, hpuncher, miaj, cuebrickj, don't use the preprocessor.
 			*/
-			uint16_t attributes = 0x8000 | (source[2]&0x03ff); // scale,size,color
+			uint16_t attributes = 0x8000 | (source[2] & 0x03ff); // scale,size,color
 
 			dest[0] = source[3]; /* gfx data */
-			dest[1] = ((xpos>>8) - dx)&0xffff;
-			dest[2] = ((ypos>>8) - dy)&0xffff;
+			dest[1] = ((xpos>>8) - dx) & 0xffff;
+			dest[2] = ((ypos>>8) - dy) & 0xffff;
 			dest[3] = attributes;
 		}
 		source += 0x50/2;
@@ -260,35 +253,36 @@ void twin16_state::spriteram_process(  )
 	m_need_process_spriteram = 0;
 }
 
-void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void twin16_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint16_t *source = 0x1800+m_spriteram->buffer() + 0x800 - 4;
-	const uint16_t *finish = 0x1800+m_spriteram->buffer();
+	const uint16_t *source = 0x1800 + m_spriteram->buffer() + 0x800 - 4;
+	const uint16_t *finish = 0x1800 + m_spriteram->buffer();
 
 	for (; source >= finish; source -= 4)
 	{
 		uint16_t attributes = source[3];
 		uint16_t code = source[0];
 
-		if((code!=0xffff) && (attributes&0x8000))
+		if ((code != 0xffff) && (attributes & 0x8000))
 		{
 			int xpos = source[1];
 			int ypos = source[2];
 
-			int pal_base = ((attributes&0xf)+0x10)*16;
-			int height  = 16<<((attributes>>6)&0x3);
-			int width   = 16<<((attributes>>4)&0x3);
+			int pal_base = ((attributes & 0xf) + 0x10) * 16;
+			int height = 16 << ((attributes >> 6) & 0x3);
+			int width = 16 << ((attributes >> 4) & 0x3);
 			const uint16_t *pen_data = nullptr;
-			int flipy = attributes&0x0200;
-			int flipx = attributes&0x0100;
+			int flipy = attributes & 0x0200;
+			int flipx = attributes & 0x0100;
 
-			if( m_is_fround ) {
+			if (m_is_fround)
+			{
 				/* fround board */
 				pen_data = m_gfxrom;
 			}
 			else
 			{
-				switch( (code>>12)&0x3 )
+				switch ((code >> 12) & 0x3)
 				{
 					/* bank select */
 					case 0:
@@ -301,7 +295,7 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 
 					case 2:
 						pen_data = m_gfxrom + 0x80000;
-						if( code&0x4000 ) pen_data += 0x40000;
+						if (code & 0x4000) pen_data += 0x40000;
 						break;
 
 					case 3:
@@ -312,48 +306,48 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 			}
 
 			/* some code masking */
-			if ((height&width) == 64) code &= ~8;       // gradius2 ending sequence 64*64
-			else if ((height&width) == 32) code &= ~3;  // devilw 32*32
-			else if ((height|width) == 48) code &= ~1;  // devilw 32*16 / 16*32
+			if ((height & width) == 64) code &= ~8;      // gradius2 ending sequence 64*64
+			else if ((height & width) == 32) code &= ~3; // devilw 32*32
+			else if ((height | width) == 48) code &= ~1; // devilw 32*16 / 16*32
 
-			pen_data += code*0x40;
+			pen_data += code * 0x40;
 
-			if( m_video_register&TWIN16_SCREEN_FLIPY )
+			if (m_video_register & TWIN16_SCREEN_FLIPY)
 			{
-				if (ypos>65000) ypos=ypos-65536; /* Bit hacky */
-				ypos = 256-ypos-height;
+				if (ypos > 65000) ypos = ypos - 65536; /* Bit hacky */
+				ypos = 256 - ypos - height;
 				flipy = !flipy;
 			}
-			if( m_video_register&TWIN16_SCREEN_FLIPX )
+			if (m_video_register & TWIN16_SCREEN_FLIPX)
 			{
-				if (xpos>65000) xpos=xpos-65536; /* Bit hacky */
-				xpos = 320-xpos-width;
+				if (xpos > 65000) xpos = xpos - 65536; /* Bit hacky */
+				xpos = 320 - xpos - width;
 				flipx = !flipx;
 			}
-			if( xpos>=320 ) xpos -= 65536;
-			if( ypos>=256 ) ypos -= 65536;
+			if (xpos >= 320) xpos -= 65536;
+			if (ypos >= 256) ypos -= 65536;
 
 			/* slow slow slow, but it's ok for now */
-			for( int y=0; y<height; y++, pen_data += width/4 )
+			for (int y = 0; y < height; y++, pen_data += width/4)
 			{
-				int sy = (flipy)?(ypos+height-1-y):(ypos+y);
-				if( sy>=cliprect.min_y && sy<=cliprect.max_y )
+				int sy = (flipy) ? (ypos + height - 1 - y) : (ypos + y);
+				if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 				{
 					uint16_t *const dest = &bitmap.pix(sy);
 					uint8_t *const pdest = &screen.priority().pix(sy);
 
-					for( int x=0; x<width; x++ )
+					for (int x = 0; x < width; x++)
 					{
-						int sx = (flipx)?(xpos+width-1-x):(xpos+x);
-						if( sx>=cliprect.min_x && sx<=cliprect.max_x )
+						int sx = (flipx) ? (xpos + width - 1 - x) : (xpos + x);
+						if (sx >= cliprect.min_x && sx <= cliprect.max_x)
 						{
-							uint16_t pen = pen_data[x>>2]>>((~x&3)<<2)&0xf;
+							uint16_t pen = pen_data[x >> 2] >> ((~x & 3) << 2) & 0xf;
 
-							if( pen && !(pdest[sx] & TWIN16_SPRITE_OCCUPIED))
+							if (pen && !(pdest[sx] & TWIN16_SPRITE_OCCUPIED))
 							{
 								pdest[sx] |= TWIN16_SPRITE_OCCUPIED;
 
-								if (pen==0xf) // shadow
+								if (pen == 0xf) // shadow
 								{
 									if (!(pdest[sx] & TWIN16_BG_NO_SHADOW))
 										dest[sx] = m_palette->shadow_table()[dest[sx]];
@@ -386,8 +380,8 @@ TILE_GET_INFO_MEMBER(twin16_state::fix_tile_info)
 	int color = (attr >> 9) & 0x0f;
 	int flags=0;
 
-	if (attr&0x2000) flags|=TILE_FLIPX;
-	if (attr&0x4000) flags|=TILE_FLIPY;
+	if (attr & 0x2000) flags |= TILE_FLIPX;
+	if (attr & 0x4000) flags |= TILE_FLIPY;
 
 	tileinfo.set(0, code, color, flags);
 }
@@ -444,7 +438,7 @@ void twin16_state::video_start()
 
 	m_palette->set_shadow_factor(0.4); // screenshots estimate
 
-	memset(m_sprite_buffer,0xff,0x800*sizeof(uint16_t));
+	memset(m_sprite_buffer, 0xff, 0x800 * sizeof(uint16_t));
 	m_video_register = 0;
 	m_sprite_busy = 0;
 	m_sprite_timer = timer_alloc(FUNC(twin16_state::sprite_tick),this);
@@ -458,9 +452,6 @@ void twin16_state::video_start()
 	save_item(NAME(m_need_process_spriteram));
 	save_item(NAME(m_video_register));
 	save_item(NAME(m_sprite_busy));
-
-	if (!m_is_fround)
-		machine().save().register_postload(save_prepost_delegate(FUNC(twin16_state::twin16_postload), this));
 }
 
 void fround_state::video_start()
@@ -537,7 +528,7 @@ uint32_t twin16_state::screen_update_twin16(screen_device &screen, bitmap_ind16 
 			break;
 	}
 
-	draw_sprites( screen, bitmap, cliprect );
+	draw_sprites(screen, bitmap, cliprect);
 
 	m_fixed_tmap->draw(screen, bitmap, cliprect, 0);
 	return 0;
@@ -550,19 +541,19 @@ void twin16_state::screen_vblank_twin16(int state)
 	{
 		set_sprite_timer();
 
-		if (spriteram_process_enable()) {
+		if (spriteram_process_enable())
+		{
 			if (m_need_process_spriteram) spriteram_process();
 			m_need_process_spriteram = 1;
 
 			/* if the sprite preprocessor is used, sprite ram is copied to an external buffer first,
 			as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
 			more to it than that */
-			memcpy(&m_spriteram->buffer()[0x1800],m_sprite_buffer,0x800*sizeof(uint16_t));
-			memcpy(m_sprite_buffer,&m_spriteram->live()[0x1800],0x800*sizeof(uint16_t));
+			memcpy(&m_spriteram->buffer()[0x1800], m_sprite_buffer, 0x800 * sizeof(uint16_t));
+			memcpy(m_sprite_buffer, &m_spriteram->live()[0x1800], 0x800 * sizeof(uint16_t));
 		}
-		else {
+		else
 			m_spriteram->copy();
-		}
 
 		// IRQ generation
 		if (m_CPUA_register & 0x20)

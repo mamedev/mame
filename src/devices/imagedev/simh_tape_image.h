@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Mietek Bak
 
-#ifndef MAME_DEVICES_IMAGEDEV_SIMH_TAPE_IMAGE_H
-#define MAME_DEVICES_IMAGEDEV_SIMH_TAPE_IMAGE_H
+#ifndef MAME_IMAGEDEV_SIMH_TAPE_IMAGE_H
+#define MAME_IMAGEDEV_SIMH_TAPE_IMAGE_H
 
 #pragma once
 
@@ -49,4 +49,4 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////////
 
-#endif // MAME_DEVICES_IMAGEDEV_SIMH_TAPE_IMAGE_H
+#endif // MAME_IMAGEDEV_SIMH_TAPE_IMAGE_H

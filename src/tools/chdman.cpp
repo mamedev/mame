@@ -17,6 +17,7 @@
 #include "hashing.h"
 #include "md5.h"
 #include "multibyte.h"
+#include "osdcore.h"
 #include "path.h"
 #include "strformat.h"
 #include "vbiparse.h"
@@ -70,6 +71,9 @@ constexpr uint32_t TEMP_BUFFER_SIZE = 32 * 1024 * 1024;
 constexpr int MODE_NORMAL = 0;
 constexpr int MODE_CUEBIN = 1;
 constexpr int MODE_GDI = 2;
+
+// osd printf verbosity
+constexpr bool OSD_PRINTF_VERBOSE = false;
 
 // command modifier
 #define REQUIRED "~"
@@ -156,6 +160,46 @@ static void do_list_templates(parameters_map &params);
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+// Allow chdman to show osd_printf_X messages
+class chdman_osd_output : public osd_output
+{
+public:
+	chdman_osd_output() {
+		osd_output::push(this);
+	}
+
+	~chdman_osd_output() {
+		osd_output::pop(this);
+	}
+
+	void output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args);
+};
+
+void chdman_osd_output::output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args)
+{
+	switch (channel)
+	{
+	case OSD_OUTPUT_CHANNEL_ERROR:
+	case OSD_OUTPUT_CHANNEL_WARNING:
+		util::stream_format(std::cerr, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_INFO:
+	case OSD_OUTPUT_CHANNEL_LOG:
+		util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_VERBOSE:
+		if (OSD_PRINTF_VERBOSE) util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_DEBUG:
+#ifdef MAME_DEBUG
+		util::stream_format(std::cout, args);
+#endif
+		break;
+	default:
+		break;
+	}
+}
 
 // ======================> option_description
 
@@ -1110,11 +1154,10 @@ static void guess_chs(
 
 
 //-------------------------------------------------
-//  parse_input_chd_parameters - parse the
-//  standard set of input CHD parameters
+//  parse_input_parent_chd - parse the parent CHD
 //-------------------------------------------------
 
-static void parse_input_chd_parameters(const parameters_map &params, chd_file &input_chd, chd_file &input_parent_chd, bool writeable = false)
+static void parse_input_parent_chd(const parameters_map &params, chd_file &input_parent_chd)
 {
 	// process input parent file
 	auto input_chd_parent_str = params.find(OPTION_INPUT_PARENT);
@@ -1124,6 +1167,18 @@ static void parse_input_chd_parameters(const parameters_map &params, chd_file &i
 		if (err)
 			report_error(1, "Error opening parent CHD file (%s): %s", *input_chd_parent_str->second, err.message());
 	}
+}
+
+
+//-------------------------------------------------
+//  parse_input_chd_parameters - parse the
+//  standard set of input CHD parameters
+//-------------------------------------------------
+
+static void parse_input_chd_parameters(const parameters_map &params, chd_file &input_chd, chd_file &input_parent_chd, bool writeable = false)
+{
+	// process input parent file
+	parse_input_parent_chd(params, input_parent_chd);
 
 	// process input file
 	auto input_chd_str = params.find(OPTION_INPUT);
@@ -1724,10 +1779,24 @@ static void do_info(parameters_map &params)
 
 static void do_verify(parameters_map &params)
 {
+	bool fix_sha1 = params.find(OPTION_FIX) != params.end();
 	// parse out input files
 	chd_file input_parent_chd;
 	chd_file input_chd;
-	parse_input_chd_parameters(params, input_chd, input_parent_chd);
+	parse_input_parent_chd(params, input_parent_chd);
+
+	// process input file
+	auto input_chd_str = params.find(OPTION_INPUT);
+	if (input_chd_str != params.end())
+	{
+		const uint32_t openflags = fix_sha1 ? (OPEN_FLAG_READ | OPEN_FLAG_WRITE) : OPEN_FLAG_READ;
+		util::core_file::ptr file;
+		std::error_condition err = util::core_file::open(*input_chd_str->second, openflags, file);
+		if (!err)
+			err = input_chd.open(std::move(file), false, input_parent_chd.opened() ? &input_parent_chd : nullptr);
+		if (err)
+			report_error(1, "Error opening CHD file (%s): %s", *input_chd_str->second, err.message());
+	}
 
 	// only makes sense for compressed CHDs with valid SHA-1's
 	if (!input_chd.compressed())
@@ -1749,7 +1818,7 @@ static void do_verify(parameters_map &params)
 		uint32_t bytes_to_read = (std::min<uint64_t>)(buffer.size(), input_chd.logical_bytes() - offset);
 		std::error_condition err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
 		if (err)
-			report_error(1, "Error reading CHD file (%s): %s", *params.find(OPTION_INPUT)->second, err.message());
+			report_error(1, "Error reading CHD file (%s): %s", *input_chd_str->second, err.message());
 
 		// add to the checksum
 		rawsha1.append(&buffer[0], bytes_to_read);
@@ -1764,7 +1833,7 @@ static void do_verify(parameters_map &params)
 		util::stream_format(std::cerr, "              actual SHA1 = %s\n", computed_sha1.as_string());
 
 		// fix it if requested; this also fixes the overall one so we don't need to do any more
-		if (params.find(OPTION_FIX) != params.end())
+		if (fix_sha1)
 		{
 			std::error_condition err = input_chd.set_raw_sha1(computed_sha1);
 			if (err)
@@ -1788,9 +1857,8 @@ static void do_verify(parameters_map &params)
 				util::stream_format(std::cerr, "                  actual SHA1 = %s\n", computed_overall_sha1.as_string());
 
 				// fix it if requested
-				if (params.find(OPTION_FIX) != params.end())
+				if (fix_sha1)
 				{
-					input_chd.set_raw_sha1(computed_sha1);
 					std::error_condition err = input_chd.set_raw_sha1(computed_sha1);
 					if (err)
 						report_error(1, "Error updating SHA1: %s", err.message());
@@ -3354,6 +3422,7 @@ static void do_list_templates(parameters_map &params)
 int CLIB_DECL main(int argc, char *argv[])
 {
 	const std::vector<std::string> args = osd_get_command_line(argc, argv);
+	chdman_osd_output osdoutput;
 
 	// print the header
 	extern const char build_version[];

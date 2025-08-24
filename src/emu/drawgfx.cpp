@@ -66,63 +66,61 @@ gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *ta
 
 
 
-
 /***************************************************************************
     GRAPHICS ELEMENTS
 ***************************************************************************/
-
 
 //-------------------------------------------------
 //  gfx_element - constructor
 //-------------------------------------------------
 
-gfx_element::gfx_element(device_palette_interface *palette, u8 *base, u16 width, u16 height, u32 rowbytes, u32 total_colors, u32 color_base, u32 color_granularity)
-	: m_palette(palette),
-		m_width(width),
-		m_height(height),
-		m_startx(0),
-		m_starty(0),
-		m_origwidth(width),
-		m_origheight(height),
-		m_total_elements(1),
-		m_color_base(color_base),
-		m_color_depth(color_granularity),
-		m_color_granularity(color_granularity),
-		m_total_colors((total_colors - color_base) / color_granularity),
-		m_line_modulo(rowbytes),
-		m_char_modulo(0),
-		m_srcdata(base),
-		m_dirtyseq(1),
-		m_gfxdata(base),
-		m_layout_is_raw(true),
-		m_layout_planes(0),
-		m_layout_xormask(0),
-		m_layout_charincrement(0)
+gfx_element::gfx_element(device_palette_interface *palette, u8 *base, u16 width, u16 height, u32 rowbytes, u32 total_colors, u32 color_base, u32 color_granularity) :
+	m_palette(palette),
+	m_width(width),
+	m_height(height),
+	m_startx(0),
+	m_starty(0),
+	m_origwidth(width),
+	m_origheight(height),
+	m_total_elements(1),
+	m_color_base(color_base),
+	m_color_depth(color_granularity),
+	m_color_granularity(color_granularity),
+	m_total_colors((total_colors - color_base) / color_granularity),
+	m_line_modulo(rowbytes),
+	m_char_modulo(0),
+	m_srcdata(base),
+	m_dirtyseq(1),
+	m_gfxdata(base),
+	m_layout_is_raw(true),
+	m_layout_planes(0),
+	m_layout_xormask(0),
+	m_layout_charincrement(0)
 {
 }
 
-gfx_element::gfx_element(device_palette_interface *palette, const gfx_layout &gl, const u8 *srcdata, u32 xormask, u32 total_colors, u32 color_base)
-	: m_palette(palette),
-		m_width(0),
-		m_height(0),
-		m_startx(0),
-		m_starty(0),
-		m_origwidth(0),
-		m_origheight(0),
-		m_total_elements(0),
-		m_color_base(color_base),
-		m_color_depth(0),
-		m_color_granularity(0),
-		m_total_colors(total_colors),
-		m_line_modulo(0),
-		m_char_modulo(0),
-		m_srcdata(nullptr),
-		m_dirtyseq(1),
-		m_gfxdata(nullptr),
-		m_layout_is_raw(false),
-		m_layout_planes(0),
-		m_layout_xormask(xormask),
-		m_layout_charincrement(0)
+gfx_element::gfx_element(device_palette_interface *palette, const gfx_layout &gl, const u8 *srcdata, u32 xormask, u32 total_colors, u32 color_base) :
+	m_palette(palette),
+	m_width(0),
+	m_height(0),
+	m_startx(0),
+	m_starty(0),
+	m_origwidth(0),
+	m_origheight(0),
+	m_total_elements(0),
+	m_color_base(color_base),
+	m_color_depth(0),
+	m_color_granularity(0),
+	m_total_colors(total_colors),
+	m_line_modulo(0),
+	m_char_modulo(0),
+	m_srcdata(nullptr),
+	m_dirtyseq(1),
+	m_gfxdata(nullptr),
+	m_layout_is_raw(false),
+	m_layout_planes(0),
+	m_layout_xormask(xormask),
+	m_layout_charincrement(0)
 {
 	// set the layout
 	set_layout(gl, srcdata);

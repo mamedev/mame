@@ -16,9 +16,9 @@ std::string upd177x_disassembler::reg4(u16 opcode)
 	return util::string_format("r%02x", (opcode >> 4) & 0x1f);
 }
 
-std::string upd177x_disassembler::reg9(u16 opcode)
+std::string upd177x_disassembler::reg8(u16 opcode)
 {
-	return util::string_format("r%02x", (opcode >> 9) & 0x1f);
+	return util::string_format("r%02x", (opcode >> 8) & 0x1f);
 }
 
 std::string upd177x_disassembler::imm8(u16 opcode)
@@ -72,12 +72,12 @@ std::string upd177x_disassembler::abs4_4(u16 opcode, u16 pc)
 
 #define P std::ostream &stream, u16 opcode, u16 pc
 const upd177x_disassembler::instruction upd177x_disassembler::instructions[] {
-	{ 0x4000, 0xe000, [](P) -> u32 { util::stream_format(stream, "mvi %s, %s", reg9(opcode), imm8(opcode)); return 1; } },
+	{ 0x4000, 0xe000, [](P) -> u32 { util::stream_format(stream, "mvi %s, %s", reg8(opcode), imm8(opcode)); return 1; } },
 	{ 0x3200, 0xff00, [](P) -> u32 { util::stream_format(stream, "mvi (h), %s", imm8(opcode)); return 1; } },
 	{ 0x3400, 0xff00, [](P) -> u32 { util::stream_format(stream, "mvi a, %s", imm8(opcode)); return 1; } },
 	{ 0x3800, 0xffc0, [](P) -> u32 { util::stream_format(stream, "mvi h, %s", imm6(opcode)); return 1; } },
-	{ 0x3100, 0xff1f, [](P) -> u32 { util::stream_format(stream, "mvi mdi, %s", imm3_5(opcode)); return 1; } },
-	{ 0x2100, 0xff80, [](P) -> u32 { util::stream_format(stream, "mvi mdo, %s", imm7(opcode)); return 1; } },
+	{ 0x3100, 0xff1f, [](P) -> u32 { util::stream_format(stream, "mvi md1, %s", imm3_5(opcode)); return 1; } },
+	{ 0x2100, 0xff80, [](P) -> u32 { util::stream_format(stream, "mvi md0, %s", imm7(opcode)); return 1; } },
 
 	{ 0x1201, 0xfe0f, [](P) -> u32 { util::stream_format(stream, "mov %s, a", reg4(opcode)); return 1; } },
 	{ 0x1005, 0xfe0f, [](P) -> u32 { util::stream_format(stream, "mov a, %s", reg4(opcode)); return 1; } },
@@ -105,18 +105,18 @@ const upd177x_disassembler::instruction upd177x_disassembler::instructions[] {
 	{ 0x1801, 0xfe0f, [](P) -> u32 { util::stream_format(stream, "tblo a, (%s)", reg4(opcode)); return 1; } },
 	{ 0x1802, 0xfe0f, [](P) -> u32 { util::stream_format(stream, "tblo x, (%s)", reg4(opcode)); return 1; } },
 	{ 0x1804, 0xfe0f, [](P) -> u32 { util::stream_format(stream, "tblo y, (%s)", reg4(opcode)); return 1; } },
-	{ 0x1808, 0xfe0f, [](P) -> u32 { util::stream_format(stream, "callo (%s)", reg4(opcode)); return 1; } },
+	{ 0x1808, 0xfe0f, [](P) -> u32 { util::stream_format(stream, "callo (%s)", reg4(opcode)); return 1 | STEP_OVER; } },
 
 	{ 0x6000, 0xf000, [](P) -> u32 { util::stream_format(stream, "jmp %s", abs12(opcode, pc)); return 1; } },
-	{ 0x2000, 0xff0f, [](P) -> u32 { util::stream_format(stream, "jmp %s", abs4_4(opcode, pc)); return 1; } },
+	{ 0x2000, 0xff0f, [](P) -> u32 { util::stream_format(stream, "jpp %s", abs4_4(opcode, pc)); return 1; } },
 	{ 0x0501, 0xffff, [](P) -> u32 { util::stream_format(stream, "jmpa"); return 1; } },
 	{ 0x2400, 0xff00, [](P) -> u32 { util::stream_format(stream, "jmpfz %s", abs8(opcode, pc)); return 1; } },
 
-	{ 0x7000, 0xf000, [](P) -> u32 { util::stream_format(stream, "call %s", abs12(opcode, pc)); return 1; } },
+	{ 0x7000, 0xf000, [](P) -> u32 { util::stream_format(stream, "call %s", abs12(opcode, pc)); return 1 | STEP_OVER; } },
 
-	{ 0x0800, 0xffff, [](P) -> u32 { util::stream_format(stream, "ret"); return 1; } },
-	{ 0x0801, 0xffff, [](P) -> u32 { util::stream_format(stream, "rets"); return 1; } },
-	{ 0x090f, 0xffff, [](P) -> u32 { util::stream_format(stream, "reti"); return 1; } },
+	{ 0x0800, 0xffff, [](P) -> u32 { util::stream_format(stream, "ret"); return 1 | STEP_OUT; } },
+	{ 0x0801, 0xffff, [](P) -> u32 { util::stream_format(stream, "rets"); return 1 | STEP_OUT; } },
+	{ 0x090f, 0xffff, [](P) -> u32 { util::stream_format(stream, "reti"); return 1 | STEP_OUT; } },
 
 	{ 0x0005, 0xffff, [](P) -> u32 { util::stream_format(stream, "stf"); return 1; } },
 	{ 0x0602, 0xffff, [](P) -> u32 { util::stream_format(stream, "off"); return 1; } },
@@ -279,7 +279,7 @@ const upd177x_disassembler::instruction upd177x_disassembler::instructions[] {
 	{ 0x1a01, 0xfe0f, [](P) -> u32 { util::stream_format(stream, "tbli a, (%s)", reg4(opcode)); return 1; } },
 	{ 0x1a02, 0xfe0f, [](P) -> u32 { util::stream_format(stream, "tbli x, (%s)", reg4(opcode)); return 1; } },
 	{ 0x1a04, 0xfe0f, [](P) -> u32 { util::stream_format(stream, "tbli y, (%s)", reg4(opcode)); return 1; } },
-	{ 0x1a08, 0xfe0f, [](P) -> u32 { util::stream_format(stream, "calli (%s)", reg4(opcode)); return 1; } },
+	{ 0x1a08, 0xfe0f, [](P) -> u32 { util::stream_format(stream, "calli (%s)", reg4(opcode)); return 1 | STEP_OVER; } },
 
 	{ 0x0101, 0xffff, [](P) -> u32 { util::stream_format(stream, "mon"); return 1; } },
 

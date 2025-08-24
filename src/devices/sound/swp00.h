@@ -3,8 +3,8 @@
 
 // Yamaha SWP00, rompler/dsp combo
 
-#ifndef DEVICES_SOUND_SWP00_H
-#define DEVICES_SOUND_SWP00_H
+#ifndef MAME_SOUND_SWP00_H
+#define MAME_SOUND_SWP00_H
 
 #pragma once
 
@@ -21,7 +21,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 	virtual void rom_bank_pre_change() override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
@@ -247,4 +247,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SWP00, swp00_device)
 
-#endif
+#endif // MAME_SOUND_SWP00_H

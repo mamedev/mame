@@ -5,7 +5,7 @@
  *   cp1610.h
  *   Portable General Instruments CP1610 emulator interface
  *
- *   Copyright Frank Palazzolo, all rights reserved.
+ *   Copyright Frank Palazzolo
  *
  *****************************************************************************/
 

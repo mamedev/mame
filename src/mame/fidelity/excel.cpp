@@ -177,8 +177,8 @@ CPU D6 to W: (model 6092, tied to VCC otherwise)
 
 #include "emu.h"
 
+#include "cpu/m6502/g65sc02.h"
 #include "cpu/m6502/r65c02.h"
-#include "cpu/m6502/m65sc02.h"
 #include "machine/clock.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -248,9 +248,9 @@ private:
 	void fexcelb_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
-	void speech_w(u8 data, u8 mask);
 	void ttl_w(offs_t offset, u8 data);
 	u8 ttl_r(offs_t offset);
+	void speech_w(offs_t offset, u8 data);
 };
 
 void excel_state::machine_start()
@@ -302,7 +302,7 @@ void excel_state::ttl_w(offs_t offset, u8 data)
 
 	// speech (model 6092)
 	if (m_speech != nullptr)
-		speech_w(data, mask);
+		speech_w(offset, data);
 }
 
 u8 excel_state::ttl_r(offs_t offset)
@@ -353,9 +353,10 @@ INPUT_CHANGED_MEMBER(excel_state::speech_bankswitch)
 	m_speech->set_rom_bank(m_speech_bank);
 }
 
-void excel_state::speech_w(u8 data, u8 mask)
+void excel_state::speech_w(offs_t offset, u8 data)
 {
 	// a0-a2,d2 (from ttl_w): 74259(2) to speech board
+	u8 mask = 1 << offset;
 	m_speech_data = (m_speech_data & ~mask) | ((data & 4) ? mask : 0);
 
 	// 74259 Q6: speech ROM A11
@@ -459,7 +460,7 @@ INPUT_PORTS_END
 void excel_state::fexcel(machine_config &config)
 {
 	// basic machine hardware
-	M65SC02(config, m_maincpu, 12_MHz_XTAL/4); // G65SC102P-3, 12.0M ceramic resonator
+	G65SC102(config, m_maincpu, 12_MHz_XTAL); // G65SC102P-3, 12.0M ceramic resonator (divided by 4 internally)
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcel_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz

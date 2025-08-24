@@ -1,5 +1,11 @@
+<p align="center">
+<img src="https://repository-images.githubusercontent.com/23779242/961ad700-8d21-11ea-85d3-1d64eccc4531" width="1280"> 
+</p>
+
 [GENie](https://github.com/bkaradzic/genie#what-is-it) - Project generator tool
 ===============================================================================
+
+[![Build and Upload Artifact](https://github.com/bkaradzic/GENie/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/bkaradzic/GENie/actions/workflows/build.yml)
 
 What is it?
 -----------
@@ -9,19 +15,16 @@ generates project from Lua script, making applying the same settings for
 multiple projects easy.
 
 Supported project generators:
- * FASTBuild (experimental)
  * GNU Makefile
+ * [JSON Compilation Database][jcdb]
  * Ninja (experimental)
- * Qbs / QtCreator (experimental)
- * Visual Studio 2010, 2012, 2013, 2015, 2017, 2019
+ * Visual Studio 2010, 2012, 2013, 2015, 2017, 2019, 2022
  * XCode
 
 Download (stable)
 -----------------
 
-[![Build Status](https://travis-ci.org/bkaradzic/GENie.svg?branch=master)](https://travis-ci.org/bkaradzic/GENie)
-
-	version 1115 (commit cd9b1a624810b166d11788d01c2aa4daf2ea42e6)
+	version 1181 (commit 29e6832fdf3b106c0906d288c8ced6c0761b8985)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -43,7 +46,11 @@ Documentation
 -------------
 
 [Scripting Reference](https://github.com/bkaradzic/genie/blob/master/docs/scripting-reference.md#scripting-reference)  
-[Introduction to GENie - CppCon 2016](https://onedrive.live.com/view.aspx?cid=171ee76e679935c8&page=view&resid=171EE76E679935C8!139573&parId=171EE76E679935C8!18835&authkey=!AKv_SGrgJwxDGDg&app=PowerPoint)
+
+Introduction to GENie - CppCon 2016  
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=_vArtdDTrTM" 
+target="_blank"><img src="http://img.youtube.com/vi/_vArtdDTrTM/0.jpg" 
+alt="Introduction to GENie - CppCon 2016" width="640" height="480" border="0" /></a>
 
 History
 -------
@@ -90,7 +97,7 @@ of Premake 4.4 beta 5, and there is no intention to keep it compatible with it.
  - Added support for generating PS4/Orbis projects.
  - Fixed PCH race when using concurrent Makefile build.
  - Added Green Hills Software compiler support.
- - Added edit & continue support for 64-bit builds in VS2013 upwards.
+ - Added edit & continue support for 64-bit builds in vs2013 upwards.
  - Added `windowstargetplatformversion` to specify VS Windows target version.
  - Added `NoWinRT` flag to disable WinRT CX builds.
  - Added `NoBufferSecurityCheck` flag to disable security checks in VS.
@@ -120,17 +127,23 @@ of Premake 4.4 beta 5, and there is no intention to keep it compatible with it.
  - Added `iostargetplatformversion`, `macostargetplatformversion`, and
    `tvostargetplatformversion` to specify XCode OS target version.
  - Removed the `xcode3`, and `xcode4` actions.
- - Added the `xcode8`, `xcode9`, and `xcode10` actions.
+ - Added the `xcode8`, `xcode9`, `xcode10`, `xcode11` and `xcode14` actions.
  - Added `systemincludedirs` that are always searched after directories added
    using `includedirs`.
  - Added `NoRuntimeChecks` flag to disable Basic Runtime Checks in non-optimized
    Visual Studio builds.
  - Added support for Nintendo Switch projects.
- - Added flags for selecting C++ standard: `Cpp11`, `Cpp14`, `Cpp17`,
+ - Added flags for selecting C++ standard: `Cpp11`, `Cpp14`, `Cpp17`, `Cpp20`
    and `CppLatest`.
  - Added `xcodeprojectopts` and `xcodetargetopts`.
  - Added vs2019 support.
- - Added UnitySupport flag to enable Unity (Jumbo) builds in Visual Studio 2019
+ - Added `UnitySupport` flag to enable Unity (Jumbo) builds in vs2019
+ - Added the `jcdb` action for generating a [JSON compilation database][jcdb].
+ - Added support for generating Switch/NX32 Switch/NX64 projects.
+ - Removed FASTBuild.
+ - Removed Qbs support.
+ - Added vs2022 support.
+ - Added xcode15 action with visionOS support.
 
 build - GENie build system scripts
 ----------------------------------
@@ -240,4 +253,5 @@ Developer Crackshell used GENie for development of games
 	OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+  [jcdb]: https://clang.llvm.org/docs/JSONCompilationDatabase.html
   [zbs]: https://studio.zerobrane.com

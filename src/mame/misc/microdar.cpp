@@ -501,12 +501,12 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(199?, dibifuca,   0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v9.25)",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(199?, dibif743,   dibifuca, microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.43)",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(199?, dibif727,   dibifuca, microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.27)",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, dibifpspdp, dibifuca, prospdp,   microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (unknown version, ProSPDP based)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, cfarwest,   0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, diolakoa,   0,        microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.38)",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, diola827,   diolakoa, microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.27)",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, covidarts,  0,        covidarts, microdar, microdar_state, empty_init, ROT0, "Covielsa",            "Covidarts",                                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(2009, minidart,   0,        prospdp,   microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Minidart",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, dibifuca,   0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v9.25)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(199?, dibif743,   dibifuca, microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.43)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(199?, dibif727,   dibifuca, microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.27)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, dibifpspdp, dibifuca, prospdp,   microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (unknown version, ProSPDP based)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, cfarwest,   0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, diolakoa,   0,        microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.38)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, diola827,   diolakoa, microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.27)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, covidarts,  0,        covidarts, microdar, microdar_state, empty_init, ROT0, "Covielsa",            "Covidarts",                                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2009, minidart,   0,        prospdp,   microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Minidart",                                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

@@ -720,8 +720,8 @@ void sun2_state::sun2vme(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "irq5").output_handler().set_inputline(m_maincpu, M68K_IRQ_5); // 74LS05 open collectors
 
-	SCC8530N(config, SCC1_TAG, 19.6608_MHz_XTAL / 4);
-	scc8530_device& scc2(SCC8530N(config, SCC2_TAG, 19.6608_MHz_XTAL / 4));
+	SCC8530(config, SCC1_TAG, 19.6608_MHz_XTAL / 4);
+	scc8530_device& scc2(SCC8530(config, SCC2_TAG, 19.6608_MHz_XTAL / 4));
 	scc2.out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	scc2.out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_6);
@@ -772,8 +772,8 @@ void sun2_state::sun2mbus(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "irq5").output_handler().set_inputline(m_maincpu, M68K_IRQ_5); // 74LS05 open collectors
 
-	SCC8530N(config, SCC1_TAG, 39.3216_MHz_XTAL / 8);
-	scc8530_device& scc2(SCC8530N(config, SCC2_TAG, 39.3216_MHz_XTAL / 8));
+	SCC8530(config, SCC1_TAG, 39.3216_MHz_XTAL / 8);
+	scc8530_device& scc2(SCC8530(config, SCC2_TAG, 39.3216_MHz_XTAL / 8));
 	scc2.out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	scc2.out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_6);

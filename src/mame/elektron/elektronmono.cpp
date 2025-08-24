@@ -161,8 +161,7 @@ void elekmono_state::elektron(machine_config &config)
 	MCF5206E(config, m_maincpu, XTAL(25'447'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &elekmono_state::elektron_map);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 static INPUT_PORTS_START( elektron )

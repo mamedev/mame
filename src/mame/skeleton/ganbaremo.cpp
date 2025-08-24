@@ -262,4 +262,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992?, ganbaremo, 0, ganbaremo, ganbaremo, ganbaremo_state, empty_init, ROT0, "Shoken", "Ganbare Momotarou Oni Taiji", MACHINE_IS_SKELETON_MECHANICAL ) // was advertised in 1992
+GAME( 1992?, ganbaremo, 0, ganbaremo, ganbaremo, ganbaremo_state, empty_init, ROT0, "Shoken", "Ganbare Momotarou Oni Taiji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // was advertised in 1992

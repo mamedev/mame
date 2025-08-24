@@ -1016,6 +1016,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/fz1_dsk.h,FORMATS["FZ1_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FZ1_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/fz1_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/fz1_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/g64_dsk.h,FORMATS["G64_DSK"] = true
 --------------------------------------------------
 
@@ -1047,6 +1059,18 @@ if opt_tool(FORMATS, "GUAB_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/guab_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/guab_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/h17disk.h,FORMATS["H17D_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "H17D_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/h17disk.cpp",
+		MAME_DIR.. "src/lib/formats/h17disk.h",
 	}
 end
 

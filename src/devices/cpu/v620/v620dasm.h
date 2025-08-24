@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_CPU_V620_V620_H
-#define MAME_CPU_V620_V620_H
+#ifndef MAME_CPU_V620_V620DASM_H
+#define MAME_CPU_V620_V620DASM_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ protected:
 	virtual offs_t dasm_io(std::ostream &stream, u16 inst, offs_t pc, const data_buffer &opcodes) const override;
 };
 
-#endif // MAME_CPU_V620_V620_H
+#endif // MAME_CPU_V620_V620DASM_H

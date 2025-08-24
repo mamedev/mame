@@ -831,6 +831,7 @@ void jongbou_state::jongbou(machine_config &config)
 }
 
 
+// also seen on a bootleg PCB CH86-01006A with double sized ROMs and the 8748 MCU
 ROM_START( sstingry )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_BYTE( "ss_05.rom",  0x0000,  0x4000, CRC(bfb28d53) SHA1(64a1b8627529ed13074bb949cb104077eb3eac1f) )

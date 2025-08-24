@@ -54,7 +54,7 @@ DEFINE_DEVICE_TYPE(VGMVIZ, vgmviz_device, "vgmviz", "VGM Visualizer")
 
 vgmviz_device::vgmviz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, VGMVIZ, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_sound_interface(mconfig, *this)
 	, m_screen(*this, "screen")
 	, m_palette(*this, "palette")
 {
@@ -76,6 +76,7 @@ vgmviz_device::~vgmviz_device()
 
 void vgmviz_device::device_start()
 {
+	stream_alloc(2, 2, machine().sample_rate());
 	WDL_fft_init();
 	fill_window();
 	m_bitmap.resize(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -283,18 +284,19 @@ void vgmviz_device::cycle_viz_mode()
 //  audio stream and process as necessary
 //-------------------------------------------------
 
-void vgmviz_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void vgmviz_device::sound_stream_update(sound_stream &stream)
 {
-	// call the normal interface to actually mix
-	device_mixer_interface::sound_stream_update(stream, inputs, outputs);
+	// Passthrough the audio
+	stream.copy(0, 0);
+	stream.copy(1, 1);
 
-	// now consume the outputs
-	for (int pos = 0; pos < outputs[0].samples(); pos++)
+	// now consume the inputs
+	for (int pos = 0; pos < stream.samples(); pos++)
 	{
-		for (int i = 0; i < outputs.size(); i++)
+		for (int i = 0; i < stream.output_count(); i++)
 		{
 			// Original code took 16-bit sample / 65536.0 instead of 32768.0, so multiply by 0.5 here but is it necessary?
-			const float sample = outputs[i].get(pos) * 0.5f;
+			const float sample = stream.get(i, pos) * 0.5f;
 			m_audio_buf[m_audio_fill_index][i][m_audio_count[m_audio_fill_index]] = sample + 0.5f;
 		}
 
@@ -737,7 +739,7 @@ void vgmviz_device::draw_waveform(bitmap_rgb32 &bitmap)
 		bitmap.pix(CHANNEL_HEIGHT + 1 + CHANNEL_CENTER, x) = MED_GRAY;
 
 		const float raw_l = m_audio_buf[1 - m_audio_fill_index][0][((int)m_history_length + 1 + x) % FFT_LENGTH];
-		const int sample_l = (int)((raw_l - 0.5f) * (CHANNEL_HEIGHT - 1));
+		const int sample_l = std::clamp((int)((raw_l - 0.5f) * (CHANNEL_HEIGHT - 1)), -CHANNEL_CENTER, CHANNEL_CENTER);
 		const int dy_l = (sample_l == 0) ? 0 : ((sample_l < 0) ? -1 : 1);
 		const int endy_l = CHANNEL_CENTER;
 		int y = endy_l - sample_l;
@@ -748,7 +750,7 @@ void vgmviz_device::draw_waveform(bitmap_rgb32 &bitmap)
 		} while(y != endy_l);
 
 		const float raw_r = m_audio_buf[1 - m_audio_fill_index][1][((int)m_history_length + 1 + x) % FFT_LENGTH];
-		const int sample_r = (int)((raw_r - 0.5f) * (CHANNEL_HEIGHT - 1));
+		const int sample_r = std::clamp((int)((raw_r - 0.5f) * (CHANNEL_HEIGHT - 1)), -CHANNEL_CENTER, CHANNEL_CENTER);
 		const int dy_r = (sample_r == 0) ? 0 : ((sample_r < 0) ? -1 : 1);
 		const int endy_r = CHANNEL_HEIGHT + 1 + CHANNEL_CENTER;
 		y = endy_r - sample_r;

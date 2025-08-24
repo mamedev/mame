@@ -144,11 +144,13 @@ private:
 	// internal sync helpers
 	TIMER_CALLBACK_MEMBER(set_aux_clk_in);
 	TIMER_CALLBACK_MEMBER(set_aux_data_in);
+	TIMER_CALLBACK_MEMBER(set_aux_irq_timer_callback);
 
 	// MCU I/O handlers
 	uint8_t p1_r();
 	void p2_w(uint8_t data);
 
+	emu_timer* m_aux_irq_timer;
 	devcb_write_line m_aux_irq_cb;
 	devcb_write_line m_aux_clk_cb, m_aux_data_cb;
 

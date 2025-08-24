@@ -56,7 +56,7 @@
 void namco_54xx_device::reset(int state)
 {
 	// The incoming signal is active low
-	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
+	m_cpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 uint8_t namco_54xx_device::K_r()
@@ -69,20 +69,17 @@ uint8_t namco_54xx_device::R0_r()
 	return m_latched_cmd & 0x0f;
 }
 
-void namco_54xx_device::O_w(uint8_t data)
+void namco_54xx_device::O_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	uint8_t out = (data & 0x0f);
-	if (data & 0x10)
-		m_discrete->write(NAMCO_54XX_1_DATA(m_basenode), out);
+	if (mem_mask == 0x0f)
+		m_discrete->write(NAMCO_54XX_0_DATA(m_basenode), data & 0x0f);
 	else
-		m_discrete->write(NAMCO_54XX_0_DATA(m_basenode), out);
+		m_discrete->write(NAMCO_54XX_1_DATA(m_basenode), data >> 4);
 }
 
 void namco_54xx_device::R1_w(uint8_t data)
 {
-	uint8_t out = (data & 0x0f);
-
-	m_discrete->write(NAMCO_54XX_2_DATA(m_basenode), out);
+	m_discrete->write(NAMCO_54XX_2_DATA(m_basenode), data & 0x0f);
 }
 
 
@@ -91,7 +88,7 @@ void namco_54xx_device::write(uint8_t data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_54xx_device::write_sync),this), data);
 }
 
-TIMER_CALLBACK_MEMBER( namco_54xx_device::write_sync )
+TIMER_CALLBACK_MEMBER(namco_54xx_device::write_sync)
 {
 	m_latched_cmd = param;
 }
@@ -99,7 +96,7 @@ TIMER_CALLBACK_MEMBER( namco_54xx_device::write_sync )
 
 void namco_54xx_device::chip_select(int state)
 {
-	m_cpu->set_input_line(0, state);
+	m_cpu->set_input_line(MB88XX_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -109,13 +106,13 @@ void namco_54xx_device::chip_select(int state)
 
 ROM_START( namco_54xx )
 	ROM_REGION( 0x400, "mcu", 0 )
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	ROM_LOAD( "54xx.bin", 0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 ROM_END
 
 DEFINE_DEVICE_TYPE(NAMCO_54XX, namco_54xx_device, "namco54", "Namco 54xx")
 
-namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_54XX, tag, owner, clock),
+namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NAMCO_54XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_discrete(*this, finder_base::DUMMY_TAG),
 	m_basenode(0),
@@ -138,7 +135,7 @@ void namco_54xx_device::device_start()
 
 void namco_54xx_device::device_add_mconfig(machine_config &config)
 {
-	MB8844(config, m_cpu, DERIVED_CLOCK(1,1)); /* parent clock, internally divided by 6 */
+	MB8844(config, m_cpu, DERIVED_CLOCK(1,1)); // parent clock, internally divided by 6
 	m_cpu->read_k().set(FUNC(namco_54xx_device::K_r));
 	m_cpu->write_o().set(FUNC(namco_54xx_device::O_w));
 	m_cpu->read_r<0>().set(FUNC(namco_54xx_device::R0_r));

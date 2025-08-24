@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+NOTE:
+- we treat supported="no" for something that have major issues everywhere,
+  "partial" for stuff running on 1+ systems but don't on others.
+
+-->
+<softwarelist name="generic_flop_525" description="Cross-platform 5.25&quot; disk images">
+
+	<!-- original from pc8801_flop -->
+	<software name="gruppe" supported="no">
+		<description>Gruppe</description>
+		<year>1985</year>
+		<publisher>SPS</publisher>
+		<notes><![CDATA[
+All systems: fails to load with "program load error".
+https://github.com/mamedev/mame/issues/2349
+]]></notes>
+		<info name="release" value="198504xx"/>
+		<info name="alt_title" value="ぐるっぺ"/>
+		<sharedfeat name="compatibility" value="mz2200,pc8801,x1"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="349392">
+				<rom name="gruppe.d88" size="349392" crc="d7efdc5d" sha1="ab4da770fae54f306bfdc8fc9df3c52f3b4a1a65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- original from x1_flop -->
+	<software name="gruppea" cloneof="gruppe" supported="no">
+		<description>Gruppe (alt)</description>
+		<year>1985</year>
+		<publisher>SPS</publisher>
+		<notes><![CDATA[
+(same as gruppe)
+]]></notes>
+		<info name="release" value="198506xx"/>
+		<info name="alt_title" value="ぐるっぺ"/>
+		<sharedfeat name="compatibility" value="mz2200,pc8801,x1"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gruppe.d88" size="348848" crc="a50dfd33" sha1="551749d2ec4deb3919f2111d234450fd4f90d54a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kitahei">
+		<description>Kitahei</description>
+		<year>1985</year>
+		<publisher>SPS</publisher>
+		<notes><![CDATA[
+mz2000: needs to press G on concealed text prompt on title (verify)
+]]></notes>
+		<info name="release" value="198509xx"/>
+		<info name="alt_title" value="棋太平"/>
+		<sharedfeat name="compatibility" value="mz2000,mz2200,pc8801,x1"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="349392">
+				<rom name="kitahei.d88" size="349392" crc="53ae4f58" sha1="bbdff7ac4d6a844580bb06accb1d8d88759b8ae9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- original in x1_flop.xml -->
+	<software name="victnined" supported="partial">
+		<description>Victorious Nine (demo)</description>
+		<year>1985</year>
+		<publisher>ニデコム (Nidecom)</publisher>
+		<notes><![CDATA[
+pc8801: crashes before reaching title screen (has V2 mode detection, which implies being compatible)
+]]></notes>
+		<info name="release" value="198509xx"/>
+		<info name="alt_title" value="ビクトリアスナイン"/>
+		<sharedfeat name="compatibility" value="mz2200,pc8801,x1"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="350560">
+				<rom name="victorious nine.d88" size="350560" crc="2fc94dfd" sha1="e29f55bed953e0304d88b8eed9448f31eb888298"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

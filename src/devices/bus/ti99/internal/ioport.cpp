@@ -78,7 +78,10 @@
 
 #include "emu.h"
 #include "ioport.h"
+#include "splitter.h"
 #include "bus/ti99/peb/peribox.h"
+#include "bus/ti99/sidecar/arcturus.h"
+#include "bus/ti99/sidecar/speechsyn.h"
 
 DEFINE_DEVICE_TYPE(TI99_IOPORT, bus::ti99::internal::ioport_device, "ti99_ioport", "TI-99 I/O Port")
 
@@ -147,6 +150,12 @@ void ioport_device::reset_in(int state)
 		m_connected->reset_in(state);
 }
 
+void ioport_device::sbe(int state)
+{
+	if (m_connected != nullptr)
+		m_connected->sbe(state);
+}
+
 void ioport_device::device_start()
 {
 	if (m_connected != nullptr)
@@ -174,9 +183,23 @@ void ioport_attached_device::set_ready(int state)
 void ti99_ioport_options_plain(device_slot_interface &device)
 {
 	device.option_add("peb", TI99_PERIBOX);
+	device.option_add("splitter", TI99_IOSPLIT);
+	device.option_add("arcturus", TI99_ARCTURUS);
+	device.option_add("speechsyn", TI99_SPEECHSYN);
 }
 
 void ti99_ioport_options_evpc(device_slot_interface &device)
 {
 	device.option_add("peb", TI99_PERIBOX_EV);
+	device.option_add("splitter", TI99_IOSPLIT);
+	device.option_add("arcturus", TI99_ARCTURUS);
+	device.option_add("speechsyn", TI99_SPEECHSYN);
+}
+
+// Used for the splitter (to avoid getting multiple EVPCs in the system)
+void ti99_ioport_options_evpc1(device_slot_interface &device)
+{
+	device.option_add("peb", TI99_PERIBOX_EV1);
+	device.option_add("splitter", TI99_IOSPLIT);
+	device.option_add("arcturus", TI99_ARCTURUS);
 }

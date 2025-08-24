@@ -70,7 +70,6 @@ private:
 	optional_shared_ptr<u32> m_arm7_shareram;
 
 	optional_device<cpu_device> m_prot;
-	DECLARE_MACHINE_START(pgm_arm_type1);
 
 	u32 arm7_type1_protlatch_r();
 	void arm7_type1_protlatch_w(offs_t offset, u32 data, u32 mem_mask);

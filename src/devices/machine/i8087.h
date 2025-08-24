@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett, Carl
+#ifndef MAME_MACHINE_I8087_H
+#define MAME_MACHINE_I8087_H
+
+#pragma once
 
 // SoftFloat 2 lacks an include guard
 #ifndef softfloat2_h
@@ -223,3 +227,5 @@ private:
 	void build_opcode_table();
 
 };
+
+#endif // MAME_MACHINE_I8087_H

@@ -96,4 +96,4 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME                     FLAGS */
-CONS( 1983, compmahj, 0,      0,      compmahj, compmahj, compmahj_state, empty_init, "Nintendo", "Computer Mah-jong Yakuman", MACHINE_IS_SKELETON )
+CONS( 1983, compmahj, 0,      0,      compmahj, compmahj, compmahj_state, empty_init, "Nintendo", "Computer Mah-jong Yakuman", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

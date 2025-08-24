@@ -12,9 +12,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_32016_H
+#define MAME_BUS_BBC_TUBE_TUBE_32016_H
 
-#ifndef MAME_BUS_BBC_TUBE_32016_H
-#define MAME_BUS_BBC_TUBE_32016_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/ns32000/ns32000.h"
@@ -95,5 +96,4 @@ DECLARE_DEVICE_TYPE(BBC_TUBE_32016, bbc_tube_32016_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_16032, bbc_tube_16032_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_32016L, bbc_tube_32016l_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_32016_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_32016_H

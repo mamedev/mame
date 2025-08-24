@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#ifndef DSP56156_PMOVE_H
-#define DSP56156_PMOVE_H
+#ifndef MAME_CPU_DSP56156_PMOVE_H
+#define MAME_CPU_DSP56156_PMOVE_H
+
+#pragma once
 
 #include "opcode.h"
 #include "tables.h"
@@ -9,8 +11,8 @@
 //
 // A ParallelMove Object is what all parallel move classes inherit from.
 //
-namespace DSP_56156
-{
+namespace DSP_56156 {
+
 class Opcode;
 
 class ParallelMove
@@ -316,5 +318,6 @@ private:
 	std::string m_destination;
 };
 
-}
-#endif
+} // namespace DSP_56156
+
+#endif // MAME_CPU_DSP56156_PMOVE_H

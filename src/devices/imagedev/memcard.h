@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_MEMCARD_H
-#define MAME_DEVICES_IMAGEDEV_MEMCARD_H
+#ifndef MAME_IMAGEDEV_MEMCARD_H
+#define MAME_IMAGEDEV_MEMCARD_H
 
 #pragma once
 
@@ -36,4 +36,4 @@ protected:
 	device_memcard_image_interface(const machine_config &mconfig, device_t &device);
 };
 
-#endif // MAME_DEVICES_IMAGEDEV_MEMCARD_H
+#endif // MAME_IMAGEDEV_MEMCARD_H

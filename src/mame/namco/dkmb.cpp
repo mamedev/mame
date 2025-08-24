@@ -137,8 +137,7 @@ void dkmb_state::dkmb(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(65536);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 
@@ -161,4 +160,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2003, dkmb, 0, dkmb, dkmb, dkmb_state, empty_init, ROT270, "Namco / Nintendo / Cosmodog", "Donkey Kong / Donkey Kong Jr / Mario Bros", MACHINE_IS_SKELETON )
+GAME( 2003, dkmb, 0, dkmb, dkmb, dkmb_state, empty_init, ROT270, "Namco / Nintendo / Cosmodog", "Donkey Kong / Donkey Kong Jr / Mario Bros", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

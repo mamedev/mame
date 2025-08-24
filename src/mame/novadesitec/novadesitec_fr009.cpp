@@ -119,4 +119,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, unkfr009, 0, fr009, fr009, novadesitec_fr009_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR009 hardware",  MACHINE_IS_SKELETON ) // possibly Super Color II (wild guesswork due to SC II barely readable on a label)
+GAME( 200?, unkfr009, 0, fr009, fr009, novadesitec_fr009_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR009 hardware",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // possibly Super Color II (wild guesswork due to SC II barely readable on a label)

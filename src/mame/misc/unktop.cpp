@@ -94,4 +94,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 19??, unktop, 0, unktop, unktop, unktop_state, empty_init, ROT0, "<unknown>", "unknown Top game", MACHINE_IS_SKELETON )
+GAME( 19??, unktop, 0, unktop, unktop, unktop_state, empty_init, ROT0, "<unknown>", "unknown Top game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

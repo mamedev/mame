@@ -9,6 +9,15 @@ see eag68k.cpp for 68000-based EAG hardware
 NOTE: To start a new game in EAS/PC, press Game Control (aka Reset), activate
 the D6 square, and then press CL. See below for more info.
 
+TODO:
+- Chess Encyclopedia modules don't work properly on fpres. Prestige doesn't
+  have nvram, it has a load/play switch for swapping modules without having to
+  turn off the chesscomputer. This won't work on MAME, since it forces a hard
+  reset when inserting a new ROM cartridge.
+- Likewise, these modules don't work properly on feasx. It doesn't correctly
+  announce when a new module needs to be inserted. Probably unsupported and
+  therefore BTANB?
+
 BTANB:
 - feasglab locks up at boot if it was powered off in the middle of the game.
   To resolve this, hold the Game Control button while booting to clear nvram.
@@ -31,7 +40,7 @@ Hardware notes:
 - TSI S14001A + speech ROM
 - I/O with 8255 PPI and bunch of TTL
 - 8*8 magnet sensors, 11 buttons, 8*(8+1) LEDs + 4*7seg LEDs
-- module slot and printer port
+- module slot and printer port (600 baud, 7 data bits, 1 stop bit, no parity)
 
 *: In West Germany, some distributors released it with overclocked CPUs,
 advertised as 3.2, 3.6, or 4MHz. Unmodified EAS PCB photos show only a 3MHz XTAL.
@@ -71,8 +80,17 @@ B8 starts a self-test and displays ROM checksums, press CL to advance.
 Fidelity Elite Private Line were EAS/EAG conversions released by Fidelity Deutschland.
 The "Elite Privat" was probably for the local market and the "Private Line" for
 export. They took out the motherboard and leds and placed them inside a little box
-separate from a (ledless) magnetic chessboard. The ROMs were unmodified, that makes
-them uninteresting to emulate as separate drivers.
+separate from a (ledless) magnetic chessboard. The EAS conversion has unmodified
+ROMs, most commonly seen with the feasgla romset. In MAME, it's available as an
+alternate view (see video options). The EAG conversion is a cloneset of feag.
+
+PC/EAS/EAG are the only Fidelity chesscomputers that officially support the EOA-EOE
+Chess Encyclopedia modules. When it's time to swap modules to a different volume,
+the 7seg display will announce it like "GS 0C", where the last digit indicates
+which module to insert (in this case: Volume C). On EAS/EAG, the user is supposed
+to turn off the chesscomputer before inserting a new module (a hard reset on MAME
+is sufficient). On Prestige, modules need to be swapped on the fly. For the 1st
+version of Prestige, it only works on level A3 or higher.
 
 *******************************************************************************/
 
@@ -81,7 +99,7 @@ them uninteresting to emulate as separate drivers.
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "cpu/m6502/m65c02.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/clock.h"
 #include "machine/i8255.h"
@@ -96,6 +114,7 @@ them uninteresting to emulate as separate drivers.
 
 // internal artwork
 #include "fidel_eag.lh"
+#include "fidel_eag_priv.lh"
 #include "fidel_eas.lh"
 #include "fidel_pc.lh"
 
@@ -111,6 +130,7 @@ public:
 		fidel_clockdiv_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
 		m_rombank(*this, "rombank"),
+		m_rs232(*this, "rs232"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -126,6 +146,7 @@ public:
 	void easc(machine_config &config);
 	void easx(machine_config &config);
 	void eag(machine_config &config);
+	void eagpriv(machine_config &config);
 	void eag2100(machine_config &config);
 
 	void init_eag() { m_rotate = true; }
@@ -139,6 +160,7 @@ protected:
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
 	optional_memory_bank m_rombank;
+	required_device<rs232_port_device> m_rs232;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
@@ -263,7 +285,8 @@ void elite_state::ppi_porta_w(u8 data)
 	m_speech->data_w(data & 0x3f);
 	m_speech->start_w(BIT(data, 6));
 
-	// d7: printer? (black wire to LED pcb)
+	// d7: printer port data
+	m_rs232->write_txd(BIT(~data, 7));
 }
 
 void elite_state::ppi_portc_w(u8 data)
@@ -289,7 +312,7 @@ void elite_state::ppi_portc_w(u8 data)
 
 u8 elite_state::ppi_portb_r()
 {
-	// d0: printer? white wire from LED pcb
+	// d0: printer busy?
 	u8 data = 1;
 
 	// d1: S14001A busy pin
@@ -365,9 +388,7 @@ void elite_state::eag2100_map(address_map &map)
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( eas )
-	PORT_INCLUDE( fidel_clockdiv_4 )
-
+static INPUT_PORTS_START( eas_base )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Game Control")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Speaker")
@@ -382,6 +403,11 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( eas )
+	PORT_INCLUDE( eas_base )
+	PORT_INCLUDE( fidel_clockdiv_2 ) // default for 3MHz
 
 	PORT_START("CPU")
 	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(elite_state::change_cpu_freq), 0) // factory set
@@ -391,9 +417,10 @@ static INPUT_PORTS_START( eas )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ewc )
-	PORT_INCLUDE( eas )
+	PORT_INCLUDE( eas_base )
+	PORT_INCLUDE( fidel_clockdiv_4 ) // default for >3MHz
 
-	PORT_MODIFY("CPU") // default to 3.57MHz
+	PORT_START("CPU")
 	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(elite_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
@@ -401,9 +428,10 @@ static INPUT_PORTS_START( ewc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( easc )
-	PORT_INCLUDE( eas )
+	PORT_INCLUDE( eas_base )
+	PORT_INCLUDE( fidel_clockdiv_4 ) // default for >3MHz
 
-	PORT_MODIFY("CPU") // default to 4MHz
+	PORT_START("CPU")
 	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(elite_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (EAS)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (EWC)" )
@@ -418,7 +446,7 @@ static INPUT_PORTS_START( pc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( easx )
-	PORT_INCLUDE( eas )
+	PORT_INCLUDE( easc )
 
 	PORT_MODIFY("CPU") // 5MHz
 	PORT_BIT(0x03, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -458,6 +486,8 @@ void elite_state::pc(machine_config &config)
 	auto &irq_clock(CLOCK(config, "irq_clock", 38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
 	irq_clock.set_pulse_width(attotime::from_nsec(13700)); // active for 13.7us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -526,8 +556,8 @@ void elite_state::easx(machine_config &config)
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	config.device_remove("nvram");
-	NVRAM(config, "nvram.ic8", nvram_device::DEFAULT_ALL_0);
-	NVRAM(config, "nvram.ic6", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram.ic8", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, "nvram.ic6", nvram_device::DEFAULT_ALL_1);
 }
 
 void elite_state::eag(machine_config &config)
@@ -537,6 +567,12 @@ void elite_state::eag(machine_config &config)
 	// video hardware
 	m_display->set_segmask(0x1ef, 0x7f);
 	config.set_default_layout(layout_fidel_eag);
+}
+
+void elite_state::eagpriv(machine_config &config)
+{
+	eag(config);
+	config.set_default_layout(layout_fidel_eag_priv);
 }
 
 void elite_state::eag2100(machine_config &config)
@@ -552,238 +588,6 @@ void elite_state::eag2100(machine_config &config)
 /*******************************************************************************
     ROM Definitions
 *******************************************************************************/
-
-ROM_START( feas )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("elite", 0x8000, 0x0800, CRC(cc904af9) SHA1(2b1d54c597a445ccc1ec73838e4bd2ac5154d7ad) ) // Intel D2764-2
-	ROM_CONTINUE( 0x9000, 0x0800 )
-	ROM_CONTINUE( 0x8800, 0x0800 )
-	ROM_CONTINUE( 0x9800, 0x0800 )
-	ROM_LOAD("101-1052a02", 0xc000, 0x2000, CRC(fee42863) SHA1(1854bb9cddb883d86e0d98594ac0186fb3908a01) ) // Mostek MK36C63N-5
-	ROM_LOAD("101-1052a01", 0xe000, 0x2000, CRC(41261e1b) SHA1(43664e30348a708fbe449b47e6eed39d4e9acb4c) ) // "
-
-	// speech ROM
-	ROM_DEFAULT_BIOS("en")
-	ROM_SYSTEM_BIOS(0, "en", "English")
-	ROM_SYSTEM_BIOS(1, "de", "German")
-	ROM_SYSTEM_BIOS(2, "fr", "French")
-	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
-
-	ROM_REGION( 1, "language", 0 )
-	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
-	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
-	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
-	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) ) // NEC D2332C
-	ROM_RELOAD(            0x1000, 0x1000)
-	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) ) // NEC D2364C
-	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) ) // "
-	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) ) // "
-ROM_END
-
-ROM_START( feasbu )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("eli_bu3", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) )
-	ROM_CONTINUE( 0x9000, 0x0800 )
-	ROM_CONTINUE( 0x8800, 0x0800 )
-	ROM_CONTINUE( 0x9800, 0x0800 )
-	ROM_LOAD("eli_bu1", 0xc000, 0x2000, CRC(859d69f1) SHA1(a8b057683369e2387f22fc7e916b6f3c75d44b21) )
-	ROM_LOAD("eli_bu2", 0xe000, 0x2000, CRC(571a33a7) SHA1(43b110cf0918caf16643178f401e58b2dc73894f) )
-
-	// speech ROM
-	ROM_DEFAULT_BIOS("en")
-	ROM_SYSTEM_BIOS(0, "en", "English")
-	ROM_SYSTEM_BIOS(1, "de", "German")
-	ROM_SYSTEM_BIOS(2, "fr", "French")
-	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
-
-	ROM_REGION( 1, "language", 0 )
-	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
-	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
-	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
-	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
-	ROM_RELOAD(            0x1000, 0x1000)
-	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
-	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
-	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
-ROM_END
-
-ROM_START( feasbua ) // model EWC
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("white_a", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // HN482764G-2
-	ROM_CONTINUE( 0x9000, 0x0800 )
-	ROM_CONTINUE( 0x8800, 0x0800 )
-	ROM_CONTINUE( 0x9800, 0x0800 )
-	ROM_LOAD("black", 0xc000, 0x0800, CRC(132b7f68) SHA1(a7aaac221387275f3a11f4441dcef73c2bfd0ee6) ) // M5L2764K
-	ROM_CONTINUE( 0xd000, 0x0800 )
-	ROM_CONTINUE( 0xc800, 0x0800 )
-	ROM_CONTINUE( 0xd800, 0x0800 )
-	ROM_LOAD("green", 0xe000, 0x0800, CRC(c7bbfbbe) SHA1(63fe13d0e64d1e5c1ea1b4de13ac3e753797a992) ) // M5L2764K - only 4 bytes different from feasbu (after descramble)
-	ROM_CONTINUE( 0xf000, 0x0800 )
-	ROM_CONTINUE( 0xe800, 0x0800 )
-	ROM_CONTINUE( 0xf800, 0x0800 )
-
-	// speech ROM
-	ROM_DEFAULT_BIOS("en")
-	ROM_SYSTEM_BIOS(0, "en", "English")
-	ROM_SYSTEM_BIOS(1, "de", "German")
-	ROM_SYSTEM_BIOS(2, "fr", "French")
-	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
-
-	ROM_REGION( 1, "language", 0 )
-	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
-	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
-	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
-	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
-	ROM_RELOAD(            0x1000, 0x1000)
-	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
-	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
-	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
-ROM_END
-
-ROM_START( feasgla )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("4.0_8_6", 0x8000, 0x0800, CRC(32784e2d) SHA1(dae060a5c49cc1993a78db293cd80464adfd892d) )
-	ROM_CONTINUE( 0x9000, 0x0800 )
-	ROM_CONTINUE( 0x8800, 0x0800 )
-	ROM_CONTINUE( 0x9800, 0x0800 )
-	ROM_LOAD("4.0_c_5", 0xc000, 0x0800, CRC(ddb80412) SHA1(b1d9435d9a71b8eb241a2169bfbaa0499f510769) )
-	ROM_CONTINUE( 0xd000, 0x0800 )
-	ROM_CONTINUE( 0xc800, 0x0800 )
-	ROM_CONTINUE( 0xd800, 0x0800 )
-	ROM_LOAD("4.0_e_4", 0xe000, 0x0800, CRC(62a5305a) SHA1(a361bd9a54b903d7b0fbacabe55ea5ccbbc1dc51) )
-	ROM_CONTINUE( 0xf000, 0x0800 )
-	ROM_CONTINUE( 0xe800, 0x0800 )
-	ROM_CONTINUE( 0xf800, 0x0800 )
-
-	// speech ROM
-	ROM_DEFAULT_BIOS("en")
-	ROM_SYSTEM_BIOS(0, "en", "English")
-	ROM_SYSTEM_BIOS(1, "de", "German")
-	ROM_SYSTEM_BIOS(2, "fr", "French")
-	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
-
-	ROM_REGION( 1, "language", 0 )
-	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
-	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
-	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
-	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
-	ROM_RELOAD(            0x1000, 0x1000)
-	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
-	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
-	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
-ROM_END
-
-ROM_START( feasglaa ) // model EAS-C
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("orange", 0x8000, 0x0800, CRC(32784e2d) SHA1(dae060a5c49cc1993a78db293cd80464adfd892d) )
-	ROM_CONTINUE( 0x9000, 0x0800 )
-	ROM_CONTINUE( 0x8800, 0x0800 )
-	ROM_CONTINUE( 0x9800, 0x0800 )
-	ROM_LOAD("black", 0xc000, 0x0800, CRC(3f0b01b6) SHA1(fe8d214f1678e000ba945e2f6dc3438af97c6f33) ) // only 2 bytes different from feasgla
-	ROM_CONTINUE( 0xd000, 0x0800 )
-	ROM_CONTINUE( 0xc800, 0x0800 )
-	ROM_CONTINUE( 0xd800, 0x0800 )
-	ROM_LOAD("green", 0xe000, 0x0800, CRC(62a5305a) SHA1(a361bd9a54b903d7b0fbacabe55ea5ccbbc1dc51) )
-	ROM_CONTINUE( 0xf000, 0x0800 )
-	ROM_CONTINUE( 0xe800, 0x0800 )
-	ROM_CONTINUE( 0xf800, 0x0800 )
-
-	// speech ROM
-	ROM_DEFAULT_BIOS("en")
-	ROM_SYSTEM_BIOS(0, "en", "English")
-	ROM_SYSTEM_BIOS(1, "de", "German")
-	ROM_SYSTEM_BIOS(2, "fr", "French")
-	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
-
-	ROM_REGION( 1, "language", 0 )
-	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
-	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
-	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
-	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
-	ROM_RELOAD(            0x1000, 0x1000)
-	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
-	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
-	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
-ROM_END
-
-ROM_START( feasglab )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("6a", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
-	ROM_CONTINUE( 0x9000, 0x0800 )
-	ROM_CONTINUE( 0x8800, 0x0800 )
-	ROM_CONTINUE( 0x9800, 0x0800 )
-	ROM_LOAD("5a", 0xc000, 0x0800, CRC(f094e625) SHA1(fef84c6a3da504aac15988ec9af94417e5fedfbd) )
-	ROM_CONTINUE( 0xd000, 0x0800 )
-	ROM_CONTINUE( 0xc800, 0x0800 )
-	ROM_CONTINUE( 0xd800, 0x0800 )
-	ROM_LOAD("4a", 0xe000, 0x0800, CRC(5f6845d1) SHA1(684eb16faf36a49560e5a73b55fd0022dc090e35) )
-	ROM_CONTINUE( 0xf000, 0x0800 )
-	ROM_CONTINUE( 0xe800, 0x0800 )
-	ROM_CONTINUE( 0xf800, 0x0800 )
-
-	// speech ROM
-	ROM_DEFAULT_BIOS("en")
-	ROM_SYSTEM_BIOS(0, "en", "English")
-	ROM_SYSTEM_BIOS(1, "de", "German")
-	ROM_SYSTEM_BIOS(2, "fr", "French")
-	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
-
-	ROM_REGION( 1, "language", 0 )
-	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
-	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
-	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
-	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
-	ROM_RELOAD(            0x1000, 0x1000)
-	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
-	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
-	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
-ROM_END
-
-ROM_START( feasx ) // 510-1071B01 PCB
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("exp_8000_6", 0xa000, 0x2000, CRC(b555c5ab) SHA1(d85ae44f0c13e2bfafbc3cadf829e74c7f4ba2e3) ) // Seeq DQ5133-25
-	ROM_LOAD("exp_c000_5", 0xc000, 0x2000, CRC(fd8471e3) SHA1(e684ded8ed4934bc5ef0cc4ae37dc5d12496d39e) ) // "
-	ROM_LOAD("exp_e000_4", 0xe000, 0x2000, CRC(19c36d83) SHA1(33438c316284182ebe195a383bb2d96d3524c88d) ) // "
-
-	// speech ROM
-	ROM_DEFAULT_BIOS("en")
-	ROM_SYSTEM_BIOS(0, "en", "English")
-	ROM_SYSTEM_BIOS(1, "de", "German")
-	ROM_SYSTEM_BIOS(2, "fr", "French")
-	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
-
-	ROM_REGION( 1, "language", 0 )
-	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
-	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
-	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
-	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
-
-	ROM_REGION( 0x2000, "speech", 0 )
-	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
-	ROM_RELOAD(            0x1000, 0x1000)
-	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
-	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
-	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
-ROM_END
-
 
 ROM_START( fpres ) // serial 0000082x
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1018,11 +822,268 @@ ROM_START( fpresgla )
 ROM_END
 
 
+ROM_START( feas )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("elite", 0x8000, 0x0800, CRC(cc904af9) SHA1(2b1d54c597a445ccc1ec73838e4bd2ac5154d7ad) ) // Intel D2764-2
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("101-1052a02", 0xc000, 0x2000, CRC(fee42863) SHA1(1854bb9cddb883d86e0d98594ac0186fb3908a01) ) // Mostek MK36C63N-5
+	ROM_LOAD("101-1052a01", 0xe000, 0x2000, CRC(41261e1b) SHA1(43664e30348a708fbe449b47e6eed39d4e9acb4c) ) // "
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) ) // NEC D2332C
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) ) // NEC D2364C
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) ) // "
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) ) // "
+ROM_END
+
+ROM_START( feasbu )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("eli_bu3", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) )
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("eli_bu1", 0xc000, 0x2000, CRC(859d69f1) SHA1(a8b057683369e2387f22fc7e916b6f3c75d44b21) )
+	ROM_LOAD("eli_bu2", 0xe000, 0x2000, CRC(571a33a7) SHA1(43b110cf0918caf16643178f401e58b2dc73894f) )
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( feasbua ) // model EWC
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("white_a", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // HN482764G-2
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("black", 0xc000, 0x0800, CRC(132b7f68) SHA1(a7aaac221387275f3a11f4441dcef73c2bfd0ee6) ) // M5L2764K
+	ROM_CONTINUE( 0xd000, 0x0800 )
+	ROM_CONTINUE( 0xc800, 0x0800 )
+	ROM_CONTINUE( 0xd800, 0x0800 )
+	ROM_LOAD("green", 0xe000, 0x0800, CRC(c7bbfbbe) SHA1(63fe13d0e64d1e5c1ea1b4de13ac3e753797a992) ) // M5L2764K - only 4 bytes different from feasbu (after descramble)
+	ROM_CONTINUE( 0xf000, 0x0800 )
+	ROM_CONTINUE( 0xe800, 0x0800 )
+	ROM_CONTINUE( 0xf800, 0x0800 )
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( feasgla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("4.0_8_6", 0x8000, 0x0800, CRC(32784e2d) SHA1(dae060a5c49cc1993a78db293cd80464adfd892d) )
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("4.0_c_5", 0xc000, 0x0800, CRC(ddb80412) SHA1(b1d9435d9a71b8eb241a2169bfbaa0499f510769) )
+	ROM_CONTINUE( 0xd000, 0x0800 )
+	ROM_CONTINUE( 0xc800, 0x0800 )
+	ROM_CONTINUE( 0xd800, 0x0800 )
+	ROM_LOAD("4.0_e_4", 0xe000, 0x0800, CRC(62a5305a) SHA1(a361bd9a54b903d7b0fbacabe55ea5ccbbc1dc51) )
+	ROM_CONTINUE( 0xf000, 0x0800 )
+	ROM_CONTINUE( 0xe800, 0x0800 )
+	ROM_CONTINUE( 0xf800, 0x0800 )
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( feasglaa ) // model EAS-C
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("orange", 0x8000, 0x0800, CRC(32784e2d) SHA1(dae060a5c49cc1993a78db293cd80464adfd892d) )
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("black", 0xc000, 0x0800, CRC(3f0b01b6) SHA1(fe8d214f1678e000ba945e2f6dc3438af97c6f33) ) // only 2 bytes different from feasgla
+	ROM_CONTINUE( 0xd000, 0x0800 )
+	ROM_CONTINUE( 0xc800, 0x0800 )
+	ROM_CONTINUE( 0xd800, 0x0800 )
+	ROM_LOAD("green", 0xe000, 0x0800, CRC(62a5305a) SHA1(a361bd9a54b903d7b0fbacabe55ea5ccbbc1dc51) )
+	ROM_CONTINUE( 0xf000, 0x0800 )
+	ROM_CONTINUE( 0xe800, 0x0800 )
+	ROM_CONTINUE( 0xf800, 0x0800 )
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( feasglab )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("6a", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("5a", 0xc000, 0x0800, CRC(f094e625) SHA1(fef84c6a3da504aac15988ec9af94417e5fedfbd) )
+	ROM_CONTINUE( 0xd000, 0x0800 )
+	ROM_CONTINUE( 0xc800, 0x0800 )
+	ROM_CONTINUE( 0xd800, 0x0800 )
+	ROM_LOAD("4a", 0xe000, 0x0800, CRC(5f6845d1) SHA1(684eb16faf36a49560e5a73b55fd0022dc090e35) )
+	ROM_CONTINUE( 0xf000, 0x0800 )
+	ROM_CONTINUE( 0xe800, 0x0800 )
+	ROM_CONTINUE( 0xf800, 0x0800 )
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( feasx ) // 510-1071B01 PCB
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("exp_8000_6", 0xa000, 0x2000, CRC(b555c5ab) SHA1(d85ae44f0c13e2bfafbc3cadf829e74c7f4ba2e3) ) // Seeq DQ5133-25
+	ROM_LOAD("exp_c000_5", 0xc000, 0x2000, CRC(fd8471e3) SHA1(e684ded8ed4934bc5ef0cc4ae37dc5d12496d39e) ) // "
+	ROM_LOAD("exp_e000_4", 0xe000, 0x2000, CRC(19c36d83) SHA1(33438c316284182ebe195a383bb2d96d3524c88d) ) // "
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+
 ROM_START( feag ) // model 6081, aka "Mobile Master" - checksum BE41 9B27 E959 42C1
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("eg_orange.ic9", 0xa000, 0x2000, CRC(df9e7e74) SHA1(db76750eba5515213ecce07402c4d974c14e1a23) ) // M5L2764K, orange sticker
 	ROM_LOAD("eg_black.ic5",  0xc000, 0x2000, CRC(a5f6f295) SHA1(319f00d4b7a1704a3ca722c40f4096004b4b89d2) ) // M5L2764K, black sticker
 	ROM_LOAD("eg_green.ic4",  0xe000, 0x2000, CRC(1dc6508a) SHA1(6f2e730b216bfb900074d1d786124fc3cb038a8d) ) // M5L2764K, green sticker
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107.ic16", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(                 0x1000, 0x1000)
+	ROMX_LOAD("101-64101.ic16", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105.ic16", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106.ic16", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( feagpriv ) // based on feag
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("e86_2_umbau", 0x8000, 0x8000, CRC(511c2203) SHA1(78c1aa68c51b8fa45578945ceb79fe0c72f828a1) ) // HN27256G-25
 
 	// speech ROM
 	ROM_DEFAULT_BIOS("en")
@@ -1112,14 +1173,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1983, feas,      0,      0,      eas,      eas,   elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (original program)", MACHINE_SUPPORTS_SAVE )
-SYST( 1983, feasbu,    feas,   0,      eas,      eas,   elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EAS)", MACHINE_SUPPORTS_SAVE )
-SYST( 1983, feasbua,   feas,   0,      ewc,      ewc,   elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EWC)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, feasgla,   feas,   0,      easc,     easc,  elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, feasglaa,  feas,   0,      easc,     easc,  elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, feasglab,  feas,   0,      easc,     easc,  elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, feasx,     feas,   0,      easx,     easx,  elite_state, empty_init, "Fidelity Computer Products", "Elite A/S Challenger (experimental)", MACHINE_SUPPORTS_SAVE )
-
 SYST( 1982, fpres,     0,      0,      pc,       pc,    elite_state, empty_init, "Fidelity Electronics", "Prestige Challenger (original program, set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, fpresa,    fpres,  0,      pc,       pc,    elite_state, empty_init, "Fidelity Electronics", "Prestige Challenger (original program, set 2)", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, fpresb,    fpres,  0,      pc,       pc,    elite_state, empty_init, "Fidelity Electronics", "Prestige Challenger (original program, set 3)", MACHINE_SUPPORTS_SAVE )
@@ -1129,6 +1182,15 @@ SYST( 1982, fprese,    fpres,  0,      pc,       pc,    elite_state, empty_init,
 SYST( 1983, fpresbu,   fpres,  0,      pc,       pc,    elite_state, empty_init, "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE )
 SYST( 1984, fpresgla,  fpres,  0,      pc,       pc,    elite_state, empty_init, "Fidelity Electronics", "Prestige Challenger (Glasgow program)", MACHINE_SUPPORTS_SAVE )
 
+SYST( 1983, feas,      0,      0,      eas,      eas,   elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (original program)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, feasbu,    feas,   0,      eas,      eas,   elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EAS)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, feasbua,   feas,   0,      ewc,      ewc,   elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EWC)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, feasgla,   feas,   0,      easc,     easc,  elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, feasglaa,  feas,   0,      easc,     easc,  elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, feasglab,  feas,   0,      easc,     easc,  elite_state, empty_init, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, feasx,     feas,   0,      easx,     easx,  elite_state, empty_init, "Fidelity Computer Products", "Elite A/S Challenger (experimental)", MACHINE_SUPPORTS_SAVE )
+
 SYST( 1986, feag,      0,      0,      eag,      eag,   elite_state, init_eag,   "Fidelity International", "Elite Avant Garde (model 6081)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, feagpriv,  feag,   0,      eagpriv,  easx,  elite_state, empty_init, "Fidelity Deutschland", "Elite Private Line (EAG 6081 conversion)", MACHINE_SUPPORTS_SAVE )
 SYST( 1986, feag2100,  feag,   0,      eag2100,  eag,   elite_state, init_eag,   "Fidelity International", "Elite Avant Garde 2100 (set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1986, feag2100a, feag,   0,      eag2100,  eag,   elite_state, init_eag,   "Fidelity International", "Elite Avant Garde 2100 (set 2)", MACHINE_SUPPORTS_SAVE )

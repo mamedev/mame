@@ -168,6 +168,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -184,8 +185,8 @@ namespace {
 class spaceg_state : public driver_device
 {
 public:
-	spaceg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	spaceg_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_io9400(*this, "io9400"),
@@ -238,6 +239,7 @@ void spaceg_state::driver_start()
 	save_item(NAME(m_sound3));
 }
 
+
 /*************************************
  *
  *  Video emulation
@@ -251,7 +253,7 @@ void spaceg_state::spaceg_palette(palette_device &palette) const
 
 	// proms are currently undumped...
 	palette.set_pen_color( 0, rgb_t(0x00, 0x00, 0x00)); //ok czarny
-	palette.set_pen_color( 1, rgb_t(0x7f, 0x00, 0x00));//???
+	palette.set_pen_color( 1, rgb_t(0x7f, 0x00, 0x00)); //???
 	palette.set_pen_color( 2, rgb_t(0xff, 0xff, 0xff)); //ok+ bialy
 	palette.set_pen_color( 3, rgb_t(0xff, 0x00, 0x00)); //ok j.czerw.
 	palette.set_pen_color( 4, rgb_t(0x3f, 0x3f, 0xff)); //ok j.niebieski
@@ -261,12 +263,12 @@ void spaceg_state::spaceg_palette(palette_device &palette) const
 
 	palette.set_pen_color( 8, rgb_t(0xff, 0x7f, 0x00)); //ok+ pomaranczowy
 	palette.set_pen_color( 9, rgb_t(0x3f, 0xbf, 0xff)); //ok j.niebieski (ciemniejszy od 13)
-	palette.set_pen_color(10, rgb_t(0x3f, 0xbf, 0x3f));    //ok+ c.zielony
-	palette.set_pen_color(11, rgb_t(0x00, 0xff, 0x00));    //ok j.zielony
-	palette.set_pen_color(12, rgb_t(0x7f, 0x00, 0x00));    //ok brazowy (c.czerw)
-	palette.set_pen_color(13, rgb_t(0x7f, 0xbf, 0xff));    //ok j.niebieski (jasniejszy od 9)
-	palette.set_pen_color(14, rgb_t(0x00, 0xff, 0xff));//???
-	palette.set_pen_color(15, rgb_t(0x7f, 0x7f, 0x7f));//???
+	palette.set_pen_color(10, rgb_t(0x3f, 0xbf, 0x3f)); //ok+ c.zielony
+	palette.set_pen_color(11, rgb_t(0x00, 0xff, 0x00)); //ok j.zielony
+	palette.set_pen_color(12, rgb_t(0x7f, 0x00, 0x00)); //ok brazowy (c.czerw)
+	palette.set_pen_color(13, rgb_t(0x7f, 0xbf, 0xff)); //ok j.niebieski (jasniejszy od 9)
+	palette.set_pen_color(14, rgb_t(0x00, 0xff, 0xff)); //???
+	palette.set_pen_color(15, rgb_t(0x7f, 0x7f, 0x7f)); //???
 }
 
 void spaceg_state::zvideoram_w(offs_t offset, uint8_t data)
@@ -290,8 +292,8 @@ void spaceg_state::zvideoram_w(offs_t offset, uint8_t data)
 			vram_data |= sdata;
 
 			// update colorram
-			if (sdata&0xff00) m_colorram[offset] = col;
-			if (sdata&0x00ff) m_colorram[offset2] = col;
+			if (sdata & 0xff00) m_colorram[offset] = col;
+			if (sdata & 0x00ff) m_colorram[offset2] = col;
 			break;
 
 		// erase
@@ -305,18 +307,16 @@ void spaceg_state::zvideoram_w(offs_t offset, uint8_t data)
 			return;
 	}
 
-	m_videoram[offset]=vram_data>>8;
-	m_videoram[offset2]=vram_data&0xff;
+	m_videoram[offset] = vram_data >> 8;
+	m_videoram[offset2] = vram_data & 0xff;
 }
 
 
 uint8_t spaceg_state::colorram_r(offs_t offset)
 {
-	int rgbcolor;
-
 	if (offset < 0x400)
 	{
-		rgbcolor = (m_colorram[offset] << 1) | ((offset &0x100) >> 8);
+		int rgbcolor = (m_colorram[offset] << 1) | ((offset & 0x100) >> 8);
 
 		if ((offset >= 0x200) && (offset < 0x220)) /* 0xa200- 0xa21f */
 		{
@@ -360,6 +360,13 @@ uint32_t spaceg_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	return 0;
 }
+
+
+/*************************************
+ *
+ *  Sound emulation
+ *
+ *************************************/
 
 static const char *const invaders_sample_names[] =
 {
@@ -418,6 +425,7 @@ void spaceg_state::sound3_w(uint8_t data)
 	if (data & ~0x0f) logerror("spaceg sound3 unmapped %02x\n", data & ~0x0f);
 }
 
+
 /*************************************
  *
  *  Memory maps
@@ -452,7 +460,6 @@ void spaceg_state::spaceg_map(address_map &map)
 	map(0x9805, 0x9805).portr("9805");
 	map(0x9806, 0x9806).portr("9806");
 }
-
 
 
 /*************************************

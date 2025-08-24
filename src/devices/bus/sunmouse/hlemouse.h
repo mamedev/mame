@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_DEVICES_SUNMOUSE_HLEMOUSE_H
-#define MAME_DEVICES_SUNMOUSE_HLEMOUSE_H
+#ifndef MAME_BUS_SUNMOUSE_HLEMOUSE_H
+#define MAME_BUS_SUNMOUSE_HLEMOUSE_H
 
 #pragma once
 
@@ -79,4 +79,4 @@ public:
 DECLARE_DEVICE_TYPE_NS(SUN_1200BAUD_HLE_MOUSE, bus::sunmouse, hle_1200baud_device)
 DECLARE_DEVICE_TYPE_NS(SUN_4800BAUD_HLE_MOUSE, bus::sunmouse, hle_4800baud_device)
 
-#endif // MAME_DEVICES_SUNMOUSE_HLEMOUSE_H
+#endif // MAME_BUS_SUNMOUSE_HLEMOUSE_H

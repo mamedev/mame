@@ -9,12 +9,12 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_WAFADRIVE_H
-#define MAME_DEVICES_IMAGEDEV_WAFADRIVE_H
-
-#include "magtape.h"
+#ifndef MAME_IMAGEDEV_WAFADRIVE_H
+#define MAME_IMAGEDEV_WAFADRIVE_H
 
 #pragma once
+
+#include "magtape.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -46,4 +46,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(WAFADRIVE_IMAGE, wafadrive_image_device)
 
-#endif // MAME_DEVICES_IMAGEDEV_WAFADRIVE_H
+#endif // MAME_IMAGEDEV_WAFADRIVE_H

@@ -7,7 +7,7 @@
 #pragma once
 
 #include "cpu/m88000/m88000.h"
-#include "machine/ds1315.h"
+#include "machine/ds1215.h"
 #include "machine/mc68681.h"
 #include "machine/mc88200.h"
 
@@ -37,7 +37,7 @@ private:
 	required_device<mc88100_device> m_cpu;
 	required_device_array<mc88200_device, 2> m_mmu;
 
-	required_device<ds1315_device> m_rtc;
+	required_device<ds1216e_device> m_rtc;
 	required_device<scn2681_device> m_duart;
 	required_device_array<rs232_port_device, 2> m_serial;
 

@@ -806,4 +806,4 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 1983, vp415, 0, 0, vp415, vp415, vp415_state, empty_init, "Philips", "VP415", MACHINE_IS_SKELETON )
+CONS( 1983, vp415, 0, 0, vp415, vp415, vp415_state, empty_init, "Philips", "VP415", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

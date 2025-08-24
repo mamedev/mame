@@ -39,7 +39,7 @@ TODO:
 #include "emu.h"
 
 #include "bus/rs232/rs232.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/clock.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
@@ -405,7 +405,7 @@ INPUT_PORTS_END
 void sexpert_state::sexpert(machine_config &config)
 {
 	// basic machine hardware
-	M65C02(config, m_maincpu, 10_MHz_XTAL/2); // or 12_MHz_XTAL/2, also seen with R65C02
+	W65C02(config, m_maincpu, 10_MHz_XTAL/2); // or 12_MHz_XTAL/2, also seen with R65C02
 	m_maincpu->set_addrmap(AS_PROGRAM, &sexpert_state::sexpert_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 32.768_kHz_XTAL/128)); // 256Hz
@@ -444,7 +444,7 @@ void sexpert_state::sexpert(machine_config &config)
 
 	// uart (configure after video)
 	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL); // R65C51P2 - RTS to CTS, DCD to GND
-	m_acia->irq_handler().set_inputline("maincpu", m65c02_device::NMI_LINE);
+	m_acia->irq_handler().set_inputline("maincpu", w65c02_device::NMI_LINE);
 	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));

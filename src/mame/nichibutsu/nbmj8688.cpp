@@ -635,7 +635,7 @@ static INPUT_PORTS_START( kaguya )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	// NOTE:Coins counted by pressing service switch
 	PORT_DIPNAME( 0x04, 0x04, "NOTE" )                      PORT_DIPLOCATION("DSWB:3")
 	PORT_DIPSETTING(    0x04, "Coin x5" )
@@ -812,7 +812,7 @@ static INPUT_PORTS_START( idhimitu )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x20, 0x20, "Bet Max" )                   PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x20, "20" )
@@ -2232,8 +2232,9 @@ static INPUT_PORTS_START( korinaim )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( crystalg )
+	// defaults based on crystalg2 manual
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x0f, 0x0d, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x05, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:1,2,3,4")
 	PORT_DIPSETTING(    0x0d, "1 (Easy)" )
 	PORT_DIPSETTING(    0x0a, "2" )
 	PORT_DIPSETTING(    0x09, "3" )
@@ -2257,64 +2258,17 @@ static INPUT_PORTS_START( crystalg )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSWB:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSWB:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSWB:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSWB:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSWB:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSWB:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSWB:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                         // TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )                  // COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )               // SERVICE
-
-	PORT_INCLUDE( nbmjcontrols )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( crystal2 )
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x0f, 0x0d, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:1,2,3,4")
-	PORT_DIPSETTING(    0x0d, "1 (Easy)" )
-	PORT_DIPSETTING(    0x0a, "2" )
-	PORT_DIPSETTING(    0x09, "3" )
-	PORT_DIPSETTING(    0x08, "4" )
-	PORT_DIPSETTING(    0x07, "5" )
-	PORT_DIPSETTING(    0x06, "6" )
-	PORT_DIPSETTING(    0x05, "7" )
-	PORT_DIPSETTING(    0x04, "8" )
-	PORT_DIPSETTING(    0x00, "9 (Hard)" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x00, "Number of last chance" )     PORT_DIPLOCATION("DSWB:1,2")
+	PORT_DIPNAME( 0x03, 0x02, "Last Chance Count" )         PORT_DIPLOCATION("DSWB:1,2")
 	PORT_DIPSETTING(    0x03, "0" )
-	PORT_DIPSETTING(    0x02, "1" )
-	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x0c, 0x00, "SANGEN Rush" )               PORT_DIPLOCATION("DSWB:3,4")
-	PORT_DIPSETTING(    0x0c, "1" )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2324,19 +2278,81 @@ static INPUT_PORTS_START( crystal2 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DSWB:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                         // MEMORY RESET
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_TOGGLE                              // ANALYZER
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                                                       // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )                                                // COIN1
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )         // OPTION (?)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                                             // SERVICE
+
+	PORT_INCLUDE( nbmjcontrols )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( crystal2 )
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x0f, 0x05, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:1,2,3,4")  // ゲーム難易度(９＝最強)
+	PORT_DIPSETTING(    0x0d, "1 (Easy)" )
+	PORT_DIPSETTING(    0x0a, "2" )
+	PORT_DIPSETTING(    0x09, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x07, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x05, "7" )
+	PORT_DIPSETTING(    0x04, "8" )
+	PORT_DIPSETTING(    0x00, "9 (Hard)" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:5")        // 常時 OFF
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:6")        // 常時 OFF
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:7")        // 常時 OFF
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:8")        // 常時 OFF
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x03, 0x02, "Last Chance Count" )         PORT_DIPLOCATION("DSWB:1,2")      // ラストチャンス
+	PORT_DIPSETTING(    0x03, "0" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x0c, 0x00, "Sangen Rush" )               PORT_DIPLOCATION("DSWB:3,4")      // 三元ラッシュ
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                                   // 無限
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:5")        // 常時 OFF
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:6")        // 常時 OFF
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:7")        // 常時 OFF
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DSWB:8")        // DEMO音声    (suggested default is Off in manual)
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                         // MEMORY RESET
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_TOGGLE                              // ANALYZER
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                                                       // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )                                                // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                                               // OPTION (?)
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -3835,7 +3851,7 @@ ROM_START( otonano )
 	ROM_LOAD( "otona_13.bin", 0x0e0000, 0x20000, CRC(208dee43) SHA1(f154ac4dab929c6f610038dbbebcf5283258e553) )
 ROM_END
 
-ROM_START( mjcamera )
+ROM_START( mjcamerao )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "mcam_01.bin", 0x00000, 0x10000, CRC(73d4b9ff) SHA1(219bc9617c14490d70bb3e28ab497dfd2ef01cf8) )
 
@@ -3987,4 +4003,4 @@ GAME( 1988, mjsikakc, mjsikaku, mjsikaku,        mjsikaku, nbmj8688_state, empty
 GAME( 1988, mjsikakd, mjsikaku, mjsikaku,        mjsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880802)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mmsikaku, mjsikaku, mmsikaku,        mmsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880929, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, otonano,  0,        otonano,         otonano,  nbmj8688_state, empty_init,    ROT0, "Apple",          "Otona no Mahjong (Japan 880628)", MACHINE_SUPPORTS_SAVE ) // おとなの麻雀
-GAME( 1988, mjcamera, 0,        mjcamera,        mjcamera, nbmj8688_state, init_mjcamera, ROT0, "Miki Syouji",    "Mahjong Camera Kozou (set 1) (Japan 881109)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjcamerao,mjcamera, mjcamera,        mjcamera, nbmj8688_state, init_mjcamera, ROT0, "Miki Syouji",    "Mahjong Camera Kozou (Japan 881109, older hardware)", MACHINE_SUPPORTS_SAVE )

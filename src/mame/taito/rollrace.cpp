@@ -447,7 +447,7 @@ static INPUT_PORTS_START( rollace )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
 
-//  PORT_BIT( 0x40, IP_ACTIVE_HIGH , IPT_CUSTOM ) PORT_VBLANK("screen")  freezes frame, could be vblank ?
+//  PORT_BIT( 0x40, IP_ACTIVE_HIGH , IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))  freezes frame, could be vblank ?
 	PORT_DIPNAME( 0x40, 0x00, "Freeze" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -573,14 +573,13 @@ void rollrace_state::rollace(machine_config &config)
 	PALETTE(config, m_palette, FUNC(rollrace_state::palette), 256);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	AY8910(config, "ay1", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "rspeaker", 0.10); // verified on PCB
-	AY8910(config, "ay2", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "rspeaker", 0.10); // verified on PCB
-	AY8910(config, "ay3", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "lspeaker", 0.10); // verified on PCB
+	AY8910(config, "ay1", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "speaker", 0.10, 1); // verified on PCB
+	AY8910(config, "ay2", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "speaker", 0.10, 1); // verified on PCB
+	AY8910(config, "ay3", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "speaker", 0.10, 0); // verified on PCB
 }
 
 void rollrace_state::rollace2(machine_config &config)

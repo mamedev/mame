@@ -18,8 +18,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_MACHINE_74165_H
-#define MAME_DEVICES_MACHINE_74165_H
+#ifndef MAME_MACHINE_74165_H
+#define MAME_MACHINE_74165_H
 
 #pragma once
 
@@ -70,4 +70,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TTL165, ttl165_device)
 
-#endif // MAME_DEVICES_MACHINE_74165_H
+#endif // MAME_MACHINE_74165_H

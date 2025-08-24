@@ -6,9 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_80286_H
+#define MAME_BUS_BBC_TUBE_TUBE_80286_H
 
-#ifndef MAME_BUS_BBC_TUBE_80286_H
-#define MAME_BUS_BBC_TUBE_80286_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/i86/i286.h"
@@ -62,5 +63,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_TUBE_80286, bbc_tube_80286_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_80286_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_80286_H

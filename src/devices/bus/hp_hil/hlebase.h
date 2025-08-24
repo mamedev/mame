@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#ifndef MAME_DEVICES_HP_HIL_HLEBASE_H
-#define MAME_DEVICES_HP_HIL_HLEBASE_H
+#ifndef MAME_BUS_HP_HIL_HLEBASE_H
+#define MAME_BUS_HP_HIL_HLEBASE_H
 
 #pragma once
 
@@ -41,4 +41,4 @@ private:
 
 } // namespace bus::hp_hil
 
-#endif // MAME_DEVICES_HP_HIL_HLEBASE_H
+#endif // MAME_BUS_HP_HIL_HLEBASE_H

@@ -179,4 +179,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, lastduelm, lastduel, lastduelm, lastduelm, lastduel_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Last Duel (Modular System)", MACHINE_IS_SKELETON )
+GAME( 199?, lastduelm, lastduel, lastduelm, lastduelm, lastduel_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Last Duel (Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

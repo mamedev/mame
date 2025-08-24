@@ -91,6 +91,7 @@ protected:
 	void inc_x();
 	void inc_y();
 	void do_branch(int condition = 1);
+	void op_illegal();
 
 	// opcode handlers
 	u8 op_inc(u8 x);

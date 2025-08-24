@@ -2,6 +2,7 @@
 // copyright-holders:Ernesto Corvi
 /*
 World Cup 90 ( Tecmo ) driver
+Tecmo 6303A + 6303B PCBs
 -----------------------------
 
 Ernesto Corvi
@@ -390,7 +391,7 @@ static INPUT_PORTS_START( wc90 )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:8,7,6,5")
-	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 7C_1C ) )
@@ -586,9 +587,9 @@ void wc90_state::wc90(machine_config &config)
 
 	ym2608_device &ymsnd(YM2608(config, "ymsnd", XTAL(8'000'000)));  // verified on PCB
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "mono", 0.50);
-	ymsnd.add_route(1, "mono", 1.0);
-	ymsnd.add_route(2, "mono", 1.0);
+	ymsnd.add_route(0, "mono", 0.75);
+	ymsnd.add_route(1, "mono", 0.5);
+	ymsnd.add_route(2, "mono", 0.5);
 }
 
 void wc90_state::wc90t(machine_config &config)

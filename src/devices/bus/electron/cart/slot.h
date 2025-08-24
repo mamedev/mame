@@ -91,8 +91,8 @@
    22      0V - Zero volts.
 
 **********************************************************************/
-#ifndef MAME_BUS_ELECTRON_CARTSLOT_H
-#define MAME_BUS_ELECTRON_CARTSLOT_H
+#ifndef MAME_BUS_ELECTRON_CART_SLOT_H
+#define MAME_BUS_ELECTRON_CART_SLOT_H
 
 #pragma once
 
@@ -211,5 +211,4 @@ DECLARE_DEVICE_TYPE(ELECTRON_CARTSLOT, electron_cartslot_device)
 
 void electron_cart(device_slot_interface &device);
 
-
-#endif // MAME_BUS_ELECTRON_CARTSLOT_H
+#endif // MAME_BUS_ELECTRON_CART_SLOT_H

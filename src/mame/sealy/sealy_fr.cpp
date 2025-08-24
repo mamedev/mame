@@ -51,4 +51,4 @@ ROM_START( snowbwar )
 	DISK_IMAGE( "snowbwar", 0, SHA1(6d2f63871b73283555de8d24029234c736ff0ba3) )
 ROM_END
 
-GAME( 20??, snowbwar, 0, sealy_fr, sealy_fr, sealy_fr_state, empty_init, ROT0, "Sealy", "Snowball War - WakuWaku Yukigassen",  MACHINE_IS_SKELETON )
+GAME( 20??, snowbwar, 0, sealy_fr, sealy_fr, sealy_fr_state, empty_init, ROT0, "Sealy", "Snowball War - WakuWaku Yukigassen",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

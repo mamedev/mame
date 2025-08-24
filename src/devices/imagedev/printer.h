@@ -8,8 +8,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_PRINTER_H
-#define MAME_DEVICES_IMAGEDEV_PRINTER_H
+#ifndef MAME_IMAGEDEV_PRINTER_H
+#define MAME_IMAGEDEV_PRINTER_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(PRINTER, printer_image_device)
 
-#endif // MAME_DEVICES_IMAGEDEV_PRINTER_H
+#endif // MAME_IMAGEDEV_PRINTER_H

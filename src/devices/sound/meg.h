@@ -5,8 +5,8 @@
 //
 // Audio dsp dedicated to effects generation, part of the SWP20 lineup
 
-#ifndef DEVICES_SOUND_MEG_H
-#define DEVICES_SOUND_MEG_H
+#ifndef MAME_SOUND_MEG_H
+#define MAME_SOUND_MEG_H
 
 #pragma once
 
@@ -68,4 +68,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MEG, meg_device)
 
-#endif
+#endif // MAME_SOUND_MEG_H

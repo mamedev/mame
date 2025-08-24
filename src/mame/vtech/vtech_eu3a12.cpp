@@ -171,4 +171,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 2004, vreadere, 0, 0, vreadere, vreadere, vreadere_state, empty_init, "Video Technology", "Reader Laptop E (Germany)", MACHINE_IS_SKELETON )
+COMP( 2004, vreadere, 0, 0, vreadere, vreadere, vreadere_state, empty_init, "Video Technology", "Reader Laptop E (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

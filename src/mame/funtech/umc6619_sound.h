@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_FUNTECH_UM6619_SOUND_H
-#define MAME_FUNTECH_UM6619_SOUND_H
+#ifndef MAME_FUNTECH_UMC6619_SOUND_H
+#define MAME_FUNTECH_UMC6619_SOUND_H
 
 #pragma once
 
@@ -29,7 +29,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	TIMER_CALLBACK_MEMBER(channel_irq);
 
@@ -70,4 +70,4 @@ private:
 
 DECLARE_DEVICE_TYPE(UMC6619_SOUND, umc6619_sound_device)
 
-#endif // MAME_FUNTECH_UM6619_SOUND_H
+#endif // MAME_FUNTECH_UMC6619_SOUND_H

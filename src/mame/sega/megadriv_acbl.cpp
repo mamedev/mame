@@ -91,7 +91,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       0xff7e12.l      0x30313000        0x30313200        0x30313400
       0xff7e16.l      0x30303900        0x30313200        0x30313500
 
-3) MCU notes
+3) MCU notes (obsolete, PIC emulated now)
 
   - As I don't know how it is on real hardware, MCU simulation is more a guess than anything;
     anyway, the game now runs correctly (coins are handled and settings change)
@@ -150,7 +150,7 @@ Sunset Riders info
  - title raster effect is broken (bug in Mega Drive code, happens with normal set too)
 
 
-    TODO (barek2mb):
+    TODO (games with PIC):
     - Unknown inputs to Port B of the emulated PIC
     - MCU clock frequency
     - There is only a 50 MHz XTAL on the PCB, are the other clocks correct?
@@ -158,8 +158,123 @@ Sunset Riders info
 ****************************************************************************/
 
 #include "emu.h"
-#include "megadriv_acbl.h"
 
+#include "megadriv.h"
+
+#include "cpu/pic16c5x/pic16c5x.h"
+#include "sound/okim6295.h"
+
+namespace {
+
+class md_boot_state : public md_ctrl_state
+{
+public:
+	md_boot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_ctrl_state(mconfig, type, tag),
+		m_io_exp(*this, "EXP")
+	{ }
+
+	void megadrvb(machine_config &config) ATTR_COLD;
+	void md_bootleg(machine_config &config) ATTR_COLD;
+
+	void init_srmdb() ATTR_COLD;
+	void init_barek2ch() ATTR_COLD;
+	void init_barek3() ATTR_COLD;
+	void init_barek3a() ATTR_COLD;
+	void init_biohzdmb() ATTR_COLD;
+	void init_sonic2mb() ATTR_COLD;
+	void init_twinktmb() ATTR_COLD;
+
+protected:
+	uint16_t dsw_r(offs_t offset);
+
+	void md_bootleg_map(address_map &map) ATTR_COLD;
+
+private:
+	void aladmdb_w(uint16_t data);
+	uint16_t barek3mba_r();
+	uint16_t twinktmb_r();
+
+	optional_ioport m_io_exp;
+};
+
+// for games with emulated PIC microcontroller
+class md_boot_mcu_state : public md_boot_state
+{
+public:
+	md_boot_mcu_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_boot_state(mconfig, type, tag),
+		m_mcu(*this, "mcu"),
+		m_dsw(*this, "DSW")
+	{ }
+
+	void md_boot_mcu(machine_config &config) ATTR_COLD;
+
+private:
+	void md_boot_mcu_map(address_map &map) ATTR_COLD;
+
+	uint16_t mcu_r();
+	void mcu_w(uint16_t data);
+
+	void mcu_porta_w(uint8_t data);
+	uint8_t mcu_portc_r();
+	void mcu_portb_w(uint8_t data);
+	void mcu_portc_w(uint8_t data);
+
+	required_device<pic16c57_device> m_mcu;
+	required_ioport m_dsw;
+
+	uint8_t m_mcu_porta = 0;
+	uint8_t m_mcu_portc = 0;
+	uint8_t m_mcu_in_latch_msb = 0;
+	uint8_t m_mcu_in_latch_lsb = 0;
+	uint8_t m_mcu_out_latch_msb = 0;
+	uint8_t m_mcu_out_latch_lsb = 0;
+};
+
+class md_sonic3bl_state : public md_boot_state
+{
+public:
+	md_sonic3bl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_boot_state(mconfig, type, tag),
+		m_in_coin(*this, "COIN"),
+		m_in_mcu(*this, "MCU")
+	{ }
+
+	void init_sonic3mb() ATTR_COLD;
+
+private:
+	void prot_w(u8 data);
+	uint16_t prot_r();
+
+	required_ioport m_in_coin;
+	required_ioport m_in_mcu;
+
+	u8 m_prot_cmd = 0;
+};
+
+class md_boot_6button_state : public md_boot_state
+{
+public:
+	md_boot_6button_state(const machine_config& mconfig, device_type type, const char* tag) :
+		md_boot_state(mconfig, type, tag)
+	{
+	}
+
+	void megadrvb_6b(machine_config &config) ATTR_COLD;
+	void ssf2mdb(machine_config &config) ATTR_COLD;
+
+	void init_mk3mdb() ATTR_COLD;
+	void init_bk3ssrmb() ATTR_COLD;
+	void init_barekch() ATTR_COLD;
+	void init_srssf2mb() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	void ssf2mdb_68k_map(address_map &map) ATTR_COLD;
+};
 
 /************************************ Mega Drive Bootlegs *************************************/
 
@@ -174,10 +289,16 @@ void md_boot_state::md_bootleg_map(address_map &map)
 
 void md_boot_mcu_state::md_boot_mcu_map(address_map &map)
 {
-	md_bootleg_map(map);
+	megadriv_68k_base_map(map);
 
-	map(0x220000, 0x220001).w(FUNC(md_boot_mcu_state::mcu_w));
-	map(0x330000, 0x330001).r(FUNC(md_boot_mcu_state::mcu_r));
+	map(0x000000, 0x1fffff).rom();
+
+	// could be mirrors
+	map(0x100000, 0x100001).w(FUNC(md_boot_mcu_state::mcu_w)); // twinktmb, sonic2mb
+	map(0x200000, 0x200001).w(FUNC(md_boot_mcu_state::mcu_w)); // jparkmb, sonic3mb
+	map(0x220000, 0x220001).w(FUNC(md_boot_mcu_state::mcu_w)); // aladmdb, barek2mb
+	map(0x300000, 0x300001).r(FUNC(md_boot_mcu_state::mcu_r)); // twinktmb, sonic2mb, jparkmb, sonic3mb, barek3mba
+	map(0x330000, 0x330001).r(FUNC(md_boot_mcu_state::mcu_r)); // aladmdb, barek2mb
 }
 
 void md_boot_6button_state::ssf2mdb_68k_map(address_map &map)
@@ -188,7 +309,6 @@ void md_boot_6button_state::ssf2mdb_68k_map(address_map &map)
 	map(0x770070, 0x770075).r(FUNC(md_boot_6button_state::dsw_r));
 	map(0xa130f0, 0xa130ff).nopw(); // custom banking is disabled (!)
 }
-
 
 /*************************************
  *
@@ -208,25 +328,6 @@ void md_boot_state::aladmdb_w(uint16_t data)
 	logerror("aladmdb_w : %06x - data = %04x\n",m_maincpu->pc(),data);
 }
 
-uint16_t md_boot_state::aladmdb_r()
-{
-	if (m_maincpu->pc() == 0x1b2a56)
-	{
-		m_aladmdb_mcu_port = ioport("MCU")->read();
-
-		if (m_aladmdb_mcu_port & 0x100)
-			return ((m_aladmdb_mcu_port & 0x0f) | 0x100); // coin inserted, calculate the number of coins
-		else
-			return (0x100); //MCU status, needed if you fall into a pitfall
-	}
-	if (m_maincpu->pc() == 0x1b2a72) return 0x0000;
-	if (m_maincpu->pc() == 0x1b2d24) return (ioport("MCU")->read() & 0x00f0) | 0x1200;    // difficulty
-	if (m_maincpu->pc() == 0x1b2d4e) return 0x0000;
-
-	logerror("aladbl_r : %06x\n",m_maincpu->pc());
-	return 0x0000;
-}
-
 uint16_t md_boot_state::twinktmb_r()
 {
 	if (m_maincpu->pc() == 0x02f81e)
@@ -239,25 +340,18 @@ uint16_t md_boot_state::twinktmb_r()
 	return 0x0000;
 }
 
-uint16_t md_boot_state::jparkmb_r()
-{
-	if (m_maincpu->pc() == 0x1e327a)
-		return ioport("COIN")->read(); // TODO: coins don't respond well
-
-	if (m_maincpu->pc() == 0x1e3254) return 0x0000; // what's this? dips?
-
-	//logerror("jparkmb_r : %06x\n",m_maincpu->pc());
-
-	return 0x0000;
-}
-
 uint16_t md_boot_state::barek3mba_r() // missing PIC dump, simulated for now
 {
 	if (m_maincpu->pc() == 0x4dbc6)
 		return 0x0300;
 
 	if (m_maincpu->pc() == 0x4dc34)
-		return 0x0ff0; // TODO: fix this, should probably read coin inputs, as is gives 9 credits at start up
+		return 0x0201 ^ (BIT(ioport("COINS")->read(), 0) << 9); // TODO: fix this, should probably read coin inputs, as is gives 9 credits at start up
+
+	// handshake flag for previous command
+	// TODO: timing should be faster than PORT_IMPULSE(1)
+	if (m_maincpu->pc() == 0x4dc5a)
+		return BIT(ioport("COINS")->read(), 0) ^ 1;
 
 	logerror("barek3mba_r : %06x\n", m_maincpu->pc());
 	return 0x0000;
@@ -356,30 +450,28 @@ void md_boot_mcu_state::mcu_portb_w(uint8_t data)
 
 uint8_t md_boot_mcu_state::mcu_portc_r()
 {
+	uint8_t data = 0xff;
+
 	// read dip switches
 	if (BIT(m_mcu_porta, 3) == 0)
-		return m_dsw->read();
+		data &= m_dsw->read();
 
 	// read from latch
 	if (BIT(m_mcu_porta, 1) == 0)
 	{
 		if (BIT(m_mcu_porta, 0) == 0)
-			return m_mcu_in_latch_lsb;
+			data &= m_mcu_in_latch_lsb;
 		else
-			return m_mcu_in_latch_msb;
+			data &= m_mcu_in_latch_msb;
 	}
 
-	// should never go here
-	logerror("mcu: read from output latch!\n");
-
-	return 0xff;
+	return data;
 }
 
 void md_boot_mcu_state::mcu_portc_w(uint8_t data)
 {
 	m_mcu_portc = data;
 }
-
 
 /*************************************
  *
@@ -519,39 +611,51 @@ INPUT_PORTS_START( mk3mdb )
 	PORT_START("DSWC")        // Not even read in this set
 INPUT_PORTS_END
 
-// Verified from M68000 code
 INPUT_PORTS_START( aladmdb )
 	PORT_INCLUDE( md_common )
 
-	PORT_MODIFY("PAD1")     // Joypad 1 (3 button + start) NOT READ DIRECTLY
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Throw") // a
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Sword") // b
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Jump") // c
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) // start
+	PORT_MODIFY("PAD1")
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Throw") // a
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("P1 Sword") // b
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("P1 Jump") // c
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_START1) // start
 
-	PORT_MODIFY("PAD2")     // Joypad 2 (3 button + start) NOT READ DIRECTLY - not used
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	// not used
+	PORT_MODIFY("PAD2")
+	PORT_BIT(0x00ff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	// As I don't know how it is on real hardware, this is more a guess than anything
-	PORT_START("MCU")
-	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )          // Code at 0x1b2a50 - unsure if there are so many settings
-//  PORT_DIPSETTING(    0x00, "INVALID" )                   // Adds 0 credit
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
-//  PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM )         // To avoid it being changed and corrupting Coinage settings
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )       // Code at 0x1b2680
-	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )             // "PRACTICE"
-	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )           // "NORMAL"
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )             // "DIFFICULT"
-//  PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_HIGH )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) // Needed to avoid credits getting mad
+	PORT_START("DSW")
+	PORT_DIPNAME(0x0f, 0x0f, DEF_STR( Coinage ))
+	PORT_DIPSETTING(   0x05, DEF_STR( 6C_1C ))
+	PORT_DIPSETTING(   0x06, DEF_STR( 5C_1C ))
+	PORT_DIPSETTING(   0x07, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(   0x08, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(   0x01, DEF_STR( 8C_3C ))
+	PORT_DIPSETTING(   0x09, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(   0x02, DEF_STR( 5C_3C ))
+	PORT_DIPSETTING(   0x03, DEF_STR( 3C_2C ))
+	PORT_DIPSETTING(   0x0f, DEF_STR( 1C_1C ))
+//  PORT_DIPSETTING(   0x00, DEF_STR( 1C_1C )) // duplicate
+	PORT_DIPSETTING(   0x04, DEF_STR( 2C_3C ))
+	PORT_DIPSETTING(   0x0e, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(   0x0d, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(   0x0c, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(   0x0b, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(   0x0a, DEF_STR( 1C_6C ))
+	PORT_DIPNAME(0x30, 0x30, DEF_STR( Difficulty ))       // Code at 0x1b2680
+	PORT_DIPSETTING(   0x10, DEF_STR( Easy ))             // "PRACTICE"
+	PORT_DIPSETTING(   0x30, DEF_STR( Normal ))           // "NORMAL"
+//  PORT_DIPSETTING(   0x00, DEF_STR( Normal ))           // "NORMAL" (duplicate)
+	PORT_DIPSETTING(   0x20, DEF_STR( Hard ))             // "DIFFICULT"
+	PORT_DIPUNUSED(0x40, IP_ACTIVE_LOW)
+	PORT_DIPUNUSED(0x80, IP_ACTIVE_LOW)
+
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( sonic2mb )
@@ -597,11 +701,20 @@ INPUT_PORTS_START( sonic2mb )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( twinktmb )
-	PORT_INCLUDE( aladmdb )
+	PORT_INCLUDE( md_common )
+
+	PORT_MODIFY("PAD1")     // Joypad 1 (3 button + start) NOT READ DIRECTLY
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Throw") // a
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Sword") // b
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Jump") // c
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) // start
+
+	PORT_MODIFY("PAD2")     // Joypad 2 (3 button + start) NOT READ DIRECTLY - not used
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	// As I don't know how it is on real hardware, this is more a guess than anything
 
-	PORT_MODIFY("MCU")
+	PORT_START("MCU")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
@@ -621,6 +734,32 @@ INPUT_PORTS_START( twinktmb )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( jparkmb )
+	PORT_INCLUDE( md_common )
+
+	// not used
+	PORT_MODIFY("PAD2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// not read by the mcu, but physically on the pcb
+	PORT_START("DSW")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW1:8")
+
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( sonic3mb )
@@ -822,7 +961,7 @@ INPUT_PORTS_START( barek2 )
 	PORT_DIPSETTING(   0x02, DEF_STR( 5C_3C ))
 	PORT_DIPSETTING(   0x03, DEF_STR( 3C_2C ))
 	PORT_DIPSETTING(   0x0f, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(   0x00, DEF_STR( 1C_1C )) // duplicate
+//  PORT_DIPSETTING(   0x00, DEF_STR( 1C_1C )) // duplicate
 	PORT_DIPSETTING(   0x04, DEF_STR( 2C_3C ))
 	PORT_DIPSETTING(   0x0e, DEF_STR( 1C_2C ))
 	PORT_DIPSETTING(   0x0d, DEF_STR( 1C_3C ))
@@ -876,6 +1015,14 @@ INPUT_PORTS_START( barek3 )
 	PORT_DIPSETTING(    0xe0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( barek3a )
+	PORT_INCLUDE( barek3 )
+
+	PORT_MODIFY("COINS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x00fe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( bk3ssrmb )
@@ -979,12 +1126,6 @@ void md_boot_mcu_state::md_boot_mcu(machine_config &config)
 	m_mcu->write_c().set(FUNC(md_boot_mcu_state::mcu_portc_w));
 }
 
-void md_boot_6button_state::machine_start()
-{
-	md_boot_state::machine_start();
-	m_vdp->stop_timers();
-}
-
 void md_boot_6button_state::megadrvb_6b(machine_config &config)
 {
 	megadrvb(config);
@@ -1000,29 +1141,17 @@ void md_boot_6button_state::ssf2mdb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_6button_state::ssf2mdb_68k_map);
 }
 
+void md_boot_6button_state::machine_start()
+{
+	md_boot_state::machine_start();
+	m_vdp->stop_timers();
+}
 
 /*************************************
  *
  *  Game-specific driver inits
  *
  *************************************/
-
-#define ENERGY_CONSOLE_MODE 0
-
-void md_boot_state::init_aladmdb()
-{
-	// Game does a check @ 1afc00 with work RAM fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
-#if ENERGY_CONSOLE_MODE
-	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
-	rom[0x1afc08/2] = 0x6600;
-#endif
-
-	// 220000 = writes to mcu? 330000 = reads?
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x220000, 0x220001, write16smo_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x330000, 0x330001, read16smo_delegate(*this, FUNC(md_boot_state::aladmdb_r)));
-
-	init_megadrij();
-}
 
 // This should be correct, the areas of the ROM that differ to the original
 // after this decode look like intentional changes
@@ -1074,7 +1203,7 @@ void md_boot_6button_state::init_mk3mdb()
 
 void md_boot_state::init_srmdb()
 {
-	uint8_t* rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int x = 0x00001; x < 0x40000; x += 2)
 	{
@@ -1130,7 +1259,7 @@ void md_boot_state::init_barek2ch()
 
 void md_boot_state::init_barek3()
 {
-	uint8_t* rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int x = 0x00001; x < 0x300000; x += 2)
 	{
@@ -1152,7 +1281,7 @@ void md_boot_state::init_barek3a()
 
 void md_boot_6button_state::init_bk3ssrmb()
 {
-	uint8_t* rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int x = 0x00001; x < 0x80000; x += 2)
 	{
@@ -1229,7 +1358,7 @@ void md_sonic3bl_state::init_sonic3mb()
 void md_boot_state::init_twinktmb()
 {
 	// boot vectors don't seem to be valid, so they are patched...
-	uint8_t* rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	rom[0x01] = 0x00;
 
 	rom[0x04] = 0x00;
@@ -1241,13 +1370,25 @@ void md_boot_state::init_twinktmb()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16smo_delegate(*this, FUNC(md_boot_state::twinktmb_r)));
 }
 
-void md_boot_state::init_jparkmb()
+void md_boot_state::init_biohzdmb()
 {
-	init_megadrij();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16smo_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16smo_delegate(*this, FUNC(md_boot_state::jparkmb_r)));
-}
+	uint8_t *rom = memregion("maincpu")->base();
 
+	for (int x = 0x00001; x < 0x80000; x += 2)
+		rom[x] = bitswap<8>(rom[x] ^ 0xff, 0, 3, 2, 5, 4, 6, 7, 1);
+
+	for (int x = 0x80001; x < 0x100000; x += 2)
+		rom[x] = bitswap<8>(rom[x], 6, 4, 0, 5, 1, 3, 2, 7);
+
+	// boot vectors don't seem to be valid, so they are patched...
+	rom[0x04] = 0x00;
+	rom[0x05] = 0x00;
+	rom[0x06] = 0x04;
+	rom[0x07] = 0x02;
+
+	init_megadrij();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::dsw_r)));
+}
 
 /*************************************
  *
@@ -1261,9 +1402,12 @@ ROM_START( aladmdb )
 	ROM_LOAD16_BYTE( "m2.bin", 0x000000, 0x080000,  CRC(142a0366) SHA1(6c94aa9936cd11ccda503b52019a6721e64a32f0) )
 	ROM_LOAD16_BYTE( "m3.bin", 0x100001, 0x080000,  CRC(0feeeb19) SHA1(bd567a33077ab9997871d21736066140d50e3d70) )
 	ROM_LOAD16_BYTE( "m4.bin", 0x100000, 0x080000,  CRC(bc712661) SHA1(dfd554d000399e17b4ddc69761e572195ed4e1f0) )
+#if 0
+	ROM_FILL(0x1afc08, 1, 0x66) // makes it play like the original console version (i.e. 8 energy hits instead of 2)
+#endif
 
-	ROM_REGION( 0x1000, "pic", ROMREGION_ERASE00 )
-	ROM_LOAD( "pic16c57xtp", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "pic16c57.bin", 0x0000, 0x2000, CRC(f35ded67) SHA1(c46f39ffe92c9d01f3b5e1380039ead488cbf41a) )
 ROM_END
 
 ROM_START( mk3mdb ) // ROMs are scrambled, we take care of the address descramble in the ROM load, and the data descramble in the init
@@ -1398,8 +1542,8 @@ ROM_START( jparkmb ) // Same PCB as twinktmb, JPA-028 label
 	ROM_LOAD16_BYTE( "f22.bin", 0x100000, 0x080000,  CRC(36337d06) SHA1(d537cff2c8ed58da146faf390c09252be359ccd1) )
 	ROM_LOAD16_BYTE( "f21.bin", 0x100001, 0x080000,  CRC(6ede6b6b) SHA1(cf29300d9278ea03f54cf54ea582bdd8b9bbdbbd) )
 
-	ROM_REGION( 0x1000, "pic", ROMREGION_ERASE00 )
-	ROM_LOAD( "pic16c57xtp", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "pic16c57.bin", 0x0000, 0x2000, CRC(4101ff42) SHA1(f00bb8a94bbbea8cda7d0cbcffc9721804e08dbd) )
 ROM_END
 
 ROM_START( barekch ) // all 27c010
@@ -1418,6 +1562,13 @@ ROM_START( barek2ch ) // all 27c4001
 	ROM_LOAD16_BYTE( "u17", 0x100000, 0x080000, CRC(cae1922e) SHA1(811c2164b6c467a49af4b0d22f151cd13c9efbc9) )
 ROM_END
 
+ROM_START( biohzdmb )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "u14", 0x000001, 0x080000, CRC(b96cf28c) SHA1(0a49cf2fc0a2712b423b4e1f95a4befe3bf5c746) )
+	ROM_LOAD16_BYTE( "u15", 0x000000, 0x080000, CRC(41a8eae8) SHA1(a9db565f4ca4d71c81fbb44fd429221951887bab) )
+ROM_END
+
+} // anonymous namespace
 
 /*************************************
  *
@@ -1426,20 +1577,21 @@ ROM_END
  *************************************/
 
 // PIC protected hardware with Mega Drive bootleg chipset marked TA-04, TA-05 and TA-06.
-GAME( 1993, aladmdb,   0,        megadrvb,     aladmdb,   md_boot_state,         init_aladmdb,  ROT0, "bootleg / Sega",   "Aladdin (bootleg of Mega Drive version)",                                       0 )
-GAME( 1993, sonic2mb,  0,        md_bootleg,   sonic2mb,  md_boot_state,         init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Mega Drive version)",                                   0 ) // Flying wires going through the empty PIC space aren't completely understood
-GAME( 1993, sonic3mb,  0,        md_bootleg,   sonic3mb,  md_sonic3bl_state,     init_sonic3mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 3 (bootleg of Mega Drive version)",                                   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
-GAME( 1994, barek2mb,  0,        md_boot_mcu,  barek2,    md_boot_mcu_state,     init_megadrij, ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Mega Drive version)",                                        0 ) // PCB labeled "BK-059"
-GAME( 1994, barek3mba, barek3mb, megadrvb,     barek3,    md_boot_state,         init_barek3a,  ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Mega Drive version)",                            MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
-GAME( 1993, twinktmb,  0,        md_bootleg,   twinktmb,  md_boot_state,         init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Mega Drive version)",                                           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
-GAME( 1993, jparkmb,   0,        md_bootleg,   twinktmb,  md_boot_state,         init_jparkmb,  ROT0, "bootleg / Sega",   "Jurassic Park (bootleg of Mega Drive version)",                                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
+GAME( 1993, aladmdb,   0,        md_boot_mcu, aladmdb,  md_boot_mcu_state, init_megadrij, ROT0, "bootleg / Sega", "Aladdin (bootleg of Mega Drive version)",              0 )
+GAME( 1993, sonic2mb,  0,        md_bootleg,  sonic2mb, md_boot_state,     init_sonic2mb, ROT0, "bootleg / Sega", "Sonic The Hedgehog 2 (bootleg of Mega Drive version)", 0 ) // Flying wires going through the empty PIC space aren't completely understood
+GAME( 1993, sonic3mb,  0,        md_bootleg,  sonic3mb, md_sonic3bl_state, init_sonic3mb, ROT0, "bootleg / Sega", "Sonic The Hedgehog 3 (bootleg of Mega Drive version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
+GAME( 1994, barek2mb,  0,        md_boot_mcu, barek2,   md_boot_mcu_state, init_megadrij, ROT0, "bootleg / Sega", "Bare Knuckle II (bootleg of Mega Drive version)",      0 ) // PCB labeled "BK-059"
+GAME( 1994, barek3mba, barek3mb, megadrvb,    barek3a,  md_boot_state,     init_barek3a,  ROT0, "bootleg / Sega", "Bare Knuckle III (bootleg of Mega Drive version)",     MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
+GAME( 1993, twinktmb,  0,        md_bootleg,  twinktmb, md_boot_state,     init_twinktmb, ROT0, "bootleg / Sega", "Twinkle Tale (bootleg of Mega Drive version)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
+GAME( 1993, jparkmb,   0,        md_boot_mcu, jparkmb,  md_boot_mcu_state, init_megadrij, ROT0, "bootleg / Sega", "Jurassic Park (bootleg of Mega Drive version)",        0 ) // PCB labeled "JPA-028"
 
 // Scrambled bootlegs with Actel for scrambling and Mega Drive bootleg chipset marked TA-04, TA-05 and TA-06.
-GAME( 1994, barekch,   0,        megadrvb_6b,  barekch,   md_boot_6button_state, init_barekch,  ROT0, "bootleg",          "Bare Knuckle (scrambled bootleg of Mega Drive version)",                                   0 )
-GAME( 1994, barek2ch,  0,        md_bootleg,   barek2ch,  md_boot_state,         init_barek2ch, ROT0, "bootleg",          "Bare Knuckle II (scrambled bootleg of Mega Drive version)",                                0 )
-GAME( 1994, barek3mb,  0,        megadrvb,     barek3,    md_boot_state,         init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (scrambled bootleg of Mega Drive version)",                                       0 )
-GAME( 1994, bk3ssrmb,  0,        megadrvb_6b,  bk3ssrmb,  md_boot_6button_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (scrambled bootleg of Mega Drive versions)",                      MACHINE_NOT_WORKING ) // Currently boots as Bare Knuckle III, mechanism to switch game not emulated yet
-GAME( 1994, srssf2mb,  0,        megadrvb_6b,  bk3ssrmb,  md_boot_6button_state, init_srssf2mb, ROT0, "bootleg / Sega",   "Sunset Riders / Super Street Fighter II - The New Challengers (scrambled bootleg of Mega Drive versions)", MACHINE_NOT_WORKING )
-GAME( 1996, mk3mdb,    0,        megadrvb_6b,  mk3mdb,    md_boot_6button_state, init_mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (scrambled bootleg of Mega Drive version)",                                        0 )
-GAME( 1994, ssf2mdb,   0,        ssf2mdb,      ssf2mdb,   md_boot_6button_state, init_megadrij, ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (scrambled bootleg of Mega Drive version)", 0 )
-GAME( 1993, srmdb,     0,        megadrvb,     srmdb,     md_boot_state,         init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (scrambled bootleg of Mega Drive version)",                                          0 )
+GAME( 1994, barekch,   0,        megadrvb_6b, barekch,   md_boot_6button_state, init_barekch,  ROT0, "bootleg",          "Bare Knuckle (scrambled bootleg of Mega Drive version)",                                                   0 )
+GAME( 1994, barek2ch,  0,        md_bootleg,  barek2ch,  md_boot_state,         init_barek2ch, ROT0, "bootleg",          "Bare Knuckle II (scrambled bootleg of Mega Drive version)",                                                0 )
+GAME( 1994, barek3mb,  0,        megadrvb,    barek3,    md_boot_state,         init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (scrambled bootleg of Mega Drive version)",                                               0 )
+GAME( 1994, bk3ssrmb,  0,        megadrvb_6b, bk3ssrmb,  md_boot_6button_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (scrambled bootleg of Mega Drive versions)",                              MACHINE_NOT_WORKING ) // Currently boots as Bare Knuckle III, mechanism to switch game not emulated yet
+GAME( 1994, srssf2mb,  0,        megadrvb_6b, bk3ssrmb,  md_boot_6button_state, init_srssf2mb, ROT0, "bootleg / Sega",   "Sunset Riders / Super Street Fighter II - The New Challengers (scrambled bootleg of Mega Drive versions)", MACHINE_NOT_WORKING )
+GAME( 1996, mk3mdb,    0,        megadrvb_6b, mk3mdb,    md_boot_6button_state, init_mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (scrambled bootleg of Mega Drive version)",                                                0 )
+GAME( 1994, ssf2mdb,   0,        ssf2mdb,     ssf2mdb,   md_boot_6button_state, init_megadrij, ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (scrambled bootleg of Mega Drive version)",                  0 )
+GAME( 1993, srmdb,     0,        megadrvb,    srmdb,     md_boot_state,         init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (scrambled bootleg of Mega Drive version)",                                                  0 )
+GAME( 1993, biohzdmb,  0,        megadrvb,    srmdb,     md_boot_state,         init_biohzdmb, ROT0, "bootleg / Sega",   "Bio-Hazard Battle (scrambled bootleg of Mega Drive version)",                                              MACHINE_NOT_WORKING ) // inputs

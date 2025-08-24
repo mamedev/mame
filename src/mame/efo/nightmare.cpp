@@ -50,10 +50,10 @@
 
   2x CDP1852 (I/O).
 
-  1x Xtal @ 2.9500 MHz.
+  1x Xtal @ 2.9500 MHz. Some sound PCBs were shipped with 3.000 MHz xtals.
 
-  Sound ROM is missing.
-  Overall the board is pretty much dead, no interruptions observed, no video sync output.
+  1x TMS2564 EPROM.
+
 
   PCBs layout:
 
@@ -74,8 +74,8 @@
   | |CDP1859CE |     |CDP1824CE |                     |     IC36 |TMS4116|   |TMS4116| IC22    |     RCA     |         2 | O |
   | '----------'     '----------'       IC9           |          '-------'   '-------'         '-------------'           | O |
   |     IC1      .--------------. .--------------.    |          .-------.   .-------.                                   | O |
-  | .----------. |   MISSING    | |  EFO 90503   |    |     IC37 |TMS4116|   |TMS4116| IC23    .-------------.           | O |
-  | |CDP1859CE | |    EPROM     | |              |    |          '-------'   '-------'         | CDP 1852 CE | IC10      '---|
+  | .----------. |   TMS 2564   | |  EFO 90503   |    |     IC37 |TMS4116|   |TMS4116| IC23    .-------------.           | O |
+  | |CDP1859CE | |   SCL 1A1    | |              |    |          '-------'   '-------'         | CDP 1852 CE | IC10      '---|
   | '----------' '--------------' '--------------'   O=O         .-------.   .-------.         |     RCA     |               |
   |                    IC5               IC8         O=O    IC38 |TMS4116|   |TMS4116| IC24    '-------------'               |
   |                                .-------------.   O=O         '-------'   '-------'                                       |
@@ -158,7 +158,7 @@
   01: Ubb (Substrate vias).                         10) CS2 (Chip select inputs: 12 bits CW).
   02: Udd (Supply voltage).                         11) CS2 (Chip select inputs: 12 bits CW).
   03: Uph (Programming voltage).                    12) Φ (Clock input).
-  04: STWL (Lenght of Control Word: 8/12 bits).     13) L (Programming signal output) (load).
+  04: STWL (Length of Control Word: 8/12 bits).     13) L (Programming signal output) (load).
   05: N/C.                                          14) Dq (Data output).
   06: /RES (Reset input).                           15) INV (Invert input signals).
   07: N/C.                                          16) REC (Data input control) (receive).
@@ -166,7 +166,7 @@
   09: CS3 (Chip select inputs: 8 or 12 bits CW).    18) Upi (Write voltage).
 
 
-  Since STWL is connected to GND, the control word is set to 8-bit lenght.
+  Since STWL is connected to GND, the control word is set to 8-bit length.
 
 
 
@@ -198,15 +198,14 @@
 
   TODO:
 
-  - Soft reset doesn't work.
   - Verify video mixing (Press F2 to enter service mode, then press 1 + 2 to continue
     to settings screen. There's diagnostic color pattern at the top of screen)
-  - Add sound hardware (ROM is missing)
   - Quitting MAME while in service mode settings screen will invalidate settings
 
 ******************************************************************************/
 
 #include "emu.h"
+#include "efo_sound3.h"
 #include "video/tms9928a.h"
 #include "cpu/cosmac/cosmac.h"
 #include "machine/cdp1852.h"
@@ -216,6 +215,8 @@
 namespace {
 
 #define MASTER_CLOCK    XTAL(10'816'000)
+
+// Some sound PCBs were shipped with 3.000 MHz xtals
 #define SOUND_CLOCK     XTAL( 2'950'000)
 
 class nightmare_state : public driver_device
@@ -224,9 +225,8 @@ public:
 	nightmare_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "cdp1802")
-		, m_soundcpu(*this,"cdp1802_sound")
-		, m_vdc(*this, "vdc")
-		, m_vdc2(*this, "vdc2")
+		, m_sound3(*this, "sound3")
+		, m_vdc(*this, "vdc%u", 1)
 		, m_eeprom(*this,"eeprom")
 	{ }
 
@@ -236,6 +236,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+private:
 	TIMER_CALLBACK_MEMBER(clear_reset);
 
 	int clear_r();
@@ -243,18 +244,15 @@ protected:
 	int ef2_r();
 	void q_w(int state);
 	void ic10_w(uint8_t data);
-	void unkout_w(uint8_t data);
+	void sound_w(uint8_t data);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
-	void sound_io_map(address_map &map) ATTR_COLD;
 	uint32_t screen_update_nightmare(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cosmac_device> m_maincpu;
-	required_device<cosmac_device> m_soundcpu;
-	required_device<tms9928a_device> m_vdc;
-	required_device<tms9928a_device> m_vdc2;
+	required_device<efo_sound3_device> m_sound3;
+	required_device_array<tms9928a_device, 2> m_vdc;
 	required_device<sda2006_device> m_eeprom;
 
 	// cpu state
@@ -274,7 +272,7 @@ void nightmare_state::machine_start()
 	m_reset_timer = timer_alloc(FUNC(nightmare_state::clear_reset), this);
 }
 
-/* Machine Reset */
+// Machine Reset
 
 void nightmare_state::machine_reset()
 {
@@ -282,7 +280,7 @@ void nightmare_state::machine_reset()
 	m_reset_timer->adjust(attotime::from_msec(200));
 }
 
-/* CDP1802 Interface */
+// CDP1802 Interface
 
 int nightmare_state::clear_r()
 {
@@ -296,40 +294,43 @@ void nightmare_state::q_w(int state)
 
 int nightmare_state::ef1_r()
 {
-	//EEPROM Inv ???
-
+	// EEPROM Inv ???
 	return 0;
 }
 
 
 int nightmare_state::ef2_r()
 {
-	//EEPROM Dq data read;
+	// EEPROM Dq data read;
 	return m_eeprom->read_data();
 }
 
 
 void nightmare_state::ic10_w(uint8_t data)
 {
-  /*
-    7 - EEPROM Di
-    6 - EEPROM Clock
-    5 - J2
-    4 - J2
-    3 - J2
-    2 - J2
-    1 - J2
-    0 - ?
-  */
+	// 7 - EEPROM Di
+	// 6 - EEPROM Clock
+	// 5 - J2
+	// 4 - J2
+	// 3 - J2
+	// 2 - J2
+	// 1 - J2
+	// 0 - ?
 
-	m_eeprom->write_data((data&0x80) ?1:0);
-	m_eeprom->write_enable((data&0x40) ?1:0);
+	m_eeprom->write_data(BIT(data, 7));
+	m_eeprom->write_enable(BIT(data, 6));
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
 }
 
 
-void nightmare_state::unkout_w(uint8_t data)
+void nightmare_state::sound_w(uint8_t data)
 {
-  // J3
+	// J3
+	m_sound3->input_w(data);
+	m_sound3->clock_w(1);
+	m_sound3->clock_w(0);
 }
 
 void nightmare_state::main_map(address_map &map)
@@ -340,20 +341,11 @@ void nightmare_state::main_map(address_map &map)
 
 void nightmare_state::io_map(address_map &map)
 {
-	map(1, 1).r("ic8", FUNC(cdp1852_device::read)).w(FUNC(nightmare_state::unkout_w));
+	map(1, 1).r("ic8", FUNC(cdp1852_device::read)).w(FUNC(nightmare_state::sound_w));
 	map(2, 2).r("ic9", FUNC(cdp1852_device::read)).w("ic10", FUNC(cdp1852_device::write));
 
-	map(4, 5).rw(m_vdc, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
-	map(6, 7).rw(m_vdc2, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
-}
-
-void nightmare_state::sound_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rom();
-}
-
-void nightmare_state::sound_io_map(address_map &map)
-{
+	map(4, 5).rw(m_vdc[0], FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
+	map(6, 7).rw(m_vdc[1], FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 }
 
 uint32_t nightmare_state::screen_update_nightmare(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -361,8 +353,8 @@ uint32_t nightmare_state::screen_update_nightmare(screen_device &screen, bitmap_
 	// combine two buffers (additive?)
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint32_t const *const bitmap1 = &m_vdc2->get_bitmap().pix(y);
-		uint32_t const *const bitmap2 = &m_vdc->get_bitmap().pix(y);
+		uint32_t const *const bitmap1 = &m_vdc[1]->get_bitmap().pix(y);
+		uint32_t const *const bitmap2 = &m_vdc[0]->get_bitmap().pix(y);
 		uint32_t *const dst = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
@@ -371,48 +363,49 @@ uint32_t nightmare_state::screen_update_nightmare(screen_device &screen, bitmap_
 			uint32_t p2 = bitmap2[x];
 			uint32_t result = 0;
 
-			for (int shift=0; shift<32;shift+=8)
+			for (int shift = 0; shift < 32; shift += 8)
 			{
-				uint32_t const data = ((p2>>shift)&0xff)+((p1>>shift)&0xff);
-				result|=((data>0xff)?0xff:data)<<shift;
+				uint32_t const data = ((p2 >> shift) & 0xff) + ((p1 >> shift) & 0xff);
+				result |= ((data > 0xff) ? 0xff : data) << shift;
 			}
-			dst[x]=result;
+			dst[x] = result;
 		}
 	}
 
 	return 0;
 }
 
+// Note: cocktail mode setting is saved in EEPROM
 static INPUT_PORTS_START( nightmare )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) // button2: jump
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // button1: ink
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("EF")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", FUNC(cosmac_device::ef3_w)) //ic17 - cpu
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", FUNC(cosmac_device::ef3_w)) // ic17 - cpu
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER("cdp1802", FUNC(cosmac_device::ef4_w))
 INPUT_PORTS_END
 
 
 void nightmare_state::nightmare(machine_config &config)
 {
-	/* main cpu */
+	// main CPU
 	CDP1802(config, m_maincpu, MASTER_CLOCK/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nightmare_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &nightmare_state::io_map);
@@ -423,13 +416,7 @@ void nightmare_state::nightmare(machine_config &config)
 	m_maincpu->ef2_cb().set(FUNC(nightmare_state::ef2_r));
 	m_maincpu->tpb_cb().set("ic10", FUNC(cdp1852_device::clock_w));
 
-	/* sound cpu */
-	CDP1802(config, m_soundcpu, SOUND_CLOCK);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &nightmare_state::sound_map);
-	m_soundcpu->set_addrmap(AS_IO, &nightmare_state::sound_io_map);
-	m_soundcpu->set_disable();
-
-	/* i/o hardware */
+	// I/O hardware
 	cdp1852_device &ic8(CDP1852(config, "ic8"));
 	ic8.mode_cb().set_constant(0);
 	ic8.di_cb().set_ioport("IN0");
@@ -444,35 +431,37 @@ void nightmare_state::nightmare(machine_config &config)
 
 	SDA2006(config, m_eeprom);
 
-	/* video hardware */
-	EFO90501( config, m_vdc, MASTER_CLOCK );
-	m_vdc->set_screen("screen");
-	m_vdc->set_vram_size(0x4000);
+	// video hardware
+	EFO90501(config, m_vdc[0], MASTER_CLOCK);
+	m_vdc[0]->set_screen("screen");
+	m_vdc[0]->set_vram_size(0x4000);
 
-	EFO90501( config, m_vdc2, MASTER_CLOCK );
-	m_vdc2->set_screen("screen");
-	m_vdc2->set_vram_size(0x4000);
-	m_vdc2->int_callback().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
+	EFO90501(config, m_vdc[1], MASTER_CLOCK);
+	m_vdc[1]->set_screen("screen");
+	m_vdc[1]->set_vram_size(0x4000);
+	m_vdc[1]->int_callback().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(nightmare_state::screen_update_nightmare));
+
+	EFO_SOUND3(config, m_sound3);
 }
 
 
 ROM_START( nightmare )
 	ROM_REGION( 0x6000, "cdp1802", 0 )
-	ROM_LOAD( "nm1-ia1.bin", 0x0000, 0x2000, CRC(5d648f62) SHA1(028a47d4b1b4910d0d4e00f81d4e94a5478834d3) )
-	ROM_LOAD( "nm1-ib1.bin", 0x2000, 0x2000, CRC(c10695f7) SHA1(929467fe7529782e8181d3caae3a67bb0a8d8753) )
-	ROM_LOAD( "nm1-ic1.bin", 0x4000, 0x2000, CRC(a3117246) SHA1(ca9601401f7ab34200c969e41ffae50bee0aca4d) )
+	ROM_LOAD( "nm1-ia1.ic11", 0x0000, 0x2000, CRC(5d648f62) SHA1(028a47d4b1b4910d0d4e00f81d4e94a5478834d3) )
+	ROM_LOAD( "nm1-ib1.ic12", 0x2000, 0x2000, CRC(c10695f7) SHA1(929467fe7529782e8181d3caae3a67bb0a8d8753) )
+	ROM_LOAD( "nm1-ic1.ic13", 0x4000, 0x2000, CRC(a3117246) SHA1(ca9601401f7ab34200c969e41ffae50bee0aca4d) )
 
-	ROM_REGION( 0x10000, "cdp1802_sound", 0 )
-	ROM_LOAD( "sound.bin",    0x0000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x2000, "sound3:rom", 0 )
+	ROM_LOAD( "scl-1a1.ic5",  0x0000, 0x2000, CRC(4bba61af) SHA1(b324344081e3d4b5db43a8ff3122c28cf75aec84) )
 
 	ROM_REGION( 0x40, "eeprom", 0 )
-	ROM_LOAD( "eeprom", 0x00, 0x40, CRC(7824e1f8) SHA1(2ccac62b4e8abcb2b3d66fa4025947fea184664e) )
+	ROM_LOAD( "eeprom.ic7",   0x0000, 0x0040, CRC(7824e1f8) SHA1(2ccac62b4e8abcb2b3d66fa4025947fea184664e) )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 1982, nightmare, 0,        nightmare, nightmare,   nightmare_state,   empty_init, ROT90, "E.F.O.", "Night Mare (Spain)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1982, nightmare,  0,         nightmare, nightmare, nightmare_state, empty_init, ROT90, "E.F.O.", "Night Mare (Spain)", MACHINE_SUPPORTS_SAVE )

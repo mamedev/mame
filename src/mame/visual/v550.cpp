@@ -168,4 +168,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1982, v550, 0, 0, v550, v550, v550_state, empty_init, "Visual Technology", "Visual 550", MACHINE_IS_SKELETON )
+COMP( 1982, v550, 0, 0, v550, v550, v550_state, empty_init, "Visual Technology", "Visual 550", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

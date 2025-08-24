@@ -328,6 +328,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(1986, eballchps, eballchp, eballchps, zpinball, zpinball_state, empty_init, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, cobrapb,   0,        zpinball,  zpinball, zpinball_state, empty_init, ROT0, "Playbar", "Cobra (Playbar)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?, comeback,  0,        zpinball,  zpinball, zpinball_state, empty_init, ROT0, "Nondum / CIFA", "Come Back", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, eballchps, eballchp, eballchps, zpinball, zpinball_state, empty_init, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1987, cobrapb,   0,        zpinball,  zpinball, zpinball_state, empty_init, ROT0, "Playbar", "Cobra (Playbar)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(198?, comeback,  0,        zpinball,  zpinball, zpinball_state, empty_init, ROT0, "Nondum / CIFA", "Come Back", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

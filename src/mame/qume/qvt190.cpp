@@ -152,4 +152,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1987, qvt190, 0, 0, qvt190, qvt190, qvt190_state, empty_init, "Qume", "QVT-190", MACHINE_IS_SKELETON )
+COMP( 1987, qvt190, 0, 0, qvt190, qvt190, qvt190_state, empty_init, "Qume", "QVT-190", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

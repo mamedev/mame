@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_COLECO_SAC_H
-#define MAME_BUS_COLECO_SAC_H
+#ifndef MAME_BUS_COLECO_CONTROLLER_SAC_H
+#define MAME_BUS_COLECO_CONTROLLER_SAC_H
 
 #pragma once
 
@@ -51,5 +51,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(COLECO_SUPER_ACTION_CONTROLLER, coleco_super_action_controller_device)
 
-
-#endif // MAME_BUS_COLECO_SAC_H
+#endif // MAME_BUS_COLECO_CONTROLLER_SAC_H

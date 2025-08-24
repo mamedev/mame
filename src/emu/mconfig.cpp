@@ -87,7 +87,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 				slot.set_card_device(new_dev);
 
 				char const *const default_bios = option->default_bios();
-				if (default_bios != nullptr)
+				if (default_bios)
 					new_dev->set_default_bios_tag(default_bios);
 
 				auto additions = option->machine_config();
@@ -404,6 +404,6 @@ void machine_config::set_perfect_quantum(device_t &device, std::string tag)
 				m_current_device->tag());
 	}
 
-	m_perfect_quantum_device.first = &device;
+	m_perfect_quantum_device.first = tag.empty() ? nullptr : &device;
 	m_perfect_quantum_device.second = std::move(tag);
 }

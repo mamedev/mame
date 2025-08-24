@@ -9,9 +9,10 @@ It was made for the US market. The chess engine is actually the one from
 Mephisto Dallas.
 
 Hardware notes:
+- PCB label: HGS 10 115 01
 - TS68000CP12 @ 12MHz
-- 64KB ROM
-- 16KB RAM
+- 64KB ROM (2*D27C256)
+- 16KB RAM (2*TC5565APL-15L)
 - PCF2112T LCD driver
 
 TODO:
@@ -239,5 +240,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME       PARENT    COMPAT  MACHINE      INPUT       CLASS             INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1988, mondl68k,  0,        0,      mondial68k,  mondial68k, mondial68k_state, empty_init, "Hegener + Glaser", "Mephisto Mondial 68000XL", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1988, mondl68k, 0,       0,      mondial68k, mondial68k, mondial68k_state, empty_init, "Hegener + Glaser", "Mephisto Mondial 68000XL", MACHINE_SUPPORTS_SAVE )

@@ -118,4 +118,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY  FULLNAME    FLAGS
-COMP( 1995, 4000_260, 0,      0,      _4000_260, _4000_260, _4000_260_state, empty_init, "ADDS",  "4000/260", MACHINE_IS_SKELETON )
+COMP( 1995, 4000_260, 0,      0,      _4000_260, _4000_260, _4000_260_state, empty_init, "ADDS",  "4000/260", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

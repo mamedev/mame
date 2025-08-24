@@ -147,8 +147,6 @@ uint32_t cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb3
 	m_vector->screen_update(screen, bitmap, cliprect);
 	m_vector->clear_list();
 
-	m_maincpu->wdt_timer_trigger();
-
 	return 0;
 }
 

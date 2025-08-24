@@ -491,9 +491,9 @@ void extension_state::init_mgcs2l()
 
 
 // hosts
-GAME( 1999, mgcs2h, 0, host, host, host_state, empty_init, ROT0, "IGS", "Manguan Caishen 2 (link version, host)", MACHINE_IS_SKELETON )
-GAME( 1999, cjslh,  0, host, host, host_state, empty_init, ROT0, "IGS", "Cai Jin Shen Long (link version, host)", MACHINE_IS_SKELETON )
+GAME( 1999, mgcs2h, 0, host, host, host_state, empty_init, ROT0, "IGS", "Manguan Caishen 2 (link version, host)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, cjslh,  0, host, host, host_state, empty_init, ROT0, "IGS", "Cai Jin Shen Long (link version, host)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // extensions
-GAME( 1999, mgcs2l, 0, mgcs2l, extension, extension_state, init_mgcs2l, ROT0, "IGS", "Manguan Caishen 2 (link version, extension, S110CN)", MACHINE_IS_SKELETON )
-GAME( 1999, cjsll,  0, cjsll,  extension, extension_state, init_cjsll,  ROT0, "IGS", "Cai Jin Shen Long (link version, extension, S111CN)", MACHINE_IS_SKELETON )
+GAME( 1999, mgcs2l, 0, mgcs2l, extension, extension_state, init_mgcs2l, ROT0, "IGS", "Manguan Caishen 2 (link version, extension, S110CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, cjsll,  0, cjsll,  extension, extension_state, init_cjsll,  ROT0, "IGS", "Cai Jin Shen Long (link version, extension, S111CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

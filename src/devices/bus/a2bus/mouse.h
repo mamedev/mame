@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_A2BUS_MOUSE_H
-#define MAME_DEVICES_A2BUS_MOUSE_H
+#ifndef MAME_BUS_A2BUS_MOUSE_H
+#define MAME_BUS_A2BUS_MOUSE_H
 
 #pragma once
 
@@ -17,4 +17,4 @@
 
 DECLARE_DEVICE_TYPE(A2BUS_MOUSE, device_a2bus_card_interface)
 
-#endif // MAME_DEVICES_A2BUS_MOUSE_H
+#endif // MAME_BUS_A2BUS_MOUSE_H

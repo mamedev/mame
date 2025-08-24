@@ -232,6 +232,7 @@ protected:
 	void delay_cycles(int cycles);
 
 	void decrement_tcounter(int count = 1);
+	virtual void load_tcounter();
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
@@ -360,6 +361,8 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	virtual void load_tcounter() override;
 
 private:
 	u8 config4;

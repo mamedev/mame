@@ -123,4 +123,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(197?, sigma21, 0, sigma21, sigma21, sigma21_state, empty_init, ROT0, "Sigma Enterprises", "21 (Sigma)", MACHINE_IS_SKELETON)
+GAME(197?, sigma21, 0, sigma21, sigma21, sigma21_state, empty_init, ROT0, "Sigma Enterprises", "21 (Sigma)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

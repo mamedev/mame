@@ -83,4 +83,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY               FULLNAME       FLAGS
-GAME( 1995, twinbskt, 0,      twinbskt, twinbskt, twinbskt_state, empty_init, ROT0, "Automatics Pasqual", "Twin Basket", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1995, twinbskt, 0,      twinbskt, twinbskt, twinbskt_state, empty_init, ROT0, "Automatics Pasqual", "Twin Basket", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

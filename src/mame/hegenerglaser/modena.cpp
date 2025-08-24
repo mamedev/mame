@@ -20,7 +20,7 @@ Hardware notes:
 
 #include "mmdisplay1.h"
 
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
@@ -119,8 +119,8 @@ void modena_state::io_w(u8 data)
 	m_io_ctrl = data;
 	update_display();
 
-	// d4: lcd strobe
-	m_display->strobe_w(BIT(data, 4));
+	// d4: lcd common
+	m_display->common_w(BIT(data, 4));
 
 	// d6: speaker out
 	m_dac->write(BIT(data, 6));
@@ -170,7 +170,7 @@ INPUT_PORTS_END
 void modena_state::modena(machine_config &config)
 {
 	// basic machine hardware
-	M65C02(config, m_maincpu, 4.194304_MHz_XTAL);
+	W65C02(config, m_maincpu, 4.194304_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &modena_state::modena_mem);
 
 	clock_device &nmi_clock(CLOCK(config, "nmi_clock", 4.194304_MHz_XTAL / 0x2000)); // active for 975us

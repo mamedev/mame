@@ -1,0 +1,77 @@
+# license:BSD-3-Clause
+# copyright-holders:David Haywood
+# vt3xx_spu opcodes
+
+phy_vt_imp
+	read_pc();
+	write(SP, Y);
+	dec_SP();
+	prefetch();
+
+phx_vt_imp
+	read_pc();
+	write(SP, X);
+	dec_SP();
+	prefetch();
+
+plx_vt_imp
+	read_pc();
+	read(SP);
+	inc_SP();
+	X = read(SP);
+	set_nz(X);
+	prefetch();
+
+ply_vt_imp
+	read_pc();
+	read(SP);
+	inc_SP();
+	Y = read(SP);
+	set_nz(Y);
+	prefetch();
+
+vtgetdbk_imp
+	read_pc();
+	A = m_databank;
+	prefetch();
+
+vtsetdbk_imp
+	read_pc();
+	m_databank = A;
+	prefetch();
+
+vtldabank_abx
+	TMP = read_pc();
+	PC++;
+	TMP2 = read_pc();
+	PC++;
+	A = m_extdata_space->read_byte(((m_databank << 16) | (TMP2 << 8) | TMP) + X);
+	set_nz(A);
+	prefetch();
+
+vtldabank_idy
+	TMP2 = read_pc();
+	PC++;
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	A = m_extdata_space->read_byte((m_databank << 16) | (TMP+Y) );
+	set_nz(A);
+	prefetch();
+
+vtadcx_aba
+	TMP = read_pc();
+	PC++;
+	TMP = set_h(TMP, read_pc());
+	PC++;
+	TMP2 = read(TMP);
+	TMP = TMP2 + X + (P & F_C ? 1 : 0); // do ADC, but with source + result in X
+	P &= ~(F_N|F_V|F_Z|F_C);
+	if(!uint8_t(TMP)) P |= F_Z;
+	else if(int8_t(TMP) < 0) P |= F_N;
+	if(~(TMP2^X) & (TMP2^TMP) & 0x80) P |= F_V;
+	if(TMP & 0xff00) P |= F_C;
+	X = TMP & 0xff;
+	prefetch();

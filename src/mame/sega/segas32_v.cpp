@@ -17,9 +17,8 @@
       The theory is that opaque pens should go above background layer and
       behind everything else like System 24.
 
-    - radr uses $1A0 as the X center for zooming; however, this
-      contradicts the theory that bit 9 is a sign bit. For now, the code
-      assumes that the X center has 10 bits of resolution.
+    - Verify that X/Y center has 10 bits of resolution when zooming and
+      9 when not.
 
     - In svf (the field) and radr (on the field), they use tilemap-specific
       flip in conjunction with rowscroll AND rowselect. According to Charles,
@@ -32,10 +31,6 @@
       Game actually uses the "rowscroll/rowselect" tables for a line window
       effect to draw the boxing ring over NBG0.
       Same deal for ga2 when in stage 2 cave a wall torch is lit.
-
-    - harddunk draws solid white in attract mode when the players are presented.
-      NBG0 is set with $200 on center X/Y, same as above or perhaps missing
-      tilemap wraparound?
 
     - Wrong priority cases (parenthesis for the level setup):
       dbzvrvs: draws text layer ($e) behind sprite-based gauges ($f).
@@ -126,14 +121,15 @@
         F44      -wwwwwww --------  Layer 1 upper-right page select
                  -------- -wwwwwww  Layer 1 upper-left page select
         F46      -wwwwwww --------  Layer 1 lower-right page select
-                 -------- -wwwwwww  Layer 2 upper-left page select
-        F48      -wwwwwww --------  Layer 2 upper-right page select
-                 -------- -wwwwwww  Layer 2 lower-left page select
-        F4A      -wwwwwww --------  Layer 2 lower-right page select
-                 -------- -wwwwwww  Layer 3 upper-left page select
-                 -wwwwwww --------  Layer 3 upper-right page select
-        F4E      -------- -wwwwwww  Layer 3 lower-left page select
-                 -wwwwwww --------  Layer 3 lower-right page select
+                 -------- -wwwwwww  Layer 1 lower-left page select
+        F48      -wwwwwww --------  Layer 2 upper-left page select
+                 -------- -wwwwwww  Layer 2 upper-right page select
+        F4A      -wwwwwww --------  Layer 2 lower-left page select
+                 -------- -wwwwwww  Layer 2 lower-right page select
+        F4C      -wwwwwww --------  Layer 3 upper-left page select
+                 -------- -wwwwwww  Layer 3 upper-right page select
+        F4E      -wwwwwww --------  Layer 3 lower-left page select
+                 -------- -wwwwwww  Layer 3 lower-right page select
         F50      xxxxxxxx xxxxxxxx  Layer 0 X step increment (0x200 = 1.0)
         F52      yyyyyyyy yyyyyyyy  Layer 0 Y step increment (0x200 = 1.0)
         F54      xxxxxxxx xxxxxxxx  Layer 1 X step increment (0x200 = 1.0)
@@ -743,9 +739,14 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, segas32_state::la
 	uint32_t srcy = (m_videoram[0x1ff16/2 + 4 * bgnum] & 0x1ff) << 20;
 	srcy += (m_videoram[0x1ff14/2 + 4 * bgnum] & 0xfe00) << 4;
 
-	/* then account for the destination center coordinates */
-	srcx_start -= util::sext(m_videoram[0x1ff30/2 + 2 * bgnum], 10) * srcxstep;
-	srcy -= util::sext(m_videoram[0x1ff32/2 + 2 * bgnum], 9) * srcystep;
+	/*
+	   Then account for the destination center coordinates - We currently expand the resolution
+	   from 9 bit to 10 bit while zooming which correctly centers the bg during attract mode in
+	   harddunk at the lower resolution and the course selection bg in radr at the higher resolution.
+	   This behavior has not been verified yet on real hardware and might be a hack.
+	*/
+	srcx_start -= util::sext(m_videoram[0x1ff30/2 + 2 * bgnum], (dstxstep != 0x200) ? 10 : 9) * srcxstep;
+	srcy -= util::sext(m_videoram[0x1ff32/2 + 2 * bgnum], (dstystep != 0x200) ? 10 : 9) * srcystep;
 
 	/* finally, account for destination top,left coordinates */
 	srcx_start += cliprect.min_x * srcxstep;

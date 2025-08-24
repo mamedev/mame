@@ -502,7 +502,7 @@ static INPUT_PORTS_START( firefox )
 	PORT_START("rdin1")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch1", FUNC(generic_latch_8_device::pending_r))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch2", FUNC(generic_latch_8_device::pending_r))
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Diagnostic Step") // mentioned in schematics, but N/C?
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -640,8 +640,8 @@ void firefox_state::firefox(machine_config &config)
 	PHILIPS_22VP931(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(64*8, 525, FUNC(firefox_state::screen_update_firefox));
 	m_laserdisc->set_overlay_clip(7*8, 53*8-1, 44, 480+44);
-	m_laserdisc->add_route(0, "lspeaker", 0.50);
-	m_laserdisc->add_route(1, "rspeaker", 0.50);
+	m_laserdisc->add_route(0, "speaker", 0.50, 0);
+	m_laserdisc->add_route(1, "speaker", 0.50, 1);
 	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	X2212(config, "nvram_1c").set_auto_save(true);
@@ -658,8 +658,7 @@ void firefox_state::firefox(machine_config &config)
 	m_riot->irq_wr_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, soundlatch[0]);
 	soundlatch[0]->data_pending_callback().set(m_riot, FUNC(mos6532_device::pa_bit_w<7>)); // MAINFLAG
@@ -672,13 +671,13 @@ void firefox_state::firefox(machine_config &config)
 	for (int i = 0; i < 4; i++)
 	{
 		POKEY(config, m_pokey[i], MASTER_XTAL/8);
-		m_pokey[i]->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-		m_pokey[i]->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+		m_pokey[i]->add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+		m_pokey[i]->add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 	}
 
 	TMS5220(config, m_tms, MASTER_XTAL/2/11);
-	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
-	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.75, 0);
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.75, 1);
 }
 
 

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_ELECTRON_MC68K_M
-#define MAME_BUS_ELECTRON_MC68K_M
+#ifndef MAME_BUS_ELECTRON_MC68K_H
+#define MAME_BUS_ELECTRON_MC68K_H
 
 #pragma once
 
@@ -59,5 +59,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ELECTRON_MC68K, electron_mc68k_device)
 
-
-#endif // MAME_BUS_ELECTRON_MC68K_M
+#endif // MAME_BUS_ELECTRON_MC68K_H

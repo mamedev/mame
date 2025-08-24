@@ -51,7 +51,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	// internal state
@@ -97,11 +97,9 @@ void istrebiteli_sound_device::device_start()
 	save_item(NAME(m_prev_data));
 }
 
-void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void istrebiteli_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
-
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		int smpl = 0;
 		if (m_rom_out_en)
@@ -112,7 +110,7 @@ void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, std::ve
 			smpl &= machine().rand() & 1;
 		smpl *= (m_prev_data & 0x80) ? 1000 : 4000; // b7 volume ?
 
-		buffer.put_int(sampindex, smpl, 32768);
+		stream.put_int(0, sampindex, smpl, 32768);
 		m_rom_cnt = (m_rom_cnt + m_rom_incr) & 0x1ff;
 	}
 }
@@ -518,8 +516,8 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2)
 	PORT_BIT(0x3c, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(istrebiteli_state::coin_r))
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_HBLANK("screen")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::hblank))
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(istrebiteli_state::coin_inc), 0)
@@ -539,8 +537,8 @@ static INPUT_PORTS_START( moto )
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)  // coin, TODO check why it is locked
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON5) // collision ?
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_HBLANK("screen") // guess, seems unused
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::hblank)) // guess, seems unused
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 INPUT_PORTS_END
 
 static const gfx_layout char_layout =

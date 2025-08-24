@@ -29,6 +29,7 @@ class m6809_base_device : public cpu_device
 public:
 	auto interrupt_vector_read() { return m_vector_read_func.bind(); }
 	auto sync_acknowledge_write() { return m_syncack_write_func.bind(); }
+
 protected:
 	// construction/destruction
 	m6809_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, int divider);
@@ -126,6 +127,16 @@ protected:
 		VECTOR_SWI          = 0xFFFA,
 		VECTOR_NMI          = 0xFFFC,
 		VECTOR_RESET_FFFE   = 0xFFFE
+	};
+
+	// exception numbers for debugger
+	enum
+	{
+		EXCEPTION_SWI   = 1,
+		EXCEPTION_SWI2  = 2,
+		EXCEPTION_SWI3  = 3,
+		EXCEPTION_XFIRQ = 4,
+		EXCEPTION_XRES  = 5
 	};
 
 	union M6809Q
@@ -315,7 +326,7 @@ public:
 	auto lic() { return m_lic_func.bind(); }
 };
 
-// ======================> m6809_device (LEGACY)
+// ======================> m6809_device (LEGACY, pinpoint if MC6809 or MC6809E)
 
 class m6809_device : public m6809_base_device
 {
@@ -332,6 +343,5 @@ enum
 
 #define M6809_IRQ_LINE  0   /* IRQ line number */
 #define M6809_FIRQ_LINE 1   /* FIRQ line number */
-#define M6809_SWI       2   /* Virtual SWI line to be used during SWI acknowledge cycle */
 
 #endif // MAME_CPU_M6809_M6809_H

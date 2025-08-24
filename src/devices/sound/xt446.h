@@ -9,8 +9,10 @@
 
 **************************************************************************************/
 
-#ifndef DEVICE_SOUND_XT446_H
-#define DEVICE_SOUND_XT446_H
+#ifndef MAME_SOUND_XT446_H
+#define MAME_SOUND_XT446_H
+
+#pragma once
 
 #include "cpu/h8/h8s2655.h"
 #include "sound/swp30.h"
@@ -38,4 +40,4 @@ private:
 
 DECLARE_DEVICE_TYPE(XT446, xt446_device)
 
-#endif
+#endif // MAME_SOUND_XT446_H

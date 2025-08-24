@@ -40,8 +40,8 @@
 
 *****************************************************************************/
 
-#ifndef MAME_DEVICES_MACHINE_74148_H
-#define MAME_DEVICES_MACHINE_74148_H
+#ifndef MAME_MACHINE_74148_H
+#define MAME_MACHINE_74148_H
 
 #pragma once
 

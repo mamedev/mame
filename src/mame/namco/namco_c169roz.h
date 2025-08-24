@@ -24,7 +24,7 @@ public:
 	uint16_t videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	typedef delegate<void (uint16_t, int*, int*, int)> c169_tilemap_delegate;
+	typedef delegate<void (uint16_t, int&, int&, int)> c169_tilemap_delegate;
 	void set_tile_callback(c169_tilemap_delegate tilemap_cb) { m_c169_cb = tilemap_cb; }
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);

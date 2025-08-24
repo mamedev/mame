@@ -230,6 +230,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2006?, aristmk7, 0, aristmk7, aristmk7, aristmk7_state, empty_init, ROT0, "Aristocrat", "Aristocrat MK-7 BIOS", MACHINE_IS_SKELETON | MACHINE_IS_BIOS_ROOT )
+GAME(2006?, aristmk7, 0, aristmk7, aristmk7, aristmk7_state, empty_init, ROT0, "Aristocrat", "Aristocrat MK-7 BIOS", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )
 
-GAME(200?,  a7lucky88, aristmk7, aristmk7, aristmk7, aristmk7_state, empty_init, ROT0, "Aristocrat", "Lucky 88 (Aristocrat MK-7)", MACHINE_IS_SKELETON )
+GAME(200?,  a7lucky88, aristmk7, aristmk7, aristmk7, aristmk7_state, empty_init, ROT0, "Aristocrat", "Lucky 88 (Aristocrat MK-7)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

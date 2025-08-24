@@ -166,7 +166,7 @@ u8 mtu130_datamover_base_device::status_r()
 		(m_irq6502_req ? 0x80 : 0x00) |
 		(m_irq4_req ? 0x40 : 0x00) |
 		(m_irq6502_en ? 0x20 : 0x00) |
-		(m_cpu->input_state(INPUT_LINE_HALT) ? 0x00 : 0x10) |
+		(m_cpu->input_line_state(INPUT_LINE_HALT) ? 0x00 : 0x10) |
 		(m_ram_visible ? 0x00 : 0x08) |
 		m_ram_bank;
 }

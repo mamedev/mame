@@ -3,8 +3,8 @@
 
 // MTU-130 extension board
 
-#ifndef MAME_BUS_MTU130_EXTENSION_H
-#define MAME_BUS_MTU130_EXTENSION_H
+#ifndef MAME_BUS_MTU130_BOARD_H
+#define MAME_BUS_MTU130_BOARD_H
 
 #include "machine/input_merger.h"
 
@@ -66,4 +66,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(MTU130_EXTENSION, mtu130_extension_device)
 
-#endif
+#endif // MAME_BUS_MTU130_BOARD_H

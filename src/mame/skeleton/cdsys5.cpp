@@ -136,4 +136,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(199?, minijook, 0, 0, minijook, minijook, cdsys5_state, empty_init, "Sound Leisure", "MiniJook", MACHINE_IS_SKELETON_MECHANICAL)
+SYST(199?, minijook, 0, 0, minijook, minijook, cdsys5_state, empty_init, "Sound Leisure", "MiniJook", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

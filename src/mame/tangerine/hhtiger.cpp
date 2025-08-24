@@ -592,5 +592,5 @@ ROM_END
 
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME     FLAGS */
-COMP( 1983, hhtiger, 0,      0,       hhtiger, hhtiger, hhtiger_state, empty_init, "H/H Microcomputers", "H/H Tiger", MACHINE_IS_SKELETON )
+COMP( 1983, hhtiger, 0,      0,       hhtiger, hhtiger, hhtiger_state, empty_init, "H/H Microcomputers", "H/H Tiger", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

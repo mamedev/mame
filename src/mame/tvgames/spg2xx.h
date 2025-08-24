@@ -5,16 +5,18 @@
 
 #pragma once
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/unsp/unsp.h"
+#include "machine/eepromser.h"
 #include "machine/i2cmem.h"
 #include "machine/spg2xx.h"
-
+#include "machine/timer.h"
 
 #include "screen.h"
 #include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
-#include "machine/eepromser.h"
-#include "machine/i2cmem.h"
 
 
 class spg2xx_game_state : public driver_device
@@ -103,10 +105,14 @@ public:
 	{ }
 
 	void pballpup(machine_config &config);
+	void mpntbalt(machine_config &config);
+	void mpntball(machine_config &config);
 
 private:
 	uint16_t porta_r();
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	void porta_nobank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	TIMER_DEVICE_CALLBACK_MEMBER(gun_irq);
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
@@ -206,6 +212,23 @@ private:
 	required_device<i2cmem_device> m_i2cmem;
 };
 
+class spg2xx_game_lpetshop_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_lpetshop_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void lpetshop(machine_config &config);
+
+private:
+	uint16_t porta_r();
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	required_device<i2cmem_device> m_i2cmem;
+};
+
 class spg2xx_game_gssytts_state : public spg2xx_game_state
 {
 public:
@@ -237,11 +260,9 @@ public:
 	{ }
 
 	void init_senwfit();
+
 protected:
-
 	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
-
-private:
 };
 
 
@@ -272,8 +293,6 @@ public:
 
 	ioport_value wheel_r();
 	ioport_value wheel2_r();
-
-private:
 };
 
 
@@ -308,10 +327,7 @@ public:
 
 	void lexiart(machine_config &config);
 
-protected:
-
 private:
-
 	void mem_map_lexiart(address_map &map) ATTR_COLD;
 };
 
@@ -329,9 +345,7 @@ public:
 	void init_jeuint();
 
 protected:
-
 	uint16_t ordentv_portc_r(offs_t offset, uint16_t mem_mask = ~0);
-private:
 };
 
 class spg2xx_game_hotwheels_state : public spg2xx_game_state
@@ -346,12 +360,10 @@ public:
 	void hotwheels(machine_config &config);
 
 protected:
-
 	uint16_t hotwheels_porta_r(offs_t offset, uint16_t mem_mask = ~0);
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 private:
-
 	uint16_t m_porta_dat_hot;
 	required_ioport m_io_p1_extra;
 };
@@ -385,10 +397,116 @@ public:
 	{ }
 
 	void init_ddr33v();
-
-protected:
-private:
 };
 
+class epo_tetr_game_state : public spg2xx_game_state
+{
+public:
+	epo_tetr_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_ioextra(*this, "EXTRA")
+	{ }
+
+	void epo_tetr(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	uint16_t epo_tetr_r(offs_t offset, uint16_t mem_mask);
+	void epo_tetr_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	uint16_t m_old_portb_data;
+	uint16_t m_old_portb_extra_latch;
+
+	required_ioport m_ioextra;
+};
+
+class spg2xx_game_prail_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_prail_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void prail(machine_config &config);
+
+protected:
+	void prail_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+private:
+	required_device<i2cmem_device> m_i2cmem;
+};
+
+class spg2xx_game_hasbro_93lc66_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_hasbro_93lc66_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_eeprom(*this, "eeprom")
+	{ }
+
+	void mylpony(machine_config &config);
+	void whacmole(machine_config &config);
+
+private:
+	uint16_t whacmole_porta_r();
+	void whacmole_porta_w(uint16_t data);
+
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+};
+
+class spg2xx_game_smartcycle_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_smartcycle_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_cart(*this, "cartslot"),
+		m_cart_region(nullptr)
+	{ }
+
+	void smartcycle(machine_config &config);
+
+	u16 unknown_random_r()
+	{
+		if (!machine().side_effects_disabled())
+			return machine().rand();
+		else
+			return 0;
+	}
+
+private:
+	virtual void machine_start() override ATTR_COLD;
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+	required_device<generic_slot_device> m_cart;
+	memory_region *m_cart_region;
+};
+
+class spg2xx_game_pdcj_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_pdcj_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_upperbank(*this, "upperbank")
+	{ }
+
+	void pdcj(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	required_memory_bank m_upperbank;
+
+private:
+
+	void mem_map_upperbank(address_map &map) ATTR_COLD;
+};
 
 #endif // MAME_TVGAMES_SPG2XX_H

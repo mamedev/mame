@@ -11,9 +11,9 @@
 #define MAME_CPU_M6502_GEW12_H
 
 #include "m6502mcu.h"
-#include "m65c02.h"
+#include "w65c02.h"
 
-class gew12_device : public m6502_mcu_device_base<m65c02_device>, public device_mixer_interface {
+class gew12_device : public m6502_mcu_device_base<w65c02_device>, public device_mixer_interface {
 public:
 	gew12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -27,7 +27,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual void internal_update(u64 current_time) override;
-	using m6502_mcu_device_base<m65c02_device>::internal_update;
+	using m6502_mcu_device_base<w65c02_device>::internal_update;
 
 	enum
 	{

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_DEVICES_MACHINE_UPD765_H
-#define MAME_DEVICES_MACHINE_UPD765_H
+#ifndef MAME_MACHINE_UPD765_H
+#define MAME_MACHINE_UPD765_H
 
 #pragma once
 
@@ -55,6 +55,7 @@ public:
 
 	void set_ready_line_connected(bool ready);
 	void set_select_lines_connected(bool select);
+	void set_ts_line_connected(bool ts);
 	void set_floppy(floppy_image_device *image);
 	virtual void soft_reset();
 
@@ -228,7 +229,7 @@ protected:
 
 	static constexpr int rates[4] = { 500000, 300000, 250000, 1000000 };
 
-	bool ready_connected, ready_polled, select_connected, select_multiplexed, has_dor;
+	bool ready_connected, ready_polled, select_connected, select_multiplexed, ts_connected, has_dor;
 
 	bool external_ready;
 
@@ -635,4 +636,4 @@ DECLARE_DEVICE_TYPE(MCS3201,        mcs3201_device)
 DECLARE_DEVICE_TYPE(TC8566AF,       tc8566af_device)
 DECLARE_DEVICE_TYPE(HD63266F,       hd63266f_device)
 
-#endif // MAME_DEVICES_MACHINE_UPD765_H
+#endif // MAME_MACHINE_UPD765_H

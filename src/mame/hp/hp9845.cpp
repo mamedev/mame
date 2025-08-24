@@ -3933,10 +3933,10 @@ ROM_START( hp9845t_de )
 ROM_END
 
 //    YEAR  NAME        PARENT   COMPAT  MACHINE  INPUT           CLASS          INIT        COMPANY            FULLNAME  FLAGS
-COMP( 1977, hp9845a,    0,       0,      hp9845a, hp9845,         hp9845_state,  empty_init, "Hewlett-Packard", "9845A",  MACHINE_IS_SKELETON )
-COMP( 1977, hp9845s,    hp9845a, 0,      hp9845a, hp9845,         hp9845_state,  empty_init, "Hewlett-Packard", "9845S",  MACHINE_IS_SKELETON )
-COMP( 1979, hp9835a,    0,       0,      hp9835a, hp9845,         hp9845_state,  empty_init, "Hewlett-Packard", "9835A",  MACHINE_IS_SKELETON )
-COMP( 1979, hp9835b,    hp9835a, 0,      hp9835a, hp9845,         hp9845_state,  empty_init, "Hewlett-Packard", "9835B",  MACHINE_IS_SKELETON )
+COMP( 1977, hp9845a,    0,       0,      hp9845a, hp9845,         hp9845_state,  empty_init, "Hewlett-Packard", "9845A",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1977, hp9845s,    hp9845a, 0,      hp9845a, hp9845,         hp9845_state,  empty_init, "Hewlett-Packard", "9845S",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1979, hp9835a,    0,       0,      hp9835a, hp9845,         hp9845_state,  empty_init, "Hewlett-Packard", "9835A",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1979, hp9835b,    hp9835a, 0,      hp9835a, hp9845,         hp9845_state,  empty_init, "Hewlett-Packard", "9835B",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 COMP( 1979, hp9845b,    0,       0,      hp9845b, hp9845_base,    hp9845b_state, empty_init, "Hewlett-Packard", "9845B",  0 )
 COMP( 1982, hp9845t,    0,       0,      hp9845t, hp9845ct,       hp9845t_state, empty_init, "Hewlett-Packard", "9845T",  0 )
 COMP( 1980, hp9845c,    0,       0,      hp9845c, hp9845ct,       hp9845c_state, empty_init, "Hewlett-Packard", "9845C",  0 )

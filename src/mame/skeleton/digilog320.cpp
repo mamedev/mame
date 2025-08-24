@@ -387,9 +387,9 @@ void digilog320_state::digilog320(machine_config &config)
 
 	I8251(config, "usart", 0);
 
-	SCC8530N(config, m_scc[0], 3.6864_MHz_XTAL);
+	SCC8530(config, m_scc[0], 3.6864_MHz_XTAL);
 
-	SCC8530N(config, m_scc[1], 3.6864_MHz_XTAL);
+	SCC8530(config, m_scc[1], 3.6864_MHz_XTAL);
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int3_w));

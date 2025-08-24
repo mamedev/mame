@@ -183,5 +183,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY                          FULLNAME               FLAGS */
-COMP( 1983, vt220,  0,      0,      vt220,   vt220, vt220_state, empty_init, "Digital Equipment Corporation", "VT220 (Version 2.3)", MACHINE_IS_SKELETON )
-COMP( 1983, vt220a, vt220,  0,      vt220a,  vt220, vt220_state, empty_init, "Digital Equipment Corporation", "VT220 (Version 2.1)", MACHINE_IS_SKELETON )
+COMP( 1983, vt220,  0,      0,      vt220,   vt220, vt220_state, empty_init, "Digital Equipment Corporation", "VT220 (Version 2.3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1983, vt220a, vt220,  0,      vt220a,  vt220, vt220_state, empty_init, "Digital Equipment Corporation", "VT220 (Version 2.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

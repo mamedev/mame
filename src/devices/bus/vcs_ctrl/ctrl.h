@@ -9,8 +9,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_CVS_CTRL_CTRL_H
-#define MAME_BUS_CVS_CTRL_CTRL_H
+#ifndef MAME_BUS_VCS_CTRL_CTRL_H
+#define MAME_BUS_VCS_CTRL_CTRL_H
 
 #pragma once
 
@@ -115,4 +115,4 @@ DECLARE_DEVICE_TYPE(VCS_CONTROL_PORT, vcs_control_port_device)
 void vcs_control_port_devices(device_slot_interface &device);
 void a800_control_port_devices(device_slot_interface &device);
 
-#endif // MAME_BUS_CVS_CTRL_CTRL_H
+#endif // MAME_BUS_VCS_CTRL_CTRL_H

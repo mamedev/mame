@@ -140,7 +140,7 @@ The main loop then looks like this:
     void device::execute_run()
     {
         if(m_inst_substate)
-            call appropriate restarted instrution handler
+            call appropriate restarted instruction handler
         while(m_icount > 0) {
             debugger_instruction_hook(m_pc);
             call appropriate non-restarted instruction handler
@@ -157,8 +157,70 @@ It is not a requirement to use a generator-based that method, but a
 different one which does not have unacceptable performance
 implications has not yet been found.
 
+3.4 Bus contention cpu_device interface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-3.4 Interaction with DRC
+The main way to setup bus contention is through the memory maps.
+Lower-level access can be obtained through some methods on cpu_device
+though.
+
+.. code-block:: C++
+
+    bool cpu_device::access_before_time(u64 access_time, u64 current_time) noexcept;
+
+The method ``access_before_time`` allows to try to run an access at a
+given time in cpu cycles.  It takes the current time
+(``total_cycles()``) and the expected time for the access.  If there
+aren't enough cycles to reach that time the remaining cycles are eaten
+and the method returns true to tell not to do the access and call the
+method again eventually.  Otherwise enough cycles are eaten to reach
+the access time and false is returned to tell to do the access.
+
+
+.. code-block:: C++
+
+    bool cpu_device::access_before_delay(u32 cycles, const void *tag) noexcept;
+
+The method ``access_before_delay`` allows to try to run an access
+after a given delay.  The tag is an opaque, non-nullptr value used to
+characterize the source of the delay, so that the delay is not applied
+multiple times.  Similarly to the previous method cycles are eaten and
+true is returned to abort the access, false to execute it.
+
+.. code-block:: C++
+
+    void cpu_device::access_after_delay(u32 cycles) noexcept;
+
+The method ``access_after_delay`` allows to add a delay after an
+access is done.  There is no abort possible, hence no return boolean.
+
+.. code-block:: C++
+
+    void cpu_device::defer_access() noexcept;
+
+The method ``defer_access`` tells the cpu that we need to wait for an
+external event.  It marks the access as to be redone, and eats all the
+remaining cycles of the timeslice.  The idea is then that the access
+will be retried after time advances up to the next global system
+synchronisation event (sync, timer timeout or set_input_line).  This
+is the method to use when for instance waiting on a magic latch for
+data expected from scsi transfers, which happen on timer timeouts.
+
+.. code-block:: C++
+
+    void cpu_device::retry_access() noexcept;
+
+The method ``retry_access`` tells the cpu that the access will need to
+be retried, and nothing else.  This can easily reach a situation of
+livelock, so be careful.  It is used for instance to simulate a wait
+line (for the z80 for instance) which is controlled through
+set_input_line.  The idea is that the device setting wait does the
+set_input_line and a retry_access.  The cpu core, as long as the wait
+line is set just eats cycles.  Then, when the line is cleared the core
+will retry the access.
+
+
+3.5 Interaction with DRC
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 At this point, interruptibility and DRC are entirely incompatible.  We

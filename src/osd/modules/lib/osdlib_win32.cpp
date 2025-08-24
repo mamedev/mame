@@ -106,6 +106,42 @@ void osd_break_into_debugger(const char *message)
 #endif
 }
 
+
+//============================================================
+//  osd_get_cache_line_size
+//============================================================
+
+std::pair<std::error_condition, unsigned> osd_get_cache_line_size() noexcept
+{
+	DWORD resultsize = 0;
+	if (GetLogicalProcessorInformation(nullptr, &resultsize) || (ERROR_INSUFFICIENT_BUFFER != GetLastError()) || !resultsize)
+		return std::make_pair(std::errc::operation_not_permitted, 0U);
+
+	auto const result = reinterpret_cast<SYSTEM_LOGICAL_PROCESSOR_INFORMATION *>(std::malloc(resultsize));
+	if (!result)
+		return std::make_pair(std::errc::not_enough_memory, 0U);
+
+	if (!GetLogicalProcessorInformation(result, &resultsize))
+	{
+		std::free(result);
+		return std::make_pair(std::errc::operation_not_permitted, 0U);
+	}
+
+	for (unsigned i = 0; i < (resultsize / sizeof(result[0])); ++i)
+	{
+		if ((RelationCache == result[i].Relationship) && (1 == result[i].Cache.Level))
+		{
+			unsigned const linesize = result[i].Cache.LineSize;
+			std::free(result);
+			return std::make_pair(std::error_condition(), linesize);
+		}
+	}
+
+	std::free(result);
+	return std::make_pair(std::errc::operation_not_permitted, 0U);
+}
+
+
 //============================================================
 //  get_clipboard_text_by_format
 //============================================================

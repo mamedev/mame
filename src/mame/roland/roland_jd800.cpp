@@ -77,4 +77,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1991, jd800, 0, 0, jd800, jd800, roland_jd800_state, empty_init, "Roland", "JD-800 Programmable Synthesizer", MACHINE_IS_SKELETON)
+SYST(1991, jd800, 0, 0, jd800, jd800, roland_jd800_state, empty_init, "Roland", "JD-800 Programmable Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

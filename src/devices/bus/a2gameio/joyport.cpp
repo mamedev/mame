@@ -127,4 +127,4 @@ void apple2_joyport_device::an1_w(int state)
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE_PRIVATE(APPLE2_JOYPORT, device_a2gameio_interface, apple2_joyport_device, "a2joyprt", "Sirius JoyPort")
+DEFINE_DEVICE_TYPE_PRIVATE(APPLE2_JOYPORT, device_a2gameio_interface, apple2_joyport_device, "a2joyprt", "Sirius JoyPort with Atari joysticks")

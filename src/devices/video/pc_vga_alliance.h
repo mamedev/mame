@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-#ifndef MAME_VIDEO_PC_VGA_PROMOTION_H
-#define MAME_VIDEO_PC_VGA_PROMOTION_H
+#ifndef MAME_VIDEO_PC_VGA_ALLIANCE_H
+#define MAME_VIDEO_PC_VGA_ALLIANCE_H
 
 #pragma once
 
@@ -37,4 +37,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PROMOTION_VGA, promotion_vga_device)
 
-#endif // MAME_VIDEO_PC_VGA_PROMOTION_H
+#endif // MAME_VIDEO_PC_VGA_ALLIANCE_H

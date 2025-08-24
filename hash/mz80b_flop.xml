@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+-->
+
+
+<softwarelist name="mz80b_flop" description="Sharp MZ-80B disk images">
+
+	<software name="mz80game">
+		<description>MZ-80B Games</description>
+		<year>1983</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+SPACE-BEE:
+BACTERIA:
+DOG-FIGHT:
+RADAR-PUCKMAN: (press Y to start)
+MISSILE-COMMAND:
+SPACE-INVADERS:
+PIN-BALL:
+GALAXIAN:
+ASTEROID-BELT:
+DEVIL'S-FIGHTER:
+SPACE-MOUSE:
+SUPERSCHACH:
+RALLY-MAZE:
+BOMBER-CRASH: Requires Jp font BIOS for instructions
+PUCKMAN:
+DESERT:
+]]></notes>
+		<info name="author" value="Nicolas Gabron" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="322816">
+				<rom name="mz80b games.dsk" size="322816" crc="3b52eee2" sha1="b39ebbd0dd352d92d66c54ee1a3b08eae923c721"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb6510tk">
+		<!-- Official Sharp Germany product? -->
+		<description>Disk BASIC/A SB-6510 Technik Diskette</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="322816">
+				<rom name="mz80b basic.dsk" size="322816" crc="a03df47d" sha1="3d4c0ddf6b563b9fd90994e881f903fb9bce7c2f"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

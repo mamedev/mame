@@ -105,4 +105,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1975?, unkpmc, 0, pmc, 0, pmc_state, empty_init, ROT0, "PMC", "unknown PMC game", MACHINE_IS_SKELETON ) // might be Aztec Princess
+GAME( 1975?, unkpmc, 0, pmc, 0, pmc_state, empty_init, ROT0, "PMC", "unknown PMC game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // might be Aztec Princess

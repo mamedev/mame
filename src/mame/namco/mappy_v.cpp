@@ -154,7 +154,7 @@ void mappy_state::mappy_palette(palette_device &palette) const
 
 ***************************************************************************/
 
-void mappy_state::phozon_palette(palette_device &palette) const
+void phozon_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static constexpr int resistances[4] = { 2200, 1000, 470, 220 };
@@ -254,7 +254,7 @@ TILE_GET_INFO_MEMBER(mappy_state::superpac_get_tile_info)
 {
 	uint8_t attr = m_videoram[tile_index + 0x400];
 
-	tileinfo.category = (attr & 0x40) >> 6;
+	tileinfo.category = BIT(attr, 6);
 	tileinfo.group = attr & 0x3f;
 	tileinfo.set(0,
 			m_videoram[tile_index],
@@ -262,11 +262,11 @@ TILE_GET_INFO_MEMBER(mappy_state::superpac_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(mappy_state::phozon_get_tile_info)
+TILE_GET_INFO_MEMBER(phozon_state::get_tile_info)
 {
 	uint8_t attr = m_videoram[tile_index + 0x400];
 
-	tileinfo.category = (attr & 0x40) >> 6;
+	tileinfo.category = BIT(attr, 6);
 	tileinfo.group = attr & 0x3f;
 	tileinfo.set(0,
 			m_videoram[tile_index] + ((attr & 0x80) << 1),
@@ -278,7 +278,7 @@ TILE_GET_INFO_MEMBER(mappy_state::mappy_get_tile_info)
 {
 	uint8_t attr = m_videoram[tile_index + 0x800];
 
-	tileinfo.category = (attr & 0x40) >> 6;
+	tileinfo.category = BIT(attr, 6);
 	tileinfo.group = attr & 0x3f;
 	tileinfo.set(0,
 			m_videoram[tile_index],
@@ -302,9 +302,9 @@ VIDEO_START_MEMBER(mappy_state,superpac)
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 31);
 }
 
-VIDEO_START_MEMBER(mappy_state,phozon)
+void phozon_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mappy_state::phozon_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(mappy_state::superpac_tilemap_scan)), 8, 8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(phozon_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(phozon_state::superpac_tilemap_scan)), 8, 8, 36, 28);
 
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 15);
 }
@@ -339,14 +339,15 @@ void mappy_state::mappy_videoram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-void mappy_state::superpac_flipscreen_w(uint8_t data)
+void mappy_state::flipscreen_w(uint8_t data)
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(BIT(data, 0));
 }
 
-uint8_t mappy_state::superpac_flipscreen_r()
+uint8_t mappy_state::flipscreen_r()
 {
-	flip_screen_set(1);
+	if (!machine().side_effects_disabled())
+		flip_screen_set(1);
 	return 0xff;
 }
 
@@ -365,15 +366,14 @@ void mappy_state::mappy_scroll_w(offs_t offset, uint8_t data)
 
 void mappy_state::mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base)
 {
-	uint8_t *spriteram = spriteram_base + 0x780;
-	uint8_t *spriteram_2 = spriteram + 0x800;
-	uint8_t *spriteram_3 = spriteram_2 + 0x800;
-	int offs;
+	uint8_t const *const spriteram = spriteram_base + 0x780;
+	uint8_t const *const spriteram_2 = spriteram + 0x800;
+	uint8_t const *const spriteram_3 = spriteram_2 + 0x800;
 
-	for (offs = 0;offs < 0x80;offs += 2)
+	for (int offs = 0; offs < 0x80; offs += 2)
 	{
 		/* is it on? */
-		if ((spriteram_3[offs+1] & 2) == 0)
+		if (BIT(~spriteram_3[offs+1], 1))
 		{
 			static const uint8_t gfx_offs[2][2] =
 			{
@@ -381,14 +381,13 @@ void mappy_state::mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 				{ 2, 3 }
 			};
 			int sprite = spriteram[offs];
-			int color = spriteram[offs+1];
-			int sx = spriteram_2[offs+1] + 0x100 * (spriteram_3[offs+1] & 1) - 40;
+			int const color = spriteram[offs+1];
+			int const sx = spriteram_2[offs+1] + 0x100 * (spriteram_3[offs+1] & 1) - 40;
 			int sy = 256 - spriteram_2[offs] + 1;   // sprites are buffered and delayed by one scanline
-			int flipx = (spriteram_3[offs] & 0x01);
-			int flipy = (spriteram_3[offs] & 0x02) >> 1;
-			int sizex = (spriteram_3[offs] & 0x04) >> 2;
-			int sizey = (spriteram_3[offs] & 0x08) >> 3;
-			int x,y;
+			int flipx = BIT(spriteram_3[offs], 0);
+			int flipy = BIT(spriteram_3[offs], 1);
+			int const sizex = (spriteram_3[offs] & 0x04) >> 2;
+			int const sizey = (spriteram_3[offs] & 0x08) >> 3;
 
 			sprite &= ~sizex;
 			sprite &= ~(sizey << 1);
@@ -402,9 +401,9 @@ void mappy_state::mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 				flipy ^= 1;
 			}
 
-			for (y = 0;y <= sizey;y++)
+			for (int y = 0; y <= sizey; y++)
 			{
-				for (x = 0;x <= sizex;x++)
+				for (int x = 0; x <= sizex; x++)
 				{
 					m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
@@ -440,17 +439,16 @@ spriteram_3
 1   -------x  X position MSB
 */
 
-void mappy_state::phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base)
+void phozon_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base)
 {
-	uint8_t *spriteram = spriteram_base + 0x780;
-	uint8_t *spriteram_2 = spriteram + 0x800;
-	uint8_t *spriteram_3 = spriteram_2 + 0x800;
-	int offs;
+	uint8_t const *const spriteram = spriteram_base + 0x780;
+	uint8_t const *const spriteram_2 = spriteram + 0x800;
+	uint8_t const *const spriteram_3 = spriteram_2 + 0x800;
 
-	for (offs = 0;offs < 0x80;offs += 2)
+	for (int offs = 0; offs < 0x80; offs += 2)
 	{
 		/* is it on? */
-		if ((spriteram_3[offs+1] & 2) == 0)
+		if (BIT(~spriteram_3[offs+1], 1))
 		{
 			static const uint8_t size[4] = { 1, 0, 3, 0 };    /* 16, 8, 32 pixels; fourth combination unused? */
 			static const uint8_t gfx_offs[4][4] =
@@ -460,15 +458,14 @@ void mappy_state::phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cli
 				{ 8, 9,12,13 },
 				{10,11,14,15 }
 			};
-			int sprite = (spriteram[offs] << 2) | ((spriteram_3[offs] & 0xc0) >> 6);
-			int color = spriteram[offs+1] & 0x3f;
-			int sx = spriteram_2[offs+1] + 0x100 * (spriteram_3[offs+1] & 1) - 69;
+			int const sprite = (spriteram[offs] << 2) | ((spriteram_3[offs] & 0xc0) >> 6);
+			int const color = spriteram[offs+1] & 0x3f;
+			int const sx = spriteram_2[offs+1] + 0x100 * (spriteram_3[offs+1] & 1) - 69;
 			int sy = 256 - spriteram_2[offs];
 			int flipx = (spriteram_3[offs] & 0x01);
 			int flipy = (spriteram_3[offs] & 0x02) >> 1;
-			int sizex = size[(spriteram_3[offs] & 0x0c) >> 2];
-			int sizey = size[(spriteram_3[offs] & 0x30) >> 4];
-			int x,y;
+			int const sizex = size[(spriteram_3[offs] & 0x0c) >> 2];
+			int const sizey = size[(spriteram_3[offs] & 0x30) >> 4];
 
 			sy -= 8 * sizey;
 			sy = (sy & 0xff) - 32;  // fix wraparound
@@ -479,9 +476,9 @@ void mappy_state::phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cli
 				flipy ^= 1;
 			}
 
-			for (y = 0;y <= sizey;y++)
+			for (int y = 0; y <= sizey; y++)
 			{
-				for (x = 0;x <= sizex;x++)
+				for (int x = 0; x <= sizex; x++)
 				{
 					m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
@@ -510,12 +507,12 @@ uint32_t mappy_state::screen_update_superpac(screen_device &screen, bitmap_ind16
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 1,0);
 
 	/* sprite color 0/1 still has priority over that (ghost eyes in Pac 'n Pal) */
-	for (int y = 0;y < sprite_bitmap.height();y++)
+	for (int y = 0; y < sprite_bitmap.height(); y++)
 	{
-		for (int x = 0;x < sprite_bitmap.width();x++)
+		for (int x = 0; x < sprite_bitmap.width(); x++)
 		{
-			int spr_entry = sprite_bitmap.pix(y, x);
-			int spr_pen = m_palette->pen_indirect(spr_entry);
+			uint16_t const spr_entry = sprite_bitmap.pix(y, x);
+			int const spr_pen = m_palette->pen_indirect(spr_entry);
 			if (spr_pen == 0 || spr_pen == 1)
 				bitmap.pix(y, x) = spr_entry;
 		}
@@ -523,14 +520,14 @@ uint32_t mappy_state::screen_update_superpac(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-uint32_t mappy_state::screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t phozon_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(m_spriteram[0x1f7f-0x800] & 1);
+	flip_screen_set(BIT(m_spriteram[0x1f7f-0x800], 0));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
-	phozon_draw_sprites(bitmap,cliprect,m_spriteram);
+	draw_sprites(bitmap,cliprect,m_spriteram);
 
 	/* Redraw the high priority characters */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 1,0);
@@ -539,9 +536,7 @@ uint32_t mappy_state::screen_update_phozon(screen_device &screen, bitmap_ind16 &
 
 uint32_t mappy_state::screen_update_mappy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
-	for (offs = 2;offs < 34;offs++)
+	for (int offs = 2; offs < 34; offs++)
 		m_bg_tilemap->set_scrolly(offs,m_scroll);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);

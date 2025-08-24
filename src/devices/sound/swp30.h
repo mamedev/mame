@@ -3,8 +3,8 @@
 
 // Yamaha SWP30/30B, rompler/dsp combo
 
-#ifndef DEVICES_SOUND_SWP30_H
-#define DEVICES_SOUND_SWP30_H
+#ifndef MAME_SOUND_SWP30_H
+#define MAME_SOUND_SWP30_H
 
 #pragma once
 
@@ -22,7 +22,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 1) / 2; }
@@ -239,4 +239,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SWP30, swp30_device)
 
-#endif
+#endif // MAME_SOUND_SWP30_H

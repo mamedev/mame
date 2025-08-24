@@ -19,8 +19,8 @@ The 10MHz version has a W65C02P-8 @ 9.83MHz.
 #include "mmboard.h"
 #include "mmdisplay2.h"
 
-#include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 
@@ -134,7 +134,7 @@ void polgar_state::polgar10(machine_config &config)
 	polgar(config);
 
 	// basic machine hardware
-	M65C02(config.replace(), m_maincpu, 9.8304_MHz_XTAL);
+	W65C02(config.replace(), m_maincpu, 9.8304_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &polgar_state::polgar_mem);
 
 	const attotime nmi_period = attotime::from_hz(9.8304_MHz_XTAL / 0x2000);

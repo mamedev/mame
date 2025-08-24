@@ -101,4 +101,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1984, tv924, 0, 0, tv924, tv924, tv924_state, empty_init, "TeleVideo Systems", "TeleVideo 924 Video Display Terminal", MACHINE_IS_SKELETON)
+COMP(1984, tv924, 0, 0, tv924, tv924, tv924_state, empty_init, "TeleVideo Systems", "TeleVideo 924 Video Display Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

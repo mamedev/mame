@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_TAITO_LSASQAD_H
-#define MAME_TAITO_LSASQAD_H
+#ifndef MAME_TAITO_LSASQUAD_H
+#define MAME_TAITO_LSASQUAD_H
 
 #pragma once
 
@@ -81,4 +81,4 @@ private:
 	void storming_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_TAITO_LSASQAD_H
+#endif // MAME_TAITO_LSASQUAD_H

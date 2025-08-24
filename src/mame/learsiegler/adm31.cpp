@@ -515,4 +515,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1978, adm31, 0, 0, adm31, adm31, adm31_state, empty_init, "Lear Siegler", "ADM-31 Data Display Terminal", MACHINE_IS_SKELETON)
+COMP(1978, adm31, 0, 0, adm31, adm31, adm31_state, empty_init, "Lear Siegler", "ADM-31 Data Display Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

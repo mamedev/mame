@@ -72,7 +72,7 @@ static void toggle_wave_data(void)
 
 static void tzx_cas_get_blocks( const uint8_t *casdata, int caslen )
 {
-	int pos = sizeof(TZX_HEADER) + 2;
+	uint32_t pos = sizeof(TZX_HEADER) + 2;
 	int max_block_count = INITIAL_MAX_BLOCK_COUNT;
 	int loopcount = 0, loopoffset = 0;
 	blocks = (uint8_t**)malloc(max_block_count * sizeof(uint8_t*));
@@ -192,7 +192,14 @@ static void tzx_cas_get_blocks( const uint8_t *casdata, int caslen )
 			break;
 		}
 
-		block_count++;
+		if (pos > caslen)
+		{
+			LOG_FORMATS("Block %d(ID=%d) with wrong length discarded\n", block_count, blocktype);
+		}
+		else
+		{
+			block_count++;
+		}
 	}
 }
 
@@ -779,7 +786,7 @@ cleanup:
 	return -1;
 }
 
-static int tzx_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
+static int tzx_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes, int )
 {
 	int16_t *p = buffer;
 	int size = 0;
@@ -788,7 +795,7 @@ static int tzx_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 	return size;
 }
 
-static int cdt_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
+static int cdt_cas_fill_wave( int16_t *buffer, int length, const uint8_t *bytes, int )
 {
 	int16_t *p = buffer;
 	int size = 0;
@@ -797,72 +804,114 @@ static int cdt_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 	return size;
 }
 
-static int tap_cas_to_wav_size( const uint8_t *casdata, int caslen )
+static int tap_cas_to_wav_size(const uint8_t *casdata, int caslen)
 {
+	/*
+	TAP Header:
+	|   0 | W       | Length of Data Block (N) | -+
+	|   2 | B       | Flag Byte                | -+
+	|   3 | B*(N-2) | Data                     |  | Data Block
+	| N+1 | B       | XOR Checksum of [2..N]   | -+
+	*/
+
 	int size = 0;
 	const uint8_t *p = casdata;
 
-	while (p < casdata + caslen)
+	while (caslen > 2)
 	{
 		int data_size = get_u16le(&p[0]);
-		int pilot_length = (p[2] == 0x00) ? 8063 : 3223;
-		LOG_FORMATS("tap_cas_to_wav_size: Handling TAP block containing 0x%X bytes", data_size);
 		p += 2;
+		caslen -= 2;
+		if (caslen < data_size)
+		{
+			LOG_FORMATS("tap_cas_to_wav_size: Requested 0x%X bytes but only 0x%X available.\n", data_size, caslen);
+			data_size = caslen;
+		}
+		caslen -= data_size;
+
+		// Data Block
+		LOG_FORMATS("tap_cas_to_wav_size: Handling TAP block containing 0x%X bytes", data_size);
+		const int pilot_length = (p[0] == 0x00) ? 8063 : 3223;
 		size += tzx_cas_handle_block(nullptr, p, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
-		LOG_FORMATS(", total size is now: %d\n", size);
+		LOG_FORMATS(", total size is now: %d", size);
+
+		// Validate Checksum
+		const uint8_t checksum = p[data_size - 1];
+		LOG_FORMATS(", checksum 0x%X\n", checksum);
+		uint8_t check = 0x00;
+		for(int i = 0; i < (data_size - 1); i++)
+		{
+			check ^= p[i];
+		}
+		if (check != checksum)
+		{
+			osd_printf_warning("tap_cas_to_wav_size: wrong checksum 0x%X\n", check);
+		}
+
 		p += data_size;
 	}
 	return size;
 }
 
-static int tap_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
+static int tap_cas_fill_wave(int16_t *buffer, int length, const uint8_t *bytes, int bytes_length)
 {
 	int16_t *p = buffer;
 	int size = 0;
 
-	while (size < length)
+	int block = 0;
+	while (bytes_length > 2)
 	{
 		int data_size = get_u16le(&bytes[0]);
-		int pilot_length = (bytes[2] == 0x00) ? 8063 : 3223;
-		LOG_FORMATS("tap_cas_fill_wave: Handling TAP block containing 0x%X bytes\n", data_size);
 		bytes += 2;
+		bytes_length -= 2;
+
+		LOG_FORMATS("tap_cas_fill_wave: Handling TAP block containing 0x%X bytes\n", data_size);
+		if (bytes_length < data_size)
+		{
+			osd_printf_warning("BAD Image: block #%d required %d byte(s), but only %d available\n", block, data_size, bytes_length);
+			data_size = bytes_length; // Take as much as we can.
+		}
+		bytes_length -= data_size;
+
+		int pilot_length = (bytes[0] == 0x00) ? 8063 : 3223;
 		size += tzx_cas_handle_block(&p, bytes, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
 		bytes += data_size;
+		++block;
 	}
 	return size;
 }
 
 static const cassette_image::LegacyWaveFiller tzx_legacy_fill_wave =
 {
-	tzx_cas_fill_wave,          /* fill_wave */
-	-1,                         /* chunk_size */
-	0,                          /* chunk_samples */
-	tzx_cas_to_wav_size,        /* chunk_sample_calc */
-	TZX_WAV_FREQUENCY,          /* sample_frequency */
-	0,                          /* header_samples */
-	0                           /* trailer_samples */
+	tzx_cas_fill_wave,   // fill_wave
+	-1,                  // chunk_size
+	0,                   // chunk_samples
+	tzx_cas_to_wav_size, // chunk_sample_calc
+	TZX_WAV_FREQUENCY,   // sample_frequency
+	0,                   // header_samples
+	0,                   // trailer_samples
 };
 
 static const cassette_image::LegacyWaveFiller tap_legacy_fill_wave =
 {
-	tap_cas_fill_wave,          /* fill_wave */
-	-1,                         /* chunk_size */
-	0,                          /* chunk_samples */
-	tap_cas_to_wav_size,        /* chunk_sample_calc */
-	TZX_WAV_FREQUENCY,          /* sample_frequency */
-	0,                          /* header_samples */
-	0                           /* trailer_samples */
+	tap_cas_fill_wave,   // fill_wave
+	-1,                  // chunk_size
+	0,                   // chunk_samples
+	tap_cas_to_wav_size, // chunk_sample_calc
+	TZX_WAV_FREQUENCY,   // sample_frequency
+	0,                   // header_samples
+	0                    // trailer_samples
 };
 
 static const cassette_image::LegacyWaveFiller cdt_legacy_fill_wave =
 {
-	cdt_cas_fill_wave,          /* fill_wave */
-	-1,                         /* chunk_size */
-	0,                          /* chunk_samples */
-	tzx_cas_to_wav_size,        /* chunk_sample_calc */
-	TZX_WAV_FREQUENCY,          /* sample_frequency */
-	0,                          /* header_samples */
-	0                           /* trailer_samples */
+	cdt_cas_fill_wave,   // fill_wave
+	-1,                  // chunk_size
+	0,                   // chunk_samples
+	tzx_cas_to_wav_size, // chunk_sample_calc
+	TZX_WAV_FREQUENCY,   // sample_frequency
+	0,                   // header_samples
+	0                    // trailer_samples
 };
 
 static cassette_image::error tzx_cassette_identify( cassette_image *cassette, cassette_image::Options *opts )

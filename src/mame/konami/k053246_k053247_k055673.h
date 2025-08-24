@@ -64,8 +64,6 @@ public:
 		m_dy = dy;
 	}
 
-	void clear_all();
-
 	u16 k055673_rom_word_r(offs_t offset);
 	u16 k055673_ps_rom_word_r(offs_t offset);
 	u16 k055673_gr_rom_word_r(offs_t offset);
@@ -98,7 +96,7 @@ public:
 
 	u8    m_kx46_regs[8];
 	u16   m_kx47_regs[16];
-	int   m_dx = 0, m_dy = 0;
+	int   m_dx, m_dy;
 	u8    m_objcha_line;
 	int   m_z_rejection;
 
@@ -106,13 +104,13 @@ public:
 
 	required_region_ptr<u8> m_gfxrom;
 	int m_gfx_num;
-	int m_bpp = 0;
+	int m_bpp;
 
 	/* alt implementation - to be collapsed */
 	void zdrawgfxzoom32GP(
 			bitmap_rgb32 &bitmap, const rectangle &cliprect,
-			u32 code, u32 color, int flipx, int flipy, int sx, int sy,
-			int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf);
+			u32 code, u32 color, bool flipx, bool flipy, int sx, int sy,
+			int scalex, int scaley, int alpha, int drawmode, int zcode, u8 pri, u8* gx_objzbuf, u8* gx_shdzbuf);
 
 	void zdrawgfxzoom32GP(
 			bitmap_ind16 &bitmap, const rectangle &cliprect,
@@ -225,10 +223,11 @@ public:
 			oy -= m_dy;
 		}
 
+		// the coordinates given are for the *center* of the sprite
 		ox -= (zoomx * width) >> 13;
 		oy -= (zoomy * height) >> 13;
 
-		if (gx_objzbuf && gx_shdzbuf) /* GX  */
+		if (gx_objzbuf && gx_shdzbuf) // GX
 		{
 			k053247_draw_yxloop_gx(bitmap, cliprect,
 				code,
@@ -242,11 +241,9 @@ public:
 				pri,
 				zcode, alpha, drawmode,
 				gx_objzbuf, gx_shdzbuf,
-				0,nullptr
-				);
-
+				0, nullptr);
 		}
-		else /* non-GX */
+		else // non-GX
 		{
 			u8* whichtable = drawmode_table;
 			if (color == -1)
@@ -285,10 +282,7 @@ public:
 				0,
 				0, 0, 0,
 				nullptr, nullptr,
-				primask,whichtable
-				);
-
-
+				primask,whichtable);
 		}
 	}
 
@@ -314,7 +308,7 @@ public:
 		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
 		int zw,zh;
-		int  fx, fy, sx, sy;
+		int fx, fy, sx, sy;
 		int tempcode;
 
 		for (int y=0; y<height; y++)
@@ -404,7 +398,7 @@ public:
 								color,
 								fx,fy,
 								sx,sy,
-								(zw << 16) >> 4,(zh << 16) >> 4,
+								zw << 12,zh << 12,
 								screen().priority(),primask,
 								whichtable);
 					}
@@ -428,7 +422,7 @@ public:
 									color,
 									fx,!fy,
 									sx,sy,
-									(zw << 16) >> 4,(zh << 16) >> 4,
+									zw << 12,zh << 12,
 									screen().priority(),primask,
 									whichtable);
 						}

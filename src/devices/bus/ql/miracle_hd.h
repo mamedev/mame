@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_QL_MIRACLE_HD
-#define MAME_BUS_QL_MIRACLE_HD
+#ifndef MAME_BUS_QL_MIRACLE_HD_H
+#define MAME_BUS_QL_MIRACLE_HD_H
 
 #pragma once
 
@@ -44,4 +44,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(MIRACLE_HARD_DISK, miracle_hard_disk_device)
 
-#endif // MAME_BUS_QL_MIRACLE_HD
+#endif // MAME_BUS_QL_MIRACLE_HD_H

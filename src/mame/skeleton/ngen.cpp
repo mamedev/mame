@@ -1203,6 +1203,6 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1983, ngen,    0,    0, ngen,    ngen, ngen_state,    empty_init, "Convergent Technologies",  "NGEN CP-001", MACHINE_IS_SKELETON )
-COMP( 1991, ngenb38, ngen, 0, ngen386, ngen, ngen386_state, empty_init, "Financial Products Corp.", "B28/38",      MACHINE_IS_SKELETON )
-COMP( 1990, 386i,    ngen, 0, _386i,   ngen, ngen386_state, empty_init, "Convergent Technologies",  "386i",        MACHINE_IS_SKELETON )
+COMP( 1983, ngen,    0,    0, ngen,    ngen, ngen_state,    empty_init, "Convergent Technologies",  "NGEN CP-001", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1991, ngenb38, ngen, 0, ngen386, ngen, ngen386_state, empty_init, "Financial Products Corp.", "B28/38",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1990, 386i,    ngen, 0, _386i,   ngen, ngen386_state, empty_init, "Convergent Technologies",  "386i",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

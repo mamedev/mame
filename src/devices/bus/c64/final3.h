@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_C4_FINAL3_H
-#define MAME_BUS_C4_FINAL3_H
+#ifndef MAME_BUS_C64_FINAL3_H
+#define MAME_BUS_C64_FINAL3_H
 
 #pragma once
 
@@ -53,4 +53,4 @@ private:
 DECLARE_DEVICE_TYPE(C64_FINAL3, c64_final3_cartridge_device)
 
 
-#endif // MAME_BUS_C4_FINAL3_H
+#endif // MAME_BUS_C64_FINAL3_H

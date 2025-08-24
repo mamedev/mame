@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_CPU_COP400_H
-#define MAME_DEVICES_CPU_COP400_H
+#ifndef MAME_CPU_COP400_COP400_H
+#define MAME_CPU_COP400_COP400_H
 
 #pragma once
 
@@ -528,4 +528,4 @@ DECLARE_DEVICE_TYPE(COP444C, cop444c_cpu_device)
 DECLARE_DEVICE_TYPE(COP445C, cop445c_cpu_device)
 DECLARE_DEVICE_TYPE(COP446C, cop446c_cpu_device)
 
-#endif  // MAME_DEVICES_CPU_COP400_H
+#endif // MAME_CPU_COP400_COP400_H

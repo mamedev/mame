@@ -74,4 +74,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 19??, age_cand, 0, age_candy, age_candy, age_candy_state, empty_init, ROT0, "Advanced Games & Engineering", "Candy Crane (AGE)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, age_cand, 0, age_candy, age_candy, age_candy_state, empty_init, ROT0, "Advanced Games & Engineering", "Candy Crane (AGE)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

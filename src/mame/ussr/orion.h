@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_RADIO_ORION_H
-#define MAME_RADIO_ORION_H
+#ifndef MAME_USSR_ORION_H
+#define MAME_USSR_ORION_H
 
 #pragma once
 
@@ -167,4 +167,4 @@ private:
 	void mem_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_RADIO_ORION_H
+#endif // MAME_USSR_ORION_H

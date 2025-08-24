@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_BUS_SEGAAI_EXP_H
-#define MAME_BUS_SEGAAI_EXP_H
+#ifndef MAME_BUS_SEGAAI_SEGAAI_EXP_H
+#define MAME_BUS_SEGAAI_SEGAAI_EXP_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ private:
 // slot interfaces
 void segaai_exp(device_slot_interface &device);
 
-#endif
+#endif // MAME_BUS_SEGAAI_SEGAAI_EXP_H

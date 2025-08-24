@@ -137,4 +137,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1998, dpsv55, 0, 0, dpsv55, dpsv55, dpsv55_state, empty_init, "Sony", "DPS-V55 Multi-Effect Processor", MACHINE_IS_SKELETON)
+SYST(1998, dpsv55, 0, 0, dpsv55, dpsv55, dpsv55_state, empty_init, "Sony", "DPS-V55 Multi-Effect Processor", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

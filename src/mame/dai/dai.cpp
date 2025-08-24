@@ -158,7 +158,7 @@ static INPUT_PORTS_START (dai)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_START("IN8") /* [8] */
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
 		PORT_BIT(0xcb, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -215,9 +215,8 @@ void dai_state::dai(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAI_SOUND(config, m_sound).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50);
+	SPEAKER(config, "speaker", 2).front();
+	DAI_SOUND(config, m_sound).add_route(0, "speaker", 0.50, 0).add_route(1, "speaker", 0.50, 1);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

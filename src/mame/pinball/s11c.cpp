@@ -810,4 +810,4 @@ GAME(1990,  gs_lu4,     0,          s11c,   s11c, s11c_state, init_s11c,  ROT0, 
 GAME(1990,  gs_lu3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LU-3) Europe",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  gs_la3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LA-3)",                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  gs_lg6,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Bally",                "The Bally Game Show (LG-6) Germany",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Krell Development",    "Star Trax (domestic prototype)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state, init_s11c,  ROT0,   "Krell Development",    "Star Trax (domestic prototype)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

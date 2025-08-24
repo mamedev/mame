@@ -132,6 +132,6 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1988, mc300,   0, 0, mc300,   mc50, roland_mc50_state, empty_init, "Roland", "MC-300 Micro Composer", MACHINE_IS_SKELETON)
-SYST(1990, mc50,    0, 0, mc50,    mc50, roland_mc50_state, empty_init, "Roland", "MC-50 Micro Composer", MACHINE_IS_SKELETON)
-SYST(1992, mc50mk2, 0, 0, mc50mk2, mc50, roland_mc50_state, empty_init, "Roland", "MC-50mkII Micro Composer", MACHINE_IS_SKELETON)
+SYST(1988, mc300,   0, 0, mc300,   mc50, roland_mc50_state, empty_init, "Roland", "MC-300 Micro Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1990, mc50,    0, 0, mc50,    mc50, roland_mc50_state, empty_init, "Roland", "MC-50 Micro Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1992, mc50mk2, 0, 0, mc50mk2, mc50, roland_mc50_state, empty_init, "Roland", "MC-50mkII Micro Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

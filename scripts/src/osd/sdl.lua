@@ -37,12 +37,6 @@ function maintargetosdoptions(_target,_subtarget)
 		end
 	end
 
-	if _OPTIONS["USE_WAYLAND"]=="1" then
-		links {
-			"wayland-egl"
-		}
-	end
-
 	if _OPTIONS["NO_USE_XINPUT"]~="1" then
 		links {
 			"Xext",
@@ -148,15 +142,6 @@ if not _OPTIONS["NO_X11"] then
 end
 
 newoption {
-	trigger = "USE_WAYLAND",
-	description = "Use Wayland",
-	allowed = {
-		{ "0",  "Do not use Wayland (use XWayland or X11)"  },
-		{ "1",  "Use Wayland" },
-	},
-}
-
-newoption {
 	trigger = "NO_USE_XINPUT",
 	description = "Disable use of Xinput",
 	allowed = {
@@ -229,12 +214,7 @@ end
 
 BASE_TARGETOS       = "unix"
 SDLOS_TARGETOS      = "unix"
-if _OPTIONS["targetos"]=="linux" then
-elseif _OPTIONS["targetos"]=="openbsd" then
-elseif _OPTIONS["targetos"]=="netbsd" then
-elseif _OPTIONS["targetos"]=="haiku" then
-elseif _OPTIONS["targetos"]=="asmjs" then
-elseif _OPTIONS["targetos"]=="windows" then
+if _OPTIONS["targetos"]=="windows" then
 	BASE_TARGETOS       = "win32"
 	SDLOS_TARGETOS      = "win32"
 elseif _OPTIONS["targetos"]=="macosx" then
@@ -372,6 +352,8 @@ project ("osd_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/modules/debugger/osx/disassemblyviewer.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogview.mm",
 			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogview.h",
+			MAME_DIR .. "src/osd/modules/debugger/osx/exceptionpointsview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/exceptionpointsview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/disassemblyview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogviewer.mm",
 			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogviewer.h",

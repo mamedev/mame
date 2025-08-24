@@ -67,4 +67,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP(1988, tek4319, 0, 0, tek4319, tek4319, tek43xx_state, empty_init, "Tektronix", "4319 Graphics Workstation", MACHINE_IS_SKELETON)
+COMP(1988, tek4319, 0, 0, tek4319, tek4319, tek43xx_state, empty_init, "Tektronix", "4319 Graphics Workstation", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -2,14 +2,15 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * NCR 5380 and 53C80, aka Zilog Z5380, AMD Am5380, Sony CXD1180 and others.
+ * NCR 5380 and 53C80, aka Zilog Z5380, AMD Am5380, Sony CXD1180, National Semiconductor DP8490, Logic Devices L5380 and others.
  *
  * Sources:
  *  - http://bitsavers.org/components/ncr/scsi/SP-1051_NCR_5380-53C80_SCSI_Interface_Chip_Design_Manual_Mar86.pdf
  *
  * TODO:
  *  - target mode
- *  - cxd1180 enhancements
+ *  - CXD1180 enhancements
+ *  - DP8490 enhancements
  */
 
 #include "emu.h"
@@ -27,6 +28,7 @@
 DEFINE_DEVICE_TYPE(NCR5380,  ncr5380_device,  "ncr5380",  "NCR 5380 SCSI")
 DEFINE_DEVICE_TYPE(NCR53C80, ncr53c80_device, "ncr53c80", "NCR 53C80 SCSI")
 DEFINE_DEVICE_TYPE(CXD1180,  cxd1180_device,  "cxd1180",  "Sony CXD1180")
+DEFINE_DEVICE_TYPE(DP8490,   dp8490_device,   "dp8490",   "National Semiconductor DP8490 EASI")
 
 ALLOW_SAVE_TYPE(ncr5380_device::state);
 
@@ -51,6 +53,11 @@ ncr53c80_device::ncr53c80_device(machine_config const &mconfig, char const *tag,
 
 cxd1180_device::cxd1180_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: ncr5380_device(mconfig, CXD1180, tag, owner, clock, true)
+{
+}
+
+dp8490_device::dp8490_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: ncr5380_device(mconfig, DP8490, tag, owner, clock, true)
 {
 }
 

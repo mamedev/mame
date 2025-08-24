@@ -177,7 +177,7 @@ uint8_t bbc_tube_z80_device::opcode_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
-		if (offset == 0x0066 && m_z80->input_state(INPUT_LINE_NMI))
+		if (offset == 0x0066 && m_z80->input_line_state(INPUT_LINE_NMI))
 			m_rom_enabled = true;
 		else if (offset >= 0x8000)
 			m_rom_enabled = false;

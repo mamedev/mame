@@ -8,17 +8,17 @@ Uses a TC0091LVC, a variant of the one used on Taito L HW
 
 Undumped games on similar hardware (ES-9402 or ES-9410):
 * Angel Fever
-* Gold Strike
 * Lucky Pierrot / Wonder Circus
 * Miracle Seven
 * Miracle Seven - Heaven's Gate Turbo
 * Multi Spin
 * Royal Choice Poker
-* Ukiyo Box
 
 TODO:
 - lastbank: sprites should be clip masked during gameplay (verify);
 - fever13: OKI sound volume overdrives a lot;
+- goldstrk, wcircus: sound flags / latches are somewhat different, need correct implementation;
+- goldstrk: correct DIP definitions;
 - hookup hopper device;
 
 **************************************************************************************************/
@@ -84,7 +84,7 @@ private:
 	void key_select_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
-	void audio_map(address_map &map) ATTR_COLD;
+	virtual void audio_map(address_map &map) ATTR_COLD;
 	void tc0091lvc_map(address_map &map) ATTR_COLD;
 };
 
@@ -98,6 +98,17 @@ public:
 protected:
 	virtual void main_map(address_map &map) override ATTR_COLD;
 	virtual void audio_io(address_map &map) override ATTR_COLD;
+};
+
+class wcircus_state : public fever13_state
+{
+public:
+	wcircus_state(const machine_config &mconfig, device_type type, const char *tag)
+		: fever13_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void audio_map(address_map &map) override ATTR_COLD;
 };
 
 
@@ -229,6 +240,13 @@ void fever13_state::audio_io(address_map &map)
 	map(0x80, 0x80).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0xc0, 0xc0).r("soundlatch1", FUNC(generic_latch_8_device::read)).w(FUNC(fever13_state::sound_flags_w));
 }
+
+void wcircus_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); // TODO: partly banked?
+	map(0x8000, 0x87ff).ram();
+}
+
 
 static INPUT_PORTS_START( lastbank )
 	PORT_START("COINS")
@@ -365,14 +383,14 @@ static INPUT_PORTS_START( lastbank )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW3:1,2,3,4")
-	PORT_DIPSETTING(    0x07, "1 Coin /100 Credits" )
-	PORT_DIPSETTING(    0x08, "1 Coin /50 Credits" )
-	PORT_DIPSETTING(    0x09, "1 Coin /25 Credits" )
-	PORT_DIPSETTING(    0x0a, "1 Coin /20 Credits" )
-	PORT_DIPSETTING(    0x0b, "1 Coin /10 Credits" )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_100C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_10C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x01, "5 Coins /2 Credits" )
+	PORT_DIPSETTING(    0x01, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
@@ -380,16 +398,16 @@ static INPUT_PORTS_START( lastbank )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x00, "10 Coins /1 Credit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 	PORT_DIPNAME( 0xf0, 0xf0, "Coin C" ) PORT_DIPLOCATION("DSW3:5,6,7,8")
-	PORT_DIPSETTING(    0x70, "1 Coin /100 Credits" )
-	PORT_DIPSETTING(    0x80, "1 Coin /50 Credits" )
-	PORT_DIPSETTING(    0x90, "1 Coin /25 Credits" )
-	PORT_DIPSETTING(    0xa0, "1 Coin /20 Credits" )
-	PORT_DIPSETTING(    0xb0, "1 Coin /10 Credits" )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_100C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_10C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x10, "5 Coins /2 Credits" )
+	PORT_DIPSETTING(    0x10, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
@@ -397,7 +415,7 @@ static INPUT_PORTS_START( lastbank )
 	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x00, "10 Coins /1 Credit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 
 	PORT_START("DSW4")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:1")
@@ -410,14 +428,14 @@ static INPUT_PORTS_START( lastbank )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW4:4,5,6")
-	PORT_DIPSETTING(    0x30, "1 Coin /50 Credits" )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_50C ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0x08, "9 Coins /1 Credit" )
-	PORT_DIPSETTING(    0x00, "10 Coins /1 Credit" )
+	PORT_DIPSETTING(    0x08, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -510,14 +528,14 @@ static INPUT_PORTS_START( fever13 )
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW3:1,2,3,4")
-	PORT_DIPSETTING(    0x07, "1 Coin /100 Credits" )
-	PORT_DIPSETTING(    0x08, "1 Coin /50 Credits" )
-	PORT_DIPSETTING(    0x09, "1 Coin /25 Credits" )
-	PORT_DIPSETTING(    0x0a, "1 Coin /20 Credits" )
-	PORT_DIPSETTING(    0x0b, "1 Coin /10 Credits" )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_100C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_10C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x01, "5 Coins /2 Credits" )
+	PORT_DIPSETTING(    0x01, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
@@ -525,16 +543,16 @@ static INPUT_PORTS_START( fever13 )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x00, "10 Coins /1 Credit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW3:5,6,7,8")
-	PORT_DIPSETTING(    0x70, "1 Coin /100 Credits" )
-	PORT_DIPSETTING(    0x80, "1 Coin /50 Credits" )
-	PORT_DIPSETTING(    0x90, "1 Coin /25 Credits" )
-	PORT_DIPSETTING(    0xa0, "1 Coin /20 Credits" )
-	PORT_DIPSETTING(    0xb0, "1 Coin /10 Credits" )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_100C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_10C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x10, "5 Coins /2 Credits" )
+	PORT_DIPSETTING(    0x10, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
@@ -542,18 +560,18 @@ static INPUT_PORTS_START( fever13 )
 	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x00, "10 Coins /1 Credit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 
 	PORT_MODIFY("DSW4")
 	PORT_DIPNAME( 0x07, 0x07, "Coin C" ) PORT_DIPLOCATION("DSW4:1,2,3")
-	PORT_DIPSETTING(    0x06, "1 Coin /50 Credits" )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_50C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0x01, "9 Coins /1 Credit" )
-	PORT_DIPSETTING(    0x00, "10 Coins /1 Credit" )
+	PORT_DIPSETTING(    0x01, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 	PORT_DIPNAME( 0x38, 0x38, "Credit Limit" ) PORT_DIPLOCATION("DSW4:4,5,6") // "Give Up"
 	PORT_DIPSETTING(    0x38, "1000" )
 	PORT_DIPSETTING(    0x30, "3000" )
@@ -569,6 +587,15 @@ static INPUT_PORTS_START( fever13 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ukiyobox )
+	PORT_INCLUDE( fever13 )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x40, 0x40, "Hopper Access" ) PORT_DIPLOCATION("DSW4:7")
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x40, "Fast" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mir7hg )
@@ -598,6 +625,110 @@ static INPUT_PORTS_START( mir7hg )
 	PORT_DIPNAME( 0x80, 0x80, "Illegal Check" ) PORT_DIPLOCATION("DSW4:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( wcircus )
+	PORT_INCLUDE( fever13 )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, "Max Bet" ) PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x02, "10" )
+	PORT_DIPSETTING(    0x01, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Min  Bet" ) PORT_DIPLOCATION("DSW1:3,4")
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Payout Rate Type" ) PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x00, "Credit In / Out" )
+	PORT_DIPSETTING(    0x20, "Game In / Out" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7") // no effect in test mode
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8") // no effect in test mode
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, "Credit Limit" ) PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(    0x07, "1000" )
+	PORT_DIPSETTING(    0x06, "2000" )
+	PORT_DIPSETTING(    0x05, "3000" )
+	PORT_DIPSETTING(    0x04, "5000" )
+	PORT_DIPSETTING(    0x03, "10000" )
+	PORT_DIPSETTING(    0x02, "20000" )
+	PORT_DIPSETTING(    0x01, "30000" )
+	PORT_DIPSETTING(    0x00, "50000" )
+	PORT_DIPNAME( 0x38, 0x38, "Win Percentage" ) PORT_DIPLOCATION("DSW2:4,5,6")
+	PORT_DIPSETTING(    0x00, "55" )
+	PORT_DIPSETTING(    0x08, "60" )
+	PORT_DIPSETTING(    0x10, "65" )
+	PORT_DIPSETTING(    0x18, "70" )
+	PORT_DIPSETTING(    0x20, "75" )
+	PORT_DIPSETTING(    0x28, "80" )
+	PORT_DIPSETTING(    0x30, "85" )
+	PORT_DIPSETTING(    0x38, "90" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "Hopper Motor" ) PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Switch" ) PORT_DIPLOCATION("DSW3:2")
+	PORT_DIPSETTING(    0x02, "Micro" )
+	PORT_DIPSETTING(    0x00, "Sensor" )
+	PORT_DIPNAME( 0x1c, 0x1c, "Coin A / Coin C" ) PORT_DIPLOCATION("DSW3:3,4,5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x14, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x0c, "1 Coin / 100 Credits" )
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW3:6,7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xa0, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x80, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x60, "1 Coin / 100 Credits" )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x03, 0x03, "Key In" ) PORT_DIPLOCATION("DSW4:1,2")
+	PORT_DIPSETTING(    0x03, "50 Credits" )
+	PORT_DIPSETTING(    0x02, "100 Credits" )
+	PORT_DIPSETTING(    0x01, "500 Credits" )
+	PORT_DIPSETTING(    0x00, "1000 Credits" )
+	PORT_DIPNAME( 0x1c, 0x1c, "Pay Out" ) PORT_DIPLOCATION("DSW4:3,4,5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x14, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x0c, "1 Coin / 100 Credits" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:6") // no effect in test mode
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Left / Center / Right Stop Buttons" ) PORT_DIPLOCATION("DSW4:7,8")
+	PORT_DIPSETTING(    0xc0, "Take / Small / Big" )
+	PORT_DIPSETTING(    0x80, "W-Up / Small / Big" )
+	PORT_DIPSETTING(    0x40, "Small / Big / Take" )
+	PORT_DIPSETTING(    0x00, "Small / Big / W-Up" )
 INPUT_PORTS_END
 
 
@@ -682,7 +813,7 @@ ROM_START( lastbank )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
 
-	ROM_REGION( 0x120000, "maincpu:gfx", 0 )
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
 	ROM_LOAD( "u11",   0x000000, 0x100000, CRC(2588d82d) SHA1(426f6821862d54123e53410e2776586ddf6b21e7) )
 	ROM_LOAD( "5.u10", 0x100000, 0x020000, CRC(51f3c5a7) SHA1(73d4c8817fe96d75be32c43e816e93c52b5d2b27) )
 
@@ -702,7 +833,7 @@ ROM_START( fever13 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "4.u48", 0x00000, 0x10000, CRC(33cba6b2) SHA1(cf7d1c7c6215b2f83c9266f92f46d3cfc0242afc) )
 
-	ROM_REGION( 0x120000, "maincpu:gfx", 0 )
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
 	// unlabeled mask ROM, socket marked as 23C8000 CG ROM
 	ROM_LOAD( "u11", 0x000000, 0x100000, CRC(da59b0d8) SHA1(86fd3cd77aae22e103d11e697b8b4f70ae8b8197) )
 
@@ -713,6 +844,25 @@ ROM_START( fever13 )
 	ROM_LOAD( "2.u60", 0x00000, 0x80000, CRC(4e0da568) SHA1(6cd4d3facf8f05747d6cff03617bdfc91b5e9d67) )
 ROM_END
 
+// 浮世箱
+// ES-9410 PCB
+ROM_START( ukiyobox )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "5-9d33.u9", 0x00000, 0x40000,CRC(6a567f55) SHA1(087579e420d581439788561abddfe42fdeaaaa88) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "4.u48", 0x00000, 0x10000, CRC(33cba6b2) SHA1(cf7d1c7c6215b2f83c9266f92f46d3cfc0242afc) )
+
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "u11", 0x00000, 0x100000, CRC(da59b0d8) SHA1(86fd3cd77aae22e103d11e697b8b4f70ae8b8197) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "es-9410.u55", 0x00000, 0x40000, CRC(09b5e4d6) SHA1(cf0235e9cf0577bf932beda7e4fb1b84410a3e0c) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
+	ROM_LOAD( "es-9410.u60", 0x00000, 0x80000, CRC(f277afa9) SHA1(1b5a8abad37b6f19730f99bf97334b4eb2da4399) )
+ROM_END
+
 // ES-9410 PCB
 ROM_START( mir7hg ) // v1.0.2 Feb 19 1996 15:05:17
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -721,7 +871,7 @@ ROM_START( mir7hg ) // v1.0.2 Feb 19 1996 15:05:17
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "3.u48", 0x00000, 0x10000, CRC(895da366) SHA1(4e82e2ee9b6a91453b8dca9f313714ef846dec56) ) // 11111xxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x80000, "maincpu:gfx", 0 )
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
 	ROM_LOAD( "2.u11", 0x00000, 0x80000, CRC(ddb65010) SHA1(f5af9f63f353023d2ce8e8787a13ec090158ac25) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
@@ -731,9 +881,50 @@ ROM_START( mir7hg ) // v1.0.2 Feb 19 1996 15:05:17
 	ROM_LOAD( "5.u60", 0x00000, 0x80000, CRC(13d8c30a) SHA1(1a2dc0c97992e9e1d73c5f3f713db8599d2d2285) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
+ROM_START( wcircus )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "6.u9", 0x00000, 0x40000, CRC(6cb29023) SHA1(e1a980f789d4c66ddd80e819d0a94991a5ad1f2b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "3.u48", 0x00000, 0x10000, CRC(ec8a0ccc) SHA1(84ffb5c9614764500f41cff8f0d6d5ad9f0d8084) )
+
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "27c802.u11", 0x000000, 0x100000, CRC(fefee118) SHA1(21c81e4a7d5ac86e1ebb452647a1908fd4ee9600) ) // 1xxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "5.u55", 0x00000, 0x40000, CRC(390911e9) SHA1(10ed6fca1a0d183f47c231503a3077faab0d593e) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
+	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(d018ed97) SHA1(02eb6559805f81f371d39b9c0660cd6d9d392656) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8b.u45", 0x000, 0x117, CRC(02e1f2e9) SHA1(25ae98facfed2796bfc1ad33cce73c5074edd135) )
+ROM_END
+
+// ES-9402 PCB
+ROM_START( goldstrk )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "7.gsoh.u9", 0x00000, 0x40000, CRC(2401cc35) SHA1(4e12150ad18aea5adf07ab8fcb39fd175bc8e4e5) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "3.u48", 0x00000, 0x10000, CRC(ec8a0ccc) SHA1(84ffb5c9614764500f41cff8f0d6d5ad9f0d8084) ) // same as wcircus
+
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "1.gschr.u11", 0x000000, 0x080000, CRC(07d75465) SHA1(ba16fe05800ebedafec64f1f0f2bfb953c39d159) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "7.gsse.u55", 0x00000, 0x40000, CRC(0eb850ba) SHA1(0b9a704188e3b8a50e54fc29fc8e4dad2e3e8397) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
+	ROM_LOAD( "7.gsbgm.u60", 0x00000, 0x80000, CRC(04952e51) SHA1(272283306d9ec951baa85cb8e2d8952da7a98894) )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fever13,  0, lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, mir7hg,   0, lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, lastbank, 0,       lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fever13,  0,       lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1995, ukiyobox, fever13, lastbank, ukiyobox, fever13_state,  empty_init, ROT0, "Excellent System", "Ukiyo Box (Japan, v1.3.7)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, mir7hg,   0,       lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, wcircus,  0,       lastbank, wcircus,  wcircus_state,  empty_init, ROT0, "Cobra",            "Wonder Circus (Japan, v1.1.1)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, goldstrk, 0,       lastbank, wcircus,  wcircus_state,  empty_init, ROT0, "Cobra",            "Gold Strike (Japan, v1.1.1 - Location Test)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud, David Haywood
 
-#ifndef MAME_CPU_SFR_SFR_H
-#define MAME_CPU_SFR_SFR_H
+#ifndef MAME_CPU_AXC51_AXC51_H
+#define MAME_CPU_AXC51_AXC51_H
 
 #pragma once
 
@@ -541,5 +541,4 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
-
-#endif // MAME_CPU_SFR_SFR_H
+#endif // MAME_CPU_AXC51_AXC51_H

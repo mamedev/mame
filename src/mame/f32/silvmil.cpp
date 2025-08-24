@@ -1,16 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-  Silver Millennium
 
-  yet another Data East / Tumble Pop derived hardware
-  this one seems similar to (but not identical to)
-  the f32/crospang.cpp hardware from F2 system
-  also very close to gotcha.c, which was also a Para
-  board.
+Silver Millennium
 
-  todo: refresh rate
-        verify dipswitches - difficulty & unknown dips
+yet another Data East / Tumble Pop derived hardware
+this one seems similar to (but not identical to)
+the f32/crospang.cpp hardware from F2 system
+also very close to gotcha.cpp, which was also a Para
+board.
+
+TODO:
+- refresh rate
+- verify dipswitches - difficulty & unknown dips
+- like gotcha, what is the audiocpu NMI for?
 
 OSC on Silver Millennium are 12MHz, 14.31818MHz & 4.096MHz
 The above has been verified on two boards.
@@ -31,6 +34,7 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

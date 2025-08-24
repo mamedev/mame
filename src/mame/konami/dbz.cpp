@@ -220,7 +220,7 @@ void dbz_state::video_start()
 		m_k056832->set_layer_offs(0, -35, -16);
 
 	m_k056832->set_layer_offs(1, -31, -16);
-	m_k056832->set_layer_offs(3, -31, -16); //?
+	m_k056832->set_layer_offs(3, -31, -16); // ?
 }
 
 uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -237,7 +237,7 @@ uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitma
 		{
 			m_layer_colorbase[plane] = new_colorbase;
 			if (plane <= 3)
-				m_k056832->mark_plane_dirty( plane);
+				m_k056832->mark_plane_dirty(plane);
 			else if (plane == 4)
 				m_bg1_tilemap->mark_all_dirty();
 			else if (plane == 5)
@@ -245,8 +245,7 @@ uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitma
 		}
 	}
 
-	//layers priority
-
+	// layers priority
 	layer[0] = 0;
 	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI3);
 	layer[1] = 1;
@@ -298,7 +297,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::dbz_scanline)
 		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 
 	if(scanline == 0 && m_k053246->k053246_is_irq_enabled()) // vblank-in irq
-		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE); //auto-acks apparently
+		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE); // auto-acks apparently
 }
 
 #if 0
@@ -600,19 +599,18 @@ void dbz_state::dbz(machine_config &config)
 	m_k053252->int1_ack().set(FUNC(dbz_state::dbz_irq2_ack_w));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 1.0);
-	ymsnd.add_route(1, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(1, "speaker", 1.0, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 void dbz_state::dbz2bl(machine_config &config)
@@ -621,6 +619,7 @@ void dbz_state::dbz2bl(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &dbz_state::dbz2bl_map);
 }
+
 /**********************************************************************************/
 
 ROM_START( dbz )

@@ -132,4 +132,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1982, juno6, 0, 0, juno6, juno6, juno6_state, empty_init, "Roland", "Juno-6 (JU-6) Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1982, juno6, 0, 0, juno6, juno6, juno6_state, empty_init, "Roland", "Juno-6 (JU-6) Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

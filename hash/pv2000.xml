@@ -154,4 +154,193 @@ No known undumped carts
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- Homebrew -->
+
+	<software name="aerial">
+		<description>Aerial</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="aerial.rom" size="0x4000" crc="177451bc" sha1="9ae121a36b5b55d484a9363e4cea3855269c7b48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antiair">
+		<description>AntiAir</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="antiair.rom" size="0x2000" crc="bbd4a5e9" sha1="a4f9066486689f9209ff6af6e578fb2038e192ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ascend">
+		<description>Ascend</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="ascend.rom" size="0x4000" crc="0f4a902d" sha1="fe7f6f3609eebb5c0e711d239cadbf098bfd2f12"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlot">
+		<description>Battlot</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="battlot.rom" size="0x4000" crc="16daeb78" sha1="1459ba79563a27bc7bad6bfb4e3efee8fa7ddc7b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bootskell">
+		<description>Bootskell</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="bootskell.rom" size="0x4000" crc="3fc4072b" sha1="05ac4e01ff331653387b2705738109f6596f5b5c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cacorm">
+		<description>Cacorm</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="cacorm.rom" size="0x4000" crc="14284d85" sha1="6300ae5185d84bd20f16b84ceb2b76667b958e84"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavit">
+		<description>Cavit</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="cavit.rom" size="0x4000" crc="140b8c6f" sha1="4787eb896626b77bb7fc53f5cdd1826bc8485e52"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cracky">
+		<description>Cracky</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="cracky.rom" size="0x2000" crc="7d1b1d80" sha1="0ccbdfb6c3c8b185c2e564d479291fae73b9eb10"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="croschas">
+		<description>Cross Chase</description>
+		<year>2021</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="cross chase (2021-05-13)(caruso, fabrizio).bin" size="0x4000" crc="6ed15819" sha1="e310dcb6b2e125a313faf88f562083319be8fba9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guntus">
+		<description>Guntus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="guntus.rom" size="0x4000" crc="272d2d9a" sha1="c87d57027669b576f68a0880433445bf1f1b020e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopman">
+		<description>Hopman</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="hopman.rom" size="0x4000" crc="d2678628" sha1="6fa05cefd7321c657ff400e38063fe6ed68fdc5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lift">
+		<description>Lift</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="lift.rom" size="0x2000" crc="54d87a14" sha1="a5a3426fedbc5f50ee9715e0ee656696382c2074"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazy">
+		<description>Mazy</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="mazy.rom" size="0x2000" crc="cbd58701" sha1="49eab18723a414c3c1deecc8be0c0d7fb6b7a49d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neuras">
+		<description>Neuras</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="neuras.rom" size="0x4000" crc="1cfc0d7e" sha1="c5c7da4fc5aae931db58b8dcb1d5633afc5c6376"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osotos">
+		<description>Osotos</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="osotos.rom" size="0x4000" crc="141a0e75" sha1="6f97568205d282777bb063b43d422cd16f698b88"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruptus">
+		<description>Ruptus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="ruptus.rom" size="0x4000" crc="dc257f5d" sha1="6838e01a53193a8727712fb64a999596b0988b78"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yewdow">
+		<description>Yewdow</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="yewdow.rom" size="0x4000" crc="25cbf349" sha1="539eff4d2a38c4f9579d0287cc47414445880e6a"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

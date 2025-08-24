@@ -1,8 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde, windyfairy
-
-#ifndef MAME_KONAMI_GN676_LAN_H
-#define MAME_KONAMI_GN676_LAN_H
+#ifndef MAME_KONAMI_KONAMI_GN676_LAN_H
+#define MAME_KONAMI_KONAMI_GN676_LAN_H
 
 #pragma once
 
@@ -71,4 +70,4 @@ protected:
 DECLARE_DEVICE_TYPE(KONAMI_GN676A_LAN, konami_gn676a_lan_device)
 DECLARE_DEVICE_TYPE(KONAMI_GN676B_LAN, konami_gn676b_lan_device)
 
-#endif // MAME_KONAMI_GN676_LAN_H
+#endif // MAME_KONAMI_KONAMI_GN676_LAN_H

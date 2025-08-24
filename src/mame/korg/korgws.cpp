@@ -106,6 +106,6 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1992, korgwsex, 0, 0, korgws,   korgws, korgws_state, empty_init, "Korg", "WaveStation EX", MACHINE_IS_SKELETON)
-SYST(1991, korgwsad, 0, 0, korgws,   korgws, korgws_state, empty_init, "Korg", "WaveStation A/D", MACHINE_IS_SKELETON)
-SYST(1992, korgwssr, 0, 0, korgwssr, korgws, korgws_state, empty_init, "Korg", "WaveStation SR", MACHINE_IS_SKELETON)
+SYST(1992, korgwsex, 0, 0, korgws,   korgws, korgws_state, empty_init, "Korg", "WaveStation EX", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1991, korgwsad, 0, 0, korgws,   korgws, korgws_state, empty_init, "Korg", "WaveStation A/D", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1992, korgwssr, 0, 0, korgwssr, korgws, korgws_state, empty_init, "Korg", "WaveStation SR", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

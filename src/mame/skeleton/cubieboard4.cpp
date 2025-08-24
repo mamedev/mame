@@ -94,7 +94,7 @@ ROM_END
 } // anonymous namespace
 
 // Main machine
-COMP( 20??, cubieboard4, 0, 0, cubiecca80, cubiecca80, cubiecca80_state, empty_init, "Cubietech Limited", "Cubieboard4 (CC A-20)", MACHINE_IS_SKELETON )
+COMP( 20??, cubieboard4, 0, 0, cubiecca80, cubiecca80, cubiecca80_state, empty_init, "Cubietech Limited", "Cubieboard4 (CC A-20)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Arcade games
-GAME( 20??, monkeyjmp, 0, cubiecca80, cubiecca80, cubiecca80_state, empty_init, ROT90, "Falgas", "Monkey Jump", MACHINE_IS_SKELETON )
+GAME( 20??, monkeyjmp, 0, cubiecca80, cubiecca80, cubiecca80_state, empty_init, ROT90, "Falgas", "Monkey Jump", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -155,4 +155,4 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE      INPUT        CLASS              INIT        COMPANY    FULLNAME                                      FLAGS
-COMP( 1999, wto2840sp, 0,      0,      webtouchone, webtouchone, webtouchone_state, empty_init, "Alcatel", "Web Touch One (model 2840, Terra, Spanish)", MACHINE_IS_SKELETON )
+COMP( 1999, wto2840sp, 0,      0,      webtouchone, webtouchone, webtouchone_state, empty_init, "Alcatel", "Web Touch One (model 2840, Terra, Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

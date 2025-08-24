@@ -11,6 +11,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Bactron</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="144" />
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="70416">
@@ -80,7 +81,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="malefatl">
-		<description>Le Malefice des Atlantes</description>
+		<description>Les Aventures du Ka 4 - Le Maléfice des Atlantes</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -95,6 +96,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>MGT</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Octobre 1986" />
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="65780">
@@ -107,6 +109,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Music 3 Voix</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="P.O. Richez" />
+		<info name="serial" value="L 546" />
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="42339">
@@ -131,6 +135,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Silent Service</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="SS 1109" />
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="48300">
@@ -143,6 +148,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Space Racer</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Mai 1988" />
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="91549">

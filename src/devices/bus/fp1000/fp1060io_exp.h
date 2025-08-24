@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_BUS_FP1060IO_EXP_H
-#define MAME_BUS_FP1060IO_EXP_H
+#ifndef MAME_BUS_FP1000_FP1060IO_EXP_H
+#define MAME_BUS_FP1000_FP1060IO_EXP_H
 
 #pragma once
 
@@ -83,5 +83,4 @@ void fp1060io_slot_devices(device_slot_interface &device);
 
 DECLARE_DEVICE_TYPE(FP1060IO_EXP_SLOT, fp1060io_exp_slot_device)
 
-#endif // MAME_BUS_FP1060IO_EXP_H
-
+#endif // MAME_BUS_FP1000_FP1060IO_EXP_H

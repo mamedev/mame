@@ -58,17 +58,17 @@ void rocknms_state::sub_flipscreen_w(int state)
 ***************************************************************************/
 
 /* BBBBBGGGGGRRRRRx xxxxxxxxxxxxxxxx */
-void tetrisp2_state::tetrisp2_palette_w(offs_t offset, u16 data, u16 mem_mask)
+void tetrisp2_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	data = COMBINE_DATA(&m_paletteram[offset]);
-	if ((offset & 1) == 0)
+	if (BIT(~offset, 0))
 		m_palette->set_pen_color(offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
-void rocknms_state::rocknms_sub_palette_w(offs_t offset, u16 data, u16 mem_mask)
+void rocknms_state::sub_palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	data = COMBINE_DATA(&m_sub_paletteram[offset]);
-	if ((offset & 1) == 0)
+	if (BIT(~offset, 0))
 		m_sub_palette->set_pen_color(offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
@@ -82,7 +82,7 @@ void rocknms_state::rocknms_sub_palette_w(offs_t offset, u16 data, u16 mem_mask)
 
 ***************************************************************************/
 
-void tetrisp2_state::tetrisp2_priority_w(offs_t offset, u16 data, u16 mem_mask)
+void tetrisp2_state::priority_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_priority[offset] = data;
@@ -90,17 +90,17 @@ void tetrisp2_state::tetrisp2_priority_w(offs_t offset, u16 data, u16 mem_mask)
 		m_priority[offset] = data >> 8;
 }
 
-u16 tetrisp2_state::tetrisp2_priority_r(offs_t offset)
+u16 tetrisp2_state::priority_r(offs_t offset)
 {
 	return m_priority[offset] | 0xff00;
 }
 
-void rocknms_state::rocknms_sub_priority_w(offs_t offset, u16 data, u16 mem_mask)
+void rocknms_state::sub_priority_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		m_rocknms_sub_priority[offset] = data;
+		m_sub_priority[offset] = data;
 	else
-		m_rocknms_sub_priority[offset] = data >> 8;
+		m_sub_priority[offset] = data >> 8;
 }
 
 
@@ -133,7 +133,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_bg)
 			0);
 }
 
-void tetrisp2_state::tetrisp2_vram_bg_w(offs_t offset, u16 data, u16 mem_mask)
+void tetrisp2_state::vram_bg_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram_bg[offset]);
 	m_tilemap_bg->mark_tile_dirty(offset/2);
@@ -153,7 +153,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_fg)
 			0);
 }
 
-void tetrisp2_state::tetrisp2_vram_fg_w(offs_t offset, u16 data, u16 mem_mask)
+void tetrisp2_state::vram_fg_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// VJ and Stepping Stage write to the upper byte here to display ASCII text,
 	// other usages in those games outside of ASCII text write a full 16-bit value.
@@ -168,73 +168,73 @@ void tetrisp2_state::tetrisp2_vram_fg_w(offs_t offset, u16 data, u16 mem_mask)
 
 TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rot)
 {
-	u16 code_hi = m_vram_rot[ 2 * tile_index + 0];
-	u16 code_lo = m_vram_rot[ 2 * tile_index + 1];
+	u16 code_hi = m_vram_rot[2 * tile_index + 0];
+	u16 code_lo = m_vram_rot[2 * tile_index + 1];
 	tileinfo.set(1,
 			code_hi,
 			code_lo & 0xf,
 			0);
 }
 
-void tetrisp2_state::tetrisp2_vram_rot_w(offs_t offset, u16 data, u16 mem_mask)
+void tetrisp2_state::vram_rot_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram_rot[offset]);
 	m_tilemap_rot->mark_tile_dirty(offset/2);
 }
 
-TILE_GET_INFO_MEMBER(rocknms_state::get_tile_info_rocknms_sub_bg)
+TILE_GET_INFO_MEMBER(rocknms_state::get_tile_info_sub_bg)
 {
-	u16 code_hi = m_rocknms_sub_vram_bg[ 2 * tile_index + 0];
-	u16 code_lo = m_rocknms_sub_vram_bg[ 2 * tile_index + 1];
+	u16 code_hi = m_sub_vram_bg[2 * tile_index + 0];
+	u16 code_lo = m_sub_vram_bg[2 * tile_index + 1];
 	tileinfo.set(0,
 			code_hi,
 			code_lo & 0xf,
 			0);
 }
 
-void rocknms_state::rocknms_sub_vram_bg_w(offs_t offset, u16 data, u16 mem_mask)
+void rocknms_state::sub_vram_bg_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_rocknms_sub_vram_bg[offset]);
+	COMBINE_DATA(&m_sub_vram_bg[offset]);
 	m_tilemap_sub_bg->mark_tile_dirty(offset/2);
 }
 
 
-TILE_GET_INFO_MEMBER(rocknms_state::get_tile_info_rocknms_sub_fg)
+TILE_GET_INFO_MEMBER(rocknms_state::get_tile_info_sub_fg)
 {
-	u16 code_hi = m_rocknms_sub_vram_fg[ 2 * tile_index + 0];
-	u16 code_lo = m_rocknms_sub_vram_fg[ 2 * tile_index + 1];
+	u16 code_hi = m_sub_vram_fg[2 * tile_index + 0];
+	u16 code_lo = m_sub_vram_fg[2 * tile_index + 1];
 	tileinfo.set(2,
 			code_hi,
 			code_lo & 0xf,
 			0);
 }
 
-void rocknms_state::rocknms_sub_vram_fg_w(offs_t offset, u16 data, u16 mem_mask)
+void rocknms_state::sub_vram_fg_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_rocknms_sub_vram_fg[offset]);
+	COMBINE_DATA(&m_sub_vram_fg[offset]);
 	m_tilemap_sub_fg->mark_tile_dirty(offset/2);
 }
 
 
-TILE_GET_INFO_MEMBER(rocknms_state::get_tile_info_rocknms_sub_rot)
+TILE_GET_INFO_MEMBER(rocknms_state::get_tile_info_sub_rot)
 {
-	u16 code_hi = m_rocknms_sub_vram_rot[ 2 * tile_index + 0];
-	u16 code_lo = m_rocknms_sub_vram_rot[ 2 * tile_index + 1];
+	u16 code_hi = m_sub_vram_rot[2 * tile_index + 0];
+	u16 code_lo = m_sub_vram_rot[2 * tile_index + 1];
 	tileinfo.set(1,
 			code_hi,
 			code_lo & 0xf,
 			0);
 }
 
-void rocknms_state::rocknms_sub_vram_rot_w(offs_t offset, u16 data, u16 mem_mask)
+void rocknms_state::sub_vram_rot_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_rocknms_sub_vram_rot[offset]);
+	COMBINE_DATA(&m_sub_vram_rot[offset]);
 	m_tilemap_sub_rot->mark_tile_dirty(offset/2);
 }
 
 
 
-VIDEO_START_MEMBER(tetrisp2_state,tetrisp2)
+void tetrisp2_state::video_start()
 {
 	m_tilemap_bg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tetrisp2_state::get_tile_info_bg)), TILEMAP_SCAN_ROWS, 16,16, NX_0,NY_0);
 	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tetrisp2_state::get_tile_info_fg)), TILEMAP_SCAN_ROWS, 8,8, NX_1,NY_1);
@@ -246,23 +246,22 @@ VIDEO_START_MEMBER(tetrisp2_state,tetrisp2)
 	// should be smaller and mirrored like m32 I guess
 	m_priority = std::make_unique<u8[]>(0x40000);
 
+	save_item(NAME(m_rot_ofsx));
+	save_item(NAME(m_rot_ofsy));
 	save_pointer(NAME(m_priority), 0x40000);
 }
 
-VIDEO_START_MEMBER(tetrisp2_state,nndmseal)
+void nndmseal_state::video_start()
 {
-	VIDEO_START_CALL_MEMBER( tetrisp2 );
+	tetrisp2_state::video_start();
 	m_tilemap_bg->set_scrolldx(-4,-4);
-
-	m_bank_hi = 0;
-	m_bank_lo = 0;
 }
 
-VIDEO_START_MEMBER(tetrisp2_state,rockntread)
+void rockn_state::video_start()
 {
-	m_tilemap_bg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tetrisp2_state::get_tile_info_bg)), TILEMAP_SCAN_ROWS, 16,16, 256,16);   // rockn ms(main),1,2,3,4
-	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tetrisp2_state::get_tile_info_fg)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
-	m_tilemap_rot = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tetrisp2_state::get_tile_info_rot)), TILEMAP_SCAN_ROWS, 16,16, 128,128);
+	m_tilemap_bg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rockn_state::get_tile_info_bg)), TILEMAP_SCAN_ROWS, 16,16, 256,16);   // rockn ms(main),1,2,3,4
+	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rockn_state::get_tile_info_fg)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_tilemap_rot = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rockn_state::get_tile_info_rot)), TILEMAP_SCAN_ROWS, 16,16, 128,128);
 
 	m_tilemap_bg->set_transparent_pen(0);
 	m_tilemap_fg->set_transparent_pen(0);
@@ -276,14 +275,13 @@ VIDEO_START_MEMBER(tetrisp2_state,rockntread)
 	save_pointer(NAME(m_priority), 0x40000);
 }
 
-
-VIDEO_START_MEMBER(rocknms_state,rocknms)
+void rocknms_state::video_start()
 {
-	VIDEO_START_CALL_MEMBER( rockntread );
+	rockn_state::video_start();
 
-	m_tilemap_sub_bg = &machine().tilemap().create(*m_sub_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rocknms_state::get_tile_info_rocknms_sub_bg)), TILEMAP_SCAN_ROWS, 16,16, 32,256);
-	m_tilemap_sub_fg = &machine().tilemap().create(*m_sub_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rocknms_state::get_tile_info_rocknms_sub_fg)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
-	m_tilemap_sub_rot = &machine().tilemap().create(*m_sub_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rocknms_state::get_tile_info_rocknms_sub_rot)), TILEMAP_SCAN_ROWS, 16,16, 128,128);
+	m_tilemap_sub_bg = &machine().tilemap().create(*m_sub_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rocknms_state::get_tile_info_sub_bg)), TILEMAP_SCAN_ROWS, 16,16, 32,256);
+	m_tilemap_sub_fg = &machine().tilemap().create(*m_sub_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rocknms_state::get_tile_info_sub_fg)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_tilemap_sub_rot = &machine().tilemap().create(*m_sub_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rocknms_state::get_tile_info_sub_rot)), TILEMAP_SCAN_ROWS, 16,16, 128,128);
 
 	m_tilemap_sub_bg->set_transparent_pen(0);
 	m_tilemap_sub_fg->set_transparent_pen(0);
@@ -390,24 +388,20 @@ static void tetrisp2_draw_sprites(BitmapClass &bitmap, bitmap_ind8 &bitmap_pri, 
 
 u32 tetrisp2_state::screen_update_tetrisp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int asc_pri;
-	int scr_pri;
-	int rot_pri;
-
 	/* Black background color */
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
-	m_tilemap_bg->set_scrollx(0, (((m_scroll_bg[ 0 ] + 0x0014) + m_scroll_bg[ 2 ] ) & 0xffff));
-	m_tilemap_bg->set_scrolly(0, (((m_scroll_bg[ 3 ] + 0x0000) + m_scroll_bg[ 5 ] ) & 0xffff));
+	m_tilemap_bg->set_scrollx(0, (((m_scroll_bg[0] + 0x0014) + m_scroll_bg[2] ) & 0xffff));
+	m_tilemap_bg->set_scrolly(0, (((m_scroll_bg[3] + 0x0000) + m_scroll_bg[5] ) & 0xffff));
 
-	m_tilemap_fg->set_scrollx(0, m_scroll_fg[ 2 ]);
-	m_tilemap_fg->set_scrolly(0, m_scroll_fg[ 5 ]);
+	m_tilemap_fg->set_scrollx(0, m_scroll_fg[2]);
+	m_tilemap_fg->set_scrolly(0, m_scroll_fg[5]);
 
-	m_tilemap_rot->set_scrollx(0, (m_rotregs[ 0 ] - m_rot_ofsx));
-	m_tilemap_rot->set_scrolly(0, (m_rotregs[ 2 ] - m_rot_ofsy));
+	m_tilemap_rot->set_scrollx(0, (m_rotregs[0] - m_rot_ofsx));
+	m_tilemap_rot->set_scrolly(0, (m_rotregs[2] - m_rot_ofsy));
 
-	asc_pri = scr_pri = rot_pri = 0;
+	int asc_pri = 0, scr_pri = 0, rot_pri = 0;
 
 	if((m_priority[0x2b00 / 2] & 0x00ff) == 0x0034)
 		asc_pri++;
@@ -450,26 +444,22 @@ u32 tetrisp2_state::screen_update_tetrisp2(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-u32 tetrisp2_state::screen_update_rockntread(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 rockn_state::screen_update_rockntread(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int asc_pri;
-	int scr_pri;
-	int rot_pri;
-
 	/* Black background color */
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
-	m_tilemap_bg->set_scrollx(0, (((m_scroll_bg[ 0 ] + 0x0014) + m_scroll_bg[ 2 ] ) & 0xffff));
-	m_tilemap_bg->set_scrolly(0, (((m_scroll_bg[ 3 ] + 0x0000) + m_scroll_bg[ 5 ] ) & 0xffff));
+	m_tilemap_bg->set_scrollx(0, (((m_scroll_bg[0] + 0x0014) + m_scroll_bg[2] ) & 0xffff));
+	m_tilemap_bg->set_scrolly(0, (((m_scroll_bg[3] + 0x0000) + m_scroll_bg[5] ) & 0xffff));
 
-	m_tilemap_fg->set_scrollx(0, m_scroll_fg[ 2 ]);
-	m_tilemap_fg->set_scrolly(0, m_scroll_fg[ 5 ]);
+	m_tilemap_fg->set_scrollx(0, m_scroll_fg[2]);
+	m_tilemap_fg->set_scrolly(0, m_scroll_fg[5]);
 
-	m_tilemap_rot->set_scrollx(0, (m_rotregs[ 0 ] - m_rot_ofsx));
-	m_tilemap_rot->set_scrolly(0, (m_rotregs[ 2 ] - m_rot_ofsy));
+	m_tilemap_rot->set_scrollx(0, (m_rotregs[0] - m_rot_ofsx));
+	m_tilemap_rot->set_scrolly(0, (m_rotregs[2] - m_rot_ofsy));
 
-	asc_pri = scr_pri = rot_pri = 0;
+	int asc_pri = 0, scr_pri = 0, rot_pri = 0;
 
 	if((m_priority[0x2b00 / 2] & 0x00ff) == 0x0034)
 		asc_pri++;
@@ -515,35 +505,31 @@ u32 tetrisp2_state::screen_update_rockntread(screen_device &screen, bitmap_ind16
 
 
 
-u32 rocknms_state::screen_update_rocknms_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 rocknms_state::screen_update_top(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int asc_pri;
-	int scr_pri;
-	int rot_pri;
-
-	m_tilemap_sub_bg->set_scrollx(0, m_rocknms_sub_scroll_bg[ 2 ] + 0x000);
-	m_tilemap_sub_bg->set_scrolly(0, m_rocknms_sub_scroll_bg[ 5 ] + 0x000);
-	m_tilemap_sub_fg->set_scrollx(0, m_rocknms_sub_scroll_fg[ 2 ] + 0x000);
-	m_tilemap_sub_fg->set_scrolly(0, m_rocknms_sub_scroll_fg[ 5 ] + 0x000);
-	m_tilemap_sub_rot->set_scrollx(0, m_rocknms_sub_rotregs[ 0 ] + 0x400);
-	m_tilemap_sub_rot->set_scrolly(0, m_rocknms_sub_rotregs[ 2 ] + 0x400);
+	m_tilemap_sub_bg->set_scrollx(0, m_sub_scroll_bg[2] + 0x000);
+	m_tilemap_sub_bg->set_scrolly(0, m_sub_scroll_bg[5] + 0x000);
+	m_tilemap_sub_fg->set_scrollx(0, m_sub_scroll_fg[2] + 0x000);
+	m_tilemap_sub_fg->set_scrolly(0, m_sub_scroll_fg[5] + 0x000);
+	m_tilemap_sub_rot->set_scrollx(0, m_sub_rotregs[0] + 0x400);
+	m_tilemap_sub_rot->set_scrolly(0, m_sub_rotregs[2] + 0x400);
 
 	bitmap.fill(m_palette->pen(0x0000), cliprect);
 	screen.priority().fill(0, cliprect);
 
-	asc_pri = scr_pri = rot_pri = 0;
+	int asc_pri = 0, scr_pri = 0, rot_pri = 0;
 
-	if((m_rocknms_sub_priority[0x2b00 / 2] & 0x00ff) == 0x0034)
+	if((m_sub_priority[0x2b00 / 2] & 0x00ff) == 0x0034)
 		asc_pri++;
 	else
 		rot_pri++;
 
-	if((m_rocknms_sub_priority[0x2e00 / 2] & 0x00ff) == 0x0034)
+	if((m_sub_priority[0x2e00 / 2] & 0x00ff) == 0x0034)
 		asc_pri++;
 	else
 		scr_pri++;
 
-	if((m_rocknms_sub_priority[0x3a00 / 2] & 0x00ff) == 0x000c)
+	if((m_sub_priority[0x3a00 / 2] & 0x00ff) == 0x000c)
 		scr_pri++;
 	else
 		rot_pri++;
@@ -570,29 +556,25 @@ u32 rocknms_state::screen_update_rocknms_left(screen_device &screen, bitmap_rgb3
 		m_tilemap_sub_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
-							m_spriteram2, m_spriteram2.bytes(), m_rocknms_sub_sprite);
+							m_spriteram2, m_spriteram2.bytes(), m_sub_sprite);
 
 	return 0;
 }
 
-u32 rocknms_state::screen_update_rocknms_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 rocknms_state::screen_update_bottom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int asc_pri;
-	int scr_pri;
-	int rot_pri;
-
-	m_tilemap_bg->set_scrollx(0, m_scroll_bg[ 2 ] + 0x000);
-	m_tilemap_bg->set_scrolly(0, m_scroll_bg[ 5 ] + 0x000);
-	m_tilemap_fg->set_scrollx(0, m_scroll_fg[ 2 ] + 0x000);
-	m_tilemap_fg->set_scrolly(0, m_scroll_fg[ 5 ] + 0x000);
-	m_tilemap_rot->set_scrollx(0, m_rotregs[ 0 ] + 0x400);
-	m_tilemap_rot->set_scrolly(0, m_rotregs[ 2 ] + 0x400);
+	m_tilemap_bg->set_scrollx(0, m_scroll_bg[2] + 0x000);
+	m_tilemap_bg->set_scrolly(0, m_scroll_bg[5] + 0x000);
+	m_tilemap_fg->set_scrollx(0, m_scroll_fg[2] + 0x000);
+	m_tilemap_fg->set_scrolly(0, m_scroll_fg[5] + 0x000);
+	m_tilemap_rot->set_scrollx(0, m_rotregs[0] + 0x400);
+	m_tilemap_rot->set_scrolly(0, m_rotregs[2] + 0x400);
 
 	/* Black background color */
 	bitmap.fill(m_palette->pen(0x0000), cliprect);
 	screen.priority().fill(0, cliprect);
 
-	asc_pri = scr_pri = rot_pri = 0;
+	int asc_pri = 0, scr_pri = 0, rot_pri = 0;
 
 	if((m_priority[0x2b00 / 2] & 0x00ff) == 0x0034)
 		asc_pri++;
@@ -766,19 +748,19 @@ void stepstag_state::convert_yuv422_to_rgb888(palette_device *paldev, u16 *palra
 	paldev->set_pen_color(offset/4, r, g, b);
 }
 
-void stepstag_state::stepstag_palette_left_w(offs_t offset, u16 data, u16 mem_mask)
+void stepstag_state::palette_left_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vj_paletteram_l[offset]);
 	convert_yuv422_to_rgb888(m_vj_palette_l,m_vj_paletteram_l,offset);
 }
 
-void stepstag_state::stepstag_palette_mid_w(offs_t offset, u16 data, u16 mem_mask)
+void stepstag_state::palette_mid_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vj_paletteram_m[offset]);
 	convert_yuv422_to_rgb888(m_vj_palette_m,m_vj_paletteram_m,offset);
 }
 
-void stepstag_state::stepstag_palette_right_w(offs_t offset, u16 data, u16 mem_mask)
+void stepstag_state::palette_right_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vj_paletteram_r[offset]);
 	convert_yuv422_to_rgb888(m_vj_palette_r,m_vj_paletteram_r,offset);

@@ -1110,11 +1110,10 @@ void midzunit_state::zunit(machine_config &config)
 	screen.set_palette(m_palette);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	WILLIAMS_NARC_SOUND(config, m_narc_sound);
-	m_narc_sound->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_narc_sound->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_narc_sound->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_narc_sound->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 
@@ -2200,6 +2199,12 @@ ROM_START( smashtv )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+
+	ROM_REGION( 0x1000, "plds", ROMREGION_ERASE00 ) // all EP600
+	ROM_LOAD ( "a_5346_3044_1.u8",  0x000, 0x32f, CRC(2ef0c217) SHA1(547d264fb5e80685f0bdccb7fec9fda4db7ad540) )
+	ROM_LOAD ( "a_5346_3044_5.u52", 0x400, 0x32f, CRC(e13d6403) SHA1(3ab6e5d75fb9b91775be47f5f0d7bf56c5553fd9) )
+	ROM_LOAD ( "a_5346_3044_6.u53", 0x800, 0x32f, CRC(b165a4f9) SHA1(a25f77841770e1a357390476e40849e940fad877) )
+	ROM_LOAD ( "a_5346_3044_7.u65", 0xc00, 0x32f, CRC(ecbd3bf2) SHA1(004e9e9e8c634c94209be52582a49fccb9358990) )
 ROM_END
 
 
@@ -2228,6 +2233,12 @@ ROM_START( smashtv6 )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+
+	ROM_REGION( 0x1000, "plds", ROMREGION_ERASE00 ) // all EP600
+	ROM_LOAD ( "a_5346_3044_1.u8",  0x000, 0x32f, CRC(2ef0c217) SHA1(547d264fb5e80685f0bdccb7fec9fda4db7ad540) )
+	ROM_LOAD ( "a_5346_3044_5.u52", 0x400, 0x32f, CRC(e13d6403) SHA1(3ab6e5d75fb9b91775be47f5f0d7bf56c5553fd9) )
+	ROM_LOAD ( "a_5346_3044_6.u53", 0x800, 0x32f, CRC(b165a4f9) SHA1(a25f77841770e1a357390476e40849e940fad877) )
+	ROM_LOAD ( "a_5346_3044_7.u65", 0xc00, 0x32f, CRC(ecbd3bf2) SHA1(004e9e9e8c634c94209be52582a49fccb9358990) )
 ROM_END
 
 
@@ -2256,6 +2267,12 @@ ROM_START( smashtv5 )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+
+	ROM_REGION( 0x1000, "plds", ROMREGION_ERASE00 ) // all EP600
+	ROM_LOAD ( "a_5346_3044_1.u8",  0x000, 0x32f, CRC(2ef0c217) SHA1(547d264fb5e80685f0bdccb7fec9fda4db7ad540) )
+	ROM_LOAD ( "a_5346_3044_5.u52", 0x400, 0x32f, CRC(e13d6403) SHA1(3ab6e5d75fb9b91775be47f5f0d7bf56c5553fd9) )
+	ROM_LOAD ( "a_5346_3044_6.u53", 0x800, 0x32f, CRC(b165a4f9) SHA1(a25f77841770e1a357390476e40849e940fad877) )
+	ROM_LOAD ( "a_5346_3044_7.u65", 0xc00, 0x32f, CRC(ecbd3bf2) SHA1(004e9e9e8c634c94209be52582a49fccb9358990) )
 ROM_END
 
 
@@ -2284,6 +2301,12 @@ ROM_START( smashtv4 )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+
+	ROM_REGION( 0x1000, "plds", ROMREGION_ERASE00 ) // all EP600
+	ROM_LOAD ( "a_5346_3044_1.u8",  0x000, 0x32f, CRC(2ef0c217) SHA1(547d264fb5e80685f0bdccb7fec9fda4db7ad540) )
+	ROM_LOAD ( "a_5346_3044_5.u52", 0x400, 0x32f, CRC(e13d6403) SHA1(3ab6e5d75fb9b91775be47f5f0d7bf56c5553fd9) )
+	ROM_LOAD ( "a_5346_3044_6.u53", 0x800, 0x32f, CRC(b165a4f9) SHA1(a25f77841770e1a357390476e40849e940fad877) )
+	ROM_LOAD ( "a_5346_3044_7.u65", 0xc00, 0x32f, CRC(ecbd3bf2) SHA1(004e9e9e8c634c94209be52582a49fccb9358990) )
 ROM_END
 
 
@@ -2312,6 +2335,12 @@ ROM_START( smashtv3 )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+
+	ROM_REGION( 0x1000, "plds", ROMREGION_ERASE00 ) // all EP600
+	ROM_LOAD ( "a_5346_3044_1.u8",  0x000, 0x32f, CRC(2ef0c217) SHA1(547d264fb5e80685f0bdccb7fec9fda4db7ad540) )
+	ROM_LOAD ( "a_5346_3044_5.u52", 0x400, 0x32f, CRC(e13d6403) SHA1(3ab6e5d75fb9b91775be47f5f0d7bf56c5553fd9) )
+	ROM_LOAD ( "a_5346_3044_6.u53", 0x800, 0x32f, CRC(b165a4f9) SHA1(a25f77841770e1a357390476e40849e940fad877) )
+	ROM_LOAD ( "a_5346_3044_7.u65", 0xc00, 0x32f, CRC(ecbd3bf2) SHA1(004e9e9e8c634c94209be52582a49fccb9358990) )
 ROM_END
 
 

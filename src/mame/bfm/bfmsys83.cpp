@@ -71,5 +71,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 198?, b83catms, 0, bfmsys83, bfmsys83, bfmsys83_state, empty_init, ROT0, "BFM", "Cat & Mouse (Bellfruit) (System 83)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 198?, b83cops,  0, bfmsys83, bfmsys83, bfmsys83_state, empty_init, ROT0, "BFM", "Cops & Robbers (Bellfruit) (System 83)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 198?, b83catms, 0, bfmsys83, bfmsys83, bfmsys83_state, empty_init, ROT0, "BFM", "Cat & Mouse (Bellfruit) (System 83)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME( 198?, b83cops,  0, bfmsys83, bfmsys83, bfmsys83_state, empty_init, ROT0, "BFM", "Cops & Robbers (Bellfruit) (System 83)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

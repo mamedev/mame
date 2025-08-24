@@ -715,10 +715,9 @@ void mrgame_state::mrgame(machine_config &config)
 
 	/* Sound */
 	genpin_audio(config);
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_8BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
-	DAC_8BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	SPEAKER(config, "speaker", 2).front();
+	DAC_8BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 0); // unknown DAC
+	DAC_8BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1); // unknown DAC
 
 	dac_8bit_r2r_device &dacvol(DAC_8BIT_R2R(config, "dacvol", 0));
 	dacvol.set_output_range(0, 1); // unknown DAC
@@ -729,8 +728,8 @@ void mrgame_state::mrgame(machine_config &config)
 
 	tms5220_device &tms(TMS5220(config, "tms", 672000)); // uses a RC combination. 672k copied from jedi.h
 	tms.ready_cb().set_inputline("audiocpu2", Z80_INPUT_LINE_WAIT);
-	tms.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	tms.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	tms.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	tms.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	/* Devices */
 	TIMER(config, "irq_timer").configure_periodic(FUNC(mrgame_state::irq_timer), attotime::from_hz(16000)); //ugh
@@ -974,10 +973,10 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1988,  dakar,     0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "Dakar",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  fasttrack, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "Fast Track",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  motrshow,  0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Zaccaria / Mr Game", "Motor Show (set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  motrshowa, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Zaccaria / Mr Game", "Motor Show (set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  motrshowb, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Zaccaria / Mr Game", "Motor Show (set 3)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  macattck,  0,         macattck,  mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  wcup90,    0,         wcup90,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "World Cup 90",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1988,  dakar,     0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "Dakar",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  fasttrack, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "Fast Track",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  motrshow,  0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Zaccaria / Mr Game", "Motor Show (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  motrshowa, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Zaccaria / Mr Game", "Motor Show (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  motrshowb, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Zaccaria / Mr Game", "Motor Show (set 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  macattck,  0,         macattck,  mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "Mac Attack",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  wcup90,    0,         wcup90,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "World Cup 90",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

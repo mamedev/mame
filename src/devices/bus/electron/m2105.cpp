@@ -114,15 +114,19 @@ void electron_m2105_device::device_add_mconfig(machine_config &config)
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(latch);
 
-	SPEECHROM(config, "vsm", 0).set_reverse_bit_order(true);
-
 	tms5220_device &tms(TMS5220(config, "vsp", 640000));
-	tms.set_speechrom_tag("vsm");
 	tms.ready_cb().set(m_via[0], FUNC(via6522_device::write_ca1));
 	tms.ready_cb().append(m_via[0], FUNC(via6522_device::write_pb2));
 	tms.irq_cb().set(m_via[0], FUNC(via6522_device::write_ca2));
 	tms.irq_cb().append(m_via[0], FUNC(via6522_device::write_pb3));
 	tms.add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	TMS6100(config, "vsm", 0);
+	tms.m0_cb().set("vsm", FUNC(tms6100_device::m0_w));
+	tms.m1_cb().set("vsm", FUNC(tms6100_device::m1_w));
+	tms.addr_cb().set("vsm", FUNC(tms6100_device::add_w));
+	tms.data_cb().set("vsm", FUNC(tms6100_device::data_line_r));
+	tms.romclk_cb().set("vsm", FUNC(tms6100_device::clk_w));
 
 	SPEAKER(config, "mono").front_center();
 }

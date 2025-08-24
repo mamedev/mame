@@ -94,6 +94,9 @@ protected:
 
 	int default_priority(int pal_pri) { return ((pal_pri >> 4) & 0xf); }
 
+	// decoding info
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+
 	// general
 	template<class BitmapClass>
 	void zdrawgfxzoom(
@@ -132,7 +135,6 @@ protected:
 	void build_sprite_list(int no);
 
 private:
-
 	void copybitmap(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 pri);
 	void copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &clip, u8 pri);
 
@@ -152,7 +154,6 @@ private:
 	int m_buffer;
 	bool m_external_prifill;
 
-	required_memory_region m_gfx_region;
 	u16 m_colbase;
 	int m_colors;
 	int m_granularity;

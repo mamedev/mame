@@ -120,7 +120,6 @@ const atari_motion_objects_config rampart_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x00ff,0,0,0 }}, // mask for the link
@@ -164,18 +163,25 @@ uint32_t rampart_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					// the PCB supports more complex priorities, but the PAL is not stuffed, so we get the default
-					pf[x] = mo[x];
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
+					{
+						if (mo[x] != 0xffff)
+						{
+							// the PCB supports more complex priorities, but the PAL is not stuffed, so we get the default
+							pf[x] = mo[x];
+						}
+					}
 				}
-		}
+			});
+
 	return 0;
 }
 
@@ -265,20 +271,20 @@ void rampart_state::latch_w(offs_t offset, u16 data, u16 mem_mask)
 	// upper byte being modified?
 	if (ACCESSING_BITS_8_15)
 	{
-		if (data & 0x1000)
+		if (BIT(data, 12))
 			LOGCOLBANK("Color bank set to 1!\n");
-		machine().bookkeeping().coin_counter_w(0, (data >> 9) & 1);
-		machine().bookkeeping().coin_counter_w(1, (data >> 8) & 1);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 9));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 8));
 	}
 
 	// lower byte being modified?
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki->set_output_gain(ALL_OUTPUTS, (data & 0x0020) ? 1.0f : 0.0f);
-		if (!(data & 0x0010))
+		m_oki->set_output_gain(ALL_OUTPUTS, BIT(data, 5) ? 1.0f : 0.0f);
+		if (BIT(~data, 4))
 			m_oki->reset();
 		m_ym2413->set_output_gain(ALL_OUTPUTS, ((data >> 1) & 7) / 7.0f);
-		if (!(data & 0x0001))
+		if (BIT(~data, 0))
 			m_ym2413->reset();
 	}
 }
@@ -298,7 +304,7 @@ void rampart_state::main_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x140000, 0x141fff).mirror(0x43e000).bankr(m_slapstic_bank);
 	map(0x200000, 0x21ffff).ram().share(m_bitmap);
-	map(0x220000, 0x3bffff).nopw();    // the code blasts right through this when initializing
+	map(0x220000, 0x3bffff).nopw(); // the code blasts right through this when initializing
 	map(0x3c0000, 0x3c07ff).mirror(0x019800).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0x3e0000, 0x3e07ff).mirror(0x010000).ram().share("mob");
 	map(0x3e0800, 0x3e3f3f).mirror(0x010000).ram();
@@ -329,7 +335,7 @@ void rampart_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( rampart )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) // alternate button1
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) // right place alt (N/C)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -337,7 +343,7 @@ static INPUT_PORTS_START( rampart )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -347,7 +353,7 @@ static INPUT_PORTS_START( rampart )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3) // alternate button2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED ) // right rotate alt (N/C)
 	PORT_SERVICE( 0x0800, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -371,7 +377,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ramprt2p )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) // alternate button1
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Players ) )
 	PORT_DIPSETTING(    0x0000, "2")
@@ -381,7 +387,7 @@ static INPUT_PORTS_START( ramprt2p )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -391,7 +397,7 @@ static INPUT_PORTS_START( ramprt2p )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3) // alternate button2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0800, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -431,7 +437,7 @@ static INPUT_PORTS_START( rampartj )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")

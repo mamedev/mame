@@ -367,6 +367,6 @@ ROM_START( rm480za )
 ROM_END
 
 /* Driver */
-//   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT                       COMPANY              FULLNAME                FLAGS
-COMP(1981, rm480z,  0,      0,      rm480z,  rm480z, rm480z_state, driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 1)", 0)
-COMP(1981, rm480za, rm480z, 0,      rm480za, rm480z, rm480z_state, driver_device::empty_init, "Research Machines", "LINK RM-480Z (set 2)", 0)
+//   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT                       COMPANY              FULLNAME             FLAGS
+COMP(1981, rm480z,  0,      0,      rm480z,  rm480z, rm480z_state, driver_device::empty_init, "Research Machines", "LINK 480Z (set 1)", 0)
+COMP(1981, rm480za, rm480z, 0,      rm480za, rm480z, rm480z_state, driver_device::empty_init, "Research Machines", "LINK 480Z (set 2)", 0)

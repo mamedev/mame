@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_TIMEHELP_H
+#define MAME_MACHINE_TIMEHELP_H
 
-#ifndef SRC_DEVICES_MACHINE_TIMEHELP_H
-#define SRC_DEVICES_MACHINE_TIMEHELP_H
+#pragma once
 
 class time_helper
 {
@@ -55,4 +55,4 @@ public:
 
 };
 
-#endif // SRC_DEVICES_MACHINE_TIMEHELP_H
+#endif // MAME_MACHINE_TIMEHELP_H

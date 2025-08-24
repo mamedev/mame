@@ -17,8 +17,8 @@
 	*                                                                          *
 	\***************************************************************************/
 
-#ifndef MAME_TMS32025_TMS32025_H
-#define MAME_TMS32025_TMS32025_H
+#ifndef MAME_CPU_TMS32025_TMS32025_H
+#define MAME_CPU_TMS32025_TMS32025_H
 
 #pragma once
 
@@ -404,4 +404,4 @@ DECLARE_DEVICE_TYPE(TMS32020, tms32020_device)
 DECLARE_DEVICE_TYPE(TMS32025, tms32025_device)
 DECLARE_DEVICE_TYPE(TMS32026, tms32026_device)
 
-#endif // MAME_TMS32025_TMS32025_H
+#endif // MAME_CPU_TMS32025_TMS32025_H

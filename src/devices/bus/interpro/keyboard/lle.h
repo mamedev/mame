@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
-#ifndef MAME_DEVICES_INTERPRO_KEYBOARD_LLE_H
-#define MAME_DEVICES_INTERPRO_KEYBOARD_LLE_H
+#ifndef MAME_BUS_INTERPRO_KEYBOARD_LLE_H
+#define MAME_BUS_INTERPRO_KEYBOARD_LLE_H
 
 #pragma once
 
@@ -70,4 +70,4 @@ public:
 
 DECLARE_DEVICE_TYPE_NS(INTERPRO_LLE_EN_US_KEYBOARD, bus::interpro::keyboard, lle_en_us_device)
 
-#endif // MAME_DEVICES_INTERPRO_KEYBOARD_LLE_H
+#endif // MAME_BUS_INTERPRO_KEYBOARD_LLE_H

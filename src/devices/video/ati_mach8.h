@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 
-#ifndef MAME_VIDEO_MACH8_H
-#define MAME_VIDEO_MACH8_H
+#ifndef MAME_VIDEO_ATI_MACH8_H
+#define MAME_VIDEO_ATI_MACH8_H
 
 #pragma once
 
@@ -82,4 +82,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MACH8, mach8_device)
 
-#endif // MAME_VIDEO_MACH8_H
+#endif // MAME_VIDEO_ATI_MACH8_H

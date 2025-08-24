@@ -100,5 +100,5 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1986, t3210,  0, 0, t3210,  bitel, bitel_state, empty_init, "Siemens", "Bitel T3210", MACHINE_IS_SKELETON)
-COMP(1989, feap90, 0, 0, feap90, bitel, bitel_state, empty_init, "Siemens", "Multitel Fe Ap 90-1.1", MACHINE_IS_SKELETON)
+COMP(1986, t3210,  0, 0, t3210,  bitel, bitel_state, empty_init, "Siemens", "Bitel T3210", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1989, feap90, 0, 0, feap90, bitel, bitel_state, empty_init, "Siemens", "Multitel Fe Ap 90-1.1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

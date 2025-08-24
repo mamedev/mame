@@ -260,7 +260,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <description>Dreamcast SDK for Sega Library Ver. 1.20J (Japan)</description>
 	    <year>199?</year>
 	    <publisher>Sega</publisher>
-	    <part interface="dc_cdrom" name="cdrom">
+	    <part interface="cdrom" name="cdrom">
 	        <diskarea name="cdrom">
 	            <disk name="dreamcast sdk for sega library ver. 1.20j (jpn)" status="nodump"/>
 	        </diskarea>
@@ -273,7 +273,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <description>Dreamcast SDK for Sega Library Ver. 1.30J (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Sega</publisher>
-	    <part interface="dc_cdrom" name="cdrom">
+	    <part interface="cdrom" name="cdrom">
 	        <diskarea name="cdrom">
 	            <disk name="dreamcast sdk for sega library ver. 1.30j (jpn)" status="nodump"/>
 	        </diskarea>
@@ -286,7 +286,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <description>Dreamcast SDK (Sega Library) Ver. 1.42J for Dev. Box (Japan)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
-	    <part interface="dc_cdrom" name="cdrom">
+	    <part interface="cdrom" name="cdrom">
 	        <diskarea name="cdrom">
 	            <disk name="dreamcast sdk (sega library) ver. 1.42j for dev. box (jpn)" status="nodump"/>
 	        </diskarea>
@@ -299,19 +299,19 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <description>Dreamcast SDK (Sega Library) Ver. 1.55J for Dev. Box (Japan)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
-	    <part interface="dc_cdrom" name="cdrom">
+	    <part interface="cdrom" name="cdrom">
 	        <feature name="part_id" value="Disc 1"/>
 	        <diskarea name="cdrom">
 	            <disk name="dreamcast sdk (sega library) ver. 1.55j for dev. box (jpn) (disc 1)" status="nodump"/>
 	        </diskarea>
 	    </part>
-	    <part interface="dc_cdrom" name="cdrom">
+	    <part interface="cdrom" name="cdrom">
 	        <feature name="part_id" value="Disc 2"/>
 	        <diskarea name="cdrom">
 	            <disk name="dreamcast sdk (sega library) ver. 1.55j for dev. box (jpn) (disc 2)" status="nodump"/>
 	        </diskarea>
 	    </part>
-	    <part interface="dc_cdrom" name="cdrom">
+	    <part interface="cdrom" name="cdrom">
 	        <feature name="part_id" value="Disc 3"/>
 	        <diskarea name="cdrom">
 	            <disk name="dreamcast sdk (sega library) ver. 1.55j for dev. box (jpn) (disc 3)" status="nodump"/>
@@ -325,7 +325,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <description>Dreamcast SDK (Sega Library) Ver. 2.00J for Dev. Box (Japan)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
-	    <part interface="dc_cdrom" name="cdrom">
+	    <part interface="cdrom" name="cdrom">
 	        <diskarea name="cdrom">
 	            <disk name="dreamcast sdk (sega library) ver. 2.00j for dev. box (jpn)" status="nodump"/>
 	        </diskarea>
@@ -338,7 +338,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <description>Dreamcast Software Development Kit: Release 8.1 (USA, Europe)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
-	    <part interface="dc_cdrom" name="cdrom">
+	    <part interface="cdrom" name="cdrom">
 	        <diskarea name="cdrom">
 	            <disk name="dreamcast software development kit release 8.1 (usa, euro)" status="nodump"/>
 	        </diskarea>
@@ -351,13 +351,13 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <description>Dreamcast Software Development Kit: Release 9 Europe (USA, Europe)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
-	    <part interface="dc_cdrom" name="cdrom">
+	    <part interface="cdrom" name="cdrom">
 	        <feature name="part_id" value="Vol. 1"/>
 	        <diskarea name="cdrom">
 	            <disk name="dreamcast software development kit release 9 europe (usa, euro) (vol. 1)" status="nodump"/>
 	        </diskarea>
 	    </part>
-	    <part interface="dc_cdrom" name="cdrom">
+	    <part interface="cdrom" name="cdrom">
 	        <feature name="part_id" value="Vol. 2"/>
 	        <diskarea name="cdrom">
 	            <disk name="dreamcast software development kit release 9 europe (usa, euro) (vol. 2)" status="nodump"/>
@@ -371,7 +371,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <description>Dreamcast Software Development Kit: Release 10.1 (USA, Europe)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
-	    <part interface="dc_cdrom" name="cdrom">
+	    <part interface="cdrom" name="cdrom">
 	        <diskarea name="cdrom">
 	            <disk name="dreamcast software development kit release 10.1 (usa, euro)" status="nodump"/>
 	        </diskarea>
@@ -384,7 +384,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <description>Dreamcast Software Development Kit: Release 11a (USA, Europe)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
-	    <part interface="dc_cdrom" name="cdrom">
+	    <part interface="cdrom" name="cdrom">
 	        <diskarea name="cdrom">
 	            <disk name="dreamcast software development kit release 11a (usa, euro)" status="nodump"/>
 	        </diskarea>
@@ -398,7 +398,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="release" value="20000414"/>
-	    <part interface="dc_cdrom" name="cdrom">
+	    <part interface="cdrom" name="cdrom">
 	        <diskarea name="cdrom">
 	            <disk name="dreamcast modem sdk ver. 1.00 (world)" status="nodump"/>
 	        </diskarea>
@@ -1156,7 +1156,7 @@ Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 				<disk name="after... wasureenu kizuna (jpn)" sha1="4ca05216dd45b9a5218186e7c2c0b5cd0be76d13"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom2">
+		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Kaze no Form"/> <!-- 風のフォルム -->
 			<diskarea name="cdrom">
 				<disk name="after... wasureenu kizuna - shokai genteiban (jpn) (kaze no form)" sha1="9cb6682fca57e78679c215baeae00d8205465fb4"/>
@@ -3151,7 +3151,7 @@ Black screen [GDROM READY] (fixed)
 				<disk name="blue-sky-blue[s] sora o mau tsubasa (jpn)" sha1="1b6db61f78b11afc250aac17f5ad4cfa651c9e19"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom2">
+		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Premium Fan Disc"/> <!-- プレミアムファンデイスク -->
 			<diskarea name="cdrom">
 				<disk name="blue-sky-blue[s] sora o mau tsubasa - shokai genteiban (jpn) (premium fan disc)" sha1="9fc87706b7fc652cba2a6c58e709c7cacc3da03f"/>
@@ -4163,7 +4163,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 				<disk name="card of destiny hikari to yami no tougousha - genteiban (jpn)" sha1="79a8dccf13f16beaa3b6293672c08d90d0c5f64e"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom2">
+		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Special Talk CD"/>
 			<diskarea name="cdrom">
 				<disk name="card of destiny hikari to yami no tougousha - genteiban (jpn) (special talk cd)" sha1="c8dba781762c063d543370a2797c5c4a3a933742"/>
@@ -6094,7 +6094,7 @@ No [PVR] renders/black screen on FMV and title screen (sound plays, setup [fb_r_
 				<disk name="d+vine [luv] - shokai genteiban (jpn)" sha1="a55d24f09e8d191a8671fd1fcb63fc2e5c1ceb9c"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom2">
+		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Opening Themesong CD"/>
 			<diskarea name="cdrom">
 				<disk name="d+vine [luv] - shokai genteiban (jpn) (opening themesong cd)" sha1="5b86e1e4a3f786c0d4e2b479ba819d05a72373db"/>
@@ -7583,7 +7583,7 @@ Built on Windows CE, requires [MMU] support
 				<disk name="di gi charat fantasy (jpn)" sha1="20c245d693f0d4701be99d71ea164d0cf0468539"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom2">
+		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Soundtrack Arrangement CD"/>
 			<diskarea name="cdrom">
 				<disk name="di gi charat fantasy - shokai genteiban (jpn) (soundtrack arrangement cd)" sha1="566cd0a7b3817f346a01bd6a6da6e2df62c59339"/>
@@ -15408,7 +15408,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 				<disk name="grandia ii (usa)" sha1="5a1a449de242d31bf47931096ebe7ce5412d0215"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom2">
+		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Music Selections"/>
 			<diskarea name="cdrom">
 				<disk name="grandia ii (usa) (music selections)" sha1="36b8d4c10044de33e05343cb1a68c4b28c13ee33"/>
@@ -15493,7 +15493,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 				<disk name="grandia ii (jpn)" sha1="6e927eb2fcd840edc12d77b7916139122c54fd13"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom2">
+		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Melodia"/>
 			<diskarea name="cdrom">
 				<disk name="grandia ii (jpn) (melodia)" sha1="8f59f6369f6efcc175f16044e9145bd2867c3ac1"/>

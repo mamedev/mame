@@ -600,8 +600,7 @@ void taotaido_state::taotaido(machine_config &config)
 	m_spr->set_tile_indirect_cb(FUNC(taotaido_state::tile_callback));
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(FUNC(taotaido_state::soundlatch_pending_w));
@@ -609,10 +608,10 @@ void taotaido_state::taotaido(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8'000'000));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 

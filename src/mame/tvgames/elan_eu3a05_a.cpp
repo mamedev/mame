@@ -92,16 +92,13 @@ void elan_eu3a05_sound_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream)
 {
-	// reset the output stream
-	outputs[0].fill(0);
-
 	int volume = m_volumes[0] | (m_volumes[1] << 8);
 
 	int outpos = 0;
 	// loop while we still have samples to generate
-	int samples = outputs[0].samples();
+	int samples = stream.samples();
 	while (samples-- != 0)
 	{
 		int total = 0;
@@ -140,7 +137,7 @@ void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream, std::ve
 				//LOGMASKED( LOG_AUDIO, "m_isstopped %02x channel %d is NOT active %08x %06x\n", m_isstopped, channel, m_sound_byte_address[channel], m_sound_current_nib_pos[channel]);
 			}
 		}
-		outputs[0].put_int(outpos, total, 32768 * 6);
+		stream.put_int(0, outpos, total, 32768 * 6);
 		outpos++;
 	}
 }
@@ -330,7 +327,8 @@ uint8_t elan_eu3a05_sound_device::elan_eu3a05_50a8_r()
 	m_stream->update();
 
 	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_50a8_r\n", machine().describe_context());
-	return m_isstopped;
+	// batvgc checks bit 0x80
+	return m_isstopped | 0xc0;
 }
 
 uint8_t elan_eu3a05_sound_device::elan_eu3a05_sound_volume_r(offs_t offset)

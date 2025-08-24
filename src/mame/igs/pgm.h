@@ -37,12 +37,10 @@ public:
 		, m_z80_mainram(*this, "z80_mainram")
 		, m_soundcpu(*this, "soundcpu")
 		, m_palette(*this, "palette")
-		, m_soundlatch(*this, "soundlatch")
-		, m_soundlatch3(*this, "soundlatch3")
+		, m_soundlatch(*this, "soundlatch%u", 1)
 		, m_ics(*this, "ics")
 		, m_video(*this, "igs023")
 	{
-		m_irq4_disabled = 0;
 	}
 
 	void init_pgm();
@@ -52,8 +50,8 @@ public:
 	void pgmbase(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr<u16> m_mainram;
@@ -64,8 +62,7 @@ protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
-	// hack
-	int m_irq4_disabled = 0;
+	int m_irq4_disabled = 0; // hack
 
 	void pgm_base_mem(address_map &map) ATTR_COLD;
 	void pgm_mem(address_map &map) ATTR_COLD;
@@ -74,23 +71,24 @@ private:
 	// memory pointers
 	required_shared_ptr<u8>  m_z80_mainram;
 
-
-
 	// devices
-	required_device<cpu_device>             m_soundcpu;
-	required_device<palette_device>         m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<generic_latch_8_device> m_soundlatch3;
-	required_device<ics2115_device>         m_ics;
-	required_device<igs023_video_device>    m_video;
+	required_device<cpu_device> m_soundcpu;
+	required_device<palette_device> m_palette;
+	required_device_array<generic_latch_8_device, 3> m_soundlatch;
+	required_device<ics2115_device> m_ics;
+	required_device<igs023_video_device> m_video;
+
+	bool m_z80_sync[2] = { };
 
 	void coin_counter_w(u16 data);
+	bool z80_sync(int which);
 	u8 z80_ram_r(offs_t offset);
 	void z80_ram_w(offs_t offset, u8 data);
 	void z80_reset_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void z80_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void m68k_l1_w(u8 data);
-	void z80_l3_w(u8 data);
+	template<int N> u8 m68k_latch_r();
+	void m68k_latch1_w(u8 data);
+	void z80_latch3_w(u8 data);
 
 	void screen_vblank(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);

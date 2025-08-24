@@ -35,7 +35,7 @@ protected:
 	virtual void device_clock_changed() override { reset_internal_state(); }
 	void reset_internal_state();
 
-	private:
+private:
 	// internal state
 	uint8_t   m_regs[16];
 	uint16_t  m_hc,m_hfp,m_hbp;

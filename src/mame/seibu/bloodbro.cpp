@@ -231,7 +231,6 @@ private:
 	bool m_opl_irq = false;
 	bool m_soundnmi_mask = false;
 
-	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void soundlatch_w(offs_t offset, u8 data);
 	void opl_irq_w(int state);
 	void opl_w(offs_t offset, uint8_t data);
@@ -830,11 +829,6 @@ void bloodbro_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_m
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
-void weststry_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_scrollram[offset]);
-}
-
 // Machine Drivers
 
 void bloodbro_state::bloodbro(machine_config &config)
@@ -880,8 +874,9 @@ void bloodbro_state::bloodbro(machine_config &config)
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
+	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
-	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->set_rombank_tag("seibu_bank");
 	m_seibu_sound->ym_read_callback().set(m_ymsnd, FUNC(ym3812_device::read));
 	m_seibu_sound->ym_write_callback().set(m_ymsnd, FUNC(ym3812_device::write));
 }

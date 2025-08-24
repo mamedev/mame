@@ -132,4 +132,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1980, elcirculo, 0, elcirculo, elcirculo, elcirculo_state, empty_init, ROT0, "Inder", "El Circulo", MACHINE_IS_SKELETON)
+GAME(1980, elcirculo, 0, elcirculo, elcirculo, elcirculo_state, empty_init, ROT0, "Inder", "El Circulo", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

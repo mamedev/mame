@@ -43,12 +43,19 @@
 
 #include "emu.h"
 
-#include "intr_cntrl.h"
-#include "sigmasoft_parallel_port.h"
-#include "tlb.h"
-
+#include "bus/heathzenith/h19/tlb.h"
 #include "bus/heathzenith/h89/h89bus.h"
-#include "bus/heathzenith/h89/cards.h"
+#include "bus/heathzenith/h89/cdr_fdc_880h.h"
+#include "bus/heathzenith/h89/h_88_3.h"
+#include "bus/heathzenith/h89/h_88_5.h"
+#include "bus/heathzenith/h89/mms77316_fdc.h"
+#include "bus/heathzenith/h89/sigmasoft_parallel_port.h"
+#include "bus/heathzenith/h89/sigmasoft_sound.h"
+#include "bus/heathzenith/h89/we_pullup.h"
+#include "bus/heathzenith/h89/z_89_11.h"
+#include "bus/heathzenith/h89/z37_fdc.h"
+#include "bus/heathzenith/intr_cntrl/intr_cntrl.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
 #include "machine/ram.h"
@@ -61,11 +68,19 @@
 
 // Single Step
 #define LOG_SS    (1U << 1)
+#define LOG_SETUP (1U << 2)
 
-#define VERBOSE (0)
+#define VERBOSE (LOG_SETUP)
 #include "logmacro.h"
 
 #define LOGSS(...)    LOGMASKED(LOG_SS,    __VA_ARGS__)
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
 
 
 namespace {
@@ -76,19 +91,19 @@ namespace {
 class h89_base_state : public driver_device
 {
 protected:
-	h89_base_state(const machine_config &mconfig, device_type type, const char *tag):
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_maincpu_region(*this, "maincpu"),
-		m_mem_view(*this, "rom_bank"),
-		m_ram(*this, RAM_TAG),
-		m_floppy_ram(*this, "floppyram"),
-		m_tlbc(*this, "tlbc"),
-		m_intr_socket(*this, "intr_socket"),
-		m_h89bus(*this, "h89bus"),
-		m_console(*this, "console"),
-		m_config(*this, "CONFIG"),
-		m_sw501(*this, "SW501")
+	h89_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_maincpu_region(*this, "maincpu")
+		, m_mem_view(*this, "rom_bank")
+		, m_ram(*this, RAM_TAG)
+		, m_floppy_ram(*this, "floppyram")
+		, m_tlbc(*this, "tlbc")
+		, m_intr_socket(*this, "intr_socket")
+		, m_h89bus(*this, "h89bus")
+		, m_console(*this, "console")
+		, m_config(*this, "CONFIG")
+		, m_sw501(*this, "SW501")
 	{
 	}
 
@@ -121,22 +136,24 @@ protected:
 
 	u32  m_cpu_speed_multiplier;
 
+	bool m_installed;
+
 	// Clocks
 	static constexpr XTAL H89_CLOCK                      = XTAL(12'288'000) / 6;
 	static constexpr XTAL INS8250_CLOCK                  = XTAL(1'843'200);
 
 	static constexpr u8 GPP_SINGLE_STEP_BIT             = 0;
 	static constexpr u8 GPP_ENABLE_TIMER_INTERRUPT_BIT  = 1;
-	static constexpr u8 GPP_MEM1_BIT                    = 2;
 	static constexpr u8 GPP_MEM0_BIT                    = 4;
-	static constexpr u8 GPP_DISABLE_ROM_BIT             = 5;
+	static constexpr u8 GPP_MEM1_BIT                    = 5;
 	static constexpr u8 GPP_IO0_BIT                     = 6;
 	static constexpr u8 GPP_IO1_BIT                     = 7;
 
 	void update_mem_view();
 
 	void update_gpp(u8 gpp);
-	void port_f2_w(offs_t offset, u8 data);
+	void port_f2_w(u8 data);
+	u8 read_sw();
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -159,19 +176,24 @@ protected:
 	void reset_single_step_state();
 
 	template <int line> void slot_irq(int state);
+
+	void h89_left_cards(device_slot_interface &device);
+	void h89_right_cards(device_slot_interface &device);
+	void h89_right_cards_mms(device_slot_interface &device);
+	void h89_right_p506_cards(device_slot_interface &device);
 };
 
 /**
  * Heathkit H88
- *  - BIOS MTR-88
+ *  - ROM MTR-88
  *  - H-88-5 Cassette Interface Board
  *
  */
 class h88_state : public h89_base_state
 {
 public:
-	h88_state(const machine_config &mconfig, device_type type, const char *tag):
-		h89_base_state(mconfig, type, tag)
+	h88_state(const machine_config &mconfig, device_type type, const char *tag)
+		: h89_base_state(mconfig, type, tag)
 	{
 	}
 
@@ -187,31 +209,24 @@ public:
 class h89_state : public h89_base_state
 {
 public:
-	h89_state(const machine_config &mconfig, device_type type, const char *tag):
-		h89_base_state(mconfig, type, tag)
+	h89_state(const machine_config &mconfig, device_type type, const char *tag)
+		: h89_base_state(mconfig, type, tag)
 	{
 	}
 
 	void h89(machine_config &config);
 };
 
-class h89_sigmasoft_state : public h89_state
+class h89_cdr_state : public h89_base_state
 {
 public:
-	h89_sigmasoft_state(const machine_config &mconfig, device_type type, const char *tag):
-		h89_state(mconfig, type, tag),
-		m_sigma_parallel(*this, "sigma_parallel")
+	h89_cdr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: h89_base_state(mconfig, type, tag)
 	{
 	}
 
-	void h89_sigmasoft(machine_config &config);
-
-protected:
-	required_device<sigmasoft_parallel_port> m_sigma_parallel;
-
-	void h89_sigmasoft_io(address_map &map);
+	void h89_cdr(machine_config &config);
 };
-
 
 /**
  * Heathkit H89 with MMS hardware
@@ -236,16 +251,13 @@ protected:
 class h89_mms_state : public h89_base_state
 {
 public:
-	h89_mms_state(const machine_config &mconfig, device_type type, const char *tag):
-		h89_base_state(mconfig, type, tag)
+	h89_mms_state(const machine_config &mconfig, device_type type, const char *tag)
+		: h89_base_state(mconfig, type, tag)
 	{
 	}
 
 	void h89_mms(machine_config &config);
 
-protected:
-	u8 port_f2_mms_r(offs_t offset);
-	void port_f2_mms_w(offs_t offset, u8 data);
 };
 
 
@@ -294,16 +306,16 @@ void h89_base_state::h89_mem(address_map &map)
 	// View 0 - ROM / Floppy RAM R/O
 	// View 1 - ROM / Floppy RAM R/W
 	// monitor ROM
-	m_mem_view[0](0x0000, 0x0fff).rom().region("maincpu", 0).unmapw();
-	m_mem_view[1](0x0000, 0x0fff).rom().region("maincpu", 0).unmapw();
+	m_mem_view[0](0x0000, 0x0fff).rom().region(m_maincpu_region, 0).unmapw();
+	m_mem_view[1](0x0000, 0x0fff).rom().region(m_maincpu_region, 0).unmapw();
 
 	// Floppy RAM
 	m_mem_view[0](0x1400, 0x17ff).readonly().share(m_floppy_ram);
 	m_mem_view[1](0x1400, 0x17ff).ram().share(m_floppy_ram);
 
 	// Floppy ROM
-	m_mem_view[0](0x1800, 0x1fff).rom().region("maincpu", 0x1800).unmapw();
-	m_mem_view[1](0x1800, 0x1fff).rom().region("maincpu", 0x1800).unmapw();
+	m_mem_view[0](0x1800, 0x1fff).rom().region(m_maincpu_region, 0x1800).unmapw();
+	m_mem_view[1](0x1800, 0x1fff).rom().region(m_maincpu_region, 0x1800).unmapw();
 }
 
 void h89_base_state::map_fetch(address_map &map)
@@ -342,79 +354,11 @@ u8 h89_base_state::m1_r(offs_t offset)
 	return data;
 }
 
-/*
-                                   PORT
-    Use                      |  Hex  |  Octal
-   --------------------------+-------+---------
-    Not specified, available |  0-77 |   0-167
-    Disk I/O #1              | 78-7B | 170-173
-    Disk I/O #2              | 7C-7F | 174-177
-    Not specified, reserved  | 80-CF | 200-317
-    DCE Serial I/O           | D0-D7 | 320-327
-    DTE Serial I/O           | D8-DF | 330-337
-    DCE Serial I/O           | EO-E7 | 340-347
-    Console I/O              | E8-EF | 350-357
-    NMI                      | F0-F1 | 360-361
-    General purpose port     |    F2 |     362
-    Cassette I/O(MTR-88 only)| F8-F9 | 370-371
-    NMI                      | FA-FB | 372-373
-
-    Disk I/O #1 - 0170-0173 (0x78-0x7b)
-       Heath Options
-         - H37 5-1/4" Soft-sectored Controller - Requires MTR-90 ROM
-         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
-         - H67 8" Hard disk + 8" Floppy Drives - Requires MTR-90 ROM
-
-    Disk I/O #2 - 0174-0177 (0x7c-0x7f)
-       Heath Options
-         - 5-1/4" Hard-sectored Controller - supported by all ROMs
-         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
-         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
-
-*/
 void h89_base_state::h89_base_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
 }
-
-void h89_sigmasoft_state::h89_sigmasoft_io(address_map &map)
-{
-	h89_base_io(map);
-
-	// Add SigmaSoft parallel port board, required for IGC graphics
-	map(0x08,0x0f).rw(m_sigma_parallel, FUNC(sigmasoft_parallel_port::read), FUNC(sigmasoft_parallel_port::write));
-}
-
-/*
-    Memory Map for MMS 444-61C PROM
-
-                                  PORT
-    Use                        |  Hex  |
-   ----------------------------+-------+
-    Not specified, available   |  0-37 |
-    MMS 77316                  | 38-3F |
-    MMS Internal test fixtures | 40-47 |
-    MMS 77317 ACT/XCOMP I/O    | 48-4F |
-    MMS 77315 CAMEO I/O        | 50-56 |
-    Unused                     |    57 |
-    MMS 77314 Corvus I/O       | 58-59 |
-    MMS 77314 REMEX I/O        | 5A-5B |
-    MMS 77314,15,17 Conf Port  |    5C |
-    Unused                     | 5D-77 |
-    Disk I/O #1                | 78-7B |
-    Disk I/O #2                | 7C-7F |
-    HDOS reserved              | 80-CF |
-    DCE Serial I/O             | D0-D7 |
-    DTE Serial I/O             | D8-DF |
-    DCE Serial I/O             | EO-E7 |
-    Console I/O                | E8-EF |
-    NMI                        | F0-F1 |
-    General purpose port       |    F2 |
-    Unused                     | F8-F9 |
-    NMI                        | FA-FB |
-    Unused                     | FC-FF |
- */
 
 // Input ports
 static INPUT_PORTS_START( h88 )
@@ -627,6 +571,54 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPSETTING(    0x00, "9600" )
 	PORT_DIPSETTING(    0x80, "19200" )
 
+	// SigmaSoft's SigmaROM
+	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )                        PORT_DIPLOCATION("SW501:1,2")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x1c)
+	PORT_DIPSETTING(    0x00, "H-88-1" )
+	PORT_DIPSETTING(    0x01, "H/Z-47" )
+	PORT_DIPSETTING(    0x02, "WD1002 Hard Disk" )
+	PORT_DIPSETTING(    0x03, "WD1002 Floppy Disk" )
+	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )                        PORT_DIPLOCATION("SW501:3,4")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x1c)
+	PORT_DIPSETTING(    0x00, "H-89-37" )
+	PORT_DIPSETTING(    0x04, "H/Z-47" )
+	PORT_DIPSETTING(    0x08, "WD1002 Hard Disk" )
+	PORT_DIPSETTING(    0x0c, "WD1002 Floppy Disk" )
+	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )                  PORT_DIPLOCATION("SW501:5")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x1c)
+	PORT_DIPSETTING(    0x00, "Disk I/O #2" )
+	PORT_DIPSETTING(    0x10, "Disk I/O #1" )
+	PORT_DIPNAME( 0x20, 0x20, "Reserved" )                           PORT_DIPLOCATION("SW501:6")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x1c)
+	PORT_DIPSETTING(    0x20, "Must be selected" )
+	PORT_DIPSETTING(    0x00, "Must not be selected" )
+	PORT_DIPNAME( 0x40, 0x00, "Console Baud rate" )                  PORT_DIPLOCATION("SW501:7")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x1c)
+	PORT_DIPSETTING(    0x00, "9600" )
+	PORT_DIPSETTING(    0x40, "19200" )
+	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )                          PORT_DIPLOCATION("SW501:8")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x1c)
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, "Auto" )
+
+	// CDR8390 ROM
+	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )                        PORT_DIPLOCATION("SW501:1,2")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "H-88-1" )
+	PORT_DIPSETTING(    0x01, "undefined" )
+	PORT_DIPSETTING(    0x02, "undefined" )
+	PORT_DIPSETTING(    0x03, "undefined" )
+	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )                        PORT_DIPLOCATION("SW501:3,4")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "undefined" )
+	PORT_DIPSETTING(    0x04, "CDR FDC-880H" )
+	PORT_DIPSETTING(    0x08, "undefined" )
+	PORT_DIPSETTING(    0x0c, "undefined" )
+	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )                  PORT_DIPLOCATION("SW501:5")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "Disk I/O #2" )
+	PORT_DIPSETTING(    0x10, "Disk I/O #1" )
+	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )       PORT_DIPLOCATION("SW501:6")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x00, "Console Baud rate" )                  PORT_DIPLOCATION("SW501:7")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "9600" )
+	PORT_DIPSETTING(    0x40, "19200" )
+	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )                          PORT_DIPLOCATION("SW501:8")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, "Auto" )
+
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x03, 0x00, "CPU Clock Speed Upgrade")
@@ -641,6 +633,8 @@ static INPUT_PORTS_START( h89 )
 	PORT_CONFSETTING(   0x10, "Kres KMR-100")
 	PORT_CONFSETTING(   0x14, "Ultimeth MTRHEX-4k")
 	PORT_CONFSETTING(   0x18, "Ultimeth MTRHEX-2k")
+	PORT_CONFSETTING(   0x1c, "SigmaROM")
+	PORT_CONFSETTING(   0x20, "CDR8390 ROM")
 
 INPUT_PORTS_END
 
@@ -656,6 +650,9 @@ void h89_base_state::machine_start()
 	save_item(NAME(m_555a_latch));
 	save_item(NAME(m_555b_latch));
 	save_item(NAME(m_556b_latch));
+	save_item(NAME(m_installed));
+
+	m_installed = false;
 
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
@@ -702,8 +699,55 @@ void h89_base_state::machine_start()
 	m_floppy_ram_we       = false;
 }
 
+u8 h89_base_state::read_sw()
+{
+	return m_sw501->read();
+}
+
 void h89_base_state::machine_reset()
 {
+	if (!m_installed)
+	{
+		// Console/Terminal address
+		h89bus::addr_ranges term_ranges = m_h89bus->get_address_ranges(h89bus::IO_TERM);
+		if (term_ranges.size() == 1)
+		{
+			h89bus::addr_range range = term_ranges.front();
+
+			m_h89bus->install_io_device(range.first, range.second,
+				read8sm_delegate(*m_console, FUNC(ins8250_device::ins8250_r)),
+				write8sm_delegate(*m_console, FUNC(ins8250_device::ins8250_w)));
+		}
+
+		h89bus::addr_ranges nmi_ranges = m_h89bus->get_address_ranges(h89bus::IO_NMI);
+
+		// Multiple ranges cause a NMI interrupt to occur, loop through all.
+		for (h89bus::addr_range range : nmi_ranges)
+		{
+			m_h89bus->install_io_device(range.first, range.second,
+				read8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_r)),
+				write8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_w)));
+		}
+
+		h89bus::addr_ranges gpp_ranges = m_h89bus->get_address_ranges(h89bus::IO_GPP);
+
+		for (h89bus::addr_range range : gpp_ranges)
+		{
+			// check for the first single address, MMS piggy-backed on this select
+			// line, the proper one for the CPU board GPP port is a single address
+			if (range.first == range.second)
+			{
+				m_h89bus->install_io_device(range.first, range.second,
+					read8smo_delegate(*this, FUNC(h89_base_state::read_sw)),
+					write8smo_delegate(*this, FUNC(h89_base_state::port_f2_w)));
+
+				break;
+			}
+		}
+
+		m_installed = true;
+	}
+
 	m_rom_enabled         = true;
 	m_timer_intr_enabled  = true;
 	m_single_step_enabled = false;
@@ -772,7 +816,7 @@ void h89_base_state::console_intr(int data)
 
 template <int line> void h89_base_state::slot_irq(int state)
 {
-	   m_intr_socket->set_irq_level(line, state);
+	m_intr_socket->set_irq_level(line, state);
 }
 
 template void h89_base_state::slot_irq<3>(int state);
@@ -816,10 +860,10 @@ void h89_base_state::reset_single_step_state()
 // ---------------------
 //  0    Single-step enable
 //  1    2 mSec interrupt enable
-//  2    Latched bit MEM 1 H on memory exp connector
-//  3    Not used
+//  2    Not used (on original Heath CPU Board)
+//  3    Not used (on original Heath CPU Board)
 //  4    Latched bit MEM 0 H on memory expansion connector (Commonly used for Speed upgrades)
-//  5    ORG-0 (CP/M map)
+//  5    Latched bit MEM 1 H on memory expansion connector - ORG-0 (CP/M map)
 //  6    Latched bit I/O 0 on I/O exp connector
 //  7    Latched bit I/O 1 on I/O exp connector
 //
@@ -847,9 +891,9 @@ void h89_base_state::update_gpp(u8 gpp)
 		}
 	}
 
-	if (BIT(changed_gpp, GPP_DISABLE_ROM_BIT))
+	if (BIT(changed_gpp, GPP_MEM1_BIT))
 	{
-		m_rom_enabled = BIT(m_gpp, GPP_DISABLE_ROM_BIT) == 0;
+		m_rom_enabled = BIT(m_gpp, GPP_MEM1_BIT) == 0;
 
 		update_mem_view();
 	}
@@ -862,33 +906,8 @@ void h89_base_state::update_gpp(u8 gpp)
 }
 
 // General Purpose Port
-void h89_base_state::port_f2_w(offs_t offset, u8 data)
+void h89_base_state::port_f2_w(u8 data)
 {
-	update_gpp(data);
-
-	m_intr_socket->set_irq_level(1, CLEAR_LINE);
-}
-
-// MMS intercepts the GPIO decoding so the GPIO pin on
-// the right slots can be used as a card select without
-// interfering with normal GPIO port operation.
-u8 h89_mms_state::port_f2_mms_r(offs_t offset)
-{
-	if ((offset & 7) != 2)
-	{
-		return 0;
-	}
-
-	return m_sw501->read();
-}
-
-void h89_mms_state::port_f2_mms_w(offs_t offset, u8 data)
-{
-	if ((offset & 7) != 2)
-	{
-		return;
-	}
-
 	update_gpp(data);
 
 	m_intr_socket->set_irq_level(1, CLEAR_LINE);
@@ -896,24 +915,17 @@ void h89_mms_state::port_f2_mms_w(offs_t offset, u8 data)
 
 static void tlb_options(device_slot_interface &device)
 {
-	device.option_add("heath",      HEATH_TLB);
-	device.option_add("gp19",       HEATH_GP19);
-	device.option_add("imaginator", HEATH_IMAGINATOR);
-	device.option_add("super19",    HEATH_SUPER19);
-	device.option_add("superset",   HEATH_SUPERSET);
-	device.option_add("ultrarom",   HEATH_ULTRA);
-	device.option_add("watzman",    HEATH_WATZ);
-}
-
-
-static void sigma_tlb_options(device_slot_interface *device)
-{
-	device->option_reset();
-	device->option_add("igc",          HEATH_IGC);
-	device->option_add("igc_super19",  HEATH_IGC_SUPER19);
-	device->option_add("igc_ultrarom", HEATH_IGC_ULTRA);
-	device->option_add("igc_watzman",  HEATH_IGC_WATZ);
-	device->set_default_option("igc");
+	device.option_add("heath",        HEATH_TLB);
+	device.option_add("gp19",         HEATH_GP19);
+	device.option_add("imaginator",   HEATH_IMAGINATOR);
+	device.option_add("super19",      HEATH_SUPER19);
+	device.option_add("superset",     HEATH_SUPERSET);
+	device.option_add("ultrarom",     HEATH_ULTRA);
+	device.option_add("watzman",      HEATH_WATZ);
+	device.option_add("igc",          HEATH_IGC);
+	device.option_add("igc_super19",  HEATH_IGC_SUPER19);
+	device.option_add("igc_ultrarom", HEATH_IGC_ULTRA);
+	device.option_add("igc_watzman",  HEATH_IGC_WATZ);
 }
 
 static void intr_ctrl_options(device_slot_interface &device)
@@ -921,6 +933,58 @@ static void intr_ctrl_options(device_slot_interface &device)
 	device.option_add("original", HEATH_INTR_CNTRL);
 	device.option_add("h37",      HEATH_Z37_INTR_CNTRL);
 	device.option_add("mms",      HEATH_MMS_INTR_CNTRL);
+}
+
+
+void h89_base_state::h89_left_cards(device_slot_interface &device)
+{
+	device.option_add("ss_parallel",     H89BUS_SIGMASOFT_PARALLEL);
+	device.option_add("ss_parallel_igc", H89BUS_SIGMASOFT_PARALLEL_IGC).machine_config(
+		[this](device_t *device)
+		{
+			downcast<sigmasoft_parallel_port_igc &>(*device).set_tlbc(m_tlbc);
+		});
+}
+
+void h89_base_state::h89_right_cards(device_slot_interface &device)
+{
+	device.option_add("cdr_fdc", H89BUS_CDR_FDC_880H);
+	device.option_add("h_88_3",  H89BUS_H_88_3);
+	device.option_add("ha_88_3", H89BUS_HA_88_3);
+	device.option_add("h_88_5",  H89BUS_H_88_5);
+	device.option_add("ss_snd",  H89BUS_SIGMASOFT_SND);
+	device.option_add("z_89_11", H89BUS_Z_89_11);
+	device.option_add("z37fdc",  H89BUS_Z37).machine_config(
+		[this](device_t *device)
+		{
+			downcast<h89bus_z37_device &>(*device).set_intr_cntrl(m_intr_socket);
+		});
+}
+
+void h89_base_state::h89_right_cards_mms(device_slot_interface &device)
+{
+	h89_right_cards(device);
+	device.option_add("mms77316", H89BUS_MMS77316).machine_config(
+		[this](device_t *device)
+		{
+			downcast<mms77316_fdc_device &>(*device).set_intr_cntrl(m_intr_socket);
+		});
+}
+
+void h89_base_state::h89_right_p506_cards(device_slot_interface &device)
+{
+	device.option_add("h_88_3",    H89BUS_H_88_3);
+	device.option_add("ha_88_3",   H89BUS_HA_88_3);
+	device.option_add("ss_snd",    H89BUS_SIGMASOFT_SND);
+	device.option_add("we_pullup", H89BUS_WE_PULLUP);
+}
+
+static void io_decoder_options(device_slot_interface &device)
+{
+	device.option_add("444_43",  H89BUS_IO_DECODER_444_43);
+	device.option_add("444_61",  H89BUS_IO_DECODER_444_61);
+	device.option_add("mms_61c", H89BUS_IO_DECODER_MMS_61C);
+	device.option_add("cdr86",   H89BUS_IO_DECODER_CDR_86);
 }
 
 void h89_base_state::h89_base(machine_config &config)
@@ -957,26 +1021,17 @@ void h89_base_state::h89_base(machine_config &config)
 	H89BUS(config, m_h89bus, 0);
 	m_h89bus->set_program_space(m_maincpu, AS_PROGRAM);
 	m_h89bus->set_io_space(m_maincpu, AS_IO);
-	m_h89bus->in_tlb_callback().set(m_console, FUNC(ins8250_device::ins8250_r));
-	m_h89bus->out_tlb_callback().set(m_console, FUNC(ins8250_device::ins8250_w));
-	m_h89bus->in_nmi_callback().set(FUNC(h89_base_state::raise_NMI_r));
-	m_h89bus->out_nmi_callback().set(FUNC(h89_base_state::raise_NMI_w));
-	m_h89bus->in_gpp_callback().set_ioport(m_sw501);
-	m_h89bus->out_gpp_callback().set(FUNC(h89_base_state::port_f2_w));
 	m_h89bus->out_int3_callback().set(FUNC(h89_base_state::slot_irq<3>));
 	m_h89bus->out_int4_callback().set(FUNC(h89_base_state::slot_irq<4>));
 	m_h89bus->out_int5_callback().set(FUNC(h89_base_state::slot_irq<5>));
 	m_h89bus->out_wait_callback().set(FUNC(h89_base_state::set_wait_state));
-	m_h89bus->out_fdcirq_callback().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
-	m_h89bus->out_fdcdrq_callback().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
-	m_h89bus->out_blockirq_callback().set(m_intr_socket, FUNC(heath_intr_socket::block_interrupts));
 	m_h89bus->out_fmwe_callback().set(FUNC(h89_base_state::set_fmwe));
-	H89BUS_LEFT_SLOT(config, "p501", "h89bus", h89_left_cards, nullptr);
-	H89BUS_LEFT_SLOT(config, "p502", "h89bus", h89_left_cards, nullptr);
-	H89BUS_LEFT_SLOT(config, "p503", "h89bus", h89_left_cards, nullptr);
-	H89BUS_RIGHT_SLOT(config, "p504", "h89bus", h89_right_cards, nullptr);
-	H89BUS_RIGHT_SLOT(config, "p505", "h89bus", h89_right_cards, "ha_88_3");
-	H89BUS_RIGHT_SLOT(config, "p506", "h89bus", h89_right_p506_cards, "we_pullup").set_p506_signalling(true);
+	H89BUS_LEFT_SLOT(config, "p501", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
+	H89BUS_LEFT_SLOT(config, "p502", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
+	H89BUS_LEFT_SLOT(config, "p503", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
+	H89BUS_RIGHT_SLOT(config, "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, nullptr);
+	H89BUS_RIGHT_SLOT(config, "p505", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "ha_88_3");
+	H89BUS_RIGHT_SLOT(config, "p506", "h89bus", [this](device_slot_interface &device) { h89_right_p506_cards(device); }, "we_pullup").set_p506_signalling(true);
 
 	// H89 interrupt interval is 2mSec
 	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_base_state::h89_irq_timer), attotime::from_msec(2));
@@ -985,66 +1040,114 @@ void h89_base_state::h89_base(machine_config &config)
 void h88_state::h88(machine_config &config)
 {
 	h89_base(config);
-	m_h89bus->set_default_bios_tag("444-43");
 
 	m_intr_socket->set_default_option("original");
 	m_intr_socket->set_fixed(true);
 
-	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", h89_right_cards, "h_88_5");
+	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "h_88_5");
+
+	LOGSETUP("%s: about to call set_io_prom_tag\n", FUNCNAME);
+	H89BUS_IO_DECODER_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "444_43");
 }
 
 void h89_state::h89(machine_config &config)
 {
 	h89_base(config);
-	m_h89bus->set_default_bios_tag("444-61");
 
 	m_intr_socket->set_default_option("h37");
 	m_intr_socket->set_fixed(true);
 
-	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", h89_right_cards, "z37fdc");
+	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "z37fdc");
+
+	LOGSETUP("%s: about to call set_io_prom_tag\n", FUNCNAME);
+	H89BUS_IO_DECODER_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "444_61");
 }
 
-void h89_sigmasoft_state::h89_sigmasoft(machine_config &config)
+void h89_cdr_state::h89_cdr(machine_config &config)
 {
-	h89(config);
-	m_h89bus->set_default_bios_tag("444-61");
-	m_maincpu->set_addrmap(AS_IO, &h89_sigmasoft_state::h89_sigmasoft_io);
+	h89_base(config);
 
-	sigma_tlb_options(m_tlbc);
+	m_intr_socket->set_default_option("original");
+	m_intr_socket->set_fixed(true);
 
-	SIGMASOFT_PARALLEL_PORT(config, m_sigma_parallel);
-	m_sigma_parallel->ctrl_r_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_ctrl_r));
-	m_sigma_parallel->video_mem_r_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_video_mem_r));
-	m_sigma_parallel->video_mem_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_video_mem_w));
-	m_sigma_parallel->io_lo_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_io_lo_addr_w));
-	m_sigma_parallel->io_hi_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_io_hi_addr_w));
-	m_sigma_parallel->window_lo_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_window_lo_addr_w));
-	m_sigma_parallel->window_hi_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_window_hi_addr_w));
-	m_sigma_parallel->ctrl_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_ctrl_w));
+	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "cdr_fdc");
+
+	LOGSETUP("%s: about to call set_io_prom_tag\n", FUNCNAME);
+	H89BUS_IO_DECODER_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "cdr86");
 }
 
 void h89_mms_state::h89_mms(machine_config &config)
 {
 	h89_base(config);
-	m_h89bus->set_default_bios_tag("444-61c");
-
-	m_h89bus->in_gpp_callback().set(FUNC(h89_mms_state::port_f2_mms_r));
-	m_h89bus->out_gpp_callback().set(FUNC(h89_mms_state::port_f2_mms_w));
 
 	// the card selection is different with the MMS mapping PROM
-	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", h89_right_cards_mms, "mms77316");
-	H89BUS_RIGHT_SLOT(config.replace(), "p505", "h89bus", h89_right_cards_mms, "ha_88_3");
-	H89BUS_RIGHT_SLOT(config.replace(), "p506", "h89bus", h89_right_cards_mms, nullptr).set_p506_signalling(true);
+	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards_mms(device); }, "mms77316");
+	H89BUS_RIGHT_SLOT(config.replace(), "p505", "h89bus", [this](device_slot_interface &device) { h89_right_cards_mms(device); }, "ha_88_3");
 
 	m_intr_socket->set_default_option("mms");
 	m_intr_socket->set_fixed(true);
+
+	LOGSETUP("%s: about to call set_io_prom_tag\n", FUNCNAME);
+	H89BUS_IO_DECODER_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "mms_61c");
 }
+
+#define ROM_H17 \
+		ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+
+#define ROM_MTR90_444_142(x) \
+		ROM_SYSTEM_BIOS(x, "mtr90", "Zenith Data Systems MTR-90 (444-142)") \
+		ROMX_LOAD("2732_444-142_mtr90.u518",  0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(x))
+
+#define ROM_MTR89(x) \
+		ROM_SYSTEM_BIOS(x, "mtr89", "Heath MTR-89 (444-62)") \
+		ROMX_LOAD("2716_444-62_mtr89.u518",   0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(x))
+
+#define ROM_MMS_444_84B(x) \
+		ROM_SYSTEM_BIOS(x, "mms84b", "Magnolia MicroSystems 444-84B") \
+		ROMX_LOAD("2732_444_84b_mms.u518",    0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(x))
+
+#define ROM_KMR_100(x) \
+		ROM_SYSTEM_BIOS(x, "kmr-100", "Kres KMR-100 V3.a.02") \
+		ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(x))
+
+#define ROM_ULTIMETH_4K(x) \
+		ROM_SYSTEM_BIOS(x, "mtrhex_4k", "Ultimeth 4k ROM") \
+		ROMX_LOAD("2732_mtrhex_4k.u518",      0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(x))
+
+#define ROM_MTR90_444_84(x) \
+		ROM_SYSTEM_BIOS(x, "mtr90-84", "Zenith Data Systems MTR-90 (444-84 - Superseded by 444-142)") \
+		ROMX_LOAD("2732_444-84_mtr90.u518",   0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(x))
+
+#define ROM_MMS_444_84A(x) \
+		ROM_SYSTEM_BIOS(x, "mms84a", "Magnolia MicroSystems 444-84A (Superseded by MMS 444-84B)") \
+		ROMX_LOAD("2732_444_84a_mms.u518",    0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(x))
+
+#define ROM_ULTIMETH_2K(x) \
+		ROM_SYSTEM_BIOS(x, "mtrhex", "Ultimeth 2k ROM") \
+		ROMX_LOAD("2716_mtrhex.u518",         0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(x))
+
+#define ROM_SIGMA_V_1_3(x) \
+		ROM_SYSTEM_BIOS(x, "sigmarom", "SigmaROM v1.3") \
+		ROMX_LOAD("2732_sigma_rom_v_1.3.bin", 0x0000, 0x1000, CRC(c5c6b799) SHA1(f55e141a63cde8e1481480b8da9ba50569e08546), ROM_BIOS(x))
+
+#define ROM_SIGMA_V_1_2(x) \
+		ROM_SYSTEM_BIOS(x, "sigmarom_v1_2", "SigmaROM v1.2") \
+		ROMX_LOAD("2732_sigma_rom_v_1.2.bin", 0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(x))
+
+#define ROM_CDR_8390(x) \
+		ROM_SYSTEM_BIOS(x, "cdr8390", "CDR 8390") \
+		ROMX_LOAD("2732_cdr8390.u518",        0x0000, 0x1000, CRC(1d30fe43) SHA1(170092d1b62cf88edd29338b474e799c249a0dd7), ROM_BIOS(x))
+
+// NOTE: this rom is not currently working
+#define ROM_CDR_80B2(x) \
+		ROM_SYSTEM_BIOS(x, "cdr80b2", "CDR 80B2") \
+		ROMX_LOAD("2732_cdr80b2.u518",        0x0000, 0x1000, CRC(804a6898) SHA1(a58daca0baf7b5d7c1485531680bd63168eb2d7e), ROM_BIOS(x))
 
 
 ROM_START( h88 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 
-	ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+	ROM_H17
 
 	ROM_LOAD("2716_444-40_mtr88.u518",    0x0000, 0x0800, CRC(093afb79) SHA1(bcc1569ad9da7babf0a4199cab96d8cd59b2dd78))
 ROM_END
@@ -1053,109 +1156,90 @@ ROM_START( h89 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mtr90")
 
-	ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+	ROM_H17
 
-	ROM_SYSTEM_BIOS(0, "mtr90", "Zenith Data Systems MTR-90 (444-142)")
-	ROMX_LOAD("2732_444-142_mtr90.u518",  0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
+	ROM_MTR90_444_142(0)
 
-	ROM_SYSTEM_BIOS(1, "mtr89", "Heath MTR-89 (444-62)")
-	ROMX_LOAD("2716_444-62_mtr89.u518",   0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(1))
+	ROM_MTR89(1)
 
-	ROM_SYSTEM_BIOS(2, "mms84b", "Magnolia MicroSystems 444-84B")
-	ROMX_LOAD("2732_444_84b_mms.u518",    0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(2))
+	ROM_MMS_444_84B(2)
 
-	ROM_SYSTEM_BIOS(3, "kmr-100", "Kres KMR-100 V3.a.02")
-	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(3))
+	ROM_KMR_100(3)
 
-	ROM_SYSTEM_BIOS(4, "mtrhex_4k", "Ultimeth 4k ROM")
-	ROMX_LOAD("2732_mtrhex_4k.u518",      0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(4))
+	ROM_ULTIMETH_4K(4)
 
-	ROM_SYSTEM_BIOS(5, "mtr90-84", "Zenith Data Systems MTR-90 (444-84 - Superseded by 444-142)")
-	ROMX_LOAD("2732_444-84_mtr90.u518",   0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(5))
+	ROM_MTR90_444_84(5)
 
-	ROM_SYSTEM_BIOS(6, "mms84a", "Magnolia MicroSystems 444-84A (Superseded by MMS 444-84B)")
-	ROMX_LOAD("2732_444_84a_mms.u518",    0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(6))
+	ROM_MMS_444_84A(6)
 
-	ROM_SYSTEM_BIOS(7, "mtrhex", "Ultimeth 2k ROM")
-	ROMX_LOAD("2716_mtrhex.u518",         0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(7))
+	ROM_ULTIMETH_2K(7)
+
+	ROM_SIGMA_V_1_3(8)
+
+	ROM_SIGMA_V_1_2(9)
+
+	ROM_CDR_8390(10)
+
+	ROM_CDR_80B2(11)
 ROM_END
 
-ROM_START( h89_sigmasoft )
+ROM_START( h89_cdr )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_DEFAULT_BIOS("mtr90")
+	ROM_DEFAULT_BIOS("cdr8390")
 
-	ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+	ROM_H17
 
-	ROM_SYSTEM_BIOS(0, "mtr90", "Zenith Data Systems MTR-90 (444-142)")
-	ROMX_LOAD("2732_444-142_mtr90.u518",  0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
+	ROM_CDR_8390(0)
 
-	ROM_SYSTEM_BIOS(1, "mtr89", "Heath MTR-89 (444-62)")
-	ROMX_LOAD("2716_444-62_mtr89.u518",   0x0000, 0x0800, CRC(8f507972) SHA1(ac6c6c1344ee4e09fb60d53c85c9b761217fe9dc), ROM_BIOS(1))
+	ROM_CDR_80B2(1)
 
-	ROM_SYSTEM_BIOS(2, "mms84b", "Magnolia MicroSystems 444-84B")
-	ROMX_LOAD("2732_444_84b_mms.u518",    0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(2))
+	ROM_KMR_100(2)
 
-	ROM_SYSTEM_BIOS(3, "kmr-100", "Kres KMR-100 V3.a.02")
-	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(3))
-
-	ROM_SYSTEM_BIOS(4, "mtrhex_4k", "Ultimeth 4k ROM")
-	ROMX_LOAD("2732_mtrhex_4k.u518",      0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(4))
-
-	ROM_SYSTEM_BIOS(5, "mtr90-84", "Zenith Data Systems MTR-90 (444-84 - Superseded by 444-142)")
-	ROMX_LOAD("2732_444-84_mtr90.u518",   0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(5))
-
-	ROM_SYSTEM_BIOS(6, "mms84a", "Magnolia MicroSystems 444-84A (Superseded by MMS 444-84B)")
-	ROMX_LOAD("2732_444_84a_mms.u518",    0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(6))
-
-	ROM_SYSTEM_BIOS(7, "mtrhex", "Ultimeth 2k ROM")
-	ROMX_LOAD("2716_mtrhex.u518",         0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(7))
+	ROM_ULTIMETH_4K(3)
 ROM_END
 
 ROM_START( h89_mms )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mms84b")
 
-	ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+	ROM_H17
 
-	ROM_SYSTEM_BIOS(0, "mms84b", "MMS 444-84B")
-	ROMX_LOAD("2732_444_84b_mms.u518",    0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(0))
+	ROM_MMS_444_84B(0)
 
-	ROM_SYSTEM_BIOS(1, "kmr-100", "Kres KMR-100 V3.a.02")
-	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(1))
+	ROM_KMR_100(1)
 
-	ROM_SYSTEM_BIOS(2, "mtrhex_4k", "Ultimeth 4k ROM")
-	ROMX_LOAD("2732_mtrhex_4k.u518",      0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(2))
+	ROM_ULTIMETH_4K(2)
 
-	ROM_SYSTEM_BIOS(3, "mms84a", "MMS 444-84A (Superseded by MMS 444-84B)")
-	ROMX_LOAD("2732_444_84a_mms.u518",    0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(3))
+	ROM_MMS_444_84A(3)
 
-	ROM_SYSTEM_BIOS(4, "mtrhex", "Ultimeth 2k ROM")
-	ROMX_LOAD("2716_mtrhex.u518",         0x0000, 0x0800, CRC(842a306a) SHA1(ddbc2b8bb127464af9eda8e7c56e6be7c8b43a16), ROM_BIOS(4))
+	ROM_ULTIMETH_2K(4)
 ROM_END
 
 ROM_START( z90 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mtr90")
 
-	ROM_LOAD( "2716_444-19_h17.u520",     0x1800, 0x0800, CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+	ROM_H17
 
-	ROM_SYSTEM_BIOS(0, "mtr90", "Zenith Data Systems MTR-90 (444-142)")
-	ROMX_LOAD("2732_444-142_mtr90.u518",  0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(0))
+	ROM_MTR90_444_142(0)
 
-	ROM_SYSTEM_BIOS(1, "mms84b", "Magnolia MicroSystems 444-84B")
-	ROMX_LOAD("2732_444_84b_mms.u518",    0x0000, 0x1000, CRC(7e75d6f4) SHA1(baf34e036388d1a191197e31f8a93209f04fc58b), ROM_BIOS(1))
+	ROM_MMS_444_84B(1)
 
-	ROM_SYSTEM_BIOS(2, "kmr-100", "Kres KMR-100 V3.a.02")
-	ROMX_LOAD("2732_kmr100_v3_a_02.u518", 0x0000, 0x1000, CRC(fd491592) SHA1(3d5803f95c38b237b07cd230353cd9ddc9858c13), ROM_BIOS(2))
+	ROM_KMR_100(2)
 
-	ROM_SYSTEM_BIOS(3, "mtrhex_4k", "Ultimeth 4k ROM")
-	ROMX_LOAD("2732_mtrhex_4k.u518",      0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(3))
+	ROM_ULTIMETH_4K(3)
 
-	ROM_SYSTEM_BIOS(4, "mtr90-84", "Zenith Data Systems MTR-90 (444-84 - Superseded by 444-142)")
-	ROMX_LOAD("2732_444-84_mtr90.u518",   0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(4))
+	ROM_MTR90_444_84(4)
 
-	ROM_SYSTEM_BIOS(5, "mms84a", "Magnolia MicroSystems 444-84A (Superseded by MMS 444-84B)")
-	ROMX_LOAD("2732_444_84a_mms.u518",    0x0000, 0x1000, CRC(0e541a7e) SHA1(b1deb620fc89c1068e2e663e14be69d1f337a4b9), ROM_BIOS(5))
+	ROM_MMS_444_84A(5)
+
+	ROM_SIGMA_V_1_3(6)
+
+	ROM_SIGMA_V_1_2(7)
+
+	ROM_CDR_8390(8)
+
+	ROM_CDR_80B2(9)
 ROM_END
 
 } // anonymous namespace
@@ -1164,6 +1248,6 @@ ROM_END
 //    year  name           parent compat machine        input class                init        company                fullname                   flags
 COMP( 1979, h88,           h89,   0,     h88,           h88,  h88_state,           empty_init, "Heath Company",       "H-88",                    MACHINE_SUPPORTS_SAVE)
 COMP( 1979, h89,           0,     0,     h89,           h89,  h89_state,           empty_init, "Heath Company",       "H-89",                    MACHINE_SUPPORTS_SAVE)
+COMP( 1981, h89_cdr,       h89,   0,     h89_cdr,       h89,  h89_cdr_state,       empty_init, "Heath Company",       "H-89 with CDR Equipment", MACHINE_SUPPORTS_SAVE)
 COMP( 1981, h89_mms,       h89,   0,     h89_mms,       h89,  h89_mms_state,       empty_init, "Heath Company",       "H-89 with MMS Equipment", MACHINE_SUPPORTS_SAVE)
 COMP( 1981, z90,           h89,   0,     h89,           h89,  h89_state,           empty_init, "Zenith Data Systems", "Z-90",                    MACHINE_SUPPORTS_SAVE)
-COMP( 1984, h89_sigmasoft, h89,   0,     h89_sigmasoft, h89,  h89_sigmasoft_state, empty_init, "Heath Company",       "H-89 with SigmaSoft IGC", MACHINE_SUPPORTS_SAVE)

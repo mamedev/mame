@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-    arm7fe.c
+    arm7fe.hxx
 
     Front-end for ARM7 DRC
 

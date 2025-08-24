@@ -46,7 +46,7 @@ control registers
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(K051316, k051316_device, "k051316", "K051316 PSAC")
+DEFINE_DEVICE_TYPE(K051316, k051316_device, "k051316", "Konami 051316 PSAC")
 
 
 const gfx_layout k051316_device::charlayout4 =
@@ -299,8 +299,8 @@ void k051316_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, con
 	startx -= (16 + m_dy) * incyx;
 	starty -= (16 + m_dy) * incyy;
 
-	startx -= (89 + m_dx) * incxx;
-	starty -= (89 + m_dx) * incxy;
+	startx -= (-7 + m_dx) * incxx;
+	starty -= (-7 + m_dx) * incxy;
 
 	m_tmap->draw_roz(screen, bitmap, cliprect, startx << 5, starty << 5,
 			incxx << 5, incxy << 5, incyx << 5, incyy << 5,

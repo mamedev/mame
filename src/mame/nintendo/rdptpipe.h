@@ -13,8 +13,10 @@
 
 ******************************************************************************/
 
-#ifndef _VIDEO_RDPTEXPIPE_H_
-#define _VIDEO_RDPTEXPIPE_H_
+#ifndef MAME_NINTENDO_RDPTPIPE_H
+#define MAME_NINTENDO_RDPTPIPE_H
+
+#pragma once
 
 #include "n64types.h"
 
@@ -162,4 +164,4 @@ class n64_texture_pipe_t
 		rgbaint_t           m_v1;
 };
 
-#endif // _VIDEO_RDPTEXPIPE_H_
+#endif // MAME_NINTENDO_RDPTPIPE_H

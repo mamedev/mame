@@ -23,10 +23,16 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	void do_math(bool mul_shf);
 
-	uint8_t m_barrel_params[2];
-	uint8_t m_multparams[3];
+	uint8_t m_mpr;
+	uint8_t m_mpd;
+
 	uint8_t m_multresults[2];
+
+	uint8_t m_mad;
+	uint8_t m_sgn_mpd;
+	uint8_t m_sgn_mpr;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_MATH, xavix_math_device)

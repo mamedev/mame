@@ -2,10 +2,10 @@
 // copyright-holders:Steve Ellenoff,R. Belmont,Ryan Holtz
 /*****************************************************************************
  *
- *   arm7drc.inc
+ *   arm7drc.hxx
  *   Portable CPU Emulator for 32-bit ARM v3/4/5/6
  *
- *   Copyright Steve Ellenoff, all rights reserved.
+ *   Copyright Steve Ellenoff
  *   Thumb, DSP, and MMU support and many bugfixes by R. Belmont and Ryan Holtz.
  *   Dyanmic Recompiler (DRC) / Just In Time Compiler (JIT) by Ryan Holtz.
  *
@@ -1027,7 +1027,7 @@ void arm7_cpu_device::static_generate_memory_accessor(int size, bool istlb, bool
 	}
 
 	/* general case: assume paging and perform a translation */
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!debugger_enabled())
 	{
 		for (int ramnum = 0; ramnum < ARM7_MAX_FASTRAM; ramnum++)
 		{
@@ -1266,7 +1266,7 @@ void arm7_cpu_device::generate_sequence_instruction(drcuml_block &block, compile
 	UML_MAPVAR(block, MAPVAR_CYCLES, compiler.cycles);                     // mapvar  CYCLES,compiler.cycles
 
 	/* if we are debugging, call the debugger */
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 	{
 		UML_MOV(block, uml::mem(&R15), desc->pc);                                // mov     [pc],desc->pc
 		save_fast_iregs(block);

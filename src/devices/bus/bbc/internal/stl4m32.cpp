@@ -59,7 +59,7 @@ ROM_END
 
 void bbc_stl4m32_device::device_add_mconfig(machine_config &config)
 {
-	//M65SC02(config.replace(), m_maincpu, DERIVED_CLOCK(1, 4));
+	//G65SC02(config.replace(), m_maincpu, DERIVED_CLOCK(1, 4));
 
 	/* 5 x 32K rom sockets */
 	BBC_ROMSLOT32(config, m_rom[4], bbc_rom_devices, nullptr);

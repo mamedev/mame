@@ -82,7 +82,6 @@ public:
 		m_ram_ptr(nullptr), m_rom_ptr(nullptr),
 		m_ram_mask(0), m_ram_size(0), m_rom_size(0),
 		m_overlay(0),
-		m_6015_timer(nullptr),
 		m_via2_ca1_hack(0),
 		m_nubus_irq_state(0),
 		m_via_interrupt(0), m_via2_interrupt(0), m_scc_interrupt(0), m_last_taken_interrupt(0)
@@ -152,11 +151,8 @@ private:
 	void devsel_w(u8 devsel);
 
 	u8 m_mac[6];
-	emu_timer *m_6015_timer;
 	int m_via2_ca1_hack, m_nubus_irq_state;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
-
-	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 };
 
 class spike_state : public quadrax00_state
@@ -280,9 +276,6 @@ void quadrax00_state::machine_start()
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = 0;
 	m_last_taken_interrupt = -1;
 
-	m_6015_timer = timer_alloc(FUNC(quadrax00_state::mac_6015_tick), this);
-	m_6015_timer->adjust(attotime::never);
-
 	save_item(NAME(m_via2_ca1_hack));
 	save_item(NAME(m_nubus_irq_state));
 	save_item(NAME(m_adb_irq_pending));
@@ -312,9 +305,6 @@ void quadrax00_state::machine_reset()
 
 	space.unmap_write(0x00000000, memory_end);
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
-
-	// start 60.15 Hz timer
-	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 }
 
 void eclipse_state::machine_start()
@@ -406,6 +396,9 @@ u16 quadrax00_state::swim_r(offs_t offset, u16 mem_mask)
 void quadrax00_state::swim_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_swim->write((offset >> 8) & 0xf, data >> 8);
+
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
 }
 
 void eclipse_state::fdc_hdsel(int state)
@@ -552,12 +545,6 @@ u8 quadrax00_state::ethernet_mac_r(offs_t offset)
 	}
 
 	return 0;
-}
-
-TIMER_CALLBACK_MEMBER(quadrax00_state::mac_6015_tick)
-{
-	/* handle ADB keyboard/mouse */
-	m_macadb->adb_vblank();
 }
 
 /***************************************************************************
@@ -753,7 +740,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		applefdintf_device::add_35_hd(config, m_floppy[0]);
 		applefdintf_device::add_35_nc(config, m_floppy[1]);
 
-		SCC8530N(config, m_scc, C7M);
+		SCC8530(config, m_scc, C7M);
 		m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 		m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
 		m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
@@ -775,8 +762,8 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
 																								 {
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0); });
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1); });
 		NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
@@ -794,6 +781,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 
 		nubus_device &nubus(NUBUS(config, "nubus", 40_MHz_XTAL / 4));
 		nubus.set_space(m_maincpu, AS_PROGRAM);
+		nubus.set_bus_mode(nubus_device::nubus_mode_t::QUADRA_DAFB);
 		nubus.out_irq9_callback().set(FUNC(quadrax00_state::nubus_irq_9_w));
 		nubus.out_irqa_callback().set(FUNC(quadrax00_state::nubus_irq_a_w));
 		nubus.out_irqb_callback().set(FUNC(quadrax00_state::nubus_irq_b_w));
@@ -815,12 +803,11 @@ void eclipse_state::via2_out_b_q900(u8 data)
 
 		MACADB(config, m_macadb, C15M);
 
-		SPEAKER(config, "lspeaker").front_left();
-		SPEAKER(config, "rspeaker").front_right();
+		SPEAKER(config, "speaker", 2).front();
 		ASC(config, m_easc, 22.5792_MHz_XTAL, asc_device::asc_type::EASC);
 		m_easc->irqf_callback().set(m_via2, FUNC(via6522_device::write_cb1)).invert();
-		m_easc->add_route(0, "lspeaker", 1.0);
-		m_easc->add_route(1, "rspeaker", 1.0);
+		m_easc->add_route(0, "speaker", 1.0, 0);
+		m_easc->add_route(1, "speaker", 1.0, 1);
 
 		// DFAC is only for audio input on Q700/Q800
 		APPLE_DFAC(config, m_dfac, 22257);
@@ -881,8 +868,8 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		m_sccpic->hint_callback().set(FUNC(eclipse_state::scc_irq_w));
 
 		m_scc->out_int_callback().set(m_sccpic, FUNC(applepic_device::pint_w));
-		m_scc->out_wreqa_callback().set(m_sccpic, FUNC(applepic_device::reqa_w));
-		m_scc->out_wreqb_callback().set(m_sccpic, FUNC(applepic_device::reqb_w));
+		m_scc->out_wreqa_callback().set(m_sccpic, FUNC(applepic_device::reqa_w)).invert();
+		m_scc->out_wreqb_callback().set(m_sccpic, FUNC(applepic_device::reqb_w)).invert();
 
 		APPLEPIC(config, m_swimpic, C15M);
 		m_swimpic->prd_callback().set(m_swim, FUNC(applefdintf_device::read));

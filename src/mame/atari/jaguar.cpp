@@ -40,7 +40,7 @@
     Components:
     sdt79r3041-20j
     Atari Jaguar CPU V1.0 6sc880hf106
-    Atari Jaguar DSP V1.0 sc414201ft (has Motorolla logo)
+    Atari Jaguar DSP V1.0 sc414201ft (has Motorola logo)
     Altera epm7128elc84-15 marked A-21652
     VIA vt83c461 IDE controller
     Actel a1010b marked A-22096 near IDE and gun inputs
@@ -366,37 +366,11 @@ Notes:
  *
  *************************************/
 
-/// HACK: Maximum force requests data but doesn't transfer it all before issuing another command.
-/// According to the ATA specification this is not allowed, more investigation is required.
-
-DECLARE_DEVICE_TYPE(COJAG_HARDDISK, cojag_hdd)
-
-class cojag_hdd : public ide_hdd_device
-{
-public:
-	cojag_hdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: ide_hdd_device(mconfig, COJAG_HARDDISK, tag, owner, clock)
-	{
-	}
-
-	virtual void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask) override
-	{
-		// the first write is to the device head register
-		if( offset == 6 && (m_status & IDE_STATUS_DRQ))
-		{
-			m_status &= ~IDE_STATUS_DRQ;
-		}
-
-		ide_hdd_device::write_cs0(offset, data, mem_mask);
-	}
-};
-
-DEFINE_DEVICE_TYPE(COJAG_HARDDISK, cojag_hdd, "cojag_hdd", "HDD CoJag")
-
 void cojag_devices(device_slot_interface &device)
 {
-	device.option_add("hdd", COJAG_HARDDISK);
+	device.option_add("hdd", IDE_HARDDISK);
 }
+
 
 /*************************************
  *
@@ -671,6 +645,7 @@ void jaguar_state::gpuctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	m_gpu->iobus_w(offset, data, mem_mask);
 }
 
+
 /*************************************
  *
  *  32-bit access to the DSP
@@ -686,6 +661,7 @@ void jaguar_state::dspctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_dsp->iobus_w(offset, data, mem_mask);
 }
+
 
 /*************************************
  *
@@ -869,7 +845,6 @@ void jaguar_state::eeprom_data_w(offs_t offset, uint32_t data)
     run it until we get back to the spin loop.
 */
 
-
 void jaguar_state::gpu_jump_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* update the data in memory */
@@ -923,9 +898,6 @@ uint32_t jaguar_state::gpu_jump_r()
     crank through some random numbers, just not several thousand every frame.
 */
 
-#if ENABLE_SPEEDUP_HACKS
-
-
 uint32_t jaguar_state::cojagr3k_main_speedup_r()
 {
 	uint64_t curcycles = m_maincpu->total_cycles();
@@ -952,8 +924,6 @@ uint32_t jaguar_state::cojagr3k_main_speedup_r()
 	return *m_main_speedup;
 }
 
-#endif
-
 
 
 /*************************************
@@ -971,17 +941,12 @@ uint32_t jaguar_state::cojagr3k_main_speedup_r()
     makes sure we don't waste time emulating that spin loop.
 */
 
-#if ENABLE_SPEEDUP_HACKS
-
-
 uint32_t jaguar_state::main_gpu_wait_r()
 {
 	if (m_gpu_command_pending)
 		m_maincpu->spin_until_interrupt();
 	return *m_main_gpu_wait;
 }
-
-#endif
 
 
 
@@ -997,8 +962,6 @@ uint32_t jaguar_state::main_gpu_wait_r()
     Very similar to the R3000 code, except we need to verify that the value in
     *main_speedup is actually 0.
 */
-
-#if ENABLE_SPEEDUP_HACKS
 
 void jaguar_state::area51_main_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
@@ -1060,7 +1023,6 @@ void jaguar_state::area51mx_main_speedup_w(offs_t offset, uint32_t data, uint32_
 	m_main_speedup_last_cycles = curcycles;
 }
 
-#endif
 
 
 /*************************************
@@ -1319,7 +1281,7 @@ void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 					break;
 
 				default:
-					printf("%04x CMD\n",m_butch_regs[offset]);
+					logerror("%04x CMD\n", m_butch_regs[offset]);
 					break;
 			}
 			break;
@@ -1332,6 +1294,7 @@ void jaguarcd_state::jaguarcd_map(address_map &map)
 	map(0x800000, 0x83ffff).rom().region("cdbios", 0);
 	map(0xdfff00, 0xdfff3f).rw(FUNC(jaguarcd_state::butch_regs_r16), FUNC(jaguarcd_state::butch_regs_w16));
 }
+
 
 /*************************************
  *
@@ -1488,6 +1451,7 @@ void jaguarcd_state::jagcd_gpu_dsp_map(address_map &map)
 	map(0x800000, 0x83ffff).r(FUNC(jaguarcd_state::cd_bios_r));
 	map(0xdfff00, 0xdfff3f).rw(FUNC(jaguarcd_state::butch_regs_r), FUNC(jaguarcd_state::butch_regs_w));
 }
+
 
 /*************************************
  *
@@ -1772,6 +1736,7 @@ static INPUT_PORTS_START( jaguar )
 	PORT_CONFSETTING(    0x10, "NTSC")
 INPUT_PORTS_END
 
+
 /*************************************
  *
  *  Machine driver
@@ -1795,7 +1760,7 @@ void jaguar_state::video_config(machine_config &config, const XTAL clock)
 void jaguar_state::cojagr3k(machine_config &config)
 {
 	/* basic machine hardware */
-	R3041(config, m_maincpu, R3000_CLOCK).set_endianness(ENDIANNESS_BIG);
+	R3041(config, m_maincpu, R3000_CLOCK / 2).set_endianness(ENDIANNESS_BIG); // divider not verified, but chip is rated for 20 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::r3000_map);
 
 	video_config(config, COJAG_CLOCK/2);
@@ -1818,10 +1783,9 @@ void jaguar_state::cojagr3k(machine_config &config)
 	PALETTE(config, m_palette, FUNC(jaguar_state::jagpal_ycc), 65536);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	SPEAKER(config, "speaker", 2).front();
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // unknown DAC
 
 	// TODO: subwoofer speaker
 }
@@ -1868,16 +1832,15 @@ void jaguar_state::jaguar(machine_config &config)
 	PALETTE(config, m_palette, FUNC(jaguar_state::jagpal_ycc), 65536);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	SPEAKER(config, "speaker", 2).front();
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // unknown DAC
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "abs,bin,cof,jag,prg").set_load_callback(FUNC(jaguar_state::quickload_cb));
+	QUICKLOAD(config, "quickload", "abs,bin,cof,jag,prg,rom", attotime::from_seconds(1)).set_load_callback(FUNC(jaguar_state::quickload_cb));
 
 	/* cartridge */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "jaguar_cart", "j64,rom,bin"));
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "jaguar_cart", "j64"));
 	cartslot.set_device_load(FUNC(jaguar_state::cart_load));
 
 	/* software lists */
@@ -1895,8 +1858,11 @@ void jaguarcd_state::jaguarcd(machine_config &config)
 
 	m_dsp->set_addrmap(AS_PROGRAM, &jaguarcd_state::jagcd_gpu_dsp_map);
 
-	CDROM(config, "cdrom").set_interface("jag_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
+
+	// TODO: software list, requires multisession support first
 }
+
 
 /*************************************
  *
@@ -1930,14 +1896,13 @@ void jaguarcd_state::init_jaguarcd()
 
 std::pair<std::error_condition, std::string> jaguar_state::quickload_cb(snapshot_image_device &image)
 {
-	offs_t quickload_begin = 0x4000, start = quickload_begin, skip = 0;
+	offs_t quickload_begin = 0x1000, start = 0x4000, skip = 0;
 
-	memset(m_shared_ram, 0, 0x200000);
-	offs_t quickload_size = std::min(offs_t(image.length()), 0x200000 - quickload_begin);
+	offs_t quickload_size = std::min(offs_t(image.length()), 0x20000 - start);
 
-	image.fread( &memregion("maincpu")->base()[quickload_begin], quickload_size);
+	image.fread( &m_shared_ram[quickload_begin], quickload_size);
 
-	fix_endian(&memregion("maincpu")->base()[quickload_begin], quickload_size);
+	fix_endian(&m_shared_ram[quickload_begin], quickload_size);
 
 	/* Deal with some of the numerous homebrew header systems */
 		/* COF */
@@ -1973,18 +1938,29 @@ std::pair<std::error_condition, std::string> jaguar_state::quickload_cb(snapshot
 	else    /* JAG binary */
 	if (image.is_filetype("jag"))
 		start = 0x5000;
+	else
+	if (image.is_filetype("rom"))
+		start = 0x802000;
 
+	quickload_size = image.length();
 
 	/* Now that we have the info, reload the file */
-	if ((start != quickload_begin) || (skip))
+	if ((start + quickload_size) < 0x200000)
 	{
 		memset(m_shared_ram, 0, 0x200000);
-		image.fseek(0, SEEK_SET);
-		image.fread( &m_shared_ram[(start-skip)/4], quickload_size);
-		quickload_begin = start;
-		fix_endian(&memregion("maincpu")->base()[(start-skip)&0xfffffc], quickload_size);
+		image.fseek(skip, SEEK_SET);
+		image.fread( &m_shared_ram[start/4], quickload_size-skip);
+		fix_endian(&m_shared_ram[start/4], quickload_size-skip);
 	}
-
+	else
+	if (start >= 0x800000)
+	{
+		image.fseek(skip, SEEK_SET);
+		image.fread( &m_cart_base[(start - 0x800000) / 4], quickload_size - skip);
+		fix_endian(&m_cart_base[(start - 0x800000) / 4], quickload_size - skip);
+	}
+	else
+		return std::make_pair(image_error::UNSUPPORTED, "Unsupported start address for this quickload.");
 
 	/* Some programs are too lazy to set a stack pointer */
 	m_maincpu->set_state_int(M68K_SP, 0x1000);
@@ -2003,13 +1979,6 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state::cart_load )
 	if (!image.loaded_through_softlist())
 	{
 		size = image.length();
-
-		/* .rom files load & run at 802000 */
-		if (image.is_filetype("rom"))
-		{
-			load_offset = 0x2000;             // fix load address
-			m_cart_base[0x101] = 0x802000;    // fix exec address
-		}
 
 		/* Load cart into memory */
 		image.fread(&m_cart_base[load_offset/4], size);
@@ -2032,6 +2001,7 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state::cart_load )
 	m_maincpu->reset();
 	return std::make_pair(std::error_condition(), std::string());
 }
+
 
 /*************************************
  *
@@ -2246,7 +2216,6 @@ ROM_END
        ROM based games
 
 ****************************************/
-
 
 ROM_START( fishfren )
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for R3000 code */
@@ -2523,6 +2492,7 @@ void jaguar_state::init_area51()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x0c0, 0x09e);
+
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
@@ -2640,11 +2610,11 @@ void jaguar_state::init_vcircle()
  *
  *************************************/
 
-/*    YEAR   NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY    FULLNAME */
-CONS( 1993,  jaguar,    0,        0,      jaguar,   jaguar,   jaguar_state,   init_jaguar,   "Atari",   "Jaguar (NTSC)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-CONS( 1995,  jaguarcd,  jaguar,   0,      jaguarcd, jaguar,   jaguarcd_state, init_jaguarcd, "Atari",   "Jaguar CD (NTSC)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+/*    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY    FULLNAME */
+CONS( 1993, jaguar,     0,        0,      jaguar,   jaguar,   jaguar_state,   init_jaguar,   "Atari",   "Jaguar (NTSC)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 1995, jaguarcd,   jaguar,   0,      jaguarcd, jaguar,   jaguarcd_state, init_jaguarcd, "Atari",   "Jaguar CD (NTSC)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-/*    YEAR   NAME       PARENT    MACHINE       INPUT     CLASS         INIT            ROT   COMPANY        FULLNAME */
+/*    YEAR  NAME        PARENT    MACHINE       INPUT     CLASS         INIT            ROT   COMPANY        FULLNAME */
 GAME( 1996, area51,     0,        cojagr3k,     area51,   jaguar_state, init_area51,    ROT0, "Atari Games", "Area 51 (R3000)", 0 )
 GAME( 1995, area51t,    area51,   cojag68k,     area51,   jaguar_state, init_area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Oct 17, 1996)", 0 )
 GAME( 1995, area51ta,   area51,   cojag68k,     area51,   jaguar_state, init_area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Nov 27, 1995)", 0 )

@@ -17,17 +17,9 @@ public:
 
 	k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	/*
-	Note: k053251_w() automatically does a ALL_TILEMAPS->mark_all_dirty()
-	when some palette index changes. If ALL_TILEMAPS is too expensive, use
-	k053251_set_tilemaps() to indicate which tilemap is associated with each index.
-	*/
-
 	void write(offs_t offset, u8 data);
-	int get_priority(int ci);
-	int get_palette_index(int ci);
-
-	u8 read(offs_t offset); // PCU1
+	u8 get_priority(u8 ci);
+	u8 get_palette_index(u8 ci);
 
 protected:
 	// device-level overrides
@@ -37,9 +29,8 @@ protected:
 
 private:
 	// internal state
-	uint8_t  m_ram[16];
-	int      m_tilemaps_set;
-	int      m_palette_index[5];
+	u8 m_ram[16];
+	u8 m_palette_index[5];
 
 	void reset_indexes();
 };

@@ -13,7 +13,9 @@ local commonui
 local macros
 local menu_stack
 
-local macros_start_macro -- really for the macros menu, but has to be declared local before edit menu functions
+local macros_start_macro -- really for the macros menu, but have to be declared local before edit menu functions
+local macros_item_first_macro
+local macros_selection_save
 
 
 -- Helpers
@@ -104,6 +106,7 @@ local edit_menu_active
 local edit_insert_position
 local edit_name_buffer
 local edit_items
+local edit_item_delete
 local edit_item_exit
 local edit_switch_poller
 
@@ -460,6 +463,17 @@ local function handle_edit(index, event)
 	local handled, selection = handle_edit_items(index, event)
 	if handled then
 		return true, selection
+	elseif (index == edit_item_delete) and (event == 'select') then
+		local macro = macros_selection_save - macros_item_first_macro + 1
+		table.remove(macros, macro)
+		if macro > #macros then
+			macros_selection_save = macros_selection_save - 1
+		end
+		edit_current_macro = nil
+		edit_menu_active = false
+		edit_items = nil
+		table.remove(menu_stack)
+		return true, selection
 	elseif (event == 'back') or ((index == edit_item_exit) and (event == 'select')) then
 		edit_current_macro = nil
 		edit_menu_active = false
@@ -504,6 +518,10 @@ local function populate_edit()
 	add_edit_items(items)
 
 	table.insert(items, { '---', '', '' })
+	table.insert(items, { _p('plugin-inputmacro', 'Delete macro'), '', '' })
+	edit_item_delete = #items
+
+	table.insert(items, { '---', '', '' })
 	table.insert(items, { _p('plugin-inputmacro', 'Done'), '', '' })
 	edit_item_exit = #items
 
@@ -519,8 +537,6 @@ end
 
 -- Macros menu
 
-local macros_item_first_macro
-local macros_selection_save
 local macros_item_add
 
 function handle_macros(index, event)
@@ -533,7 +549,7 @@ function handle_macros(index, event)
 			return true
 		end
 	elseif index >= macros_item_first_macro then
-		macro = index - macros_item_first_macro + 1
+		local macro = index - macros_item_first_macro + 1
 		if event == 'select' then
 			edit_current_macro = macros[macro]
 			edit_insert_position = #edit_current_macro.steps + 1

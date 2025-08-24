@@ -236,4 +236,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(198?, systel100, 0, 0, systel1, systel1, systel1_state, empty_init, "Systel Computers", "System 100", MACHINE_IS_SKELETON)
+COMP(198?, systel100, 0, 0, systel1, systel1, systel1_state, empty_init, "Systel Computers", "System 100", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -9,7 +9,7 @@ bool i386_device::MMXPROLOG()
 {
 	if (m_cr[0] & CR0_TS)
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return true;
 	}
 	x87_set_stack_top(0);
@@ -21,7 +21,7 @@ bool i386_device::SSEPROLOG()
 {
 	if (m_cr[0] & CR0_TS)
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return true;
 	}
 	return false;
@@ -115,7 +115,7 @@ void i386_device::pentium_rdtsc()          // Opcode 0x0f 31
 
 void i386_device::pentium_ud2()    // Opcode 0x0f 0b
 {
-	i386_trap(6, 0, 0);
+	i386_trap(6, 0);
 }
 
 void i386_device::pentium_rsm()
@@ -123,7 +123,7 @@ void i386_device::pentium_rsm()
 	if(!m_smm)
 	{
 		LOGMASKED(LOG_INVALID_OPCODE, "i386: Invalid RSM outside SMM at %08X\n", m_pc - 1);
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 		return;
 	}
 
@@ -136,7 +136,7 @@ void i386_device::pentium_rsm()
 	if(m_nmi_latched)
 	{
 		m_nmi_latched = false;
-		i386_trap(2, 1, 0);
+		i386_trap(2, 1);
 	}
 }
 
@@ -1910,12 +1910,12 @@ void i386_device::mmx_emms() // Opcode 0f 77
 {
 	if (m_cr[0] & CR0_TS)
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return;
 	}
 	if (m_cr[0] & CR0_EM)
 	{
-		i386_trap(FAULT_UD, 0, 0);
+		i386_trap(FAULT_UD, 0);
 		return;
 	}
 	m_x87_tw = 0xffff; // tag word = 0xffff
@@ -1983,7 +1983,7 @@ void i386_device::i386_cyrix_svdc() // Opcode 0f 78
 
 			default:
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 		}
 
@@ -2000,7 +2000,7 @@ void i386_device::i386_cyrix_svdc() // Opcode 0f 78
 		WRITE8(ea + 7, m_sreg[index].base >> 24);
 		WRITE16(ea + 8, m_sreg[index].selector);
 	} else {
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2049,7 +2049,7 @@ void i386_device::i386_cyrix_rsdc() // Opcode 0f 79
 
 			default:
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 		}
 
@@ -2067,7 +2067,7 @@ void i386_device::i386_cyrix_rsdc() // Opcode 0f 79
 		m_sreg[index].base = base;
 		m_sreg[index].limit = limit;
 	} else {
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2093,10 +2093,10 @@ void i386_device::i386_cyrix_svldt() // Opcode 0f 7a
 			WRITE8(ea + 7, m_ldtr.base >> 24);
 			WRITE16(ea + 8, m_ldtr.segment);
 		} else {
-			i386_trap(6, 0, 0);
+			i386_trap(6, 0);
 		}
 	} else {
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2129,10 +2129,10 @@ void i386_device::i386_cyrix_rsldt() // Opcode 0f 7b
 			m_ldtr.base = base;
 			m_ldtr.flags = flags;
 		} else {
-			i386_trap(6, 0, 0);
+			i386_trap(6, 0);
 		}
 	} else {
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2158,10 +2158,10 @@ void i386_device::i386_cyrix_svts() // Opcode 0f 7c
 			WRITE8(ea + 7, m_task.base >> 24);
 			WRITE16(ea + 8, m_task.segment);
 		} else {
-			i386_trap(6, 0, 0);
+			i386_trap(6, 0);
 		}
 	} else {
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 }
 
@@ -2189,10 +2189,10 @@ void i386_device::i386_cyrix_rsts() // Opcode 0f 7d
 			m_task.base = base;
 			m_task.flags = flags;
 		} else {
-			i386_trap(6, 0, 0);
+			i386_trap(6, 0);
 		}
 	} else {
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }

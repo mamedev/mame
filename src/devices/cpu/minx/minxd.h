@@ -7,8 +7,8 @@
 
 ************************************************************/
 
-#ifndef MAME_CPU_MINX_MINXDASM_H
-#define MAME_CPU_MINX_MINXDASM_H
+#ifndef MAME_CPU_MINX_MINXD_H
+#define MAME_CPU_MINX_MINXD_H
 
 #pragma once
 
@@ -86,4 +86,4 @@ private:
 	static const minxdasm mnemonic_cf[256];
 };
 
-#endif
+#endif // MAME_CPU_MINX_MINXD_H

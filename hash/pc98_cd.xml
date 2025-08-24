@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="pc98_cd" description="NEC PC-9801 CD-ROMs">
+<softwarelist name="pc98_cd" description="NEC PC-98 CD-ROMs">
 
 	<!--
 
@@ -16,13 +16,34 @@ license:CC0-1.0
 
 	-->
 
-<!--  OS disks  -->
+<!-- !Operating System disks -->
 
-	<!--
-	    PC-9801RS is the only machine that can boot the install disk in MAME, others complain about the CPU not being set to HIGH.
-	    Even on the RS, it doesn't launch the GUI part of the install program, so you are left with an incomplete installation.
-	    These are emulation bugs, it works correctly on real hardware.
-	-->
+	<software name="freebsd21" supported="no">
+		<!--
+		Origin: private dump (sampson)
+		<rom name="FreeBSD.bin" size="758814000" crc="b3b9fa4d" md5="2e3e4dbb8be25fc0f6c5e72c96bbfd46" sha1="60a27b813432d879bb8bb8f50b0203c289e5c242" />
+		-->
+		<!-- "XFree86 3.1.2 Beta(98) Version PL.0" printed on CD -->
+		<!-- "ISO 9660 / Rock Ridge extension" printed on CD -->
+		<!-- 07/1996 as per file timestamps -->
+		<description>FreeBSD(98) Nyuumon Kit (2.1.0R)</description>
+		<year>1996</year>
+		<publisher>Shuwa System</publisher>
+		<notes><![CDATA[
+boot.flp: cannot read CD-ROM device at install time
+atapi.flp: cannot read HDD device when partitioning
+Fumbles HDD detection at Heads greater than 8, Sectors greater than 17
+]]></notes>
+		<info name="alt_title" value="FreeBSD(98) 入門キット" />
+		<info name="serial" value="V008-SSUN" />
+		<info name="usage" value="Needs boot.flp or atapi.flp formatted with 2HC spec, use hidden command format /6 from MS-DOS then use rawrite.exe provided from disk" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="freebsd" sha1="9a1b03c223be4a1e12d7d99654f84f5d11edf75f" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="os2warp3" supported="no">
 		<!--
 		Origin: private dump (sampson)
@@ -31,6 +52,11 @@ license:CC0-1.0
 		<description>OS/2 Warp V3 - Nihongo-ban</description>
 		<year>1995</year>
 		<publisher>NEC / IBM</publisher>
+		<notes><![CDATA[
+Fumbles [ATAPI] driver autodetection, workaround by manual driver install
+Runs too fast on pc9821ap2 (cfr. double mouse click not working, video running at x4 speed)
+Has [PC9801-86] DAC FIFO issues
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Install Disk" />
 			<dataarea name="flop" size="1261568">
@@ -484,7 +510,7 @@ license:CC0-1.0
 	</software>
 
 
-<!--  Game disks  -->
+<!-- !Game disks -->
 
 	<software name="aitd2">
 		<!--
@@ -1713,6 +1739,7 @@ license:CC0-1.0
 		<description>NEC Demonstration CD-ROM - Evolution and Dinosaurs</description>
 		<year>1992</year>
 		<publisher>NEC</publisher>
+		<info name="usage" value="Requires AVGDRV.SYS or AVSDRV.SYS CD driver" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="nec demonstration cd-rom - evolution and dinosaurs (japan)" sha1="b07a302de9f90b5eb958a35381cdda1f050ed37e" />
@@ -1745,8 +1772,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Hangs shortly after starting a new game -->
-	<software name="diesirae" supported="no">
+	<software name="diesirae" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="Dies Irae (Japan) (Track 01).bin" size="12272736" crc="d5c723ca" sha1="158e4de6a5d908bafd2d0a8dc651f1cbdaf2c47d"/>
@@ -1817,6 +1843,10 @@ license:CC0-1.0
 		<description>Dies Irae</description>
 		<year>1996</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<notes><![CDATA[
+Should it have BGMs during gameplay?
+Not extensively tested
+]]></notes>
 		<info name="serial" value="21D-2032"/>
 		<info name="alt_title" value="ディエス イレ" />
 		<info name="release" value="19960215" />
@@ -4292,8 +4322,12 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<description>Master of Magic</description>
 		<year>1996</year>
 		<publisher>ローカス (Locus)</publisher>
+		<notes><![CDATA[
+Fussy with HIMEM.SYS and EMM386.EXE provided by boot disk, tbd VEM486 use.
+]]></notes>
 		<info name="alt_title" value="マスター・オブ・マジック" />
 		<info name="release" value="19961206" />
+		<info name="usage" value="Prepare a DOS format /s floppy image before starting to install." />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="master of magic (japan)" sha1="055bd04d20a57a8a3ef70b906f80beecee67f6a3" />

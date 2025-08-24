@@ -7,8 +7,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_NES_CTRL_ZAPPER_SENSOR
-#define MAME_BUS_NES_CTRL_ZAPPER_SENSOR
+#ifndef MAME_BUS_NES_CTRL_ZAPPER_SENSOR_H
+#define MAME_BUS_NES_CTRL_ZAPPER_SENSOR_H
 
 #pragma once
 
@@ -50,4 +50,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NES_ZAPPER_SENSOR, nes_zapper_sensor_device)
 
-#endif // MAME_BUS_NES_CTRL_ZAPPER_SENSOR
+#endif // MAME_BUS_NES_CTRL_ZAPPER_SENSOR_H

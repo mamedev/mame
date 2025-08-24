@@ -17,7 +17,7 @@
      - La Perla del Caribe Plus
      - Las Joyas de Cleopatra
      - Leyendas de Oriente
-     - Lucky Player
+     - Lucky Player (2012 version)
      - Máquina del Tiempo
      - Multi Star
      - Ocean's Treasures
@@ -195,4 +195,4 @@ ROM_END
 } // Anonymous namespace
 
 //    YEAR  NAME       PARENT  MACHINE    INPUT         CLASS               INIT        ROT   COMPANY          FULLNAME                   FLAGS
-GAME( 2015, maquinati, 0,      maquinati, cirsa2080606, cirsa2080606_state, empty_init, ROT0, "Unidesa/Cirsa", u8"La Máquina del Tiempo", MACHINE_IS_SKELETON )
+GAME( 2015, maquinati, 0,      maquinati, cirsa2080606, cirsa2080606_state, empty_init, ROT0, "Unidesa/Cirsa", u8"La Máquina del Tiempo", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

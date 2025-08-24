@@ -136,7 +136,7 @@ public:
 		  m_a2common(*this, "a2common"),
 		  //      m_a2host(*this, "a2host"),
 		  m_gameio(*this, "gameio"),
-		  m_speaker(*this, "speaker"),
+		  m_speaker(*this, "speaker_sound"),
 		  m_upperbank(*this, A2GS_UPPERBANK_TAG),
 		  m_upperaux(*this, A2GS_AUXUPPER_TAG),
 		  m_upper00(*this, A2GS_00UPPER_TAG),
@@ -386,6 +386,8 @@ private:
 	void bank1_0000_sh_w(offs_t offset, u8 data);
 	u8 bank1_c000_r(offs_t offset);
 	void bank1_c000_w(offs_t offset, u8 data);
+	u8 expandedram_r(offs_t offset);
+	void expandedram_w(offs_t offset, u8 data);
 	void a2bus_irq_w(int state);
 	void a2bus_nmi_w(int state);
 	void a2bus_inh_w(int state);
@@ -447,7 +449,7 @@ private:
 
 	// Sound GLU variables
 	u8 m_sndglu_ctrl = 0;
-	int m_sndglu_addr = 0;
+	u16 m_sndglu_addr = 0;
 	int m_sndglu_dummy_read = 0;
 
 	// Key GLU variables
@@ -473,6 +475,7 @@ private:
 	u8 m_clkdata = 0, m_clock_control = 0;
 	u8 m_clock_frame = 0;
 
+	void lcrom_update();
 	void do_io(int offset);
 	u8 read_floatingbus();
 	void update_slotrom_banks();
@@ -896,6 +899,10 @@ void apple2gs_state::machine_reset()
 	// reset the slots
 	m_a2bus->reset_bus();
 
+	// Apple-specific initial state
+	m_scc->ctsa_w(0);
+	m_scc->dcda_w(0);
+
 	// with all the banking reset, now reset the CPU
 	m_maincpu->reset();
 
@@ -1056,7 +1063,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 			raise_irq(IRQS_VBL);
 		}
 
-		m_adbmicro->set_input_line(0, ASSERT_LINE);
+		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, ASSERT_LINE);
 
 		m_clock_frame++;
 
@@ -1096,7 +1103,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	}
 	else if (scanline == (192+BORDER_TOP+1))
 	{
-		m_adbmicro->set_input_line(1, ASSERT_LINE);
+		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, CLEAR_LINE);
 	}
 }
 
@@ -1266,20 +1273,7 @@ void apple2gs_state::lc_update(int offset, bool writing)
 
 	if (m_lcram != old_lcram)
 	{
-		if (m_lcram)
-		{
-			m_lcbank.select(1);
-			m_lcaux.select(1);
-			m_lc00.select(1 + (m_romswitch ? 2 : 0));
-			m_lc01.select(1);
-		}
-		else
-		{
-			m_lcbank.select(0);
-			m_lcaux.select(0);
-			m_lc00.select(0 + (m_romswitch ? 2 : 0));
-			m_lc01.select(0);
-		}
+		lcrom_update();
 	}
 
 	#if 0
@@ -1289,6 +1283,24 @@ void apple2gs_state::lc_update(int offset, bool writing)
 			m_lcram2 ? 0x1000 : 0x0000,
 			m_altzp);
 	#endif
+}
+
+void apple2gs_state::lcrom_update()
+{
+	if (m_lcram)
+	{
+		m_lcbank.select(1);
+		m_lcaux.select(1);
+		m_lc00.select(1 + (m_romswitch ? 2 : 0));
+		m_lc01.select(1);
+	}
+	else
+	{
+		m_lcbank.select(0);
+		m_lcaux.select(0);
+		m_lc00.select(0 + (m_romswitch ? 2 : 0));
+		m_lc01.select(0);
+	}
 }
 
 // most softswitches don't care about read vs write, so handle them here
@@ -1366,13 +1378,11 @@ void apple2gs_state::do_io(int offset)
 			break;
 
 		case 0x54:  // set page 1
-			m_video->page2_w(false);
 			m_video->scr_w(0);
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
-			m_video->page2_w(true);
 			m_video->scr_w(1);
 			auxbank_update();
 			break;
@@ -1590,6 +1600,9 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x29:  // NEWVIDEO
 			return m_video->get_newvideo();
+
+		case 0x2b:  // LANGSEL
+			return m_video->get_GS_langsel();
 
 		case 0x2d:  // SLOTROMSEL
 			return m_slotromsel;
@@ -1946,6 +1959,10 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			m_video->set_newvideo(data);
 			break;
 
+		case 0x2b:  // LANGSEL
+			m_video->set_GS_langsel(data);
+			break;
+
 		case 0x2d:  // SLOTROMSEL
 			m_slotromsel = data;
 			break;
@@ -2083,10 +2100,12 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			m_inten = data & 0x1f;
 			if (!(data & 0x10))
 			{
+				m_intflag &= ~INTFLAG_QUARTER;
 				lower_irq(IRQS_QTRSEC);
 			}
 			if (!(data & 0x08))
 			{
+				m_intflag &= ~INTFLAG_VBL;
 				lower_irq(IRQS_VBL);
 			}
 			//printf("%02x to INTEN, now %02x\n", data, m_vgcint);
@@ -2475,6 +2494,34 @@ void apple2gs_state::c800_w(offs_t offset, u8 data)
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		update_slotrom_banks();
 		return;
+	}
+}
+
+/* for < 14MB RAM, returns the bank number on reads >= 8MB */
+u8 apple2gs_state::expandedram_r(offs_t offset)
+{
+	offset += 0x020000;
+
+	if (offset >= m_ram_size)
+	{
+		if (offset >= 0x800000)
+		{
+			return offset >> 16;
+		}
+
+		return 0;
+	}
+
+	return m_ram_ptr[offset];
+}
+
+void apple2gs_state::expandedram_w(offs_t offset, u8 data)
+{
+	offset += 0x20000;
+
+	if (offset < m_ram_size)
+	{
+		m_ram_ptr[offset] = data;
 	}
 }
 
@@ -3271,6 +3318,8 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	m_e0_4000bank[2](0x4000, 0xbfff).rw(FUNC(apple2gs_state::e0ram_r<0x4000>), FUNC(apple2gs_state::e1ram_w<0x4000>));
 	m_e0_4000bank[3](0x4000, 0xbfff).rw(FUNC(apple2gs_state::e1ram_r<0x4000>), FUNC(apple2gs_state::e1ram_w<0x4000>));
 
+	map(0x020000, 0xdfffff).rw(FUNC(apple2gs_state::expandedram_r), FUNC(apple2gs_state::expandedram_w));
+
 	map(0xe0c000, 0xe0c07f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
 	map(0xe0c080, 0xe0c0ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
 	map(0xe0c100, 0xe0c2ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
@@ -3405,6 +3454,7 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 		m_video->page2_w(false);
 		m_video->res_w(0);
 
+		lcrom_update();
 		auxbank_update();
 		update_slotrom_banks();
 	}
@@ -3652,6 +3702,12 @@ void apple2gs_state::keyglu_regen_irqs()
 	{
 		bIRQ = true;
 	}
+
+	if ((m_glu_regs[GLU_KG_STATUS] & KGS_MOUSEX_FULL) && (m_glu_regs[GLU_SYSSTAT] & GLU_STATUS_MOUSEIRQEN))
+	{
+		bIRQ = true;
+	}
+
 	if (bIRQ)
 	{
 		raise_irq(IRQS_ADB);
@@ -3816,19 +3872,19 @@ void apple2gs_state::apple2gs(machine_config &config)
 	PALETTE(config, "palette", FUNC(apple2gs_state::palette_init), 256);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER(config, "a2speaker").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "a2speaker", 1.00);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "ensoniq", 4).corners();
 	ES5503(config, m_doc, A2GS_7M);
-	m_doc->set_channels(2);
+	m_doc->set_channels(4);
 	m_doc->set_addrmap(0, &apple2gs_state::a2gs_es5503_map);
 	m_doc->irq_func().set(FUNC(apple2gs_state::doc_irq_w));
 	m_doc->adc_func().set(FUNC(apple2gs_state::doc_adc_read));
-	// IIgs Tech Node #19 says even channels are right, odd are left, and 80s/90s stereo cards followed that.
-	m_doc->add_route(0, "rspeaker", 1.0);
-	m_doc->add_route(1, "lspeaker", 1.0);
+	m_doc->add_route(0, "ensoniq", 1.0, 0);
+	m_doc->add_route(1, "ensoniq", 1.0, 1);
+	m_doc->add_route(2, "ensoniq", 1.0, 2);
+	m_doc->add_route(3, "ensoniq", 1.0, 3);
 
 	/* RAM */
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);
@@ -3931,8 +3987,8 @@ ROM_START(apple2gs)
 	ROM_REGION(0x1000, "adbmicro", 0)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
+	ROM_REGION(0x4000,"gfx1",0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	// 341-0728 is the MASK rom version while 341-0737 is the EPROM version - SAME data.
@@ -3946,8 +4002,8 @@ ROM_START(apple2gsr3p)
 	ROM_REGION(0x1000, "adbmicro", 0)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
+	ROM_REGION(0x4000,"gfx1",0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("341-0728", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0728: IIgs ROM03 prototype FC-FD - 28 pin MASK rom */
@@ -3958,8 +4014,8 @@ ROM_START(apple2gsr1)
 	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
+	ROM_REGION(0x4000,"gfx1",0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("342-0077-b", 0x20000, 0x20000, CRC(42f124b0) SHA1(e4fc7560b69d062cb2da5b1ffbe11cd1ca03cc37)) /* 342-0077-B: IIgs ROM01 */
@@ -3969,8 +4025,8 @@ ROM_START(apple2gsr0)
 	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
+	ROM_REGION(0x4000,"gfx1",0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("342-0077-a", 0x20000, 0x20000, CRC(dfbdd97b) SHA1(ff0c245dd0732ec4413a934fd80efc2defd8a8e3) ) /* 342-0077-A: IIgs ROM00 */
@@ -3980,8 +4036,8 @@ ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
 	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
+	ROM_REGION(0x4000,"gfx1",0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD( "rombf.bin",    0x020000, 0x020000, CRC(ab04fedf) SHA1(977589a17553956d583a21020080a39dd396df5c) )
@@ -3991,8 +4047,8 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
+	ROM_REGION(0x4000,"gfx1",0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD( "apple iigs alpha rom 2.0 19860310.bin", 0x020000, 0x020000, CRC(a47d275f) SHA1(c5836adcfc8be69c7351b84afa94c814e8d92b81) )
@@ -4003,8 +4059,8 @@ ROM_START(apple2gsmt)
 	ROM_REGION(0x1000, "adbmicro", 0)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
-	ROM_REGION(0x1000, "gfx1", 0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
+	ROM_REGION(0x4000, "gfx1", 0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000, "maincpu", 0)
 	// The Mark Twain ROM is 512K, with address bit 16 inverted (same as ROM 3).

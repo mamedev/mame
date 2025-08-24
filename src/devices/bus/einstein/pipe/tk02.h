@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_EINSTEIN_TK02_H
-#define MAME_BUS_EINSTEIN_TK02_H
+#ifndef MAME_BUS_EINSTEIN_PIPE_TK02_H
+#define MAME_BUS_EINSTEIN_PIPE_TK02_H
 
 #pragma once
 
@@ -59,4 +59,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TK02_80COL, tk02_device)
 
-#endif // MAME_BUS_EINSTEIN_TK02_H
+#endif // MAME_BUS_EINSTEIN_PIPE_TK02_H

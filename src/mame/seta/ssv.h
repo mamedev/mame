@@ -75,6 +75,7 @@ protected:
 	uint16_t mainram_r(offs_t offset);
 	void mainram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t srmp4_input_r();
+	uint16_t srmp7_input_r();
 	uint16_t srmp7_irqv_r();
 	void srmp7_sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t latch32_r(offs_t offset);
@@ -161,10 +162,8 @@ public:
 	void twineag2(machine_config &config);
 
 private:
-	uint16_t dsp_dr_r();
-	void dsp_dr_w(uint16_t data);
-	uint16_t dsp_r(offs_t offset);
-	void dsp_w(offs_t offset, uint16_t data);
+	uint8_t dsp_r(offs_t offset);
+	void dsp_w(offs_t offset, uint8_t data);
 	uint16_t drifto94_unknown_r();
 
 	void drifto94_map(address_map &map) ATTR_COLD;

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_COLECO_HAND_H
-#define MAME_BUS_COLECO_HAND_H
+#ifndef MAME_BUS_COLECO_CONTROLLER_HAND_H
+#define MAME_BUS_COLECO_CONTROLLER_HAND_H
 
 #pragma once
 
@@ -50,5 +50,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(COLECO_HAND_CONTROLLER, coleco_hand_controller_device)
 
-
-#endif // MAME_BUS_COLECO_HAND_H
+#endif // MAME_BUS_COLECO_CONTROLLER_HAND_H

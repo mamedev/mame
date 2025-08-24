@@ -38,6 +38,7 @@ protected:
 
 	virtual bool is_contended(offs_t offset) override;
 	virtual bool is_vram_write(offs_t offset) override;
+	virtual u8 *snow_pattern1_base(u8 i_reg) override;
 
 	template <u8 Bank>
 	void spectrum_128_ram_w(offs_t offset, u8 data);
@@ -60,7 +61,7 @@ private:
 #define X1_128_AMSTRAD  35'469'000       // Main clock (Amstrad 128K model, +2A?)
 #define X1_128_SINCLAIR 35.469_MHz_XTAL  // Main clock (Sinclair 128K model)
 
-/* 128K machines take an extra 4 cycles per scan line - add this to retrace */
+// 128K machines take an extra 4 cycles per scan line - add this to retrace
 #define SPEC128_UNSEEN_LINES    15
 #define SPEC128_RETRACE_CYCLES  52
 #define SPEC128_CYCLES_PER_LINE 228

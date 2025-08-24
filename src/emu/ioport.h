@@ -46,12 +46,13 @@ constexpr ioport_value IP_ACTIVE_LOW = 0xffffffff;
 constexpr int MAX_PLAYERS = 10;
 
 // unicode constants
+constexpr char32_t UCHAR_INVALID = 0xffff;
 constexpr char32_t UCHAR_PRIVATE = 0x100000;
 constexpr char32_t UCHAR_SHIFT_1 = UCHAR_PRIVATE + 0;
 constexpr char32_t UCHAR_SHIFT_2 = UCHAR_PRIVATE + 1;
 constexpr char32_t UCHAR_SHIFT_BEGIN = UCHAR_SHIFT_1;
 constexpr char32_t UCHAR_SHIFT_END = UCHAR_SHIFT_2;
-constexpr char32_t UCHAR_MAMEKEY_BEGIN = UCHAR_PRIVATE + 2;
+constexpr char32_t UCHAR_MAMEKEY_BEGIN = UCHAR_SHIFT_END + 1;
 
 
 // crosshair types
@@ -111,8 +112,8 @@ enum
 	INPUT_STRING_Coin_B,
 //  INPUT_STRING_20C_1C,    //  0.050000
 //  INPUT_STRING_15C_1C,    //  0.066667
-//  INPUT_STRING_10C_1C,    //  0.100000
-#define __input_string_coinage_start INPUT_STRING_9C_1C
+#define __input_string_coinage_start INPUT_STRING_10C_1C
+	INPUT_STRING_10C_1C,    //  0.100000
 	INPUT_STRING_9C_1C,     //  0.111111
 	INPUT_STRING_8C_1C,     //  0.125000
 	INPUT_STRING_7C_1C,     //  0.142857
@@ -129,13 +130,13 @@ enum
 	INPUT_STRING_3C_1C,     //  0.333333
 	INPUT_STRING_8C_3C,     //  0.375000
 //  INPUT_STRING_10C_4C,    //  0.400000
+	INPUT_STRING_5C_2C,     //  0.400000
 //  INPUT_STRING_7C_3C,     //  0.428571
 //  INPUT_STRING_9C_4C,     //  0.444444
 //  INPUT_STRING_10C_5C,    //  0.500000
 //  INPUT_STRING_8C_4C,     //  0.500000
 //  INPUT_STRING_6C_3C,     //  0.500000
 	INPUT_STRING_4C_2C,     //  0.500000
-	INPUT_STRING_5C_2C,     //  0.500000
 	INPUT_STRING_2C_1C,     //  0.500000
 //  INPUT_STRING_9C_5C,     //  0.555556
 //  INPUT_STRING_7C_4C,     //  0.571429
@@ -212,20 +213,20 @@ enum
 	INPUT_STRING_1C_7C,     //  7.000000
 	INPUT_STRING_1C_8C,     //  8.000000
 	INPUT_STRING_1C_9C,     //  9.000000
-#define __input_string_coinage_end INPUT_STRING_1C_9C
-//  INPUT_STRING_1C_10C,    //  10.000000
+	INPUT_STRING_1C_10C,    //  10.000000
 //  INPUT_STRING_1C_11C,    //  11.000000
 //  INPUT_STRING_1C_12C,    //  12.000000
 //  INPUT_STRING_1C_13C,    //  13.000000
 //  INPUT_STRING_1C_14C,    //  14.000000
 //  INPUT_STRING_1C_15C,    //  15.000000
-//  INPUT_STRING_1C_20C,    //  20.000000
-//  INPUT_STRING_1C_25C,    //  25.000000
+	INPUT_STRING_1C_20C,    //  20.000000
+	INPUT_STRING_1C_25C,    //  25.000000
 //  INPUT_STRING_1C_30C,    //  30.000000
 //  INPUT_STRING_1C_40C,    //  40.000000
-//  INPUT_STRING_1C_50C,    //  50.000000
+	INPUT_STRING_1C_50C,    //  50.000000
 //  INPUT_STRING_1C_99C,    //  99.000000
-//  INPUT_STRING_1C_100C,   //  100.000000
+	INPUT_STRING_1C_100C,   //  100.000000
+#define __input_string_coinage_end INPUT_STRING_1C_100C
 //  INPUT_STRING_1C_120C,   //  120.000000
 //  INPUT_STRING_1C_125C,   //  125.000000
 //  INPUT_STRING_1C_150C,   //  150.000000
@@ -473,7 +474,7 @@ public:
 	bool none() const { return (m_condition == ALWAYS); }
 
 	// configuration
-	void reset() { set(ALWAYS, nullptr, 0, 0); }
+	void reset() { set(ALWAYS, "", 0, 0); }
 	void set(condition_t condition, const char *tag, ioport_value mask, ioport_value value)
 	{
 		m_condition = condition;
@@ -488,7 +489,7 @@ public:
 private:
 	// internal state
 	condition_t     m_condition;    // condition to use
-	const char *    m_tag;          // tag of port whose condition is to be tested
+	const char *    m_tag;          // tag of port whose condition is to be tested (must never be nullptr)
 	ioport_port *   m_port;         // reference to the port to be tested
 	ioport_value    m_mask;         // mask to apply to the port
 	ioport_value    m_value;        // value to compare against
@@ -1091,6 +1092,7 @@ private:
 	ioport_port *       m_curport;
 	ioport_field *      m_curfield;
 	ioport_setting *    m_cursetting;
+	int                 m_curshift;
 };
 
 
@@ -1453,12 +1455,6 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 
 #define PORT_SERVICE_NO_TOGGLE(_mask, _default) \
 	PORT_BIT( _mask, _mask & _default, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode ))
-
-#define PORT_VBLANK(_screen) \
-	PORT_READ_LINE_DEVICE_MEMBER(_screen, FUNC(screen_device::vblank))
-
-#define PORT_HBLANK(_screen) \
-	PORT_READ_LINE_DEVICE_MEMBER(_screen, FUNC(screen_device::hblank))
 
 //**************************************************************************
 //  INLINE FUNCTIONS

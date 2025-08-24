@@ -332,4 +332,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1984, emu2, 0, 0, emu2, emu2, emu2_state, empty_init, "E-mu Systems", "Emulator II", MACHINE_IS_SKELETON)
+SYST(1984, emu2, 0, 0, emu2, emu2, emu2_state, empty_init, "E-mu Systems", "Emulator II", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

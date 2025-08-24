@@ -130,12 +130,12 @@ ROM_END
 
 void bbc_tube_6502_device::device_add_mconfig(machine_config &config)
 {
-	M65SC02(config, m_maincpu, 12_MHz_XTAL / 4); // G65SC02
+	G65SC02(config, m_maincpu, 12_MHz_XTAL / 4); // G65SC02
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_6502_device::tube_6502_mem);
 
 	TUBE(config, m_ula);
-	m_ula->pnmi_handler().set_inputline(m_maincpu, M65C02_NMI_LINE);
-	m_ula->pirq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
+	m_ula->pnmi_handler().set_inputline(m_maincpu, G65SC02_NMI_LINE);
+	m_ula->pirq_handler().set_inputline(m_maincpu, G65SC02_IRQ_LINE);
 	m_ula->prst_handler().set(FUNC(bbc_tube_6502_device::prst_w));
 
 	RAM(config, m_ram).set_default_size("64K").set_default_value(0);
@@ -155,7 +155,7 @@ void bbc_tube_6502e_device::device_add_mconfig(machine_config &config)
 {
 	bbc_tube_6502_device::device_add_mconfig(config);
 
-	M65SC02(config.replace(), m_maincpu, 12_MHz_XTAL / 4); // G65SC02
+	G65SC02(config.replace(), m_maincpu, 12_MHz_XTAL / 4); // G65SC02
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_6502e_device::tube_6502e_mem);
 
 	m_ram->set_default_size("256K").set_default_value(0);
@@ -165,7 +165,7 @@ void bbc_tube_65c102_device::device_add_mconfig(machine_config &config)
 {
 	bbc_tube_6502_device::device_add_mconfig(config);
 
-	R65C02(config.replace(), m_maincpu, 16_MHz_XTAL / 4); // R65C102
+	R65C102(config.replace(), m_maincpu, 16_MHz_XTAL); // R65C102
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_65c102_device::tube_6502_mem);
 }
 

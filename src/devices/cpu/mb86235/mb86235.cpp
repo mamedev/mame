@@ -1,22 +1,15 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, ElSemi, Ville Linde
+// copyright-holders:Angelo Salese, ElSemi, Ville Linde, Matthew Daniels
 /********************************************************************************
  *
  * MB86235 "TGPx4" (c) Fujitsu
  *
- * Written by Angelo Salese & ElSemi
- *
  * TODO:
  * - rewrite ALU integer/floating point functions, use templates etc;
- * - move post-opcodes outside of the execute_op() function, like increment_prp()
- *    (needed if opcode uses fifo in/out);
  * - rewrite fifo hookups, remove them from the actual opcodes.
- * - use a phase system for the execution, like do_alu() being separated
- *    from control();
  * - illegal delay slots unsupported, and no idea about what is supposed to happen;
- * - externalize PDR / DDR (error LED flags on Model 2);
- * - instruction cycles;
- * - pipeline (four instruction executed per cycle!)
+ * - externalize PDR (error LED flags on Model 2);
+ * - perform external memory access if AALU-A is 0x400 or higher
  *
  ********************************************************************************/
 
@@ -78,7 +71,9 @@ void mb86235_device::execute_run()
 		else
 			handle_single_step_execution();
 
-		execute_op(opcode >> 32, opcode & 0xffffffff);
+		m_core->cur_fifo_state.has_stalled = false;
+
+		execute_op(opcode);
 
 		m_core->icount--;
 	}
@@ -264,8 +259,7 @@ mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, d
 	, m_dataa_config("data_a", ENDIANNESS_LITTLE, 32, 24, -2, address_map_constructor(FUNC(mb86235_device::internal_abus), this))
 	, m_datab_config("data_b", ENDIANNESS_LITTLE, 32, 10, -2, address_map_constructor(FUNC(mb86235_device::internal_bbus), this))
 	, m_fifoin(*this, finder_base::DUMMY_TAG)
-	, m_fifoout0(*this, finder_base::DUMMY_TAG)
-	, m_fifoout1(*this, finder_base::DUMMY_TAG)
+	, m_fifoout(*this, finder_base::DUMMY_TAG)
 	, m_cache(CACHE_SIZE + sizeof(mb86235_internal_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)

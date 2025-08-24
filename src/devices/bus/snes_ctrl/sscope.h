@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_SNES_CTRL_SUPERSCOPE_H
-#define MAME_BUS_SNES_CTRL_SUPERSCOPE_H
+#ifndef MAME_BUS_SNES_CTRL_SSCOPE_H
+#define MAME_BUS_SNES_CTRL_SSCOPE_H
 
 #pragma once
 
@@ -55,4 +55,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SNES_SUPERSCOPE, snes_sscope_device)
 
-#endif // MAME_BUS_SNES_CTRL_SUPERSCOPE_H
+#endif // MAME_BUS_SNES_CTRL_SSCOPE_H

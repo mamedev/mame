@@ -533,4 +533,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY  FULLNAME              FLAGS
 GAME( 1992, speedbsk, 0,      speedbsk, speedbsk, speedbsk_state, empty_init, ROT0,     "Sega",  "Speed Basketball",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1993, boatrace, 0,      speedbsk, speedbsk, speedbsk_state, empty_init, ROT0,     "Sega",  "Exciting Boat Race", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1993, boatrace, 0,      speedbsk, speedbsk, speedbsk_state, empty_init, ROT0,     "Sega",  "Exciting Boat Race", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

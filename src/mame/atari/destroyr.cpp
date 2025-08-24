@@ -290,8 +290,8 @@ void destroyr_state::main_map(address_map &map)
 	map(0x1000, 0x1007).mirror(0xff0).w("outlatch", FUNC(f9334_device::write_d0));
 	map(0x1008, 0x1008).mirror(0xff7).w(FUNC(destroyr_state::misc_w));
 	map(0x2000, 0x2000).mirror(0xfff).portr("IN2");
-	map(0x3000, 0x30ff).mirror(0xf00).writeonly().share("alpha_nuram");
-	map(0x4000, 0x401f).mirror(0xfe0).writeonly().share("major_obj_ram");
+	map(0x3000, 0x30ff).mirror(0xf00).nopr().writeonly().share("alpha_nuram");
+	map(0x4000, 0x401f).mirror(0xfe0).nopr().writeonly().share("major_obj_ram");
 	map(0x5000, 0x5000).mirror(0xff8).w(FUNC(destroyr_state::cursor_load_w));
 	map(0x5001, 0x5001).mirror(0xff8).w(FUNC(destroyr_state::interrupt_ack_w));
 	map(0x5002, 0x5007).mirror(0xff8).writeonly().share("minor_obj_ram");
@@ -322,7 +322,7 @@ static INPUT_PORTS_START( destroyr )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:4,3")

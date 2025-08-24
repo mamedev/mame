@@ -100,5 +100,5 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 2004,  photopsxsp,  0,          photoplaysx, photoplaysx, photoplaysx_state, empty_init, ROT0, "Funworld", "Photo Play Spirit Xtreme (Spanish)",         MACHINE_IS_SKELETON )
-GAME( 2004?, photopsxusp, photopsxsp, photoplaysx, photoplaysx, photoplaysx_state, empty_init, ROT0, "Funworld", "Photo Play Spirit Xtreme (update, Spanish)", MACHINE_IS_SKELETON )
+GAME( 2004,  photopsxsp,  0,          photoplaysx, photoplaysx, photoplaysx_state, empty_init, ROT0, "Funworld", "Photo Play Spirit Xtreme (Spanish)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004?, photopsxusp, photopsxsp, photoplaysx, photoplaysx, photoplaysx_state, empty_init, ROT0, "Funworld", "Photo Play Spirit Xtreme (update, Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

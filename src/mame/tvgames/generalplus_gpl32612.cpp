@@ -184,8 +184,7 @@ void generalplus_gpl32612_game_state::gpl32612(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(generalplus_gpl32612_game_state::screen_update_gpl32612));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void generalplus_zippity_game_state::machine_start()
@@ -224,8 +223,7 @@ void generalplus_zippity_game_state::zippity(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(generalplus_zippity_game_state::screen_update_gpl32612));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_zippity_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -294,6 +292,82 @@ ROM_START( pocketmr )
 	ROM_LOAD( "tc58nvg0s3hta00_withspare.u6", 0x0000, 0x8800000, CRC(ec839dde) SHA1(18b77c7e1cf3c66787ccfde9f450671e3d1b0e36) )
 ROM_END
 
+ROM_START( dmnslayg )
+	ROM_REGION(  0x8800000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg0s3hta00_with_spare.u3", 0x0000, 0x8800000, CRC(a9402fdb) SHA1(0809a8da176f65efc2926131ba0259278d3c644d) )
+ROM_END
+
+ROM_START( anpanm19 )
+	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25l1280.u3", 0x0000, 0x1000000, CRC(7932fb3e) SHA1(a381eeba5357fe71e4d6081b9b91b57e5705f7f1) )
+ROM_END
+
+ROM_START( smatomo )
+	ROM_REGION(  0x400000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx25l3206e.ic3", 0x0000, 0x400000, CRC(fb4d1684) SHA1(98cecd7ead52118028cb3a1de71cb3528cd81be5) )
+ROM_END
+
+ROM_START( tamameet )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q64.u3", 0x0000, 0x800000, CRC(f15507f8) SHA1(356cb1bd68169eb747898325eacfd7590dbe9f9c) )
+ROM_END
+
+ROM_START( chiikpc )
+	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25l12833f.u6", 0x0000, 0x1000000, CRC(bde74209) SHA1(8a91554ae653f4ed54fd354049c32b545e4d359d) )
+ROM_END
+
+ROM_START( saikyopc )
+	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25l12833f.u6", 0x0000, 0x1000000, CRC(5b870182) SHA1(909d2834875484f8369cfbce2c51fa27c0a3d973) )
+ROM_END
+
+ROM_START( tmydistb )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l64.u5", 0x0000, 0x800000, CRC(01e5a892) SHA1(b9164173e707eb69cd7d50ce69f3368de7e7390f) )
+ROM_END
+
+ROM_START( intrtvg )
+	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
+
+	DISK_REGION( "sdcard" ) // 4GB SD Card
+	DISK_IMAGE( "interactivetv", 0, SHA1(7061e28c4560b763bda1157036b79c726387e430) )
+ROM_END
+
+ROM_START( ardancem )
+	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(ba2cdacd) SHA1(d47829ee5310140665146262a44e0ba91942f25c) )
+
+	DISK_REGION( "sdcard" ) // 16GB SD Card
+	DISK_IMAGE( "ardancemat", 0, SHA1(df8cb065f5ce0ca863b205549ecc4c27647f9954) )
+ROM_END
+
+
+ROM_START( pdcm2 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x84000000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "k9gag08u0m.u3", 0x0000, 0x84000000, CRC(88d9c107) SHA1(0b70962ecddf3a8a748b7af5e81cffb365f704e2) )
+ROM_END
+
+ROM_START( arcadege )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x8400000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg0s3eta00.u3", 0x0000, 0x8400000, CRC(9b4db25e) SHA1(7e3d7e15f2592efd98027440c3761179c95e4417) )
+ROM_END
+
+ROM_START( airobo )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
+
+	ROM_REGION( 0x22000000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg2s0hta00.bin", 0x0000, 0x22000000, CRC(6cfa4600) SHA1(152c04532ae2587dea590d169e87534924f5ea89) )
+ROM_END
+
 
 void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
@@ -344,11 +418,11 @@ void generalplus_gpl32612_game_state::nand_init880()
 
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
-CONS( 200?, jak_swbstrik,    0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Star Wars Blaster Strike", MACHINE_IS_SKELETON )
-CONS( 200?, jak_tmnthp,      0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Teenage Mutant Ninja Turtles Hero Portal", MACHINE_IS_SKELETON )
-CONS( 200?, jak_ddhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DreamWorks Dragons Hero Portal", MACHINE_IS_SKELETON )
-CONS( 200?, jak_prhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Power Rangers Super Megaforce Hero Portal", MACHINE_IS_SKELETON ) // from a PAL unit (probably not region specific)
-CONS( 200?, jak_dchp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DC Super Heroes The Watchtower Hero Portal", MACHINE_IS_SKELETON )
+CONS( 200?, jak_swbstrik,    0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Star Wars Blaster Strike", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, jak_tmnthp,      0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Teenage Mutant Ninja Turtles Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, jak_ddhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DreamWorks Dragons Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, jak_prhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Power Rangers Super Megaforce Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a PAL unit (probably not region specific)
+CONS( 200?, jak_dchp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DC Super Heroes The Watchtower Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Might not belong here, SoC is marked GPL32300A instead, but is still ARM based, and has GPNAND strings
 CONS( 201?, zippity,         0,       0,      zippity, gpl32612, generalplus_zippity_game_state, empty_init,  "LeapFrog",         "Zippity (US)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
@@ -362,3 +436,57 @@ CONS( 201?, kidizmb,         0,        0,      gpl32612, gpl32612, generalplus_g
 
 CONS( 2019, pocketmp,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters PC",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters Rotom Tablet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPL32610 - 「それいけ！アンパンマン」スポーツ育脳マット
+CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "JoyPalette",        "Anpanman: Sports Ikunou Mat (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
+CONS( 201?, smatomo,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Smatomo (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// very generic packaging, boots from SPI, has game data on SD card (mostly NES games)
+CONS( 202?, intrtvg,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "Interactive Game Console (Model B608, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// also very generic packaging, similar SD card content to above, including NES games, but with some extra music/videos for the dance part
+CONS( 202?, ardancem,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Dance Mat (Model DM02, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now
+// ROM has 'GPNandTag2' header rather than the usual
+// 鬼滅の刃 全集中パッド（グリーン)
+CONS( 2021, dmnslayg,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Bandai",        "Demon Slayer: Kimetsu no Yaiba Zenshuuchuu Pad (green ver.) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+/* PCB is marked as M2-SPG48-GPG35-V30 2009-08-11
+
+SoC appears to be
+CONNY CNT61623P-003A-QL172
+MD481P
+0917
+
+(could be a rebranded GPL32 series, ROM has GPNand header)
+
+there is also a
+GPY0201A
+
+*/
+
+CONS( 2009, pdcm2,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VideoJet / Conny",        "PDC M2",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses a GPL32600A-003A-QL141
+CONS( 200?, arcadege,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Millennium 2000 GmbH",        "Millennium Arcade Genius SE",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses a GP326813
+// 学習おうえんAI★ミラクルロボ
+CONS( 2020, airobo,             0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840,  "Benesse Corporation",        "Gakushuu Ouen AI Miracle Robo",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPE13101A
+// たまごっち みーつ  (there appear to be many units in this series, ROM data could differ, this was from a light blue 'hearts and rainbows' themed unit with no subtitles)
+CONS( 2018, tamameet,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tamagotchi Meets (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses a glob CPU
+// ちいかわラーニングパソコン
+CONS( 2021, chiikpc,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Chiikawa Learning PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses a glob CPU
+// 学びの最強王になれ! 最強王図鑑パソコン
+CONS( 2020, saikyopc,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Manabi no Sai-Kyo-Oh ni Nare! Sai-Kyo-Oh Zukan PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// ディズニー&ディズニー／ピクサーキャラクターズ できた!がいっぱい ドリームトイパッド
+CONS( 2020, tmydistb,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Tomy",          "Disney & Disney/Pixar Characters Dekita! ga Ippai Dream Toy Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

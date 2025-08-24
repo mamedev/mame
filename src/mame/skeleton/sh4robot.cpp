@@ -50,7 +50,7 @@ private:
 	void io_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
 
-	required_device<sh4_device> m_maincpu;
+	required_device<sh7750_device> m_maincpu;
 };
 
 
@@ -60,7 +60,6 @@ void sh4robot_state::mem_map(address_map &map)
 	map(0x00000000, 0x00000fff).rom();
 	map(0x08000000, 0x08ffffff).ram(); // SDRAM 1
 	map(0x0c000000, 0x0cffffff).ram(); // SDRAM 2
-	map(0xa0000000, 0xa0000fff).rom().region("maincpu", 0);
 }
 
 void sh4robot_state::io_map(address_map &map)
@@ -74,7 +73,7 @@ INPUT_PORTS_END
 void sh4robot_state::sh4robot(machine_config &config)
 {
 	/* basic machine hardware */
-	SH4LE(config, m_maincpu, 200000000); // SH7750
+	SH7750(config, m_maincpu, 200000000);
 	m_maincpu->set_md(0, 1);
 	m_maincpu->set_md(1, 0);
 	m_maincpu->set_md(2, 1);
@@ -108,4 +107,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME  FLAGS
-COMP( 20??, sh4robot, 0,      0,      sh4robot, sh4robot, sh4robot_state, empty_init, "<unknown>", "Robot",  MACHINE_IS_SKELETON_MECHANICAL )
+COMP( 20??, sh4robot, 0,      0,      sh4robot, sh4robot, sh4robot_state, empty_init, "<unknown>", "Robot",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

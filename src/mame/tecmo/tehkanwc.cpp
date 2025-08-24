@@ -429,8 +429,8 @@ void tehkanwc_state::shared_mem(address_map &map)
 	map(0xc800, 0xcfff).ram().share("shareram");
 	map(0xd000, 0xd3ff).ram().w(FUNC(tehkanwc_state::videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(tehkanwc_state::colorram_w)).share("colorram");
-	map(0xd800, 0xddff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xde00, 0xdfff).nopw(); // unused part of the palette RAM, I think? Gridiron writes here
+	map(0xd800, 0xddff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xde00, 0xdfff).ram().share("palette2"); // unused part of the palette RAM, I think? Gridiron writes here
 	map(0xe000, 0xe7ff).ram().w(FUNC(tehkanwc_state::videoram2_w)).share("videoram2");
 	map(0xe800, 0xebff).ram().share("spriteram");
 	map(0xec00, 0xec01).w(FUNC(tehkanwc_state::scroll_x_w));
@@ -801,29 +801,26 @@ GFXDECODE_END
 void tehkanwc_state::tehkanwc(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 18432000/4);     /* 18.432000 / 4 */
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::main_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 18432000/4);
+	Z80(config, m_subcpu, 18.432_MHz_XTAL / 4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::sub_mem);
 	m_subcpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 18432000/4);
+	Z80(config, m_audiocpu, 18.432_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::sound_mem);
 	m_audiocpu->set_addrmap(AS_IO, &tehkanwc_state::sound_port);
 	m_audiocpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	config.set_maximum_quantum(attotime::from_hz(600));  /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
+	config.set_maximum_quantum(attotime::from_hz(600)); // 10 CPU slices per frame - seems enough to keep the CPUs in sync
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240); // verified from unofficial schematics
 	screen.set_screen_update(FUNC(tehkanwc_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -836,12 +833,12 @@ void tehkanwc_state::tehkanwc(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	ym2149_device &ay1(YM2149(config, "ay1", 18432000/12));
+	ym2149_device &ay1(YM2149(config, "ay1", 18.432_MHz_XTAL / 12));
 	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
 	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ym2149_device &ay2(YM2149(config, "ay2", 18432000/12));
+	ym2149_device &ay2(YM2149(config, "ay2", 18.432_MHz_XTAL / 12));
 	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
 	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -855,12 +852,12 @@ void tehkanwc_state::tehkanwc(machine_config &config)
 void tehkanwc_state::tehkanwcb(machine_config &config)
 {
 	tehkanwc(config);
-	ay8910_device &ay1(AY8910(config.replace(), "ay1", 18432000/12));
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", 18.432_MHz_XTAL / 12));
 	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
 	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ay8910_device &ay2(AY8910(config.replace(), "ay2", 18432000/12));
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", 18.432_MHz_XTAL / 12));
 	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
 	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);

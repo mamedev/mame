@@ -61,9 +61,7 @@ uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)
 	if(id != 2)
 	{
 		data = nscsi_full_device::scsi_get_data(id, pos);
-	}
-	else
-	{
+	} else {
 		int clba = lba + pos / bytes_per_sector;
 		if(clba != cur_lba) {
 			cur_lba = clba;
@@ -120,9 +118,7 @@ void nscsi_harddisk_device::scsi_command()
 		if(image->read(lba, block)) {
 			scsi_data_in(2, blocks*bytes_per_sector);
 			scsi_status_complete(SS_GOOD);
-		}
-		else
-		{
+		} else {
 			scsi_status_complete(SS_CHECK_CONDITION);
 			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
 		}
@@ -136,8 +132,13 @@ void nscsi_harddisk_device::scsi_command()
 
 		LOG("command WRITE start=%08x blocks=%04x\n", lba, blocks);
 
-		scsi_data_out(2, blocks*bytes_per_sector);
-		scsi_status_complete(SS_GOOD);
+		if(image->write(lba, block)) {
+			scsi_data_out(2, blocks*bytes_per_sector);
+			scsi_status_complete(SS_GOOD);
+		} else {
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+		}
 		break;
 
 	case SC_INQUIRY: {
@@ -245,7 +246,7 @@ void nscsi_harddisk_device::scsi_command()
 			case 0x01: // read-write error recovery page
 				scsi_cmdbuf[pos++] = 0x01; // !PS, page id
 				scsi_cmdbuf[pos++] = 0x0a; // page length
-				scsi_cmdbuf[pos++] = 0; // various bits
+				scsi_cmdbuf[pos++] = 0x26; // various bits
 				scsi_cmdbuf[pos++] = 0; // read retry count
 				scsi_cmdbuf[pos++] = 0; // correction span
 				scsi_cmdbuf[pos++] = 0; // head offset count
@@ -384,7 +385,7 @@ void nscsi_harddisk_device::scsi_command()
 		}
 
 		if (!fail) {
-			scsi_cmdbuf[0] = pos;
+			scsi_cmdbuf[0] = pos - 1;
 			if (pos > size)
 				pos = size;
 
@@ -444,6 +445,11 @@ void nscsi_harddisk_device::scsi_command()
 		break;
 	}
 
+	case SC_SYNCHRONIZE_CACHE:
+		LOG("command SYNCHRONIZE CACHE (10)\n");
+		scsi_status_complete(SS_GOOD);
+		break;
+
 	case SC_READ_CAPACITY: {
 		LOG("command READ CAPACITY\n");
 
@@ -481,8 +487,15 @@ void nscsi_harddisk_device::scsi_command()
 
 		LOG("command WRITE EXTENDED start=%08x blocks=%04x\n", lba, blocks);
 
-		scsi_data_out(2, blocks*bytes_per_sector);
-		scsi_status_complete(SS_GOOD);
+		if(image->write(lba, block)) {
+			scsi_data_out(2, blocks*bytes_per_sector);
+			scsi_status_complete(SS_GOOD);
+		}
+		else
+		{
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+		}
 		break;
 
 	case SC_FORMAT_UNIT:

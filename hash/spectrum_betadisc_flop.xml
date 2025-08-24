@@ -146,6 +146,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="batty" supported="no">
+		<description>Batty</description>
+		<year>1998</year>
+		<publisher>Nova</publisher>
+		<notes>Freeze after the title screen (kempston mouse needed?)</notes>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="Batty(GS-KM).trd" size="655360" crc="2afea257" sha1="7f7f737294c2419c77cba33c93754ad4332064c4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bobcarot">
 		<description>Bobby Carrot</description>
 		<year>2018</year>
@@ -168,6 +180,230 @@ license:CC0-1.0
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="Carlos Michelis - Demo.trd" size="655360" crc="5295622a" sha1="6be8fb78a6d81a4e8a435ab2fabea760447e812a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas">
+		<description>Delta's Shadow (demo v1.6, English, AY chip sound)</description>
+		<year>2021</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="English" />
+		<info name="version" value="1.6" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 05.02.21 AY eng demo.trd" size="655360" crc="dd39f273" sha1="2334664641605a653e096b72b170ddf8abce9769"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm10_enay" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.0, English, AY chip sound)</description>
+		<year>2020</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="English" />
+		<info name="version" value="1.0" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 25.12.20 AY eng demo.trd" size="655360" crc="4f494100" sha1="ae1be5d9a3a7238d1a4016643fe410b9aaaa43d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm10_ents" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.0, English, Turbo Sound)</description>
+		<year>2020</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="English" />
+		<info name="version" value="1.0" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 25.12.20 TS eng demo.trd" size="655360" crc="a2e4565d" sha1="2c5e076acd181ceef432fdfeda417e30aa425f6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm16_ents" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.6, English, Turbo Sound)</description>
+		<year>2021</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="English" />
+		<info name="version" value="1.6" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 05.02.21 TS eng demo.trd" size="655360" crc="996800de" sha1="c317e9bdde52f988cc69d2c5952e4c184d68f546"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm10_play" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.0, Polish, AY chip sound)</description>
+		<year>2020</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="Polish" />
+		<info name="version" value="1.0" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 25.12.20 AY pol demo.trd" size="655360" crc="544a9a95" sha1="4632e600524d06c7175720497207d95896f25e05"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm10_plts" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.0, Polish, Turbo Sound)</description>
+		<year>2020</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="Polish" />
+		<info name="version" value="1.0" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 25.12.20 TS pol demo.trd" size="655360" crc="9c53597a" sha1="cc4721632ac10112d96e58dde955550478b798d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm16_play" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.6, Polish, AY chip sound)</description>
+		<year>2021</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="Polish" />
+		<info name="version" value="1.6" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 05.02.21 AY pol demo.trd" size="655360" crc="97daf0b1" sha1="10203cca12bf138dcc60015720dc80c90c1c4afc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm16_plts" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.6, Polish, Turbo Sound)</description>
+		<year>2021</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="Polish" />
+		<info name="version" value="1.6" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 05.02.21 TS pol demo.trd" size="655360" crc="126bc17e" sha1="8a14b77dc57fe1a3ffd0154a56c88a5aa9aa8e5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm10_ruay" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.0, Russian, AY chip sound)</description>
+		<year>2021</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="Russian" />
+		<info name="version" value="1.0" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 25.12.20 AY rus demo.trd" size="655360" crc="e6000bbb" sha1="b0787ac84a319328ed80c6baa0c61c0014bbc18e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm10_ruts" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.0, Russian, Turbo Sound)</description>
+		<year>2021</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="Russian" />
+		<info name="version" value="1.0" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 25.12.20 TS rus demo.trd" size="655360" crc="6ff7fb8f" sha1="6984a5d2e9af7836a35a197b663e574ac9476d10"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm16_ruay" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.6, Russian, AY chip sound)</description>
+		<year>2021</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="Russian" />
+		<info name="version" value="1.6" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 05.02.21 AY rus demo.trd" size="655360" crc="bf633494" sha1="521133f5eb3c7645404a4f05502f9cf3bae03432"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm16_ruts" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.6, Russian, Turbo Sound)</description>
+		<year>2021</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="Russian" />
+		<info name="version" value="1.6" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 05.02.21 TS rus demo.trd" size="655360" crc="662e2010" sha1="f1d2f80f2bdd010d062dda82fb05c91e3850abf5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm10_esay" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.0, Spanish, AY chip sound)</description>
+		<year>2021</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="Spanish" />
+		<info name="version" value="1.0" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 25.12.20 AY esp demo.trd" size="655360" crc="13fe73e4" sha1="b63f415c1c3d320780defc52219ac9173ee794f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm10_ests" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.0, Spanish, Turbo Sound)</description>
+		<year>2021</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="Spanish" />
+		<info name="version" value="1.0" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 25.12.20 TS esp demo.trd" size="655360" crc="76b84d98" sha1="54762f512b3409f6eef926e5a062531a1ec41ef0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm16_esay" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.6, Spanish, AY chip sound)</description>
+		<year>2021</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="Spanish" />
+		<info name="version" value="1.6" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 05.02.21 AY esp demo.trd" size="655360" crc="6e5d2f96" sha1="0d5d44875e5ce95d25e24fae09c7ba95a24e8015"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deltas_dm16_ests" cloneof="deltas">
+		<description>Delta's Shadow (demo v1.6, Spanish, Turbo Sound)</description>
+		<year>2021</year>
+		<publisher>ZX Online</publisher>
+		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="language" value="Spanish" />
+		<info name="version" value="1.6" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DS 05.02.21 TS esp demo.trd" size="655360" crc="34cdf67f" sha1="76b55adeab9706383dbd2c90a07742ace5625fb6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -491,6 +727,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mystdime">
+		<description>Mysterious Dimensions</description>
+		<year>2016</year>
+		<publisher>Hooy-Program</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="MysteriousDimensions128.trd" size="655360" crc="8f37e776" sha1="1aa1fa49d68b47bcb84aaf64539bf8fe981bd40c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rtype">
 		<description>R-Type (mod)</description>
 		<year>2019</year>
@@ -531,7 +778,6 @@ license:CC0-1.0
 		<year>19??</year>
 		<publisher>Proxima</publisher>
 		<info name="language" value="Czech" />
-		<info name="region" value="Czechia" />
 		<info name="usage" value="Works on Pentagon 1024SL machine" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">

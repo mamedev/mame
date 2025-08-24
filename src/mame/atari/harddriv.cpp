@@ -792,7 +792,7 @@ static INPUT_PORTS_START( harddriv )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", FUNC(adc0808_device::eoc_r))
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
@@ -875,7 +875,7 @@ static INPUT_PORTS_START( racedriv )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", FUNC(adc0808_device::eoc_r))
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
@@ -959,7 +959,7 @@ static INPUT_PORTS_START( racedriv_pan )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("leftpcb:screen")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("leftpcb:screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("leftpcb:adc8", FUNC(adc0808_device::eoc_r))
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
@@ -971,7 +971,7 @@ static INPUT_PORTS_START( racedriv_pan )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("rightpcb:screen")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rightpcb:screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rightpcb:adc8", FUNC(adc0808_device::eoc_r))
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
@@ -998,7 +998,7 @@ static INPUT_PORTS_START( racedrivc )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", FUNC(adc0808_device::eoc_r))
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
@@ -1087,7 +1087,7 @@ static INPUT_PORTS_START( stunrun )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", FUNC(adc0808_device::eoc_r))
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
@@ -1176,7 +1176,7 @@ static INPUT_PORTS_START( steeltal )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", FUNC(adc0808_device::eoc_r))
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
@@ -1266,7 +1266,7 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", FUNC(adc0808_device::eoc_r))
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
@@ -1356,7 +1356,7 @@ static INPUT_PORTS_START( hdrivair )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", FUNC(adc0808_device::eoc_r))
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
@@ -1627,11 +1627,10 @@ void harddriv_state::ds3(machine_config &config)
 	m_ds3xdsp->set_addrmap(AS_DATA, &harddriv_state::ds3xdsp_data_map);
 	TIMER(config, "ds3xdsp_timer").configure_generic(FUNC(harddriv_state::ds3xdsp_internal_timer_callback));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // unknown DAC
 }
 
 
@@ -1932,8 +1931,7 @@ void steeltal_board_device_state::device_add_mconfig(machine_config &config) //t
 	config.device_remove("ds3xdsp");
 	config.device_remove("ldac");
 	config.device_remove("rdac");
-	config.device_remove("lspeaker");
-	config.device_remove("rspeaker");
+	config.device_remove("speaker");
 
 	ASIC65(config, m_asic65, 0, ASIC65_STEELTAL);         /* ASIC65 on DSPCOM board */
 
