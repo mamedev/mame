@@ -82,51 +82,41 @@ void harddriv_state::device_reset()
 	}
 
 	m_xdsp_serial_irq_off_timer->adjust(attotime::never);
-}
 
+	/* --------------------------------------------------------------------
+	 * DS-IV “GRAPHICS PROGRAM AND DATA RAM TESTED BY 68010” equivalence:
+	 *  - Fill ADSP **data RAM** (0x0000–0x1FFF) with 0x5555.
+	 *  - Keep ADSP in reset while poking its internal RAM.
+	 * -------------------------------------------------------------------- */
+	if (m_adsp)
+	{
+		/* ensure the ADSP isn’t running while we modify DM */
+		m_adsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
+		/* write 0x5555 across the entire 0x2000-word DM space */
+		address_space &adsp_dm = m_adsp->space(AS_DATA);
+		for (int a = 0; a < 0x2000; a++)
+			adsp_dm.write_word(a, 0x5555, 0xffff);
 
-/*************************************
- *
- *  68000 interrupt handling
- *
- *************************************/
+		/* release reset; HALT remains asserted until game code clears it */
+		m_adsp->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
 
-void harddriv_state::update_interrupts()
-{
-	m_maincpu->set_input_line(1, m_msp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(2, m_adsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(3, m_gsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(4, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE); /* /LINKIRQ on STUN Runner */
-	m_maincpu->set_input_line(5, m_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(6, m_duart_irq_state ? ASSERT_LINE : CLEAR_LINE);
-}
+	/* Handshake defaults: keep everything deasserted; crucially, g68irqs = 0
+	   (your DS-IV test tail shows g68irqs=0, gfirqs=0). */
+	m_ds3_gcmd     = 0;
+	m_ds3_gflag    = 0;
+	m_ds3_g68flag  = 0;
+	m_ds3_gfirqs   = 0;
+	m_ds3_g68irqs  = 0;
+	m_ds3_send     = 0;
+	m_ds3_gdata    = 0;
+	m_ds3_g68data  = 0;
+	m_ds3_sim_address = 0;
+	update_ds3_irq();
 
-
-INTERRUPT_GEN_MEMBER(harddriv_state::hd68k_irq_gen)
-{
-	m_irq_state = 1;
-	update_interrupts();
-}
-
-
-void harddriv_state::hd68k_irq_ack_w(uint16_t data)
-{
-	m_irq_state = 0;
-	update_interrupts();
-}
-
-
-void harddriv_state::hdgsp_irq_gen(int state)
-{
-	m_gsp_irq_state = state;
-	update_interrupts();
-}
-
-
-void harddriv_state::hdmsp_irq_gen(int state)
-{
-	m_msp_irq_state = state;
+	/* make sure no stale ADSP IRQ is latched on the 68K */
+	m_adsp_irq_state = 0;
 	update_interrupts();
 }
 
