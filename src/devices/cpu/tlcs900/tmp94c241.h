@@ -12,7 +12,29 @@
 #pragma once
 
 #include "tlcs900.h"
+#include "tmp94c241_serial.h"
 
+enum
+{
+	INTE45,
+	INTE67,
+	INTE89,
+	INTEAB,
+	INTET01,
+	INTET23,
+	INTET45,
+	INTET67,
+	INTET89,
+	INTETAB,
+	INTES0,
+	INTES1,
+	INTETC01,
+	INTETC23,
+	INTETC45,
+	INTETC67,
+	INTE0AD,
+	INTNMWDT
+};
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -22,6 +44,8 @@
 
 class tmp94c241_device : public tlcs900h_device
 {
+	friend class tmp94c241_serial_device;
+
 	static constexpr uint8_t PORT_0 = 0; // 8 bit I/O. Shared with d0-d7
 	static constexpr uint8_t PORT_1 = 1; // 8 bit I/O. Shared with d8-d15
 	static constexpr uint8_t PORT_2 = 2; // 8 bit I/O. Shared with d16-d23
@@ -111,6 +135,7 @@ protected:
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -243,10 +268,7 @@ private:
 	// Watchdog Timer
 	uint8_t m_watchdog_mode;
 
-	// Serial Channel
-	uint8_t m_serial_control[2];
-	uint8_t m_serial_mode[2];
-	uint8_t m_baud_rate[2];
+	// Serial Channels
 	uint8_t m_od_enable;
 
 	// A/D Converter Control
@@ -271,6 +293,9 @@ private:
 
 	// D/A Converter Control
 	uint8_t m_da_drive;
+
+public:
+	required_device_array<tmp94c241_serial_device, 2> m_serial;
 };
 
 // device type declaration
