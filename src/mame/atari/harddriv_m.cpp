@@ -87,13 +87,13 @@ void harddriv_state::device_reset()
 	 * DS-IV “GRAPHICS PROGRAM AND DATA RAM TESTED BY 68010” equivalence:
 	 *  - Fill ADSP **data RAM** (0x0000–0x1FFF) with 0x5555.
 	 *  - Keep ADSP in reset while poking its internal RAM.
+	 *  - Logs show the test ending with a sweep of W@0000..W@1FFE = 0x5555.
 	 * -------------------------------------------------------------------- */
-	if (m_adsp)
+	if (m_adsp && m_ds3xdsp.found())
 	{
 		/* ensure the ADSP isn’t running while we modify DM */
 		m_adsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-		/* write 0x5555 across the entire 0x2000-word DM space */
 		address_space &adsp_dm = m_adsp->space(AS_DATA);
 		for (int a = 0; a < 0x2000; a++)
 			adsp_dm.write_word(a, 0x5555, 0xffff);
