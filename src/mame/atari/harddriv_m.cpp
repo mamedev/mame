@@ -593,7 +593,6 @@ uint16_t harddriv_state::hd68k_adsp_data_r(offs_t offset)
 	return m_adsp_data_memory[offset];
 }
 
-
 void harddriv_state::hd68k_adsp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_adsp_data_memory[offset]);
@@ -601,12 +600,25 @@ void harddriv_state::hd68k_adsp_data_w(offs_t offset, uint16_t data, uint16_t me
 	/* any write to $1FFF is taken to be a trigger; synchronize the CPUs */
 	if (offset == 0x1fff)
 	{
+		/* If you run the "DS IV GRAPHICS PROGRAM AND DATA RAM TESTED BY 68010" in the hdrivairp test menu
+		the 68010 seeds the ADSP DM 0x0000–0x1FFE with 0x5555 before writing the sync address. This code
+		simulates the test behaviour so that the game can load normally without the "bad poly buff error". */
+		if ((data & 0xffff) == 0x5555)
+		{
+			for (int i = 0; i < 0x1fff; i++)
+				m_adsp_data_memory[i] = 0x5555;
+
+			logerror("[harddriv] Seeded ADSP DM 0000..1FFE with 5555 (DS-IV test end)\n");
+		}
+
 		logerror("%06X:ADSP sync address written (%04X)\n", m_maincpu->pcbase(), data);
 		machine().scheduler().synchronize();
 		m_adsp->signal_interrupt_trigger();
 	}
 	else
+	{
 		logerror("%06X:ADSP W@%04X (%04X)\n", m_maincpu->pcbase(), offset, data);
+	}
 }
 
 
