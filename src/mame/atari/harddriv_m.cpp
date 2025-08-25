@@ -125,53 +125,6 @@ void harddriv_state::device_reset()
 
 /*************************************
  *
- *  68000 interrupt handling
- *
- *************************************/
-
-
-void harddriv_state::update_interrupts()
-{
-	m_maincpu->set_input_line(1, m_msp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(2, m_adsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(3, m_gsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(4, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE); /* /LINKIRQ on STUN Runner */
-	m_maincpu->set_input_line(5, m_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(6, m_duart_irq_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-INTERRUPT_GEN_MEMBER(harddriv_state::hd68k_irq_gen)
-{
-	m_irq_state = 1;
-	update_interrupts();
-}
-
-
-void harddriv_state::hd68k_irq_ack_w(uint16_t data)
-{
-	m_irq_state = 0;
-	update_interrupts();
-}
-
-
-void harddriv_state::hdgsp_irq_gen(int state)
-{
-	m_gsp_irq_state = state;
-	update_interrupts();
-}
-
-
-void harddriv_state::hdmsp_irq_gen(int state)
-{
-	m_msp_irq_state = state;
-	update_interrupts();
-}
-
-
-
-/*************************************
- *
  *  68000 access to GSP
  *
  *************************************/
