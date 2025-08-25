@@ -5354,6 +5354,11 @@ static INPUT_PORTS_START( lucky8b )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_MODIFY("IN2")
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("P1 - Stop3")
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP2) PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("P1 - Stop2")
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP1) PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("P1 - Stop1")
+
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x10, 0x10, "Double Up Game Pay Rate" )   PORT_DIPLOCATION("DSW1:5")      // OK
 	PORT_DIPSETTING(    0x10, "60%" )
@@ -5369,6 +5374,15 @@ static INPUT_PORTS_START( lucky8b )
 	PORT_DIPSETTING(    0x02, "78%" )
 	PORT_DIPSETTING(    0x01, "82%" )
 	PORT_DIPSETTING(    0x00, "86%" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( lucky8l )
+	PORT_INCLUDE( lucky8 )
+
+	PORT_MODIFY("IN2")
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("P1 - Stop3")
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP2) PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("P1 - Stop2")
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP1) PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("P1 - Stop1")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lucky8d )
@@ -24913,7 +24927,7 @@ GAMEL( 1991, lucky8h,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_ini
 GAMEL( 1989, lucky8i,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Eagle/Wing",        "New Lucky 8 Lines (set 9, W-4, Eagle, licensed by Wing)",  0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 199?, lucky8j,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines Crown Turbo (Hack)",                     MACHINE_NOT_WORKING,   layout_lucky8 )    // 2 control sets...
 GAMEL( 1989, lucky8k,    lucky8,   lucky8k,  lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 10, W-4, encrypted NEC D315-5136)", 0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8l,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8l,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 11, W-4)",                          MACHINE_WRONG_COLORS,  layout_lucky8 )    // uses a strange mix of PLDs and PROMs for colors
+GAMEL( 1989, lucky8l,    lucky8,   lucky8,   lucky8l,  wingco_state,   init_lucky8l,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 11, W-4)",                          MACHINE_WRONG_COLORS,  layout_lucky8 )    // uses a strange mix of PLDs and PROMs for colors
 GAMEL( 1989, lucky8m,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8m,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 12, W-4, encrypted)",               0,                     layout_lucky8 )
 GAMEL( 1989, lucky8n,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8n,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 13)",                               0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 1988, lucky8o,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines (set 14, W-4, Yamate)",                  0,                     layout_lucky8 )    // 2 control sets...
