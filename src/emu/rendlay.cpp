@@ -602,7 +602,8 @@ private:
 
 	std::string parameter_name(util::xml::data_node const &node)
 	{
-		std::string const *const attrib(node.get_attribute_string_ptr("name"));
+		using namespace std::literals;
+		std::string const *const attrib(node.get_attribute_string_ptr("name"sv));
 		if (!attrib)
 			throw layout_syntax_error("parameter lacks name attribute");
 		return std::string(expand(*attrib));
@@ -664,11 +665,13 @@ public:
 
 	void set_parameter(util::xml::data_node const &node)
 	{
+		using namespace std::literals;
+
 		// do basic validation
 		std::string name(parameter_name(node));
-		if (node.has_attribute("start") || node.has_attribute("increment") || node.has_attribute("lshift") || node.has_attribute("rshift"))
+		if (node.has_attribute("start"sv) || node.has_attribute("increment"sv) || node.has_attribute("lshift"sv) || node.has_attribute("rshift"sv))
 			throw layout_syntax_error("start/increment/lshift/rshift attributes are only allowed for repeat parameters");
-		std::string const *const value(node.get_attribute_string_ptr("value"));
+		std::string const *const value(node.get_attribute_string_ptr("value"sv));
 		if (!value)
 			throw layout_syntax_error("parameter lacks value attribute");
 
@@ -678,23 +681,25 @@ public:
 
 	void set_repeat_parameter(util::xml::data_node const &node, bool init)
 	{
+		using namespace std::literals;
+
 		// two types are allowed here - static value, and start/increment/lshift/rshift
 		std::string name(parameter_name(node));
-		std::string const *const start(node.get_attribute_string_ptr("start"));
+		std::string const *const start(node.get_attribute_string_ptr("start"sv));
 		if (start)
 		{
 			// simple validity checks
-			if (node.has_attribute("value"))
+			if (node.has_attribute("value"sv))
 				throw layout_syntax_error("start attribute may not be used in combination with value attribute");
-			int const lshift(node.has_attribute("lshift") ? get_attribute_int(node, "lshift", -1) : 0);
-			int const rshift(node.has_attribute("rshift") ? get_attribute_int(node, "rshift", -1) : 0);
+			int const lshift(node.has_attribute("lshift"sv) ? get_attribute_int(node, "lshift"sv, -1) : 0);
+			int const rshift(node.has_attribute("rshift"sv) ? get_attribute_int(node, "rshift"sv, -1) : 0);
 			if ((0 > lshift) || (0 > rshift))
 				throw layout_syntax_error("lshift/rshift attributes must be non-negative integers");
 
 			// increment is more complex - it may be an integer or a floating-point number
 			s64 intincrement(0);
 			double floatincrement(0);
-			std::string const *const increment(node.get_attribute_string_ptr("increment"));
+			std::string const *const increment(node.get_attribute_string_ptr("increment"sv));
 			if (increment)
 			{
 				std::string_view const expanded(expand(*increment));
@@ -741,13 +746,13 @@ public:
 					m_entries.emplace(pos, std::move(name), std::string(expand(*start)), intincrement, lshift - rshift);
 			}
 		}
-		else if (node.has_attribute("increment") || node.has_attribute("lshift") || node.has_attribute("rshift"))
+		else if (node.has_attribute("increment"sv) || node.has_attribute("lshift"sv) || node.has_attribute("rshift"sv))
 		{
 			throw layout_syntax_error("increment/lshift/rshift attributes require start attribute");
 		}
 		else
 		{
-			std::string const *const value(node.get_attribute_string_ptr("value"));
+			std::string const *const value(node.get_attribute_string_ptr("value"sv));
 			if (!value)
 				throw layout_syntax_error("parameter lacks value attribute");
 			entry_vector::iterator const pos(
@@ -781,19 +786,19 @@ public:
 				m_entries.end());
 	}
 
-	std::string_view get_attribute_string(util::xml::data_node const &node, char const *name, std::string_view defvalue = std::string_view())
+	std::string_view get_attribute_string(util::xml::data_node const &node, std::string_view name, std::string_view defvalue = std::string_view())
 	{
 		std::string const *const attrib(node.get_attribute_string_ptr(name));
 		return attrib ? expand(*attrib) : defvalue;
 	}
 
-	std::string get_attribute_subtag(util::xml::data_node const &node, char const *name)
+	std::string get_attribute_subtag(util::xml::data_node const &node, std::string_view name)
 	{
 		std::string const *const attrib(node.get_attribute_string_ptr(name));
 		return attrib ? device().subtag(expand(*attrib)) : std::string();
 	}
 
-	int get_attribute_int(util::xml::data_node const &node, const char *name, int defvalue)
+	int get_attribute_int(util::xml::data_node const &node, std::string_view name, int defvalue)
 	{
 		std::string const *const attrib(node.get_attribute_string_ptr(name));
 		if (!attrib)
@@ -803,7 +808,7 @@ public:
 		return parse_int(expand(*attrib), defvalue);
 	}
 
-	float get_attribute_float(util::xml::data_node const &node, char const *name, float defvalue)
+	float get_attribute_float(util::xml::data_node const &node, std::string_view name, float defvalue)
 	{
 		std::string const *const attrib(node.get_attribute_string_ptr(name));
 		if (!attrib)
@@ -816,7 +821,7 @@ public:
 		return (stream >> result) ? result : defvalue;
 	}
 
-	bool get_attribute_bool(util::xml::data_node const &node, char const *name, bool defvalue)
+	bool get_attribute_bool(util::xml::data_node const &node, std::string_view name, bool defvalue)
 	{
 		std::string const *const attrib(node.get_attribute_string_ptr(name));
 		if (!attrib)
@@ -824,9 +829,10 @@ public:
 
 		// first try yes/no strings
 		std::string_view const expanded(expand(*attrib));
-		if ("yes" == expanded || "true" == expanded)
+		using namespace std::literals;
+		if ("yes"sv == expanded || "true"sv == expanded)
 			return true;
-		if ("no" == expanded || "false" == expanded)
+		if ("no"sv == expanded || "false"sv == expanded)
 			return false;
 
 		// fall back to integer parsing
@@ -843,35 +849,37 @@ public:
 		}
 		else
 		{
+			using namespace std::literals;
+
 			// horizontal position/size
-			if (node->has_attribute("left"))
+			if (node->has_attribute("left"sv))
 			{
-				result.x0 = get_attribute_float(*node, "left", 0.0F);
-				result.x1 = get_attribute_float(*node, "right", 1.0F);
+				result.x0 = get_attribute_float(*node, "left"sv, 0.0F);
+				result.x1 = get_attribute_float(*node, "right"sv, 1.0F);
 			}
 			else
 			{
-				float const width = get_attribute_float(*node, "width", 1.0F);
-				if (node->has_attribute("xc"))
-					result.x0 = get_attribute_float(*node, "xc", 0.0F) - (width / 2.0F);
+				float const width = get_attribute_float(*node, "width"sv, 1.0F);
+				if (node->has_attribute("xc"sv))
+					result.x0 = get_attribute_float(*node, "xc"sv, 0.0F) - (width / 2.0F);
 				else
-					result.x0 = get_attribute_float(*node, "x", 0.0F);
+					result.x0 = get_attribute_float(*node, "x"sv, 0.0F);
 				result.x1 = result.x0 + width;
 			}
 
 			// vertical position/size
-			if (node->has_attribute("top"))
+			if (node->has_attribute("top"sv))
 			{
-				result.y0 = get_attribute_float(*node, "top", 0.0F);
-				result.y1 = get_attribute_float(*node, "bottom", 1.0F);
+				result.y0 = get_attribute_float(*node, "top"sv, 0.0F);
+				result.y1 = get_attribute_float(*node, "bottom"sv, 1.0F);
 			}
 			else
 			{
-				float const height = get_attribute_float(*node, "height", 1.0F);
-				if (node->has_attribute("yc"))
-					result.y0 = get_attribute_float(*node, "yc", 0.0F) - (height / 2.0F);
+				float const height = get_attribute_float(*node, "height"sv, 1.0F);
+				if (node->has_attribute("yc"sv))
+					result.y0 = get_attribute_float(*node, "yc"sv, 0.0F) - (height / 2.0F);
 				else
-					result.y0 = get_attribute_float(*node, "y", 0.0F);
+					result.y0 = get_attribute_float(*node, "y"sv, 0.0F);
 				result.y1 = result.y0 + height;
 			}
 
@@ -888,11 +896,12 @@ public:
 			return render_color{ 1.0F, 1.0F, 1.0F, 1.0F };
 
 		// parse attributes
+		using namespace std::literals;
 		render_color const result{
-				get_attribute_float(*node, "alpha", 1.0F),
-				get_attribute_float(*node, "red", 1.0F),
-				get_attribute_float(*node, "green", 1.0F),
-				get_attribute_float(*node, "blue", 1.0F) };
+				get_attribute_float(*node, "alpha"sv, 1.0F),
+				get_attribute_float(*node, "red"sv, 1.0F),
+				get_attribute_float(*node, "green"sv, 1.0F),
+				get_attribute_float(*node, "blue"sv, 1.0F) };
 
 		// check for errors
 		if ((0.0F > (std::min)({ result.r, result.g, result.b, result.a })) || (1.0F < (std::max)({ result.r, result.g, result.b, result.a })))
@@ -908,8 +917,9 @@ public:
 			return ROT0;
 
 		// parse attributes
+		using namespace std::literals;
 		int result;
-		int const rotate(get_attribute_int(*node, "rotate", 0));
+		int const rotate(get_attribute_int(*node, "rotate"sv, 0));
 		switch (rotate)
 		{
 		case 0:     result = ROT0;      break;
@@ -918,11 +928,11 @@ public:
 		case 270:   result = ROT270;    break;
 		default:    throw layout_syntax_error(util::string_format("invalid rotate attribute %d", rotate));
 		}
-		if (get_attribute_bool(*node, "swapxy", false))
+		if (get_attribute_bool(*node, "swapxy"sv, false))
 			result ^= ORIENTATION_SWAP_XY;
-		if (get_attribute_bool(*node, "flipx", false))
+		if (get_attribute_bool(*node, "flipx"sv, false))
 			result ^= ORIENTATION_FLIP_X;
-		if (get_attribute_bool(*node, "flipy", false))
+		if (get_attribute_bool(*node, "flipy"sv, false))
 			result ^= ORIENTATION_FLIP_Y;
 		return result;
 	}
@@ -933,12 +943,12 @@ class view_environment : public layout_environment
 {
 private:
 	view_environment *const m_next_view = nullptr;
-	char const *const m_name;
+	std::string_view const m_name;
 	u32 const m_visibility_mask = 0U;
 	unsigned m_next_visibility_bit = 0U;
 
 public:
-	view_environment(layout_environment &next, char const *name)
+	view_environment(layout_environment &next, std::string_view name)
 		: layout_environment(next)
 		, m_name(name)
 	{
@@ -969,7 +979,8 @@ namespace {
 
 bool add_bounds_step(emu::render::detail::layout_environment &env, emu::render::detail::bounds_vector &steps, util::xml::data_node const &node)
 {
-	int const state(env.get_attribute_int(node, "state", 0));
+	using namespace std::literals;
+	int const state(env.get_attribute_int(node, "state"sv, 0));
 	auto const pos(
 			std::lower_bound(
 				steps.begin(),
@@ -1069,7 +1080,8 @@ inline render_bounds interpolate_bounds(emu::render::detail::bounds_vector const
 
 bool add_color_step(emu::render::detail::layout_environment &env, emu::render::detail::color_vector &steps, util::xml::data_node const &node)
 {
-	int const state(env.get_attribute_int(node, "state", 0));
+	using namespace std::literals;
+	int const state(env.get_attribute_int(node, "state"sv, 0));
 	auto const pos(
 			std::lower_bound(
 				steps.begin(),
@@ -1147,11 +1159,12 @@ unsigned get_state_shift(ioport_value mask)
 std::string make_child_output_tag(
 		emu::render::detail::view_environment &env,
 		util::xml::data_node const &itemnode,
-		char const *child)
+		std::string_view child)
 {
+	using namespace std::literals;
 	util::xml::data_node const *const childnode(itemnode.get_child(child));
 	if (childnode)
-		return std::string(env.get_attribute_string(*childnode, "name"));
+		return std::string(env.get_attribute_string(*childnode, "name"sv));
 	else
 		return std::string();
 }
@@ -1159,34 +1172,37 @@ std::string make_child_output_tag(
 std::string make_child_input_tag(
 		emu::render::detail::view_environment &env,
 		util::xml::data_node const &itemnode,
-		char const *child)
+		std::string_view child)
 {
+	using namespace std::literals;
 	util::xml::data_node const *const childnode(itemnode.get_child(child));
-	return childnode ? env.get_attribute_subtag(*childnode, "inputtag") : std::string();
+	return childnode ? env.get_attribute_subtag(*childnode, "inputtag"sv) : std::string();
 }
 
 ioport_value make_child_mask(
 		emu::render::detail::view_environment &env,
 		util::xml::data_node const &itemnode,
-		char const *child)
+		std::string_view child)
 {
+	using namespace std::literals;
 	util::xml::data_node const *const childnode(itemnode.get_child(child));
-	return childnode ? env.get_attribute_int(*childnode, "mask", ~ioport_value(0)) : ~ioport_value(0);
+	return childnode ? env.get_attribute_int(*childnode, "mask"sv, ~ioport_value(0)) : ~ioport_value(0);
 }
 
 bool make_child_wrap(
 		emu::render::detail::view_environment &env,
 		util::xml::data_node const &itemnode,
-		char const *child)
+		std::string_view child)
 {
+	using namespace std::literals;
 	util::xml::data_node const *const childnode(itemnode.get_child(child));
-	return childnode ? env.get_attribute_bool(*childnode, "wrap", false) : false;
+	return childnode ? env.get_attribute_bool(*childnode, "wrap"sv, false) : false;
 }
 
 float make_child_size(
 		emu::render::detail::view_environment &env,
 		util::xml::data_node const &itemnode,
-		char const *child)
+		std::string_view child)
 {
 	util::xml::data_node const *const childnode(itemnode.get_child(child));
 	return std::clamp(childnode ? env.get_attribute_float(*childnode, "size", 1.0f) : 1.0f, 0.01f, 1.0f);
@@ -1195,7 +1211,7 @@ float make_child_size(
 ioport_value make_child_min(
 		emu::render::detail::view_environment &env,
 		util::xml::data_node const &itemnode,
-		char const *child)
+		std::string_view child)
 {
 	util::xml::data_node const *const childnode(itemnode.get_child(child));
 	return childnode ? env.get_attribute_int(*childnode, "min", ioport_value(0)) : ioport_value(0);
@@ -1204,7 +1220,7 @@ ioport_value make_child_min(
 ioport_value make_child_max(
 		emu::render::detail::view_environment &env,
 		util::xml::data_node const &itemnode,
-		char const *child,
+		std::string_view child,
 		ioport_value mask)
 {
 	util::xml::data_node const *const childnode(itemnode.get_child(child));
@@ -1216,13 +1232,15 @@ std::string make_input_tag(
 		emu::render::detail::view_environment &env,
 		util::xml::data_node const &itemnode)
 {
-	return env.get_attribute_subtag(itemnode, "inputtag");
+	using namespace std::literals;
+	return env.get_attribute_subtag(itemnode, "inputtag"sv);
 }
 
 int get_blend_mode(emu::render::detail::view_environment &env, util::xml::data_node const &itemnode)
 {
 	// see if there's a blend mode attribute
-	std::string const *const mode(itemnode.get_attribute_string_ptr("blend"));
+	using namespace std::literals;
+	std::string const *const mode(itemnode.get_attribute_string_ptr("blend"sv));
 	if (mode)
 	{
 		if (*mode == "none")
@@ -1238,9 +1256,10 @@ int get_blend_mode(emu::render::detail::view_environment &env, util::xml::data_n
 	}
 
 	// fall back to implicit blend mode based on element type
-	if (!strcmp(itemnode.get_name(), "screen"))
+	using namespace std::literals;
+	if (itemnode.name() == "screen")
 		return -1; // magic number recognised by render.cpp to allow per-element blend mode
-	else if (!strcmp(itemnode.get_name(), "overlay"))
+	else if (itemnode.name() == "overlay")
 		return BLENDMODE_RGB_MULTIPLY;
 	else
 		return BLENDMODE_ALPHA;
@@ -1284,9 +1303,9 @@ layout_element::layout_element(environment &env, util::xml::data_node const &ele
 	render_bounds bounds = { 0.0, 0.0, 0.0, 0.0 };
 	for (util::xml::data_node const *compnode = elemnode.get_first_child(); compnode; compnode = compnode->get_next_sibling())
 	{
-		make_component_map::const_iterator const make_func(s_make_component.find(compnode->get_name()));
+		make_component_map::const_iterator const make_func(s_make_component.find(compnode->name()));
 		if (make_func == s_make_component.end())
-			throw layout_syntax_error(util::string_format("unknown element component %s", compnode->get_name()));
+			throw layout_syntax_error(util::string_format("unknown element component %s", compnode->name()));
 
 		// insert the new component into the list
 		component const &newcomp(*m_complist.emplace_back(make_func->second(env, *compnode)));
@@ -1448,10 +1467,11 @@ void layout_group::resolve_bounds(environment &env, group_map &groupmap, std::ve
 	if (seen.end() != std::find(seen.begin(), seen.end(), this))
 	{
 		// a wild loop appears!
+		using namespace std::literals;
 		std::ostringstream path;
 		for (layout_group const *const group : seen)
-			path << ' ' << group->m_groupnode.get_attribute_string("name", "");
-		path << ' ' << m_groupnode.get_attribute_string("name", "");
+			path << ' ' << group->m_groupnode.get_attribute_string("name"sv);
+		path << ' ' << m_groupnode.get_attribute_string("name"sv);
 		throw layout_syntax_error(util::string_format("recursively nested groups %s", path.str()));
 	}
 
@@ -1476,19 +1496,20 @@ void layout_group::resolve_bounds(
 		bool repeat,
 		bool init)
 {
+	using namespace std::literals;
 	LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Group '%s' resolve bounds empty=%s vistoggle=%s repeat=%s init=%s\n",
-			parentnode.get_attribute_string("name", ""), empty, vistoggle, repeat, init);
+			parentnode.get_attribute_string("name"sv), empty, vistoggle, repeat, init);
 	bool envaltered(false);
 	bool unresolved(true);
 	for (util::xml::data_node const *itemnode = parentnode.get_first_child(); !m_bounds_resolved && itemnode; itemnode = itemnode->get_next_sibling())
 	{
-		if (!strcmp(itemnode->get_name(), "bounds"))
+		if (itemnode->name() == "bounds"sv)
 		{
 			// use explicit bounds
 			env.parse_bounds(itemnode, m_bounds);
 			m_bounds_resolved = true;
 		}
-		else if (!strcmp(itemnode->get_name(), "param"))
+		else if (itemnode->name() == "param"sv)
 		{
 			envaltered = true;
 			if (!unresolved)
@@ -1503,20 +1524,20 @@ void layout_group::resolve_bounds(
 			else
 				env.set_repeat_parameter(*itemnode, init);
 		}
-		else if (!strcmp(itemnode->get_name(), "element") ||
-				!strcmp(itemnode->get_name(), "backdrop") ||
-				!strcmp(itemnode->get_name(), "screen") ||
-				!strcmp(itemnode->get_name(), "overlay") ||
-				!strcmp(itemnode->get_name(), "bezel") ||
-				!strcmp(itemnode->get_name(), "cpanel") ||
-				!strcmp(itemnode->get_name(), "marquee"))
+		else if (itemnode->name() == "element"sv ||
+				itemnode->name() == "backdrop"sv ||
+				itemnode->name() == "screen"sv ||
+				itemnode->name() == "overlay"sv ||
+				itemnode->name() == "bezel"sv ||
+				itemnode->name() == "cpanel"sv ||
+				itemnode->name() == "marquee"sv)
 		{
 			render_bounds itembounds;
-			util::xml::data_node const *boundsnode = itemnode->get_child("bounds");
+			util::xml::data_node const *boundsnode = itemnode->get_child("bounds"sv);
 			env.parse_bounds(boundsnode, itembounds);
 			while (boundsnode)
 			{
-				boundsnode = boundsnode->get_next_sibling("bounds");
+				boundsnode = boundsnode->get_next_sibling("bounds"sv);
 				if (boundsnode)
 				{
 					render_bounds b;
@@ -1533,9 +1554,9 @@ void layout_group::resolve_bounds(
 					itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
 					m_bounds.x0, m_bounds.y0, m_bounds.x1, m_bounds.y1);
 		}
-		else if (!strcmp(itemnode->get_name(), "group"))
+		else if (itemnode->name() == "group"sv)
 		{
-			util::xml::data_node const *const itemboundsnode(itemnode->get_child("bounds"));
+			util::xml::data_node const *const itemboundsnode(itemnode->get_child("bounds"sv));
 			if (itemboundsnode)
 			{
 				render_bounds itembounds;
@@ -1546,13 +1567,13 @@ void layout_group::resolve_bounds(
 					m_bounds |= itembounds;
 				empty = false;
 				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate group '%s' reference explicit bounds (%s %s %s %s) -> (%s %s %s %s)\n",
-						itemnode->get_attribute_string("ref", ""),
+						itemnode->get_attribute_string("ref"sv),
 						itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
 						m_bounds.x0, m_bounds.y0, m_bounds.x1, m_bounds.y1);
 			}
 			else
 			{
-				std::string const ref(env.get_attribute_string(*itemnode, "ref"));
+				std::string const ref(env.get_attribute_string(*itemnode, "ref"sv));
 				if (ref.empty())
 					throw layout_syntax_error("nested group must have non-empty ref attribute");
 
@@ -1560,7 +1581,7 @@ void layout_group::resolve_bounds(
 				if (groupmap.end() == found)
 					throw layout_syntax_error(util::string_format("unable to find group %s", ref));
 
-				int const orientation(env.parse_orientation(itemnode->get_child("orientation")));
+				int const orientation(env.parse_orientation(itemnode->get_child("orientation"sv)));
 				environment local(env);
 				found->second.resolve_bounds(local, groupmap, seen);
 				render_bounds const itembounds{
@@ -1575,12 +1596,12 @@ void layout_group::resolve_bounds(
 				empty = false;
 				unresolved = false;
 				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate group '%s' reference computed bounds (%s %s %s %s) -> (%s %s %s %s)\n",
-						itemnode->get_attribute_string("ref", ""),
+						itemnode->get_attribute_string("ref"sv),
 						itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
 						m_bounds.x0, m_bounds.y0, m_bounds.x1, m_bounds.y1);
 			}
 		}
-		else if (!strcmp(itemnode->get_name(), "repeat"))
+		else if (itemnode->name() == "repeat"sv)
 		{
 			int const count(env.get_attribute_int(*itemnode, "count", -1));
 			if (0 >= count)
@@ -1592,16 +1613,16 @@ void layout_group::resolve_bounds(
 				local.increment_parameters();
 			}
 		}
-		else if (!strcmp(itemnode->get_name(), "collection"))
+		else if (itemnode->name() == "collection"sv)
 		{
-			if (!itemnode->has_attribute("name"))
+			if (!itemnode->has_attribute("name"sv))
 				throw layout_syntax_error("collection must have name attribute");
 			environment local(env);
 			resolve_bounds(local, *itemnode, groupmap, seen, empty, true, false, true);
 		}
 		else
 		{
-			throw layout_syntax_error(util::string_format("unknown group element %s", itemnode->get_name()));
+			throw layout_syntax_error(util::string_format("unknown group element %s", itemnode->name()));
 		}
 	}
 
@@ -1617,7 +1638,7 @@ void layout_group::resolve_bounds(
 	if (!vistoggle && !repeat)
 	{
 		LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Marking group '%s' bounds resolved\n",
-				parentnode.get_attribute_string("name", ""));
+				parentnode.get_attribute_string("name"sv));
 		m_bounds_resolved = true;
 	}
 }
@@ -2100,11 +2121,12 @@ private:
 		}
 	}
 
-	static std::string get_data(util::xml::data_node const &compnode)
+	static std::string_view get_data(util::xml::data_node const &compnode)
 	{
-		util::xml::data_node const *datanode(compnode.get_child("data"));
-		if (datanode && datanode->get_value())
-			return datanode->get_value();
+		using namespace std::literals;
+		util::xml::data_node const *datanode(compnode.get_child("data"sv));
+		if (datanode)
+			return datanode->value();
 		else
 			return "";
 	}
@@ -2474,8 +2496,9 @@ public:
 	text_component(environment &env, util::xml::data_node const &compnode)
 		: component(env, compnode)
 	{
-		m_string = env.get_attribute_string(compnode, "string");
-		m_textalign = env.get_attribute_int(compnode, "align", 0);
+		using namespace std::literals;
+		m_string = env.get_attribute_string(compnode, "string"sv);
+		m_textalign = env.get_attribute_int(compnode, "align"sv, 0);
 	}
 
 protected:
@@ -3092,7 +3115,8 @@ public:
 	{
 		osd_printf_warning("Warning: layout file contains deprecated reel component\n");
 
-		std::string_view symbollist = env.get_attribute_string(compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
+		using namespace std::literals;
+		std::string_view symbollist = env.get_attribute_string(compnode, "symbollist"sv, "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"sv);
 
 		// split out position names from string and figure out our number of symbols
 		m_numstops = 0;
@@ -3550,24 +3574,25 @@ layout_element::component::component(environment &env, util::xml::data_node cons
 {
 	for (util::xml::data_node const *child = compnode.get_first_child(); child; child = child->get_next_sibling())
 	{
-		if (!strcmp(child->get_name(), "bounds"))
+		using namespace std::literals;
+		if (child->name() == "bounds"sv)
 		{
 			if (!add_bounds_step(env, m_bounds, *child))
 			{
 				throw layout_syntax_error(
 						util::string_format(
 							"%s component has duplicate bounds for state",
-							compnode.get_name()));
+							compnode.name()));
 			}
 		}
-		else if (!strcmp(child->get_name(), "color"))
+		else if (child->name() == "color"sv)
 		{
 			if (!add_color_step(env, m_color, *child))
 			{
 				throw layout_syntax_error(
 						util::string_format(
 							"%s component has duplicate color for state",
-							compnode.get_name()));
+							compnode.name()));
 			}
 		}
 	}
@@ -4008,16 +4033,18 @@ layout_view::layout_view(
 	, m_ptr_time_out(true) // FIXME: add attribute for this
 	, m_exp_show_ptr(-1)
 {
+	using namespace std::literals;
+
 	// check for explicit pointer display setting
-	if (viewnode.get_attribute_string_ptr("showpointers"))
+	if (viewnode.get_attribute_string_ptr("showpointers"sv))
 	{
-		m_show_ptr = env.get_attribute_bool(viewnode, "showpointers", false);
+		m_show_ptr = env.get_attribute_bool(viewnode, "showpointers"sv, false);
 		m_exp_show_ptr = m_show_ptr ? 1 : 0;
 	}
 
 	// parse the layout
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
-	view_environment local(env, m_name.c_str());
+	view_environment local(env, m_name);
 	layer_lists layers;
 	local.set_parameter("viewname", std::string(m_name));
 	add_items(layers, local, viewnode, elemmap, groupmap, ROT0, identity_transform, render_color{ 1.0F, 1.0F, 1.0F, 1.0F }, true, false, true);
@@ -4453,13 +4480,14 @@ void layout_view::add_items(
 	bool unresolved(true);
 	for (util::xml::data_node const *itemnode = parentnode.get_first_child(); itemnode; itemnode = itemnode->get_next_sibling())
 	{
-		if (!strcmp(itemnode->get_name(), "bounds"))
+		using namespace std::literals;
+		if (itemnode->name() == "bounds"sv)
 		{
 			// set explicit bounds
 			if (root)
 				env.parse_bounds(itemnode, m_expbounds);
 		}
-		else if (!strcmp(itemnode->get_name(), "param"))
+		else if (itemnode->name() == "param"sv)
 		{
 			envaltered = true;
 			if (!unresolved)
@@ -4473,53 +4501,53 @@ void layout_view::add_items(
 			else
 				env.set_repeat_parameter(*itemnode, init);
 		}
-		else if (!strcmp(itemnode->get_name(), "screen"))
+		else if (itemnode->name() == "screen"sv)
 		{
 			layers.screens.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 		}
-		else if (!strcmp(itemnode->get_name(), "element"))
+		else if (itemnode->name() == "element"sv)
 		{
 			layers.screens.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
-		else if (!strcmp(itemnode->get_name(), "backdrop"))
+		else if (itemnode->name() == "backdrop"sv)
 		{
 			if (layers.backdrops.empty())
 				osd_printf_warning("Warning: layout view '%s' contains deprecated backdrop element\n", name());
 			layers.backdrops.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
-		else if (!strcmp(itemnode->get_name(), "overlay"))
+		else if (itemnode->name() == "overlay"sv)
 		{
 			if (layers.overlays.empty())
 				osd_printf_warning("Warning: layout view '%s' contains deprecated overlay element\n", name());
 			layers.overlays.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
-		else if (!strcmp(itemnode->get_name(), "bezel"))
+		else if (itemnode->name() == "bezel"sv)
 		{
 			if (layers.bezels.empty())
 				osd_printf_warning("Warning: layout view '%s' contains deprecated bezel element\n", name());
 			layers.bezels.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
-		else if (!strcmp(itemnode->get_name(), "cpanel"))
+		else if (itemnode->name() == "cpanel"sv)
 		{
 			if (layers.cpanels.empty())
 				osd_printf_warning("Warning: layout view '%s' contains deprecated cpanel element\n", name());
 			layers.cpanels.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
-		else if (!strcmp(itemnode->get_name(), "marquee"))
+		else if (itemnode->name() == "marquee"sv)
 		{
 			if (layers.marquees.empty())
 				osd_printf_warning("Warning: layout view '%s' contains deprecated marquee element\n", name());
 			layers.marquees.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
-		else if (!strcmp(itemnode->get_name(), "group"))
+		else if (itemnode->name() == "group"sv)
 		{
-			std::string const ref(env.get_attribute_string(*itemnode, "ref"));
+			std::string const ref(env.get_attribute_string(*itemnode, "ref"sv));
 			if (ref.empty())
 				throw layout_syntax_error("group instantiation must have non-empty ref attribute");
 
@@ -4530,8 +4558,8 @@ void layout_view::add_items(
 			found->second.resolve_bounds(env, groupmap);
 
 			layout_group::transform grouptrans(trans);
-			util::xml::data_node const *const itemboundsnode(itemnode->get_child("bounds"));
-			util::xml::data_node const *const itemorientnode(itemnode->get_child("orientation"));
+			util::xml::data_node const *const itemboundsnode(itemnode->get_child("bounds"sv));
+			util::xml::data_node const *const itemorientnode(itemnode->get_child("orientation"sv));
 			int const grouporient(env.parse_orientation(itemorientnode));
 			if (itemboundsnode)
 			{
@@ -4553,14 +4581,14 @@ void layout_view::add_items(
 					groupmap,
 					orientation_add(grouporient, orientation),
 					grouptrans,
-					env.parse_color(itemnode->get_child("color")) * color,
+					env.parse_color(itemnode->get_child("color"sv)) * color,
 					false,
 					false,
 					true);
 		}
-		else if (!strcmp(itemnode->get_name(), "repeat"))
+		else if (itemnode->name() == "repeat"sv)
 		{
-			int const count(env.get_attribute_int(*itemnode, "count", -1));
+			int const count(env.get_attribute_int(*itemnode, "count"sv, -1));
 			if (0 >= count)
 				throw layout_syntax_error("repeat must have positive integer count attribute");
 			view_environment local(env, false);
@@ -4570,9 +4598,9 @@ void layout_view::add_items(
 				local.increment_parameters();
 			}
 		}
-		else if (!strcmp(itemnode->get_name(), "collection"))
+		else if (itemnode->name() == "collection"sv)
 		{
-			std::string_view const name(env.get_attribute_string(*itemnode, "name"));
+			std::string_view const name(env.get_attribute_string(*itemnode, "name"sv));
 			if (name.empty())
 				throw layout_syntax_error("collection must have non-empty name attribute");
 
@@ -4587,7 +4615,7 @@ void layout_view::add_items(
 		}
 		else
 		{
-			throw layout_syntax_error(util::string_format("unknown view item %s", itemnode->get_name()));
+			throw layout_syntax_error(util::string_format("unknown view item %s", itemnode->name()));
 		}
 	}
 
@@ -4600,7 +4628,8 @@ void layout_view::add_items(
 
 std::string layout_view::make_name(layout_environment &env, util::xml::data_node const &viewnode)
 {
-	std::string_view const name(env.get_attribute_string(viewnode, "name"));
+	using namespace std::literals;
+	std::string_view const name(env.get_attribute_string(viewnode, "name"sv));
 	if (name.empty())
 		throw layout_syntax_error("view must have non-empty name attribute");
 
@@ -4682,17 +4711,19 @@ layout_view_item::layout_view_item(
 	, m_have_scrollyoutput(!make_child_output_tag(env, itemnode, "yscroll").empty())
 	, m_has_clickthrough(!env.get_attribute_string(itemnode, "clickthrough").empty())
 {
+	using namespace std::literals;
+
 	// fetch common data
-	int index = env.get_attribute_int(itemnode, "index", -1);
+	int index = env.get_attribute_int(itemnode, "index"sv, -1);
 	if (index != -1)
 		m_screen = screen_device_enumerator(env.machine().root_device()).byindex(index);
 
 	// sanity checks
-	if (strcmp(itemnode.get_name(), "screen") == 0)
+	if (itemnode.name() == "screen"sv)
 	{
-		if (itemnode.has_attribute("tag"))
+		if (itemnode.has_attribute("tag"sv))
 		{
-			std::string_view const tag(env.get_attribute_string(itemnode, "tag"));
+			std::string_view const tag(env.get_attribute_string(itemnode, "tag"sv));
 			m_screen = dynamic_cast<screen_device *>(env.device().subdevice(tag));
 			if (!m_screen)
 				throw layout_reference_error(util::string_format("invalid screen tag '%d'", tag));
@@ -4704,7 +4735,7 @@ layout_view_item::layout_view_item(
 	}
 	else if (!m_element)
 	{
-		throw layout_syntax_error(util::string_format("item of type %s requires an element tag", itemnode.get_name()));
+		throw layout_syntax_error(util::string_format("item of type %s requires an element tag", itemnode.name()));
 	}
 	else if (m_scrollxmin == m_scrollxmax)
 	{
@@ -5231,7 +5262,8 @@ render_color layout_view_item::get_interpolated_color() const
 
 layout_element *layout_view_item::find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap)
 {
-	std::string const name(env.get_attribute_string(itemnode, !strcmp(itemnode.get_name(), "element") ? "ref" : "element"));
+	using namespace std::literals;
+	std::string const name(env.get_attribute_string(itemnode, itemnode.name() == "element"sv ? "ref"sv : "element"sv));
 	if (name.empty())
 		return nullptr;
 
@@ -5253,15 +5285,16 @@ layout_view_item::bounds_vector layout_view_item::make_bounds(
 		util::xml::data_node const &itemnode,
 		layout_group::transform const &trans)
 {
+	using namespace std::literals;
 	bounds_vector result;
-	for (util::xml::data_node const *bounds = itemnode.get_child("bounds"); bounds; bounds = bounds->get_next_sibling("bounds"))
+	for (util::xml::data_node const *bounds = itemnode.get_child("bounds"sv); bounds; bounds = bounds->get_next_sibling("bounds"sv))
 	{
 		if (!add_bounds_step(env, result, *bounds))
 		{
 			throw layout_syntax_error(
 					util::string_format(
 						"%s item has duplicate bounds for state",
-						itemnode.get_name()));
+						itemnode.name()));
 		}
 	}
 	for (emu::render::detail::bounds_step &step : result)
@@ -5286,15 +5319,16 @@ layout_view_item::color_vector layout_view_item::make_color(
 		util::xml::data_node const &itemnode,
 		render_color const &mult)
 {
+	using namespace std::literals;
 	color_vector result;
-	for (util::xml::data_node const *color = itemnode.get_child("color"); color; color = color->get_next_sibling("color"))
+	for (util::xml::data_node const *color = itemnode.get_child("color"sv); color; color = color->get_next_sibling("color"sv))
 	{
 		if (!add_color_step(env, result, *color))
 		{
 			throw layout_syntax_error(
 					util::string_format(
 						"%s item has duplicate color for state",
-						itemnode.get_name()));
+						itemnode.name()));
 		}
 	}
 	if (result.empty())
@@ -5348,15 +5382,17 @@ layout_file::layout_file(
 {
 	try
 	{
+		using namespace std::literals;
+
 		environment env(device, searchpath, dirname);
 
 		// find the layout node
-		util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");
+		util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout"sv);
 		if (!mamelayoutnode)
 			throw layout_syntax_error("missing mamelayout node");
 
 		// validate the config data version
-		int const version = mamelayoutnode->get_attribute_int("version", 0);
+		int const version = mamelayoutnode->get_attribute_int("version"sv, 0);
 		if (version != LAYOUT_VERSION)
 			throw layout_syntax_error(util::string_format("unsupported version %d", version));
 
@@ -5365,7 +5401,7 @@ layout_file::layout_file(
 		add_elements(env, *mamelayoutnode, groupmap, false, true);
 
 		// parse all the views
-		for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
+		for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"sv); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"sv))
 		{
 			// the trouble with allowing errors to propagate here is that it wreaks havoc with screenless systems that use a terminal by default
 			// e.g. intlc44 and intlc440 have a terminal on the TTY port by default and have a view with the front panel with the terminal screen
@@ -5377,16 +5413,16 @@ layout_file::layout_file(
 			}
 			catch (layout_reference_error const &err)
 			{
-				osd_printf_warning("Error instantiating layout view %s: %s\n", env.get_attribute_string(*viewnode, "name"), err.what());
+				osd_printf_warning("Error instantiating layout view %s: %s\n", env.get_attribute_string(*viewnode, "name"sv), err.what());
 			}
 		}
 
 		// load the content of the first script node
 		if (!m_viewlist.empty())
 		{
-			util::xml::data_node const *const scriptnode = mamelayoutnode->get_child("script");
+			util::xml::data_node const *const scriptnode = mamelayoutnode->get_child("script"sv);
 			if (scriptnode)
-				emulator_info::layout_script_cb(*this, scriptnode->get_value());
+				emulator_info::layout_script_cb(*this, scriptnode->value().c_str());
 		}
 	}
 	catch (layout_syntax_error const &err)
@@ -5440,32 +5476,33 @@ void layout_file::add_elements(
 {
 	for (util::xml::data_node const *childnode = parentnode.get_first_child(); childnode; childnode = childnode->get_next_sibling())
 	{
-		if (!strcmp(childnode->get_name(), "param"))
+		using namespace std::literals;
+		if (childnode->name() == "param"sv)
 		{
 			if (!repeat)
 				env.set_parameter(*childnode);
 			else
 				env.set_repeat_parameter(*childnode, init);
 		}
-		else if (!strcmp(childnode->get_name(), "element"))
+		else if (childnode->name() == "element"sv)
 		{
-			std::string_view const name(env.get_attribute_string(*childnode, "name"));
+			std::string_view const name(env.get_attribute_string(*childnode, "name"sv));
 			if (name.empty())
 				throw layout_syntax_error("element must have non-empty name attribute");
 			if (!m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(env, *childnode)).second)
 				throw layout_syntax_error(util::string_format("duplicate element name %s", name));
 		}
-		else if (!strcmp(childnode->get_name(), "group"))
+		else if (childnode->name() == "group"sv)
 		{
-			std::string_view const name(env.get_attribute_string(*childnode, "name"));
+			std::string_view const name(env.get_attribute_string(*childnode, "name"sv));
 			if (name.empty())
 				throw layout_syntax_error("group must have non-empty name attribute");
 			if (!groupmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(*childnode)).second)
 				throw layout_syntax_error(util::string_format("duplicate group name %s", name));
 		}
-		else if (!strcmp(childnode->get_name(), "repeat"))
+		else if (childnode->name() == "repeat"sv)
 		{
-			int const count(env.get_attribute_int(*childnode, "count", -1));
+			int const count(env.get_attribute_int(*childnode, "count"sv, -1));
 			if (0 >= count)
 				throw layout_syntax_error("repeat must have positive integer count attribute");
 			environment local(env);
@@ -5475,9 +5512,9 @@ void layout_file::add_elements(
 				local.increment_parameters();
 			}
 		}
-		else if (repeat || (strcmp(childnode->get_name(), "view") && strcmp(childnode->get_name(), "script")))
+		else if (repeat || (childnode->name() != "view"sv && childnode->name() != "script"sv))
 		{
-			throw layout_syntax_error(util::string_format("unknown layout item %s", childnode->get_name()));
+			throw layout_syntax_error(util::string_format("unknown layout item %s", childnode->name()));
 		}
 	}
 }

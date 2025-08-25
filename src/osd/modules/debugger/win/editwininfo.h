@@ -16,6 +16,7 @@
 
 #include <deque>
 #include <string>
+#include <string_view>
 
 
 namespace osd::debugger::win {
@@ -39,7 +40,7 @@ protected:
 	int expression_view_index() const { return m_viewidx; }
 
 	void set_editwnd_bounds(RECT const &bounds);
-	void set_editwnd_text(char const *text);
+	void set_editwnd_text(std::string_view text);
 	void editwnd_select_all();
 	void set_edit_defstr(const std::string &string) { m_edit_defstr = string; }
 

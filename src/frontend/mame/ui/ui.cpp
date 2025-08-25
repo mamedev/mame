@@ -397,20 +397,21 @@ void mame_ui_manager::config_load_warnings(
 		}
 		else
 		{
-			m_last_launch_time = std::time_t(parentnode->get_attribute_int("launched", -1));
-			m_last_warning_time = std::time_t(parentnode->get_attribute_int("warned", -1));
+			using namespace std::literals;
+			m_last_launch_time = std::time_t(parentnode->get_attribute_int("launched"sv, -1));
+			m_last_warning_time = std::time_t(parentnode->get_attribute_int("warned"sv, -1));
 			for (util::xml::data_node const *node = parentnode->get_first_child(); node; node = node->get_next_sibling())
 			{
-				if (!std::strcmp(node->get_name(), "feature"))
+				if (node->name() == "feature"sv)
 				{
-					char const *const device = node->get_attribute_string("device", nullptr);
-					char const *const feature = node->get_attribute_string("type", nullptr);
-					char const *const status = node->get_attribute_string("status", nullptr);
-					if (device && *device && feature && *feature && status && *status)
+					std::string_view const device(node->get_attribute_string("device"sv));
+					std::string_view const feature(node->get_attribute_string("type"sv));
+					std::string_view const status(node->get_attribute_string("status"sv));
+					if (!device.empty() && !feature.empty())
 					{
-						if (!std::strcmp(status, "unemulated"))
+						if (status == "unemulated"sv)
 							m_unemulated_features.emplace(device, feature);
-						else if (!std::strcmp(status, "imperfect"))
+						else if (status == "imperfect"sv)
 							m_imperfect_features.emplace(device, feature);
 					}
 				}
@@ -432,23 +433,25 @@ void mame_ui_manager::config_save_warnings(
 	// only save system-level configuration when times are valid
 	if ((config_type::SYSTEM == cfg_type) && (std::time_t(-1) != m_last_launch_time) && (std::time_t(-1) != m_last_warning_time))
 	{
-		parentnode->set_attribute_int("launched", static_cast<long long>(m_last_launch_time));
-		parentnode->set_attribute_int("warned", static_cast<long long>(m_last_warning_time));
+		using namespace std::literals;
+
+		parentnode->set_attribute_int("launched"sv, static_cast<long long>(m_last_launch_time));
+		parentnode->set_attribute_int("warned"sv, static_cast<long long>(m_last_warning_time));
 
 		for (auto const &feature : m_unemulated_features)
 		{
-			util::xml::data_node *const feature_node = parentnode->add_child("feature", nullptr);
-			feature_node->set_attribute("device", feature.first.c_str());
-			feature_node->set_attribute("type", feature.second.c_str());
-			feature_node->set_attribute("status", "unemulated");
+			util::xml::data_node *const feature_node = parentnode->add_child("feature");
+			feature_node->set_attribute("device"sv, feature.first);
+			feature_node->set_attribute("type"sv, feature.second);
+			feature_node->set_attribute("status"sv, "unemulated"sv);
 		}
 
 		for (auto const &feature : m_imperfect_features)
 		{
-			util::xml::data_node *const feature_node = parentnode->add_child("feature", nullptr);
-			feature_node->set_attribute("device", feature.first.c_str());
-			feature_node->set_attribute("type", feature.second.c_str());
-			feature_node->set_attribute("status", "imperfect");
+			util::xml::data_node *const feature_node = parentnode->add_child("feature");
+			feature_node->set_attribute("device"sv, feature.first);
+			feature_node->set_attribute("type"sv, feature.second);
+			feature_node->set_attribute("status"sv, "imperfect"sv);
 		}
 	}
 }
@@ -483,12 +486,13 @@ void mame_ui_manager::config_load_pointers(
 	case config_type::SYSTEM:
 		if (!parentnode)
 			break;
-		for (auto const *targetnode = parentnode->get_child("target"); targetnode; targetnode = targetnode->get_next_sibling("target"))
+		using namespace std::literals;
+		for (auto const *targetnode = parentnode->get_child("target"sv); targetnode; targetnode = targetnode->get_next_sibling("target"sv))
 		{
-			auto const index(targetnode->get_attribute_int("index", -1));
+			auto const index(targetnode->get_attribute_int("index"sv, -1));
 			if ((0 <= index) && (m_pointer_options.size() > index))
 			{
-				auto const timeout(targetnode->get_attribute_float("activity_timeout", -1.0F));
+				auto const timeout(targetnode->get_attribute_float("activity_timeout"sv, -1.0F));
 				auto const ms(std::lround(timeout * 1000.0F));
 				if ((0 <= ms) && (10'000 >= ms))
 				{
@@ -498,7 +502,7 @@ void mame_ui_manager::config_load_pointers(
 						m_pointer_options[index].set_initial_timeout(std::chrono::milliseconds(ms));
 				}
 
-				auto const hide(targetnode->get_attribute_int("hide_inactive", -1));
+				auto const hide(targetnode->get_attribute_int("hide_inactive"sv, -1));
 				if (0 <= hide)
 				{
 					if (config_type::SYSTEM == cfg_type)
@@ -533,17 +537,18 @@ void mame_ui_manager::config_save_pointers(
 			pointer_options const &options(m_pointer_options[i]);
 			if (options.options_set())
 			{
-				util::xml::data_node *const targetnode = parentnode->add_child("target", nullptr);
+				using namespace std::literals;
+				util::xml::data_node *const targetnode = parentnode->add_child("target"sv);
 				if (targetnode)
 				{
-					targetnode->set_attribute_int("index", i);
+					targetnode->set_attribute_int("index"sv, i);
 					if (options.timeout_set())
 					{
 						auto const ms(std::chrono::duration_cast<std::chrono::milliseconds>(options.timeout()));
-						targetnode->set_attribute_float("activity_timeout", float(ms.count()) * 0.001F);
+						targetnode->set_attribute_float("activity_timeout"sv, float(ms.count()) * 0.001F);
 					}
 					if (options.hide_inactive_set())
-						targetnode->set_attribute_int("hide_inactive", options.hide_inactive());
+						targetnode->set_attribute_int("hide_inactive"sv, options.hide_inactive());
 				}
 			}
 		}

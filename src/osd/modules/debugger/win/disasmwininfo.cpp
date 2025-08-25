@@ -160,10 +160,10 @@ void disasmwin_info::restore_configuration_from_node(util::xml::data_node const 
 	update_caption();
 
 	util::xml::data_node const *const expr = node.get_child(NODE_WINDOW_EXPRESSION);
-	if (expr && expr->get_value())
+	if (expr && !expr->value().empty())
 	{
-		set_editwnd_text(expr->get_value());
-		process_string(expr->get_value());
+		set_editwnd_text(expr->value());
+		process_string(expr->value());
 	}
 
 	disasmbasewin_info::restore_configuration_from_node(node);

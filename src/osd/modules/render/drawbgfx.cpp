@@ -556,12 +556,13 @@ renderer_bgfx::renderer_bgfx(osd_window &window, parent_module &parent)
 	, m_save_sub(parent.subscribe_save(&renderer_bgfx::save_config, this))
 {
 	// load settings if recreated after fullscreen toggle
-	util::xml::data_node *windownode = m_module().persistent_settings().get_child("window");
+	using namespace std::literals;
+	util::xml::data_node *windownode = m_module().persistent_settings().get_child("window"sv);
 	while (windownode)
 	{
-		if (windownode->get_attribute_int("index", -1) != window.index())
+		if (windownode->get_attribute_int("index"sv, -1) != window.index())
 		{
-			windownode = windownode->get_next_sibling("window");
+			windownode = windownode->get_next_sibling("window"sv);
 		}
 		else
 		{
@@ -570,7 +571,7 @@ renderer_bgfx::renderer_bgfx(osd_window &window, parent_module &parent)
 				m_config = util::xml::file::create();
 				windownode->copy_into(*m_config);
 			}
-			std::exchange(windownode, windownode->get_next_sibling("window"))->delete_node();
+			std::exchange(windownode, windownode->get_next_sibling("window"sv))->delete_node();
 		}
 	}
 }
@@ -1660,12 +1661,13 @@ uint32_t renderer_bgfx::get_window_height(uint32_t index) const
 
 void renderer_bgfx::load_config(util::xml::data_node const &parentnode)
 {
-	util::xml::data_node const *windownode = parentnode.get_child("window");
+	using namespace std::literals;
+	util::xml::data_node const *windownode = parentnode.get_child("window"sv);
 	while (windownode)
 	{
-		if (windownode->get_attribute_int("index", -1) != window().index())
+		if (windownode->get_attribute_int("index"sv, -1) != window().index())
 		{
-			windownode = windownode->get_next_sibling("window");
+			windownode = windownode->get_next_sibling("window"sv);
 			continue;
 		}
 
@@ -1674,7 +1676,7 @@ void renderer_bgfx::load_config(util::xml::data_node const &parentnode)
 		else
 			m_config->get_first_child()->delete_node();
 		windownode->copy_into(*m_config);
-		m_config->get_first_child()->set_attribute("persist", "0");
+		m_config->get_first_child()->set_attribute("persist"sv, "0"sv);
 		osd_printf_verbose("BGFX: Found configuration for window %d\n", window().index());
 		break;
 	}
