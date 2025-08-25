@@ -791,7 +791,6 @@ void wingco_state::machine_start()
 
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_vidreg));
-	//m_ticket_dispenser->motor_w(0);
 }
 
 void unkch_state::machine_start()
@@ -942,6 +941,8 @@ void goldstar_state::goldstar_fa00_w(uint8_t data)
 	m_reel_tilemap[0]->mark_all_dirty();
 	m_reel_tilemap[1]->mark_all_dirty();
 	m_reel_tilemap[2]->mark_all_dirty();
+
+	m_ticket_dispenser->motor_w(BIT(data, 7));
 }
 
 
@@ -4252,10 +4253,10 @@ static INPUT_PORTS_START( goldstar )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin A")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin B")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )	
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper")  // hopper empty
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper Payout")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
 
@@ -6184,7 +6185,7 @@ static INPUT_PORTS_START( ladylinr )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kkotnoli )
-	PORT_START("IN0")   // d800
+	PORT_START("IN0")   // b800
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_B) PORT_NAME("P1 - Big / Switch Controls")
@@ -6194,7 +6195,7 @@ static INPUT_PORTS_START( kkotnoli )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_N) PORT_NAME("P1 - Small / Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("P1 - Start")
 
-	PORT_START("IN1")   // d801
+	PORT_START("IN1")   // b801
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_CODE(KEYCODE_G) PORT_NAME("P2 - Big / Switch Controls")
@@ -6204,7 +6205,7 @@ static INPUT_PORTS_START( kkotnoli )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_CODE(KEYCODE_H) PORT_NAME("P2 - Small / Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_CODE(KEYCODE_S) PORT_NAME("P2 - Start")
 
-	PORT_START("IN2")   // d802
+	PORT_START("IN2")   // b802
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -6214,7 +6215,7 @@ static INPUT_PORTS_START( kkotnoli )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")   // d810
+	PORT_START("IN3")   // b810
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // Coin1 1 coin/1 credit
@@ -6224,7 +6225,7 @@ static INPUT_PORTS_START( kkotnoli )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2)  // Coin4 1 coin/10 credits
 
-	PORT_START("IN4")   // d811
+	PORT_START("IN4")   // b811
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -6262,7 +6263,7 @@ static INPUT_PORTS_START( kkotnoli )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bingowng )
-	PORT_START("IN0")  // d800
+	PORT_START("IN0")  // b800
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_B) PORT_NAME("P1 - Switch Controls")
@@ -6272,7 +6273,7 @@ static INPUT_PORTS_START( bingowng )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_N) PORT_NAME("P1 - Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("P1 - Start")
 
-	PORT_START("IN1")  // d801
+	PORT_START("IN1")  // b801
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_CODE(KEYCODE_G) PORT_NAME("P2 - Switch Controls")
@@ -6282,7 +6283,7 @@ static INPUT_PORTS_START( bingowng )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_CODE(KEYCODE_H) PORT_NAME("P2 - Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_CODE(KEYCODE_S) PORT_NAME("P2 - Start")
 
-	PORT_START("IN2")  // d802
+	PORT_START("IN2")  // b802
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -6292,7 +6293,7 @@ static INPUT_PORTS_START( bingowng )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")  // d810
+	PORT_START("IN3")  // b810
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
@@ -6302,7 +6303,7 @@ static INPUT_PORTS_START( bingowng )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME( "Coin B" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME( "Coin A" )
 
-	PORT_START("IN4")  // d811
+	PORT_START("IN4")  // b811
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
@@ -6605,7 +6606,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( magodds )
-	PORT_START("IN0")  // d800
+	PORT_START("IN0")  // b800
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_X) PORT_NAME("P1 - Big / Switch Controls")
@@ -6615,7 +6616,7 @@ static INPUT_PORTS_START( magodds )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("P1 - Small / Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_N) PORT_NAME("P1 - Start")
 
-	PORT_START("IN1")  // d801
+	PORT_START("IN1")  // b801
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_CODE(KEYCODE_S) PORT_NAME("P2 - Big / Switch Controls")
@@ -6625,7 +6626,7 @@ static INPUT_PORTS_START( magodds )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_CODE(KEYCODE_D) PORT_NAME("P2 - Small / Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_CODE(KEYCODE_H) PORT_NAME("P2 - Start")
 
-	PORT_START("IN2")  // d802
+	PORT_START("IN2")  // b802
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -6635,7 +6636,7 @@ static INPUT_PORTS_START( magodds )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")  // d810
+	PORT_START("IN3")  // b810
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -6645,7 +6646,7 @@ static INPUT_PORTS_START( magodds )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
 
-	PORT_START("IN4")  // d811
+	PORT_START("IN4")  // b811
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -10986,8 +10987,9 @@ void goldstar_state::goldstar(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // clock frequency & pin 7 not verified
-	
-	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(200));
+
+	// payout hardware
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
 }
 
 
@@ -11001,7 +11003,6 @@ void goldstar_state::goldstbl(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar<false>));
@@ -11019,6 +11020,9 @@ void goldstar_state::goldstbl(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // clock frequency & pin 7 not verified
+
+	// payout hardware
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
 }
 
 void goldstar_state::moonlght(machine_config &config)
@@ -11774,7 +11778,6 @@ void wingco_state::magodds(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::magodds_map);
-	//m_maincpu->set_addrmap(AS_IO, &wingco_state::goldstar_readport);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -11795,7 +11798,6 @@ void wingco_state::magodds(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(wingco_state::screen_update_magical));
@@ -11826,7 +11828,6 @@ void goldstar_state::kkotnoli(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::kkotnoli_map);
-	//m_maincpu->set_addrmap(AS_IO, &goldstar_state::goldstar_readport);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -11843,7 +11844,6 @@ void goldstar_state::kkotnoli(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar<false>));
@@ -11856,6 +11856,9 @@ void goldstar_state::kkotnoli(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+
+	// payout hardware
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
 }
 
 
@@ -11864,7 +11867,6 @@ void goldstar_state::ladylinr(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::ladylinr_map);
-	//m_maincpu->set_addrmap(AS_IO, &goldstar_state::goldstar_readport);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -11877,7 +11879,6 @@ void goldstar_state::ladylinr(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar<false>));
@@ -12718,6 +12719,11 @@ ROM_START( moonlghtc )
 	ROM_LOAD( "moon-sound.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
+/*
+  Golden Regular.
+  The hopper payout routine is NOP'ed, doing a reset when finish.
+
+*/
 ROM_START( gregular )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "30.prg", 0x00000, 0x20000, CRC(7219d1c1) SHA1(8d17f29f94f50db952a1dd144c971b2e3be2dad3) ) // 1ST AND 2ND HALF IDENTICAL
