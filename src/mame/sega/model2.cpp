@@ -144,6 +144,8 @@ void model2_state::machine_start()
 	// initialize custom debugger pool, @see machine/model2.cpp
 	debug_init();
 
+	m_output.resolve();
+
 	save_item(NAME(m_intreq));
 	save_item(NAME(m_intena));
 	save_item(NAME(m_coproctl));
@@ -1191,6 +1193,7 @@ void model2o_state::daytona_output_w(u8 data)
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	m_output[1] = data;
 }
 
 void model2o_state::desert_output_w(u8 data)
@@ -1206,6 +1209,7 @@ void model2o_state::desert_output_w(u8 data)
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	m_output[1] = data;
 }
 
 void model2o_state::vcop_output_w(u8 data)
@@ -1217,6 +1221,7 @@ void model2o_state::vcop_output_w(u8 data)
 
 	machine().bookkeeping().coin_counter_w(1, BIT(~data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(~data, 0));
+	m_output[1] = data;
 }
 
 
@@ -1533,8 +1538,15 @@ void model2_state::rchase2_drive_board_w(u8 data)
 
 void model2_state::drive_board_w(u8 data)
 {
+	m_output[0] = data;
 	m_driveio_comm_data = data;
-	m_drivecpu->set_input_line(0, HOLD_LINE);
+	if (m_drivecpu)
+		m_drivecpu->set_input_line(0, HOLD_LINE);
+}
+
+void model2_state::gen_outputs_w(u8 data)
+{
+	m_output[1] = data;
 }
 
 
@@ -2698,6 +2710,7 @@ void model2a_state::model2a(machine_config &config)
 	io.in_pd_callback().set_ioport("IN2");
 	io.in_pg_callback().set_ioport("SW");
 	io.out_pe_callback().set([this] (u8 data) { m_billboard->write(data); });
+	io.out_pf_callback().set(FUNC(model2a_state::gen_outputs_w));
 
 	model2_timers(config);
 	model2_screen(config);
@@ -2839,6 +2852,7 @@ void model2b_state::model2b(machine_config &config)
 	io.in_pd_callback().set_ioport("IN2");
 	io.in_pg_callback().set_ioport("SW");
 	io.out_pe_callback().set([this] (u8 data) { m_billboard->write(data); });
+	io.out_pf_callback().set(FUNC(model2b_state::gen_outputs_w));
 
 	model2_timers(config);
 	model2_screen(config);
@@ -2876,6 +2890,7 @@ void model2b_state::indy500(machine_config &config)
 	model2b(config);
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pe_callback().set(FUNC(model2b_state::drive_board_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
@@ -2886,6 +2901,7 @@ void model2b_state::overrev2b(machine_config &config)
 	model2b(config);
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pe_callback().set(FUNC(model2b_state::drive_board_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
@@ -2988,6 +3004,7 @@ void model2c_state::model2c(machine_config &config)
 	io.in_pc_callback().set_ioport("IN1");
 	io.in_pd_callback().set_ioport("IN2");
 	io.in_pg_callback().set_ioport("SW");
+	io.out_pf_callback().set(FUNC(model2c_state::gen_outputs_w));
 
 	model2_timers(config);
 	model2_screen(config);
@@ -3010,6 +3027,7 @@ void model2c_state::stcc(machine_config &config)
 	model2c(config);
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pe_callback().set(FUNC(model2c_state::drive_board_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
@@ -3067,6 +3085,7 @@ void model2c_state::overrev2c(machine_config &config)
 	model2c(config);
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pe_callback().set(FUNC(model2c_state::drive_board_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");

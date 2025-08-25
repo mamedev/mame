@@ -72,7 +72,8 @@ public:
 		m_copro_data(*this, "copro_data"),
 		m_in0(*this, "IN0"),
 		m_gears(*this, "GEARS"),
-		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
+		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"}),
+		m_output(*this, "output%u", 0U)
 	{ }
 
 	/* Public for access by the rendering functions */
@@ -136,6 +137,7 @@ protected:
 	required_ioport m_in0;
 	optional_ioport m_gears;
 	optional_ioport_array<4> m_lightgun_ports;
+	output_finder<2> m_output;
 
 	u32 m_timervals[4]{};
 	u32 m_timerorig[4]{};
@@ -182,6 +184,7 @@ protected:
 	u8 rchase2_drive_board_r();
 	void rchase2_drive_board_w(u8 data);
 	void drive_board_w(u8 data);
+	void gen_outputs_w(u8 data);
 	u8 lightgun_data_r(offs_t offset);
 	u8 lightgun_mux_r();
 	void lightgun_mux_w(u8 data);
