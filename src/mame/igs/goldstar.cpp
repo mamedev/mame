@@ -291,6 +291,7 @@ public:
 		m_ppi(*this, "ppi8255_%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_ticket_dispenser(*this, "hopper"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -337,6 +338,7 @@ protected:
 	optional_device_array<i8255_device, 3> m_ppi;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<ticket_dispenser_device> m_ticket_dispenser;
 	output_finder<16> m_lamps;
 
 	tilemap_t *m_reel_tilemap[3] {};
@@ -544,8 +546,7 @@ public:
 		m_fl7w4_id(*this, "fl7w4_id"),
 		m_mcu(*this, "mcu"),
 		m_tmcu(*this, "tmcu"),
-		m_nvram(*this, "nvram"),
-		m_ticket_dispenser(*this, "hopper")
+		m_nvram(*this, "nvram")
 	{ }
 
 	void animalw(machine_config &config) ATTR_COLD;
@@ -637,7 +638,6 @@ private:
 	optional_device<m68705p_device> m_mcu;
 	optional_device<i80c51_device> m_tmcu;
 	optional_shared_ptr<uint8_t> m_nvram;
-	optional_device<ticket_dispenser_device> m_ticket_dispenser;
 
 	uint8_t m_nmi_enable = 0U;
 	uint8_t m_vidreg = 0U;
@@ -791,7 +791,7 @@ void wingco_state::machine_start()
 
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_vidreg));
-	m_ticket_dispenser->motor_w(0);
+	//m_ticket_dispenser->motor_w(0);
 }
 
 void unkch_state::machine_start()
@@ -1055,7 +1055,7 @@ void cmaster_state::outport0_w(uint8_t data)
   xxxx ----  unused?
 
 */
-	//popmessage("%02x",data);
+	//popmessage("outport %02x",data);
 	m_enable_reg = data;
 }
 
@@ -2333,6 +2333,10 @@ void cmaster_state::coincount_w(uint8_t data)
 
 //  if (data & 0x86) // triggered by fb2010
 //      popmessage("counters: %02X", data);
+
+	m_ticket_dispenser->motor_w(BIT(data,7));
+//	popmessage("counters-hopper: %02X", data);
+
 }
 
 void cmaster_state::cm_portmap(address_map &map)
@@ -2409,7 +2413,8 @@ void cmaster_state::cmv4zg_portmap(address_map &map)
 	//map(0x08, 0x08).r(); // doesn't seem to affect settings
 	//map(0x09, 0x09).r(); // doesn't seem to affect settings. Maybe some kind of protection routine? See 0xb006 - b003f in dasm.
 	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
-	map(0x11, 0x11).w(FUNC(cmaster_state::coincount_w));
+	//map(0x11, 0x11).w(FUNC(cmaster_state::coincount_w));
+	map(0x0b, 0x0b).w(FUNC(cmaster_state::coincount_w)); // remapped for counters and hopper control (24/08/2025)
 	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
 	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
 	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
@@ -3201,10 +3206,10 @@ static INPUT_PORTS_START( cmv4_service )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) //PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Hopper Coin")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // Hopper presence detect
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Out / Attendant")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper Payout")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")  // on some sets a DSW must be on/off to access this menu
 INPUT_PORTS_END
@@ -10981,6 +10986,8 @@ void goldstar_state::goldstar(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // clock frequency & pin 7 not verified
+	
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(200));
 }
 
 
@@ -11309,6 +11316,8 @@ void cmaster_state::cm(machine_config &config)
 	aysnd.port_a_read_callback().set_ioport("DSW4");
 	aysnd.port_b_read_callback().set_ioport("DSW5");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+	
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
 }
 
 void cmaster_state::cmasterc(machine_config &config)
@@ -11413,6 +11422,9 @@ void cmaster_state::cmast91(machine_config &config)
 	aysnd.port_a_read_callback().set_ioport("DSW4");
 	aysnd.port_b_read_callback().set_ioport("DSW5");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	// payout hardware
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
 }
 
 void cmaster_state::cmast92(machine_config &config)
