@@ -88,7 +88,6 @@ void harddriv_state::device_reset()
 	 *  - Fill ADSP **data RAM** (0x0000–0x1FFF) with 0x5555.
 	 *  - Keep ADSP in reset while poking its internal RAM.
 	 *  - Logs show the test ending with a sweep of W@0000..W@1FFE = 0x5555.
-	 *  - Fixes the hdrivairp "BAD POLY BUFF" error when starting the game.
 	 * -------------------------------------------------------------------- */
 	if (m_adsp && m_ds3xdsp.found())
 	{
