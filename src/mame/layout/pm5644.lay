@@ -1,0 +1,419 @@
+<?xml version="1.0"?>
+
+<mamelayout version="2">
+	<element name="background">
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+	</element>
+
+	<element name="ledg" defstate="1">
+		<disk state="1">
+			<color red="0.2" green="1.0" blue="0.2" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.3" blue="0.2" />
+		</disk>
+	</element>
+
+	<element name="ledr" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.2" blue="0.2" />
+		</disk>
+		<disk state="0">
+			<color red="0.3" green="0.2" blue="0.2" />
+		</disk>
+	</element>
+
+	<element name="label">
+		<rect>
+			<color red="0.2" green="0.2" blue="0.6" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+		<text string="PM">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="1.5" y="0" width="2" height="1" />
+		</text>
+		<text string="5644">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="4" y="0" width="2" height="1" />
+		</text>
+		<text string="color pattern generator">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="6" y="0" width="10" height="1" />
+		</text>
+	</element>
+
+	<element name="button" defstate="0">
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds x="0" y="1" width="1" height="1" />
+		</rect>
+
+		<disk state="1">
+			<color red="0.2" green="1.0" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.3" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+
+		<text string="">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="1" height="0.5" />
+		</text>
+		<text string="">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.5" />
+		</text>
+	</element>
+
+	<element name="button1" defstate="0">
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds x="0" y="1" width="1" height="1" />
+		</rect>
+
+		<disk state="1">
+			<color red="0.2" green="1.0" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.3" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+
+		<text string="TEST">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="1" height="0.5" />
+		</text>
+		<text string="PATTERN">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.5" />
+		</text>
+	</element>
+
+	<element name="button2" defstate="0">
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds x="0" y="1" width="1" height="1" />
+		</rect>
+
+		<disk state="1">
+			<color red="0.2" green="1.0" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.3" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+
+		<text string="COLOR">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="1" height="0.5" />
+		</text>
+		<text string="BAR">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.5" />
+		</text>
+	</element>
+
+	<element name="button3" defstate="0">
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds x="0" y="1" width="1" height="1" />
+		</rect>
+
+		<disk state="1">
+			<color red="0.2" green="1.0" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.3" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+
+		<text string="CROSS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="1" height="0.5" />
+		</text>
+		<text string="HATCH">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.5" />
+		</text>
+	</element>
+
+	<element name="button4" defstate="0">
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds x="0" y="1" width="1" height="1" />
+		</rect>
+
+		<disk state="1">
+			<color red="0.2" green="1.0" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.3" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+
+		<text string="WINDOW">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="1" height="0.5" />
+		</text>
+	</element>
+
+	<element name="button5" defstate="0">
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds x="0" y="1" width="1" height="1" />
+		</rect>
+
+		<disk state="1">
+			<color red="0.2" green="1.0" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.3" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+
+		<text string="MULTI">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="1" height="0.5" />
+		</text>
+		<text string="BURST">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.5" />
+		</text>
+	</element>
+
+	<element name="button6" defstate="0">
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds x="0" y="1" width="1" height="1" />
+		</rect>
+
+		<disk state="1">
+			<color red="0.2" green="1.0" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.3" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+
+		<text string="PULSE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="1" height="0.5" />
+		</text>
+		<text string="&amp; BAR">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.5" />
+		</text>
+	</element>
+
+	<element name="button7" defstate="0">
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds x="0" y="1" width="1" height="1" />
+		</rect>
+
+		<disk state="1">
+			<color red="0.2" green="1.0" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.3" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+
+		<text string="LINE-">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="1" height="0.5" />
+		</text>
+		<text string="ARITY">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.5" />
+		</text>
+	</element>
+
+	<element name="button8" defstate="0">
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds x="0" y="1" width="1" height="1" />
+		</rect>
+
+		<disk state="1">
+			<color red="0.2" green="1.0" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.3" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+
+		<text string="SIN X/Y">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="1" height="0.5" />
+		</text>
+	</element>
+
+	<element name="button9" defstate="0">
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds x="0" y="1" width="1" height="1" />
+		</rect>
+
+		<disk state="1">
+			<color red="0.2" green="1.0" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.3" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+
+		<text string="LIVE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="1" height="0.5" />
+		</text>
+	</element>
+
+	<element name="button10" defstate="0">
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds x="0" y="1" width="1" height="1" />
+		</rect>
+
+		<disk state="1">
+			<color red="0.2" green="1.0" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.3" blue="0.2" />
+			<bounds x="0.25" y="1.25" width="0.5" height="0.5" />
+		</disk>
+
+		<text string="APL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="1" height="0.5" />
+		</text>
+
+	</element>
+
+	<view name="Internal Layout">
+		<bounds left="0" right="48" top="0" bottom="4" />
+		<element ref="background">
+			<bounds left="0" right="48" top="0" bottom="4" />
+		</element>
+
+		<element name="label" ref="label">
+			<bounds x="1" y="0" width="16" height="1" />
+		</element>
+
+		<element name="ledpw" ref="ledg" defstate="0">
+			<bounds x="5" y="2" width="1" height="1" />
+		</element>
+
+		<element name="led26" ref="ledr"> <!-- remote -->
+			<bounds x="7" y="2" width="1" height="1" />
+		</element>
+
+		<element name="led27" ref="ledr"> <!-- int/ext -->
+			<bounds x="9" y="2" width="1" height="1" />
+		</element>
+
+
+		<element name="led21" ref="ledr"> <!-- vert id off -->
+			<bounds x="10" y="2" width="1" height="1" />
+		</element>
+
+		<element name="led22" ref="ledr">
+			<bounds x="11" y="2" width="1" height="1" />
+		</element>
+
+		<element name="led23" ref="ledr">
+			<bounds x="12" y="2" width="1" height="1" />
+		</element>
+
+		<element name="led24" ref="ledr">
+			<bounds x="13" y="2" width="1" height="1" />
+		</element>
+
+		<element name="led25" ref="ledr">
+			<bounds x="14" y="2" width="1" height="1" />
+		</element>
+
+
+		<element name="led0" inputtag="COL3" inputmask="0x01" ref="button1">
+			<bounds x="24" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led1" inputtag="COL2" inputmask="0x01" ref="button2">
+			<bounds x="25" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led2" inputtag="COL1" inputmask="0x01" ref="button3">
+			<bounds x="26" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led3" inputtag="COL0" inputmask="0x01" ref="button4">
+			<bounds x="27" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led4" inputtag="COL3" inputmask="0x02" ref="button5">
+			<bounds x="28" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led5" inputtag="COL2" inputmask="0x02" ref="button6">
+			<bounds x="29" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led6" inputtag="COL1" inputmask="0x02" ref="button7">
+			<bounds x="30" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led7" inputtag="COL0" inputmask="0x02" ref="button8">
+			<bounds x="31" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led10" inputtag="COL3" inputmask="0x04" ref="button9">
+			<bounds x="32" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led11" inputtag="COL2" inputmask="0x04" ref="button10">
+			<bounds x="33" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led12" inputtag="COL1" inputmask="0x04" ref="button">
+			<bounds x="35" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led13" inputtag="COL0" inputmask="0x04" ref="button">
+			<bounds x="36" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led14" ref="button">
+			<bounds x="37" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led15" ref="button">
+			<bounds x="38" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led16" ref="button">
+			<bounds x="39" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led17" ref="button">
+			<bounds x="40" y="1" width="1" height="2" />
+		</element>
+
+		<element name="led20" ref="button">
+			<bounds x="41" y="1" width="1" height="2" />
+		</element>
+	</view>
+</mamelayout>
