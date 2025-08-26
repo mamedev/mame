@@ -860,9 +860,6 @@ ROM_START(acw443)
 
 	ROM_REGION(0x40000, "vsm", ROMREGION_ERASE00)
 	ROM_LOAD("cm62024.bin", 0x3c000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
-
-	DISK_REGION("1mhzbus:awhd:scsi:0:acb4000a:image")
-	DISK_IMAGE("acw_panos14", 0, BAD_DUMP SHA1(9b9bad7197c9b1193342d9d60fe3f7a465afd99a)) // NEC D5126 with clean Panos 1.4 installation
 ROM_END
 
 
