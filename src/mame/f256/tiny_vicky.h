@@ -54,7 +54,7 @@ private:
     // raster
     rgb_t get_text_lut(uint8_t color_index, bool fg, bool gamma);
     rgb_t get_lut_value(uint8_t lut_index, uint8_t pix_val, bool gamma);
-    void draw_text(uint32_t *row, uint8_t mcr, bool enable_gamma, uint8_t brd_x, uint8_t brd_y, uint16_t line, uint16_t x_res, uint16_t y_res);
+    void draw_text(uint32_t *row, uint8_t mcr, bool enable_gamma, uint8_t brd_x, uint8_t brd_y, uint16_t line, uint16_t x_res, uint16_t y_res, u64 frame_number);
     void draw_bitmap(uint32_t *row, bool enable_gamma, uint8_t layer, bool bkgrnd, rgb_t bgndColor, uint8_t borderXSize, uint8_t borderYSize, uint16_t line, uint16_t width);
     void draw_sprites(uint32_t *row, bool enable_gamma, uint8_t layer, bool bkgrnd, uint8_t borderXSize, uint8_t borderYSize, uint16_t line, uint16_t width, uint16_t height);
     void draw_tiles(uint32_t *row, bool enable_gamma, uint8_t layer, bool bkgrnd, uint8_t borderXSize, uint16_t line, uint16_t width);
@@ -72,7 +72,6 @@ private:
     // cursor handling routines
     bool m_cursor_visible = false;
     bool m_enable_cursor_flash = true;
-    uint8_t m_cursor_counter = 0;
     uint8_t m_cursor_flash_rate = 60;
 
 

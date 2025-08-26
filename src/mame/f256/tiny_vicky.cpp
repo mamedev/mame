@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Daniel Tremblay
 #include "emu.h"
-#include "tiny_vicky.h"
-
-#include "machine/ram.h"
 #include "screen.h"
+#include "tiny_vicky.h"
+#include "machine/ram.h"
+
 
 DEFINE_DEVICE_TYPE(TINY_VICKY, tiny_vicky_video_device, "tiny_vicky", "F256K Tiny Vicky")
 
@@ -55,11 +55,7 @@ uint32_t tiny_vicky_video_device::screen_update(screen_device &screen, bitmap_rg
     {
         uint8_t mcr = m_iopage0_ptr[0x1000];
         uint8_t mcr_h = m_iopage0_ptr[0x1001];
-        m_cursor_counter++;
-        if (m_cursor_counter > m_cursor_flash_rate *2)
-        {
-            m_cursor_counter = 0;
-        }
+
         // if MCR=0 or MCR bit 7 is set, then video is disabled
         if (mcr != 0 && (mcr != 0x80))
         {
@@ -199,7 +195,12 @@ uint32_t tiny_vicky_video_device::screen_update(screen_device &screen, bitmap_rg
                     // Only display text in these cases
                     if ((mcr & 0x7) == 1 || (mcr & 0x7) == 3 || (mcr & 0x7) == 7)
                     {
-                        draw_text(row, mcr, enable_gamma, border_x, border_y, y, (uint16_t)640, (uint16_t)lines);
+                        // m_cursor_counter++;
+                        // if (m_cursor_counter > m_cursor_flash_rate *2)
+                        // {
+                        //     m_cursor_counter = 0;
+                        // }
+                        draw_text(row, mcr, enable_gamma, border_x, border_y, y, (uint16_t)640, (uint16_t)lines, screen.frame_number());
                     }
                 }
                 draw_mouse(row, enable_gamma, y, (uint16_t)640, (uint16_t)lines);
@@ -211,7 +212,7 @@ uint32_t tiny_vicky_video_device::screen_update(screen_device &screen, bitmap_rg
 }
 
 
-void tiny_vicky_video_device::draw_text(uint32_t *row, uint8_t mcr, bool enable_gamma, uint8_t brd_x, uint8_t brd_y, uint16_t line, uint16_t x_res, uint16_t y_res)
+void tiny_vicky_video_device::draw_text(uint32_t *row, uint8_t mcr, bool enable_gamma, uint8_t brd_x, uint8_t brd_y, uint16_t line, uint16_t x_res, uint16_t y_res, u64 frame_number)
 {
     bool overlay = (mcr & 0x2) != 0;
     uint8_t mcrh = m_iopage0_ptr[0x1001] & 0x3f;
@@ -251,7 +252,7 @@ void tiny_vicky_video_device::draw_text(uint32_t *row, uint8_t mcr, bool enable_
     }
     int screen_x = brd_x;
     // I'm assuming that if m_enable_cursor_flash is 0, then the cursor is always visible
-    m_cursor_visible = enable_cursor && (m_enable_cursor_flash && (m_cursor_counter < m_cursor_flash_rate));
+    m_cursor_visible = enable_cursor && (m_enable_cursor_flash && ((frame_number % (2 * m_cursor_flash_rate)) < m_cursor_flash_rate));
     // the loop should go to txt_cols - going to 80 causes a weird alias, but the machine works this way... so.
     for (int col = 0; col < 80; col++)
     {

@@ -5,25 +5,29 @@
 
 #pragma once
 
-#include "machine/ram.h"
-#include "screen.h"
-#include "machine/bq4847.h"
-#include "machine/6522via.h"
-#include "sound/sn76496.h"
-#include "sound/ymopl.h"
-#include "sound/mos6581.h"
-#include "utf8.h"
-#include "tiny_vicky.h"
-#include "speaker.h"
-#include "machine/spi_sdcard.h"
-// PS/2 mouse and keyboard
-#include "bus/pc_kbd/pc_kbdc.h"
-#include "bus/pc_kbd/hle_mouse.h"
-#include "debug/debugcon.h"
 #include "debugger.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "tiny_vicky.h"
+#include "utf8.h"
+// PS/2 mouse and keyboard
+#include "bus/pc_kbd/hle_mouse.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "debug/debugcon.h"
+// VIA and RTC
+#include "machine/6522via.h"
+#include "machine/bq4847.h"
+#include "machine/ins8250.h"
+#include "machine/ram.h"
+#include "machine/spi_sdcard.h"
+#include "sound/sn76496.h"
+#include "sound/mos6581.h"
+#include "sound/ymopl.h"
+
 //#include "bus/cbmiec/cbmiec.h"
 //#include "bus/cbmiec/c1581.h"
-#include "machine/ins8250.h"
+
 
 #define MASTER_CLOCK        (XTAL(25'175'000))
 #define MUSIC_CLOCK         (XTAL(14'318'181))
