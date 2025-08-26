@@ -1223,6 +1223,8 @@ if (BUSES["COLECO_CART"]~=null) then
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/activision.h",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/megacart.cpp",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/megacart.h",
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/sgc.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/sgc.h",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/std.cpp",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/std.h",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/xin1.h",
