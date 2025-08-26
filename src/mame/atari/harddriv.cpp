@@ -1063,13 +1063,13 @@ static INPUT_PORTS_START( racedrivc )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - force brake */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_REVERSE PORT_NAME("Force Brake")
+	PORT_BIT( 0xff, 0x20, IPT_PEDAL2 ) PORT_MINMAX(0x20, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(40) PORT_REVERSE PORT_NAME("Force Brake")
 
 	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
-	PORT_BIT(0xfff, 0x800, IPT_PADDLE) PORT_MINMAX(0x010, 0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x010, 0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
 	PORT_START("mainpcb:12BADC.1")
@@ -1338,7 +1338,7 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
-	PORT_BIT(0xfff, 0x200, IPT_PADDLE) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
+	PORT_BIT( 0xfff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
 	PORT_START("mainpcb:12BADC.1")       /* FAKE */
@@ -1428,7 +1428,7 @@ static INPUT_PORTS_START( hdrivair )
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
 
 	PORT_START("mainpcb:12BADC.0")       /* 400000 - steering wheel */
-	PORT_BIT(0xfff, 0x200, IPT_PADDLE) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_REVERSE PORT_NAME("Steering Wheel")
+	PORT_BIT( 0xfff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_REVERSE PORT_NAME("Steering Wheel")
 
 	/* dummy ADC ports to end up with the same number as the full version */
 	PORT_START("mainpcb:12BADC.1")
