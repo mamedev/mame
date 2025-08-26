@@ -26,7 +26,12 @@ The audio section also has unpopulated space marked for a YMZ280.
 
 
 TODO:
-- everything
+- lamps
+- hopper
+- EEPROM?
+- battery backed RAM
+- tilemaps (once a game which uses them is dumped)
+- priorities (once a game which uses them is dumped)
 */
 
 #include "emu.h"
@@ -49,7 +54,8 @@ public:
 	bpsc68000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_spriteram(*this, "spriteram")
 	{ }
 
 	void bpsc68000(machine_config &config) ATTR_COLD;
@@ -61,6 +67,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	required_shared_ptr<uint16_t> m_spriteram;
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void prg_map(address_map &map) ATTR_COLD;
@@ -71,21 +80,44 @@ void bpsc68000_state::video_start()
 {
 }
 
+void bpsc68000_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
+	{
+		if (!BIT(m_spriteram[offs], 2))
+			continue;
+
+		int const sprite = m_spriteram[offs + 1];
+		int const x = m_spriteram[offs + 2];
+		int const y = m_spriteram[offs + 3] ;
+		int const flipx = 0; // TODO
+		int const flipy = 0; // TODO
+		int const color = m_spriteram[offs] >> 8;
+
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite, color, flipx, flipy, x, y, 0);
+	}
+}
+
 uint32_t bpsc68000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	draw_sprites(bitmap, cliprect);
+
 	return 0;
 }
 
 
 void bpsc68000_state::prg_map(address_map &map)
 {
-	map.unmap_value_high(); // TODO: remove once more about the hw is figured out
-
 	map(0x000000, 0x01ffff).rom();
-	map(0x200000, 0x20ffff).ram();
-	// map(0xa00000, 0xa00001).r() // inputs?
-	// map(0xa00002, 0xa00003).r() // inputs??
-	// map(0xc00000, 0xc0002b).rw(); // video regs?
+	map(0x200000, 0x2001ff).ram().w("palette", FUNC(palette_device::write16)).share("palette"); // TODO: surely bigger, adjust when a game using tilemaps is dumped
+	map(0x200200, 0x20dfff).ram();
+	map(0x20e000, 0x20ffff).ram().share(m_spriteram);
+	map(0xa00000, 0xa00001).portr("DSW1");
+	map(0xa00002, 0xa00003).portr("DSW2");
+	// TODO: various reads and writes in the 0xc00000-0xc0002f range
+	map(0xc00026, 0xc00027).portr("IN0");
+	map(0xc00028, 0xc00029).portr("IN1");
+	map(0xc0002a, 0xc0002b).portr("IN2");
 	map(0x800001, 0x800001).w("oki", FUNC(okim6295_device::write));
 	map(0xe00000, 0xe07fff).ram();
 }
@@ -93,72 +125,91 @@ void bpsc68000_state::prg_map(address_map &map)
 
 static INPUT_PORTS_START( lnumbers )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(4)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(4)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(4)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(4)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) // 100 Yen
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // Medal
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // Medal sensor
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:2")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:5")
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:1")
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:2")
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:3")
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:4")
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:5")
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:6")
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8")
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0e, 0x0e, "Payout %" ) PORT_DIPLOCATION("DSW1:2,3,4")
+	PORT_DIPSETTING(    0x0e, "55" )
+	PORT_DIPSETTING(    0x0c, "60" )
+	PORT_DIPSETTING(    0x0a, "65" )
+	PORT_DIPSETTING(    0x08, "70" )
+	PORT_DIPSETTING(    0x06, "75" )
+	PORT_DIPSETTING(    0x04, "80" )
+	PORT_DIPSETTING(    0x02, "85" )
+	PORT_DIPSETTING(    0x00, "90" )
+	PORT_DIPNAME( 0x10, 0x10, "Winwave" ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, "Small" )
+	PORT_DIPSETTING(    0x00, "Big" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6") // no effect in test mode
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7") // no effect in test mode
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8") // no effect in test mode
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW2:1,2,3,4") // Medals for 100 Yen
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_8C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_9C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x06, "1 Coin/11 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Coin/12 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin/13 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin/14 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin/15 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin/16 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/17 Credits" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:5") // no effect in test mode
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:6") // no effect in test mode
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7") // no effect in test mode
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8") // no effect in test mode
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -177,17 +228,17 @@ void bpsc68000_state::bpsc68000(machine_config &config)
 	// NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0, 320-1, 16, 240-1);
+	screen.set_size(64*8, 32*8); // TODO
+	screen.set_visarea(0, 256-1, 0, 224-1);
 	screen.set_screen_update(FUNC(bpsc68000_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx);
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x400);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x100);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -202,8 +253,8 @@ ROM_START( lnumbers )
 	ROM_LOAD16_WORD_SWAP( "s197_a01.prog16b.u15", 0x00000, 0x20000, CRC(b824a0ed) SHA1(ea8ef81d17896205f89d330066a23c459ab5e668) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD( "s197_a04.obj1.u24", 0x00000, 0x80000, CRC(e70f4f14) SHA1(030bbbe2da07a9b8c3a8c7055799e89113bad16b) )
-	ROM_LOAD( "s197_a03_obj2.u25", 0x80000, 0x80000, CRC(5d5955e8) SHA1(aea84b08ed639b2bacada1c4ade9760b2599cfc7) )
+	ROM_LOAD( "s197_a03_obj2.u25", 0x00000, 0x80000, CRC(5d5955e8) SHA1(aea84b08ed639b2bacada1c4ade9760b2599cfc7) )
+	ROM_LOAD( "s197_a04.obj1.u24", 0x80000, 0x80000, CRC(e70f4f14) SHA1(030bbbe2da07a9b8c3a8c7055799e89113bad16b) )
 	// unpopulated OBJ3 / OBJ4 space at u26 / u27
 
 	// unpopulated BG1 space at u31
