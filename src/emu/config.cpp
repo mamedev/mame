@@ -156,6 +156,8 @@ bool configuration_manager::attempt_load(game_driver const &system, emu_file &fi
 
 bool configuration_manager::load_xml(game_driver const &system, emu_file &file, config_type which_type)
 {
+	using namespace std::literals;
+
 	// read the file
 	util::xml::file::ptr const root(util::xml::file::read(file, nullptr));
 	if (!root)
@@ -165,7 +167,7 @@ bool configuration_manager::load_xml(game_driver const &system, emu_file &file, 
 	}
 
 	// find the config node
-	util::xml::data_node const *const confignode = root->get_child("mameconfig");
+	util::xml::data_node const *const confignode = root->get_child("mameconfig"sv);
 	if (!confignode)
 	{
 		osd_printf_warning("Could not find root mameconfig element in configuration file %s\n", file.filename());
@@ -173,7 +175,7 @@ bool configuration_manager::load_xml(game_driver const &system, emu_file &file, 
 	}
 
 	// validate the config data version
-	int const version = confignode->get_attribute_int("version", 0);
+	int const version = confignode->get_attribute_int("version"sv, 0);
 	if (version != CONFIG_VERSION)
 	{
 		osd_printf_warning("Configuration file %s has unsupported version %d\n", file.filename(), version);
@@ -193,10 +195,10 @@ bool configuration_manager::load_xml(game_driver const &system, emu_file &file, 
 
 	// loop over all system nodes in the file
 	int count = 0;
-	for (util::xml::data_node const *systemnode = confignode->get_child("system"); systemnode; systemnode = systemnode->get_next_sibling("system"))
+	for (util::xml::data_node const *systemnode = confignode->get_child("system"sv); systemnode; systemnode = systemnode->get_next_sibling("system"sv))
 	{
 		// look up the name of the system here; skip if none
-		char const *name = systemnode->get_attribute_string("name", "");
+		std::string_view name = systemnode->get_attribute_string("name"sv);
 
 		// based on the file type, determine whether we have a match
 		config_level level = config_level::DEFAULT;
@@ -204,7 +206,7 @@ bool configuration_manager::load_xml(game_driver const &system, emu_file &file, 
 		{
 		case config_type::SYSTEM:
 			// only match on the specific system name
-			if (strcmp(name, system.name))
+			if (name != system.name)
 			{
 				osd_printf_verbose("Ignoring configuration for system %s in system configuration file %s\n", name, file.filename());
 				continue;
@@ -214,7 +216,7 @@ bool configuration_manager::load_xml(game_driver const &system, emu_file &file, 
 
 		case config_type::DEFAULT:
 			// only match on default
-			if (strcmp(name, "default"))
+			if (name != "default"sv)
 			{
 				osd_printf_verbose("Ignoring configuration for system %s in default configuration file %s\n", name, file.filename());
 				continue;
@@ -226,24 +228,24 @@ bool configuration_manager::load_xml(game_driver const &system, emu_file &file, 
 			{
 				// match on: default, system name, source file name, parent name, grandparent name
 				int clone_of;
-				if (!strcmp(name, "default"))
+				if (name == "default"sv)
 				{
 					osd_printf_verbose("Applying default configuration from controller configuration file %s\n", file.filename());
 					level = config_level::DEFAULT;
 				}
-				else if (!strcmp(name, system.name))
+				else if (name == system.name)
 				{
 					osd_printf_verbose("Applying configuration for system %s from controller configuration file %s\n", name, file.filename());
 					level = config_level::SYSTEM;
 				}
-				else if (!strcmp(name, srcfile))
+				else if (name == srcfile)
 				{
 					osd_printf_verbose("Applying configuration for source file %s from controller configuration file %s\n", name, file.filename());
 					level = config_level::SOURCE;
 				}
 				else if (
-						((clone_of = driver_list::clone(system)) != -1 && !strcmp(name, driver_list::driver(clone_of).name)) ||
-						(clone_of != -1 && ((clone_of = driver_list::clone(clone_of)) != -1) && !strcmp(name, driver_list::driver(clone_of).name)))
+						((clone_of = driver_list::clone(system)) != -1 && name == driver_list::driver(clone_of).name) ||
+						(clone_of != -1 && ((clone_of = driver_list::clone(clone_of)) != -1) && name == driver_list::driver(clone_of).name))
 				{
 					osd_printf_verbose("Applying configuration for parent/BIOS %s from controller configuration file %s\n", name, file.filename());
 					level = (driver_list::driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) ? config_level::BIOS : config_level::PARENT;
@@ -265,7 +267,7 @@ bool configuration_manager::load_xml(game_driver const &system, emu_file &file, 
 
 		// loop over all registrants and call their load function
 		for (auto const &type : m_typelist)
-			type.second.load(which_type, level, systemnode->get_child(type.first.c_str()));
+			type.second.load(which_type, level, systemnode->get_child(type.first));
 		count++;
 
 		// save unhandled settings for default and system types
@@ -289,35 +291,37 @@ bool configuration_manager::load_xml(game_driver const &system, emu_file &file, 
 
 bool configuration_manager::save_xml(emu_file &file, config_type which_type)
 {
+	using namespace std::literals;
+
 	// if we cant't create a root node, bail
 	util::xml::file::ptr root(util::xml::file::create());
 	if (!root)
 		return false;
 
 	// create a config node
-	util::xml::data_node *const confignode = root->add_child("mameconfig", nullptr);
+	util::xml::data_node *const confignode = root->add_child("mameconfig"sv);
 	if (!confignode)
 		return false;
-	confignode->set_attribute_int("version", CONFIG_VERSION);
+	confignode->set_attribute_int("version"sv, CONFIG_VERSION);
 
 	// create a system node
-	util::xml::data_node *const systemnode = confignode->add_child("system", nullptr);
+	util::xml::data_node *const systemnode = confignode->add_child("system"sv);
 	if (!systemnode)
 		return false;
-	systemnode->set_attribute("name", (which_type == config_type::DEFAULT) ? "default" : machine().system().name);
+	systemnode->set_attribute("name"sv, (which_type == config_type::DEFAULT) ? "default"sv : std::string(machine().system().name));
 
 	// loop over all registrants and call their save function
 	util::xml::data_node *curnode = nullptr;
 	for (auto const &type : m_typelist)
 	{
-		if (!curnode || (type.first != curnode->get_name()))
-			curnode = systemnode->add_child(type.first.c_str(), nullptr);
+		if (!curnode || (type.first != curnode->name()))
+			curnode = systemnode->add_child(type.first);
 		if (!curnode)
 			return false;
 		type.second.save(which_type, curnode);
 
 		// if nothing was added, just nuke the node
-		if (!curnode->get_value() && !curnode->get_first_child() && !curnode->count_attributes())
+		if (curnode->value().empty() && !curnode->get_first_child() && !curnode->count_attributes())
 		{
 			curnode->delete_node();
 			curnode = nullptr;
@@ -351,8 +355,8 @@ void configuration_manager::save_unhandled(
 {
 	for (util::xml::data_node const *curnode = systemnode.get_first_child(); curnode; curnode = curnode->get_next_sibling())
 	{
-		auto const handler = m_typelist.lower_bound(curnode->get_name());
-		if ((m_typelist.end() == handler) || (handler->first != curnode->get_name()))
+		auto const handler = m_typelist.lower_bound(curnode->name());
+		if ((m_typelist.end() == handler) || (handler->first != curnode->name()))
 		{
 			if (!unhandled)
 				unhandled = util::xml::file::create();

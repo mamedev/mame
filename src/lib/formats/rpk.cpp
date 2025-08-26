@@ -129,29 +129,30 @@ std::error_condition rpk_reader::read(std::unique_ptr<util::random_read> &&strea
 	layout_xml_text.reset();
 
 	// now we work within the XML tree
+	using namespace std::literals;
 
 	// romset is the root node
-	util::xml::data_node const *const romset_node = layout_xml->get_child("romset");
+	util::xml::data_node const *const romset_node = layout_xml->get_child("romset"sv);
 	if (!romset_node)
 		return error::INVALID_LAYOUT; // document element must be <romset>
 
 	// resources is a child of romset
-	util::xml::data_node const *const resources_node = romset_node->get_child("resources");
+	util::xml::data_node const *const resources_node = romset_node->get_child("resources"sv);
 	if (!resources_node)
 		return error::INVALID_LAYOUT; // <romset> must have a <resources> child
 
 	// configuration is a child of romset; we're actually interested in ...
-	util::xml::data_node const *const configuration_node = romset_node->get_child("configuration");
+	util::xml::data_node const *const configuration_node = romset_node->get_child("configuration"sv);
 	if (!configuration_node)
 		return error::INVALID_LAYOUT; // <romset> must have a <configuration> child
 
 	// ... pcb, which is a child of configuration
-	util::xml::data_node const *const pcb_node = configuration_node->get_child("pcb");
+	util::xml::data_node const *const pcb_node = configuration_node->get_child("pcb"sv);
 	if (!pcb_node)
 		return error::INVALID_LAYOUT; // <configuration> must have a <pcb> child
 
 	// we'll try to find the PCB type on the provided type list.
-	std::string const *const pcb_type_string = pcb_node->get_attribute_string_ptr("type");
+	std::string const *const pcb_type_string = pcb_node->get_attribute_string_ptr("type"sv);
 	if (!pcb_type_string)
 		return error::INVALID_LAYOUT; // <pcb> must have a 'type' attribute";
 	int pcb_type = 0;
@@ -166,14 +167,16 @@ std::error_condition rpk_reader::read(std::unique_ptr<util::random_read> &&strea
 	// find the sockets and load their respective resource
 	for (util::xml::data_node const *socket_node = pcb_node->get_first_child(); socket_node; socket_node = socket_node->get_next_sibling())
 	{
-		if (strcmp(socket_node->get_name(), "socket") != 0)
+		using namespace std::literals;
+
+		if (socket_node->name() != "socket"sv)
 			return error::INVALID_LAYOUT; // <pcb> element has only <socket> children
 
-		std::string const *const id = socket_node->get_attribute_string_ptr("id");
+		std::string const *const id = socket_node->get_attribute_string_ptr("id"sv);
 		if (!id)
 			return error::INVALID_LAYOUT; // <socket> must have an 'id' attribute
 
-		std::string const *const uses_name = socket_node->get_attribute_string_ptr("uses");
+		std::string const *const uses_name = socket_node->get_attribute_string_ptr("uses"sv);
 		if (!uses_name)
 			return error::INVALID_LAYOUT; // <socket> must have a 'uses' attribute"
 
@@ -181,7 +184,7 @@ std::error_condition rpk_reader::read(std::unique_ptr<util::random_read> &&strea
 		util::xml::data_node const *resource_node = nullptr;
 		for (util::xml::data_node const *this_resource_node = resources_node->get_first_child(); this_resource_node; this_resource_node = this_resource_node->get_next_sibling())
 		{
-			std::string const *const resource_name = this_resource_node->get_attribute_string_ptr("id");
+			std::string const *const resource_name = this_resource_node->get_attribute_string_ptr("id"sv);
 			if (!resource_name)
 				return error::INVALID_LAYOUT; // resource node must have an 'id' attribute
 
@@ -195,13 +198,13 @@ std::error_condition rpk_reader::read(std::unique_ptr<util::random_read> &&strea
 			return error::INVALID_RESOURCE_REF; // *uses_name
 
 		// process the resource
-		if (!strcmp(resource_node->get_name(), "rom"))
+		if (resource_node->name() == "rom"sv)
 		{
 			std::error_condition err = file->add_rom_socket(std::string(*id), *resource_node);
 			if (err)
 				return err;
 		}
-		else if (!strcmp(resource_node->get_name(), "ram"))
+		else if (resource_node->name() == "ram"sv)
 		{
 			if (!m_supports_ram)
 				return error::UNSUPPORTED_RPK_FEATURE; // <ram> is not supported by this system
@@ -250,14 +253,16 @@ rpk_file::~rpk_file()
 
 std::error_condition rpk_file::add_rom_socket(std::string &&id, const util::xml::data_node &rom_resource_node)
 {
+	using namespace std::literals;
+
 	// find the file attribute (required)
-	std::string const *const file = rom_resource_node.get_attribute_string_ptr("file");
+	std::string const *const file = rom_resource_node.get_attribute_string_ptr("file"sv);
 	if (!file)
 		return rpk_reader::error::INVALID_LAYOUT; // <rom> must have a 'file' attribute
 
 	// check for crc (optional)
 	std::optional<util::hash_collection> hashes;
-	std::string const *const crcstr = rom_resource_node.get_attribute_string_ptr("crc");
+	std::string const *const crcstr = rom_resource_node.get_attribute_string_ptr("crc"sv);
 	if (crcstr)
 	{
 		if (!hashes)
@@ -266,7 +271,7 @@ std::error_condition rpk_file::add_rom_socket(std::string &&id, const util::xml:
 	}
 
 	// check for sha1 (optional)
-	std::string const *const sha1 = rom_resource_node.get_attribute_string_ptr("sha1");
+	std::string const *const sha1 = rom_resource_node.get_attribute_string_ptr("sha1"sv);
 	if (sha1)
 	{
 		if (!hashes.has_value())
@@ -286,8 +291,10 @@ std::error_condition rpk_file::add_rom_socket(std::string &&id, const util::xml:
 
 std::error_condition rpk_file::add_ram_socket(std::string &&id, const util::xml::data_node &ram_resource_node)
 {
+	using namespace std::literals;
+
 	// find the length attribute
-	std::string const *const length_string = ram_resource_node.get_attribute_string_ptr("length");
+	std::string const *const length_string = ram_resource_node.get_attribute_string_ptr("length"sv);
 	if (!length_string)
 		return rpk_reader::error::MISSING_RAM_LENGTH;
 
@@ -324,8 +331,8 @@ std::error_condition rpk_file::add_ram_socket(std::string &&id, const util::xml:
 
 	// determine the type of RAM
 	rpk_socket::socket_type type;
-	std::string const *const ram_type = ram_resource_node.get_attribute_string_ptr("type");
-	if (ram_type && *ram_type == "persistent")
+	std::string const *const ram_type = ram_resource_node.get_attribute_string_ptr("type"sv);
+	if (ram_type && *ram_type == "persistent"sv)
 		type = rpk_socket::socket_type::PERSISTENT_RAM;
 	else
 		type = rpk_socket::socket_type::RAM;
@@ -334,7 +341,7 @@ std::error_condition rpk_file::add_ram_socket(std::string &&id, const util::xml:
 	std::string file;
 	if (type == rpk_socket::socket_type::PERSISTENT_RAM)
 	{
-		std::string const *const ram_filename = ram_resource_node.get_attribute_string_ptr("file");
+		std::string const *const ram_filename = ram_resource_node.get_attribute_string_ptr("file"sv);
 		if (ram_filename == nullptr)
 			return rpk_reader::error::INVALID_RAM_SPEC; // <ram type='persistent'> must have a 'file' attribute
 		file = *ram_filename;

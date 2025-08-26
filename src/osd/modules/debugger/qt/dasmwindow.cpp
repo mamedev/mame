@@ -156,9 +156,9 @@ void DasmWindow::restoreConfiguration(util::xml::data_node const &node)
 	}
 
 	util::xml::data_node const *const expression = node.get_child(NODE_WINDOW_EXPRESSION);
-	if (expression && expression->get_value())
+	if (expression && !expression->value().empty())
 	{
-		m_inputEdit->setText(QString::fromUtf8(expression->get_value()));
+		m_inputEdit->setText(QString::fromUtf8(expression->value().c_str()));
 		expressionSubmitted();
 	}
 

@@ -221,7 +221,7 @@ void DebuggerView::saveConfigurationToNode(util::xml::data_node &node)
 {
 	if (m_view->cursor_supported())
 	{
-		util::xml::data_node *const selection = node.add_child(NODE_WINDOW_SELECTION, nullptr);
+		util::xml::data_node *const selection = node.add_child(NODE_WINDOW_SELECTION);
 		if (selection)
 		{
 			debug_view_xy const pos = m_view->cursor_position();

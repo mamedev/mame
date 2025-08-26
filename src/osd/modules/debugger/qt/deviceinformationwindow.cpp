@@ -115,7 +115,7 @@ void DeviceInformationWindow::fill_device_information()
 	setCentralWidget(mainWindowFrame);
 }
 
-void DeviceInformationWindow::set_device(const char *tag)
+void DeviceInformationWindow::set_device(std::string_view tag)
 {
 	m_device = m_machine.root_device().subdevice(tag);
 	if (!m_device)

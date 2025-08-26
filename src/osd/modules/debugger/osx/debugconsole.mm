@@ -433,7 +433,7 @@
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	[super saveConfigurationToNode:node];
 	node->set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_CONSOLE);
-	util::xml::data_node *const splits = node->add_child(osd::debugger::NODE_WINDOW_SPLITS, nullptr);
+	util::xml::data_node *const splits = node->add_child(osd::debugger::NODE_WINDOW_SPLITS);
 	if (splits)
 	{
 		splits->set_attribute_float(osd::debugger::ATTR_SPLITS_CONSOLE_STATE,
