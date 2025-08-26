@@ -40425,16 +40425,20 @@ wmegam2
 xeye
 
 @source:sega/megadriv_acbl.cpp
+3in1mbc
 aladmdb
 barekch
 barek2ch
 barek2mb
 barek3mb
 barek3mba
+barek3mbc
 biohzdmb
 bk3ssrmb
+contrambc
 jparkmb
 mk3mdb
+sidepmbc
 sonic2mb
 sonic3mb
 srmdb
@@ -43135,6 +43139,10 @@ attache816
 
 @source:skeleton/ax20.cpp
 ax20
+
+@source:seibu/banpresto_bpsc68000.cpp
+lnumbers
+
 
 @source:skeleton/banpresto_tomy_h8s.cpp
 cmcwa
