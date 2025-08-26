@@ -7,6 +7,6 @@
 
 #include "h8bus.h"
 
-DECLARE_DEVICE_TYPE(H8BUS_H_8_1,    device_h8bus_card_interface)
+DECLARE_DEVICE_TYPE(H8BUS_H_8_1, device_h8bus_card_interface)
 
 #endif // MAME_BUS_HEATHZENITH_H8_H_8_1_H
