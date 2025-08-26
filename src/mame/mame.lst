@@ -43140,7 +43140,7 @@ attache816
 @source:skeleton/ax20.cpp
 ax20
 
-@source:seibu/banpresto_bpsc68000.cpp
+@source:skeleton/banpresto_bpsc68000.cpp
 lnumbers
 
 
