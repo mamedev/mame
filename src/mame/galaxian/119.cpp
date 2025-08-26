@@ -26,6 +26,8 @@ The hardware is quite Galaxian-like (background + sprites + bullets) but tiles
 are 3bpp, not 2bpp, and there is extra sound hardware. The hardware is outdated
 for 1986, it's rumoured that the game is actually from 1983 (see Sega PCB label).
 
+Coreland / Sega Bopeep (also from 1986, a Gunjin Shogi game) is on the same PCB.
+
 TODO:
 - Sometimes killed by something invisible at the top-right of the 1st stage? It's
   not a hidden sprite, and whatever's there can't be defeated by spraying water.
