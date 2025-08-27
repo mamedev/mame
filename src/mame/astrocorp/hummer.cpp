@@ -34,14 +34,41 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	void hummer(machine_config &config);
+	void jackvent(machine_config &config) ATTR_COLD;
+	void pengprty(machine_config &config) ATTR_COLD;
+
+	void init_px004() ATTR_COLD { decrypt_rom(v102_px004_table); }
+	void init_px013() ATTR_COLD { decrypt_rom(v102_px013_table); }
 
 private:
 	required_device<cpu_device> m_maincpu;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void program_map(address_map &map) ATTR_COLD;
+	void jackvent_map(address_map &map) ATTR_COLD;
+	void pengprty_map(address_map &map) ATTR_COLD;
+
+	struct decryption_info {
+		struct {
+			// Address bits used for bitswap/xor selection
+			u8 bits[3];
+			struct {
+				// 8-8 Bitswap
+				u8 bits[8];
+				// Xor
+				u8 xor_mask;
+			} entries[8];
+		} rom[2];
+		// Global address bitswap (src -> dest, some sets use bits 12-8 only, while others 12-2)
+		u8 bits[11];
+	};
+
+	static const decryption_info v102_px004_table;
+	static const decryption_info v102_px013_table;
+
+	void decrypt_rom(const decryption_info &table) ATTR_COLD;
+
+	void hummer(machine_config &config) ATTR_COLD;
 };
 
 
@@ -50,9 +77,21 @@ uint32_t hummer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-void hummer_state::program_map(address_map &map)
+
+void hummer_state::jackvent_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x87ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
+	// map(0xc00000, 0xc00001).w // EEPROM / CPU code w?
+	map(0xc80000, 0xc8ffff).ram(); // NVRAM?
+}
+
+void hummer_state::pengprty_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x87ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
+	// map(0xb80000, 0xb80001).w // EEPROM / CPU code w?
+	map(0xe00000, 0xe0ffff).ram(); // NVRAM?
 }
 
 
@@ -81,7 +120,6 @@ void hummer_state::hummer(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, 22.579_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &hummer_state::program_map);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -97,11 +135,27 @@ void hummer_state::hummer(machine_config &config)
 	// AM001 for sound
 }
 
+void hummer_state::jackvent(machine_config &config)
+{
+	hummer(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &hummer_state::jackvent_map);
+}
+
+void hummer_state::pengprty(machine_config &config)
+{
+	hummer(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &hummer_state::pengprty_map);
+}
+
 
 ROM_START( pengprty ) // PCBHR REV:E + Flash Card V1.1 riser board for GFX ROMs + CS350P093 TSOP to DIP riser board for sound ROM
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "1-tm_fpus01.01b.tu1", 0x00000, 0x40000, CRC(2569e2b9) SHA1(dcec1e9bfe73a062b891812f2c8eb8407066b993) )
-	ROM_LOAD16_BYTE( "2-tm_fpus01.01b.tu3", 0x00001, 0x40000, CRC(23cda107) SHA1(f2c5cba9a3c2c8bfea6bce0b221fd9209810fdf3) )
+	ROM_REGION16_BE( 0x80000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x80000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "2-tm_fpus01.01b.tu3", 0x00000, 0x40000, CRC(23cda107) SHA1(f2c5cba9a3c2c8bfea6bce0b221fd9209810fdf3) )
+	ROM_LOAD16_BYTE( "1-tm_fpus01.01b.tu1", 0x00001, 0x40000, CRC(2569e2b9) SHA1(dcec1e9bfe73a062b891812f2c8eb8407066b993) )
 
 	ROM_REGION( 0x8000000, "sprites", 0 ) // TODO: probably interleaved
 	ROM_LOAD( "mx29gl128eh.u1", 0x0000000, 0x1000000, CRC(80f0d70f) SHA1(82de9bb82a2c5901d5e2dc8f93cd2eee5d65a20b) )
@@ -115,12 +169,17 @@ ROM_START( pengprty ) // PCBHR REV:E + Flash Card V1.1 riser board for GFX ROMs 
 
 	ROM_REGION( 0x800000, "am001", 0 )
 	ROM_LOAD( "mx29lv640eb.u53", 0x000000, 0x800000, CRC(0289fef0) SHA1(f349abd69fcbb9b92ba1362f01c3a83a521fdcc3) )
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "pengprty_cpucode.key", 0x00, 0x02, NO_DUMP )
 ROM_END
 
 ROM_START( jackvent ) // PCBHR REV:C + Flash Card V1.1 riser board for GFX ROMs + CS350P093 TSOP to DIP riser board for sound ROM
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "1_jvus02.01a.tu1", 0x00000, 0x40000, CRC(71471ff7) SHA1(b342d93417b9f8d2e5e36152a31acb09b6a5acd3) )
-	ROM_LOAD16_BYTE( "2_jvus02.01a.tu3", 0x00001, 0x40000, CRC(945a01b1) SHA1(e621c1dd0db573dd5e3bc2202b04c997d84af4fc) )
+	ROM_REGION16_BE( 0x80000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x80000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "2_jvus02.01a.tu3", 0x00000, 0x40000, CRC(945a01b1) SHA1(e621c1dd0db573dd5e3bc2202b04c997d84af4fc) )
+	ROM_LOAD16_BYTE( "1_jvus02.01a.tu1", 0x00001, 0x40000, CRC(71471ff7) SHA1(b342d93417b9f8d2e5e36152a31acb09b6a5acd3) )
 
 	ROM_REGION( 0x4000000, "sprites", 0 ) // TODO: probably interleaved
 	ROM_LOAD( "29lv640.u1", 0x0000000, 0x0800000, CRC(5be4c27d) SHA1(f16bb283e7d28148efacae7d42091985d96825b8) )
@@ -134,9 +193,141 @@ ROM_START( jackvent ) // PCBHR REV:C + Flash Card V1.1 riser board for GFX ROMs 
 
 	ROM_REGION( 0x800000, "am001", 0 )
 	ROM_LOAD( "29lv640.u53", 0x000000, 0x800000, CRC(c891b5ff) SHA1(5e0dce5b33230bd181f3eed94f64da328d11be28) )
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "jackvent_cpucode.key", 0x00, 0x02, NO_DUMP )
 ROM_END
+
+
+void hummer_state::decrypt_rom(const decryption_info &table)
+{
+	const u32 size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("encrypted_rom")->base();
+	u16 * const decrypted = (u16 *)memregion("maincpu")->base();
+	std::unique_ptr<u16[]> tmp = std::make_unique<u16[]>(size/2);
+
+	// Pass 1: decrypt high and low byte independently.  They go
+	// through a bitswap and an xor, choosing between 8 possibilities
+	// through address bits.
+
+	for (u32 i = 0; i != size; i += 2) {
+		u16 orig = rom[i >> 1];
+		u16 result = 0;
+		for (u32 rb = 0; rb < 2; rb ++) {
+			u8 val = orig >> (rb ? 0 : 8);
+			u32 index =
+				(BIT(i, table.rom[rb].bits[0]) << 2) |
+				(BIT(i, table.rom[rb].bits[1]) << 1) |
+				BIT(i, table.rom[rb].bits[2]);
+			val = bitswap(val,
+						  table.rom[rb].entries[index].bits[0],
+						  table.rom[rb].entries[index].bits[1],
+						  table.rom[rb].entries[index].bits[2],
+						  table.rom[rb].entries[index].bits[3],
+						  table.rom[rb].entries[index].bits[4],
+						  table.rom[rb].entries[index].bits[5],
+						  table.rom[rb].entries[index].bits[6],
+						  table.rom[rb].entries[index].bits[7]);
+			val = val ^ table.rom[rb].entries[index].xor_mask;
+
+			result |= val << (rb ? 0 : 8);
+		}
+		tmp[i >> 1] = result;
+	}
+
+	// Pass 2: copy back the decrypted data following the address
+	// scrambling
+	for (u32 i = 0; i != size; i += 2) {
+		u32 dest =
+			(i & 0xffffe003) |
+			(BIT(i, table.bits[0])  << 12) |
+			(BIT(i, table.bits[1])  << 11) |
+			(BIT(i, table.bits[2])  << 10) |
+			(BIT(i, table.bits[3])  <<  9) |
+			(BIT(i, table.bits[4])  <<  8) |
+			(BIT(i, table.bits[5])  <<  7) |
+			(BIT(i, table.bits[6])  <<  6) |
+			(BIT(i, table.bits[7])  <<  5) |
+			(BIT(i, table.bits[8])  <<  4) |
+			(BIT(i, table.bits[9])  <<  3) |
+			(BIT(i, table.bits[10]) <<  2);
+		decrypted[dest >> 1] = tmp[i >> 1];
+	}
+
+	// TODO: are these overlays provided by the custom CPU? It does seem so.
+	// both the encrypted and decrypted bytes at these positions make no sense.
+	// gostopac explicitly checks that 0x4-0x7 are 0x0400'0400
+	decrypted[0x00004/2] = 0x0400;
+	decrypted[0x00006/2] = 0x0400;
+}
+
+// TODO: this is the same as v102_px001_table, shouldn't be?
+const hummer_state::decryption_info hummer_state::v102_px004_table = {
+	{
+		{
+			{ 8, 9, 10 },
+			{
+				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
+				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
+				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
+				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
+				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
+				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
+				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
+				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
+			}
+		},
+		{
+			{ 12, 9, 11 },
+			{
+				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
+				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
+				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
+				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
+				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
+				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
+				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
+				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
+			}
+		}
+	},
+	{ 12, 10, 8, 11, 9, 7, 2, 4, 6, 5, 3 }
+};
+
+const hummer_state::decryption_info hummer_state::v102_px013_table = {
+	{
+		{
+			{ 8, 9, 10 },
+			{
+				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
+				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
+				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
+				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
+				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
+				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
+				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
+				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
+			}
+		},
+		{
+			{ 12, 9, 11 },
+			{
+				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
+				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
+				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
+				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
+				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
+				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
+				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
+				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
+			}
+		}
+	},
+	{ 12, 10, 8, 11, 9, 7, 6, 5, 4, 3, 2 }
+};
 
 } // anonymous namespace
 
-GAME ( 2009,  pengprty, 0, hummer, hummer, hummer_state, empty_init, ROT0, "Astro Corp.", "Penguin Party",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME ( 2012,  jackvent, 0, hummer, hummer, hummer_state, empty_init, ROT0, "Astro Corp.", "Jack's Venture - Inca Treasure", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME ( 2012,  pengprty, 0, pengprty, hummer, hummer_state, init_px013, ROT0, "Astro Corp.", "Penguin Party (TM.01.01.B, 2012/01/16)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME ( 2010,  jackvent, 0, jackvent, hummer, hummer_state, init_px004, ROT0, "Astro Corp.", "Jack's Venture - Inca Treasure (US.02.01.A, 2010/01/21)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

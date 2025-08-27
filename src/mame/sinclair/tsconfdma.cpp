@@ -15,14 +15,30 @@ TODO:
 #define VERBOSE ( LOG_GENERAL )
 #include "logmacro.h"
 
+enum
+{
+	SEQ_READ,
+	SEQ_WRITE
+};
+
+enum
+{
+	MEM_MEM   = 0b0001,
+	SPI_MEM   = 0b0010,
+	FILL_MEM  = 0b0100,
+	BLT_MEM   = 0b1001,
+	RAM_CRAM  = 0b1100,
+	RAM_SFILE = 0b1101
+};
+
 tsconfdma_device::tsconfdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TSCONF_DMA, tag, owner, clock),
-	  m_in_mreq_cb(*this, 0),
-	  m_out_mreq_cb(*this),
-	  m_in_mspi_cb(*this, 0),
-	  m_out_cram_cb(*this),
-	  m_out_sfile_cb(*this),
-	  m_on_ready_cb(*this)
+	: device_t(mconfig, TSCONF_DMA, tag, owner, clock)
+	, m_in_mreq_cb(*this, 0)
+	, m_out_mreq_cb(*this)
+	, m_in_mspi_cb(*this, 0)
+	, m_out_cram_cb(*this)
+	, m_out_sfile_cb(*this)
+	, m_on_ready_cb(*this)
 {
 }
 
@@ -44,9 +60,6 @@ void tsconfdma_device::device_start()
 	save_item(NAME(m_align_s));
 	save_item(NAME(m_align_d));
 	save_item(NAME(m_asz));
-	save_item(NAME(m_align));
-	save_item(NAME(m_m1));
-	save_item(NAME(m_m2));
 }
 
 void tsconfdma_device::device_reset()
@@ -118,44 +131,92 @@ void tsconfdma_device::start_tx(u8 task, bool s_align, bool d_align, bool align_
 	m_align_s = s_align;
 	m_align_d = d_align;
 	m_asz = align_opt;
-	m_align = m_asz ? 512 : 256;
-	m_m1 = m_asz ? 0x3ffe00 : 0x3fff00;
-	m_m2 = m_asz ? 0x0001ff : 0x0000ff;
 	m_ready = CLEAR_LINE;
 
 	m_tx_block_num = 0;
 	m_tx_block = 0;
-	m_dma_clock->adjust(attotime::from_ticks(1, clock() / 6), 0, attotime::from_ticks(1, clock() / 6));
+
+	const attotime curtime = machine().time();
+	m_dma_clock->adjust(attotime::from_ticks(curtime.as_ticks(clock()) + 1, clock()) - curtime, SEQ_READ);
 }
 
 TIMER_CALLBACK_MEMBER(tsconfdma_device::dma_clock)
 {
-	if (m_tx_block == 0)
+	int len;
+	if (param == SEQ_READ)
 	{
-		m_tx_s_addr = m_address_s;
-		m_tx_d_addr = m_address_d;
+		if (m_tx_block == 0)
+		{
+			m_tx_s_addr = m_address_s;
+			m_tx_d_addr = m_address_d;
+		}
+
+		len = do_read();
+	}
+	else
+	{
+		len = do_write();
+
+		const u32 m_m1 = m_asz ? 0x3ffe00 : 0x3fff00;
+		const u32 m_m2 = m_asz ? 0x0001ff : 0x0000ff;
+		const u16 m_align = m_asz ? 512 : 256;
+		m_tx_s_addr = m_align_s ? ((m_tx_s_addr & m_m1) | ((m_tx_s_addr + 2) & m_m2)) : ((m_tx_s_addr + 2) & 0x3fffff);
+		m_tx_d_addr = m_align_d ? ((m_tx_d_addr & m_m1) | ((m_tx_d_addr + 2) & m_m2)) : ((m_tx_d_addr + 2) & 0x3fffff);
+
+		++m_tx_block;
+		if (m_tx_block > m_block_len)
+		{
+			m_address_s = m_align_s ? (m_address_s + m_align) : m_tx_s_addr;
+			m_address_d = m_align_d ? (m_address_d + m_align) : m_tx_d_addr;
+
+			m_tx_block = 0;
+			++m_tx_block_num;
+			if (m_tx_block_num > m_block_num)
+			{
+				m_dma_clock->reset();
+				m_ready = ASSERT_LINE;
+				m_on_ready_cb(1);
+				return;
+			}
+		}
 	}
 
+	if (len >= 0)
+		m_dma_clock->adjust(clocks_to_attotime(len), param == SEQ_READ ? SEQ_WRITE : SEQ_READ);
+	else
+		LOG("Unknown task %02X: %06X (%02X:%04X) -> %06X\n", m_task, m_address_s, m_block_len, m_block_num, m_address_d);
+}
+
+int tsconfdma_device::do_read()
+{
+	int len = -1;
 	switch (m_task)
 	{
-	case 0b0001: // Mem -> Mem
-		m_out_mreq_cb(m_tx_d_addr, m_in_mreq_cb(m_tx_s_addr));
+	case MEM_MEM:
+	case RAM_CRAM:
+	case RAM_SFILE:
+		len = 4;
+		m_tx_data = m_in_mreq_cb(m_tx_s_addr);
 		break;
 
-	case 0b0010: // SPI -> Mem
-		m_out_mreq_cb(m_tx_d_addr, m_in_mspi_cb());
+	case SPI_MEM:
+		len = 4;
+		m_tx_data = m_in_mspi_cb();
 		break;
 
-	case 0b0100: // Fill
+	case FILL_MEM:
 		if (!m_tx_block_num && !m_tx_block)
 		{
+			len = 4;
 			m_tx_data = m_in_mreq_cb(m_address_s);
 		}
-		m_out_mreq_cb(m_tx_d_addr, m_tx_data);
+		else
+			len = 0;
 		break;
 
-	case 0b1001: // Blt -> Mem
+	case BLT_MEM:
 		{
+			len = 8;
 			u16 d_val = m_in_mreq_cb(m_tx_d_addr);
 			u16 s_val = m_in_mreq_cb(m_tx_s_addr);
 			if (m_asz)
@@ -170,43 +231,45 @@ TIMER_CALLBACK_MEMBER(tsconfdma_device::dma_clock)
 				d_val = (d_val & 0xf0ff) | (((s_val & 0x0f00) ? s_val : d_val) & 0x0f00);
 				d_val = (d_val & 0x0fff) | (((s_val & 0xf000) ? s_val : d_val) & 0xf000);
 			}
-			m_out_mreq_cb(m_tx_d_addr, d_val);
+			m_tx_data = d_val;
 		}
-		break;
-
-	case 0b1100: // RAM -> CRAM
-		m_out_cram_cb(m_tx_d_addr, m_in_mreq_cb(m_tx_s_addr));
-		break;
-
-	case 0b1101: // RAM -> SFILE
-		m_out_sfile_cb(m_tx_d_addr, m_in_mreq_cb(m_tx_s_addr));
 		break;
 
 	default:
-		LOG("Unknown task %02X: %06X (%02X:%04X) -> %06X\n", m_task, m_address_s, m_block_len, m_block_num, m_address_d);
-		m_tx_block_num = m_block_num;
-		m_tx_block = m_block_len;
 		break;
 	}
 
-	m_tx_s_addr = m_align_s ? ((m_tx_s_addr & m_m1) | ((m_tx_s_addr + 2) & m_m2)) : ((m_tx_s_addr + 2) & 0x3fffff);
-	m_tx_d_addr = m_align_d ? ((m_tx_d_addr & m_m1) | ((m_tx_d_addr + 2) & m_m2)) : ((m_tx_d_addr + 2) & 0x3fffff);
+	return len;
+}
 
-	++m_tx_block;
-	if (m_tx_block > m_block_len)
+int tsconfdma_device::do_write()
+{
+	int len = -1;
+	switch (m_task)
 	{
-		m_address_s = m_align_s ? (m_address_s + m_align) : m_tx_s_addr;
-		m_address_d = m_align_d ? (m_address_d + m_align) : m_tx_d_addr;
+	case MEM_MEM:
+	case SPI_MEM:
+	case FILL_MEM:
+	case BLT_MEM:
+		len = 4;
+		m_out_mreq_cb(m_tx_d_addr, m_tx_data);
+		break;
 
-		m_tx_block = 0;
-		++m_tx_block_num;
-		if (m_tx_block_num > m_block_num)
-		{
-			m_dma_clock->reset();
-			m_ready = ASSERT_LINE;
-			m_on_ready_cb(1);
-		}
+	case RAM_CRAM:
+		len = 1;
+		m_out_cram_cb(m_tx_d_addr, m_tx_data);
+		break;
+
+	case RAM_SFILE:
+		len = 4;
+		m_out_sfile_cb(m_tx_d_addr, m_tx_data);
+		break;
+
+	default:
+		break;
 	}
+
+	return len;
 }
 
 // device type definition

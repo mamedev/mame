@@ -90,6 +90,7 @@ Scanline 0 is the start of vblank.
 
 #include "bus/mackbd/mackbd.h"
 #include "bus/macpds/hyperdrive.h"
+#include "bus/macpds/pds_tpdfpd.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "cpu/m68000/m68000.h"
@@ -108,7 +109,8 @@ Scanline 0 is the start of vblank.
 #include "macscsi.h"
 #include "sound/dac.h"
 #include "sound/flt_biquad.h"
-#include "bus/macpds/pds_tpdfpd.h"
+#include "sound/flt_rc.h"
+#include "sound/spkrdev.h"
 
 #include "formats/ap_dsk35.h"
 
@@ -117,17 +119,17 @@ Scanline 0 is the start of vblank.
 #include "softlist.h"
 #include "speaker.h"
 
-
 namespace {
 
-#define C7M (15.6672_MHz_XTAL / 2)
-#define C3_7M (15.6672_MHz_XTAL / 4).value()
+static constexpr auto C7M   = (15.6672_MHz_XTAL / 2);
+static constexpr auto C3_7M = (15.6672_MHz_XTAL / 4).value();
 
 // video parameters
-static constexpr int MAC_H_VIS   = 512;
-static constexpr int MAC_V_VIS   = 342;
-static constexpr int MAC_H_TOTAL = 704;       // (512+192)
-static constexpr int MAC_V_TOTAL = 370;       // (342+28)
+static constexpr s32 MAC_H_VIS   = 512;
+static constexpr s32 MAC_V_VIS   = 342;
+static constexpr s32 MAC_H_TOTAL = 704; // (512 visible + 192 hblank)
+static constexpr s32 MAC_V_TOTAL = 370; // (28 vblank + 342 visible)
+static constexpr s32 MAC_V_FIRST = 28;  // first visible line
 
 // sound buffer locations
 static constexpr int MAC_MAIN_SND_BUF_OFFSET = (0x0300>>1); // (end of memory minus 0x0300; for the typical macplus case, this is 0x3ffd00-0x3fffe3 in 16 bit blocks)
@@ -151,16 +153,37 @@ public:
 		m_mackbd(*this, "kbd"),
 		m_rtc(*this, "rtc"),
 		m_screen(*this, "screen"),
+		m_scanline_timer(*this, "scantimer"),
+		m_hblank_timer(*this, "hblanktimer"),
 		m_dac(*this, "macdac"),
+		m_dac_timer(*this, "dactimer"),
 		m_filter(*this, "dacfilter"),
 		m_volfilter(*this, "volfilter"),
+		m_outfilter(*this, "outfilter"),
 		m_scc(*this, "scc"),
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
 		m_mouse2(*this, "MOUSE2"),
 		m_cur_floppy(nullptr),
 		m_hdsel(0),
-		m_devsel(0)
+		m_devsel(0),
+		m_pwm_count_total(0), m_pwm_count_1(0),
+		m_pwm_current_rpm{0.0f, 0.0f},
+		m_overlay(false),
+		m_mouse_bit{0, 0}, m_mouse_last{0, 0},
+		m_mouse_last_m{0, 0}, m_mouse_count{0, 0},
+		m_screen_buffer(false),
+		m_scc_interrupt(false), m_via_interrupt(false),
+		m_scsi_interrupt(false), m_scsi_interrupt_mask(false),
+		m_last_taken_interrupt(false),
+		m_scsi_drq(false),
+		m_snd_enable(false),
+		m_main_buffer(false),
+		m_snd_vol(0),
+		m_adb_irq_pending(false),
+		m_drive_select(false),
+		m_ram_ptr(nullptr), m_rom_ptr(nullptr),
+		m_ram_mask(0), m_ram_size(0)
 	{
 	}
 
@@ -188,9 +211,13 @@ private:
 	optional_device<mac_keyboard_port_device> m_mackbd;
 	required_device<rtc3430042_device> m_rtc;
 	required_device<screen_device> m_screen;
-	required_device<dac_12bit_r2r_device> m_dac; // actually 1-bit pwm w/8-bit counters
+	required_device<timer_device> m_scanline_timer;
+	required_device<timer_device> m_hblank_timer;
+	required_device<speaker_sound_device> m_dac;
+	required_device<timer_device> m_dac_timer;
 	required_device<filter_biquad_device> m_filter;
 	required_device<filter_biquad_device> m_volfilter;
+	required_device<filter_rc_device> m_outfilter;
 	required_device<z80scc_device> m_scc;
 
 	optional_ioport m_mouse0, m_mouse1, m_mouse2;
@@ -198,45 +225,46 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void scc_mouse_irq( int x, int y );
+	void scc_mouse_irq(int x, int y);
 	void set_via_interrupt(int value);
 	void field_interrupts();
 	void mouse_callback();
 
-	uint16_t ram_r(offs_t offset);
-	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void ram_w_se(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t ram_600000_r(offs_t offset);
-	void ram_600000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~ 0);
-	uint16_t mac_via_r(offs_t offset);
-	void mac_via_w(offs_t offset, uint16_t data);
-	uint16_t mac_autovector_r(offs_t offset);
-	void mac_autovector_w(offs_t offset, uint16_t data);
-	uint16_t mac_iwm_r(offs_t offset, uint16_t mem_mask = ~0);
-	void mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t macplus_scsi_r(offs_t offset, uint16_t mem_mask = ~0);
-	void macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t macse_scsi_r(offs_t offset, uint16_t mem_mask = ~0);
-	void macse_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	u16 ram_r(offs_t offset);
+	void ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void ram_w_se(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 ram_600000_r(offs_t offset);
+	void ram_600000_w(offs_t offset, u16 data, u16 mem_mask = ~ 0);
+	u16 mac_via_r(offs_t offset);
+	void mac_via_w(offs_t offset, u16 data);
+	u16 mac_autovector_r(offs_t offset);
+	void mac_autovector_w(offs_t offset, u16 data);
+	u16 mac_iwm_r(offs_t offset, u16 mem_mask = ~0);
+	void mac_iwm_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 scsi_r(offs_t offset, u16 mem_mask = ~0);
+	void scsi_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 macse_scsi_r(offs_t offset, u16 mem_mask = ~0);
+	void macse_scsi_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void scsi_irq_w(int state);
 	void scsi_drq_w(int state);
-	void scsi_berr_w(uint8_t data);
+	void scsi_berr_w(u8 data);
 	void set_scc_interrupt(int state);
 	void vblank_w(int state);
 
 	void adb_irq_w(int state) { m_adb_irq_pending = state; }
 
-	TIMER_CALLBACK_MEMBER(mac_scanline);
-	TIMER_CALLBACK_MEMBER(mac_hblank);
-	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(mac_hblank);
+	TIMER_DEVICE_CALLBACK_MEMBER(mac_dac);
+	u32 screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t mac_via_in_a();
-	uint8_t mac_via_in_b();
-	uint8_t mac_via_in_b_se();
-	void mac_via_out_a(uint8_t data);
-	void mac_via_out_b(uint8_t data);
-	void mac_via_out_a_se(uint8_t data);
-	void mac_via_out_b_se(uint8_t data);
+	u8 mac_via_in_a();
+	u8 mac_via_in_b();
+	u8 mac_via_in_b_se();
+	void mac_via_out_a(u8 data);
+	void mac_via_out_b(u8 data);
+	void mac_via_out_a_se(u8 data);
+	void mac_via_out_b_se(u8 data);
 	void mac_via_irq(int state);
 	void update_volume();
 
@@ -246,38 +274,35 @@ private:
 
 	floppy_image_device *m_cur_floppy;
 	int m_hdsel, m_devsel;
-	int m_pwm_count_total = 0, m_pwm_count_1 = 0;
+	int m_pwm_count_total, m_pwm_count_1;
 	float m_pwm_current_rpm[2]{};
 
-	void phases_w(uint8_t phases);
-	void devsel_w(uint8_t devsel);
-	void devsel_se_w(uint8_t devsel);
-	void snd_push(uint8_t data);
-	void pwm_push(uint8_t data);
+	void phases_w(u8 phases);
+	void devsel_w(u8 devsel);
+	void devsel_se_w(u8 devsel);
+	void snd_push(u8 data);
+	void pwm_push(u8 data);
 
-	uint32_t m_overlay = 0;
+	bool m_overlay;
 
-	uint8_t m_mouse_bit[2]{}, m_mouse_last[2]{};
-	int16_t m_mouse_last_m[2]{}, m_mouse_count[2]{};
-	int m_screen_buffer = 0;
-	emu_timer *m_scan_timer = nullptr;
-	emu_timer *m_hblank_timer = nullptr;
+	u8 m_mouse_bit[2]{}, m_mouse_last[2]{};
+	s16 m_mouse_last_m[2]{}, m_mouse_count[2]{};
+	bool m_screen_buffer;
 
 	// interrupts
-	int m_scc_interrupt = 0, m_via_interrupt = 0, m_scsi_interrupt = 0, m_last_taken_interrupt = 0;
+	bool m_scc_interrupt, m_via_interrupt, m_scsi_interrupt, m_scsi_interrupt_mask;
+	s32 m_last_taken_interrupt;
 
 	// DRQ
-	int m_scsi_drq = 0;
+	bool m_scsi_drq;
 
-	// wait states for accessing the VIA
-	bool m_snd_enable = false;
-	bool m_main_buffer = false;
-	int m_snd_vol = 0;
-	int m_adb_irq_pending = 0;
-	int m_drive_select = 0;
-	int m_scsiirq_enable = 0;
-	u16 *m_ram_ptr = nullptr, *m_rom_ptr = nullptr;
-	u32 m_ram_mask = 0, m_ram_size = 0;
+	bool m_snd_enable;
+	bool m_main_buffer;
+	u8 m_snd_vol;
+	bool m_adb_irq_pending;
+	bool m_drive_select;
+	u16 *m_ram_ptr, *m_rom_ptr;
+	u32 m_ram_mask, m_ram_size;
 };
 
 void mac128_state::machine_start()
@@ -286,9 +311,6 @@ void mac128_state::machine_start()
 	m_ram_size = m_ram->size()>>1;
 	m_ram_mask = m_ram_size - 1;
 	m_rom_ptr = (u16*)memregion("bootrom")->base();
-
-	m_scan_timer = timer_alloc(FUNC(mac128_state::mac_scanline), this);
-	m_hblank_timer = timer_alloc(FUNC(mac128_state::mac_hblank), this);
 
 	save_item(NAME(m_overlay));
 	save_item(NAME(m_mouse_bit));
@@ -299,6 +321,7 @@ void mac128_state::machine_start()
 	save_item(NAME(m_scc_interrupt));
 	save_item(NAME(m_via_interrupt));
 	save_item(NAME(m_scsi_interrupt));
+	save_item(NAME(m_scsi_interrupt_mask));
 	save_item(NAME(m_scsi_drq));
 	save_item(NAME(m_last_taken_interrupt));
 	save_item(NAME(m_snd_enable));
@@ -306,7 +329,6 @@ void mac128_state::machine_start()
 	save_item(NAME(m_snd_vol));
 	save_item(NAME(m_adb_irq_pending));
 	save_item(NAME(m_drive_select));
-	save_item(NAME(m_scsiirq_enable));
 	save_item(NAME(m_pwm_count_total));
 	save_item(NAME(m_pwm_count_1));
 	save_item(NAME(m_pwm_current_rpm));
@@ -318,28 +340,25 @@ void mac128_state::machine_start()
 void mac128_state::machine_reset()
 {
 	m_last_taken_interrupt = -1;
-	m_overlay = 1;
-	m_screen_buffer = 1;
+	m_overlay = true;
+	m_screen_buffer = true;
 	m_last_taken_interrupt = 0;
 	m_snd_enable = false;
 	m_main_buffer = true;
 	m_snd_vol = 3;
-	m_adb_irq_pending = 0;
-	m_drive_select = 0;
-	m_scsiirq_enable = 0;
+	m_adb_irq_pending = false;
+	m_drive_select = false;
+	m_scsi_interrupt_mask = false;
 	m_pwm_count_total = 0;
 	m_pwm_count_1 = 0;
 	m_pwm_current_rpm[0] = 302.5; // Speed for 0% duty cycle
 	m_pwm_current_rpm[1] = 302.5;
-	m_scsi_drq = 0;
+	m_scsi_drq = false;
 
-	const int next_vpos = m_screen->vpos() + 1;
-	m_scan_timer->adjust(m_screen->time_until_pos(next_vpos), next_vpos);
-	if (m_screen->vblank())
-		m_via->write_pb6(0);
+	m_via->write_pb6(0);
 }
 
-uint16_t mac128_state::ram_r(offs_t offset)
+u16 mac128_state::ram_r(offs_t offset)
 {
 	if (m_overlay)
 	{
@@ -349,7 +368,7 @@ uint16_t mac128_state::ram_r(offs_t offset)
 	return m_ram_ptr[offset & m_ram_mask];
 }
 
-void mac128_state::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void mac128_state::ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (!m_overlay)
 	{
@@ -357,27 +376,27 @@ void mac128_state::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-void mac128_state::ram_w_se(offs_t offset, uint16_t data, uint16_t mem_mask)
+void mac128_state::ram_w_se(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_overlay = 0;
+	m_overlay = false;
 	COMBINE_DATA(&m_ram_ptr[offset & m_ram_mask]);
 }
 
-uint16_t mac128_state::ram_600000_r(offs_t offset)
+u16 mac128_state::ram_600000_r(offs_t offset)
 {
 	return m_ram_ptr[offset & m_ram_mask];
 }
 
-void mac128_state::ram_600000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void mac128_state::ram_600000_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_ram_ptr[offset & m_ram_mask]);
 }
 
 void mac128_state::field_interrupts()
 {
-	int take_interrupt = -1;
+	s32 take_interrupt = -1;
 
-	if ((m_scc_interrupt) || (m_scsi_interrupt))
+	if ((m_scc_interrupt) || (m_scsi_interrupt && m_scsi_interrupt_mask))
 	{
 		take_interrupt = 2;
 	}
@@ -418,68 +437,88 @@ void mac128_state::update_volume()
 {
 	/* LS161 audio PWM counters TC (SND) -> LS04 inverter (/SND) ->
 	 * -> CD4016 gate A pulling a 5.1V zener-regulated signal to ground if input is high ->
-	 * -> Sallen-key low-pass filter (R1 = 47K, R2 = 47K, C1 = 0.001uF, C2 = 470pF
-	 *  FC of 4939.3903Hz, Q of 0.7293, Gain of 1.0) ->
-	 * ->\-> r13 (470k) ------------------------>|
-	 *   |-> r12 (470k) -> CD4016 D (pa0 != 0) ->|
-	 *   |-> r17 (150k) -> CD4016 C (pa1 != 0) ->|
-	 *   |-> r16 (68k)  -> CD4016 B (pa2 != 0) ->\-> DC blocking caps ->
-	 * -> Push-Pull +12v/-12vb amplifier w/feedback (technically a 1st order multifeedback lowpass filter?) ->
+	 * -> Sallen-key low-pass filter (R1 = 47K, R2 = 47K, C1 = 0.001uF, C2 = 470pF)
+	 *  (FC of 4939.3903Hz, Q of 0.7293, Gain of 1.0) ->
+	 * -> Differentiator (bandpass) Filter:
+	 *   ->\-> r13 (470k) ------------------------>|
+	 *     |-> r12 (470k) -> CD4016 D (pa0 != 0) ->|
+	 *     |-> r17 (150k) -> CD4016 C (pa1 != 0) ->|
+	 *     |-> r16 (68k)  -> CD4016 B (pa2 != 0) ->\ ->
+	 *   -> DC blocking caps (2x .1uf in parallel) ->
+	 *   -> Push-Pull +12v/-12v current amplifier for the speaker (can be safely ignored) ->
+	 * -> R/C low-pass filter (R = 47Ohm, C = .1uf) ->
 	 * -> Audio Jack -> Speaker
 	 */
-	const double res_ohm_tbl[8] =
-	{
-		//       R13                  R16                 R17                  R12
-		(1.0 / ( (1.0 / RES_K(470))                                                               ) ),
-		(1.0 / ( (1.0 / RES_K(470))                                          + (1.0 / RES_K(470)) ) ),
-		(1.0 / ( (1.0 / RES_K(470))                     + (1.0 / RES_K(150))                      ) ),
-		(1.0 / ( (1.0 / RES_K(470))                     + (1.0 / RES_K(150)) + (1.0 / RES_K(470)) ) ),
-		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68))                                           ) ),
-		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68))                      + (1.0 / RES_K(470)) ) ),
-		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68)) + (1.0 / RES_K(150))                      ) ),
-		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68)) + (1.0 / RES_K(150)) + (1.0 / RES_K(470)) ) )
-	};
+	constexpr double res_ohm_tbl[8] =
+		{
+			//       R13                  R16                 R17                  R12
+			(1.0 / ((1.0 / RES_K(470)))),                                                               // 470,000 ohms, gain of ~-7.426 fc1 = 1.692hz fc2 = 3.653hz
+			(1.0 / ((1.0 / RES_K(470)) + (1.0 / RES_K(470)))),                                          // 235,000 ohms, gain of ~-1.409 fc1 = 3.425hz fc2 = 3.611hz
+			(1.0 / ((1.0 / RES_K(470)) + (1.0 / RES_K(150)))),                                          // 113,710 ohms, gain of ~+4.888 fc1 = 7.017hz fc2 = 3.671hz
+			(1.0 / ((1.0 / RES_K(470)) + (1.0 / RES_K(150)) + (1.0 / RES_K(470)))),                     //  91,558 ohms, gain of ~+6.766 fc1 = 8.816hz fc2 = 3.671hz
+			(1.0 / ((1.0 / RES_K(470)) + (1.0 / RES_K(68)))),                                           //  59,405 ohms, gain of ~+10.512 fc1 = 13.245hz fc2 = 3.656khz
+			(1.0 / ((1.0 / RES_K(470)) + (1.0 / RES_K(68)) + (1.0 / RES_K(470)))),                      //  52,739 ohms, gain of ~+11.541 fc1 = 15.141hz fc2 = 3.656khz
+			(1.0 / ((1.0 / RES_K(470)) + (1.0 / RES_K(68)) + (1.0 / RES_K(150)))),                      //  42,552 ohms, gain of ~+13.397 fc1 = 18.756hz fc2 = 3.656khz
+			(1.0 / ((1.0 / RES_K(470)) + (1.0 / RES_K(68)) + (1.0 / RES_K(150)) + (1.0 / RES_K(470))))  //  39,020 ohms, gain of ~+14.146 fcl = 20hz fch = 3.607khz
+		};
 
-	m_volfilter->opamp_mfb_lowpass_modify(res_ohm_tbl[m_snd_vol&7], RES_K(0), RES_K(200), CAP_U(0), CAP_P(220)); // variable based on cd4016, short, R15, absent, C10
+	m_volfilter->opamp_diff_bandpass_modify(res_ohm_tbl[m_snd_vol & 7], RES_K(200), CAP_U(.2), CAP_P(220)); // variable based on cd4016, R15, C11+C12, C10
 }
 
 void mac128_state::vblank_w(int state)
 {
-	m_via->write_ca1(state);
+	m_via->write_ca1(!state);
 }
 
-TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(mac128_state::mac_scanline)
 {
 	const int scanline = param;
 
-	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (scanline >= 28)
+	m_via->write_pb6(0);         // H4 signal
+								 // During the visible portion (first 512 pixels) of a scanline, (i.e. the
+								 // first 512 15.6672MHz clock cycles on a scanline, which is 256 CPU C7M
+								 // cycles), there are four CPU cycles used, followed by four /DTACK cycles
+								 // used to retrieve a word from DRAM, for every block of 8 CPU cycles.
+								 // * [v = clock during visible portion, h = clock during hblank portion]
+								 // * C16M: v v v v v v v v v v v v v v v v v v...v v h h h h h h h h h h...
+								 // * C7M:  v   v   v   v   v   v   v   v   v  ...v   h   h   h   h   h  ...
+								 // *       CPU CPU CPU CPU RAM RAM RAM RAM CPU...RAM CPU CPU CPU CPU CPU...
+								 // In addition, the very last 4 cycles on a scanline are used by the
+								 // sound/pwm system to grab the sound/pwm word.
+								 // * (H4 goes active here:         4 4 4 4 4 4 4 4 ?                      )
+								 // * C16M:...h h h h h h h h h h h h h h h h h h h h v v v v v v v v v v...
+								 // * C7M: ...h   h   h   h   h   h   h   h   h   h   v   v   v   v   v  ...
+								 // *      ...CPU CPU CPU CPU CPU CPU SND SND SND SND CPU CPU CPU CPU RAM
+								 // This effectively means that the cpu loses access to the memory bus for
+								 // 4 out of the 352 C7M cycles on every scanline, and an additional 128 C7M
+								 // cycles on a visible scanline not in vblank.
+	if (scanline >= MAC_V_FIRST) // on a visible scanline
 	{
-		m_via->write_pb6(1);
+		m_maincpu->adjust_icount(-128);
 	}
 
-	m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_TOTAL));
+	m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_TOTAL - 9));
 
 	if ((!(scanline % 10)) && (!m_macadb))
 	{
 		mouse_callback();
 	}
-
-	m_scan_timer->adjust(m_screen->time_until_pos(scanline+1), (scanline+1) % m_screen->height());
 }
 
-TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
+TIMER_DEVICE_CALLBACK_MEMBER(mac128_state::mac_hblank)
 {
 	const int scanline = m_screen->vpos();
-	uint16_t *mac_snd_buf_ptr;
+	u16 *mac_snd_buf_ptr;
 
+	m_via->write_pb6(1); // H4 signal
+	m_maincpu->adjust_icount(-4);
 	if (m_main_buffer)
 	{
-		mac_snd_buf_ptr = (uint16_t *)(m_ram_ptr + m_ram_size - MAC_MAIN_SND_BUF_OFFSET);
+		mac_snd_buf_ptr = (u16 *)(m_ram_ptr + m_ram_size - MAC_MAIN_SND_BUF_OFFSET);
 	}
 	else
 	{
-		mac_snd_buf_ptr = (uint16_t *)(m_ram_ptr + m_ram_size - MAC_ALT_SND_BUF_OFFSET);
+		mac_snd_buf_ptr = (u16 *)(m_ram_ptr + m_ram_size - MAC_ALT_SND_BUF_OFFSET);
 	}
 
 	// The sound "DAC" is a 1-bit PWM output driven by two 4-bit LS161 counters
@@ -510,13 +549,37 @@ TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
 	m_via->write_pb6(0);
 }
 
-void mac128_state::snd_push(uint8_t data)
+void mac128_state::snd_push(u8 data)
 {
-	double frac = (m_snd_enable ? (((double)(~data)) / (MAC_H_TOTAL / 2.0)) : 1.0);
-	m_dac->write((uint16_t)(frac * 4095.0)); // using a fraction of a 12 bit value, so we can handle inputs ranging between 0/352 and 352/352 without losing resolution.
+	if ((data < 0xff) || (!m_snd_enable))
+	{
+		m_dac->level_w(0);
+		if (m_snd_enable)
+		{
+			m_dac_timer->adjust(m_maincpu->cycles_to_attotime(0xff - data));
+		}
+		else
+		{
+			m_dac_timer->adjust(attotime::never);
+		}
+	}
+	else // value is 0xff; TC is already high.
+	{
+		m_dac->level_w(1);
+		m_dac_timer->adjust(attotime::never);
+	}
 }
 
-void mac128_state::pwm_push(uint8_t data)
+TIMER_DEVICE_CALLBACK_MEMBER(mac128_state::mac_dac)
+{
+	if (m_snd_enable)
+	{
+		m_dac->level_w(1);
+	}
+	m_dac_timer->adjust(attotime::never);
+}
+
+void mac128_state::pwm_push(u8 data)
 {
 	// The PWM works by sending pulses with a specific duty cycle.
 	// The lengths sent by the firmware are in the range 1-40, which
@@ -534,7 +597,7 @@ void mac128_state::pwm_push(uint8_t data)
 	// and insertion on bit 5.  The firmware writes a value so that
 	// the length is reached when the counter hits 0x20.
 
-	static const uint8_t value_to_length[64] = {
+	static constexpr u8 value_to_length[64] = {
 		 0,  1, 59,  2, 60, 40, 54,  3,
 		61, 32, 49, 41, 55, 19, 35,  4,
 		62, 52, 30, 33, 50, 12, 14, 42,
@@ -588,23 +651,24 @@ void mac128_state::pwm_push(uint8_t data)
 
 void mac128_state::scsi_irq_w(int state)
 {
+	m_scsi_interrupt = state;
+	field_interrupts();
 }
+
 
 void mac128_state::scsi_drq_w(int state)
 {
 	m_scsi_drq = state;
 }
 
-void mac128_state::scsi_berr_w(uint8_t data)
+void mac128_state::scsi_berr_w(u8 data)
 {
 	m_maincpu->trigger_bus_error();
 }
 
-uint16_t mac128_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
+u16 mac128_state::scsi_r(offs_t offset, u16 mem_mask)
 {
-	int reg = (offset >> 3) & 0xf;
-
-	//  logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
+	const int reg = (offset >> 3) & 0xf;
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -624,11 +688,9 @@ uint16_t mac128_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
 	return u16(m_ncr5380->read(reg)) << 8;
 }
 
-void mac128_state::macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void mac128_state::scsi_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	int reg = (offset >> 3) & 0xf;
-
-	//  logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
+	const int reg = (offset >> 3) & 0xf;
 
 	// here we can take advantage of 68000 byte smearing
 	if ((offset >= 0x100) && (m_scsi_drq))
@@ -639,21 +701,15 @@ void mac128_state::macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	m_ncr5380->write(reg, data & 0xff);
 }
 
-uint16_t mac128_state::macse_scsi_r(offs_t offset, uint16_t mem_mask)
+u16 mac128_state::macse_scsi_r(offs_t offset, u16 mem_mask)
 {
-	int reg = (offset>>3) & 0xf;
-
-//  logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
-
+	const int reg = (offset>>3) & 0xf;
 	return m_scsihelp->read_wrapper(BIT(offset, 8), reg)<<8;
 }
 
-void mac128_state::macse_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void mac128_state::macse_scsi_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	int reg = (offset>>3) & 0xf;
-
-//  logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
-
+	const int reg = (offset>>3) & 0xf;
 	m_scsihelp->write_wrapper(BIT(offset, 8), reg, data>>8);
 }
 
@@ -688,13 +744,13 @@ void mac128_state::scc_mouse_irq(int x, int y)
 	}
 }
 
-uint16_t mac128_state::mac_iwm_r(offs_t offset, uint16_t mem_mask)
+u16 mac128_state::mac_iwm_r(offs_t offset, u16 mem_mask)
 {
-	uint16_t result = m_iwm->read((offset >> 8) & 0xf);
+	u16 result = m_iwm->read((offset >> 8) & 0xf);
 	return (result << 8) | result;
 }
 
-void mac128_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void mac128_state::mac_iwm_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_iwm->write((offset >> 8) & 0xf, data & 0xff);
@@ -708,9 +764,9 @@ void mac128_state::mac_via_irq(int state)
 	set_via_interrupt(state);
 }
 
-uint16_t mac128_state::mac_via_r(offs_t offset)
+u16 mac128_state::mac_via_r(offs_t offset)
 {
-	uint16_t data;
+	u16 data;
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -719,7 +775,7 @@ uint16_t mac128_state::mac_via_r(offs_t offset)
 	return (data & 0xff) | (data << 8);
 }
 
-void mac128_state::mac_via_w(offs_t offset, uint16_t data)
+void mac128_state::mac_via_w(offs_t offset, u16 data)
 {
 	offset >>= 8;
 	offset &= 0x0f;
@@ -727,25 +783,25 @@ void mac128_state::mac_via_w(offs_t offset, uint16_t data)
 	m_via->write(offset, (data >> 8) & 0xff);
 }
 
-void mac128_state::mac_autovector_w(offs_t offset, uint16_t data)
+void mac128_state::mac_autovector_w(offs_t offset, u16 data)
 {
 	/* This should throw an exception */
 	/* Not yet implemented */
 }
 
-uint16_t mac128_state::mac_autovector_r(offs_t offset)
+u16 mac128_state::mac_autovector_r(offs_t offset)
 {
 	/* This should throw an exception */
 	/* Not yet implemented */
 	return 0;
 }
 
-uint8_t mac128_state::mac_via_in_a()
+u8 mac128_state::mac_via_in_a()
 {
 	return 0x81;
 }
 
-uint8_t mac128_state::mac_via_in_b()
+u8 mac128_state::mac_via_in_b()
 {
 	int val = 0x40;
 
@@ -760,7 +816,7 @@ uint8_t mac128_state::mac_via_in_b()
 	return val;
 }
 
-uint8_t mac128_state::mac_via_in_b_se()
+u8 mac128_state::mac_via_in_b_se()
 {
 	int val = 0;
 
@@ -776,12 +832,12 @@ uint8_t mac128_state::mac_via_in_b_se()
 	return val;
 }
 
-void mac128_state::mac_via_out_a(uint8_t data)
+void mac128_state::mac_via_out_a(u8 data)
 {
 //  printf("%s VIA1 OUT A: %02x (PC %x)\n", machine().describe_context().c_str(), data);
 
 	//set_scc_waitrequest((data & 0x80) >> 7);
-	m_screen_buffer = (data & 0x40) >> 6;
+	m_screen_buffer = BIT(data, 6);
 
 	int hdsel = BIT(data, 5);
 	if (hdsel != m_hdsel)
@@ -792,26 +848,22 @@ void mac128_state::mac_via_out_a(uint8_t data)
 		}
 		m_hdsel = hdsel;
 	}
-
-	m_main_buffer = ((data & 0x08) == 0x08) ? true : false;
-	m_snd_vol = data & 0x07;
-	update_volume();
 
 	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE and
 	 * later models, overlay was set on reset, but cleared on the first
 	 * access to the ROM's normal address space. */
-	if (((data & 0x10) >> 4) != m_overlay)
-	{
-		m_overlay = (data & 0x10) >> 4;
-	}
+	m_overlay = BIT(data, 4);
+	m_main_buffer = BIT(data, 3);
+	m_snd_vol = data & 0x07;
+	update_volume();
 }
 
-void mac128_state::mac_via_out_a_se(uint8_t data)
+void mac128_state::mac_via_out_a_se(u8 data)
 {
 //  printf("%s VIA OUT A: %02x (PC %x)\n", machine().describe_context().c_str(), data);
 
 	//set_scc_waitrequest((data & 0x80) >> 7);
-	m_screen_buffer = (data & 0x40) >> 6;
+	m_screen_buffer = BIT(data, 6);
 
 	int hdsel = BIT(data, 5);
 	if (hdsel != m_hdsel)
@@ -822,9 +874,6 @@ void mac128_state::mac_via_out_a_se(uint8_t data)
 		}
 		m_hdsel = hdsel;
 	}
-
-	m_snd_vol = data & 0x07;
-	update_volume();
 
 	// on SE only this selects which floppy drive (0 = upper, 1 = lower)
 	if (m_drive_select != BIT(data, 4))
@@ -832,33 +881,44 @@ void mac128_state::mac_via_out_a_se(uint8_t data)
 		m_drive_select = BIT(data, 4);
 		devsel_se_w(m_devsel);
 	}
+
+	// BIT(data, 3) controls synchronous modem support for SCC channel A
+	m_snd_vol = data & 0x07;
+	update_volume();
 }
 
-void mac128_state::mac_via_out_b(uint8_t data)
+void mac128_state::mac_via_out_b(u8 data)
 {
 //  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
-	m_snd_enable = ((data & 0x80) == 0) ? true : false;
-	update_volume();
-	m_rtc->ce_w((data & 0x04)>>2);
-	m_rtc->data_w(data & 0x01);
-	m_rtc->clk_w((data >> 1) & 0x01);
+	m_snd_enable = !BIT(data, 7);
+	if (!m_snd_enable)
+	{
+		m_dac->level_w(0);
+	}
+	m_rtc->ce_w(BIT(data, 2));
+	m_rtc->data_w(BIT(data, 0));
+	m_rtc->clk_w(BIT(data, 1));
 }
 
-void mac128_state::mac_via_out_b_se(uint8_t data)
+void mac128_state::mac_via_out_b_se(u8 data)
 {
 //  printf("%s VIA OUT B: %02x\n", machine().describe_context().c_str(), data);
 
-	m_snd_enable = ((data & 0x80) == 0) ? true : false;
-	update_volume();
+	m_snd_enable = !BIT(data, 7);
+	if (!m_snd_enable)
+	{
+		m_dac->level_w(0);
+	}
 
-	m_scsiirq_enable = (data & 0x40) ? 0 : 1;
+	m_scsi_interrupt_mask = !BIT(data, 6); // only the SE and classic can actually enable this interrupt
 
 	m_adbmodem->set_via_state((data & 0x30) >> 4);
 
-	m_rtc->ce_w((data & 0x04)>>2);
-	m_rtc->data_w(data & 0x01);
-	m_rtc->clk_w((data >> 1) & 0x01);
+	m_rtc->ce_w(BIT(data, 2));
+	m_rtc->data_w(BIT(data, 0));
+	m_rtc->clk_w(BIT(data, 1));
+	field_interrupts(); // it is possible the mask above was enabled by the last write while a scsi interrupt was pending, hence a scsi interrupt should immediately fire.
 }
 
 /* *************************************************************************
@@ -932,26 +992,26 @@ void mac128_state::mouse_callback()
 
 void mac128_state::mac_driver_init()
 {
-	m_scsi_interrupt = 0;
+	m_scsi_interrupt = m_scsi_interrupt_mask = 0;
 
 	memset(m_ram->pointer(), 0, m_ram->size());
 }
 
-#define MAC_MAIN_SCREEN_BUF_OFFSET  (0x5900>>1)
-#define MAC_ALT_SCREEN_BUF_OFFSET   (0xD900>>1)
+static constexpr u32 MAC_MAIN_SCREEN_BUF_OFFSET = (0x5900>>1);
+static constexpr u32 MAC_ALT_SCREEN_BUF_OFFSET  = (0xd900>>1);
 
-uint32_t mac128_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 mac128_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint32_t const video_base = m_ram_size - (m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
-	uint16_t const *video_ram = (const uint16_t *) (m_ram_ptr + video_base);
+	u32 const video_base = m_ram_size - (m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	u16 const *video_ram = (const u16 *) (m_ram_ptr + video_base);
 
-	for (int y = 0; y < MAC_V_VIS; y++)
+	for (int y = MAC_V_FIRST; y < MAC_V_TOTAL; y++)
 	{
-		uint16_t *const line = &bitmap.pix(y);
+		u16 *const line = &bitmap.pix(y);
 
 		for (int x = 0; x < MAC_H_VIS; x += 16)
 		{
-			uint16_t const word = *(video_ram++);
+			u16 const word = *(video_ram++);
 			for (int b = 0; b < 16; b++)
 			{
 				line[x + b] = (word >> (15 - b)) & 0x0001;
@@ -962,13 +1022,13 @@ uint32_t mac128_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-void mac128_state::phases_w(uint8_t phases)
+void mac128_state::phases_w(u8 phases)
 {
 	if (m_cur_floppy)
 		m_cur_floppy->seek_phase_w(phases);
 }
 
-void mac128_state::devsel_w(uint8_t devsel)
+void mac128_state::devsel_w(u8 devsel)
 {
 	if (devsel == 1)
 		m_cur_floppy = m_floppy[0]->get_device();
@@ -986,7 +1046,7 @@ void mac128_state::devsel_w(uint8_t devsel)
 	}
 }
 
-void mac128_state::devsel_se_w(uint8_t devsel)
+void mac128_state::devsel_se_w(u8 devsel)
 {
 	// m_drive_select = 0 for the SE's two internal drives, 1 for the single external
 	if (!m_drive_select)
@@ -1018,10 +1078,29 @@ void mac128_state::devsel_se_w(uint8_t devsel)
     ADDRESS MAPS
 ***************************************************************************/
 
-void mac128_state::mac512ke_map(address_map &map)
+/* ROM mirroring notes
+ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a09 a08 a07 a06 a05 a04 a03 a02 a01[a00]
+   0  [a   b]  0 |[x] [x] [x]  x | *   *   *   * | *   *   *   * | *   *   *   * | *   *   *   *2 - mac 128/512 (64k rom w/overlay on) (a b = active if bits are 0 0, 0 1, or 1 0)
+   0   1  ?0?  0 |[x] [x] [x]  x | *   *   *   * | *   *   *   * | *   *   *   * | *   *   *   *2 - mac 128/512 (64k rom w/overlay off)
+   0  [a   b]  0 |[x] [x] [x]  * | *   *   *   * | *   *   *   * | *   *   *   * | *   *   *   *2 - mac 128/512 (128k rom w/overlay on) (a b = active if bits are 0 0, 0 1, or 1 0)
+   0   1  ?0?  0 |[x] [x] [x]  * | *   *   *   * | *   *   *   * | *   *   *   * | *   *   *   *2 - mac 128/512 (128k rom w/overlay off)
+   0   x   0  ?0?|[x] [x]  0   * | *   *   *   * | *   *   *   * | *   *   *   * | *   *   *   *2 - mac plus (128k rom w/overlay on)
+   0   1   0  ?0?|[x] [x]  0   * | *   *   *   * | *   *   *   * | *   *   *   * | *   *   *   *2 - mac plus (128k rom w/overlay off)
+   0   x   0  ?0?|[x] [x]  *   * | *   *   *   * | *   *   *   * | *   *   *   * | *   *   *   *2 - mac plus (256k mask rom[2] w/overlay on)
+   0   1   0  ?0?|[x] [x]  *   * | *   *   *   * | *   *   *   * | *   *   *   * | *   *   *   *2 - mac plus (256k mask rom[2] w/overlay off)
+ [x] = available for expanded ROM by using patch wires, as is done in some homebrew/mods
+ [2] - The Mac Plus never shipped with 256k of mask ROM; (it shipped with 128k
+        of mask rom on two JEDEC 23512 64KiB mask roms), but A17 was wired to
+        /OE (pin 22) as it would be on a non-JEDEC Toshiba tc531000/NEC 23c1024
+        28 pin 128KiB mask ROM.
+       The Mac SE did ship with a pair of tc531000/23c1024 mask ROMs.
+ *2  - A00 is not decoded for the ROMs; one of the ROMs connects to D15-D8 and the other to D7-D0
+ */
+
+ void mac128_state::mac512ke_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rw(FUNC(mac128_state::ram_r), FUNC(mac128_state::ram_w));
-	map(0x400000, 0x4fffff).rom().region("bootrom", 0).mirror(0x100000);
+	map(0x400000, 0x4fffff).rom().region("bootrom", 0);
 	map(0x600000, 0x6fffff).rw(FUNC(mac128_state::ram_600000_r), FUNC(mac128_state::ram_600000_w));
 	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
 	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
@@ -1034,7 +1113,7 @@ void mac128_state::macplus_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rw(FUNC(mac128_state::ram_r), FUNC(mac128_state::ram_w));
 	map(0x400000, 0x4fffff).rom().region("bootrom", 0);
-	map(0x580000, 0x5fffff).rw(FUNC(mac128_state::macplus_scsi_r), FUNC(mac128_state::macplus_scsi_w));
+	map(0x580000, 0x5fffff).rw(FUNC(mac128_state::scsi_r), FUNC(mac128_state::scsi_w));
 	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
 	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
@@ -1069,12 +1148,12 @@ void mac128_state::mac512ke(machine_config &config)
 	M68000(config, m_maincpu, C7M);        /* 7.8336 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::mac512ke_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
-	m_maincpu->set_tas_write_callback(NAME([] (offs_t offset, uint8_t data) { })); // TAS read-modify-write cycles are not supported on pre-SE Macs
+	m_maincpu->set_tas_write_callback(NAME([] (offs_t offset, u8 data) { })); // TAS read-modify-write cycles are not supported on pre-SE Macs
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
+	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, MAC_V_FIRST, MAC_V_TOTAL);
 	m_screen->set_native_aspect();
 	m_screen->set_screen_update(FUNC(mac128_state::screen_update_mac));
 	m_screen->screen_vblank().set(FUNC(mac128_state::vblank_w));
@@ -1082,14 +1161,19 @@ void mac128_state::mac512ke(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
+	TIMER(config, m_scanline_timer).configure_scanline(FUNC(mac128_state::mac_scanline), "screen", 0, 1);
+	TIMER(config, m_hblank_timer).configure_generic(FUNC(mac128_state::mac_hblank));
+
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	FILTER_BIQUAD(config, m_volfilter).opamp_mfb_lowpass_setup(RES_K(39.020), RES_K(0), RES_K(200), CAP_U(0), CAP_P(220)); // variable based on cd4016, short, R15, absent, C10
-	m_volfilter->add_route(ALL_OUTPUTS, "speaker", 0.195); // this filter has a max gain of ~5.126, so we diminish it by the inverse of that (0.195)
+	FILTER_RC(config, m_outfilter).set_rc(filter_rc_device::LOWPASS, RES_R(47), 0, 0, CAP_U(0.1)); // RC filter R7, C1
+	m_outfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_volfilter).opamp_diff_bandpass_setup(RES_K(39.020), RES_K(200), CAP_U(0.2), CAP_P(220));                     // variable differentiator filter based on cd4016, R15, C11+C12, C10
+	m_volfilter->add_route(ALL_OUTPUTS, m_outfilter, 0.195);                                                                             // this filter has a max gain of ~5.126, so we diminish it by the inverse of that (0.195)
 	FILTER_BIQUAD(config, m_filter).opamp_sk_lowpass_setup(RES_K(47), RES_K(47), RES_M(999.99), RES_R(0.001), CAP_U(0.001), CAP_P(470)); // R18, R14, absent, short, C18, C19
 	m_filter->add_route(ALL_OUTPUTS, m_volfilter, 1.0);
-	DAC_12BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, m_filter, 1.0); // 2 x ls161; this is a 1-bit PWM value selecting an 8-bit fraction from 0/352nds to 255/352nds of a scanline, with /SNDRES forcing it active for 352/352nds.
-
+	SPEAKER_SOUND(config, m_dac, 0).add_route(ALL_OUTPUTS, m_filter, 1.839); // speaker_filtered_1bit_pwm has an effective gain of 0.54375 so invert that
+	TIMER(config, m_dac_timer).configure_generic(FUNC(mac128_state::mac_dac));
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->cko_cb().set(m_via, FUNC(via6522_device::write_ca2));
@@ -1186,7 +1270,7 @@ void mac128_state::macplus(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR5380).machine_config([this](device_t *device) {
 		ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
-		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
+		// The IRQ pin (23) on the NCR5380 is unconnected on the Mac Plus, and will cause it to crash if it is
 		adapter.drq_handler().set(*this, FUNC(mac128_state::scsi_drq_w));
 	});
 
@@ -1234,6 +1318,10 @@ void mac128_state::macse(machine_config &config)
 
 	subdevice<nscsi_connector>("scsi:7")->set_option_machine_config("ncr5380", [this](device_t *device) {
 		ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
+		// The INT pin (23) on the NCR5380 is connected to the the GLU PAL16L8 pin 3.
+		// The VIA PB6 pin is connected to the GLU PAL16L8 pin 2, and the open-collector and /OE
+		// gated PAL16L8 output pin 14 is wired-OR with the VIA /IRQ pin to the 68K /IPL0 pin.
+		// This effectively performs a NAND of !(PB6) and INT to produce /SCSIIRQ.
 		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
 		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
 	});
@@ -1506,6 +1594,12 @@ ROM_START( macplus ) // same notes as above apply here as well
 	// @U1D  342-0522-A  VP16RP8MPC (PAL16R4A on schem) TSM
 ROM_END
 
+ROM_START( macplusj )
+	ROM_REGION16_BE(0x100000, "bootrom", 0)
+	ROMX_LOAD( "342-0441-a.u6d", 0x000000, 0x020000, CRC(ba5b74fb) SHA1(a39d10753d355144d6f483d9d3dc72993aa4b345), ROM_SKIP(1) )
+	ROMX_LOAD( "342-0442-a.u8d", 0x000001, 0x020000, CRC(19e552a7) SHA1(00ca715e653101bf5f42cf86fc5be11e028e2a6b), ROM_SKIP(1) )
+ROM_END
+
 ROM_START( macse )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_LOAD16_WORD( "macse.rom",  0x00000, 0x40000, CRC(0f7ff80c) SHA1(58532b7d0d49659fd5228ac334a1b094f0241968))
@@ -1534,7 +1628,8 @@ COMP( 1984, mac512k,  mac128k, 0,      mac512k,  macplus, mac128_state, mac_driv
 COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh 512ke", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, unitron,  macplus, 0,      mac512ke, macplus, mac128_state, mac_driver_init,  "bootleg (Unitron)", "Mac 512",  MACHINE_SUPPORTS_SAVE )
 COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh Plus",  MACHINE_SUPPORTS_SAVE )
+COMP( 1986, macplusj, macplus, 0,      macplus,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh Plus (Japan)",  MACHINE_SUPPORTS_SAVE )
 COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, mac_driver_init,  "bootleg (Unitron)", "Unitron 1024",  MACHINE_SUPPORTS_SAVE )
 COMP( 1987, macse,    0,       0,      macse,    macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh SE",  MACHINE_SUPPORTS_SAVE )
-COMP( 1987, macsefd,  0,       0,      macsefd,  macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh SE (FDHD)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1989, macsefd,  0,       0,      macsefd,  macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh SE (FDHD)",  MACHINE_SUPPORTS_SAVE )
 COMP( 1990, macclasc, 0,       0,      macclasc, macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh Classic",  MACHINE_SUPPORTS_SAVE )

@@ -134,6 +134,7 @@ const double XTAL::known_xtals[] = {
 	  5'659'200, // 5.6592_MHz_XTAL        Digilog 320 dot clock
 	  5'670'000, // 5.67_MHz_XTAL          RCA CDP1869 NTSC dot clock
 	  5'714'300, // 5.7143_MHz_XTAL        Cidelsa Destroyer, TeleVideo serial keyboards
+	  5'760'000, // 5.760_MHz_XTAL         ADI unknown keyboard
 	  5'856'000, // 5.856_MHz_XTAL         HP 3478A Multimeter
 	  5'911'000, // 5.911_MHz_XTAL         Philips Videopac Plus G7400
 	  5'990'400, // 5.9904_MHz_XTAL        Luxor ABC 800 keyboard (Keytronic custom part #48-300-008 is equivalent)
@@ -366,6 +367,7 @@ const double XTAL::known_xtals[] = {
 	 24'000'000, // 24_MHz_XTAL            Mario, 80's Data East games, 80's Konami games
 	 24'073'400, // 24.0734_MHz_XTAL       DEC Rainbow 100
 	 24'167'829, // 24.167829_MHz_XTAL     Neo Geo AES rev. 3-3 and later (~1536x NTSC line rate)
+	 24'180'000, // 24.18_MHz_XTAL         Gemini Wing bootleg
 	 24'270'000, // 24.27_MHz_XTAL         CIT-101XL
 	 24'300'000, // 24.3_MHz_XTAL          ADM 36 132-column display clock
 	 24'576'000, // 24.576_MHz_XTAL        Pole Position h/w, Model 3 CPU board

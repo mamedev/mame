@@ -34,7 +34,7 @@
 
 #include "bus/spectrum/zxbus/bus.h"
 #include "cpu/z80/z80n.h"
-#include "machine/i2cds1307.h"
+#include "machine/ds1307.h"
 #include "machine/spi_sdcard.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -123,6 +123,7 @@ protected:
 	void mmu_x2_w(offs_t bank, u8 data);
 	u8 dma_r(bool dma_mode);
 	void dma_w(bool dma_mode, u8 data);
+	u8 dma_mreq_r(offs_t offset);
 	u8 spi_data_r();
 	void spi_data_w(u8 data);
 	void spi_miso_w(u8 data);
@@ -1153,6 +1154,15 @@ void specnext_state::dma_w(bool dma_mode, u8 data)
 {
 	m_dma->dma_mode_w(dma_mode);
 	m_dma->write(data);
+}
+
+u8 specnext_state::dma_mreq_r(offs_t offset)
+{
+	if (m_nr_07_cpu_speed == 0b11)
+	{
+		m_dma->adjust_wait(1);
+	}
+	return m_program.read_byte(offset);
 }
 
 u8 specnext_state::reg_r(offs_t nr_register)
@@ -2262,13 +2272,13 @@ static const z80_daisy_config z80_daisy_chain[] =
 
 TIMER_CALLBACK_MEMBER(specnext_state::irq_off)
 {
-	spectrum_state::irq_off(param);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	m_irq_mask = 0;
 }
 
 TIMER_CALLBACK_MEMBER(specnext_state::irq_on)
 {
-	spectrum_state::irq_on(param);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	m_irq_mask |= 1 << 11;
 	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 }
@@ -2288,8 +2298,7 @@ INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 	line_irq_adjust();
 	if (!port_ff_interrupt_disable())
 	{
-		m_irq_on_timer->adjust(m_screen->time_until_pos(SCR_256x192.top(), SCR_256x192.left())
-			- attotime::from_ticks(14365, m_maincpu->unscaled_clock()));
+		m_irq_on_timer->adjust(m_screen->time_until_pos((SCR_256x192.bottom() + 57) % CYCLES_VERT, SCR_256x192.left()));
 	}
 }
 
@@ -2406,6 +2415,12 @@ void specnext_state::map_fetch(address_map &map)
 			approach gives better experience in debugger UI. */
 			do_m1(offset);
 			m_divmmc_delayed_check = 0;
+
+			// do_m1 performs read from m_program with waits, we need to take it back
+			if (!machine().side_effects_disabled() && (m_nr_07_cpu_speed == 0b11))
+			{
+				m_maincpu->adjust_icount(1);
+			}
 		}
 
 		return m_program.read_byte(offset);
@@ -3429,6 +3444,14 @@ void specnext_state::video_start()
 			to[offset & 0x1fff] = data;
 		}
 	});
+	prg.install_read_tap(0x0000, 0xffff, "mem_wait_r", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		// The 28MHz with core 3.0.5 is adding extra wait state to every instruction opcode fetch and memory read
+		if (!machine().side_effects_disabled() && (m_nr_07_cpu_speed == 0b11))
+		{
+			m_maincpu->adjust_icount(-1);
+		}
+	});
 }
 
 void specnext_state::tbblue(machine_config &config)
@@ -3457,7 +3480,7 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_DMA(config, m_dma, 28_MHz_XTAL / 8);
 	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_dma->in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
+	m_dma->in_mreq_callback().set(FUNC(specnext_state::dma_mreq_r));
 	m_dma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
 	m_dma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
 	m_dma->out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
@@ -3471,7 +3494,7 @@ void specnext_state::tbblue(machine_config &config)
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
 
-	SPEAKER(config, "speakers", 2).front();
+	SPEAKER(config.replace(), "speakers", 2).front();
 
 	DAC_8BIT_R2R(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speakers", 0.75, 0);
 	DAC_8BIT_R2R(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speakers", 0.75, 0);

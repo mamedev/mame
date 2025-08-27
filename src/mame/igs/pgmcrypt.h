@@ -64,5 +64,10 @@ void mxsqy_decrypt(running_machine& machine) ATTR_COLD;
 void qiji6_decrypt(running_machine& machine) ATTR_COLD;
 void mjzb_decrypt(running_machine& machine) ATTR_COLD;
 void tswxp_decrypt(running_machine& machine) ATTR_COLD;
+void jking04_decrypt(running_machine& machine) ATTR_COLD;
+void krzykeno_decrypt(running_machine& machine) ATTR_COLD;
+void royal5p_decrypt(running_machine& machine) ATTR_COLD;
+void jhg3d_decrypt(running_machine& machine) ATTR_COLD;
+void gonefsh_decrypt(running_machine& machine) ATTR_COLD;
 
 #endif // MAME_IGS_PGMCRYPT_H

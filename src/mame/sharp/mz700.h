@@ -149,9 +149,6 @@ private:
 	void mz800_read_format_w(uint8_t data);
 	void mz800_display_mode_w(uint8_t data);
 	void mz800_scroll_border_w(uint8_t data);
-	uint8_t mz800_ramdisk_r();
-	void mz800_ramdisk_w(uint8_t data);
-	void mz800_ramaddr_w(uint8_t data);
 	void mz800_palette_w(uint8_t data);
 	void mz800_cgram_w(offs_t offset, uint8_t data);
 	uint32_t screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -166,8 +163,6 @@ private:
 	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 
 	std::unique_ptr<uint8_t[]> m_cgram;
-
-	uint16_t m_mz800_ramaddr = 0;
 };
 
 #endif // MAME_SHARP_MZ700_H

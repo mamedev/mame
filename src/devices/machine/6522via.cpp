@@ -263,10 +263,11 @@ void via6522_device::device_start()
 	m_ddr_b = 0;
 	m_latch_b = 0;
 
-	m_t1cl = 0;
-	m_t1ch = 0;
-	m_t2cl = 0;
-	m_t2ch = 0;
+	// TODO: initial counter state unknown, but definitely not zero.
+	m_t1cl = 0xff;
+	m_t1ch = 0xff;
+	m_t2cl = 0xff;
+	m_t2ch = 0xff;
 
 	m_sr = 0;
 	m_pcr = 0;
@@ -338,11 +339,6 @@ void via6522_device::device_reset()
 	m_ddr_b = 0;
 	m_latch_b = 0;
 
-	m_t1cl = 0;
-	m_t1ch = 0;
-	m_t2cl = 0;
-	m_t2ch = 0;
-
 	m_pcr = 0;
 	m_acr = 0;
 	m_ier = 0;
@@ -350,7 +346,6 @@ void via6522_device::device_reset()
 	m_t1_active = 0;
 	m_t1_pb7 = 1;
 	m_t2_active = 0;
-	m_shift_counter = 0;
 
 	output_pa();
 	output_pb();

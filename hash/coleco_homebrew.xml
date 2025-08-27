@@ -746,6 +746,20 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<!-- There is also a newer 2023 version -->
+	<software name="gradius">
+		<description>Gradius</description>
+		<year>2016</year>
+		<publisher>Opcode Games</publisher>
+		<info name="usage" value="req. Super Game Module" />
+		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="sgc_1mbit" />
+			<dataarea name="rom" size="131072">
+				<rom name="gradius.rom" size="131072" crc="30d337e4" sha1="20a3204faf796fe8284eab0e47cb17738219c999" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gulkave">
 		<description>Gulkave</description>
 		<year>2010</year>
@@ -1839,6 +1853,18 @@ Unoffical software releases for the Coleco Colecovision
 			<feature name="slot" value="megacart" />
 			<dataarea name="rom" size="131072">
 				<rom name="super-space-acer-2011.rom" size="131072" crc="ae209065" sha1="cfd112d2e907262cf9b60c2d43f19d2596f5892a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="svellas">
+		<description>Svellas</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="megacart" />
+			<dataarea name="rom" size="9259">
+				<rom name="svellas.rom" size="9259" crc="3244546f" sha1="366dbc7552fd0a9e13b88a95b74141e81e0114ec" />
 			</dataarea>
 		</part>
 	</software>

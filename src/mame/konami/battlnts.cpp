@@ -309,32 +309,29 @@ void battlnts_state::machine_reset()
 void battlnts_state::battlnts(machine_config &config)
 {
 	// basic machine hardware
-	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // HD63C09EP
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // HD63C09EP
 	m_maincpu->set_addrmap(AS_PROGRAM, &battlnts_state::main_map);
 
-	Z80(config, m_audiocpu, XTAL(24'000'000) / 6); // 3579545? (no such XTAL on board)
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 6); // 3579545? (no such XTAL on board)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &battlnts_state::sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(battlnts_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set(FUNC(battlnts_state::vblank_irq));
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 128);
 
-	K007342(config, m_k007342, 0, "palette", gfx_battlnts_tiles);
+	K007342(config, m_k007342, 24_MHz_XTAL, "palette", gfx_battlnts_tiles);
 	m_k007342->set_tile_callback(FUNC(battlnts_state::tile_callback));
 	m_k007342->flipscreen_cb().set(m_k007420, FUNC(k007420_device::set_flipscreen));
 	m_k007342->sprite_wrap_y_cb().set(m_k007420, FUNC(k007420_device::set_wrap_y));
 
-	K007420(config, m_k007420, 0, "palette", gfx_battlnts_spr);
+	K007420(config, m_k007420, 24_MHz_XTAL, "palette", gfx_battlnts_spr);
 	m_k007420->set_bank_limit(0x3ff);
 	m_k007420->set_sprite_callback(FUNC(battlnts_state::sprite_callback));
 
@@ -343,9 +340,9 @@ void battlnts_state::battlnts(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM3812(config, "ym1", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM3812(config, "ym1", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	YM3812(config, "ym2", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM3812(config, "ym2", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

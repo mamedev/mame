@@ -253,6 +253,12 @@ public:
 	sst_39sf010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class sst_39sf020_device : public intelfsh8_device
+{
+public:
+	sst_39sf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class sst_39sf040_device : public intelfsh8_device
 {
 public:
@@ -425,6 +431,7 @@ DECLARE_DEVICE_TYPE(PANASONIC_MN63F805MNP,   panasonic_mn63f805mnp_device)
 DECLARE_DEVICE_TYPE(SANYO_LE26FV10N1TS,      sanyo_le26fv10n1ts_device)
 DECLARE_DEVICE_TYPE(SST_28SF040,             sst_28sf040_device)
 DECLARE_DEVICE_TYPE(SST_39SF010,             sst_39sf010_device)
+DECLARE_DEVICE_TYPE(SST_39SF020,             sst_39sf020_device)
 DECLARE_DEVICE_TYPE(SST_39SF040,             sst_39sf040_device)
 DECLARE_DEVICE_TYPE(SST_39VF020,             sst_39vf020_device)
 DECLARE_DEVICE_TYPE(SST_49LF020,             sst_49lf020_device)

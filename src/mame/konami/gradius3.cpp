@@ -181,8 +181,6 @@ uint32_t gradius3_state::screen_update_gradius3(screen_device &screen, bitmap_in
 	m_k052109->write(0x1d80, 0x10);
 	m_k052109->write(0x1f00, 0x32);
 
-	m_k052109->tilemap_update();
-
 	screen.priority().fill(0, cliprect);
 	if (m_priority == 0)
 	{

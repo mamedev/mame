@@ -769,9 +769,9 @@ void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
 				{
 				case CONF_VERSION:
 				{
-					strcpy((char *)m_fx, "M.A.M.E.");
+					strcpy((char *)m_fx, "MAME");
 					PAIR16 m_ver;
-					m_ver.w = ((22 << 9) | (02 << 5) | 8); // y.m.d
+					m_ver.w = ((25 << 9) | (07 << 5) | 31); // y.m.d
 					m_fx[0x0c] = m_ver.b.l;
 					m_fx[0x0d] = m_ver.b.h;
 					break;
@@ -785,10 +785,8 @@ void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
 				}
 				for (u8 i = 0; i < 0xf; i++)
 				{
-					m_glukrs->address_w(0xf0 + i);
-					m_glukrs->data_w(m_fx[i]);
+					m_glukrs->write_direct(0xf0 + i, m_fx[i]);
 				}
-				m_glukrs->address_w(0xf0);
 			}
 			else
 			{

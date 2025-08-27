@@ -174,6 +174,11 @@ ROM_START( tomyegg )
 	ROM_LOAD( "gpr25l6403f.u1", 0x0000, 0x800000, CRC(2acd6752) SHA1(85e59546a1af4618c75c275cead7ef0f5e3faa44) )
 ROM_END
 
+ROM_START( chikawac )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "xm25qh64c.u1", 0x0000, 0x800000, CRC(88c984aa) SHA1(6e176960b64fc3576efaa40dfe2ff0a6dcea3c3f) )
+ROM_END
+
 } // anonymous namespace
 
 // Tomy / San-X devices
@@ -181,18 +186,17 @@ ROM_END
 // dates for each of these taken from back of case, are the DX versions different software or just different accessories?
 
 // 2018 version is a square device - Sumikko Gurashi - Sumikko Atsume (すみっコぐらし すみっコあつめ)
+// see evolution_handheld.cpp
 
 // 2019 version is house shaped device - すみっコぐらし すみっコさがし
 CONS( 2019, sanxpet,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // or Sumikko Gurashi - Sumikko Sagashi DX (すみっコぐらし すみっコさがしDX "Sumikko Gurashi the movie" alt version)
 
-// 2020 version is a cloud shaped device - Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)
-// or Sumikko Gurashi - Sumikko Catch DX (すみっコぐらし すみっコキャッチDX) = Sumikko Catch with pouch and strap
+// 2020 version - Sumikko Gurashi - Sumikko Catch, see generalplus_gpl16250_spi_direct.cpp
 
 // 2021 version is a square device with a tiny 'mole' figure on top - すみっコぐらし すみっコみっけDX
 // or Sumikko Gurashi - Sumikko Mikke (すみっコぐらし すみっコみっけ)
 CONS( 2021, sanxpeta,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke DX (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-
 
 // other devices on the same Soc
 
@@ -201,3 +205,5 @@ CONS( 2019, tomyegg,         0,        0,      gp327902, gp327902, generalplus_g
 // these also exist, are they the same software or different versions?
 // Powder Pink (パウダーピンク)
 // Mint Blue (ミントブルー).
+
+CONS( 2021, chikawac,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Chiikawa Camera De Ya-! (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -8,7 +8,6 @@ Uses a TC0091LVC, a variant of the one used on Taito L HW
 
 Undumped games on similar hardware (ES-9402 or ES-9410):
 * Angel Fever
-* Gold Strike
 * Lucky Pierrot / Wonder Circus
 * Miracle Seven
 * Miracle Seven - Heaven's Gate Turbo
@@ -18,7 +17,8 @@ Undumped games on similar hardware (ES-9402 or ES-9410):
 TODO:
 - lastbank: sprites should be clip masked during gameplay (verify);
 - fever13: OKI sound volume overdrives a lot;
-- wcircus: sound flags / latches are somewhat different, need correct implementation
+- goldstrk, wcircus: sound flags / latches are somewhat different, need correct implementation;
+- goldstrk: correct DIP definitions;
 - hookup hopper device;
 
 **************************************************************************************************/
@@ -901,6 +901,24 @@ ROM_START( wcircus )
 	ROM_LOAD( "gal16v8b.u45", 0x000, 0x117, CRC(02e1f2e9) SHA1(25ae98facfed2796bfc1ad33cce73c5074edd135) )
 ROM_END
 
+// ES-9402 PCB
+ROM_START( goldstrk )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "7.gsoh.u9", 0x00000, 0x40000, CRC(2401cc35) SHA1(4e12150ad18aea5adf07ab8fcb39fd175bc8e4e5) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "3.u48", 0x00000, 0x10000, CRC(ec8a0ccc) SHA1(84ffb5c9614764500f41cff8f0d6d5ad9f0d8084) ) // same as wcircus
+
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "1.gschr.u11", 0x000000, 0x080000, CRC(07d75465) SHA1(ba16fe05800ebedafec64f1f0f2bfb953c39d159) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "7.gsse.u55", 0x00000, 0x40000, CRC(0eb850ba) SHA1(0b9a704188e3b8a50e54fc29fc8e4dad2e3e8397) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
+	ROM_LOAD( "7.gsbgm.u60", 0x00000, 0x80000, CRC(04952e51) SHA1(272283306d9ec951baa85cb8e2d8952da7a98894) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -909,3 +927,4 @@ GAME( 1995, fever13,  0,       lastbank, fever13,  fever13_state,  empty_init, R
 GAME( 1995, ukiyobox, fever13, lastbank, ukiyobox, fever13_state,  empty_init, ROT0, "Excellent System", "Ukiyo Box (Japan, v1.3.7)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1996, mir7hg,   0,       lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 199?, wcircus,  0,       lastbank, wcircus,  wcircus_state,  empty_init, ROT0, "Cobra",            "Wonder Circus (Japan, v1.1.1)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, goldstrk, 0,       lastbank, wcircus,  wcircus_state,  empty_init, ROT0, "Cobra",            "Gold Strike (Japan, v1.1.1 - Location Test)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

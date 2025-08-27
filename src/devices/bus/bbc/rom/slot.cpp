@@ -123,20 +123,24 @@ std::pair<std::error_condition, std::string> bbc_romslot_device::call_load()
 		if (size % 0x2000)
 			return std::make_pair(image_error::INVALIDLENGTH, "Invalid ROM size (must be a multiple of 8K)");
 
-		m_cart->rom_alloc(size, tag());
+		uint8_t *base;
+		const char *pcb_name = get_feature("slot");
+		if (pcb_name && !strcmp(pcb_name, "ram"))
+		{
+			base = m_cart->get_ram_base();
+		}
+		else
+		{
+			m_cart->rom_alloc(size, tag());
+			base = m_cart->get_rom_base();
+		}
 
 		if (!loaded_through_softlist())
-			fread(m_cart->get_rom_base(), size);
+			fread(base, size);
 		else
-			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
+			memcpy(base, get_software_region("rom"), size);
 
 		m_cart->decrypt_rom();
-
-		if (get_software_region("ram"))
-			m_cart->ram_alloc(get_software_region_length("ram"));
-
-		if (get_software_region("nvram"))
-			m_cart->nvram_alloc(get_software_region_length("nvram"));
 	}
 
 	return std::make_pair(std::error_condition(), std::string());
@@ -216,10 +220,23 @@ void bbc_romslot_device::write(offs_t offset, uint8_t data)
 #include "rtc.h"
 
 
+//-------------------------------------------------
+//  present - rom/ram selected
+//-------------------------------------------------
+
+bool bbc_romslot_device::present()
+{
+	if (m_cart && ((m_cart->device().type() == BBC_RAM) || m_cart->device().type() == BBC_NVRAM))
+		return true;
+	else
+		return is_loaded() || loaded_through_softlist();
+}
+
+
 void bbc_rom_devices(device_slot_interface &device)
 {
+	device.option_add("ram", BBC_RAM);
 	device.option_add_internal("rom", BBC_ROM);
-	device.option_add_internal("ram", BBC_RAM);
 	device.option_add_internal("nvram", BBC_NVRAM);
 	device.option_add_internal("cciword", BBC_CCIWORD);
 	device.option_add_internal("ccibase", BBC_CCIBASE);

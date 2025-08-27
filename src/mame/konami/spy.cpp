@@ -8,9 +8,9 @@
 
     driver by Nicola Salmoria
 
-    BTANB:
-    - sprites lag by 1 frame, I'm saying this since it looks nicer on on old
-      MAME versions. However, the 1 frame lag is accurate when compared to PCB.
+    TODO:
+    - sprites should be lagging by 1 frame (eg. on the platforming levels,
+      bg scroll and sprite movement should not be in sync)
 
     Revisions:
 
@@ -151,8 +151,6 @@ K051960_CB_MEMBER(spy_state::sprite_callback)
 
 uint32_t spy_state::screen_update_spy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
 	screen.priority().fill(0, cliprect);
 
 	if (m_video_enable)

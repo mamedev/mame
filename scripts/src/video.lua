@@ -45,6 +45,19 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ym7101.h,VIDEOS["YM7101"] = true
+--------------------------------------------------
+
+if (VIDEOS["YM7101"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ym7101.cpp",
+		MAME_DIR .. "src/devices/video/ym7101.h",
+	}
+end
+
+
+--------------------------------------------------
+--
 --@src/devices/video/am8052.h,VIDEOS["AM8052"] = true
 --------------------------------------------------
 
@@ -1778,5 +1791,17 @@ if (VIDEOS["ST7626"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/st7626.cpp",
 		MAME_DIR .. "src/devices/video/st7626.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/serialvfd.h,VIDEOS["SERIALVFD"] = true
+--------------------------------------------------
+
+if (VIDEOS["SERIALVFD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/serialvfd.cpp",
+		MAME_DIR .. "src/devices/video/serialvfd.h",
 	}
 end

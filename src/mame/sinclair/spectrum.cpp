@@ -294,7 +294,8 @@ SamRam
 
 uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 {
-	if (is_contended(offset)) content_early();
+	m_is_m1_rd_contended = false;
+	if (!machine().side_effects_disabled() && is_contended(offset)) content_early();
 
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
@@ -308,7 +309,7 @@ uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 
 uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 {
-	if (is_contended(offset)) content_early();
+	if (!machine().side_effects_disabled() && is_contended(offset)) content_early();
 
 	m_exp->pre_data_fetch(offset);
 	uint8_t retval = m_specmem->read8(offset);
@@ -372,8 +373,11 @@ void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 /* DJR: Spectrum+ keys added */
 uint8_t spectrum_state::spectrum_ula_r(offs_t offset)
 {
-	if (is_contended(offset)) content_early();
-	content_early(1);
+	if (!machine().side_effects_disabled())
+	{
+		if (is_contended(offset)) content_early();
+		content_early(1);
+	}
 
 	int lines = offset >> 8;
 	int data = 0xff;
@@ -462,7 +466,7 @@ void spectrum_state::spectrum_port_w(offs_t offset, uint8_t data)
 
 uint8_t spectrum_state::spectrum_port_r(offs_t offset)
 {
-	if (is_contended(offset))
+	if (!machine().side_effects_disabled() && is_contended(offset))
 	{
 		content_early();
 		content_late();
@@ -686,6 +690,7 @@ void spectrum_state::machine_start()
 {
 	save_item(NAME(m_port_fe_data));
 	save_item(NAME(m_int_at));
+	save_item(NAME(m_is_m1_rd_contended));
 
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 	m_maincpu->space(AS_IO).specific(m_io);
@@ -698,6 +703,7 @@ void spectrum_state::machine_reset()
 	m_port_fe_data = -1;
 	m_port_7ffd_data = -1;
 	m_port_1ffd_data = -1;
+	m_is_m1_rd_contended = false;
 	m_irq_on_timer->adjust(attotime::never);
 	m_irq_off_timer->adjust(attotime::never);
 }
@@ -722,13 +728,13 @@ TIMER_CALLBACK_MEMBER(spectrum_state::irq_on)
 {
 	m_int_at = m_maincpu->total_cycles();
 	m_int_at -= m_maincpu->attotime_to_cycles(m_maincpu->local_time() - machine().time());
-	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 }
 
 TIMER_CALLBACK_MEMBER(spectrum_state::irq_off)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
@@ -744,6 +750,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_maincpu->set_memory_map(&spectrum_state::spectrum_data);
 	m_maincpu->set_io_map(&spectrum_state::spectrum_io);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
+	m_maincpu->refresh_cb().set(FUNC(spectrum_state::spectrum_refresh_w));
 	m_maincpu->nomreq_cb().set(FUNC(spectrum_state::spectrum_nomreq));
 	m_maincpu->busack_cb().set("dma", FUNC(dma_slot_device::bai_w));
 
@@ -768,8 +775,8 @@ void spectrum_state::spectrum_common(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_spectrum);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER(config, "speakers").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "speakers", 0.50);
 	static const double speaker_levels[4] = { 0.0, 0.33, 0.66, 1.0 };
 	m_speaker->set_levels(4, speaker_levels);
 
@@ -794,7 +801,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(tzx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->add_route(ALL_OUTPUTS, "speakers", 0.05);
 	m_cassette->set_interface("spectrum_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("spectrum_cass");

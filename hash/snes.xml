@@ -20615,7 +20615,7 @@ more investigation needed...
 	</software>
 
 	<software name="ninjawaru" cloneof="ninjawar">
-		<description>The Ninjawarriors (USA)</description>
+		<description>The Ninja Warriors (USA)</description>
 		<year>1994</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="SNS-NI-USA" />
@@ -52008,7 +52008,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ninjawarj" cloneof="ninjawar">
-		<description>The Ninjawarriors Again (Japan)</description>
+		<description>The Ninja Warriors Again (Japan)</description>
 		<year>1994</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="SHVC-NI" />
@@ -52023,7 +52023,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ninjawar">
-		<description>The Ninjawarriors (Europe)</description>
+		<description>The Ninja Warriors (Europe)</description>
 		<year>1994</year>
 		<publisher>Titus</publisher>
 		<info name="alt_title" value="Ninjawarriors - The New Generation (Box)" />

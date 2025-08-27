@@ -50,9 +50,9 @@
 
 #include "emu.h"
 #include "kaypro.h"
-#include "kay_kbd.h"
 #include "formats/kaypro_dsk.h"
 
+#include "bus/keytronic/keytronic.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "machine/com8116.h"
@@ -246,9 +246,9 @@ void kayproii_state::kayproii(machine_config &config)
 	/* devices */
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(kayproii_state::quickload_cb));
 
-	kaypro_10_keyboard_device &kbd(KAYPRO_10_KEYBOARD(config, "kbd"));
-	kbd.rxd_cb().set("sio", FUNC(z80sio_device::rxb_w));
-	kbd.rxd_cb().append("sio", FUNC(z80sio_device::syncb_w));
+	keytronic_connector_device &kbd(KEYTRONIC_CONNECTOR(config, "kbd", kaypro_keyboards, "kayproii"));
+	kbd.ser_out_callback().set("sio", FUNC(z80sio_device::rxb_w));
+	kbd.ser_out_callback().append("sio", FUNC(z80sio_device::syncb_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(kayproii_state::write_centronics_busy));
@@ -281,7 +281,7 @@ void kayproii_state::kayproii(machine_config &config)
 	sio.out_txda_callback().set("serial", FUNC(rs232_port_device::write_txd));
 	sio.out_dtra_callback().set("serial", FUNC(rs232_port_device::write_dtr));
 	sio.out_rtsa_callback().set("serial", FUNC(rs232_port_device::write_rts));
-	sio.out_txdb_callback().set("kbd", FUNC(kaypro_10_keyboard_device::txd_w));
+	sio.out_txdb_callback().set("kbd", FUNC(keytronic_connector_device::ser_in_w));
 
 	FD1793(config, m_fdc, 20_MHz_XTAL / 20);
 	m_fdc->intrq_wr_callback().set(FUNC(kayproii_state::fdc_intrq_w));
@@ -340,9 +340,9 @@ void kaypro84_state::kaypro484(machine_config &config)
 
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(kaypro84_state::quickload_cb));
 
-	kaypro_10_keyboard_device &kbd(KAYPRO_10_KEYBOARD(config, "kbd"));
-	kbd.rxd_cb().set("sio_1", FUNC(z80sio_device::rxb_w));
-	kbd.rxd_cb().append("sio_1", FUNC(z80sio_device::syncb_w));
+	keytronic_connector_device &kbd(KEYTRONIC_CONNECTOR(config, "kbd", kaypro_keyboards, "kaypro10"));
+	kbd.ser_out_callback().set("sio_1", FUNC(z80sio_device::rxb_w));
+	kbd.ser_out_callback().append("sio_1", FUNC(z80sio_device::syncb_w));
 
 	CLOCK(config, "kbdtxrxc", 16_MHz_XTAL / 16 / 13 / 16).signal_handler().set("sio_1", FUNC(z80sio_device::rxtxcb_w));
 
@@ -368,7 +368,7 @@ void kaypro84_state::kaypro484(machine_config &config)
 	sio_1.out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
 	sio_1.out_dtra_callback().set("modem", FUNC(rs232_port_device::write_dtr));
 	sio_1.out_rtsa_callback().set("modem", FUNC(rs232_port_device::write_rts));
-	sio_1.out_txdb_callback().set("kbd", FUNC(kaypro_10_keyboard_device::txd_w));
+	sio_1.out_txdb_callback().set("kbd", FUNC(keytronic_connector_device::ser_in_w));
 
 	z80sio_device& sio_2(Z80SIO(config, "sio_2", 16_MHz_XTAL / 4)); /* extra sio for modem and printer */
 	sio_2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // FIXME: use a combiner

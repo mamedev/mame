@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*
 
-  ES5503 - Ensoniq ES5503 "DOC" emulator v2.3
+  ES5503 - Ensoniq ES5503 "DOC" emulator v2.4
   By R. Belmont.
 
   Copyright R. Belmont.
@@ -37,6 +37,8 @@
   2.2 (RB) - More precise one-shot even/swap odd behavior from hardware observations with Ian Brumby's SWAPTEST.
   2.3 (RB) - Sync & AM modes added, emulate the volume glitch for the highest-numbered enabled oscillator.
   2.3.1 (RB) - Fixed thinko in the volume glitch emulation and minor cleanup.
+  2.4 (RB) - Halting an oscillator from the CPU behaves the same as halting it from the DOC itself.
+             Skate or Die on the IIgs accidentally relies on this behavior.
 */
 
 #include "emu.h"
@@ -134,8 +136,9 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 	}
 	else
 	{
-		// if we're not swap and we're the even oscillator of the pair and the partner's swap
-		// but we aren't, we retrigger (!!!)  Verified on IIgs hardware.
+		// if we're the even oscillator of the pair and the partner's swap
+		// but we aren't, we retrigger (!!!)  Verified on IIgs hardware, and hinted by
+		// the Ensoniq data sheet.
 		if ((partnerMode == MODE_SWAP) && ((onum & 1)==0))
 		{
 			pOsc->control &= ~1;
@@ -451,11 +454,19 @@ void es5503_device::write(offs_t offset, u8 data)
 				{
 					m_oscillators[osc].accumulator = 0;
 				}
+
+				// The Ensoniq data sheet says that if the low bit of the mode is set,
+				// then halting either internally or from the CPU will reset the oscillator.
+				// In practice, this means in swap mode that we will also do the swap.
+				if (!(m_oscillators[osc].control & 1) && ((data & 1)) && ((data >> 1) & 1))
+				{
+					halt_osc(osc, 0, &m_oscillators[osc].accumulator, resshifts[m_oscillators[osc].resolution]);
+				}
 				m_oscillators[osc].control = data;
 				break;
 
-			case 0xc0:  // bank select / wavetable size / resolution
-				if (data & 0x40)    // bank select - not used on the Apple IIgs
+			case 0xc0:           // bank select / wavetable size / resolution
+				if (data & 0x40) // bank select, effectively A16 for external addressing
 				{
 					m_oscillators[osc].wavetblpointer |= 0x10000;
 				}
@@ -464,7 +475,7 @@ void es5503_device::write(offs_t offset, u8 data)
 					m_oscillators[osc].wavetblpointer &= 0xffff;
 				}
 
-				m_oscillators[osc].wavetblsize = ((data>>3) & 7);
+				m_oscillators[osc].wavetblsize = ((data >> 3) & 7);
 				m_oscillators[osc].wtsize = wavesizes[m_oscillators[osc].wavetblsize];
 				m_oscillators[osc].resolution = (data & 7);
 				break;

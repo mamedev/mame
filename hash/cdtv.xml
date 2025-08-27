@@ -3,9 +3,6 @@
 <!--
 license:CC0-1.0
 
-We currently mark all of these as supported=no because none works on the intended HW (CDTV)
-
-
 TODO:
 - verify if all of these are really CDTV as minimum requirement;
 - Substitute low grade anon dumps with redump.org, for proper serial identification;
@@ -15,6 +12,7 @@ TODO:
 - Most Discis releases:
   "To preview other Discis books, press the ?/Escape button once the button has opened"
   Test this when CDTV works, it may list undumped Discis releases.
+
 -->
 <softwarelist name="cdtv" description="Commodore Amiga CDTV CD-ROMs">
 	<!--
@@ -187,7 +185,7 @@ cd32: black screen
 		<year>1991</year>
 		<publisher>MultiMedia Corporation</publisher>
 		<notes><![CDATA[
-cd32: cursor is uncontrollable, [joytest] reset counter
+cdtv/cd32: cursor is uncontrollable, [joytest] reset counter
 ]]></notes>
 		<info name="sku" value="CDT-2502"/>
 		<info name="disc_matrix" value="MADE BY DISCOVERY SYSTEMS - AN AMERICAN COMPANY U2RY010UB"/>
@@ -203,14 +201,11 @@ cd32: cursor is uncontrollable, [joytest] reset counter
 		</part>
 	</software>
 
-	<software name="lngranch" supported="no">
+	<software name="lngranch" supported="yes">
 		<!-- https://hol.abime.net/5792 -->
 		<description>A Long, Hard Day at the Ranch (UK, Spain)</description>
 		<year>1991</year>
 		<publisher>Discis Knowledge Research</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="book_author" value="Audrey Nelson"/>
 		<info name="book_isbn" value="0-921974-45-0"/>
 		<info name="disc_matrix" value="CDRM-574000 4"/>
@@ -226,7 +221,7 @@ cd32: boot OK
 		<year>1991</year>
 		<publisher>Dominion Software &amp; Design</publisher>
 		<notes><![CDATA[
-cd32: cuts off GFX display to the far right
+[Denise] HAM strips on actual photos
 ]]></notes>
 
 		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
@@ -242,7 +237,7 @@ cd32: cuts off GFX display to the far right
 		<year>1991</year>
 		<publisher>Dominion Software &amp; Design</publisher>
 		<notes><![CDATA[
-cd32: cuts off GFX display to the far right
+[Denise] HAM strips on actual photos
 ]]></notes>
 		<info name="disc_matrix" value="MADE BY DISCOVERY SYSTEMS - AN AMERICAN COMPANY   U2RW010UB"/>
 		<part name="cdrom" interface="cdrom">
@@ -256,13 +251,12 @@ cd32: cuts off GFX display to the far right
 		</part>
 	</software>
 
-	<!-- All Dogs Go To Heaven -->
 	<software name="dgheaven" supported="no">
 		<description>All Dogs Go to Heaven: Talking Electric Crayon</description>
 		<year>1991</year>
 		<publisher>Merit Software</publisher>
 		<notes><![CDATA[
-cd32: boot OK
+Not extensively tested
 ]]></notes>
 		<info name="sku" value="CDT-3532"/>
 		<part name="cdrom" interface="cdrom">
@@ -272,14 +266,11 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<software name="amerdict" supported="no">
+	<software name="amerdict" supported="yes">
 		<!-- v910214 in main menu -->
 		<description>American Heritage Illustrated Encyclopedic Dictionary (USA, 1991a Edition)</description>
 		<year>1991</year>
 		<publisher>Xïphias</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="serial" value="CDRM 446200"/>
 		<info name="disc_matrix" value="CDRM-446200 1"/>
 		<info name="sku" value="CDT-7501"/>
@@ -311,15 +302,12 @@ Has untested printer option
 	</software>
 
 	<!-- Apprenez L'Anglais Avec Asterix - Asterix and Son - Disque 1 -->
-	<software name="asterix1" supported="no">
+	<software name="asterix1" supported="yes">
 		<!-- French release but still full English as title hints -->
 		<!-- https://hol.abime.net/4034 -->
 		<description>Apprenez l'Anglais Avec Astérix - Asterix and Son</description>
 		<year>1991</year>
 		<publisher>EuroTalk</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="apprenez l'anglais avec asterix - asterix and son - disque 1 (1991)(eurotalk)(fr)" sha1="71a9d4130ea8fb8d693befc8d3766df5befcced0" status="baddump" />
@@ -328,14 +316,11 @@ cd32: boot OK
 	</software>
 
 	<!-- Read with Asterix - Asterix and Son -->
-	<software name="asterix1a" cloneof="asterix1" supported="no">
+	<software name="asterix1a" cloneof="asterix1" supported="yes">
 		<!-- Earlier revision, without "The interview" and "Recording" sub-menus -->
 		<description>Read with Asterix - Asterix and Son</description>
 		<year>1991</year>
 		<publisher>EuroTalk</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="read with asterix - asterix and son (1991)(eurotalk)" sha1="5357aadbd94ee9c7610f858bc8131b9b82e082fd" status="baddump" />
@@ -344,12 +329,12 @@ cd32: boot OK
 	</software>
 
 	<!-- Barney Bear Goes Camping -->
-	<software name="barneycp" supported="no">
+	<software name="barneycp" supported="partial">
 		<description>Barney Bear Goes Camping</description>
 		<year>1990</year>
 		<publisher>Free Spirit Software</publisher>
 		<notes><![CDATA[
-cd32: selecting tree option (games) has no GFXs on game select section (fixes the second time around)
+cd32: selecting tree option (games) has no GFXs on game select section (fixes the second time around) (verify)
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -363,7 +348,7 @@ cd32: selecting tree option (games) has no GFXs on game select section (fixes th
 		<year>1990</year>
 		<publisher>Free Spirit Software</publisher>
 		<notes><![CDATA[
-cd32: hangs on title screen
+cd32: hangs on title screen (verify)
 ]]></notes>
 		<info name="sku" value="CDT-2501"/>
 		<info name="disc_matrix" value="MADE BY DISCOVERY SYSTEMS - AN AMERICAN COMPANY U28Y050UA"/>
@@ -476,12 +461,12 @@ cd32: hangs on title screen
 		</part>
 	</software>
 
-	<!-- Battle Chess -->
 	<software name="btlchess" supported="no">
 		<description>Battle Chess</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
 		<notes><![CDATA[
+cdtv: black screen
 cd32: tutorial mode has no [CDDA] redbook audio (sample repeats)
 cd32: game mode AI thinking is really slow after few moves
 ]]></notes>
@@ -493,15 +478,13 @@ cd32: game mode AI thinking is really slow after few moves
 		</part>
 	</software>
 
-	<!-- Battlestorm -->
-	<software name="btlstorm" supported="no">
+	<software name="btlstorm" supported="partial">
 		<description>Battlestorm</description>
 		<year>1991</year>
 		<publisher>Titus</publisher>
 		<notes><![CDATA[
-cd32: game hangs if gameplay intro isn't skipped
-cd32: wrong background colors
-cd32: GFX score never updates (stuck at 0)
+cdtv: boot OK
+cd32: game hangs if gameplay intro isn't skipped (verify)
 ]]></notes>
 		<info name="sku" value="CDT-3502"/>
 		<part name="cdrom" interface="cdrom">
@@ -511,7 +494,6 @@ cd32: GFX score never updates (stuck at 0)
 		</part>
 	</software>
 
-	<!-- Black Viper -->
 	<software name="blkviper" supported="no">
 		<!-- TODO: Verify if this works on stock CDTV -->
 		<!-- Shouldn't and be just an CD32/AmigaCD release -->
@@ -519,6 +501,7 @@ cd32: GFX score never updates (stuck at 0)
 		<year>1996</year>
 		<publisher>Neo</publisher>
 		<notes><![CDATA[
+cdtv: unrecognized by BIOS
 cd32: boot OK, has stripe glitch during FMV
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -528,16 +511,12 @@ cd32: boot OK, has stripe glitch during FMV
 		</part>
 	</software>
 
-	<!-- Casino Games CDTV -->
-	<software name="casigams" supported="no">
+	<software name="casigams" supported="yes">
 		<!-- https://hol.abime.net/2943 -->
 		<description>Casino Games</description>
 		<!-- In-game reports '91, HoL says '92 -->
 		<year>1992</year>
 		<publisher>Saen Software</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="casino games cdtv" sha1="1f02c705e57aff330fc393696e6fae96ed8e61d2" status="baddump" />
@@ -545,12 +524,12 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- CD Remix - The D.J. in a box -->
 	<software name="cdremix" supported="no">
 		<description>CD Remix - The D.J. in a Box</description>
 		<year>1991</year>
 		<publisher>Microdeal</publisher>
 		<notes><![CDATA[
+Requires CDTV input device
 cd32: black screen with mouse pointer after title screen (is it crashed?)
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -565,6 +544,7 @@ cd32: black screen with mouse pointer after title screen (is it crashed?)
 		<year>1991</year>
 		<publisher>Microdeal</publisher>
 		<notes><![CDATA[
+Requires CDTV input device
 Requires disc swap with an audio CD for load sequence procedure (cfr. tutorial)
 ]]></notes>
 
@@ -576,12 +556,12 @@ Requires disc swap with an audio CD for load sequence procedure (cfr. tutorial)
 		</part>
 	</software>
 
-	<!-- CD Remix Version II -->
 	<software name="cdremix2a" cloneof="cdremix2" supported="no">
 		<description>CD Remix Version II (alt)</description>
 		<year>1991</year>
 		<publisher>Microdeal</publisher>
 		<notes><![CDATA[
+Requires CDTV input device
 Requires disc swap with an audio CD for load sequence procedure (cfr. tutorial)
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -597,7 +577,7 @@ Requires disc swap with an audio CD for load sequence procedure (cfr. tutorial)
 		<publisher>On-Line</publisher>
 		<notes><![CDATA[
 cd32: black screen (PC=32114, PC=332a4 $35180)
-Requires a CDTV controller to play (digit options in main menu)
+Requires a CDTV input device to play (digit options in main menu)
 Fills log with [DDFSTRT]=0xc underruns
 ]]></notes>
 		<info name="developer" value="KirkMoreno Multimedia"/>
@@ -616,7 +596,7 @@ Fills log with [DDFSTRT]=0xc underruns
 		<publisher>On-line</publisher>
 		<notes><![CDATA[
 cd32: black screen
-Requires a CDTV controller to play (digit options in main menu)
+Requires a CDTV input device to play (digit options in main menu)
 Fills log with [DDFSTRT]=0xc underruns
 ]]></notes>
 		<info name="developer" value="KirkMoreno Multimedia"/>
@@ -628,15 +608,11 @@ Fills log with [DDFSTRT]=0xc underruns
 		</part>
 	</software>
 
-	<!-- Cinderella - The Original Fairy Tale -->
-	<software name="cinderel" supported="no">
+	<software name="cinderel" supported="yes">
 		<!-- https://hol.abime.net/5793 -->
 		<description>Cinderella - The Original Fairy Tale (USA)</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="book_isbn" value="0-921974-41-8"/>
 		<info name="serial" value="CDRM 735100"/>
 		<info name="sku" value="CDT-2523"/>
@@ -653,14 +629,10 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Classic Board Games -->
-	<software name="clsbg" supported="no">
+	<software name="clsbg" supported="yes">
 		<description>Classic Board Games</description>
 		<year>1991</year>
 		<publisher>Merit Software</publisher>
-		<notes><![CDATA[
-cd32: boot OK, status bar selection boxes draws an extra filled grey box to their right (cfr. "Language" in main menu) [Copper]?
-]]></notes>
 		<info name="barcode" value="7 22301 66115 4"/>
 		<info name="sku" value="CDT-3506"/>
 		<part name="cdrom" interface="cdrom">
@@ -674,13 +646,14 @@ cd32: boot OK, status bar selection boxes draws an extra filled grey box to thei
 		</part>
 	</software>
 
-	<!-- Commodore Amiga CDTV, Amiga 600, Amiga 600HD Demo Disc -->
-	<software name="cdtvd1" supported="no">
+	<software name="cdtvd1" supported="partial">
+		<!-- Point of Sale demo? -->
 		<description>Commodore Amiga CDTV, Amiga 600, Amiga 600HD Demo Disc 1</description>
 		<year>1992</year>
 		<publisher>Commodore</publisher>
 		<notes><![CDATA[
-cd32: Throws a pos software failure #80000004 at boot
+cdtv: boot OK
+cd32: Throws a pos software failure #80000004 at boot (verify)
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -690,11 +663,12 @@ cd32: Throws a pos software failure #80000004 at boot
 	</software>
 
 	<!-- same as cdtvdemo:cdrom2? -->
-	<software name="cdtvd2" supported="no">
+	<software name="cdtvd2" supported="partial">
 		<description>Commodore Amiga CDTV, Amiga 600, Amiga 600HD Demo Disc 2</description>
 		<year>1992</year>
 		<publisher>Commodore</publisher>
 		<notes><![CDATA[
+cdtv: boot OK
 cd32: Throws an AMOS software failure #8000000A at boot
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -704,8 +678,7 @@ cd32: Throws an AMOS software failure #8000000A at boot
 		</part>
 	</software>
 
-	<!-- CoverGirlStripPoker -->
-	<software name="covgrlsp" supported="no">
+	<software name="covgrlsp" supported="partial">
 		<!-- https://hol.abime.net/3106 (requires login) -->
 		<!-- https://www.mobygames.com/game/cover-girl-strip-poker -->
 		<description>Cover Girl Strip Poker</description>
@@ -820,14 +793,10 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Dinosaurs for Hire -->
-	<software name="dinohire" supported="no">
+	<software name="dinohire" supported="yes">
 		<description>Dinosaurs for Hire</description>
 		<year>1991</year>
 		<publisher>Wright Works III</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dinosaurs for hire (1992)(wright works iii)" sha1="7cd03f4e0b33462ac5c9358be7dca46481e95a9b" status="baddump" />
@@ -835,15 +804,11 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Dr. Wellman - A Guide to Good Health for You &amp; Your Family -->
-	<software name="drwellm" supported="no">
+	<software name="drwellm" supported="yes">
 		<description>Dr. Wellman - A Guide to Good Health for You and Your Family</description>
 		<year>1991</year>
 		<!-- "Digita Multimedia" -->
 		<publisher>CDTV Publishing</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="sku" value="CDT-7001"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -852,7 +817,6 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- DuneCDTV (ONLY REAL CDTV) -->
 	<software name="dunep" supported="no">
 		<!-- No mention neither on HoL nor Lemon Amiga -->
 		<!-- Is it truly a prototype? -->
@@ -860,6 +824,7 @@ cd32: boot OK
 		<year>1992</year>
 		<publisher>Virgin Multimedia</publisher>
 		<notes><![CDATA[
+cdtv: boot OK, not extensively tested
 cd32: doesn't boot
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -869,13 +834,14 @@ cd32: doesn't boot
 		</part>
 	</software>
 
-	<!-- E.S.S. Mega -->
 	<software name="essmega" supported="no">
 		<description>E.S.S. Mega</description>
 		<year>1991</year>
 		<publisher>Coktel</publisher>
 		<notes><![CDATA[
+cdtv: crashes with "Play LBA: Not implemented" after selecting game or demo
 cd32: crashes in-game when accessing "3d mod" option
+May use [joytest] reset counter (verify)
 ]]></notes>
 		<info name="developer" value="Tomahawk"/>
 		<part name="cdrom" interface="cdrom">
@@ -885,7 +851,6 @@ cd32: crashes in-game when accessing "3d mod" option
 		</part>
 	</software>
 
-	<!-- FALCON -->
 	<software name="falcon" supported="no">
 		<!-- https://hol.abime.net/488 -->
 		<description>Falcon</description>
@@ -909,7 +874,8 @@ Needs CDTV input device
 		<year>1992</year>
 		<publisher>Centaur</publisher>
 		<notes><![CDATA[
-cd32: title screen cuts off selection text in the middle
+Title screen cuts off selection text in the middle
+Leds in stage select have [copper] issues when scrolling
 cd32: gameplay audio outputs SFX even if user selects BGM
 ]]></notes>
 		<info name="disc_matrix" value="DISC MFG., INC. (A) W.O.# 40834-3 CD-ROM (1)"/>
@@ -925,13 +891,12 @@ cd32: gameplay audio outputs SFX even if user selects BGM
 		</part>
 	</software>
 
-	<!-- Fractal Universe -->
 	<software name="fractuni" supported="no">
 		<description>Fractal Universe</description>
 		<year>1992</year>
 		<publisher>Almathera</publisher>
 		<notes><![CDATA[
-cd32: cursor is uncontrollable in main menu, [joytest] reset counter
+cursor is uncontrollable in main menu, [joytest] reset counter
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -940,13 +905,12 @@ cd32: cursor is uncontrollable in main menu, [joytest] reset counter
 		</part>
 	</software>
 
-	<!-- Fun School 3 - for the under 5s -->
 	<software name="funsch30" supported="no">
 		<description>Fun School 3 for the Under 5s</description>
 		<year>1991</year>
 		<publisher>Database Educational Software</publisher>
 		<notes><![CDATA[
-cd32: cursor is uncontrollable in most games, [joytest] reset counter
+cursor is uncontrollable in most games, [joytest] reset counter
 ]]></notes>
 		<info name="sku" value="CDT-2505"/>
 		<part name="cdrom" interface="cdrom">
@@ -956,13 +920,12 @@ cd32: cursor is uncontrollable in most games, [joytest] reset counter
 		</part>
 	</software>
 
-	<!-- Fun School 3 - for 5 to 7 year olds -->
 	<software name="funsch31" supported="no">
 		<description>Fun School 3 for 5 to 7 Year Olds</description>
 		<year>1991</year>
 		<publisher>Europress Software</publisher>
 		<notes><![CDATA[
-cd32: cursor is uncontrollable in most games, [joytest] reset counter
+cursor is uncontrollable in most games, [joytest] reset counter
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -971,13 +934,12 @@ cd32: cursor is uncontrollable in most games, [joytest] reset counter
 		</part>
 	</software>
 
-	<!-- Fun School 3 - for the over 7s -->
 	<software name="funsch32" supported="no">
 		<description>Fun School 3 for the Over 7s</description>
 		<year>1991</year>
 		<publisher>Europress Software</publisher>
 		<notes><![CDATA[
-cd32: cursor is uncontrollable in most games, [joytest] reset counter
+cursor is uncontrollable in most games, [joytest] reset counter
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -986,12 +948,12 @@ cd32: cursor is uncontrollable in most games, [joytest] reset counter
 		</part>
 	</software>
 
-	<!-- Galaga_Deluxe_CDTV -->
 	<software name="dxgalaga" supported="no">
 		<description>Deluxe Galaga (v2.4)</description>
 		<year>1995</year>
 		<publisher>Edgar Vigdal</publisher>
 		<notes><![CDATA[
+Missing starfield in gameplay
 cd32: has serious GFX pitch corruption when booted, [Copper] or [Blitter]
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -1001,7 +963,6 @@ cd32: has serious GFX pitch corruption when booted, [Copper] or [Blitter]
 		</part>
 	</software>
 
-	<!-- Gamers' Delight -->
 	<software name="gamerdel" supported="no">
 		<description>Gamers' Delight (UK, Germany)</description>
 		<year>1994</year>
@@ -1016,13 +977,13 @@ cd32: not extensively tested
 		</part>
 	</software>
 
-	<!-- Garden Fax - Fruits, Vegetables &amp; Herbs -->
-	<software name="gardfaxf" supported="no">
+	<software name="gardfaxf" supported="partial">
 		<description>Garden Fax - Fruits, Vegetables, and Herbs (USA)</description>
 		<year>1991</year>
 		<publisher>CDTV Publishing</publisher>
 		<notes><![CDATA[
-cd32: boot OK
+May require CDTV input device
+[Denise] HAM strips on some photos
 ]]></notes>
 		<info name="developer" value="Inter Search Systems"/>
 		<info name="sku" value="CDT-1004"/>
@@ -1043,6 +1004,7 @@ cd32: boot OK
 		<year>1991</year>
 		<publisher>CDTV Publishing</publisher>
 		<notes><![CDATA[
+cdtv: unrecognized by BIOS
 cd32: punts to cd32 player
 ]]></notes>
 		<info name="sku" value="CDT-1002"/>
@@ -1059,13 +1021,13 @@ cd32: punts to cd32 player
 		</part>
 	</software>
 
-	<!-- Garden Fax - Indoor Plants -->
-	<software name="gardfaxi" supported="no">
+	<software name="gardfaxi" supported="partial">
 		<description>Garden Fax - Indoor Plants (USA)</description>
 		<year>1991</year>
 		<publisher>CDTV Publishing</publisher>
 		<notes><![CDATA[
-cd32: boot OK
+May require CDTV input device
+[Denise] HAM strips on some photos
 ]]></notes>
 		<info name="developer" value="Inter Search Systems"/>
 		<info name="sku" value="CDT-1001"/>
@@ -1081,13 +1043,13 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Garden Fax - Trees, Shrubs, Roses &amp; Conifers -->
-	<software name="gardfaxt" supported="no">
+	<software name="gardfaxt" supported="partial">
 		<description>Garden Fax - Trees, Shrubs, Roses, and Conifers (USA)</description>
 		<year>1991</year>
 		<publisher>CDTV Publishing</publisher>
 		<notes><![CDATA[
-cd32: boot OK
+May require CDTV input device
+[Denise] HAM strips on some photos
 ]]></notes>
 		<info name="developer" value="Inter Search Systems"/>
 		<info name="sku" value="CDT-1003"/>
@@ -1129,9 +1091,9 @@ cd32: GFX overlays are a bit offsetted to the right
 		<year>1992</year>
 		<publisher>Hex</publisher>
 		<notes><![CDATA[
-cd32: main menu animations looks goofily fast
-cd32: eternal rave [Paula] music looks off (verify)
-cd32: Top Banana boot OK, but gives one life only then punts to main menu (verify)
+main menu animations looks goofily fast (verify)
+Eternal rave [Paula] music looks off (verify)
+Top Banana boot OK, but gives one life only then punts to main menu (verify)
 ]]></notes>
 		<info name="alt_title" value="Global Chaos - Top Banana - Digital Love"/>
 		<part name="cdrom" interface="cdrom">
@@ -1141,13 +1103,13 @@ cd32: Top Banana boot OK, but gives one life only then punts to main menu (verif
 		</part>
 	</software>
 
-	<!-- Guy Spy and the Crystals of Armageddon v1.0 -->
 	<software name="guyspy" supported="no">
 		<description>Guy Spy and the Crystals of Armageddon (v1.0)</description>
 		<year>1992</year>
 		<publisher>ReadySoft</publisher>
 		<notes><![CDATA[
-cd32: doesn't boot
+May require CDTV input device
+cd32: doesn't boot (verify)
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1156,15 +1118,11 @@ cd32: doesn't boot
 		</part>
 	</software>
 
-	<!-- Heather Hits Her First Home Run -->
-	<software name="heathr" supported="no">
-		<!-- unlisted on HoL -->
+	<software name="heathr" supported="yes">
+		<!-- https://amiga.abime.net/games/view/heather-hits-her-first-home-run -->
 		<description>Heather Hits Her First Home Run</description>
 		<year>1991</year>
 		<publisher>Discis Knowledge Research</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="heather hits her first home run (1991)(discis)(en-es)" sha1="7c40e1b1b6c13f413da6b980bdcb36b6a39a587c" status="baddump" />
@@ -1172,13 +1130,14 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Heroic Age of Spaceflight - NASA... The 25th Year -->
 	<software name="nasa25" supported="no">
 		<!-- Uses "CDXL" -->
+		<!-- USA release? -->
 		<description>Heroic Age of Spaceflight - NASA... The 25th Year</description>
 		<year>1991</year>
 		<publisher>Troika Multimedia</publisher>
 		<notes><![CDATA[
+cdtv: crashes at the second CDXL playback (even same one)
 cd32: FMVs has audio-video desyncs (shows periodic black frames, audio is too fast)
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -1188,12 +1147,12 @@ cd32: FMVs has audio-video desyncs (shows periodic black frames, audio is too fa
 		</part>
 	</software>
 
-	<!-- Insight Dinosaurs v1.0 -->
 	<software name="insidino" supported="no">
 		<description>Insight: Dinosaurs (Europe, v1.0)</description>
 		<year>1994</year>
 		<publisher>Optonica</publisher>
 		<notes><![CDATA[
+cdtv: crashes when selecting any main menu item
 cd32: GFX pitch corruption on initial copyright screen (fmode=3)
 cd32: FMV video glitches out every other frame
 cd32: Pointer is very unstable if mouse is used
@@ -1205,12 +1164,12 @@ cd32: Pointer is very unstable if mouse is used
 		</part>
 	</software>
 
-	<!-- Insight Technology -->
 	<software name="insitech" supported="no">
 		<description>Insight: Technology</description>
 		<year>1993</year>
 		<publisher>Commodore</publisher>
 		<notes><![CDATA[
+[Denise] HAM heavy corruption on Commodore presents screen
 cd32: uncontrollable on main menu [joytest]?
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -1220,12 +1179,12 @@ cd32: uncontrollable on main menu [joytest]?
 		</part>
 	</software>
 
-	<!-- It Came from the Desert -->
 	<software name="itcame" supported="no">
 		<description>It Came from the Desert</description>
 		<year>1989</year>
 		<publisher>Cinemaware</publisher>
 		<notes><![CDATA[
+cdtv: boot OK, not extensively tested
 cd32: punts to cd32 player
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -1235,13 +1194,12 @@ cd32: punts to cd32 player
 		</part>
 	</software>
 
-	<!-- Karaoke Hits 1 -->
 	<software name="karaoke1" supported="no">
 		<description>Karaoke Hits 1</description>
 		<year>1992</year>
 		<publisher>Music Machine Marketing</publisher>
 		<notes><![CDATA[
-cd32: inputs doesn't work, should require digit presses on a CDTV input device
+Inputs doesn't work, should require digit presses on a CDTV input device
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1250,7 +1208,6 @@ cd32: inputs doesn't work, should require digit presses on a CDTV input device
 		</part>
 	</software>
 
-	<!-- Language TV - English -->
 	<software name="langtv" supported="no">
 		<description>Language TV - English (France)</description>
 		<year>1991</year>
@@ -1277,7 +1234,7 @@ cd32: boot OK
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<notes><![CDATA[
-cd32: lemmings boot OK, B button isn't recognized on Lemmings/Planetside demo initial prompt (requires CDTV input device?)
+lemmings boot OK, B button isn't recognized on Lemmings/Planetside demo initial prompt (requires CDTV input device?)
 ]]></notes>
 		<info name="disc_matrix" value="LEM CD   50163 021 02 /"/>
 		<info name="barcode" value="0 53203 00438 2"/>
@@ -1293,14 +1250,13 @@ cd32: lemmings boot OK, B button isn't recognized on Lemmings/Planetside demo in
 		</part>
 	</software>
 
-	<!-- Log!cal -->
-	<software name="logical" supported="no">
+	<software name="logical" supported="partial">
 		<description>Log!cal (Europe)</description>
 		<!-- title screen and build date says '91, multiple sources claims being '92 for CDTV -->
 		<year>1992</year>
 		<publisher>Rainbow Arts</publisher>
 		<notes><![CDATA[
-cd32: crashes after title screen (68k goes to lalaland)
+cd32: crashes after title screen (68k goes to lalaland) (verify)
 ]]></notes>
 		<info name="disc_matrix" value="SONOPRESS * F-7419- * CD-ROM A 3"/>
 		<info name="barcode" value="4 005209 007641"/>
@@ -1315,13 +1271,12 @@ cd32: crashes after title screen (68k goes to lalaland)
 		</part>
 	</software>
 
-	<!-- Monopoly -->
-	<software name="monopoly" supported="no">
+	<software name="monopoly" supported="partial">
 		<description>Monopoly</description>
 		<year>1994</year>
 		<publisher>Supervision</publisher>
 		<notes><![CDATA[
-cd32: inputs doesn't work
+cd32: inputs doesn't work (verify)
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1330,15 +1285,11 @@ cd32: inputs doesn't work
 		</part>
 	</software>
 
-	<!-- Moving Gives Me A Stomach Ache -->
-	<software name="movstoma" supported="no">
+	<software name="movstoma" supported="yes">
 		<!-- https://hol.abime.net/5794 -->
 		<description>Moving Gives Me a Stomach Ache</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="book_author" value="Heather McKend"/>
 		<info name="book_isbn" value="0-921974-48-5"/>
 		<info name="disc_matrix" value="CDRM-734800 3"/>
@@ -1349,14 +1300,11 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<software name="mudpuddl" supported="no">
+	<software name="mudpuddl" supported="yes">
 		<!-- https://hol.abime.net/5001 -->
 		<description>Mud Puddle (USA, Multi 5)</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="book_author" value="Robert N. Munsch"/>
 		<info name="book_isbn" value="0-921974-39-6"/>
 		<info name="sku" value="CDT-2515"/>
@@ -1396,14 +1344,10 @@ cd32: outputs a very quiet [CDDA] redbook if you move on main menu with an analo
 		</part>
 	</software>
 
-	<!-- My Paint - The Paint Program Just for Kids! -->
-	<software name="mypaint" supported="no">
+	<software name="mypaint" supported="yes">
 		<description>My Paint CDTV - The Paint Program Just for Kids!</description>
 		<year>1990</year>
 		<publisher>Saddleback Graphics</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="sku" value="CDT-2516"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1412,14 +1356,10 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- North Polar Expedition -->
-	<software name="northpol" supported="no">
+	<software name="northpol" supported="yes">
 		<description>North Polar Expedition (v1.01)</description>
 		<year>1992</year>
 		<publisher>Virgin Multimedia</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="sku" value="CDT-2507"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1428,12 +1368,12 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<software name="pandora" supported="no">
+	<software name="pandora" supported="partial">
 		<description>Pandora's CD v1.0</description>
 		<year>1993</year>
 		<publisher>Optonica</publisher>
 		<notes><![CDATA[
-cd32: boot OK
+[Denise] HAM strips on some FMVs
 ]]></notes>
 
 		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
@@ -1445,12 +1385,12 @@ cd32: boot OK
 	</software>
 
 	<!-- same as above? -->
-	<software name="pandoras" cloneof="pandora" supported="no">
+	<software name="pandoras" cloneof="pandora" supported="partial">
 		<description>Pandora's CD v1.0 (alt)</description>
 		<year>1993</year>
 		<publisher>Optonica</publisher>
 		<notes><![CDATA[
-cd32: boot OK
+[Denise] HAM strips on some FMVs
 ]]></notes>
 		<info name="disc_matrix" value="SONOPRESS CD-ROM * G-9273 * A 2"/>
 		<info name="barcode" value="5 025465 130012"/>
@@ -1465,13 +1405,13 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Pinocchio -->
 	<software name="pinoc" supported="no">
 		<description>Pinocchio</description>
 		<year>1993</year>
 		<publisher>Giunti Multimedia</publisher>
 		<notes><![CDATA[
-cd32: glitchy Giunti FMV opening (uses HAM)
+Glitchy Giunti FMV opening (uses HAM)
+cdtv: black screen after Giunti FMV opening
 cd32: "the game" doesn't display main sprite
 cd32: "the movie" has scrolling glitches
 ]]></notes>
@@ -1482,12 +1422,12 @@ cd32: "the movie" has scrolling glitches
 		</part>
 	</software>
 
-	<!-- Power Pinball -->
 	<software name="powerpin" supported="no">
 		<description>Power Pinball</description>
 		<year>1990</year>
 		<publisher>KarmaSoft</publisher>
 		<notes><![CDATA[
+cdtv: ball can get stuck easily (verify)
 cd32: black screen (68k accesses unmapped addresses)
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -1497,13 +1437,12 @@ cd32: black screen (68k accesses unmapped addresses)
 		</part>
 	</software>
 
-	<!-- Prehistorik -->
-	<software name="prehisto" supported="no">
+	<software name="prehisto" supported="partial">
 		<description>Prehistorik</description>
 		<year>1991</year>
 		<publisher>Titus</publisher>
 		<notes><![CDATA[
-cd32: boot OK, [CDDA] redbook audio tracks doesn't repeat? (verify)
+cd32: boot OK, [CDDA] redbook audio tracks doesn't repeat
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1517,6 +1456,7 @@ cd32: boot OK, [CDDA] redbook audio tracks doesn't repeat? (verify)
 		<year>1992</year>
 		<publisher>On-line</publisher>
 		<notes><![CDATA[
+cdtv: hangs at "Once upon a time" initial screen with wrong [CDDA] playback
 cd32: hangs on acknowledge ending credits (i.e. when you die and have to start over)
 ]]></notes>
 		<info name="developer" value="Delta 4 Interactive"/>
@@ -1534,6 +1474,7 @@ cd32: hangs on acknowledge ending credits (i.e. when you die and have to start o
 		<year>1992</year>
 		<publisher>On-line</publisher>
 		<notes><![CDATA[
+cdtv: hangs at "Once upon a time" initial screen with wrong [CDDA] playback
 cd32: hangs on acknowledge ending credits (i.e. when you die and have to start over)
 ]]></notes>
 		<info name="developer" value="Delta 4 Interactive"/>
@@ -1553,7 +1494,7 @@ cd32: hangs on acknowledge ending credits (i.e. when you die and have to start o
 		</part>
 	</software>
 
-	<software name="cdtvdemo" supported="no">
+	<software name="cdtvdemo" supported="yes">
 		<!-- Point of sale demo discs -->
 		<!-- Disc 1 is an early video for unreleased Planetside -->
 		<description>CDTV Demo Disc (Europe)</description>
@@ -1561,6 +1502,7 @@ cd32: hangs on acknowledge ending credits (i.e. when you die and have to start o
 		<!-- TODO: arguably may be published by both companies -->
 		<publisher>Commodore</publisher>
 		<notes><![CDATA[
+cdtv: disc 1 and 2 boots
 cd32: disc 1 boot OK
 cd32: disc 2 throws an AMOS software failure #8000000A at boot
 ]]></notes>
@@ -1587,13 +1529,10 @@ cd32: disc 2 throws an AMOS software failure #8000000A at boot
 		</part>
 	</software>
 
-	<software name="raffles" supported="no">
+	<software name="raffles" supported="yes">
 		<description>Raffles (Sweden)</description>
 		<year>1991</year>
 		<publisher>Edge</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="disc_matrix" value="40908 THE EDGE 17172 W.O.# 40908-2 CD-ROM (1)"/>
 		<info name="barcode" value="7 33673 17172 1"/>
 		<!-- baddump: "MCN unverified" -->
@@ -1608,7 +1547,6 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- RiseOfTheDragon(CDTV) -->
 	<software name="rotd" supported="no">
 		<!-- TODO: No info over the net, is this official? -->
 		<description>Rise of the Dragon</description>
@@ -1625,15 +1563,11 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Scary Poems for Rotten Kids -->
-	<software name="scarpoem" supported="no">
+	<software name="scarpoem" supported="yes">
 		<!-- https://hol.abime.net/5796 -->
 		<description>Scary Poems for Rotten Kids</description>
 		<year>1991</year>
 		<publisher>Discis Knowledge Research</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="book_author" value="Sean O Huigin"/>
 		<info name="book_isbn" value="0-921974-37-X"/>
 		<info name="sku" value="CDT-2514"/>
@@ -1644,7 +1578,6 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Sherlock Holmes on a Disc - Illustrated Sherlock Holmes -->
 	<software name="holmes" supported="no">
 		<!-- "The Illustrated Sherlock Holmes" on title screen, description is what is printed on boxart / spine -->
 		<description>Sherlock Holmes on a Disc</description>
@@ -1652,8 +1585,8 @@ cd32: boot OK
 		<publisher>Animated Pixels</publisher>
 		<notes><![CDATA[
 Compiled over the same engine as illbible
-cd32: offset hand cursor on main menu
-cd32: cannot move on multimedia section (hangs?)
+Offset hand cursor on main menu (verify)
+Cannot move on multimedia section (hangs?)
 ]]></notes>
 		<info name="sku" value="CDT-7503"/>
 		<part name="cdrom" interface="cdrom">
@@ -1668,6 +1601,7 @@ cd32: cannot move on multimedia section (hangs?)
 		<year>1991</year>
 		<publisher>Software 2000</publisher>
 		<notes><![CDATA[
+Mouse pointer in Lettrix is unstable, requires CDTV input device?
 cd32: Lettrix punts to CD32 disc screen
 cd32: Shiftrix boot OK
 ]]></notes>
@@ -1684,12 +1618,12 @@ cd32: Shiftrix boot OK
 		</part>
 	</software>
 
-	<!-- Shiftrix &amp; Lettrix -->
 	<software name="shiftrixa" cloneof="shiftrix" supported="no">
 		<description>Shiftrix &amp; Lettrix (alt)</description>
 		<year>1991</year>
 		<publisher>Software 2000</publisher>
 		<notes><![CDATA[
+Mouse pointer in Lettrix is unstable, requires CDTV input device?
 cd32: Lettrix punts to CD32 disc screen
 cd32: Shiftrix boot OK
 ]]></notes>
@@ -1708,6 +1642,7 @@ cd32: Shiftrix boot OK
 		<publisher>Infogrames</publisher>
 		<notes><![CDATA[
 Saving requires either a ramcard or a disk, [FDC] format
+cdtv: bitplane glitch when scrolling vertically, [Copper]?
 cd32: boot OK
 ]]></notes>
 		<info name="sku" value="CDT-3518"/>
@@ -1746,6 +1681,7 @@ cd32: boot OK
 		<year>1991</year>
 		<publisher>Edge</publisher>
 		<notes><![CDATA[
+cdtv: black screen (reaches a STOP #2000)
 cd32: black screen
 ]]></notes>
 		<info name="sku" value="CDT-3533"/>
@@ -1764,12 +1700,12 @@ cd32: black screen
 		</part>
 	</software>
 
-	<!-- Space Wars CDTV -->
 	<software name="spacewar" supported="no">
 		<description>Space Wars</description>
 		<year>1992</year>
 		<publisher>Odyssey</publisher>
 		<notes><![CDATA[
+cdtv: Requires CDTV input device
 cd32: boot OK but too fast during gameplay
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -1779,12 +1715,12 @@ cd32: boot OK but too fast during gameplay
 		</part>
 	</software>
 
-	<!-- Spirit of Excalibur -->
 	<software name="spirexa" supported="no">
 		<description>Spirit of Excalibur</description>
 		<year>1991</year>
 		<publisher>Virgin</publisher>
 		<notes><![CDATA[
+cdtv: black screen
 cd32: black screen
 ]]></notes>
 		<info name="sku" value="CDT-3509"/>
@@ -1795,14 +1731,13 @@ cd32: black screen
 		</part>
 	</software>
 
-	<!-- Super Games Pak -->
-	<software name="suprgams" supported="no">
+	<software name="suprgams" supported="partial">
+		<!-- https://amiga.abime.net/games/view/super-games-pak -->
 		<description>Super Games Pak</description>
 		<year>1991</year>
 		<publisher>Odyssey</publisher>
 		<notes><![CDATA[
-Not extensively tested (brief Jail Break play)
-cd32: boot OK
+Deathbots: has slight player [sprite] corruption when moving left/right
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1811,14 +1746,11 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<software name="teamyank" supported="no">
+	<software name="teamyank" supported="yes">
 		<!-- https://hol.abime.net/1325 -->
 		<description>Team Yankee (Europe)</description>
 		<year>1992</year>
 		<publisher>Empire</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="developer" value="Oxford Digital Enterprises"/>
 		<info name="disc_matrix" value="CDRM-729600 3"/>
 		<part name="cdrom" interface="cdrom">
@@ -1832,8 +1764,8 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Assassins -->
-	<software name="assass1" supported="no">
+	<!-- TODO: move to AmigaCD? -->
+	<software name="assass1" supported="partial">
 		<description>The Assassins Ultimate CD Games Collection</description>
 		<year>19??</year>
 		<publisher>Weird Science</publisher>
@@ -1847,8 +1779,8 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Assassins 2 -->
-	<software name="assass2" supported="no">
+	<!-- TODO: move to AmigaCD? -->
+	<software name="assass2" supported="partial">
 		<description>The Assassins Ultimate Games Volume 2</description>
 		<year>19??</year>
 		<publisher>Weird Science</publisher>
@@ -1863,8 +1795,9 @@ cd32: draws title screen with a line of garbage at bottom
 		</part>
 	</software>
 
+	<!-- TODO: move to AmigaCD? -->
 	<!-- Assassins 3 - The Ultimate Games CD -->
-	<software name="assass3" supported="no">
+	<software name="assass3" supported="partial">
 		<description>The Assassins CD 3</description>
 		<year>1997</year>
 		<publisher>Weird Science</publisher>
@@ -1897,14 +1830,12 @@ cd32: draws title screen with a line of garbage at bottom
 		</part>
 	</software>
 
-	<!-- Case of the Cautious Condor, The -->
-	<software name="cautcond" supported="no">
+	<software name="cautcond" supported="partial">
 		<description>The Case of the Cautious Condor</description>
 		<year>1990</year>
 		<publisher>Tiger Media</publisher>
 		<notes><![CDATA[
 A few [CDDA] redbook speeches scratches at the end (dump?)
-cd32: boot OK
 ]]></notes>
 		<info name="sku" value="CDT-3507"/>
 		<part name="cdrom" interface="cdrom">
@@ -1914,7 +1845,6 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- CDTV Interactive Point of Sale Compact Disc, The -->
 	<software name="cdtvsale" supported="no">
 		<description>The CDTV Interactive Point of Sale Compact Disc</description>
 		<year>1991</year>
@@ -1933,7 +1863,6 @@ cd32: Battlestorm demo crashes (sends 68k to lalaland)
 		</part>
 	</software>
 
-	<!-- Connoisseur, The - Fine Art Collection -->
 	<software name="connoiss" supported="no">
 		<description>The Connoisseur - Fine Art Collection</description>
 		<year>1992</year>
@@ -1948,12 +1877,12 @@ cd32: boot OK, glitchy scroll up/down when artwork description is called when ch
 		</part>
 	</software>
 
-	<!-- Curse of RA, The -->
 	<software name="cursera" supported="no">
 		<description>The Curse of Ra (Germany)</description>
 		<year>1992</year>
 		<publisher>Rainbow Arts</publisher>
 		<notes><![CDATA[
+cdtv: main menu cursor moves too fast, wants CDTV input device?
 cd32: has serious sprite position issues (offset on demo, draws garbage from time to time)
 ]]></notes>
 		<info name="developer" value="Cyberstyle"/>
@@ -1970,7 +1899,6 @@ cd32: has serious sprite position issues (offset on demo, draws garbage from tim
 		</part>
 	</software>
 
-	<!-- Demo Collection for Amiga CDTV, The -->
 	<software name="democdtv" supported="no">
 		<!-- bootable version of Ten On Ten disc #4 -->
 		<description>The Demo Collection for Amiga CDTV (Europe, Black Disc)</description>
@@ -1992,14 +1920,13 @@ cd32: bottom GFX is corrupted on title screen
 		</part>
 	</software>
 
-	<!-- Guinness CDTV Disc of Records, The - 1991 Edition -->
-	<software name="guinness" supported="no">
+	<software name="guinness" supported="partial">
 		<!-- looks USA-centric (cfr. Soccer) but New Media was based in London according to title/credits -->
 		<description>The Guinness CDTV Disc of Records (1991 Edition)</description>
 		<year>1991</year>
 		<publisher>CDTV Publishing</publisher>
 		<notes><![CDATA[
-cd32: boot OK, has a bit of left side corruption on HAM tour videos
+Slight [Denis] left side corruption on HAM tour videos
 ]]></notes>
 		<info name="developer" value="New Media Productions"/>
 		<part name="cdrom" interface="cdrom">
@@ -2009,7 +1936,6 @@ cd32: boot OK, has a bit of left side corruption on HAM tour videos
 		</part>
 	</software>
 
-	<!-- Hound of the Baskervilles, The -->
 	<software name="houndbas" supported="no">
 		<!-- A Sherlock Holmes Murder Mystery on front cover -->
 		<!-- Prefixed with The in title -->
@@ -2029,12 +1955,12 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Hutchinson Encyclopedia, The - PAL Version -->
-	<software name="hutchins" supported="no">
+	<software name="hutchins" supported="partial">
 		<description>The Hutchinson Encyclopedia (Europe)</description>
 		<year>1991</year>
 		<publisher>Attica Cybernetics</publisher>
 		<notes><![CDATA[
+[Denise] HAM issues on some Pictures
 cd32: boot OK, vertical scrolling glitches a bit in Pictures sub menu [Copper]
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -2048,13 +1974,12 @@ cd32: boot OK, vertical scrolling glitches a bit in Pictures sub menu [Copper]
 		</part>
 	</software>
 
-	<!-- Illustrated Holy Bible, The -->
 	<software name="illbible" supported="no">
 		<description>The Illustrated Holy Bible</description>
 		<year>1991</year>
 		<publisher>Animated Pixels</publisher>
 		<notes><![CDATA[
-cd32: keeps beeping, uncontrollable (not compatible with cd32 input device?)
+Keeps beeping, uncontrollable, needs CDTV Input device?
 cd32: jerky scrolling for user portion in multimedia section
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -2064,12 +1989,12 @@ cd32: jerky scrolling for user portion in multimedia section
 		</part>
 	</software>
 
-	<!-- Illustrated Works of Shakespeare, The -->
 	<software name="illshake" supported="no">
 		<description>The Illustrated Works of Shakespeare</description>
 		<year>1990</year>
 		<publisher>Animated Pixels</publisher>
 		<notes><![CDATA[
+May require CDTV Input device
 cd32: keeps beeping, uncontrollable (not compatible with cd32 input device?)
 cd32: jerky scrolling for user portion in multimedia section
 ]]></notes>
@@ -2080,13 +2005,14 @@ cd32: jerky scrolling for user portion in multimedia section
 		</part>
 	</software>
 
-	<!-- Labyrinth of Time, The -->
 	<software name="labytime" supported="no">
 		<description>The Labyrinth of Time</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
 Not extensively tested
+Cutoff DIW on bottom of load/save menu
+[Denise] HAM issues on some gameplay screens
 cd32: GFX pitch corruption for intro screens, EA logo is offset to the left [ddfstrt]
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -2096,14 +2022,10 @@ cd32: GFX pitch corruption for intro screens, EA logo is offset to the left [ddf
 		</part>
 	</software>
 
-	<!-- New Basics Electronic Cookbook, The - 1991a Edition -->
-	<software name="newbasic" supported="no">
+	<software name="newbasic" supported="yes">
 		<description>The New Basics Electronic Cookbook (USA, 1991a Edition)</description>
 		<year>1991</year>
 		<publisher>Xïphias</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="serial" value="CDRM-445900"/>
 		<info name="disc_matrix" value="CDRM-445900 2"/>
 		<info name="barcode" value="728795111120"/>
@@ -2119,14 +2041,10 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- New Grolier Electronic Encyclopedia, The -->
-	<software name="newgroli" supported="no">
-		<description>The New Grolier Electronic Encyclopedia</description>
+	<software name="newgroli" supported="yes">
+		<description>The New Grolier Electronic Encyclopedia (5/6/91)</description>
 		<year>1991</year>
 		<publisher>CDTV Publishing</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="sku" value="CDT-7002"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2135,15 +2053,11 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Night Before Christmas, The -->
-	<software name="nbxmas" supported="no">
+	<software name="nbxmas" supported="yes">
 		<!-- unlisted on HoL -->
 		<description>The Night Before Christmas</description>
 		<year>1991</year>
 		<publisher>Discis Knowledge Research</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="night before christmas, the (1991)(discis)(en-es)" sha1="16fa7fdcb8dab59b8ab7b5acb17be786fc47443f" status="baddump" />
@@ -2151,15 +2065,11 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Paper Bag Princess, The -->
-	<software name="paperbag" supported="no">
+	<software name="paperbag" supported="yes">
 		<!-- https://hol.abime.net/5795 -->
 		<description>The Paper Bag Princess</description>
 		<year>1991</year>
 		<publisher>Discis Knowledge Research</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="book_author" value="Robert N. Munsch"/>
 		<info name="book_isbn" value="0-921974-33-7"/>
 		<info name="disc_matrix" value="CDRM-734700 3"/>
@@ -2171,15 +2081,11 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Tale of Benjamin Bunny, The -->
-	<software name="talbenjb" supported="no">
-		<!-- unlisted on HoL -->
+	<software name="talbenjb" supported="yes">
+		<!-- https://amiga.abime.net/games/view/the-tale-of-benjamin-bunny -->
 		<description>The Tale of Benjamin Bunny</description>
 		<year>1991</year>
 		<publisher>Discis Knowledge Research</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tale of benjamin bunny, the (1991)(discis)(en-es)" sha1="453aec25e283a30a9493d34db1a914f9c248e818" status="baddump" />
@@ -2187,15 +2093,11 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Tale of Peter Rabbit, The -->
-	<software name="talpeter" supported="no">
+	<software name="talpeter" supported="yes">
 		<!-- https://hol.abime.net/5797 -->
 		<description>The Tale of Peter Rabbit</description>
 		<year>1992</year>
 		<publisher>Discis Knowledge Research</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="book_author" value="Beatrix Potter"/>
 		<info name="book_isbn" value="0-921974-31-0"/>
 		<info name="disc_matrix" value="CDRM-734900 1"/>
@@ -2227,7 +2129,6 @@ cd32: hangs when explaining the hourglass icon in tutorial
 		</part>
 	</software>
 
-	<!-- Town With No Name -->
 	<software name="townonaa" cloneof="townona" supported="no">
 		<description>The Town with No Name (alt)</description>
 		<year>1992</year>
@@ -2246,15 +2147,11 @@ cd32: hangs when explaining the hourglass icon in tutorial
 		</part>
 	</software>
 
-	<!-- Thomas' Snowsuit -->
-	<software name="thomsnow" supported="no">
+	<software name="thomsnow" supported="yes">
 		<!-- https://hol.abime.net/5798 -->
 		<description>Thomas' Snowsuit</description>
 		<year>1991</year>
 		<publisher>Discis Knowledge Research</publisher>
-		<notes><![CDATA[
-cd32: boot OK
-]]></notes>
 		<info name="book_author" value="Robert N. Munsch"/>
 		<info name="book_isbn" value="0-921974-35-3"/>
 		<info name="sku" value="CDT-2512"/>
@@ -2265,15 +2162,15 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<!-- Tie Break -->
-	<software name="tiebreak" supported="no">
+	<software name="tiebreak" supported="partial">
 		<description>Tie Break</description>
 		<year>1991</year>
 		<publisher>Starbyte</publisher>
 		<notes><![CDATA[
-cd32: black screen
-Unsupported 4-players parallel interface
+cd32: black screen (verify)
 ]]></notes>
+		<info name="usage" value="Supports adaptator in Centronics port for p3 and p4" />
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tie break (1991)(starbyte)" sha1="e61de9dceb6be3af0dd81a13d5b9a8d1e58bb69f" status="baddump" />
@@ -2281,13 +2178,10 @@ Unsupported 4-players parallel interface
 		</part>
 	</software>
 
-	<software name="ttohbusi" supported="no">
+	<software name="ttohbusi" supported="yes">
 		<description>Time Table of History - Business, Politics &amp; Media (USA, 1991a Edition)</description>
 		<year>1991</year>
 		<publisher>Xïphias</publisher>
-		<notes><![CDATA[
-cd32: bottom GFX section for "World" icon screens have offset text (starts from right edge)
-]]></notes>
 		<info name="sku" value="CDT-7504"/>
 		<info name="disc_matrix" value="CDRM-446100 1"/>
 		<info name="barcode" value="7 28795 02112 2"/>
@@ -2302,14 +2196,10 @@ cd32: bottom GFX section for "World" icon screens have offset text (starts from 
 		</part>
 	</software>
 
-	<!-- Time Table of History - Science and Innovation - 1991a Edition -->
-	<software name="ttohsci" supported="no">
+	<software name="ttohsci" supported="yes">
 		<description>Time Table of History - Science and Innovation (USA, 1991a Edition)</description>
 		<year>1991</year>
 		<publisher>Xïphias</publisher>
-		<notes><![CDATA[
-cd32: bottom GFX section for "World" icon screens have offset text (starts from right edge)
-]]></notes>
 		<info name="sku" value="CDT-7505"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2318,13 +2208,13 @@ cd32: bottom GFX section for "World" icon screens have offset text (starts from 
 		</part>
 	</software>
 
-	<software name="trivcdtv" supported="no">
+	<software name="trivcdtv" supported="partial">
 		<!-- v1.0a E02PAL printed on title screen -->
 		<description>Trivial Pursuit - The CDTV Edition (Europe, v1.0a)</description>
 		<year>1992</year>
 		<publisher>Domark</publisher>
 		<notes><![CDATA[
-cd32: boot OK
+Optional save options, [FDC] format
 ]]></notes>
 		<info name="developer" value="The Kremlin"/>
 		<info name="disc_matrix" value="TRIVIAL PURSUIT 1 50246 426 02 >"/>
@@ -2350,13 +2240,13 @@ cd32: boot OK
 		</part>
 	</software>
 
-	<software name="turrican">
+	<software name="turrican" supported="partial">
 		<description>Turrican</description>
 		<year>1991</year>
 		<publisher>Rainbow Arts</publisher>
 		<notes><![CDATA[
-Controls are a bit odd to figure out, but this appear to work (update: on cdtv?)
-cd32: black screen with unmapped accesses (reads DSKDAT R too)
+[Paula] some sound notes are a bit off (verify)
+cd32: black screen with unmapped accesses (verify)
 ]]></notes>
 
 		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
@@ -2367,13 +2257,13 @@ cd32: black screen with unmapped accesses (reads DSKDAT R too)
 		</part>
 	</software>
 
-	<!-- Turrican -->
-	<software name="turricana" cloneof="turrican" supported="no">
+	<software name="turricana" cloneof="turrican" supported="partial">
 		<description>Turrican (Germany, alt)</description>
 		<year>1992</year>
 		<publisher>Rainbow Arts</publisher>
 		<notes><![CDATA[
-cd32: black screen with unmapped accesses (reads DSKDAT R too)
+[Paula] some sound notes are a bit off (verify)
+cd32: black screen with unmapped accesses (verify)
 ]]></notes>
 		<info name="disc_matrix" value="SONOPRESS * F-7897 * CD-ROM A"/>
 		<info name="barcode" value="4 005209 007689"/>
@@ -2388,12 +2278,12 @@ cd32: black screen with unmapped accesses (reads DSKDAT R too)
 		</part>
 	</software>
 
-	<software name="turricn2">
+	<software name="turricn2" supported="partial">
 		<description>Turrican II: The Final Fight</description>
 		<year>1991</year>
 		<publisher>Rainbow Arts</publisher>
 		<notes><![CDATA[
-cd32: black screen with unmapped accesses (reads DSKDAT R too)
+cd32: black screen with unmapped accesses (verify)
 ]]></notes>
 
 		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
@@ -2404,13 +2294,12 @@ cd32: black screen with unmapped accesses (reads DSKDAT R too)
 		</part>
 	</software>
 
-	<!-- Turrican 2 CDTV -->
-	<software name="turricn2a" cloneof="turricn2" supported="no">
+	<software name="turricn2a" cloneof="turricn2" supported="partial">
 		<description>Turrican II: The Final Fight (Germany, alt)</description>
 		<year>1991</year>
 		<publisher>Rainbow Arts</publisher>
 		<notes><![CDATA[
-cd32: black screen with unmapped accesses (reads DSKDAT R too)
+cd32: black screen with unmapped accesses (verify)
 ]]></notes>
 		<info name="disc_matrix" value="SONOPRESS * F-8339 * CD-ROM A"/>
 		<info name="barcode" value="4 005209 007696"/>
@@ -2425,14 +2314,13 @@ cd32: black screen with unmapped accesses (reads DSKDAT R too)
 		</part>
 	</software>
 
-	<!-- Ultimate Basketball! -->
 	<software name="ultbball" supported="no">
 		<description>Ultimate Basketball</description>
 		<year>1991</year>
 		<publisher>Context Systems</publisher>
 		<notes><![CDATA[
+sprite layer is glitched in the middle during gameplay, and cuts off names on status bar [Copper]
 cd32: Most GFXs are pitch corrupted
-cd32: sprite layer is glitched in the middle during gameplay, and cuts off names on status bar [Copper]
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2441,12 +2329,12 @@ cd32: sprite layer is glitched in the middle during gameplay, and cuts off names
 		</part>
 	</software>
 
-	<software name="welcdtvm" supported="no">
+	<software name="welcdtvm" supported="partial">
 		<description>Welcome to CDTV Multimedia (USA, CDRM-499000)</description>
 		<year>1991</year>
 		<publisher>Commodore</publisher>
 		<notes><![CDATA[
-cd32: black screen with BGM playing
+cd32: black screen with BGM playing (verify)
 ]]></notes>
 		<info name="disc_matrix" value="CDRM-499000 1"/>
 		<part name="cdrom" interface="cdrom">
@@ -2460,12 +2348,12 @@ cd32: black screen with BGM playing
 		</part>
 	</software>
 
-	<software name="welcdtvma" cloneof="welcdtvm" supported="no">
+	<software name="welcdtvma" cloneof="welcdtvm" supported="partial">
 		<description>Welcome to CDTV Multimedia (367808-01 33)</description>
 		<year>1991</year>
 		<publisher>Commodore</publisher>
 		<notes><![CDATA[
-cd32: black screen with BGM playing
+cd32: black screen with BGM playing (verify)
 ]]></notes>
 		<info name="disc_matrix" value="367808-01 33"/>
 		<part name="cdrom" interface="cdrom">
@@ -2579,14 +2467,12 @@ cd32: few [Blitter] OPs has an extra line of garbage (cfr. title screen vertical
 		</part>
 	</software>
 
-	<!-- Women in Motion - Eadweard Muybridge -->
-	<software name="womenmot" supported="no">
+	<software name="womenmot" supported="partial">
 		<description>Eadweard Muybridge's Women in Motion</description>
 		<year>1991</year>
 		<publisher>On-line</publisher>
 		<notes><![CDATA[
-cd32: boot OK
-Has untested printer option
+Has untested [Printer] option
 ]]></notes>
 		<info name="sku" value="CDT-1503"/>
 		<part name="cdrom" interface="cdrom">
@@ -2596,13 +2482,12 @@ Has untested printer option
 		</part>
 	</software>
 
-	<!-- World Vista -->
-	<software name="worldvis" supported="no">
+	<software name="worldvis" supported="partial">
 		<description>World Vista</description>
 		<year>1991</year>
 		<publisher>Applied Optical Media Corporation</publisher>
 		<notes><![CDATA[
-cd32: beeps when selecting any option in main menu, likely it requires a CDTV input device
+cd32: beeps when selecting any option in main menu, incompatible with CD32 pad? (verify)
 ]]></notes>
 		<info name="sku" value="CDT-7506"/>
 		<part name="cdrom" interface="cdrom">
@@ -2613,10 +2498,12 @@ cd32: beeps when selecting any option in main menu, likely it requires a CDTV in
 	</software>
 
 	<software name="wrdemon" supported="no">
+		<!-- https://amiga.abime.net/games/view/wrath-of-the-demon -->
 		<description>Wrath of the Demon (USA)</description>
 		<year>1990</year>
 		<publisher>ReadySoft</publisher>
 		<notes><![CDATA[
+cdtv: gameplay locks up at first level, spawning the horse without a ride
 cd32: hangs at ReadySoft logo
 ]]></notes>
 		<info name="sku" value="CDT-3522"/>
@@ -2633,13 +2520,13 @@ cd32: hangs at ReadySoft logo
 		</part>
 	</software>
 
-	<!-- Xenon2Megablast -->
 	<software name="xenon2" supported="no">
 		<!-- Also has "wnazennjn" language option, which is a pseudo-Polish joke -->
 		<description>Xenon 2 - Megablast (Europe)</description>
 		<year>1992</year>
 		<publisher>Image Works</publisher>
 		<notes><![CDATA[
+cdtv: black screen, boots on cdtvn
 cd32: boot OK
 ]]></notes>
 		<info name="developer" value="The Assembly Line"/>

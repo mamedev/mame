@@ -9,7 +9,7 @@ namespace bus::spectrum::dma_slot {
 namespace {
 
 /**********************************************************************
-	DATAGEAR: UA858D, Port 0x6b
+    DATAGEAR: UA858D, Port 0x6b
 **********************************************************************/
 class datagear_device : public dma_device
 {
@@ -32,7 +32,7 @@ void datagear_device::device_add_mconfig(machine_config &config)
 
 
 /**********************************************************************
-	DATAGEAR: ZILOG, Port 0x6b
+    DATAGEAR: ZILOG, Port 0x6b
 **********************************************************************/
 class datagear_zilog_device : public dma_device
 {
@@ -47,7 +47,7 @@ protected:
 
 
 /**********************************************************************
-	DATAGEAR: UA858D, Port 0x6b
+    DATAGEAR: UA858D, Port 0x6b
 **********************************************************************/
 void datagear_zilog_device::device_add_mconfig(machine_config &config)
 {
@@ -59,7 +59,7 @@ void datagear_zilog_device::device_add_mconfig(machine_config &config)
 
 
 /**********************************************************************
-	MB02+: UA858D, Port 0x0b
+    MB02+: UA858D, Port 0x0b
 **********************************************************************/
 class mb02p_device : public dma_device
 {
@@ -82,7 +82,7 @@ void mb02p_device::device_add_mconfig(machine_config &config)
 
 
 /**********************************************************************
-	MB02+: ZILOG, Port 0x0b
+    MB02+: ZILOG, Port 0x0b
 **********************************************************************/
 class mb02p_zilog_device : public dma_device
 {

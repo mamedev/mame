@@ -658,6 +658,7 @@ GFXDECODE_END
 
 void divebomb_state::divebomb(machine_config &config)
 {
+	// basic machine hardware
 	Z80(config, m_fgcpu, 24_MHz_XTAL / 4); // ?
 	m_fgcpu->set_addrmap(AS_PROGRAM, &divebomb_state::fgcpu_map);
 	m_fgcpu->set_addrmap(AS_IO, &divebomb_state::fgcpu_iomap);
@@ -670,7 +671,7 @@ void divebomb_state::divebomb(machine_config &config)
 	m_rozcpu->set_addrmap(AS_PROGRAM, &divebomb_state::rozcpu_map);
 	m_rozcpu->set_addrmap(AS_IO, &divebomb_state::rozcpu_iomap);
 
-	config.set_perfect_quantum(m_fgcpu);
+	config.set_maximum_quantum(attotime::from_hz(m_fgcpu->clock() / 4));
 
 	INPUT_MERGER_ANY_HIGH(config, m_fgcpu_irq).output_handler().set_inputline(m_fgcpu, INPUT_LINE_IRQ0);
 

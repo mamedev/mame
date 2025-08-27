@@ -8447,11 +8447,6 @@ ROM_START( arcadian )
 	ROM_LOAD( "rhp94099.5", 0x040000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  // all banked
 	ROM_LOAD( "rhp94099.6", 0x240000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
 
-	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "prom1.u19",      0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) ) // unknown
-	ROM_LOAD( "prom2.u53",      0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) ) // unknown
-	ROM_LOAD( "prom3.u60",      0x0200, 0x0100, CRC(304f98c6) SHA1(8dfd9bf719087ec30c83efe95c4561666c7d1801) ) // unknown
-
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "prom1.u19", 0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) )  // 82S129
 
@@ -10540,7 +10535,7 @@ GAME( 1990, mustang,    0,        mustang,      mustang,      nmk16_state,      
 GAME( 1990, mustangs,   mustang,  mustang,      mustang,      nmk16_state,        empty_init,           ROT0,   "UPL (Seoul Trading license)",  "US AAF Mustang (25th May. 1990 / Seoul Trading)", 0 )
 
 GAME( 1990, bioship,    0,        bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL (American Sammy license)", "Bio-ship Paladin", 0 ) // US version but no regional notice
-GAME( 1990, sbsgomo,    bioship,  bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL",                          "Space Battle Ship Gomorrah", 0 )
+GAME( 1990, sbsgomo,    bioship,  bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL",                          "Space Battle Ship Gomorrah (Japan)", 0 )
 
 GAME( 1990, vandyke,    0,        vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL",                          "Vandyke (Japan)", 0 )
 GAME( 1990, vandykejal, vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)", 0 )

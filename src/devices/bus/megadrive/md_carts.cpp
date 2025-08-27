@@ -9,13 +9,15 @@
 #include "emu.h"
 #include "md_carts.h"
 
-#include "rom.h"
-#include "svp.h"
-#include "sk.h"
-#include "ggenie.h"
 #include "eeprom.h"
+#include "ggenie.h"
 #include "jcart.h"
+#include "rom.h"
+#include "sk.h"
 #include "stm95.h"
+#include "svp.h"
+#include "titan.h"
+#include "tplay96.h"
 
 
 void md_cart(device_slot_interface &device)
@@ -35,8 +37,8 @@ void md_cart(device_slot_interface &device)
 // EEPROM handling (most not supported fully yet)
 	device.option_add_internal("rom_eeprom",  MD_STD_EEPROM);
 	device.option_add_internal("rom_nbajam",  MD_EEPROM_NBAJAM);
-	device.option_add_internal("rom_nbajamte",  MD_EEPROM_NBAJAMTE);
-	device.option_add_internal("rom_nflqb96",  MD_EEPROM_NFLQB);
+	device.option_add_internal("rom_nbajamte", MD_EEPROM_NBAJAMTE);
+	device.option_add_internal("rom_nflqb96",  MD_EEPROM_NFLQB96);
 	device.option_add_internal("rom_cslam",  MD_EEPROM_CSLAM);
 	device.option_add_internal("rom_nhlpa",  MD_EEPROM_NHLPA);
 	device.option_add_internal("rom_blara",  MD_EEPROM_BLARA);
@@ -85,7 +87,9 @@ void md_cart(device_slot_interface &device)
 	device.option_add_internal("rom_tekkensp",  MD_ROM_TEKKENSP);
 	device.option_add_internal("rom_topf",  MD_ROM_TOPF);
 
+	device.option_add_internal("rom_titan", MD_ROM_TITAN);
 
 	device.option_add_internal("rom_nbajam_alt",  MD_EEPROM_NBAJAM_ALT);
+	device.option_add_internal("rom_tplay96", MD_ROM_TPLAY96);
 	device.option_add_internal("rom_paprium",  MD_ROM_PAPRIUM);
 }

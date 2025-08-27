@@ -6,7 +6,7 @@
     CD-i MCD212 Video Decoder and System Controller emulation
     -------------------
 
-    written by Ryan Holtz
+    written by Ryan Holtz, Vincent.Halver
 
 
 *******************************************************************************
@@ -54,17 +54,14 @@ inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_matte_op(const uint32_t matt
 
 void mcd212_device::update_matte_arrays()
 {
-	bool latched_mf[2]{ false, false };
-	uint8_t latched_wfa = m_weight_factor[0][0];
-	uint8_t latched_wfb = m_weight_factor[1][0];
 	const int width = get_screen_width();
-
 	const int num_mattes = BIT(m_image_coding_method, ICM_NM_BIT) ? 2 : 1;
-	const bool matte_flag = BIT(m_matte_control[0], MC_MF_BIT); // MF bit must be the same. See 5.10.2 Matte Commands
 
+	bool latched_mf[2]{ false, false };
+	uint8_t latched_wf[2] = { m_weight_factor[0][0], m_weight_factor[1][0] };
 	int matte_idx[2] = { 0, 4 };
-	int x = 0;
-	for (; x < width; x++)
+
+	for (int x = 0; x < width; x++)
 	{
 		for (int matte = 0; matte < num_mattes; matte++)
 		{
@@ -74,69 +71,39 @@ void mcd212_device::update_matte_arrays()
 				continue;
 			}
 			const uint32_t matte_ctrl = m_matte_control[matte_idx[matte]];
-			const uint32_t matte_op = get_matte_op(matte_idx[matte]);
-			const int flag = (num_mattes == 2) ? matte : matte_flag;
 
 			if (x == (matte_ctrl & MC_X))
 			{
+				const uint32_t matte_op = get_matte_op(matte_idx[matte]);
+				const int flag = (num_mattes == 2) ? matte : BIT(m_matte_control[matte_idx[matte]], MC_MF_BIT);
+				// See 5.10.2 Matte Commands. Changing the MF-bit inside a line is undefined. Greenbook says don't do it.
+				// Console validation shows the 220 reads and uses this value anyway.
 				switch (matte_op)
 				{
 				case 0: // Disregard all commands in higher registers. See 5.10.2
-					matte_idx[matte] = max_matte_id;
+					matte_idx[matte] = 8;
 					break;
-				case 1:
-				case 2:
-				case 3: // Not used
+				case 1: case 2: case 3: case 5: case 7: case 10: case 11: // Not used
 					break;
-				case 4: // Change weight of plane A
-					latched_wfa = get_weight_factor(matte_idx[matte]);
+				case 4: case 6: // Change weight of plane (A or B)
+					latched_wf[BIT(matte_op, 1)] = get_weight_factor(matte_idx[matte]);
 					break;
-				case 5: // Not used
+				case 8: case 9: // (Reset or Set) matte flag
+					latched_mf[flag] = BIT(matte_op, 0);
 					break;
-				case 6: // Change weight of plane B
-					latched_wfb = get_weight_factor(matte_idx[matte]);
-					break;
-				case 7: // Not used
-					break;
-				case 8: // Reset matte flag
-					latched_mf[flag] = false;
-					break;
-				case 9: // Set matte flag
-					latched_mf[flag] = true;
-					break;
-				case 10:    // Not used
-				case 11:    // Not used
-					break;
-				case 12: // Reset matte flag and change weight of plane A
-					latched_wfa = get_weight_factor(matte_idx[matte]);
-					latched_mf[flag] = false;
-					break;
-				case 13: // Set matte flag and change weight of plane A
-					latched_wfa = get_weight_factor(matte_idx[matte]);
-					latched_mf[flag] = true;
-					break;
-				case 14: // Reset matte flag and change weight of plane B
-					latched_wfb = get_weight_factor(matte_idx[matte]);
-					latched_mf[flag] = false;
-					break;
-				case 15: // Set matte flag and change weight of plane B
-					latched_wfb = get_weight_factor(matte_idx[matte]);
-					latched_mf[flag] = true;
+				case 12: case 13: case 14: case 15: // Change weight of plane (A or B) and (Reset or Set) matte flag
+					latched_wf[BIT(matte_op, 1)] = get_weight_factor(matte_idx[matte]);
+					latched_mf[flag] = BIT(matte_op, 0);
 					break;
 				}
 				matte_idx[matte]++;
 			}
 		}
-		m_weight_factor[0][x] = latched_wfa;
-		m_weight_factor[1][x] = latched_wfb;
+		m_weight_factor[0][x] = latched_wf[0];
+		m_weight_factor[1][x] = latched_wf[1];
 		m_matte_flag[0][x] = latched_mf[0];
 		m_matte_flag[1][x] = latched_mf[1];
 	}
-	// Fill the remainder.
-	std::fill_n(m_weight_factor[0] + x, std::size(m_weight_factor[0]) - x, latched_wfa);
-	std::fill_n(m_weight_factor[1] + x, std::size(m_weight_factor[1]) - x, latched_wfb);
-	std::fill_n(m_matte_flag[0] + x, std::size(m_matte_flag[0]) - x, latched_mf[0]);
-	std::fill_n(m_matte_flag[1] + x, std::size(m_matte_flag[1]) - x, latched_mf[1]);
 }
 
 template <int Path>
@@ -351,17 +318,25 @@ int mcd212_device::get_border_width()
 	return width;
 }
 
+uint32_t mcd212_device::get_backdrop_plane()
+{
+	if (BIT(m_image_coding_method, ICM_EV_BIT))
+		return 0; // External Video Background. Default to Black since there is no DVC.
+	else
+		return s_4bpp_color[m_backdrop_color];
+}
+
 template <int Path>
 void mcd212_device::process_ica()
 {
 	uint16_t *ica = Path ? m_planeb.target() : m_planea.target();
-	uint32_t addr = 0x200;
-	uint32_t cmd = 0;
-
 	const int max_to_process = m_ica_height * 120;
+	// LCT depends on the current frame parity
+	uint32_t addr = (BIT(m_csrr[0], CSR1R_PA_BIT) == 0) ? 0x200 : 0x202;
+
 	for (int i = 0; i < max_to_process; i++)
 	{
-		cmd = ica[addr++] << 16;
+		uint32_t cmd = ica[addr++] << 16;
 		cmd |= ica[addr++];
 		switch ((cmd & 0xff000000) >> 24)
 		{
@@ -488,24 +463,24 @@ void mcd212_device::process_dca()
 }
 
 template <int Path>
-static inline uint8_t BYTE_TO_CLUT(int icm, uint8_t byte)
+static inline uint8_t BYTE_TO_CLUT(int icm, uint8_t byte, bool clut_select)
 {
 	switch (icm)
 	{
-		case 1:
-			return byte;
-		case 3:
-			return (Path ? 0x80 : 0) | (byte & 0x7f);
-		case 4:
-			if (Path == 0)
-			{
-				return byte & 0x7f;
-			}
-			break;
-		case 11:
-			return (Path ? 0x80 : 0) | (byte & 0x0f);
-		default:
-			break;
+	case 1:
+		return byte;
+	case 3:
+		return (Path ? 0x80 : 0) | (byte & 0x7f);
+	case 4:
+		if (Path == 0)
+		{
+			return (clut_select ? 0x80 : 0) | (byte & 0x7f);
+		}
+		break;
+	case 11:
+		return (Path ? 0x80 : 0) | (byte & 0x0f);
+	default:
+		break;
 	}
 	return 0;
 }
@@ -621,24 +596,25 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 		}
 		else
 		{
+			bool clut_select = BIT(m_image_coding_method, ICM_CS_BIT);
 			if (icm == ICM_RGB555 && Path == 1)
 			{
 				const uint8_t byte1 = data2[(vsr2++ & 0x0007ffff) ^ 1];
 				const uint8_t blue = (byte & 0b11111) << 3;
 				const uint8_t green = ((byte & 0b11100000) >> 2) + ((byte1 & 0b11) << 6);
 				const uint8_t red = (byte1 & 0b01111100) << 1;
-				rgb_tp_bit = (use_rgb_tp_bit && ((byte1 & 0x80) == tp_check_parity));
+				rgb_tp_bit = (use_rgb_tp_bit && (BIT(byte1,7) == tp_check_parity));
 				color1 = color0 = (uint32_t(red) << 16) | (uint32_t(green) << 8) | blue;
 			}
 			else if (icm == ICM_CLUT4)
 			{
 				const uint8_t mask = (decodingMode == DDR_FT_RLE) ? 0x7 : 0xf;
-				color0 = m_clut[BYTE_TO_CLUT<Path>(icm, mask & (byte >> 4))];
-				color1 = m_clut[BYTE_TO_CLUT<Path>(icm, mask & byte)];
+				color0 = m_clut[BYTE_TO_CLUT<Path>(icm, mask & (byte >> 4), clut_select)];
+				color1 = m_clut[BYTE_TO_CLUT<Path>(icm, mask & byte, clut_select)];
 			}
 			else
 			{
-				color1 = color0 = m_clut[BYTE_TO_CLUT<Path>(icm, byte)];
+				color1 = color0 = m_clut[BYTE_TO_CLUT<Path>(icm, byte, clut_select)];
 			}
 
 			int length_m = mosaic_enable ? (mosaic_factor * 2) : 2;
@@ -674,19 +650,32 @@ const uint32_t mcd212_device::s_4bpp_color[16] =
 template <bool MosaicA, bool MosaicB, bool OrderAB>
 void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *plane_b, bool *transparent_b, uint32_t *out)
 {
-	const uint8_t mosaic_count_a = (m_mosaic_hold[0] & 0x0000ff) << 1;
-	const uint8_t mosaic_count_b = (m_mosaic_hold[1] & 0x0000ff) << 1;
+	const uint8_t icmA = get_icm<0>();
+	const uint8_t icmB = get_icm<1>();
+	uint16_t mosaic_count_a = (m_mosaic_hold[0] & 0x0000ff) << 1;
+	uint16_t mosaic_count_b = (m_mosaic_hold[1] & 0x0000ff) << 1;
 	const int width = get_screen_width();
 	const int border_width = get_border_width();
 
 	uint8_t *weight_a = &m_weight_factor[0][0];
 	uint8_t *weight_b = &m_weight_factor[1][0];
 
+	// Console Verified. CLUT4 pixels are drawn in pairs during VSR. So the mosaic here is halved.
+	if (icmA == ICM_CLUT4)
+		mosaic_count_a >>= 1;
+	if (icmB == ICM_CLUT4)
+		mosaic_count_b >>= 1;
+
+	// If PAL and 'Standard' bit set, insert a 24px border on the left/right
+	uint32_t offset = (!BIT(m_dcr[0], DCR_CF_BIT) || BIT(m_csrw[0], CSR1W_ST_BIT)) ? 24 : 0;
+	std::fill_n(out, offset, s_4bpp_color[0]);
+	out += offset;
+
 	for (int x = 0; x < width; x++)
 	{
 		if (transparent_a[x] && transparent_b[x])
 		{
-			out[x] = s_4bpp_color[m_backdrop_color];
+			out[x] = get_backdrop_plane();
 			continue;
 		}
 		uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
@@ -749,7 +738,7 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 		if (!invert)
 			return; // Normal Blink
 		else
-			color_index = ~color_index & 0xf; // Inverted Color Blink
+			color_index = color_index ^ 0x7; // Inverted Color Blink. MCD212 Section 7.5
 	}
 
 	const uint16_t cursor_x = m_cursor_position & 0x3ff;
@@ -760,7 +749,7 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 	if ((0 <= y) && (y < 16))
 	{
 		const uint32_t color = s_4bpp_color[color_index];
-		const uint8_t resolution = (m_cursor_control & CURCNT_CUW) ? 4 : 2;
+		const uint8_t resolution = (m_cursor_control & CURCNT_CUW) ? 1 : 2;
 		for (int x = 0; x < 16; x++)
 		{
 			if (BIT(m_cursor_pattern[y], 15 - x))
@@ -979,12 +968,19 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	bool transparent_a[768];
 	bool transparent_b[768];
 
+	if (screen.vpos() >= m_total_height)
+	{
+		return 0; // Do nothing on the extended rows.
+	}
+
 	int scanline = screen.vpos();
 
 	// Process VSR and mix if we're in the visible region
 	if (scanline >= m_ica_height)
 	{
-		uint32_t *out = &bitmap.pix(scanline);
+		uint32_t bitmap_line = ((scanline - m_ica_height) << 1) + m_ica_height;
+		uint32_t *out = &bitmap.pix(bitmap_line + (!BIT(m_csrr[0], CSR1R_PA_BIT)));
+		uint32_t* out2 = &bitmap.pix(bitmap_line + (BIT(m_csrr[0], CSR1R_PA_BIT)));
 
 		bool draw_line = true;
 		if (!BIT(m_dcr[0], DCR_FD_BIT) && BIT(m_csrw[0], CSR1W_ST_BIT))
@@ -992,7 +988,7 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			// If PAL and 'Standard' bit set, insert a 20-line border on the top/bottom
 			if ((scanline - m_ica_height < 20) || (scanline >= (m_total_height - 20)))
 			{
-				std::fill_n(out, 768, 0xff101010);
+				std::fill_n(out, 768, s_4bpp_color[0]);
 				draw_line = false;
 			}
 		}
@@ -1001,12 +997,6 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		if (draw_line)
 		{
-			// If PAL and 'Standard' bit set, insert a 24px border on the left/right
-			if (!BIT(m_dcr[0], DCR_CF_BIT) || BIT(m_csrw[0], CSR1W_ST_BIT))
-			{
-				std::fill_n(out, 24, 0xff101010);
-				out += 24;
-			}
 
 			process_vsr<0>(plane_a, transparent_a);
 			process_vsr<1>(plane_b, transparent_b);
@@ -1043,6 +1033,16 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			}
 
 			draw_cursor(out);
+		}
+
+		if (BIT(m_dcr[0], DCR_SM_BIT)) {
+			// Interlace Output
+			memcpy(out2, m_interlace_field[scanline], 768 * sizeof(uint32_t));
+			memcpy(m_interlace_field[scanline], out, 768 * sizeof(uint32_t));
+		}
+		else {
+			// Single Field Output (duplicate lines)
+			memcpy(out2, out, 768 * sizeof(uint32_t));
 		}
 	}
 
@@ -1134,6 +1134,9 @@ void mcd212_device::device_reset()
 	m_ica_height = 32;
 	m_total_height = 312;
 	m_blink_time = 0;
+	for (int i = 0; i < 312; i++) {
+		std::fill_n(m_interlace_field[i], 768, 0);
+	}
 
 	m_int_callback(CLEAR_LINE);
 
@@ -1212,6 +1215,8 @@ void mcd212_device::device_start()
 
 	save_item(NAME(m_blink_time));
 	save_item(NAME(m_blink_active));
+
+	save_item(NAME(m_interlace_field));
 
 	m_dca_timer = timer_alloc(FUNC(mcd212_device::dca_tick), this);
 	m_dca_timer->adjust(attotime::never);

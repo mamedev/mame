@@ -11,7 +11,7 @@
    Known Issues:
    - some dips not mapped
    - protection isn't fully understood, but game seems to be ok.
-   - cpu speeds unverified
+   - cpu speed unverified (ay frequency matches pcb video)
 
    Buttons are laid out as follows:
    7   8   9
@@ -111,7 +111,7 @@ TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
 {
 	uint16_t const code = m_tileram[tile_index];
 
-	tileinfo.set(BIT(code, 9), code & 0x1ff, 0, 0);
+	tileinfo.set(0, code & 0x3ff, 0, 0);
 }
 
 void mole_state::video_start()
@@ -222,8 +222,7 @@ void mole_state::main_map(address_map &map)
 	map(0x8400, 0x8400).w(FUNC(mole_state::tilebank_w));
 	map(0x8c00, 0x8c01).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x8c40, 0x8c40).nopw(); // ???
-	map(0x8c80, 0x8c80).nopw(); // ???
-	map(0x8c81, 0x8c81).nopw(); // ???
+	map(0x8c80, 0x8c81).nopw(); // ???
 	map(0x8d00, 0x8d00).portr("DSW").w(FUNC(mole_state::irqack_w));
 	map(0x8d40, 0x8d40).portr("IN0");
 	map(0x8d80, 0x8d80).portr("IN1");
@@ -239,9 +238,9 @@ void mole_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( mole )
 	PORT_START("DSW")   /* 0x8d00 */
-	PORT_DIPNAME( 0x01, 0x00, "Round Points" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "Passing Point" ) // increases by 50 every 5 rounds
+	PORT_DIPSETTING(    0x00, "300" )
+	PORT_DIPSETTING(    0x01, "400" )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -296,21 +295,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout tile_layout =
-{
-	8,8,    /* character size */
-	512,    /* number of characters */
-	3,      /* number of bitplanes */
-	{ 0x0000*8, 0x1000*8, 0x2000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-
 static GFXDECODE_START( gfx_mole )
-	GFXDECODE_ENTRY( "gfx", 0x0000, tile_layout, 0x00, 1 )
-	GFXDECODE_ENTRY( "gfx", 0x3000, tile_layout, 0x00, 1 )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x3_planar, 0, 1 )
 GFXDECODE_END
 
 
@@ -342,7 +328,7 @@ void mole_state::mole(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	AY8910(config, "aysnd", 2'000'000).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -359,12 +345,12 @@ ROM_START( mole ) // ALL ROMS ARE 2732
 	ROM_LOAD( "m1a.8h", 0x7000, 0x1000, CRC(cff0119a) SHA1(48fc81b8c68e977680e7b8baf1193f0e7e0cd013) )
 
 	ROM_REGION( 0x6000, "gfx", 0 )
-	ROM_LOAD( "mea.4a", 0x0000, 0x1000, CRC(49d89116) SHA1(aa4cde07e10624072e50ba5bd209acf93092cf78) )
-	ROM_LOAD( "mca.6a", 0x1000, 0x1000, CRC(04e90300) SHA1(c908a3a651e50428eedc2974160cdbf2ed946abc) )
-	ROM_LOAD( "maa.9a", 0x2000, 0x1000, CRC(6ce9442b) SHA1(c08bf0911f1dfd4a3f9452efcbb3fd3688c4bf8c) )
-	ROM_LOAD( "mfa.3a", 0x3000, 0x1000, CRC(0d0c7d13) SHA1(8a6d371571391f2b54ffa65b77e4e83fd607d2c9) )
-	ROM_LOAD( "mda.5a", 0x4000, 0x1000, CRC(41ae1842) SHA1(afc169c3245b0946ef81e65d0b755d498ee71667) )
-	ROM_LOAD( "mba.8a", 0x5000, 0x1000, CRC(50c43fc9) SHA1(af478f3d89cd6c87f32dcdda7fabce25738c340b) )
+	ROM_LOAD( "maa.9a", 0x0000, 0x1000, CRC(6ce9442b) SHA1(c08bf0911f1dfd4a3f9452efcbb3fd3688c4bf8c) )
+	ROM_LOAD( "mba.8a", 0x1000, 0x1000, CRC(50c43fc9) SHA1(af478f3d89cd6c87f32dcdda7fabce25738c340b) )
+	ROM_LOAD( "mca.6a", 0x2000, 0x1000, CRC(04e90300) SHA1(c908a3a651e50428eedc2974160cdbf2ed946abc) )
+	ROM_LOAD( "mda.5a", 0x3000, 0x1000, CRC(41ae1842) SHA1(afc169c3245b0946ef81e65d0b755d498ee71667) )
+	ROM_LOAD( "mea.4a", 0x4000, 0x1000, CRC(49d89116) SHA1(aa4cde07e10624072e50ba5bd209acf93092cf78) )
+	ROM_LOAD( "mfa.3a", 0x5000, 0x1000, CRC(0d0c7d13) SHA1(8a6d371571391f2b54ffa65b77e4e83fd607d2c9) )
 ROM_END
 
 } // anonymous namespace

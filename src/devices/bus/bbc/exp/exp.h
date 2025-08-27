@@ -71,9 +71,6 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
-	// callbacks for mertec device (also connects to joyport)
-	auto cb1_handler() { return m_cb1_handler.bind(); }
-	auto cb2_handler() { return m_cb2_handler.bind(); }
 
 	uint8_t fred_r(offs_t offset);
 	void fred_w(offs_t offset, uint8_t data);
@@ -85,12 +82,17 @@ public:
 	void irq_w(int state) { m_irq_handler(state); }
 	void nmi_w(int state) { m_nmi_handler(state); }
 
-	// additional handlers for mertec device
+	// additional callbacks/handlers for mertec device (also connects to joyport)
+	auto cb1_handler() { return m_cb1_handler.bind(); }
+	auto cb2_handler() { return m_cb2_handler.bind(); }
+
 	void cb1_w(int state) { m_cb1_handler(state); }
 	void cb2_w(int state) { m_cb2_handler(state); }
 
 	uint8_t pb_r();
 	void pb_w(uint8_t data);
+	void write_cb1(int state);
+	void write_cb2(int state);
 
 protected:
 	// device-level overrides
@@ -121,6 +123,8 @@ public:
 
 	virtual uint8_t pb_r() { return 0xff; }
 	virtual void pb_w(uint8_t data) { }
+	virtual void write_cb1(int state) { }
+	virtual void write_cb2(int state) { }
 
 protected:
 	device_bbc_exp_interface(const machine_config &mconfig, device_t &device);

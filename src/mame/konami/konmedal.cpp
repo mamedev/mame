@@ -408,7 +408,6 @@ uint32_t konmedal_state::screen_update_shuriboy(screen_device &screen, bitmap_in
 {
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
-	m_k052109->tilemap_update();
 
 	for (int p = 0; p < 2; p++)
 	{

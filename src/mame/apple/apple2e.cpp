@@ -1872,13 +1872,11 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			break;
 
 		case 0x54:  // set page 1
-			m_video->page2_w(false);
 			m_video->scr_w(0);
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
-			m_video->page2_w(true);
 			m_video->scr_w(1);
 			auxbank_update();
 			break;
@@ -3757,7 +3755,7 @@ void apple2e_state::ace2200_map(address_map &map)
 {
 	base_map(map);
 
-	// change the banking here to acommodate the Ace 2x00's ROM banking in at $A000
+	// change the banking here to accommodate the Ace 2x00's ROM banking in at $A000
 	m_4000bank[0](0x4000, 0xbfff).rw(FUNC(apple2e_state::ram4000_ace2200_r), FUNC(apple2e_state::ram4000_w));
 
 	map(0xc090, 0xc097).w(FUNC(apple2e_state::laserprn_w));
@@ -3766,8 +3764,8 @@ void apple2e_state::ace2200_map(address_map &map)
 
 void apple2e_state::spectred_keyb_map(address_map &map)
 {
-		map(0x0000, 0x07ff).rom();
-		map(0x0800, 0x0fff).ram();
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x0fff).ram();
 }
 
 /***************************************************************************

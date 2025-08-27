@@ -386,6 +386,8 @@ private:
 	void bank1_0000_sh_w(offs_t offset, u8 data);
 	u8 bank1_c000_r(offs_t offset);
 	void bank1_c000_w(offs_t offset, u8 data);
+	u8 expandedram_r(offs_t offset);
+	void expandedram_w(offs_t offset, u8 data);
 	void a2bus_irq_w(int state);
 	void a2bus_nmi_w(int state);
 	void a2bus_inh_w(int state);
@@ -447,7 +449,7 @@ private:
 
 	// Sound GLU variables
 	u8 m_sndglu_ctrl = 0;
-	int m_sndglu_addr = 0;
+	u16 m_sndglu_addr = 0;
 	int m_sndglu_dummy_read = 0;
 
 	// Key GLU variables
@@ -1376,13 +1378,11 @@ void apple2gs_state::do_io(int offset)
 			break;
 
 		case 0x54:  // set page 1
-			m_video->page2_w(false);
 			m_video->scr_w(0);
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
-			m_video->page2_w(true);
 			m_video->scr_w(1);
 			auxbank_update();
 			break;
@@ -2497,6 +2497,34 @@ void apple2gs_state::c800_w(offs_t offset, u8 data)
 	}
 }
 
+/* for < 14MB RAM, returns the bank number on reads >= 8MB */
+u8 apple2gs_state::expandedram_r(offs_t offset)
+{
+	offset += 0x020000;
+
+	if (offset >= m_ram_size)
+	{
+		if (offset >= 0x800000)
+		{
+			return offset >> 16;
+		}
+
+		return 0;
+	}
+
+	return m_ram_ptr[offset];
+}
+
+void apple2gs_state::expandedram_w(offs_t offset, u8 data)
+{
+	offset += 0x20000;
+
+	if (offset < m_ram_size)
+	{
+		m_ram_ptr[offset] = data;
+	}
+}
+
 u8 apple2gs_state::inh_r(offs_t offset)
 {
 	if (m_inh_slot != -1)
@@ -3289,6 +3317,8 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	m_e0_4000bank[1](0x4000, 0xbfff).rw(FUNC(apple2gs_state::e1ram_r<0x4000>), FUNC(apple2gs_state::e0ram_w<0x4000>));
 	m_e0_4000bank[2](0x4000, 0xbfff).rw(FUNC(apple2gs_state::e0ram_r<0x4000>), FUNC(apple2gs_state::e1ram_w<0x4000>));
 	m_e0_4000bank[3](0x4000, 0xbfff).rw(FUNC(apple2gs_state::e1ram_r<0x4000>), FUNC(apple2gs_state::e1ram_w<0x4000>));
+
+	map(0x020000, 0xdfffff).rw(FUNC(apple2gs_state::expandedram_r), FUNC(apple2gs_state::expandedram_w));
 
 	map(0xe0c000, 0xe0c07f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
 	map(0xe0c080, 0xe0c0ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));

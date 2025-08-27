@@ -11,27 +11,18 @@
 #pragma once
 
 #include "m72_a.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "machine/mb8421.h"
 #include "machine/pic8259.h"
 #include "machine/upd4701.h"
 #include "video/bufsprite.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
 
-#define M81_B_B_JUMPER_J3_S \
-	PORT_START("JumperJ3") \
-	PORT_CONFNAME( 0x0001, 0x0000, "M81-B-B Jumper J3" ) \
-	PORT_CONFSETTING(      0x0000, "S" ) \
-	/* PORT_CONFSETTING(      0x0001, "W" ) */
-
-#define M81_B_B_JUMPER_J3_W \
-	PORT_START("JumperJ3") \
-	PORT_CONFNAME( 0x0001, 0x0001, "M81-B-B Jumper J3" ) \
-	/* PORT_CONFSETTING(      0x0000, "S" ) */ \
-	PORT_CONFSETTING(      0x0001, "W" )
 
 // Base state
 class m72_state : public driver_device
@@ -41,6 +32,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
+		m_upd71059c(*this, "upd71059c"),
 		m_dac(*this, "dac"),
 		m_audio(*this, "m72"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -50,18 +42,13 @@ public:
 		m_videoram(*this, "videoram%u", 1U),
 		m_soundram(*this, "soundram"),
 		m_paletteram(*this, "paletteram%u", 1U),
-		m_upd71059c(*this, "upd71059c"),
 		m_samples_region(*this, "samples"),
 		m_io_dsw(*this, "DSW"),
 		m_fg_tilemap(nullptr),
 		m_bg_tilemap(nullptr),
 		m_video_off(false),
-		m_fg_source(0),
-		m_bg_source(0),
 		m_m81_b_b_j3(*this, "JumperJ3")
 	{
-		m_scrollx[0] = m_scrollx[1] = 0;
-		m_scrolly[0] = m_scrolly[1] = 0;
 	}
 
 	void m72_base(machine_config &config);
@@ -87,6 +74,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	optional_device<pic8259_device> m_upd71059c;
 	optional_device<dac_byte_interface> m_dac;
 	optional_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -97,18 +85,14 @@ protected:
 	required_shared_ptr_array<u16, 2> m_videoram;
 	optional_shared_ptr<u8> m_soundram;
 	required_shared_ptr_array<u16, 2> m_paletteram;
-
-	optional_device<pic8259_device> m_upd71059c;
-
 	optional_region_ptr<u8> m_samples_region;
-
 	optional_ioport m_io_dsw;
 
 	std::unique_ptr<u16[]> m_protection_ram;
 	emu_timer *m_scanline_timer = nullptr;
 	const u8 *m_protection_code = nullptr;
 	const u8 *m_protection_crc = nullptr;
-	u32 m_raster_irq_position = 0;
+	s32 m_raster_irq_position = -1;
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
 	s32 m_scrollx[2]{};
@@ -146,7 +130,6 @@ protected:
 	template<unsigned N> TILE_GET_INFO_MEMBER(rtype2_get_tile_info);
 
 	DECLARE_VIDEO_START(m72);
-	DECLARE_VIDEO_START(dbreedm72);
 	DECLARE_VIDEO_START(xmultipl);
 	DECLARE_VIDEO_START(hharry);
 	DECLARE_VIDEO_START(rtype2);
@@ -161,13 +144,12 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	inline void m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,const u16 *vram,int gfxnum);
+	inline void m72_m81_get_tile_info(tile_data &tileinfo, int tile_index, const u16 *vram, int gfxnum);
 	void register_savestate();
 	inline void changecolor(offs_t color, u8 r, u8 g, u8 b);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void copy_le(u16 *dest, const u8 *src, u8 bytes);
-	void install_protection_handler(const u8 *code,const u8 *crc);
+	void install_protection_handler(const u8 *code, const u8 *crc);
 
 	void dbreed_map(address_map &map) ATTR_COLD;
 	void dbreedwm72_map(address_map &map) ATTR_COLD;
@@ -195,8 +177,8 @@ protected:
 	void xmultipl_map(address_map &map) ATTR_COLD;
 };
 
-// M72 with MCU
 
+// M72 with MCU
 class m72_mcu_state : public m72_state
 {
 public:
@@ -211,12 +193,7 @@ public:
 	void m72_airduel(machine_config &config);
 	void m72_dbreed(machine_config &config);
 	void m72_xmultipl(machine_config &config);
-	void imgfight(machine_config &config);
 	void imgfightjb(machine_config &config);
-	void mrheli(machine_config &config);
-	void nspirit(machine_config &config);
-
-	//void init_m72_8751();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -237,9 +214,10 @@ private:
 	void mcu_low_w(u8 data);
 	void mcu_high_w(u8 data);
 
-	DECLARE_VIDEO_START(imgfight);
 	DECLARE_VIDEO_START(mrheli);
 	DECLARE_VIDEO_START(nspirit);
+	DECLARE_VIDEO_START(imgfight);
+	DECLARE_VIDEO_START(loht);
 
 	TIMER_CALLBACK_MEMBER(delayed_ram16_w);
 	TIMER_CALLBACK_MEMBER(delayed_ram8_w);
@@ -254,6 +232,7 @@ private:
 	void xmultiplm72_map(address_map &map) ATTR_COLD;
 };
 
+
 // M82 (with modified video features)
 class m82_state : public m72_state
 {
@@ -261,10 +240,7 @@ public:
 	m82_state(const machine_config &mconfig, device_type type, const char *tag) :
 		m72_state(mconfig, type, tag),
 		m_m82_rowscrollram(*this, "majtitle_rowscr"),
-		m_spriteram2(*this, "spriteram2"),
-		m_bg_tilemap_large(nullptr),
-		m_m82_rowscroll(false),
-		m_m82_tmcontrol(0)
+		m_spriteram2(*this, "spriteram2")
 	{
 	}
 
@@ -291,11 +267,12 @@ private:
 	TILEMAP_MAPPER_MEMBER(m82_scan_rows);
 
 	u32 screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void majtitle_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void m82_map(address_map &map) ATTR_COLD;
 	void m82_portmap(address_map &map) ATTR_COLD;
 };
+
 
 // M85 (with trackball)
 class poundfor_state : public m72_state
@@ -303,7 +280,7 @@ class poundfor_state : public m72_state
 public:
 	poundfor_state(const machine_config &mconfig, device_type type, const char *tag) :
 		m72_state(mconfig, type, tag),
-		m_upd4701(*this, {"upd4701l", "upd4701h"})
+		m_upd4701(*this, { "upd4701l", "upd4701h" })
 	{
 	}
 

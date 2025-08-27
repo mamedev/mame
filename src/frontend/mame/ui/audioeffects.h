@@ -37,12 +37,12 @@ private:
 	virtual bool handle(event const *ev) override;
 
 	u32 flag_type() const;
-	u32 flag_lat() const;
+	u32 flag_latency() const;
 	u32 flag_length() const;
 	u32 flag_phases() const;
 
-	static float change_f(const float *table, float value, int change);
-	static u32 change_u32(const u32 *table, u32 value, int change);
+	float change_f(float val, bool inc, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
+	u32 change_int(u16 which, int val, bool inc, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
 
 	static std::string format_lat(float latency);
 	static std::string format_u32(u32 val);

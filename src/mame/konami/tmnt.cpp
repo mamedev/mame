@@ -444,8 +444,6 @@ void tmnt_state::tmnt_priority_w(offs_t offset, uint16_t data)
 
 uint32_t tmnt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
 	if ((m_tmnt_priorityflag & 1) == 1) m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
@@ -577,10 +575,10 @@ static INPUT_PORTS_START( cuebrick )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")
-	KONAMI16_LSB( 1, IPT_BUTTON3, IPT_UNUSED )
+	KONAMI16_LSB_MONO_4WAY( IPT_BUTTON3, IPT_UNUSED )
 
 	PORT_START("P2")
-	KONAMI16_LSB( 2, IPT_BUTTON3, IPT_UNUSED )
+	KONAMI16_LSB_COCKTAIL_4WAY( IPT_BUTTON3, IPT_UNUSED )
 
 	PORT_START("DSW1")
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
@@ -610,7 +608,7 @@ static INPUT_PORTS_START( cuebrick )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Upright Controls" ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" ) PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
@@ -831,7 +829,6 @@ void tmnt_state::cuebrick(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);

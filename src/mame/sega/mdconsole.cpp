@@ -117,15 +117,6 @@ void md_cons_state::tmss_swap_w(uint16_t data)
 	}
 }
 
-
-void md_cons_state::dcat16_megadriv_map(address_map &map)
-{
-	megadriv_68k_base_map(map);
-
-	map(0x000000, 0x7fffff).rom();
-}
-
-
 void md_cons_state::install_tmss()
 {
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x000000, 0x7fffff);
@@ -196,13 +187,6 @@ void md_cons_state::screen_vblank_console(int state)
 	}
 }
 
-void md_cons_state::dcat16_megadriv_base(machine_config &config)
-{
-	md_ntsc(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &md_cons_state::dcat16_megadriv_map);
-}
-
 void md_cons_slot_state::ms_megadriv(machine_config &config)
 {
 	md_ntsc(config);
@@ -271,19 +255,6 @@ void md_cons_slot_state::genesis_tmss(machine_config &config)
 	subdevice<software_list_device>("cart_list")->set_filter("NTSC-U,TMSS");
 }
 
-void md_cons_state::dcat16_megadriv(machine_config &config)
-{
-	dcat16_megadriv_base(config);
-
-	m_screen->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
-
-	md_ctrl_ports(config);
-
-//  has SD card slot instead?
-//  MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
-//  SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
-}
-
 /*************************************
  *
  *  ROM definition(s)
@@ -316,63 +287,6 @@ ROM_START(genesis_tmss)
 	ROM_LOAD( "tmss_usa.bin", 0x0000,  0x4000, CRC(5f5e64eb) SHA1(453fca4e1db6fae4a10657c4451bccbb71955628) )
 ROM_END
 
-ROM_START(dcat16)
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "mg6025.u1", 0x0000,  0x800000, CRC(5453d673) SHA1(b9f8d849cbed81fe73525229f4897ccaeeb7a833) )
-
-	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
-ROM_END
-
-
-ROM_START(mahg156)
-	ROM_REGION(0x8000000, "mainrom", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "md156.u3", 0x0000,  0x8000000, CRC(665fc68c) SHA1(6b765f96716c4a0abf3d27252ec82be6b0d9a985) )
-
-	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
-//  the Megadrive ROMs for the most part appear to be hacked versions of the games / old scene dumps
-//  some are region locked to differing regions (not all games present in ROM appear on the menu)
-//  ROM_COPY( "mainrom", 0x0000000, 0, 0x080000) // FORGOTTEN WORLDS
-//  ROM_COPY( "mainrom", 0x0080000, 0, 0x080000) // FIRE PRO WRESTLING
-//  ROM_COPY( "mainrom", 0x0100000, 0, 0x080000) // GHOST BUSTERS
-//  ROM_COPY( "mainrom", 0x0180000, 0, 0x080000) // DICK TRACY
-//  ROM_COPY( "mainrom", 0x0200000, 0, 0x080000) // DEVIL CRASH
-//  ROM_COPY( "mainrom", 0x0280000, 0, 0x080000) // DECAP ATTACK
-//  ROM_COPY( "mainrom", 0x0300000, 0, 0x080000) // DARWIN 4081
-//  ROM_COPY( "mainrom", 0x0380000, 0, 0x080000) // CRACK DOWN
-//  ROM_COPY( "mainrom", 0x0400000, 0, 0x080000) // CAPTAIN PLANET
-//  ROM_COPY( "mainrom", 0x0480000, 0, 0x080000) // CALIFORNIA GAMES
-//  ROM_COPY( "mainrom", 0x0500000, 0, 0x080000) // CADASH
-//  ROM_COPY( "mainrom", 0x0580000, 0, 0x080000) // BOOGIE WOOGIE BOWLING
-//  ROM_COPY( "mainrom", 0x0600000, 0, 0x080000) // BIMINI RUN
-//  ROM_COPY( "mainrom", 0x0700000, 0, 0x080000) // BATTLE TOADS
-//  ROM_COPY( "mainrom", 0x0780000, 0, 0x080000) // TROUBLE SHOOTER
-//  ROM_COPY( "mainrom", 0x0800000, 0, 0x080000) // BURNING FORCE
-//  ROM_COPY( "mainrom", 0x0880000, 0, 0x080000) // FAERY TALE ADVENTURE
-//  ROM_COPY( "mainrom", 0x0900000, 0, 0x080000) // E-SWAT
-//  ROM_COPY( "mainrom", 0x0980000, 0, 0x080000) // ELEMENTAL MASTER
-//  ROM_COPY( "mainrom", 0x0a00000, 0, 0x080000) // EA HOCKEY
-//  ROM_COPY( "mainrom", 0x0a80000, 0, 0x080000) // DARK CASTLE
-//  ROM_COPY( "mainrom", 0x0b00000, 0, 0x080000) // CYBORG JUSTICE (CENSOR)
-//  ROM_COPY( "mainrom", 0x0b80000, 0, 0x080000) // LITTLE MERMAID
-//  ROM_COPY( "mainrom", 0x0c00000, 0, 0x080000) // DORAEMON
-//  ROM_COPY( "mainrom", 0x0c80000, 0, 0x080000) // SONIC
-//  ROM_COPY( "mainrom", 0x0d00000, 0, 0x080000) // WANI WANI WORLD
-//  ROM_COPY( "mainrom", 0x0d80000, 0, 0x080000) // GOLDEN AXE 2
-//  etc.
-	ROM_COPY( "mainrom", 0x7800000, 0x00000, 0x200000) // DMC RedKid (Menu, requires unusual rendering mode?)
-
-	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
-ROM_END
-
-ROM_START(mdhh100)
-	ROM_REGION(0x8000000, "mainrom", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "s29gl01gp11tfir1.u13", 0x0000,  0x8000000, CRC(564ab33a) SHA1(e455aaa9ed6f302d1ebe55b5202f983af612c415) )
-
-	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
-	ROM_COPY( "mainrom", 0x7800000, 0x00000, 0x200000) // DMC RedKid (Menu, requires unusual rendering mode?)
-
-	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
-ROM_END
 
 ROM_START(megajet)
 	ROM_REGION(MD_CPU_REGION_SIZE, "maincpu", ROMREGION_ERASEFF)
@@ -409,6 +323,12 @@ void md_cons_state::init_genesis()
 	m_version_hi_nibble = 0x80; // Export NTSC
 	if (!m_segacd)
 		m_version_hi_nibble |= 0x20;
+}
+
+void md_cons_state::init_genesis_tmss()
+{
+	init_genesis();
+	m_version_lo_nibble = 1;
 }
 
 void md_cons_state::init_md_eur()
@@ -519,21 +439,21 @@ void md_cons_state::genesis_32x(machine_config &config)
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
 	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback));
 	m_vdp->reset_routes();
-	m_vdp->add_route(ALL_OUTPUTS, "speaker", (0.50)/2);
-	m_vdp->add_route(ALL_OUTPUTS, "speaker", (0.50)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_screen("megadriv");
-	m_32x->add_route(0, "speaker", 1.00);
-	m_32x->add_route(1, "speaker", 1.00);
+	m_32x->add_route(0, "speaker", 1.00, 0);
+	m_32x->add_route(1, "speaker", 1.00, 1);
 
 	m_screen->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the YM because the balance is different
 	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
-	m_ymsnd->add_route(0, "speaker", (0.50)/2);
-	m_ymsnd->add_route(1, "speaker", (0.50)/2);
+	m_ymsnd->add_route(0, "speaker", (0.50)/2, 0);
+	m_ymsnd->add_route(1, "speaker", (0.50)/2, 1);
 
 	md_ctrl_ports(config);
 	md_exp_port(config);
@@ -554,21 +474,21 @@ void md_cons_state::mdj_32x(machine_config &config)
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
 	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback));
 	m_vdp->reset_routes();
-	m_vdp->add_route(ALL_OUTPUTS, "speaker", (0.50)/2);
-	m_vdp->add_route(ALL_OUTPUTS, "speaker", (0.50)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_screen("megadriv");
-	m_32x->add_route(0, "speaker", 1.00);
-	m_32x->add_route(1, "speaker", 1.00);
+	m_32x->add_route(0, "speaker", 1.00, 0);
+	m_32x->add_route(1, "speaker", 1.00, 1);
 
 	m_screen->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
-	m_ymsnd->add_route(0, "speaker", (0.50)/2);
-	m_ymsnd->add_route(1, "speaker", (0.50)/2);
+	m_ymsnd->add_route(0, "speaker", (0.50)/2, 0);
+	m_ymsnd->add_route(1, "speaker", (0.50)/2, 1);
 
 	md_ctrl_ports(config);
 	md_exp_port(config);
@@ -589,21 +509,21 @@ void md_cons_state::md_32x(machine_config &config)
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
 	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback));
 	m_vdp->reset_routes();
-	m_vdp->add_route(ALL_OUTPUTS, "speaker", (0.50)/2);
-	m_vdp->add_route(ALL_OUTPUTS, "speaker", (0.50)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	SEGA_32X_PAL(config, m_32x, (MASTER_CLOCK_PAL * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_screen("megadriv");
-	m_32x->add_route(0, "speaker", 1.00);
-	m_32x->add_route(1, "speaker", 1.00);
+	m_32x->add_route(0, "speaker", 1.00, 0);
+	m_32x->add_route(1, "speaker", 1.00, 1);
 
 	m_screen->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
-	m_ymsnd->add_route(0, "speaker", (0.50)/2);
-	m_ymsnd->add_route(1, "speaker", (0.50)/2);
+	m_ymsnd->add_route(0, "speaker", (0.50)/2, 0);
+	m_ymsnd->add_route(1, "speaker", (0.50)/2, 1);
 
 	md_ctrl_ports(config);
 	md_exp_port(config);
@@ -1053,7 +973,7 @@ CONS( 1990, megadriv,     genesis,  0,      ms_megadpal,     md,       md_cons_s
 CONS( 1988, megadrij,     genesis,  0,      ms_megadrivj,    md,       md_cons_slot_state, init_md_jpn,  "Sega",   "Mega Drive (Japan, NTSC)", MACHINE_SUPPORTS_SAVE )
 
 // 1990+ models had the TMSS security chip, leave this as a clone, it reduces compatibility and nothing more.
-CONS( 1990, genesis_tmss, genesis,  0,      genesis_tmss,    md,       md_cons_slot_state, init_genesis, "Sega",   "Genesis (USA, NTSC, with TMSS chip)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1990, genesis_tmss, genesis,  0,      genesis_tmss,    md,       md_cons_slot_state, init_genesis_tmss, "Sega",   "Genesis (USA, NTSC, with TMSS chip)",  MACHINE_SUPPORTS_SAVE )
 
 // the 32X plugged in the cart slot, games plugged into the 32x.  Maybe it should be handled as an expansion device?
 CONS( 1994, 32x,          0,        0,      genesis_32x,     md,       md_cons_state, init_genesis, "Sega",   "Genesis with 32X (USA, NTSC)", MACHINE_NOT_WORKING )
@@ -1091,12 +1011,3 @@ CONS( 1993, megajet,      gen_nomd, 0,      ms_megajet,      md,       md_cons_s
 CONS( 1993, laseract,     0,        0,      genesis_scd,     md,       md_cons_cd_state, init_genesis, "Pioneer / Sega","LaserActive with Genesis Pack PAC-S10 (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1993, laseractj,    laseract, 0,      mdj_scd,         md,       md_cons_cd_state, init_md_jpn,  "Pioneer / Sega","LaserActive with Mega Drive Pack PAC-S1 (Japan, NTSC)", MACHINE_NOT_WORKING )
 //TODO: it has also PC Engine Pack(PAC-N1)/TG16 Pack(PAC-N10) for plays PC Engine/TG16 Cartridge, (Super/Arcade) CD-ROM2/TurboGrafx-CD, LD-ROM2 stuffs, but not emulated.
-
-// these might be better placed in megadriv_rad.cpp (which contains some other clone hardware)
-
-/* clone hardware - not sure if this hardware is running some kind of emulator, or enhanced MD clone, or just custom banking */
-CONS( 200?, dcat16,       0,        0,      dcat16_megadriv, md,       md_cons_slot_state, init_genesis, "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )
-// seems to be based on the AT games units, requires custom mode for menu?
-CONS( 201?, mahg156,      0,        0,      dcat16_megadriv, md,       md_cons_slot_state, init_genesis, "<unknown>",   "Mini Arcade Handheld Game Console 2.8 Inch Screen Built in 156 Retro Games (Mega Drive handheld)",  MACHINE_NOT_WORKING )
-// game-boy like handheld, pink in colour, 6 button controller (+ home select, start, vol buttons)
-CONS( 201?, mdhh100,      0,        0,      dcat16_megadriv, md,       md_cons_slot_state, init_genesis, "<unknown>",   "unknown 100-in-1 handheld (Mega Drive based)",  MACHINE_NOT_WORKING )

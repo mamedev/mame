@@ -568,7 +568,7 @@ void mc1000_state::mc1000(machine_config &config)
 	/* video hardware */
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
-	MC6847_NTSC(config, m_vdg, XTAL(3'579'545));
+	MC6847(config, m_vdg, XTAL(3'579'545));
 	m_vdg->hsync_wr_callback().set(FUNC(mc1000_state::hs_w));
 	m_vdg->fsync_wr_callback().set(FUNC(mc1000_state::fs_w));
 	m_vdg->input_callback().set(FUNC(mc1000_state::videoram_r));

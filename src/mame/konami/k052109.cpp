@@ -146,7 +146,7 @@ to go through the chip (8 bits at a time, even on 68000-based systems).
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(K052109, k052109_device, "k052109", "K052109 Tilemap Generator")
+DEFINE_DEVICE_TYPE(K052109, k052109_device, "k052109", "Konami 052109 Tilemap Generator")
 
 const gfx_layout k052109_device::charlayout =
 {
@@ -315,6 +315,9 @@ void k052109_device::vblank_callback(screen_device &screen, bool state)
 {
 	if (state && BIT(m_irq_control, 2))
 		m_irq_handler(ASSERT_LINE);
+
+	if (!state)
+		update_scroll();
 }
 
 TIMER_CALLBACK_MEMBER(k052109_device::firq_scanline)
@@ -342,21 +345,34 @@ u8 k052109_device::read(offs_t offset)
 		if ((offset & 0x1fff) >= 0x1800)
 		{
 			if (offset >= 0x180c && offset < 0x1834)
-			{   /* A y scroll */    }
+			{
+				// A y scroll
+			}
 			else if (offset >= 0x1a00 && offset < 0x1c00)
-			{   /* A x scroll */    }
+			{
+				// A x scroll
+			}
 			else if (offset == 0x1d00)
-			{   /* read for bitwise operations before writing */    }
+			{
+				// read for bitwise operations before writing
+			}
 			else if (offset >= 0x380c && offset < 0x3834)
-			{   /* B y scroll */    }
+			{
+				// B y scroll
+			}
 			else if (offset >= 0x3a00 && offset < 0x3c00)
-			{   /* B x scroll */    }
-			//else logerror("%s: read from unknown 052109 address %04x\n",machine().describe_context(),offset);
+			{
+				// B x scroll
+			}
+			else
+			{
+				//logerror("%s: read from unknown 052109 address %04x\n",machine().describe_context(),offset);
+			}
 		}
 
 		return m_ram[offset];
 	}
-	else    /* Punk Shot and TMNT read from 0000-1fff, Aliens from 2000-3fff */
+	else // Punk Shot and TMNT read from 0000-1fff, Aliens from 2000-3fff
 	{
 		assert(m_char_rom.found());
 
@@ -364,7 +380,7 @@ u8 k052109_device::read(offs_t offset)
 		int color = m_romsubbank;
 		int flags = 0;
 		int priority = 0;
-		int bank = m_charrombank[(color & 0x0c) >> 2] >> 2;   /* discard low bits (TMNT) */
+		int bank = m_charrombank[(color & 0x0c) >> 2] >> 2; // discard low bits (TMNT)
 		int addr;
 
 		bank |= (m_charrombank_2[(color & 0x0c) >> 2] >> 2); // Surprise Attack uses this 2nd bank in the rom test
@@ -385,22 +401,26 @@ u8 k052109_device::read(offs_t offset)
 
 void k052109_device::write(offs_t offset, u8 data)
 {
-	if ((offset & 0x1fff) < 0x1800) /* tilemap RAM */
+	if ((offset & 0x1fff) < 0x1800) // tilemap RAM
 	{
 		if (offset >= 0x4000)
-			m_has_extra_video_ram = 1;  /* kludge for X-Men */
+			m_has_extra_video_ram = 1; // kludge for X-Men
 
 		m_ram[offset] = data;
 		m_tilemap[(offset & 0x1800) >> 11]->mark_tile_dirty(offset & 0x7ff);
 	}
-	else    /* control registers */
+	else // control registers
 	{
 		m_ram[offset] = data;
 
 		if (offset >= 0x180c && offset < 0x1834)
-		{   /* A y scroll */    }
+		{
+			// A y scroll
+		}
 		else if (offset >= 0x1a00 && offset < 0x1c00)
-		{   /* A x scroll */    }
+		{
+			// A x scroll
+		}
 		else if (offset == 0x1c00)
 		{
 			m_addrmap = data;
@@ -493,9 +513,13 @@ void k052109_device::write(offs_t offset, u8 data)
 			}
 		}
 		else if (offset >= 0x380c && offset < 0x3834)
-		{   /* B y scroll */    }
+		{
+			// B y scroll
+		}
 		else if (offset >= 0x3a00 && offset < 0x3c00)
-		{   /* B x scroll */    }
+		{
+			// B x scroll
+		}
 		else if (offset == 0x3d80) // Surprise Attack uses offset 0x3d80 in rom test
 		{
 			// mirroring this write, breaks Surprise Attack in game tilemaps
@@ -508,12 +532,15 @@ void k052109_device::write(offs_t offset, u8 data)
 			m_charrombank_2[2] = data & 0x0f;
 			m_charrombank_2[3] = (data >> 4) & 0x0f;
 		}
-		//else logerror("%s: write %02x to unknown 052109 address %04x\n",machine().describe_context(),data,offset);
+		else
+		{
+			//logerror("%s: write %02x to unknown 052109 address %04x\n",machine().describe_context(),data,offset);
+		}
 	}
 }
 
 
-void k052109_device::tilemap_update()
+void k052109_device::update_scroll()
 {
 
 #if 0
