@@ -777,6 +777,23 @@ void nmk16_state::acrobatmbl_map(address_map &map)
 	map(0xd4000, 0xd47ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 }
 
+void nmk16_state::hachamfb2_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x080001).portr("IN0");
+	map(0x080002, 0x080003).portr("IN1");
+	map(0x080008, 0x080009).portr("DSW1");
+	map(0x08000a, 0x08000b).portr("DSW2");
+	map(0x080015, 0x080015).w(FUNC(nmk16_state::flipscreen_w));
+	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
+	map(0x08001e, 0x08001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
+	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x08c000, 0x08c007).w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().share(m_mainram);
+}
+
 void nmk16_state::bioship_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -4880,6 +4897,13 @@ void nmk16_state::acrobatmbl(machine_config &config)
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
 
+void nmk16_state::hachamfb2(machine_config &config)
+{
+	acrobatmbl(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::hachamfb2_map);
+}
+
 void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden sound hardware
 {
 	// basic machine hardware
@@ -7202,6 +7226,35 @@ ROM_START( acrobatmbl ) // this bootleg has a PIC performing simple protection c
 	ROM_LOAD( "1.14y", 0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
 
+ROM_START( hachamfb2 ) // this bootleg has a PIC performing simple protection checks and Raiden sounds
+	ROM_REGION( 0x40000, "maincpu", 0 ) // extremely similar to the original
+	ROM_LOAD16_BYTE( "10e", 0x00000, 0x20000, CRC(45867475) SHA1(c5e528e1a034ab5f148e4d17de3a584de32b2909) )
+	ROM_LOAD16_BYTE( "10c", 0x00001, 0x20000, CRC(8c8e6a3c) SHA1(8e1b050f935bb71d48120d495c1c60b56e0100ac) )
+
+	ROM_REGION( 0x2000, "mcu", 0 ) // needs to be decapped
+	ROM_LOAD( "pic16c57", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "fgtile", 0 )
+	ROM_LOAD( "tile.10l", 0x000000, 0x020000, CRC(a2c1e25d) SHA1(cf09cbfd9afc7e3907fef6b26fb269b743f2e036) )   // 8x8 tiles
+
+	ROM_REGION( 0x100000, "bgtile", 0 )
+	ROM_LOAD( "bg.9w", 0x000000, 0x100000, CRC(df9653a4) SHA1(4a3204a98d7738c7895169fcece922fdf355f4fa) )
+
+	ROM_REGION( 0x100000, "sprites", 0 ) // same as the prototype but doubled up
+	ROM_LOAD16_BYTE( "b.2k",  0x000000, 0x080000, CRC(cb213740) SHA1(596d7b7da9cd7d1d09a34c58d811352c0ebd4682) )
+	ROM_IGNORE(                         0x080000 ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD16_BYTE( "c.2m",  0x000001, 0x080000, CRC(4d7ddc5e) SHA1(28ef045824daa77c524353f24fd541efe849756c) )
+	ROM_IGNORE(                         0x080000 ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "2.12w",             0x00000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
+	ROM_CONTINUE(                  0x10000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x00000, 0x18000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "1.14y", 0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
+ROM_END
+
 /*
 
 S.B.S. Gomorrah / Bio-ship Paladin (UPL, 1990)
@@ -7884,7 +7937,7 @@ ROM_START( hachamfb ) // Thunder Dragon conversion - unprotected prototype or bo
 	ROM_LOAD( "82s135.ic50", 0x0000, 0x0100, BAD_DUMP CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) )  // 82S135 - Used the dump from hachamfp
 ROM_END
 
-ROM_START( hachamfp ) // Protoype Location Test Release; Hand-written labels with various dates. 68K program ROM has 19th Sep. 1991 string.
+ROM_START( hachamfp ) // Prototype Location Test Release; Hand-written labels with various dates. 68K program ROM has 19th Sep. 1991 string.
 	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "kf-68-pe-b.ic7",  0x00000, 0x20000, CRC(b98a525e) SHA1(161c3b3360068e606e4d4104cc172b9736a52eeb) ) // Label says "KF 9/25 II 68 PE B"
 	ROM_LOAD16_BYTE( "kf-68-po-b.ic6",  0x00001, 0x20000, CRC(b62ad179) SHA1(60a66fb9eb3fc792d172e1f4507a806ac2ad4217) ) // Label says "KF 9/25 II 68 PO B"
@@ -10613,6 +10666,7 @@ GAME( 1997, tomagic,    0,        tomagic,      tomagic,      nmk16_tomagic_stat
 GAME( 1990, mustangb,   mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg",                       "US AAF Mustang (bootleg, set 1)", 0 )
 GAME( 1990, mustangb2,  mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg (TAB Austria)",         "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and ROMs have TAB Austria stickers
 GAME( 1991, acrobatmbl, acrobatm, acrobatmbl,   acrobatmbl,   nmk16_state, init_acrobatmbl,      ROT270, "bootleg",                       "Acrobat Mission (bootleg with Raiden sounds)", 0 )
+GAME( 1991, hachamfb2,  hachamf,  hachamfb2,    hachamfb,     nmk16_state, empty_init,           ROT0,   "bootleg",                       "Hacha Mecha Fighter (bootleg with Raiden sounds)", 0 )
 GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, encrypted)", 0 )
 GAME( 1991, tdragonb3,  tdragon,  tdragonb3,    tdragonb,     nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, unencrypted)", 0 )
 GAME( 1992, strahljbl,  strahl,   strahljbl,    strahl,       nmk16_state, empty_init,           ROT0,   "bootleg",                       "Koutetsu Yousai Strahl (Japan, bootleg)", 0 )

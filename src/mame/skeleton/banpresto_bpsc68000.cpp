@@ -26,12 +26,15 @@ The audio section also has unpopulated space marked for a YMZ280.
 
 
 TODO:
-- lamps
-- hopper
-- EEPROM?
-- battery backed RAM
+- ticket_dispenser (main roadblock to playable state)
+- unknown read / writes as noted in memory map
+- spams "requested to play sample on non-stopped voice" from the Oki. Why?
+- layout (cab picture is available)
+- EEPROM? (don't see any obvious writes)
+- sprites flip y bit (once a game which uses it is dumped)
 - tilemaps (once a game which uses them is dumped)
 - priorities (once a game which uses them is dumped)
+- probably lots of other stuff (the dumped game makes little use of the hardware)
 */
 
 #include "emu.h"
@@ -39,6 +42,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/okim6295.h"
 
 #include "emupal.h"
@@ -55,22 +59,32 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_spriteram(*this, "spriteram")
+		m_ticket_dispenser(*this, "ticket_dispenser"),
+		m_spriteram(*this, "spriteram"),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void bpsc68000(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<ticket_dispenser_device> m_ticket_dispenser;
 
 	required_shared_ptr<uint16_t> m_spriteram;
 
+	output_finder<4> m_lamps;
+
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void counters_w(uint16_t data);
+	void lamps_1_w(uint16_t data);
+	void lamps_2_w(uint16_t data);
 
 	void prg_map(address_map &map) ATTR_COLD;
 };
@@ -90,7 +104,7 @@ void bpsc68000_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 		int const sprite = m_spriteram[offs + 1];
 		int const x = m_spriteram[offs + 2];
 		int const y = m_spriteram[offs + 3] ;
-		int const flipx = 0; // TODO
+		int const flipx = BIT(m_spriteram[offs], 4);
 		int const flipy = 0; // TODO
 		int const color = m_spriteram[offs] >> 8;
 
@@ -106,20 +120,71 @@ uint32_t bpsc68000_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 }
 
 
+void bpsc68000_state::counters_w(uint16_t data)
+{
+	// at start the game writes here with a 0x00ff mem_mask. Only value observed is 0xc6c6.
+	// after that, the game writes with a 0xffff mem_mask
+
+	for (int i = 0x00; i < 0x04; i++)
+		if (BIT(data, i))
+			logerror("%s counters_w unknown bit %1x written: %04x\n", machine().describe_context(), i, data);
+
+	// bit 1 and 2 seem coin lockout related
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4)); // 100 Yen
+
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5)); // medal
+
+	for (int i = 0x06; i < 0x10; i++)
+		if (BIT(data, i))
+			logerror("%s counters_w unknown bit %1x written: %04x\n", machine().describe_context(), i, data);
+
+	// bit 6 and / or 7 seem ticket dispenser related
+}
+
+void bpsc68000_state::lamps_1_w(uint16_t data)
+{
+	m_lamps[1] = BIT(data, 4); // stop 1 lamp, shown in test mode
+	m_lamps[2] = BIT(data, 5); // stop 2 lamp, shown in test mode
+	m_lamps[3] = BIT(data, 6); // stop 3 lamp, shown in test mode
+
+	if (data & 0xff8f)
+		logerror("%s lamps_1_w unknown bits written: %04x\n", machine().describe_context(), data);
+}
+
+void bpsc68000_state::lamps_2_w(uint16_t data)
+{
+	m_lamps[0] = BIT(data, 0); // start lamp, shown in test mode
+
+	if (data & 0xfffe)
+		logerror("%s lamps_2_w unknown bits written: %04x\n", machine().describe_context(), data);
+}
+
+
 void bpsc68000_state::prg_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x200000, 0x2001ff).ram().w("palette", FUNC(palette_device::write16)).share("palette"); // TODO: surely bigger, adjust when a game using tilemaps is dumped
 	map(0x200200, 0x20dfff).ram();
 	map(0x20e000, 0x20ffff).ram().share(m_spriteram);
+	// map(0x210000, 0x21000f).w() // only written shortly after start-up (CRTC programming?). All writes & 00ff
 	map(0xa00000, 0xa00001).portr("DSW1");
 	map(0xa00002, 0xa00003).portr("DSW2");
-	// TODO: various reads and writes in the 0xc00000-0xc0002f range
+	// map(0xc00000, 0xc00001).rw() // read from c00000 & 00ff (rare), write to c00000 & 00ff (rare, only seen 1111 value)
+	// map(0xc00002, 0xc00003).r() // read from c00002 & 00ff (often), write to c00000 & 00ff (often, only seen 0000 value)
+	// map(0xc00008, 0xc00009).w() // write to c00008 & 00ff (rare, only seen 0808 value)
+	// map(0xc0000a, 0xc0000b).w() // write to c0000a & 00ff (rare, only seen 0000 value)
+	// map(0xc0000c, 0xc0000d).w() // write to c0000c & 00ff (rare, only seen 8c8c value)
+	// map(0xc0000e, 0xc0000f).w() // write to c0000e & 00ff (rare, only seen 9999 value)
+	map(0xc00020, 0xc00021).w(FUNC(bpsc68000_state::counters_w)); // .r() read from c00020 & ffff
+	map(0xc00022, 0xc00023).w(FUNC(bpsc68000_state::lamps_1_w)); // .r() read from c00022 & ffff
+	map(0xc00024, 0xc00025).w(FUNC(bpsc68000_state::lamps_2_w)); // .r() read from c00024 & ffff
+	// map(0xc0002e, 0xc0002f).w() // write to c0002e & 00ff (rare, only seen 0707 value)
 	map(0xc00026, 0xc00027).portr("IN0");
 	map(0xc00028, 0xc00029).portr("IN1");
 	map(0xc0002a, 0xc0002b).portr("IN2");
-	map(0x800001, 0x800001).w("oki", FUNC(okim6295_device::write));
-	map(0xe00000, 0xe07fff).ram();
+	map(0x800001, 0x800001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe00000, 0xe07fff).ram().share("nvram");
 }
 
 
@@ -131,7 +196,7 @@ static INPUT_PORTS_START( lnumbers )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // Medal sensor
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) // PORT_READ_LINE_DEVICE_MEMBER("ticket_dispenser", FUNC(ticket_dispenser_device::line_r)) // Medal sensor
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 
 	PORT_START("IN1")
@@ -225,7 +290,9 @@ void bpsc68000_state::bpsc68000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bpsc68000_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bpsc68000_state::irq4_line_hold));
 
-	// NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(100)); // guessed period
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -271,4 +338,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1995, lnumbers, 0, bpsc68000, lnumbers, bpsc68000_state, empty_init, ROT0, "Banpresto", "Ultraman Club - Lucky Numbers", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1995, lnumbers, 0, bpsc68000, lnumbers, bpsc68000_state, empty_init, ROT0, "Banpresto", "Ultraman Club - Lucky Numbers", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
