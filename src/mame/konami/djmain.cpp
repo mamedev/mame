@@ -1676,7 +1676,7 @@ void djmain_state::djmainj(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(32_MHz_XTAL / 2, 660, 12, 12+488, 418, 0, 384);
+	screen.set_raw(32_MHz_XTAL / 2, 660, 0, 512, 418, 0, 384);
 	screen.set_screen_update(FUNC(djmain_state::screen_update_djmain));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4440 / 4);
