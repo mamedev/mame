@@ -157,6 +157,7 @@ namespace plib
 	template<typename FT>
 	class normal_distribution_t
 	{
+		std::array<FT, 256> m_buf {};
 	public:
 		normal_distribution_t(FT dev)
 		: m_p(m_buf.size()), m_stddev(dev) { }
@@ -213,7 +214,6 @@ namespace plib
 			m_p = 0;
 		}
 
-		std::array<FT, 256> m_buf;
 		std::size_t m_p;
 		FT m_stddev;
 	};

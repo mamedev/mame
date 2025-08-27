@@ -163,7 +163,7 @@ namespace plib {
 			if (SIZE2 <= 0)
 			{
 				for (size_type i=0; i < this->size(); i++)
-					(*this)[i] = parray<FT, SIZE2>(size2);
+					(*this)[i] = parray<FT, SIZE2>(size2, static_cast<FT>(0));
 			}
 		}
 

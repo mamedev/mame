@@ -94,6 +94,7 @@ namespace webpp {
 		};
 
 		class Request : public webpp::Request {
+			asio::streambuf streambuf;
 			friend class ServerBase<socket_type>;
 			friend class Server<socket_type>;
 		public:
@@ -108,7 +109,6 @@ namespace webpp {
 				}
 				catch(...) {}
 			}
-			asio::streambuf streambuf;
 		};
 
 		class Config {
