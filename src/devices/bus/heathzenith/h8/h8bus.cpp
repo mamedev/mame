@@ -83,6 +83,27 @@ h8bus_slot_device::h8bus_slot_device(const machine_config &mconfig, device_type 
 {
 }
 
+void h8bus_slot_device::map_mem(address_space_installer &space)
+{
+	auto dev = get_card_device();
+
+	if(dev)
+	{
+		dev->map_mem(space);
+	}
+}
+
+void h8bus_slot_device::map_io(address_space_installer &space)
+{
+	auto dev = get_card_device();
+
+	if(dev)
+	{
+		dev->map_io(space);
+	}
+}
+
+
 void h8bus_slot_device::device_start()
 {
 }
@@ -139,13 +160,29 @@ void h8bus_device::device_reset()
 
 void h8bus_device::mem_map(address_map &map)
 {
-	map.unmap_value_high();
+	map.unmap_value_low();
 }
 
 void h8bus_device::io_map(address_map &map)
 {
-	map.unmap_value_high();
+	map.unmap_value_low();
 	map.global_mask(0xff);
+}
+
+void h8bus_device::map_mem(address_space_installer &space)
+{
+	for (device_h8bus_card_interface &entry : m_device_list)
+	{
+		entry.map_mem(space);
+	}
+}
+
+void h8bus_device::map_io(address_space_installer &space)
+{
+	for (device_h8bus_card_interface &entry : m_device_list)
+	{
+		entry.map_io(space);
+	}
 }
 
 device_memory_interface::space_config_vector h8bus_device::memory_space_config() const

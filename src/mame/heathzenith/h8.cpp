@@ -114,7 +114,7 @@ void h8_state::h8(machine_config &config)
 	H8BUS_SLOT(config,  "p7", "h8bus", h8_cards,     nullptr);
 	H8BUS_SLOT(config,  "p8", "h8bus", h8_cards,     nullptr);
 	H8BUS_SLOT(config,  "p9", "h8bus", h8_cards,     "h_8_5");
-	H8BUS_SLOT(config, "p10", "h8bus", h8_p10_cards, nullptr);
+	H8BUS_SLOT(config, "p10", "h8bus", h8_p10_cards, "ha_8_8");
 }
 
 // ROM definition

@@ -150,6 +150,7 @@ class h8bus_device;
 
 class device_h8bus_card_interface : public device_interface
 {
+	friend class h8bus_slot_device;
 	friend class h8bus_device;
 public:
 	virtual ~device_h8bus_card_interface();
@@ -174,6 +175,9 @@ public:
 protected:
 	device_h8bus_card_interface(const machine_config &mconfig, device_t &device);
 	virtual void interface_pre_start() override;
+
+	virtual void map_mem(address_space_installer & space) {};
+	virtual void map_io(address_space_installer & space) {};
 
 	void set_slot_int1(int state);
 	void set_slot_int2(int state);
@@ -256,6 +260,9 @@ public:
 		m_h8bus_slottag = slottag;
 	}
 
+	void map_mem(address_space_installer &space);
+	void map_io(address_space_installer &space);
+
 protected:
 	h8bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -277,6 +284,9 @@ class h8bus_device : public device_t, public device_memory_interface
 public:
 	h8bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~h8bus_device();
+
+	void map_mem(address_space_installer &space);
+	void map_io(address_space_installer &space);
 
 protected:
 	h8bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

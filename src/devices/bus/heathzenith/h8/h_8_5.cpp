@@ -38,7 +38,8 @@
 
 namespace {
 
-class h_8_5_device : public device_t, public device_h8bus_card_interface
+class h_8_5_device : public device_t
+				   , public device_h8bus_card_interface
 {
 public:
 
@@ -49,6 +50,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void map_io(address_space_installer & space) override ATTR_COLD;
 
 	void uart_rts(u8 data);
 	void uart_tx_empty(u8 data);
@@ -61,8 +63,6 @@ protected:
 	required_device<i8251_device>          m_console;
 	required_device<cassette_image_device> m_cass_player;
 	required_device<cassette_image_device> m_cass_recorder;
-
-	bool m_installed;
 
 	u8   m_cass_data[4];
 	bool m_cassbit;
@@ -91,8 +91,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h_8_5_device::kansas_w)
 	}
 
 	LOGCASS("%s: m_cassbit: %d\n", FUNCNAME, m_cassbit);
-	// 2400Hz -> 0
-	// 1200Hz -> 1
+	// 2400Hz -> 0, 1200Hz -> 1
 	const int bit_pos = m_cassbit ? 0 : 1;
 
 	m_cass_recorder->output(BIT(m_cass_data[3], bit_pos) ? -1.0 : +1.0);
@@ -138,9 +137,6 @@ void h_8_5_device::irq_callback(int state)
 
 void h_8_5_device::device_start()
 {
-	m_installed = false;
-
-	save_item(NAME(m_installed));
 	save_item(NAME(m_cass_data));
 	save_item(NAME(m_cassbit));
 	save_item(NAME(m_cassold));
@@ -150,18 +146,6 @@ void h_8_5_device::device_reset()
 {
 	LOGFUNC("%s\n", FUNCNAME);
 
-	if (!m_installed)
-	{
-		h8bus().space(AS_IO).install_readwrite_handler(0xf8, 0xf9,
-			read8sm_delegate(m_uart, FUNC(i8251_device::read)),
-			write8sm_delegate(m_uart, FUNC(i8251_device::write)));
-
-		h8bus().space(AS_IO).install_readwrite_handler(0xfa, 0xfb,
-			read8sm_delegate(m_console, FUNC(i8251_device::read)),
-			write8sm_delegate(m_console, FUNC(i8251_device::write)));
-
-		m_installed = true;
-	}
 	// cassette
 	m_cassbit      = 1;
 	m_cassold      = 0;
@@ -174,6 +158,20 @@ void h_8_5_device::device_reset()
 	m_uart->write_dsr(0);
 	m_uart->write_rxd(0);
 }
+
+void h_8_5_device::map_io(address_space_installer & space)
+{
+	space.install_readwrite_handler(0xf8, 0xf9,
+		read8sm_delegate(m_uart, FUNC(i8251_device::read)),
+		write8sm_delegate(m_uart, FUNC(i8251_device::write))
+	);
+
+	space.install_readwrite_handler(0xfa, 0xfb,
+		read8sm_delegate(m_console, FUNC(i8251_device::read)),
+		write8sm_delegate(m_console, FUNC(i8251_device::write))
+	);
+}
+
 
 // The usual baud rate is 600. The H8 supported baud rates from 110 to
 // 9600. You can change the baud rate if it is changed here and in the
