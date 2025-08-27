@@ -157,6 +157,11 @@
 #define OPTION_UPDATEINPAUSE        "update_in_pause"
 #define OPTION_DEBUGSCRIPT          "debugscript"
 #define OPTION_DEBUGLOG             "debuglog"
+#define OPTION_SRCDBGINFO           "src_debug_info"
+#define OPTION_SRCDBGSEARCHPATH     "src_debug_search_path"
+#define OPTION_SRCDBGPREFIXMAP      "src_debug_prefix_map"
+#define OPTION_SRCDBGOFFSET         "src_debug_offset"
+
 
 // core misc options
 #define OPTION_DRC                  "drc"
@@ -439,6 +444,10 @@ public:
 	const char *debug_script() const { return value(OPTION_DEBUGSCRIPT); }
 	bool update_in_pause() const { return bool_value(OPTION_UPDATEINPAUSE); }
 	bool debuglog() const { return bool_value(OPTION_DEBUGLOG); }
+	const char *srcdbg_info() const { return value(OPTION_SRCDBGINFO); }
+	const char *srcdbg_search_path() const { return value(OPTION_SRCDBGSEARCHPATH); }
+	const char *srcdbg_prefix_map() const { return value(OPTION_SRCDBGPREFIXMAP); }
+	int srcdbg_offset() const { return int_value(OPTION_SRCDBGOFFSET); }
 
 	// core misc options
 	bool drc() const { return bool_value(OPTION_DRC); }
