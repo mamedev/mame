@@ -148,8 +148,8 @@ void orientalpearl_state::orientp(machine_config &config)
 	mcu.set_addrmap(AS_IO, &orientalpearl_state::mcu_io_map);
 
 	/* I8255A for leds,  does need xtal? */
-    I8255A(config, "ppi1"); */
-    I8255A(config, "ppi2"); */
+    I8255A(config, "ppi1"); 
+    I8255A(config, "ppi2");
 	
 	/* Keyboard & display interface */
 	I8279(config, "kdc", XTAL(10'738'000) / 6); 
