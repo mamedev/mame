@@ -184,6 +184,7 @@ ROM_START( east8 )
 
     ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 )
     ROM_LOAD( "at89s51.u39", 0x0000, 0x1000, BAD_DUMP CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. The read is not protected, Could be wrong.
+ 
     ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
     ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, NO_DUMP ) //  Voices Rom
 
