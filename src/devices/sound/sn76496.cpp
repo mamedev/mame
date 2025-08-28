@@ -281,7 +281,6 @@ void sn76496_base_device::device_start()
 
 	// save states
 	save_item(NAME(m_ready_state));
-	save_item(NAME(m_vol_table));
 	save_item(NAME(m_register));
 	save_item(NAME(m_last_register));
 	save_item(NAME(m_volume));
