@@ -17175,12 +17175,13 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Davidson &amp; Associates</publisher>
 		<info name="programmer" value="Linda Broudy and Sid Broudy" />
-		<info name="usage" value="Requires a 48K Apple ][+ or later. The disk must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 2.1" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-15 -->
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234790">
 				<rom name="classmate v2.1-04.01.87.woz" size="234790" crc="263424cc" sha1="bfb56deb0c92b09f4bbeda54edb7210235a4b7e6" />
 			</dataarea>
@@ -22031,12 +22032,13 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>The Learning Company</publisher>
 		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
-		<info name="usage" value="Requires a 48K Apple ][+ or later. The disk must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-16.  Dump updated: 2025-08-10 to fix version number. -->
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234845">
 				<rom name="gertrude's puzzles.woz" size="234845" crc="88b08601" sha1="33cf536fad4646ede13d47e2e848058f57e3c630" />
 			</dataarea>
@@ -22082,12 +22084,13 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>The Learning Company</publisher>
 		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
-		<info name="usage" value="Requires a 48K Apple ][+ or later. The disk must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-16.  Dump updated: 2025-08-10 to fix version number. -->
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234813">
 				<rom name="gertrude's secrets v1.0.woz" size="234813" crc="c9a3661a" sha1="e69c238e207e7401b3a3ac8aff5333a600286deb" />
 			</dataarea>
@@ -24623,12 +24626,13 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>The Learning Company</publisher>
 		<info name="programmer" value=" Warren Robinett, Leslie Grimm, Teri Perl, and Ann Piestrup" />
-		<info name="usage" value="Requires a 48K Apple ][+ or later. The disk must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-16 -->
 		<!-- unreleased prototype -->
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234825">
 				<rom name="logic tools (prototype).woz" size="234825" crc="c4dcf4e7" sha1="44f0459a08e358527489c01ab7d00e3d84978e8c" />
 			</dataarea>
@@ -32710,13 +32714,14 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Davidson &amp; Associates</publisher>
 		<info name="programmer" value="Richard Eckert and Janice Davidson, Ph.D." />
-		<info name="usage" value="Requires a 48K Apple ][+ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="06.12.85" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-15 -->
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Program" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="241471">
 				<rom name="speed reader ii v061285 disk 1 - program disk.woz" size="241471" crc="fe8b6799" sha1="a7b58b21cb88b0d9d9b918f752633cff29ed3976" />
 			</dataarea>
@@ -32734,18 +32739,20 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Davidson &amp; Associates</publisher>
 		<info name="programmer" value="Richard Eckert and Janice Davidson, Ph.D." />
-		<info name="usage" value="Requires a 48K Apple ][+ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-15 -->
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="241432">
 				<rom name="spell it side a.woz" size="241432" crc="3c4583ff" sha1="a6107d3ed6d07189bbfcd875205694eb00a7a7bd" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234776">
 				<rom name="spell it side b.woz" size="234776" crc="ca9718fd" sha1="3aa728730d386ace23fd791ca21bf828cddbfe7a" />
 			</dataarea>
@@ -32757,7 +32764,7 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Davidson &amp; Associates</publisher>
 		<info name="programmer" value="Richard Eckert and Janice Davidson, Ph.D." />
-		<info name="usage" value="Requires a 48K Apple ][+ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="07.03.85" />
 		<!-- according to disk label -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -32765,12 +32772,14 @@ license:CC0-1.0
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="241465">
+			<feature name="write_protected" value="true" />
+				<dataarea name="flop" size="241465">
 				<rom name="spell it v070385 side a.woz" size="241465" crc="0e50c5ea" sha1="4eebbce0345f94eee608046ce05bd6440e4bc13b" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="241465">
 				<rom name="spell it v070385 side b.woz" size="241465" crc="7abbdcac" sha1="89c21d2a622ec0091f3a7db07c9c483e5bd54b9b" />
 			</dataarea>
@@ -38772,19 +38781,21 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
-		<info name="usage" value="Requires a 48K Apple ][ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<info name="version" value="05-SEP-81" />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-04-02. Redumped: 2022-05-10 to fix critical data corruption in the saved characters roster that entirely prevented playing. -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A - Scenario disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234881">
 				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side a - scenario.woz" size="234881" crc="0e955f2e" sha1="47dd791b826c1d952ca78fe209fafd5f6fc30ed8" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B - Boot disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234846">
 				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side b - boot.woz" size="234846" crc="a7d80c8c" sha1="1f1ad5cb198a29e1934a744901ae71cccc82e300" />
 			</dataarea>
@@ -38796,19 +38807,21 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
-		<info name="usage" value="Requires a 48K Apple ][ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<info name="version" value="01-DEC-81" />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-04-02 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A - Master scenario disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234884">
 				<rom name="wizardry- proving grounds of the mad overlord v01-dec-81 side a - master scenario.woz" size="234884" crc="caae12b7" sha1="78b15dbc13bcf61cf9f44a31d3478a565b010b0f" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B - Boot disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234873">
 				<rom name="wizardry- proving grounds of the mad overlord v01-dec-81 side b - boot.woz" size="234873" crc="0a1eb2ab" sha1="36d42cdb06b5b7452c05ddccf5d6aa8182bdd790" />
 			</dataarea>
@@ -38820,19 +38833,21 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
-		<info name="usage" value="Requires a 48K Apple ][ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<info name="version" value="2.0 01-JAN-82" />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-06-04 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A - Master scenario disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234937">
 				<rom name="wizardry- proving grounds of the mad overlord v2.0 01-jan-82 side a - scenario master disk.woz" size="234937" crc="8a92f261" sha1="b90ced6408a7e15cd177c0aaead773d6da417093" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B - Boot disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234896">
 				<rom name="wizardry- proving grounds of the mad overlord v2.0 01-jan-82 side b - boot disk.woz" size="234896" crc="d9c55106" sha1="60bcd0d81ad3fe4a7f6cae4d94e71d5cb01cf3e7" />
 			</dataarea>
@@ -38844,19 +38859,21 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
-		<info name="usage" value="Requires a 48K Apple ][ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<info name="version" value="2.1 22-jan-82" />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2020-01-11 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Boot disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234829">
 				<rom name="wizardry - proving grounds of the mad overlord v2.1 - boot disk.woz" size="234829" crc="29dfa2a6" sha1="6c0416fb7cb91bde8da05df77ecfc5f7b7c645f1" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 - Scenario master disk" />
+			<feature name="write_protected" value="true" />			
 			<dataarea name="flop" size="234829">
 				<rom name="wizardry - proving grounds of the mad overlord v2.1 - scenario master disk.woz" size="234829" crc="7951ca26" sha1="604a416c50ca6fccb39c11142f8be00d51ce627c" />
 			</dataarea>
@@ -39166,19 +39183,21 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Davidson &amp; Associates</publisher>
 		<info name="programmer" value="Richard Eckert and Janice Davidson, Ph.D." />
-		<info name="usage" value="Requires a 48K Apple ][+ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="09.12.86" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-15 -->
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="241468">
+			<feature name="write_protected" value="true" />
+				<dataarea name="flop" size="241468">
 				<rom name="word attack v091286 side a.woz" size="241468" crc="20938492" sha1="bd3f659c80e3380810b51baa461a4d492540328d" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="241468">
 				<rom name="word attack v091286 side b.woz" size="241468" crc="8e9025e1" sha1="b33b36544236bb41f3e4c81b3f1ffca716da9542" />
 			</dataarea>
