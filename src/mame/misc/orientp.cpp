@@ -190,7 +190,7 @@ ROM_START( east8a )
 
     ROM_END
 
-ROM_START( east8a )
+ROM_START( east8b )
 	ROM_REGION( 0x10000, "maincpu", 0 ) 
 	ROM_LOAD( "27c512.u33", 0x00000, 0x10000, CRC(85e28db5) SHA1(96f80a7d2214672c09b8f719cb573e77b8bac731) ) // Main program.  EAST8  v1.00 string
 
