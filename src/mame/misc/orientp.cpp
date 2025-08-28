@@ -178,7 +178,7 @@ void orientalpearl_state::orientp(machine_config &config)
 	OKIM6295(config, "oki", XTAL(10'738'000) / 6, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
 }
 
-ROM_START( east8 )
+ROM_START( east8a )
 	ROM_REGION( 0x10000, "maincpu", 0 ) 
 	ROM_LOAD( "w27c512.u33", 0x00000, 0x10000, CRC(8d3d1e91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // Main program.  EAST8  v1.05 string
 
@@ -190,8 +190,22 @@ ROM_START( east8 )
 
     ROM_END
 
+ROM_START( east8a )
+	ROM_REGION( 0x10000, "maincpu", 0 ) 
+	ROM_LOAD( "27c512.u33", 0x00000, 0x10000, CRC(85e28db5) SHA1(96f80a7d2214672c09b8f719cb573e77b8bac731) ) // Main program.  EAST8  v1.00 string
+
+    ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 )
+    ROM_LOAD( "at89s51.u39", 0x0000, 0x1000,   CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. 
+ 
+    ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
+    ROM_LOAD( "27c5020.bin", 0x00000, 0x40000, NO_DUMP ) //  Voices Rom
+
+    ROM_END
+
 } // anonymous namespace
 
 
 //   YEAR   NAME    PARENT   MACHINE    INPUT    STATE                INIT        ROT    COMPANY       FULLNAME                 FLAGS
-GAME( 200?, east8,  0,       orientp,   orientp, orientalpearl_state, empty_init, ROT0, "<unknown>", " Unknown EAST8 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, easta,  0,       orientp,   orientp, orientalpearl_state, empty_init, ROT0, "<unknown>", " Unknown EAST8 (v1.00)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, eastb,  0,       orientp,   orientp, orientalpearl_state, empty_init, ROT0, "<unknown>", " Unknown EAST8 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+
