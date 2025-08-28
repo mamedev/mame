@@ -390,7 +390,6 @@ void decocass_state::decocass_watchdog_count_w(uint8_t data)
 	LOG(1,("decocass_watchdog_count_w: $%02x\n", data));
 	m_watchdog->set_vblank_count(m_screen, (data & 0x0f) + 1);
 	m_watchdog->watchdog_reset();
-
 }
 
 void decocass_state::decocass_watchdog_flip_w(uint8_t data)
