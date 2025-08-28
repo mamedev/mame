@@ -164,7 +164,6 @@ ROM_START( east8 )
  
     ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
     ROM_LOAD( "27c5020.bin", 0x00000, 0x40000, NO_DUMP ) //  Voices Rom
-
     ROM_END
 
 ROM_START( east8a )
@@ -176,7 +175,6 @@ ROM_START( east8a )
  
     ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
     ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, NO_DUMP ) //  Voices Rom
-
     ROM_END
 
 
