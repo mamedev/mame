@@ -174,52 +174,52 @@ sn76496_base_device::sn76496_base_device(
 }
 
 sn76496_device::sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN76496, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
+	: sn76496_base_device(mconfig, SN76496, tag, 0x10000, 0x04, 0x08, false, false, 8, false, false, owner, clock)
 {
 }
 
 y2404_device::y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, Y2404, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
+	: sn76496_base_device(mconfig, Y2404, tag, 0x10000, 0x04, 0x08, false, false, 8, false, false, owner, clock)
 {
 }
 
 sn76489_device::sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN76489, tag, 0x4000, 0x01, 0x02, true, false, 8, false, true, owner, clock)
+	: sn76496_base_device(mconfig, SN76489, tag, 0x4000, 0x01, 0x02, true, false, 8, false, false, owner, clock)
 {
 }
 
 sn76489a_device::sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN76489A, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
+	: sn76496_base_device(mconfig, SN76489A, tag, 0x10000, 0x04, 0x08, false, false, 8, false, false, owner, clock)
 {
 }
 
 sn76494_device::sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN76494, tag, 0x10000, 0x04, 0x08, false, false, 1, false, true, owner, clock)
+	: sn76496_base_device(mconfig, SN76494, tag, 0x10000, 0x04, 0x08, false, false, 1, false, false, owner, clock)
 {
 }
 
 sn94624_device::sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN94624, tag, 0x4000, 0x01, 0x02, true, false, 1, false, true, owner, clock)
+	: sn76496_base_device(mconfig, SN94624, tag, 0x4000, 0x01, 0x02, true, false, 1, false, false, owner, clock)
 {
 }
 
 ncr8496_device::ncr8496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, NCR8496, tag, 0x8000, 0x02, 0x20, true, false, 8, true, true, owner, clock)
+	: sn76496_base_device(mconfig, NCR8496, tag, 0x8000, 0x02, 0x20, true, false, 8, true, false, owner, clock)
 {
 }
 
 pssj3_device::pssj3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, PSSJ3, tag, 0x8000, 0x02, 0x20, false, false, 8, true, true, owner, clock)
+	: sn76496_base_device(mconfig, PSSJ3, tag, 0x8000, 0x02, 0x20, false, false, 8, true, false, owner, clock)
 {
 }
 
 gamegear_device::gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, GAMEGEAR, tag, 0x8000, 0x01, 0x08, true, true, 8, false, false, owner, clock)
+	: sn76496_base_device(mconfig, GAMEGEAR, tag, 0x8000, 0x01, 0x08, true, true, 8, false, true, owner, clock)
 {
 }
 
 segapsg_device::segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SEGAPSG, tag, 0x8000, 0x01, 0x08, true, false, 8, false, false, owner, clock)
+	: sn76496_base_device(mconfig, SEGAPSG, tag, 0x8000, 0x01, 0x08, true, false, 8, false, true, owner, clock)
 {
 }
 
@@ -241,8 +241,8 @@ void sn76496_base_device::device_start()
 	for (int i = 0; i < 4; i++)
 	{
 		m_output[i] = 0;
-		m_period[i] = 0x3ff;
-		m_count[i] = 0x3ff;
+        m_period[i] = m_sega_style_psg ? 0 : 0x400;
+        m_count[i] = m_sega_style_psg ? 0 : 0x400;
 	}
 
 	m_RNG = m_feedback_mask;
@@ -328,7 +328,7 @@ void sn76496_base_device::write(u8 data)
 		case 2: // tone 1: frequency
 		case 4: // tone 2: frequency
 			if ((data & 0x80) == 0) m_register[r] = (m_register[r] & 0x0f) | ((data & 0x3f) << 4);
-			if ((m_register[r] != 0) || (!m_sega_style_psg)) m_period[c] = m_register[r];
+			if ((m_register[r] != 0) || m_sega_style_psg) m_period[c] = m_register[r];
 			else m_period[c] = 0x400;
 
 			if (r == 4)
