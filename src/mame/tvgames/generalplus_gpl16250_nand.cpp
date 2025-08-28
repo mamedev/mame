@@ -70,7 +70,7 @@ uint8_t generalplus_gpac800_game_state::read_nand(offs_t offset)
 }
 void generalplus_gpac800_game_state::dma_complete_hacks(int state)
 {
-	// HACKS to get into service mode for debugging
+	// HACKS to get into service mode for debugging (needed for testing as many of these require input sequences on the not yet emulated custom controls)
 
 	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
 
