@@ -116,10 +116,10 @@ void orientalpearl_state::io_map(address_map &map)
 	map(0xf800, 0xf803).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf900, 0xf903).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfa00, 0xfa01).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-    map(0xfb02, 0xfb03).w("psg", FUNC(ay8910_device::address_data_w));
+	map(0xfb02, 0xfb03).w("psg", FUNC(ay8910_device::address_data_w));
+//  map(0xfc20, 0xfc20).w 
 	map(0xfc40, 0xfc40).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
     map(0xfe00, 0xfe01).w("opll", FUNC(ym2413_device::write));
-//  map(0xfc20, 0xfc20).w 
 }
 void orientalpearl_state::mcu_map(address_map &map)
 {
