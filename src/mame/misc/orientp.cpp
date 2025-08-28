@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:flama12333
 /*************************************************************************
-// Hardware info - may not accurate
-the dump was from Soccer Santiago II 6 ball pinball I dont known which was from due to unconfirmed, so im gonna to name as unknown.
+// 
+notes:
+The dump of set 2 was from Soccer Santiago II 6 ball pinball I dont known which was from due to unconfirmed, so im gonna to name as unknown.
 
-
+Hardware info from set 2 - may not accurate
 Buttons
 K1
 K2
@@ -22,7 +23,8 @@ u39 at89s51 second mcu for protection.
 // TODO:
 Need hardware info.
 Hook up nvram inputs opll and adpcm.
-east8a Only the mcu dump was From the east8. Marking Bad dump for now
+mcu, nvram not hooked up.
+Verify memory maps.
 
 Need Layout as and Add segment display as marywu.cpp
 */
@@ -110,10 +112,14 @@ void orientalpearl_state::program_map(address_map &map)
 
 void orientalpearl_state::io_map(address_map &map)
 {
-    map(0xfa00, 0xfa01).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
+//  map(0xe400, 0xe400).rw 
+	map(0xf800, 0xf803).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf900, 0xf903).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xfa00, 0xfa01).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
     map(0xfb02, 0xfb03).w("psg", FUNC(ay8910_device::address_data_w));
-	map(0xfe00, 0xfe01).w("opll", FUNC(ym2413_device::write));
-	
+	map(0xfc40, 0xfc40).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+    map(0xfe00, 0xfe01).w("opll", FUNC(ym2413_device::write));
+//  map(0xfc20, 0xfc20).w 
 }
 void orientalpearl_state::mcu_map(address_map &map)
 {
@@ -140,11 +146,15 @@ void orientalpearl_state::orientp(machine_config &config)
 	i8051_device &mcu(I8051(config, "mcu", XTAL(10'738'000)));
     mcu.set_addrmap(AS_PROGRAM, &orientalpearl_state::mcu_map);
 	mcu.set_addrmap(AS_IO, &orientalpearl_state::mcu_io_map);
+
+	/* I8255A for leds,  does need xtal? */
+    I8255A(config, "ppi1"); */
+    I8255A(config, "ppi2"); */
 	
 	/* Keyboard & display interface */
 	I8279(config, "kdc", XTAL(10'738'000) / 6); 
-	
-	/* sound hardware */
+    
+/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &psg(AY8910(config, "psg", XTAL(10'738'000) / 6));
 	psg.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -153,17 +163,18 @@ void orientalpearl_state::orientp(machine_config &config)
 	opll.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	OKIM6295(config, "oki", XTAL(10'738'000) / 6, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
+
 }
 
 ROM_START( east8 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) 
-	ROM_LOAD( "27c512.u33", 0x00000, 0x10000, CRC(85e28db5) SHA1(96f80a7d2214672c09b8f719cb573e77b8bac731) ) // Main program.  EAST8  v1.00 string
+	ROM_LOAD( "27c512.u33", 0x00000, 0x10000,  CRC(85e28db5) SHA1(96f80a7d2214672c09b8f719cb573e77b8bac731) ) // Main program.  EAST8  v1.00 string
 
     ROM_REGION( 0x1000, "mcu", 0 )
     ROM_LOAD( "at89s51.u39", 0x0000, 0x1000,   CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. 
  
-    ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
-    ROM_LOAD( "27c5020.bin", 0x00000, 0x40000, NO_DUMP ) //  Voices Rom
+    ROM_REGION( 0x40000, "oki", 0 )
+    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  Voices Rom
     ROM_END
 
 ROM_START( east8a )
