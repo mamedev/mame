@@ -3,10 +3,10 @@
 
 /*
    Sony NEWS M68K systems.
- 
+
    Sources:
      - http://wiki.netbsd.org/ports/news68k/
-  
+
    TODO:
      - mouse/keyboard
      - graphics/slots

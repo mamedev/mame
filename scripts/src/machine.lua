@@ -1924,18 +1924,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/keytronic_l2207.h,MACHINES["KEYTRONIC_L2207"] = true
----------------------------------------------------
-
-if (MACHINES["KEYTRONIC_L2207"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/keytronic_l2207.cpp",
-		MAME_DIR .. "src/devices/machine/keytronic_l2207.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/kr1601rr1.h,MACHINES["KR1601RR1"] = true
 ---------------------------------------------------
 

@@ -274,7 +274,7 @@ u32 dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, 
     It's a Mitsubishi M54828P (M54824P family).
     A frequency counter with 5-digit FLT display driver.
 
-	It writes to S1-S4, and reads digit segments (two of b/c/e/g?)
+    It writes to S1-S4, and reads digit segments (two of b/c/e/g?)
 
     Pinout:
 

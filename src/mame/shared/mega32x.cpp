@@ -533,8 +533,8 @@ void sega_32x_device::dreq_common_w(address_space &space, offs_t offset, uint16_
 			//if (m_fifo[0].full() && m_fifo[1].full())
 			//{
 			//  //m_fifo_read_block ^= 1;
-			//	//m_master_cpu->sh2_notify_dma_data_available();
-			//	//m_slave_cpu->sh2_notify_dma_data_available();
+			//  //m_master_cpu->sh2_notify_dma_data_available();
+			//  //m_slave_cpu->sh2_notify_dma_data_available();
 			//}
 
 			break;

@@ -33,7 +33,7 @@ ym7101_device::ym7101_device(const machine_config &mconfig, const char *tag, dev
 	, m_space_vram_config("videoram", ENDIANNESS_BIG, 8, 17, 0, address_map_constructor(FUNC(ym7101_device::vram_map), this))
 	, m_space_regs_config("regs", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(ym7101_device::regs_map), this))
 	, m_vint_callback(*this)
-//	, m_hint_callback(*this)
+//  , m_hint_callback(*this)
 	, m_sint_callback(*this)
 	, m_psg(*this, "psg")
 {
@@ -151,8 +151,8 @@ void ym7101_device::regs_map(address_map &map)
 	map(7, 7).lw8(NAME([this] (u8 data) {
 		LOGREGS("#07: Background Color %02x & 0x3f\n", data);
 	}));
-//	map(8, 8) Master System h scroll
-//	map(9, 9) Master System v scroll
+//  map(8, 8) Master System h scroll
+//  map(9, 9) Master System v scroll
 	map(10, 10).lw8(NAME([this] (u8 data) {
 		LOGREGS("#10: Horizontal Interrupt Counter %02x (%d)\n", data, data);
 	}));

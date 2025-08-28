@@ -76,10 +76,6 @@ generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &m
 
 void generalplus_gpspi_direct_device::ramwrite_w(offs_t offset, uint16_t data)
 {
-	// TODO: Gross hack, it puts some self-check code in RAM at startup, this replaces those calls with retf.
-	if (offset == 0x100 && data == 0xf14c) data = 0x9a90;
-	if (offset == 0x00 && data == 0x9311) data = 0x9a90;
-
 	m_mainram[offset] = data;
 }
 

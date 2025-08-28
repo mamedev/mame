@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include "mdioport.h"
-
+#include "bus/megadrive/ctrl/mdioport.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
@@ -54,7 +53,7 @@ protected:
 	optional_ioport m_io_reset;
 
 private:
-//	IRQ_CALLBACK_MEMBER(genesis_int_callback);
+//  IRQ_CALLBACK_MEMBER(genesis_int_callback);
 	void cpu_space_map(address_map &map);
 
 	void vdp_vint_cb(int state);
@@ -108,8 +107,6 @@ protected:
 	uint8_t megadriv_z80_vdp_read(offs_t offset);
 	uint8_t megadriv_z80_unmapped_read();
 	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
-
-	void vdp_sndirqline_callback_genesis_z80(int state);
 
 	void megadriv_stop_scanline_timer();
 

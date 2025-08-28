@@ -1046,7 +1046,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bennyeng2" supported="no">
 		<description>Benny and Friends English Book Vol. 2 -Majo to taiketsu! Daibouken- (Japan)</description>
 		<year>2002</year>
@@ -1515,7 +1515,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Benesse Qpad cartridges -->
-	
+
 	<software name="gogogoj" supported="no">
 		<description>Hirogaru Sekai-e Go! Go! Go! (Japan)</description>
 		<year>2002</year>

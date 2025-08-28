@@ -721,21 +721,6 @@ void md_base_state::megadriv_stop_scanline_timer()
 }
 
 
-
-// this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
-void md_base_state::vdp_sndirqline_callback_genesis_z80(int state)
-{
-	if (state == ASSERT_LINE)
-	{
-		if ((m_genz80.z80_has_bus == 1) && (m_genz80.z80_is_reset == 0))
-			m_z80snd->set_input_line(0, HOLD_LINE);
-	}
-	else if (state == CLEAR_LINE)
-	{
-		m_z80snd->set_input_line(0, CLEAR_LINE);
-	}
-}
-
 // this comes from the vdp, and is connected to 68k irq level 6 (IPL2, main vbl interrupt)
 void md_core_state::vdp_vint_cb(int state)
 {
@@ -822,7 +807,7 @@ void md_core_state::md_core_pal(machine_config &config)
 
 void md_base_state::megadriv_ioports(machine_config &config)
 {
-	// TODO: this latches video counters as well as setting interrupt level 2
+	// TODO: this latches video counters as well as setting interrupt level 2 (thru VDP)
 	auto &hl(INPUT_MERGER_ANY_HIGH(config, "hl"));
 	hl.output_handler().set_inputline(m_maincpu, 2);
 
@@ -876,7 +861,8 @@ void md_base_state::md_ntsc(machine_config &config)
 	// I/O port controllers
 	megadriv_ioports(config);
 
-	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
+	// this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
+	m_vdp->snd_irq().set_inputline(m_z80snd, 0);
 	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
 	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
@@ -914,7 +900,7 @@ void md_base_state::md_pal(machine_config &config)
 	// I/O port controllers
 	megadriv_ioports(config);
 
-	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
+	m_vdp->snd_irq().set_inputline(m_z80snd, 0);
 	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
 	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 

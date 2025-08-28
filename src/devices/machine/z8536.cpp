@@ -409,12 +409,12 @@ void cio_base_device::write_register(offs_t offset, u8 data)
 		switch (data >> 5)
 		{
 		case IC_CLEAR_IP_IUS:   m_register[offset] &= ~(CTCS_IP | CTCS_ERR | CTCS_IUS); LOG("%s CIO Counter/Timer %u Clear IP/IUS\n", machine().describe_context(), counter + 1);   break;
-		case IC_SET_IUS:        m_register[offset] |= CTCS_IUS;            				LOG("%s CIO Counter/Timer %u Set IUS\n", machine().describe_context(), counter + 1);        break;
-		case IC_CLEAR_IUS:      m_register[offset] &= ~CTCS_IUS;            			LOG("%s CIO Counter/Timer %u Clear IUS\n", machine().describe_context(), counter + 1);      break;
-		case IC_SET_IP:         m_register[offset] |= CTCS_IP;              			LOG("%s CIO Counter/Timer %u Set IP\n", machine().describe_context(), counter + 1);         break;
-		case IC_CLEAR_IP:       m_register[offset] &= ~(CTCS_IP | CTCS_ERR); 			LOG("%s CIO Counter/Timer %u Clear IP\n", machine().describe_context(), counter + 1);       break;
-		case IC_SET_IE:         m_register[offset] |= CTCS_IE;              			LOG("%s CIO Counter/Timer %u Set IE\n", machine().describe_context(), counter + 1);         break;
-		case IC_CLEAR_IE:       m_register[offset] &= ~CTCS_IE;             			LOG("%s CIO Counter/Timer %u Clear IE\n", machine().describe_context(), counter + 1);       break;
+		case IC_SET_IUS:        m_register[offset] |= CTCS_IUS;                         LOG("%s CIO Counter/Timer %u Set IUS\n", machine().describe_context(), counter + 1);        break;
+		case IC_CLEAR_IUS:      m_register[offset] &= ~CTCS_IUS;                        LOG("%s CIO Counter/Timer %u Clear IUS\n", machine().describe_context(), counter + 1);      break;
+		case IC_SET_IP:         m_register[offset] |= CTCS_IP;                          LOG("%s CIO Counter/Timer %u Set IP\n", machine().describe_context(), counter + 1);         break;
+		case IC_CLEAR_IP:       m_register[offset] &= ~(CTCS_IP | CTCS_ERR);            LOG("%s CIO Counter/Timer %u Clear IP\n", machine().describe_context(), counter + 1);       break;
+		case IC_SET_IE:         m_register[offset] |= CTCS_IE;                          LOG("%s CIO Counter/Timer %u Set IE\n", machine().describe_context(), counter + 1);         break;
+		case IC_CLEAR_IE:       m_register[offset] &= ~CTCS_IE;                         LOG("%s CIO Counter/Timer %u Clear IE\n", machine().describe_context(), counter + 1);       break;
 		}
 
 		// gate command bit
@@ -671,7 +671,7 @@ void cio_base_device::count(int id)
 
 	// count down
 	m_counter[id]--;
-	
+
 	LOG("%s CIO Counter/Timer %u Count %04x\n", machine().time().as_string(), id + 1, m_counter[id]);
 
 	if (m_counter[id] == 0)

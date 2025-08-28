@@ -102,7 +102,7 @@ TODO:
 - Find source of level 2 interrupt (sprite DMA end?).
 - magibomb_br44, westvent: need a redump of one of the program ROMs.
 - hacher, winbingo_gm051: need a redump of the sprite ROMs.
-- gostopac: needs verifying of inputs, outputs and layout. Sound doesn't seem 100% correct (Oki banking problem?)
+- gostopac: needs verifying of outputs and layout. Sound doesn't seem 100% correct (Oki banking problem?)
 - monkeyl and clones: need verifying of inputs, outputs and layout.
 - speedmst and clones: need verifying of inputs, outputs and layout.
 - cptshark: needs verifying of inputs and layout
@@ -1485,6 +1485,50 @@ static INPUT_PORTS_START( astoneag )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SLOT_STOP2    ) PORT_NAME("Select Line / Double Up")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_GAMBLE_BET    )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_OTHER         ) PORT_NAME("Reserve Switch") // shown in test mode
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( keno21 )
+	PORT_INCLUDE( dinodino )
+
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1         ) PORT_IMPULSE(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SLOT_STOP3    ) PORT_NAME("Take / Play 3 / Stand")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_SLOT_STOP1    ) PORT_NAME("Play 1 / Double")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNUSED        ) // no effect in test mode
+	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW     )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_START         ) PORT_NAME("Hit / Start / Re-Play")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_OTHER         ) PORT_NAME("Ticket Out") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_SLOT_STOP_ALL ) PORT_NAME("Auto")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SLOT_STOP2    ) PORT_NAME("Play 2")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SLOT_STOP4    ) PORT_NAME("Play 4")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gostopac )
+	PORT_INCLUDE( dinodino )
+
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1         ) PORT_IMPULSE(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_POKER_HOLD4   ) PORT_NAME("Hold 4 / Take / Stop")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Double")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNUSED        ) // no effect in test mode
+	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW     )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_START         ) PORT_NAME("Start / Go")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_OTHER         ) PORT_NAME("Ticket Out") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_POKER_HOLD1   ) PORT_NAME("Hold 1 / Double x 2")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Double x 1/2")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_POKER_HOLD5   ) PORT_NAME("Hold 5 / Bet")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
@@ -4386,10 +4430,10 @@ GAMEL( 2007,  astoneag_aa05h,  astoneag, astoneag,        astoneag,       astone
 GAMEL( 2006,  cptshark,        0,        winbingo,        winbingo,       zoo_state,       init_px006,     ROT0, "Astro Corp. / American Alpha", "Captain Shark (Ver. CS.01.6, Apr 21 2006)",    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_winbingo ) // 13:50:11 Apr 21 2006
 GAME(  2007,  crzcircus,       0,        crzcircus,       winbingo,       zoo_state,       init_px001,     ROT0, "Astro Corp.",                  "Crazy Circus (Ver. US.01.7)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Dec 25 2007
 GAMEL( 2005,  dinodino,        0,        dinodino,        dinodino,       zoo_state,       init_px010,     ROT0, "Astro Corp.",                  "Dino Dino (Ver. A1.1, 01/13/2005)",            MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_dinodino ) // 13/01.2005 10:59
-GAME(  2004,  gostopac,        0,        gostopac,        dinodino,       zoo_state,       init_gostopac,  ROT0, "Astro Corp.",                  "Go & Stop (Ver. EN1.10)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME(  2004,  gostopac,        0,        gostopac,        gostopac,       zoo_state,       init_gostopac,  ROT0, "Astro Corp.",                  "Go & Stop (Ver. EN1.10)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME ( 2008,  hapfarm,         0,        hapfarm,         magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. US.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/16
 GAME ( 2011,  hapfarm_in0102b, hapfarm,  hapfarm_in0102b, magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. IN.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2011/06/02
-GAME(  200?,  keno21,          0,        keno21,          dinodino,       zoo_state,       init_px001,     ROT0, "Astro Corp.",                  "Keno 21 (Ver. A-2.30)",                        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME(  200?,  keno21,          0,        keno21,          keno21,         zoo_state,       init_px001,     ROT0, "Astro Corp.",                  "Keno 21 (Ver. A-2.30)",                        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAMEL( 2004,  magibomb_aa71a,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.71.A, 30/04/04)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 30/04/04 10:55
 GAMEL( 2005,  magibomb_aa72c,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.72.C, 25/05/05)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 25/05/05 11:26
 GAMEL( 2005,  magibomb_aa72d,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.72.D, 14/11/05)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 15/11/05 09:31

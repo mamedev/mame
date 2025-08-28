@@ -18,6 +18,7 @@ Wicat - various systems.
 
 #include "emu.h"
 
+#include "bus/keytronic/keytronic.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/8x300/8x300.h"
 #include "cpu/m68000/m68000.h"
@@ -28,7 +29,6 @@ Wicat - various systems.
 #include "machine/am9517a.h"
 #include "machine/im6402.h"
 #include "machine/input_merger.h"
-#include "machine/keytronic_l2207.h"
 #include "machine/mm58174.h"
 #include "machine/scn_pci.h"
 #include "machine/wd_fdc.h"
@@ -550,11 +550,12 @@ void wicat_state::wicat(machine_config &config)
 	IM6402(config, m_kbduart, 0); // IM6402-1IPL
 	m_kbduart->set_rrc(5068800 / 1056); // 74LS393 output?
 	m_kbduart->set_trc(5068800 / 1056);
-	m_kbduart->tro_callback().set("keyboard", FUNC(keytronic_l2207_device::ser_in_w));
+	m_kbduart->tro_callback().set("keyboard", FUNC(keytronic_connector_device::ser_in_w));
 	m_kbduart->dr_callback().set(m_videoirq, FUNC(input_merger_device::in_w<2>));
 	m_kbduart->tbre_callback().set("tbreirq", FUNC(input_merger_device::in_w<0>));
 
-	KEYTRONIC_L2207(config, "keyboard").ser_out_callback().set(m_kbduart, FUNC(im6402_device::rri_w));
+	keytronic_connector_device &keyboard(KEYTRONIC_CONNECTOR(config, "keyboard", ascii_terminal_keyboards, "l2207"));
+	keyboard.ser_out_callback().set(m_kbduart, FUNC(im6402_device::rri_w));
 
 	INPUT_MERGER_ALL_HIGH(config, "tbreirq").output_handler().set(m_videoirq, FUNC(input_merger_device::in_w<3>));
 

@@ -5028,7 +5028,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="batman1" cloneof="batman" supported="no">
+	<software name="batman1" cloneof="batman" supported="yes">
 		<!-- SPS (CAPS) release 19 -->
 		<description>Batman (Europe, Single Disk)</description>
 		<!-- retail, standalone -->
@@ -5036,7 +5036,6 @@ ATK test: C:0 H:U Bad
 		<year>1989</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Black screen, [CIAB] fails on comparing a TOD 9 > 0x115 at PC=de4
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -34925,8 +34924,6 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Psyclapse</publisher>
 		<notes><![CDATA[
-black screen with eventually running irq at $ffffff, [FDC] dsksync (fixed)
-Hangs on [CIA] timer A readback while setting mode $99 (fixed)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -37062,7 +37059,7 @@ ATK test: C:even H:L 1 Sector Bad
 		</part>
 	</software>
 
-	<software name="pang" supported="no">
+	<software name="pang" supported="yes">
 		<!-- SPS (CAPS) release 929 -->
 		<description>Pang (Europe)</description>
 		<!-- retail, standalone -->
@@ -37070,8 +37067,6 @@ ATK test: C:even H:L 1 Sector Bad
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Throws a Guru Meditation on first boot, boots afterwards, [CIAB]?
-black screen after level select, trashes memory, [FDC]
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -45869,7 +45864,6 @@ ATK test: C:79 Bad
 		<year>1993</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-new68k: trashes memory after initial loading, reports regressed track reading in ATK, [FDC] or [CIA]
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">

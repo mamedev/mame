@@ -33,6 +33,8 @@
 
 #include "emu.h"
 
+#include "adi_unk_kbd.h" // only here so that it doesn't bitrot
+
 #include "bus/rs232/keyboard.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
@@ -278,8 +280,7 @@ void adi_vt52_state::adi_vt52(machine_config &config)
 
 	// might be clocked externally by the keyboard
 	clock_device &kbd_clock(CLOCK(config, "kbd_clock", 9600 * 64));
-	kbd_clock.signal_handler().set(m_mc6850, FUNC(acia6850_device::write_txc));
-	kbd_clock.signal_handler().append(m_mc6850, FUNC(acia6850_device::write_rxc));
+	kbd_clock.signal_handler().set(m_mc6850, FUNC(acia6850_device::write_rxc));
 
 	rs232_port_device &kbd(RS232_PORT(config, "kbd", adi_vt52_keyboard_devices, "keyboard"));
 	kbd.rxd_handler().set(m_mc6850, FUNC(acia6850_device::write_rxd));

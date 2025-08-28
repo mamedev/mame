@@ -320,44 +320,52 @@ atomes
 atomrr
 prophet2
 
-@source:acorn/bbc.cpp
-abc110
-abc310
-acw443
+@source:acorn/bbcb.cpp
 bbca
 bbcb
 bbcb_de
 bbcb_us
 bbcb_no
-bbcbp
-bbcbp128
-bbcm
-bbcm512
-bbcmaiv
-bbcmarm
-bbcmc
-bbcmc_ar
-bbcmet
-bbcmt
-cfa3000bp
-cfa3000
-daisy
-discmon
-discmate
-mpc800
-mpc900
-mpc900gx
-econx25
-ltmpbp
-ltmpm
-pro128s
-autoc15
-reutapm
+dolphinm
 sist1
 torchf
 torchh
 torch301
 torch725
+
+@source:acorn/bbcbp.cpp
+abc110
+abc310
+acw443
+bbcbp
+bbcbp128
+cfa3000bp
+econx25
+ltmpbp
+
+@source:acorn/bbcm.cpp
+bbcm
+bbcm512
+bbcmaiv
+bbcmarm
+bbcmet
+bbcmt
+cfa3000
+daisy
+discmon
+discmate
+ht280
+ltmpm
+mpc800
+mpc900
+mpc900gx
+se3010
+
+@source:acorn/bbcmc.cpp
+autoc15
+bbcmc
+bbcmc_ar
+pro128s
 
 @source:acorn/belatra.cpp
 fairyl2
@@ -392,6 +400,9 @@ eurobeeb3m
 eurobeeb3c
 eurocube09
 eurocube65
+
+@source:acorn/reutapm.cpp
+reutapm
 
 @source:acorn/riscpc.cpp
 a7000
@@ -2053,7 +2064,7 @@ harddrivg4
 harddrivj
 harddrivj6
 hdrivair
-hdrivairp
+hdrivair0
 racedriv
 racedriv1
 racedriv2
@@ -16941,11 +16952,15 @@ caractn2
 cookrace
 disco
 discof
+dommy
+eggs
 lnc
 mmonkey
 mmonkeyj
 protenn
 protennb
+rockduck
+scregg
 sdtennis
 tisland
 wtennis
@@ -17364,12 +17379,6 @@ wizdfirea
 wizdfireu
 wolffang
 hangzo
-
-@source:dataeast/scregg.cpp
-dommy
-eggs
-rockduck
-scregg
 
 @source:dataeast/shootout.cpp
 shootout
@@ -20485,7 +20494,6 @@ animalhsa
 animalhsb
 animalhsc
 animalw
-animalwa
 animalwbl
 aplan
 bingowng
@@ -20617,6 +20625,9 @@ lucky8p
 lucky8q
 lucky8r
 lucky8s
+lucky8t
+lucky8u
+lucky8v
 lucky8tet
 luckybar
 luckylad
@@ -24529,9 +24540,10 @@ divebomb
 @source:konami/djmain.cpp
 bm1stmix
 bm2ndmix
-bm2ndmxa
-bm3rdeaa
+bm2ndmixa
 bm3rdmix
+bm3rdmixa
+bm3rdmixe
 bm4thmix
 bm5thmix
 bm6thmix
@@ -35985,6 +35997,7 @@ gunnailb
 hachamf
 hachamfa
 hachamfb
+hachamfb2
 hachamfp
 hotbubl
 hotbubla
@@ -37284,6 +37297,15 @@ videopacp
 @source:philips/p2000t.cpp
 p2000m
 p2000t
+
+@source:philips/patgen.cpp
+pm5644g00
+pm5644g913
+pm5644g924
+pm5644g924b
+pm5644l00
+pm5644m00
+pm5644p00
 
 @source:philips/philipsbo.cpp
 pbo
@@ -40404,15 +40426,20 @@ wmegam2
 xeye
 
 @source:sega/megadriv_acbl.cpp
+3in1mbc
 aladmdb
 barekch
 barek2ch
 barek2mb
 barek3mb
 barek3mba
+barek3mbc
+biohzdmb
 bk3ssrmb
+contrambc
 jparkmb
 mk3mdb
+sidepmbc
 sonic2mb
 sonic3mb
 srmdb
@@ -41633,7 +41660,6 @@ ufomini
 
 @source:sega/segaufoh8.cpp
 ufo7
-ufo7s
 
 @source:sega/segaxbd.cpp
 abcop
@@ -43093,6 +43119,9 @@ asma3k
 @source:skeleton/am1000.cpp
 am1000
 
+@source:skeleton/amusement_6502.cpp
+unkamus
+
 @source:skeleton/antonelli_hd6305.cpp
 anto2495
 anto2614
@@ -43110,6 +43139,9 @@ attache816
 
 @source:skeleton/ax20.cpp
 ax20
+
+@source:skeleton/banpresto_bpsc68000.cpp
+lnumbers
 
 @source:skeleton/banpresto_tomy_h8s.cpp
 cmcwa
@@ -43780,6 +43812,7 @@ semcrossw
 seoul88
 
 @source:skeleton/sgm.cpp
+dajiaddz
 wpddz
 
 @source:skeleton/sh4robot.cpp

@@ -13,9 +13,9 @@
 #include "screen.h"
 
 class ym7101_device : public device_t,
-                      public device_memory_interface,
-                      public device_video_interface,
-                      public device_mixer_interface
+					  public device_memory_interface,
+					  public device_video_interface,
+					  public device_mixer_interface
 {
 public:
 	ym7101_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -35,13 +35,13 @@ public:
 
 		//if (m_vint_pending)
 		//{
-		//	m_vint_pending = 0;
+		//  m_vint_pending = 0;
 		m_vint_callback(false);
 		//}
 		//else if (m_hint_pending)
 		//{
-		//	m_hint_pending = 0;
-		//	m_hint_callback(false);
+		//  m_hint_pending = 0;
+		//  m_hint_callback(false);
 		//}
 	}
 
@@ -59,7 +59,7 @@ private:
 	const address_space_config m_space_regs_config;
 
 	devcb_write_line m_vint_callback;
-//	devcb_write_line m_hint_callback;
+//  devcb_write_line m_hint_callback;
 	devcb_write_line m_sint_callback;
 
 	required_device<segapsg_device> m_psg;

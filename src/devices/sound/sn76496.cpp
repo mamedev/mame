@@ -231,9 +231,7 @@ void sn76496_base_device::device_start()
 
 	m_sound = stream_alloc(0, (m_stereo? 2:1), sample_rate);
 
-	for (int i = 0; i < 4; i++) m_volume[i] = 0;
-
-	m_last_register = m_sega_style_psg?3:0; // Sega VDP PSG defaults to selected period reg for 2nd channel
+	m_last_register = m_sega_style_psg ? 3 :0; // Sega VDP PSG defaults to selected period reg for 2nd channel
 	for (int i = 0; i < 8; i+=2)
 	{
 		m_register[i] = 0;
@@ -243,8 +241,8 @@ void sn76496_base_device::device_start()
 	for (int i = 0; i < 4; i++)
 	{
 		m_output[i] = 0;
-		m_period[i] = 0;
-		m_count[i] = 0;
+		m_period[i] = 0x3ff;
+		m_count[i] = 0x3ff;
 	}
 
 	m_RNG = m_feedback_mask;
@@ -273,6 +271,9 @@ void sn76496_base_device::device_start()
 		out /= 1.258925412; /* = 10 ^ (2/20) = 2dB */
 	}
 	m_vol_table[15] = 0;
+
+	for (int i = 0; i < 4; i++)
+		m_volume[i] = m_vol_table[8];
 
 	m_ready_state = true;
 

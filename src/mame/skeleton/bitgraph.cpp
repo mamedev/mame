@@ -41,6 +41,7 @@
 #include "emu.h"
 
 #include "bus/centronics/ctronics.h"
+#include "bus/keytronic/keytronic.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
@@ -50,7 +51,6 @@
 #include "machine/com8116.h"
 #include "machine/er2055.h"
 #include "machine/i8243.h"
-#include "machine/keytronic_l2207.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
@@ -489,10 +489,11 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	rs232h.cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 
 	ACIA6850(config, m_acia1, 0);
-	m_acia1->txd_handler().set("keyboard", FUNC(keytronic_l2207_device::ser_in_w));
+	m_acia1->txd_handler().set("keyboard", FUNC(keytronic_connector_device::ser_in_w));
 	m_acia1->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	KEYTRONIC_L2207(config, "keyboard").ser_out_callback().set(m_acia1, FUNC(acia6850_device::write_rxd));
+	keytronic_connector_device &keyboard(KEYTRONIC_CONNECTOR(config, "keyboard", ascii_terminal_keyboards, "l2207"));
+	keyboard.ser_out_callback().set(m_acia1, FUNC(acia6850_device::write_rxd));
 
 	ACIA6850(config, m_acia2, 0);
 	m_acia2->txd_handler().set(RS232_D_TAG, FUNC(rs232_port_device::write_txd));

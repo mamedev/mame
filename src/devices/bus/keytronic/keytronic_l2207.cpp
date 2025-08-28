@@ -4,8 +4,8 @@
 
     Keytronic L2207 83-key keyboard
 
-    This was sold by Keytronic as a generic VT100-lookalike ASCII
-    keyboard. Its normal configuration communicates via 300 baud
+    This was sold by Key Tronic Corp. as a generic VT100-lookalike
+    ASCII keyboard. Its normal configuration communicates via 300 baud
     asynchronous TTL-level serial, but populating a few additional
     components and using an alternate connector gives it a parallel
     interface for outputs. The PCB additionally supports a "minimum"
@@ -44,8 +44,7 @@
 
     Several other codes (A0-A5, D4, D6, F0, F5) are assigned to
     9 additional switches which are not normally populated. The
-    presently dumped firmware also sends AA in response to the
-    undocumented test command below.
+    presently dumped firmware also sends AA as its ID byte.
 
     List of commands (delivered through serial input):
 
@@ -55,7 +54,7 @@
          -  -  -  -  -  -  1  0      Short beep
          -  -  -  -  -  1  0  0      Long beep
          -  -  -  -  1  0  0  0      Key click off
-         -  -  -  1  0  0  0  0      Test? (undocumented)
+         -  -  -  1  0  0  0  0      Keyboard ID (undocumented)
          -  -  -  0  0  0  0  0      Key click on
 
     An alternate version of this keyboard, whose solder side is
@@ -63,26 +62,113 @@
     keytops and a different EPROM but is otherwise identical in layout
     and functionality.
 
+    The Kaypro II 76-key detachable keyboard is practically identical
+    to L2207 (the firmware is identical), but with no LEDs installed
+    and seven keys removed.
+
 **********************************************************************/
 
 #include "emu.h"
 #include "keytronic_l2207.h"
 
+#include "cpu/mcs48/mcs48.h"
+#include "sound/spkrdev.h"
 #include "speaker.h"
 
-DEFINE_DEVICE_TYPE(KEYTRONIC_L2207, keytronic_l2207_device, "keytronic_l2207", "Keytronic L2207 serial keyboard")
 
-keytronic_l2207_device::keytronic_l2207_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, KEYTRONIC_L2207, tag, owner, clock)
+namespace {
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> keytronic_l2207_device
+
+class keytronic_l2207_device : public device_t, public device_keytronic_interface
+{
+public:
+	// device type constructor
+	keytronic_l2207_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0U);
+
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
+protected:
+	keytronic_l2207_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// device_t implementation
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	// device_keytronics_interface implementation
+	virtual void ser_in_w(int state) override;
+
+	// MCU handlers
+	u8 led_latch_r();
+	u8 p1_r();
+	void p2_w(u8 data);
+
+	// address maps
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
+
+	// object finders
+	required_device<mcs48_cpu_device> m_mcu;
+	required_device<speaker_sound_device> m_beeper;
+	required_ioport_array<12> m_keys;
+	output_finder<8> m_leds;
+	output_finder<> m_all_caps;
+
+	// internal state
+	u8 m_p1_in;
+	u8 m_p2_out;
+	bool m_beeper_latch;
+};
+
+
+// ======================> kayproii_keyboard_device
+
+class kayproii_keyboard_device : public keytronic_l2207_device
+{
+public:
+	// device type constructor
+	kayproii_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0U);
+
+protected:
+	// device_t implementation
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
+
+//**************************************************************************
+//  DEVICE IMPLEMENTATION
+//**************************************************************************
+
+keytronic_l2207_device::keytronic_l2207_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_keytronic_interface(mconfig, *this)
 	, m_mcu(*this, "mcu")
 	, m_beeper(*this, "beeper")
 	, m_keys(*this, "KEYS%d", 0U)
 	, m_leds(*this, "kbd_led%d", 1U)
 	, m_all_caps(*this, "all_caps")
-	, m_ser_out_callback(*this)
 	, m_p1_in(0xff)
 	, m_p2_out(0)
 	, m_beeper_latch(false)
+{
+}
+
+keytronic_l2207_device::keytronic_l2207_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: keytronic_l2207_device(mconfig, KEYTRONIC_L2207, tag, owner, clock)
+{
+}
+
+kayproii_keyboard_device::kayproii_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: keytronic_l2207_device(mconfig, KAYPROII_KEYBOARD, tag, owner, clock)
 {
 }
 
@@ -130,7 +216,7 @@ u8 keytronic_l2207_device::p1_r()
 void keytronic_l2207_device::p2_w(u8 data)
 {
 	if (BIT(data, 5) != BIT(m_p2_out, 5))
-		m_ser_out_callback(BIT(data, 5));
+		ser_out_w(BIT(data, 5));
 
 	if (!BIT(data, 4))
 		m_p1_in = 0xff;
@@ -180,7 +266,7 @@ static INPUT_PORTS_START(keytronic_l2207)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEYS2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('2') PORT_CHAR('@') PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2  @") PORT_CHAR('2') PORT_CHAR('@') PORT_CHAR(0x00) PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"3  # £") PORT_CHAR('3') PORT_CHAR('#', 0x00a3) PORT_CODE(KEYCODE_3)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W") PORT_CHAR('w') PORT_CHAR('W') PORT_CHAR(0x17) PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CHAR('e') PORT_CHAR('E') PORT_CHAR(0x05) PORT_CODE(KEYCODE_E)
@@ -200,7 +286,7 @@ static INPUT_PORTS_START(keytronic_l2207)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V") PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR(0x16) PORT_CODE(KEYCODE_V)
 
 	PORT_START("KEYS4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('6') PORT_CHAR('^') PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6  ^") PORT_CHAR('6') PORT_CHAR('^') PORT_CHAR(0x1e) PORT_CODE(KEYCODE_6)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('7') PORT_CHAR('&') PORT_CODE(KEYCODE_7)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y") PORT_CHAR('y') PORT_CHAR('y') PORT_CHAR(0x19) PORT_CODE(KEYCODE_Y)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U") PORT_CHAR('u') PORT_CHAR('u') PORT_CHAR(0x15) PORT_CODE(KEYCODE_U)
@@ -221,7 +307,7 @@ static INPUT_PORTS_START(keytronic_l2207)
 
 	PORT_START("KEYS6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('0') PORT_CHAR(')') PORT_CODE(KEYCODE_0)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('-') PORT_CHAR('_') PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-  _") PORT_CHAR('-') PORT_CHAR('_') PORT_CHAR(0x1f) PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P") PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR(0x10) PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('[') PORT_CHAR('{') PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('\'') PORT_CHAR('"') PORT_CODE(KEYCODE_QUOTE)
@@ -232,9 +318,9 @@ static INPUT_PORTS_START(keytronic_l2207)
 	PORT_START("KEYS7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('=') PORT_CHAR('+') PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('`') PORT_CHAR('~') PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(']') PORT_CHAR('}') PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("]  }") PORT_CHAR(']') PORT_CHAR('}') PORT_CHAR(0x1d) PORT_CODE(KEYCODE_CLOSEBRACE)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('\\') PORT_CHAR('|') PORT_CODE(KEYCODE_PGUP)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\  |") PORT_CHAR('\\') PORT_CHAR('|') PORT_CHAR(0x1c) PORT_CODE(KEYCODE_PGUP)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed") PORT_CHAR(0x0a) PORT_CODE(KEYCODE_PGDN)
@@ -275,9 +361,35 @@ static INPUT_PORTS_START(keytronic_l2207)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(' ') PORT_CODE(KEYCODE_SPACE)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(kayproii_keyboard)
+	PORT_INCLUDE(keytronic_l2207)
+
+	PORT_MODIFY("KEYS0")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("KEYS1")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("KEYS8")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("KEYS9")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("KEYS10")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
 ioport_constructor keytronic_l2207_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(keytronic_l2207);
+}
+
+ioport_constructor kayproii_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(kayproii_keyboard);
 }
 
 void keytronic_l2207_device::device_add_mconfig(machine_config &config)
@@ -296,6 +408,21 @@ void keytronic_l2207_device::device_add_mconfig(machine_config &config)
 	SPEAKER_SOUND(config, m_beeper).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
+void kayproii_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	I8048(config, m_mcu, 3.579545_MHz_XTAL);
+	m_mcu->set_addrmap(AS_IO, &kayproii_keyboard_device::ext_map);
+	m_mcu->p1_in_cb().set(FUNC(kayproii_keyboard_device::p1_r));
+	m_mcu->p2_out_cb().set(FUNC(kayproii_keyboard_device::p2_w));
+	m_mcu->t0_in_cb().set_constant(1);
+	m_mcu->t1_in_cb().set_constant(0);
+	m_mcu->bus_out_cb().set_nop();
+	m_mcu->prog_out_cb().set_nop();
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_beeper).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
 ROM_START(keytronic_l2207)
 	ROM_REGION(0x800, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "a65_02207", "A65-02207-051/2510") // from Wicat System 150
@@ -305,7 +432,23 @@ ROM_START(keytronic_l2207)
 	ROMX_LOAD("key_05__162092859__8-23-82.bin", 0x000, 0x800, CRC(970b11a3) SHA1(a1c9c505eb3ccf132307b2ac0e04b0326f50621e), ROM_BIOS(1)) // MM2716Q
 ROM_END
 
+ROM_START(kayproii_keyboard)
+	ROM_REGION(0x400, "mcu", 0)
+	ROM_LOAD("kaypro_ii-ins8048.bin", 0x000, 0x400, CRC(f65e1ca5) SHA1(7919385fe8badbb610b793a3f5e4077982094aaa))
+ROM_END
+
 const tiny_rom_entry *keytronic_l2207_device::device_rom_region() const
 {
 	return ROM_NAME(keytronic_l2207);
 }
+
+const tiny_rom_entry *kayproii_keyboard_device::device_rom_region() const
+{
+	return ROM_NAME(kayproii_keyboard);
+}
+
+} // anonymous namespace
+
+// device type definitions
+DEFINE_DEVICE_TYPE_PRIVATE(KEYTRONIC_L2207, device_keytronic_interface, keytronic_l2207_device, "keytronic_l2207", "Keytronic L2207 serial keyboard")
+DEFINE_DEVICE_TYPE_PRIVATE(KAYPROII_KEYBOARD, device_keytronic_interface, kayproii_keyboard_device, "kayproiikbd", "Kaypro II Keyboard")
