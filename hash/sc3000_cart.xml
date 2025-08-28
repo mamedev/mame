@@ -6,8 +6,8 @@ license:CC0-1.0
 
 <softwarelist name="sc3000_cart" description="Sega SC-3000 cartridges">
 
-	<software name="basic311">
-		<description>BASIC Level III (Japan, Version 1.1)</description>
+	<software name="basic3">
+		<description>BASIC Level III (Japan, version 1.1)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -20,8 +20,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="basic310" cloneof="basic311">
-		<description>BASIC Level III (Japan, Version 1.0)</description>
+	<software name="basic3v10" cloneof="basic3">
+		<description>BASIC Level III (Japan, version 1.0)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -123,7 +123,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chueis1na" cloneof="chueis1n">
-		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 1-Nen (Japan, Alt)</description>
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 1-Nen (Japan, alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-104"/>
@@ -162,7 +162,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tansan4ja" cloneof="tansan4j">
-		<description>Tanoshii Sansu ~ Shougaku 4-Nen Jou (Japan, Alt)</description>
+		<description>Tanoshii Sansu ~ Shougaku 4-Nen Jou (Japan, alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-106"/>
@@ -227,7 +227,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chueit2na" cloneof="chueit2n">
-		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 2-Nen (Japan, Alt)</description>
+		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 2-Nen (Japan, alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-110"/>
@@ -253,7 +253,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chueis2na" cloneof="chueis2n">
-		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 2-Nen (Japan, Alt)</description>
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 2-Nen (Japan, alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-111"/>
