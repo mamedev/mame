@@ -141,6 +141,12 @@ void decocass_state::decocass_nmi_reset_w(uint8_t data)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE );
 }
 
+INPUT_CHANGED_MEMBER(decocass_state::coin_inserted)
+{
+	if (!newval)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
 void decocass_state::decocass_quadrature_decoder_reset_w(uint8_t data)
 {
 	/* just latch the analog controls here */
@@ -1328,9 +1334,9 @@ void decocass_state::machine_reset()
 	m_sound_ack = 0;
 	m_audio_nmi_enabled = 0;
 	m_audio_nmi_state = 0;
+	m_watchdog->watchdog_enable(0);
 
 	/* video-related */
-	m_watchdog_flip = 0;
 	m_color_missiles = 0;
 	m_color_center_bot = 0;
 	m_mode_set = 0;

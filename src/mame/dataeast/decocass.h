@@ -65,6 +65,8 @@ public:
 	void init_cdsteljn();
 	void init_nebula();
 
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
 protected:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -111,8 +113,6 @@ private:
 	tilemap_t *m_bg_tilemap_l = nullptr;
 	tilemap_t *m_bg_tilemap_r = nullptr;
 	uint8_t   m_empty_tile[16*16]{};
-	int32_t   m_watchdog_count = 0;
-	int32_t   m_watchdog_flip = 0;
 	int32_t   m_color_missiles = 0;
 	int32_t   m_color_center_bot = 0;
 	int32_t   m_mode_set = 0;

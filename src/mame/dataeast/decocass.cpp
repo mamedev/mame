@@ -177,8 +177,8 @@ static INPUT_PORTS_START( decocass )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH,IPT_START1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_START2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(decocass_state::coin_inserted), 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(decocass_state::coin_inserted), 0)
 
 	PORT_START("AN0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1030,7 +1030,7 @@ void decocass_state::decocass(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(4200)); /* interleave CPUs */
 
-	WATCHDOG_TIMER(config, m_watchdog);
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 16);
 
 	DECOCASS_TAPE(config, m_cassette, 0);
 

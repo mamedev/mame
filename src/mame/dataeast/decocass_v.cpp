@@ -167,8 +167,6 @@ static const uint32_t tile_offset[32*32] = {
  ********************************************/
 void decocass_state::decocass_video_state_save_init()
 {
-	save_item(NAME(m_watchdog_count));
-	save_item(NAME(m_watchdog_flip));
 	save_item(NAME(m_color_missiles));
 	save_item(NAME(m_color_center_bot));
 	save_item(NAME(m_mode_set));
@@ -389,13 +387,14 @@ void decocass_state::decocass_bgvideoram_w(offs_t offset, uint8_t data)
 void decocass_state::decocass_watchdog_count_w(uint8_t data)
 {
 	LOG(1,("decocass_watchdog_count_w: $%02x\n", data));
-	m_watchdog_count = data & 0x0f;
+	m_watchdog->set_vblank_count(m_screen, (data & 0x0f) + 1);
+	m_watchdog->watchdog_reset();
 }
 
 void decocass_state::decocass_watchdog_flip_w(uint8_t data)
 {
 	LOG(1,("decocass_watchdog_flip_w: $%02x\n", data));
-	m_watchdog_flip = data;
+	m_watchdog->watchdog_enable(BIT(data, 2));
 }
 
 void decocass_state::decocass_color_missiles_w(uint8_t data)
@@ -657,13 +656,13 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 	// technically our y drawing probably shouldn't wrap / mask, but simply draw the 128pixel high 'edge' at the requested position
 	//  see note above this funciton
-	for (int y=clip.top(); y<=clip.bottom(); y++)
+	for (int y = clip.top(); y <= clip.bottom(); y++)
 	{
 		int srcline = (y + scrolly) & 0x1ff;
 		uint16_t const *const src = &srcbitmap->pix(srcline);
 		uint16_t *const dst = &bitmap.pix(y);
 
-		for (int x=clip.left(); x<=clip.right(); x++)
+		for (int x = clip.left(); x <= clip.right(); x++)
 		{
 			int srccol = 0;
 
@@ -683,7 +682,6 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 				dst[x] = pix;
 		}
 	}
-
 }
 
 
@@ -718,18 +716,6 @@ void decocass_state::video_start()
 
 uint32_t decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* THIS CODE SHOULD NOT BE IN SCREEN UPDATE !! */
-
-	if (0xc0 != (ioport("IN2")->read() & 0xc0))  /* coin slots assert an NMI */
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-
-	if (0 == (m_watchdog_flip & 0x04))
-		m_watchdog->watchdog_reset();
-	else if (m_watchdog_count-- > 0)
-		m_watchdog->watchdog_reset();
-
-	/* (end) THIS CODE SHOULD NOT BE IN SCREEN UPDATE !! */
-
 #ifdef MAME_DEBUG
 	{
 		if (machine().input().code_pressed_once(KEYCODE_I))
