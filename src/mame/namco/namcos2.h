@@ -274,6 +274,23 @@ enum
 	void sound_default_am(address_map &map) ATTR_COLD;
 };
 
+class suzuka8h_state : public namcos2_state
+{
+public:
+	suzuka8h_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos2_state(mconfig, type, tag),
+		m_out_digit(*this, "digit%u", 0U)
+	{ }
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+	virtual void dpram_word_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
+
+private:
+	output_finder<7> m_out_digit;
+};
+
 class gollygho_state : public namcos2_state
 {
 public:
