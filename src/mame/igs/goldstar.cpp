@@ -4765,11 +4765,8 @@ static INPUT_PORTS_START( tonypok )
 	PORT_DIPSETTING(    0x40, "30" )
 INPUT_PORTS_END
 
-/* taken from manual - (it's a starting point)
-   consider everything unverified
-   not all DIP banks are actually hooked up as I/O map
-   is currently based on what crazybon actually reads
-*/
+// taken from manual
+// most verified and fixed/corrected.
 static INPUT_PORTS_START( pkrmast )
 	PORT_START("IN0") // PLAYER
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Deal/Draw/Take")  // Yes, also "Take"
