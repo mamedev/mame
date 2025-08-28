@@ -2,31 +2,6 @@
 // copyright-holders:flama12333
 /*************************************************************************
 
-// Features Notes Was from archived websited:
-src: Chang yu website
-
-Pearl in the  East 
-
-5 balls per game ... win a bonus if 4 balls flip into the same slot.
-
-When balls flip into certain slots, additional lamps illuminate.
-
-When scoring on all letters of pearl in the east, up to 4 extra lamps randomly illuminate.
-
-Higher bets when scoring on all letters of PEARL IN THE EAST win a higher bonus.
-
-New feature: buy a 6th ball toup the odds.
-
-Oriental Pearl - 1997
-
-5 balls per game and 2 win modes.
-
-1 higher bets mean more bonus lights and more chances to win.
-
-Big bonus for scoring on all letters of "ORIENTAL PEARL".
-
-Electronic ball-checking device ensures where ball lands.
-
 // Hardware info - may not accurate
 the dump was from Soccer Santiago II 6 ball pinball
 
