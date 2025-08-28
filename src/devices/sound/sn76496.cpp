@@ -239,8 +239,8 @@ void sn76496_base_device::device_start()
 	for (int i = 0; i < 4; i++)
 	{
 		m_output[i] = 0;
-		m_period[i] = m_sega_style_psg ? 0 : 0x400;
-		m_count[i] = m_sega_style_psg ? 0 : 0x400;
+		m_period[i] = (m_sega_style_psg || i == 3) ? 0 : 0x400;
+		m_count[i] = (m_sega_style_psg || i == 3) ? 0 : 0x400;
 	}
 
 	m_RNG = m_feedback_mask;
@@ -274,10 +274,10 @@ void sn76496_base_device::device_start()
 	for (int i = 0; i < 4; i++)
 		m_volume[i] = m_vol_table[m_register[i * 2 + 1]];
 
-	m_ready_state = true;
+	m_ready_state = -1;
 
 	m_ready_timer = timer_alloc(FUNC(sn76496_base_device::delayed_ready), this);
-	m_ready_handler(ASSERT_LINE);
+	m_ready_timer->adjust(attotime::zero);
 
 	// save states
 	save_item(NAME(m_ready_state));
@@ -307,10 +307,15 @@ void sn76496_base_device::stereo_w(u8 data)
 		fatalerror("sn76496_base_device: Call to stereo write with mono chip!\n");
 }
 
-TIMER_CALLBACK_MEMBER(sn76496_base_device::delayed_ready)
+void sn76496_base_device::set_ready_state(int32_t state)
 {
-	m_ready_state = true;
-	m_ready_handler(ASSERT_LINE);
+	if (state != m_ready_state)
+	{
+		m_ready_state = state;
+
+		if (!m_ready_handler.isunset())
+			m_ready_handler(state ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 void sn76496_base_device::write(u8 data)
@@ -377,14 +382,8 @@ void sn76496_base_device::write(u8 data)
 			break;
 	}
 
-	m_ready_state = false;
-	m_ready_handler(CLEAR_LINE);
+	set_ready_state(0);
 	m_ready_timer->adjust(attotime::from_hz(clock() / (4 * m_clock_divider)));
-}
-
-inline bool sn76496_base_device::in_noise_mode()
-{
-	return ((m_register[6] & 4) != 0);
 }
 
 void sn76496_base_device::sound_stream_update(sound_stream &stream)
@@ -421,7 +420,7 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream)
 				// if noisemode is 1, both taps are enabled
 				// if noisemode is 0, the lower tap, whitenoisetap2, is held at 0
 				// The != was a bit-XOR (^) before
-				if (((m_RNG & m_whitenoise_tap1) != 0) != (((m_RNG & m_whitenoise_tap2) != (m_ncr_style_psg ? m_whitenoise_tap2 : 0)) && in_noise_mode()))
+				if (((m_RNG & m_whitenoise_tap1) != 0) != (((m_RNG & m_whitenoise_tap2) != (m_ncr_style_psg ? m_whitenoise_tap2 : 0)) && BIT(m_register[6], 2)))
 				{
 					m_RNG >>= 1;
 					m_RNG |= m_feedback_mask;

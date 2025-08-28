@@ -5,6 +5,22 @@
 
 #pragma once
 
+// pinout reference
+
+/*
+             ___   ___
+       D2 1 |*  \_/   | 16 Vcc
+       D1 2 |         | 15 D3
+       D0 3 |         | 14 CLOCK
+    READY 4 | SN76496 | 13 D4
+      _WE 5 |         | 12 D5
+      _CE 6 |         | 11 D6
+AUDIO OUT 7 |         | 10 D7
+      GND 8 |_________| 9  AUDIO IN
+
+    on SN76489, pin 9 is N/C
+
+*/
 
 DECLARE_DEVICE_TYPE(SN76496,  sn76496_device)
 DECLARE_DEVICE_TYPE(Y2404,    y2404_device)
@@ -35,17 +51,16 @@ protected:
 	virtual void device_clock_changed() override;
 	virtual void sound_stream_update(sound_stream &stream) override;
 
-	TIMER_CALLBACK_MEMBER(delayed_ready);
-
 private:
-	inline bool     in_noise_mode();
+	void set_ready_state(int32_t state);
+	TIMER_CALLBACK_MEMBER(delayed_ready) { set_ready_state(1); }
 
 	devcb_write_line m_ready_handler;
 	emu_timer       *m_ready_timer;
 	sound_stream    *m_sound;
 
 	// internal state
-	bool            m_ready_state;
+	int32_t         m_ready_state;      // READY pin state
 	int32_t         m_vol_table[16];    // volume table (for 4-bit to db conversion)
 	int32_t         m_register[8];      // registers
 	int32_t         m_last_register;    // last register written
@@ -53,8 +68,8 @@ private:
 	uint32_t        m_RNG;              // noise generator LFSR
 	int32_t         m_current_clock;
 	int32_t         m_stereo_mask;      // the stereo output mask
-	int32_t         m_period[4];        // Length of 1/2 of waveform
-	int32_t         m_count[4];         // Position within the waveform
+	int32_t         m_period[4];        // length of 1/2 of waveform
+	int32_t         m_count[4];         // position within the waveform
 	int32_t         m_output[4];        // 1-bit output of each channel, pre-volume
 
 	// configuration
