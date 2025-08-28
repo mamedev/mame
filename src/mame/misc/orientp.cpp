@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:flama12333
 /*************************************************************************
-
 // Hardware info - may not accurate
-the dump was from Soccer Santiago II 6 ball pinball
+the dump was from Soccer Santiago II 6 ball pinball. Since I dont known which was from for not mentioning by the owner so im gonna to name as unknown.
+
 
 Buttons
 K1
