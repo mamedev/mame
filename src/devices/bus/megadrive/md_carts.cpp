@@ -18,6 +18,7 @@
 #include "svp.h"
 #include "titan.h"
 #include "tplay96.h"
+#include "paprium.h"
 
 
 void md_cart(device_slot_interface &device)

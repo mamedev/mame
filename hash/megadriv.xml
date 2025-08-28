@@ -37856,7 +37856,7 @@ Crashes at startup with megadriv (verify)
 		</part>
 	</software>
 
-	<software name="paprium" supported="partial">
+	<software name="paprium" supported="no">
 		<description>Paprium</description>
 		<year>2020</year>
 		<publisher>WaterMelon</publisher>

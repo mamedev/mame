@@ -3856,6 +3856,8 @@ if (BUSES["MEGADRIVE"]~=null) then
 		MAME_DIR .. "src/devices/bus/megadrive/titan.h",
 		MAME_DIR .. "src/devices/bus/megadrive/tplay96.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/tplay96.h",
+		MAME_DIR .. "src/devices/bus/megadrive/paprium.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/paprium.h",
 	}
 end
 
