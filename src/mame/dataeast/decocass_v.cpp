@@ -167,6 +167,7 @@ static const uint32_t tile_offset[32*32] = {
  ********************************************/
 void decocass_state::decocass_video_state_save_init()
 {
+	save_item(NAME(m_watchdog_flip));
 	save_item(NAME(m_color_missiles));
 	save_item(NAME(m_color_center_bot));
 	save_item(NAME(m_mode_set));
@@ -389,12 +390,14 @@ void decocass_state::decocass_watchdog_count_w(uint8_t data)
 	LOG(1,("decocass_watchdog_count_w: $%02x\n", data));
 	m_watchdog->set_vblank_count(m_screen, (data & 0x0f) + 1);
 	m_watchdog->watchdog_reset();
+
 }
 
 void decocass_state::decocass_watchdog_flip_w(uint8_t data)
 {
 	LOG(1,("decocass_watchdog_flip_w: $%02x\n", data));
-	m_watchdog->watchdog_enable(BIT(data, 2));
+	m_watchdog->watchdog_enable(BIT(data, 3));
+	m_watchdog_flip = data;
 }
 
 void decocass_state::decocass_color_missiles_w(uint8_t data)
@@ -734,6 +737,9 @@ uint32_t decocass_state::screen_update_decocass(screen_device &screen, bitmap_in
 				m_center_v_shift);
 	}
 #endif
+
+	// flip screen flag only has effect if cocktail dsw is on
+	flip_screen_set(m_watchdog_flip & BIT(m_dsw[0]->read(), 6));
 
 	bitmap_ind8 &priority = screen.priority();
 	bitmap.fill(8, cliprect);

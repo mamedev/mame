@@ -46,6 +46,9 @@ public:
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
 		, m_soundlatch2(*this, "soundlatch2")
+		, m_inputs(*this, "IN%u", 0)
+		, m_analog(*this, "AN%u", 0)
+		, m_dsw(*this, "DSW%u", 1)
 		, m_rambase(*this, "rambase")
 		, m_charram(*this, "charram")
 		, m_fgvideoram(*this, "fgvideoram")
@@ -53,7 +56,7 @@ public:
 		, m_tileram(*this, "tileram")
 		, m_objectram(*this, "objectram")
 		, m_paletteram(*this, "paletteram")
-		, m_bank1(*this, "bank1")
+		, m_rombank(*this, "bank")
 	{
 	}
 
@@ -95,6 +98,10 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 
+	required_ioport_array<3> m_inputs;
+	required_ioport_array<4> m_analog;
+	required_ioport_array<2> m_dsw;
+
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_rambase;
 	required_shared_ptr<uint8_t> m_charram;
@@ -103,7 +110,7 @@ private:
 	required_shared_ptr<uint8_t> m_tileram;
 	required_shared_ptr<uint8_t> m_objectram;
 	required_shared_ptr<uint8_t> m_paletteram;
-	optional_memory_bank         m_bank1;
+	optional_memory_bank         m_rombank;
 
 	uint8_t   *m_bgvideoram = nullptr; /* shares bits D0-3 with tileram! */
 	size_t    m_bgvideoram_size = 0U;
@@ -112,6 +119,7 @@ private:
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap_l = nullptr;
 	tilemap_t *m_bg_tilemap_r = nullptr;
+	uint8_t   m_watchdog_flip = 0;
 	uint8_t   m_empty_tile[16*16]{};
 	int32_t   m_color_missiles = 0;
 	int32_t   m_color_center_bot = 0;

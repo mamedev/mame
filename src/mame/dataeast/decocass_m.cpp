@@ -150,10 +150,8 @@ INPUT_CHANGED_MEMBER(decocass_state::coin_inserted)
 void decocass_state::decocass_quadrature_decoder_reset_w(uint8_t data)
 {
 	/* just latch the analog controls here */
-	m_quadrature_decoder[0] = ioport("AN0")->read();
-	m_quadrature_decoder[1] = ioport("AN1")->read();
-	m_quadrature_decoder[2] = ioport("AN2")->read();
-	m_quadrature_decoder[3] = ioport("AN3")->read();
+	for (int i = 0; i < 4; i++)
+		m_quadrature_decoder[i] = m_analog[i]->read();
 }
 
 void decocass_state::decocass_adc_w(uint8_t data)
@@ -173,12 +171,11 @@ void decocass_state::decocass_adc_w(uint8_t data)
 uint8_t decocass_state::decocass_input_r(offs_t offset)
 {
 	uint8_t data = 0xff;
-	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
 	switch (offset & 7)
 	{
 	case 0: case 1: case 2:
-		data = machine().root_device().ioport(portnames[offset & 7])->read();
+		data = m_inputs[offset & 7]->read();
 		break;
 	case 3: case 4: case 5: case 6:
 		data = m_quadrature_decoder[(offset & 7) - 3];
@@ -1267,7 +1264,7 @@ void decocass_state::decocass_e900_w(uint8_t data)
 	if (m_de0091_enable == 0x3) // invalid
 		return;
 
-	membank("bank1")->set_entry(data & 3);
+	m_rombank->set_entry(data & 3);
 }
 
 void decocass_state::decocass_de0091_w(offs_t offset, uint8_t data)
@@ -1334,9 +1331,9 @@ void decocass_state::machine_reset()
 	m_sound_ack = 0;
 	m_audio_nmi_enabled = 0;
 	m_audio_nmi_state = 0;
-	m_watchdog->watchdog_enable(0);
 
 	/* video-related */
+	decocass_watchdog_flip_w(0);
 	m_color_missiles = 0;
 	m_color_center_bot = 0;
 	m_mode_set = 0;

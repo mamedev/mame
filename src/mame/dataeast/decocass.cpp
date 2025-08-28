@@ -130,7 +130,7 @@ void decocass_state::decocass_map(address_map &map)
 void decocass_state::decocrom_map(address_map &map)
 {
 	decocass_map(map);
-	map(0x6000, 0xafff).bankr("bank1").w(FUNC(decocass_state::decocass_de0091_w));
+	map(0x6000, 0xafff).bankr("bank").w(FUNC(decocass_state::decocass_de0091_w));
 	map(0xe900, 0xe900).w(FUNC(decocass_state::decocass_e900_w));
 }
 
@@ -2098,10 +2098,10 @@ void decocass_state::init_decocrom()
 	init_decocass();
 
 	/* convert charram to a banked ROM */
-	membank("bank1")->configure_entry(0, m_charram);
-	membank("bank1")->configure_entry(1, memregion("user3")->base());
-	membank("bank1")->configure_entry(2, memregion("user3")->base()+0x5000);
-	membank("bank1")->set_entry(0);
+	m_rombank->configure_entry(0, m_charram);
+	m_rombank->configure_entry(1, memregion("user3")->base());
+	m_rombank->configure_entry(2, memregion("user3")->base()+0x5000);
+	m_rombank->set_entry(0);
 }
 
 uint8_t decocass_state::cdsteljn_input_r(offs_t offset)
@@ -2109,7 +2109,7 @@ uint8_t decocass_state::cdsteljn_input_r(offs_t offset)
 	uint8_t res;
 	static const char *const portnames[2][4] = {
 		{"P1_MP0", "P1_MP1", "P1_MP2", "P1_MP3"},
-		{"P2_MP0", "P2_MP1", "P2_MP2", "P2_MP3"}         };
+		{"P2_MP0", "P2_MP1", "P2_MP2", "P2_MP3"} };
 
 	if(offset & 6)
 		return decocass_input_r(offset);
@@ -2123,9 +2123,6 @@ void decocass_state::cdsteljn_mux_w(uint8_t data)
 {
 	m_mux_data = (data & 0xc) >> 2;
 	/* bit 0 and 1 are p1/p2 lamps */
-
-	if(data & ~0xf)
-		printf("%02x\n",data);
 }
 
 void decocass_state::init_cdsteljn()
