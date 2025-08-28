@@ -23,6 +23,8 @@ u39 at89s51 second mcu for protection.
 Need hardware info.
 Hook up nvram inputs opll and adpcm.
 east8 Has undumped mcu and adpcm rom.
+Only the mcu dump was From the set 2. Marking Bad dump for now
+
 Need Layout as and Add segment display as marywu.cpp
 */
 
@@ -153,7 +155,7 @@ void orientalpearl_state::orientp(machine_config &config)
 	OKIM6295(config, "oki", XTAL(10'738'000) / 6, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
 }
 
-ROM_START( east8a )
+ROM_START( east8 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) 
 	ROM_LOAD( "27c512.u33", 0x00000, 0x10000, CRC(85e28db5) SHA1(96f80a7d2214672c09b8f719cb573e77b8bac731) ) // Main program.  EAST8  v1.00 string
 
@@ -183,5 +185,5 @@ ROM_START( east8b )
 
 
 //   YEAR   NAME    PARENT   MACHINE    INPUT    STATE                INIT        ROT    COMPANY       FULLNAME                 FLAGS
-GAME( 200?, easta,  0,       orientp,   orientp, orientalpearl_state, empty_init, ROT0, "<unknown>", " Unknown EAST8 Set 1 (v1.00)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 200?, eastb,  0,       orientp,   orientp, orientalpearl_state, empty_init, ROT0, "<unknown>", " Unknown EAST8 Set 2 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, east8,   0,       orientp,   orientp, orientalpearl_state, empty_init, ROT0, "<unknown>", " Unknown EAST8 Set 1 (v1.00)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, east8a,  0,       orientp,   orientp, orientalpearl_state, empty_init, ROT0, "<unknown>", " Unknown EAST8 Set 2 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
