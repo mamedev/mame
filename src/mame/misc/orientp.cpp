@@ -2,8 +2,16 @@
 // copyright-holders:flama12333
 /*************************************************************************
 // 
-notes:
+
+
+ notes: 
 The dump of set 2 was from Soccer Santiago II 6 ball pinball I dont known which was from due to unconfirmed, so im gonna to name as unknown.
+
+these roulettes use a 2x8 scan matrix for keyboard with the 8279. Only 14 buttons are used.
+
+Port at back pcb:
+small port: bonus PCB (7 segment 4-digit)
+big port: playfield sensors PCB with lots of 74HC245, leds, sensors, multiplex
 
 Hardware info - may not accurate
 Buttons
