@@ -50,7 +50,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="basic2" cloneof="basic311">
+	<software name="basic2" cloneof="basic3">
 		<description>BASIC Level 2 (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
