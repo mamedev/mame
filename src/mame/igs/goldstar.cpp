@@ -318,6 +318,8 @@ public:
 	void init_wcherry() ATTR_COLD;
 
 	void init_palnibbles() ATTR_COLD;
+	
+	void p2_lamps_w(uint8_t data);
 
 protected:
 	required_shared_ptr<uint8_t> m_fg_vidram;
@@ -357,7 +359,6 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	void p1_lamps_w(uint8_t data);
-	void p2_lamps_w(uint8_t data);
 	void fg_vidram_w(offs_t offset, uint8_t data);
 	void fg_atrram_w(offs_t offset, uint8_t data);
 	void bg_vidram_w(offs_t offset, uint8_t data);
@@ -1637,7 +1638,7 @@ void goldstar_state::p2_lamps_w(uint8_t data)
 	m_lamps[8 + 6] = BIT(data, 6);
 	m_lamps[8 + 7] = BIT(data, 7);
 
-//  popmessage("p2 lamps: %02X", data);
+	popmessage("p2 lamps: %02X", data);
 }
 
 // lucky bar mcu
@@ -2337,6 +2338,7 @@ void cmaster_state::coincount_w(uint8_t data)
 //      popmessage("counters: %02X", data);
 
 	m_ticket_dispenser->motor_w(BIT(data,7));
+	popmessage("counters: %02X", data);
 
 }
 
@@ -2355,8 +2357,8 @@ void cmaster_state::pkm_out0_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(2, data & 0x10);  // Counter 3 Coin C
 	machine().bookkeeping().coin_counter_w(3, data & 0x08);  // Counter 4 Coin D
 
-	m_ticket_dispenser->motor_w(BIT(data,0));
-	//popmessage("pkm_out0_w: %02X", data);
+	m_ticket_dispenser->motor_w(BIT(data,0)); //pkrmast:port 0x00 - jkrmast:port 0x13
+	popmessage("pkm_out0_w: %02X", data);
 
 }
 
@@ -2503,13 +2505,8 @@ void cmaster_state::pkrmast_portmap(address_map &map)
 	map(0x02, 0x02).portr("DSW6");
 	map(0x03, 0x03).portr("DSW7");
 
-	map(0x20, 0x20).portr("DSW1");
-	map(0x21, 0x21).portr("DSW2");
-	map(0x22, 0x22).portr("DSW3").w(FUNC(cmaster_state::p1_lamps_w));
-
-	map(0x24, 0x24).portr("IN2");
-	map(0x25, 0x25).portr("IN0");
-	map(0x26, 0x26).portr("IN1");
+	map(0x20, 0x23).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // DIP switches	
+	map(0x24, 0x27).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Inputs
 
 	map(0x29, 0x29).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x2a, 0x2a).w("aysnd", FUNC(ay8910_device::data_w));
@@ -2528,6 +2525,7 @@ void cmaster_state::jkrmast_portmap(address_map &map)
 	map(0x10, 0x10).portr("IN1");
 	map(0x11, 0x11).portr("IN0");
 	map(0x12, 0x12).portr("IN2");
+	map(0x13, 0x13).w(FUNC(cmaster_state::pkm_out0_w));
 	map(0x17, 0x17).lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; m_bgcolor = data & 0x03; m_bg_tilemap->mark_all_dirty(); }));
 	// map(0x18, 0x18).w // enable reg?
 }
@@ -2560,10 +2558,12 @@ void cmaster_state::animalhs_portmap(address_map &map)  // TODO: incomplete, may
 	map(0x11, 0x11).portr("DSW2");
 	map(0x12, 0x12).portr("DSW3");
 	map(0x13, 0x13).portr("DSW4");
-	map(0x60, 0x60).portr("IN2").lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; }));  // TODO: other bits are used, too
-	map(0x61, 0x61).portr("IN0");
-	map(0x62, 0x62).portr("IN1");
-	map(0x63, 0x63).lr8(NAME([] () -> uint8_t { return 0xff; }));  // checks battery level here, among other things, writes should be lamps
+	//map(0x60, 0x60).portr("IN2").lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; }));  // TODO: other bits are used, too
+	map(0x60, 0x60).lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; }));  // TODO: other bits are used, too
+	map(0x61, 0x61).portr("IN0").w(FUNC(goldstar_state::p2_lamps_w)); // it seems lamps
+	map(0x62, 0x62).portr("IN1").w(FUNC(cmaster_state::coincount_w));
+	//map(0x63, 0x63).lr8(NAME([] () -> uint8_t { return 0xff; }));  // checks battery level here, among other things, writes should be lamps
+	map(0x63, 0x63).portr("IN2");
 }
 
 void cmaster_state::cmast91_portmap(address_map &map)
@@ -4770,14 +4770,13 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pkrmast )
 	PORT_START("IN0") // PLAYER
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Deal/Draw/Take")  // Yes, also "Take"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small / Black")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small / Black / Stop 1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take / Stop All")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("D.Up / Stop 3")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Red")
-
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Red / Stop 2")
 	PORT_START("IN1") // COIN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin A")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
@@ -4787,7 +4786,6 @@ static INPUT_PORTS_START( pkrmast )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper Payout")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT)
-
 	PORT_START("IN2") // TEST
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
@@ -4850,28 +4848,28 @@ static INPUT_PORTS_START( pkrmast )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x00, "Key In Rate" )           PORT_DIPLOCATION("DSW3:1,2")
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_10C ) )       PORT_CONDITION("DSW2",0x40,EQUALS,0x00)  // A Type
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_20C ) )       PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_50C ) )       PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_100C ) )      PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C) )         PORT_CONDITION("DSW2",0x40,EQUALS,0x40)  // B Type
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_10C ) )       PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_25C ) )       PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_50C ) )       PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_10C ) )       PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // A Type
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_20C ) )       PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_50C ) )       PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_100C ) )      PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C) )         PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)  // B Type
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_10C ) )       PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_25C ) )       PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_50C ) )       PORT_CONDITION("DSW2", 0x40, EQUALS, 0x40)
 	PORT_DIPNAME( 0x0c, 0x00, "Coin A Rate" )           PORT_DIPLOCATION("DSW3:3,4")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x30, 0x00, "Coin D Rate" )           PORT_DIPLOCATION("DSW3:5,6")
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_5C) )         PORT_CONDITION("DSW2",0x80,EQUALS,0x00)  // C Type
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_10C ) )       PORT_CONDITION("DSW2",0x80,EQUALS,0x00)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_25C ) )       PORT_CONDITION("DSW2",0x80,EQUALS,0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_50C ) )       PORT_CONDITION("DSW2",0x80,EQUALS,0x00)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )        PORT_CONDITION("DSW2",0x80,EQUALS,0x80)  // D Type
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_1C ) )        PORT_CONDITION("DSW2",0x80,EQUALS,0x80)
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )        PORT_CONDITION("DSW2",0x80,EQUALS,0x80)
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )        PORT_CONDITION("DSW2",0x80,EQUALS,0x80)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_5C) )         PORT_CONDITION("DSW2", 0x80, EQUALS, 0x00)  // C Type
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_10C ) )       PORT_CONDITION("DSW2", 0x80, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_25C ) )       PORT_CONDITION("DSW2", 0x80, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_50C ) )       PORT_CONDITION("DSW2", 0x80, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )        PORT_CONDITION("DSW2", 0x80, EQUALS, 0x80)  // D Type
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_1C ) )        PORT_CONDITION("DSW2", 0x80, EQUALS, 0x80)
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )        PORT_CONDITION("DSW2", 0x80, EQUALS, 0x80)
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )        PORT_CONDITION("DSW2", 0x80, EQUALS, 0x80)
 	PORT_DIPNAME( 0xc0, 0x00, "Coin C Rate" )           PORT_DIPLOCATION("DSW3:7,8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
@@ -4980,36 +4978,35 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( jkrmast )
-	// test mode shows 3 input ports
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("IN0") // PLAYER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Deal/Draw/Take")  // Yes, also "Take"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small / Black / Stop 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take / Stop All")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("D.Up / Stop 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Red / Stop 3")
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("IN1") // COIN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin B") PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Coin C")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Coin D") PORT_IMPULSE(2)  
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin A") PORT_IMPULSE(2) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")	
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper Payout")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT)
+	
+	PORT_START("IN2") // TEST
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // Hopper presence
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // Hopper Coin Out
 
 	// test mode shows 4 8-DIP banks
 	PORT_START("DSW1")
@@ -6845,10 +6842,10 @@ static INPUT_PORTS_START( schery97 )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Out / Attendant")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper Payout")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")  // doesn't work in v352c4
 
@@ -12188,6 +12185,16 @@ void cmaster_state::pkrmast(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map);
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::pkrmast_portmap);
 
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("DSW1");
+	m_ppi[0]->in_pb_callback().set_ioport("DSW2");
+	m_ppi[0]->in_pc_callback().set_ioport("DSW3");
+
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("IN2");
+	m_ppi[1]->in_pb_callback().set_ioport("IN0");
+	m_ppi[1]->in_pc_callback().set_ioport("IN1");
+	
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -12230,6 +12237,10 @@ void cmaster_state::crazybon(machine_config &config)
 	pkrmast(config);
 
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::crazybon_portmap);
+	
+	I8255A(config.replace(), m_ppi[0]);
+	I8255A(config.replace(), m_ppi[1]);
+
 }
 
 void cmaster_state::crazybonb(machine_config &config)
@@ -22748,6 +22759,7 @@ void goldstar_state::init_goldstar()
 void cmaster_state::init_jkrmast()
 {
 	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *prom = memregion("colours")->base();
 
 	for (int A = 0; A < 0x8000; A++)
 	{
@@ -22770,6 +22782,23 @@ void cmaster_state::init_jkrmast()
 		else if ((i & 0x60) == 0x20)
 			rom[i] = buf[i];
 	}
+
+	uint8_t buff[0x80] = {};
+	static const uint8_t row_map[16] = { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 };
+
+	for (int addr = 0; addr < 0x80; addr++)
+	{
+        uint8_t swapped;
+		uint8_t row = (addr >> 3) & 0x0f;
+		uint8_t offset = addr & 0x07;
+		swapped = (row_map[row] << 3) | offset;
+		buff[swapped] = prom[addr]; 
+	}
+
+	for (int addr = 0; addr < 0x80; addr++)
+	{
+		prom[addr] = buff[addr];
+	}	
 
 	init_palnibbles();
 }
@@ -22826,6 +22855,7 @@ void cmaster_state::init_pkrmast()
 
 	uint8_t buff[0x80] = {};
 	static const uint8_t row_map[16] = { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 };
+
 	for (int addr = 0; addr < 0x80; addr++)
 	{
 
@@ -22835,6 +22865,7 @@ void cmaster_state::init_pkrmast()
 		swapped = (row_map[row] << 3) | offset;
 		buff[swapped] = prom[addr]; 
 	}
+
 	for (int addr = 0; addr < 0x80; addr++)
 	{
 		prom[addr] = buff[addr];
@@ -24954,10 +24985,10 @@ GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamh
 GAMEL( 199?, alienatt,   cmaster,  cm,       cmaster,  cmaster_state,  init_alienatt,  ROT0, "bootleg",           "Allien Attack",                               MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 
 GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
-GAME(  1998, jkrmast,    0,        jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // needs correct FG colors and controls
-GAME(  1998, jkrmasta,   jkrmast,  jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // needs correct FG colors and controls
-GAME(  1993, pkrmast,    jkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 1)",                0 ) // puts FUN USA 95H N/G  V2.20 in NVRAM
-GAME(  1993, pkrmasta,   jkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 2)",                0 ) // needs dips fixed, puts PM93 JAN 29/1996 V1.52 in NVRAM
+GAME(  1998, jkrmast,    0,        jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    0 )
+GAME(  1998, jkrmasta,   jkrmast,  jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512)",    0 )
+GAME(  1993, pkrmast,    0,        pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 1)",                0 ) // puts FUN USA 95H N/G  V2.20 in NVRAM
+GAME(  1993, pkrmasta,   pkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 2)",                0 ) // needs dips fixed, puts PM93 JAN 29/1996 V1.52 in NVRAM
 
 GAME(  199?, chthree,    cmaster,  cm,       cmaster,  cmaster_state,  init_chthree,   ROT0, "Promat",            "Channel Three",                               0 ) // hack of cmaster, still shows DYNA CM-1 V1.01 in book-keeping
 
@@ -25077,7 +25108,7 @@ GAME(  199?, mtonic2,    0,        magodds,  magoddsc, wingco_state,   init_mago
 
 // --- Amcoe games ---
 
-//     YEAR  NAME        PARENT    MACHINE   INPUT      STATE           INIT       ROT    COMPANY    FULLNAME                                                       FLAGS              LAYOUT
+//     YEAR  NAME        PARENT    MACHINE   INPUT      STATE           INIT            ROT    COMPANY    FULLNAME                                                       FLAGS              LAYOUT
 GAMEL( 1997, schery97,   0,        amcoe1,   schery97,  cmaster_state,  init_schery97,  ROT0, "Amcoe",   "Skill Cherry '97 (Talking ver. sc3.52)",                       0,                 layout_nfb96 )  // running in CB hardware
 GAMEL( 1997, schery97a,  schery97, amcoe1,   schery97,  cmaster_state,  init_schery97a, ROT0, "Amcoe",   "Skill Cherry '97 (Talking ver. sc3.52c4)",                     0,                 layout_nfb96 )  // running in C4 hardware
 GAMEL( 1998, skill98,    0,        amcoe1,   schery97,  cmaster_state,  init_skill98,   ROT0, "Amcoe",   "Skill '98 (Talking ver. s98-1.33)",                            0,                 layout_skill98 )
@@ -25177,8 +25208,8 @@ GAMEL( 198?, cmtetrisb,  cmtetris, cm,        cmtetris, cmaster_state,  init_cm,
 GAMEL( 198?, cmtetrisc,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisc, ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, encrypted)",                       0,                                              layout_cmpacman )
 GAMEL( 198?, cmtetriskr, cmtetris, cmtetriskr,cmtetris, cmaster_state,  init_cmtetriskr,ROT0, "<unknown>",               "Tetris + Global Money Fever (Corsica, v8.01, Korean bootleg)",             MACHINE_NOT_WORKING,                            layout_cmpacman ) // starts with coins already inserted in Tetris mode, need to press K/L to switch between games...
 GAMEL( 198?, cmtetrisd,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisd, ROT0, "bootleg (Aidonis Games)", "Tetris + Cherry Master (Aidonis Games bootleg)",                           0,                                              layout_cmpacman ) // seems to have been hacked to run the slot game as default, see 0x8ba8
-GAMEL( 1997, crazybon,   0,        crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 1)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
-GAMEL( 1997, crazybona,  crazybon, crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 2)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon )
+GAMEL( 1997, crazybon,   0,        crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 1)",                                         0,                                              layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
+GAMEL( 1997, crazybona,  crazybon, crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 2)",                                         0,                                              layout_crazybon )
 GAMEL( 1997, crazybonb,  crazybon, crazybonb, pkrmast,  cmaster_state,  init_crazybonb, ROT0, "bootleg (TV Games)",      "Crazy Bonus 2002 (Ver. 1, set 3)",                                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS, layout_crazybon ) // F.B. & POKER 94, VER.1 in NVRAM, decryption seems ok, possibly needs proper memory map
 GAMEL( 1988, lucky8tet,  lucky8,   lucky8tet, lucky8tet, wingco_state,  init_l8tet,     ROT0, "bootleg",                 "Tetris + New Lucky 8 Lines (W-4 + W4BET-VID sub board with MCU)",          MACHINE_UNEMULATED_PROTECTION,                  layout_lucky8p1 )
 
