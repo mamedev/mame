@@ -7,10 +7,9 @@
  ***********************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "cpu/mcs48/mcs48.h"
 #include "decocass.h"
-#include "decocass_tape.h"
+
+#include "cpu/m6502/m6502.h"
 
 /* dongle type #1: jumpers C and D assignments */
 #define MAKE_MAP(m0,m1,m2,m3,m4,m5,m6,m7)   \
@@ -24,7 +23,7 @@
 	((uint32_t)(m7) << 21)
 
 
-#define T1MAP(x, m) (((m)>>(x*3))&7)
+#define T1MAP(x, m) (((m) >> (x * 3)) & 7)
 
 
 
@@ -1568,7 +1567,6 @@ MACHINE_RESET_MEMBER(decocass_type3_state,cfishing)
 	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_01;
-
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cbtime)
@@ -1576,7 +1574,6 @@ MACHINE_RESET_MEMBER(decocass_type3_state,cbtime)
 	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_12;
-
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cburnrub)
@@ -1675,7 +1672,6 @@ MACHINE_RESET_MEMBER(decocass_type3_state,cfghtice)
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_25;
 }
-
 
 
 

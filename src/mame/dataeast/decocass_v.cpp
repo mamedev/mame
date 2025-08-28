@@ -521,8 +521,8 @@ void decocass_state::decocass_center_v_shift_w(uint8_t data)
  ********************************************/
 
 void decocass_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect, int color,
-						int sprite_y_adjust, int sprite_y_adjust_flip_screen,
-						uint8_t *sprite_ram, int interleave)
+		int sprite_y_adjust, int sprite_y_adjust_flip_screen,
+		uint8_t *sprite_ram, int interleave)
 {
 	/* Draw the sprites */
 	int offs = 28 * interleave;
@@ -569,8 +569,8 @@ void decocass_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &priority, c
 
 
 void decocass_state::draw_missiles(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect,
-						int missile_y_adjust, int missile_y_adjust_flip_screen,
-						uint8_t *missile_ram, int interleave)
+		int missile_y_adjust, int missile_y_adjust_flip_screen,
+		uint8_t *missile_ram, int interleave)
 {
 	/* Draw the missiles (16 of them) seemingly with alternating colors
 	 * from the E302 latch (color_missiles) */
@@ -653,7 +653,7 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		srcbitmap = &m_bg_tilemap_r->pixmap();
 	}
 
-//  printf("m_mode_set %d\n", m_mode_set & 0x3);
+	//printf("m_mode_set %d\n", m_mode_set & 0x3);
 
 	// technically our y drawing probably shouldn't wrap / mask, but simply draw the 128pixel high 'edge' at the requested position
 	//  see note above this funciton
@@ -729,7 +729,6 @@ uint32_t decocass_state::screen_update_decocass(screen_device &screen, bitmap_in
 		m_watchdog->watchdog_reset();
 
 	/* (end) THIS CODE SHOULD NOT BE IN SCREEN UPDATE !! */
-
 
 #ifdef MAME_DEBUG
 	{
