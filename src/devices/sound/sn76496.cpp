@@ -233,7 +233,7 @@ void sn76496_base_device::device_start()
 	for (int i = 0; i < 8; i += 2)
 	{
 		m_register[i] = 0;
-		m_register[i + 1] = 0x0; // volume = 0x0 (max volume) on reset; this needs testing on chips other than SN76489A and Sega VDP PSG
+		m_register[i + 1] = m_sega_style_psg ? 0xf : 0; // volume = 0x0 (max volume) on reset; this needs testing on chips other than SN76489A and Sega VDP PSG
 	}
 
 	for (int i = 0; i < 4; i++)
@@ -272,7 +272,7 @@ void sn76496_base_device::device_start()
 	m_vol_table[15] = 0;
 
 	for (int i = 0; i < 4; i++)
-		m_volume[i] = m_vol_table[8];
+		m_volume[i] = m_vol_table[m_register[i * 2 + 1]];
 
 	m_ready_state = true;
 
