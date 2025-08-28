@@ -22,8 +22,7 @@ u39 at89s51 second mcu for protection.
 // TODO:
 Need hardware info.
 Hook up nvram inputs opll and adpcm.
-east8 Has undumped mcu and adpcm rom.
-Only the mcu dump was From the set 2. Marking Bad dump for now
+east8a Only the mcu dump was From the east8. Marking Bad dump for now
 
 Need Layout as and Add segment display as marywu.cpp
 */
@@ -62,7 +61,7 @@ protected:
 
 };
 
-static INPUT_PORTS_START( orientp )
+static INPUT_PORTS_START( east8 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -168,7 +167,7 @@ ROM_START( east8 )
 
     ROM_END
 
-ROM_START( east8b )
+ROM_START( east8a )
 	ROM_REGION( 0x10000, "maincpu", 0 ) 
 	ROM_LOAD( "w27c512.u33", 0x00000, 0x10000, CRC(8d3d1e91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // Main program.  EAST8  v1.05 string
 
@@ -186,5 +185,5 @@ ROM_START( east8b )
 
 
 //   YEAR   NAME    PARENT   MACHINE    INPUT    STATE                INIT        ROT    COMPANY       FULLNAME                 FLAGS
-GAME( 200?, east8,   0,       orientp,   orientp, orientalpearl_state, empty_init, ROT0, "<unknown>", " Unknown EAST8 Set 1 (v1.00)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 200?, east8a,  0,       orientp,   orientp, orientalpearl_state, empty_init, ROT0, "<unknown>", " Unknown EAST8 Set 2 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, east8,   0,       orientp,   east8, orientalpearl_state, empty_init, ROT0, "<unknown>", " Unknown EAST8 Set 1 (v1.00)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, east8a,  0,       orientp,   east8, orientalpearl_state, empty_init, ROT0, "<unknown>", " Unknown EAST8 Set 2 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
