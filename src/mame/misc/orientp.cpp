@@ -137,10 +137,11 @@ void orientalpearl_state::orientp(machine_config &config)
 	i8052_device &maincpu(I8052(config, "maincpu", XTAL(10'738'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &orientalpearl_state::program_map);
 	maincpu.set_addrmap(AS_IO, &orientalpearl_state::io_map);
-	
-	i8051_device &maincpu(I80C51(config, "mcu", XTAL(10'738'000)));
-	maincpu.set_addrmap(AS_PROGRAM, &orientalpearl_state::mcu_map);
-	maincpu.set_addrmap(AS_IO, &orientalpearl_state::mcu_io_map);
+   	
+	i8051_device &kbdcpu(I8051(config, "mcu", XTAL(10'738'000)));
+
+	mcu.set_addrmap(AS_PROGRAM, &orientalpearl_state::mcu_map);
+	mcu.set_addrmap(AS_IO, &orientalpearl_state::mcu_io_map);
 	
 	/* Keyboard & display interface */
 	I8279(config, "kdc", XTAL(10'738'000) / 6); 
