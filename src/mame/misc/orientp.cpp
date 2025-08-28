@@ -180,6 +180,18 @@ void orientalpearl_state::orientp(machine_config &config)
 
 ROM_START( east8a )
 	ROM_REGION( 0x10000, "maincpu", 0 ) 
+	ROM_LOAD( "27c512.u33", 0x00000, 0x10000, CRC(85e28db5) SHA1(96f80a7d2214672c09b8f719cb573e77b8bac731) ) // Main program.  EAST8  v1.00 string
+
+    ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 )
+    ROM_LOAD( "at89s51.u39", 0x0000, 0x1000,   CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. 
+ 
+    ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
+    ROM_LOAD( "27c5020.bin", 0x00000, 0x40000, NO_DUMP ) //  Voices Rom
+
+    ROM_END
+
+ROM_START( east8b )
+	ROM_REGION( 0x10000, "maincpu", 0 ) 
 	ROM_LOAD( "w27c512.u33", 0x00000, 0x10000, CRC(8d3d1e91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // Main program.  EAST8  v1.05 string
 
     ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 )
@@ -190,17 +202,7 @@ ROM_START( east8a )
 
     ROM_END
 
-ROM_START( east8b )
-	ROM_REGION( 0x10000, "maincpu", 0 ) 
-	ROM_LOAD( "27c512.u33", 0x00000, 0x10000, CRC(85e28db5) SHA1(96f80a7d2214672c09b8f719cb573e77b8bac731) ) // Main program.  EAST8  v1.00 string
 
-    ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 )
-    ROM_LOAD( "at89s51.u39", 0x0000, 0x1000,   CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. 
- 
-    ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
-    ROM_LOAD( "27c5020.bin", 0x00000, 0x40000, NO_DUMP ) //  Voices Rom
-
-    ROM_END
 
 } // anonymous namespace
 
