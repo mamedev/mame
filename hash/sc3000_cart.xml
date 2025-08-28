@@ -36,7 +36,7 @@ license:CC0-1.0
 
 	<!-- Two variants of this cart exist: A "Level A" cart that only contains 16k of RAM, and a "Level B" with 32k.
 	     Both of these have the same program data, the only difference is the amount of RAM. -->
-	<software name="basic3e" cloneof="basic311">
+	<software name="basic3e" cloneof="basic3">
 		<description>BASIC Level III (Export)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
