@@ -139,8 +139,7 @@ void orientalpearl_state::orientp(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &orientalpearl_state::io_map);
    	
 	i8051_device &kbdcpu(I8051(config, "mcu", XTAL(10'738'000)));
-
-	mcu.set_addrmap(AS_PROGRAM, &orientalpearl_state::mcu_map);
+    mcu.set_addrmap(AS_PROGRAM, &orientalpearl_state::mcu_map);
 	mcu.set_addrmap(AS_IO, &orientalpearl_state::mcu_io_map);
 	
 	/* Keyboard & display interface */
@@ -150,6 +149,7 @@ void orientalpearl_state::orientp(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &psg(AY8910(config, "psg", XTAL(10'738'000) / 6));
 	psg.add_route(ALL_OUTPUTS, "mono", 1.0);
+
 	ym2413_device &opll(YM2413(config, "opll", 3.579545_MHz_XTAL));
 	opll.add_route(ALL_OUTPUTS, "mono", 1.0);
 
