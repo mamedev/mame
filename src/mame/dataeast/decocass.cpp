@@ -130,7 +130,7 @@ void decocass_state::decocass_map(address_map &map)
 void decocass_state::decocrom_map(address_map &map)
 {
 	decocass_map(map);
-	map(0x6000, 0xafff).bankr("bank").w(FUNC(decocass_state::decocass_de0091_w));
+	map(0x6000, 0xafff).bankr(m_rombank).w(FUNC(decocass_state::decocass_de0091_w));
 	map(0xe900, 0xe900).w(FUNC(decocass_state::decocass_e900_w));
 }
 
@@ -2106,17 +2106,10 @@ void decocass_state::init_decocrom()
 
 uint8_t decocass_state::cdsteljn_input_r(offs_t offset)
 {
-	uint8_t res;
-	static const char *const portnames[2][4] = {
-		{"P1_MP0", "P1_MP1", "P1_MP2", "P1_MP3"},
-		{"P2_MP0", "P2_MP1", "P2_MP2", "P2_MP3"} };
-
 	if(offset & 6)
 		return decocass_input_r(offset);
-
-	res = ioport(portnames[offset & 1][m_mux_data])->read();
-
-	return res;
+	else
+		return m_muxport[BIT(offset, 0)][m_mux_data]->read();
 }
 
 void decocass_state::cdsteljn_mux_w(uint8_t data)

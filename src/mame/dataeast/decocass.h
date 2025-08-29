@@ -49,6 +49,7 @@ public:
 		, m_inputs(*this, "IN%u", 0)
 		, m_analog(*this, "AN%u", 0)
 		, m_dsw(*this, "DSW%u", 1)
+		, m_muxport{ { *this, "P1_MP%u", 0U }, { *this, "P2_MP%u", 0U } }
 		, m_rambase(*this, "rambase")
 		, m_charram(*this, "charram")
 		, m_fgvideoram(*this, "fgvideoram")
@@ -101,6 +102,7 @@ private:
 	required_ioport_array<3> m_inputs;
 	required_ioport_array<4> m_analog;
 	required_ioport_array<2> m_dsw;
+	optional_ioport_array<4> m_muxport[2];
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_rambase;

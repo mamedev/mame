@@ -11,19 +11,28 @@
 
 #include "cpu/m6502/m6502.h"
 
-/* dongle type #1: jumpers C and D assignments */
-#define MAKE_MAP(m0,m1,m2,m3,m4,m5,m6,m7)   \
-	((uint32_t)(m0)) | \
-	((uint32_t)(m1) << 3) | \
-	((uint32_t)(m2) << 6) | \
-	((uint32_t)(m3) << 9) | \
-	((uint32_t)(m4) << 12) | \
-	((uint32_t)(m5) << 15) | \
-	((uint32_t)(m6) << 18) | \
-	((uint32_t)(m7) << 21)
+
+namespace {
+
+// dongle type #1: jumpers C and D assignments
+constexpr uint32_t MAKE_MAP(
+		uint32_t m0,
+		uint32_t m1,
+		uint32_t m2,
+		uint32_t m3,
+		uint32_t m4,
+		uint32_t m5,
+		uint32_t m6,
+		uint32_t m7)
+{
+	return m0 | (m1 << 3) | (m2 << 6) | (m3 << 9) | (m4 << 12) | (m5 << 15) | (m6 << 18) | (m7 << 21);
+}
 
 
-#define T1MAP(x, m) (((m) >> (x * 3)) & 7)
+constexpr uint32_t T1MAP(unsigned x, uint32_t m)
+{
+	return (m >> (x * 3)) & 7;
+}
 
 
 
@@ -40,6 +49,8 @@ enum {
 	TYPE3_SWAP_56,
 	TYPE3_SWAP_67
 };
+
+} // anonymous namespace
 
 
 void decocass_state::decocass_coin_counter_w(uint8_t data)
