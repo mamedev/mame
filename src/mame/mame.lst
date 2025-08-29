@@ -40009,6 +40009,9 @@ mt32
 @source:roland/roland_mt80s.cpp
 mt80s
 
+@source:roland/roland_pg1000.cpp
+pg1000
+
 @source:roland/roland_pr100.cpp
 pr100
 pr100_201

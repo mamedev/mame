@@ -202,6 +202,7 @@ protected:
 	virtual void configure_ops();
 	virtual uint8_t read_pc();
 	virtual void write_pc(uint8_t data);
+	void write_smh(uint8_t data);
 
 	static const struct opcode_s s_op48[256];
 	static const struct opcode_s s_op4C[256];

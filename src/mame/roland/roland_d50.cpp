@@ -9,7 +9,6 @@
 #include "emu.h"
 
 #include "mb63h149.h"
-#include "pg1000.h"
 
 #include "cpu/upd78k/upd78k3.h"
 #include "machine/bankdev.h"
@@ -207,8 +206,6 @@ void roland_d50_state::d50(machine_config &config)
 	//keyscan.int_callback().set_inputline(m_maincpu, upd78312_device::INT2_LINE);
 
 	//MB87136(config, "synthe", 32.768_MHz_XTAL);
-
-	PG1000(config, "programmer");
 }
 
 void roland_d50_state::d550(machine_config &config)
