@@ -601,12 +601,12 @@ void esq1_state::duart_output(uint8_t data)
 {
 	int bank = m_adc_poll_target = ((data >> 1) & 0x7);
 	LOG("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
-	LOG("%s [%02x] bank %d => offset %x\n", machine().describe_context().c_str(), data, bank, bank * 0x1000);
+	LOG("%s [%02x] bank %d => offset %x\n", machine().describe_context(), data, bank, bank * 0x1000);
 	membank("osbank")->set_base(memregion("osrom")->base() + (bank * 0x1000) );
 
 	m_seq_bank = (data & 0x8) ? 0x8000 : 0x0000;
 	m_seq_bank += ((data>>1) & 3) * 0x2000;
-	LOG("seqram_bank = %x\n", state->m_seq_bank);
+	LOG("seqram_bank = %x\n", m_seq_bank);
 }
 
 void esq1_state::send_through_panel(uint8_t data)
