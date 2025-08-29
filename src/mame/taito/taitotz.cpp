@@ -3013,8 +3013,8 @@ ROM_END
 
 GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, empty_init,    ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )
 GAME( 1999, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgear, ROT0, "Taito", "Battle Gear (VER.2.40A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, init_landhigh, ROT0, "Taito", "Landing High Japan (VER.2.01OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, init_landhigha,ROT0, "Taito", "Landing High Japan (VER.2.02O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, init_landhigh, ROT0, "Taito", "Landing High Japan (VER.2.01OK, no sub monitor)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // pitch/roll indicator on main screen
+GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, init_landhigha,ROT0, "Taito", "Landing High Japan (VER.2.02O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // pitch/roll indicator on sub monitor, requires sub monitor-compatible board
 GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, init_pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (VER.2.07J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1999/8/5 19:13:35
 GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgr2,  ROT0, "Taito", "Battle Gear 2 (VER.2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 2000, batlgr2a,  batlgr2,  taitotz,  batlgr2,  taitotz_state, init_batlgr2a, ROT0, "Taito", "Battle Gear 2 (VER.2.01J, Side by Side conversion)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN ) // "BATTLE GEAR2(S)" on test menu
