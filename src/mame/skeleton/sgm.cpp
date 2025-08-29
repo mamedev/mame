@@ -187,5 +187,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004?, wpddz,    0, wpddz, wpddz, sgm_state, empty_init, ROT0, "SGM", "Wang Pai Dou Dizhou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?,  dajiaddz, 0, wpddz, wpddz, sgm_state, empty_init, ROT0, "SGM", "Dajia Dou Dizhou",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004?, wpddz,    0, wpddz, wpddz, sgm_state, empty_init, ROT0, "SGM", "Wang Pai Dou Dizhu", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?,  dajiaddz, 0, wpddz, wpddz, sgm_state, empty_init, ROT0, "SGM", "Dajia Dou Dizhu",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
