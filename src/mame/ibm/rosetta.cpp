@@ -22,6 +22,7 @@
 #define LOG_RELOAD  (1U << 2)
 #define LOG_ECC     (1U << 3)
 #define LOG_INVALID (1U << 4)
+#define LOG_LED     (1U << 5)
 
 //#define VERBOSE (LOG_GENERAL|LOG_TLB|LOG_RELOAD|LOG_ECC|LOG_INVALID)
 #include "logmacro.h"
@@ -833,7 +834,7 @@ u32 rosetta_device::rca_r(offs_t offset)
 
 	if (!m_led_lock)
 	{
-		LOG("led 0x%02x (%s)\n", u8(offset), machine().describe_context());
+		LOGMASKED(LOG_LED, "led 0x%02x (%s)\n", u8(offset), machine().describe_context());
 
 		m_leds[0] = led_pattern[(offset >> 0) & 15];
 		m_leds[1] = led_pattern[(offset >> 4) & 15];
