@@ -443,6 +443,7 @@ CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_g
 // unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
 CONS( 201?, smatomo,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Smatomo (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+// company is called 深圳市飞讯互动科技有限公司
 // very generic packaging, boots from SPI, has game data on SD card (mostly NES games)
 CONS( 202?, intrtvg,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "Interactive Game Console (Model B608, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // also very generic packaging, similar SD card content to above, including NES games, but with some extra music/videos for the dance part
