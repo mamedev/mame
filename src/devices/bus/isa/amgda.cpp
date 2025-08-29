@@ -170,7 +170,7 @@ void isa16_amgda_device::device_start()
 	m_isa->install_memory(0xd0'0000, 0xd1'ffff, *this, &isa16_amgda_device::mem_map);
 
 	// TODO: ISA bus shared interrupt 11 enable
-	m_isa->space(isa16_device::AS_ISA_IO).install_write_tap(0x06f3, 0x06f3, "irq_arm", [this](offs_t offset, u8 &data, u8 mem_mask) { irq_w(0); });
+	//m_isa->space(isa16_device::AS_ISA_IO).install_write_tap(0x06f3, 0x06f3, "irq_arm", [this](offs_t offset, u8 &data, u8 mem_mask) { irq_w(0); });
 }
 
 void isa16_amgda_device::device_reset()
