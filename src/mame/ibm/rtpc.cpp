@@ -143,7 +143,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void iocc_mem_map(address_map &map);
 	template <bool SCC> void iocc_pio_map(address_map &map) ATTR_COLD;
@@ -264,8 +264,11 @@ void rtpc_state::machine_start()
 	m_crrb = 0xff;
 }
 
-void rtpc_state::machine_reset()
+void rtpc_state::device_reset()
 {
+	offs_t const mask = m_ipl.bytes() - 1;
+
+	m_cpu->space(AS_PROGRAM).install_rom(0, mask, 0x00ff'ffff & ~mask, m_ipl);
 }
 
 void rtpc_state::init_common()
