@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /***************************************************************************
 
-    drivers/esq1.c
+    ensoniq/esq1.cpp
 
     Ensoniq ESQ-1 Digital Wave Synthesizer
     Ensoniq ESQ-M (rack-mount ESQ-1)
@@ -53,10 +53,9 @@ IRQ sources are the DUART and the DRQ line from the FDC (SQ-80 only).
 NMI is from the IRQ line on the FDC (again, SQ-80 only).
 
 TODO:
-    - VFD display
     - Keyboard
-]    - Analog filters and VCA on the back end of the 5503 (inaccurate)
-     - duart seems to keep interrupting even after MIDI xmit buffer becomes empty
+     - Analog filters and VCA on the back end of the 5503 (inaccurate)
+     - DUART seems to keep interrupting even after MIDI xmit buffer becomes empty
 
 NOTES:
     Commands from KPC are all 2 bytes
@@ -181,14 +180,21 @@ NOTES:
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "esqpanel.h"
+
 #include "bus/midi/midi.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/input_merger.h"
 #include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
-#include "esqpanel.h"
 #include "sound/es5503.h"
+
 #include "speaker.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
 #include "esq1.lh"
 
 
@@ -469,27 +475,26 @@ void esq1_state::sq80_es5503_map(address_map &map)
 uint8_t esq1_state::esq1_adc_read()
 {
 	uint8_t value;
-	switch (m_adc_poll_target)
-	{
-		case 0: // VALV
+	switch(m_adc_poll_target) {
+	case 0: // VALV
 		value = m_data_entry_slider->read();
 		break;
 
-		case 1: // PEDV - Expression Pedal / CV input
+	case 1: // PEDV - Expression Pedal / CV input
 		value = 0;
 		break;
 
-		case 2: // PITV
+	case 2: // PITV
 		value = m_pitch_wheel->read();
 		break;
 
-		case 3: // MODV
+	case 3: // MODV
 		value = m_mod_wheel->read();
 		break;
 
-		case 4: // FILV
-		case 5: // BATV
-		default:
+	case 4: // FILV
+	case 5: // BATV
+	default:
 		value = 0;
 		break;
 	}
@@ -499,7 +504,7 @@ uint8_t esq1_state::esq1_adc_read()
 void esq1_state::machine_reset()
 {
 	// set default OSROM banking
-	membank("osbank")->set_base(memregion("osrom")->base() );
+	membank("osbank")->set_base(memregion("osrom")->base());
 
 	m_mapper_state = 1;
 	m_seq_bank = 0;
@@ -520,7 +525,7 @@ void esq1_state::mapper_w(uint8_t data)
 {
 	m_mapper_state = (data & 1);
 
-//    printf("mapper_state = %d\n", data ^ 1);
+	LOG("mapper_state = %d\n", data ^ 1);
 }
 
 void esq1_state::analog_w(offs_t offset, uint8_t data)
@@ -537,24 +542,18 @@ void esq1_state::analog_w(offs_t offset, uint8_t data)
 
 uint8_t esq1_state::seqdosram_r(offs_t offset)
 {
-	if (m_mapper_state)
-	{
+	if (m_mapper_state) {
 		return m_dosram[offset];
-	}
-	else
-	{
+	} else {
 		return m_seqram[offset + m_seq_bank];
 	}
 }
 
 void esq1_state::seqdosram_w(offs_t offset, uint8_t data)
 {
-	if (m_mapper_state)
-	{
+	if (m_mapper_state) {
 		m_dosram[offset] = data;
-	}
-	else
-	{
+	} else {
 		m_seqram[offset + m_seq_bank] = data;
 	}
 }
@@ -601,13 +600,13 @@ void esq1_state::sq80_map(address_map &map)
 void esq1_state::duart_output(uint8_t data)
 {
 	int bank = m_adc_poll_target = ((data >> 1) & 0x7);
-//  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
-//  printf("%s [%02x] bank %d => offset %x\n", machine().describe_context().c_str(), data, bank, bank * 0x1000);
+	LOG("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
+	LOG("%s [%02x] bank %d => offset %x\n", machine().describe_context().c_str(), data, bank, bank * 0x1000);
 	membank("osbank")->set_base(memregion("osrom")->base() + (bank * 0x1000) );
 
 	m_seq_bank = (data & 0x8) ? 0x8000 : 0x0000;
 	m_seq_bank += ((data>>1) & 3) * 0x2000;
-//    printf("seqram_bank = %x\n", state->m_seq_bank);
+	LOG("seqram_bank = %x\n", state->m_seq_bank);
 }
 
 void esq1_state::send_through_panel(uint8_t data)
@@ -618,23 +617,20 @@ void esq1_state::send_through_panel(uint8_t data)
 INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 {
 	u8 offset = 0;
-	if (strncmp(machine().basename().c_str(), "sq80", 4) == 0)
-	 {
-		if (!kpc_calibrated)
-		 { // ack SQ80 keyboard calibration
+	// FIXME: get rid of short name checks
+	if(strncmp(machine().basename().c_str(), "sq80", 4) == 0) {
+		if (!kpc_calibrated) {
+			// ack SQ80 keyboard calibration
 			send_through_panel((u8)0xff);
 			kpc_calibrated = true;
 		}
 		offset = 2; // SQ80 keycodes are offset by -2
 	}
 
-	if (oldval == 0 && newval == 1)
-	{
+	if(oldval == 0 && newval == 1) {
 		send_through_panel((u8)param - offset);
 		send_through_panel((u8)0x00);
-	}
-	else if (oldval == 1 && newval == 0)
-	{
+	} else if(oldval == 1 && newval == 0) {
 		send_through_panel(((u8)param - offset)&0x7f);
 		send_through_panel((u8)0x00);
 	}
@@ -642,13 +638,10 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 
 INPUT_CHANGED_MEMBER(esq1_state::internal_kbd_key_stroke)
 {
-	if (oldval == 0 && newval == 1)
-	{
+	if(oldval == 0 && newval == 1) {
 		send_through_panel((u8)param);
 		send_through_panel((u8)0x01);
-	}
-	else if (oldval == 1 && newval == 0)
-	{
+	} else if(oldval == 1 && newval == 0) {
 		send_through_panel(((u8)param)&0x7f);
 		send_through_panel((u8)0x01);
 	}
@@ -704,6 +697,7 @@ void esq1_state::esq1(machine_config &config)
 void esq1_state::sq80(machine_config &config)
 {
 	esq1(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq1_state::sq80_map);
 
 	m_es5503->set_addrmap(0, &esq1_state::sq80_es5503_map);
