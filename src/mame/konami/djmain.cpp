@@ -2,6 +2,7 @@
 // copyright-holders:smf
 /*
  *  Beatmania DJ Main Board (GQ753)
+ *  PCB label is "DMAIN", but the manuals call it "DJ_MAIN".
  *
  *  Product numbers: (x: Q = full cabinet, C = conversion kit)
  *  GQ753 beatmania (first release in 1997.12)
