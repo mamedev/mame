@@ -99,8 +99,10 @@
   the others, as in real life.
 
   15/02/2010: Lord Nightmare & Michael Zapf (additional testing by PlgDavid)
-  Fix noise period when set to mirror channel 3 and channel 3 period is set to 0 (tested on hardware for noise, wave needs tests) - MZ
-  Fix phase of noise on sn94624 and sn76489; all chips use a standard XOR, the only inversion is the output itself - LN, Plgdavid
+  Fix noise period when set to mirror channel 3 and channel 3 period is set to 0
+  (tested on hardware for noise, wave needs tests) - MZ
+  Fix phase of noise on sn94624 and sn76489; all chips use a standard XOR, the only
+  inversion is the output itself - LN, Plgdavid
   Thanks to PlgDavid and Michael Zapf for providing samples which helped immensely here.
 
   23/02/2011: Lord Nightmare & Enik
@@ -137,6 +139,10 @@
   * verify NCR8496/PSSJ-3 behavior on write to mirrored registers; unlike the
     other variants, the NCR-derived variants are implied to ignore writes to
     regs 1,3,5,6,7 if 0x80 is not set. This needs to be verified on real hardware.
+
+  BTANB:
+  * Unless the registers are quickly initialized by software, non-Sega chips
+    output a low-pitch beep at cold boot, eg. bbcm, bankp, exedexes, docastle.
 
 ***************************************************************************/
 
@@ -239,8 +245,8 @@ void sn76496_base_device::device_start()
 	for (int i = 0; i < 4; i++)
 	{
 		m_output[i] = 0;
+		m_count[i] = 0;
 		m_period[i] = (m_sega_style_psg || i == 3) ? 0 : 0x400;
-		m_count[i] = (m_sega_style_psg || i == 3) ? 0 : 0x400;
 	}
 
 	m_RNG = m_feedback_mask;
