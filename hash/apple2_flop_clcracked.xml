@@ -41018,8 +41018,7 @@ license:CC0-1.0
 		<description>Mathematics Action Games: Frog Jump: Ordering Numbers (4am crack)</description>
 		<year>1985</year>
 		<publisher>Scott, Foresman and Company</publisher>
-		<info name="developer" value="Scott" />
-		<info name="developer" value="Foresman and Company" />
+		<info name="developer" value="Scott, Foresman and Company" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2014-05-10 -->
@@ -41035,8 +41034,7 @@ license:CC0-1.0
 		<description>Mathematics Action Games: Picture Parts: Basic Operations (4am crack)</description>
 		<year>1985</year>
 		<publisher>Scott, Foresman and Company</publisher>
-		<info name="developer" value="Scott" />
-		<info name="developer" value="Foresman and Company" />
+		<info name="developer" value="Scott, Foresman and Company" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-12-18 -->
@@ -41052,8 +41050,7 @@ license:CC0-1.0
 		<description>Mathematics Action Games: Pyramid Puzzler (4am crack)</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
-		<info name="developer" value="Scott" />
-		<info name="developer" value="Foresman and Company" />
+		<info name="developer" value="Scott, Foresman and Company" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-01-25. Redumped: 2021-08-28 Redumped: 2021-08-28 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
@@ -41085,8 +41082,7 @@ license:CC0-1.0
 		<description>Mathematics Action Games: Star Maze (4am crack)</description>
 		<year>1985</year>
 		<publisher>Scott, Foresman and Company</publisher>
-		<info name="developer" value="Scott" />
-		<info name="developer" value="Foresman and Company" />
+		<info name="developer" value="Scott, Foresman and Company" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2014-12-12 -->
@@ -44371,8 +44367,7 @@ license:CC0-1.0
 		<description>Number Bowling: Decimals and Fractions (4am crack)</description>
 		<year>1985</year>
 		<publisher>Scott, Foresman and Company</publisher>
-		<info name="developer" value="Scott" />
-		<info name="developer" value="Foresman and Company" />
+		<info name="developer" value="Scott, Foresman and Company" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2014-08-13 -->
@@ -52286,8 +52281,7 @@ license:CC0-1.0
 		<description>Strategies in Problem Solving: Dinosaurs and Squids (4am crack)</description>
 		<year>1985</year>
 		<publisher>Scott, Foresman and Company</publisher>
-		<info name="developer" value="Scott" />
-		<info name="developer" value="Foresman and Company" />
+		<info name="developer" value="Scott, Foresman and Company" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-12-31 -->
@@ -56593,9 +56587,7 @@ license:CC0-1.0
 		<description>Thinkers: Mathematics Unlimited Problem Solving (4am crack)</description>
 		<year>1986</year>
 		<publisher>Holt, Rinehart, and Winston</publisher>
-		<info name="developer" value="Holt" />
-		<info name="developer" value="Rinehart" />
-		<info name="developer" value="and Winston" />
+		<info name="developer" value="Holt, Rinehart &amp; Winston" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-12-31 -->

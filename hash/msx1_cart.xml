@@ -22867,8 +22867,7 @@ legacy FM implementations cannot find it.
 		<description>Lotus F3</description>
 		<year>2007</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik" />
-		<info name="developer" value="joyrex" />
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x20000">
@@ -22881,8 +22880,7 @@ legacy FM implementations cannot find it.
 		<description>Lotus F3 (alt)</description>
 		<year>2007</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik" />
-		<info name="developer" value="joyrex" />
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x20000">
@@ -24253,8 +24251,7 @@ legacy FM implementations cannot find it.
 		<description>Peek-A-Boo</description>
 		<year>2008</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik" />
-		<info name="developer" value="joyrex" />
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -24267,8 +24264,7 @@ legacy FM implementations cannot find it.
 		<description>Peek-A-Boo (older)</description>
 		<year>2008</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik" />
-		<info name="developer" value="joyrex" />
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -25719,8 +25715,7 @@ legacy FM implementations cannot find it.
 		<description>Sudoku</description>
 		<year>2006</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik" />
-		<info name="developer" value="joyrex" />
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -27473,8 +27468,7 @@ legacy FM implementations cannot find it.
 		<description>Yahtzee</description>
 		<year>2007</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik" />
-		<info name="developer" value="joyrex" />
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
