@@ -15563,7 +15563,8 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<description>Hexx: Heresy of the Wizard</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
-		<info name="developer" value="A.P. Taglione &amp; P.H. James" />
+		<info name="developer" value="A.P. Taglione" />
+		<info name="developer" value="P.H. James" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Hexx [Psygnosis] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="96e88e9a" sha1="7b7fdeff4a597920ceb40bc0c97b43f5d1a67c0a"/>
