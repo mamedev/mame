@@ -1756,7 +1756,7 @@ void djmain_state::machine_start()
 
 	save_item(NAME(m_sndram_bank));
 	save_item(NAME(m_turntable_select));
-	save_item(NAME(m_turntable_last_pos));
+	//save_item(NAME(m_turntable_last_pos));
 	save_item(NAME(m_turntable_pos));
 	save_item(NAME(m_pending_vb_int));
 	save_item(NAME(m_v_ctrl));
@@ -2707,34 +2707,34 @@ void djmain_state::init_bmfinal()
  *
  *************************************/
 
-GAME( 1997, bm1stmix,  0,        djmainj, bm1stmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania (ver JA-B)", 0 )
-GAME( 1998, bm2ndmix,  0,        djmainj, bm2ndmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-B)", 0 )
-GAME( 1998, bm2ndmixa, bm2ndmix, djmainj, bm2ndmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-A)", 0 )
-GAME( 1998, bm3rdmix,  0,        djmainj, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-B)", 0 )
-GAME( 1998, bm3rdmixa, bm3rdmix, djmainj, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-A)", 0 )
-GAME( 1998, bm3rdmixe, bm3rdmix, djmainu, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver EA-A)", 0 )
-GAME( 1999, bmcompmx,  0,        djmainj, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-C)", 0 )
-GAME( 1999, bmcompmxb, bmcompmx, djmainj, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-B)", 0 )
-GAME( 1999, bmcmxaac,  bmcompmx, djmainu, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver AA-C)", 0 )
-GAME( 1999, hmcompmx,  bmcompmx, djmainu, bmcompmx,  djmain_state, init_hmcompmx,  ROT0, "Konami", "hiphopmania complete MIX (ver UA-B)", 0 )
-GAME( 1999, bscompmx,  bmcompmx, djmainu, bmcompmx,  djmain_state, init_bscompmx,  ROT0, "Konami", "beatstage complete MIX (ver KA-B)", 0 )
-GAME( 1999, bm4thmix,  0,        djmainj, bm4thmix,  djmain_state, init_bm4thmix,  ROT0, "Konami", "beatmania 4th MIX (ver JA-A)", 0 )
-GAME( 1999, bs4thmix,  bm4thmix, djmainu, bm4thmix,  djmain_state, init_bs4thmix,  ROT0, "Konami", "beatstage 4th MIX (ver KA-A)", 0 )
-GAME( 1999, bm5thmix,  0,        djmainj, bm5thmix,  djmain_state, init_bm5thmix,  ROT0, "Konami", "beatmania 5th MIX (ver JA-A)", 0 )
-GAME( 2000, bmcompm2,  0,        djmainj, bm5thmix,  djmain_state, init_bmcompm2,  ROT0, "Konami", "beatmania complete MIX 2 (ver JA-A)", 0 )
-GAME( 2000, hmcompm2,  bmcompm2, djmainu, hmcompm2,  djmain_state, init_hmcompm2,  ROT0, "Konami", "hiphopmania complete MIX 2 (ver UA-A)", 0 )
-GAME( 2000, bmclubmx,  0,        djmainj, bmclubmx,  djmain_state, init_bmclubmx,  ROT0, "Konami", "beatmania Club MIX (ver JA-A)", 0 )
-GAME( 2000, bmdct,     0,        djmainj, bmdct,     djmain_state, init_bmdct,     ROT0, "Konami", "beatmania featuring Dreams Come True (ver JA-A)", 0 )
-GAME( 2000, bmcorerm,  0,        djmainj, bmcorerm,  djmain_state, init_bmcorerm,  ROT0, "Konami", "beatmania CORE REMIX (ver JA-A)", 0 )
-GAME( 2001, bm6thmix,  0,        djmainj, bm6thmix,  djmain_state, init_bm6thmix,  ROT0, "Konami", "beatmania 6th MIX (ver JA-A)", 0 )
-GAME( 2001, bm7thmix,  0,        djmainj, bm6thmix,  djmain_state, init_bm7thmix,  ROT0, "Konami", "beatmania 7th MIX (ver JA-B)", 0 )
-GAME( 2002, bmfinal,   0,        djmainj, bm6thmix,  djmain_state, init_bmfinal,   ROT0, "Konami", "beatmania THE FINAL (ver JA-A)", 0 )
+GAME( 1997, bm1stmix,  0,        djmainj, bm1stmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania (ver JA-B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bm2ndmix,  0,        djmainj, bm2ndmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bm2ndmixa, bm2ndmix, djmainj, bm2ndmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bm3rdmix,  0,        djmainj, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bm3rdmixa, bm3rdmix, djmainj, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bm3rdmixe, bm3rdmix, djmainu, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver EA-A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bmcompmx,  0,        djmainj, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bmcompmxb, bmcompmx, djmainj, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bmcmxaac,  bmcompmx, djmainu, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver AA-C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hmcompmx,  bmcompmx, djmainu, bmcompmx,  djmain_state, init_hmcompmx,  ROT0, "Konami", "hiphopmania complete MIX (ver UA-B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bscompmx,  bmcompmx, djmainu, bmcompmx,  djmain_state, init_bscompmx,  ROT0, "Konami", "beatstage complete MIX (ver KA-B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bm4thmix,  0,        djmainj, bm4thmix,  djmain_state, init_bm4thmix,  ROT0, "Konami", "beatmania 4th MIX (ver JA-A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bs4thmix,  bm4thmix, djmainu, bm4thmix,  djmain_state, init_bs4thmix,  ROT0, "Konami", "beatstage 4th MIX (ver KA-A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bm5thmix,  0,        djmainj, bm5thmix,  djmain_state, init_bm5thmix,  ROT0, "Konami", "beatmania 5th MIX (ver JA-A)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, bmcompm2,  0,        djmainj, bm5thmix,  djmain_state, init_bmcompm2,  ROT0, "Konami", "beatmania complete MIX 2 (ver JA-A)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hmcompm2,  bmcompm2, djmainu, hmcompm2,  djmain_state, init_hmcompm2,  ROT0, "Konami", "hiphopmania complete MIX 2 (ver UA-A)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, bmclubmx,  0,        djmainj, bmclubmx,  djmain_state, init_bmclubmx,  ROT0, "Konami", "beatmania Club MIX (ver JA-A)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, bmdct,     0,        djmainj, bmdct,     djmain_state, init_bmdct,     ROT0, "Konami", "beatmania featuring Dreams Come True (ver JA-A)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, bmcorerm,  0,        djmainj, bmcorerm,  djmain_state, init_bmcorerm,  ROT0, "Konami", "beatmania CORE REMIX (ver JA-A)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, bm6thmix,  0,        djmainj, bm6thmix,  djmain_state, init_bm6thmix,  ROT0, "Konami", "beatmania 6th MIX (ver JA-A)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, bm7thmix,  0,        djmainj, bm6thmix,  djmain_state, init_bm7thmix,  ROT0, "Konami", "beatmania 7th MIX (ver JA-B)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, bmfinal,   0,        djmainj, bm6thmix,  djmain_state, init_bmfinal,   ROT0, "Konami", "beatmania THE FINAL (ver JA-A)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, popn1,     0,        djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music (ver TA-A, HDD 1.01)", 0 )
-GAME( 1998, popn1a,    popn1,    djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music (ver AA-A, HDD 1.00)", 0 )
-GAME( 1998, popn1k,    popn1,    djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music (ver KA-A, HDD 1.01)", 0 ) // KA-A based on filenames provided, no warning message
-GAME( 1998, popn1j,    popn1,    djmainj, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music (ver JA-A, HDD 1.00)", 0 )
-GAME( 1999, popn2,     0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", 0 )
-GAME( 1999, popn3,     0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 3 (ver JA-A)", 0 )
+GAME( 1998, popn1,     0,        djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music (ver TA-A, HDD 1.01)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, popn1a,    popn1,    djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music (ver AA-A, HDD 1.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, popn1k,    popn1,    djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music (ver KA-A, HDD 1.01)", MACHINE_SUPPORTS_SAVE ) // KA-A based on filenames provided, no warning message
+GAME( 1998, popn1j,    popn1,    djmainj, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music (ver JA-A, HDD 1.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, popn2,     0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, popn3,     0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 3 (ver JA-A)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, popnstex,  0,        djmainj, popnstex,  djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Stage EX (ver JB-A)", 0 )
+GAME( 1999, popnstex,  0,        djmainj, popnstex,  djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Stage EX (ver JB-A)", MACHINE_SUPPORTS_SAVE )
