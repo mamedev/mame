@@ -4146,54 +4146,66 @@ static INPUT_PORTS_START( dolmenk )
 	PORT_BIT(  0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Tested at boot
 INPUT_PORTS_END
 
-static GFXDECODE_START( gfx_tharrier )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) // color 0x000-0x0ff
-	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) // color 0x000-0x0ff
+static GFXDECODE_START( gfx_macross_spr )
 	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) // color 0x100-0x1ff
 GFXDECODE_END
 
-static GFXDECODE_START( gfx_macross )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x200, 16 ) // color 0x200-0x2ff
-	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) // color 0x000-0x0ff
-	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) // color 0x100-0x1ff
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_macross2 )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x300, 16 ) // color 0x300-0x3ff
-	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) // color 0x000-0x0ff
+static GFXDECODE_START( gfx_macross2_spr )
 	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 32 ) // color 0x100-0x2ff
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_bioship_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x200, 16 ) // color 0x200-0x2ff
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_powerins_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x400, 0x40 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_powerinsc_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_lsb, 0x400, 0x40 ) // TODO: wrong decode and ROM loading
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_tharrier )
+	GFXDECODE_ENTRY( "fgtile", 0, gfx_8x8x4_packed_msb,               0x000, 16 ) // color 0x000-0x0ff
+	GFXDECODE_ENTRY( "bgtile", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) // color 0x000-0x0ff
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_macross )
+	GFXDECODE_ENTRY( "fgtile", 0, gfx_8x8x4_packed_msb,               0x200, 16 ) // color 0x200-0x2ff
+	GFXDECODE_ENTRY( "bgtile", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) // color 0x000-0x0ff
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_macross2 )
+	GFXDECODE_ENTRY( "fgtile", 0, gfx_8x8x4_packed_msb,               0x300, 16 ) // color 0x300-0x3ff
+	GFXDECODE_ENTRY( "bgtile", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) // color 0x000-0x0ff
+GFXDECODE_END
+
 static GFXDECODE_START( gfx_bjtwin )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) // color 0x000-0x0ff
-	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) // color 0x000-0x0ff
-	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) // color 0x100-0x1ff
+	GFXDECODE_ENTRY( "fgtile", 0, gfx_8x8x4_packed_msb, 0x000, 16 ) // color 0x000-0x0ff
+	GFXDECODE_ENTRY( "bgtile", 0, gfx_8x8x4_packed_msb, 0x000, 16 ) // color 0x000-0x0ff
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_bioship )
 	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x300, 16 ) // color 0x300-0x3ff
 	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) // color 0x100-0x1ff
-	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x200, 16 ) // color 0x200-0x2ff
 	GFXDECODE_ENTRY( "bg2tile", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) // color 0x000-0x0ff
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_strahl )
 	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) // color 0x000-0x0ff
 	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x300, 16 ) // color 0x300-0x3ff
-	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) // color 0x100-0x1ff
 	GFXDECODE_ENTRY( "bg2tile", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x200, 16 ) // color 0x200-0x2ff
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_powerins )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x200, 0x10 )  // TODO: confirm values (is it same that macross2 one?)
-	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 0x20 )
-	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x400, 0x40 )
+	GFXDECODE_ENTRY( "fgtile", 0, gfx_8x8x4_packed_msb,               0x200, 0x10 )  // TODO: confirm values (is it same that macross2 one?)
+	GFXDECODE_ENTRY( "bgtile", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 0x20 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_powerinsc )
-	GFXDECODE_ENTRY( "bgtile",  0x280000, gfx_8x8x4_packed_lsb,               0x200, 0x10 )
-	GFXDECODE_ENTRY( "bgtile",  0,        gfx_8x8x4_col_2x2_group_packed_lsb, 0x000, 0x20 )
-	GFXDECODE_ENTRY( "sprites", 0,        gfx_8x8x4_col_2x2_group_packed_lsb, 0x400, 0x40 ) // TODO: wrong decode and ROM loading
+	GFXDECODE_ENTRY( "bgtile", 0x280000, gfx_8x8x4_packed_lsb,               0x200, 0x10 )
+	GFXDECODE_ENTRY( "bgtile", 0,        gfx_8x8x4_col_2x2_group_packed_lsb, 0x000, 0x20 )
 GFXDECODE_END
 
 
@@ -4335,6 +4347,7 @@ void nmk16_state::set_screen_lowres(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(12'000'000)/2);
+	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_screen_size(92+348, 16+240);
 	m_spritegen->set_max_sprite_clock(384 * 263); // from hardware manual
 	m_spritegen->set_videoshift(92);
@@ -4348,6 +4361,7 @@ void nmk16_state::set_screen_midres(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(14'000'000)/2);
+	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_mask(0x3ff, 0x3ff);
 	m_spritegen->set_screen_size(60+380, 16+240);
 	m_spritegen->set_max_sprite_clock(448 * 263); // not verified?
@@ -4361,6 +4375,7 @@ void nmk16_state::set_screen_hires(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(16'000'000)/2);
+	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_screen_size(28+412, 16+240);
 	m_spritegen->set_max_sprite_clock(512 * 263); // not verified?
 	m_spritegen->set_videoshift(28+64);
@@ -4555,6 +4570,7 @@ void nmk16_state::tharrier(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_spritegen->set_ext_callback(FUNC(nmk16_state::get_sprite_flip));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_tharrier));
@@ -4610,6 +4626,7 @@ void nmk16_state::mustang(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -4652,6 +4669,7 @@ void nmk16_state::mustangb(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -4690,6 +4708,7 @@ void nmk16_state::mustangb3(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -4726,6 +4745,7 @@ void nmk16_state::bioship(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_bioship_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_strahl));
 
@@ -4764,6 +4784,7 @@ void nmk16_state::vandyke(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -4804,6 +4825,7 @@ void nmk16_state::vandykeb(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -4828,11 +4850,12 @@ void nmk16_state::acrobatm(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 768);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	// sound hardware
@@ -4872,11 +4895,12 @@ void nmk16_state::acrobatmbl(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config); // TODO: video XTAL is 12 MHz
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 768);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
@@ -4919,6 +4943,7 @@ void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden so
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -4960,6 +4985,7 @@ void nmk16_state::tdragonb2(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -4984,6 +5010,7 @@ void nmk16_state::tdragon(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -5070,7 +5097,7 @@ void macross_prot_state::device_post_load()
 		// Force graphics unscrambling now
 		decode_nmk214();
 		m_gfxdecode->gfx(1)->mark_all_dirty(); // background tiles
-		m_gfxdecode->gfx(2)->mark_all_dirty(); // sprites
+		m_spritegen->gfx(0)->mark_all_dirty(); // sprites
 		m_bg_tilemap[0]->mark_all_dirty();
 		m_gfx_decoded = true;
 	}
@@ -5130,6 +5157,7 @@ void nmk16_state::ssmissin(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -5157,11 +5185,12 @@ void nmk16_state::strahl(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_strahl));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_strahl);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,strahl)
 
 	// sound hardware
@@ -5197,11 +5226,12 @@ void nmk16_state::strahljbl(machine_config &config)
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_strahl));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_strahl);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,strahl)
 
 	SPEAKER(config, "mono").front_center();
@@ -5231,6 +5261,7 @@ void nmk16_state::hachamf(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -5308,6 +5339,7 @@ void nmk16_state::macross(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -5346,6 +5378,7 @@ void nmk16_state::blkheart(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -5383,6 +5416,7 @@ void nmk16_state::gunnail(machine_config &config)
 
 	// video hardware
 	set_screen_hires(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -5450,6 +5484,7 @@ void nmk16_state::macross2(machine_config &config)
 
 	// video hardware
 	set_screen_hires(config);
+	m_spritegen->set_info(gfx_macross2_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_5bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -5494,6 +5529,7 @@ void nmk16_state::tdragon2(machine_config &config)
 
 	// video hardware
 	set_screen_hires(config);
+	m_spritegen->set_info(gfx_macross2_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_5bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -5555,6 +5591,7 @@ void nmk16_state::raphero(machine_config &config)
 
 	// video hardware
 	set_screen_hires(config);
+	m_spritegen->set_info(gfx_macross2_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_5bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
@@ -5595,6 +5632,7 @@ void nmk16_state::bjtwin(machine_config &config)
 
 	// video hardware
 	set_screen_hires(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_bjtwin));
 
@@ -5647,7 +5685,7 @@ void macross_prot_state::mcu_port3_to_214_w(u8 data)
 			{
 				decode_nmk214();
 				m_gfxdecode->gfx(1)->mark_all_dirty(); // background tiles
-				m_gfxdecode->gfx(2)->mark_all_dirty(); // sprites
+				m_spritegen->gfx(0)->mark_all_dirty(); // sprites
 				m_bg_tilemap[0]->mark_all_dirty();
 				m_gfx_decoded = true;
 			}
@@ -5730,6 +5768,7 @@ void nmk16_state::powerins(machine_config &config)
 
 	// video hardware
 	set_screen_midres(config);
+	m_spritegen->set_info(gfx_powerins_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_6bit));
 	m_spritegen->set_ext_callback(FUNC(nmk16_state::get_flip_extcode_powerins));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
@@ -5771,7 +5810,7 @@ void nmk16_state::powerinsa(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(nmk16_state::screen_vblank_powerins_bootleg));
 	m_screen->set_palette(m_palette);
 
-	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(14'000'000) / 2);
+	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(14'000'000) / 2, m_palette, gfx_powerins_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_6bit));
 	m_spritegen->set_ext_callback(FUNC(nmk16_state::get_flip_extcode_powerins));
 	m_spritegen->set_mask(0x3ff, 0x3ff);
@@ -5811,7 +5850,7 @@ void nmk16_state::powerinsb(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(nmk16_state::screen_vblank_powerins_bootleg));
 	m_screen->set_palette(m_palette);
 
-	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(14'000'000) / 2);
+	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(14'000'000) / 2, m_palette, gfx_powerins_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_6bit));
 	m_spritegen->set_ext_callback(FUNC(nmk16_state::get_flip_extcode_powerins));
 	m_spritegen->set_mask(0x3ff, 0x3ff);
@@ -5845,6 +5884,7 @@ void nmk16_state::powerinsc(machine_config &config)
 {
 	powerinsb(config);
 
+	m_spritegen->set_info(gfx_powerinsc_spr);
 	m_gfxdecode->set_info(gfx_powerinsc);
 }
 
@@ -5886,7 +5926,7 @@ void nmk16_state::manybloc(machine_config &config)
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 	m_screen->set_palette(m_palette);
 
-	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(12'000'000)/2);
+	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(12'000'000)/2, m_palette, gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_spritegen->set_ext_callback(FUNC(nmk16_state::get_sprite_flip));
 	m_spritegen->set_screen_size(256, 256);
@@ -5894,7 +5934,7 @@ void nmk16_state::manybloc(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tharrier);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,manybloc)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5933,6 +5973,7 @@ void nmk16_tomagic_state::tomagic(machine_config &config)
 
 	// video hardware
 	set_screen_hires(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_tomagic_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_tomagic_state::screen_update_macross));
 
@@ -6396,15 +6437,17 @@ static const gfx_layout tilelayout_8bpp =
 
 
 static GFXDECODE_START( gfx_grdnstrm )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x200, 16 ) // [2] Layer 1
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout_8bpp,                    0x000,  1 ) // [1] Layer 0
-	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( "fgtile", 0, gfx_8x8x4_packed_msb, 0x200, 16 ) // [0] Layer 1
+	GFXDECODE_ENTRY( "bgtile", 0, tilelayout_8bpp,      0x000,  1 ) // [1] Layer 0
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_redhawkb_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_lsb, 0x100, 16 ) // [0] Sprites
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_redhawkb )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x200, 16 ) // [2] Layer 1
-	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_lsb, 0x000, 16 ) // [1] Layer 0
-	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_lsb, 0x100, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( "fgtile", 0, gfx_8x8x4_packed_msb,               0x200, 16 ) // [0] Layer 1
+	GFXDECODE_ENTRY( "bgtile", 0, gfx_8x8x4_col_2x2_group_packed_lsb, 0x000, 16 ) // [1] Layer 0
 GFXDECODE_END
 
 
@@ -6428,6 +6471,7 @@ void afega_state::stagger1(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(afega_state::get_colour_4bit));
 	m_spritegen->set_ext_callback(FUNC(afega_state::get_sprite_flip));
 	m_screen->set_screen_update(FUNC(afega_state::screen_update_afega));
@@ -6465,6 +6509,7 @@ void afega_state::redhawkb(machine_config &config)
 
 	// basic machine hardware
 	// video hardware
+	m_spritegen->set_info(gfx_redhawkb_spr);
 	m_gfxdecode->set_info(gfx_redhawkb);
 	m_screen->set_screen_update(FUNC(afega_state::screen_update_redhawkb));
 }
@@ -6511,6 +6556,7 @@ void afega_state::firehawk(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(afega_state::get_colour_4bit));
 	m_spritegen->set_ext_callback(FUNC(afega_state::get_sprite_flip));
 	m_screen->set_screen_update(FUNC(afega_state::screen_update_firehawk));
@@ -6551,6 +6597,7 @@ void nmk16_state::twinactn(machine_config &config)
 
 	// video hardware
 	set_screen_lowres(config);
+	m_spritegen->set_info(gfx_macross_spr);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
