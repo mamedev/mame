@@ -18,15 +18,15 @@ jobs:
           fetch-depth: 2
 
       - name: Install reviewdog
-        uses: reviewdog/action-setup@v1
-        with:
-          reviewdog_version: latest
+        uses: reviewdog/action-setup@v1.3.2
 
       - name: Run style check
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           files=$(git diff --name-only HEAD^1 HEAD | grep -E '\.(c|cpp|h|hpp)$' || true)
           if [ -n "$files" ]; then
-            scripts/build/style.py $files \
+            python3 scripts/build/style.py $files \
               | reviewdog -efm="%f:%l: %m" \
                 -name="cpp-style" \
                 -reporter=github-pr-review \

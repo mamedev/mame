@@ -14,7 +14,7 @@ def check_cpp_file(path: Path):
     try:
         text = path.read_text()
     except Exception:
-        return errors  # skip non-text files
+        return errors # skip non-text files
 
     lines = text.splitlines()
 
