@@ -1633,6 +1633,25 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<!--
+	This is a "fixed" version. The common available dump with a crc32 of 0x6831ad48
+	appears to have a bit error - It sets an error flag when the memory test succeeds
+	instead of when it fails. Other emulators run the game because they force the SGM
+	to be always on in case of an SGC game. Location 0x3bd6 was changed from 0x28 to 0x20.
+	-->
+	<software name="pengadv">
+		<description>Penguin Adventure</description>
+		<year>2016</year>
+		<publisher>Opcode Games</publisher>
+		<info name="usage" value="req. Super Game Module" />
+		<part name="cart" interface="coleco_cart">
+			<feature name="slot" value="sgc_1mbit" />
+			<dataarea name="rom" size="131072">
+				<rom name="penguin-adventure-fixed.rom" size="131072" crc="efe6a1a5" sha1="122027d4ffdb4fd9a96f783210e8b43b7f8c91a3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pillars">
 		<description>Pillars</description>
 		<year>2021</year>
