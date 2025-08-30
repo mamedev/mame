@@ -3009,7 +3009,7 @@ void unkch_state::coincount_w(uint8_t data)
 
 */
 
-	m_ticket_dispenser->motor_w(!BIT(data, 7));
+	m_ticket_dispenser->motor_w(BIT(data, 7));
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);  // Credit counter
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);  // Key In counter
@@ -8187,9 +8187,7 @@ static INPUT_PORTS_START( unkch_controls )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  // Trips "call attendant" state if activated while credited - something to do with hopper out?
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper Payout")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("tickets", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
@@ -10950,7 +10948,7 @@ void wingco_state::system_outputc_w(uint8_t data)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	
 	m_ticket_dispenser->motor_w(!BIT(data, 7));
-	popmessage("system_outputc_w %02x",data);
+	//popmessage("system_outputc_w %02x",data);
 }
 
 void wingco_state::ay8910_outputa_w(uint8_t data)
@@ -15001,9 +14999,37 @@ ROM_START( jkrmast )
 	ROM_LOAD( "n82s129.u28",  0x0000, 0x0100, CRC(cfb152cf) SHA1(3166b9b21be4ce1d3b6fc8974c149b4ead03abac) )
 ROM_END
 
+// this set is version 512, but the id at bottom of the program says v513
+// sometimes fg colors aren't accurate, and in the bonus stages, reels bg is always white.  
 ROM_START( jkrmasta )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pid-513.u5",  0x4000, 0x4000, CRC(12fa7ea0) SHA1(71ee141fe01ae2ce9913620b52c54cf445fd0b00) )
+	ROM_CONTINUE(0x0000, 0x4000)
+	ROM_CONTINUE(0xc000, 0x4000)
+	ROM_CONTINUE(0x8000, 0x4000)
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "2000b.u48", 0x00000,  0x20000, CRC(e7b406ec) SHA1(c0a10cf8bf5467ecfe3c90e6897db3ab9aae0127) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "2000a.u41", 0x00000,  0x20000, CRC(cb8b1563) SHA1(c8c3ae646a9f3a7482d83566e4b3e18441c5d67f) )
+
+	ROM_REGION( 0x200, "colours", 0 )
+	ROM_LOAD( "n82s147a.u13", 0x000, 0x200, CRC(da92f0ae) SHA1(1269a2029e689a5f111c57e80825b3756b50521e) )
+
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
+	// filled at init()
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "n82s129.u28",  0x0000, 0x0100, CRC(cfb152cf) SHA1(3166b9b21be4ce1d3b6fc8974c149b4ead03abac) )
+ROM_END
+
+// this set is an alt version 512, but the id at bottom of the program says v512
+// gfx needs work to properly hide the bg tilemap when you trigger settings or coin in when title or info.
+// if you coin or enter setting whilst the reels demo, all is ok. 
+ROM_START( jkrmastb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v512_27c512.bin",  0x4000, 0x4000, CRC(22aa8b9f) SHA1(0e06f6491d6c1e74ba7e721866b10d89c4be2e7c) )
 	ROM_CONTINUE(0x0000, 0x4000)
 	ROM_CONTINUE(0xc000, 0x4000)
 	ROM_CONTINUE(0x8000, 0x4000)
@@ -25013,7 +25039,8 @@ GAMEL( 199?, alienatt,   cmaster,  cm,       cmaster,  cmaster_state,  init_alie
 
 GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1998, jkrmast,    0,        jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    0 )
-GAME(  1998, jkrmasta,   jkrmast,  jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512)",    0 )
+GAME(  1998, jkrmasta,   jkrmast,  jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512/513)", MACHINE_IMPERFECT_COLORS ) // sometimes fg colors are wrong, bonus stages have reels bg always white
+GAME(  1998, jkrmastb,   jkrmast,  jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512)",    MACHINE_IMPERFECT_GRAPHICS ) // needs to clean the bg tilemap properly
 GAME(  1993, pkrmast,    0,        pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 1)",                0 ) // puts FUN USA 95H N/G  V2.20 in NVRAM
 GAME(  1993, pkrmasta,   pkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 2)",                0 ) // needs dips fixed, puts PM93 JAN 29/1996 V1.52 in NVRAM
 
