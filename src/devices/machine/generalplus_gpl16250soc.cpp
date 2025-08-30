@@ -47,6 +47,7 @@ sunplus_gcm394_base_device::sunplus_gcm394_base_device(const machine_config& mco
 	m_romtype(0),
 	m_space_read_cb(*this, 0),
 	m_space_write_cb(*this),
+	m_dma_complete_cb(*this),
 	m_alt_periodic_irq(false),
 	m_boot_mode(0),
 	m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback))
@@ -339,36 +340,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(int channel)
 		dest += destdelta;
 	}
 
-	// HACKS to get into service mode for debugging
-
-	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
-
-	address_space& mem = this->space(AS_PROGRAM);
-
-	//if (mem.read_word(0x4368c) == 0x4846)
-	//  mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
-
-	//if (mem.read_word(0x34410) == 0x4846)
-	//  mem.write_word(0x34410, 0x4840);    // golden tee force service mode
-
-	// what is it waiting for when we need these? (needed on some service mode screens)
-	//if (mem.read_word(0x3f368) == 0x4840)
-	//  mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
-
-	//if (mem.read_word(0x4d8d4) == 0x4840)
-	//  mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
-
-	//if (mem.read_word(0x3510f) == 0x4845)
-	//  mem.write_word(0x3510f, 0x4840);    // camp rock force service mode
-
-	if (mem.read_word(0x4abe7) == 0x4840)
-		mem.write_word(0x4abe7, 0x4841);    // camp rock IRQ? wait hack
-
-	//if (mem.read_word(0x37244) == 0x4845)
-	//  mem.write_word(0x37244, 0x4840);    // hannah montana guitar force service mode
-
-
-
+	m_dma_complete_cb(1); // allow some driver specific hacks for service modes
 
 	// clear params after operation
 	m_dma_params[0][channel] = m_dma_params[0][channel] & 0x00f7;
@@ -377,7 +349,6 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(int channel)
 	m_dma_latched[channel] = false;
 
 	//machine().debug_break();
-
 }
 
 void sunplus_gcm394_base_device::system_dma_7abf_unk_w(uint16_t data)

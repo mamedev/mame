@@ -41,6 +41,7 @@ public:
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	auto space_write_callback() { return m_space_write_cb.bind(); }
+	auto dma_complete_callback() { return m_dma_complete_cb.bind(); }
 
 	auto nand_read_callback() { return m_nand_read_cb.bind(); }
 
@@ -185,6 +186,7 @@ protected:
 private:
 	devcb_read16 m_space_read_cb;
 	devcb_write16 m_space_write_cb;
+	devcb_write_line m_dma_complete_cb;
 
 	uint16_t unk_r(offs_t offset);
 	void unk_w(offs_t offset, uint16_t data);
