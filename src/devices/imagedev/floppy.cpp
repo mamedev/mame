@@ -672,6 +672,11 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_load()
 		m_image.reset();
 		return std::make_pair(image_error::INVALIDIMAGE, "Incompatible image file format or corrupted data");
 	}
+
+	const char *wp = get_feature("write_protected");
+	if(wp && !std::strcmp(wp, "true"))
+		make_readonly();
+
 	m_output_format = is_readonly() ? nullptr : best_format;
 
 	m_image_dirty = false;
