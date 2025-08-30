@@ -1,0 +1,353 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+	<element name="static_black">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="green_led" defstate="0">
+		<rect state="0">
+			<color red="0" green="0.2" blue="0" />
+		</rect>
+		<rect state="1">
+			<color red="0" green="0.8" blue="0" />
+		</rect>
+	</element>
+
+	<element name="button_risk" defstate="0">
+		<disk><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0" green="0" blue="0.0" /></disk>
+		<disk state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="0.0" /></disk>
+		<disk state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.7" green="0.7" blue="0.0" /></disk>
+		<text string="1:1"><bounds x="0.3" y="0.2" width="0.5" height="0.4" /><color red="0" green="0" blue="0" /></text>
+		<text string="RISIKO"><bounds x="0.2" y="0.6" width="0.7" height="0.2" /><color red="0" green="0" blue="0" /></text>
+	</element>
+
+	<element name="button_start" defstate="0">
+		<disk><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0" green="0" blue="0.0" /></disk>
+		<disk state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="0.0" blue="0.0" /></disk>
+		<disk state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.7" green="0.0" blue="0.0" /></disk>
+		<text string="START"><bounds x="0.2" y="0.4" width="0.7" height="0.3" /><color red="0" green="0" blue="0" /></text>
+	</element>
+
+	<element name="button_stop" defstate="0">
+		<disk><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0" green="0" blue="0.0" /></disk>
+		<disk state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="0.0" blue="0.0" /></disk>
+		<disk state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.7" green="0.0" blue="0.0" /></disk>
+		<text string="STOP"><bounds x="0.2" y="0.4" width="0.7" height="0.3" /><color red="0" green="0" blue="0" /></text>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.2" />
+		</led7seg>
+	</element>
+
+	<element name="disk_1symbol"><disk symbollist="sonne,60,40,80"><color red="0.8" green="0.8" blue="0.8" /></disk></element>
+	<element name="disk_2symbol"><disk symbollist="40,sonne,40,80,40,sonne"><color red="0.8" green="0.8" blue="0.8" /></disk></element>
+
+	<element name="ladder" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.7" green="0.7" blue="0.7" />
+		</rect>
+	</element>
+
+	<element name="indicator_red" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.5" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Internal Layout">
+		<bounds left="0" right="470" top="0" bottom="540" />
+		<element ref="static_black">
+			<bounds left="0" right="470" top="0" bottom="540" />
+		</element>
+
+<!-- debug display -->
+		<element name="digit15" ref="digit">
+			<bounds x="0" y="0" width="10" height="15" />
+		</element>
+		<element name="digit14" ref="digit">
+			<bounds x="10" y="0" width="10" height="15" />
+		</element>
+		<element name="digit13" ref="digit">
+			<bounds x="20" y="0" width="10" height="15" />
+		</element>
+		<element name="digit12" ref="digit">
+			<bounds x="30" y="0" width="10" height="15" />
+		</element>
+		<element name="digit11" ref="digit">
+			<bounds x="40" y="0" width="10" height="15" />
+		</element>
+		<element name="digit10" ref="digit">
+			<bounds x="50" y="0" width="10" height="15" />
+		</element>
+		<element name="digit9" ref="digit">
+			<bounds x="60" y="0" width="10" height="15" />
+		</element>
+		<element name="digit8" ref="digit">
+			<bounds x="70" y="0" width="10" height="15" />
+		</element>
+
+<!-- left panel -->
+		<!-- Sonderspiele -->
+		<element name="digit7" ref="digit">
+			<bounds x="150" y="50" width="15" height="25" />
+		</element>
+		<element name="digit6" ref="digit">
+			<bounds x="165" y="50" width="15" height="25" />
+		</element>
+		<element name="digit5" ref="digit">
+			<bounds x="180" y="50" width="15" height="25" />
+		</element>
+
+<!-- right panel -->
+		<!-- Münzspeicher -->
+		<element name="digit4" ref="digit">
+			<bounds x="280" y="50" width="15" height="25" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds x="295" y="50" width="15" height="25" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="310" y="50" width="15" height="25" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="325" y="50" width="10" height="10" />
+		</element>
+		<element name="digit0" ref="digit">
+			<bounds x="335" y="50" width="10" height="10" />
+		</element>
+
+		<!-- 0.10DM,1DM,2DM,5DM -->
+		<element name="lamp50" ref="green_led">
+			<bounds x="385" y="45" width="5" height="5" />
+		</element>
+
+		<element name="lamp51" ref="green_led">
+			<bounds x="385" y="55" width="5" height="5" />
+		</element>
+
+		<element name="lamp52" ref="green_led">
+			<bounds x="385" y="65" width="5" height="5" />
+		</element>
+
+		<element name="lamp53" ref="green_led">
+			<bounds x="385" y="75" width="5" height="5" />
+		</element>
+
+		<!-- coin return button -->
+		<element name="lamp36" ref="indicator_red">
+			<bounds x="400" y="45" width="5" height="15" />
+		</element>
+
+		<element name="lamp37" ref="indicator_red">
+			<bounds x="400" y="65" width="5" height="15" />
+		</element>
+
+<!-- lampZEILESPALTE -->
+
+<!-- left panel -->
+		<!-- Leiter II LZ3+LZ6+LZ7-->
+
+		<element name="lamp75" ref="ladder">
+			<bounds x="45" y="150" width="45" height="25" />
+		</element>
+
+		<element name="lamp73" ref="ladder">
+			<bounds x="45" y="190" width="45" height="25" />
+		</element>
+
+		<element name="lamp72" ref="ladder">
+			<bounds x="45" y="220" width="45" height="25" />
+		</element>
+
+		<element name="lamp71" ref="ladder">
+			<bounds x="45" y="250" width="45" height="25" />
+		</element>
+
+		<element name="lamp70" ref="ladder">
+			<bounds x="45" y="280" width="45" height="25" />
+		</element>
+
+		<element name="lamp64" ref="ladder">
+			<bounds x="45" y="310" width="45" height="25" />
+		</element>
+
+		<element name="lamp63" ref="ladder">
+			<bounds x="45" y="340" width="45" height="25" />
+		</element>
+
+		<element name="lamp62" ref="ladder">
+			<bounds x="45" y="370" width="45" height="25" />
+		</element>
+
+		<element name="lamp61" ref="ladder">
+			<bounds x="45" y="400" width="45" height="25" />
+		</element>
+
+		<element name="lamp60" ref="ladder">
+			<bounds x="45" y="430" width="45" height="25" />
+		</element>
+
+<!-- right panel -->
+		<!-- Leiter I  LZ3+LZ4-->
+
+		<element name="lamp45" ref="ladder">
+			<bounds x="390" y="150" width="45" height="25" />
+		</element>
+
+		<element name="lamp43" ref="ladder">
+			<bounds x="390" y="190" width="45" height="25" />
+		</element>
+
+		<element name="lamp42" ref="ladder">
+			<bounds x="390" y="220" width="45" height="25" />
+		</element>
+
+		<element name="lamp41" ref="ladder">
+			<bounds x="390" y="250" width="45" height="25" />
+		</element>
+
+		<element name="lamp40" ref="ladder">
+			<bounds x="390" y="280" width="45" height="25" />
+		</element>
+
+		<element name="lamp43" ref="ladder">
+			<bounds x="390" y="310" width="45" height="25" />
+		</element>
+
+		<element name="lamp33" ref="ladder">
+			<bounds x="390" y="340" width="45" height="25" />
+		</element>
+
+		<element name="lamp32" ref="ladder">
+			<bounds x="390" y="370" width="45" height="25" />
+		</element>
+
+		<element name="lamp31" ref="ladder">
+			<bounds x="390" y="400" width="45" height="25" />
+		</element>
+
+		<element name="lamp30" ref="ladder">
+			<bounds x="390" y="430" width="45" height="25" />
+		</element>
+
+<!-- center LZ0+LZ2+LZ5-->
+		<!-- gestoert -->
+		<element name="lamp26" ref="indicator_red">
+			<bounds x="110" y="305" width="45" height="25" />
+		</element>
+
+
+		<element name="lamp14" ref="ladder">
+			<bounds x="130" y="335" width="45" height="25" />
+		</element>
+
+		<element name="lamp13" ref="ladder">
+			<bounds x="130" y="365" width="45" height="25" />
+		</element>
+
+
+		<element name="lamp1" ref="ladder">
+			<bounds x="175" y="320" width="45" height="25" />
+		</element>
+
+		<element name="lamp55" ref="ladder">
+			<bounds x="175" y="350" width="45" height="25" />
+		</element>
+
+		<element name="lamp12" ref="ladder">
+			<bounds x="175" y="380" width="45" height="25" />
+		</element>
+
+
+		<element name="lamp16" ref="ladder">
+			<bounds x="220" y="335" width="45" height="25" />
+		</element>
+
+		<element name="lamp10" ref="ladder">
+			<bounds x="220" y="365" width="45" height="25" />
+		</element>
+
+
+		<element name="lamp11" ref="ladder">
+			<bounds x="265" y="320" width="45" height="25" />
+		</element>
+
+		<element name="lamp54" ref="ladder">
+			<bounds x="265" y="350" width="45" height="25" />
+		</element>
+
+		<element name="lamp06" ref="ladder">
+			<bounds x="265" y="380" width="45" height="25" />
+		</element>
+
+
+		<element name="lamp03" ref="ladder">
+			<bounds x="310" y="335" width="45" height="25" />
+		</element>
+
+		<element name="lamp05" ref="ladder">
+			<bounds x="310" y="365" width="45" height="25" />
+		</element>
+
+<!-- bottom panel LZ0 -->
+		<!-- Tasten -->
+		<element name="lamp02" ref="button_risk" inputtag="INPUTS" inputmask="0x02">
+			<bounds x="50" y="480" width="35" height="35" />
+		</element>
+
+		<element name="lamp00" ref="button_start" inputtag="INPUTS" inputmask="0x80">
+			<bounds x="145" y="480" width="35" height="35" />
+		</element>
+
+		<element name="lamp07" ref="button_stop" inputtag="INPUTS" inputmask="0x10">
+			<bounds x="225" y="480" width="35" height="35" />
+		</element>
+
+		<element name="lamp04" ref="button_stop" inputtag="INPUTS" inputmask="0x08">
+			<bounds x="300" y="480" width="35" height="35" />
+		</element>
+
+		<element name="lamp01" ref="button_risk" inputtag="INPUTS" inputmask="0x01">
+			<bounds x="395" y="480" width="35" height="35" />
+		</element>
+
+
+		<element name="lamp23" ref="ladder">
+			<bounds x="50" y="520" width="45" height="10" />
+		</element>
+
+		<element name="lamp22" ref="ladder">
+			<bounds x="390" y="520" width="45" height="10" />
+		</element>
+
+
+		<element name="disc02" ref="disk_1symbol">
+			<bounds x="185" y="185" width="120" height="120" />
+		</element>
+
+		<element name="disc01" ref="disk_1symbol">
+			<bounds x="100" y="150" width="120" height="120" />
+		</element>
+
+		<element name="disc03" ref="disk_1symbol">
+			<bounds x="260" y="150" width="120" height="120" />
+		</element>
+
+
+	</view>
+</mamelayout>

@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+	<element name="static_black">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="green_led" defstate="0">
+		<rect state="0">
+			<color red="0" green="0.2" blue="0" />
+		</rect>
+		<rect state="1">
+			<color red="0" green="0.8" blue="0" />
+		</rect>
+	</element>
+
+	<element name="button_service">
+    	<rect>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.2" />
+		</led7seg>
+	</element>
+
+
+	<view name="Internal Layout">
+		<bounds left="0" right="180" top="0" bottom="100" />
+		<element ref="static_black">
+			<bounds left="0" right="180" top="0" bottom="100" />
+		</element>
+
+<!-- debug display -->
+		<element name="digit15" ref="digit">
+			<bounds x="30" y="10" width="15" height="20" />
+		</element>
+		<element name="digit14" ref="digit">
+			<bounds x="45" y="10" width="15" height="20" />
+		</element>
+		<element name="digit13" ref="digit">
+			<bounds x="60" y="10" width="15" height="20" />
+		</element>
+		<element name="digit12" ref="digit">
+			<bounds x="75" y="10" width="15" height="20" />
+		</element>
+
+		<element name="digit11" ref="digit">
+			<bounds x="100" y="10" width="15" height="20" />
+		</element>
+		<element name="digit10" ref="digit">
+			<bounds x="115" y="10" width="15" height="20" />
+		</element>
+		<element name="digit9" ref="digit">
+			<bounds x="130" y="10" width="15" height="20" />
+		</element>
+		<element name="digit8" ref="digit">
+			<bounds x="145" y="10" width="15" height="20" />
+		</element>
+
+
+		<!-- keys -->
+    <repeat count="2">
+        <param name="y" start="60" increment="20" />
+        <param name="row" start="6" increment="1" />
+        <repeat count="8">
+                <param name="btnx" start="15" increment="20" />
+                <param name="mask" start="0x80" rshift="1" />
+                <element ref="button_service" inputtag="TZ~row~" inputmask="~mask~">
+                    <bounds x="~btnx~" y="~y~" width="15" height="15" />
+                </element>
+        </repeat>
+    </repeat>
+
+<!-- debug-->
+    <repeat count="8">
+    <param name="z" start="0" increment="1" />
+    <param name="x" start="0" increment="2" />
+        <repeat count="8">
+        <param name="s" start="0" increment="1" />
+        <param name="y" start="10" increment="2" />
+            <element name="lamp~z~~s~" ref="green_led">
+			    <bounds x="~x~" y="~y~" width="1" height="1" />
+		    </element>
+        </repeat>
+    </repeat>
+
+	</view>
+</mamelayout>
