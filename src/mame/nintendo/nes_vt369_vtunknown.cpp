@@ -1205,7 +1205,6 @@ CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, em
     (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB, different menus)
     Lexibook Console Colour - Barbie
 
-
     (units for use with TV)
     Lexibook Retro TV Game Console (300 Games) - Cars
     Lexibook Retro TV Game Console (300 Games) - PJ Masks

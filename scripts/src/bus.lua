@@ -3861,18 +3861,6 @@ if (BUSES["MEGADRIVE"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/devices/bus/megadrive/ctrl/mdioport.h,BUSES["MEGADRIVE_CTRL"] = true
----------------------------------------------------
-
-if (BUSES["MEGADRIVE_CTRL"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/megadrive/ctrl/mdioport.cpp",
-		MAME_DIR .. "src/devices/bus/megadrive/ctrl/mdioport.h",
-	}
-end
-
 
 ---------------------------------------------------
 --

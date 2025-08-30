@@ -29,15 +29,15 @@ public:
 		m_rom(*this, "maincpu")
 	{ }
 
-	void megadriv_firecore_3button_ntsc(machine_config &config);
-	void megadriv_firecore_3button_pal(machine_config &config);
-	void megadriv_firecore_6button_ntsc(machine_config &config);
+	void megadriv_firecore_3button_ntsc(machine_config &config) ATTR_COLD;
+	void megadriv_firecore_3button_pal(machine_config &config) ATTR_COLD;
+	void megadriv_firecore_6button_ntsc(machine_config &config) ATTR_COLD;
 
-	void init_atgame40();
-	void init_dcat();
-	void init_mdhh100();
-	void init_sarc110();
-	void init_reactmd();
+	void init_atgame40() ATTR_COLD;
+	void init_dcat() ATTR_COLD;
+	void init_mdhh100() ATTR_COLD;
+	void init_sarc110() ATTR_COLD;
+	void init_reactmd() ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
