@@ -19,10 +19,14 @@ jobs:
         with:
           reviewdog_version: latest
 
-      - name: Run linter
+      - name: Run style check
         run: |
-          # Get changed files in the PR
           files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(c|cpp|h|hpp)$' || true)
           if [ -n "$files" ]; then
-            scripts/build/style.py $files | reviewdog -efm="%f:%l: %m" -name="pr-linter" -reporter=github-pr-review -level=error
+            scripts/build/style.py $files \
+              | reviewdog -efm="%f:%l: %m" \
+                -name="cpp-style" \
+                -reporter=github-pr-review \
+                -filter-mode=diff_context \
+                -fail-on-error=false
           fi
