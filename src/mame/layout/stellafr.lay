@@ -4,6 +4,20 @@ license:CC0-1.0
 -->
 <mamelayout version="2">
 
+	<element name="led_red" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.17" green="0.015" blue="0.02" /></disk>
+	</element>
+
+	<element name="green_led" defstate="0">
+		<rect state="0">
+			<color red="0" green="0.2" blue="0" />
+		</rect>
+		<rect state="1">
+			<color red="0" green="0.8" blue="0" />
+		</rect>
+	</element>
+
 <!-- define elements -->
 	<element name="static_black">
 		<rect>
@@ -18,39 +32,62 @@ license:CC0-1.0
 	</element>
 
 	<view name="Internal Layout">
-		<bounds left="0" right="170" top="0" bottom="47" />
+		<bounds left="0" right="110" top="0" bottom="50" />
 		<element ref="static_black">
-			<bounds left="0" right="170" top="0" bottom="47" />
+			<bounds left="0" right="110" top="0" bottom="50" />
 		</element>
 
 <!-- left panel -->
 		<!-- Sonderspiele -->
 		<element name="digit7" ref="digit">
-			<bounds x="40" y="10" width="10" height="15" />
+			<bounds x="10" y="10" width="10" height="15" />
 		</element>
 		<element name="digit6" ref="digit">
-			<bounds x="50" y="10" width="10" height="15" />
+			<bounds x="20" y="10" width="10" height="15" />
 		</element>
 		<element name="digit5" ref="digit">
-			<bounds x="60" y="10" width="10" height="15" />
+			<bounds x="30" y="10" width="10" height="15" />
 		</element>
 
 <!-- right panel -->
 		<!-- Münzspeicher -->
 		<element name="digit4" ref="digit">
-			<bounds x="100" y="10" width="10" height="15" />
+			<bounds x="50" y="10" width="10" height="15" />
 		</element>
 		<element name="digit3" ref="digit">
-			<bounds x="110" y="10" width="10" height="15" />
+			<bounds x="60" y="10" width="10" height="15" />
 		</element>
 		<element name="digit2" ref="digit">
-			<bounds x="120" y="10" width="10" height="15" />
+			<bounds x="70" y="10" width="10" height="15" />
 		</element>
 		<element name="digit1" ref="digit">
-			<bounds x="130" y="10" width="10" height="10" />
+			<bounds x="80" y="10" width="10" height="10" />
 		</element>
 		<element name="digit0" ref="digit">
-			<bounds x="140" y="10" width="10" height="10" />
+			<bounds x="90" y="10" width="10" height="10" />
 		</element>
+
+<!-- control unit-->
+		<element name="led0" ref="led_red">
+			<bounds left="40" right="45" top="30" bottom="35" />
+		</element>
+		<element name="led1" ref="led_red">
+			<bounds left="50" right="55" top="30" bottom="35" />
+		</element>
+
+<!-- debug-->
+    <repeat count="12">
+    <param name="s" start="0" increment="1" />
+    <param name="x" start="0" increment="2" />
+        <repeat count="8">
+        <param name="z" start="0" increment="1" />
+        <param name="y" start="30" increment="2" />
+            <element name="lamp~z~~s~" ref="green_led">
+			    <bounds x="~x~" y="~y~" width="1" height="1" />
+		    </element>
+        </repeat>
+    </repeat>
+
+
 	</view>
 </mamelayout>
