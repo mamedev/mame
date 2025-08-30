@@ -155,6 +155,8 @@ Sunset Riders info
     - MCU clock frequency
     - There is only a 50 MHz XTAL on the PCB, are the other clocks correct?
 
+    TODO (Conny games):
+    - Coin reading depends by IRQ7. What triggers it? The Lattice?
 ****************************************************************************/
 
 #include "emu.h"
