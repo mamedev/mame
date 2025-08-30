@@ -78,6 +78,10 @@ widespread English Latin title for the ``description`` element, and put
 the other titles in ``info`` elements with ``name="alt_title"``
 attributes.
 
+For software items that have multiple developers and/or languages, use
+multiple ``info`` elements with ``name="developer"`` and
+``name="language"`` attributes per each entry.
+
 If disambiguation is needed, try to be descriptive as possible.  For
 example, use the manufacturer’s version number, regional licensee’s
 name, or terse description of hardware differences in preference to
