@@ -409,6 +409,14 @@ ROM_START(toumapet)
 	ROM_LOAD("p25d32sh.bin", 0x000000, 0x400000, CRC(25498f00) SHA1(c5c410e29f540d7f1fd4bbb333467f8a3eaccc15) )
 ROM_END
 
+ROM_START(throwback)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("25q32egig.bin", 0x000000, 0x400000, CRC(959EB09D) SHA1(901738e6b6c8fdfe4ed9b268ba3ddd1444551442))
+ROM_END
+
 
 } // anonymous namespace
 
@@ -432,6 +440,8 @@ CONS( 201?, dgun2953,      0,       0,      bbl380,   bbl380, bbl380_state, empt
 CONS( 201?, arcade10,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Fizz Creations", "Mini Arcade Console (Arcade 10-in-1)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 201?, supreme,       0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Fizz Creations", "Arcade Classics Mini Handheld Arcade (Supreme 150)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 201?, throwback,     0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Westminster", "Throwback Pocket Video Game Console 150-in-1", MACHINE_IMPERFECT_SOUND )
 
 // these are for the Japanese market, the ROM is the same between the Pocket Game and Game Computer but the form factor is different.
 // they have the 0xE4 XOR on the SPI data like many of the above units, but don't currently boot - need to verify if the internal ROM part should be the same or not
