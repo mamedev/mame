@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Install reviewdog
         uses: reviewdog/action-setup@v1
@@ -22,7 +24,7 @@ jobs:
 
       - name: Run style check
         run: |
-          files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(c|cpp|h|hpp)$' || true)
+          files=$(git diff --name-only HEAD^1 HEAD | grep -E '\.(c|cpp|h|hpp)$' || true)
           if [ -n "$files" ]; then
             scripts/build/style.py $files \
               | reviewdog -efm="%f:%l: %m" \
