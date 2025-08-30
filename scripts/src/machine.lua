@@ -3391,7 +3391,7 @@ end
 --@src/devices/machine/sega_md_ioport.h,MACHINES["SEGA_MD_IOPORT"] = true
 ---------------------------------------------------
 
-if (BUSES["SEGA_MD_IOPORT"]~=null) then
+if (MACHINES["SEGA_MD_IOPORT"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/sega_md_ioport.cpp",
 		MAME_DIR .. "src/devices/machine/sega_md_ioport.h",
