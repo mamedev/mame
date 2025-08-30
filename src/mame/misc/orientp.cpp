@@ -210,7 +210,7 @@ void orientalpearl_state::machine_start()
 
 void orientalpearl_state::orientp(machine_config &config)
 {
-	/* basic machine hardware */
+    // basic machine hardware
 	i8052_device &maincpu(I8052(config, "maincpu", XTAL(10'738'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &orientalpearl_state::program_map);
 	maincpu.set_addrmap(AS_IO, &orientalpearl_state::io_map);
@@ -219,17 +219,17 @@ void orientalpearl_state::orientp(machine_config &config)
     mcu.set_addrmap(AS_PROGRAM, &orientalpearl_state::mcu_map);
 	mcu.set_addrmap(AS_IO, &orientalpearl_state::mcu_io_map);
 
-	/* M82C55 for leds */
+	// M82C55 for leds
     I8255A(config, "ppi1");
     I8255A(config, "ppi2");
 	
-	/* Keyboard & display interface */
+	// Keyboard & display interface 
     i8279_device &kbdc(I8279(config, "kdc", XTAL(10'738'635) / 6));
 	kbdc.out_sl_callback().set(FUNC(orientalpearl_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
 	kbdc.in_rl_callback().set(FUNC(orientalpearl_state::keyboard_r));          // keyboard Return Lines
 	kbdc.out_disp_callback().set(FUNC(orientalpearl_state::display_7seg_data_w));
 	
-	/* Video */
+	// Video
 	config.set_default_layout(layout_marywu);
 /* sound hardware */
 	SPEAKER(config, "mono").front_center();
