@@ -1,7 +1,8 @@
 name: Style Check
 
 on:
-    pull_request:
+  pull_request:
+    paths:
     - '.github/workflows/**'
     - 'src/**.cpp'
     - 'src/**.h'
