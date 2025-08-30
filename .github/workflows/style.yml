@@ -1,0 +1,28 @@
+name: Style Check
+
+on:
+    pull_request:
+    - '.github/workflows/**'
+    - 'src/**.cpp'
+    - 'src/**.h'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install reviewdog
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      - name: Run linter
+        run: |
+          # Get changed files in the PR
+          files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(c|cpp|h|hpp)$' || true)
+          if [ -n "$files" ]; then
+            scripts/build/style.py $files | reviewdog -efm="%f:%l: %m" -name="pr-linter" -reporter=github-pr-review -level=error
+          fi
