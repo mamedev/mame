@@ -1590,6 +1590,9 @@ NETLIST_START(brdrline)
 	 *          or trigger?
 	 *          or were the acrade what i played in the past a modified bootleg?
 	 *          or is it only in my head?
+	 *
+	 *   2025-08-30: just as reference a video of real hardware sounds:
+	 *               https://www.youtube.com/watch?v=-U8iGhnAVCI
 	 */
 	ALIAS(GUN_TRG,    I_SOUND_5.Q)
 	ALIAS(JEEP_ON,    I_SOUND_6.Q)
