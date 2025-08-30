@@ -297,7 +297,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<year>2002</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Electronic Arts"/>
-		<info name="language" value="English/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLUS-01449"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -1877,7 +1878,10 @@ The game freezes when loading (after the intro)
 		<year>1996</year>
 		<publisher>Maxis</publisher>
 		<info name="developer" value="Artdink" />
-		<info name="language" value="English/French/German/Japanese" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Japanese" />
 		<info name="serial" value="SLUS-00003"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -23732,7 +23736,9 @@ The game freezes when loading (after the intro)
 		<year>2001</year>
 		<publisher> Infogrames</publisher>
 		<info name="developer" value="Artificial Mind + Movement"/>
-		<info name="language" value="English/French/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLUS-01359"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -37369,7 +37375,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1995</year>
 		<publisher>Artdink</publisher>
 		<info name="developer" value="Artdink" />
-		<info name="language" value="English/French/German/Japanese" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Japanese" />
 		<info name="serial" value="SLPS-00125" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -37395,7 +37404,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1997</year>
 		<publisher>Artdink</publisher>
 		<info name="developer" value="Artdink" />
-		<info name="language" value="English/French/German/Japanese" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Japanese" />
 		<info name="serial" value="SLPS-91019" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -60238,7 +60250,8 @@ The game only boot on PAL
 		<year>2002</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Electronic Arts"/>
-		<info name="language" value="English/Swedish" />
+		<info name="language" value="English" />
+		<info name="language" value="Swedish" />
 		<info name="serial" value="SLES-03830"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60369,7 +60382,12 @@ The game only boot on PAL
 		<year>2001</year>
 		<publisher> Infogrames</publisher>
 		<info name="developer" value="Artificial Mind + Movement"/>
-		<info name="language" value="Dutch/English/French/German/Italian/Spanish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLES-03120"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60445,7 +60463,10 @@ The game only boot on PAL
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="developer" value="Arc Developments" />
-		<info name="language" value="English/French/German/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLES-00095"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60639,7 +60660,11 @@ The game only boot on PAL
 		<year>2000</year>
 		<publisher>Sony</publisher>
 		<info name="developer" value="Namco"/>
-		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SCES-02066"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60679,7 +60704,11 @@ The game only boot on PAL
 		<year>2001</year>
 		<publisher>3DO / Hasbro Interactive</publisher>
 		<info name="developer" value="Blitz Games"/>
-		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLES-03083"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60699,7 +60728,16 @@ The game only boot on PAL
 		<year>2000</year>
 		<publisher>Hasbro Interactive</publisher>
 		<info name="developer" value="Interactive Studios"/>
-		<info name="language" value="Danish/Dutch/English/Finnish/French/German/Italian/Norwegian/Spanish/Swedish"/>
+		<info name="language" value="Danish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="Finnish" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Norwegian" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<info name="serial" value="SLES-01761"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60720,7 +60758,16 @@ The game only boot on PAL
 		<publisher>Hasbro Interactive</publisher>
 		<info name="copy_protection" value="Error Detection and Correction"/>
 		<info name="developer" value="Interactive Studios"/>
-		<info name="language" value="Danish/Dutch/English/Finnish/French/German/Italian/Norwegian/Spanish/Swedish"/>
+		<info name="language" value="Danish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="Finnish" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Norwegian" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<info name="serial" value="SLES-01761#"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60741,7 +60788,9 @@ The game only boot on PAL
 		<year>1996</year>
 		<publisher>Gremlin Interactive</publisher>
 		<info name="developer" value="Gremlin Interactive"/>
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="serial" value="SLES-00015"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60894,7 +60943,11 @@ Scrambled graphics when shooting the ball
 		<publisher>Vivendi Universal Games</publisher>
 		<info name="developer" value="Coktel Vision" />
 		<info name="developer" value="Neko Entertainment" />
-		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLES-04108"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60942,7 +60995,11 @@ Scrambled graphics when shooting the ball
 The game freezes when loading (after the intro)
 ]]></notes>
 		<info name="developer" value="Psygnosis"/>
-		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLES-00189"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60963,7 +61020,12 @@ The game freezes when loading (after the intro)
 		<year>1997</year>
 		<publisher>Psygnosis</publisher>
 		<info name="developer" value="Shen Technologies"/>
-		<info name="language" value="Dutch/English/French/German/Italian/Spanish"/>
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLES-00857"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -61013,7 +61075,10 @@ During gameplay, the commentary speech audio is playing too fast
 		<year>1996</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="developer" value="Artdink"/>
-		<info name="language" value="English/French/German/Japanese" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Japanese" />
 		<info name="serial" value="SCES-00290"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -61216,7 +61281,11 @@ During gameplay, the commentary speech audio is playing too fast
 		<publisher>Infogrames</publisher>
 		<info name="barcode" value="3 329720 010173"/>
 		<info name="developer" value="Infogrames"/>
-		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLES-00037"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -61416,7 +61485,10 @@ During gameplay, the commentary speech audio is playing too fast
 		<year>2001</year>
 		<publisher>Midas Interactive</publisher>
 		<info name="developer" value="The Code Monkeys"/>
-		<info name="language" value="Dutch/English/French/German"/>
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="serial" value="SLES-02961"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -61494,7 +61566,12 @@ During gameplay, the commentary speech audio is playing too fast
 		<publisher>GT Interactive</publisher>
 		<notes>Scrambled graphics</notes>
 		<info name="developer" value="Mirage Technologies"/>
-		<info name="language" value="Dutch/English/French/German/Italian/Spanish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="19970407" />
 		<info name="serial" value="SLES-00334"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
@@ -61558,7 +61635,8 @@ During gameplay, the commentary speech audio is playing too fast
 		<year>1996</year>
 		<publisher>Ocean</publisher>
 		<info name="developer" value="Ocean" />
-		<info name="language" value="English/French" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<info name="serial" value="SLES-00053"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -62853,7 +62931,11 @@ During gameplay, the commentary speech audio is playing too fast
 		<year>1997</year>
 		<publisher>Ocean</publisher>
 		<info name="developer" value="MicroProse"/>
-		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="19970915"/>
 		<info name="serial" value="SLES-00262"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>

@@ -16467,7 +16467,9 @@ When starting the game, the error "Packed file is corrupt" is shown.
 		<year>1991</year>
 		<publisher>Maxis Software</publisher>
 		<info name="developer" value="Maxis Software" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -17194,7 +17196,8 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<publisher>Rainbird Software</publisher>
 		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Argonaut Software" />
-		<info name="language" value="English/German" />
+		<info name="language" value="English" />
+		<info name="language" value="German" />
 		<info name="ported_by" value="Realtime Games Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">

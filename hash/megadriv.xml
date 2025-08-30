@@ -2272,7 +2272,8 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<year>2021</year>
 		<publisher>Itch.io</publisher>
 		<info name="developer" value="Mangangá Team" />
-		<info name="language" value="English/Portuguese (Brazil)" />
+		<info name="language" value="English" />
+		<info name="language" value="Portuguese (Brazil)" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3168608">
 				<rom name="Devwill Too Prologue (ENG - PTBR).bin" size="3168608" crc="736a07e2" sha1="5cb22aadeba74ea155be1eb846a428bd665d5a16" />
@@ -3252,7 +3253,11 @@ Crashes with NTSC machines after EOA logo (verify)
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="alt_title" value="Fever Pitch Soccer"/> <!-- box title -->
-		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-18008-U"/>
@@ -3268,7 +3273,10 @@ Crashes with NTSC machines after EOA logo (verify)
 		<description>FIFA International Soccer (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="language" value="English/French/German/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWA P10001 REV J"/>
 			<feature name="u1" value="FIFA SOCCER10"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -3453,7 +3461,8 @@ Crashes with NTSC machines after EOA logo (verify)
 		<description>Flashback (Europe, rev. A)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="English/French"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-15410A-SM"/>
@@ -3469,7 +3478,8 @@ Crashes with NTSC machines after EOA logo (verify)
 		<description>Flashback - The Quest for Identity (USA)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="English/French"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -4818,7 +4828,11 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 		<description>Kick Off 3 - European Challenge (Europe)</description>
 		<year>1994</year>
 		<publisher>Vic Tokai</publisher>
-		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -5148,7 +5162,9 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 		<description>The Lost Vikings (Europe)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -6392,7 +6408,12 @@ Unsupported [Menacer] peripheral
 		<description>Olympic Gold (Europe)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="Dutch/English/French/German/Italian/Portuguese (Brazil)/Spanish/Swedish"/>
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-14753-F"/>
@@ -6410,7 +6431,12 @@ Unsupported [Menacer] peripheral
 		<info name="serial" value="G-4081"/>
 		<info name="release" value="19920724"/>
 		<info name="alt_title" value="オリンピックゴールド"/>
-		<info name="language" value="Dutch/English/French/German/Italian/Portuguese (Brazil)/Spanish/Swedish"/>
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-14858A-T"/>
@@ -6942,7 +6968,10 @@ Unemulated HeartBeat peripheral
 		<description>Power Drive (Europe)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="English/French/German/Portuguese (Brazil)/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Portuguese (Brazil)/Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-17421-T"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -7081,7 +7110,11 @@ Unemulated HeartBeat peripheral
 		<description>Psycho Pinball (Europe, 199409)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="SR16V4-0"/>
 			<feature name="u1" value="CODEMASTERS PSYCHO PINBALL MDPP021F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -7648,7 +7681,10 @@ Unemulated HeartBeat peripheral
 		<description>Sensible Soccer (Europe)</description>
 		<year>1993</year>
 		<publisher>Renegade</publisher>
-		<info name="language" value="English/French/German/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -7672,7 +7708,10 @@ Unemulated HeartBeat peripheral
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="alt_title" value="International Sensible Soccer - Limited Edition: World Champions (Box)"/>
-		<info name="language" value="English/French/German/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -7946,7 +7985,11 @@ Unemulated HeartBeat peripheral
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
 		<info name="developer" value="Infogrames" />
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -7963,7 +8006,11 @@ Unemulated HeartBeat peripheral
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<info name="developer" value="Infogrames" />
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
@@ -9549,7 +9596,11 @@ Unemulated HeartBeat peripheral
 		<description>Ultimate Soccer (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
@@ -9810,7 +9861,11 @@ Unemulated HeartBeat peripheral
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Distinctive Software" />
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWB SC42X1 REV B"/>
 			<feature name="u1" value="CARMEN CAR04 7129"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -9826,7 +9881,11 @@ Unemulated HeartBeat peripheral
 		<description>Where in the World Is Carmen Sandiego? (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWB SC42X1 REV E"/>
 			<feature name="u1" value="CARMEN WORLD CWOR01"/>
@@ -9897,7 +9956,12 @@ Unemulated HeartBeat peripheral
 		<description>Winter Olympics (Europe)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="English/French/German/Italian/Norwegian/Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Norwegian" />
+		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="837-10096 / 171-6587A"/>
 			<!-- two epoxy blocks are present on the PCB, 1MB each?!? -->
@@ -10091,7 +10155,12 @@ https://tcrf.net/World_Championship_Soccer_(Genesis)
 		<description>World Cup USA 94 (Europe, USA, Korea)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="Dutch/English/French/German/Italian/Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="?? (Sega)"/>
@@ -10443,7 +10512,9 @@ https://tcrf.net/World_Championship_Soccer_(Genesis)
 		<description>Rugby World Cup 1995 (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="language" value="English/French/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Italian" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWA P10001 REV H"/>
 			<feature name="u1" value="RUGBY RUGBYB21"/>
@@ -10661,7 +10732,11 @@ Doesn't accept any input
 		<description>Psycho Pinball (Europe, 199410)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mdppf821.bin" size="2097152" crc="32dd8351" sha1="928f46ca87886c6e72d10f7c9db29b09e483bc49"/>
@@ -11590,7 +11665,9 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<year>2020</year>
 		<publisher>Broke Studio</publisher>
 		<info name="developer" value="Sik" />
-		<info name="language" value="English/French/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="Arkagis Revolution (REV01) (World) (Unl).bin" size="4194304" crc="a9bdc71b" sha1="c3f03b06a220816b075c84090470a3974dd67bab" />
@@ -11603,7 +11680,9 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<year>2020</year>
 		<publisher>Sik</publisher>
 		<info name="developer" value="Sik" />
-		<info name="language" value="English/French/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="2020-03-04" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="786432">
@@ -11617,7 +11696,9 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<year>2019</year>
 		<publisher>Sik</publisher>
 		<info name="developer" value="Sik" />
-		<info name="language" value="English/French/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="2019-02-21" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="786432">
@@ -11631,7 +11712,8 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<year>2019</year>
 		<publisher>Sik</publisher>
 		<info name="developer" value="Sik" />
-		<info name="language" value="English/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="2019-07-29" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="786432">
@@ -11645,7 +11727,8 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<year>2019</year>
 		<publisher>Sik</publisher>
 		<info name="developer" value="Sik" />
-		<info name="language" value="English/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="2019-09-02" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="786432">
@@ -11659,7 +11742,8 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<year>2019</year>
 		<publisher>Sik</publisher>
 		<info name="developer" value="Sik" />
-		<info name="language" value="English/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="2019-09-16" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="786432">
@@ -11673,7 +11757,9 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<year>2019</year>
 		<publisher>Sik</publisher>
 		<info name="developer" value="Sik" />
-		<info name="language" value="English/French/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="2019-11-28" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="786432">
@@ -11687,7 +11773,9 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<year>2023</year>
 		<publisher>Sik</publisher>
 		<info name="developer" value="Sik" />
-		<info name="language" value="English/Japanese/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="Japanese" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="2023-01-23" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -11701,7 +11789,9 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<year>2021</year>
 		<publisher>Sik</publisher>
 		<info name="developer" value="Sik" />
-		<info name="language" value="English/Japanese/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="Japanese" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="2021-11-06" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -11715,7 +11805,9 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<year>2022</year>
 		<publisher>Sik</publisher>
 		<info name="developer" value="Sik" />
-		<info name="language" value="English/Japanese/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="Japanese" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="2022-04-29" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -13367,7 +13459,8 @@ Unsupported [Menacer] peripheral (joypad works)
 		<description>Bone Marrow (demo)</description>
 		<year>2021</year>
 		<publisher>PSCD Games</publisher>
-		<info name="language" value="English/Russian"/>
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="Bone_Marrow_Demo.bin" size="2097152" crc="6b533352" sha1="55c218069406f8a8bcebe91a51dd5708e9a8ac43" />
@@ -13379,7 +13472,8 @@ Unsupported [Menacer] peripheral (joypad works)
 		<description>Bone Marrow Rebirth (demo)</description>
 		<year>2021</year>
 		<publisher>PSCD Games</publisher>
-		<info name="language" value="English/Russian"/>
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1966080">
 				<rom name="Bone_Marrow_Demo v2.bin" size="1966080" crc="6428449c" sha1="1e6a2e526814282eb58b2221570fa3d378fb6d79" />
@@ -15640,7 +15734,8 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>T.C.K - The Cursed Knight</description>
 		<year>2022</year>
 		<publisher>Broke Studio</publisher>
-		<info name="language" value="English/French" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="The Cursed Knight.bin" size="4194304" crc="573f195b" sha1="7697ea661a2f5e97429991ca51dd0eb55a672126" />
@@ -15653,7 +15748,8 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<year>2022</year>
 		<publisher>Broke Studio</publisher>
 		<info name="developer" value="GGS Studio Creation" />
-		<info name="language" value="English/French" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="The Cursed Knight (beta).bin" size="4194304" crc="52c6ef0f" sha1="b0ea6ed28d39b278aabf315841763dfb37b60a1c" />
@@ -15721,7 +15817,8 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<year>2022</year>
 		<publisher>Broke Studio</publisher>
 		<info name="developer" value="GGS Studio Creation" />
-		<info name="language" value="English/French" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<info name="version" value="demo 3.0" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3801088">
@@ -16196,7 +16293,11 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Demons of Asteborg (demo 20210913)</description>
 		<year>2021</year>
 		<publisher>Neofid Studios</publisher>
-		<info name="language" value="English/French/German/Italian/Portuguese (Brazil)/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese (Brazil)/Spanish" />
 		<info name="release" value="2020-09-13" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="15335424">
@@ -16249,7 +16350,11 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Demons of Asteborg (demo 20210827)</description>
 		<year>2021</year>
 		<publisher>Neofid Studios</publisher>
-		<info name="language" value="English/French/German/Italian/Portuguese (Brazil)/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese (Brazil)/Spanish" />
 		<info name="release" value="2020-08-27" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="15335424">
@@ -16262,7 +16367,11 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Demons of Asteborg (demo 20210903)</description>
 		<year>2021</year>
 		<publisher>Neofid Studios</publisher>
-		<info name="language" value="English/French/German/Italian/Portuguese (Brazil)/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese (Brazil)/Spanish" />
 		<info name="release" value="2020-09-03" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="15335424">
@@ -18343,7 +18452,8 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<description>Flashback (prototype 19920918)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="English/French"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="flashback (sep 18, 1992 prototype).bin" size="2097152" crc="82095cb6" sha1="3c0b25e090d0c1167714e1a7346a289ffb808b49"/>
@@ -18355,7 +18465,8 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<description>Flashback - The Quest for Identity (USA, alt)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="English/French"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1572864">
@@ -20546,7 +20657,8 @@ Black screen
 		<description>Kirito - The Game (demo 1.1)</description>
 		<year>2024</year>
 		<publisher>Tulfared</publisher>
-		<info name="language" value="English/French" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2228224">
 				<rom name="rom_demo_ktg_d11.bin" size="2228224" crc="03b9a3be" sha1="50f51e180cc1877ebeae366435f6fbbd35068232" />
@@ -20558,7 +20670,8 @@ Black screen
 		<description>Kirito - The Game (demo 1.0)</description>
 		<year>2024</year>
 		<publisher>Tulfared</publisher>
-		<info name="language" value="English/French" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2228224">
 				<rom name="rom_demo_ktg.bin" size="2228224" crc="567c2bc1" sha1="ec0e63ee4541212699bc7613aab34f3e18a5be79" />
@@ -21142,7 +21255,9 @@ Unsupported [Justifier] peripheral (joypad works)
 		<description>The Lost Vikings (Europe, prototype)</description>
 		<year>1993</year>
 		<publisher>Interplay</publisher>
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="lost vikings, the (euro) (beta).bin" size="1048576" crc="17bed25f" sha1="375eaa9845692db4fdbd0b51985aa0892a8fe425"/>
@@ -24382,7 +24497,12 @@ Unemulated [Sega Mega Modem] features
 		<description>Olympic Gold (USA)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="Dutch/English/French/German/Italian/Portuguese (Brazil)/Spanish/Swedish"/>
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="olympic gold (usa).bin" size="524288" crc="339594b4" sha1="f9febd976d98545dee35c10b69755908d6929fd4"/>
@@ -31804,7 +31924,12 @@ No BGMs
 		<description>Tintin au Tibet (Europe)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
-		<info name="language" value="Dutch/English/French/German/Spanish/Swedish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -31817,7 +31942,12 @@ No BGMs
 		<description>Tintin au Tibet (Europe, prototype)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
-		<info name="language" value="Dutch/English/French/German/Spanish/Swedish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -33493,7 +33623,12 @@ Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
 		<info name="serial" value="G-4115"/>
 		<info name="release" value="19940211"/>
 		<info name="alt_title" value="ウィンターオリンピック"/>
-		<info name="language" value="English/French/German/Italian/Norwegian/Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Norwegian" />
+		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="winter olympics (jpn).bin" size="2097152" crc="654a4684" sha1="aa2fc21eaa833640eaf882d66ca6ceb4f8adabcf"/>
@@ -33505,7 +33640,12 @@ Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
 		<description>Winter Olympic Games (USA)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="English/French/German/Italian/Norwegian/Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Norwegian" />
+		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="winter olympic games (usa).bin" size="2097152" crc="c5834437" sha1="da5a2a0c1a0a6b7b29492f8845eca1167158ebea"/>
@@ -35053,7 +35193,13 @@ Black screen
 		<description>Xeno Crisis</description>
 		<year>2019</year>
 		<publisher>Bitmap Bureau</publisher>
-		<info name="language" value="Dutch/English/French/German/Italian/Japanese/Portuguese (Brazil)/Spanish"/>
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Japanese" />
+		<info name="language" value="Portuguese (Brazil)/Spanish" />
 		<info name="release" value="20191028"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
@@ -36281,7 +36427,11 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 		<description>Ultimate Soccer (Europe, prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="world soccer (prototype).bin" size="1048576" crc="9d451f72" sha1="892747034876a7f587bbf0e3f21c9f35237bb1ea"/>

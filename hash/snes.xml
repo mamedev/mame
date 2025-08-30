@@ -14166,7 +14166,9 @@ more investigation needed...
 		<description>Flashback (Europe, English / French / German)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="serial" value="SNSP-5F-NOE" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-2J0N-01" />
@@ -14214,7 +14216,9 @@ more investigation needed...
 		<description>Flashback - The Quest for Identity (USA)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="serial" value="SNS-5F-USA" />
 		<info name="release" value="199402xx" />
 		<part name="cart" interface="snes_cart">
@@ -41536,7 +41540,8 @@ List of unclassified roms
 		<description>Flashback (Europe, English / French)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="English/French" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2097152">
@@ -49495,7 +49500,8 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<year>2020</year>
 		<publisher>Portabledev</publisher>
 		<info name="developer" value="Alekmaul" />
-		<info name="language" value="English/French" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<info name="version" value="v2.1" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -49510,7 +49516,8 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<year>2020</year>
 		<publisher>Portabledev</publisher>
 		<info name="developer" value="Alekmaul" />
-		<info name="language" value="English/French" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<info name="version" value="v2.1" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -49525,7 +49532,8 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<year>2012</year>
 		<publisher>Portabledev</publisher>
 		<info name="developer" value="Alekmaul" />
-		<info name="language" value="English/French" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<info name="version" value="v1.3" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -49540,7 +49548,8 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<year>2012</year>
 		<publisher>Portabledev</publisher>
 		<info name="developer" value="Alekmaul" />
-		<info name="language" value="English/French" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<info name="version" value="v1.2" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
