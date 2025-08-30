@@ -21107,7 +21107,8 @@ legacy FM implementations cannot find it.
 		<description>Destroyer</description>
 		<year>2014</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="CEZ / RetroWorks"/>
+		<info name="developer" value="CEZ" />
+		<info name="developer" value="RetroWorks" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -21120,7 +21121,8 @@ legacy FM implementations cannot find it.
 		<description>Destroyer (older)</description>
 		<year>2014</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="CEZ / RetroWorks"/>
+		<info name="developer" value="CEZ" />
+		<info name="developer" value="RetroWorks" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -21923,7 +21925,9 @@ legacy FM implementations cannot find it.
 		<description>Gommy - Medieval Defender (English)</description>
 		<year>2013</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Retroworks, Dimension Z, nenefranz"/>
+		<info name="developer" value="Retroworks" />
+		<info name="developer" value="Dimension Z" />
+		<info name="developer" value="nenefranz" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -21936,7 +21940,9 @@ legacy FM implementations cannot find it.
 		<description>Gommy - Medieval Defender (Spanish)</description>
 		<year>2013</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Retroworks, Dimension Z, nenefranz"/>
+		<info name="developer" value="Retroworks" />
+		<info name="developer" value="Dimension Z" />
+		<info name="developer" value="nenefranz" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -24565,7 +24571,8 @@ legacy FM implementations cannot find it.
 		<description>PSGed (v0.82b)</description>
 		<year>2010</year>
 		<publisher>aorante</publisher>
-		<info name="developer" value="aorante/303bcn"/>
+		<info name="developer" value="aorante" />
+		<info name="developer" value="303bcn" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -24578,7 +24585,8 @@ legacy FM implementations cannot find it.
 		<description>PSGed (v0.8b)</description>
 		<year>2010</year>
 		<publisher>aorante</publisher>
-		<info name="developer" value="aorante/303bcn"/>
+		<info name="developer" value="aorante" />
+		<info name="developer" value="303bcn" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -24591,7 +24599,8 @@ legacy FM implementations cannot find it.
 		<description>PSGed (v0.4b)</description>
 		<year>2010</year>
 		<publisher>aorante</publisher>
-		<info name="developer" value="aorante/303bcn"/>
+		<info name="developer" value="aorante" />
+		<info name="developer" value="303bcn" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8001">

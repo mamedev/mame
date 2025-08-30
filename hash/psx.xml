@@ -57854,7 +57854,8 @@ The game only boot on PAL
 		<description>Transport Tycoon 3D: SL Kara Hajimeyou!! (Japan)</description>
 		<year>1998</year>
 		<publisher>Ocean</publisher>
-		<info name="developer" value="MicroProse / Digital Amusement"/>
+		<info name="developer" value="MicroProse" />
+		<info name="developer" value="Digital Amusement" />
 		<info name="language" value="Japanese"/>
 		<info name="release" value="19980806"/>
 		<info name="serial" value="SLPS-00694"/>
@@ -60891,7 +60892,8 @@ Scrambled graphics when shooting the ball
 		<description>Adiboo &amp; Paziral's Secret (Europe)</description>
 		<year>2003</year>
 		<publisher>Vivendi Universal Games</publisher>
-		<info name="developer" value="Coktel Vision / Neko Entertainment"/>
+		<info name="developer" value="Coktel Vision" />
+		<info name="developer" value="Neko Entertainment" />
 		<info name="language" value="English/French/German/Italian/Spanish"/>
 		<info name="serial" value="SLES-04108"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
@@ -60911,7 +60913,9 @@ Scrambled graphics when shooting the ball
 		<description>Adibou et l'Ombre Verte (France)</description>
 		<year>2001</year>
 		<publisher>Vivendi Universal Games</publisher>
-		<info name="developer" value="Coktel Vision / Kalisto Entertainment / Neko Entertainment"/>
+		<info name="developer" value="Coktel Vision" />
+		<info name="developer" value="Kalisto Entertainment" />
+		<info name="developer" value="Neko Entertainment" />
 		<info name="language" value="French"/>
 		<info name="serial" value="SCES-03558"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>

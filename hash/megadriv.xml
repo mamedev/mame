@@ -3389,7 +3389,8 @@ Crashes with NTSC machines after EOA logo (verify)
 		<description>Fighting Masters (USA)</description>
 		<year>1992</year>
 		<publisher>Treco</publisher>
-		<info name="developer" value="Aicom / ALU" />
+		<info name="developer" value="Aicom" />
+		<info name="developer" value="ALU" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-14635-S"/>
@@ -5250,7 +5251,8 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 		<description>Mario Andretti Racing (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="developer" value="Stormfront Studios / High Score Productions" />
+		<info name="developer" value="Stormfront Studios" />
+		<info name="developer" value="High Score Productions" />
 		<info name="language" value="English" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="P/N 670128-1 REV 1"/>
@@ -7610,7 +7612,9 @@ Unemulated HeartBeat peripheral
 		<description>The Second Samurai (Europe)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
-		<info name="developer" value="Vivid Image / Psygnosis / Krisalis Software" />
+		<info name="developer" value="Vivid Image" />
+		<info name="developer" value="Psygnosis" />
+		<info name="developer" value="Krisalis Software" />
 		<info name="language" value="English" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -17282,7 +17286,8 @@ Choppy timings during gameplay (btanb?)
 		<info name="serial" value="T-73033"/>
 		<info name="release" value="19930625"/>
 		<info name="alt_title" value="エリミネートダウン"/>
-		<info name="developer" value="Aprinet / Varie"/>
+		<info name="developer" value="Aprinet" />
+		<info name="developer" value="Varie" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="eliminate down (jpn).bin" size="1048576" crc="48467542" sha1="53b418bde065011e161e703dd7c175aa48a04fe5"/>
@@ -36602,7 +36607,8 @@ Boots to a pink screen (btanb)
 https://bootleggames.fandom.com/wiki/Death_Caliber
 Unsupported lightgun or mouse?
 ]]></notes>
-		<info name="developer" value="Hummer Software, Tomsoft"/>
+		<info name="developer" value="Hummer Software" />
+		<info name="developer" value="Tomsoft" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="death caliber.bin" size="4194304" crc="3cd2c797" sha1="414bce2fa385642fccaa4653339dae44f1913505"/>

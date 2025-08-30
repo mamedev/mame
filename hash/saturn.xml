@@ -3677,7 +3677,8 @@ https://segaretro.org/Delisoba_Deluxe
 		<info name="serial" value="610-6803"/>
 		<info name="release" value="19971028"/>
 		<info name="alt_title" value="デリソバ デラックス"/>
-		<info name="developer" value="Sega, Cave"/>
+		<info name="developer" value="Sega" />
+		<info name="developer" value="Cave" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

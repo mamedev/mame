@@ -551,7 +551,8 @@ The text "v1" or "v2" are simply to distinguish different versions. It isn't an 
 		<description>Editor-Assembler V.1.2B</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="developer" value="Dubois and McNamara, Mark Harwood"/>
+		<info name="developer" value="Dubois and McNamara" />
+		<info name="developer" value="Mark Harwood" />
 		<part name="snap" interface="vzsnap">
 			<dataarea name="snap" size="0x0027bd">
 				<rom name="tape disk editor assembler v1.2b (19xx)" size="0x0027bd" crc="a776198e" sha1="693d20dad9f302026c2c02bb3a0fc7e87277c8ac"/>

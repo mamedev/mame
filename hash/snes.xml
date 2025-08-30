@@ -42519,7 +42519,9 @@ List of unclassified roms
 		<description>Ghoul Patrol (USA, Limited Run Games)</description>
 		<year>2021</year>
 		<publisher>Limited Run Games</publisher>
-		<info name="developer" value="LucasArts / Motion Pixel / Realtime Associates" />
+		<info name="developer" value="LucasArts" />
+		<info name="developer" value="Motion Pixel" />
+		<info name="developer" value="Realtime Associates" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SNES-LROM-RAM-V03 RB INNEX-C01" />
 			<feature name="u0" value="U0 EPROM [HY29F800BT-70 0041A]" />
@@ -65290,7 +65292,8 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>Unholy Night: The Darkness Hunter (Europe)</description>
 		<year>2017</year>
 		<publisher>PixelHeart</publisher>
-		<info name="developer" value="Foxbat Corporation / Nu-Gaia" />
+		<info name="developer" value="Foxbat Corporation" />
+		<info name="developer" value="Nu-Gaia" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="4194304">
@@ -65303,7 +65306,8 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>Unholy Night: The Darkness Hunter (USA)</description>
 		<year>2017</year>
 		<publisher>Retroism</publisher>
-		<info name="developer" value="Foxbat Corporation / Nu-Gaia" />
+		<info name="developer" value="Foxbat Corporation" />
+		<info name="developer" value="Nu-Gaia" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="090-UNHOLY-04" />
 			<feature name="u1" value="U1 EPROM [XC9572XL VQG64AWN1 713 F5379514A]" />
@@ -65323,7 +65327,8 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>Unholy Night: The Darkness Hunter (Japan)</description>
 		<year>2017</year>
 		<publisher>BlazePro</publisher>
-		<info name="developer" value="Foxbat Corporation / Nu-Gaia" />
+		<info name="developer" value="Foxbat Corporation" />
+		<info name="developer" value="Nu-Gaia" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="4194304">

@@ -21712,7 +21712,8 @@ license:CC0-1.0
 		<description>Frog Jump: Ordering Numbers</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
-		<info name="developer" value="Scott, Foresman and Company" />
+		<info name="developer" value="Scott" />
+		<info name="developer" value="Foresman and Company" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-12-12 -->
@@ -25427,7 +25428,8 @@ license:CC0-1.0
 		<description>Mathematics Action Games: Pyramid Puzzler</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
-		<info name="developer" value="Scott, Foresman and Company" />
+		<info name="developer" value="Scott" />
+		<info name="developer" value="Foresman and Company" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-30 -->
@@ -28768,7 +28770,8 @@ license:CC0-1.0
 		<description>Number Bowling: Decimals and Fractions</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
-		<info name="developer" value="Scott, Foresman and Company" />
+		<info name="developer" value="Scott" />
+		<info name="developer" value="Foresman and Company" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-30 -->
@@ -32414,7 +32417,8 @@ license:CC0-1.0
 		<description>Star Maze: Division</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
-		<info name="developer" value="Scott, Foresman and Company" />
+		<info name="developer" value="Scott" />
+		<info name="developer" value="Foresman and Company" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-30 -->

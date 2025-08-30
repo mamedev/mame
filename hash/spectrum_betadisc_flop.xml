@@ -48,7 +48,9 @@ license:CC0-1.0
 		<description>Aliens: Neoplasma (v1.3, English, AY sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
-		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
 		<info name="language" value="English" />
 		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
@@ -63,7 +65,9 @@ license:CC0-1.0
 		<description>Aliens: Neoplasma (v1.3, English, Turbo Sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
-		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
 		<info name="language" value="English" />
 		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
@@ -78,7 +82,9 @@ license:CC0-1.0
 		<description>Aliens: Neoplasma (v1.3, Russian, AY sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
-		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
 		<info name="language" value="Russian" />
 		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
@@ -93,7 +99,9 @@ license:CC0-1.0
 		<description>Aliens: Neoplasma (v1.3, Russian, Turbo Sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
-		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
 		<info name="language" value="Russian" />
 		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
@@ -108,7 +116,9 @@ license:CC0-1.0
 		<description>Aliens: Neoplasma (v1.3, Spanish, AY sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
-		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
 		<info name="language" value="Spanish" />
 		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
@@ -123,7 +133,9 @@ license:CC0-1.0
 		<description>Aliens: Neoplasma (v1.3, Spanish, Turbo Sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
-		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
 		<info name="language" value="Spanish" />
 		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
@@ -137,7 +149,8 @@ license:CC0-1.0
 		<description>Ammytris</description>
 		<year>1995</year>
 		<publisher>Navigator</publisher>
-		<info name="developer" value="Andrey Prohorenko / Dream Makers Software" />
+		<info name="developer" value="Andrey Prohorenko" />
+		<info name="developer" value="Dream Makers Software" />
 		<info name="usage" value="Works on Pentagon 1024SL machine" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -188,7 +201,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, English, AY chip sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="English" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -202,7 +216,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, English, AY chip sound)</description>
 		<year>2020</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="English" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -216,7 +231,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, English, Turbo Sound)</description>
 		<year>2020</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="English" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -230,7 +246,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, English, Turbo Sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="English" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -244,7 +261,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, Polish, AY chip sound)</description>
 		<year>2020</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Polish" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -258,7 +276,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, Polish, Turbo Sound)</description>
 		<year>2020</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Polish" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -272,7 +291,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, Polish, AY chip sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Polish" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -286,7 +306,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, Polish, Turbo Sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Polish" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -300,7 +321,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, Russian, AY chip sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Russian" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -314,7 +336,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, Russian, Turbo Sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Russian" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -328,7 +351,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, Russian, AY chip sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Russian" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -342,7 +366,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, Russian, Turbo Sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Russian" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -356,7 +381,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, Spanish, AY chip sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Spanish" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -370,7 +396,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, Spanish, Turbo Sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Spanish" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -384,7 +411,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, Spanish, AY chip sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Spanish" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -398,7 +426,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, Spanish, Turbo Sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Spanish" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -877,7 +906,8 @@ license:CC0-1.0
 		<description>Sun Bucket</description>
 		<year>2014</year>
 		<publisher>Stonechat Productions</publisher>
-		<info name="developer" value="Dave Hughes / Lee Prince" />
+		<info name="developer" value="Dave Hughes" />
+		<info name="developer" value="Lee Prince" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="Sunbucket.trd" size="655360" crc="63084771" sha1="043586c8db70000af084d8af231ed8e193be8656"/>

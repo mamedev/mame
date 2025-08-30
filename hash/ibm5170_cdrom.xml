@@ -446,7 +446,8 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<description>Alien Carnage (Europe)</description>
 		<year>1995</year>
 		<publisher>Kixx XL</publisher>
-		<info name="developer" value="Interactive Binary Illusions / SubZero Software" />
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="developer" value="SubZero Software" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
 		<info name="region" value="ver acs 1.0" />
@@ -465,7 +466,8 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<description>Alien Carnage (Netherlands)</description>
 		<year>1995</year>
 		<publisher>WizardWorks</publisher>
-		<info name="developer" value="Interactive Binary Illusions / SubZero Software" />
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="developer" value="SubZero Software" />
 		<info name="distributor" value="Multi Media International" />
 		<info name="language" value="English" />
 		<info name="region" value="Netherlands" />
@@ -3936,7 +3938,8 @@ This release doesn't have audio speech.
 		<notes><![CDATA[
 Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 ]]></notes>
-		<info name="developer" value="Coktel Vision / M.D.O." />
+		<info name="developer" value="Coktel Vision" />
+		<info name="developer" value="M.D.O." />
 		<info name="language" value="English/French/German/Italian/Spanish" />
 		<info name="region" value="Italy" />
 		<sharedfeat name="platform" value="DOS" />
@@ -3956,7 +3959,8 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<description>Gobliiins (USA, Sierra Originals release)</description>
 		<year>1995</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="developer" value="Coktel Vision / M.D.O." />
+		<info name="developer" value="Coktel Vision" />
+		<info name="developer" value="M.D.O." />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
 		<info name="version" value="1.000 10.05.93" />
@@ -4610,7 +4614,8 @@ Untested multiplayer options
 		<description>Jazz Jackrabbit 2 (Europe)</description>
 		<year>1998</year>
 		<publisher>Project Two Interactive</publisher>
-		<info name="developer" value="Epic MegaGames / Orange Games" />
+		<info name="developer" value="Epic MegaGames" />
+		<info name="developer" value="Orange Games" />
 		<info name="language" value="English/Dutch/French/German/Italian/Spanish" />
 		<info name="region" value="Europe" />
 		<info name="version" value="1.20" />

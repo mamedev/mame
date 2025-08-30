@@ -2594,7 +2594,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Anglais - Volume 1 - Tests de Niveau</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="developer" value="CEGOS" />
+		<info name="developer" value="Alpha-Langues" />
 		<info name="serial" value="45 1901"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -2615,7 +2616,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Anglais - Volume 2 - Le Système Verbal 1</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="developer" value="CEGOS" />
+		<info name="developer" value="Alpha-Langues" />
 
 		<part name="cass1" interface="mo_cass">
 			<feature name="part_id" value="Tape 1"/>
@@ -2635,7 +2637,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Anglais - Volume 3 - Le Système Verbal 2</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="developer" value="CEGOS" />
+		<info name="developer" value="Alpha-Langues" />
 		<info name="serial" value="45 1903"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -2656,7 +2659,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Anglais - Volume 4 - Le Groupe Nominal 1</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="developer" value="CEGOS" />
+		<info name="developer" value="Alpha-Langues" />
 
 		<part name="cass1" interface="mo_cass">
 			<feature name="part_id" value="Tape 1"/>
@@ -2676,7 +2680,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Anglais - Volume 5 - Le Groupe Nominal 2</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="developer" value="CEGOS" />
+		<info name="developer" value="Alpha-Langues" />
 
 		<part name="cass1" interface="mo_cass">
 			<feature name="part_id" value="Tape 1"/>
