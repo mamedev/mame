@@ -1,48 +1,159 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-/*
- *  Beatmania DJ Main Board (GQ753)
- *  PCB label is "DMAIN", but the manuals call it "DJ_MAIN".
- *
- *  Product numbers: (x: Q = full cabinet, C = conversion kit)
- *  GQ753 beatmania (first release in 1997.12)
- *  Gx853 beatmania 2nd MIX (1998.03)
- *  Gx825 beatmania 3rd MIX (1998.09)
- *  Gx858 beatmania complete MIX (1999.01)
- *  Gx847 beatmania 4th MIX (1999.04)
- *  Gx981 beatmania 5th MIX (1999.09)
- *  Gx988 beatmania complete MIX 2 (2000.01)
- *  Gx993 beatmania Club MIX (2000.03)
- *  Gx995 beatmania featuring Dreams Come True (2000.05)
- *  GxA05 beatmania CORE REMIX (2000.11)
- *  GxA21 beatmania 6th MIX (2001.07)
- *  GxB07 beatmania 7th MIX (2002.01)
- *  GxC01 beatmania THE FINAL (2002.07)
- *
- *  Gx803 Pop'n Music (1998.09)
- *  Gx831 Pop'n Music 2 (1999.04)
- *  Gx980 Pop'n Music 3 (1999.09)
- *
- *  Gx970 Pop'n Stage (1999.11)
- *  Gx970 Pop'n Stage EX (2000.03)
- *
- *  Chips:
- *  15a:    MC68EC020FG25 @ 16 MHz
- *  25b:    001642 or KS10101 (sprites, misc)
- *  18d:    055555 (priority encoder)
- *   5f:    056766 (color DAC)
- *  18f:    056832 (tiles)
- *  22f:    058143 = 054156 (tiles)
- *  12j:    058141 = 054539 (x2) (2 sound chips in one)
- *
- *  Vsync: 57.99667Hz
- *  Hsync: 24.24kHz
- *
- */
+/*******************************************************************************
 
-/*
+Konami DJ Main (GQ753)
+This PCB runs several music rhythm games.
 
-Dumping a HD image.
+Product numbers: (x: Q = full cabinet, C = conversion kit)
+GQ753 beatmania (first release in 1997.12)
+Gx853 beatmania 2nd MIX (1998.03)
+Gx825 beatmania 3rd MIX (1998.09)
+Gx858 beatmania complete MIX (1999.01)
+Gx847 beatmania 4th MIX (1999.04)
+Gx981 beatmania 5th MIX (1999.09)
+Gx988 beatmania complete MIX 2 (2000.01)
+Gx993 beatmania Club MIX (2000.03)
+Gx995 beatmania featuring Dreams Come True (2000.05)
+GxA05 beatmania CORE REMIX (2000.11)
+GxA21 beatmania 6th MIX (2001.07)
+GxB07 beatmania 7th MIX (2002.01)
+GxC01 beatmania THE FINAL (2002.07)
+
+Gx803 Pop'n Music (1998.09)
+Gx831 Pop'n Music 2 (1999.04)
+Gx980 Pop'n Music 3 (1999.09)
+
+Gx970 Pop'n Stage (1999.11)
+Gx970 Pop'n Stage EX (2000.03)
+
+
+Hardware Info By Guru
+---------------------
+
+PCB Layout (info from Beatmania 3rd Mix PCB)
+----------
+KONAMI GQ753 DMAIN (note PCB says 'DMAIN' not 'DJMAIN'. Apparently it says DJ_MAIN in the manuals)
+PWB(A3)0000041651
+MADE IN JAPAN
+|---------------------------------------------------------------------------|
+| CN9      CN8                       CN7            CN6         CN3   CN5   |
+|   M66011FP        NRPS11                                                  |
+|34051                                            056820       C4741 C4741  |
+|34051        4AK16   4AK16   4AK16                                         |
+|                                                |------|        056602A    |
+|  825B01.6A                                     |KONAMI|        056602A    |
+|                                                |056766|        056602A    |
+|L8 825B02.8A                                    |------|        056602A    |
+|L7 84256.9A                                      CY7C185                   |
+|L6 84256.10A                                     CY7C185       |------|    |
+|L5                                               CY7C185       |KONAMI|    |
+|L4       |-------|                                             |058141|    |
+|L3       |68EC020|                                             |------|    |
+|L2       |FG25   |                                             84256.14J   |
+|L1       |-------|     PAL16V8.16C                                         |
+|                       LTC1232   |------|   |------|                       |
+| RESET_SW                        |KONAMI|   |KONAMI| HM5116100  HM5116100  |
+|            MACH111  MACH211     |055555|   |056832| HM5116100  HM5116100  |
+|DIPSW3                           |------|   |------| HM5116100  HM5116100  |
+|  825A03.19A                                         HM5116100  HM5116100  |
+|DIPSW2                                      |------| 18.432MHz          CN4|
+|  825A04.20A  |-----------|    825B07.22D   |KONAMI| 32MHz                 |
+|DIPSW1        |           |                 |058143|                 LEDHDD|
+|  825A05.22A  |           |    825B08.23D   |------|                    CN2|
+|              |  001642   |                                            CN1 |
+|  825A06.24A  |           |    825B09.25D   84256.25F                      |
+|  84256.26A   |           |                 84256.26F                      |
+|  84256.27A   |-----------|    825B10.27D   84256.27F                JMP2  |
+|---------------------------------------------------------------------------|
+Notes:
+  68EC020FG25 - Motorola MC68EC020FG25 CPU. Clock Input 16MHz [32/2]. Clock and reset are buffered through 001642 Custom.
+       NRPS11 - IDEC NRPS11-2A Miniature Resettable Circuit Protector
+      LTC1232 - Linear Technology LTC1232 Microprocessor Supervisory Circuit (Reset+Watchdog)
+         L1-8 - LEDs. They move slowly as the game runs, starting at L1 and ending at L8 then looping back to L1.
+      CN1/CN2 - 50 Pin 2.5" IDE Hard Drive Connector. Only CN1 is populated.
+                Games from Complete Mix onwards have HDD Password. Use the info further down to dump those HDDs.
+                The first 6 pins on the connector are not used and only the standard ATA IDE44 signals are
+                used by the main board.
+                The HDD model and size varies per game. The 2.5" HDD has jumpers for setting master, slave
+                or cable select using the first 4 pins of the 50 pin connector. The drive needs to be set
+                to cable select or master with a HIGH signal on the jumper pin to be seen by the PCB.
+                IDE44 pin 28 'Cable Select' is a PAL input signal so if the drive is not jumpered
+                correctly (or the signal is low) the IDE44 16-bit data bus 74F245 buffers are not enabled by
+                the PAL and the POST check will display Error E710 when the HDD is checked.
+                As a result of this, common IDE44 CF or SD card adapters don't work as they leave those
+                signals either floating, tied only low or the jumper pins are not present on the adapter.
+          CN3 - Red/White RCA jack for stereo output to bass speakers
+          CN4 - Power input connector. Pinout is GND, GND, 5V, 5V, 12V, 12V, GND, GND
+          CN5 - Red/White RCA jack for stereo output to main speakers
+          CN6 - Video output connector. Pinout is RED, GREEN, BLUE, SYNC, GND, GND
+          CN7 - 50 pin flat cable connector for controls
+          CN8 - 16 pin flat cable connector for driving high current devices (lamps/motors etc)
+          CN9 - RJ45 network connector. Uses RS-422A Differential Signalling.
+        4AK16 - Hitachi 4AK16 60V 5A N-Channel Power MOSFET Array
+   PAL16V8.8C - PALCE16V8 marked '39423'
+       DSW1/2 - 8-position DIP Switch
+         DSW3 - 6-position DIP Switch
+     M66011FP - Mitsubishi M66011FP Serial Bus Controller. Clock input 4.000MHz [32/8].
+                The Shift Clock Output is 57.99667Hz which is the same as the PCB VSync.
+        C4741 - NEC uPC4741 Quad Operational Amplifier
+        34051 - Mitsubishi M5M34051P Dual RS-422A Transceiver (functionally equivalent to AM26LS31/AM26LS32)
+      056602A - Konami Custom 056602A Ceramic Module. One module per speaker output (4 modules total).
+                The module contains a 5V regulator, 8 pin dual op-amp, capacitors/resistors, 74LS74, 74LS86 and a
+                Nippon Precision Circuits SM5877AM SSOP24 3rd-Order Sigma Delta 2-Channel DAC.
+                SM5877AM Clocks: CKO = 18.432MHz, BCKI = 1.536MHz [18.432/12], XTI = 18.432MHz
+                DS = LOW (normal speed). This is the cost-reduced version. A similar pin-compatible module
+                without the 'A' in the part number has two voltage regulators, two NJM2100 op-amps and a SM5871AM
+                SSOP28 3rd-Order Sigma Delta 2-Channel DAC, seen on earlier games such as Crypt Killer, Konami GV
+                and some other games such as Pop'n Music.
+       056766 - Konami Custom 056766 24-bit RGB Color DAC
+       056820 - Konami Custom Ceramic RGB Drive Module. Contains 5V regulator, transistors, capacitors and resistors.
+                This module drives the analog RGB output coming out of 056766 and outputs to the arcade monitor. It
+                normally runs hot as the module uses 12V with the regulator creating a clean 5V source for the circuit.
+                The full schematic is available at https://gurudumps.otenko.com/re/ (item #43)
+       055555 - Konami Custom 055555 5-bits per Pixel Priority Encoder
+       058141 - Konami Custom 058141 ADPCM 16-Channel Sound Chip. Functionally equivalent to 2x Konami Custom 054539.
+       056832 - Konami Custom 056832 Tilemap Generator \
+       058143 - Konami Custom 058143 Tilemap Generator / These work together and are similar to 054156/054157
+                but with larger tiles and more banks.
+       001642 - Konami Custom 001642 Sprites and Miscellaneous Functions (CPU Reset Source, CPU Clock Source + more?).
+                This chip does not have 'Konami' printed on it. Also seen as 'KONAMI KS10101'.
+      CY7C185 - Cypress CY7C185 8kB x8-bit SRAM. POST Check = COL RAM. Error = E112 if any are bad.
+        84256 - Fujitsu MB84256 32kB x8-bit SRAM
+                9A, 10A - Work RAM. Not checked by POST.
+                26A, 27A - Object RAM. POST Check = OBJ RAM. Error = E115 if any are bad.
+                25F, 26F, 27F - Video RAM. POST Check = V RAM. Error = E113 if any are bad.
+                14J - 058141 RAM. Not checked by POST.
+    HM5116100 - Hitachi HM5116100S6 16MB x1-bit Fast Page DRAM. POST Check = S RAM. Error E114 if any are bad.
+      MACH111 - AMD MACH111 CPLD marked '47831'
+      MACH211 - AMD MACH211 CPLD marked '39838A'. On some games including Pop'n Music this is replaced with
+                a Xilinx XC9536 CPLD.
+         JMP2 - 8-pin not-populated header to set HDD master/slave/cable select mode. Pins 1-4 of the
+                HDD connector CN1 and CN2 are tied to JMP2. All pins are open on the PCB with no connection
+                to anything else other than the HDD connector. These can be used when a 50 pin IDE cable
+                is used as that will cover the master and slave jumper pins on the HDD. A 50 pin 2.5" IDE cable is
+                the same cable used by 2.5" SCSI HDDs. It seems likely that Konami used some kind of adapter PCB
+                in the middle to interface the HDD with the main board. For Pop'n Music the HDD is 3.5" so there
+                was definitely a 2.5" to 3.5" cable adapter used.
+                The jumper pins are laid out like this....
+                |---|
+                |1 2|
+                |---|
+                |3 4|
+                |5 6|
+                |7 8|
+                |---|
+                Jump pins 1-3 for Master, jump pins 3-4 for Cable Select.
+         ROMs - (All ROMs are 27C040)
+                825B01/825B02 - Main Program
+                825A03 to A06 - Sprites
+                825B07 to B10 - Tiles
+        Syncs - Vsync - 57.99667Hz
+                Hsync - 24.24kHz
+
+
+Dumping a HDD image
+-------------------
 
 2.5 inch    2.5 to                                  2.5 to
 hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
@@ -55,16 +166,16 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
                   ||                            /\    ||<-- Power connector
                   ||                            ||          not used
                   ||                            ||
-                  ||
-               ---------                   unplug here
-               |  PC   |                   when game PCB is booted
-               |Power  |                   and working. Boot Windows and stop at menu (F8)
-               |Supply |                   Then plug HD into PC IDE controller, and continue boot process
-               |+5V and|                   then dump the hard drive with Winhex
-               |GND    |                   once PC is booted up again.
-               ---------
+                  ||                            ||
+               |-------|        Unplug here when game PCB is booted and working.
+               |  PC   |        Boot PC and stop at boot menu (F8).
+               |Power  |        Then plug HDD into PC IDE controller and continue boot process.
+               |Supply |        Then dump the hard drive with Winhex or some other HDD imaging
+               |+5V and|        software once PC is booted up.
+               |GND    |
+               |-------|
 
-*/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -101,7 +212,7 @@ public:
 		, m_objrom(*this, "sprites")
 		, m_objram(*this, "objram")
 		, m_sndram(*this, "sndram")
-		, m_pcb_leds(*this, "pled%u", 0U)
+		, m_pcb_leds(*this, "pled%u", 1U)
 		, m_button_leds(*this, "led%u", 0U)
 		, m_right_red_hlt(*this, "right-red-hlt")
 		, m_left_red_hlt(*this, "left-red-hlt")
