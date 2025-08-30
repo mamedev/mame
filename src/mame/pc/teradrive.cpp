@@ -177,7 +177,7 @@ void isa16_ibm_79f2661::md_mem_map(address_map &map)
 				return (u16)(res | (res << 8));
 			}
 
-			return m_md_space->read_word(base_address, mem_mask);
+			return swapendian_int16(m_md_space->read_word(base_address, mem_mask));
 		}),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			const u32 base_address = (offset << 1) + (m_68k_address << 12);
@@ -186,7 +186,7 @@ void isa16_ibm_79f2661::md_mem_map(address_map &map)
 			else if (!ACCESSING_BITS_8_15)
 				m_md_space->write_byte(base_address, data);
 			else
-				m_md_space->write_word(base_address, data, mem_mask);
+				m_md_space->write_word(base_address, swapendian_int16(data), mem_mask);
 		})
 	);
 }
@@ -937,6 +937,17 @@ void teradrive_state::teradrive(machine_config &config)
 
 	YM7101(config, m_md_vdp, md_master_xtal / 4);
 	m_md_vdp->set_screen(m_mdscreen);
+	// TODO: actual DTACK
+	// TODO: accessing 68k bus from x86, defers access?
+	m_md_vdp->dtack_cb().set_inputline(m_md68kcpu, INPUT_LINE_HALT);
+	m_md_vdp->mreq_cb().set([this] (offs_t offset) {
+		// TODO: can't read outside of base cart and RAM
+		//printf("%06x\n", offset);
+		address_space &space68k = m_md68kcpu->space();
+		u16 ret = space68k.read_word(offset, 0xffff);
+
+		return ret;
+	});
 	m_md_vdp->vint_cb().set_inputline(m_md68kcpu, 6);
 //  m_md_vdp->hint_cb().set_inputline(m_md68kcpu, 4);
 	m_md_vdp->sint_cb().set_inputline(m_mdz80cpu, INPUT_LINE_IRQ0);

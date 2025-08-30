@@ -33585,7 +33585,8 @@ Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
 		<year>1993</year>
 		<publisher>Victor</publisher>
 		<notes><![CDATA[
-Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
+https://segaretro.org/Wonder_Library
+Unsupported [Mega CD]/[Wondermega] cart allowing EBXA format to be played back
 ]]></notes>
 		<info name="alt_title" value="ワンダーライブラリ"/>
 		<part name="cart" interface="megadriv_cart">
@@ -35474,7 +35475,7 @@ Crashes often if you use level select in options menu, particularly later on.
 		<publisher>Virgin Interactive</publisher>
 		<notes><![CDATA[
 https://segaretro.org/Flux
-Needs Mega CD addon
+Needs [Mega CD] addon
 ]]></notes>
 		<!-- TODO: check compatibility -->
 		<part name="cart" interface="megadriv_cart">
@@ -35490,7 +35491,7 @@ Needs Mega CD addon
 		<publisher>Virgin Interactive</publisher>
 		<notes><![CDATA[
 https://segaretro.org/Flux
-Needs Mega CD addon
+Needs [Mega CD] addon
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5694-01"/>
