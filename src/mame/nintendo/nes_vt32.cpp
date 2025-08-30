@@ -448,8 +448,6 @@ ROM_START( retror30 )
 	ROM_LOAD( "s29gl032n90tfi03.u2", 0x00000, 0x400000, CRC(dfb89ef7) SHA1(401539b73521e018e3af70b8019e6b59ba67fcad) )
 ROM_END
 
-
-
 } // anonymous namespace
 
 

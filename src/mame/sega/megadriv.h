@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include "bus/megadrive/ctrl/mdioport.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/sega_md_ioport.h"
 #include "sound/sn76496.h"
 #include "sound/ymopn.h"
 #include "video/315_5313.h"

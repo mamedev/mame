@@ -332,7 +332,7 @@ void mcd212_device::process_ica()
 	uint16_t *ica = Path ? m_planeb.target() : m_planea.target();
 	const int max_to_process = m_ica_height * 120;
 	// LCT depends on the current frame parity
-	uint32_t addr = (BIT(m_csrr[0], CSR1R_PA_BIT) == 0) ? 0x200 : 0x202;
+	uint32_t addr = !BIT(m_csrr[0], CSR1R_PA_BIT) ? 0x200 : 0x202;
 
 	for (int i = 0; i < max_to_process; i++)
 	{
@@ -973,14 +973,15 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		return 0; // Do nothing on the extended rows.
 	}
 
+	// FIXME this should use the clipping rectangle to determine which lines need drawing
 	int scanline = screen.vpos();
 
 	// Process VSR and mix if we're in the visible region
 	if (scanline >= m_ica_height)
 	{
-		uint32_t bitmap_line = ((scanline - m_ica_height) << 1) + m_ica_height;
-		uint32_t *out = &bitmap.pix(bitmap_line + (!BIT(m_csrr[0], CSR1R_PA_BIT)));
-		uint32_t* out2 = &bitmap.pix(bitmap_line + (BIT(m_csrr[0], CSR1R_PA_BIT)));
+		uint32_t const bitmap_line = ((scanline - m_ica_height) << 1) + m_ica_height;
+		uint32_t *const out = &bitmap.pix(bitmap_line + BIT(~m_csrr[0], CSR1R_PA_BIT));
+		uint32_t *const out2 = &bitmap.pix(bitmap_line + BIT(m_csrr[0], CSR1R_PA_BIT));
 
 		bool draw_line = true;
 		if (!BIT(m_dcr[0], DCR_FD_BIT) && BIT(m_csrw[0], CSR1W_ST_BIT))
@@ -1035,14 +1036,16 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			draw_cursor(out);
 		}
 
-		if (BIT(m_dcr[0], DCR_SM_BIT)) {
+		if (BIT(m_dcr[0], DCR_SM_BIT))
+		{
 			// Interlace Output
-			memcpy(out2, m_interlace_field[scanline], 768 * sizeof(uint32_t));
-			memcpy(m_interlace_field[scanline], out, 768 * sizeof(uint32_t));
+			std::copy_n(m_interlace_field[scanline], 768, out2);
+			std::copy_n(out, 768, m_interlace_field[scanline]);
 		}
-		else {
+		else
+		{
 			// Single Field Output (duplicate lines)
-			memcpy(out2, out, 768 * sizeof(uint32_t));
+			std::copy_n(out, 768, out2);
 		}
 	}
 
@@ -1134,9 +1137,8 @@ void mcd212_device::device_reset()
 	m_ica_height = 32;
 	m_total_height = 312;
 	m_blink_time = 0;
-	for (int i = 0; i < 312; i++) {
+	for (int i = 0; i < 312; i++)
 		std::fill_n(m_interlace_field[i], 768, 0);
-	}
 
 	m_int_callback(CLEAR_LINE);
 
