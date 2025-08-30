@@ -499,8 +499,9 @@ void prophet5_state::update_nvram_record()
 
 void prophet5_state::memory_map(address_map &map)
 {
-	// Memory decoding done by U318 (74LS138).
 	map.global_mask(0x9fff);  // Z80 A13 and A14 are not connected.
+
+	// Memory decoding done by U318 (74LS138).
 	map(0x0000, 0x0bff).mirror(0x8000).rom();
 	map(0x0c00, 0x0fff).readonly().share("nvram");  // 8 x 1K x 1bit RAMs (6508, U301-U308).
 	map(0x1000, 0x13ff).mirror(0x8000).ram();  // 2 x 1K x 4bit RAMs (2114, U316, U317).
@@ -654,7 +655,7 @@ DECLARE_INPUT_CHANGED_MEMBER(prophet5_state::gate_in_changed)
 		// is ~1.4ms nominal. The schematic says "2ms delay". The actual delay
 		// is not well-specified, since it depends on the trip point of the
 		// inverter.
-		constexpr double DT = -RES_K(100) * CAP_U(0.02) * log(2.5 / 5.0);  // R311, C316
+		const double DT = -RES_K(100) * CAP_U(0.02) * log(2.5 / 5.0);  // R311, C316
 		m_gate_in_delay->adjust(attotime::from_double(DT));
 	}
 	else
