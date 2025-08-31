@@ -45,7 +45,7 @@
 #define LOG_MEM   (1U << 2)
 #define LOG_WARN  (1U << 3)
 
-#define VERBOSE ( LOG_GENERAL | LOG_IO | /*LOG_MEM |*/ LOG_WARN )
+//#define VERBOSE ( LOG_GENERAL | LOG_IO | /*LOG_MEM |*/ LOG_WARN )
 #include "logmacro.h"
 
 #define LOGIO(...)    LOGMASKED(LOG_IO,    __VA_ARGS__)
@@ -907,7 +907,7 @@ void specnext_state::update_video_mode()
 
 	m_eff_nr_03_machine_timing = m_nr_03_machine_timing;
 	m_eff_nr_05_5060 = m_nr_05_5060;
-	popmessage("%s: %s %dHz", machine_name, is_hdmi ? "HDMI" : "VGA", m_nr_05_5060 ? 60 : 50);
+	LOG("%s: %s %dHz", machine_name, is_hdmi ? "HDMI" : "VGA", m_nr_05_5060 ? 60 : 50);
 }
 
 u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -2298,7 +2298,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_d9_iotrap_write = nr_wr_dat;
 		break;
 	case 0xff:
-		popmessage("Debug: #%02X\n", nr_wr_dat); // LED
+		LOG("Debug: #%02X\n", nr_wr_dat); // LED
 		break;
 	default:
 		LOGWARN("wR: %X <- %x\n", nr_wr_reg, nr_wr_dat);
