@@ -78,6 +78,7 @@ TODO:
 - hookup PIC16F84 for rbspm
 - emulate protection devices correctly instead of patching
 - inputs and layout for tbss (takes a long time to enable tilemaps)
+- inputs and layout for sglc
 - work out remaining magslot lamps and add layout
 - work out remaining jinpaish lamps and update layout
 - work out remaining sball2k1 I/O and update layout
@@ -89,7 +90,7 @@ TODO:
   be, Chi not permitted when it should be, other issues)
 - jinpaish move timer runs way too slowly
 - jinpaish seems to play the wrong sound samples?
-- broken title GFX in yyhm (transparent pen problem?)
+- broken title GFX in sglc, yyhm (transparent pen problem?)
 - the newer games seem to use range 0x9e1000-0x9e1fff during gameplay
 - smatch03 seems to use newer / different custom chips, currently not emulated
 - battery-backed RAM support
@@ -173,6 +174,7 @@ public:
 	void init_hgly() ATTR_COLD;
 	void init_rbspm() ATTR_COLD;
 	void init_sball2k1() ATTR_COLD;
+	void init_sglc() ATTR_COLD;
 	void init_smwc() ATTR_COLD;
 	void init_ssanguoj() ATTR_COLD;
 	void init_sscs() ATTR_COLD;
@@ -3253,6 +3255,23 @@ ROM_START( tbss )
 	ROM_LOAD( "u39", 0x80000, 0x80000, CRC(4be91081) SHA1(0a3691bb2c7b5ba7fb5617cb16aacecb2fa93519) )
 ROM_END
 
+// 三国列车 (Sānguó Lièchē)
+ROM_START( sglc )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD( "v1_6_5010.u64", 0x00000, 0x80000, CRC(533f47e9) SHA1(343044532466c63cce65e250fadb7d296f597066) )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "s1_0_193c.u83", 0x00000, 0x80000, CRC(311602e4) SHA1(747f7e86352fdb52f6e9ca643dea776119fe5197) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "a1_4m_5af8.u47", 0x000000, 0x080000, CRC(e1af2443) SHA1(48a863c867d0c82108478d6a2e7bac357eddb600) )
+	ROM_LOAD( "a2_4m_c9c1.u22", 0x080000, 0x080000, CRC(27a5d76f) SHA1(d720c54930c442b5bf8b4b326c1529d964b8cfe3) )
+
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00)
+	// u29 not populated
+	ROM_LOAD( "t1_0_6b65.u39", 0x80000, 0x80000, CRC(5c703544) SHA1(2bd10804f0a2df577e0494274e5f89ffba850393) )
+ROM_END
+
 
 // Possibly to be moved to separate driver.
 // Usual standard components but much bigger GFX ROMs. 1 bank of 8 switches.
@@ -3490,6 +3509,13 @@ void gms_2layers_state::init_tbss()
 	rom[0x96f8 / 2] = 0x6000;
 }
 
+void gms_2layers_state::init_sglc()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	rom[0x129a2 / 2] = 0x4e71;
+}
+
 } // anonymous namespace
 
 
@@ -3516,6 +3542,7 @@ GAME( 2003, magslot,  0,    magslot,  magslot,  gms_3layers_state, empty_init,  
 
 // train games
 GAME( 1999, hgly,     0,    hgly,     hgly,     gms_2layers_state, init_hgly,     ROT0,  "GMS", "Huangguan Leyuan (990726 CRG1.1)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now. EEPROM interface isn't fully understood.
+GAME( 1999, sglc,     0,    hgly,     hgly,     gms_2layers_state, init_sglc,     ROT0,  "GMS", "Sanguo Lieche (880103 1.6 CHINA)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now.
 GAMEL(2002, ballch,   0,    super555, ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_ballch ) // stops during boot, patched for now.
 GAMEL(2005, cots,     0,    hgly,     cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cots )   // stops during boot, patched for now. EEPROM interface isn't fully understood.
 

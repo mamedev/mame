@@ -378,20 +378,12 @@ void goldart_state::goldartp(machine_config &config)
 	OKIM6295(config, "oki", 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
-/* Different versions of the internal code exist (0x6000-0x6fff code is VERY different between them)
-   the one we're using for now was taken from the Spanish set but doesn't seem region specific as
-   all strings are referenced through tables of pointers in the external ROM
-
-   Code at 692F is potentially incorrect should be 0E or 1F
-   Code at 6ABF is potentially incorrect should be AE or 74
-
-   dump is tested and runs attract mode correctly on PCB
-*/
-
+/* Different versions of the internal code exist (0x6000-0x6fff code is VERY different between them).
+   The one we're using for now is the Gaelco "official" archived one (for repairs, etc.). */
 
 ROM_START( goldart )
 	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
-	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
+	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
 
 	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
 	DS5002FP_SET_MON( 0x79 )
@@ -407,7 +399,7 @@ ROM_END
 
 ROM_START( goldartfr )
 	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
-	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
+	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
 
 	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
 	DS5002FP_SET_MON( 0x79 )
@@ -423,7 +415,7 @@ ROM_END
 
 ROM_START( goldartgr )
 	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
-	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
+	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
 
 	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
 	DS5002FP_SET_MON( 0x79 )
@@ -439,7 +431,7 @@ ROM_END
 
 ROM_START( goldartpt )
 	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
-	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
+	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
 
 	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
 	DS5002FP_SET_MON( 0x79 )
@@ -455,7 +447,7 @@ ROM_END
 
 ROM_START( goldartuk )
 	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
-	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
+	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
 
 	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
 	DS5002FP_SET_MON( 0x79 )

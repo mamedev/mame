@@ -52,10 +52,10 @@ private:
 	int m_vdp_state = 0;
 
 	void vdp_sndirqline_callback_genesis_z80(int state);
-	void vdp_lv6irqline_callback_genesis_68k(int state);
-	void vdp_lv4irqline_callback_genesis_68k(int state);
+	void vdp_vint_cb(int state);
+	void vdp_hint_cb(int state);
 
-	IRQ_CALLBACK_MEMBER(genesis_int_callback);
+	void cpu_space_map(address_map &map);
 
 	uint16_t cal_700000_r();
 	void cal_770000_w(uint16_t data);
@@ -206,42 +206,37 @@ void calcune_state::machine_reset()
 	m_vdp[1]->device_reset_old();
 }
 
-
-IRQ_CALLBACK_MEMBER(calcune_state::genesis_int_callback)
+void calcune_state::cpu_space_map(address_map &map)
 {
-	if (irqline==4)
-	{
-		m_vdp[0]->vdp_clear_irq4_pending();
-	}
-
-	if (irqline==6)
-	{
-		m_vdp[0]->vdp_clear_irq6_pending();
-	}
-
-	return (0x60+irqline*4)/4; // vector address
+	map(0xfffff3, 0xfffff3).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 25; }));
+	// IPL0, should be unused by Calcune
+	map(0xfffff5, 0xfffff5).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 26; }));
+	map(0xfffff7, 0xfffff7).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 27; }));
+	map(0xfffff9, 0xfffff9).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 {
+		m_vdp[0]->irq_ack();
+		return 28;
+	}));
+	map(0xfffffb, 0xfffffb).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 29; }));
+	map(0xfffffd, 0xfffffd).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 {
+		m_vdp[0]->irq_ack();
+		return 30;
+	}));
+	map(0xffffff, 0xffffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 31; }));
 }
 
 void calcune_state::vdp_sndirqline_callback_genesis_z80(int state)
 {
 }
 
-void calcune_state::vdp_lv6irqline_callback_genesis_68k(int state)
+// this looks odd but is the logic the Genesis code requires
+void calcune_state::vdp_vint_cb(int state)
 {
-	// this looks odd but is the logic the Genesis code requires
-	if (state == ASSERT_LINE)
-		m_maincpu->set_input_line(6, HOLD_LINE);
-	else
-		m_maincpu->set_input_line(6, CLEAR_LINE);
+	m_maincpu->set_input_line(6, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void calcune_state::vdp_lv4irqline_callback_genesis_68k(int state)
+void calcune_state::vdp_hint_cb(int state)
 {
-	// this looks odd but is the logic the Genesis code requires
-	if (state == ASSERT_LINE)
-		m_maincpu->set_input_line(4, HOLD_LINE);
-	else
-		m_maincpu->set_input_line(4, CLEAR_LINE);
+	m_maincpu->set_input_line(4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void calcune_state::machine_start()
@@ -256,7 +251,7 @@ void calcune_state::calcune(machine_config &config)
 {
 	M68000(config, m_maincpu, OSC1_CLOCK / 7); /* 7.67 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &calcune_state::calcune_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(calcune_state::genesis_int_callback));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &calcune_state::cpu_space_map);
 
 	Z80(config, "z80", OSC1_CLOCK / 15).set_disable(); /* 3.58 MHz, no code is ever uploaded for the Z80, so it's unused here even if it is present on the PCB */
 
@@ -271,8 +266,8 @@ void calcune_state::calcune(machine_config &config)
 	SEGA315_5313(config, m_vdp[0], OSC1_CLOCK, m_maincpu);
 	m_vdp[0]->set_is_pal(false);
 	m_vdp[0]->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));
-	m_vdp[0]->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
-	m_vdp[0]->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp[0]->vint_cb().set(FUNC(calcune_state::vdp_vint_cb));
+	m_vdp[0]->hint_cb().set(FUNC(calcune_state::vdp_hint_cb));
 	m_vdp[0]->set_alt_timing(1);
 	m_vdp[0]->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
 	m_vdp[0]->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
@@ -281,8 +276,8 @@ void calcune_state::calcune(machine_config &config)
 	m_vdp[1]->set_is_pal(false);
 //  are these not hooked up or should they OR with the other lines?
 //  m_vdp[1]->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));
-//  m_vdp[1]->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
-//  m_vdp[1]->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
+//  m_vdp[1]->vint_cb().set(FUNC(calcune_state::vdp_vint_cb));
+//  m_vdp[1]->hint_cb().set(FUNC(calcune_state::vdp_hint_cb));
 	m_vdp[1]->set_alt_timing(1);
 	m_vdp[1]->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
 	m_vdp[1]->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);

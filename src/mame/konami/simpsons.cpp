@@ -598,6 +598,7 @@ INPUT_PORTS_END
 
 void simpsons_state::object_dma()
 {
+	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
 	uint16_t *dst;
 	m_k053246->k053247_get_ram(&dst);
 

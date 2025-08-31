@@ -444,8 +444,6 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	/* perform adjustments */
 	beginrow = (std::max)(beginrow, cliprect.top());
 	endrow = (std::min)(endrow, cliprect.bottom());
-	const int startrow = (beginrow / 8) * 8;
-	const int stoprow = ((endrow / 8) + 1) * 8;
 	const int startcol = (cliprect.left() / 14);
 	const int stopcol = ((cliprect.right() / 14) + 1);
 
@@ -457,7 +455,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 	//printf("GR: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
 
-	for (int row = startrow; row <= stoprow; row += 4)
+	for (int row = beginrow; row <= endrow; row += 4)
 	{
 		/* calculate address */
 		uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5));
@@ -519,13 +517,13 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 			render_line(&bitmap.pix(row), words, startcol, stopcol, monochrome, Double);
 		}
 
-		if (startcol < stopcol)
+		// copy this row down through the end of its lo-res pixel, respecting cliprect
+		for (int y = 1; ((row + y) & 3) && ((row + y) <= endrow); y++)
 		{
-			for (int y = 1; y < 4; y++)
-			{
-				memcpy(&bitmap.pix(row + y, startcol * 14), &bitmap.pix(row, startcol * 14), (stopcol - startcol) * 14 * (bitmap.bpp() / 8));
-			}
+			memcpy(&bitmap.pix(row + y, startcol * 14), &bitmap.pix(row, startcol * 14), (stopcol - startcol) * 14 * (bitmap.bpp() / 8));
 		}
+		// align subsequent loops to the first row of a lo-res pixel
+		row -= row & 3;
 	}
 }
 
@@ -533,14 +531,10 @@ template <a2_video_device::model Model, bool Invert, bool Flip>
 void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	uint8_t const *const aux_page = m_aux_ptr ? m_aux_ptr : m_ram_ptr;
-
 	uint32_t const start_address = use_page_2() ? 0x0800 : 0x0400;
 
-	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
-	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
-
-	const int startrow = (beginrow / 8) * 8;
-	const int stoprow = ((endrow / 8) + 1) * 8;
+	beginrow = (std::max)(beginrow, cliprect.top());
+	endrow = (std::min)(endrow, cliprect.bottom());
 	const int startcol = (cliprect.left() / 14);
 	const int stopcol = ((cliprect.right() / 14) + 1);
 
@@ -548,7 +542,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	bool const is_80_column = (Model == model::IIE || Model == model::IIGS) && m_80col;
 	bool const monochrome = !(m_graphics && composite_monitor() && composite_text_color(is_80_column));
-	for (int row = startrow; row < stoprow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
 		uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5));
 		uint32_t const aux_address = (Model == model::IIGS) ? address : (address & m_aux_mask);
@@ -597,6 +591,8 @@ template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, t
 
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
+	unsigned const start_address = use_page_2() ? 0x4000 : 0x2000;
+
 	beginrow = (std::max)(beginrow, cliprect.top());
 	endrow = (std::min)(endrow, cliprect.bottom());
 	int const startcol = (cliprect.left() / 14);
@@ -604,8 +600,6 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	// B&W/Green/Amber monitor, CEC mono HGR mode, or IIgs $C021 monochrome HGR
 	bool const monochrome = monochrome_monitor() || m_monohgr || (m_monochrome & 0x80);
-
-	unsigned const start_address = use_page_2() ? 0x4000 : 0x2000;
 
 	// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
 	uint8_t const bit7_mask = m_dhires ? 0 : 0x80;
@@ -653,13 +647,13 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	int const page = use_page_2() ? 0x4000 : 0x2000;
 	int const rgbmode = rgb_monitor() ? m_rgbmode : -1;
 
-	// B&W/Green/Amber monitor, IIgs force-monochrome-DHR setting, or IIe RGB card monochrome DHR
-	bool const monochrome = monochrome_monitor() || (m_newvideo & 0x20) || rgbmode == 0;
-
 	beginrow = (std::max)(beginrow, cliprect.top());
 	endrow = (std::min)(endrow, cliprect.bottom());
 	int const startcol = (cliprect.left() / 14);
 	int const stopcol = (cliprect.right() / 14) + 1;
+
+	// B&W/Green/Amber monitor, IIgs force-monochrome-DHR setting, or IIe RGB card monochrome DHR
+	bool const monochrome = monochrome_monitor() || (m_newvideo & 0x20) || rgbmode == 0;
 
 	uint8_t const *const vram = &m_ram_ptr[page];
 	uint8_t const *const vaux = (m_aux_ptr ? m_aux_ptr : vram) + page;

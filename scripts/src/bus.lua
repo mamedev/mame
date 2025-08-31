@@ -877,6 +877,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/bbc/vsp/slot.h,BUSES["BBC_VSP"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_VSP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/vsp/slot.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/vsp/slot.h",
+		MAME_DIR .. "src/devices/bus/bbc/vsp/speech.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/vsp/speech.h",
+		MAME_DIR .. "src/devices/bus/bbc/vsp/sweetalker.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/vsp/sweetalker.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bw2/exp.h,BUSES["BW2"] = true
 ---------------------------------------------------
 
@@ -1206,6 +1223,8 @@ if (BUSES["COLECO_CART"]~=null) then
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/activision.h",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/megacart.cpp",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/megacart.h",
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/sgc.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/cartridge/sgc.h",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/std.cpp",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/std.h",
 		MAME_DIR .. "src/devices/bus/coleco/cartridge/xin1.h",
@@ -1777,6 +1796,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/aha1542c.h",
 		MAME_DIR .. "src/devices/bus/isa/aha174x.cpp",
 		MAME_DIR .. "src/devices/bus/isa/aha174x.h",
+		MAME_DIR .. "src/devices/bus/isa/amgda.cpp",
+		MAME_DIR .. "src/devices/bus/isa/amgda.h",
 		MAME_DIR .. "src/devices/bus/isa/asc88.cpp",
 		MAME_DIR .. "src/devices/bus/isa/asc88.h",
 		MAME_DIR .. "src/devices/bus/isa/bblue2.cpp",
@@ -1952,6 +1973,24 @@ if (BUSES["JAKKS_GAMEKEY"]~=null) then
 		MAME_DIR .. "src/devices/bus/jakks_gamekey/slot.h",
 		MAME_DIR .. "src/devices/bus/jakks_gamekey/rom.cpp",
 		MAME_DIR .. "src/devices/bus/jakks_gamekey/rom.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/keytronic/keytronic.h,BUSES["KEYTRONIC"] = true
+---------------------------------------------------
+
+if (BUSES["KEYTRONIC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/keytronic/informer_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/keytronic/informer_kbd.h",
+		MAME_DIR .. "src/devices/bus/keytronic/kay_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/keytronic/kay_kbd.h",
+		MAME_DIR .. "src/devices/bus/keytronic/keytronic.cpp",
+		MAME_DIR .. "src/devices/bus/keytronic/keytronic.h",
+		MAME_DIR .. "src/devices/bus/keytronic/keytronic_l2207.cpp",
+		MAME_DIR .. "src/devices/bus/keytronic/keytronic_l2207.h",
 	}
 end
 
@@ -3823,6 +3862,7 @@ if (BUSES["MEGADRIVE"]~=null) then
 		MAME_DIR .. "src/devices/bus/megadrive/tplay96.h",
 	}
 end
+
 
 ---------------------------------------------------
 --
@@ -5905,6 +5945,38 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/heathzenith/h8/h8bus.h,BUSES["H8BUS"] = true
+---------------------------------------------------
+
+if (BUSES["H8BUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/cards.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/cards.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/cpu8080.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/cpu8080.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/front_panel.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/front_panel.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h8bus.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h8bus.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_1.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_1.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_5.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_5.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_64.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_64.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/heathzenith/h8/front_panel.cpp", GEN_DIR .. "emu/layout/h8_fp.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "h8_fp"),
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.h,BUSES["HEATH_INTR_SOCKET"] = true
 ---------------------------------------------------
 
@@ -5960,5 +6032,7 @@ if (BUSES["STCART_CONNECTOR"]~=null) then
 		MAME_DIR .. "src/devices/bus/st/stcart.h",
 		MAME_DIR .. "src/devices/bus/st/replay.cpp",
 		MAME_DIR .. "src/devices/bus/st/replay.h",
+		MAME_DIR .. "src/devices/bus/st/rom.cpp",
+		MAME_DIR .. "src/devices/bus/st/rom.h",
 	}
 end

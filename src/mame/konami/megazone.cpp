@@ -272,13 +272,6 @@ private:
 
 
 /***************************************************************************
-Based on driver from MAME 0.55
-Changes by Martin M. (pfloyd@gmx.net) 14.10.2001:
-
- - Added support for screen flip in cocktail mode (tricky!) */
-
-
-/***************************************************************************
 
   Convert the color PROMs into a more useable format.
 
@@ -408,7 +401,6 @@ uint32_t megazone_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		copyscrollbitmap(bitmap, *m_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 	}
 
-
 	// Draw the sprites.
 	{
 		for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
@@ -530,7 +522,7 @@ void megazone_state::main_map(address_map &map)
 	map(0x2800, 0x2bff).ram().share(m_colorram[0]);
 	map(0x2c00, 0x2fff).ram().share(m_colorram[1]);
 	map(0x3000, 0x33ff).ram().share(m_spriteram);
-	map(0x3800, 0x3fff).lrw8([this](offs_t off) { return m_sharedram[off]; }, "share_r", [this](offs_t off, u8 data) { m_sharedram[off] = data; }, "share_w");
+	map(0x3800, 0x3fff).ram().share(m_sharedram);
 	map(0x4000, 0xffff).rom();     // 4000->5FFF is a debug ROM
 }
 
@@ -664,20 +656,20 @@ void megazone_state::vblank_irq(int state)
 void megazone_state::megazone(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI1(config, m_maincpu, XTAL(18'432'000) / 12);        // 1.536 MHz
+	KONAMI1(config, m_maincpu, 18.432_MHz_XTAL / 12); // 1.536 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &megazone_state::main_map);
 
-	Z80(config, m_audiocpu, XTAL(18'432'000) / 6);     // Z80 Clock is derived from the H1 signal
+	Z80(config, m_audiocpu, 18.432_MHz_XTAL / 6); // Z80 Clock is derived from the H1 signal
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megazone_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &megazone_state::sound_io_map);
 
-	I8039(config, m_daccpu, XTAL(14'318'181) / 2);    // 7.15909 MHz
+	I8039(config, m_daccpu, 14.318181_MHz_XTAL / 2); // 7.15909 MHz
 	m_daccpu->set_addrmap(AS_PROGRAM, &megazone_state::i8039_map);
 	m_daccpu->set_addrmap(AS_IO, &megazone_state::i8039_io_map);
 	m_daccpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 	m_daccpu->p2_out_cb().set(FUNC(megazone_state::i8039_irqen_and_status_w));
 
-	config.set_maximum_quantum(attotime::from_hz(900));
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 13A
 	mainlatch.q_out_cb<0>().set(FUNC(megazone_state::coin_counter_w<1>));
@@ -689,10 +681,7 @@ void megazone_state::megazone(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60.606060);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(36*8, 32*8);
-	screen.set_visarea(0*8, 36*8-1, 2*8, 30*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 288, 264, 16, 240);
 	screen.set_screen_update(FUNC(megazone_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(megazone_state::vblank_irq));
@@ -705,7 +694,7 @@ void megazone_state::megazone(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(14'318'181) / 8));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 14.318181_MHz_XTAL / 8));
 	aysnd.port_a_read_callback().set(FUNC(megazone_state::port_a_r));
 	aysnd.port_b_write_callback().set(FUNC(megazone_state::port_b_w));
 	aysnd.add_route(0, "filter.0.0", 0.30);

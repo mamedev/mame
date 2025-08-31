@@ -6103,6 +6103,30 @@ ROM_START( mspacmab3 ) // main PCB with GDP-02 auxiliary card
 	ROM_LOAD( "82s141.i14", 0x0000, 0x0200, CRC(8d43d0a6) SHA1(be4e0d86ce4c6f1833cc0efc18277b4e04dc458f) ) // 1ST AND 2ND HALF IDENTICAL
 ROM_END
 
+ROM_START( mspacmab5 ) // GDP-01 PCB (same as Piranha). Very similar to mspacmab3, code-wise
+	ROM_REGION( 0x10000, "maincpu",0 )
+	ROM_LOAD( "d1.d7",  0x0000, 0x1000, CRC(50b38941) SHA1(c798fe6efe7ec6d15add74986d72d9ea8676d14a) )
+	ROM_LOAD( "d2.e7",  0x1000, 0x1000, CRC(713af282) SHA1(7258e966a117d4d9129e3d9af23ad9b403394ece) )
+	ROM_LOAD( "d3.g7",  0x2000, 0x1000, CRC(124a4507) SHA1(a7c82970ac53129c7a642322214adee4206298ff) )
+	ROM_LOAD( "d4.j7",  0x3000, 0x1000, CRC(08ac65da) SHA1(745d9d054c33df96a7f27a1f4575f8770d92ac10) )
+	ROM_LOAD( "d5.g6",  0x8000, 0x1000, CRC(50b29f09) SHA1(27ca2cdf57b96d628b1811210d254b107e2f324e) )
+	ROM_LOAD( "d6.j6",  0x9000, 0x0800, CRC(33b09ed9) SHA1(a2a3e069cce442c3b179315e90476cd431c604c2) )
+
+	ROM_REGION( 0x2000, "gfx1" , 0 )
+	ROM_LOAD( "d7.d5",  0x0000, 0x0800, CRC(b5d8c872) SHA1(d137b0cff8635a6a02f9334b7fa72dc1a623fe9b) )
+	ROM_LOAD( "d9.g5",  0x0800, 0x0800, CRC(9b2b936c) SHA1(d6f57d0ce6fba37d4838cdcace7e2e02c94b1ba1) )
+	ROM_LOAD( "d8.e5",  0x1000, 0x0800, CRC(a70a6ac4) SHA1(81b0c56697bb671cc43928133446da74e74b4982) )
+	ROM_LOAD( "d10.j5", 0x1800, 0x0800, CRC(53368498) SHA1(0409288fe59c2bbf2730c31e4c7817392a544165) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "6331.8h", 0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "6301.4a", 0x0020, 0x0100, CRC(08c9447b) SHA1(5e4fbfcc7179fc4b1436af9bb709ffc381479315) )
+
+	ROM_REGION( 0x0200, "namco", 0 ) // sound PROMs
+	ROM_LOAD( "63s141.1k", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "63s141.3k", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used
+ROM_END
+
 ROM_START( ctrpllrp )
 	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_LOAD( "c1.bin", 0x0000, 0x0800, CRC(9d027c4a) SHA1(88e094880057451a75cdc2ce9477403021813982) )
@@ -8902,6 +8926,7 @@ GAME( 1982, ctrpllrp,  puckman,  pacman,   pacman,   pacman_state,  empty_init, 
 GAME( 1981, piranha,   puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "GL (US Billiards license)",         "Piranha",                                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1981, piranhao,  puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "GL (US Billiards license)",         "Piranha (older)",                                          MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacmab3, puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "bootleg",                           "Ms. Pac-Man (bootleg, set 3)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmab5, puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "bootleg",                           "Ms. Pac-Man (bootleg, set 5)",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, abscam,    puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "GL (US Billiards license)",         "Abscam",                                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1981, piranhah,  puckman,  pacman,   mspacman, pacman_state,  empty_init,    ROT90,  "hack",                              "Piranha (hack)",                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1981, titanpac,  puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "hack (NSM)",                        "Titan (hack of Pac-Man)",                                  MACHINE_SUPPORTS_SAVE )

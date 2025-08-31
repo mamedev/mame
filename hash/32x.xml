@@ -2295,8 +2295,10 @@ Accesses [cart] backup RAM
 		<year>199?</year>
 		<publisher>Time Warner Interactive</publisher>
 		<notes><![CDATA[
+Black screen, needs tighter sync after FIFO rewrite (?)
 Uses [DE-9] port 2 button B for something
 [Slave SH-2] tests [SCI] port
+Writes 0x0f1f to $a130e0 in undefined [cart] area
 ]]></notes>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="262144">

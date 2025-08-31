@@ -1,24 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/***************************************************************************/
-/*                                                                         */
-/*                                 055555                                  */
-/*  Mixer Device / Priority encoder                                        */
-/*                                                                         */
-/***************************************************************************/
-
 /*
 
-
-K055555
--------
-
-Priority encoder.  Always found in conjunction with k054338, but the reverse
-isn't true.  The 55555 has 8 inputs: "A", "B", "C", and "D" intended for a 156/157
-type tilemap chip, "OBJ" intended for a '246 type sprite chip, and "SUB1-SUB3"
+Konami 055555
+-------------
+5-bit-per-pixel Priority encoder.  Always found in conjunction with 054338, but the
+reverse isn't true.  The 055555 has 8 inputs: "A", "B", "C", and "D" intended for a
+156/157 type tilemap chip, "OBJ" intended for a '246 type sprite chip, and "SUB1-SUB3"
 which can be used for 3 additional layers.
 
-When used in combintion with a k054338, each input can be chosen to participate
+When used in combintion with a 054338, each input can be chosen to participate
 in shadow/highlight operations, R/G/B alpha blending, and R/G/B brightness control.
 Per-tile priority is supported for tilemap planes A and B.
 
@@ -31,11 +22,11 @@ it doesn't want it visible).
 It also appears that brightness control and alpha blend can be decided per-tile
 and per-sprite, although this is not certain.
 
-Additionally the 55555 can provide a gradient background with one palette entry
+Additionally the 055555 can provide a gradient background with one palette entry
 per scanline.  This is fairly rarely used, but does turn up in Gokujou Parodius as
 well as the Sexy Parodius title screen.
 
-Lots of byte-wise registers.  A partial map:
+48 8-bit-wide byte-wide registers.  A partial map:
 
 0: Palette index(?) for the gradient background
 1: related to tilemap brightness control
@@ -54,21 +45,14 @@ Lots of byte-wise registers.  A partial map:
 44: OSBRI_ON: not quite sure
 45: input enables.  bits as follows: (MSB) S3 S2 S1 OB VD VC VB VA (LSB)
 
-
 */
-
-
 
 #include "emu.h"
 #include "k055555.h"
 
-
 #define VERBOSE 0
 #include "logmacro.h"
 
-
-/* K055555 5-bit-per-pixel priority encoder */
-/* This device has 48 8-bit-wide registers */
 
 void k055555_device::K055555_write_reg(uint8_t regnum, uint8_t regdat)
 {
@@ -138,8 +122,6 @@ int k055555_device::K055555_get_palette_index(int idx)
 /*****************************************************************************
     DEVICE INTERFACE
 *****************************************************************************/
-
-
 
 DEFINE_DEVICE_TYPE(K055555, k055555_device, "k055555", "Konami 055555 Priority Encoder")
 

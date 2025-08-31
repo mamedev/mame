@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Known undumped list (* denotes availablity in HDD folder):
+- Auto Net-S (G-3003), TERA-NET BBS software
+- Drakkhen (ドラッケン, G-?)
+- Janou Touryuumon II (雀皇登竜門 II, T-45019)
+- Page Pro-S (G-3004), desktop publishing software
+* Puzzle Construction (パズルコンストラクション, G-3002)
+- The BestPlay Baseball (ベストプレーベースボール)
+* The Manhole
+
+- CCT/V, may be just DOS/V compatible
+- Daisenryaku Construction (大戦略 コンストラクション), prototype at best
+- Princess Maker (プリンセスメーカー), may be just DOS/V compatible
+- Wibarm U.S.A. (ウイバーン U.S.A.), may be just DOS/V compatible
+
+-->
+<softwarelist name="teradrive_flop" description="Sega Teradrive floppy disk images">
+
+<!--!Operating Systems -->
+
+<!-- DOS/V sets have "for Sega Teradrive" and "IBM Personal System/55" labels -->
+
+	<software name="dosv407" supported="partial">
+		<description>IBM DOS (J4.07/V)</description>
+		<year>1991</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ibm-dos-j4.07.ima" size="1474560" crc="0c94926a" sha1="0763ac53e07dc6b40e23ab6bd126e74278c87a4a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dosv406" cloneof="dosv407" supported="partial">
+		<description>IBM DOS (J4.06/V)</description>
+		<year>1991</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<!-- original in .imz format -->
+				<!-- <rom name="ibm-dos-j4.0-v-rev-4.06.imz" size="559221" crc="e7bd130e" sha1="14180c714cff70b63b0dac588f0dcd04873dece2"/> -->
+				<rom name="ibm dos j4.0-v-rev-4.06.ima" size="1474560" crc="53620fed" sha1="de070ea9c9aa443fc26949e54d3b276239cee59b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dosv512" supported="no">
+		<description>IBM DOS (J5.00/V, rev 1.2)</description>
+		<year>1993</year>
+		<publisher>IBM</publisher>
+		<notes><![CDATA[
+Non-bootable, contains AX, J3, TE, CHPRN, SP, ESCP12 and $ANSI folders
+Part of a multidisk set?
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<!-- original in .imz format -->
+				<!-- <rom name="ibm-dos-j5.0-v-rev-1.2.imz" size="144603" crc="1a7b6d79" sha1="d08d8b7c0328bcbf5254a66ae32f240d8cbad838"/> -->
+				<rom name="ibm-dos-j5.0-v-rev-1.2.ima" size="1474560" crc="dfaf3948" sha1="2ff8991aa0a211ba87d22847ff29360cdfbc2073"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!--!Driver disks -->
+
+	<software name="drv4" supported="partial">
+		<description>Teradrive Driver Disk (J4.0)</description>
+		<year>1991</year>
+		<publisher>IBM / Sega</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="driver-disk-j4.0-serial.ima" size="1474560" crc="ca62ad08" sha1="f8c0c707cca8c949a6e2ff61034a14560ac6f567"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- another dump floating, same contents plus extra empty folders -->
+	<!-- JDASH, JSW, JSFONT, JSUT -->
+	<!-- <rom name="driver-disk-j4.0-no-serial.ima" size="1474560" crc="b2060607" sha1="b7aba7da01bc3846c1d88857d067e5febafd63f1"/>-->
+
+</softwarelist>

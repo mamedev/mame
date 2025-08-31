@@ -486,4 +486,27 @@ private:
 	memory_region *m_cart_region;
 };
 
+class spg2xx_game_pdcj_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_pdcj_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_upperbank(*this, "upperbank")
+	{ }
+
+	void pdcj(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	required_memory_bank m_upperbank;
+
+private:
+
+	void mem_map_upperbank(address_map &map) ATTR_COLD;
+};
+
 #endif // MAME_TVGAMES_SPG2XX_H
