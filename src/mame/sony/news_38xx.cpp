@@ -101,7 +101,6 @@ public:
 			{INPUT_LINE_IRQ0, cpu_irq::UBUS},
 			{INPUT_LINE_IRQ1, cpu_irq::IOP},
 			{INPUT_LINE_IRQ2, cpu_irq::TIMER},
-			{INPUT_LINE_IRQ3, cpu_irq::FPA},
 			{INPUT_LINE_IRQ4, cpu_irq::WRBERR},
 			{INPUT_LINE_IRQ5, cpu_irq::PERR}
 		})
@@ -186,14 +185,13 @@ protected:
 		UBUS = 0,   // Interprocessor communication interrupt from UPU
 		IOP = 1,    // Interprocessor communication interrupt from IOP
 		TIMER = 2,  // 100Hz timer
-		FPA = 3,    // FPU interrupt
+		FPA [[maybe_unused]] = 3, // FPU interrupt (handled by set_fpu)
 		WRBERR = 4, // async bus write error
 		PERR = 5    // Main memory parity error
 	};
 
 	static constexpr std::array cpu_irq_names = {"UBUS"sv, "IOP"sv, "TIMER"sv, "FPA"sv, "WRBERR"sv, "PERR"sv};
 	static constexpr uint32_t cpu_nmi_mask = 1 << static_cast<uint32_t>(cpu_irq::WRBERR) |
-	                                         1 << static_cast<uint32_t>(cpu_irq::FPA) |
 	                                         1 << static_cast<uint32_t>(cpu_irq::IOP);
 
 	template <cpu_irq Number>
@@ -415,7 +413,7 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x2c000000, 0x2c0000ff).rom().region("idrom", 0);
 	map(0x2c000100, 0x2c000103).portr("SW1");
 
-	map(0x2e000000, 0x2effffff).r(FUNC(news_38xx_state::iop_bus_error_r)).mirror(0x10000000); // Expansion I/O
+	map(0x2e000000, 0x2effffff).r(FUNC(news_38xx_state::iop_bus_error_r)).mirror(0x10000000); // Expansion I/O TODO: w?
 }
 
 void news_38xx_state::iop_vector_map(address_map &map)
@@ -492,6 +490,7 @@ u8 news_38xx_state::iop_ipc_intst_r()
 
 u8 news_38xx_state::park_status_r()
 {
+	// TODO: do static_cast<bool> instead? test printing afterwards
 	const u8 park_status = static_cast<u8>(m_parallel_fault) << 6 |
 	                       static_cast<u8>(m_serial[0]->dsr_r()) << 5 |
 	                       static_cast<u8>(m_parallel_busy) << 4 |
@@ -892,7 +891,6 @@ void news_38xx_state::cpuled_w(offs_t offset, u32 data)
 
 void news_scsi_devices(device_slot_interface &device)
 {
-	// TODO: tape
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("tape", NSCSI_TAPE);
@@ -902,7 +900,7 @@ void news_38xx_state::common(machine_config &config)
 {
 	R3000A(config, m_cpu, 40_MHz_XTAL / 2, 65536, 65536); // 40MHz goes into the R3000 pkg, but is divided internally to 20MHz
 	m_cpu->set_addrmap(AS_PROGRAM, &news_38xx_state::cpu_map);
-	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4); // TODO: FPA IRQ?
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4, INPUT_LINE_IRQ3);
 
 	M68030(config, m_iop, 40_MHz_XTAL / 2);
 	m_iop->set_addrmap(AS_PROGRAM, &news_38xx_state::iop_map);
