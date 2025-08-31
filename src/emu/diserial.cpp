@@ -154,6 +154,10 @@ void device_serial_interface::set_data_frame(int start_bit_count, int data_bit_c
 {
 	LOGMASKED(LOG_SETUP, "Start bits: %d; Data bits: %d; Parity: %s; Stop bits: %s\n", start_bit_count, data_bit_count, parity_tostring(parity), stop_bits_tostring(stop_bits));
 
+	bool df_changed = (start_bit_count != m_df_start_bit_count) || (data_bit_count != m_df_word_length) || (parity != m_df_parity);
+	u8 orig_stop_bit_count = m_df_stop_bit_count;
+	u8 orig_min_rx_stop_bit_count = m_df_min_rx_stop_bit_count;
+
 	m_df_word_length = data_bit_count;
 
 	switch (stop_bits)
@@ -178,6 +182,15 @@ void device_serial_interface::set_data_frame(int start_bit_count, int data_bit_c
 		m_df_stop_bit_count = 2;
 		m_df_min_rx_stop_bit_count = 1;
 		break;
+	}
+
+	df_changed |= (m_df_stop_bit_count != orig_stop_bit_count) || (m_df_min_rx_stop_bit_count != orig_min_rx_stop_bit_count);
+
+	if (!df_changed)
+	{
+		LOGMASKED(LOG_SETUP, "No change to data frame, skipping\n");
+
+		return;
 	}
 
 	m_df_parity = parity;
