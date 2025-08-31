@@ -744,8 +744,8 @@ static INPUT_PORTS_START( f1gp2 )
 INPUT_PORTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( linkplay )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_38400 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_38400 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_78125 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_78125 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -846,7 +846,7 @@ void f1gp_state::f1gp(machine_config &config)
 	rs232in.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
 	rs232in.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 20_MHz_XTAL / 32)); // assume ~38400 baud
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 20_MHz_XTAL / 16)); // 78125 baud
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
@@ -917,7 +917,7 @@ void f1gp_state::f1gpbl(machine_config &config)
 	rs232in.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
 	rs232in.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 20_MHz_XTAL / 32)); // assume ~38400 baud
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 20_MHz_XTAL / 16)); // 78125 baud
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
