@@ -8623,7 +8623,9 @@ Installation and Open Circulation CDs are bootable.
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
 		<info name="language" value="Norwegian" />
-		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="English" />
@@ -9584,7 +9586,27 @@ Installation and Open Circulation CDs are bootable.
 		<publisher>Microsoft</publisher>
 		<info name="release" value="20000518" />
 		<info name="language" value="Arabic" />
-		<info name="language" value="Chinese (Simplified)/Chinese (Traditional)/Czech/Danish/Dutch/French/Finnish/German/Hebrew/Hungarian/Italian/Japanese/Korean/Norwegian/Polish/Portuguese (Brazil)/Portuguese (Europe)/Russian/Spanish/Swedish/Turkish" />
+		<info name="language" value="Chinese (Simplified)" />
+		<info name="language" value="Chinese (Traditional)" />
+		<info name="language" value="Czech" />
+		<info name="language" value="Danish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="French" />
+		<info name="language" value="Finnish" />
+		<info name="language" value="German" />
+		<info name="language" value="Hebrew" />
+		<info name="language" value="Hungarian" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Japanese" />
+		<info name="language" value="Korean" />
+		<info name="language" value="Norwegian" />
+		<info name="language" value="Polish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Portuguese (Europe)" />
+		<info name="language" value="Russian" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
+		<info name="language" value="Turkish" />
 		<info name="usage" value="Installs on the US-English version of Windows 2000; disc 1 is the Windows 2000 install disc" />
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="Disc 2" />

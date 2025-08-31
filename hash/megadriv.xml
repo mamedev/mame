@@ -6413,7 +6413,9 @@ Unsupported [Menacer] peripheral
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
-		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-14753-F"/>
@@ -6436,7 +6438,9 @@ Unsupported [Menacer] peripheral
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
-		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-14858A-T"/>
@@ -6971,7 +6975,8 @@ Unemulated HeartBeat peripheral
 		<info name="language" value="English" />
 		<info name="language" value="French" />
 		<info name="language" value="German" />
-		<info name="language" value="Portuguese (Brazil)/Spanish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-17421-T"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -9961,7 +9966,9 @@ Unemulated HeartBeat peripheral
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
 		<info name="language" value="Norwegian" />
-		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="837-10096 / 171-6587A"/>
 			<!-- two epoxy blocks are present on the PCB, 1MB each?!? -->
@@ -10160,7 +10167,9 @@ https://tcrf.net/World_Championship_Soccer_(Genesis)
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
-		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="?? (Sega)"/>
@@ -16297,7 +16306,8 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
-		<info name="language" value="Portuguese (Brazil)/Spanish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="2020-09-13" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="15335424">
@@ -16354,7 +16364,8 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
-		<info name="language" value="Portuguese (Brazil)/Spanish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="2020-08-27" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="15335424">
@@ -16371,7 +16382,8 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
-		<info name="language" value="Portuguese (Brazil)/Spanish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="2020-09-03" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="15335424">
@@ -24502,7 +24514,9 @@ Unemulated [Sega Mega Modem] features
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
-		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="olympic gold (usa).bin" size="524288" crc="339594b4" sha1="f9febd976d98545dee35c10b69755908d6929fd4"/>
@@ -33498,7 +33512,8 @@ Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
 		<description>Where in the World Is Carmen Sandiego? (Brazil)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
-		<info name="language" value="Portuguese (Brazil)/Spanish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="where in the world is carmen sandiego (bra).bin" size="1048576" crc="7d4450ad" sha1="8441f0eba23c0b013ca3932914f9f8d364e61a01"/>
@@ -33510,7 +33525,8 @@ Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
 		<description>Where in Time Is Carmen Sandiego? (Brazil)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
-		<info name="language" value="Portuguese (Brazil)/Spanish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="where in time is carmen sandiego (bra).bin" size="1048576" crc="d523b552" sha1="213b6dfc129fe245f2ecd73ad91c772efd628462"/>
@@ -33628,7 +33644,9 @@ Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
 		<info name="language" value="Norwegian" />
-		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="winter olympics (jpn).bin" size="2097152" crc="654a4684" sha1="aa2fc21eaa833640eaf882d66ca6ceb4f8adabcf"/>
@@ -33645,7 +33663,9 @@ Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
 		<info name="language" value="Norwegian" />
-		<info name="language" value="Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="winter olympic games (usa).bin" size="2097152" crc="c5834437" sha1="da5a2a0c1a0a6b7b29492f8845eca1167158ebea"/>
@@ -35199,7 +35219,8 @@ Black screen
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
 		<info name="language" value="Japanese" />
-		<info name="language" value="Portuguese (Brazil)/Spanish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="20191028"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
