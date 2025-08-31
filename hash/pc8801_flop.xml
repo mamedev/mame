@@ -42114,6 +42114,9 @@ No BGM on title screen, locks up on game selection, requires a [i8214] sound irq
 		<description>Charie Music Gallery Vol.2</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Unresponsive [keyboard] in main menu
+]]></notes>
 		<info name="developer" value="Charie Soft" />
 		<info name="alt_title" value="チャーリーソフトMG2"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -42129,6 +42132,7 @@ No BGM on title screen, locks up on game selection, requires a [i8214] sound irq
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="release" value="19901202" />
+		<!-- NOTE: different than Charie Soft -->
 		<info name="developer" value="Charlie Soft" />
 		<!--combined image-->
 		<!--rom name="charie music disk 4.d88" size="732512" crc="458d72f4" sha1="44edcf62557dca160fe91990f75cd54be5aed343"/-->
@@ -42201,8 +42205,8 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 		<description>Charlie Music Disk 5.0</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Charlie Soft" />
 		<info name="release" value="19910817" />
+		<info name="developer" value="Charlie Soft" />
 		<!--combined image-->
 		<!--rom name="ongaku_disk_5.d88" size="1046544" crc="0875deab" sha1="be756d95d2bb4cc062fe677f7a2bccb74bc3eeb7" /-->
 
