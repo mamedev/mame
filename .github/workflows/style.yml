@@ -20,11 +20,15 @@ jobs:
       - name: Install reviewdog
         uses: reviewdog/action-setup@v1.3.2
 
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v46.0.5
+
       - name: Run style check
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          files=$(git diff --name-only --diff-filter=d "${{ github.event.base_ref }}~1" "${{ github.event.head_ref }}" | grep -E '\.(c|cpp|h|hpp)$' || true)
+          files=$(echo ${{ steps.changed-files.outputs.all_changed_files }} | grep -E '\.(cpp|h)$' || true)
           if [ -n "$files" ]; then
             python3 scripts/build/style.py $files \
               | reviewdog -efm="%f:%l: %m" \
