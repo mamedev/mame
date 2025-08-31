@@ -1291,28 +1291,22 @@ uint32_t wingco_state::screen_update_lucky8(screen_device &screen, bitmap_rgb32 
 
 	if (m_enable_reg & 0x08)
 	{
-		// guess, could be wrong, but different screens clearly need different reel layouts
 		if (m_vidreg & 2)
 		{
 			for (int i = 0; i < 64; i++)
 			{
+				// only one reels tilemap
 				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
-				//m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
-				//m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
 			}
 
 			const rectangle visible1(0*8, (14+48)*8-1,  3*8,  (3+7)*8-1);
-			//const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+7)*8-1);
-			//const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+7)*8-1);
-
 			m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
-			//m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
-			//m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
 		}
 		else
 		{
 			for (int i = 0; i < 64; i++)
 			{
+				// all three reels tilemaps
 				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
 				m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
 				m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
