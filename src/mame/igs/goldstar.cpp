@@ -631,6 +631,7 @@ private:
 	uint8_t nvram_r(offs_t offset);
 
 	void magodds_palette(palette_device &palette) const ATTR_COLD;
+	uint32_t screen_update_lucky8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bingowng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_magical(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mbstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -1278,6 +1279,59 @@ VIDEO_START_MEMBER(wingco_state, magical)
 
 	// is there an enable reg for this game?
 	m_enable_reg = 0x0b;
+}
+
+
+uint32_t wingco_state::screen_update_lucky8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(rgb_t::black(), cliprect);
+
+	if (!(m_enable_reg & 0x01))
+		return 0;
+
+	if (m_enable_reg & 0x08)
+	{
+		// guess, could be wrong, but different screens clearly need different reel layouts
+		if (m_vidreg & 2)
+		{
+			for (int i = 0; i < 64; i++)
+			{
+				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+				//m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+				//m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+			}
+
+			const rectangle visible1(0*8, (14+48)*8-1,  3*8,  (3+7)*8-1);
+			//const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+7)*8-1);
+			//const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+7)*8-1);
+
+			m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+			//m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+			//m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
+		}
+		else
+		{
+			for (int i = 0; i < 64; i++)
+			{
+				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+				m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+				m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+			}
+
+			const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
+			const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+7)*8-1);
+			const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+7)*8-1);
+
+			m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+			m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+			m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
+		}
+	}
+
+	if (m_enable_reg & 0x02)
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
 }
 
 
@@ -11009,7 +11063,7 @@ void wingco_state::system_outputc_w(uint8_t data)
 {
 	m_nmi_enable = data & 8;
 	m_vidreg = data & 2;
-	//popmessage("system_outputc_w %02x",data);
+//	popmessage("system_outputc_w %02x",data);
 
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -11635,7 +11689,7 @@ void wingco_state::lucky8(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(wingco_state::screen_update_goldstar<false>));
+	screen.set_screen_update(FUNC(wingco_state::screen_update_lucky8));
 	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
