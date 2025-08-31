@@ -14,7 +14,7 @@ def check_cpp_file(path: Path):
     try:
         text = path.read_text()
     except Exception:
-        return errors # skip non-text files
+        return errors
 
     lines = text.splitlines()
 
@@ -83,10 +83,8 @@ def check_mame_lst(changed_cpp_files: set[str]):
 
     for i, line in enumerate(lines):
         if line.startswith("@source:"):
-            # clear previous block
             if current_block:
                 errors.extend(check_block(current_block, block_start_line, current_source))
-            # new block
             current_source = "src/mame/" + line[len("@source:"):].strip()
             
             current_block = []
@@ -113,7 +111,7 @@ def main():
     for lineno, msg in errors:
             print(f"src/mame/mame.lst:{lineno}: {msg}")
 
-    sys.exit(0) # needed so workflow doesn't fail
+    sys.exit(0)
 
 if __name__ == "__main__":
     main()
