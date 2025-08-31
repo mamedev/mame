@@ -7,6 +7,7 @@
     Implementation of Motorola 6847 video hardware chip
 
 ***************************************************************************/
+
 #ifndef MAME_VIDEO_MC6847_H
 #define MAME_VIDEO_MC6847_H
 
