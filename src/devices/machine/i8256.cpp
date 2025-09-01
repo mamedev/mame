@@ -310,7 +310,7 @@ void i8256_device::receive_clock()
 		//LOGBITS("8256: Rx Sampled %d\n", m_rxd);
 		receive_register_update_bit(m_rxd);
 		if (is_receive_register_synchronized())
-			m_rxc_count = sync ? m_br_factor : (3 * m_br_factor / 2);
+			m_rxc_count = SYNC ? m_br_factor : (3 * m_br_factor / 2);
 
 		if (is_receive_register_full())
 		{
