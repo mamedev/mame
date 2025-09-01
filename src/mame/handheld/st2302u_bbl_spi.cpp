@@ -401,6 +401,13 @@ ROM_START(supreme)
 	ROM_LOAD("25q32.bin", 0x000000, 0x400000, CRC(93072a3d) SHA1(9f8770839032922e64d5ddd8864441357623c45f))
 ROM_END
 
+ROM_START(throwbck)
+	INTERNAL_ROM_TYPE1
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("25q32egig.bin", 0x000000, 0x400000, CRC(959eb09d) SHA1(901738e6b6c8fdfe4ed9b268ba3ddd1444551442))
+ROM_END
+
 // sets with 2nd version of internal ROM
 
 ROM_START(dphh8633)
@@ -461,6 +468,8 @@ CONS( 201?, dgun2953,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl3
 CONS( 201?, arcade10,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Fizz Creations", "Mini Arcade Console (Arcade 10-in-1)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 201?, supreme,       0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Fizz Creations", "Arcade Classics Mini Handheld Arcade (Supreme 150)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 201?, throwbck,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Westminster", "Throwback Pocket Video Game Console 150+ 8-Bit Games", MACHINE_IMPERFECT_SOUND )
 
 // releases with different internal ROM, these currently have rendering issues for unknown reasons
 
