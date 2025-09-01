@@ -41528,7 +41528,8 @@ Not extensively tested
 		<description>Amazing Disk Episode I</description>
 		<year>1987</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Onion Soft / Alphax" />
+		<info name="developer" value="Onion Soft" />
+		<info name="developer" value="Alphax" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 34002 -->
 				<rom name="amazing disk episode i.d88" size="348848" crc="26851b3d" sha1="20a163df982507c9ad8177d7a978c0a018712478"/>
@@ -41540,7 +41541,8 @@ Not extensively tested
 		<description>Amazing Disk Episode II</description>
 		<year>1987</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Onion Soft / Alphax" />
+		<info name="developer" value="Onion Soft" />
+		<info name="developer" value="Alphax" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 41311 -->
 				<rom name="amazing disk episode ii.d88" size="348848" crc="a136a79e" sha1="1efaa89e7de137d09f5c552bc645ce1bbf4bb40c"/>
@@ -41552,7 +41554,8 @@ Not extensively tested
 		<description>Amazing Disk Episode III</description>
 		<year>1987</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Onion Soft / Alphax" />
+		<info name="developer" value="Onion Soft" />
+		<info name="developer" value="Alphax" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 57249 -->
 				<rom name="amazing disk episode iii.d88" size="348848" crc="75a61353" sha1="0e813364d53701fbea17e96c1134e87fd8b72b6b"/>
@@ -41969,7 +41972,8 @@ No BGM on title screen, locks up on game selection, requires a [i8214] sound irq
 		<description>Card Force III</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="SSL / PeachLand" />
+		<info name="developer" value="SSL" />
+		<info name="developer" value="PeachLand" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="263760">
 				<rom name="card force iii.d88" size="263760" crc="202d4468" sha1="12429c9f7b5ebfc17e60e4f20b2d426a9e006852"/>
@@ -41981,7 +41985,8 @@ No BGM on title screen, locks up on game selection, requires a [i8214] sound irq
 		<description>Card Force IV</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="SSL / PeachLand" />
+		<info name="developer" value="SSL" />
+		<info name="developer" value="PeachLand" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="422160">
 				<rom name="card force iv.d88" size="422160" crc="af0db9fc" sha1="6a867ef92335c5eb7687a50deafb7411a033ab93"/>

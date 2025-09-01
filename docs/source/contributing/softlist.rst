@@ -125,6 +125,12 @@ Multiple ``info`` elements with the same ``name`` may be present if
 appropriate.  This is frequently seen for software sold using different
 titles in different regions.
 
+Prefer multiple ``info`` elements with the same ``name`` attribute over
+combining multiple values into a single element.  For example if a piece
+of software supports multiple user interface languages, use multiple
+``info`` elements with ``name="language"`` attributes.  This makes
+filtering and database queries more practical.
+
 MAME displays metadata from ``info`` elements in the software selection
 menu.  The following ``name`` attributes are recognised specifically,
 and can show localised names:
@@ -150,6 +156,8 @@ install
     Installation instructions.
 isbn
     ISBN for software included with a commercial book.
+language
+    User interface language supported by the software.
 oem
     Original equipment manufacturer, typically used with customised
     versions of software distributed by a hardware vendor.

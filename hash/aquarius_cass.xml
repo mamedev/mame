@@ -514,7 +514,7 @@ license:CC0-1.0
 		<description>Invaders</description>
 		<year>1984</year>
 		<publisher>Dick Smith Electronics</publisher>
-		<info name="author" value="Dubois and McNamara"/>
+		<info name="author" value="Dubois &amp; McNamara"/>
 		<info name="serial" value="X-6110"/>
 		<part name="cass1" interface="aquarius_cass">
 			<feature name="part_id" value="INVADERS_BAS"/>
@@ -570,7 +570,7 @@ license:CC0-1.0
 		<description>Maths Armada</description>
 		<year>1984</year>
 		<publisher>Dick Smith Electronics</publisher>
-		<info name="author" value="Dubois and McNamara"/>
+		<info name="author" value="Dubois &amp; McNamara"/>
 		<info name="serial" value="X-6200"/>
 		<part name="cass1" interface="aquarius_cass">
 			<feature name="part_id" value="MATHSARMADA_BAS"/>
@@ -752,7 +752,7 @@ license:CC0-1.0
 		<description>Read-It</description>
 		<year>1984</year>
 		<publisher>Dick Smith Electronics</publisher>
-		<info name="author" value="Dubois and McNamara"/>
+		<info name="author" value="Dubois &amp; McNamara"/>
 		<info name="serial" value="X-6201"/>
 		<part name="cass1" interface="aquarius_cass">
 			<feature name="part_id" value="READ-IT_BAS"/>
@@ -785,7 +785,7 @@ license:CC0-1.0
 		<description>Space Ram</description>
 		<year>1984</year>
 		<publisher>Dick Smith Electronics</publisher>
-		<info name="author" value="Dubois and McNamara"/>
+		<info name="author" value="Dubois &amp; McNamara"/>
 		<info name="serial" value="X-6109"/>
 		<part name="cass1" interface="aquarius_cass">
 			<feature name="part_id" value="SPACERAM_BAS"/>
@@ -817,7 +817,7 @@ license:CC0-1.0
 		<description>Spell-It</description>
 		<year>1984</year>
 		<publisher>Dick Smith Electronics</publisher>
-		<info name="author" value="Dubois and McNamara"/>
+		<info name="author" value="Dubois &amp; McNamara"/>
 		<info name="serial" value="X-6202"/>
 		<part name="cass1" interface="aquarius_cass">
 			<feature name="part_id" value="SPELL-IT_BAS"/>

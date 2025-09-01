@@ -56587,7 +56587,7 @@ license:CC0-1.0
 		<description>Thinkers: Mathematics Unlimited Problem Solving (4am crack)</description>
 		<year>1986</year>
 		<publisher>Holt, Rinehart, and Winston</publisher>
-		<info name="developer" value="Holt, Rinehart, and Winston" />
+		<info name="developer" value="Holt, Rinehart &amp; Winston" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-12-31 -->
