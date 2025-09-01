@@ -294,11 +294,11 @@ void i8256_device::p2_w(uint8_t data)
 
 void i8256_device::receive_clock()
 {
-	/* receive enable? */
+	// receive enable?
 	if (BIT(m_command3, I8256_CMD3_RxE))
 	{
-		const bool sync = is_receive_register_synchronized();
-		if (sync)
+		const bool SYNC = is_receive_register_synchronized();
+		if (SYNC)
 		{
 			--m_rxc_count;
 			if (m_rxc_count)
@@ -306,7 +306,7 @@ void i8256_device::receive_clock()
 		}
 
 		//logerror("i8256\n");
-		/* get bit received from other side and update receive register */
+		// get bit received from other side and update receive register
 		//LOGBITS("8256: Rx Sampled %d\n", m_rxd);
 		receive_register_update_bit(m_rxd);
 		if (is_receive_register_synchronized())
@@ -443,7 +443,7 @@ void i8256_device::transmit_clock()
 
 	}
 
-	/* if diserial has bits to send, make them so */
+	// if diserial has bits to send, make them so
 	if (!is_transmit_register_empty())
 	{
 		uint8_t data = transmit_register_get_data_bit();
@@ -459,7 +459,7 @@ void i8256_device::receive_character(uint8_t ch)
 	m_rx_data = ch;
 
 	LOG("status RX READY test %02x\n", m_status);
-	/* char has not been read and another has arrived! */
+	// char has not been read and another has arrived!
 	if (BIT(m_status, I8256_STATUS_RB_FULL))
 	{
 		m_status |= I8256_STATUS_OVERRUN_ERROR;
