@@ -25,7 +25,6 @@ def check_file(path: Path, fix: bool = False):
     except Exception:
         return errors
 
-    # Detect non-native line endings
     if sys.platform != "win32" and b"\r\n" in raw_bytes:
         errors.append((1, "File contains Windows (CRLF) line endings on a non-Windows system"))
     elif sys.platform == "win32" and b"\n" in raw_bytes and b"\r\n" not in raw_bytes:
@@ -40,7 +39,7 @@ def check_file(path: Path, fix: bool = False):
 
     for i, line in enumerate(lines, 1):
         if line.rstrip() != line:
-            errors.append((i, "Trailing whitespace detected"))
+            errors.append((i, "Lines should not have trailing whitespaces"))
 
     return errors
 
