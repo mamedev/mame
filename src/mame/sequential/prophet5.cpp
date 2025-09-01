@@ -66,6 +66,8 @@ namespace {
 class prophet5_state : public driver_device
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::TAPE; }
+
 	prophet5_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD;
 
 	void prophet5rev30(machine_config &config) ATTR_COLD;
