@@ -16,9 +16,20 @@ def is_snake_case(name: str):
 def check_file(path: Path, fix: bool = False):
     errors = []
     try:
-        text = path.read_text()
+        raw_bytes = path.read_bytes()
+        try:
+            text = raw_bytes.decode("utf-8", errors="strict")
+        except UnicodeDecodeError as e:
+            errors.append((1, f"Invalid UTF-8 sequence at byte {e.start}-{e.end}"))
+            return errors
     except Exception:
         return errors
+
+    # Detect non-native line endings
+    if sys.platform != "win32" and b"\r\n" in raw_bytes:
+        errors.append((1, "File contains Windows (CRLF) line endings on a non-Windows system"))
+    elif sys.platform == "win32" and b"\n" in raw_bytes and b"\r\n" not in raw_bytes:
+        errors.append((1, "File contains Unix (LF) line endings on Windows"))
 
     lines = text.splitlines()
 
@@ -26,6 +37,12 @@ def check_file(path: Path, fix: bool = False):
         if fix:
             path.write_text(text + "\n")
         errors.append((len(lines) or 1, "File should end with a newline"))
+
+    for i, line in enumerate(lines, 1):
+        if line.rstrip() != line:
+            if fix:
+                lines[i - 1] = line.rstrip()
+            errors.append((i, "Trailing whitespace detected"))
 
     return errors
 
