@@ -363,8 +363,8 @@ void stella8085_state::io71(uint8_t data)
 		popmessage("GONG");
 	if (US)
 		LOG("activating US\n");
-	m_beep->set_output_gain(ALL_OUTPUTS,!dg);
-	if (ug || ds || dm || um)
+	m_beep->set_output_gain(ALL_OUTPUTS,!DG);
+	if (UG || DS || DM || UM)
 		LOG("UG %d DS %d DM %d UM %d\n", UG,DS,DM,UM);
 }
 
