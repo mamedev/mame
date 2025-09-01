@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!--
+license:BSD-3-Clause
+-->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+
+	<view name="Default Layout">
+		<bounds left="0" top="20" right="798" bottom="770" />
+
+		<!-- LEDs -->
+
+
+
+		<!-- Top 7seg display modules -->
+
+		<element name="digit19" ref="digit">
+			<bounds left="200" top="521" right="234" bottom="560" />
+		</element>
+		<element name="digit18" ref="digit">
+			<bounds left="244" top="521" right="278" bottom="560" />
+		</element>
+		<element name="digit17" ref="digit">
+			<bounds left="288" top="521" right="322" bottom="560" />
+		</element>
+		<element name="digit16" ref="digit">
+			<bounds left="332" top="521" right="366" bottom="560" />
+		</element>
+
+
+		<!-- Middle 7seg display module -->
+
+		<element name="digit21" ref="digit">
+			<bounds left="355" top="421" right="389" bottom="460" />
+		</element>
+		<element name="digit20" ref="digit">
+			<bounds left="399" top="421" right="433" bottom="460" />
+		</element>
+
+		<!-- Bottom 7seg display modules -->
+
+
+		<element name="digit15" ref="digit">
+			<bounds left="432" top="521" right="466" bottom="560" />
+		</element>
+		<element name="digit14" ref="digit">
+			<bounds left="476" top="521" right="510" bottom="560" />
+		</element>
+		<element name="digit13" ref="digit">
+			<bounds left="520" top="521" right="554" bottom="560" />
+		</element>
+		<element name="digit12" ref="digit">
+			<bounds left="564" top="521" right="598" bottom="560" />
+		</element>
+
+
+
+	</view>
+</mamelayout>
