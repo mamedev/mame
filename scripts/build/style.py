@@ -103,8 +103,16 @@ def check_mame_lst(changed_cpp_files: set[str]):
 
 def main():
     cpp_files = {f for f in sys.argv[1:] if f.endswith(".cpp")}
+    h_files = {f for f in sys.argv[1:] if f.endswith(".h")}
 
-    for file in sys.argv[1:]:
+    for file in cpp_files:
+        path = Path(file)
+        errors = check_cpp_file(path)
+
+        for lineno, msg in errors:
+            print(f"{path}:{lineno}: {msg}")
+
+    for file in h_files:
         path = Path(file)
         errors = check_cpp_file(path)
 
