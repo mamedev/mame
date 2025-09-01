@@ -399,21 +399,21 @@ void stella8085_state::makesound(uint8_t tone, uint8_t octave, uint8_t length)
 
 int stella8085_state::soundfreq(uint8_t channel, uint8_t clockdiv)
 {
-	const int sound_clock = (m_maincpu->clock() / 3);
-	const int int_clock = sound_clock >> (4-clockdiv);
-	const int C8SHARP = int_clock / 451;
-	const int D8 = int_clock / 426;
-	const int D8SHARP = int_clock / 402;
-	const int E8 = int_clock / 379;
-	const int F8 = int_clock / 358;
-	const int F8SHARP = int_clock / 338;
-	const int G8 = int_clock / 319;
-	const int G8SHARP = int_clock / 301;
-	const int A8 = int_clock / 284;
-	const int A8SHARP = int_clock / 268;
-	const int B8 = int_clock / 253;
-	const int C9 = int_clock / 239;
-	const int C8 = int_clock / 478; //unused?
+	const int SOUND_CLOCK = (m_maincpu->clock() / 3);
+	const int INT_CLOCK = SOUND_CLOCK >> (4-clockdiv);
+	const int C8SHARP = INT_CLOCK / 451;
+	const int D8 = INT_CLOCK / 426;
+	const int D8SHARP = INT_CLOCK / 402;
+	const int E8 = INT_CLOCK / 379;
+	const int F8 = INT_CLOCK / 358;
+	const int F8SHARP = INT_CLOCK / 338;
+	const int G8 = INT_CLOCK / 319;
+	const int G8SHARP = INT_CLOCK / 301;
+	const int A8 = INT_CLOCK / 284;
+	const int A8SHARP = INT_CLOCK / 268;
+	const int B8 = INT_CLOCK / 253;
+	const int C9 = INT_CLOCK / 239;
+	const int C8 = INT_CLOCK / 478; //unused?
 	switch (channel)
 	{
 		case 1:
