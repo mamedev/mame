@@ -13,7 +13,7 @@ def is_screaming_snake(name: str):
 def is_snake_case(name: str):
     return re.fullmatch(r"[a-z][a-z0-9_]*(_[a-z0-9]+)*", name) is not None
 
-def check_cpp_file(path: Path):
+def check_cpp_file(path: Path, fix: bool = False):
     errors = []
     try:
         text = path.read_text()
@@ -23,6 +23,8 @@ def check_cpp_file(path: Path):
     lines = text.splitlines()
 
     if not text.endswith("\n"):
+        if fix:
+            path.write_text(text + "\n")
         errors.append((len(lines) or 1, "File should end with a newline"))
 
     for i, line in enumerate(lines, 1):
@@ -102,19 +104,22 @@ def check_mame_lst(changed_cpp_files: set[str]):
     return errors
 
 def main():
-    cpp_files = {f for f in sys.argv[1:] if f.endswith(".cpp")}
-    h_files = {f for f in sys.argv[1:] if f.endswith(".h")}
+    fix = "-f" in sys.argv
+    args = [f for f in sys.argv[1:] if f != "-f"]
+
+    cpp_files = {f for f in args if f.endswith(".cpp")}
+    h_files = {f for f in args if f.endswith(".h")}
 
     for file in cpp_files:
         path = Path(file)
-        errors = check_cpp_file(path)
+        errors = check_cpp_file(path, fix=fix)
 
         for lineno, msg in errors:
             print(f"{path}:{lineno}: {msg}")
 
     for file in h_files:
         path = Path(file)
-        errors = check_cpp_file(path)
+        errors = check_cpp_file(path, fix=fix)
 
         for lineno, msg in errors:
             print(f"{path}:{lineno}: {msg}")

@@ -8,14 +8,12 @@ on:
     - 'src/**.h'
 
 jobs:
-  lint:
+  stylecheck:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Install reviewdog
         uses: reviewdog/action-setup@v1.3.2
@@ -30,7 +28,12 @@ jobs:
         run: |
           python3 scripts/build/style.py ${{ steps.changed-files.outputs.all_changed_files }} \
               | reviewdog -efm="%f:%l: %m" \
-                -name="cpp-style" \
+                -name="stylecheck" \
                 -reporter=github-pr-review \
                 -filter-mode=diff_context \
                 -fail-on-error=false
+
+      - name: Make suggestions
+        uses: reviewdog/action-suggester@v1.22
+        with:
+          tool_name: python3 scripts/build/style.py python3 scripts/build/style.py -f ${{ steps.changed-files.outputs.all_changed_files }}
