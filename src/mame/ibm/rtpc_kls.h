@@ -32,6 +32,7 @@ public:
 
 protected:
 	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -53,6 +54,8 @@ private:
 	required_device_array<input_merger_all_high_device, 2> m_rcv;
 
 	optional_device<speaker_sound_device> m_speaker;
+
+	required_ioport m_keylock;
 
 	devcb_write_line m_atn;
 	devcb_write_line m_irq;

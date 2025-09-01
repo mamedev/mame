@@ -9,6 +9,7 @@
 #include "rtpc_kls.h"
 
 #include "rtpc_kbd.h"
+#include "rtpc_mouse.h"
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
@@ -65,6 +66,7 @@ rtpc_kls_device::rtpc_kls_device(machine_config const &mconfig, char const *tag,
 	, m_locc(*this, "locc")
 	, m_rcv(*this, { "rcv_loop", "rcv_data" })
 	, m_speaker(*this, "kbdc:kbd:speaker")
+	, m_keylock(*this, "KEYLOCK")
 	, m_atn(*this)
 	, m_irq(*this)
 {
@@ -83,6 +85,7 @@ void kbd_devices(device_slot_interface &device)
 
 void loc_devices(device_slot_interface &device)
 {
+	device.option_add("mouse", RTPC_MOUSE);
 }
 
 void rtpc_kls_device::device_add_mconfig(machine_config &config)
@@ -96,7 +99,7 @@ void rtpc_kls_device::device_add_mconfig(machine_config &config)
 	m_mcu->set_addrmap(AS_PROGRAM, &rtpc_kls_device::mcu_map);
 	m_mcu->port_in_cb<0>().set([this]() { return m_mcu_p[0]; });
 	m_mcu->port_out_cb<0>().set([this](u8 data) { m_mcu_p[0] = data; });
-	m_mcu->port_in_cb<1>().set([this]() { return m_mcu_p[1]; });
+	m_mcu->port_in_cb<1>().set([this]() { return m_mcu_p[1] | m_keylock->read(); });
 	m_mcu->port_out_cb<1>().set(FUNC(rtpc_kls_device::mcu_port1_w));
 	m_mcu->port_in_cb<2>().set([this]() { return m_mcu_p[2]; });
 	m_mcu->port_out_cb<2>().set(FUNC(rtpc_kls_device::mcu_port2_w));
@@ -170,7 +173,7 @@ void rtpc_kls_device::device_add_mconfig(machine_config &config)
 			m_mcu->set_input_line(MCS51_INT0_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 		});
 
-	RS232_PORT(config, m_locc, loc_devices, nullptr);
+	RS232_PORT(config, m_locc, loc_devices, "mouse");
 	m_mcu->port_out_cb<3>().append(m_locc, FUNC(rs232_port_device::write_txd)).bit(1);
 	m_locc->rxd_handler().set(m_rcv[1], FUNC(input_merger_all_high_device::in_w<1>));
 }
@@ -407,4 +410,16 @@ ROM_END
 tiny_rom_entry const *rtpc_kls_device::device_rom_region() const
 {
 	return ROM_NAME(rtpc_kls);
+}
+
+INPUT_PORTS_START(rtpc_kls)
+	PORT_START("KEYLOCK")
+	PORT_CONFNAME(0x20, 0x00, "Key Lock")
+	PORT_CONFSETTING(0x00, "Unlock")
+	PORT_CONFSETTING(0x20, "Locked")
+INPUT_PORTS_END
+
+ioport_constructor rtpc_kls_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(rtpc_kls);
 }
