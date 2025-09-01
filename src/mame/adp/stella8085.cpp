@@ -174,7 +174,7 @@ uint8_t stella8085_state::lw_r()
 	//P1.6 is always low
 	// LIW5
 
-	return 0xBF;
+	return 0xbf;
 }
 
 void stella8085_state::machine1_w(uint8_t data)
@@ -210,7 +210,7 @@ void stella8085_state::kbd_bd_w(uint8_t data)
 
 uint8_t stella8085_state::kbd_rl_r()
 {
-	uint8_t ret = 0xFF;
+	uint8_t ret = 0xff;
 	switch (m_kbd_sl)
 	{
 	case 0:
@@ -262,27 +262,27 @@ void stella8085_state::output_digit(uint8_t i, uint8_t data)
 {
 	// Seven-segment encoding for digits 0-9 (abcdefg, no decimal point)
 	static const uint8_t bcd_to_7seg[16] = {
-		0x3F, // 0: 0b00111111
+		0x3f, // 0: 0b00111111
 		0x06, // 1: 0b00000110
-		0x5B, // 2: 0b01011011
-		0x4F, // 3: 0b01001111
+		0x5b, // 2: 0b01011011
+		0x4f, // 3: 0b01001111
 		0x66, // 4: 0b01100110
-		0x6D, // 5: 0b01101101
-		0x7D, // 6: 0b01111101
+		0x6d, // 5: 0b01101101
+		0x7d, // 6: 0b01111101
 		0x07, // 7: 0b00000111
-		0x7F, // 8: 0b01111111
-		0x6F, // 9: 0b01101111
+		0x7f, // 8: 0b01111111
+		0x6f, // 9: 0b01101111
 
 		0x77, // A: 0b01110111
-		0x7C, // B: 0b01111100
+		0x7c, // B: 0b01111100
 		0x39, // C: 0b00111001
-		0x5E, // D: 0b01011110
+		0x5e, // D: 0b01011110
 		0x79, // E: 0b01111001
 		0x71  // F: 0b01110001
 	};
 
 	if (i > 7) {
-		uint8_t debug = data & 0x0F;
+		uint8_t debug = data & 0x0f;
 		uint8_t cash = data >> 4;
 
 		m_digits[i - 8] = bcd_to_7seg[debug];
@@ -317,62 +317,62 @@ void stella8085_state::io9w(uint8_t data)
 
 void stella8085_state::io70(uint8_t data)
 {
-	const bool aw1 = BIT(data,0);
-	const bool aw2 = BIT(data,1);
-	const bool aw3 = BIT(data,2);
-	const bool aw4 = BIT(data,3);
-	const bool mp = BIT(data,4);
-	const bool sz = BIT(data,5);
-	const bool d6 = BIT(data,6); // high on startup
-	const bool pa7 = BIT(data,7);
+	const bool AW1 = BIT(data,0);
+	const bool AW2 = BIT(data,1);
+	const bool AW3 = BIT(data,2);
+	const bool AW4 = BIT(data,3);
+	const bool MP = BIT(data,4);
+	const bool SZ = BIT(data,5);
+	const bool D6 = BIT(data,6); // high on startup
+	const bool PA7 = BIT(data,7);
 
-	machine().bookkeeping().coin_lockout_global_w(mp); // coin magnet
-	machine().bookkeeping().coin_counter_w(0,aw1); // coin eject
-	machine().bookkeeping().coin_counter_w(1,aw2);
-	machine().bookkeeping().coin_counter_w(2,aw3);
-	machine().bookkeeping().coin_counter_w(3,aw4);
-	machine().bookkeeping().coin_counter_w(5,sz); // game counter
+	machine().bookkeeping().coin_lockout_global_w(MP); // coin magnet
+	machine().bookkeeping().coin_counter_w(0,AW1); // coin eject
+	machine().bookkeeping().coin_counter_w(1,AW2);
+	machine().bookkeeping().coin_counter_w(2,AW3);
+	machine().bookkeeping().coin_counter_w(3,AW4);
+	machine().bookkeeping().coin_counter_w(5,SZ); // game counter
 
-	if (d6) {
+	if (D6) {
 		;//LOG("Short test\n");
 	}
 
-	if (pa7) {
+	if (PA7) {
 		LOG("PA7 high\n");
 	}
 }
 
 void stella8085_state::io71(uint8_t data)
 {
-	const bool rs = BIT(data,0);
-	const bool gong = BIT(data,1);
-	const bool dg = BIT(data,2);
-	const bool ug = BIT(data,3);
-	const bool ds = BIT(data,4);
-	const bool us = BIT(data,5);
-	const bool dm = BIT(data,6);
-	const bool um = BIT(data,7);
+	const bool RS = BIT(data,0);
+	const bool GONG = BIT(data,1);
+	const bool DG = BIT(data,2);
+	const bool UG = BIT(data,3);
+	const bool DS = BIT(data,4);
+	const bool US = BIT(data,5);
+	const bool DM = BIT(data,6);
+	const bool UM = BIT(data,7);
 
 	// IO 71 D0 connected through CD4013 flipflop to DIP switch connected to RST55
 	if ( BIT(m_dsw->read(),3))
-		m_maincpu->set_input_line(I8085_RST55_LINE, rs ? CLEAR_LINE : ASSERT_LINE);
+		m_maincpu->set_input_line(I8085_RST55_LINE, RS ? CLEAR_LINE : ASSERT_LINE);
 	else
 		m_maincpu->set_input_line(I8085_RST55_LINE, CLEAR_LINE);
 
-	if (gong)
+	if (GONG)
 		popmessage("GONG");
-	if (us)
+	if (US)
 		LOG("activating US\n");
 	m_beep->set_output_gain(ALL_OUTPUTS,!dg);
 	if (ug || ds || dm || um)
-		LOG("UG %d DS %d DM %d UM %d\n", ug,ds,dm,um);
+		LOG("UG %d DS %d DM %d UM %d\n", UG,DS,DM,UM);
 }
 
 void stella8085_state::sounddev(uint8_t data)
 {
-	uint8_t tone = data & 0x0F;
+	uint8_t tone = data & 0x0f;
 	uint8_t length = data & 0x30;
-	uint8_t octave = data & 0xC0;
+	uint8_t octave = data & 0xc0;
 	makesound(tone, octave, 60*(length+1)); // 60 is not correct
 }
 
@@ -401,47 +401,47 @@ int stella8085_state::soundfreq(uint8_t channel, uint8_t clockdiv)
 {
 	const int sound_clock = (m_maincpu->clock() / 3);
 	const int int_clock = sound_clock >> (4-clockdiv);
-	const int c8sharp = int_clock / 451;
-	const int d8 = int_clock / 426;
-	const int d8sharp = int_clock / 402;
-	const int e8 = int_clock / 379;
-	const int f8 = int_clock / 358;
-	const int f8sharp = int_clock / 338;
-	const int g8 = int_clock / 319;
-	const int g8sharp = int_clock / 301;
-	const int a8 = int_clock / 284;
-	const int a8sharp = int_clock / 268;
-	const int b8 = int_clock / 253;
-	const int c9 = int_clock / 239;
-	const int c8 = int_clock / 478; //unused?
+	const int C8SHARP = int_clock / 451;
+	const int D8 = int_clock / 426;
+	const int D8SHARP = int_clock / 402;
+	const int E8 = int_clock / 379;
+	const int F8 = int_clock / 358;
+	const int F8SHARP = int_clock / 338;
+	const int G8 = int_clock / 319;
+	const int G8SHARP = int_clock / 301;
+	const int A8 = int_clock / 284;
+	const int A8SHARP = int_clock / 268;
+	const int B8 = int_clock / 253;
+	const int C9 = int_clock / 239;
+	const int C8 = int_clock / 478; //unused?
 	switch (channel)
 	{
 		case 1:
-			return c9;
+			return C9;
 		case 2:
-			return b8;
+			return B8;
 		case 3:
-			return a8sharp;
+			return A8SHARP;
 		case 4:
-			return a8;
+			return A8;
 		case 5:
-			return g8sharp;
+			return G8SHARP;
 		case 6:
-			return g8;
+			return G8;
 		case 7:
-			return f8sharp;
+			return F8SHARP;
 		case 8:
-			return f8;
+			return F8;
 		case 9:
-			return e8;
+			return E8;
 		case 10:
-			return d8sharp;
+			return D8SHARP;
 		case 11:
-			return d8;
+			return D8;
 		case 12:
-			return c8sharp;
+			return C8SHARP;
 		default:
-			return c8;
+			return C8;
 	}
 }
 
