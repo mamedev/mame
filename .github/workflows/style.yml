@@ -32,7 +32,7 @@ jobs:
               | reviewdog -efm="%f:%l: %m" \
                 -name="stylecheck" \
                 -reporter=github-pr-review \
-                -filter-mode=diff_context \
+                -filter-mode=nofilter \
                 -fail-on-error=false
 
       - name: Make suggestions
