@@ -236,6 +236,12 @@
   If you have credits in one game, you can switch to the other
   pressing BIG button.
 
+  Chance Bonus = when active by turning on DIP switch 7 #5 The Chance Bonus
+  builds up when credits are added to the game. For every 32 credits added
+  to the game 3 bonus credits are added to the Chance Bonus (CB). When all
+  the credits are played off the game the accumulated Chance Bonus credits
+  will be sent to the credit box for play.
+
 
 ***************************************************************************/
 
@@ -489,6 +495,7 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_cherrym_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_cherrym_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_pkrmast_fg_tile_info);
 
 private:
 	void outport0_w(uint8_t data);
@@ -503,6 +510,7 @@ private:
 	void nfm_palette(palette_device &palette) const ATTR_COLD;
 
 	DECLARE_VIDEO_START(jkrmast);
+	DECLARE_VIDEO_START(pkrmast);
 
 	void amcoe1_portmap(address_map &map) ATTR_COLD;
 	void amcoe2_portmap(address_map &map) ATTR_COLD;
@@ -526,6 +534,8 @@ private:
 	void pkrmast_portmap(address_map &map) ATTR_COLD;
 	void super7_map(address_map &map) ATTR_COLD;
 	void super7_portmap(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+
 
 	// installed by various driver init handlers to get stuff to work
 	template <uint8_t V> uint8_t fixedval_r() { return V; }
@@ -885,6 +895,33 @@ TILE_GET_INFO_MEMBER(cmaster_state::get_cherrym_bg_tile_info)
 			0);
 }
 
+TILE_GET_INFO_MEMBER(cmaster_state::get_pkrmast_fg_tile_info)
+{
+	int const code = m_fg_vidram[tile_index];
+	int const attr = m_fg_atrram[tile_index];
+	uint8_t color = (attr & 0xf0) >> 4;
+/*
+	if (color < 8)
+	{
+		color *= 2;
+	}
+	else
+	if (color < 15)
+	{
+		color = (color - 8) * 2 + 1;  // color 15 remains unchanged
+	}
+*/
+
+//  just switch to mapping to facilite the different tests...
+	const int mapping[] = {0, 2, 4, 6, 8, 10, 12, 14, 1, 3, 5, 7, 9, 11, 13, 15};
+	color = mapping[color];
+
+	tileinfo.set(0,
+			code | (attr & 0x0f) << 8 | m_tile_bank << 12,
+			color,
+			0);
+}
+
 template <uint8_t Which>
 void goldstar_state::reel_ram_w(offs_t offset, uint8_t data)
 {
@@ -937,17 +974,49 @@ void cmaster_state::video_start()
 	m_enable_reg = 0x0b;
 }
 
+VIDEO_START_MEMBER(cmaster_state, pkrmast)
+{
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+
+	m_reel_tilemap[0]->set_scroll_cols(64);
+	m_reel_tilemap[1]->set_scroll_cols(64);
+	m_reel_tilemap[2]->set_scroll_cols(64);
+
+	m_cmaster_girl_num = 0;
+	m_cmaster_girl_pal = 0;
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_pkrmast_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+
+	m_enable_reg = 0x0b;
+}
+
 VIDEO_START_MEMBER(cmaster_state, jkrmast)
 {
-	cmaster_state::video_start();
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_cherrym_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-
-	m_bg_tilemap->set_scroll_cols(64);
+	m_reel_tilemap[0]->set_scroll_cols(64);
+	m_reel_tilemap[1]->set_scroll_cols(64);
+	m_reel_tilemap[2]->set_scroll_cols(64);
 
 	m_reel_tilemap[0]->set_transparent_pen(0);
 	m_reel_tilemap[1]->set_transparent_pen(0);
 	m_reel_tilemap[2]->set_transparent_pen(0);
+
+	m_cmaster_girl_num = 0;
+	m_cmaster_girl_pal = 0;
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_pkrmast_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_cherrym_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_bg_tilemap->set_scroll_cols(64);
+
+	m_enable_reg = 0x0b;
 
 	save_item(NAME(m_reel_bank));
 }
@@ -2375,6 +2444,11 @@ void cmaster_state::animalhs_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
+void cmaster_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
+
 
 void cmaster_state::coincount_w(uint8_t data)
 {
@@ -2548,6 +2622,10 @@ void cmaster_state::crazybon_portmap(address_map &map)
 	map(0x10, 0x10).portr("IN0");
 	map(0x11, 0x11).portr("IN1");
 	map(0x12, 0x12).portr("IN2");
+
+	map(0x1c, 0x1c).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x1d, 0x1d).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x1e, 0x1e).w("ramdac", FUNC(ramdac_device::mask_w));
 
 	map(0x20, 0x20).portr("DSW3-0");
 	map(0x21, 0x21).portr("DSW3-1");
@@ -11001,7 +11079,7 @@ static const gfx_layout cmast97_layout =
 };
 
 static const gfx_layout cmast97_layout32 =
-	{
+{
 	8,32,
 	RGN_FRAC(1,1),
 	4,
@@ -12347,6 +12425,8 @@ void cmaster_state::pkrmast(machine_config &config)
 	PALETTE(config, m_palette, FUNC(cmaster_state::cm_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
+	MCFG_VIDEO_START_OVERRIDE(cmaster_state, pkrmast)
+
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
@@ -12381,6 +12461,8 @@ void cmaster_state::crazybon(machine_config &config)
 	I8255A(config.replace(), m_ppi[0]);
 	I8255A(config.replace(), m_ppi[1]);
 
+	PALETTE(config.replace(), m_palette).set_entries(0x100);
+	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &cmaster_state::ramdac_map);
 }
 
 void cmaster_state::crazybonb(machine_config &config)
@@ -12662,13 +12744,6 @@ ROM_START( crazybon )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 
-	// proms taken from cmv4, probably wrong
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) BAD_DUMP )
-	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) BAD_DUMP )
-
-	ROM_REGION( 0x100, "proms2", 0 )
-	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) BAD_DUMP )
 ROM_END
 
 ROM_START( crazybona )
@@ -12683,13 +12758,6 @@ ROM_START( crazybona )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 
-	// proms taken from cmv4, probably wrong
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) BAD_DUMP )
-	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) BAD_DUMP )
-
-	ROM_REGION( 0x100, "proms2", 0 )
-	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) BAD_DUMP )
 ROM_END
 
 // this set of crazy bonus is running in a daughterboard,
@@ -22966,7 +23034,6 @@ void goldstar_state::init_goldstar()
 void cmaster_state::init_jkrmast()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	uint8_t *prom = memregion("colours")->base();
 
 	for (int A = 0; A < 0x8000; A++)
 	{
@@ -22990,30 +23057,12 @@ void cmaster_state::init_jkrmast()
 			rom[i] = buf[i];
 	}
 
-	uint8_t buff[0x80] = {};
-	static const uint8_t row_map[16] = { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 };
-
-	for (int addr = 0; addr < 0x80; addr++)
-	{
-		uint8_t swapped;
-		uint8_t row = (addr >> 3) & 0x0f;
-		uint8_t offset = addr & 0x07;
-		swapped = (row_map[row] << 3) | offset;
-		buff[swapped] = prom[addr];
-	}
-
-	for (int addr = 0; addr < 0x80; addr++)
-	{
-		prom[addr] = buff[addr];
-	}
-
 	init_palnibbles();
 }
 
 void cmaster_state::init_pkrmast()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	uint8_t *prom = memregion("colours")->base();
 
 	for (int i = 0; i < 0x8000; i++)
 	{
@@ -23058,24 +23107,6 @@ void cmaster_state::init_pkrmast()
 		}
 
 		rom[i] = x;
-	}
-
-	uint8_t buff[0x80] = {};
-	static const uint8_t row_map[16] = { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 };
-
-	for (int addr = 0; addr < 0x80; addr++)
-	{
-
-		uint8_t swapped;
-		uint8_t row = (addr >> 3) & 0x0f;
-		uint8_t offset = addr & 0x07;
-		swapped = (row_map[row] << 3) | offset;
-		buff[swapped] = prom[addr];
-	}
-
-	for (int addr = 0; addr < 0x80; addr++)
-	{
-		prom[addr] = buff[addr];
 	}
 
 	init_palnibbles();
