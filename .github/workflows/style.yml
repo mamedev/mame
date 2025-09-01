@@ -17,6 +17,8 @@ jobs:
 
       - name: Install reviewdog
         uses: reviewdog/action-setup@v1.3.2
+        with:
+          reviewdog_version: nightly
 
       - name: Get changed files
         id: changed-files
