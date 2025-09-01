@@ -97,7 +97,7 @@ uint8_t i8256_device::read(offs_t offset)
 		offset = offset >> 1;
 	}	
     	
-	u8 reg = offset & 0x0F;
+	u8 reg = offset & 0x0f;
 
 	switch (reg)
 	{
@@ -132,14 +132,14 @@ uint8_t i8256_device::read(offs_t offset)
 			return m_status;
 		default:
 			LOG("I8256 Read unmapped register: %u\n", reg);
-			return 0xFF;
+			return 0xff;
 	};
 }
 
 void i8256_device::write(offs_t offset, u8 data)
 {
 
-	u8 reg = offset & 0x0F;
+	u8 reg = offset & 0x0f;
 
     // In the 8-bit mode, AD0-AD3 are used to select the proper register, while AD1-AD4 are used in the 16-bit mode.
     // AD4 in the 8-bit mote is ignored as an address.
@@ -148,7 +148,7 @@ void i8256_device::write(offs_t offset, u8 data)
 	{
 		if (!BIT(offset,0)) // AD0 in the 16-bit mode is used as a second chip select, active low.
 		{
-			reg = (offset >> 1) & 0x0F;
+			reg = (offset >> 1) & 0x0f;
 		} else {
 			return;
 		}
@@ -182,7 +182,7 @@ void i8256_device::write(offs_t offset, u8 data)
 			if (m_command2 != data) {
             	m_command2 = data;
 
-				set_rate(baudRates[m_command2 & 0x0F]);
+				set_rate(baudRates[m_command2 & 0x0f]);
 
 				if (BIT(m_command2,I8256_CMD2_PARITY_ENABLE))
 					m_parity = BIT(m_command2,I8256_CMD2_EVEN_PARITY) ? PARITY_EVEN : PARITY_ODD;
@@ -279,8 +279,8 @@ void i8256_device::p2_w(uint8_t data)
     uint8_t port2_data = 0;
     switch (p2c)
     {
-        case I8256_PORT2C_IO: port2_data = m_port2_int & 0x0F; break;
-        case I8256_PORT2C_OI: port2_data = m_port2_int & 0xF0; break;
+        case I8256_PORT2C_IO: port2_data = m_port2_int & 0x0f; break;
+        case I8256_PORT2C_OI: port2_data = m_port2_int & 0xf0; break;
         case I8256_PORT2C_OO: port2_data = m_port2_int; break;
         default: port2_data = 0; break;
     }
