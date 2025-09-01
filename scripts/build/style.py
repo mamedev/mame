@@ -45,7 +45,7 @@ def check_file(path: Path, fix: bool = False):
     return errors
 
 def check_cpp_file(path: Path, fix: bool = False):
-    errors = []
+    errors = check_file(path, fix)
     try:
         text = path.read_text()
     except Exception:
