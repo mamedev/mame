@@ -30,12 +30,12 @@ frequencies. The rest (23 CVs) are common to all voices. This setup results in a
 
 There is no dedicated ADC chip. The knobs and external CV are scanned by routing
 the knob (or input) voltages to a window comparator. Those voltages are compared
-with the ADC reference, which is controlled by the firwmare. See update_vmux()
+with the ADC reference, which is controlled by the firmware. See update_vmux()
 and adc_r() for details.
 
 TODO: Outline of voice architecture.
 
-This driver is based on the Prophet 5 Rev 3.0 technicam manual, and is intended
+This driver is based on the Prophet 5 Rev 3.0 technical manual, and is intended
 as an education tool.
 
 There is no layout and no audio. Running with `-oslog -output console` will
@@ -246,9 +246,9 @@ u8 prophet5_state::misc_r()
 u8 prophet5_state::adc_r()
 {
 	// The ADC consists of two comparators (U365C,D, LM339). A network of
-	// resistors and diodes adds and substracts 34mV nominal (according to the
-	// schematic) to the ADC reference. The ADC reference is nominally half the
-	// DAC output voltage.
+	// resistors and diodes create the reference inputs to the two comparators,
+	// by adding and subtracting 34mV to the ADC reference. The ADC reference is
+	// nominally half the DAC output voltage.
 	const u8 d0 = (m_adc_vmux < m_adc_vref - 0.034) ? 1 : 0;  // ADC LO
 	const u8 d1 = (m_adc_vmux > m_adc_vref + 0.034) ? 1 : 0;  // ADC HI
 	if (d0 || d1)
@@ -360,7 +360,7 @@ void prophet5_state::update_vdac()
 
 void prophet5_state::update_vmux()
 {
-	// The Vmux singal is one of the inputs to the ADC comparator. The other
+	// The Vmux signal is one of the inputs to the ADC comparator. The other
 	// one is the ADC reference (m_adc_vref).
 
 	double vmux_sum = 0;
@@ -379,7 +379,7 @@ void prophet5_state::update_vmux()
 
 	if (m_seq_cv_enabled)  // U371C (CD4016) control input.
 	{
-		// CV input expects 0-10V.
+		// CV input is expected to be 0-10V.
 		const double cv_in = 10.0 * m_seq_cv_in->read() / 100.0;
 
 		// The external CV is buffered, scaled, and offsetted by U374A (LM348
@@ -862,7 +862,7 @@ INPUT_PORTS_START(prophet5)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TP304")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TP306")
 
-	// All knob potentiomenters are 10K linear.
+	// All knob potentiometers are 10K linear.
 
 	PORT_START("pot_0")  // R217
 	PORT_ADJUSTER(50, "GLIDE") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 0)
@@ -959,12 +959,9 @@ INPUT_PORTS_END
 
 ROM_START(prophet5rev30)
 	ROM_REGION(0xc00, "maincpu", 0)  // 3 x 2708 1Kbyte ROMS.
-	ROM_LOAD("0.v8.1.u312", 0x000000, 0x000400, CRC(7cb704f0) SHA1(915c46486a983d2cee140cf6e9f5c505d620b956))
-	ROM_IGNORE(0x400)  // The first 1K bytes are duplicated. But 2708 ROMs should only contain 1K.
-	ROM_LOAD("1.v8.1.u313", 0x000400, 0x000400, CRC(a988728e) SHA1(81f958f1928abb48a750255f4bfdfa40cb941abc))
-	ROM_IGNORE(0x400)
-	ROM_LOAD("2.v8.1.u314", 0x000800, 0x000400, CRC(a500842e) SHA1(a5993436d4dc09ace7ae7b68bee18a3d3bbf6e62))
-	ROM_IGNORE(0x400)
+	ROM_LOAD("0.v8.1.u312", 0x000000, 0x000400, CRC(6337d2ae) SHA1(bad79f6475dc0a8bb139ea0a12258cb3e5bfa0be))
+	ROM_LOAD("1.v8.1.u313", 0x000400, 0x000400, CRC(1e334fd3) SHA1(276b7abf4a13fbae0d09e869f786b3073ee82504))
+	ROM_LOAD("2.v8.1.u314", 0x000800, 0x000400, CRC(ffafaa95) SHA1(9d119fb22270d45e34c1f16899453ae7469d7d20))
 ROM_END
 
 }  // anonymous namespace
