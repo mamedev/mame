@@ -253,7 +253,7 @@ ROM_START( east8 )
     ROM_LOAD( "at89s51.u39", 0x0000, 0x1000,   CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. 
  
     ROM_REGION( 0x40000, "oki", 0 )
-    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  Voices Rom
+    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  No label  Rom. From Nreat-new GN-001 pcb. misspelled as Great-new?
 
     ROM_END
 
