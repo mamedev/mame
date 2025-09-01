@@ -745,15 +745,15 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 			// tiles with mix codes are put into category 1.
 			// draw them in a separate pass for per-tile blending if necessary.
 			flags2 |= TILEMAP_DRAW_ALPHA(alpha2);
-			m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags2, 0);
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer, flags2, 0);
 		}
 		else
 		{
 			// if no alpha is being applied to category 1 (tile mix code) tiles,
-			// draw all tiles with one m_tilemap_draw call
+			// draw all tiles with one tilemap_draw call
 			flags |= TILEMAP_DRAW_ALL_CATEGORIES;
 		}
-		m_k056832->m_tilemap_draw(screen, bitmap, cliprect, layer, flags, 0);
+		m_k056832->tilemap_draw(screen, bitmap, cliprect, layer, flags, 0);
 	}
 }
 

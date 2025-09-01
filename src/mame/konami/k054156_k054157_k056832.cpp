@@ -181,7 +181,6 @@ ones.  The other 7 words are ignored.  Global scrollx is ignored.
 
 
 
-
 DEFINE_DEVICE_TYPE(K056832, k056832_device, "k056832", "Konami 056832 Tilemap Generator")
 
 k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -225,6 +224,146 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 {
 	std::fill(std::begin(m_last_colorbase), std::end(m_last_colorbase), 0);
 }
+
+
+void k056832_device::create_gfx()
+{
+	int gfx_index = 0;
+	uint32_t total;
+
+	static const gfx_layout charlayout8 =
+	{
+		8, 8,
+		0,
+		8,
+		{ 8*7,8*3,8*5,8*1,8*6,8*2,8*4,8*0 },
+		{ 0, 1, 2, 3, 4, 5, 6, 7 },
+		{ 0, 8*8, 8*8*2, 8*8*3, 8*8*4, 8*8*5, 8*8*6, 8*8*7 },
+		8*8*8
+	};
+	static const gfx_layout charlayout8le =
+	{
+		8, 8,
+		0,
+		8,
+//      { 0, 1, 2, 3, 0+(0x200000*8), 1+(0x200000*8), 2+(0x200000*8), 3+(0x200000*8) },
+		{ 0+(0x200000*8), 1+(0x200000*8), 2+(0x200000*8), 3+(0x200000*8), 0, 1, 2, 3 },
+		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
+		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
+		8*8*4
+	};
+	static const gfx_layout charlayout6 =
+	{
+		8, 8,
+		0,
+		6,
+		{ 40, 32, 24, 8, 16, 0 },
+		{ 0, 1, 2, 3, 4, 5, 6, 7 },
+		{ 0, 6*8, 6*8*2, 6*8*3, 6*8*4, 6*8*5, 6*8*6, 6*8*7 },
+		8*8*6
+	};
+	static const gfx_layout charlayout5 =
+	{
+		8, 8,
+		0,
+		5,
+		{ 32, 24, 8, 16, 0 },
+		{ 0, 1, 2, 3, 4, 5, 6, 7 },
+		{ 0, 5*8, 5*8*2, 5*8*3, 5*8*4, 5*8*5, 5*8*6, 5*8*7 },
+		8*8*5
+	};
+	static const gfx_layout charlayout4 =
+	{
+		8, 8,
+		0,
+		4,
+		{ 0, 1, 2, 3 },
+		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
+		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
+		8*8*4
+	};
+
+	static const gfx_layout charlayout4ps =
+	{
+		8, 8, // W, H
+		0, // Total num elements
+		4, // No. Bit planes
+		{ 8*2,8*0,8*3,8*1 }, // Bit plane offsets
+		{ 0, 1, 2, 3, 4, 5, 6, 7 },
+		{ 0, 8*4, 8*4*2, 8*4*3, 8*4*4, 8*4*5, 8*4*6, 8*4*7 },
+		8*8*4 // Increment
+	};
+
+	static const gfx_layout charlayout4dj =
+	{
+		8, 8, // W, H
+		0, // Total num elements
+		4, // No. Bit planes
+		{ 8*3,8*1,8*2,8*0 }, // Bit plane offsets
+		{ 0, 1, 2, 3, 4, 5, 6, 7 },
+		{ 0, 8*4, 8*4*2, 8*4*3, 8*4*4, 8*4*5, 8*4*6, 8*4*7 },
+		8*8*4 // Increment
+	};
+
+	/* handle the various graphics formats */
+	int i = (m_big) ? 8 : 16;
+
+	/* decode the graphics */
+	switch (m_bpp)
+	{
+		case K056832_BPP_4:
+			total = m_rombase.bytes() / (i*4);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout4, 4);
+			break;
+
+		case K056832_BPP_5:
+			total = m_rombase.bytes() / (i*5);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout5, 5);
+			break;
+
+		case K056832_BPP_6:
+			total = m_rombase.bytes() / (i*6);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout6, 6);
+			break;
+
+		case K056832_BPP_8:
+			total = m_rombase.bytes() / (i*8);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout8, 8);
+			break;
+
+		case K056832_BPP_8LE:
+			total = m_rombase.bytes() / (i*8);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout8le, 8);
+			break;
+
+		case K056832_BPP_8TASMAN:
+			total = m_rombase.bytes() / (i*8);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout8, 8);
+			break;
+
+		case K056832_BPP_4PIRATESH:
+			total = m_rombase.bytes() / (i*4);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout4ps, 4);
+			break;
+
+		case K056832_BPP_4dj:
+			total = m_rombase.bytes() / (i*4);
+			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout4dj, 4);
+			break;
+
+		default:
+			fatalerror("Unsupported bpp\n");
+	}
+
+	gfx(gfx_index)->set_granularity(16); /* override */
+	gfx(gfx_index)->set_colors(palette().entries() / 16);
+
+	m_gfx_num = gfx_index;
+
+	m_num_gfx_banks = m_rombase.bytes() / 0x2000;
+	m_cur_gfx_banks = 0;
+}
+
 
 void k056832_device::create_tilemaps()
 {
@@ -333,16 +472,14 @@ void k056832_device::device_start()
 	// bind callbacks
 	m_k056832_cb.resolve();
 
-	memset(m_regs,     0x00, sizeof(m_regs) );
-	memset(m_regsb,    0x00, sizeof(m_regsb) );
+	memset(m_regs, 0x00, sizeof(m_regs));
+	memset(m_regsb, 0x00, sizeof(m_regsb));
 
 	/* TODO: understand which elements MUST be init here (to keep correct layer
 	associations) and which ones can can be init at RESET, if any */
 
 	create_gfx();
-
 	create_tilemaps();
-
 	finalize_init();
 }
 
@@ -353,7 +490,7 @@ void k056832_device::device_start()
 #define mark_line_dirty(P, L) if (L < 0x100) m_line_dirty[P][L >> 5] |= 1 << (L & 0x1f)
 #define mark_all_lines_dirty(P) m_all_lines_dirty[P] = 1
 
-void k056832_device::mark_page_dirty( int page )
+void k056832_device::mark_page_dirty(int page)
 {
 	if (m_page_tile_mode[page])
 		m_tilemap[page]->mark_all_dirty();
@@ -362,7 +499,7 @@ void k056832_device::mark_page_dirty( int page )
 }
 
 
-void k056832_device::mark_plane_dirty( int layer )
+void k056832_device::mark_plane_dirty(int layer)
 {
 	int tilemode = m_layer_tile_mode[layer];
 
@@ -377,9 +514,7 @@ void k056832_device::mark_plane_dirty( int layer )
 }
 
 
-
-
-void k056832_device::mark_all_tilemaps_dirty( )
+void k056832_device::mark_all_tilemaps_dirty()
 {
 	for (int i = 0; i < K056832_PAGE_COUNT; i++)
 	{
@@ -391,7 +526,7 @@ void k056832_device::mark_all_tilemaps_dirty( )
 	}
 }
 
-void k056832_device::update_page_layout( )
+void k056832_device::update_page_layout()
 {
 	int layer, rowstart, rowspan, colstart, colspan, r, c, page_idx, setlayer;
 
@@ -445,9 +580,7 @@ void k056832_device::update_page_layout( )
 }
 
 
-
-
-int k056832_device::get_lookup( int bits )
+int k056832_device::get_lookup(int bits)
 {
 	int res = (m_regs[0x1c] >> (bits << 2)) & 0x0f;
 
@@ -457,7 +590,7 @@ int k056832_device::get_lookup( int bits )
 	return res;
 }
 
-void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pageIndex )
+void k056832_device::get_tile_info(tile_data &tileinfo, int tile_index, int pageIndex)
 {
 	static const struct K056832_SHIFTMASKS
 	{
@@ -505,25 +638,25 @@ void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pa
 
 
 
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info0 ) { get_tile_info(tileinfo,tile_index,0x0); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info1 ) { get_tile_info(tileinfo,tile_index,0x1); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info2 ) { get_tile_info(tileinfo,tile_index,0x2); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info3 ) { get_tile_info(tileinfo,tile_index,0x3); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info4 ) { get_tile_info(tileinfo,tile_index,0x4); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info5 ) { get_tile_info(tileinfo,tile_index,0x5); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info6 ) { get_tile_info(tileinfo,tile_index,0x6); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info7 ) { get_tile_info(tileinfo,tile_index,0x7); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info8 ) { get_tile_info(tileinfo,tile_index,0x8); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info9 ) { get_tile_info(tileinfo,tile_index,0x9); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_infoa ) { get_tile_info(tileinfo,tile_index,0xa); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_infob ) { get_tile_info(tileinfo,tile_index,0xb); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_infoc ) { get_tile_info(tileinfo,tile_index,0xc); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_infod ) { get_tile_info(tileinfo,tile_index,0xd); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_infoe ) { get_tile_info(tileinfo,tile_index,0xe); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_infof ) { get_tile_info(tileinfo,tile_index,0xf); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info0) { get_tile_info(tileinfo,tile_index,0x0); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info1) { get_tile_info(tileinfo,tile_index,0x1); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info2) { get_tile_info(tileinfo,tile_index,0x2); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info3) { get_tile_info(tileinfo,tile_index,0x3); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info4) { get_tile_info(tileinfo,tile_index,0x4); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info5) { get_tile_info(tileinfo,tile_index,0x5); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info6) { get_tile_info(tileinfo,tile_index,0x6); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info7) { get_tile_info(tileinfo,tile_index,0x7); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info8) { get_tile_info(tileinfo,tile_index,0x8); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info9) { get_tile_info(tileinfo,tile_index,0x9); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_infoa) { get_tile_info(tileinfo,tile_index,0xa); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_infob) { get_tile_info(tileinfo,tile_index,0xb); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_infoc) { get_tile_info(tileinfo,tile_index,0xc); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_infod) { get_tile_info(tileinfo,tile_index,0xd); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_infoe) { get_tile_info(tileinfo,tile_index,0xe); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_infof) { get_tile_info(tileinfo,tile_index,0xf); }
 
 
-void k056832_device::change_rambank( )
+void k056832_device::change_rambank()
 {
 	/* ------xx page col
 	 * ---xx--- page row
@@ -543,14 +676,13 @@ void k056832_device::change_rambank( )
 
 
 
-int k056832_device::get_current_rambank( )
+int k056832_device::get_current_rambank()
 {
 	int bank = m_regs[0x19];
-
 	return ((bank >> 1) & 0xc) | (bank & 3);
 }
 
-void k056832_device::change_rombank( )
+void k056832_device::change_rombank()
 {
 	int bank;
 
@@ -564,7 +696,7 @@ void k056832_device::change_rombank( )
 
 
 
-void k056832_device::set_tile_bank( int bank )
+void k056832_device::set_tile_bank(int bank)
 {
 	m_uses_tile_banks = true;
 
@@ -582,7 +714,7 @@ void k056832_device::set_tile_bank( int bank )
 }
 
 /* generic helper routine for ROM checksumming */
-int k056832_device::rom_read_b( int offset, int blksize, int blksize2, int zerosec )
+int k056832_device::rom_read_b(int offset, int blksize, int blksize2, int zerosec)
 {
 	int base, ret;
 
@@ -671,7 +803,6 @@ u8 k056832_device::chusenoh_rom_r(offs_t offset)
 u16 k056832_device::piratesh_rom_r(offs_t offset)
 {
 	uint32_t addr = 0x2000 * m_cur_gfx_banks + offset;
-
 	return m_rombase[addr + 1] | (m_rombase[addr] << 8);
 }
 
@@ -679,7 +810,6 @@ u16 k056832_device::piratesh_rom_r(offs_t offset)
 u16 k056832_device::rom_word_r(offs_t offset)
 {
 	int addr = 0x2000 * m_cur_gfx_banks + 2 * offset;
-
 	return m_rombase[addr + 1] | (m_rombase[addr] << 8);
 }
 
@@ -746,21 +876,18 @@ u16 k056832_device::mw_rom_word_r(offs_t offset)
 u16 k056832_device::bishi_rom_word_r(offs_t offset)
 {
 	int addr = 0x4000 * m_cur_gfx_banks + offset;
-
 	return m_rombase[addr + 2] | (m_rombase[addr] << 8);
 }
 
 u16 k056832_device::rom_word_8000_r(offs_t offset)
 {
 	int addr = 0x8000 * m_cur_gfx_banks + 2 * offset;
-
 	return m_rombase[addr + 2] | (m_rombase[addr] << 8);
 }
 
 u16 k056832_device::old_rom_word_r(offs_t offset)
 {
 	int addr = 0x2000 * m_cur_gfx_banks + 2 * offset;
-
 	return m_rombase[addr + 1] | (m_rombase[addr] << 8);
 }
 
@@ -939,7 +1066,7 @@ void k056832_device::word_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (new_data != old_data)
 	{
-		switch(offset)
+		switch (offset)
 		{
 			/* -x-- ---- ---- hardcodes 8bpp when enabled (ignores next field)
 			 * --xx ---- ---- gfx bpp select: n + 4 (1 << n), i.e. from 7bpp to 4bpp
@@ -1081,8 +1208,7 @@ void k056832_device::b_w(offs_t offset, u8 data)
 	}
 }
 
-template<class BitmapClass>
-int k056832_device::update_linemap( screen_device &screen, BitmapClass &bitmap, int page, int flags )
+int k056832_device::update_linemap(int page)
 {
 	if (m_page_tile_mode[page])
 		return 0;
@@ -1180,7 +1306,7 @@ int k056832_device::update_linemap( screen_device &screen, BitmapClass &bitmap, 
 }
 
 template<class BitmapClass>
-void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority )
+void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority)
 {
 	uint32_t last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;
@@ -1197,8 +1323,8 @@ void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bi
 
 	int rowstart = m_y[layer];
 	int colstart = m_x[layer];
-	int rowspan  = m_h[layer] + 1;
-	int colspan  = m_w[layer] + 1;
+	int rowspan = m_h[layer] + 1;
+	int colspan = m_w[layer] + 1;
 	int dy = m_dy[layer];
 	int dx = m_dx[layer];
 	int scrollbank = ((m_regs[0x18] >> 1) & 0xc) | (m_regs[0x18] & 3);
@@ -1243,10 +1369,16 @@ void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bi
 
 	corr -= m_layer_offs[layer][0];
 
-	switch( scrollmode )
+	if (scrollmode == 0 && (flags & K056382_DRAW_FLAG_FORCE_XYSCROLL))
+	{
+		scrollmode = 3;
+		flags &= ~K056382_DRAW_FLAG_FORCE_XYSCROLL;
+	}
+
+	switch (scrollmode)
 	{
 		case 0: // linescroll
-			p_scroll_data = &m_videoram[scrollbank<<12] + (m_lsram_page[layer][1]>>1);
+			p_scroll_data = &m_videoram[scrollbank << 12] + (m_lsram_page[layer][1] >> 1);
 			line_height = 1;
 			sdat_wrapmask = 0x3ff;
 			sdat_adv = 2;
@@ -1267,6 +1399,7 @@ void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bi
 	}
 	if (flipy)
 		sdat_adv = -sdat_adv;
+
 	/*
 	if (scrollmode == 2)
 	{
@@ -1286,6 +1419,7 @@ void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bi
 	    printf("\nend\n");
 	}
 	*/
+
 	last_active = m_active_layer;
 	new_colorbase = (m_k055555 != nullptr) ? m_k055555->K055555_get_palette_index(layer) : 0;
 
@@ -1317,7 +1451,11 @@ void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bi
 					clipy = line_starty = 0;
 					line_endy = cliph;
 					sdat_start = ty;
-					if (scrollmode == 2) { sdat_start &= ~7; line_starty -= ty & 7; }
+					if (scrollmode == 2)
+					{
+						sdat_start &= ~7;
+						line_starty -= ty & 7;
+					}
 				}
 			}
 			else
@@ -1335,7 +1473,8 @@ void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bi
 					clipy = line_starty = -ty;
 					line_endy = K056832_PAGE_HEIGHT;
 					sdat_start = K056832_PAGE_HEIGHT - 1;
-					if (scrollmode == 2) sdat_start &= ~7;
+					if (scrollmode == 2)
+						sdat_start &= ~7;
 				}
 				else
 				{
@@ -1367,7 +1506,11 @@ void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bi
 				sdat_start = K056832_PAGE_HEIGHT - 1;
 			}
 
-			if (scrollmode == 2) { sdat_start &= ~7; line_starty -= dy & 7; }
+			if (scrollmode == 2)
+			{
+				sdat_start &= ~7;
+				line_starty -= dy & 7;
+			}
 		}
 
 		sdat_start += r * K056832_PAGE_HEIGHT;
@@ -1406,11 +1549,10 @@ void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bi
 					m_active_layer = 0;
 			}
 
-			if (update_linemap(screen, bitmap, pageIndex, flags))
+			if (update_linemap(pageIndex))
 				continue;
 
 			tmap = m_tilemap[pageIndex];
-
 			tmap->set_scrolly(0, ay);
 
 			last_dx = 0x100000;
@@ -1427,8 +1569,8 @@ void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bi
 
 				sdat_offs = sdat_walk & sdat_wrapmask;
 
-				drawrect.min_y = (dminy < cminy ) ? cminy : dminy;
-				drawrect.max_y = (dmaxy > cmaxy ) ? cmaxy : dmaxy;
+				drawrect.min_y = (dminy < cminy) ? cminy : dminy;
+				drawrect.max_y = (dmaxy > cmaxy) ? cmaxy : dmaxy;
 				// printf("%04x  %04x\n",layer,flipy);
 				// in xexex: K056832_DRAW_FLAG_MIRROR != flipy
 				if ((scrollmode == 2) && (flags & K056832_DRAW_FLAG_MIRROR) && (flipy))
@@ -1484,15 +1626,15 @@ void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bi
 				dminx = clipx;
 				dmaxx = clipx + clipw - 1;
 
-				drawrect.min_x = (dminx < cminx ) ? cminx : dminx;
-				drawrect.max_x = (dmaxx > cmaxx ) ? cmaxx : dmaxx;
+				drawrect.min_x = (dminx < cminx) ? cminx : dminx;
+				drawrect.max_x = (dmaxx > cmaxx) ? cmaxx : dmaxx;
 
 				// soccer superstars visible area is >512 pixels, this causes problems with the logic because
 				// the tilemaps are 512 pixels across.  Assume that if the limits were set as below that we
 				// want the tilemap to be drawn on the right hand side..  this is probably not the correct
 				// logic, but it works.
-				if ((drawrect.min_x>0) && (drawrect.max_x==511))
-					drawrect.max_x=cliprect.max_x;
+				if ((drawrect.min_x > 0) && (drawrect.max_x == 511))
+					drawrect.max_x = cliprect.max_x;
 
 				tmap->set_scrollx(0, dx);
 				tmap->draw(screen, bitmap, drawrect, flags, priority);
@@ -1504,18 +1646,18 @@ void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bi
 	m_active_layer = last_active;
 }
 
-void k056832_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority )
+void k056832_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority)
 {
 	tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority);
 }
 
-void k056832_device::tilemap_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority )
+void k056832_device::tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority)
 {
 	tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority);
 }
 
 
-void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority )
+void k056832_device::tilemap_draw_dj(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority)
 {
 	uint32_t last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;
@@ -1532,8 +1674,8 @@ void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitma
 
 	int rowstart = m_y[layer];
 	int colstart = m_x[layer];
-	int rowspan  = m_h[layer] + 1;
-	int colspan  = m_w[layer] + 1;
+	int rowspan = m_h[layer] + 1;
+	int colspan = m_w[layer] + 1;
 	int dy = m_dy[layer];
 	int dx = m_dx[layer];
 	int scrollbank = ((m_regs[0x18] >> 1) & 0xc) | (m_regs[0x18] & 3);
@@ -1558,6 +1700,7 @@ void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitma
 	}
 	else
 		corr = 0;
+
 	dy += corr;
 	ay = (unsigned)(dy - m_layer_offs[layer][1]) % height;
 
@@ -1573,7 +1716,7 @@ void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitma
 
 	corr -= m_layer_offs[layer][0];
 
-	switch( scrollmode )
+	switch (scrollmode)
 	{
 		case 0: // linescroll
 			p_scroll_data = &m_videoram[scrollbank << 12] + (m_lsram_page[layer][1] >> 1);
@@ -1631,7 +1774,11 @@ void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitma
 				line_endy = cliph;
 				ty = -ty;
 				sdat_start = ty;
-				if (scrollmode == 2) { sdat_start &= ~7; line_starty -= ty & 7; }
+				if (scrollmode == 2)
+				{
+					sdat_start &= ~7;
+					line_starty -= ty & 7;
+				}
 			}
 
 			// clip y
@@ -1694,7 +1841,7 @@ void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitma
 					m_active_layer = 0;
 			}
 
-			if (update_linemap(screen, bitmap, pageIndex, flags))
+			if (update_linemap(pageIndex))
 				continue;
 
 			tmap = m_tilemap[pageIndex];
@@ -1714,8 +1861,8 @@ void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitma
 
 				sdat_offs = sdat_walk & sdat_wrapmask;
 
-				drawrect.min_y = (dminy < cminy ) ? cminy : dminy;
-				drawrect.max_y = (dmaxy > cmaxy ) ? cmaxy : dmaxy;
+				drawrect.min_y = (dminy < cminy) ? cminy : dminy;
+				drawrect.max_y = (dmaxy > cmaxy) ? cmaxy : dmaxy;
 
 				dx = ((int)p_scroll_data[sdat_offs] << 16 | (int)p_scroll_data[sdat_offs + 1]) + corr;
 
@@ -1771,8 +1918,8 @@ void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitma
 				dminx = clipx;
 				dmaxx = clipx + clipw - 1;
 
-				drawrect.min_x = (dminx < cminx ) ? cminx : dminx;
-				drawrect.max_x = (dmaxx > cmaxx ) ? cmaxx : dmaxx;
+				drawrect.min_x = (dminx < cminx) ? cminx : dminx;
+				drawrect.max_x = (dmaxx > cmaxx) ? cmaxx : dmaxx;
 
 				tmap->set_scrollx(0, dx);
 				tmap->draw(screen, bitmap, drawrect, flags, priority);
@@ -1785,36 +1932,36 @@ void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitma
 }
 
 
-void k056832_device::set_layer_association( int status )
+void k056832_device::set_layer_association(int status)
 {
 	m_default_layer_association = status;
 }
 
 
-void k056832_device::set_layer_offs( int layer, int offsx, int offsy )
+void k056832_device::set_layer_offs(int layer, int offsx, int offsy)
 {
 	m_layer_offs[layer][0] = offsx;
 	m_layer_offs[layer][1] = offsy;
 }
 
-void k056832_device::set_lsram_page( int logical_page, int physical_page, int physical_offset )
+void k056832_device::set_lsram_page(int logical_page, int physical_page, int physical_offset)
 {
 	m_lsram_page[logical_page][0] = physical_page;
 	m_lsram_page[logical_page][1] = physical_offset;
 }
 
-int k056832_device::is_irq_enabled( int irqline )
+int k056832_device::is_irq_enabled(int irqline)
 {
 	return(m_regs[0x06/2] & (1 << irqline & 7));
 }
 
-void k056832_device::read_avac( int *mode, int *data )
+void k056832_device::read_avac(int *mode, int *data)
 {
 	*mode = m_regs[0x04/2] & 7;
 	*data = m_regs[0x38/2];
 }
 
-int k056832_device::read_register( int regnum )
+int k056832_device::read_register(int regnum)
 {
 	return(m_regs[regnum]);
 }
@@ -1837,549 +1984,3 @@ u16 k056832_device::b_word_r(offs_t offset)
 {
 	return (m_regsb[offset]);
 }   // VSCCS (board dependent)
-
-/*
-
-  some drivers still rely on this non-device implementation, this should be collapsed into the device.
-
-*/
-
-
-
-/***************************************************************************/
-/*                                                                         */
-/*                                 054157 / 056832                         */
-/*                                                                         */
-/***************************************************************************/
-
-void k056832_device::create_gfx()
-{
-	int gfx_index = 0;
-	int i;
-	uint32_t total;
-
-	static const gfx_layout charlayout8 =
-	{
-		8, 8,
-		0,
-		8,
-		{ 8*7,8*3,8*5,8*1,8*6,8*2,8*4,8*0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7 },
-		{ 0, 8*8, 8*8*2, 8*8*3, 8*8*4, 8*8*5, 8*8*6, 8*8*7 },
-		8*8*8
-	};
-	static const gfx_layout charlayout8le =
-	{
-		8, 8,
-		0,
-		8,
-//      { 0, 1, 2, 3, 0+(0x200000*8), 1+(0x200000*8), 2+(0x200000*8), 3+(0x200000*8) },
-		{ 0+(0x200000*8), 1+(0x200000*8), 2+(0x200000*8), 3+(0x200000*8), 0, 1, 2, 3 },
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
-		8*8*4
-	};
-	static const gfx_layout charlayout6 =
-	{
-		8, 8,
-		0,
-		6,
-		{ 40, 32, 24, 8, 16, 0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7 },
-		{ 0, 6*8, 6*8*2, 6*8*3, 6*8*4, 6*8*5, 6*8*6, 6*8*7 },
-		8*8*6
-	};
-	static const gfx_layout charlayout5 =
-	{
-		8, 8,
-		0,
-		5,
-		{ 32, 24, 8, 16, 0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7 },
-		{ 0, 5*8, 5*8*2, 5*8*3, 5*8*4, 5*8*5, 5*8*6, 5*8*7 },
-		8*8*5
-	};
-	static const gfx_layout charlayout4 =
-	{
-		8, 8,
-		0,
-		4,
-		{ 0, 1, 2, 3 },
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
-		8*8*4
-	};
-
-	static const gfx_layout charlayout4ps =
-	{
-		8, 8, // W, H
-		0, // Total num elements
-		4, // No. Bit planes
-		{ 8*2,8*0,8*3,8*1 }, // Bit plane offsets
-		{ 0, 1, 2, 3, 4, 5, 6, 7 },
-		{ 0, 8*4, 8*4*2, 8*4*3, 8*4*4, 8*4*5, 8*4*6, 8*4*7 },
-		8*8*4 // Increment
-	};
-
-	static const gfx_layout charlayout4dj =
-	{
-		8, 8, // W, H
-		0, // Total num elements
-		4, // No. Bit planes
-		{ 8*3,8*1,8*2,8*0 }, // Bit plane offsets
-		{ 0, 1, 2, 3, 4, 5, 6, 7 },
-		{ 0, 8*4, 8*4*2, 8*4*3, 8*4*4, 8*4*5, 8*4*6, 8*4*7 },
-		8*8*4 // Increment
-	};
-
-	/* handle the various graphics formats */
-	i = (m_big) ? 8 : 16;
-
-	/* decode the graphics */
-	switch (m_bpp)
-	{
-		case K056832_BPP_4:
-			total = m_rombase.bytes() / (i*4);
-			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout4, 4);
-			break;
-
-		case K056832_BPP_5:
-			total = m_rombase.bytes() / (i*5);
-			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout5, 5);
-			break;
-
-		case K056832_BPP_6:
-			total = m_rombase.bytes() / (i*6);
-			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout6, 6);
-			break;
-
-		case K056832_BPP_8:
-			total = m_rombase.bytes() / (i*8);
-			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout8, 8);
-			break;
-
-		case K056832_BPP_8LE:
-			total = m_rombase.bytes() / (i*8);
-			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout8le, 8);
-			break;
-
-		case K056832_BPP_8TASMAN:
-			total = m_rombase.bytes() / (i*8);
-			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout8, 8);
-			break;
-
-		case K056832_BPP_4PIRATESH:
-			total = m_rombase.bytes() / (i*4);
-			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout4ps, 4);
-			break;
-
-		case K056832_BPP_4dj:
-			total = m_rombase.bytes() / (i*4);
-			konami_decode_gfx(*this, gfx_index, &m_rombase[0], total, &charlayout4dj, 4);
-			break;
-
-		default:
-			fatalerror("Unsupported bpp\n");
-	}
-
-	gfx(gfx_index)->set_granularity(16); /* override */
-	gfx(gfx_index)->set_colors(palette().entries() / 16);
-
-	m_gfx_num = gfx_index;
-
-	m_num_gfx_banks = m_rombase.bytes() / 0x2000;
-	m_cur_gfx_banks = 0;
-}
-
-
-int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb32 &bitmap, int page, int flags)
-{
-	if (m_page_tile_mode[page])
-		return 0;
-	if (!m_linemap_enabled)
-		return 1;
-
-	tilemap_t *tmap;
-	uint32_t *dirty;
-	int all_dirty;
-	uint8_t *xprdata;
-
-	tmap = m_tilemap[page];
-	bitmap_ind8 &xprmap = tmap->flagsmap();
-	xprdata = tmap->tile_flags();
-
-	dirty = m_line_dirty[page];
-	all_dirty = m_all_lines_dirty[page];
-
-	if (all_dirty)
-	{
-		dirty[7] = dirty[6] = dirty[5] = dirty[4] = dirty[3] = dirty[2] = dirty[1] = dirty[0] = 0;
-		m_all_lines_dirty[page] = 0;
-
-		// force tilemap into a clean, static state
-		tmap->mark_all_dirty();
-		tmap->pixmap();                     // dummy call to reset tile_dirty_map
-		xprmap.fill(0);                     // reset pixel transparency_bitmap;
-		memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);   // reset tile transparency_data;
-	}
-	else
-	{
-		if (!(dirty[0] | dirty[1] | dirty[2] | dirty[3] | dirty[4] | dirty[5] | dirty[6] | dirty[7]))
-			return 0;
-	}
-
-	// this code is hacky...
-	// gijoe uses it for some line/column scroll style effects (lift level of attract mode)
-	//
-	// We REALLY shouldn't be writing directly back into the pixmap, surely this should
-	// be done when rendering instead.
-	bitmap_ind16 *pixmap;
-
-	const uint8_t *src_ptr;
-	uint8_t *xpr_ptr;
-	uint16_t *dst_ptr;
-	uint16_t pen, basepen;
-	gfx_element *src_gfx;
-
-	#define DRAW_PIX(N) \
-		pen = src_ptr[N]; \
-		if (pen) \
-		{ pen += basepen; xpr_ptr[count+N] = TILEMAP_PIXEL_LAYER0; dst_ptr[count+N] = pen; } else \
-		{ xpr_ptr[count+N] = 0; }
-
-	pixmap = m_pixmap[page];
-	src_gfx = gfx(m_gfx_num);
-
-	for (int line = 0; line < 256; line++)
-	{
-		if (!all_dirty)
-		{
-			uint8_t offs = line >> 5;
-			uint32_t mask = 1 << (line & 0x1f);
-			if (!(dirty[offs] & mask)) continue;
-			dirty[offs] ^= mask;
-		}
-
-		tile_data tileinfo = {0};
-		tileinfo.decoder = this;
-		get_tile_info(tileinfo, line, page);
-		basepen = tileinfo.palette_base;
-
-		dst_ptr = &pixmap->pix(line);
-		xpr_ptr = &xprmap.pix(line);
-
-		for (int count = 0; count < 512; count += 8)
-		{
-			src_ptr = src_gfx->get_data((tileinfo.code & ~7) | (count >> 6));
-			src_ptr += count & 0x3f;
-
-			DRAW_PIX(0)
-			DRAW_PIX(1)
-			DRAW_PIX(2)
-			DRAW_PIX(3)
-			DRAW_PIX(4)
-			DRAW_PIX(5)
-			DRAW_PIX(6)
-			DRAW_PIX(7)
-		}
-	}
-
-	#undef DRAW_PIX
-
-	return 0;
-}
-
-void k056832_device::m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority)
-{
-	uint32_t last_dx, last_visible, new_colorbase, last_active;
-	int sx, sy, ay, tx, ty, width, height;
-	int clipw, clipx, cliph, clipy, clipmaxy;
-	int line_height, line_endy, line_starty, line_y;
-	int sdat_start, sdat_walk, sdat_adv, sdat_wrapmask, sdat_offs;
-	int pageIndex, flipx, flipy, corr, r, c;
-	int cminy, cmaxy, cminx, cmaxx;
-	int dminy, dmaxy, dminx, dmaxx;
-	rectangle drawrect;
-	tilemap_t *tmap;
-	uint16_t *pScrollData;
-	uint16_t ram16[2];
-
-	int rowstart = m_y[layer];
-	int colstart = m_x[layer];
-	int rowspan  = m_h[layer]+1;
-	int colspan  = m_w[layer]+1;
-	int dy = m_dy[layer];
-	int dx = m_dx[layer];
-	int scrollbank = ((m_regs[0x18]>>1) & 0xc) | (m_regs[0x18] & 3);
-	int scrollmode = m_regs[0x05]>>(m_lsram_page[layer][0]<<1) & 3;
-
-	if (m_use_ext_linescroll)
-	{
-		scrollbank = K056832_PAGE_COUNT;
-	}
-
-	height = rowspan * K056832_PAGE_HEIGHT;
-	width  = colspan * K056832_PAGE_WIDTH;
-
-	cminx = cliprect.min_x;
-	cmaxx = cliprect.max_x;
-	cminy = cliprect.min_y;
-	cmaxy = cliprect.max_y;
-
-	// flip correction registers
-	flipy = m_regs[0] & 0x20;
-	if (flipy)
-	{
-		corr = m_regs[0x3c/2];
-		if (corr & 0x400)
-			corr |= 0xfffff800;
-	} else corr = 0;
-	dy += corr;
-	ay = (unsigned)(dy - m_layer_offs[layer][1]) % height;
-
-	flipx = m_regs[0] & 0x10;
-	if (flipx)
-	{
-		corr = m_regs[0x3a/2];
-		if (corr & 0x800)
-			corr |= 0xfffff000;
-	} else corr = 0;
-	corr -= m_layer_offs[layer][0];
-
-	if (scrollmode == 0 && (flags & K056382_DRAW_FLAG_FORCE_XYSCROLL))
-	{
-		scrollmode = 3;
-		flags &= ~K056382_DRAW_FLAG_FORCE_XYSCROLL;
-	}
-
-	switch( scrollmode )
-	{
-		case 0: // linescroll
-			pScrollData = &m_videoram[scrollbank<<12] + (m_lsram_page[layer][1]>>1);
-			line_height = 1;
-			sdat_wrapmask = 0x3ff;
-			sdat_adv = 2;
-		break;
-		case 2: // rowscroll
-
-			pScrollData = &m_videoram[scrollbank<<12] + (m_lsram_page[layer][1]>>1);
-			line_height = 8;
-			sdat_wrapmask = 0x3ff;
-			sdat_adv = 16;
-		break;
-		default: // xyscroll
-			pScrollData = ram16;
-			line_height = K056832_PAGE_HEIGHT;
-			sdat_wrapmask = 0;
-			sdat_adv = 0;
-			ram16[0] = 0;
-			ram16[1] = dx;
-	}
-	if (flipy) sdat_adv = -sdat_adv;
-
-	last_active = m_active_layer;
-	new_colorbase = (m_k055555 != nullptr) ? m_k055555->K055555_get_palette_index(layer) : 0;
-
-	for (r = 0; r < rowspan; r++)
-	{
-		if (rowspan > 1)
-		{
-			sy = ay;
-			ty = r * K056832_PAGE_HEIGHT;
-
-			if (!flipy)
-			{
-				// handle bottom-edge wraparoundness and cull off-screen tilemaps
-				if ((r == 0) && (sy > height - K056832_PAGE_HEIGHT)) sy -= height;
-				if ((sy + K056832_PAGE_HEIGHT <= ty) || (sy - K056832_PAGE_HEIGHT >= ty)) continue;
-
-				// switch frame of reference and clip y
-				if ((ty -= sy) >= 0)
-				{
-					cliph = K056832_PAGE_HEIGHT - ty;
-					clipy = line_starty = ty;
-					line_endy = K056832_PAGE_HEIGHT;
-					sdat_start = 0;
-				}
-				else
-				{
-					cliph = K056832_PAGE_HEIGHT + ty;
-					ty = -ty;
-					clipy = line_starty = 0;
-					line_endy = cliph;
-					sdat_start = ty;
-					if (scrollmode == 2) { sdat_start &= ~7; line_starty -= ty & 7; }
-				}
-			}
-			else
-			{
-				ty += K056832_PAGE_HEIGHT;
-
-				// handle top-edge wraparoundness and cull off-screen tilemaps
-				if ((r == rowspan-1) && (sy < K056832_PAGE_HEIGHT)) sy += height;
-				if ((sy + K056832_PAGE_HEIGHT <= ty) || (sy - K056832_PAGE_HEIGHT >= ty)) continue;
-
-				// switch frame of reference and clip y
-				if ((ty -= sy) <= 0)
-				{
-					cliph = K056832_PAGE_HEIGHT + ty;
-					clipy = line_starty = -ty;
-					line_endy = K056832_PAGE_HEIGHT;
-					sdat_start = K056832_PAGE_HEIGHT-1;
-					if (scrollmode == 2) sdat_start &= ~7;
-				}
-				else
-				{
-					cliph = K056832_PAGE_HEIGHT - ty;
-					clipy = line_starty = 0;
-					line_endy = cliph;
-					sdat_start = cliph-1;
-					if (scrollmode == 2) { sdat_start &= ~7; line_starty -= ty & 7; }
-				}
-			}
-		}
-		else
-		{
-			cliph = line_endy = K056832_PAGE_HEIGHT;
-			clipy = line_starty = 0;
-
-			if (!flipy)
-				sdat_start = dy;
-			else
-			{
-				// doesn't work with Metamorphic Force and Martial Champion (software Y-flipped) but
-				// LE2U (naturally Y-flipped) seems to expect this condition as an override.
-
-				//sdat_start = K056832_PAGE_HEIGHT-1 -dy;
-				sdat_start = K056832_PAGE_HEIGHT-1;
-			}
-
-			if (scrollmode == 2) { sdat_start &= ~7; line_starty -= dy & 7; }
-		}
-
-		sdat_start += r * K056832_PAGE_HEIGHT;
-		sdat_start <<= 1;
-
-		clipmaxy = clipy + cliph - 1;
-
-		for (c = 0; c < colspan; c++)
-		{
-			pageIndex = (((rowstart + r) & 3) << 2) + ((colstart + c) & 3);
-
-			if (m_layer_association)
-			{
-				if (m_layer_assoc_with_page[pageIndex] != layer) continue;
-			}
-			else
-			{
-				if (m_layer_assoc_with_page[pageIndex] == -1) continue;
-				m_active_layer = layer;
-			}
-
-			if (m_k055555 != nullptr)
-			{
-				if (m_last_colorbase[pageIndex] != new_colorbase)
-				{
-					m_last_colorbase[pageIndex] = new_colorbase;
-					mark_page_dirty(pageIndex);
-				}
-			}
-			else
-				if (!pageIndex) m_active_layer = 0;
-
-			if (altK056832_update_linemap(screen, bitmap, pageIndex, flags)) continue;
-
-			tmap = m_tilemap[pageIndex];
-			tmap->set_scrolly(0, ay);
-
-			last_dx = 0x100000;
-			last_visible = 0;
-
-			for (sdat_walk=sdat_start, line_y=line_starty; line_y<line_endy; sdat_walk+=sdat_adv, line_y+=line_height)
-			{
-				dminy = line_y;
-				dmaxy = line_y + line_height - 1;
-
-				if (dminy < clipy) dminy = clipy;
-				if (dmaxy > clipmaxy) dmaxy = clipmaxy;
-				if (dminy > cmaxy || dmaxy < cminy) continue;
-
-				sdat_offs = sdat_walk & sdat_wrapmask;
-
-				drawrect.min_y = (dminy < cminy ) ? cminy : dminy;
-				drawrect.max_y = (dmaxy > cmaxy ) ? cmaxy : dmaxy;
-
-				dx = ((int)pScrollData[sdat_offs]<<16 | (int)pScrollData[sdat_offs+1]) + corr;
-
-				if (last_dx == dx)
-				{
-					if (last_visible)
-						tmap->draw(screen, bitmap, drawrect, flags, priority);
-					continue;
-				}
-				last_dx = dx;
-
-				if (colspan > 1)
-				{
-					//sx = (unsigned)dx % width;
-					sx = (unsigned)dx & (width-1);
-
-					//tx = c * K056832_PAGE_WIDTH;
-					tx = c << 9;
-
-					if (!flipx)
-					{
-						// handle right-edge wraparoundness and cull off-screen tilemaps
-						if ((c == 0) && (sx > width - K056832_PAGE_WIDTH)) sx -= width;
-						if ((sx + K056832_PAGE_WIDTH <= tx) || (sx - K056832_PAGE_WIDTH >= tx))
-							{ last_visible = 0; continue; }
-
-						// switch frame of reference and clip x
-						if ((tx -= sx) <= 0) { clipw = K056832_PAGE_WIDTH + tx; clipx = 0; }
-						else { clipw = K056832_PAGE_WIDTH - tx; clipx = tx; }
-					}
-					else
-					{
-						tx += K056832_PAGE_WIDTH;
-
-						// handle left-edge wraparoundness and cull off-screen tilemaps
-						if ((c == colspan-1) && (sx < K056832_PAGE_WIDTH)) sx += width;
-						if ((sx + K056832_PAGE_WIDTH <= tx) || (sx - K056832_PAGE_WIDTH >= tx))
-							{ last_visible = 0; continue; }
-
-						// switch frame of reference and clip y
-						if ((tx -= sx) >= 0) { clipw = K056832_PAGE_WIDTH - tx; clipx = 0; }
-						else { clipw = K056832_PAGE_WIDTH + tx; clipx = -tx; }
-					}
-				}
-				else { clipw = K056832_PAGE_WIDTH; clipx = 0; }
-
-				last_visible = 1;
-
-				dminx = clipx;
-				dmaxx = clipx + clipw - 1;
-
-				drawrect.min_x = (dminx < cminx ) ? cminx : dminx;
-				drawrect.max_x = (dmaxx > cmaxx ) ? cmaxx : dmaxx;
-
-				// soccer superstars visible area is >512 pixels, this causes problems with the logic because
-				// the tilemaps are 512 pixels across.  Assume that if the limits were set as below that we
-				// want the tilemap to be drawn on the right hand side..  this is probably not the correct
-				// logic, but it works.
-				if ((drawrect.min_x>0) && (drawrect.max_x==511)) drawrect.max_x=cliprect.max_x;
-
-				tmap->set_scrollx(0, dx);
-				tmap->draw(screen, bitmap, drawrect, flags, priority);
-
-			} // end of line loop
-		} // end of column loop
-	} // end of row loop
-
-	m_active_layer = last_active;
-}
-
-
-int k056832_device::get_layer_association(void)
-{
-	return(m_layer_association);
-}
