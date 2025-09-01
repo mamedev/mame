@@ -13,7 +13,7 @@ def is_screaming_snake(name: str):
 def is_snake_case(name: str):
     return re.fullmatch(r"[a-z][a-z0-9_]*(_[a-z0-9]+)*", name) is not None
 
-def check_cpp_file(path: Path, fix: bool = False):
+def check_file(path: Path, fix: bool = False):
     errors = []
     try:
         text = path.read_text()
@@ -26,6 +26,17 @@ def check_cpp_file(path: Path, fix: bool = False):
         if fix:
             path.write_text(text + "\n")
         errors.append((len(lines) or 1, "File should end with a newline"))
+
+    return errors
+
+def check_cpp_file(path: Path, fix: bool = False):
+    errors = []
+    try:
+        text = path.read_text()
+    except Exception:
+        return errors
+
+    lines = text.splitlines()
 
     for i, line in enumerate(lines, 1):
         hex_pattern = re.compile(r"0x[A-F]+")
@@ -63,29 +74,30 @@ def check_cpp_file(path: Path, fix: bool = False):
 
     return errors
 
+def check_block(block, start_line, src_file):
+    if not src_file or src_file not in changed_cpp_files:
+        return []
+    sorted_block = sorted(block, key=lambda s: s.lower())
+    errors_local = []
+    for offset, (expected, actual) in enumerate(zip(sorted_block, block)):
+        if expected != actual:
+            line_no = start_line + offset + 1
+            errors_local.append(
+                (line_no, f"Entry '{actual}' is out of order, expected '{expected}'")
+            )
+    return errors_local
+
 def check_mame_lst(changed_cpp_files: set[str]):
-    errors = []
+    path = Path("src/mame/mame.lst")
+    errors = check_file(path, False)
     try:
-        lines = Path("src/mame/mame.lst").read_text().splitlines()
+        lines = path.read_text().splitlines()
     except Exception:
         return errors
 
     current_block = []
     block_start_line = 0
     current_source = None
-
-    def check_block(block, start_line, src_file):
-        if not src_file or src_file not in changed_cpp_files:
-            return []
-        sorted_block = sorted(block, key=lambda s: s.lower())
-        errors_local = []
-        for offset, (expected, actual) in enumerate(zip(sorted_block, block)):
-            if expected != actual:
-                line_no = start_line + offset + 1
-                errors_local.append(
-                    (line_no, f"Entry '{actual}' is out of order, expected '{expected}'")
-                )
-        return errors_local
 
     for i, line in enumerate(lines):
         if line.startswith("@source:"):
@@ -107,8 +119,8 @@ def main():
     fix = "-f" in sys.argv
     args = [f for f in sys.argv[1:] if f != "-f"]
 
-    cpp_files = {f for f in args if f.endswith(".cpp")}
-    h_files = {f for f in args if f.endswith(".h")}
+    cpp_files = {f for f in args if f.endswith(".c") or f.endswith(".cpp")}
+    h_files = {f for f in args if f.endswith(".h") or f.endswith(".hpp") or f.endswith(".hxx")}
 
     for file in cpp_files:
         path = Path(file)
