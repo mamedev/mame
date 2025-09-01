@@ -275,5 +275,5 @@ ROM_START( east8a )
 
 
 //   YEAR   NAME    PARENT   MACHINE    INPUT    STATE                INIT        ROT    COMPANY       FULLNAME                 FLAGS
-GAME( 200?, east8,   0,       orientp,   east8, orientalpearl_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 Set 1 (v1.00)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 200?, east8a,  0,       orientp,   east8, orientalpearl_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 Set 2 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, east8,   0,       orientp,   east8, orientalpearl_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 Set 1 (v1.00)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, east8a,  0,       orientp,   east8, orientalpearl_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 Set 2 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
