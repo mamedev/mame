@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+##
+## license:BSD-3-Clause
+## copyright-holders:stonedDiscord
+
 import re
 import sys
 from pathlib import Path
