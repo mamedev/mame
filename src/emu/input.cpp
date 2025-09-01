@@ -66,20 +66,20 @@ struct code_string_table
 // token strings for device classes
 const code_string_table devclass_token_table[] =
 {
-	{ DEVICE_CLASS_KEYBOARD,       "KEYCODE" },
-	{ DEVICE_CLASS_MOUSE,          "MOUSECODE" },
-	{ DEVICE_CLASS_LIGHTGUN,       "GUNCODE" },
-	{ DEVICE_CLASS_JOYSTICK,       "JOYCODE" },
+	{ DEVICE_CLASS_KEYBOARD,       "Keyboard" },
+	{ DEVICE_CLASS_MOUSE,          "Mouse" },
+	{ DEVICE_CLASS_LIGHTGUN,       "Light_Gun" },
+	{ DEVICE_CLASS_JOYSTICK,       "Controller" },
 	{ code_string_table::SENTINEL, "UNKCODE" }
 };
 
 // friendly strings for device classes
 const code_string_table devclass_string_table[] =
 {
-	{ DEVICE_CLASS_KEYBOARD,       "Kbd" },
+	{ DEVICE_CLASS_KEYBOARD,       "Keyboard" },
 	{ DEVICE_CLASS_MOUSE,          "Mouse" },
-	{ DEVICE_CLASS_LIGHTGUN,       "Gun" },
-	{ DEVICE_CLASS_JOYSTICK,       "Joy" },
+	{ DEVICE_CLASS_LIGHTGUN,       "Light Gun" },
+	{ DEVICE_CLASS_JOYSTICK,       "Controller" },
 	{ code_string_table::SENTINEL, "Unk" }
 };
 
