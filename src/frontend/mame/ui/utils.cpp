@@ -2059,10 +2059,10 @@ ui_software_info::ui_software_info(
 	infotext.append(shortname);
 
 	info.reserve(sw.info().size());
-
-	std::map<std::string, std::string> features = {};
 	for (software_info_item const &feature : sw.info())
 	{
+		// add info for the internal UI, localising recognised keys
+		infotext.append(2, '\n');
 		auto const found = std::lower_bound(
 				std::begin(ui::SOFTWARE_INFO_NAMES),
 				std::end(ui::SOFTWARE_INFO_NAMES),
@@ -2071,31 +2071,16 @@ ui_software_info::ui_software_info(
 				{
 					return 0 > std::strcmp(a.first, b);
 				});
-
-		std::string feature_name;
 		if ((std::end(ui::SOFTWARE_INFO_NAMES) != found) && (feature.name() == found->first))
-			feature_name = _("swlist-info", found->second);
+			infotext.append(_("swlist-info", found->second));
 		else
-			feature_name = feature.name();
-
-		if (auto search = features.find(feature_name); search != features.end())
-			features[search->first] = search->second.append(" / ").append(feature.value());
-		else
-			features[feature_name] = feature.value();
+			infotext.append(feature.name());
+		infotext.append(1, '\n').append(feature.value());
 
 		// keep references to stuff for filtering and searching
 		auto const &ins = info.emplace_back(feature.name(), feature.value());
 		if (feature.name() == "alt_title")
 			alttitles.emplace_back(ins.value());
-	}
-
-	for (const auto& [name, value] : features)
-	{
-		// add info for the internal UI, localising recognised keys
-		infotext.append(2, '\n');
-		infotext.append(name);
-		infotext.append(1, '\n');
-		infotext.append(value);
 	}
 }
 
