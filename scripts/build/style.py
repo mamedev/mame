@@ -74,7 +74,7 @@ def check_cpp_file(path: Path, fix: bool = False):
 
     return errors
 
-def check_block(block, start_line, src_file):
+def check_block(block, changed_cpp_files, start_line, src_file):
     if not src_file or src_file not in changed_cpp_files:
         return []
     sorted_block = sorted(block, key=lambda s: s.lower())
@@ -102,7 +102,7 @@ def check_mame_lst(changed_cpp_files: set[str]):
     for i, line in enumerate(lines):
         if line.startswith("@source:"):
             if current_block:
-                errors.extend(check_block(current_block, block_start_line, current_source))
+                errors.extend(check_block(current_block, changed_cpp_files, block_start_line, current_source))
             current_source = "src/mame/" + line[len("@source:"):].strip()
             
             current_block = []
@@ -111,7 +111,7 @@ def check_mame_lst(changed_cpp_files: set[str]):
             current_block.append(line.strip())
 
     if current_block:
-        errors.extend(check_block(current_block, block_start_line, current_source))
+        errors.extend(check_block(current_block, changed_cpp_files, block_start_line, current_source))
 
     return errors
 
