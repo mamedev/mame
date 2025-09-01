@@ -26,7 +26,7 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python3 scripts/build/style.py ${{ steps.changed-files.outputs.all_changed_files }} \
+          python3 scripts/build/style.py -f ${{ steps.changed-files.outputs.all_changed_files }} \
               | reviewdog -efm="%f:%l: %m" \
                 -name="stylecheck" \
                 -reporter=github-pr-review \
@@ -35,5 +35,3 @@ jobs:
 
       - name: Make suggestions
         uses: reviewdog/action-suggester@v1.22
-        with:
-          tool_name: python3 scripts/build/style.py python3 scripts/build/style.py -f ${{ steps.changed-files.outputs.all_changed_files }}
