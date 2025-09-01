@@ -40,8 +40,6 @@ def check_file(path: Path, fix: bool = False):
 
     for i, line in enumerate(lines, 1):
         if line.rstrip() != line:
-            if fix:
-                lines[i - 1] = line.rstrip()
             errors.append((i, "Trailing whitespace detected"))
 
     return errors
@@ -137,7 +135,8 @@ def main():
     args = [f for f in sys.argv[1:] if f != "-f"]
 
     cpp_files = {f for f in args if f.endswith(".c") or f.endswith(".cpp")}
-    h_files = {f for f in args if f.endswith(".h") or f.endswith(".hpp") or f.endswith(".hxx")}
+    h_files = {f for f in args if f.endswith(".h") or f.endswith(".hpp") or f.endswith(".hxx") or f.endswith(".ipp")}
+    other_files = {f for f in args if f.endswith(".py") or f.endswith(".lua") or f.endswith(".mm") or f.endswith(".lay") or f.endswith(".lst")}
 
     for file in cpp_files:
         path = Path(file)
@@ -149,6 +148,13 @@ def main():
     for file in h_files:
         path = Path(file)
         errors = check_cpp_file(path, fix=fix)
+
+        for lineno, msg in errors:
+            print(f"{path}:{lineno}: {msg}")
+
+    for file in other_files:
+        path = Path(file)
+        errors = check_file(path, fix=fix)
 
         for lineno, msg in errors:
             print(f"{path}:{lineno}: {msg}")
