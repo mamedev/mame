@@ -230,7 +230,7 @@ void orientalpearl_state::orientp(machine_config &config)
 	kbdc.out_disp_callback().set(FUNC(orientalpearl_state::display_7seg_data_w));
 	
 	// Video
-	config.set_default_layout(layout_marywu);
+	config.set_default_layout(layout_orientp);
 /* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6));
