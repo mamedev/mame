@@ -3253,7 +3253,9 @@ ROM_START( invad2ct )
 	ROM_LOAD( "invad2ct.a", 0x5800, 0x0800, CRC(efdabb03) SHA1(33f4cf249e88e2b7154350e54c479eb4fa86f26f) )
 ROM_END
 
-// IRECSA bootleg on original Midway PCB
+/* Irecsa bootleg on original Midway PCB.
+   There is a Space King II on a PCB silkscreened with Irecsa logos (straight copy of the Midway one), with probably
+   the same ROM contents. */ 
 ROM_START( spcking2ir )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gm2_1-2_tms2516.h",  0x0000, 0x0800, CRC(a5cad5b7) SHA1(2f1179d2aabd6fa9b86656bcdea1896909a49aae) )
