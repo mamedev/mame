@@ -32,7 +32,7 @@ def check_cpp_file(path: Path):
 
         comment_pattern = re.compile(r"/\*.*\*/")
         if comment_pattern.search(line.strip()):
-            errors.append((i, "/* Single-line block comments */ are not allowed, use // instead"))
+            errors.append((i, "/* Single-line block comments */ should use // instead"))
 
         macro_pattern = re.compile(r"^\s*#define\s+([A-Za-z0-9_]+)")
         m = macro_pattern.match(line)
