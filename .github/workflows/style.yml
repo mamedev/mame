@@ -17,7 +17,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        run: echo "changed_files=$(git diff --name-only HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
+        run: echo "changed_files=$(gh pr diff --name-only | xargs)" >> $GITHUB_OUTPUT
 
       - name: Run style check
         id: style-check
