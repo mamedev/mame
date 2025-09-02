@@ -571,6 +571,20 @@ private:
 	uint16_t                m_comram[0x400/2]{};
 	uint64_t                m_last_bio_cycles = 0;
 
+
+	// --- AM6012/TL084 DAC analog path emulation state ---
+	emu_timer*             m_am6012_timer = nullptr;   // mixer timer (e.g., 96 kHz)
+	uint16_t               m_am6012_code = 0x0800;     // latched 12-bit DAC code (MSB inverted, low nibble ignored)
+	int                    m_prev_out12 = 0x0800;      // last filtered 12-bit sample
+	int32_t                m_dac_lp1 = (0x0800 << 8);  // fixed-point 24.8 filters
+	int32_t                m_dac_lp2 = (0x0800 << 8);
+	int32_t                m_dac_lp3 = (0x0800 << 8);
+	uint8_t                m_mute_ramp = 255;          // 0..255 soft mute ramp
+	uint8_t                m_dac_muted = 0;            // boolean
+	uint16_t               m_dither_lfsr = 0xACE1;     // dither LFSR
+
+	TIMER_CALLBACK_MEMBER(am6012_stream_tick);
+
 	void update_68k_interrupts();
 	TIMER_CALLBACK_MEMBER( delayed_68k_w );
 
