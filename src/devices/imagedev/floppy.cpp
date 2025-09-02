@@ -656,9 +656,9 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_load()
 	const floppy_image_format_t *best_format = nullptr;
 	for (const floppy_image_format_t *format : m_fif_list) {
 		int score = format->identify(*io, m_form_factor, m_variants);
-		if(score && format->extension_matches(filename()))
+		if (score && format->extension_matches(filename()))
 			score |= floppy_image_format_t::FIFID_EXT;
-		if(score > best) {
+		if (score > best) {
 			best = score;
 			best_format = format;
 		}
@@ -673,8 +673,8 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_load()
 		return std::make_pair(image_error::INVALIDIMAGE, "Incompatible image file format or corrupted data");
 	}
 
-	const char *wp = get_feature("write_protected");
-	if(wp && !std::strcmp(wp, "true"))
+	char const *const wp = get_feature("write_protected");
+	if (wp && !std::strcmp(wp, "true"))
 		make_readonly();
 
 	m_output_format = is_readonly() ? nullptr : best_format;
