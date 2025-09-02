@@ -17,7 +17,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        run: echo "::set-output name=changed_files::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
+        run: echo "::set-output name=changed_files::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | xargs)"
 
       - name: Run style check
         id: style-check
