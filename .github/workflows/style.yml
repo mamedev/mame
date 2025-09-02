@@ -17,9 +17,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: echo "changed_files=$(gh pr diff --name-only | xargs)" >> $GITHUB_OUTPUT
+        run: echo "::set-output name=changed_files::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
 
       - name: Run style check
         id: style-check
