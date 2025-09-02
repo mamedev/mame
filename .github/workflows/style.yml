@@ -32,22 +32,3 @@ jobs:
           GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 scripts/build/style.py ${{ steps.changed-files.outputs.result }}
-
-      - name: Post review comments
-        uses: actions/github-script@v7
-        id: post-comments
-        env:
-          REVIEWS: ${{ steps.style-check.outputs.result }}
-        with:
-          result-encoding: string
-          script: |
-            const reviews = process.env.REVIEWS;
-            console.log(reviews);
-            github.rest.pulls.createReviewComment({
-              context.repo.owner,
-              context.repo.repo,
-              context.payload.pull_request.number,
-              body,
-              commit_id,
-              path,
-            });

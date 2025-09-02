@@ -129,6 +129,10 @@ def check_mame_lst(changed_cpp_files: set[str]):
 
     return errors
 
+def print_warning(path,lineno,msg):
+    print(f"::warning file={path},line={lineno},col=1,endColumn=99,title=style::{msg}")
+
+
 def main():
     fix = "-f" in sys.argv
     args = [f for f in sys.argv[1:] if f != "-f"]
@@ -142,25 +146,25 @@ def main():
         errors = check_cpp_file(path, fix=fix)
 
         for lineno, msg in errors:
-            print(f"{path}:{lineno}: {msg}")
+            print_warning(path,lineno,msg)
 
     for file in h_files:
         path = Path(file)
         errors = check_cpp_file(path, fix=fix)
 
         for lineno, msg in errors:
-            print(f"{path}:{lineno}: {msg}")
+            print_warning(path,lineno,msg)
 
     for file in other_files:
         path = Path(file)
         errors = check_file(path, fix=fix)
 
         for lineno, msg in errors:
-            print(f"{path}:{lineno}: {msg}")
+            print_warning(path,lineno,msg)
 
     errors = check_mame_lst(cpp_files)
     for lineno, msg in errors:
-            print(f"src/mame/mame.lst:{lineno}: {msg}")
+            print_warning("src/mame/mame.lst",lineno,msg)
 
     sys.exit(0)
 
