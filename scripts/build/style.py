@@ -140,7 +140,7 @@ def main():
 
     cpp_files = {f for f in args if f.endswith(".c") or f.endswith(".cpp")}
     h_files = {f for f in args if f.endswith(".h") or f.endswith(".hpp") or f.endswith(".hxx") or f.endswith(".ipp")}
-    other_files = {f for f in args if f.endswith(".py") or f.endswith(".lua") or f.endswith(".mm") or f.endswith(".lay") or f.endswith(".lst")}
+    other_files = {f for f in args if f.endswith(".lua") or f.endswith(".lay") or f.endswith(".lst") or f.endswith(".mm") or f.endswith(".py") or f.endswith(".yml")}
 
     for file in cpp_files:
         path = Path(file)
