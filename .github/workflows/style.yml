@@ -33,7 +33,6 @@ jobs:
         with:
           script: |
             const reviews = JSON.parse(process.env.REVIEWS || "[]");
-            console.log("review log", reviews);
 
             const comments = reviews.map(r => ({
               body: r.body,
@@ -43,6 +42,7 @@ jobs:
             }));
 
             if (comments.length > 0) {
+              console.debug("Reviews: ", reviews);
               await github.rest.pulls.createReview({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -51,5 +51,5 @@ jobs:
                 comments,
               });
             } else {
-              console.log("Nothing wrong.");
+              console.info("Review list empty.");
             }
