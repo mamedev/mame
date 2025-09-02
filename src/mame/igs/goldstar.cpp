@@ -15363,7 +15363,7 @@ ROM_END
 
 ROM_START( missbingo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pokermastera.rom",  0x7000, 0x1000, CRC(467249f7) SHA1(efbab56896dc58d22ec921e7f5fd0befcfaadc52) )
+	ROM_LOAD( "missbingo.rom",     0x7000, 0x1000, CRC(f59e0273) SHA1(160426b86dbb8a718cb3b886f90a231baed86a40) )
 	ROM_CONTINUE(                  0x0000, 0x1000)
 	ROM_CONTINUE(                  0x6000, 0x1000)
 	ROM_CONTINUE(                  0x1000, 0x1000)
