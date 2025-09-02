@@ -3,6 +3,7 @@
 ## license:BSD-3-Clause
 ## copyright-holders:stonedDiscord
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -129,8 +130,9 @@ def check_mame_lst(changed_cpp_files: set[str]):
 
     return errors
 
-def print_review(path,lineno,msg):
-    print(f"::error file={path},line={lineno}::{msg}")
+def print_review(path, lineno, msg):
+    review = {"body": str(msg), "path": str(path), "line": int(lineno)}
+    print(json.dumps(review))
 
 def main():
     fix = "-f" in sys.argv
