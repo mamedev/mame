@@ -60,5 +60,5 @@ public:
 
 MODULE_DEFINITION(KEYBOARD_NONE, osd::keyboard_input_none)
 MODULE_DEFINITION(MOUSE_NONE, osd::mouse_input_none)
-MODULE_DEFINITION(LIGHTGUN_NONE, osd::lightgun_input_none)
 MODULE_DEFINITION(JOYSTICK_NONE, osd::joystick_input_none)
+MODULE_DEFINITION(LIGHTGUN_NONE, osd::lightgun_input_none)

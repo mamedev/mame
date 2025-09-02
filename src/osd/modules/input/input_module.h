@@ -28,9 +28,9 @@ public:
 //  CONSTANTS
 //============================================================
 
-#define OSD_KEYBOARDINPUT_PROVIDER   "keyboardprovider"
-#define OSD_MOUSEINPUT_PROVIDER      "mouseprovider"
-#define OSD_LIGHTGUNINPUT_PROVIDER   "lightgunprovider"
-#define OSD_JOYSTICKINPUT_PROVIDER   "joystickprovider"
+#define OSD_KEYBOARDINPUT_PROVIDER   "Keyboard provider"
+#define OSD_MOUSEINPUT_PROVIDER      "Mouse provider"
+#define OSD_JOYSTICKINPUT_PROVIDER   "Controller provider"
+#define OSD_LIGHTGUNINPUT_PROVIDER   "Light gun provider"
 
 #endif // MAME_OSD_INPUT_INPUT_MODULE_H
