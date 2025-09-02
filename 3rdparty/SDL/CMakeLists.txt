@@ -1,0 +1,16 @@
+set(SDL_SHARED OFF)
+set(SDL_STATIC ON)
+set(SDL_TEST_LIBRARY OFF)
+set(SDL_TESTS OFF)
+set(SDL_DISABLE_INSTALL ON)
+set(SDL_DISABLE_INSTALL_DOCS ON)
+set(SDL_INSTALL_TESTS OFF)
+
+add_subdirectory(SDL)
+
+if (TARGET SDL3)
+  dolphin_disable_warnings(SDL3)
+endif()
+if (TARGET SDL3-static)
+  dolphin_disable_warnings(SDL3-static)
+endif()

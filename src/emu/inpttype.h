@@ -90,14 +90,14 @@ enum ioport_type : osd::u32
 		IPT_JOYSTICK_RIGHT,
 
 		// use IPT_JOYSTICKLEFT and IPT_JOYSTICKRIGHT for dual joystick panels
-		IPT_JOYSTICKRIGHT_UP,
-		IPT_JOYSTICKRIGHT_DOWN,
-		IPT_JOYSTICKRIGHT_LEFT,
-		IPT_JOYSTICKRIGHT_RIGHT,
 		IPT_JOYSTICKLEFT_UP,
 		IPT_JOYSTICKLEFT_DOWN,
 		IPT_JOYSTICKLEFT_LEFT,
 		IPT_JOYSTICKLEFT_RIGHT,
+		IPT_JOYSTICKRIGHT_UP,
+		IPT_JOYSTICKRIGHT_DOWN,
+		IPT_JOYSTICKRIGHT_LEFT,
+		IPT_JOYSTICKRIGHT_RIGHT,
 
 	IPT_DIGITAL_JOYSTICK_LAST,
 
@@ -219,6 +219,8 @@ enum ioport_type : osd::u32
 			IPT_AD_STICK_X,     // absolute // autocenter
 			IPT_AD_STICK_Y,     // absolute // autocenter
 			IPT_AD_STICK_Z,     // absolute // autocenter
+			IPT_WHEEL,         // absolute // autocenter
+			IPT_WHEEL_V,       // absolute // autocenter
 			IPT_PADDLE,         // absolute // autocenter
 			IPT_PADDLE_V,       // absolute // autocenter
 			IPT_PEDAL,          // absolute // autocenter

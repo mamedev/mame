@@ -214,24 +214,24 @@ using util::BIT;
 
 
 char const *const AXIS_NAMES_GAMEPAD[]{
-		"LSX",
-		"LSY",
-		"RSX",
-		"RSY",
+		"Left Stick (horizontal)",
+		"Left Stick (vertical)",
+		"Right Stick (horizontal)",
+		"Right Stick (vertical)",
 		"LT",
 		"RT" };
 
 char const *const AXIS_NAMES_WHEEL[]{
 		"Wheel",
-		"LSY",
-		"RSX",
-		"RSY",
+		"Left Stick (vertical)",
+		"Right Stick (horizontal)",
+		"Right Stick (vertical)",
 		"Brake",
 		"Accelerator" };
 
 char const *const AXIS_NAMES_GUITAR[]{
-		"LSX",
-		"LSY",
+		"Left Stick (horizontal)",
+		"Left Stick (vertical)",
 		"Whammy Bar",
 		"Orientation",
 		"Pickup Selector",
@@ -246,10 +246,10 @@ input_item_id const AXIS_IDS_GAMEPAD[]{
 		ITEM_ID_SLIDER2 };
 
 char const *const HAT_NAMES_GAMEPAD[]{
-		"D-pad Up",
-		"D-pad Down",
-		"D-pad Left",
-		"D-pad Right",
+		"D-Pad Up",
+		"D-Pad Down",
+		"D-Pad Left",
+		"D-Pad Right",
 		"POV Hat Up",
 		"POV Hat Down",
 		"POV Hat Left",
@@ -266,10 +266,10 @@ char const *const HAT_NAMES_ARCADE_STICK[]{
 		nullptr };
 
 char const *const HAT_NAMES_GUITAR[]{
-		"Strum/D-pad Up",
-		"Strum/D-pad Down",
-		"D-pad Left",
-		"D-pad Right" };
+		"Strum/D-Pad Up",
+		"Strum/D-Pad Down",
+		"D-Pad Left",
+		"D-Pad Right" };
 
 char const *const BUTTON_NAMES_GAMEPAD[]{
 		"A",
@@ -280,8 +280,8 @@ char const *const BUTTON_NAMES_GAMEPAD[]{
 		"RT",
 		"LB",
 		"RB",
-		"LSB",
-		"RSB" };
+		"Left Stick Click",
+		"Right Stick Click" };
 
 char const *const BUTTON_NAMES_FLIGHT_STICK[]{
 		"A",
@@ -290,8 +290,8 @@ char const *const BUTTON_NAMES_FLIGHT_STICK[]{
 		"Y",
 		"LB",
 		"RB",
-		"LSB",
-		"RSB" };
+		"Left Stick Click",
+		"Right Stick Click" };
 
 char const *const BUTTON_NAMES_GUITAR[]{
 		"Fret 1",
@@ -301,7 +301,7 @@ char const *const BUTTON_NAMES_GUITAR[]{
 		"Fret 5",
 		"Fret Modifier",
 		"RB",
-		"RSB" };
+		"Right Stick Click" };
 
 char const *const BUTTON_NAMES_DRUMKIT[]{
 		"Green",        // floor tom
@@ -310,8 +310,8 @@ char const *const BUTTON_NAMES_DRUMKIT[]{
 		"Yellow",       // Rock Band high tom, Guitar Hero hi-hat
 		"Orange",       // Guitar Hero crash cymbal
 		"Bass Drum",
-		"LSB",
-		"RSB" };
+		"Left Stick Click",
+		"Right Stick Click" };
 
 char const *const BUTTON_NAMES_KEYBOARD[]{
 		"A",
@@ -320,8 +320,8 @@ char const *const BUTTON_NAMES_KEYBOARD[]{
 		"Y",
 		"LB",
 		"RB",
-		"LSB",
-		"RSB" };
+		"Left Stick Click",
+		"Right Stick Click" };
 
 
 
@@ -418,41 +418,41 @@ xinput_device_base::xinput_device_base(
 	switch (m_capabilities.Type)
 	{
 	case XINPUT_DEVTYPE_GAMEPAD:
-		type_name = "game controller";
+		type_name = "Controller";
 		switch (m_capabilities.SubType)
 		{
 		case 0x00: // XINPUT_DEVSUBTYPE_UNKNOWN: work around MinGW header issues
-			subtype_name = "unknown";
+			subtype_name = "Unknown";
 			break;
 		case XINPUT_DEVSUBTYPE_GAMEPAD:
-			subtype_name = "gamepad";
+			subtype_name = "Gamepad";
 			break;
 		case XINPUT_DEVSUBTYPE_WHEEL:
-			subtype_name = "wheel";
+			subtype_name = "Racing Wheel";
 			break;
 		case XINPUT_DEVSUBTYPE_ARCADE_STICK:
-			subtype_name = "arcade stick";
+			subtype_name = "Arcade Stick";
 			break;
 		case 0x04: // XINPUT_DEVSUBTYPE_FLIGHT_STICK: work around MinGW header issues
-			subtype_name = "flight stick";
+			subtype_name = "Flight Stick";
 			break;
 		case XINPUT_DEVSUBTYPE_DANCE_PAD:
-			subtype_name = "dance pad";
+			subtype_name = "Dance Pad";
 			break;
 		case XINPUT_DEVSUBTYPE_GUITAR:
-			subtype_name = "guitar";
+			subtype_name = "Guitar";
 			break;
 		case XINPUT_DEVSUBTYPE_GUITAR_ALTERNATE:
-			subtype_name = "alternate guitar";
+			subtype_name = "Alternate Guitar";
 			break;
 		case XINPUT_DEVSUBTYPE_DRUM_KIT:
-			subtype_name = "drum kit";
+			subtype_name = "Drum Kit";
 			break;
 		case XINPUT_DEVSUBTYPE_GUITAR_BASS:
-			subtype_name = "bass guitar";
+			subtype_name = "Bass Guitar";
 			break;
 		case XINPUT_DEVSUBTYPE_ARCADE_PAD:
-			subtype_name = "arcade pad";
+			subtype_name = "Arcade Pad";
 			break;
 		}
 		break;
