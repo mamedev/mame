@@ -4,6 +4,7 @@
 #include "rom.h"
 #include "paprium.h"
 #include "md_slot.h"
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(MD_ROM_PAPRIUM, md_rom_paprium_device, "md_rom_paprium", "MD Paprium")
 
@@ -15,11 +16,11 @@ DEFINE_DEVICE_TYPE(MD_ROM_PAPRIUM, md_rom_paprium_device, "md_rom_paprium", "MD 
 
  Current issues:
  - Still WIP/incomplete, no sound, reset not working, hacks, etc...
+ - some objects will display with wrong palette attribute, extra data
+seems to be in animation data, but wasn't figured yet.
  - Implementation is a bit too much pointer happy
  for save state atm.
  -------------------------------------------------*/
-
-#define PPM_DEBUG 0
 
 md_rom_paprium_device::md_rom_paprium_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
     : md_rom_sram_device(mconfig, MD_ROM_PAPRIUM, tag, owner, clock)
@@ -112,10 +113,6 @@ void md_rom_paprium_device::device_reset()
 
 			// emulator check
 			m_rom[0x81104 / 2] = 0x4e71;
-
-			// mame pretends to be version 1 megadrive but does not implement
-			// proper TMSS register & rom, this will fix the issue being detected
-			m_rom[0xbca5e / 2] = 0x6006; // bra.s to the correct location
 			break;
 		default:
 			printf("UNKNOWN PAPRIUM VERSION 0x%04X\n", m_rom[0x1000a / 2]);
@@ -126,8 +123,7 @@ void md_rom_paprium_device::device_reset()
 	// clear/setup registers
 	ppm_interface->reg_command = 0;
 	ppm_interface->reg_status_1 = 0;
-	ppm_interface->reg_status_2.word = 0;
-	ppm_interface->reg_status_2.bits.megawire_status = 7; // let's pretend MW is plugged & connected
+	ppm_interface->reg_status_2 = 7; // let's pretend MW is plugged & connected (last 3 bits)
 
 	ppm_sdram_pointer = ppm_sdram;
 	ppm_sdram_window_enabled = false;
@@ -141,7 +137,7 @@ uint16_t md_rom_paprium_device::read(offs_t offset)
 		return ppm_dual_port_ram[offset];
 
 	if ((offset >= 0xc000 / 2) && (offset < 0x10000 / 2) && ppm_sdram_window_enabled)
-		return *ppm_sdram_pointer++;
+		return !machine().side_effects_disabled() ? *ppm_sdram_pointer++ : *ppm_sdram_pointer;
 
 	if (offset < 0x400000 / 2)
 		return m_rom[offset];
@@ -207,18 +203,14 @@ void md_rom_paprium_device::ppm_process_command()
 			ppm_interface->reg_command = 0x0000; // explicit 0 return
 			return;
 		default:
-#if PPM_DEBUG
-			printf("CMD 0x00, unknown challenge 0x%02x\n", command_arg);
-#endif
+			LOG("CMD 0x00, unknown challenge 0x%02x\n", command_arg);
 			break;
 		}
 		break;
 	// initial startup/reset? - 3 0w8100 writes on startup
 	// finding arcade mode sends 0x810f
 	case 0x81:
-#if PPM_DEBUG
-		printf("CMD 0x%04x\n", ppm_interface->reg_command);
-#endif
+		LOG("CMD 0x%04x\n", ppm_interface->reg_command);
 		ppm_sdram_window_enabled = true;
 		//	removed, as command 0xb0 was added
 		//	ppm_vram_set_budget(0);
@@ -228,9 +220,7 @@ void md_rom_paprium_device::ppm_process_command()
 	// 8300/8302 toggle *12 (24 total writes) on startup
 	// couple toggles between stages
 	case 0x83:
-#if PPM_DEBUG
-		printf("CMD 0x%04x\n", ppm_interface->reg_command);
-#endif
+		LOG("CMD 0x%04x\n", ppm_interface->reg_command);
 		break;
 	// disable sdram window
 	case 0x84:
@@ -337,9 +327,7 @@ void md_rom_paprium_device::ppm_process_command()
 
 	// SFX play, 4 additional args
 	case 0xd1:
-#if PPM_DEBUG
-		printf("SFX 0x%02x - 0x%04x / 0x%04x / 0x%04x / 0x%04x\n", command_arg, ppm_interface->command_args[0], ppm_interface->command_args[1], ppm_interface->command_args[2], ppm_interface->command_args[3]);
-#endif
+		LOG("SFX 0x%02x - 0x%04x / 0x%04x / 0x%04x / 0x%04x\n", command_arg, ppm_interface->command_args[0], ppm_interface->command_args[1], ppm_interface->command_args[2], ppm_interface->command_args[3]);
 		break;
 		// ?unk?
 		//	case 0xd2:
@@ -348,9 +336,7 @@ void md_rom_paprium_device::ppm_process_command()
 
 	// d6
 	case 0xd6:
-#if PPM_DEBUG
-		printf("CMD 0x%04x - 0x%04x\n", ppm_interface->reg_command, ppm_interface->command_args[0]);
-#endif
+		LOG("CMD 0x%04x - 0x%04x\n", ppm_interface->reg_command, ppm_interface->command_args[0]);
 		break;
 
 	// unpack request
@@ -359,7 +345,7 @@ void md_rom_paprium_device::ppm_process_command()
 		ppm_unpack((ppm_interface->command_args[1] << 16) + ppm_interface->command_args[2], ppm_interface->command_args[0]);
 		ppm_sdram_pointer = &ppm_sdram[ppm_interface->command_args[0] / 2]; // optional ?
 		ppm_interface->reg_status_1 &= ~0x0004;
-		ppm_interface->reg_status_2.bits.busy = 0;
+		ppm_interface->reg_status_2 &= ~STATUS2_BUSY; // clear busy bit
 		break;
 	// setup sdram pointer for read
 	case 0xdb:
@@ -394,18 +380,16 @@ void md_rom_paprium_device::ppm_process_command()
 			memcpy(&m_nvram[0], &ppm_dual_port_ram[ppm_interface->command_args[1] / 2], 0x200);
 			break;
 		}
-		ppm_interface->reg_status_2.bits.eeprom_error1 = 0;
-		ppm_interface->reg_status_2.bits.eeprom_error2 = 0;
+		ppm_interface->reg_status_2 &= ~STATUS2_EEPROM_ERROR1;
+		ppm_interface->reg_status_2 &= ~STATUS2_EEPROM_ERROR2;
 		break;
 
 	case 0xe7: // send some data over network
-#if PPM_DEBUG
-		printf("CMD 0x%04x (0x%04x / 0x%04x):", ppm_interface->reg_command, ppm_interface->command_args[0], ppm_interface->command_args[1]);
+		LOG("CMD 0x%04x (0x%04x / 0x%04x):", ppm_interface->reg_command, ppm_interface->command_args[0], ppm_interface->command_args[1]);
 		for (int i = 0; i < (ppm_interface->command_args[1] + 1) / 2; i++)
-			printf(" 0x%04x", ppm_interface->command_args[2 + i]);
-		printf("\n");
-#endif
-		ppm_interface->reg_status_2.bits.megawire_data_in = 1;			     // pretend data is in
+			LOG(" 0x%04x", ppm_interface->command_args[2 + i]);
+		LOG("\n");
+		ppm_interface->reg_status_2 |= STATUS2_MW_DATA_IN;			     // pretend data is in
 		ppm_interface->network_data[0x10 / 2] = ppm_interface->command_args[0] + 16; // pretend 16 bytes in?
 		// 0x24: ranking fetch
 		// 0x82: list access points
@@ -431,13 +415,10 @@ void md_rom_paprium_device::ppm_process_command()
 		break;
 	// scale current stamp to desired size
 	case 0xf5:
-		// logerror("stamp resize - 0x%04x / 0x%04x / 0x%04x / 0x%04x\n", ppm_interface->command_args[0], ppm_interface->command_args[1], ppm_interface->command_args[2], ppm_interface->command_args[3]);
 		ppm_stamp_rescale(ppm_interface->command_args[0], ppm_interface->command_args[1], ppm_interface->command_args[2], ppm_interface->command_args[3]);
 		break;
 	default:
-#if PPM_DEBUG
-		printf("Unprocessed command 0x%04x\n", ppm_interface->reg_command);
-#endif
+		LOG("Unprocessed command 0x%04x\n", ppm_interface->reg_command);
 		break;
 	}
 	// ack command
@@ -543,7 +524,7 @@ uint32_t md_rom_paprium_device::ppm_unpack(uint32_t source_addr, uint32_t dest_a
 
 void md_rom_paprium_device::ppm_setup_data(uint32_t bgm_file, uint32_t unk1_file, uint32_t smp_file, uint32_t unk2_file, uint32_t sfx_file, uint32_t anm_file, uint32_t blk_file)
 {
-	uint32_t unpack_addr = PPM_DATA_START_ADDR;
+	uint32_t unpack_addr = 0x10000;	// lower area reserved for ingame unpacking
 
 	logerror("=== data setup ===\n");
 	// setup misc data (unpack some of thoses to sdram):
@@ -860,9 +841,7 @@ void md_rom_paprium_device::ppm_obj_render(uint16_t obj_slot)
 
 	if (!blocks_available)
 	{
-#if PPM_DEBUG
-		printf(">>> block budget out / ");
-#endif
+		LOG(">>> block budget out / ");
 		if (previous_offset)
 		{
 			// restore offset/counter
@@ -871,15 +850,11 @@ void md_rom_paprium_device::ppm_obj_render(uint16_t obj_slot)
 			intf_obj->animCounter = previous_counter;
 			data_offset = ppm_anim_data[previous_offset >> 2] & 0xffffff;
 			spr_info = (ppm_spr_data_header_struct *)&ppm_sdram[(ppm_anim_data_base_addr + data_offset) >> 1];
-#if PPM_DEBUG
-			printf("Obj #%02x: keep previous frame\n", obj_slot);
-#endif
+			LOG("Obj #%02x: keep previous frame\n", obj_slot);
 		}
 		else
 		{
-#if PPM_DEBUG
-			printf("Obj #%02x: no render\n", obj_slot);
-#endif
+			LOG("Obj #%02x: no render\n", obj_slot);
 			return;
 		}
 	}
@@ -904,11 +879,8 @@ void md_rom_paprium_device::ppm_obj_render(uint16_t obj_slot)
 		satEntry->posY = posY & 0x3ff;
 		satEntry->sizeNext = ((spr_data->size & 0xf) << 8) + (ppm_interface->sat_count & 0xff);
 		// attributes aren't quite right yet, some objects have wrong palette
-		// #		satEntry->attrs = ((spr_data->attrs & 0x98) << 8) ^ intf_obj->attrs ^ (ppm_vram_find_block(spr_data->blockNum) + spr_data->offset); // whole attr word?
+		//satEntry->attrs = ((spr_data->attrs & 0x98) << 8) ^ intf_obj->attrs ^ (ppm_vram_find_block(spr_data->blockNum) + spr_data->offset); // whole attr word?
 		satEntry->attrs = ((spr_data->attrs & 0xf8) << 8) ^ intf_obj->attrs ^ (ppm_vram_find_block(spr_data->blockNum) + spr_data->offset); // whole attr word?
-		// satEntry->attrs = ppm_dual_port_ram[0] ^ (spr_data->attrs << 8) ^ intf_obj->attrs ^ (ppm_vram_find_block(spr_data->blockNum) + spr_data->offset); // debug
-		// satEntry->attrs = ((spr_data->attrs & ppm_dual_port_ram[0]) << 8) ^ intf_obj->attrs ^ (ppm_vram_find_block(spr_data->blockNum) + spr_data->offset); //whole attr word?
-		// satEntry->attrs ^= (spr_info->flags & ppm_dual_port_ram[1]) << 8;
 		satEntry++;
 	}
 	intf_obj->objID &= 0x7fff;
@@ -930,7 +902,6 @@ void md_rom_paprium_device::ppm_stamp_rescale(uint16_t window_start, uint16_t wi
 	// layout is weird because... reasons?
 	for (uint16_t s = 0; s < 32; s++) // 4px strips
 	{
-		// uint16_t clmn = ((s << 4) & 0xffe0) + (s & 1 ? 0x200 : 0);
 		uint16_t clmn = ((s & 0xfe) << 4) + ((s & 1) << 9);
 		for (uint16_t y = 0; y < 32; y++)
 		{

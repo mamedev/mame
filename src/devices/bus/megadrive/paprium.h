@@ -47,6 +47,12 @@ typedef struct ppm_dma_command_struct
 	uint16_t cmdL;
 } ppm_dma_command_struct;
 
+// defines for status register 2 (0x1fe6)
+#define STATUS2_BUSY 0x4000	     // bit 14
+#define STATUS2_EEPROM_ERROR1 0x0100 // bit 8
+#define STATUS2_EEPROM_ERROR2 0x0200 // bit 9
+#define STATUS2_MW_DATA_IN 0x0020    // bit 5
+
 typedef struct ppm_interface_struct
 {
 	uint16_t vectors[0x80];	   // 68k vectors table
@@ -79,34 +85,8 @@ typedef struct ppm_interface_struct
 	uint16_t reg_unk0;     // 1fe0
 	uint16_t reg_unk1;     // 1fe2
 	uint16_t reg_status_1; // 1fe4
-	struct
-	{
-		union
-		{
-			uint16_t word;
-			struct
-			{
-				uint16_t megawire_status : 3;
-				uint16_t bit_3 : 1;
-				// sub_9B738
-				uint16_t bit_4 : 1;	       // MW? send a900 if set
-				uint16_t megawire_data_in : 1; // MW ack ?
-				uint16_t bit_6 : 1;
-				uint16_t bit_7 : 1;
-
-				uint16_t eeprom_error1 : 1; // b8 sum error?
-				uint16_t eeprom_error2 : 1; // b9 eepr error?
-				uint16_t bit_10 : 1;
-				uint16_t bit_11 : 1;
-
-				uint16_t bit_12 : 1;
-				uint16_t bit_13 : 1;
-				uint16_t busy : 1; // b14 task busy
-				uint16_t bit_15 : 1;
-			} bits;
-		};
-	} reg_status_2;	   // 1fe6
-	uint16_t reg_unk4; // 1fe8
+	uint16_t reg_status_2; // 1fe6
+	uint16_t reg_unk4;     // 1fe8
 	uint16_t reg_command;
 	uint16_t reg_watchdog; // unconfirmed
 	uint16_t reg_unk7;     // 1fee
@@ -121,7 +101,6 @@ typedef struct ppm_interface_struct
 } ppm_interface_struct;
 
 // sdram data
-#define PPM_DATA_START_ADDR 0x10000 // base sdram unpack address
 #define PPM_MAX_VRAM_SLOTS 64
 #define PPM_OBJECTS_COUNT 64
 #define PPM_MAX_OBJ_BLOCKS 32
@@ -249,4 +228,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MD_ROM_PAPRIUM, md_rom_paprium_device)
 
-#endif
+#endif // MAME_BUS_MEGADRIVE_PAPRIUM_H
