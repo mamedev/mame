@@ -28469,17 +28469,15 @@ Gameplay is too fast, needs [V1S]
 		</part>
 	</software>
 
-	<software name="rtishtar" supported="no">
+	<software name="rtishtar">
 		<description>The Return of Ishtar</description>
 		<year>1987</year>
 		<publisher>S·P·S</publisher>
-		<notes><![CDATA[
-Shows a SD Ki animation screen and hangs (which should also do mid-frame palette changes), wants floppy with [Write Protect] flag
-]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198708xx"/>
 		<info name="alt_title" value="ザ・リターン・オブ・イシター"/>
-		<info name="usage" value="Boot with write protect enabled"/>
+		<!-- Would otherwise throw a SD Ki animation screen (with raster effect palette), with hang -->
+		<sharedfeat name="write_protected" value="true" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="422832">
 				<rom name="the return of ishtar.d88" size="422832" crc="dffe6edc" sha1="b6a34f5f5c8eb0d947cb504fe8d07d6e052d6fed"/>
