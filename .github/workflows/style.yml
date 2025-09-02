@@ -17,11 +17,11 @@ jobs:
 
       - name: Get changed files
         id: changed-files
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: echo "changed_files=$(gh pr diff --name-only | xargs)" >> $GITHUB_OUTPUT
 
       - name: Run style check
         id: style-check
-        env:
-          GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 scripts/build/style.py ${{ steps.changed-files.outputs.changed_files }}
