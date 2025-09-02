@@ -23,7 +23,7 @@ jobs:
 
       - name: Run style check
         id: style-check
-        run: echo "reviews=$(python3 scripts/build/style.py ${{ steps.changed-files.outputs.changed_files }} | jq -s .)" >> $GITHUB_OUTPUT
+        run: echo "reviews=$(python3 scripts/build/style.py ${{ steps.changed-files.outputs.changed_files }} | jq -s -c .)" >> $GITHUB_OUTPUT
 
       - name: Post review comments
         uses: actions/github-script@v7
