@@ -32773,7 +32773,7 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A" />
 			<feature name="write_protected" value="true" />
-				<dataarea name="flop" size="241465">
+			<dataarea name="flop" size="241465">
 				<rom name="spell it v070385 side a.woz" size="241465" crc="0e50c5ea" sha1="4eebbce0345f94eee608046ce05bd6440e4bc13b" />
 			</dataarea>
 		</part>
