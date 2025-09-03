@@ -131,6 +131,9 @@ private:
 
 	u16 data_port_r(offs_t offset, u16 mem_mask);
 	void data_port_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 control_port_r(offs_t offset, u16 mem_mask);
+	void control_port_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 hv_counter_r(offs_t offset, u16 mem_mask);
 
 	void vram_w(offs_t offset, u16 data, u16 mem_mask);
 	void cram_w(offs_t offset, u16 data, u16 mem_mask);
@@ -149,6 +152,7 @@ private:
 	u32 m_sprite_attribute_table;
 	u8 m_background_color;
 	u16 m_hit; // HBlank interrupt rate
+	u8 m_vs, m_hs; // Vertical/Horizontal scroll modes
 	// window
 	bool m_rigt;
 	u8 m_whp;

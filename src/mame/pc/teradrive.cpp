@@ -657,6 +657,8 @@ void teradrive_state::flush_z80_state()
 {
 	m_mdz80cpu->set_input_line(INPUT_LINE_RESET, m_z80_reset ? ASSERT_LINE : CLEAR_LINE);
 	m_mdz80cpu->set_input_line(Z80_INPUT_LINE_BUSRQ, m_z80_busrq ? CLEAR_LINE : ASSERT_LINE);
+	if (m_z80_reset)
+		m_opn->reset();
 	if (m_z80_reset || !m_z80_busrq)
 		m_md_68k_sound_view.select(0);
 	else
@@ -936,7 +938,7 @@ void teradrive_state::teradrive(machine_config &config)
 	m_md68kcpu->set_addrmap(AS_PROGRAM, &teradrive_state::md_68k_map);
 	m_md68kcpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &teradrive_state::md_cpu_space_map);
 
-	Z80(config, m_mdz80cpu, md_master_xtal / 7 / 2);
+	Z80(config, m_mdz80cpu, md_master_xtal / 15);
 	m_mdz80cpu->set_addrmap(AS_PROGRAM, &teradrive_state::md_z80_map);
 	m_mdz80cpu->set_addrmap(AS_IO, &teradrive_state::md_z80_io);
 

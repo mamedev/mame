@@ -118,7 +118,7 @@ void ym7101_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_palette);
 	m_palette->set_entries(0x40 + 0x40 * 2);
 
-	SEGAPSG(config, m_psg, DERIVED_CLOCK(4, 15)).add_route(ALL_OUTPUTS, *this, 1.0, 0);
+	SEGAPSG(config, m_psg, DERIVED_CLOCK(4, 15)).add_route(ALL_OUTPUTS, *this, 0.5, 0);
 }
 
 device_memory_interface::space_config_vector ym7101_device::memory_space_config() const
@@ -137,8 +137,67 @@ void ym7101_device::update_command_state()
 	m_command.code = ((m_command.latch & 0xc000) >> 14) | ((m_command.latch & 0xf0'0000) >> 18);
 }
 
-u16  ym7101_device::data_port_r(offs_t offset, u16 mem_mask)
+u16 ym7101_device::control_port_r(offs_t offset, u16 mem_mask)
 {
+	// other bits returns open bus, tbd
+	// FIFO empty << 9
+	// FIFO full << 8
+	return (m_vint_pending << 7)
+//      | sprite_overflow << 6
+//      | sprite_collision << 5
+//      | odd << 4
+		| (screen().vblank() << 3)
+		| (screen().hblank() << 2)
+		| (m_dma.active << 1);
+		// is_pal << 0
+}
+
+void ym7101_device::control_port_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	//printf("%04x %04x %d\n", data, mem_mask, m_command.write_state);
+	if (ACCESSING_BITS_0_15)
+	{
+		if (m_command.write_state == command_write_state_t::SECOND_WORD)
+		{
+			m_command.latch = (data << 16) | (m_command.latch & 0xffff);
+			update_command_state();
+			m_dma.active = !!(m_m1 && BIT(m_command.code, 5));
+
+			if (m_dma.active &&
+				(
+					(m_dma.mode == MEMORY_TO_VRAM && BIT(m_command.code, 0))
+					// supdaisn writes a code of 0x30
+					|| (m_dma.mode == VRAM_COPY && BIT(m_command.code, 4))
+				)
+			)
+			{
+				m_dma_timer->adjust(attotime::from_ticks(8, clock()));
+			}
+
+			m_command.write_state = command_write_state_t::FIRST_WORD;
+			return;
+		}
+
+		m_command.latch = data | (m_command.latch & 0xffff0000);
+		update_command_state();
+
+		if ((data & 0xc000) == 0x8000)
+		{
+			space(AS_VDP_IO).write_byte((data >> 8) & 0x3f, data & 0xff);
+		}
+		else
+		{
+			m_command.write_state = command_write_state_t::SECOND_WORD;
+		}
+	}
+}
+
+
+u16 ym7101_device::data_port_r(offs_t offset, u16 mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		return 0xffff;
+
 	m_command.write_state = command_write_state_t::FIRST_WORD;
 
 	if (BIT(m_command.code, 0))
@@ -212,55 +271,22 @@ void ym7101_device::data_port_w(offs_t offset, u16 data, u16 mem_mask)
 	m_command.address &= 0x1ffff;
 }
 
+// https://gendev.spritesmind.net/forum/viewtopic.php?t=768
+u16 ym7101_device::hv_counter_r(offs_t offset, u16 mem_mask)
+{
+//	int const hpos = screen().hpos();
+	int const vpos = screen().vpos();
+	u8 vcount = vpos > 234 ? vpos - 0xea + 0xe4 : vpos;
+
+	return (vcount << 8);
+}
+
 void ym7101_device::if16_map(address_map &map)
 {
 	map(0x00, 0x01).mirror(2).rw(FUNC(ym7101_device::data_port_r), FUNC(ym7101_device::data_port_w));
 	// Control Port
-	map(0x04, 0x05).mirror(2).lrw16(
-		NAME([this] (offs_t offset, u16 mem_mask) {
-			return (m_vint_pending << 7)
-				| (screen().vblank() << 3)
-				| (m_dma.active << 1);
-		}),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
-			//printf("%04x %04x\n", data, mem_mask);
-			if (ACCESSING_BITS_0_15)
-			{
-				if (m_command.write_state == command_write_state_t::SECOND_WORD)
-				{
-					m_command.latch = (data << 16) | (m_command.latch & 0xffff);
-					update_command_state();
-					m_dma.active = !!(m_m1 && BIT(m_command.code, 5));
-
-					if (m_dma.active &&
-						(
-							(m_dma.mode == MEMORY_TO_VRAM && BIT(m_command.code, 0))
-							// supdaisn writes a code of 0x30
-							|| (m_dma.mode == VRAM_COPY && BIT(m_command.code, 4))
-						)
-					)
-					{
-						m_dma_timer->adjust(attotime::from_ticks(8, clock()));
-					}
-
-					m_command.write_state = command_write_state_t::FIRST_WORD;
-					return;
-				}
-
-				m_command.latch = data | (m_command.latch & 0xffff0000);
-				update_command_state();
-
-				if ((data & 0xc000) == 0x8000)
-				{
-					space(AS_VDP_IO).write_byte((data >> 8) & 0x3f, data & 0xff);
-				}
-				else
-				{
-					m_command.write_state = command_write_state_t::SECOND_WORD;
-				}
-			}
-		})
-	);
+	map(0x04, 0x05).mirror(2).rw(FUNC(ym7101_device::control_port_r), FUNC(ym7101_device::control_port_w));
+	map(0x08, 0x09).mirror(6).r(FUNC(ym7101_device::hv_counter_r));
 	map(0x11, 0x11).mirror(6).w(m_psg, FUNC(segapsg_device::write));
 	// TODO: debug port at $18/$1c
 }
@@ -317,7 +343,6 @@ void ym7101_device::vsram_map(address_map &map)
 {
 	map(0x00, 0x4f).ram().share("vsram");
 }
-
 
 static const char *const size_names[] = { "256 pixels/32 cells", "512 pixels/64 cells", "<invalid>", "1024 pixels/128 cells" };
 
@@ -413,15 +438,20 @@ void ym7101_device::regs_map(address_map &map)
 	// <-- mode 4 ignores everything beyond this point
 	map(11, 11).lw8(NAME([this] (u8 data) {
 		LOGREGS("#11: Mode Register 3 %02x\n", data);
+		m_vs = BIT(data, 2);
+		m_hs = data & 3;
 		LOGREGS("\tIE2: %d VS: %d HS: %d\n"
 			, BIT(data, 3)
-			, BIT(data, 2)
-			, data & 3
+			, m_vs
+			, m_hs
 		);
 	}));
 	map(12, 12).lw8(NAME([this] (u8 data) {
 		LOGREGS("#12: Mode Register 4 %02x\n", data);
-		LOGREGS("\tRSx: %d (%s) VS: %d HS: %d EP: %d SH: %d LSx: %d\n"
+		// VS-HS-EP are undocumented
+		// VS/HS: (external?) Sync
+		// EP: External Pixel bus enable (32x?)
+		LOGREGS("\tRSx: %d (%s) VS: %d HS: %d EP: %d S/H: %d LSx: %d\n"
 			, BIT(data, 7)
 			, BIT(data, 7) ? "H40" : "H32"
 			, BIT(data, 6)
@@ -524,9 +554,11 @@ TIMER_CALLBACK_MEMBER(ym7101_device::hint_trigger_callback)
 
 void ym7101_device::prepare_sprite_line(int scanline)
 {
+	// TODO: configure for H32
 	std::fill_n(&m_sprite_line[0], 320, 0);
 
-	int num_sprites = 0;
+	int num_sprites = 20;
+	int num_pixels = 320;
 	u16 link = 0;
 	u16 offset = 0;
 	int y, x;
@@ -541,7 +573,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 
 		if (scanline == std::clamp(scanline, y, y + height - 1))
 		{
-			num_sprites ++;
+			num_sprites --;
 			width = (((cache[1] >> 10) & 0x3) + 1) * 8;
 			x = (vram[3] & 0x1ff) - 128;
 
@@ -556,7 +588,9 @@ void ym7101_device::prepare_sprite_line(int scanline)
 
 			for (int xi = 0; xi < width; xi ++)
 			{
-				if (x + xi < 0 || x + xi >= 320)
+				num_pixels --;
+
+				if (x + xi < 0 || x + xi >= 320 || num_pixels < 0)
 					continue;
 
 				const int x_offs = flipx ? width - xi - 1 : xi;
@@ -592,6 +626,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 
 		// jumping on the same offset just aborts the chain.
 		// rambo3 depends on this during intro (will deadlock otherwise)
+		// implicitly hitting 64/80 sprites per screen max?
 		if (offset == link * 4)
 		{
 			break;
@@ -599,7 +634,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 
 		offset = link * 4;
 
-	} while(num_sprites < 21 && link != 0);
+	} while(num_sprites > 0 && num_pixels > 0 && link != 0);
 
 	// sprite overflow, here
 }
@@ -642,12 +677,21 @@ bool ym7101_device::render_line(int scanline)
 
 	if (is_window_y_layer)
 	{
+		// TODO: this is intentionally reversed, until I understand what's happening here
 		min_x = m_rigt ? 0 : m_whp * 2;
 		max_x = m_rigt ? m_whp * 2 : 40;
 	}
 
 //	if (min_x != -1 && max_x != -1)
 //		popmessage("X %d %d Y %d %d", min_x, max_x, min_y, max_y);
+
+	// mode 1 is <prohibited>, used by d_titov2
+	const u16 scroll_x_mode_masks[] = { 0, 0x7, 0xf8, 0xff };
+	const u16 scroll_x_base = (scanline & scroll_x_mode_masks[m_hs]) << 1;
+
+	// gynoug, mushaj, btlmanid
+	// TODO: buggy with first column if HS also enabled (gynoug)
+	const u8 scroll_y_mask = m_vs ? 0x7e : 0;
 
 	for (int x = 0; x < 40; x ++)
 	{
@@ -672,8 +716,8 @@ bool ym7101_device::render_line(int scanline)
 		}
 		else
 		{
-			const u16 scrollx_a = m_vram[m_hscroll_address >> 1];
-			const u16 scrolly_a = m_vsram[0];
+			const u16 scrollx_a = m_vram[(m_hscroll_address >> 1) + scroll_x_base];
+			const u16 scrolly_a = m_vsram[x & scroll_y_mask];
 			const u16 vcolumn_a = (scrolly_a + scanline) & ((v_page * 8) - 1);
 			const u32 tile_offset_a = ((x - (scrollx_a >> 3)) & ((h_page * 1) - 1)) + ((vcolumn_a >> 3) * (h_page >> 0));
 			scrolly_a_frac = scrolly_a & 7;
@@ -686,9 +730,9 @@ bool ym7101_device::render_line(int scanline)
 			high_priority_a = !!BIT(id_flags_a, 15);
 		}
 
-		const u16 scrollx_b = m_vram[(m_hscroll_address >> 1) + 1];
+		const u16 scrollx_b = m_vram[(m_hscroll_address >> 1) + 1 + scroll_x_base];
 		const u16 scrollx_b_frac = 0; //scrollx_b & 7;
-		const u16 scrolly_b = m_vsram[1];
+		const u16 scrolly_b = m_vsram[(x & scroll_y_mask) + 1];
 		const u16 scrolly_b_frac = scrolly_b & 7;
 		const u16 vcolumn_b = (scrolly_b + scanline) & ((v_page * 8) - 1);
 		const u32 tile_offset_b = ((x - (scrollx_b >> 3)) & ((h_page * 1) - 1)) + ((vcolumn_b >> 3) * (h_page >> 0));
