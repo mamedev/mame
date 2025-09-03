@@ -125,6 +125,9 @@ void servicet_state::servicet_io(address_map &map)
 	map(0x0072, 0x0072).w(m_lcd, FUNC(hd44780_device::data_w));
 	map(0x0073, 0x0073).r(m_lcd, FUNC(hd44780_device::data_r));
 
+	map(0x0010, 0x0030).w(FUNC(servicet_state::gsg_w));
+	map(0x0040, 0x0050).r(FUNC(servicet_state::gsg_r));
+	map(0x0060, 0x0060).w(FUNC(servicet_state::gsg_w));
 	map(0x4000, 0x4000).w(FUNC(servicet_state::gsg_w));
 }
 
@@ -148,7 +151,7 @@ static INPUT_PORTS_START( servicet )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_NAME("INT0")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2) PORT_NAME("INT1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("INT1")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -252,7 +255,7 @@ uint8_t servicet_state::gsg_r(offs_t offset)
 		popmessage("Read GSG out");
 		break;
 	}
-
+	}
 	return data;
 }
 
