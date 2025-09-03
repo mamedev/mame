@@ -238,9 +238,9 @@ void servicet_state::port3_w(uint8_t data)
 
 uint8_t servicet_state::gsg_scramble(uint8_t data)
 {
-    bool d1 = BIT(data,1)
-    bool d2 = BIT(data,2)
-    bool d3 = BIT(data,3)
+    bool d1 = BIT(data,1);
+    bool d2 = BIT(data,2);
+    bool d3 = BIT(data,3);
 
     // zero d1-d3
     data &= ~(0b1110);
