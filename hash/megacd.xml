@@ -124,7 +124,6 @@ Dumps that are known to exist, but are lost in the aether:
 | Final Fight (Prototype)                                     |                                                                   |
 | Hot Hits - Adventurous New Music Sampler                    | Redump.org dump. http://redump.org/disc/23530/                    |
 | Hot Hits - Adventurous New Music Sampler                    | TruRip has two dumps. One is probably an alt to the redump dump.  |                                                                  |
-| Loadstar (Prototype)                                        |                                                                   |
 | INXS (Prototype)                                            |                                                                   |
 | Kris Kross (Prototype)                                      |                                                                   |
 | Marky Mark and The Funky Bunch (Prototype)                  |                                                                   |
@@ -6488,6 +6487,43 @@ Requires [disc swap]
 		</part>
 	</software>
 
+	<software name="heavynovp" cloneof="heavynov" supported="no">
+		<!-- http://redump.org/disc/126503/
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02).cue" size="2110" crc="3642313d" md5="192cb352974f5e3e1ae5e423c8bc72e9" sha1="5563dcbf81a8bf533503cb9679979f40d57680fb"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 01).bin" size="2429616" crc="7a28795c" md5="e3b3d16b33165d46e118b6bba014cec1" sha1="197a7ad9a7cf7c10c28cdf07472ee17a1771e121"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 02).bin" size="27847680" crc="e188eff3" md5="1956e8ff353e248e612f7f87a5d9f1e5" sha1="b5b7f2627ac3205a7a9528ef37a519387ce5ee03"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 03).bin" size="54813360" crc="f0cc7a0f" md5="ec9e80433b13cc0392ec1913dd186357" sha1="b573a181930f1ae0ceb8d031e100672d9d4d260c"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 04).bin" size="42027888" crc="05cca3b3" md5="9ec76f16d84304c29a03892177aae889" sha1="6b0d4271a12cf180699bf54cbc5cb7053b1ad7b1"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 05).bin" size="35237664" crc="050de106" md5="7547e9805299d286b71ff6081aa2c491" sha1="e402b9a88b436eadced5e30b03f5372317e0e78d"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 06).bin" size="21932400" crc="a08e3841" md5="f901132d905260844a2c5612027e6bd7" sha1="4bf9dc50345f2f358ffe51e8e4d440c554fa2fca"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 07).bin" size="30785328" crc="c737208b" md5="dae46906c351b1b544305b187bffed37" sha1="b4c5daa001de996a3b47535a19196ebeec58c4d6"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 08).bin" size="32260032" crc="43c79487" md5="2745a20e3c4a409dd454b8f28f7ac40f" sha1="8e0fd67a6afb36167a8e6ba12b09bbccfcd4986d"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 09).bin" size="32681040" crc="ca9d8dcc" md5="40556adba7bc9fa6f20e758f56954b3f" sha1="016e2ab9ae4075b51684dd85382013f26f8577f9"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 10).bin" size="32843328" crc="6d0fe556" md5="2936d156a4864db0f322bffa228fdf3e" sha1="edf0335e1ab083f27249cbcd9532520b96701b57"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 11).bin" size="33080880" crc="bb1427f4" md5="820d0a2ee4d350735c764b93411dcd6d" sha1="445e9bf0d9ea2646f945b4a5199eac1cd9d0e9a2"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 12).bin" size="32001312" crc="d685ceca" md5="1b3a39b2dd18095923dfabde49e825f9" sha1="43e80eedf87f0dd8af1469017b985d307eca275b"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 13).bin" size="32838624" crc="bc6ef41c" md5="6f27482ef3e244eaa528674f3acaede7" sha1="3429d5bdfac5b57895899cde98874d1a69cf25ac"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 14).bin" size="31937808" crc="8418e083" md5="e613951cffb51794a9532409cec308ea" sha1="5dd1e41d232348a25a1322271a2fd3b784389520"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 15).bin" size="27330240" crc="2ab48c63" md5="dfc14a025b4cb7c5c71558f42071f365" sha1="1df1f357c2d60f2236efcb4eea0f387274e409d4"/>
+		<rom name="Heavy Nova (Japan) (Beta) (1991-11-02) (Track 16).bin" size="13740384" crc="121542cb" md5="b6d2d538ef1783aeb334c29349435443" sha1="a94cf256b8c65eb21eb577fec4c627201e51f368"/>
+		-->
+		<description>Heavy Nova (Japan, prototype 19911102)</description>
+		<year>1991</year>
+		<publisher>Micronet</publisher>
+		<notes><![CDATA[
+Disc does not boot, uses development security boot code.
+]]></notes>
+		<info name="serial" value="T-22014"/>
+		<info name="release" value="19911212"/>
+		<info name="alt_title" value="ヘビーノバ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="heavy nova (japan) (prototype 19911102)" sha1="e088ac7523c78c860c7ed66484fc9873bc1d670e"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="heimdall">
 		<!-- http://redump.org/disc/21039/
 		<rom name="Heimdall (USA).cue" size="2294" crc="d9024819" md5="efe0f4d6da5b56c260bf6af3b1ccf174" sha1="66e858090085673dbfdea26d06dd354504b2296d"/>
@@ -8122,6 +8158,24 @@ Optionally uses [Justifier] gun
 		</part>
 	</software>
 
+	<software name="loadstarp" cloneof="loadstar">
+		<!-- http://redump.org/disc/125403/
+		<rom name="Loadstar - The Legend of Tully Bodine (USA) (Beta).cue" size="308" crc="ecd1539d" md5="9884739faae9fde68908f95d7a626f51" sha1="0d2a2091bc42e314bacbb76346a523810ded6d37"/>
+		<rom name="Loadstar - The Legend of Tully Bodine (USA) (Beta) (Track 1).bin" size="656137440" crc="764e8c85" md5="1118d66eb68efc0ca9f3e5c373cbcadb" sha1="c57082ef7344c44acb2463bc4cf3de88f0ffe8d3"/>
+		<rom name="Loadstar - The Legend of Tully Bodine (USA) (Beta) (Track 2).bin" size="1258320" crc="a32f8a84" md5="1eb2e5bc68c67c4429f642fc34c31e6a" sha1="2855d99357b775a54b8bbce17d1b000e6c2d2023"/>
+		-->
+		<description>Loadstar - The Legend of Tully Bodine (USA, prototype)</description>
+		<year>1994</year>
+		<publisher>Rocket Science Games</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="SEGABETA10LS R1J   MFD BY JVC"/>
+			<diskarea name="cdrom">
+				<disk name="loadstar - the legend of tully bodine (usa) (beta)" sha1="645762b7e610b93b28366b82dd1880d5e6d96dae"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="lodoss">
 		<!-- http://redump.org/disc/1635/
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou (Japan).cue" size="1858" crc="98bfd15e" />
@@ -9579,6 +9633,50 @@ Glitchy tile in border area (verify)
 			<feature name="cd_matrix" value="SEGAT60035RE R1C MFD BY JVC"/>
 			<diskarea name="cdrom">
 				<disk name="the secret of monkey island (usa)" sha1="a894a9e6ba908f742d686fb85b7ae3c700fb1d36"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="monkeya">
+		<!-- http://redump.org/disc/89210/
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games).cue" size="4603" crc="f701139e" md5="4ac8b47fa064192030580511ab61249c" sha1="fc0c5dd77aa0320d22a0189c05988495c60b5b87"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 01).bin" size="13063008" crc="8a9c032d" md5="9efbaf7fa3ebe088db4deb78f93f05e4" sha1="a63fc8aad1001064f16fda2f57c4c59eb7994908"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 02).bin" size="21525504" crc="b770d568" md5="d09ee2c920c89d7c8f6e273af9ed2325" sha1="14c8aeff008231a792b8d6afb9a4ed3290f63c23"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 03).bin" size="22191120" crc="0e5a083d" md5="917da170659eeb97ae02a38ff6ad96bc" sha1="4e6fe7f8ebd3d88bcad68674208d12f66cc7f3dc"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 04).bin" size="22028832" crc="1f283eff" md5="9393a63b0ff1a6833c23f17a982a5963" sha1="a87f858f3aabb9c939b42e83b9f1fde753c3bbb6"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 05).bin" size="20664672" crc="b6ee9b37" md5="c38205d7198b34e5bbad2a92e148f7fb" sha1="8c32bb0d6f4ae420e2b280520bcfce31f2e043a4"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 06).bin" size="22640352" crc="5086fbdd" md5="0491143714a88a02b9f09a513ccf250a" sha1="86f02b016f7dbef2d9493e99512be2eee18d944e"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 07).bin" size="2232048" crc="27d292fd" md5="51966ce15d7108a1799ed6f71af10571" sha1="033e1aa207c61d6d084290e464ebab6a4bb674df"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 08).bin" size="12825456" crc="ab326079" md5="4ef52f505d9a571ae605e08fc08deec7" sha1="6335324e4d0fa5bf178e0fa034a23f252b3ea4a0"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 09).bin" size="24660720" crc="735b03ea" md5="4a1b5fa7dbd2c9c68c3d2fe8b04d7e25" sha1="b871b8c38fbb42b2d52db0feae04956c2adc50d9"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 10).bin" size="22108800" crc="ee15590f" md5="d09b172e40c5a1b9d7adb2b6c7e73a3a" sha1="d271cdefdbdd1bede06a1e5444fa23d94c86d6dc"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 11).bin" size="16689792" crc="cd5093d5" md5="c7fb84631ae1910b1ab40f1a14a0493a" sha1="6c63f3d13759ac2f19a5ed2e8fa92f2b8b830103"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 12).bin" size="24681888" crc="7a06a923" md5="ef69bff2d99414396c76b42f4461701e" sha1="e1b10a4708c98e8c98888881aa0211b593d2e411"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 13).bin" size="21864192" crc="2d52cf9d" md5="c90a6a899de4052402d3f385359b03ba" sha1="289205466b678016b391cf128c2730f4aff36754"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 14).bin" size="3473904" crc="6a5b964c" md5="189711a68bfa6e0340d895760c09d62a" sha1="1becf86de9ebbbbdf8eb00498141994d8bc6d330"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 15).bin" size="27906480" crc="9f1a8188" md5="094665c62557937e936e513149eaec60" sha1="8789dd313f042231bb6d988e1f9363a1013b45c9"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 16).bin" size="26570544" crc="fe706398" md5="82fd8ca2bcd2666e622cd99f392a5e32" sha1="e991c554fd93bce8cd5528b3030b59a8e01576ef"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 17).bin" size="39290160" crc="6afad5d8" md5="5a6e90b9170dde839bf687993761913a" sha1="c2091931a4e358f808a60be65c5cd7725db66f86"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 18).bin" size="28252224" crc="52d80344" md5="fb0893ab9b15ea8122f2c4a6cd8afac3" sha1="9c8560609b2d506a7e98d11c28db1a768e850925"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 19).bin" size="28129920" crc="f3f48f3a" md5="203b513e05493d8a6db7a013b62f1f3d" sha1="aac24242662e6a983b82b9efe7a46742ea56af74"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 20).bin" size="3259872" crc="1fa9890d" md5="2b7a295afd7eb7f63f7ae61a11f35588" sha1="50923d0db0a3268fc99aaa89965ea223a04b44b7"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 21).bin" size="3582096" crc="ed9527c6" md5="3888aa61e5c358174439bac12d65e7f9" sha1="4dc425a86a02698519d44f2ab80bb2c0cc37407e"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 22).bin" size="23849280" crc="067a6e33" md5="567375b8cc71855fc207276c200a4347" sha1="e192f148ef41d0d33d4050d6d02e9fe4e3826293"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 23).bin" size="18028080" crc="d132a19f" md5="478f59c8d5d1fd30713ff1e14e6f6c7d" sha1="10bba4d1ce218be26eabd80291e6dd1e7d241f2b"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 24).bin" size="1773408" crc="4ccf7438" md5="f2d04742f30a7f44d0d3e111e4d34a44" sha1="6aacdb85c0e9a68e2b86ea69e021acfee74564c0"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 25).bin" size="2222640" crc="53727532" md5="cd0a68375da9adf9f18380cd8f61bd4e" sha1="2ac34d05ed1846b0ee39d5ea72409d6ff5ae4ff0"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 26).bin" size="11176704" crc="9b3d3e03" md5="0010673ffeef69e65083b964dd9fb44b" sha1="28ffc8c7c48cf6134f72d1c64b733d929eb84aae"/>
+		<rom name="Secret of Monkey Island, The (USA) (Limited Run Games) (Track 27).bin" size="10252368" crc="86b9300e" md5="b82553f0ad3230da3a12235d530810dc" sha1="c0c65b5d338db8080ee11b347cb22dda7ca66316"/>
+		-->
+		<description>The Secret of Monkey Island (USA, re-release)</description>
+		<year>2020</year>
+		<publisher>Limited Run Games</publisher>
+		<info name="usage" value="Supports -ctrl2 mouse"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="MED2481   DISC MAKERS"/>
+			<diskarea name="cdrom">
+				<disk name="secret of monkey island, the (usa) (limited run games)" sha1="565cfd79331466d126d1b98048af79ee20a545b5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13778,6 +13876,45 @@ Optional [Justifier] support
 		</part>
 	</software>
 
+	<software name="snatcherp" cloneof="snatcher" supported="partial">
+		<!-- http://redump.org/disc/62657/
+		<rom name="Snatcher (USA) (Beta) (1994-10-07).cue" size="2754" crc="a285b223" md5="e020d9136d1b7d69d8a2e71b64a3613c" sha1="2e3b0743e1ab99f62413a1a2889c37b87f9999df"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 01).bin" size="131744928" crc="b6f1932e" md5="44b57d67b3e216e77d6357abb3e4627f" sha1="606dc65dba04fd95097d0cfc8fed22de7122d786"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 02).bin" size="1164240" crc="d00f54c4" md5="cc325c2484ff41e7d4b0e9060894146b" sha1="ac73d5629875586db0a5d776a13beef377d9a854"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 03).bin" size="23802240" crc="40a49fba" md5="786b30a8b252a61fc91bbabcf4685edb" sha1="43f02ad9d970492426732bfede4c76a0cbf202a2"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 04).bin" size="48345360" crc="e6043e39" md5="6230808a2c1f340f8415cdc49326e155" sha1="ce50b9dad31f960905c5c8d105051b65d45bcada"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 05).bin" size="3716160" crc="c32e9ebe" md5="80ef48d3a8cd6d6d8cf7db175656571a" sha1="9e1374fc524759ba8ceccebad4047e136852fcd4"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 06).bin" size="12740784" crc="a7705e57" md5="03be927bbc866c3158a5a7af03634505" sha1="0310fe11504dc05388a5e025ae1ca0af4fe0e0d6"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 07).bin" size="29404704" crc="fccd71c5" md5="e4d03194b32eca0edb65b92f1f5299a7" sha1="8a124916025294432adee4dd75baf9082d5d7f7b"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 08).bin" size="37843680" crc="2b5cf3d5" md5="749bea144eb88ee76cd19fc93a89adbb" sha1="4d7411ec40205baf5c294f7e16813de8eb493f4b"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 09).bin" size="15412656" crc="afe3dcbf" md5="091c2fe24eee2cc5969a5fd0a4775c10" sha1="697295e985cefec143a2981734d3f93066f16dc7"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 10).bin" size="22769712" crc="9832f63e" md5="f275214198e76b425f76b825fb870dc5" sha1="a27713205d8fac230e54c51cfd773762eb4b5d23"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 11).bin" size="19164096" crc="4150d5c5" md5="7cac1aca396c2b7891d4f86652c1b51e" sha1="00e8f43bf89470b7cbd596c93ef57dcb198d6223"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 12).bin" size="47576256" crc="d6bb6cba" md5="533669bf6b1b22bce349e31d1328be18" sha1="17664b3ab873cb71c158f9df4d28b77fc6620138"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 13).bin" size="20278944" crc="477d9244" md5="f30b732535691c71494c4ab54c375cd3" sha1="a8d0eb4929d5560e631500734e0b309dbc2d5bd9"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 14).bin" size="14445984" crc="749b2596" md5="1af1918aa779911eca30a92ca28bdc05" sha1="ee02d2d226d1a668b11f9b73daaf713212e0492b"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 15).bin" size="13778016" crc="a8562533" md5="48c5cfedac8956afde3e5fb4965deeb2" sha1="644ec8b9ed2e35f00fc40bda24f39f442f72a4e2"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 16).bin" size="3027024" crc="71af88c7" md5="774de00f0effe67e1d2079efbdfc13b5" sha1="1bc854049cbd19f5c5c91eff71731c8a5f844f29"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 17).bin" size="17461248" crc="562edc62" md5="44e8f8cf01786be03858961bdb103c73" sha1="49802ef9c3a3e18dd8e9853e45c8b13069f0a538"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 18).bin" size="8314320" crc="f0a265b6" md5="6a83142465025eb01057686d903893ad" sha1="f0c798e93f582e18209d47631f2e84da2bf008cf"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 19).bin" size="74551344" crc="97dca941" md5="4dc8d5aa81c4a76a951cc92d2e845bfd" sha1="768066f720bd2a57a060097b4bc8c9a19c5d2dab"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 20).bin" size="5844720" crc="b5341397" md5="006364d3667b62b2371a85a2dca67ed5" sha1="5d9fa0f6b1f5e3611df29159cb9d7ce132ae6fb1"/>
+		<rom name="Snatcher (USA) (Beta) (1994-10-07) (Track 21).bin" size="73805760" crc="cde0a9e4" md5="f22950f393f8d0829a556ff5685a4ce9" sha1="6144d301e257da0709dddaf7df9ad510006a015e"/>
+		-->
+		<description>Snatcher (USA, prototype 19941007)</description>
+		<year>1994</year>
+		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Optional [Justifier] support
+]]></notes>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="snatcher (usa) (prototype 19941007)" sha1="6ed7458b427ebfd5b61bce5b7e87f1351e9c8201"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="snatcheru" cloneof="snatcher" supported="partial">
 		<!-- http://redump.org/disc/20559/
 		<rom name="Snatcher (USA).cue" size="2271" crc="13845fdf" md5="fe305d5467811e10fee501bc9135efb5" sha1="c6bdafb2bdb8b2558c8104549cbfdd9ef9a1817f"/>
@@ -15368,6 +15505,24 @@ offset [redbook] in intro
 		</part>
 	</software>
 
+	<software name="swraua" cloneof="swra">
+		<!-- http://redump.org/disc/75925/
+		<rom name="Star Wars - Rebel Assault (USA) (Limited Run Games).cue" size="295" crc="39203248" md5="56d27694df8a14b67bc5a16bc5135c28" sha1="238d2a5f29102e42407d739de0c83716cc4e6fff"/>
+		<rom name="Star Wars - Rebel Assault (USA) (Limited Run Games) (Track 1).bin" size="395255952" crc="310bc2e8" md5="d6a6e3dd209869bad97c1908fcf8b59c" sha1="786bb1709349ef83da583009b088ea711f598daf"/>
+		<rom name="Star Wars - Rebel Assault (USA) (Limited Run Games) (Track 2).bin" size="57798048" crc="23e0f645" md5="962b35c4019b1dbc99e9bec1186c0272" sha1="9e53fa60d97acb77ef7ab43729f4a6ce0d36d502"/>
+		-->
+		<description>Star Wars - Rebel Assault (USA, re-release)</description>
+		<year>2020</year>
+		<publisher>Limited Run Games</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="MED2486   DISC MAKERS"/>
+			<diskarea name="cdrom">
+				<disk name="star wars - rebel assault (usa) (limited run games)" sha1="b42f1599b9b77f6411e65b5a01b66da7bfdd2463"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="syndicat">
 		<!-- source toseciso
 		<rom name="Syndicate (1995)(Domark)(PAL)(M3)[!].cue" size="797" crc="c50de591" />
@@ -16593,6 +16748,23 @@ Cannot save without a [SRAM cart] (621 blocks!)
 			<feature name="cd_matrix" value="1008604437 8/95 1RA2"/>
 			<diskarea name="cdrom">
 				<disk name="wirehead (usa)" sha1="762bb917b936f1a781a2fbe66bbe3a9bf5dd5d43"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wireheadp" cloneof="wirehead">
+		<!-- http://redump.org/disc/103543/
+		<rom name="WireHead (Europe) (Beta) (1995-09-12).cue" size="244" crc="08904ecc" md5="071260eb65874a23ffd185d6241f6aed" sha1="d0e0794a21dfca0b91aa85fd05edb05b0b17d1f7"/>
+		<rom name="WireHead (Europe) (Beta) (1995-09-12) (Track 1).bin" size="626991456" crc="08895d06" md5="9927fe4108cc562541c52bb27dfdc63a" sha1="46d2cc707718e1e8a9e25910cd3dc2645b733857"/>
+		<rom name="WireHead (Europe) (Beta) (1995-09-12) (Track 2).bin" size="1632288" crc="fb30352a" md5="9479493accbdc93735bf3de02e65fb06" sha1="0e03384f2742eaf5591ac7e8de8540822295df03"/>
+		-->
+		<description>WireHead (Europe, prototype 19950912)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="wirehead (europe) (beta) (1995-09-12)" sha1="62ef7c16023046f7fe42ab30bc9394e0a21eeb17"/>
 			</diskarea>
 		</part>
 	</software>

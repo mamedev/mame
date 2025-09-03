@@ -1507,39 +1507,35 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rrabbit">
-		<description>Reader Rabbit (version 2.3) (cleanly cracked)</description>
+	<software name="rrabbit20" cloneof="rrabbit">
+		<description>Reader Rabbit (version 2.0) (trex crack)</description>
 		<year>1987</year>
 		<publisher>The Learning Company</publisher>
 		<info name="programmer" value="Pete Rowe and Aaron Weiss" />
-		<info name="version" value="2.3" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
+		<info name="version" value="2.0" />
 		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 256K Apple IIgs. -->
-		<!-- "Reader Rabbit" is a 1987 educational program developed by Pete Rowe and Aaron Weiss, and distributed by The Learning Company. -->
+		<!-- Dump released: 2023-04-13 -->
+		<!-- educational program -->
 		<!-- Protection: Bad block check for block $7 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="reader rabbit v2.3 iigs (trex crack).2mg" size="819264" crc="b59cc9f2" sha1="3cb739ae7b6c2a967ea649f944cd3d41221f6ba4"/>
+				<rom name="reader rabbit v2.0 iigs (trex crack).2mg" size="819264" crc="0d7519e3" sha1="105012eccd7f066a0c3344b8f51b111fff7fc170"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="rrabbita" cloneof="rrabbit">
-		<description>Reader Rabbit (version 2.2) (cleanly cracked)</description>
+	<software name="rrabbit22" cloneof="rrabbit">
+		<description>Reader Rabbit (version 2.2) (trex crack)</description>
 		<year>1987</year>
 		<publisher>The Learning Company</publisher>
 		<info name="programmer" value="Pete Rowe and Aaron Weiss" />
-		<info name="version" value="2.2" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
+		<info name="version" value="2.2" />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 256K Apple IIgs. -->
-		<!-- "Reader Rabbit" is a 1987 educational program developed by Pete Rowe and Aaron Weiss, and distributed by The Learning Company. -->
+		<!-- educational program -->
 		<!-- Protection: Bad block check for block $7 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="reader rabbit v2.2 iigs (trex crack).2mg" size="819264" crc="518994ed" sha1="48290f00ea231e7df039b89c74bafcf00ee28854"/>
@@ -1547,22 +1543,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rrabbitb" cloneof="rrabbit">
-		<description>Reader Rabbit (Version 2.0) (cleanly cracked)</description>
+	<software name="rrabbit">
+		<description>Reader Rabbit (version 2.3) (trex crack)</description>
 		<year>1987</year>
 		<publisher>The Learning Company</publisher>
 		<info name="programmer" value="Pete Rowe and Aaron Weiss" />
-		<info name="version" value="2.0" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
+		<info name="version" value="2.3" />
 		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2023-04-13 -->
-		<!-- It requires a 256K Apple IIgs. -->
-		<!-- "Reader Rabbit" is a 1987 educational program developed by Pete Rowe and Aaron Weiss, and distributed by The Learning Company. -->
+		<!-- Dump released: 2021-08-13 -->
+		<!-- educational program -->
 		<!-- Protection: Bad block check for block $7 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="reader rabbit v2.0 iigs (trex crack).2mg" size="819264" crc="0d7519e3" sha1="105012eccd7f066a0c3344b8f51b111fff7fc170"/>
+				<rom name="reader rabbit v2.3 iigs (trex crack).2mg" size="819264" crc="b59cc9f2" sha1="3cb739ae7b6c2a967ea649f944cd3d41221f6ba4"/>
 			</dataarea>
 		</part>
 	</software>

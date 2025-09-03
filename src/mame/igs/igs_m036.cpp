@@ -755,7 +755,7 @@ ROM_START( huoqilin )
 	ROM_LOAD( "v103cn.u30", 0x1200000, 0x0200000, CRC(1eb6463e) SHA1(2979d7ef627ffbddd1c5236d4dcc1b622a2a9a38) )
 ROM_END
 
-// 猴椰乐园 (Hóu Yē Lèyuán)
+// 猴椰乐园 (Hóu Yē Lèyuán) - PCB-0733-04-JC
 ROM_START( hyleyuan )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -884,7 +884,7 @@ GAME( 2010, mjzhizun, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<mjz
 
 GAME( 2010, lhfy,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhfy_key>,     ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 20??, hlddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036,          ROT0, "IGS",           "Huanle Dou Dizhu (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, hlddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hlddz_key>,    ROT0, "IGS",           "Huanle Dou Dizhu (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2010, zjddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<zjddz_key>,    ROT0, "IGS",           "Zhongji Dou Dizhu (V204CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
