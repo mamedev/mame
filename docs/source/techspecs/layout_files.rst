@@ -362,10 +362,8 @@ This is an example opening tag for a top-level ``mamelayout`` element:
     <mamelayout version="2">
 
 In general, children of the top-level ``mamelayout`` element are processed in
-reading order from top to bottom.  The exception is that, for historical
-reasons, views are processed last.  This means views see the final values of all
-parameters at the end of the ``mamelayout`` element, and may refer to elements
-and groups that appear after them.
+reading order from top to bottom.  Elements and groups must be defined before
+they can be used.
 
 The following elements are allowed inside the top-level ``mamelayout`` element:
 
@@ -684,11 +682,7 @@ This is an example of a valid opening tag for a ``view`` element:
     <view name="Control panel">
 
 A view creates a nested parameter scope inside the parameter scope of the
-top-level ``mamelayout`` element.  For historical reasons, ``view`` elements are
-processed *after* all other child elements of the top-level ``mamelayout``
-element.  This means a view can reference elements and groups that appear after
-it in the file, and parameters from the enclosing scope will have their final
-values from the end of the ``mamelayout`` element.
+top-level ``mamelayout`` element.
 
 A ``view`` element may have a ``showpointers`` attribute to set whether mouse
 and pen pointers should be shown for the view.  If present, the value must be
@@ -1203,7 +1197,7 @@ must be an integer specifying the bits of the I/O port field that the item
 should activate.  This sample shows instantiation of clickable buttons:
 
 The ``clickthrough`` attribute controls whether clicks can pass through the view
-item to other view items drawn above it.  The ``clickthrough`` attribute must be
+item to other view items drawn below it.  The ``clickthrough`` attribute must be
 ``yes`` or ``no`` if present.  The default is ``no`` (clicks do not pass
 through) for view items with ``inputtag`` and ``inputmask`` attributes, and
 ``yes`` (clicks pass through) for other view items.
