@@ -6,6 +6,8 @@ Titan Overdrive 2 mapper
 
 https://plutiedev.com/beyond-4mb
 
+- Bankswitching controlled by SEGA 315-5709/315-5779 mapper or compatible hardwares
+
 TODO:
 - This is same as SSF2 mapper, merge at cart slot rewrite;
 
@@ -62,6 +64,14 @@ void md_rom_titan_device::write_a13(offs_t offset, uint16_t data)
 			// D7-D6 unconnected, sgdk_bap (and likely others) cares about D4
 			m_bank[offset] = data & 0x3f;
 		}
+		/*
+		else
+		{
+			D0: Determine upper half (0x200000 onward) of ROM space: Backup RAM(1) or ROM(0)
+			D1: Backup RAM Write protect
+			(No official licensed software used these features)
+		}
+		*/
 	}
 }
 

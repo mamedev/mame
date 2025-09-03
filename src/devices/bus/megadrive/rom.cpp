@@ -546,7 +546,7 @@ uint16_t md_rom_fram_device::read_a13(offs_t offset)
 }
 
 /*-------------------------------------------------
- SUPER STREET FIGHTER 2
+ SUPER STREET FIGHTER 2 (with 315-5709/315-5779)
  -------------------------------------------------*/
 
 uint16_t md_rom_ssf2_device::read(offs_t offset)
@@ -573,6 +573,14 @@ void md_rom_ssf2_device::write_a13(offs_t offset, uint16_t data)
 				m_bank[offset] = data & 0xf;
 				memcpy(ROM + offset * 0x080000/2, ROM + 0x400000/2 + (m_bank[offset] * 0x080000)/2, 0x080000);
 			}
+			/*
+			else
+			{
+				D0: Determine upper half (0x200000 onward) of ROM space: Backup RAM(1) or ROM(0)
+				D1: Backup RAM Write protect
+				(No official licensed software used these features)
+			}
+			*/
 		}
 	}
 }
