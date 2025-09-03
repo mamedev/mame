@@ -94,8 +94,9 @@ private:
 	void port1_w(uint8_t data);
 	uint8_t port3_r();
 	void port3_w(uint8_t data);
-	uint8_t bus_r(offs_t offset);
-	void bus_w(offs_t offset, uint8_t data);
+
+	uint8_t gsg_r(offs_t offset);
+	void gsg_w(offs_t offset, uint8_t data);
 
 	void servicet_io(address_map &map) ATTR_COLD;
 	void servicet_map(address_map &map) ATTR_COLD;
@@ -119,7 +120,12 @@ void servicet_state::servicet_map(address_map &map)
 
 void servicet_state::servicet_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(servicet_state::bus_r), FUNC(servicet_state::bus_w));
+	map(0x0070, 0x0070).w(m_lcd, FUNC(hd44780_device::control_w));
+	map(0x0071, 0x0071).r(m_lcd, FUNC(hd44780_device::control_r));
+	map(0x0072, 0x0072).w(m_lcd, FUNC(hd44780_device::data_w));
+	map(0x0073, 0x0073).r(m_lcd, FUNC(hd44780_device::data_r));
+
+	map(0x4000, 0x4000).w(FUNC(servicet_state::gsg_w));
 }
 
 static INPUT_PORTS_START( servicet )
@@ -142,7 +148,7 @@ static INPUT_PORTS_START( servicet )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_NAME("INT0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2) PORT_NAME("INT1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2) PORT_NAME("INT1")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -225,7 +231,7 @@ void servicet_state::port3_w(uint8_t data)
 	m_i2cmem->write_scl(BIT(data, PORT_3_SCL));
 }
 
-uint8_t servicet_state::bus_r(offs_t offset)
+uint8_t servicet_state::gsg_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -246,36 +252,11 @@ uint8_t servicet_state::bus_r(offs_t offset)
 		popmessage("Read GSG out");
 		break;
 	}
-	case 0x70: //Y7 LCD
-	{
-		// RS and RW are A1 and A0
-		bool rs = BIT(offset, 1);
-		bool rw = BIT(offset, 0);
 
-		if (rw)
-		{
-			m_lcd->rs_w(rs);
-			m_lcd->rw_w(1);
-
-			m_lcd->e_w(1);
-			data = m_lcd->db_r();
-			m_lcd->e_w(0);
-		}
-		else
-		{
-			data = m_lcd_data;
-		}
-		break;
-	}
-	default:
-	{
-		//LOG("Bus read: from %04X\n", offset);
-	}
-	}
 	return data;
 }
 
-void servicet_state::bus_w(offs_t offset, uint8_t data)
+void servicet_state::gsg_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x70)
 	{
@@ -293,24 +274,6 @@ void servicet_state::bus_w(offs_t offset, uint8_t data)
 	{
 		popmessage("Write GSG out %02X",data);
 		break;
-	}
-	case 0x70: //Y7 LCD
-	{
-		// RS and RW are A1 and A0
-		bool rs = BIT(offset, 1);
-		bool rw = BIT(offset, 0);
-
-		if (!rw)
-		{
-			m_lcd_data = data;
-
-			m_lcd->rs_w(rs);
-			m_lcd->rw_w(0);
-			m_lcd->db_w(data);
-
-			m_lcd->e_w(1);
-			m_lcd->e_w(0);
-		}
 	}
 	default:
 	{
