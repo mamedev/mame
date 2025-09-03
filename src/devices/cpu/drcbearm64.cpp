@@ -3305,6 +3305,8 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 		}
 		else if (srcp.is_immediate())
 		{
+			mov_reg_param(a, inst.size(), dst, dstp);
+
 			// val1 = src & ~PARAM3
 			if (is_valid_immediate_mask(~maskp.immediate() & util::make_bitmask<uint64_t>(instbits), inst.size()))
 			{
