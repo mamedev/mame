@@ -85,6 +85,8 @@ public:
 
 	void servicet(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(en_w);
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -92,6 +94,7 @@ protected:
 private:
 	uint8_t port1_r();
 	void port1_w(uint8_t data);
+
 	uint8_t port3_r();
 	void port3_w(uint8_t data);
 
@@ -135,26 +138,26 @@ void servicet_state::servicet_io(address_map &map)
 
 static INPUT_PORTS_START( servicet )
 	PORT_START("IN0") // P1.0
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START) PORT_NAME("OK")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("F4")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START) PORT_NAME("OK")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("F4")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY
 
 	PORT_START("IN1") // P1.1
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_4WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY
 
 	PORT_START("IN2") // P1.2
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("F3")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("F1")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("F2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("F3")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("F1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("F2")
 
 	PORT_START("P3") // P3
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_NAME("INT0")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("INT1")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_NAME("INT0") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(servicet_state::en_w), 0) //MCS51_INT0_LINE
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("INT1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(servicet_state::en_w), 0) //MCS51_INT1_LINE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(i2cmem_device::read_sda))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -176,44 +179,55 @@ void servicet_state::machine_reset()
 
 uint8_t servicet_state::port1_r()
 {
-	uint8_t data = m_port1; // Start with what was written to port1
+	/*
+	* the keypad scan works by writing 0xfb,0xfd,0xfe (pulling rows low) to port 1
+	* send seeing which bits end up low instead of high
+	*/
+	uint8_t data = m_port1;
 
-	// key matrix scanning seems to be bidirectional
-	// CPU drives each line HIGH and checks if connected lines are also HIGH = button pressed
-
-	// Column-to-Row scanning: When columns (P1.0-P1.2) are driven HIGH
-	for (int col = 0; col < 3; col++)
+	switch (m_port1)
 	{
-		if (m_port1 & (1 << col)) // Column is driven HIGH
-		{
-			uint8_t keys = m_io_keys[col]->read();
-			data |= (keys & 0x70); // Mask to only row bits (4,5,6)
-		}
+	case 0xfb:
+	{
+		uint8_t keys = m_io_keys[2]->read(); // F3, F1, F2
+		data &= ~(keys & 0x70);
+		break;
 	}
-
-	// Row-to-Column scanning: When rows (P1.4-P1.6) are driven HIGH
-	for (int row = 0; row < 3; row++)
+	case 0xfd:
 	{
-		if (m_port1 & (1 << (row + 4))) // Row is driven HIGH (bits 4,5,6)
-		{
-			// Check all columns for this row
-			for (int col = 0; col < 3; col++)
-			{
-				uint8_t keys = m_io_keys[col]->read();
-				if (keys & (1 << (row + 4))) // Key pressed in this row
-				{
-					data |= (1 << col); // Set corresponding column bit HIGH
-				}
-			}
-		}
+		uint8_t keys = m_io_keys[1]->read(); // Right, Left, Down
+		data &= ~(keys & 0x70);
+		break;
+	}
+	case 0xfe:
+	{
+		uint8_t keys = m_io_keys[0]->read(); // OK, F4, Up
+		data &= ~(keys & 0x70);
+		break;
+	}
+	case 0xff:
+	{
+		// 0xff default
+		break;
+	}
+	default:
+		logerror("Invalid write to P1 %02d",data);
+		break;
 	}
 
 	return data;
 }
 
+
 void servicet_state::port1_w(uint8_t data)
 {
 	m_port1 = data;
+}
+
+INPUT_CHANGED_MEMBER(servicet_state::en_w)
+{
+	m_maincpu->set_input_line(MCS51_INT0_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(MCS51_INT1_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 uint8_t servicet_state::port3_r()
