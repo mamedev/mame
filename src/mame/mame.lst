@@ -29746,6 +29746,9 @@ bsuprem
 fun4
 fun4a
 
+@source:misc/banpresto_bpsc68000.cpp
+lnumbers
+
 @source:misc/beaminv.cpp
 beaminv
 pacominv
@@ -43151,9 +43154,6 @@ attache816
 
 @source:skeleton/ax20.cpp
 ax20
-
-@source:skeleton/banpresto_bpsc68000.cpp
-lnumbers
 
 @source:skeleton/banpresto_tomy_h8s.cpp
 cmcwa
