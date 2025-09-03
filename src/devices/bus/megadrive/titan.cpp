@@ -69,7 +69,7 @@ void md_rom_titan_device::write_a13(offs_t offset, uint16_t data)
 		{
 			D0: Determine upper half (0x200000 onward) of ROM space: Backup RAM(1) or ROM(0)
 			D1: Backup RAM Write protect
-			(No official licensed software used these features)
+			(No official licensed software used these registers in mapper chip)
 		}
 		*/
 	}
