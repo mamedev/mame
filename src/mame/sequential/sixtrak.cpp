@@ -141,7 +141,7 @@ double sixtrak_state::get_dac_v(bool inverted) const
 	// resistors.
 
 	// A MUX (U108, 4051) selects between the non-inverted and inverted voltages
-	// when updating CVs. This essentially adds 1 bit of precission to the
+	// when updating CVs. This essentially adds 1 bit of precision to the
 	// 12-bit DAC, for the CVs that need it. But most CVs just use the 6 most
 	// significant bits of the DAC. The ADC comparator always compares against
 	// the inverted (0V - 4V) voltage.
@@ -166,7 +166,7 @@ double sixtrak_state::get_voltage_mux_out() const
 
 	// The voltage MUX (U108, CD4051) routes potentiometer voltages to the ADC
 	// comparator and routes the appropriate DAC output to the CV S&H circuits.
-	// The MUX's output is always enabled. The firwmare controls whether the ADC
+	// The MUX's output is always enabled. The firmware controls whether the ADC
 	// or an S&H circuit is activated.
 	switch (m_voltage_mux_input)
 	{
@@ -339,12 +339,12 @@ void sixtrak_state::io_map(address_map &map)
 	map(0x09, 0x09).mirror(0xf6).r(FUNC(sixtrak_state::misc_r));
 	map(0x0a, 0x0a).mirror(0xf5).r(FUNC(sixtrak_state::keys_r));
 
-	map(0x08, 0x08).mirror(0xe0).w("latch_u149", FUNC(output_latch_device::write));
+	map(0x08, 0x08).mirror(0xe0).w("led_latch_2", FUNC(output_latch_device::write));
 	map(0x09, 0x09).mirror(0xf0).w(FUNC(sixtrak_state::dac_low_w));
 	map(0x0a, 0x0a).mirror(0xf0).w(FUNC(sixtrak_state::dac_high_w));
-	map(0x0b, 0x0b).mirror(0xf0).w("latch_u102", FUNC(output_latch_device::write));
-	map(0x0c, 0x0c).mirror(0xf0).w("latch_u101", FUNC(output_latch_device::write));
-	map(0x0d, 0x0d).mirror(0xf0).w("latch_u148", FUNC(output_latch_device::write));
+	map(0x0b, 0x0b).mirror(0xf0).w("led_latch_0", FUNC(output_latch_device::write));
+	map(0x0c, 0x0c).mirror(0xf0).w("led_latch_1", FUNC(output_latch_device::write));
+	map(0x0d, 0x0d).mirror(0xf0).w("tune_latch", FUNC(output_latch_device::write));
 	map(0x0e, 0x0e).mirror(0xf0).w(FUNC(sixtrak_state::voice_select_w));
 	map(0x0f, 0x0f).mirror(0xf0).w(FUNC(sixtrak_state::param_select_w));
 	map(0x18, 0x18).mirror(0xe0).w(FUNC(sixtrak_state::digit_w));
@@ -397,13 +397,13 @@ void sixtrak_state::sixtrak(machine_config &config)
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("midiacia", FUNC(acia6850_device::write_rxd));
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	auto &u148 = OUTPUT_LATCH(config, "latch_u148");  // 4174 (CD40174?)
+	auto &u148 = OUTPUT_LATCH(config, "tune_latch");  // CD40174
 	// Bit 0: sound output on/off.
 	// Bit 1, 2, 4: autotune-related.
 	// Bit 3: Not connected.
 	u148.bit_handler<5>().set("nmiff", FUNC(ttl7474_device::preset_w));
 
-	auto &u102 = OUTPUT_LATCH(config, "latch_u102");  // 74LS174
+	auto &u102 = OUTPUT_LATCH(config, "led_latch_0");  // 74LS174
 	u102.bit_handler<0>().set_output("led_track_1").invert();
 	u102.bit_handler<1>().set_output("led_track_2").invert();
 	u102.bit_handler<2>().set_output("led_track_3").invert();
@@ -411,7 +411,7 @@ void sixtrak_state::sixtrak(machine_config &config)
 	u102.bit_handler<4>().set_output("led_track_5").invert();
 	u102.bit_handler<5>().set_output("led_track_6").invert();
 
-	auto &u101 = OUTPUT_LATCH(config, "latch_u101");  // 74LS174
+	auto &u101 = OUTPUT_LATCH(config, "led_latch_1");  // 74LS174
 	u101.bit_handler<0>().set_output("led_seq_a").invert();
 	u101.bit_handler<1>().set_output("led_seq_b").invert();
 	u101.bit_handler<2>().set_output("led_arp_up_down").invert();
@@ -419,7 +419,7 @@ void sixtrak_state::sixtrak(machine_config &config)
 	u101.bit_handler<4>().set_output("led_stack_a").invert();
 	u101.bit_handler<5>().set_output("led_stack_b").invert();
 
-	auto &u149 = OUTPUT_LATCH(config, "latch_u149");  // 74LS174
+	auto &u149 = OUTPUT_LATCH(config, "led_latch_2");  // 74LS174
 	u149.bit_handler<0>().set_output("led_program").invert();
 	u149.bit_handler<1>().set_output("led_param").invert();
 	u149.bit_handler<2>().set_output("led_value").invert();
@@ -576,8 +576,7 @@ ROM_START(sixtrak)
 	ROM_DEFAULT_BIOS("v11")
 
 	ROM_SYSTEM_BIOS(0, "v11", "Six-Trak V11 (1985)")  // Last official release.
-	ROMX_LOAD("trak-11.bin", 0x000000, 0x004000, CRC(192e6a1c) SHA1(cc56e065f8974af73ae0a1c670f849c08212cb68), ROM_BIOS(0))
-	ROM_IGNORE(1)  // Binary is 0x4001 bytes.
+	ROMX_LOAD("trak-11.bin", 0x000000, 0x004000, CRC(4d361d4f) SHA1(f14d4291c1a6a3e9462ae9786641cef11a9aac9a), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "v9", "Six-Trak V9")
 	ROMX_LOAD("trak-9.bin", 0x000000, 0x004000, CRC(d1e6261c) SHA1(bdad57290c24a9ce02c3a5161f8d12f8f96fc74a), ROM_BIOS(1))
