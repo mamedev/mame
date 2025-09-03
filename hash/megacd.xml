@@ -9676,7 +9676,7 @@ Glitchy tile in border area (verify)
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="MED2481   DISC MAKERS"/>
 			<diskarea name="cdrom">
-				<disk name="Secret of Monkey Island, The (USA) (Limited Run Games)" sha1="565cfd79331466d126d1b98048af79ee20a545b5"/>
+				<disk name="secret of monkey island, the (usa) (limited run games)" sha1="565cfd79331466d126d1b98048af79ee20a545b5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -15518,7 +15518,7 @@ offset [redbook] in intro
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="MED2486   DISC MAKERS"/>
 			<diskarea name="cdrom">
-				<disk name="Star Wars - Rebel Assault (USA) (Limited Run Games)" sha1="b42f1599b9b77f6411e65b5a01b66da7bfdd2463"/>
+				<disk name="star wars - rebel assault (usa) (limited run games)" sha1="b42f1599b9b77f6411e65b5a01b66da7bfdd2463"/>
 			</diskarea>
 		</part>
 	</software>
