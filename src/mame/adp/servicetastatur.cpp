@@ -95,6 +95,8 @@ private:
 	uint8_t port3_r();
 	void port3_w(uint8_t data);
 
+	uint8_t gsg_scramble(uint8_t data);
+
 	uint8_t gsg_r(offs_t offset);
 	void gsg_w(offs_t offset, uint8_t data);
 
@@ -234,6 +236,21 @@ void servicet_state::port3_w(uint8_t data)
 	m_i2cmem->write_scl(BIT(data, PORT_3_SCL));
 }
 
+uint8_t servicet_state::gsg_scramble(uint8_t data)
+{
+    bool d1 = BIT(data,1)
+    bool d2 = BIT(data,2)
+    bool d3 = BIT(data,3)
+
+    // zero d1-d3
+    data &= ~(0b1110);
+
+    // d1 and d3 are swapped
+    data |= (d3 << 1) | (d2 << 2) | (d1 << 3);
+
+    return data;
+}
+
 uint8_t servicet_state::gsg_r(offs_t offset)
 {
 	uint8_t data = 0xff;
@@ -248,6 +265,7 @@ uint8_t servicet_state::gsg_r(offs_t offset)
 	case 0x50: //Y5 U19 OE
 	{
 		popmessage("Read scrambled GSG");
+		data = gsg_scramble(data);
 		break;
 	}
 	case 0x60: //Y6 U13 PL
@@ -271,6 +289,7 @@ void servicet_state::gsg_w(offs_t offset, uint8_t data)
 	case 0x50: //Y5 U19 OE
 	{
 		popmessage("Write scrambled GSG in %02X",data);
+		data = gsg_scramble(data);
 		break;
 	}
 	case 0x60: //Y6 U13 PL
