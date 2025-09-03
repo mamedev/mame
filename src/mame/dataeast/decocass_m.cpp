@@ -7,24 +7,32 @@
  ***********************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "cpu/mcs48/mcs48.h"
 #include "decocass.h"
-#include "decocass_tape.h"
 
-/* dongle type #1: jumpers C and D assignments */
-#define MAKE_MAP(m0,m1,m2,m3,m4,m5,m6,m7)   \
-	((uint32_t)(m0)) | \
-	((uint32_t)(m1) << 3) | \
-	((uint32_t)(m2) << 6) | \
-	((uint32_t)(m3) << 9) | \
-	((uint32_t)(m4) << 12) | \
-	((uint32_t)(m5) << 15) | \
-	((uint32_t)(m6) << 18) | \
-	((uint32_t)(m7) << 21)
+#include "cpu/m6502/m6502.h"
 
 
-#define T1MAP(x, m) (((m)>>(x*3))&7)
+namespace {
+
+// dongle type #1: jumpers C and D assignments
+constexpr uint32_t MAKE_MAP(
+		uint32_t m0,
+		uint32_t m1,
+		uint32_t m2,
+		uint32_t m3,
+		uint32_t m4,
+		uint32_t m5,
+		uint32_t m6,
+		uint32_t m7)
+{
+	return m0 | (m1 << 3) | (m2 << 6) | (m3 << 9) | (m4 << 12) | (m5 << 15) | (m6 << 18) | (m7 << 21);
+}
+
+
+constexpr uint32_t T1MAP(unsigned x, uint32_t m)
+{
+	return (m >> (x * 3)) & 7;
+}
 
 
 
@@ -41,6 +49,8 @@ enum {
 	TYPE3_SWAP_56,
 	TYPE3_SWAP_67
 };
+
+} // anonymous namespace
 
 
 void decocass_state::decocass_coin_counter_w(uint8_t data)
@@ -142,13 +152,17 @@ void decocass_state::decocass_nmi_reset_w(uint8_t data)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE );
 }
 
+INPUT_CHANGED_MEMBER(decocass_state::coin_inserted)
+{
+	if (!newval)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
 void decocass_state::decocass_quadrature_decoder_reset_w(uint8_t data)
 {
 	/* just latch the analog controls here */
-	m_quadrature_decoder[0] = ioport("AN0")->read();
-	m_quadrature_decoder[1] = ioport("AN1")->read();
-	m_quadrature_decoder[2] = ioport("AN2")->read();
-	m_quadrature_decoder[3] = ioport("AN3")->read();
+	for (int i = 0; i < 4; i++)
+		m_quadrature_decoder[i] = m_analog[i]->read();
 }
 
 void decocass_state::decocass_adc_w(uint8_t data)
@@ -168,12 +182,11 @@ void decocass_state::decocass_adc_w(uint8_t data)
 uint8_t decocass_state::decocass_input_r(offs_t offset)
 {
 	uint8_t data = 0xff;
-	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
 	switch (offset & 7)
 	{
 	case 0: case 1: case 2:
-		data = machine().root_device().ioport(portnames[offset & 7])->read();
+		data = m_inputs[offset & 7]->read();
 		break;
 	case 3: case 4: case 5: case 6:
 		data = m_quadrature_decoder[(offset & 7) - 3];
@@ -1262,7 +1275,7 @@ void decocass_state::decocass_e900_w(uint8_t data)
 	if (m_de0091_enable == 0x3) // invalid
 		return;
 
-	membank("bank1")->set_entry(data & 3);
+	m_rombank->set_entry(data & 3);
 }
 
 void decocass_state::decocass_de0091_w(offs_t offset, uint8_t data)
@@ -1331,7 +1344,7 @@ void decocass_state::machine_reset()
 	m_audio_nmi_state = 0;
 
 	/* video-related */
-	m_watchdog_flip = 0;
+	decocass_watchdog_flip_w(0);
 	m_color_missiles = 0;
 	m_color_center_bot = 0;
 	m_mode_set = 0;
@@ -1568,7 +1581,6 @@ MACHINE_RESET_MEMBER(decocass_type3_state,cfishing)
 	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_01;
-
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cbtime)
@@ -1576,7 +1588,6 @@ MACHINE_RESET_MEMBER(decocass_type3_state,cbtime)
 	machine_reset();
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_12;
-
 }
 
 MACHINE_RESET_MEMBER(decocass_type3_state,cburnrub)
@@ -1675,7 +1686,6 @@ MACHINE_RESET_MEMBER(decocass_type3_state,cfghtice)
 	LOG(0,("dongle type #3 (PAL)\n"));
 	m_type3_swap = TYPE3_SWAP_25;
 }
-
 
 
 

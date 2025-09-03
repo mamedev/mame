@@ -25,9 +25,9 @@ public:
 		m_rom(*this, "maincpu")
 	{ }
 
-	void megadriv_dgunl_ntsc(machine_config &config);
+	void megadriv_dgunl_ntsc(machine_config &config) ATTR_COLD;
 
-	void init_dgunl3227();
+	void init_dgunl3227() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -59,7 +59,7 @@ public:
 
 	void megadriv_ra145_ntsc(machine_config &config);
 
-	void init_ra145();
+	void init_ra145() ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;

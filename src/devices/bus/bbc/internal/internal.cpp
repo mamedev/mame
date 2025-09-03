@@ -37,10 +37,10 @@ device_bbc_internal_interface::device_bbc_internal_interface(const machine_confi
 	, m_maincpu(*this, ":maincpu")
 	, m_mb_ram(*this, ":ram")
 	, m_mb_rom(*this, ":romslot%u", 0U)
-	, m_region_swr(*this, ":swr")
+	, m_region_swr(*this, ":rom")
 	, m_region_mos(*this, ":mos")
+	, m_slot(dynamic_cast<bbc_internal_slot_device *>(device.owner()))
 {
-	m_slot = dynamic_cast<bbc_internal_slot_device *>(device.owner());
 }
 
 

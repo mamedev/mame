@@ -297,7 +297,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<year>2002</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Electronic Arts"/>
-		<info name="language" value="English/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLUS-01449"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -919,19 +920,23 @@ The game freezes when loading (after the intro)
 		</part>
 	</software>
 
-	<software name="aitd2">
-		<!-- Original images (Redump)
+	<software name="aitd2_us" cloneof="aitd2">
+		<!-- 
+		http://redump.org/disc/3083
 		<rom name="Alone in the Dark - One-Eyed Jack's Revenge (USA).cue" size="115" crc="e7e7f0de" sha1="4e282f1c2fe8f2252ce18601611673feceb3fb64"/>
 		<rom name="Alone in the Dark - One-Eyed Jack's Revenge (USA).bin" size="715309056" crc="83f2a2d1" sha1="d928e147ca1ef265929e1c51d8f8ae39de2a24f9"/>
 		-->
-		<description>Alone in the Dark - One-Eyed Jack's Revenge (USA)</description>
+		<description>Alone in the Dark: One-Eyed Jack's Revenge (USA)</description>
 		<year>1996</year>
 		<publisher>Kokopeli Digital Studios</publisher>
+		<info name="barcode" value="7 52919 47002 2"/>
+		<info name="developer" value="I-Motion"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00239"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="alone in the dark - one-eyed jack's revenge (usa)" sha1="66da4ab3ad0f385d48f89fa8a0f4b6b174a40469"/>
+				<disk name="Alone in the Dark - One-Eyed Jack's Revenge (USA)" sha1="e27406a6237dd80759188ae031904395ca7045e3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1873,7 +1878,10 @@ The game freezes when loading (after the intro)
 		<year>1996</year>
 		<publisher>Maxis</publisher>
 		<info name="developer" value="Artdink" />
-		<info name="language" value="English/French/German/Japanese" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Japanese" />
 		<info name="serial" value="SLUS-00003"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -23728,7 +23736,9 @@ The game freezes when loading (after the intro)
 		<year>2001</year>
 		<publisher> Infogrames</publisher>
 		<info name="developer" value="Artificial Mind + Movement"/>
-		<info name="language" value="English/French/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLUS-01359"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -28812,8 +28822,9 @@ The game freezes when loading (after the intro)
 		</part>
 	</software>
 
-	<software name="ult8ball">
-		<!-- Original images (Redump)
+	<software name="ult8ball" cloneof="actpool">
+		<!-- 
+		redump.org/disc/7723
 		<rom name="Ultimate 8 Ball (USA).cue" size="2650" crc="f00be595" sha1="058e5414628f6a53e0120328559be5aede8da8c9"/>
 		<rom name="Ultimate 8 Ball (USA) (Track 01).bin" size="63652176" crc="2dbd76d4" sha1="3eebb555ff77f3e873741735155416cb7559d036"/>
 		<rom name="Ultimate 8 Ball (USA) (Track 02).bin" size="37140432" crc="b9632e21" sha1="9603ab3df84a77bbd5162776eb833ed3c4511edf"/>
@@ -28842,11 +28853,14 @@ The game freezes when loading (after the intro)
 		<description>Ultimate 8 Ball (USA)</description>
 		<year>1999</year>
 		<publisher>THQ</publisher>
+		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="developer" value="Mirage"/>
+		<info name="language" value="English" />
 		<info name="serial" value="SLUS-00864"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="ultimate 8 ball (usa)" sha1="40ffe75b4126f0cac3258d44dbcc826e27b0d95a"/>
+				<disk name="Ultimate 8 Ball (USA)" sha1="fbd958ea16985b10b7cad0c1b4275d7e4731fe64"/>
 			</diskarea>
 		</part>
 	</software>
@@ -37361,7 +37375,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1995</year>
 		<publisher>Artdink</publisher>
 		<info name="developer" value="Artdink" />
-		<info name="language" value="English/French/German/Japanese" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Japanese" />
 		<info name="serial" value="SLPS-00125" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -37387,7 +37404,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1997</year>
 		<publisher>Artdink</publisher>
 		<info name="developer" value="Artdink" />
-		<info name="language" value="English/French/German/Japanese" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Japanese" />
 		<info name="serial" value="SLPS-91019" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -37712,6 +37732,28 @@ The game only boot on PAL
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="AirRace Championship (Japan)" sha1="74f6d9150d6ab868c55db706f115fe56a77ebfb8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="aitd2_jp" cloneof="aitd2">
+		<!-- 
+		http://redump.org/disc/13174
+		<rom name="Alone in the Dark 2 (Japan).cue" size="93" crc="3eaa5bd8" sha1="8cd56d33586e170116a80e8fb247be26ebadc1d9"/>
+		<rom name="Alone in the Dark 2 (Japan).bin" size="715297296" crc="2bffe515" sha1="e78721a8c4b4d16d846e111928bd7701f85e243b"/>
+		-->
+		<description>Alone in the Dark 2 (Japan)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="アローン・イン・ザ・ダーク２"/>
+		<info name="barcode" value="4 938833 002280"/>
+		<info name="developer" value="Infogrames"/>
+		<info name="language" value="Japanese"/>
+		<info name="serial" value="SLPS-00141"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alone in the Dark 2 (Japan)" sha1="3d03366a2d78f89cdcde2577a5baefa63ad864e1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -57824,7 +57866,8 @@ The game only boot on PAL
 		<description>Transport Tycoon 3D: SL Kara Hajimeyou!! (Japan)</description>
 		<year>1998</year>
 		<publisher>Ocean</publisher>
-		<info name="developer" value="MicroProse / Digital Amusement"/>
+		<info name="developer" value="MicroProse" />
+		<info name="developer" value="Digital Amusement" />
 		<info name="language" value="Japanese"/>
 		<info name="release" value="19980806"/>
 		<info name="serial" value="SLPS-00694"/>
@@ -60207,7 +60250,8 @@ The game only boot on PAL
 		<year>2002</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Electronic Arts"/>
-		<info name="language" value="English/Swedish" />
+		<info name="language" value="English" />
+		<info name="language" value="Swedish" />
 		<info name="serial" value="SLES-03830"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60338,7 +60382,12 @@ The game only boot on PAL
 		<year>2001</year>
 		<publisher> Infogrames</publisher>
 		<info name="developer" value="Artificial Mind + Movement"/>
-		<info name="language" value="Dutch/English/French/German/Italian/Spanish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLES-03120"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60414,7 +60463,10 @@ The game only boot on PAL
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="developer" value="Arc Developments" />
-		<info name="language" value="English/French/German/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLES-00095"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60608,7 +60660,11 @@ The game only boot on PAL
 		<year>2000</year>
 		<publisher>Sony</publisher>
 		<info name="developer" value="Namco"/>
-		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SCES-02066"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60648,7 +60704,11 @@ The game only boot on PAL
 		<year>2001</year>
 		<publisher>3DO / Hasbro Interactive</publisher>
 		<info name="developer" value="Blitz Games"/>
-		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLES-03083"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60668,7 +60728,16 @@ The game only boot on PAL
 		<year>2000</year>
 		<publisher>Hasbro Interactive</publisher>
 		<info name="developer" value="Interactive Studios"/>
-		<info name="language" value="Danish/Dutch/English/Finnish/French/German/Italian/Norwegian/Spanish/Swedish"/>
+		<info name="language" value="Danish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="Finnish" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Norwegian" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<info name="serial" value="SLES-01761"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60689,7 +60758,16 @@ The game only boot on PAL
 		<publisher>Hasbro Interactive</publisher>
 		<info name="copy_protection" value="Error Detection and Correction"/>
 		<info name="developer" value="Interactive Studios"/>
-		<info name="language" value="Danish/Dutch/English/Finnish/French/German/Italian/Norwegian/Spanish/Swedish"/>
+		<info name="language" value="Danish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="Finnish" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Norwegian" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<info name="serial" value="SLES-01761#"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60710,7 +60788,9 @@ The game only boot on PAL
 		<year>1996</year>
 		<publisher>Gremlin Interactive</publisher>
 		<info name="developer" value="Gremlin Interactive"/>
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="serial" value="SLES-00015"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60767,6 +60847,138 @@ Scrambled graphics when shooting the ball
 		</part>
 	</software>
 
+	<software name="actpool">
+		<!--
+		redump.org/disc/25691
+		<rom name="Actua Pool (Europe).cue" size="2604" crc="96021278" sha1="e14d6d8fc9dbb7fbcdbbda311050317c70d4aae5"/>
+		<rom name="Actua Pool (Europe) (Track 01).bin" size="59809008" crc="5a4c398f" sha1="511fd8c4d19d067c67cc46c6267e6df0026357c8"/>
+		<rom name="Actua Pool (Europe) (Track 02).bin" size="37140432" crc="b9632e21" sha1="9603ab3df84a77bbd5162776eb833ed3c4511edf"/>
+		<rom name="Actua Pool (Europe) (Track 03).bin" size="37417968" crc="e38e6b98" sha1="d7d7ded7ab6421faa2321f0d42bac8acaebdcce2"/>
+		<rom name="Actua Pool (Europe) (Track 04).bin" size="46675440" crc="d65301bb" sha1="91785a7e24ff5370ac96b757d4844d2932d2c904"/>
+		<rom name="Actua Pool (Europe) (Track 05).bin" size="42077280" crc="7b1a81cc" sha1="ec69c718ca2c0e21f62398d7c4eecd208b106482"/>
+		<rom name="Actua Pool (Europe) (Track 06).bin" size="42060816" crc="951caa0a" sha1="4154161b2698be5cfa6f42a7b2dc1f4e4684b671"/>
+		<rom name="Actua Pool (Europe) (Track 07).bin" size="40270944" crc="1c3d3ccf" sha1="0cd9ba489de57b33091f4d41e1386f0980392a22"/>
+		<rom name="Actua Pool (Europe) (Track 08).bin" size="45515904" crc="0bd09957" sha1="040491223dce547b314acc6b7fa0d71ee88e8ab7"/>
+		<rom name="Actua Pool (Europe) (Track 09).bin" size="41430480" crc="e4a92eb2" sha1="769b96c47b1004647a8b6efc951ee7b44fe3c8bb"/>
+		<rom name="Actua Pool (Europe) (Track 10).bin" size="45033744" crc="2c9bd10d" sha1="9666a943a8ec522096b36e7474324f770e5c1a4b"/>
+		<rom name="Actua Pool (Europe) (Track 11).bin" size="43126272" crc="68c4ccdd" sha1="8bee6ad50dbac68badb364061da80f2ed914ffd3"/>
+		<rom name="Actua Pool (Europe) (Track 12).bin" size="41070624" crc="eb0f30df" sha1="6ed02ccdf02b4a766df699bd4213fdcec14cec9c"/>
+		<rom name="Actua Pool (Europe) (Track 13).bin" size="7961520" crc="784b24c8" sha1="b7886afcbedabc0c830e3c0d22bc534229d4a631"/>
+		<rom name="Actua Pool (Europe) (Track 14).bin" size="8968176" crc="04605c56" sha1="5d967eacb24e221ab650a6f883cb5c2ef900c5bf"/>
+		<rom name="Actua Pool (Europe) (Track 15).bin" size="8232000" crc="749bd5fc" sha1="695d68862c29ecaa7d5e464512e1bd624f620f4c"/>
+		<rom name="Actua Pool (Europe) (Track 16).bin" size="8232000" crc="09b2b123" sha1="38aad6cd0de3a04ed182699795355a4db59051aa"/>
+		<rom name="Actua Pool (Europe) (Track 17).bin" size="8065008" crc="b20c9291" sha1="033147cf95b8c05c0e367694f1025028fa541011"/>
+		<rom name="Actua Pool (Europe) (Track 18).bin" size="7761600" crc="d7cf0fb6" sha1="97647d0107abaade6e118a0dfcad1a4255338b1d"/>
+		<rom name="Actua Pool (Europe) (Track 19).bin" size="7479360" crc="d6f9d940" sha1="fc762c5da759f8286474df0d79a947dce21d0e72"/>
+		<rom name="Actua Pool (Europe) (Track 20).bin" size="7535808" crc="dc495e23" sha1="299771a021644c8e398e17e0faa6de82c07d5708"/>
+		<rom name="Actua Pool (Europe) (Track 21).bin" size="8403696" crc="c5db598a" sha1="b9050ef4ed7d6667daec1886d6fa45ce47173f54"/>
+		<rom name="Actua Pool (Europe) (Track 22).bin" size="7761600" crc="2d666534" sha1="5bad4562deaf05a193a29e35a26c1d7766b220f1"/>
+		<rom name="Actua Pool (Europe) (Track 23).bin" size="37140432" crc="b9632e21" sha1="9603ab3df84a77bbd5162776eb833ed3c4511edf"/>
+		-->
+		<description>Actua Pool (Europe)</description>
+		<year>1999</year>
+		<publisher>Gremlin Interactive / Acclaim Entertainment</publisher>
+		<info name="developer" value="Mirage"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-01647"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Actua Pool (Europe)" sha1="8efc1b6382bbaae4b77e98246b2bd2f753cf7b0d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="poolshrk" cloneof="actpool">
+		<!--
+		redump.org/disc/15758
+		<rom name="Pool Shark (Europe).cue" size="2604" crc="7b9f3144" sha1="e49907b33d5b2f51c3de1859c3cf9804e232efe6"/>
+		<rom name="Pool Shark (Europe) (Track 01).bin" size="59794896" crc="3a135b33" sha1="7cda0d82668da6fc53c33bf80a9b1a3d61dda138"/>
+		<rom name="Pool Shark (Europe) (Track 02).bin" size="37140432" crc="b9632e21" sha1="9603ab3df84a77bbd5162776eb833ed3c4511edf"/>
+		<rom name="Pool Shark (Europe) (Track 03).bin" size="37417968" crc="e38e6b98" sha1="d7d7ded7ab6421faa2321f0d42bac8acaebdcce2"/>
+		<rom name="Pool Shark (Europe) (Track 04).bin" size="46675440" crc="d65301bb" sha1="91785a7e24ff5370ac96b757d4844d2932d2c904"/>
+		<rom name="Pool Shark (Europe) (Track 05).bin" size="42077280" crc="7b1a81cc" sha1="ec69c718ca2c0e21f62398d7c4eecd208b106482"/>
+		<rom name="Pool Shark (Europe) (Track 06).bin" size="42060816" crc="951caa0a" sha1="4154161b2698be5cfa6f42a7b2dc1f4e4684b671"/>
+		<rom name="Pool Shark (Europe) (Track 07).bin" size="40270944" crc="1c3d3ccf" sha1="0cd9ba489de57b33091f4d41e1386f0980392a22"/>
+		<rom name="Pool Shark (Europe) (Track 08).bin" size="45515904" crc="0bd09957" sha1="040491223dce547b314acc6b7fa0d71ee88e8ab7"/>
+		<rom name="Pool Shark (Europe) (Track 09).bin" size="41430480" crc="e4a92eb2" sha1="769b96c47b1004647a8b6efc951ee7b44fe3c8bb"/>
+		<rom name="Pool Shark (Europe) (Track 10).bin" size="45033744" crc="2c9bd10d" sha1="9666a943a8ec522096b36e7474324f770e5c1a4b"/>
+		<rom name="Pool Shark (Europe) (Track 11).bin" size="43126272" crc="68c4ccdd" sha1="8bee6ad50dbac68badb364061da80f2ed914ffd3"/>
+		<rom name="Pool Shark (Europe) (Track 12).bin" size="41070624" crc="eb0f30df" sha1="6ed02ccdf02b4a766df699bd4213fdcec14cec9c"/>
+		<rom name="Pool Shark (Europe) (Track 13).bin" size="7961520" crc="784b24c8" sha1="b7886afcbedabc0c830e3c0d22bc534229d4a631"/>
+		<rom name="Pool Shark (Europe) (Track 14).bin" size="8968176" crc="04605c56" sha1="5d967eacb24e221ab650a6f883cb5c2ef900c5bf"/>
+		<rom name="Pool Shark (Europe) (Track 15).bin" size="8232000" crc="749bd5fc" sha1="695d68862c29ecaa7d5e464512e1bd624f620f4c"/>
+		<rom name="Pool Shark (Europe) (Track 16).bin" size="8232000" crc="09b2b123" sha1="38aad6cd0de3a04ed182699795355a4db59051aa"/>
+		<rom name="Pool Shark (Europe) (Track 17).bin" size="8065008" crc="b20c9291" sha1="033147cf95b8c05c0e367694f1025028fa541011"/>
+		<rom name="Pool Shark (Europe) (Track 18).bin" size="7761600" crc="d7cf0fb6" sha1="97647d0107abaade6e118a0dfcad1a4255338b1d"/>
+		<rom name="Pool Shark (Europe) (Track 19).bin" size="7479360" crc="d6f9d940" sha1="fc762c5da759f8286474df0d79a947dce21d0e72"/>
+		<rom name="Pool Shark (Europe) (Track 20).bin" size="7535808" crc="dc495e23" sha1="299771a021644c8e398e17e0faa6de82c07d5708"/>
+		<rom name="Pool Shark (Europe) (Track 21).bin" size="8403696" crc="c5db598a" sha1="b9050ef4ed7d6667daec1886d6fa45ce47173f54"/>
+		<rom name="Pool Shark (Europe) (Track 22).bin" size="7761600" crc="2d666534" sha1="5bad4562deaf05a193a29e35a26c1d7766b220f1"/>
+		<rom name="Pool Shark (Europe) (Track 23).bin" size="37140432" crc="b9632e21" sha1="9603ab3df84a77bbd5162776eb833ed3c4511edf"/>
+		-->
+		<description>Pool Shark (Europe)</description>
+		<year>1999</year>
+		<publisher>Gremlin Interactive</publisher>
+		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="developer" value="Mirage"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-01537"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Pool Shark (Europe)" sha1="5a2a773ecab72985a8a30e74e31e8dfde17af78a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="adiboo">
+		<!--
+		http://redump.org/disc/19839
+		<rom name="Adiboo &amp; Paziral's Secret (Europe) (En,Fr,De,Es,It).cue" size="117" crc="5a147324" sha1="5c05f8ed28d6f1cb86b28f499fe063d993361e84"/>
+		<rom name="Adiboo &amp; Paziral's Secret (Europe) (En,Fr,De,Es,It).bin" size="648037152" crc="2ecd2fc7" sha1="acfc342f9ee98a9c65e0aefac919d51ebbab4fe0"/>
+		-->
+		<description>Adiboo &amp; Paziral's Secret (Europe)</description>
+		<year>2003</year>
+		<publisher>Vivendi Universal Games</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<info name="developer" value="Neko Entertainment" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-04108"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Adiboo and Paziral's Secret (Europe) (En,Fr,De,Es,It)" sha1="e46dc661269d45ddd84f6234caeb4f7bc18a81d3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="adibou">
+		<!--
+		http://redump.org/disc/27473
+		<rom name="Adibou et l'Ombre Verte (France).cue" size="98" crc="056e2737" sha1="db59a051b96f4166b6c52302217e642b6c84c70d"/>
+		<rom name="Adibou et l'Ombre Verte (France).bin" size="563162880" crc="23e63cb2" sha1="8a25a2878bf540697a8e25f5fd4c0b7f366ba372"/>
+		-->
+		<description>Adibou et l'Ombre Verte (France)</description>
+		<year>2001</year>
+		<publisher>Vivendi Universal Games</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<info name="developer" value="Kalisto Entertainment" />
+		<info name="developer" value="Neko Entertainment" />
+		<info name="language" value="French"/>
+		<info name="serial" value="SCES-03558"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Adibou et l'Ombre Verte (France)" sha1="2beb9b219541eab541eed1811ec4c7ce43d7d264"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="adidas" supported= "no">
 		<!--
 		http://redump.org/disc/1283
@@ -60783,7 +60995,11 @@ Scrambled graphics when shooting the ball
 The game freezes when loading (after the intro)
 ]]></notes>
 		<info name="developer" value="Psygnosis"/>
-		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLES-00189"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60804,7 +61020,12 @@ The game freezes when loading (after the intro)
 		<year>1997</year>
 		<publisher>Psygnosis</publisher>
 		<info name="developer" value="Shen Technologies"/>
-		<info name="language" value="Dutch/English/French/German/Italian/Spanish"/>
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLES-00857"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60854,7 +61075,10 @@ During gameplay, the commentary speech audio is playing too fast
 		<year>1996</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="developer" value="Artdink"/>
-		<info name="language" value="English/French/German/Japanese" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Japanese" />
 		<info name="serial" value="SCES-00290"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60876,43 +61100,6 @@ During gameplay, the commentary speech audio is playing too fast
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="action replay 2 version 2.23 (europe) (en,fr,de,it) (disc 2) (bonus psone codes) (unl)" sha1="0b9dc08b337fc82620540a87165299013bb6dbe1"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="anastasia">
-		<!--
-		http://redump.org/disc/6713
-		<rom name="Anastasia (Europe) (En,Fr,De,Nl).cue" size="98" crc="d4be8b7e" sha1="fdea7b6c93669a23f5de2e16a563bf857b72fd20"/>
-		<rom name="Anastasia (Europe) (En,Fr,De,Nl).bin" size="512759520" crc="30735008" sha1="70afcc8eb81584ac18d52f08a77f63e803cd822d"/>
-		-->
-		<description>Anastasia (Europe)</description>
-		<year>2001</year>
-		<publisher>Midas Interactive</publisher>
-		<info name="developer" value="The Code Monkeys"/>
-		<info name="language" value="Dutch/English/French/German"/>
-		<info name="serial" value="SLES-02961"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="Anastasia (Europe) (En,Fr,De,Nl)" sha1="fbefa124869a040d653301ee7ebc08d75e5e537d"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- http://redump.org/disc/6147/ -->
-	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
-	<software name="apescapee" cloneof="apescape" supported="no">
-		<description>Ape Escape (Europe)</description>
-		<year>1999</year>
-		<publisher>Sony Computer Entertainment Europe</publisher>
-		<info name="serial" value="SCES-01564"/>
-		<info name="release" value="19990701" />
-		<info name="barcode" value="7 11719 78752 5"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="ape escape (europe)" sha1="4e7ed4caaaabbf57b2b137f2e7f67fa2849c5d08" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -61083,6 +61270,251 @@ During gameplay, the commentary speech audio is playing too fast
 		</part>
 	</software>
 
+	<software name="aitd2">
+		<!-- 
+		http://redump.org/disc/485
+		<rom name="Alone in the Dark - Jack Is Back (Europe) (En,Fr,De,Es,It).cue" size="124" crc="f7ce671d" sha1="6ea73167cc18018d4cd0372d2a4fb990e7f86fd5"/>
+		<rom name="Alone in the Dark - Jack Is Back (Europe) (En,Fr,De,Es,It).bin" size="714170688" crc="74fbb4a8" sha1="ac18785261cca340268dbd27ee156ca2436fcff2"/>
+		-->
+		<description>Alone in the Dark: Jack is Back (Europe)</description>
+		<year>1996</year>
+		<publisher>Infogrames</publisher>
+		<info name="barcode" value="3 329720 010173"/>
+		<info name="developer" value="Infogrames"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-00037"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alone in the Dark - Jack Is Back (Europe) (En,Fr,De,Es,It)" sha1="9b7faad11506cc128dcdfa289b4c204cbbd57505"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="amerzone">
+		<!--
+		http://redump.org/disc/31197
+		<rom name="Amerzone - The Explorer's Legacy (Europe) (Disc 1).cue" size="116" crc="81d37b26" sha1="2a46847352a2752f14933a47337684df59c74c2d"/>
+		<rom name="Amerzone - The Explorer's Legacy (Europe) (Disc 1).bin" size="683201904" crc="df28a6f4" sha1="9f36bf17afab18f1193465883d3cc7059dae4211"/>
+
+		http://redump.org/disc/31198
+		<rom name="Amerzone - The Explorer's Legacy (Europe) (Disc 2).cue" size="116" crc="808e5df7" sha1="96a02487f1ed646c4aab2dc08e33e737c3d7fa45"/>
+		<rom name="Amerzone - The Explorer's Legacy (Europe) (Disc 2).bin" size="517150704" crc="21259fe5" sha1="a3b1f05a896737ffc796f51b004d43ad3d928606"/>
+		-->
+		<description>Amerzone: The Explorer's Legacy (Europe)</description>
+		<year>1999</year>
+		<publisher>Microïds</publisher>
+		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="developer" value="Microïds"/>
+		<info name="language" value="English"/>
+		<info name="serial" value="SLES-02347 / SLES-12347"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amerzone - The Explorer's Legacy (Europe) (Disc 1)" sha1="d0b6c61938a08b775904c3219dbe595dc144c1a6"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amerzone - The Explorer's Legacy (Europe) (Disc 2)" sha1="498f196d19807e6c4a3700f6d826e7dd5fbf62d0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="amerzone_de" cloneof="amerzone">
+		<!--
+		http://redump.org/disc/5515
+		<rom name="Amerzone - Das Testament des Forschungsreisenden (Germany) (Disc 1).cue" size="133" crc="bfdaa795" sha1="4e3ab252fc3a327b98a6d196088fcddfebdc6ea6"/>
+		<rom name="Amerzone - Das Testament des Forschungsreisenden (Germany) (Disc 1).bin" size="685165824" crc="d4bd767c" sha1="1eeb77107e795252d50ba6f895d089bf16bc8965"/>
+
+		http://redump.org/disc/5516
+		<rom name="Amerzone - Das Testament des Forschungsreisenden (Germany) (Disc 2).cue" size="133" crc="be878144" sha1="b287a2271dfb68353411d0dd3dda8118d5caee39"/>
+		<rom name="Amerzone - Das Testament des Forschungsreisenden (Germany) (Disc 2).bin" size="517943328" crc="14ed1531" sha1="0619398db19e169dc1b9e6882b4615873e8db40e"/>
+		-->
+		<description>Amerzone: Das Testament des Forschungsreisenden (Germany)</description>
+		<year>1999</year>
+		<publisher>Microïds</publisher>
+		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="developer" value="Microïds"/>
+		<info name="language" value="German"/>
+		<info name="serial" value="SLES-02348 / SLES-12348"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amerzone - Das Testament des Forschungsreisenden (Germany) (Disc 1)" sha1="60f2c8e7c0175184d05d1d8b02cab989f7d5951f"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amerzone - Das Testament des Forschungsreisenden (Germany) (Disc 2)" sha1="81f473452a6342188fc86f9e594cd635a3b62dfa"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="amerzone_es" cloneof="amerzone">
+		<!--
+		http://redump.org/disc/27535
+		<rom name="Amerzone - El Legado del Explorador (Spain) (Disc 1).cue" size="118" crc="47aef34e" sha1="500345fcc228e2082fe47006791ed32d74b7574d"/>
+		<rom name="Amerzone - El Legado del Explorador (Spain) (Disc 1).bin" size="684107424" crc="e0527dec" sha1="a8e2df17df16095a710052e17fd78bb1298e133c"/>
+
+		http://redump.org/disc/27536
+		<rom name="Amerzone - El Legado del Explorador (Spain) (Disc 2).cue" size="118" crc="46f3d59f" sha1="c98a3ab773892fb33932e98cf4be623f5ab43a2e"/>
+		<rom name="Amerzone - El Legado del Explorador (Spain) (Disc 2).bin" size="516193440" crc="8fabe501" sha1="88c44c7ea319ed1ce110e2afddf1a81a7c946d57"/>
+		-->
+		<description>Amerzone: El Legado del Explorador (Spain)</description>
+		<year>1999</year>
+		<publisher>Microïds</publisher>
+		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="developer" value="Microïds"/>
+		<info name="language" value="Spanish"/>
+		<info name="serial" value="SLES-02349 / SLES-12349"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amerzone - El Legado del Explorador (Spain) (Disc 1)" sha1="812edd50affba6dfb5af9d61c29ccd42feb4ec64"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amerzone - El Legado del Explorador (Spain) (Disc 2)" sha1="ab67aba19ae0bfae75648540c01adaeb35150f1c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="amerzone_it" cloneof="amerzone">
+		<!--
+		http://redump.org/disc/35298
+		<rom name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 1).cue" size="124" crc="eec8987d" sha1="1e87621eba649f35eef2d1efdced35f848868c00"/>
+		<rom name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 1).bin" size="682733856" crc="51d17a34" sha1="b26de149fab1251c41282fecec9370c28623d66b"/>
+
+		http://redump.org/disc/35299
+		<rom name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 2).cue" size="124" crc="ef95beac" sha1="c6dac3b70720f8962c91dced4b561a79c70af683"/>
+		<rom name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 2).bin" size="516520368" crc="2961f496" sha1="e4404580b86604feba74dc61627e0e6f2c8ffcb2"/>
+		-->
+		<description>Amerzone: Il Testamento dell'Esploratore (Italy)</description>
+		<year>1999</year>
+		<publisher>Microïds</publisher>
+		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="developer" value="Microïds"/>
+		<info name="language" value="Italian"/>
+		<info name="serial" value="SLES-02350 / SLES-12350"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 1)" sha1="32cebdc58162ff3ce80d27ae7ba55586656325ad"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 2)" sha1="6fc94c06b1bb76c1575c435506a6ce516642cab2"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="amerzone_pt" cloneof="amerzone">
+		<!--
+		http://redump.org/disc/64127
+		<rom name="Amerzone - O Testamento do Explorador (Portugal) (Disc 1).cue" size="123" crc="a5d01395" sha1="0c32cb0efb744554212d7841d4eb4996f6b6b33f"/>
+		<rom name="Amerzone - O Testamento do Explorador (Portugal) (Disc 1).bin" size="685932576" crc="516f76b5" sha1="093228b0a7f076816acfb1e954c94f851ff90a4f"/>
+
+		http://redump.org/disc/64128
+		<rom name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 2).cue" size="124" crc="ef95beac" sha1="c6dac3b70720f8962c91dced4b561a79c70af683"/>
+		<rom name="Amerzone - Il Testamento dell'Esploratore (Italy) (Disc 2).bin" size="516520368" crc="2961f496" sha1="e4404580b86604feba74dc61627e0e6f2c8ffcb2"/>
+		-->
+		<description>Amerzone: O Testamento do Explorador (Portugal)</description>
+		<year>1999</year>
+		<publisher>Microïds</publisher>
+		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="developer" value="Microïds"/>
+		<info name="language" value="Portuguese"/>
+		<info name="serial" value="SLES-02429 / SLES-12429"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amerzone - O Testamento do Explorador (Portugal) (Disc 1)" sha1="e4179ab2c6e181506ea82f001377d78b6a4db44e"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amerzone - O Testamento do Explorador (Portugal) (Disc 2)" sha1="31503e94890c0b1e87e3f5f8604f9baae0792277"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="amerzone_fr" cloneof="amerzone">
+		<!--
+		http://redump.org/disc/15005
+		<rom name="Amerzone, L' (France) (Disc 1).cue" size="96" crc="c767edbb" sha1="3a1533f7da042fa79cca5b0b337670cea4d3001e"/>
+		<rom name="Amerzone, L' (France) (Disc 1).bin" size="688301040" crc="cb3a508c" sha1="f96b2a612ba4c6cf4c21fcc0d2c1d62947c2b8a6"/>
+
+		http://redump.org/disc/15006
+		<rom name="Amerzone, L' (France) (Disc 2).cue" size="96" crc="c63acb6a" sha1="6e13826fd55b52ee08ab7a951edf981ea89b8346"/>
+		<rom name="Amerzone, L' (France) (Disc 2).bin" size="519796704" crc="38bd90a4" sha1="e2bc390ed4d58aaa2185ebc5692329573e8c65f6"/>
+		-->
+		<description>L'Amerzone (France)</description>
+		<year>1999</year>
+		<publisher>Microïds</publisher>
+		<info name="copy_protection" value="Error Detection and Correction"/>
+		<info name="developer" value="Microïds"/>
+		<info name="language" value="French"/>
+		<info name="serial" value="SLES-02346 / SLES-12346"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amerzone, L' (France) (Disc 1)" sha1="79e96126d9bcbab13610812176814292b053c3c8"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amerzone, L' (France) (Disc 2)" sha1="a273182a6456932aca33fbdf6d44177ad731903f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="anastasia">
+		<!--
+		http://redump.org/disc/6713
+		<rom name="Anastasia (Europe) (En,Fr,De,Nl).cue" size="98" crc="d4be8b7e" sha1="fdea7b6c93669a23f5de2e16a563bf857b72fd20"/>
+		<rom name="Anastasia (Europe) (En,Fr,De,Nl).bin" size="512759520" crc="30735008" sha1="70afcc8eb81584ac18d52f08a77f63e803cd822d"/>
+		-->
+		<description>Anastasia (Europe)</description>
+		<year>2001</year>
+		<publisher>Midas Interactive</publisher>
+		<info name="developer" value="The Code Monkeys"/>
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="serial" value="SLES-02961"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Anastasia (Europe) (En,Fr,De,Nl)" sha1="fbefa124869a040d653301ee7ebc08d75e5e537d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/6147/ -->
+	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
+	<software name="apescapee" cloneof="apescape" supported="no">
+		<description>Ape Escape (Europe)</description>
+		<year>1999</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-01564"/>
+		<info name="release" value="19990701" />
+		<info name="barcode" value="7 11719 78752 5"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ape escape (europe)" sha1="4e7ed4caaaabbf57b2b137f2e7f67fa2849c5d08" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- http://redump.org/disc/1036/ -->
 	<!-- Came bundled with releases of "Crash Bandicoot" and "Tekken 2" -->
 	<software name="acrels96">
@@ -61134,7 +61566,12 @@ During gameplay, the commentary speech audio is playing too fast
 		<publisher>GT Interactive</publisher>
 		<notes>Scrambled graphics</notes>
 		<info name="developer" value="Mirage Technologies"/>
-		<info name="language" value="Dutch/English/French/German/Italian/Spanish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="19970407" />
 		<info name="serial" value="SLES-00334"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
@@ -61198,7 +61635,8 @@ During gameplay, the commentary speech audio is playing too fast
 		<year>1996</year>
 		<publisher>Ocean</publisher>
 		<info name="developer" value="Ocean" />
-		<info name="language" value="English/French" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<info name="serial" value="SLES-00053"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -62244,6 +62682,138 @@ During gameplay, the commentary speech audio is playing too fast
 		</part>
 	</software>
 
+	<software name="technomg">
+		<!-- 
+		http://redump.org/disc/12627
+		<rom name="TechnoMage - Return of Eternity (Europe).cue" size="106" crc="6ed71521" sha1="71223456d07192ab9c9a24e814829fa600dd6ce6"/>
+		<rom name="TechnoMage - Return of Eternity (Europe).bin" size="682315200" crc="6010fa91" sha1="790600d94f38efd28519fef767b2c8c52526aadb"/>
+		-->
+		<description>TechnoMage: Return of Eternity (Europe)</description>
+		<year>2001</year>
+		<publisher>Sunflowers</publisher>
+		<info name="barcode" value="3 546430 016589"/>
+		<info name="copy_protection" value="Error Detection and Correction / LibCrypt"/>
+		<info name="developer" value="Sunflowers"/>
+		<info name="language" value="English"/>
+		<info name="serial" value="SLES-03241"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="TechnoMage - Return of Eternity (Europe)" sha1="0cf66669228c6b73c22732ae252523485024e5ee"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="technomg_nl" cloneof="technomg">
+		<!-- 
+		http://redump.org/disc/27310
+		<rom name="TechnoMage - De Terugkeer der Eeuwigheid (Netherlands).cue" size="120" crc="5fa9cd4f" sha1="869470d8bf84b0742d3326dc310baa657951a5dd"/>
+		<rom name="TechnoMage - De Terugkeer der Eeuwigheid (Netherlands).bin" size="714481152" crc="1e10a432" sha1="6a9edb882ddaae2f1ae8913e179dc2be30b80e85"/>
+		-->
+		<description>TechnoMage: De Terugkeer der Eeuwigheid (Netherlands)</description>
+		<year>2001</year>
+		<publisher>Sunflowers</publisher>
+		<info name="barcode" value="3 546430 018217"/>
+		<info name="copy_protection" value="Error Detection and Correction / LibCrypt"/>
+		<info name="developer" value="Sunflowers"/>
+		<info name="language" value="Dutch"/>
+		<info name="serial" value="SLES-03245"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="TechnoMage - De Terugkeer der Eeuwigheid (Netherlands)" sha1="66181e2610e4a01fbc5111b48c13cc34ec19eeb4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="technomg_de" cloneof="technomg">
+		<!-- 
+		http://redump.org/disc/25284
+		<rom name="TechnoMage - Die Rueckkehr der Ewigkeit (Germany).cue" size="115" crc="cf387233" sha1="29692072a8b82d95b696c0740c00023eee52df4d"/>
+		<rom name="TechnoMage - Die Rueckkehr der Ewigkeit (Germany).bin" size="674652384" crc="9ccd3eac" sha1="5f4727482ba67c11f20f1901c0cc1f382a2f3a09"/>
+		-->
+		<description>TechnoMage: Die Rüeckkehr der Ewigkeit (Germany)</description>
+		<year>2001</year>
+		<publisher>Sunflowers</publisher>
+		<info name="barcode" value="4 018008 300561"/>
+		<info name="copy_protection" value="Error Detection and Correction / LibCrypt"/>
+		<info name="developer" value="Sunflowers"/>
+		<info name="language" value="German"/>
+		<info name="serial" value="SLES-02831"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="TechnoMage - Die Rueckkehr der Ewigkeit (Germany)" sha1="28464bf227d75597a190f7a19db49f6efb164e30"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="technomg_es" cloneof="technomg">
+		<!-- 
+		http://redump.org/disc/49569
+		<rom name="Technomage - El Retorno de la Eternidad (Spain).cue" size="113" crc="0b433ae7" sha1="0d4bfd43ff3d2984c862dfbd3f0b674741dedaff"/>
+		<rom name="Technomage - El Retorno de la Eternidad (Spain).bin" size="669393312" crc="0b82d025" sha1="02b2a823f207b1a3e42452a50df5259dbb7cf413"/>
+		-->
+		<description>Technomage: El Retorno de la Eternidad (Spain)</description>
+		<year>2001</year>
+		<publisher>Sunflowers</publisher>
+		<info name="barcode" value="3 546430 016602"/>
+		<info name="copy_protection" value="Error Detection and Correction / LibCrypt / Anti-modchip"/>
+		<info name="developer" value="Sunflowers"/>
+		<info name="language" value="Spanish"/>
+		<info name="serial" value="SLES-03244"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Technomage - El Retorno de la Eternidad (Spain)" sha1="ec8de298b3308891ac3705ab010b721c686661e3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="technomg_fr" cloneof="technomg">
+		<!-- 
+		http://redump.org/disc/49569
+		<rom name="TechnoMage - En Quete de L'Eternite (France).cue" size="110" crc="c17633fb" sha1="aefe1d47c49e1ef47bd6c2e059f93d39db238fd5"/>
+		<rom name="TechnoMage - En Quete de L'Eternite (France).bin" size="679666848" crc="a111b887" sha1="c54b68713ff2c4a0f43dff411243bb1ff538e6a8"/>
+		-->
+		<description>TechnoMage: En Quête de L'Eternité (France)</description>
+		<year>2001</year>
+		<publisher>Sunflowers</publisher>
+		<info name="barcode" value="3 546430 016596"/>
+		<info name="copy_protection" value="Error Detection and Correction / LibCrypt"/>
+		<info name="developer" value="Sunflowers"/>
+		<info name="language" value="French"/>
+		<info name="serial" value="SLES-03242"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="TechnoMage - En Quete de L'Eternite (France)" sha1="1f91b7fddbd089fa0304c2b3f35a96fca2235b44"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="technomg_it" cloneof="technomg">
+		<!-- 
+		http://redump.org/disc/46130
+		<rom name="TechnoMage - Ritorno all'Eternita (Italy).cue" size="107" crc="3cbf68ca" sha1="69a1e3cad8753b0e82e1cf5ca434d72706a287bb"/>
+		<rom name="TechnoMage - Ritorno all'Eternita (Italy).bin" size="672236880" crc="c28f565a" sha1="a84bdb4eab9571a3baa9a663ce7b93c8c3bb6e06"/>
+		-->
+		<description>TechnoMage: Ritorno all'Eternitá (Italy)</description>
+		<year>2001</year>
+		<publisher>Sunflowers</publisher>
+		<info name="barcode" value="3 546430 018224"/>
+		<info name="copy_protection" value="Error Detection and Correction / LibCrypt"/>
+		<info name="developer" value="Sunflowers"/>
+		<info name="language" value="Italian"/>
+		<info name="serial" value="SLES-03243"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="TechnoMage - Ritorno all'Eternita (Italy)" sha1="4c21ba6694b26a2421a06f4c88cdc9e2fc3be6db"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- http://redump.org/disc/19603/ -->
 	<software name="tenchude" cloneof="tenchu">
 		<description>Tenchu: Stealth Assassins (Europe, demo)</description>
@@ -62361,7 +62931,11 @@ During gameplay, the commentary speech audio is playing too fast
 		<year>1997</year>
 		<publisher>Ocean</publisher>
 		<info name="developer" value="MicroProse"/>
-		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="19970915"/>
 		<info name="serial" value="SLES-00262"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>

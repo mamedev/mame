@@ -42,7 +42,7 @@ public:
 		, m_ioc(*this, "ioc")
 		, m_memc(*this, "memc")
 		, m_vidc10(*this, "vidc")
-		{ }
+	{ }
 
 	void ertictac(machine_config &config);
 
@@ -182,38 +182,38 @@ static INPUT_PORTS_START( poizone )
 	// TODO: default settings
 	PORT_MODIFY("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW1:3" )
-	PORT_DIPNAME( 0x30, 0x40, "Coinage 1" ) PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPNAME( 0x30, 0x00, "Coinage 1" ) PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xC0, 0x00, "Coinage 2" ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, "Coinage 2" ) PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0xC0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Setting 1" ) PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x01, "Manual" )
 	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0x1A, 0x1A, "Setting 2" )  PORT_DIPLOCATION("DSW2:3,4,5")
+	PORT_DIPNAME( 0x1a, 0x1a, "Setting 2" )  PORT_DIPLOCATION("DSW2:3,4,5")
 	PORT_DIPSETTING(    0x00, "Extremely Easy - 2:00")  PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x02, "Very Easy - 1:30")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x08, "Easy - 2:00")    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x0A, "Normal 1 - 1:30")    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x0a, "Normal 1 - 1:30")    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x10, "Normal 2 - 1:45")    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x12, "Difficult - 2:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x18, "Very Difficult - 2:00")  PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x1A, "Extremely Difficult - 1:30") PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x1a, "Extremely Difficult - 1:30") PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "Clear 20% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x02, "Clear 30% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x08, "Clear 40% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x0A, "Clear 50% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x0a, "Clear 50% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x10, "Clear 60% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x12, "Clear 70% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x18, "Clear 80% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x1A, "Clear 90% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x1a, "Clear 90% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW2:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW2:6" )
 INPUT_PORTS_END
@@ -350,7 +350,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1990, ertictac,         0, ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic",          MACHINE_IMPERFECT_SOUND)
+GAME( 1990, ertictac,  0,        ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic",          MACHINE_IMPERFECT_SOUND)
 GAME( 1990, ertictaca, ertictac, ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic (ver 01)", MACHINE_IMPERFECT_SOUND)
 GAME( 1990, ertictacb, ertictac, ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic (set 2)",  MACHINE_IMPERFECT_SOUND)
-GAME( 1991, poizone,          0, ertictac, poizone,  ertictac_state, init_ertictac, ROT0, "Eterna",  "Poizone",                   MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1991, poizone,   0,        ertictac, poizone,  ertictac_state, init_ertictac, ROT0, "Eterna",  "Poizone",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)

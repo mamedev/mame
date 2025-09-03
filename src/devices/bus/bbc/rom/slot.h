@@ -46,7 +46,7 @@ public:
 
 	void set_fixed_ram(bool fixed) { this->set_fixed(fixed); this->set_user_loadable(!fixed); }
 
-	virtual bool present() { return is_loaded() || loaded_through_softlist() || !user_loadable(); }
+	virtual bool present();
 
 	uint32_t get_rom_size();
 	uint32_t get_slot_size() const { return m_slot_size; }
@@ -61,7 +61,7 @@ protected:
 	uint32_t m_slot_size;
 
 private:
-	device_bbc_rom_interface*   m_cart;
+	device_bbc_rom_interface *m_cart;
 };
 
 // ======================> bbc_romslot16_device

@@ -188,7 +188,6 @@ void junofrst_state::blitter_w(offs_t offset, uint8_t data)
 				src++;
 
 				/* if there is a source pixel either copy the pixel or clear the pixel depending on the copy flag */
-
 				if (data)
 				{
 					if (!copy)
@@ -216,7 +215,6 @@ uint8_t junofrst_state::portA_r()
 	int const timer = (m_audiocpu->total_cycles() / (1024 / 2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
-
 	return (timer << 4) | m_i8039_status;
 }
 

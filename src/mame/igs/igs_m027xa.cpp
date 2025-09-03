@@ -913,6 +913,7 @@ void igs_m027xa_state::init_wldfruit()
 
 void igs_m027xa_state::init_jking04()
 {
+	jking04_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
@@ -920,6 +921,7 @@ void igs_m027xa_state::init_jking04()
 
 void igs_m027xa_state::init_krzykeno()
 {
+	krzykeno_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);

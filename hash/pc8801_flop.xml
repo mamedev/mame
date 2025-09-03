@@ -28469,17 +28469,15 @@ Gameplay is too fast, needs [V1S]
 		</part>
 	</software>
 
-	<software name="rtishtar" supported="no">
+	<software name="rtishtar">
 		<description>The Return of Ishtar</description>
 		<year>1987</year>
 		<publisher>S·P·S</publisher>
-		<notes><![CDATA[
-Shows a SD Ki animation screen and hangs (which should also do mid-frame palette changes), wants floppy with [Write Protect] flag
-]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198708xx"/>
 		<info name="alt_title" value="ザ・リターン・オブ・イシター"/>
-		<info name="usage" value="Boot with write protect enabled"/>
+		<!-- Would otherwise throw a SD Ki animation screen (with raster effect palette), with hang -->
+		<sharedfeat name="write_protected" value="true" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="422832">
 				<rom name="the return of ishtar.d88" size="422832" crc="dffe6edc" sha1="b6a34f5f5c8eb0d947cb504fe8d07d6e052d6fed"/>
@@ -41528,7 +41526,8 @@ Not extensively tested
 		<description>Amazing Disk Episode I</description>
 		<year>1987</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Onion Soft / Alphax" />
+		<info name="developer" value="Onion Soft" />
+		<info name="developer" value="Alphax" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 34002 -->
 				<rom name="amazing disk episode i.d88" size="348848" crc="26851b3d" sha1="20a163df982507c9ad8177d7a978c0a018712478"/>
@@ -41540,7 +41539,8 @@ Not extensively tested
 		<description>Amazing Disk Episode II</description>
 		<year>1987</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Onion Soft / Alphax" />
+		<info name="developer" value="Onion Soft" />
+		<info name="developer" value="Alphax" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 41311 -->
 				<rom name="amazing disk episode ii.d88" size="348848" crc="a136a79e" sha1="1efaa89e7de137d09f5c552bc645ce1bbf4bb40c"/>
@@ -41552,7 +41552,8 @@ Not extensively tested
 		<description>Amazing Disk Episode III</description>
 		<year>1987</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Onion Soft / Alphax" />
+		<info name="developer" value="Onion Soft" />
+		<info name="developer" value="Alphax" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 57249 -->
 				<rom name="amazing disk episode iii.d88" size="348848" crc="75a61353" sha1="0e813364d53701fbea17e96c1134e87fd8b72b6b"/>
@@ -41969,7 +41970,8 @@ No BGM on title screen, locks up on game selection, requires a [i8214] sound irq
 		<description>Card Force III</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="SSL / PeachLand" />
+		<info name="developer" value="SSL" />
+		<info name="developer" value="PeachLand" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="263760">
 				<rom name="card force iii.d88" size="263760" crc="202d4468" sha1="12429c9f7b5ebfc17e60e4f20b2d426a9e006852"/>
@@ -41981,7 +41983,8 @@ No BGM on title screen, locks up on game selection, requires a [i8214] sound irq
 		<description>Card Force IV</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="SSL / PeachLand" />
+		<info name="developer" value="SSL" />
+		<info name="developer" value="PeachLand" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="422160">
 				<rom name="card force iv.d88" size="422160" crc="af0db9fc" sha1="6a867ef92335c5eb7687a50deafb7411a033ab93"/>
@@ -42114,6 +42117,9 @@ No BGM on title screen, locks up on game selection, requires a [i8214] sound irq
 		<description>Charie Music Gallery Vol.2</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Unresponsive [keyboard] in main menu
+]]></notes>
 		<info name="developer" value="Charie Soft" />
 		<info name="alt_title" value="チャーリーソフトMG2"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -42129,6 +42135,7 @@ No BGM on title screen, locks up on game selection, requires a [i8214] sound irq
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="release" value="19901202" />
+		<!-- NOTE: different than Charie Soft -->
 		<info name="developer" value="Charlie Soft" />
 		<!--combined image-->
 		<!--rom name="charie music disk 4.d88" size="732512" crc="458d72f4" sha1="44edcf62557dca160fe91990f75cd54be5aed343"/-->
@@ -42201,8 +42208,8 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 		<description>Charlie Music Disk 5.0</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Charlie Soft" />
 		<info name="release" value="19910817" />
+		<info name="developer" value="Charlie Soft" />
 		<!--combined image-->
 		<!--rom name="ongaku_disk_5.d88" size="1046544" crc="0875deab" sha1="be756d95d2bb4cc062fe677f7a2bccb74bc3eeb7" /-->
 

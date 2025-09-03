@@ -15,7 +15,7 @@ The MCU is inside the cartridge, not the console, in theory it could have any MC
 The console itself has the video hardware and controls.
 
 TODO:
-- change cartridge to slot device? there are free homebrew games by Infuto that
+- change cartridge to slot device? there are free homebrew games by Inufuto that
   currently won't work, since cartridge PCB has an MC6803 + 32KB ROM + 8KB RAM
 
 *******************************************************************************/

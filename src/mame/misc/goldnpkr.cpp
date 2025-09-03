@@ -2135,7 +2135,7 @@ void goldnpkr_state::kmhpan_map(address_map &map)
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW1");
 	map(0x2400, 0x2400).w("sn", FUNC(sn76489a_device::write));
-//	map(0x2800, 0x2800).w  // SN76489AN, initialized but not present on PCB. not written during gameplay
+//  map(0x2800, 0x2800).w  // SN76489AN, initialized but not present on PCB. not written during gameplay
 	map(0x4000, 0x7fff).rom();
 	map(0xc000, 0xffff).rom();  // extended rom space
 }
@@ -2166,7 +2166,7 @@ void goldnpkr_state::wing_w90_map(address_map &map)
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW1");
 	map(0x2400, 0x2400).w("snsnd", FUNC(sn76489_device::write));  // SN76489AN PSG
-//	map(0x2800, 0x2800).w();  // Initializes another SN76489, not present in the PCB, and then no activity
+//  map(0x2800, 0x2800).w();  // Initializes another SN76489, not present in the PCB, and then no activity
 	map(0x4000, 0x7fff).rom();  // bankswitched through 74ls154
 	map(0xc000, 0xffff).rom();  // bankswitched through 74ls154
 }
@@ -5000,7 +5000,7 @@ static INPUT_PORTS_START( wing_w90 )  // wing w90-3 pcb
 	PORT_DIPSETTING(    0x00, "Ok" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( unkicpetg )  // ICP-1 w/daughterboard
+static INPUT_PORTS_START( icp_etg )  // ICP-1 w/daughterboard
 	PORT_INCLUDE( goldnpkr )
 
 	PORT_MODIFY("IN0-3")
@@ -5761,7 +5761,7 @@ void goldnpkr_state::wing_w90(machine_config &config)
 	goldnpkr_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::wing_w90_map);
-	
+
 	PIA6821(config.replace(), m_pia[1]);
 	m_pia[1]->readpa_handler().set(FUNC(goldnpkr_state::snsnd_ready_r));
 	m_pia[1]->writepa_handler().remove();
@@ -13224,7 +13224,7 @@ ROM_START( wing90pkr )
 	ROM_LOAD( "6.17a", 0x7000, 0x1000, CRC(84c6a3cd) SHA1(41fda1f76318771fe8bc475edd25b3c9540b6167) )
 	ROM_CONTINUE(      0xf000, 0x1000 )
 
-    // ROM 3-6a is bad. Should have the jokers missing bitplane at 1000-17FF, but it's not there
+	// ROM 3-6a is bad. Should have the jokers missing bitplane at 1000-17FF, but it's not there
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_FILL(          0x0000, 0x1000, 0x0000 )
 	ROM_LOAD( "3.6a",  0x1000, 0x0800, BAD_DUMP CRC(efff6f44) SHA1(270dec73cbd86016bdb4c79cfd27dfaf9ce0c986) )
@@ -13234,7 +13234,7 @@ ROM_START( wing90pkr )
 	ROM_LOAD( "1.2a",  0x0000, 0x0800, CRC(b85e1275) SHA1(1de37c634643e5ddde0a16a80a9c16625bebfb08) )
 	ROM_CONTINUE(      0x0000, 0x1000 )
 	ROM_IGNORE(                0x0800 )
-	ROM_LOAD( "2.4a",  0x1000, 0x0800, CRC(f475b43e) SHA1(b09544828a75c592e27fdc69646b594cbfcf0483) ) 
+	ROM_LOAD( "2.4a",  0x1000, 0x0800, CRC(f475b43e) SHA1(b09544828a75c592e27fdc69646b594cbfcf0483) )
 	ROM_CONTINUE(      0x1000, 0x1000 )
 	ROM_IGNORE(                0x0800 )
 	ROM_LOAD( "3.6a",  0x2000, 0x0800, BAD_DUMP CRC(efff6f44) SHA1(270dec73cbd86016bdb4c79cfd27dfaf9ce0c986) )
@@ -13309,44 +13309,10 @@ ROM_START( unkicpf80 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
-/*
-  EX-TURBO-GT poker
-  ICP PCBs with daughterboard.
-
-  Game type selectable via DIP switches.
-
-  * Normal mode.
-  * Turbo mode.
-  * Turbo-GT 8-Bet mode.
-  * EX-Turbo 16-Bet mode.
-
-*/
-ROM_START( unkicpetg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a.bin", 0x6000, 0x1000, CRC(bb8092f2) SHA1(47dbe72bf76cf99d94471691deb1d8dc67f87ef3) )
-	ROM_LOAD( "b.bin", 0x7000, 0x1000, CRC(ead750c8) SHA1(1754c7069ccb8b3460a84886e818eb240474d791) )
-	ROM_LOAD( "c.bin", 0xf000, 0x1000, CRC(3ed958af) SHA1(b7fcedc840919bee9d42d7501c66930a3c53ff83) )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(         0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
-	ROM_LOAD( "4.8a", 0x1000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // char ROM
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
-	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
-	ROM_LOAD( "3.7a", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane3
-
-	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
-	ROM_LOAD( "unkicpetg_nvram.bin", 0x0000, 0x0800, CRC(aed44123) SHA1(d7993de94654ec70ff9fdcabf27c6fdafae89485) )
-
-	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
-	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-	ROM_CONTINUE(           0x0000, 0x0100 )
-ROM_END
 
 /*
   The following are programs that fit
@@ -13354,13 +13320,55 @@ ROM_END
   looks like hacks and some real programs
   to change different game functionalities.
 
-*/  
+  They add new features like FEVER function,
+  Auto Start, or different bet ammounts using
+  the hold buttons.
+
+*/
 
 ROM_START( icpf40_01 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "137_7_10b_sub.bin",   0x6000, 0x1000, CRC(698a04c1) SHA1(f3e3cfef5ef3d517b2c1550c85d0be09f1fa17b1) )
 	ROM_LOAD( "137_8_10b_sub.bin",   0x7000, 0x1000, CRC(d5c43fce) SHA1(6797d9cd485791dba8be0d2136b6f713f9e2908e) )
 	ROM_LOAD( "137fv_10yen_f40.bin", 0xf000, 0x1000, CRC(17974f36) SHA1(14f4780977fd35d0dafc204b9e4408aefe0cc8e1) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "34.8a", 0x2000, 0x1000, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1", 0x2800, 0x1000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "137_82s131_bprom.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+ROM_END
+
+ROM_START( icpf40_02 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "137_7_10b_sub.bin", 0x6000, 0x1000, CRC(698a04c1) SHA1(f3e3cfef5ef3d517b2c1550c85d0be09f1fa17b1) )
+	ROM_LOAD( "137_8_10b_sub.bin", 0x7000, 0x1000, CRC(d5c43fce) SHA1(6797d9cd485791dba8be0d2136b6f713f9e2908e) )
+	ROM_LOAD( "jap_9a.bin",        0xf000, 0x1000, CRC(074b3510) SHA1(8cce67f6f0fec19d1868a595f51f1292e072ef2e) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "34.8a", 0x2000, 0x1000, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1", 0x2800, 0x1000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "137_82s131_bprom.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+ROM_END
+
+ROM_START( icpf40_03 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "100yen_7.bin", 0x6000, 0x1000, CRC(698a04c1) SHA1(f3e3cfef5ef3d517b2c1550c85d0be09f1fa17b1) )
+	ROM_LOAD( "100yen_8.bin", 0x7000, 0x1000, CRC(36bad2b9) SHA1(15ef64c14c12335bbacb7b0819169232cdc46259) )
+	ROM_LOAD( "jap_9a.bin",   0xf000, 0x1000, CRC(074b3510) SHA1(8cce67f6f0fec19d1868a595f51f1292e072ef2e) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(          0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
@@ -13392,8 +13400,8 @@ ROM_START( icpf80_01 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_02 )
@@ -13413,8 +13421,8 @@ ROM_START( icpf80_02 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_03 )
@@ -13434,8 +13442,8 @@ ROM_START( icpf80_03 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_04 )
@@ -13455,8 +13463,8 @@ ROM_START( icpf80_04 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_05 )
@@ -13476,8 +13484,8 @@ ROM_START( icpf80_05 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_06 )
@@ -13497,8 +13505,8 @@ ROM_START( icpf80_06 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_07 )
@@ -13518,8 +13526,8 @@ ROM_START( icpf80_07 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_08 )
@@ -13539,8 +13547,8 @@ ROM_START( icpf80_08 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_09 )
@@ -13560,8 +13568,8 @@ ROM_START( icpf80_09 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_10 )
@@ -13581,8 +13589,8 @@ ROM_START( icpf80_10 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_11 )
@@ -13602,8 +13610,8 @@ ROM_START( icpf80_11 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_12 )
@@ -13623,8 +13631,8 @@ ROM_START( icpf80_12 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_13 )
@@ -13644,8 +13652,8 @@ ROM_START( icpf80_13 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_14 )
@@ -13665,8 +13673,8 @@ ROM_START( icpf80_14 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_15 )
@@ -13686,8 +13694,8 @@ ROM_START( icpf80_15 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_16 )
@@ -13707,8 +13715,8 @@ ROM_START( icpf80_16 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_17 )
@@ -13728,8 +13736,8 @@ ROM_START( icpf80_17 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_18 )
@@ -13749,8 +13757,8 @@ ROM_START( icpf80_18 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_19 )
@@ -13770,8 +13778,8 @@ ROM_START( icpf80_19 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
 ROM_END
 
 ROM_START( icpf80_20 )
@@ -13791,8 +13799,103 @@ ROM_START( icpf80_20 )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
 	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
-//	ROM_CONTINUE(           0x0000, 0x0100 )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
+ROM_END
+
+ROM_START( icpf80_21 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "7_blue.bin",   0x6000, 0x1000, CRC(333145a9) SHA1(daaef6d19daaa6c02e73fa7be40a7711f306d321) )
+	ROM_LOAD( "8_green.bin",  0x7000, 0x1000, CRC(42c6b655) SHA1(c78be07d64d632e53b06b193084e17d9f0d07b3e) )
+	ROM_LOAD( "9_reddot.bin", 0xf000, 0x1000, CRC(6a541674) SHA1(7288b713d324fdbe9eb0030a81757baaa55a5738) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(         0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "4.8a", 0x1000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_LOAD( "3.7a", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+//  ROM_CONTINUE(           0x0000, 0x0100 )
+ROM_END
+
+
+/*
+  EX-TURBO-GT poker
+  ICP PCBs with daughterboard.
+
+  Game type selectable via DIP switches.
+
+  * Normal mode.
+  * Turbo mode.
+  * Turbo-GT 8-Bet mode.
+  * EX-Turbo 16-Bet mode.
+
+*/
+ROM_START( icp_etg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a.bin", 0x6000, 0x1000, CRC(bb8092f2) SHA1(47dbe72bf76cf99d94471691deb1d8dc67f87ef3) )
+	ROM_LOAD( "b.bin", 0x7000, 0x1000, CRC(ead750c8) SHA1(1754c7069ccb8b3460a84886e818eb240474d791) )
+	ROM_LOAD( "c.bin", 0xf000, 0x1000, CRC(3ed958af) SHA1(b7fcedc840919bee9d42d7501c66930a3c53ff83) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(         0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "4.8a", 0x1000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_LOAD( "3.7a", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+	ROM_LOAD( "icp_etg_nvram.bin", 0x0000, 0x0800, CRC(aed44123) SHA1(d7993de94654ec70ff9fdcabf27c6fdafae89485) )
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+	ROM_CONTINUE(           0x0000, 0x0100 )
+ROM_END
+
+ROM_START( techtrna )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ex_7.bin",   0x6000, 0x1000, CRC(c7d57797) SHA1(2050654860145c64533d5a16ad7076f7ae01b48c) )
+	ROM_LOAD( "ex_8.bin",   0x7000, 0x1000, CRC(e5985cf1) SHA1(e35fbbe5a620a6cf2a0f79416ef9728ad46033db) )
+	ROM_LOAD( "ex_red.bin", 0xf000, 0x1000, CRC(91a3a5e9) SHA1(febd6057be8c91dc9ed916e2bf015b1d5ea61d36) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(         0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "4.8a", 0x1000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_LOAD( "3.7a", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+ROM_END
+
+ROM_START( techtrnb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ex_7.bin",    0x6000, 0x1000, CRC(c7d57797) SHA1(2050654860145c64533d5a16ad7076f7ae01b48c) )
+	ROM_LOAD( "ex_8_20.bin", 0x7000, 0x1000, CRC(5c1a0a0e) SHA1(0d28b972afeef6e313bd4c0ea9ea648d7b2350a6) )
+	ROM_LOAD( "ex_red.bin",  0xf000, 0x1000, CRC(91a3a5e9) SHA1(febd6057be8c91dc9ed916e2bf015b1d5ea61d36) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(         0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "4.8a", 0x1000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_LOAD( "3.7a", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "82s131.bin", 0x0000, 0x0200, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
 ROM_END
 
 
@@ -13802,6 +13905,50 @@ ROM_START( gp_turbo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "turbo_7.bin", 0x2000, 0x1000, CRC(c9a059be) SHA1(b77953cfd86d079f7be86f85e9e3e289372e34ca) )
 	ROM_LOAD( "turbo_8.bin", 0x3000, 0x1000, CRC(5ccfb5cc) SHA1(ea9dafb41a4f206ad32f1a66d0eb4a79f8f3b7b0) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "ic7_0.bin",  0x2000, 0x1000, CRC(1090e7f0) SHA1(26a7fc8853debb9a759811d7fee39410614c3895) )    // char ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "ic2_7.bin",  0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "ic3_8.bin",  0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "ic5_9.bin",  0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+	ROM_LOAD( "gp_turbo_nvram.bin", 0x0000, 0x0800, CRC(4e5fa405) SHA1(287f26240128f3aa4af936fb51bf1488da32462a) )
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+	ROM_CONTINUE(           0x0000, 0x0100 )
+ROM_END
+
+ROM_START( gp_turboa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "7_white.bin", 0x2000, 0x1000, CRC(4707a436) SHA1(2415a048299f1c11909f868ea0c7915bd083ccab) )
+	ROM_LOAD( "b_turbo.bin", 0x3000, 0x1000, CRC(44b60bde) SHA1(353731929cbde7be113086cf6aa9b523d5500b76) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "ic7_0.bin",  0x2000, 0x1000, CRC(1090e7f0) SHA1(26a7fc8853debb9a759811d7fee39410614c3895) )    // char ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "ic2_7.bin",  0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "ic3_8.bin",  0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "ic5_9.bin",  0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+	ROM_LOAD( "gp_turbo_nvram.bin", 0x0000, 0x0800, CRC(4e5fa405) SHA1(287f26240128f3aa4af936fb51bf1488da32462a) )
+
+	ROM_REGION( 0x0200, "proms", 0 )  // the second half has the palette for black background instead of blue.
+	ROM_LOAD( "82s131.bin", 0x0000, 0x0100, CRC(41ff6a5d) SHA1(a5a69b1ac6022fa2c51480250f875328ae44d7ff) )
+	ROM_CONTINUE(           0x0000, 0x0100 )
+ROM_END
+
+ROM_START( gp_turbob )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "15_60.bin",    0x2000, 0x1000, CRC(55d191ec) SHA1(41ffcb48750f63f41c94031e9740da9f1935fef1) )
+	ROM_LOAD( "50square.bin", 0x3000, 0x1000, CRC(b945a91d) SHA1(7cc913d271d492b4c38a4a2e698f07adf371831e) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(               0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
@@ -13842,6 +13989,24 @@ ROM_START( gp_ped42_95 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gp_ped42.a",    0x6000, 0x1000, CRC(e583e157) SHA1(331f68ac4c5458722848ad8e2e28caf759c2106a) )
 	ROM_LOAD( "gp_ped42.b95",  0x7000, 0x1000, CRC(26bc2b04) SHA1(485ea98c203a0b842142e88bfa7908229cfca237) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "u38_5a.bin", 0x4000, 0x2000, CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char ROM
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "u43_2a.bin", 0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "u40_4a.bin", 0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1",   0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+ROM_START( gp_ped42_95a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gp_ped42.a",    0x6000, 0x1000, CRC(e583e157) SHA1(331f68ac4c5458722848ad8e2e28caf759c2106a) )
+	ROM_LOAD( "4_a_8.bin",     0x7000, 0x1000, CRC(5e5afaa6) SHA1(4d4abfcbc51d23c166959c5aa087971b75024f0a) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_FILL(               0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
@@ -13966,11 +14131,11 @@ ROM_END
                      '-------------'
 
   Sets:
-  
+
   dash_a37    DASH! A37             1998/10/22   VER OCT 22, 98
   dash_a37b   DASH! A37             1996/11/18,  AVANTY  50 BET SPECIAL
   lfhouse     Lucky Full House      1996/02/01 ver 1.16, DATA ver 1.05
-  lfhouseb    Lucky Full House      1994/08/26 ver 1.15, DATA ver 1.04 
+  lfhouseb    Lucky Full House      1994/08/26 ver 1.15, DATA ver 1.04
   dynchance   Dynamic Chance        type-3.0 1992/08/29  PART 1-2
   dynchancf   Dynamic Chance(alt)   type-3.0 1992/08/29  PART 1-2  (only 4 bytes of difference)
   dynplus     Dynamic Plus One      1997/01/13, SP TYPE Ver 1.10
@@ -14053,7 +14218,7 @@ ROM_START( lfhouse )
 	ROM_IGNORE(               0x4000 )
 	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
 	ROM_IGNORE(               0x4000 )
-	
+
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
 	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
 	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
@@ -14087,7 +14252,7 @@ ROM_START( lfhouseb )
 	ROM_IGNORE(               0x4000 )
 	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
 	ROM_IGNORE(               0x4000 )
-	
+
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
 	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
 	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
@@ -14121,7 +14286,7 @@ ROM_START( dynchance )
 	ROM_IGNORE(                 0x4000 )
 	ROM_LOAD( "mk3.5n", 0x4000, 0x4000, CRC(3f6c00cb) SHA1(fd45a515a068bf6e2dfa95d411029da0f2eb512c) )
 	ROM_IGNORE(                 0x4000 )
-	
+
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
 	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (data)
 	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (data)
@@ -14155,7 +14320,7 @@ ROM_START( dynchancf )
 	ROM_IGNORE(                 0x4000 )
 	ROM_LOAD( "mk3.5n", 0x4000, 0x4000, CRC(3f6c00cb) SHA1(fd45a515a068bf6e2dfa95d411029da0f2eb512c) )
 	ROM_IGNORE(                 0x4000 )
-	
+
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
 	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (data)
 	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (data)
@@ -14189,7 +14354,7 @@ ROM_START( dynplus )
 	ROM_IGNORE(                 0x4000 )
 	ROM_LOAD( "mk3.5n", 0x4000, 0x4000, CRC(3f6c00cb) SHA1(fd45a515a068bf6e2dfa95d411029da0f2eb512c) )
 	ROM_IGNORE(                 0x4000 )
-	
+
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
 	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (data)
 	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (data)
@@ -14925,9 +15090,10 @@ GAME(  198?, wing90pkr, goldnpkr, wing_w90, wing_w90, goldnpkr_state, empty_init
 
 GAME(  198?, unkicpf40, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F40 poker (137 Fever, 10 bet)",       0 )
 GAME(  198?, unkicpf80, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F80 poker (137 Fever, 50 bet)",       0 )
-GAME(  198?, unkicpetg, 0,        unkicpf40, unkicpetg, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP EX-Turbo-GT poker",                   0 )
 
-GAME(  198?, icpf40_01, unkicpf40, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F40 poker (137fv_10yen_f40, autostart)", 0 )
+GAME(  198?, icpf40_01, unkicpf40, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F40 poker (137fv_10yen_f40)",         0 )
+GAME(  198?, icpf40_02, unkicpf40, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F40 poker (jap_9a)",                  0 )
+GAME(  198?, icpf40_03, unkicpf40, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F40 poker (100yen)",                  0 )
 GAME(  198?, icpf80_01, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_50_100)",              0 )
 GAME(  198?, icpf80_02, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9.bin)",               0 )
 GAME(  198?, icpf80_03, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_0jap)",              0 )
@@ -14946,16 +15112,24 @@ GAME(  198?, icpf80_15, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_i
 GAME(  198?, icpf80_16, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (af_80_older)",             0 )
 GAME(  198?, icpf80_17, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (jap_9)",                   0 )
 GAME(  198?, icpf80_18, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (jap_9_jap)",               0 )
-GAME(  198?, icpf80_19, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (redx_9_40_45_50_60.bin)",  0 )
-GAME(  198?, icpf80_20, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (redx_9_7.bin)",            0 )
+GAME(  198?, icpf80_19, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (redx_9_40_45_50_60)",      0 )
+GAME(  198?, icpf80_20, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (redx_9_7)",                0 )
+GAME(  198?, icpf80_21, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (blue-green-red dots)",     0 )
 
-GAME(  198?, gp_turbo,  0,        pottnpkr,  pottnpkr,  goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Unknown Turbo Poker",                     0 )  // no lamps
-GAME(  198?, gp_jpn22,  goldnpkr, goldnpkr,  goldnpkr,  goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Unknown Golden Poker (Japan Ver. 2.2)",   0 )  // no lamps
-GAME(  1987, gp_ped42_95, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 95%)",          0 )  // no lamps
-GAME(  1987, gp_ped42_90, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 90%)",          0 )  // no lamps
-GAME(  1987, gp_ped42_85, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 85%)",          0 )  // no lamps
-GAME(  1987, gp_ped42_80, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 80%)",          0 )  // no lamps
-GAME(  1987, gp_ped42_70, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42,  ROT0,   "<unknown>",                "Unknown Golden Poker (PED 70%)",          0 )  // no lamps
+GAMEL( 198?, icp_etg,   0,         unkicpf40, icp_etg,   goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP EX-Turbo-GT poker",                   0,                layout_goldnpkr )
+GAMEL( 198?, techtrna,  unkicpf80, unkicpf40, icp_etg,   goldnpkr_state, empty_init, ROT0,   "Techtron Japan",           "Techtron EX-Turbo-GT poker (set 1)",      0,                layout_goldnpkr )
+GAMEL( 198?, techtrnb,  unkicpf80, unkicpf40, icp_etg,   goldnpkr_state, empty_init, ROT0,   "Techtron Japan",           "Techtron EX-Turbo-GT poker (set 2)",      0,                layout_goldnpkr )
+
+GAME(  198?, gp_turbo,  0,         pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 1)",             0 )  // no lamps
+GAME(  198?, gp_turboa, gp_turbo,  pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 2)",             0 )  // no lamps
+GAME(  198?, gp_turbob, gp_turbo,  pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 3)",             0 )  // no lamps
+GAME(  198?, gp_jpn22,  goldnpkr,  goldnpkr,  goldnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Golden Poker (Japan Ver. 2.2)",   0 )  // no lamps
+GAME(  1987, gp_ped42_95,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 95%, set 1)",   0 )  // no lamps
+GAME(  1987, gp_ped42_95a, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 95%, set 2)",   0 )  // no lamps
+GAME(  1987, gp_ped42_90, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 90%)",          0 )  // no lamps
+GAME(  1987, gp_ped42_85, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 85%)",          0 )  // no lamps
+GAME(  1987, gp_ped42_80, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 80%)",          0 )  // no lamps
+GAME(  1987, gp_ped42_70, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 70%)",          0 )  // no lamps
 
 // DEP 9801 encrypted platform...
 GAME(  1998, dash_a37,  0,         dep_9801,  goldnpkr, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "Dash! (A37, ver 1998/10/22)",                MACHINE_NOT_WORKING )

@@ -29,8 +29,8 @@ public:
 	typedef device_delegate<void (int scanline)> md_32x_scanline_helper_delegate;
 
 	auto snd_irq() { return m_sndirqline_callback.bind(); }
-	auto lv6_irq() { return m_lv6irqline_callback.bind(); }
-	auto lv4_irq() { return m_lv4irqline_callback.bind(); }
+	auto vint_cb() { return m_lv6irqline_callback.bind(); }
+	auto hint_cb() { return m_lv4irqline_callback.bind(); }
 
 	void set_lcm_scaling(bool lcm_scaling) { m_lcm_scaling = lcm_scaling; }
 	void set_alt_timing(int use_alt_timing) { m_use_alt_timing = use_alt_timing; }
@@ -73,8 +73,22 @@ public:
 	TIMER_CALLBACK_MEMBER(irq4_on_timer_callback);
 	void vdp_handle_eof();
 	void device_reset_old();
-	void vdp_clear_irq6_pending() { m_irq6_pending = 0; }
-	void vdp_clear_irq4_pending() { m_irq4_pending = 0; }
+	void irq_ack()
+	{
+		if (machine().side_effects_disabled())
+			return;
+
+		if (m_irq6_pending)
+		{
+			m_irq6_pending = 0;
+			m_lv6irqline_callback(false);
+		}
+		else if (m_irq4_pending)
+		{
+			m_irq4_pending = 0;
+			m_lv4irqline_callback(false);
+		}
+	}
 
 	// set some VDP variables at start (shall be moved to a device interface?)
 	void set_scanline_counter(int scanline) { m_scanline_counter = scanline; }

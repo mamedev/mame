@@ -3727,7 +3727,7 @@ ROM_START( cltchitrbl ) // same PCB as ddcrewbl
 	ROM_REGION( 0x1000, "pic", ROMREGION_ERASE00 )
 	ROM_LOAD( "pic16c57", 0x0000, 0x1000, NO_DUMP )
 
-	
+
 	ROM_REGION( 0xc0000, "tiles", 0 ) // same as original, but for very minor differences in 1.gfx1
 	ROM_LOAD( "3.gfx1", 0x000000, 0x40000, CRC(0451f5f3) SHA1(5069edddf29a8190a73dc467b91ffcb80348aff6) )
 	ROM_LOAD( "2.gfx1", 0x040000, 0x40000, CRC(d7bd63fe) SHA1(ea5cf70db1303dd4564215fde824305637b97d05) )

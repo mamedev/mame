@@ -235,8 +235,6 @@ public:
 	void init_denib();
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
-	void esq5505_otis_irq(int state);
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -260,20 +258,12 @@ private:
 	uint16_t analog_r();
 	void analog_w(offs_t offset, uint16_t data);
 
-	void duart_irq_handler(int state);
-	void duart_tx_a(int state);
-	void duart_tx_b(int state);
 	void duart_output(uint8_t data);
 
 	void es5505_clock_changed(u32 data);
 
 	int m_system_type = 0;
 	uint8_t m_duart_io = 0;
-	uint8_t m_otis_irq_state = 0;
-	uint8_t m_dmac_irq_state = 0;
-	uint8_t m_duart_irq_state = 0;
-
-	void update_irq_to_maincpu();
 
 	static void floppy_formats(format_registration &fr);
 
@@ -286,9 +276,6 @@ private:
 	void eps_cpu_space_map(address_map &map) ATTR_COLD;
 
 	uint16_t m_analog_values[8];
-
-	//dmac
-	void dma_irq(int state);
 };
 
 void esq5505_state::floppy_formats(format_registration &fr)
@@ -311,9 +298,6 @@ void esq5505_state::eps_cpu_space_map(address_map &map)
 
 void esq5505_state::machine_start()
 {
-	m_otis_irq_state = 0;
-	m_dmac_irq_state = 0;
-	m_duart_irq_state = 0;
 }
 
 void esq5505_state::machine_reset()
@@ -349,35 +333,6 @@ void esq5505_state::machine_reset()
 		{
 			m_duart->ip0_w(ASSERT_LINE);
 		}
-	}
-}
-
-void esq5505_state::update_irq_to_maincpu()
-{
-	// printf("updating IRQ state: have OTIS=%d, DMAC=%d, DUART=%d\n", m_otis_irq_state, m_dmac_irq_state, m_duart_irq_state);
-	if (m_duart_irq_state)
-	{
-		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
-	}
-	else if (m_dmac_irq_state)
-	{
-		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
-	}
-	else if (m_otis_irq_state)
-	{
-		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 	}
 }
 
@@ -461,12 +416,6 @@ void esq5505_state::sq1_map(address_map &map)
 	map(0xff0000, 0xffffff).ram().share("osram");
 }
 
-void esq5505_state::esq5505_otis_irq(int state)
-{
-	m_otis_irq_state = (state != 0);
-	update_irq_to_maincpu();
-}
-
 void esq5505_state::es5505_clock_changed(u32 data)
 {
 	m_pump->set_unscaled_clock(data);
@@ -481,20 +430,6 @@ void esq5505_state::analog_w(offs_t offset, uint16_t data)
 uint16_t esq5505_state::analog_r()
 {
 	return m_analog_values[m_duart_io & 7];
-}
-
-void esq5505_state::duart_irq_handler(int state)
-{
-//    printf("\nDUART IRQ: state %d vector %d\n", state, vector);
-	if (state == ASSERT_LINE)
-	{
-		m_duart_irq_state = 1;
-	}
-	else
-	{
-		m_duart_irq_state = 0;
-	}
-	update_irq_to_maincpu();
 }
 
 void esq5505_state::duart_output(uint8_t data)
@@ -550,32 +485,6 @@ void esq5505_state::duart_output(uint8_t data)
 	}
 
 //    printf("DUART output: %02x (PC=%x)\n", data, m_maincpu->pc());
-}
-
-// MIDI send
-void esq5505_state::duart_tx_a(int state)
-{
-	m_mdout->write_txd(state);
-}
-
-void esq5505_state::duart_tx_b(int state)
-{
-	m_panel->rx_w(state);
-}
-
-void esq5505_state::dma_irq(int state)
-{
-	if (state != CLEAR_LINE)
-	{
-		logerror("DMAC error, vector = %x\n", m_dmac->iack());
-		m_dmac_irq_state = 1;
-	}
-	else
-	{
-		m_dmac_irq_state = 0;
-	}
-
-	update_irq_to_maincpu();
 }
 
 #if KEYBOARD_HACK
@@ -646,9 +555,9 @@ void esq5505_state::vfx(machine_config &config)
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
 
 	MC68681(config, m_duart, 4000000);
-	m_duart->irq_cb().set(FUNC(esq5505_state::duart_irq_handler));
-	m_duart->a_tx_cb().set(FUNC(esq5505_state::duart_tx_a));
-	m_duart->b_tx_cb().set(FUNC(esq5505_state::duart_tx_b));
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
+	m_duart->a_tx_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
+	m_duart->b_tx_cb().set(m_panel, FUNC(esqpanel_device::rx_w));
 	m_duart->outport_cb().set(FUNC(esq5505_state::duart_output));
 	m_duart->set_clocks(500000, 500000, 1000000, 1000000);
 
@@ -670,7 +579,7 @@ void esq5505_state::vfx(machine_config &config)
 	es5505.set_region0("waverom");  /* Bank 0 */
 	es5505.set_region1("waverom2"); /* Bank 1 */
 	es5505.set_channels(4);          /* channels */
-	es5505.irq_cb().set(FUNC(esq5505_state::esq5505_otis_irq)); /* irq */
+	es5505.irq_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 	es5505.read_port_cb().set(FUNC(esq5505_state::analog_r)); /* ADC */
 	es5505.add_route(0, "pump", 1.0, 0);
 	es5505.add_route(1, "pump", 1.0, 1);
@@ -704,7 +613,7 @@ void esq5505_state::eps(machine_config &config)
 	m_dmac->set_cpu_tag(m_maincpu);
 	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
-	m_dmac->irq_callback().set(FUNC(esq5505_state::dma_irq));
+	m_dmac->irq_callback().set_inputline(m_maincpu, M68K_IRQ_2);
 	m_dmac->dma_read<0>().set(m_fdc, FUNC(wd1772_device::data_r));  // ch 0 = fdc, ch 1 = 340001 (ADC?)
 	m_dmac->dma_write<0>().set(m_fdc, FUNC(wd1772_device::data_w));
 }
@@ -736,9 +645,9 @@ void esq5505_state::vfx32(machine_config &config)
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
 
 	MC68681(config, m_duart,  4000000);
-	m_duart->irq_cb().set(FUNC(esq5505_state::duart_irq_handler));
-	m_duart->a_tx_cb().set(FUNC(esq5505_state::duart_tx_a));
-	m_duart->b_tx_cb().set(FUNC(esq5505_state::duart_tx_b));
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
+	m_duart->a_tx_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
+	m_duart->b_tx_cb().set(m_panel, FUNC(esqpanel_device::rx_w));
 	m_duart->outport_cb().set(FUNC(esq5505_state::duart_output));
 	m_duart->set_clocks(500000, 500000, 1000000, 1000000);
 
@@ -760,7 +669,7 @@ void esq5505_state::vfx32(machine_config &config)
 	es5505.set_region0("waverom");  /* Bank 0 */
 	es5505.set_region1("waverom2"); /* Bank 1 */
 	es5505.set_channels(4);          /* channels */
-	es5505.irq_cb().set(FUNC(esq5505_state::esq5505_otis_irq)); /* irq */
+	es5505.irq_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 	es5505.read_port_cb().set(FUNC(esq5505_state::analog_r)); /* ADC */
 	es5505.add_route(0, "pump", 1.0, 0);
 	es5505.add_route(1, "pump", 1.0, 1);

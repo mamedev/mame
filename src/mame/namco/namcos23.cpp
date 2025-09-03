@@ -6092,24 +6092,35 @@ void crszone_state::machine_start()
 
 void namcos23_state::machine_reset()
 {
-	m_c435.buffer_pos = 0;
-	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_subcpu_running = false;
-
-	m_c435.direct_buf_pos = 0;
-	m_c435.direct_buf_nonempty = false;
-	m_c435.direct_buf_open = false;
-	memset(m_proj_matrix, 0, sizeof(float) * 24);
-	m_proj_matrix_line = 0;
 	m_absolute_priority = 0;
 	m_tx = 0;
 	m_ty = 0;
-	m_model_blend_factor = 0;
+	m_model_blend_factor = 0x4000;
 	m_camera_power = 0;
 	m_camera_ambient = 0;
+	memset(m_proj_matrix, 0, sizeof(m_proj_matrix));
+	m_proj_matrix_line = 0;
 
-	memset(m_c404.rowscroll, 0, sizeof(m_c404.rowscroll));
-	m_c404.lastrow = 0;
+	for (int i = 0; i < 256; i++)
+	{
+		memset(m_matrices[i], 0, sizeof(s16) * 9);
+		memset(m_vectors[i], 0, sizeof(s32) * 3);
+	}
+	memset(m_light_vector, 0, sizeof(m_light_vector));
+	m_scaling = 0x4000;
+	memset(m_spv, 0, sizeof(m_spv));
+	memset(m_spm, 0, sizeof(m_spm));
+
+	memset(&m_c404, 0, sizeof(c404_t));
+	m_c361.scanline = 0;
+	memset(&m_c417, 0, sizeof(c417_t));
+	memset(&m_c412, 0, sizeof(c412_t));
+	memset(&m_c421, 0, sizeof(c421_t));
+	memset(&m_c422, 0, sizeof(c422_t));
+	memset(&m_c435, 0, sizeof(c435_t));
+
+	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_subcpu_running = false;
 
 	m_subcpu_scanline_on_timer->adjust(attotime::zero, 0, m_screen->scan_period());
 	m_subcpu_scanline_off_timer->adjust(m_screen->time_until_pos(0, 32), 0, m_screen->time_until_pos(0, 32) + m_screen->scan_period());
@@ -6117,6 +6128,8 @@ void namcos23_state::machine_reset()
 	m_jvs_sense = 1;
 	m_main_irqcause = 0;
 	m_ctl_vbl_active = false;
+	m_ctl_led = 0;
+	m_ctl_inp_buffer[0] = m_ctl_inp_buffer[1] = 0;
 	m_sub_port8 = 0x02;
 	m_sub_porta = 0;
 	m_sub_portb = 0x50;
@@ -7945,6 +7958,9 @@ ROM_START( downhill ) // Dump has been reprogrammed on blank flash ROMs and test
 	ROM_LOAD( "dh1cglm.5k",   0x000000, 0x800000, CRC(5d9a5e35) SHA1(d746abb45f04aa4eb9d43d9c79051e71bf024e38) )
 	ROM_LOAD( "dh1ccrl.7m",   0x000000, 0x400000, CRC(65c857df) SHA1(5d67b17cf272f042b4264d9871d6e4088c20b788) )
 	ROM_LOAD( "dh1ccrh.7k",   0x000000, 0x200000, CRC(f21c482d) SHA1(bfcead2ff3d10f996ac0bf81470d050bd6374156) )
+
+	ROM_REGION( 0x010000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x010000, CRC(1195e532) SHA1(1c88b2d83c290f79e9505dda5beb4ae3a85d5d30) )
 ROM_END
 
 
@@ -7991,6 +8007,9 @@ ROM_START( downhillu )
 	ROM_LOAD( "dh1cglm.5k",   0x000000, 0x800000, CRC(5d9a5e35) SHA1(d746abb45f04aa4eb9d43d9c79051e71bf024e38) )
 	ROM_LOAD( "dh1ccrl.7m",   0x000000, 0x400000, CRC(65c857df) SHA1(5d67b17cf272f042b4264d9871d6e4088c20b788) )
 	ROM_LOAD( "dh1ccrh.7k",   0x000000, 0x200000, CRC(f21c482d) SHA1(bfcead2ff3d10f996ac0bf81470d050bd6374156) )
+
+	ROM_REGION( 0x010000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x010000, CRC(1195e532) SHA1(1c88b2d83c290f79e9505dda5beb4ae3a85d5d30) )
 ROM_END
 
 
@@ -8045,7 +8064,7 @@ ROM_END
 
 ROM_START( crszonev4a )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 8 megs for main R4650 code */
-	ROM_LOAD16_WORD_SWAP( "cszo4vera.ic4", 0x000000, 0x800000, CRC(cabee8c3) SHA1(4887b8550038c072f988c5999d57ec40e82e4072) )
+	ROM_LOAD16_WORD_SWAP( "cszo4vera.ic4", 0x000000, 0x800000, CRC(3755b402) SHA1(e169fded9d136af7ce6997868629eed5196b8cdd) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic1", 0x000000, 0x080000, CRC(c790743b) SHA1(5fa7b83a7a1b1105a3aa0870b782cf2741b7d11c) )
@@ -8143,7 +8162,7 @@ ROM_END
 
 ROM_START( crszonev3b2 )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 8 megs for main R4650 code */
-	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic4", 0x000000, 0x800000, CRC(3755b402) SHA1(e169fded9d136af7ce6997868629eed5196b8cdd) ) // sldh
+	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic4", 0x000000, 0x800000, CRC(cabee8c3) SHA1(4887b8550038c072f988c5999d57ec40e82e4072) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic1", 0x000000, 0x080000, CRC(c790743b) SHA1(5fa7b83a7a1b1105a3aa0870b782cf2741b7d11c) )
@@ -8347,8 +8366,8 @@ GAME( 1997, rapidrvrp,   rapidrvr, rapidrvr,    rapidrvrp, rapidrvr_state,      
 GAME( 1997, finfurl,     0,        finfurl,     finfurl,   gorgon_state,         empty_init,  ROT0, "Namco", "Final Furlong (World, FF2 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, downhill,    0,        downhill,    downhill,  namcos23_state,       empty_init,  ROT0, "Namco", "Downhill Bikers (World, DH2 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, downhillu,   downhill, downhill,    downhill,  namcos23_state,       empty_init,  ROT0, "Namco", "Downhill Bikers (US, DH3 Ver. A)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgo,     0,        motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (US, MG3 Ver. A)",        GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgov2a,  motoxgo,  motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgo,     0,        motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (World, MG3 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov2a,  motoxgo,  motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (US, MG2 Ver. A)",        GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, motoxgov1a,  motoxgo,  motoxgo,     motoxgo,   motoxgo_state,        empty_init,  ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state,       empty_init,  ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state,       empty_init,  ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )

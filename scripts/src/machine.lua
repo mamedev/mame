@@ -1924,18 +1924,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/keytronic_l2207.h,MACHINES["KEYTRONIC_L2207"] = true
----------------------------------------------------
-
-if (MACHINES["KEYTRONIC_L2207"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/keytronic_l2207.cpp",
-		MAME_DIR .. "src/devices/machine/keytronic_l2207.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/kr1601rr1.h,MACHINES["KR1601RR1"] = true
 ---------------------------------------------------
 
@@ -3400,6 +3388,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/sega_md_ioport.h,MACHINES["SEGA_MD_IOPORT"] = true
+---------------------------------------------------
+
+if (MACHINES["SEGA_MD_IOPORT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sega_md_ioport.cpp",
+		MAME_DIR .. "src/devices/machine/sega_md_ioport.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sega_scu.h,MACHINES["SEGA_SCU"] = true
+---------------------------------------------------
+
+if (MACHINES["SEGA_SCU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sega_scu.cpp",
+		MAME_DIR .. "src/devices/machine/sega_scu.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/sensorboard.h,MACHINES["SENSORBOARD"] = true
 ---------------------------------------------------
 
@@ -3431,18 +3443,6 @@ if (MACHINES["SMPC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/smpc.cpp",
 		MAME_DIR .. "src/devices/machine/smpc.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/sega_scu.h,MACHINES["SEGA_SCU"] = true
----------------------------------------------------
-
-if (MACHINES["SEGA_SCU"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/sega_scu.cpp",
-		MAME_DIR .. "src/devices/machine/sega_scu.h",
 	}
 end
 

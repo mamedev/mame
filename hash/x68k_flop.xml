@@ -25682,7 +25682,8 @@ No sound (verify)
 		<description>Fa-Mass</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="VHS / Demon's" />
+		<info name="developer" value="VHS" />
+		<info name="developer" value="Demon's" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="famass (1990)(vhs - demon's).dim" size="1261824" crc="fffbf708" sha1="2228561a5d6f8d0d15d2b1f517fdca60d2d7c228" />
@@ -26050,7 +26051,8 @@ No sound (verify)
 		<description>Frapull</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="D Bou / Wing K." />
+		<info name="developer" value="D Bou" />
+		<info name="developer" value="Wing K." />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="frapull (19xx)(d bou - wing k.).dim" size="1261824" crc="0a98af96" sha1="108dc4291a07f0da16e61f886eec7fe91dfb8074" />
@@ -26387,7 +26389,8 @@ No sound (verify)
 		<description>Gemdrop</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="SSL / Au" />
+		<info name="developer" value="SSL" />
+		<info name="developer" value="Au" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="gemdrop (1990)(ssl - au).dim" size="1261824" crc="e2e73f80" sha1="3c09d1636e55e5b5448912664a22efed847f5bf7" />
@@ -26487,7 +26490,8 @@ No sound (verify)
 		<description>Gokiburi Game</description>
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="NST / Onion Soft" />
+		<info name="developer" value="NST" />
+		<info name="developer" value="Onion Soft" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="gokiburi game (1989)(nst - onion soft).dim" size="1261824" crc="b41f1f06" sha1="bf58ca1aede6b5313010add638675ba0d70254a9" />
@@ -27826,7 +27830,8 @@ No sound (verify)
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="alt_title" value="ラスト テンペスト" />
-		<info name="developer" value="Tea Planning/Koucha Kikaku" />
+		<info name="developer" value="Tea Planning" />
+		<info name="developer" value="Koucha Kikaku" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">

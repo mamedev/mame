@@ -22,7 +22,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
 #include "machine/z80scc.h"
-#include "informer_213_kbd.h"
+#include "bus/keytronic/keytronic.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/printer.h"
 #include "sound/beep.h"
@@ -31,11 +31,39 @@
 #include "speaker.h"
 
 
-namespace {
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+namespace {
+
+class informer_213_kbdintf_device : public device_t, public device_serial_interface
+{
+public:
+	informer_213_kbdintf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	auto int_handler() { return m_int_handler.bind(); }
+	auto txd_handler() { return m_txd_handler.bind(); }
+
+	uint8_t read();
+	void write(uint8_t data);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+
+	virtual void tra_callback() override;
+	virtual void rcv_complete() override;
+
+private:
+	devcb_write_line m_int_handler;
+	devcb_write_line m_txd_handler;
+};
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE(INFORMER_213_KBDINTF, informer_213_kbdintf_device, "informer_213_kbdintf", "Informer 213 Keyboard Interface")
+
+namespace {
 
 class informer_213_state : public driver_device
 {
@@ -105,12 +133,55 @@ private:
 
 
 //**************************************************************************
+//  SERIAL KEYBOARD INTERFACE
+//**************************************************************************
+
+informer_213_kbdintf_device::informer_213_kbdintf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, INFORMER_213_KBDINTF, tag, owner, clock),
+	device_serial_interface(mconfig, *this),
+	m_int_handler(*this),
+	m_txd_handler(*this)
+{
+}
+
+void informer_213_kbdintf_device::device_start()
+{
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rcv_rate(300);
+	set_tra_rate(300);
+}
+
+uint8_t informer_213_kbdintf_device::read()
+{
+	if (!machine().side_effects_disabled())
+		m_int_handler(CLEAR_LINE);
+	return get_received_char();
+}
+
+void informer_213_kbdintf_device::write(uint8_t data)
+{
+	transmit_register_setup(data);
+}
+
+void informer_213_kbdintf_device::tra_callback()
+{
+	m_txd_handler(transmit_register_get_data_bit());
+}
+
+void informer_213_kbdintf_device::rcv_complete()
+{
+	receive_register_extract();
+	m_int_handler(ASSERT_LINE);
+}
+
+
+//**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
 void informer_213_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x0000).rw("kbd", FUNC(informer_213_kbd_hle_device::read), FUNC(informer_213_kbd_hle_device::write));
+	map(0x0000, 0x0000).rw("kbdintf", FUNC(informer_213_kbdintf_device::read), FUNC(informer_213_kbdintf_device::write));
 	map(0x0006, 0x0007).unmapr().w(FUNC(informer_213_state::vram_start_addr_w));
 	map(0x0008, 0x0009).unmapr().w(FUNC(informer_213_state::vram_end_addr_w));
 	map(0x000a, 0x000b).unmapr().w(FUNC(informer_213_state::vram_start_addr2_w));
@@ -150,6 +221,7 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 	// line at which vram splits into two windows
 	int split = 24 - ((m_vram_start_addr2 - m_vram_start_addr) / 80);
 
+	auto dis = machine().disable_side_effects();
 	for (int y = 0; y < 26; y++)
 	{
 		uint8_t line_attr = 0;
@@ -346,6 +418,9 @@ void informer_213_state::bell_w(uint8_t data)
 
 void informer_213_state::kbd_int_w(int state)
 {
+	if (state == CLEAR_LINE)
+		return;
+
 	m_firq_vector = 0x14;
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
@@ -415,6 +490,9 @@ void informer_213_state::informer_213(machine_config &config)
 	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	m_scc->out_int_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
+	keytronic_connector_device &kbd(KEYTRONIC_CONNECTOR(config, "kbd", informer_213_keyboards, "in213"));
+	kbd.ser_out_callback().set("kbdintf", FUNC(informer_213_kbdintf_device::rx_w));
+
 	rs232_port_device &rs232_host(RS232_PORT(config, "host", default_rs232_devices, nullptr));
 	rs232_host.rxd_handler().set(m_scc, FUNC(scc85c30_device::rxa_w));
 	rs232_host.dcd_handler().set(m_scc, FUNC(scc85c30_device::dcda_w));
@@ -441,8 +519,9 @@ void informer_213_state::informer_213(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beep", 500).add_route(ALL_OUTPUTS, "mono", 0.50); // frequency unknown
 
-	informer_213_kbd_hle_device &kbd(INFORMER_213_KBD_HLE(config, "kbd"));
-	kbd.int_handler().set(FUNC(informer_213_state::kbd_int_w));
+	informer_213_kbdintf_device &kbdintf(INFORMER_213_KBDINTF(config, "kbdintf"));
+	kbdintf.int_handler().set(FUNC(informer_213_state::kbd_int_w));
+	kbdintf.txd_handler().set("kbd", FUNC(keytronic_connector_device::ser_in_w));
 }
 
 
