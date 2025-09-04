@@ -75,7 +75,7 @@ filter_biquad_device::filter_biquad_device(const machine_config &mconfig, const 
 }
 
 // set up the filter with the specified parameters and return a pointer to the new device
-filter_biquad_device& filter_biquad_device::setup(biquad_type type, double fc, double q, double gain)
+filter_biquad_device &filter_biquad_device::setup(biquad_type type, double fc, double q, double gain)
 {
 	m_type = type;
 	m_fc = fc;
@@ -83,7 +83,7 @@ filter_biquad_device& filter_biquad_device::setup(biquad_type type, double fc, d
 	m_gain = gain;
 	return *this;
 }
-filter_biquad_device& filter_biquad_device::setup(filter_biquad_device::biquad_params p)
+filter_biquad_device &filter_biquad_device::setup(filter_biquad_device::biquad_params p)
 {
 	m_type = p.type;
 	m_fc = p.fc;
@@ -91,7 +91,7 @@ filter_biquad_device& filter_biquad_device::setup(filter_biquad_device::biquad_p
 	m_gain = p.gain;
 	return *this;
 }
-filter_biquad_device& filter_biquad_device::setup_raw(double a1, double a2, double b0, double b1, double b2)
+filter_biquad_device &filter_biquad_device::setup_raw(double a1, double a2, double b0, double b1, double b2)
 {
 	m_type = biquad_type::RAWPARAMS;
 	m_a1 = a1;
@@ -113,7 +113,7 @@ void filter_biquad_device::modify(biquad_type type, double fc, double q, double 
 	m_gain = gain;
 	recalc();
 }
-void filter_biquad_device::modify(filter_biquad_device::biquad_params p)
+void filter_biquad_device::modify(biquad_params p)
 {
 	m_stream->update();
 	m_type = p.type;
@@ -155,7 +155,7 @@ void filter_biquad_device::modify_raw(double a1, double a2, double b0, double b1
  */
 filter_biquad_device::biquad_params filter_biquad_device::opamp_sk_lphp_calc(biquad_type type, double r1, double r2, double r3, double r4, double c1, double c2)
 {
-	filter_biquad_device::biquad_params r;
+	biquad_params r;
 	if ((r1 == 0) || (r2 == 0) || (r3 == 0) || (r4 == 0) || (c1 == 0) || (c2 == 0))
 	{
 		fatalerror("filter_biquad_device::opamp_sk_lphp_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, r3: %f, r4: %f, c1: %f, c2: %f", r1, r2, r3, r4, c1, c2); /* Filter can not be setup.  Undefined results. */
@@ -197,15 +197,15 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_sk_lphp_calc(biq
  *                                 |
  *                                gnd
  */
-filter_biquad_device& filter_biquad_device::opamp_sk_lowpass_setup(double r1, double r2, double r3, double r4, double c1, double c2)
+filter_biquad_device &filter_biquad_device::opamp_sk_lowpass_setup(double r1, double r2, double r3, double r4, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_sk_lphp_calc(biquad_type::LOWPASS, r1, r2, r3, r4, c1, c2);
+	biquad_params p = opamp_sk_lphp_calc(biquad_type::LOWPASS, r1, r2, r3, r4, c1, c2);
 	return setup(p);
 }
 
 void filter_biquad_device::opamp_sk_lowpass_modify(double r1, double r2, double r3, double r4, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_sk_lphp_calc(biquad_type::LOWPASS, r1, r2, r3, r4, c1, c2);
+	biquad_params p = opamp_sk_lphp_calc(biquad_type::LOWPASS, r1, r2, r3, r4, c1, c2);
 	modify(p);
 }
 
@@ -233,15 +233,15 @@ void filter_biquad_device::opamp_sk_lowpass_modify(double r1, double r2, double 
  *                                 |
  *                                gnd
  */
-filter_biquad_device& filter_biquad_device::opamp_sk_highpass_setup(double r1, double r2, double r3, double r4, double c1, double c2)
+filter_biquad_device &filter_biquad_device::opamp_sk_highpass_setup(double r1, double r2, double r3, double r4, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_sk_lphp_calc(biquad_type::HIGHPASS, r1, r2, r3, r4, c1, c2);
+	biquad_params p = opamp_sk_lphp_calc(biquad_type::HIGHPASS, r1, r2, r3, r4, c1, c2);
 	return setup(p);
 }
 
 void filter_biquad_device::opamp_sk_highpass_modify(double r1, double r2, double r3, double r4, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_sk_lphp_calc(biquad_type::HIGHPASS, r1, r2, r3, r4, c1, c2);
+	biquad_params p = opamp_sk_lphp_calc(biquad_type::HIGHPASS, r1, r2, r3, r4, c1, c2);
 	modify(p);
 }
 
@@ -288,21 +288,21 @@ void filter_biquad_device::opamp_sk_highpass_modify(double r1, double r2, double
  *                vRef >--'  |/
  *
  */
-filter_biquad_device& filter_biquad_device::opamp_mfb_lowpass_setup(double r1, double r2, double r3, double c1, double c2)
+filter_biquad_device &filter_biquad_device::opamp_mfb_lowpass_setup(double r1, double r2, double r3, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_mfb_lowpass_calc(r1, r2, r3, c1, c2);
+	biquad_params p = opamp_mfb_lowpass_calc(r1, r2, r3, c1, c2);
 	return setup(p);
 }
 
 void filter_biquad_device::opamp_mfb_lowpass_modify(double r1, double r2, double r3, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_mfb_lowpass_calc(r1, r2, r3, c1, c2);
+	biquad_params p = opamp_mfb_lowpass_calc(r1, r2, r3, c1, c2);
 	modify(p);
 }
 
 filter_biquad_device::biquad_params filter_biquad_device::opamp_mfb_lowpass_calc(double r1, double r2, double r3, double c1, double c2)
 {
-	filter_biquad_device::biquad_params r;
+	biquad_params r;
 	if ((r1 == 0) || ((r2 == 0) && (c1 != 0)) || (r3 == 0) || (c2 == 0))
 	{
 		fatalerror("filter_biquad_device::opamp_mfb_lowpass_calc() - only c1 can be 0 (and if c1 is 0, r2 can also be 0); parameters were: r1: %f, r2: %f, r3: %f, c1: %f, c2: %f", r1, r2, r3, c1, c2); /* Filter can not be setup.  Undefined results. */
@@ -344,7 +344,7 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_mfb_lowpass_calc
  *               gnd
  *
  */
-filter_biquad_device& filter_biquad_device::opamp_mfb_bandpass_setup(double r1, double r2, double r3, double c1, double c2)
+filter_biquad_device &filter_biquad_device::opamp_mfb_bandpass_setup(double r1, double r2, double r3, double c1, double c2)
 {
 	if ((r1 == 0) || (r2 == 0) || (r3 == 0) || (c1 == 0) || (c2 == 0))
 	{
@@ -375,7 +375,7 @@ filter_biquad_device& filter_biquad_device::opamp_mfb_bandpass_setup(double r1, 
  *               gnd      vRef >---'  |/
  *
  */
-filter_biquad_device& filter_biquad_device::opamp_mfb_highpass_setup(double r1, double r2, double c1, double c2, double c3)
+filter_biquad_device &filter_biquad_device::opamp_mfb_highpass_setup(double r1, double r2, double c1, double c2, double c3)
 {
 	if ((r1 == 0) || (r2 == 0) || (c1 == 0) || (c2 == 0) || (c3 == 0))
 	{
@@ -411,21 +411,21 @@ filter_biquad_device& filter_biquad_device::opamp_mfb_highpass_setup(double r1, 
  *                        vRef >---'  |/
  *
  */
-filter_biquad_device& filter_biquad_device::opamp_diff_bandpass_setup(double r1, double r2, double c1, double c2)
+filter_biquad_device &filter_biquad_device::opamp_diff_bandpass_setup(double r1, double r2, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_diff_bandpass_calc(r1, r2, c1, c2);
+	biquad_params p = opamp_diff_bandpass_calc(r1, r2, c1, c2);
 	return setup(p);
 }
 
 void filter_biquad_device::opamp_diff_bandpass_modify(double r1, double r2, double c1, double c2)
 {
-	filter_biquad_device::biquad_params p = opamp_diff_bandpass_calc(r1, r2, c1, c2);
+	biquad_params p = opamp_diff_bandpass_calc(r1, r2, c1, c2);
 	modify(p);
 }
 
 filter_biquad_device::biquad_params filter_biquad_device::opamp_diff_bandpass_calc(double r1, double r2, double c1, double c2)
 {
-	filter_biquad_device::biquad_params r;
+	biquad_params r;
 	if ((r1 == 0) || (r2 == 0) || (c1 == 0) || (c2 == 0))
 	{
 		fatalerror("filter_biquad_device::opamp_diff_bandpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, c1: %f, c2: %f", r1, r2, c1, c2); /* Filter can not be setup.  Undefined results. */
@@ -439,6 +439,101 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_diff_bandpass_ca
 	r.type = biquad_type::BANDPASS;
 	LOGMASKED(LOG_SETUP,"filter_biquad_device::opamp_diff_bandpass_calc(%f, %f, %f, %f) yields:\n\ttype = %d, fc = %f (f1 = %f, f2 = %f), Q = %f, gain = %f\n", r1, r2, c1*1000000, c2*1000000, static_cast<int>(r.type), r.fc, f1, f2, r.q, r.gain);
 	return r;
+}
+
+
+/* RC-based band-pass filters:
+ *
+ * RR variation: the two resistors are connected to each other:
+ *
+ *   Vin -- C1 -- R1 -+-----+- Vout
+ *                    |     |
+ *                    R2    C2
+ *                    |     |
+ *                   GND  (V)GND
+ *
+ *
+ * CC variation: The two capacitors are connected to each other:
+ *
+ *   Vin -- R1 -+- C2 -+- Vout
+ *              |      |
+ *              C1     R2
+ *              |      |
+ *             GND   (V)GND
+ *
+ * (V)GND could be a virtual ground.
+ *
+ * BPF transfer function: H(s) = (A * s) / (s ^ 2 + B * s + C)
+ * In the RR configuration, we have:
+ *   A = 1 / (R1 * C2)
+ *   B = (R1 * C1 + R2 * C2 + R2 * C1) / (R1 * R2 * C1 * C2)
+ *   C = 1 / (R1 * R2 * C1 * C2)
+ * In the CC configuration, we have:
+ *   A = 1 / (R1 * C1)
+ *   B = (R1 * C1 + R2 * C2 + R1 * C2) / (R1 * R2 * C1 * C2)
+ *   C = 1 / (R1 * R2 * C1 * C2)
+ * From the standard transfer function for BPFs, we have:
+ *   A = gain * (w / Q)
+ *   B = w / Q
+ *   C = w ^ 2
+ * The calculations of Fc, Q and gain in the *_calc functions below are derived
+ * from the equations above, with some algebra.
+ */
+
+filter_biquad_device &filter_biquad_device::rc_rr_bandpass_setup(double r1, double r2, double c1, double c2)
+{
+	return setup(rc_rr_bandpass_calc(r1, r2, c1, c2));
+}
+
+void filter_biquad_device::rc_rr_bandpass_modify(double r1, double r2, double c1, double c2)
+{
+	modify(rc_rr_bandpass_calc(r1, r2, c1, c2));
+}
+
+filter_biquad_device::biquad_params filter_biquad_device::rc_rr_bandpass_calc(double r1, double r2, double c1, double c2)
+{
+	if ((r1 == 0) || (r2 == 0) || (c1 == 0) || (c2 == 0))
+	{
+		fatalerror("filter_biquad_device::rc_rr_bandpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, c1: %f, c2: %f", r1, r2, c1, c2);
+	}
+	const double x = sqrt(r1 * r2 * c1 * c2);
+	const double y = r1 * c1 + r2 * c2 + r2 * c1;
+	const double z = r2 * c1;
+	biquad_params p;
+	p.type = biquad_type::BANDPASS;
+	p.fc = 1.0 / (2.0 * M_PI * x);
+	p.q = x / y;
+	p.gain = z / y;
+	LOGMASKED(LOG_SETUP, "filter_biquad_device::rc_rr_bandpass_calc(%f %f %f %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, c1, c2, p.fc, p.q, p.gain);
+	return p;
+}
+
+filter_biquad_device &filter_biquad_device::rc_cc_bandpass_setup(double r1, double r2, double c1, double c2)
+{
+	return setup(rc_cc_bandpass_calc(r1, r2, c1, c2));
+}
+
+void filter_biquad_device::rc_cc_bandpass_modify(double r1, double r2, double c1, double c2)
+{
+	modify(rc_cc_bandpass_calc(r1, r2, c1, c2));
+}
+
+filter_biquad_device::biquad_params filter_biquad_device::rc_cc_bandpass_calc(double r1, double r2, double c1, double c2)
+{
+	if ((r1 == 0) || (r2 == 0) || (c1 == 0) || (c2 == 0))
+	{
+		fatalerror("filter_biquad_device::rc_cc_bandpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, c1: %f, c2: %f", r1, r2, c1, c2);
+	}
+	const double x = sqrt(r1 * r2 * c1 * c2);
+	const double y = r1 * c1 + r2 * c2 + r1 * c2;
+	const double z = r2 * c2;
+	biquad_params p;
+	p.type = biquad_type::BANDPASS;
+	p.fc = 1.0 / (2.0 * M_PI * x);
+	p.q = x / y;
+	p.gain = z / y;
+	LOGMASKED(LOG_SETUP, "filter_biquad_device::rc_cc_bandpass_calc(%f %f %f %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, c1, c2, p.fc, p.q, p.gain);
+	return p;
 }
 
 

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Nicola Salmoria
-/***************************************************************************
+/*******************************************************************************
 
  Lethal Enforcers
  (c) 1992 Konami
@@ -231,20 +231,25 @@ Notes:
       VSync - 59.6380Hz
 
 
-note:
+TODO:
 
-Lethal Enforcers has two sprite rendering chips working in parallel with their
-output mixed to give 6bpp, and two tilemap rendering chips working in parallel
-to give 8bpp. We currently cheat, using just one of each device but using
-alternate gfx layouts. Emulating it accurately will require separating the
-"front end" chips (053245, 054156) from the "back end" chips (053244, 054157)
-as only the latter are doubled.
+- Lethal Enforcers has two sprite rendering chips working in parallel with their
+  output mixed to give 6bpp, and two tilemap rendering chips working in parallel
+  to give 8bpp. We currently cheat, using just one of each device but using
+  alternate gfx layouts. Emulating it accurately will require separating the
+  "front end" chips (053245, 054156) from the "back end" chips (053244, 054157)
+  as only the latter are doubled.
 
-mirror not set up correctly
+- maybe some sprite placement issues (more likely due to zoom)
 
-maybe some sprite placement issues
 
-***************************************************************************/
+BTANB:
+
+- Shadows remain on screen when player shoots and screen flashes white. The game
+  briefly sets SHD0 here, but since shadows remain stuck on screen during this
+  frame, it doesn't look like this bit is for disabling shadows.
+
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -278,10 +283,10 @@ public:
 		m_k056832(*this, "k056832"),
 		m_k053244(*this, "k053244"),
 		m_k054321(*this, "k054321"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
 
-	void lethalej(machine_config &config);
 	void lethalen(machine_config &config);
 
 protected:
@@ -305,17 +310,19 @@ private:
 	required_device<k056832_device> m_k056832;
 	required_device<k053244_device> m_k053244;
 	required_device<k054321_device> m_k054321;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	void control2_w(uint8_t data);
 	uint8_t sound_irq_r();
 	void sound_irq_w(uint8_t data);
-	void le_bankswitch_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
 	uint8_t guns_r(offs_t offset);
 	uint8_t gunsaux_r();
-	void lethalen_palette_control(offs_t offset, uint8_t data);
-	uint32_t screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(lethalen_interrupt);
+	void palette_control_w(offs_t offset, uint8_t data);
+	void palette_w(offs_t offset, uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vblank(int state);
 	K053244_CB_MEMBER(sprite_callback);
 	K056832_CB_MEMBER(tile_callback);
 	void bank4000_map(address_map &map) ATTR_COLD;
@@ -324,32 +331,41 @@ private:
 };
 
 
+void lethal_state::video_start()
+{
+	const uint32_t num_colors = m_palette->entries() / 2;
+
+	// add our own shadow table, since shadows are cyan instead of default
+	for (int i = 0; i < num_colors; i++)
+		m_palette->shadow_table()[i] = i + num_colors;
+}
+
 K053244_CB_MEMBER(lethal_state::sprite_callback)
 {
-	int pri = (*color & 0xfff0);
-	*color = *color & 0x000f;
-	*color += m_sprite_colorbase;
+	// color & 0xf0:
+	// priority 0x00:
+	//     0x00: gunshots, etc.
+	//     0x40: blood splats?
+	//     0x80: empty sprite on level 4-3
+	// priority 0xf0:
+	//     0x10: guys on first level
+	//     0x90: car doors
+	// priority 0xfc:
+	//     0x20: people behind glass on 1st level
+	//     0xa0: glass on 1st/2nd level
+	// priority 0xfe:
+	//     0x30: always in a bad colour, used to do special effects i think
 
-	/* this isn't ideal.. shouldn't need to hardcode it? not 100% sure about it anyway*/
-	if (pri == 0x10)
-		*priority = 0xf0; // guys on first level
-	else if (pri == 0x90)
-		*priority = 0xf0; // car doors
-	else if (pri == 0x20)
-		*priority = 0xf0 | 0xcc; // people behind glass on 1st level
-	else if (pri == 0xa0)
-		*priority = 0xf0 | 0xcc; // glass on 1st/2nd level
-	else if (pri == 0x40)
-		*priority = 0; // blood splats?
-	else if (pri == 0x00)
-		*priority = 0; // gunshots etc
-	else if (pri == 0x30)
-		*priority = 0xf0 | 0xcc | 0xaa; // mask sprites (always in a bad colour, used to do special effects i think
-	else
+	switch (*color & 0x30)
 	{
-		popmessage("unknown pri %04x\n", pri);
-		*priority = 0;
+		case 0x00: *priority = 0x00; break;
+		case 0x10: *priority = 0xf0; break;
+		case 0x20: *priority = 0xfc; break;
+		case 0x30: *priority = 0xfe; break;
 	}
+
+	*color = *color & 0x0f;
+	*color += m_sprite_colorbase;
 
 	*code = (*code & 0x3fff); // | spritebanks[(*code >> 12) & 3];
 }
@@ -359,44 +375,22 @@ K056832_CB_MEMBER(lethal_state::tile_callback)
 	*color = m_layer_colorbase[layer] + ((*color & 0x3c) << 2);
 }
 
-void lethal_state::video_start()
-{
-	// this game uses external linescroll RAM
-	m_k056832->SetExtLinescroll();
-
-	// the US and Japanese cabinets apparently use different mirror setups
-	if (!strcmp(machine().system().name, "lethalenj"))
-	{
-		m_k056832->set_layer_offs(0, 29, 0);
-		m_k056832->set_layer_offs(1, 31, 0);
-		m_k056832->set_layer_offs(2, 33, 0);
-		m_k056832->set_layer_offs(3, 35, 0);
-	}
-	else
-	{
-		m_k056832->set_layer_offs(0, 188, 0);
-		m_k056832->set_layer_offs(1, 190, 0);
-		m_k056832->set_layer_offs(2, 192, 0);
-		m_k056832->set_layer_offs(3, 194, 0);
-	}
-}
-
-void lethal_state::lethalen_palette_control(offs_t offset, uint8_t data)
+void lethal_state::palette_control_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 		case 0: // 40c8 - PCU1 from schematics
 			m_layer_colorbase[0] = (data & 0x7) * 1024 / 16;
 			m_layer_colorbase[1] = ((data >> 4) & 0x7) * 1024 / 16;
-			m_k056832->mark_plane_dirty( 0);
-			m_k056832->mark_plane_dirty( 1);
+			m_k056832->mark_plane_dirty(0);
+			m_k056832->mark_plane_dirty(1);
 			break;
 
 		case 4: // 40cc - PCU2 from schematics
 			m_layer_colorbase[2] = (data & 0x7) * 1024 / 16;
 			m_layer_colorbase[3] = ((data >> 4) & 0x7) * 1024 / 16;
-			m_k056832->mark_plane_dirty( 2);
-			m_k056832->mark_plane_dirty( 3);
+			m_k056832->mark_plane_dirty(2);
+			m_k056832->mark_plane_dirty(3);
 			break;
 
 		case 8: // 40d0 - PCU3 from schematics
@@ -406,8 +400,39 @@ void lethal_state::lethalen_palette_control(offs_t offset, uint8_t data)
 	}
 }
 
-uint32_t lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void lethal_state::palette_w(offs_t offset, uint8_t data)
 {
+	m_palette->write8(offset, data);
+
+	// update shadow pen
+	rgb_t color = m_palette->pen_color(offset / 2);
+	color.set_r(color.r() * PALETTE_DEFAULT_SHADOW_FACTOR);
+	m_palette->set_pen_color(offset / 2 + m_palette->entries() / 2, color);
+}
+
+uint32_t lethal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// layer offsets are different if horizontally flipped
+	if (m_k056832->read_register(0x0) & 0x10)
+	{
+		m_k056832->set_layer_offs(0, -4 - 167, 0);
+		m_k056832->set_layer_offs(1, -2 - 167, 0);
+		m_k056832->set_layer_offs(2, 0 - 167, 0);
+		m_k056832->set_layer_offs(3, 2 - 167, 0);
+	}
+	else
+	{
+		m_k056832->set_layer_offs(0, -4, 0);
+		m_k056832->set_layer_offs(1, -2, 0);
+		m_k056832->set_layer_offs(2, 0, 0);
+		m_k056832->set_layer_offs(3, 2, 0);
+	}
+
+	if (m_k056832->read_register(0x0) & 0x20)
+		m_k053244->set_offsets(0, 1);
+	else
+		m_k053244->set_offsets(0, -1);
+
 	bitmap.fill(m_back_colorbase, cliprect);
 	screen.priority().fill(0, cliprect);
 
@@ -432,31 +457,32 @@ static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIG
 
 void lethal_state::control2_w(uint8_t data)
 {
-	/* bit 0 is data */
-	/* bit 1 is cs (active low) */
-	/* bit 2 is clock (active high) */
-	/* bit 3 is "MUT" on the schematics (audio mute?) */
-	/* bit 4 bankswitches the 4400-7fff region: 0 = registers, 1 = palette RAM ("CBNK" on schematics) */
-	/* bit 6 is "SHD0" (some kind of shadow control) */
-	/* bit 7 is "SHD1" (ditto) */
+	// bit 0 is EEPROM data
+	// bit 1 is EEPROM cs (active low)
+	// bit 2 is EEPROM clock (active high)
+	// bit 3 is "MUT" on the schematics (audio mute?)
+	// bit 4 is "CBNK" (bankswitches the 4400-7fff region: 0 = registers, 1 = palette RAM)
+	// bit 6 is "SHD0" (some kind of shadow control)
+	// bit 7 is "SHD1" (ditto)
+
+	m_bank4000->set_bank(BIT(data, 4));
+	ioport("EEPROMOUT")->write(data, 0xff);
 
 	m_cur_control2 = data;
-
-	m_bank4000->set_bank(BIT(m_cur_control2, 4));
-
-	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 }
 
-INTERRUPT_GEN_MEMBER(lethal_state::lethalen_interrupt)
+void lethal_state::vblank(int state)
 {
-	if (m_k056832->is_irq_enabled(0))
-		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
+	if (state && m_k056832->is_irq_enabled(0))
+		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 uint8_t lethal_state::sound_irq_r()
 {
-	m_soundcpu->set_input_line(0, HOLD_LINE);
-	return 0x00;
+	if (!machine().side_effects_disabled())
+		sound_irq_w(0);
+
+	return 0;
 }
 
 void lethal_state::sound_irq_w(uint8_t data)
@@ -464,7 +490,7 @@ void lethal_state::sound_irq_w(uint8_t data)
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-void lethal_state::le_bankswitch_w(uint8_t data)
+void lethal_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data);
 }
@@ -514,12 +540,12 @@ void lethal_state::le_main(address_map &map)
 	map(0x4090, 0x4090).rw(FUNC(lethal_state::sound_irq_r), FUNC(lethal_state::sound_irq_w));
 	map(0x40a0, 0x40a0).nopr();
 	map(0x40c4, 0x40c4).w(FUNC(lethal_state::control2_w));
-	map(0x40c8, 0x40d0).w(FUNC(lethal_state::lethalen_palette_control)); // PCU1-PCU3 on the schematics
+	map(0x40c8, 0x40d0).w(FUNC(lethal_state::palette_control_w)); // PCU1-PCU3 on the schematics
 	map(0x40d4, 0x40d7).r(FUNC(lethal_state::guns_r));
 	map(0x40d8, 0x40d8).portr("DSW");
 	map(0x40d9, 0x40d9).portr("INPUTS");
 	map(0x40db, 0x40db).r(FUNC(lethal_state::gunsaux_r));     // top X bit of guns
-	map(0x40dc, 0x40dc).w(FUNC(lethal_state::le_bankswitch_w));
+	map(0x40dc, 0x40dc).w(FUNC(lethal_state::bankswitch_w));
 	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
 }
 
@@ -541,7 +567,7 @@ void lethal_state::bank4000_map(address_map &map)
 	map(0xa000, 0xbfff).mirror(0x4000).unmaprw(); // .r(m_k056832, FUNC(k056832_device::rom_byte_r));
 
 	// CBNK = 1; partially overlaid when VRD = 1
-	map(0x4000, 0x7fff).mirror(0x8000).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x4000, 0x7fff).mirror(0x8000).ram().w(FUNC(lethal_state::palette_w)).share("palette");
 }
 
 void lethal_state::le_sound(address_map &map)
@@ -653,64 +679,50 @@ void lethal_state::machine_reset()
 
 void lethal_state::lethalen(machine_config &config)
 {
-	constexpr XTAL MAIN_CLOCK = 24_MHz_XTAL;
-	constexpr XTAL SOUND_CLOCK = 18.432_MHz_XTAL;
-
-	/* basic machine hardware */
-	HD6309E(config, m_maincpu, MAIN_CLOCK/8);    /* verified on pcb */
+	// basic machine hardware
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &lethal_state::le_main);
-	m_maincpu->set_vblank_int("screen", FUNC(lethal_state::lethalen_interrupt));
 
-	Z80(config, m_soundcpu, MAIN_CLOCK/4);  /* verified on pcb */
+	Z80(config, m_soundcpu, 24_MHz_XTAL / 4); // verified on pcb
 	m_soundcpu->set_addrmap(AS_PROGRAM, &lethal_state::le_sound);
 
 	ADDRESS_MAP_BANK(config, m_bank4000).set_map(&lethal_state::bank4000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x4000);
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.62);  /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(216, 504-1, 16, 240-1);
-	screen.set_screen_update(FUNC(lethal_state::screen_update_lethalen));
-	screen.set_palette(m_palette);
+	// video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 24, 312, 262, 16, 240); // measured 59.638Hz
+	m_screen->set_screen_update(FUNC(lethal_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(lethal_state::vblank));
+	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x2000 * 2); // custom shadows
 	m_palette->enable_shadows();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(lethal_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_8LE, 1, 0);
 	m_k056832->set_palette(m_palette);
+	m_k056832->set_ext_linescroll(true); // this game uses external linescroll RAM
 
 	K053244(config, m_k053244, 0);
 	m_k053244->set_palette(m_palette);
 	m_k053244->set_bpp(6);
-	m_k053244->set_offsets(191, 0);
 	m_k053244->set_sprite_callback(FUNC(lethal_state::sprite_callback));
+	m_k053244->set_priority_shadows(true);
 
 	K054000(config, "k054000", 0);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	K054321(config, m_k054321, "speaker");
 
-	k054539_device &k054539(K054539(config, "k054539", SOUND_CLOCK));
+	k054539_device &k054539(K054539(config, "k054539", 18.432_MHz_XTAL));
 	k054539.timer_handler().set_inputline("soundcpu", INPUT_LINE_NMI);
-	k054539.add_route(0, "speaker", 1.0, 0);
-	k054539.add_route(1, "speaker", 1.0, 1);
-}
-
-void lethal_state::lethalej(machine_config &config)
-{
-	lethalen(config);
-
-	subdevice<screen_device>("screen")->set_visarea(224, 512-1, 16, 240-1);
-
-	m_k053244->set_offsets(-9, 0);
+	k054539.add_route(0, "speaker", 1.0, 1);
+	k054539.add_route(1, "speaker", 1.0, 0);
 }
 
 ROM_START( lethalen )   // US version UAE
@@ -953,4 +965,4 @@ GAME( 1992, lethaleneab,lethalen, lethalen, lethalene, lethal_state, empty_init,
 GAME( 1992, lethaleneaa,lethalen, lethalen, lethalene, lethal_state, empty_init, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAA, 09/09/92 09:44)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EA to eeprom
 
 // different mirror / display setup
-GAME( 1992, lethalenj,  lethalen, lethalej, lethalenj, lethal_state, empty_init, ORIENTATION_FLIP_X, "Konami", "Lethal Enforcers (ver JAD, 12/04/92 17:16)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes JC to eeprom?!
+GAME( 1992, lethalenj,  lethalen, lethalen, lethalenj, lethal_state, empty_init, ORIENTATION_FLIP_X, "Konami", "Lethal Enforcers (ver JAD, 12/04/92 17:16)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes JC to eeprom?!

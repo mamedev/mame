@@ -2030,7 +2030,9 @@ Runs slightly fast (verify)
 ATK test: OK
 ]]></notes>
 		<!-- from ranking screen -->
-		<info name="developer" value="Kyle Hodgetts, Tony Windsor, Barry Smith" />
+		<info name="developer" value="Kyle Hodgetts" />
+		<info name="developer" value="Tony Windsor" />
+		<info name="developer" value="Barry Smith" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1921)alpha-1.ipf" size="1049612" crc="f890bd14" sha1="8a604afc3d7b17ec17fd7b69b3f79af46d0d368b"/>
@@ -5028,7 +5030,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="batman1" cloneof="batman" supported="no">
+	<software name="batman1" cloneof="batman" supported="yes">
 		<!-- SPS (CAPS) release 19 -->
 		<description>Batman (Europe, Single Disk)</description>
 		<!-- retail, standalone -->
@@ -5036,7 +5038,6 @@ ATK test: C:0 H:U Bad
 		<year>1989</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Black screen, [CIAB] fails on comparing a TOD 9 > 0x115 at PC=de4
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -11849,7 +11850,9 @@ Runs slightly fast (verify)
 ATK test: OK
 ]]></notes>
 		<!-- from ranking screen -->
-		<info name="developer" value="Kyle Hodgetts, Tony Windsor, Barry Smith" />
+		<info name="developer" value="Kyle Hodgetts" />
+		<info name="developer" value="Tony Windsor" />
+		<info name="developer" value="Barry Smith" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
@@ -34925,8 +34928,6 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Psyclapse</publisher>
 		<notes><![CDATA[
-black screen with eventually running irq at $ffffff, [FDC] dsksync (fixed)
-Hangs on [CIA] timer A readback while setting mode $99 (fixed)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -37062,7 +37063,7 @@ ATK test: C:even H:L 1 Sector Bad
 		</part>
 	</software>
 
-	<software name="pang" supported="no">
+	<software name="pang" supported="yes">
 		<!-- SPS (CAPS) release 929 -->
 		<description>Pang (Europe)</description>
 		<!-- retail, standalone -->
@@ -37070,8 +37071,6 @@ ATK test: C:even H:L 1 Sector Bad
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Throws a Guru Meditation on first boot, boots afterwards, [CIAB]?
-black screen after level select, trashes memory, [FDC]
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -45869,7 +45868,6 @@ ATK test: C:79 Bad
 		<year>1993</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
-new68k: trashes memory after initial loading, reports regressed track reading in ATK, [FDC] or [CIA]
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">

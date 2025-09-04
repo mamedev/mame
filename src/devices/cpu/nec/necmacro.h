@@ -38,33 +38,33 @@
 #define XORW dst^=src; m_CarryVal=m_OverVal=m_AuxVal=0; SetSZPF_Word(dst)
 
 #define IncWordReg(Reg)                     \
-	unsigned tmp = (unsigned)Wreg(Reg); \
+	unsigned tmp = (unsigned)Wreg(Reg);     \
 	unsigned tmp1 = tmp+1;                  \
-	m_OverVal = (tmp == 0x7fff);           \
+	m_OverVal = (tmp == 0x7fff);            \
 	SetAF(tmp1,tmp,1);                      \
 	SetSZPF_Word(tmp1);                     \
 	Wreg(Reg)=tmp1
 
 #define DecWordReg(Reg)                     \
-	unsigned tmp = (unsigned)Wreg(Reg); \
+	unsigned tmp = (unsigned)Wreg(Reg);     \
 	unsigned tmp1 = tmp-1;                  \
-	m_OverVal = (tmp == 0x8000);           \
+	m_OverVal = (tmp == 0x8000);            \
 	SetAF(tmp1,tmp,1);                      \
 	SetSZPF_Word(tmp1);                     \
 	Wreg(Reg)=tmp1
 
 #define IncByteReg(Reg)                     \
-	unsigned tmp = (unsigned)Breg(Reg); \
+	unsigned tmp = (unsigned)Breg(Reg);     \
 	unsigned tmp1 = tmp+1;                  \
-	m_OverVal = (tmp == 0x7f);           \
+	m_OverVal = (tmp == 0x7f);              \
 	SetAF(tmp1,tmp,1);                      \
 	SetSZPF_Byte(tmp1);                     \
 	Breg(Reg)=tmp1
 
 #define DecByteReg(Reg)                     \
-	unsigned tmp = (unsigned)Breg(Reg); \
+	unsigned tmp = (unsigned)Breg(Reg);     \
 	unsigned tmp1 = tmp-1;                  \
-	m_OverVal = (tmp == 0x80);           \
+	m_OverVal = (tmp == 0x80);              \
 	SetAF(tmp1,tmp,1);                      \
 	SetSZPF_Byte(tmp1);                     \
 	Breg(Reg)=tmp1
@@ -72,65 +72,65 @@
 #define JMP(flag)                           \
 	int tmp;                                \
 	EMPTY_PREfetch();                       \
-	tmp = (int)((int8_t)fetch());             \
+	tmp = (int)((int8_t)fetch());           \
 	if (flag)                               \
 	{                                       \
-		static const uint8_t table[3]={3,10,10};  \
-		m_ip = (WORD)(m_ip+tmp);          \
-		CLK(table[m_chip_type/8]);   \
+		static const uint8_t table[3] = {3,10,10}; \
+		m_ip = (WORD)(m_ip + tmp);          \
+		CLK(table[m_chip_type/8]);          \
 		CHANGE_PC;                          \
 		return;                             \
 	}
 
 #define ADJ4(param1,param2)                 \
-	if (AF || ((Breg(AL) & 0xf) > 9))   \
+	if (AF || ((Breg(AL) & 0xf) > 9))       \
 	{                                       \
-		uint16_t tmp;                         \
-		tmp = Breg(AL) + param1;        \
-		Breg(AL) = tmp;                 \
-		m_AuxVal = 1;                      \
-		m_CarryVal |= tmp & 0x100;         \
+		uint16_t tmp;                       \
+		tmp = Breg(AL) + param1;            \
+		Breg(AL) = tmp;                     \
+		m_AuxVal = 1;                       \
+		m_CarryVal |= tmp & 0x100;          \
 	}                                       \
-	if (CF || (Breg(AL)>0x9f))          \
+	if (CF || (Breg(AL)>0x9f))              \
 	{                                       \
-		Breg(AL) += param2;             \
-		m_CarryVal = 1;                        \
+		Breg(AL) += param2;                 \
+		m_CarryVal = 1;                     \
 	}                                       \
 	SetSZPF_Byte(Breg(AL))
 
 #define ADJB(param1,param2)                 \
-	if (AF || ((Breg(AL) & 0xf) > 9))   \
+	if (AF || ((Breg(AL) & 0xf) > 9))       \
 	{                                       \
-		Breg(AL) += param1;             \
-		Breg(AH) += param2;             \
-		m_AuxVal = 1;                      \
-		m_CarryVal = 1;                        \
+		Breg(AL) += param1;                 \
+		Breg(AH) += param2;                 \
+		m_AuxVal = 1;                       \
+		m_CarryVal = 1;                     \
 	}                                       \
 	else                                    \
 	{                                       \
-		m_AuxVal = 0;                      \
-		m_CarryVal = 0;                        \
+		m_AuxVal = 0;                       \
+		m_CarryVal = 0;                     \
 	}                                       \
 	Breg(AL) &= 0x0F
 
 #define BITOP_BYTE                          \
-	ModRM = fetch();                            \
+	ModRM = fetch();                        \
 	if (ModRM >= 0xc0) {                    \
-		tmp=Breg(Mod_RM.RM.b[ModRM]);   \
+		tmp=Breg(Mod_RM.RM.b[ModRM]);       \
 	}                                       \
 	else {                                  \
-		(this->*s_GetEA[ModRM])();                 \
-		tmp=read_mem_byte(m_EA);                  \
+		(this->*s_GetEA[ModRM])();          \
+		tmp=read_mem_byte(m_EA);            \
 	}
 
 #define BITOP_WORD                          \
-	ModRM = fetch();                            \
+	ModRM = fetch();                        \
 	if (ModRM >= 0xc0) {                    \
-		tmp=Wreg(Mod_RM.RM.w[ModRM]);   \
+		tmp=Wreg(Mod_RM.RM.w[ModRM]);       \
 	}                                       \
 	else {                                  \
-		(this->*s_GetEA[ModRM])();                 \
-		tmp=read_mem_word(m_EA);                  \
+		(this->*s_GetEA[ModRM])();          \
+		tmp=read_mem_word(m_EA);            \
 	}
 
 #define BIT_NOT                             \
@@ -141,8 +141,8 @@
 
 #define XchgAWReg(Reg)                      \
 	WORD tmp;                               \
-	tmp = Wreg(Reg);                    \
-	Wreg(Reg) = Wreg(AW);           \
+	tmp = Wreg(Reg);                        \
+	Wreg(Reg) = Wreg(AW);                   \
 	Wreg(AW) = tmp
 
 #define ROL_BYTE m_CarryVal = dst & 0x80; dst = (dst << 1)+CF
@@ -157,129 +157,146 @@
 #define SHL_WORD(c) CLK(c); dst <<= c;    SetCFW(dst); SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
 #define SHR_BYTE(c) CLK(c); dst >>= c-1; m_CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
 #define SHR_WORD(c) CLK(c); dst >>= c-1; m_CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
-#define SHRA_BYTE(c) CLK(c); dst = ((int8_t)dst) >> (c-1);  m_CarryVal = dst & 0x1;    dst = ((int8_t)((BYTE)dst)) >> 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
-#define SHRA_WORD(c) CLK(c); dst = ((int16_t)dst) >> (c-1); m_CarryVal = dst & 0x1;    dst = ((int16_t)((WORD)dst)) >> 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
+#define SHRA_BYTE(c) CLK(c); dst = ((int8_t)dst) >> (c-1);  m_CarryVal = dst & 0x1; dst = ((int8_t)((BYTE)dst)) >> 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
+#define SHRA_WORD(c) CLK(c); dst = ((int16_t)dst) >> (c-1); m_CarryVal = dst & 0x1; dst = ((int16_t)((WORD)dst)) >> 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
 
-#define DIVUB                                               \
-	uresult = Wreg(AW);                                 \
-	uresult2 = uresult % tmp;                               \
-	if ((uresult /= tmp) > 0xff) {                          \
-		nec_interrupt(NEC_DIVIDE_VECTOR, BRK); break;                            \
-	} else {                                                \
-		Breg(AL) = uresult;                             \
-		Breg(AH) = uresult2;                            \
-	}
+// After DIV/DIVU overflow, registers are confirmed to be unchanged on V30/V35.
+// V20/V25 untested, but probably same as V30.
+// From testing by wickerwaka, V33 appears to store an intermediate result, it's not
+// entirely clear how that works, so let's just store the truncated result for now.
 
-#define DIVB                                                \
-	result = (int16_t)Wreg(AW);                           \
-	result2 = result % (int16_t)((int8_t)tmp);                  \
-	if ((result /= (int16_t)((int8_t)tmp)) > 0xff) {            \
-		nec_interrupt(NEC_DIVIDE_VECTOR, BRK); break;                            \
-	} else {                                                \
-		Breg(AL) = result;                              \
-		Breg(AH) = result2;                             \
-	}
+#define DIVUB {                                          \
+	uresult = Wreg(AW);                                  \
+	uresult2 = uresult % tmp;                            \
+	uresult /= tmp;                                      \
+	bool overflow = uresult > 0xff;                      \
+	if (overflow)                                        \
+		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);           \
+	if (!overflow || m_chip_type == V33_TYPE) {          \
+		Breg(AL) = uresult;                              \
+		Breg(AH) = uresult2;                             \
+	}                                                    \
+}
 
-#define DIVUW                                               \
-	uresult = (((uint32_t)Wreg(DW)) << 16) | Wreg(AW);\
-	uresult2 = uresult % tmp;                               \
-	if ((uresult /= tmp) > 0xffff) {                        \
-		nec_interrupt(NEC_DIVIDE_VECTOR, BRK); break;                            \
-	} else {                                                \
-		Wreg(AW)=uresult;                               \
-		Wreg(DW)=uresult2;                              \
-	}
+#define DIVB {                                           \
+	result = (int16_t)Wreg(AW);                          \
+	result2 = result % (int16_t)((int8_t)tmp);           \
+	result /= (int16_t)((int8_t)tmp);                    \
+	bool overflow = result > 0x7f || result < -0x7f;     \
+	if (overflow)                                        \
+		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);           \
+	if (!overflow || m_chip_type == V33_TYPE) {          \
+		Breg(AL) = result;                               \
+		Breg(AH) = result2;                              \
+	}                                                    \
+}
 
-#define DIVW                                                \
-	result = ((uint32_t)Wreg(DW) << 16) + Wreg(AW);   \
-	result2 = result % (int32_t)((int16_t)tmp);                 \
-	if ((result /= (int32_t)((int16_t)tmp)) > 0xffff) {         \
-		nec_interrupt(NEC_DIVIDE_VECTOR, BRK); break;                            \
-	} else {                                                \
-		Wreg(AW)=result;                                \
-		Wreg(DW)=result2;                               \
-	}
+#define DIVUW {                                          \
+	uresult = (((uint32_t)Wreg(DW)) << 16) | Wreg(AW);   \
+	uresult2 = uresult % tmp;                            \
+	uresult /= tmp;                                      \
+	bool overflow = uresult > 0xffff;                    \
+	if (overflow)                                        \
+		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);           \
+	if (!overflow || m_chip_type == V33_TYPE) {          \
+		Wreg(AW) = uresult;                              \
+		Wreg(DW) = uresult2;                             \
+	}                                                    \
+}
 
-#define ADD4S {                                             \
-	int i,v1,v2,result;                                     \
-	int count = (Breg(CL)+1)/2;                         \
-	unsigned di = Wreg(IY);                             \
-	unsigned si = Wreg(IX);                             \
-	static const uint8_t table[3]={18,19,19};                 \
+#define DIVW {                                           \
+	result = ((uint32_t)Wreg(DW) << 16) + Wreg(AW);      \
+	result2 = result % (int32_t)((int16_t)tmp);          \
+	result /= (int32_t)((int16_t)tmp);                   \
+	bool overflow = result > 0x7fff || result < -0x7fff; \
+	if (overflow)                                        \
+		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);           \
+	if (!overflow || m_chip_type == V33_TYPE) {          \
+		Wreg(AW) = result;                               \
+		Wreg(DW) = result2;                              \
+	}                                                    \
+}
+
+#define ADD4S {                                  \
+	int i,v1,v2,result;                          \
+	int count = (Breg(CL)+1)/2;                  \
+	unsigned di = Wreg(IY);                      \
+	unsigned si = Wreg(IX);                      \
+	static const uint8_t table[3]={18,19,19};    \
 	if (m_seg_prefix) logerror("%06x: Warning: seg_prefix defined for add4s\n",PC()); \
-	m_ZeroVal = m_CarryVal = 0;                               \
-	for (i=0;i<count;i++) {                                 \
-		CLK(table[m_chip_type/8]);                   \
-		tmp = GetMemB(DS0, si);                             \
-		tmp2 = GetMemB(DS1, di);                            \
-		v1 = (tmp>>4)*10 + (tmp&0xf);                       \
-		v2 = (tmp2>>4)*10 + (tmp2&0xf);                     \
-		result = v1+v2+m_CarryVal;                         \
-		m_CarryVal = result > 99 ? 1 : 0;                  \
-		result = result % 100;                              \
-		v1 = ((result/10)<<4) | (result % 10);              \
-		PutMemB(DS1, di,v1);                                \
-		if (v1) m_ZeroVal = 1;                             \
-		si++;                                               \
-		di++;                                               \
-	}                                                       \
+	m_ZeroVal = m_CarryVal = 0;                  \
+	for (i=0;i<count;i++) {                      \
+		CLK(table[m_chip_type/8]);               \
+		tmp = GetMemB(DS0, si);                  \
+		tmp2 = GetMemB(DS1, di);                 \
+		v1 = (tmp>>4)*10 + (tmp&0xf);            \
+		v2 = (tmp2>>4)*10 + (tmp2&0xf);          \
+		result = v1+v2+m_CarryVal;               \
+		m_CarryVal = result > 99 ? 1 : 0;        \
+		result = result % 100;                   \
+		v1 = ((result/10)<<4) | (result % 10);   \
+		PutMemB(DS1, di,v1);                     \
+		if (v1) m_ZeroVal = 1;                   \
+		si++;                                    \
+		di++;                                    \
+	}                                            \
 }
 
-#define SUB4S {                                             \
-	int count = (Breg(CL)+1)/2;                         \
-	int i,v1,v2,result;                                     \
-	unsigned di = Wreg(IY);                             \
-	unsigned si = Wreg(IX);                             \
-	static const uint8_t table[3]={18,19,19};                 \
+#define SUB4S {                                  \
+	int count = (Breg(CL)+1)/2;                  \
+	int i,v1,v2,result;                          \
+	unsigned di = Wreg(IY);                      \
+	unsigned si = Wreg(IX);                      \
+	static const uint8_t table[3]={18,19,19};    \
 	if (m_seg_prefix) logerror("%06x: Warning: seg_prefix defined for sub4s\n",PC()); \
-	m_ZeroVal = m_CarryVal = 0;                               \
-	for (i=0;i<count;i++) {                                 \
-		CLK(table[m_chip_type/8]);                   \
-		tmp = GetMemB(DS1, di);                             \
-		tmp2 = GetMemB(DS0, si);                            \
-		v1 = (tmp>>4)*10 + (tmp&0xf);                       \
-		v2 = (tmp2>>4)*10 + (tmp2&0xf);                     \
-		if (v1 < (v2+m_CarryVal)) {                            \
-			v1+=100;                                        \
-			result = v1-(v2+m_CarryVal);                   \
-			m_CarryVal = 1;                                    \
-		} else {                                            \
-			result = v1-(v2+m_CarryVal);                   \
-			m_CarryVal = 0;                                    \
-		}                                                   \
-		v1 = ((result/10)<<4) | (result % 10);              \
-		PutMemB(DS1, di,v1);                                \
-		if (v1) m_ZeroVal = 1;                             \
-		si++;                                               \
-		di++;                                               \
-	}                                                       \
+	m_ZeroVal = m_CarryVal = 0;                  \
+	for (i=0;i<count;i++) {                      \
+		CLK(table[m_chip_type/8]);               \
+		tmp = GetMemB(DS1, di);                  \
+		tmp2 = GetMemB(DS0, si);                 \
+		v1 = (tmp>>4)*10 + (tmp&0xf);            \
+		v2 = (tmp2>>4)*10 + (tmp2&0xf);          \
+		if (v1 < (v2+m_CarryVal)) {              \
+			v1+=100;                             \
+			result = v1-(v2+m_CarryVal);         \
+			m_CarryVal = 1;                      \
+		} else {                                 \
+			result = v1-(v2+m_CarryVal);         \
+			m_CarryVal = 0;                      \
+		}                                        \
+		v1 = ((result/10)<<4) | (result % 10);   \
+		PutMemB(DS1, di,v1);                     \
+		if (v1) m_ZeroVal = 1;                   \
+		si++;                                    \
+		di++;                                    \
+	}                                            \
 }
 
-#define CMP4S {                                             \
-	int count = (Breg(CL)+1)/2;                         \
-	int i,v1,v2,result;                                     \
-	unsigned di = Wreg(IY);                             \
-	unsigned si = Wreg(IX);                             \
-	static const uint8_t table[3]={14,19,19};                 \
+#define CMP4S {                                  \
+	int count = (Breg(CL)+1)/2;                  \
+	int i,v1,v2,result;                          \
+	unsigned di = Wreg(IY);                      \
+	unsigned si = Wreg(IX);                      \
+	static const uint8_t table[3]={14,19,19};    \
 	if (m_seg_prefix) logerror("%06x: Warning: seg_prefix defined for cmp4s\n",PC()); \
-	m_ZeroVal = m_CarryVal = 0;                               \
-	for (i=0;i<count;i++) {                                 \
-		CLK(table[m_chip_type/8]);                   \
-		tmp = GetMemB(DS1, di);                             \
-		tmp2 = GetMemB(DS0, si);                            \
-		v1 = (tmp>>4)*10 + (tmp&0xf);                       \
-		v2 = (tmp2>>4)*10 + (tmp2&0xf);                     \
-		if (v1 < (v2+m_CarryVal)) {                            \
-			v1+=100;                                        \
-			result = v1-(v2+m_CarryVal);                   \
-			m_CarryVal = 1;                                    \
-		} else {                                            \
-			result = v1-(v2+m_CarryVal);                   \
-			m_CarryVal = 0;                                    \
-		}                                                   \
-		v1 = ((result/10)<<4) | (result % 10);              \
-		if (v1) m_ZeroVal = 1;                             \
-		si++;                                               \
-		di++;                                               \
-	}                                                       \
+	m_ZeroVal = m_CarryVal = 0;                  \
+	for (i=0;i<count;i++) {                      \
+		CLK(table[m_chip_type/8]);               \
+		tmp = GetMemB(DS1, di);                  \
+		tmp2 = GetMemB(DS0, si);                 \
+		v1 = (tmp>>4)*10 + (tmp&0xf);            \
+		v2 = (tmp2>>4)*10 + (tmp2&0xf);          \
+		if (v1 < (v2+m_CarryVal)) {              \
+			v1+=100;                             \
+			result = v1-(v2+m_CarryVal);         \
+			m_CarryVal = 1;                      \
+		} else {                                 \
+			result = v1-(v2+m_CarryVal);         \
+			m_CarryVal = 0;                      \
+		}                                        \
+		v1 = ((result/10)<<4) | (result % 10);   \
+		if (v1) m_ZeroVal = 1;                   \
+		si++;                                    \
+		di++;                                    \
+	}                                            \
 }

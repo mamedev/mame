@@ -1833,6 +1833,7 @@ void hotsmash_state::init_pbillian()
 
 void hotsmash_state::init_hotsmash()
 {
+	init_pbillian();
 	m_invert_p2_spinner = true;
 }
 

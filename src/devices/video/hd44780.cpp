@@ -19,9 +19,6 @@
        200kOhms instead, for a ~122.4kHz clock speed, and it isn't clear
        why they did this, as it is lower than the minimum intended clock
        speed on the datasheet.
-    DONE
-    - busy flag durations in clock cycles
-    - blink timing in clock cycles
 
     BUSY TIMINGS:
     Manufacturer:            Hitachi           Epson         Samsung

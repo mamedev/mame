@@ -274,7 +274,7 @@ void k053250ps_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, int
 	uint32_t src_clipmask, src_wrapmask; //, dst_wrapmask;
 	int linedata_offs, line_pos, line_start, line_end, scroll_corr;
 	int color, offset, zoom, scroll, passes, i;
-//	bool wrap500 = false;
+//  bool wrap500 = false;
 
 	uint16_t *line_ram = m_buffer[0];                             // pointer to physical line RAM
 	int map_scrollx = short(m_regs[0] << 8 | m_regs[1]) - m_offx; // signed horizontal scroll value
@@ -334,7 +334,7 @@ void k053250ps_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, int
 			// crop source offset between 0 and 255 inclusive,
 			// and allow source offset to wrap back at 0x500 to -0x300
 			src_wrapmask = src_clipmask = 0xff;
-//			wrap500 = true;
+//          wrap500 = true;
 		break;
 //      case 2 : // Xexex: title
 //      case 7 : // Xexex: L4 organic stage
@@ -452,7 +452,7 @@ void k053250ps_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, int
 			scroll -= 0x800;
 
 		scroll += scroll_corr;  // apply final scroll correction
-//		scroll &= dst_wrapmask; // wraparound scroll value if necessary
+//      scroll &= dst_wrapmask; // wraparound scroll value if necessary
 
 		if (0)
 		{

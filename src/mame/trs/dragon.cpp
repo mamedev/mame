@@ -20,7 +20,7 @@ keeping track of it in a variable in the driver.
 
 Radically re-wrote memory emulation code for CoCo 1/2 & Dragon machines, the
 new code emulates the memory mapping of the SAM, dependent on what size of
-RAM chips it is programed to use, including proper mirroring of the RAM.
+RAM chips it is programmed to use, including proper mirroring of the RAM.
 
 Replaced the kludged emulation of the cart line, with a timer based trigger
 this is set to toggle at 1Hz, this seems to be good enough to trigger the
@@ -53,7 +53,6 @@ easier to manage.
 #include "formats/dmk_dsk.h"
 #include "formats/sdf_dsk.h"
 #include "formats/vdk_dsk.h"
-
 
 
 /***************************************************************************
@@ -91,8 +90,8 @@ void dragon64_state::machine_start()
 	dragon_state::machine_start();
 
 	uint8_t *rom = memregion("maincpu")->base();
-	m_rombank[0]->configure_entries(0, 2, &rom[0x0000], 0x8000);
-	m_rombank[1]->configure_entries(0, 2, &rom[0x2000], 0x8000);
+	m_rombank[0]->configure_entries(0, 2, &rom[0x0000], 0x4000);
+	m_rombank[1]->configure_entries(0, 2, &rom[0x2000], 0x4000);
 }
 
 
@@ -281,7 +280,6 @@ void d64plus_state::machine_reset()
 	m_pram_bank->set_entry(0);
 	m_vram_bank->set_entry(0);
 }
-
 
 
 //**************************************************************************
@@ -654,34 +652,35 @@ void dragon64_state::tanodr64h(machine_config &config)
 ***************************************************************************/
 
 ROM_START(dragon32)
-	ROM_REGION(0xC000, "maincpu",0)
-	ROM_LOAD("d32.rom",      0x0000,  0x4000, CRC(e3879310) SHA1(f2dab125673e653995a83bf6b793e3390ec7f65a))
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("dragon_data_ltd_1-0.ic18", 0x0000, 0x2000, CRC(e192b3eb) SHA1(9fbba5128b8a53c65ee0586c10513a0a6fb05a7d))
+	ROM_LOAD("dragon_data_ltd_1-1.ic17", 0x2000, 0x2000, CRC(0e1d7bf0) SHA1(7088d75995cc2ec80a7eed9b9cc3d62f0f820a43))
 ROM_END
 
 ROM_START(dragon64)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
-	ROM_LOAD("d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("d64_1.rom",    0x0000, 0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
+	ROM_LOAD("d64_2.rom",    0x4000, 0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 ROM_END
 
 ROM_START(dragon200)
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "ic18.rom",    0x0000, 0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
-	ROM_LOAD( "ic17.rom",    0x8000, 0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
+	ROM_LOAD( "ic17.rom",    0x4000, 0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 ROM_END
 
 ROM_START(dragon200e)
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "ic18_v1.4e.ic34",    0x0000, 0x4000, CRC(95af0a0a) SHA1(628543ee8b47a56df2b2175cfb763c0051517b90))
-	ROM_LOAD( "ic17_v1.4e.ic37",    0x8000, 0x4000, CRC(48b985df) SHA1(c25632f3c2cfd1af3ee26b2f233a1ce1eccc365d))
-	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD( "ic17_v1.4e.ic37",    0x4000, 0x4000, CRC(48b985df) SHA1(c25632f3c2cfd1af3ee26b2f233a1ce1eccc365d))
+	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "rom26.ic1",          0x0000, 0x1000, CRC(565724bc) SHA1(da5b756ba2a9c9ecebaa7daa8ba8bfd984d56a6f))
 ROM_END
 
 ROM_START(d64plus)
-	ROM_REGION(0x10000,"maincpu",0)
+	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("d64_1.rom",      0x0000, 0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
-	ROM_LOAD("d64_2.rom",      0x8000, 0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
+	ROM_LOAD("d64_2.rom",      0x4000, 0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 	ROM_REGION(0x0200, "prom", 0)
 	ROM_LOAD("n82s147an.ic12", 0x0000, 0x0200, CRC(92b6728d) SHA1(bcf7c60c4e5608a58587044458d9cacaca4568aa))
 	ROM_REGION(0x2000, "chargen", 0)
@@ -689,18 +688,19 @@ ROM_START(d64plus)
 ROM_END
 
 ROM_START(tanodr64)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
-	ROM_LOAD("d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("tano_1.ic18",    0x0000, 0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
+	ROM_LOAD("tano_2.ic17",    0x4000, 0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 ROM_END
 
 #define rom_dragon64h rom_dragon64
 #define rom_tanodr64h rom_tanodr64
 
+
 //    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS               INIT        COMPANY                         FULLNAME                          FLAGS
 COMP( 1982, dragon32,   0,        0,      dragon32,   dragon,     dragon_state,       empty_init, "Dragon Data Ltd",              "Dragon 32",                      0 )
 COMP( 1983, dragon64,   dragon32, 0,      dragon64,   dragon,     dragon64_state,     empty_init, "Dragon Data Ltd",              "Dragon 64",                      0 )
-COMP( 19??, dragon64h,  dragon32, 0,      dragon64h,  dragon,     dragon64_state,     empty_init, "Dragon Data Ltd",              "Dragon 64 (HD6309E CPU)",        MACHINE_UNOFFICIAL )
+COMP( 19??, dragon64h,  dragon32, 0,      dragon64h,  dragon,     dragon64_state,     empty_init, "Dragon Data Ltd",              "Dragon 64 (HD6309E)",            MACHINE_UNOFFICIAL )
 COMP( 1985, dragon200,  dragon32, 0,      dragon64,   dragon,     dragon64_state,     empty_init, "Eurohard S.A.",                "Dragon 200",                     0 )
 COMP( 1985, dragon200e, dragon32, 0,      dragon200e, dragon200e, dragon200e_state,   empty_init, "Eurohard S.A.",                "Dragon 200-E",                   0 )
 COMP( 1985, d64plus,    dragon32, 0,      d64plus,    dragon,     d64plus_state,      empty_init, "Dragon Data Ltd / Compusense", "Dragon 64 Plus",                 0 )

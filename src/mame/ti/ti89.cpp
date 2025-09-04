@@ -781,8 +781,8 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY              FULLNAME          FLAGS
-COMP( 1998, ti89,  0,       0,     ti89,    ti8x,  ti68k_state, empty_init, "Texas Instruments", "TI-89",          MACHINE_NO_SOUND )
-COMP( 1995, ti92,  0,       0,     ti92,    ti9x,  ti68k_state, empty_init, "Texas Instruments", "TI-92",          MACHINE_NO_SOUND )
-COMP( 1999, ti92p, 0,       0,     ti92p,   ti9x,  ti68k_state, empty_init, "Texas Instruments", "TI-92 Plus",     MACHINE_NO_SOUND )
-COMP( 2002, v200,  0,       0,     v200,    ti9x,  ti68k_state, empty_init, "Texas Instruments", "Voyage 200 PLT", MACHINE_NO_SOUND )
-COMP( 2004, ti89t, 0,       0,     ti89t,   ti8x,  ti68k_state, empty_init, "Texas Instruments", "TI-89 Titanium", MACHINE_NO_SOUND )
+COMP( 1998, ti89,  0,       0,     ti89,    ti8x,  ti68k_state, empty_init, "Texas Instruments", "TI-89",          MACHINE_NO_SOUND_HW )
+COMP( 1995, ti92,  0,       0,     ti92,    ti9x,  ti68k_state, empty_init, "Texas Instruments", "TI-92",          MACHINE_NO_SOUND_HW )
+COMP( 1999, ti92p, 0,       0,     ti92p,   ti9x,  ti68k_state, empty_init, "Texas Instruments", "TI-92 Plus",     MACHINE_NO_SOUND_HW )
+COMP( 2002, v200,  0,       0,     v200,    ti9x,  ti68k_state, empty_init, "Texas Instruments", "Voyage 200 PLT", MACHINE_NO_SOUND_HW )
+COMP( 2004, ti89t, 0,       0,     ti89t,   ti8x,  ti68k_state, empty_init, "Texas Instruments", "TI-89 Titanium", MACHINE_NO_SOUND_HW )

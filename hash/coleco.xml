@@ -2631,6 +2631,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="adamusic">
+		<description>Adam's Musicbox Demo</description>
+		<year>1987</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="adams-musicbox-demo.rom" size="24576" crc="164c8c26" sha1="9ef2974a04f5982bd034f39d1741666b6d117d24" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bbears">
 		<!-- Berenstain Bears, The (1984)(Coleco)(proto).bin -->
 		<description>The Berenstain Bears (prototype)</description>
@@ -2732,6 +2743,19 @@ license:CC0-1.0
 				<rom name="dragon80-chip1-4-16-ec4a.bin" size="8192" crc="950950d0" sha1="ef0c45269cfe7b78125be2a2edf3f3781305f740" offset="0x0000" />
 				<rom name="dragon80-chip2-4-16-ec4a.bin" size="8192" crc="8a778f5a" sha1="274944cfe6f4ebfa13a68377ef5716879426b577" offset="0x2000" />
 				<rom name="dragon80-chip3-4-16-ec4a.bin" size="8192" crc="8eec1020" sha1="21b08651f76925baa0ec99b0b5e7dba3a5880c5a" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Apparently for use in children's play areas of Canadian nuclear power plants -->
+	<software name="energyq">
+		<description>Energy Quiz (limited release)</description>
+		<year>1983</year>
+		<publisher>Sydney Development Corporation</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<!-- second half empty, overdump? -->
+				<rom name="energy-quiz.rom" size="32768" crc="afb90dcd" sha1="9bd47f0b288612e85224c9bda093b12f0b5bff36" />
 			</dataarea>
 		</part>
 	</software>

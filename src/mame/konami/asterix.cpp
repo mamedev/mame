@@ -1,17 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-/***************************************************************************
+/*******************************************************************************
 
 Asterix
 Konami GX068 PCB
 
-TODO:
- - the konami logo: in the original the outline is drawn, then there's a slight
-   delay of 1 or 2 seconds, then it fills from the top to the bottom with the
-   colour, including the word "Konami"
- - Verify clocks, PCB has 2 OSCs. 32MHz & 24MHz
+OSC: 32MHz & 24MHz
+CPU: MC68000P12, Z84C0006PEC
+Konami custom: 054358, 054156, 054157, 053251, 053244, 053245, 053260
 
-***************************************************************************/
+TODO:
+- verify clocks and video timing
+
+BTANB:
+- although not 100% identical to MAME, there are 1px line gaps at several frames
+  during title screen scaling animation (both horizontal and vertical)
+
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -131,17 +136,19 @@ uint32_t asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind1
 	// layer offsets are different if horizontally flipped
 	if (m_k056832->read_register(0x0) & 0x10)
 	{
-		m_k056832->set_layer_offs(0, 89 - 176, 0);
-		m_k056832->set_layer_offs(1, 91 - 176, 0);
-		m_k056832->set_layer_offs(2, 89 - 176, 0);
-		m_k056832->set_layer_offs(3, 95 - 176, 0);
+		m_k056832->set_layer_offs(0, -7 - 177, 0);
+		m_k056832->set_layer_offs(1, -5 - 177, 0);
+		m_k056832->set_layer_offs(2, -3 - 177, 0);
+		m_k056832->set_layer_offs(3, -1 - 177, 0);
+		m_k053244->set_offsets(-3 + 6, -1);
 	}
 	else
 	{
-		m_k056832->set_layer_offs(0, 89, 0);
-		m_k056832->set_layer_offs(1, 91, 0);
-		m_k056832->set_layer_offs(2, 89, 0);
-		m_k056832->set_layer_offs(3, 95, 0);
+		m_k056832->set_layer_offs(0, -7, 0);
+		m_k056832->set_layer_offs(1, -5, 0);
+		m_k056832->set_layer_offs(2, -3, 0);
+		m_k056832->set_layer_offs(3, -1, 0);
+		m_k053244->set_offsets(-3, -1);
 	}
 
 	// update color info and refresh tilemaps
@@ -382,21 +389,18 @@ void asterix_state::machine_reset()
 void asterix_state::asterix(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000)/2); // 12MHz
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2); // 12MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &asterix_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(asterix_state::asterix_interrupt));
 
-	Z80(config, m_audiocpu, XTAL(32'000'000)/4); // 8MHz Z80E ??
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 4); // 6MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &asterix_state::sound_map);
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 262, 16, 240); // not 264
 	screen.set_screen_update(FUNC(asterix_state::screen_update_asterix));
 	screen.set_palette("palette");
 
@@ -409,7 +413,6 @@ void asterix_state::asterix(machine_config &config)
 
 	K053244(config, m_k053244, 0);
 	m_k053244->set_palette("palette");
-	m_k053244->set_offsets(93, -1);
 	m_k053244->set_sprite_callback(FUNC(asterix_state::sprite_callback));
 
 	K053251(config, m_k053251, 0);
@@ -417,9 +420,11 @@ void asterix_state::asterix(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", XTAL(32'000'000)/8).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1); // 4MHz
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32_MHz_XTAL / 8)); // 4MHz
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(1, "speaker", 1.0, 1);
 
-	k053260_device &k053260(K053260(config, "k053260", XTAL(32'000'000)/8)); // 4MHz
+	k053260_device &k053260(K053260(config, "k053260", 32_MHz_XTAL / 8)); // 4MHz
 	k053260.add_route(0, "speaker", 0.75, 0);
 	k053260.add_route(1, "speaker", 0.75, 1);
 	k053260.sh1_cb().set(FUNC(asterix_state::z80_nmi_w));

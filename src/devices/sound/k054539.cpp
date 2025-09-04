@@ -22,16 +22,14 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K054539, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
-	, flags(0)
-	, reverb_pos(0)
-	, cur_ptr(0)
-	, rom_addr(0)
-	, stream(nullptr)
+	, m_flags(RESET_FLAGS)
+	, m_stream(nullptr)
 	, m_timer(nullptr)
-	, m_timer_state(0)
 	, m_timer_handler(*this)
 	, m_apan_cb(*this)
 {
+	for(auto & elem : m_gain)
+		elem = 1.0;
 }
 
 
@@ -74,33 +72,38 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
     The reverb delay is actually an offset in this buffer.
 */
 
-void k054539_device::init_flags(int _flags)
+void k054539_device::init_flags(int flags)
 {
-	flags = _flags;
+	if(started())
+		m_stream->update();
+
+	m_flags = flags;
 }
 
-void k054539_device::set_gain(int channel, double _gain)
+void k054539_device::set_gain(int channel, double gain)
 {
-	if(_gain >= 0)
-		gain[channel] = _gain;
+	if(started())
+		m_stream->update();
+
+	if(gain >= 0)
+		m_gain[channel] = gain;
 }
-//*
 
 bool k054539_device::regupdate()
 {
-	return !(regs[0x22f] & 0x80);
+	return !(m_regs[0x22f] & 0x80);
 }
 
 void k054539_device::keyon(int channel)
 {
 	if(regupdate())
-		regs[0x22c] |= 1 << channel;
+		m_regs[0x22c] |= 1 << channel;
 }
 
 void k054539_device::keyoff(int channel)
 {
 	if(regupdate())
-		regs[0x22c] &= ~(1 << channel);
+		m_regs[0x22c] &= ~(1 << channel);
 }
 
 void k054539_device::sound_stream_update(sound_stream &stream)
@@ -112,58 +115,58 @@ void k054539_device::sound_stream_update(sound_stream &stream)
 		0 * 0x100, -64 * 0x100, -32 * 0x100, -16 * 0x100, -8 * 0x100, -4 * 0x100, -2 * 0x100, -1 * 0x100
 	};
 
-	int16_t *rbase = (int16_t *)&ram[0];
+	int16_t *rbase = (int16_t *)&m_ram[0];
 
-	if(!(regs[0x22f] & 1))
+	if(!(m_regs[0x22f] & 1))
 		return;
 
 	for(int sample = 0; sample != stream.samples(); sample++) {
 		double lval, rval;
-		if(!(flags & DISABLE_REVERB))
-			lval = rval = rbase[reverb_pos];
+		if(!(m_flags & DISABLE_REVERB))
+			lval = rval = rbase[m_reverb_pos];
 		else
 			lval = rval = 0;
-		rbase[reverb_pos] = 0;
+		rbase[m_reverb_pos] = 0;
 
-		for(int ch=0; ch<8; ch++)
-			if(BIT(regs[0x22c], ch)) {
-				unsigned char *base1 = regs + 0x20*ch;
-				unsigned char *base2 = regs + 0x200 + 0x2*ch;
-				channel *chan = channels + ch;
+		for(int ch=0; ch<8; ch++) {
+			if(BIT(m_regs[0x22c], ch)) {
+				unsigned char *base1 = m_regs + 0x20*ch;
+				unsigned char *base2 = m_regs + 0x200 + 0x2*ch;
+				channel *chan = m_channels + ch;
 
 				int delta = base1[0x00] | (base1[0x01] << 8) | (base1[0x02] << 16);
 
 				int vol = base1[0x03];
 
 				int bval = vol + base1[0x04];
-				if (bval > 255)
+				if(bval > 255)
 					bval = 255;
 
 				int pan = base1[0x05];
 				// DJ Main: 81-87 right, 88 middle, 89-8f left
-				if (pan >= 0x81 && pan <= 0x8f)
+				if(pan >= 0x81 && pan <= 0x8f)
 					pan -= 0x81;
-				else if (pan >= 0x11 && pan <= 0x1f)
+				else if(pan >= 0x11 && pan <= 0x1f)
 					pan -= 0x11;
 				else
 					pan = 0x18 - 0x11;
 
-				double cur_gain = gain[ch];
+				double cur_gain = m_gain[ch];
 
-				double lvol = voltab[vol] * pantab[pan] * cur_gain;
-				if (lvol > VOL_CAP)
+				double lvol = m_voltab[vol] * m_pantab[pan] * cur_gain;
+				if(lvol > VOL_CAP)
 					lvol = VOL_CAP;
 
-				double rvol = voltab[vol] * pantab[0xe - pan] * cur_gain;
-				if (rvol > VOL_CAP)
+				double rvol = m_voltab[vol] * m_pantab[0xe - pan] * cur_gain;
+				if(rvol > VOL_CAP)
 					rvol = VOL_CAP;
 
-				double rbvol= voltab[bval] * cur_gain / 2;
-				if (rbvol > VOL_CAP)
+				double rbvol= m_voltab[bval] * cur_gain / 2;
+				if(rbvol > VOL_CAP)
 					rbvol = VOL_CAP;
 
 				int rdelta = (base1[6] | (base1[7] << 8)) >> 3;
-				rdelta = (rdelta + reverb_pos) & 0x3fff;
+				rdelta = (rdelta + m_reverb_pos) & 0x3fff;
 
 				int cur_pos = (base1[0x0c] | (base1[0x0d] << 8) | (base1[0x0e] << 16));
 
@@ -281,7 +284,7 @@ void k054539_device::sound_stream_update(sound_stream &stream)
 				}
 				lval += cur_val * lvol;
 				rval += cur_val * rvol;
-				rbase[(rdelta + reverb_pos) & 0x1fff] += int16_t(cur_val*rbvol);
+				rbase[(rdelta + m_reverb_pos) & 0x1fff] += int16_t(cur_val*rbvol);
 
 				chan->pos = cur_pos;
 				chan->pfrac = cur_pfrac;
@@ -294,7 +297,9 @@ void k054539_device::sound_stream_update(sound_stream &stream)
 					base1[0x0e] = cur_pos>>16 & 0xff;
 				}
 			}
-		reverb_pos = (reverb_pos + 1) & 0x1fff;
+		}
+
+		m_reverb_pos = (m_reverb_pos + 1) & 0x1fff;
 		stream.put_int(0, sample, lval, 32768);
 		stream.put_int(1, sample, rval, 32768);
 	}
@@ -303,94 +308,94 @@ void k054539_device::sound_stream_update(sound_stream &stream)
 
 TIMER_CALLBACK_MEMBER(k054539_device::call_timer_handler)
 {
-	if (regs[0x22f] & 0x20)
+	if(m_regs[0x22f] & 0x20)
 		m_timer_handler(m_timer_state ^= 1);
 }
 
 void k054539_device::init_chip()
 {
-	memset(regs, 0, sizeof(regs));
-	memset(posreg_latch, 0, sizeof(posreg_latch)); //*
-	flags |= UPDATE_AT_KEYON; //* make it default until proven otherwise
+	memset(m_regs, 0, sizeof(m_regs));
+	memset(m_posreg_latch, 0, sizeof(m_posreg_latch));
+	m_flags |= UPDATE_AT_KEYON; // make it default until proven otherwise
 
-	ram = std::make_unique<uint8_t []>(0x8000);
+	m_ram = std::make_unique<uint8_t []>(0x8000);
 
-	reverb_pos = 0;
-	cur_ptr = 0;
-	memset(&ram[0], 0, 0x8000);
+	m_reverb_pos = 0;
+	m_cur_ptr = 0;
+	m_rom_addr = 0;
+	m_timer_state = 0;
+	memset(&m_ram[0], 0, 0x8000);
 
-	stream = stream_alloc(0, 2, clock() / 384);
+	m_stream = stream_alloc(0, 2, clock() / 384);
 
-	save_item(NAME(voltab));
-	save_item(NAME(pantab));
-	save_item(NAME(gain));
-	save_item(NAME(posreg_latch));
-	save_item(NAME(flags));
+	save_item(NAME(m_voltab));
+	save_item(NAME(m_pantab));
+	save_item(NAME(m_gain));
+	save_item(NAME(m_posreg_latch));
+	save_item(NAME(m_flags));
 
-	save_item(NAME(regs));
-	save_pointer(NAME(ram), 0x8000);
-	save_item(NAME(reverb_pos));
-	save_item(NAME(cur_ptr));
-	save_item(NAME(rom_addr));
+	save_item(NAME(m_regs));
+	save_pointer(NAME(m_ram), 0x8000);
+	save_item(NAME(m_reverb_pos));
+	save_item(NAME(m_cur_ptr));
+	save_item(NAME(m_rom_addr));
 
 	save_item(NAME(m_timer_state));
 }
 
 void k054539_device::write(offs_t offset, u8 data)
 {
+	m_stream->update();
+
 	if(0) {
 		int voice, reg;
 
 		/* The K054539 has behavior like many other wavetable chips including
 		   the Ensoniq 550x and Gravis GF-1: if a voice is active, writing
-		   to it's current position is silently ignored.
+		   to its current position is silently ignored.
 
-		   Dadandaan depends on this or the vocals go wrong.
+		   Dadandarn depends on this or the vocals go wrong.
 		*/
-		if (offset < 8*0x20)
+		if(offset < 8*0x20)
 		{
 			voice = offset / 0x20;
 			reg = offset & ~0x20;
 
-			if(regs[0x22c] & (1<<voice))
-				if (reg >= 0xc && reg <= 0xe)
+			if(m_regs[0x22c] & (1<<voice))
+				if(reg >= 0xc && reg <= 0xe)
 					return;
 		}
 	}
 
-	bool latch = (flags & UPDATE_AT_KEYON) && (regs[0x22f] & 1);
+	bool latch = (m_flags & UPDATE_AT_KEYON) && (m_regs[0x22f] & 1);
 
-	if (latch && offset < 0x100)
-	{
+	if(latch && offset < 0x100) {
 		int offs = (offset & 0x1f) - 0xc;
 		int ch = offset >> 5;
 
-		if (offs >= 0 && offs <= 2)
-		{
+		if(offs >= 0 && offs <= 2) {
 			// latch writes to the position index registers
-			posreg_latch[ch][offs] = data;
+			m_posreg_latch[ch][offs] = data;
 			return;
 		}
 	}
 
-	else
+	else {
 		switch(offset) {
 		case 0x13f: {
 			int pan = data >= 0x11 && data <= 0x1f ? data - 0x11 : 0x18 - 0x11;
-			if (!m_apan_cb.isnull())
-				m_apan_cb(pantab[pan], pantab[0xe - pan]);
+			if(!m_apan_cb.isnull())
+				m_apan_cb(m_pantab[pan], m_pantab[0xe - pan]);
 			break;
 		}
 
 		case 0x214:
-			if (latch)
-			{
-				for(int ch=0; ch<8; ch++)
-				{
+			if(latch) {
+				for(int ch=0; ch<8; ch++) {
 					if(data & (1<<ch))
 					{
-						uint8_t *posptr = &posreg_latch[ch][0];
-						uint8_t *regptr = regs + (ch<<5) + 0xc;
+						uint8_t *posptr = &m_posreg_latch[ch][0];
+						uint8_t *regptr = m_regs + (ch<<5) + 0xc;
 
 						// update the chip at key-on
 						regptr[0] = posptr[0];
@@ -400,9 +405,7 @@ void k054539_device::write(offs_t offset, u8 data)
 						keyon(ch);
 					}
 				}
-			}
-			else
-			{
+			} else {
 				for(int ch=0; ch<8; ch++)
 					if(data & (1<<ch))
 						keyon(ch);
@@ -415,8 +418,7 @@ void k054539_device::write(offs_t offset, u8 data)
 					keyoff(ch);
 		break;
 
-		case 0x227:
-		{
+		case 0x227: {
 			attotime period = attotime::from_hz((float)(38 + data) * (clock()/384.0f/14400.0f)) / 2.0f;
 
 			m_timer->adjust(period, 0, period);
@@ -427,21 +429,20 @@ void k054539_device::write(offs_t offset, u8 data)
 		break;
 
 		case 0x22d:
-			if(rom_addr == 0x80) {
-				offs_t const addr = (cur_ptr & 0x3fff) | ((cur_ptr & 0x10000) >> 2);
-				ram[addr] = data;
+			if(m_rom_addr == 0x80) {
+				offs_t const addr = (m_cur_ptr & 0x3fff) | ((m_cur_ptr & 0x10000) >> 2);
+				m_ram[addr] = data;
 			}
-			cur_ptr = (cur_ptr + 1) & 0x1ffff;
+			m_cur_ptr = (m_cur_ptr + 1) & 0x1ffff;
 		break;
 
 		case 0x22e:
-			rom_addr = data;
-			cur_ptr = 0;
+			m_rom_addr = data;
+			m_cur_ptr = 0;
 		break;
 
 		case 0x22f:
-			if (!(data & 0x20)) // Disable timer output?
-			{
+			if(!(data & 0x20)) { // Disable timer output?
 				m_timer_state = 0;
 				m_timer_handler(m_timer_state);
 			}
@@ -449,7 +450,7 @@ void k054539_device::write(offs_t offset, u8 data)
 
 		default:
 #if 0
-			if(regs[offset] != data) {
+			if(m_regs[offset] != data) {
 				if((offset & 0xff00) == 0) {
 					chanoff = offset & 0x1f;
 					if(chanoff < 4 || chanoff == 5 ||
@@ -463,9 +464,10 @@ void k054539_device::write(offs_t offset, u8 data)
 			}
 #endif
 		break;
+		}
 	}
 
-	regs[offset] = data;
+	m_regs[offset] = data;
 }
 
 void k054539_device::device_post_load()
@@ -476,21 +478,24 @@ u8 k054539_device::read(offs_t offset)
 {
 	switch(offset) {
 	case 0x22d:
-		if(regs[0x22f] & 0x10) {
-			offs_t const addr = (cur_ptr & 0x3fff) | ((cur_ptr & 0x10000) >> 2);
-			uint8_t res = (rom_addr == 0x80) ? ram[addr] : read_byte((0x20000*rom_addr) + cur_ptr);
+		if(m_regs[0x22f] & 0x10) {
+			offs_t const addr = (m_cur_ptr & 0x3fff) | ((m_cur_ptr & 0x10000) >> 2);
+			uint8_t res = (m_rom_addr == 0x80) ? m_ram[addr] : read_byte((0x20000*m_rom_addr) + m_cur_ptr);
 			if(!machine().side_effects_disabled())
-				cur_ptr = (cur_ptr + 1) & 0x1ffff;
+				m_cur_ptr = (m_cur_ptr + 1) & 0x1ffff;
 			return res;
 		} else
 			return 0;
+
 	case 0x22c:
 		break;
+
 	default:
 		LOG("K054539 read %03x\n", offset);
 		break;
 	}
-	return regs[offset];
+
+	return m_regs[offset];
 }
 
 void k054539_device::device_start()
@@ -500,11 +505,6 @@ void k054539_device::device_start()
 	// resolve delegates
 	m_apan_cb.resolve();
 
-	for (auto & elem : gain)
-		elem = 1.0;
-
-	flags = RESET_FLAGS;
-
 	/*
 	    I've tried various equations on volume control but none worked consistently.
 	    The upper four channels in most MW/GX games simply need a significant boost
@@ -513,34 +513,34 @@ void k054539_device::device_start()
 	    values smaller than those of the hihats. Needless to say the two K054539 chips
 	    in Mystic Warriors are completely out of balance. Rather than forcing a
 	    "one size fits all" function to the voltab the current invert exponential
-	    appraoch seems most appropriate.
+	    approach seems most appropriate.
 	*/
 	// Factor the 1/4 for the number of channels in the volume (1/8 is too harsh, 1/2 gives clipping)
 	// vol=0 -> no attenuation, vol=0x40 -> -36dB
 	for(int i=0; i<256; i++)
-		voltab[i] = pow(10.0, (-36.0 * (double)i / (double)0x40) / 20.0) / 4.0;
+		m_voltab[i] = pow(10.0, (-36.0 * (double)i / (double)0x40) / 20.0) / 4.0;
 
 	// Pan table for the left channel
 	// Right channel is identical with inverted index
 	// Formula is such that pan[i]**2+pan[0xe-i]**2 = 1 (constant output power)
 	// and pan[0xe] = 1 (full panning)
 	for(int i=0; i<0xf; i++)
-		pantab[i] = sqrt((double)i) / sqrt((double)0xe);
+		m_pantab[i] = sqrt((double)i) / sqrt((double)0xe);
 
 	init_chip();
 }
 
 void k054539_device::device_clock_changed()
 {
-	stream->set_sample_rate(clock() / 384);
+	m_stream->set_sample_rate(clock() / 384);
 }
 
 void k054539_device::device_reset()
 {
-	regs[0x22c] = 0;
-	regs[0x22f] = 0;
-	memset(&ram[0], 0, 0x8000);
-	m_timer->enable(false);
+	m_regs[0x22c] = 0;
+	m_regs[0x22f] = 0;
+	memset(&m_ram[0], 0, 0x8000);
+	m_timer->adjust(attotime::never);
 }
 
 
@@ -551,5 +551,5 @@ void k054539_device::device_reset()
 
 void k054539_device::rom_bank_pre_change()
 {
-	stream->update();
+	m_stream->update();
 }

@@ -40,8 +40,8 @@ void pluto6_calypso32_device::device_add_mconfig(machine_config &config) {
 	RAM(config, m_vram);
 	m_vram->set_default_size("8M");
 	m_vram->set_default_value(0);
-    
-    MB86292(config, m_gpu, XTAL(14'318'181));
+
+	MB86292(config, m_gpu, XTAL(14'318'181));
 	m_gpu->set_vram("vram");
 	m_gpu->set_screen(m_screen);
 }

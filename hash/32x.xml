@@ -100,7 +100,8 @@ Missing [PWM] samples
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Some 3d geometry bugs when [DRC] is used
+Some 3d geometry bugs when [-drc] is used
+Accesses [cart] backup RAM
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
@@ -1699,6 +1700,7 @@ Master SH-2 enables HINT
 		<notes><![CDATA[
 left/right column sprites don't wraparound properly (webs in stage 1, first boss intro roar) (verify)
 Waterfall in stage 2 is static on left side, looks less prominent in YT videos (verify)
+Update: writes to no man's land area with [SH-2] around $0009'0xxx, very likely cache shenanigans
 Randomly crashed once during stage 2
 Reportedly runs at 30 FPS on real HW
 ]]></notes>
@@ -2293,8 +2295,10 @@ Accesses [cart] backup RAM
 		<year>199?</year>
 		<publisher>Time Warner Interactive</publisher>
 		<notes><![CDATA[
+Black screen, needs tighter sync after FIFO rewrite (?)
 Uses [DE-9] port 2 button B for something
 [Slave SH-2] tests [SCI] port
+Writes 0x0f1f to $a130e0 in undefined [cart] area
 ]]></notes>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="262144">
@@ -2436,7 +2440,8 @@ Uses [DE-9] port 2 button B for something
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Some 3d geometry bugs when [DRC] is used
+Some 3d geometry bugs with [-drc]
+Accesses [cart] backup RAM
 ]]></notes>
 		<info name="serial" value="GM-5001 (JPN)"/>
 		<info name="release" value="19941216 (JPN)"/>
@@ -2454,7 +2459,8 @@ Some 3d geometry bugs when [DRC] is used
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Some 3d geometry bugs when [DRC] is used
+Some 3d geometry bugs when [-drc] is used
+Accesses [cart] backup RAM
 ]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
@@ -2521,10 +2527,13 @@ Extensive checks for [cart] SRAM space, boots back to main menu if a new league 
 	</software>
 
 	<!-- TODO: sometimes it corrupts sound? -->
-	<software name="wwfraw">
+	<software name="wwfraw" supported="no">
 		<description>WWF Raw (World)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Background doesn't draw with [-nodrc], uses [SH-2] cache for cartridge RAM write
+]]></notes>
 		<info name="usage" value="Supports 4-players thru teamplay option"/>
 		<info name="serial" value="T-8101A (JPN)"/>
 		<info name="release" value="19950901 (JPN)"/>

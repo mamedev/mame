@@ -26,10 +26,10 @@ DEFINE_DEVICE_TYPE(BBC_EXP_SLOT, bbc_exp_slot_device, "bbc_exp_slot", "BBC Maste
 //  device_bbc_exp_interface - constructor
 //-------------------------------------------------
 
-device_bbc_exp_interface::device_bbc_exp_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "bbcexp")
+device_bbc_exp_interface::device_bbc_exp_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "bbcexp")
+	, m_slot(dynamic_cast<bbc_exp_slot_device*>(device.owner()))
 {
-	m_slot = dynamic_cast<bbc_exp_slot_device *>(device.owner());
 }
 
 
@@ -83,14 +83,6 @@ uint8_t bbc_exp_slot_device::jim_r(offs_t offset)
 		return 0xff;
 }
 
-uint8_t bbc_exp_slot_device::sheila_r(offs_t offset)
-{
-	if (m_card)
-		return m_card->sheila_r(offset);
-	else
-		return 0xfe;
-}
-
 //-------------------------------------------------
 //  write
 //-------------------------------------------------
@@ -135,6 +127,29 @@ void bbc_exp_slot_device::pb_w(uint8_t data)
 	if (m_card)
 		m_card->pb_w(data);
 }
+
+
+//-------------------------------------------------
+//  write_cb1
+//-------------------------------------------------
+
+void bbc_exp_slot_device::write_cb1(int state)
+{
+	if (m_card)
+		m_card->write_cb1(state);
+}
+
+
+//-------------------------------------------------
+//  write_cb2
+//-------------------------------------------------
+
+void bbc_exp_slot_device::write_cb2(int state)
+{
+	if (m_card)
+		m_card->write_cb2(state);
+}
+
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( bbc_exp_devices )

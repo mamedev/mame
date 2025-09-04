@@ -129,13 +129,14 @@ Notes:
       1x 3.579545MHz crystal
       1x 74HC138 logic chip
       1x 18 pin unknown chip (DIP18, surface scratched but it's probably a PIC16xxx, labelled 'dgSMART-PR3 MAGIC EYES')
-      3x Intel E28F128J3A 128MBit surface mounted FlashROMs (TSOP56, labelled 'BREZZASOFT BCSV0004Fxx', xx=01, 02, 03)
-         Note: there are 8 spaces total for FlashROMs. Only U1, U2 & U3 are populated in this cart.
+      3x Intel E28F128J3A 128Mbit surface mounted Flash ROMs (TSOP56, labelled 'BREZZASOFT BCSV0004Fxx', xx=01, 02, 03)
+         Note: there are 8 spaces total for Flash ROMs. Only U1, U2 & U3 are populated in this cart.
 
 
 */
 
 #include "emu.h"
+
 #include "cpu/se3208/se3208.h"
 #include "machine/ds1302.h"
 #include "machine/eepromser.h"
@@ -164,14 +165,15 @@ public:
 		m_system(*this, "SYSTEM")
 	{ }
 
-	void init_topbladv();
-	void init_officeye();
-	void init_crysking();
-	void init_evosocc();
-	void init_donghaer();
-	void init_maldaiza();
+	void init_topbladv() ATTR_COLD;
+	void init_officeye() ATTR_COLD;
+	void init_crysking() ATTR_COLD;
+	void init_evosocc() ATTR_COLD;
+	void init_donghaer() ATTR_COLD;
+	void init_maldaiza() ATTR_COLD;
 
-	void crystal(machine_config &config);
+	void crystal(machine_config &config) ATTR_COLD;
+
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
@@ -195,10 +197,12 @@ private:
 	required_ioport m_dsw;
 	required_ioport m_system;
 
+	std::unique_ptr<uint8_t[]> m_dummy_region;
+
 	uint32_t    m_bank;
 	uint32_t    m_maxbank;
 	uint32_t    m_flashcmd;
-	std::unique_ptr<uint8_t[]> m_dummy_region;
+	uint32_t    m_pio;
 
 	uint32_t system_input_r();
 	void banksw_w(uint32_t data);
@@ -213,13 +217,12 @@ private:
 	uint32_t pioldat_r();
 	void pioldat_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t pioedat_r();
-	uint32_t m_pio;
 };
 
 
 uint32_t crystal_state::system_input_r()
 {
-	return ( m_system->read() << 16) | (m_dsw->read()) | 0xff00ff00;
+	return (m_system->read() << 16) | (m_dsw->read()) | 0xff00ff00;
 }
 
 void crystal_state::banksw_w(uint32_t data)
@@ -236,13 +239,13 @@ uint32_t crystal_state::pioldat_r()
 // PIO Latched output DATa Register
 void crystal_state::pioldat_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint32_t RST = data & 0x01000000;
-	uint32_t CLK = data & 0x02000000;
-	uint32_t DAT = data & 0x10000000;
+	const uint32_t RST = BIT(data, 24);
+	const uint32_t CLK = BIT(data, 25);
+	const uint32_t DAT = BIT(data, 28);
 
-	m_ds1302->ce_w(RST ? 1 : 0);
-	m_ds1302->io_w(DAT ? 1 : 0);
-	m_ds1302->sclk_w(CLK ? 1 : 0);
+	m_ds1302->ce_w(RST);
+	m_ds1302->io_w(DAT);
+	m_ds1302->sclk_w(CLK);
 
 	COMBINE_DATA(&m_pio);
 }
@@ -284,8 +287,8 @@ void crystal_state::coin_counters_w(uint8_t data)
 {
 	// Both signals are sent when setting is "1 shooter"
 	// Only evosocc and crysking allow the user to change this setting.
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
 void crystal_state::crystal_mem(address_map &map)
@@ -322,7 +325,7 @@ void crystal_state::patchreset()
 
 	//The test menu reset routine seems buggy
 	//it reads the reset vector from 0x02000000 but it should be
-	//read from 0x00000000. At 0x2000000 there is the bios signature
+	//read from 0x00000000. At 0x2000000 there is the BIOS signature
 	//"LOADED VER....", so it jumps to "LOAD" in hex (0x44414F4C)
 	//I'll add some code there that makes the game stay in a loop
 	//reading the flip register so the idle skip works
@@ -373,8 +376,8 @@ void crystal_state::machine_start()
 
 	if (m_mainbank)
 	{
-		m_maxbank = (m_flash) ? m_flash.bytes() / 0x1000000 : 0;
-		m_dummy_region = std::make_unique<uint8_t[]>(0x1000000);
+		m_maxbank = m_flash ? (m_flash.bytes() / 0x1000000) : 0;
+		m_dummy_region = std::make_unique<uint8_t []>(0x1000000);
 		std::fill_n(&m_dummy_region[0], 0x1000000, 0xff); // 0xff filled at unmapped area
 		uint8_t *rom = (m_flash) ? (uint8_t *)&m_flash[0] : &m_dummy_region[0];
 		for (int i = 0; i < 8; i++)
@@ -571,7 +574,7 @@ INPUT_PORTS_END
 
 void crystal_state::crystal(machine_config &config)
 {
-	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCB
+	SE3208(config, m_maincpu, 14'318'180 * 3); // TODO : different between each PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::crystal_mem);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
@@ -690,9 +693,12 @@ ROM_END
 /* note on PIC protection from ElSemi (for actually emulating it instead of patching)
 
 The PIC uses a software UART bit banged on a single output pin of the main CPU:
-the data port is bit 0x20000000 on the PIO register, the same register where the EEPROM control lines are. The serial data is transmitted at 8 data bits, even parity, 1 stop bit. It's probably
-tricky to get it working properly because it doesn't rely on a clock signal, and so, the PIC and main CPU must run in parallel, and the bit lengths must match. The PIC bit delay routine is just a loop.
-Also it seems that bit 0x40000000 is the PIC reset.
+the data port is bit 0x20000000 on the PIO register, the same register where the
+EEPROM control lines are.  The serial data is transmitted at 8 data bits, even
+parity, 1 stop bit. It's probably tricky to get it working properly because it
+doesn't rely on a clock signal, and so, the PIC and main CPU must run in
+parallel, and the bit lengths must match.  The PIC bit delay routine is just a
+loop.  Also it seems that bit 0x40000000 is the PIC reset.
 
 */
 
@@ -818,7 +824,7 @@ void crystal_state::init_maldaiza()
 GAME( 2001, crysbios, 0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "Crystal System BIOS", MACHINE_IS_BIOS_ROOT )
 GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, init_crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings", 0 )
 GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, init_evosocc,  ROT0, "Evoga",               "Evolution Soccer", 0 )
-GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, init_officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
+GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, init_officeye, ROT0, "Danbi",               "Office Yeoin Cheonha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
 GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 2 players mode has GFX issues, seldomly hangs
 GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", 0 ) // lamps, verify game timings
 GAME( 2003, topbladv, crysbios, crystal,  topbladv, crystal_state, init_topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", 0 )

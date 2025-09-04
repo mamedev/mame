@@ -20,9 +20,6 @@ Nascar Arcade                (C) Sega, 2000
 Planet Harriers              (C) Sega, 2001
 Star Wars Racer Arcade       (C) Sega, 2000
 
-! - denotes secured but not fully dumped yet
-* - denotes not dumped yet.
-
 The Sega Hikaru system comprises the following PCBs.....
 Main board     - 2 known versions exists. They're mostly the same. It contains many thin BGAs,
                  lots of RAM, 2x SH4 CPUs and 1x 16MBit boot EPROM. Because of the use of many thin BGA
@@ -1478,13 +1475,13 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2000, hikaru,    0,        hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Hikaru BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
-GAME( 1999, braveff,   hikaru,   hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Brave Firefighters", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, airtrix,   hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Air Trix (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, airtrixo,  airtrix,  hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Air Trix (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, hikcheck,  hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Hikaru Check ROM Board", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, sgnascar,  hikaru,   hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Electronic Arts", "NASCAR Arcade (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, sgnascaro, sgnascar, hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Electronic Arts", "NASCAR Arcade (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, pharrier,  hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, swracer,   hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Star Wars: Racer Arcade", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2001, von4,      hikaru,   hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Hitmaker", "Cyber Troopers Virtual-On 4 Force (Rev E)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, hikaru,    0,        hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega",                    "Hikaru BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
+GAME( 1999, braveff,   hikaru,   hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega",                    "Brave Firefighters", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, airtrix,   hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Hitmaker",         "Air Trix (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, airtrixo,  airtrix,  hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Hitmaker",         "Air Trix (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, hikcheck,  hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",                    "Hikaru Check ROM Board", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, sgnascar,  hikaru,   hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Electronic Arts",  "NASCAR Arcade (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, sgnascaro, sgnascar, hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Electronic Arts",  "NASCAR Arcade (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, pharrier,  hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Amusement Vision", "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, swracer,   hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Lucas Arts",       "Star Wars: Racer Arcade", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2001, von4,      hikaru,   hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Hitmaker",         "Cyber Troopers Virtual-On 4: Force (Rev E)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING ) // game version may be switched to 7.5, 7.6 or 7.7 via password in game test mode

@@ -4,8 +4,6 @@
 
 Atari A800/A5200/XEGS cart slot emulation
 
-<fill me>
-
 References:
 - Altirra HW reference manual 2022-07-07 edition, chapter 8;
 - https://github.com/atari800/atari800/blob/master/DOC/cart.txt
@@ -741,7 +739,7 @@ template <unsigned Bank> uint8_t a800_cart_slot_device::read_cart(offs_t offset)
 
 template <unsigned Bank> void a800_cart_slot_device::write_cart(offs_t offset, uint8_t data)
 {
-	return m_space_mem->write_byte(offset | Bank << 13, data);
+	m_space_mem->write_byte(offset | Bank << 13, data);
 }
 
 // Instantiate maps

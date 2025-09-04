@@ -352,27 +352,28 @@ uint16_t moo_state::control2_r()
 
 void moo_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/* bit 0  is data */
-	/* bit 1  is cs (active low) */
-	/* bit 2  is clock (active high) */
-	/* bit 5  is enable irq 5 (unconfirmed) */
-	/* bit 8  is enable sprite ROM reading */
-	/* bit 10 is watchdog */
-	/* bit 11 is enable irq 4 (unconfirmed) */
+	// bit 0  is data
+	// bit 1  is cs (active low)
+	// bit 2  is clock (active high)
+	// bit 5  is enable irq 5 (unconfirmed)
+	// bit 8  is enable sprite ROM reading
+	// bit 10 is watchdog
+	// bit 11 is enable irq 4 (unconfirmed)
 
 	COMBINE_DATA(&m_cur_control2);
 
 	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 
-	if (data & 0x100)
-		m_k053246->k053246_set_objcha_line( ASSERT_LINE);
+	if (m_cur_control2 & 0x100)
+		m_k053246->k053246_set_objcha_line(ASSERT_LINE);
 	else
-		m_k053246->k053246_set_objcha_line( CLEAR_LINE);
+		m_k053246->k053246_set_objcha_line(CLEAR_LINE);
 }
 
 
 void moo_state::moo_objdma()
 {
+	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
 	int num_inactive;
 	uint16_t *src, *dst;
 	int counter = m_k053246->k053247_get_dy();
@@ -524,7 +525,7 @@ void moo_state::moo_map(address_map &map)
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));      /* K054338 alpha blending engine */
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x0ce000, 0x0ce01f).w(FUNC(moo_state::moo_prot_w));
-	map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);                  /* CCU regs (ignored) */
+	map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); /* CCU regs (ignored) */
 	map(0x0d4000, 0x0d4001).w(FUNC(moo_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));        /* VSCCS regs */
@@ -588,7 +589,7 @@ void moo_state::bucky_map(address_map &map)
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));      /* K054338 alpha blending engine */
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x0ce000, 0x0ce01f).w(FUNC(moo_state::moo_prot_w));
-	map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);                  /* CCU regs (ignored) */
+	map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); /* CCU regs (ignored) */
 	map(0x0d2000, 0x0d203f).m("k054000", FUNC(k054000_device::map)).umask16(0x00ff);
 	map(0x0d4000, 0x0d4001).w(FUNC(moo_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
@@ -712,23 +713,23 @@ void moo_state::machine_reset()
 void moo_state::moo(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2); // 16MHz verified
+	M68000(config, m_maincpu, 32_MHz_XTAL / 2); // 16MHz verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &moo_state::moo_map);
 	m_maincpu->set_vblank_int("screen", FUNC(moo_state::moo_interrupt));
 
-	Z80(config, m_soundcpu, XTAL(32'000'000)/4); // 8MHz verified
+	Z80(config, m_soundcpu, 32_MHz_XTAL / 4); // 8MHz verified
 	m_soundcpu->set_addrmap(AS_PROGRAM, &moo_state::sound_map);
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	K053252(config, m_k053252, XTAL(32'000'000)/4); // 8MHz
+	K053252(config, m_k053252, 32_MHz_XTAL / 4); // 8MHz
 	m_k053252->set_offsets(40, 16);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200));   // should give IRQ4 sufficient time to update scroll registers
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200)); // should give IRQ4 sufficient time to update scroll registers
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
 	m_screen->set_screen_update(FUNC(moo_state::screen_update_moo));
@@ -758,17 +759,19 @@ void moo_state::moo(machine_config &config)
 
 	K054321(config, m_k054321, "speaker");
 
-	YM2151(config, "ymsnd", XTAL(32'000'000)/8).add_route(0, "speaker", 0.50, 0).add_route(1, "speaker", 0.50, 1); // 4MHz verified
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32_MHz_XTAL / 8)); // 4MHz verified
+	ymsnd.add_route(0, "speaker", 0.30, 0);
+	ymsnd.add_route(1, "speaker", 0.30, 1);
 
 	K054539(config, m_k054539, XTAL(18'432'000));
-	m_k054539->add_route(0, "speaker", 0.75, 0);
-	m_k054539->add_route(1, "speaker", 0.75, 1);
+	m_k054539->add_route(0, "speaker", 0.50, 1);
+	m_k054539->add_route(1, "speaker", 0.50, 0);
 }
 
 void moo_state::moobl(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16100000);
+	M68000(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &moo_state::moobl_map);
 	m_maincpu->set_vblank_int("screen", FUNC(moo_state::moobl_interrupt));
 
@@ -804,11 +807,10 @@ void moo_state::moobl(machine_config &config)
 	K054338(config, m_k054338, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "speaker").front_center();
 
 	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
-	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void moo_state::bucky(machine_config &config)

@@ -4910,7 +4910,9 @@ Hangs on technique screen after level select (assuming you pick them up in stage
 		<description>Ryuuko no Ken (Japan)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
-		<info name="language" value="English/Japanese/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="Japanese" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="HCD4061"/>
 		<info name="release" value="19940326"/>
 		<info name="alt_title" value="龍虎の拳"/>
@@ -6813,7 +6815,8 @@ Cuts off [ADPCM] playback, enables half irq
 		<notes><![CDATA[
 Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 ]]></notes>
-		<info name="language" value="English/Japanese"/>
+		<info name="language" value="English" />
+		<info name="language" value="Japanese" />
 		<info name="serial" value="PVCD0001"/>
 		<info name="release" value="19900330"/>
 		<info name="alt_title" value="カルメンサンディエゴを追え! 世界編"/>
@@ -8372,7 +8375,9 @@ Offset [CRTC] screen
 		<description>Mysterious Song (re-release)</description>
 		<year>2014</year>
 		<publisher>Frozen Utopia</publisher>
-		<info name="language" value="English/French/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Spanish" />
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="cdrom">
@@ -8419,7 +8424,9 @@ Offset [CRTC] screen
 		<description>Mysterious Song</description>
 		<year>2012</year>
 		<publisher>Frozen Utopia</publisher>
-		<info name="language" value="English/French/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Spanish" />
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="cdrom">
@@ -8467,7 +8474,8 @@ Offset [CRTC] screen
 		<description>Revival Chase</description>
 		<year>2013</year>
 		<publisher>Revival Games</publisher>
-		<info name="language" value="English/French" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
 		<info name="serial" value="VOC3628"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>

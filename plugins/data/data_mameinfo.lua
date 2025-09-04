@@ -16,8 +16,11 @@ function dat.check(set, softlist)
 	if not status or not info then
 		return nil
 	end
-	local sourcefile = emu.driver_find(set).source_file:match('[^/\\]*$')
+	local sourcefile = emu.driver_find(set).source_file:match('[^/\\]+[/\\\\][^/\\]*$')
 	status, drvinfo = pcall(datread, 'drv', 'info', sourcefile)
+	if not drvinfo then
+		status, drvinfo = pcall(datread, 'drv', 'info', sourcefile:match('[^/\\]*$'))
+	end
 	if drvinfo then
 		info = info .. _p('plugin-data', '\n\n--- DRIVER INFO ---\nDriver: ') .. sourcefile .. '\n\n' .. drvinfo
 	end

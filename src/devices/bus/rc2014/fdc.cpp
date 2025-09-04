@@ -123,9 +123,9 @@ static INPUT_PORTS_START( rc2014_fdc9266_jumpers )
 	PORT_CONFSETTING( 0x0, "GND" )
 	PORT_CONFSETTING( 0x1, "+5V" )
 	PORT_START("JP4")
-	PORT_CONFNAME( 0x1, 0x4, "RDY" )
+	PORT_CONFNAME( 0x1, 0x1, "RDY" )
 	PORT_CONFSETTING( 0x0, "GND" )
-	PORT_CONFSETTING( 0x4, "DC/RDY" )
+	PORT_CONFSETTING( 0x1, "DC/RDY" )
 INPUT_PORTS_END
 
 ioport_constructor rc2014_fdc9266_device::device_input_ports() const

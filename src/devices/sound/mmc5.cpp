@@ -278,7 +278,7 @@ u8 mmc5_sound_device::read(offs_t offset)
 		break;
 	default:
 		if (!machine().side_effects_disabled())
-			logerror("%s: Invalid mmc5 sound read at $%02x\n", offset);
+			logerror("%s: Invalid mmc5 sound read at $%02x\n", machine().describe_context(), offset);
 		break;
 	}
 

@@ -4,7 +4,7 @@
 "CGA" Amcoe HW (c) 1999-2004 Amcoe
 
 Notes:
-- Some games requires an operator password to prevent players from changing the settings
+- Some games require an operator password to prevent players from changing the settings
   it defaults to 123456
 
 - The games don't cope well with corrupt NVRAM, and may fail to boot completely(!)
@@ -30,15 +30,15 @@ Notes on version letters:
 -------------------------
 
 E  = Export (It displays a "Outside USA use only" message)
-R  = ?? (In some games, it displays value of winning combinations, see e.g. fb4 Ver. R vs. Ver. LT)
-LT = ?? (It displays a "PT/TKT" message, so maybe it has a minimum amount of points
-     needed to get a ticket)
+R  = Regular
+LT = Limit Win version with 5 different TX-XT options
 XT = Texas XT / Arkansas / Iowa
-N  = ??
+N  = No Reel Spin
 B  = High Bonus Version
-SH = ??
+SH = Skill Hold
 T  = 10 Times (Bonus game every ten times, see bonus table)
-
+Q  = ??
+S  = SPECIAL. Modify "Feel of playing"
 
 2009-08 FP: Reworked parent/clone relationships so that parent is the higher revision and/or the
 Export version. Also, I tried to standardize setnames by using the following convention:
@@ -273,10 +273,12 @@ MH86171 Color Palette RAMDAC
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "video/ramdac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -309,11 +311,9 @@ public:
 	void sfbonus(machine_config &config);
 
 	void init_hldspin2d();
-	void init_ch2000v3();
 	void init_fb5v();
 	void init_suprball();
 	void init_ch2000v2();
-	void init_act2000v3();
 	void init_classiced3();
 	void init_fb6v3();
 	void init_fb4d();
@@ -326,7 +326,6 @@ public:
 	void init_fb6();
 	void init_classicev3();
 	void init_fb4();
-	void init_ch2000c();
 	void init_pir2001();
 	void init_version4();
 	void init_pir2002v();
@@ -3408,6 +3407,25 @@ ROM_START( fb2genv2 )
 	ROM_LOAD( "fb2g18lt.id", 0x00, 0x20, CRC(8f36bc08) SHA1(53d970cb1a1055c459e64a09f4e495c52aa2ab9f) )
 ROM_END
 
+ROM_START( fb2gencq )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "f2gv18lt.bin", 0x00000, 0x80000, CRC(ea6cb51e) SHA1(d86398feeac529aee12e1955e9f01b6477d6505c) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fb2grom3.bin", 0x00000, 0x80000, CRC(21ade753) SHA1(ca70ab941740983626f4d274aa4a9edea366f38a) )
+	ROM_LOAD16_BYTE( "fb2grom4.bin", 0x00001, 0x80000, CRC(56605a08) SHA1(09022dc797dd824a973c5126cafe7b086a94184c) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fb2grom5.bin", 0x00000, 0x80000, CRC(6aa1e45d) SHA1(a821c98513ad851f5f9e2452620feb662c28f8bb) )
+	ROM_LOAD16_BYTE( "fb2grom6.bin", 0x00001, 0x80000, CRC(1a525dcf) SHA1(20b1b2d6bdb0953300a6d9937b582fd5e20931ed) )
+
+	ROM_REGION( 0x1000, "nvram", ROMREGION_ERASE00 ) /* default settings */
+	ROM_LOAD( "fb2g18q.id", 0x00, 0x20, CRC(f7755da4) SHA1(98a490e0801d0dde65ae06771f07da1f24e8f8d5) )
+ROM_END
+
 ROM_START( fb2geno )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb2g16xt.bin", 0x00000, 0x40000, CRC(ea525ebb) SHA1(965bba045ba69ac4316b27d0d69b130119f9ce04) )
@@ -3578,6 +3596,26 @@ ROM_START( fb2ndo )
 
 	ROM_REGION( 0x1000, "nvram", ROMREGION_ERASE00 ) /* default settings */
 	ROM_LOAD( "fb2e15r.id", 0x00, 0x20, CRC(1c1db94c) SHA1(3438c43b31640b3d052bc4e740f9056b70a57550) )
+ROM_END
+
+// shows 1.6 in bookkeeping but saves 1.6R in NVRAM
+ROM_START( fb2ndo1 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "fb2e16r.bin", 0x00000, 0x40000, CRC(00c79759) SHA1(fb2978e4ba8ed1dfa2c9edeb1b5b23a04078e18e) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fb2erom3.bin", 0x00000, 0x80000, CRC(58201f71) SHA1(1e8d44105194a619d75d106cebcef783edc810f2) )
+	ROM_LOAD16_BYTE( "fb2erom4.bin", 0x00001, 0x80000, CRC(4f8cb873) SHA1(7fae47e41abb8e3fffd584f9a5507168c06b8b6b) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fb2erom5.bin", 0x00000, 0x80000, CRC(1bc55876) SHA1(d04ff7bf97145d45de943129bc9f3cbe27f4588e) )
+	ROM_LOAD16_BYTE( "fb2erom6.bin", 0x00001, 0x80000, CRC(71b43f19) SHA1(a0b7f2b1968e6c083f9793f1249edb339422370d) )
+
+	ROM_REGION( 0x1000, "nvram", ROMREGION_ERASE00 ) /* default settings */
+	ROM_LOAD( "fb2e16r.id", 0x00, 0x20, CRC(e4eaab6e) SHA1(fb010d7492b10ebd568fff4a715c98aee63fe136) )
 ROM_END
 
 /* Fruit Bonus 2004 */
@@ -4216,6 +4254,119 @@ ROM_START( ch2000o3 )
 	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x40000, CRC(0ebe2ea5) SHA1(d83c1ba940e43ce1d392969055f36b3c49ac9727) )
 ROM_END
 
+ROM_START( ch2000o4 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "fc2k26.u6", 0x00000, 0x40000, CRC(a6bd9c2d) SHA1(ba9b18edcbebf78f310fb061a5ae75ffe8809d20) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fbrom2.u18", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fbrom3.u25", 0x00000, 0x40000, CRC(fba18126) SHA1(d4b8ce0cf2a73696828c3d649ceb6b73a80825e5) )
+	ROM_LOAD16_BYTE( "fbrom4.u24", 0x00001, 0x40000, CRC(3e8926ca) SHA1(0486b1390f9e5dadd4ba946a10e8a47bfd9041e6) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fbrom5.u23", 0x00000, 0x40000, CRC(d21d171a) SHA1(7c7a3c46879220a174a038f634518d60f3959047) )
+	ROM_LOAD16_BYTE( "fbrom6.u22", 0x00001, 0x40000, CRC(a9efbd48) SHA1(008d6628c1a1af3b50cb69c8800f8f35ed310dd3) )
+ROM_END
+
+ROM_START( ch2000o5 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "fc2k31.bin", 0x00000, 0x40000, CRC(3944aabe) SHA1(5d31ab50ea6ffc83e6aa13140a23cb5bc2f04ba4) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fbrom3.bin", 0x00000, 0x40000, CRC(a712b521) SHA1(355b3bd892d5fbd360961ca4b5adb20ddf2ba553) )
+	ROM_LOAD16_BYTE( "fbrom4.bin", 0x00001, 0x40000, CRC(8996d2d5) SHA1(fc3830b8126ef9d15108e0873209168ad0b608c8) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fbrom5.bin", 0x00000, 0x40000, CRC(494fd1fa) SHA1(01ca60e35b68da398612fc7c8a7da6f8835eabd5) )
+	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x40000, CRC(0ebe2ea5) SHA1(d83c1ba940e43ce1d392969055f36b3c49ac9727) )
+ROM_END
+
+ROM_START( ch2000o6 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "fc2k33.bin", 0x00000, 0x40000, CRC(b07877fe) SHA1(c520c67ed5f10c22feb8c73e2ae12e1645a9490d) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fbrom3.bin", 0x00000, 0x40000, CRC(a712b521) SHA1(355b3bd892d5fbd360961ca4b5adb20ddf2ba553) )
+	ROM_LOAD16_BYTE( "fbrom4.bin", 0x00001, 0x40000, CRC(8996d2d5) SHA1(fc3830b8126ef9d15108e0873209168ad0b608c8) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fbrom5.bin", 0x00000, 0x40000, CRC(494fd1fa) SHA1(01ca60e35b68da398612fc7c8a7da6f8835eabd5) )
+	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x40000, CRC(0ebe2ea5) SHA1(d83c1ba940e43ce1d392969055f36b3c49ac9727) )
+ROM_END
+
+ROM_START( ch2000o7 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "fc2k36.bin", 0x00000, 0x40000, CRC(4247b2f9) SHA1(fc4c568c5be6a05445b0809d4ade0903b7ca57dc) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fbrom3.bin", 0x00000, 0x40000, CRC(a712b521) SHA1(355b3bd892d5fbd360961ca4b5adb20ddf2ba553) )
+	ROM_LOAD16_BYTE( "fbrom4.bin", 0x00001, 0x40000, CRC(8996d2d5) SHA1(fc3830b8126ef9d15108e0873209168ad0b608c8) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fbrom5.bin", 0x00000, 0x40000, CRC(494fd1fa) SHA1(01ca60e35b68da398612fc7c8a7da6f8835eabd5) )
+	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x40000, CRC(0ebe2ea5) SHA1(d83c1ba940e43ce1d392969055f36b3c49ac9727) )
+ROM_END
+
+ROM_START( ch2000o8 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "fc2k36a.bin", 0x00000, 0x40000, CRC(0c9eb597) SHA1(c4d329fa90b7fcf546682a4a206d09115f0c52dc) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fbrom3.bin", 0x00000, 0x40000, CRC(a712b521) SHA1(355b3bd892d5fbd360961ca4b5adb20ddf2ba553) )
+	ROM_LOAD16_BYTE( "fbrom4.bin", 0x00001, 0x40000, CRC(8996d2d5) SHA1(fc3830b8126ef9d15108e0873209168ad0b608c8) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fbrom5.bin", 0x00000, 0x40000, CRC(494fd1fa) SHA1(01ca60e35b68da398612fc7c8a7da6f8835eabd5) )
+	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x40000, CRC(0ebe2ea5) SHA1(d83c1ba940e43ce1d392969055f36b3c49ac9727) )
+ROM_END
+
+ROM_START( ch2000o9 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "fc2k23b.bin", 0x00000, 0x20000, CRC(9c4b44b7) SHA1(6ed0b9983517fa67091731827d4c9713439dd083) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fbrom3.bin", 0x00000, 0x80000, CRC(4045640f) SHA1(5ac5da23c434cefbae46dfd25ee74c1baac27926) )
+	ROM_LOAD16_BYTE( "fbrom4.bin", 0x00001, 0x80000, CRC(1147b772) SHA1(cd57119d0dca7d1a1d4e7e49e279abe6c6073a37) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fbrom5.bin", 0x00000, 0x80000, CRC(a113ba92) SHA1(ce6acfe3fe4c478fae4cfbb504baa82d79907fe1) )
+	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x80000, CRC(7f81610d) SHA1(372f33e016df99b45d24d0fe63c3f31f085817c1) )
+ROM_END
+
+
+ROM_START( ch2000o10 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "fc2k23xt.bin", 0x00000, 0x20000, CRC(4067463b) SHA1(2c16fbe6f064b0bcf133e14988fc5795fd54110a) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fbrom3.bin", 0x00000, 0x80000, CRC(4045640f) SHA1(5ac5da23c434cefbae46dfd25ee74c1baac27926) )
+	ROM_LOAD16_BYTE( "fbrom4.bin", 0x00001, 0x80000, CRC(1147b772) SHA1(cd57119d0dca7d1a1d4e7e49e279abe6c6073a37) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fbrom5.bin", 0x00000, 0x80000, CRC(a113ba92) SHA1(ce6acfe3fe4c478fae4cfbb504baa82d79907fe1) )
+	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x80000, CRC(7f81610d) SHA1(372f33e016df99b45d24d0fe63c3f31f085817c1) )
+ROM_END
+
 /* Pirate 2001 */
 ROM_START( pir2001 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
@@ -4734,6 +4885,25 @@ ROM_START( classicev2 )
 	ROM_LOAD( "fcs16lt.id", 0x00, 0x20,  CRC(9888f6bb) SHA1(638dbb61a26743159e012bca906206eae0ba1d66) )
 ROM_END
 
+ROM_START( classiceo )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "fcsd14r.bin", 0x00000, 0x80000, CRC(f017f389) SHA1(66b1988f21de4faa1dde9dd8fcef96d333497708) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fcsrom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(4a96ab78) SHA1(b8f98cd9789ba5cc13eacf34db765ca8d5635903) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fcsrom3.bin", 0x00000, 0x40000, CRC(0ba6207a) SHA1(06d1b5826da3af2cb55c64ee69772b7fb3e6bf89) )
+	ROM_LOAD16_BYTE( "fcsrom4.bin", 0x00001, 0x40000, CRC(149dcf7d) SHA1(1f4e0f54cdb22ee9a867861a2a7d659cd339a0a2) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
+	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+
+	ROM_REGION( 0x1000, "nvram", ROMREGION_ERASE00 ) /* default settings */
+	ROM_LOAD( "fcs14r.id", 0x00, 0x20,  CRC(9da3fcbf) SHA1(541d63dbe539718727eb8cb637bc02f824f0c264) )
+ROM_END
+
 /* Sea World */
 ROM_START( seawld )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
@@ -4867,6 +5037,25 @@ ROM_START( moneymacv2 )
 
 	ROM_REGION( 0x1000, "nvram", ROMREGION_ERASE00 ) /* default settings */
 	ROM_LOAD( "mm17lt.id", 0x00, 0x20,  CRC(b6b08ea0) SHA1(a56c7648424ca4dd0d405059f07af6f7cee0111a) )
+ROM_END
+
+ROM_START( moneymaco )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "mmd13r.bin", 0x00000, 0x40000, CRC(e1d12d5b) SHA1(b11ee6f8e58a8b20b2e3fabf9524921a9298fb0e) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "mmrom2.bin", 0x00000, 0x40000, CRC(fc3195e6) SHA1(a13c22c0cd5cdbc833e0f7e229ce4afe2cf2b466) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "mmrom3.bin", 0x00000, 0x80000, CRC(1ef6ee35) SHA1(0617121b44fb0866fdc992aa35a8c2e5f696b69a) )
+	ROM_LOAD16_BYTE( "mmrom4.bin", 0x00001, 0x80000, CRC(f9f979b5) SHA1(994bd28fc82a6e10126e5c2e7c1938f6a20a49a8) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "mmrom5.bin", 0x00000, 0x80000, CRC(7009308d) SHA1(8c09bfa025ae5cdab5c488af9cf1747da5d1ac67) )
+	ROM_LOAD16_BYTE( "mmrom6.bin", 0x00001, 0x80000, CRC(828dde28) SHA1(3024d5d449acce1f78254053866f3aa8d36aff53) )
+
+	ROM_REGION( 0x1000, "nvram", ROMREGION_ERASE00 ) /* default settings */
+	ROM_LOAD( "mmd13r.id", 0x00, 0x20,  CRC(e986acfe) SHA1(916914db025a258eccc8e47468e6c70abe071625) )
 ROM_END
 
 // incomplete / mixed sets etc. sort these first before doing anything else with them
@@ -5876,7 +6065,6 @@ void sfbonus_state::init_act2000()          { sfbonus_bitswap( 0x25, 1,2,7,6,5,4
 void sfbonus_state::init_act2000d()         { sfbonus_bitswap( 0x3d, 0,2,7,6,5,4,3,1, 0xef, 1,7,6,5,4,3,2,0, 0x27, 0,2,1,7,6,5,4,3, 0xad, 4,3,0,1,2,7,6,5, 0x3b, 2,1,7,6,5,4,3,0, 0xed, 0,7,6,5,4,3,2,1, 0x27, 0,2,1,7,6,5,4,3, 0xaa, 4,3,1,2,0,7,6,5); }
 void sfbonus_state::init_act2000v()         { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 void sfbonus_state::init_act2000v2()        { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
-void sfbonus_state::init_act2000v3()        { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 void sfbonus_state::init_anibonus()         { sfbonus_bitswap( 0x33, 0,3,7,6,5,2,1,4, 0xe7, 2,7,6,5,3,4,1,0, 0x3a, 4,2,3,7,6,5,1,0, 0xa8, 3,4,2,0,1,7,6,5, 0x3d, 2,3,7,6,5,1,0,4, 0xff, 3,7,6,5,1,0,2,4, 0x3a, 4,2,3,7,6,5,1,0, 0xbe, 3,4,1,0,2,7,6,5); }
 void sfbonus_state::init_anibonus3()        { sfbonus_bitswap( 0x33, 0,3,7,6,5,2,1,4, 0xff, 3,7,6,5,1,0,4,2, 0x36, 4,2,3,7,6,5,1,0, 0xa8, 3,2,4,0,1,7,6,5, 0x2c, 0,1,7,6,5,2,4,3, 0xff, 3,7,6,5,1,0,4,2, 0x26, 2,4,3,7,6,5,1,0, 0xbe, 4,1,3,0,2,7,6,5); }
 void sfbonus_state::init_anibonusd()        { sfbonus_bitswap( 0x3b, 0,1,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x21, 0,2,1,7,6,5,4,3, 0xa8, 4,3,0,1,2,7,6,5, 0x3d, 2,1,7,6,5,4,3,0, 0xed, 2,7,6,5,4,3,1,0, 0x21, 0,2,1,7,6,5,4,3, 0xaa, 4,3,1,2,0,7,6,5); }
@@ -5888,11 +6076,9 @@ void sfbonus_state::init_anithuntv()        { sfbonus_bitswap( 0x39, 1,2,7,6,5,4
 void sfbonus_state::init_atworld()          { sfbonus_bitswap( 0x3c, 1,0,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x26, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,0,2, 0x22, 0,1,2,7,6,5,4,3, 0xa9, 4,3,2,1,0,7,6,5); }
 void sfbonus_state::init_atworldd()         { sfbonus_bitswap( 0x3c, 1,0,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x26, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 0,1,7,6,5,4,3,2, 0xe8, 1,7,6,5,4,3,0,2, 0x22, 0,1,2,7,6,5,4,3, 0xa9, 4,3,2,1,0,7,6,5); }
 void sfbonus_state::init_ch2000()           { sfbonus_bitswap( 0x29, 2,3,7,6,5,0,4,1, 0xfe, 2,7,6,5,1,0,3,4, 0x33, 0,1,3,7,6,5,2,4, 0xa6, 1,0,3,4,2,7,6,5, 0x25, 4,1,7,6,5,3,2,0, 0xfe, 2,7,6,5,1,0,3,4, 0x35, 0,1,4,7,6,5,3,2, 0xbe, 1,0,4,2,3,7,6,5); }
-void sfbonus_state::init_ch2000c()          { sfbonus_bitswap( 0x29, 2,3,7,6,5,0,4,1, 0xfe, 2,7,6,5,1,0,3,4, 0x33, 0,1,3,7,6,5,2,4, 0xa6, 1,0,3,4,2,7,6,5, 0x25, 4,1,7,6,5,3,2,0, 0xfe, 2,7,6,5,1,0,3,4, 0x35, 0,1,4,7,6,5,3,2, 0xbe, 1,0,4,2,3,7,6,5); }
 void sfbonus_state::init_ch2000d()          { sfbonus_bitswap( 0x38, 0,2,7,6,5,4,3,1, 0xed, 0,7,6,5,4,3,2,1, 0x25, 2,0,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3c, 0,1,7,6,5,4,3,2, 0xed, 1,7,6,5,4,3,0,2, 0x25, 2,0,1,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
 void sfbonus_state::init_ch2000v()          { sfbonus_bitswap( 0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 1,0,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
 void sfbonus_state::init_ch2000v2()         { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3e, 2,1,7,6,5,4,3,0, 0xec, 0,7,6,5,4,3,2,1, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
-void sfbonus_state::init_ch2000v3()         { sfbonus_bitswap( 0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 1,0,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
 void sfbonus_state::init_classice()         { sfbonus_bitswap( 0x3f, 2,0,7,6,5,4,3,1, 0xe9, 2,7,6,5,4,3,1,0, 0x22, 2,1,0,7,6,5,4,3, 0xab, 4,3,2,0,1,7,6,5, 0x3e, 2,1,7,6,5,4,3,0, 0xeb, 2,7,6,5,4,3,0,1, 0x22, 0,2,1,7,6,5,4,3, 0xad, 4,3,0,2,1,7,6,5); }
 void sfbonus_state::init_classiced()        { sfbonus_bitswap( 0x38, 0,2,7,6,5,4,3,1, 0xea, 2,7,6,5,4,3,0,1, 0x24, 2,1,0,7,6,5,4,3, 0xaa, 4,3,2,0,1,7,6,5, 0x3e, 1,0,7,6,5,4,3,2, 0xe8, 0,7,6,5,4,3,1,2, 0x24, 2,1,0,7,6,5,4,3, 0xa8, 4,3,0,2,1,7,6,5); }
 void sfbonus_state::init_classiced3()       { sfbonus_bitswap( 0x3b, 2,1,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x24, 2,1,0,7,6,5,4,3, 0xaa, 4,3,2,0,1,7,6,5, 0x3e, 1,0,7,6,5,4,3,2, 0xe8, 0,7,6,5,4,3,1,2, 0x24, 2,1,0,7,6,5,4,3, 0xae, 4,3,1,0,2,7,6,5); }
@@ -6117,6 +6303,7 @@ GAME( 2004, fb2genv1,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_f
 GAME( 2004, fb2genc2,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gen,          ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, fb2gend2,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gend,         ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, fb2genv2,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2genv,         ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2gencq,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gend,         ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8Q)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, fb2geno,     fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gen,          ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.6XT)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, fb2geno2,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gen,          ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.5)", MACHINE_SUPPORTS_SAVE )
 
@@ -6127,6 +6314,7 @@ GAME( 2004, fb2ndc2,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_f
 GAME( 2004, fb2ndd2,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2ndd,          ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, fb2ndv2,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2ndv,          ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT Dual)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, fb2ndo,      fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2nd,           ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.5)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2ndo1,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2ndd,          ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.6R)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2004, fb4,         0,        sfbonus, amcoe2_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5R, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, fb4c1,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5R, set 2)", MACHINE_SUPPORTS_SAVE )
@@ -6145,7 +6333,7 @@ GAME( 1999, act2000,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_a
 GAME( 1999, act2000v1,   act2000,  sfbonus, amcoe1_reels3, sfbonus_state, init_act2000v,        ROT0,  "Amcoe", "Action 2000 (Version 3.5R Dual)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, act2000d1,   act2000,  sfbonus, amcoe1_reels3, sfbonus_state, init_act2000d,        ROT0,  "Amcoe", "Action 2000 (Version 3.5R, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, act2000b1,   act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_act2000,         ROT0,  "Amcoe", "Action 2000 (Version 3.5R, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, act2000vx,   act2000,  sfbonus, amcoe1_reels3, sfbonus_state, init_act2000v3,       ROT0,  "Amcoe", "Action 2000 (Version 3.30XT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, act2000vx,   act2000,  sfbonus, amcoe1_reels3, sfbonus_state, init_act2000v,        ROT0,  "Amcoe", "Action 2000 (Version 3.30XT Dual)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, act2000dx,   act2000,  sfbonus, amcoe1_reels3, sfbonus_state, init_act2000d,        ROT0,  "Amcoe", "Action 2000 (Version 3.30XT, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, act2000bx,   act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_act2000,         ROT0,  "Amcoe", "Action 2000 (Version 3.30XT, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, act2000o,    act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_act2000,         ROT0,  "Amcoe", "Action 2000 (Version 3.3)", MACHINE_SUPPORTS_SAVE )
@@ -6154,16 +6342,23 @@ GAME( 1999, act2000o3,   act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_a
 
 GAME( 2000, ch2000,      0,        sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000v2,        ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4E Dual)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ch2000b1,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, ch2000c1,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000c,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000c1,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ch2000d1,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000d,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ch2000v1,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000v,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R Dual)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ch2000b2,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, ch2000c2,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000c,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000c2,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ch2000d2,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000d,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, ch2000v2,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000v3,        ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000v2,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000v,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT Dual)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ch2000o,     ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9XT)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ch2000o2,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9D)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ch2000o3,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000o4,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 2.6 Special)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000o5,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.1 Special)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000o6,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.3 Special)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000o7,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.4 Special, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000o8,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.4 Special, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000o9,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 2.3B)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000o10,   ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version T 2.3C)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2001, pir2001,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_pir2001v2,       ROT0,  "Amcoe", "Pirate 2001 (Version 2.5E Dual)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, pir2001b1,   pir2001,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2001,         ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R, set 1)", MACHINE_SUPPORTS_SAVE )
@@ -6195,6 +6390,7 @@ GAME( 2004, classicev1,  classice, sfbonus, amcoe1_reels3, sfbonus_state, init_c
 GAME( 2004, classice2,   classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classice,        ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, classiced2,  classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classiced,       ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, classicev2,  classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classicev,       ROT0,  "Amcoe", "Classic Edition (Version 1.6LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, classiceo,   classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classice,        ROT0,  "Amcoe", "Classic Edition (Version 1.4R)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2005, seawld,      0,        sfbonus, amcoe1_reels3, sfbonus_state, init_seawldv,         ROT0,  "Amcoe", "Sea World (Version 1.6E Dual)", MACHINE_SUPPORTS_SAVE )
 GAME( 2005, seawldd1,    seawld,   sfbonus, amcoe1_reels3, sfbonus_state, init_seawld,          ROT0,  "Amcoe", "Sea World (Version 1.6R CGA)", MACHINE_SUPPORTS_SAVE )
@@ -6204,6 +6400,7 @@ GAME( 2005, moneymacd1,  moneymac, sfbonus, amcoe1_reels3, sfbonus_state, init_m
 GAME( 2005, moneymacv1,  moneymac, sfbonus, amcoe1_reels3, sfbonus_state, init_moneymac,        ROT0,  "Amcoe", "Money Machine (Version 1.7R Dual)", MACHINE_SUPPORTS_SAVE )
 GAME( 2005, moneymacd2,  moneymac, sfbonus, amcoe1_reels3, sfbonus_state, init_moneymacd,       ROT0,  "Amcoe", "Money Machine (Version 1.7LT)", MACHINE_SUPPORTS_SAVE )
 GAME( 2005, moneymacv2,  moneymac, sfbonus, amcoe1_reels3, sfbonus_state, init_moneymac,        ROT0,  "Amcoe", "Money Machine (Version 1.7LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, moneymaco,   moneymac, sfbonus, amcoe1_reels3, sfbonus_state, init_moneymacd,       ROT0,  "Amcoe", "Money Machine (Version 1.3R)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2005, fb5,         0,        sfbonus, amcoe2_reels3, sfbonus_state, init_fb5,             ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2005, fb5c,        fb5,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb5,             ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 2)", MACHINE_SUPPORTS_SAVE )

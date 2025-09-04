@@ -101,6 +101,7 @@ protected:
 		ICM_MODE2            = 0x000f00,    // Plane 2
 		ICM_MODE2_SHIFT      = 8,
 		ICM_EV               = 0x040000,    // External video
+		ICM_EV_BIT           = 18,
 		ICM_NM               = 0x080000,    // Number of Matte flags
 		ICM_NM_BIT           = 19,
 		ICM_CS               = 0x400000,    // CLUT select
@@ -138,6 +139,7 @@ protected:
 		MC_OP_SHIFT          = 20,
 
 		CSR1R_PA             = 0x20,        // Parity
+		CSR1R_PA_BIT         = 5,
 		CSR1R_DA             = 0x80,        // Display Active
 
 		CSR1W_BE             = 0x0001,      // Bus Error
@@ -230,6 +232,8 @@ protected:
 	required_shared_ptr<uint16_t> m_planea;
 	required_shared_ptr<uint16_t> m_planeb;
 
+	uint32_t m_interlace_field[312][768];
+
 	// internal state
 	bool m_matte_flag[2][768]{};
 	int m_ica_height = 0;
@@ -249,6 +253,7 @@ protected:
 
 	int get_screen_width();
 	int get_border_width();
+	uint32_t get_backdrop_plane();
 
 	template <int Path> void set_vsr(uint32_t value);
 	template <int Path> uint32_t get_vsr();

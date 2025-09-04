@@ -82,6 +82,7 @@
 #include "emu.h"
 #include "mz700.h"
 
+#include "bus/mz80/mz80_exp.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 
@@ -170,26 +171,24 @@ void mz800_state::mz800_bankf(address_map &map)
 
 void mz800_state::mz800_io(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0xcc, 0xcc).w(FUNC(mz800_state::mz800_write_format_w));
-	map(0xcd, 0xcd).w(FUNC(mz800_state::mz800_read_format_w));
-	map(0xce, 0xce).rw(FUNC(mz800_state::mz800_crtc_r), FUNC(mz800_state::mz800_display_mode_w));
-	map(0xcf, 0xcf).w(FUNC(mz800_state::mz800_scroll_border_w));
-	map(0xd0, 0xd3).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xd4, 0xd7).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xe0, 0xe0).rw(FUNC(mz800_state::mz800_bank_0_r), FUNC(mz800_state::mz800_bank_0_w));
-	map(0xe1, 0xe1).rw(FUNC(mz800_state::mz800_bank_1_r), FUNC(mz800_state::mz700_bank_1_w));
-	map(0xe2, 0xe2).w(FUNC(mz800_state::mz700_bank_2_w));
-	map(0xe3, 0xe3).w(FUNC(mz800_state::mz700_bank_3_w));
-	map(0xe4, 0xe4).w(FUNC(mz800_state::mz700_bank_4_w));
-	map(0xe5, 0xe5).w(FUNC(mz800_state::mz700_bank_5_w));
-	map(0xe6, 0xe6).w(FUNC(mz800_state::mz700_bank_6_w));
-	map(0xea, 0xea).rw(FUNC(mz800_state::mz800_ramdisk_r), FUNC(mz800_state::mz800_ramdisk_w));
-	map(0xeb, 0xeb).w(FUNC(mz800_state::mz800_ramaddr_w));
-	map(0xf0, 0xf0).r(m_joy[0], FUNC(msx_general_purpose_port_device::read)).w(FUNC(mz800_state::mz800_palette_w));
-	map(0xf1, 0xf1).r(m_joy[1], FUNC(msx_general_purpose_port_device::read));
-	map(0xf2, 0xf2).w("sn76489n", FUNC(sn76489a_device::write));
-	map(0xfc, 0xff).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	// Expansion I/O options may use 16-bit addressing
+	map(0xcc, 0xcc).mirror(0xff00).w(FUNC(mz800_state::mz800_write_format_w));
+	map(0xcd, 0xcd).mirror(0xff00).w(FUNC(mz800_state::mz800_read_format_w));
+	map(0xce, 0xce).mirror(0xff00).rw(FUNC(mz800_state::mz800_crtc_r), FUNC(mz800_state::mz800_display_mode_w));
+	map(0xcf, 0xcf).mirror(0xff00).w(FUNC(mz800_state::mz800_scroll_border_w));
+	map(0xd0, 0xd3).mirror(0xff00).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xd4, 0xd7).mirror(0xff00).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xe0, 0xe0).mirror(0xff00).rw(FUNC(mz800_state::mz800_bank_0_r), FUNC(mz800_state::mz800_bank_0_w));
+	map(0xe1, 0xe1).mirror(0xff00).rw(FUNC(mz800_state::mz800_bank_1_r), FUNC(mz800_state::mz700_bank_1_w));
+	map(0xe2, 0xe2).mirror(0xff00).w(FUNC(mz800_state::mz700_bank_2_w));
+	map(0xe3, 0xe3).mirror(0xff00).w(FUNC(mz800_state::mz700_bank_3_w));
+	map(0xe4, 0xe4).mirror(0xff00).w(FUNC(mz800_state::mz700_bank_4_w));
+	map(0xe5, 0xe5).mirror(0xff00).w(FUNC(mz800_state::mz700_bank_5_w));
+	map(0xe6, 0xe6).mirror(0xff00).w(FUNC(mz800_state::mz700_bank_6_w));
+	map(0xf0, 0xf0).mirror(0xff00).r(m_joy[0], FUNC(msx_general_purpose_port_device::read)).w(FUNC(mz800_state::mz800_palette_w));
+	map(0xf1, 0xf1).mirror(0xff00).r(m_joy[1], FUNC(msx_general_purpose_port_device::read));
+	map(0xf2, 0xf2).mirror(0xff00).w("sn76489n", FUNC(sn76489a_device::write));
+	map(0xfc, 0xff).mirror(0xff00).rw("z80pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
 /***************************************************************************
@@ -445,9 +444,13 @@ void mz800_state::mz800(machine_config &config)
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set("z80pio", FUNC(z80pio_device::strobe_b)).invert();
 
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
+
+	MZ80_EXP_SLOT(config, "exp1", mz800_exp_devices, nullptr).set_iospace(m_maincpu, AS_IO);
+	MZ80_EXP_SLOT(config, "exp2", mz800_exp_devices, nullptr).set_iospace(m_maincpu, AS_IO);
 }
 
 
@@ -474,9 +477,14 @@ ROM_END
 
 ROM_START( mz800 )
 	ROM_REGION( 0x4000, "monitor", 0 )
-	ROM_LOAD( "mz800.rom", 0x0000, 0x4000, CRC(600d17e1) SHA1(950ce4b51429916f8036e41ba6130fac149b36e4) )
-
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 ) // ramdisk
+	ROM_SYSTEM_BIOS( 0, "9z504m", "Monitor 9Z-504M" )
+	ROMX_LOAD( "mz800.rom", 0x0000, 0x4000, CRC(600d17e1) SHA1(950ce4b51429916f8036e41ba6130fac149b36e4), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "willy", "Willy's MZ-800 Monitor (English)" )
+	ROMX_LOAD( "800willy_en.rom", 0x0000, 0x4000, CRC(f98b4bea) SHA1(84a0316a3a52e6ad5c9d0f1c7365fca06f069566), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "willyg", "Willy's MZ-800 Monitor (German)" )
+	ROMX_LOAD( "800willy_ge.rom", 0x0000, 0x4000, CRC(2471034f) SHA1(68d988c816b644b4e52d2474a9159311d47c3790), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "willyj", "Willy's MZ-800 Monitor (Japanese)" )
+	ROMX_LOAD( "800willy_jap.rom", 0x0000, 0x4000, CRC(92bbf0a3) SHA1(02647816cc33ba2162f84997974f7fe3bab1323a), ROM_BIOS(3) )
 ROM_END
 
 ROM_START( mz1500 )
@@ -487,8 +495,6 @@ ROM_START( mz1500 )
 	ROM_REGION( 0x1000, "cgrom", 0 )
 	//ROM_LOAD( "mz700fon.jp", 0x0000, 0x1000, CRC(697ec121) SHA1(5eb1d42d273b1fd2cab120486279ab8ff6c85dc7))
 	ROM_LOAD( "mz700fon.jpn", 0x0000, 0x1000, CRC(425eedf5) SHA1(bd2cc750f2d2f63e50a59786668509e81a276e32) )
-
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 ) // ramdisk
 ROM_END
 
 /***************************************************************************

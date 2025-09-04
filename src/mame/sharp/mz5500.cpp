@@ -311,8 +311,8 @@ void mz5500_state::psg_porta_w(u8 data)
 	// However both msdos211 and cpm86 will be unhappy with this.
 	//if ((data & 0xf) == 0)
 	//{
-	//	m_current_floppy = nullptr;
-	//	m_fdc->set_floppy(nullptr);
+	//  m_current_floppy = nullptr;
+	//  m_fdc->set_floppy(nullptr);
 	//}
 	//else
 	{
@@ -400,9 +400,9 @@ void mz5500_state::mz5500(machine_config &config)
 			res |= m_current_floppy->mon_r() << 7;
 		return res;
 	});
-//	pio.in_pc_callback().set([this] () {
-//		return 0;
-//	});
+//  pio.in_pc_callback().set([this] () {
+//      return 0;
+//  });
 	/*
 	 * -x-- ---- Centronics /ACK input
 	 * --x- ---- Centronics /STROBE output

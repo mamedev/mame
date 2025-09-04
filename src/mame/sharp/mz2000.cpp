@@ -181,7 +181,7 @@ public:
 
 protected:
 	virtual void draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-//	virtual void draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+//  virtual void draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
@@ -1428,6 +1428,7 @@ void mz2000_state::mz2000(machine_config &config)
 
 	SOFTWARE_LIST(config.replace(), "flop_list").set_original("mz2000_flop");
 	SOFTWARE_LIST(config.replace(), "cass_list").set_original("mz2000_cass").set_filter("MONO");
+	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("mz2000");
 }
 
 void mz2200_state::mz2200(machine_config &config)
@@ -1437,6 +1438,7 @@ void mz2200_state::mz2200(machine_config &config)
 	PALETTE(config.replace(), m_palette, palette_device::BRG_3BIT);
 
 	SOFTWARE_LIST(config.replace(), "cass_list").set_original("mz2000_cass").set_filter("COLOR");
+	SOFTWARE_LIST(config.replace(), "flop_generic_list").set_compatible("generic_flop_525").set_filter("mz2200");
 }
 
 

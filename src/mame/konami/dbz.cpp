@@ -619,6 +619,7 @@ void dbz_state::dbz2bl(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &dbz_state::dbz2bl_map);
 }
+
 /**********************************************************************************/
 
 ROM_START( dbz )

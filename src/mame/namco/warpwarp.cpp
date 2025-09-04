@@ -1087,10 +1087,10 @@ GAMEL( 1978, geebeea,    geebee,   geebeeb,  geebeeb,   warpwarp_state, init_gee
 GAMEL( 1978, geebeeb,    geebee,   geebeeb,  geebeeb,   warpwarp_state, init_geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", MACHINE_SUPPORTS_SAVE, layout_geebee ) // Fratelli Bertolino
 GAMEL( 1978, geebeeg,    geebee,   geebee,   geebee,    warpwarp_state, init_geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", MACHINE_SUPPORTS_SAVE, layout_geebee )
 
-GAME(  1979, sos,        0,        sos,      sos,       warpwarp_state, init_sos,      ROT90, "K.K. Tokki (Namco license)", "SOS Game", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1980, navarone,   0,        navarone, navarone,  warpwarp_state, init_navarone, ROT90, "Namco", "Navarone", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_navarone )
+GAME(  1979, sos,        0,        sos,      sos,       warpwarp_state, init_sos,      ROT90, "K.K. Tokki (Namco license)", "SOS", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // aka SOS Game (SOSゲーム)
+GAMEL( 1980, navarone,   0,        navarone, navarone,  warpwarp_state, init_navarone, ROT90, "Namco", "Navarone", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_navarone ) // aka Navalone
 GAME(  1980, kaitein,    kaitei,   kaitei,   kaitein,   warpwarp_state, init_kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", MACHINE_SUPPORTS_SAVE ) // pretty sure it didn't have a color overlay
-GAME(  1980, kaitei,     0,        kaitei,   kaitei,    warpwarp_state, init_kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", MACHINE_SUPPORTS_SAVE ) // " - aka "Atrantis"
+GAME(  1980, kaitei,     0,        kaitei,   kaitei,    warpwarp_state, init_kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", MACHINE_SUPPORTS_SAVE ) // " - aka Atrantis
 
 /* Color games */
 GAME(  1979, bombbee,    0,        bombbee,  bombbee,   warpwarp_state, init_bombbee,  ROT90, "Namco", "Bomb Bee", MACHINE_SUPPORTS_SAVE )

@@ -21,7 +21,7 @@ enum
 /* interrupt sources */
 enum INTSOURCES
 {
-	BRK = 0,
+	BRK     = 0,
 	INT_IRQ = 1,
 	NMI_IRQ = 2
 };
@@ -40,11 +40,11 @@ enum BREGS {
 	BH = NATIVE_ENDIAN_VALUE_LE_BE(0x7, 0x6)
 };
 
-#define Sreg(x)         m_sregs[x]
-#define Wreg(x)         m_regs.w[x]
-#define Breg(x)         m_regs.b[x]
+#define Sreg(x) m_sregs[x]
+#define Wreg(x) m_regs.w[x]
+#define Breg(x) m_regs.b[x]
 
-#define PC()       ((Sreg(PS)<<4)+m_ip)
+#define PC()    ((Sreg(PS)<<4)+m_ip)
 
 #define CF      (m_CarryVal!=0)
 #define SF      (m_SignVal<0)
@@ -55,10 +55,10 @@ enum BREGS {
 
 /************************************************************************/
 
-#define read_mem_byte(a)            m_program->read_byte(m_chip_type == V33_TYPE ? v33_translate(a) : (a))
-#define read_mem_word(a)            m_program->read_word_unaligned(m_chip_type == V33_TYPE ? v33_translate(a) : (a))
-#define write_mem_byte(a,d)         m_program->write_byte(m_chip_type == V33_TYPE ? v33_translate(a) : (a), (d))
-#define write_mem_word(a,d)         m_program->write_word_unaligned(m_chip_type == V33_TYPE ? v33_translate(a) : (a), (d))
+#define read_mem_byte(a)        m_program->read_byte(m_chip_type == V33_TYPE ? v33_translate(a) : (a))
+#define read_mem_word(a)        m_program->read_word_unaligned(m_chip_type == V33_TYPE ? v33_translate(a) : (a))
+#define write_mem_byte(a,d)     m_program->write_byte(m_chip_type == V33_TYPE ? v33_translate(a) : (a), (d))
+#define write_mem_word(a,d)     m_program->write_word_unaligned(m_chip_type == V33_TYPE ? v33_translate(a) : (a), (d))
 
 #define read_port_byte(a)       io_read_byte(a)
 #define read_port_word(a)       io_read_word(a)

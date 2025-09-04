@@ -353,10 +353,7 @@ void rollerg_state::rollerg(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240); // from CCU
 	screen.set_screen_update(FUNC(rollerg_state::screen_update));
 	screen.set_palette("palette");
 
@@ -364,17 +361,17 @@ void rollerg_state::rollerg(machine_config &config)
 
 	K053244(config, m_k053244, 24_MHz_XTAL);
 	m_k053244->set_palette("palette");
-	m_k053244->set_offsets(12*8 - 3, -1);
+	m_k053244->set_offsets(-3, -1);
 	m_k053244->set_sprite_callback(FUNC(rollerg_state::sprite_callback));
 
 	K051316(config, m_k051316, 24_MHz_XTAL / 2);
 	m_k051316->set_palette("palette");
-	m_k051316->set_offsets(14*8 + 6, 1);
+	m_k051316->set_offsets(6 + 16, 1);
 	m_k051316->set_zoom_callback(FUNC(rollerg_state::zoom_callback));
 
-	k053252_device &k053252(K053252(config, "k053252", 3'000'000 * 2));
+	k053252_device &k053252(K053252(config, "k053252", 24_MHz_XTAL / 4));
 	k053252.int1_ack().set_inputline(m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
-	k053252.set_offsets(14*8, 2*8);
+	k053252.set_offsets(16, 16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

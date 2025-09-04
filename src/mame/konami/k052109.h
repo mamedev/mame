@@ -25,7 +25,7 @@ public:
 
 	// configuration
 	auto irq_handler() { return m_irq_handler.bind(); }
-	auto firq_handler() { return m_firq_handler.bind(); }
+	//auto firq_handler() { return m_firq_handler.bind(); } // unused
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
 	/*

@@ -50,8 +50,7 @@ if __name__ == '__main__':
 
     for argno in range(1, len(sys.argv)):
         process_file(sys.argv[argno])
-        
+
     devices.sort()
     for d in devices:
         print("LIB_ENTRY({})".format(d))
-        

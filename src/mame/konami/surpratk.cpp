@@ -2,11 +2,10 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-    Surprise Attack (Konami GX911) (c) 1990 Konami
+Surprise Attack (Konami GX911) (c) 1990 Konami
+Very similar to Parodius
 
-    Very similar to Parodius
-
-    driver by Nicola Salmoria
+driver by Nicola Salmoria
 
 ***************************************************************************/
 
@@ -49,6 +48,7 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// video-related
@@ -66,8 +66,9 @@ private:
 
 	required_memory_bank m_mainbank;
 
+	void palette_w(offs_t offset, uint8_t data);
 	void videobank_w(uint8_t data);
-	void _5fc0_w(uint8_t data);
+	void control_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	K053244_CB_MEMBER(sprite_callback);
@@ -77,6 +78,15 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 };
 
+
+void surpratk_state::video_start()
+{
+	const uint32_t num_colors = m_palette->entries() / 2;
+
+	// add our own shadow table, since shadows are cyan instead of default
+	for (int i = 0; i < num_colors; i++)
+		m_palette->shadow_table()[i] = i + num_colors;
+}
 
 /***************************************************************************
 
@@ -156,6 +166,16 @@ uint32_t surpratk_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
+void surpratk_state::palette_w(offs_t offset, uint8_t data)
+{
+	m_palette->write8(offset, data);
+
+	// update shadow pen
+	rgb_t color = m_palette->pen_color(offset / 2);
+	color.set_r(color.r() * PALETTE_DEFAULT_SHADOW_FACTOR);
+	m_palette->set_pen_color(offset / 2 + m_palette->entries() / 2, color);
+}
+
 void surpratk_state::videobank_w(uint8_t data)
 {
 	if (data & 0xf8)
@@ -170,7 +190,7 @@ void surpratk_state::videobank_w(uint8_t data)
 		m_bank0000->set_bank(BIT(data, 0));
 }
 
-void surpratk_state::_5fc0_w(uint8_t data)
+void surpratk_state::control_w(uint8_t data)
 {
 	if ((data & 0xf4) != 0x10)
 		logerror("%04x: 3fc0 = %02x\n", m_maincpu->pc(), data);
@@ -201,7 +221,7 @@ void surpratk_state::main_map(address_map &map)
 	map(0x5f90, 0x5f90).portr("DSW2");
 	map(0x5fa0, 0x5faf).rw(m_k053244, FUNC(k053244_device::k053244_r), FUNC(k053244_device::k053244_w));
 	map(0x5fb0, 0x5fbf).w(m_k053251, FUNC(k053251_device::write));
-	map(0x5fc0, 0x5fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(surpratk_state::_5fc0_w));
+	map(0x5fc0, 0x5fc0).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(surpratk_state::control_w));
 	map(0x5fc4, 0x5fc4).w(FUNC(surpratk_state::videobank_w));
 	map(0x5fd0, 0x5fd1).w("ymsnd", FUNC(ym2151_device::write));
 	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
@@ -211,7 +231,7 @@ void surpratk_state::bank0000_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x0800, 0x0fff).rw(m_k053244, FUNC(k053244_device::k053245_r), FUNC(k053244_device::k053245_w));
-	map(0x1000, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x1000, 0x1fff).ram().w(FUNC(surpratk_state::palette_w)).share("palette");
 }
 
 
@@ -315,7 +335,7 @@ void surpratk_state::surpratk(machine_config &config)
 	screen.set_screen_update(FUNC(surpratk_state::screen_update));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800 * 2); // custom shadows
 	m_palette->enable_shadows();
 
 	K052109(config, m_k052109, 24_MHz_XTAL);

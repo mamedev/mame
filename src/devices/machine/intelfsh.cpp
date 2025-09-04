@@ -115,6 +115,7 @@ DEFINE_DEVICE_TYPE(PANASONIC_MN63F805MNP,    panasonic_mn63f805mnp_device,    "p
 DEFINE_DEVICE_TYPE(SANYO_LE26FV10N1TS,       sanyo_le26fv10n1ts_device,       "sanyo_le26fv10n1ts",       "Sanyo LE26FV10N1TS Flash")
 DEFINE_DEVICE_TYPE(SST_28SF040,              sst_28sf040_device,              "sst_28sf040",              "SST 28SF040 Flash")
 DEFINE_DEVICE_TYPE(SST_39SF010,              sst_39sf010_device,              "sst_39sf010",              "SST 39SF010 Flash")
+DEFINE_DEVICE_TYPE(SST_39SF020,              sst_39sf020_device,              "sst_39sf020",              "SST 39SF020 Flash")
 DEFINE_DEVICE_TYPE(SST_39SF040,              sst_39sf040_device,              "sst_39sf040",              "SST 39SF040 Flash")
 DEFINE_DEVICE_TYPE(SST_39VF020,              sst_39vf020_device,              "sst_39vf020",              "SST 39VF020 Flash")
 DEFINE_DEVICE_TYPE(SST_49LF020,              sst_49lf020_device,              "sst_49lf020",              "SST 49LF020 Flash")
@@ -273,10 +274,13 @@ sst_28sf040_device::sst_28sf040_device(const machine_config &mconfig, const char
 	: intelfsh8_device(mconfig, SST_28SF040, tag, owner, clock, 0x80000, MFG_SST, 0x04) { }
 
 sst_39sf010_device::sst_39sf010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, SST_39SF010, tag, owner, clock, 0x20000, MFG_SST, 0xb5) { m_addrmask = 0x7fff; }
+	: intelfsh8_device(mconfig, SST_39SF010, tag, owner, clock, 0x20000, MFG_SST, 0xb5) { m_addrmask = 0x7fff; m_sector_is_4k = true; }
+
+sst_39sf020_device::sst_39sf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, SST_39SF020, tag, owner, clock, 0x40000, MFG_SST, 0xb6) { m_addrmask = 0x7fff; m_sector_is_4k = true; }
 
 sst_39sf040_device::sst_39sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, SST_39SF040, tag, owner, clock, 0x80000, MFG_SST, 0xb7) { m_addrmask = 0x7fff; }
+	: intelfsh8_device(mconfig, SST_39SF040, tag, owner, clock, 0x80000, MFG_SST, 0xb7) { m_addrmask = 0x7fff; m_sector_is_4k = true; }
 
 sst_39vf020_device::sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, SST_39VF020, tag, owner, clock, 0x40000, MFG_SST, 0xd6) { m_sector_is_4k = true; }

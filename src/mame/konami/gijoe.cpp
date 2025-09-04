@@ -1,9 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-/***************************************************************************
+/*******************************************************************************
 
     G.I. Joe  (c) 1992 Konami
 
+TODO:
+- sprite gaps (K053247 zoom fraction rounding)
+- shadow masking (eg. the shadow of Baroness' aircraft should not project on the sky)
+- improve K056832 linemap emulation, it shouldn't (ab)use the tilemap pixmap as a
+  render buffer, gijoe is the only game that uses it
+
+********************************************************************************
 
 G.I. Joe
 Konami 1992
@@ -71,16 +78,7 @@ Notes:
       HSync - 15.2036kHz
       VSync - 59.6374Hz
 
-
-****************************************************************************
-
-Known Issues
-------------
-
-- sprite gaps (K053247 zoom fraction rounding)
-- shadow masking (eg. the shadow of Baroness' aircraft should not project on the sky)
-
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -124,6 +122,11 @@ public:
 
 	void gijoe(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -138,7 +141,7 @@ private:
 	int         m_sprite_colorbase = 0;
 
 	/* misc */
-	uint16_t      m_cur_control2 = 0U;
+	uint16_t    m_cur_control2 = 0U;
 	emu_timer   *m_dmadelay_timer = nullptr;
 
 	/* devices */
@@ -154,9 +157,6 @@ private:
 	uint16_t control2_r();
 	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_irq_w(uint16_t data);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_gijoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gijoe_interrupt);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
@@ -216,11 +216,7 @@ K056832_CB_MEMBER(gijoe_state::tile_callback)
 
 void gijoe_state::video_start()
 {
-	int i;
-
-	m_k056832->linemap_enable(1);
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_avac_occupancy[i] = 0;
 		m_avac_bits[i] = 0;
@@ -233,7 +229,7 @@ void gijoe_state::video_start()
 	save_item(NAME(m_avac_vrc));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_avac_occupancy));
-	save_item(NAME(m_avac_bits));   // these could possibly be re-created at postload k056832 elements
+	save_item(NAME(m_avac_bits)); // these could possibly be re-created at postload k056832 elements
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layer_pri));
 }
@@ -242,7 +238,7 @@ uint32_t gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &b
 {
 	static const int K053251_CI[4] = { k053251_device::CI1, k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
 	int layer[4];
-	int vrc_mode, vrc_new, colorbase_new, /*primode,*/ dirty, i;
+	int vrc_mode, vrc_new, colorbase_new, /*primode,*/ dirty;
 	int mask = 0;
 
 	// update tile offsets
@@ -266,7 +262,7 @@ uint32_t gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &b
 	// update color info and refresh tilemaps
 	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		dirty = 0;
 		colorbase_new = m_k053251->get_palette_index(K053251_CI[i]);
@@ -328,7 +324,7 @@ uint32_t gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &b
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
 
-	m_k053246->k053247_sprites_draw( bitmap, cliprect);
+	m_k053246->k053247_sprites_draw(bitmap, cliprect);
 	return 0;
 }
 
@@ -342,28 +338,29 @@ void gijoe_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		/* bit 0  is data */
-		/* bit 1  is cs (active low) */
-		/* bit 2  is clock (active high) */
-		/* bit 3  (unknown: coin) */
-		/* bit 5  is enable irq 6 */
-		/* bit 7  (unknown: enable irq 5?) */
+		// bit 0 = data
+		// bit 1 = cs (active low)
+		// bit 2 = clock (active high)
+		// bit 3 = (unknown: coin)
+		// bit 5 = enable irq 6
+		// bit 7 = (unknown: enable irq 5?)
 		ioport("EEPROMOUT")->write(data, 0xff);
 
 		m_cur_control2 = data;
 
-		/* bit 6 = enable sprite ROM reading */
-		m_k053246->k053246_set_objcha_line( (data & 0x0040) ? ASSERT_LINE : CLEAR_LINE);
+		// bit 6 = enable sprite ROM reading
+		m_k053246->k053246_set_objcha_line((data & 0x0040) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
-void gijoe_state::gijoe_objdma(  )
+void gijoe_state::gijoe_objdma()
 {
+	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
 	uint16_t *src_head, *src_tail, *dst_head, *dst_tail;
 
 	src_head = m_spriteram;
 	src_tail = m_spriteram + 255 * 8;
-	m_k053246->k053247_get_ram( &dst_head);
+	m_k053246->k053247_get_ram(&dst_head);
 	dst_tail = dst_head + 255 * 8;
 
 	for (; src_head <= src_tail; src_head += 8)
@@ -508,22 +505,18 @@ void gijoe_state::machine_reset()
 void gijoe_state::gijoe(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2);   /* 16MHz Confirmed */
+	M68000(config, m_maincpu, 32_MHz_XTAL / 2); // 16MHz Confirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &gijoe_state::gijoe_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gijoe_state::gijoe_interrupt));
 
-	Z80(config, m_audiocpu, XTAL(32'000'000)/4);     /* Amuse & confirmed. Z80E at 8MHz */
+	Z80(config, m_audiocpu, 32_MHz_XTAL / 4); // Amuse & confirmed. Z80E at 8MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gijoe_state::sound_map);
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(24, 24+288-1, 16, 16+224-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 24, 312, 262, 16, 240); // measured 59.637Hz
 	screen.set_screen_update(FUNC(gijoe_state::screen_update_gijoe));
 	screen.set_palette("palette");
 
@@ -532,6 +525,7 @@ void gijoe_state::gijoe(machine_config &config)
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(gijoe_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
+	m_k056832->set_linemap_enable(true);
 	m_k056832->set_palette(m_palette);
 
 	K053246(config, m_k053246, 0);
@@ -546,7 +540,7 @@ void gijoe_state::gijoe(machine_config &config)
 
 	K054321(config, m_k054321, "speaker");
 
-	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
+	k054539_device &k054539(K054539(config, "k054539", 18.432_MHz_XTAL));
 	k054539.timer_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
 	k054539.add_route(0, "speaker", 1.0, 1);
 	k054539.add_route(1, "speaker", 1.0, 0);
@@ -761,7 +755,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992, gijoe,   0,     gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoe,   0,     gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (World, EAB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, gijoeea, gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, gijoeu,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (US, UAB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, gijoeua, gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (US, UAA)", MACHINE_SUPPORTS_SAVE )

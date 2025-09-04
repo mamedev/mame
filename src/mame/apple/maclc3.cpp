@@ -19,6 +19,7 @@
 
 #include "cuda.h"
 #include "dfac.h"
+#include "dfac2.h"
 #include "egret.h"
 #include "macadb.h"
 #include "macscsi.h"
@@ -58,6 +59,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_sonora(*this, "sonora"),
 		m_dfac(*this, "dfac"),
+		m_dfac2(*this, "dfac2"),
 		m_omega(*this, "omega"),
 		m_scsibus1(*this, "scsi"),
 		m_ncr5380(*this, "scsi:7:ncr5380"),
@@ -86,6 +88,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<sonora_device> m_sonora;
 	optional_device<dfac_device> m_dfac;
+	optional_device<dfac2_device> m_dfac2;
 	required_device<omega_device> m_omega;
 	required_device<nscsi_bus_device> m_scsibus1;
 	required_device<ncr5380_device> m_ncr5380;
@@ -311,18 +314,12 @@ void macvail_state::maclc3_base(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	APPLE_DFAC(config, m_dfac, 22257);
-	m_dfac->add_route(0, "speaker", 1.0, 0);
-	m_dfac->add_route(1, "speaker", 1.0, 1);
-
 	APPLE_OMEGA(config, m_omega, 31.3344_MHz_XTAL);
 	m_omega->pclock_changed().set(m_sonora, FUNC(sonora_device::pixel_clock_w));
 
 	SONORA(config, m_sonora, C15M);
 	m_sonora->set_maincpu_tag("maincpu");
 	m_sonora->set_rom_tag("bootrom");
-	m_sonora->add_route(0, m_dfac, 1.0, 0);
-	m_sonora->add_route(1, m_dfac, 1.0, 1);
 
 	nubus_device &nubus(NUBUS(config, "pds", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
@@ -361,6 +358,12 @@ void macvail_state::maclc3(machine_config &config)
 	m_sonora->pb4_callback().set(m_egret, FUNC(egret_device::set_via_full));
 	m_sonora->pb5_callback().set(m_egret, FUNC(egret_device::set_sys_session));
 	m_sonora->cb2_callback().set(m_egret, FUNC(egret_device::set_via_data));
+
+	APPLE_DFAC(config, m_dfac, 22257);
+	m_dfac->add_route(0, "speaker", 1.0, 0);
+	m_dfac->add_route(1, "speaker", 1.0, 1);
+	m_sonora->add_route(0, m_dfac, 1.0, 0);
+	m_sonora->add_route(1, m_dfac, 1.0, 1);
 }
 
 void macvail_state::maclc3p(machine_config &config)
@@ -394,11 +397,15 @@ void macvail_state::maclc520(machine_config &config)
 	m_sonora->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_sonora->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
 
-	// DFAC only is found in machines with Egret, and not the IIsi
+	// DFAC is in LC III/LCIII+.  LC520/550 use DFAC2.
 	m_sonora->reset_routes();
 	m_sonora->add_route(0, "speaker", 1.0, 0);
 	m_sonora->add_route(1, "speaker", 1.0, 1);
-	config.device_remove("dfac");
+
+	APPLE_DFAC2(config, m_dfac2, 22257);
+	m_dfac2->sda_callback().set(m_cuda, FUNC(cuda_device::set_iic_sda));
+	m_cuda->iic_scl_callback().set(m_dfac2, FUNC(dfac2_device::scl_write));
+	m_cuda->iic_sda_callback().set(m_dfac2, FUNC(dfac2_device::sda_write));
 }
 
 void macvail_state::maclc550(machine_config &config)

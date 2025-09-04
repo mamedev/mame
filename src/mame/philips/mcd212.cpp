@@ -6,7 +6,7 @@
     CD-i MCD212 Video Decoder and System Controller emulation
     -------------------
 
-    written by Ryan Holtz
+    written by Ryan Holtz, Vincent.Halver
 
 
 *******************************************************************************
@@ -83,7 +83,7 @@ void mcd212_device::update_matte_arrays()
 				case 0: // Disregard all commands in higher registers. See 5.10.2
 					matte_idx[matte] = 8;
 					break;
-				case 1: case 2:	case 3: case 5: case 7: case 10: case 11: // Not used
+				case 1: case 2: case 3: case 5: case 7: case 10: case 11: // Not used
 					break;
 				case 4: case 6: // Change weight of plane (A or B)
 					latched_wf[BIT(matte_op, 1)] = get_weight_factor(matte_idx[matte]);
@@ -318,17 +318,25 @@ int mcd212_device::get_border_width()
 	return width;
 }
 
+uint32_t mcd212_device::get_backdrop_plane()
+{
+	if (BIT(m_image_coding_method, ICM_EV_BIT))
+		return 0; // External Video Background. Default to Black since there is no DVC.
+	else
+		return s_4bpp_color[m_backdrop_color];
+}
+
 template <int Path>
 void mcd212_device::process_ica()
 {
 	uint16_t *ica = Path ? m_planeb.target() : m_planea.target();
-	uint32_t addr = 0x200;
-	uint32_t cmd = 0;
-
 	const int max_to_process = m_ica_height * 120;
+	// LCT depends on the current frame parity
+	uint32_t addr = !BIT(m_csrr[0], CSR1R_PA_BIT) ? 0x200 : 0x202;
+
 	for (int i = 0; i < max_to_process; i++)
 	{
-		cmd = ica[addr++] << 16;
+		uint32_t cmd = ica[addr++] << 16;
 		cmd |= ica[addr++];
 		switch ((cmd & 0xff000000) >> 24)
 		{
@@ -653,18 +661,21 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 	uint8_t *weight_b = &m_weight_factor[1][0];
 
 	// Console Verified. CLUT4 pixels are drawn in pairs during VSR. So the mosaic here is halved.
-	if (icmA == ICM_CLUT4) {
+	if (icmA == ICM_CLUT4)
 		mosaic_count_a >>= 1;
-	}
-	if (icmB == ICM_CLUT4) {
+	if (icmB == ICM_CLUT4)
 		mosaic_count_b >>= 1;
-	}
+
+	// If PAL and 'Standard' bit set, insert a 24px border on the left/right
+	uint32_t offset = (!BIT(m_dcr[0], DCR_CF_BIT) || BIT(m_csrw[0], CSR1W_ST_BIT)) ? 24 : 0;
+	std::fill_n(out, offset, s_4bpp_color[0]);
+	out += offset;
 
 	for (int x = 0; x < width; x++)
 	{
 		if (transparent_a[x] && transparent_b[x])
 		{
-			out[x] = s_4bpp_color[m_backdrop_color];
+			out[x] = get_backdrop_plane();
 			continue;
 		}
 		uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
@@ -727,7 +738,7 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 		if (!invert)
 			return; // Normal Blink
 		else
-			color_index = ~color_index & 0xf; // Inverted Color Blink
+			color_index = color_index ^ 0x7; // Inverted Color Blink. MCD212 Section 7.5
 	}
 
 	const uint16_t cursor_x = m_cursor_position & 0x3ff;
@@ -957,12 +968,20 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	bool transparent_a[768];
 	bool transparent_b[768];
 
+	if (screen.vpos() >= m_total_height)
+	{
+		return 0; // Do nothing on the extended rows.
+	}
+
+	// FIXME this should use the clipping rectangle to determine which lines need drawing
 	int scanline = screen.vpos();
 
 	// Process VSR and mix if we're in the visible region
 	if (scanline >= m_ica_height)
 	{
-		uint32_t *out = &bitmap.pix(scanline);
+		uint32_t const bitmap_line = ((scanline - m_ica_height) << 1) + m_ica_height;
+		uint32_t *const out = &bitmap.pix(bitmap_line + BIT(~m_csrr[0], CSR1R_PA_BIT));
+		uint32_t *const out2 = &bitmap.pix(bitmap_line + BIT(m_csrr[0], CSR1R_PA_BIT));
 
 		bool draw_line = true;
 		if (!BIT(m_dcr[0], DCR_FD_BIT) && BIT(m_csrw[0], CSR1W_ST_BIT))
@@ -979,12 +998,6 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		if (draw_line)
 		{
-			// If PAL and 'Standard' bit set, insert a 24px border on the left/right
-			if (!BIT(m_dcr[0], DCR_CF_BIT) || BIT(m_csrw[0], CSR1W_ST_BIT))
-			{
-				std::fill_n(out, 24, s_4bpp_color[0]);
-				out += 24;
-			}
 
 			process_vsr<0>(plane_a, transparent_a);
 			process_vsr<1>(plane_b, transparent_b);
@@ -1021,6 +1034,18 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			}
 
 			draw_cursor(out);
+		}
+
+		if (BIT(m_dcr[0], DCR_SM_BIT))
+		{
+			// Interlace Output
+			std::copy_n(m_interlace_field[scanline], 768, out2);
+			std::copy_n(out, 768, m_interlace_field[scanline]);
+		}
+		else
+		{
+			// Single Field Output (duplicate lines)
+			std::copy_n(out, 768, out2);
 		}
 	}
 
@@ -1112,6 +1137,8 @@ void mcd212_device::device_reset()
 	m_ica_height = 32;
 	m_total_height = 312;
 	m_blink_time = 0;
+	for (int i = 0; i < 312; i++)
+		std::fill_n(m_interlace_field[i], 768, 0);
 
 	m_int_callback(CLEAR_LINE);
 
@@ -1190,6 +1217,8 @@ void mcd212_device::device_start()
 
 	save_item(NAME(m_blink_time));
 	save_item(NAME(m_blink_active));
+
+	save_item(NAME(m_interlace_field));
 
 	m_dca_timer = timer_alloc(FUNC(mcd212_device::dca_tick), this);
 	m_dca_timer->adjust(attotime::never);

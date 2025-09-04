@@ -138,7 +138,6 @@ TILEMAP_MAPPER_MEMBER(supduck_state::tilemap_scan)
 
 	offset += (((row ^ 0x3f) & ~0x7) / 0x8) * 0x400;
 
-
 	return offset;
 }
 
@@ -151,13 +150,6 @@ void supduck_state::video_start()
 
 	m_text_tilemap->set_transparent_pen(0x3);
 	m_fore_tilemap->set_transparent_pen(0xf);
-
-	m_text_tilemap->set_scrolldx(128, 128);
-	m_text_tilemap->set_scrolldy(  6,   6);
-	m_fore_tilemap->set_scrolldx(128, 128);
-	m_fore_tilemap->set_scrolldy(  6,   6);
-	m_back_tilemap->set_scrolldx(128, 128);
-	m_back_tilemap->set_scrolldy(  6,   6);
 }
 
 uint32_t supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -443,7 +435,7 @@ void supduck_state::supduck(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(6000000, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	screen.set_raw(6000000, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(supduck_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));

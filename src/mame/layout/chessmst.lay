@@ -458,8 +458,8 @@ authors:Sandro Ronco, hap
 		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds x="118" y="62" width="4" height="4" /></element>
 		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds x="118" y="69" width="4" height="4" /></element>
 
-		<element ref="nothing" inputtag="IN.1" inputmask="0x01" clickthrough="yes"><bounds x="108" y="79" width="4" height="4" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds x="108" y="79" width="4" height="4" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x01"><bounds x="108" y="79" width="4" height="4" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x02" clickthrough="yes"><bounds x="108" y="79" width="4" height="4" /></element>
 		<element ref="hlb" inputtag="IN.1" inputmask="0x01"><bounds x="122" y="79" width="4" height="4" /></element>
 
 		<element ref="cwhite"><bounds x="17" y="4" width="81" height="81" /></element>

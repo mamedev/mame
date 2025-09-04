@@ -331,6 +331,11 @@ void spg2xx_game_lexiart_state::mem_map_lexiart(address_map &map)
 	map(0x3f0000, 0x3f7fff).ram(); // 2 * 32Kb RAMs on PCB
 }
 
+void spg2xx_game_pdcj_state::mem_map_upperbank(address_map &map)
+{
+	map(0x000000, 0x1fffff).bankr("cartbank");
+	map(0x200000, 0x3fffff).bankr("upperbank");
+}
 
 
 static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuring out of inputs
@@ -1344,6 +1349,26 @@ static INPUT_PORTS_START( tmntbftc )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spidm2 )
+	PORT_START("P1") // the motion controls seem to map to simple button presses
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Hand Punch")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Web")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Right Hand Punch")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Swing")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Jump")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Kick")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Pause")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( rocksock )
 	PORT_START("P1")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1667,6 +1692,27 @@ static INPUT_PORTS_START( ddr33v )
 	PORT_MODIFY("P3")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( pdcj )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pause")
+	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -2636,6 +2682,41 @@ void spg2xx_game_smartcycle_state::smartcycle(machine_config &config)
 	SOFTWARE_LIST(config, "smartcycle_cart").set_original("smartcycle_cart");
 }
 
+void spg2xx_game_pdcj_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if ((data & mem_mask) & 0x0800)
+		m_upperbank->set_entry(2);
+	else
+		m_upperbank->set_entry(1);
+
+	m_maincpu->invalidate_cache();
+}
+
+void spg2xx_game_pdcj_state::machine_start()
+{
+	m_upperbank->configure_entries(0, memregion("maincpu")->bytes() / 0x400000, memregion("maincpu")->base(), 0x400000);
+	m_upperbank->set_entry(1);
+	spg2xx_game_state::machine_start();
+}
+
+void spg2xx_game_pdcj_state::machine_reset()
+{
+	m_upperbank->set_entry(1);
+	spg2xx_game_state::machine_reset();
+}
+
+void spg2xx_game_pdcj_state::pdcj(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_pdcj_state::mem_map_upperbank);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3");
+}
+
 
 void spg2xx_game_ddr33v_state::init_ddr33v()
 {
@@ -3034,6 +3115,22 @@ ROM_START( smartcyc )
 	/* no system ROM, all game data is on cartridges */
 ROM_END
 
+ROM_START( spidm2 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "spiderman2.bin", 0x000000, 0x400000, CRC(7ed425d8) SHA1(25b2078cdc83f5b54425a863336424c56ff20121) )
+ROM_END
+
+ROM_START( dinothun )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "dinothunder.bin", 0x000000, 0x400000, CRC(03e82604) SHA1(c39d72aa8a0750ee38ab01b317e77a46e1d6004e) )
+ROM_END
+
+ROM_START( pdcj )
+	ROM_REGION( 0xc00000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "chip1.u2", 0x000000, 0x800000, CRC(ba4f2279) SHA1(cd6bc20f21e096251ca43b539c46cb51c790769c) )
+	ROM_LOAD16_WORD_SWAP( "chip2.u3", 0x800000, 0x400000, CRC(4fb335ac) SHA1(d6499816acb3da5c4f6a582bd3104c707422eb34) )
+ROM_END
+
 void spg2xx_game_state::init_crc()
 {
 	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
@@ -3267,3 +3364,10 @@ CONS( 2007, lpetshop,   0,        0, lpetshop,  lpetshop,  spg2xx_game_lpetshop_
 CONS( 2005, barbpet,    0,        0, spg2xx,    barbpet,   spg2xx_game_state,               empty_init, "Mattel",                                              "Barbie: I Love Pets - Pet Rescue", MACHINE_IMPERFECT_SOUND )
 
 CONS( 200?, smartcyc,   0,        0, smartcycle, smartcyc, spg2xx_game_smartcycle_state,    empty_init, "Fisher Price",                                        "Smart Cycle", MACHINE_NOT_WORKING )
+
+CONS( 2004, spidm2,     0,        0, spg2xx,     spidm2,   spg2xx_game_state,               empty_init, "N-Vision",                                            "Spider-Man 2 Web Action", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2004, dinothun,   0,        0, spg2xx,    spg2xx,    spg2xx_game_state,               empty_init, "N-Vision / Toy Quest",                                "Power Rangers Dino Thunder: Thunder Action", MACHINE_NOT_WORKING )
+
+// this Japan version uses different banking to spg2xx_pdc.cpp so is in here instead
+CONS( 2006, pdcj,       0,        0, pdcj,      pdcj,      spg2xx_game_pdcj_state,          empty_init, "Conny / Takara",                                      "PDC - Pocket Dream Console (Japan)", MACHINE_IMPERFECT_SOUND )

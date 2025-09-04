@@ -42,7 +42,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
-	
+
 	uint32_t m_coldfire_regs[0x400/4];
 
 };

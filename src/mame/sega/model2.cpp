@@ -21,14 +21,14 @@
     - fvipers: enables timers, but then irq register is empty, hence it crashes with an
       "interrupt halt" at POST (regression, worked around);
     - hpyagu98: stops with 'Error #1' message during boot.
-	  Also writes to the 0x600000-0x62ffff range in main CPU program map;
+      Also writes to the 0x600000-0x62ffff range in main CPU program map;
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
     - lastbrnx: has wrong graphics, uses several SHARC opcodes that needs to be double checked
                 (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
     - manxtt: no escape from "active motion slider" tutorial (needs analog inputs),
               bypass it by entering then exiting service mode;
     - sgt24h: has input analog issues, steering doesn't center when neutral,
-	  gas and brake pedals pulses instead of being fixed;
+      gas and brake pedals pulses instead of being fixed;
     - stcc: no collision detection with enemy cars, sometimes enemy cars glitch out and disappear altogether;
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
 
@@ -7528,8 +7528,8 @@ void model2_state::init_zerogun()
 
 void model2_state::init_sgt24h()
 {
-//	u32 *ROM = (u32 *)memregion("maincpu")->base();
-//	ROM[0x56578/4] = 0x08000004;
+//  u32 *ROM = (u32 *)memregion("maincpu")->base();
+//  ROM[0x56578/4] = 0x08000004;
 	//ROM[0x5b3e8/4] = 0x08000004;
 }
 

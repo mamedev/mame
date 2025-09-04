@@ -434,7 +434,7 @@ void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		if (flipscreenX)
 		{
-			ox = 512 - ox;
+			ox = 320 - ox;
 			if (!mirrorx)
 				flipx = !flipx;
 		}
@@ -450,7 +450,10 @@ void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		oy = (-(oy + spriteoffsY + 0x07)) & 0x3ff;
 		if (oy >= 640) oy -= 1024;
 
-		/* the coordinates given are for the *center* of the sprite */
+		// limit to maximum 1024x512 (see asterix konami logo)
+		rectangle clip = rectangle { ox - 0x200, ox + 0x1ff, oy - 0x100, oy + 0xff } & cliprect;
+
+		// the coordinates given are for the *center* of the sprite
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
 
@@ -518,7 +521,7 @@ void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					gfx(0)->prio_transtable(bitmap,cliprect,
+					gfx(0)->prio_transtable(bitmap,clip,
 							c,color,
 							fx,fy,
 							sx,sy,
@@ -527,11 +530,11 @@ void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 				}
 				else
 				{
-					gfx(0)->prio_zoom_transtable(bitmap,cliprect,
+					gfx(0)->prio_zoom_transtable(bitmap,clip,
 							c,color,
 							fx,fy,
 							sx,sy,
-							(zw << 16) / 16,(zh << 16) / 16,
+							zw << 12,zh << 12,
 							priority_bitmap,pri,
 							drawmode_table);
 

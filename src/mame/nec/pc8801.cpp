@@ -1664,15 +1664,11 @@ void pc8801_state::pc8801(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("pc8801_cass");
 
-	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
 
 	// TODO: clock, receiver handler, DCD?
 	I8251(config, m_usart, 0);
 	m_usart->txd_handler().set(FUNC(pc8801_state::txdata_callback));
 	m_usart->rxrdy_handler().set(FUNC(pc8801_state::rxrdy_irq_w));
-
-	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
-	SOFTWARE_LIST(config, "disk_n_list").set_compatible("pc8001_flop");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_raw(PIXEL_CLOCK_24KHz,848,0,640,448,0,400);
@@ -1724,6 +1720,11 @@ void pc8801_state::pc8801(machine_config &config)
 	m_exp->int3_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT3_IRQ_LEVEL, !state); });
 	m_exp->int4_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !state); });
 	m_exp->int5_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT5_IRQ_LEVEL, !state); });
+
+	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
+	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
+	SOFTWARE_LIST(config, "disk_n_list").set_compatible("pc8001_flop");
+	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("pc8801");
 }
 
 void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)

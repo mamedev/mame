@@ -38,21 +38,12 @@ ioport_constructor rbv_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  palette_entries - palette size
-//-------------------------------------------------
-
-u32 rbv_device::palette_entries() const noexcept
-{
-	return 256;
-}
-
-//-------------------------------------------------
 //  ADDRESS_MAP
 //-------------------------------------------------
 
 void rbv_device::map(address_map &map)
 {
-	map(0x00000000, 0x00000007).rw(FUNC(rbv_device::dac_r), FUNC(rbv_device::dac_w)).mirror(0x00f00000);
+	map(0x00000000, 0x0000000f).rw(m_bt478, FUNC(bt478_device::read), FUNC(bt478_device::write)).umask32(0xff000000).mirror(0x00f00000);
 	map(0x00002000, 0x00003fff).rw(m_pseudovia, FUNC(pseudovia_device::read), FUNC(pseudovia_device::write)).mirror(0x00f00000);
 }
 
@@ -68,6 +59,8 @@ void rbv_device::device_add_mconfig(machine_config &config)
 	m_screen->screen_vblank().set(m_pseudovia, FUNC(pseudovia_device::slot_irq_w<0x40>));
 	config.set_default_layout(layout_monitors);
 
+	BT478(config, m_bt478, 0);
+
 	APPLE_PSEUDOVIA(config, m_pseudovia, DERIVED_CLOCK(1, 2));
 	m_pseudovia->readvideo_handler().set(FUNC(rbv_device::via2_video_config_r));
 	m_pseudovia->writevideo_handler().set(FUNC(rbv_device::via2_video_config_w));
@@ -80,11 +73,11 @@ void rbv_device::device_add_mconfig(machine_config &config)
 
 rbv_device::rbv_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, RBV, tag, owner, clock),
-	device_palette_interface(mconfig, *this),
 	write_6015(*this),
 	write_irq(*this),
 	m_io_montype(*this, "MONTYPE"),
 	m_screen(*this, "screen"),
+	m_bt478(*this, "bt478"),
 	m_pseudovia(*this, "pseudovia")
 {
 }
@@ -107,10 +100,6 @@ void rbv_device::device_start()
 	save_item(NAME(m_vres));
 	save_item(NAME(m_montype));
 	save_item(NAME(m_monochrome));
-	save_item(NAME(m_pal_address));
-	save_item(NAME(m_pal_idx));
-
-	m_pal_address = m_pal_idx = 0;
 }
 
 //-------------------------------------------------
@@ -199,50 +188,6 @@ void rbv_device::via2_irq_w(int state)
 	write_irq(state);
 }
 
-u8 rbv_device::dac_r(offs_t offset)
-{
-	switch (offset)
-	{
-	case 0:
-		return m_pal_address;
-
-	default:
-		return 0;
-	}
-}
-
-void rbv_device::dac_w(offs_t offset, u8 data)
-{
-	switch (offset)
-	{
-	case 0:
-		m_pal_address = data;
-		m_pal_idx = 0;
-		break;
-
-	case 4:
-		switch (m_pal_idx)
-		{
-		case 0:
-			set_pen_red_level(m_pal_address, data);
-			break;
-		case 1:
-			set_pen_green_level(m_pal_address, data);
-			break;
-		case 2:
-			set_pen_blue_level(m_pal_address, data);
-			break;
-		}
-		m_pal_idx++;
-		if (m_pal_idx == 3)
-		{
-			m_pal_idx = 0;
-			m_pal_address++;
-		}
-		break;
-	}
-}
-
 u32 rbv_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_monochrome)
@@ -257,7 +202,7 @@ u32 rbv_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const
 	auto const vram8 = util::big_endian_cast<u8 const>(m_ram_ptr);
 
 	// video disabled?
-	if (m_video_config & 0x40)
+	if (BIT(m_video_config, 6))
 	{
 		bitmap.fill(0, cliprect);
 		return 0;
@@ -266,7 +211,7 @@ u32 rbv_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const
 	auto const pen =
 			[this] (unsigned n) -> rgb_t
 			{
-				rgb_t const val = pen_color(n);
+				rgb_t const val = m_bt478->pen_color(n);
 				if (Mono)
 					return rgb_t(val.b(), val.b(), val.b());
 				else

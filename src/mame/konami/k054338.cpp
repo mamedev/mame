@@ -1,5 +1,31 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+/*
+
+Konami 054338
+-------------
+Color combiner engine / final mixer. Designed for use with the 055555, but also found
+in games without one.
+
+Registers (word-wise):
+
+0:     first 8 bits unknown, second 8 bits are the R component of the background color
+1:     G and B components (8 bits each) of the background color
+2-4:   shadow 1 R/G/B (16 bits per component.  In shadow mode, determines a blend
+       value between total blackness and the original color.  In highlight mode,
+       determines a blend value between total whiteness and the original color.
+       The hardware clamps at black or white as necessary: see the Graphics Test
+       in many System GX games).
+5-7:   shadow 2 R/G/B
+8-10:  shadow 3 R/G/B
+11-12: brightness R/G/B (external circuit such as the 055555 decides which layers
+       this applies to)
+13-14: alpha blend R/G/B (external circuit such as the 055555 decides which layers
+       this applies to)
+
+Because the implementation is video dependent, this is just a register-handling shell.
+
+*/
 
 #include "emu.h"
 #include "k054338.h"
@@ -8,20 +34,10 @@
 #include "logmacro.h"
 
 
-/***************************************************************************/
-/*                                                                         */
-/*                                 054338                                  */
-/*                                                                         */
-/***************************************************************************/
-
-// k054338 alpha blend / final mixer (normally used with the 55555)
-// because the implementation is video dependant, this is just a
-// register-handling shell.
-
 DEFINE_DEVICE_TYPE(K054338, k054338_device, "k054338", "Konami 054338 Mixer")
 
-k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K054338, tag, owner, clock),
+k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, K054338, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_alpha_inv(0),
 	m_k055555(*this, finder_base::DUMMY_TAG)
@@ -67,12 +83,11 @@ u16 k054338_device::register_r(offs_t offset)
 
 void k054338_device::update_all_shadows(int rushingheroes_hack, palette_device &palette)
 {
-	int i, d;
 	int noclip = m_regs[K338_REG_CONTROL] & K338_CTL_CLIPSL;
 
-	for (i = 0; i < 9; i++)
+	for (int i = 0; i < 9; i++)
 	{
-		d = m_regs[K338_REG_SHAD1R + i] & 0x1ff;
+		int d = m_regs[K338_REG_SHAD1R + i] & 0x1ff;
 		if (d >= 0x100) d -= 0x200;
 		m_shd_rgb[i] = d;
 	}
@@ -103,8 +118,9 @@ void k054338_device::fill_solid_bg(bitmap_rgb32 &bitmap, const rectangle &clipre
 // Unified k054338/K055555 BG color fill (see p.67)
 void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &cliprect, const pen_t *pal_ptr, int mode)
 {
-	if ((mode & 0x02) == 0) // solid fill
+	if ((mode & 0x02) == 0)
 	{
+		// solid fill
 		bitmap.fill(*pal_ptr, cliprect);
 	}
 	else
@@ -112,8 +128,9 @@ void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &clipr
 		uint32_t *dst_ptr = &bitmap.pix(cliprect.min_y);
 		int dst_pitch = bitmap.rowpixels();
 
-		if ((mode & 0x01) == 0) // vertical gradient fill
+		if ((mode & 0x01) == 0)
 		{
+			// vertical gradient fill
 			pal_ptr += cliprect.min_y;
 			for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
@@ -126,8 +143,9 @@ void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &clipr
 				dst_ptr += dst_pitch;
 			}
 		}
-		else    // horizontal gradient fill
+		else
 		{
+			// horizontal gradient fill
 			int width = cliprect.width() * sizeof(uint32_t);
 			pal_ptr += cliprect.min_x;
 			dst_ptr += cliprect.min_x;
@@ -148,10 +166,10 @@ int k054338_device::set_alpha_level(int pblend)
 	if (!pblend) return 255;
 
 	// sanitize input
-	pblend &= 0b11;
+	pblend &= 3;
 
 	const u8 mixset = m_regs[K338_REG_PBLEND + (pblend >> 1 & 1)] >> (~pblend << 3 & 8);
-	int mixlv  = mixset & 0x1f;
+	int mixlv = mixset & 0x1f;
 
 	if (m_alpha_inv) mixlv = 0x1f - mixlv;
 
