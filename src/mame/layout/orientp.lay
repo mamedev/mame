@@ -21,16 +21,16 @@ license:BSD-3-Clause
 
 		<!-- Top 7seg display modules -->
 
-		<element name="digit19" ref="digit">
+		<element name="digit17" ref="digit">
 			<bounds left="200" top="521" right="234" bottom="560" />
 		</element>
-		<element name="digit18" ref="digit">
+		<element name="digit16" ref="digit">
 			<bounds left="244" top="521" right="278" bottom="560" />
 		</element>
-		<element name="digit17" ref="digit">
+		<element name="digit19" ref="digit">
 			<bounds left="288" top="521" right="322" bottom="560" />
 		</element>
-		<element name="digit16" ref="digit">
+		<element name="digit18" ref="digit">
 			<bounds left="332" top="521" right="366" bottom="560" />
 		</element>
 
@@ -47,16 +47,16 @@ license:BSD-3-Clause
 		<!-- Bottom 7seg display modules -->
 
 
-		<element name="digit15" ref="digit">
+		<element name="digit23" ref="digit">
 			<bounds left="432" top="521" right="466" bottom="560" />
 		</element>
-		<element name="digit14" ref="digit">
+		<element name="digit22" ref="digit">
 			<bounds left="476" top="521" right="510" bottom="560" />
 		</element>
-		<element name="digit13" ref="digit">
+		<element name="digit25" ref="digit">
 			<bounds left="520" top="521" right="554" bottom="560" />
 		</element>
-		<element name="digit12" ref="digit">
+		<element name="digit24" ref="digit">
 			<bounds left="564" top="521" right="598" bottom="560" />
 		</element>
 
