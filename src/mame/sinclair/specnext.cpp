@@ -901,7 +901,7 @@ void specnext_state::update_video_mode()
 			? rectangle(m_video_timings.hdmi_xmin << 1, m_video_timings.hdmi_xmax << 1,m_video_timings.hdmi_ymin, m_video_timings.hdmi_ymax)
 			: m_clip320x256
 		, HZ_TO_ATTOSECONDS(28_MHz_XTAL / 2) * width * height);
-	m_ula->set_raster_offset(left, top);
+	m_ula_scr->set_raster_offset(left, top);
 	m_lores->set_raster_offset(left, top);
 	m_tiles->set_raster_offset(left, top);
 	m_layer2->set_raster_offset(left, top);
