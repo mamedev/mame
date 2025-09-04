@@ -22,7 +22,7 @@ but tests show that it runs at a much higher speed. Three individual CP2000 were
 measured, by timing move calculation, and one recording to verify beeper pitch and
 display blinking rate. Real CP2000 CPU frequency is in the 2.63MHz-2.91MHz range.
 
-The 'sequels' CP3000-CP6000 are on HMCS40 (see minichess.cpp and trsensor.cpp),
+The 'sequels' CP3000-CP6000 are on HMCS40 (see minichess.cpp and tschess.cpp),
 Chess Partner 1000 does not exist.
 
 *******************************************************************************/

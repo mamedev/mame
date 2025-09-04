@@ -1240,7 +1240,7 @@ void x07_state::x07_io(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( x07 )
 	PORT_START("BATTERY")
-		PORT_CONFNAME( 0x40, 0x30, "Battery Status" )
+		PORT_CONFNAME( 0x70, 0x30, "Battery Status" )
 		PORT_CONFSETTING( 0x30, DEF_STR( Normal ) )
 		PORT_CONFSETTING( 0x40, "Low Battery" )
 	PORT_START("CARDBATTERY")

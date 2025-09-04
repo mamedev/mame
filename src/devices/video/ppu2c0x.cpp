@@ -81,7 +81,6 @@ void ppu2c0x_device::device_config_complete()
 	/* reset the callbacks */
 	m_scanline_callback_proc.set(nullptr);
 	m_hblank_callback_proc.set(nullptr);
-	m_vidaccess_callback_proc.set(nullptr);
 	m_latch.set(nullptr);
 }
 
@@ -107,7 +106,6 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	m_spriteramsize(0x100),
 	m_scanline_callback_proc(*this),
 	m_hblank_callback_proc(*this),
-	m_vidaccess_callback_proc(*this),
 	m_int_callback(*this),
 	m_refresh_latch(0),
 	m_add(1),
@@ -1313,10 +1311,6 @@ void ppu2c0x_device::write(offs_t offset, u8 data)
 
 		if (!m_latch.isnull())
 			m_latch(tempAddr);
-
-		/* if there's a callback, call it now */
-		if (!m_vidaccess_callback_proc.isnull())
-			data = m_vidaccess_callback_proc(tempAddr, data);
 
 		/* store the data */
 		writebyte(tempAddr, data);

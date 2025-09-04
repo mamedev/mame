@@ -94,28 +94,28 @@ enum BREGS {
 	BH = NATIVE_ENDIAN_VALUE_LE_BE(0x19, 0x18)
 };
 
-#define SetRB(x)        do { m_RBW = (x) << 4; m_RBB = (x) << 5; } while (0)
+#define SetRB(x) do { m_RBW = (x) << 4; m_RBB = (x) << 5; } while (0)
 
-#define Sreg(x)         m_internal_ram[m_RBW + (x)]
-#define Wreg(x)         m_internal_ram[m_RBW + (x)]
-#define Breg(x)         reinterpret_cast<uint8_t *>(&m_internal_ram[0])[m_RBB + (x)]
+#define Sreg(x)  m_internal_ram[m_RBW + (x)]
+#define Wreg(x)  m_internal_ram[m_RBW + (x)]
+#define Breg(x)  reinterpret_cast<uint8_t *>(&m_internal_ram[0])[m_RBB + (x)]
 
-#define PC()       ((Sreg(PS)<<4)+m_ip)
+#define PC()     ((Sreg(PS)<<4)+m_ip)
 
-#define CF      (m_CarryVal!=0)
-#define SF      (m_SignVal<0)
-#define ZF      (m_ZeroVal==0)
-#define PF      parity_table[(BYTE)m_ParityVal]
-#define AF      (m_AuxVal!=0)
-#define OF      (m_OverVal!=0)
-#define RB      (m_RBW >> 4)
+#define CF       (m_CarryVal!=0)
+#define SF       (m_SignVal<0)
+#define ZF       (m_ZeroVal==0)
+#define PF       parity_table[(BYTE)m_ParityVal]
+#define AF       (m_AuxVal!=0)
+#define OF       (m_OverVal!=0)
+#define RB       (m_RBW >> 4)
 
 /************************************************************************/
 
-#define read_mem_byte(a)            v25_read_byte((a))
-#define read_mem_word(a)            v25_read_word((a))
-#define write_mem_byte(a,d)         v25_write_byte((a),(d))
-#define write_mem_word(a,d)         v25_write_word((a),(d))
+#define read_mem_byte(a)        v25_read_byte((a))
+#define read_mem_word(a)        v25_read_word((a))
+#define write_mem_byte(a,d)     v25_write_byte((a),(d))
+#define write_mem_word(a,d)     v25_write_word((a),(d))
 
 #define read_port_byte(a)       m_io->read_byte(a)
 #define read_port_word(a)       m_io->read_word_unaligned(a)

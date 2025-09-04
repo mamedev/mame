@@ -305,6 +305,7 @@ wd90c00_vga_device::wd90c00_vga_device(const machine_config &mconfig, device_typ
 	, m_cnf14_read_cb(*this, 1)
 	, m_cnf13_read_cb(*this, 1)
 	, m_cnf12_read_cb(*this, 1)
+	, m_cnf_write_ddr_cb(*this, 0xff)
 {
 	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(wd90c00_vga_device::crtc_map), this));
 }
@@ -464,7 +465,9 @@ u8 wd90c00_vga_device::egasw_r(offs_t offset)
 void wd90c00_vga_device::egasw_w(offs_t offset, u8 data)
 {
 	LOG("PR11 EGA Switch W %02x\n", data);
-	m_pr11 = data & 0xff;
+	// NOTE: teradrive and megapc will flush the entire CRTC range after setup mode
+	// expecting bit 7 still high on reads afterwards (pullup)
+	m_pr11 = (data & m_cnf_write_ddr_cb()) | (m_pr11 & ~m_cnf_write_ddr_cb());
 }
 
 /*

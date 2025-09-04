@@ -74,10 +74,7 @@ private:
 	void bg_yscroll_w(uint8_t data);
 	void bg_xscroll_w(offs_t offset, uint8_t data);
 	void screen_ctrl_w(uint8_t data);
-	template <uint8_t Xor = 0> void rombank_w(uint8_t data);
-
-	// game specific
-	void gekiretu_rombank_w(uint8_t data);
+	template <uint8_t Xor> void rombank_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -649,10 +646,8 @@ void quizdna_state::machine_start()
 
 void quizdna_state::quizdna(machine_config &config)
 {
-	static constexpr XTAL MCLK = 16_MHz_XTAL;
-
 	// basic machine hardware
-	Z80(config, m_maincpu, MCLK / 2); // 8.000 MHz
+	Z80(config, m_maincpu, 16_MHz_XTAL / 2); // 8.000 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &quizdna_state::quizdna_map);
 	m_maincpu->set_addrmap(AS_IO, &quizdna_state::quizdna_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(quizdna_state::irq0_line_hold));
@@ -672,7 +667,7 @@ void quizdna_state::quizdna(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", MCLK / 4));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 16_MHz_XTAL / 4));
 	ymsnd.port_a_read_callback().set_ioport("DSW3");
 	ymsnd.port_b_read_callback().set_ioport("DSW2");
 	ymsnd.add_route(0, "mono", 0.10);
@@ -680,7 +675,7 @@ void quizdna_state::quizdna(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.10);
 	ymsnd.add_route(3, "mono", 0.40);
 
-	OKIM6295(config, "oki", (MCLK / 1024) * 132, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", (16_MHz_XTAL / 1024) * 132, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30); // clock frequency & pin 7 not verified
 }
 
 void quizdna_state::gakupara(machine_config &config)
@@ -688,7 +683,6 @@ void quizdna_state::gakupara(machine_config &config)
 	quizdna(config);
 
 	// basic machine hardware
-
 	m_maincpu->set_addrmap(AS_IO, &quizdna_state::gakupara_io_map);
 }
 
@@ -697,7 +691,6 @@ void quizdna_state::gekiretu(machine_config &config)
 	quizdna(config);
 
 	// basic machine hardware
-
 	m_maincpu->set_addrmap(AS_PROGRAM, &quizdna_state::gekiretu_map);
 	m_maincpu->set_addrmap(AS_IO, &quizdna_state::gekiretu_io_map);
 }
@@ -730,7 +723,7 @@ ROM_START( quizdna )
 ROM_END
 
 ROM_START( gakupara )
-	ROM_REGION( 0x110000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "u28.bin",  0x00000,  0x80000, CRC(72124bb8) SHA1(e734acff7e9d6b8c6a95c76860732320a2e3a828) )
 	ROM_LOAD( "u29.bin",  0x80000,  0x40000, CRC(09f4948e) SHA1(21ccf5af6935cf40c0cf73fbee14bff3c4e1d23d) )
 

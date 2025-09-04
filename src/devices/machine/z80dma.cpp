@@ -180,6 +180,7 @@ void z80dma_device::device_start()
 	save_item(NAME(m_force_ready));
 	save_item(NAME(m_wait));
 	save_item(NAME(m_waits_extra));
+	save_item(NAME(m_busrq));
 	save_item(NAME(m_busrq_ack));
 	save_item(NAME(m_is_pulse));
 	save_item(NAME(m_latch));
@@ -202,6 +203,7 @@ void z80dma_device::device_reset()
 	m_num_follow = 0;
 	m_read_num_follow = m_read_cur_follow = 0;
 	m_reset_pointer = 0;
+	m_busrq = CLEAR_LINE;
 	m_busrq_ack = 0;
 	m_is_pulse = false;
 	memset(m_regs, 0, sizeof(m_regs));
@@ -305,8 +307,20 @@ void z80dma_device::disable()
 	m_timer->reset();
 	if (m_busrq_ack == 1)
 	{
-		m_out_busreq_cb(CLEAR_LINE);
+		set_busrq(CLEAR_LINE);
 	}
+}
+
+void z80dma_device::update_bao()
+{
+	m_out_bao_cb(!m_busrq && m_busrq_ack);
+}
+
+void z80dma_device::set_busrq(int state)
+{
+	m_busrq = state;
+	m_out_busreq_cb(m_busrq);
+	update_bao();
 }
 
 /****************************************************************************
@@ -478,7 +492,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 		case SEQ_REQUEST_BUS:
 			if (m_busrq_ack == 0)
 			{
-				m_out_busreq_cb(ASSERT_LINE);
+				set_busrq(ASSERT_LINE);
 			}
 			m_dma_seq = SEQ_WAITING_ACK;
 			break;
@@ -546,7 +560,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 				switch (mode)
 				{
 					case 0b00: // Byte/Single/byte-at-a-time
-						m_out_busreq_cb(CLEAR_LINE);
+						set_busrq(CLEAR_LINE);
 						m_dma_seq = SEQ_WAIT_READY;
 						break;
 
@@ -557,7 +571,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 						}
 						else
 						{
-							m_out_busreq_cb(CLEAR_LINE);
+							set_busrq(CLEAR_LINE);
 							m_dma_seq = SEQ_WAIT_READY;
 						}
 						break;
@@ -888,6 +902,7 @@ void z80dma_device::rdy_w(int state)
 void z80dma_device::bai_w(int state)
 {
 	m_busrq_ack = state;
+	update_bao();
 }
 
 

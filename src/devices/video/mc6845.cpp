@@ -484,7 +484,7 @@ void mc6845_device::recompute_parameters(bool postload)
 				visarea.set(0 + m_visarea_adjust_min_x, max_visible_x + m_visarea_adjust_max_x, 0 + m_visarea_adjust_min_y, max_visible_y + m_visarea_adjust_max_y);
 
 			LOGCONF("M6845 config screen: HTOTAL: %d  VTOTAL: %d  MAX_X: %d  MAX_Y: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
-				 horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
+				horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
 
 			if (has_screen())
 				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
@@ -509,8 +509,6 @@ void mc6845_device::recompute_parameters(bool postload)
 		{
 			m_line_timer->adjust(cclks_to_attotime(m_horiz_char_total + 1));
 		}
-		if ( (!m_reconfigure_cb.isnull()) && (!postload) )
-			m_line_counter = 0;
 	}
 }
 
@@ -983,7 +981,7 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		if (m_display_disabled_msg_shown == true)
 		{
-			logerror("M6845: Valid screen parameters - display reenabled!!!\n");
+			logerror("M6845: Valid screen parameters - display re-enabled!!!\n");
 			m_display_disabled_msg_shown = false;
 		}
 

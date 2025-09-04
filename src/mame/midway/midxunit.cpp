@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders: Aaron Giles
+
 /*************************************************************************
 
     Midway X-unit system
@@ -10,6 +11,8 @@
     Games supported:
         * Revolution X
 
+    TODO:
+        * hook up PIC dump
 ***************************************************************************
 
 Revolution X
@@ -110,14 +113,393 @@ ________________________________________________________________
 **************************************************************************/
 
 #include "emu.h"
-#include "midxunit.h"
 
+#include "dcs.h"
+#include "midtunit_v.h"
+
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/tms34010/tms34010.h"
 #include "machine/adc0844.h"
+#include "machine/nvram.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+#define LOG_IO      (1U << 1)
+#define LOG_UART    (1U << 2)
+#define LOG_UNKNOWN (1U << 3)
+#define LOG_SOUND   (1U << 4)
+
+#define VERBOSE     (0)
+#include "logmacro.h"
+
+
+namespace {
+
+class midxunit_state : public driver_device
+{
+public:
+	midxunit_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_video(*this, "video")
+		, m_dcs(*this, "dcs")
+		, m_palette(*this, "palette")
+		, m_nvram(*this, "nvram")
+		, m_pic(*this, "pic")
+		, m_nvram_data(*this, "nvram_data", 0x2000, ENDIANNESS_LITTLE)
+		, m_gun_recoil(*this, "Player%u_Gun_Recoil", 1U)
+		, m_gun_led(*this, "Player%u_Gun_LED", 1U)
+	{ }
+
+	void midxunit(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_device<tms340x0_device> m_maincpu;
+	required_device<midtunit_video_device> m_video;
+	required_device<dcs_audio_device> m_dcs;
+	required_device<palette_device> m_palette;
+	required_device<nvram_device> m_nvram;
+	required_device<pic16c57_device> m_pic;
+	memory_share_creator<uint8_t> m_nvram_data;
+	output_finder<3> m_gun_recoil;
+	output_finder<3> m_gun_led;
+
+	uint16_t m_iodata[8] = {};
+	uint8_t m_uart[8] = {};
+	bool m_adc_int = false;
+
+	uint8_t m_pic_command = 0;
+	uint8_t m_pic_data = 0;
+	uint8_t m_pic_clk = 0;
+	uint8_t m_pic_status = 0;
+
+	uint8_t cmos_r(offs_t offset);
+	void cmos_w(offs_t offset, uint8_t data);
+	void io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void unknown_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void adc_int_w(int state);
+	uint32_t status_r();
+	uint8_t uart_r(offs_t offset);
+	void uart_w(offs_t offset, uint8_t data);
+	uint32_t security_r();
+	void security_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void security_clock_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void dcs_output_full(int state);
+	uint32_t dma_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
+	void main_map(address_map &map) ATTR_COLD;
+};
+
+
+/*************************************
+ *
+ *  CMOS reads/writes
+ *
+ *************************************/
+
+uint8_t midxunit_state::cmos_r(offs_t offset)
+{
+	return m_nvram_data[offset];
+}
+
+void midxunit_state::cmos_w(offs_t offset, uint8_t data)
+{
+	m_nvram_data[offset] = data;
+}
+
+
+/*************************************
+ *
+ *  General I/O writes
+ *
+ *************************************/
+
+void midxunit_state::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	offset = (offset / 2) % 8;
+	uint16_t const oldword = m_iodata[offset];
+	uint16_t newword = oldword;
+	COMBINE_DATA(&newword);
+
+	switch (offset)
+	{
+		case 2:
+			// watchdog reset
+//          watchdog_reset_w(0,0);
+			break;
+
+		default:
+			// Gun Outputs for RevX
+			// Note: The Gun for the Coin slot you use is supposed to rumble when you insert coins, and it doesn't for P3.
+			// Perhaps an Input is hooked up wrong.
+			m_gun_recoil[0] = BIT(data, 0);
+			m_gun_recoil[1] = BIT(data, 1);
+			m_gun_recoil[2] = BIT(data, 2);
+			m_gun_led[0] = BIT(~data, 4);
+			m_gun_led[1] = BIT(~data, 5);
+			m_gun_led[2] = BIT(~data, 6);
+
+			LOGMASKED(LOG_IO, "%s: I/O write to %d = %04X\n", machine().describe_context(), offset, data);
+			break;
+	}
+	m_iodata[offset] = newword;
+}
+
+
+void midxunit_state::unknown_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	int const offs = offset / 0x40000;
+
+	if (offs == 1 && ACCESSING_BITS_0_7)
+		m_dcs->reset_w(~data & 2);
+
+	if (ACCESSING_BITS_0_7 && offset % 0x40000 == 0)
+		LOGMASKED(LOG_UNKNOWN, "%s: unknown_w @ %d = %02X\n", machine().describe_context(), offs, data & 0xff);
+}
+
+
+void midxunit_state::adc_int_w(int state)
+{
+	m_adc_int = (state != CLEAR_LINE);
+}
+
+
+
+/*************************************
+ *
+ *  General I/O reads
+ *
+ *************************************/
+
+uint32_t midxunit_state::status_r()
+{
+	// low bit indicates whether the ADC is done reading the current input
+	return (m_pic_status << 1) | (m_adc_int ? 1 : 0);
+}
+
+
+
+/*************************************
+ *
+ *  Revolution X UART
+ *
+ *************************************/
+
+void midxunit_state::dcs_output_full(int state)
+{
+	// only signal if not in loopback state
+	if (m_uart[1] != 0x66)
+		m_maincpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+uint8_t midxunit_state::uart_r(offs_t offset)
+{
+	uint8_t result = 0;
+
+	// switch off the offset
+	switch (offset)
+	{
+		case 0: // register 0 must return 0x13 in order to pass the self test
+			result = 0x13;
+			break;
+
+		case 1: // register 1 contains the status
+
+			// loopback case: data always ready, and always ok to send
+			if (m_uart[1] == 0x66)
+				result |= 5;
+
+			// non-loopback case: bit 0 means data ready, bit 2 means ok to send
+			else
+			{
+				int const temp = m_dcs->control_r();
+				result |= (temp & 0x800) >> 9;
+				result |= (~temp & 0x400) >> 10;
+				machine().scheduler().synchronize();
+			}
+			break;
+
+		case 3: // register 3 contains the data read
+
+			// loopback case: feed back last data wrtten
+			if (m_uart[1] == 0x66)
+				result = m_uart[3];
+
+			// non-loopback case: read from the DCS system
+			else
+			{
+				if (!machine().side_effects_disabled())
+					LOGMASKED(LOG_SOUND, "%08X:Sound read\n", m_maincpu->pc());
+
+				result = m_dcs->data_r();
+			}
+			break;
+
+		case 5: // register 5 seems to be like 3, but with in/out swapped
+
+			// loopback case: data always ready, and always ok to send
+			if (m_uart[1] == 0x66)
+				result |= 5;
+
+			// non-loopback case: bit 0 means data ready, bit 2 means ok to send
+			else
+			{
+				int const temp = m_dcs->control_r();
+				result |= (temp & 0x800) >> 11;
+				result |= (~temp & 0x400) >> 8;
+				machine().scheduler().synchronize();
+			}
+			break;
+
+		default: // everyone else reads themselves
+			result = m_uart[offset];
+			break;
+	}
+
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_UART, "%s: UART R @ %X = %02X\n", machine().describe_context(), offset, result);
+	return result;
+}
+
+
+void midxunit_state::uart_w(offs_t offset, uint8_t data)
+{
+	// switch off the offset
+	switch (offset)
+	{
+		case 3: // register 3 contains the data to be sent
+
+			// loopback case: don't feed through
+			if (m_uart[1] == 0x66)
+				m_uart[3] = data;
+
+			// non-loopback case: send to the DCS system
+			else
+				m_dcs->data_w(data);
+			break;
+
+		case 5: // register 5 write seems to reset things
+			m_dcs->data_r();
+			break;
+
+		default: // everyone else just stores themselves
+			m_uart[offset] = data;
+			break;
+	}
+
+	LOGMASKED(LOG_UART, "%s: UART W @ %X = %02X\n", machine().describe_context(), offset, data);
+}
+
+
+
+/*************************************
+ *
+ *  X-unit init (DCS)
+ *
+ *  music: ADSP2101
+ *
+ *************************************/
+
+/********************** Revolution X **********************/
+
+/*************************************
+ *
+ *  Machine init
+ *
+ *************************************/
+
+void midxunit_state::machine_start()
+{
+	m_gun_recoil.resolve();
+	m_gun_led.resolve();
+
+	m_nvram->set_base(m_nvram_data.target(), 0x2000);
+
+	save_item(NAME(m_iodata));
+	save_item(NAME(m_uart));
+	save_item(NAME(m_adc_int));
+
+	save_item(NAME(m_pic_command));
+	save_item(NAME(m_pic_data));
+	save_item(NAME(m_pic_clk));
+	save_item(NAME(m_pic_status));
+}
+
+void midxunit_state::machine_reset()
+{
+	// reset sound
+	m_dcs->reset_w(0);
+	m_dcs->reset_w(1);
+
+	m_pic_command = 0;
+	m_pic_data = 0;
+	m_pic_clk = 0;
+	m_pic_status = 0;
+
+	m_dcs->set_io_callbacks(write_line_delegate(*this, FUNC(midxunit_state::dcs_output_full)), write_line_delegate(*this));
+}
+
+
+
+/*************************************
+ *
+ *  Security chip I/O
+ *
+ *************************************/
+
+uint32_t midxunit_state::security_r()
+{
+	return m_pic_data;
+}
+
+void midxunit_state::security_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+		m_pic_command = data & 0x0f;
+}
+
+
+void midxunit_state::security_clock_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+		m_pic_clk = BIT(data, 1);
+}
+
+
+
+/*************************************
+ *
+ *  DMA registers
+ *
+ *************************************/
+
+uint32_t midxunit_state::dma_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t result = 0;
+
+	result |= m_video->dma_r(offset * 2);
+	if (ACCESSING_BITS_0_15)
+		result |= uint32_t(m_video->dma_r(offset * 2 + 1)) << 16;
+
+	return result;
+}
+
+
+void midxunit_state::dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	m_video->dma_w(offset * 2, data & 0xffff);
+	if (ACCESSING_BITS_0_15)
+		m_video->dma_w(offset * 2 + 1, data >> 16);
+}
 
 
 /*************************************
@@ -216,7 +598,7 @@ static INPUT_PORTS_START( revx )
 	PORT_DIPSETTING(      0x0300, DEF_STR( USA ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( French ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( German ) )
-//  PORT_DIPSETTING(      0x0000, DEF_STR( Unused ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( Unused ))
 	PORT_DIPNAME( 0x0400, 0x0400, "Bill Validator" )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
@@ -324,6 +706,12 @@ void midxunit_state::midxunit(machine_config &config)
  *************************************/
 
 ROM_START( revx )
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 )   // 34020 code
+	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u51.u51",  0x00000, 0x80000, CRC(9960ac7c) SHA1(441322f061d627ca7573f612f370a85794681d0f) ) // labels needs to be verified, so far was observed only reprogrammed P5 ROMs
+	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u52.u52",  0x00001, 0x80000, CRC(fbf55510) SHA1(8a5b0004ed09391fe37f0f501b979903d6ae4868) )
+	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u53.u53",  0x00002, 0x80000, CRC(a045b265) SHA1(b294d3a56e41f5ec4ab9bbcc0088833b1cab1879) )
+	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u54.u54",  0x00003, 0x80000, CRC(24471269) SHA1(262345bd147402100785459af422dafd1c562787) )
+
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  // sound data
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u2.u2", 0x000000, 0x80000, CRC(d2ed9f5e) SHA1(415ce5e41a560d135ea41c7924219fdeda504237) ) // shows as "Sound Software Version - Release 2"
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u3.u3", 0x200000, 0x80000, CRC(af8f253b) SHA1(25a0000cab177378070f7a6e3c7378fe87fad63e) )
@@ -333,12 +721,6 @@ ROM_START( revx )
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u7.u7", 0xa00000, 0x80000, CRC(6795fd88) SHA1(7c3790730a8b99b63112c851318b1c7e4989e5e0) )
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u8.u8", 0xc00000, 0x80000, CRC(793a7eb5) SHA1(4b1f81b68f95cedf1b356ef362d1eb37acc74b16) )
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u9.u9", 0xe00000, 0x80000, CRC(14ddbea1) SHA1(8dba9dc5529ea77c4312ea61f825bf9062ffc6c3) )
-
-	ROM_REGION32_LE( 0x200000, "maincpu", 0 )   // 34020 code
-	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u51.u51",  0x00000, 0x80000, CRC(9960ac7c) SHA1(441322f061d627ca7573f612f370a85794681d0f) ) // labels needs to be verified, so far was observed only reprogrammed P5 ROMs
-	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u52.u52",  0x00001, 0x80000, CRC(fbf55510) SHA1(8a5b0004ed09391fe37f0f501b979903d6ae4868) )
-	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u53.u53",  0x00002, 0x80000, CRC(a045b265) SHA1(b294d3a56e41f5ec4ab9bbcc0088833b1cab1879) )
-	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u54.u54",  0x00003, 0x80000, CRC(24471269) SHA1(262345bd147402100785459af422dafd1c562787) )
 
 	ROM_REGION( 0x2000, "pic", 0 )
 	ROM_LOAD( "419_revolution-x_u444.u444", 0x0000, 0x2000, CRC(7df57330) SHA1(fa6733972f45d90563c184b6735da7a40cee1bf2) )
@@ -391,6 +773,12 @@ ROM_START( revx )
 ROM_END
 
 ROM_START( revxp5 )
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 )   // 34020 code
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u51.u51",  0x00000, 0x80000, CRC(f3877eee) SHA1(7a4fdce36edddd35308c107c992ce626a2c9eb8c) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u52.u52",  0x00001, 0x80000, CRC(199a54d8) SHA1(45319437e11176d4926c00c95c372098203a32a3) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u53.u53",  0x00002, 0x80000, CRC(fcfcf72a) SHA1(b471afb416e3d348b046b0b40f497d27b0afa470) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u54.u54",  0x00003, 0x80000, CRC(fd684c31) SHA1(db3453792e4d9fc375297d030f0b3f9cc3cad925) )
+
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  // sound data
 	ROM_LOAD16_BYTE( "p5_revolution_x_sound_rom_u2.u2", 0x000000, 0x80000, CRC(4ed9e803) SHA1(ba50f1beb9f2a2cf5110897209b5e9a2951ff165) ) // shows as "Sound Software Version - Release 1"
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u3.u3", 0x200000, 0x80000, CRC(af8f253b) SHA1(25a0000cab177378070f7a6e3c7378fe87fad63e) )
@@ -400,12 +788,6 @@ ROM_START( revxp5 )
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u7.u7", 0xa00000, 0x80000, CRC(6795fd88) SHA1(7c3790730a8b99b63112c851318b1c7e4989e5e0) )
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u8.u8", 0xc00000, 0x80000, CRC(793a7eb5) SHA1(4b1f81b68f95cedf1b356ef362d1eb37acc74b16) )
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u9.u9", 0xe00000, 0x80000, CRC(14ddbea1) SHA1(8dba9dc5529ea77c4312ea61f825bf9062ffc6c3) )
-
-	ROM_REGION32_LE( 0x200000, "maincpu", 0 )   // 34020 code
-	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u51.u51",  0x00000, 0x80000, CRC(f3877eee) SHA1(7a4fdce36edddd35308c107c992ce626a2c9eb8c) )
-	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u52.u52",  0x00001, 0x80000, CRC(199a54d8) SHA1(45319437e11176d4926c00c95c372098203a32a3) )
-	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u53.u53",  0x00002, 0x80000, CRC(fcfcf72a) SHA1(b471afb416e3d348b046b0b40f497d27b0afa470) )
-	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u54.u54",  0x00003, 0x80000, CRC(fd684c31) SHA1(db3453792e4d9fc375297d030f0b3f9cc3cad925) )
 
 	ROM_REGION( 0x2000, "pic", 0 )
 	ROM_LOAD( "419_revolution-x_u444.u444", 0x0000, 0x2000, CRC(7df57330) SHA1(fa6733972f45d90563c184b6735da7a40cee1bf2) )
@@ -457,6 +839,8 @@ ROM_START( revxp5 )
 	ROM_LOAD( "snd-gal16v8a.u17", 0x400, 0x117, NO_DUMP ) // Protected
 ROM_END
 
+} // anonymous namespace
+
 
 /*************************************
  *
@@ -464,5 +848,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, revx,     0,    midxunit, revx, midxunit_state, empty_init, ROT0, "Midway",   "Revolution X (rev 1.0 6/16/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, revxp5,   revx, midxunit, revx, midxunit_state, empty_init, ROT0, "Midway",   "Revolution X (prototype, rev 5.0 5/23/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, revx,   0,    midxunit, revx, midxunit_state, empty_init, ROT0, "Midway", "Revolution X (rev 1.0 6/16/94)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1994, revxp5, revx, midxunit, revx, midxunit_state, empty_init, ROT0, "Midway", "Revolution X (prototype, rev 5.0 5/23/94)", MACHINE_SUPPORTS_SAVE )

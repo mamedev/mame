@@ -954,7 +954,6 @@ void romp_device::execute_run()
 			// TODO: assume iar is updated
 			m_scr[IAR] = updated_iar;
 			break;
-
 		}
 	}
 }
@@ -1019,7 +1018,11 @@ device_memory_interface::space_config_vector romp_device::memory_space_config() 
 bool romp_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
 	target_space = &space(spacenum);
-	return true;
+
+	if (m_scr[ICS] & ICS_TM)
+		return m_mmu->translate(address);
+	else
+		return true;
 }
 
 std::unique_ptr<util::disasm_interface> romp_device::create_disassembler()

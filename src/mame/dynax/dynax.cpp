@@ -6577,7 +6577,7 @@ ROM_END
 
 ROM_START( mjreachp2 ) // BTANB: typo on title screen shows 'Mahjong Reach Rart II' (verified with reference pics)
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "880q.wc",         0x00000, 0x40000, CRC(a92954bc) SHA1(473778eabd0ecc7b66c7e66ab7eb3d8b40554434) )
+	ROM_LOAD( "8801.2c",         0x00000, 0x40000, CRC(a92954bc) SHA1(473778eabd0ecc7b66c7e66ab7eb3d8b40554434) )
 	ROM_RELOAD(                  0x10000, 0x40000 )
 	ROM_LOAD( "mjreach2-mcu.5b", 0x00000, 0x02000, CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // MCU has pins 9 to 12 & 15 to 16 stripped out
 

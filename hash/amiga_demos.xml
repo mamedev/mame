@@ -45,7 +45,9 @@ TODO:
 		<description>Misery Dentro 2 (demo)</description>
 		<year>1993</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Masque of TRSI, Tristar and Red Sector Inc."/>
+		<!-- https://demozoo.org/groups/69/  -->
+		<info name="developer" value="Masque of TRSI" />
+		<info name="developer" value="Tristar and Red Sector Inc." />
 		<info name="release" value="19930328"/>
 		<!-- 2nd place in CeBIT 1993 Amiga Demo Competition in Germany -->
 		<!-- OCS/ECS -->

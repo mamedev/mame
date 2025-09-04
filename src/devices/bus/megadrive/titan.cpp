@@ -59,7 +59,8 @@ void md_rom_titan_device::write_a13(offs_t offset, uint16_t data)
 		if (offset)
 		{
 			//printf("%02x %02x\n", offset, data);
-			m_bank[offset] = data & 0xf;
+			// D7-D6 unconnected, sgdk_bap (and likely others) cares about D4
+			m_bank[offset] = data & 0x3f;
 		}
 	}
 }

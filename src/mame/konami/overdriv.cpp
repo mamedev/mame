@@ -330,7 +330,7 @@ void overdriv_state::overdriv_master_map(address_map &map)
 	map(0x238000, 0x238001).w(FUNC(overdriv_state::slave_irq5_assert_w));
 }
 
-TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb )
+TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb)
 {
 	m_subcpu->set_input_line(6, HOLD_LINE);
 }
@@ -340,7 +340,7 @@ void overdriv_state::objdma_w(uint8_t data)
 	if(data & 0x10)
 		m_objdma_end_timer->adjust(attotime::from_usec(100));
 
-	m_k053246->k053246_w(5,data);
+	m_k053246->k053246_w(5, data);
 }
 
 void overdriv_state::overdriv_slave_map(address_map &map)

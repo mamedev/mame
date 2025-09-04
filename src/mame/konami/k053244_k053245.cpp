@@ -534,7 +534,7 @@ void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 							c,color,
 							fx,fy,
 							sx,sy,
-							(zw << 16) / 16,(zh << 16) / 16,
+							zw << 12,zh << 12,
 							priority_bitmap,pri,
 							drawmode_table);
 

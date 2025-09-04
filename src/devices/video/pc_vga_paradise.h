@@ -60,6 +60,7 @@ public:
 	auto read_cnf14_callback() { return m_cnf14_read_cb.bind(); }
 	auto read_cnf13_callback() { return m_cnf13_read_cb.bind(); }
 	auto read_cnf12_callback() { return m_cnf12_read_cb.bind(); }
+	auto cnf_write_ddr_callback() { return m_cnf_write_ddr_cb.bind(); }
 
 	// NOTE: these are internal shadows, for the input sense.
 	ioport_value egasw4_r();
@@ -106,6 +107,7 @@ private:
 	devcb_read_line m_cnf14_read_cb;
 	devcb_read_line m_cnf13_read_cb;
 	devcb_read_line m_cnf12_read_cb;
+	devcb_read8     m_cnf_write_ddr_cb;
 };
 
 class wd90c11a_vga_device : public wd90c00_vga_device

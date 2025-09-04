@@ -10,7 +10,7 @@
     on the parameters.
 
     Thunder Cross II POST checks of this chip.
-    It literally tests the chip in an unit test fashion:
+    It literally tests the chip in a unit test fashion:
       1. zeroing all ports;
       2. test that status returns 0;
       3. ping ACX reg 0 with 0xff;
@@ -19,9 +19,9 @@
       6. test status = 0;
       7. ping ACX reg 1 with 0xff;
       8. test status = 1;
-      9. rinse and repeat until all registers are exausted.
+      9. rinse and repeat until all registers are exhausted.
 
-    The fun part is that game doesn't even access the chip at all during gameplay
+    The fun part is that the game doesn't even access the chip at all during gameplay
     (or at least not until stage 6, where game disallows continues) while the specific
     "delta" registers are instead challenged by Vendetta OTG attacks (cfr. MT06393, MT07839).
 

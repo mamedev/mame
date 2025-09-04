@@ -18,9 +18,12 @@
 
 #include "vsystem_gga.h"
 
+#include "bus/rs232/rs232.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopn.h"
 #include "video/k051316.h"
@@ -49,6 +52,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_acia(*this, "acia"),
+		m_rs232_out(*this, "com_out"),
+		m_rs232_in(*this, "com_in"),
 		m_analog(*this, "AN%u", 0U)
 	{ }
 
@@ -82,6 +87,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<acia6850_device> m_acia;
+	required_device<rs232_port_device> m_rs232_out;
+	required_device<rs232_port_device> m_rs232_in;
 	required_ioport_array<2> m_analog;
 
 	void txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -433,6 +440,14 @@ static INPUT_PORTS_START( sformula )
 	PORT_DIPSETTING(      0x8000, "Overseas" ) // "Tail to Nose"
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( linkplay )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_78125 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_78125 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 
 static const gfx_layout tail2nos_spritelayout =
 {
@@ -491,8 +506,20 @@ void tail2nos_state::tail2nos(machine_config &config)
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set_inputline("maincpu", M68K_IRQ_3);
-	//m_acia->txd_handler().set("link", FUNC(rs232_port_device::write_txd));
-	//m_acia->rts_handler().set("link", FUNC(rs232_port_device::write_rts));
+	m_acia->txd_handler().set("com_out", FUNC(rs232_port_device::write_txd));
+
+	// dual DE-9 ports
+	// COM-IN (inner) and COM-OUT (outer) according to manual
+	rs232_port_device &rs232out(RS232_PORT(config, "com_out", default_rs232_devices, nullptr));
+	rs232out.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
+
+	rs232_port_device &rs232in(RS232_PORT(config, "com_in", default_rs232_devices, nullptr));
+	rs232in.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
+	rs232in.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
+
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 20_MHz_XTAL / 16)); // 78125 baud
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -662,7 +689,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1989, tail2nos,  0,        tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Tail to Nose - Great Championship / Super Formula", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // Only set that's affected by the Country dipswitch
-GAME( 1989, tail2nosa, tail2nos, tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Tail to Nose - Great Championship",                 MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sformula,  tail2nos, tail2nos, sformula, tail2nos_state, empty_init, ROT90, "V-System Co.", "Super Formula (Japan, set 1)",                      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // For Use in Japan... warning
-GAME( 1989, sformulaa, tail2nos, tail2nos, sformula, tail2nos_state, empty_init, ROT90, "V-System Co.", "Super Formula (Japan, set 2)",                      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version
+GAME( 1989, tail2nos,  0,        tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Tail to Nose - Great Championship / Super Formula", MACHINE_SUPPORTS_SAVE ) // Only set that's affected by the Country dipswitch
+GAME( 1989, tail2nosa, tail2nos, tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Tail to Nose - Great Championship",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sformula,  tail2nos, tail2nos, sformula, tail2nos_state, empty_init, ROT90, "V-System Co.", "Super Formula (Japan, set 1)",                      MACHINE_SUPPORTS_SAVE ) // For Use in Japan... warning
+GAME( 1989, sformulaa, tail2nos, tail2nos, sformula, tail2nos_state, empty_init, ROT90, "V-System Co.", "Super Formula (Japan, set 2)",                      MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version

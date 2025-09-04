@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-/***************************************************************************
+/*******************************************************************************
 
 Asterix
 Konami GX068 PCB
@@ -12,7 +12,11 @@ Konami custom: 054358, 054156, 054157, 053251, 053244, 053245, 053260
 TODO:
 - verify clocks and video timing
 
-***************************************************************************/
+BTANB:
+- although not 100% identical to MAME, there are 1px line gaps at several frames
+  during title screen scaling animation (both horizontal and vertical)
+
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -132,10 +136,11 @@ uint32_t asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind1
 	// layer offsets are different if horizontally flipped
 	if (m_k056832->read_register(0x0) & 0x10)
 	{
-		m_k056832->set_layer_offs(0, -7 - 176, 0);
-		m_k056832->set_layer_offs(1, -5 - 176, 0);
-		m_k056832->set_layer_offs(2, -3 - 176, 0);
-		m_k056832->set_layer_offs(3, -1 - 176, 0);
+		m_k056832->set_layer_offs(0, -7 - 177, 0);
+		m_k056832->set_layer_offs(1, -5 - 177, 0);
+		m_k056832->set_layer_offs(2, -3 - 177, 0);
+		m_k056832->set_layer_offs(3, -1 - 177, 0);
+		m_k053244->set_offsets(-3 + 6, -1);
 	}
 	else
 	{
@@ -143,6 +148,7 @@ uint32_t asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind1
 		m_k056832->set_layer_offs(1, -5, 0);
 		m_k056832->set_layer_offs(2, -3, 0);
 		m_k056832->set_layer_offs(3, -1, 0);
+		m_k053244->set_offsets(-3, -1);
 	}
 
 	// update color info and refresh tilemaps
@@ -407,7 +413,6 @@ void asterix_state::asterix(machine_config &config)
 
 	K053244(config, m_k053244, 0);
 	m_k053244->set_palette("palette");
-	m_k053244->set_offsets(-3, -1);
 	m_k053244->set_sprite_callback(FUNC(asterix_state::sprite_callback));
 
 	K053251(config, m_k053251, 0);

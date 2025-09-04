@@ -12,6 +12,7 @@
 #pragma once
 
 #include "spec_snqk.h"
+#include "spectrum_ula.h"
 #include "machine/bankdev.h"
 #include "bus/spectrum/exp.h"
 #include "imagedev/cassette.h"
@@ -54,6 +55,7 @@ public:
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
+		m_ula(*this, "ula"),
 		m_cassette(*this, "cassette"),
 		m_rom(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
@@ -117,27 +119,15 @@ protected:
 	optional_shared_ptr<uint8_t> m_video_ram;
 	uint8_t *m_screen_location;
 
-	std::vector<u8> m_contention_pattern;
-	/* Pixel offset in 8px chunk (4T) when current chunk is rendered. */
-	u8 m_border4t_render_at = 0;
-	/* Defines offset in CPU cycles from screen left side. Early model (48/128/+2) typically use -1, later (+2A/+3) +1 */
-	s8 m_contention_offset = -1;
-	bool m_is_m1_rd_contended = false;
-	u64 m_int_at;
-
 	uint8_t pre_opcode_fetch_r(offs_t offset);
 	void spectrum_rom_w(offs_t offset, uint8_t data);
 	virtual uint8_t spectrum_rom_r(offs_t offset);
 	uint8_t spectrum_data_r(offs_t offset);
 	void spectrum_data_w(offs_t offset, uint8_t data);
-	virtual bool is_contended(offs_t offset);
 	virtual bool is_vram_write(offs_t offset);
-	void content_early(s8 shift = 0);
-	void content_late();
 	virtual u8 *snow_pattern1_base(u8 i_reg);
 
 	void spectrum_refresh_w(offs_t offset, uint8_t data);
-	void spectrum_nomreq(offs_t offset, uint8_t data);
 	void spectrum_ula_w(offs_t offset, uint8_t data);
 	uint8_t spectrum_ula_r(offs_t offset);
 	void spectrum_port_w(offs_t offset, uint8_t data);
@@ -154,6 +144,7 @@ protected:
 
 	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<spectrum_ula_device> m_ula;
 
 	void spectrum_io(address_map &map) ATTR_COLD;
 	void spectrum_clone_io(address_map &map) ATTR_COLD;
@@ -227,5 +218,6 @@ protected:
 INPUT_PORTS_EXTERN( spectrum );
 INPUT_PORTS_EXTERN( spec128 );
 INPUT_PORTS_EXTERN( spec_plus );
+INPUT_PORTS_EXTERN( spec_plus2a );
 
 #endif // MAME_SINCLAIR_SPECTRUM_H

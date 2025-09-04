@@ -412,10 +412,10 @@ OP( 0x62, i_chkind  ) {
 }
 OP( 0x64, i_repnc    ) { do_repnc(start_rep()); }
 OP( 0x65, i_repc     ) { do_repc(start_rep()); }
-OP( 0x68, i_push_d16 ) { uint32_t tmp;    tmp = fetchword(); PUSH(tmp);   CLKW(12,12,5,12,8,5,Wreg(SP));  }
-OP( 0x69, i_imul_d16 ) { uint32_t tmp;    DEF_r16w;   tmp = fetchword(); dst = (int32_t)((int16_t)src)*(int32_t)((int16_t)tmp); m_CarryVal = m_OverVal = (((int32_t)dst) >> 15 != 0) && (((int32_t)dst) >> 15 != -1);     RegWord(ModRM)=(WORD)dst;     CLK((ModRM >= 0xc0) ? 38 : 47); }
-OP( 0x6a, i_push_d8  ) { uint32_t tmp = (WORD)((int16_t)((int8_t)fetch()));   PUSH(tmp);  CLKW(11,11,5,11,7,3,Wreg(SP));  }
-OP( 0x6b, i_imul_d8  ) { uint32_t src2; DEF_r16w; src2= (WORD)((int16_t)((int8_t)fetch())); dst = (int32_t)((int16_t)src)*(int32_t)((int16_t)src2); m_CarryVal = m_OverVal = (((int32_t)dst) >> 15 != 0) && (((int32_t)dst) >> 15 != -1); RegWord(ModRM)=(WORD)dst; CLK((ModRM >= 0xc0 ) ? 31 : 39); }
+OP( 0x68, i_push_d16 ) { uint32_t tmp; tmp = fetchword(); PUSH(tmp); CLKW(12,12,5,12,8,5,Wreg(SP));  }
+OP( 0x69, i_imul_d16 ) { uint32_t tmp; DEF_r16w; tmp = fetchword(); dst = (int32_t)((int16_t)src)*(int32_t)((int16_t)tmp); m_CarryVal = m_OverVal = (((int32_t)dst) >> 15 != 0) && (((int32_t)dst) >> 15 != -1); RegWord(ModRM)=(WORD)dst; CLKM(42,42,12,52,48,16); }
+OP( 0x6a, i_push_d8  ) { uint32_t tmp = (WORD)((int16_t)((int8_t)fetch())); PUSH(tmp); CLKW(11,11,5,11,7,3,Wreg(SP));  }
+OP( 0x6b, i_imul_d8  ) { uint32_t src2; DEF_r16w; src2= (WORD)((int16_t)((int8_t)fetch())); dst = (int32_t)((int16_t)src)*(int32_t)((int16_t)src2); m_CarryVal = m_OverVal = (((int32_t)dst) >> 15 != 0) && (((int32_t)dst) >> 15 != -1); RegWord(ModRM)=(WORD)dst; CLKM(34,34,12,44,40,16); }
 OP( 0x6c, i_insb     ) { PutMemB(DS1,Wreg(IY),read_port_byte(Wreg(DW))); Wreg(IY)+= -2 * m_DF + 1; CLK(8); }
 OP( 0x6d, i_insw     ) { PutMemW(DS1,Wreg(IY),read_port_word(Wreg(DW))); Wreg(IY)+= -4 * m_DF + 2; CLKS(18,10,8); }
 OP( 0x6e, i_outsb    ) { write_port_byte(Wreg(DW),GetMemB(DS0,Wreg(IX))); Wreg(IX)+= -2 * m_DF + 1; CLK(8); }
@@ -745,10 +745,10 @@ OP( 0xf6, i_f6pre ) { uint32_t tmp; uint32_t uresult,uresult2; int32_t result,re
 		case 0x08: logerror("%06x: Undefined opcode 0xf6 0x08\n",PC()); break;
 		case 0x10: PutbackRMByte(ModRM,~tmp); CLK((ModRM >= 0xc0) ? 2 : 16); break; /* NOT */
 		case 0x18: m_CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Byte(tmp); PutbackRMByte(ModRM,tmp&0xff); CLK((ModRM >= 0xc0) ? 2 : 16); break; /* NEG */
-		case 0x20: uresult = Breg(AL)*tmp; Wreg(AW)=(WORD)uresult; m_CarryVal=m_OverVal=(Breg(AH)!=0); CLK((ModRM >= 0xc0) ? 30 : 36); break; /* MULU */
-		case 0x28: result = (int16_t)((int8_t)Breg(AL))*(int16_t)((int8_t)tmp); Wreg(AW)=(WORD)result; m_CarryVal=m_OverVal=(Breg(AH)!=0); CLK((ModRM >= 0xc0) ? 30 : 36); break; /* MUL */
-		case 0x30: if (tmp) { DIVUB; } else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLK((ModRM >= 0xc0) ? 43 : 53); break;
-		case 0x38: if (tmp) { DIVB;  } else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLK((ModRM >= 0xc0) ? 43 : 53); break;
+		case 0x20: uresult = Breg(AL)*tmp; Wreg(AW)=(WORD)uresult; m_CarryVal=m_OverVal=(Breg(AH)!=0); CLKM(30,30,8,36,36,12); break; /* MULU */
+		case 0x28: result = (int16_t)((int8_t)Breg(AL))*(int16_t)((int8_t)tmp); Wreg(AW)=(WORD)result; m_CarryVal=m_OverVal=(Breg(AH)!=0); CLKM(47,47,8,57,53,12); break; /* MUL */
+		case 0x30: if (tmp) DIVUB else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLKM(25,25,11,35,31,15); break;
+		case 0x38: if (tmp) DIVB else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLKM(43,43,17,53,49,20); break;
 	}
 }
 
@@ -759,10 +759,10 @@ OP( 0xf7, i_f7pre   ) { uint32_t tmp,tmp2; uint32_t uresult,uresult2; int32_t re
 		case 0x08: logerror("%06x: Undefined opcode 0xf7 0x08\n",PC()); break;
 		case 0x10: PutbackRMWord(ModRM,~tmp); CLK((ModRM >= 0xc0) ? 2 : 16); break; /* NOT */
 		case 0x18: m_CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Word(tmp); PutbackRMWord(ModRM,tmp&0xffff); CLK((ModRM >= 0xc0) ? 2 : 16); break; /* NEG */
-		case 0x20: uresult = Wreg(AW)*tmp; Wreg(AW)=uresult&0xffff; Wreg(DW)=((uint32_t)uresult)>>16; m_CarryVal=m_OverVal=(Wreg(DW)!=0); CLK((ModRM >= 0xc0) ? 30 : 36); break; /* MULU */
-		case 0x28: result = (int32_t)((int16_t)Wreg(AW))*(int32_t)((int16_t)tmp); Wreg(AW)=result&0xffff; Wreg(DW)=result>>16; m_CarryVal=m_OverVal=(Wreg(DW)!=0); CLK((ModRM >= 0xc0) ? 30 : 36); break; /* MUL */
-		case 0x30: if (tmp) { DIVUW; } else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLK((ModRM >= 0xc0) ? 43 : 53); break;
-		case 0x38: if (tmp) { DIVW;  } else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLK((ModRM >= 0xc0) ? 43 : 53); break;
+		case 0x20: uresult = Wreg(AW)*tmp; Wreg(AW)=uresult&0xffff; Wreg(DW)=((uint32_t)uresult)>>16; m_CarryVal=m_OverVal=(Wreg(DW)!=0); CLKM(30,30,12,36,36,16); break; /* MULU */
+		case 0x28: result = (int32_t)((int16_t)Wreg(AW))*(int32_t)((int16_t)tmp); Wreg(AW)=result&0xffff; Wreg(DW)=result>>16; m_CarryVal=m_OverVal=(Wreg(DW)!=0); CLKM(47,47,12,57,53,16); break; /* MUL */
+		case 0x30: if (tmp) DIVUW else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLKM(25,25,19,35,31,23); break;
+		case 0x38: if (tmp) DIVW else nec_interrupt(NEC_DIVIDE_VECTOR, BRK); CLKM(43,43,24,53,49,28); break;
 	}
 }
 

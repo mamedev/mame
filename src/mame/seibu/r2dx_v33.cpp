@@ -723,7 +723,7 @@ void r2dx_v33_state::r2dx_oki_map(address_map &map)
 void r2dx_v33_state::rdx_v33(machine_config &config)
 {
 	/* basic machine hardware */
-	V33(config, m_maincpu, 32000000/2); // ?
+	V33A(config, m_maincpu, 32000000/2); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &r2dx_v33_state::rdx_v33_map);
 	m_maincpu->set_vblank_int("screen", FUNC(r2dx_v33_state::interrupt));
 
@@ -759,7 +759,7 @@ void r2dx_v33_state::rdx_v33(machine_config &config)
 void r2dx_v33_state::nzerotea(machine_config &config)
 {
 	/* basic machine hardware */
-	V33(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
+	V33A(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &r2dx_v33_state::nzerotea_map);
 	m_maincpu->set_vblank_int("screen", FUNC(r2dx_v33_state::interrupt));
 
@@ -874,7 +874,7 @@ It's possible that the BG and OBJ ROMs from this set can be used to complete the
 previous (incomplete) dump that runs on the V30 hardware, since most GFX chips are the same.
 
 PCB ID: (C) 1996 JJ4-China-Ver2.0 SEIBU KAIHATSU INC., MADE IN JAPAN
-CPU   : NEC 70136AL-16 (V33)
+CPU   : NEC 70136AL-16 or 70136AL-10 (V33A)
 SOUND : Oki M6295
 OSC   : 28.636360MHz
 RAM   : CY7C199-15 (28 Pin SOIC, x11)
@@ -1110,21 +1110,21 @@ ROM_END
 } // anonymous namespace
 
 
-// newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, the rom contains both
+// newer PCB, with V33A CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, the rom contains both
 // is there a switching method? for now I've split it into 2 sets with different EEPROM, the game checks that on startup and runs different code depending on what it finds
 GAME( 1996, r2dx_v33,    0,        rdx_v33,  rdx_v33,  r2dx_v33_state, init_rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden DX EEPROM)", MACHINE_SUPPORTS_SAVE)
 GAME( 1996, r2dx_v33_r2, r2dx_v33, rdx_v33,  rdx_v33,  r2dx_v33_state, init_rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden II EEPROM)", MACHINE_SUPPORTS_SAVE)
 
-// 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, DSW for settings
+// 'V33 system type_b' - uses V33A CPU, COPX-D3 external protection rom, but still has the proper sound system, DSW for settings
 GAME( 1997, nzeroteam,   zeroteam, nzerotea, nzerotea, r2dx_v33_state, init_nzerotea,  ROT0,   "Seibu Kaihatsu",                                     "New Zero Team (V33 SYSTEM TYPE_B hardware)", MACHINE_SUPPORTS_SAVE)
 GAME( 1997, nzeroteama,  zeroteam, nzerotea, nzerotea, r2dx_v33_state, init_nzerotea,  ROT0,   "Seibu Kaihatsu (Zhongguo Shantou Yihuang license)",  "New Zero Team (V33 SYSTEM TYPE_B hardware, Zhongguo Shantou Yihuang license)", MACHINE_SUPPORTS_SAVE) // license text translated from title screen
 GAME( 1997, nzeroteamb,  zeroteam, nzerotea, nzerotea, r2dx_v33_state, init_nzerotea,  ROT0,   "Seibu Kaihatsu (Haoyunlai Trading Company license)", "New Zero Team (V33 SYSTEM TYPE_B hardware, Haoyunlai Trading Company license)", MACHINE_SUPPORTS_SAVE) // license text translated from title screen
 
-// 'V33 SYSTEM TYPE_C' - uses V33 CPU, basically the same board as TYPE_C VER2
+// 'V33 SYSTEM TYPE_C' - uses V33A CPU, basically the same board as TYPE_C VER2
 // there is a version of New Zero Team on "V33 SYSTEM TYPE_C" board with EEPROM rather than dipswitches like Zero Team 2000
 // 1998 release of New Zero team on this hardware also exists, but not dumped: https://youtu.be/8mnFjXCc9BI
 
-// 'V33 SYSTEM TYPE_C VER2' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, unencrypted sprites, EEPROM for settings.  PCB also seen without 'VER2', looks the same
+// 'V33 SYSTEM TYPE_C VER2' - uses V33A CPU, COPX-D3 external protection rom, but still has the proper sound system, unencrypted sprites, EEPROM for settings.  PCB also seen without 'VER2', looks the same
 GAME( 2000, zerotm2k,    zeroteam, zerotm2k, zerotm2k, r2dx_v33_state, init_zerotm2k,  ROT0,  "Seibu Kaihatsu", "Zero Team 2000", MACHINE_SUPPORTS_SAVE)
 
 // there is also a 'Raiden 2 2000' on unknown hardware.

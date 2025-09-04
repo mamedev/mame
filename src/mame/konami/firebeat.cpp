@@ -2751,4 +2751,4 @@ GAME( 2000, bm3,      0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, 
 GAME( 2000, bm3core,  0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append Core Remix", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, bm36th,   0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append 6th Mix", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, bm37th,   0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append 7th Mix", MACHINE_IMPERFECT_SOUND )
-GAME( 2003, bm3final, 0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III The Final", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, bm3final, 0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III The Final", MACHINE_IMPERFECT_SOUND )

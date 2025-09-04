@@ -1393,8 +1393,8 @@ void segas18_state::system18(machine_config &config)
 	SEGA315_5313(config, m_vdp, 15000000, m_maincpu); // ??? Frequency is a complete guess
 	m_vdp->set_is_pal(false);
 	m_vdp->snd_irq().set(FUNC(segas18_state::vdp_sndirqline_callback_s18));
-	m_vdp->lv6_irq().set(FUNC(segas18_state::vdp_lv6irqline_callback_s18));
-	m_vdp->lv4_irq().set(FUNC(segas18_state::vdp_lv4irqline_callback_s18));
+	m_vdp->vint_cb().set(FUNC(segas18_state::vdp_lv6irqline_callback_s18));
+	m_vdp->hint_cb().set(FUNC(segas18_state::vdp_lv4irqline_callback_s18));
 	m_vdp->set_alt_timing(1);
 	m_vdp->set_pal_write_base(0x1000);
 	m_vdp->set_ext_palette(m_palette);

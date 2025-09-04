@@ -993,6 +993,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 		case 0x91:  //NOP: no operation
 		case 0x95:  //VRM: vertical sync mask reset
 		case 0x99:  //VSM: vertical sync mask set
+			set_busy_flag(1000);
 			break;
 		case 0xb0:  //INY: increment Y
 			set_busy_flag(2000);
@@ -1074,7 +1075,9 @@ void ef9345_device::update_scanline(uint16_t scanline)
 	if (scanline == 250)
 		m_state &= 0xfb;
 
-	set_busy_flag(104000);
+	// If we are interrupting a running command, delay its completion.
+	if (m_busy_timer->enabled())
+		m_busy_timer->adjust(m_busy_timer->remaining() + attotime::from_nsec(104000));
 
 	if (m_char_mode == MODE12x80 || m_char_mode == MODE8x80)
 	{

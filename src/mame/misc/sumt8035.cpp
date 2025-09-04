@@ -21,9 +21,9 @@ namespace {
 class sumt8035_state : public driver_device
 {
 public:
-	sumt8035_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+	sumt8035_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void summit(machine_config &config);
@@ -265,5 +265,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1981, sm_ngacc,  0,    summit, summit, sumt8035_state, empty_init, ROT270, "Summit Coin", "Nudge Accumulator (Summit Coin)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1981, sm_ultng,  0,    summit, summit, sumt8035_state, empty_init, ROT270, "Summit Coin", "Ultimate Nudge (Summit Coin)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1981, sm_ngacc, 0,    summit, summit, sumt8035_state, empty_init, ROT0, "Summit Coin", "Nudge Accumulator (Summit Coin)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1981, sm_ultng, 0,    summit, summit, sumt8035_state, empty_init, ROT0, "Summit Coin", "Ultimate Nudge (Summit Coin)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -23,10 +23,10 @@ To advance test mode screens:
 - Mad Gear / LED Storm: Press P1 button 1 and hold up
 
 TODO:
-- The seem to be minor priority issues in Mad Gear, but the game might just
+- There seem to be minor priority issues in Mad Gear, but the game might just
   be like that. The priority PROM is dumped but currently not used.
-- Verify lastduel clocks, XTALs on photos are the same as madgear PCB notes
-  below, so: 10MHz, 3.57MHz, 24MHz.
+- Verify lastduel clocks, XTALs on photos are the same as leds2011 PCB notes
+  below, so: 10MHz, 3.57MHz, 24MHz, CPU is MC68000P10.
 
 **************************************************************************
 
@@ -117,8 +117,6 @@ Notes:
       6116        - 2kx8 SRAM (DIP24)
       81301       - ? (SDIP28)
       29          - 63S141 bipolar PROM (DIP16)
-
-
 
 **************************************************************************/
 

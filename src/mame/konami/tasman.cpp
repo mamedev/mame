@@ -21,15 +21,18 @@
 */
 
 #include "emu.h"
+
+#include "k053246_k053247_k055673.h"
+#include "k054156_k054157_k056832.h"
+#include "k055555.h"
 #include "konami_helper.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
 #include "machine/k053252.h"
 #include "machine/timer.h"
-#include "k053246_k053247_k055673.h"
-#include "k054156_k054157_k056832.h"
-#include "k055555.h"
 #include "machine/eepromser.h"
+
 #include "emupal.h"
 #include "speaker.h"
 

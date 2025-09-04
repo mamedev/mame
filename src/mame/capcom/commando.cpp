@@ -1,12 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders: Nicola Salmoria
+/*******************************************************************************
 
-/***************************************************************************
+Commando (C) 1985 Capcom
 
-Commando memory map (preliminary)
-
-driver by Nicola Salmoria
-
+Memory map (preliminary):
 
 MAIN CPU
 0000-bfff ROM
@@ -38,23 +36,24 @@ write:
 8002      YM2203 #2 control
 8003      YM2203 #2 write
 
-****************************************************************************
+********************************************************************************
 
-Note : there is an ingame typo bug that doesn't display the bonus life values
-       correctly on the title screen in 'commando', 'commandoj' and 'spaceinv'.
+BTANB:
+- there is an ingame typo bug that doesn't display the bonus life values correctly
+  on the title screen in 'commando', 'commandoj' and 'spaceinv'
+- when sprites move over the top edge of the screen, sometimes they'll appear at
+  the bottom of the screen for 1 frame
 
-***************************************************************************/
+Notes by Jose Tejada (jotego):
+The main CPU frequency is 3 MHz, after a two-stage FF clock divider.
+The CPU clock is gated by bus arbitration logic. The CPU clock is halted until
+video hardware has an opening in memory access, then the CPU is allowed to access
+common memory. This slows down the CPU but doesn't alter its basic 3MHz frequency.
 
-// Notes by Jose Tejada (jotego):
-// The main CPU frequency is 3 MHz, after a two-stage FF clock divider.
-// The CPU clock is gated by bus arbitration logic. The CPU clock is halted until
-// video hardware has an opening in memory access, then the CPU is allowed to
-// access common memory. This slows down the CPU but doesn't alter its basic 3MHz frequency.
-//
-// There is also a DMA circuit that copies object data from the CPU RAM to a buffer
-// this also slows down the CPU as it is halted during that time.
+There is also a DMA circuit that copies object data from the CPU RAM to a buffer
+this also slows down the CPU as it is halted during that time.
 
-/***************************************************************************
+********************************************************************************
 
 Commando (Capcom, 1985)
 Hardware info by Guru
@@ -160,8 +159,7 @@ Notes:
           2114 - Mitsubishi M5L2114 1kBx4-bit SRAM (sprite RAM)
           2148 - Intel P2148 1kBx4-bit SRAM (sprite RAM)
 
-***************************************************************************/
-
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -311,19 +309,19 @@ void commando_state::video_start()
 
 void commando_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *buffered_spriteram = m_spriteram->buffer();
+	uint8_t *spriteram = m_spriteram->buffer();
 
 	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
 	{
 		// bit 1 of attr is not used
-		int const attr = buffered_spriteram[offs + 1];
+		int const attr = spriteram[offs + 1];
 		int const bank = (attr & 0xc0) >> 6;
-		int const code = buffered_spriteram[offs] + 256 * bank;
+		int const code = spriteram[offs] + 256 * bank;
 		int const color = (attr & 0x30) >> 4;
 		int flipx = attr & 0x04;
 		int flipy = attr & 0x08;
-		int sx = buffered_spriteram[offs + 3] - ((attr & 0x01) << 8);
-		int sy = buffered_spriteram[offs + 2];
+		int sx = spriteram[offs + 3] - ((attr & 0x01) << 8);
+		int sy = spriteram[offs + 2];
 
 		if (flip_screen())
 		{
@@ -359,7 +357,7 @@ void commando_state::main_map(address_map &map)
 	map(0xc004, 0xc004).portr("DSW2");
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc804, 0xc804).w(FUNC(commando_state::control_w));
-	// 0xc806 triggers the DMA (not emulated)
+	map(0xc806, 0xc806).w(m_spriteram, FUNC(buffered_spriteram8_device::write));
 	map(0xc808, 0xc809).w(FUNC(commando_state::scrollx_w));
 	map(0xc80a, 0xc80b).w(FUNC(commando_state::scrolly_w));
 	map(0xd000, 0xd3ff).ram().w(FUNC(commando_state::videoram_w<1>)).share(m_videoram[1]);
@@ -572,7 +570,6 @@ void commando_state::commando(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(MAIN / 2, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(commando_state::screen_update));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_commando);

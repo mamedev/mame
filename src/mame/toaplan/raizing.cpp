@@ -1066,6 +1066,15 @@ ROM_START( kingdmgpbl )
 
 	ROM_REGION( 0x8000, "unknown", 0 )
 	ROM_LOAD( "d-24.bin", 0x0000, 0x8000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) ) // BADADDR         ---xxxxxxxxxxxx
+
+	ROM_REGION( 0x1000, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8.1",      0x000, 0x117, CRC(c1d254eb) SHA1(65ebc26f70db1bb14d1bf6a1563073d2981e5c4b) )
+	ROM_LOAD( "gal16v8.6",      0x200, 0x117, CRC(359337d4) SHA1(f3f950ce6eae36126a719bcb6f837659b85bc36a) )
+	ROM_LOAD( "palce20v10h.8",  0x400, 0x2dd, CRC(2f5b291f) SHA1(684f5ace6d43806a890e11a1946b36e0d6a3f4f1) )
+	ROM_LOAD( "palce20v10h.10", 0x700, 0x2dd, CRC(6e2a2bb3) SHA1(a716a21f18bb2344e967dd612244da609dfc67f4) )
+	ROM_LOAD( "gal16v8.13",     0xa00, 0x117, CRC(3f4a2f5e) SHA1(2fc4f7d6443f5f86366deda3524daa9ce015c0ce) )
+	ROM_LOAD( "gal16v8.14",     0xc00, 0x117, CRC(c3bbc41b) SHA1(19372e19af15c8729a7872e3eda4b7ebcc5a2b96) )
+	ROM_LOAD( "gal16v8.nn",     0xe00, 0x117, CRC(2d9efaeb) SHA1(37cb914ffda7613976c44ecfcd6d49e79feb2e9c) )
 ROM_END
 
 

@@ -14,6 +14,8 @@
     31 LEDs, 13 modules of double-digit 7-seg displays and 4 push-buttons).
   * we may also have user inputs from the coin slot and from the
     cabinet buttons, for making bets.
+    If hold Key A or K then press f3 to reset, will shown error 30 code.
+
 **************************************************************************/
 
 #include "emu.h"

@@ -2748,7 +2748,7 @@ void i386_device::i386_groupF7_32()        // Opcode 0xf7
 						REG32(EAX) = (uint32_t)result;
 					}
 				} else {
-					i386_trap(0, 0, 0);
+					i386_trap(0, 0);
 				}
 			}
 			break;
@@ -2776,7 +2776,7 @@ void i386_device::i386_groupF7_32()        // Opcode 0xf7
 						REG32(EAX) = (uint32_t)result;
 					}
 				} else {
-					i386_trap(0, 0, 0);
+					i386_trap(0, 0);
 				}
 			}
 			break;
@@ -2952,7 +2952,7 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 			break;
 		case 1:         /* STR */
@@ -2969,7 +2969,7 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 			break;
 		case 2:         /* LLDT */
@@ -2995,7 +2995,7 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 			break;
 
@@ -3027,7 +3027,7 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 			break;
 
@@ -3077,7 +3077,7 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 				LOGMASKED(LOG_PM_EVENTS, "i386: VERR: Exception - Running in real mode or virtual 8086 mode.\n");
 			}
 			break;
@@ -3118,7 +3118,7 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 				LOGMASKED(LOG_PM_EVENTS, "i386: VERW: Exception - Running in real mode or virtual 8086 mode.\n");
 			}
 			break;
@@ -3416,7 +3416,7 @@ void i386_device::i386_lar_r32_rm32()  // Opcode 0x0f 0x02
 	else
 	{
 		// illegal opcode
-		i386_trap(6,0, 0);
+		i386_trap(6,0);
 		LOGMASKED(LOG_PM_EVENTS, "i386: LAR: Exception - running in real mode or virtual 8086 mode.\n");
 	}
 }
@@ -3481,7 +3481,7 @@ void i386_device::i386_lsl_r32_rm32()  // Opcode 0x0f 0x03
 		}
 	}
 	else
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 }
 
 void i386_device::i386_bound_r32_m32_m32() // Opcode 0x62
@@ -3506,7 +3506,7 @@ void i386_device::i386_bound_r32_m32_m32() // Opcode 0x62
 	if ((val < low) || (val > high))
 	{
 		CYCLES(CYCLES_BOUND_OUT_RANGE);
-		i386_trap(5, 0, 0);
+		i386_trap(5, 0);
 	}
 	else
 	{

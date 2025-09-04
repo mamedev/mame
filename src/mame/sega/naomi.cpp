@@ -2687,7 +2687,8 @@ USA, Export and Australia is missing.
 EPR-21576b - NAOMI BOOT ROM 1999 02/15  1.20 (Japan)   Japan 1.20 BOOT ROM was labeled "B", all the rest - "A".
 EPR-21577a - NAOMI BOOT ROM 1999 02/15  1.20 (USA)
 EPR-21578a - NAOMI BOOT ROM 1999 02/15  1.20 (Export)
-Korea and Australia is missing.
+EPR-21580a - NAOMI BOOT ROM 1999 02/15  1.20 (Australia)
+Korea is missing.
 
 EPR-21576c - NAOMI BOOT ROM 1999 03/11  1.30 (Japan)   only Japan ver was released
 EPR-21801  - NAOMI BOOT ROM 1999 03/11  1.30 (USA)     (Airline Pilots)
@@ -2872,6 +2873,8 @@ OFF  OFF  ON   Australia
 	ROM_LOAD16_WORD_SWAP_BIOS( 26, "epr-21336a.ic27", 0x000000, 0x200000, BAD_DUMP CRC(d3d57af8) SHA1(0eb72c2a20ad8b86d442b77760eab5e89521d469) ) \
 	ROM_SYSTEM_BIOS( 27, "bios27", "Dev Naomi Boot 2491" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 27, "naomi_boot_2491.ic27", 0x000000, 0x200000, CRC(5b28f868) SHA1(d101f58c69d9835e87a969688e43dc9b699b89d0) ) \
+	ROM_SYSTEM_BIOS( 28, "bios28", "epr-21580a (Australia)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 28, "epr-21580a.ic27", 0x000000, 0x200000, CRC(46dbe90f) SHA1(822b2ea8e254ea3ce66f0ea67e80a8c7e1125ec9) ) \
 	ROM_REGION( 0x4000, "altera_pof", 0) \
 	ROM_LOAD("315-6188.ic31", 0x0000, 0x2034, CRC(7c9fea46) SHA1(f77c07ae65dfed18c1c4c632c8945be21d02ddaf) )
 
@@ -2976,7 +2979,7 @@ EPR-23605B - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
 EPR-23607B - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
 EPR-23608B - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
 EPR-23609B - NAOMI BOOT ROM 2001 09/10  1.70 (Korea)
-Australia is missing.
+EPR-23610B - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
 
 version text at 0x1ffd60 / version shown in test mode
 EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI2 GAME BOOT ROM Ver 2.01 (Japan)
@@ -2986,7 +2989,6 @@ Korea and Australia is missing.
 Actual build date Dec 19 2005.
 
 EPR-21604  - No known dumps (Development BOOT ROM)
-EPR-?????  - No known dumps (Australia)
 
 EPR-23605B, EPR-23607B & EPR-23608B all differ by 8 bytes:
 
@@ -3030,8 +3032,10 @@ Region byte encoding is as follows:
 	ROM_LOAD16_WORD_SWAP_BIOS( 10, "epr-23607.ic27",   0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) ) \
 	ROM_SYSTEM_BIOS( 11, "bios11", "epr-23609b (Korea)"  ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 11, "epr-23609b.ic27",  0x000000, 0x200000, CRC(99e3751f) SHA1(8a244f75595c49d2a37a42ab96b6bab35163ca0e) ) \
-	ROM_SYSTEM_BIOS( 12, "bios12", "epr-23605c (multi-region hack)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 12, "epr-23605c_multi.ic27",   0x000000, 0x200000, CRC(353fdbcd) SHA1(a8b7dce572b74e02e65cb949b2c366c87625157f) )
+	ROM_SYSTEM_BIOS( 12, "bios12", "epr-23610b (Australia)"  ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12, "epr-23610b.ic27",  0x000000, 0x200000, CRC(de8e1267) SHA1(0b3a36446c308fcbfe3647df45c848091e8797f1) ) \
+	ROM_SYSTEM_BIOS( 13, "bios13", "epr-23605c (multi-region hack)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 13, "epr-23605c_multi.ic27",   0x000000, 0x200000, CRC(353fdbcd) SHA1(a8b7dce572b74e02e65cb949b2c366c87625157f) )
 /*
    First half is BIOS, second half is game settings and is blanked/reprogrammed by the BIOS if game cartridge exchange was detected
    area 0x1A000-0x1BFFF is write protected and contain 12 bytes of unit-specific unique information (probably serial number, manufacture date, etc),
@@ -10956,7 +10960,7 @@ void naomi_state::init_hotd2()
 /* 0026    */ GAME( 2000, totdo,     totd,     naomim2_kb, naomi_kb,   naomi_state, init_naomi,   ROT0, "Sega", "The Typing of the Dead", GAME_FLAGS )
 /* 0026    */ GAME( 2000, totd,      naomi,    naomim2_kb, naomi_kb,   naomi_state, init_naomi,   ROT0, "Sega", "The Typing of the Dead (Rev A)", GAME_FLAGS )
 /* 0027    */ GAME( 2000, smarinef,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Sega Marine Fishing", GAME_FLAGS )
-/* 0028    */ GAME( 2000, vonot,     naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtual On Oratorio Tangram M.S.B.S. ver5.66 2000 Edition", GAME_FLAGS )
+/* 0028    */ GAME( 2000, vonot,     naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Cyber Troopers Virtual-On: Oratorio Tangram M.S.B.S. ver 5.66 2000 Edition", GAME_FLAGS )
 // 0029 Derby Owners Club 2000
 /* 0030    */ GAME( 2000, qmegamis,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Quiz Aa! Megami-sama ~Tatakau Tsubasa to Tomoni~ (Japan)", GAME_FLAGS ) // クイズ ああっ女神さまっ ～闘う翼とともに～
 /* 0034    */ GAME( 2000, shorsepb,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (backup data)", GAME_FLAGS )
