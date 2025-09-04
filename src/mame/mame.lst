@@ -44432,6 +44432,9 @@ m5
 m5p
 m5p_brno
 
+@source:sord/future32.cpp
+future32a
+
 @source:stern/astinvad.cpp
 astinvad
 astinvadb
