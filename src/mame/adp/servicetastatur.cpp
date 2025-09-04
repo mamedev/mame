@@ -40,6 +40,7 @@ ___| XTAL  80C31          +KEYPAD+       |__
 */
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
 #include "video/hd44780.h"
@@ -103,7 +104,8 @@ private:
 	uint8_t gsg_r(offs_t offset);
 	void gsg_w(offs_t offset, uint8_t data);
 
-	void clk_in(bool newval);
+	void enable_in(int state);
+	void data_in(int state);
 
 	void servicet_io(address_map &map) ATTR_COLD;
 	void servicet_map(address_map &map) ATTR_COLD;
@@ -235,7 +237,6 @@ uint8_t servicet_state::port1_r()
 	}
 	default:
 		logerror("Invalid write to P1 %02d",data);
-		clk_in(true); //warning go away
 		break;
 	}
 
@@ -252,6 +253,7 @@ INPUT_CHANGED_MEMBER(servicet_state::en_w)
 {
 	m_maincpu->set_input_line(MCS51_INT1_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(MCS51_INT0_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
+	enable_in(1);
 }
 
 uint8_t servicet_state::port3_r()
@@ -334,6 +336,7 @@ void servicet_state::gsg_w(offs_t offset, uint8_t data)
 	case 0x60: //Y6 U13 PL
 	{
 		m_u13 = data;
+		popmessage("Send to machine: %02X", data);
 		break;
 	}
 	default:
@@ -343,11 +346,14 @@ void servicet_state::gsg_w(offs_t offset, uint8_t data)
 	}
 }
 
-void servicet_state::clk_in(bool newval)
+void servicet_state::data_in(int state)
 {
-	m_u13 = 0xff;
-	m_u19 = 0xff;
-	m_u20 = 0xff;
+	m_u20 = (m_u20 >> 1) | (0xFE & state);
+}
+
+void servicet_state::enable_in(int state)
+{
+	//strobe u19 and u20
 }
 
 void servicet_state::servicet(machine_config &config)
@@ -363,6 +369,11 @@ void servicet_state::servicet(machine_config &config)
 
 	// I2C EEPROM: 24C16 (2KB) - connected to P3.4 (SDA) and P3.5 (SCL)
 	I2C_24C16(config, "eeprom");
+
+	// SERIAL: WE ARE THE DCE
+	rs232_port_device &dte(RS232_PORT(config, "dte", default_rs232_devices, nullptr));
+	dte.dcd_handler().set(FUNC(servicet_state::enable_in));
+	dte.rxd_handler().set(FUNC(servicet_state::data_in));
 
 	// LCD4002A
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
