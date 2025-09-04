@@ -94,7 +94,7 @@ public:
 	sprinter_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_isa(*this, "isa%u", 0U)
+		, m_isa(*this, "isa8%u", 0U)
 		, m_irqs(*this, "irqs")
 		, m_rtc(*this, "rtc")
 		, m_ata(*this, "ata%u", 1U)
@@ -1948,13 +1948,11 @@ void sprinter_state::sprinter(machine_config &config)
 
 	ISA8(config, m_isa[0], X_SP / 5);
 	m_isa[0]->set_custom_spaces();
-	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	zxbus.set_iospace(m_isa[0], isa8_device::AS_ISA_IO);
-	ZXBUS_SLOT(config, "zxbus2isa", 0, "zxbus", zxbus_cards, nullptr);
+	ISA8_SLOT(config, "isa0", 0, m_isa[0], pc_isa8_cards, "zxbus_adapter", false);
 
 	ISA8(config, m_isa[1], X_SP / 5);
 	m_isa[1]->set_custom_spaces();
-	ISA8_SLOT(config, "isa8", 0, m_isa[1], pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", 0, m_isa[1], pc_isa8_cards, nullptr, false);
 
 	m_screen->set_raw(X_SP / 3, SPRINT_WIDTH, SPRINT_HEIGHT, { 0, SPRINT_XVIS - 1, 0, SPRINT_YVIS - 1 });
 	m_screen->set_screen_update(FUNC(sprinter_state::screen_update));
