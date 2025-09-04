@@ -143,6 +143,8 @@ Notes:
 #include "machine/nvram.h"
 #include "machine/vrender0.h"
 
+#include "speaker.h"
+
 #include <algorithm>
 
 
@@ -574,16 +576,21 @@ INPUT_PORTS_END
 
 void crystal_state::crystal(machine_config &config)
 {
-	SE3208(config, m_maincpu, 14'318'180 * 3); // TODO : different between each PCB
+	SE3208(config, m_maincpu, 14'318'180 * 3); // TODO : dynamic via PLL
 	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::crystal_mem);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
-	m_vr0soc->set_host_cpu_tag(m_maincpu);
+	VRENDER0_SOC(config, m_vr0soc, 14'318'180 * 6); // TODO : dynamic via PLL
+	m_vr0soc->set_host_space_tag(m_maincpu, AS_PROGRAM);
+	m_vr0soc->int_callback().set_inputline(m_maincpu, SE3208_INT);
 
 	DS1302(config, m_ds1302, 32.768_kHz_XTAL);
+
+	SPEAKER(config, "speaker", 2).front();
+	m_vr0soc->add_route(0, "speaker", 1.0, 0);
+	m_vr0soc->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -823,7 +830,7 @@ void crystal_state::init_maldaiza()
 
 GAME( 2001, crysbios, 0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "Crystal System BIOS", MACHINE_IS_BIOS_ROOT )
 GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, init_crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings", 0 )
-GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, init_evosocc,  ROT0, "Evoga",               "Evolution Soccer", 0 )
+GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, init_evosocc,  ROT0, "Evoga / BrezzaSoft",  "Evolution Soccer", 0 )
 GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, init_officeye, ROT0, "Danbi",               "Office Yeoin Cheonha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
 GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 2 players mode has GFX issues, seldomly hangs
 GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", 0 ) // lamps, verify game timings
