@@ -173,11 +173,11 @@ protected:
 	                                         1 << static_cast<uint32_t>(iop_irq::AST);
 
 	template<iop_irq Number>
-	void iop_irq_w(u8 state); // TODO: see if template deduction can work for having irq_w overloaded
+	void irq_w(u8 state);
 	template<iop_irq Number>
-	void iop_inten_w(uint8_t state);
+	void inten_w(uint8_t state);
 	template<iop_irq Number>
-	bool is_iop_irq_set();
+	bool is_irq_set();
 	void int_check_iop();
 
 	enum class cpu_irq : unsigned
@@ -195,11 +195,11 @@ protected:
 	                                         1 << static_cast<uint32_t>(cpu_irq::IOP);
 
 	template <cpu_irq Number>
-	void cpu_irq_w(u8 state);
+	void irq_w(u8 state);
 	template <cpu_irq Number>
-	void cpu_inten_w(uint8_t state);
+	void inten_w(uint8_t state);
 	template<cpu_irq Number>
-	bool is_cpu_irq_set();
+	bool is_irq_set();
 	void int_check_cpu();
 
 	// IOP platform hardware
@@ -337,7 +337,7 @@ void news_38xx_state::cpu_map(address_map &map)
 	map(0x18000004, 0x18000007).w(FUNC(news_38xx_state::cpenitmr_w)).mirror(0xffff00);
 	map(0x18000020, 0x18000027).w(FUNC(news_38xx_state::cpintxp_w)).mirror(0xffff00);
 	map(0x18000040, 0x18000043).w(FUNC(news_38xx_state::mapvec_w)).mirror(0xffff00);
-	map(0x18000044, 0x18000047).w(FUNC(news_38xx_state::cpu_inten_w<cpu_irq::UBUS>)).mirror(0xffff00);
+	map(0x18000044, 0x18000047).w(FUNC(news_38xx_state::inten_w<cpu_irq::UBUS>)).mirror(0xffff00);
 	map(0x18000060, 0x18000067).w(FUNC(news_38xx_state::cpclixp_w)).mirror(0xffff00);
 	map(0x18000080, 0x18000087).w(FUNC(news_38xx_state::cpuled_w)).mirror(0xffff00);
 	map(0x1c000000, 0x1c000003).r(FUNC(news_38xx_state::wrbeadr_r));
@@ -360,7 +360,7 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x22000001, 0x22000001).w(FUNC(news_38xx_state::romdis_w));
 	map(0x22000002, 0x22000002).w(FUNC(news_38xx_state::ptycken_w));
 	map(0x22000003, 0x22000003).w(FUNC(news_38xx_state::timeren_w));
-	map(0x22000004, 0x22000004).w(FUNC(news_38xx_state::iop_irq_w<iop_irq::SOFTINTR>));
+	map(0x22000004, 0x22000004).w(FUNC(news_38xx_state::irq_w<iop_irq::SOFTINTR>));
 	map(0x22000005, 0x22000005).w(FUNC(news_38xx_state::astintr_w));
 	map(0x22000006, 0x22000007).w(FUNC(news_38xx_state::iopled_w));
 
@@ -385,8 +385,8 @@ void news_38xx_state::iop_map(address_map &map)
 		LOG("parallel strobe w 0x%x\n", data);
 		m_parallel->write_strobe(!data);
 	}));
-	map(0x26040002, 0x26040002).lw8(NAME([this] (u8) { iop_irq_w<iop_irq::PARALLEL>(0);}));
-	map(0x26040003, 0x26040003).w(FUNC(news_38xx_state::iop_inten_w<iop_irq::PARALLEL>));
+	map(0x26040002, 0x26040002).lw8(NAME([this] (u8) { irq_w<iop_irq::PARALLEL>(0);}));
+	map(0x26040003, 0x26040003).w(FUNC(news_38xx_state::inten_w<iop_irq::PARALLEL>));
 
 	map(0x26080000, 0x26080007).m(m_scsi[0], FUNC(cxd1180_device::map));
 	map(0x260c0000, 0x260c0007).m(m_scsi[1], FUNC(cxd1180_device::map));
@@ -469,21 +469,21 @@ void news_38xx_state::ram_tas_w(offs_t offset, u32 data, u32 mem_mask)
 
 u8 news_38xx_state::iop_intst_r()
 {
-	const u8 iop_status = is_iop_irq_set<iop_irq::PERR>() << 7 |
-	                      is_iop_irq_set<iop_irq::SCSI0>() << 6 |
-	                      is_iop_irq_set<iop_irq::SCSI1>() << 5 |
-	                      (is_iop_irq_set<iop_irq::CPU>() || is_iop_irq_set<iop_irq::UBUS>()) << 4 |
-	                      is_iop_irq_set<iop_irq::LANCE>() << 3 |
-	                      is_iop_irq_set<iop_irq::FDCIRQ>() << 2 |
-	                      is_iop_irq_set<iop_irq::PARALLEL>() << 1 |
-	                      is_iop_irq_set<iop_irq::SLOT>();
+	const u8 iop_status = is_irq_set<iop_irq::PERR>() << 7 |
+	                      is_irq_set<iop_irq::SCSI0>() << 6 |
+	                      is_irq_set<iop_irq::SCSI1>() << 5 |
+	                      (is_irq_set<iop_irq::CPU>() || is_irq_set<iop_irq::UBUS>()) << 4 |
+	                      is_irq_set<iop_irq::LANCE>() << 3 |
+	                      is_irq_set<iop_irq::FDCIRQ>() << 2 |
+	                      is_irq_set<iop_irq::PARALLEL>() << 1 |
+	                      is_irq_set<iop_irq::SLOT>();
 	LOGMASKED(LOG_INTERRUPT, "%s iop_intst_r: 0x%x\n", machine().describe_context(), iop_status);
 	return iop_status;
 }
 
 u8 news_38xx_state::iop_ipc_intst_r()
 {
-	const u8 iop_status = is_iop_irq_set<iop_irq::UBUS>() << 1 | is_iop_irq_set<iop_irq::CPU>();
+	const u8 iop_status = is_irq_set<iop_irq::UBUS>() << 1 | is_irq_set<iop_irq::CPU>();
 	LOGMASKED(LOG_INTERRUPT, "%s iop_ipc_intst_r: 0x%x\n", machine().describe_context(), iop_status);
 	return iop_status;
 }
@@ -494,7 +494,7 @@ u8 news_38xx_state::park_status_r()
 	const u8 park_status = static_cast<u8>(m_parallel_fault) << 6 |
 	                       static_cast<u8>(m_serial[0]->dsr_r()) << 5 |
 	                       static_cast<u8>(m_parallel_busy) << 4 |
-	                       static_cast<u8>(!is_iop_irq_set<iop_irq::PARALLEL>()) << 3 |
+	                       static_cast<u8>(!is_irq_set<iop_irq::PARALLEL>()) << 3 |
 	                       static_cast<u8>(m_serial[0]->ri_r()) << 2 |
 	                       static_cast<u8>(m_serial[1]->dsr_r()) << 1 |
 	                       static_cast<u8>(m_serial[1]->ri_r());
@@ -503,7 +503,7 @@ u8 news_38xx_state::park_status_r()
 }
 
 template<news_38xx_state::iop_irq Number>
-void news_38xx_state::iop_irq_w(u8 state)
+void news_38xx_state::irq_w(u8 state)
 {
 	if (Number != iop_irq::TIMER)
 	{
@@ -529,7 +529,7 @@ void news_38xx_state::iop_irq_w(u8 state)
 }
 
 template<news_38xx_state::iop_irq Number>
-void news_38xx_state::iop_inten_w(uint8_t state)
+void news_38xx_state::inten_w(uint8_t state)
 {
 	if (Number != iop_irq::TIMER)
 	{
@@ -555,7 +555,7 @@ void news_38xx_state::iop_inten_w(uint8_t state)
 }
 
 template<news_38xx_state::iop_irq Number>
-bool news_38xx_state::is_iop_irq_set()
+bool news_38xx_state::is_irq_set()
 {
 	return BIT(m_iop_intst, static_cast<u32>(Number));
 }
@@ -585,7 +585,7 @@ void news_38xx_state::int_check_iop()
 }
 
 template <news_38xx_state::cpu_irq Number>
-void news_38xx_state::cpu_irq_w(u8 state)
+void news_38xx_state::irq_w(u8 state)
 {
 	if (Number != cpu_irq::TIMER)
 	{
@@ -611,7 +611,7 @@ void news_38xx_state::cpu_irq_w(u8 state)
 }
 
 template<news_38xx_state::cpu_irq Number>
-void news_38xx_state::cpu_inten_w(uint8_t state)
+void news_38xx_state::inten_w(uint8_t state)
 {
 	if (Number != cpu_irq::TIMER)
 	{
@@ -637,7 +637,7 @@ void news_38xx_state::cpu_inten_w(uint8_t state)
 }
 
 template<news_38xx_state::cpu_irq Number>
-bool news_38xx_state::is_cpu_irq_set()
+bool news_38xx_state::is_irq_set()
 {
 	return BIT(m_cpu_intst, static_cast<u32>(Number));
 }
@@ -675,12 +675,12 @@ TIMER_CALLBACK_MEMBER(news_38xx_state::timer)
 	// to the CPINTR PAL that generates the CPU IRQ when CPENITMR is set.
 	if (m_iop_inten & 1 << static_cast<u32>(iop_irq::TIMER))
 	{
-		iop_irq_w<iop_irq::TIMER>(1);
+		irq_w<iop_irq::TIMER>(1);
 	}
 
 	if (m_cpu_inten & 1 << static_cast<u32>(cpu_irq::TIMER))
 	{
-		cpu_irq_w<cpu_irq::TIMER>(1);
+		irq_w<cpu_irq::TIMER>(1);
 	}
 }
 
@@ -708,19 +708,19 @@ void news_38xx_state::romdis_w(u8 data)
 
 void news_38xx_state::ptycken_w(u8 data)
 {
-	iop_inten_w<iop_irq::PERR>(data > 0);
+	inten_w<iop_irq::PERR>(data > 0);
 	if (!data)
 	{
-		iop_irq_w<iop_irq::PERR>(0);
+		irq_w<iop_irq::PERR>(0);
 	}
 }
 
 void news_38xx_state::timeren_w(u8 data)
 {
-	iop_inten_w<iop_irq::TIMER>(data > 0);
+	inten_w<iop_irq::TIMER>(data > 0);
 	if (!data)
 	{
-		iop_irq_w<iop_irq::TIMER>(0);
+		irq_w<iop_irq::TIMER>(0);
 	}
 }
 
@@ -754,7 +754,7 @@ void news_38xx_state::ipintxp_w(offs_t offset, u8 data)
 	LOGMASKED(LOG_INTERRUPT, "IPINT%cP = 0x%x\n", !offset ? 'C' : 'H', data);
 	if (!offset)
 	{
-		cpu_irq_w<cpu_irq::IOP>(1);
+		irq_w<cpu_irq::IOP>(1);
 	}
 	else
 	{
@@ -769,11 +769,11 @@ void news_38xx_state::ipenixp_w(offs_t offset, u8 data)
 	LOGMASKED(LOG_INTERRUPT, "IPENI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
 	if (!offset)
 	{
-		iop_inten_w<iop_irq::CPU>(data > 0);
+		inten_w<iop_irq::CPU>(data > 0);
 	}
 	else
 	{
-		iop_inten_w<iop_irq::UBUS>(data > 0);
+		inten_w<iop_irq::UBUS>(data > 0);
 	}
 }
 
@@ -784,11 +784,11 @@ void news_38xx_state::ipclixp_w(offs_t offset, u8 data)
 	LOGMASKED(LOG_INTERRUPT, "IPCLI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
 	if (!offset)
 	{
-		iop_irq_w<iop_irq::CPU>(0);
+		irq_w<iop_irq::CPU>(0);
 	}
 	else
 	{
-		iop_irq_w<iop_irq::UBUS>(0);
+		irq_w<iop_irq::UBUS>(0);
 	}
 }
 
@@ -800,7 +800,7 @@ void news_38xx_state::index_divide_w(offs_t offset, u8 data)
 
 u32 news_38xx_state::cpstat_r()
 {
-	const u8 cpu_status = is_cpu_irq_set<cpu_irq::UBUS>() << 1 | is_cpu_irq_set<cpu_irq::IOP>();
+	const u8 cpu_status = is_irq_set<cpu_irq::UBUS>() << 1 | is_irq_set<cpu_irq::IOP>();
 	LOGMASKED(LOG_INTERRUPT, "%s cpstat_r 0x%x\n", machine().describe_context(), cpu_status);
 	return cpu_status;
 }
@@ -833,19 +833,19 @@ u8 news_38xx_state::boot_vector_r(offs_t offset)
 
 void news_38xx_state::cpenipty_w(u32 data)
 {
-	cpu_inten_w<cpu_irq::PERR>(data > 0);
+	inten_w<cpu_irq::PERR>(data > 0);
 	if (!data)
 	{
-		cpu_irq_w<cpu_irq::PERR>(0);
+		irq_w<cpu_irq::PERR>(0);
 	}
 }
 
 void news_38xx_state::cpenitmr_w(u32 data)
 {
-	cpu_inten_w<cpu_irq::TIMER>(data > 0);
+	inten_w<cpu_irq::TIMER>(data > 0);
 	if (!data)
 	{
-		cpu_irq_w<cpu_irq::TIMER>(0);
+		irq_w<cpu_irq::TIMER>(0);
 	}
 }
 
@@ -854,7 +854,7 @@ void news_38xx_state::cpintxp_w(offs_t offset, u32 data)
 	LOGMASKED(LOG_INTERRUPT, "CPINT%cP = 0x%x\n", !offset ? 'I' : 'H', data);
 	if (!offset)
 	{
-		iop_irq_w<iop_irq::CPU>(1);
+		irq_w<iop_irq::CPU>(1);
 	}
 	else
 	{
@@ -876,11 +876,11 @@ void news_38xx_state::cpclixp_w(offs_t offset, u32 data)
 	LOGMASKED(LOG_INTERRUPT, "(%s) CPCLI%cP = 0x%x\n", machine().describe_context(), !offset ? 'I' : 'H', data);
 	if (!offset)
 	{
-		cpu_irq_w<cpu_irq::IOP>(0);
+		irq_w<cpu_irq::IOP>(0);
 	}
 	else
 	{
-		cpu_irq_w<cpu_irq::UBUS>(0);
+		irq_w<cpu_irq::UBUS>(0);
 	}
 }
 
@@ -924,7 +924,7 @@ void news_38xx_state::common(machine_config &config)
 		[this](const int state)
 		{
 			m_scc_irq_state = static_cast<bool>(state);
-			iop_irq_w<iop_irq::SCC>(state != 0);
+			irq_w<iop_irq::SCC>(state != 0);
 		});
 
 	// scc channel A
@@ -944,13 +944,13 @@ void news_38xx_state::common(machine_config &config)
 	m_scc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
 	AM7990(config, m_net, 20_MHz_XTAL / 2);
-	m_net->intr_out().set(FUNC(news_38xx_state::iop_irq_w<iop_irq::LANCE>)).invert();
+	m_net->intr_out().set(FUNC(news_38xx_state::irq_w<iop_irq::LANCE>)).invert();
 	m_net->dma_in().set([this](const offs_t offset) { return m_net_ram[offset >> 1]; });
 	m_net->dma_out().set([this](const offs_t offset, const u16 data, const u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset >> 1]); });
 
 	N82077AA(config, m_fdc, 24_MHz_XTAL, n82077aa_device::mode_t::PS2);
-	m_fdc->intrq_wr_callback().set(FUNC(news_38xx_state::iop_irq_w<iop_irq::FDCIRQ>));
-	m_fdc->drq_wr_callback().set(FUNC(news_38xx_state::iop_irq_w<iop_irq::FDCDRQ>));
+	m_fdc->intrq_wr_callback().set(FUNC(news_38xx_state::irq_w<iop_irq::FDCIRQ>));
+	m_fdc->drq_wr_callback().set(FUNC(news_38xx_state::irq_w<iop_irq::FDCDRQ>));
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi bus 0 and devices
@@ -970,7 +970,7 @@ void news_38xx_state::common(machine_config &config)
 			auto &adapter = downcast<cxd1180_device &>(*device);
 			adapter.set_clock(20_MHz_XTAL / 2);
 
-			adapter.irq_handler().set(*this, FUNC(news_38xx_state::iop_irq_w<iop_irq::SCSI0>));
+			adapter.irq_handler().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::SCSI0>));
 			adapter.irq_handler().append(m_dma[0], FUNC(dmac_0266_device::eop_w));
 			adapter.drq_handler().set(m_dma[0], FUNC(dmac_0266_device::req_w));
 
@@ -995,7 +995,7 @@ void news_38xx_state::common(machine_config &config)
 			auto &adapter = downcast<cxd1180_device &>(*device);
 			adapter.set_clock(20_MHz_XTAL / 2);
 
-			adapter.irq_handler().set(*this, FUNC(news_38xx_state::iop_irq_w<iop_irq::SCSI1>));
+			adapter.irq_handler().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::SCSI1>));
 			adapter.irq_handler().append(m_dma[1], FUNC(dmac_0266_device::eop_w));
 			adapter.drq_handler().set(m_dma[1], FUNC(dmac_0266_device::req_w));
 
@@ -1012,7 +1012,7 @@ void news_38xx_state::common(machine_config &config)
 		{
 			LOG("Parallel busy changed to %s", new_status ? "H" : "L");
 			m_parallel_busy = new_status;
-			iop_irq_w<iop_irq::PARALLEL>(1);
+			irq_w<iop_irq::PARALLEL>(1);
 		}
 	});
 	m_parallel->fault_handler().set([this](const int status) {
@@ -1020,8 +1020,8 @@ void news_38xx_state::common(machine_config &config)
 		if (m_parallel_fault != new_status)
 		{
 			LOG("Parallel fault changed to %s", new_status ? "H" : "L");
-			m_parallel_fault = !new_status;
-			iop_irq_w<iop_irq::PARALLEL>(1);
+			m_parallel_fault = !new_status; // TODO: why !? this seems wrong
+			irq_w<iop_irq::PARALLEL>(1);
 		}
 	});
 
@@ -1029,8 +1029,8 @@ void news_38xx_state::common(machine_config &config)
 	m_parallel->set_output_latch(*m_parallel_data);
 
 	NEWS_HID_HLE(config, m_hid);
-	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(*this, FUNC(news_38xx_state::iop_irq_w<iop_irq::KEYBOARD>));
-	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(*this, FUNC(news_38xx_state::iop_irq_w<iop_irq::MOUSE>));
+	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::KEYBOARD>));
+	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::MOUSE>));
 
 	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("RISC");
 }
