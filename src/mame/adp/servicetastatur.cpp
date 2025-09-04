@@ -115,7 +115,10 @@ private:
 
 	uint8_t m_port1 = 0xff;
 	uint8_t m_port3 = 0xff;
-	uint8_t m_lcd_data = 0;
+
+	uint8_t m_u13 = 0xff;
+	uint8_t m_u19 = 0xff;
+	uint8_t m_u20 = 0xff;
 };
 
 void servicet_state::servicet_map(address_map &map)
@@ -167,14 +170,20 @@ void servicet_state::machine_start()
 {
 	save_item(NAME(m_port1));
 	save_item(NAME(m_port3));
-	save_item(NAME(m_lcd_data));
+
+	save_item(NAME(m_u13));
+	save_item(NAME(m_u19));
+	save_item(NAME(m_u20));
 }
 
 void servicet_state::machine_reset()
 {
 	m_port1 = 0xff;
 	m_port3 = 0xff;
-	m_lcd_data = 0;
+
+	m_u13 = 0xff;
+	m_u19 = 0xff;
+	m_u20 = 0xff;
 }
 
 uint8_t servicet_state::port1_r()
@@ -226,8 +235,8 @@ void servicet_state::port1_w(uint8_t data)
 
 INPUT_CHANGED_MEMBER(servicet_state::en_w)
 {
-	m_maincpu->set_input_line(MCS51_INT0_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(MCS51_INT1_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(MCS51_INT1_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(MCS51_INT0_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 uint8_t servicet_state::port3_r()
@@ -267,24 +276,26 @@ uint8_t servicet_state::gsg_scramble(uint8_t data)
 
 uint8_t servicet_state::gsg_r(offs_t offset)
 {
-	uint8_t data = 0xff;
+	uint8_t data = 0x00;
 
 	switch (offset & 0x70)
 	{
 	case 0x40: //Y4 U20 OE
 	{
 		popmessage("Read GSG");
+		data = m_u20;
 		break;
 	}
 	case 0x50: //Y5 U19 OE
 	{
 		popmessage("Read scrambled GSG");
-		data = gsg_scramble(data);
+		data = gsg_scramble(m_u19);
 		break;
 	}
 	case 0x60: //Y6 U13 PL
 	{
 		popmessage("Read GSG out");
+		data = m_u13;
 		break;
 	}
 	}
@@ -297,18 +308,17 @@ void servicet_state::gsg_w(offs_t offset, uint8_t data)
 	{
 	case 0x40: //Y4 U20 OE
 	{
-		popmessage("Write GSG in %02X",data);
+		m_u20 = data;
 		break;
 	}
 	case 0x50: //Y5 U19 OE
 	{
-		popmessage("Write scrambled GSG in %02X",data);
-		data = gsg_scramble(data);
+		m_u13 = gsg_scramble(data);
 		break;
 	}
 	case 0x60: //Y6 U13 PL
 	{
-		popmessage("Write GSG out %02X",data);
+		m_u13 = data;
 		break;
 	}
 	default:
@@ -316,6 +326,15 @@ void servicet_state::gsg_w(offs_t offset, uint8_t data)
 		//popmessage("Bus write: %02X to %04X\n", data, offset);
 	}
 	}
+}
+
+void clk_in(bool newval)
+{
+	m_u13 = 0xff;
+	m_u19 = 0xff;
+	m_u20 = 0xff;
+	
+	
 }
 
 void servicet_state::servicet(machine_config &config)
