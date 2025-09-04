@@ -78,21 +78,22 @@ namespace {
 class criter75_state : public driver_device
 {
 public:
-	criter75_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
+	criter75_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 	{
 	}
 
 	void criter75(machine_config &config);
 
-private:
-	// devices
-	required_device<netlist_mame_device> m_maincpu;
-
+protected:
 	// driver_device overrides
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	// devices
+	required_device<netlist_mame_device> m_maincpu;
 };
 
 static NETLIST_START(criter75)

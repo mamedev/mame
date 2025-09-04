@@ -164,7 +164,8 @@ public:
 		m_ds1302(*this, "rtc"),
 		m_eeprom(*this, "eeprom"),
 		m_dsw(*this, "DSW"),
-		m_system(*this, "SYSTEM")
+		m_system(*this, "SYSTEM"),
+		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	void init_topbladv() ATTR_COLD;
@@ -199,6 +200,8 @@ private:
 	required_ioport m_dsw;
 	required_ioport m_system;
 
+	output_finder<16> m_lamps;
+
 	std::unique_ptr<uint8_t[]> m_dummy_region;
 
 	uint32_t    m_bank;
@@ -208,6 +211,7 @@ private:
 
 	uint32_t system_input_r();
 	void banksw_w(uint32_t data);
+	void lamps_w(offs_t offset, u8 data);
 	uint32_t flashcmd_r();
 	void flashcmd_w(uint32_t data);
 	void coin_counters_w(uint8_t data);
@@ -231,6 +235,12 @@ void crystal_state::banksw_w(uint32_t data)
 {
 	m_bank = (data >> 1) & 7;
 	m_mainbank->set_entry(m_bank);
+}
+
+void crystal_state::lamps_w(offs_t offset, uint8_t data)
+{
+	for (unsigned i = 0; 8 > i; ++i)
+		m_lamps[(offset << 3) | i] = BIT(data, i);
 }
 
 uint32_t crystal_state::pioldat_r()
@@ -303,6 +313,7 @@ void crystal_state::crystal_mem(address_map &map)
 	map(0x01200008, 0x0120000b).r(FUNC(crystal_state::system_input_r));
 
 	map(0x01280000, 0x01280003).w(FUNC(crystal_state::banksw_w));
+	map(0x01320000, 0x01320003).umask32(0x00ff00ff).w(FUNC(crystal_state::lamps_w));
 	map(0x01400000, 0x0140ffff).ram().share("nvram");
 
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
@@ -374,6 +385,8 @@ loop:
 
 void crystal_state::machine_start()
 {
+	m_lamps.resolve();
+
 	patchreset();
 
 	if (m_mainbank)
@@ -551,14 +564,17 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( urachamu )
 	PORT_INCLUDE( officeye )
 
-	// oddly they reversed red and blue
+	// uses blue/yellow/red rather than red/green/blue
 	PORT_MODIFY("P1_P2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Blue")
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Red")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Blue")
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Blue")
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Red")
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Red")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Blue")
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Yellow")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Red")
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Blue")
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Blue")
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Yellow")
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Yellow")
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Red")
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Red")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wulybuly )

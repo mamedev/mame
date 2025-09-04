@@ -124,7 +124,7 @@ void vrender0soc_device::frame_map(address_map &map)
 void vrender0soc_device::device_add_mconfig(machine_config &config)
 {
 	for (required_device<vr0uart_device> &uart : m_uart)
-		VRENDER0_UART(config, uart, 3579500); // DERIVED_CLOCK(1, 24));
+		VRENDER0_UART(config, uart, 3'579'500); // DERIVED_CLOCK(1, 24));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// evolution soccer defaults
@@ -133,7 +133,7 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(vrender0soc_device::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	// runs at double speed wrt of the bus clock
+	// runs at double speed WRT the bus clock
 	VIDEO_VRENDER0(config, m_vr0vid, DERIVED_CLOCK(1, 1));
 
 	PALETTE(config, m_palette, palette_device::RGB_565);
@@ -340,7 +340,7 @@ void vrender0soc_device::TimerStart(int which)
 {
 	int PD = (m_timer_control[which] >> 8) & 0xff;
 	int TCV = m_timer_count[which] & 0xffff;
-	// TODO: documentation claims this is bus clock, half than internal PLL frequency.
+	// TODO: documentation claims this is bus clock, half the internal PLL frequency.
 	attotime period = attotime::from_hz(this->clock()) * 2 * ((PD + 1) * (TCV + 1));
 	m_Timer[which]->adjust(period);
 

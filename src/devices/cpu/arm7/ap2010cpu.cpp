@@ -28,7 +28,7 @@ void ap2010cpu_device::add_hotspot(offs_t pc)
 
 void ap2010cpu_device::execute_run()
 {
-	for (size_t i = 0; i < ARM7_MAX_HOTSPOTS; i++) {
+	for (size_t i = 0; i < MAX_HOTSPOTS; i++) {
 		if (m_hotspot[i] == 0) {
 			break;
 		}
