@@ -5976,6 +5976,12 @@ if (BUSES["H8BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_1.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_5.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_5.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/ha_8_6.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/ha_8_6.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/ha_8_8.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/ha_8_8.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_16.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_16.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_64.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_64.h",
 	}
