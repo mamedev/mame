@@ -173,7 +173,7 @@ void alpha68k_N_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 
 				bank = data >> 10 & 3;
 				tile = data & 0x3ff;
-				if (m_is_super_stingray == true)
+				if (m_is_super_stingray)
 					color = (data >> 7 & 0x18) | (data >> 13 & 7);
 				else
 				{
@@ -183,7 +183,7 @@ void alpha68k_N_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 				}
 
 				// can't be 0xff in super stingray
-				if (color != 0xff)
+				if (color != 0xff || !m_is_super_stingray)
 				{
 					int fy = ((data & 0x1000) >> 12) ^ m_flipscreen;
 					int fx = m_flipscreen;
