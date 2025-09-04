@@ -2273,6 +2273,7 @@ void sega315_5313_device::vdp_handle_scanline_callback(int scanline)
 	//  if (get_scanline_counter() == 0) m_irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
 		// m_irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
 
+		// TODO: V30 mode (PAL) runs the V counter up to 240
 		if (get_scanline_counter() <= 224)
 		{
 			m_irq4counter--;

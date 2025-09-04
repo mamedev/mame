@@ -3801,7 +3801,11 @@ The game doesn't start after choosing the "Loader" option menu.
 		<year>2017</year>
 		<publisher>Team Yolkfolk</publisher>
 		<info name="version" value="1.0.5" />
-		<info name="developer" value="Barskiy, Ponomarjov, Origin, Kosov, Del Campo" />
+		<info name="developer" value="Barskiy" />
+		<info name="developer" value="Ponomarjov" />
+		<info name="developer" value="Origin" />
+		<info name="developer" value="Kosov" />
+		<info name="developer" value="Del Campo" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="Dizzy VII - Crystal Kindom Dizzy (2017) v1.0.5.dsk" size="194816" crc="6ce7df16" sha1="baa05aa6ccf2a296485e83e12bb602e174232ba4"/>
@@ -5884,7 +5888,12 @@ The game doesn't start after choosing the "Loader" option menu.
 		<description>Funky Fungus</description>
 		<year>2013</year>
 		<publisher>Alessandro Grussu</publisher>
-		<info name="language" value="English/French/German/Italian/Portuguese/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="Italy" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
@@ -5897,7 +5906,11 @@ The game doesn't start after choosing the "Loader" option menu.
 		<description>Funky Fungus (alt)</description>
 		<year>2013</year>
 		<publisher>Alessandro Grussu</publisher>
-		<info name="language" value="English/German/Italian/Portuguese/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="Italy" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
@@ -14230,7 +14243,8 @@ This dump of Side A has been manually fixed, a new untampered one may be needed 
 		<description>Seto Taisho vs Yokai (English, Italian)</description>
 		<year>2016</year>
 		<publisher>Alessandro Grussu</publisher>
-		<info name="language" value="English/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="Italian" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="seto taisho vs yokai (2016-02-29)(grussu, alessandro)(en-it).dsk" size="194816" crc="12d6499a" sha1="1ed7e33084dfcdde9870c623de2f30795cedc5f7"/>
@@ -14242,7 +14256,8 @@ This dump of Side A has been manually fixed, a new untampered one may be needed 
 		<description>Seto Taisho vs Yokai (English, Italian) (alt)</description>
 		<year>2016</year>
 		<publisher>Alessandro Grussu</publisher>
-		<info name="language" value="English/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="Italian" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="Seto-IT-EN.dsk" size="194816" crc="5d9333ed" sha1="9fad85ef5993c5166b6cdd1ce60d70211feb8ca1"/>
@@ -14254,7 +14269,8 @@ This dump of Side A has been manually fixed, a new untampered one may be needed 
 		<description>Seto Taisho vs Yokai (German, Spanish)</description>
 		<year>2016</year>
 		<publisher>Alessandro Grussu</publisher>
-		<info name="language" value="German/Spanish" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="seto taisho vs yokai (2016-02-29)(grussu, alessandro)(de-es).dsk" size="194816" crc="c1ebd473" sha1="4c32c7b87911b5ba209cc4c48083d2e157a582be"/>
@@ -14266,7 +14282,8 @@ This dump of Side A has been manually fixed, a new untampered one may be needed 
 		<description>Seto Taisho vs Yokai (German, Spanish) (alt)</description>
 		<year>2016</year>
 		<publisher>Alessandro Grussu</publisher>
-		<info name="language" value="German/Spanish" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="Seto-DE-ES.dsk" size="194816" crc="78b7b6b4" sha1="614cac3020a06d8d131dd6791b2c428ca478b699"/>
@@ -14278,7 +14295,8 @@ This dump of Side A has been manually fixed, a new untampered one may be needed 
 		<description>Seto Taisho vs Yokai (French, Portuguese)</description>
 		<year>2016</year>
 		<publisher>Alessandro Grussu</publisher>
-		<info name="language" value="French/Portuguese" />
+		<info name="language" value="French" />
+		<info name="language" value="Portuguese" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="seto taisho vs yokai (2016-02-29)(grussu, alessandro)(fr-pt).dsk" size="194816" crc="6d28e331" sha1="d5650a8fdd2fee7e54cfce32ad8301561aebdf57"/>
@@ -14290,7 +14308,8 @@ This dump of Side A has been manually fixed, a new untampered one may be needed 
 		<description>Seto Taisho vs Yokai (French, Portuguese) (alt)</description>
 		<year>2016</year>
 		<publisher>Alessandro Grussu</publisher>
-		<info name="language" value="French/Portuguese" />
+		<info name="language" value="French" />
+		<info name="language" value="Portuguese" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="Seto-FR-PT.dsk" size="194816" crc="f807a0e5" sha1="c1e957dd66d74ee0ca4b0f2a92485846fad25d45"/>
@@ -14308,7 +14327,12 @@ Seto Taisho vs Yokai
 Seto Taisho to Kazan
 ]]></notes>
 		<info name="developer" value="Alessandro Grussu" />
-		<info name="language" value="English/Italian/German/Spanish/French/Portuguese" />
+		<info name="language" value="English" />
+		<info name="language" value="Italian" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="French" />
+		<info name="language" value="Portuguese" />
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Seto Taisho vs Yokai (English, Italian)"/>
 			<dataarea name="flop" size="194816">
@@ -18024,7 +18048,8 @@ The floppy disks don't load after choosing the "Loader" option menu.
 		<description>The Tears of the Moon + Laskar's Crystals</description>
 		<year>1992</year>
 		<publisher>Zenobi Software</publisher>
-		<info name="developer" value="Clive Wilson / Laurence Creighton" />
+		<info name="developer" value="Clive Wilson" />
+		<info name="developer" value="Laurence Creighton" />
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="195635">
 				<rom name="Tears Of The Moon + Laskar's Crystals.dsk" size="195635" crc="dcfc75e9" sha1="53a166a3a0dd2c7fab21c499114ca3bb0dbfbc4d"/>
@@ -18474,7 +18499,8 @@ Disk 3 - Side A: Vindicators (Domark)
 		<description>Tiki Taca</description>
 		<year>2019</year>
 		<publisher>Climacus</publisher>
-		<info name="developer" value="Eduardo Martin Torices / Igor Errazkin" />
+		<info name="developer" value="Eduardo Martin Torices" />
+		<info name="developer" value="Igor Errazkin" />
 		<info name="region" value="Spain" />
 		<part name="flop" interface="floppy_3">
 			<dataarea name="flop" size="194816">

@@ -15,7 +15,7 @@
 ***********************************************************************/
 
 #include "emu.h"
-#include "mdioport.h"
+#include "sega_md_ioport.h"
 
 #include <cassert>
 

@@ -776,7 +776,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="cloderunta" cloneof="cloderun">
-		<description>Xun Bao Er Dai (Taiwan, Alt)</description>
+		<description>Xun Bao Er Dai (Taiwan, alt)</description>
 		<!-- This version has a Chinese title screen -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -2459,7 +2459,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="spacearmt" cloneof="spacearm">
-		<description>Space Armor (Taiwan, v20, Alt)</description>
+		<description>Space Armor (Taiwan, v20, alt)</description>
 		<year>1984</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-016"/>

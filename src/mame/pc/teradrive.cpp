@@ -54,7 +54,6 @@ TODO:
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/isa/svga_paradise.h"
-#include "bus/megadrive/ctrl/mdioport.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/sms_ctrl/controllers.h"
@@ -65,6 +64,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/input_merger.h"
 #include "machine/ram.h"
+#include "machine/sega_md_ioport.h"
 #include "machine/wd7600.h"
 #include "sound/spkrdev.h"
 #include "sound/ymopn.h"
@@ -177,7 +177,7 @@ void isa16_ibm_79f2661::md_mem_map(address_map &map)
 				return (u16)(res | (res << 8));
 			}
 
-			return m_md_space->read_word(base_address, mem_mask);
+			return swapendian_int16(m_md_space->read_word(base_address, mem_mask));
 		}),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			const u32 base_address = (offset << 1) + (m_68k_address << 12);
@@ -186,7 +186,7 @@ void isa16_ibm_79f2661::md_mem_map(address_map &map)
 			else if (!ACCESSING_BITS_8_15)
 				m_md_space->write_byte(base_address, data);
 			else
-				m_md_space->write_word(base_address, data, mem_mask);
+				m_md_space->write_word(base_address, swapendian_int16(data), mem_mask);
 		})
 	);
 }
@@ -393,6 +393,7 @@ protected:
 	void md_cpu_space_map(address_map &map);
 	void md_68k_z80_map(address_map &map) ATTR_COLD;
 	void md_z80_map(address_map &map) ATTR_COLD;
+	void md_z80_io(address_map &map) ATTR_COLD;
 	void md_ioctrl_map(address_map &map) ATTR_COLD;
 private:
 	required_device<i80286_cpu_device> m_x86cpu;
@@ -522,7 +523,7 @@ void teradrive_state::md_68k_map(address_map &map)
 
 //  map(0x800000, 0x9fffff) unmapped or 32X
 	map(0xa00000, 0xa07fff).view(m_md_68k_sound_view);
-	m_md_68k_sound_view[0](0xa00000, 0xa07fff).m(*this, FUNC(teradrive_state::md_68k_z80_map));
+	m_md_68k_sound_view[0](0xa00000, 0xa07fff).before_delay(NAME([](offs_t) { return 1; })).m(*this, FUNC(teradrive_state::md_68k_z80_map));
 //  map(0xa07f00, 0xa07fff) Z80 VDP space (freezes machine if accessed from 68k)
 //  map(0xa08000, 0xa0ffff) Z80 68k window (assume no DTACK), or just mirror of above according to TD HW notes?
 //  map(0xa10000, 0xa100ff) I/O
@@ -607,7 +608,7 @@ void teradrive_state::md_68k_map(address_map &map)
 		})
 	);
 //  map(0xc00000, 0xdfffff) VDP and PSG (with mirrors and holes)
-	map(0xc00000, 0xc0001f).m(m_md_vdp, FUNC(ym7101_device::if_map));
+	map(0xc00000, 0xc0001f).m(m_md_vdp, FUNC(ym7101_device::if16_map));
 	map(0xe00000, 0xe0ffff).mirror(0x1f0000).ram(); // Work RAM, usually accessed at $ff0000
 }
 
@@ -616,21 +617,21 @@ void teradrive_state::md_ioctrl_map(address_map &map)
 {
 	// version, should be 0 for Teradrive, bit 5 for expansion bus not connected yet
 	map(0x00, 0x01).lr8(NAME([] () { return 1 << 5; }));
-	map(0x02, 0x03).rw(m_md_ioports[0], FUNC(megadrive_io_port_device::data_r), FUNC(megadrive_io_port_device::data_w)).umask16(0xffff);
-	map(0x04, 0x05).rw(m_md_ioports[1], FUNC(megadrive_io_port_device::data_r), FUNC(megadrive_io_port_device::data_w)).umask16(0xffff);
-	map(0x06, 0x07).rw(m_md_ioports[2], FUNC(megadrive_io_port_device::data_r), FUNC(megadrive_io_port_device::data_w)).umask16(0xffff);
-	map(0x08, 0x09).rw(m_md_ioports[0], FUNC(megadrive_io_port_device::ctrl_r), FUNC(megadrive_io_port_device::ctrl_w)).umask16(0xffff);
-	map(0x0a, 0x0b).rw(m_md_ioports[1], FUNC(megadrive_io_port_device::ctrl_r), FUNC(megadrive_io_port_device::ctrl_w)).umask16(0xffff);
-	map(0x0c, 0x0d).rw(m_md_ioports[2], FUNC(megadrive_io_port_device::ctrl_r), FUNC(megadrive_io_port_device::ctrl_w)).umask16(0xffff);
-	map(0x0e, 0x0f).rw(m_md_ioports[0], FUNC(megadrive_io_port_device::txdata_r), FUNC(megadrive_io_port_device::txdata_w)).umask16(0xffff);
-	map(0x10, 0x11).r(m_md_ioports[0], FUNC(megadrive_io_port_device::rxdata_r)).umask16(0xffff);
-	map(0x12, 0x13).rw(m_md_ioports[0], FUNC(megadrive_io_port_device::s_ctrl_r), FUNC(megadrive_io_port_device::s_ctrl_w)).umask16(0xffff);
-	map(0x14, 0x15).rw(m_md_ioports[1], FUNC(megadrive_io_port_device::txdata_r), FUNC(megadrive_io_port_device::txdata_w)).umask16(0xffff);
-	map(0x16, 0x17).r(m_md_ioports[1], FUNC(megadrive_io_port_device::rxdata_r)).umask16(0xffff);
-	map(0x18, 0x19).rw(m_md_ioports[1], FUNC(megadrive_io_port_device::s_ctrl_r), FUNC(megadrive_io_port_device::s_ctrl_w)).umask16(0xffff);
-	map(0x1a, 0x1b).rw(m_md_ioports[2], FUNC(megadrive_io_port_device::txdata_r), FUNC(megadrive_io_port_device::txdata_w)).umask16(0xffff);
-	map(0x1c, 0x1d).r(m_md_ioports[2], FUNC(megadrive_io_port_device::rxdata_r)).umask16(0xffff);
-	map(0x1e, 0x1f).rw(m_md_ioports[2], FUNC(megadrive_io_port_device::s_ctrl_r), FUNC(megadrive_io_port_device::s_ctrl_w)).umask16(0xffff);
+	map(0x02, 0x03).rw(m_md_ioports[0], FUNC(megadrive_io_port_device::data_r), FUNC(megadrive_io_port_device::data_w));
+	map(0x04, 0x05).rw(m_md_ioports[1], FUNC(megadrive_io_port_device::data_r), FUNC(megadrive_io_port_device::data_w));
+	map(0x06, 0x07).rw(m_md_ioports[2], FUNC(megadrive_io_port_device::data_r), FUNC(megadrive_io_port_device::data_w));
+	map(0x08, 0x09).rw(m_md_ioports[0], FUNC(megadrive_io_port_device::ctrl_r), FUNC(megadrive_io_port_device::ctrl_w));
+	map(0x0a, 0x0b).rw(m_md_ioports[1], FUNC(megadrive_io_port_device::ctrl_r), FUNC(megadrive_io_port_device::ctrl_w));
+	map(0x0c, 0x0d).rw(m_md_ioports[2], FUNC(megadrive_io_port_device::ctrl_r), FUNC(megadrive_io_port_device::ctrl_w));
+	map(0x0e, 0x0f).rw(m_md_ioports[0], FUNC(megadrive_io_port_device::txdata_r), FUNC(megadrive_io_port_device::txdata_w));
+	map(0x10, 0x11).r(m_md_ioports[0], FUNC(megadrive_io_port_device::rxdata_r));
+	map(0x12, 0x13).rw(m_md_ioports[0], FUNC(megadrive_io_port_device::s_ctrl_r), FUNC(megadrive_io_port_device::s_ctrl_w));
+	map(0x14, 0x15).rw(m_md_ioports[1], FUNC(megadrive_io_port_device::txdata_r), FUNC(megadrive_io_port_device::txdata_w));
+	map(0x16, 0x17).r(m_md_ioports[1], FUNC(megadrive_io_port_device::rxdata_r));
+	map(0x18, 0x19).rw(m_md_ioports[1], FUNC(megadrive_io_port_device::s_ctrl_r), FUNC(megadrive_io_port_device::s_ctrl_w));
+	map(0x1a, 0x1b).rw(m_md_ioports[2], FUNC(megadrive_io_port_device::txdata_r), FUNC(megadrive_io_port_device::txdata_w));
+	map(0x1c, 0x1d).r(m_md_ioports[2], FUNC(megadrive_io_port_device::rxdata_r));
+	map(0x1e, 0x1f).rw(m_md_ioports[2], FUNC(megadrive_io_port_device::s_ctrl_r), FUNC(megadrive_io_port_device::s_ctrl_w));
 }
 
 void teradrive_state::md_cpu_space_map(address_map &map)
@@ -639,7 +640,6 @@ void teradrive_state::md_cpu_space_map(address_map &map)
 	// TODO: IPL0 (external irq tied to VDP IE2)
 	map(0xfffff5, 0xfffff5).before_time(m_md68kcpu, FUNC(m68000_device::vpa_sync)).after_delay(m_md68kcpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 26; }));
 	map(0xfffff7, 0xfffff7).before_time(m_md68kcpu, FUNC(m68000_device::vpa_sync)).after_delay(m_md68kcpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 27; }));
-	// TODO: IPL1
 	map(0xfffff9, 0xfffff9).before_time(m_md68kcpu, FUNC(m68000_device::vpa_sync)).after_delay(m_md68kcpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 {
 		m_md_vdp->irq_ack();
 		return 28;
@@ -657,6 +657,8 @@ void teradrive_state::flush_z80_state()
 {
 	m_mdz80cpu->set_input_line(INPUT_LINE_RESET, m_z80_reset ? ASSERT_LINE : CLEAR_LINE);
 	m_mdz80cpu->set_input_line(Z80_INPUT_LINE_BUSRQ, m_z80_busrq ? CLEAR_LINE : ASSERT_LINE);
+	if (m_z80_reset)
+		m_opn->reset();
 	if (m_z80_reset || !m_z80_busrq)
 		m_md_68k_sound_view.select(0);
 	else
@@ -702,6 +704,7 @@ void teradrive_state::md_z80_map(address_map &map)
 	map(0x6000, 0x60ff).lw8(NAME([this] (offs_t offset, u8 data) {
 		m_z80_main_address = ((m_z80_main_address >> 1) | ((data & 1) << 23)) & 0xff8000;
 	}));
+	map(0x7f00, 0x7f1f).m(m_md_vdp, FUNC(ym7101_device::if8_map));
 	map(0x8000, 0xffff).lrw8(
 		NAME([this] (offs_t offset) {
 			address_space &space68k = m_md68kcpu->space();
@@ -716,6 +719,14 @@ void teradrive_state::md_z80_map(address_map &map)
 	);
 }
 
+void teradrive_state::md_z80_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	// juuouki reads $bf in irq service (SMS VDP left-over?)
+	map(0x00, 0xff).nopr();
+	// TODO: SMS mode thru cart
+}
 
 /*
  *
@@ -927,8 +938,9 @@ void teradrive_state::teradrive(machine_config &config)
 	m_md68kcpu->set_addrmap(AS_PROGRAM, &teradrive_state::md_68k_map);
 	m_md68kcpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &teradrive_state::md_cpu_space_map);
 
-	Z80(config, m_mdz80cpu, md_master_xtal / 7 / 2);
+	Z80(config, m_mdz80cpu, md_master_xtal / 15);
 	m_mdz80cpu->set_addrmap(AS_PROGRAM, &teradrive_state::md_z80_map);
+	m_mdz80cpu->set_addrmap(AS_IO, &teradrive_state::md_z80_io);
 
 	SCREEN(config, m_mdscreen, SCREEN_TYPE_RASTER);
 	// NOTE: PAL is 423x312
@@ -937,8 +949,19 @@ void teradrive_state::teradrive(machine_config &config)
 
 	YM7101(config, m_md_vdp, md_master_xtal / 4);
 	m_md_vdp->set_screen(m_mdscreen);
+	// TODO: actual DTACK
+	// TODO: accessing 68k bus from x86, defers access?
+	m_md_vdp->dtack_cb().set_inputline(m_md68kcpu, INPUT_LINE_HALT);
+	m_md_vdp->mreq_cb().set([this] (offs_t offset) {
+		// TODO: can't read outside of base cart and RAM
+		//printf("%06x\n", offset);
+		address_space &space68k = m_md68kcpu->space();
+		u16 ret = space68k.read_word(offset, 0xffff);
+
+		return ret;
+	});
 	m_md_vdp->vint_cb().set_inputline(m_md68kcpu, 6);
-//  m_md_vdp->hint_cb().set_inputline(m_md68kcpu, 4);
+	m_md_vdp->hint_cb().set_inputline(m_md68kcpu, 4);
 	m_md_vdp->sint_cb().set_inputline(m_mdz80cpu, INPUT_LINE_IRQ0);
 	m_md_vdp->add_route(ALL_OUTPUTS, "md_speaker", 0.50, 0);
 	m_md_vdp->add_route(ALL_OUTPUTS, "md_speaker", 0.50, 1);

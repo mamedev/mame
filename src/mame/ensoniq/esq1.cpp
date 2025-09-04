@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /***************************************************************************
 
-    drivers/esq1.c
+    ensoniq/esq1.cpp
 
     Ensoniq ESQ-1 Digital Wave Synthesizer
     Ensoniq ESQ-M (rack-mount ESQ-1)
@@ -53,10 +53,9 @@ IRQ sources are the DUART and the DRQ line from the FDC (SQ-80 only).
 NMI is from the IRQ line on the FDC (again, SQ-80 only).
 
 TODO:
-    - VFD display
     - Keyboard
-]    - Analog filters and VCA on the back end of the 5503 (inaccurate)
-     - duart seems to keep interrupting even after MIDI xmit buffer becomes empty
+     - Analog filters and VCA on the back end of the 5503 (inaccurate)
+     - DUART seems to keep interrupting even after MIDI xmit buffer becomes empty
 
 NOTES:
     Commands from KPC are all 2 bytes
@@ -181,14 +180,22 @@ NOTES:
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "esqpanel.h"
+
 #include "bus/midi/midi.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/input_merger.h"
 #include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
-#include "esqpanel.h"
 #include "sound/es5503.h"
+
 #include "speaker.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
+#include "esq1.lh"
 
 
 #define WD1772_TAG      "wd1772"
@@ -397,6 +404,10 @@ public:
 		m_filters(*this, "filters"),
 		m_fdc(*this, WD1772_TAG),
 		m_panel(*this, "panel"),
+		m_volume_slider(*this, "volume_slider"),
+		m_data_entry_slider(*this, "data_entry_slider"),
+		m_pitch_wheel(*this, "pitch_wheel"),
+		m_mod_wheel(*this, "mod_wheel"),
 		m_mdout(*this, "mdout"),
 		m_es5503(*this, "es5503"),
 		m_es5503_rom(*this, "es5503")
@@ -407,6 +418,7 @@ public:
 	void esq1(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	DECLARE_INPUT_CHANGED_MEMBER(internal_kbd_key_stroke);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -414,6 +426,10 @@ private:
 	required_device<esq1_filters> m_filters;
 	optional_device<wd1772_device> m_fdc;
 	optional_device<esqpanel2x40_device> m_panel;
+	required_ioport m_volume_slider;
+	required_ioport m_data_entry_slider;
+	required_ioport m_pitch_wheel;
+	required_ioport m_mod_wheel;
 	optional_device<midi_port_device> m_mdout;
 	required_device<es5503_device> m_es5503;
 	required_region_ptr<uint8_t> m_es5503_rom;
@@ -443,8 +459,7 @@ private:
 	void sq80_es5503_map(address_map &map) ATTR_COLD;
 
 	bool kpc_calibrated = false;  // sq80 requires keyboard calibration acknowledgement
-	int m_adc_target = 0;     // adc poll target (index into the table below)
-	uint8_t m_adc_value[6] = { 0,0,128,0,0,0 }; // VALV,PEDV,PITV,MODV,FILV,BATV
+	int m_adc_poll_target = 0;
 };
 
 uint8_t esq1_state::es5503_sample_r(offs_t offset)
@@ -459,13 +474,37 @@ void esq1_state::sq80_es5503_map(address_map &map)
 
 uint8_t esq1_state::esq1_adc_read()
 {
-	return m_adc_value[m_adc_target];
+	uint8_t value;
+	switch(m_adc_poll_target) {
+	case 0: // VALV
+		value = m_data_entry_slider->read();
+		break;
+
+	case 1: // PEDV - Expression Pedal / CV input
+		value = 0;
+		break;
+
+	case 2: // PITV
+		value = m_pitch_wheel->read();
+		break;
+
+	case 3: // MODV
+		value = m_mod_wheel->read();
+		break;
+
+	case 4: // FILV
+	case 5: // BATV
+	default:
+		value = 0;
+		break;
+	}
+	return value * 255.0/100;
 }
 
 void esq1_state::machine_reset()
 {
 	// set default OSROM banking
-	membank("osbank")->set_base(memregion("osrom")->base() );
+	membank("osbank")->set_base(memregion("osrom")->base());
 
 	m_mapper_state = 1;
 	m_seq_bank = 0;
@@ -486,7 +525,7 @@ void esq1_state::mapper_w(uint8_t data)
 {
 	m_mapper_state = (data & 1);
 
-//    printf("mapper_state = %d\n", data ^ 1);
+	LOG("mapper_state = %d\n", data ^ 1);
 }
 
 void esq1_state::analog_w(offs_t offset, uint8_t data)
@@ -503,24 +542,18 @@ void esq1_state::analog_w(offs_t offset, uint8_t data)
 
 uint8_t esq1_state::seqdosram_r(offs_t offset)
 {
-	if (m_mapper_state)
-	{
+	if (m_mapper_state) {
 		return m_dosram[offset];
-	}
-	else
-	{
+	} else {
 		return m_seqram[offset + m_seq_bank];
 	}
 }
 
 void esq1_state::seqdosram_w(offs_t offset, uint8_t data)
 {
-	if (m_mapper_state)
-	{
+	if (m_mapper_state) {
 		m_dosram[offset] = data;
-	}
-	else
-	{
+	} else {
 		m_seqram[offset + m_seq_bank] = data;
 	}
 }
@@ -566,14 +599,14 @@ void esq1_state::sq80_map(address_map &map)
 
 void esq1_state::duart_output(uint8_t data)
 {
-	int bank = m_adc_target = ((data >> 1) & 0x7);
-//  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
-//  printf("%s [%02x] bank %d => offset %x\n", machine().describe_context().c_str(), data, bank, bank * 0x1000);
+	int bank = m_adc_poll_target = ((data >> 1) & 0x7);
+	LOG("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
+	LOG("%s [%02x] bank %d => offset %x\n", machine().describe_context(), data, bank, bank * 0x1000);
 	membank("osbank")->set_base(memregion("osrom")->base() + (bank * 0x1000) );
 
 	m_seq_bank = (data & 0x8) ? 0x8000 : 0x0000;
 	m_seq_bank += ((data>>1) & 3) * 0x2000;
-//    printf("seqram_bank = %x\n", state->m_seq_bank);
+	LOG("seqram_bank = %x\n", m_seq_bank);
 }
 
 void esq1_state::send_through_panel(uint8_t data)
@@ -584,25 +617,33 @@ void esq1_state::send_through_panel(uint8_t data)
 INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 {
 	u8 offset = 0;
-	if (strncmp(machine().basename().c_str(), "sq80", 4) == 0)
-	 {
-		if (!kpc_calibrated)
-		 { // ack SQ80 keyboard calibration
+	// FIXME: get rid of short name checks
+	if(strncmp(machine().basename().c_str(), "sq80", 4) == 0) {
+		if (!kpc_calibrated) {
+			// ack SQ80 keyboard calibration
 			send_through_panel((u8)0xff);
 			kpc_calibrated = true;
 		}
 		offset = 2; // SQ80 keycodes are offset by -2
 	}
 
-	if (oldval == 0 && newval == 1)
-	{
+	if(oldval == 0 && newval == 1) {
 		send_through_panel((u8)param - offset);
 		send_through_panel((u8)0x00);
-	}
-	else if (oldval == 1 && newval == 0)
-	{
+	} else if(oldval == 1 && newval == 0) {
 		send_through_panel(((u8)param - offset)&0x7f);
 		send_through_panel((u8)0x00);
+	}
+}
+
+INPUT_CHANGED_MEMBER(esq1_state::internal_kbd_key_stroke)
+{
+	if(oldval == 0 && newval == 1) {
+		send_through_panel((u8)param);
+		send_through_panel((u8)0x01);
+	} else if(oldval == 1 && newval == 0) {
+		send_through_panel(((u8)param)&0x7f);
+		send_through_panel((u8)0x01);
 	}
 }
 
@@ -649,11 +690,14 @@ void esq1_state::esq1(machine_config &config)
 	m_es5503->add_route(5, "filters", 1.0, 5);
 	m_es5503->add_route(6, "filters", 1.0, 6);
 	m_es5503->add_route(7, "filters", 1.0, 7);
+
+	config.set_default_layout(layout_esq1);
 }
 
 void esq1_state::sq80(machine_config &config)
 {
 	esq1(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq1_state::sq80_map);
 
 	m_es5503->set_addrmap(0, &esq1_state::sq80_es5503_map);
@@ -665,32 +709,157 @@ void esq1_state::sq80(machine_config &config)
 }
 
 static INPUT_PORTS_START( esq1 )
-	PORT_START("KEY0")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x84) PORT_NAME("SEQ")
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x85) PORT_NAME("CART A")
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x86) PORT_NAME("CART B")
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x87) PORT_NAME("INT")
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x88) PORT_NAME("1 / SEQ 1")
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x89) PORT_NAME("2 / SEQ 2")
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x8a) PORT_NAME("3 / SEQ 3")
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x8b) PORT_NAME("4 / SONG")
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('Z') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x8c) PORT_NAME("COMPARE")
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x8e) PORT_NAME("DATA DOWN")
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x8d) PORT_NAME("DATA UP")
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x8f) PORT_NAME("WRITE")
+	PORT_START("volume_slider")
+	PORT_ADJUSTER(255, "Volume")
 
-	PORT_START("KEY1")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x90) PORT_NAME("UPPER 1")
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x91) PORT_NAME("UPPER 2")
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x92) PORT_NAME("UPPER 3")
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x93) PORT_NAME("UPPER 4")
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x99) PORT_NAME("UPPER 5")
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x94) PORT_NAME("LOWER 1")
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x95) PORT_NAME("LOWER 2")
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x96) PORT_NAME("LOWER 3")
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x97) PORT_NAME("LOWER 4")
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x98) PORT_NAME("LOWER 5")
+	PORT_START("data_entry_slider")
+	PORT_ADJUSTER(255, "Data Entry")
 
+	PORT_START("pitch_wheel")
+	PORT_ADJUSTER(255, "Pitch Wheel")
+
+	PORT_START("mod_wheel")
+	PORT_ADJUSTER(255, "Mod Wheel")
+
+	PORT_START("COL0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x84) PORT_NAME("SEQ")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x85) PORT_NAME("CART A")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x86) PORT_NAME("CART B")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x87) PORT_NAME("INT")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x88) PORT_NAME("1 / SEQ 1")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x89) PORT_NAME("2 / SEQ 2")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x8a) PORT_NAME("3 / SEQ 3")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x8b) PORT_NAME("4 / SONG")
+
+	PORT_START("COL1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('Z') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x8c) PORT_NAME("COMPARE")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x8d) PORT_NAME("DATA UP")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x8e) PORT_NAME("DATA DOWN")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x8f) PORT_NAME("WRITE")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x90) PORT_NAME("UPPER 1")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x91) PORT_NAME("UPPER 2")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x92) PORT_NAME("UPPER 3")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x93) PORT_NAME("UPPER 4")
+
+	PORT_START("COL2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x94) PORT_NAME("LOWER 1")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x95) PORT_NAME("LOWER 2")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x96) PORT_NAME("LOWER 3")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x97) PORT_NAME("LOWER 4")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x98) PORT_NAME("LOWER 5")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x99) PORT_NAME("UPPER 5")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x9a) PORT_NAME("LFO 1")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x9b) PORT_NAME("ENV 2")
+
+	PORT_START("COL3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x9c) PORT_NAME("Master")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x9d) PORT_NAME("Create/Erase")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x9e) PORT_NAME("Tracks: Select")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0x9f) PORT_NAME("Record")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xa0) PORT_NAME("Storage")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xa1) PORT_NAME("Edit")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xa2) PORT_NAME("Mix")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xa3) PORT_NAME("Stop")
+
+	PORT_START("COL4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xa4) PORT_NAME("MIDI")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xa5) PORT_NAME("Control")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xa6) PORT_NAME("Locate")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xa7) PORT_NAME("Play")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xa8) PORT_NAME("OSC 1")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xa9) PORT_NAME("OSC 2")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xaa) PORT_NAME("OSC 3")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xab) PORT_NAME("ENV 1")
+
+	PORT_START("COL5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xac) PORT_NAME("DCA 1")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xad) PORT_NAME("DCA 2")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xae) PORT_NAME("DCA 3")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xaf) PORT_NAME("LFO 2")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xb0) PORT_NAME("LFO 3")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xb1) PORT_NAME("Filter")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xb2) PORT_NAME("ENV 4")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xb3) PORT_NAME("ENV 3")
+
+	PORT_START("COL6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xb4) PORT_NAME("DCA 4")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xb5) PORT_NAME("Modes")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::key_stroke), 0xb6) PORT_NAME("Split")
+	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("INTERNAL_KBD1")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0x98) PORT_GM_C1
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0x99) PORT_GM_CS1
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0x9a) PORT_GM_D1
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0x9b) PORT_GM_DS1
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0x9c) PORT_GM_E1
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0x9d) PORT_GM_F1
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0x9e) PORT_GM_FS1
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0x9f) PORT_GM_G1
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xa0) PORT_GM_GS1
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xa1) PORT_GM_A1
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xa2) PORT_GM_AS1
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xa3) PORT_GM_B1
+
+	PORT_START("INTERNAL_KBD2")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xa4) PORT_GM_C2
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xa5) PORT_GM_CS2
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xa6) PORT_GM_D2
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xa7) PORT_GM_DS2
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xa8) PORT_GM_E2
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xa9) PORT_GM_F2
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xaa) PORT_GM_FS2
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xab) PORT_GM_G2
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xac) PORT_GM_GS2
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xad) PORT_GM_A2
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xae) PORT_GM_AS2
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xaf) PORT_GM_B2
+
+	PORT_START("INTERNAL_KBD3")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xb0) PORT_GM_C3
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xb1) PORT_GM_CS3
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xb2) PORT_GM_D3
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xb3) PORT_GM_DS3
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xb4) PORT_GM_E3
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xb5) PORT_GM_F3
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xb6) PORT_GM_FS3
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xb7) PORT_GM_G3
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xb8) PORT_GM_GS3
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xb9) PORT_GM_A3
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xba) PORT_GM_AS3
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xbb) PORT_GM_B3
+
+	PORT_START("INTERNAL_KBD4")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xbc) PORT_GM_C4
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xbd) PORT_GM_CS4
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xbe) PORT_GM_D4
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xbf) PORT_GM_DS4
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xc0) PORT_GM_E4
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xc1) PORT_GM_F4
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xc2) PORT_GM_FS4
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xc3) PORT_GM_G4
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xc4) PORT_GM_GS4
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xc5) PORT_GM_A4
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xc6) PORT_GM_AS4
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xc7) PORT_GM_B4
+
+	PORT_START("INTERNAL_KBD5")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xc8) PORT_GM_C5
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xc9) PORT_GM_CS5
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xca) PORT_GM_D5
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xcb) PORT_GM_DS5
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xcc) PORT_GM_E5
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xcd) PORT_GM_F5
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xce) PORT_GM_FS5
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xcf) PORT_GM_G5
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xd0) PORT_GM_GS5
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xd1) PORT_GM_A5
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xd2) PORT_GM_AS5
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xd3) PORT_GM_B5
+
+	PORT_START("INTERNAL_KBD6")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq1_state::internal_kbd_key_stroke), 0xd4) PORT_GM_C6
+	PORT_BIT(0xffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 INPUT_PORTS_END
 

@@ -92,12 +92,12 @@ public:
 	void tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, uint32_t flags, uint32_t priority);
 	void tilemap_draw_dj(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority);
 	void set_layer_association(int status);
-	int  get_layer_association();
+	int get_layer_association() { return m_layer_association; }
 	void set_layer_offs(int layer, int offsx, int offsy);
 	void set_lsram_page(int logical_page, int physical_page, int physical_offset);
-	int  is_irq_enabled(int irqline);
+	int is_irq_enabled(int irqline);
 	void read_avac(int *mode, int *data);
-	int  read_register(int regnum);
+	int read_register(int regnum);
 	int get_current_rambank();
 	int get_lookup(int bits); /* Asterix */
 	void set_tile_bank(int bank); /* Asterix */
@@ -166,7 +166,7 @@ private:
 
 	optional_device<k055555_device> m_k055555;  /* used to choose colorbase */
 
-	void get_tile_info(  tile_data &tileinfo, int tile_index, int pageIndex );
+	void get_tile_info(tile_data &tileinfo, int tile_index, int pageIndex);
 
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
@@ -192,20 +192,12 @@ private:
 	int rom_read_b(int offset, int blksize, int blksize2, int zerosec);
 
 	template<class BitmapClass>
-	int update_linemap(screen_device &screen, BitmapClass &bitmap, int page, int flags);
-
-	template<class BitmapClass>
 	void tilemap_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority);
+	int update_linemap(int page);
 
 	void create_gfx();
 	void create_tilemaps();
 	void finalize_init();
-
-public:
-	void m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, uint32_t flags, uint32_t priority);
-
-private:
-	int altK056832_update_linemap(screen_device &screen, bitmap_rgb32 &bitmap, int page, int flags);
 };
 
 DECLARE_DEVICE_TYPE(K056832, k056832_device)

@@ -494,8 +494,8 @@ thanks-to:Franz Huber
 		<element ref="keys" inputtag="IN.3" inputmask="0x08"><bounds x="89" y="103" width="4" height="4" /><color alpha="0.25" /></element>
 
 		<!-- hidden input between CL/ENT buttons to press both -->
-		<element ref="nothing" inputtag="IN.1" inputmask="0x01" clickthrough="yes"><bounds x="92" y="93" width="3" height="4" /></element>
-		<element ref="nothing" inputtag="IN.1" inputmask="0x02" clickthrough="no"> <bounds x="92" y="93" width="3" height="4" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x01" clickthrough="no"> <bounds x="92" y="93" width="3" height="4" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x02" clickthrough="yes"><bounds x="92" y="93" width="3" height="4" /></element>
 	</group>
 
 

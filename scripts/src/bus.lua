@@ -1796,6 +1796,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/aha1542c.h",
 		MAME_DIR .. "src/devices/bus/isa/aha174x.cpp",
 		MAME_DIR .. "src/devices/bus/isa/aha174x.h",
+		MAME_DIR .. "src/devices/bus/isa/amgda.cpp",
+		MAME_DIR .. "src/devices/bus/isa/amgda.h",
 		MAME_DIR .. "src/devices/bus/isa/asc88.cpp",
 		MAME_DIR .. "src/devices/bus/isa/asc88.h",
 		MAME_DIR .. "src/devices/bus/isa/bblue2.cpp",
@@ -3856,18 +3858,6 @@ if (BUSES["MEGADRIVE"]~=null) then
 		MAME_DIR .. "src/devices/bus/megadrive/titan.h",
 		MAME_DIR .. "src/devices/bus/megadrive/tplay96.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/tplay96.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/bus/megadrive/ctrl/mdioport.h,BUSES["MEGADRIVE_CTRL"] = true
----------------------------------------------------
-
-if (BUSES["MEGADRIVE_CTRL"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/megadrive/ctrl/mdioport.cpp",
-		MAME_DIR .. "src/devices/bus/megadrive/ctrl/mdioport.h",
 	}
 end
 

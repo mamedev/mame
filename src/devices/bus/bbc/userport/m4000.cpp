@@ -15,7 +15,6 @@
 
 namespace {
 
-
 class bbc_m4000_device : public device_t, public device_bbc_userport_interface
 {
 public:
@@ -50,7 +49,7 @@ private:
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( m4000 )
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 static INPUT_PORTS_START( m4000 )
@@ -122,11 +121,6 @@ static INPUT_PORTS_START( m4000 )
 	PORT_BIT(0x7f, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Foot Switch")
 INPUT_PORTS_END
-
-
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
 
 ioport_constructor bbc_m4000_device::device_input_ports() const
 {

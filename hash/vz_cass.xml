@@ -169,7 +169,7 @@ Demonstration Tape (included with the VZ300)
 		<description>Ghost Hunter</description>
 		<year>198?</year>
 		<publisher>Dick Smith Electronics</publisher>
-		<info name="author" value="Dubois and McNamara" />
+		<info name="author" value="Dubois &amp; McNamara" />
 		<info name="serial" value="X-7242" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="1732336">
@@ -205,7 +205,7 @@ Demonstration Tape (included with the VZ300)
 		<description>Invaders</description>
 		<year>198?</year>
 		<publisher>Dick Smith Electronics</publisher>
-		<info name="author" value="Dubois and McNamara" />
+		<info name="author" value="Dubois &amp; McNamara" />
 		<info name="serial" value="X-7239" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="1723824">

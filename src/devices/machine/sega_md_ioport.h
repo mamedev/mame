@@ -14,8 +14,8 @@
     connector.
 
 ***********************************************************************/
-#ifndef MAME_BUS_MEGADRIVE_CTRL_MDIOPORT_H
-#define MAME_BUS_MEGADRIVE_CTRL_MDIOPORT_H
+#ifndef MAME_MACHINE_SEGA_MD_IOPORT_H
+#define MAME_MACHINE_SEGA_MD_IOPORT_H
 
 #pragma once
 
@@ -206,4 +206,4 @@ private:
 DECLARE_DEVICE_TYPE(MEGADRIVE_IO_PORT, megadrive_io_port_device)
 DECLARE_DEVICE_TYPE(GAMEGEAR_IO_PORT, gamegear_io_port_device)
 
-#endif // MAME_BUS_MEGADRIVE_CTRL_MDIOPORT_H
+#endif // MAME_MACHINE_SEGA_MD_IOPORT_H

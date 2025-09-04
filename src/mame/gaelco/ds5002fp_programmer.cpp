@@ -57,10 +57,9 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cart(*this, "cartslot")
-		, m_cart_region(nullptr)
 	{ }
 
-	void ds5002fp_programmer(machine_config &config);
+	void ds5002fp_programmer(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -68,25 +67,16 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) ATTR_COLD;
 
 	void prg_map(address_map &map);
 
-	u16 cart_r(offs_t offset);
-
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-	memory_region *m_cart_region;
 };
 
 void ds5002fp_programmer_state::machine_start()
 {
-	// if there's a cart, override the standard mapping
-	if (m_cart && m_cart->exists())
-	{
-		std::string region_tag;
-		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	}
 }
 
 void ds5002fp_programmer_state::machine_reset()
@@ -95,7 +85,7 @@ void ds5002fp_programmer_state::machine_reset()
 
 void ds5002fp_programmer_state::prg_map(address_map &map)
 {
-	map(0x000000, 0x01ffff).r(FUNC(ds5002fp_programmer_state::cart_r));
+	map(0x000000, 0x01ffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
 }
 
 
@@ -103,15 +93,13 @@ DEVICE_IMAGE_LOAD_MEMBER(ds5002fp_programmer_state::cart_load)
 {
 	uint32_t const size = m_cart->common_get_size("rom");
 
+	if ((size > 0x020000) | (size & 0x000001))
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported ROM size (must be 16 bits wide and no larger than 128K)");
+
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	return std::make_pair(std::error_condition(), std::string());
-}
-
-u16 ds5002fp_programmer_state::cart_r(offs_t offset)
-{
-	return m_cart->read_rom(offset * 2) | (m_cart->read_rom((offset * 2) + 1) << 8);
 }
 
 static INPUT_PORTS_START( ds5002fp_programmer )
@@ -137,4 +125,4 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 1992, gaelcods,      0,       0,      ds5002fp_programmer,   ds5002fp_programmer, ds5002fp_programmer_state, empty_init, "Gaelco", "Gaelco DS5002FP Programmer", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+SYST( 1992, gaelcods, 0, 0, ds5002fp_programmer, ds5002fp_programmer, ds5002fp_programmer_state, empty_init, "Gaelco", "Gaelco DS5002FP Programmer", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

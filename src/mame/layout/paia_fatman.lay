@@ -259,12 +259,12 @@ copyright-holders:m1macrophage
 		<element ref="text-slow">
 			<bounds x="138" y="94" width="40" height="15"/>
 		</element>
-		<element ref="transparent-rect" clickthrough="no">
-			<!-- Disable clicks on the `simplecounter` below, because they
-			change the value in an unintuitive way. -->
+		<element ref="knob-value" inputraw="yes" inputtag="~knob_inputtag~" inputmask="0x7f">
 			<bounds x="68" y="52" width="40" height="16"/>
 		</element>
-		<element ref="knob-value" inputraw="yes" inputtag="~knob_inputtag~" inputmask="0x7f">
+		<element ref="transparent-rect" clickthrough="no">
+			<!-- Disable clicks on the `simplecounter` above, because they
+			change the value in an unintuitive way. -->
 			<bounds x="68" y="52" width="40" height="16"/>
 		</element>
 	</group>

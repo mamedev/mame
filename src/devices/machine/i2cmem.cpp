@@ -316,7 +316,7 @@ void i2cmem_device::write_sda(int state)
 	state &= 1;
 	if( m_sdaw != state )
 	{
-		LOGMASKED( LOG_WRITELINE, "%s: SDA = %d @ %s\n", machine().describe_context(), state, machine().time().to_string() );
+		LOGMASKED( LOG_WRITELINE, "%s: SDA = %d @ %s (%d)\n", machine().describe_context(), state, machine().time().to_string(), state );
 		m_sdaw = state;
 
 		// Ignore transitions on SDA while device is driving it low
@@ -352,7 +352,7 @@ void i2cmem_device::write_scl(int state)
 	if( m_scl != state )
 	{
 		m_scl = state;
-		LOGMASKED( LOG_WRITELINE, "%s: SCL = %d @ %s\n", machine().describe_context(), m_scl, machine().time().to_string() );
+		LOGMASKED( LOG_WRITELINE, "%s: SCL = %d @ %s (%d)\n", machine().describe_context(), m_scl, machine().time().to_string(), m_state );
 
 		switch( m_state )
 		{
@@ -567,8 +567,12 @@ void i2cmem_device::write_wc(int state)
 int i2cmem_device::read_sda()
 {
 	int res = m_sdar & 1;
+	// https://github.com/mamedev/mame/issues/13998
+	// pullup write value if reading doesn't belong to this device
+	if (m_state == STATE_IDLE)
+		res = m_sdaw & 1;
 	if( !machine().side_effects_disabled() )
-		LOGMASKED( LOG_READLINE, "%s: SDA = %d\n", machine().describe_context(), res );
+		LOGMASKED( LOG_READLINE, "%s: SDA = %d (%d)\n", machine().describe_context(), res, m_state );
 
 	return res;
 }

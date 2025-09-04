@@ -80,6 +80,7 @@ public:
 
 	// cpu interface
 	virtual bool fetch(u32 address, u16 &data, rsc_mode const mode = RSC_N) = 0;
+	virtual bool translate(u32 &address) const = 0;
 
 	// rsc_bus_interface overrides
 	virtual bool mem_load(u32 address, u8 &data, rsc_mode const mode = RSC_N, bool sp = true) override = 0;

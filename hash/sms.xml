@@ -8091,7 +8091,10 @@ license:CC0-1.0
 		<description>Wing Warriors (fix)</description>
 		<year>2024</year>
 		<publisher>EGS</publisher>
-		<info name="language" value="English/French/Portuguese (Brazil)/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
 		<info name="version" value="v1.00" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
@@ -8104,7 +8107,9 @@ license:CC0-1.0
 		<description>Wing Warriors</description>
 		<year>2019</year>
 		<publisher>Kitmaker Entertainment</publisher>
-		<info name="language" value="English/French/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Spanish" />
 		<info name="version" value="v1.00" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
@@ -8117,7 +8122,14 @@ license:CC0-1.0
 		<description>Winter Olympics - Lillehammer '94 (Europe)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="English/French/German/Italian/Norwegian/Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Norwegian" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<info name="serial" value="29015-50, 29015-09, 29015-18"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
@@ -8130,7 +8142,14 @@ license:CC0-1.0
 		<description>Winter Olympics - Lillehammer '94 (Brazil)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="language" value="English/French/German/Italian/Norwegian/Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Norwegian" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<info name="serial" value="028.350"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">

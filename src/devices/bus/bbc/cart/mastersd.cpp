@@ -17,10 +17,6 @@
 
 namespace {
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
 // ======================> bbc_mastersd_device
 
 class bbc_mastersd_device : public device_t, public device_bbc_cart_interface
@@ -32,12 +28,12 @@ public:
 protected:
 	bbc_mastersd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device_t implementation
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	// device_bbc_cart_interface implementation
+	// device_bbc_cart_interface overrides
 	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
 	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
 
@@ -110,6 +106,7 @@ bbc_mastersdr2_device::bbc_mastersdr2_device(const machine_config &mconfig, cons
 	: bbc_mastersd_device(mconfig, BBC_MASTERSDR2, tag, owner, clock)
 {
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -300,10 +297,6 @@ TIMER_CALLBACK_MEMBER(bbc_mastersd_device::spi_clock)
 
 } // anonymous namespace
 
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(BBC_MASTERSD, device_bbc_cart_interface, bbc_mastersd_device, "bbc_mastersd", "MasterSD BBC Master SD Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(BBC_MASTERSDR2, device_bbc_cart_interface, bbc_mastersdr2_device, "bbc_mastersdr2", "MasterSD R2 BBC Master SD Cartridge")

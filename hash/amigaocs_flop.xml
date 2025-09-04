@@ -2030,7 +2030,9 @@ Runs slightly fast (verify)
 ATK test: OK
 ]]></notes>
 		<!-- from ranking screen -->
-		<info name="developer" value="Kyle Hodgetts, Tony Windsor, Barry Smith" />
+		<info name="developer" value="Kyle Hodgetts" />
+		<info name="developer" value="Tony Windsor" />
+		<info name="developer" value="Barry Smith" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1921)alpha-1.ipf" size="1049612" crc="f890bd14" sha1="8a604afc3d7b17ec17fd7b69b3f79af46d0d368b"/>
@@ -11848,7 +11850,9 @@ Runs slightly fast (verify)
 ATK test: OK
 ]]></notes>
 		<!-- from ranking screen -->
-		<info name="developer" value="Kyle Hodgetts, Tony Windsor, Barry Smith" />
+		<info name="developer" value="Kyle Hodgetts" />
+		<info name="developer" value="Tony Windsor" />
+		<info name="developer" value="Barry Smith" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">

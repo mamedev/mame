@@ -11,6 +11,7 @@
 
 // video
 #include "aga.h"
+#include "amgda.h"
 #include "cga.h"
 #include "ega.h"
 #include "eis_hgb107x.h"
@@ -177,6 +178,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("aha1542c", AHA1542C);
 	device.option_add("aha1542cf", AHA1542CF);
 	device.option_add("aha1542cp", AHA1542CP);
+	device.option_add("amgda", ISA16_AMGDA);
 	device.option_add("gus", ISA16_GUS);
 	device.option_add("sblaster_16", ISA16_SOUND_BLASTER_16);
 	device.option_add("svga_s3", ISA16_SVGA_S3);
