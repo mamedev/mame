@@ -43083,6 +43083,7 @@ uk2086
 
 @source:sinclair/tsconf.cpp
 tsconf
+tsconf2
 
 @source:sinclair/zx.cpp
 lambda

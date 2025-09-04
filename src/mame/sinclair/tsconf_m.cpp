@@ -365,6 +365,38 @@ void tsconf_state::draw_sprites(screen_device &screen_d, bitmap_rgb32 &bitmap, c
 
 }
 
+attotime tsconf_state::copper_until_pos_r(u16 pos)
+{
+	const u8 mode = pos >> 14;
+	switch(mode)
+	{
+		case 0b11: // line
+		case 0b10: // x
+			{
+				const int vpos = m_screen->vpos();
+				const int x = (mode == 0b11) ? screen_area[3].right() + 1 : ((pos & 0xff) << 1);
+				if (m_screen->hpos() < x)
+					return m_screen->time_until_pos(vpos, x);
+				else
+					return m_screen->time_until_pos((vpos + 1) % m_screen->height(), x);
+			}
+			break;
+		case 0b01: // y
+			{
+				const u8 y = pos & 0x1ff;
+				if (m_screen->vpos() == y)
+					return attotime::zero;
+				else
+					return m_screen->time_until_pos(y);
+			}
+			break;
+		case 0b00: // frame
+		default:
+			return m_screen->time_until_pos(0, 0);
+			break;
+	}
+}
+
 u8 tsconf_state::ram_bank_read(u8 bank, offs_t offset)
 {
 	if (!machine().side_effects_disabled() && ((m_regs[SYS_CONFIG] & 3) == 2)) // 14Mhz
@@ -390,18 +422,22 @@ void tsconf_state::ram_bank_write(u8 bank, offs_t offset, u8 data)
 	{
 		offs_t machine_addr = PAGE4K(bank) + offset;
 		offs_t fmap_addr = BIT(m_regs[FMAPS], 0, 4) << 12;
-		if ((machine_addr >= fmap_addr) && (machine_addr < (fmap_addr + 256 * 5)))
+		if ((machine_addr >= fmap_addr) && (machine_addr < (fmap_addr + 0x800)))
 		{
 			u16 addr_w = machine_addr - fmap_addr;
-			if (addr_w < 512)
+			if (addr_w < 0x200)
 				cram_write(addr_w, data);
-			else if (addr_w < 1024)
+			else if (addr_w < 0x400)
 			{
 				m_sprites_cache.clear();
-				m_sfile->write(addr_w - 512, data);
+				m_sfile->write(addr_w - 0x200, data);
 			}
-			else
-				tsconf_port_xxaf_w((addr_w - 1024) << 8, data);
+			else if (addr_w < 0x500)
+				tsconf_port_xxaf_w((addr_w - 0x400) << 8, data);
+			else if (addr_w < 0x600)
+				; // reserved
+			else if (m_copper != nullptr)
+				m_copper->cl_data_w(addr_w - 0x600, data);
 		}
 	}
 
@@ -481,6 +517,7 @@ u16 tsconf_state::spi_read16()
 
 void tsconf_state::cram_write(u16 offset, u8 data)
 {
+	m_screen->update_now();
 	u16 dest = offset & 0x1ff;
 	m_cram->write(dest, data);
 	u8 pen = dest >> 1;
@@ -642,6 +679,11 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 
 	case PAGE3:
 		m_bank_ram[3]->set_entry(data);
+		break;
+	
+	case COPPER:
+		if (m_copper != nullptr)
+			m_copper->copper_en_w(data);
 		break;
 
 	case DMAS_ADDRESS_L:

@@ -14,8 +14,9 @@
 
 #include "glukrs.h"
 #include "tsconf_beta.h"
+#include "tsconf_copper.h"
+#include "tsconf_dma.h"
 #include "tsconf_rs232.h"
-#include "tsconfdma.h"
 
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
@@ -44,10 +45,12 @@ public:
 		, m_cram(*this, "cram")
 		, m_sfile(*this, "sfile")
 		, m_dac(*this, "dac")
+		, m_copper(*this, "copper")
 	{
 	}
 
 	void tsconf(machine_config &config);
+	void tsconf2(machine_config &config);
 
 	static constexpr u16 with_hblank(u16 pixclocks) { return 88 + pixclocks; }
 	static constexpr u16 with_vblank(u16 pixclocks) { return 32 + pixclocks; }
@@ -101,6 +104,7 @@ private:
 		PAGE2 = 0x12,
 		PAGE3 = 0x13,
 
+		COPPER = 0x14,
 		FMAPS = 0x15,
 		T_MAP_PAGE = 0x16,
 		T0_G_PAGE = 0x17,
@@ -175,6 +179,7 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tsconf_update_video_mode();
 	void copy_tiles_to_raw(const u8 *tiles_src, u8 *raw_target);
+	attotime copper_until_pos_r(u16 pos);
 
 	u8 tsconf_port_xx1f_r(offs_t offset);
 	void tsconf_port_7ffd_w(u8 data);
@@ -243,6 +248,7 @@ private:
 	std::vector<sprite_data> m_sprites_cache;
 
 	required_device<dac_byte_interface> m_dac;
+	optional_device<tsconf_copper_device> m_copper;
 };
 
 /*----------- defined in drivers/tsconf.c -----------*/

@@ -135,7 +135,7 @@ protected:
 	void turbosound_address_w(u8 data);
 	u8 mf_port_r(offs_t addr);
 	void mf_port_w(offs_t addr, u8 data);
-	attotime cooper_until_pos_r(u16 pos);
+	attotime copper_until_pos_r(u16 pos);
 
 	void bank_update(u8 bank, u8 count);
 	void bank_update(u8 bank);
@@ -1100,7 +1100,7 @@ void specnext_state::mf_port_w(offs_t addr, u8 data)
 	m_mf->port_mf_disable_rd_w(0);
 }
 
-attotime specnext_state::cooper_until_pos_r(u16 pos)
+attotime specnext_state::copper_until_pos_r(u16 pos)
 {
 	const u16 vcount = BIT(pos, 0, 9);
 	const u16 hcount = ((BIT(pos, 9, 6) << 3) + (BIT(pos, 15) ? 12 : 0)) << 1;
@@ -3541,7 +3541,7 @@ void specnext_state::tbblue(machine_config &config)
 
 	SPECNEXT_COPPER(config, m_copper, 28_MHz_XTAL);
 	m_copper->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
-	m_copper->set_in_until_pos_cb(FUNC(specnext_state::cooper_until_pos_r));
+	m_copper->set_in_until_pos_cb(FUNC(specnext_state::copper_until_pos_r));
 
 	config.device_remove("snapshot");
 }
