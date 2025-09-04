@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// copyright-holders:stonedDiscord
 /**********************************************************************
 
     Intel 8256(AH) Multifunction microprocessor support controller emulation
@@ -70,16 +71,15 @@ public:
 	uint8_t p2_r();
 	void    p2_w(uint8_t data);
 
-
 private:
 	devcb_read_line m_in_inta_cb;
 	devcb_write_line m_out_int_cb;
 	devcb_read_line m_in_extint_cb;
 
-	bool m_rxc;
-	bool m_rxd;
-	bool m_cts;
-	bool m_txc;
+	int32_t m_rxc;
+	int32_t m_rxd;
+	int32_t m_cts;
+	int32_t m_txc;
 
 	devcb_write_line m_txd_handler;
 
@@ -94,15 +94,10 @@ private:
 	stop_bits_t m_stop_bits;
 
 	uint8_t m_mode;
-
 	uint8_t m_port1_control;
-
 	uint8_t m_interrupts, m_current_interrupt_level;
-
 	uint8_t m_tx_buffer, m_rx_buffer;
-
 	uint8_t m_port1_int, m_port2_int;
-
 	uint8_t m_timers[5];
 	emu_timer *m_timer;
 
@@ -115,7 +110,6 @@ private:
 	uint8_t m_sync1, m_sync2, m_sync8, m_sync16;
 
 	void receive_clock();
-	bool calc_parity(u8 ch);
 	void sync1_rxc();
 	void sync2_rxc();
 	bool is_tx_enabled();
@@ -289,7 +283,6 @@ private:
 		I8256_MOD_RS4,
 		I8256_MOD_0
 	};
-
 };
 
 DECLARE_DEVICE_TYPE(I8256, i8256_device)

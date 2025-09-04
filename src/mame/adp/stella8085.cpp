@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:stonedDiscord
 
 /*
 
@@ -69,6 +69,7 @@ private:
 	uint8_t m_digit = 0U;
 	uint8_t m_kbd_sl = 0x00;
 	bool m_kbd_bd = false;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8256_device> m_uart;
 	required_device<i8279_device> m_kdc;
@@ -107,7 +108,6 @@ private:
 	void makesound(uint8_t tone, uint8_t octave, uint8_t length);
 	int soundfreq(uint8_t channel, uint8_t clockdiv);
 	TIMER_CALLBACK_MEMBER(sound_stop);
-
 };
 
 void stella8085_state::machine_start()
@@ -197,7 +197,7 @@ void stella8085_state::kbd_sl_w(uint8_t data)
 	m_kbd_sl = data;
 
 	// SL3 connected through CD4093 NAND to DIP switch connected to RST75
-	if ( BIT(m_dsw->read(),0))
+	if (BIT(m_dsw->read(), 0))
 		m_maincpu->set_input_line(I8085_RST75_LINE, BIT(data,3) ? CLEAR_LINE : ASSERT_LINE);
 	else
 		m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
@@ -246,7 +246,8 @@ uint8_t stella8085_state::kbd_rl_r()
 
 void stella8085_state::disp_w(uint8_t data)
 {
-	if (m_kbd_sl < 8) {
+	if (m_kbd_sl < 8)
+	{
 		for (int i = 0; i < 8; i++)
 		{
 			uint8_t lamp_index = (m_kbd_sl * 10) + i;
@@ -261,7 +262,8 @@ void stella8085_state::disp_w(uint8_t data)
 void stella8085_state::output_digit(uint8_t i, uint8_t data)
 {
 	// Seven-segment encoding for digits 0-9 (abcdefg, no decimal point)
-	static const uint8_t bcd_to_7seg[16] = {
+	static const uint8_t bcd_to_7seg[16] =
+	{
 		0x3f, // 0: 0b00111111
 		0x06, // 1: 0b00000110
 		0x5b, // 2: 0b01011011
@@ -281,7 +283,8 @@ void stella8085_state::output_digit(uint8_t i, uint8_t data)
 		0x71  // F: 0b01110001
 	};
 
-	if (i > 7) {
+	if (i > 7)
+	{
 		uint8_t debug = data & 0x0f;
 		uint8_t cash = data >> 4;
 
@@ -290,7 +293,7 @@ void stella8085_state::output_digit(uint8_t i, uint8_t data)
 	}
 }
 
-TIMER_CALLBACK_MEMBER( stella8085_state::sound_stop )
+TIMER_CALLBACK_MEMBER(stella8085_state::sound_stop)
 {
 	m_beep->set_state(0);
 }
@@ -302,7 +305,7 @@ void stella8085_state::rst65_w(uint8_t state)
 
 void stella8085_state::io00(uint8_t data)
 {
-	; //old boards
+	//old boards
 }
 
 uint8_t stella8085_state::io9r()
@@ -312,7 +315,7 @@ uint8_t stella8085_state::io9r()
 
 void stella8085_state::io9w(uint8_t data)
 {
-	; //old boards
+	//old boards
 }
 
 void stella8085_state::io70(uint8_t data)
@@ -333,13 +336,13 @@ void stella8085_state::io70(uint8_t data)
 	machine().bookkeeping().coin_counter_w(3,AW4);
 	machine().bookkeeping().coin_counter_w(5,SZ); // game counter
 
-	if (D6) {
-		;//LOG("Short test\n");
+	if (D6)
+	{
+		//LOG("Short test\n");
 	}
 
-	if (PA7) {
+	if (PA7)
 		LOG("PA7 high\n");
-	}
 }
 
 void stella8085_state::io71(uint8_t data)
@@ -354,7 +357,7 @@ void stella8085_state::io71(uint8_t data)
 	const bool UM = BIT(data,7);
 
 	// IO 71 D0 connected through CD4013 flipflop to DIP switch connected to RST55
-	if ( BIT(m_dsw->read(),3))
+	if (BIT(m_dsw->read(), 3))
 		m_maincpu->set_input_line(I8085_RST55_LINE, RS ? CLEAR_LINE : ASSERT_LINE);
 	else
 		m_maincpu->set_input_line(I8085_RST55_LINE, CLEAR_LINE);
@@ -378,7 +381,7 @@ void stella8085_state::sounddev(uint8_t data)
 
 void stella8085_state::io73(uint8_t data)
 {
-	; //old boards
+	//old boards
 }
 
 void stella8085_state::makesound(uint8_t tone, uint8_t octave, uint8_t length)
