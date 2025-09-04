@@ -399,7 +399,6 @@ void scorpion_state::video_start()
 {
 	spectrum_state::video_start();
 	m_screen_location = m_ram->pointer() + (5 << 14);
-	m_contention_pattern = {};
 }
 
 /* F4 Character Displayer */
@@ -488,6 +487,7 @@ void scorpion_state::scorpion(machine_config &config)
 	m_maincpu->nomreq_cb().remove();
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_scorpion);
+	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
 	SPEAKER(config.replace(), "speakers", 2).front();
 
