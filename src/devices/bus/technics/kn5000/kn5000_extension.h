@@ -3,8 +3,8 @@
 //
 // Generic Technics KN5000 extension slot
 
-#ifndef MAME_BUS_TECHNICS_KN5000_EXTENSION_H
-#define MAME_BUS_TECHNICS_KN5000_EXTENSION_H
+#ifndef MAME_BUS_TECHNICS_KN5000_KN5000_EXTENSION_H
+#define MAME_BUS_TECHNICS_KN5000_KN5000_EXTENSION_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ DECLARE_DEVICE_TYPE(KN5000_EXTENSION, kn5000_extension_connector)
 
 void kn5000_extension_intf(device_slot_interface &device);
 
-#endif // MAME_BUS_TECHNICS_KN5000_EXTENSION_H
+#endif // MAME_BUS_TECHNICS_KN5000_KN5000_EXTENSION_H
