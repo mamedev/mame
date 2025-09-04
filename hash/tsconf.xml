@@ -5,6 +5,8 @@ license:CC0-1.0
 -->
 <softwarelist name="tsconf" description="TS-Configuration (All Formats)">
 
+<!-- !Snapshots -->
+
 	<software name="alterego">
 		<description>Alter Ego</description>
 		<year>2011</year>
@@ -55,18 +57,6 @@ license:CC0-1.0
 		<part name="dump" interface="spectrum_snapshot">
 			<dataarea name="dump" size="13824">
 				<rom name="chase.spg" size="13824" crc="0b8b82fe" sha1="79a26756345f9178adb1305dbd5c31ea87d9f252" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="copter">
-		<description>Copter v0.1</description>
-		<year>2012</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Wizart"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="COPTER.trd" size="655360" crc="43236562" sha1="c4e3a9bcfd2387e954372a633f7415db368dbd4b" />
 			</dataarea>
 		</part>
 	</software>
@@ -221,23 +211,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ouk">
-		<description>Once Upon a Time in a Kingdom</description>
-		<year>201?</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Marie Slip"/>
-		<info name="developer" value="Colorizator"/>
-		<info name="developer" value="Devstratum, Graf Cherry"/>
-		<info name="developer" value="Mister Robin"/>
-		<info name="developer" value="Fatalsnipe"/>
-		<info name="developer" value="Karbafos"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="O.U.K (AY) last-cat.trd" size="655360" crc="5f84d0f7" sha1="c4e061dde0b4cc3244e994b51b1ed02ef8b56fbc" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pacpack">
 		<description>PacPack</description>
 		<year>2018</year>
@@ -315,21 +288,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="synchronization">
-		<description>Synchronization</description>
-		<year>201?</year>
-		<publisher>Robus</publisher>
-		<info name="developer" value="Hacker VBI"/>
-		<info name="developer" value="Robus"/>
-		<info name="developer" value="Mellona"/>
-		<info name="developer" value="n1k-o"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="SYNCHRO.TRD" size="655360" crc="8b99764d" sha1="022ea81b2f3e2154ee0fdd733dbe6ddc8a020ca6" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tcircles">
 		<description>T-circles</description>
 		<year>201?</year>
@@ -350,43 +308,6 @@ license:CC0-1.0
 		<part name="dump" interface="spectrum_snapshot">
 			<dataarea name="dump" size="3584">
 				<rom name="tetris.spg" size="3584" crc="335c998d" sha1="f730ea4eabb1b301bf8b8e2713bbf0ae2d3745fe" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tsdemo">
-		<description>TS-TechDemo</description>
-		<year>2013</year>
-		<publisher>Wizart/DT</publisher>
-		<info name="developer" value="Wizart"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="TSDemo.trd" size="655360" crc="c2e72fe4" sha1="fe99a846c9702c3c424daa8b6509458853bcf5ff" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tsolitaire">
-		<description>TSolitaire</description>
-		<year>201?</year>
-		<publisher>ERA Creative Group (Multinational)</publisher>
-		<info name="developer" value="Marie Slip"/>
-		<info name="developer" value="n1k-o"/>
-		<info name="developer" value="Black Cat"/>
-		<info name="developer" value="Inside"/>
-		<part name="v2_0_turbosound" interface="floppy_5_25">
-			<dataarea name="flop1" size="655360">
-				<rom name="TS v2.0(TFM)_edited.trd" size="655360" crc="05cf31ef" sha1="6a25e71b805c21410607f8c62a62198333ced2fd" />
-			</dataarea>
-		</part>
-		<part name="v2_0" interface="floppy_5_25">
-			<dataarea name="flop1" size="655360">
-				<rom name="TS v2.0_edited.trd" size="655360" crc="e4d026bb" sha1="a8bbb38f301cc588f3af0f8ed01f0822c7b38ab3" />
-			</dataarea>
-		</part>
-		<part name="v1_1" interface="floppy_5_25">
-			<dataarea name="flop1" size="655360">
-				<rom name="TSolv1.1.trd" size="655360" crc="0ec1c4da" sha1="5c0a0cb8c8043748b582750d0171d68d9ac4d6c7" />
 			</dataarea>
 		</part>
 	</software>
@@ -436,6 +357,90 @@ license:CC0-1.0
 		<part name="dump" interface="spectrum_snapshot">
 			<dataarea name="dump" size="18432">
 				<rom name="zenloops.spg" size="18432" crc="50f3a0e4" sha1="6a99fdac432f5467dc16bbb7374a7455eca9df19" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- !Floppies -->
+
+	<software name="copter">
+		<description>Copter v0.1</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Wizart"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="COPTER.trd" size="655360" crc="43236562" sha1="c4e3a9bcfd2387e954372a633f7415db368dbd4b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ouk">
+		<description>Once Upon a Time in a Kingdom</description>
+		<year>201?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Marie Slip"/>
+		<info name="developer" value="Colorizator"/>
+		<info name="developer" value="Devstratum, Graf Cherry"/>
+		<info name="developer" value="Mister Robin"/>
+		<info name="developer" value="Fatalsnipe"/>
+		<info name="developer" value="Karbafos"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="O.U.K (AY) last-cat.trd" size="655360" crc="5f84d0f7" sha1="c4e061dde0b4cc3244e994b51b1ed02ef8b56fbc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="synchronization">
+		<description>Synchronization</description>
+		<year>201?</year>
+		<publisher>Robus</publisher>
+		<info name="developer" value="Hacker VBI"/>
+		<info name="developer" value="Robus"/>
+		<info name="developer" value="Mellona"/>
+		<info name="developer" value="n1k-o"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="SYNCHRO.TRD" size="655360" crc="8b99764d" sha1="022ea81b2f3e2154ee0fdd733dbe6ddc8a020ca6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsdemo">
+		<description>TS-TechDemo</description>
+		<year>2013</year>
+		<publisher>Wizart/DT</publisher>
+		<info name="developer" value="Wizart"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="TSDemo.trd" size="655360" crc="c2e72fe4" sha1="fe99a846c9702c3c424daa8b6509458853bcf5ff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsolitaire">
+		<description>TSolitaire</description>
+		<year>201?</year>
+		<publisher>ERA Creative Group (Multinational)</publisher>
+		<info name="developer" value="Marie Slip"/>
+		<info name="developer" value="n1k-o"/>
+		<info name="developer" value="Black Cat"/>
+		<info name="developer" value="Inside"/>
+		<part name="v2_0_turbosound" interface="floppy_5_25">
+			<dataarea name="flop1" size="655360">
+				<rom name="TS v2.0(TFM)_edited.trd" size="655360" crc="05cf31ef" sha1="6a25e71b805c21410607f8c62a62198333ced2fd" />
+			</dataarea>
+		</part>
+		<part name="v2_0" interface="floppy_5_25">
+			<dataarea name="flop1" size="655360">
+				<rom name="TS v2.0_edited.trd" size="655360" crc="e4d026bb" sha1="a8bbb38f301cc588f3af0f8ed01f0822c7b38ab3" />
+			</dataarea>
+		</part>
+		<part name="v1_1" interface="floppy_5_25">
+			<dataarea name="flop1" size="655360">
+				<rom name="TSolv1.1.trd" size="655360" crc="0ec1c4da" sha1="5c0a0cb8c8043748b582750d0171d68d9ac4d6c7" />
 			</dataarea>
 		</part>
 	</software>
