@@ -67,10 +67,10 @@ def check_cpp_file(path: Path, fix: bool = False):
         if m and not is_screaming_snake(m.group(1)):
             errors.append((i, f"Macro '{m.group(1)}' should use SCREAMING_SNAKE_CASE"))
 
-        const_pattern = re.compile(r"\bconst\b[^;=()]*\b([A-Za-z_][A-Za-z0-9_]*)\b\s*(?:=|;)")
+        const_pattern = re.compile(r"\bconstexpr\b[^;=()]*\b([A-Za-z_][A-Za-z0-9_]*)\b\s*(?:=|;)")
         c = const_pattern.search(line)
         if c and not is_screaming_snake(c.group(1)):
-            errors.append((i, f"Constant '{c.group(1)}' should use SCREAMING_SNAKE_CASE"))
+            errors.append((i, f"Constant expression '{c.group(1)}' should use SCREAMING_SNAKE_CASE"))
 
         function_pattern = re.compile(r"\b([a-z][a-z0-9_]*)\s*\(")
         f = function_pattern.search(line)
