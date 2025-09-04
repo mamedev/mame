@@ -199,7 +199,7 @@ private:
 		I8256_BAUD_75,
 		I8256_BAUD_50
 	};
-	const int baudRates[16] = { 0, 0, 0, 19200, 9600, 4800, 2400, 1200, 600, 300, 200, 150, 110, 100, 75, 50 };
+	const int BAUD_RATES[16] = { 0, 0, 0, 19200, 9600, 4800, 2400, 1200, 600, 300, 200, 150, 110, 100, 75, 50 };
 
 	enum
 	{
@@ -208,7 +208,7 @@ private:
 		I8256_SCLK_DIV2, // 2.048 MHz
 		I8256_SCLK_DIV1  // 1.024 MHz
 	};
-	const char sysclockDivider[4] = {5,3,2,1};
+	const char SYSCLOCK_DIVIDER[4] = {5,3,2,1};
 
 	enum
 	{
@@ -234,7 +234,7 @@ private:
 		I8256_INT_TIMER5
 	};
 
-	const char timer_interrupt[5] = {I8256_INT_TIMER1, I8256_INT_TIMER2, I8256_INT_TIMER3, I8256_INT_TIMER4, I8256_INT_TIMER5};
+	const char TIMER_INTERRUPTS[5] = {I8256_INT_TIMER1, I8256_INT_TIMER2, I8256_INT_TIMER3, I8256_INT_TIMER4, I8256_INT_TIMER5};
 
 	enum
 	{
