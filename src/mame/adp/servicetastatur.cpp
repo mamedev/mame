@@ -103,6 +103,8 @@ private:
 	uint8_t gsg_r(offs_t offset);
 	void gsg_w(offs_t offset, uint8_t data);
 
+	void clk_in(bool newval);
+
 	void servicet_io(address_map &map) ATTR_COLD;
 	void servicet_map(address_map &map) ATTR_COLD;
 
@@ -328,13 +330,11 @@ void servicet_state::gsg_w(offs_t offset, uint8_t data)
 	}
 }
 
-void clk_in(bool newval)
+void servicet_state::clk_in(bool newval)
 {
 	m_u13 = 0xff;
 	m_u19 = 0xff;
 	m_u20 = 0xff;
-	
-	
 }
 
 void servicet_state::servicet(machine_config &config)
