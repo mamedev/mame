@@ -173,7 +173,7 @@ void i8256_device::write(offs_t offset, u8 data)
 					LOG("I8256 Enabled 8086 mode\n");
 
 				m_data_bits_count = 8-((BIT(m_command1, I8256_CMD1_L0)) | (BIT(m_command1, I8256_CMD1_L1) << 1));
-				m_stop_bits = stopBits[(BIT(m_command1, I8256_CMD1_S0)) | (BIT(m_command1, I8256_CMD1_S1) << 1)];
+				m_stop_bits = stop_bits[(BIT(m_command1, I8256_CMD1_S0)) | (BIT(m_command1, I8256_CMD1_S1) << 1)];
 
 				set_data_frame(1, m_data_bits_count, m_parity, m_stop_bits);
 			}
