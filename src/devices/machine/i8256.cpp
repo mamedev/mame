@@ -258,9 +258,9 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 		if (m_timers[i] > 0)
 		{
 			m_timers[i]--;
-			if (m_timers[i] == 0 && BIT(m_interrupts,timer_interrupt[i])) // If the interrupt is enabled
+			if (m_timers[i] == 0 && BIT(m_interrupts,TIMER_INTERRUPTS[i])) // If the interrupt is enabled
 			{
-				m_current_interrupt_level = timer_interrupt[i];
+				m_current_interrupt_level = TIMER_INTERRUPTS[i];
 				m_out_int_cb(1); // it occurs when the counter changes from 1 to 0.
 			}
 		}
@@ -337,11 +337,11 @@ void i8256_device::write(offs_t offset, u8 data)
 
 				if (BIT(m_command1,I8256_CMD1_FRQ))
 				{
-					m_timer->adjust(attotime::from_hz((clock() / sysclockDivider[(m_command2 & 0x30 >> 4)]) / 1024), 0, attotime::from_hz((clock() / sysclockDivider[(m_command2 & 0x30 >> 4)]) / 1024));
+					m_timer->adjust(attotime::from_hz((clock() / SYSCLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]) / 1024), 0, attotime::from_hz((clock() / SYSCLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]) / 1024));
 				}
 				else
 				{
-					m_timer->adjust(attotime::from_hz((clock() / sysclockDivider[(m_command2 & 0x30 >> 4)]) / 64), 0, attotime::from_hz((clock() / sysclockDivider[(m_command2 & 0x30 >> 4)]) / 64));
+					m_timer->adjust(attotime::from_hz((clock() / SYSCLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]) / 64), 0, attotime::from_hz((clock() / SYSCLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]) / 64));
 				}
 
 				if (BIT(m_command1,I8256_CMD1_8086))
@@ -474,8 +474,8 @@ void i8256_device::receive_clock()
 	// receive enable?
 	if (BIT(m_command3, I8256_CMD3_RxE))
 	{
-		const bool sync = is_receive_register_synchronized();
-		if (sync)
+		const bool SYNC = is_receive_register_synchronized();
+		if (SYNC)
 		{
 			--m_rxc_count;
 			if (m_rxc_count)
@@ -487,7 +487,7 @@ void i8256_device::receive_clock()
 		//LOGBITS("8256: Rx Sampled %d\n", m_rxd);
 		receive_register_update_bit(m_rxd);
 		if (is_receive_register_synchronized())
-			m_rxc_count = sync ? m_br_factor : (3 * m_br_factor / 2);
+			m_rxc_count = SYNC ? m_br_factor : (3 * m_br_factor / 2);
 
 		if (is_receive_register_full())
 		{
