@@ -245,7 +245,7 @@ u8 bbl380_state::spi_r()
 
 void bbl380_state::bbl380_map(address_map &map)
 {
-	map(0x0000000, 0x03fffff).rom().region("maincpu", 0);
+	map(0x0002000, 0x0003fff).rom().region("maincpu", 0);
 	map(0x1800000, 0x1800000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
 	map(0x1804000, 0x1804000).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
 }
@@ -294,7 +294,7 @@ void bbl380_state::bbl380_do_maincpu_config()
 
 void bbl380_state::bbl380(machine_config &config)
 {
-	ST2302U(config, m_maincpu, 32000000);  // 32Mhz clock correct for music tempo. SoC type not confirmed
+	ST2302U(config, m_maincpu, 32'000'000);  // 32MHz clock correct for music tempo. SoC type not confirmed
 	SPEAKER(config, "mono").front_center();
 
 	bbl380_do_maincpu_config();
@@ -323,19 +323,19 @@ void bbl380_state::bbl380_menuprot(machine_config &config)
 void bbl380_state::bbl380_24mhz(machine_config &config)
 {
 	bbl380(config);
-	ST2302U(config.replace(), m_maincpu, 24000000); // 24Mhz clock correct for music tempo. SoC type not confirmed
+	ST2302U(config.replace(), m_maincpu, 24'000'000); // 24MHz clock correct for music tempo. SoC type not confirmed
 	bbl380_do_maincpu_config();
 }
 
 // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
 #define INTERNAL_ROM_TYPE1 \
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF) \
-	ROM_LOAD("st2x_internal_type1.bin", 0x002000, 0x002000, CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941))
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF) \
+	ROM_LOAD("st2x_internal_type1.bin", 0x0000, 0x2000, CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941))
 
 // internal OTPROM BIOS, dumped from retro150a PCB, 6000-7fff range
 #define INTERNAL_ROM_TYPE2 \
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF) \
-	ROM_LOAD("st2x_internal_type2.bin", 0x002000, 0x002000, CRC(32d96794) SHA1(9d7e3e284f1656d8b2f7dae754cab1f82b3a1d61))
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF) \
+	ROM_LOAD("st2x_internal_type2.bin", 0x0000, 0x2000, CRC(32d96794) SHA1(9d7e3e284f1656d8b2f7dae754cab1f82b3a1d61))
 
 
 // sets with unknown version of internal ROM
