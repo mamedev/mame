@@ -530,14 +530,8 @@ TIMER_CALLBACK_MEMBER(via6522_device::t1_tick)
 	if (T1_CONTINUOUS(m_acr))
 	{
 		if (TIMER1_VALUE > 0)
-		{
 			m_t1_pb7 = !m_t1_pb7;
-			m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
-		}
-		else
-		{
-			m_t1_active = 0;
-		}
+		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
 	}
 	else
 	{
