@@ -61,21 +61,28 @@ template<int Width, int AddrShift> memory_units_descriptor<Width, AddrShift>::me
 	umasks[handler_entry::END]                      &= emask;
 	umasks[handler_entry::START|handler_entry::END] &= smask & emask;
 
+	if(m_addrstart == m_addrend)
+		umasks[0] = umasks[handler_entry::START] = umasks[handler_entry::END] = umasks[handler_entry::START|handler_entry::END];
+		
+		
 	for(u32 i=0; i<4; i++)
 		m_keymap[i] = mask_to_ukey<uX>(umasks[i]);
-
+	
 	// Compute the shift
+	uX umask = umasks[m_addrstart == m_addrend ? handler_entry::START|handler_entry::END : 0];
 	uX dmask = make_bitmask<uX>(bits_per_access);
 	u32 active_count = 0;
+	s8 shift_base = -1;
 	for(u32 i=0; i != 8 << Width; i += bits_per_access)
-		if(unitmask & (dmask << i))
+		if(umask & (dmask << i)) {
 			active_count ++;
+			if(shift_base == -1)
+				shift_base = i;
+		}
 	u32 active_count_log = active_count == 1 ? 0 : active_count == 2 ? 1 : active_count == 4 ? 2 : active_count == 8 ? 3 : 0xff;
 	if(active_count_log == 0xff)
 		abort();
-	s8 base_shift = Width - access_width - active_count_log;
-	s8 shift = base_shift + access_width + AddrShift;
-
+	s8 shift = active_count_log + AddrShift;
 
 	// Build the handler characteristics
 	m_handler_start = shift < 0 ? addrstart << -shift : addrstart >> shift;
@@ -83,10 +90,10 @@ template<int Width, int AddrShift> memory_units_descriptor<Width, AddrShift>::me
 
 	for(u32 i=0; i<4; i++)
 		if(m_entries_for_key.find(m_keymap[i]) == m_entries_for_key.end())
-			generate(m_keymap[i], unitmask, umasks[i], cswidth, bits_per_access, base_shift, shift, active_count);
+			generate(m_keymap[i], unitmask, umasks[i], cswidth, bits_per_access, shift, active_count);
 }
 
-template<int Width, int AddrShift> void memory_units_descriptor<Width, AddrShift>::generate(u8 ukey, emu::detail::handler_entry_size_t<Width> gumask, emu::detail::handler_entry_size_t<Width> umask, u32 cswidth, u32 bits_per_access, u8 base_shift, s8 shift, u32 active_count)
+template<int Width, int AddrShift> void memory_units_descriptor<Width, AddrShift>::generate(u8 ukey, emu::detail::handler_entry_size_t<Width> gumask, emu::detail::handler_entry_size_t<Width> umask, u32 cswidth, u32 bits_per_access, s8 shift, u32 active_count)
 {
 	auto &entries = m_entries_for_key[ukey];
 
