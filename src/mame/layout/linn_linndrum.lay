@@ -216,21 +216,19 @@ copyright-holders:m1macrophage
 		</rect>
 	</element>
 
+	<element name="transparent"><rect><color red="0.0" green="0.0" blue="0.0" alpha="0.0"/></rect></element>
 	<element name="knob_outer"><disk><color red="0.17" green="0.16" blue="0.18"/></disk></element>
 	<element name="knob_inner"><disk><color red="0.23" green="0.22" blue="0.24"/></disk></element>
-	<element name="knob_value_background"><rect><color red="0.0" green="0.0" blue="0.0" alpha="0.0"/></rect></element>
 	<element name="knob_value">
 		<simplecounter maxstate="100" digits="1"><color red="1.0" green="0.5" blue="0.2"/></simplecounter>
 	</element>
 	<group name="knob">
 		<element ref="knob_outer" id="knob_~knob_input~"><bounds x="0" y="0" width="68" height="68"/></element>
 		<element ref="knob_inner"><bounds x="9" y="9" width="50" height="50"/></element>
-		<element ref="knob_value_background" clickthrough="no">
-			<bounds x="17" y="22" width="34" height="24"/>
-		</element>
 		<element ref="knob_value" inputtag="~knob_input~" inputmask="0x7f" inputraw="yes">
 			<bounds x="17" y="22" width="34" height="24"/>
 		</element>
+		<element ref="transparent" clickthrough="no"><bounds x="17" y="22" width="34" height="24"/></element>
 	</group>
 
 	<element name="slider_area"><rect><color red="0.0" blue="0.0" green="0.0" alpha="0.0"/></rect></element>

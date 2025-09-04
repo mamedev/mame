@@ -748,12 +748,11 @@ the visibility and style of elements that differ between the two.
 		<element ref="txt_slow"><bounds x="1338" y="612" width="42" height="15"/></element>
 		<element ref="txt_fast"><bounds x="1477" y="612" width="42" height="15"/></element>
 		<element ref="tempo_well"><bounds x="1366" y="480" width="130" height="130"/></element>
-		<element ref="tempo_knob" id="tempo_knob" clickthrough="no">
-			<bounds x="1381" y="495" width="100" height="100"/>
-		</element>
+		<element ref="tempo_knob" id="tempo_knob"><bounds x="1381" y="495" width="100" height="100"/></element>
 		<element ref="tempo_value" inputtag="TEMPO" inputmask="0x7f" inputraw="yes">
 			<bounds x="1386" y="533" width="90" height="24"/>
 		</element>
+		<element ref="transparent" clickthrough="no"><bounds x="1381" y="495" width="100" height="100"/></element>
 
 
 		<!-- Scales -->
