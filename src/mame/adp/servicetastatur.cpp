@@ -143,19 +143,34 @@ void servicet_state::servicet_io(address_map &map)
 
 static INPUT_PORTS_START( servicet )
 	PORT_START("IN0") // P1.0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START) PORT_NAME("OK")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("F4")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN1") // P1.1
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2") // P1.2
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("F3")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("F1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("F2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P3") // P3
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -200,20 +215,17 @@ uint8_t servicet_state::port1_r()
 	{
 	case 0xfb:
 	{
-		uint8_t keys = m_io_keys[2]->read(); // F3, F1, F2
-		data &= ~(keys & 0x70);
+		data = ioport("IN2")->read(); // F3, F1, F2
 		break;
 	}
 	case 0xfd:
 	{
-		uint8_t keys = m_io_keys[1]->read(); // Right, Left, Down
-		data &= ~(keys & 0x70);
+		data = ioport("IN1")->read(); // Right, Left, Down
 		break;
 	}
 	case 0xfe:
 	{
-		uint8_t keys = m_io_keys[0]->read(); // OK, F4, Up
-		data &= ~(keys & 0x70);
+		data = ioport("IN0")->read(); // OK, F4, Up
 		break;
 	}
 	case 0xff:
@@ -223,6 +235,7 @@ uint8_t servicet_state::port1_r()
 	}
 	default:
 		logerror("Invalid write to P1 %02d",data);
+		clk_in(true); //warning go away
 		break;
 	}
 
