@@ -6,8 +6,6 @@ Victor 9000 / ACT Sirius 1 emulation
 
 TODO:
 - contrast
-- some software sets timer 1 counter to 0 to silence the audio, this causes a
-  high-pitched whine in MAME
 - expansion bus:
   * Z80 card
   * RAM cards
@@ -906,4 +904,4 @@ ROM_END
 //******************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                     FULLNAME       FLAGS
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS )
