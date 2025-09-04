@@ -530,14 +530,7 @@ TIMER_CALLBACK_MEMBER(via6522_device::t1_tick)
 	if (T1_CONTINUOUS (m_acr))
 	{
 		m_t1_pb7 = !m_t1_pb7;
-		if (TIMER1_VALUE > 0)
-		{
-			m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
-		}
-		else
-		{
-			m_t1_active = 0;
-		}
+		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
 	}
 	else
 	{
@@ -936,15 +929,8 @@ void via6522_device::write(offs_t offset, u8 data)
 			output_pb();
 		}
 
-		if (TIMER1_VALUE > 0)
-		{
-			m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
-			m_t1_active = 1;
-		}
-		else
-		{
-			m_t1_active = 0;
-		}
+		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
+		m_t1_active = 1;
 		break;
 
 	case VIA_T2CL:
