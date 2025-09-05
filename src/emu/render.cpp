@@ -1300,13 +1300,13 @@ void render_target::update_pointer_fields()
 	}
 
 	// update field state
-	for (int state = 0; state < 2; state++)
+	for (int state = 0; 2 > state; ++state)
 	{
 		for (size_t i = 0; m_clickable_items.size() > i; ++i)
 		{
-			layout_view_item const &item(current_view().interactive_items()[i]);
 			if (bool(state) != bool(prev_hit[i]) && bool(state) == bool(m_clickable_items[i].hit))
 			{
+				layout_view_item const &item(current_view().interactive_items()[i]);
 				auto const [port, mask] = item.input_tag_and_mask();
 				ioport_field *const field(port ? port->field(mask) : nullptr);
 				if (field)
