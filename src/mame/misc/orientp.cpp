@@ -41,6 +41,7 @@ Need Layout as and Add segment display as marywu.cpp
 #include "emu.h"
 
 #include "cpu/mcs51/mcs51.h"
+#include "machine/nvram.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
@@ -181,8 +182,8 @@ void orientalpearl_state::program_map(address_map &map)
 
 void orientalpearl_state::io_map(address_map &map)
 {
-//  map(0xe400, 0xe400).rw 
-	map(0xf800, 0xf803).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+    map(0xd800, 0xf7ff).ram().share("nvram"); // might be wrong
+    map(0xf800, 0xf803).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf900, 0xf903).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfa00, 0xfa01).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xfb02, 0xfb03).w("ay1", FUNC(ay8910_device::address_data_w));
@@ -214,7 +215,9 @@ void orientalpearl_state::orientp(machine_config &config)
 	i8052_device &maincpu(I8052(config, "maincpu", XTAL(10'738'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &orientalpearl_state::program_map);
 	maincpu.set_addrmap(AS_IO, &orientalpearl_state::io_map);
-   	
+   
+    NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	
 	i8051_device &mcu(I8051(config, "mcu", XTAL(10'738'000)));
     mcu.set_addrmap(AS_PROGRAM, &orientalpearl_state::mcu_map);
 	mcu.set_addrmap(AS_IO, &orientalpearl_state::mcu_io_map);
