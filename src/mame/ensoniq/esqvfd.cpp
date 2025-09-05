@@ -10,10 +10,12 @@
 
 #include "esq1by22.lh"
 #include "esq2by40.lh"
+#include "nec_fip80b5r.lh"
 
 DEFINE_DEVICE_TYPE(ESQ1X22,     esq1x22_device,     "esq1x22",     "Ensoniq 1x22 VFD")
 DEFINE_DEVICE_TYPE(ESQ2X40,     esq2x40_device,     "esq2x40",     "Ensoniq 2x40 VFD")
 DEFINE_DEVICE_TYPE(ESQ2X40_SQ1, esq2x40_sq1_device, "esq2x40_sq1", "Ensoniq 2x40 VFD (SQ-1 variant)")
+DEFINE_DEVICE_TYPE(ESQ2X40_VFX, esq2x40_vfx_device, "esq2x40_vfx", "Ensoniq 2x40 VFD (VFX Family variant)")
 
 // adapted from bfm_bd1, rearranged to work with ASCII data used by the Ensoniq h/w
 static const uint16_t font[]=
@@ -114,6 +116,127 @@ static const uint16_t font[]=
 	0x0226, // 0000 0010 0010 0110 ].
 	0x0810, // 0000 1000 0001 0000 ~.
 	0x0000, // 0000 0000 0000 0000 (DEL)
+};
+
+/**
+ * The font used by the VFX family on the NEC FIP80B5R display, including 
+ * VFX-family-specific characters sich as digits followed by a period / decimal point.
+ * Arranged to match this, fairly arbitrarily chosen, order of segments:
+ * 
+ *     ---- 0 ----
+ *    |\    |    /|
+ *    | \   |   / |
+ *    5  4  3  2  1
+ *    |   \ | /   |
+ *    |    \|/    |
+ *     --7-- --6--
+ *    |    /|\    |
+ *    |   / | \   |
+ *   12 11 10  9  8
+ *    | /   |   \ |
+ *    |/    |    \|
+ *     ----13-----  *14
+ * 
+ *    -----15-----
+ * 
+ */
+static const uint16_t font_vfx[] = {
+	0x0000, //  0000 0000 0000 0000 SPACE
+	0x7927, //  0011 1001 0010 0111 '0.'
+	0x0028, //  0000 0000 0010 1000 '"'
+	0x4408, //  0000 0100 0000 1000 '1.'
+	0x25e9, //  0010 0101 1110 1001 '$'
+	0x70c3, //  0011 0000 1100 0011 '2.'
+	0x0000, //  0000 0000 0000 0000 '&'
+	0x0010, //  0000 0000 0001 0000 '''
+	0x61c3, //  0010 0001 1100 0011 '3.'
+	0x41e2, //  0000 0001 1110 0010 '4.'
+	0x0edc, //  0000 1110 1101 1100 '*'
+	0x04c8, //  0000 0100 1100 1000 '+'
+	0x0000, //  0000 0000 0000 0000 ','
+	0x00c0, //  0000 0000 1100 0000 '-'
+	0x4000, //  0100 0000 0000 0000 '.'
+	0x0804, //  0000 1000 0000 0100 '/'
+	0x3927, //  0011 1001 0010 0111 '0'
+	0x0408, //  0000 0100 0000 1000 '1'
+	0x30c3, //  0011 0000 1100 0011 '2'
+	0x21c3, //  0010 0001 1100 0011 '3'
+	0x01e2, //  0000 0001 1110 0010 '4'
+	0x21e1, //  0010 0001 1110 0001 '5'
+	0x31e1, //  0011 0001 1110 0001 '6'
+	0x0103, //  0000 0001 0000 0011 '7'
+	0x31e3, //  0011 0001 1110 0011 '8'
+	0x21e3, //  0010 0001 1110 0011 '9'
+	0x0000, //  0000 0000 0000 0000 ':'
+	0x71e1, //  0011 0001 1110 0001 '6.'
+	0x0204, //  0000 0010 0000 0100 '('
+	0x20c0, //  0010 0000 1100 0000 '='
+	0x0810, //  0000 1000 0001 0000 ')'
+	0x0000, //  0000 0000 0000 0000 '?'
+	0x3583, //  0011 0101 1000 0011 '@'
+	0x11e3, //  0001 0001 1110 0011 'A'
+	0x254b, //  0010 0101 0100 1011 'B'
+	0x3021, //  0011 0000 0010 0001 'C'
+	0x250b, //  0010 0101 0000 1011 'D'
+	0x30e1, //  0011 0000 1110 0001 'E'
+	0x10e1, //  0001 0000 1110 0001 'F'
+	0x3161, //  0011 0001 0110 0001 'G'
+	0x11e2, //  0001 0001 1110 0010 'H'
+	0x2409, //  0010 0100 0000 1001 'I'
+	0x3102, //  0011 0001 0000 0010 'J'
+	0x12a4, //  0001 0010 1010 0100 'K'
+	0x3020, //  0011 0000 0010 0000 'L'
+	0x1136, //  0001 0001 0011 0110 'M'
+	0x1332, //  0001 0011 0011 0010 'N'
+	0x3123, //  0011 0001 0010 0011 'O'
+	0x10e3, //  0001 0000 1110 0011 'P'
+	0x3323, //  0011 0011 0010 0011 'Q'
+	0x12e3, //  0001 0010 1110 0011 'R'
+	0x21e1, //  0010 0001 1110 0001 'S'
+	0x0409, //  0000 0100 0000 1001 'T'
+	0x3122, //  0011 0001 0010 0010 'U'
+	0x1824, //  0001 1000 0010 0100 'V'
+	0x1b22, //  0001 1011 0010 0010 'W'
+	0x0a14, //  0000 1010 0001 0100 'X'
+	0x0414, //  0000 0100 0001 0100 'Y'
+	0x2805, //  0010 1000 0000 0101 'Z'
+	0x3021, //  0011 0000 0010 0001 '['
+	0x71e3, //  0011 0001 1110 0011 '8.'
+	0x2103, //  0010 0001 0000 0011 ']'
+	0x0a00, //  0000 1010 0000 0000 '^'
+	0x2000, //  0010 0000 0000 0000 '_'
+	0x0010, //  0000 0000 0001 0000 '`'
+	0x11e3, //  0001 0001 1110 0011 'a'
+	0x254b, //  0010 0101 0100 1011 'b'
+	0x3021, //  0011 0000 0010 0001 'c'
+	0x250b, //  0010 0101 0000 1011 'd'
+	0x30e1, //  0011 0000 1110 0001 'e'
+	0x10e1, //  0001 0000 1110 0001 'f'
+	0x3161, //  0011 0001 0110 0001 'g'
+	0x11e2, //  0001 0001 1110 0010 'h'
+	0x2409, //  0010 0100 0000 1001 'i'
+	0x3102, //  0011 0001 0000 0010 'j'
+	0x12a4, //  0001 0010 1010 0100 'k'
+	0x3020, //  0011 0000 0010 0000 'l'
+	0x1136, //  0001 0001 0011 0110 'm'
+	0x1332, //  0001 0011 0011 0010 'n'
+	0x3123, //  0011 0001 0010 0011 'o'
+	0x10e3, //  0001 0000 1110 0011 'p'
+	0x3323, //  0011 0011 0010 0011 'q'
+	0x12e3, //  0001 0010 1110 0011 'r'
+	0x21e1, //  0010 0001 1110 0001 's'
+	0x0409, //  0000 0100 0000 1001 't'
+	0x3122, //  0011 0001 0010 0010 'u'
+	0x1824, //  0001 1000 0010 0100 'v'
+	0x1b22, //  0001 1011 0010 0010 'w'
+	0x0a14, //  0000 1010 0001 0100 'x'
+	0x0414, //  0000 0100 0001 0100 'y'
+	0x2805, //  0010 1000 0000 0101 'z'
+	0x3021, //  0011 0000 0010 0001 '{'
+	0x0408, //  0000 0100 0000 1000 '|'
+	0x2103, //  0010 0001 0000 0011 '}'
+	0x0a00, //  0000 1010 0000 0000 '~'
+	0x0000, //  0000 0000 0000 0000 DEL
 };
 
 esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dimensions_param &&dimensions) :
@@ -262,44 +385,76 @@ void esq2x40_device::write_char(uint8_t data)
 	update_display();
 }
 
-bool esq2x40_device::write_contents(std::ostream &o)
-{
-	o.put((char) 0xd6); // clear screen
-
-	uint8_t attrs = 0;
-	for (int row = 0; row < 2; row++)
-	{
-		o.put((char) (0x80 + (40 * row))); // move to first column this row
-
-		for (int col = 0; col < 40; col++)
-		{
-			if (m_attrs[row][col] != attrs)
-			{
-				attrs = m_attrs[row][col];
-
-				o.put((char) 0xd1); // all attributes off
-
-				if (attrs & AT_BLINK)
-				{
-					o.put((char) 0xd0); // blink on
-				}
-
-				if (attrs & AT_UNDERLINE)
-				{
-					o.put((char) 0xd3); // underline
-				}
-			}
-
-			o.put((char) (m_chars[row][col] + ' '));
-		}
-	}
-	return true;
-}
-
-
 esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	esqvfd_device(mconfig, ESQ2X40, tag, owner, clock, make_dimensions<2, 40>(*this))
 {
+}
+
+/*
+ * VFX-family specifics:
+ * This device leavs the handling of commands to the esqpanel subclass that uses this vfd,
+ * and instead simply focuses on storing and displaying the characters with their attributes.
+ * 
+ */ 
+
+esq2x40_vfx_device::esq2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	esqvfd_device(mconfig, ESQ2X40, tag, owner, clock, make_dimensions<2, 40>(*this))
+{
+}
+
+void esq2x40_vfx_device::set_char(uint8_t row, uint8_t column, uint8_t c, uint8_t attr) {
+	m_chars[row][column] = c;
+	m_attrs[row][column] = attr;
+	m_dirty[row][column] = true;
+
+	update_display();
+}
+
+void esq2x40_vfx_device::clear() {
+	memset(m_chars, 0, sizeof(m_chars));
+	memset(m_attrs, 0, sizeof(m_attrs));
+	memset(m_dirty, 1, sizeof(m_dirty));
+
+	update_display();
+}
+
+void esq2x40_vfx_device::update_display()
+{
+	for (int row = 0; row < m_rows; row++)
+	{
+		for (int col = 0; col < m_cols; col++)
+		{
+			if (m_dirty[row][col])
+			{
+				uint32_t segdata = font_vfx[m_chars[row][col]];
+				auto attr = m_attrs[row][col];
+				auto underline = (attr & AT_UNDERLINE) && (!(attr & AT_BLINK) || m_blink_on);
+
+				// digits:
+				m_vfds->set((row * m_cols) + col, segdata | (underline ? 0x8000 : 0));
+
+				m_dirty[row][col] = 0;
+			}
+		}
+	}
+}
+
+void esq2x40_vfx_device::device_add_mconfig(machine_config &config)
+{
+	config.set_default_layout(layout_nec_fip80b5r);
+}
+
+void esq2x40_vfx_device::set_blink_on(bool blink_on) {
+	m_blink_on = blink_on;
+
+	for (int row = 0; row < m_rows; row++)
+	{
+		for (int col = 0; col < m_cols; col++)
+		{
+			m_dirty[row][col] |= m_attrs[row][col] & AT_BLINK;
+		}
+	}
+	update_display();
 }
 
 /* 1x22 display from the VFX (not right, but it'll do for now) */
@@ -308,7 +463,6 @@ void esq1x22_device::device_add_mconfig(machine_config &config)
 {
 	config.set_default_layout(layout_esq1by22);
 }
-
 
 void esq1x22_device::write_char(uint8_t data)
 {

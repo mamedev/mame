@@ -36,7 +36,7 @@ protected:
 
 	typedef std::tuple<output_helper::ptr, int, int> dimensions_param;
 
-	template <int R, int C> static dimensions_param make_dimensions(device_t &device) { return dimensions_param(std::make_unique<output_helper_impl<2 * R * C> >(device), R, C); }
+	template <int R, int C> static dimensions_param make_dimensions(device_t &device) { return dimensions_param(std::make_unique<output_helper_impl<R * C> >(device), R, C); }
 
 	esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dimensions_param &&dimensions);
 
@@ -77,11 +77,35 @@ public:
 	esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_char(uint8_t data) override;
-	virtual bool write_contents(std::ostream &o) override;
+
+	template <int R, int C> static dimensions_param make_dimensions(device_t &device) { return dimensions_param(std::make_unique<output_helper_impl<2 * R * C> >(device), R, C); }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
+
+// Include VFX-family-specifics
+class esq2x40_vfx_device : public esqvfd_device {
+public:
+	esq2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void set_char(uint8_t row, uint8_t column, uint8_t c, uint8_t attr);
+	virtual uint8_t get_attr(uint8_t row, uint8_t column) { return m_attrs[row][column]; }
+	virtual uint8_t get_char(uint8_t row, uint8_t column) { return m_chars[row][column]; }
+	virtual void clear();
+	virtual void set_blink_on(bool blink_on);
+	virtual void update_display() override;
+
+	virtual void write_char(uint8_t data) override { /* no-op*/ }
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	bool m_blink_on = false;
+};
+
 
 class esq2x40_sq1_device : public esqvfd_device {
 public:
@@ -99,5 +123,6 @@ private:
 DECLARE_DEVICE_TYPE(ESQ1X22,     esq1x22_device)
 DECLARE_DEVICE_TYPE(ESQ2X40,     esq2x40_device)
 DECLARE_DEVICE_TYPE(ESQ2X40_SQ1, esq2x40_sq1_device)
+DECLARE_DEVICE_TYPE(ESQ2X40_VFX, esq2x40_vfx_device)
 
 #endif // MAME_ENSONIQ_ESQVFD_H

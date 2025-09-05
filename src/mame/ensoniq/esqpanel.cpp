@@ -146,24 +146,82 @@ namespace esqpanel {
 			}
 		}
 
-		void send_to_all(char c)
+		void send(const std::string &s, http_manager::websocket_connection_ptr conn = nullptr)
 		{
-			// printf("server: send_to_all(%02x)\n", ((unsigned int) c) & 0xff);
 			std::lock_guard<std::recursive_mutex> lock(m_mutex);
-			// printf("server: sending '%02x' to all\n", ((unsigned int) c) & 0xff);
-			m_to_send.str("");
-			m_to_send.put('D');
-			m_to_send.put(c);
-			const std::string &s = m_to_send.str();
 
-			for (const auto &iter: m_panels)
-			{
-				external_panel_ptr panel = iter.second;
-				if (panel->send_display_data())
+			if (conn) {
+				// sending this only to a single connection that needs a large update
+				send(conn, s);
+			} else {
+				for (const auto &iter: m_panels)
 				{
-					send(iter.first, s);
+					external_panel_ptr panel = iter.second;
+					if (panel->send_display_data())
+					{
+						send(iter.first, s);
+					}
 				}
 			}
+		}
+
+		void clear_display(http_manager::websocket_connection_ptr conn = nullptr)
+		{
+			send("DX", conn);
+		}
+
+		void set_char(uint8_t row, uint8_t column, uint8_t c, bool underline, bool blink, http_manager::websocket_connection_ptr conn = nullptr)
+		{
+			std::ostringstream os;
+			os << "DC" << static_cast<int>(row) << " " << static_cast<int>(column) << " " << static_cast<int>(c) << " " << underline << " " << blink;
+			send(os.str(), conn);
+		}
+
+		void set_light(uint8_t light, uint8_t state, http_manager::websocket_connection_ptr conn = nullptr) 
+		{
+			std::ostringstream os;
+			os << "L" << static_cast<int>(light) << " " << static_cast<int>(state);
+			send(os.str(), conn);
+		}
+
+		void button_down(uint8_t button, http_manager::websocket_connection_ptr conn = nullptr)
+		{
+			std::ostringstream os;
+			os << "BD " << static_cast<int>(button);
+			send(os.str(), conn);
+		}
+
+		void button_up(uint8_t button, http_manager::websocket_connection_ptr conn = nullptr)
+		{
+			std::ostringstream os;
+			os << "BU " << static_cast<int>(button);
+			send(os.str(), conn);
+		}
+
+		void set_button(uint8_t button, bool pressed, http_manager::websocket_connection_ptr conn = nullptr)
+		{ 
+			if (pressed)
+			{
+				button_down(button, conn);
+			}
+			else
+			{
+				button_up(button, conn);
+			}
+		}
+
+		void set_analog_value(uint8_t channel, int value, http_manager::websocket_connection_ptr conn = nullptr)
+		{
+			std::ostringstream os;
+			os << "A" << static_cast<int>(channel) << " " << value;
+			send(os.str(), conn);
+		}
+
+		void set_blink_phase(uint8_t phase)
+		{
+			std::ostringstream os;
+			os << "P" << static_cast<int>(phase);
+			send(os.str());
 		}
 
 		void on_open(http_manager::websocket_connection_ptr connection)
@@ -188,7 +246,7 @@ namespace esqpanel {
 				if ((changed & message_type::DISPLAY) && panel->send_display_data())
 				{
 					// printf("server: control message, sending contents\n");
-					send_contents(connection);
+					send_display_contents(connection);
 				}
 
 				if ((changed & message_type::ANALOG) && panel->send_analog_values())
@@ -305,9 +363,19 @@ namespace esqpanel {
 			}
 		}
 
-		void set_content_provider(std::function<bool(std::ostream&)> provider)
+		void set_send_display_contents(std::function<void(http_manager::websocket_connection_ptr)> fun)
 		{
-			m_content_provider = provider;
+			m_send_display_contents = fun;
+		}
+
+		void set_send_analog_values(std::function<void(http_manager::websocket_connection_ptr)> fun)
+		{
+			m_send_analog_values = fun;
+		}
+
+		void set_send_button_states(std::function<void(http_manager::websocket_connection_ptr)> fun)
+		{
+			m_send_button_states = fun;
 		}
 
 		void set_keyboard(const std::string &keyboard)
@@ -349,27 +417,28 @@ namespace esqpanel {
 			connection->send_message(s, websocket_opcode::binary);
 		}
 
-		void send_contents(http_manager::websocket_connection_ptr connection)
+		void send_display_contents(http_manager::websocket_connection_ptr connection)
 		{
-			if (m_content_provider)
+			if (m_send_display_contents) 
 			{
-				m_to_send.str("");
-				m_to_send.put('D');
-				if (m_content_provider(m_to_send))
-				{
-					send(connection, m_to_send.str());
-				}
+				m_send_display_contents(connection);
 			}
 		}
 
 		void send_analog_values(http_manager::websocket_connection_ptr connection)
 		{
-			// TODO(cbrunschen): get the current analog values and send them
+			if (m_send_analog_values) 
+			{
+				m_send_analog_values(connection);
+			}
 		}
 
 		void send_button_states(http_manager::websocket_connection_ptr connection)
 		{
-			// TODO(cbrunschen): track current button states and send them
+			if (m_send_button_states)
+			{
+				m_send_button_states(connection);
+			}
 		}
 
 		http_manager *m_server;
@@ -383,7 +452,12 @@ namespace esqpanel {
 		std::string m_index;
 		std::string m_keyboard;
 		std::string m_version;
-		std::function<bool(std::ostream&)> m_content_provider;
+
+		// callbacks to send 
+		std::function<void(http_manager::websocket_connection_ptr)> m_send_display_contents;
+		std::function<void(http_manager::websocket_connection_ptr)> m_send_button_states; // also includes button light states. really
+		std::function<void(http_manager::websocket_connection_ptr)> m_send_analog_values;
+
 		std::map<const std::string, const std::string> m_template_values;
 	};
 
@@ -429,14 +503,16 @@ void esqpanel_device::device_start()
 {
 	m_external_panel_server = new esqpanel::external_panel_server(machine().manager().http());
 	if (machine().manager().http()->is_active()) {
+		using namespace std::placeholders;
+
 		m_external_panel_server->set_keyboard(owner()->shortname());
 		m_external_panel_server->set_index("/esqpanel/FrontPanel.html");
 		m_external_panel_server->add_http_template("/esqpanel/FrontPanel.html", get_front_panel_html_file());
 		m_external_panel_server->add_http_document("/esqpanel/FrontPanel.js", get_front_panel_js_file());
-		m_external_panel_server->set_content_provider([this](std::ostream& o)
-		{
-			return write_contents(o);
-		});
+
+		m_external_panel_server->set_send_display_contents(std::bind(&esqpanel_device::send_display_contents, this, _1));
+		m_external_panel_server->set_send_analog_values(std::bind(&esqpanel_device::send_analog_values, this, _1));
+		m_external_panel_server->set_send_button_states(std::bind(&esqpanel_device::send_button_states, this, _1));
 
 		m_external_timer = timer_alloc(FUNC(esqpanel_device::check_external_panel_server), this);
 		m_external_timer->enable(false);
@@ -489,7 +565,6 @@ void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 //  if (data >= 0xe0) printf("Got %02x from motherboard (second %s)\n", data, m_bCalibSecondByte ? "yes" : "no");
 
 	send_to_display(data);
-	m_external_panel_server->send_to_all(data);
 
 	if (m_bCalibSecondByte)
 	{
@@ -627,6 +702,16 @@ TIMER_CALLBACK_MEMBER(esqpanel_device::check_external_panel_server) {
 				// printf("button %d %s : sending char to mainboard: %02x\n", button, down ? "down" : "up", sendme);
 				xmit_char(sendme);
 				xmit_char(0x00);
+
+				// record the button pressed state
+				if (down)
+				{
+					m_pressed_buttons.insert(button);
+				} 
+				else
+				{
+					m_pressed_buttons.erase(button);
+				}
 			} else if (c == 'A') {
 				// analog value from ES5505 OTIS: 10 bits, left-aligned within 16 bits.
 				int channel, value;
@@ -679,7 +764,7 @@ esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const ch
 
 void esqpanel2x40_vfx_device::device_add_mconfig(machine_config &config)
 {
-	ESQ2X40(config, m_vfd, 60);
+	ESQ2X40_VFX(config, m_vfd, 60);
 }
 
 esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -689,17 +774,191 @@ esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, 
 	m_eps_mode = false;
 }
 
-bool esqpanel2x40_vfx_device::write_contents(std::ostream &o)
+void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 {
-	m_vfd->write_contents(o);
-	for (int i = 0; i < m_light_states.size(); i++)
+	receive_register_extract();
+	uint8_t data = get_received_char();
+
+//  if (data >= 0xe0) printf("Got %02x from motherboard (second %s)\n", data, m_bCalibSecondByte ? "yes" : "no");
+
+	if (m_bCalibSecondByte)
 	{
-		o.put(char(0xff));
-		o.put((m_light_states[i] << 6) | i);
+//      printf("second byte is %02x\n", data);
+		if (data == 0xfd)   // calibration request
+		{
+//          printf("let's send reply!\n");
+			xmit_char(0xff);   // this is the correct response for "calibration OK"
+		}
+		m_bCalibSecondByte = false;
 	}
-	return true;
+	else if (m_bButtonLightSecondByte)
+	{
+		// Lights on the Buttons, on the VFX-SD:
+		// Number   Button
+		// 0        1-6
+		// 1        8
+		// 2        6
+		// 3        4
+		// 4        2
+		// 5        Compare
+		// 6        1
+		// 7        Presets
+		// 8        7-12
+		// 9        9
+		// a        7
+		// b        5
+		// c        3
+		// d        Sounds
+		// e        0
+		// f        Cart
+		int lightNumber = data & 0x3f;
+
+		// Light states:
+		// 0 = Off
+		// 2 = On
+		// 3 = Blinking
+		m_light_states[lightNumber] = (data & 0xc0) >> 6;
+		m_external_panel_server->set_light(lightNumber, m_light_states[lightNumber]);
+
+		// TODO: do something with the button information!
+		// printf("Setting light %d to %s\n", lightNumber, lightState == 3 ? "Blink" : lightState == 2 ? "On" : "Off");
+		m_bButtonLightSecondByte = false;
+	}
+	else if (data == 0xfb)   // request calibration
+	{
+		m_bCalibSecondByte = true;
+	}
+	else if (data == 0xff)  // button light state command
+	{
+		m_bButtonLightSecondByte = true;
+	}
+	else
+	{
+		if ((data >= 0x80) && (data < 0xd0))
+		{
+			m_cursy = ((data & 0x7f) >= 40) ? 1 : 0;
+			m_cursx = (data & 0x7f) % 40;
+			m_curattr = m_vfd->get_attr(m_cursy, m_cursx);
+		}
+		else if (data >= 0xd0)
+		{
+			switch (data)
+			{
+				case 0xd0:  // blink start
+					m_curattr |= AT_BLINK;
+					break;
+
+				case 0xd1:  // cancel all attribs on VFX+
+					m_curattr = 0;
+					break;
+
+				case 0xd2:  // blinking underline on VFX
+					m_curattr |= AT_BLINK | AT_UNDERLINE;
+					break;
+
+				case 0xd3:  // start underline
+					m_curattr |= AT_UNDERLINE;
+					break;
+
+				case 0xd6:  // clear screen
+					m_vfd->clear();
+					m_external_panel_server->clear_display();
+					m_cursx = m_cursy = 0;
+					m_curattr = 0;
+					break;
+
+				case 0xf5:  // save cursor position
+					m_savedx = m_cursx;
+					m_savedy = m_cursy;
+					break;
+
+				case 0xf6:  // restore cursor position
+					m_cursx = m_savedx;
+					m_cursy = m_savedy;
+					m_curattr = m_vfd->get_attr(m_cursy, m_cursx);
+					break;
+
+				default:
+					// printf("Unknown control code %02x\n", data);
+					break;
+			}
+		}
+		else
+		{
+			if ((data >= 0x20) && (data <= 0x5f))
+			{
+				m_vfd->set_char(m_cursy, m_cursx, data - ' ', m_curattr);
+				m_external_panel_server->set_char(m_cursy, m_cursx, data - ' ', (m_curattr * AT_UNDERLINE) != 0, (m_curattr & AT_BLINK) != 0);
+				m_cursx++;
+
+				if (m_cursx >= 39)
+				{
+					m_cursx = 39;
+				}
+			}
+		}
+	}
 }
 
+TIMER_CALLBACK_MEMBER(esqpanel2x40_vfx_device::update_blink) {
+	m_blink_phase = (m_blink_phase + 1) & 3;
+	m_vfd->set_blink_on(m_blink_phase & 2);
+	m_external_panel_server->set_blink_phase(m_blink_phase);
+}
+
+void esqpanel2x40_vfx_device::device_start()
+{
+	esqpanel_device::device_start();
+
+	m_blink_timer = timer_alloc(FUNC(esqpanel2x40_vfx_device::update_blink), this);
+	m_blink_timer->enable(false);
+}
+
+void esqpanel2x40_vfx_device::device_reset()
+{
+	esqpanel_device::device_reset();
+
+	if (m_blink_timer) {
+		attotime sample_time(0, 250 * ATTOSECONDS_PER_MILLISECOND);
+		attotime initial_delay(0, 250 * ATTOSECONDS_PER_MILLISECOND);
+
+		m_blink_timer->adjust(initial_delay, 0, sample_time);
+		m_blink_timer->enable(true);
+	}
+}
+
+void esqpanel2x40_vfx_device::send_display_contents(http_manager::websocket_connection_ptr conn)
+{
+	for (int row = 0; row < 2; row++)
+	{
+		for (int column = 0; column < 40; column++) 
+		{
+			auto attr = m_vfd->get_attr(row, column);
+			m_external_panel_server->set_char(row, column, m_vfd->get_char(row, column), (attr & AT_UNDERLINE) != 0, (attr & AT_BLINK) != 0);
+		}
+	}
+}
+
+void esqpanel2x40_vfx_device::send_analog_values(http_manager::websocket_connection_ptr conn)
+{
+	// TODO(cbrunschen): read analog values from the emulated keyboard and send them to the panel(s)
+}
+
+void esqpanel2x40_vfx_device::send_button_states(http_manager::websocket_connection_ptr conn)
+{
+	// send the button statuses
+	for (int i = 0; i < 64; i++)
+	{
+		bool pressed = m_pressed_buttons.find(i) != m_pressed_buttons.end();
+		m_external_panel_server->set_button(i, pressed);
+	}
+
+	// and the states for the lights
+	for (int i = 0; i < 16; i++)
+	{
+		m_external_panel_server->set_light(i, m_light_states[i]);
+	}
+}
 
 
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
