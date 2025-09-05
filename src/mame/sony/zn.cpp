@@ -295,7 +295,7 @@ ZN-1 1-659-709-12  COH-1000C
 |M                                                       |
 |                                                        |
 |M                                                       |
-|                *                                       |
+|                KM4132G271Q-12*                         |
 |A           DSW                                         |
 |                                CXD8561Q    CXD8530CQ   |
 |                KM4132G271Q-12                          |
@@ -321,16 +321,17 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1000C.353, Capcom ZN-1 BIOS, 4MBit MaskROM type M534002 (SOP40)
-      AT28C16        - Atmel AT28C16 2K x8 EEPROM (SOP24)
-      814260-70      - 256K x16 (4MBit) DRAM (SOJ40)
-      KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM (QFP100)
-      *              - Unpopulated position for KM4132G271Q-12 SGRAM
-      KM48V514BJ-6   - 512k x8 (4MBit) DRAM (SOJ28)
-      EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
-      CAT702         - Protection chip labelled 'CP01' (DIP20)
-      PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
-      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
+      BIOS            - COH1000C.353, Capcom ZN-1 BIOS, 4MBit MaskROM type M534002 (SOP40).
+      AT28C16         - Atmel AT28C16 2K x8 EEPROM (SOP24).
+      814260-70       - 256K x16 (4MBit) DRAM (SOJ40).
+      KM4132G271Q-12* - 128K x32 x2 banks (32MBit) SGRAM (QFP100).
+                        Usually unpopulated, but needed by a few games (like Street Fighter EX/EX Plus).
+      KM4132G271Q-12  - 128K x32 x2 banks (32MBit) SGRAM (QFP100).
+      KM48V514BJ-6    - 512k x8 (4MBit) DRAM (SOJ28).
+      EPM7032         - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44).
+      CAT702          - Protection chip labelled 'CP01' (DIP20).
+      PALCE16V8       - PAL, labelled 'ZN1A' (PLCC20).
+      NEC_78081G503   - NEC uPD78081 MCU, 5MHz.
 
 
 Game board (Gallop Racer)
