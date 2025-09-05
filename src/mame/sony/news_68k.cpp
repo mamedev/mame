@@ -67,6 +67,8 @@ __|              |         |  |ALS05A| |N82077   |   __             6 x 74F00J->
   - 3 x HM62256LFP-12T
   - 1 x DS1000S-50
 
+ NWS-1250 came bundled with a Sony mouse based on a Fujitsu MB88201H MCU (undumped mask ROM 512 x 8 bits).
+ 
  */
 
 #include "emu.h"
