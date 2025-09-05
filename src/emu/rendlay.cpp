@@ -4062,7 +4062,7 @@ layout_view::layout_view(
 	}
 	if (!layers.marquees.empty())
 	{
-		m_vistoggles.emplace_back("Backdrops", mask);
+		m_vistoggles.emplace_back("Marquees", mask);
 		for (item &marquee : layers.marquees)
 			marquee.m_visibility_mask = mask;
 		m_defvismask |= mask;
