@@ -1134,6 +1134,19 @@ var fp = (function() {
             console.log("restored cursor position (row " + this.savedCursorY + ", col " + this.savedCursorX + ")");
             break;
 
+          case 0xfb: // unknown but encountered in command stream
+            console.log("0xfb: ignoring");
+            break;
+
+          case 0xfd: // unknown but encountered in command streem
+            console.log("0xfd: clearing");
+            this.cursorX = this.cursorY = 0;
+            this.blink = this.underline = false;
+            this.display.clear();
+            // seems to be always followed by 0x7f, let's ignore that one
+            this.ignoreNext = 1;
+            break;
+
           case 0xff: // Specify a button light state
             this.light = true;
             break;
