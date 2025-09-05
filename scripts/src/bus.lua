@@ -1941,6 +1941,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/xsu_cards.h",
 		MAME_DIR .. "src/devices/bus/isa/xtide.cpp",
 		MAME_DIR .. "src/devices/bus/isa/xtide.h",
+		MAME_DIR .. "src/devices/bus/isa/zxbus_adapter.cpp",
+		MAME_DIR .. "src/devices/bus/isa/zxbus_adapter.h",
 	}
 end
 
@@ -5562,6 +5564,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/technics/kn5000/kn5000_extension.h,BUSES["KN5000"] = true
+---------------------------------------------------
+
+if (BUSES["KN5000"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/technics/kn5000/kn5000_extension.cpp",
+		MAME_DIR .. "src/devices/bus/technics/kn5000/kn5000_extension.h",
+		MAME_DIR .. "src/devices/bus/technics/kn5000/hdae5000.cpp",
+		MAME_DIR .. "src/devices/bus/technics/kn5000/hdae5000.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/multibus/multibus.h,BUSES["MULTIBUS"] = true
 ---------------------------------------------------
 
@@ -5960,6 +5976,12 @@ if (BUSES["H8BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_1.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_5.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_5.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/ha_8_6.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/ha_8_6.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/ha_8_8.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/ha_8_8.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_16.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_16.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_64.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/wh_8_64.h",
 	}

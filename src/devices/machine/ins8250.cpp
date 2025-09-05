@@ -301,6 +301,7 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 		case 3:
 			{
 			bool break_state_changed = bool((m_regs.lcr ^ data) & INS8250_LCR_BREAK);
+			bool data_frame_changed = bool((m_regs.lcr ^ data) & 0x3f);
 
 			m_regs.lcr = data;
 
@@ -351,7 +352,10 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 					m_out_tx_cb(new_out_val);
 				}
 			}
-			set_data_frame(1, data_bit_count, parity, stop_bits);
+			if (data_frame_changed)
+			{
+				set_data_frame(1, data_bit_count, parity, stop_bits);
+			}
 			}
 			break;
 		case 4:

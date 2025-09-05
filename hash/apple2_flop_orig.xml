@@ -2206,21 +2206,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rboots40">
-		<description>Rocky's Boots (version 4.0)</description>
-		<year>1985</year>
-		<publisher>The Learning Company</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-03-27 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234747">
-				<rom name="rocky's boots v4.0.woz" size="234747" crc="638f1d4f" sha1="67dc599a7b8f0b84cdfdcd7c29f910dbea5f9f0c" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="flocklnd">
 		<description>The Flockland Island Crisis</description>
 		<year>1982</year>
@@ -3304,21 +3289,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234827">
 				<rom name="alice in wonderland side b.woz" size="234827" crc="2d0642e8" sha1="55df9c5e6b1aa3e8233783bf3a5ee65605760919" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="moptown">
-		<description>Moptown</description>
-		<year>1981</year>
-		<publisher>Advanced Learning Technology</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-07-27 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="235421">
-				<rom name="moptown.woz" size="235421" crc="228f8de0" sha1="7c20f871e47b76ed12b647fc5adffcaa93f7036f" />
 			</dataarea>
 		</part>
 	</software>
@@ -5976,28 +5946,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wrabbt13">
-		<description>Writer Rabbit (version 1.3)</description>
-		<year>1987</year>
-		<publisher>The Learning Company</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-06-04 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="234859">
-				<rom name="writer rabbit v1.3 side a.woz" size="234859" crc="05a5d952" sha1="ff4029d09cb54e5e98b250f16b6c5bd05a45a4f3" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B" />
-			<dataarea name="flop" size="241515">
-				<rom name="writer rabbit v1.3 side b.woz" size="241515" crc="6807af6f" sha1="ad144ed23f61e29c777824fc9656498328ca5a42" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pthtacts">
 		<description>Path Tactics (version 1.0)</description>
 		<year>1984</year>
@@ -8500,38 +8448,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mathrb13">
-		<description>Math Rabbit (version 1.3) (800K 3.5")</description>
-		<year>1986</year>
-		<publisher>The Learning Company</publisher>
-		<info name="usage" value="Requires a 128K Apple //e, //c+ or IIgs." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-09-29 -->
-		<!-- "Math Rabbit" is a 1986 educational game developed by Teri Perl, Analee Nunan, and Aaron Weiss, and distributed by The Learning Company. This is version 1.3. It requires a 128K Apple //e, //c+ or IIgs. -->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296204">
-				<rom name="math rabbit 800k.woz" size="1296204" crc="92d6a324" sha1="eff164d131db23346afa189c667d215153f9c911" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="thquik14">
-		<description>Think Quick! (version 1.4) (800K 3.5")</description>
-		<year>1987</year>
-		<publisher>The Learning Company</publisher>
-		<info name="usage" value="Requires a 128K Apple //e, //c+ or IIgs." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-09-29 -->
-		<!-- "Think Quick!" is a 1987 educational game developed by Leslie Grimm and Sid Weber, and distributed by The Learning Company. This is version 1.4. It requires a 128K Apple //e, //c+ or IIgs. -->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296193">
-				<rom name="think quick 800k.woz" size="1296193" crc="dd552c51" sha1="fd81362e8608fbba19189db5b5976c640c3c1b70" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kiludead">
 		<description>Killed Until Dead</description>
 		<year>1987</year>
@@ -8551,22 +8467,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234888">
 				<rom name="killed until dead side b.woz" size="234888" crc="da6d7e77" sha1="b8aca63b2269330030e9be2dc589e16e2701c013" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rboots4035">
-		<description>Rocky's Boots (version 4.1) (800K 3.5")</description>
-		<year>1988</year>
-		<publisher>The Learning Company</publisher>
-		<info name="usage" value="Requires a Apple IIgs, //c+, or //e or 64K ][+ with a compatible drive controller card." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-10-10 -->
-		<!-- "Rocky's Boots" is a 1988 educational game developed by Warren Robinett and Leslie Grimm, and distributed by The Learning Company. It requires a Apple IIgs, //c+, or //e or 64K ][+ with a compatible drive controller card. -->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296202">
-				<rom name="rocky's boots v4.1 800k.woz" size="1296202" crc="9547ceae" sha1="9ed4042968ce40c1d5049befe27ecc74d81e4aea" />
 			</dataarea>
 		</part>
 	</software>
@@ -9329,22 +9229,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Data disk" />
 			<dataarea name="flop" size="234779">
 				<rom name="the eating machine disk 2 - data.woz" size="234779" crc="464c5728" sha1="0005e37ce0698f02e2e73eb09f6c6bff943506b4" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrdspinr">
-		<description>Word Spinner (version 1.0)</description>
-		<year>1984</year>
-		<publisher>The Learning Company</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-21 -->
-		<!-- "Word Spinner" is a 1984 educational game developed by Dale Disharoon and distributed by The Learning Company. This is version 1.0. It requires a 48K Apple ][+ or later. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="73025">
-				<rom name="word spinner.woz" size="73025" crc="c6c1b178" sha1="6d2528a5908feae6b73511d29f5f967307445b1a" />
 			</dataarea>
 		</part>
 	</software>
@@ -13628,6 +13512,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="addmagic">
+		<description>Addition Magician</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Dale DeSharone" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="121624">
+				<rom name="addition magician.woz" size="121624" crc="a459c137" sha1="cb5d165813e8df58f389acf8d2104088584fceae" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="advbwalk">
 		<description>Advance to Boardwalk</description>
 		<year>1990</year>
@@ -16526,6 +16426,91 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bmblgmes13" cloneof="bmblgmes14">
+		<description>Bumble Games (version 1.3)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="188203">
+				<rom name="bumble games v1.3.woz" size="188203" crc="f17536da" sha1="f1031c4176259c7c8e89c7dc22074ee48ec57dc1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmblgmes14">
+		<description>Bumble Games (version 1.4)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="188203">
+				<rom name="bumble games v1.4.woz" size="188203" crc="9569d86e" sha1="247d7d1c904fdf39bcafc9badadf413120d5aed8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmblplot10" cloneof="bmblplot">
+		<description>Bumble Plot (The Learning Company) (version 1.0)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234794">
+				<rom name="bumble plot v1.0.woz" size="234794" crc="7fcbba3f" sha1="07bfbdaedeb0319c61f36d47b2013b678c0563be" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmblplot11" cloneof="bmblplot">
+		<description>Bumble Plot (The Learning Company) (version 1.1)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="214826">
+				<rom name="bumble plot v1.1.woz" size="214826" crc="4eaac25c" sha1="c3e41be7c1e0ff284a3b5a02ea66a26b54f54f90" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmblplot">
+		<description>Bumble Plot (The Learning Company) (version 1.2)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234794">
+				<rom name="bumble plot v1.2.woz" size="234794" crc="abd9f5f4" sha1="bdf26d3c608a28b3a579dcf7ed08e9c9e1c80c7f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bzbghrvy">
 		<description>Buzz Bang Harvey</description>
 		<year>1984</year>
@@ -17185,7 +17170,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="clasmate" supported="no">
+	<software name="clasmate">
 		<description>Classmate (version 2.1)</description>
 		<year>1987</year>
 		<publisher>Davidson &amp; Associates</publisher>
@@ -17196,6 +17181,7 @@ license:CC0-1.0
 		<!-- Dump released: 2024-11-15 -->
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234790">
 				<rom name="classmate v2.1-04.01.87.woz" size="234790" crc="263424cc" sha1="bfb56deb0c92b09f4bbeda54edb7210235a4b7e6" />
 			</dataarea>
@@ -21391,6 +21377,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="fatjack">
+		<description>Fat Jack</description>
+		<year>1985</year>
+		<publisher>The Learning Seed Company</publisher>
+		<info name="developer" value="SoftWorks and Graphics Alive" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-15 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234792">
+				<rom name="fat jack.woz" size="234792" crc="cabfd86a" sha1="bdddd5c82d42c1e809eccd7854b5fb96295c1ee2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="faywrd35">
 		<description>Fay: The Word Hunter (800K 3.5")</description>
 		<year>1991</year>
@@ -22021,6 +22023,127 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234775">
 				<rom name="germany 1985 v2.0.woz" size="234775" crc="85a4ff9d" sha1="daf67f5de2cce689f9692b3d92c5e80dc6668a12" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertpuzz10" cloneof="gertpuzz">
+		<description>Gertrude's Puzzles (version 1.0)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16.  Dump updated: 2025-08-10 to fix version number. -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="write_protected" value="true" />
+			<dataarea name="flop" size="234845">
+				<rom name="gertrude's puzzles.woz" size="234845" crc="88b08601" sha1="33cf536fad4646ede13d47e2e848058f57e3c630" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertpuzz11" cloneof="gertpuzz">
+		<description>Gertrude's Puzzles (version 1.1)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16.  Dump updated: 2025-08-10 to fix version number. -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="108349">
+				<rom name="gertrude's puzzles v1.1.woz" size="108349" crc="fe45ae34" sha1="1ae7b8d91b7b429abaf4941a13f6d2de22709f11" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertpuzz">
+		<description>Gertrude's Puzzles (version 1.2)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="121661">
+				<rom name="gertrude's puzzles v1.2.woz" size="121661" crc="62ca4b3c" sha1="65a398df63f6a222e2f71d0e530e33b1d94b64b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertsec10" cloneof="gertsec">
+		<description>Gertrude's Secrets (version 1.0)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16.  Dump updated: 2025-08-10 to fix version number. -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="write_protected" value="true" />
+			<dataarea name="flop" size="234813">
+				<rom name="gertrude's secrets v1.0.woz" size="234813" crc="c9a3661a" sha1="e69c238e207e7401b3a3ac8aff5333a600286deb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertsec11" cloneof="gertsec">
+		<description>Gertrude's Secrets (version 1.1)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16.  Dump updated: 2025-08-10 to fix version number. -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="108349">
+				<rom name="gertrude's secrets v1.1.woz" size="108349" crc="b155f65b" sha1="7fd687b6c8b9c943eef1e8525d8b9f1250714cfe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertsec12" cloneof="gertsec">
+		<description>Gertrude's Secrets (version 1.2)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="128335">
+				<rom name="gertrude's secrets v1.2.woz" size="128335" crc="a0caac53" sha1="f6874999ee5b9bc2a7c45571b9811d66104b4e4f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertsec">
+		<description>Gertrude's Secrets (version 1.3)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234813">
+				<rom name="gertrude's secrets v1.3.woz" size="234813" crc="574fa90b" sha1="91f3c418a280c33835846fed8c74b3793b16e75e" />
 			</dataarea>
 		</part>
 	</software>
@@ -23290,6 +23413,42 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="juglrb10" cloneof="juglrb">
+		<description>Juggles' Rainbow (version 1.0)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="original_publisher" value="Apple Computer" />
+		<info name="programmer" value="A. Piestrup, B. Jasinski, Leslie Grimm, P. Fiorentini, Warren Robinett, and A. Chiang" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234849">
+				<rom name="juggles' rainbow v1.0.woz" size="234849" crc="5a6ca731" sha1="62d23da196b95509dbf0639512db0d32393c3804" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="juglrb">
+		<description>Juggles' Rainbow (version 1.4)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="original_publisher" value="Apple Computer" />
+		<info name="programmer" value="A. Piestrup, B. Jasinski, Leslie Grimm, P. Fiorentini, Warren Robinett, and A. Chiang" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234849">
+				<rom name="juggles' rainbow v1.4.woz" size="234849" crc="7e560ab2" sha1="f3612650f8db40902c1b654fbe627b12231b580b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="oneonone">
 		<description>Julius Erving and Larry Bird Go One on One</description>
 		<year>1983</year>
@@ -24462,6 +24621,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="logictls">
+		<description>Logic Tools (prototype)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value=" Warren Robinett, Leslie Grimm, Teri Perl, and Ann Piestrup" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- unreleased prototype -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="write_protected" value="true" />
+			<dataarea name="flop" size="234825">
+				<rom name="logic tools (prototype).woz" size="234825" crc="c4dcf4e7" sha1="44f0459a08e358527489c01ab7d00e3d84978e8c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="logomot">
 		<description>LogoMotion (version 1.2) (Softsmith)</description>
 		<year>1982</year>
@@ -24686,12 +24863,84 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mspells11" cloneof="mspells">
+		<description>Magic Spells (version 1.1)</description>
+		<year>1981</year>
+		<publisher>The Learning Company</publisher>
+		<info name="original_publisher" value="Apple Computer" />
+		<info name="programmer" value=" Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241435">
+				<rom name="magic spells v1.1.woz" size="241435" crc="861d3308" sha1="9ad05dab75357a828ceadc6f01c459bc4a44f6e1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mspells20d" cloneof="mspells" supported="no">
+		<description>Magic Spells (version 2.0d)</description>
+		<year>1985</year>
+		<publisher>The Learning Company</publisher>
+		<info name="original_publisher" value="Apple Computer" />
+		<info name="programmer" value=" G. Genoar, S. Gordon, K. Klose, Leslie Grimm, and K. Elliott" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="2.0d" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234853">
+				<rom name="magic spells v2.0d.woz" size="234853" crc="2789d6c1" sha1="e4b183549f1840ecc33633890199e1f9f9af48c6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mspells21x" cloneof="mspells">
+		<description>Magic Spells (version 2.1x)</description>
+		<year>1985</year>
+		<publisher>The Learning Company</publisher>
+		<info name="original_publisher" value="Apple Computer" />
+		<info name="programmer" value=" G. Genoar, S. Gordon, K. Klose, Leslie Grimm, and K. Elliott" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="2.1x" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241477">
+				<rom name="magic spells v2.1x.woz" size="241477" crc="6a791f84" sha1="2630f9b62cdd3a0b9ad4b0b3e53a63ef7cdc02c4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mspells22" cloneof="mspells">
+		<description>Magic Spells (version 2.2) (800K 3.5")</description>
+		<year>1985</year>
+		<publisher>The Learning Company</publisher>
+		<info name="original_publisher" value="Apple Computer" />
+		<info name="programmer" value=" G. Genoar, S. Gordon, K. Klose, Leslie Grimm, and K. Elliott" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 64K //e with a compatible drive controller card." />
+		<info name="version" value="2.2" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-18 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296201">
+				<rom name="magic spells v2.2 800k.woz" size="1296201" crc="9d242890" sha1="f47a0f180ddf1f26dbc1d08124d580cf8b54bb59" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mspells">
 		<description>Magic Spells (version 2.3) (800K 3.5")</description>
 		<year>1985</year>
 		<publisher>The Learning Company</publisher>
 		<info name="original_publisher" value="Apple Computer" />
-		<info name="programmer" value="K. Elliott, G. Genoar, S. Gordon, L. Grimm, and K. Klose" />
+		<info name="programmer" value="K. Elliott, G. Genoar, S. Gordon, Leslie Grimm, and K. Klose" />
 		<info name="usage" value="Requires an Apple IIgs, //c+, or 64K //e with a compatible drive controller card." />
 		<info name="version" value="2.3" />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
@@ -25274,6 +25523,56 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234768">
 				<rom name="math man.woz" size="234768" crc="cb865fc4" sha1="5f99c6a876b63c81aa17eabaf79d54ac87a66dc3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathrabt10" cloneof="mathrabt">
+		<description>Math Rabbit (version 1.0)</description>
+		<year>1986</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Teri Perl, Analee Nunan, and Aaron Weiss" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241458">
+				<rom name="math rabbit v1.0.woz" size="241458" crc="43db56a4" sha1="7b9bc6bce7a7fb07714d327969d826eda73cd1dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathrabt11" cloneof="mathrabt">
+		<description>Math Rabbit (version 1.1)</description>
+		<year>1986</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Teri Perl, Analee Nunan, and Aaron Weiss" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241458">
+				<rom name="math rabbit v1.1.woz" size="241458" crc="07d011df" sha1="9145d440655368eca17b59ab8d850ff24e6b3714" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathrabt">
+		<description>Math Rabbit (version 1.3) (800K 3.5")</description>
+		<year>1986</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Teri Perl, Analee Nunan, and Aaron Weiss" />
+		<info name="usage" value="Requires a 128K Apple //e, //c+ or IIgs." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-09-29 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296204">
+				<rom name="math rabbit 800k.woz" size="1296204" crc="92d6a324" sha1="eff164d131db23346afa189c667d215153f9c911" />
 			</dataarea>
 		</part>
 	</software>
@@ -27947,6 +28246,74 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="moptown">
+		<description>Moptown (version 1981)</description>
+		<year>1981</year>
+		<publisher>Advanced Learning Technology</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1981" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-07-27 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235421">
+				<rom name="moptown.woz" size="235421" crc="228f8de0" sha1="7c20f871e47b76ed12b647fc5adffcaa93f7036f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mptwnhtl12" cloneof="mptwnhtl">
+		<description>Moptown Hotel (version 1.2)</description>
+		<year>1981</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="201547">
+				<rom name="moptown hotel v1.2.woz" size="201547" crc="c9ebdb2b" sha1="534aac11fc09b0c53ba3079287dde484f0953e0e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mptwnhtl">
+		<description>Moptown Hotel (version 1.3)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234796">
+				<rom name="moptown hotel v1.3.woz" size="234796" crc="d056628b" sha1="ebd8ad6023e4e494ec4398d20e71850f08f2b396" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mptwnpar10">
+		<description>Moptown Parade (version 1.0)</description>
+		<year>1981</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="181549">
+				<rom name="moptown parade v1.0.woz" size="181549" crc="f336b42c" sha1="08fd07f9b0312586ff4e9f5c68f692499c366e60" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mtftdecfra">
 		<description>More Teasers from Tobbs: Decimals and Fractions</description>
 		<year>1990</year>
@@ -28744,6 +29111,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234793">
 				<rom name="number farm.woz" size="234793" crc="32b5f68b" sha1="b41ef0804a4f6f1191d343ba7d306a379862b999" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbrstmpr">
+		<description>Number Stumper</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Dennis Sorensen" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174870">
+				<rom name="number stumper.woz" size="174870" crc="c73d0f7b" sha1="b0f37dec5a3770008fecb58437c215f3dd69744f" />
 			</dataarea>
 		</part>
 	</software>
@@ -30084,6 +30467,74 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="rrabbit10" cloneof="rrabbit">
+		<description>Reader Rabbit (version 1.0)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Corinne Grimm, and Cindy Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241464">
+				<rom name="reader rabbit v1.0.woz" size="241464" crc="befff98c" sha1="852b1927abebdd9de94a71261c879587ec39923c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrabbit11" cloneof="rrabbit">
+		<description>Reader Rabbit (version 1.1)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Corinne Grimm, and Cindy Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234808">
+				<rom name="reader rabbit v1.1.woz" size="234808" crc="2b2f787c" sha1="904c57ed1b478fe2168b23fcdde8f0d4c493f971" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrabbit13" cloneof="rrabbit">
+		<description>Reader Rabbit (version 1.3)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Corinne Grimm, and Cindy Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234808">
+				<rom name="reader rabbit v1.3.woz" size="234808" crc="1d4107ba" sha1="43d1a98885b6b8de655da4d4332a60fd3b1e5302" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrabbit">
+		<description>Reader Rabbit (version 1.4)</description>
+		<year>1987</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Corinne Grimm, and Cindy Grimm" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241464">
+				<rom name="reader rabbit v1.4.woz" size="241464" crc="046ffaac" sha1="2920e62337562300ae732419c0dfc190ff8dc44c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rdtrchst">
 		<description>Reader's Treasure Chest: Level One</description>
 		<year>1987</year>
@@ -30751,6 +31202,60 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="robotody10" cloneof="robotody">
+		<description>Robot Odyssey I (version 1.0)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Mike Wallace and Leslie Grimm" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Robotropolis" />
+			<dataarea name="flop" size="234820">
+				<rom name="robot odyssey i v1.0 side a - robotropolis.woz" size="234820" crc="49599d6c" sha1="23e8c2338469bd20a433e0ea53cde05bbc0c2446" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Innovation lab and tutorials" />
+			<dataarea name="flop" size="234836">
+				<rom name="robot odyssey i v1.0 side b - innovation lab and tutorials.woz" size="234836" crc="7a0021ac" sha1="9368bba0e1f4c200f5c999556973ec48a3157b21" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotody">
+		<description>Robot Odyssey I (version 2.0)</description>
+		<year>1985</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Mike Wallace and Leslie Grimm" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="2.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Robotropolis" />
+			<dataarea name="flop" size="234828">
+				<rom name="robot odyssey i v2.0 side a - robotropolis.woz" size="234828" crc="6142a825" sha1="bb202d7f1f9379901dd032c022fd94c58d9de05d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Robotropolis preview, chip designs, innovation lab, and chip library" />
+			<dataarea name="flop" size="234883">
+				<rom name="robot odyssey i v2.0 side b - robotropolis preview, chip designs, innovation lab and chip library.woz" size="234883" crc="951cfeb8" sha1="2fa9e87fff13782b357bda9ed6300c4bab35f5a7" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C - Robot anatomy, robot wiring, sensors, the toolkit, robot circuits, and robot teamwork" />
+			<dataarea name="flop" size="234900">
+				<rom name="robot odyssey i v2.0 side c - robot anatomy, robot wiring, sensors, the toolkit, robot circuits and robot teamwork.woz" size="234900" crc="3b251db2" sha1="4fc1356e4bbf2a375553f08f334c2c573f2ce10e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="robotrsc">
 		<description>Robot Rascals</description>
 		<year>1986</year>
@@ -30810,6 +31315,58 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="233475">
 				<rom name="robots of dawn.woz" size="233475" crc="1857ecfd" sha1="571daffa89f2269679ed6ada76e76016da26b594" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rboots10l" cloneof="rboots">
+		<description>Rocky's Boots (version 1.0 later)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Teri Perl, Warren Robinett, and Leslie Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0 later" />
+		<!-- Has a different title page and loads much faster. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234798">
+				<rom name="rocky's boots v1.0.woz" size="234798" crc="35d5ab1d" sha1="e2c8c8fd5630d46100789887a76664838afd9ee7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rboots40" cloneof="rboots">
+		<description>Rocky's Boots (version 4.0)</description>
+		<year>1985</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Teri Perl, Warren Robinett, and Leslie Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="4.0" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-03-27 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234747">
+				<rom name="rocky's boots v4.0.woz" size="234747" crc="638f1d4f" sha1="67dc599a7b8f0b84cdfdcd7c29f910dbea5f9f0c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rboots">
+		<description>Rocky's Boots (version 4.1) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Teri Perl, Warren Robinett, and Leslie Grimm" />
+		<info name="usage" value="Requires a Apple IIgs, //c+, or //e or 64K ][+ with a compatible drive controller card." />
+		<info name="version" value="4.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-10-10 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296202">
+				<rom name="rocky's boots v4.1 800k.woz" size="1296202" crc="9547ceae" sha1="9ed4042968ce40c1d5049befe27ecc74d81e4aea" />
 			</dataarea>
 		</part>
 	</software>
@@ -32152,7 +32709,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="spdrdr2061285" supported="no">
+	<software name="spdrdr2061285">
 		<description>Speed Reader II (version 06.12.85)</description>
 		<year>1985</year>
 		<publisher>Davidson &amp; Associates</publisher>
@@ -32164,6 +32721,7 @@ license:CC0-1.0
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Program" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="241471">
 				<rom name="speed reader ii v061285 disk 1 - program disk.woz" size="241471" crc="fe8b6799" sha1="a7b58b21cb88b0d9d9b918f752633cff29ed3976" />
 			</dataarea>
@@ -32176,7 +32734,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="spellitu" cloneof="spellit" supported="no">
+	<software name="spellitu" cloneof="spellit">
 		<description>Spell It!</description>
 		<year>1984</year>
 		<publisher>Davidson &amp; Associates</publisher>
@@ -32187,19 +32745,21 @@ license:CC0-1.0
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="241432">
 				<rom name="spell it side a.woz" size="241432" crc="3c4583ff" sha1="a6107d3ed6d07189bbfcd875205694eb00a7a7bd" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234776">
 				<rom name="spell it side b.woz" size="234776" crc="ca9718fd" sha1="3aa728730d386ace23fd791ca21bf828cddbfe7a" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="spellit070385" cloneof="spellit" supported="no">
+	<software name="spellit070385" cloneof="spellit">
 		<description>Spell It! (version 07.03.85)</description>
 		<year>1985</year>
 		<publisher>Davidson &amp; Associates</publisher>
@@ -32212,12 +32772,14 @@ license:CC0-1.0
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="241465">
 				<rom name="spell it v070385 side a.woz" size="241465" crc="0e50c5ea" sha1="4eebbce0345f94eee608046ce05bd6440e4bc13b" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="241465">
 				<rom name="spell it v070385 side b.woz" size="241465" crc="7abbdcac" sha1="89c21d2a622ec0091f3a7db07c9c483e5bd54b9b" />
 			</dataarea>
@@ -34645,6 +35207,60 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="childwpc">
+		<description>The Children's Writing &amp; Publishing Center (version 1.0)</description>
+		<year>1988</year>
+		<publisher>The Learning Company</publisher>
+		<info name="developer" value="Creative Pursuits" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-17 -->
+		<!-- graphics program -->
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1 - Program" />
+			<dataarea name="flop" size="234844">
+				<rom name="the children's writing publishing center v1.0 - program disk side 1.woz" size="234844" crc="cf313965" sha1="fdf50663ea1a056ec43e0d06cb5cca3c8c957770" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2 - Program" />
+			<dataarea name="flop" size="234844">
+				<rom name="the children's writing publishing center v1.0 - program disk side 2.woz" size="234844" crc="8249555e" sha1="1e5b7b9880fb211d8dba2683b02dae130340a983" />
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1 - Picture" />
+			<dataarea name="flop" size="234844">
+				<rom name="the children's writing publishing center v1.0 - picture disk side 1.woz" size="234844" crc="6f392ffb" sha1="74238301fa159b0724bb6ab222d2d489a4b1891a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2 - Picture" />
+			<dataarea name="flop" size="234844">
+				<rom name="the children's writing publishing center v1.0 - picture disk side 2.woz" size="234844" crc="ba6d2473" sha1="14deea3dfaa2efcbda7f5e3652bb00cb1926b0bf" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Storage" />
+			<dataarea name="flop" size="234837">
+				<rom name="the children's writing publishing center v1.0 - storage disk.woz" size="234837" crc="a4218a59" sha1="d1343a9fa5efa56928d54143bf34f375091cef95" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side 1 - Template" />
+			<dataarea name="flop" size="234845">
+				<rom name="the children's writing publishing center v1.0 - template disk side 1.woz" size="234845" crc="0ec157db" sha1="af2ed9a1a079815b35e2d0635bdcac77aa8b93fc" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side 2 - Template" />
+			<dataarea name="flop" size="234845">
+				<rom name="the children's writing publishing center v1.0 - template disk side 2.woz" size="234845" crc="c650e4d3" sha1="17116143bfc11cc10fd90d1c68a8b48f27bd9c5e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tcomsent">
 		<description>The Compound Sentence (version 1988)</description>
 		<year>1988</year>
@@ -36232,6 +36848,83 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234784">
 				<rom name="thexder v1.5.woz" size="234784" crc="921ecd56" sha1="f571e7168f8554b6d114d3f14b6d1136a76cb205" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thquick11" cloneof="thquick">
+		<description>Think Quick! (version 1.1)</description>
+		<year>1987</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Sid Weber" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Program" />
+			<dataarea name="flop" size="234816">
+				<rom name="think quick v1.1 disk 1a - program.woz" size="234816" crc="95ad92b7" sha1="7d32e1618dc4f80c8284f6aa46fb90750d4863ba" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Program" />
+			<dataarea name="flop" size="234816">
+				<rom name="think quick v1.1 disk 1b - program.woz" size="234816" crc="f9fa8382" sha1="aaf520e128c8c5a49143b50c506c374fc9c95bfd" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Storage" />
+			<dataarea name="flop" size="234814">
+				<rom name="think quick v1.1 disk 2 - storage.woz" size="234814" crc="8dfcac1f" sha1="f9073c672a54b241459720be14bf430aaf0bf3b0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thquick12" cloneof="thquick">
+		<description>Think Quick! (version 1.2)</description>
+		<year>1987</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Sid Weber" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Program" />
+			<dataarea name="flop" size="241472">
+				<rom name="think quick v1.2 disk 1a - program.woz" size="241472" crc="971703b6" sha1="75e6b02a724f34e35d7d8ced80980aa7484f72f1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Program" />
+			<dataarea name="flop" size="241472">
+				<rom name="think quick v1.2 disk 1b - program.woz" size="241472" crc="e89d721d" sha1="8e36ad03cf1dcfeed9f12c202855d1264640c512" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Storage" />
+			<dataarea name="flop" size="241470">
+				<rom name="think quick v1.2 disk 2 - storage.woz" size="241470" crc="4ebd7fb1" sha1="270295a20c56e48593c76caefe8983c1ba11615f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thquick">
+		<description>Think Quick! (version 1.4) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Sid Weber" />
+		<info name="usage" value="Requires a 128K Apple //e, //c+ or IIgs." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-09-29 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296193">
+				<rom name="think quick 800k.woz" size="1296193" crc="dd552c51" sha1="fd81362e8608fbba19189db5b5976c640c3c1b70" />
 			</dataarea>
 		</part>
 	</software>
@@ -38088,19 +38781,21 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
-		<info name="usage" value="Requires a 48K Apple ][ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<info name="version" value="05-SEP-81" />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-04-02. Redumped: 2022-05-10 to fix critical data corruption in the saved characters roster that entirely prevented playing. -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A - Scenario disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234881">
 				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side a - scenario.woz" size="234881" crc="0e955f2e" sha1="47dd791b826c1d952ca78fe209fafd5f6fc30ed8" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B - Boot disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234846">
 				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side b - boot.woz" size="234846" crc="a7d80c8c" sha1="1f1ad5cb198a29e1934a744901ae71cccc82e300" />
 			</dataarea>
@@ -38112,19 +38807,21 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
-		<info name="usage" value="Requires a 48K Apple ][ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<info name="version" value="01-DEC-81" />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-04-02 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A - Master scenario disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234884">
 				<rom name="wizardry- proving grounds of the mad overlord v01-dec-81 side a - master scenario.woz" size="234884" crc="caae12b7" sha1="78b15dbc13bcf61cf9f44a31d3478a565b010b0f" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B - Boot disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234873">
 				<rom name="wizardry- proving grounds of the mad overlord v01-dec-81 side b - boot.woz" size="234873" crc="0a1eb2ab" sha1="36d42cdb06b5b7452c05ddccf5d6aa8182bdd790" />
 			</dataarea>
@@ -38136,19 +38833,21 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
-		<info name="usage" value="Requires a 48K Apple ][ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<info name="version" value="2.0 01-JAN-82" />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-06-04 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A - Master scenario disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234937">
 				<rom name="wizardry- proving grounds of the mad overlord v2.0 01-jan-82 side a - scenario master disk.woz" size="234937" crc="8a92f261" sha1="b90ced6408a7e15cd177c0aaead773d6da417093" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B - Boot disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234896">
 				<rom name="wizardry- proving grounds of the mad overlord v2.0 01-jan-82 side b - boot disk.woz" size="234896" crc="d9c55106" sha1="60bcd0d81ad3fe4a7f6cae4d94e71d5cb01cf3e7" />
 			</dataarea>
@@ -38160,19 +38859,21 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="programmer" value="Andrew Greenberg and Robert Woodhead" />
-		<info name="usage" value="Requires a 48K Apple ][ or later. The disks must be loaded as read-only, outside of software list." />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<info name="version" value="2.1 22-jan-82" />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2020-01-11 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Boot disk" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="234829">
 				<rom name="wizardry - proving grounds of the mad overlord v2.1 - boot disk.woz" size="234829" crc="29dfa2a6" sha1="6c0416fb7cb91bde8da05df77ecfc5f7b7c645f1" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 - Scenario master disk" />
+			<feature name="write_protected" value="true" />			
 			<dataarea name="flop" size="234829">
 				<rom name="wizardry - proving grounds of the mad overlord v2.1 - scenario master disk.woz" size="234829" crc="7951ca26" sha1="604a416c50ca6fccb39c11142f8be00d51ce627c" />
 			</dataarea>
@@ -38477,7 +39178,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wordattk091286" cloneof="wordattk" supported="no">
+	<software name="wordattk091286" cloneof="wordattk">
 		<description>Word Attack! (version 09.12.86)</description>
 		<year>1986</year>
 		<publisher>Davidson &amp; Associates</publisher>
@@ -38489,12 +39190,14 @@ license:CC0-1.0
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A" />
-			<dataarea name="flop" size="241468">
+			<feature name="write_protected" value="true" />
+				<dataarea name="flop" size="241468">
 				<rom name="word attack v091286 side a.woz" size="241468" crc="20938492" sha1="bd3f659c80e3380810b51baa461a4d492540328d" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B" />
+			<feature name="write_protected" value="true" />
 			<dataarea name="flop" size="241468">
 				<rom name="word attack v091286 side b.woz" size="241468" crc="8e9025e1" sha1="b33b36544236bb41f3e4c81b3f1ffca716da9542" />
 			</dataarea>
@@ -38605,6 +39308,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234826">
 				<rom name="word quest- binary search strategies.woz" size="234826" crc="a559b0c3" sha1="fcfa01b5a2ae6fec3f348f8059730b3834267e93" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdspinr">
+		<description>Word Spinner (version 1.0)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Dale Disharoon" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-02-21 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="73025">
+				<rom name="word spinner.woz" size="73025" crc="c6c1b178" sha1="6d2528a5908feae6b73511d29f5f967307445b1a" />
 			</dataarea>
 		</part>
 	</software>
@@ -38767,6 +39487,81 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234848">
 				<rom name="write it right- punctuation and capitalization.woz" size="234848" crc="8d8a1f89" sha1="86ae9ecb8079e717f12a8f35a7d554ca4b5c9a1b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrabbt10" cloneof="wrabbt">
+		<description>Writer Rabbit (version 1.0)</description>
+		<year>1986</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Dennis Caswell, Gene Genoar, Sid Weber, Shaun Gordon, Pete Rowe, Murray Suid, and Anna Suid" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<!-- Includes a one-time backup utility (press B at the level selection screen) which has not been used. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234864">
+				<rom name="writer rabbit v1.0 side a.woz" size="234864" crc="4ab97908" sha1="85725b6954711961581a20a9aa18870c08088d1a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234864">
+				<rom name="writer rabbit v1.0 side b.woz" size="234864" crc="5cc39910" sha1="7efc44e6b83e133876ec9a03f1e6f0139a96720d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrabbt12" cloneof="wrabbt">
+		<description>Writer Rabbit (version 1.2)</description>
+		<year>1986</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Dennis Caswell, Gene Genoar, Sid Weber, Shaun Gordon, Pete Rowe, Murray Suid, and Anna Suid" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<!-- Includes a one-time backup utility (press B at the level selection screen) which has not been used. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234864">
+				<rom name="writer rabbit v1.2 side a.woz" size="234864" crc="ee09b000" sha1="82ce60369e297f0e90a21d532dfe7e365a15234f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234864">
+				<rom name="writer rabbit v1.2 side b.woz" size="234864" crc="4c79dc67" sha1="d002934b06d62314db05750aeaf067a02a51ef50" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrabbt">
+		<description>Writer Rabbit (version 1.3)</description>
+		<year>1987</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Dennis Caswell, Gene Genoar, Sid Weber, Shaun Gordon, Pete Rowe, Murray Suid, and Anna Suid" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<!-- Includes a one-time backup utility (press B at the level selection screen) which has not been used. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-06-04 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234859">
+				<rom name="writer rabbit v1.3 side a.woz" size="234859" crc="05a5d952" sha1="ff4029d09cb54e5e98b250f16b6c5bd05a45a4f3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="241515">
+				<rom name="writer rabbit v1.3 side b.woz" size="241515" crc="6807af6f" sha1="ad144ed23f61e29c777824fc9656498328ca5a42" />
 			</dataarea>
 		</part>
 	</software>

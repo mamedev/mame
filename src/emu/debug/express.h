@@ -217,9 +217,11 @@ private:
 	u64 read_program_direct(address_space &space, int opcode, offs_t address, int size);
 	u64 read_memory_region(const char *rgntag, offs_t address, int size);
 	u64 read_memory_share(const char *shatag, offs_t address, int size);
+	template <typename T> u64 do_read_memory(T *mem, offs_t address, int size);
 	void write_program_direct(address_space &space, int opcode, offs_t address, int size, u64 data);
 	void write_memory_region(const char *rgntag, offs_t address, int size, u64 data);
 	void write_memory_share(const char *shatag, offs_t address, int size, u64 data);
+	template <typename T> void do_write_memory(T *mem, offs_t address, int size, u64 data);
 	expression_error expression_get_space(const char *tag, int &spacenum, device_memory_interface *&memory);
 	void notify_memory_modified();
 

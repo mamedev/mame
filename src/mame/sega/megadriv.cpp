@@ -310,11 +310,13 @@ void md_base_state::m68k_ioport_s_ctrl_write(uint16_t data)
 
 void md_base_state::megadriv_68k_base_map(address_map &map)
 {
-	map(0xa00000, 0xa01fff).rw(FUNC(md_base_state::megadriv_68k_read_z80_ram), FUNC(md_base_state::megadriv_68k_write_z80_ram));
-	map(0xa02000, 0xa03fff).w(FUNC(md_base_state::megadriv_68k_write_z80_ram));
-	map(0xa04000, 0xa04003).rw(FUNC(md_base_state::megadriv_68k_YM2612_read), FUNC(md_base_state::megadriv_68k_YM2612_write));
+	// before_delay required by pacman2 intro
+	// TODO: unverified if 68k doesn't have bus grant
+	map(0xa00000, 0xa01fff).before_delay(NAME([](offs_t) { return 1; })).rw(FUNC(md_base_state::megadriv_68k_read_z80_ram), FUNC(md_base_state::megadriv_68k_write_z80_ram));
+	map(0xa02000, 0xa03fff).before_delay(NAME([](offs_t) { return 1; })).w(FUNC(md_base_state::megadriv_68k_write_z80_ram));
+	map(0xa04000, 0xa04003).before_delay(NAME([](offs_t) { return 1; })).rw(FUNC(md_base_state::megadriv_68k_YM2612_read), FUNC(md_base_state::megadriv_68k_YM2612_write));
 
-	map(0xa06000, 0xa06001).w(FUNC(md_base_state::megadriv_68k_z80_bank_write));
+	map(0xa06000, 0xa06001).before_delay(NAME([](offs_t) { return 1; })).w(FUNC(md_base_state::megadriv_68k_z80_bank_write));
 
 	map(0xa10000, 0xa10001).r(FUNC(md_base_state::m68k_version_read));
 	map(0xa10002, 0xa10007).rw(FUNC(md_base_state::m68k_ioport_data_read), FUNC(md_base_state::m68k_ioport_data_write));

@@ -453,7 +453,6 @@ void atm_state::video_start()
 	m_screen_location = m_ram->pointer() + (5 << 14);
 	m_char_location = m_char_rom;
 	subdevice<gfxdecode_device>("gfxdecode")->gfx(0)->set_source(m_char_location);
-	m_contention_pattern = {};
 }
 
 /* F4 Character Displayer */
@@ -508,6 +507,7 @@ void atm_state::atm(machine_config &config)
 
 	m_screen->set_raw(X1_128_SINCLAIR / 5, 448, 312, {get_screen_area().left() - 40, get_screen_area().right() + 40, get_screen_area().top() - 40, get_screen_area().bottom() + 40});
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atm);
+	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
 	BETA_DISK(config, m_beta, 0);
 	ATA_INTERFACE(config, m_ata).options(atm_ata_devices, nullptr, nullptr, false);
@@ -596,7 +596,7 @@ ROM_START( atmtb2plus )
 	ROM_LOAD( "sgen.rom", 0x0000, 0x0800, CRC(1f4387d6) SHA1(93b3774dc8a486643a1bdd48c606b0c84fa0e22b))
 ROM_END
 
-/*    YEAR  NAME        PARENT   COMPAT MACHINE     INPUT      CLASS          INIT        COMPANY     FULLNAME                  FLAGS */
-COMP( 1991, atm,        spec128, 0,     atm,        spec_plus, atm_state,     empty_init, "MicroART", "ATM-Turbo (ATM-CP)",     MACHINE_NOT_WORKING)
-COMP( 1992, atmtb2,     spec128, 0,     atmtb2,     spec_plus, atm_state,     empty_init, "MicroART", "ATM-Turbo 2",            MACHINE_SUPPORTS_SAVE)
-COMP( 1993, atmtb2plus, spec128, 0,     atmtb2plus, spec_plus, atm_state,     empty_init, "MicroART", "ATM-Turbo 2+",           MACHINE_SUPPORTS_SAVE)
+/*    YEAR  NAME        PARENT   COMPAT MACHINE     INPUT        CLASS          INIT        COMPANY     FULLNAME                  FLAGS */
+COMP( 1991, atm,        spec128, 0,     atm,        spec_plus2a, atm_state,     empty_init, "MicroART", "ATM-Turbo (ATM-CP)",     MACHINE_NOT_WORKING)
+COMP( 1992, atmtb2,     spec128, 0,     atmtb2,     spec_plus2a, atm_state,     empty_init, "MicroART", "ATM-Turbo 2",            MACHINE_SUPPORTS_SAVE)
+COMP( 1993, atmtb2plus, spec128, 0,     atmtb2plus, spec_plus2a, atm_state,     empty_init, "MicroART", "ATM-Turbo 2+",           MACHINE_SUPPORTS_SAVE)

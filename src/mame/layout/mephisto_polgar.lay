@@ -405,8 +405,8 @@ authors:Sandro Ronco, hap
 		<element ref="hlb" inputtag="KEY" inputmask="0x80"> <bounds x="54.5" y="10" width="3.5" height="2.5" /> </element>
 
 		<!-- hidden input above ENT/CL buttons to press both -->
-		<element ref="nothing" inputtag="KEY" inputmask="0x40" clickthrough="yes"><bounds x="52.2" y="8.0" width="3.1" height="1.1" /></element>
-		<element ref="nothing" inputtag="KEY" inputmask="0x80" clickthrough="no"> <bounds x="52.2" y="8.0" width="3.1" height="1.1" /></element>
+		<element ref="nothing" inputtag="KEY" inputmask="0x40" clickthrough="no"> <bounds x="52.2" y="8.0" width="3.1" height="1.1" /></element>
+		<element ref="nothing" inputtag="KEY" inputmask="0x80" clickthrough="yes"><bounds x="52.2" y="8.0" width="3.1" height="1.1" /></element>
 	</group>
 
 

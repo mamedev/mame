@@ -84,7 +84,6 @@ protected:
 	void check_for_tx_start();
 	void start_tx();
 
-
 	enum
 	{
 		I8251_NEXT_COMMAND = 0,
@@ -105,7 +104,6 @@ private:
 	void sync1_rxc();
 	void sync2_rxc();
 	void update_syndet(bool voltage);
-	bool calc_parity(u8 ch);
 
 	/* flags controlling how i8251_control_w operates */
 	uint8_t m_flags;
@@ -121,11 +119,11 @@ private:
 	uint8_t m_mode_byte;
 	bool m_delayed_tx_en;
 
-	bool m_cts;
-	bool m_dsr;
-	bool m_rxd;
-	bool m_rxc;
-	bool m_txc;
+	int32_t m_cts;
+	int32_t m_dsr;
+	int32_t m_rxd;
+	int32_t m_rxc;
+	int32_t m_txc;
 	int m_rxc_count;
 	int m_txc_count;
 	int m_br_factor;

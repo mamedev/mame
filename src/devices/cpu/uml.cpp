@@ -278,22 +278,6 @@ private:
 			inst.m_param[pnum] = inst.param(pnum).immediate() & mask;
 	}
 
-	static void normalise_commutative(instruction &inst)
-	{
-		const u64 mask = size_mask(inst);
-
-		// truncate immediates to instruction size
-		truncate_immediate(inst, 1, mask);
-		truncate_immediate(inst, 2, mask);
-
-		// if a source is the destination put it first, and put a single immediate last
-		if ((inst.param(0) == inst.param(2)) || (inst.param(1).is_immediate() && !inst.param(2).is_immediate()))
-		{
-			using std::swap;
-			swap(inst.m_param[1], inst.m_param[2]);
-		}
-	}
-
 	static void convert_to_mov_immediate(instruction &inst, u64 immediate)
 	{
 		u64 const mask = size_mask(inst);
@@ -335,6 +319,22 @@ public:
 
 		for (int i = 0; inst.numparams() > i; ++i)
 			truncate_immediate(inst, i, mask);
+	}
+
+	static void normalise_commutative(instruction &inst)
+	{
+		const u64 mask = size_mask(inst);
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 1, mask);
+		truncate_immediate(inst, 2, mask);
+
+		// if a source is the destination put it first, and put a single immediate last
+		if ((inst.param(0) == inst.param(2)) || (inst.param(1).is_immediate() && !inst.param(2).is_immediate()))
+		{
+			using std::swap;
+			swap(inst.m_param[1], inst.m_param[2]);
+		}
 	}
 
 	static void read(instruction &inst)
@@ -799,6 +799,11 @@ public:
 			inst.m_param[0] = val;
 			inst.m_param[1] = val ? mask : 0;
 		}
+		else if (inst.param(1).is_immediate_value(0))
+		{
+			// testing against zero always produces the same result
+			inst.m_param[0] = 0;
+		}
 		else if (inst.param(0) == inst.param(1))
 		{
 			// testing a value against itself, turn the second operand into an immediate
@@ -1224,7 +1229,7 @@ void uml::instruction::simplify()
 		case OP_ROLAND: simplify_op::roland(*this);                   break;
 		case OP_ROLINS: simplify_op::rolins(*this);                   break;
 		case OP_ADD:    simplify_op::add(*this);                      break;
-		case OP_ADDC:   simplify_op::truncate_imm(*this);             break;
+		case OP_ADDC:   simplify_op::normalise_commutative(*this);    break;
 		case OP_SUB:    simplify_op::sub(*this);                      break;
 		case OP_SUBB:   simplify_op::truncate_imm(*this);             break;
 		case OP_CMP:    simplify_op::cmp(*this);                      break;

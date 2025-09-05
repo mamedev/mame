@@ -11,17 +11,18 @@ NOTE:
 <softwarelist name="generic_flop_525" description="Cross-platform 5.25&quot; disk images">
 
 	<!-- original from pc8801_flop -->
-	<software name="gruppe" supported="no">
+	<software name="gruppe">
 		<description>Gruppe</description>
 		<year>1985</year>
 		<publisher>SPS</publisher>
 		<notes><![CDATA[
-All systems: fails to load with "program load error".
-https://github.com/mamedev/mame/issues/2349
+pc8801: only parent has sound (verify, likely btanb for being V1 game)
 ]]></notes>
 		<info name="release" value="198504xx"/>
 		<info name="alt_title" value="ぐるっぺ"/>
 		<sharedfeat name="compatibility" value="mz2200,pc8801,x1"/>
+		<!-- fails to load with "program load error" otherwise -->
+		<sharedfeat name="write_protected" value="true" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349392">
 				<rom name="gruppe.d88" size="349392" crc="d7efdc5d" sha1="ab4da770fae54f306bfdc8fc9df3c52f3b4a1a65"/>
@@ -30,16 +31,14 @@ https://github.com/mamedev/mame/issues/2349
 	</software>
 
 	<!-- original from x1_flop -->
-	<software name="gruppea" cloneof="gruppe" supported="no">
+	<software name="gruppea" cloneof="gruppe">
 		<description>Gruppe (alt)</description>
 		<year>1985</year>
 		<publisher>SPS</publisher>
-		<notes><![CDATA[
-(same as gruppe)
-]]></notes>
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ぐるっぺ"/>
 		<sharedfeat name="compatibility" value="mz2200,pc8801,x1"/>
+		<sharedfeat name="write_protected" value="true" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="gruppe.d88" size="348848" crc="a50dfd33" sha1="551749d2ec4deb3919f2111d234450fd4f90d54a"/>

@@ -68,6 +68,7 @@ constexpr std::pair<char const *, char const *> SOFTWARE_INFO_NAMES[] = {
 		{ "distributor",        N_p("swlist-info", "Distributor")               },
 		{ "install",            N_p("swlist-info", "Installation Instructions") },
 		{ "isbn",               N_p("swlist-info", "ISBN")                      },
+		{ "language",           N_p("swlist-info", "Language")                  },
 		{ "oem",                N_p("swlist-info", "OEM")                       },
 		{ "original_publisher", N_p("swlist-info", "Original Publisher")        },
 		{ "partno",             N_p("swlist-info", "Part Number")               },

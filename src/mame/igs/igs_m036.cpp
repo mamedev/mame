@@ -755,6 +755,26 @@ ROM_START( huoqilin )
 	ROM_LOAD( "v103cn.u30", 0x1200000, 0x0200000, CRC(1eb6463e) SHA1(2979d7ef627ffbddd1c5236d4dcc1b622a2a9a38) )
 ROM_END
 
+// 猴椰乐园 (Hóu Yē Lèyuán) - PCB-0733-04-JC
+ROM_START( hyleyuan )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "s_103cn.u24", 0x000000, 0x200000, CRC(248aa7e3) SHA1(d24ef32021dc03d9ae875f53767d742c91dd7d78) )
+
+	ROM_REGION( 0x800000, "oki", 0 ) // samples
+	ROM_LOAD( "sp.u39", 0x000000, 0x800000, CRC(27ae2ffb) SHA1(1ce14d426157012a56c7d03c361b0a5d0599b2e1) )
+
+	ROM_REGION( 0x10000000, "gfx", 0 )
+	ROM_LOAD( "gfx.u1", 0x0000000, 0x4000000, CRC(a12df89d) SHA1(4e860ce9d776f01b4dc58737906bd593bf709c77) ) // 0xff filled after the first 0x1'000'000 block
+	ROM_LOAD( "gfx.u2", 0x4000000, 0x4000000, CRC(2d7fdb3f) SHA1(86da3f86460a6b70c894eb94af14f416e670eae4) ) // "
+	ROM_LOAD( "gfx.u3", 0x8000000, 0x4000000, CRC(1369a551) SHA1(8f0ba7a0997c31c6eb5a443223ee6a0270ac17c5) ) // "
+	ROM_LOAD( "gfx.u4", 0xc000000, 0x4000000, CRC(39f2cdfe) SHA1(73ba10eebd2efb0e153033d23f572cf489ea8db1) ) // "
+ROM_END
+
+
 void igs_m036_state::pgm_create_dummy_internal_arm_region()
 {
 	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
@@ -864,10 +884,12 @@ GAME( 2010, mjzhizun, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<mjz
 
 GAME( 2010, lhfy,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhfy_key>,     ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 20??, hlddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036,          ROT0, "IGS",           "Huanle Dou Dizhu (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, hlddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hlddz_key>,    ROT0, "IGS",           "Huanle Dou Dizhu (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2010, zjddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<zjddz_key>,    ROT0, "IGS",           "Zhongji Dou Dizhu (V204CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhzbgqb_key>,  ROT0, "IGS",           "Long Hu Zheng Ba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 201?, hyleyuan, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hyleyuan_key>, ROT0, "IGS",           "Hou Ye Leyuan (S103CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2015, mghammer, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_mghammer,          ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // but has S033CN strings?

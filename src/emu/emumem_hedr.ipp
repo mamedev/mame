@@ -66,8 +66,18 @@ template<int HighBits, int Width, int AddrShift> handler_entry_read_dispatch<Hig
 	m_u_dispatch = m_dispatch_array[0].data();
 	m_global_range = src->m_global_range;
 
+	std::map<handler_entry_read<Width, AddrShift> *, handler_entry_read<Width, AddrShift> *> dupmap;
 	for(unsigned int i=0; i != COUNT; i++) {
-		m_u_dispatch[i] = src->m_u_dispatch[i]->dup();
+		handler_entry_read<Width, AddrShift> *msrc = src->m_u_dispatch[i];
+		auto m = dupmap.find(msrc);
+		if(m != dupmap.end()) {
+			m->second->ref();
+			m_u_dispatch[i] = m->second;
+		} else {
+			handler_entry_read<Width, AddrShift> *dest = msrc->dup();
+			dupmap[src] = dest;
+			m_u_dispatch[i] = dest;
+		}
 		m_u_ranges[i] = src->m_u_ranges[i];
 	}
 }
@@ -714,9 +724,20 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatc
 		m_u_ranges = m_ranges_array[i].data();
 		m_u_dispatch = m_dispatch_array[i].data();
 
+		std::map<handler_entry_read<Width, AddrShift> *, handler_entry_read<Width, AddrShift> *> dupmap;
+
 		for(u32 entry = 0; entry != COUNT; entry++)
 			if(m_dispatch_array[0][entry]) {
-				m_u_dispatch[entry] = m_dispatch_array[0][entry]->dup();
+				handler_entry_read<Width, AddrShift> *src = m_dispatch_array[0][entry];
+				auto m = dupmap.find(src);
+				if(m != dupmap.end()) {
+					m->second->ref();
+					m_u_dispatch[entry] = m->second;
+				} else {
+					handler_entry_read<Width, AddrShift> *dest = src->dup();
+					dupmap[src] = dest;
+					m_u_dispatch[entry] = dest;
+				}
 				m_u_ranges[entry] = m_ranges_array[0][entry];
 			}
 

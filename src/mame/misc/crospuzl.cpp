@@ -118,14 +118,18 @@ uint8_t crospuzl_state::FlashCmd_r()
 //      const uint8_t id[5] = { 0xee, 0x81, 0x00, 0x15, 0x00 };
 		const uint8_t id[5] = { 0xec, 0xf1, 0x00, 0x95, 0x40 };
 		uint8_t res = id[m_FlashAddr];
-		m_FlashAddr ++;
-		m_FlashAddr %= 5;
+		if (!machine().side_effects_disabled())
+		{
+			m_FlashAddr++;
+			m_FlashAddr %= 5;
+		}
 		return res;
 	}
 	if ((m_FlashCmd & 0xff) == 0x30)
 	{
 		uint8_t res = m_flash[m_FlashAddr];
-		m_FlashAddr++;
+		if (!machine().side_effects_disabled())
+			m_FlashAddr++;
 		return res;
 	}
 	return 0;
@@ -143,7 +147,7 @@ void crospuzl_state::FlashCmd_w(uint8_t data)
 void crospuzl_state::FlashAddr_w(uint8_t data)
 {
 	m_FlashAddr |= data << (m_FlashShift*8);
-	m_FlashShift ++;
+	m_FlashShift++;
 	if (m_FlashShift == 4)
 		logerror("%08x %02x ADDR\n",m_FlashAddr,m_FlashShift);
 }
@@ -364,8 +368,9 @@ void crospuzl_state::crospuzl(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3); // FIXME: 72 MHz-ish
-	m_vr0soc->set_host_cpu_tag(m_maincpu);
+	VRENDER0_SOC(config, m_vr0soc, 14318180 * 6); // FIXME: 72 MHz-ish
+	m_vr0soc->set_host_space_tag(m_maincpu, AS_PROGRAM);
+	m_vr0soc->int_callback().set_inputline(m_maincpu, SE3208_INT);
 	m_vr0soc->set_external_vclk(14318180 * 2); // Unknown clock, should output ~70 Hz?
 
 //  ROM strings have references to a K9FXX08 device
@@ -373,6 +378,10 @@ void crospuzl_state::crospuzl(machine_config &config)
 //  SAMSUNG_K9F1G08U0B(config, m_nand, 0); // TODO: exact flavor
 
 	PCF8583(config, m_rtc, 32.768_kHz_XTAL);
+
+	SPEAKER(config, "speaker", 2).front();
+	m_vr0soc->add_route(0, "speaker", 1.0, 0);
+	m_vr0soc->add_route(1, "speaker", 1.0, 1);
 }
 
 ROM_START( crospuzl )

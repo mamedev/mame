@@ -29,7 +29,8 @@
 
 namespace {
 
-class wh_8_64_device : public device_t, public device_h8bus_card_interface
+class wh_8_64_device : public device_t
+					 , public device_h8bus_card_interface
 {
 public:
 
@@ -39,12 +40,9 @@ protected:
 
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
+	virtual void map_mem(address_space_installer & space) override ATTR_COLD;
 	std::vector<int> get_addr(u8 sw) ATTR_COLD;
-	void install_mem_bank(u8 bank) ATTR_COLD;
-
-	bool m_installed;
+	void install_mem_bank(address_space_installer &space,u8 bank) ATTR_COLD;
 
 	memory_share_array_creator<u8, 8> m_ram;
 	required_ioport_array<4>          m_sw;
@@ -63,27 +61,6 @@ wh_8_64_device::wh_8_64_device(const machine_config &mconfig, const char *tag, d
 
 void wh_8_64_device::device_start()
 {
-	m_installed = false;
-
-	save_item(NAME(m_installed));
-}
-
-void wh_8_64_device::device_reset()
-{
-	if (!m_installed)
-	{
-		ioport_value const config(m_config->read());
-
-		for (int i = 0; i < 4; i++)
-		{
-			if (BIT(config, i))
-			{
-				install_mem_bank(i);
-			}
-		}
-
-		m_installed = true;
-	}
 }
 
 std::vector<int> wh_8_64_device::get_addr(u8 sw)
@@ -103,7 +80,7 @@ std::vector<int> wh_8_64_device::get_addr(u8 sw)
 	return result;
 }
 
-void wh_8_64_device::install_mem_bank(u8 bank)
+void wh_8_64_device::install_mem_bank(address_space_installer &space, u8 bank)
 {
 	std::vector<int> addresses = get_addr(3 - bank);
 
@@ -120,16 +97,29 @@ void wh_8_64_device::install_mem_bank(u8 bank)
 
 		LOGSW("Installing block %d at 0x%04x\n", block, addr);
 
-		h8bus().space(AS_PROGRAM).install_ram(addr, addr + 0x1fff, m_ram[block++]);
+		space.install_ram(addr, addr + 0x1fff, m_ram[block++]);
 	}
 }
 
+void wh_8_64_device::map_mem(address_space_installer & space)
+{
+	ioport_value const config(m_config->read());
+
+	for (int bank = 0; bank < 4; bank++)
+	{
+		if (BIT(config, bank))
+		{
+			install_mem_bank(space, bank);
+		}
+	}
+}
+
+
 static INPUT_PORTS_START( wh_8_64 )
 	PORT_START("SW1")
-	// TODO: Properly map the last 8k, needs an HA-8-6 Z80 CPU or HA-8-8 Extended
-	// Configuration board to handle the ROM/RAM swap. Only one switch is set to 1
-	// on SW1.
-	PORT_DIPNAME( 0x01, 0x00, "Bank 3 - Address Block 0k - 8k")    PORT_DIPLOCATION("SW1:1")
+	// Needs an HA-8-6 Z80 CPU or HA-8-8 Extended Configuration board to handle the ROM/RAM
+	// swap.
+	PORT_DIPNAME( 0x01, 0x01, "Bank 3 - Address Block 0k - 8k")    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "Bank 3 - Address Block 8k - 16k")   PORT_DIPLOCATION("SW1:2")

@@ -78,7 +78,7 @@ TODO:
 - hookup PIC16F84 for rbspm
 - emulate protection devices correctly instead of patching
 - inputs and layout for tbss (takes a long time to enable tilemaps)
-- inputs and layout for sglc
+- sglc gives a "call attendant" (通知服务员) error when attempting to start
 - work out remaining magslot lamps and add layout
 - work out remaining jinpaish lamps and update layout
 - work out remaining sball2k1 I/O and update layout
@@ -2260,47 +2260,7 @@ static INPUT_PORTS_START( cjdlz )
 	//PORT_DIPUNUSED_DIPLOC( 0x8000, 0x0000, "DSW6:8")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( hgly )
-	// Mahjong keyboard controls:
-	// A           Hold Reel 1  Stop Reel 1
-	// B           Hold Reel 2  Stop Reel 2
-	// C           Hold Reel 3  Stop Reel 3
-	// Start       Start        Stop All Reels  Take Score
-	// Bet         Bet
-	// Take Score                               Double Up × 2  Big
-	// Double Up                                Double Up × 1
-	// Big                                      Double Up × ½  Small
-	// Small                                    Take Score
-	// There seems to be no Show Odds control in mahjong keyboard mode.
-	// Counters are credit in, key-in, credit out, key-out
-	GMS_MAHJONG_KEYBOARD("DSW3", 0x0040, 0x0040)
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All")         PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)  // also functions as Take Score
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )                                           PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL )  PORT_NAME("Show Odds")                PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )                                           PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )                                           PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                                           PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )                                          PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )    PORT_NAME(u8"Double Up × 1")          PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME(u8"Double Up × 2 / Big")    PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME(u8"Double Up × ½ / Small")  PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
-
+static INPUT_PORTS_START( hgly_dip_sw )
 	// Only 4 DIP banks are actually populated on PCBs but test mode reads all 6.
 	PORT_START("DSW1")   // 16bit, in test mode first 8 are recognized as DSW1, second 8 as DSW4.
 	PORT_DIPNAME( 0x0007, 0x0000, "Payout Rate" )                 PORT_DIPLOCATION("DSW1:1,2,3")  // 出牌率
@@ -2340,7 +2300,7 @@ static INPUT_PORTS_START( hgly )
 	PORT_DIPSETTING(      0x0400, "500,000" )
 	PORT_DIPNAME( 0x3000, 0x0000, "Credit Limit" )                PORT_DIPLOCATION("DSW4:5,6")    // 進分上限
 	PORT_DIPSETTING(      0x0000, "5,000" )
-	PORT_DIPSETTING(      0x1000, "1,0000" )
+	PORT_DIPSETTING(      0x1000, "10,000" )
 	PORT_DIPSETTING(      0x2000, "30,000" )
 	PORT_DIPSETTING(      0x3000, "50,000" )
 	PORT_DIPNAME( 0x4000, 0x0000, "Double Up Game Jackpot" )      PORT_DIPLOCATION("DSW4:7")      // 比倍爆機
@@ -2418,7 +2378,7 @@ static INPUT_PORTS_START( hgly )
 	PORT_DIPSETTING(      0x0001, "32" )
 	PORT_DIPSETTING(      0x0002, "32" )
 	PORT_DIPSETTING(      0x0003, "32" )
-	PORT_DIPNAME( 0x000c, 0x0000, "Minimum Bet" )                 PORT_DIPLOCATION("DSW3:3,4")    // 最大押分  (only two settings)
+	PORT_DIPNAME( 0x000c, 0x0000, "Maximum Bet" )                 PORT_DIPLOCATION("DSW3:3,4")    // 最大押分  (only two settings)
 	PORT_DIPSETTING(      0x0000, "200" )
 	PORT_DIPSETTING(      0x0004, "200" )
 	PORT_DIPSETTING(      0x0008, "200" )
@@ -2444,6 +2404,142 @@ static INPUT_PORTS_START( hgly )
 	//PORT_DIPUNUSED_DIPLOC( 0x2000, 0x0000, "DSW6:6")
 	//PORT_DIPUNUSED_DIPLOC( 0x4000, 0x0000, "DSW6:7")
 	//PORT_DIPUNUSED_DIPLOC( 0x8000, 0x0000, "DSW6:8")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hgly )
+	// Mahjong keyboard controls:
+	// A           Hold Reel 1  Stop Reel 1
+	// B           Hold Reel 2  Stop Reel 2
+	// C           Hold Reel 3  Stop Reel 3
+	// Start       Start        Stop All Reels  Take Score
+	// Bet         Bet
+	// Take Score                               Double Up × 2  Big
+	// Double Up                                Double Up × 1
+	// Big                                      Double Up × ½  Small
+	// Small                                    Take Score
+	// There seems to be no Show Odds control in mahjong keyboard mode.
+	// Counters are credit in, key-in, credit out, key-out
+	GMS_MAHJONG_KEYBOARD("DSW3", 0x0040, 0x0040)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All")         PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)  // also functions as Take Score
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )                                           PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL )  PORT_NAME("Show Odds")                PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )                                           PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )                                           PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                                           PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )                                          PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )    PORT_NAME(u8"Double Up × 1")          PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME(u8"Double Up × 2 / Big")    PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME(u8"Double Up × ½ / Small")  PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
+
+	PORT_INCLUDE( hgly_dip_sw )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sglc )
+	// similar to hgly, but lacks mahjong keyboard support and some settings are different
+	// also uses simplified Chinese characters in settings display (hgly uses traditional characters)
+	// TODO: confirm double-up game controls when the game becomes playable
+
+	PORT_START("COUNTERS")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT )        PORT_WRITE_LINE_MEMBER(FUNC(gms_2layers_state::counter_w<1>)) // key-in
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT )        PORT_WRITE_LINE_MEMBER(FUNC(gms_2layers_state::counter_w<0>)) // coin in
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT )        PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_OUTPUT )        PORT_WRITE_LINE_MEMBER(FUNC(gms_2layers_state::counter_w<3>)) // key-out
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_OUTPUT )        PORT_WRITE_LINE_MEMBER(FUNC(gms_2layers_state::counter_w<2>)) // coin out
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME(DEF_STR(Test))
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Stop All")         // also functions as Take Score
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL )  PORT_NAME("Show Odds")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )    PORT_NAME(u8"Double Up × 1")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME(u8"Double Up × 2 / Big")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME(u8"Double Up × ½ / Small")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0600, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
+
+	PORT_INCLUDE( hgly_dip_sw )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0e00, 0x0000, "Jackpot Limit" )                      PORT_DIPLOCATION("DSW4:2,3,4")  // 破台限制
+	PORT_DIPSETTING(      0x0200, "1,000" )
+	PORT_DIPSETTING(      0x0400, "2,000" )
+	PORT_DIPSETTING(      0x0600, "5,000" )
+	PORT_DIPSETTING(      0x0800, "10,000" )
+	PORT_DIPSETTING(      0x0a00, "20,000" )
+	PORT_DIPSETTING(      0x0000, "30,000" )
+	PORT_DIPSETTING(      0x0c00, "50,000" )
+	PORT_DIPSETTING(      0x0e00, "90,000" )
+	PORT_DIPNAME( 0x3000, 0x0000, "Credit Limit" )                       PORT_DIPLOCATION("DSW4:5,6")    // 进分上限
+	PORT_DIPSETTING(      0x1000, "1,000" )
+	PORT_DIPSETTING(      0x2000, "3,000" )
+	PORT_DIPSETTING(      0x0000, "5,000" )
+	PORT_DIPSETTING(      0x3000, "10,000" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x0020, 0x0000, "Minimum Bet for Shuai/Shuai/Shuai" )  PORT_DIPLOCATION("DSW2:6")      // 帥帥帥最小押分
+	PORT_DIPSETTING(      0x0000, "32" )
+	PORT_DIPSETTING(      0x0020, "64" )
+	PORT_DIPNAME( 0x0080, 0x0000, "Initial Bing/Bing/Bing Points" )      PORT_DIPLOCATION("DSW2:8")      // 兵兵兵起始分
+	PORT_DIPSETTING(      0x0080, "500" )
+	PORT_DIPSETTING(      0x0000, "1000" )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x0003, 0x0000, "Minimum Bet" )                        PORT_DIPLOCATION("DSW3:1,2")    // 最小押分
+	PORT_DIPSETTING(      0x0001, "4" )
+	PORT_DIPSETTING(      0x0000, "8" )
+	PORT_DIPSETTING(      0x0002, "16" )
+	PORT_DIPSETTING(      0x0003, "32" )
+	PORT_DIPNAME( 0x000c, 0x0000, "Maximum Bet" )                        PORT_DIPLOCATION("DSW3:3,4")    // 最大押分
+	PORT_DIPSETTING(      0x0000, "50" )
+	PORT_DIPSETTING(      0x0004, "100" )
+	PORT_DIPSETTING(      0x0008, "200" )
+	PORT_DIPSETTING(      0x000c, "360" )
+	PORT_DIPNAME( 0x0010, 0x0000, "Bet Increment" )                      PORT_DIPLOCATION("DSW3:5")      // 每次押分
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0010, "4" )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR(Controls) )                    PORT_DIPLOCATION("DSW3:7")      // 操作介面  (only one setting)
+	PORT_DIPSETTING(      0x0000, DEF_STR(Joystick) )                                                    // 娱乐
+	PORT_DIPSETTING(      0x0040, DEF_STR(Joystick) )                                                    // 娱乐
 INPUT_PORTS_END
 
 
@@ -3542,7 +3638,7 @@ GAME( 2003, magslot,  0,    magslot,  magslot,  gms_3layers_state, empty_init,  
 
 // train games
 GAME( 1999, hgly,     0,    hgly,     hgly,     gms_2layers_state, init_hgly,     ROT0,  "GMS", "Huangguan Leyuan (990726 CRG1.1)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now. EEPROM interface isn't fully understood.
-GAME( 1999, sglc,     0,    hgly,     hgly,     gms_2layers_state, init_sglc,     ROT0,  "GMS", "Sanguo Lieche (880103 1.6 CHINA)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now.
+GAME( 1999, sglc,     0,    hgly,     sglc,     gms_2layers_state, init_sglc,     ROT0,  "GMS", "Sanguo Lieche (880103 1.6 CHINA)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now.
 GAMEL(2002, ballch,   0,    super555, ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_ballch ) // stops during boot, patched for now.
 GAMEL(2005, cots,     0,    hgly,     cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cots )   // stops during boot, patched for now. EEPROM interface isn't fully understood.
 

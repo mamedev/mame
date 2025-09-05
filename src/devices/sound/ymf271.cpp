@@ -250,7 +250,7 @@ inline bool ymf271_device::check_envelope_end(YMF271Slot *slot)
 inline void ymf271_device::calculate_status_end(int slotnum, bool state)
 {
 	// guess: don't enable/disable if slot isn't a multiple of 4
-	if(slotnum & 3)
+	if (slotnum & 3)
 		return;
 
 	/*
@@ -261,10 +261,10 @@ inline void ymf271_device::calculate_status_end(int slotnum, bool state)
 	uint8_t subbit = slotnum / 12;
 	uint8_t bankbit = ((slotnum % 12) >> 2);
 
-	if(state == false)
-		m_end_status &= ~(1 << (subbit+bankbit*4));
+	if (state == false)
+		m_end_status &= ~(1 << (subbit + bankbit * 4));
 	else
-		m_end_status |= (1 << (subbit+bankbit*4));
+		m_end_status |= (1 << (subbit + bankbit * 4));
 
 }
 
@@ -568,13 +568,11 @@ void ymf271_device::set_feedback(int slotnum, int64_t inp)
 
 void ymf271_device::sound_stream_update(sound_stream &stream)
 {
-	int i, j;
-	int op;
 	int32_t *mixp;
 
-	std::fill(m_mix_buffer.begin(), m_mix_buffer.end(), 0);
+	std::fill_n(m_mix_buffer.begin(), stream.samples() * 4, 0);
 
-	for (j = 0; j < 12; j++)
+	for (int j = 0; j < 12; j++)
 	{
 		YMF271Group *slot_group = &m_groups[j];
 		mixp = &m_mix_buffer[0];
@@ -599,7 +597,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream)
 
 				if (m_slots[slot1].active)
 				{
-					for (i = 0; i < stream.samples(); i++)
+					for (int i = 0; i < stream.samples(); i++)
 					{
 						int64_t output1 = 0, output2 = 0, output3 = 0, output4 = 0;
 						int64_t phase_mod1, phase_mod2, phase_mod3;
@@ -825,7 +823,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream)
 			// 2x 2 operator FM
 			case 1:
 			{
-				for (op = 0; op < 2; op++)
+				for (int op = 0; op < 2; op++)
 				{
 					int slot1 = j + ((op + 0) * 12);
 					int slot3 = j + ((op + 2) * 12);
@@ -833,7 +831,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream)
 					mixp = &m_mix_buffer[0];
 					if (m_slots[slot1].active)
 					{
-						for (i = 0; i < stream.samples(); i++)
+						for (int i = 0; i < stream.samples(); i++)
 						{
 							int64_t output1 = 0, output3 = 0;
 							int64_t phase_mod1, phase_mod3;
@@ -900,7 +898,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream)
 
 				if (m_slots[slot1].active)
 				{
-					for (i = 0; i < stream.samples(); i++)
+					for (int i = 0; i < stream.samples(); i++)
 					{
 						int64_t output1 = 0, output2 = 0, output3 = 0;
 						int64_t phase_mod1, phase_mod3;
@@ -1023,7 +1021,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream)
 	}
 
 	mixp = &m_mix_buffer[0];
-	for (i = 0; i < stream.samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		stream.put_int(0, i, *mixp++, 32768 << 2);
 		stream.put_int(1, i, *mixp++, 32768 << 2);
@@ -1040,7 +1038,7 @@ void ymf271_device::write_register(int slotnum, int reg, uint8_t data)
 	{
 		case 0x0:
 			slot->ext_en = (data & 0x80) ? 1 : 0;
-			slot->ext_out = (data>>3)&0xf;
+			slot->ext_out = (data >> 3) & 0xf;
 
 			if (data & 1)
 			{
@@ -1448,9 +1446,10 @@ void ymf271_device::write(offs_t offset, u8 data)
 {
 	m_stream->update();
 
-	m_regs_main[offset & 0xf] = data;
+	offset &= 0xf;
+	m_regs_main[offset] = data;
 
-	switch (offset & 0xf)
+	switch (offset)
 	{
 		case 0x0:
 		case 0x2:
@@ -1492,7 +1491,13 @@ void ymf271_device::write(offs_t offset, u8 data)
 
 u8 ymf271_device::read(offs_t offset)
 {
-	switch (offset & 0xf)
+	offset &= 0xf;
+
+	// update stream before reading status registers
+	if (offset <= 1)
+		m_stream->update();
+
+	switch (offset)
 	{
 		case 0x0:
 			return m_status | ((m_end_status & 0xf) << 3);
@@ -1524,18 +1529,16 @@ u8 ymf271_device::read(offs_t offset)
 
 void ymf271_device::init_tables()
 {
-	int i, j;
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		m_lut_waves[i] = std::make_unique<int16_t[]>(SIN_LEN);
 
-	for (i = 0; i < 4*8; i++)
+	for (int i = 0; i < 4*8; i++)
 		m_lut_plfo[i>>3][i&7] = std::make_unique<double[]>(LFO_LENGTH);
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		m_lut_alfo[i] = std::make_unique<int[]>(LFO_LENGTH);
 
-	for (i = 0; i < SIN_LEN; i++)
+	for (int i = 0; i < SIN_LEN; i++)
 	{
 		double m = sin( ((i*2)+1) * M_PI / SIN_LEN );
 		double m2 = sin( ((i*4)+1) * M_PI / SIN_LEN );
@@ -1564,7 +1567,7 @@ void ymf271_device::init_tables()
 		m_lut_waves[7][i] = 0;
 	}
 
-	for (i = 0; i < LFO_LENGTH; i++)
+	for (int i = 0; i < LFO_LENGTH; i++)
 	{
 		int tri_wave;
 		double ftri_wave, fsaw_wave;
@@ -1588,7 +1591,7 @@ void ymf271_device::init_tables()
 			default: plfo[3] = 0; assert(0); break;
 		}
 
-		for (j = 0; j < 4; j++)
+		for (int j = 0; j < 4; j++)
 		{
 			m_lut_plfo[j][0].get()[i] = pow(2.0, 0.0);
 			m_lut_plfo[j][1].get()[i] = pow(2.0, (3.378 * plfo[j]) / 1200.0);
@@ -1611,16 +1614,16 @@ void ymf271_device::init_tables()
 		m_lut_alfo[3][i] = (i < (LFO_LENGTH/2)) ? ALFO_MAX-tri_wave : tri_wave;
 	}
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		m_lut_env_volume[i] = (int)(65536.0 / pow(10.0, ((double)i / (256.0 / 96.0)) / 20.0));
 	}
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		m_lut_attenuation[i] = (int)(65536.0 / pow(10.0, channel_attenuation_table[i] / 20.0));
 	}
-	for (i = 0; i < 128; i++)
+	for (int i = 0; i < 128; i++)
 	{
 		double db = 0.75 * (double)i;
 		m_lut_total_level[i] = (int)(65536.0 / pow(10.0, db / 20.0));
@@ -1727,8 +1730,8 @@ void ymf271_device::device_start()
 	init_tables();
 	init_state();
 
-	m_mix_buffer.resize(m_master_clock/(384/4));
-	m_stream = stream_alloc(0, 4, m_master_clock/384);
+	m_mix_buffer.resize(m_master_clock / (384/4));
+	m_stream = stream_alloc(0, 4, m_master_clock / 384);
 }
 
 //-------------------------------------------------
@@ -1767,7 +1770,7 @@ void ymf271_device::device_clock_changed()
 	if (m_master_clock != old_clock)
 	{
 		if (old_clock < m_master_clock)
-			m_mix_buffer.resize(m_master_clock/(384/4));
+			m_mix_buffer.resize(m_master_clock / (384/4));
 
 		m_stream->set_sample_rate(m_master_clock / 384);
 	}

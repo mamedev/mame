@@ -10377,7 +10377,8 @@ The disks have had their OEM IDs modified by Windows
 		<description>Alien Carnage (set 1)</description>
 		<year>1994</year>
 		<publisher>Apogee Software</publisher>
-		<info name="developer" value="Interactive Binary Illusions / Sub Zer0 Software" />
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="developer" value="Sub Zer0 Software" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -10395,7 +10396,8 @@ The disks have had their OEM IDs modified by Windows
 		<description>Alien Carnage (set 2, older)</description>
 		<year>1994</year>
 		<publisher>Apogee Software</publisher>
-		<info name="developer" value="Interactive Binary Illusions / Sub Zer0 Software" />
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="developer" value="Sub Zer0 Software" />
 		<info name="version" value="v1.0 - Registered Version" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -10413,7 +10415,8 @@ The disks have had their OEM IDs modified by Windows
 		<description>Alien Carnage (FormGen release)</description>
 		<year>1995</year>
 		<publisher>FormGen</publisher>
-		<info name="developer" value="Interactive Binary Illusions / Sub Zer0 Software" />
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="developer" value="Sub Zer0 Software" />
 		<info name="version" value="v1.0 - Registered Version" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -11316,7 +11319,13 @@ Differences between clone/parent:
 		<year>1994</year>
 		<publisher>Virgin</publisher>
 		<info name="developer" value="Revolution Software" />
-		<info name="language" value="English/French/German/Italian/Portuguese/Spanish/Swedish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<info name="region" value="Europe" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="DISK 1 OF 6" />
@@ -11361,7 +11370,9 @@ Differences between clone/parent:
 		<year>1994</year>
 		<publisher>Virgin</publisher>
 		<info name="developer" value="Revolution Software" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="France" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="DISK 1 OF 6" />
@@ -11598,8 +11609,11 @@ Differences between clone/parent:
 		<description>Brutal: Paws of Fury</description>
 		<year>1995</year>
 		<publisher>GameTek</publisher>
-		<info name="developer" value="Eurocom Developments / GameTek" />
-		<info name="language" value="English/French/German" />
+		<info name="developer" value="Eurocom Developments" />
+		<info name="developer" value="GameTek" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Brutal - Paws of Fury [GameTek] [1995] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="ea97fa6e" sha1="faa5de473bbdee62d4c229ad657fe25a256463f5"/>
@@ -14935,7 +14949,8 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 		<year>1992</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="copy_protection" value="Manual - Code sheets required" />
-		<info name="developer" value="Coktel Vision, M.D.O." />
+		<info name="developer" value="Coktel Vision" />
+		<info name="developer" value="M.D.O." />
 		<info name="version" value="1.000 09/11/92" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -14954,7 +14969,8 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 		<year>1993</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.000.000 02/10/93" />
-		<info name="developer" value="Coktel Vision, M.D.O." />
+		<info name="developer" value="Coktel Vision" />
+		<info name="developer" value="M.D.O." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Gobliins 2 [Sierra] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="8b4ebf44" sha1="295d025ddb3953289aee6c96d69d3276111f8ea8"/>
@@ -15557,7 +15573,8 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<description>Hexx: Heresy of the Wizard</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
-		<info name="developer" value="A.P. Taglione &amp; P.H. James" />
+		<info name="developer" value="A.P. Taglione" />
+		<info name="developer" value="P.H. James" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Hexx [Psygnosis] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="96e88e9a" sha1="7b7fdeff4a597920ceb40bc0c97b43f5d1a67c0a"/>
@@ -17180,7 +17197,11 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<year>1992</year>
 		<publisher>Krisalis Software</publisher>
 		<info name="developer" value="Target Games" />
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
@@ -17206,7 +17227,8 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<description>The Legacy: Realm of Terror (Europe)</description>
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
-		<info name="developer" value="Magnetic Scrolls/MicroProse" />
+		<info name="developer" value="Magnetic Scrolls" />
+		<info name="developer" value="MicroProse" />
 		<info name="region" value="Europe" />
 		<info name="version" value="1.154 Apr 21 1993 19:52:07 European Release" />
 		<part name="flop1" interface="floppy_3_5">
@@ -18332,7 +18354,8 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Michael Jordan in Flight</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="developer" value="Pacific Gameworks, ZCT Systems Group" />
+		<info name="developer" value="Pacific Gameworks" />
+		<info name="developer" value="ZCT Systems Group" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Michael Jordan in Flight [Electronic Arts] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="a9de8087" sha1="dbba3b92d0a56f5a5afa3c86f539cbb1cafe3f6c"/>
@@ -19501,7 +19524,9 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
 		<info name="developer" value="MPS Labs" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="Pirates Gold [MicroProse] [1993] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="29c00a1b" sha1="56a6230698c25f502ad7f6d21b83c995fe188f64"/>
@@ -19809,7 +19834,11 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<publisher>Codemasters</publisher>
 		<notes>Bad dump: Modified ROOT and OEM id</notes>
 		<info name="copy_protection" value="Manual required" />
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Psycho Pinball [Codemasters] [1995] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="fcbb3a7a" sha1="06ce414876eb66c7389193fc83957f7a22b5c096" status="baddump"/>
@@ -19842,7 +19871,10 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<year>1994</year>
 		<publisher>The Hit Squad</publisher>
 		<info name="developer" value="Red Rat Software" />
-		<info name="language" value="English/French/German/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Push-Over [Hit Squad] [1994] [3.5DD] [Disk 1 of 3].img" size="737280" crc="15fc80ce" sha1="c92559f8e13b481e144e819c42f3bd2fafbb98d8" />
@@ -19932,7 +19964,12 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<year>1995</year>
 		<publisher>Nestle</publisher>
 		<info name="developer" value="ARGON Software" />
-		<info name="language" value="English/French/German/Italian/Portuguese/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese" />
+		<info name="language" value="Spanish" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Quicky [Nestle] [1995] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f2564361" sha1="1c4981ef296f48c6638da96d6e51ee6bda308809"/>
@@ -20460,7 +20497,8 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="copy_protection" value="Manual required" />
-		<info name="developer" value="Dinamic Software / Zeus Software" />
+		<info name="developer" value="Dinamic Software" />
+		<info name="developer" value="Zeus Software" />
 		<info name="region" value="Italy" />
 		<info name="version" value="v1.1 (1/9/92)" />
 		<part name="flop1" interface="floppy_3_5">
@@ -20475,7 +20513,8 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="copy_protection" value="Manual required" />
-		<info name="developer" value="Dinamic Software / Zeus Software" />
+		<info name="developer" value="Dinamic Software" />
+		<info name="developer" value="Zeus Software" />
 		<info name="version" value="v1.1 (1/9/92)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -22625,7 +22664,9 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Bullfrog Productions" />
-		<info name="language" value="English/French/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Italian" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="1f88694e" sha1="ce392619acc8d00d611d7aee450bc6d34a24e9f4"/>
@@ -22658,7 +22699,9 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Bullfrog Productions" />
-		<info name="language" value="English/French/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Italian" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Syndicate 1" />
 			<dataarea name="flop" size = "1474560">
@@ -23331,7 +23374,11 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<publisher>Mindscape</publisher>
 		<notes>Bad dump: Modified ROOT and OEM id</notes>
 		<info name="developer" value="Atreid Concept" />
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="usage" value="requires a VESA compatible video card" />
 		<info name="version" value="v1.0β" />
 		<part name="flop1" interface="floppy_3_5">

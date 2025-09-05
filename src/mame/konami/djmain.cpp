@@ -192,6 +192,7 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
 
 namespace {
 
@@ -266,16 +267,16 @@ private:
 	void unknown802000_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void unknownc02000_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	uint32_t screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
 	void ide_interrupt(int state);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	K056832_CB_MEMBER(tile_callback);
 	void k054539_map(address_map &map) ATTR_COLD;
-	void maincpu_djmain(address_map &map) ATTR_COLD;
-	void maincpu_djmaina(address_map &map) ATTR_COLD;
-	void maincpu_djmainj(address_map &map) ATTR_COLD;
-	void maincpu_djmainu(address_map &map) ATTR_COLD;
+	void base_map(address_map &map) ATTR_COLD;
+	void main_map_a(address_map &map) ATTR_COLD;
+	void main_map_j(address_map &map) ATTR_COLD;
+	void main_map_u(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
@@ -314,12 +315,31 @@ private:
 };
 
 
+/*
+    Sprite format (16 bytes per sprite)
+
+    Offset  Bits                                     Description 
+            1111 1111 1111 1111 0000 0000 0000 0000
+            fedc ba98 7654 3210 fedc ba98 7654 3210
+    0x0     x--- ---- ---- ---- ---- ---- ---- ----  Skip this sprite
+			--xx xxxx xxxx xxxx ---- ---- ---- ----  Tile index
+            ---- ---- ---- ---- x--- ---- ---- ----  Active this sprite
+			---- ---- ---- ---- ---- x--- ---- ----  Flip Y
+			---- ---- ---- ---- ---- -x-- ---- ----  Flip X
+			---- ---- ---- ---- ---- --xx ---- ----  Size (1,2,4,8 horizontal and vertical tiles)
+            ---- ---- ---- ---- ---- ---- -xxx xxxx  vs. Sprite priority
+    0x4     xxxx xxxx xxxx xxxx ---- ---- ---- ----  Y
+            ---- ---- ---- ---- xxxx xxxx xxxx xxxx  X
+    0x8     xxxx xxxx xxxx xxxx ---- ---- ---- ----  Zoom X
+            ---- ---- ---- ---- xxxx xxxx xxxx xxxx  Zoom Y
+    0xc     ---- ---- ---- xxxx ---- ---- ---- ----  Color
+*/
 void djmain_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static constexpr int NUM_SPRITES = 128;
 
 	int offs, pri_code;
-	int sortedlist[NUM_SPRITES];
+	int sortedlist[NUM_SPRITES]{};
 
 	m_gfxdecode->gfx(0)->set_colorbase(m_k055555->K055555_read_register(K55_PALBASE_SUB2) * 0x400);
 
@@ -344,27 +364,20 @@ void djmain_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
 		static const int sizetab[4] =  { 1, 2, 4, 8 };
-		int x, y;
-		int ox, oy;
-		int flipx, flipy;
-		int xscale, yscale;
-		int code;
-		int color;
-		int size;
 
-		offs = sortedlist[pri_code];
+		const int offs = sortedlist[pri_code];
 		if (offs == -1) continue;
 
-		code = m_objram[offs] >> 16;
-		flipx = (m_objram[offs] >> 10) & 1;
-		flipy = (m_objram[offs] >> 11) & 1;
-		size = sizetab[(m_objram[offs] >> 8) & 3];
+		const int code = m_objram[offs] >> 16;
+		const bool flipx = BIT(m_objram[offs], 10);
+		const bool flipy = BIT(m_objram[offs], 11);
+		const int size = sizetab[(m_objram[offs] >> 8) & 3];
 
-		ox = (int16_t)(m_objram[offs + 1] & 0xffff);
-		oy = (int16_t)(m_objram[offs + 1] >> 16);
+		int ox = (int16_t)(m_objram[offs + 1] & 0xffff);
+		int oy = (int16_t)(m_objram[offs + 1] >> 16);
 
-		xscale = m_objram[offs + 2] >> 16;
-		yscale = m_objram[offs + 2] & 0xffff;
+		int xscale = m_objram[offs + 2] >> 16;
+		int yscale = m_objram[offs + 2] & 0xffff;
 
 		if (!xscale || !yscale)
 			continue;
@@ -374,11 +387,11 @@ void djmain_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		ox -= (size * xscale) >> 13;
 		oy -= (size * yscale) >> 13;
 
-		color = (m_objram[offs + 3] >> 16) & 15;
+		const int color = (m_objram[offs + 3] >> 16) & 15;
 
-		for (x = 0; x < size; x++)
+		for (int x = 0; x < size; x++)
 		{
-			for (y = 0; y < size; y++)
+			for (int y = 0; y < size; y++)
 			{
 				int c = code;
 
@@ -394,10 +407,10 @@ void djmain_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 				if (xscale != 0x10000 || yscale != 0x10000)
 				{
-					int sx = ox + ((x * xscale + (1 << 11)) >> 12);
-					int sy = oy + ((y * yscale + (1 << 11)) >> 12);
-					int zw = ox + (((x + 1) * xscale + (1 << 11)) >> 12) - sx;
-					int zh = oy + (((y + 1) * yscale + (1 << 11)) >> 12) - sy;
+					const int sx = ox + ((x * xscale + (1 << 11)) >> 12);
+					const int sy = oy + ((y * yscale + (1 << 11)) >> 12);
+					const int zw = ox + (((x + 1) * xscale + (1 << 11)) >> 12) - sx;
+					const int zh = oy + (((y + 1) * yscale + (1 << 11)) >> 12) - sy;
 
 					m_gfxdecode->gfx(0)->zoom_transpen(bitmap,
 							cliprect,
@@ -413,8 +426,8 @@ void djmain_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				}
 				else
 				{
-					int sx = ox + (x << 4);
-					int sy = oy + (y << 4);
+					const int sx = ox + (x << 4);
+					const int sy = oy + (y << 4);
 
 					m_gfxdecode->gfx(0)->transpen(bitmap,
 							cliprect,
@@ -443,9 +456,9 @@ void djmain_state::video_start()
 	m_k056832->set_layer_offs(1, -88, -27);
 }
 
-uint32_t djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t djmain_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int enables = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	const int enables = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	int pri[3];
 	int order[3];
 
@@ -460,17 +473,14 @@ uint32_t djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 
 		for (int j = i + 1; j < 3; j++)
 			if (pri[order[i]] > pri[order[j]])
 			{
-				int temp = order[i];
-
-				order[i] = order[j];
-				order[j] = temp;
+				std::swap(order[i], order[j]);
 			}
 
 	bitmap.fill(m_palette->pen(0), cliprect);
 
 	for (int i = 0; i < 3; i++)
 	{
-		int layer = order[i];
+		const int layer = order[i];
 
 		if (layer == 2)
 		{
@@ -554,7 +564,7 @@ void djmain_state::obj_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 uint32_t djmain_state::obj_rom_r(offs_t offset, uint32_t mem_mask)
 {
-	int bank = m_obj_regs[0x28/4] >> 16 & 0x3ff;
+	const int bank = m_obj_regs[0x28/4] >> 16 & 0x3ff;
 
 	offset += bank * 0x200;
 	offset *= 4;
@@ -584,7 +594,7 @@ void djmain_state::v_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint32_t djmain_state::v_rom_r(offs_t offset, uint32_t mem_mask)
 {
-	int bank = m_k056832->word_r(0x34/2) & 0xff;
+	const int bank = m_k056832->word_r(0x34/2) & 0xff;
 
 	offset *= 2;
 
@@ -614,11 +624,8 @@ uint32_t djmain_state::turntable_r(offs_t offset, uint32_t mem_mask)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		uint8_t pos;
-		int delta;
-
-		pos = m_turntable[m_turntable_select].read_safe(0);
-		delta = pos - m_turntable_last_pos[m_turntable_select];
+		const uint8_t pos = m_turntable[m_turntable_select].read_safe(0);
+		int delta = pos - m_turntable_last_pos[m_turntable_select];
 		if (delta < -128)
 			delta += 256;
 		if (delta > 128)
@@ -779,7 +786,7 @@ void djmain_state::ide_interrupt(int state)
  *
  *************************************/
 
-void djmain_state::maincpu_djmain(address_map &map)
+void djmain_state::base_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x400000, 0x40ffff).ram();
@@ -804,9 +811,9 @@ void djmain_state::maincpu_djmain(address_map &map)
 	map(0x803800, 0x803fff).r(FUNC(djmain_state::obj_rom_r)); // OBJECT ROM readthrough (for POST)
 }
 
-void djmain_state::maincpu_djmainj(address_map &map)
+void djmain_state::main_map_j(address_map &map)
 {
-	maincpu_djmain(map);
+	base_map(map);
 
 	map(0xc00000, 0xc01fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0xc02000, 0xc02047).w(FUNC(djmain_state::unknownc02000_w)); // ?
@@ -814,18 +821,18 @@ void djmain_state::maincpu_djmainj(address_map &map)
 	map(0xf40000, 0xf4000f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
 }
 
-void djmain_state::maincpu_djmainu(address_map &map)
+void djmain_state::main_map_u(address_map &map)
 {
-	maincpu_djmain(map);
+	base_map(map);
 
 	map(0xd00000, 0xd0000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
 	map(0xd40000, 0xd4000f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
 	map(0xe00000, 0xe01fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 }
 
-void djmain_state::maincpu_djmaina(address_map &map)
+void djmain_state::main_map_a(address_map &map)
 {
-	maincpu_djmain(map);
+	base_map(map);
 
 	map(0xc00000, 0xc0000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
 	map(0xc40000, 0xc4000f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
@@ -834,7 +841,7 @@ void djmain_state::maincpu_djmaina(address_map &map)
 
 void djmain_state::k054539_map(address_map &map)
 {
-	map(0x000000, 0xffffff).ram().share("sndram");
+	map(0x000000, 0xffffff).ram().share(m_sndram);
 }
 
 
@@ -1711,21 +1718,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout spritelayout =
-{
-	16, 16, /* 16x16 characters */
-	0x200000 / 128, /* 16384 characters */
-	4,  /* bit planes */
-	{ 0, 1, 2, 3 },
-	{ 4, 0, 12, 8, 20, 16, 28, 24,
-		4+256, 0+256, 12+256, 8+256, 20+256, 16+256, 28+256, 24+256 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		0*32+512, 1*32+512, 2*32+512, 3*32+512, 4*32+512, 5*32+512, 6*32+512, 7*32+512 },
-	16*16*4
-};
-
 static GFXDECODE_START( gfx_djmain )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0,  (0x4440/4)/16 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_row_2x2_group_packed_lsb, 0, (0x4440/4)/16 )
 GFXDECODE_END
 
 
@@ -1782,7 +1776,7 @@ void djmain_state::djmainj(machine_config &config)
 {
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, 32_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &djmain_state::maincpu_djmainj);
+	m_maincpu->set_addrmap(AS_PROGRAM, &djmain_state::main_map_j);
 	m_maincpu->set_vblank_int("screen", FUNC(djmain_state::vb_interrupt));
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
@@ -1791,7 +1785,7 @@ void djmain_state::djmainj(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(32_MHz_XTAL / 2, 660, 0, 512, 418, 0, 384);
-	screen.set_screen_update(FUNC(djmain_state::screen_update_djmain));
+	screen.set_screen_update(FUNC(djmain_state::screen_update));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4440 / 4);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_djmain);
@@ -1820,13 +1814,13 @@ void djmain_state::djmainj(machine_config &config)
 void djmain_state::djmainu(machine_config &config)
 {
 	djmainj(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &djmain_state::maincpu_djmainu);
+	m_maincpu->set_addrmap(AS_PROGRAM, &djmain_state::main_map_u);
 }
 
 void djmain_state::djmaina(machine_config &config)
 {
 	djmainj(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &djmain_state::maincpu_djmaina);
+	m_maincpu->set_addrmap(AS_PROGRAM, &djmain_state::main_map_a);
 }
 
 

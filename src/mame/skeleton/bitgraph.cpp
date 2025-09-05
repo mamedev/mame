@@ -36,6 +36,10 @@
         Selectable memory size.
         Video enable/reverse video switch.
 
+    FIXME: The CPU and PSG XTAL values are probably fake. More likely, all
+    clocks except the BRG clock are divisions of a ~41.42 MHz dot clock.
+    (What is its actual value?)
+
 ****************************************************************************/
 
 #include "emu.h"

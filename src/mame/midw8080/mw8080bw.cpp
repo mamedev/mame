@@ -187,7 +187,7 @@ INPUT_CHANGED_MEMBER(mw8080bw_state::direct_coin_count)
 
 uint8_t mw8080bw_state::vpos_to_vysnc_chain_counter( int vpos )
 {
-	/* convert from a vertical position to the actual values on the vertical sync counters */
+	// convert from a vertical position to the actual values on the vertical sync counters
 	uint8_t counter;
 	int vblank = (vpos >= MW8080BW_VBSTART);
 
@@ -202,7 +202,7 @@ uint8_t mw8080bw_state::vpos_to_vysnc_chain_counter( int vpos )
 
 int mw8080bw_state::vysnc_chain_counter_to_vpos( uint8_t counter, int vblank )
 {
-	/* convert from the vertical sync counters to an actual vertical position */
+	// convert from the vertical sync counters to an actual vertical position
 	int vpos;
 
 	if (vblank)
@@ -328,13 +328,13 @@ void mw8080bw_state::main_map(address_map &map)
 
 void mw8080bw_state::mw8080bw_root(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	i8080_cpu_device &maincpu(I8080(config, m_maincpu, MW8080BW_CPU_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &mw8080bw_state::main_map);
 	maincpu.set_irq_acknowledge_callback(FUNC(mw8080bw_state::interrupt_vector));
 	maincpu.out_inte_func().set(FUNC(mw8080bw_state::int_enable_w));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MW8080BW_PIXEL_CLOCK, MW8080BW_HTOTAL, MW8080BW_HBEND, MW8080BW_HPIXCOUNT, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART);
 	m_screen->set_screen_update(FUNC(mw8080bw_state::screen_update_mw8080bw));
@@ -736,7 +736,7 @@ void mw8080bw_state::tornbase_io_map(address_map &map)
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	/* no decoder, just 3 AND gates */
+	// no decoder, just 3 AND gates
 	map(0x00, 0x07).w(FUNC(mw8080bw_state::tornbase_io_w));
 }
 
@@ -752,11 +752,11 @@ static INPUT_PORTS_START( tornbase )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(mw8080bw_state::tornbase_hit_right_input_r))
 	PORT_BIT( 0x7e, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(mw8080bw_state::tornbase_pitch_right_input_r))
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED)  /* not connected */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED)  // not connected
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )  /* schematics shows it as "START", but not used by the software */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )  // schematics shows it as "START", but not used by the software
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(mw8080bw_state::tornbase_score_input_r))
 	PORT_DIPNAME( 0x78, 0x40, DEF_STR( Coinage ) ) PORT_CONDITION("IN2", 0x80, EQUALS, 0x00) PORT_DIPLOCATION("B1:2,3,4,5")
 	PORT_DIPSETTING(    0x18, "4 Coins/1 Inning" )
@@ -777,7 +777,7 @@ static INPUT_PORTS_START( tornbase )
 	PORT_DIPSETTING(    0x60, "1 Coin/9 Innings" )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "B1:6" )
 
-	/* fake ports to handle the various input configurations based on cabinet type */
+	// fake ports to handle the various input configurations based on cabinet type
 	PORT_START(TORNBASE_L_HIT_PORT_TAG)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Hit") PORT_PLAYER(1)
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -816,7 +816,7 @@ static INPUT_PORTS_START( tornbase )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	/* fake port for cabinet type */
+	// fake port for cabinet type
 	PORT_START(TORNBASE_CAB_TYPE_PORT_TAG)
 	PORT_CONFNAME( 0x03, TORNBASE_CAB_TYPE_UPRIGHT_NEW, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING( TORNBASE_CAB_TYPE_UPRIGHT_OLD, "Upright/w One Hit Button" )
@@ -830,14 +830,14 @@ void mw8080bw_state::tornbase(machine_config &config)
 {
 	mw8080bw_root(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &mw8080bw_state::tornbase_io_map);
-	/* there is no watchdog */
+	// there is no watchdog
 
-	/* add shifter */
+	// add shifter
 	MB14241(config, m_mb14241);
 
-	/* audio hardware */
+	// audio hardware
 	tornbase_audio(config);
 }
 
@@ -867,13 +867,13 @@ void zzzap_state::io_map(address_map &map)
 
 static INPUT_PORTS_START( zzzap )
 	PORT_START("IN0")
-	PORT_BIT( 0x0f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(64) PORT_PLAYER(1)   /* accelerator */
+	PORT_BIT( 0x0f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(64) PORT_PLAYER(1)   // accelerator
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_TOGGLE PORT_NAME("P1 Shift") PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )    /* not connected */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )    // not connected
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START1 )    /* start button, but never used? */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START1 )    // start button, but never used?
 
-	PORT_START("IN1")   /* steering wheel */
+	PORT_START("IN1")   // steering wheel
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x01,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START("IN2")
@@ -894,7 +894,7 @@ static INPUT_PORTS_START( zzzap )
 	PORT_DIPSETTING(    0x10, "2.00" )
 	PORT_DIPSETTING(    0x00, "2.50" )
 	PORT_DIPSETTING(    0x20, DEF_STR( None ) )
-	/* PORT_DIPSETTING( 0x30, DEF_STR( None ) ) */
+	// PORT_DIPSETTING( 0x30, DEF_STR( None ) )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language )) PORT_CONDITION("IN2", 0x0c, NOTEQUALS, 0x04) PORT_DIPLOCATION("E3:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( German ) )
@@ -938,15 +938,15 @@ void zzzap_state::zzzap_common(machine_config &config)
 {
 	mw8080bw_root(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &zzzap_state::io_map);
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_MONOSTABLE(RES_M(1), CAP_U(1))); /* 1.1s */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_MONOSTABLE(RES_M(1), CAP_U(1))); // 1.1s
 
-	/* add shifter */
+	// add shifter
 	MB14241(config, m_mb14241);
 
-	/* audio hardware handled by specific machine */
+	// audio hardware handled by specific machine
 }
 
 
@@ -954,7 +954,7 @@ void zzzap_state::zzzap(machine_config &config)
 {
 	zzzap_common(config);
 
-	/* audio hardware */
+	// audio hardware
 	ZZZAP_AUDIO(config, "soundboard");
 }
 
@@ -963,7 +963,7 @@ void zzzap_state::lagunar(machine_config &config)
 {
 	zzzap_common(config);
 
-	/* audio hardware */
+	// audio hardware
 	LAGUNAR_AUDIO(config, "soundboard");
 }
 
@@ -975,7 +975,7 @@ void zzzap_state::lagunar(machine_config &config)
  *
  *************************************/
 
-/* schematic says 12.5 Hz, but R/C values shown give 8.5Hz */
+// schematic says 12.5 Hz, but R/C values shown give 8.5 Hz
 #define MAZE_555_B1_PERIOD      PERIOD_OF_555_ASTABLE(RES_K(33) /* R200 */, RES_K(68) /* R201 */, CAP_U(1) /* C201 */)
 
 void mw8080bw_state::maze_update_discrete()
@@ -995,14 +995,14 @@ MACHINE_START_MEMBER(mw8080bw_state,maze)
 {
 	mw8080bw_state::machine_start();
 
-	/* create astable timer for IC B1 */
+	// create astable timer for IC B1
 	m_maze_tone_timer = timer_alloc(FUNC(mw8080bw_state::maze_tone_timing_timer_callback), this);
 	m_maze_tone_timer->adjust(MAZE_555_B1_PERIOD, 0, MAZE_555_B1_PERIOD);
 
-	/* initialize state of Tone Timing FF, IC C1 */
+	// initialize state of Tone Timing FF, IC C1
 	m_maze_tone_timing_state = 0;
 
-	/* setup for save states */
+	// setup for save states
 	save_item(NAME(m_maze_tone_timing_state));
 	machine().save().register_postload(save_prepost_delegate(FUNC(mw8080bw_state::maze_update_discrete), this));
 }
@@ -1010,7 +1010,7 @@ MACHINE_START_MEMBER(mw8080bw_state,maze)
 
 void mw8080bw_state::maze_coin_counter_w(uint8_t data)
 {
-	/* the data is not used, just pulse the counter */
+	// the data is not used, just pulse the counter
 	machine().bookkeeping().coin_counter_w(0, 0);
 	machine().bookkeeping().coin_counter_w(0, 1);
 }
@@ -1030,7 +1030,7 @@ void mw8080bw_state::maze_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 
-	/* no decoder, just a couple of AND gates */
+	// no decoder, just a couple of AND gates
 	map(0x00, 0x03).w(FUNC(mw8080bw_state::maze_io_w));
 }
 
@@ -1049,7 +1049,7 @@ static INPUT_PORTS_START( maze )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )    /* labeled 'Not Used' */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )    // labeled 'Not Used'
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1  )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) ) PORT_CONDITION("IN1", 0x80, EQUALS, 0x00) PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
@@ -1067,14 +1067,14 @@ void mw8080bw_state::maze(machine_config &config)
 {
 	mw8080bw_root(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &mw8080bw_state::maze_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,maze)
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10))); /* 2.97s */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10))); // 2.97s
 
-	/* audio hardware */
+	// audio hardware
 	maze_audio(config);
 }
 
@@ -1206,7 +1206,7 @@ void mw8080bw_state::checkmat_io_map(address_map &map)
 	map(0x02, 0x02).portr("IN2");
 	map(0x03, 0x03).portr("IN3");
 
-	/* no decoder, just a couple of AND gates */
+	// no decoder, just a couple of AND gates
 	map(0x00, 0x03).w(FUNC(mw8080bw_state::checkmat_io_w));
 }
 
@@ -1276,12 +1276,12 @@ void mw8080bw_state::checkmat(machine_config &config)
 {
 	mw8080bw_root(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &mw8080bw_state::checkmat_io_map);
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10))); /* 2.97s */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10))); // 2.97s
 
-	/* audio hardware */
+	// audio hardware
 	checkmat_audio(config);
 }
 
@@ -1352,7 +1352,7 @@ static INPUT_PORTS_START( desertgu )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	/* fake ports for reading the gun's X and Y axis */
+	// fake ports for reading the gun's X and Y axis
 	PORT_START(DESERTGU_GUN_X_PORT_TAG)
 	PORT_BIT( 0xff, 0x4d, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x10,0x8e) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
@@ -2011,7 +2011,7 @@ void clowns_state::spacwalk(machine_config &config)
 
 void mw8080bw_state::shuffle_io_map(address_map &map)
 {
-	map.global_mask(0xf);    /* yes, 4, and no mirroring on the read handlers */
+	map.global_mask(0xf);    // yes, 4, and no mirroring on the read handlers
 	map(0x01, 0x01).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 	map(0x02, 0x02).portr("IN0");
 	map(0x03, 0x03).r(FUNC(mw8080bw_state::mw8080bw_shift_result_rev_r));
@@ -2033,7 +2033,7 @@ static INPUT_PORTS_START( shuffle )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( German ) )
-	/* PORT_DIPSETTING( 0x03, DEF_STR( German ) ) */
+	// PORT_DIPSETTING( 0x03, DEF_STR( German ) )
 	PORT_DIPNAME( 0x0c, 0x04, "Points to Win" ) PORT_CONDITION("IN0", 0x80, EQUALS, 0x80) PORT_DIPLOCATION("B3:3,4")
 	PORT_DIPSETTING(    0x00, "Game 1 = 25, Game 2 = 11" )
 	PORT_DIPSETTING(    0x04, "Game 1 = 35, Game 2 = 15" )
@@ -2054,10 +2054,10 @@ static INPUT_PORTS_START( shuffle )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Game Select")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )  // not connected
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )  // not connected
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // not connected
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )  // not connected
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(50) PORT_PLAYER(1)
@@ -2071,15 +2071,15 @@ void mw8080bw_state::shuffle(machine_config &config)
 {
 	mw8080bw_root(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &mw8080bw_state::shuffle_io_map);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
-	/* add shifter */
+	// add shifter
 	MB14241(config, m_mb14241);
 
-	/* audio hardware */
+	// audio hardware
 	shuffle_audio(config);
 }
 
@@ -2253,16 +2253,16 @@ static const ioport_value spcenctr_controller_table[] =
 
 static INPUT_PORTS_START( spcenctr )
 	PORT_START("IN0")
-	/* horizontal range is limited to 12 - 46 by stoppers on the control for 35 positions */
-	PORT_BIT( 0x3f, 17, IPT_POSITIONAL ) PORT_POSITIONS(35) PORT_REMAP_TABLE(spcenctr_controller_table+12) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE /* 6 bit horiz encoder */
+	// horizontal range is limited to 12 - 46 by stoppers on the control for 35 positions
+	PORT_BIT( 0x3f, 17, IPT_POSITIONAL ) PORT_POSITIONS(35) PORT_REMAP_TABLE(spcenctr_controller_table+12) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE // 6 bit horiz encoder
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1")
-	/* vertical range is limited to 22 - 41 by stoppers on the control for 20 positions */
-	PORT_BIT( 0x3f, 19, IPT_POSITIONAL_V ) PORT_POSITIONS(20) PORT_REMAP_TABLE(spcenctr_controller_table+22) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE /* 6 bit vert encoder - pushing control in makes ship move faster */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )  /* marked as COIN #2, but the software never reads it */
+	// vertical range is limited to 22 - 41 by stoppers on the control for 20 positions
+	PORT_BIT( 0x3f, 19, IPT_POSITIONAL_V ) PORT_POSITIONS(20) PORT_REMAP_TABLE(spcenctr_controller_table+22) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE // 6 bit vert encoder - pushing control in makes ship move faster
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // not connected
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )  // marked as COIN #2, but the software never reads it
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Bonus_Life ) ) PORT_CONDITION("IN2", 0x30, EQUALS, 0x00) PORT_DIPLOCATION("F3:1,2")
@@ -2317,7 +2317,7 @@ MACHINE_START_MEMBER(mw8080bw_state,phantom2)
 {
 	mw8080bw_state::machine_start();
 
-	/* setup for save states */
+	// setup for save states
 	save_item(NAME(m_phantom2_cloud_counter));
 
 	m_phantom2_cloud_counter = 0;
@@ -2348,8 +2348,8 @@ static INPUT_PORTS_START( phantom2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // not connected
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )  // not connected
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_CONDITION("IN1", 0x20, EQUALS, 0x20) PORT_DIPLOCATION("SW:1")
@@ -2380,21 +2380,21 @@ void mw8080bw_state::phantom2(machine_config &config)
 {
 	mw8080bw_root(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &mw8080bw_state::phantom2_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,phantom2)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
-	/* video hardware */
+	// video hardware
 	m_screen->set_screen_update(FUNC(mw8080bw_state::screen_update_phantom2));
 	m_screen->screen_vblank().set(FUNC(mw8080bw_state::screen_vblank_phantom2));
 
-	/* add shifter */
+	// add shifter
 	MB14241(config, m_mb14241);
 
-	/* audio hardware */
+	// audio hardware
 	PHANTOM2_AUDIO(config, "soundboard");
 }
 
@@ -2467,13 +2467,13 @@ void bowler_state::lights_2_w(uint8_t data)
 
 	m_select_game_light = BIT(data, 3);
 
-	/* D4-D7 are not connected */
+	// D4-D7 are not connected
 }
 
 
 void bowler_state::io_map(address_map &map)
 {
-	map.global_mask(0xf);  /* no masking on the reads, all 4 bits are decoded */
+	map.global_mask(0xf);  // no masking on the reads, all 4 bits are decoded
 	map(0x01, 0x01).r(FUNC(bowler_state::shift_result_r));
 	map(0x02, 0x02).portr("IN0");
 	map(0x03, 0x03).r(FUNC(bowler_state::mw8080bw_shift_result_rev_r));
@@ -2501,10 +2501,10 @@ static INPUT_PORTS_START( bowler )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( German ) )
-	/*PORT_DIPSETTING(  0x03, DEF_STR( German ) ) */
+	//PORT_DIPSETTING(  0x03, DEF_STR( German ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) ) PORT_CONDITION("IN0", 0x80, EQUALS, 0x00) PORT_DIPLOCATION("B3:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )  /* every 17 minutes */
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )  // every 17 minutes
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Game_Time ) ) PORT_CONDITION("IN0", 0x80, EQUALS, 0x00) PORT_DIPLOCATION("B3:4")
 	PORT_DIPSETTING(    0x00, "No Limit" )
 	PORT_DIPSETTING(    0x08, "5 Minutes" )
@@ -2541,15 +2541,15 @@ void bowler_state::bowler(machine_config &config)
 {
 	mw8080bw_root(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &bowler_state::io_map);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
-	/* add shifter */
+	// add shifter
 	MB14241(config, m_mb14241);
 
-	/* audio hardware */
+	// audio hardware
 	audio(config);
 }
 
@@ -2686,10 +2686,10 @@ static INPUT_PORTS_START( invaders )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/* fake port for cabinet type */
+	// fake port for cabinet type
 	INVADERS_CAB_TYPE_PORT
 
-	/* fake ports for handling the various input ports based on cabinet type */
+	// fake ports for handling the various input ports based on cabinet type
 	PORT_START(INVADERS_SW6_SW7_PORT_TAG)
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -2799,7 +2799,7 @@ static INPUT_PORTS_START( blueshrk )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) PORT_CONDITION("IN1", 0x80, EQUALS, 0x80) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )  /* not shown on the schematics, instead DIP SW4 is connected here */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )  // not shown on the schematics, instead DIP SW4 is connected here
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_CONDITION("IN1", 0x80, EQUALS, 0x80) PORT_DIPLOCATION("SW:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2810,7 +2810,7 @@ static INPUT_PORTS_START( blueshrk )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW:8" )
 
-	/* fake port for reading the coin input */
+	// fake port for reading the coin input
 	PORT_START(BLUESHRK_COIN_INPUT_PORT_TAG)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2821,15 +2821,15 @@ void mw8080bw_state::blueshrk(machine_config &config)
 {
 	mw8080bw_root(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &mw8080bw_state::blueshrk_io_map);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
-	/* add shifter */
+	// add shifter
 	MB14241(config, m_mb14241);
 
-	/* audio hardware */
+	// audio hardware
 	blueshrk_audio(config);
 }
 
@@ -2867,7 +2867,7 @@ static INPUT_PORTS_START( invad2ct )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )  /* labeled NAMED RESET, but not read by the software */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )  // labeled NAMED RESET, but not read by the software
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -2887,7 +2887,7 @@ static INPUT_PORTS_START( invad2ct )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW:2") /* this switch only changes the orientation of the score */
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW:2") // this switch only changes the orientation of the score
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -3018,7 +3018,7 @@ ROM_START( checkmat )
 	ROM_LOAD( "checkmat.g", 0x0400, 0x0400, CRC(df5fa551) SHA1(484ff9bfb95166ba09f34c753a7908a73de3cc7d) )
 	ROM_LOAD( "checkmat.f", 0x0800, 0x0400, CRC(25586406) SHA1(39e0cf502735819a7e1d933e3686945fcfae21af) )
 	ROM_LOAD( "checkmat.e", 0x0c00, 0x0400, CRC(59330d84) SHA1(453f95dd31968d439339c41e625481170437eb0f) )
-	ROM_LOAD( "checkmat.d", 0x1000, 0x0400, NO_DUMP )   /* language ROM */
+	ROM_LOAD( "checkmat.d", 0x1000, 0x0400, NO_DUMP )   // language ROM
 ROM_END
 
 
@@ -3158,7 +3158,7 @@ ROM_START( phantom2 )
 	ROM_LOAD( "phantom2.f", 0x1000, 0x0800, CRC(30e83c6d) SHA1(fe34a3e4519a7e5ffe66e76fe974049988656b71) )
 	ROM_LOAD( "phantom2.e", 0x1800, 0x0800, CRC(8c641cac) SHA1(c4986daacb7ed9efed59b022c6101240b0eddcdc) )
 
-	ROM_REGION( 0x0800, "proms", 0 )      /* cloud graphics */
+	ROM_REGION( 0x0800, "proms", 0 )      // cloud graphics
 	ROM_LOAD( "p2clouds.f2",0x0000, 0x0800, CRC(dcdd2927) SHA1(d8d42c6594e36c12b40ee6342a9ad01a8bbdef75) )
 ROM_END
 
@@ -3253,6 +3253,18 @@ ROM_START( invad2ct )
 	ROM_LOAD( "invad2ct.a", 0x5800, 0x0800, CRC(efdabb03) SHA1(33f4cf249e88e2b7154350e54c479eb4fa86f26f) )
 ROM_END
 
+/* Irecsa bootleg on original Midway PCB.
+   There is a Space King II on a PCB silkscreened with Irecsa logos (straight copy of the Midway one), with probably
+   the same ROM contents. */ 
+ROM_START( spcking2ir )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gm2_1-2_tms2516.h",  0x0000, 0x0800, CRC(a5cad5b7) SHA1(2f1179d2aabd6fa9b86656bcdea1896909a49aae) )
+	ROM_LOAD( "gm2_3-4_tms2516.g",  0x0800, 0x0800, CRC(c7b5f8ae) SHA1(d7e8c1953ad0b6b03808d19f3fe9c1b7522dea83) )
+	ROM_LOAD( "gm2_5-6_tms2516.f",  0x1000, 0x0800, CRC(a5084884) SHA1(8edf6e627f821a68ccb101d9f3b7f805c9c36543) )
+	ROM_LOAD( "gm2_7-8_tms2516.e",  0x1800, 0x0800, CRC(3ff5d28f) SHA1(f54ae9c53d9ca730afc25d0b95d8f20ac80e23b2) )
+	ROM_LOAD( "gm2_9-10_tms2516.d", 0x4000, 0x0800, CRC(98db0e7d) SHA1(b216b53e5853888d7b8dc7317cc8cc900ec6c1f5) )
+ROM_END
+
 
 
 /*************************************
@@ -3261,40 +3273,41 @@ ROM_END
  *
  *************************************/
 
-// PCB #         year  rom         parent    machine   inp       state           init        monitor company,fullname,flags
+// PCB #         year  rom          parent    machine   inp       state           init        monitor company                                     fullname                                          flags                                            layout
 
-/* 596 */ GAMEL( 1976, seawolf,    0,        seawolf,  seawolf,  seawolf_state,  empty_init, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
-/* 596 */ GAMEL( 1976, seawolfo,   seawolf,  seawolf,  seawolf,  seawolf_state,  empty_init, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
-/* 596 */ GAMEL( 1976, seawolfa,   seawolf,  seawolf,  seawolf,  seawolf_state,  empty_init, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
-/* 597 */ GAMEL( 1975, gunfight,   0,        gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", MACHINE_SUPPORTS_SAVE, layout_gunfight )
-/* 597 */ GAMEL( 1975, gunfighto,  gunfight, gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_SUPPORTS_SAVE, layout_gunfight )
+/* 596 */ GAMEL( 1976, seawolf,     0,        seawolf,  seawolf,  seawolf_state,  empty_init, ROT0,   "Dave Nutting Associates / Midway",         "Sea Wolf (set 1)",                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
+/* 596 */ GAMEL( 1976, seawolfo,    seawolf,  seawolf,  seawolf,  seawolf_state,  empty_init, ROT0,   "Dave Nutting Associates / Midway",         "Sea Wolf (set 2)",                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
+/* 596 */ GAMEL( 1976, seawolfa,    seawolf,  seawolf,  seawolf,  seawolf_state,  empty_init, ROT0,   "Dave Nutting Associates / Midway",         "Sea Wolf (set 3)",                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
+/* 597 */ GAMEL( 1975, gunfight,    0,        gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway",         "Gun Fight (set 1)",                              MACHINE_SUPPORTS_SAVE,                           layout_gunfight )
+/* 597 */ GAMEL( 1975, gunfighto,   gunfight, gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway",         "Gun Fight (set 2)",                              MACHINE_SUPPORTS_SAVE,                           layout_gunfight )
 /* 604 Gun Fight (cocktail, dump does not exist) */
-/* 605 */ GAME(  1976, tornbase,   0,        tornbase, tornbase, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    zzzap_state,    empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP (set 1)", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
-/* 610 */ GAMEL( 1976, 280zzzapa,  280zzzap, zzzap,    zzzap,    zzzap_state,    empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP (set 2)", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
-/* 611 */ GAMEL( 1976, maze,       0,        maze,     maze,     mw8080bw_state, empty_init, ROT0,   "Midway", "Amazing Maze", MACHINE_SUPPORTS_SAVE, layout_maze )
-/* 612 */ GAME(  1977, boothill,   0,        boothill, boothill, boothill_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", MACHINE_SUPPORTS_SAVE )
-/* 615 */ GAME(  1977, checkmat,   0,        checkmat, checkmat, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 618 */ GAME(  1977, desertgu,   0,        desertgu, desertgu, desertgu_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Desert Gun", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 618 */ GAME(  1977, roadrunm,   desertgu, desertgu, desertgu, desertgu_state, empty_init, ROT0,   "Midway", "Road Runner (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 619 */ GAME(  1977, dplay,      0,        dplay,    dplay,    dplay_state,    empty_init, ROT0,   "Midway", "Double Play", MACHINE_SUPPORTS_SAVE )
-/* 622 */ GAMEL( 1977, lagunar,    0,        lagunar,  lagunar,  zzzap_state,    empty_init, ROT90,  "Midway", "Laguna Racer", MACHINE_SUPPORTS_SAVE, layout_lagunar )
-/* 623 */ GAME(  1977, gmissile,   0,        gmissile, gmissile, boothill_state, empty_init, ROT0,   "Midway", "Guided Missile", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 626 */ GAME(  1977, m4,         0,        m4,       m4,       boothill_state, empty_init, ROT0,   "Midway", "M-4", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 630 */ GAMEL( 1978, clowns,     0,        clowns,   clowns,   clowns_state,   empty_init, ROT0,   "Midway", "Clowns (rev. 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
-/* 630 */ GAMEL( 1978, clowns1,    clowns,   clowns,   clowns1,  clowns_state,   empty_init, ROT0,   "Midway", "Clowns (rev. 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
-/* 640 */ GAMEL( 1978, spacwalk,   0,        spacwalk, spacwalk, clowns_state,   empty_init, ROT0,   "Midway", "Space Walk", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacwalk )
-/* 642 */ GAME(  1978, einning,    0,        dplay,    einning,  dplay_state,    empty_init, ROT0,   "Midway / Taito", "Extra Inning / Ball Park II", MACHINE_SUPPORTS_SAVE )
-/* 643 */ GAME(  1978, shuffle,    0,        shuffle,  shuffle,  mw8080bw_state, empty_init, ROT90,  "Midway", "Shuffleboard", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 644 */ GAME(  1977, dogpatch,   0,        dogpatch, dogpatch, mw8080bw_state, empty_init, ROT0,   "Midway", "Dog Patch", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 645 */ GAMEL( 1980, spcenctr,   0,        spcenctr, spcenctr, spcenctr_state, empty_init, ROT0,   "Midway", "Space Encounters", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spcenctr )
-/* 652 */ GAMEL( 1979, phantom2,   0,        phantom2, phantom2, mw8080bw_state, empty_init, ROT0,   "Midway", "Phantom II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_phantom2 )
-/* 730 */ GAME(  1978, bowler,     0,        bowler,   bowler,   bowler_state,   empty_init, ROT90,  "Midway", "Bowling Alley", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 739 */ GAMEL( 1978, invaders,   0,        invaders, invaders, invaders_state, empty_init, ROT270, "Taito / Midway", "Space Invaders / Space Invaders M", MACHINE_SUPPORTS_SAVE, layout_invaders )
-/* 742 */ GAME(  1978, blueshrk,   0,        blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "Midway", "Blue Shark", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-		  GAME(  1978, blueshrkmr, blueshrk, blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "bootleg (Model Racing)", "Blue Shark (Model Racing bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-		  GAME(  1978, blueshrkmr2,blueshrk, blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "bootleg (Model Racing)", "Blue Shark (Model Racing bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 605 */ GAME(  1976, tornbase,    0,        tornbase, tornbase, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 610 */ GAMEL( 1976, 280zzzap,    0,        zzzap,    zzzap,    zzzap_state,    empty_init, ROT0,   "Dave Nutting Associates / Midway",         "280-ZZZAP (set 1)",                              MACHINE_SUPPORTS_SAVE,                           layout_280zzzap )
+/* 610 */ GAMEL( 1976, 280zzzapa,   280zzzap, zzzap,    zzzap,    zzzap_state,    empty_init, ROT0,   "Dave Nutting Associates / Midway",         "280-ZZZAP (set 2)",                              MACHINE_SUPPORTS_SAVE,                           layout_280zzzap )
+/* 611 */ GAMEL( 1976, maze,        0,        maze,     maze,     mw8080bw_state, empty_init, ROT0,   "Midway",                                   "Amazing Maze",                                   MACHINE_SUPPORTS_SAVE,                           layout_maze )
+/* 612 */ GAME(  1977, boothill,    0,        boothill, boothill, boothill_state, empty_init, ROT0,   "Dave Nutting Associates / Midway",         "Boot Hill",                                      MACHINE_SUPPORTS_SAVE )
+/* 615 */ GAME(  1977, checkmat,    0,        checkmat, checkmat, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway",         "Checkmate",                                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 618 */ GAME(  1977, desertgu,    0,        desertgu, desertgu, desertgu_state, empty_init, ROT0,   "Dave Nutting Associates / Midway",         "Desert Gun",                                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 618 */ GAME(  1977, roadrunm,    desertgu, desertgu, desertgu, desertgu_state, empty_init, ROT0,   "Midway",                                   "Road Runner (Midway)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 619 */ GAME(  1977, dplay,       0,        dplay,    dplay,    dplay_state,    empty_init, ROT0,   "Midway",                                   "Double Play",                                    MACHINE_SUPPORTS_SAVE )
+/* 622 */ GAMEL( 1977, lagunar,     0,        lagunar,  lagunar,  zzzap_state,    empty_init, ROT90,  "Midway",                                   "Laguna Racer",                                   MACHINE_SUPPORTS_SAVE,                           layout_lagunar )
+/* 623 */ GAME(  1977, gmissile,    0,        gmissile, gmissile, boothill_state, empty_init, ROT0,   "Midway",                                   "Guided Missile",                                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 626 */ GAME(  1977, m4,          0,        m4,       m4,       boothill_state, empty_init, ROT0,   "Midway",                                   "M-4",                                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 630 */ GAMEL( 1978, clowns,      0,        clowns,   clowns,   clowns_state,   empty_init, ROT0,   "Midway",                                   "Clowns (rev. 2)",                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
+/* 630 */ GAMEL( 1978, clowns1,     clowns,   clowns,   clowns1,  clowns_state,   empty_init, ROT0,   "Midway",                                   "Clowns (rev. 1)",                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
+/* 640 */ GAMEL( 1978, spacwalk,    0,        spacwalk, spacwalk, clowns_state,   empty_init, ROT0,   "Midway",                                   "Space Walk",                                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacwalk )
+/* 642 */ GAME(  1978, einning,     0,        dplay,    einning,  dplay_state,    empty_init, ROT0,   "Midway / Taito",                           "Extra Inning / Ball Park II",                    MACHINE_SUPPORTS_SAVE )
+/* 643 */ GAME(  1978, shuffle,     0,        shuffle,  shuffle,  mw8080bw_state, empty_init, ROT90,  "Midway",                                   "Shuffleboard",                                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 644 */ GAME(  1977, dogpatch,    0,        dogpatch, dogpatch, mw8080bw_state, empty_init, ROT0,   "Midway",                                   "Dog Patch",                                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 645 */ GAMEL( 1980, spcenctr,    0,        spcenctr, spcenctr, spcenctr_state, empty_init, ROT0,   "Midway",                                   "Space Encounters",                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spcenctr )
+/* 652 */ GAMEL( 1979, phantom2,    0,        phantom2, phantom2, mw8080bw_state, empty_init, ROT0,   "Midway",                                   "Phantom II",                                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_phantom2 )
+/* 730 */ GAME(  1978, bowler,      0,        bowler,   bowler,   bowler_state,   empty_init, ROT90,  "Midway",                                   "Bowling Alley",                                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 739 */ GAMEL( 1978, invaders,    0,        invaders, invaders, invaders_state, empty_init, ROT270, "Taito / Midway",                           "Space Invaders / Space Invaders M",              MACHINE_SUPPORTS_SAVE, layout_invaders )
+/* 742 */ GAME(  1978, blueshrk,    0,        blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "Midway",                                   "Blue Shark",                                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+          GAME(  1978, blueshrkmr,  blueshrk, blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "bootleg (Model Racing)",                   "Blue Shark (Model Racing bootleg, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+          GAME(  1978, blueshrkmr2, blueshrk, blueshrk, blueshrk, mw8080bw_state, empty_init, ROT0,   "bootleg (Model Racing)",                   "Blue Shark (Model Racing bootleg, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 749 4 Player Bowling Alley (cocktail, dump does not exist) */
-/* 851 */ GAMEL( 1980, invad2ct,   0,        invad2ct, invad2ct, mw8080bw_state, empty_init, ROT90,  "Midway", "Space Invaders II (Midway, cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invad2ct )
+/* 851 */ GAMEL( 1980, invad2ct,    0,        invad2ct, invad2ct, mw8080bw_state, empty_init, ROT90,  "Midway",                                   "Space Invaders II (Midway, cocktail)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invad2ct )
+          GAMEL( 1980, spcking2ir,  invad2ct, invaders, invaders, invaders_state, empty_init, ROT270, "bootleg (Irecsa)",                         "Space King Part II (Space Invaders II bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invad2ct )
 /* 852 Space Invaders Deluxe (color hardware, not in this driver) */
 /* 870 Space Invaders Deluxe (cocktail, dump does not exist) */

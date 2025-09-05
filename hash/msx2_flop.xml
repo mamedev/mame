@@ -24202,7 +24202,8 @@ HOMEBREW
 		<description>Pumpkin Adventure III (Netherlands, demo)</description>
 		<year>1995</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Umax / Sunrise" />
+		<info name="developer" value="Umax" />
+		<info name="developer" value="Sunrise" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pumpkin adventure iii (demo) (1995)(umax)(nl).dsk" size="737280" crc="74644973" sha1="13f80299e5567c96859fe2ae9a26e935374d9b41"/>
@@ -24214,7 +24215,8 @@ HOMEBREW
 		<description>Pumpkin Adventure III (Netherlands, demo, alt)</description>
 		<year>1995</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="Umax / Sunrise" />
+		<info name="developer" value="Umax" />
+		<info name="developer" value="Sunrise" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pumpkin adventure iii (demo) (1995)(umax)(nl)[a].dsk" size="737280" crc="cf8f48ac" sha1="15137daead8f3b2d15d2ed9ac154a6a4dbe68d74"/>
@@ -24340,7 +24342,8 @@ HOMEBREW
 		<description>Quinch (Netherlands)</description>
 		<year>1993</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="developer" value="MCE/MSCV" />
+		<info name="developer" value="MCE" />
+		<info name="developer" value="MSCV" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="quinch (19xx)(mcev).dsk" size="737280" crc="500f39a1" sha1="dfe3cd2fe5a74bccb9dddfa5a9491737e94d9b77"/>
