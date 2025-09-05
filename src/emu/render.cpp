@@ -1272,6 +1272,14 @@ void render_target::update_pointer_fields()
 		m_pointers[ptr].edges = edges;
 	}
 
+	// remember previous item hit states
+	std::vector<u64> prev_hit(m_clickable_items.size());
+    std::transform(m_clickable_items.begin(), m_clickable_items.end(), prev_hit.begin(),
+			[](const hit_test& item)
+			{
+				return item.hit;
+			});
+
 	// update item hit states
 	u64 obscured(0U);
 	for (size_t i = 0; m_clickable_items.size() > i; ++i)
@@ -1294,21 +1302,28 @@ void render_target::update_pointer_fields()
 					obscured |= u64(1) << ptr;
 			}
 		}
+		m_clickable_items[i].hit = hit;
+	}
 
-		// update field state
-		if (bool(hit) != bool(m_clickable_items[i].hit))
+	// update field state
+	for (int state = 0; state < 2; state++)
+	{
+		for (size_t i = 0; m_clickable_items.size() > i; ++i)
 		{
-			auto const [port, mask] = item.input_tag_and_mask();
-			ioport_field *const field(port ? port->field(mask) : nullptr);
-			if (field)
+			layout_view_item const &item(current_view().interactive_items()[i]);
+			if (bool(state) != bool(prev_hit[i]) && bool(state) == bool(m_clickable_items[i].hit))
 			{
-				if (hit)
-					field->set_value(1);
-				else
-					field->clear_value();
+				auto const [port, mask] = item.input_tag_and_mask();
+				ioport_field *const field(port ? port->field(mask) : nullptr);
+				if (field)
+				{
+					if (state)
+						field->set_value(1);
+					else
+						field->clear_value();
+				}
 			}
 		}
-		m_clickable_items[i].hit = hit;
 	}
 }
 
