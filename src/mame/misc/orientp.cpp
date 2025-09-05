@@ -233,7 +233,7 @@ void orientalpearl_state::orientp(machine_config &config)
 	
 	// Video
 	config.set_default_layout(layout_orientp);
-/* sound hardware */
+    // sound hardware
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6));
 	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
