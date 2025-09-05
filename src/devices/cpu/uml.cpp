@@ -803,7 +803,6 @@ public:
 		{
 			// testing against zero always produces the same result
 			inst.m_param[0] = 0;
-			inst.m_param[1] = 0;
 		}
 		else if (inst.param(0) == inst.param(1))
 		{

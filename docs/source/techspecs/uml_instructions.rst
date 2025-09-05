@@ -20,7 +20,7 @@ executed or interpreted on the host system.
 
 Many UML instruction have multiple instruction sizes.  Integer instructions
 default to 32-bit size.  Adding a ``D`` or ``d`` prefix to the mnemonic changes
-to 64-bit size (double word).  Floating-point instructions use the mnemonic
+to 64-bit size (double word).  Floating point instructions use the mnemonic
 prefix/suffix ``FS`` or ``fs`` for IEEE 754 32-bit format (single precision) or
 or the prefix/suffix ``FD`` or ``fd`` for IEEE 754 64-bit format (double
 precision).
@@ -1807,10 +1807,10 @@ Operands
 ^^^^^^^^
 
 src1 (32-bit or 64-bit – memory, integer register, immediate, map variable)
-    The first left-hand side value to compare, or the minuend (the value to
-    subtract from).
+    The left-hand side value to compare, or the minuend (the value to subtract
+    from).
 src2 (32-bit or 64-bit – memory, integer register, immediate, map variable)
-    The first right-hand side value to compare, or the subtrahend (the value to
+    The right-hand side value to compare, or the subtrahend (the value to
     subtract).
 
 Flags
@@ -1858,7 +1858,7 @@ set if the corresponding bits are set in both inputs).
 |     dand    dst,src1,src2 |     UML_DAND(block, dst, src1, src2); |
 +---------------------------+---------------------------------------+
 
-Calculates ``dst = src1 ∧ src2``.
+Calculates ``dst = src1 & src2``.
 
 Operands
 ^^^^^^^^
@@ -1930,7 +1930,7 @@ Set the flags based on the bitwise logical conjunction of two integers.
 |     dtest   src1,src2 |     UML_DTEST(block, src1, src2); |
 +-----------------------+-----------------------------------+
 
-Sets the flags based on calculating ``src1 ∧ src2`` but discards the result of
+Sets the flags based on calculating ``src1 & src2`` but discards the result of
 the conjunction.
 
 Operands
@@ -1992,7 +1992,7 @@ will be set if the corresponding bits are set in either input).
 |     dor     dst,src1,src2 |     UML_DOR(block, dst, src1, src2); |
 +---------------------------+--------------------------------------+
 
-Calculates ``dst = src1 ∨ src2``.
+Calculates ``dst = src1 | src2``.
 
 Operands
 ^^^^^^^^
@@ -2062,7 +2062,7 @@ input).
 |     dxor    dst,src1,src2 |     UML_DXOR(block, dst, src1, src2); |
 +---------------------------+---------------------------------------+
 
-Calculates ``dst = src1 ⊻ src2``.
+Calculates ``dst = src1 ^ src2``.
 
 Operands
 ^^^^^^^^
@@ -2189,3 +2189,449 @@ Simplification rules
 
 * Converted to :ref:`MOV <umlinst-mov>` or :ref:`AND <umlinst-and>` if the
   ``src`` operand is an immediate value.
+
+
+.. _umlinst-fparith:
+
+Floating point arithmetic
+-------------------------
+
+.. _umlinst-fadd:
+
+FADD
+~~~~
+
+Add two floating point numbers.
+
++---------------------------+----------------------------------------+
+| Disassembly               | Usage                                  |
++===========================+========================================+
+| .. code-block::           | .. code-block:: C++                    |
+|                           |                                        |
+|     fsadd   dst,src1,src2 |     UML_FSADD(block, dst, src1, src2); |
+|     fdadd   dst,src1,src2 |     UML_FDADD(block, dst, src1, src2); |
++---------------------------+----------------------------------------+
+
+Calculates ``dst = src1 + src2``.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, floating point register)
+    The destination where the sum will be stored.
+src1 (32-bit or 64-bit – memory, floating point register)
+    The first addend.
+src2 (32-bit or 64-bit – memory, floating point register)
+    The second addend.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
+.. _umlinst-fsub:
+
+FSUB
+~~~~
+
+Subtract a floating point number from another floating point number.
+
++---------------------------+----------------------------------------+
+| Disassembly               | Usage                                  |
++===========================+========================================+
+| .. code-block::           | .. code-block:: C++                    |
+|                           |                                        |
+|     fssub   dst,src1,src2 |     UML_FSSUB(block, dst, src1, src2); |
+|     fdsub   dst,src1,src2 |     UML_FDSUB(block, dst, src1, src2); |
++---------------------------+----------------------------------------+
+
+Calculates ``dst = src1 - src2``.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, floating point register)
+    The destination where the difference will be stored.
+src1 (32-bit or 64-bit – memory, floating point register)
+    The minuend (the value to subtract from).
+src2 (32-bit or 64-bit – memory, floating point register)
+    The subtrahend (the value to subtract).
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Undefined.
+sign (S)
+    Undefined.
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
+.. _umlinst-fcmp:
+
+FCMP
+~~~~
+
+Compare two floating-point numbers and set the carry, zero and unordered flags.
+
++-----------------------+-----------------------------------+
+| Disassembly           | Usage                             |
++=======================+===================================+
+| .. code-block::       | .. code-block:: C++               |
+|                       |                                   |
+|     fscmp   src1,src2 |     UML_FSCMP(block, src1, src2); |
+|     fdcmp   src1,src2 |     UML_FDCMP(block, src1, src2); |
++-----------------------+-----------------------------------+
+
+Operands
+^^^^^^^^
+
+src1 (32-bit or 64-bit – memory, floating point register)
+    The left-hand side value to compare.
+src2 (32-bit or 64-bit – memory, floating point register)
+    The right-hand side value to compare.
+
+Flags
+^^^^^
+
+carry (C)
+    Set if the value of ``src1`` is less than the value of ``src2``, or cleared
+    otherwise.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the values of ``src1`` and ``src2`` are equal, or cleared otherwise.
+sign (S)
+    Undefined.
+unordered (U)
+    Set if either ``src1`` or ``src2`` is not a number (NaN), or cleared
+    otherwise.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
+.. _umlinst-fmul:
+
+FMUL
+~~~~
+
+Multiply two floating point numbers.
+
++---------------------------+----------------------------------------+
+| Disassembly               | Usage                                  |
++===========================+========================================+
+| .. code-block::           | .. code-block:: C++                    |
+|                           |                                        |
+|     fsmul   dst,src1,src2 |     UML_FSMUL(block, dst, src1, src2); |
+|     fdmul   dst,src1,src2 |     UML_FDMUL(block, dst, src1, src2); |
++---------------------------+----------------------------------------+
+
+Calculates ``dst = src1 * src2``.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, floating point register)
+    The destination where the product will be stored.
+src1 (32-bit or 64-bit – memory, floating point register)
+    The multiplicand (the value to multiply).
+src2 (32-bit or 64-bit – memory, floating point register)
+    The multiplier (the value to multiply by).
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Undefined.
+sign (S)
+    Undefined.
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
+.. _umlinst-fdiv:
+
+FDIV
+~~~~
+
+Divide a floating point number by another floating point number.
+
++---------------------------+----------------------------------------+
+| Disassembly               | Usage                                  |
++===========================+========================================+
+| .. code-block::           | .. code-block:: C++                    |
+|                           |                                        |
+|     fsdiv   dst,src1,src2 |     UML_FSDIV(block, dst, src1, src2); |
+|     fddiv   dst,src1,src2 |     UML_FDDIV(block, dst, src1, src2); |
++---------------------------+----------------------------------------+
+
+Calculates ``dst = src1 / src2``.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, floating point register)
+    The destination where the quotient will be stored.
+src1 (32-bit or 64-bit – memory, floating point register)
+    The dividend (the value to divide).
+src2 (32-bit or 64-bit – memory, floating point register)
+    The divisor (the value to divide by).
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Undefined.
+sign (S)
+    Undefined.
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
+.. _umlinst-fneg:
+
+FNEG
+~~~~
+
+Negate a floating point number.
+
++---------------------+---------------------------------+
+| Disassembly         | Usage                           |
++=====================+=================================+
+| .. code-block::     | .. code-block:: C++             |
+|                     |                                 |
+|     fsneg   dst,src |     UML_FSNEG(block, dst, src); |
+|     fdneg   dst,src |     UML_FDNEG(block, dst, src); |
++---------------------+---------------------------------+
+
+Calculates ``dst = -src``.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, floating point register)
+    The destination where the result will be stored.
+src (32-bit or 64-bit – memory, floating point register)
+    The value to be negated.
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Undefined.
+sign (S)
+    Undefined.
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
+.. _umlinst-fabs:
+
+FABS
+~~~~
+
+Calculate the absolute value of a floating point number.
+
++---------------------+---------------------------------+
+| Disassembly         | Usage                           |
++=====================+=================================+
+| .. code-block::     | .. code-block:: C++             |
+|                     |                                 |
+|     fsabs   dst,src |     UML_FSABS(block, dst, src); |
+|     fdabs   dst,src |     UML_FDABS(block, dst, src); |
++---------------------+---------------------------------+
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, floating point register)
+    The destination where the result will be stored.
+src (32-bit or 64-bit – memory, floating point register)
+    The value to calculate the absolute value of.
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Undefined.
+sign (S)
+    Undefined.
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
+.. _umlinst-fsqrt:
+
+FSQRT
+~~~~~
+
+Calculate the square root of a floating point number.
+
++---------------------+----------------------------------+
+| Disassembly         | Usage                            |
++=====================+==================================+
+| .. code-block::     | .. code-block:: C++              |
+|                     |                                  |
+|     fssqrt  dst,src |     UML_FSSQRT(block, dst, src); |
+|     fdsqrt  dst,src |     UML_FDSQRT(block, dst, src); |
++---------------------+----------------------------------+
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, floating point register)
+    The destination where the square root will be stored.
+src (32-bit or 64-bit – memory, floating point register)
+    The value to calculate the square root of.
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Undefined.
+sign (S)
+    Undefined.
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
+.. _umlinst-frecip:
+
+FRECIP
+~~~~~~
+
+Calculate an approximate reciprocal value of a floating point number.  The
+algorithm used, precision and nature of inaccuracies in the approximation are
+undefined.
+
++---------------------+---------------------------------+
+| Disassembly         | Usage                           |
++=====================+=================================+
+| .. code-block::     | .. code-block:: C++             |
+|                     |                                 |
+|     fsabs   dst,src |     UML_FSABS(block, dst, src); |
+|     fdabs   dst,src |     UML_FDABS(block, dst, src); |
++---------------------+---------------------------------+
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, floating point register)
+    The destination where the result will be stored.
+src (32-bit or 64-bit – memory, floating point register)
+    The value to approximate the reciprocal of.
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Undefined.
+sign (S)
+    Undefined.
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
+
+.. _umlinst-frsqrt:
+
+FRSQRT
+~~~~~~
+
+Calculate an approximate reciprocal value of the square root of a floating point
+number.  The algorithm used, precision and nature of inaccuracies in the
+approximation are undefined.
+
++---------------------+-----------------------------------+
+| Disassembly         | Usage                             |
++=====================+===================================+
+| .. code-block::     | .. code-block:: C++               |
+|                     |                                   |
+|     fsrsqrt dst,src |     UML_FSRSQRT(block, dst, src); |
+|     fdrsqrt dst,src |     UML_FDRSQRT(block, dst, src); |
++---------------------+-----------------------------------+
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, floating point register)
+    The destination where the result will be stored.
+src (32-bit or 64-bit – memory, floating point register)
+    The value to approximate the reciprocal of the square root of.
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Undefined.
+sign (S)
+    Undefined.
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+No simplifications are applied to this instruction.
