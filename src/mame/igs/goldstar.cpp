@@ -1770,7 +1770,7 @@ void goldstar_state::p2_lamps_w(uint8_t data)
 	m_lamps[8 + 6] = BIT(data, 6);
 	m_lamps[8 + 7] = BIT(data, 7);
 
-	popmessage("p2 lamps: %02X", data);
+//	popmessage("p2 lamps: %02X", data);
 }
 
 // lucky bar mcu
@@ -2475,7 +2475,7 @@ void cmaster_state::coincount_w(uint8_t data)
 //      popmessage("counters: %02X", data);
 
 	m_ticket_dispenser->motor_w(BIT(data,7));
-	popmessage("counters: %02X", data);
+//	popmessage("counters: %02X", data);
 
 }
 
@@ -2652,6 +2652,8 @@ void cmaster_state::pkrmast_portmap(address_map &map)
 	map(0x29, 0x29).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x2a, 0x2a).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x2b, 0x2b).w("aysnd", FUNC(ay8910_device::address_w));
+
+ 	map(0xb4, 0xb4).ram();
 
 	map(0xf0, 0xf0).nopw();  // Writing 0's and 1's constantly.  Watchdog feeder?
 }
@@ -5178,10 +5180,10 @@ static INPUT_PORTS_START( jkrmast )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Main Game Pay Rate" )          PORT_DIPLOCATION("DSW2:1,2")
-	PORT_DIPSETTING(    0x00, "40%" )
-	PORT_DIPSETTING(    0x01, "50%" )
-	PORT_DIPSETTING(    0x02, "60%" )
-	PORT_DIPSETTING(    0x03, "70%" )    
+	PORT_DIPSETTING(    0x00, "55%" )
+	PORT_DIPSETTING(    0x01, "65%" )
+	PORT_DIPSETTING(    0x02, "75%" )
+	PORT_DIPSETTING(    0x03, "85%" )
 	PORT_DIPNAME( 0x04, 0x04, "Ticket Game" )                 PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )    
@@ -5247,6 +5249,37 @@ static INPUT_PORTS_START( jkrmast )
 	PORT_DIPSETTING(    0x40, "10" )   // ON-OFF
 	PORT_DIPSETTING(    0x00, "25" )   // ON-ON
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( jkrmastb )
+
+	PORT_INCLUDE( jkrmast )
+
+	PORT_MODIFY("IN1") // COIN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin C") 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME("Coin D")
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Main Game Pay Rate" )          PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPSETTING(    0x00, "40%" )
+	PORT_DIPSETTING(    0x01, "50%" )
+	PORT_DIPSETTING(    0x02, "60%" )
+	PORT_DIPSETTING(    0x03, "70%" ) 
+
+	PORT_MODIFY("DSW4")    
+	PORT_DIPNAME( 0x30, 0x00, "Coin D Rate" )                 PORT_DIPLOCATION("DSW4:5,6")
+	PORT_DIPSETTING(    0x30, "1" )    // OFF-OFF
+	PORT_DIPSETTING(    0x20, "5" )    // OFF-ON
+	PORT_DIPSETTING(    0x10, "10" )   // ON-OFF
+	PORT_DIPSETTING(    0x00, "25" )   // ON-ON
+	PORT_DIPNAME( 0xc0, 0x00, "Coin C Rate" )                 PORT_DIPLOCATION("DSW4:7,8")
+	PORT_DIPSETTING(    0xc0, "5" )    // OFF-OFF
+	PORT_DIPSETTING(    0x80, "10" )   // OFF-ON
+	PORT_DIPSETTING(    0x40, "25" )   // ON-OFF
+	PORT_DIPSETTING(    0x00, "50" )   // ON-ON
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( chry10 )
 	PORT_START("IN0")
@@ -11366,6 +11399,9 @@ void goldstar_state::super9(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // pin 7 not verified
+
+	// payout hardware
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
 }
 
 
@@ -11862,6 +11898,9 @@ void wingco_state::superdrg(machine_config &config)
 	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	YM2413(config, "ym2413", 12_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	// payout hardware
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
 }
 
 void wingco_state::luckylad(machine_config &config)
@@ -12710,17 +12749,18 @@ ROM_END
   Close to star100 hardware, but with 5x DSW banks.
 
   27C020 socket place for OKI samples is blind.
+  Colors are generated dinamically through a RAMDAC.
 
-  This dump is not from the original Sang Ho board, it's from a Poker Master stealth conversion kit
-  Plug-in daughterboard dated 1997
+  This dump is not from the original Sang Ho board,
+  it's from a Poker Master stealth conversion kit.
+  Plug-in daughterboard dated 1997.
   This set displays Crazy Co. copyright
 
-  Stealth mode with a Windows ME Edition desktop, handled by a DSW,
-  and need to choose 3 or 4 apps to allow choose the Crazy Bonus icon
-  to launch the game.
+  Stealth mode with a Windows ME desktop, is handled by a DSW,
+  and need to choose 3 or 4 apps to allow choose the Crazy
+  Bonus icon and launch the game.
 
-  TODO: need work on colors, since the board has no bipolar PROMs.
-        Seems that are handled for a DAC.
+  TODO: Find the proper colors for the Windows ME nag of stealth mode. 
 
 */
 ROM_START( crazybon )
@@ -12765,13 +12805,14 @@ ROM_START( crazybonb )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 
-	// proms taken from cmv4, probably wrong
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) BAD_DUMP )
-	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) BAD_DUMP )
+	ROM_REGION( 0x200, "colours", 0 )
+	ROM_LOAD( "82s147.s8", 0x000, 0x200, CRC(da92f0ae) SHA1(1269a2029e689a5f111c57e80825b3756b50521e) )
+
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
+	// filled at init()
 
 	ROM_REGION( 0x100, "proms2", 0 )
-	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) BAD_DUMP )
+	ROM_LOAD( "82s129.h3", 0x000, 0x100, CRC(cfb152cf) SHA1(3166b9b21be4ce1d3b6fc8974c149b4ead03abac) )
 ROM_END
 
 // same program as above, running in pkrmast pcb with DB
@@ -12787,13 +12828,14 @@ ROM_START( missbingoc )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 
-	// proms taken from cmv4, probably wrong
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) BAD_DUMP )
-	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) BAD_DUMP )
+	ROM_REGION( 0x200, "colours", 0 )
+	ROM_LOAD( "82s147.s8", 0x000, 0x200, CRC(da92f0ae) SHA1(1269a2029e689a5f111c57e80825b3756b50521e) )
+
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
+	// filled at init()
 
 	ROM_REGION( 0x100, "proms2", 0 )
-	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) BAD_DUMP )
+	ROM_LOAD( "82s129.h3", 0x000, 0x100, CRC(cfb152cf) SHA1(3166b9b21be4ce1d3b6fc8974c149b4ead03abac) )
 ROM_END
 
 
@@ -14708,7 +14750,12 @@ ROM_START( srmagic )
 	ROM_LOAD( "82s129.u46", 0x000, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
-// A hack of cmv4 with cb3 GFX. DYNA CM V4.1 and ZIOGAS V4.1 in ROM
+/*
+  A hack of cmv4 with cb3 GFX. DYNA CM V4.1 and ZIOGAS V4.1 in ROM
+
+  The logo has wrong colors, but are the same in the real PCB.
+
+*/
 ROM_START( cmv4zg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "512_main.bin", 0x04000, 0x4000, CRC(4367007d) SHA1(fd3a864dd124d14ed3b15d550b53c07ae13a6f23) )
@@ -14726,8 +14773,8 @@ ROM_START( cmv4zg )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "rom4-91.bin", 0x0000, 0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
 	ROM_LOAD( "rom3-91.bin", 0x2000, 0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
-	ROM_LOAD( "rom2-91.bin", 0x4000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
-	ROM_LOAD( "rom1-91.bin", 0x6000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "rom1-91.bin", 0x4000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "rom2-91.bin", 0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 	// not populated
@@ -14748,6 +14795,8 @@ ROM_END
   A hack of cmv4 with cb3 GFX. Only ZIOGAS V4.1 in ROM
   (DYNA string removed, among other changes from the above set)
 
+  The logo has wrong colors, but are the same in the real PCB.
+
 */
 ROM_START( cmv4zga )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -14766,8 +14815,8 @@ ROM_START( cmv4zga )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "rom4-91.bin", 0x0000, 0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
 	ROM_LOAD( "rom3-91.bin", 0x2000, 0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
-	ROM_LOAD( "rom2-91.bin", 0x4000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
-	ROM_LOAD( "rom1-91.bin", 0x6000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "rom1-91.bin", 0x4000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "rom2-91.bin", 0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 	// not populated
@@ -23205,6 +23254,46 @@ void cmaster_state::init_crazybonb()
 
 		rom[i] = x;
 	}
+
+	init_palnibbles();
+
+	// Hack Protection
+	rom[0x0123]=0x20; // change call $b00c to call $5a20  / Protection #1
+	rom[0x0124]=0x5a;
+	
+	rom[0x0152]=0x80; // change call $b00F to call $980  / Protection #3
+	rom[0x0153]=0x09;
+
+	rom[0x0197]=0x85; // change call $b012 to call $1485  / Protection #2
+	rom[0x0198]=0x14;
+
+	rom[0x01ff]=0x10; // change call $b015 to call $910  / Protection #5 
+	rom[0x0200]=0x09;
+	
+	rom[0x022d]=0x85; // change call $b018 to call $1485 / Protection #4
+	rom[0x022e]=0x14;
+	
+	rom[0x028f]=0x67; // change call $b01b to call $5c67 / Protection #12 
+	rom[0x0290]=0x5c;
+	
+	rom[0x02af]=0xc3; // change call $b01e to call $5c67 / Protection #11 
+	rom[0x02b0]=0x55;
+	
+	rom[0x04fb]=0x10; // change call $b021 to call $910  / Protection #6
+	rom[0x04fc]=0x09;
+	
+	rom[0x2029]=0xa9; // change call $b000 to call $b5a9 / Protection #9 
+	rom[0x202a]=0xb5;
+	
+	rom[0x1c20]=0x01; // change call $b006 to call $b601 / Protection #7 
+	rom[0x1c21]=0xb6;
+	
+	rom[0x23fd]=0x9f; // change call $b006 to call $b59f / Protection #8 
+	rom[0x23fe]=0xb5;
+	
+	rom[0x2527]=0xb2; // change call $b006 to call $b59f / Protection #10
+	rom[0x2528]=0xb5;	
+
 }
 
 void goldstar_state::init_ladylinrb()
@@ -25276,11 +25365,13 @@ GAMEL( 199?, alienatt,   cmaster,  cm,       cmaster,  cmaster_state,  init_alie
 
 GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1999, jkrmast,    0,        jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    0 )
-GAME(  1999, jkrmasta,   jkrmast,  jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512/513)", MACHINE_IMPERFECT_COLORS ) // sometimes fg colors are wrong, bonus stages have reels bg always white
-GAME(  1999, jkrmastb,   jkrmast,  jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512)",    MACHINE_IMPERFECT_GRAPHICS ) // needs to clean the bg tilemap properly
-GAME(  1993, pkrmast,    0,        pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 1)",                0 ) // puts FUN USA 95H N/G  V2.20 in NVRAM
-GAME(  1993, pkrmasta,   pkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 2)",                0 ) // needs dips fixed, puts PM93 JAN 29/1996 V1.52 in NVRAM
-GAME(  1993, missbingo,  pkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Miss Bingo (ED-1993, Poker Master HW)",       0 ) // needs girl support
+GAME(  1999, jkrmasta,   jkrmast,  jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512/513)", MACHINE_IMPERFECT_COLORS ) // sometimes fg colors are wrong, bonus stages have reels bg always white --> tilemap garbage or white
+GAME(  1999, jkrmastb,   jkrmast,  jkrmast,  jkrmastb, cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512)",    MACHINE_IMPERFECT_GRAPHICS ) // needs to clean the bg tilemap properly
+GAME(  1993, pkrmast,    0,        pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993, dual game, set 1)",    0 ) // puts FUN USA 95H N/G  V2.20 in NVRAM
+GAME(  1993, pkrmasta,   pkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993, dual game, set 2)",    0 ) // needs dips fixed, puts PM93 JAN 29/1996 V1.52 in NVRAM
+GAME(  1993, missbingo,  pkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Miss Bingo (Poker Master HW, dual game)",     0 ) // needs girl support
+GAME(  1997, crazybonb,  0,        crazybonb, pkrmast, cmaster_state,  init_crazybonb, ROT0, "bootleg (TV Games)", "Crazy Bonus 2002 (Ver. 1, dual game)",       MACHINE_UNEMULATED_PROTECTION ) // F.B. & POKER 94, VER.1 in NVRAM, decryption seems ok, possibly needs proper memory map
+GAME(  1993, missbingoc, crazybonb,crazybonb, pkrmast, cmaster_state,  init_crazybonb, ROT0, "bootleg",            "Miss Bingo (Crazy Bonus DB, dual game)",     MACHINE_UNEMULATED_PROTECTION ) // same program as crazybonb
 
 GAME(  199?, chthree,    cmaster,  cm,       cmaster,  cmaster_state,  init_chthree,   ROT0, "Promat",            "Channel Three",                               0 ) // hack of cmaster, still shows DYNA CM-1 V1.01 in book-keeping
 
@@ -25500,10 +25591,8 @@ GAMEL( 198?, cmtetrisb,  cmtetris, cm,        cmtetris, cmaster_state,  init_cm,
 GAMEL( 198?, cmtetrisc,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisc, ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, encrypted)",                       0,                                              layout_cmpacman )
 GAMEL( 198?, cmtetriskr, cmtetris, cmtetriskr,cmtetris, cmaster_state,  init_cmtetriskr,ROT0, "<unknown>",               "Tetris + Global Money Fever (Corsica, v8.01, Korean bootleg)",             MACHINE_NOT_WORKING,                            layout_cmpacman ) // starts with coins already inserted in Tetris mode, need to press K/L to switch between games...
 GAMEL( 198?, cmtetrisd,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisd, ROT0, "bootleg (Aidonis Games)", "Tetris + Cherry Master (Aidonis Games bootleg)",                           0,                                              layout_cmpacman ) // seems to have been hacked to run the slot game as default, see 0x8ba8
-GAMEL( 1997, crazybon,   0,        crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 1)",                                         0,                                              layout_crazybon ) // Windows ME desktop...
+GAMEL( 1997, crazybon,   0,        crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, Shanho HW, set 1)",                              0,                                              layout_crazybon ) // Windows ME desktop...
 GAMEL( 1997, crazybona,  crazybon, crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 2)",                                         0,                                              layout_crazybon ) // Windows ME desktop...
-GAMEL( 1997, crazybonb,  crazybon, crazybonb, pkrmast,  cmaster_state,  init_crazybonb, ROT0, "bootleg (TV Games)",      "Crazy Bonus 2002 (Ver. 1, set 3)",                                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS, layout_crazybon ) // F.B. & POKER 94, VER.1 in NVRAM, decryption seems ok, possibly needs proper memory map
-GAMEL( 1993, missbingoc, crazybon, crazybonb, pkrmast,  cmaster_state,  init_crazybonb, ROT0, "bootleg",                 "Miss Bingo (dual game, Crazy Bonus DB)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS, layout_crazybon ) // same program as crazybonb
 GAMEL( 1988, lucky8tet,  lucky8,   lucky8tet, lucky8tet, wingco_state,  init_l8tet,     ROT0, "bootleg",                 "Tetris + New Lucky 8 Lines (W-4 + W4BET-VID sub board with MCU)",          MACHINE_UNEMULATED_PROTECTION,                  layout_lucky8p1 )
 
 /* other possible stealth sets:
