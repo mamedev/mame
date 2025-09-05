@@ -32,10 +32,9 @@ u39 at89s51 second mcu for protection.
 Need proper description.
 Error code 10
 Hardware info.
-mcu
+MCU Hook up
 Verify memory maps.
-
-Need Layout as and Add segment display as marywu.cpp
+Need Proper Layout .
 
 */
 
