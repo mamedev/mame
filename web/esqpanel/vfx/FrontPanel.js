@@ -264,7 +264,7 @@ var fp = (function() {
   }
 
   my.Display.segmentsForCharacter = function(c, underline, blink, blinkPhase) {
-    var lit = (c < 32 || 127 < c) ? 0 : my.Display.segmentsByCharacter[c - 32];
+    var lit = (c < 0 || 95 < c) ? 0 : my.Display.segmentsByCharacter[c];
     if (blink && !blinkPhase) {
       if (underline) {
         return lit;
@@ -736,13 +736,6 @@ var fp = (function() {
       this.analogControls = new Array();
       this.addControls(keyboard);
 
-      this.cursorX = 0;
-      this.cursorY = 0;
-      this.savedCursorX = 0;
-      this.savedCursorY = 0;
-      this.blink = false;
-      this.underline = false;
-
       this.serverUrl = serverUrl;
       try {
         this.connect();
@@ -750,15 +743,13 @@ var fp = (function() {
         console.log("Unable to connect to '" + serverUrl + "': " + e);
       }
 
-      var that = this;
       this.blinkPhase = 0;
-      setInterval(function() { that.updateBlink(); }, 250);
     }
 
-    my.Panel.prototype.updateBlink = function() {
-      this.blinkPhase = (this.blinkPhase + 1) % 4;
-      this.display.setBlinkPhase(this.blinkPhase < 2);
-      var buttonPhase = (this.blinkPhase % 2) == 0;
+    my.Panel.prototype.setBlinkPhase = function(blinkPhase) {
+      this.blinkPhase = blinkPhase % 4;
+      this.display.setBlinkPhase(this.blinkPhase & 2);
+      var buttonPhase = (this.blinkPhase & 1) == 0;
       for (var i = 0; i < this.lightButtons.length; i++) {
         this.lightButtons[i].setBlinkPhase(buttonPhase);
       }
@@ -775,7 +766,7 @@ var fp = (function() {
       this.socket.binaryType = "arraybuffer";
 
       this.socket.onopen = function(event) {
-        console.log("opened: " + event);
+        // console.log("opened: " + event);
         panel.sendString("I"); // Request server information
       };
 
@@ -783,17 +774,26 @@ var fp = (function() {
         var data = new Uint8Array(event.data);
         var c = String.fromCharCode(data[0]);
 
+        var s = String.fromCharCode.apply(null, data);
+        // console.log("Handling message '" + s + "'");
+
         if (c == 'A') {
-          console.log("handling analog value")
+          // console.log("handling analog value")
           panel.handleAnalogValue(data.slice(1));
         } else if (c == 'B') {
-          console.log("handling button state")
+          // console.log("handling button state")
           panel.handleButtonState(data.slice(1));
         } else if (c == 'D') {
-          console.log("handling display data")
+          // console.log("handling display data")
           panel.handleDisplayData(data.slice(1));
+        } else if (c == 'L') {
+          // console.log("handling Light state")
+          panel.handleLightState(data.slice(1));
+        } else if (c == 'P') {
+          // console.log("handling blink Phase")
+          panel.handleBlinkPhase(data.slice(1));
         } else if (c == 'I') {
-          console.log("handling server information");
+          // console.log("handling server information");
           panel.handleServerInformation(data.slice(1));
         }
       };
@@ -1058,117 +1058,58 @@ var fp = (function() {
     }
 
     my.Panel.prototype.handleDisplayData = function(data) {
-      console.log("Handling display data " + data.length + " : " + data);
-      for (var i = 0; i < data.length; i++) {
-        var received = data[i];
-
-        if (this.ignoreNext > 0) {
-          console.log("skipping byte: 0x" + received.toString(16));
-          this.ignoreNext--;
-          continue;
+      var c = String.fromCharCode(data[0]);
+      if (c == 'X') {
+        // Clear the screen
+        // console.log("Clearing the screen");
+        this.display.clear();
+      } else if (c == 'C') {
+        // Character data
+        var s = String.fromCharCode.apply(null, data.slice(1));
+        // console.log("Displaying character: '" + s + "'");
+        var parts = s.split(" ");
+        if (parts.length == 5) {
+          let row = parseInt(parts[0]);
+          let column = parseInt(parts[1]);
+          let ch = parseInt(parts[2]);
+          let underline = parseInt(parts[3]) != 0;;
+          let blink = parseInt(parts[4]) != 0;
+          this.display.setChar(row, column, ch, underline, blink);
         }
+      } else {
+        var s = String.fromCharCode.apply(null, data);
+        console.log("Unknown display message '" + s + "'");
+      }
+    }
 
-        console.log("handling byte: 0x" + received.toString(16));
-        if (this.light) {
-          var whichLight = received & 0x3f;
-          var button = this.lightButtons[whichLight];
-          if (button != null) {
-            var state = (received & 0xc0);
-            if (state == 0x80) {
-              button.setLight(my.Light.ON);
-            } else if (state == 0xc0) {
-              button.setLight(my.Light.BLINK);
-            } else {
-              button.setLight(my.Light.OFF);
-            }
+    my.Panel.prototype.handleLightState = function(data) {
+      var s = String.fromCharCode.apply(null, data);
+      var parts = s.split(" ");
+      if (parts.length == 2) {
+        let whichLight = parseInt(parts[0]);
+        let state = parseInt(parts[1]);
+        var button = this.lightButtons[whichLight];
+        if (button != null && button instanceof my.Button) {
+          if (state == 2) {
+            button.setLight(my.Light.ON);
+          } else if (state == 3) {
+            button.setLight(my.Light.BLINK);
+          } else {
+            button.setLight(my.Light.OFF);
           }
-          this.light = false;
-        } else if ((received >= 0x80) && (received < 0xd0)) {
-          this.cursorY = ((received & 0x7f) >= 40) ? 1 : 0;
-          this.cursorX = (received & 0x7f) % 40;
-          this.blink = this.display.blink(this.cursorY, this.cursorX);
-          this.underline = this.display.underline(this.cursorY, this.cursorX);
-          console.log("moving to row " + this.cursorY + ", column " + this.cursorX);
-        } else if (received >= 0xd0) {
-          switch (received) {
-          case 0xd0:  // blink start
-            console.log("blink on");
-            this.blink = true;
-            break;
-
-          case 0xd1:  // blink stop (cancel all attribs on VFX+)
-            console.log("attrs off");
-            this.blink = false;
-            this.underline = false;
-            break;
-
-          case 0xd2:  // blinking underline?
-            console.log("blinking underline on");
-            this.blink = true;
-            this.underline = true;
-            break;
-
-          case 0xd3:  // start underline
-            console.log("underline on");
-            this.underline = true;
-            break;
-
-          case 0xd6:  // clear screen
-            console.log("clear screen");
-            this.cursorX = this.cursorY = 0;
-            this.blink = this.underline = false;
-            this.display.clear();
-            break;
-
-          case 0xf5:  // save cursor position
-            this.savedCursorX = this.cursorX;
-            this.savedCursorY = this.cursorY;
-            console.log("saving cursor position (row " + this.savedCursorY + ", col " + this.savedCursorX + ")");
-            break;
-
-          case 0xf6:  // restore cursor position
-            this.cursorX = this.savedCursorX;
-            this.cursorY = this.savedCursorY;
-            this.blink = this.display.blink(this.cursorY, this.cursorX);
-            this.underline = this.display.underline(this.cursorY, this.cursorX);
-            console.log("restored cursor position (row " + this.savedCursorY + ", col " + this.savedCursorX + ")");
-            break;
-
-          case 0xfb: // unknown but encountered in command stream
-            console.log("0xfb: ignoring");
-            break;
-
-          case 0xfd: // unknown but encountered in command streem
-            console.log("0xfd: clearing");
-            this.cursorX = this.cursorY = 0;
-            this.blink = this.underline = false;
-            this.display.clear();
-            // seems to be always followed by 0x7f, let's ignore that one
-            this.ignoreNext = 1;
-            break;
-
-          case 0xff: // Specify a button light state
-            this.light = true;
-            break;
-
-          default:
-            console.log("Unexpected control code: " + received);
-            break;
-          }
-        } else if ((received >= 0x20) && (received <= 0x5f)) {
-          // var attrs = this.blink ? this.underline ? " with blink & underline" : " with blink" : this.underline ? " with underline" : "";
-          // console.log("at (" + this.cursorY + ", " + this.cursorX + ") char " + received  + attrs);
-          this.display.setChar(this.cursorY, this.cursorX, received, this.underline, this.blink);
-          this.cursorX = Math.min(this.cursorX + 1, 39);
-        } else {
-          console.log("Unexpected byte: " + received.toString(16));
         }
       }
     }
 
+    my.Panel.prototype.handleBlinkPhase = function(data) {
+      var s = String.fromCharCode.apply(null, data);
+      let phase = parseInt(s);
+      this.setBlinkPhase(phase);
+    }
+
     my.Panel.prototype.handleAnalogValue = function(data) {
       var s = String.fromCharCode.apply(null, data);
-      console.log("Handling analog value: '" + s + "'");
+      // console.log("Handling analog value: '" + s + "'");
       var parts = s.split(" ");
       if (parts.length == 2) {
         var channel = parseInt(parts[0]);
