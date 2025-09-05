@@ -129,7 +129,6 @@ protected:
 
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_MACHINE_RESET(zerowing);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void screen_vblank(int state);

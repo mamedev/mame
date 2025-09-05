@@ -43150,6 +43150,9 @@ asma3k
 @source:skeleton/am1000.cpp
 am1000
 
+@source:skeleton/amcoe_au1250.cpp
+burningr
+
 @source:skeleton/amusement_6502.cpp
 unkamus
 

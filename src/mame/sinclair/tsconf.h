@@ -163,7 +163,6 @@ private:
 	u8 m_int_mask;
 	bool m_update_on_m1;
 
-	DECLARE_VIDEO_START(tsconf);
 	TILE_GET_INFO_MEMBER(get_tile_info_txt);
 	template <u8 Layer>
 	TILE_GET_INFO_MEMBER(get_tile_info_16c);

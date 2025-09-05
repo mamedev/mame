@@ -86,7 +86,6 @@ public:
 	void init_hustlerd();
 	void init_billiard();
 	DECLARE_MACHINE_RESET(scramble);
-	DECLARE_MACHINE_RESET(explorer);
 	void scramble_sh_7474_q_callback(int state);
 	uint8_t mariner_protection_1_r();
 	uint8_t mariner_protection_2_r();

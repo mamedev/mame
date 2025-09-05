@@ -2587,7 +2587,6 @@ void towns_state::towns_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &towns_state::towns_1g_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	//MCFG_MACHINE_RESET_OVERRIDE(towns_state,towns)
 
 	/* pad ports */
 	MSX_GENERAL_PURPOSE_PORT(config, m_pad_ports[0], msx_general_purpose_port_devices, "townspad");
@@ -2683,8 +2682,6 @@ void towns_state::towns_base(machine_config &config)
 	m_dma[1]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
 	m_dma[1]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
 	m_dma[1]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
-
-	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
 
 	I8251(config, m_i8251, 0);
 	m_i8251->rxrdy_handler().set(FUNC(towns_state::towns_rxrdy_irq));
