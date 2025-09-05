@@ -1272,21 +1272,15 @@ void render_target::update_pointer_fields()
 		m_pointers[ptr].edges = edges;
 	}
 
-	// remember previous item hit states
-	std::vector<u64> prev_hit(m_clickable_items.size());
-    std::transform(m_clickable_items.begin(), m_clickable_items.end(), prev_hit.begin(),
-			[](const hit_test& item)
-			{
-				return item.hit;
-			});
-
 	// update item hit states
+	std::vector<u64> prev_hit(m_clickable_items.size());
 	u64 obscured(0U);
 	for (size_t i = 0; m_clickable_items.size() > i; ++i)
 	{
 		layout_view_item const &item(current_view().interactive_items()[i]);
 		u64 const inbounds(m_clickable_items[i].inbounds.first & m_clickable_items[i].inbounds.second);
 		u64 hit(m_clickable_items[i].hit);
+		prev_hit[i] = hit;
 		for (unsigned ptr = 0; m_pointers.size() > ptr; ++ptr)
 		{
 			pointer_info const &pointer(m_pointers[ptr]);
