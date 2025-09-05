@@ -33,6 +33,7 @@ public:
 
 protected:
 	bool has_net_device() const noexcept { return bool(m_dev); }
+	void log_bytes(u8 *buf, int len);
 
 	// bandwidth in bytes per second
 	u32 m_bandwidth;
