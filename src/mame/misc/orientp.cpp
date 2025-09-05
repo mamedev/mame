@@ -29,9 +29,10 @@ u33 winbond w27c512 boot rom.
 u39 at89s51 second mcu for protection.
 
 // TODO:
-Need hardware info.
-Hook up nvram inputs opll and adpcm.
-mcu, nvram not hooked up.
+Need proper description.
+Error code 10
+Hardware info.
+mcu
 Verify memory maps.
 
 Need Layout as and Add segment display as marywu.cpp
@@ -182,7 +183,7 @@ void orientalpearl_state::program_map(address_map &map)
 
 void orientalpearl_state::io_map(address_map &map)
 {
-    map(0xd800, 0xf7ff).ram().share("nvram"); // might be wrong
+   map(0xd800, 0xf7ff).ram().share("nvram"); // might be wrong
     map(0xf800, 0xf803).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf900, 0xf903).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfa00, 0xfa01).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
