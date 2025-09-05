@@ -13,6 +13,8 @@ class sgi_ge5_device : public cpu_device
 public:
 	sgi_ge5_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
+	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
+
 	// host interface
 	auto out_int() { return m_int_cb.bind(); }
 	auto fifo_empty() { return m_fifo_empty.bind(); }
@@ -148,8 +150,6 @@ public:
 
 	virtual u32 opcode_alignment() const override { return 1; }
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, data_buffer const &opcodes, data_buffer const &params) override;
-
-private:
 };
 
 DECLARE_DEVICE_TYPE(SGI_GE5, sgi_ge5_device)
