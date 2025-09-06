@@ -243,7 +243,7 @@ void pg1000_state::mem_map(address_map &map)
 void pg1000_state::palette_init(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(11, 183, 253));
-	palette.set_pen_color(1, rgb_t(3, 117, 202));
+	palette.set_pen_color(1, rgb_t(0, 60, 130));
 }
 
 void pg1000_state::pg1000(machine_config &config)
