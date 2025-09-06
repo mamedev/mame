@@ -9,197 +9,133 @@ license:CC0-1.0
 
   <element name="cell" >
 
-		<!-- segment 0 -->  
-		<image state="0" statemask="0x01"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M1053 705 c-43 19 -57 47 -43 89 23 70 87 106 189 106 38 0 70 8 106 25 79 39 111 41 183 11 80 -34 119 -33 205 6 68 31 78 33 192 33 116 0 123 -1 195 -35 67 -31 87 -35 182 -40 101 -5 108 -7 137 -34 40 -38 50 -89 25 -118 -11 -11 -37 -29 -59 -39 -37 -17 -79 -19 -660 -18 -505 0 -626 2 -652 14z" />
-			</svg>
-		]]></data></image>
-		<image state="0x01" statemask="0x01"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M1053 705 c-43 19 -57 47 -43 89 23 70 87 106 189 106 38 0 70 8 106 25 79 39 111 41 183 11 80 -34 119 -33 205 6 68 31 78 33 192 33 116 0 123 -1 195 -35 67 -31 87 -35 182 -40 101 -5 108 -7 137 -34 40 -38 50 -89 25 -118 -11 -11 -37 -29 -59 -39 -37 -17 -79 -19 -660 -18 -505 0 -626 2 -652 14z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 0 -->  
+    <image state="0" statemask="0x01" file="nec_fip80b5r/segment0.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x01" statemask="0x01" file="nec_fip80b5r/segment0.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 1 -->  
-		<image state="0" statemask="0x02"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M2519 963 c-20 13 -46 47 -63 81 -28 53 -31 69 -37 199 -7 155 -20 211 -75 319 -50 99 -68 199 -54 301 23 167 52 217 126 217 37 0 47 -5 77 -40 53 -63 74 -151 97 -410 5 -63 16 -167 24 -230 42 -326 45 -374 21 -419 -24 -47 -63 -54 -116 -18z" />
-			</svg>
-		]]></data></image>
-		<image state="0x02" statemask="0x02"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M2519 963 c-20 13 -46 47 -63 81 -28 53 -31 69 -37 199 -7 155 -20 211 -75 319 -50 99 -68 199 -54 301 23 167 52 217 126 217 37 0 47 -5 77 -40 53 -63 74 -151 97 -410 5 -63 16 -167 24 -230 42 -326 45 -374 21 -419 -24 -47 -63 -54 -116 -18z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 1 -->  
+    <image state="0" statemask="0x02" file="nec_fip80b5r/segment1.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x02" statemask="0x02" file="nec_fip80b5r/segment1.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 2 -->  
-		<image state="0" statemask="0x04"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M2144 1089 c-59 43 -88 78 -135 161 -23 41 -75 112 -115 156 -108 119 -132 188 -136 386 -3 107 -1 118 17 132 11 9 28 16 37 16 25 0 92 -63 154 -145 29 -39 100 -129 158 -200 58 -72 113 -144 121 -162 19 -40 32 -106 41 -214 5 -68 3 -91 -9 -116 -28 -52 -74 -57 -133 -14z" />
-			</svg>
-		]]></data></image>
-		<image state="0x04" statemask="0x04"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M2144 1089 c-59 43 -88 78 -135 161 -23 41 -75 112 -115 156 -108 119 -132 188 -136 386 -3 107 -1 118 17 132 11 9 28 16 37 16 25 0 92 -63 154 -145 29 -39 100 -129 158 -200 58 -72 113 -144 121 -162 19 -40 32 -106 41 -214 5 -68 3 -91 -9 -116 -28 -52 -74 -57 -133 -14z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 2 -->  
+    <image state="0" statemask="0x04" file="nec_fip80b5r/segment2.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x04" statemask="0x04" file="nec_fip80b5r/segment2.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 3 -->  
-		<image state="0" statemask="0x08"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M1515 1089 c-70 43 -69 41 -77 285 -3 121 -11 259 -18 306 -6 47 -13 142 -17 211 -6 141 5 183 54 195 78 20 124 -53 135 -216 13 -192 26 -274 61 -385 77 -245 76 -359 -3 -400 -39 -20 -99 -19 -135 4z" />
-			</svg>
-		]]></data></image>
-		<image state="0x08" statemask="0x08"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M1515 1089 c-70 43 -69 41 -77 285 -3 121 -11 259 -18 306 -6 47 -13 142 -17 211 -6 141 5 183 54 195 78 20 124 -53 135 -216 13 -192 26 -274 61 -385 77 -245 76 -359 -3 -400 -39 -20 -99 -19 -135 4z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 3 -->  
+    <image state="0" statemask="0x08" file="nec_fip80b5r/segment3.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x08" statemask="0x08" file="nec_fip80b5r/segment3.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 4 -->  
-		<image state="0" statemask="0x10"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M1108 1087 c-32 36 -42 71 -50 163 -5 52 -11 122 -14 156 -6 55 -1 75 41 200 53 152 59 165 87 183 16 10 24 9 44 -4 31 -20 43 -51 55 -135 5 -36 17 -97 26 -137 14 -63 15 -81 3 -145 -37 -205 -43 -222 -88 -271 -30 -32 -80 -37 -104 -10z" />
-			</svg>
-		]]></data></image>
-		<image state="0x10" statemask="0x10"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M1108 1087 c-32 36 -42 71 -50 163 -5 52 -11 122 -14 156 -6 55 -1 75 41 200 53 152 59 165 87 183 16 10 24 9 44 -4 31 -20 43 -51 55 -135 5 -36 17 -97 26 -137 14 -63 15 -81 3 -145 -37 -205 -43 -222 -88 -271 -30 -32 -80 -37 -104 -10z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 4 -->  
+    <image state="0" statemask="0x10" file="nec_fip80b5r/segment4.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x10" statemask="0x10" file="nec_fip80b5r/segment4.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 5 -->  
-		<image state="0" statemask="0x20"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M797 938 c-32 36 -44 102 -67 377 -19 222 -30 337 -42 428 -17 138 12 277 67 313 55 36 123 -6 173 -109 52 -106 54 -167 12 -292 -27 -78 -30 -102 -30 -205 0 -79 7 -147 20 -210 11 -51 20 -111 20 -133 0 -123 -97 -231 -153 -169z" />
-			</svg>
-		]]></data></image>
-		<image state="0x20" statemask="0x20"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M797 938 c-32 36 -44 102 -67 377 -19 222 -30 337 -42 428 -17 138 12 277 67 313 55 36 123 -6 173 -109 52 -106 54 -167 12 -292 -27 -78 -30 -102 -30 -205 0 -79 7 -147 20 -210 11 -51 20 -111 20 -133 0 -123 -97 -231 -153 -169z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 5 -->  
+    <image state="0" statemask="0x20" file="nec_fip80b5r/segment5.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x20" statemask="0x20" file="nec_fip80b5r/segment5.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 6 -->  
-		<image state="0" statemask="0x40"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M1940 2120 c-14 4 -56 8 -94 9 -80 1 -141 26 -181 73 -32 38 -32 78 1 118 48 56 84 67 249 74 146 7 151 7 195 -17 52 -27 99 -89 100 -130 0 -33 -31 -81 -63 -98 -27 -15 -125 -38 -157 -38 -14 1 -36 5 -50 9z" />
-			</svg>
-		]]></data></image>
-		<image state="0x40" statemask="0x40"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M1940 2120 c-14 4 -56 8 -94 9 -80 1 -141 26 -181 73 -32 38 -32 78 1 118 48 56 84 67 249 74 146 7 151 7 195 -17 52 -27 99 -89 100 -130 0 -33 -31 -81 -63 -98 -27 -15 -125 -38 -157 -38 -14 1 -36 5 -50 9z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 6 -->  
+    <image state="0" statemask="0x40" file="nec_fip80b5r/segment6.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x40" statemask="0x40" file="nec_fip80b5r/segment6.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 7 -->  
-		<image state="0" statemask="0x80"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M1099 2129 c-51 10 -110 43 -132 73 -28 37 -16 88 32 138 36 38 41 40 95 40 64 0 115 -22 159 -68 32 -34 46 -97 28 -130 -23 -43 -109 -68 -182 -53z" />
-			</svg>
-		]]></data></image>
-		<image state="0x80" statemask="0x80"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M1099 2129 c-51 10 -110 43 -132 73 -28 37 -16 88 32 138 36 38 41 40 95 40 64 0 115 -22 159 -68 32 -34 46 -97 28 -130 -23 -43 -109 -68 -182 -53z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 7 -->  
+    <image state="0" statemask="0x80" file="nec_fip80b5r/segment7.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x80" statemask="0x80" file="nec_fip80b5r/segment7.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 8 -->  
-		<image state="0" statemask="0x100"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M2279 2467 c-56 50 -69 80 -80 186 -6 51 -16 127 -24 169 -14 83 -10 123 25 213 36 95 44 146 31 203 -14 66 -14 205 -1 254 12 41 70 98 100 98 52 0 75 -100 100 -435 6 -77 22 -241 36 -364 28 -255 27 -268 -37 -325 -54 -49 -94 -49 -150 1z" />
-			</svg>
-		]]></data></image>
-		<image state="0x100" statemask="0x100"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M2279 2467 c-56 50 -69 80 -80 186 -6 51 -16 127 -24 169 -14 83 -10 123 25 213 36 95 44 146 31 203 -14 66 -14 205 -1 254 12 41 70 98 100 98 52 0 75 -100 100 -435 6 -77 22 -241 36 -364 28 -255 27 -268 -37 -325 -54 -49 -94 -49 -150 1z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 8 -->  
+    <image state="0" statemask="0x100" file="nec_fip80b5r/segment8.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x100" statemask="0x100" file="nec_fip80b5r/segment8.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 9 -->  
-		<image state="0" statemask="0x200"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M1701 2579 c-24 24 -40 122 -44 261 -2 95 1 112 27 178 15 41 44 94 63 119 19 25 57 92 84 149 58 121 94 164 137 164 38 0 78 -32 90 -73 19 -60 22 -181 7 -238 -20 -77 -116 -277 -180 -376 -30 -46 -66 -106 -80 -133 -35 -69 -69 -86 -104 -51z" />
-			</svg>
-		]]></data></image>
-		<image state="0x200" statemask="0x200"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M1701 2579 c-24 24 -40 122 -44 261 -2 95 1 112 27 178 15 41 44 94 63 119 19 25 57 92 84 149 58 121 94 164 137 164 38 0 78 -32 90 -73 19 -60 22 -181 7 -238 -20 -77 -116 -277 -180 -376 -30 -46 -66 -106 -80 -133 -35 -69 -69 -86 -104 -51z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 9 -->  
+    <image state="0" statemask="0x200" file="nec_fip80b5r/segment9.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x200" statemask="0x200" file="nec_fip80b5r/segment9.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 10 -->  
-		<image state="0" statemask="0x400"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M1372 2456 c-40 28 -52 66 -52 166 0 92 -27 323 -55 468 -21 108 -19 246 3 290 21 44 59 65 96 56 47 -12 123 -92 146 -152 28 -77 28 -203 -1 -281 -21 -55 -22 -62 -10 -218 6 -88 14 -178 16 -201 6 -54 -11 -110 -38 -129 -28 -19 -76 -19 -105 1z" />
-			</svg>
-		]]></data></image>
-		<image state="0x400" statemask="0x400"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M1372 2456 c-40 28 -52 66 -52 166 0 92 -27 323 -55 468 -21 108 -19 246 3 290 21 44 59 65 96 56 47 -12 123 -92 146 -152 28 -77 28 -203 -1 -281 -21 -55 -22 -62 -10 -218 6 -88 14 -178 16 -201 6 -54 -11 -110 -38 -129 -28 -19 -76 -19 -105 1z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 10 -->  
+    <image state="0" statemask="0x400" file="nec_fip80b5r/segment10.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x400" statemask="0x400" file="nec_fip80b5r/segment10.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 11 -->  
-		<image state="0" statemask="0x800"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M1067 2721 c-19 11 -122 161 -156 228 -42 81 -51 129 -51 276 0 113 3 147 18 175 39 80 102 35 199 -141 28 -52 56 -112 62 -134 6 -22 11 -114 11 -205 0 -134 -3 -170 -16 -188 -16 -24 -39 -27 -67 -11z" />
-			</svg>
-		]]></data></image>
-		<image state="0x800" statemask="0x800"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M1067 2721 c-19 11 -122 161 -156 228 -42 81 -51 129 -51 276 0 113 3 147 18 175 39 80 102 35 199 -141 28 -52 56 -112 62 -134 6 -22 11 -114 11 -205 0 -134 -3 -170 -16 -188 -16 -24 -39 -27 -67 -11z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 11 -->  
+    <image state="0" statemask="0x800" file="nec_fip80b5r/segment11.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x800" statemask="0x800" file="nec_fip80b5r/segment11.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 12 -->  
-		<image state="0" statemask="0x1000"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M695 2447 c-45 23 -76 54 -91 90 -8 18 -18 101 -24 190 -18 298 -21 328 -52 516 -26 164 -29 194 -18 235 23 91 68 107 130 44 46 -45 59 -86 71 -217 5 -55 13 -143 18 -195 11 -120 37 -199 101 -302 48 -78 50 -85 50 -153 0 -95 -15 -143 -60 -187 -42 -42 -75 -48 -125 -21z" />
-			</svg>
-		]]></data></image>
-		<image state="0x1000" statemask="0x1000"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M695 2447 c-45 23 -76 54 -91 90 -8 18 -18 101 -24 190 -18 298 -21 328 -52 516 -26 164 -29 194 -18 235 23 91 68 107 130 44 46 -45 59 -86 71 -217 5 -55 13 -143 18 -195 11 -120 37 -199 101 -302 48 -78 50 -85 50 -153 0 -95 -15 -143 -60 -187 -42 -42 -75 -48 -125 -21z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 12 -->  
+    <image state="0" statemask="0x1000" file="nec_fip80b5r/segment12.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x1000" statemask="0x1000" file="nec_fip80b5r/segment12.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 13 -->  
-		<image state="0" statemask="0x2000"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M1550 3539 c-14 5 -57 24 -97 44 -107 54 -134 56 -218 12 -79 -42 -105 -41 -170 3 -35 23 -53 28 -145 33 -131 8 -181 24 -194 62 -14 39 9 78 54 94 49 17 1278 18 1315 1 51 -23 42 -87 -18 -132 -21 -15 -48 -21 -115 -26 -77 -4 -94 -9 -140 -38 -85 -55 -195 -76 -272 -53z" />
-			</svg>
-		]]></data></image>
-		<image state="0x2000" statemask="0x2000"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M1550 3539 c-14 5 -57 24 -97 44 -107 54 -134 56 -218 12 -79 -42 -105 -41 -170 3 -35 23 -53 28 -145 33 -131 8 -181 24 -194 62 -14 39 9 78 54 94 49 17 1278 18 1315 1 51 -23 42 -87 -18 -132 -21 -15 -48 -21 -115 -26 -77 -4 -94 -9 -140 -38 -85 -55 -195 -76 -272 -53z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 13 -->  
+    <image state="0" statemask="0x2000" file="nec_fip80b5r/segment13.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x2000" statemask="0x2000" file="nec_fip80b5r/segment13.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 14 -->  
-		<image state="0" statemask="0x4000"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M2619 3393 c-19 12 -45 43 -59 67 -36 65 -36 183 0 255 48 93 136 107 207 33 60 -61 76 -152 48 -257 -17 -63 -45 -97 -94 -111 -52 -14 -64 -13 -102 13z" />
-			</svg>
-		]]></data></image>
-		<image state="0x4000" statemask="0x4000"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M2619 3393 c-19 12 -45 43 -59 67 -36 65 -36 183 0 255 48 93 136 107 207 33 60 -61 76 -152 48 -257 -17 -63 -45 -97 -94 -111 -52 -14 -64 -13 -102 13z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 14 -->  
+    <image state="0" statemask="0x4000" file="nec_fip80b5r/segment14.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x4000" statemask="0x4000" file="nec_fip80b5r/segment14.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
-		<!-- segment 15 -->  
-		<image state="0" statemask="0x8000"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#002211" d="M512 4422 c-38 8 -46 15 -63 51 -37 83 -18 153 51 181 36 14 127 16 863 16 642 0 827 -3 847 -13 16 -8 31 -31 44 -64 16 -46 17 -57 5 -94 -8 -24 -26 -51 -42 -63 -28 -21 -34 -21 -845 -23 -501 0 -834 3 -860 9z" />
-			</svg>
-		]]></data></image>
-		<image state="0x8000" statemask="0x8000"><data><![CDATA[
-			<svg width="3420" height="5720" viewBox="0 0 3420 5720">
-				<path fill="#00ffbb" d="M512 4422 c-38 8 -46 15 -63 51 -37 83 -18 153 51 181 36 14 127 16 863 16 642 0 827 -3 847 -13 16 -8 31 -31 44 -64 16 -46 17 -57 5 -94 -8 -24 -26 -51 -42 -63 -28 -21 -34 -21 -845 -23 -501 0 -834 3 -860 9z" />
-			</svg>
-		]]></data></image>
+    <!-- segment 15 -->  
+    <image state="0" statemask="0x8000" file="nec_fip80b5r/segment15.svg">
+      <color red="0.0" green="0.133" blue="0.066" />
+    </image>
+    <image state="0x8000" statemask="0x8000" file="nec_fip80b5r/segment15.svg">
+      <color red="0.0" green="1.0" blue="0.733" />
+    </image>
 
 	</element>
 
