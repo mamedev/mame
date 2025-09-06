@@ -1088,6 +1088,32 @@ public:
 		// truncate immediate address to size
 		truncate_immediate(inst, 0, 0xffffffff);
 	}
+
+	static void ffrint(instruction &inst)
+	{
+		// truncate immediate source to size
+		if (inst.param(2).size() == SIZE_DWORD)
+			truncate_immediate(inst, 1, 0xffffffff);
+	}
+
+	static void ffrflt(instruction &inst)
+	{
+		// convert to FMOV or NOP if the source and destination formats match
+		auto const dst = inst.size();
+		auto const src = inst.param(2).size();
+		if (((4 == dst) && (SIZE_DWORD == src)) || ((8 == dst) && (SIZE_QWORD == src)))
+		{
+			if (inst.param(0) == inst.param(1))
+			{
+				inst.nop();
+			}
+			else
+			{
+				inst.m_opcode = OP_FMOV;
+				inst.m_numparams = 2;
+			}
+		}
+	}
 };
 
 
@@ -1255,6 +1281,8 @@ void uml::instruction::simplify()
 		case OP_RORC:   simplify_op::rolrc(*this);                    break;
 		case OP_FREAD:  simplify_op::fread(*this);                    break;
 		case OP_FWRITE: simplify_op::fwrite(*this);                   break;
+		case OP_FFRINT: simplify_op::ffrint(*this);                   break;
+		case OP_FFRFLT: simplify_op::ffrflt(*this);                   break;
 
 		default:                                                      break;
 		}

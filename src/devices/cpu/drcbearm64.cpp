@@ -4874,7 +4874,7 @@ void drcbe_arm64::op_ftoint(a64::Assembler &a, const uml::instruction &inst)
 			break;
 
 		case ROUND_TRUNC:
-		case ROUND_DEFAULT:
+		case ROUND_DEFAULT: // FIXME: ROUND_DEFAULT should use mode set using SETFMOD
 		default:
 			a.fcvtzs(dstreg, srcreg);
 			break;
