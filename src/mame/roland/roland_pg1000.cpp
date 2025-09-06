@@ -251,16 +251,13 @@ void pg1000_state::pg1000(machine_config &config)
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
 	mdin.rxd_handler().set([this] (bool state) { m_mdin_bit = state; });
-	mdin.rxd_handler().append("mdthru", FUNC(midi_port_device::write_txd));
 
 	midiout_slot(MIDI_PORT(config, "mdout"));
 
-	auto &mdthru(MIDI_PORT(config, "mdthru"));
-	midiout_slot(mdthru);
-
-	auto &paramreq(MIDI_PORT(config, "param_req"));
-	midiin_slot(paramreq);
-	paramreq.rxd_handler().set([this] (bool state) { m_paramreq_bit = state; });
+	/* TODO: What is the correct way of declaring this "Parameter In" port? */
+	// auto &paramin(MIDI_PORT(config, "param_in"));
+	// midiin_slot(paramin);
+	// paramreq.rxd_handler().set([this] (bool state) { m_paramreq_bit = state; });
 
 	UPD78C10(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pg1000_state::mem_map);
@@ -406,4 +403,4 @@ ROM_START(pg1000)
 	ROMX_LOAD("roland_pg-1000_v1.00.ic4", 0x000, 0x2000, CRC(c09ef84e) SHA1(d780d4d53e57918e6ea8098f54f5c9b43aeec287), ROM_BIOS(2))
 ROM_END
 
-SYST(1987, pg1000,  0,   0, pg1000,  pg1000, pg1000_state, empty_init, "Roland", "PG-1000 Programmer", MACHINE_NO_SOUND_HW)
+SYST(1987, pg1000,  0,   0, pg1000,  pg1000, pg1000_state, empty_init, "Roland", "PG-1000 Programmer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
