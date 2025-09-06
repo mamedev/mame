@@ -190,7 +190,8 @@ int am7990_device_base::receive(u8 *buf, int length)
 		return -1;
 
 	LOGMASKED(LOG_RXTX, "receive packet length %d\n", length);
-	dump_bytes(buf, length);
+	if (VERBOSE & LOG_PACKETS)
+		log_bytes(buf, length);
 
 	// check we have a buffer
 	u32 ring_address = (m_rx_ring_base + (m_rx_ring_pos << 3)) & RING_ADDR_MASK;
@@ -452,7 +453,8 @@ void am7990_device_base::transmit()
 	}
 
 	LOGMASKED(LOG_RXTX, "transmit sending packet length %d\n", length);
-	dump_bytes(buf, length);
+	if (VERBOSE & LOG_PACKETS)
+		log_bytes(buf, length);
 
 	// handle loopback
 	if (m_mode & MODE_LOOP)
@@ -822,22 +824,6 @@ void am7990_device_base::dma_out(u32 address, u8 *buf, int length)
 		buf++;
 		address++;
 		length--;
-	}
-}
-
-void am7990_device_base::dump_bytes(u8 *buf, int length)
-{
-	if (VERBOSE & LOG_PACKETS)
-	{
-		// pad with zeros to 8-byte boundary
-		for (int i = 0; i < 8 - (length % 8); i++)
-			buf[length + i] = 0;
-
-		// dump length / 8 (rounded up) groups of 8 bytes
-		for (int i = 0; i < (length + 7) / 8; i++)
-			LOGMASKED(LOG_PACKETS, "%02x %02x %02x %02x %02x %02x %02x %02x\n",
-				buf[i * 8 + 0], buf[i * 8 + 1], buf[i * 8 + 2], buf[i * 8 + 3],
-				buf[i * 8 + 4], buf[i * 8 + 5], buf[i * 8 + 6], buf[i * 8 + 7]);
 	}
 }
 

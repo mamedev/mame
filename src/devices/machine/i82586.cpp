@@ -268,7 +268,8 @@ int i82586_base_device::recv_start(u8 *buf, int length)
 	if (address_filter(buf))
 	{
 		LOG("recv_start receiving frame length %d\n", length);
-		dump_bytes(buf, length);
+		if (VERBOSE & LOG_FRAMES)
+			log_bytes(buf, length);
 
 		return ru_execute(buf, length);
 	}
@@ -754,22 +755,6 @@ int i82586_base_device::store_bytes(u32 dst, u8 *buf, int length)
 	return offset;
 }
 
-void i82586_base_device::dump_bytes(u8 *buf, int length)
-{
-	if (VERBOSE & LOG_FRAMES)
-	{
-		// pad frame with zeros to 8-byte boundary
-		for (int i = 0; i < 8 - (length % 8); i++)
-			buf[length + i] = 0;
-
-		// dump length / 8 (rounded up) groups of 8 bytes
-		for (int i = 0; i < (length + 7) / 8; i++)
-			LOGMASKED(LOG_FRAMES, "%02x %02x %02x %02x %02x %02x %02x %02x\n",
-				buf[i * 8 + 0], buf[i * 8 + 1], buf[i * 8 + 2], buf[i * 8 + 3],
-				buf[i * 8 + 4], buf[i * 8 + 5], buf[i * 8 + 6], buf[i * 8 + 7]);
-	}
-}
-
 // 82586 implementation
 void i82586_device::device_start()
 {
@@ -1020,7 +1005,8 @@ bool i82586_device::cu_transmit(u32 command)
 	else
 	{
 		LOG("cu_transmit sending frame length %d\n", length);
-		dump_bytes(buf, length);
+		if (VERBOSE & LOG_FRAMES)
+			log_bytes(buf, length);
 
 		return send(buf, length, 4) == length;
 	}
@@ -1680,7 +1666,8 @@ bool i82596_device::cu_transmit(u32 command)
 	else
 	{
 		LOG("cu_transmit sending frame length %d\n", length);
-		dump_bytes(buf, length);
+		if (VERBOSE & LOG_FRAMES)
+			log_bytes(buf, length);
 
 		return send(buf, length) == length;
 	}

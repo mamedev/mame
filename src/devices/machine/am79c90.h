@@ -43,7 +43,6 @@ protected:
 
 	void dma_in(u32 address, u8 *buf, int length);
 	void dma_out(u32 address, u8 *buf, int length);
-	void dump_bytes(u8 *buf, int length);
 
 	virtual int get_buf_length(u16 data) const = 0;
 
