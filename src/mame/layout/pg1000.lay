@@ -387,10 +387,10 @@ license:CC0-1.0
 		<element ref="panel_sheet"><bounds x="0" y="0" width="1000" height="800"/></element>
 		<element ref="black_rect"><bounds x="6" y="20" width="988" height="105"/></element>
 		<element ref="screen_border"><bounds x="104" y="54" width="196" height="44"/></element>
-		<screen index="0"><bounds x="106" y="62" width="192" height="32"/></screen>
+		<screen index="0"><bounds x="106" y="60" width="192" height="32"/></screen>
 
 		<repeat count="2">
-			<param name="y" start="62" increment="18" />
+			<param name="y" start="60" increment="18" />
 			<repeat count="16">
 				<param name="x" start="106" increment="12" />
 				<element ref="display_rect">
