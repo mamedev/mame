@@ -2846,8 +2846,8 @@ src (32-bit or 64-bit – memory, floating point register)
     The floating point value to convert.  The size/format is controlled
     by the ``size`` operand.
 size (access size)
-    The size of the input.  Must be ``SIZE_DWORD`` (32-bit) or
-    ``SIZE_QWORD`` (64-bit).  Note that this operand controls the size
+    The size of the input.  Must be ``SIZE_SHORT`` (32-bit) or
+    ``SIZE_DOUBLE`` (64-bit).  Note that this operand controls the size
     of the ``src`` operand while the instruction size sets the size of
     the ``dst`` operand.
 
