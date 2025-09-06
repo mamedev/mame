@@ -1,24 +1,24 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR
+// copyright-holders:AJR,m1macrophage
 /****************************************************************************
 
-    Skeleton driver for Roland TR-707/727 drum machines.
+    Driver for Roland TR-707/727 drum machines.
 
     From the Service Notes: “The differences between two models [TR-707 and
     TR-727] are sound data, component values in several audio stages and a
     couple of pin connections at IC30 of Voice board. Both models derive all
     rhythm sounds from PCM-encoded samples of real sounds stored in ROM.”
 
-    The TR-707 and TR-727 have 10 voices, each of which can be played independently.
-    Some of the voices have two sample variations, and the hi hat voice has two
-    decay variations (open and closed). Only one variation per voice can play at
-    a time. This brings the total number of sounds to 15. While there are 16
-    drum pads, the two "closed hi hat / short whistle" pads produce the same
-    sound.
+    The TR-707 and TR-727 have 10 voices, each of which can be played
+    simultaneously. Some of the voices have two sample variations, and the
+    hi-hat voice has two decay variations (open and closed). Only one variation
+    per voice can play at a time. This brings the total number of sounds to 15.
+    While there are 16 drum pads, the two "closed hi hat" pads ("short whistle"
+    for the TR-727) produce the same sound.
 
     There are 2 voice architectures. The "multiplex sound" section uses a single
     8-bit DAC with time-multiplexing for 8 voices. The "single sound" section
-    consists of two independent ROMs and 6-bit DACs. More information in:
+    consists of two independent ROMs and 6-bit DACs. More information in
     tr707_audio_device::device_add_mconfig().
 
     The TR-707/727 come with the following sounds:
@@ -85,6 +85,7 @@
 #define LOG_ACCENT  (1U << 4)
 #define LOG_CART    (1U << 5)
 #define LOG_MIX     (1U << 6)
+#define LOG_KEYS    (1U << 7)
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -106,11 +107,29 @@ enum mux_voice
 	MV_COUNT
 };
 
+constexpr const double MUX_EG_C[MV_COUNT] =
+{
+	CAP_U(0.047),  // C53
+	CAP_U(0.047),  // C48
+	CAP_U(0.047),  // C54
+	CAP_U(0.047),  // C52
+	CAP_U(0.047),  // C58
+	CAP_U(1),      // C47
+	CAP_U(0.047),  // C57
+	CAP_U(0.047),  // C55
+};
+
 enum cymbal_voice
 {
 	CV_CRASH = 0,
 	CV_RIDE,
 	CV_COUNT
+};
+
+constexpr const double CYMBAL_EG_C[CV_COUNT] =
+{
+	CAP_U(1),  // C50
+	CAP_U(1),  // C49
 };
 
 enum mix_channel
@@ -272,6 +291,8 @@ private:
 
 
 	const component_config m_comps;
+	const std::array<double, MV_COUNT> m_mux_eg_r;
+	const std::array<double, CV_COUNT> m_cymbal_eg_r;
 
 	required_memory_region m_mux_samples;  // IC34, IC35
 	required_device<mb63h114_device> m_mac;  // IC30
@@ -280,11 +301,11 @@ private:
 	required_device_array<va_vca_device, MV_COUNT> m_mux_vca;
 	required_device<va_rc_eg_device> m_hat_eg;
 
-	required_memory_region_array<CV_COUNT> m_cymbal_samples;
-	required_device_array<dac_6bit_r2r_device, CV_COUNT> m_cymbal_dac;
+	required_memory_region_array<CV_COUNT> m_cymbal_samples;  // IC19, IC22
+	required_device_array<dac_6bit_r2r_device, CV_COUNT> m_cymbal_dac;  // RA3, RA4 (RKM7LW502)
 	required_device_array<filter_rc_device, CV_COUNT> m_cymbal_hpf;
 	required_device_array<va_rc_eg_device, CV_COUNT> m_cymbal_eg;
-	required_device_array<va_vca_device, CV_COUNT> m_cymbal_vca;
+	required_device_array<va_vca_device, CV_COUNT> m_cymbal_vca;  // Q14, Q15 (2SD1469R)
 
 	required_ioport_array<MC_COUNT> m_level_sliders;
 	required_device_array<filter_volume_device, MC_COUNT> m_level;
@@ -293,9 +314,9 @@ private:
 	// LPFs after the voice volume faders.
 	required_device_array<filter_rc_device, MC_COUNT> m_voice_lpf;
 
-	required_device<mixer_device> m_left_mixer;
-	required_device<mixer_device> m_right_mixer;
-	required_ioport m_master_volume;
+	required_device<filter_volume_device> m_left_level;  // IC206a opamp + VR212a potentiometer.
+	required_device<filter_volume_device> m_right_level;  // IC206b opamp + VR212b potentiometer.
+	required_ioport m_master_volume;  // VR212
 
 	u16 m_triggers = 0x3ff;
 	double m_accent_level = 0;
@@ -305,6 +326,8 @@ private:
 	u8 m_handclap_tambourine = 0;  // 0: handclap, 1: tambourine.
 	bool m_hat_is_closed = false;
 	bool m_hat_triggering = false;
+	u8 m_mux_sample = 0;
+	u8 m_mux_voice = 0;
 	u8 m_mac_c = 0;  // Last value of IC30, output C (pin 7).
 	std::array<u16, CV_COUNT> m_cymbal_counter = {MAX_CYMBAL_COUNTER, MAX_CYMBAL_COUNTER};  // TC404 (IC18, IC23), TC4520 (IC20a, IC20b).
 };
@@ -317,6 +340,24 @@ DEFINE_DEVICE_TYPE(TR707_AUDIO, tr707_audio_device, "tr707_audio", "TR-707 audio
 tr707_audio_device::tr707_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const component_config &components)
 	: device_t(mconfig, TR707_AUDIO, tag, owner, 0)
 	, m_comps(components)
+	, m_mux_eg_r
+	{
+		m_comps.R95,
+		m_comps.R102,
+		RES_M(4.7),  // R92
+		RES_M(4.7),  // R93
+		RES_M(4.7),  // R85
+		RES_M(4.7),  // R104
+		m_comps.R82,
+		m_comps.R91,
+	}
+	, m_cymbal_eg_r
+	{
+		// R58 is 47K in the schematic, but that causes a very quick decay.
+		// Using 470K, which matches R61 used in the ride cymbal voice below.
+		RES_K(470),  // R58
+		RES_2_PARALLEL(/*R61*/RES_K(470), m_comps.R73),
+	}
 	, m_mux_samples(*this, ":voices")
 	, m_mac(*this, "mac")
 	, m_mux_dac(*this, "mux_dac_%u", 1)
@@ -332,8 +373,8 @@ tr707_audio_device::tr707_audio_device(const machine_config &mconfig, const char
 	, m_level(*this, "level_%u", 1)
 	, m_voice_bpf(*this, "voice_bpf_%u", 1)
 	, m_voice_lpf(*this, "voice_lpf_%u", 1)
-	, m_left_mixer(*this, "lmixer")
-	, m_right_mixer(*this, "rmixer")
+	, m_left_level(*this, "left_master_level")
+	, m_right_level(*this, "right_master_level")
 	, m_master_volume(*this, ":VOLUME")
 {
 }
@@ -368,36 +409,84 @@ void tr707_audio_device::voice_select_w(u8 data)
 
 void tr707_audio_device::voice_trigger_w(u16 data)
 {
+	constexpr double R79 = RES_R(100);
+
 	if ((data & 0x03ff) == m_triggers)
 		return;
+
+	const u16 old_triggers = m_triggers;
 	m_triggers = data & 0x03ff;
 
+	// Reset sample ROM address counters for triggered MUX voices.
 	m_mac->xst_w(m_triggers & 0xff);
+
+	// The EG capacitors for all triggered voices will charge through a
+	// single 100 Ohm resistor (R79). If more than one voice is triggered,
+	// there will be multiple capacitors charging in parallel. Treat that
+	// parallel capacitance as the effective capacitance of each triggered EG.
+	double effective_charge_c = 0;
+	for (int i = 0; i < MV_COUNT; ++i)
+		if (!BIT(m_triggers, i))
+			effective_charge_c += MUX_EG_C[i];
+	for (int i = 0; i < CV_COUNT; ++i)
+		if (!BIT(m_triggers, 8 + i))
+			effective_charge_c += CYMBAL_EG_C[i];
+
+	// Trigger amplitude EGs for MUX voices.
 	for (int i = 0; i < MV_COUNT; ++i)
 	{
-		if (BIT(m_triggers, i))
-			m_mux_eg[i]->set_target_v(0);
-		else
-			m_mux_eg[i]->set_instant_v(m_accent_level);
+		va_rc_eg_device *eg = m_mux_eg[i];
+		if (!BIT(m_triggers, i))  // EG attack
+		{
+			// When the trigger is active, the EG capacitor will be connected
+			// to both: the discharge resistor to ground (m_mux_eg_r[i]) and the
+			// resistor to the accent voltage (R79) via a transistor. This setup
+			// affects the effective resistance and target voltage of the RC
+			// circuit as per the equations below. The effect of the transistor
+			// in the charge path is not modelled.
+			eg->set_r(RES_2_PARALLEL(R79, m_mux_eg_r[i]));
+			eg->set_c(effective_charge_c);
+			eg->set_target_v(m_accent_level * RES_VOLTAGE_DIVIDER(R79, m_mux_eg_r[i]));
+		}
+		else  // EG release
+		{
+			eg->set_r(m_mux_eg_r[i]);
+			eg->set_c(MUX_EG_C[i]);
+			eg->set_target_v(0);
+		}
 	}
 
 	// In addition to the EG for the DAC reference current (handled above), the
-	// hi-hat voice has an additional EG and VCA that postrpocesses the DAC
+	// hi-hat voice has an additional EG and VCA that postprocesses the DAC
 	// output. This is used to create the open and closed hat variations.
 	m_hat_triggering = !BIT(m_triggers, MV_HI_HAT);  // Active low.
 	update_hat_eg();
 
+	// Trigger amplitude EGs for cymbal voices.
 	for (int i = 0; i < CV_COUNT; ++i)
 	{
-		if (!BIT(m_triggers, 8 + i))
+		va_rc_eg_device *eg = m_cymbal_eg[i];
+		const int trigger_index = 8 + i;
+
+		if (!BIT(m_triggers, trigger_index))  // EG attack
 		{
+			// See comments for MUX voice triggering above.
+			eg->set_r(RES_2_PARALLEL(R79, m_cymbal_eg_r[i]));
+			eg->set_c(effective_charge_c);
+			eg->set_target_v(m_accent_level * RES_VOLTAGE_DIVIDER(R79, m_cymbal_eg_r[i]));
+		}
+		else  // EG release
+		{
+			eg->set_r(m_cymbal_eg_r[i]);
+			eg->set_c(CYMBAL_EG_C[i]);
+			eg->set_target_v(0);
+		}
+
+		// The trigger signal is connected to the ROM address counter's reset
+		// inputs (active high) via a 100 pF capacitor. This setup will cause a
+		// reset on the positive edge of the trigger.
+		if (!BIT(old_triggers, trigger_index) && BIT(m_triggers, trigger_index))
 			m_cymbal_counter[i] = 0;
-			m_cymbal_eg[i]->set_instant_v(m_accent_level);
-		}
-		else
-		{
-			m_cymbal_eg[i]->set_target_v(0);
-		}
 	}
 
 	if (m_triggers != 0x3ff)
@@ -429,19 +518,6 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	MB63H114(config, m_mac, 1.6_MHz_XTAL);
 	m_mac->counter_cb().set(FUNC(tr707_audio_device::advance_sample_w));
 
-	// Decay resistors for the envelope generators.
-	const std::array<double, MV_COUNT> MUX_EG_R =
-	{
-		m_comps.R95,
-		m_comps.R102,
-		RES_M(4.7),  // R92
-		RES_M(4.7),  // R93
-		RES_M(4.7),  // R85
-		RES_M(4.7),  // R104
-		m_comps.R82,
-		m_comps.R91,
-	};
-
 	// Larger DAC data values result in more negative voltages. So the maximum
 	// voltage is produced when data = 0, and the minimum one when data = 0xff.
 	constexpr double MAX_MUX_EG_V = VCC;
@@ -449,17 +525,16 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	const double mux_dac_scale = -(mux_dac_vpp / 2.0) / MAX_MUX_EG_V;
 
 	// Time multiplexing is not emulated at the moment. Using 8 "virtual" DACs
-	// and corresponding VCAs instead. The DAC circuit is somewhat involved. See
-	// mux_dac_v() for its interpretation.
+	// and corresponding VCAs instead. The DAC circuit is somewhat elaborate.
+	// See mux_dac_v() for its interpretation.
 	for (int i = 0; i < MV_COUNT; ++i)
 	{
-		VA_RC_EG(config, m_mux_eg[i]).set_r(MUX_EG_R[i]).set_c(CAP_U(0.047));  // [C48, C52-55, C57-58]
+		VA_RC_EG(config, m_mux_eg[i]).set_r(m_mux_eg_r[i]).set_c(MUX_EG_C[i]);
 		DAC08(config, m_mux_dac[i]);
 		VA_VCA(config, m_mux_vca[i]);
 		m_mux_dac[i]->add_route(0, m_mux_vca[i], 1.0, 0);
 		m_mux_eg[i]->add_route(0, m_mux_vca[i], mux_dac_scale, 1);
 	}
-	m_mux_eg[MV_HI_HAT]->set_c(CAP_U(1));  // C47
 
 
 	// *** Hi-hat VCA section ***
@@ -493,24 +568,16 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	constexpr double CYMBAL_VCA_V2I_SCALE = 0.0043;  // Converts from input voltage to output current.
 	constexpr double CYMBAL_VCA_SCALE = -CYMBAL_VCA_V2I_SCALE * RES_K(10);  // [R62, R65], inverting op-amp.
 
-	const std::array<double, CV_COUNT> CYMBAL_EG_R =
-	{
-		// R58 is 47K in the schematic, but that causes a very quick decay.
-		// Using 470K, which matches R61 used in the ride cymbal voice below.
-		RES_K(470),  // R58
-		RES_2_PARALLEL(/*R61*/RES_K(470), m_comps.R73),
-	};
-
 	for (int i = 0; i < CV_COUNT; ++i)
 	{
-		DAC_6BIT_R2R(config, m_cymbal_dac[i]).set_output_range(0, VCC);
 		FILTER_RC(config, m_cymbal_hpf[i]);
 		m_cymbal_hpf[i]->set_rc(filter_rc_device::HIGHPASS, RES_R(470), 0, 0, CAP_U(1));  // ~339 Hz, [R63, R64], [C35, C34]
+
+		DAC_6BIT_R2R(config, m_cymbal_dac[i]).set_output_range(0, VCC);
 		m_cymbal_dac[i]->add_route(0, m_cymbal_hpf[i], CYMBAL_HPF_SCALE);
 
-		VA_RC_EG(config, m_cymbal_eg[i]).set_r(CYMBAL_EG_R[i]).set_c(CAP_U(1));  // [C50, C49]
+		VA_RC_EG(config, m_cymbal_eg[i]).set_r(m_cymbal_eg_r[i]).set_c(CYMBAL_EG_C[i]);
 		VA_VCA(config, m_cymbal_vca[i]);  // 2SD1469R [Q14, Q15]
-		// V2I converter is based on an op-amp in inverting configuration.
 		m_cymbal_hpf[i]->add_route(0, m_cymbal_vca[i], CYMBAL_VCA_SCALE, 0);
 		m_cymbal_eg[i]->add_route(0, m_cymbal_vca[i], 1.0 / VCC, 1);
 	}
@@ -596,8 +663,8 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 		m_cymbal_vca[CV_RIDE],
 	};
 
-	MIXER(config, m_left_mixer);
-	MIXER(config, m_right_mixer);
+	auto &left_mixer = MIXER(config, "left_mixer");
+	auto &right_mixer = MIXER(config, "right_mixer");
 	for (int i = 0; i < MC_COUNT; ++i)
 	{
 		FILTER_BIQUAD(config, m_voice_bpf[i]);
@@ -609,22 +676,47 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 
 		FILTER_RC(config, m_voice_lpf[i]).set_lowpass(RES_K(1), CAP_U(0.01));  // ~15.9 KHz.
 		m_level[i]->add_route(0, m_voice_lpf[i], 1.0);
-		m_voice_lpf[i]->add_route(0, m_left_mixer, -R_MAX_MASTER_VOLUME / r_mix_left[i]);  // Inverting op-amp.
-		m_voice_lpf[i]->add_route(0, m_right_mixer,  -R_MAX_MASTER_VOLUME / r_mix_right[i]);  // Same.
+
+		m_voice_lpf[i]->add_route(0, left_mixer, -R_MAX_MASTER_VOLUME / r_mix_left[i]);  // Inverting op-amp.
+		m_voice_lpf[i]->add_route(0, right_mixer, -R_MAX_MASTER_VOLUME / r_mix_right[i]);  // Same.
 	}
+
+	// Model DC-blocking capacitors (C211, C212) on the opamp (IC206) inverting
+	// inputs. Those do not have corresponding resistors.
+	const filter_biquad_device::biquad_params dcblock
+	{
+		// HIGHPASS1P is a stable highpass filter with inaccurate frequency
+		// response. Good for DC-blocking (very low cutoff frequency), where
+		// frequency response does not matter.
+		.type = filter_biquad_device::biquad_type::HIGHPASS1P,
+		.fc = 0.05,
+		.q = 0,  // N/A
+		.gain = 1,
+	};
+	auto &left_dcblock = FILTER_BIQUAD(config, "left_dcblock").setup(dcblock);  // C211
+	auto &right_dcblock = FILTER_BIQUAD(config, "right_dcblock").setup(dcblock);  // C212
+	left_mixer.add_route(0, left_dcblock, 1.0);
+	right_mixer.add_route(0, right_dcblock, 1.0);
+
+	FILTER_VOLUME(config, m_left_level);  // IC206a opamp + VR212a potentiometer.
+	FILTER_VOLUME(config, m_right_level);  // IC206b opamp + VR212b potentiometer.
+	left_dcblock.add_route(0, m_left_level, 1.0);
+	right_dcblock.add_route(0, m_right_level, 1.0);
 
 
 	/*** Output section ***/
 
 	// The outputs of the left and right summing op-amps are processed by BPFs
 	// with a flat response, and -3dB points at ~0.35 Hz and ~12.4 KHz, before
-	// making it to the left and right output sockets.
+	// making it to the left and right output sockets. Note that the exact
+	// frequency response of these BPFs will be affected by the input impedance
+	// of the connected device (not emulated).
 	auto &left_bpf = FILTER_BIQUAD(config, "left_out_bpf");
 	auto &right_bpf = FILTER_BIQUAD(config, "right_out_bpf");
 	left_bpf.rc_rr_bandpass_setup(RES_K(1), RES_K(47), CAP_U(10), CAP_U(0.01));  // R114, R112, C79, C76
 	right_bpf.rc_rr_bandpass_setup(RES_K(1), RES_K(47), CAP_U(10), CAP_U(0.01));  // R113, R111, C80, C77
-	m_left_mixer->add_route(0, left_bpf, 1.0);
-	m_right_mixer->add_route(0, right_bpf, 1.0);
+	m_left_level->add_route(0, left_bpf, 1.0);
+	m_right_level->add_route(0, right_bpf, 1.0);
 
 	constexpr double VOLTAGE_TO_AUDIO_SCALE = 0.2;
 	SPEAKER(config, "speaker", 2).front();
@@ -642,6 +734,8 @@ void tr707_audio_device::device_start()
 	save_item(NAME(m_handclap_tambourine));
 	save_item(NAME(m_hat_is_closed));
 	save_item(NAME(m_hat_triggering));
+	save_item(NAME(m_mux_sample));
+	save_item(NAME(m_mux_voice));
 	save_item(NAME(m_mac_c));
 	save_item(NAME(m_cymbal_counter));
 }
@@ -674,8 +768,8 @@ double tr707_audio_device::mux_dac_v(double v_eg, u8 data)
 	// formula specifies "/ 256", rather than the more intuitive "/ 255".
 	const double i_out = double(data) / 256.0 * i_ref;
 
-	// Compute voltage at the DAC output. There is a "feed-forward" loop from
-	// v_in to the DAC's i_out, via 2 resistors.
+	// Compute voltage at the DAC output. There is a connection from v_in to the
+	// DAC's i_out, via 2 resistors.
 	const double v_dac_out = v_in - (R147 + R148) * i_out;
 
 	// Compute the final output of the circuit.
@@ -684,6 +778,15 @@ double tr707_audio_device::mux_dac_v(double v_eg, u8 data)
 
 void tr707_audio_device::advance_sample_w(offs_t offset, u16 data)
 {
+	// Playback of multiplex voice samples lags one step behind the sample
+	// selection by the MAC. The DAC reference MUX (IC40) and sound output MUX
+	// (IC41) CBA inputs are configured to accommodate that. For example, the
+	// DAC reference for voice 0 (bass drum) is selected when IC40 CBA = 1.
+
+	// Latch the sample addressed in the previous step, into the multiplex
+	// voice DAC.
+	m_mux_dac[m_mux_voice]->data_w(m_mux_sample);
+
 	// Update MB63H114 clock inputs.
 	const u8 b = BIT(offset, 1);
 	const u8 c = BIT(offset, 2);
@@ -691,10 +794,11 @@ void tr707_audio_device::advance_sample_w(offs_t offset, u16 data)
 	const u8 xck2 = BIT(offset, m_comps.xck2_input);
 	m_mac->xck_w((b << 7) | (b << 6) | (c << 5) | (d << 4) | (d << 3) | (xck2 << 2) | (b << 1) | (b << 0));
 
-	// Update multiplex voice DAC.
+	// Compute next multiplex voice sample. This will be latched into the DAC
+	// in the next advance_sample_w invocation.
 	u16 counter = 0;
-	const u8 voice = offset & 0x07;
-	switch (voice)
+	m_mux_voice = offset & 0x07;
+	switch (m_mux_voice)
 	{
 		case 0: counter = (data & 0x1ffe) | m_bass_variation; break;
 		case 1: counter = (data & 0x1ffe) | m_snare_variation; break;
@@ -702,23 +806,27 @@ void tr707_audio_device::advance_sample_w(offs_t offset, u16 data)
 		case 7: counter = (data & 0x1ffe) | m_handclap_tambourine; break;
 		default: counter = data; break;
 	}
-	const u8 sample = m_mux_samples->as_u8((voice << 13) | counter);
-	m_mux_dac[voice]->data_w(sample);
+	m_mux_sample = m_mux_samples->as_u8((m_mux_voice << 13) | counter);
 
 	// Update single sound (cymbal) DACs.
-	if (!m_mac_c && c)  // Positive edge of C output.
+	for (int i = 0; i < CV_COUNT; ++i)
 	{
+		// Once bit 15 is set, the ROM address counter stops incrementing, and
+		// no new data is latched to the DAC.
+		if (m_cymbal_counter[i] >= MAX_CYMBAL_COUNTER)
+			continue;
+
 		// Cymbal timing is actually controlled by output B, which is divided by
 		// 2 by a flipflop. But C is also B divided by 2, so using C here for
 		// convenience.
-		for (int i = 0; i < CV_COUNT; ++i)
+		if (m_mac_c && !c)  // Negative edge increments ROM address.
 		{
-			if (m_cymbal_counter[i] < MAX_CYMBAL_COUNTER)
-			{
-				++m_cymbal_counter[i];
-				const u8 cymbal_sample = m_cymbal_samples[i]->as_u8(m_cymbal_counter[i] & 0x7fff);
-				m_cymbal_dac[i]->data_w(cymbal_sample >> 2);  // Bits D2-D7.
-			}
+			++m_cymbal_counter[i];
+		}
+		else if (!m_mac_c && c)  // Positive edge latches ROM contents to DAC.
+		{
+			const u8 cymbal_sample = m_cymbal_samples[i]->as_u8(m_cymbal_counter[i] & 0x7fff);
+			m_cymbal_dac[i]->data_w(cymbal_sample >> 2);  // Bits D2-D7.
 		}
 	}
 	m_mac_c = c;
@@ -764,8 +872,8 @@ void tr707_audio_device::update_hat_eg()
 void tr707_audio_device::update_master_volume()
 {
 	const double gain = m_master_volume->read() / 100.0;
-	m_left_mixer->set_output_gain(0, gain);
-	m_right_mixer->set_output_gain(0, gain);
+	m_left_level->set_gain(gain);
+	m_right_level->set_gain(gain);
 	LOGMASKED(LOG_MIX, "Master volume adjusted %d %f\n", m_master_volume->read(), gain);
 }
 
@@ -906,6 +1014,7 @@ private:
 	required_ioport m_accent_level;  // VR201, 50K(B).
 
 	output_finder<> m_layout_727;
+	output_finder<> m_layout_cart;
 	bool m_is_727;  // Configuration. Not needed in save state.
 	std::vector<std::vector<seg_output>> m_seg_map;  // Configuration.
 
@@ -953,6 +1062,7 @@ roland_tr707_state::roland_tr707_state(const machine_config &mconfig, device_typ
 	, m_accent_trimmer_parallel(*this, "TM3")
 	, m_accent_level(*this, "SLIDER_1")
 	, m_layout_727(*this, "is727")
+	, m_layout_cart(*this, "has_cartridge")
 	, m_is_727(false)
 	, m_seg_map(hd61602_device::NCOM, std::vector<seg_output>(hd61602_device::NSEG))  // 4x51 LCD segments.
 	, m_cart_bank(0)
@@ -1066,6 +1176,7 @@ void roland_tr707_state::machine_start()
 	save_item(NAME(m_midi_rxd_bit));
 
 	m_layout_727.resolve();
+	m_layout_cart.resolve();
 	m_dinsync_out.resolve();
 	m_cart_led.resolve();
 	for (std::vector<output_finder<>> &led_row : m_leds)
@@ -1084,6 +1195,7 @@ void roland_tr707_state::machine_reset()
 	update_internal_tempo_timer(true);
 	update_accent_adc();
 	m_layout_727 = m_is_727;
+	m_layout_cart = m_cartslot->exists() ? 1 : 0;
 }
 
 
@@ -1097,12 +1209,32 @@ double roland_tr707_state::discharge_t(double r, double c, double v)
 
 u8 roland_tr707_state::key_scan_r()
 {
-	u8 data = 0x00;
-
+	bool row_active[4] = {false, false, false, false};
+	u8 row_keys[4] = {0, 0, 0, 0};
 	for (int n = 0; n < 4; n++)
-		if (!BIT(m_key_led_row, n))
-			data |= m_key_switches[n]->read();
+	{
+		row_active[n] = !BIT(m_key_led_row, n);
+		row_keys[n] = m_key_switches[n]->read();
+	}
 
+	// In contrast to rows 1 and 2 (drum pads), rows 2 and 3 (other buttons)
+	// lack a protection diode for each key. The wiring is such that, if one
+	// of rows 2 or 3 is activated, and two keys in the same column are pressed,
+	// then the other row will also get activated.
+	if ((row_active[2] || row_active[3]) && (row_keys[2] & row_keys[3]))
+	{
+		row_active[2] = true;
+		row_active[3] = true;
+		LOGMASKED(LOG_KEYS, "Row 2/3 conflict: %02x, %02x\n", row_keys[2], row_keys[3]);
+	}
+
+	u8 data = 0x00;
+	for (int n = 0; n < 4; n++)
+		if (row_active[n])
+			data |= row_keys[n];
+
+	if (data)
+		LOGMASKED(LOG_KEYS, "Keys pressed: %02x\n", data);
 	return data;
 }
 
@@ -1351,7 +1483,7 @@ void roland_tr707_state::update_accent_adc()
 	// for a capacitor (C15) to discharge via the Accent slider, two trimmers
 	// and a resistor. The firmware initiates the discharge. Once the voltage
 	// reaches the negative-going threshold of IC3e, IRQ2 will be asserted and
-	// the capacitor will start charging.
+	// the firmware will restart the charge-discharge cycle.
 
 	constexpr const double ACCENT_MAX = RES_K(50);
 	constexpr const double TM2_MAX = RES_K(50);
@@ -1389,7 +1521,7 @@ void roland_tr707_state::update_accent_adc()
 		m_accent_adc_timer->reset();
 	}
 
-	// fliflop Q connected to P51 (IRQ2).
+	// flipflop Q connected to P51 (IRQ2).
 	const enum line_state irq2 = m_accent_adc_ff->output_r() ? CLEAR_LINE : ASSERT_LINE;
 	m_maincpu->set_input_line(HD6301_IRQ2_LINE, irq2);
 
@@ -1597,7 +1729,7 @@ void roland_tr707_state::tr_707_727_common(machine_config &config)
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(roland_tr707_state::midi_rxd_w));
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	GENERIC_CARTSLOT(config, m_cartslot, generic_plain_slot, nullptr, "tr707_cart");
+	GENERIC_CARTSLOT(config, m_cartslot, generic_plain_slot, nullptr, "m64c_cart");
 
 	HD61602(config, m_lcdc);
 	m_lcdc->write_segs().set(FUNC(roland_tr707_state::lcd_seg_w));
