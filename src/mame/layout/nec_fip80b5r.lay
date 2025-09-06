@@ -5,6 +5,28 @@ license:CC0-1.0
 <!-- 2025-09-05: Initial version.  [Christian Brunschen] -->
 <!-- Based on esq2by40.lay by  [R. Belmont / VFDGen 0.1] -->
 
+<!--
+ The segments are numbered in order of the pins 58 .. 73 that drive
+ the top row of character segments, as shown on a scan of the Ensoniq ESQ1
+ display board at http://buchty.net/ensoniq/files/schematics/esq1-display.jpg
+ 
+      ==== 0 ====
+     |\    |    /|
+     | \   |   / |
+     5  4  3  2  1
+     |   \ | /   |
+     |    \|/    |
+      ==7== ==6==
+     |    /|\    |
+     |   / | \   |
+    12 11 10  9  8
+     | /   |   \ |
+     |/    |    \|
+      ==== 13 ===  #14
+ 
+     ===== 15 ====
+-->
+
 <mamelayout version="2">
 
   <element name="cell" >
