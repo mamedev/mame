@@ -3471,7 +3471,7 @@ Gone Fishing II
 IGS PCB-0388-05-FW
 
    +--------------------------------------------+
-+--+               8-Liner Connecter            +---+
++--+               8-Liner Connector            +---+
 |                                                   |
 |    +---------------+                            +-+
 |    |   IGS 0027A   |     +------+               |
@@ -3492,7 +3492,7 @@ IGS PCB-0388-05-FW
 |e   +---+ |   | +---+                              |
 |c         +---+                                    |
 |t                        62257                     |
-|e                                                  |
+|o                                                  |
 |r       +-------+                                  |
 |        |       |                                  |
 |        |  IGS  |                                  |
@@ -3527,11 +3527,14 @@ IGS 0027 - Custom programmed ARM9
 */
 
 
+// these titles are listed in the ROM
+// IGS CASTLE KING 2001 USA ONLINE
+// IGS GONE FISHIN II USA
 
 ROM_START( gonefsh2 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "gonefsh2_igs027a", 0x00000, 0x4000, NO_DUMP ) // unknown sticker
+	ROM_LOAD( "027a.bin", 0x00000, 0x4000, CRC(0ef83d8b) SHA1(31ee4bf95561cdccf4262463545839bcde9ce087) )  // unknown sticker
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "gfii_v-904uso.u12", 0x000000, 0x80000, CRC(ef0f6735) SHA1(0add92599b0989f3e50dc64e32ce234b4bd87d33) )
@@ -3544,6 +3547,9 @@ ROM_START( gonefsh2 )
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "gfii_sp.u13", 0x00000, 0x080000, CRC(61da1d58) SHA1(0a79578f0daf15f0efe2b0eeac59a60d8372a644) )
+
+	ROM_REGION( 0x300, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "fw.u26", 0x000, 0x2dd, NO_DUMP ) // atf22v10c
 ROM_END
 
 /*
@@ -3554,7 +3560,7 @@ Chess Challenge II
 IGS PCB-0388-04-FW
 
    +--------------------------------------------+
-+--+               8-Liner Connecter            +---+
++--+               8-Liner Connector            +---+
 |                                                   |
 |    +---------------+                            +-+
 |    |   IGS 0027A   |     +------+               |
@@ -3575,7 +3581,7 @@ IGS PCB-0388-04-FW
 |e   +---+ |   | +---+                              |
 |c         +---+                                    |
 |t                        62257                     |
-|e                                                  |
+|o                                                  |
 |r       +-------+                                  |
 |        |       |                                  |
 |        |  IGS  |                                  |
@@ -4309,9 +4315,15 @@ void igs_m027_state::init_cjtljp()
 
 void igs_m027_state::init_gonefsh2()
 {
-	gonefsh2_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt();
-	pgm_create_dummy_internal_arm_region();
+	zhongguo_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+
+	// bypass IGS025 'version' check
+	m_external_rom[0x1f894/4] ^= 0x00000100;
+	// bypass external ROM checksum
+	u32 *ROM2 = &memregion("maincpu")->as_u32();
+	ROM2[(0x168/4)] ^= 0x10000000;
 }
 
 void igs_m027_state::init_zhongguo()
@@ -4522,6 +4534,7 @@ GAME(  2006, tswxp,         0,        tct2p,        tswxp,         igs_m027_stat
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME(  2002, chessc2,       0,        chessc2,      chessc2,       igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME(  200?, gonefsh2,      0,        chessc2,      chessc2,       igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2 (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 
 // these can select between two different games via DIP switch (currently unemulated feature)
 GAME(  2007, cjddzs,        0,        cjddz,        cjddz,         igs_m027_state, init_cjddzs,   ROT0, "bootleg (WDF)", "Chaoji Dou Dizhu (V219CN) / Chaoji Dou Dizhu Jianan Ban (V302CN)", MACHINE_NOT_WORKING )
@@ -4540,6 +4553,3 @@ GAME(  2001, cjdh6th,       0,        m027_1ppi<false>, base,     igs_m027_state
 GAME(  2005, royal5p,       0,        m027_1ppi<false>, base,     igs_m027_state, init_royal5p,  ROT0, "IGS", "Royal 5+ (V101US)", MACHINE_NOT_WORKING )
 GAME(  200?, jhg3d,         0,        m027_1ppi<false>, base,     igs_m027_state, init_jhg3d,    ROT0, "IGS", "Jin Huangguan 3-dai (V445CN)", MACHINE_NOT_WORKING )
 GAME(  2002, gonefsh,       0,        m027_1ppi<false>, base,     igs_m027_state, init_gonefsh,  ROT0, "IGS", "Gone Fishing (V602US)", MACHINE_NOT_WORKING )
-
-// these have an IGS025 protection device instead of the 8255
-GAME(  200?, gonefsh2,      0,        m027_noppi<false>,base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )
