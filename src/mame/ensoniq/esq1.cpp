@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Olivier Galibert
+// copyright-holders:R. Belmont, Olivier Galibert, Felipe Sanches
 /***************************************************************************
 
     ensoniq/esq1.cpp
@@ -53,7 +53,6 @@ IRQ sources are the DUART and the DRQ line from the FDC (SQ-80 only).
 NMI is from the IRQ line on the FDC (again, SQ-80 only).
 
 TODO:
-    - Keyboard
      - Analog filters and VCA on the back end of the 5503 (inaccurate)
      - DUART seems to keep interrupting even after MIDI xmit buffer becomes empty
 
