@@ -1877,9 +1877,9 @@ void goldstar_state::super9_map(address_map &map)
 	map(0xf800, 0xf800).portr("IN0");    // player
 	map(0xf801, 0xf801).portr("IN1");    // second line
 	map(0xf802, 0xf802).portr("DSW1");   // DSW1 ok
-//  map(0xf803, 0xf803) unknown reads...
-//  map(0xf804, 0xf804) unknown reads...
-//	map(0xf805, 0xf805) unknown constant reads...
+	map(0xf803, 0xf803).nopr();  // unknown reads...
+	map(0xf804, 0xf804).nopr();  // unknown reads...
+	map(0xf805, 0xf805).nopr();  // unknown massive reads...
 	map(0xf806, 0xf806).portr("IN2");    // nothing... to check
 	map(0xf810, 0xf810).portr("IN3");    // coin
 	map(0xf811, 0xf811).portr("IN4");    // test
@@ -1888,7 +1888,6 @@ void goldstar_state::super9_map(address_map &map)
 	map(0xf840, 0xf840).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0xf900, 0xf900).w(FUNC(goldstar_state::p1_lamps_w));
 	map(0xfa00, 0xfa00).w(FUNC(goldstar_state::goldstar_fa00_w));
-	map(0xfb00, 0xfb00).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xfc00, 0xfdff).rom();
 	map(0xfe00, 0xfeff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // TODO: where's the palette
 //  map(0xfe11, 0xfe11) unknown reads...
@@ -1899,6 +1898,7 @@ void goldstar_state::super9_map(address_map &map)
 void goldstar_state::super9_portmap(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0x00, 0x00).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x10, 0x10).portr("DSW5");   // DSW5 ok
 //	map(0x00, 0xff).ram();
 }
@@ -4635,10 +4635,10 @@ static INPUT_PORTS_START( super9 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_M) PORT_NAME("Player: M")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_L) PORT_NAME("Player: L")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_X) PORT_NAME("Red Bet")           // ok
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_N) PORT_NAME("Small / Info")      // ok
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_C) PORT_NAME("Blue Bet / D-UP")   // ok
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_V) PORT_NAME("Take")              // ok
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_B) PORT_NAME("Big")               // ok
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_B) PORT_NAME("Small / Info / Stop 3")      // ok
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_C) PORT_NAME("Blue Bet / D-UP / Stop 1")   // ok
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_V) PORT_NAME("Take / Stop 2")              // ok
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_N) PORT_NAME("Big")               // ok
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_Z) PORT_NAME("Start / Stop All")  // ok
 
 	PORT_START("IN1")  // second line
