@@ -41,11 +41,11 @@
 #define SCREEN_TAG                  "screen"
 #define VIA_TAG                     "via6522"
 
-class f256_state : public driver_device
+class f256k_state : public driver_device
 {
 public:
-	f256_state(const machine_config &mconfig, device_type type, const char *tag);
-	~f256_state();
+	f256k_state(const machine_config &mconfig, device_type type, const char *tag);
+	~f256k_state();
     void f256k(machine_config &config);
 
 protected:
@@ -206,4 +206,18 @@ private:
 	uint8_t m_iec_in, m_iec_out;
 };
 
+/**
+ *  The F256K2 is nearly identical to the F256K but it addes the following:
+ *  $DD20 - $DD3F - SDCARD1 *** This one has moved ***
+ *  $DD40 - $DD5F - SPLASH LCD (SPI Port)
+ *  $DD60 - $DD7F - Wiznet Copper SPI Interface
+ *  $DD80 - $DD9F - Wiznet WIFI UART interface (115K or 2M)
+ *  $DDA0 - $DDBF - MIDI UART (Fixed @ 31,250Baud)
+ *  $DDC0 - $DDDF - Master SPI Interface to Supervisor (RP2040)*
+ */
+class f256k2_state : public f256k_state
+{
+public:
+	f256k2_state(const machine_config &mconfig, device_type type, const char *tag);
+};
 #endif // MAME_F256_F256_H

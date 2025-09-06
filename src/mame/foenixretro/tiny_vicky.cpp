@@ -251,10 +251,10 @@ void tiny_vicky_video_device::draw_text(uint32_t *row, uint8_t mcr, bool enable_
             break;
     }
     int screen_x = brd_x;
-    // I'm assuming that if m_enable_cursor_flash is 0, then the cursor is always visible
-    m_cursor_visible = enable_cursor && (m_enable_cursor_flash && ((frame_number % (2 * m_cursor_flash_rate)) < m_cursor_flash_rate));
+    // When m_enable_cursor_flash is false and enable_curse is true, the cursor is always visible
+    m_cursor_visible = enable_cursor && ((m_enable_cursor_flash && ((frame_number % (2 * m_cursor_flash_rate)) < m_cursor_flash_rate)) || !m_enable_cursor_flash);
     // the loop should go to txt_cols - going to 80 causes a weird alias, but the machine works this way... so.
-    for (int col = 0; col < 80; col++)
+    for (int col = 0; col < txt_cols; col++)
     {
         int x = col * MAME_F256_CHAR_WIDTH;
         if (x + brd_x > x_res - 1 - brd_x)

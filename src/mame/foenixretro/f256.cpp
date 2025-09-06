@@ -5,8 +5,6 @@
 #include "tiny_vicky.h"
 #include "cpu/m6502/w65c02s.h"
 
-
-
 /**
  *
  * F256K - WDC65C02 Processor running at 6.25MHz
@@ -21,7 +19,7 @@
  *
  */
 
-f256_state::f256_state(const machine_config &mconfig, device_type type, const char *tag) :
+f256k_state::f256k_state(const machine_config &mconfig, device_type type, const char *tag) :
     driver_device(mconfig, type, tag)
     , m_maincpu(*this, MAINCPU_TAG)
     , m_ram(*this, RAM_TAG)
@@ -52,10 +50,10 @@ f256_state::f256_state(const machine_config &mconfig, device_type type, const ch
 {
 }
 
-void f256_state::f256k(machine_config &config)
+void f256k_state::f256k(machine_config &config)
 {
     W65C02S(config, m_maincpu, MASTER_CLOCK/4);
-    m_maincpu->set_addrmap(AS_PROGRAM, &f256_state::program_map);
+    m_maincpu->set_addrmap(AS_PROGRAM, &f256k_state::program_map);
 
     RAM(config, m_ram).set_default_size("512k").set_default_value(0x0);
     for (auto &iopage : m_iopage)
@@ -72,11 +70,11 @@ void f256_state::f256k(machine_config &config)
 
     BQ4802(config, m_rtc, MASTER_CLOCK / 1000);  // RTC clock in kHz
     //set interrupt handler for the RTC
-    m_rtc->int_handler().set(FUNC(f256_state::rtc_interrupt_handler));
+    m_rtc->int_handler().set(FUNC(f256k_state::rtc_interrupt_handler));
 
     TINY_VICKY(config, m_video, MASTER_CLOCK);
-    m_video->sof_irq_handler().set(FUNC(f256_state::sof_interrupt));
-    m_video->sol_irq_handler().set(FUNC(f256_state::sol_interrupt));
+    m_video->sof_irq_handler().set(FUNC(f256k_state::sof_interrupt));
+    m_video->sol_irq_handler().set(FUNC(f256k_state::sol_interrupt));
 
     // VIA are used to implement the keyboard and Atari-style joysticks polling
     for (auto &via655: m_via6522)
@@ -84,21 +82,21 @@ void f256_state::f256k(machine_config &config)
         W65C22S(config, via655, MASTER_CLOCK / 4);  // Atari Joysticks
     }
     // The functions for VIA 0 and VIA 1 are different as they poll different devices
-    m_via6522[0]->readpa_handler().set(FUNC(f256_state::via0_system_porta_r));
-    m_via6522[0]->readpb_handler().set(FUNC(f256_state::via0_system_portb_r));
-    m_via6522[0]->writepa_handler().set(FUNC(f256_state::via0_system_porta_w));
-    m_via6522[0]->writepb_handler().set(FUNC(f256_state::via0_system_portb_w));
-    m_via6522[0]->ca2_handler().set(FUNC(f256_state::via0_ca2_write));
-    m_via6522[0]->cb2_handler().set(FUNC(f256_state::via0_cb2_write));
-    m_via6522[0]->irq_handler().set(FUNC(f256_state::via0_interrupt));
+    m_via6522[0]->readpa_handler().set(FUNC(f256k_state::via0_system_porta_r));
+    m_via6522[0]->readpb_handler().set(FUNC(f256k_state::via0_system_portb_r));
+    m_via6522[0]->writepa_handler().set(FUNC(f256k_state::via0_system_porta_w));
+    m_via6522[0]->writepb_handler().set(FUNC(f256k_state::via0_system_portb_w));
+    m_via6522[0]->ca2_handler().set(FUNC(f256k_state::via0_ca2_write));
+    m_via6522[0]->cb2_handler().set(FUNC(f256k_state::via0_cb2_write));
+    m_via6522[0]->irq_handler().set(FUNC(f256k_state::via0_interrupt));
 
-    m_via6522[1]->readpa_handler().set(FUNC(f256_state::via1_system_porta_r));
-    m_via6522[1]->readpb_handler().set(FUNC(f256_state::via1_system_portb_r));
-    m_via6522[1]->writepa_handler().set(FUNC(f256_state::via1_system_porta_w));
-    m_via6522[1]->writepb_handler().set(FUNC(f256_state::via1_system_portb_w));
-    m_via6522[1]->ca2_handler().set(FUNC(f256_state::via1_ca2_write));
-    m_via6522[1]->cb2_handler().set(FUNC(f256_state::via1_cb2_write));
-    m_via6522[1]->irq_handler().set(FUNC(f256_state::via1_interrupt));
+    m_via6522[1]->readpa_handler().set(FUNC(f256k_state::via1_system_porta_r));
+    m_via6522[1]->readpb_handler().set(FUNC(f256k_state::via1_system_portb_r));
+    m_via6522[1]->writepa_handler().set(FUNC(f256k_state::via1_system_porta_w));
+    m_via6522[1]->writepb_handler().set(FUNC(f256k_state::via1_system_portb_w));
+    m_via6522[1]->ca2_handler().set(FUNC(f256k_state::via1_ca2_write));
+    m_via6522[1]->cb2_handler().set(FUNC(f256k_state::via1_cb2_write));
+    m_via6522[1]->irq_handler().set(FUNC(f256k_state::via1_interrupt));
 
     // initialize the PS2 mouse
     PC_KBDC(config, m_ps2_keyboard, XTAL(32'768));
@@ -149,12 +147,13 @@ void f256_state::f256k(machine_config &config)
 
     // The IEC interface is not yet implemented
     // cbm_iec_slot_device::add(config, m_iec, "c1581");
-	// m_iec->srq_callback().set(FUNC(f256_state::iec_srq_w));
-	// m_iec->data_callback().set(FUNC(f256_state::iec_data_w));
-    // m_iec->atn_callback().set(FUNC(f256_state::iec_atn_w));
-    // m_iec->clk_callback().set(FUNC(f256_state::iec_clk_w));
+	// m_iec->srq_callback().set(FUNC(f256k_state::iec_srq_w));
+	// m_iec->data_callback().set(FUNC(f256k_state::iec_data_w));
+    // m_iec->atn_callback().set(FUNC(f256k_state::iec_atn_w));
+    // m_iec->clk_callback().set(FUNC(f256k_state::iec_clk_w));
 }
-f256_state::~f256_state()
+
+f256k_state::~f256k_state()
 {
 }
 /*
@@ -164,15 +163,15 @@ f256_state::~f256_state()
     $10:0000 - $13:FFFF	Expansion Memory - NOT IMPLEMENTED
     $14:0000 - $1F:FFFF	Reserved
 */
-void f256_state::program_map(address_map &map)
+void f256k_state::program_map(address_map &map)
 {
     // the address range 0:F
     // 0: LUT Edit $80 allows writing to 8 to F, LUT Select 0 to 3
-    map(0x0000, 0x000f).rw(FUNC(f256_state::lut_r), FUNC(f256_state::lut_w));
-    map(0x0010, 0xffff).rw(FUNC(f256_state::mem_r), FUNC(f256_state::mem_w));
+    map(0x0000, 0x000f).rw(FUNC(f256k_state::lut_r), FUNC(f256k_state::lut_w));
+    map(0x0010, 0xffff).rw(FUNC(f256k_state::mem_r), FUNC(f256k_state::mem_w));
 };
 
-void f256_state::data_map(address_map &map)
+void f256k_state::data_map(address_map &map)
 {
     map(0x0000, 0x1fff).ram().share(IOPAGE_TAG "0");
     map(0x0000, 0x1fff).ram().share(IOPAGE_TAG "1");
@@ -180,7 +179,7 @@ void f256_state::data_map(address_map &map)
     map(0x0000, 0x1fff).ram().share(IOPAGE_TAG "3");
 }
 
-u8   f256_state::lut_r(offs_t offset)
+u8   f256k_state::lut_r(offs_t offset)
 {
     // addresses 2 to 7 are always read from RAM
     if (offset == 0)
@@ -209,7 +208,7 @@ u8   f256_state::lut_r(offs_t offset)
         }
     }
 }
-void f256_state::lut_w(offs_t offset, u8 data)
+void f256k_state::lut_w(offs_t offset, u8 data)
 {
     // addresses 2:7 are always RAM
     if (offset == 0)
@@ -240,7 +239,7 @@ void f256_state::lut_w(offs_t offset, u8 data)
 }
 
 // offsets are 0x10 based
-u8   f256_state::mem_r(offs_t offset)
+u8   f256k_state::mem_r(offs_t offset)
 {
 
     // find which slot to read
@@ -561,6 +560,14 @@ u8   f256_state::mem_r(offs_t offset)
                                 return 0xff;
                         }
                     }
+                    else if (adj_addr == 0xdda1)
+                    {
+                        // SAM2695 MIDI Chip in F256K2 and F256JrJr
+
+
+
+
+                    }
                     else if (adj_addr >= 0xde00 && adj_addr < 0xde20)
                     {
                         // Math Coprocessor
@@ -633,7 +640,7 @@ u8   f256_state::mem_r(offs_t offset)
     // Invalid area of memory
     return 0;
 }
-void f256_state::mem_w(offs_t offset, u8 data)
+void f256k_state::mem_w(offs_t offset, u8 data)
 {
     // find which slot to write
     uint8_t mmu = m_mmu_reg & 3;
@@ -734,7 +741,7 @@ void f256_state::mem_w(offs_t offset, u8 data)
                             if ((base == 2) && ((data & 1) == 1))
                             {
                                 // start a timer that will reset the value to zero
-                                this->machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(f256_state::codec_done), this), 1);   // timer_alloc(timer_expired_delegate(FUNC(f256_state::timer), this));
+                                this->machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(f256k_state::codec_done), this), 1);   // timer_alloc(timer_expired_delegate(FUNC(f256k_state::timer), this));
                             }
                         }
                         else if (adj_addr >= 0xd630 && adj_addr < 0xd640)
@@ -1222,11 +1229,11 @@ void f256_state::mem_w(offs_t offset, u8 data)
         }
     }
 }
-void f256_state::codec_done(s32 param)
+void f256k_state::codec_done(s32 param)
 {
     m_codec[2] = 0;
 }
-void f256_state::reset_mmu()
+void f256k_state::reset_mmu()
 {
     logerror("reset_mmu\n");
     for (int i =0; i < 32; i++)
@@ -1246,7 +1253,7 @@ void f256_state::reset_mmu()
 //-------------------------------------------------
 //  IEC Methods
 //-------------------------------------------------
-inline void f256_state::update_iec()
+inline void f256k_state::update_iec()
 {
 	// int fsdir = m_mmu->fsdir_r();
 
@@ -1273,7 +1280,7 @@ inline void f256_state::update_iec()
 	//m_iec->host_srq_w(srq_out);
 }
 
-void f256_state::iec_srq_w(int state)
+void f256k_state::iec_srq_w(int state)
 {
     logerror("Event iec_srq_w: %X\n", state);
 
@@ -1287,7 +1294,7 @@ void f256_state::iec_srq_w(int state)
 
 	update_iec();
 }
-void f256_state::iec_data_w(int state)
+void f256k_state::iec_data_w(int state)
 {
     logerror("Event iec_data_w: %X\n", state);
 
@@ -1298,7 +1305,7 @@ void f256_state::iec_data_w(int state)
     }
     update_iec();
 }
-void f256_state::iec_atn_w(int state)
+void f256k_state::iec_atn_w(int state)
 {
     logerror("Event iec_atn_w: %X\n", state);
     if (state && ((m_interrupt_masks[2] & 0x4) == 0))
@@ -1307,7 +1314,7 @@ void f256_state::iec_atn_w(int state)
         m_maincpu->set_input_line((m_iec_out & 0x20) !=0 ? M6502_NMI_LINE:M6502_IRQ_LINE, state);
     }
 }
-void f256_state::iec_clk_w(int state)
+void f256k_state::iec_clk_w(int state)
 {
     logerror("Event iec_clk_w: %X\n", state);
     if (state && ((m_interrupt_masks[2] & 0x2) == 0))
@@ -1319,14 +1326,14 @@ void f256_state::iec_clk_w(int state)
 //-------------------------------------------------
 //  Math Coprocessor Methods
 //-------------------------------------------------
-void f256_state::unsignedMultiplier(int baseAddr)
+void f256k_state::unsignedMultiplier(int baseAddr)
 {
     uint16_t acc1 = (m_iopage[0]->read(baseAddr + 1) << 8) + m_iopage[0]->read(baseAddr);
     uint16_t acc2 = (m_iopage[0]->read(baseAddr + 3) << 8) + m_iopage[0]->read(baseAddr + 2);
     m_multiplication_result = acc1 * acc2;
 }
 
-void f256_state::unsignedDivider(int baseAddr)
+void f256k_state::unsignedDivider(int baseAddr)
 {
     uint16_t acc1 = (m_iopage[0]->read(baseAddr + 1) << 8) + m_iopage[0]->read(baseAddr);
     uint16_t acc2 = (m_iopage[0]->read(baseAddr + 3) << 8) + m_iopage[0]->read(baseAddr + 2);
@@ -1337,7 +1344,7 @@ void f256_state::unsignedDivider(int baseAddr)
     }
 }
 
-void f256_state::unsignedAdder(int baseAddr)
+void f256k_state::unsignedAdder(int baseAddr)
 {
     int acc1 = (m_iopage[0]->read(baseAddr + 3) << 24) + (m_iopage[0]->read(baseAddr + 2) << 16) +
         (m_iopage[0]->read(baseAddr + 1) << 8) + m_iopage[0]->read(baseAddr);
@@ -1349,7 +1356,7 @@ void f256_state::unsignedAdder(int baseAddr)
 //-------------------------------------------------
 //  DMA Methods
 //-------------------------------------------------
-uint8_t f256_state::get_random()
+uint8_t f256k_state::get_random()
 {
     uint8_t m_random = rand();
     return m_random & 0xff;
@@ -1357,7 +1364,7 @@ uint8_t f256_state::get_random()
 //-------------------------------------------------
 //  DMA Methods
 //-------------------------------------------------
-void f256_state::perform2DFillDMA()
+void f256k_state::perform2DFillDMA()
 {
 
     uint8_t fill_byte = m_iopage[0]->read(0xdf01 - 0xc000);
@@ -1374,7 +1381,7 @@ void f256_state::perform2DFillDMA()
         }
     }
 }
-void f256_state::performLinearFillDMA()
+void f256k_state::performLinearFillDMA()
 {
     uint8_t fill_byte = m_iopage[0]->read(0xdf01 - 0xc000);
     uint32_t dest_addr = ((m_iopage[0]->read(0xdf0a) & 0x7) << 16) + (m_iopage[0]->read(0xdf09) << 8) + m_iopage[0]->read(0xdf08);
@@ -1382,7 +1389,7 @@ void f256_state::performLinearFillDMA()
     //logerror("Linear Fill DMA DEST: %X, LEN: %X\n", dest_addr, count);
     memset(m_ram->pointer() + dest_addr, fill_byte, count);
 }
-void f256_state::perform2DDMA()
+void f256k_state::perform2DDMA()
 {
     uint32_t src_addr = ((m_iopage[0]->read(0xdf06) & 0x7) << 16) + (m_iopage[0]->read(0xdf05) << 8) + m_iopage[0]->read(0xdf04);
     uint32_t dest_addr = ((m_iopage[0]->read(0xdf0a) & 0x7) << 16) + (m_iopage[0]->read(0xdf09) << 8) + m_iopage[0]->read(0xdf08);
@@ -1401,7 +1408,7 @@ void f256_state::perform2DDMA()
         }
     }
 }
-void f256_state::performLinearDMA()
+void f256k_state::performLinearDMA()
 {
     uint32_t src_addr = ((m_iopage[0]->read(0xdf06) & 0x7) << 16) + (m_iopage[0]->read(0xdf05) << 8) + m_iopage[0]->read(0xdf04);
     uint32_t dest_addr = ((m_iopage[0]->read(0xdf0a) & 0x7) << 16) + (m_iopage[0]->read(0xdf09) << 8) + m_iopage[0]->read(0xdf08);
@@ -1414,7 +1421,7 @@ void f256_state::performLinearDMA()
 //-------------------------------------------------
 //  device_start
 //-------------------------------------------------
-void f256_state::device_start()
+void f256k_state::device_start()
 {
 	driver_device::device_start();
     reset_mmu();
@@ -1469,7 +1476,7 @@ void f256_state::device_start()
     m_via6522[1]->write(via6522_device::VIA_DDRA, 0);     // DDRA
 
     // Initialize SD Card / SPI clock
-    m_spi_clock = timer_alloc(FUNC(f256_state::spi_clock), this);
+    m_spi_clock = timer_alloc(FUNC(f256k_state::spi_clock), this);
     save_item(NAME(m_spi_clock_state));
 	save_item(NAME(m_spi_clock_sysclk));
 	save_item(NAME(m_spi_clock_cycles));
@@ -1478,14 +1485,14 @@ void f256_state::device_start()
 	save_item(NAME(m_out_latch));
     save_item(NAME(m_iec_srq));
 
-    m_timer0 = timer_alloc(FUNC(f256_state::timer0), this);
-    m_timer1 = timer_alloc(FUNC(f256_state::timer1), this);
+    m_timer0 = timer_alloc(FUNC(f256k_state::timer0), this);
+    m_timer1 = timer_alloc(FUNC(f256k_state::timer1), this);
 }
 
 //-------------------------------------------------
 //  device_reset
 //-------------------------------------------------
-void f256_state::device_reset()
+void f256k_state::device_reset()
 {
 	driver_device::device_reset();
     reset_mmu();
@@ -1517,7 +1524,7 @@ void f256_state::device_reset()
 //-------------------------------------------------
 //  Interrupts
 //-------------------------------------------------
-void f256_state::sof_interrupt(int state)
+void f256k_state::sof_interrupt(int state)
 {
     if (state) // && ((m_interrupt_masks[1] & 0x01) == 0))
     {
@@ -1526,7 +1533,7 @@ void f256_state::sof_interrupt(int state)
         m_maincpu->set_input_line(M6502_IRQ_LINE, state);
     }
 }
-void f256_state::sol_interrupt(int state)
+void f256k_state::sol_interrupt(int state)
 {
     if (state && ((m_interrupt_masks[1] & 0x02) == 0))
     {
@@ -1535,7 +1542,7 @@ void f256_state::sol_interrupt(int state)
         m_maincpu->set_input_line(M6502_IRQ_LINE, state);
     }
 }
-void f256_state::rtc_interrupt_handler(int state)
+void f256k_state::rtc_interrupt_handler(int state)
 {
     // this is really odd: if I set state==1, then the interrupt gets only called once.
     if (state == 0 && ((m_interrupt_masks[1] & 0x10) == 0))
@@ -1546,7 +1553,7 @@ void f256_state::rtc_interrupt_handler(int state)
     }
 }
 
-void f256_state::via0_interrupt(int state)
+void f256k_state::via0_interrupt(int state)
 {
     // if a joystick button is pressed, set the VIA0 interrupt if the mask allows if
     if (state && ((m_interrupt_masks[1] & 0x20) == 0))
@@ -1556,7 +1563,7 @@ void f256_state::via0_interrupt(int state)
         m_maincpu->set_input_line(M6502_IRQ_LINE, state);
     }
 }
-void f256_state::via1_interrupt(int state)
+void f256k_state::via1_interrupt(int state)
 {
     // if a keyboard button is pressed, set the VIA1 interrupt if the mask allows if
     if (state && ((m_interrupt_masks[1] & 0x40) == 0))
@@ -1566,7 +1573,7 @@ void f256_state::via1_interrupt(int state)
         m_maincpu->set_input_line(M6502_IRQ_LINE, state);
     }
 }
-void f256_state::dma_interrupt_handler(int state)
+void f256k_state::dma_interrupt_handler(int state)
 {
     // if (state && ((m_interrupt_masks[1] & 0x10) == 0))
     // {
@@ -1575,7 +1582,7 @@ void f256_state::dma_interrupt_handler(int state)
     //     m_maincpu->set_input_line(M6502_IRQ_LINE, state);
     // }
 }
-void f256_state::timer0_interrupt_handler(int state)
+void f256k_state::timer0_interrupt_handler(int state)
 {
     if (state && ((m_interrupt_masks[0] & 0x10) == 0))
     {
@@ -1584,7 +1591,7 @@ void f256_state::timer0_interrupt_handler(int state)
         m_maincpu->set_input_line(M6502_IRQ_LINE, state);
     }
 }
-void f256_state::timer1_interrupt_handler(int state)
+void f256k_state::timer1_interrupt_handler(int state)
 {
     logerror("Timer1 interrupt handler %d\n", state);
     if (state && ((m_interrupt_masks[0] & 0x20) == 0))
@@ -1594,7 +1601,7 @@ void f256_state::timer1_interrupt_handler(int state)
         m_maincpu->set_input_line(M6502_IRQ_LINE, state);
     }
 }
-TIMER_CALLBACK_MEMBER(f256_state::spi_clock)
+TIMER_CALLBACK_MEMBER(f256k_state::spi_clock)
 {
 
 	if (m_spi_clock_cycles > 0)
@@ -1622,7 +1629,7 @@ TIMER_CALLBACK_MEMBER(f256_state::spi_clock)
 }
 
 // This is the optimized function for Timer0
-TIMER_CALLBACK_MEMBER(f256_state::timer0)
+TIMER_CALLBACK_MEMBER(f256k_state::timer0)
 {
     logerror("Timer0 reached value: %06X\n", m_timer0_load);
     uint8_t reg_t0 = m_iopage[0]->read(0xd650 - 0xc000);
@@ -1631,7 +1638,7 @@ TIMER_CALLBACK_MEMBER(f256_state::timer0)
         timer0_interrupt_handler(1);
     }
 }
-// TIMER_CALLBACK_MEMBER(f256_state::timer0)
+// TIMER_CALLBACK_MEMBER(f256k_state::timer0)
 // {
 //     uint8_t reg_t0 = m_iopage[0]->read(0xd650 - 0xc000);
 //     uint32_t cmp = m_iopage[0]->read(0xd655 - 0xc000) + (m_iopage[0]->read(0xd656 - 0xc000) << 8) +
@@ -1697,7 +1704,7 @@ TIMER_CALLBACK_MEMBER(f256_state::timer0)
 
 
 // This timer is much slower than Timer0, so we can use single increments
-TIMER_CALLBACK_MEMBER(f256_state::timer1)
+TIMER_CALLBACK_MEMBER(f256k_state::timer1)
 {
     uint8_t reg_t1 = m_iopage[0]->read(0xd658 - 0xc000);
     uint32_t cmp = m_iopage[0]->read(0xd65d - 0xc000) + (m_iopage[0]->read(0xd65e - 0xc000) << 8) +
@@ -1764,34 +1771,34 @@ TIMER_CALLBACK_MEMBER(f256_state::timer1)
 //-------------------------------------------------
 //  VIA0 - JOYSTICK
 //-------------------------------------------------
-u8 f256_state::via0_system_porta_r()
+u8 f256k_state::via0_system_porta_r()
 {
     //logerror("VIA #0 Port A Read ioport JOY2: %02X\n", data);
     return m_joy[1]->read();
 }
-u8 f256_state::via0_system_portb_r()
+u8 f256k_state::via0_system_portb_r()
 {
     //logerror("VIA #0 Port B Read ioport JOY1: %02X\n", m_via_joy1);
     return m_via_joy1;
 }
-void f256_state::via0_system_porta_w(u8 data)
+void f256k_state::via0_system_porta_w(u8 data)
 {
     //logerror("VIA #0 Port A Write: %02X\n", data);
     // writing should only be done if DDR allows it
     m_via6522[0]->write_pa(data);
 }
-void f256_state::via0_system_portb_w(u8 data)
+void f256k_state::via0_system_portb_w(u8 data)
 {
     //logerror("VIA #0 Port B Write: %02X\n", data);
     // writing should only be done if DDR allows it
     m_via6522[0]->write_pb(data);
 }
-void f256_state::via0_ca2_write(u8 value)
+void f256k_state::via0_ca2_write(u8 value)
 {
     //logerror("Write to VIA0 - CA2 %02X\n", value);
     m_via6522[0]->write_ca2(value);
 }
-void f256_state::via0_cb2_write(u8 value)
+void f256k_state::via0_cb2_write(u8 value)
 {
     //logerror("Write to VIA0 - CB2 %02X\n", value);
     m_via6522[0]->write_cb2(value);
@@ -1832,18 +1839,18 @@ INPUT_PORTS_END
 //-------------------------------------------------
 //  VIA1 - F256K Keyboard
 //-------------------------------------------------
-u8 f256_state::via1_system_porta_r()
+u8 f256k_state::via1_system_porta_r()
 {
     //logerror("VIA1 Read Port A - %02X\n", m_via_keyboard_port_a);
     return m_via_keyboard_port_a;
 }
-u8 f256_state::via1_system_portb_r()
+u8 f256k_state::via1_system_portb_r()
 {
     //logerror("VIA1 Read Port B - %02X\n", m_via_keyboard_port_b);
     return m_via_keyboard_port_b;
 }
 // Read keyboard as rows
-void f256_state::via1_system_porta_w(u8 data)
+void f256k_state::via1_system_porta_w(u8 data)
 {
     //logerror("VIA1 Write Port A - %02X\n", data);
 
@@ -1873,16 +1880,16 @@ void f256_state::via1_system_porta_w(u8 data)
     m_via6522[0]->write_pb(m_via_joy1);
 }
 // Read keyboard as columns
-void f256_state::via1_system_portb_w(u8 data)
+void f256k_state::via1_system_portb_w(u8 data)
 {
     m_via_keyboard_port_b = data;
     m_via6522[1]->write_pb(data);
 }
-void f256_state::via1_ca2_write(u8 value)
+void f256k_state::via1_ca2_write(u8 value)
 {
     m_via6522[1]->write_ca2(value);
 }
-void f256_state::via1_cb2_write(u8 value)
+void f256k_state::via1_cb2_write(u8 value)
 {
     m_via6522[1]->write_cb2(value);
 }
@@ -2009,5 +2016,27 @@ ROM_START(f256k)
     ROM_LOAD("f256jr_font_micah_jan25th.bin", 0x0000, 0x0800, CRC(6d66da85) SHA1(377dc27ff3a4ae2d80d740b2d16373f8e639eef6))
 ROM_END
 
-//    YEAR  NAME   PARENT COMPAT  MACHINE    INPUT    CLASS        INIT        COMPANY              FULLNAME                        FLAGS
-COMP( 2024, f256k,    0,      0,    f256k,   f256k,   f256_state, empty_init, "Stefany Allaire", "F256K 8-bit Retro System",    MACHINE_UNOFFICIAL  )
+// f256k2_state::f256k2_state(const machine_config &mconfig, device_type type, const char *tag) : f256k_state(mconfig, type, tag)
+// {
+
+// }
+
+//    YEAR  NAME   PARENT COMPAT  MACHINE    INPUT    CLASS         INIT        COMPANY              FULLNAME                        FLAGS
+COMP( 2024, f256k,    0,      0,   f256k,   f256k,   f256k_state,  empty_init, "Stefany Allaire", "F256K 8-bit Retro System",    MACHINE_UNOFFICIAL  )
+//COMP( 2024, f256k2,  f256k,   0,   f256k2,   f256k,  f256k2_state, empty_init, "Stefany Allaire", "F256K2 8-bit Retro System",   MACHINE_UNOFFICIAL  )
+// GAME_DRIVER_TRAITS(f256k2, "F256K2 8-bit Retro System")
+// 		extern game_driver const GAME_NAME(f256k2)
+// 		{
+// 			GAME_DRIVER_TYPE(f256k2, f256k2_state, MACHINE_UNOFFICIAL),
+// 			"f256k",  // parent
+// 			"2024",   // year
+// 			"Stefany Allaire",
+// 			[] (machine_config &config, device_t &owner) { downcast<f256k2_state &>(owner).f256k2(config); },
+// 			INPUT_PORTS_NAME(f256k),
+// 			[] (device_t &owner) { downcast<f256k2_state &>(owner).empty_init(); },
+// 			ROM_NAME(f256k),
+// 			0,
+// 			nullptr,
+// 			machine_flags::type(u32(ROT0 | (MACHINE_UNOFFICIAL))),
+// 			"f256k2"
+// 		};
