@@ -16,6 +16,7 @@ here;
 
 #define LOG_REGS        (1U << 1)
 #define LOG_REGSDMA     (1U << 2)
+#define LOG_DMA         (1U << 3)
 
 #define VERBOSE (LOG_GENERAL | LOG_REGS)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -23,6 +24,7 @@ here;
 
 #define LOGREGS(...)       LOGMASKED(LOG_REGS, __VA_ARGS__)
 #define LOGREGSDMA(...)    LOGMASKED(LOG_REGSDMA, __VA_ARGS__)
+#define LOGDMA(...)        LOGMASKED(LOG_DMA, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(YM7101, ym7101_device, "ym7101", "Yamaha YM7101 VDP")
 
@@ -171,6 +173,14 @@ void ym7101_device::control_port_w(offs_t offset, u16 data, u16 mem_mask)
 				)
 			)
 			{
+				LOGDMA("DMA %s code=%02x: src=%06x dst=%06x length=%04x autoinc=%02x\n"
+					, m_dma.mode == MEMORY_TO_VRAM ? "Memory->VDP" : "VRAM Copy"
+					, m_command.code
+					, m_dma.source_address
+					, m_command.address
+					, m_dma.length
+					, m_auto_increment
+				);
 				m_dma_timer->adjust(attotime::from_ticks(8, clock()));
 			}
 
@@ -246,6 +256,14 @@ void ym7101_device::data_port_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (m_dma.active && m_dma.mode == VRAM_FILL && BIT(m_command.code, 0))
 	{
+		LOGDMA("DMA VRAM Fill code=%02x value=%04x: dst=%06x length=%04x autoinc=%02x\n"
+			, m_command.code
+			, m_dma.fill
+			, m_command.address
+			, m_dma.length
+			, m_auto_increment
+		);
+
 		m_dma.fill = data;
 		m_dma_timer->adjust(attotime::from_ticks(8, clock()));
 		return;
@@ -558,11 +576,13 @@ void ym7101_device::prepare_sprite_line(int scanline)
 	std::fill_n(&m_sprite_line[0], 320, 0);
 
 	int num_sprites = 20;
+	int entry_sprites = 80;
 	int num_pixels = 320;
 	u16 link = 0;
 	u16 offset = 0;
 	int y, x;
 	u16 height, width;
+	u8 sprite_mask_state = 0;
 
 	do {
 		const u16 *cache = &m_sprite_cache[offset];
@@ -571,11 +591,18 @@ void ym7101_device::prepare_sprite_line(int scanline)
 		y = (cache[0] & 0x1ff) - 128;
 		height = (((cache[1] >> 8) & 0x3) + 1) * 8;
 
+		entry_sprites --;
 		if (scanline == std::clamp(scanline, y, y + height - 1))
 		{
-			num_sprites --;
 			width = (((cache[1] >> 10) & 0x3) + 1) * 8;
 			x = (vram[3] & 0x1ff) - 128;
+			bool sprite_mask = x == -128;
+			if (sprite_mask_state == 0 && !sprite_mask)
+				sprite_mask_state = 1;
+			else if (sprite_mask_state == 1 && sprite_mask)
+				sprite_mask_state = 2;
+
+			num_sprites --;
 
 			const u16 id_flags = vram[2];
 			const u16 tile = id_flags & 0x7ff;
@@ -624,17 +651,18 @@ void ym7101_device::prepare_sprite_line(int scanline)
 			break;
 		}
 
-		// jumping on the same offset just aborts the chain.
-		// rambo3 depends on this during intro (will deadlock otherwise)
-		// implicitly hitting 64/80 sprites per screen max?
-		if (offset == link * 4)
-		{
+		// special: an X of -128 will mask everything else on line
+		// (sonic2 title, sor player spawn)
+		// semantics explained with https://segaretro.org/Sprite_Masking_and_Overflow_Test_ROM
+		// TODO: currently fails test 6. MASK S1 ON DOT OVERFLOW
+		// TODO: check mmaniaj 3d chase stages
+		// (should reduce number of access slots by disabling display during HBlank)
+		if (sprite_mask_state == 2)
 			break;
-		}
 
 		offset = link * 4;
 
-	} while(num_sprites > 0 && num_pixels > 0 && link != 0);
+	} while(num_sprites > 0 && num_pixels > 0 && entry_sprites > 0 && link != 0);
 
 	// sprite overflow, here
 }
