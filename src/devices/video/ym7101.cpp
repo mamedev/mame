@@ -85,6 +85,8 @@ void ym7101_device::device_start()
 	m_dma.active = false;
 	m_sprite_cache = std::make_unique<u16[]>(80 * 4);
 	m_sprite_line = std::make_unique<u8[]>(320);
+	m_tile_a_line = std::make_unique<u8[]>(320);
+	m_tile_b_line = std::make_unique<u8[]>(320);
 
 	set_gfx(0, std::make_unique<gfx_element>(
 		m_palette,
@@ -671,22 +673,14 @@ void ym7101_device::prepare_sprite_line(int scanline)
 	// sprite overflow, here
 }
 
-bool ym7101_device::render_line(int scanline)
+void ym7101_device::prepare_tile_line(int scanline)
 {
-	if (scanline >= 224)
-		return false;
-
-	uint32_t *p = &m_bitmap.pix(scanline);
+	// TODO: configure for H32
+	std::fill_n(&m_tile_a_line[0], 320, 0);
+	std::fill_n(&m_tile_b_line[0], 320, 0);
 
 	//int y = scanline >> 3;
 	int yi = scanline & 7;
-
-	if (!m_de)
-	{
-		const rectangle scanclip(0, 320, scanline, scanline);
-		m_bitmap.fill(m_palette->pen(m_background_color), scanclip);
-		return true;
-	}
 
 	const u16 vram_mask = 0x7ff;
 	//const u16 page_mask[] = { 0x7ff, 0x1fff, 0x1fff, 0x1fff };
@@ -699,9 +693,6 @@ bool ym7101_device::render_line(int scanline)
 	const u16 window_h_page = 64;
 	const u16 window_v_page = 32;
 
-	prepare_sprite_line(scanline);
-
-	// TODO: smasters wants full screen window for text layer to work
 	const int min_y = m_down ? m_wvp * 8 : 0;
 	const int max_y = m_down ? 223 : (m_wvp * 8) - 1;
 
@@ -724,17 +715,17 @@ bool ym7101_device::render_line(int scanline)
 	const u16 scroll_x_mode_masks[] = { 0, 0x7, 0xf8, 0xff };
 	const u16 scroll_x_base = (scanline & scroll_x_mode_masks[m_hs]) << 1;
 
-	// gynoug, mushaj, btlmanid
-	// TODO: buggy with first column if HS also enabled (gynoug)
+	// gynoug (with buggy first column), mushaj, btlmanid
 	const u8 scroll_y_mask = m_vs ? 0x7e : 0;
 
-	for (int x = 0; x < 40; x ++)
+	// need to extend two tiles to ensure display on fractional X scrolling
+	for (int x = -1; x < 41; x ++)
 	{
 		// TODO: prettify, shouldn't need scrolly in branch
 		u16 id_flags_a, tile_a;
 		u8 flipx_a, flipy_a, color_a;
 		bool high_priority_a;
-		const u16 scrollx_a_frac = 0; //scrollx_a & 7;
+		u16 scrollx_a_frac;
 		u16 scrolly_a_frac;
 
 		if (is_window_y_layer && x == std::clamp(x, min_x, max_x))
@@ -742,6 +733,7 @@ bool ym7101_device::render_line(int scanline)
 			const u16 vcolumn_a = scanline & ((window_v_page * 8) - 1);
 			const u32 tile_offset_a = (x & ((window_h_page * 1) - 1)) + ((vcolumn_a >> 3) * (window_h_page >> 0));
 			scrolly_a_frac = 0;
+			scrollx_a_frac = 0;
 			id_flags_a = m_vram[((m_window_name_table >> 1) + tile_offset_a) & 0x1ffff];
 			tile_a = id_flags_a & vram_mask;
 			flipx_a = BIT(id_flags_a, 11) ? 4 : 3;
@@ -756,6 +748,7 @@ bool ym7101_device::render_line(int scanline)
 			const u16 vcolumn_a = (scrolly_a + scanline) & ((v_page * 8) - 1);
 			const u32 tile_offset_a = ((x - (scrollx_a >> 3)) & ((h_page * 1) - 1)) + ((vcolumn_a >> 3) * (h_page >> 0));
 			scrolly_a_frac = scrolly_a & 7;
+			scrollx_a_frac = scrollx_a & 7;
 
 			id_flags_a = m_vram[((m_plane_a_name_table >> 1) + tile_offset_a) & 0x1ffff];
 			tile_a = id_flags_a & vram_mask;
@@ -766,7 +759,7 @@ bool ym7101_device::render_line(int scanline)
 		}
 
 		const u16 scrollx_b = m_vram[(m_hscroll_address >> 1) + 1 + scroll_x_base];
-		const u16 scrollx_b_frac = 0; //scrollx_b & 7;
+		const u16 scrollx_b_frac = scrollx_b & 7;
 		const u16 scrolly_b = m_vsram[(x & scroll_y_mask) + 1];
 		const u16 scrolly_b_frac = scrolly_b & 7;
 		const u16 vcolumn_b = (scrolly_b + scanline) & ((v_page * 8) - 1);
@@ -780,30 +773,70 @@ bool ym7101_device::render_line(int scanline)
 
 		for (int xi = 0; xi < 8; xi++)
 		{
-			u8 pen = m_background_color;
+			const int xpos_layer_a = (x << 3) + xi + scrollx_a_frac;
 
-			const u8 x_char_a = (xi + scrollx_a_frac) & 7;
-			const u8 y_char_a = (yi + scrolly_a_frac) & 7;
-			const u16 dot_a = m_vram[(tile_a << 4) + BIT(x_char_a ^ flipx_a, 2) + ((y_char_a ^ flipy_a) << 1)] >> (((flipx_a ^ x_char_a) & 3) * 4) & 0xf;
-
-			const u8 x_char_b = (xi + scrollx_b_frac) & 7;
-			const u8 y_char_b = (yi + scrolly_b_frac) & 7;
-			const u16 dot_b = m_vram[(tile_b << 4) + BIT(x_char_b ^ flipx_b, 2) + ((y_char_b ^ flipy_b) << 1)] >> (((flipx_b ^ x_char_b) & 3) * 4) & 0xf;
-
-			for (int pri = 0; pri < 2; pri ++)
+			if (xpos_layer_a == std::clamp(xpos_layer_a, 0, 319))
 			{
-				if (dot_b && high_priority_b == pri)
-					pen = (dot_b) | color_b;
+				const u8 x_char_a = (xi) & 7;
+				const u8 y_char_a = (yi + scrolly_a_frac) & 7;
+				const u16 dot_a = m_vram[(tile_a << 4) + BIT(x_char_a ^ flipx_a, 2) + ((y_char_a ^ flipy_a) << 1)] >> (((flipx_a ^ x_char_a) & 3) * 4) & 0xf;
 
-				if (dot_a && high_priority_a == pri)
-					pen = (dot_a) | color_a;
-
-				if (m_sprite_line[x * 8 + xi] & 0xf && BIT(m_sprite_line[x * 8 + xi], 6) == pri)
-					pen = m_sprite_line[x * 8 + xi] & 0x3f;
+				if (dot_a)
+					m_tile_a_line[xpos_layer_a] = (color_a) | (dot_a & 0xf) | (high_priority_a << 6);
 			}
 
-			p[(x << 3) + xi] = m_palette->pen(pen);
+			const int xpos_layer_b = (x << 3) + xi + scrollx_b_frac;
+
+			if (xpos_layer_b == std::clamp(xpos_layer_b, 0, 319))
+			{
+				const u8 x_char_b = (xi) & 7;
+				const u8 y_char_b = (yi + scrolly_b_frac) & 7;
+				const u16 dot_b = m_vram[(tile_b << 4) + BIT(x_char_b ^ flipx_b, 2) + ((y_char_b ^ flipy_b) << 1)] >> (((flipx_b ^ x_char_b) & 3) * 4) & 0xf;
+
+				if (dot_b)
+					m_tile_b_line[xpos_layer_b] = (color_b) | (dot_b & 0xf) | (high_priority_b << 6);
+			}
 		}
+	}
+}
+
+bool ym7101_device::render_line(int scanline)
+{
+	if (scanline >= 224)
+		return false;
+
+	uint32_t *p = &m_bitmap.pix(scanline);
+
+
+	if (!m_de)
+	{
+		const rectangle scanclip(0, 320, scanline, scanline);
+		m_bitmap.fill(m_palette->pen(m_background_color), scanclip);
+		return true;
+	}
+
+	prepare_tile_line(scanline);
+	prepare_sprite_line(scanline);
+
+	for (int x = 0; x < 320; x ++)
+	{
+		u8 pen = m_background_color;
+
+		for (int pri = 0; pri < 2; pri ++)
+		{
+			u8 dot = m_tile_b_line[x];
+			if ((dot & 0xf) && BIT(dot, 6) == pri)
+				pen = dot & 0x3f;
+
+			dot = m_tile_a_line[x];
+			if ((dot & 0xf) && BIT(dot, 6) == pri)
+				pen = dot & 0x3f;
+
+			if (m_sprite_line[x] & 0xf && BIT(m_sprite_line[x], 6) == pri)
+				pen = m_sprite_line[x] & 0x3f;
+		}
+
+		p[x] = m_palette->pen(pen);
 	}
 
 	return true;

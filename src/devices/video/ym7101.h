@@ -83,6 +83,8 @@ private:
 
 	std::unique_ptr<u16[]> m_sprite_cache;
 	std::unique_ptr<u8[]> m_sprite_line;
+	std::unique_ptr<u8[]> m_tile_a_line;
+	std::unique_ptr<u8[]> m_tile_b_line;
 
 	TIMER_CALLBACK_MEMBER(scan_timer_callback);
 	TIMER_CALLBACK_MEMBER(vint_trigger_callback);
@@ -165,6 +167,7 @@ private:
 	bitmap_rgb32 m_bitmap;
 	bool render_line(int scanline);
 	void prepare_sprite_line(int scanline);
+	void prepare_tile_line(int scanline);
 
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 };
