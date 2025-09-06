@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Felipe Sanches
 
-#ifndef MAME_ROLAND_PG1000_H
-#define MAME_ROLAND_PG1000_H
+#ifndef MAME_ROLAND_ROLAND_PG1000_H
+#define MAME_ROLAND_ROLAND_PG1000_H
 
 #include "cpu/upd7810/upd7810.h"
 #include "video/hd44780.h"
@@ -61,4 +61,4 @@ private:
 	bool m_param_req_enable;
 };
 
-#endif // MAME_ROLAND_PG1000_H
+#endif // MAME_ROLAND_ROLAND_PG1000_H
