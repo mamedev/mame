@@ -407,7 +407,7 @@ void servicet_state::servicet(machine_config &config)
 
 	// SERIAL: WE ARE THE DCE
 	RS232_PORT(config, m_dte, default_rs232_devices, nullptr);
-	m_dte->dcd_handler().set(FUNC(servicet_state::enable_in));
+	m_dte->dsr_handler().set(FUNC(servicet_state::enable_in));
 	m_dte->rxd_handler().set(FUNC(servicet_state::data_in));
 	m_dte->cts_handler().set(FUNC(servicet_state::clock_in));
 

@@ -319,6 +319,12 @@ void stellafr_state::mux_w(uint8_t data)
 		;
 	if (aw2)
 		;
+
+	m_st->write_rts(1);
+	m_st->write_dtr(enanz1);
+	m_st->write_rts(0);
+
+	
 }
 
 void stellafr_state::mux2_w(uint8_t data)
@@ -333,6 +339,10 @@ void stellafr_state::mux2_w(uint8_t data)
 	m_mux1  = (m_mux1  << 1) | BIT(data,U1_MUX1);
 	m_anz2  = (m_anz2  << 1) | BIT(data,U1_ANZ2);
 	m_mux2  = (m_mux2  << 1) | BIT(data,U1_MUX2);
+
+	m_st->write_rts(1);
+	m_st->write_txd(m_ma1);
+	m_st->write_rts(0);
 }
 
 void stellafr_state::duart_output_w(uint8_t data)
