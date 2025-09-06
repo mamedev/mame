@@ -113,6 +113,8 @@ private:
 	void servicet_io(address_map &map) ATTR_COLD;
 	void servicet_map(address_map &map) ATTR_COLD;
 
+	void palette_init(palette_device &palette);
+
 	HD44780_PIXEL_UPDATE(servicet_pixel_update);
 
 	required_device<mcs51_cpu_device> m_maincpu;
@@ -383,6 +385,12 @@ void servicet_state::enable_in(int newval)
 	m_maincpu->set_input_line(MCS51_INT0_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
+void servicet_state::palette_init(palette_device &palette)
+{
+	palette.set_pen_color(0, rgb_t(65, 165, 115));
+	palette.set_pen_color(1, rgb_t(0, 50, 25));
+}
+
 void servicet_state::servicet(machine_config &config)
 {
 	I80C31(config, m_maincpu, 11.0592_MHz_XTAL);
@@ -413,7 +421,7 @@ void servicet_state::servicet(machine_config &config)
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+	PALETTE(config, "palette", FUNC(servicet_state::palette_init), 2);
 
 	HD44780(config, m_lcd, 270'000);
 	m_lcd->set_lcd_size(2, 40); // 2 lines, 40 characters
