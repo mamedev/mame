@@ -121,23 +121,28 @@ static const uint16_t font[]=
 /**
  * The font used by the VFX family on the NEC FIP80B5R display, including 
  * VFX-family-specific characters sich as digits followed by a period / decimal point.
- * Arranged to match this, fairly arbitrarily chosen, order of segments:
  * 
- *     ---- 0 ----
- *    |\    |    /|
- *    | \   |   / |
- *    5  4  3  2  1
- *    |   \ | /   |
- *    |    \|/    |
- *     --7-- --6--
- *    |    /|\    |
- *    |   / | \   |
- *   12 11 10  9  8
- *    | /   |   \ |
- *    |/    |    \|
- *     ----13-----  *14
+ * The segments are numbered in order of the pins 58 .. 73 that drive
+ * the top row of character segments, as shown on a scan of the Ensoniq ESQ1
+ * display board at http://buchty.net/ensoniq/files/schematics/esq1-display.jpg
+ * This is the same order as in the [nec_fip80b5r.lay] layout, so they can be
+ * used immediately without need for bit order conversion.
  * 
- *    -----15-----
+ *      ==== 0 ====
+ *     |\    |    /|
+ *     | \   |   / |
+ *     5  4  3  2  1
+ *     |   \ | /   |
+ *     |    \|/    |
+ *      ==7== ==6==
+ *     |    /|\    |
+ *     |   / | \   |
+ *    12 11 10  9  8
+ *     | /   |   \ |
+ *     |/    |    \|
+ *      ==== 13 ===  #14
+ * 
+ *     ===== 15 ====
  * 
  */
 static const uint16_t font_vfx[] = {
