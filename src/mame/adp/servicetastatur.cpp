@@ -81,7 +81,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_i2cmem(*this, "eeprom"),
 		m_lcd(*this, "hd44780"),
+		m_dte(*this, "dte"),
 		m_io_keys(*this, "IN%u", 0U)
+		
 	{ }
 
 	void servicet(machine_config &config);
@@ -105,6 +107,7 @@ private:
 	void gsg_w(offs_t offset, uint8_t data);
 
 	void enable_in(int state);
+	void clock_in(int state);
 	void data_in(int state);
 
 	void servicet_io(address_map &map) ATTR_COLD;
@@ -115,7 +118,10 @@ private:
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<hd44780_device> m_lcd;
+	required_device<rs232_port_device> m_dte;
 	required_ioport_array<3> m_io_keys;
+
+	bool m_datain = 0;
 
 	uint8_t m_port1 = 0xff;
 	uint8_t m_port3 = 0xff;
@@ -251,9 +257,7 @@ void servicet_state::port1_w(uint8_t data)
 
 INPUT_CHANGED_MEMBER(servicet_state::en_w)
 {
-	m_maincpu->set_input_line(MCS51_INT1_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(MCS51_INT0_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
-	enable_in(1);
+	enable_in(newval);
 }
 
 uint8_t servicet_state::port3_r()
@@ -293,7 +297,7 @@ uint8_t servicet_state::gsg_scramble(uint8_t data)
 
 uint8_t servicet_state::gsg_r(offs_t offset)
 {
-	uint8_t data = 0x00;
+	uint8_t data = std::rand();
 
 	switch (offset & 0x70)
 	{
@@ -315,6 +319,8 @@ uint8_t servicet_state::gsg_r(offs_t offset)
 		data = m_u13;
 		break;
 	}
+	default:
+		popmessage("Read jack shit %02X", offset);
 	}
 	return data;
 }
@@ -326,11 +332,13 @@ void servicet_state::gsg_w(offs_t offset, uint8_t data)
 	case 0x40: //Y4 U20 OE
 	{
 		m_u20 = data;
+		popmessage("Wrote U20: %02X", data);
 		break;
 	}
 	case 0x50: //Y5 U19 OE
 	{
 		m_u13 = gsg_scramble(data);
+		popmessage("Wrote U13: %02X", data);
 		break;
 	}
 	case 0x60: //Y6 U13 PL
@@ -341,19 +349,38 @@ void servicet_state::gsg_w(offs_t offset, uint8_t data)
 	}
 	default:
 	{
-		//popmessage("Bus write: %02X to %04X\n", data, offset);
+		popmessage("Garbage write: %02X to %04X\n", data, offset);
 	}
 	}
 }
 
 void servicet_state::data_in(int state)
 {
-	m_u20 = (m_u20 >> 1) | (0xFE & state);
+    m_datain = state;
 }
 
-void servicet_state::enable_in(int state)
+void servicet_state::clock_in(int state)
+{
+    if (state)
+    {
+        // --- INPUT SHIFT CHAIN (U20 + U19, 74HC4094) ---
+        uint16_t chain = (m_u19 << 8) | m_u20;
+        chain = ((chain << 1) | m_datain) & 0xFFFF;
+        m_u20 = chain & 0xFF;
+        m_u19 = (chain >> 8) & 0xFF;
+
+        // --- OUTPUT SHIFT REGISTER (U13, 74HC165) ---
+        int q7 = (m_u13 >> 7) & 1;
+        m_dte->write_txd(q7);
+        m_u13 = (m_u13 << 1) & 0xFF;
+    }
+}
+
+void servicet_state::enable_in(int newval)
 {
 	//strobe u19 and u20
+	m_maincpu->set_input_line(MCS51_INT1_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(MCS51_INT0_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void servicet_state::servicet(machine_config &config)
@@ -371,9 +398,10 @@ void servicet_state::servicet(machine_config &config)
 	I2C_24C16(config, "eeprom");
 
 	// SERIAL: WE ARE THE DCE
-	rs232_port_device &dte(RS232_PORT(config, "dte", default_rs232_devices, nullptr));
-	dte.dcd_handler().set(FUNC(servicet_state::enable_in));
-	dte.rxd_handler().set(FUNC(servicet_state::data_in));
+	RS232_PORT(config, m_dte, default_rs232_devices, nullptr);
+	m_dte->dcd_handler().set(FUNC(servicet_state::enable_in));
+	m_dte->rxd_handler().set(FUNC(servicet_state::data_in));
+	m_dte->cts_handler().set(FUNC(servicet_state::clock_in));
 
 	// LCD4002A
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
