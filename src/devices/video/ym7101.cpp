@@ -300,7 +300,7 @@ u16 ym7101_device::hv_counter_r(offs_t offset, u16 mem_mask)
 	u8 vcount = vpos > 234 ? vpos - 0xea + 0xe4 : vpos;
 	// TODO: a bit off compared to screen htotal (half clocks? 68k stalls on hsync?)
 	// (54 + 364 = 418 vs. 0x1aa of 427)
-	u8 hcount = (hpos > (0xb6 << 1) ? hpos + (-0xb6 << 1) + (0xe4 << 1) : hpos) >> 1;
+	u8 hcount = (hpos > (0xb6 << 1) ? hpos - (0xb6 << 1) + (0xe4 << 1) : hpos) >> 1;
 
 	return (vcount << 8) | hcount;
 }
