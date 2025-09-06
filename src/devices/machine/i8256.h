@@ -61,6 +61,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	void reset_timer();
+
 	TIMER_CALLBACK_MEMBER(timer_check);
 
 	void write(offs_t offset, u8 data);
@@ -158,7 +160,7 @@ private:
 		I8256_STOP_075
 	};
 
-	stop_bits_t stopBits[4] = {STOP_BITS_1, STOP_BITS_1_5, STOP_BITS_2, STOP_BITS_0};
+	stop_bits_t stop_bits[4] = {STOP_BITS_1, STOP_BITS_1_5, STOP_BITS_2, STOP_BITS_0};
 
 	enum
 	{
@@ -199,7 +201,7 @@ private:
 		I8256_BAUD_75,
 		I8256_BAUD_50
 	};
-	const int baudRates[16] = { 0, 0, 0, 19200, 9600, 4800, 2400, 1200, 600, 300, 200, 150, 110, 100, 75, 50 };
+	const int baud_rates[16] = { 0, 0, 0, 19200, 9600, 4800, 2400, 1200, 600, 300, 200, 150, 110, 100, 75, 50 };
 
 	enum
 	{
@@ -208,7 +210,7 @@ private:
 		I8256_SCLK_DIV2, // 2.048 MHz
 		I8256_SCLK_DIV1  // 1.024 MHz
 	};
-	const char sysclockDivider[4] = {5,3,2,1};
+	const char sysclock_divider[4] = {5,3,2,1};
 
 	enum
 	{
@@ -234,7 +236,7 @@ private:
 		I8256_INT_TIMER5
 	};
 
-	const char timer_interrupt[5] = {I8256_INT_TIMER1, I8256_INT_TIMER2, I8256_INT_TIMER3, I8256_INT_TIMER4, I8256_INT_TIMER5};
+	const char timer_interrupts[5] = {I8256_INT_TIMER1, I8256_INT_TIMER2, I8256_INT_TIMER3, I8256_INT_TIMER4, I8256_INT_TIMER5};
 
 	enum
 	{
