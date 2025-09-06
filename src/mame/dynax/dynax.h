@@ -461,6 +461,5 @@ private:
 
 
 INPUT_PORTS_EXTERN(dynax_mahjong_keys);
-INPUT_PORTS_EXTERN(dynax_hanafuda_keys_bet);
 
 #endif // MAME_DYNAX_DYNAX_H
