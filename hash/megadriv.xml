@@ -38006,6 +38006,7 @@ https://jsgroth.dev/blog/posts/titan-overdrive/
 Most effects fails
 https://jsgroth.dev/blog/posts/titan-overdrive-2-part-1/
 https://jsgroth.dev/blog/posts/titan-overdrive-2-part-2/
+Currently 0D2 B50D crash around Titan logo display, HINT regression sensitive after PR#14038
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">

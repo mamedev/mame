@@ -144,12 +144,13 @@ u16 ym7101_device::control_port_r(offs_t offset, u16 mem_mask)
 	// other bits returns open bus, tbd
 	// FIFO empty << 9
 	// FIFO full << 8
+	const bool in_hblank = !!(screen().hpos() < (0x05 << 1)) || (screen().hpos() > (0xb2 << 1));
 	return (m_vint_pending << 7)
 //      | sprite_overflow << 6
 //      | sprite_collision << 5
 //      | odd << 4
 		| (screen().vblank() << 3)
-		| (screen().hblank() << 2)
+		| in_hblank << 2
 		| (m_dma.active << 1);
 		// is_pal << 0
 }
@@ -205,7 +206,7 @@ void ym7101_device::control_port_w(offs_t offset, u16 data, u16 mem_mask)
 
 u16 ym7101_device::data_port_r(offs_t offset, u16 mem_mask)
 {
-	if (!machine().side_effects_disabled())
+	if (machine().side_effects_disabled())
 		return 0xffff;
 
 	m_command.write_state = command_write_state_t::FIRST_WORD;
@@ -292,11 +293,14 @@ void ym7101_device::data_port_w(offs_t offset, u16 data, u16 mem_mask)
 // https://gendev.spritesmind.net/forum/viewtopic.php?t=768
 u16 ym7101_device::hv_counter_r(offs_t offset, u16 mem_mask)
 {
-//	int const hpos = screen().hpos();
-	int const vpos = screen().vpos();
+	int const hpos = screen().hpos();
+	int const vpos = screen().vpos() + !!(hpos > (0xa4 << 1));
 	u8 vcount = vpos > 234 ? vpos - 0xea + 0xe4 : vpos;
+	// TODO: a bit off compared to screen htotal (half clocks? 68k stalls on hsync?)
+	// (54 + 364 = 418 vs. 0x1aa of 427)
+	u8 hcount = (hpos > (0xb6 << 1) ? hpos + (-0xb6 << 1) + (0xe4 << 1) : hpos) >> 1;
 
-	return (vcount << 8);
+	return (vcount << 8) | hcount;
 }
 
 void ym7101_device::if16_map(address_map &map)
@@ -692,6 +696,9 @@ bool ym7101_device::render_line(int scanline)
 	const u16 h_page = page_masks[m_hsz];
 	const u16 v_page = page_masks[m_vsz];
 
+	const u16 window_h_page = 64;
+	const u16 window_v_page = 32;
+
 	prepare_sprite_line(scanline);
 
 	// TODO: smasters wants full screen window for text layer to work
@@ -732,8 +739,8 @@ bool ym7101_device::render_line(int scanline)
 
 		if (is_window_y_layer && x == std::clamp(x, min_x, max_x))
 		{
-			const u16 vcolumn_a = scanline & ((v_page * 8) - 1);
-			const u32 tile_offset_a = (x & ((h_page * 1) - 1)) + ((vcolumn_a >> 3) * (h_page >> 0));
+			const u16 vcolumn_a = scanline & ((window_v_page * 8) - 1);
+			const u32 tile_offset_a = (x & ((window_h_page * 1) - 1)) + ((vcolumn_a >> 3) * (window_h_page >> 0));
 			scrolly_a_frac = 0;
 			id_flags_a = m_vram[((m_window_name_table >> 1) + tile_offset_a) & 0x1ffff];
 			tile_a = id_flags_a & vram_mask;
@@ -821,13 +828,15 @@ TIMER_CALLBACK_MEMBER(ym7101_device::scan_timer_callback)
 
 	const bool active_scan = render_line(scanline);
 
-	// TODO: should trigger at the end of current display pixel
+	// TODO: should trigger at the end of current display phase
+	// check dracula, galahad, marvlandj, roadrashj on changes
 	if (active_scan)
 	{
-		m_vcounter ++;
-		if (m_vcounter >= m_hit)
+		m_vcounter --;
+
+		if (m_vcounter <= 0)
 		{
-			m_vcounter = 0;
+			m_vcounter = m_hit;
 			m_hint_pending = 1;
 			if (m_ie1)
 			{
@@ -840,7 +849,7 @@ TIMER_CALLBACK_MEMBER(ym7101_device::scan_timer_callback)
 	else
 	{
 		// NOTE: V counter is not running during vertical border and onward
-		m_vcounter = 0;
+		m_vcounter = m_hit;
 	}
 
 	scanline ++;

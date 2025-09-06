@@ -160,7 +160,7 @@ private:
 	u8 m_wvp;
 
 	int m_vint_pending, m_hint_pending;
-	u16 m_vcounter; // irq4 counter
+	int m_vcounter; // irq4 counter
 
 	bitmap_rgb32 m_bitmap;
 	bool render_line(int scanline);
