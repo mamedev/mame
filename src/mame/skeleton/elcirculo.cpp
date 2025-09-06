@@ -55,6 +55,8 @@ LD15 (_)                                                                        
 
 #include "speaker.h"
 
+#include "elcirculo.lh"
+
 namespace {
 
 class elcirculo_state : public driver_device
@@ -64,13 +66,20 @@ public:
 	elcirculo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_leds(*this, "ld%u", 0U)
+		, m_lamps(*this, "il%u", 0U)
 	{
 	}
 
 	void elcirculo(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	required_device<cpu_device> m_maincpu;
+	output_finder<32> m_leds;
+	output_finder<8> m_lamps;
 
 	INTERRUPT_GEN_MEMBER(irq_gen);
 
@@ -116,6 +125,12 @@ INPUT_PORTS_START(elcirculo)
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 INPUT_PORTS_END
 
+void elcirculo_state::machine_start()
+{
+	m_leds.resolve();
+	m_lamps.resolve();
+}
+
 void elcirculo_state::elcirculo(machine_config &config)
 {
 	M6504(config, m_maincpu, 1'000'000); // R6504P, internal clock
@@ -132,4 +147,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1980, elcirculo, 0, elcirculo, elcirculo, elcirculo_state, empty_init, ROT0, "Inder", "El Circulo", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAMEL(1980, elcirculo, 0, elcirculo, elcirculo, elcirculo_state, empty_init, ROT0, "Inder", "El Circulo", MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_elcirculo)
