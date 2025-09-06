@@ -61,6 +61,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
 
+	virtual void bank3_set_page(u8 page) override;
+
 	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
 	TIMER_CALLBACK_MEMBER(irq_frame);
 	TIMER_CALLBACK_MEMBER(irq_scanline);
