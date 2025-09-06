@@ -32409,6 +32409,9 @@ komocomo
 maddonnab
 oneshot
 
+@source:misc/orientp.cpp
+east8                           //
+east8a                          //
 @source:misc/onetwo.cpp
 onetwo
 onetwoe
