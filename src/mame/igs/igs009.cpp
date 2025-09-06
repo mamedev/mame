@@ -238,7 +238,7 @@ void gp98_state::video_start()
 
 uint32_t igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int const layers_ctrl = m_video_enable ? -1 : 0;
+	int layers_ctrl = m_video_enable ? -1 : 0;
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed(KEYCODE_Z))
