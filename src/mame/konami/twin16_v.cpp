@@ -70,6 +70,9 @@ konami_twin16_video_device::konami_twin16_video_device(const machine_config &mco
 
 void konami_twin16_video_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	if (!palette().shadows_enabled())
 		fatalerror("%s: palette shadow is should be enabled!", machine().describe_context());
 
