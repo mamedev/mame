@@ -97,8 +97,8 @@ INTERRUPT_GEN_MEMBER(elcirculo_state::irq_gen)
 
 void elcirculo_state::led_w(offs_t offset, uint8_t data)
 {
-    if (offset == 1)
-    {
+	if (offset == 1)
+	{
 		switch (data & 0x0f)
 		{
 			case 0x0e: m_led_row = 0; break;
@@ -108,9 +108,9 @@ void elcirculo_state::led_w(offs_t offset, uint8_t data)
 			case 0x00: m_led_row = 4; break;
 			default: logerror("row %02x\n",data); break;
 		}
-		
-    }
-    else if (offset == 0)
+
+	}
+	else if (offset == 0)
 	{
 		if (m_led_row <= 3)
 		{
