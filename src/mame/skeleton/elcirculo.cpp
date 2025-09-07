@@ -81,7 +81,11 @@ private:
 	output_finder<32> m_leds;
 	output_finder<8> m_lamps;
 
+	uint8_t m_led_row = 0;
+
 	INTERRUPT_GEN_MEMBER(irq_gen);
+
+	void led_w(offs_t offset, uint8_t data);
 
 	void program_map(address_map &map) ATTR_COLD;
 };
@@ -91,6 +95,46 @@ INTERRUPT_GEN_MEMBER(elcirculo_state::irq_gen)
 	m_maincpu->set_input_line(M6504_IRQ_LINE, HOLD_LINE);
 }
 
+void elcirculo_state::led_w(offs_t offset, uint8_t data)
+{
+    if (offset == 1)
+    {
+		switch (data & 0x0f)
+		{
+			case 0x0e: m_led_row = 0; break;
+			case 0x0d: m_led_row = 1; break;
+			case 0x0b: m_led_row = 2; break;
+			case 0x07: m_led_row = 3; break;
+			case 0x00: m_led_row = 4; break;
+			default: logerror("row %02x\n",data); break;
+		}
+		
+    }
+    else if (offset == 0)
+	{
+		if (m_led_row <= 3)
+		{
+			for (int bit = 0; bit < 8; bit++)
+			{
+				std::string name = string_format("ld%d%d", m_led_row, bit);
+				machine().output().set_value(name, !BIT(data, bit));
+			}
+		}
+		else if (m_led_row == 4)
+		{
+			for (int bit = 0; bit < 8; bit++)
+			{
+				std::string name = string_format("il%d", bit);
+				machine().output().set_value(name, !BIT(data, bit));
+			}
+		}
+		else
+		{
+			popmessage("guh %02x", m_led_row);
+		}
+	}
+}
+
 void elcirculo_state::program_map(address_map &map)
 {
 	map.global_mask(0x1fff);
@@ -98,8 +142,8 @@ void elcirculo_state::program_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x0200).portr("IN0");
 	map(0x0201, 0x0201).portr("DSW1");
-	// map(0x0400, 0x0401).w();
-	// map(0x0600, 0x0601).w();
+	map(0x0400, 0x0401).w(FUNC(elcirculo_state::led_w));
+	map(0x0600, 0x0601).nopw(); //scanning inputs?
 	map(0x1000, 0x17ff).mirror(0x800).rom().region("maincpu", 0);
 }
 
