@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+    <element name="background">
+        <rect>
+            <color red="0.20" green="0.35" blue="0.55" />
+        </rect>
+    </element>
+
+    <element name="F1">
+        <rect>
+            <color red="0.1" green="0.1" blue="0.2" />
+        </rect>
+        <text string="F1">
+            <color red="0.8" green="0.6" blue="0.2" />
+        </text>
+    </element>
+    <element name="F2">
+        <rect>
+            <color red="0.1" green="0.1" blue="0.2" />
+        </rect>
+        <text string="F2">
+            <color red="0.8" green="0.6" blue="0.2" />
+        </text>
+    </element>
+        <element name="F3">
+        <rect>
+            <color red="0.1" green="0.1" blue="0.2" />
+        </rect>
+        <text string="F3">
+            <color red="0.8" green="0.6" blue="0.2" />
+        </text>
+    </element>
+    <element name="F4">
+        <rect>
+            <color red="0.1" green="0.1" blue="0.2" />
+        </rect>
+        <text string="F4">
+            <color red="0.8" green="0.6" blue="0.2" />
+        </text>
+    </element>
+    <element name="Down">
+        <rect>
+            <color red="0.1" green="0.1" blue="0.2" />
+        </rect>
+        <text string="Down">
+            <color red="0.8" green="0.6" blue="0.2" />
+        </text>
+    </element>
+        <element name="Left">
+        <rect>
+            <color red="0.1" green="0.1" blue="0.2" />
+        </rect>
+        <text string="Left">
+            <color red="0.8" green="0.6" blue="0.2" />
+        </text>
+    </element>
+        <element name="Up">
+        <rect>
+            <color red="0.1" green="0.1" blue="0.2" />
+        </rect>
+        <text string="Up">
+            <color red="0.8" green="0.6" blue="0.2" />
+        </text>
+    </element>
+        <element name="Right">
+        <rect>
+            <color red="0.1" green="0.1" blue="0.2" />
+        </rect>
+        <text string="Right">
+            <color red="0.8" green="0.6" blue="0.2" />
+        </text>
+    </element>
+        <element name="OK">
+        <rect>
+            <color red="0.1" green="0.1" blue="0.2" />
+        </rect>
+        <text string="OK">
+            <color red="0.8" green="0.6" blue="0.2" />
+        </text>
+    </element>
+
+
+    <view name="Handheld">
+        <bounds left="0" right="22" top="0" bottom="11" />
+        <element ref="background">
+            <bounds x="0" y="0" width="22" height="11" />
+        </element>
+
+        <screen tag="screen">
+			<bounds x="3" y="3" width="16" height="2" />
+		</screen>
+
+        <element name="F1" ref="F1" inputtag="IN2" inputmask="0x20">
+			<bounds x="4" y="6" width="2" height="2" />
+		</element>
+
+        <element name="F2" ref="F2" inputtag="IN2" inputmask="0x40">
+			<bounds x="8" y="6" width="2" height="2" />
+		</element>
+
+        <element name="F3" ref="F3" inputtag="IN2" inputmask="0x10">
+			<bounds x="12" y="6" width="2" height="2" />
+		</element>
+
+        <element name="F4" ref="F4" inputtag="IN0" inputmask="0x20">
+			<bounds x="16" y="6" width="2" height="2" />
+		</element>
+
+        <element name="OK" ref="OK" inputtag="IN0" inputmask="0x10">
+			<bounds x="19" y="8" width="3" height="2" />
+		</element>
+
+        <element name="Down" ref="Down" inputtag="IN1" inputmask="0x40">
+			<bounds x="0" y="2" width="2" height="2" />
+		</element>
+
+        <element name="Left" ref="Left" inputtag="IN1" inputmask="0x20">
+			<bounds x="0" y="4" width="2" height="2" />
+		</element>
+
+        <element name="Up" ref="Up" inputtag="IN0" inputmask="0x40">
+			<bounds x="20" y="2" width="2" height="2" />
+		</element>
+
+        <element name="Right" ref="Right" inputtag="IN1" inputmask="0x10">
+			<bounds x="20" y="4" width="2" height="2" />
+		</element>
+
+    </view>
+</mamelayout>
