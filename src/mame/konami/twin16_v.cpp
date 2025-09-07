@@ -275,8 +275,8 @@ void konami_twin16_video_device::spriteram_process()
 		{
 			uint16_t *dest = &m_spriteram[0][0x1800 | ((priority & 0xff) << 2)];
 
-			const uint32_t xpos = (source[4] << 16) | source[5];
-			const uint32_t ypos = (source[6] << 16) | source[7];
+			const uint32_t xpos = (uint32_t(source[4]) << 16) | source[5];
+			const uint32_t ypos = (uint32_t(source[6]) << 16) | source[7];
 
 			/* notes on sprite attributes:
 
