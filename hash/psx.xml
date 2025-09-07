@@ -63245,7 +63245,7 @@ During gameplay, the commentary speech audio is playing too fast
 		</part>
 	</software>
 
-	<software name="technomg">
+	<software name="technomg" supported="no">
 		<!-- 
 		http://redump.org/disc/12627
 		<rom name="TechnoMage - Return of Eternity (Europe).cue" size="106" crc="6ed71521" sha1="71223456d07192ab9c9a24e814829fa600dd6ce6"/>
@@ -63271,7 +63271,7 @@ Missing subchannel Q LibCrypt protection
 		</part>
 	</software>
 
-	<software name="technomg_nl" cloneof="technomg">
+	<software name="technomg_nl" cloneof="technomg" supported="no">
 		<!-- 
 		http://redump.org/disc/27310
 		<rom name="TechnoMage - De Terugkeer der Eeuwigheid (Netherlands).cue" size="120" crc="5fa9cd4f" sha1="869470d8bf84b0742d3326dc310baa657951a5dd"/>
@@ -63297,7 +63297,7 @@ Missing subchannel Q LibCrypt protection
 		</part>
 	</software>
 
-	<software name="technomg_de" cloneof="technomg">
+	<software name="technomg_de" cloneof="technomg" supported="no">
 		<!-- 
 		http://redump.org/disc/25284
 		<rom name="TechnoMage - Die Rueckkehr der Ewigkeit (Germany).cue" size="115" crc="cf387233" sha1="29692072a8b82d95b696c0740c00023eee52df4d"/>
@@ -63323,7 +63323,7 @@ Missing subchannel Q LibCrypt protection
 		</part>
 	</software>
 
-	<software name="technomg_es" cloneof="technomg">
+	<software name="technomg_es" cloneof="technomg" supported="no">
 		<!-- 
 		http://redump.org/disc/49569
 		<rom name="Technomage - El Retorno de la Eternidad (Spain).cue" size="113" crc="0b433ae7" sha1="0d4bfd43ff3d2984c862dfbd3f0b674741dedaff"/>
@@ -63350,7 +63350,7 @@ Missing subchannel Q LibCrypt protection
 		</part>
 	</software>
 
-	<software name="technomg_fr" cloneof="technomg">
+	<software name="technomg_fr" cloneof="technomg" supported="no">
 		<!-- 
 		http://redump.org/disc/49569
 		<rom name="TechnoMage - En Quete de L'Eternite (France).cue" size="110" crc="c17633fb" sha1="aefe1d47c49e1ef47bd6c2e059f93d39db238fd5"/>
@@ -63376,7 +63376,7 @@ Missing subchannel Q LibCrypt protection
 		</part>
 	</software>
 
-	<software name="technomg_it" cloneof="technomg">
+	<software name="technomg_it" cloneof="technomg" supported="no">
 		<!-- 
 		http://redump.org/disc/46130
 		<rom name="TechnoMage - Ritorno all'Eternita (Italy).cue" size="107" crc="3cbf68ca" sha1="69a1e3cad8753b0e82e1cf5ca434d72706a287bb"/>
