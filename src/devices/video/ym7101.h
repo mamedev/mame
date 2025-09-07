@@ -25,6 +25,10 @@ public:
 	void if16_map(address_map &map) ATTR_COLD;
 	void if8_map(address_map &map) ATTR_COLD;
 
+	// unscaled setter clock, needed for H32 and H40 to coexist
+	void set_mclk(u32 freq) { m_ref_mclk = freq; }
+	void set_mclk(const XTAL &freq) { m_ref_mclk = freq.value(); }
+
 	auto vint_cb() { return m_vint_callback.bind(); }
 	auto hint_cb() { return m_hint_callback.bind(); }
 	auto sint_cb() { return m_sint_callback.bind(); }
@@ -56,7 +60,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
-//	virtual u32 palette_entries() const noexcept override { return 0x40 + 0x40 * 2; }
+	virtual void device_validity_check(validity_checker &valid) const override;
 private:
 	void vram_map(address_map &map) ATTR_COLD;
 	void cram_map(address_map &map) ATTR_COLD;
@@ -94,6 +98,8 @@ private:
 	emu_timer *m_vint_on_timer;
 	emu_timer *m_hint_on_timer;
 	emu_timer *m_dma_timer;
+
+	u32 m_ref_mclk;
 
 	enum command_write_state_t : u8 {
 		FIRST_WORD,
@@ -161,6 +167,8 @@ private:
 	bool m_down;
 	u8 m_wvp;
 
+	// internals
+	u8 m_hres_mode;
 	int m_vint_pending, m_hint_pending;
 	int m_vcounter; // irq4 counter
 
@@ -170,6 +178,8 @@ private:
 	void prepare_tile_line(int scanline);
 
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+
+	void flush_screen_mode();
 };
 
 DECLARE_DEVICE_TYPE(YM7101, ym7101_device)

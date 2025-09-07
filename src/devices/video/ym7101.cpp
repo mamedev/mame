@@ -48,10 +48,10 @@ ym7101_device::ym7101_device(const machine_config &mconfig, const char *tag, dev
 	, m_dtack_cb(*this)
 	, m_palette(*this, "palette")
 	, m_psg(*this, "psg")
+	, m_ref_mclk(0)
 {
 }
 
-//const u16 dot_a = m_vram[(tile_a << 4) + BIT(xi ^ flipx_a, 2) + ((y_char_a ^ flipy_a) << 1)] >> (((flipx_a ^ xi) & 3) * 4) & 0xf;
 // NOTE: can't use RGN_FRAC(1,1) in devices
 static const gfx_layout layout_8x8x4 =
 {
@@ -96,6 +96,8 @@ void ym7101_device::device_start()
 	));
 
 	save_pointer(NAME(m_sprite_cache), 80 * 4);
+
+	m_hres_mode = 0x81;
 }
 
 void ym7101_device::device_reset()
@@ -134,6 +136,19 @@ device_memory_interface::space_config_vector ym7101_device::memory_space_config(
 		std::make_pair(AS_VDP_IO,   &m_space_regs_config)
 	};
 }
+
+void ym7101_device::device_validity_check(validity_checker &valid) const
+{
+	if (m_ref_mclk == 0)
+		osd_printf_error("No reference mclk defined\n");
+}
+
+
+/*
+ *
+ * Implementation
+ *
+ */
 
 void ym7101_device::update_command_state()
 {
@@ -267,6 +282,9 @@ void ym7101_device::data_port_w(offs_t offset, u16 data, u16 mem_mask)
 			, m_auto_increment
 		);
 
+		// HACK: rewrite using a completely different path
+		m_dma.length += 1;
+
 		m_dma.fill = data;
 		m_dma_timer->adjust(attotime::from_ticks(8, clock()));
 		return;
@@ -295,12 +313,19 @@ void ym7101_device::data_port_w(offs_t offset, u16 data, u16 mem_mask)
 // https://gendev.spritesmind.net/forum/viewtopic.php?t=768
 u16 ym7101_device::hv_counter_r(offs_t offset, u16 mem_mask)
 {
+	const u8 h40_mode = BIT(m_hres_mode, 0);
+
 	int const hpos = screen().hpos();
-	int const vpos = screen().vpos() + !!(hpos > (0xa4 << 1));
+
+	const u16 vincrement_hpos = h40_mode ? (0xa4 << 1) : (0x84 << 1);
+	int const vpos = screen().vpos() + !!(hpos > vincrement_hpos);
+
 	u8 vcount = vpos > 234 ? vpos - 0xea + 0xe4 : vpos;
 	// TODO: a bit off compared to screen htotal (half clocks? 68k stalls on hsync?)
 	// (54 + 364 = 418 vs. 0x1aa of 427)
-	u8 hcount = (hpos > (0xb6 << 1) ? hpos - (0xb6 << 1) + (0xe4 << 1) : hpos) >> 1;
+	const u16 hphase1 = h40_mode ? (0xb6 << 1) : (0x93 << 1);
+	const u16 hphase2 = h40_mode ? (0xe4 << 1) : (0xe9 << 1);
+	u8 hcount = (hpos > hphase1 ? hpos - hphase1 + hphase2 : hpos) >> 1;
 
 	return (vcount << 8) | hcount;
 }
@@ -475,6 +500,11 @@ void ym7101_device::regs_map(address_map &map)
 		// VS-HS-EP are undocumented
 		// VS/HS: (external?) Sync
 		// EP: External Pixel bus enable (32x?)
+		if (m_hres_mode != (data & 0x81))
+		{
+			m_hres_mode = data & 0x81;
+			flush_screen_mode();
+		}
 		LOGREGS("\tRSx: %d (%s) VS: %d HS: %d EP: %d S/H: %d LSx: %d\n"
 			, BIT(data, 7)
 			, BIT(data, 7) ? "H40" : "H32"
@@ -484,9 +514,6 @@ void ym7101_device::regs_map(address_map &map)
 			, BIT(data, 3)
 			, (data & 6) >> 1
 		);
-		// https://plutiedev.com/mirror/kabuto-hardware-notes#h40-mode-tricks
-		if (BIT(data, 7) != BIT(data, 0))
-			popmessage("ym7101.cpp: invalid RS setting %02x", data & 0x81);
 	}));
 	map(13, 13).lw8(NAME([this] (u8 data) {
 		m_hscroll_address = (data & 0x7f) << 10;
@@ -575,15 +602,46 @@ TIMER_CALLBACK_MEMBER(ym7101_device::hint_trigger_callback)
 	m_hint_callback(1);
 }
 
+void ym7101_device::flush_screen_mode()
+{
+	const u8 h40_mode = BIT(m_hres_mode, 0);
+	const u8 divider = (h40_mode ? 8 : 10);
+	const u32 target_clock = m_ref_mclk / divider;
+
+	//this->set_unscaled_clock(target_clock);
+
+	const int htotal = h40_mode ? 427 : 342;
+	const int vtotal = 262;
+
+	rectangle visarea(0, (h40_mode ? 320 : 256) - 1, 0, 224 - 1);
+
+	attoseconds_t refresh = HZ_TO_ATTOSECONDS(target_clock) * htotal * vtotal;
+
+	// 427, 0, 320, 262, 0, 224
+	screen().configure(htotal, vtotal, visarea, refresh);
+
+	// https://plutiedev.com/mirror/kabuto-hardware-notes#h40-mode-tricks
+	if (BIT(m_hres_mode, 7) != BIT(m_hres_mode, 0))
+		popmessage("ym7101.cpp: fast RS setting %02x", m_hres_mode & 0x81);
+}
+
+/*
+ *
+ * Render
+ *
+ */
 
 void ym7101_device::prepare_sprite_line(int scanline)
 {
-	// TODO: configure for H32
-	std::fill_n(&m_sprite_line[0], 320, 0);
+	const u8 h40_mode = BIT(m_hres_mode, 0);
 
-	int num_sprites = 20;
-	int entry_sprites = 80;
-	int num_pixels = 320;
+	const int line_width = h40_mode ? 320 : 256;
+	const int max_sprites = h40_mode ? 80 : 64;
+	std::fill_n(&m_sprite_line[0], line_width, 0);
+
+	int num_pixels = line_width;
+	int num_sprites = h40_mode ? 20 : 16;
+	int entry_sprites = max_sprites;
 	u16 link = 0;
 	u16 offset = 0;
 	int y, x;
@@ -623,7 +681,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 			{
 				num_pixels --;
 
-				if (x + xi < 0 || x + xi >= 320 || num_pixels < 0)
+				if (x + xi < 0 || x + xi >= line_width || num_pixels < 0)
 					continue;
 
 				const int x_offs = flipx ? width - xi - 1 : xi;
@@ -646,7 +704,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 		link = cache[1] & 0x7f;
 
 		// TODO: https://plutiedev.com/mirror/kabuto-hardware-notes#sprite-rendering-beyond-80
-		if (link >= 80)
+		if (link >= max_sprites)
 		{
 			// - teradrive pzlcnst game.exe tends to use a link = 0x7f (127) on piece removals,
 			//   with X and Y at max values (0xffff).
@@ -675,9 +733,14 @@ void ym7101_device::prepare_sprite_line(int scanline)
 
 void ym7101_device::prepare_tile_line(int scanline)
 {
-	// TODO: configure for H32
-	std::fill_n(&m_tile_a_line[0], 320, 0);
-	std::fill_n(&m_tile_b_line[0], 320, 0);
+	const u8 h40_mode = BIT(m_hres_mode, 0);
+
+	const int line_width = h40_mode ? 320 : 256;
+
+	const int char_num = line_width / 8;
+
+	std::fill_n(&m_tile_a_line[0], line_width, 0);
+	std::fill_n(&m_tile_b_line[0], line_width, 0);
 
 	//int y = scanline >> 3;
 	int yi = scanline & 7;
@@ -690,7 +753,7 @@ void ym7101_device::prepare_tile_line(int scanline)
 	const u16 h_page = page_masks[m_hsz];
 	const u16 v_page = page_masks[m_vsz];
 
-	const u16 window_h_page = 64;
+	const u16 window_h_page = h40_mode ? 64 : 32;
 	const u16 window_v_page = 32;
 
 	const int min_y = m_down ? m_wvp * 8 : 0;
@@ -719,7 +782,7 @@ void ym7101_device::prepare_tile_line(int scanline)
 	const u8 scroll_y_mask = m_vs ? 0x7e : 0;
 
 	// need to extend two tiles to ensure display on fractional X scrolling
-	for (int x = -1; x < 41; x ++)
+	for (int x = -1; x < char_num + 1; x ++)
 	{
 		// TODO: prettify, shouldn't need scrolly in branch
 		u16 id_flags_a, tile_a;
@@ -775,26 +838,24 @@ void ym7101_device::prepare_tile_line(int scanline)
 		{
 			const int xpos_layer_a = (x << 3) + xi + scrollx_a_frac;
 
-			if (xpos_layer_a == std::clamp(xpos_layer_a, 0, 319))
+			if (xpos_layer_a == std::clamp(xpos_layer_a, 0, line_width - 1))
 			{
 				const u8 x_char_a = (xi) & 7;
 				const u8 y_char_a = (yi + scrolly_a_frac) & 7;
 				const u16 dot_a = m_vram[(tile_a << 4) + BIT(x_char_a ^ flipx_a, 2) + ((y_char_a ^ flipy_a) << 1)] >> (((flipx_a ^ x_char_a) & 3) * 4) & 0xf;
 
-				if (dot_a)
-					m_tile_a_line[xpos_layer_a] = (color_a) | (dot_a & 0xf) | (high_priority_a << 6);
+				m_tile_a_line[xpos_layer_a] = (color_a) | (dot_a & 0xf) | (high_priority_a << 6);
 			}
 
 			const int xpos_layer_b = (x << 3) + xi + scrollx_b_frac;
 
-			if (xpos_layer_b == std::clamp(xpos_layer_b, 0, 319))
+			if (xpos_layer_b == std::clamp(xpos_layer_b, 0, line_width - 1))
 			{
 				const u8 x_char_b = (xi) & 7;
 				const u8 y_char_b = (yi + scrolly_b_frac) & 7;
 				const u16 dot_b = m_vram[(tile_b << 4) + BIT(x_char_b ^ flipx_b, 2) + ((y_char_b ^ flipy_b) << 1)] >> (((flipx_b ^ x_char_b) & 3) * 4) & 0xf;
 
-				if (dot_b)
-					m_tile_b_line[xpos_layer_b] = (color_b) | (dot_b & 0xf) | (high_priority_b << 6);
+				m_tile_b_line[xpos_layer_b] = (color_b) | (dot_b & 0xf) | (high_priority_b << 6);
 			}
 		}
 	}
@@ -806,11 +867,13 @@ bool ym7101_device::render_line(int scanline)
 		return false;
 
 	uint32_t *p = &m_bitmap.pix(scanline);
+	const u8 h40_mode = BIT(m_hres_mode, 0);
 
+	const int line_width = h40_mode ? 320 : 256;
 
 	if (!m_de)
 	{
-		const rectangle scanclip(0, 320, scanline, scanline);
+		const rectangle scanclip(0, line_width, scanline, scanline);
 		m_bitmap.fill(m_palette->pen(m_background_color), scanclip);
 		return true;
 	}
@@ -818,7 +881,7 @@ bool ym7101_device::render_line(int scanline)
 	prepare_tile_line(scanline);
 	prepare_sprite_line(scanline);
 
-	for (int x = 0; x < 320; x ++)
+	for (int x = 0; x < line_width; x ++)
 	{
 		u8 pen = m_background_color;
 
@@ -911,12 +974,24 @@ TIMER_CALLBACK_MEMBER(ym7101_device::dma_callback)
 
 	switch (m_dma.mode)
 	{
-		case MEMORY_TO_VRAM: res = m_mreq_cb(src); m_dtack_cb(1); break;
-		case VRAM_FILL:      res = m_dma.fill; break;
-		case VRAM_COPY:      res = space(AS_VDP_VRAM).read_word((src >> 1) & mask, 0xffff); break;
+		case MEMORY_TO_VRAM:
+			res = m_mreq_cb(src); m_dtack_cb(1);
+			space(code_dest).write_word((dst >> 0) & mask, res, 0xffff);
+			break;
+		// fill is in bytes
+		// gynoug (title/options)
+		case VRAM_FILL:
+			res = m_dma.fill;
+			if (dst & 1)
+				space(code_dest).write_word((dst >> 0) & mask, res & 0xff00, 0xff00);
+			else
+				space(code_dest).write_word((dst >> 0) & mask, res >> 8, 0x00ff);
+			break;
+		case VRAM_COPY:
+			res = space(AS_VDP_VRAM).read_word((src >> 1) & mask, 0xffff);
+			space(code_dest).write_word((dst >> 0) & mask, res, 0xffff);
+			break;
 	}
-
-	space(code_dest).write_word((dst >> 0) & mask, res, 0xffff);
 
 	m_dma.source_address = (m_dma.source_address & 0xfe0000) | ((m_dma.source_address + 2) & 0x1ffff);
 	m_command.address += m_auto_increment;

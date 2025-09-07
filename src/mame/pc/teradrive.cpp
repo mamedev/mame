@@ -948,6 +948,7 @@ void teradrive_state::teradrive(machine_config &config)
 	m_mdscreen->set_screen_update(FUNC(teradrive_state::md_screen_update));
 
 	YM7101(config, m_md_vdp, md_master_xtal / 4);
+	m_md_vdp->set_mclk(md_master_xtal);
 	m_md_vdp->set_screen(m_mdscreen);
 	// TODO: actual DTACK
 	// TODO: accessing 68k bus from x86, defers access?
