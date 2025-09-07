@@ -83,21 +83,41 @@ public:
 		m_key{ { *this, "P1_KEY%u", 0U }, { *this, "P2_KEY%u", 0U } }
 	{ }
 
-	void hnayayoi(machine_config &config);
-	void hnfubuki(machine_config &config);
-	void untoucha(machine_config &config);
+	void hnayayoi(machine_config &config) ATTR_COLD;
+	void hnfubuki(machine_config &config) ATTR_COLD;
 
-	void init_hnfubuki();
+	void init_hnfubuki() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
+	uint16_t m_palbank = 0;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_mainlatch;
+	required_device<msm5205_device> m_msm;
+	required_device<palette_device> m_palette;
+
+	template <uint8_t Which> uint8_t keyboard_r();
+	void keyboard_w(uint8_t data);
+	void dynax_blitter_rev1_param_w(offs_t offset, uint8_t data);
+	void dynax_blitter_rev1_start_w(uint8_t data);
+	void dynax_blitter_rev1_clear_w(uint8_t data);
+	void palbank_w(offs_t offset, uint8_t data);
+	void nmi_enable_w(int state);
+
+	void draw_layer_interleaved(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t row, uint16_t y, uint8_t x_count, int left_pixmap, int right_pixmap, int palbase, bool transp);
+	void common_vh_start(int num_pixmaps);
+
 private:
+	required_region_ptr<uint8_t> m_blitrom;
+
+	required_ioport_array<5> m_key[2];
+
 	// video-related
 	std::unique_ptr<uint8_t[]> m_pixmap[8];
-	uint16_t m_palbank = 0;
 	uint8_t m_blit_layer = 0;
 	uint16_t m_blit_dest = 0;
 	uint32_t m_blit_src = 0;
@@ -106,37 +126,32 @@ private:
 	uint8_t m_keyb = 0;
 	bool m_nmi_enable = false;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<ls259_device> m_mainlatch;
-	required_device<msm5205_device> m_msm;
-	required_device<palette_device> m_palette;
-
-	required_region_ptr<uint8_t> m_blitrom;
-
-	required_ioport_array<5> m_key[2];
-
-	template <uint8_t Which> uint8_t keyboard_r();
-	void keyboard_w(uint8_t data);
-	void dynax_blitter_rev1_param_w(offs_t offset, uint8_t data);
-	void dynax_blitter_rev1_start_w(uint8_t data);
-	void dynax_blitter_rev1_clear_w(uint8_t data);
-	void palbank_w(offs_t offset, uint8_t data);
 	void coin_counter_w(int state);
-	void nmi_enable_w(int state);
 	void nmi_clock_w(int state);
-	DECLARE_VIDEO_START(untoucha);
-	MC6845_UPDATE_ROW(hnayayoi_update_row);
-	MC6845_UPDATE_ROW(untoucha_update_row);
-	void common_vh_start(int num_pixmaps);
+	MC6845_UPDATE_ROW(update_row);
 	void copy_pixel(int x, int y, int pen);
-	void draw_layer_interleaved(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t row, uint16_t y, uint8_t x_count, int left_pixmap, int right_pixmap, int palbase, bool transp);
 	void irqhandler(int state);
 
 	void hnayayoi_map(address_map &map) ATTR_COLD;
 	void hnayayoi_io_map(address_map &map) ATTR_COLD;
 	void hnfubuki_map(address_map &map) ATTR_COLD;
-	void untoucha_map(address_map &map) ATTR_COLD;
-	void untoucha_io_map(address_map &map) ATTR_COLD;
+};
+
+class untoucha_state : public hnayayoi_state
+{
+public:
+	using hnayayoi_state::hnayayoi_state;
+
+	void untoucha(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	MC6845_UPDATE_ROW(update_row);
+
+	void program_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -165,7 +180,7 @@ void hnayayoi_state::video_start()
 	common_vh_start(4);  // 4 bitmaps -> 2 layers
 }
 
-VIDEO_START_MEMBER(hnayayoi_state, untoucha)
+void untoucha_state::video_start()
 {
 	common_vh_start(8);  // 8 bitmaps -> 4 layers
 }
@@ -241,16 +256,16 @@ void hnayayoi_state::copy_pixel(int x, int y, int pen)
 
 void hnayayoi_state::dynax_blitter_rev1_start_w(uint8_t data)
 {
-	int romlen = m_blitrom.bytes();
+	int const romlen = m_blitrom.bytes();
 
-	int sx = m_blit_dest & 0xff;
-	int sy = m_blit_dest >> 8;
+	int const sx = m_blit_dest & 0xff;
+	int const sy = m_blit_dest >> 8;
 	int x = sx;
 	int y = sy;
 	while (m_blit_src < romlen)
 	{
 		int cmd = m_blitrom[m_blit_src] & 0x0f;
-		int pen = m_blitrom[m_blit_src] >> 4;
+		int const pen = m_blitrom[m_blit_src] >> 4;
 
 		m_blit_src++;
 
@@ -312,7 +327,7 @@ void hnayayoi_state::dynax_blitter_rev1_start_w(uint8_t data)
 
 void hnayayoi_state::dynax_blitter_rev1_clear_w(uint8_t data)
 {
-	int pen = data >> 4;
+	int const pen = data >> 4;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -358,22 +373,22 @@ void hnayayoi_state::draw_layer_interleaved(bitmap_rgb32 &bitmap, const rectangl
 }
 
 
-MC6845_UPDATE_ROW(hnayayoi_state::hnayayoi_update_row)
+MC6845_UPDATE_ROW(hnayayoi_state::update_row)
 {
-	int col0 = (m_palbank >>  0) & 0x0f;
-	int col1 = (m_palbank >>  4) & 0x0f;
+	int const col0 = (m_palbank >>  0) & 0x0f;
+	int const col1 = (m_palbank >>  4) & 0x0f;
 
 	draw_layer_interleaved(bitmap, cliprect, y, y, x_count, 3, 2, col1, false);
 	draw_layer_interleaved(bitmap, cliprect, y, y, x_count, 1, 0, col0, true);
 }
 
 
-MC6845_UPDATE_ROW(hnayayoi_state::untoucha_update_row)
+MC6845_UPDATE_ROW(untoucha_state::update_row)
 {
-	int col0 = (m_palbank >>  0) & 0x0f;
-	int col1 = (m_palbank >>  4) & 0x0f;
-	int col2 = (m_palbank >>  8) & 0x0f;
-	int col3 = (m_palbank >> 12) & 0x0f;
+	int const col0 = (m_palbank >>  0) & 0x0f;
+	int const col1 = (m_palbank >>  4) & 0x0f;
+	int const col2 = (m_palbank >>  8) & 0x0f;
+	int const col3 = (m_palbank >> 12) & 0x0f;
 
 	draw_layer_interleaved(bitmap, cliprect, y + 16, y, x_count, 7, 6, col3, false);
 	draw_layer_interleaved(bitmap, cliprect, y + 16, y, x_count, 5, 4, col2, true);
@@ -472,14 +487,14 @@ void hnayayoi_state::hnfubuki_map(address_map &map)
 	map(0xff62, 0xff67).w(FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
 }
 
-void hnayayoi_state::untoucha_map(address_map &map)
+void untoucha_state::program_map(address_map &map)
 {
 	map(0x0000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram().share("nvram");
 	map(0x8000, 0xffff).rom();
 }
 
-void hnayayoi_state::untoucha_io_map(address_map &map)
+void untoucha_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x10).w("ymsnd", FUNC(ym2203_device::address_w));
@@ -487,13 +502,13 @@ void hnayayoi_state::untoucha_io_map(address_map &map)
 	map(0x12, 0x12).w("crtc", FUNC(hd6845s_device::address_w));
 	map(0x13, 0x13).w(m_msm, FUNC(msm5205_device::data_w));
 	map(0x14, 0x14).portr("COIN");
-	map(0x15, 0x15).r(FUNC(hnayayoi_state::keyboard_r<1>));
-	map(0x16, 0x16).r(FUNC(hnayayoi_state::keyboard_r<0>));  // bit 7 = blitter busy flag
-	map(0x17, 0x17).w(FUNC(hnayayoi_state::keyboard_w));
-	map(0x18, 0x19).w(FUNC(hnayayoi_state::palbank_w));
-	map(0x1a, 0x1f).w(FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
-	map(0x20, 0x20).w(FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
-	map(0x28, 0x28).w(FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
+	map(0x15, 0x15).r(FUNC(untoucha_state::keyboard_r<1>));
+	map(0x16, 0x16).r(FUNC(untoucha_state::keyboard_r<0>));  // bit 7 = blitter busy flag
+	map(0x17, 0x17).w(FUNC(untoucha_state::keyboard_w));
+	map(0x18, 0x19).w(FUNC(untoucha_state::palbank_w));
+	map(0x1a, 0x1f).w(FUNC(untoucha_state::dynax_blitter_rev1_param_w));
+	map(0x20, 0x20).w(FUNC(untoucha_state::dynax_blitter_rev1_clear_w));
+	map(0x28, 0x28).w(FUNC(untoucha_state::dynax_blitter_rev1_start_w));
 	map(0x30, 0x37).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x50, 0x50).w("ymsnd", FUNC(ym2203_device::data_w));
 	map(0x51, 0x51).r("ymsnd", FUNC(ym2203_device::data_r));
@@ -974,7 +989,7 @@ void hnayayoi_state::hnayayoi(machine_config &config)
 	crtc.set_char_width(4);
 	crtc.set_show_border_area(false);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
-	crtc.set_update_row_callback(FUNC(hnayayoi_state::hnayayoi_update_row));
+	crtc.set_update_row_callback(FUNC(hnayayoi_state::update_row));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1003,20 +1018,18 @@ void hnayayoi_state::hnfubuki(machine_config &config)
 	m_mainlatch->q_out_cb<4>().set(FUNC(hnayayoi_state::nmi_enable_w));
 }
 
-void hnayayoi_state::untoucha(machine_config &config)
+void untoucha_state::untoucha(machine_config &config)
 {
 	hnayayoi(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &hnayayoi_state::untoucha_map);
-	m_maincpu->set_addrmap(AS_IO, &hnayayoi_state::untoucha_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &untoucha_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &untoucha_state::io_map);
 
 	m_mainlatch->q_out_cb<1>().set(m_msm, FUNC(msm5205_device::vclk_w));
-	m_mainlatch->q_out_cb<2>().set(FUNC(hnayayoi_state::nmi_enable_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(untoucha_state::nmi_enable_w));
 	m_mainlatch->q_out_cb<3>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();
 	m_mainlatch->q_out_cb<4>().set_nop(); // ?
 
-	subdevice<hd6845s_device>("crtc")->set_update_row_callback(FUNC(hnayayoi_state::untoucha_update_row));
-
-	MCFG_VIDEO_START_OVERRIDE(hnayayoi_state,untoucha)
+	subdevice<hd6845s_device>("crtc")->set_update_row_callback(FUNC(untoucha_state::update_row));
 }
 
 
@@ -1113,4 +1126,4 @@ void hnayayoi_state::init_hnfubuki()
 
 GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, hnayayoi_state, empty_init,    ROT0, "Dyna Electronics", "Hana Yayoi (Japan)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, init_hnfubuki, ROT0, "Dynax",            "Hana Fubuki (Japan)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1987, untoucha, 0,        untoucha, untoucha, hnayayoi_state, empty_init,    ROT0, "Dynax",            "Untouchable (Ver. 2.10)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1987, untoucha, 0,        untoucha, untoucha, untoucha_state, empty_init,    ROT0, "Dynax",            "Untouchable (Ver. 2.10)",   MACHINE_SUPPORTS_SAVE )

@@ -607,11 +607,12 @@ void address_space_installer::check_optimize_all(const char *function, int width
 		changing_bits = nstart ^ nend;
 	}
 
-	if(width < m_config.data_width() && ((nstart & default_lowbits_mask) || (nend & default_lowbits_mask) != default_lowbits_mask)) {
+	if(changing_bits <= default_lowbits_mask && (nend - nstart) != default_lowbits_mask) {
 		// If the access size is lower than the bus width and the
 		// internal range limited, adjust to one full bus width and
 		// adjust the unitmask.  This can have a very positive
 		// interaction with the following block
+		assert(width < m_config.data_width());
 
 		u64 extra_mask;
 		if(m_config.endianness() == ENDIANNESS_BIG)
@@ -621,7 +622,7 @@ void address_space_installer::check_optimize_all(const char *function, int width
 		nstart &= ~default_lowbits_mask;
 		nend   |=  default_lowbits_mask;
 		nunitmask &= extra_mask;
-		changing_bits = nstart ^ nend;
+		changing_bits = default_lowbits_mask;
 	}
 
 	if(nmirror && !(nstart & changing_bits) && !((~nend) & changing_bits)) {

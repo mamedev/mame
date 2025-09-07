@@ -477,12 +477,6 @@ license:CC0-1.0
 			<param name="as" start="14" increment="301" />
 			<param name="b" start="31" increment="301" />
 
-			<element ref="black_key" inputtag="INTERNAL_KBD~n~" inputmask="0x002"><!-- C# / Db key --><bounds x="~cs~" y="257" width="27" height="158"/></element>
-			<element ref="black_key" inputtag="INTERNAL_KBD~n~" inputmask="0x008"><!-- D# / Eb key --><bounds x="~ds~" y="257" width="27" height="158"/></element>
-			<element ref="black_key" inputtag="INTERNAL_KBD~n~" inputmask="0x040"><!-- F# / Gb key --><bounds x="~fs~" y="257" width="27" height="158"/></element>
-			<element ref="black_key" inputtag="INTERNAL_KBD~n~" inputmask="0x100"><!-- G# / Ab key --><bounds x="~gs~" y="257" width="27" height="158"/></element>
-			<element ref="black_key" inputtag="INTERNAL_KBD~n~" inputmask="0x400"><!-- A# / Bb key --><bounds x="~as~" y="257" width="27" height="158"/></element>
-
 			<element ref="white_key" inputtag="INTERNAL_KBD~n~" inputmask="0x001"><!-- C key  --><bounds x="~c~" y="257" width="39" height="250"/></element>
 			<element ref="white_key" inputtag="INTERNAL_KBD~n~" inputmask="0x004"><!-- D key  --><bounds x="~d~" y="257" width="39" height="250"/></element>
 			<element ref="white_key" inputtag="INTERNAL_KBD~n~" inputmask="0x010"><!-- E key  --><bounds x="~e~" y="257" width="39" height="250"/></element>
@@ -491,9 +485,6 @@ license:CC0-1.0
 			<element ref="white_key" inputtag="INTERNAL_KBD~n~" inputmask="0x200"><!-- A key  --><bounds x="~a~" y="257" width="39" height="250"/></element>
 			<element ref="white_key" inputtag="INTERNAL_KBD~n~" inputmask="0x800"><!-- B key  --><bounds x="~b~" y="257" width="39" height="250"/></element>
 
-
-			<!-- Declaring the black keys AGAIN here is a hack!
-			     I need to find a better way to let the black keys have precedence over the white ones. -->
 			<element ref="black_key" inputtag="INTERNAL_KBD~n~" inputmask="0x002"><!-- C# / Db key --><bounds x="~cs~" y="257" width="27" height="158"/></element>
 			<element ref="black_key" inputtag="INTERNAL_KBD~n~" inputmask="0x008"><!-- D# / Eb key --><bounds x="~ds~" y="257" width="27" height="158"/></element>
 			<element ref="black_key" inputtag="INTERNAL_KBD~n~" inputmask="0x040"><!-- F# / Gb key --><bounds x="~fs~" y="257" width="27" height="158"/></element>

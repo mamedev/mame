@@ -34,7 +34,9 @@
 #endif
 
 
-class front_panel_device : public device_t, public device_h8bus_card_interface, public device_p201_p1_card_interface
+class front_panel_device : public device_t
+						 , public device_h8bus_card_interface
+						 , public device_p201_p1_card_interface
 {
 public:
 	front_panel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
@@ -50,13 +52,14 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
+	virtual void map_io(address_space_installer & space) override ATTR_COLD;
+
 	u8 portf0_r();
 	void portf0_w(u8 data);
 	void portf1_w(u8 data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_irq_pulse);
-
-	bool m_installed;
+	TIMER_CALLBACK_MEMBER(turn_off_run_led_timer);
 
 	u8   m_digit;
 	u8   m_segment;
@@ -73,6 +76,7 @@ protected:
 	output_finder<>              m_pwr_led;
 	output_finder<>              m_ion_led;
 	output_finder<>              m_run_led;
+	emu_timer                   *m_run_led_timer;
 };
 
 
@@ -93,7 +97,11 @@ front_panel_device::front_panel_device(const machine_config &mconfig, const char
 void front_panel_device::m1_w(int state)
 {
 	// operate the RUN LED
-	m_run_led = !state;
+	if (state)
+	{
+		m_run_led = 0;
+		m_run_led_timer->adjust(attotime::from_nsec(4700));
+	}
 
 	// For Single Instruction(SI) mode, there are 2 D flipflops, ic108a and ic108b.  Both are held in
 	// set mode while not in SI mode.  The data for ic108a is /INTE and ic108a Q is connected to data on
@@ -231,6 +239,18 @@ void front_panel_device::portf1_w(u8 data)
 	}
 }
 
+void front_panel_device::map_io(address_space_installer & space)
+{
+	space.install_readwrite_handler(0xf0, 0xf0,
+		read8smo_delegate(*this, FUNC(front_panel_device::portf0_r)),
+		write8smo_delegate(*this, FUNC(front_panel_device::portf0_w))
+	);
+
+	space.install_write_handler(0xf1, 0xf1,
+		write8smo_delegate(*this, FUNC(front_panel_device::portf1_w))
+	);
+}
+
 // Input ports
 static INPUT_PORTS_START( h8 )
 	PORT_START("X0")
@@ -284,11 +304,9 @@ void front_panel_device::device_start()
 	m_ion_led.resolve();
 	m_run_led.resolve();
 
-	m_installed  = false;
-	m_digit      = 0;
-	m_segment    = 0;
+	m_digit   = 0;
+	m_segment = 0;
 
-	save_item(NAME(m_installed));
 	save_item(NAME(m_digit));
 	save_item(NAME(m_segment));
 	save_item(NAME(m_ic108a));
@@ -296,6 +314,8 @@ void front_panel_device::device_start()
 	save_item(NAME(m_int_en));
 	save_item(NAME(m_allow_int1));
 	save_item(NAME(m_allow_int2));
+
+	m_run_led_timer = timer_alloc(FUNC(front_panel_device::turn_off_run_led_timer), this);
 }
 
 void front_panel_device::device_reset()
@@ -311,18 +331,6 @@ void front_panel_device::device_reset()
 	m_run_led = 1;
 	m_ion_led = 1;
 	m_mon_led = 1;
-
-	if (!m_installed)
-	{
-		h8bus().space(AS_IO).install_readwrite_handler(0xf0, 0xf0,
-			read8smo_delegate(*this, FUNC(front_panel_device::portf0_r)),
-			write8smo_delegate(*this, FUNC(front_panel_device::portf0_w)));
-
-		h8bus().space(AS_IO).install_write_handler(0xf1, 0xf1,
-			write8smo_delegate(*this, FUNC(front_panel_device::portf1_w)));
-
-		m_installed = true;
-	}
 }
 
 void front_panel_device::device_add_mconfig(machine_config &config)
@@ -346,6 +354,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(front_panel_device::h8_irq_pulse)
 	{
 		m_p201_int1(ASSERT_LINE);
 	}
+}
+
+TIMER_CALLBACK_MEMBER(front_panel_device::turn_off_run_led_timer)
+{
+	m_run_led = 1;
 }
 
 DEFINE_DEVICE_TYPE_PRIVATE(H8BUS_FRONT_PANEL, device_h8bus_card_interface, front_panel_device, "h8_fp", "Heath H-8 Front Panel");

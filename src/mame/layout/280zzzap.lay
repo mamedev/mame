@@ -76,9 +76,6 @@ license:CC0-1.0
 			</element>
 		</collection>
 		<collection name="Shifter">
-			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-				<bounds x="606" y="414" width="32" height="64" />
-			</element>
 			<element ref="shifter" inputtag="IN0" inputmask="0x10">
 				<bounds x="606" y="414" width="32" height="64" />
 				<color alpha="0.6" />
@@ -88,6 +85,9 @@ license:CC0-1.0
 					<bounds x="606" y="414" width="32" height="64" />
 				</element>
 			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="606" y="414" width="32" height="64" />
+			</element>
 		</collection>
 	</view>
 
@@ -101,9 +101,6 @@ license:CC0-1.0
 			</element>
 		</collection>
 		<collection name="Shifter">
-			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-				<bounds x="648" y="414" width="32" height="64" />
-			</element>
 			<element ref="shifter" inputtag="IN0" inputmask="0x10">
 				<bounds x="648" y="414" width="32" height="64" />
 				<color alpha="0.6" />
@@ -113,6 +110,9 @@ license:CC0-1.0
 					<bounds x="648" y="414" width="32" height="64" />
 				</element>
 			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="648" y="414" width="32" height="64" />
+			</element>
 		</collection>
 	</view>
 
@@ -126,9 +126,6 @@ license:CC0-1.0
 			</element>
 		</collection>
 		<collection name="Shifter">
-			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-				<bounds x="2" y="414" width="32" height="64" />
-			</element>
 			<element ref="shifter" inputtag="IN0" inputmask="0x10">
 				<bounds x="2" y="414" width="32" height="64" />
 				<color alpha="0.6" />
@@ -138,6 +135,9 @@ license:CC0-1.0
 					<bounds x="2" y="414" width="32" height="64" />
 				</element>
 			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="2" y="414" width="32" height="64" />
+			</element>
 		</collection>
 	</view>
 
@@ -151,9 +151,6 @@ license:CC0-1.0
 			</element>
 		</collection>
 		<collection name="Shifter">
-			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-				<bounds x="-40" y="414" width="32" height="64" />
-			</element>
 			<element ref="shifter" inputtag="IN0" inputmask="0x10">
 				<bounds x="-40" y="414" width="32" height="64" />
 				<color alpha="0.6" />
@@ -163,6 +160,9 @@ license:CC0-1.0
 					<bounds x="-40" y="414" width="32" height="64" />
 				</element>
 			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="-40" y="414" width="32" height="64" />
+			</element>
 		</collection>
 	</view>
 

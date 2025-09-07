@@ -475,6 +475,7 @@ const double XTAL::known_xtals[] = {
 	 45'830'400, // 45.8304_MHz_XTAL       Microterm 5510
 	 46'615'120, // 46.61512_MHz_XTAL      Soundblaster 16 PCM base clock
 	 47'736'000, // 47.736_MHz_XTAL        Visual 100
+	 47'843'000, // 47.843_MHz_XTAL        Sord Future 32a
 	 48'000'000, // 48_MHz_XTAL            Williams/Midway Y/Z-unit system / SSV board
 	 48'384'000, // 48.384_MHz_XTAL        Namco NB-1
 	 48'556'800, // 48.5568_MHz_XTAL       Wyse WY-85

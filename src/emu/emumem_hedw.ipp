@@ -70,9 +70,10 @@ template<int HighBits, int Width, int AddrShift> handler_entry_write_dispatch<Hi
 	for(unsigned int i=0; i != COUNT; i++) {
 		handler_entry_write<Width, AddrShift> *msrc = src->m_u_dispatch[i];
 		auto m = dupmap.find(msrc);
-		if(m != dupmap.end())
+		if(m != dupmap.end()) {
+			m->second->ref();
 			m_u_dispatch[i] = m->second;
-		else {
+		} else {
 			handler_entry_write<Width, AddrShift> *dest = msrc->dup();
 			dupmap[src] = dest;
 			m_u_dispatch[i] = dest;
@@ -731,9 +732,10 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 			if(m_dispatch_array[0][entry]) {
 				handler_entry_write<Width, AddrShift> *src = m_dispatch_array[0][entry];
 				auto m = dupmap.find(src);
-				if(m != dupmap.end())
+				if(m != dupmap.end()) {
+					m->second->ref();
 					m_u_dispatch[entry] = m->second;
-				else {
+				} else {
 					handler_entry_write<Width, AddrShift> *dest = src->dup();
 					dupmap[src] = dest;
 					m_u_dispatch[entry] = dest;

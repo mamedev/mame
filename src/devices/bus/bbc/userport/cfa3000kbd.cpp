@@ -26,19 +26,38 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "cfa3000kbd.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(CFA3000_KBD, cfa3000_kbd_device, "cfa3000kbd", "Henson CFA 3000 Keyboard")
+namespace {
+
+class cfa3000_kbd_device : public device_t, public device_bbc_userport_interface
+{
+public:
+	cfa3000_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, CFA3000_KBD, tag, owner, clock),
+		device_bbc_userport_interface(mconfig, *this),
+		m_kbd(*this, "KBD.%u", 0)
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD { }
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual uint8_t pb_r() override;
+
+private:
+	required_ioport_array<4> m_kbd;
+};
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( cfa3000kbd )
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 static INPUT_PORTS_START( cfa3000kbd )
@@ -64,48 +83,9 @@ static INPUT_PORTS_START( cfa3000kbd )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Print")            PORT_CODE(KEYCODE_P)
 INPUT_PORTS_END
 
-
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
 ioport_constructor cfa3000_kbd_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( cfa3000kbd );
-}
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  cfa3000_kbd_device - constructor
-//-------------------------------------------------
-
-cfa3000_kbd_device::cfa3000_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CFA3000_KBD, tag, owner, clock),
-	device_bbc_userport_interface(mconfig, *this),
-	m_kbd(*this, "KBD.%u", 0)
-{
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void cfa3000_kbd_device::device_start()
-{
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void cfa3000_kbd_device::device_reset()
-{
 }
 
 
@@ -139,3 +119,8 @@ uint8_t cfa3000_kbd_device::pb_r()
 	}
 	return data;
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(CFA3000_KBD, device_bbc_userport_interface, cfa3000_kbd_device, "cfa3000kbd", "Henson CFA 3000 Keyboard")

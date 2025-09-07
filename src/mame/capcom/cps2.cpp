@@ -668,18 +668,22 @@ public:
 		, m_ecofghtr_dial_last1(0)
 	{ }
 
-	void cps2(machine_config &config);
-	void cps2comm(machine_config &config);
-	void gigaman2(machine_config &config);
-	void dead_cps2(machine_config &config);
-	void dead_cps2comm(machine_config &config);
+	void cps2(machine_config &config) ATTR_COLD;
+	void cps2comm(machine_config &config) ATTR_COLD;
+	void gigaman2(machine_config &config) ATTR_COLD;
+	void dead_cps2(machine_config &config) ATTR_COLD;
+	void dead_cps2comm(machine_config &config) ATTR_COLD;
 
-	void init_cps2();
-	void init_cps2nc();
-	void init_gigaman2();
-	void init_pzloop2();
-	void init_singbrd();
-	void init_ecofghtr();
+	void init_cps2() ATTR_COLD;
+	void init_cps2nc() ATTR_COLD;
+	void init_gigaman2() ATTR_COLD;
+	void init_pzloop2() ATTR_COLD;
+	void init_singbrd() ATTR_COLD;
+	void init_ecofghtr() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void init_digital_volume();
@@ -707,9 +711,6 @@ private:
 	uint16_t *cps2_objbase();
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	uint32_t screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_MACHINE_START(cps2);
-	virtual void video_start() override ATTR_COLD;
 
 	void cps2_map(address_map &map) ATTR_COLD;
 	void cps2_comm_map(address_map &map) ATTR_COLD;
@@ -1806,7 +1807,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(cps2_state,cps2)
+void cps2_state::machine_start()
 {
 	if (m_audiocpu != nullptr) // gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
 		membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, memregion("audiocpu")->base() + 0x10000, 0x4000);
@@ -1829,8 +1830,6 @@ void cps2_state::cps2(machine_config &config)
 
 	const attotime audio_irq_period = attotime::from_hz(8_MHz_XTAL / 32000); // measured
 	m_audiocpu->set_periodic_int(FUNC(cps2_state::irq0_line_hold), audio_irq_period);
-
-	MCFG_MACHINE_START_OVERRIDE(cps2_state, cps2)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 

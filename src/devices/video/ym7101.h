@@ -25,6 +25,10 @@ public:
 	void if16_map(address_map &map) ATTR_COLD;
 	void if8_map(address_map &map) ATTR_COLD;
 
+	// unscaled setter clock, needed for H32 and H40 to coexist
+	void set_mclk(u32 freq) { m_ref_mclk = freq; }
+	void set_mclk(const XTAL &freq) { m_ref_mclk = freq.value(); }
+
 	auto vint_cb() { return m_vint_callback.bind(); }
 	auto hint_cb() { return m_hint_callback.bind(); }
 	auto sint_cb() { return m_sint_callback.bind(); }
@@ -56,7 +60,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
-//	virtual u32 palette_entries() const noexcept override { return 0x40 + 0x40 * 2; }
+	virtual void device_validity_check(validity_checker &valid) const override;
 private:
 	void vram_map(address_map &map) ATTR_COLD;
 	void cram_map(address_map &map) ATTR_COLD;
@@ -83,6 +87,8 @@ private:
 
 	std::unique_ptr<u16[]> m_sprite_cache;
 	std::unique_ptr<u8[]> m_sprite_line;
+	std::unique_ptr<u8[]> m_tile_a_line;
+	std::unique_ptr<u8[]> m_tile_b_line;
 
 	TIMER_CALLBACK_MEMBER(scan_timer_callback);
 	TIMER_CALLBACK_MEMBER(vint_trigger_callback);
@@ -92,6 +98,8 @@ private:
 	emu_timer *m_vint_on_timer;
 	emu_timer *m_hint_on_timer;
 	emu_timer *m_dma_timer;
+
+	u32 m_ref_mclk;
 
 	enum command_write_state_t : u8 {
 		FIRST_WORD,
@@ -131,6 +139,9 @@ private:
 
 	u16 data_port_r(offs_t offset, u16 mem_mask);
 	void data_port_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 control_port_r(offs_t offset, u16 mem_mask);
+	void control_port_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 hv_counter_r(offs_t offset, u16 mem_mask);
 
 	void vram_w(offs_t offset, u16 data, u16 mem_mask);
 	void cram_w(offs_t offset, u16 data, u16 mem_mask);
@@ -149,20 +160,26 @@ private:
 	u32 m_sprite_attribute_table;
 	u8 m_background_color;
 	u16 m_hit; // HBlank interrupt rate
+	u8 m_vs, m_hs; // Vertical/Horizontal scroll modes
 	// window
 	bool m_rigt;
 	u8 m_whp;
 	bool m_down;
 	u8 m_wvp;
 
+	// internals
+	u8 m_hres_mode;
 	int m_vint_pending, m_hint_pending;
-	u16 m_vcounter; // irq4 counter
+	int m_vcounter; // irq4 counter
 
 	bitmap_rgb32 m_bitmap;
 	bool render_line(int scanline);
 	void prepare_sprite_line(int scanline);
+	void prepare_tile_line(int scanline);
 
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+
+	void flush_screen_mode();
 };
 
 DECLARE_DEVICE_TYPE(YM7101, ym7101_device)

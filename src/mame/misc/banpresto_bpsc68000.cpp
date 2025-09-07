@@ -26,7 +26,6 @@ The audio section also has unpopulated space marked for a YMZ280.
 
 
 TODO:
-- missing fortune wheel sprites (they are in sprite ROM but are not put in sprite RAM?)
 - verify ticket dispenser hook-up (seems to work)
 - unknown read / writes as noted in memory map
 - spams "requested to play sample on non-stopped voice" from the Oki. Why?
@@ -102,14 +101,18 @@ void bpsc68000_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 		if (!BIT(m_spriteram[offs], 2))
 			continue;
 
-		int const sprite = m_spriteram[offs + 1];
-		int const x = m_spriteram[offs + 2];
-		int const y = m_spriteram[offs + 3] ;
+		int sprite = m_spriteram[offs + 1];
+		int const x = m_spriteram[offs + 2] & 0x3ff;
+		int const y = m_spriteram[offs + 3] & 0x3ff;
 		int const flipx = BIT(m_spriteram[offs], 4);
 		int const flipy = 0; // TODO
 		int const color = m_spriteram[offs] >> 8;
+		int const xchain = m_spriteram[offs + 2] >> 11;
+		int const ychain = m_spriteram[offs + 3] >> 11;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite, color, flipx, flipy, x, y, 0);
+		for (int cy = 0; cy < (ychain + 1); cy++)
+			for (int cx = 0; cx < (xchain + 1); cx++)
+				m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, flipx, flipy, x + 16 * cx, y + 16 * cy, 0);
 	}
 }
 
@@ -345,4 +348,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1995, lnumbers, 0, bpsc68000, lnumbers, bpsc68000_state, empty_init, ROT0, "Banpresto", "Ultraman Club - Lucky Numbers", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lnumbers, 0, bpsc68000, lnumbers, bpsc68000_state, empty_init, ROT0, "Banpresto", "Ultraman Club - Lucky Numbers", MACHINE_SUPPORTS_SAVE )

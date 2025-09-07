@@ -32,17 +32,98 @@
 #include "emu.h"
 #include "pointer.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBC_AMXMOUSE,  bbc_amxmouse_device,  "bbc_amxmouse",  "AMX Mouse (BBC Micro)")
-DEFINE_DEVICE_TYPE(BBC_M512MOUSE, bbc_m512mouse_device, "bbc_m512mouse", "Acorn Master 512 Mouse")
-DEFINE_DEVICE_TYPE(BBC_TRACKER,   bbc_tracker_device,   "bbc_tracker",   "Marconi RB2 Tracker Ball")
+namespace {
+
+class bbc_pointer_device : public device_t, public device_bbc_userport_interface
+{
+protected:
+	bbc_pointer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, type, tag, owner, clock)
+		, device_bbc_userport_interface(mconfig, *this)
+		, m_pointer_x(*this, "POINTER_X")
+		, m_pointer_y(*this, "POINTER_Y")
+		, m_buttons(*this, "BUTTONS")
+	{
+	}
+
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	TIMER_CALLBACK_MEMBER(update);
+
+	required_ioport m_pointer_x;
+	required_ioport m_pointer_y;
+	required_ioport m_buttons;
+
+	// quadrature output
+	int m_xdir, m_ydir;
+
+	// internal quadrature state
+	int m_x, m_y;
+	int m_phase_x, m_phase_y;
+
+	emu_timer *m_pointer_timer;
+};
+
+
+// ======================> bbc_amxmouse_device
+
+class bbc_amxmouse_device : public bbc_pointer_device
+{
+public:
+	bbc_amxmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: bbc_pointer_device(mconfig, BBC_AMXMOUSE, tag, owner, clock)
+	{
+	}
+
+protected:
+	uint8_t pb_r() override;
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+};
+
+
+// ======================> bbc_m512mouse_device
+
+class bbc_m512mouse_device : public bbc_pointer_device
+{
+public:
+	bbc_m512mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: bbc_pointer_device(mconfig, BBC_M512MOUSE, tag, owner, clock)
+	{
+	}
+
+protected:
+	uint8_t pb_r() override;
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+};
+
+
+// ======================> bbc_tracker_device
+
+class bbc_tracker_device : public bbc_pointer_device
+{
+public:
+	bbc_tracker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: bbc_pointer_device(mconfig, BBC_TRACKER, tag, owner, clock)
+	{
+	}
+
+protected:
+	uint8_t pb_r() override;
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+};
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( amxmouse )
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 static INPUT_PORTS_START( amxmouse )
@@ -59,10 +140,6 @@ static INPUT_PORTS_START( amxmouse )
 INPUT_PORTS_END
 
 
-//-------------------------------------------------
-//  INPUT_PORTS( m512mouse )
-//-------------------------------------------------
-
 static INPUT_PORTS_START( m512mouse )
 	PORT_START("POINTER_X")
 	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100)
@@ -76,9 +153,6 @@ static INPUT_PORTS_START( m512mouse )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2)
 INPUT_PORTS_END
 
-//-------------------------------------------------
-//  INPUT_PORTS( tracker )
-//-------------------------------------------------
 
 static INPUT_PORTS_START( tracker )
 	PORT_START("POINTER_X")
@@ -93,9 +167,6 @@ static INPUT_PORTS_START( tracker )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Right Button") PORT_CODE(MOUSECODE_BUTTON2)
 INPUT_PORTS_END
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
 
 ioport_constructor bbc_amxmouse_device::device_input_ports() const
 {
@@ -110,38 +181,6 @@ ioport_constructor bbc_m512mouse_device::device_input_ports() const
 ioport_constructor bbc_tracker_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( tracker );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_pointer_device - constructor
-//-------------------------------------------------
-
-bbc_pointer_device::bbc_pointer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_bbc_userport_interface(mconfig, *this)
-	, m_pointer_x(*this, "POINTER_X")
-	, m_pointer_y(*this, "POINTER_Y")
-	, m_buttons(*this, "BUTTONS")
-{
-}
-
-bbc_amxmouse_device::bbc_amxmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_pointer_device(mconfig, BBC_AMXMOUSE, tag, owner, clock)
-{
-}
-
-bbc_m512mouse_device::bbc_m512mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_pointer_device(mconfig, BBC_M512MOUSE, tag, owner, clock)
-{
-}
-
-bbc_tracker_device::bbc_tracker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_pointer_device(mconfig, BBC_TRACKER, tag, owner, clock)
-{
 }
 
 
@@ -262,3 +301,10 @@ uint8_t bbc_tracker_device::pb_r()
 {
 	return (m_buttons->read() & 0x07) | (m_xdir << 3) | (m_ydir << 4) | 0xe0;
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_AMXMOUSE,  device_bbc_userport_interface, bbc_amxmouse_device,  "bbc_amxmouse",  "AMX Mouse (BBC Micro)")
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_M512MOUSE, device_bbc_userport_interface, bbc_m512mouse_device, "bbc_m512mouse", "Acorn Master 512 Mouse")
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_TRACKER,   device_bbc_userport_interface, bbc_tracker_device,   "bbc_tracker",   "Marconi RB2 Tracker Ball")

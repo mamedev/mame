@@ -127,8 +127,9 @@ Notes:
 **********************************************************************************************************************/
 
 #include "emu.h"
-#include "dynax.h"
 
+#include "dynax_blitter_rev2.h"
+#include "hanafuda.h"
 #include "mjdipsw.h"
 
 #include "mahjong.h"
@@ -141,9 +142,14 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
+#include "machine/rstbuf.h"
+#include "machine/ticket.h"
 #include "sound/ay8910.h"
+#include "sound/okim6295.h"
 #include "sound/ymopl.h"
 
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -194,15 +200,21 @@ static const int hanakanz_commands[8]   = { BLIT_NEXT,    BLIT_CHANGE_PEN, BLIT_
 static const int mjflove_commands[8]    = { BLIT_STOP,    BLIT_CHANGE_PEN, BLIT_CHANGE_NUM, BLIT_UNKNOWN,
 											BLIT_SKIP,    BLIT_COPY,       BLIT_LINE,       BLIT_NEXT   };
 
-class ddenlovr_state : public dynax_state
+class ddenlovr_state : public driver_device
 {
 public:
 	ddenlovr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dynax_state(mconfig, type, tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_mainlatch(*this, "mainlatch")
+		, m_hopper(*this, "hopper")
 		, m_blitter_irq_handler(*this)
 		, m_oki(*this, "oki")
 		, m_protection1(*this, "protection1")
 		, m_protection2(*this, "protection2")
+		, m_io_key{ { *this, "KEY%u", 0U }, { *this, "KEY%u", 5U } }
 		, m_io_fake(*this, "FAKE")
 	{ }
 
@@ -372,6 +384,9 @@ private:
 	void quiz365_oki_bank2_w(int state);
 protected:
 	void ddenlovr_select_w(uint8_t data);
+	void keyboard_select_w(uint8_t data);
+	template <int Which> uint8_t keyb_r();
+
 private:
 	uint8_t quiz365_input_r();
 	void nettoqc_oki_bank_w(uint8_t data);
@@ -431,21 +446,33 @@ private:
 	void ultrchmp_map(address_map &map) ATTR_COLD;
 
 protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<ls259_device> m_mainlatch;
+	optional_device<hopper_device> m_hopper;
+
 	devcb_write_line m_blitter_irq_handler;
 	optional_device<okim6295_device> m_oki;
 
 private:
 	optional_shared_ptr<uint16_t> m_protection1;
 	optional_shared_ptr<uint16_t> m_protection2;
+protected:
+	optional_ioport_array<5> m_io_key[2];
+private:
 	optional_ioport m_io_fake;
 protected:
 	std::unique_ptr<uint8_t[]>  m_ddenlovr_pixmap[8];
 
 	// input/output
+	uint8_t m_input_sel = 0U;
+	uint8_t m_dsw_sel = 0U;
+	uint8_t m_keyb = 0U;
 	uint8_t m_coins = 0U;
 	uint8_t m_hopper_hack = 0U;
 
-	// blitter (TODO: merge with the dynax.h, where possible)
+	// blitter & mixer (TODO: make these devices)
 	int m_extra_layers;
 	int m_ddenlovr_dest_layer;
 	int m_ddenlovr_blit_flip;
@@ -500,6 +527,9 @@ class htengoku_state : public ddenlovr_state
 public:
 	htengoku_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ddenlovr_state(mconfig, type, tag)
+		, m_blitter(*this, "blitter")
+		, m_mainirq(*this, "mainirq")
+		, m_palette_ram(*this, "palette", 0x2000, ENDIANNESS_LITTLE)
 		, m_highview(*this, "highmem")
 		, m_rombank(*this, "bank1")
 		, m_dsw(*this, "DSW%u", 0U)
@@ -511,7 +541,21 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	uint32_t screen_update_htengoku(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void blit_pixel_w(offs_t offset, uint8_t data);
+	void blit_dest_w(uint8_t data);
+	void blit_scrollx_w(uint8_t data);
+	void blit_scrolly_w(uint8_t data);
+	void extra_scrollx_w(uint8_t data);
+	void extra_scrolly_w(uint8_t data);
+	void flipscreen_w(int state);
+	void layer_half_w(int state);
+	void layer_half2_w(int state);
+	void palette_data_w(offs_t offset, uint8_t data);
+
+	void vblank_w(int state);
+	void blitter_irq_w(int state);
+	void vblank_ack_w(uint8_t data);
+	void blitter_ack_w(int state);
 
 	void htengoku_select_w(uint8_t data);
 	void htengoku_coin_w(uint8_t data);
@@ -526,10 +570,19 @@ private:
 	void htengoku_io_map(address_map &map) ATTR_COLD;
 	void htengoku_mem_map(address_map &map) ATTR_COLD;
 
+	required_device<dynax_blitter_rev2_device> m_blitter;
+	required_device<rst_pos_buffer_device> m_mainirq;
+
+	memory_share_creator<uint8_t> m_palette_ram;
 	memory_view m_highview;
 	required_memory_bank m_rombank;
 	required_ioport_array<5> m_dsw;
-	bitmap_ind16 m_htengoku_layer;
+
+	uint8_t m_blit_dest;
+	bool m_flipscreen;
+	bool m_layer_half;
+	bool m_layer_half2;
+	bool m_blitter_irq_mask;
 };
 
 class mmpanic_state : public ddenlovr_state
@@ -2009,6 +2062,23 @@ void ddenlovr_state::ddenlovr_select2_w(uint8_t data)
 	m_input_sel = data;
 }
 
+void ddenlovr_state::keyboard_select_w(uint8_t data)
+{
+	m_keyb = data;
+}
+
+template <int Which>
+uint8_t ddenlovr_state::keyb_r()
+{
+	uint8_t result = 0x3f;
+
+	for (int i = 0; i < 5; i++)
+		if (!BIT(m_keyb, i))
+			result &= m_io_key[Which][i]->read();
+
+	return result;
+}
+
 uint8_t ddenlovr_state::rongrong_input2_r()
 {
 //  logerror("%04x: input2_r offset %d select %x\n", m_maincpu->pc(), offset, m_input_sel);
@@ -2811,7 +2881,7 @@ void hanakanz_state::hanakanz_dsw_w(uint8_t data)
 
 uint8_t hanakanz_state::hanakanz_keyb_r(offs_t offset)
 {
-	uint8_t val = offset ? hanamai_keyboard_r<0>() : hanamai_keyboard_r<1>();
+	uint8_t val = offset ? keyb_r<0>() : keyb_r<1>();
 
 	val |= ioport(offset ? "HOPPER" : "BET")->read();
 	return val;
@@ -2915,7 +2985,7 @@ void hanakanz_state::hanakanz_portmap(address_map &map)
 	map(0x90, 0x90).portr("SYSTEM");
 	map(0x91, 0x92).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0x93, 0x93).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
-	map(0x94, 0x94).w(FUNC(hanakanz_state::hanamai_keyboard_w));
+	map(0x94, 0x94).w(FUNC(hanakanz_state::keyboard_select_w));
 	map(0x96, 0x96).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -2933,7 +3003,7 @@ void hanakanz_state::hkagerou_portmap(address_map &map)
 	map(0xb0, 0xb0).portr("SYSTEM");
 	map(0xb1, 0xb2).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0xb3, 0xb3).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
-	map(0xb4, 0xb4).w(FUNC(hanakanz_state::hanamai_keyboard_w));
+	map(0xb4, 0xb4).w(FUNC(hanakanz_state::keyboard_select_w));
 	map(0xb6, 0xb6).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -2953,7 +3023,7 @@ void hanakanz_state::kotbinyo_portmap(address_map &map)
 	map(0xb1, 0xb1).portr("KEYB0");
 	map(0xb2, 0xb2).portr("KEYB1");
 	map(0xb3, 0xb3).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
-//  map(0xb4, 0xb4).w(FUNC(hanakanz_state::hanamai_keyboard_w));
+//  map(0xb4, 0xb4).w(FUNC(hanakanz_state::keyboard_select_w));
 	map(0xb6, 0xb6).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -2973,7 +3043,7 @@ void hanakanz_state::kotbinsp_portmap(address_map &map)
 	map(0x91, 0x91).portr("KEYB0");
 	map(0x92, 0x92).portr("KEYB1");
 	map(0x93, 0x93).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
-//  map(0x94, 0x94).w(FUNC(hanakanz_state::hanamai_keyboard_w));
+//  map(0x94, 0x94).w(FUNC(hanakanz_state::keyboard_select_w));
 	map(0x96, 0x96).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -2986,7 +3056,7 @@ void hanakanz_state::mjreach1_portmap(address_map &map)
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
-	map(0x90, 0x90).w(FUNC(hanakanz_state::hanamai_keyboard_w));
+	map(0x90, 0x90).w(FUNC(hanakanz_state::keyboard_select_w));
 	map(0x92, 0x92).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0x93, 0x93).rw(FUNC(hanakanz_state::technotop_protection_r<0x00>), FUNC(hanakanz_state::protection_w));
 	map(0x94, 0x94).portr("SYSTEM");
@@ -3004,7 +3074,7 @@ void hanakanz_state::mjreach1_portmap(address_map &map)
 
 uint8_t hanakanz_state::mjchuuka_keyb_r(offs_t offset)
 {
-	uint8_t val = offset ? hanamai_keyboard_r<0>() : hanamai_keyboard_r<1>();
+	uint8_t val = offset ? keyb_r<0>() : keyb_r<1>();
 
 	val |= ioport(offset ? "HOPPER" : "BET")->read();
 
@@ -3102,7 +3172,7 @@ void hanakanz_state::mjchuuka_portmap(address_map &map)
 	map(0x21, 0x21).select(0xff00).w(FUNC(hanakanz_state::mjchuuka_palette_w));
 	map(0x23, 0x23).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_gfxrom_0_r));
 	map(0x40, 0x40).mirror(0xff00).w(FUNC(hanakanz_state::mjchuuka_coincounter_w));
-	map(0x41, 0x41).mirror(0xff00).w(FUNC(hanakanz_state::hanamai_keyboard_w));
+	map(0x41, 0x41).mirror(0xff00).w(FUNC(hanakanz_state::keyboard_select_w));
 	map(0x42, 0x42).mirror(0xff00).portr("SYSTEM");
 	map(0x43, 0x44).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_keyb_r));
 	map(0x45, 0x45).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_gfxrom_1_r));
@@ -3158,7 +3228,7 @@ void ddenlovr_state::mjschuka_portmap(address_map &map)
 	map(0x5c, 0x5c).r(FUNC(ddenlovr_state::hanakanz_rand_r));
 
 	map(0x60, 0x60).w(FUNC(ddenlovr_state::sryudens_coincounter_w));
-	map(0x61, 0x61).w(FUNC(ddenlovr_state::hanamai_keyboard_w));
+	map(0x61, 0x61).w(FUNC(ddenlovr_state::keyboard_select_w));
 	map(0x62, 0x62).portr("SYSTEM");
 	map(0x63, 0x64).r(FUNC(ddenlovr_state::sryudens_keyb_r));
 
@@ -3189,7 +3259,7 @@ void ddenlovr_state::mjmyorntr_portmap(address_map &map)
 	map(0x40, 0x41).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0x43, 0x43).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x50, 0x50).w(FUNC(ddenlovr_state::sryudens_coincounter_w));
-	map(0x51, 0x51).w(FUNC(ddenlovr_state::hanamai_keyboard_w));
+	map(0x51, 0x51).w(FUNC(ddenlovr_state::keyboard_select_w));
 	map(0x52, 0x52).portr("SYSTEM");
 	map(0x53, 0x54).r(FUNC(ddenlovr_state::sryudens_keyb_r));
 	map(0x58, 0x58).portr("DSW1");
@@ -3955,8 +4025,8 @@ void ddenlovr_state::mjflove_portmap(address_map &map)
 	map(0x0038, 0x0038).nopr();         // ? ack or watchdog
 	map(0x0040, 0x0041).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).mirror(0xff00);
 	map(0x0043, 0x0043).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
-	map(0x0080, 0x0080).r(FUNC(ddenlovr_state::hanamai_keyboard_r<0>));
-	map(0x0081, 0x0081).r(FUNC(ddenlovr_state::hanamai_keyboard_r<1>));
+	map(0x0080, 0x0080).r(FUNC(ddenlovr_state::keyb_r<0>));
+	map(0x0081, 0x0081).r(FUNC(ddenlovr_state::keyb_r<1>));
 	map(0x0082, 0x0082).portr("SYSTEM");
 	map(0x00da, 0x00da).r(FUNC(ddenlovr_state::mjflove_protection_r)).mirror(0xff00);
 	map(0x00f2, 0x00f2).w(FUNC(ddenlovr_state::mjmyster_rambank_w)).mirror(0xff00);
@@ -4088,7 +4158,7 @@ void ddenlovr_state::sryudens_map(address_map &map)
 
 uint8_t ddenlovr_state::sryudens_keyb_r(offs_t offset)
 {
-	uint8_t val = offset ? hanamai_keyboard_r<0>() : hanamai_keyboard_r<1>();
+	uint8_t val = offset ? keyb_r<0>() : keyb_r<1>();
 
 	val |= ioport(offset ? "HOPPER" : "BET")->read();
 	if (offset)
@@ -4147,7 +4217,7 @@ void ddenlovr_state::sryudens_portmap(address_map &map)
 	map(0x93, 0x93).portr("DSW3");
 	map(0x94, 0x94).portr("DSWTOP");
 	map(0x98, 0x98).w(FUNC(ddenlovr_state::sryudens_coincounter_w));
-	map(0x99, 0x99).w(FUNC(ddenlovr_state::hanamai_keyboard_w));
+	map(0x99, 0x99).w(FUNC(ddenlovr_state::keyboard_select_w));
 	map(0x9a, 0x9a).portr("SYSTEM");
 	map(0x9b, 0x9c).r(FUNC(ddenlovr_state::sryudens_keyb_r));
 }
@@ -4193,7 +4263,7 @@ void ddenlovr_state::janshinp_portmap(address_map &map)
 	map(0x03, 0x03).portr("DSW3");
 	map(0x04, 0x04).portr("DSWTOP");
 	map(0x08, 0x08).w(FUNC(ddenlovr_state::janshinp_coincounter_w));
-	map(0x09, 0x09).w(FUNC(ddenlovr_state::hanamai_keyboard_w));
+	map(0x09, 0x09).w(FUNC(ddenlovr_state::keyboard_select_w));
 	map(0x0a, 0x0a).portr("SYSTEM");
 	map(0x0b, 0x0c).r(FUNC(ddenlovr_state::sryudens_keyb_r));
 	map(0x20, 0x23).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
@@ -4311,7 +4381,7 @@ void ddenlovr_state::jongoh_portmap(address_map &map)
 
 void htengoku_state::machine_start()
 {
-	ddenlovr_state::machine_start();
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 
 	m_rombank->configure_entries(0, 8, memregion("maincpu")->base(), 0x8000);
 	m_rombank->set_entry(0);
@@ -4321,26 +4391,86 @@ void htengoku_state::machine_start()
 VIDEO_START_MEMBER(htengoku_state,htengoku)
 {
 	VIDEO_START_CALL_MEMBER(ddenlovr);
-	VIDEO_START_CALL_MEMBER(hnoridur);
 
-	m_screen->register_screen_bitmap(m_htengoku_layer);
+	m_blit_dest = 0;
+	m_flipscreen = 0;
+	m_layer_half = 0;
+	m_layer_half2 = 0;
+	m_blitter_irq_mask = 0;
+
+	save_item(NAME(m_blit_dest));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_layer_half));
+	save_item(NAME(m_layer_half2));
+	save_item(NAME(m_blitter_irq_mask));
 }
 
-uint32_t htengoku_state::screen_update_htengoku(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void htengoku_state::blit_pixel_w(offs_t offset, uint8_t data)
 {
-	// render the layers, one by one, "dynax.c" style. Then convert the pixmaps to "ddenlovr.c"
-	// format and let screen_update_ddenlovr() do the final compositing (priorities + palettes)
+	if (m_flipscreen)
+		offset ^= 0xffff;
+	if (BIT(m_blit_dest, 4))
+		data |= (m_blitter->blit_pen() & 0x08) << 1;
+	offset = offset << 1 | (1 ^ m_layer_half ^ m_flipscreen);
+
 	for (int layer = 0; layer < 4; layer++)
 	{
-		m_htengoku_layer.fill(0, cliprect);
-		hanamai_copylayer(m_htengoku_layer, cliprect, layer);
+		if (!BIT(m_blit_dest, layer))
+		{
+			m_ddenlovr_pixmap[layer][offset] = data;
+			if (m_layer_half2)
+				m_ddenlovr_pixmap[layer][offset ^ 1] = data;
 
-		for (int y = 0; y < 256; y++)
-			for (int x = 0; x < 512; x++)
-				m_ddenlovr_pixmap[3 - layer][y * 512 + x] = uint8_t(m_htengoku_layer.pix(y, x));
+			// HACK: mirror pixels
+			m_ddenlovr_pixmap[layer][offset + 256 * 512] = data;
+			if (m_layer_half2)
+				m_ddenlovr_pixmap[layer][(offset + 256 * 512) ^ 1] = data;
+		}
 	}
+}
 
-	return screen_update_ddenlovr(screen, bitmap, cliprect);
+void htengoku_state::blit_dest_w(uint8_t data)
+{
+	m_blit_dest = data;
+}
+
+void htengoku_state::blit_scrollx_w(uint8_t data)
+{
+	for (int layer = 0; layer < 4; layer++)
+		if (layer != 2)
+			m_ddenlovr_scroll[layer] = data * 2;
+}
+
+void htengoku_state::blit_scrolly_w(uint8_t data)
+{
+	for (int layer = 0; layer < 4; layer++)
+		if (layer != 2)
+			m_ddenlovr_scroll[layer + 4] = data;
+}
+
+void htengoku_state::extra_scrollx_w(uint8_t data)
+{
+	m_ddenlovr_scroll[2] = data * 2;
+}
+
+void htengoku_state::extra_scrolly_w(uint8_t data)
+{
+	m_ddenlovr_scroll[2 + 4] = data;
+}
+
+void htengoku_state::flipscreen_w(int state)
+{
+	m_flipscreen = state;
+}
+
+void htengoku_state::layer_half_w(int state)
+{
+	m_layer_half = !state;
+}
+
+void htengoku_state::layer_half2_w(int state)
+{
+	m_layer_half2 = !state;
 }
 
 void htengoku_state::htengoku_select_w(uint8_t data)
@@ -4436,11 +4566,35 @@ void htengoku_state::htengoku_blit_romregion_w(uint8_t data)
 {
 	switch (data)
 	{
-		case 0x80:  dynax_blit_romregion_w(0);    return;
-		case 0x81:  dynax_blit_romregion_w(1);    return;
-		case 0x00:  dynax_blit_romregion_w(2);    return;
+		case 0x80:  m_blitter->set_rom_bank(0);    return;
+		case 0x81:  m_blitter->set_rom_bank(1);    return;
+		case 0x00:  m_blitter->set_rom_bank(2);    return;
 	}
 	logerror("%04x: unmapped romregion=%02X\n", m_maincpu->pc(), data);
+}
+
+void htengoku_state::vblank_w(int state)
+{
+	if (state)
+		m_mainirq->rst2_w(1);
+}
+
+void htengoku_state::vblank_ack_w(uint8_t data)
+{
+	m_mainirq->rst2_w(0);
+}
+
+void htengoku_state::blitter_irq_w(int state)
+{
+	if (state && m_blitter_irq_mask)
+		m_mainirq->rst4_w(1);
+}
+
+void htengoku_state::blitter_ack_w(int state)
+{
+	m_blitter_irq_mask = state;
+	if (!state)
+		m_mainirq->rst4_w(0);
 }
 
 void htengoku_state::htengoku_io_map(address_map &map)
@@ -4466,11 +4620,11 @@ void htengoku_state::htengoku_io_map(address_map &map)
 	map(0xb6, 0xb6).w(FUNC(htengoku_state::ddenlovr_layer_enable_w));
 	map(0xb8, 0xb8).r(FUNC(htengoku_state::unk_r));                  // ? must be 78 on startup
 	map(0xc2, 0xc2).w(FUNC(htengoku_state::htengoku_rombank_w));     // BANK ROM Select
-	map(0xc0, 0xc0).w(FUNC(htengoku_state::dynax_extra_scrollx_w));  // screen scroll X
-	map(0xc1, 0xc1).w(FUNC(htengoku_state::dynax_extra_scrolly_w));  // screen scroll Y
-	map(0xc3, 0xc3).w(FUNC(htengoku_state::dynax_vblank_ack_w));     // VBlank IRQ Ack
+	map(0xc0, 0xc0).w(FUNC(htengoku_state::extra_scrollx_w));        // screen scroll X
+	map(0xc1, 0xc1).w(FUNC(htengoku_state::extra_scrolly_w));        // screen scroll Y
+	map(0xc3, 0xc3).w(FUNC(htengoku_state::vblank_ack_w));           // VBlank IRQ Ack
 	map(0xc4, 0xc4).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w));  // Destination Pen
-	map(0xc5, 0xc5).w(FUNC(htengoku_state::dynax_blit_dest_w));            // Destination Layer
+	map(0xc5, 0xc5).w(FUNC(htengoku_state::blit_dest_w));            // Destination Layer
 	map(0xc6, 0xc6).w(FUNC(htengoku_state::htengoku_blit_romregion_w));    // Blitter ROM bank
 	map(0xe0, 0xe7).w(m_mainlatch, FUNC(ls259_device::write_d1));
 }
@@ -4479,6 +4633,16 @@ void htengoku_state::htengoku_io_map(address_map &map)
                            Hanafuda Hana Tengoku
 ***************************************************************************/
 
+void htengoku_state::palette_data_w(offs_t offset, uint8_t data)
+{
+	// TODO: palette banking?
+	offs_t index = (offset & 0x1e0) | (offset & 0x00f) << 1;
+	if (BIT(offset, 4))
+		m_palette->write8(index + 1, data << 2 | data >> 6); // bb0ggggg
+	else
+		m_palette->write8(index, data); // bbbrrrrr
+}
+
 void htengoku_state::htengoku_mem_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom().region("maincpu", 0);
@@ -4486,7 +4650,7 @@ void htengoku_state::htengoku_mem_map(address_map &map)
 	map(0x7000, 0x7fff).ram();
 	map(0x8000, 0xffff).view(m_highview);
 	m_highview[0](0x8000, 0xffff).bankr(m_rombank);
-	m_highview[1](0x0000, 0x01ff).w(FUNC(htengoku_state::tenkai_palette_w));
+	m_highview[1](0x8000, 0x81ff).w(FUNC(htengoku_state::palette_data_w));
 }
 
 void htengoku_state::htengoku(machine_config &config)
@@ -4502,10 +4666,10 @@ void htengoku_state::htengoku(machine_config &config)
 	RST_POS_BUFFER(config, "mainirq", 0).int_callback().set_inputline(m_maincpu, 0);
 
 	LS259(config, m_mainlatch);
-	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w));
-	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::layer_half_w));   // half of the interleaved layer to write to
-	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w));  //
-	m_mainlatch->q_out_cb<5>().set(FUNC(dynax_state::blitter_ack_w));  // Blitter IRQ Ack
+	m_mainlatch->q_out_cb<0>().set(FUNC(htengoku_state::flipscreen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(htengoku_state::layer_half_w));   // half of the interleaved layer to write to
+	m_mainlatch->q_out_cb<2>().set(FUNC(htengoku_state::layer_half2_w));  //
+	m_mainlatch->q_out_cb<5>().set(FUNC(htengoku_state::blitter_ack_w));  // Blitter IRQ Ack
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
@@ -4515,17 +4679,17 @@ void htengoku_state::htengoku(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 336-1, 0+8, 256-1-8);
-	m_screen->set_screen_update(FUNC(htengoku_state::screen_update_htengoku));
+	m_screen->set_screen_update(FUNC(htengoku_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->screen_vblank().set(FUNC(htengoku_state::sprtmtch_vblank_w));
+	m_screen->screen_vblank().set(FUNC(htengoku_state::vblank_w));
 
 	DYNAX_BLITTER_REV2(config, m_blitter, 0);
-	m_blitter->vram_out_cb().set(FUNC(dynax_state::hnoridur_blit_pixel_w));
-	m_blitter->scrollx_cb().set(FUNC(dynax_state::dynax_blit_scrollx_w));
-	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
-	m_blitter->ready_cb().set(FUNC(dynax_state::sprtmtch_blitter_irq_w));
+	m_blitter->vram_out_cb().set(FUNC(htengoku_state::blit_pixel_w));
+	m_blitter->scrollx_cb().set(FUNC(htengoku_state::blit_scrollx_w));
+	m_blitter->scrolly_cb().set(FUNC(htengoku_state::blit_scrolly_w));
+	m_blitter->ready_cb().set(FUNC(htengoku_state::blitter_irq_w));
 
-	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x1000);
+	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 0x1000);
 
 	MCFG_VIDEO_START_OVERRIDE(htengoku_state,htengoku)
 
@@ -4552,7 +4716,7 @@ void htengoku_state::htengoku(machine_config &config)
 uint8_t ddenlovr_state::daimyojn_keyb1_r()
 {
 	uint8_t hopper_bit = ((m_hopper_hack && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));
-	uint8_t val = hanamai_keyboard_r<1>() | hopper_bit;
+	uint8_t val = keyb_r<1>() | hopper_bit;
 
 //  val |= ioport("BET")->read();
 	return val;
@@ -4560,7 +4724,7 @@ uint8_t ddenlovr_state::daimyojn_keyb1_r()
 
 uint8_t ddenlovr_state::daimyojn_keyb2_r()
 {
-	uint8_t val = hanamai_keyboard_r<0>();
+	uint8_t val = keyb_r<0>();
 
 	val |= ioport("HOPPER")->read();
 	return val;
@@ -9855,7 +10019,7 @@ void ddenlovr_state::mjflove(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::rongrong_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjflove_portmap);
 	maincpu.in_pa_callback().set_ioport("DSW2");
-	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hanamai_keyboard_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::keyboard_select_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
 
@@ -10076,7 +10240,7 @@ void ddenlovr_state::seljan2(machine_config &config)
 	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000) / 2));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::seljan2_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::seljan2_portmap);
-	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::hanamai_keyboard_w));
+	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::keyboard_select_w));
 	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::sryudens_coincounter_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,seljan2)

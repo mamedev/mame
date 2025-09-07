@@ -1441,6 +1441,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/upd72120.h,VIDEOS["UPD72120"] = true
+--------------------------------------------------
+
+if (VIDEOS["UPD72120"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/upd72120.cpp",
+		MAME_DIR .. "src/devices/video/upd72120.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/v9938.h,VIDEOS["V9938"] = true
 --------------------------------------------------
 

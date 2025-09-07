@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR
+// copyright-holders:AJR,m1macrophage
 /***************************************************************************
 
     Roland MB63H114 Multiple Address Counter
@@ -44,7 +44,7 @@ mb63h114_device::mb63h114_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, MB63H114, tag, owner, clock)
 	, m_counter_func(*this)
 	, m_timer(nullptr)
-	, m_xst(0)
+	, m_xst(0xff)
 	, m_xck(0)
 	, m_active_counter(0)
 	, m_d(0)
@@ -92,7 +92,7 @@ void mb63h114_device::device_start()
 
 void mb63h114_device::device_reset()
 {
-	m_xst = 0;
+	m_xst = 0xff;
 	m_xck = 0;
 	m_active_counter = 0;
 	m_d = 0;
