@@ -403,7 +403,7 @@ esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, d
  */ 
 
 esq2x40_vfx_device::esq2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esqvfd_device(mconfig, ESQ2X40, tag, owner, clock, make_dimensions<2, 40>(*this))
+	esqvfd_device(mconfig, ESQ2X40_VFX, tag, owner, clock, make_dimensions<2, 40>(*this))
 {
 }
 
