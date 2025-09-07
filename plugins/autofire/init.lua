@@ -2,7 +2,7 @@
 -- copyright-holders:Jack Li
 local exports = {
 	name = 'autofire',
-	version = '0.0.4',
+	version = '0.0.5',
 	description = 'Autofire plugin',
 	license = 'BSD-3-Clause',
 	author = { name = 'Jack Li' } }
@@ -23,6 +23,10 @@ function autofire.startplugin()
 	--   'off_frames' - number of frames button is released
 	--   'button' - reference to ioport_field
 	--   'counter' - position in autofire cycle
+	--   'enabled' - autofire enabled/disabled
+	--   'toggle_key' - input_seq of the toggle keybinding
+	--   'toggle_key_cfg' - configuration string for the toggle keybinding
+	--   'toggle_key_pressed' - whether the toggle key is currently being pressed
 	local buttons = {}
 
 	local input_manager
@@ -31,10 +35,21 @@ function autofire.startplugin()
 	local function process_frame()
 		local function process_button(button)
 			local pressed = input_manager:seq_pressed(button.key)
+			local new_toggle_pressed = button.toggle_key and input_manager:seq_pressed(button.toggle_key)
+			local toggled = new_toggle_pressed and not button.toggle_key_pressed and not manager.ui.menu_active
+			button.toggle_key_pressed = new_toggle_pressed
+			if toggled then
+				button.enabled = not button.enabled
+				button.counter = 0
+			end
 			if pressed then
-				local state = button.counter < button.on_frames and 1 or 0
-				button.counter = (button.counter + 1) % (button.on_frames + button.off_frames)
-				return state
+				if button.enabled then
+					local state = button.counter < button.on_frames and 1 or 0
+					button.counter = (button.counter + 1) % (button.on_frames + button.off_frames)
+					return state
+				else -- Behave like a normal button when autofire is disabled
+					return 1
+				end
 			else
 				button.counter = 0
 				return 0

@@ -62,6 +62,16 @@ may need higher numbers than 1 for the system to recognise the button being
 released and pressed again (e.g. 2 on frames and 2 off frames works for Alcon).
 Experiment with different values to get the best effect.
 
+Select **Toggle hotkey** to set a control to enable/disable autofire on the
+button.  This is optional, and may be skipped if not needed.  Press the UI Clear
+key or select the **Unset toggle hotkey** menu item (which appears when the
+toggle hotkey is set) to remove the hotkey.  When the toggle hotkey is set,
+pressing it turns off autofire on the button, making it behave like a
+non-autofire button (holding the hotkey keeps the button pressed).  Pressing the
+toggle hotkey again turns autofire back on.  This is useful if you want to
+switch between autofire and non-autofire behavior without having separate
+buttons for the two.
+
 When adding a new autofire button, there is a **Cancel** option that changes to
 **Create** after you set the input and hotkey.  Select **Create** to finish
 creating the autofire button and return to the list of autofire buttons.  The
@@ -112,4 +122,5 @@ levels will only produce a single beam, greatly reducing the weapon’s
 effectiveness.  The fire button must be held down to produce all beams.  Some
 shooting games (e.g. Raiden Fighters) require the primary fire button to be held
 down for a charged special attack.  This means it’s often necessary to have a
-non-autofire input for the primary fire button assigned to play effectively.
+non-autofire input for the primary fire button assigned to play effectively, or
+a toggle hotkey assigned to switch between autofire and non-autofire.

@@ -33,6 +33,9 @@ local configure_selection_save
 -- Helper for polling for hotkeys
 local hotkey_poller
 
+-- Helper for polling for toggle hotkeys
+local toggle_hotkey_poller
+
 -- Button being created/edited
 local current_button = {}
 
@@ -57,7 +60,8 @@ local function create_new_button()
 	return {
 		on_frames = 1,
 		off_frames = 1,
-		counter = 0
+		counter = 0,
+		enabled = true
 	}
 end
 
@@ -153,6 +157,7 @@ local function populate_configure_menu(menu)
 		button_name = _p('plugin-autofire', '[not set]')
 	end
 	local key_name = current_button.key and manager.machine.input:seq_name(current_button.key) or _p('plugin-autofire', '[not set]')
+	local toggle_key_name = current_button.toggle_key and manager.machine.input:seq_name(current_button.toggle_key) or _p('plugin-autofire', '[not set]')
 	table.insert(menu, {_p('plugin-autofire', 'Input'), button_name, ''})
 	if not (configure_menu_active or configure_selection_save) then
 		configure_selection_save = #menu
@@ -160,6 +165,10 @@ local function populate_configure_menu(menu)
 	table.insert(menu, {_p('plugin-autofire', 'Hotkey'), key_name, hotkey_poller and 'lr' or ''})
 	table.insert(menu, {_p('plugin-autofire', 'On frames'), tostring(current_button.on_frames), current_button.on_frames > 1 and 'lr' or 'r'})
 	table.insert(menu, {_p('plugin-autofire', 'Off frames'), tostring(current_button.off_frames), current_button.off_frames > 1 and 'lr' or 'r'})
+	table.insert(menu, {_p('plugin-autofire', 'Toggle hotkey'), toggle_key_name, toggle_hotkey_poller and 'lr' or ''})
+	if current_button.toggle_key then
+		table.insert(menu, {_p('plugin-autofire', 'Unset toggle hotkey'), '', ''})
+	end
 	configure_menu_active = true
 end
 
@@ -172,6 +181,19 @@ local function handle_configure_menu(index, event)
 				current_button.key_cfg = manager.machine.input:seq_to_tokens(hotkey_poller.sequence)
 			end
 			hotkey_poller = nil
+			return true
+		end
+		return false
+	end
+
+	if toggle_hotkey_poller then
+		-- special handling for polling for toggle hotkey
+		if toggle_hotkey_poller:poll() then
+			if toggle_hotkey_poller.sequence then
+				current_button.toggle_key = toggle_hotkey_poller.sequence
+				current_button.toggle_key_cfg = manager.machine.input:seq_to_tokens(toggle_hotkey_poller.sequence)
+			end
+			toggle_hotkey_poller = nil
 			return true
 		end
 		return false
@@ -222,6 +244,27 @@ local function handle_configure_menu(index, event)
 			current_button.off_frames = 1
 			return true
 		end
+	elseif index == 5 then
+		-- Toggle hotkey
+		manager.machine:popmessage(_p('plugin-autofire', 'Hotkey to enable/disable autofire for this button'))
+		if event == 'select' then
+			if not commonui then
+				commonui = require('commonui')
+			end
+			toggle_hotkey_poller = commonui.switch_polling_helper()
+			return true
+		elseif event == 'clear' then
+			current_button.toggle_key = nil
+			current_button.toggle_key_cfg = nil
+			return true
+		end
+	elseif index == 6 then
+		-- Unset toggle hotkey
+		if event == 'select' then
+			current_button.toggle_key = nil
+			current_button.toggle_key_cfg = nil
+			return true
+		end
 	end
 	return false
 end
@@ -245,6 +288,8 @@ local function populate_edit_menu()
 	configure_selection_save = nil
 	if hotkey_poller then
 		return hotkey_poller:overlay(menu, selection, 'lrrepeat')
+	elseif toggle_hotkey_poller then
+		return toggle_hotkey_poller:overlay(menu, selection, 'lrrepeat')
 	else
 		return menu, selection, 'lrrepeat'
 	end
@@ -292,6 +337,8 @@ local function populate_add_menu()
 	configure_selection_save = nil
 	if hotkey_poller then
 		return hotkey_poller:overlay(menu, selection, 'lrrepeat')
+	elseif toggle_hotkey_poller then
+		return toggle_hotkey_poller:overlay(menu, selection, 'lrrepeat')
 	else
 		return menu, selection, 'lrrepeat'
 	end
