@@ -134,7 +134,7 @@ license:CC0-1.0
 		</element>
 		<element id="knob_~slider_id~" ref="slider_knob">
 			<animate inputtag="~port_name~" inputmask="0x7f"/>
-			<bounds state="100" x="2" y="7" width="25" height="20"/>
+			<bounds state="255" x="2" y="7" width="25" height="20"/>
 			<bounds state="0" x="2" y="100" width="25" height="20"/>
 		</element>
 	</group>
@@ -852,7 +852,7 @@ s
 
 			-- A slider is selected. Update state and, indirectly, slider knob position,
 			-- based on the pointer's Y position. It is assumed the attached IO field is
-			-- an IPT_ADJUSTER with a range of 0-100 (the default).
+			-- an IPT_ADJUSTER with a range of 0-255.
 
 			local pointer = pointers[id]
 			local slider = sliders[pointer.selected_slider]
@@ -865,16 +865,16 @@ s
 			if pointer.relative then
 				-- User clicked on the knob. The new value will depend on how much the
 				-- knob was dragged.
-				new_value = pointer.start_value - 100 * (y - pointer.start_y) / (max_y - min_y)
+				new_value = pointer.start_value - 255 * (y - pointer.start_y) / (max_y - min_y)
 			else
 				-- User clicked elsewhere on the slider. The new value will depend on
 				-- the absolute position of the click.
-				new_value = 100 - 100 * (y - min_y) / (max_y - min_y)
+				new_value = 255 - 255 * (y - min_y) / (max_y - min_y)
 			end
 
 			new_value = math.floor(new_value + 0.5)
 			if new_value < 0 then new_value = 0 end
-			if new_value > 100 then new_value = 100 end
+			if new_value > 255 then new_value = 255 end
 			slider.field.user_value = new_value
 		end
 

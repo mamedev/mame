@@ -279,98 +279,98 @@ void pg1000_state::pg1000(machine_config &config)
 	m_maincpu->an0_func().set([this] { /* IC11 */
 		switch(m_an_select)
 		{
-			case 7: return m_bottom_slider[1]->read() * 255 / 100; /* TVA: VELO */
-			case 6: return m_bottom_slider[0]->read() * 255 / 100; /* TVA: LEVEL */
-			case 5: return m_bottom_slider[2]->read() * 255 / 100; /* TVA: BIAS DIREC */
-			case 4: return m_middle_slider[0]->read() * 255 / 100; /* TVF: CUTOFF FREQ */
-			case 3: return m_middle_slider[4]->read() * 255 / 100; /* TVF: BIAS POINT */
-			case 2: return m_middle_slider[1]->read() * 255 / 100; /* TVF: RESO */
-			case 1: return m_middle_slider[2]->read() * 255 / 100; /* TVF: KF */
-			case 0: return m_middle_slider[3]->read() * 255 / 100; /* TVF: BIAS DIREC */
+			case 7: return m_bottom_slider[1]->read(); /* TVA: VELO */
+			case 6: return m_bottom_slider[0]->read(); /* TVA: LEVEL */
+			case 5: return m_bottom_slider[2]->read(); /* TVA: BIAS DIREC */
+			case 4: return m_middle_slider[0]->read(); /* TVF: CUTOFF FREQ */
+			case 3: return m_middle_slider[4]->read(); /* TVF: BIAS POINT */
+			case 2: return m_middle_slider[1]->read(); /* TVF: RESO */
+			case 1: return m_middle_slider[2]->read(); /* TVF: KF */
+			case 0: return m_middle_slider[3]->read(); /* TVF: BIAS DIREC */
 		}
 		return (unsigned int) 0xff; // std::unreachable();
 	});
 	m_maincpu->an1_func().set([this] { /* IC14 */
 		switch(m_an_select)
 		{
-			case 7: return m_bottom_slider[13]->read() * 255 / 100; /* TVF ENV: DKF */
-			case 6: return m_bottom_slider[12]->read() * 255 / 100; /* TVF ENV: END L */
-			case 5: return m_bottom_slider[14]->read() * 255 / 100; /* TVA ENV: L1 */
-			case 4: return m_bottom_slider[11]->read() * 255 / 100; /* TVF ENV: SUS L */
-			case 3: return m_middle_slider[17]->read() * 255 / 100; /* TVA ENV: T1 */
-			case 2: return m_middle_slider[14]->read() * 255 / 100; /* TVF ENV: T4 */
-			case 1: return m_middle_slider[15]->read() * 255 / 100; /* TVF ENV: T5 */
-			case 0: return m_middle_slider[16]->read() * 255 / 100; /* TVF ENV: TKF */
+			case 7: return m_bottom_slider[13]->read(); /* TVF ENV: DKF */
+			case 6: return m_bottom_slider[12]->read(); /* TVF ENV: END L */
+			case 5: return m_bottom_slider[14]->read(); /* TVA ENV: L1 */
+			case 4: return m_bottom_slider[11]->read(); /* TVF ENV: SUS L */
+			case 3: return m_middle_slider[17]->read(); /* TVA ENV: T1 */
+			case 2: return m_middle_slider[14]->read(); /* TVF ENV: T4 */
+			case 1: return m_middle_slider[15]->read(); /* TVF ENV: T5 */
+			case 0: return m_middle_slider[16]->read(); /* TVF ENV: TKF */
 		}
 		return (unsigned int) 0xff; // std::unreachable();
 	});
 	m_maincpu->an2_func().set([this] { /* IC8 */
 		switch(m_an_select)
 		{
-			case 7: return m_top_slider[12]->read() * 255 / 100; /* WG WAVEFORM: PCM */
-			case 6: return m_middle_slider[22]->read() * 255 / 100; /* TVA ENV: TKF */
-			case 5: return m_top_slider[11]->read() * 255 / 100; /* WG WAVEFORM: PWM DEPTH */
-			case 4: return m_middle_slider[21]->read() * 255 / 100; /* TVA ENV: T5 */
-			case 3: return m_top_slider[10]->read() * 255 / 100; /* WG WAVEFORM: PWM LFO SEL */
-			case 2: return m_top_slider[7]->read() * 255 / 100; /* WG WAVEFORM: PW */
-			case 1: return m_top_slider[8]->read() * 255 / 100; /* WG WAVEFORM: PW VELO */
-			case 0: return m_top_slider[9]->read() * 255 / 100; /* WG WAVEFORM: PW AFTER */
+			case 7: return m_top_slider[12]->read(); /* WG WAVEFORM: PCM */
+			case 6: return m_middle_slider[22]->read(); /* TVA ENV: TKF */
+			case 5: return m_top_slider[11]->read(); /* WG WAVEFORM: PWM DEPTH */
+			case 4: return m_middle_slider[21]->read(); /* TVA ENV: T5 */
+			case 3: return m_top_slider[10]->read(); /* WG WAVEFORM: PWM LFO SEL */
+			case 2: return m_top_slider[7]->read(); /* WG WAVEFORM: PW */
+			case 1: return m_top_slider[8]->read(); /* WG WAVEFORM: PW VELO */
+			case 0: return m_top_slider[9]->read(); /* WG WAVEFORM: PW AFTER */
 		}
 		return (unsigned int) 0xff; // std::unreachable();
 	});
 	m_maincpu->an3_func().set([this] { /* IC13 */
 		switch(m_an_select)
 		{
-			case 7: return m_bottom_slider[9]->read() * 255 / 100; /* TVF ENV: L2 */
-			case 6: return m_bottom_slider[8]->read() * 255 / 100; /* TVF ENV: L1 */
-			case 5: return m_bottom_slider[10]->read() * 255 / 100; /* TVF ENV: L3 */
-			case 4: return m_bottom_slider[7]->read() * 255 / 100; /* TVA: AFTER RANGE */
-			case 3: return m_middle_slider[13]->read() * 255 / 100; /* TVF ENV: T3 */
-			case 2: return m_middle_slider[9]->read() * 255 / 100; /* TVF: LFO DEPTH */
-			case 1: return m_middle_slider[10]->read() * 255 / 100; /* TVF: AFTER RANGE */
-			case 0: return m_middle_slider[11]->read() * 255 / 100; /* TVF ENV: T1 */
+			case 7: return m_bottom_slider[9]->read(); /* TVF ENV: L2 */
+			case 6: return m_bottom_slider[8]->read(); /* TVF ENV: L1 */
+			case 5: return m_bottom_slider[10]->read(); /* TVF ENV: L3 */
+			case 4: return m_bottom_slider[7]->read(); /* TVA: AFTER RANGE */
+			case 3: return m_middle_slider[13]->read(); /* TVF ENV: T3 */
+			case 2: return m_middle_slider[9]->read(); /* TVF: LFO DEPTH */
+			case 1: return m_middle_slider[10]->read(); /* TVF: AFTER RANGE */
+			case 0: return m_middle_slider[11]->read(); /* TVF ENV: T1 */
 		}
 		return (unsigned int) 0xff; // std::unreachable();
 	});
 	m_maincpu->an4_func().set([this] { /* IC9 */
 		switch(m_an_select)
 		{
-			case 7: return m_top_slider[0]->read() * 255 / 100; /* WG PITCH: COARSE */
-			case 6: return m_top_slider[1]->read() * 255 / 100; /* WG PITCH: FINE */
-			case 5: return m_middle_slider[12]->read() * 255 / 100; /* TVF ENV: T2 */
-			case 4: return m_top_slider[2]->read() * 255 / 100; /* WG PITCH: KF */
-			case 3: return m_top_slider[6]->read() * 255 / 100; /* WG WAVEFORM: WF */
-			case 2: return m_top_slider[3]->read() * 255 / 100; /* WG PITCH: LFO MODE */
-			case 1: return m_top_slider[4]->read() * 255 / 100; /* WG PITCH: ENV MODE */
-			case 0: return m_top_slider[5]->read() * 255 / 100; /* WG PITCH: BEND MODE */
+			case 7: return m_top_slider[0]->read(); /* WG PITCH: COARSE */
+			case 6: return m_top_slider[1]->read(); /* WG PITCH: FINE */
+			case 5: return m_middle_slider[12]->read(); /* TVF ENV: T2 */
+			case 4: return m_top_slider[2]->read(); /* WG PITCH: KF */
+			case 3: return m_top_slider[6]->read(); /* WG WAVEFORM: WF */
+			case 2: return m_top_slider[3]->read(); /* WG PITCH: LFO MODE */
+			case 1: return m_top_slider[4]->read(); /* WG PITCH: ENV MODE */
+			case 0: return m_top_slider[5]->read(); /* WG PITCH: BEND MODE */
 		}
 		return (unsigned int) 0xff; // std::unreachable();
 	});
 	m_maincpu->an5_func().set([this] { /* IC12 */
 		switch(m_an_select)
 		{
-			case 7: return m_bottom_slider[5]->read() * 255 / 100; /* TVA: LFO SELECT */
-			case 6: return m_bottom_slider[4]->read() * 255 / 100; /* TVA: BIAS LEVEL */
-			case 5: return m_bottom_slider[6]->read() * 255 / 100; /* TVA: LFO DEPTH */
-			case 4: return m_bottom_slider[3]->read() * 255 / 100; /* TVA: BIAS POINT */
-			case 3: return m_middle_slider[8]->read() * 255 / 100; /* TVF: LFO SELECT */
-			case 2: return m_middle_slider[5]->read() * 255 / 100; /* TVF: BIAS LEVEL */
-			case 1: return m_middle_slider[6]->read() * 255 / 100; /* TVF: ENV DEPTH */
-			case 0: return m_middle_slider[7]->read() * 255 / 100; /* TVF: ENV VELO */
+			case 7: return m_bottom_slider[5]->read(); /* TVA: LFO SELECT */
+			case 6: return m_bottom_slider[4]->read(); /* TVA: BIAS LEVEL */
+			case 5: return m_bottom_slider[6]->read(); /* TVA: LFO DEPTH */
+			case 4: return m_bottom_slider[3]->read(); /* TVA: BIAS POINT */
+			case 3: return m_middle_slider[8]->read(); /* TVF: LFO SELECT */
+			case 2: return m_middle_slider[5]->read(); /* TVF: BIAS LEVEL */
+			case 1: return m_middle_slider[6]->read(); /* TVF: ENV DEPTH */
+			case 0: return m_middle_slider[7]->read(); /* TVF: ENV VELO */
 		}
 		return (unsigned int) 0xff; // std::unreachable();
 	});
 	m_maincpu->an6_func().set([this] { /* IC15 */
 		switch(m_an_select)
 		{
-			case 7: return m_bottom_slider[17]->read() * 255 / 100; /* TVA ENV: SUS L */
-			case 6: return m_bottom_slider[16]->read() * 255 / 100; /* TVA ENV: L3 */
-			case 5: return m_bottom_slider[18]->read() * 255 / 100; /* TVA ENV: END L */
-			case 4: return m_bottom_slider[15]->read() * 255 / 100; /* TVA ENV: L2 */
-			case 3: return m_bottom_slider[19]->read() * 255 / 100; /* TVA ENV: T1 VELO */
-			case 2: return m_middle_slider[18]->read() * 255 / 100; /* TVA ENV: T2 */
-			case 1: return m_middle_slider[19]->read() * 255 / 100; /* TVA ENV: T3 */
-			case 0: return m_middle_slider[20]->read() * 255 / 100; /* TVA ENV: T4 */
+			case 7: return m_bottom_slider[17]->read(); /* TVA ENV: SUS L */
+			case 6: return m_bottom_slider[16]->read(); /* TVA ENV: L3 */
+			case 5: return m_bottom_slider[18]->read(); /* TVA ENV: END L */
+			case 4: return m_bottom_slider[15]->read(); /* TVA ENV: L2 */
+			case 3: return m_bottom_slider[19]->read(); /* TVA ENV: T1 VELO */
+			case 2: return m_middle_slider[18]->read(); /* TVA ENV: T2 */
+			case 1: return m_middle_slider[19]->read(); /* TVA ENV: T3 */
+			case 0: return m_middle_slider[20]->read(); /* TVA ENV: T4 */
 		}
 		return (unsigned int) 0xff; // std::unreachable();
 	});
