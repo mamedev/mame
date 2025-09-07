@@ -266,13 +266,13 @@ void pg1000_state::pg1000(machine_config &config)
 	m_maincpu->pc_in_cb().set([this] {
 		return (
 			(m_mdin_bit && m_midi_in_enable) ||
-			(m_paramreq_bit && m_param_req_enable)) ? 2 : 0;
+			(m_paramreq_bit && m_param_in_enable)) ? 2 : 0;
 	});
 	m_maincpu->pc_out_cb().set([this](u8 data)
 	{
 		m_mdout->write_txd(BIT(data, 0));
 		m_midi_in_enable = BIT(data, 2);
-		m_param_req_enable = BIT(data, 3);
+		m_param_in_enable = BIT(data, 3);
 		m_lcdc->rs_w(BIT(data, 4));
 		m_an_select = (data >> 5) & 7;
 	});

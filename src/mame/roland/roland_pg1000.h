@@ -29,7 +29,7 @@ public:
 		, m_mdin_bit(false)
 		, m_paramreq_bit(false)
 		, m_midi_in_enable(false)
-		, m_param_req_enable(false)
+		, m_param_in_enable(false)
 	{
 	}
 
@@ -58,7 +58,7 @@ private:
 	bool m_mdin_bit;
 	bool m_paramreq_bit;
 	bool m_midi_in_enable;
-	bool m_param_req_enable;
+	bool m_param_in_enable;
 };
 
 #endif // MAME_ROLAND_ROLAND_PG1000_H
