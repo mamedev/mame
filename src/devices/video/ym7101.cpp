@@ -236,7 +236,7 @@ u16 ym7101_device::data_port_r(offs_t offset, u16 mem_mask)
 
 	u16 res = 0;
 
-	switch (m_command.code >> 1)
+	switch ((m_command.code & 0xe) >> 1)
 	{
 		case 0:
 			res = space(AS_VDP_VRAM).read_word(m_command.address, mem_mask);
@@ -252,7 +252,7 @@ u16 ym7101_device::data_port_r(offs_t offset, u16 mem_mask)
 			LOG("data_port_r: undocumented vram 8-bit & %04x\n", mem_mask);
 			break;
 		default:
-			LOG("data_port_r: illegal code %d & %04x\n", m_command.code >> 1, mem_mask);
+			LOG("data_port_r: illegal code %02x & %04x\n", m_command.code >> 1, mem_mask);
 			break;
 	}
 
@@ -290,7 +290,9 @@ void ym7101_device::data_port_w(offs_t offset, u16 data, u16 mem_mask)
 		return;
 	}
 
-	switch (m_command.code >> 1)
+	// ignore DMA code here
+	// - joemac cares during stage 1 (T-Rex bg composition)
+	switch ((m_command.code & 0xe) >> 1)
 	{
 		case 0:
 			space(AS_VDP_VRAM).write_word(m_command.address, data, mem_mask);
@@ -302,7 +304,7 @@ void ym7101_device::data_port_w(offs_t offset, u16 data, u16 mem_mask)
 			space(AS_VDP_VSRAM).write_word(m_command.address, data, mem_mask);
 			break;
 		default:
-			LOG("data_port_w: illegal code %d data %04x & %04x\n", m_command.code >> 1, data, mem_mask);
+			LOG("data_port_w: illegal code %02x data %04x & %04x\n", m_command.code >> 1, data, mem_mask);
 			break;
 	}
 
@@ -311,7 +313,7 @@ void ym7101_device::data_port_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 // https://gendev.spritesmind.net/forum/viewtopic.php?t=768
-u16 ym7101_device::hv_counter_r(offs_t offset, u16 mem_mask)
+u16 ym7101_device::get_hv_counter()
 {
 	const u8 h40_mode = BIT(m_hres_mode, 0);
 
@@ -328,6 +330,13 @@ u16 ym7101_device::hv_counter_r(offs_t offset, u16 mem_mask)
 	u8 hcount = (hpos > hphase1 ? hpos - hphase1 + hphase2 : hpos) >> 1;
 
 	return (vcount << 8) | hcount;
+}
+
+u16 ym7101_device::hv_counter_r(offs_t offset, u16 mem_mask)
+{
+	if (m_m3)
+		return m_hvcounter_latch;
+	return get_hv_counter();
 }
 
 void ym7101_device::if16_map(address_map &map)
@@ -403,6 +412,13 @@ void ym7101_device::regs_map(address_map &map)
 	map(0, 0).lw8(NAME([this] (u8 data) {
 		LOGREGS("#00: Mode Register 1 %02x\n", data);
 		m_ie1 = !!BIT(data, 4);
+		// ssriders/ssridersu depends on this, otherwise used for ext. interrupts (IE2)
+		if (m_m3 != BIT(data, 1))
+		{
+			m_m3 = !!BIT(data, 1);
+			if (m_m3)
+				m_hvcounter_latch = get_hv_counter();
+		}
 		if (m_hint_pending && m_ie1)
 		{
 			m_hint_on_timer->adjust(attotime::from_ticks(16, clock()));
@@ -410,11 +426,11 @@ void ym7101_device::regs_map(address_map &map)
 		else
 			m_hint_callback(0);
 
-		LOGREGS("\tL: %d IE1: %d M4: %d M3: %d DE: %d\n"
+		LOGREGS("\tL: %d IE1: %d M4: %d M3: %d DE?: %d\n"
 			, BIT(data, 5)
 			, m_ie1
 			, BIT(data, 2)
-			, BIT(data, 1)
+			, m_m3
 			, BIT(data, 0)
 		);
 	}));
@@ -916,10 +932,12 @@ TIMER_CALLBACK_MEMBER(ym7101_device::scan_timer_callback)
 		m_vint_pending = 1;
 	}
 
-	// TODO: correct?
-	if (scanline == 240)
+	// sound interrupt
+	// batmanj/scrack/worldillj/krustyfh all expect Z80 to be somewhat synchronized with 68k vint,
+	// 240 is too late
+	if (scanline == 224)
 		m_sint_callback(1);
-	if (scanline == 241)
+	if (scanline == 225)
 		m_sint_callback(0);
 
 	const bool active_scan = render_line(scanline);
