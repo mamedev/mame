@@ -17,7 +17,6 @@
 DEFINE_DEVICE_TYPE(BBC_EXP_SLOT, bbc_exp_slot_device, "bbc_exp_slot", "BBC Master Compact Expansion port")
 
 
-
 //**************************************************************************
 //  DEVICE BBC_EXP PORT INTERFACE
 //**************************************************************************
@@ -41,14 +40,15 @@ device_bbc_exp_interface::device_bbc_exp_interface(const machine_config &mconfig
 //  bbc_exp_slot_device - constructor
 //-------------------------------------------------
 
-bbc_exp_slot_device::bbc_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, BBC_EXP_SLOT, tag, owner, clock),
-	device_single_card_slot_interface<device_bbc_exp_interface>(mconfig, *this),
-	m_card(nullptr),
-	m_irq_handler(*this),
-	m_nmi_handler(*this),
-	m_cb1_handler(*this),
-	m_cb2_handler(*this)
+bbc_exp_slot_device::bbc_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, BBC_EXP_SLOT, tag, owner, clock)
+	, device_single_card_slot_interface<device_bbc_exp_interface>(mconfig, *this)
+	, m_card(nullptr)
+	, m_irq_handler(*this)
+	, m_nmi_handler(*this)
+	, m_lpstb_handler(*this)
+	, m_cb1_handler(*this)
+	, m_cb2_handler(*this)
 {
 }
 
@@ -97,12 +97,6 @@ void bbc_exp_slot_device::jim_w(offs_t offset, uint8_t data)
 {
 	if (m_card)
 		m_card->jim_w(offset, data);
-}
-
-void bbc_exp_slot_device::sheila_w(offs_t offset, uint8_t data)
-{
-	if (m_card)
-		m_card->sheila_w(offset, data);
 }
 
 //-------------------------------------------------

@@ -9,20 +9,67 @@
     TODO:
     - Fix userport, by somehow passing lines into joyport
     - Not sure whether any 1MHz bus devices should work on the 2MHz bus
-    - No idea how the 6821 is connected/used
+    - Map 6821 to ROM region offset 0x6000
 
 **********************************************************************/
-
 
 #include "emu.h"
 #include "mertec.h"
 
+#include "bus/bbc/1mhzbus/1mhzbus.h"
+#include "bus/bbc/analogue/analogue.h"
+#include "bus/bbc/userport/userport.h"
+#include "machine/6821pia.h"
+#include "machine/upd7002.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBC_MERTEC, bbc_mertec_device, "bbc_mertec", "Mertec Compact Companion");
+namespace {
+
+class bbc_mertec_device : public device_t, public device_bbc_exp_interface
+{
+public:
+	bbc_mertec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBC_MERTEC, tag, owner, clock)
+		, device_bbc_exp_interface(mconfig, *this)
+		, m_pia(*this, "pia")
+		, m_upd7002(*this, "upd7002")
+		, m_analog(*this, "analogue")
+		, m_userport(*this, "userport")
+		, m_2mhzbus(*this, "2mhzbus")
+		, m_ext_rom(*this, "ext_rom")
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD { }
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual uint8_t fred_r(offs_t offset) override;
+	virtual void fred_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t jim_r(offs_t offset) override;
+	virtual void jim_w(offs_t offset, uint8_t data) override;
+
+	virtual uint8_t pb_r() override;
+	virtual void pb_w(uint8_t data) override;
+
+private:
+	uint8_t m_adc_ctrl = 0;
+	uint8_t m_adc_data = 0;
+
+	uint8_t adc_ctrl_r();
+	void adc_ctrl_w(uint8_t data);
+
+	required_device<pia6821_device> m_pia;
+	required_device<upd7002_device> m_upd7002;
+	required_device<bbc_analogue_slot_device> m_analog;
+	required_device<bbc_userport_slot_device> m_userport;
+	required_device<bbc_1mhzbus_slot_device> m_2mhzbus;
+	required_memory_region m_ext_rom;
+};
 
 
 //-------------------------------------------------
@@ -47,24 +94,26 @@ const tiny_rom_entry *bbc_mertec_device::device_rom_region() const
 void bbc_mertec_device::device_add_mconfig(machine_config &config)
 {
 	PIA6821(config, m_pia, DERIVED_CLOCK(1, 8));
-	//m_pia->readpb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_r));
-	//m_pia->writepb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_w));
-	//m_pia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
+	m_pia->readpa_handler().set(FUNC(bbc_mertec_device::adc_ctrl_r));
+	m_pia->writepa_handler().set(FUNC(bbc_mertec_device::adc_ctrl_w));
+	m_pia->readpb_handler().set([this]() { return m_adc_data; });
+	m_pia->writepb_handler().set([this](uint8_t data) { m_adc_data = data; });
+	m_pia->irqb_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_exp_slot_device::irq_w));
 
-	/* adc */
 	UPD7002(config, m_upd7002, DERIVED_CLOCK(1, 8));
-	m_upd7002->set_get_analogue_callback(FUNC(bbc_mertec_device::get_analogue_input));
-	m_upd7002->set_eoc_callback(FUNC(bbc_mertec_device::upd7002_eoc));
+	m_upd7002->get_analogue_callback().set(m_analog, FUNC(bbc_analogue_slot_device::ch_r));
+	m_upd7002->eoc_callback().set(m_pia, FUNC(pia6821_device::cb1_w));
 
-	/* analogue port */
+	// analogue port
 	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
+	//m_analog->lpstb_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_exp_slot_device::lpstb_w));
 
-	/* user port */
+	// user port
 	BBC_USERPORT_SLOT(config, m_userport, bbc_userport_devices, nullptr);
-	//m_userport->cb1_handler().set(m_pia, FUNC(via6522_device::write_cb1));
-	//m_userport->cb2_handler().set(m_pia, FUNC(via6522_device::write_cb2));
+	m_userport->cb1_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_exp_slot_device::cb1_w));
+	m_userport->cb2_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_exp_slot_device::cb2_w));
 
-	/* 2mhz bus port */
+	// 2mhz bus port
 	BBC_1MHZBUS_SLOT(config, m_2mhzbus, DERIVED_CLOCK(1, 4), bbc_1mhzbus_devices, nullptr);
 	m_2mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_exp_slot_device::irq_w));
 	m_2mhzbus->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_exp_slot_device::nmi_w));
@@ -72,46 +121,28 @@ void bbc_mertec_device::device_add_mconfig(machine_config &config)
 
 
 //**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_mertec_device - constructor
-//-------------------------------------------------
-
-bbc_mertec_device::bbc_mertec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_MERTEC, tag, owner, clock)
-	, device_bbc_exp_interface(mconfig, *this)
-	, m_pia(*this, "pia")
-	, m_upd7002(*this, "upd7002")
-	, m_analog(*this, "analogue")
-	, m_userport(*this, "userport")
-	, m_2mhzbus(*this, "2mhzbus")
-	, m_ext_rom(*this, "ext_rom")
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void bbc_mertec_device::device_start()
-{
-}
-
-
-//**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
 
-int bbc_mertec_device::get_analogue_input(int channel_number)
+uint8_t bbc_mertec_device::adc_ctrl_r()
 {
-	return m_analog->ch_r(channel_number) << 8;
+	return (m_adc_ctrl & 0x1f) | (m_analog->pb_r() << 1);
 }
 
-void bbc_mertec_device::upd7002_eoc(int data)
+void bbc_mertec_device::adc_ctrl_w(uint8_t data)
 {
-	//m_via6522_0->write_cb1(data);
+	m_adc_ctrl = data & 0x1f;
+
+	if (!BIT(data, 4)) // CS
+	{
+		switch (data & 0x0c)
+		{
+		case 0x04: m_upd7002->write(data & 3, m_adc_data); break;
+		case 0x08: m_adc_data = m_upd7002->read(data & 3); break;
+		}
+	}
+
+	m_analog->pb_w(data >> 1);
 }
 
 uint8_t bbc_mertec_device::fred_r(offs_t offset)
@@ -134,26 +165,6 @@ void bbc_mertec_device::jim_w(offs_t offset, uint8_t data)
 	m_2mhzbus->jim_w(offset, data);
 }
 
-uint8_t bbc_mertec_device::sheila_r(offs_t offset)
-{
-	uint8_t data = 0xfe;
-
-	if (offset >= 0x18 && offset < 0x20)
-	{
-		data = m_upd7002->read(offset & 0x03);
-	}
-
-	return data;
-}
-
-void bbc_mertec_device::sheila_w(offs_t offset, uint8_t data)
-{
-	if (offset >= 0x18 && offset < 0x20)
-	{
-		m_upd7002->write(offset & 0x03, data);
-	}
-}
-
 uint8_t bbc_mertec_device::pb_r()
 {
 	return m_userport->pb_r();
@@ -163,3 +174,8 @@ void bbc_mertec_device::pb_w(uint8_t data)
 {
 	m_userport->pb_w(data);
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_MERTEC, device_bbc_exp_interface, bbc_mertec_device, "bbc_mertec", "Mertec Compact Companion");
