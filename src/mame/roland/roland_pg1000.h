@@ -27,7 +27,7 @@ public:
 		, m_scan(0)
 		, m_an_select(0)
 		, m_mdin_bit(false)
-		, m_paramreq_bit(false)
+		, m_paramin_bit(false)
 		, m_midi_in_enable(false)
 		, m_param_in_enable(false)
 	{
@@ -56,7 +56,7 @@ private:
 	u8 m_scan;
 	u8 m_an_select;
 	bool m_mdin_bit;
-	bool m_paramreq_bit;
+	bool m_paramin_bit;
 	bool m_midi_in_enable;
 	bool m_param_in_enable;
 };

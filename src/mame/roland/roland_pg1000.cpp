@@ -257,7 +257,7 @@ void pg1000_state::pg1000(machine_config &config)
 	/* TODO: What is the correct way of declaring this "Parameter In" port? */
 	// auto &paramin(MIDI_PORT(config, "param_in"));
 	// midiin_slot(paramin);
-	// paramreq.rxd_handler().set([this] (bool state) { m_paramreq_bit = state; });
+	// paramreq.rxd_handler().set([this] (bool state) { m_paramin_bit = state; });
 
 	UPD78C10(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pg1000_state::mem_map);
@@ -266,7 +266,7 @@ void pg1000_state::pg1000(machine_config &config)
 	m_maincpu->pc_in_cb().set([this] {
 		return (
 			(m_mdin_bit && m_midi_in_enable) ||
-			(m_paramreq_bit && m_param_in_enable)) ? 2 : 0;
+			(m_paramin_bit && m_param_in_enable)) ? 2 : 0;
 	});
 	m_maincpu->pc_out_cb().set([this](u8 data)
 	{
