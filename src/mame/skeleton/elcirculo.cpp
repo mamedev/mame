@@ -78,7 +78,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	output_finder<32> m_leds;
+	output_finder<38> m_leds;
 	output_finder<8> m_lamps;
 
 	uint8_t m_led_row = 0;
@@ -116,21 +116,19 @@ void elcirculo_state::led_w(offs_t offset, uint8_t data)
 		{
 			for (int bit = 0; bit < 8; bit++)
 			{
-				std::string name = string_format("ld%d%d", m_led_row, bit);
-				machine().output().set_value(name, !BIT(data, bit));
+				m_leds[m_led_row*10 + bit] = !BIT(data, bit);
 			}
 		}
 		else if (m_led_row == 4)
 		{
 			for (int bit = 0; bit < 8; bit++)
 			{
-				std::string name = string_format("il%d", bit);
-				machine().output().set_value(name, !BIT(data, bit));
+				m_lamps[bit] = !BIT(data, bit);
 			}
 		}
 		else
 		{
-			popmessage("guh %02x", m_led_row);
+			logerror("led_row %02x", m_led_row);
 		}
 	}
 }
