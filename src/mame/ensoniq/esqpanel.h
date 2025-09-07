@@ -134,7 +134,6 @@ protected:
 private:
 	int m_cursx = 0, m_cursy = 0;
 	int m_savedx = 0, m_savedy = 0;
-	int const m_rows = 0, m_cols = 0;
 	uint8_t m_curattr = 0;
 
 	emu_timer *m_blink_timer = nullptr;
