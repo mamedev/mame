@@ -848,6 +848,7 @@ s
 							start_value = sliders[i].field.user_value }
 						break
 					elseif sliders[i].clickarea.bounds:includes(x, y) then
+						sliders[i].knob:set_state(1)
 						pointers[id] = {
 							selected_slider = i,
 							relative = false }
