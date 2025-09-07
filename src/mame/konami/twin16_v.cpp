@@ -355,7 +355,7 @@ void konami_twin16_video_device::draw_sprites(screen_device &screen, bitmap_ind1
 
 			/* slow slow slow, but it's ok for now */
 			int sy = sy_start;
-			for (int y = 0; y < height; y++, sy += yinc)
+			for (int y = 0; y < height; y++, sy += yinc, pen_addr += (width >> 2))
 			{
 				if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 				{
@@ -363,9 +363,10 @@ void konami_twin16_video_device::draw_sprites(screen_device &screen, bitmap_ind1
 					uint8_t *const pdest = &screen.priority().pix(sy);
 
 					int sx = sx_start;
-					for (int x = 0; x < width; x += 4, pen_addr++)
+					uint32_t pen_addr_x = pen_addr;
+					for (int x = 0; x < width; x += 4, pen_addr_x++)
 					{
-						uint16_t pen = m_sprite_cb(pen_addr);
+						uint16_t pen = m_sprite_cb(pen_addr_x);
 						for (int ix = 0; ix < 4; ix++, sx += xinc, pen <<= 4)
 						{
 							if (sx >= cliprect.min_x && sx <= cliprect.max_x)
