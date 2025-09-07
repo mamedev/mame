@@ -38150,7 +38150,7 @@ Battle screen status bar flickers
 		</part>
 	</software>
 
-	<software name="smcourt2" cloneof="kournikov">
+	<software name="smcourt2_jp" cloneof="smcourt2">
 		<!--
 		http://redump.org/disc/7200
 		<rom name="Smash Court 2 (Japan).cue" size="87" crc="3ff91e56" sha1="02d1acba0dccf0a5aee8326e6b79a051cb146ccb"/>
@@ -61893,7 +61893,7 @@ During gameplay, the commentary speech audio is playing too fast
 		</part>
 	</software>
 
-	<software name="kournikov">
+	<software name="smcourt2">
 		<!--
 		http://redump.org/disc/5500
 		<rom name="Anna Kournikova's Smash Court Tennis (Europe) (Rev 1).cue" size="119" crc="8f6ccdab" sha1="99d1f1864e3bce4c8f1e2772a378c2e7d9f23e94"/>
@@ -61914,7 +61914,7 @@ During gameplay, the commentary speech audio is playing too fast
 		</part>
 	</software>
 
-	<software name="kournikov_a" cloneof="kournikov">
+	<software name="smcourt2_a" cloneof="smcourt2">
 		<!--
 		http://redump.org/disc/61311
 		<rom name="Anna Kournikova's Smash Court Tennis (Europe).cue" size="111" crc="dd7252e5" sha1="49a592cbf2b899e4c483f7226c6dbb40bbfc1e71"/>
