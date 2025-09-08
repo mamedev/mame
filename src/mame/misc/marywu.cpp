@@ -24,7 +24,7 @@
 	key k p1 button 1 button 2 button 3 button 4
     Error 02
 
-    Key k p1 button 1 button 2 button 3 tried to reset?
+    Key k p1 button 1 button 2 button 3 reset nvram?
     unmapped memory read FFA4 until FFFF
     
 	key k p1 button 1 led, 7 segment test
