@@ -57,7 +57,7 @@ public:
 		m_tz(*this, "TZ%u", 0U),
 		m_dsw(*this, "DSW"),
 		m_digits(*this, "digit%u", 0U),
-		m_lamps(*this, "lamp%u%u", 0U, 0U),
+		m_lamps(*this, "lamp%u%u", 0U),
 		m_beep(*this, "beeper")
 	{ }
 
@@ -79,7 +79,7 @@ private:
 	required_ioport_array<8> m_tz;
 	required_ioport m_dsw;
 	output_finder<16> m_digits;
-	output_finder<8, 8> m_lamps;
+	output_finder<8,8> m_lamps;
 	required_device<beep_device> m_beep;
 	emu_timer *m_sound_timer;
 
