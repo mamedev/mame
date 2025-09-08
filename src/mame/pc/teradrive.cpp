@@ -37,10 +37,10 @@ NOTES (MD side):
 TODO:
 - RAM size always gets detected as 2560K even when it's not (from chipset?);
 - Quadtel EMM driver fails recognizing WD76C10 chipset with drv4;
-- 286 card comms errors out at DOS/V bootstrap, may require VDP vint pending status;
 - Cannot HDD format with floppy insthdd.bat, cannot boot from HDD (needs floppy first).
   Attached disk is a WDL-330PS with no geometry info available;
 - MD side cart slot, expansion bay and VDP rewrites (WIP);
+- TMSS unlock and respective x86<->MD bus grants are sketchy;
 - SEGA TERADRIVE テラドライブ ユーザーズマニュアル known to exist (not scanned yet)
 - "TIMER FAIL" when exiting from F1 setup menu (keyboard? reset from chipset?);
 
@@ -301,7 +301,8 @@ void isa16_ibm_79f2661::io_map(address_map &map)
  */
 	map(0x05, 0x05).lr8(
 		NAME([this] (offs_t offset) {
-			return m_system_in_cb() & 5;
+			// HACK: MD TMSS never writes `SEGA` from $a14000
+			return (1 << 5) | (m_system_in_cb() & 5);
 		})
 	);
 	map(0x06, 0x07).lrw16(
