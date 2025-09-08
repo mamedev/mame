@@ -125,21 +125,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bellhop">
-		<description>Bellhop</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2018-07-31 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="240180">
-				<rom name="bellhop.woz" size="240180" crc="14f96de9" sha1="8b864bdfeb11f029295bd1b7e7337cc857510bc7" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bilestod">
 		<description>The Bilestoad</description>
 		<year>1983</year>
@@ -3557,21 +3542,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="crmstopr">
-		<description>Crime Stopper</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-09-28 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="242146">
-				<rom name="crime stopper.woz" size="242146" crc="a3f353f8" sha1="9bafc69292e39aebf5fcf253ffcd34cb02ed669f" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tapper">
 		<description>Tapper</description>
 		<year>1984</year>
@@ -3613,21 +3583,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="235460">
 				<rom name="apple stellar invaders.woz" size="235460" crc="edf89d17" sha1="12ffab9535d9a98b26638b7d8de72de8556efa71" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="alibi">
-		<description>Alibi</description>
-		<year>1981</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-10-14 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="248803">
-				<rom name="alibi.woz" size="248803" crc="12ac7a0b" sha1="38e38af85103b666b8d610a18d18ccd344a4a302" />
 			</dataarea>
 		</part>
 	</software>
@@ -3680,21 +3635,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="168203">
 				<rom name="pulsar ][.woz" size="168203" crc="d7ca2e40" sha1="a2558764c118dc708c2306cbaac6d353815127d4" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gohayden">
-		<description>Go (Hayden)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-10-20 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234775">
-				<rom name="go.woz" size="234775" crc="aa3a005d" sha1="d96d7d67c1a2f664735f412c25229b91306cd5bf" />
 			</dataarea>
 		</part>
 	</software>
@@ -5530,21 +5470,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234797">
 				<rom name="ballyhoo r97.woz" size="234797" crc="4a4edff2" sha1="c1e73096b7d23753e6e42517a80fbb96b8e73964" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chmpgolf">
-		<description>Championship Golf</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-05-04 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234798">
-				<rom name="championship golf.woz" size="234798" crc="9d1a193f" sha1="e7b0eb6e3272044046a9373ea7acabe598cabd46" />
 			</dataarea>
 		</part>
 	</software>
@@ -13876,6 +13801,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="alibi">
+		<description>Alibi</description>
+		<year>1981</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Ian Trackman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-10-14 -->
+		<!-- strategy game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="248803">
+				<rom name="alibi.woz" size="248803" crc="12ac7a0b" sha1="38e38af85103b666b8d610a18d18ccd344a4a302" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alcwndrls" cloneof="alcwndrl">
 		<description>Alice in Wonderland (Spinnaker Software)</description>
 		<year>1985</year>
@@ -15646,6 +15587,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bellhop">
+		<description>Bellhop</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value=" Garry Kitchen and John van Ryzin" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-07-31 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="240180">
+				<rom name="bellhop.woz" size="240180" crc="14f96de9" sha1="8b864bdfeb11f029295bd1b7e7337cc857510bc7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="belwrt">
 		<description>Below the Root</description>
 		<year>1984</year>
@@ -16951,6 +16909,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234813">
 				<rom name="challenge math.woz" size="234813" crc="18ec6871" sha1="15b4fe2e391ad74d6f143cdd03c4eb8c3b7a15ae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chmpgolf">
+		<description>Championship Golf</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Blair Hadfield" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-05-04 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234798">
+				<rom name="championship golf.woz" size="234798" crc="9d1a193f" sha1="e7b0eb6e3272044046a9373ea7acabe598cabd46" />
 			</dataarea>
 		</part>
 	</software>
@@ -18879,6 +18853,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241431">
 				<rom name="cribbage-solitaire.woz" size="241431" crc="91f3b311" sha1="32d7713d8d451398b685b507a3cf66d22011588b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crmstopr">
+		<description>Crime Stopper</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value="Dan Kitchen and Barry Marx" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-09-28 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="242146">
+				<rom name="crime stopper.woz" size="242146" crc="a3f353f8" sha1="9bafc69292e39aebf5fcf253ffcd34cb02ed669f" />
 			</dataarea>
 		</part>
 	</software>
@@ -22210,6 +22201,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234818">
 				<rom name="gettysburg- the turning point v1.2 side b.woz" size="234818" crc="87dee9e8" sha1="bdc23502c510695d46cfecc730e28928fc02bea4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gohayden">
+		<description>Go (Hayden Book Company)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Stan Erwin" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-10-20 -->
+		<!-- board game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="go.woz" size="234775" crc="aa3a005d" sha1="d96d7d67c1a2f664735f412c25229b91306cd5bf" />
 			</dataarea>
 		</part>
 	</software>
@@ -28087,7 +28094,7 @@ license:CC0-1.0
 	<software name="mbcellres">
 		<description>Modern Biology: Cellular Respiration</description>
 		<year>1989</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Prentice Associates" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -28110,7 +28117,7 @@ license:CC0-1.0
 	<software name="mbgenet">
 		<description>Modern Biology: Genetics</description>
 		<year>1989</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Prentice Associates" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -28145,7 +28152,7 @@ license:CC0-1.0
 	<software name="mbphoto">
 		<description>Modern Biology: Photosynthesis</description>
 		<year>1989</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Prentice Associates" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />

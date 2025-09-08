@@ -1988,19 +1988,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bellhop">
-		<description>Bellhop (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2017-10-04"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="bellhop (4am crack).dsk" size="143360" crc="b5a5c914" sha1="fac8017d1810673c8cda26f2e342d30695dba29f" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="biblebb">
 		<description>Bible Baseball (cleanly cracked)</description>
 		<year>1983</year>
@@ -2255,19 +2242,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="championship baseball (4am crack) side b.dsk" size="143360" crc="b4767c81" sha1="4ad26e03f0227ec4eada7ad0709222baf79427bb" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chmpgolf">
-		<description>Championship Golf (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Software</publisher>
-		<info name="release" value="2018-06-12"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="championship golf (4am crack).dsk" size="143360" crc="632254c5" sha1="c4613b775f652be87706f89362ebf61bcdd43239" />
 			</dataarea>
 		</part>
 	</software>
@@ -3119,19 +3093,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="creative play (imperfect 4am crack) side b.dsk" size="143360" crc="58283e22" sha1="1db7172d6549dc8a4f39133ba1c05941acc69a2d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crmstopr">
-		<description>Crime Stopper (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2018-08-08"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="crime stopper (4am crack).dsk" size="143360" crc="045b7082" sha1="d0a76363471a6d4f721f8e6506c6b32af2f74e25" />
 			</dataarea>
 		</part>
 	</software>
@@ -4877,19 +4838,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="gin rummy (4am crack).dsk" size="143360" crc="9286c88c" sha1="49140b844e7683a9f0df3eafd4a7fb8cfaa06c76" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gohayden">
-		<description>Go (Hayden) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Co.</publisher>
-		<info name="release" value="2016-07-27"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="go (4am crack).dsk" size="143360" crc="014b2a73" sha1="70a43566885d69bfe902a21103341a431da731a6" />
 			</dataarea>
 		</part>
 	</software>
@@ -9206,19 +9154,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="raf - the battle of britain (4am crack).dsk" size="143360" crc="b2caaab8" sha1="43dd4d5a1085ec0c18c7c3b690b85499d0b1bb50" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="alibi">
-		<description>Alibi (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2019-06-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="alibi (4am crack).dsk" size="143360" crc="0b3db1e0" sha1="8d6a7c582944ee1d54c5c4d875ed4d2e41299ec1" />
 			</dataarea>
 		</part>
 	</software>
@@ -20873,27 +20808,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="inca">
-		<description>Inca (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Hayden Software</publisher>
-		<info name="release" value="2021-09-17"/>
-		<!-- "Inca" is a 1985 adventure game developed by Joe Emerson and Ken Smith, and distributed by Hayden Software. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="inca (4am crack) side a.dsk" size="143360" crc="622c8e05" sha1="52f15fff82587642fecc73342139260cb12f025e"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="inca (4am crack) side b.dsk" size="143360" crc="32d9ef26" sha1="827d2c6c8e93731d1f8b52e5ae3d1ac8fa4754f7"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hlygrail">
 		<description>The Holy Grail (cleanly cracked)</description>
 		<year>1985</year>
@@ -23618,7 +23532,7 @@ license:CC0-1.0
 	<software name="apstriplon">
 		<description>Adventures in Problem Solving: A Trip to London (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -23634,7 +23548,7 @@ license:CC0-1.0
 	<software name="apsalicenl">
 		<description>Adventures in Problem Solving: Alice's Adventure in Numberland (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -23650,7 +23564,7 @@ license:CC0-1.0
 	<software name="apsmarat">
 		<description>Adventures in Problem Solving: Marathon (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -23666,7 +23580,7 @@ license:CC0-1.0
 	<software name="apstreasfi">
 		<description>Adventures in Problem Solving: The Treasure of Forest Isle (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -24307,6 +24221,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="ali baba and the forty thieves (4am and san inc crack).dsk" size="143360" crc="85829ce0" sha1="ef4868fee81fc6d2b7c75ed100d5569c6c3c187d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alibi">
+		<description>Alibi (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Ian Trackman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-06-02 -->
+		<!-- strategy game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alibi (4am crack).dsk" size="143360" crc="0b3db1e0" sha1="8d6a7c582944ee1d54c5c4d875ed4d2e41299ec1" />
 			</dataarea>
 		</part>
 	</software>
@@ -26465,6 +26395,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bellhop">
+		<description>Bellhop (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value=" Garry Kitchen and John van Ryzin" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-10-04 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bellhop (4am crack).dsk" size="143360" crc="b5a5c914" sha1="fac8017d1810673c8cda26f2e342d30695dba29f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="belwrt">
 		<description>Below the Root (4am crack)</description>
 		<year>1984</year>
@@ -28096,6 +28043,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="challenge math (4am crack).dsk" size="143360" crc="13ca32af" sha1="77fd54dfe5bc0b3775c43d38540a3f3366d25c24" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chmpgolf">
+		<description>Championship Golf (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Blair Hadfield" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-06-12 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="championship golf (4am crack).dsk" size="143360" crc="632254c5" sha1="c4613b775f652be87706f89362ebf61bcdd43239" />
 			</dataarea>
 		</part>
 	</software>
@@ -30222,6 +30185,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="cribbage-solitaire (4am crack).dsk" size="143360" crc="36c5a597" sha1="d9368998f793c8a50d6b7a83acd6f74cd803b3cf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crmstopr">
+		<description>Crime Stopper (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value="Dan Kitchen and Barry Marx" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-08-08 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="crime stopper (4am crack).dsk" size="143360" crc="045b7082" sha1="d0a76363471a6d4f721f8e6506c6b32af2f74e25" />
 			</dataarea>
 		</part>
 	</software>
@@ -34951,6 +34931,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="gohayden">
+		<description>Go (Hayden Book Company) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Stan Erwin" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-07-27 -->
+		<!-- board game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="go (4am crack).dsk" size="143360" crc="014b2a73" sha1="70a43566885d69bfe902a21103341a431da731a6" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="go2headclmb" cloneof="go2headcl">
 		<description>Go To The Head Of The Class (4am crack)</description>
 		<year>1984</year>
@@ -36447,6 +36443,29 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="inferential anne ii (4am crack).dsk" size="143360" crc="aaccfba4" sha1="47e7fe20de827e9292a8d2a5fe1912db93da2633" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inca">
+		<description>Inca (4am crack)</description>
+		<year>1985</year>
+		<publisher>Hayden Software</publisher>
+		<info name="programmer" value="Joe Emerson and Ken Smith" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-09-17 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="inca (4am crack) side a.dsk" size="143360" crc="622c8e05" sha1="52f15fff82587642fecc73342139260cb12f025e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Story"/>
+			<dataarea name="flop" size="143360">
+				<rom name="inca (4am crack) side b.dsk" size="143360" crc="32d9ef26" sha1="827d2c6c8e93731d1f8b52e5ae3d1ac8fa4754f7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -51190,7 +51209,7 @@ license:CC0-1.0
 	<software name="sshonbear">
 		<description>Start Solving: Honeybear (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -51206,7 +51225,7 @@ license:CC0-1.0
 	<software name="sssamstst">
 		<description>Start Solving: Sam's Sticker Store (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -51222,7 +51241,7 @@ license:CC0-1.0
 	<software name="sstinatvs">
 		<description>Start Solving: Tina's TV Show (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -56481,8 +56500,8 @@ license:CC0-1.0
 	<software name="thkmathunps">
 		<description>Thinkers: Mathematics Unlimited Problem Solving (4am crack)</description>
 		<year>1986</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
-		<info name="developer" value="Holt, Rinehart, and Winston" />
+		<publisher>Holt, Rinehart and Winston</publisher>
+		<info name="developer" value="Holt, Rinehart and Winston" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-12-31 -->
@@ -58623,7 +58642,7 @@ license:CC0-1.0
 	<software name="voygmimi">
 		<description>Voyage of the Mimi (4am crack)</description>
 		<year>1985</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="programmer" value="Cynthia Char, Bill Tally, Dennis Sullivan, Michael Martin, and Roberta Schwartz" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -58964,7 +58983,7 @@ license:CC0-1.0
 	<software name="wtpacerept">
 		<description>What's the Problem: Ace Reporter (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -58980,7 +58999,7 @@ license:CC0-1.0
 	<software name="wtpchesche">
 		<description>What's the Problem: Chester and the Cheese (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -58996,7 +59015,7 @@ license:CC0-1.0
 	<software name="wtpwhworld">
 		<description>What's the Problem: Where in the World? (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
