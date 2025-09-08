@@ -682,6 +682,7 @@ ROM_START( disc3000 )
 ROM_END
 
 ROM_START( discolympia )
+	ROM_REGION( 0x9000, "maincpu", 0 )
 	ROM_LOAD( "olympia_pr1", 0x0000, 0x1000, CRC(531deb63) SHA1(6fddfc5791465c3bcdb554f207de391905085df9) )
 	ROM_LOAD( "olympia_pr2", 0x1000, 0x1000, CRC(81e119b2) SHA1(a28eca9394e88b862b15e7bc117b0c4d01d4cf38) )
 	ROM_LOAD( "olympia_pr3", 0x2000, 0x1000, CRC(2e156cef) SHA1(e5f145f3e4b7515b949fa7b570ca312c5dd12311) )
@@ -759,7 +760,7 @@ GAMEL( 1982, excellent,   0, excellent, dicemstr, stella8085_state, empty_init, 
 GAMEL( 1983, bahia,       0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Bahia",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1984, disc,        0, excellent, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1985, doppelstart, 0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelstart",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1986, discolympia, 0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1986, discolympia, 0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Olympia",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1986, doppelpot,   0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1986, elitedisc,   0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1986, rasant,      0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Venus",  "Rasant",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
