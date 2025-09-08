@@ -15,6 +15,21 @@
   * we may also have user inputs from the coin slot and from the
     cabinet buttons, for making bets.
     If hold Key A or K then press f3 to reset, will shown error 30 code.
+    
+	Debug:
+    p1 = 90 to bypass error 30
+    Key k service keys?
+    Press p1 button 1 to change number 0 to 12
+    
+	key k p1 button 1 button 2 button 3 button 4
+    Error 02
+
+    Key k p1 button 1 button 2 button 3 tried to reset?
+    unmapped memory read FFA4 until FFFF
+    
+	key k p1 button 1 led, 7 segment test
+
+
 
 **************************************************************************/
 
