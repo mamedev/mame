@@ -1921,6 +1921,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/svga_tseng.h",
 		MAME_DIR .. "src/devices/bus/isa/tekram_dc820.cpp",
 		MAME_DIR .. "src/devices/bus/isa/tekram_dc820.h",
+		MAME_DIR .. "src/devices/bus/isa/ubpnic.cpp",
+		MAME_DIR .. "src/devices/bus/isa/ubpnic.h",
 		MAME_DIR .. "src/devices/bus/isa/ultra12f.cpp",
 		MAME_DIR .. "src/devices/bus/isa/ultra12f.h",
 		MAME_DIR .. "src/devices/bus/isa/ultra14f.cpp",

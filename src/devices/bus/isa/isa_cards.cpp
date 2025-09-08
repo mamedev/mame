@@ -86,6 +86,7 @@
 #include "ne1000.h"
 #include "ne2000.h"
 #include "np600.h"
+#include "ubpnic.h"
 
 // communication ports
 #include "com.h"
@@ -162,6 +163,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("opus108pm", ISA8_OPUS108PM);
 	device.option_add("ibm_speech", ISA8_IBM_SPEECH);
 	device.option_add("zxbus_adapter", ISA8_ZXBUS);
+	device.option_add("ubpnic", ISA8_UBPNIC);
 }
 
 void pc_isa16_cards(device_slot_interface &device)
