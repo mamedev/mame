@@ -2126,6 +2126,60 @@ Simplification rules
   ``src1`` and ``src2`` operands refer to the same memory location or
   register.
 
+.. _umlinst-sext:
+
+SEXT
+~~~~
+
+Sign extend an integer value.
+
++--------------------------+---------------------------------------+
+| Disassembly              | Usage                                 |
++==========================+=======================================+
+| .. code-block::          | .. code-block::                       |
+|                          |                                       |
+|     sext    dst,src,size |     UML_SEXT(block, dst, src, size);  |
+|     dsext   dst,src,size |     UML_DSEXT(block, dst, src, size); |
++--------------------------+---------------------------------------+
+
+Sets ``dst`` to the value of ``src`` sign extended from the size
+specified by the ``size`` operand to the instruction size.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the sign extended value will be stored.
+src (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The value to sign extend.
+size (access size)
+    The size of the value to sign extend.  Must be ``SIZE_BYTE``
+    (8-bit), ``SIZE_WORD`` (16-bit) or ``SIZE_DWORD`` (32-bit).
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
+  :ref:`OR <umlinst-or>` if the ``src`` operand is an immediate value or
+  if the ``size`` operand specifies a size no smaller than the
+  instruction size.
+
 .. _umlinst-lzcnt:
 
 LZCNT

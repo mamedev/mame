@@ -84,8 +84,8 @@ public:
 		, m_buf(nullptr)
 		, m_idx(nullptr)
 		, m_int_state(false)
-{
-}
+	{
+	}
 
 protected:
 	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
@@ -212,42 +212,50 @@ void isa8_ubpnic_device::mem_map(address_map &map)
 
 u8 isa8_ubpnic_device::txinit_r()
 {
-	LOGMASKED(LOG_REGR, "%s: txinit_r\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+	{
+		LOGMASKED(LOG_REGR, "%s: txinit_r\n", machine().describe_context());
 
-	m_intstat &= ~(INTSTAT_TPKTOK | INTSTAT_TXDONE);
+		m_intstat &= ~(INTSTAT_TPKTOK | INTSTAT_TXDONE);
 
-	// trigger dma transfer
-	txdrq_w(1);
+		// trigger dma transfer
+		txdrq_w(1);
+	}
 
 	return 0;
 }
 
 u8 isa8_ubpnic_device::clrpav_r()
 {
-	LOGMASKED(LOG_REGR, "%s: clrpav_r\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+	{
+		LOGMASKED(LOG_REGR, "%s: clrpav_r\n", machine().describe_context());
 
-	// initialize next empty page if rx buffer was full
-	if (rxb_full())
-		m_idx[m_epppav & EPP_EPP] = 0;
+		// initialize next empty page if rx buffer was full
+		if (rxb_full())
+			m_idx[m_epppav & EPP_EPP] = 0;
 
-	m_epppav &= ~EPP_PAV;
+		m_epppav &= ~EPP_PAV;
 
-	if (!(m_intstat & INTSTAT_PAVINT))
-		irq<INTSTAT_PAVINT>(0);
+		if (!(m_intstat & INTSTAT_PAVINT))
+			irq<INTSTAT_PAVINT>(0);
+	}
 
 	return 0;
 }
 
 u8 isa8_ubpnic_device::intstat_r()
 {
-	LOGMASKED(LOG_REGR, "%s: intstat_r 0x%02x\n", machine().describe_context(), m_intstat);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REGR, "%s: intstat_r 0x%02x\n", machine().describe_context(), m_intstat);
 
 	return m_intstat;
 }
 
 u8 isa8_ubpnic_device::epppav_r()
 {
-	LOGMASKED(LOG_REGR, "%s: epppav_r 0x%02x\n", machine().describe_context(), m_epppav);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REGR, "%s: epppav_r 0x%02x\n", machine().describe_context(), m_epppav);
 
 	return m_epppav;
 }
@@ -327,6 +335,7 @@ void isa8_ubpnic_device::intctl_w(u8 data)
 
 	interrupt();
 }
+
 void isa8_ubpnic_device::fppmie_w(u8 data)
 {
 	LOGMASKED(LOG_REGW, "%s: fppmie_w 0x%02x\n", machine().describe_context(), data);
@@ -338,7 +347,8 @@ void isa8_ubpnic_device::fppmie_w(u8 data)
 
 u8 isa8_ubpnic_device::rpidx_r(offs_t offset)
 {
-	LOGMASKED(LOG_REGR, "%s: rpidx_r 0x%02x data 0x%02x\n", machine().describe_context(), offset, m_idx[offset]);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REGR, "%s: rpidx_r 0x%02x data 0x%02x\n", machine().describe_context(), offset, m_idx[offset]);
 
 	return m_idx[offset];
 }
@@ -352,7 +362,8 @@ void isa8_ubpnic_device::rpidx_w(offs_t offset, u8 data)
 
 u8 isa8_ubpnic_device::buf_r(offs_t offset)
 {
-	LOGMASKED(LOG_BUF, "%s: buf_r 0x%02x data 0x%02x\n", machine().describe_context(), offset, m_buf[offset]);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_BUF, "%s: buf_r 0x%02x data 0x%02x\n", machine().describe_context(), offset, m_buf[offset]);
 
 	return m_buf[offset];
 }
