@@ -4,6 +4,9 @@
 #include "emu.h"
 #include "mb8795.h"
 
+#include "hashing.h"
+#include "multibyte.h"
+
 #define LOG_REGR   (1U << 1)
 #define LOG_REGW   (1U << 2)
 #define LOG_TX     (1U << 3)
@@ -14,41 +17,45 @@
 #include "logmacro.h"
 
 // Lifted from netbsd
-enum {
-	EN_TXS_READY        = 0x80, // ready for packet
-	EN_TXS_BUSY         = 0x40, // receive carrier detect
-	EN_TXS_TXRECV       = 0x20, // transmission received
-	EN_TXS_SHORTED      = 0x10, // possible coax short
-	EN_TXS_UNDERFLOW    = 0x08, // underflow on xmit
-	EN_TXS_COLLERR      = 0x04, // collision detected
-	EN_TXS_COLLERR16    = 0x02, // 16th collision error
-	EN_TXS_PARERR       = 0x01, // parity error in tx data
-
-	EN_RXS_OK           = 0x80, // packet received ok
-	EN_RXS_RESET        = 0x10, // reset packet received
-	EN_RXS_SHORT        = 0x08, // < minimum length
-	EN_RXS_ALIGNERR     = 0x04, // alignment error
-	EN_RXS_CRCERR       = 0x02, // CRC error
-	EN_RXS_OVERFLOW     = 0x01, // receiver FIFO overflow
-
-	EN_TMD_COLLMASK     = 0xf0, // collision count
-	EN_TMD_COLLSHIFT    =    4,
-	EN_TMD_PARIGNORE    = 0x08, // ignore parity
-	EN_TMD_TURBO1       = 0x04,
-	EN_TMD_LB_DISABLE   = 0x02, // loop back disabled
-	EN_TMD_DISCONTENT   = 0x01, // disable contention (rx carrier)
-
-	EN_RMD_TEST         = 0x80, // must be zero
-	EN_RMD_ADDRSIZE     = 0x10, // reduces NODE match to 5 chars
-	EN_RMD_SHORTENABLE  = 0x08, // "rx packets >= 10 bytes" - <?
-	EN_RMD_RESETENABLE  = 0x04, // detect "reset" ethernet frames
-	EN_RMD_WHATRECV     = 0x03, // controls what packets are received
-	EN_RMD_RECV_PROMISC = 0x03, // all packets
-	EN_RMD_RECV_MULTI   = 0x02, // accept broad/multicasts
-	EN_RMD_RECV_NORMAL  = 0x01, // accept broad/limited multicasts
-	EN_RMD_RECV_NONE    = 0x00, // accept no packets
-
-	EN_RST_RESET        = 0x80, // reset interface
+enum txs_mask : u8 {
+	TXS_READY        = 0x80, // ready for packet
+	TXS_BUSY         = 0x40, // receive carrier detect
+	TXS_TXRECV       = 0x20, // transmission received
+	TXS_SHORTED      = 0x10, // possible coax short
+	TXS_UNDERFLOW    = 0x08, // underflow on xmit
+	TXS_COLLERR      = 0x04, // collision detected
+	TXS_COLLERR16    = 0x02, // 16th collision error
+	TXS_PARERR       = 0x01, // parity error in tx data
+};
+enum rxs_mask : u8 {
+	RXS_OK           = 0x80, // packet received ok
+	RXS_RESET        = 0x10, // reset packet received
+	RXS_SHORT        = 0x08, // < minimum length
+	RXS_ALIGNERR     = 0x04, // alignment error
+	RXS_CRCERR       = 0x02, // CRC error
+	RXS_OVERFLOW     = 0x01, // receiver FIFO overflow
+};
+enum tmd_mask : u8 {
+	TMD_COLLMASK     = 0xf0, // collision count
+	TMD_COLLSHIFT    = 4,
+	TMD_PARIGNORE    = 0x08, // ignore parity
+	TMD_TURBO1       = 0x04,
+	TMD_LB_DISABLE   = 0x02, // loop back disabled
+	TMD_DISCONTENT   = 0x01, // disable contention (rx carrier)
+};
+enum rmd_mask : u8 {
+	RMD_TEST         = 0x80, // must be zero
+	RMD_ADDRSIZE     = 0x10, // reduces NODE match to 5 chars
+	RMD_SHORTENABLE  = 0x08, // "rx packets >= 10 bytes" - <?
+	RMD_RESETENABLE  = 0x04, // detect "reset" ethernet frames
+	RMD_WHATRECV     = 0x03, // controls what packets are received
+	RMD_RECV_PROMISC = 0x03, // all packets
+	RMD_RECV_MULTI   = 0x02, // accept broad/multicasts
+	RMD_RECV_NORMAL  = 0x01, // accept broad/limited multicasts
+	RMD_RECV_NONE    = 0x00, // accept no packets
+};
+enum rst_mask : u8 {
+	RST_RESET        = 0x80, // reset interface
 };
 
 DEFINE_DEVICE_TYPE(MB8795, mb8795_device, "mb8795", "Fujitsu MB8795")
@@ -101,7 +108,7 @@ void mb8795_device::device_start()
 
 void mb8795_device::device_reset()
 {
-	m_txstat = EN_TXS_READY;
+	m_txstat = TXS_READY;
 	m_txmask = 0x00;
 	m_rxstat = 0x00;
 	m_rxmask = 0x00;
@@ -113,14 +120,26 @@ void mb8795_device::device_reset()
 
 	m_txlen = m_rxlen = m_txcount = 0;
 
+	// TODO: verify if LBC is asserted after reset
+	set_loopback(true);
+
 	start_send();
 }
 
-void mb8795_device::recv_cb(u8 *buf, int len)
+int mb8795_device::recv_start_cb(u8 *buf, int len)
 {
-	memcpy(m_rxbuf, buf, len);
-	m_rxlen = len;
-	receive();
+	if(!m_rxlen) {
+		memcpy(m_rxbuf, buf, len);
+		m_rxlen = len;
+		return len;
+	} else
+		return 0;
+}
+
+void mb8795_device::recv_complete_cb(int result)
+{
+	if(result > 0)
+		receive();
 }
 
 u8 mb8795_device::txstat_r()
@@ -183,6 +202,7 @@ u8 mb8795_device::txmode_r()
 
 void mb8795_device::txmode_w(u8 data)
 {
+	set_loopback(!(data & TMD_LB_DISABLE));
 	m_txmode = data;
 	LOGMASKED(LOG_REGW, "txmode_w %02x %s\n", m_txmode, machine().describe_context());
 }
@@ -201,7 +221,7 @@ void mb8795_device::rxmode_w(u8 data)
 
 void mb8795_device::reset_w(u8 data)
 {
-	if(data & EN_RST_RESET)
+	if(data & RST_RESET)
 		reset();
 }
 
@@ -236,8 +256,8 @@ void mb8795_device::start_send()
 void mb8795_device::tx_dma_w(u8 data, bool eof)
 {
 	m_txbuf[m_txlen++] = data;
-	if(m_txstat & EN_TXS_READY) {
-		m_txstat &= ~EN_TXS_READY;
+	if(m_txstat & TXS_READY) {
+		m_txstat &= ~TXS_READY;
 		check_irq();
 	}
 
@@ -245,23 +265,29 @@ void mb8795_device::tx_dma_w(u8 data, bool eof)
 	m_drq_tx_cb(m_drq_tx);
 
 	if(eof) {
-		LOGMASKED(LOG_TX, "send packet, dest=%02x.%02x.%02x.%02x.%02x.%02x len=%04x loopback=%s\n",
-					m_txbuf[0], m_txbuf[1], m_txbuf[2], m_txbuf[3], m_txbuf[4], m_txbuf[5],
-					m_txlen,
-					m_txmode & EN_TMD_LB_DISABLE ? "off" : "on");
+		LOGMASKED(LOG_TX, "send packet, dest=%02x.%02x.%02x.%02x.%02x.%02x len=%04x\n",
+			m_txbuf[0], m_txbuf[1], m_txbuf[2], m_txbuf[3], m_txbuf[4], m_txbuf[5], m_txlen);
 
 		if(m_txlen > 1500)
 			m_txlen = 1500; // Weird packet send on loopback test in the next
 
-		if(!(m_txmode & EN_TMD_LB_DISABLE)) {
+		// append frame check sequence
+		put_u32le(&m_txbuf[m_txlen], util::crc32_creator::simple(m_txbuf, m_txlen));
+		m_txlen += 4;
+
+		// count number of bits transmitted
+		m_txcount = send(m_txbuf, m_txlen, 4) * 8;
+
+		// transmitted frames are seen by the receiver
+		// TODO: TXS_TXRECV
+		if(m_txmode & TMD_LB_DISABLE) {
 			memcpy(m_rxbuf, m_txbuf, m_txlen);
 			m_rxlen = m_txlen;
 			receive();
 		}
-		send(m_txbuf, m_txlen);
+
 		m_txlen = 0;
-		m_txstat |= EN_TXS_READY;
-		m_txcount++;
+		m_txstat |= TXS_READY;
 		start_send();
 	} else
 		m_timer_tx->adjust(attotime::from_nsec(800));
@@ -289,17 +315,17 @@ void mb8795_device::rx_dma_r(u8 &data, bool &eof)
 void mb8795_device::receive()
 {
 	bool keep = false;
-	switch(m_rxmode & EN_RMD_WHATRECV) {
-	case EN_RMD_RECV_NONE:
+	switch(m_rxmode & RMD_WHATRECV) {
+	case RMD_RECV_NONE:
 		keep = false;
 		break;
-	case EN_RMD_RECV_NORMAL:
+	case RMD_RECV_NORMAL:
 		keep = recv_is_broadcast() || recv_is_me() || recv_is_local_multicast();
 		break;
-	case EN_RMD_RECV_MULTI:
+	case RMD_RECV_MULTI:
 		keep = recv_is_broadcast() || recv_is_me() || recv_is_multicast();
 		break;
-	case EN_RMD_RECV_PROMISC:
+	case RMD_RECV_PROMISC:
 		keep = true;
 		break;
 	}
@@ -309,16 +335,26 @@ void mb8795_device::receive()
 	if(!keep)
 		m_rxlen = 0;
 	else {
-		// Minimal ethernet packet size
+		m_rxstat = 0;
 		if(m_rxlen < 64) {
-			memset(m_rxbuf+m_rxlen, 0, 64-m_rxlen);
-			m_rxlen = 64;
+			if(!(m_rxmode & RMD_SHORTENABLE) || (m_rxlen < 10)) {
+				LOGMASKED(LOG_RX, "short packet discarded\n");
+				m_rxlen = 0;
+				return;
+			} else
+				m_rxstat |= RXS_SHORT;
 		}
-		// Checksum?  In any case, it's there
-		memset(m_rxbuf+m_rxlen, 0, 4);
-		m_rxlen += 4;
 
-		m_rxstat |= EN_RXS_OK;
+		// TODO: RMD_TEST
+		if(util::crc32_creator::simple(m_rxbuf, m_rxlen).m_raw != get_u32le(&m_rxbuf[m_rxlen - 4]))
+			m_rxstat |= RXS_CRCERR;
+
+		// frame check sequence is not added to fifo
+		m_rxlen -= 4;
+
+		if(!(m_rxstat & (RXS_SHORT | RXS_CRCERR)))
+			m_rxstat |= RXS_OK;
+
 		check_irq();
 		m_timer_rx->adjust(attotime::zero);
 	}
@@ -343,7 +379,7 @@ bool mb8795_device::recv_is_me()
 		m_rxbuf[2] == m_mac[2] &&
 		m_rxbuf[3] == m_mac[3] &&
 		m_rxbuf[4] == m_mac[4] &&
-		((m_rxmode & EN_RMD_ADDRSIZE) || m_rxbuf[5] == m_mac[5]);
+		((m_rxmode & RMD_ADDRSIZE) || m_rxbuf[5] == m_mac[5]);
 }
 
 bool mb8795_device::recv_is_local_multicast()

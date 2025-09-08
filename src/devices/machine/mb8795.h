@@ -25,7 +25,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual void recv_cb(u8 *buf, int len) override;
+	virtual int recv_start_cb(u8 *buf, int len) override;
+	virtual void recv_complete_cb(int result) override;
 
 	TIMER_CALLBACK_MEMBER(tx_update);
 	TIMER_CALLBACK_MEMBER(rx_update);
