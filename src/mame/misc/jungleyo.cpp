@@ -37,6 +37,7 @@
         frtgenieb: bp 581e,1,{curpc=0x58fe;g}
         frtgeniec: bp 5812,1,{curpc=0x58f0;g}
         frtgenied: bp 80de,1,{curpc=0x81bc;g}
+        kingfrt: bp 80d6,1,{curpc=0x81b4;g}
     - second half of frtgenie's main CPU ROM seems to contain an earlier version
       of the data 'GENIE FRUITS DATA: 2001/08/15 VERSION: VA1.00'. Can it be
       reached or just a leftover?
@@ -121,11 +122,12 @@ public:
 		, m_paletteram(*this, "paletteram", 0x18000, ENDIANNESS_BIG)
 	{ }
 
-	void jungleyo(machine_config &config);
+	void jungleyo(machine_config &config) ATTR_COLD;
 
-	void init_frtgenie();
-	void init_jungleyo();
-	template <uint16_t Reset_addr> void init_magjack();
+	void init_frtgenie() ATTR_COLD;
+	void init_jungleyo() ATTR_COLD;
+	void init_kingfrt() ATTR_COLD;
+	template <uint16_t Reset_addr> void init_magjack() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -706,6 +708,45 @@ static INPUT_PORTS_START( frtgenied )
 	PORT_DIPSETTING(      0x0000, "500" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( kingfrt )
+	PORT_INCLUDE( frtgenied )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Change")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start / All Stop / Take" )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take / Hold")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Win Up / Stop2 / Odds")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Big / Stop1")
+
+	PORT_MODIFY("DSW12")
+	PORT_DIPNAME( 0x0007, 0x0007, "Main Game Rate" ) PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPSETTING(      0x0000, "78%" )
+	PORT_DIPSETTING(      0x0004, "80%" )
+	PORT_DIPSETTING(      0x0002, "82%" )
+	PORT_DIPSETTING(      0x0006, "84%" )
+	PORT_DIPSETTING(      0x0001, "86%" )
+	PORT_DIPSETTING(      0x0005, "88%" )
+	PORT_DIPSETTING(      0x0003, "90%" )
+	PORT_DIPSETTING(      0x0007, "92%" )
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Max. Bet" ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(      0x00c0, "80" )
+	PORT_DIPSETTING(      0x0080, "120" )
+	PORT_DIPSETTING(      0x0040, "240" )
+	PORT_DIPSETTING(      0x0000, "300" )
+
+	PORT_MODIFY("DSW34")
+	PORT_DIPNAME( 0x0300, 0x0300, "Double Up Rate" ) PORT_DIPLOCATION("DSW4:1,2")
+	PORT_DIPSETTING(      0x0000, "84%" )
+	PORT_DIPSETTING(      0x0200, "86%" )
+	PORT_DIPSETTING(      0x0100, "88%" )
+	PORT_DIPSETTING(      0x0300, "90%" )
+	PORT_DIPNAME( 0xc000, 0xc000, "Key Out" ) PORT_DIPLOCATION("DSW4:7,8")
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0xc000, "10" )
+	PORT_DIPSETTING(      0x4000, "50" )
+	PORT_DIPSETTING(      0x8000, "100" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( magjack )
 	PORT_INCLUDE( frtgenie )
 
@@ -1020,6 +1061,29 @@ ROM_START( frtgenied ) // MADE IN TAIWAN YONSHI PCB NO-006E
 	ROM_LOAD( "atf20v8b.u37", 0x000, 0x157, NO_DUMP )
 ROM_END
 
+// probably a bootleg: copyright has been hacked out of the title screen / test mode. Still present in ROM, though.
+// GFX and some strings change to Portuguese
+ROM_START( kingfrt )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code, encrypted
+	ROM_LOAD16_BYTE( "king_fruit_rom3.u15", 0x00000, 0x20000, CRC(6e875869) SHA1(1f50ce610945ce350e9603fa6fa259e84896b1f9) )
+	ROM_LOAD16_BYTE( "king_fruit_rom2.u14", 0x00001, 0x20000, CRC(8a3bc7fb) SHA1(ebcfcf30a6825e392af5e0d92368ed5188752fbe) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "king_fruit_rom_1.u99", 0x00000, 0x40000, CRC(28b0c8fb) SHA1(5cdf59dcbed7da9b882c7dcf27020c1c37dd22cc) )
+
+	ROM_REGION( 0x80000, "reelgfx", 0 )
+	ROM_LOAD( "king_fruit_rom_4.u58", 0x00000, 0x80000, CRC(b3b467b6) SHA1(f1a64af7a8fe22c7ef76617aba359df11e4af737) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "king_fruit_rom_5.u59", 0x00000, 0x80000, CRC(8ce286cc) SHA1(cc4ee86c032e4d500dde15524029b5acdaad62fe) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_LOAD( "king_fruit_rom_6.u60", 0x00000, 0x80000, CRC(f3ab172a) SHA1(e64b2d9391d574a77d48407d4bb915a21e0ef9f0) )
+
+	ROM_REGION( 0x157, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "atf20v8b.u37", 0x000, 0x157, NO_DUMP )
+ROM_END
+
 ROM_START( magjack ) // MADE IN TAIWAN PCB NO-006A
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code, encrypted
 	ROM_LOAD16_BYTE( "3.u15", 0x00000, 0x20000, CRC(7d0855d0) SHA1(489e54f529c648da2333a3a811ced20f0d578029) ) // 27C010
@@ -1198,6 +1262,30 @@ void jungleyo_state::init_frtgenie()
 	src[0x006 / 2] = 0x01f8; // reset opcode
 }
 
+void jungleyo_state::init_kingfrt()
+{
+	u16 *src = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0x00000; i < 0x10000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0x00ff, 15, 9, 12, 10, 14, 13, 8, 11, 7, 6, 1, 4, 3, 5, 0, 2);
+
+	for (int i = 0x10000 / 2; i < 0x20000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0xff00, 11, 13, 14, 8, 12, 15, 9, 10, 6, 2, 1, 5, 4, 0, 7, 3);
+
+	for (int i = 0x20000 / 2; i < 0x30000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0x00ff, 9, 15, 12, 10, 13, 14, 11, 8, 4, 0, 3, 7, 6, 2, 1, 5);
+
+	for (int i = 0x30000 / 2; i < 0x40000 / 2; i++)
+		src[i] = bitswap<16>(src[i] ^ 0xffff, 12, 8, 14, 11, 10, 9, 13, 15, 2, 5, 6, 3, 1, 7, 4, 0);
+
+	// TODO: Stack Pointer/Initial PC settings don't seem to decrypt correctly
+	// hack these until better understood (still wrong values)
+	src[0x000 / 2] = 0x0000;
+	src[0x002 / 2] = 0x0000;
+	src[0x004 / 2] = 0x0000;
+	src[0x006 / 2] = 0x01f8; // reset opcode
+}
+
 template <uint16_t Reset_addr>
 void jungleyo_state::init_magjack()
 {
@@ -1233,6 +1321,7 @@ GAME( 2003, frtgeniea, frtgenie, jungleyo, frtgeniea, jungleyo_state, init_frtge
 GAME( 2003, frtgenieb, frtgenie, jungleyo, frtgenieb, jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 3)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2003, frtgeniec, frtgenie, jungleyo, frtgeniec, jungleyo_state, init_frtgenie,       ROT0, "Global",       "Fruit Genie (Version 1-1-03, set 4)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, frtgenied, frtgenie, jungleyo, frtgenied, jungleyo_state, init_jungleyo,       ROT0, "Winnin World", "Fruit Genie (VT 2.11)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, kingfrt,   frtgenie, jungleyo, kingfrt,   jungleyo_state, init_kingfrt,        ROT0, "bootleg?",     "King Fruit (VZ 1.04)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 2000, magjack,   0,        jungleyo, magjack,   jungleyo_state, init_magjack<0x260>, ROT0, "Global",       "Magical Jack (VA 4.00)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/09/28
 GAME( 2000, magjacka,  magjack,  jungleyo, magjacka,  jungleyo_state, init_magjack<0x268>, ROT0, "Global",       "Magical Jack (VA 3.30)",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 2000/08/04
