@@ -928,7 +928,9 @@ TIMER_CALLBACK_MEMBER(ym7101_device::scan_timer_callback)
 	// TODO: to execution pipeline
 	if (scanline == 224)
 	{
-		m_vint_on_timer->adjust(attotime::from_ticks(16, clock()));
+		// mazinsagj hangs on title screen transition with 16
+		// (expects to hit at first non-border hpos?)
+		m_vint_on_timer->adjust(attotime::from_ticks(32, clock()));
 		m_vint_pending = 1;
 	}
 

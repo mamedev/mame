@@ -44,7 +44,6 @@ public:
 
 		// chukrck2 & d_titov2 cares about not ack-ing an irq that isn't enabled.
 		// fatalrew/killshow & sesame otherwise need this
-		// https://jsgroth.dev/blog/posts/emulator-bugs-fatal-rewind/
 		if (m_vint_pending && m_ie0)
 		{
 			m_vint_pending = 0;
