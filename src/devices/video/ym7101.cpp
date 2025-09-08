@@ -779,23 +779,30 @@ void ym7101_device::prepare_tile_line(int scanline)
 	const u16 window_h_page = h40_mode ? 64 : 32;
 	const u16 window_v_page = 32;
 
-	const int min_y = m_down ? m_wvp * 8 : 0;
-	const int max_y = m_down ? 223 : (m_wvp * 8) - 1;
+	const int win_min_y = m_down ? m_wvp * 8 : 0;
+	const int win_max_y = m_down ? 223 : (m_wvp * 8) - 1;
 
-	const bool is_window_y_layer = scanline == std::clamp(scanline, min_y, max_y);
+	// window is mutually exclusive (i.e. WVP has priority over WHP)
+	// cfr. "Window Test by Fonzie" test ROM
+	const bool is_window_y_layer = scanline == std::clamp(scanline, win_min_y, win_max_y);
 
-	int min_x = -1;
-	int max_x = -1;
+	int win_min_x = -2;
+	int win_max_x = -2;
 
 	if (is_window_y_layer)
 	{
-		// TODO: this is intentionally reversed, until I understand what's happening here
-		min_x = m_rigt ? 0 : m_whp * 2;
-		max_x = m_rigt ? m_whp * 2 : 40;
+		win_min_x = 0;
+		win_max_x = char_num;
 	}
-
-//	if (min_x != -1 && max_x != -1)
-//		popmessage("X %d %d Y %d %d", min_x, max_x, min_y, max_y);
+	else
+	{
+		// TODO: mark first tile with hscroll window bug
+		win_min_x = m_rigt ? m_whp * 2 : 0;
+		win_max_x = m_rigt ? char_num : m_whp * 2 - 1;
+		// disable window layer
+		if (win_min_x >= win_max_x)
+			win_min_x = win_max_x = -2;
+	}
 
 	// mode 1 is <prohibited>, used by d_titov2
 	const u16 scroll_x_mode_masks[] = { 0, 0x7, 0xf8, 0xff };
@@ -814,7 +821,7 @@ void ym7101_device::prepare_tile_line(int scanline)
 		u16 scrollx_a_frac;
 		u16 scrolly_a_frac;
 
-		if (is_window_y_layer && x == std::clamp(x, min_x, max_x))
+		if (x == std::clamp(x, win_min_x, win_max_x))
 		{
 			const u16 vcolumn_a = scanline & ((window_v_page * 8) - 1);
 			const u32 tile_offset_a = (x & ((window_h_page * 1) - 1)) + ((vcolumn_a >> 3) * (window_h_page >> 0));
