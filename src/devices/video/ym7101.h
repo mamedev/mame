@@ -177,6 +177,7 @@ private:
 	int m_vint_pending, m_hint_pending;
 	int m_vcounter; // irq4 counter
 	u16 m_hvcounter_latch;
+	u32 m_vram_mask;
 
 	bitmap_rgb32 m_bitmap;
 	bool render_line(int scanline);
