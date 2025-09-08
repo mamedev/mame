@@ -202,6 +202,10 @@ license:CC0-1.0
 			<bounds x="45" y="430" width="45" height="25" />
 		</element>
 
+		<element name="lamp23" ref="ladder">
+			<bounds x="50" y="520" width="45" height="10" />
+		</element>
+
 <!-- right panel -->
 		<!-- Leiter I  LZ3+LZ4-->
 
@@ -243,6 +247,10 @@ license:CC0-1.0
 
 		<element name="lamp30" ref="ladder">
 			<bounds x="390" y="430" width="45" height="25" />
+		</element>
+
+		<element name="lamp22" ref="ladder">
+			<bounds x="390" y="520" width="45" height="10" />
 		</element>
 
 <!-- center LZ0+LZ2+LZ5-->
@@ -325,15 +333,7 @@ license:CC0-1.0
 		<element name="lamp01" ref="button_risk" inputtag="INPUTS" inputmask="0x01">
 			<bounds x="395" y="480" width="35" height="35" />
 		</element>
-
-
-		<element name="lamp23" ref="ladder">
-			<bounds x="50" y="520" width="45" height="10" />
-		</element>
-
-		<element name="lamp22" ref="ladder">
-			<bounds x="390" y="520" width="45" height="10" />
-		</element>
+		
 
 
 		<element name="disc02" ref="disk_1symbol">
