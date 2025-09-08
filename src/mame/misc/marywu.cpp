@@ -25,6 +25,7 @@
     Error 02
 
     Key k p1 button 1 button 2 button 3 reset nvram?
+	Will cause to display all 1 and led on then off
     unmapped memory read FFA4 until FFFF
     
 	key k p1 button 1 led, 7 segment test
