@@ -101,15 +101,7 @@ void elcirculo_state::led_w(offs_t offset, uint8_t data)
 {
 	if (offset == 1)
 	{
-		switch (data & 0x0f)
-		{
-			case 0x0e: m_led_row = 0; break;
-			case 0x0d: m_led_row = 1; break;
-			case 0x0b: m_led_row = 2; break;
-			case 0x07: m_led_row = 3; break;
-			default: logerror("row %02x\n",data); break;
-		}
-
+		m_led_row = (~data) & 0x0f;
 	}
 	else if (offset == 0)
 	{
@@ -119,17 +111,16 @@ void elcirculo_state::led_w(offs_t offset, uint8_t data)
 
 void elcirculo_state::strobe_w(offs_t offset, uint8_t data)
 {
-	if (m_led_row <= 3)
+	for (uint8_t row = 0; std::size(m_leds) > row; ++row)
+	{
+		if (BIT(m_led_row, row))
 		{
 			for (int bit = 0; bit < 8; bit++)
 			{
-				m_leds[m_led_row][bit] = !BIT(m_led_data, bit);
+				m_leds[row][bit] = !BIT(m_led_data, bit);
 			}
 		}
-		else
-		{
-			logerror("led_row %02x", m_led_row);
-		}
+	}
 }
 
 void elcirculo_state::program_map(address_map &map)
