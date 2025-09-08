@@ -20433,6 +20433,9 @@ rtpca25
 @source:ibm/thinkpad600.cpp
 thinkpad600
 thinkpad600e
+thinkpad600x
+thinkpad760xd
+thinkpad770z
 
 @source:ibm/thinkpad8xx.cpp
 thinkpad850
