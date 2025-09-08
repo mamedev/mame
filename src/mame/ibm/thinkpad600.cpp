@@ -65,7 +65,7 @@ Hardware for the 600 model.
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
-#include "cpu/h8/h83337.h"
+#include "cpu/h8/h83437.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
@@ -152,8 +152,8 @@ static void isa_internal_devices(device_slot_interface &device)
 
 void thinkpad600_state::thinkpad600_base(machine_config &config)
 {
-	// TODO: move away, maps on MB resource, bump to H83437
-	h83337_device &mcu(H83337(config, "mcu", XTAL(16'000'000))); // Actually an Hitachi HD64F3437TF, unknown clock
+	// TODO: move away, maps on MB resource
+	h83437_device &mcu(H83437(config, "mcu", XTAL(16'000'000))); // Actually an Hitachi HD64F3437TF, unknown clock
 	mcu.set_addrmap(AS_PROGRAM, &thinkpad600_state::mcu_map);
 //  mcu.set_disable();
 }
