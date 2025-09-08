@@ -1603,7 +1603,8 @@ zero (Z)
     Set if the result is zero, or cleared otherwise.
 sign (S)
     Set to the value of the most significant bit of the result (set if
-    the result is a negative signed integer, or cleared otherwise).
+    the result is a negative signed integer value, or cleared
+    otherwise).
 unordered (U)
     Undefined.
 
@@ -1665,7 +1666,8 @@ zero (Z)
     Set if the result is zero, or cleared otherwise.
 sign (S)
     Set to the value of the most significant bit of the result (set if
-    the result is a negative signed integer, or cleared otherwise).
+    the result is a negative signed integer value, or cleared
+    otherwise).
 unordered (U)
     Undefined.
 
@@ -1722,21 +1724,22 @@ zero (Z)
     and subtrahend are equal, or cleared otherwise).
 sign (S)
     Set to the value of the most significant bit of the result (set if
-    the result is a negative signed integer, or cleared otherwise).
+    the result is a negative signed integer value, or cleared
+    otherwise).
 unordered (U)
     Undefined.
 
 Simplification rules
 ^^^^^^^^^^^^^^^^^^^^
 
-* Immediate values for the ``src1`` and ``src2`` operands are truncated
-  to the instruction size.
 * Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
   :ref:`OR <umlinst-or>` if the ``src1`` and ``src2`` operands are both
   immediate values and the carry and overflow flags are not required.
 * Converted to :ref:`MOV <umlinst-mov>` or :ref:`AND <umlinst-and>` if
   the ``src2`` operand is the immediate value zero and the carry and
   overflow flags are not required.
+* Immediate values for the ``src1`` and ``src2`` operands are truncated
+  to the instruction size.
 
 .. _umlinst-subb:
 
@@ -1782,7 +1785,8 @@ zero (Z)
     otherwise).
 sign (S)
     Set to the value of the most significant bit of the result (set if
-    the result is a negative signed integer, or cleared otherwise).
+    the result is a negative signed integer value, or cleared
+    otherwise).
 unordered (U)
     Undefined.
 
@@ -1889,7 +1893,8 @@ zero (Z)
     Set if the result is zero, or cleared otherwise.
 sign (S)
     Set to the value of the most significant bit of the result (set if
-    the result is a negative signed integer, or cleared otherwise).
+    the result is a negative signed integer value, or cleared
+    otherwise).
 unordered (U)
     Undefined.
 
@@ -2031,7 +2036,8 @@ zero (Z)
     Set if the result is zero, or cleared otherwise.
 sign (S)
     Set to the value of the most significant bit of the result (set if
-    the result is a negative signed integer, or cleared otherwise).
+    the result is a negative signed integer value, or cleared
+    otherwise).
 unordered (U)
     Undefined.
 
@@ -2105,7 +2111,8 @@ zero (Z)
     Set if the result is zero, or cleared otherwise.
 sign (S)
     Set to the value of the most significant bit of the result (set if
-    the result is a negative signed integer, or cleared otherwise).
+    the result is a negative signed integer value, or cleared
+    otherwise).
 unordered (U)
     Undefined.
 
@@ -2210,6 +2217,333 @@ Simplification rules
 
 * Converted to :ref:`MOV <umlinst-mov>` or :ref:`AND <umlinst-and>` if
   the ``src`` operand is an immediate value.
+
+
+.. _umlinst-intshift:
+
+Integer shift and rotate
+------------------------
+
+.. _umlinst-shl:
+
+SHL
+~~~
+
+Shift an integer value to the left (toward the most significant bit
+position), shifting zeroes into the least significant bit.
+
++---------------------------+---------------------------------------+
+| Disassembly               | Usage                                 |
++===========================+=======================================+
+| .. code-block::           | .. code-block::                       |
+|                           |                                       |
+|     shl     dst,src,count |     UML_SHL(block, dst, src, count);  |
+|     dshl    dst,src,count |     UML_DSHL(block, dst, src, count); |
++---------------------------+---------------------------------------+
+
+Sets ``dst`` to the value of ``src`` shifted left by ``count`` bit
+positions modulo the operand size in bits.  Zeroes are shifted into the
+least significant bit position.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the shifted value will be stored.
+src (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The value to shift.
+count (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The number of bit positions to shift by.  Only the least significant
+    five bits or six bits of this operand are used, depending on the
+    instruction size.
+
+Flags
+^^^^^
+
+carry (C)
+    Set to the value of the last bit shifted out of the most significant
+    bit position if the shift count modulo the operand size in bits is
+    non-zero, or cleared if the shift count modulo the operand size in
+    bits is zero.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
+  :ref:`OR <umlinst-or>` if the ``src`` and ``count`` operands are both
+  immediate values or the ``count`` operand is the immediate value zero
+  and the carry flag is not required.
+* Immediate values for the ``src`` operand are truncated to the
+  instruction size.
+* Immediate values for the ``count`` operand are truncated to five or
+  six bits for 32-bit or 64-bit operands, respectively.
+
+.. _umlinst-shr:
+
+SHR
+~~~
+
+Shift an integer value to the right (toward the least significant bit
+position), shifting zeroes into the most significant bit.
+
++---------------------------+---------------------------------------+
+| Disassembly               | Usage                                 |
++===========================+=======================================+
+| .. code-block::           | .. code-block::                       |
+|                           |                                       |
+|     shr     dst,src,count |     UML_SHR(block, dst, src, count);  |
+|     dshr    dst,src,count |     UML_DSHR(block, dst, src, count); |
++---------------------------+---------------------------------------+
+
+Sets ``dst`` to the value of ``src`` shifted right by ``count`` bit
+positions modulo the operand size in bits.  Zeroes are shifted into the
+most significant bit position.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the shifted value will be stored.
+src (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The value to shift.
+count (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The number of bit positions to shift by.  Only the least significant
+    five bits or six bits of this operand are used, depending on the
+    instruction size.
+
+Flags
+^^^^^
+
+carry (C)
+    Set to the value of the last bit shifted out of the least
+    significant bit position if the shift count modulo the operand size
+    in bits is non-zero, or cleared if the shift count modulo the
+    operand size in bits is zero.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
+  :ref:`OR <umlinst-or>` if the ``src`` and ``count`` operands are both
+  immediate values or the ``count`` operand is the immediate value zero
+  and the carry flag is not required.
+* Immediate values for the ``src`` operand are truncated to the
+  instruction size.
+* Immediate values for the ``count`` operand are truncated to five or
+  six bits for 32-bit or 64-bit operands, respectively.
+
+.. _umlinst-sar:
+
+SAR
+~~~
+
+Shift an integer value to the right (toward the least significant bit
+position), preserving the value of the most significant bit.
+
++---------------------------+---------------------------------------+
+| Disassembly               | Usage                                 |
++===========================+=======================================+
+| .. code-block::           | .. code-block::                       |
+|                           |                                       |
+|     sar     dst,src,count |     UML_SAR(block, dst, src, count);  |
+|     dsar    dst,src,count |     UML_DSAR(block, dst, src, count); |
++---------------------------+---------------------------------------+
+
+Sets ``dst`` to the value of ``src`` shifted right by ``count`` bit
+positions modulo the operand size in bits.  The value of the most
+significant bit is preserved  after each shift step.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the shifted value will be stored.
+src (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The value to shift.
+count (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The number of bit positions to shift by.  Only the least significant
+    five bits or six bits of this operand are used, depending on the
+    instruction size.
+
+Flags
+^^^^^
+
+carry (C)
+    Set to the value of the last bit shifted out of the least
+    significant bit position if the shift count modulo the operand size
+    in bits is non-zero, or cleared if the shift count modulo the
+    operand size in bits is zero.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
+  :ref:`OR <umlinst-or>` if the ``src`` and ``count`` operands are both
+  immediate values or the ``count`` operand is the immediate value zero
+  and the carry flag is not required.
+* Immediate values for the ``src`` operand are truncated to the
+  instruction size.
+* Immediate values for the ``count`` operand are truncated to five or
+  six bits for 32-bit or 64-bit operands, respectively.
+
+.. _umlinst-rol:
+
+ROL
+~~~
+
+Rotate an integer value to the left (toward the most significant bit
+position).  Bits shifted out of the most significant bit position are
+shifted into the least significant bit position.
+
++---------------------------+---------------------------------------+
+| Disassembly               | Usage                                 |
++===========================+=======================================+
+| .. code-block::           | .. code-block::                       |
+|                           |                                       |
+|     rol     dst,src,count |     UML_ROL(block, dst, src, count);  |
+|     drol    dst,src,count |     UML_DROL(block, dst, src, count); |
++---------------------------+---------------------------------------+
+
+Sets ``dst`` to the value of ``src`` rotated left by ``count`` bit
+positions.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the rotated value will be stored.
+src (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The value to rotated.
+count (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The number of bit positions to rotate by.  Only the least
+    significant five bits or six bits of this operand are used,
+    depending on the instruction size.
+
+Flags
+^^^^^
+
+carry (C)
+    Set to the value of the last bit rotated out of the most significant
+    bit position (set to the least significant bit of the result) if the
+    shift count modulo the operand size in bits is non-zero, or cleared
+    if the shift count modulo the operand size in bits is zero.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
+  :ref:`OR <umlinst-or>` if the ``src`` and ``count`` operands are both
+  immediate values or the ``count`` operand is the immediate value zero
+  and the carry flag is not required.
+* Immediate values for the ``src`` operand are truncated to the
+  instruction size.
+* Immediate values for the ``count`` operand are truncated to five or
+  six bits for 32-bit or 64-bit operands, respectively.
+
+.. _umlinst-ror:
+
+ROR
+~~~
+
+Rotate an integer value to the right (toward the least significant bit
+position).  Bits shifted out of the least significant bit position are
+shifted into the most significant bit position.
+
++---------------------------+---------------------------------------+
+| Disassembly               | Usage                                 |
++===========================+=======================================+
+| .. code-block::           | .. code-block::                       |
+|                           |                                       |
+|     ror     dst,src,count |     UML_ROR(block, dst, src, count);  |
+|     dror    dst,src,count |     UML_DROR(block, dst, src, count); |
++---------------------------+---------------------------------------+
+
+Sets ``dst`` to the value of ``src`` rotated right by ``count`` bit
+positions.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the rotated value will be stored.
+src (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The value to rotated.
+count (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The number of bit positions to rotate by.  Only the least
+    significant five bits or six bits of this operand are used,
+    depending on the instruction size.
+
+Flags
+^^^^^
+
+carry (C)
+    Set to the value of the last bit rotated out of the least
+    significant bit position (set to the most significant bit of the
+    result) if the shift count modulo the operand size in bits is
+    non-zero, or cleared if the shift count modulo the operand size in
+    bits is zero.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
+  :ref:`OR <umlinst-or>` if the ``src`` and ``count`` operands are both
+  immediate values or the ``count`` operand is the immediate value zero
+  and the carry flag is not required.
+* Immediate values for the ``src`` operand are truncated to the
+  instruction size.
+* Immediate values for the ``count`` operand are truncated to five or
+  six bits for 32-bit or 64-bit operands, respectively.
 
 
 .. _umlinst-fparith:
