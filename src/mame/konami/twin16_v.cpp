@@ -74,7 +74,7 @@ void konami_twin16_video_device::device_start()
 		throw device_missing_dependencies();
 
 	if (!palette().shadows_enabled())
-		fatalerror("%s: palette shadow is should be enabled!", machine().describe_context());
+		fatalerror("%s: palette shadows must be enabled!", machine().describe_context());
 
 	m_sprite_cb.resolve_safe(0);
 	m_tile_cb.resolve_safe(0);
@@ -83,12 +83,12 @@ void konami_twin16_video_device::device_start()
 	const size_t videoram_size = 0x2000 / 2;
 	const size_t spriteram_size = 0x4000 / 2;
 	const size_t spritebuffer_size = 0x1000 / 2;
-	m_fixram = make_unique_clear<uint16_t[]>(fixram_size);
-	m_sprite_buffer = std::make_unique<uint16_t[]>(spritebuffer_size);
+	m_fixram = make_unique_clear<uint16_t []>(fixram_size);
+	m_sprite_buffer = std::make_unique<uint16_t []>(spritebuffer_size);
 	for (int i = 0; i < 2; i++)
 	{
-		m_videoram[i] = make_unique_clear<uint16_t[]>(videoram_size);
-		m_spriteram[i] = make_unique_clear<uint16_t[]>(spriteram_size);
+		m_videoram[i] = make_unique_clear<uint16_t []>(videoram_size);
+		m_spriteram[i] = make_unique_clear<uint16_t []>(spriteram_size);
 		save_pointer(NAME(m_videoram[i]), videoram_size, i);
 		save_pointer(NAME(m_spriteram[i]), spriteram_size, i);
 	}
@@ -428,7 +428,8 @@ TILE_GET_INFO_MEMBER(konami_twin16_video_device::scroll_tile_info)
 	const uint32_t code = m_tile_cb(data & 0x1fff);
 	const uint32_t color = (Which << 3) + (data >> 13);
 	uint8_t flags = 0;
-	if (m_video_register & TWIN16_TILE_FLIPY) flags |= TILE_FLIPY;
+	if (m_video_register & TWIN16_TILE_FLIPY)
+		flags |= TILE_FLIPY;
 
 	tileinfo.set(1, code, color, flags);
 	tileinfo.category = BIT(data, 15);
@@ -517,7 +518,8 @@ void konami_twin16_video_device::screen_vblank(int state)
 
 		if (m_sprite_process_enable)
 		{
-			if (m_need_process_spriteram) spriteram_process();
+			if (m_need_process_spriteram)
+				spriteram_process();
 			m_need_process_spriteram = 1;
 
 			/* if the sprite preprocessor is used, sprite ram is copied to an external buffer first,
@@ -527,7 +529,9 @@ void konami_twin16_video_device::screen_vblank(int state)
 			std::copy_n(&m_spriteram[0][0x1800], 0x800, &m_sprite_buffer[0]);
 		}
 		else
+		{
 			std::copy_n(&m_spriteram[0][0], 0x2000, &m_spriteram[1][0]);
+		}
 
 		// IRQ generation
 		m_virq_cb(ASSERT_LINE);
