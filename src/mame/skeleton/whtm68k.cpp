@@ -72,8 +72,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_crtc(*this, "crtc"),
 		m_ramdac(*this, "ramdac%u", 0U),
+		m_palette(*this, "palette"),
 		m_bgram(*this, "bgram"),
-		m_fgram(*this, "fgram")
+		m_fgram(*this, "fgram"),
+		m_bg_attr(*this, "bg_attr")
 	{ }
 
 	void yizhix(machine_config &config) ATTR_COLD;
@@ -87,9 +89,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<hd6845s_device> m_crtc;
 	required_device_array<ramdac_device, 2> m_ramdac;
+	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint16_t> m_bgram;
 	required_shared_ptr<uint16_t> m_fgram;
+	// TODO: uint8?
+	required_shared_ptr<uint16_t> m_bg_attr;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
@@ -98,8 +103,11 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
 	void bgram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fgram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg_attr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void main_program_map(address_map &map) ATTR_COLD;
@@ -126,30 +134,40 @@ void whtm68k_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(whtm68k_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(whtm68k_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
+	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-// TODO: wrong, just to show something
+// TODO: color is unconfirmed, other attr bits
 TILE_GET_INFO_MEMBER(whtm68k_state::get_bg_tile_info)
 {
 	uint16_t const tile = m_bgram[tile_index] & 0xfff;
-	uint16_t const attr = (m_bgram[tile_index] & 0xf000) >> 12;
-	tileinfo.set(0, tile, attr, 0);
+	uint16_t const color = (m_bgram[tile_index] & 0xf000) >> 12;
+	uint16_t const attr = m_bg_attr[tile_index];
+
+	tileinfo.category = BIT(attr, 4);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(whtm68k_state::get_fg_tile_info)
 {
 	uint16_t const tile = ((m_fgram[tile_index] & 0xfff) | 0x1000); // TODO: actually find tile bank
-	uint16_t const attr = (m_fgram[tile_index] & 0xf000) >> 12;
-	tileinfo.set(0, tile, attr | 0x10, 0);
+	uint16_t const color = (m_fgram[tile_index] & 0xf000) >> 12;
+//	uint16_t const attr = m_fg_attr[tile_index];
+
+//	tileinfo.category = BIT(attr, 4);
+	tileinfo.set(0, tile, color | 0x10, 0);
 }
 
 uint32_t whtm68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(rgb_t::black(), cliprect);
+	// TODO: mixing between the two layers
+	// register in RAMDACs selecting this?
+	bitmap.fill(m_palette->pen(0), cliprect);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 
 	return 0;
 }
@@ -166,6 +184,11 @@ void whtm68k_state::fgram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
+void whtm68k_state::bg_attr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_bg_attr[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
 
 void whtm68k_state::main_program_map(address_map &map)
 {
@@ -184,7 +207,8 @@ void whtm68k_state::main_program_map(address_map &map)
 	map(0x810401, 0x810401).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xd00000, 0xd03fff).ram().w(FUNC(whtm68k_state::bgram_w)).share(m_bgram);
 	map(0xd10000, 0xd13fff).ram().w(FUNC(whtm68k_state::fgram_w)).share(m_fgram);
-	map(0xd20000, 0xd27fff).ram(); // attribute RAM, for tile banks?
+	map(0xd20000, 0xd23fff).ram().w(FUNC(whtm68k_state::bg_attr_w)).share(m_bg_attr);
+	map(0xd24000, 0xd24001).ram(); // unknown, set once during POST with 0x42
 	map(0xe00000, 0xe03fff).ram(); // work RAM?
 	map(0xe10000, 0xe10fff).ram().share("nvram");
 	map(0xe30000, 0xe30001).nopr(); // TODO: read continuously during gameplay
@@ -207,9 +231,15 @@ void whtm68k_state::audio_io_map(address_map &map)
 template <uint8_t Which>
 void whtm68k_state::ramdac_map(address_map &map)
 {
-	// TODO: format isn't right (fade in/out effects)
-	// swapping data writes gives better results, still not enough.
-	map(0x000, 0x2ff).rw(m_ramdac[Which], FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
+	// TODO: unchecked bits 0-1, check writes to RAMDAC[1] at 0xfe-0xff
+	map(0x000, 0x2ff).lrw8(
+		NAME([this] (offs_t offset)  {
+			return bitswap<6>(m_ramdac[Which]->ramdac_pal_r(offset), 2, 3, 4, 5, 6, 7);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_ramdac[Which]->ramdac_rgb666_w(offset, bitswap<6>(data, 2, 3, 4, 5, 6, 7));
+		})
+	);
 }
 
 
@@ -325,7 +355,7 @@ void whtm68k_state::yizhix(machine_config &config)
 	m_ramdac[1]->set_color_base(0x100);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_wht);
-	PALETTE(config, "palette").set_entries(0x200);
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
