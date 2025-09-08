@@ -1870,6 +1870,9 @@ void goldstar_state::super9_map(address_map &map)
 	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::reel_ram_w<0>)).share(m_reel_ram[0]);
 	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::reel_ram_w<1>)).share(m_reel_ram[1]);
 	map(0xe800, 0xe9ff).ram().w(FUNC(goldstar_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+
+	map(0xea00, 0xeaff).rom();  // palette placeholder
+
 	map(0xf040, 0xf07f).ram().share(m_reel_scroll[0]);
 	map(0xf080, 0xf0bf).ram().share(m_reel_scroll[1]);
 	map(0xf0c0, 0xf0ff).ram().share(m_reel_scroll[2]);
@@ -1877,9 +1880,9 @@ void goldstar_state::super9_map(address_map &map)
 	map(0xf800, 0xf800).portr("IN0");    // player
 	map(0xf801, 0xf801).portr("IN1");    // second line
 	map(0xf802, 0xf802).portr("DSW1");   // DSW1 ok
-	map(0xf803, 0xf803).nopr();  // unknown reads...
-	map(0xf804, 0xf804).nopr();  // unknown reads...
-	map(0xf805, 0xf805).nopr();  // unknown massive reads...
+	map(0xf803, 0xf803).nopr();          // unknown reads...
+	map(0xf804, 0xf804).nopr();          // unknown reads...
+	map(0xf805, 0xf805).nopr();          // unknown massive reads...
 	map(0xf806, 0xf806).portr("IN2");    // nothing... to check
 	map(0xf810, 0xf810).portr("IN3");    // coin
 	map(0xf811, 0xf811).portr("IN4");    // test
@@ -1889,9 +1892,7 @@ void goldstar_state::super9_map(address_map &map)
 	map(0xf900, 0xf900).w(FUNC(goldstar_state::p1_lamps_w));
 	map(0xfa00, 0xfa00).w(FUNC(goldstar_state::goldstar_fa00_w));
 	map(0xfc00, 0xfdff).rom();
-	map(0xfe00, 0xfeff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // TODO: where's the palette
-//  map(0xfe11, 0xfe11) unknown reads...
-//  map(0xfe12, 0xfe12) unknown reads...
+	map(0xfe00, 0xfeff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xff00, 0xffff).ram();
 }
 
@@ -1900,7 +1901,6 @@ void goldstar_state::super9_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x10, 0x10).portr("DSW5");   // DSW5 ok
-//	map(0x00, 0xff).ram();
 }
 
 
@@ -4632,22 +4632,22 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( super9 )
 
 	PORT_START("IN0")  // player
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_M) PORT_NAME("Player: M")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_L) PORT_NAME("Player: L")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_X) PORT_NAME("Red Bet")           // ok
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_M) PORT_NAME("Player: M")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_L) PORT_NAME("Player: L")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_X) PORT_NAME("Red Bet")                    // ok
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_B) PORT_NAME("Small / Info / Stop 3")      // ok
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_C) PORT_NAME("Blue Bet / D-UP / Stop 1")   // ok
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_V) PORT_NAME("Take / Stop 2")              // ok
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_N) PORT_NAME("Big")               // ok
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_Z) PORT_NAME("Start / Stop All")  // ok
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_N) PORT_NAME("Big")                        // ok
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_Z) PORT_NAME("Start / Stop All")           // ok
 
 	PORT_START("IN1")  // second line
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin B")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("Keyout")  // need to hook hopper lines
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )  // Hopper presence detection
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Out / Attendant")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper Payout")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
 
@@ -11580,7 +11580,7 @@ void goldstar_state::super9(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 32*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar<false>));
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
@@ -13330,6 +13330,7 @@ ROM_START( super9 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "27e010.30", 0x10000, 0x10000, CRC(1aaea8d3) SHA1(71395a6d74a7cd55606daa57d17ff4628aa5f577) )
 	ROM_CONTINUE(          0x00000, 0x10000 )
+	ROM_COPY( "maincpu",   0x1c700, 0xea00, 0x0100 ) // palette data
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "nearcpu.bin", 0x00000, 0x20000, CRC(643cff6f) SHA1(305ca9182c3f6d69e09be38b854b3d7bdfa75439) )
@@ -13351,6 +13352,7 @@ ROM_START( super9a )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "27e010.30", 0x10000, 0x10000, CRC(986a9439) SHA1(c877379c6d2b283d209ec5abea4a5a542b934436) )
 	ROM_CONTINUE(          0x00000, 0x10000 )
+	ROM_COPY( "maincpu",   0x1c700, 0xea00, 0x0100 ) // palette
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "27e010.28", 0x00000, 0x20000, CRC(643cff6f) SHA1(305ca9182c3f6d69e09be38b854b3d7bdfa75439) )
@@ -23467,8 +23469,8 @@ void cmaster_state::init_crazybonb()
 	rom[0x01ff]=0x10; // change call $b015 to call $910  / Protection #5 
 	rom[0x0200]=0x09;
 	
-	rom[0x022d]=0x85; // change call $b018 to call $1485 / Protection #4
-	rom[0x022e]=0x14;
+	rom[0x022d]=0x86; // change call $b018 to call $b586 / Protection #4
+	rom[0x022e]=0xb5;
 	
 	rom[0x028f]=0x67; // change call $b01b to call $5c67 / Protection #12 
 	rom[0x0290]=0x5c;
@@ -25140,6 +25142,65 @@ void goldstar_state::init_super9()
 
 	for (int i = 0; i < 0x8000; i++)
 		src2[i] = bitswap<8>(src2[i], 3, 7, 6, 2, 5, 1, 0, 4);
+
+/*  Routine to arrange palette is in second half
+    Here we try to adapt one for this half of program.
+
+    021E: 21 00 EA    ld   hl,$EA00
+    0221: 11 00 FE    ld   de,$FE00
+    0224: 01 00 01    ld   bc,$0100
+    0227: ED B0       ldir
+    0229: 11 00 EA    ld   de,$EA00
+    022C: 21 00 FE    ld   hl,$FE00
+    022F: 0E 00       ld   c,$00
+    0231: 1A          ld   a,(de)
+    0232: BE          cp   (hl)
+    0233: 20 E9       jr   nz,$021E
+    0235: 13          inc  de
+    0236: 23          inc  hl
+    0237: 0D          dec  c
+    0238: 20 F7       jr   nz,$0231
+*/
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0x021e] = 0x21;  // HL
+	rom[0x021f] = 0x00;  // palette source (low)
+	rom[0x0220] = 0xea;  // palette source (high)
+
+	rom[0x0221] = 0x11;  // DE
+	rom[0x0222] = 0x00;  // palette write (low)
+	rom[0x0223] = 0xfe;  // palette write (high)
+
+	rom[0x0224] = 0x01;  // BC
+	rom[0x0225] = 0x00;  // size (low)
+	rom[0x0226] = 0x01;  // size (high)
+
+	rom[0x0227] = 0xed;  // ldir
+	rom[0x0228] = 0xb0;
+
+	rom[0x0229] = 0x11;  // DE
+	rom[0x022a] = 0x00;  // palette source (low)
+	rom[0x022b] = 0xea;  // palette source (high)
+
+	rom[0x022c] = 0x21;  // HL
+	rom[0x022d] = 0x00;  // palette write (low)
+	rom[0x022e] = 0xfe;  // palette write (high)
+
+	rom[0x022f] = 0x0e;  // ld c, $00
+	rom[0x0230] = 0x00;
+
+	rom[0x0231] = 0x1a;  // ld a,(de)
+	rom[0x0232] = 0xbe;  // cp   (hl)
+	rom[0x0233] = 0x20;  // jr nz, $021E
+	rom[0x0234] = 0xe9;
+	rom[0x0235] = 0x13;  // inc de
+	rom[0x0236] = 0x23;  // inc hl
+	rom[0x0237] = 0x0d;  // dec c
+	rom[0x0238] = 0x20;  // jr nz, $0231
+	rom[0x0239] = 0xf7;
+
+	rom[0xea80] = 0x00;  // reels tilemap mask 
+
 }
 
 
