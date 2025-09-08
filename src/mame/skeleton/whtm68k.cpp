@@ -70,6 +70,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_crtc(*this, "crtc"),
+		m_ramdac(*this, "ramdac%u", 0U),
 		m_bgram(*this, "bgram"),
 		m_fgram(*this, "fgram")
 	{ }
@@ -83,6 +85,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<hd6845s_device> m_crtc;
+	required_device_array<ramdac_device, 2> m_ramdac;
 
 	required_shared_ptr<uint16_t> m_bgram;
 	required_shared_ptr<uint16_t> m_fgram;
@@ -101,8 +105,7 @@ private:
 	void main_program_map(address_map &map) ATTR_COLD;
 	void audio_program_map(address_map &map) ATTR_COLD;
 	void audio_io_map(address_map &map) ATTR_COLD;
-	void ramdac_map(address_map &map) ATTR_COLD;
-	void ramdac2_map(address_map &map) ATTR_COLD;
+	template <uint8_t Which> void ramdac_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -110,7 +113,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(whtm68k_state::scanline_cb)
 {
 	int const scanline = param;
 
-	if (scanline == 128)
+	if (scanline == 256)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 
 	if (scanline == 0)
@@ -130,15 +133,15 @@ void whtm68k_state::video_start()
 TILE_GET_INFO_MEMBER(whtm68k_state::get_bg_tile_info)
 {
 	uint16_t const tile = m_bgram[tile_index] & 0xfff;
-	uint16_t const attr = m_bgram[tile_index] & 0xf000 >> 12;
+	uint16_t const attr = (m_bgram[tile_index] & 0xf000) >> 12;
 	tileinfo.set(0, tile, attr, 0);
 }
 
 TILE_GET_INFO_MEMBER(whtm68k_state::get_fg_tile_info)
 {
 	uint16_t const tile = ((m_fgram[tile_index] & 0xfff) | 0x1000); // TODO: actually find tile bank
-	uint16_t const attr = m_fgram[tile_index] & 0xf000 >> 12;
-	tileinfo.set(0, tile, attr, 0);
+	uint16_t const attr = (m_fgram[tile_index] & 0xf000) >> 12;
+	tileinfo.set(0, tile, attr | 0x10, 0);
 }
 
 uint32_t whtm68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -167,19 +170,21 @@ void whtm68k_state::fgram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void whtm68k_state::main_program_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x800100, 0x800101).nopw(); //TODO: map(0x800101, 0x800101).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x800102, 0x800103).nopw(); //TODO: map(0x800103, 0x800103).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x800104, 0x800105).nopw(); //TODO: map(0x800105, 0x800105).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x800200, 0x800201).nopw(); //TODO: map(0x800201, 0x800201).w("ramdac2", FUNC(ramdac_device::index_w));
-	map(0x800202, 0x800203).nopw(); //TODO: map(0x800203, 0x800203).w("ramdac2", FUNC(ramdac_device::mask_w));
-	map(0x800204, 0x800205).nopw(); //TODO: map(0x800205, 0x800205).w("ramdac2", FUNC(ramdac_device::pal_w));
+	map(0x800001, 0x800001).rw(m_crtc, FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));
+	map(0x800003, 0x800003).rw(m_crtc, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
+	map(0x800101, 0x800101).w(m_ramdac[0], FUNC(ramdac_device::index_w));
+	map(0x800103, 0x800103).w(m_ramdac[0], FUNC(ramdac_device::mask_w));
+	map(0x800105, 0x800105).w(m_ramdac[0], FUNC(ramdac_device::pal_w));
+	map(0x800201, 0x800201).w(m_ramdac[1], FUNC(ramdac_device::index_w));
+	map(0x800203, 0x800203).w(m_ramdac[1], FUNC(ramdac_device::mask_w));
+	map(0x800205, 0x800205).w(m_ramdac[1], FUNC(ramdac_device::pal_w));
 	map(0x810002, 0x810003).portr("IN0");
 	map(0x810100, 0x810101).portr("DSW1"); // ??
 	map(0x810300, 0x810301).portr("DSW2"); // ??
 	map(0x810401, 0x810401).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xd00000, 0xd03fff).ram().w(FUNC(whtm68k_state::bgram_w)).share(m_bgram);
 	map(0xd10000, 0xd13fff).ram().w(FUNC(whtm68k_state::fgram_w)).share(m_fgram);
-	map(0xd20000, 0xd23fff).ram(); // attribute RAM? or third bitmap?
+	map(0xd20000, 0xd27fff).ram(); // attribute RAM, for tile banks?
 	map(0xe00000, 0xe03fff).ram(); // work RAM?
 	map(0xe10000, 0xe10fff).ram().share("nvram");
 	map(0xe30000, 0xe30001).nopr(); // TODO: read continuously during gameplay
@@ -199,14 +204,12 @@ void whtm68k_state::audio_io_map(address_map &map)
 	map(0xc000, 0xc001).w("ym", FUNC(ym2413_device::write));
 }
 
+template <uint8_t Which>
 void whtm68k_state::ramdac_map(address_map &map)
 {
-	map(0x000, 0x2ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
-}
-
-void whtm68k_state::ramdac2_map(address_map &map)
-{
-	map(0x000, 0x2ff).rw("ramdac2", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+	// TODO: format isn't right (fade in/out effects)
+	// swapping data writes gives better results, still not enough.
+	map(0x000, 0x2ff).rw(m_ramdac[Which], FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
 }
 
 
@@ -268,14 +271,14 @@ const gfx_layout gfx_8x8x4_packed_msb_r =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ STEP4(3,-1) },
+	{ 0, 1, 2, 3 },
 	{ 4, 0, 28, 24, 20, 16, 12, 8 },
 	{ STEP8(0,4*8) },
 	8*8*4
 };
 
 static GFXDECODE_START( gfx_wht )
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb_r, 0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb_r, 0, 32 )
 GFXDECODE_END
 
 
@@ -304,21 +307,25 @@ void whtm68k_state::yizhix(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: everything
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
+	screen.set_size(512, 262);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(whtm68k_state::screen_update));
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", 12_MHz_XTAL / 12));  // divisor guessed
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
+	HD6845S(config, m_crtc, 12_MHz_XTAL / 8);  // clock/divisor guessed
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
 
-	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &whtm68k_state::ramdac_map); // MU9C4870-80PC
-	RAMDAC(config, "ramdac2", 0, "palette2").set_addrmap(0, &whtm68k_state::ramdac2_map); // MU9C4870-80PC
+	RAMDAC(config, m_ramdac[0], 0, "palette"); // MU9C4870-80PC
+	m_ramdac[0]->set_addrmap(0, &whtm68k_state::ramdac_map<0>);
+	m_ramdac[0]->set_color_base(0);
+
+	RAMDAC(config, m_ramdac[1], 0, "palette"); // MU9C4870-80PC
+	m_ramdac[1]->set_addrmap(0, &whtm68k_state::ramdac_map<1>);
+	m_ramdac[1]->set_color_base(0x100);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_wht);
-	PALETTE(config, "palette").set_entries(0x100); // TODO
-	PALETTE(config, "palette2").set_entries(0x100); // TODO
+	PALETTE(config, "palette").set_entries(0x200);
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
