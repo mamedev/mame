@@ -14,6 +14,9 @@
 class konami_twin16_video_device : public device_t, public device_video_interface, public device_gfx_interface
 {
 public:
+	using sprite_cb_delegate = device_delegate<uint16_t (int addr)>;
+	using tile_cb_delegate = device_delegate<uint32_t (uint16_t data)>;
+
 	// constructor/destructor
 	konami_twin16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	template <typename T> konami_twin16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
@@ -24,9 +27,6 @@ public:
 	}
 
 	// configurations
-	using sprite_cb_delegate = device_delegate<uint16_t (int addr)>;
-	using tile_cb_delegate = device_delegate<uint32_t (uint16_t data)>;
-
 	auto virq_callback() { return m_virq_cb.bind(); }
 	template <typename... T> void set_sprite_callback(T &&... args) { m_sprite_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_tile_callback(T &&... args) { m_tile_cb.set(std::forward<T>(args)...); }
@@ -64,11 +64,11 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	std::unique_ptr<uint16_t[]> m_fixram;
-	std::unique_ptr<uint16_t[]> m_videoram[2];
+	std::unique_ptr<uint16_t []> m_fixram;
+	std::unique_ptr<uint16_t []> m_videoram[2];
 
-	std::unique_ptr<uint16_t[]> m_spriteram[2];
-	std::unique_ptr<uint16_t[]> m_sprite_buffer;
+	std::unique_ptr<uint16_t []> m_spriteram[2];
+	std::unique_ptr<uint16_t []> m_sprite_buffer;
 
 	emu_timer *m_sprite_timer;
 	uint8_t m_sprite_process_enable;
@@ -93,7 +93,6 @@ private:
 	int set_sprite_timer();
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	bool spriteram_process_enable();
-
 };
 
 DECLARE_DEVICE_TYPE(KONAMI_TWIN16_VIDEO,  konami_twin16_video_device)
