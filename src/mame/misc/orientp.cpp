@@ -41,8 +41,8 @@ u1 Nec D8279C-2
 u17 and u21 Nec D8255-AC-2
 u25  Intel P8052AH mcu - 8052
 u32  hm6264alp-12
-u102 kc8972
-u104 ym2413
+u102 jfc 95101
+u104 unpopulated ym2413
 u107 u6295
 
 
