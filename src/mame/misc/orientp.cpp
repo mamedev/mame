@@ -222,7 +222,7 @@ void orientp_state::orientp(machine_config &config)
    
     NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	
-	//TODO: Check mcu dump and mcu hook up
+	//TODO: Check mcu dump and hook up
     i8051_device &mcu(I8051(config, "mcu", XTAL(10'738'000)));
     mcu.set_addrmap(AS_PROGRAM, &orientp_state::mcu_map);
 	mcu.set_addrmap(AS_IO, &orientp_state::mcu_io_map);
