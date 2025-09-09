@@ -669,7 +669,7 @@ void mpu4_state::dataport_rxd(int state)
 /* IC4, 7 seg leds, 50Hz timer reel sensors, current sensors */
 void mpu4_state::pia_ic4_porta_w(uint8_t data)
 {
-	if(m_ic23_active)
+	if (m_ic23_active)
 	{
 		if (m_use_pia4_porta_leds)
 		{
@@ -804,7 +804,6 @@ uint8_t mpu4_state::pia_ic5_porta_r()
 
 	LOG("%s: IC5 PIA Read of Port A (AUX1)\n", machine().describe_context());
 
-
 	uint8_t tempinput = m_aux1_port->read() | m_aux1_input;
 	return tempinput;
 }
@@ -895,9 +894,9 @@ void mpu4_state::pia_ic5_portb_w(uint8_t data)
 
 	if (m_use_simplecard_leds)
 	{
-		if(m_simplecard_leds_strobe != m_input_strobe)
+		if (m_simplecard_leds_strobe != m_input_strobe)
 		{
-			for(int i=0; i<8; i++)
+			for (int i=0; i<8; i++)
 			{
 				m_mpu4leds[( ( (7 - m_input_strobe) | m_simplecard_leds_base) << 3) | i] = BIT(m_pia4->a_output(), i);
 			}
@@ -1869,7 +1868,6 @@ void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 
 	space.install_read_handler(0x08c0, 0x08c7, read8sm_delegate(*m_okicard, FUNC(mpu4_oki_sampled_sound::ic3_read)));
 	space.install_write_handler(0x08c0, 0x08c7, write8sm_delegate(*m_okicard, FUNC(mpu4_oki_sampled_sound::ic3_write)));
-
 }
 
 
@@ -1883,7 +1881,6 @@ void mpu4_state::mpu4_config_common()
 	m_flutterbox.resolve();
 
 	m_ic24_timer = timer_alloc(FUNC(mpu4_state::update_ic24), this);
-
 
 	save_item(NAME( m_mmtr_data ));
 	save_item(NAME( m_ay8913_address ));
@@ -1956,7 +1953,6 @@ void mpu4_state::mpu4_config_common()
 	save_item(NAME( m_hopper2_opto ));
 
 	m_lamp_strobe_ext_persistence = 0;
-
 }
 
 MACHINE_START_MEMBER(mpu4_state, mod2)
@@ -2323,7 +2319,6 @@ void mpu4_state::mpu4_common(machine_config &config)
 
 	HOPPER(config, m_hopper1, attotime::from_msec(100));
 
-
 	SPEAKER(config, "mono").front_center();
 
 	DAC_1BIT(config, m_alarmdac, 0);
@@ -2345,9 +2340,7 @@ void mpu4_state::mpu4base(machine_config &config)
 
 	mpu4_common(config);
 
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
 	MC68681(config, m_duart68681, MPU4_MASTER_CLOCK); // ?
 
 	config.set_default_layout(layout_mpu4);
@@ -2409,7 +2402,6 @@ void mpu4_state::mod4oki_f(machine_config &config)
 	m_okicard->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	m_okicard->cb2_handler().set(FUNC(mpu4_state::pia_gb_cb2_w));
-
 }
 
 void mpu4_state::mod4oki_no_bacta_f(machine_config &config)
