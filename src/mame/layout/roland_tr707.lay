@@ -81,7 +81,20 @@ the visibility and style of elements that differ between the two.
 			<rect fill="#d4d4cf" width="682" height="258" rx="8" ry="8" x="6" y="6" />
 		]]></data></image>
 	</element>
-	<element name="cartridge"><rect><color red="0.34" green="0.37" blue="0.39"/></rect></element>
+	<element name="cartridge">
+		<rect state="0">
+			<bounds x="0" y="0" width="62" height="234"/>
+			<color red="0.34" green="0.37" blue="0.39"/>
+		</rect>
+		<rect state="1">
+			<bounds x="0" y="0" width="62" height="234"/>
+			<color red="0.22" green="0.22" blue="0.22"/>
+		</rect>
+		<rect state="1">
+			<bounds x="6" y="8" width="40" height="216"/>
+			<color red="0.82" green="0.84" blue="0.86"/>
+		</rect>
+	</element>
 
 	<element name="lcd_border"><rect><color red="0.82" green="0.81" blue="0.80"/></rect></element>
 	<element name="lcd_background"><rect><color red="0.72" green="0.76" blue="0.77"/></rect></element>
@@ -567,7 +580,7 @@ the visibility and style of elements that differ between the two.
 		<element ref="cartlcdsection"><bounds x="83" y="135" width="694" height="270"/></element>
 		<element ref="line"><bounds x="291" y="135" width="5" height="270"/></element>
 		<element ref="sunken"><bounds x="153" y="147" width="74" height="246"/></element>
-		<element ref="cartridge"><bounds x="159" y="153" width="62" height="234"/></element>
+		<element ref="cartridge" name="has_cartridge"><bounds x="159" y="153" width="62" height="234"/></element>
 		<element ref="lcd_border"><bounds x="365" y="147" width="350" height="246"/></element>
 		<element ref="lcd_background"><bounds x="393" y="161" width="294" height="218"/></element>
 

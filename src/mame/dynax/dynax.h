@@ -68,8 +68,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_device<ls259_device> m_mainlatch;
-	optional_device<dynax_blitter_rev2_device> m_blitter;
+	required_device<ls259_device> m_mainlatch;
+	required_device<dynax_blitter_rev2_device> m_blitter;
 	optional_device<hopper_device> m_hopper;
 	optional_device<address_map_bank_device> m_bankdev;
 	optional_device<rst_pos_buffer_device> m_mainirq;
@@ -94,8 +94,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	// Nothing below here is used by ddenlovr.cpp
-	// TODO: further decouple dynax.cpp and ddenlovr.cpp
 	void coincounter_0_w(int state);
 	void coincounter_1_w(int state);
 	uint8_t ret_ff();
@@ -461,6 +459,5 @@ private:
 
 
 INPUT_PORTS_EXTERN(dynax_mahjong_keys);
-INPUT_PORTS_EXTERN(dynax_hanafuda_keys_bet);
 
 #endif // MAME_DYNAX_DYNAX_H

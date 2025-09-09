@@ -427,6 +427,19 @@ public:
 			}
 			convert_to_mov_immediate(inst, val);
 		}
+		else if ((1 << inst.param(2).size()) >= inst.size())
+		{
+			if (inst.flags())
+			{
+				inst.m_opcode = OP_AND;
+				inst.m_param[2] = size_mask(inst);
+			}
+			else
+			{
+				inst.m_opcode = OP_MOV;
+				inst.m_numparams = 2;
+			}
+		}
 	}
 
 	static void roland(instruction &inst)
