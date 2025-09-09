@@ -64,10 +64,10 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	std::unique_ptr<uint16_t []> m_fixram;
-	std::unique_ptr<uint16_t []> m_videoram[2];
+	memory_share_creator<uint16_t> m_fixram;
+	memory_share_array_creator<uint16_t, 2> m_videoram;
 
-	std::unique_ptr<uint16_t []> m_spriteram[2];
+	memory_share_array_creator<uint16_t, 2> m_spriteram;
 	std::unique_ptr<uint16_t []> m_sprite_buffer;
 
 	emu_timer *m_sprite_timer;

@@ -84,13 +84,14 @@ public:
 		m_gfxrom(*this, "gfxrom")
 	{ }
 
-	void devilw(machine_config &config);
-	void miaj(machine_config &config);
-	void twin16(machine_config &config);
+	void devilw(machine_config &config) ATTR_COLD;
+	void miaj(machine_config &config) ATTR_COLD;
+	void twin16(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
@@ -218,6 +219,11 @@ uint32_t fround_state::tile_callback(uint16_t data)
 	*/
 	const uint8_t bank = (data >> 11) & 3;
 	return (m_gfx_bank[bank] << 11) | (data & 0x7ff);
+}
+
+void twin16_state::video_start()
+{
+	m_palette->set_shadow_factor(0.4); // screenshots estimate
 }
 
 

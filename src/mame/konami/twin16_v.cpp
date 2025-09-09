@@ -49,9 +49,9 @@ konami_twin16_video_device::konami_twin16_video_device(const machine_config &mco
 	: device_t(mconfig, KONAMI_TWIN16_VIDEO, tag, owner, clock)
 	, device_video_interface(mconfig, *this, true)
 	, device_gfx_interface(mconfig, *this, nullptr)
-	, m_fixram(nullptr)
-	, m_videoram{nullptr, nullptr}
-	, m_spriteram{nullptr, nullptr}
+	, m_fixram(*this, "fixram", 0x4000U, ENDIANNESS_BIG)
+	, m_videoram(*this, "videoram_%u", 0U, 0x2000U, ENDIANNESS_BIG)
+	, m_spriteram{*this, "spriteram_%u", 0U, 0x4000U, ENDIANNESS_BIG}
 	, m_sprite_buffer(nullptr)
 	, m_sprite_timer(nullptr)
 	, m_sprite_process_enable(1)
@@ -79,19 +79,8 @@ void konami_twin16_video_device::device_start()
 	m_sprite_cb.resolve_safe(0);
 	m_tile_cb.resolve_safe(0);
 
-	const size_t fixram_size = 0x4000 / 2;
-	const size_t videoram_size = 0x2000 / 2;
-	const size_t spriteram_size = 0x4000 / 2;
 	const size_t spritebuffer_size = 0x1000 / 2;
-	m_fixram = make_unique_clear<uint16_t []>(fixram_size);
 	m_sprite_buffer = std::make_unique<uint16_t []>(spritebuffer_size);
-	for (int i = 0; i < 2; i++)
-	{
-		m_videoram[i] = make_unique_clear<uint16_t []>(videoram_size);
-		m_spriteram[i] = make_unique_clear<uint16_t []>(spriteram_size);
-		save_pointer(NAME(m_videoram[i]), videoram_size, i);
-		save_pointer(NAME(m_spriteram[i]), spriteram_size, i);
-	}
 
 	m_fixed_tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(konami_twin16_video_device::fix_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_scroll_tmap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(konami_twin16_video_device::scroll_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -101,13 +90,10 @@ void konami_twin16_video_device::device_start()
 	m_scroll_tmap[0]->set_transparent_pen(0);
 	m_scroll_tmap[1]->set_transparent_pen(0);
 
-	palette().set_shadow_factor(0.4); // screenshots estimate
-
 	std::fill_n(&m_sprite_buffer[0], 0x800, uint16_t(~0));
 	m_sprite_timer = timer_alloc(FUNC(konami_twin16_video_device::sprite_tick), this);
 	m_sprite_timer->adjust(attotime::never);
 
-	save_pointer(NAME(m_fixram), fixram_size);
 	save_pointer(NAME(m_sprite_buffer), spritebuffer_size);
 	save_item(NAME(m_sprite_busy));
 	save_item(NAME(m_need_process_spriteram));
@@ -352,10 +338,11 @@ void konami_twin16_video_device::draw_sprites(screen_device &screen, bitmap_ind1
 			const int sy_start = flipy ? (ypos + height - 1) : ypos;
 			const int xinc = flipx ? -1 : 1;
 			const int yinc = flipy ? -1 : 1;
+			const int pitch = (width >> 2);
 
 			/* slow slow slow, but it's ok for now */
 			int sy = sy_start;
-			for (int y = 0; y < height; y++, sy += yinc, pen_addr += (width >> 2))
+			for (int y = 0; y < height; y++, sy += yinc, pen_addr += pitch)
 			{
 				if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 				{
