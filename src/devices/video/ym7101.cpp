@@ -784,6 +784,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 		// (sonic2 title, sor player spawn)
 		// semantics explained with https://segaretro.org/Sprite_Masking_and_Overflow_Test_ROM
 		// TODO: currently fails test 6. MASK S1 ON DOT OVERFLOW
+		// mask startup behaviour should change depending on previous line overflow setting
 		// TODO: check mmaniaj 3d chase stages
 		// (should reduce number of access slots by disabling display during HBlank)
 		if (sprite_mask_state == 2)
