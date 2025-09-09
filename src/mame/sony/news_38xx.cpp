@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Patrick Mackinlay
+// copyright-holders:Patrick Mackinlay,Brice Onken
 
 /*
  * Sony NEWS NWS-38xx workstations
@@ -9,8 +9,17 @@
  * to handle system I/O. Unlike the 8xx/9xx and 18xx/19xx, the NWS-3800 is a mixed architecture system. It uses a MIPS
  * R3000 CPU for NEWS-OS and user programs, and a 68030 running rtx (NEWS-OS 3) or mrx (NEWS-OS 4) as the IOP.
  *
+ * The motherboard designator for the 3800 series is MPU-10.
+ *
+ * Supported:
+ *  - NWS-3860
+ *
  * Known NWS-3800 configurations
- *  - TODO
+ *  - NWS-3840: Apr 1990, 20MHz CPU/IOP, 16MB RAM (expandable to 80MB), 286MB HDD, without tape drive
+ *  - NWS-3860: Dec 1989, 20MHz CPU/IOP, 16MB RAM (expandable to 80MB), 640MB HDD, with tape drive
+ *  - NWS-3865: Aug 1991, 25MHz CPU/IOP, 16MB RAM (expandable to 80MB), 640MB HDD (Type E) or 1.25GB HDD (Type G), with tape drive
+ *  - NWS-3870: Jan 1991, 25MHz CPU/IOP, 64MB RAM (expandable to 128MB), 1.25GB HDD, with tape drive
+ *  - NWS-3880: Feb 1992, 25MHz CPU/IOP, 64MB RAM (expandable to ?), 2.0GB HDD, tape drive unknown
  *
  * Sources:
  *  - NWS-3840/3860 Service Guide
@@ -18,9 +27,13 @@
  *  - https://katsu.watanabe.name/doc/sonynews/model.html
  *
  * TODO:
- *   - slots (I/O expansion and UBUS expansion)
+ *   - slots (I/O and UBUS expansion slots)
  *   - graphics
  *   - sound
+ *   - Something in the format/install flow is iffy: you have to manually write the disklabel before the installer works
+ *     I do not have the NEWS-OS 4.1R install manual, so I don't know if I am doing something wrong or if the emulation
+ *     is missing something. The format program does seem to spin for a bit on reading the defect information after
+ *     running FORMAT UNIT.
  */
 
 #include "emu.h"
@@ -60,7 +73,7 @@
 #define LOG_IOP (1U << 5)
 #define LOG_CPU (1U << 6)
 
-#define VERBOSE (LOG_GENERAL|LOG_INTERRUPT|LOG_TAS)
+#define VERBOSE (LOG_GENERAL|LOG_INTERRUPT)
 #include "logmacro.h"
 
 
@@ -225,7 +238,7 @@ protected:
 	u8 boot_vector_r(offs_t offset);
 	void cpu_parity_check_enable_w(u32 data);
 	void cpu_timer_w(u32 data);
-	void mapvec_w(u32 data);
+	void cpu_boot_vector_map_w(u32 data);
 	void cpuled_w(offs_t offset, u32 data);
 	void reset_cpu_registers();
 
@@ -330,7 +343,7 @@ void news_38xx_state::cpu_map(address_map &map)
 
 	map(0x08000000, 0x0fffffff).rw(FUNC(news_38xx_state::ram_tas_r), FUNC(news_38xx_state::ram_tas_w));
 
-	// 0x10000000 - 0x17ffffff TODO: UBUS I/O?
+	// 0x10000000 - 0x17ffffff UBUS
 
 	// All registers below this line are 32 bit registers, LSB 1 = Set, 0 = Reset
 	map(0x18000000, 0x18000003).r(FUNC(news_38xx_state::cpu_status_r));
@@ -338,7 +351,7 @@ void news_38xx_state::cpu_map(address_map &map)
 	map(0x18000004, 0x18000007).w(FUNC(news_38xx_state::cpu_timer_w)).mirror(0xffff00);
 	map(0x18000020, 0x18000023).lw32(NAME([this] (u32) { irq_w<iop_irq::CPU>(1); })).mirror(0xffff00);
 	map(0x18000024, 0x18000027).lw32(NAME([] (u32) { fatalerror("CPU tried to interrupt UBUS without UPU installed!"); })).mirror(0xffff00);
-	map(0x18000040, 0x18000043).w(FUNC(news_38xx_state::mapvec_w)).mirror(0xffff00);
+	map(0x18000040, 0x18000043).w(FUNC(news_38xx_state::cpu_boot_vector_map_w)).mirror(0xffff00);
 	map(0x18000044, 0x18000047).w(FUNC(news_38xx_state::inten_w<cpu_irq::UBUS>)).mirror(0xffff00);
 	map(0x18000060, 0x18000063).lw32(NAME([this] (u32) { irq_w<cpu_irq::IOP>(0); })).mirror(0xffff00);
 	map(0x18000064, 0x18000067).lw32(NAME([this] (u32) { irq_w<cpu_irq::UBUS>(0); })).mirror(0xffff00);
@@ -704,7 +717,7 @@ void news_38xx_state::poweron_w(u8 data)
 
 void news_38xx_state::romdis_w(u8 data)
 {
-	LOGMASKED(LOG_IOP, "(%s) Write ROMDIS = 0x%x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_IOP, "(%s) IOP ROMDIS = 0x%x\n", machine().describe_context(), data);
 
 	if (data) {
 		m_iop->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
@@ -716,7 +729,7 @@ void news_38xx_state::romdis_w(u8 data)
 
 void news_38xx_state::iop_parity_check_enable_w(u8 data)
 {
-	LOGMASKED(LOG_IOP, "(%s) %s IOP parity checking\n", machine().describe_context(), data ? ENABLED : DISABLED);
+	LOGMASKED(LOG_IOP, "(%s) IOP parity checking %s\n", machine().describe_context(), data ? ENABLED : DISABLED);
 
 	inten_w<iop_irq::PERR>(data > 0);
 	if (!data)
@@ -727,7 +740,7 @@ void news_38xx_state::iop_parity_check_enable_w(u8 data)
 
 void news_38xx_state::iop_timer_w(u8 data)
 {
-	LOGMASKED(LOG_TIMER, "(%s) %s IOP timer\n", machine().describe_context(), data ? ENABLED : DISABLED);
+	LOGMASKED(LOG_TIMER, "(%s) IOP timer %s\n", machine().describe_context(), data ? ENABLED : DISABLED);
 
 	inten_w<iop_irq::TIMER>(data > 0);
 	if (!data)
@@ -796,7 +809,7 @@ u8 news_38xx_state::boot_vector_r(offs_t offset)
 	}
 
 	// In reality, this probably just causes a bus error, returns 0x0/0xff, or something like that
-	fatalerror("CPU tried to read from boot vector space without MAPVEC!");
+	fatalerror("CPU tried to read from boot vector space without boot vector mapping!");
 }
 
 void news_38xx_state::cpu_parity_check_enable_w(u32 data)
@@ -821,7 +834,7 @@ void news_38xx_state::cpu_timer_w(u32 data)
 	}
 }
 
-void news_38xx_state::mapvec_w(u32 data)
+void news_38xx_state::cpu_boot_vector_map_w(u32 data)
 {
 	LOGMASKED(LOG_CPU, "(%s) CPU boot vector mapping %s\n", machine().describe_context(), data ? DISABLED : ENABLED);
 	m_mapvec = data > 0;
@@ -857,7 +870,7 @@ void news_38xx_state::common(machine_config &config)
 	m_iop->set_addrmap(AS_PROGRAM, &news_38xx_state::iop_map);
 	m_iop->set_addrmap(m68000_base_device::AS_CPU_SPACE, &news_38xx_state::iop_vector_map);
 
-	// Base RAM: 16M onboard
+	// For NWS3840/3860: 16M onboard
 	// With NWB-109 expansion kit: 16M onboard + 16M (1Mbit DRAM chips) expansion = 32M total
 	// With NWB-112 expansion kit: 16M onboard + 64M (4Mbit DRAM chips) expansion = 80M total
 	RAM(config, m_ram);
@@ -985,7 +998,7 @@ void news_38xx_state::common(machine_config &config)
 	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::KEYBOARD>));
 	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::MOUSE>));
 
-	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("RISC");
+	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("RISC,NWS3000");
 }
 
 void news_38xx_state::nws3860(machine_config &config)
