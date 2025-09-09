@@ -649,9 +649,4 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool imd_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const imd_format FLOPPY_IMD_FORMAT;

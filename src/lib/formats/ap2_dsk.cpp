@@ -133,11 +133,6 @@ const char *a2_13sect_format::extensions() const noexcept
 	return "d13";
 }
 
-bool a2_13sect_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const a2_13sect_format FLOPPY_A213S_FORMAT;
 
 static const uint8_t translate6[0x40] =
@@ -1154,11 +1149,6 @@ const char *a2_edd_format::extensions() const noexcept
 	return "edd";
 }
 
-bool a2_edd_format::supports_save() const noexcept
-{
-	return false;
-}
-
 int a2_edd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
@@ -1274,11 +1264,6 @@ const char *a2_nib_format::description() const noexcept
 const char *a2_nib_format::extensions() const noexcept
 {
 	return "nib";
-}
-
-bool a2_nib_format::supports_save() const noexcept
-{
-	return false;
 }
 
 int a2_nib_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
