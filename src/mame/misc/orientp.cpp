@@ -53,10 +53,10 @@ Need Proper Layout.
 
 namespace {
 
-class orientalpearl_state : public driver_device
+class orientp_state : public driver_device
 {
 public:
-	orientalpearl_state(const machine_config &mconfig, device_type type, const char *tag)
+	orientp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
@@ -137,25 +137,25 @@ static INPUT_PORTS_START( east8 )
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void orientalpearl_state::ay1_port_a_w(uint8_t data)
+void orientp_state::ay1_port_a_w(uint8_t data)
 {
 	for (uint8_t i = 0; i < 8; i++)
 		m_leds[i] = BIT(data, i);
 }
 
-void orientalpearl_state::ay1_port_b_w(uint8_t data)
+void orientp_state::ay1_port_b_w(uint8_t data)
 {
 	for (uint8_t i = 0; i < 8; i++)
 		m_leds[i + 8] = BIT(data, i);
 }
 
-void orientalpearl_state::multiplex_7seg_w(uint8_t data)
+void orientp_state::multiplex_7seg_w(uint8_t data)
 {
 	m_selected_7seg_module = data;
 }
 
 
-uint8_t orientalpearl_state::keyboard_r()
+uint8_t orientp_state::keyboard_r()
 {
 	switch (m_selected_7seg_module & 0x07)
 	{
@@ -169,7 +169,7 @@ uint8_t orientalpearl_state::keyboard_r()
 	}
 }
 
-void orientalpearl_state::display_7seg_data_w(uint8_t data)
+void orientp_state::display_7seg_data_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // (7 seg display driver) Might be not correct
 
@@ -177,12 +177,12 @@ void orientalpearl_state::display_7seg_data_w(uint8_t data)
 	m_digits[2 * m_selected_7seg_module + 1] = patterns[data >> 4];
 }
 
-void orientalpearl_state::program_map(address_map &map)
+void orientp_state::program_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom();
 }
 
-void orientalpearl_state::io_map(address_map &map)
+void orientp_state::io_map(address_map &map)
 {
     map(0xd800, 0xf7ff).ram().share("nvram"); // might be wrong
     map(0xf800, 0xf803).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -192,35 +192,35 @@ void orientalpearl_state::io_map(address_map &map)
 	map(0xfc40, 0xfc40).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
     map(0xfe00, 0xfe01).w("opll", FUNC(ym2413_device::write));
 }
-void orientalpearl_state::mcu_map(address_map &map)
+void orientp_state::mcu_map(address_map &map)
 {
 	map(0x0000, 0xfff).rom();
 }
 
-void orientalpearl_state::mcu_io_map(address_map &map)
+void orientp_state::mcu_io_map(address_map &map)
 {
   
 	
 }
 
-void orientalpearl_state::machine_start()
+void orientp_state::machine_start()
 {
 	m_digits.resolve();
 	m_leds.resolve();
 }
 
-void orientalpearl_state::orientp(machine_config &config)
+void orientp_state::orientp(machine_config &config)
 {
     // basic machine hardware
 	i8052_device &maincpu(I8052(config, "maincpu", XTAL(10'738'000)));
-	maincpu.set_addrmap(AS_PROGRAM, &orientalpearl_state::program_map);
-	maincpu.set_addrmap(AS_IO, &orientalpearl_state::io_map);
+	maincpu.set_addrmap(AS_PROGRAM, &orientp_state::program_map);
+	maincpu.set_addrmap(AS_IO, &orientp_state::io_map);
    
     NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	
 	i8051_device &mcu(I8051(config, "mcu", XTAL(10'738'000)));
-    mcu.set_addrmap(AS_PROGRAM, &orientalpearl_state::mcu_map);
-	mcu.set_addrmap(AS_IO, &orientalpearl_state::mcu_io_map);
+    mcu.set_addrmap(AS_PROGRAM, &orientp_state::mcu_map);
+	mcu.set_addrmap(AS_IO, &orientp_state::mcu_io_map);
 
 	// M82C55 for leds
     I8255A(config, "ppi1");
@@ -228,9 +228,9 @@ void orientalpearl_state::orientp(machine_config &config)
 	
 	// Keyboard & display interface 
     i8279_device &kbdc(I8279(config, "kdc", XTAL(10'738'635) / 6));
-	kbdc.out_sl_callback().set(FUNC(orientalpearl_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
-	kbdc.in_rl_callback().set(FUNC(orientalpearl_state::keyboard_r));          // keyboard Return Lines
-	kbdc.out_disp_callback().set(FUNC(orientalpearl_state::display_7seg_data_w));
+	kbdc.out_sl_callback().set(FUNC(orientp_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
+	kbdc.in_rl_callback().set(FUNC(orientp_state::keyboard_r));          // keyboard Return Lines
+	kbdc.out_disp_callback().set(FUNC(orientp_state::display_7seg_data_w));
 	
 	// Video
 	config.set_default_layout(layout_orientp);
@@ -238,8 +238,8 @@ void orientalpearl_state::orientp(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6));
 	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
-	ay1.port_a_write_callback().set(FUNC(orientalpearl_state::ay1_port_a_w));
-	ay1.port_b_write_callback().set(FUNC(orientalpearl_state::ay1_port_b_w));
+	ay1.port_a_write_callback().set(FUNC(orientp_state::ay1_port_a_w));
+	ay1.port_b_write_callback().set(FUNC(orientp_state::ay1_port_b_w));
 	
 	ym2413_device &opll(YM2413(config, "opll", 3.579545_MHz_XTAL));
 	opll.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -278,5 +278,5 @@ ROM_START( east8a )
 
 
 //   YEAR   NAME    PARENT   MACHINE    INPUT    STATE                INIT        ROT    COMPANY       FULLNAME                 FLAGS
-GAME( 199?, east8,   0,       orientp,   east8, orientalpearl_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 Set 1 (v1.00)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 199?, east8a,  0,       orientp,   east8, orientalpearl_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 Set 2 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, east8,   0,       orientp,   east8, orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 Set 1 (v1.00)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, east8a,  0,       orientp,   east8, orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 Set 2 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
