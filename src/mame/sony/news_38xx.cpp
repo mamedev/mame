@@ -72,8 +72,9 @@
 #define LOG_TAS (1U << 4)
 #define LOG_IOP (1U << 5)
 #define LOG_CPU (1U << 6)
+#define LOG_PARALLEL (1U << 7)
 
-#define VERBOSE (LOG_GENERAL|LOG_INTERRUPT)
+#define VERBOSE (LOG_GENERAL|LOG_INTERRUPT|LOG_PARALLEL)
 #include "logmacro.h"
 
 
@@ -393,11 +394,11 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x24000105, 0x24000105).rw(m_fdc, FUNC(n82077aa_device::dma_r), FUNC(n82077aa_device::dma_w));
 
 	map(0x26040000, 0x26040000).lw8(NAME([this] (u8 data) {
-		LOG("parallel data w 0x%x\n", data);
+		LOGMASKED(LOG_PARALLEL, "Parallel data w 0x%x\n", data);
 		m_parallel_data->write(data);
 	}));
 	map(0x26040001, 0x26040001).lw8(NAME([this] (u8 data) {
-		LOG("parallel strobe w 0x%x\n", data);
+		LOGMASKED(LOG_PARALLEL, "Parallel strobe w 0x%x\n", data);
 		m_parallel->write_strobe(!data);
 	}));
 	map(0x26040002, 0x26040002).lw8(NAME([this] (u8) { irq_w<iop_irq::PARALLEL>(0);}));
@@ -976,7 +977,7 @@ void news_38xx_state::common(machine_config &config)
 		const bool new_status = status;
 		if (m_parallel_busy != new_status)
 		{
-			LOG("Parallel busy changed to %s\n", new_status ? "H" : "L");
+			LOGMASKED(LOG_PARALLEL, "Parallel busy changed to %s\n", new_status ? "H" : "L");
 			m_parallel_busy = new_status;
 			irq_w<iop_irq::PARALLEL>(1);
 		}
@@ -985,8 +986,8 @@ void news_38xx_state::common(machine_config &config)
 		const bool new_status = status;
 		if (m_parallel_fault != new_status)
 		{
-			LOG("Parallel fault changed to %s\n", new_status ? "H" : "L");
-			m_parallel_fault = !new_status; // TODO: why !? this seems wrong
+			LOGMASKED(LOG_PARALLEL, "Parallel fault changed to %s\n", new_status ? "H" : "L");
+			m_parallel_fault = !new_status;
 			irq_w<iop_irq::PARALLEL>(1);
 		}
 	});
