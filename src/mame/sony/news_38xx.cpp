@@ -77,7 +77,8 @@
 #include "logmacro.h"
 
 
-namespace {
+namespace
+{
 
 using namespace std::literals::string_view_literals;
 
@@ -92,38 +93,38 @@ public:
 
 	news_38xx_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
-		, m_cpu(*this, "cpu")
-		, m_iop(*this, "iop")
-		, m_ram(*this, "ram")
-		, m_dma(*this, "dma%u", 0U)
-		, m_rtc(*this, "rtc")
-		, m_scc(*this, "scc")
-		, m_net(*this, "net")
-		, m_fdc(*this, "fdc")
-		, m_hid(*this, "hid")
-		, m_scsi(*this, "scsi%u:7:cxd1180", 0U)
-		, m_serial(*this, "serial%u", 0U)
-		, m_scsibus(*this, "scsi%u", 0U)
-		, m_parallel(*this, "parallel")
-		, m_parallel_data(*this, "parallel_data")
-		, m_eprom(*this, "eprom")
-		, m_led(*this, "led%u", 0U)
-		, iop_irq_line_map({
-			{INPUT_LINE_IRQ1, {iop_irq::AST}},
-			{INPUT_LINE_IRQ2, {iop_irq::SOFTINTR}},
-			{INPUT_LINE_IRQ3, {iop_irq::FDCIRQ, iop_irq::PARALLEL, iop_irq::SLOT}},
-			{INPUT_LINE_IRQ4, {iop_irq::LANCE, iop_irq::SCSI0, iop_irq::SCSI1, iop_irq::CPU, iop_irq::UBUS}},
-			{INPUT_LINE_IRQ5, {iop_irq::SCC, iop_irq::KEYBOARD, iop_irq::MOUSE}},
-			{INPUT_LINE_IRQ6, {iop_irq::TIMER}},
-			{INPUT_LINE_IRQ7, {iop_irq::FDCDRQ, iop_irq::PERR}}
-		})
-		, cpu_irq_line_map({
-			{INPUT_LINE_IRQ0, cpu_irq::UBUS},
-			{INPUT_LINE_IRQ1, cpu_irq::IOP},
-			{INPUT_LINE_IRQ2, cpu_irq::TIMER},
-			{INPUT_LINE_IRQ4, cpu_irq::WRBERR},
-			{INPUT_LINE_IRQ5, cpu_irq::PERR}
-		})
+		  , m_cpu(*this, "cpu")
+		  , m_iop(*this, "iop")
+		  , m_ram(*this, "ram")
+		  , m_dma(*this, "dma%u", 0U)
+		  , m_rtc(*this, "rtc")
+		  , m_scc(*this, "scc")
+		  , m_net(*this, "net")
+		  , m_fdc(*this, "fdc")
+		  , m_hid(*this, "hid")
+		  , m_scsi(*this, "scsi%u:7:cxd1180", 0U)
+		  , m_serial(*this, "serial%u", 0U)
+		  , m_scsibus(*this, "scsi%u", 0U)
+		  , m_parallel(*this, "parallel")
+		  , m_parallel_data(*this, "parallel_data")
+		  , m_eprom(*this, "eprom")
+		  , m_led(*this, "led%u", 0U)
+		  , iop_irq_line_map({
+			  {INPUT_LINE_IRQ1, {iop_irq::AST}},
+			  {INPUT_LINE_IRQ2, {iop_irq::SOFTINTR}},
+			  {INPUT_LINE_IRQ3, {iop_irq::FDCIRQ, iop_irq::PARALLEL, iop_irq::SLOT}},
+			  {INPUT_LINE_IRQ4, {iop_irq::LANCE, iop_irq::SCSI0, iop_irq::SCSI1, iop_irq::CPU, iop_irq::UBUS}},
+			  {INPUT_LINE_IRQ5, {iop_irq::SCC, iop_irq::KEYBOARD, iop_irq::MOUSE}},
+			  {INPUT_LINE_IRQ6, {iop_irq::TIMER}},
+			  {INPUT_LINE_IRQ7, {iop_irq::FDCDRQ, iop_irq::PERR}}
+		  })
+		  , cpu_irq_line_map({
+			  {INPUT_LINE_IRQ0, cpu_irq::UBUS},
+			  {INPUT_LINE_IRQ1, cpu_irq::IOP},
+			  {INPUT_LINE_IRQ2, cpu_irq::TIMER},
+			  {INPUT_LINE_IRQ4, cpu_irq::WRBERR},
+			  {INPUT_LINE_IRQ5, cpu_irq::PERR}
+		  })
 	{
 	}
 
@@ -201,21 +202,21 @@ protected:
 
 	enum class cpu_irq : unsigned
 	{
-		UBUS = 0,   // Interprocessor communication interrupt from UPU
-		IOP = 1,    // Interprocessor communication interrupt from IOP
-		TIMER = 2,  // 100Hz timer
+		UBUS = 0, // Interprocessor communication interrupt from UPU
+		IOP = 1, // Interprocessor communication interrupt from IOP
+		TIMER = 2, // 100Hz timer
 		FPA [[maybe_unused]] = 3, // FPU interrupt (handled by set_fpu)
 		WRBERR = 4, // async bus write error
-		PERR = 5    // Main memory parity error
+		PERR = 5 // Main memory parity error
 	};
 
 	static constexpr std::array cpu_irq_names = {"UBUS"sv, "IOP"sv, "TIMER"sv, "FPA"sv, "WRBERR"sv, "PERR"sv};
 	static constexpr u32 cpu_nmi_mask = 1 << static_cast<u32>(cpu_irq::WRBERR) |
 	                                    1 << static_cast<u32>(cpu_irq::IOP);
 
-	template <cpu_irq Number>
+	template<cpu_irq Number>
 	void irq_w(u8 state);
-	template <cpu_irq Number>
+	template<cpu_irq Number>
 	void inten_w(u8 state);
 	template<cpu_irq Number>
 	bool is_irq_set();
@@ -280,7 +281,7 @@ protected:
 	u32 m_wrbeadr = 0;
 
 	// IOP IRQ state
-	const std::map<int, std::vector<iop_irq>> iop_irq_line_map;
+	const std::map<int, std::vector<iop_irq> > iop_irq_line_map;
 	bool m_scc_irq_state = false;
 	u32 m_iop_intst = 0;
 	u32 m_iop_inten = 0;
@@ -350,7 +351,8 @@ void news_38xx_state::cpu_map(address_map &map)
 	map(0x18000000, 0x18000003).w(FUNC(news_38xx_state::cpu_parity_check_enable_w)).mirror(0xffff00);
 	map(0x18000004, 0x18000007).w(FUNC(news_38xx_state::cpu_timer_w)).mirror(0xffff00);
 	map(0x18000020, 0x18000023).lw32(NAME([this] (u32) { irq_w<iop_irq::CPU>(1); })).mirror(0xffff00);
-	map(0x18000024, 0x18000027).lw32(NAME([] (u32) { fatalerror("CPU tried to interrupt UBUS without UPU installed!"); })).mirror(0xffff00);
+	map(0x18000024, 0x18000027).lw32(
+		NAME([] (u32) { fatalerror("CPU tried to interrupt UBUS without UPU installed!"); })).mirror(0xffff00);
 	map(0x18000040, 0x18000043).w(FUNC(news_38xx_state::cpu_boot_vector_map_w)).mirror(0xffff00);
 	map(0x18000044, 0x18000047).w(FUNC(news_38xx_state::inten_w<cpu_irq::UBUS>)).mirror(0xffff00);
 	map(0x18000060, 0x18000063).lw32(NAME([this] (u32) { irq_w<cpu_irq::IOP>(0); })).mirror(0xffff00);
@@ -380,7 +382,8 @@ void news_38xx_state::iop_map(address_map &map)
 
 	map(0x22800000, 0x22800001).w(FUNC(news_38xx_state::xpustart_w));
 	map(0x22800008, 0x22800008).lw8(NAME([this] (u8) { irq_w<cpu_irq::IOP>(1); }));
-	map(0x22800009, 0x22800009).lw8(NAME([] (u8) { fatalerror("IOP tried to interrupt UBUS without UPU installed!"); }));
+	map(0x22800009, 0x22800009).
+			lw8(NAME([] (u8) { fatalerror("IOP tried to interrupt UBUS without UPU installed!"); }));
 	map(0x22800010, 0x22800010).w(FUNC(news_38xx_state::inten_w<iop_irq::CPU>));
 	map(0x22800011, 0x22800011).w(FUNC(news_38xx_state::inten_w<iop_irq::UBUS>));
 	map(0x22800018, 0x22800018).lw8(NAME([this] (u8) { irq_w<iop_irq::CPU>(0); }));
@@ -395,11 +398,11 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x26040000, 0x26040000).lw8(NAME([this] (u8 data) {
 		LOGMASKED(LOG_PARALLEL, "Parallel data w 0x%x\n", data);
 		m_parallel_data->write(data);
-	}));
+		}));
 	map(0x26040001, 0x26040001).lw8(NAME([this] (u8 data) {
 		LOGMASKED(LOG_PARALLEL, "Parallel strobe w 0x%x\n", data);
 		m_parallel->write_strobe(!data);
-	}));
+		}));
 	map(0x26040002, 0x26040002).lw8(NAME([this] (u8) { irq_w<iop_irq::PARALLEL>(0);}));
 	map(0x26040003, 0x26040003).w(FUNC(news_38xx_state::inten_w<iop_irq::PARALLEL>));
 
@@ -438,7 +441,8 @@ void news_38xx_state::iop_vector_map(address_map &map)
 	map(0xfffffff5, 0xfffffff5).lr8(NAME([] { return m68000_base_device::autovector(2); }));
 	map(0xfffffff7, 0xfffffff7).lr8(NAME([] { return m68000_base_device::autovector(3); }));
 	map(0xfffffff9, 0xfffffff9).lr8(NAME([] { return m68000_base_device::autovector(4); }));
-	map(0xfffffffb, 0xfffffffb).lr8(NAME([this] { return m_scc_irq_state ? m_scc->m1_r() : m68000_base_device::autovector(5); }));
+	map(0xfffffffb, 0xfffffffb).lr8(
+		NAME([this] { return m_scc_irq_state ? m_scc->m1_r() : m68000_base_device::autovector(5); }));
 	map(0xfffffffd, 0xfffffffd).lr8(NAME([] { return m68000_base_device::autovector(6); }));
 	map(0xffffffff, 0xffffffff).lr8(NAME([] { return m68000_base_device::autovector(7); }));
 }
@@ -535,7 +539,7 @@ void news_38xx_state::irq_w(const u8 state)
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-				  iop_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+		          iop_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
 	}
 
 	if (state)
@@ -561,7 +565,7 @@ void news_38xx_state::inten_w(const u8 state)
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-			iop_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+		          iop_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 
 	if (state)
@@ -585,17 +589,18 @@ bool news_38xx_state::is_irq_set()
 void news_38xx_state::int_check_iop()
 {
 	const u32 active_irq = m_iop_intst & (m_iop_inten | iop_nmi_mask);
-	for (const auto& [input_line, irq_inputs] : iop_irq_line_map)
+	for (const auto &[input_line, irq_inputs]: iop_irq_line_map)
 	{
 		// Calculate state of input pin (logical OR of all attached inputs)
 		bool state = false;
-		for (auto irq_input : irq_inputs)
+		for (auto irq_input: irq_inputs)
 		{
 			state |= active_irq & 1 << static_cast<u32>(irq_input);
 		}
 
 		// Update input pin status if it has changed
-		if (m_iop->input_line_state(input_line) != state) {
+		if (m_iop->input_line_state(input_line) != state)
+		{
 			if (input_line != INPUT_LINE_IRQ6)
 			{
 				LOGMASKED(LOG_INTERRUPT, "Setting IOP input line %d to %d\n", input_line, state ? 1 : 0);
@@ -606,7 +611,7 @@ void news_38xx_state::int_check_iop()
 	}
 }
 
-template <news_38xx_state::cpu_irq Number>
+template<news_38xx_state::cpu_irq Number>
 void news_38xx_state::irq_w(const u8 state)
 {
 	if (Number != cpu_irq::TIMER)
@@ -617,7 +622,7 @@ void news_38xx_state::irq_w(const u8 state)
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-		  cpu_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+		          cpu_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
 	}
 
 	if (state)
@@ -643,7 +648,7 @@ void news_38xx_state::inten_w(const u8 state)
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-		  cpu_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+		          cpu_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 
 	if (state)
@@ -667,7 +672,7 @@ bool news_38xx_state::is_irq_set()
 void news_38xx_state::int_check_cpu()
 {
 	const u32 active_irq = m_cpu_intst & (m_cpu_inten | cpu_nmi_mask);
-	for (const auto& [input_line, irq_input] : cpu_irq_line_map)
+	for (const auto &[input_line, irq_input]: cpu_irq_line_map)
 	{
 		// Update input pin status if it has changed
 		const bool state = BIT(active_irq, static_cast<u32>(irq_input));
@@ -719,10 +724,12 @@ void news_38xx_state::romdis_w(u8 data)
 {
 	LOGMASKED(LOG_IOP, "(%s) IOP ROMDIS = 0x%x\n", machine().describe_context(), data);
 
-	if (data) {
+	if (data)
+	{
 		m_iop->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
 	}
-	else {
+	else
+	{
 		m_iop->space(0).install_rom(0x00000000, 0x0000ffff, m_eprom);
 	}
 }
@@ -764,7 +771,8 @@ void news_38xx_state::iopled_w(offs_t offset, u8 data)
 
 void news_38xx_state::xpustart_w(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_IOP, "(%s) %s %cPU\n", machine().describe_context(), data ? "Starting" : "Stopping", !offset ? 'C' : 'U');
+	LOGMASKED(LOG_IOP, "(%s) %s %cPU\n", machine().describe_context(), data ? "Starting" : "Stopping",
+	          !offset ? 'C' : 'U');
 
 	if (!offset)
 	{
@@ -862,7 +870,8 @@ void news_scsi_devices(device_slot_interface &device)
 
 void news_38xx_state::common(machine_config &config)
 {
-	R3000A(config, m_cpu, 40_MHz_XTAL / 2, 65536, 65536); // 40MHz goes into the R3000 pkg, but is divided internally to 20MHz
+	// 40MHz goes into the R3000 pkg, but is divided internally to 20MHz
+	R3000A(config, m_cpu, 40_MHz_XTAL / 2, 65536, 65536);
 	m_cpu->set_addrmap(AS_PROGRAM, &news_38xx_state::cpu_map);
 	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4, INPUT_LINE_IRQ3);
 
@@ -887,8 +896,7 @@ void news_38xx_state::common(machine_config &config)
 
 	SCC85C30(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_int_callback().set(
-		[this](const int state)
-		{
+		[this](const int state) {
 			m_scc_irq_state = static_cast<bool>(state);
 			irq_w<iop_irq::SCC>(state != 0);
 		});
@@ -912,12 +920,15 @@ void news_38xx_state::common(machine_config &config)
 	AM7990(config, m_net, 20_MHz_XTAL / 2);
 	m_net->intr_out().set(FUNC(news_38xx_state::irq_w<iop_irq::LANCE>)).invert();
 	m_net->dma_in().set([this](const offs_t offset) { return m_net_ram[offset >> 1]; });
-	m_net->dma_out().set([this](const offs_t offset, const u16 data, const u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset >> 1]); });
+	m_net->dma_out().set([this](const offs_t offset, const u16 data, const u16 mem_mask) {
+		COMBINE_DATA(&m_net_ram[offset >> 1]);
+	});
 
 	N82077AA(config, m_fdc, 24_MHz_XTAL, n82077aa_device::mode_t::PS2);
 	m_fdc->intrq_wr_callback().set(FUNC(news_38xx_state::irq_w<iop_irq::FDCIRQ>));
 	m_fdc->drq_wr_callback().set(FUNC(news_38xx_state::irq_w<iop_irq::FDCDRQ>));
-	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).
+			enable_sound(false);
 
 	// scsi bus 0 and devices
 	NSCSI_BUS(config, m_scsibus[0]);
@@ -931,8 +942,7 @@ void news_38xx_state::common(machine_config &config)
 
 	// scsi bus 0 host adapter
 	NSCSI_CONNECTOR(config, "scsi0:7").option_set("cxd1180", CXD1180).machine_config(
-		[this](device_t *device)
-		{
+		[this](device_t *device) {
 			auto &adapter = downcast<cxd1180_device &>(*device);
 			adapter.set_clock(20_MHz_XTAL / 2);
 
@@ -956,8 +966,7 @@ void news_38xx_state::common(machine_config &config)
 
 	// scsi bus 1 host adapter
 	NSCSI_CONNECTOR(config, "scsi1:7").option_set("cxd1180", CXD1180).machine_config(
-		[this](device_t *device)
-		{
+		[this](device_t *device) {
 			auto &adapter = downcast<cxd1180_device &>(*device);
 			adapter.set_clock(20_MHz_XTAL / 2);
 
@@ -1015,32 +1024,37 @@ ROM_START(nws3860)
 	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(a2b9e968) SHA1(09c7d253c7ed0b368c49f4b60bfe5ca76acd7cc3) BAD_DUMP)
 ROM_END
 
-static INPUT_PORTS_START(nws3860)
+INPUT_PORTS_START(nws3860)
 	PORT_START("SW1")
-	PORT_DIPNAME(0x07000000, 0x07000000, "Display") PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME(0x07000000, 0x07000000, "Display")
+	PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(0x07000000, "Console")
 	PORT_DIPSETTING(0x06000000, "NWB-512")
 	PORT_DIPSETTING(0x03000000, "NWB-225A")
 	PORT_DIPSETTING(0x00000000, "Autoselect")
 
-	PORT_DIPNAME(0x08000000, 0x08000000, "Boot Device") PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME(0x08000000, 0x08000000, "Boot Device")
+	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(0x08000000, "SCSI")
 	PORT_DIPSETTING(0x00000000, "Floppy")
 
-	PORT_DIPNAME(0x10000000, 0x10000000, "Automatic Boot") PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME(0x10000000, 0x10000000, "Automatic Boot")
+	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(0x10000000, DEF_STR(Off))
 	PORT_DIPSETTING(0x00000000, DEF_STR(On))
 
-	PORT_DIPNAME(0x20000000, 0x20000000, "Diagnostic Mode") PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME(0x20000000, 0x20000000, "Diagnostic Mode")
+	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(0x20000000, DEF_STR(Off))
 	PORT_DIPSETTING(0x00000000, DEF_STR(On))
 
-	PORT_DIPNAME(0xc0000000, 0xc0000000, "Unused") PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME(0xc0000000, 0xc0000000, "Unused")
+	PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(0xc0000000, DEF_STR(Off))
 INPUT_PORTS_END
 
 } // anonymous namespace
 
 
-/*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS            INIT         COMPANY  FULLNAME    FLAGS */
-COMP(1989, nws3860, 0,      0,      nws3860, nws3860, news_38xx_state, init_common, "Sony",  "NWS-3860", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+/*   YEAR  NAME     P  C  MACHINE  INPUT    CLASS            INIT         COMPANY  FULLNAME   FLAGS */
+COMP(1989, nws3860, 0, 0, nws3860, nws3860, news_38xx_state, init_common, "Sony", "NWS-3860", MACHINE_NO_SOUND)
