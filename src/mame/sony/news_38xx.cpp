@@ -181,15 +181,15 @@ protected:
 		"AST"sv, "SOFTINTR"sv, "FDCIRQ"sv, "PARALLEL"sv, "SLOT"sv, "LANCE"sv, "SCSI0"sv, "SCSI1"sv, "CPU"sv, "UBUS"sv,
 		"SCC"sv, "KEYBOARD"sv, "MOUSE"sv, "TIMER"sv, "FDCDRQ"sv, "PERR"sv
 	};
-	static constexpr uint32_t iop_nmi_mask = 1 << static_cast<uint32_t>(iop_irq::FDCDRQ) |
-	                                         1 << static_cast<uint32_t>(iop_irq::SCC) |
-	                                         1 << static_cast<uint32_t>(iop_irq::SCSI0) |
-	                                         1 << static_cast<uint32_t>(iop_irq::SCSI1) |
-	                                         1 << static_cast<uint32_t>(iop_irq::LANCE) |
-	                                         1 << static_cast<uint32_t>(iop_irq::FDCIRQ) |
-	                                         1 << static_cast<uint32_t>(iop_irq::SLOT) |
-	                                         1 << static_cast<uint32_t>(iop_irq::SOFTINTR) |
-	                                         1 << static_cast<uint32_t>(iop_irq::AST);
+	static constexpr u32 iop_nmi_mask = 1 << static_cast<u32>(iop_irq::FDCDRQ) |
+	                                    1 << static_cast<u32>(iop_irq::SCC) |
+	                                    1 << static_cast<u32>(iop_irq::SCSI0) |
+	                                    1 << static_cast<u32>(iop_irq::SCSI1) |
+	                                    1 << static_cast<u32>(iop_irq::LANCE) |
+	                                    1 << static_cast<u32>(iop_irq::FDCIRQ) |
+	                                    1 << static_cast<u32>(iop_irq::SLOT) |
+	                                    1 << static_cast<u32>(iop_irq::SOFTINTR) |
+	                                    1 << static_cast<u32>(iop_irq::AST);
 
 	template<iop_irq Number>
 	void irq_w(u8 state);
@@ -210,13 +210,13 @@ protected:
 	};
 
 	static constexpr std::array cpu_irq_names = {"UBUS"sv, "IOP"sv, "TIMER"sv, "FPA"sv, "WRBERR"sv, "PERR"sv};
-	static constexpr uint32_t cpu_nmi_mask = 1 << static_cast<uint32_t>(cpu_irq::WRBERR) |
-	                                         1 << static_cast<uint32_t>(cpu_irq::IOP);
+	static constexpr u32 cpu_nmi_mask = 1 << static_cast<u32>(cpu_irq::WRBERR) |
+	                                    1 << static_cast<u32>(cpu_irq::IOP);
 
 	template <cpu_irq Number>
 	void irq_w(u8 state);
 	template <cpu_irq Number>
-	void inten_w(uint8_t state);
+	void inten_w(u8 state);
 	template<cpu_irq Number>
 	bool is_irq_set();
 	void int_check_cpu();
@@ -282,13 +282,13 @@ protected:
 	// IOP IRQ state
 	const std::map<int, std::vector<iop_irq>> iop_irq_line_map;
 	bool m_scc_irq_state = false;
-	uint32_t m_iop_intst = 0;
-	uint32_t m_iop_inten = 0;
+	u32 m_iop_intst = 0;
+	u32 m_iop_inten = 0;
 
 	// CPU IRQ state
 	const std::map<int, cpu_irq> cpu_irq_line_map;
-	uint32_t m_cpu_intst = 0;
-	uint32_t m_cpu_inten = 0;
+	u32 m_cpu_intst = 0;
+	u32 m_cpu_inten = 0;
 };
 
 void news_38xx_state::machine_start()
@@ -551,7 +551,7 @@ void news_38xx_state::irq_w(const u8 state)
 }
 
 template<news_38xx_state::iop_irq Number>
-void news_38xx_state::inten_w(const uint8_t state)
+void news_38xx_state::inten_w(const u8 state)
 {
 	if (Number != iop_irq::TIMER)
 	{
@@ -584,7 +584,7 @@ bool news_38xx_state::is_irq_set()
 
 void news_38xx_state::int_check_iop()
 {
-	const uint32_t active_irq = m_iop_intst & (m_iop_inten | iop_nmi_mask);
+	const u32 active_irq = m_iop_intst & (m_iop_inten | iop_nmi_mask);
 	for (const auto& [input_line, irq_inputs] : iop_irq_line_map)
 	{
 		// Calculate state of input pin (logical OR of all attached inputs)
@@ -633,7 +633,7 @@ void news_38xx_state::irq_w(const u8 state)
 }
 
 template<news_38xx_state::cpu_irq Number>
-void news_38xx_state::inten_w(const uint8_t state)
+void news_38xx_state::inten_w(const u8 state)
 {
 	if (Number != cpu_irq::TIMER)
 	{
@@ -666,11 +666,11 @@ bool news_38xx_state::is_irq_set()
 
 void news_38xx_state::int_check_cpu()
 {
-	const uint32_t active_irq = m_cpu_intst & (m_cpu_inten | cpu_nmi_mask);
+	const u32 active_irq = m_cpu_intst & (m_cpu_inten | cpu_nmi_mask);
 	for (const auto& [input_line, irq_input] : cpu_irq_line_map)
 	{
 		// Update input pin status if it has changed
-		const bool state = BIT(active_irq, static_cast<uint32_t>(irq_input));
+		const bool state = BIT(active_irq, static_cast<u32>(irq_input));
 		if (m_cpu->input_line_state(input_line) != state)
 		{
 			if (input_line != INPUT_LINE_IRQ2)
