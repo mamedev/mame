@@ -42,6 +42,7 @@ u1 File kc8279
 u17 and u21 mitsubishi m5m82c55ap-2
 u25  INTEL P8052AH mcu - 8052
 u32  hm6264alp-12
+u39 at89s51 8051 mcu for protection.
 u102 kc8972
 u104 ym2413
 u107 u6295
@@ -57,6 +58,7 @@ u1 Nec D8279C-2
 u17 and u21 Nec D8255AC-2
 u25  INTEL P8052AH mcu - 8052
 u32  hm6264alp-15
+u39 at89s51 8051 mcu for protection.
 u102 kc8972
 u104 ym2413
 u107 u6295
@@ -72,10 +74,12 @@ u1 NEC D8279C-2
 u17 and u21 NEC D8255-AC-2
 u25  INTEL P8052AH mcu - 8052
 u32  hm6264alp-12
+u39 at89s51 8051 mcu for protection.
 u100 CY CHENG YING-7 060329 - ???
 u102 jfc 95101
 u104 unpopulated ym2413
 u107 u6295
+
 EEPROM:
 st ????? - probably 29f1615. labeled A-0 not dumped
 am27c020 labeled Mujer 1 español. dumped.
