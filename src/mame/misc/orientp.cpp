@@ -63,19 +63,20 @@ public:
 		, m_inputs(*this, { "KEYS1", "KEYS2", "DSW1", "PUSHBUTTONS" })
 	{ }
 
-	void orientp(machine_config &config);
+	void orientp(machine_config &config) ATTR_COLD;
+
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void io_map(address_map &map);
-	void program_map(address_map &map);
-	void mcu_io_map(address_map &map);
-	void mcu_map(address_map &map);
-    void display_7seg_data_w(uint8_t data);
-	void multiplex_7seg_w(uint8_t data);
-	void ay1_port_a_w(uint8_t data);
-	void ay1_port_b_w(uint8_t data);
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
+	void mcu_io_map(address_map &map) ATTR_COLD;
+	void mcu_map(address_map &map) ATTR_COLD;
+    void display_7seg_data_w(uint8_t data) ATTR_COLD;
+	void multiplex_7seg_w(uint8_t data) ATTR_COLD;
+	void ay1_port_a_w(uint8_t data) ATTR_COLD;
+	void ay1_port_b_w(uint8_t data) ATTR_COLD;
 	uint8_t keyboard_r();
 	uint8_t m_selected_7seg_module = 0;
 
