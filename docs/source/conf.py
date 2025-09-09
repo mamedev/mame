@@ -264,7 +264,7 @@ texinfo_documents = [
 #texinfo_show_urls = 'footnote'
 
 # Add download links at bottom left when the MAMEDEV environment
-# varaible is set. See versions.html in the _template folder.
+# variable is set. See versions.html in the _template folder.
 try:
     html_context
 except NameError:
