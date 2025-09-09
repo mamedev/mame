@@ -74,7 +74,7 @@ private:
 		TRAPIO_FLAG__IORC		= 2,	// Active Low
 		TRAPIO_FLAG__LBHE		= 4,	// Active Low
 		TRAPIO_FLAG_LA0			= 8
-	} trapio_flags_e;
+	};
 };
 
 // device type definition
