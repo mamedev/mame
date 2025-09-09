@@ -3,7 +3,7 @@
 /****************************************************************************************************************
 
   Skeleton driver for "El Circulo", from Inder.
-  It's a gambling roulette built with lights (mix of leds and small light bulbs) and an crystal artwork overlay.
+  It's a gambling roulette built with lights (mix of LEDs and small light bulbs) and an crystal artwork overlay.
 
      ______________    ______    __________________________________    ____________    ________________
     | | | | | | | |___| | | |___|               _         _       |___| | | | | | |___| | | | | | | | |
@@ -71,14 +71,14 @@ public:
 	{
 	}
 
-	void elcirculo(machine_config &config);
+	void elcirculo(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
-	output_finder<4,8> m_leds;
+	output_finder<4, 8> m_leds;
 	output_finder<8> m_lamps;
 
 	uint8_t m_led_row = 0;
@@ -99,13 +99,13 @@ INTERRUPT_GEN_MEMBER(elcirculo_state::irq_gen)
 
 void elcirculo_state::led_w(offs_t offset, uint8_t data)
 {
-	if (offset == 1)
-	{
-		m_led_row = (~data) & 0x0f;
-	}
-	else if (offset == 0)
+	if (offset == 0)
 	{
 		m_led_data = data;
+	}
+	else if (offset == 1)
+	{
+		m_led_row = ~data & 0x0f;
 	}
 }
 
@@ -159,6 +159,9 @@ INPUT_PORTS_END
 
 void elcirculo_state::machine_start()
 {
+	save_item(NAME(m_led_row));
+	save_item(NAME(m_led_data));
+
 	m_leds.resolve();
 	m_lamps.resolve();
 }
