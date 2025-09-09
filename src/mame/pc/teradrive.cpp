@@ -144,6 +144,13 @@ void isa16_ibm_79f2661::device_start()
 {
 	set_isa_device();
 	m_rom_window_bank->configure_entries(0, 0x100, m_romdisk->base(), 0x2000);
+
+	save_item(NAME(m_rom_bank));
+	save_item(NAME(m_rom_address));
+	save_item(NAME(m_reg_1163));
+	save_item(NAME(m_reg_1164));
+	save_item(NAME(m_68k_address));
+	save_item(NAME(m_68k_view));
 }
 
 void isa16_ibm_79f2661::device_reset()
@@ -477,7 +484,7 @@ void teradrive_state::x86_map(address_map &map)
 void teradrive_state::x86_io(address_map &map)
 {
 	map.unmap_value_high();
-	// TODO: what's the origin of this?
+	// TODO: belongs to chipset
 	map(0xfc72, 0xfc73).lr16(
 		NAME([this] () {
 			u16 res = m_heartbeat & 0x8000;
@@ -816,6 +823,16 @@ void teradrive_state::machine_start()
 	m_tmss_bank->configure_entries(0, 0x200, memregion("tmss")->base(), 0x1000);
 	// doubled in space
 	m_sound_program = std::make_unique<u8[]>(0x4000);
+
+	save_item(NAME(m_heartbeat));
+
+	save_item(NAME(m_isa_address_bank));
+	save_item(NAME(m_68k_hs));
+	save_pointer(NAME(m_sound_program), 0x4000);
+
+	save_item(NAME(m_z80_reset));
+	save_item(NAME(m_z80_busrq));
+	save_item(NAME(m_z80_main_address));
 }
 
 void teradrive_state::machine_reset()

@@ -98,6 +98,48 @@ void ym7101_device::device_start()
 	save_pointer(NAME(m_sprite_cache), 80 * 4);
 
 	m_hres_mode = 0x81;
+
+	save_item(STRUCT_MEMBER(m_command, latch));
+	save_item(STRUCT_MEMBER(m_command, address));
+	save_item(STRUCT_MEMBER(m_command, code));
+//	save_item(STRUCT_MEMBER(m_command, write_state));
+
+	save_item(STRUCT_MEMBER(m_dma, source_address));
+	save_item(STRUCT_MEMBER(m_dma, length));
+//	save_item(STRUCT_MEMBER(m_dma, mode));
+	save_item(STRUCT_MEMBER(m_dma, active));
+	save_item(STRUCT_MEMBER(m_dma, fill));
+
+	save_item(NAME(m_ie1));
+	save_item(NAME(m_vr));
+	save_item(NAME(m_de));
+	save_item(NAME(m_ie0));
+	save_item(NAME(m_m1));
+	save_item(NAME(m_m3));
+	save_item(NAME(m_hscroll_address));
+	save_item(NAME(m_hsz));
+	save_item(NAME(m_vsz));
+	save_item(NAME(m_auto_increment));
+	save_item(NAME(m_plane_a_name_table));
+	save_item(NAME(m_window_name_table));
+	save_item(NAME(m_plane_b_name_table));
+	save_item(NAME(m_sprite_attribute_table));
+	save_item(NAME(m_background_color));
+	save_item(NAME(m_hit));
+	save_item(NAME(m_vs));
+	save_item(NAME(m_hs));
+	save_item(NAME(m_rigt));
+	save_item(NAME(m_whp));
+	save_item(NAME(m_down));
+	save_item(NAME(m_wvp));
+
+	save_item(NAME(m_hres_mode));
+	save_item(NAME(m_vint_pending));
+	save_item(NAME(m_hint_pending));
+	save_item(NAME(m_vcounter));
+	save_item(NAME(m_hvcounter_latch));
+	save_item(NAME(m_vram_mask));
+
 }
 
 void ym7101_device::device_reset()
