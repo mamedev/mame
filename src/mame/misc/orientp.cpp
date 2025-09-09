@@ -218,11 +218,12 @@ void orientp_state::orientp(machine_config &config)
    
     NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	
-	i8051_device &mcu(I8051(config, "mcu", XTAL(10'738'000)));
+	//TODO: Check and mcu hook up
+    i8051_device &mcu(I8051(config, "mcu", XTAL(10'738'000)));
     mcu.set_addrmap(AS_PROGRAM, &orientp_state::mcu_map);
 	mcu.set_addrmap(AS_IO, &orientp_state::mcu_io_map);
 
-	// M82C55 for leds
+	//TODO: M82C55 for leds
     I8255A(config, "ppi1");
     I8255A(config, "ppi2");
 	
@@ -234,7 +235,8 @@ void orientp_state::orientp(machine_config &config)
 	
 	// Video
 	config.set_default_layout(layout_orientp);
-    // sound hardware
+   
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6));
 	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -271,7 +273,6 @@ ROM_START( east8a )
     ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) BAD_DUMP SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  Voices Rom.  From Nreat-new GN-001 pcb. Marked as Bad dump for now
 
     ROM_END
-
 
 
 } // anonymous namespace
