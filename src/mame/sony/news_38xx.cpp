@@ -57,14 +57,20 @@
 #define LOG_TIMER (1U << 2)
 #define LOG_LED (1U << 3)
 #define LOG_TAS (1U << 4)
+#define LOG_IOP (1U << 5)
+#define LOG_CPU (1U << 6)
 
-#define VERBOSE (LOG_GENERAL|LOG_INTERRUPT)
+#define VERBOSE (LOG_GENERAL|LOG_INTERRUPT|LOG_TAS)
 #include "logmacro.h"
 
 
 namespace {
 
 using namespace std::literals::string_view_literals;
+
+// Logging constants
+constexpr auto ENABLED = "enabled";
+constexpr auto DISABLED = "disabled";
 
 class news_38xx_state : public driver_device
 {
@@ -88,6 +94,7 @@ public:
 		, m_parallel(*this, "parallel")
 		, m_parallel_data(*this, "parallel_data")
 		, m_eprom(*this, "eprom")
+		, m_led(*this, "led%u", 0U)
 		, iop_irq_line_map({
 			{INPUT_LINE_IRQ1, {iop_irq::AST}},
 			{INPUT_LINE_IRQ2, {iop_irq::SOFTINTR}},
@@ -104,7 +111,6 @@ public:
 			{INPUT_LINE_IRQ4, cpu_irq::WRBERR},
 			{INPUT_LINE_IRQ5, cpu_irq::PERR}
 		})
-//      , m_led(*this, "led%u", 0U)
 	{
 	}
 
@@ -175,7 +181,7 @@ protected:
 	template<iop_irq Number>
 	void irq_w(u8 state);
 	template<iop_irq Number>
-	void inten_w(uint8_t state);
+	void inten_w(u8 state);
 	template<iop_irq Number>
 	bool is_irq_set();
 	void int_check_iop();
@@ -206,28 +212,24 @@ protected:
 	u32 iop_bus_error_r();
 	void poweron_w(u8 data);
 	void romdis_w(u8 data);
-	void ptycken_w(u8 data);
-	void timeren_w(u8 data);
-	void astintr_w(u8 data);
-	void iopled_w(offs_t offset, u8 data); // IOPLED0/IOPLED1
-	void xpustart_w(offs_t offset, u8 data); // CPUSTART/HPUSTART
-	void ipintxp_w(offs_t offset, u8 data); // IPINTCP/IPINTHP
-	void ipenixp_w(offs_t offset, u8 data); // IPENICP/IPENIHP
-	void ipclixp_w(offs_t offset, u8 data);	// IPCLICP/IPCLIHP
+	void iop_parity_check_enable_w(u8 data);
+	void iop_timer_w(u8 data);
+	void ast_w(u8 data);
+	void iopled_w(offs_t offset, u8 data);
+	void xpustart_w(offs_t offset, u8 data);
 	void index_divide_w(offs_t offset, u8 data);
 
-	TIMER_CALLBACK_MEMBER(timer);
-
 	// CPU platform hardware
-	u32 cpstat_r();
-	u32 wrbeadr_r();
+	u32 cpu_status_r();
+	u32 cpu_bus_error_address_r();
 	u8 boot_vector_r(offs_t offset);
-	void cpenipty_w(u32 data);
-	void cpenitmr_w(u32 data);
-	void cpintxp_w(offs_t offset, u32 data);
+	void cpu_parity_check_enable_w(u32 data);
+	void cpu_timer_w(u32 data);
 	void mapvec_w(u32 data);
-	void cpclixp_w(offs_t offset, u32 data);
 	void cpuled_w(offs_t offset, u32 data);
+	void reset_cpu_registers();
+
+	TIMER_CALLBACK_MEMBER(timer);
 
 	// devices
 	required_device<r3000a_device> m_cpu;
@@ -248,9 +250,11 @@ protected:
 	optional_device<output_latch_device> m_parallel_data;
 
 	required_region_ptr<u32> m_eprom;
-	//output_finder<4> m_led;
-
+	output_finder<4> m_led;
 	std::unique_ptr<u16[]> m_net_ram;
+
+	// For RAM test-and-set implementation
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_memory_access;
 
 	emu_timer *m_timer = nullptr;
 
@@ -276,11 +280,12 @@ protected:
 
 void news_38xx_state::machine_start()
 {
-	//m_led.resolve();
-
+	m_led.resolve();
+	m_cpu->space(AS_PROGRAM).specific(m_memory_access);
+	m_timer = timer_alloc(FUNC(news_38xx_state::timer), this);
 	m_net_ram = std::make_unique<u16[]>(8192);
-	save_pointer(NAME(m_net_ram), 8192);
 
+	save_pointer(NAME(m_net_ram), 8192);
 	save_item(NAME(m_parallel_busy));
 	save_item(NAME(m_parallel_fault));
 	save_item(NAME(m_mapvec));
@@ -290,8 +295,6 @@ void news_38xx_state::machine_start()
 	save_item(NAME(m_iop_inten));
 	save_item(NAME(m_cpu_intst));
 	save_item(NAME(m_cpu_inten));
-
-	m_timer = timer_alloc(FUNC(news_38xx_state::timer), this);
 }
 
 void news_38xx_state::machine_reset()
@@ -299,19 +302,17 @@ void news_38xx_state::machine_reset()
 	// For the IOP, EPROM is mapped at 0 after reset
 	m_iop->space(0).install_rom(0x00000000, 0x0000ffff, m_eprom);
 
+	// External timer is 100Hz
 	m_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
 
 	// CPU does not run until the IOP tells it to
 	m_cpu->set_input_line(INPUT_LINE_HALT, 1);
 
 	// Clear platform hardware state
-	m_mapvec = false;
-	m_wrbeadr = 0;
 	m_scc_irq_state = false;
-	m_cpu_intst = 0;
-	m_cpu_inten = 0;
 	m_iop_intst = 0;
 	m_iop_inten = 0;
+	reset_cpu_registers();
 }
 
 void news_38xx_state::init_common()
@@ -329,21 +330,21 @@ void news_38xx_state::cpu_map(address_map &map)
 
 	map(0x08000000, 0x0fffffff).rw(FUNC(news_38xx_state::ram_tas_r), FUNC(news_38xx_state::ram_tas_w));
 
-	// 0x10000000 - 0x17ffffff: UBUS I/O
+	// 0x10000000 - 0x17ffffff TODO: UBUS I/O?
 
 	// All registers below this line are 32 bit registers, LSB 1 = Set, 0 = Reset
-	map(0x18000000, 0x18000003).r(FUNC(news_38xx_state::cpstat_r));
-	map(0x18000000, 0x18000003).w(FUNC(news_38xx_state::cpenipty_w)).mirror(0xffff00);
-	map(0x18000004, 0x18000007).w(FUNC(news_38xx_state::cpenitmr_w)).mirror(0xffff00);
-	map(0x18000020, 0x18000027).w(FUNC(news_38xx_state::cpintxp_w)).mirror(0xffff00);
+	map(0x18000000, 0x18000003).r(FUNC(news_38xx_state::cpu_status_r));
+	map(0x18000000, 0x18000003).w(FUNC(news_38xx_state::cpu_parity_check_enable_w)).mirror(0xffff00);
+	map(0x18000004, 0x18000007).w(FUNC(news_38xx_state::cpu_timer_w)).mirror(0xffff00);
+	map(0x18000020, 0x18000023).lw32(NAME([this] (u32) { irq_w<iop_irq::CPU>(1); })).mirror(0xffff00);
+	map(0x18000024, 0x18000027).lw32(NAME([] (u32) { fatalerror("CPU tried to interrupt UBUS without UPU installed!"); })).mirror(0xffff00);
 	map(0x18000040, 0x18000043).w(FUNC(news_38xx_state::mapvec_w)).mirror(0xffff00);
 	map(0x18000044, 0x18000047).w(FUNC(news_38xx_state::inten_w<cpu_irq::UBUS>)).mirror(0xffff00);
-	map(0x18000060, 0x18000067).w(FUNC(news_38xx_state::cpclixp_w)).mirror(0xffff00);
+	map(0x18000060, 0x18000063).lw32(NAME([this] (u32) { irq_w<cpu_irq::IOP>(0); })).mirror(0xffff00);
+	map(0x18000064, 0x18000067).lw32(NAME([this] (u32) { irq_w<cpu_irq::UBUS>(0); })).mirror(0xffff00);
 	map(0x18000080, 0x18000087).w(FUNC(news_38xx_state::cpuled_w)).mirror(0xffff00);
-	map(0x1c000000, 0x1c000003).r(FUNC(news_38xx_state::wrbeadr_r));
-
-	// TODO: what is the proper end address here?
-	map(0x1fc00000, 0x1fc1ffff).r(FUNC(news_38xx_state::boot_vector_r));
+	map(0x1c000000, 0x1c000003).r(FUNC(news_38xx_state::cpu_bus_error_address_r));
+	map(0x1f000000, 0x1fffffff).r(FUNC(news_38xx_state::boot_vector_r)); // MAPVEC forces A28~24 to 0
 }
 
 void news_38xx_state::iop_map(address_map &map)
@@ -355,22 +356,23 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x18000000, 0x1803ffff).ram(); // IOP ram
 	map(0x20000000, 0x2000ffff).rom().region("eprom", 0).mirror(0x1fff0000);
 
-	// IOP Control Registers
+	// Platform control hardware
 	map(0x22000000, 0x22000000).w(FUNC(news_38xx_state::poweron_w));
 	map(0x22000001, 0x22000001).w(FUNC(news_38xx_state::romdis_w));
-	map(0x22000002, 0x22000002).w(FUNC(news_38xx_state::ptycken_w));
-	map(0x22000003, 0x22000003).w(FUNC(news_38xx_state::timeren_w));
+	map(0x22000002, 0x22000002).w(FUNC(news_38xx_state::iop_parity_check_enable_w));
+	map(0x22000003, 0x22000003).w(FUNC(news_38xx_state::iop_timer_w));
 	map(0x22000004, 0x22000004).w(FUNC(news_38xx_state::irq_w<iop_irq::SOFTINTR>));
-	map(0x22000005, 0x22000005).w(FUNC(news_38xx_state::astintr_w));
+	map(0x22000005, 0x22000005).w(FUNC(news_38xx_state::ast_w));
 	map(0x22000006, 0x22000007).w(FUNC(news_38xx_state::iopled_w));
 
-	// Inter-Processor Control Registers
 	map(0x22800000, 0x22800001).w(FUNC(news_38xx_state::xpustart_w));
-	map(0x22800008, 0x22800009).w(FUNC(news_38xx_state::ipintxp_w));
-	map(0x22800010, 0x22800011).w(FUNC(news_38xx_state::ipenixp_w));
-	map(0x22800018, 0x22800019).w(FUNC(news_38xx_state::ipclixp_w));
+	map(0x22800008, 0x22800008).lw8(NAME([this] (u8) { irq_w<cpu_irq::IOP>(1); }));
+	map(0x22800009, 0x22800009).lw8(NAME([] (u8) { fatalerror("IOP tried to interrupt UBUS without UPU installed!"); }));
+	map(0x22800010, 0x22800010).w(FUNC(news_38xx_state::inten_w<iop_irq::CPU>));
+	map(0x22800011, 0x22800011).w(FUNC(news_38xx_state::inten_w<iop_irq::UBUS>));
+	map(0x22800018, 0x22800018).lw8(NAME([this] (u8) { irq_w<iop_irq::CPU>(0); }));
+	map(0x22800019, 0x22800019).lw8(NAME([this] (u8) { irq_w<iop_irq::UBUS>(0); }));
 
-	// IOP and Inter-Processor Interrupt Status Registers
 	map(0x23000000, 0x23000000).r(FUNC(news_38xx_state::iop_intst_r));
 	map(0x23800000, 0x23800000).r(FUNC(news_38xx_state::iop_ipc_intst_r));
 
@@ -394,17 +396,18 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x26100000, 0x26100007).m(m_hid, FUNC(news_hid_hle_device::map_68k));
 	map(0x26140000, 0x26140003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 	map(0x26180000, 0x2618000f).rw(m_rtc, FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
-	// 0x261c0000 // kb beep frequency LOWTONE 0x1 = low, 0x0 = high
+
+	// 0x261c0000 // kb beep frequency
 
 	map(0x26200000, 0x26203fff).lrw16(
 		[this](offs_t offset) { return m_net_ram[offset]; }, "net_ram_r",
 		[this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset]); }, "net_ram_w");
+
 	// 0x262c0000 // audio
 
 	map(0x26300000, 0x26300003).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
 
 	map(0x26340000, 0x26340000).r(FUNC(news_38xx_state::park_status_r));
-
 	map(0x26380000, 0x26380000).w(FUNC(news_38xx_state::index_divide_w));
 
 	map(0x28000000, 0x28000017).m(m_dma[0], FUNC(dmac_0266_device::map));
@@ -413,7 +416,7 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x2c000000, 0x2c0000ff).rom().region("idrom", 0);
 	map(0x2c000100, 0x2c000103).portr("SW1");
 
-	map(0x2e000000, 0x2effffff).r(FUNC(news_38xx_state::iop_bus_error_r)).mirror(0x10000000); // Expansion I/O TODO: w?
+	map(0x2e000000, 0x2effffff).r(FUNC(news_38xx_state::iop_bus_error_r)).mirror(0x10000000); // Expansion I/O
 }
 
 void news_38xx_state::iop_vector_map(address_map &map)
@@ -429,25 +432,26 @@ void news_38xx_state::iop_vector_map(address_map &map)
 
 u32 news_38xx_state::ram_tas_r(offs_t offset, u32 mem_mask)
 {
-	const u32 current_value = m_iop->space(0).read_dword(offset << 2);
-	if (machine().side_effects_disabled())
-	{
-		return current_value;
-	}
-
 	if (mem_mask != 0xffffffff)
 	{
 		fatalerror("%s tried to acquire lock with unaligned memory access!", machine().describe_context());
 	}
 
-	if (current_value == 0)
+	constexpr u32 LOCK_VALUE = 0x80000000;
+	const u32 current_value = m_memory_access.read_dword(offset << 2);
+	if (machine().side_effects_disabled())
+	{
+		return current_value;
+	}
+
+	if (current_value < LOCK_VALUE)
 	{
 		LOGMASKED(LOG_TAS, "%s acquired lock at offset 0x%x\n", machine().describe_context(), offset << 2);
 	}
 
-	// TODO: what is the actual value written by the hardware? Is it OR'd with the contents?
-	//		 Both vmunix and mrx appear to use bltz (r3k)/bmi (030) instructions, at least during boot
-	m_cpu->space(0).write_dword(offset << 2, 0x80000000); // TODO: fix usage of ->space
+	// TODO: what is the actual value written by the hardware?
+	//		 Both vmunix and mrx appear to use bltz (r3k)/bmi (030) instructions for lock spin
+	m_memory_access.write_dword(offset << 2, LOCK_VALUE);
 	return current_value;
 }
 
@@ -463,8 +467,14 @@ void news_38xx_state::ram_tas_w(offs_t offset, u32 data, u32 mem_mask)
 		fatalerror("%s tried to release lock with unaligned memory access!", machine().describe_context());
 	}
 
-	LOGMASKED(LOG_TAS, "%s releasing lock at offset 0x%x\n", machine().describe_context(), offset << 2);
-	m_cpu->space(0).write_dword(offset << 2, data); // TODO: fix usage of ->space
+	offset <<= 2;
+	if (m_memory_access.read_dword(offset) != 0x80000000)
+	{
+		fatalerror("%s tried to release unheld lock!");
+	}
+
+	LOGMASKED(LOG_TAS, "%s releasing lock at offset 0x%x\n", machine().describe_context(), offset);
+	m_memory_access.write_dword(offset, data);
 }
 
 u8 news_38xx_state::iop_intst_r()
@@ -490,20 +500,19 @@ u8 news_38xx_state::iop_ipc_intst_r()
 
 u8 news_38xx_state::park_status_r()
 {
-	// TODO: do static_cast<bool> instead? test printing afterwards
-	const u8 park_status = static_cast<u8>(m_parallel_fault) << 6 |
-	                       static_cast<u8>(m_serial[0]->dsr_r()) << 5 |
-	                       static_cast<u8>(m_parallel_busy) << 4 |
-	                       static_cast<u8>(!is_irq_set<iop_irq::PARALLEL>()) << 3 |
-	                       static_cast<u8>(m_serial[0]->ri_r()) << 2 |
-	                       static_cast<u8>(m_serial[1]->dsr_r()) << 1 |
-	                       static_cast<u8>(m_serial[1]->ri_r());
+	const u8 park_status = m_parallel_fault << 6 |
+	                       static_cast<bool>(m_serial[0]->dsr_r()) << 5 |
+	                       m_parallel_busy << 4 |
+	                       !is_irq_set<iop_irq::PARALLEL>() << 3 |
+	                       static_cast<bool>(m_serial[0]->ri_r()) << 2 |
+	                       static_cast<bool>(m_serial[1]->dsr_r()) << 1 |
+	                       static_cast<bool>(m_serial[1]->ri_r());
 	LOGMASKED(LOG_INTERRUPT, "%s park_status_r: 0x%x\n", machine().describe_context(), park_status);
 	return park_status;
 }
 
 template<news_38xx_state::iop_irq Number>
-void news_38xx_state::irq_w(u8 state)
+void news_38xx_state::irq_w(const u8 state)
 {
 	if (Number != iop_irq::TIMER)
 	{
@@ -529,17 +538,17 @@ void news_38xx_state::irq_w(u8 state)
 }
 
 template<news_38xx_state::iop_irq Number>
-void news_38xx_state::inten_w(uint8_t state)
+void news_38xx_state::inten_w(const uint8_t state)
 {
 	if (Number != iop_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-		          iop_irq_names[static_cast<unsigned>(Number)], state ? "enabled" : "disabled");
+		          iop_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-			iop_irq_names[static_cast<unsigned>(Number)], state ? "enabled" : "disabled");
+			iop_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 
 	if (state)
@@ -585,7 +594,7 @@ void news_38xx_state::int_check_iop()
 }
 
 template <news_38xx_state::cpu_irq Number>
-void news_38xx_state::irq_w(u8 state)
+void news_38xx_state::irq_w(const u8 state)
 {
 	if (Number != cpu_irq::TIMER)
 	{
@@ -611,17 +620,17 @@ void news_38xx_state::irq_w(u8 state)
 }
 
 template<news_38xx_state::cpu_irq Number>
-void news_38xx_state::inten_w(uint8_t state)
+void news_38xx_state::inten_w(const uint8_t state)
 {
 	if (Number != cpu_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-		          cpu_irq_names[static_cast<unsigned>(Number)], state ? "enabled" : "disabled");
+		          cpu_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-		  cpu_irq_names[static_cast<unsigned>(Number)], state ? "enabled" : "disabled");
+		  cpu_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 
 	if (state)
@@ -671,8 +680,7 @@ u32 news_38xx_state::iop_bus_error_r()
 
 TIMER_CALLBACK_MEMBER(news_38xx_state::timer)
 {
-	// WSC-PARK generates a 100Hz IRQ for the IOP when the timer is enabled and feeds the 100Hz clock for the CPU
-	// to the CPINTR PAL that generates the CPU IRQ when CPENITMR is set.
+	// 100Hz clock from PARK is used to generate both IOP and CPU interrupts
 	if (m_iop_inten & 1 << static_cast<u32>(iop_irq::TIMER))
 	{
 		irq_w<iop_irq::TIMER>(1);
@@ -684,10 +692,9 @@ TIMER_CALLBACK_MEMBER(news_38xx_state::timer)
 	}
 }
 
-// TODO: Add and unify logging for all of these, add a unique log level for IOP registers, and add machine context
 void news_38xx_state::poweron_w(u8 data)
 {
-	LOG("Write POWERON = 0x%x (%s)\n", data, machine().describe_context());
+	LOGMASKED(LOG_IOP, "(%s) Write POWERON = 0x%x\n", machine().describe_context(), data);
 
 	if (!machine().side_effects_disabled() && !data)
 	{
@@ -697,17 +704,20 @@ void news_38xx_state::poweron_w(u8 data)
 
 void news_38xx_state::romdis_w(u8 data)
 {
-	LOG("ROMDIS = 0x%x (%s)\n", data, machine().describe_context());
+	LOGMASKED(LOG_IOP, "(%s) Write ROMDIS = 0x%x\n", machine().describe_context(), data);
+
 	if (data) {
 		m_iop->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
 	}
 	else {
-		// TODO: re-map EPROM
+		m_iop->space(0).install_rom(0x00000000, 0x0000ffff, m_eprom);
 	}
 }
 
-void news_38xx_state::ptycken_w(u8 data)
+void news_38xx_state::iop_parity_check_enable_w(u8 data)
 {
+	LOGMASKED(LOG_IOP, "(%s) %s IOP parity checking\n", machine().describe_context(), data ? ENABLED : DISABLED);
+
 	inten_w<iop_irq::PERR>(data > 0);
 	if (!data)
 	{
@@ -715,8 +725,10 @@ void news_38xx_state::ptycken_w(u8 data)
 	}
 }
 
-void news_38xx_state::timeren_w(u8 data)
+void news_38xx_state::iop_timer_w(u8 data)
 {
+	LOGMASKED(LOG_TIMER, "(%s) %s IOP timer\n", machine().describe_context(), data ? ENABLED : DISABLED);
+
 	inten_w<iop_irq::TIMER>(data > 0);
 	if (!data)
 	{
@@ -724,115 +736,73 @@ void news_38xx_state::timeren_w(u8 data)
 	}
 }
 
-void news_38xx_state::astintr_w(u8 data)
+void news_38xx_state::ast_w(u8 data)
 {
-	LOG("ASTINTR = 0x%x\n", data);
-	// TODO: how to trigger AST IRQ when IOP enters user mode? No easy injection point like my experiments with NWS800
+	LOGMASKED(LOG_IOP, "(%s) AST interrupt %s\n", machine().describe_context(), data ? ENABLED : DISABLED);
+	// TODO: how to trigger AST IRQ when IOP enters user mode? No easy injection point like my experiments with NWS-831.
+	//       mrx doesn't seem to use it, but that could be due to other issues.
 }
 
 void news_38xx_state::iopled_w(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_LED, "IOPLED%01d = 0x%x\n", offset, data);
+	constexpr int IOP_LED_BASE = 2;
+	m_led[IOP_LED_BASE + offset % 2] = data > 0;
 }
 
 void news_38xx_state::xpustart_w(offs_t offset, u8 data)
 {
-	// offset 0 = start running main CPU
-	// offset 1 = start running UPU (UBUS bus master, expansion slot A?)
-	LOG("%cPUSTART = 0x%x\n", !offset ? 'C' : 'H', data);
-	if (!offset) {
-		// TODO: reset CPU platform registers here? make reset_cpu_port() function or something
+	LOGMASKED(LOG_IOP, "(%s) %s %cPU\n", machine().describe_context(), data ? "Starting" : "Stopping", !offset ? 'C' : 'U');
+
+	if (!offset)
+	{
 		m_cpu->set_input_line(INPUT_LINE_HALT, data ? 0 : 1);
-	} else {
+		if (!data)
+		{
+			reset_cpu_registers();
+		}
+	}
+	else
+	{
 		if (data) fatalerror("Tried to start UPU without UPU installed!");
-	}
-}
-
-void news_38xx_state::ipintxp_w(offs_t offset, u8 data)
-{
-	// Send interrupt to CPU or UPU
-	LOGMASKED(LOG_INTERRUPT, "IPINT%cP = 0x%x\n", !offset ? 'C' : 'H', data);
-	if (!offset)
-	{
-		irq_w<cpu_irq::IOP>(1);
-	}
-	else
-	{
-		fatalerror("IOP tried to interrupt UPU without UPU installed!");
-	}
-}
-
-void news_38xx_state::ipenixp_w(offs_t offset, u8 data)
-{
-	// Enable or disable interrupts from CPU or UPU
-	// TODO: this doesn't need to be it's own function anymore
-	LOGMASKED(LOG_INTERRUPT, "IPENI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
-	if (!offset)
-	{
-		inten_w<iop_irq::CPU>(data > 0);
-	}
-	else
-	{
-		inten_w<iop_irq::UBUS>(data > 0);
-	}
-}
-
-void news_38xx_state::ipclixp_w(offs_t offset, u8 data)
-{
-	// Clear interrupt from CPU or UPU
-	// TODO: this doesn't need to be its own function anymore
-	LOGMASKED(LOG_INTERRUPT, "IPCLI%cP = 0x%x\n", !offset ? 'C' : 'H', data);
-	if (!offset)
-	{
-		irq_w<iop_irq::CPU>(0);
-	}
-	else
-	{
-		irq_w<iop_irq::UBUS>(0);
 	}
 }
 
 void news_38xx_state::index_divide_w(offs_t offset, u8 data)
 {
+	LOGMASKED(LOG_IOP, "(%s) Set divide index to %s\n", machine().describe_context(), data ? "divide" : "passthrough");
 	// TODO: what to do with this?
-	LOG("(%s) Set divide index to %s\n", machine().describe_context(), data ? "0.5x" : "1x");
+	//       I think it divides INDX pulse by half (2x INDX pulses from the drive to make 1 go to the FDC controller)
 }
 
-u32 news_38xx_state::cpstat_r()
+u32 news_38xx_state::cpu_status_r()
 {
 	const u8 cpu_status = is_irq_set<cpu_irq::UBUS>() << 1 | is_irq_set<cpu_irq::IOP>();
-	LOGMASKED(LOG_INTERRUPT, "%s cpstat_r 0x%x\n", machine().describe_context(), cpu_status);
+	LOGMASKED(LOG_INTERRUPT, "%s read CPU status 0x%x\n", machine().describe_context(), cpu_status);
 	return cpu_status;
 }
 
-u32 news_38xx_state::wrbeadr_r()
+u32 news_38xx_state::cpu_bus_error_address_r()
 {
-	// Last write bus error address
-	LOG("WRBEADR read 0x%x\n", m_wrbeadr);
+	LOGMASKED(LOG_CPU, "(%s) Read last bus error address = 0x%x\n", machine().describe_context(), m_wrbeadr);
+	// This will need to be properly implemented if anything is added that can cause a CPU bus error
 	return m_wrbeadr;
 }
 
 u8 news_38xx_state::boot_vector_r(offs_t offset)
 {
-	// RAM endianness is an issue because RAM is installed with install_ram.
-	// Therefore, go straight to the memory bus (technically its own bus, but we can go via IOP as a hack)
-	// TODO: pick one of the following instead of doing this
-	//       A) figure out the correct way to deal with the endianness issue
-	//       B) Replace this with a memory_access::specific
-	//       C) Use an accessor function for RAM along with a memory_access cache to avoid endianness mismatch
-
 	if (!m_mapvec)
 	{
-		constexpr u32 BOOT_VECTOR_BASE = 0xc00000;
-		return m_cpu->space(0).read_byte(BOOT_VECTOR_BASE + offset);
+		return m_memory_access.read_byte(offset);
 	}
 
 	// In reality, this probably just causes a bus error, returns 0x0/0xff, or something like that
 	fatalerror("CPU tried to read from boot vector space without MAPVEC!");
 }
 
-void news_38xx_state::cpenipty_w(u32 data)
+void news_38xx_state::cpu_parity_check_enable_w(u32 data)
 {
+	LOGMASKED(LOG_CPU, "(%s) Write CPU parity check enable = 0x%x\n", machine().describe_context(), data);
+
 	inten_w<cpu_irq::PERR>(data > 0);
 	if (!data)
 	{
@@ -840,8 +810,10 @@ void news_38xx_state::cpenipty_w(u32 data)
 	}
 }
 
-void news_38xx_state::cpenitmr_w(u32 data)
+void news_38xx_state::cpu_timer_w(u32 data)
 {
+	LOGMASKED(LOG_TIMER, "(%s) CPU timer %s\n", machine().describe_context(), data ? ENABLED : DISABLED);
+
 	inten_w<cpu_irq::TIMER>(data > 0);
 	if (!data)
 	{
@@ -849,44 +821,23 @@ void news_38xx_state::cpenitmr_w(u32 data)
 	}
 }
 
-void news_38xx_state::cpintxp_w(offs_t offset, u32 data)
-{
-	LOGMASKED(LOG_INTERRUPT, "CPINT%cP = 0x%x\n", !offset ? 'I' : 'H', data);
-	if (!offset)
-	{
-		irq_w<iop_irq::CPU>(1);
-	}
-	else
-	{
-		fatalerror("CPU tried to interrupt UPU without UPU installed!");
-	}
-}
-
 void news_38xx_state::mapvec_w(u32 data)
 {
-	// 1 = normal operation, 0 = map CPU reset vector 0x1fc00000 to 0x00c00000 in RAM
-	// Like other CPU control registers, this defaults to 0.
-	LOG("(%s) MAPVEC = 0x%x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_CPU, "(%s) CPU boot vector mapping %s\n", machine().describe_context(), data ? DISABLED : ENABLED);
 	m_mapvec = data > 0;
-}
-
-void news_38xx_state::cpclixp_w(offs_t offset, u32 data)
-{
-	// Clear interrupt from IOP or UPU
-	LOGMASKED(LOG_INTERRUPT, "(%s) CPCLI%cP = 0x%x\n", machine().describe_context(), !offset ? 'I' : 'H', data);
-	if (!offset)
-	{
-		irq_w<cpu_irq::IOP>(0);
-	}
-	else
-	{
-		irq_w<cpu_irq::UBUS>(0);
-	}
 }
 
 void news_38xx_state::cpuled_w(offs_t offset, u32 data)
 {
-	LOGMASKED(LOG_LED, "CPULED%01d = 0x%x\n", offset, data);
+	m_led[offset % 2] = data > 0;
+}
+
+void news_38xx_state::reset_cpu_registers()
+{
+	m_mapvec = false;
+	m_wrbeadr = 0;
+	m_cpu_intst = 0;
+	m_cpu_inten = 0;
 }
 
 void news_scsi_devices(device_slot_interface &device)
@@ -906,10 +857,12 @@ void news_38xx_state::common(machine_config &config)
 	m_iop->set_addrmap(AS_PROGRAM, &news_38xx_state::iop_map);
 	m_iop->set_addrmap(m68000_base_device::AS_CPU_SPACE, &news_38xx_state::iop_vector_map);
 
+	// Base RAM: 16M onboard
+	// With NWB-109 expansion kit: 16M onboard + 16M (1Mbit DRAM chips) expansion = 32M total
+	// With NWB-112 expansion kit: 16M onboard + 64M (4Mbit DRAM chips) expansion = 80M total
 	RAM(config, m_ram);
 	m_ram->set_default_size("16M");
-	// TODO: confirm each bank supports 4x1M or 4x4M
-	//m_ram->set_extra_options("4M,8M,12M,20M,24M,32M,36M,48M");
+	m_ram->set_extra_options("32M,80M");
 
 	RTC62421(config, m_rtc, 32.768_kHz_XTAL);
 
@@ -1005,12 +958,12 @@ void news_38xx_state::common(machine_config &config)
 
 	CENTRONICS(config, m_parallel, centronics_devices, nullptr);
 	// Note: printing works, but I'm not sure how accurate triggering the IRQ on each edge is.
-	// NEWS-OS properly checks the PARK status before taking action, but this might not be what real hw does
+	// mrx properly checks the PARK status before taking action, but this might not be what real hw does
 	m_parallel->busy_handler().set([this](const int status) {
 		const bool new_status = status;
 		if (m_parallel_busy != new_status)
 		{
-			LOG("Parallel busy changed to %s", new_status ? "H" : "L");
+			LOG("Parallel busy changed to %s\n", new_status ? "H" : "L");
 			m_parallel_busy = new_status;
 			irq_w<iop_irq::PARALLEL>(1);
 		}
@@ -1019,7 +972,7 @@ void news_38xx_state::common(machine_config &config)
 		const bool new_status = status;
 		if (m_parallel_fault != new_status)
 		{
-			LOG("Parallel fault changed to %s", new_status ? "H" : "L");
+			LOG("Parallel fault changed to %s\n", new_status ? "H" : "L");
 			m_parallel_fault = !new_status; // TODO: why !? this seems wrong
 			irq_w<iop_irq::PARALLEL>(1);
 		}
