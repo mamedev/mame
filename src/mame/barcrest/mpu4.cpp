@@ -324,11 +324,12 @@ void mpu4_state::led_write_extender(uint8_t latch, uint8_t data, uint8_t column)
 	{
 		if (BIT(diff, i))
 		{
+			int index = ext_strobe + i;
 			for (int j = 0; j < 8; j++)
-			{
-				m_mpu4leds[(ext_strobe + i) | j], BIT(data, j);
-			}
-			m_digits[(ext_strobe + i)] = data;
+				m_mpu4leds[index << 3 | j], BIT(data, j);
+
+			m_digits[index] = data;
+			m_digitsi[index] = data ^ 0xff;
 		}
 	}
 
@@ -675,11 +676,12 @@ void mpu4_state::pia_ic4_porta_w(uint8_t data)
 		{
 			if (m_pia4_porta_leds_strobe != m_input_strobe)
 			{
-				for (int i=0; i<8; i++)
-				{
-					m_mpu4leds[(((7 - m_input_strobe) | m_pia4_porta_leds_base) << 3) | i] = BIT(data, i);
-				}
-				m_digits[(7 - m_input_strobe) | m_pia4_porta_leds_base] = data;
+				int index = (7 - m_input_strobe) | m_pia4_porta_leds_base;
+				for (int i = 0; i < 8; i++)
+					m_mpu4leds[index << 3 | i] = BIT(data, i);
+
+				m_digits[index] = data;
+				m_digitsi[index] = data ^ 0xff;
 			}
 			m_pia4_porta_leds_strobe = m_input_strobe;
 		}
@@ -848,11 +850,12 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 #if 0
 		if ((m_ic23_active) && m_card_live)
 		{
+			int index = (m_last_b7 << 3) | m_input_strobe;
 			for (int i = 0; i < 8; i++)
-			{
-				m_mpu4leds[(m_last_b7 << 6) | (m_input_strobe << 3) | i] = BIT(~data, i);
-			}
-			m_digits[(m_last_b7 << 3) | m_input_strobe] = ~data;
+				m_mpu4leds[index << 3 | i] = BIT(~data, i);
+
+			m_digits[index] = data ^ 0xff;
+			m_digitsi[index] = data;
 		}
 #endif
 		break;
@@ -896,11 +899,12 @@ void mpu4_state::pia_ic5_portb_w(uint8_t data)
 	{
 		if (m_simplecard_leds_strobe != m_input_strobe)
 		{
-			for (int i=0; i<8; i++)
-			{
-				m_mpu4leds[( ( (7 - m_input_strobe) | m_simplecard_leds_base) << 3) | i] = BIT(m_pia4->a_output(), i);
-			}
-			m_digits[(7 - m_input_strobe) | m_simplecard_leds_base] = m_pia4->a_output();
+			int index = (7 - m_input_strobe) | m_simplecard_leds_base;
+			for (int i = 0; i < 8; i++)
+				m_mpu4leds[index << 3 | i] = BIT(m_pia4->a_output(), i);
+
+			m_digits[index] = m_pia4->a_output();
+			m_digitsi[index] = m_pia4->a_output() ^ 0xff;
 		}
 		m_simplecard_leds_strobe = m_input_strobe;
 	}
@@ -1877,6 +1881,7 @@ void mpu4_state::mpu4_config_common()
 	m_lamps.resolve();
 	m_mpu4leds.resolve();
 	m_digits.resolve();
+	m_digitsi.resolve();
 	m_triacs.resolve();
 	m_flutterbox.resolve();
 
