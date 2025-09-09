@@ -31,7 +31,7 @@ u107 u6295
 
 
 EEPROM:
-??  winbond w27c020? cant read text due to poor pictures quality
+??? ?27c020 - winbond w27c020? cant read text due to poor pictures quality
 u33 winbond w27c512  boot rom.
 u39 at89s51 8051 mcu for protection.
 
@@ -50,7 +50,7 @@ u107 u6295
 EEPROM:
 27C020-12
 at back.
-??? - 27c512
+?27c512
 
 pcb 3
 GN-001
@@ -66,7 +66,7 @@ u107 u6295
 EEPROM:
 at27c020 - dumped
 at back.
-w27e512-12 
+winbond w27e512-12 
 
 pcb 4 A.LC M.D.P labeled SY-OP-001
 a1 ALTERA EPM7032LC44-10
@@ -84,7 +84,7 @@ EEPROM:
 st ????? - probably 29f1615. labeled A-0 not dumped
 am27c020 labeled Mujer 1 español. dumped.
 at back
-??? - 27c512
+?27c512
 
 
 
