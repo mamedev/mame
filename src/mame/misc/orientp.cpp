@@ -64,6 +64,8 @@ public:
 	{ }
 
 	void orientp(machine_config &config);
+protected:
+	virtual void machine_start() override;
 
 private:
 	void io_map(address_map &map);
@@ -81,8 +83,6 @@ private:
 	output_finder<30> m_leds;
 	required_ioport_array<4> m_inputs;
 
-protected:
-	virtual void machine_start() override;
 
 };
 
