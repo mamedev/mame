@@ -46,8 +46,8 @@ u102 jfc 95101
 u104 unpopulated ym2413
 u107 u6295
 EEPROM:
-st ????? A-0 not dumped
-am27020 - dumped.
+st ????? labeled A-0 not dumped
+am27020 labeled Mujer 1 español. dumped.
 at back
 ??? - 27c512
 
