@@ -211,6 +211,10 @@ void orientp_state::machine_start()
 
 void orientp_state::orientp(machine_config &config)
 {
+    // The 8279 (U1) and PSGs (U102) are clocked using the ALE output from the 8052.
+	// This is normally 1/6th of the input clock frequency, but a pulse is skipped during external data memory accesses.
+	// If the program accesses external data memory, sound generation and keyboard scanning will be affected.
+	
     // basic machine hardware
 	i8052_device &maincpu(I8052(config, "maincpu", XTAL(10'738'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &orientp_state::program_map);
@@ -218,7 +222,7 @@ void orientp_state::orientp(machine_config &config)
    
     NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	
-	//TODO: Check and mcu hook up
+	//TODO: Check mcu dump and mcu hook up
     i8051_device &mcu(I8051(config, "mcu", XTAL(10'738'000)));
     mcu.set_addrmap(AS_PROGRAM, &orientp_state::mcu_map);
 	mcu.set_addrmap(AS_IO, &orientp_state::mcu_io_map);
@@ -228,6 +232,7 @@ void orientp_state::orientp(machine_config &config)
     I8255A(config, "ppi2");
 	
 	// Keyboard & display interface 
+	//TODO: pasted from marywu
     i8279_device &kbdc(I8279(config, "kdc", XTAL(10'738'635) / 6));
 	kbdc.out_sl_callback().set(FUNC(orientp_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
 	kbdc.in_rl_callback().set(FUNC(orientp_state::keyboard_r));          // keyboard Return Lines
