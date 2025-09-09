@@ -183,14 +183,14 @@ protected:
 		"SCC"sv, "KEYBOARD"sv, "MOUSE"sv, "TIMER"sv, "FDCDRQ"sv, "PERR"sv
 	};
 	static constexpr u32 iop_nmi_mask = 1 << static_cast<u32>(iop_irq::FDCDRQ) |
-	                                    1 << static_cast<u32>(iop_irq::SCC) |
-	                                    1 << static_cast<u32>(iop_irq::SCSI0) |
-	                                    1 << static_cast<u32>(iop_irq::SCSI1) |
-	                                    1 << static_cast<u32>(iop_irq::LANCE) |
-	                                    1 << static_cast<u32>(iop_irq::FDCIRQ) |
-	                                    1 << static_cast<u32>(iop_irq::SLOT) |
-	                                    1 << static_cast<u32>(iop_irq::SOFTINTR) |
-	                                    1 << static_cast<u32>(iop_irq::AST);
+										1 << static_cast<u32>(iop_irq::SCC) |
+										1 << static_cast<u32>(iop_irq::SCSI0) |
+										1 << static_cast<u32>(iop_irq::SCSI1) |
+										1 << static_cast<u32>(iop_irq::LANCE) |
+										1 << static_cast<u32>(iop_irq::FDCIRQ) |
+										1 << static_cast<u32>(iop_irq::SLOT) |
+										1 << static_cast<u32>(iop_irq::SOFTINTR) |
+										1 << static_cast<u32>(iop_irq::AST);
 
 	template<iop_irq Number>
 	void irq_w(u8 state);
@@ -212,7 +212,7 @@ protected:
 
 	static constexpr std::array cpu_irq_names = {"UBUS"sv, "IOP"sv, "TIMER"sv, "FPA"sv, "WRBERR"sv, "PERR"sv};
 	static constexpr u32 cpu_nmi_mask = 1 << static_cast<u32>(cpu_irq::WRBERR) |
-	                                    1 << static_cast<u32>(cpu_irq::IOP);
+										1 << static_cast<u32>(cpu_irq::IOP);
 
 	template<cpu_irq Number>
 	void irq_w(u8 state);
@@ -467,7 +467,7 @@ u32 news_38xx_state::ram_tas_r(offs_t offset, u32 mem_mask)
 	}
 
 	// TODO: what is the actual value written by the hardware?
-	//		 Both vmunix and mrx appear to use bltz (r3k)/bmi (030) instructions for lock spin
+	//       Both vmunix and mrx appear to use bltz (r3k)/bmi (030) instructions for lock spin
 	m_memory_access.write_dword(offset << 2, LOCK_VALUE);
 	return current_value;
 }
@@ -497,13 +497,13 @@ void news_38xx_state::ram_tas_w(offs_t offset, u32 data, u32 mem_mask)
 u8 news_38xx_state::iop_intst_r()
 {
 	const u8 iop_status = is_irq_set<iop_irq::PERR>() << 7 |
-	                      is_irq_set<iop_irq::SCSI0>() << 6 |
-	                      is_irq_set<iop_irq::SCSI1>() << 5 |
-	                      (is_irq_set<iop_irq::CPU>() || is_irq_set<iop_irq::UBUS>()) << 4 |
-	                      is_irq_set<iop_irq::LANCE>() << 3 |
-	                      is_irq_set<iop_irq::FDCIRQ>() << 2 |
-	                      is_irq_set<iop_irq::PARALLEL>() << 1 |
-	                      is_irq_set<iop_irq::SLOT>();
+						  is_irq_set<iop_irq::SCSI0>() << 6 |
+						  is_irq_set<iop_irq::SCSI1>() << 5 |
+						  (is_irq_set<iop_irq::CPU>() || is_irq_set<iop_irq::UBUS>()) << 4 |
+						  is_irq_set<iop_irq::LANCE>() << 3 |
+						  is_irq_set<iop_irq::FDCIRQ>() << 2 |
+						  is_irq_set<iop_irq::PARALLEL>() << 1 |
+						  is_irq_set<iop_irq::SLOT>();
 	LOGMASKED(LOG_INTERRUPT, "%s iop_intst_r: 0x%x\n", machine().describe_context(), iop_status);
 	return iop_status;
 }
@@ -518,12 +518,12 @@ u8 news_38xx_state::iop_ipc_intst_r()
 u8 news_38xx_state::park_status_r()
 {
 	const u8 park_status = m_parallel_fault << 6 |
-	                       static_cast<bool>(m_serial[0]->dsr_r()) << 5 |
-	                       m_parallel_busy << 4 |
-	                       !is_irq_set<iop_irq::PARALLEL>() << 3 |
-	                       static_cast<bool>(m_serial[0]->ri_r()) << 2 |
-	                       static_cast<bool>(m_serial[1]->dsr_r()) << 1 |
-	                       static_cast<bool>(m_serial[1]->ri_r());
+						   static_cast<bool>(m_serial[0]->dsr_r()) << 5 |
+						   m_parallel_busy << 4 |
+						   !is_irq_set<iop_irq::PARALLEL>() << 3 |
+						   static_cast<bool>(m_serial[0]->ri_r()) << 2 |
+						   static_cast<bool>(m_serial[1]->dsr_r()) << 1 |
+						   static_cast<bool>(m_serial[1]->ri_r());
 	LOGMASKED(LOG_INTERRUPT, "%s park_status_r: 0x%x\n", machine().describe_context(), park_status);
 	return park_status;
 }
@@ -534,12 +534,12 @@ void news_38xx_state::irq_w(const u8 state)
 	if (Number != iop_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-		          iop_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+				  iop_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-		          iop_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+				  iop_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
 	}
 
 	if (state)
@@ -560,12 +560,12 @@ void news_38xx_state::inten_w(const u8 state)
 	if (Number != iop_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-		          iop_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+				  iop_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-		          iop_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+				  iop_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 
 	if (state)
@@ -617,12 +617,12 @@ void news_38xx_state::irq_w(const u8 state)
 	if (Number != cpu_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-		          cpu_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+				  cpu_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-		          cpu_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+				  cpu_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
 	}
 
 	if (state)
@@ -643,12 +643,12 @@ void news_38xx_state::inten_w(const u8 state)
 	if (Number != cpu_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-		          cpu_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+				  cpu_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-		          cpu_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+				  cpu_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 
 	if (state)
@@ -772,7 +772,7 @@ void news_38xx_state::iopled_w(offs_t offset, u8 data)
 void news_38xx_state::xpustart_w(offs_t offset, u8 data)
 {
 	LOGMASKED(LOG_IOP, "(%s) %s %cPU\n", machine().describe_context(), data ? "Starting" : "Stopping",
-	          !offset ? 'C' : 'U');
+			  !offset ? 'C' : 'U');
 
 	if (!offset)
 	{
