@@ -342,7 +342,7 @@ void whtm68k_state::yizhix(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &whtm68k_state::audio_program_map);
 	audiocpu.set_addrmap(AS_IO, &whtm68k_state::audio_io_map);
 	audiocpu.port_in_cb<0>().set([this] () { LOGPORTS("%s: 80C32 port 0 read\n", machine().describe_context()); return 0; });
-	audiocpu.port_in_cb<1>().set([this] () { /*LOGPORTS("%s: 80C32 port 1 read\n", machine().describe_context());*/ return 0; }); // TODO: read all the time
+	audiocpu.port_in_cb<1>().set([this] () { (void)this; /*LOGPORTS("%s: 80C32 port 1 read\n", machine().describe_context());*/ return 0; }); // TODO: read all the time
 	audiocpu.port_in_cb<2>().set([this] () { LOGPORTS("%s: 80C32 port 2 read\n", machine().describe_context()); return 0; });
 	audiocpu.port_in_cb<3>().set([this] () { LOGPORTS("%s: 80C32 port 3 read\n", machine().describe_context()); return 0; });
 	audiocpu.port_out_cb<0>().set([this] (uint8_t data) { LOGPORTS("%s: 80C32 port 0 write %02x\n", machine().describe_context(), data); });
