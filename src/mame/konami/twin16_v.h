@@ -14,6 +14,7 @@
 class konami_twin16_video_device : public device_t, public device_video_interface, public device_gfx_interface
 {
 public:
+	// TODO: probably cleaner to implemen these as address spaces where the driver can install ROM/RAM rather than delegates
 	using sprite_cb_delegate = device_delegate<uint16_t (int addr)>;
 	using tile_cb_delegate = device_delegate<uint32_t (uint16_t data)>;
 
