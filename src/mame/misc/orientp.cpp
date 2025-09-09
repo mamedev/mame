@@ -104,12 +104,14 @@ Need Proper Layout.
 #include "emu.h"
 
 #include "cpu/mcs51/mcs51.h"
+
 #include "machine/nvram.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
+
 #include "orientp.lh"
 
 #include "speaker.h"
