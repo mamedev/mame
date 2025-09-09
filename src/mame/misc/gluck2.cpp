@@ -3,37 +3,41 @@
 /******************************************************************************
 
   Good Luck II
-  Yung Yu / CYE, 1992.
+  Si Se 7 (4-colors 7's)
 
+  Yung Yu / CYE, 1992.
 
   Driver by Roberto Fresca.
 
 
-  Hardware based on Golden Poker / Cal Omega, but with a lot of improvements...
+  Hardware based on Golden Poker / Cal Omega, but with a lot of improvements.
+  PCB silkscreened: "YUNGYU" "920210". There are two variants. Good Luck II
+  has 1x UM3567 (clone of Yamaha YM2413) for sound, in the Si Se 7 board, they
+  replaced the YM2413 toward a OKI6295 for sound samples support.
 
 
 *******************************************************************************
 
-
   *** Hardware notes ***
 
-  - CPU:  1x 6502 (U8). Empty socket.
+  CPU:  1x 6502 (U8). Empty socket.
 
-  - CRTC: 1x HD6845SP (U13)
+  CRTC: 1x HD6845SP (U13)
 
-  - RAM:  2x 6116. 2K*8 SRAM. (U6, U17). Empty sockets.
+  RAM:  2x 6116. 2K*8 SRAM. (U6, U17). Empty sockets.
 
-  - ROMs: 1x ST27C512 (U7)
-          3x M27C256 (U31, U32, U33)
+  ROMs: 1x ST27C512 (U7)
+        3x M27C256 (U31, U32, U33)
 
-  - PROMs: 3x Bipolar PROMs (U25, U26, U27)
+  PROMs: 3x Bipolar PROMs (U25, U26, U27)
 
-  - CLK:  1x crystal @ 10.000 MHz. (for CPU clock)
-          1x crystal @ 3.5795 MHz. (for sound circuitry)
+  CLK:  1x crystal @ 10.000 MHz. (for CPU clock)
+        1x crystal @ 3.5795 MHz. (for sound circuitry)
 
-  - SOUND: 1x AY-3-8910 (U38)
-           1x UM3567 (clone of Yamaha YM2413) (U36)
-           1x 2904D JRC (Dual Operational Amplifier) (U40)
+  SOUND: 1x AY-3-8910 (U38)
+         1x UM3567 (clone of Yamaha YM2413) (U36) --> Good Luck II PCB.
+		 1x MK28 (Clone of OKI 6295) ---------------> Si Se 7 PCB. 
+         1x 2904D JRC (Dual Operational Amplifier) (U40)
 
 
   Other components:
@@ -50,7 +54,7 @@
   Original stickers from CYE (Chang Yu Electronic Company) in PCB and ROMs.
 
 
-  PCB Layout:
+  PCB Layout (Good Luck II):
 
   .----------------------------------------------------------------------------------------------.
   |  U12                                U8                           U2            BT1           |
@@ -195,6 +199,7 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/ymopl.h"
+#include "sound/okim6295.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -220,6 +225,7 @@ public:
 	{ }
 
 	void gluck2(machine_config &config);
+	void sise7(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -238,7 +244,9 @@ private:
 	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void gluck2_map(address_map &map) ATTR_COLD;
+	void sise7_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -339,6 +347,25 @@ void gluck2_state::gluck2_map(address_map &map)
   0848-084b    PIA1 leftover???
 
 */
+
+void gluck2_state::sise7_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x084b).noprw();  // see below
+	map(0x1000, 0x13ff).ram().w(FUNC(gluck2_state::videoram_w)).share("videoram");  // 6116 #1 (2K x 8) RAM (only 1st half used)
+	map(0x1800, 0x1bff).ram().w(FUNC(gluck2_state::colorram_w)).share("colorram");  // 6116 #2 (2K x 8) RAM (only 1st half used)
+	map(0x2000, 0x2000).portr("SW1");
+	map(0x2d00, 0x2d00).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3400, 0x3400).portr("IN0");
+	map(0x3500, 0x3500).portr("IN1");
+	map(0x3600, 0x3600).portr("IN2");
+	map(0x3700, 0x3700).w(FUNC(gluck2_state::counters_w));
+	map(0x3d00, 0x3d01).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x4000, 0xffff).rom();
+}
+
 
 /*********************************************
 *                Input ports                 *
@@ -640,6 +667,17 @@ void gluck2_state::gluck2(machine_config &config)
 	YM2413(config, "ymsnd", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void gluck2_state::sise7(machine_config &config)
+{
+	gluck2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &gluck2_state::sise7_map);
+
+	config.device_remove("ymsnd");
+
+	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);  // pin 7 not verified
+
+}
 
 /*********************************************
 *                  Rom Load                  *
@@ -697,4 +735,4 @@ ROM_END
 
 //    YEAR  NAME     PARENT  MACHINE   INPUT   STATE         INIT        ROT    COMPANY          FULLNAME                 FLAGS...
 GAME( 1992, gluck2,  0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Good Luck II",           MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sise7,   0,      gluck2,   sise7,  gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Si Se 7 (4-colors 7's)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sise7,   0,      sise7,    sise7,  gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Si Se 7 (4-colors 7's)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
