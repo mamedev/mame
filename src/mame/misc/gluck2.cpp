@@ -183,8 +183,7 @@
 
   TODO:
 
-  - Get a good dump of the unkyungyu program (we have only the 2nd half)
-  - Hook the OKI 6295 ADPCM samples system for unkyungyu.
+  - Hook the OKI 6295 ADPCM samples system for sise7.
   - Figure out the remaining DIP switches.
   - Nothing at all... :)
 
@@ -450,7 +449,116 @@ static INPUT_PORTS_START( gluck2 )
 	PORT_DIPNAME( 0x80, 0x80, "SW3:2" )         PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( sise7 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Repeat Bet")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_NAME("Note In")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_NAME("Coin In")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_1_PAD) PORT_NAME("PAD 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_2_PAD) PORT_NAME("PAD 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME("Small")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Service")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_3_PAD) PORT_NAME("PAD 3")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_4_PAD) PORT_NAME("PAD 4")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PAD 5")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PAD 6")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_7_PAD) PORT_NAME("PAD 7")
+
+	PORT_START("SW1")   // 2000
+	PORT_DIPNAME( 0x01, 0x01, "SW1" )               PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")   // 3D01: AY8910 port B
+	PORT_DIPNAME( 0x01, 0x01, "SW2" )               PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3")   // 3D01: AY8910 port A
+	PORT_DIPNAME( 0x01, 0x01, "SW3" )               PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -553,25 +661,15 @@ ROM_START( gluck2 )
 ROM_END
 
 /*
+   4-colors 7's
+  "四色7" (Sì Sè Qī)
 
-  Unknown YungYu game
-  Possible title:
-
-  Tè jiǎng
-  特奖
-
-  This means "Special Bonus"
-
-  The program ROM it's underdumped and lacks of the first half.
-  The device has no marks at all, and need to be identified.
-  Dumped as 27256, you can get the second half of the program.
-  Dumped as 27128, you can get the last quarter.
-  Dumped as 27512, you get all garbage, 99.8% of FF's.
+  Yung Yu / CYE
 
 */
-ROM_START( unkyungyu )
-	ROM_REGION( 0x10000, "maincpu", 0 )  // prg rom lacks of the first half
-	ROM_LOAD( "tejiang.u7",  0x8000, 0x8000, BAD_DUMP CRC(0eefe5e3) SHA1(56f398afdd603e4a4bbd9f9c0bc759bf0fb351f9) )
+ROM_START( sise7 )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // redumped...
+	ROM_LOAD( "tejiang.u7",  0x0000, 0x10000, CRC(e3fe6ca9) SHA1(32a5611c3870078b11ebe790efd12efe3b4a4fb4) )
 
 	ROM_REGION( 0x18000, "gfx", 0 )
 	ROM_LOAD( "3.u33",  0x00000, 0x4000, CRC(dedd9eeb) SHA1(14a81a3c98b10e996f0b340ce18df627d0cd7f3d) )
@@ -597,6 +695,6 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME       PARENT  MACHINE   INPUT   STATE         INIT        ROT    COMPANY          FULLNAME                FLAGS...
-GAME( 1992, gluck2,    0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Good Luck II",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, unkyungyu, 0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "unknown YungYu game",   MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  MACHINE   INPUT   STATE         INIT        ROT    COMPANY          FULLNAME                 FLAGS...
+GAME( 1992, gluck2,  0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Good Luck II",           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sise7,   0,      gluck2,   sise7,  gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Si Se 7 (4-colors 7's)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
