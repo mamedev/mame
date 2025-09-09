@@ -34,7 +34,7 @@ Error code 10
 Hardware info.
 MCU Hook up
 Verify memory maps.
-Need Proper Layout .
+Need Proper Layout.
 
 */
 
@@ -48,6 +48,7 @@ Need Proper Layout .
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
 #include "orientp.lh"
+
 #include "speaker.h"
 
 namespace {
