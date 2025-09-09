@@ -40,8 +40,8 @@ zxbus_device::zxbus_device(const machine_config &mconfig, const char *tag, devic
 
 zxbus_device::zxbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_iospace(*this, finder_base::DUMMY_TAG, -1)
-	, m_shadow_io_view(nullptr)
+	, m_io(nullptr)
+	, m_shadow_io(nullptr)
 {
 }
 
@@ -52,10 +52,14 @@ void zxbus_device::device_start()
 void zxbus_device::add_slot(zxbus_slot_device &slot)
 {
 	m_slot_list.push_front(&slot);
-	if (m_shadow_io_view)
+
+	device_zxbus_card_interface *card = slot.get_card_device();
+	if (card)
 	{
-		device_zxbus_card_interface *dev = slot.get_card_device();
-		(*m_shadow_io_view).install_device(0x0000, 0xffff, *dev, &device_zxbus_card_interface::map_shadow_io);
+		if (m_io)
+			m_io->install_device(0x0000, 0xffff, *card, &device_zxbus_card_interface::io_map);
+		if (m_shadow_io)
+			m_shadow_io->install_device(0x0000, 0xffff, *card, &device_zxbus_card_interface::shadow_io_map);
 	}
 }
 
@@ -63,11 +67,6 @@ device_zxbus_card_interface::device_zxbus_card_interface(const machine_config &m
 	: device_interface(device, "zxbus")
 	, m_zxbus(nullptr)
 {
-}
-
-void zxbus_device::install_shadow_io(memory_view::memory_view_entry &io_view)
-{
-	m_shadow_io_view = &io_view;
 }
 
 void device_zxbus_card_interface::interface_pre_start()

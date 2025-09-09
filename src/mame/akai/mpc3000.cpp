@@ -198,7 +198,7 @@ void mpc3000_state::floppies(device_slot_interface &device)
 
 void mpc3000_state::mpc3000(machine_config &config)
 {
-	V53A(config, m_maincpu, 16_MHz_XTAL);
+	V53A(config, m_maincpu, 32_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpc3000_state::mpc3000_map);
 	m_maincpu->set_addrmap(AS_IO, &mpc3000_state::mpc3000_io_map);
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v53a_device::hack_w));
@@ -216,6 +216,9 @@ void mpc3000_state::mpc3000(machine_config &config)
 	m_maincpu->tout_handler<0>().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_maincpu->tout_handler<1>().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_maincpu->tout_handler<2>().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
+
+	constexpr XTAL V53_CLKOUT = 32_MHz_XTAL / 2;
+	constexpr XTAL V53_PCLKOUT = 32_MHz_XTAL / 4;
 
 	// HC02 gates
 	INPUT_MERGER_ANY_HIGH(config, "intp3").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
@@ -253,23 +256,23 @@ void mpc3000_state::mpc3000(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(mpc3000_state::mpc3000_palette), 2);
 
-	UPD72069(config, m_fdc, 16_MHz_XTAL); // clocked by V53 CLKOUT (TODO: upd72069 supports motor control)
+	UPD72069(config, m_fdc, V53_CLKOUT); // TODO: upd72069 supports motor control
 	m_fdc->intrq_wr_callback().set("intp3", FUNC(input_merger_device::in_w<0>));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<1>));
 
 	FLOPPY_CONNECTOR(config, m_floppy, mpc3000_state::floppies, "35hd", floppy_image_device::default_mfm_floppy_formats);
 
 	pit8254_device &pit(PIT8254(config, "synctmr", 0)); // MB89254
-	pit.set_clk<0>(16_MHz_XTAL / 4);
-	pit.set_clk<1>(16_MHz_XTAL / 4);
-	pit.set_clk<2>(16_MHz_XTAL / 4);
+	pit.set_clk<0>(V53_PCLKOUT);
+	pit.set_clk<1>(V53_PCLKOUT);
+	pit.set_clk<2>(V53_PCLKOUT);
 
 	I8255(config, "adcexp"); // MB89255B
 	I8255(config, "dioexp"); // MB89255B
 
 	HD61830(config, m_lcdc, 4.9152_MHz_XTAL / 2 / 2); // LC7981
 
-	//TE7774(config, "sio", 16_MHz_XTAL / 4);
+	//TE7774(config, "sio", V53_PCLKOUT);
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
@@ -290,14 +293,14 @@ void mpc3000_state::mpc3000(machine_config &config)
 		{
 			mb89352_device &spc = downcast<mb89352_device &>(*device);
 
-			spc.set_clock(16_MHz_XTAL / 2);
+			spc.set_clock(32_MHz_XTAL / 4); // PCLKOUT
 			spc.out_irq_callback().set(":intp3", FUNC(input_merger_device::in_w<1>));
 			spc.out_dreq_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<0>));
 		});
 
 	SPEAKER(config, "speaker", 2).front();
 
-	L7A1045(config, m_dsp, 16_MHz_XTAL);
+	L7A1045(config, m_dsp, 33.8688_MHz_XTAL / 2); // TODO: verify clock
 	m_dsp->add_route(0, "speaker", 1.0, 0);
 	m_dsp->add_route(1, "speaker", 1.0, 1);
 }

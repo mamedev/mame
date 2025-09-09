@@ -57,6 +57,8 @@ snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *ta
 	, m_screen(*this, "^screen")
 	, m_flipscreen(false)
 	, m_partialupdates(1)
+	, m_xpos_shift(0)
+	, m_color_entry_mask(0)
 {
 }
 
@@ -66,6 +68,8 @@ void snk68_spr_device::tile_callback_noindirect(int &tile, int& fx, int& fy, int
 
 void snk68_spr_device::device_start()
 {
+	save_item(NAME(m_flipscreen));
+
 	// bind our handler
 	m_newtilecb.resolve();
 }
@@ -114,7 +118,6 @@ void snk68_spr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 	{
 		int mx = (m_spriteram[offs + 2*group] & 0xff) << (16-m_xpos_shift);
 		int my = m_spriteram[offs + 2*group + 1];
-		int i;
 
 		// TODO: for some reason alpha68k wants this to be 15 instead of 12, different row/col arrangement?
 		mx = mx | (my >> m_xpos_shift);
@@ -133,7 +136,7 @@ void snk68_spr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 		}
 
 		// every sprite is a column 32 tiles (512 pixels) tall
-		for (i = 0; i < 0x20; ++i)
+		for (int i = 0; i < 0x20; ++i)
 		{
 			my &= 0x1ff;
 

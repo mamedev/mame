@@ -2132,55 +2132,73 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4T, 4, 0):    // FSTOI4T dst,src1
-				if (FSPARAM1 >= 0)
-					*inst[0].pint32 = floor(FSPARAM1);
-				else
-					*inst[0].pint32 = ceil(FSPARAM1);
+				*inst[0].pint32 = int32_t(FSPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4R, 4, 0):    // FSTOI4R dst,src1
-				if (FSPARAM1 >= 0)
-					*inst[0].pint32 = floor(FSPARAM1 + 0.5f);
-				else
-					*inst[0].pint32 = ceil(FSPARAM1 - 0.5f);
+				*inst[0].pint32 = lroundf(FSPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4F, 4, 0):    // FSTOI4F dst,src1
-				*inst[0].pint32 = floor(FSPARAM1);
+				*inst[0].pint32 = int32_t(floorf(FSPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4C, 4, 0):    // FSTOI4C dst,src1
-				*inst[0].pint32 = ceil(FSPARAM1);
+				*inst[0].pint32 = int32_t(ceilf(FSPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4, 4, 0):     // FSTOI4  dst,src1
-				*inst[0].pint32 = FSPARAM1;
+				switch (m_state.fmod)
+				{
+				default:
+				case ROUND_TRUNC:
+					*inst[0].pint32 = int32_t(FSPARAM1);
+					break;
+				case ROUND_ROUND:
+					*inst[0].pint32 = lroundf(FSPARAM1);
+					break;
+				case ROUND_FLOOR:
+					*inst[0].pint32 = int32_t(floorf(FSPARAM1));
+					break;
+				case ROUND_CEIL:
+					*inst[0].pint32 = int32_t(ceilf(FSPARAM1));
+					break;
+				}
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8T, 4, 0):    // FSTOI8T dst,src1
-				if (FSPARAM1 >= 0)
-					*inst[0].pint64 = floor(FSPARAM1);
-				else
-					*inst[0].pint64 = ceil(FSPARAM1);
+				*inst[0].pint64 = int64_t(FSPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8R, 4, 0):    // FSTOI8R dst,src1
-				if (FSPARAM1 >= 0)
-					*inst[0].pint64 = floor(FSPARAM1 + 0.5f);
-				else
-					*inst[0].pint64 = ceil(FSPARAM1 - 0.5f);
+				*inst[0].pint64 = llroundf(FSPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8F, 4, 0):    // FSTOI8F dst,src1
-				*inst[0].pint64 = floor(FSPARAM1);
+				*inst[0].pint64 = int64_t(floorf(FSPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8C, 4, 0):    // FSTOI8C dst,src1
-				*inst[0].pint64 = ceil(FSPARAM1);
+				*inst[0].pint64 = int64_t(ceilf(FSPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8, 4, 0):     // FSTOI8  dst,src1
-				*inst[0].pint64 = FSPARAM1;
+				switch (m_state.fmod)
+				{
+				default:
+				case ROUND_TRUNC:
+					*inst[0].pint64 = int64_t(FSPARAM1);
+					break;
+				case ROUND_ROUND:
+					*inst[0].pint64 = llroundf(FSPARAM1);
+					break;
+				case ROUND_FLOOR:
+					*inst[0].pint64 = int64_t(floorf(FSPARAM1));
+					break;
+				case ROUND_CEIL:
+					*inst[0].pint64 = int64_t(ceilf(FSPARAM1));
+					break;
+				}
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FFRI4, 4, 0):     // FSFRI4  dst,src1
@@ -2275,55 +2293,73 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4T, 8, 0):    // FDTOI4T dst,src1
-				if (FDPARAM1 >= 0)
-					*inst[0].pint32 = floor(FDPARAM1);
-				else
-					*inst[0].pint32 = ceil(FDPARAM1);
+				*inst[0].pint32 = int32_t(FDPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4R, 8, 0):    // FDTOI4R dst,src1
-				if (FDPARAM1 >= 0)
-					*inst[0].pint32 = floor(FDPARAM1 + 0.5);
-				else
-					*inst[0].pint32 = ceil(FDPARAM1 - 0.5);
+				*inst[0].pint32 = lround(FDPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4F, 8, 0):    // FDTOI4F dst,src1
-				*inst[0].pint32 = floor(FDPARAM1);
+				*inst[0].pint32 = int32_t(floor(FDPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4C, 8, 0):    // FDTOI4C dst,src1
-				*inst[0].pint32 = ceil(FDPARAM1);
+				*inst[0].pint32 = int32_t(ceil(FDPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4, 8, 0):     // FDTOI4  dst,src1
-				*inst[0].pint32 = FDPARAM1;
+				switch (m_state.fmod)
+				{
+				default:
+				case ROUND_TRUNC:
+					*inst[0].pint32 = int32_t(FDPARAM1);
+					break;
+				case ROUND_ROUND:
+					*inst[0].pint32 = lround(FDPARAM1);
+					break;
+				case ROUND_FLOOR:
+					*inst[0].pint32 = int32_t(floor(FDPARAM1));
+					break;
+				case ROUND_CEIL:
+					*inst[0].pint32 = int32_t(ceil(FDPARAM1));
+					break;
+				}
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8T, 8, 0):    // FDTOI8T dst,src1
-				if (FDPARAM1 >= 0)
-					*inst[0].pint64 = floor(FDPARAM1);
-				else
-					*inst[0].pint64 = ceil(FDPARAM1);
+				*inst[0].pint64 = int64_t(FDPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8R, 8, 0):    // FDTOI8R  dst,src1
-				if (FDPARAM1 >= 0)
-					*inst[0].pint64 = floor(FDPARAM1 + 0.5);
-				else
-					*inst[0].pint64 = ceil(FDPARAM1 - 0.5);
+				*inst[0].pint64 = llround(FDPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8F, 8, 0):    // FDTOI8F dst,src1
-				*inst[0].pint64 = floor(FDPARAM1);
+				*inst[0].pint64 = int64_t(floor(FDPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8C, 8, 0):    // FDTOI8C dst,src1
-				*inst[0].pint64 = ceil(FDPARAM1);
+				*inst[0].pint64 = int64_t(ceil(FDPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8, 8, 0):     // FDTOI8  dst,src1
-				*inst[0].pint64 = FDPARAM1;
+				switch (m_state.fmod)
+				{
+				default:
+				case ROUND_TRUNC:
+					*inst[0].pint64 = int64_t(FDPARAM1);
+					break;
+				case ROUND_ROUND:
+					*inst[0].pint64 = llround(FDPARAM1);
+					break;
+				case ROUND_FLOOR:
+					*inst[0].pint64 = int64_t(floor(FDPARAM1));
+					break;
+				case ROUND_CEIL:
+					*inst[0].pint64 = int64_t(ceil(FDPARAM1));
+					break;
+				}
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FFRI4, 8, 0):     // FDFRI4  dst,src1

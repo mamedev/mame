@@ -85,6 +85,8 @@ public:
 	void alg_r1(machine_config &config);
 
 protected:
+	virtual void video_start() override ATTR_COLD;
+
 	// amiga_state overrides
 	virtual void potgo_w(uint16_t data) override;
 
@@ -99,8 +101,6 @@ private:
 	uint16_t m_input_select;
 
 	int get_lightgun_pos(int player, int *x, int *y);
-
-	DECLARE_VIDEO_START(alg);
 
 	void a500_mem(address_map &map) ATTR_COLD;
 	void main_map_picmatic(address_map &map) ATTR_COLD;
@@ -140,7 +140,7 @@ int alg_state::get_lightgun_pos(int player, int *x, int *y)
  *
  *************************************/
 
-VIDEO_START_MEMBER(alg_state,alg)
+void alg_state::video_start()
 {
 	// Standard video start
 	VIDEO_START_CALL_MEMBER(amiga);
@@ -352,8 +352,6 @@ void alg_state::alg_r1(machine_config &config)
 
 	// FIXME: should be 4096
 	PALETTE(config, m_palette, FUNC(alg_state::amiga_palette), 4097);
-
-	MCFG_VIDEO_START_OVERRIDE(alg_state,alg)
 
 	// Sound hardware
 	SPEAKER(config, "speaker", 2).front();

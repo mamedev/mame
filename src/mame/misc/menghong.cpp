@@ -93,6 +93,7 @@ Notes:
 #include "machine/vrender0.h"
 
 #include "emupal.h"
+#include "speaker.h"
 
 #include <algorithm>
 
@@ -323,8 +324,9 @@ crzyddz2    in      out
             c0      80
 */
 // menghong Sealy logo pal offset is at 0x3ea7400, relevant code is at 2086034
-//  m_prot = (m_pio >> 8) & 0xc0) ^ 0x40;
-	m_prot = (machine().rand() & 0xc0);
+	if (!machine().side_effects_disabled())
+	//  m_prot = (m_pio >> 8) & 0xc0) ^ 0x40;
+		m_prot = (machine().rand() & 0xc0);
 
 	return 0xffffff00 | data | m_prot;
 }
@@ -483,7 +485,7 @@ INPUT_PORTS_END
 
 void menghong_state::menghong(machine_config &config)
 {
-	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCBs
+	SE3208(config, m_maincpu, 14318180 * 3); // TODO : dynamic via PLL
 	m_maincpu->set_addrmap(AS_PROGRAM, &menghong_state::menghong_mem);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
@@ -491,12 +493,17 @@ void menghong_state::menghong(machine_config &config)
 
 //  NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
-	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
-	m_vr0soc->set_host_cpu_tag(m_maincpu);
+	VRENDER0_SOC(config, m_vr0soc, 14318180 * 6); // TODO : dynamic via PLL
+	m_vr0soc->set_host_space_tag(m_maincpu, AS_PROGRAM);
+	m_vr0soc->int_callback().set_inputline(m_maincpu, SE3208_INT);
 	m_vr0soc->set_external_vclk(28636360); // Assumed from the only available XTal on PCB
 
 	DS1302(config, m_ds1302, 32.768_kHz_XTAL);
 	EEPROM_93C46_16BIT(config, m_eeprom);
+
+	SPEAKER(config, "speaker", 2).front();
+	m_vr0soc->add_route(0, "speaker", 1.0, 0);
+	m_vr0soc->add_route(1, "speaker", 1.0, 1);
 }
 
 void menghong_state::crzyddz2(machine_config &config)

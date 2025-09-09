@@ -62,7 +62,6 @@ protected:
 	void mz700_bank_4_w(uint8_t data);
 	void mz700_bank_5_w(uint8_t data);
 	void mz700_bank_6_w(uint8_t data);
-	DECLARE_MACHINE_RESET(mz700);
 	uint32_t screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_cursor_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_other_callback);

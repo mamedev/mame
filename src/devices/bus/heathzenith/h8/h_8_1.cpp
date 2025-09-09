@@ -12,7 +12,8 @@
 
 namespace {
 
-class h_8_1_device : public device_t, public device_h8bus_card_interface
+class h_8_1_device : public device_t
+				   , public device_h8bus_card_interface
 {
 public:
 
@@ -21,14 +22,13 @@ public:
 protected:
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	bool m_installed;
+	virtual void map_mem(address_space_installer & space) override ATTR_COLD;
 
-	memory_share_creator<u8>    m_ram;
-	required_ioport             m_jumpers;
-	required_ioport             m_config;
+	memory_share_creator<u8> m_ram;
+	required_ioport          m_jumpers;
+	required_ioport          m_config;
 };
 
 h_8_1_device::h_8_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -42,26 +42,19 @@ h_8_1_device::h_8_1_device(const machine_config &mconfig, const char *tag, devic
 
 void h_8_1_device::device_start()
 {
-	m_installed = false;
-
-	save_item(NAME(m_installed));
 }
 
-void h_8_1_device::device_reset()
+void h_8_1_device::map_mem(address_space_installer & space)
 {
-	if (!m_installed)
-	{
-		ioport_value const jumpers(m_jumpers->read());
-		ioport_value const config(m_config->read());
+	ioport_value const jumpers(m_jumpers->read());
+	ioport_value const config(m_config->read());
 
-		u16 base_addr = (jumpers & 0x07) << 13;
-		u16 top_addr = base_addr + (BIT(config, 0) ? 0x1fff : 0x0fff);
+	u16 base_addr = (jumpers & 0x07) << 13;
+	u16 top_addr = base_addr + (BIT(config, 0) ? 0x1fff : 0x0fff);
 
-		h8bus().space(AS_PROGRAM).install_ram(base_addr, top_addr, m_ram);
-
-		m_installed = true;
-	}
+	space.install_ram(base_addr, top_addr, m_ram);
 }
+
 
 static INPUT_PORTS_START( h_8_1_jumpers )
 	PORT_START("JUMPERS")

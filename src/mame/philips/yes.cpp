@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "machine/i8256.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
 #include "screen.h"
@@ -17,7 +18,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fdc(*this, "fdc"),
-		m_crtc(*this, "crtc")
+		m_crtc(*this, "crtc"),
+		m_uart(*this, "uart")
 		{ }
 
 	void yes(machine_config &config);
@@ -26,6 +28,7 @@ private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<wd2793_device> m_fdc;
 	required_device<hd6845s_device> m_crtc;
+	required_device<i8256_device> m_uart;
 	void io_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -39,7 +42,7 @@ void yes_state::program_map(address_map &map)
 
 void yes_state::io_map(address_map &map)
 {
-	//map(0x0400, 0x041f).i8256
+	map(0x0400, 0x041f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x0480, 0x0487).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write)).umask16(0x00ff);
 	map(0x0500, 0x0500).w(m_crtc, FUNC(hd6845s_device::address_w));
 	map(0x0502, 0x0502).rw(m_crtc, FUNC(hd6845s_device::register_r), FUNC(mc6845_device::register_w));
@@ -56,8 +59,10 @@ void yes_state::yes(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &yes_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &yes_state::io_map);
 
+	I8256(config, "uart", 16_MHz_XTAL / 8);
+
 	WD2793(config, m_fdc, 16_MHz_XTAL / 8);
-	//m_fdc->intrq_wr_callback().set(m_muart, FUNC(i8256_device::ir));
+	//m_fdc->intrq_wr_callback().set(m_uart, FUNC(i8256_device::ir));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

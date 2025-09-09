@@ -1408,83 +1408,77 @@ void drcbe_arm64::set_flags(a64::Assembler &a)
 	a.and_(FLAGS_REG, FLAGS_REG, TEMP_REG2);
 }
 
-void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits)
+inline void drcbe_arm64::calculate_carry_shift_left(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift, int maxBits)
 {
 	m_carry_state = carry_state::POISON;
 
-	Label calc = a.newLabel();
-	Label end = a.newLabel();
-
-	a.cbnz(shift, calc);
-	store_carry_reg(a, a64::xzr);
-	a.b(end);
-
-	a.bind(calc);
 	const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
+	const a64::Gp zero = select_register(a64::xzr, reg.isGpW() ? 4 : 8);
 
-	// carry = ((PARAM1 << (shift - 1)) >> maxBits) & 1
-	a.movz(scratch, maxBits + 1);
-	a.sub(scratch, scratch, shift);
+	// scratch = ((PARAM1 << (shift - 1)) >> maxBits) & 1
+	a.neg(scratch, shift);
+	a.ands(scratch, scratch, maxBits);
 	a.lsr(scratch, reg, scratch);
-	store_carry_reg(a, scratch);
 
-	a.bind(end);
+	a.csel(scratch, zero, scratch, a64::CondCode::kZero);
+	store_carry_reg(a, scratch);
 }
 
-void drcbe_arm64::calculate_carry_shift_left_imm(a64::Assembler &a, const a64::Gp &reg, const int shift, int maxBits)
+inline void drcbe_arm64::calculate_carry_shift_left_imm(a64::Assembler &a, const a64::Gp &reg, const int shift, int maxBits)
 {
 	m_carry_state = carry_state::POISON;
 
 	if (shift == 0)
 	{
 		store_carry_reg(a, a64::xzr);
-		return;
 	}
+	else
+	{
+		const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
 
-	const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
-
-	// carry = ((PARAM1 << (shift - 1)) >> maxBits) & 1
-	a.lsr(scratch, reg, maxBits + 1 - shift);
-	store_carry_reg(a, scratch);
+		// carry = ((PARAM1 << (shift - 1)) >> maxBits) & 1
+		a.lsr(scratch, reg, maxBits + 1 - shift);
+		store_carry_reg(a, scratch);
+	}
 }
 
-void drcbe_arm64::calculate_carry_shift_right(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift)
+inline void drcbe_arm64::calculate_carry_shift_right(a64::Assembler &a, const a64::Gp &reg, const a64::Gp &shift)
 {
 	m_carry_state = carry_state::POISON;
 
-	Label calc = a.newLabel();
-	Label end = a.newLabel();
-
-	a.cbnz(shift, calc);
-	store_carry_reg(a, a64::xzr);
-	a.b(end);
-
-	a.bind(calc);
 	const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
+	const a64::Gp zero = select_register(a64::xzr, reg.isGpW() ? 4 : 8);
 
-	// carry = (PARAM1 >> (shift - 1)) & 1
+	a.tst(shift, shift);
+
+	// scratch = (PARAM1 >> (shift - 1)) & 1
 	a.sub(scratch, shift, 1);
 	a.lsr(scratch, reg, scratch);
-	store_carry_reg(a, scratch);
 
-	a.bind(end);
+	a.csel(scratch, zero, scratch, a64::CondCode::kZero);
+	store_carry_reg(a, scratch);
 }
 
-void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, const a64::Gp &reg, const int shift)
+inline void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, const a64::Gp &reg, const int shift)
 {
 	m_carry_state = carry_state::POISON;
 
 	if (shift == 0)
 	{
 		store_carry_reg(a, a64::xzr);
-		return;
 	}
+	else if (shift == 1)
+	{
+		store_carry_reg(a, reg);
+	}
+	else
+	{
+		const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
 
-	const a64::Gp scratch = select_register(SCRATCH_REG1, reg.isGpW() ? 4 : 8);
-
-	// carry = (PARAM1 >> (shift - 1)) & 1
-	a.lsr(scratch, reg, shift - 1);
-	store_carry_reg(a, scratch);
+		// carry = (PARAM1 >> (shift - 1)) & 1
+		a.lsr(scratch, reg, shift - 1);
+		store_carry_reg(a, scratch);
+	}
 }
 
 drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
@@ -4316,53 +4310,62 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_shift(a64::Assembler &a, co
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	size_t const maxBits = inst.size() * 8 - 1;
+	size_t const maxBits = (inst.size() * 8) - 1;
+	bool const rightShift = (Opcode == a64::Inst::kIdRor) || (Opcode == a64::Inst::kIdLsr) || (Opcode == a64::Inst::kIdAsr);
 
-	// If possible it's more optimal to write directly to the dst register,
-	// but be careful to not overwrite one of the source values since they're needed for later calculations
-	bool can_use_dst_reg = dstp.is_int_register();
-	if (can_use_dst_reg && src1p.is_int_register())
-		can_use_dst_reg = src1p.ireg() != dstp.ireg();
-	if (can_use_dst_reg && src2p.is_int_register())
-		can_use_dst_reg = src2p.ireg() != dstp.ireg();
+	const a64::Gp dst = dstp.select_register(TEMP_REG1, inst.size());
+	const a64::Gp src = src1p.select_register(dst, inst.size());
+	const a64::Gp scratch = select_register(TEMP_REG2, inst.size());
+	const a64::Gp shift = src2p.select_register(scratch, inst.size());
 
-	const a64::Gp src = src1p.select_register(TEMP_REG1, inst.size());
-	const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
-	const a64::Gp dst = can_use_dst_reg ? dstp.select_register(TEMP_REG3, inst.size()) : select_register(TEMP_REG3, inst.size());
-	const a64::Gp scratch = select_register(FUNC_SCRATCH_REG, inst.size());
-
-	mov_reg_param(a, inst.size(), src, src1p);
-
-	if (src2p.is_immediate() && is_valid_immediate(src2p.immediate(), (inst.size() == 8) ? 5 : 4))
+	if (src2p.is_immediate())
 	{
-		const auto shift = src2p.immediate() % (inst.size() * 8);
+		const auto si = src2p.immediate() & maxBits;
 
-		a.emit(Opcode, dst, src, shift);
+		if (!si)
+		{
+			if (inst.flags() & FLAG_C)
+				store_carry_reg(a, a64::xzr);
 
-		if (Opcode == a64::Inst::kIdRor || Opcode == a64::Inst::kIdLsr || Opcode == a64::Inst::kIdAsr)
-			calculate_carry_shift_right_imm(a, src, shift);
-		else if (Opcode == a64::Inst::kIdLsl)
-			calculate_carry_shift_left_imm(a, src, shift, maxBits);
+			mov_reg_param(a, inst.size(), dst, src1p);
+		}
+		else
+		{
+			mov_reg_param(a, inst.size(), src, src1p);
+
+			if (inst.flags() & FLAG_C)
+			{
+				if (rightShift)
+					calculate_carry_shift_right_imm(a, src, si);
+				else
+					calculate_carry_shift_left_imm(a, src, si, maxBits);
+			}
+
+			a.emit(Opcode, dst, src, si);
+		}
 	}
 	else
 	{
 		mov_reg_param(a, inst.size(), shift, src2p);
+		a.and_(scratch, shift, maxBits);
 
-		a.and_(scratch, shift, inst.size() * 8 - 1);
+		mov_reg_param(a, inst.size(), src, src1p);
+
+		if (inst.flags() & FLAG_C)
+		{
+			if (rightShift)
+				calculate_carry_shift_right(a, src, scratch);
+			else
+				calculate_carry_shift_left(a, src, scratch, maxBits);
+		}
 
 		a.emit(Opcode, dst, src, scratch);
-
-		if (Opcode == a64::Inst::kIdRor || Opcode == a64::Inst::kIdLsr || Opcode == a64::Inst::kIdAsr)
-			calculate_carry_shift_right(a, src, scratch);
-		else if (Opcode == a64::Inst::kIdLsl)
-			calculate_carry_shift_left(a, src, scratch, maxBits);
 	}
 
-	if (inst.flags())
-	{
+	if (inst.flags() & (FLAG_Z | FLAG_S))
 		a.tst(dst, dst);
+	if (inst.flags())
 		m_carry_state = carry_state::POISON;
-	}
 
 	// save dst after using inputs for calculations so the registers have no chance of being overwritten
 	mov_param_reg(a, inst.size(), dstp, dst);
@@ -4378,58 +4381,63 @@ void drcbe_arm64::op_rol(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	size_t const maxBits = inst.size() * 8 - 1;
+	size_t const maxBits = (inst.size() * 8) - 1;
 
-	bool can_use_dst_reg = dstp.is_int_register();
-	if (can_use_dst_reg && src1p.is_int_register())
-		can_use_dst_reg = src1p.ireg() != dstp.ireg();
-	if (can_use_dst_reg && src2p.is_int_register())
-		can_use_dst_reg = src2p.ireg() != dstp.ireg();
-
-	const a64::Gp param = src1p.select_register(TEMP_REG1, inst.size());
-	const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
-	const a64::Gp output = can_use_dst_reg ? dstp.select_register(TEMP_REG3, inst.size()) : select_register(TEMP_REG3, inst.size());
-	const a64::Gp scratch2 = select_register(FUNC_SCRATCH_REG, inst.size());
-
-	mov_reg_param(a, inst.size(), param, src1p);
+	const a64::Gp dst = dstp.select_register(TEMP_REG1, inst.size());
+	const a64::Gp src = src1p.select_register(dst, inst.size());
+	const a64::Gp scratch = select_register(TEMP_REG2, inst.size());
+	const a64::Gp shift = src2p.select_register(scratch, inst.size());
 
 	if (src2p.is_immediate())
 	{
-		const auto s = src2p.immediate() % (inst.size() * 8);
-		const auto s2 = ((inst.size() * 8) - s) % (inst.size() * 8);
+		const auto si = -src2p.immediate() & maxBits;
 
-		if (s2 == 0)
+		if (!si)
 		{
-			if (output.id() != param.id())
-				a.mov(output, param);
+			mov_reg_param(a, inst.size(), dst, src1p);
+
+			if (inst.flags() & FLAG_C)
+				store_carry_reg(a, a64::xzr);
 		}
 		else
 		{
-			a.ror(output, param, s2);
-		}
+			mov_reg_param(a, inst.size(), src, src1p);
 
-		calculate_carry_shift_left_imm(a, param, s, maxBits);
+			a.ror(dst, src, si);
+
+			if (inst.flags() & FLAG_C)
+				store_carry_reg(a, dst);
+		}
 	}
 	else
 	{
 		mov_reg_param(a, inst.size(), shift, src2p);
+		a.neg(scratch, shift);
 
-		const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
-		a.mov(scratch, inst.size() * 8);
-		a.and_(scratch2, shift, maxBits);
-		a.sub(scratch, scratch, scratch2);
-		a.ror(output, param, scratch);
+		mov_reg_param(a, inst.size(), src, src1p);
 
-		calculate_carry_shift_left(a, param, scratch2, maxBits);
+		if (inst.flags() & FLAG_C)
+			a.ands(scratch, scratch, maxBits);
+		else
+			a.and_(scratch, scratch, maxBits);
+
+		a.ror(dst, src, scratch);
+
+		if (inst.flags() & FLAG_C)
+		{
+			const a64::Gp zero = select_register(a64::xzr, inst.size());
+
+			a.csel(scratch, zero, dst, a64::CondCode::kZero);
+			store_carry_reg(a, scratch);
+		}
 	}
 
+	if (inst.flags() & (FLAG_Z | FLAG_S))
+		a.tst(dst, dst);
 	if (inst.flags())
-	{
-		a.tst(output, output);
 		m_carry_state = carry_state::POISON;
-	}
 
-	mov_param_reg(a, inst.size(), dstp, output);
+	mov_param_reg(a, inst.size(), dstp, dst);
 }
 
 void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
@@ -4855,6 +4863,10 @@ void drcbe_arm64::op_ftoint(a64::Assembler &a, const uml::instruction &inst)
 
 	switch (roundp.rounding())
 	{
+		case ROUND_TRUNC:
+			a.fcvtzs(dstreg, srcreg);
+			break;
+
 		case ROUND_ROUND:
 			a.fcvtns(dstreg, srcreg);
 			break;
@@ -4867,10 +4879,28 @@ void drcbe_arm64::op_ftoint(a64::Assembler &a, const uml::instruction &inst)
 			a.fcvtms(dstreg, srcreg);
 			break;
 
-		case ROUND_TRUNC:
 		case ROUND_DEFAULT:
 		default:
-			a.fcvtzs(dstreg, srcreg);
+			{
+				Label base = a.newLabel();
+				Label done = a.newLabel();
+
+				// this depends on each case being two instructions
+				emit_ldrb_mem(a, TEMP_REG1, &m_state.fmod);
+				a.adr(TEMP_REG2, base);
+				a.add(TEMP_REG2, TEMP_REG1, arm::lsl(3));
+				a.br(TEMP_REG2);
+
+				a.bind(base);
+				a.fcvtzs(dstreg, srcreg); // 0 - TRUNC
+				a.b(done);
+				a.fcvtns(dstreg, srcreg); // 1 - ROUND
+				a.b(done);
+				a.fcvtps(dstreg, srcreg); // 2 - CEIL
+				a.b(done);
+				a.fcvtms(dstreg, srcreg); // 3 - FLOOR
+				a.bind(done);
+			}
 			break;
 	}
 

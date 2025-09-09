@@ -90,7 +90,6 @@ public:
 	/* Public for access by MCFG */
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	u16 crypt_read_callback(u32 addr);
-	DECLARE_MACHINE_START(model2);
 
 
 	/* Public for access by GAME() */
@@ -222,7 +221,6 @@ protected:
 	u8 driveio_porth_r();
 	void driveio_port_w(u8 data);
 	void push_geo_data(u32 data);
-	DECLARE_VIDEO_START(model2);
 	void reset_model2_scsp();
 	u32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 //  void screen_vblank_model2(int state);
