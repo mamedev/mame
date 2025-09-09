@@ -89,6 +89,7 @@
 #include "ubpnic.h"
 
 // communication ports
+#include "5080pa.h"
 #include "com.h"
 #include "lpt.h"
 #include "pds.h"
@@ -182,6 +183,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("aha1542c", AHA1542C);
 	device.option_add("aha1542cf", AHA1542CF);
 	device.option_add("aha1542cp", AHA1542CP);
+	device.option_add("5080pa", ISA16_5080PA);
 	device.option_add("amgda", ISA16_AMGDA);
 	device.option_add("gus", ISA16_GUS);
 	device.option_add("sblaster_16", ISA16_SOUND_BLASTER_16);
