@@ -19,14 +19,35 @@ K1
 K2
 K3
 K4
-east8
-ic
-u1 kc8279
-u17 and u21 nec d8255ac-2
-u32 hm6264
-??  winbond w27c020? adpcm rom.
-u33 winbond w27c512 boot rom.
-u39 at89s51 second mcu for protection.
+pcb 1
+u1 File kc8279
+u17 and u21 Nec D8255-AC-2
+u25  winbond unknown - 8052
+u32  ?? - could be hm6264alp-12
+u102 kc8972
+u104 ym2413
+u107 u6295
+
+
+
+EEPROM:
+??  winbond w27c020? cant read text due to poor pictures quality
+u33 winbond w27c512  boot rom.
+u39 at89s51 8051 mcu for protection.
+
+pcb 2 A.LC M.D.P
+a1 unknown pld
+u1 Nec D8279C-2
+u17 and u21 Nec D8255-AC-2
+u25  Intel P8052AH mcu - 8052
+u32  hm6264alp-12
+u102 kc8972
+u104 ym2413
+u107 u6295
+
+
+
+
 
 // TODO:
 Need proper description.
