@@ -35,15 +35,21 @@ EEPROM:
 u33 winbond w27c512  boot rom.
 u39 at89s51 8051 mcu for protection.
 
-pcb 2 A.LC M.D.P
-a1 unknown pld
-u1 Nec D8279C-2
-u17 and u21 Nec D8255-AC-2
-u25  Intel P8052AH mcu - 8052
+pcb 2 A.LC M.D.P labeled SY-OP-001
+a1 ALTERA EPM7032LC44-10
+u1 NEC D8279C-2
+u17 and u21 NEC D8255-AC-2
+u25  INTEL P8052AH mcu - 8052
 u32  hm6264alp-12
+u100 CY CHENG YING-7 060329 - ???
 u102 jfc 95101
 u104 unpopulated ym2413
 u107 u6295
+EEPROM:
+st ????? A-0 not dumped
+am27020 - dumped.
+at back
+??? - 27c512
 
 
 
