@@ -248,12 +248,12 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 
 
 	<element name="str_CICLOUNICO">
-			<text string="CICLO ÚNICO">
+		<text string="CICLO ÚNICO">
 			<color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="str_INSTRUCAOUNICA">
-			<text string="INSTRUÇÃO ÚNICA">
+		<text string="INSTRUÇÃO ÚNICA">
 			<color red="0" green="0" blue="0" /></text>
 	</element>
 
@@ -287,12 +287,12 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<text string="PREPARAÇÃO"><color red="0" green="0" blue="0" /></text>
 	</element>
 
-<!-- define background -->
+	<!-- define background -->
 
 	<view name="Default layout">
 		<bounds x="0" y="0" width="1280" height="1200" />
 
-<!-- define lamps -->
+		<!-- define lamps -->
 
 		<element ref="panel_background">
 			<bounds x="-33" y="-980" width="1343" height="2218" />
@@ -578,7 +578,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="1114" y="1154" width="68" height="18" />
 		</element>
 
-<!-- define horizontal lines -->
+		<!-- define horizontal lines -->
 		<element ref="line">
 			<bounds x="68" y="38" width="1177" height="4" />
 		</element>
@@ -651,11 +651,11 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="32" y="527" width="545" height="4" />
 		</element>
 
-<!-- define 'FASES DE OPERACAO' horizontal lines -->
+		<!-- define 'FASES DE OPERACAO' horizontal lines -->
 		<element ref="line">
 			<bounds x="72" y="568" width="95" height="1" />
 		</element>
-		
+
 		<element ref="line">
 			<bounds x="422" y="568" width="95" height="1" />
 		</element>
@@ -726,6 +726,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="72" y="760" width="445" height="1" />
 		</element>
 
+<!-- TODO: review this: -->
 		<element ref="line">
 			<bounds x="565" y="634" width="6" height="1" />
 		</element>
@@ -745,8 +746,9 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<element ref="line">
 			<bounds x="674" y="669" width="62" height="1" />
 		</element>
+<!-- end of "TODO: review this" -->
 
-<!-- define vertical lines -->
+		<!-- define vertical lines -->
 		<element ref="line">
 			<bounds x="32" y="97" width="4" height="430" />
 		</element>
@@ -775,7 +777,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="1246" y="38" width="4" height="295" />
 		</element>
 
-<!-- define 'FASES DE OPERACAO' vertical lines -->
+		<!-- define 'FASES DE OPERACAO' vertical lines -->
 		<element ref="line">
 			<bounds x="72" y="568" width="1" height="49" />
 		</element>
@@ -835,6 +837,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="469" y="726" width="1" height="34" />
 		</element>
 
+<!-- TODO: Review this: -->
 		<element ref="line">
 			<bounds x="565" y="634" width="1" height="35" />
 		</element>
@@ -848,8 +851,9 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<element ref="line">
 			<bounds x="736" y="634" width="1" height="35" />
 		</element>
+<!-- End of "TODO: Review this" -->
 
-<!-- define 'ENTRADA MANUAL DE DADOS' horizontal lines -->
+		<!-- define 'ENTRADA MANUAL DE DADOS' horizontal lines -->
 
 		<repeat count="12">
 			<param name="line1_x" start="123" increment="85"/>
@@ -917,7 +921,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="803" y="884" width="342" height="4" />
 		</element>
 
-<!-- define 'ENTRADA MANUAL DE DADOS' vertical lines -->
+		<!-- define 'ENTRADA MANUAL DE DADOS' vertical lines -->
 		<repeat count="13">
 			<param name="line1_x" start="123" increment="85"/>
 			<element ref="line">
@@ -949,7 +953,118 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="803" y="875" width="4" height="12" />
 		</element>
 
-<!-- define circles -->
+		<!-- define 'MEMORIA' lines -->
+		<element ref="line">
+			<bounds x="378" y="942" width="116" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="378" y="942" width="1" height="23"/>
+		</element>
+		<element ref="line">
+			<bounds x="693" y="942" width="1" height="23"/>
+		</element>
+		<element ref="line">
+			<bounds x="580" y="942" width="116" height="1"/>
+		</element>
+
+		<!-- define 'MODO DE OPERACAO' lines -->
+		<repeat count="6">
+			<param name="line_x_top_left" start="63" increment="105"/>
+			<param name="line_y_left" start="63" increment="105"/>
+			<param name="line_x_bottom" start="63" increment="105"/>
+			<param name="line_y_right" start="168" increment="105"/>
+			<param name="line_x_top_right" start="155" increment="105"/>
+			<element ref="line">
+				<bounds x="~line_x_top_left~" y="965" width="13" height="1"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_y_left~" y="965" width="1" height="49"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_x_bottom~" y="1014" width="105" height="1"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_y_right~" y="965" width="1" height="49"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_x_top_right~" y="965" width="13" height="1"/>
+			</element>
+		</repeat>
+
+		<element ref="line">
+			<bounds x="63" y="1057" width="210" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="63" y="1014" width="1" height="43"/>
+		</element>
+		<element ref="line">
+			<bounds x="63" y="1014" width="630" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="693" y="1014" width="1" height="43"/>
+		</element>
+		<element ref="line">
+			<bounds x="485" y="1057" width="210" height="1"/>
+		</element>
+
+		<!-- define 'COMANDO' lines -->
+		<repeat count="3">
+			<param name="line_x_top_left" start="884" increment="105"/>
+			<param name="line_y_left" start="884" increment="105"/>
+			<param name="line_x_bottom" start="884" increment="105"/>
+			<param name="line_y_right" start="989" increment="105"/>
+			<param name="line_x_top_right" start="976" increment="105"/>
+			<element ref="line">
+				<bounds x="~line_x_top_left~" y="965" width="13" height="1"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_y_left~" y="965" width="1" height="49"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_x_bottom~" y="1014" width="105" height="1"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_y_right~" y="965" width="1" height="49"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_x_top_right~" y="965" width="13" height="1"/>
+			</element>
+		</repeat>
+
+		<element ref="line">
+			<bounds x="884" y="1057" width="108" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="884" y="1014" width="1" height="43"/>
+		</element>
+		<element ref="line">
+			<bounds x="884" y="1014" width="316" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="1200" y="1014" width="1" height="43"/>
+		</element>
+		<element ref="line">
+			<bounds x="1092" y="1057" width="108" height="1"/>
+		</element>
+
+		<!-- define 'PREPARACAO' lines -->
+		<element ref="line">
+			<bounds x="1094" y="1160" width="13" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="1094" y="1111" width="1" height="49"/>
+		</element>
+		<element ref="line">
+			<bounds x="1094" y="1111" width="105" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="1200" y="1111" width="1" height="49"/>
+		</element>
+		<element ref="line">
+			<bounds x="1187" y="1160" width="13" height="1"/>
+		</element>
+
+		<!-- define circles -->
 		<element ref="circle">
 			<bounds x="573" y="74" width="11" height="11" />
 		</element>
