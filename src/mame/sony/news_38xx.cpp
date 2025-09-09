@@ -30,6 +30,7 @@
  *   - slots (I/O and UBUS expansion slots)
  *   - graphics
  *   - sound
+ *   - AST
  *   - Something in the format/install flow is iffy: you have to manually write the disklabel before the installer works
  *     I do not have the NEWS-OS 4.1R install manual, so I don't know if I am doing something wrong or if the emulation
  *     is missing something. The format program does seem to spin for a bit on reading the defect information after
@@ -68,13 +69,11 @@
 
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_TIMER (1U << 2)
-#define LOG_LED (1U << 3)
-#define LOG_TAS (1U << 4)
-#define LOG_IOP (1U << 5)
-#define LOG_CPU (1U << 6)
-#define LOG_PARALLEL (1U << 7)
+#define LOG_TAS (1U << 3)
+#define LOG_IOP (1U << 4)
+#define LOG_CPU (1U << 5)
+#define LOG_PARALLEL (1U << 6)
 
-#define VERBOSE (LOG_GENERAL|LOG_INTERRUPT|LOG_PARALLEL)
 #include "logmacro.h"
 
 
