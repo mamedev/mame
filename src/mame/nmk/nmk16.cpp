@@ -4902,6 +4902,8 @@ void nmk16_state::hachamfb2(machine_config &config)
 	acrobatmbl(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::hachamfb2_map);
+
+	config.device_remove("mcu");
 }
 
 void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden sound hardware
@@ -7226,13 +7228,10 @@ ROM_START( acrobatmbl ) // this bootleg has a PIC performing simple protection c
 	ROM_LOAD( "1.14y", 0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
 
-ROM_START( hachamfb2 ) // this bootleg has a PIC performing simple protection checks and Raiden sounds
+ROM_START( hachamfb2 ) // same PCB as acrobatmbl, but no PIC
 	ROM_REGION( 0x40000, "maincpu", 0 ) // extremely similar to the original
 	ROM_LOAD16_BYTE( "10e", 0x00000, 0x20000, CRC(45867475) SHA1(c5e528e1a034ab5f148e4d17de3a584de32b2909) )
 	ROM_LOAD16_BYTE( "10c", 0x00001, 0x20000, CRC(8c8e6a3c) SHA1(8e1b050f935bb71d48120d495c1c60b56e0100ac) )
-
-	ROM_REGION( 0x2000, "mcu", 0 ) // needs to be decapped
-	ROM_LOAD( "pic16c57", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "fgtile", 0 )
 	ROM_LOAD( "tile.10l", 0x000000, 0x020000, CRC(a2c1e25d) SHA1(cf09cbfd9afc7e3907fef6b26fb269b743f2e036) )   // 8x8 tiles

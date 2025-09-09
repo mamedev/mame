@@ -343,9 +343,11 @@ private:
 
 	void draw_chars(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t transparency, uint8_t color, int priority);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *tmap, uint8_t color);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t color,
-							uint8_t sprite_y_adjust, uint8_t sprite_y_adjust_flip_screen,
-							uint8_t *sprite_ram, offs_t interleave);
+	void draw_sprites(
+			bitmap_ind16 &bitmap, const rectangle &cliprect,
+			uint8_t color,
+			uint8_t sprite_y_adjust, uint8_t sprite_y_adjust_flip_screen,
+			uint8_t const *sprite_ram, offs_t interleave);
 
 	void audio_map(address_map &map) ATTR_COLD;
 	void bnj_map(address_map &map) ATTR_COLD;
@@ -680,9 +682,11 @@ void btime_state::draw_chars(bitmap_ind16 &bitmap, const rectangle &cliprect, ui
 	}
 }
 
-void btime_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t color,
-							uint8_t sprite_y_adjust, uint8_t sprite_y_adjust_flip_screen,
-							uint8_t *sprite_ram, offs_t interleave)
+void btime_state::draw_sprites(
+		bitmap_ind16 &bitmap, const rectangle &cliprect,
+		uint8_t color,
+		uint8_t sprite_y_adjust, uint8_t sprite_y_adjust_flip_screen,
+		uint8_t const *sprite_ram, offs_t interleave)
 {
 	int i;
 	offs_t offs;

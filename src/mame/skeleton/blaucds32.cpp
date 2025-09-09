@@ -139,6 +139,7 @@ ROM_START( blaucds32 )
 	ROM_REGION( 0x0eb, "prom", 0 )
 	ROM_LOAD( "n82s153n.v4245",       0x00000, 0x000eb, NO_DUMP ) // On main PCB
 ROM_END
+
 } // anonymous namespace
 
 

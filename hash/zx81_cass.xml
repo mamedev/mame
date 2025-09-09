@@ -5172,7 +5172,8 @@ Columbia: not working
 Defender: not working
 ]]></notes>
 
-		<info name="developer" value="Manuel Fragas / Luiz Carlos Capanema" />
+		<info name="developer" value="Manuel Fragas" />
+		<info name="developer" value="Luiz Carlos Capanema" />
 		<info name="language" value="Portuguese (Brazil)" />
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">

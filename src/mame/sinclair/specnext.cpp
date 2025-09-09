@@ -68,6 +68,7 @@ public:
 	specnext_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_io_shadow_view(*this, "io_shadow_view")
 		, m_bank_boot_rom(*this, "bootrom")
 		, m_bank_ram(*this, "bank_ram%u", 0U)
 		, m_view0(*this, "mem_view0")
@@ -89,7 +90,7 @@ public:
 		, m_regs_map(*this, "regs_map")
 		, m_mf(*this, "multiface")
 		, m_divmmc(*this, "divmmc")
-		, m_ula(*this, "ula")
+		, m_ula_scr(*this, "ula_scr")
 		, m_tiles(*this, "tiles")
 		, m_layer2(*this, "layer2")
 		, m_lores(*this, "lores")
@@ -134,7 +135,7 @@ protected:
 	void turbosound_address_w(u8 data);
 	u8 mf_port_r(offs_t addr);
 	void mf_port_w(offs_t addr, u8 data);
-	attotime cooper_until_pos_r(u16 pos);
+	attotime copper_until_pos_r(u16 pos);
 
 	void bank_update(u8 bank, u8 count);
 	void bank_update(u8 bank);
@@ -189,25 +190,25 @@ private:
 	void nr_19_sprite_clip_x2_w(u8 data) { m_nr_19_sprite_clip_x2 = data; m_sprites->clip_x2_w(m_nr_19_sprite_clip_x2); }
 	void nr_19_sprite_clip_y1_w(u8 data) { m_nr_19_sprite_clip_y1 = data; m_sprites->clip_y1_w(m_nr_19_sprite_clip_y1); }
 	void nr_19_sprite_clip_y2_w(u8 data) { m_nr_19_sprite_clip_y2 = data; m_sprites->clip_y2_w(m_nr_19_sprite_clip_y2); }
-	void nr_1a_ula_clip_x1_w(u8 data) { m_nr_1a_ula_clip_x1 = data; m_ula->ula_clip_x1_w(m_nr_1a_ula_clip_x1); m_lores->clip_x1_w(m_nr_1a_ula_clip_x1); }
-	void nr_1a_ula_clip_x2_w(u8 data) { m_nr_1a_ula_clip_x2 = data; m_ula->ula_clip_x2_w(m_nr_1a_ula_clip_x2); m_lores->clip_x2_w(m_nr_1a_ula_clip_x2); }
-	void nr_1a_ula_clip_y1_w(u8 data) { m_nr_1a_ula_clip_y1 = data; m_ula->ula_clip_y1_w(m_nr_1a_ula_clip_y1); m_lores->clip_y1_w(m_nr_1a_ula_clip_y1); }
+	void nr_1a_ula_clip_x1_w(u8 data) { m_nr_1a_ula_clip_x1 = data; m_ula_scr->ula_clip_x1_w(m_nr_1a_ula_clip_x1); m_lores->clip_x1_w(m_nr_1a_ula_clip_x1); }
+	void nr_1a_ula_clip_x2_w(u8 data) { m_nr_1a_ula_clip_x2 = data; m_ula_scr->ula_clip_x2_w(m_nr_1a_ula_clip_x2); m_lores->clip_x2_w(m_nr_1a_ula_clip_x2); }
+	void nr_1a_ula_clip_y1_w(u8 data) { m_nr_1a_ula_clip_y1 = data; m_ula_scr->ula_clip_y1_w(m_nr_1a_ula_clip_y1); m_lores->clip_y1_w(m_nr_1a_ula_clip_y1); }
 	void nr_1a_ula_clip_y2_w(u8 data);
 	void nr_1b_tm_clip_x1_w(u8 data) { m_nr_1b_tm_clip_x1 = data; m_tiles->clip_x1_w(m_nr_1b_tm_clip_x1); }
 	void nr_1b_tm_clip_x2_w(u8 data) { m_nr_1b_tm_clip_x2 = data; m_tiles->clip_x2_w(m_nr_1b_tm_clip_x2); }
 	void nr_1b_tm_clip_y1_w(u8 data) { m_nr_1b_tm_clip_y1 = data; m_tiles->clip_y1_w(m_nr_1b_tm_clip_y1); }
 	void nr_1b_tm_clip_y2_w(u8 data) { m_nr_1b_tm_clip_y2 = data; m_tiles->clip_y2_w(m_nr_1b_tm_clip_y2); }
-	void nr_26_ula_scrollx_w(u8 data) { m_nr_26_ula_scrollx = data; m_ula->ula_scroll_x_w(m_nr_26_ula_scrollx); }
-	void nr_27_ula_scrolly_w(u8 data) { m_nr_27_ula_scrolly = data; m_ula->ula_scroll_y_w(m_nr_27_ula_scrolly); }
+	void nr_26_ula_scrollx_w(u8 data) { m_nr_26_ula_scrollx = data; m_ula_scr->ula_scroll_x_w(m_nr_26_ula_scrollx); }
+	void nr_27_ula_scrolly_w(u8 data) { m_nr_27_ula_scrolly = data; m_ula_scr->ula_scroll_y_w(m_nr_27_ula_scrolly); }
 
 	void nr_30_tm_scrollx_w(u16 data) { m_nr_30_tm_scrollx = data; m_tiles->tm_scroll_x_w(m_nr_30_tm_scrollx); }
 	void nr_31_tm_scrolly_w(u8 data) { m_nr_31_tm_scrolly = data; m_tiles->tm_scroll_y_w(m_nr_31_tm_scrolly); }
 	void nr_32_lores_scrollx_w(u8 data) { m_nr_32_lores_scrollx = data; m_lores->scroll_x_w(m_nr_32_lores_scrollx); }
 	void nr_33_lores_scrolly_w(u8 data) { m_nr_33_lores_scrolly = data; m_lores->scroll_y_w(m_nr_33_lores_scrolly); }
 
-	void nr_42_ulanext_format_w(u8 data) { m_nr_42_ulanext_format = data; m_ula->ulanext_format_w(m_nr_42_ulanext_format); }
-	void nr_43_ulanext_en_w(bool data) { m_nr_43_ulanext_en = data; m_ula->ulanext_en_w(m_nr_43_ulanext_en); m_lores->ulap_en_w(m_port_ff3b_ulap_en && !m_nr_43_ulanext_en); }
-	void nr_43_active_ula_palette_w(bool data) { m_nr_43_active_ula_palette = data; m_ula->ula_palette_select_w(m_nr_43_active_ula_palette); m_lores->lores_palette_select_w(m_nr_43_active_ula_palette); }
+	void nr_42_ulanext_format_w(u8 data) { m_nr_42_ulanext_format = data; m_ula_scr->ulanext_format_w(m_nr_42_ulanext_format); }
+	void nr_43_ulanext_en_w(bool data) { m_nr_43_ulanext_en = data; m_ula_scr->ulanext_en_w(m_nr_43_ulanext_en); m_lores->ulap_en_w(m_port_ff3b_ulap_en && !m_nr_43_ulanext_en); }
+	void nr_43_active_ula_palette_w(bool data) { m_nr_43_active_ula_palette = data; m_ula_scr->ula_palette_select_w(m_nr_43_active_ula_palette); m_lores->lores_palette_select_w(m_nr_43_active_ula_palette); }
 	void nr_43_active_layer2_palette_w(bool data) { m_nr_43_active_layer2_palette = data; m_layer2->layer2_palette_select_w(m_nr_43_active_layer2_palette); }
 	void nr_43_active_sprite_palette_w(bool data) { m_nr_43_active_sprite_palette = data; m_sprites->sprite_palette_select_w(m_nr_43_active_sprite_palette); }
 
@@ -215,7 +216,7 @@ private:
 	void nr_4c_tm_transparent_index_w(u8 data) { m_nr_4c_tm_transparent_index = data; m_tiles->transp_colour_w(m_nr_4c_tm_transparent_index); }
 
 	void nr_62_copper_mode_w(u8 data) { m_nr_62_copper_mode = data; m_copper->copper_en_w(m_nr_62_copper_mode); }
-	void nr_68_ula_fine_scroll_x_w(bool data) { m_nr_68_ula_fine_scroll_x = data; m_ula->ula_fine_scroll_x_w(m_nr_68_ula_fine_scroll_x); }
+	void nr_68_ula_fine_scroll_x_w(bool data) { m_nr_68_ula_fine_scroll_x = data; m_ula_scr->ula_fine_scroll_x_w(m_nr_68_ula_fine_scroll_x); }
 
 	void nr_6a_lores_radastan_w(bool data) { m_nr_6a_lores_radastan = data; m_lores->mode_w(m_nr_6a_lores_radastan); }
 	void nr_6a_lores_radastan_xor_w(bool data) { m_nr_6a_lores_radastan_xor = data; m_lores->dfile_w(BIT(m_port_ff_data, 0) != m_nr_6a_lores_radastan_xor); }
@@ -281,13 +282,14 @@ private:
 
 	void port_123b_layer2_en_w(bool data) { m_screen->update_now(); m_port_123b_layer2_en = data; m_layer2->layer2_en_w(m_port_123b_layer2_en); }
 
-	void port_ff3b_ulap_en_w(bool data) { m_port_ff3b_ulap_en = data; m_ula->ulap_en_w(m_port_ff3b_ulap_en); m_lores->ulap_en_w(m_port_ff3b_ulap_en && !m_nr_43_ulanext_en); }
+	void port_ff3b_ulap_en_w(bool data) { m_port_ff3b_ulap_en = data; m_ula_scr->ulap_en_w(m_port_ff3b_ulap_en); m_lores->ulap_en_w(m_port_ff3b_ulap_en && !m_nr_43_ulanext_en); }
 	u16 nr_palette_dat();
 
 	void port_e3_reg_w(u8 data);
 	void port_e7_reg_w(u8 data);
 
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_next_regs;
+	memory_view m_io_shadow_view;
 	memory_bank_creator m_bank_boot_rom;
 	memory_bank_array_creator<8> m_bank_ram;
 	memory_view m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7;
@@ -302,7 +304,7 @@ private:
 	required_device<address_map_bank_device> m_regs_map;
 	required_device<specnext_multiface_device> m_mf;
 	required_device<specnext_divmmc_device> m_divmmc;
-	required_device<screen_ula_device> m_ula;
+	required_device<screen_ula_device> m_ula_scr;
 	required_device<specnext_tiles_device> m_tiles;
 	required_device<specnext_layer2_device> m_layer2;
 	required_device<specnext_lores_device> m_lores;
@@ -821,7 +823,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		// background
 		if (m_nr_68_ula_en)
 		{
-			m_ula->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
+			m_ula_scr->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
 		}
 		else {
 			bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
@@ -844,7 +846,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		if (m_nr_68_ula_en && BIT(~m_nr_6b_tm_control, 3))
 		{
 			if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, l[0]);
-			else m_ula->draw(screen, bitmap, clip256x192, flash, l[0]);
+			else m_ula_scr->draw(screen, bitmap, clip256x192, flash, l[0]);
 		}
 		if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), l[0]);
 		m_layer2->draw(screen, bitmap, clip320x256, l[1], l[2]);
@@ -859,7 +861,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (m_nr_68_ula_en && BIT(~m_nr_6b_tm_control, 3))
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
-				else m_ula->draw(screen, bitmap, clip256x192, flash, 1);
+				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
 			}
 			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 2);
 			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 8);
@@ -877,7 +879,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (m_nr_68_ula_en && BIT(~m_nr_6b_tm_control, 3))
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
-				else m_ula->draw(screen, bitmap, clip256x192, flash, 1);
+				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
 			}
 			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 2);
 			if (m_nr_6b_tm_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 2);
@@ -932,7 +934,7 @@ u8 specnext_state::port_ff_r()
 void specnext_state::port_ff_w(u8 data)
 {
 	m_port_ff_data = data; // ==port_ff_dat_tmx
-	m_ula->port_ff_reg_w(m_port_ff_data);
+	m_ula_scr->port_ff_reg_w(m_port_ff_data);
 	nr_6a_lores_radastan_xor_w(m_nr_6a_lores_radastan_xor);
 
 	// TODO confirm this
@@ -945,7 +947,7 @@ void specnext_state::port_ff_w(u8 data)
 void specnext_state::port_7ffd_reg_w(u8 data)
 {
 	m_port_7ffd_data = data;
-	m_ula->ula_shadow_en_w(port_7ffd_shadow());
+	m_ula_scr->ula_shadow_en_w(port_7ffd_shadow());
 }
 
 void specnext_state::port_e3_reg_w(u8 data)
@@ -1098,7 +1100,7 @@ void specnext_state::mf_port_w(offs_t addr, u8 data)
 	m_mf->port_mf_disable_rd_w(0);
 }
 
-attotime specnext_state::cooper_until_pos_r(u16 pos)
+attotime specnext_state::copper_until_pos_r(u16 pos)
 {
 	const u16 vcount = BIT(pos, 0, 9);
 	const u16 hcount = ((BIT(pos, 9, 6) << 3) + (BIT(pos, 15) ? 12 : 0)) << 1;
@@ -2250,7 +2252,7 @@ void specnext_state::nr_14_global_transparent_rgb_w(u8 data)
 {
 	m_nr_14_global_transparent_rgb = data;
 	m_global_transparent = (m_nr_14_global_transparent_rgb << 1) | BIT(m_nr_14_global_transparent_rgb, 1) | BIT(m_nr_14_global_transparent_rgb, 0);
-	m_ula->set_global_transparent(data);
+	m_ula_scr->set_global_transparent(data);
 	m_lores->set_global_transparent(data);
 	m_layer2->set_global_transparent(data);
 }
@@ -2259,7 +2261,7 @@ void specnext_state::nr_1a_ula_clip_y2_w(u8 data)
 {
 	m_nr_1a_ula_clip_y2 = data;
 	const u8 ula_clip_y2_0 = ((m_nr_1a_ula_clip_y2 & 0xc0) == 0xc0) ? 0xbf : m_nr_1a_ula_clip_y2;
-	m_ula->ula_clip_y2_w(ula_clip_y2_0);
+	m_ula_scr->ula_clip_y2_w(ula_clip_y2_0);
 	m_lores->clip_y2_w(ula_clip_y2_0);
 }
 
@@ -2769,6 +2771,10 @@ void specnext_state::map_io(address_map &map)
 		if (m_nr_08_dac_en)
 			m_dac[3]->data_w(data);
 	}));
+
+	map(0x0000, 0xffff).view(m_io_shadow_view);
+	subdevice<zxbus_device>("zxbus")->set_io_space(m_io_shadow_view[0], m_io_shadow_view[1]);
+	m_io_shadow_view.select(0);
 }
 
 void specnext_state::map_regs(address_map &map)
@@ -2816,7 +2822,7 @@ void specnext_state::machine_start()
 	m_bank_boot_rom->configure_entry(0, memregion("maincpu")->base());
 
 	const u8 *ram = m_ram->pointer() + 0x40000;
-	m_ula->set_host_ram_ptr(ram);
+	m_ula_scr->set_host_ram_ptr(ram);
 	m_tiles->set_host_ram_ptr(ram);
 	m_layer2->set_host_ram_ptr(ram);
 	m_lores->set_host_ram_ptr(ram);
@@ -3432,7 +3438,6 @@ GFXDECODE_END
 void specnext_state::video_start()
 {
 	spectrum_128_state::video_start();
-	m_contention_pattern = {}; // No contention for now
 
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 	prg.install_write_tap(0x0000, 0xbfff, "shadow_w", [this](offs_t offset, u8 &data, u8 mem_mask)
@@ -3515,8 +3520,7 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_DIVMMC(config, m_divmmc, 0);
 
 	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	zxbus.set_iospace("maincpu", AS_IO);
-	ZXBUS_SLOT(config, "zxbus:1", 0, "zxbus", zxbus_cards, nullptr);
+	ZXBUS_SLOT(config, "zxbus:1", 0, zxbus, zxbus_cards, nullptr);
 
 	const rectangle scr_full = { SCR_320x256.left() - 16, SCR_320x256.right() + 16, SCR_320x256.top() - 8, SCR_320x256.bottom() + 8 };
 	m_screen->set_raw(28_MHz_XTAL / 2, CYCLES_HORIZ, CYCLES_VERT, scr_full);
@@ -3525,10 +3529,11 @@ void specnext_state::tbblue(machine_config &config)
 
 	PALETTE(config.replace(), m_palette, palette_device::BLACK, 512 * 4 + 1); // ulatm, l2s, +1 == fallback
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tbblue);
+	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
 	const u16 left = SCR_256x192.left();
 	const u16 top = SCR_256x192.top();
-	SCREEN_ULA_NEXT (config, m_ula,     0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x000, 0x100);
+	SCREEN_ULA_NEXT (config, m_ula_scr, 0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x000, 0x100);
 	SPECNEXT_LORES  (config, m_lores,   0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x000, 0x100);
 	SPECNEXT_TILES  (config, m_tiles,   0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x200, 0x300);
 	SPECNEXT_LAYER2 (config, m_layer2,  0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x400, 0x500);
@@ -3536,7 +3541,7 @@ void specnext_state::tbblue(machine_config &config)
 
 	SPECNEXT_COPPER(config, m_copper, 28_MHz_XTAL);
 	m_copper->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
-	m_copper->set_in_until_pos_cb(FUNC(specnext_state::cooper_until_pos_r));
+	m_copper->set_in_until_pos_cb(FUNC(specnext_state::copper_until_pos_r));
 
 	config.device_remove("snapshot");
 }

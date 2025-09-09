@@ -77,6 +77,7 @@ private:
 	uint8_t fetch_r(offs_t offset);
 	uint8_t acccon_r();
 	void acccon_w(uint8_t data);
+	uint8_t romsel_r();
 	void romsel_w(offs_t offset, uint8_t data);
 	uint8_t paged_r(offs_t offset);
 	void paged_w(offs_t offset, uint8_t data);
@@ -162,7 +163,7 @@ void bbcmc_state::bbcmc_io(address_map &map)
 	map(0x0220, 0x0223).w(FUNC(bbcmc_state::video_ula_w));                                                             // W: FE20-FE23  Video ULA      Video system chip
 	map(0x0224, 0x0227).w(FUNC(bbcmc_state::drive_control_w));                                                         // W: FE24-FE27  FDC Latch      1772 Control latch
 	map(0x0228, 0x022f).rw(m_wdfdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write));                            //    FE28-FE2F  1772 FDC       Floppy disc controller
-	map(0x0230, 0x0233).w(FUNC(bbcmc_state::romsel_w));                                                                // W: FE30-FE33  ROMSEL         ROM Select
+	map(0x0230, 0x0233).rw(FUNC(bbcmc_state::romsel_r), FUNC(bbcmc_state::romsel_w));                                  //    FE30-FE33  ROMSEL         ROM Select
 	map(0x0234, 0x0237).rw(FUNC(bbcmc_state::acccon_r), FUNC(bbcmc_state::acccon_w));                                  //    FE34-FE37  ACCCON         ACCCON select register
 	map(0x0238, 0x023b).lr8(NAME([this]() { econet_int_enable(0); return 0xfe; }));                                    // R: FE38-FE3B  INTOFF         ECONET Interrupt Off
 	map(0x0238, 0x023b).lw8(NAME([this](uint8_t data) { econet_int_enable(0); }));                                     // W: FE38-FE3B  INTOFF         ECONET Interrupt Off
@@ -203,9 +204,14 @@ uint8_t bbcmc_state::fetch_r(offs_t offset)
 }
 
 
+uint8_t bbcmc_state::romsel_r()
+{
+	return m_romsel;
+}
+
 void bbcmc_state::romsel_w(offs_t offset, uint8_t data)
 {
-	// ROMSEL - FE30 write only
+	// ROMSEL - FE30 read/write register
 	//  b7 RAM 1 = Page in ANDY 8000-8FFF
 	//         0 = Page in ROM  8000-8FFF
 	//  b6     Not Used

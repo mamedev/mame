@@ -26,7 +26,7 @@ The audio section also has unpopulated space marked for a YMZ280.
 
 
 TODO:
-- ticket_dispenser (main roadblock to playable state)
+- verify ticket dispenser hook-up (seems to work)
 - unknown read / writes as noted in memory map
 - spams "requested to play sample on non-stopped voice" from the Oki. Why?
 - layout (cab picture is available)
@@ -101,14 +101,18 @@ void bpsc68000_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 		if (!BIT(m_spriteram[offs], 2))
 			continue;
 
-		int const sprite = m_spriteram[offs + 1];
-		int const x = m_spriteram[offs + 2];
-		int const y = m_spriteram[offs + 3] ;
+		int sprite = m_spriteram[offs + 1];
+		int const x = m_spriteram[offs + 2] & 0x3ff;
+		int const y = m_spriteram[offs + 3] & 0x3ff;
 		int const flipx = BIT(m_spriteram[offs], 4);
 		int const flipy = 0; // TODO
 		int const color = m_spriteram[offs] >> 8;
+		int const xchain = m_spriteram[offs + 2] >> 11;
+		int const ychain = m_spriteram[offs + 3] >> 11;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite, color, flipx, flipy, x, y, 0);
+		for (int cy = 0; cy < (ychain + 1); cy++)
+			for (int cx = 0; cx < (xchain + 1); cx++)
+				m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, flipx, flipy, x + 16 * cx, y + 16 * cy, 0);
 	}
 }
 
@@ -135,11 +139,17 @@ void bpsc68000_state::counters_w(uint16_t data)
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 5)); // medal
 
-	for (int i = 0x06; i < 0x10; i++)
+	// TODO: strange hook-up, check if correct
+	if (BIT(data, 6))
+		m_ticket_dispenser->motor_w(1);
+
+	if (BIT(data, 7))
+		m_ticket_dispenser->motor_w(0);
+
+	for (int i = 0x08; i < 0x10; i++)
 		if (BIT(data, i))
 			logerror("%s counters_w unknown bit %1x written: %04x\n", machine().describe_context(), i, data);
 
-	// bit 6 and / or 7 seem ticket dispenser related
 }
 
 void bpsc68000_state::lamps_1_w(uint16_t data)
@@ -196,7 +206,7 @@ static INPUT_PORTS_START( lnumbers )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) // PORT_READ_LINE_DEVICE_MEMBER("ticket_dispenser", FUNC(ticket_dispenser_device::line_r)) // Medal sensor
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket_dispenser", FUNC(ticket_dispenser_device::line_r)) // Medal sensor
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 
 	PORT_START("IN1")
@@ -338,4 +348,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1995, lnumbers, 0, bpsc68000, lnumbers, bpsc68000_state, empty_init, ROT0, "Banpresto", "Ultraman Club - Lucky Numbers", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lnumbers, 0, bpsc68000, lnumbers, bpsc68000_state, empty_init, ROT0, "Banpresto", "Ultraman Club - Lucky Numbers", MACHINE_SUPPORTS_SAVE )

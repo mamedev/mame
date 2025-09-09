@@ -72,7 +72,7 @@ Most of them use also the Cirsa-Unidesa 930902-3 for extra sound.
 #include "cpu/i86/i86.h"
 #include "machine/i2cmem.h"
 #include "machine/i8155.h"
-//#include "machine/i8256.h"
+#include "machine/i8256.h"
 #include "machine/pcf8583.h"
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
@@ -130,9 +130,9 @@ void cirsa910510_state::cirsa910510(machine_config &config)
 
 	I8155(config, "sound_8155", 0); // on sound PCB
 
-	//I8256(config, "muart1", 18.432_MHz_XTAL / 3);
+	I8256(config, "muart1", 18.432_MHz_XTAL / 3);
 
-	//I8256(config, "muart2", 18.432_MHz_XTAL / 3);
+	I8256(config, "muart2", 18.432_MHz_XTAL / 3);
 
 	PCF8583(config, "rtc", 32.768_kHz_XTAL);
 

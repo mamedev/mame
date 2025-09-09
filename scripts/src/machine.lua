@@ -3388,6 +3388,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/sega_md_ioport.h,MACHINES["SEGA_MD_IOPORT"] = true
+---------------------------------------------------
+
+if (MACHINES["SEGA_MD_IOPORT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sega_md_ioport.cpp",
+		MAME_DIR .. "src/devices/machine/sega_md_ioport.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sega_scu.h,MACHINES["SEGA_SCU"] = true
+---------------------------------------------------
+
+if (MACHINES["SEGA_SCU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sega_scu.cpp",
+		MAME_DIR .. "src/devices/machine/sega_scu.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/sensorboard.h,MACHINES["SENSORBOARD"] = true
 ---------------------------------------------------
 
@@ -3419,18 +3443,6 @@ if (MACHINES["SMPC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/smpc.cpp",
 		MAME_DIR .. "src/devices/machine/smpc.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/sega_scu.h,MACHINES["SEGA_SCU"] = true
----------------------------------------------------
-
-if (MACHINES["SEGA_SCU"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/sega_scu.cpp",
-		MAME_DIR .. "src/devices/machine/sega_scu.h",
 	}
 end
 
@@ -4169,6 +4181,18 @@ if (MACHINES["I8255"]~=null) then
 		MAME_DIR .. "src/devices/machine/i8255.h",
 		MAME_DIR .. "src/devices/machine/mb89363b.cpp",
 		MAME_DIR .. "src/devices/machine/mb89363b.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/i8256.h,MACHINES["I8256"] = true
+---------------------------------------------------
+
+if (MACHINES["I8256"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i8256.cpp",
+		MAME_DIR .. "src/devices/machine/i8256.h",
 	}
 end
 

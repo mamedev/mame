@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders: David Haywood, ElSemi
-// IGS 027 Encryptions
+// IGS 027 encryptions
 #ifndef MAME_IGS_PGMCRYPT_H
 #define MAME_IGS_PGMCRYPT_H
 
@@ -32,7 +32,6 @@ void sdwx_decrypt(running_machine &machine) ATTR_COLD;
 void hauntedh_decrypt(running_machine &machine) ATTR_COLD;
 void chessc2_decrypt(running_machine &machine) ATTR_COLD;
 void zhongguo_decrypt(running_machine &machine) ATTR_COLD;
-void gonefsh2_decrypt(running_machine &machine) ATTR_COLD;
 void cjddz_decrypt(running_machine &machine) ATTR_COLD;
 void cjddzp_decrypt(running_machine &machine) ATTR_COLD;
 void lhzb4_decrypt(running_machine &machine) ATTR_COLD;

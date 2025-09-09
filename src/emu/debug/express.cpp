@@ -33,6 +33,7 @@
 #include "express.h"
 
 #include "corestr.h"
+
 #include <cctype>
 
 
@@ -319,7 +320,7 @@ std::string expression_error::code_string() const
 		case TOO_MANY_STRINGS:      return "too many strings";
 		case INVALID_MEMORY_SIZE:   return "invalid memory size (b/w/d/q expected)";
 		case NO_SUCH_MEMORY_SPACE:  return "non-existent memory space";
-		case INVALID_MEMORY_SPACE:  return "invalid memory space (p/d/i/o/r/m expected)";
+		case INVALID_MEMORY_SPACE:  return "invalid memory space (p/d/i/o/r/m/s expected)";
 		case INVALID_MEMORY_NAME:   return "invalid memory name";
 		case MISSING_MEMORY_NAME:   return "missing memory name";
 		default:                    return "unknown error";
@@ -673,6 +674,11 @@ u64 symbol_table::memory_value(const char *name, expression_space spacenum, u32 
 			return read_memory_region(name, address, size);
 		break;
 
+	case EXPSPACE_SHARE:
+		if (name)
+			return read_memory_share(name, address, size);
+		break;
+
 	default:
 		break;
 	}
@@ -741,38 +747,65 @@ u64 symbol_table::read_program_direct(address_space &space, int opcode, offs_t a
 u64 symbol_table::read_memory_region(const char *rgntag, offs_t address, int size)
 {
 	auto search = get_device_search(m_machine, m_memintf, rgntag);
-	memory_region *const region = search.first.memregion(search.second);
-	u64 result = ~u64(0) >> (64 - 8*size);
+	return do_read_memory(search.first.memregion(search.second), address, size);
+}
+
+
+//-------------------------------------------------
+//  read_memory_share - read memory from a
+//  memory share
+//-------------------------------------------------
+
+u64 symbol_table::read_memory_share(const char *shatag, offs_t address, int size)
+{
+	auto search = get_device_search(m_machine, m_memintf, shatag);
+	return do_read_memory(search.first.memshare(search.second), address, size);
+}
+
+
+//-------------------------------------------------
+//  do_read_memory - common logic for reading from
+//  a memory region or share
+//-------------------------------------------------
+
+template <typename T>
+u64 symbol_table::do_read_memory(T *mem, offs_t address, int size)
+{
+	u64 result = ~u64(0) >> (64 - (8 * size));
 
 	// make sure we get a valid base before proceeding
-	if (region)
+	if (mem)
 	{
-		// call ourself recursively until we are byte-sized
 		if (size > 1)
 		{
-			int halfsize = size / 2;
-			u64 r0, r1;
+			// call ourself recursively until we are byte-sized
+			int const halfsize = size / 2;
 
 			// read each half, from lower address to upper address
-			r0 = read_memory_region(rgntag, address + 0, halfsize);
-			r1 = read_memory_region(rgntag, address + halfsize, halfsize);
+			u64 const r0 = do_read_memory(mem, address, halfsize);
+			u64 const r1 = do_read_memory(mem, address + halfsize, halfsize);
 
 			// assemble based on the target endianness
-			if (region->endianness() == ENDIANNESS_LITTLE)
+			if (mem->endianness() == ENDIANNESS_LITTLE)
 				result = r0 | (r1 << (8 * halfsize));
 			else
 				result = r1 | (r0 << (8 * halfsize));
 		}
-
-		// only process if we're within range
-		else if (address < region->bytes())
+		else if (address < mem->bytes())
 		{
+			// only process if we're within range
+			struct getbase
+			{
+				u8 const *operator()(memory_region &region) { return region.base(); }
+				u8 const *operator()(memory_share &share) { return reinterpret_cast<u8 const *>(share.ptr()); }
+			};
+
 			// lowmask specified which address bits are within the databus width
-			u32 lowmask = region->bytewidth() - 1;
-			u8 *base = region->base() + (address & ~lowmask);
+			u32 const lowmask = mem->bytewidth() - 1;
+			u8 const *const base = getbase()(*mem) + (address & ~lowmask);
 
 			// if we have a valid base, return the appropriate byte
-			if (region->endianness() == ENDIANNESS_LITTLE)
+			if (mem->endianness() == ENDIANNESS_LITTLE)
 				result = base[BYTE8_XOR_LE(address) & lowmask];
 			else
 				result = base[BYTE8_XOR_BE(address) & lowmask];
@@ -829,6 +862,11 @@ void symbol_table::set_memory_value(const char *name, expression_space spacenum,
 	case EXPSPACE_REGION:
 		if (name)
 			write_memory_region(name, address, size, data);
+		break;
+
+	case EXPSPACE_SHARE:
+		if (name)
+			write_memory_share(name, address, size, data);
 		break;
 
 	default:
@@ -902,20 +940,42 @@ void symbol_table::write_program_direct(address_space &space, int opcode, offs_t
 void symbol_table::write_memory_region(const char *rgntag, offs_t address, int size, u64 data)
 {
 	auto search = get_device_search(m_machine, m_memintf, rgntag);
-	memory_region *const region = search.first.memregion(search.second);
+	do_write_memory(search.first.memregion(search.second), address, size, data);
+}
 
+
+//-------------------------------------------------
+//  write_memory_share - write memory to a
+//  memory share
+//-------------------------------------------------
+
+void symbol_table::write_memory_share(const char *shatag, offs_t address, int size, u64 data)
+{
+	auto search = get_device_search(m_machine, m_memintf, shatag);
+	do_write_memory(search.first.memshare(search.second), address, size, data);
+}
+
+
+//-------------------------------------------------
+//  do_write_memory - common logic for writing to
+//  a memory region or share
+//-------------------------------------------------
+
+template <typename T>
+void symbol_table::do_write_memory(T *mem, offs_t address, int size, u64 data)
+{
 	// make sure we get a valid base before proceeding
-	if (region)
+	if (mem)
 	{
-		// call ourself recursively until we are byte-sized
 		if (size > 1)
 		{
-			int halfsize = size / 2;
+			// call ourself recursively until we are byte-sized
+			int const halfsize = size / 2;
 
 			// break apart based on the target endianness
-			u64 halfmask = ~u64(0) >> (64 - 8 * halfsize);
+			u64 const halfmask = ~u64(0) >> (64 - (8 * halfsize));
 			u64 r0, r1;
-			if (region->endianness() == ENDIANNESS_LITTLE)
+			if (mem->endianness() == ENDIANNESS_LITTLE)
 			{
 				r0 = data & halfmask;
 				r1 = (data >> (8 * halfsize)) & halfmask;
@@ -927,26 +987,28 @@ void symbol_table::write_memory_region(const char *rgntag, offs_t address, int s
 			}
 
 			// write each half, from lower address to upper address
-			write_memory_region(rgntag, address + 0, halfsize, r0);
-			write_memory_region(rgntag, address + halfsize, halfsize, r1);
+			do_write_memory(mem, address, halfsize, r0);
+			do_write_memory(mem, address + halfsize, halfsize, r1);
 		}
-
-		// only process if we're within range
-		else if (address < region->bytes())
+		else if (address < mem->bytes())
 		{
+			// only process if we're within range
+			struct getbase
+			{
+				u8 *operator()(memory_region &region) { return region.base(); }
+				u8 *operator()(memory_share &share) { return reinterpret_cast<u8 *>(share.ptr()); }
+			};
+
 			// lowmask specified which address bits are within the databus width
-			u32 lowmask = region->bytewidth() - 1;
-			u8 *base = region->base() + (address & ~lowmask);
+			const u32 lowmask = mem->bytewidth() - 1;
+			u8 *const base = getbase()(*mem) + (address & ~lowmask);
 
 			// if we have a valid base, set the appropriate byte
-			if (region->endianness() == ENDIANNESS_LITTLE)
-			{
+			if (mem->endianness() == ENDIANNESS_LITTLE)
 				base[BYTE8_XOR_LE(address) & lowmask] = data;
-			}
 			else
-			{
 				base[BYTE8_XOR_BE(address) & lowmask] = data;
-			}
+
 			notify_memory_modified();
 		}
 	}
@@ -994,6 +1056,20 @@ expression_error::error_code symbol_table::memory_valid(const char *name, expres
 			auto search = get_device_search(m_machine, m_memintf, name);
 			memory_region *const region = search.first.memregion(search.second);
 			if (!region || !region->base())
+				return expression_error::INVALID_MEMORY_NAME;
+		}
+		break;
+
+	case EXPSPACE_SHARE:
+		if (!name)
+		{
+			return expression_error::MISSING_MEMORY_NAME;
+		}
+		else
+		{
+			auto search = get_device_search(m_machine, m_memintf, name);
+			memory_share *const share = search.first.memshare(search.second);
+			if (!share || !share->ptr())
 				return expression_error::INVALID_MEMORY_NAME;
 		}
 		break;
@@ -1618,6 +1694,7 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 		case 'r':   memspace = EXPSPACE_PRGDIRECT;                                              break;
 		case 'o':   memspace = EXPSPACE_OPDIRECT;                                               break;
 		case 'm':   memspace = EXPSPACE_REGION;                                                 break;
+		case 's':   memspace = EXPSPACE_SHARE;                                                  break;
 		default:    throw expression_error(expression_error::INVALID_MEMORY_SPACE, token.offset() + (string - startstring));
 	}
 

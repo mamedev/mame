@@ -235,8 +235,8 @@ void igs_string_device::dump(const char *filename, u32 string_addr, u32 xor_addr
 
 	printf("igs_string addr = %x, %x (%d bits)\n", string_addr, xor_addr, is_16bits ? 16 : 8);
 
-	const u8 * const string_base    =   (const u8 *)memregion(":maincpu")->base() + string_addr;
-	const u8 * const xor_base       =   (const u8 *)memregion(":maincpu")->base() + xor_addr;
+	const u8 *const string_base    =   (const u8 *)memregion(":maincpu")->base() + string_addr;
+	const u8 *const xor_base       =   (const u8 *)memregion(":maincpu")->base() + xor_addr;
 	for (u32 i = 0; i < 0xec; ++i)
 	{
 		const u32 addr = is_16bits ? BYTE_XOR_BE(i) : i;
@@ -1027,7 +1027,7 @@ u16 igs017_state::tarzan_palette_bitswap(u16 bgr) const
                                 Decryption
 ***************************************************************************/
 
-[[maybe_unused]] void save_decrypted_rom(const u8 * const rom, int rom_size)
+[[maybe_unused]] void save_decrypted_rom(const u8 *const rom, int rom_size)
 {
 	FILE *f = fopen("igs017_decrypted.bin", "wb");
 	fwrite(rom, 1, rom_size, f);
@@ -1037,7 +1037,7 @@ u16 igs017_state::tarzan_palette_bitswap(u16 bgr) const
 void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u8 * const rom = memregion("maincpu")->base();
+	u8 *const rom = memregion("maincpu")->base();
 	std::unique_ptr<u8[]> tmp = std::make_unique<u8[]>(rom_size);
 
 	// decrypt the program ROM
@@ -1110,7 +1110,7 @@ void igs017_state::init_tjsb()
 void igs017_state::mgcs_decrypt_program_rom()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -1158,7 +1158,7 @@ void igs017_state::mgcs_decrypt_program_rom()
 void igs017_state::mgcsa_decrypt_program_rom()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -1202,7 +1202,7 @@ void igs017_state::mgcsa_decrypt_program_rom()
 void igs017_state::mgcsb_decrypt_program_rom()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -1241,7 +1241,7 @@ void igs017_state::mgcsb_decrypt_program_rom()
 #if 0
 void igs017_state::mgcs_patch_rom()
 {
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	rom[0x20666/2] = 0x601e; // 020666: 671E    beq $20686 (rom check)
 
@@ -1286,7 +1286,7 @@ void igs017_state::init_mgcsb()
 void igs017_state::tarzan_decrypt_program_rom()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u8 * const rom = memregion("maincpu")->base();
+	u8 *const rom = memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size; i++)
 	{
@@ -1326,7 +1326,7 @@ void igs017_state::init_tarzanc()
 void igs017_state::tarzana_decrypt_program_rom()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u8 * const rom = memregion("maincpu")->base();
+	u8 *const rom = memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size; i++)
 	{
@@ -1381,7 +1381,7 @@ void igs017_state::init_tarzana()
 void igs017_state::starzan_decrypt_program_rom()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u8 * const rom = memregion("maincpu")->base();
+	u8 *const rom = memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size; i++)
 	{
@@ -1435,7 +1435,7 @@ void igs017_state::init_jking103a()
 void igs017_state::jking200pr_decrypt_program_rom()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u8 * const rom = memregion("maincpu")->base();
+	u8 *const rom = memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size; i++)
 	{
@@ -1479,7 +1479,7 @@ void igs017_state::init_jking200pr()
 void igs017_state::init_happyskl()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u8 * const rom = memregion("maincpu")->base();
+	u8 *const rom = memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size; i++)
 	{
@@ -1519,7 +1519,7 @@ void igs017_state::init_happyskl()
 void igs017_state::init_cpoker2()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u8 * const rom = memregion("maincpu")->base();
+	u8 *const rom = memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size; i++)
 	{
@@ -1546,7 +1546,7 @@ void igs017_state::init_cpoker2()
 void igs017_state::init_sdmg2754ca()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -1597,7 +1597,7 @@ void igs017_state::init_sdmg2754ca()
 void igs017_state::init_sdmg2754cb()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -1647,7 +1647,7 @@ void igs017_state::init_sdmg2754cb()
 void igs017_state::init_sdmg2()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -1680,7 +1680,7 @@ void igs017_state::init_sdmg2()
 void igs017_state::init_sdmg2p()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -1709,7 +1709,7 @@ void igs017_state::init_sdmg2p()
 void igs017_state::init_mgdha()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -1742,7 +1742,7 @@ void igs017_state::init_mgdha()
 
 void igs017_state::mgdh_patch_rom()
 {
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	// game id check
 	rom[0x4ad50/2] = 0x4e71;
@@ -1761,7 +1761,7 @@ void igs017_state::init_mgdh()
 #if 0
 void igs017_state::lhzb2_patch_rom()
 {
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	// Prot. checks:
 	rom[0x14786/2] = 0x6044; // 014786: 6744    beq $147cc
@@ -1774,7 +1774,7 @@ void igs017_state::lhzb2_patch_rom()
 void igs017_state::init_lhzb2()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -1868,7 +1868,7 @@ void igs017_state::init_lhzb2()
 void igs017_state::init_lhzb2a()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -1931,7 +1931,7 @@ void igs017_state::init_lhzb2a()
 void igs017_state::init_lhzb2b()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -2000,7 +2000,7 @@ void igs017_state::init_lhzb2b()
 void igs017_state::init_lhzb2c()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -2063,7 +2063,7 @@ void igs017_state::init_lhzb2c()
 #if 0
 void igs017_state::slqz2_patch_rom()
 {
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	// Prot. checks:
 	rom[0x1489c/2] = 0x6044; // 01489C: 6744    beq $148e2
@@ -2076,7 +2076,7 @@ void igs017_state::slqz2_patch_rom()
 void igs017_state::init_slqz2()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -2158,7 +2158,7 @@ void igs017_state::init_slqz2()
 void igs017_state::init_slqz2b()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -2235,7 +2235,7 @@ void igs017_state::init_slqz2b()
 
 void igs017_state::spkrform_patch_rom()
 {
-	u8 * const rom = memregion("maincpu")->base();
+	u8 *const rom = memregion("maincpu")->base();
 
 	rom[0x32ea9] = 0; // enable poker ($e9be = 0)
 	rom[0x32ef9] = 0; // start with poker ($e9bf = 0)
@@ -2256,7 +2256,7 @@ void igs017_state::init_spkrform()
 void igs017_state::init_jking302us()
 {
 	const int rom_size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	u16 *const rom = (u16 *)memregion("maincpu")->base();
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{

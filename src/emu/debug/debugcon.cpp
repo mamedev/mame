@@ -24,6 +24,7 @@
 #include <cctype>
 #include <fstream>
 #include <iterator>
+#include <regex>
 
 
 /***************************************************************************
@@ -883,7 +884,7 @@ bool debugger_console::validate_device_space_parameter(std::string_view param, i
 /// optionally followed by a colon and a device identifier.  If the
 /// device identifier is not presnt, the current CPU with debugger focus
 /// is assumed.  See #validate_device_parameter for information on how
-/// device parametersare interpreted.
+/// device parameters are interpreted.
 /// \param [in] The parameter string.
 /// \param [in] spacenum The default address space index.  If negative,
 ///   the first address space exposed by the device (i.e. the address
@@ -916,6 +917,40 @@ bool debugger_console::validate_target_address_parameter(std::string_view param,
 }
 
 
+/// \brief Validate a parameter as an address in a memory region or share
+///
+/// Validates a parameter as a address with memory region or share tag.
+/// \param [in] The parameter string.
+/// \param [out] addr The address on success, or unchanged on failure.
+/// \param [out] region The region if the parameter refers to a memory
+///   region, or unchanged otherwise.
+/// \param [out] share The share if the parameter refers to a share, or
+///   unchanged otherwise.
+/// \return true if the parameter refers to an address in a memory
+///   region or share in the current system, or false otherwise.
+bool debugger_console::validate_address_with_memory_parameter(std::string_view param, u64 &addr, memory_region *&region, memory_share *&share)
+{
+	std::string str(param);
+	std::regex re("^([^:]+)(:.+)\\.([ms])$");
+	std::smatch m;
+	if (std::regex_match(str, m, re))
+	{
+		if ('m' == m[3])
+			validate_memory_region_parameter(m.str(2), region);
+		else if ('s' == m[3])
+			validate_memory_share_parameter(m.str(2), share);
+		else
+			return false;
+
+		validate_number_parameter(m.str(1), addr);
+
+		return true;
+	}
+
+	return false;
+}
+
+
 /// \brief Validate a parameter as a memory region
 ///
 /// Validates a parameter as a memory region tag and retrieves the
@@ -939,6 +974,34 @@ bool debugger_console::validate_memory_region_parameter(std::string_view param, 
 	else
 	{
 		printf("No matching memory region found for '%s'\n", param);
+		return false;
+	}
+}
+
+
+/// \brief Validate a parameter as a memory share
+///
+/// Validates a parameter as a memory share tag and retrieves the
+/// specified memory share.
+/// \param [in] The parameter string.
+/// \param [out] result The memory share on success, or unchanged on
+///   failure.
+/// \return true if the parameter refers to a memory share in the
+///   current system, or false otherwise.
+bool debugger_console::validate_memory_share_parameter(std::string_view param, memory_share *&result)
+{
+	auto const &shares = m_machine.memory().shares();
+	std::string_view relative = param;
+	device_t &base = get_device_search_base(relative);
+	auto const iter = shares.find(base.subtag(strmakelower(relative)));
+	if (shares.end() != iter)
+	{
+		result = iter->second.get();
+		return true;
+	}
+	else
+	{
+		printf("No matching memory share found for '%s'\n", param);
 		return false;
 	}
 }

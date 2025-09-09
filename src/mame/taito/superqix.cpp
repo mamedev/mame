@@ -911,9 +911,6 @@ void superqix_state_base::machine_init_common()
 	// superqix specific stuff, TODO: should be moved to superqix_state below
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_show_bitmap));
-	// the following are saved in VIDEO_START_MEMBER(superqix_state,superqix):
-	//save_item(NAME(*m_fg_bitmap[0]));
-	//save_item(NAME(*m_fg_bitmap[1]));
 
 	m_z80_has_written = false;
 }
@@ -940,19 +937,6 @@ void hotsmash_state::machine_init_common()
 	// spinner quadrature stuff
 	save_item(NAME(m_dial_oldpos));
 	save_item(NAME(m_dial_sign));
-}
-
-MACHINE_RESET_MEMBER(superqix_state, superqix)
-{
-	if (m_mcu.found()) // mcu sets only
-	{
-		// on reset, the mcu is reset, and the mcu p2 latch is explicitly cleared by the reset generator;
-		// the act of clearing this latch asserts the z80 reset, and the mcu must clear it itself by writing
-		// to the p2 latch with bit 5 set.
-		m_port2_raw = 0x01; // force the following function into latching a zero write by having bit 0 falling edge
-		mcu_port2_w(0x00);
-		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-	}
 }
 
 void superqix_state::machine_start()

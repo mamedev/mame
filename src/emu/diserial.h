@@ -240,7 +240,7 @@ protected:
 		}
 		else
 		{
-			device().logerror("FIFO overrun (byte = 0x%02x)", byte);
+			device().logerror("FIFO overrun (byte = 0x%02x)\n", byte);
 		}
 	}
 

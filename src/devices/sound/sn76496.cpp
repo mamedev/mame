@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  sn76496.c
+  sn76496.cpp
   by Nicola Salmoria
   with contributions by others
 
@@ -99,8 +99,10 @@
   the others, as in real life.
 
   15/02/2010: Lord Nightmare & Michael Zapf (additional testing by PlgDavid)
-  Fix noise period when set to mirror channel 3 and channel 3 period is set to 0 (tested on hardware for noise, wave needs tests) - MZ
-  Fix phase of noise on sn94624 and sn76489; all chips use a standard XOR, the only inversion is the output itself - LN, Plgdavid
+  Fix noise period when set to mirror channel 3 and channel 3 period is set to 0
+  (tested on hardware for noise, wave needs tests) - MZ
+  Fix phase of noise on sn94624 and sn76489; all chips use a standard XOR, the only
+  inversion is the output itself - LN, Plgdavid
   Thanks to PlgDavid and Michael Zapf for providing samples which helped immensely here.
 
   23/02/2011: Lord Nightmare & Enik
@@ -129,21 +131,23 @@
   * READY line handling by own emu_timer, not depending on sound_stream_update
 
 
-  TODO: * Implement the TMS9919 - any difference to sn94624?
-        * Implement the T6W28; has registers in a weird order, needs writes
-          to be 'sanitized' first. Also is stereo, similar to game gear.
-        * Factor out common code so that the SAA1099 can share some code.
-        * verify NCR8496/PSSJ-3 behavior on write to mirrored registers; unlike the
-          other variants, the NCR-derived variants are implied to ignore writes to
-          regs 1,3,5,6,7 if 0x80 is not set. This needs to be verified on real hardware.
+  TODO:
+  * Implement the TMS9919 - any difference to sn94624?
+  * Implement the T6W28; has registers in a weird order, needs writes to be
+    'sanitized' first. Also is stereo, similar to game gear.
+  * Factor out common code so that the SAA1099 can share some code.
+  * verify NCR8496/PSSJ-3 behavior on write to mirrored registers; unlike the
+    other variants, the NCR-derived variants are implied to ignore writes to
+    regs 1,3,5,6,7 if 0x80 is not set. This needs to be verified on real hardware.
+
+  BTANB:
+  * Unless the registers are quickly initialized by software, non-Sega chips
+    output a low-pitch beep at cold boot, eg. bbcm, bankp, exedexes, docastle.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "sn76496.h"
-
-#define MAX_OUTPUT 0x7fff
-
 
 sn76496_base_device::sn76496_base_device(
 		const machine_config &mconfig,
@@ -174,86 +178,85 @@ sn76496_base_device::sn76496_base_device(
 }
 
 sn76496_device::sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN76496, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
+	: sn76496_base_device(mconfig, SN76496, tag, 0x10000, 0x04, 0x08, false, false, 8, false, false, owner, clock)
 {
 }
 
 y2404_device::y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, Y2404, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
+	: sn76496_base_device(mconfig, Y2404, tag, 0x10000, 0x04, 0x08, false, false, 8, false, false, owner, clock)
 {
 }
 
 sn76489_device::sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN76489, tag, 0x4000, 0x01, 0x02, true, false, 8, false, true, owner, clock)
+	: sn76496_base_device(mconfig, SN76489, tag, 0x4000, 0x01, 0x02, true, false, 8, false, false, owner, clock)
 {
 }
 
 sn76489a_device::sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN76489A, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
+	: sn76496_base_device(mconfig, SN76489A, tag, 0x10000, 0x04, 0x08, false, false, 8, false, false, owner, clock)
 {
 }
 
 sn76494_device::sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN76494, tag, 0x10000, 0x04, 0x08, false, false, 1, false, true, owner, clock)
+	: sn76496_base_device(mconfig, SN76494, tag, 0x10000, 0x04, 0x08, false, false, 1, false, false, owner, clock)
 {
 }
 
 sn94624_device::sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN94624, tag, 0x4000, 0x01, 0x02, true, false, 1, false, true, owner, clock)
+	: sn76496_base_device(mconfig, SN94624, tag, 0x4000, 0x01, 0x02, true, false, 1, false, false, owner, clock)
 {
 }
 
 ncr8496_device::ncr8496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, NCR8496, tag, 0x8000, 0x02, 0x20, true, false, 8, true, true, owner, clock)
+	: sn76496_base_device(mconfig, NCR8496, tag, 0x8000, 0x02, 0x20, true, false, 8, true, false, owner, clock)
 {
 }
 
 pssj3_device::pssj3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, PSSJ3, tag, 0x8000, 0x02, 0x20, false, false, 8, true, true, owner, clock)
+	: sn76496_base_device(mconfig, PSSJ3, tag, 0x8000, 0x02, 0x20, false, false, 8, true, false, owner, clock)
 {
 }
 
 gamegear_device::gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, GAMEGEAR, tag, 0x8000, 0x01, 0x08, true, true, 8, false, false, owner, clock)
+	: sn76496_base_device(mconfig, GAMEGEAR, tag, 0x8000, 0x01, 0x08, true, true, 8, false, true, owner, clock)
 {
 }
 
 segapsg_device::segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SEGAPSG, tag, 0x8000, 0x01, 0x08, true, false, 8, false, false, owner, clock)
+	: sn76496_base_device(mconfig, SEGAPSG, tag, 0x8000, 0x01, 0x08, true, false, 8, false, true, owner, clock)
 {
 }
 
 
 void sn76496_base_device::device_start()
 {
-	int sample_rate = clock()/2;
-	int gain;
+	static constexpr int MAX_OUTPUT = 0x7fff;
+	int sample_rate = clock() / 2;
 
-	m_sound = stream_alloc(0, (m_stereo? 2:1), sample_rate);
+	m_sound = stream_alloc(0, (m_stereo ? 2 : 1), sample_rate);
 
-	m_last_register = m_sega_style_psg ? 3 :0; // Sega VDP PSG defaults to selected period reg for 2nd channel
-	for (int i = 0; i < 8; i+=2)
+	m_last_register = m_sega_style_psg ? 3 : 0; // Sega VDP PSG defaults to selected period reg for 2nd channel
+	for (int i = 0; i < 8; i += 2)
 	{
 		m_register[i] = 0;
-		m_register[i + 1] = 0x0;   // volume = 0x0 (max volume) on reset; this needs testing on chips other than SN76489A and Sega VDP PSG
+		m_register[i + 1] = m_sega_style_psg ? 0xf : 0; // volume = 0x0 (max volume) on reset; this needs testing on chips other than SN76489A and Sega VDP PSG
 	}
 
 	for (int i = 0; i < 4; i++)
 	{
 		m_output[i] = 0;
-		m_period[i] = 0x3ff;
-		m_count[i] = 0x3ff;
+		m_count[i] = 0;
+		m_period[i] = (m_sega_style_psg || i == 3) ? 0 : 0x400;
 	}
 
 	m_RNG = m_feedback_mask;
 	m_output[3] = m_RNG & 1;
 
-	m_stereo_mask = 0xFF;           // all channels enabled
-	m_current_clock = m_clock_divider-1;
+	m_stereo_mask = 0xff; // all channels enabled
+	m_current_clock = m_clock_divider - 1;
 
 	// set gain
-	gain = 0;
-
+	int gain = 0;
 	gain &= 0xff;
 
 	// increase max output basing on gain (0.2 dB per step)
@@ -265,76 +268,100 @@ void sn76496_base_device::device_start()
 	for (int i = 0; i < 15; i++)
 	{
 		// limit volume to avoid clipping
-		if (out > MAX_OUTPUT / 4) m_vol_table[i] = MAX_OUTPUT / 4;
-		else m_vol_table[i] = out;
+		if (out > MAX_OUTPUT / 4)
+			m_vol_table[i] = MAX_OUTPUT / 4;
+		else
+			m_vol_table[i] = out;
 
 		out /= 1.258925412; /* = 10 ^ (2/20) = 2dB */
 	}
 	m_vol_table[15] = 0;
 
 	for (int i = 0; i < 4; i++)
-		m_volume[i] = m_vol_table[8];
+		m_volume[i] = m_vol_table[m_register[i * 2 + 1]];
 
-	m_ready_state = true;
+	m_ready_state = -1;
 
 	m_ready_timer = timer_alloc(FUNC(sn76496_base_device::delayed_ready), this);
-	m_ready_handler(ASSERT_LINE);
+	m_ready_timer->adjust(attotime::zero);
 
-	register_for_save_states();
+	// save states
+	save_item(NAME(m_ready_state));
+	save_item(NAME(m_register));
+	save_item(NAME(m_last_register));
+	save_item(NAME(m_volume));
+	save_item(NAME(m_RNG));
+	save_item(NAME(m_current_clock));
+	save_item(NAME(m_stereo_mask));
+	save_item(NAME(m_period));
+	save_item(NAME(m_count));
+	save_item(NAME(m_output));
 }
 
 void sn76496_base_device::device_clock_changed()
 {
-	m_sound->set_sample_rate(clock()/2);
+	m_sound->set_sample_rate(clock() / 2);
 }
 
 void sn76496_base_device::stereo_w(u8 data)
 {
 	m_sound->update();
-	if (m_stereo) m_stereo_mask = data;
-	else fatalerror("sn76496_base_device: Call to stereo write with mono chip!\n");
+
+	if (m_stereo)
+		m_stereo_mask = data;
+	else
+		fatalerror("sn76496_base_device: Call to stereo write with mono chip!\n");
 }
 
-TIMER_CALLBACK_MEMBER(sn76496_base_device::delayed_ready)
+void sn76496_base_device::set_ready_state(int32_t state)
 {
-	m_ready_state = true;
-	m_ready_handler(ASSERT_LINE);
+	if (state != m_ready_state)
+	{
+		m_ready_state = state;
+
+		if (!m_ready_handler.isunset())
+			m_ready_handler(state ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 void sn76496_base_device::write(u8 data)
 {
-	int n, r, c;
-
 	// update the output buffer before changing the registers
 	m_sound->update();
 
+	int r;
 	if (data & 0x80)
 	{
 		r = (data & 0x70) >> 4;
 		m_last_register = r;
-		if (((m_ncr_style_psg) && (r == 6)) && ((data&0x04) != (m_register[6]&0x04))) m_RNG = m_feedback_mask; // NCR-style PSG resets the LFSR only on a mode write which actually changes the state of bit 2 of register 6
+		if ((m_ncr_style_psg && (r == 6)) && ((data & 0x04) != (m_register[6] & 0x04)))
+			m_RNG = m_feedback_mask; // NCR-style PSG resets the LFSR only on a mode write which actually changes the state of bit 2 of register 6
 		m_register[r] = (m_register[r] & 0x3f0) | (data & 0x0f);
 	}
 	else
 	{
 		r = m_last_register;
-		//if ((m_ncr_style_psg) && ((r & 1) || (r == 6))) return; // NCR-style PSG ignores writes to regs 1, 3, 5, 6 and 7 with bit 7 clear; this behavior is not verified on hardware yet, uncomment it once verified.
+		//if (m_ncr_style_psg && ((r & 1) || (r == 6)))
+		//	return; // NCR-style PSG ignores writes to regs 1, 3, 5, 6 and 7 with bit 7 clear; this behavior is not verified on hardware yet, uncomment it once verified.
 	}
 
-	c = r >> 1;
+	int c = r >> 1;
 	switch (r)
 	{
 		case 0: // tone 0: frequency
 		case 2: // tone 1: frequency
 		case 4: // tone 2: frequency
-			if ((data & 0x80) == 0) m_register[r] = (m_register[r] & 0x0f) | ((data & 0x3f) << 4);
-			if ((m_register[r] != 0) || (!m_sega_style_psg)) m_period[c] = m_register[r];
+			if ((data & 0x80) == 0)
+				m_register[r] = (m_register[r] & 0x0f) | ((data & 0x3f) << 4);
+			if ((m_register[r] != 0) || m_sega_style_psg)
+				m_period[c] = m_register[r];
 			else m_period[c] = 0x400;
 
 			if (r == 4)
 			{
 				// update noise shift frequency
-				if ((m_register[6] & 0x03) == 0x03) m_period[3] = m_period[2]<<1;
+				if ((m_register[6] & 0x03) == 0x03)
+					m_period[3] = m_period[2] << 1;
 			}
 			break;
 		case 1: // tone 0: volume
@@ -342,34 +369,31 @@ void sn76496_base_device::write(u8 data)
 		case 5: // tone 2: volume
 		case 7: // noise: volume
 			m_volume[c] = m_vol_table[data & 0x0f];
-			if ((data & 0x80) == 0) m_register[r] = (m_register[r] & 0x3f0) | (data & 0x0f);
+			if ((data & 0x80) == 0)
+				m_register[r] = (m_register[r] & 0x3f0) | (data & 0x0f);
 			break;
 		case 6: // noise: frequency, mode
 			{
-				if ((data & 0x80) == 0) logerror("sn76496_base_device: write to reg 6 with bit 7 clear; data was %03x, new write is %02x!\n", m_register[6], data);
-				if ((data & 0x80) == 0) m_register[r] = (m_register[r] & 0x3f0) | (data & 0x0f);
-				n = m_register[6];
+				if ((data & 0x80) == 0)
+					logerror("sn76496_base_device: write to reg 6 with bit 7 clear; data was %03x, new write is %02x!\n", m_register[6], data);
+				if ((data & 0x80) == 0)
+					m_register[r] = (m_register[r] & 0x3f0) | (data & 0x0f);
+
+				int n = m_register[6];
 				// N/512,N/1024,N/2048,Tone #3 output
-				m_period[3] = ((n&3) == 3)? (m_period[2]<<1) : (1 << (5+(n&3)));
-				if (!(m_ncr_style_psg)) m_RNG = m_feedback_mask;
+				m_period[3] = ((n & 3) == 3) ? (m_period[2] << 1) : (1 << (5 + (n & 3)));
+				if (!m_ncr_style_psg)
+					m_RNG = m_feedback_mask;
 			}
 			break;
 	}
 
-	m_ready_state = false;
-	m_ready_handler(CLEAR_LINE);
-	m_ready_timer->adjust(attotime::from_hz(clock()/(4*m_clock_divider)));
-}
-
-inline bool sn76496_base_device::in_noise_mode()
-{
-	return ((m_register[6] & 4)!=0);
+	set_ready_state(0);
+	m_ready_timer->adjust(attotime::from_hz(clock() / (4 * m_clock_divider)));
 }
 
 void sn76496_base_device::sound_stream_update(sound_stream &stream)
 {
-	int i;
-
 	int16_t out;
 	int16_t out2 = 0;
 
@@ -382,10 +406,10 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream)
 		}
 		else // ready for new divided clock, make a new sample
 		{
-			m_current_clock = m_clock_divider-1;
+			m_current_clock = m_clock_divider - 1;
 
 			// handle channels 0,1,2
-			for (i = 0; i < 3; i++)
+			for (int i = 0; i < 3; i++)
 			{
 				m_count[i]--;
 				if (m_count[i] <= 0)
@@ -402,7 +426,7 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream)
 				// if noisemode is 1, both taps are enabled
 				// if noisemode is 0, the lower tap, whitenoisetap2, is held at 0
 				// The != was a bit-XOR (^) before
-				if (((m_RNG & m_whitenoise_tap1)!=0) != (((m_RNG & m_whitenoise_tap2)!=(m_ncr_style_psg?m_whitenoise_tap2:0)) && in_noise_mode()))
+				if (((m_RNG & m_whitenoise_tap1) != 0) != (((m_RNG & m_whitenoise_tap2) != (m_ncr_style_psg ? m_whitenoise_tap2 : 0)) && BIT(m_register[6], 2)))
 				{
 					m_RNG >>= 1;
 					m_RNG |= m_feedback_mask;
@@ -412,29 +436,28 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream)
 					m_RNG >>= 1;
 				}
 				m_output[3] = m_RNG & 1;
-
 				m_count[3] = m_period[3];
 			}
 		}
 
 		if (m_stereo)
 		{
-			out = ((((m_stereo_mask & 0x10)!=0) && (m_output[0]!=0))? m_volume[0] : 0)
-				+ ((((m_stereo_mask & 0x20)!=0) && (m_output[1]!=0))? m_volume[1] : 0)
-				+ ((((m_stereo_mask & 0x40)!=0) && (m_output[2]!=0))? m_volume[2] : 0)
-				+ ((((m_stereo_mask & 0x80)!=0) && (m_output[3]!=0))? m_volume[3] : 0);
+			out = ((((m_stereo_mask & 0x10) != 0) && (m_output[0] != 0)) ? m_volume[0] : 0) +
+					((((m_stereo_mask & 0x20) != 0) && (m_output[1] != 0)) ? m_volume[1] : 0) +
+					((((m_stereo_mask & 0x40) != 0) && (m_output[2] != 0)) ? m_volume[2] : 0) +
+					((((m_stereo_mask & 0x80) != 0) && (m_output[3] != 0)) ? m_volume[3] : 0);
 
-			out2= ((((m_stereo_mask & 0x1)!=0) && (m_output[0]!=0))? m_volume[0] : 0)
-				+ ((((m_stereo_mask & 0x2)!=0) && (m_output[1]!=0))? m_volume[1] : 0)
-				+ ((((m_stereo_mask & 0x4)!=0) && (m_output[2]!=0))? m_volume[2] : 0)
-				+ ((((m_stereo_mask & 0x8)!=0) && (m_output[3]!=0))? m_volume[3] : 0);
+			out2 = ((((m_stereo_mask & 0x1) != 0) && (m_output[0] != 0)) ? m_volume[0] : 0) +
+					((((m_stereo_mask & 0x2) != 0) && (m_output[1] != 0)) ? m_volume[1] : 0) +
+					((((m_stereo_mask & 0x4) != 0) && (m_output[2] != 0)) ? m_volume[2] : 0) +
+					((((m_stereo_mask & 0x8) != 0) && (m_output[3] != 0)) ? m_volume[3] : 0);
 		}
 		else
 		{
-			out= ((m_output[0]!=0)? m_volume[0]:0)
-				+((m_output[1]!=0)? m_volume[1]:0)
-				+((m_output[2]!=0)? m_volume[2]:0)
-				+((m_output[3]!=0)? m_volume[3]:0);
+			out = ((m_output[0] != 0) ? m_volume[0] : 0) +
+					((m_output[1] != 0) ? m_volume[1] : 0) +
+					((m_output[2] != 0) ? m_volume[2] : 0) +
+					((m_output[3] != 0) ? m_volume[3] : 0);
 		}
 
 		if (m_negate) { out = -out; out2 = -out2; }
@@ -443,27 +466,6 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream)
 		if (m_stereo)
 			stream.put_int(1, sampindex, out2, 32768);
 	}
-}
-
-void sn76496_base_device::register_for_save_states()
-{
-	save_item(NAME(m_vol_table));
-	save_item(NAME(m_register));
-	save_item(NAME(m_last_register));
-	save_item(NAME(m_volume));
-	save_item(NAME(m_RNG));
-//  save_item(NAME(m_clock_divider));
-	save_item(NAME(m_current_clock));
-//  save_item(NAME(m_feedback_mask));
-//  save_item(NAME(m_whitenoise_tap1));
-//  save_item(NAME(m_whitenoise_tap2));
-//  save_item(NAME(m_negate));
-//  save_item(NAME(m_stereo));
-	save_item(NAME(m_stereo_mask));
-	save_item(NAME(m_period));
-	save_item(NAME(m_count));
-	save_item(NAME(m_output));
-//  save_item(NAME(m_sega_style_psg));
 }
 
 DEFINE_DEVICE_TYPE(SN76496,  sn76496_device,   "sn76496",      "SN76496")

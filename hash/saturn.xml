@@ -3677,7 +3677,8 @@ https://segaretro.org/Delisoba_Deluxe
 		<info name="serial" value="610-6803"/>
 		<info name="release" value="19971028"/>
 		<info name="alt_title" value="デリソバ デラックス"/>
-		<info name="developer" value="Sega, Cave"/>
+		<info name="developer" value="Sega" />
+		<info name="developer" value="Cave" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -30259,7 +30260,10 @@ Sega logo animation draws offset [VDP2]
 		<description>Alien Trilogy (Europe)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="language" value="English/French/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="T-8113H-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">

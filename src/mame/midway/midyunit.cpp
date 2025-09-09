@@ -1070,6 +1070,59 @@ static INPUT_PORTS_START( totcarn )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( yunittst )
+	PORT_INCLUDE(hiimpact)
+	PORT_MODIFY("DSW")
+
+	PORT_DIPNAME( 0x80, 0x80, "RAM Test" )                    PORT_DIPLOCATION("DS1:1")
+	PORT_DIPSETTING(      0x80, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x40, 0x40, "CMOS Test" )                   PORT_DIPLOCATION("DS1:2")
+	PORT_DIPSETTING(      0x40, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x20, "Quick DMA Test" )              PORT_DIPLOCATION("DS1:3")
+	PORT_DIPSETTING(      0x20, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x10, 0x10, "Harsh DMA Test" )              PORT_DIPLOCATION("DS1:4")
+	PORT_DIPSETTING(      0x10, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x08, "ROM Checksums" )               PORT_DIPLOCATION("DS1:5")
+	PORT_DIPSETTING(      0x08, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x04, 0x04, "Switch Input Test" )           PORT_DIPLOCATION("DS1:6")
+	PORT_DIPSETTING(      0x04, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x02, 0x02, "Coin Counter Test" )           PORT_DIPLOCATION("DS1:7")
+	PORT_DIPSETTING(      0x02, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x01, 0x01, "Sound Port Test" )             PORT_DIPLOCATION("DS1:8")
+	PORT_DIPSETTING(      0x01, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+
+
+	PORT_DIPNAME( 0xc000, 0xc000, "Display Type" )            PORT_DIPLOCATION("DS2:1,2")
+	PORT_DIPSETTING(      0xc000, "Auto Sense")
+	PORT_DIPSETTING(      0x4000, "4 Bit Y-Unit")
+	PORT_DIPSETTING(      0x8000, "6 Bit Y-Unit")
+	PORT_DIPSETTING(      0x0000, "8 Bit Y-Unit")
+	PORT_DIPNAME( 0x2000, 0x2000, "Screen Alignment" )        PORT_DIPLOCATION("DS2:3")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPNAME( 0x1800, 0x1800, "Screen Fills" )            PORT_DIPLOCATION("DS2:4,5")
+	PORT_DIPSETTING(      0x1800, "Nothing")
+	PORT_DIPSETTING(      0x0800, "Red")
+	PORT_DIPSETTING(      0x1000, "Green")
+	PORT_DIPSETTING(      0x0000, "Blue")
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unused ))          PORT_DIPLOCATION("DS2:6")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unused ))          PORT_DIPLOCATION("DS2:7")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPNAME( 0x0100, 0x0100, "Williams Logo" )           PORT_DIPLOCATION("DS2:8")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -3609,6 +3662,19 @@ ROM_START( totcarnp1 )
 ROM_END
 
 
+
+ROM_START( yunittst )
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )    // sound CPU
+	ROM_LOAD ( "y_unit_test_snd",  0x000000, 0x90000,	NO_DUMP )
+
+	ROM_REGION16_LE( 0x100000, "maindata", 0 ) // 34010 code
+	ROM_LOAD16_BYTE( "y_unit_test_u105.u105", 0xc0000, 0x20000, CRC(bd29a7d1) SHA1(211905c16874a23840652555757b9d2f2712facb) )
+	ROM_LOAD16_BYTE( "y_unit_test_u89.u89",   0xc0001, 0x20000, CRC(6db6e0cd) SHA1(3f4c7cd48d6606c03195ed9209f7cedbc9efd42d) )
+
+	ROM_REGION( 0x800000, "gfx", 0 )
+	ROM_LOAD ( "y_unit_test_gfx",  0x000000, 0x800000,	NO_DUMP )
+ROM_END
+
 /*************************************
  *
  *  Game drivers
@@ -3679,3 +3745,6 @@ GAME( 1992, mkla3bl,    mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_ad
 GAME( 1992, totcarn,    0,        yunit_adpcm_6bit_fast,   totcarn,  midyunit_adpcm_state, init_totcarn,   ROT0,              "Midway",           "Total Carnage (rev LA1 03/10/92)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, totcarnp2,  totcarn,  yunit_adpcm_6bit_fast,   totcarn,  midyunit_adpcm_state, init_totcarn,   ROT0,              "Midway",           "Total Carnage (prototype, proto v 2.0 02/10/92)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, totcarnp1,  totcarn,  yunit_adpcm_6bit_fast,   totcarn,  midyunit_adpcm_state, init_totcarn,   ROT0,              "Midway",           "Total Carnage (prototype, proto v 1.0 01/25/92)", MACHINE_SUPPORTS_SAVE )
+
+//Configuring as a generic CVSD, can run on any board
+GAME( 199?, yunittst,   0,		  yunit_cvsd_6bit_slow,    yunittst, midyunit_cvsd_state,  init_shimpact, ROT0,               "Midway",           "Y-Unit Test ROM (v1.40)", MACHINE_SUPPORTS_SAVE )

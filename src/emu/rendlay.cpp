@@ -4062,7 +4062,7 @@ layout_view::layout_view(
 	}
 	if (!layers.marquees.empty())
 	{
-		m_vistoggles.emplace_back("Backdrops", mask);
+		m_vistoggles.emplace_back("Marquees", mask);
 		for (item &marquee : layers.marquees)
 			marquee.m_visibility_mask = mask;
 		m_defvismask |= mask;
@@ -4272,7 +4272,7 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// sort edges of interactive items
 	LOGMASKED(LOG_INTERACTIVE_ITEMS, "Recalculated view '%s' with %u interactive items\n",
 			name(), m_interactive_items.size());
-	//std::reverse(m_interactive_items.begin(), m_interactive_items.end()); TODO: flip hit test order to match visual order
+	std::reverse(m_interactive_items.begin(), m_interactive_items.end());
 	m_interactive_edges_x.reserve(m_interactive_items.size() * 2);
 	m_interactive_edges_y.reserve(m_interactive_items.size() * 2);
 	for (unsigned i = 0; m_interactive_items.size() > i; ++i)
@@ -5360,26 +5360,9 @@ layout_file::layout_file(
 		if (version != LAYOUT_VERSION)
 			throw layout_syntax_error(util::string_format("unsupported version %d", version));
 
-		// parse all the parameters, elements and groups
+		// parse all the parameters, elements, groups and views
 		group_map groupmap;
 		add_elements(env, *mamelayoutnode, groupmap, false, true);
-
-		// parse all the views
-		for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
-		{
-			// the trouble with allowing errors to propagate here is that it wreaks havoc with screenless systems that use a terminal by default
-			// e.g. intlc44 and intlc440 have a terminal on the TTY port by default and have a view with the front panel with the terminal screen
-			// however, they have a second view with just the front panel which is very useful if you're using e.g. -tty null_modem with a socket
-			// if the error is allowed to propagate, the entire layout is dropped so you can't select the useful view
-			try
-			{
-				m_viewlist.emplace_back(env, *viewnode, m_elemmap, groupmap);
-			}
-			catch (layout_reference_error const &err)
-			{
-				osd_printf_warning("Error instantiating layout view %s: %s\n", env.get_attribute_string(*viewnode, "name"), err.what());
-			}
-		}
 
 		// load the content of the first script node
 		if (!m_viewlist.empty())
@@ -5475,7 +5458,22 @@ void layout_file::add_elements(
 				local.increment_parameters();
 			}
 		}
-		else if (repeat || (strcmp(childnode->get_name(), "view") && strcmp(childnode->get_name(), "script")))
+		else if (!repeat && !strcmp(childnode->get_name(), "view"))
+		{
+			// the trouble with allowing errors to propagate here is that it wreaks havoc with screenless systems that use a terminal by default
+			// e.g. intlc44 and intlc440 have a terminal on the TTY port by default and have a view with the front panel with the terminal screen
+			// however, they have a second view with just the front panel which is very useful if you're using e.g. -tty null_modem with a socket
+			// if the error is allowed to propagate, the entire layout is dropped so you can't select the useful view
+			try
+			{
+				m_viewlist.emplace_back(env, *childnode, m_elemmap, groupmap);
+			}
+			catch (layout_reference_error const &err)
+			{
+				osd_printf_warning("Error instantiating layout view %s: %s\n", env.get_attribute_string(*childnode, "name"), err.what());
+			}
+		}
+		else if (repeat || strcmp(childnode->get_name(), "script"))
 		{
 			throw layout_syntax_error(util::string_format("unknown layout item %s", childnode->get_name()));
 		}

@@ -551,7 +551,8 @@ The text "v1" or "v2" are simply to distinguish different versions. It isn't an 
 		<description>Editor-Assembler V.1.2B</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="developer" value="Dubois and McNamara, Mark Harwood"/>
+		<info name="developer" value="Dubois &amp; McNamara" />
+		<info name="developer" value="Mark Harwood" />
 		<part name="snap" interface="vzsnap">
 			<dataarea name="snap" size="0x0027bd">
 				<rom name="tape disk editor assembler v1.2b (19xx)" size="0x0027bd" crc="a776198e" sha1="693d20dad9f302026c2c02bb3a0fc7e87277c8ac"/>
@@ -562,7 +563,7 @@ The text "v1" or "v2" are simply to distinguish different versions. It isn't an 
 		<description>Editor-Assembler V.1.2</description>
 		<year>198?</year>
 		<publisher>Dick Smith ELectronics</publisher>
-		<info name="developer" value="Dubois and McNamara"/>
+		<info name="developer" value="Dubois &amp; McNamara"/>
 		<part name="snap" interface="vzsnap">
 			<dataarea name="snap" size="0x0027bb">
 				<rom name="edasm_vz200.vz" size="0x0027bb" crc="c7280111" sha1="e0c4e8f28bfa0367c8a529328a5f327c8b13ca65"/>
@@ -770,7 +771,7 @@ The text "v1" or "v2" are simply to distinguish different versions. It isn't an 
 		<description>Ghost Hunter v1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="developer" value="Dubois and McNamara"/>
+		<info name="developer" value="Dubois &amp; McNamara"/>
 		<part name="snap" interface="vzsnap">
 			<dataarea name="snap" size="0x0014b1">
 				<rom name="ghost.vz" size="0x0014b1" crc="f5c3870e" sha1="121070b1f6a01e24c32b11172ade4a43f1173c91"/>
@@ -964,7 +965,7 @@ The text "v1" or "v2" are simply to distinguish different versions. It isn't an 
 		<description>Invaders v2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="developer" value="Dubois and McNamara"/>
+		<info name="developer" value="Dubois &amp; McNamara"/>
 		<part name="snap" interface="vzsnap">
 			<dataarea name="snap" size="0x001493">
 				<rom name="invaders.vz" size="0x001493" crc="fd40a481" sha1="0b63eebfea300d32957012a6d20dea028b22279e"/>
@@ -1016,7 +1017,7 @@ The text "v1" or "v2" are simply to distinguish different versions. It isn't an 
 		<description>Instructions for Ladder Challenge</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="developer" value="Dubois and McNamara"/>
+		<info name="developer" value="Dubois &amp; McNamara"/>
 		<part name="snap" interface="vzsnap">
 			<dataarea name="snap" size="0x000be0">
 				<rom name="ladde_in.vz" size="0x000be0" crc="cec4d15c" sha1="1344a2ca180bdb6fc8eaf96903cc783977c8d0cc"/>
@@ -1027,7 +1028,7 @@ The text "v1" or "v2" are simply to distinguish different versions. It isn't an 
 		<description>Ladder Challenge</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="developer" value="Dubois and McNamara"/>
+		<info name="developer" value="Dubois &amp; McNamara"/>
 		<part name="snap" interface="vzsnap">
 			<dataarea name="snap" size="0x00134f">
 				<rom name="ladder.vz" size="0x00134f" crc="6e5e9b22" sha1="900e18d4cfb1c38c29ff80c9b9ea6c72f19e391d"/>
@@ -1130,7 +1131,7 @@ The text "v1" or "v2" are simply to distinguish different versions. It isn't an 
 		<description>Asteroids</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="developer" value="Dubois and McNamara"/>
+		<info name="developer" value="Dubois &amp; McNamara"/>
 		<part name="snap" interface="vzsnap">
 			<dataarea name="snap" size="0x00272f">
 				<rom name="meteor.vz" size="0x00272f" crc="6ba04bec" sha1="8e2601801bacb09931f8fccefcca41e8511673b3"/>

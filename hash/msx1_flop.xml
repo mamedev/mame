@@ -3346,7 +3346,8 @@ The following floppies came with the machines.
 		<description>Xarchon</description>
 		<year>1986</year>
 		<publisher>Micro MSX</publisher>
-		<info name="developer" value="Patrick Chaveron &amp; Christophe Turco"/>
+		<info name="developer" value="Patrick Chaveron" />
+		<info name="developer" value="Christophe Turco" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="rom" size="737280">
 				<rom name="xarchon - patrick chaveron &amp; christope turco.dsk" size="737280" crc="56f0577f" sha1="d427390caa93601980dea6db1071d7f26bbd47f8"/>

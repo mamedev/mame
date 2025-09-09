@@ -48,7 +48,9 @@ license:CC0-1.0
 		<description>Aliens: Neoplasma (v1.3, English, AY sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
-		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
 		<info name="language" value="English" />
 		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
@@ -63,7 +65,9 @@ license:CC0-1.0
 		<description>Aliens: Neoplasma (v1.3, English, Turbo Sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
-		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
 		<info name="language" value="English" />
 		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
@@ -78,7 +82,9 @@ license:CC0-1.0
 		<description>Aliens: Neoplasma (v1.3, Russian, AY sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
-		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
 		<info name="language" value="Russian" />
 		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
@@ -93,7 +99,9 @@ license:CC0-1.0
 		<description>Aliens: Neoplasma (v1.3, Russian, Turbo Sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
-		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
 		<info name="language" value="Russian" />
 		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
@@ -108,7 +116,9 @@ license:CC0-1.0
 		<description>Aliens: Neoplasma (v1.3, Spanish, AY sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
-		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
 		<info name="language" value="Spanish" />
 		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
@@ -123,7 +133,9 @@ license:CC0-1.0
 		<description>Aliens: Neoplasma (v1.3, Spanish, Turbo Sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
-		<info name="developer" value="Aleksander Udotov / Oleg Nikitin / Eugene Rogulin" />
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
 		<info name="language" value="Spanish" />
 		<info name="version" value="1.3" />
 		<part name="flop" interface="floppy_5_25">
@@ -137,7 +149,8 @@ license:CC0-1.0
 		<description>Ammytris</description>
 		<year>1995</year>
 		<publisher>Navigator</publisher>
-		<info name="developer" value="Andrey Prohorenko / Dream Makers Software" />
+		<info name="developer" value="Andrey Prohorenko" />
+		<info name="developer" value="Dream Makers Software" />
 		<info name="usage" value="Works on Pentagon 1024SL machine" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -176,7 +189,9 @@ license:CC0-1.0
 		<description>Carlos Michelis (demo)</description>
 		<year>2012</year>
 		<publisher>World XXI Soft</publisher>
-		<info name="language" value="English/Russian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
+		<info name="language" value="Spanish" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="Carlos Michelis - Demo.trd" size="655360" crc="5295622a" sha1="6be8fb78a6d81a4e8a435ab2fabea760447e812a"/>
@@ -188,7 +203,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, English, AY chip sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="English" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -202,7 +218,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, English, AY chip sound)</description>
 		<year>2020</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="English" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -216,7 +233,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, English, Turbo Sound)</description>
 		<year>2020</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="English" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -230,7 +248,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, English, Turbo Sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="English" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -244,7 +263,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, Polish, AY chip sound)</description>
 		<year>2020</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Polish" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -258,7 +278,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, Polish, Turbo Sound)</description>
 		<year>2020</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Polish" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -272,7 +293,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, Polish, AY chip sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Polish" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -286,7 +308,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, Polish, Turbo Sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Polish" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -300,7 +323,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, Russian, AY chip sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Russian" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -314,7 +338,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, Russian, Turbo Sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Russian" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -328,7 +353,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, Russian, AY chip sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Russian" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -342,7 +368,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, Russian, Turbo Sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Russian" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -356,7 +383,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, Spanish, AY chip sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Spanish" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -370,7 +398,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.0, Spanish, Turbo Sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Spanish" />
 		<info name="version" value="1.0" />
 		<part name="flop" interface="floppy_5_25">
@@ -384,7 +413,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, Spanish, AY chip sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Spanish" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -398,7 +428,8 @@ license:CC0-1.0
 		<description>Delta's Shadow (demo v1.6, Spanish, Turbo Sound)</description>
 		<year>2021</year>
 		<publisher>ZX Online</publisher>
-		<info name="developer" value="Sanchez Crew / Sinc LAIR" />
+		<info name="developer" value="Sanchez Crew" />
+		<info name="developer" value="Sinc LAIR" />
 		<info name="language" value="Spanish" />
 		<info name="version" value="1.6" />
 		<part name="flop" interface="floppy_5_25">
@@ -473,7 +504,12 @@ license:CC0-1.0
 		<year>2018</year>
 		<publisher>Monument Microgames</publisher>
 		<info name="developer" value="Alessandro Grussu" />
-		<info name="language" value="English/French/German/Italian/Portuguese/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese" />
+		<info name="language" value="Spanish" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="DoomPit.trd" size="655360" crc="3b5cca6f" sha1="eda8038415942b22962ecda92c49e9d8164484bb"/>
@@ -486,7 +522,12 @@ license:CC0-1.0
 		<year>2021</year>
 		<publisher>Zankle Soft</publisher>
 		<info name="developer" value="Alessandro Grussu" />
-		<info name="language" value="English/French/German/Italian/Portuguese/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese" />
+		<info name="language" value="Spanish" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="DoomPit (Zankle Soft).trd" size="655360" crc="e3a62d8d" sha1="9c8cc4079c8a11774fabb372ccf535a27d102de7"/>
@@ -522,7 +563,8 @@ license:CC0-1.0
 		<description>Dune II - Battle for Arrakis (Demige)</description>
 		<year>2019</year>
 		<publisher>Demige</publisher>
-		<info name="language" value="English/Russian" />
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="DuneII-BattleForArrakis(Demige)(Disk1).trd" size="655360" crc="4963b6a6" sha1="90ecaad11d34d7d6f5515f561ae6e5228f3da759"/>
@@ -539,7 +581,8 @@ license:CC0-1.0
 		<description>Dune II - Battle for Arrakis (Perestroika Software)</description>
 		<year>2014</year>
 		<publisher>Perestroika Software</publisher>
-		<info name="language" value="English/Russian" />
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="DuneIIBattleForArrakis_1.trd" size="655360" crc="5a3d3e29" sha1="8d72eeeb43adc3e0ed69d3e2fd67246385cbcd0d"/>
@@ -753,7 +796,8 @@ license:CC0-1.0
 		<description>Redshift (v1.1)</description>
 		<year>2020</year>
 		<publisher>World XXI Soft</publisher>
-		<info name="language" value="English/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="Spanish" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="redshift_1.1.trd" size="655360" crc="9f05e2a3" sha1="59599c2e1e58c16a16f3f293df5226112927bb16"/>
@@ -765,7 +809,8 @@ license:CC0-1.0
 		<description>Redshift (v1.0)</description>
 		<year>2019</year>
 		<publisher>World XXI Soft</publisher>
-		<info name="language" value="English/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="Spanish" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="redshift_1.0.trd" size="655360" crc="3ce73e13" sha1="03d302feadd39e9123a807827c0000b77ba17245"/>
@@ -840,7 +885,12 @@ license:CC0-1.0
 		<year>2016</year>
 		<publisher>Alessandro Grussu</publisher>
 		<info name="developer" value="Alessandro Grussu" />
-		<info name="language" value="English/French/German/Italian/Portuguese/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese" />
+		<info name="language" value="Spanish" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="SetoTaishoVsYokai.trd" size="655360" crc="0112482e" sha1="29def2d85791d0fd2a10f264df061ab83a648ac3"/>
@@ -853,7 +903,14 @@ license:CC0-1.0
 		<year>2021</year>
 		<publisher>Zankle Soft</publisher>
 		<info name="developer" value="Alessandro Grussu" />
-		<info name="language" value="English/French/German/Italian/Portuguese/Russian/Spanish/Swedish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese" />
+		<info name="language" value="Russian" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="Sophia.trd" size="655360" crc="e2c41106" sha1="f40fe0039cd4f29567537d1c761d700a06e26af8"/>
@@ -877,7 +934,8 @@ license:CC0-1.0
 		<description>Sun Bucket</description>
 		<year>2014</year>
 		<publisher>Stonechat Productions</publisher>
-		<info name="developer" value="Dave Hughes / Lee Prince" />
+		<info name="developer" value="Dave Hughes" />
+		<info name="developer" value="Lee Prince" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="Sunbucket.trd" size="655360" crc="63084771" sha1="043586c8db70000af084d8af231ed8e193be8656"/>
@@ -890,7 +948,10 @@ license:CC0-1.0
 		<year>2012</year>
 		<publisher>SaNchez</publisher>
 		<info name="developer" value="Aleksander Udotov" />
-		<info name="language" value="English/Polish/Russian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="Polish" />
+		<info name="language" value="Russian" />
+		<info name="language" value="Spanish" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="Survivisection.trd" size="655360" crc="3bc6809a" sha1="784c2f90116fb1b5ffee10668cec684320a44fff"/>
@@ -902,7 +963,8 @@ license:CC0-1.0
 		<description>Thieves School (demo)</description>
 		<year>2008</year>
 		<publisher>World XXI Soft</publisher>
-		<info name="language" value="English/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="Spanish" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="tsd.trd" size="655360" crc="90498cb1" sha1="1670708c070020d92e72a354647f15491910a867"/>

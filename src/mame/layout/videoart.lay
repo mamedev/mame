@@ -64,8 +64,8 @@ authors:hap
 		<element ref="text_erase" blend="multiply"><bounds x="16" yc="5" width="30" height="6" /></element>
 		<element name="led" ref="led"><bounds x="33" yc="5" width="4" height="4" /></element>
 
-		<element ref="nothing" clickthrough="no"><bounds x="54" y="2" width="360" height="6" /></element> <!-- block clickable input -->
 		<element ref="color" inputtag="AN0" inputmask="0xff" inputraw="yes"><bounds x="54" y="2" width="360" height="6" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="54" y="2" width="360" height="6" /></element> <!-- block clickable input -->
 		<element ref="text_color" blend="multiply"><bounds x="55" yc="5" width="30" height="6" /></element>
 
 		<element ref="black"><bounds x="400" y="-1" width="40" height="12" /></element>

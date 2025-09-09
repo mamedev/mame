@@ -8,17 +8,44 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "lcd.h"
+
+#include "video/hd44780.h"
+
+#include "emupal.h"
 #include "screen.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(BBC_LCD, bbc_lcd_device, "bbc_lcd", "Sprow LCD Display")
+class bbc_lcd_device : public device_t, public device_bbc_userport_interface
+{
+public:
+	bbc_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBC_LCD, tag, owner, clock)
+		, device_bbc_userport_interface(mconfig, *this)
+		, m_lcdc(*this, "lcdc")
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD { }
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual uint8_t pb_r() override;
+	virtual void pb_w(uint8_t data) override;
+
+private:
+	required_device<hd44780_device> m_lcdc;
+
+	HD44780_PIXEL_UPDATE(lcd_pixel_update);
+
+	void lcd_palette(palette_device &palette) const;
+};
 
 
 //-------------------------------------------------
@@ -45,31 +72,6 @@ void bbc_lcd_device::device_add_mconfig(machine_config &config)
 	// but is verified from pictures of an original Hitachi LM044L Module.
 	m_lcdc->set_lcd_size(4, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(bbc_lcd_device::lcd_pixel_update));
-}
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_lcd_device - constructor
-//-------------------------------------------------
-
-bbc_lcd_device::bbc_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_LCD, tag, owner, clock)
-	, device_bbc_userport_interface(mconfig, *this)
-	, m_lcdc(*this, "lcdc")
-{
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void bbc_lcd_device::device_start()
-{
 }
 
 
@@ -115,3 +117,8 @@ void bbc_lcd_device::pb_w(uint8_t data)
 	m_lcdc->e_w(BIT(data, 2));
 	m_lcdc->db_w(data << 1);
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_LCD, device_bbc_userport_interface, bbc_lcd_device, "bbc_lcd", "Sprow LCD Display")

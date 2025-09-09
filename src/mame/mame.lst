@@ -470,24 +470,35 @@ manohman
 servicet
 
 @source:adp/stella8085.cpp
+bahia
 dicemstr
+disc
 disc2000
 disc2001
 disc3000
 doppelpot
+doppelstart
 elitedisc
-extrablatt
 excellent
+extrablatt
 glucksstern
 juwel
 karoas
 kniffi
+macao
+rasant
 supermultib
 
 @source:adp/stellafr.cpp
 action
 allfred
+big_jackpot
+disc_bonus
+disc_jackpot
 grandhand
+jokerpoker
+jumbojumbo
+jumbojumbof
 kleopatra
 multimulti
 st_ohla
@@ -20422,6 +20433,9 @@ rtpca25
 @source:ibm/thinkpad600.cpp
 thinkpad600
 thinkpad600e
+thinkpad600x
+thinkpad760xd
+thinkpad770z
 
 @source:ibm/thinkpad8xx.cpp
 thinkpad850
@@ -20596,6 +20610,7 @@ hamhouse
 hamhouse9
 jkrmast
 jkrmasta
+jkrmastb
 jpknight
 kkotnoli
 ladylinr
@@ -20639,6 +20654,8 @@ magoddsd
 match98
 mbs2euro
 megaline
+missbingo
+missbingoc
 moonlght
 moonlghta
 moonlghtb
@@ -20909,6 +20926,7 @@ cjgdy
 dahuaxy
 hlddz
 huoqilin
+hyleyuan
 igsm312
 jhzb
 jxry
@@ -28291,6 +28309,7 @@ seawolfo
 shuffle
 spacwalk
 spcenctr
+spcking2ir
 tornbase
 
 @source:midw8080/rotaryf.cpp
@@ -28593,6 +28612,7 @@ trog4
 trogpa4
 trogpa5
 trogpa6
+yunittst
 
 @source:midway/midzeus.cpp
 crusnexo
@@ -29740,6 +29760,9 @@ bsuprem
 @source:misc/bailey.cpp
 fun4
 fun4a
+
+@source:misc/banpresto_bpsc68000.cpp
+lnumbers
 
 @source:misc/beaminv.cpp
 beaminv
@@ -31158,6 +31181,7 @@ rbmk
 rbspm
 sball2k1
 sc2in1
+sglc
 smatch03
 smwc
 ssanguoj
@@ -31605,6 +31629,7 @@ frtgenieb
 frtgeniec
 frtgenied
 jungleyo
+kingfrt
 magjack
 magjacka
 magjackb
@@ -37621,6 +37646,9 @@ pmv112
 pmv112r
 pp100
 
+@source:pinball/criter75.cpp
+criter75
+
 @source:pinball/de_2.cpp
 bttf_a20
 bttf_a21
@@ -42463,8 +42491,14 @@ wiz
 wizt
 wizta
 
+@source:sequential/prophet5.cpp
+prophet5rev30
+
 @source:sequential/prophet600.cpp
 prpht600
+
+@source:sequential/sixtrak.cpp
+sixtrak
 
 @source:seta/albazc.cpp
 hanaroku
@@ -43053,6 +43087,7 @@ uk2086
 
 @source:sinclair/tsconf.cpp
 tsconf
+tsconf2
 
 @source:sinclair/zx.cpp
 lambda
@@ -43119,6 +43154,9 @@ asma3k
 @source:skeleton/am1000.cpp
 am1000
 
+@source:skeleton/amcoe_au1250.cpp
+burningr
+
 @source:skeleton/amusement_6502.cpp
 unkamus
 
@@ -43139,9 +43177,6 @@ attache816
 
 @source:skeleton/ax20.cpp
 ax20
-
-@source:skeleton/banpresto_bpsc68000.cpp
-lnumbers
 
 @source:skeleton/banpresto_tomy_h8s.cpp
 cmcwa
@@ -44403,6 +44438,9 @@ ts2ua
 m5
 m5p
 m5p_brno
+
+@source:sord/future32.cpp
+future32a
 
 @source:stern/astinvad.cpp
 astinvad

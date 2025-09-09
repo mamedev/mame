@@ -10,9 +10,9 @@ TODO:
 **********************************************************************/
 
 #include "emu.h"
-#include "tsconfdma.h"
+#include "tsconf_dma.h"
 
-#define VERBOSE ( LOG_GENERAL )
+//#define VERBOSE ( LOG_GENERAL )
 #include "logmacro.h"
 
 enum

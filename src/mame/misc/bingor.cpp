@@ -4,6 +4,7 @@
 
   Bingo Roll / Bell Star
 
+   TODO: Hook up i8256
 
 ************************************************************************
 
@@ -510,6 +511,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/gen_latch.h"
+#include "machine/i8256.h"
 #include "machine/intelfsh.h"
 #include "machine/msm6242.h"
 #include "sound/ay8910.h"

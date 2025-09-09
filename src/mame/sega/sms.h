@@ -10,11 +10,11 @@
 
 #pragma once
 
-#include "bus/megadrive/ctrl/mdioport.h"
 #include "bus/sega8/sega8_slot.h"
 #include "bus/sg1000_exp/sg1000exp.h"
 #include "bus/sms_ctrl/smsctrl.h"
 #include "bus/sms_exp/smsexp.h"
+#include "machine/sega_md_ioport.h"
 #include "machine/timer.h"
 #include "sound/ymopl.h"
 #include "video/315_5124.h"
