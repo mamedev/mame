@@ -2242,7 +2242,7 @@ void goldstar_state::wcherry_map(address_map &map)
 {
 	map(0x0000, 0xb7ff).rom();
 	map(0xb800, 0xbfff).ram().share("nvram");
-	map(0xc000, 0xc7ff).rom();
+	map(0xc000, 0xc7ff).ram();
 
 	// Video RAM and reels stuff are there just as placeholder, and obviously in wrong offset
 	map(0xc800, 0xcfff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share(m_fg_vidram);
@@ -2252,7 +2252,7 @@ void goldstar_state::wcherry_map(address_map &map)
 	map(0xe800, 0xe9ff).ram().w(FUNC(goldstar_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xf040, 0xf07f).ram().share(m_reel_scroll[0]);
 	map(0xf080, 0xf0bf).ram().share(m_reel_scroll[1]);
-	map(0xf0c0, 0xf0ff).ram().share(m_reel_scroll[2]);
+	map(0xf100, 0xf13f).ram().share(m_reel_scroll[2]);
 
 	// Not really PPI's... They are emulated/simulated inside the CPLDs
 	map(0xf600, 0xf603).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
@@ -4643,6 +4643,16 @@ static INPUT_PORTS_START( gregular )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( wcherry )
+	PORT_INCLUDE( chrygld )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )  // Hopper presence detection
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )	
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( super9 )
 
 	PORT_START("IN0")  // player
@@ -4659,7 +4669,7 @@ static INPUT_PORTS_START( super9 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin B")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )  // Hopper presence detection
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )  // Hopper presence detection
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Out / Attendant")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper Payout")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
@@ -15082,6 +15092,93 @@ ROM_START( skillmsta )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "n82s129an.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+
+/*
+  Florida Skill Deluxe 2K
+  (FBV2 ver.T)
+
+  Another skill/tickets game
+
+*/
+ROM_START( skdelux2k )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "main_skill_deluxe97_min_bet_8.bin", 0x0000, 0x1000, CRC(4ab0df68) SHA1(2ae5bb633c4e6d7fe5f48871f7ceb723ee692c82) )
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000,  0x08000, CRC(42847284) SHA1(6c0fce56f9ea749686ddc7f16eb98dbad2fdabaa) )
+	ROM_CONTINUE(      0x00000,  0x08000 )
+	ROM_LOAD( "6.u11", 0x08000,  0x08000, CRC(7216b056) SHA1(1671169e3e930134ae3021f3d7649731e24f5a15) )
+	ROM_CONTINUE(      0x08000,  0x08000 )
+	ROM_LOAD( "5.u4",  0x10000,  0x08000, CRC(3aa9f839) SHA1(99da08270fcfdcea92da94aaf9ce484d6efd5ef4) )
+	ROM_CONTINUE(      0x10000,  0x08000 )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15",  0x0000,  0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10",  0x2000,  0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14",  0x4000,  0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",   0x6000,  0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+/*
+  Florida Skill Deluxe 99
+  (FBV2 ver.T)
+
+  Another skill/tickets game
+
+*/
+ROM_START( skdelux99 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "main_skill_deluxe97_min_bet_8.bin", 0x0000, 0x1000, CRC(4ab0df68) SHA1(2ae5bb633c4e6d7fe5f48871f7ceb723ee692c82) )
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000,  0x08000, CRC(8a317c0e) SHA1(cfccfdf3832500da2113d1535daa6955a4e1e960) )
+	ROM_CONTINUE(      0x00000,  0x08000 )
+	ROM_LOAD( "6.u11", 0x08000,  0x08000, CRC(40135f75) SHA1(514fbca122600c5f1b75f661d45553e2230e336f) )
+	ROM_CONTINUE(      0x08000,  0x08000 )
+	ROM_LOAD( "5.u4",  0x10000,  0x08000, CRC(f21cf6b3) SHA1(fe95e1f4be5babd98bc17d27fcb38d8fec8254d8) )
+	ROM_CONTINUE(      0x10000,  0x08000 )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15",  0x0000,  0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10",  0x2000,  0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14",  0x4000,  0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",   0x6000,  0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
 
@@ -25549,6 +25646,33 @@ void goldstar_state::init_wcherry()
 	{
 		src2[i] = bitswap<8>(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);  // OK
 	}
+
+//  temporary hack for analysis and reverse engineering on the protection system
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0x02e3] = 0;
+	rom[0x02e4] = 0;
+	rom[0x02e5] = 0;
+
+	rom[0x00a3] = 0;
+	rom[0x00a4] = 0;
+	rom[0x00a5] = 0;
+
+	rom[0x0d8f] = 0;
+	rom[0x0d90] = 0;
+	rom[0x0d91] = 0;
+
+	rom[0x0ff1] = 0;
+	rom[0x0ff2] = 0;
+	rom[0x0ff3] = 0;
+
+	rom[0x506b] = 0;
+	rom[0x506c] = 0;
+	rom[0x506d] = 0;
+
+	rom[0x5267] = 0;
+	rom[0x5268] = 0;
+	rom[0x5269] = 0;
 }
 
 void cmaster_state::init_chthree()
@@ -25881,7 +26005,7 @@ GAMEL( 199?, chry10,     0,        chrygld,  chry10,   cb3_state,      init_chry
 GAME(  199?, goldfrui,   goldstar, goldfrui, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
 GAME(  2001, super9,     goldstar, super9,   super9,   goldstar_state, init_super9,    ROT0, "Playmark",          "Super Nove (Playmark, V. M271B)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // needs palette, inputs / outputs checked
 GAME(  2001, super9a,    goldstar, super9,   super9,   goldstar_state, init_super9,    ROT0, "Playmark",          "Super Nove (Playmark, V. M271C)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // needs palette, inputs / outputs checked
-GAME(  2001, wcherry,    0,        wcherry,  chrygld,  goldstar_state, init_wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            MACHINE_NOT_WORKING )
+GAME(  2001, wcherry,    0,        wcherry,  wcherry,  goldstar_state, init_wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            MACHINE_NOT_WORKING )
 GAME(  199?, star100,    0,        star100,  star100,  sanghopm_state, empty_init,     ROT0, "Sang Ho",           "Ming Xing 100 (Star 100)",                    MACHINE_IMPERFECT_COLORS )
 
 // are these really Dyna, or bootlegs?
@@ -25948,6 +26072,8 @@ GAMEL( 1991, cutylinea,  cutyline, cm,       cmasterb, cmaster_state,  init_cmv4
 GAMEL( 1991, cutylineb,  cutyline, cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.7C.14)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
 GAMEL( 1991, lonestar,   cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Lonestar Roundup (set 1)",                    0,                 layout_cmasterb )
 GAMEL( 1991, lonestara,  cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Lonestar Roundup (set 2)",                    0,                 layout_cmasterb )
+GAMEL( 1991, skdelux2k,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Florida Skill Deluxe 2K (FBV2 ver.T)",        0,                 layout_cmasterb )
+GAMEL( 1991, skdelux99,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Florida Skill Deluxe 99 (FBV2 ver.T)",        0,                 layout_cmasterb )
 GAMEL( 199?, super7,     cmaster,  super7,   super7,   cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven (ver. 2.3)",                      MACHINE_NOT_WORKING, layout_cmasterb ) // inputs / outputs needs verifying
 GAME ( 199?, wcat3a,     wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 GAMEL( 199?, ll3,        cmaster,  cm,       cmasterb, cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III",                              MACHINE_NOT_WORKING, layout_cmasterb )  // not looked at yet
