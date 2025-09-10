@@ -573,7 +573,8 @@ license:CC0-1.0
 		<publisher>Cassidy and Greene</publisher>
 		<info name="programmer" value="Patrick Buckland" />
 		<info name="programmer" value="Rebecca Heineman" />
-		<info name="programmer" value="Mike 'Jed' Patrick, and Scott Everts" />
+		<info name="programmer" value="Mike 'Jed' Patrick" />
+		<info name="programmer" value="Scott Everts" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-05-11 -->
@@ -712,7 +713,8 @@ license:CC0-1.0
 		<year>1992</year>
 		<publisher>Seven Hills Software</publisher>
 		<info name="programmer" value="Henrik Gudat" />
-		<info name="programmer" value="Jörg Kienzle, and Yann Le Tensorer" />
+		<info name="programmer" value="Jörg Kienzle" />
+		<info name="programmer" value="Yann Le Tensorer" />
 		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-05-18 -->
@@ -893,7 +895,10 @@ license:CC0-1.0
 		<publisher>Fanfare</publisher>
 		<info name="programmer" value="Javier Rullan" />
 		<info name="programmer" value="Huibert Aalbers" />
-		<info name="programmer" value="Thierry Méchain, Stéphane Renaudin, J-C. Doré, and Olivier Guichaoua" />
+		<info name="programmer" value="Thierry Méchain" />
+		<info name="programmer" value="Stéphane Renaudin" />
+		<info name="programmer" value="J-C. Doré" />
+		<info name="programmer" value="Olivier Guichaoua" />
 		<info name="usage" value="Requires a 1.25MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-05-24 -->
@@ -1143,7 +1148,12 @@ license:CC0-1.0
 		<description>Photonix II (version 2.50)</description>
 		<year>1990</year>
 		<publisher>Free Tools Association</publisher>
-		<info name="programmer" value="Pierre Raynaud-Richard, Olivier Goguel, Denis Barritault, Dany Bar, Olivier Bailly-Maitre, and Lionel Picamelot" />
+		<info name="programmer" value="Pierre Raynaud-Richard" />
+		<info name="programmer" value="Olivier Goguel" />
+		<info name="programmer" value="Denis Barritault" />
+		<info name="programmer" value="Dany Bar" />
+		<info name="programmer" value="Olivier Bailly-Maitre" />
+		<info name="programmer" value="Lionel Picamelot" />
 		<info name="usage" value="Requires an Apple IIgs with 1.25MB of RAM" />
 		<info name="version" value="2.50" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -1286,7 +1296,7 @@ license:CC0-1.0
 		<info name="programmer" value="Alan B. Clark" />
 		<info name="programmer" value="Graeme Devine" />
 		<info name="programmer" value="Mike Branham" />
-		<info name="programmer" value="Lloyd Ollmann Jr." />
+		<info name="programmer" value="Lloyd Ollmann, Jr." />
 		<info name="programmer" value="John Conley" />
 		<info name="programmer" value="Jim McBride" />
 		<info name="programmer" value="Michael Park" />
@@ -1873,7 +1883,10 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
 		<info name="programmer" value="Marek Jackiewicz" />
-		<info name="programmer" value="Andrzej Miciłkiewicz, Marcin Szostakowski, Maciej Markuszewski, and Dorota Błaszczak" />
+		<info name="programmer" value="Andrzej Miciłkiewicz" />
+		<info name="programmer" value="Marcin Szostakowski" />
+		<info name="programmer" value="Maciej Markuszewski" />
+		<info name="programmer" value="Dorota Błaszczak" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-06-01 -->
@@ -2047,7 +2060,9 @@ license:CC0-1.0
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Philippe Ulrich" />
 		<info name="programmer" value="Didier Bouchon" />
-		<info name="programmer" value="Jean-Michel Jarre, Alexis Martial, and Michael Rho" />
+		<info name="programmer" value="Jean-Michel Jarre" />
+		<info name="programmer" value="Alexis Martial" />
+		<info name="programmer" value="Michael Rho" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-05-31 -->
@@ -2554,7 +2569,7 @@ license:CC0-1.0
 		<info name="programmer" value="Michael D. Branham" />
 		<info name="programmer" value="Robert C. Clardy" />
 		<info name="programmer" value="John P. Conley" />
-		<info name="programmer" value="Lloyd Ollmann Jr." />
+		<info name="programmer" value="Lloyd Ollmann, Jr." />
 		<info name="programmer" value="Michael Ormsby" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<info name="version" value="2.7" />
@@ -2572,7 +2587,14 @@ license:CC0-1.0
 		<description>Tunnels of Armageddon (version 1.0)</description>
 		<year>1989</year>
 		<publisher>California Dreams</publisher>
-		<info name="programmer" value="Adam Skorupiński, Mirek Zabłocki, Krzysiek Koziarski, Zbych Dąbrowski, Dorota Błaszczak, Marcin Grzegorzewski, Dick Vohlers, Tomek Meuś" />
+		<info name="programmer" value="Adam Skorupiński" />
+		<info name="programmer" value="Mirek Zabłocki" />
+		<info name="programmer" value="Krzysiek Koziarski" />
+		<info name="programmer" value="Zbych Dąbrowski" />
+		<info name="programmer" value="Dorota Błaszczak" />
+		<info name="programmer" value="Marcin Grzegorzewski" />
+		<info name="programmer" value="Dick Vohlers" />
+		<info name="programmer" value="Tomek Meuś" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -3238,7 +3260,8 @@ license:CC0-1.0
 		<description>Tarot</description>
 		<year>1990</year>
 		<publisher>Toolbox</publisher>
-		<info name="programmer" value="François Uhrich and Jean-François Sauvage" />
+		<info name="programmer" value="François Uhrich" />
+		<info name="programmer" value="Jean-François Sauvage" />
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-06-16 -->
@@ -3254,7 +3277,11 @@ license:CC0-1.0
 		<description>Full Metal Planete (version 1.0)</description>
 		<year>1990</year>
 		<publisher>Infogrames</publisher>
-		<info name="programmer" value="François Uhrich, Nicolas Bergeret, Louis van Proosdij Duport, Etienne Petitjean, and Pascal Wassong" />
+		<info name="programmer" value="François Uhrich" />
+		<info name="programmer" value="Nicolas Bergeret" />
+		<info name="programmer" value="Louis van Proosdij Duport" />
+		<info name="programmer" value="Etienne Petitjean" />
+		<info name="programmer" value="Pascal Wassong" />
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -3495,7 +3522,10 @@ license:CC0-1.0
 		<year>1992</year>
 		<publisher>FTA</publisher>
 		<info name="programmer" value="Olivier Goguel" />
-		<info name="programmer" value="Olivier Bailly-Maitre, Pascal Watel, Lionel Picanelot, and Michael Guitton" />
+		<info name="programmer" value="Olivier Bailly-Maitre" />
+		<info name="programmer" value="Pascal Watel" />
+		<info name="programmer" value="Lionel Picanelot" />
+		<info name="programmer" value="Michael Guitton" />
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<info name="version" value="1.00" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -3512,7 +3542,12 @@ license:CC0-1.0
 		<description>HyperStudio (version 3.1c)</description>
 		<year>1989</year>
 		<publisher>Roger Wagner Publishing</publisher>
-		<info name="programmer" value="Michael O'Keefe, Dave Klimas, Eric Mueller, Roy Bannon, Ken Kashmarek, and Garrick Toubassi" />
+		<info name="programmer" value="Michael O'Keefe" />
+		<info name="programmer" value="Dave Klimas" />
+		<info name="programmer" value="Eric Mueller" />
+		<info name="programmer" value="Roy Bannon" />
+		<info name="programmer" value="Ken Kashmarek" />
+		<info name="programmer" value="Garrick Toubassi" />
 		<info name="usage" value="Requires a 1.5MB Apple IIgs ROM 01 or later." />
 		<info name="version" value="3.1c" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -4314,7 +4349,7 @@ license:CC0-1.0
 		<description>Gnarly Golf</description>
 		<year>1989</year>
 		<publisher>Britannica Software</publisher>
-		<info name="programmer" value="Jim Coliz Jr." />
+		<info name="programmer" value="Jim Coliz, Jr." />
 		<info name="programmer" value="Darren Bartlett" />
 		<info name="programmer" value="Andy Hildebrand" />
 		<info name="programmer" value="Greg Thomas" />
@@ -4630,7 +4665,8 @@ license:CC0-1.0
 		<info name="programmer" value="John Brooks" />
 		<info name="programmer" value="Thomas J. Clement" />
 		<info name="programmer" value="Jerry Vincent" />
-		<info name="programmer" value="Bonita Long-Hemsath, and Robin Kar" />
+		<info name="programmer" value="Bonita Long-Hemsath" />
+		<info name="programmer" value="Robin Kar" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2022-07-05 -->

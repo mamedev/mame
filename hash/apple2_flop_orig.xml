@@ -9226,7 +9226,9 @@ license:CC0-1.0
 		<description>Creature Cube</description>
 		<year>1990</year>
 		<publisher>WINGS for learning</publisher>
-		<info name="programmer" value="Tom O'Brien, James Kim, and David Findley" />
+		<info name="programmer" value="Tom O'Brien" />
+		<info name="programmer" value="James Kim" />
+		<info name="programmer" value="David Findley" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-09 -->
@@ -13869,7 +13871,10 @@ license:CC0-1.0
 		<description>Alice in Wonderland (Spinnaker Software)</description>
 		<year>1985</year>
 		<publisher>Spinnaker Software</publisher>
-		<info name="programmer" value="Dale DeSharone, Laurence Yep, William Groetzinger, and Vince Mills" />
+		<info name="programmer" value="Dale DeSharone" />
+		<info name="programmer" value="Laurence Yep" />
+		<info name="programmer" value="William Groetzinger" />
+		<info name="programmer" value="Vince Mills" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later. This program will frequently fail its own copy protection check requiring a reset. Enter PR#6 multiple times in MAME until it loads." />
 		<!-- Copy protection check fail is confirmed on real hardware. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -13894,7 +13899,10 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Windham Classics</publisher>
 		<info name="original_publisher" value="Spinnaker Software" />
-		<info name="programmer" value="Dale DeSharone, Laurence Yep, William Groetzinger, and Vince Mills" />
+		<info name="programmer" value="Dale DeSharone" />
+		<info name="programmer" value="Laurence Yep" />
+		<info name="programmer" value="William Groetzinger" />
+		<info name="programmer" value="Vince Mills" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released:  2019-07-23 -->
@@ -14112,7 +14120,9 @@ license:CC0-1.0
 		<info name="partno" value="A-336" />
 		<info name="programmer" value="Diane Portner" />
 		<info name="programmer" value="Korey Schulz" />
-		<info name="programmer" value="Ju-Chang Wang, John P. Wlazlo, and Shari Zehm" />
+		<info name="programmer" value="Ju-Chang Wang" />
+		<info name="programmer" value="John P. Wlazlo" />
+		<info name="programmer" value="Shari Zehm" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
@@ -14132,7 +14142,9 @@ license:CC0-1.0
 		<info name="partno" value="A-336" />
 		<info name="programmer" value="Diane Portner" />
 		<info name="programmer" value="Korey Schulz" />
-		<info name="programmer" value="Ju-Chang Wang, John P. Wlazlo, and Shari Zehm" />
+		<info name="programmer" value="Ju-Chang Wang" />
+		<info name="programmer" value="John P. Wlazlo" />
+		<info name="programmer" value="Shari Zehm" />
 		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
@@ -15130,7 +15142,7 @@ license:CC0-1.0
 		<description>Back It Up III (version 3.4)</description>
 		<year>1983</year>
 		<publisher>Sensible Software</publisher>
-		<info name="programmer" value="Henry A. Roberts Jr." />
+		<info name="programmer" value="Henry A. Roberts, Jr." />
 		<info name="usage" value="Requires an Apple ][, Apple ][+, Apple //e, and enhanced Apple //e with 48K." />
 		<info name="version" value="3.4" />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE" />
@@ -15148,7 +15160,7 @@ license:CC0-1.0
 		<description>Back It Up III (version 3.6)</description>
 		<year>1983</year>
 		<publisher>Sensible Software</publisher>
-		<info name="programmer" value="Henry A. Roberts Jr." />
+		<info name="programmer" value="Henry A. Roberts, Jr." />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<info name="version" value="3.6" />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
@@ -15734,7 +15746,8 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Hayden Book Company</publisher>
 		<info name="developer" value="Imaginative Systems Software" />
-		<info name="programmer" value=" Garry Kitchen and John van Ryzin" />
+		<info name="programmer" value="Garry Kitchen" />
+		<info name="programmer" value="John van Ryzin" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-07-31 -->
@@ -15750,7 +15763,8 @@ license:CC0-1.0
 		<description>Below the Root</description>
 		<year>1984</year>
 		<publisher>Windham Classics</publisher>
-		<info name="programmer" value="Dale DeSharone and William Groetzinger" />
+		<info name="programmer" value="Dale DeSharone" />
+		<info name="programmer" value="William Groetzinger" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released:  2018-11-13 -->
@@ -16109,7 +16123,8 @@ license:CC0-1.0
 		<description>Blockers and Finders</description>
 		<year>1987</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="Tom O'Brien and Jim Thomas" />
+		<info name="programmer" value="Tom O'Brien" />
+		<info name="programmer" value="Jim Thomas" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-05-20 -->
@@ -16694,7 +16709,7 @@ license:CC0-1.0
 		<description>Call The Parrot (version 12.01.1989)</description>
 		<year>1989</year>
 		<publisher>Hartley Courseware</publisher>
-		<info name="programmer" value="A. Tyler Cowell Jr." />
+		<info name="programmer" value="A. Tyler Cowell, Jr." />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="12.01.1989" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -16834,7 +16849,8 @@ license:CC0-1.0
 		<info name="programmer" value="Dan Megears" />
 		<info name="programmer" value="Sue Minor" />
 		<info name="programmer" value="Lawrence Peterson" />
-		<info name="programmer" value="Ju-Chang Wang, and LaDonna Williams" />
+		<info name="programmer" value="Ju-Chang Wang" />
+		<info name="programmer" value="LaDonna Williams" />
 		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
@@ -19205,7 +19221,8 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Hayden Book Company</publisher>
 		<info name="developer" value="Imaginative Systems Software" />
-		<info name="programmer" value="Dan Kitchen and Barry Marx" />
+		<info name="programmer" value="Dan Kitchen" />
+		<info name="programmer" value="Barry Marx" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-09-28 -->
@@ -20669,7 +20686,10 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Interplay Productions</publisher>
 		<info name="programmer" value="Rebecca Ann Heineman" />
-		<info name="programmer" value="Paul O'Connor, Brian Fargo, Todd J. Camasta, and Kurt Heiden" />
+		<info name="programmer" value="Paul O'Connor" />
+		<info name="programmer" value="Brian Fargo" />
+		<info name="programmer" value="Todd J. Camasta" />
+		<info name="programmer" value="Kurt Heiden" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-09-14 -->
@@ -20774,7 +20794,8 @@ license:CC0-1.0
 		<info name="partno" value="A-338" />
 		<info name="programmer" value="Dave Denninger" />
 		<info name="programmer" value="Rod Haenke" />
-		<info name="programmer" value="Ju-Chang Wang, and John P. Wlazlo" />
+		<info name="programmer" value="Ju-Chang Wang" />
+		<info name="programmer" value="John P. Wlazlo" />
 		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
 		<info name="version" value="1.0" />
 		<!-- Image has been modified to remove identifying site license information. -->
@@ -21034,7 +21055,8 @@ license:CC0-1.0
 		<description>Early Emerging Rules: Negation (version 1.0)</description>
 		<year>1990</year>
 		<publisher>Laureate Learning Systems</publisher>
-		<info name="programmer" value="Bernard J. Fox, M.S. and Mary Sweig Wilson, Ph.D." />
+		<info name="programmer" value="Bernard J. Fox, M.S." />
+		<info name="programmer" value="Mary Sweig Wilson, Ph.D." />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -21051,7 +21073,8 @@ license:CC0-1.0
 		<description>Early Emerging Rules: Plurals (version 1.0)</description>
 		<year>1990</year>
 		<publisher>Laureate Learning Systems</publisher>
-		<info name="programmer" value="Bernard J. Fox, M.S. and Mary Sweig Wilson, Ph.D." />
+		<info name="programmer" value="Bernard J. Fox, M.S." />
+		<info name="programmer" value="Mary Sweig Wilson, Ph.D." />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -23071,8 +23094,7 @@ license:CC0-1.0
 		<description>Guardian (Continental Software)</description>
 		<year>1982</year>
 		<publisher>Continental Software</publisher>
-		<info name="programmer" value="Tom" />
-		<info name="programmer" value="Jerry" />
+		<info name="programmer" value="Tom and Jerry" />
 		<info name="usage" value="Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-10-04 -->
@@ -23089,8 +23111,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Softsmith</publisher>
 		<info name="original_publisher" value="Continental Software" />
-		<info name="programmer" value="Tom" />
-		<info name="programmer" value="Jerry" />
+		<info name="programmer" value="Tom and Jerry" />
 		<info name="usage" value="Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-14. Redumped: 2025-04-08 -->
@@ -25538,7 +25559,8 @@ license:CC0-1.0
 		<description>Magic Spells (version 1.0) (Advanced Learning Technology)</description>
 		<year>1981</year>
 		<publisher>Advanced Learning Technology</publisher>
-		<info name="programmer" value="Leslie Grimm and Corrine Grimm" />
+		<info name="programmer" value="Leslie Grimm" />
+		<info name="programmer" value="Corrine Grimm" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -28346,7 +28368,9 @@ license:CC0-1.0
 		<info name="programmer" value="Michael Sweet" />
 		<info name="programmer" value="Amy E. McKinley" />
 		<info name="programmer" value="Lisa Mandel" />
-		<info name="programmer" value="Lisa Feder-Feitel, Rose Trivisonno, and Tara Framer" />
+		<info name="programmer" value="Lisa Feder-Feitel" />
+		<info name="programmer" value="Rose Trivisonno" />
+		<info name="programmer" value="Tara Framer" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-09-01 -->
@@ -28387,7 +28411,11 @@ license:CC0-1.0
 		<info name="programmer" value="Andrew Kaplan" />
 		<info name="programmer" value="Michael Sweet" />
 		<info name="programmer" value="Lisa Mandel" />
-		<info name="programmer" value="Marian Buck-Murray, Rose Trivisonno, Maureen Stapleton, Jessica Stonier, and Tara Framer" />
+		<info name="programmer" value="Marian Buck-Murray" />
+		<info name="programmer" value="Rose Trivisonno" />
+		<info name="programmer" value="Maureen Stapleton" />
+		<info name="programmer" value="Jessica Stonier" />
+		<info name="programmer" value="Tara Framer" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-09-01 -->
@@ -28427,7 +28455,9 @@ license:CC0-1.0
 		<info name="programmer" value="Donald Way" />
 		<info name="programmer" value="Stuart Blavatnik" />
 		<info name="programmer" value="Lisa Mandel" />
-		<info name="programmer" value="Marian Buck-Murray, Rose Trivisonno, and Jessica Stonier" />
+		<info name="programmer" value="Marian Buck-Murray" />
+		<info name="programmer" value="Rose Trivisonno" />
+		<info name="programmer" value="Jessica Stonier" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-09-01 -->
@@ -28467,7 +28497,9 @@ license:CC0-1.0
 		<info name="programmer" value="Alissa Ossip" />
 		<info name="programmer" value="Donald Way" />
 		<info name="programmer" value="Lisa Mandel" />
-		<info name="programmer" value="Marian Buck-Murray, Nadine Browning, and Laura Jeffers" />
+		<info name="programmer" value="Marian Buck-Murray" />
+		<info name="programmer" value="Nadine Browning" />
+		<info name="programmer" value="Laura Jeffers" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-09-01 -->
@@ -28506,7 +28538,9 @@ license:CC0-1.0
 		<info name="programmer" value="Alissa Ossip" />
 		<info name="programmer" value="Michael Repasy" />
 		<info name="programmer" value="Lisa Mandel" />
-		<info name="programmer" value="Marian Buck-Murray, Nadine Browning, and Laura Jeffers" />
+		<info name="programmer" value="Marian Buck-Murray" />
+		<info name="programmer" value="Nadine Browning" />
+		<info name="programmer" value="Laura Jeffers" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-09-01 -->
@@ -28544,7 +28578,9 @@ license:CC0-1.0
 		<info name="programmer" value="Cary Hammer" />
 		<info name="programmer" value="Michael Repasy" />
 		<info name="programmer" value="Lisa Mandel" />
-		<info name="programmer" value="Marian Buck-Murray, Nadine Browning, and Laura Jeffers" />
+		<info name="programmer" value="Marian Buck-Murray" />
+		<info name="programmer" value="Nadine Browning" />
+		<info name="programmer" value="Laura Jeffers" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-09-01 -->
@@ -28582,7 +28618,10 @@ license:CC0-1.0
 		<info name="programmer" value="Cary Hammer" />
 		<info name="programmer" value="Michael Repasy" />
 		<info name="programmer" value="Lisa Mandel" />
-		<info name="programmer" value="Marian Buck-Murray, Nadine Browning, Denise Chew, and Lisa Feder-Feitel" />
+		<info name="programmer" value="Marian Buck-Murray" />
+		<info name="programmer" value="Nadine Browning" />
+		<info name="programmer" value="Denise Chew" />
+		<info name="programmer" value="Lisa Feder-Feitel" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-11-20 -->
@@ -28822,7 +28861,11 @@ license:CC0-1.0
 		<info name="programmer" value="Amy E. McKinley" />
 		<info name="programmer" value="Rose Trivisonno" />
 		<info name="programmer" value="Lainee Cohen" />
-		<info name="programmer" value="Lisa Feder-Feitel, Lisa Mandel, Nancy Waks, Tara Framer, and Jenny Grant" />
+		<info name="programmer" value="Lisa Feder-Feitel" />
+		<info name="programmer" value="Lisa Mandel" />
+		<info name="programmer" value="Nancy Waks" />
+		<info name="programmer" value="Tara Framer" />
+		<info name="programmer" value="Jenny Grant" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-05-17 -->
@@ -28868,7 +28911,10 @@ license:CC0-1.0
 		<info name="programmer" value="Amy E. McKinley" />
 		<info name="programmer" value="Rose Trivisonno" />
 		<info name="programmer" value="Lainee Cohen" />
-		<info name="programmer" value="Lisa Feder-Feitel, Lisa Mandel, Tara Framer, and Jenny Grant" />
+		<info name="programmer" value="Lisa Feder-Feitel" />
+		<info name="programmer" value="Lisa Mandel" />
+		<info name="programmer" value="Tara Framer" />
+		<info name="programmer" value="Jenny Grant" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-05-17 -->
@@ -28913,7 +28959,10 @@ license:CC0-1.0
 		<info name="programmer" value="Amy E. McKinley" />
 		<info name="programmer" value="Rose Trivisonno" />
 		<info name="programmer" value="Lainee Cohen" />
-		<info name="programmer" value="Lisa Feder-Feitel, Lisa Mandel, Tara Framer, and Jenny Grant" />
+		<info name="programmer" value="Lisa Feder-Feitel" />
+		<info name="programmer" value="Lisa Mandel" />
+		<info name="programmer" value="Tara Framer" />
+		<info name="programmer" value="Jenny Grant" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-05-17 -->
@@ -28955,7 +29004,11 @@ license:CC0-1.0
 		<info name="programmer" value="Stuart Blavatnik" />
 		<info name="programmer" value="Amy E. McKinley" />
 		<info name="programmer" value="Rose Trivisonno" />
-		<info name="programmer" value="Lisa Feder-Feitel, Lisa Mandel, Maureen Stapleton, Jessica Stonier, and Tara Framer" />
+		<info name="programmer" value="Lisa Feder-Feitel" />
+		<info name="programmer" value="Lisa Mandel" />
+		<info name="programmer" value="Maureen Stapleton" />
+		<info name="programmer" value="Jessica Stonier" />
+		<info name="programmer" value="Tara Framer" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-05-17 -->
@@ -28996,7 +29049,11 @@ license:CC0-1.0
 		<info name="programmer" value="Jo Ann Comito" />
 		<info name="programmer" value="Stuart Blavatnik" />
 		<info name="programmer" value="Rose Trivisonno" />
-		<info name="programmer" value="Lisa Feder-Feitel, Lisa Mandel, Maureen Stapleton, Jessica Stonier, and Tara Framer" />
+		<info name="programmer" value="Lisa Feder-Feitel" />
+		<info name="programmer" value="Lisa Mandel" />
+		<info name="programmer" value="Maureen Stapleton" />
+		<info name="programmer" value="Jessica Stonier" />
+		<info name="programmer" value="Tara Framer" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-05-17 -->
@@ -29037,7 +29094,10 @@ license:CC0-1.0
 		<info name="programmer" value="Jo Ann Comito" />
 		<info name="programmer" value="Stuart Blavatnik" />
 		<info name="programmer" value="Rose Trivisonno" />
-		<info name="programmer" value="Lisa Feder-Feitel, Lisa Mandel, Jessica Stonier, and Tara Framer" />
+		<info name="programmer" value="Lisa Feder-Feitel" />
+		<info name="programmer" value="Lisa Mandel" />
+		<info name="programmer" value="Jessica Stonier" />
+		<info name="programmer" value="Tara Framer" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-05-17 -->
@@ -29613,7 +29673,8 @@ license:CC0-1.0
 		<description>More Teasers from Tobbs: Decimals and Fractions</description>
 		<year>1990</year>
 		<publisher>WINGS for learning</publisher>
-		<info name="programmer" value="Tom O'Brien and James Kim" />
+		<info name="programmer" value="Tom O'Brien" />
+		<info name="programmer" value="James Kim" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-09 -->
@@ -29769,7 +29830,7 @@ license:CC0-1.0
 		<publisher>Hartley Courseware</publisher>
 		<info name="programmer" value="Milt Collins" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<info name="version" value=" 08.24.89" />
+		<info name="version" value="08.24.89" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-14 -->
 		<!-- educational program -->
@@ -30193,7 +30254,7 @@ license:CC0-1.0
 		<description>New World</description>
 		<year>1982</year>
 		<publisher>Epyx</publisher>
-		<info name="programmer" value="D. A. Decker Jr." />
+		<info name="programmer" value="D. A. Decker, Jr." />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2020-01-20 -->
@@ -31174,7 +31235,8 @@ license:CC0-1.0
 		<description>Pie-Man (revision 1)</description>
 		<year>1982</year>
 		<publisher>Penguin Software</publisher>
-		<info name="programmer" value="Eagle Berns and Michael Kosaka" />
+		<info name="programmer" value="Eagle Berns" />
+		<info name="programmer" value="Michael Kosaka" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -31191,7 +31253,8 @@ license:CC0-1.0
 		<description>Pie-Man (revision 2)</description>
 		<year>1982</year>
 		<publisher>Penguin Software</publisher>
-		<info name="programmer" value="Eagle Berns and Michael Kosaka" />
+		<info name="programmer" value="Eagle Berns" />
+		<info name="programmer" value="Michael Kosaka" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 2" />
 		<!-- Uses a different copy protection and a different disk structure. -->
@@ -31624,7 +31687,8 @@ license:CC0-1.0
 		<description>Puzzle Tanks: A Game of Numbers and Logic</description>
 		<year>1984</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="Thomas C. O'Brien and Jim Thomas" />
+		<info name="programmer" value="Thomas C. O'Brien" />
+		<info name="programmer" value="Jim Thomas" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-07-29 -->
@@ -32305,7 +32369,9 @@ license:CC0-1.0
 		<description>Reading II</description>
 		<year>1988</year>
 		<publisher>Spinnaker Software</publisher>
-		<info name="programmer" value="Jim Bach, Vince Mills, and Luisa Navejas" />
+		<info name="programmer" value="Jim Bach" />
+		<info name="programmer" value="Vince Mills" />
+		<info name="programmer" value="Luisa Navejas" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-21 -->
@@ -33054,7 +33120,8 @@ license:CC0-1.0
 		<description>Safari Search: Problem Solving and Inference</description>
 		<year>1985</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="Thomas C. O'Brien and Jim Thomas" />
+		<info name="programmer" value="Thomas C. O'Brien" />
+		<info name="programmer" value="Jim Thomas" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-05-25 -->
@@ -34112,7 +34179,7 @@ license:CC0-1.0
 		<info name="programmer" value="Tom Snyder" />
 		<info name="programmer" value="Karen Eagen" />
 		<info name="programmer" value="Karen Whittredge" />
-		<info name="programmer" value="Chris A. Lutes Jr." />
+		<info name="programmer" value="Chris A. Lutes, Jr." />
 		<info name="programmer" value="Kathy Lunt" />
 		<info name="programmer" value="Bruce Brown" />
 		<info name="programmer" value="David Beyer" />
@@ -35567,7 +35634,11 @@ license:CC0-1.0
 		<description>Sum Ducks</description>
 		<year>1984</year>
 		<publisher>Spinnaker Software</publisher>
-		<info name="programmer" value="Barbara Jasinki, Diane Downie, Mark Ravitz, Bryan Moss, Marge Boots" />
+		<info name="programmer" value="Barbara Jasinki" />
+		<info name="programmer" value="Diane Downie" />
+		<info name="programmer" value="Mark Ravitz" />
+		<info name="programmer" value="Bryan Moss" />
+		<info name="programmer" value="Marge Boots" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-21 -->
@@ -35625,7 +35696,18 @@ license:CC0-1.0
 		<info name="programmer" value="John Leupp" />
 		<info name="programmer" value="Kevin Norman" />
 		<info name="programmer" value="Larry Clague" />
-		<info name="programmer" value="Scott Nelson; ported to the Apple ][ by John Stouffer, Jeff Webb, Doug Matson, Greg Broniak, Tim Grost, Matt Decker, Vera Petrusha, Ken Evans, Dr. Keith Dreyer, and Chris Oesterling" />
+		<info name="programmer" value="Scott Nelson" />
+		<!-- see #14146 below marked as "ported to the Apple ][ by" -->
+		<info name="programmer" value="John Stouffer" />
+		<info name="programmer" value="Jeff Webb" />
+		<info name="programmer" value="Doug Matson" />
+		<info name="programmer" value="Greg Broniak" />
+		<info name="programmer" value="Tim Grost" />
+		<info name="programmer" value="Matt Decker" />
+		<info name="programmer" value="Vera Petrusha" />
+		<info name="programmer" value="Ken Evans" />
+		<info name="programmer" value="Dr. Keith Dreyer" />
+		<info name="programmer" value="Chris Oesterling" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2020-01-25 -->
@@ -36104,7 +36186,8 @@ license:CC0-1.0
 		<description>Targets: A Numbers Game</description>
 		<year>1985</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="T.C. O'Brien II and Andrew Lorenz" />
+		<info name="programmer" value="T.C. O'Brien II" />
+		<info name="programmer" value="Andrew Lorenz" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-05-14 -->
@@ -36174,7 +36257,8 @@ license:CC0-1.0
 		<description>Teasers by Tobbs: Whole Numbers</description>
 		<year>1990</year>
 		<publisher>WINGS for learning</publisher>
-		<info name="programmer" value="Tom O'Brien and James Kim" />
+		<info name="programmer" value="Tom O'Brien" />
+		<info name="programmer" value="James Kim" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-09 -->
@@ -37441,7 +37525,7 @@ license:CC0-1.0
 		<info name="programmer" value="Carl Mey" />
 		<info name="programmer" value="Scott Nelson" />
 		<info name="programmer" value="Kevin Norman" />
-		<info name="programmer" value="Edwin W. Reich Jr." />
+		<info name="programmer" value="Edwin W. Reich, Jr." />
 		<info name="programmer" value="Al Rubin" />
 		<info name="programmer" value="Chuck Sommerville" />
 		<info name="programmer" value="Steve A. Baker" />
@@ -37532,7 +37616,9 @@ license:CC0-1.0
 		<description>The Graphics Magician (version 1.0)</description>
 		<year>1982</year>
 		<publisher>Penguin Software</publisher>
-		<info name="programmer" value="Mark Pelczarski, David Lubar, and Chris Jochumson" />
+		<info name="programmer" value="Mark Pelczarski" />
+		<info name="programmer" value="David Lubar" />
+		<info name="programmer" value="Chris Jochumson" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -37549,7 +37635,9 @@ license:CC0-1.0
 		<description>The Graphics Magician (version 10.82)</description>
 		<year>1982</year>
 		<publisher>Penguin Software</publisher>
-		<info name="programmer" value="Mark Pelczarski, David Lubar, and Chris Jochumson" />
+		<info name="programmer" value="Mark Pelczarski" />
+		<info name="programmer" value="David Lubar" />
+		<info name="programmer" value="Chris Jochumson" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="10.82" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -37754,7 +37842,9 @@ license:CC0-1.0
 		<description>The King's Rule: Mathematics and Discovery</description>
 		<year>1984</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="Tom O'Brien, Tom Raich, and Mike Fish" />
+		<info name="programmer" value="Tom O'Brien" />
+		<info name="programmer" value="Tom Raich" />
+		<info name="programmer" value="Mike Fish" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-05-14 -->
@@ -38478,7 +38568,8 @@ license:CC0-1.0
 		<description>The Royal Rules</description>
 		<year>1986</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="Tom O'Brien and Raoul Watson" />
+		<info name="programmer" value="Tom O'Brien" />
+		<info name="programmer" value="Raoul Watson" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-06-04 -->
@@ -38902,7 +38993,12 @@ license:CC0-1.0
 		<description>The Wizard of Oz</description>
 		<year>1985</year>
 		<publisher>Windham Classics</publisher>
-		<info name="programmer" value="Ruth Wick, Ralph Hebb, Dan Mydlack, Mitch Stein, Howard Boles, and Seth Godin" />
+		<info name="programmer" value="Ruth Wick" />
+		<info name="programmer" value="Ralph Hebb" />
+		<info name="programmer" value="Dan Mydlack" />
+		<info name="programmer" value="Mitch Stein" />
+		<info name="programmer" value="Howard Boles" />
+		<info name="programmer" value="Seth Godin" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-06-07 -->
@@ -39210,7 +39306,7 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 		<info name="author" value="Mercer Mayer"/>
-		<info name="developer" value=" Angelsoft" />
+		<info name="developer" value="Angelsoft" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-23 -->
@@ -39227,7 +39323,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
 		<info name="author" value="Mercer Mayer"/>
-		<info name="developer" value=" Angelsoft" />
+		<info name="developer" value="Angelsoft" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2020-04-11 -->
@@ -39244,7 +39340,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
 		<info name="author" value="Mercer Mayer"/>
-		<info name="developer" value=" Angelsoft" />
+		<info name="developer" value="Angelsoft" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-23 -->
@@ -39470,7 +39566,9 @@ license:CC0-1.0
 		<description>Transylvania (version 1984) (Penguin Software)</description>
 		<year>1984</year>
 		<publisher>Penguin Software</publisher>
-		<info name="programmer" value="Antonio Antiochia, Steven Meuse, and Marsha Meuse" />
+		<info name="programmer" value="Antonio Antiochia" />
+		<info name="programmer" value="Steven Meuse" />
+		<info name="programmer" value="Marsha Meuse" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<info name="version" value="1984" />
 		<!-- Re-release with double hi-res graphics. -->
@@ -39531,7 +39629,11 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Windham Classics</publisher>
 		<info name="developer" value="Byron Preiss Video Productions" />
-		<info name="programmer" value="Michael P. Meyer, John Pierard, Ann Weil, Andre Garneau, and Lee Jacknow" />
+		<info name="programmer" value="Michael P. Meyer" />
+		<info name="programmer" value="John Pierard" />
+		<info name="programmer" value="Ann Weil" />
+		<info name="programmer" value="Andre Garneau" />
+		<info name="programmer" value="Lee Jacknow" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2020-02-08 -->

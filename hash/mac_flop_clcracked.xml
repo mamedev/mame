@@ -1360,7 +1360,8 @@ license:CC0-1.0
 		<description>Speed Reader II (version 1.1) (4am crack)</description>
 		<year>1985</year>
 		<publisher>Davidson &amp; Associates</publisher>
-		<info name="programmer" value="Jan Davidson, Ph.D. and Joel Cannon" />
+		<info name="programmer" value="Jan Davidson, Ph.D." />
+		<info name="programmer" value="Joel Cannon" />
 		<info name="usage" value="Runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
 		<info name="version" value="1.1" />
 		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
@@ -2167,7 +2168,7 @@ license:CC0-1.0
 		<publisher>Davidson &amp; Associates</publisher>
 		<info name="developer" value="Creighton Development" />
 		<info name="programmer" value="Jan Davidson, Ph.D." />
-		<info name="programmer" value="Richard K. Eckert Jr." />
+		<info name="programmer" value="Richard K. Eckert, Jr." />
 		<info name="programmer" value="Cathy Johnson" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
 		<info name="version" value="1.0" />

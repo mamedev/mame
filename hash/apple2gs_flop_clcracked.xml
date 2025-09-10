@@ -323,7 +323,9 @@ license:CC0-1.0
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Philippe Ulrich" />
 		<info name="programmer" value="Didier Bouchon" />
-		<info name="programmer" value="Jean-Michel Jarre, Alexis Martial, and Michael Rho" />
+		<info name="programmer" value="Jean-Michel Jarre" />
+		<info name="programmer" value="Alexis Martial" />
+		<info name="programmer" value="Michael Rho" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
@@ -840,7 +842,7 @@ license:CC0-1.0
 		<description>Gnarly Golf (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Fanfare by Britannica</publisher>
-		<info name="programmer" value="Jim Coliz Jr." />
+		<info name="programmer" value="Jim Coliz, Jr." />
 		<info name="programmer" value="Darren Bartlett" />
 		<info name="programmer" value="Andy Hildebrand" />
 		<info name="programmer" value="Greg Thomas" />
@@ -1183,7 +1185,10 @@ license:CC0-1.0
 		<publisher>Fanfare</publisher>
 		<info name="programmer" value="Javier Rullan" />
 		<info name="programmer" value="Huibert Aalbers" />
-		<info name="programmer" value="Thierry Méchain, Stéphane Renaudin, J-C. Doré, and Olivier Guichaoua" />
+		<info name="programmer" value="Thierry Méchain" />
+		<info name="programmer" value="Stéphane Renaudin" />
+		<info name="programmer" value="J-C. Doré" />
+		<info name="programmer" value="Olivier Guichaoua" />
 		<info name="usage" value="Requires a 1.25MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2886,7 +2891,7 @@ license:CC0-1.0
 		<info name="programmer" value="Michael D. Branham" />
 		<info name="programmer" value="Robert C. Clardy" />
 		<info name="programmer" value="John P. Conley" />
-		<info name="programmer" value="Lloyd Ollmann Jr." />
+		<info name="programmer" value="Lloyd Ollmann, Jr." />
 		<info name="programmer" value="Michael Ormsby" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
@@ -2912,7 +2917,7 @@ license:CC0-1.0
 		<info name="programmer" value="Michael D. Branham" />
 		<info name="programmer" value="Robert C. Clardy" />
 		<info name="programmer" value="John P. Conley" />
-		<info name="programmer" value="Lloyd Ollmann Jr." />
+		<info name="programmer" value="Lloyd Ollmann, Jr." />
 		<info name="programmer" value="Michael Ormsby" />
 		<info name="version" value="2.7" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
@@ -3089,7 +3094,10 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
 		<info name="programmer" value="Marek Jackiewicz" />
-		<info name="programmer" value="Andrzej Miciłkiewicz, Marcin Szostakowski, Maciej Markuszewski, and Dorota Błaszczak" />
+		<info name="programmer" value="Andrzej Miciłkiewicz" />
+		<info name="programmer" value="Marcin Szostakowski" />
+		<info name="programmer" value="Maciej Markuszewski" />
+		<info name="programmer" value="Dorota Błaszczak" />
 		<info name="version" value="1.1 25-Jul-88" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -3111,7 +3119,10 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
 		<info name="programmer" value="Marek Jackiewicz" />
-		<info name="programmer" value="Andrzej Miciłkiewicz, Marcin Szostakowski, Maciej Markuszewski, and Dorota Błaszczak" />
+		<info name="programmer" value="Andrzej Miciłkiewicz" />
+		<info name="programmer" value="Marcin Szostakowski" />
+		<info name="programmer" value="Maciej Markuszewski" />
+		<info name="programmer" value="Dorota Błaszczak" />
 		<info name="version" value="1.0 07-Jun-88" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -3137,7 +3148,7 @@ license:CC0-1.0
 		<info name="programmer" value="Alan B. Clark" />
 		<info name="programmer" value="Graeme Devine" />
 		<info name="programmer" value="Mike Branham" />
-		<info name="programmer" value="Lloyd Ollmann Jr." />
+		<info name="programmer" value="Lloyd Ollmann, Jr." />
 		<info name="programmer" value="John Conley" />
 		<info name="programmer" value="Jim McBride" />
 		<info name="programmer" value="Michael Park" />

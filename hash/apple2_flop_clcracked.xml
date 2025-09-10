@@ -18279,7 +18279,13 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-12"/>
-		<info name="programmer" value="Miryam Acevedo-Bouchard, Rich Childers, Susan Gabrys, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Larry Phenow"/>
+		<info name="programmer" value="Miryam Acevedo-Bouchard" />
+		<info name="programmer" value="Rich Childers" />
+		<info name="programmer" value="Susan Gabrys" />
+		<info name="programmer" value="Charolyn Kapplinger" />
+		<info name="programmer" value="Sherry Luedloff" />
+		<info name="programmer" value="Jane Peterson" />
+		<info name="programmer" value="Larry Phenow" />
 		<!-- "Patterns" is a 1988 educational program developed by Miryam Acevedo-Bouchard, Rich Childers, Susan Gabrys, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Larry Phenow, and distributed by MECC. This is version 1.0. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -18294,7 +18300,13 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-12"/>
-		<info name="programmer" value="Miryam Acevedo-Bouchard, John J. Krenz, Mark Paquette, Larry Phenow, Roger Shimada, Steve Taffee, and Paul Wieser"/>
+		<info name="programmer" value="Miryam Acevedo-Bouchard" />
+		<info name="programmer" value="John J. Krenz" />
+		<info name="programmer" value="Mark Paquette" />
+		<info name="programmer" value="Larry Phenow" />
+		<info name="programmer" value="Roger Shimada" />
+		<info name="programmer" value="Steve Taffee" />
+		<info name="programmer" value="Paul Wieser" />
 		<!-- "MECC Outliner" is a 1988 educational program developed by Miryam Acevedo-Bouchard, John J. Krenz, Mark Paquette, Larry Phenow, Roger Shimada, Steve Taffee, and Paul Wieser, and distributed by MECC. This is version 1.0. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -18309,7 +18321,13 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-12"/>
-		<info name="programmer" value="Miryam Acevedo-Bouchard, Rich Childers, Susan Gabrys, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Larry Phenow"/>
+		<info name="programmer" value="Miryam Acevedo-Bouchard" />
+		<info name="programmer" value="Rich Childers" />
+		<info name="programmer" value="Susan Gabrys" />
+		<info name="programmer" value="Charolyn Kapplinger" />
+		<info name="programmer" value="Sherry Luedloff" />
+		<info name="programmer" value="Jane Peterson" />
+		<info name="programmer" value="Larry Phenow" />
 		<!-- "Patterns" is a 1988 educational program developed by Miryam Acevedo-Bouchard, Rich Childers, Susan Gabrys, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Larry Phenow, and distributed by MECC. This is version 1.2. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -18344,7 +18362,15 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-12"/>
-		<info name="programmer" value="Miryam Acevedo-Bouchard, Vince Erickson, Charlyn Kapplinger, Sherry Luedloff, Brian Nesse, Diane Portner, Roger Shimada, Caren Stelson, and Paul Wieser"/>
+		<info name="programmer" value="Miryam Acevedo-Bouchard" />
+		<info name="programmer" value="Vince Erickson" />
+		<info name="programmer" value="Charlyn Kapplinger" />
+		<info name="programmer" value="Sherry Luedloff" />
+		<info name="programmer" value="Brian Nesse" />
+		<info name="programmer" value="Diane Portner" />
+		<info name="programmer" value="Roger Shimada" />
+		<info name="programmer" value="Caren Stelson" />
+		<info name="programmer" value="Paul Wieser" />
 		<!-- "Spelling Workout" is a 1988 educational program developed by Miryam Acevedo-Bouchard, Vince Erickson, Charlyn Kapplinger, Sherry Luedloff, Brian Nesse, Diane Portner, Roger Shimada, Caren Stelson, and Paul Wieser, and distributed by MECC. This is version 1.0. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -18359,7 +18385,15 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-12"/>
-		<info name="programmer" value="Miryam Acevedo-Bouchard, Vince Erickson, Charlyn Kapplinger, Sherry Luedloff, Brian Nesse, Diane Portner, Roger Shimada, Caren Stelson, and Paul Wieser"/>
+		<info name="programmer" value="Miryam Acevedo-Bouchard" />
+		<info name="programmer" value="Vince Erickson" />
+		<info name="programmer" value="Charlyn Kapplinger" />
+		<info name="programmer" value="Sherry Luedloff" />
+		<info name="programmer" value="Brian Nesse" />
+		<info name="programmer" value="Diane Portner" />
+		<info name="programmer" value="Roger Shimada" />
+		<info name="programmer" value="Caren Stelson" />
+		<info name="programmer" value="Paul Wieser" />
 		<!-- "Spelling Workout" is a 1988 educational program developed by Miryam Acevedo-Bouchard, Vince Erickson, Charlyn Kapplinger, Sherry Luedloff, Brian Nesse, Diane Portner, Roger Shimada, Caren Stelson, and Paul Wieser, and distributed by MECC. This is version 1.1. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -24155,7 +24189,7 @@ license:CC0-1.0
 		<description>Algebra Action (4am crack)</description>
 		<year>1986</year>
 		<publisher>Houghton Mifflin</publisher>
-		<info name="developer" value=" Prentice Associates" />
+		<info name="developer" value="Prentice Associates" />
 		<info name="usage" value="Requires an 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2021-04-10 -->
@@ -24575,7 +24609,10 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Windham Classics</publisher>
 		<info name="original_publisher" value="Spinnaker Software" />
-		<info name="programmer" value="Dale DeSharone, Laurence Yep, William Groetzinger, and Vince Mills" />
+		<info name="programmer" value="Dale DeSharone" />
+		<info name="programmer" value="Laurence Yep" />
+		<info name="programmer" value="William Groetzinger" />
+		<info name="programmer" value="Vince Mills" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
 		<!-- Revision 1 crack of this game was an earlier version. That one was protected with the E7 bitstream, invented in 1983 and productized in 1984. Revision 2 has a newer protection scheme that wasn't invented until 1985. -->
@@ -24601,7 +24638,10 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Windham Classics</publisher>
 		<info name="original_publisher" value="Spinnaker Software" />
-		<info name="programmer" value="Dale DeSharone, Laurence Yep, William Groetzinger, and Vince Mills" />
+		<info name="programmer" value="Dale DeSharone" />
+		<info name="programmer" value="Laurence Yep" />
+		<info name="programmer" value="William Groetzinger" />
+		<info name="programmer" value="Vince Mills" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="revision 2" />
 		<!-- Revision 1 crack of this game was an earlier version. That one was protected with the E7 bitstream, invented in 1983 and productized in 1984. Revision 2 has a newer protection scheme that wasn't invented until 1985. -->
@@ -24858,7 +24898,9 @@ license:CC0-1.0
 		<info name="partno" value="A-336" />
 		<info name="programmer" value="Diane Portner" />
 		<info name="programmer" value="Korey Schulz" />
-		<info name="programmer" value="Ju-Chang Wang, John P. Wlazlo, and Shari Zehm" />
+		<info name="programmer" value="Ju-Chang Wang" />
+		<info name="programmer" value="John P. Wlazlo" />
+		<info name="programmer" value="Shari Zehm" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
@@ -26587,7 +26629,7 @@ license:CC0-1.0
 		<description>Basic Number Facts: Practice (4am crack)</description>
 		<year>1982</year>
 		<publisher> Control Data Corporation</publisher>
-		<info name="developer" value=" Control Data Corporation" />
+		<info name="developer" value="Control Data Corporation" />
 		<info name="usage" value="Requires an Apple ][+ or unenhanced //e." />
 		<!-- Due to coding errors unrelated to the copy protection, this program does not work on any Apple ][ with a 65c02 CPU. -->
 		<sharedfeat name="compatibility" value="A2P,A2E" />
@@ -26856,7 +26898,8 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Hayden Book Company</publisher>
 		<info name="developer" value="Imaginative Systems Software" />
-		<info name="programmer" value=" Garry Kitchen and John van Ryzin" />
+		<info name="programmer" value="Garry Kitchen" />
+		<info name="programmer" value="John van Ryzin" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-10-04 -->
@@ -26872,7 +26915,8 @@ license:CC0-1.0
 		<description>Below the Root (4am crack)</description>
 		<year>1984</year>
 		<publisher>Windham Classics</publisher>
-		<info name="programmer" value="Dale DeSharone and William Groetzinger" />
+		<info name="programmer" value="Dale DeSharone" />
+		<info name="programmer" value="William Groetzinger" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released:  2018-11-13 -->
@@ -27191,7 +27235,8 @@ license:CC0-1.0
 		<description>Blockers and Finders (4am crack)</description>
 		<year>1987</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="Tom O'Brien and Jim Thomas" />
+		<info name="programmer" value="Tom O'Brien" />
+		<info name="programmer" value="Jim Thomas" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-05-21 -->
@@ -28543,7 +28588,11 @@ license:CC0-1.0
 		<info name="developer" value="Pelican Software"/>
 		<info name="programmer" value="Lester Humphreys" />
 		<info name="programmer" value="Ken Grey" />
-		<info name="programmer" value="artwork: Janet Coutu, Steve Parlotto, Kim Looney, Herb Perez, and Diane Riendeau" />
+		<info name="programmer" value="artwork: Janet Coutu" />
+		<info name="programmer" value="Steve Parlotto" />
+		<info name="programmer" value="Kim Looney" />
+		<info name="programmer" value="Herb Perez" />
+		<info name="programmer" value="Diane Riendeau" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-11-21. Redumped 2021-08-28 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
@@ -30877,7 +30926,8 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Hayden Book Company</publisher>
 		<info name="developer" value="Imaginative Systems Software" />
-		<info name="programmer" value="Dan Kitchen and Barry Marx" />
+		<info name="programmer" value="Dan Kitchen" />
+		<info name="programmer" value="Barry Marx" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-08-08 -->
@@ -32977,7 +33027,8 @@ license:CC0-1.0
 		<description>Early Emerging Rules: Negation (version 1.0) (4am crack)</description>
 		<year>1990</year>
 		<publisher>Laureate Learning Systems</publisher>
-		<info name="programmer" value="Bernard J. Fox, M.S. and Mary Sweig Wilson, Ph.D." />
+		<info name="programmer" value="Bernard J. Fox, M.S." />
+		<info name="programmer" value="Mary Sweig Wilson, Ph.D." />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -32994,7 +33045,8 @@ license:CC0-1.0
 		<description>Early Emerging Rules: Plurals (version 1.0) (4am crack)</description>
 		<year>1990</year>
 		<publisher>Laureate Learning Systems</publisher>
-		<info name="programmer" value="Bernard J. Fox, M.S. and Mary Sweig Wilson, Ph.D." />
+		<info name="programmer" value="Bernard J. Fox, M.S." />
+		<info name="programmer" value="Mary Sweig Wilson, Ph.D." />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -34393,7 +34445,8 @@ license:CC0-1.0
 		<description>Floppy Teaches: What is Missing? (4am crack)</description>
 		<year>1983</year>
 		<publisher>Floppy Enterprises</publisher>
-		<info name="programmer" value="Priscilla D. Huffman, Ph.D. and Janice M. Keil, Ph.D." />
+		<info name="programmer" value="Priscilla D. Huffman, Ph.D." />
+		<info name="programmer" value="Janice M. Keil, Ph.D." />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-10-21 -->
@@ -35435,7 +35488,7 @@ license:CC0-1.0
 		<description>German Vocabulary Builder (4am crack)</description>
 		<year>1982</year>
 		<publisher> Control Data Corporation</publisher>
-		<info name="developer" value=" Control Data Corporation" />
+		<info name="developer" value="Control Data Corporation" />
 		<info name="usage" value="Requires an Apple ][+ or unenhanced //e." />
 		<!-- Due to programming errors unrelated to copy protection, this program will crash on an enhanced Apple //e or later. -->
 		<sharedfeat name="compatibility" value="A2P,A2E" />
@@ -36234,9 +36287,9 @@ license:CC0-1.0
 		<info name="programmer" value="Hilary Mills" />
 		<info name="programmer" value="Steve Snyder" />
 		<info name="programmer" value="Karen Elliott" />
-		<info name="programmer" value="&#xA; Barbara McCosh" />
+		<info name="programmer" value="Barbara McCosh" />
 		<info name="programmer" value="Louisa Leary" />
-		<info name="programmer" value="&#xA; Sheila Lucas" />
+		<info name="programmer" value="Sheila Lucas" />
 		<info name="programmer" value="Phil Cassel" />
 		<info name="programmer" value="Paula Polley" />
 		<info name="programmer" value="Richard Pels" />
@@ -36312,8 +36365,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Softsmith</publisher>
 		<info name="original_publisher" value="Continental Software" />
-		<info name="programmer" value="Tom" />
-		<info name="programmer" value="Jerry" />
+		<info name="programmer" value="Tom and Jerry" />
 		<info name="usage" value="Runs on any Apple ][ with 48K." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2021-06-26 -->
@@ -37297,7 +37349,7 @@ license:CC0-1.0
 		<publisher>Focus Media</publisher>
 		<info name="programmer" value="Judith J. Waite" />
 		<info name="programmer" value="Ted Costa" />
-		<info name="programmer" value="William J. Dalton Jr." />
+		<info name="programmer" value="William J. Dalton, Jr." />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-11-22 -->
@@ -37342,7 +37394,8 @@ license:CC0-1.0
 		<description>Inca (4am crack)</description>
 		<year>1985</year>
 		<publisher>Hayden Software</publisher>
-		<info name="programmer" value="Joe Emerson and Ken Smith" />
+		<info name="programmer" value="Joe Emerson" />
+		<info name="programmer" value="Ken Smith" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2021-09-17 -->
@@ -44717,7 +44770,7 @@ license:CC0-1.0
 		<publisher>Hartley Courseware</publisher>
 		<info name="programmer" value="Milt Collins" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<info name="version" value=" 08.24.89" />
+		<info name="version" value="08.24.89" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-18 -->
 		<!-- educational program -->
@@ -45094,7 +45147,8 @@ license:CC0-1.0
 		<description>Mystery Mazes Case 1: The Carnival Caper (4am crack)</description>
 		<year>1985</year>
 		<publisher>Educational Activities</publisher>
-		<info name="programmer" value="Stuart Paltrowitz, M.S. and Donna Paltrowitz, M.S." />
+		<info name="programmer" value="Stuart Paltrowitz, M.S." />
+		<info name="programmer" value="Donna Paltrowitz, M.S." />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2016-07-17 -->
@@ -45110,7 +45164,8 @@ license:CC0-1.0
 		<description>Mystery Mazes Case 3: Castle Clues (4am crack)</description>
 		<year>1987</year>
 		<publisher>Educational Activities</publisher>
-		<info name="programmer" value="Stuart Paltrowitz, M.S. and Donna Paltrowitz, M.S." />
+		<info name="programmer" value="Stuart Paltrowitz, M.S." />
+		<info name="programmer" value="Donna Paltrowitz, M.S." />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-03-14 -->
@@ -47881,7 +47936,8 @@ license:CC0-1.0
 		<description>Puzzle Tanks: A Game of Numbers and Logic (4am crack)</description>
 		<year>1984</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="Thomas C. O'Brien and Jim Thomas" />
+		<info name="programmer" value="Thomas C. O'Brien" />
+		<info name="programmer" value="Jim Thomas" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2016-01-17 -->
@@ -48331,7 +48387,8 @@ license:CC0-1.0
 		<description>Rainbow Keyboarding (4am crack)</description>
 		<year>1986</year>
 		<publisher>Scholastic</publisher>
-		<info name="programmer" value="Trisha Adkins Ainsa, Ph.D. and Rick Thompson" />
+		<info name="programmer" value="Trisha Adkins Ainsa, Ph.D." />
+		<info name="programmer" value="Rick Thompson" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-02-27 -->
@@ -48923,7 +48980,8 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Scott, Foresman and Company</publisher>
 		<info name="developer" value="Learning to Learn Software" />
-		<info name="programmer" value="Reid J. Daitzman, Ph.D. and Andrew G. Singer" />
+		<info name="programmer" value="Reid J. Daitzman, Ph.D." />
+		<info name="programmer" value="Andrew G. Singer" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-05-04. Redumped: 2021-08-28 -->
@@ -48950,7 +49008,8 @@ license:CC0-1.0
 		<!-- Scott, Foresman and Company -->
 		<info name="alt_title" value="Mindscape School Group's: Reading Workshop: Grade 5" />
 		<info name="developer" value="Learning to Learn Software" />
-		<info name="programmer" value="Reid J. Daitzman, Ph.D. and Andrew G. Singer" />
+		<info name="programmer" value="Reid J. Daitzman, Ph.D." />
+		<info name="programmer" value="Andrew G. Singer" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-03-13 -->
@@ -49006,7 +49065,8 @@ license:CC0-1.0
 		<!-- Scott, Foresman and Company -->
 		<info name="alt_title" value="Mindscape School Group's: Reading Workshop: Grade 6" />
 		<info name="developer" value="Learning to Learn Software" />
-		<info name="programmer" value="Reid J. Daitzman, Ph.D. and Andrew G. Singer" />
+		<info name="programmer" value="Reid J. Daitzman, Ph.D." />
+		<info name="programmer" value="Andrew G. Singer" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-06-14 -->
@@ -49060,7 +49120,8 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Scott, Foresman and Company</publisher>
 		<info name="developer" value="Learning to Learn Software" />
-		<info name="programmer" value="Reid J. Daitzman, Ph.D. and Andrew G. Singer" />
+		<info name="programmer" value="Reid J. Daitzman, Ph.D." />
+		<info name="programmer" value="Andrew G. Singer" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-09-23. Redumped: 2021-08-28 -->
@@ -50232,7 +50293,8 @@ license:CC0-1.0
 		<description>Safari Search: Problem Solving and Inference (version 1985) (4am crack)</description>
 		<year>1985</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="Thomas C. O'Brien and Jim Thomas" />
+		<info name="programmer" value="Thomas C. O'Brien" />
+		<info name="programmer" value="Jim Thomas" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="1985" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -50249,7 +50311,8 @@ license:CC0-1.0
 		<description>Safari Search (version 1987.08.24) (4am crack)</description>
 		<year>1987</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="Thomas C. O'Brien and Jim Thomas" />
+		<info name="programmer" value="Thomas C. O'Brien" />
+		<info name="programmer" value="Jim Thomas" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="1987.08.24" />
 		<!-- This version, dated 1987-08-24 in source code comments, fixes several bugs in the KITTENS program. -->
@@ -51317,7 +51380,8 @@ license:CC0-1.0
 		<description>Simple Sentence Structure (4am crack)</description>
 		<year>1994</year>
 		<publisher>Laureate Learning Systems</publisher>
-		<info name="programmer" value="Bernard J. Fox, M.S. and Mary Sweig Wilson, Ph.D." />
+		<info name="programmer" value="Bernard J. Fox, M.S." />
+		<info name="programmer" value="Mary Sweig Wilson, Ph.D." />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-09-21 -->
@@ -51526,7 +51590,7 @@ license:CC0-1.0
 		<info name="programmer" value="Tom Snyder" />
 		<info name="programmer" value="Karen Eagen" />
 		<info name="programmer" value="Karen Whittredge" />
-		<info name="programmer" value="Chris A. Lutes Jr." />
+		<info name="programmer" value="Chris A. Lutes, Jr." />
 		<info name="programmer" value="Kathy Lunt" />
 		<info name="programmer" value="Bruce Brown" />
 		<info name="programmer" value="David Beyer" />
@@ -51550,7 +51614,7 @@ license:CC0-1.0
 		<info name="programmer" value="Tom Snyder" />
 		<info name="programmer" value="Karen Eagen" />
 		<info name="programmer" value="Karen Whittredge" />
-		<info name="programmer" value="Chris A. Lutes Jr." />
+		<info name="programmer" value="Chris A. Lutes, Jr." />
 		<info name="programmer" value="Kathy Lunt" />
 		<info name="programmer" value="Bruce Brown" />
 		<info name="programmer" value="David Beyer" />
@@ -52231,7 +52295,8 @@ license:CC0-1.0
 		<description>Spanish Grammar Review: Familiar and Formal Commands in the Affirmative and Negative (4am crack)</description>
 		<year>1984</year>
 		<publisher>Gessler Educational Software</publisher>
-		<info name="programmer" value="Dr. José Montero and Michele Gottlieb" />
+		<info name="programmer" value="Dr. José Montero" />
+		<info name="programmer" value="Michele Gottlieb" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-08-29 -->
@@ -52247,7 +52312,8 @@ license:CC0-1.0
 		<description>Spanish Grammar Review: Future and Conditional Tenses of Regular and Irregular Verbs (4am crack)</description>
 		<year>1984</year>
 		<publisher>Gessler Educational Software</publisher>
-		<info name="programmer" value="Dr. José Montero and Michele Gottlieb" />
+		<info name="programmer" value="Dr. José Montero" />
+		<info name="programmer" value="Michele Gottlieb" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-08-29 -->
@@ -52263,7 +52329,8 @@ license:CC0-1.0
 		<description>Spanish Grammar Review: Por vs. Para (4am crack)</description>
 		<year>1984</year>
 		<publisher>Gessler Educational Software</publisher>
-		<info name="programmer" value="Dr. José Montero and Michele Gottlieb" />
+		<info name="programmer" value="Dr. José Montero" />
+		<info name="programmer" value="Michele Gottlieb" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2014-11-20 -->
@@ -54444,7 +54511,18 @@ license:CC0-1.0
 		<info name="programmer" value="John Leupp" />
 		<info name="programmer" value="Kevin Norman" />
 		<info name="programmer" value="Larry Clague" />
-		<info name="programmer" value="Scott Nelson; ported to the Apple ][ by John Stouffer, Jeff Webb, Doug Matson, Greg Broniak, Tim Grost, Matt Decker, Vera Petrusha, Ken Evans, Dr. Keith Dreyer, and Chris Oesterling" />
+		<info name="programmer" value="Scott Nelson" />
+		<!-- see #14146 below marked as "ported to the Apple ][ by" -->
+		<info name="programmer" value="John Stouffer" />
+		<info name="programmer" value="Jeff Webb" />
+		<info name="programmer" value="Doug Matson" />
+		<info name="programmer" value="Greg Broniak" />
+		<info name="programmer" value="Tim Grost" />
+		<info name="programmer" value="Matt Decker" />
+		<info name="programmer" value="Vera Petrusha" />
+		<info name="programmer" value="Ken Evans" />
+		<info name="programmer" value="Dr. Keith Dreyer" />
+		<info name="programmer" value="Chris Oesterling" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2016-09-05. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
@@ -55039,7 +55117,8 @@ license:CC0-1.0
 		<description>Targets: A Number Game (4am crack)</description>
 		<year>1985</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="T.C. O'Brien II and Andrew Lorenz" />
+		<info name="programmer" value="T.C. O'Brien II" />
+		<info name="programmer" value="Andrew Lorenz" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2014-08-20 -->
@@ -55109,7 +55188,8 @@ license:CC0-1.0
 		<description>Teasers by Tobbs with Integers (4am crack)</description>
 		<year>1989</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="Tom O'Brien and James Kim" />
+		<info name="programmer" value="Tom O'Brien" />
+		<info name="programmer" value="James Kim" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-04-13 -->
@@ -55185,7 +55265,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Jostens Learning Corporation</publisher>
 		<info name="programmer" value="Janis Stevenson" />
-		<info name="programmer" value="Henry F. Olds Jr." />
+		<info name="programmer" value="Henry F. Olds, Jr." />
 		<info name="programmer" value="Laura F. Koller" />
 		<info name="programmer" value="Betty Bardige" />
 		<info name="programmer" value="Jon Madian" />
@@ -56330,7 +56410,7 @@ license:CC0-1.0
 		<info name="programmer" value="Carl Mey" />
 		<info name="programmer" value="Scott Nelson" />
 		<info name="programmer" value="Kevin Norman" />
-		<info name="programmer" value="Edwin W. Reich Jr." />
+		<info name="programmer" value="Edwin W. Reich, Jr." />
 		<info name="programmer" value="Al Rubin" />
 		<info name="programmer" value="Chuck Sommerville" />
 		<info name="programmer" value="Steve A. Baker" />
@@ -56692,7 +56772,9 @@ license:CC0-1.0
 		<description>The King's Rule: Mathematics and Discovery (4am crack)</description>
 		<year>1984</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="Tom O'Brien, Tom Raich, and Mike Fish" />
+		<info name="programmer" value="Tom O'Brien" />
+		<info name="programmer" value="Tom Raich" />
+		<info name="programmer" value="Mike Fish" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2016-01-13 -->
@@ -56906,7 +56988,10 @@ license:CC0-1.0
 		<publisher>Program Design</publisher>
 		<info name="developer" value="Professional Software Services" />
 		<info name="programmer" value="Dick Dramstad" />
-		<info name="programmer" value="Tom O'Sullivan, Kirk Wennerstrom, Dee Williams and Jerry Williams" />
+		<info name="programmer" value="Tom O'Sullivan" />
+		<info name="programmer" value="Kirk Wennerstrom" />
+		<info name="programmer" value="Dee Williams" />
+		<info name="programmer" value="Jerry Williams" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-12-12 -->
@@ -57362,7 +57447,8 @@ license:CC0-1.0
 		<description>The Royal Rules (revision 1) (4am crack)</description>
 		<year>1986</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="Tom O'Brien and Raoul Watson" />
+		<info name="programmer" value="Tom O'Brien" />
+		<info name="programmer" value="Raoul Watson" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -57386,7 +57472,8 @@ license:CC0-1.0
 		<description>The Royal Rules (revision 2) (4am crack)</description>
 		<year>1986</year>
 		<publisher>Sunburst Communications</publisher>
-		<info name="programmer" value="Tom O'Brien and Raoul Watson" />
+		<info name="programmer" value="Tom O'Brien" />
+		<info name="programmer" value="Raoul Watson" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="revision 2" />
 		<!-- This version has additional security-related code in the STARTUP program, indicating a later revision. There is no visible versioning and no date/time metadata in the disk catalog. -->
@@ -58350,7 +58437,12 @@ license:CC0-1.0
 		<description>The Wizard of Oz (4am crack)</description>
 		<year>1985</year>
 		<publisher>Windham Classics</publisher>
-		<info name="programmer" value="Ruth Wick, Ralph Hebb, Dan Mydlack, Mitch Stein, Howard Boles, and Seth Godin" />
+		<info name="programmer" value="Ruth Wick" />
+		<info name="programmer" value="Ralph Hebb" />
+		<info name="programmer" value="Dan Mydlack" />
+		<info name="programmer" value="Mitch Stein" />
+		<info name="programmer" value="Howard Boles" />
+		<info name="programmer" value="Seth Godin" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-03-13. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
@@ -58831,7 +58923,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
 		<info name="author" value="Mercer Mayer"/>
-		<info name="developer" value=" Angelsoft" />
+		<info name="developer" value="Angelsoft" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-08-11 -->
@@ -58848,7 +58940,7 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 		<info name="author" value="Mercer Mayer"/>
-		<info name="developer" value=" Angelsoft" />
+		<info name="developer" value="Angelsoft" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-05-30.  Redumped: 2021-08-28 due to subtle timing differece between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
@@ -58865,7 +58957,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
 		<info name="author" value="Mercer Mayer"/>
-		<info name="developer" value=" Angelsoft" />
+		<info name="developer" value="Angelsoft" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-06-01.  Redumped: 2021-08-28 due to subtle timing differece between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
@@ -58882,7 +58974,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
 		<info name="author" value="Mercer Mayer"/>
-		<info name="developer" value=" Angelsoft" />
+		<info name="developer" value="Angelsoft" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-09-02. Redumped: 2021-08-28 due to subtle timing differece between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
@@ -59250,7 +59342,11 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Windham Classics</publisher>
 		<info name="developer" value="Byron Preiss Video Productions" />
-		<info name="programmer" value="Michael P. Meyer, John Pierard, Ann Weil, Andre Garneau, and Lee Jacknow" />
+		<info name="programmer" value="Michael P. Meyer" />
+		<info name="programmer" value="John Pierard" />
+		<info name="programmer" value="Ann Weil" />
+		<info name="programmer" value="Andre Garneau" />
+		<info name="programmer" value="Lee Jacknow" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-10-03. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
