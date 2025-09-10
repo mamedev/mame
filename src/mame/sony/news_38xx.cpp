@@ -116,13 +116,7 @@ public:
 			{INPUT_LINE_IRQ4, {iop_irq::LANCE, iop_irq::SCSI0, iop_irq::SCSI1, iop_irq::CPU, iop_irq::UBUS}},
 			{INPUT_LINE_IRQ5, {iop_irq::SCC, iop_irq::KEYBOARD, iop_irq::MOUSE}},
 			{INPUT_LINE_IRQ6, {iop_irq::TIMER}},
-			{INPUT_LINE_IRQ7, {iop_irq::FDCDRQ, iop_irq::PERR}}}),
-		cpu_irq_line_map({
-			{INPUT_LINE_IRQ0, cpu_irq::UBUS},
-			{INPUT_LINE_IRQ1, cpu_irq::IOP},
-			{INPUT_LINE_IRQ2, cpu_irq::TIMER},
-			{INPUT_LINE_IRQ4, cpu_irq::WRBERR},
-			{INPUT_LINE_IRQ5, cpu_irq::PERR}})
+			{INPUT_LINE_IRQ7, {iop_irq::FDCDRQ, iop_irq::PERR}}})
 	{
 	}
 
@@ -193,8 +187,14 @@ protected:
 	};
 
 	static constexpr std::array CPU_IRQ_NAMES = {"UBUS"sv, "IOP"sv, "TIMER"sv, "FPA"sv, "WRBERR"sv, "PERR"sv};
-	static constexpr u32 CPU_NMI_MASK = 1 << (u32)cpu_irq::WRBERR |
-										1 << (u32)cpu_irq::IOP;
+	static constexpr u32 CPU_NMI_MASK = 1 << (u32)cpu_irq::WRBERR | 1 << (u32)cpu_irq::IOP;
+	static constexpr size_t CPU_LINE_COUNT = 5; // FPA is handled separately
+	static constexpr std::array<std::pair<int, cpu_irq>, CPU_LINE_COUNT> CPU_IRQ_LINES = {
+		std::make_pair(INPUT_LINE_IRQ0, cpu_irq::UBUS),
+		std::make_pair(INPUT_LINE_IRQ1, cpu_irq::IOP),
+		std::make_pair(INPUT_LINE_IRQ2, cpu_irq::TIMER),
+		std::make_pair(INPUT_LINE_IRQ4, cpu_irq::WRBERR),
+		std::make_pair(INPUT_LINE_IRQ5, cpu_irq::PERR)};
 
 	template<iop_irq Number>
 	void irq_w(u8 state);
@@ -284,7 +284,6 @@ protected:
 	u32 m_iop_inten = 0;
 
 	// CPU IRQ state
-	const std::map<int, cpu_irq> cpu_irq_line_map;
 	u32 m_cpu_intst = 0;
 	u32 m_cpu_inten = 0;
 };
@@ -514,13 +513,13 @@ u8 news_38xx_state::iop_ipc_intst_r()
 
 u8 news_38xx_state::park_status_r()
 {
-	const u8 park_status = m_parallel_fault ? 0x40 : 0x0 |
-						   m_serial[0]->dsr_r() ? 0x20 :0x0 |
-						   m_parallel_busy ? 0x10 : 0x0 |
-						   !is_irq_set<iop_irq::PARALLEL>() ? 0x8 : 0x0 |
-						   m_serial[0]->ri_r() ? 0x4 : 0x0 |
-						   m_serial[1]->dsr_r() ? 0x2 : 0x0 |
-						   m_serial[1]->ri_r() ? 0x1 : 0x0;
+	const u8 park_status = (m_parallel_fault ? 0x40 : 0x0) |
+						   (m_serial[0]->dsr_r() ? 0x20 : 0x0) |
+						   (m_parallel_busy ? 0x10 : 0x0) |
+						   (!is_irq_set<iop_irq::PARALLEL>() ? 0x8 : 0x0) |
+						   (m_serial[0]->ri_r() ? 0x4 : 0x0) |
+						   (m_serial[1]->dsr_r() ? 0x2 : 0x0) |
+						   (m_serial[1]->ri_r() ? 0x1 : 0x0);
 	LOGMASKED(LOG_INTERRUPT, "%s park_status_r: 0x%x\n", machine().describe_context(), park_status);
 	return park_status;
 }
@@ -669,7 +668,7 @@ bool news_38xx_state::is_irq_set()
 void news_38xx_state::int_check_cpu()
 {
 	const u32 active_irq = m_cpu_intst & (m_cpu_inten | CPU_NMI_MASK);
-	for (const auto &[input_line, irq_input]: cpu_irq_line_map)
+	for (const auto &[input_line, irq_input]: CPU_IRQ_LINES)
 	{
 		// Update input pin status if it has changed
 		const bool state = BIT(active_irq, (u32)irq_input);
