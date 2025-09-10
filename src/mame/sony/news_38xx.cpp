@@ -108,15 +108,7 @@ public:
 		m_parallel(*this, "parallel"),
 		m_parallel_data(*this, "parallel_data"),
 		m_eprom(*this, "eprom"),
-		m_led(*this, "led%u", 0U),
-		iop_irq_line_map({
-			{INPUT_LINE_IRQ1, {iop_irq::AST}},
-			{INPUT_LINE_IRQ2, {iop_irq::SOFTINTR}},
-			{INPUT_LINE_IRQ3, {iop_irq::FDCIRQ, iop_irq::PARALLEL, iop_irq::SLOT}},
-			{INPUT_LINE_IRQ4, {iop_irq::LANCE, iop_irq::SCSI0, iop_irq::SCSI1, iop_irq::CPU, iop_irq::UBUS}},
-			{INPUT_LINE_IRQ5, {iop_irq::SCC, iop_irq::KEYBOARD, iop_irq::MOUSE}},
-			{INPUT_LINE_IRQ6, {iop_irq::TIMER}},
-			{INPUT_LINE_IRQ7, {iop_irq::FDCDRQ, iop_irq::PERR}}})
+		m_led(*this, "led%u", 0U)
 	{
 	}
 
@@ -175,6 +167,14 @@ protected:
 										1 << (u32)iop_irq::SLOT |
 										1 << (u32)iop_irq::SOFTINTR |
 										1 << (u32)iop_irq::AST;
+	static constexpr std::array IOP_LINE_MASK = {
+		std::make_pair(INPUT_LINE_IRQ1, 1 << (u32)iop_irq::AST),
+		std::make_pair(INPUT_LINE_IRQ2, 1 << (u32)iop_irq::SOFTINTR),
+		std::make_pair(INPUT_LINE_IRQ3, 1 << (u32)iop_irq::FDCIRQ | 1 << (u32)iop_irq::PARALLEL | 1 << (u32)iop_irq::SLOT),
+		std::make_pair(INPUT_LINE_IRQ4, 1 << (u32)iop_irq::LANCE | 1 << (u32)iop_irq::SCSI0 | 1 << (u32)iop_irq::SCSI1 | 1 << (u32)iop_irq::CPU | 1 << (u32)iop_irq::UBUS),
+		std::make_pair(INPUT_LINE_IRQ5, 1 << (u32)iop_irq::SCC | 1 << (u32)iop_irq::KEYBOARD | 1 << (u32)iop_irq::MOUSE),
+		std::make_pair(INPUT_LINE_IRQ6, 1 << (u32)iop_irq::TIMER),
+		std::make_pair(INPUT_LINE_IRQ7, 1 << (u32)iop_irq::FDCDRQ | 1 << (u32)iop_irq::PERR)};
 
 	enum class cpu_irq : unsigned
 	{
@@ -188,8 +188,7 @@ protected:
 
 	static constexpr std::array CPU_IRQ_NAMES = {"UBUS"sv, "IOP"sv, "TIMER"sv, "FPA"sv, "WRBERR"sv, "PERR"sv};
 	static constexpr u32 CPU_NMI_MASK = 1 << (u32)cpu_irq::WRBERR | 1 << (u32)cpu_irq::IOP;
-	static constexpr size_t CPU_LINE_COUNT = 5; // FPA is handled separately
-	static constexpr std::array<std::pair<int, cpu_irq>, CPU_LINE_COUNT> CPU_IRQ_LINES = {
+	static constexpr std::array CPU_IRQ_LINES = {
 		std::make_pair(INPUT_LINE_IRQ0, cpu_irq::UBUS),
 		std::make_pair(INPUT_LINE_IRQ1, cpu_irq::IOP),
 		std::make_pair(INPUT_LINE_IRQ2, cpu_irq::TIMER),
@@ -278,7 +277,6 @@ protected:
 	u32 m_wrbeadr = 0;
 
 	// IOP IRQ state
-	const std::map<int, std::vector<iop_irq> > iop_irq_line_map;
 	bool m_scc_irq_state = false;
 	u32 m_iop_intst = 0;
 	u32 m_iop_inten = 0;
@@ -585,14 +583,10 @@ bool news_38xx_state::is_irq_set()
 void news_38xx_state::int_check_iop()
 {
 	const u32 active_irq = m_iop_intst & (m_iop_inten | IOP_NMI_MASK);
-	for (const auto &[input_line, irq_inputs]: iop_irq_line_map)
+	for (const auto &[input_line, line_mask]: IOP_LINE_MASK)
 	{
 		// Calculate state of input pin (logical OR of all attached inputs)
-		bool state = false;
-		for (auto irq_input: irq_inputs)
-		{
-			state |= active_irq & 1 << (u32)irq_input;
-		}
+		const bool state = active_irq & line_mask;
 
 		// Update input pin status if it has changed
 		if (m_iop->input_line_state(input_line) != state)
