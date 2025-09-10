@@ -24,7 +24,7 @@ K-665 sound chip (Oki M6295 clone)
 
 
 TODO:
-- hook up RAMDAC devices / colors;
+- color bug with faces spinning in gameplay (another bitswap meme?)
 - audio CPU ROM banking;
 - CRTC?;
 - inputs;
@@ -53,7 +53,8 @@ TODO:
 // configurable logging
 #define LOG_PORTS     (1U << 1)
 
-//#define VERBOSE (LOG_GENERAL | LOG_PORTS)
+#define VERBOSE (LOG_GENERAL | LOG_PORTS)
+//#define LOG_OUTPUT_FUNC osd_printf_error
 
 #include "logmacro.h"
 
@@ -151,22 +152,16 @@ TILE_GET_INFO_MEMBER(whtm68k_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(whtm68k_state::get_fg_tile_info)
 {
-	uint16_t const tile = ((m_fgram[tile_index] & 0xfff) | 0x1000); // TODO: actually find tile bank
-	uint16_t const color = (m_fgram[tile_index] & 0xf000) >> 12;
-//	uint16_t const attr = m_fg_attr[tile_index];
-
-//	tileinfo.category = BIT(attr, 4);
-	tileinfo.set(0, tile, color | 0x10, 0);
+	uint16_t const tile = ((m_fgram[tile_index] & 0xfff));
+	tileinfo.set(1, tile, 0, 0);
 }
 
 uint32_t whtm68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// TODO: mixing between the two layers
-	// register in RAMDACs selecting this?
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 
 	return 0;
@@ -195,10 +190,19 @@ void whtm68k_state::main_program_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x800001, 0x800001).rw(m_crtc, FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));
 	map(0x800003, 0x800003).rw(m_crtc, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
-	map(0x800101, 0x800101).w(m_ramdac[0], FUNC(ramdac_device::index_w));
+	map(0x800101, 0x800101).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			// assumed, no access beyond auto-increments
+			m_ramdac[0]->index_w(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
+		})
+	);
 	map(0x800103, 0x800103).w(m_ramdac[0], FUNC(ramdac_device::mask_w));
 	map(0x800105, 0x800105).w(m_ramdac[0], FUNC(ramdac_device::pal_w));
-	map(0x800201, 0x800201).w(m_ramdac[1], FUNC(ramdac_device::index_w));
+	map(0x800201, 0x800201).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			m_ramdac[1]->index_w(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
+		})
+	);
 	map(0x800203, 0x800203).w(m_ramdac[1], FUNC(ramdac_device::mask_w));
 	map(0x800205, 0x800205).w(m_ramdac[1], FUNC(ramdac_device::pal_w));
 	map(0x810002, 0x810003).portr("IN0");
@@ -211,7 +215,9 @@ void whtm68k_state::main_program_map(address_map &map)
 	map(0xd24000, 0xd24001).ram(); // unknown, set once during POST with 0x42
 	map(0xe00000, 0xe03fff).ram(); // work RAM?
 	map(0xe10000, 0xe10fff).ram().share("nvram");
-	map(0xe30000, 0xe30001).nopr(); // TODO: read continuously during gameplay
+	 // TODO: read continuously during gameplay
+	 // branches with 0xaa, 0xbb, 0xcc and 0xee at PC=824c, once per frame
+	map(0xe30001, 0xe30001).lr8(NAME([this] (offs_t offset) { return m_screen->frame_number(); }));
 }
 
 void whtm68k_state::audio_program_map(address_map &map)
@@ -231,10 +237,9 @@ void whtm68k_state::audio_io_map(address_map &map)
 template <uint8_t Which>
 void whtm68k_state::ramdac_map(address_map &map)
 {
-	// TODO: unchecked bits 0-1, check writes to RAMDAC[1] at 0xfe-0xff
 	map(0x000, 0x2ff).lrw8(
 		NAME([this] (offs_t offset)  {
-			return bitswap<6>(m_ramdac[Which]->ramdac_pal_r(offset), 2, 3, 4, 5, 6, 7);
+			return bitswap<6>(m_ramdac[Which]->ramdac_pal_r(offset), 2, 3, 4, 5, 6, 7) << 2;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_ramdac[Which]->ramdac_rgb666_w(offset, bitswap<6>(data, 2, 3, 4, 5, 6, 7));
@@ -307,8 +312,21 @@ const gfx_layout gfx_8x8x4_packed_msb_r =
 	8*8*4
 };
 
+const gfx_layout gfx_8x8x8_packed_msb_r =
+{
+	8,8,
+	RGN_FRAC(1,2),
+	8,
+	{ 0, 1, 2, 3, RGN_FRAC(1, 2)+0, RGN_FRAC(1, 2)+1, RGN_FRAC(1, 2)+2, RGN_FRAC(1, 2)+3 },
+	{ 4, 0, 28, 24, 20, 16, 12, 8 },
+	{ STEP8(0,4*8) },
+	8*8*4
+};
+
+
 static GFXDECODE_START( gfx_wht )
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb_r, 0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb_r, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x8_packed_msb_r, 0x100, 1 )
 GFXDECODE_END
 
 
@@ -324,7 +342,7 @@ void whtm68k_state::yizhix(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &whtm68k_state::audio_program_map);
 	audiocpu.set_addrmap(AS_IO, &whtm68k_state::audio_io_map);
 	audiocpu.port_in_cb<0>().set([this] () { LOGPORTS("%s: 80C32 port 0 read\n", machine().describe_context()); return 0; });
-	audiocpu.port_in_cb<1>().set([this] () { LOGPORTS("%s: 80C32 port 1 read\n", machine().describe_context()); return 0; }); // TODO: read all the time
+	audiocpu.port_in_cb<1>().set([this] () { (void)this; /*LOGPORTS("%s: 80C32 port 1 read\n", machine().describe_context());*/ return 0; }); // TODO: read all the time
 	audiocpu.port_in_cb<2>().set([this] () { LOGPORTS("%s: 80C32 port 2 read\n", machine().describe_context()); return 0; });
 	audiocpu.port_in_cb<3>().set([this] () { LOGPORTS("%s: 80C32 port 3 read\n", machine().describe_context()); return 0; });
 	audiocpu.port_out_cb<0>().set([this] (uint8_t data) { LOGPORTS("%s: 80C32 port 0 write %02x\n", machine().describe_context(), data); });
@@ -375,10 +393,12 @@ ROM_START( yizhix )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "chs_m.u74", 0x00000, 0x20000, CRC(b0c030df) SHA1(0cd388dc39004a41cc58ebedab32cc45e338f64b) )
 
-	ROM_REGION( 0x60000, "tiles", 0 )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "chs_v1.u50", 0x00000, 0x20000, CRC(dde0d62b) SHA1(bbf0d7dadbeec9036c20a4dfd64a8276c4ff1664) )
-	ROM_LOAD( "chs_v2.u54", 0x20000, 0x20000, CRC(347db59c) SHA1(532d5621ea45fe569e37612f99fed46e6b6fe377) ) // the u54 socket is between u50 and u53 on PCB
-	ROM_LOAD( "chs_v3.u53", 0x40000, 0x20000, CRC(36353ce4) SHA1(427c9b946398a38afae850c199438808eee96d80) )
+
+	ROM_REGION( 0x40000, "gfx2", 0)
+	ROM_LOAD( "chs_v2.u54", 0x00000, 0x20000, CRC(347db59c) SHA1(532d5621ea45fe569e37612f99fed46e6b6fe377) ) // the u54 socket is between u50 and u53 on PCB
+	ROM_LOAD( "chs_v3.u53", 0x20000, 0x20000, CRC(36353ce4) SHA1(427c9b946398a38afae850c199438808eee96d80) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "chs_s.u34", 0x00000, 0x20000, CRC(e8492df9) SHA1(08be7cd33b751d56ec830240840adfd841b3af93) ) // 1xxxxxxxxxxxxxxxx = 0x00, very few samples
@@ -387,4 +407,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1996, yizhix,  0, yizhix, yizhix,  whtm68k_state, empty_init, ROT0, "WHT", "Yizhi Xiangqi", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // 1996 WHT copyright in GFX
+GAME( 1996, yizhix,  0, yizhix, yizhix,  whtm68k_state, empty_init, ROT0, "WHT", "Yizhi Xiangqi", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // 1996 WHT copyright in GFX

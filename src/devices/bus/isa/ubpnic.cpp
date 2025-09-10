@@ -281,37 +281,6 @@ void isa8_ubpnic_device::intctl_w(u8 data)
 	// clear disabled interrupts
 	m_intstat |= (~data) & INTCTL_ALL;
 
-#if false
-	// TRCINT - clear by disable
-	if (!(m_intstat & INTSTAT_TRCINT) && !(data & INTCTL_TRCIE))
-		m_intstat |= INTSTAT_TRCINT;
-
-	// PAVINT - clear by disable
-	if (!(m_intstat & INTSTAT_PAVINT) && !(data & INTCTL_PAVIE))
-		m_intstat |= INTSTAT_PAVINT;
-
-	// SFTINT - assert/clear by enable/disable
-	if (!(m_intstat & INTSTAT_SFTINT) && !(data & INTCTL_SFTIE))
-		m_intstat |= INTSTAT_SFTINT;
-	else if ((m_intstat & INTSTAT_SFTINT) && (data & INTCTL_SFTIE))
-		m_intstat &= ~INTSTAT_SFTINT;
-
-	// TIMINT - start/clear by enable/disable
-	if (!(m_intctl & INTCTL_TIMIE) && (data & INTCTL_TIMIE))
-	{
-		// timer is multiple of 9.15ms
-		attotime const period = attotime::from_double(0.00915 * m_w14->read());
-
-		m_timer->adjust(period, 1, period);
-	}
-	else if (!(m_intstat & INTSTAT_TIMINT) && !(data & INTCTL_TIMIE))
-	{
-		// TIMINT - clear by disable
-		m_timer->reset();
-
-		m_intstat |= INTSTAT_TIMINT;
-	}
-#else
 	// assert enabled software interrupt
 	if (data & INTCTL_SFTIE)
 		m_intstat &= ~INTSTAT_SFTINT;
@@ -329,7 +298,6 @@ void isa8_ubpnic_device::intctl_w(u8 data)
 		else
 			m_timer->reset();
 	}
-#endif
 
 	m_intctl = data;
 

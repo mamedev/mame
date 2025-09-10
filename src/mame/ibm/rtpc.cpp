@@ -94,6 +94,7 @@
 // busses and connectors
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/isa/5080pa.h"
 #include "bus/isa/amgda.h"
 #include "bus/isa/ega.h"
 #include "bus/isa/fdc.h"
@@ -490,6 +491,7 @@ void rtpc_isa8_cards(device_slot_interface &device)
 
 void rtpc_isa16_cards(device_slot_interface &device)
 {
+	device.option_add("5080pa", ISA16_5080PA);
 	device.option_add("amgda", ISA16_AMGDA);
 	device.option_add("ide", ISA16_IDE);
 
