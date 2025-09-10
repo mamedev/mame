@@ -145,14 +145,6 @@ public:
 	void init_common();
 
 protected:
-	// Hardware-enforced test-and-set access to RAM
-	u32 ram_tas_r(offs_t offset, u32 mem_mask);
-	void ram_tas_w(offs_t offset, u32 data, u32 mem_mask);
-
-	u8 iop_intst_r();
-	u8 iop_ipc_intst_r();
-	u8 park_status_r();
-
 	// Not all IRQs feed into the status register directly
 	// Because we have to handle IRQ data being stored everywhere and/or apply filtering to the status register,
 	// apply the same strategy used in news_68k_iop, which also had to deal with this problem.
@@ -190,14 +182,6 @@ protected:
 										1 << (u32)iop_irq::SOFTINTR |
 										1 << (u32)iop_irq::AST;
 
-	template<iop_irq Number>
-	void irq_w(u8 state);
-	template<iop_irq Number>
-	void inten_w(u8 state);
-	template<iop_irq Number>
-	bool is_irq_set();
-	void int_check_iop();
-
 	enum class cpu_irq : unsigned
 	{
 		UBUS = 0, // Interprocessor communication interrupt from UPU
@@ -212,6 +196,14 @@ protected:
 	static constexpr u32 CPU_NMI_MASK = 1 << (u32)cpu_irq::WRBERR |
 										1 << (u32)cpu_irq::IOP;
 
+	template<iop_irq Number>
+	void irq_w(u8 state);
+	template<iop_irq Number>
+	void inten_w(u8 state);
+	template<iop_irq Number>
+	bool is_irq_set();
+	void int_check_iop();
+
 	template<cpu_irq Number>
 	void irq_w(u8 state);
 	template<cpu_irq Number>
@@ -220,7 +212,14 @@ protected:
 	bool is_irq_set();
 	void int_check_cpu();
 
+	// Hardware-enforced test-and-set access to RAM
+	u32 ram_tas_r(offs_t offset, u32 mem_mask);
+	void ram_tas_w(offs_t offset, u32 data, u32 mem_mask);
+
 	// IOP platform hardware
+	u8 iop_intst_r();
+	u8 iop_ipc_intst_r();
+	u8 park_status_r();
 	u32 iop_bus_error_r();
 	void poweron_w(u8 data);
 	void romdis_w(u8 data);
