@@ -91,47 +91,45 @@ class news_38xx_state : public driver_device
 public:
 	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
 
-	news_38xx_state(machine_config const &mconfig, device_type type, char const *tag)
-		: driver_device(mconfig, type, tag)
-		  , m_cpu(*this, "cpu")
-		  , m_iop(*this, "iop")
-		  , m_ram(*this, "ram")
-		  , m_dma(*this, "dma%u", 0U)
-		  , m_rtc(*this, "rtc")
-		  , m_scc(*this, "scc")
-		  , m_net(*this, "net")
-		  , m_fdc(*this, "fdc")
-		  , m_hid(*this, "hid")
-		  , m_scsi(*this, "scsi%u:7:cxd1180", 0U)
-		  , m_serial(*this, "serial%u", 0U)
-		  , m_scsibus(*this, "scsi%u", 0U)
-		  , m_parallel(*this, "parallel")
-		  , m_parallel_data(*this, "parallel_data")
-		  , m_eprom(*this, "eprom")
-		  , m_led(*this, "led%u", 0U)
-		  , iop_irq_line_map({
-			  {INPUT_LINE_IRQ1, {iop_irq::AST}},
-			  {INPUT_LINE_IRQ2, {iop_irq::SOFTINTR}},
-			  {INPUT_LINE_IRQ3, {iop_irq::FDCIRQ, iop_irq::PARALLEL, iop_irq::SLOT}},
-			  {INPUT_LINE_IRQ4, {iop_irq::LANCE, iop_irq::SCSI0, iop_irq::SCSI1, iop_irq::CPU, iop_irq::UBUS}},
-			  {INPUT_LINE_IRQ5, {iop_irq::SCC, iop_irq::KEYBOARD, iop_irq::MOUSE}},
-			  {INPUT_LINE_IRQ6, {iop_irq::TIMER}},
-			  {INPUT_LINE_IRQ7, {iop_irq::FDCDRQ, iop_irq::PERR}}
-		  })
-		  , cpu_irq_line_map({
-			  {INPUT_LINE_IRQ0, cpu_irq::UBUS},
-			  {INPUT_LINE_IRQ1, cpu_irq::IOP},
-			  {INPUT_LINE_IRQ2, cpu_irq::TIMER},
-			  {INPUT_LINE_IRQ4, cpu_irq::WRBERR},
-			  {INPUT_LINE_IRQ5, cpu_irq::PERR}
-		  })
+	news_38xx_state(machine_config const &mconfig, device_type type, char const *tag) :
+		driver_device(mconfig, type, tag),
+		m_cpu(*this, "cpu"),
+		m_iop(*this, "iop"),
+		m_ram(*this, "ram"),
+		m_dma(*this, "dma%u", 0U),
+		m_rtc(*this, "rtc"),
+		m_scc(*this, "scc"),
+		m_net(*this, "net"),
+		m_fdc(*this, "fdc"),
+		m_hid(*this, "hid"),
+		m_scsi(*this, "scsi%u:7:cxd1180", 0U),
+		m_serial(*this, "serial%u", 0U),
+		m_scsibus(*this, "scsi%u", 0U),
+		m_parallel(*this, "parallel"),
+		m_parallel_data(*this, "parallel_data"),
+		m_eprom(*this, "eprom"),
+		m_led(*this, "led%u", 0U),
+		iop_irq_line_map({
+			{INPUT_LINE_IRQ1, {iop_irq::AST}},
+			{INPUT_LINE_IRQ2, {iop_irq::SOFTINTR}},
+			{INPUT_LINE_IRQ3, {iop_irq::FDCIRQ, iop_irq::PARALLEL, iop_irq::SLOT}},
+			{INPUT_LINE_IRQ4, {iop_irq::LANCE, iop_irq::SCSI0, iop_irq::SCSI1, iop_irq::CPU, iop_irq::UBUS}},
+			{INPUT_LINE_IRQ5, {iop_irq::SCC, iop_irq::KEYBOARD, iop_irq::MOUSE}},
+			{INPUT_LINE_IRQ6, {iop_irq::TIMER}},
+			{INPUT_LINE_IRQ7, {iop_irq::FDCDRQ, iop_irq::PERR}}}),
+		cpu_irq_line_map({
+			{INPUT_LINE_IRQ0, cpu_irq::UBUS},
+			{INPUT_LINE_IRQ1, cpu_irq::IOP},
+			{INPUT_LINE_IRQ2, cpu_irq::TIMER},
+			{INPUT_LINE_IRQ4, cpu_irq::WRBERR},
+			{INPUT_LINE_IRQ5, cpu_irq::PERR}})
 	{
 	}
 
 protected:
 	// driver_device overrides
-	void machine_start() override ATTR_COLD;
-	void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
 	void cpu_map(address_map &map) ATTR_COLD;
@@ -178,11 +176,11 @@ protected:
 		PERR
 	};
 
-	static constexpr std::array iop_irq_names = {
+	static constexpr std::array IOP_IRQ_NAMES = {
 		"AST"sv, "SOFTINTR"sv, "FDCIRQ"sv, "PARALLEL"sv, "SLOT"sv, "LANCE"sv, "SCSI0"sv, "SCSI1"sv, "CPU"sv, "UBUS"sv,
 		"SCC"sv, "KEYBOARD"sv, "MOUSE"sv, "TIMER"sv, "FDCDRQ"sv, "PERR"sv
 	};
-	static constexpr u32 iop_nmi_mask = 1 << static_cast<u32>(iop_irq::FDCDRQ) |
+	static constexpr u32 IOP_NMI_MASK = 1 << static_cast<u32>(iop_irq::FDCDRQ) |
 										1 << static_cast<u32>(iop_irq::SCC) |
 										1 << static_cast<u32>(iop_irq::SCSI0) |
 										1 << static_cast<u32>(iop_irq::SCSI1) |
@@ -210,8 +208,8 @@ protected:
 		PERR = 5 // Main memory parity error
 	};
 
-	static constexpr std::array cpu_irq_names = {"UBUS"sv, "IOP"sv, "TIMER"sv, "FPA"sv, "WRBERR"sv, "PERR"sv};
-	static constexpr u32 cpu_nmi_mask = 1 << static_cast<u32>(cpu_irq::WRBERR) |
+	static constexpr std::array CPU_IRQ_NAMES = {"UBUS"sv, "IOP"sv, "TIMER"sv, "FPA"sv, "WRBERR"sv, "PERR"sv};
+	static constexpr u32 CPU_NMI_MASK = 1 << static_cast<u32>(cpu_irq::WRBERR) |
 										1 << static_cast<u32>(cpu_irq::IOP);
 
 	template<cpu_irq Number>
@@ -534,12 +532,12 @@ void news_38xx_state::irq_w(const u8 state)
 	if (Number != iop_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-				  iop_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+				  IOP_IRQ_NAMES[static_cast<unsigned>(Number)], state ? "set" : "cleared");
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-				  iop_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+				  IOP_IRQ_NAMES[static_cast<unsigned>(Number)], state ? "set" : "cleared");
 	}
 
 	if (state)
@@ -560,12 +558,12 @@ void news_38xx_state::inten_w(const u8 state)
 	if (Number != iop_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-				  iop_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+				  IOP_IRQ_NAMES[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-				  iop_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+				  IOP_IRQ_NAMES[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 
 	if (state)
@@ -588,7 +586,7 @@ bool news_38xx_state::is_irq_set()
 
 void news_38xx_state::int_check_iop()
 {
-	const u32 active_irq = m_iop_intst & (m_iop_inten | iop_nmi_mask);
+	const u32 active_irq = m_iop_intst & (m_iop_inten | IOP_NMI_MASK);
 	for (const auto &[input_line, irq_inputs]: iop_irq_line_map)
 	{
 		// Calculate state of input pin (logical OR of all attached inputs)
@@ -617,12 +615,12 @@ void news_38xx_state::irq_w(const u8 state)
 	if (Number != cpu_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-				  cpu_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+				  CPU_IRQ_NAMES[static_cast<unsigned>(Number)], state ? "set" : "cleared");
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-				  cpu_irq_names[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+				  CPU_IRQ_NAMES[static_cast<unsigned>(Number)], state ? "set" : "cleared");
 	}
 
 	if (state)
@@ -643,12 +641,12 @@ void news_38xx_state::inten_w(const u8 state)
 	if (Number != cpu_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-				  cpu_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+				  CPU_IRQ_NAMES[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-				  cpu_irq_names[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+				  CPU_IRQ_NAMES[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
 	}
 
 	if (state)
@@ -671,7 +669,7 @@ bool news_38xx_state::is_irq_set()
 
 void news_38xx_state::int_check_cpu()
 {
-	const u32 active_irq = m_cpu_intst & (m_cpu_inten | cpu_nmi_mask);
+	const u32 active_irq = m_cpu_intst & (m_cpu_inten | CPU_NMI_MASK);
 	for (const auto &[input_line, irq_input]: cpu_irq_line_map)
 	{
 		// Update input pin status if it has changed
