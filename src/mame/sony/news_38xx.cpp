@@ -209,8 +209,8 @@ protected:
 	};
 
 	static constexpr std::array CPU_IRQ_NAMES = {"UBUS"sv, "IOP"sv, "TIMER"sv, "FPA"sv, "WRBERR"sv, "PERR"sv};
-	static constexpr u32 CPU_NMI_MASK = 1 << static_cast<u32>(cpu_irq::WRBERR) |
-										1 << static_cast<u32>(cpu_irq::IOP);
+	static constexpr u32 CPU_NMI_MASK = 1 << (u32)cpu_irq::WRBERR |
+										1 << (u32)cpu_irq::IOP;
 
 	template<cpu_irq Number>
 	void irq_w(u8 state);
@@ -532,21 +532,21 @@ void news_38xx_state::irq_w(const u8 state)
 	if (Number != iop_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-				  IOP_IRQ_NAMES[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+				  IOP_IRQ_NAMES[(unsigned)Number], state ? "set" : "cleared");
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-				  IOP_IRQ_NAMES[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+				  IOP_IRQ_NAMES[(unsigned)Number], state ? "set" : "cleared");
 	}
 
 	if (state)
 	{
-		m_iop_intst |= 1U << static_cast<u32>(Number);
+		m_iop_intst |= 1U << (u32)Number;
 	}
 	else
 	{
-		m_iop_intst &= ~(1U << static_cast<u32>(Number));
+		m_iop_intst &= ~(1U << (u32)Number);
 	}
 
 	int_check_iop();
@@ -558,21 +558,21 @@ void news_38xx_state::inten_w(const u8 state)
 	if (Number != iop_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-				  IOP_IRQ_NAMES[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+				  IOP_IRQ_NAMES[(unsigned)Number], state ? ENABLED : DISABLED);
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) IOP IRQ %s %s\n", machine().describe_context(),
-				  IOP_IRQ_NAMES[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+				  IOP_IRQ_NAMES[(unsigned)Number], state ? ENABLED : DISABLED);
 	}
 
 	if (state)
 	{
-		m_iop_inten |= 1 << static_cast<u32>(Number);
+		m_iop_inten |= 1 << (u32)Number;
 	}
 	else
 	{
-		m_iop_inten &= ~(1 << static_cast<u32>(Number));
+		m_iop_inten &= ~(1 << (u32)Number);
 	}
 
 	int_check_iop();
@@ -581,7 +581,7 @@ void news_38xx_state::inten_w(const u8 state)
 template<news_38xx_state::iop_irq Number>
 bool news_38xx_state::is_irq_set()
 {
-	return BIT(m_iop_intst, static_cast<u32>(Number));
+	return BIT(m_iop_intst, (u32)Number);
 }
 
 void news_38xx_state::int_check_iop()
@@ -593,7 +593,7 @@ void news_38xx_state::int_check_iop()
 		bool state = false;
 		for (auto irq_input: irq_inputs)
 		{
-			state |= active_irq & 1 << static_cast<u32>(irq_input);
+			state |= active_irq & 1 << (u32)irq_input;
 		}
 
 		// Update input pin status if it has changed
@@ -615,21 +615,21 @@ void news_38xx_state::irq_w(const u8 state)
 	if (Number != cpu_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-				  CPU_IRQ_NAMES[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+				  CPU_IRQ_NAMES[(unsigned)Number], state ? "set" : "cleared");
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-				  CPU_IRQ_NAMES[static_cast<unsigned>(Number)], state ? "set" : "cleared");
+				  CPU_IRQ_NAMES[(unsigned)Number], state ? "set" : "cleared");
 	}
 
 	if (state)
 	{
-		m_cpu_intst |= 1U << static_cast<u32>(Number);
+		m_cpu_intst |= 1U << (u32)Number;
 	}
 	else
 	{
-		m_cpu_intst &= ~(1U << static_cast<u32>(Number));
+		m_cpu_intst &= ~(1U << (u32)Number);
 	}
 
 	int_check_cpu();
@@ -641,21 +641,21 @@ void news_38xx_state::inten_w(const u8 state)
 	if (Number != cpu_irq::TIMER)
 	{
 		LOGMASKED(LOG_INTERRUPT, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-				  CPU_IRQ_NAMES[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+				  CPU_IRQ_NAMES[(unsigned)Number], state ? ENABLED : DISABLED);
 	}
 	else
 	{
 		LOGMASKED(LOG_TIMER, "(%s) CPU IRQ %s %s\n", machine().describe_context(),
-				  CPU_IRQ_NAMES[static_cast<unsigned>(Number)], state ? ENABLED : DISABLED);
+				  CPU_IRQ_NAMES[(unsigned)Number], state ? ENABLED : DISABLED);
 	}
 
 	if (state)
 	{
-		m_cpu_inten |= 1 << static_cast<u32>(Number);
+		m_cpu_inten |= 1 << (u32)Number;
 	}
 	else
 	{
-		m_cpu_inten &= ~(1 << static_cast<u32>(Number));
+		m_cpu_inten &= ~(1 << (u32)Number);
 	}
 
 	int_check_cpu();
@@ -664,7 +664,7 @@ void news_38xx_state::inten_w(const u8 state)
 template<news_38xx_state::cpu_irq Number>
 bool news_38xx_state::is_irq_set()
 {
-	return BIT(m_cpu_intst, static_cast<u32>(Number));
+	return BIT(m_cpu_intst, (u32)Number);
 }
 
 void news_38xx_state::int_check_cpu()
@@ -673,7 +673,7 @@ void news_38xx_state::int_check_cpu()
 	for (const auto &[input_line, irq_input]: cpu_irq_line_map)
 	{
 		// Update input pin status if it has changed
-		const bool state = BIT(active_irq, static_cast<u32>(irq_input));
+		const bool state = BIT(active_irq, (u32)irq_input);
 		if (m_cpu->input_line_state(input_line) != state)
 		{
 			if (input_line != INPUT_LINE_IRQ2)
@@ -697,12 +697,12 @@ u32 news_38xx_state::iop_bus_error_r()
 TIMER_CALLBACK_MEMBER(news_38xx_state::timer)
 {
 	// 100Hz clock from PARK is used to generate both IOP and CPU interrupts
-	if (m_iop_inten & 1 << static_cast<u32>(iop_irq::TIMER))
+	if (m_iop_inten & 1 << (u32)iop_irq::TIMER)
 	{
 		irq_w<iop_irq::TIMER>(1);
 	}
 
-	if (m_cpu_inten & 1 << static_cast<u32>(cpu_irq::TIMER))
+	if (m_cpu_inten & 1 << (u32)cpu_irq::TIMER)
 	{
 		irq_w<cpu_irq::TIMER>(1);
 	}
@@ -895,7 +895,7 @@ void news_38xx_state::common(machine_config &config)
 	SCC85C30(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_int_callback().set(
 		[this](const int state) {
-			m_scc_irq_state = static_cast<bool>(state);
+			m_scc_irq_state = (bool)state;
 			irq_w<iop_irq::SCC>(state != 0);
 		});
 
@@ -1024,30 +1024,25 @@ ROM_END
 
 INPUT_PORTS_START(nws3860)
 	PORT_START("SW1")
-	PORT_DIPNAME(0x07000000, 0x07000000, "Display")
-	PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME(0x07000000, 0x07000000, "Display") PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(0x07000000, "Console")
 	PORT_DIPSETTING(0x06000000, "NWB-512")
 	PORT_DIPSETTING(0x03000000, "NWB-225A")
 	PORT_DIPSETTING(0x00000000, "Autoselect")
 
-	PORT_DIPNAME(0x08000000, 0x08000000, "Boot Device")
-	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME(0x08000000, 0x08000000, "Boot Device") PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(0x08000000, "SCSI")
 	PORT_DIPSETTING(0x00000000, "Floppy")
 
-	PORT_DIPNAME(0x10000000, 0x10000000, "Automatic Boot")
-	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME(0x10000000, 0x10000000, "Automatic Boot") PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(0x10000000, DEF_STR(Off))
 	PORT_DIPSETTING(0x00000000, DEF_STR(On))
 
-	PORT_DIPNAME(0x20000000, 0x20000000, "Diagnostic Mode")
-	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME(0x20000000, 0x20000000, "Diagnostic Mode") PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(0x20000000, DEF_STR(Off))
 	PORT_DIPSETTING(0x00000000, DEF_STR(On))
 
-	PORT_DIPNAME(0xc0000000, 0xc0000000, "Unused")
-	PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME(0xc0000000, 0xc0000000, "Unused") PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(0xc0000000, DEF_STR(Off))
 INPUT_PORTS_END
 
