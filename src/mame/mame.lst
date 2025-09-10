@@ -43707,6 +43707,9 @@ madmoney2
 apvm110
 apvm110a
 
+@source:skeleton/megacrane.cpp
+megacrane
+
 @source:skeleton/mes.cpp
 mes
 
