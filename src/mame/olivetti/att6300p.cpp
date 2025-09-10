@@ -45,6 +45,7 @@
 #include "emu.h"
 
 #include "att6300p_mmu.h"
+#include "m24_kbd.h"
 
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
@@ -53,7 +54,6 @@
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/z80ctc.h"
-#include "m24_kbd.h"
 #include "machine/mm58274c.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
@@ -206,16 +206,6 @@ private:
 	 */
 
 	enum {
-		// Virtualization Register offsets
-		R_VIRT_RESET		= 0x00,
-		R_VIRT_PROTECTEN	= 0x20,
-		R_VIRT_TIMESLICE	= 0x40,
-		R_VIRT_TRAPCE		= 0x60,
-		R_VIRT_VXLATEN		= 0x80,
-		R_VIRT_BITREAD		= 0xa0,
-		R_VIRT_ADADV		= 0xc0,
-		R_VIRT_CLTRAP		= 0xe0,
-
 		// PROTECTEN register bits
 		B_VIRT_PE_IOSETUP	= 0x01,
 		B_VIRT_PE_MEMSETUP 	= 0x02,
@@ -305,15 +295,27 @@ private:
 	void kbcdata_w(uint8_t data);
 	void kbcin_w(int state);
 
-	void int_w(int state);
 	void update_ir1();
 
 	static void floppy_formats(format_registration &fr);
 
 	void soft_reset();
 	void configure_mapping(int sel);
-	uint8_t virt_r(offs_t offset);
-	void virt_w(offs_t offset, uint8_t data);
+
+	uint8_t reset_r(offs_t offset);
+	void reset_w(offs_t offset, uint8_t data);
+	void protecten_w(offs_t offset, uint8_t data);
+	uint8_t timeslice_r(offs_t offset);
+	void timeslice_w(offs_t offset, uint8_t data);
+	uint8_t trapce_r(offs_t offset);
+	void trapce_w(offs_t offset, uint8_t data);
+	uint8_t vxlaten_r(offs_t offset);
+	void vxlaten_w(offs_t offset, uint8_t data);
+	uint8_t bitread_r(offs_t offset);
+	uint8_t adadv_r(offs_t offset);
+	void adadv_w(offs_t offset, uint8_t data);
+	uint8_t cltrap_r(offs_t offset);
+	void cltrap_w(offs_t offset, uint8_t data);
 
 	bool m_protected;
 	bool m_mapping_sel;
@@ -523,7 +525,7 @@ void att6300p_state::update_speaker()
 
 void att6300p_state::update_ir1()
 {
-    // TimeSlice interrupt is shared with KBD interrupt
+	// TimeSlice interrupt is shared with KBD interrupt
 	m_pic->ir1_w((m_kb_int || m_ts_int) ? 1 : 0);
 }
 
@@ -724,106 +726,119 @@ void att6300p_state::set_protected_mode(bool enabled)
 	}
 }
 
-uint8_t att6300p_state::virt_r(offs_t offset)
+uint8_t att6300p_state::reset_r(offs_t offset)
 {
-	uint8_t reg = offset & 0xe0;
+	soft_reset();
 
-	switch (reg)
+	return 0xff;
+}
+
+void att6300p_state::reset_w(offs_t offset, uint8_t data)
+{
+	soft_reset();
+}
+
+uint8_t att6300p_state::timeslice_r(offs_t offset)
+{
+	m_sanity_active = false;
+	m_ts_int = false;
+	update_ir1();
+
+	return m_ctc->read(offset & 3);
+}
+
+void att6300p_state::timeslice_w(offs_t offset, uint8_t data)
+{
+	m_sanity_active = false;
+	m_ts_int = false;
+	update_ir1();
+
+	m_ctc->write(offset & 3, data);
+}
+
+void att6300p_state::protecten_w(offs_t offset, uint8_t data)
+{
+	set_protected_mode(data & B_VIRT_PE_PROTECTEN);
+
+	m_mmu->set_mem_setup_enabled(data & B_VIRT_PE_MEMSETUP);
+	m_mmu->set_io_setup_enabled(data & B_VIRT_PE_IOSETUP);
+	m_mmu->set_memprot_enabled(data & B_VIRT_PE_MEMFENCE);
+
+	m_trapio_read_enabled = data & B_VIRT_PE_IORDTRAP;
+	m_trapio_write_enabled = data & B_VIRT_PE_IOWRTRAP;
+	m_warm_reset = data & B_VIRT_PE_PWRUP;
+}
+
+uint8_t att6300p_state::trapce_r(offs_t offset)
+{
+	m_trapio_active = false;
+	update_nmi();
+
+	// Surely IORDTRAP has some other more useful purpose?
+	if (m_trapio_read_enabled)
 	{
-		case R_VIRT_RESET:
-			soft_reset();
-			break;
-		case R_VIRT_TIMESLICE:
-			m_sanity_active = false;
-			m_ts_int = false;
-			update_ir1();
-
-			return m_ctc->read(offset & 3);
-		case R_VIRT_TRAPCE:
-			m_trapio_active = false;
-			update_nmi();
-
-			if (m_trapio_read_enabled)
-			{
-				return m_trapio_reg[m_trapio_reg_idx][(reg>>1) & 0x3];
-			}
-
-			break;
-		case R_VIRT_VXLATEN:
-			return m_mapping_sel;
-		case R_VIRT_BITREAD:
-			  return (m_protected ? B_VIRT_BR_PROTECTEN : 0) |
-				(m_sanity_active ? 0 : B_VIRT_BR_SANITYNMI) |
-				(m_trapio_active ? 0 : B_VIRT_BR_TRAPIO) |
-				(m_nmi_active ? B_VIRT_BR_NMI: 0) |
-				(m_ts_int ? B_VIRT_BR_TS : 0) |
-				(m_warm_reset ? B_VIRT_BR_PWRUP : 0);
-		case R_VIRT_ADADV:
-			m_trapio_reg_idx = (m_trapio_reg_idx + 1) & 3;
-			break;
-		case R_VIRT_CLTRAP:
-			m_trapio_reg_idx = 0;
-			break;
+		return m_trapio_reg[m_trapio_reg_idx][(offset>>1) & 0x3];
 	}
 
 	return 0xff;
 }
 
-void att6300p_state::virt_w(offs_t offset, uint8_t data)
+void att6300p_state::trapce_w(offs_t offset, uint8_t data)
 {
-	uint8_t reg = offset & 0xe0;
+	m_trapio_active = false;
+	update_nmi();
 
-	switch (reg)
+	if (m_trapio_write_enabled)
 	{
-		case R_VIRT_RESET:
-			soft_reset();
-			break;
-		case R_VIRT_PROTECTEN:
-			set_protected_mode(data & B_VIRT_PE_PROTECTEN);
+		m_trapio_reg[m_trapio_reg_idx][(offset>>1) & 0x3] = data;
 
-			m_mmu->set_mem_setup_enabled(data & B_VIRT_PE_MEMSETUP);
-			m_mmu->set_io_setup_enabled(data & B_VIRT_PE_IOSETUP);
-			m_mmu->set_memprot_enabled(data & B_VIRT_PE_MEMFENCE);
-
-			m_trapio_read_enabled = data & B_VIRT_PE_IORDTRAP;
-			m_trapio_write_enabled = data & B_VIRT_PE_IOWRTRAP;
-			m_warm_reset = data & B_VIRT_PE_PWRUP;
-			break;
-		case R_VIRT_TIMESLICE:
-			m_sanity_active = false;
-			m_ts_int = false;
-			update_ir1();
-
-			m_ctc->write(offset & 3, data);
-			break;
-		case R_VIRT_TRAPCE:
-			m_trapio_active = false;
-			update_nmi();
-
-			if (m_trapio_write_enabled)
-			{
-				m_trapio_reg[m_trapio_reg_idx][(reg>>1) & 0x3] = data;
-
-				// Should the advance be conditional on register address bit 0???
-				m_trapio_reg_idx = (m_trapio_reg_idx + 1) & 3;
-			}
-
-			break;
-		case R_VIRT_VXLATEN:
-			configure_mapping(data & 0xf);
-			break;
-		case R_VIRT_ADADV:
-			m_trapio_reg_idx = (m_trapio_reg_idx + 1) & 3;
-			break;
-		case R_VIRT_CLTRAP:
-			m_trapio_reg_idx = 0;
-			break;
+		// Should the advance be conditional on register address bit 0???
+		m_trapio_reg_idx = (m_trapio_reg_idx + 1) & 3;
 	}
 }
 
-void att6300p_state::int_w(int state)
+uint8_t att6300p_state::vxlaten_r(offs_t offset)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	return m_mapping_sel;
+}
+
+void att6300p_state::vxlaten_w(offs_t offset, uint8_t data)
+{
+	configure_mapping(data & 0xf);
+}
+
+uint8_t att6300p_state::bitread_r(offs_t offset)
+{
+	  return (m_protected ? B_VIRT_BR_PROTECTEN : 0) |
+		(m_sanity_active ? 0 : B_VIRT_BR_SANITYNMI) |
+		(m_trapio_active ? 0 : B_VIRT_BR_TRAPIO) |
+		(m_nmi_active ? B_VIRT_BR_NMI: 0) |
+		(m_ts_int ? B_VIRT_BR_TS : 0) |
+		(m_warm_reset ? B_VIRT_BR_PWRUP : 0);
+}
+
+uint8_t att6300p_state::adadv_r(offs_t offset)
+{
+	m_trapio_reg_idx = (m_trapio_reg_idx + 1) & 3;
+
+	return 0xff;
+}
+
+void att6300p_state::adadv_w(offs_t offset, uint8_t data)
+{
+	m_trapio_reg_idx = (m_trapio_reg_idx + 1) & 3;
+}
+
+uint8_t att6300p_state::cltrap_r(offs_t offset)
+{
+	m_trapio_reg_idx = 0;
+
+	return 0xff;
+}
+
+void att6300p_state::cltrap_w(offs_t offset, uint8_t data)
+{
+	m_trapio_reg_idx = 0;
 }
 
 void att6300p_state::att6300p_mem_map(address_map &map)
@@ -855,8 +870,16 @@ void att6300p_state::att6300p_vmem_map(address_map &map)
 
 void att6300p_state::att6300p_vio_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x0fff).mirror(0xc000).rw(m_mmu, FUNC(att6300p_mmu_device::io_r), FUNC(att6300p_mmu_device::io_w));
-	map(0x3f00, 0x3fff).mirror(0xc000).rw(FUNC(att6300p_state::virt_r), FUNC(att6300p_state::virt_w));
+	map(0x3f00, 0x3f00).mirror(0x001f).rw(FUNC(att6300p_state::reset_r), FUNC(att6300p_state::reset_w));
+	map(0x3f20, 0x3f20).mirror(0x001f).w(FUNC(att6300p_state::protecten_w));
+	map(0x3f40, 0x3f40).mirror(0x001f).rw(FUNC(att6300p_state::timeslice_r), FUNC(att6300p_state::timeslice_w));
+	map(0x3f60, 0x3f7f).rw(FUNC(att6300p_state::trapce_r), FUNC(att6300p_state::trapce_w));
+	map(0x3f80, 0x3f80).mirror(0x001f).rw(FUNC(att6300p_state::vxlaten_r), FUNC(att6300p_state::vxlaten_w));
+	map(0x3fa0, 0x3fa0).mirror(0x001f).r(FUNC(att6300p_state::bitread_r));
+	map(0x3fc0, 0x3fc0).mirror(0x001f).rw(FUNC(att6300p_state::adadv_r), FUNC(att6300p_state::adadv_w));
+	map(0x3fe0, 0x3fe0).mirror(0x001f).rw(FUNC(att6300p_state::cltrap_r), FUNC(att6300p_state::cltrap_w));
 }
 
 static INPUT_PORTS_START( att6300p )
@@ -945,7 +968,7 @@ void att6300p_state::att6300p(machine_config &config)
 
 	PIC8259(config, m_pic);
 	m_pic->in_sp_callback().set_constant(1);
-	m_pic->out_int_callback().set(FUNC(att6300p_state::int_w));
+    m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(14.318181_MHz_XTAL / 12);		// IOCLK/4
@@ -1031,12 +1054,12 @@ void att6300p_state::att6300p(machine_config &config)
 }
 
 ROM_START( att6300p )
-	ROM_REGION16_LE(0x8000,"bios", 0)
+	ROM_REGION16_LE(0x8000, "bios", 0)
 
-	ROMX_LOAD("att6300p_bios_6j_v1.04_lo.bin", 0x0000, 0x4000, CRC(dd0b9335) SHA1(56783b84f34d900b3cc73d1f7f1291a4211271ec), ROM_SKIP(1))
-	ROMX_LOAD("att6300p_bios_6k_v1.04_hi.bin", 0x0001, 0x4000, CRC(208d84ab) SHA1(16ac79071a39b31ff002231f3fa564ac2d91b30c), ROM_SKIP(1))
+	ROM_LOAD16_BYTE("att6300p_bios_6j_v1.04_lo.bin", 0x0000, 0x4000, CRC(dd0b9335) SHA1(56783b84f34d900b3cc73d1f7f1291a4211271ec))
+	ROM_LOAD16_BYTE("att6300p_bios_6k_v1.04_hi.bin", 0x0001, 0x4000, CRC(208d84ab) SHA1(16ac79071a39b31ff002231f3fa564ac2d91b30c))
 
-	ROM_REGION16_LE(0x200,"addrmap", 0)
+	ROM_REGION16_LE(0x200, "addrmap", 0)
 	ROMX_LOAD("addrmap_4f_r4.0.bin", 0, 0x200, CRC(ea70d65d) SHA1(aed2295e0cb747b0a1ce5e78df4f99ac6ec692ed), 0)
 
 	ROM_REGION(0x400, "kbc", 0)

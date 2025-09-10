@@ -41,6 +41,8 @@ protected:
 	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 private:
+	void update_fastpath();
+
 	devcb_write32 m_trapio;
 
 	const address_space_config m_mem_config;
@@ -48,8 +50,6 @@ private:
 	memory_access<20, 0, 0, ENDIANNESS_BIG>::specific m_mem8_space;
 	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::specific m_mem16_space;
 	address_space *m_io;
-
-	void update_fastpath();
 
 	bool m_protected_mode;
 	uint32_t m_map_table[32];
