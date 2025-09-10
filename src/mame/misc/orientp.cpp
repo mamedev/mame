@@ -1,101 +1,85 @@
 // license:BSD-3-Clause
 // copyright-holders:flama12333
 /*************************************************************************
-// 
+The dump of the pcb 1 was from Soccer Santiago II 6 ball pinball. Unsure if is from or not?.
 
-
- notes: 
-The dump of set 2 was from Soccer Santiago II 6 ball pinball I dont known which was from due to unconfirmed, so im gonna to name as unknown.
-
-these roulettes use a 2x8 scan matrix for keyboard with the 8279. Only 14 buttons are used.
-
-Port at back pcb:
+at the back pcb:
 small port: bonus PCB (7 segment 4-digit)
 big port: playfield sensors PCB with lots of 74HC245, leds, sensors, multiplex
 
-Hardware info - may not accurate
 Buttons
 K1
 K2
 K3
 K4
-pcb 1
-u1 File kc8279
+
+pcb 1 - From Soccer Santiago II.  Unsure  if are match?. info based of guessing. Might be not correct due to poor quality.
+u1  kc8279
 u17 and u21 Nec D8255-AC-2
-u25  winbond unknown - 8052
+u25 unknown winbond mcu - 8052
 u32  ?? - could be hm6264alp-12
 u102 kc8972
 u104 ym2413
 u107 u6295
 
-
-
 EEPROM:
-??? ?27c020 - winbond w27c020? cant read text due to poor pictures quality
-u33 winbond w27c512  boot rom.
+??? ?27c020 -  w27c020? 
+u33 w27c512  boot rom.
 u39 at89s51 8051 mcu for protection.
 
 pcb 2
-NREAT NEW misspelled as GREAT-NEW 
-GN-001
-u1 File kc8279
-u17 and u21 mitsubishi m5m82c55ap-2
-u25  INTEL P8052AH mcu - 8052
+NREAT NEW GN-001. misspelled as GREAT-NEW?
+
+u1 kc8279
+u17 and u21 m5m82c55ap-2
+u25  P8052AH mcu - 8052
 u32  hm6264alp-12
-u39 at89s51 8051 mcu for protection.
+u39  at89s51 - 8051 mcu for protection.
 u102 kc8972
 u104 ym2413
 u107 u6295
 
 EEPROM:
-27C020-12
+27C020-12.
 at back.
-?27c512
+?27c512.
 
 pcb 3
 GN-001
-u1 Nec D8279C-2
-u17 and u21 Nec D8255AC-2
-u25  INTEL P8052AH mcu - 8052
-u32  hm6264alp-15
-u39 at89s51 8051 mcu for protection.
+u1 D8279C-2
+u17 and u21  D8255AC-2
+u25 P8052AH mcu - 8052
+u32 hm6264alp-15
+u39 at89s51 - 8051 mcu for protection.
 u102 kc8972
 u104 ym2413
 u107 u6295
 
 EEPROM:
-at27c020 - dumped
+at27c020
 at back.
 winbond w27e512-12 
 
 pcb 4 A.LC M.D.P labeled SY-OP-001
-a1 ALTERA EPM7032LC44-10
-u1 NEC D8279C-2
+a1 EPM7032LC44-10
+u1 D8279C-2
 u17 and u21 NEC D8255-AC-2
-u25  INTEL P8052AH mcu - 8052
-u32  hm6264alp-12
+u25  P8052AH mcu - 8052
+u32 hm6264alp-12
 u39 at89s51 8051 mcu for protection.
 u100 CY CHENG YING-7 060329 - ???
 u102 jfc 95101
-u104 unpopulated ym2413
+u104 unpopulated ym2413.
 u107 u6295
 
 EEPROM:
-st ????? - probably 29f1615. labeled A-0 not dumped
+st ????? - probably 29f1615. labeled A-0. not dumped
 am27c020 labeled Mujer 1 español. dumped.
-at back
-?27c512
-
-
-
-
-
+at back pcb
+?27c512.
 
 // TODO:
-Need proper description.
-Error code 10
-Hardware info.
-MCU Hook up
+MCU, Inputs. Hook up
 Verify memory maps.
 Need Proper Layout.
 
@@ -149,9 +133,7 @@ private:
 	output_finder<30> m_leds;
 	required_ioport_array<4> m_inputs;
 
-
 };
-
 
 static INPUT_PORTS_START( east8 )
 	PORT_START("KEYS1")
@@ -195,10 +177,10 @@ static INPUT_PORTS_START( east8 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW2:8")
 	
 	PORT_START("PUSHBUTTONS")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) // K0
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) // K1
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) // K2
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) // K3
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) 
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4)
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -257,6 +239,7 @@ void orientp_state::io_map(address_map &map)
 	map(0xfc40, 0xfc40).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
     map(0xfe00, 0xfe01).w("opll", FUNC(ym2413_device::write));
 }
+
 void orientp_state::mcu_map(address_map &map)
 {
 	map(0x0000, 0xfff).rom();
@@ -287,17 +270,16 @@ void orientp_state::orientp(machine_config &config)
    
     NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	
-	//TODO: Check mcu dump and hook up
+	// at89s51 mcu
     i8051_device &mcu(I8051(config, "mcu", XTAL(10'738'000)));
     mcu.set_addrmap(AS_PROGRAM, &orientp_state::mcu_map);
 	mcu.set_addrmap(AS_IO, &orientp_state::mcu_io_map);
 
-	//TODO: M82C55 for leds
+	// 82C55 for leds
     I8255A(config, "ppi1");
     I8255A(config, "ppi2");
 	
-	// Keyboard & display interface 
-	//TODO: pasted from marywu
+	// Keyboard & display interface. pasted from marywu. 
     i8279_device &kbdc(I8279(config, "kdc", XTAL(10'738'635) / 6));
 	kbdc.out_sl_callback().set(FUNC(orientp_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
 	kbdc.in_rl_callback().set(FUNC(orientp_state::keyboard_r));          // keyboard Return Lines
@@ -308,6 +290,7 @@ void orientp_state::orientp(machine_config &config)
    
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
+	
 	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6));
 	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
 	ay1.port_a_write_callback().set(FUNC(orientp_state::ay1_port_a_w));
@@ -328,24 +311,25 @@ ROM_START( east8 )
     ROM_LOAD( "at89s51.u39", 0x0000, 0x1000,   CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. 
  
     ROM_REGION( 0x40000, "oki", 0 )
-    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  No label  Rom. From Nreat-new GN-001 pcb. misspelled as Great-new?
+    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  No label  Rom. From Nreat-new GN-001 pcb. misspelled as Great-new
 
     ROM_END
 
 ROM_START( east8a )
-	ROM_REGION( 0x10000, "maincpu", 0 ) 
+	ROM_REGION( 0x10000, "maincpu", 0 ) // was from pcb 1
 	ROM_LOAD( "w27c512.u33", 0x00000, 0x10000, CRC(8d3d1e91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // Main program.  EAST8  v1.05 string
 
     ROM_REGION( 0x1000, "mcu", 0 )
-    ROM_LOAD( "at89s51.u39", 0x0000, 0x1000, BAD_DUMP CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. From the Nreat-new GN-001 pcb. Marked as Bad dump for now
+    ROM_LOAD( "at89s51.u39", 0x0000, 0x1000, BAD_DUMP CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. From the pcb 2
  
     ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
-    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) BAD_DUMP SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  Voices Rom.  From Nreat-new GN-001 pcb. Marked as Bad dump for now
+    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) BAD_DUMP SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  Voices Rom.
 
     ROM_END
 
-
 } // anonymous namespace
+
+
 //    YEAR  NAME    PARENT   MACHINE   INPUT  STATE          INIT        ROT   COMPANY      FULLNAME                  FLAGS
 GAME( 199?, east8,  0,       orientp,  east8, orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 (v1.00)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 199?, east8a, 0,       orientp,  east8, orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
