@@ -635,8 +635,8 @@ void att6300p_state::kbc_p2_w(uint8_t data)
 	m_keyboard->clock_w(!BIT(data, 0));
 	m_keyboard->data_w(!BIT(data, 1));
 
-	// Needed to ensure the 8741 gets scheduled in time to poll for the
-	// clock change
+	// Needed to ensure the keyboard MCU gets scheduled to respond to
+	// the clock change and output the data in time.
 	machine().scheduler().perfect_quantum(attotime::from_usec(50));
 
 	if (m_kb_int != BIT(data, 4))
