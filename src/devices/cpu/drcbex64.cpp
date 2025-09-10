@@ -60,9 +60,9 @@
         XMM15      - non-volatile
 
 
-    -----------------------------
-    ABI/conventions (Linux/MacOS)
-    -----------------------------
+    ----------------------
+    ABI/conventions (SysV)
+    ----------------------
 
     Registers:
         RAX        - volatile, function return value
@@ -605,7 +605,7 @@ private:
 
 	void calculate_status_flags(Assembler &a, uint32_t instsize, Operand const &dst, u8 flags);
 	void calculate_status_flags_mul(Assembler &a, uint32_t instsize, Gp const &lo, Gp const &hi);
-	void calculate_status_flags_mul_low(Assembler &a, uint32_t instsize, Gp const &lo);
+	void calculate_status_flags_mul_low(Assembler &a, Gp const &lo);
 
 	size_t emit(CodeHolder &ch);
 
@@ -1527,15 +1527,12 @@ void drcbe_x64::calculate_status_flags_mul(Assembler &a, uint32_t instsize, Gp c
 	a.sahf();
 }
 
-void drcbe_x64::calculate_status_flags_mul_low(Assembler &a, uint32_t instsize, Gp const &lo)
+inline void drcbe_x64::calculate_status_flags_mul_low(Assembler &a, Gp const &lo)
 {
 	// calculate zero, sign flags based on the lower half of the result but keep the overflow from the multiplication
 	a.seto(dl);
 
-	if (instsize == 4)
-		a.test(lo.r32(), lo.r32());
-	else
-		a.test(lo, lo);
+	a.test(lo, lo);
 
 	// restore overflow flag
 	a.lahf();
@@ -4405,7 +4402,7 @@ void drcbe_x64::op_mul(Assembler &a, const instruction &inst)
 	if (compute_hi)
 		mov_param_reg(a, edstp, edstreg);
 
-	if (inst.flags())
+	if (inst.flags() & (FLAG_Z | FLAG_S))
 		calculate_status_flags_mul(a, inst.size(), rax, rdx);
 }
 
@@ -4449,8 +4446,13 @@ void drcbe_x64::op_mullw(Assembler &a, const instruction &inst)
 	}
 	mov_param_reg(a, dstp, dstreg);
 
-	if (inst.flags())
-		calculate_status_flags_mul_low(a, inst.size(), rax);
+	if (inst.flags() & (FLAG_Z | FLAG_S))
+	{
+		if (inst.flags() & FLAG_V)
+			calculate_status_flags_mul_low(a, dstreg);
+		else
+			a.test(dstreg, dstreg);
+	}
 }
 
 

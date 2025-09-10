@@ -37,6 +37,39 @@ r29     base generated code frame pointer
 r30     link register
 sp      stack pointer
 
+v0
+v1
+v2
+v3
+v4
+v5
+v6
+v7
+v8      UML register F0
+v9      UML register F1
+v10     UML register F2
+v11     UML register F3
+v12     UML register F4
+v13     UML register F5
+v14     UML register F6
+v15     UML register F7
+v16     temporary for intermediate values
+v17     temporary for intermediate values
+v18     temporary for intermediate values
+v19
+v20
+v21
+v22
+v23
+v24
+v25
+v26
+v27
+v28
+v29
+v30
+v31
+
 
 Stack layout in top-level generated code frame:
 

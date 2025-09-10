@@ -2273,6 +2273,254 @@ Simplification rules
   the ``src`` operand is an immediate value.
 
 
+.. _umlinst-intmuldiv:
+
+Integer multiply and divide
+---------------------------
+
+.. _umlinst-mullw:
+
+MULLW
+~~~~~
+
+Multiply two integer values.
+
++---------------------------+------------------------------------------+
+| Disassembly               | Usage                                    |
++===========================+==========================================+
+| .. code-block::           | .. code-block:: C++                      |
+|                           |                                          |
+|     mululw  dst,src1,src2 |     UML_MULULW(block, dst, src1, src2);  |
+|     mulslw  dst,src1,src2 |     UML_MULSLW(block, dst, src1, src2);  |
+|     dmululw dst,src1,src2 |     UML_DMULULW(block, dst, src1, src2); |
+|     dmulslw dst,src1,src2 |     UML_DMULSLW(block, dst, src1, src2); |
++---------------------------+------------------------------------------+
+
+Calculates ``dst = src1 * src2`` producing a result the same size as the
+inputs.  MULULW and DMULULW take unsigned integer values as inputs and
+produce an unsigned integer value as a result, while MULSLW and DMULSLW
+take signed integer values as inputs and produce a signed integer value
+as a result.  Note that the distinction between signed and unsigned
+values only affects the calculation of the overflow flag for this
+instruction.  It does not affect the result of the multiplication.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the product will be stored.
+src1 (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The multiplicand (the value to multiply).
+src2 (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The multiplier (the value to multiply by).
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Set if the full result of the multiplication cannot be represented
+    within the instruction size.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.  Note that this is
+    based on the possibly truncated result value, not the full result of
+    the multiplication.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).  Note that this is based on the possibly truncated
+    result value, not the full result of the multiplication.
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
+  :ref:`OR <umlinst-or>` if the ``src1`` and ``src2`` operands are both
+  immediate values or either the ``src1`` or ``src2`` operand is the
+  immediate value zero or one and the overflow flag is not required.
+* Immediate values for the ``src1`` and ``src2`` operands are truncated
+  to the instruction size.
+* If the ``src2`` and ``dst`` operands refer to the same register or
+  memory location, the ``src1`` and ``src2`` operands are exchanged.
+* If the ``src1`` operand is an immediate value and the ``src2`` operand
+  is not an immediate value, the ``src1`` and ``src2`` operands are
+  exchanged.
+
+.. _umlinst-mul:
+
+MUL
+~~~
+
+Multiply two integer values, possibly producing an extended result.
+
++--------------------------------+----------------------------------------------+
+| Disassembly                    | Usage                                        |
++================================+==============================================+
+| .. code-block::                | .. code-block:: C++                          |
+|                                |                                              |
+|     mulu    dst,edst,src1,src2 |     UML_MULU(block, dst, edst, src1, src2);  |
+|     muls    dst,edst,src1,src2 |     UML_MULS(block, dst, edst, src1, src2);  |
+|     dmulu   dst,edst,src1,src2 |     UML_DMULU(block, dst, edst, src1, src2); |
+|     dmuls   dst,edst,src1,src2 |     UML_DMULS(block, dst, edst, src1, src2); |
++--------------------------------+----------------------------------------------+
+
+Calculates ``edst:dst = src1 * src2`` if the ``dst`` and ``edst``
+operands do not refer to the same register or memory location, or
+``dst = src1 * src2`` if the ``dst`` and ``edst`` operands refer to the
+same register or memory location.  MULU and DMULU take unsigned integer
+values as inputs and produce an unsigned integer value as a result,
+while MULS and DMULS take signed integer values as inputs and produce a
+signed integer value as a result.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the least significant half of the full product
+    will be stored.
+edst (32-bit or 64-bit – memory, integer register)
+    The destination where the most significant half of the full product
+    will be stored if this operand does not refer to the same memory
+    location or register as the ``dst`` operand.  If this operand refers
+    to the same memory location or register as the ``dst`` operand, the
+    most significant half of the full product will be discarded,
+    producing a result the same size as the inputs.
+src1 (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The multiplicand (the value to multiply).
+src2 (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The multiplier (the value to multiply by).
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Set if the full result of the multiplication cannot be represented
+    within the instruction size.
+zero (Z)
+    Set if the full result of the multiplication is zero, or cleared
+    otherwise.  Note that this is based on the full result of the
+    multiplication even when the ``dst`` and ``edst`` operands refer to
+    the same memory location or register, causing the result to be
+    truncated.
+sign (S)
+    Set to the value of the most significant bit of the full result of
+    the multiplication (set if the result is a negative signed integer
+    value, or cleared otherwise).  Note that this is based on the full
+    result of the multiplication even when the ``dst`` and ``edst``
+    operands refer to the same memory location or register, causing the
+    result to be truncated.
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MULLW <umlinst-mullw>` if the ``dst`` and ``edst``
+  operands refer to the same memory location or register and the zero
+  and sign flags are not required.
+* Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
+  :ref:`OR <umlinst-or>` if the ``dst`` and ``edst`` operands refer to
+  the same memory location or register, the ``src1`` and ``src2``
+  operands are both immediate values or either the ``src1`` or ``src2``
+  operand is the immediate value zero, the most significant half of the
+  full result of the multiplication is the sign extension of the least
+  significant half or the sign flag is not required, and the overflow
+  flag is not required.
+* Converted to :ref:`MOV <umlinst-mov>` or :ref:`AND <umlinst-and>` if
+  the ``dst`` and ``edst`` operands refer to the same memory location or
+  register, either the ``src1`` or ``src2`` operand is the immediate
+  value one, signed multiplication is being performed or the sign flag
+  is not required, and the overflow flag is not required.
+* Immediate values for the ``src1`` and ``src2`` operands are truncated
+  to the instruction size.
+* If the ``src1`` operand is an immediate value and the ``src2`` operand
+  is not an immediate value, the ``src1`` and ``src2`` operands are
+  exchanged.
+
+.. _umlinst-div:
+
+DIV
+~~~
+
+Divide an integer value by another integer value.
+
++--------------------------------+----------------------------------------------+
+| Disassembly                    | Usage                                        |
++================================+==============================================+
+| .. code-block::                | .. code-block:: C++                          |
+|                                |                                              |
+|     divu    dst,edst,src1,src2 |     UML_DIVU(block, dst, edst, src1, src2);  |
+|     divs    dst,edst,src1,src2 |     UML_DIVS(block, dst, edst, src1, src2);  |
+|     ddivu   dst,edst,src1,src2 |     UML_DDIVU(block, dst, edst, src1, src2); |
+|     ddivs   dst,edst,src1,src2 |     UML_DDIVS(block, dst, edst, src1, src2); |
++--------------------------------+----------------------------------------------+
+
+If the value of ``src2`` is not zero, the value of ``src1`` is divided
+by the value of ``src2``, the quotient is stored in the memory location
+or register referred to by ``dst``, and the remainder is stored in the
+memory location or register referred to by ``edst`` if the ``dst`` and
+``edst`` operands do not refer to the same memory location or register.
+
+If the value of ``src2`` is zero, the overflow flag is set and the
+values of the memory locations or registers referred to by the ``dst``
+and ``edst`` operands are undefined.
+
+DIVU and DDIVU take unsigned integer values as inputs and produce
+unsigned integer values as results, while DIVS and DDIVS take signed
+integer values as inputs and produce signed integer values as results.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the quotient will be stored if the value of
+    the ``src2`` operand is not zero.
+edst (32-bit or 64-bit – memory, integer register)
+    The destination where the value of the remainder will be stored if
+    this operand does not refer to the same memory location or register
+    as the ``dst`` operand and the value of the ``src2`` operand is not
+    zero.
+src1 (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The dividend (the value to divide).
+src2 (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The divisor (the value to divide by).
+
+Flags
+^^^^^
+
+carry (C)
+    Undefined.
+overflow (V)
+    Set if the divisor (the value of the ``src2`` operand) is zero, or
+    cleared otherwise.
+zero (Z)
+    Set if the divisor (the value of the ``src2`` operand) is not zero
+    and the quotient is zero, or cleared otherwise.
+sign (S)
+    Set to the most significant bit of the quotient (set if the quotient
+    is a negative signed integer value) if the divisor (the value of the
+    ``src2`` operand) is not zero, or cleared otherwise.
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>`, :ref:`AND <umlinst-and>` or
+  :ref:`OR <umlinst-or>` if the ``dst`` and ``edst`` operands refer to
+  the same memory location or register, the ``src1`` and ``src2``
+  operands are both immediate values or ``src2`` operand is the
+  immediate value one, the ``src2`` operand is not the immediate value
+  zero, and the overflow flag is not required.
+* Immediate values for the ``src1`` and ``src2`` operands are truncated
+  to the instruction size.
+
+
 .. _umlinst-intshift:
 
 Integer shift and rotate
