@@ -28588,7 +28588,8 @@ license:CC0-1.0
 		<info name="developer" value="Pelican Software"/>
 		<info name="programmer" value="Lester Humphreys" />
 		<info name="programmer" value="Ken Grey" />
-		<info name="programmer" value="artwork: Janet Coutu" />
+		<!-- see #14146 below marked "artwork:" -->
+		<info name="programmer" value="Janet Coutu" />
 		<info name="programmer" value="Steve Parlotto" />
 		<info name="programmer" value="Kim Looney" />
 		<info name="programmer" value="Herb Perez" />
@@ -37165,7 +37166,7 @@ license:CC0-1.0
 		<info name="programmer" value="Peter A. Golden" />
 		<info name="programmer" value="Michael J. Becker" />
 		<info name="programmer" value="Steve DeFrisco" />
-		<info name="programmer" value="and Wilfredo Aguilar" />
+		<info name="programmer" value="Wilfredo Aguilar" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-12-26 -->
