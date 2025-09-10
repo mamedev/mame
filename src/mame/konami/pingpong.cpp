@@ -11,6 +11,11 @@ Z80 (surface scratched), 18432.00kHz XTAL
 Several Konami customs, but surface scratched like the Z80: 28-pin DIP @ 5D,
 28-pin DIP @ 13H, 40-pin DIP @ 12A
 
+TODO:
+- correct video timing, probably 60.6Hz?
+- verify CPU/sound freq for the Zilec games, there's a PCB photo of merlinmm
+  with a 14MHz XTAL, but it's on Coinmaster hardware (Z80, 3 PIAs, AY8912)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -722,10 +727,13 @@ void pingpong_state::pingpong(machine_config &config)
 void pingpong_state::merlinmm(machine_config &config)
 {
 	pingpong(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &pingpong_state::merlinmm_map);
 	subdevice<timer_device>("scantimer")->set_callback(FUNC(pingpong_state::merlinmm_interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	subdevice<sn76489a_device>("snsnd")->set_clock(18.432_MHz_XTAL / 8); // assumption
 }
 
 void cashquiz_state::cashquiz(machine_config &config)
@@ -837,5 +845,5 @@ void cashquiz_state::init_cashquiz()
 
 GAME( 1985, pingpong, 0, pingpong, pingpong, pingpong_state, empty_init,    ROT0,  "Konami",         "Konami's Ping-Pong",            MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, merlinmm, 0, merlinmm, merlinmm, pingpong_state, init_merlinmm, ROT90, "Zilec-Zenitone", "Merlins Money Maze",            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, merlinmm, 0, merlinmm, merlinmm, pingpong_state, init_merlinmm, ROT90, "Zilec-Zenitone", "Merlin's Money Maze",           MACHINE_SUPPORTS_SAVE )
 GAME( 1986, cashquiz, 0, cashquiz, cashquiz, cashquiz_state, init_cashquiz, ROT0,  "Zilec-Zenitone", "Cash Quiz (Type B, Version 5)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
