@@ -79,6 +79,7 @@ at back pcb
 ?27c512.
 
 // TODO:
+In which dump belong in the pcb?
 MCU, Inputs. Hook up
 Verify memory maps.
 Need Proper Layout.
