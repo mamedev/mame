@@ -4341,8 +4341,8 @@ HSync: 15.16kHz
 
 ROM_START( lastfort ) // Japanese version on PCB VG420
 	ROM_REGION( 0x040000, "maincpu", 0 )        // 68000 Code
-	ROM_LOAD16_BYTE( "tr_jc09", 0x000000, 0x020000, CRC(8b98a49a) SHA1(15adca78d54973820d04f8b308dc58d0784eb900) )
-	ROM_LOAD16_BYTE( "tr_jc10", 0x000001, 0x020000, CRC(8d04da04) SHA1(5c7e65a39929e94d1fa99aeb5fed7030b110451f) )
+	ROM_LOAD16_BYTE( "tr_jc09", 0x000000, 0x020000, CRC(8b98a49a) SHA1(15adca78d54973820d04f8b308dc58d0784eb900) ) // also seen with same content with tr_jb09 label
+	ROM_LOAD16_BYTE( "tr_jc10", 0x000001, 0x020000, CRC(8d04da04) SHA1(5c7e65a39929e94d1fa99aeb5fed7030b110451f) ) // also seen with same content with tr_jb10 label
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )       // NEC78C10 Code
 	ROM_LOAD( "tr_jb12", 0x000000, 0x020000, CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) ) // (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)

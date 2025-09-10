@@ -4182,7 +4182,7 @@ ROM_START( jhg3d ) // IGS PCB-0376-01-FS. 3 banks of 8 switches. 1 PPI.
 	ROM_LOAD( "cg_u21.u21", 0x000000, 0x200000, CRC(1e1c243a) SHA1(441e837fc806160182d019b9719f40a85327ba12) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "v-445cn.u20 ", 0x00000, 0x40000, CRC(e6aac74d) SHA1(b8f88b894383cd3eab4b00a20b74ee84dea61672) )
+	ROM_LOAD( "v-445cn.u20", 0x00000, 0x40000, CRC(e6aac74d) SHA1(b8f88b894383cd3eab4b00a20b74ee84dea61672) )
 ROM_END
 
 // 泰山五线 加强版 (Tàishān Wǔxiàn Jiāqiáng Bǎn)
