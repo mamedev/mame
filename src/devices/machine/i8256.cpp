@@ -69,7 +69,18 @@ void i8256_device::device_reset()
 
 	m_status = 0x30; // TRE and TBE
 
-	m_timer->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
+	reset_timer();
+}
+
+void i8256_device::reset_timer()
+{
+	int divider = 64; //default is 16kHz from the datasheet, it may later be changed to a slower one
+	if (BIT(m_command1, I8256_CMD1_FRQ))
+	{
+		divider = 1024;
+	}
+	const attotime time = attotime::from_hz((clock() / sysclock_divider[(m_command2 & 0x30 >> 4)]) / divider);
+	m_timer->adjust(time, 0, time);
 }
 
 TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
@@ -79,9 +90,9 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 		if (m_timers[i] > 0)
 		{
 			m_timers[i]--;
-			if (m_timers[i] == 0 && BIT(m_interrupts,timer_interrupt[i])) // If the interrupt is enabled
+			if (m_timers[i] == 0 && BIT(m_interrupts,timer_interrupts[i])) // If the interrupt is enabled
 			{
-				m_current_interrupt_level = timer_interrupt[i];
+				m_current_interrupt_level = timer_interrupts[i];
 				m_out_int_cb(1); // it occurs when the counter changes from 1 to 0.
 			}
 		}
@@ -156,16 +167,13 @@ void i8256_device::write(offs_t offset, u8 data)
 			{
 				m_command1 = data;
 
-				if (BIT(m_command1,I8256_CMD1_FRQ))
-					m_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
-				else
-					m_timer->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
+				reset_timer();
 
 				if (BIT(m_command1,I8256_CMD1_8086))
 					LOG("I8256 Enabled 8086 mode\n");
 
 				m_data_bits_count = 8-((BIT(m_command1, I8256_CMD1_L0)) | (BIT(m_command1, I8256_CMD1_L1) << 1));
-				m_stop_bits = stopBits[(BIT(m_command1, I8256_CMD1_S0)) | (BIT(m_command1, I8256_CMD1_S1) << 1)];
+				m_stop_bits = stop_bits[(BIT(m_command1, I8256_CMD1_S0)) | (BIT(m_command1, I8256_CMD1_S1) << 1)];
 
 				set_data_frame(1, m_data_bits_count, m_parity, m_stop_bits);
 			}
@@ -175,7 +183,7 @@ void i8256_device::write(offs_t offset, u8 data)
 			{
 				m_command2 = data;
 
-				set_rate(baudRates[m_command2 & 0x0f]);
+				set_rate(baud_rates[m_command2 & 0x0f]);
 
 				if (BIT(m_command2,I8256_CMD2_PARITY_ENABLE))
 					m_parity = BIT(m_command2,I8256_CMD2_EVEN_PARITY) ? PARITY_EVEN : PARITY_ODD;
@@ -184,9 +192,9 @@ void i8256_device::write(offs_t offset, u8 data)
 
 				set_data_frame(1, m_data_bits_count, m_parity, m_stop_bits);
 
-				LOG("I8256 Clock Scale: %u\n", sysclockDivider[(m_command2 & 0x30 >> 4)]);
-				if((clock() / sysclockDivider[(m_command2 & 0x30 >> 4)]) != 1024000)
-					logerror("I8256 Internal Clock should be 1024000, calculated: %u\n", (clock() / sysclockDivider[(m_command2 & 0x30 >> 4)]));
+				LOG("I8256 Clock Scale: %u\n", sysclock_divider[(m_command2 & 0x30 >> 4)]);
+				if((clock() / sysclock_divider[(m_command2 & 0x30 >> 4)]) != 1024000)
+					logerror("I8256 Internal Clock should be 1024000, calculated: %u\n", (clock() / sysclock_divider[(m_command2 & 0x30 >> 4)]));
 			}
 			break;
 		case I8256_REG_CMD3:
