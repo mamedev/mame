@@ -675,7 +675,7 @@ void gluck2_state::sise7(machine_config &config)
 
 	config.device_remove("ymsnd");
 
-	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);  // pin 7 not verified
+	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);  // pin 7 connected to GND
 
 }
 
@@ -735,4 +735,4 @@ ROM_END
 
 //    YEAR  NAME     PARENT  MACHINE   INPUT   STATE         INIT        ROT    COMPANY          FULLNAME                 FLAGS...
 GAME( 1992, gluck2,  0,      gluck2,   gluck2, gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Good Luck II",           MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sise7,   0,      sise7,    sise7,  gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Si Se 7 (4-colors 7's)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sise7,   0,      sise7,    sise7,  gluck2_state, empty_init, ROT0, "Yung Yu / CYE", "Si Se 7 (4-colors 7's)", MACHINE_SUPPORTS_SAVE )
