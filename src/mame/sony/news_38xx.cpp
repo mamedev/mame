@@ -180,15 +180,15 @@ protected:
 		"AST"sv, "SOFTINTR"sv, "FDCIRQ"sv, "PARALLEL"sv, "SLOT"sv, "LANCE"sv, "SCSI0"sv, "SCSI1"sv, "CPU"sv, "UBUS"sv,
 		"SCC"sv, "KEYBOARD"sv, "MOUSE"sv, "TIMER"sv, "FDCDRQ"sv, "PERR"sv
 	};
-	static constexpr u32 IOP_NMI_MASK = 1 << static_cast<u32>(iop_irq::FDCDRQ) |
-										1 << static_cast<u32>(iop_irq::SCC) |
-										1 << static_cast<u32>(iop_irq::SCSI0) |
-										1 << static_cast<u32>(iop_irq::SCSI1) |
-										1 << static_cast<u32>(iop_irq::LANCE) |
-										1 << static_cast<u32>(iop_irq::FDCIRQ) |
-										1 << static_cast<u32>(iop_irq::SLOT) |
-										1 << static_cast<u32>(iop_irq::SOFTINTR) |
-										1 << static_cast<u32>(iop_irq::AST);
+	static constexpr u32 IOP_NMI_MASK = 1 << (u32)iop_irq::FDCDRQ |
+										1 << (u32)iop_irq::SCC |
+										1 << (u32)iop_irq::SCSI0 |
+										1 << (u32)iop_irq::SCSI1 |
+										1 << (u32)iop_irq::LANCE |
+										1 << (u32)iop_irq::FDCIRQ |
+										1 << (u32)iop_irq::SLOT |
+										1 << (u32)iop_irq::SOFTINTR |
+										1 << (u32)iop_irq::AST;
 
 	template<iop_irq Number>
 	void irq_w(u8 state);
@@ -515,13 +515,13 @@ u8 news_38xx_state::iop_ipc_intst_r()
 
 u8 news_38xx_state::park_status_r()
 {
-	const u8 park_status = m_parallel_fault << 6 |
-						   static_cast<bool>(m_serial[0]->dsr_r()) << 5 |
-						   m_parallel_busy << 4 |
-						   !is_irq_set<iop_irq::PARALLEL>() << 3 |
-						   static_cast<bool>(m_serial[0]->ri_r()) << 2 |
-						   static_cast<bool>(m_serial[1]->dsr_r()) << 1 |
-						   static_cast<bool>(m_serial[1]->ri_r());
+	const u8 park_status = m_parallel_fault ? 0x40 : 0x0 |
+						   m_serial[0]->dsr_r() ? 0x20 :0x0 |
+						   m_parallel_busy ? 0x10 : 0x0 |
+						   !is_irq_set<iop_irq::PARALLEL>() ? 0x8 : 0x0 |
+						   m_serial[0]->ri_r() ? 0x4 : 0x0 |
+						   m_serial[1]->dsr_r() ? 0x2 : 0x0 |
+						   m_serial[1]->ri_r() ? 0x1 : 0x0;
 	LOGMASKED(LOG_INTERRUPT, "%s park_status_r: 0x%x\n", machine().describe_context(), park_status);
 	return park_status;
 }
