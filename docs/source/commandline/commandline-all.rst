@@ -1354,7 +1354,7 @@ Core Search Path Options
 
     Specifies the default path from which to load loose software image files.
 
-    The default is ``sofware`` (that is, a directory ``software`` in the current
+    The default is ``software`` (that is, a directory ``software`` in the current
     working directory).
 
     Example:
@@ -1811,7 +1811,7 @@ Core State/Playback Options
             All save states will be stored inside sta\c64\robby\
 
 .. Tip:: Note that even on Microsoft Windows, you should use ``/`` as your
-         path seperator for **-statename**
+         path separator for **-statename**
 
 
 .. _mame-commandline-noburnin:

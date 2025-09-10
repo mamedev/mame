@@ -577,7 +577,7 @@ Including subsets of supported systems
 SUBTARGET
     Set emulator subtarget to build.  Some pre-defined subtargets are provided,
     using Lua scripts in *scripts/target/mame* and system driver filter files in
-    *src/mame*.  User-defined substargets can be created using the **SOURCES**
+    *src/mame*.  User-defined subtargets can be created using the **SOURCES**
     or **SOURCEFILTER** option.
 SOURCES
     Specify system driver source files and/or folders to include.  Usually used
@@ -762,7 +762,7 @@ the ``_FORTIFY_SOURCE`` macro is set in the RPM build environment, and not by
 distributing a modified version of GCC.)
 
 If you get compilation errors in ``bits/string_fortified.h`` you should first
-ensure that the ``_FORTIY_SOURCE`` macro is defined via the environment (e.g.
+ensure that the ``_FORTIFY_SOURCE`` macro is defined via the environment (e.g.
 a **CFLAGS** or **CXXFLAGS** environment variable).  You can check to see
 whether the ``_FORTIFY_SOURCE`` macro is a built-in macro with your version of
 GCC with a command like this:
