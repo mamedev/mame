@@ -45,7 +45,7 @@
 #define LOG_MEM   (1U << 2)
 #define LOG_WARN  (1U << 3)
 
-#define VERBOSE ( LOG_GENERAL | LOG_IO | /*LOG_MEM |*/ LOG_WARN )
+//#define VERBOSE ( LOG_GENERAL | LOG_IO | /*LOG_MEM |*/ LOG_WARN )
 #include "logmacro.h"
 
 #define LOGIO(...)    LOGMASKED(LOG_IO,    __VA_ARGS__)
@@ -57,10 +57,31 @@ namespace {
 
 #define TIMINGS_PERFECT     0
 
-static const u16 CYCLES_HORIZ = (228 * 2) << 1;
-static const u16 CYCLES_VERT = 311;
-static const rectangle SCR_256x192 = { 48 << 1, (304 << 1) - 1, 40, 231 };
-static const rectangle SCR_320x256 = {  16 << 1, (336 << 1) - 1,  8, 263 };
+struct video_timings_info {
+	u16 min_hblank;
+	u16 int_h;
+
+	u16 min_hsync;
+	u16 max_hsync;
+	u16 max_hblank;
+	u16 min_hactive; // 256x192 area
+	u16 max_hc;
+
+	u16 min_vblank;
+	u16 int_v;
+	u16 min_vsync; // displays don't like vsync = vblank
+	u16 max_vsync;
+	u16 max_vblank;
+	u16 min_vactive; // 256x192 area
+	u16 max_vc;
+
+	// hdmi 360x288
+	u16 hdmi_xmin;
+	u16 hdmi_xmax;
+	u16 hdmi_ymin;
+	u16 hdmi_ymax;
+	u16 hdmi_ysync;
+};
 
 class specnext_state : public spectrum_128_state
 {
@@ -96,6 +117,7 @@ public:
 		, m_lores(*this, "lores")
 		, m_sprites(*this, "sprites")
 		, m_io_issue(*this, "ISSUE")
+		, m_io_video(*this, "VIDEO")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
 	{}
 
@@ -110,6 +132,7 @@ protected:
 	void reset_hard();
 	virtual void video_start() override ATTR_COLD;
 	virtual void spectrum_128_update_memory() override {}
+	void update_video_mode();
 
 	u8 do_m1(offs_t offset);
 	void do_mf_nmi();
@@ -310,8 +333,12 @@ private:
 	required_device<specnext_lores_device> m_lores;
 	required_device<specnext_sprites_device> m_sprites;
 	required_ioport m_io_issue;
+	optional_ioport m_io_video;
 	required_ioport_array<3> m_io_mouse;
 
+	video_timings_info m_video_timings;
+	rectangle m_clip256x192;
+	rectangle m_clip320x256;
 	int m_page_shadow[8];
 	bool m_bootrom_en;
 	u8 m_port_ff_data;
@@ -343,6 +370,7 @@ private:
 	u8 m_nr_04_romram_bank; // u7
 	u8 m_nr_05_joy1; // u2
 	u8 m_nr_05_joy0; // u2
+	bool m_nr_05_5060;
 	u8 m_nr_06_psg_mode; // u2
 	bool m_nr_06_ps2_mode;
 	bool m_nr_06_button_m1_nmi_en;
@@ -809,11 +837,86 @@ void specnext_state::memory_change(u16 port, u8 data) // port_memory_change_dly
 	m_port_1ffd_special_old = port_1ffd_special();
 }
 
+void specnext_state::update_video_mode()
+{
+	std::string machine_name;
+	if (BIT(m_nr_03_machine_timing, 2))
+	{
+		machine_name = "Pentagon";
+		m_video_timings = // Pentagon is always 50 Hz
+		{
+			0, 448 + 3 - 12, 16, 47, 63, 128, 447,
+			0, 319, 1, 14, 15, 80, 319,
+			76, 435, 24, 311, 24 + 0
+		};
+		m_nr_05_5060 = 0;
+	}
+	else if (BIT(m_nr_03_machine_timing, 1))
+	{
+		machine_name = BIT(m_nr_03_machine_timing, 0) ? "+3" : "128K";
+		if (!m_nr_05_5060)
+			m_video_timings = // 128K 50 Hz
+			{
+				0, u16(!BIT(m_nr_03_machine_timing, 0) ? 136 + 4 - 12 /* 128 */ : 136 + 2 - 12 /* +3 */), 16, 47, 95, 136, 455,
+				0, 1, 1, 4, 7, 64, 310,
+				88, 447, 16, 303, 16 + 4
+			};
+		else
+			m_video_timings = // 128K 60 Hz
+			{
+				0, u16(!BIT(m_nr_03_machine_timing, 0) ? 136 + 4 - 12 /* 128 */ : 136 + 2 - 12 /* +3 */), 16, 47, 95, 136, 455,
+				0, 0, 1, 4, 7, 40, 263,
+				88, 447, 16, 255, 16 + 0
+			};
+	}
+	else
+	{
+		machine_name = "48K";
+		if (!m_nr_05_5060)
+			m_video_timings = // 48K 50 Hz
+			{
+				0, 128 + 0 - 12, 16, 47, 95, 128, 447,
+				0, 0, 1, 4, 7, 64, 311,
+				80, 439, 16, 303, 16 + 4
+			};
+		else
+			m_video_timings = // 48K 60 Hz
+			{
+				0, 128 + 0 - 12, 16, 47, 95, 128, 447,
+				0, 0, 1, 4, 7, 40, 263,
+				80, 439, 16, 255, 16 + 0
+			};
+	}
+
+	const bool is_hdmi = ~m_io_video.read_safe(1) & 1;
+	const int left = m_video_timings.min_hactive << 1;
+	const int top = m_video_timings.min_vactive;
+	const int width = (m_video_timings.max_hc + 1) << 1;
+	const int height = m_video_timings.max_vc + 1;
+	m_clip256x192 = rectangle(left, left + (256 << 1) - 1, top, top + 192 - 1);
+	m_clip320x256 = rectangle(left - (32 << 1), left + ((256 + 32) << 1) - 1, top - 32, top + 192 + 32 - 1);
+
+	m_screen->configure(width, height
+		, is_hdmi
+			? rectangle(m_video_timings.hdmi_xmin << 1, m_video_timings.hdmi_xmax << 1,m_video_timings.hdmi_ymin, m_video_timings.hdmi_ymax)
+			: m_clip320x256
+		, HZ_TO_ATTOSECONDS(28_MHz_XTAL / 2) * width * height);
+	m_ula_scr->set_raster_offset(left, top);
+	m_lores->set_raster_offset(left, top);
+	m_tiles->set_raster_offset(left, top);
+	m_layer2->set_raster_offset(left, top);
+	m_sprites->set_raster_offset(left, top);
+
+	m_eff_nr_03_machine_timing = m_nr_03_machine_timing;
+	m_eff_nr_05_5060 = m_nr_05_5060;
+	LOG("%s: %s %dHz", machine_name, is_hdmi ? "HDMI" : "VGA", m_nr_05_5060 ? 60 : 50);
+}
+
 u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	rectangle clip256x192 = SCR_256x192;
+	rectangle clip256x192 = m_clip256x192;
 	clip256x192 &= cliprect;
-	rectangle clip320x256 = SCR_320x256;
+	rectangle clip320x256 = m_clip320x256;
 	clip320x256 &= cliprect;
 
 	screen.priority().fill(0, cliprect);
@@ -1105,7 +1208,7 @@ attotime specnext_state::copper_until_pos_r(u16 pos)
 	const u16 vcount = BIT(pos, 0, 9);
 	const u16 hcount = ((BIT(pos, 9, 6) << 3) + (BIT(pos, 15) ? 12 : 0)) << 1;
 	return ((vcount < m_screen->height()) && (hcount < m_screen->width()))
-		? m_screen->time_until_pos(SCR_256x192.top() + vcount + m_nr_64_copper_offset, SCR_256x192.left() + hcount)
+		? m_screen->time_until_pos(m_clip256x192.top() + vcount + m_nr_64_copper_offset, m_clip256x192.left() + hcount)
 		: attotime::never;
 }
 
@@ -1308,10 +1411,10 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = (m_nr_1b_tm_clip_idx << 6) | (m_nr_1a_ula_clip_idx << 4) | (m_nr_19_sprite_clip_idx << 2) | m_nr_18_layer2_clip_idx;
 		break;
 	case 0x1e:
-		port_253b_dat = BIT((m_screen->vpos() - 40) % m_screen->height(), 8);
+		port_253b_dat = BIT((m_nr_64_copper_offset + m_screen->vpos() - m_clip256x192.top() + m_screen->height()) % m_screen->height(), 8);
 		break;
 	case 0x1f:
-		port_253b_dat = ((m_screen->vpos() - 40) % m_screen->height()) & 0xff;
+		port_253b_dat = ((m_nr_64_copper_offset + m_screen->vpos() - m_clip256x192.top() + m_screen->height()) % m_screen->height())  & 0xff;
 		break;
 	case 0x20:
 		port_253b_dat = 0;//(BIT(im2_int_status, 0) <<) | (BIT(im2_int_status, 11) <<) | (0b00 <<) | BIT(im2_int_status, 3, 4);
@@ -1664,6 +1767,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 	case 0x05:
 		m_nr_05_joy0 = (BIT(nr_wr_dat, 3) << 2) | BIT(nr_wr_dat, 6, 2);
 		m_nr_05_joy1 = (BIT(nr_wr_dat, 1) << 2) | BIT(nr_wr_dat, 4, 2);
+		m_nr_05_5060 = BIT(nr_wr_dat, 2);
 		break;
 	case 0x06:
 		m_nr_06_hotkey_cpu_speed_en = BIT(nr_wr_dat, 7);
@@ -2196,7 +2300,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_d9_iotrap_write = nr_wr_dat;
 		break;
 	case 0xff:
-		popmessage("Debug: #%02X\n", nr_wr_dat); // LED
+		LOG("Debug: #%02X\n", nr_wr_dat); // LED
 		break;
 	default:
 		LOGWARN("wR: %X <- %x\n", nr_wr_reg, nr_wr_dat);
@@ -2297,10 +2401,13 @@ INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 {
 	m_tiles->control_w(m_nr_6b_tm_control); // TODO (1): Santa's Pressie, The Next War
 
+	if (m_eff_nr_05_5060 != m_nr_05_5060 || m_nr_03_machine_timing != m_eff_nr_03_machine_timing)
+		update_video_mode();
+
 	line_irq_adjust();
 	if (!port_ff_interrupt_disable())
 	{
-		m_irq_on_timer->adjust(m_screen->time_until_pos((SCR_256x192.bottom() + 57) % CYCLES_VERT, SCR_256x192.left()));
+		m_irq_on_timer->adjust(m_screen->time_until_pos(m_video_timings.int_v, m_video_timings.int_h << 1));
 	}
 }
 
@@ -2310,8 +2417,8 @@ void specnext_state::line_irq_adjust()
 		u16 line = m_nr_64_copper_offset + m_nr_23_line_interrupt;
 		if (line < m_screen->width())
 			m_irq_line_timer->adjust(m_screen->time_until_pos(
-				(SCR_256x192.top() - 1 + line) % m_screen->height(),
-				SCR_256x192.right() + 2));
+				(m_clip256x192.top() - 1 + line) % m_screen->height(),
+				m_clip256x192.right() + 2));
 		else
 			m_irq_line_timer->reset();
 	}
@@ -2792,6 +2899,12 @@ INPUT_PORTS_START(specnext)
 	PORT_CONFSETTING(0x02, "Issue 4 (KS 2)" )
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
+	PORT_START("VIDEO")
+	PORT_CONFNAME(0x01, 0x00, "Video" )
+	PORT_CONFSETTING(0x00, "HDMI" )
+	PORT_CONFSETTING(0x01, "VGA" )
+	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
+
 	PORT_START("mouse_input1")
 	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(40)
 
@@ -2859,6 +2972,7 @@ void specnext_state::machine_start()
 	save_item(NAME(m_nr_04_romram_bank));
 	save_item(NAME(m_nr_05_joy1));
 	save_item(NAME(m_nr_05_joy0));
+	save_item(NAME(m_nr_05_5060));
 	save_item(NAME(m_nr_06_psg_mode));
 	save_item(NAME(m_nr_06_ps2_mode));
 	save_item(NAME(m_nr_06_button_m1_nmi_en));
@@ -3084,6 +3198,7 @@ void specnext_state::reset_hard()
 	m_nr_04_romram_bank = 0;
 	m_nr_05_joy0 = 0b001;
 	m_nr_05_joy1 = 0b000;
+	m_nr_05_5060 = 0;
 	m_nr_06_hotkey_cpu_speed_en = 1;
 	m_nr_06_hotkey_5060_en = 1;
 	m_nr_06_button_drive_nmi_en = 0;
@@ -3141,7 +3256,6 @@ void specnext_state::reset_hard()
 	m_nr_f8_xadc_den = 0;
 	m_nr_f9_xadc_d0 = 0;
 	m_nr_fa_xadc_d1 = 0;
-	//m_nr_05_5060 = 0;
 	//m_nr_05_scandouble_en = 1;
 	m_nr_09_scanlines = 0b00;
 	m_nr_02_reset_type = 0b100;
@@ -3156,13 +3270,14 @@ void specnext_state::reset_hard()
 	// xdna_shift = 0;
 	// xadc_reset = 0;
 	// xadc_convst = 0;
-	m_eff_nr_05_5060 = 0;
 	m_eff_nr_05_scandouble_en = 0;
 	m_eff_nr_09_scanlines = 0;
 	m_nr_2d_i2s_sample = 0b00;
 
 	// m_port_00_data = 0;
 	m_nr_0a_divmmc_automap_en = 1;
+
+	update_video_mode();
 }
 
 void specnext_state::machine_reset()
@@ -3522,8 +3637,7 @@ void specnext_state::tbblue(machine_config &config)
 	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
 	ZXBUS_SLOT(config, "zxbus:1", 0, zxbus, zxbus_cards, nullptr);
 
-	const rectangle scr_full = { SCR_320x256.left() - 16, SCR_320x256.right() + 16, SCR_320x256.top() - 8, SCR_320x256.bottom() + 8 };
-	m_screen->set_raw(28_MHz_XTAL / 2, CYCLES_HORIZ, CYCLES_VERT, scr_full);
+	m_screen->set_raw(28_MHz_XTAL / 2, 456 << 1, 312,  { 0, 360 << 1, 0, 288 });
 	m_screen->set_screen_update(FUNC(specnext_state::screen_update));
 	m_screen->set_no_palette();
 
@@ -3531,13 +3645,11 @@ void specnext_state::tbblue(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tbblue);
 	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
-	const u16 left = SCR_256x192.left();
-	const u16 top = SCR_256x192.top();
-	SCREEN_ULA_NEXT (config, m_ula_scr, 0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x000, 0x100);
-	SPECNEXT_LORES  (config, m_lores,   0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x000, 0x100);
-	SPECNEXT_TILES  (config, m_tiles,   0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x200, 0x300);
-	SPECNEXT_LAYER2 (config, m_layer2,  0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x400, 0x500);
-	SPECNEXT_SPRITES(config, m_sprites, 0).set_raster_offset(left, top).set_palette(m_palette->device().tag(), 0x600, 0x700);
+	SCREEN_ULA_NEXT (config, m_ula_scr, 0).set_palette(m_palette->device().tag(), 0x000, 0x100);
+	SPECNEXT_LORES  (config, m_lores,   0).set_palette(m_palette->device().tag(), 0x000, 0x100);
+	SPECNEXT_TILES  (config, m_tiles,   0).set_palette(m_palette->device().tag(), 0x200, 0x300);
+	SPECNEXT_LAYER2 (config, m_layer2,  0).set_palette(m_palette->device().tag(), 0x400, 0x500);
+	SPECNEXT_SPRITES(config, m_sprites, 0).set_palette(m_palette->device().tag(), 0x600, 0x700);
 
 	SPECNEXT_COPPER(config, m_copper, 28_MHz_XTAL);
 	m_copper->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
