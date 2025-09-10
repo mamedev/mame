@@ -7,8 +7,10 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mc68hc11/mc68hc11.h"
+#include "speaker.h"
 
+#include "cpu/mc68hc11/mc68hc11.h"
+#include "sound/ay8910.h"
 
 namespace {
 
@@ -45,6 +47,10 @@ void megacrane_state::megacrane(machine_config &config)
 {
 	MC68HC11F1(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &megacrane_state::mem_map);
+
+	SPEAKER(config, "mono").front_center();
+
+	YMZ284(config, "ymz", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 }
 
