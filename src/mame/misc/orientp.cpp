@@ -277,7 +277,8 @@ void orientp_state::orientp(machine_config &config)
 
 	// 82C55 for leds
     I8255A(config, "ppi1");
-    I8255A(config, "ppi2");
+  
+	I8255A(config, "ppi2");
 	
 	// Keyboard & display interface. pasted from marywu. 
     i8279_device &kbdc(I8279(config, "kdc", XTAL(10'738'635) / 6));
