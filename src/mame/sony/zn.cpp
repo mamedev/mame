@@ -1889,7 +1889,7 @@ protected:
 };
 
 /*
-Judge Dread (light-gun type shooting game)
+Judge Dredd (light-gun type shooting game)
 Uses the Sony ZN-1 hardware with ROM board and HDD.
 U35 and U36 EPROMs are 27C1001.
 Disk Drive is a Quantum 2.1GB
