@@ -35,6 +35,7 @@ private:
 void megacrane_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom().region("program", 0);
+	map(0x0000, 0x7fff).ram();
 }
 
 
