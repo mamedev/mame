@@ -115,7 +115,10 @@ void ym7101_device::device_start()
 	save_item(NAME(m_de));
 	save_item(NAME(m_ie0));
 	save_item(NAME(m_m1));
+	save_item(NAME(m_m2));
 	save_item(NAME(m_m3));
+	save_item(NAME(m_m5));
+	save_item(NAME(m_sh));
 	save_item(NAME(m_hscroll_address));
 	save_item(NAME(m_hsz));
 	save_item(NAME(m_vsz));
@@ -202,10 +205,15 @@ void ym7101_device::update_command_state()
 
 u16 ym7101_device::control_port_r(offs_t offset, u16 mem_mask)
 {
+	const u8 h40_mode = BIT(m_hres_mode, 0);
+
+	const u16 hblank_upper = h40_mode ? (0xb2 << 1) : (0x92 << 1);
+	const u16 hblank_lower = h40_mode ? (0x05 << 1) : (0x04 << 1);
+
 	// other bits returns open bus, tbd
 	// FIFO empty << 9
 	// FIFO full << 8
-	const bool in_hblank = !!(screen().hpos() < (0x05 << 1)) || (screen().hpos() > (0xb2 << 1));
+	const bool in_hblank = !!(screen().hpos() < hblank_lower) || (screen().hpos() > hblank_upper);
 	return (m_vint_pending << 7)
 //      | sprite_overflow << 6
 //      | sprite_collision << 5
@@ -255,7 +263,12 @@ void ym7101_device::control_port_w(offs_t offset, u16 data, u16 mem_mask)
 
 		if ((data & 0xc000) == 0x8000)
 		{
-			space(AS_VDP_IO).write_byte((data >> 8) & 0x3f, data & 0xff);
+			const u8 reg = (data >> 8) & 0x3f;
+
+			// disable upper access in Mode 4 (bassmpro Sega logo)
+			if (!m_m5 && reg > 10)
+				return;
+			space(AS_VDP_IO).write_byte(reg, data & 0xff);
 		}
 		else
 		{
@@ -433,7 +446,10 @@ void ym7101_device::cram_w(offs_t offset, u16 data, u16 mem_mask)
 
 	// normal
 	m_palette->set_pen_color(offset, level[r << 1], level[g << 1], level[b << 1]);
-	// TODO: shadow & highlight
+	// shadow
+	m_palette->set_pen_color(offset | 0x80, level[r], level[g], level[b]);
+	// hilight
+	m_palette->set_pen_color(offset | 0x40, level[7 + r], level[7 + g], level[7 + b]);
 }
 
 void ym7101_device::cram_map(address_map &map)
@@ -484,6 +500,8 @@ void ym7101_device::regs_map(address_map &map)
 		m_de = !!BIT(data, 6);
 		m_ie0 = !!BIT(data, 5);
 		m_m1 = !!BIT(data, 4);
+		m_m2 = !!BIT(data, 3);
+		m_m5 = !!BIT(data, 2);
 		//m_dma.active = !!(m_m1 && BIT(m_command.code, 5));
 
 		if (m_ie0 && m_vint_pending)
@@ -503,8 +521,8 @@ void ym7101_device::regs_map(address_map &map)
 			, m_de
 			, m_ie0
 			, m_m1
-			, BIT(data, 3)
-			, BIT(data, 2)
+			, m_m2
+			, m_m5
 		);
 	}));
 	map(2, 2).lw8(NAME([this] (u8 data) {
@@ -570,13 +588,14 @@ void ym7101_device::regs_map(address_map &map)
 			m_hres_mode = data & 0x81;
 			flush_screen_mode();
 		}
+		m_sh = !!(BIT(data, 3));
 		LOGREGS("\tRSx: %d (%s) VS: %d HS: %d EP: %d S/H: %d LSx: %d\n"
 			, BIT(data, 7)
 			, BIT(data, 7) ? "H40" : "H32"
 			, BIT(data, 6)
 			, BIT(data, 5)
 			, BIT(data, 4)
-			, BIT(data, 3)
+			, m_sh
 			, (data & 6) >> 1
 		);
 	}));
@@ -956,27 +975,90 @@ bool ym7101_device::render_line(int scanline)
 
 	for (int x = 0; x < line_width; x ++)
 	{
-		u8 pen = m_background_color;
-
-		for (int pri = 0; pri < 2; pri ++)
-		{
-			u8 dot = m_tile_b_line[x];
-			if ((dot & 0xf) && BIT(dot, 6) == pri)
-				pen = dot & 0x3f;
-
-			dot = m_tile_a_line[x];
-			if ((dot & 0xf) && BIT(dot, 6) == pri)
-				pen = dot & 0x3f;
-
-			if (m_sprite_line[x] & 0xf && BIT(m_sprite_line[x], 6) == pri)
-				pen = m_sprite_line[x] & 0x3f;
-		}
+		u8 dot_b = m_tile_b_line[x];
+		u8 dot_a = m_tile_a_line[x];
+		u8 dot_sprite = m_sprite_line[x];
+		u8 pen = (this->*mix_table[m_sh])(dot_a, dot_b, dot_sprite);
 
 		p[x] = m_palette->pen(pen);
 	}
 
 	return true;
 }
+
+const ym7101_device::mix_func ym7101_device::mix_table[2] =
+{
+	&ym7101_device::mix_normal,
+	&ym7101_device::mix_sh
+};
+
+u8 ym7101_device::mix_normal(u8 dot_a, u8 dot_b, u8 dot_sprite)
+{
+	u8 pen = m_background_color;
+	for (int pri = 0; pri < 2; pri ++)
+	{
+		if ((dot_b & 0xf) && BIT(dot_b, 6) == pri)
+			pen = dot_b & 0x3f;
+
+		if ((dot_a & 0xf) && BIT(dot_a, 6) == pri)
+			pen = dot_a & 0x3f;
+
+		if (dot_sprite & 0xf && BIT(dot_sprite, 6) == pri)
+			pen = dot_sprite & 0x3f;
+	}
+	return pen;
+}
+
+// https://rasterscroll.com/mdgraphics/graphical-effects/shadow-and-highlight/
+u8 ym7101_device::mix_sh(u8 dot_a, u8 dot_b, u8 dot_sprite)
+{
+	u8 pen = m_background_color;
+
+	for (int pri = 0; pri < 2; pri ++)
+	{
+		if ((dot_b & 0xf) && BIT(dot_b, 6) == pri)
+			pen = dot_b & 0x3f;
+
+		if ((dot_a & 0xf) && BIT(dot_a, 6) == pri)
+			pen = dot_a & 0x3f;
+
+		// apply shadow if both tiles are low priority
+		if (!pri && !BIT(dot_a, 6) && !BIT(dot_b, 6))
+			pen |= 0x80;
+
+		if (dot_sprite & 0xf && BIT(dot_sprite, 6) == pri)
+		{
+			const u8 sprite_entry = dot_sprite & 0x3f;
+			if (sprite_entry == 0x3f)
+			{
+				// make pen transparent and apply shadow mask
+				pen |= 0x80;
+			}
+			else if (sprite_entry == 0x3e)
+			{
+				// make pen transparent and apply highlight mask
+				// cancel shadow effect if was previously set
+				if (pen & 0x80)
+					pen &= 0x3f;
+				else
+					pen |= 0x40;
+			}
+			else
+			{
+				// apply shadow mask if sprite entry isn't in the E line
+				// and overlaps a low priority tile
+				if (!pri && (sprite_entry & 0xf) != 0xe)
+				{
+					pen = (dot_sprite & 0x3f) | (pen & 0x80);
+				}
+				else
+					pen = (dot_sprite & 0x3f);
+			}
+		}
+	}
+	return pen;
+}
+
 
 TIMER_CALLBACK_MEMBER(ym7101_device::scan_timer_callback)
 {

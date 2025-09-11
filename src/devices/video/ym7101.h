@@ -155,7 +155,10 @@ private:
 	bool m_de; // display enable
 	bool m_ie0; // VINT enable
 	bool m_m1; // DMA enable
+	bool m_m2; // Vertical resolution V28/V30, latter won't sync in NTSC
 	bool m_m3; // latch H/V counter
+	bool m_m5; // Mode 5 if on, else Mode 4 (SMS)
+	bool m_sh; // Shadow/Highlight mode, aliases: S/TE, S/TEN
 	u32 m_hscroll_address;
 	u8 m_hsz, m_vsz;
 	u8 m_auto_increment;
@@ -183,6 +186,11 @@ private:
 	bool render_line(int scanline);
 	void prepare_sprite_line(int scanline);
 	void prepare_tile_line(int scanline);
+
+	typedef u8 (ym7101_device::*mix_func)(u8 dot_a, u8 dot_b, u8 sprite_dot);
+	static const mix_func mix_table[2];
+	u8 mix_normal(u8 dot_a, u8 dot_b, u8 sprite_dot);
+	u8 mix_sh(u8 dot_a, u8 dot_b, u8 sprite_dot);
 
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
