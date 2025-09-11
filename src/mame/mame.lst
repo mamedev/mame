@@ -47923,6 +47923,7 @@ vector4
 looping
 loopingv
 loopingva
+loopingvb
 skybump
 
 @source:venture/spcforce.cpp
