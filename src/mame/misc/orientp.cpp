@@ -305,8 +305,8 @@ void orientp_state::orientp(machine_config &config)
 
 }
 
-ROM_START( east8 )
-	ROM_REGION( 0x10000, "maincpu", 0 ) 
+ROM_START( east8v100 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // idk which pcb are from.
 	ROM_LOAD( "27c512.u33", 0x00000, 0x10000,  CRC(85e28db5) SHA1(96f80a7d2214672c09b8f719cb573e77b8bac731) ) // Main program.  EAST8  v1.00 string
 
     ROM_REGION( 0x1000, "mcu", 0 )
@@ -317,7 +317,7 @@ ROM_START( east8 )
 
     ROM_END
 
-ROM_START( east8a )
+ROM_START( east8v105 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // was from pcb 1
 	ROM_LOAD( "w27c512.u33", 0x00000, 0x10000, CRC(8d3d1e91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // Main program.  EAST8  v1.05 string
 
@@ -329,9 +329,24 @@ ROM_START( east8a )
 
     ROM_END
 
+ROM_START( unk6bp )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // No kdc output. no label rom mentioned by dumper. Marked as BAD_DUMP.
+	ROM_LOAD( "eeprommusical.u33", 0x00000, 0x10000, BAD_DUMP CRC(7211acd8) SHA1(742f949c4ac661f41cf5aca42a279dc82cba2e2e) ) // No string
+
+    ROM_REGION( 0x1000, "mcu", 0 )
+    ROM_LOAD( "at89s51.u39", 0x0000, 0x1000, BAD_DUMP CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. From the pcb 2
+ 
+    ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
+    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) BAD_DUMP SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  Voices Rom. From the pcb 2.
+
+    ROM_END
+
 } // anonymous namespace
 
 
-//    YEAR  NAME    PARENT   MACHINE   INPUT  STATE          INIT        ROT   COMPANY      FULLNAME                  FLAGS
-GAME( 199?, east8,  0,       orientp,  east8, orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 (v1.00)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 199?, east8a, 0,       orientp,  east8, orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+// unsorted: in which board are from?
+//    YEAR  NAME            PARENT   MACHINE   INPUT  STATE   INIT        ROT   COMPANY      FULLNAME                     FLAGS
+GAME( 199?, east8v100,  0,  orientp,  east8,   orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 (v1.00)",     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // error 10
+GAME( 199?, east8v105,  0,  orientp,  east8,   orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 (v1.05)",     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // same goes to east8
+GAME( 199?, unk6ballp,  0,  orientp,  east8,   orientp_state, empty_init, ROT0, "<unknown>", "Unknown 6 ball pinball",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // No String. no output.
+
