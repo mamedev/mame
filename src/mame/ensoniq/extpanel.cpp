@@ -9,6 +9,8 @@
 #include "extpanel.h"
 #include "emuopts.h"
 
+#include "asio.h"
+
 #include <memory>
 #include <iostream>
 
