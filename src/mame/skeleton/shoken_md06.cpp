@@ -25,6 +25,7 @@ DIP sheets are available
 
 #include "cpu/z80/kl5c80a12.h"
 #include "machine/msm6242.h"
+#include "sound/okim9810.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -42,6 +43,7 @@ public:
 	{ }
 
 	void petitlot(machine_config &config) ATTR_COLD;
+	void polarstar(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<kl5c80a12_device> m_maincpu;
@@ -145,13 +147,28 @@ void shoken_md06_state::petitlot(machine_config &config)
 	// TODO: sound related ICs aren't present?
 }
 
+void shoken_md06_state::polarstar(machine_config &config)
+{
+	petitlot(config);
+
+	okim9810_device &oki(OKIM9810(config, "oki", 16_MHz_XTAL / 12));
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0); //divider guessed
+}
 
 ROM_START( petitlot )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "md06_ver4_1.ic6", 0x00000, 0x10000, CRC(ebc81f10) SHA1(28ac52aeadfbf792da95c01b16fb88f7a5eb1d4e) ) // 1xxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
+ROM_START( polarstar2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "polarstar2_mk04_ver.4.5.ic8", 0x00000, 0x20000, CRC(80d71047) SHA1(4253f0d3273bce22202d34a08f092fa72f7760a0) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "polarstar_mb01_sound-b.ic35", 0x00000, 0x80000, CRC(ef01200e) SHA1(5cd70c9d307302e689aa7903e2d65b0ce50091ca) )
+ROM_END
+
 } // anonymous namespace
 
-
-GAME( 2001, petitlot, 0, petitlot, petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Petit Lot (ver. 4.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 199?, polarstar2, 0, polarstar, petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Polar Star 2 (ver. 4.5)", MACHINE_NO_SOUND    | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2001, petitlot,   0, petitlot,  petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Petit Lot (ver. 4.1)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
