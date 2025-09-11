@@ -98,6 +98,8 @@ void ym7101_device::device_start()
 	save_pointer(NAME(m_sprite_cache), 80 * 4);
 
 	m_hres_mode = 0x81;
+	m_sprite_collision = false;
+	m_sprite_overflow = false;
 
 	save_item(STRUCT_MEMBER(m_command, latch));
 	save_item(STRUCT_MEMBER(m_command, address));
@@ -142,7 +144,8 @@ void ym7101_device::device_start()
 	save_item(NAME(m_vcounter));
 	save_item(NAME(m_hvcounter_latch));
 	save_item(NAME(m_vram_mask));
-
+	save_item(NAME(m_sprite_collision));
+	save_item(NAME(m_sprite_overflow));
 }
 
 void ym7101_device::device_reset()
@@ -210,14 +213,21 @@ u16 ym7101_device::control_port_r(offs_t offset, u16 mem_mask)
 	const u16 hblank_upper = h40_mode ? (0xb2 << 1) : (0x92 << 1);
 	const u16 hblank_lower = h40_mode ? (0x05 << 1) : (0x04 << 1);
 
+	const u8 sprite_flags = (m_sprite_overflow << 6) | (m_sprite_collision << 5);
+
+	if (!machine().side_effects_disabled())
+	{
+		m_sprite_overflow = false;
+		m_sprite_collision = false;
+	}
+
 	// other bits returns open bus, tbd
 	// FIFO empty << 9
 	// FIFO full << 8
 	const bool in_hblank = !!(screen().hpos() < hblank_lower) || (screen().hpos() > hblank_upper);
 	return (m_vint_pending << 7)
-//      | sprite_overflow << 6
-//      | sprite_collision << 5
-//      | odd << 4
+		| sprite_flags
+//	    | odd << 4
 		| (screen().vblank() << 3)
 		| in_hblank << 2
 		| (m_dma.active << 1);
@@ -730,7 +740,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 	u16 offset = 0;
 	int y, x;
 	u16 height, width;
-	u8 sprite_mask_state = 0;
+	u8 sprite_mask_state = 0; // m_sprite_overflow;
 
 	do {
 		const u16 *cache = &m_sprite_cache[offset];
@@ -780,8 +790,8 @@ void ym7101_device::prepare_sprite_line(int scanline)
 
 				if ((m_sprite_line[x + xi] & 0xf) == 0)
 					m_sprite_line[x + xi] = (color) | (dot & 0xf) | (high_priority << 6);
-				// sprite collision
-				// else if (dot)
+				else if (dot)
+					m_sprite_collision = true;
 			}
 		}
 
@@ -813,7 +823,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 
 	} while(num_sprites > 0 && num_pixels > 0 && entry_sprites > 0 && link != 0);
 
-	// sprite overflow, here
+	// m_sprite_overflow = num_pixels <= 0 || num_sprites <= 0 || sprite_mask_state == 2;
 }
 
 void ym7101_device::prepare_tile_line(int scanline)

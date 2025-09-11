@@ -181,6 +181,7 @@ private:
 	int m_vcounter; // irq4 counter
 	u16 m_hvcounter_latch;
 	u32 m_vram_mask;
+	bool m_sprite_collision, m_sprite_overflow;
 
 	bitmap_rgb32 m_bitmap;
 	bool render_line(int scanline);
