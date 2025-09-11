@@ -347,6 +347,7 @@ void looping_state::machine_reset()
 	m_cop_port_l = 0;
 }
 
+
 /*************************************
  *
  *  Interrupt handling
@@ -904,4 +905,5 @@ GAME( 1982, looping,   0,        looping, looping, looping_state, init_looping, 
 GAME( 1982, loopingu,  looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (US, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, loopingua, looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (US, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, loopingub, looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (US, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
 GAME( 1982, skybump,   0,        looping, skybump, looping_state, init_looping, ROT90, "Venture Line", "Sky Bumper", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
