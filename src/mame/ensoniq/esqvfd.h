@@ -41,10 +41,8 @@ protected:
 	esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dimensions_param &&dimensions);
 
 	static constexpr uint8_t AT_NORMAL      = 0x00;
-	static constexpr uint8_t AT_BOLD        = 0x01;
-	static constexpr uint8_t AT_UNDERLINE   = 0x02;
-	static constexpr uint8_t AT_BLINK       = 0x04;
-	static constexpr uint8_t AT_BLINKED     = 0x80;   // set when character should be blinked off
+	static constexpr uint8_t AT_UNDERLINE   = 0x01;
+	static constexpr uint8_t AT_BLINK       = 0x02;
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
