@@ -24,11 +24,11 @@ K-665 sound chip (Oki M6295 clone)
 
 
 TODO:
-- color bug with faces spinning in gameplay (another bitswap meme?)
+- I/O;
 - audio CPU ROM banking;
-- CRTC?;
-- inputs;
-- lamps.
+- Convert video to use 6845 semantics;
+- lamps;
+
 */
 
 
@@ -102,8 +102,8 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_4bpp_tile_info);
+	TILE_GET_INFO_MEMBER(get_7bpp_tile_info);
 
 	void bgram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fgram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -132,37 +132,36 @@ TIMER_DEVICE_CALLBACK_MEMBER(whtm68k_state::scanline_cb)
 
 void whtm68k_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(whtm68k_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(whtm68k_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(whtm68k_state::get_7bpp_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(whtm68k_state::get_4bpp_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-// TODO: color is unconfirmed, other attr bits
-TILE_GET_INFO_MEMBER(whtm68k_state::get_bg_tile_info)
+TILE_GET_INFO_MEMBER(whtm68k_state::get_4bpp_tile_info)
 {
-	uint16_t const tile = m_bgram[tile_index] & 0xfff;
-	uint16_t const color = (m_bgram[tile_index] & 0xf000) >> 12;
-	uint16_t const attr = m_bg_attr[tile_index];
+	uint16_t const tile = m_fgram[tile_index] & 0xfff;
+	uint16_t const color = (m_fgram[tile_index] & 0xf000) >> 12;
 
-	tileinfo.category = BIT(attr, 4);
 	tileinfo.set(0, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(whtm68k_state::get_fg_tile_info)
+TILE_GET_INFO_MEMBER(whtm68k_state::get_7bpp_tile_info)
 {
-	uint16_t const tile = ((m_fgram[tile_index] & 0xfff));
-	tileinfo.set(1, tile, 0, 0);
+	uint16_t const tile = ((m_bgram[tile_index] & 0xfff));
+	uint16_t const attr = m_bg_attr[tile_index];
+	uint16_t const color = (attr >> 4) & 1;
+
+	tileinfo.set(1, tile, color, 0);
 }
 
 uint32_t whtm68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 
 	return 0;
 }
@@ -209,8 +208,8 @@ void whtm68k_state::main_program_map(address_map &map)
 	map(0x810100, 0x810101).portr("DSW1"); // ??
 	map(0x810300, 0x810301).portr("DSW2"); // ??
 	map(0x810401, 0x810401).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xd00000, 0xd03fff).ram().w(FUNC(whtm68k_state::bgram_w)).share(m_bgram);
-	map(0xd10000, 0xd13fff).ram().w(FUNC(whtm68k_state::fgram_w)).share(m_fgram);
+	map(0xd00000, 0xd03fff).ram().w(FUNC(whtm68k_state::fgram_w)).share(m_fgram);
+	map(0xd10000, 0xd13fff).ram().w(FUNC(whtm68k_state::bgram_w)).share(m_bgram);
 	map(0xd20000, 0xd23fff).ram().w(FUNC(whtm68k_state::bg_attr_w)).share(m_bg_attr);
 	map(0xd24000, 0xd24001).ram(); // unknown, set once during POST with 0x42
 	map(0xe00000, 0xe03fff).ram(); // work RAM?
@@ -312,21 +311,21 @@ const gfx_layout gfx_8x8x4_packed_msb_r =
 	8*8*4
 };
 
-const gfx_layout gfx_8x8x8_packed_msb_r =
+// 0 is unused, matters for faces around $880 block
+const gfx_layout gfx_8x8x7_packed_msb_r =
 {
 	8,8,
 	RGN_FRAC(1,2),
-	8,
-	{ 0, 1, 2, 3, RGN_FRAC(1, 2)+0, RGN_FRAC(1, 2)+1, RGN_FRAC(1, 2)+2, RGN_FRAC(1, 2)+3 },
+	7,
+	{ 1, 2, 3, RGN_FRAC(1, 2)+0, RGN_FRAC(1, 2)+1, RGN_FRAC(1, 2)+2, RGN_FRAC(1, 2)+3 },
 	{ 4, 0, 28, 24, 20, 16, 12, 8 },
 	{ STEP8(0,4*8) },
 	8*8*4
 };
 
-
 static GFXDECODE_START( gfx_wht )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb_r, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x8_packed_msb_r, 0x100, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb_r, 0x000, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x7_packed_msb_r, 0x100, 2 )
 GFXDECODE_END
 
 
@@ -407,4 +406,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1996, yizhix,  0, yizhix, yizhix,  whtm68k_state, empty_init, ROT0, "WHT", "Yizhi Xiangqi", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // 1996 WHT copyright in GFX
+GAME( 1996, yizhix,  0, yizhix, yizhix,  whtm68k_state, empty_init, ROT0, "WHT", "Yizhi Xiangqi", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // I/O
