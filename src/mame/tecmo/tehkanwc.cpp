@@ -1164,14 +1164,14 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcc, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
-GAME( 1985, tehkanwcd, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 4, earlier)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tehkanwch, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "hack",    "Tehkan World Cup (1986 year hack)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcc, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
+GAME( 1985, tehkanwcd, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 4, earlier)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tehkanwch, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "hack",    "Tehkan World Cup (1986 year hack)",    MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Gridiron Fight",                     MACHINE_SUPPORTS_SAVE, layout_gridiron )
-GAMEL(1987, aafootb,   gridiron, tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tecmo",   "All American Football (Tecmo)",      MACHINE_SUPPORTS_SAVE, layout_gridiron )
+GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Gridiron Fight (World)",               MACHINE_SUPPORTS_SAVE, layout_gridiron )
+GAMEL(1987, aafootb,   gridiron, tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tecmo",   "All American Football (Tecmo, Japan)", MACHINE_SUPPORTS_SAVE, layout_gridiron )
 
-GAME( 1987, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (World)",                  MACHINE_SUPPORTS_SAVE ) // found in US, but no region warning
-GAME( 1986, teedoffj,  teedoff,  tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (World)",                    MACHINE_SUPPORTS_SAVE ) // found in US, but no region warning
+GAME( 1986, teedoffj,  teedoff,  tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (Japan)",                    MACHINE_SUPPORTS_SAVE )
