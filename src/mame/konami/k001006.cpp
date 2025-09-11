@@ -22,6 +22,7 @@ k001006_device::k001006_device(const machine_config &mconfig, const char *tag, d
 	, m_addr(0)
 	, m_device_sel(0)
 	, m_gfxrom(*this, finder_base::DUMMY_TAG)
+	, m_enable_bilinear(false)
 {
 }
 
@@ -46,8 +47,9 @@ void k001006_device::device_start()
 
 	save_pointer(NAME(m_pal_ram), 0x800);
 	save_pointer(NAME(m_unknown_ram), 0x1000);
-	save_item(NAME(m_device_sel));
 	save_item(NAME(m_addr));
+	save_item(NAME(m_device_sel));
+	save_item(NAME(m_enable_bilinear));
 }
 
 //-------------------------------------------------
