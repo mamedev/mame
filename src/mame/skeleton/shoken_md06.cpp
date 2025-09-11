@@ -55,14 +55,18 @@ private:
 
 void shoken_md06_state::program_map(address_map &map)
 {
-	map(0x00000, 0x04fff).rom();
+	map(0x00000, 0x08fff).rom();
+	map(0x09000, 0x0cfff).ram();
 	map(0xe0000, 0xe3fff).ram();
+	map(0xfcc00, 0xfffff).ram();
 }
 
 void shoken_md06_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map.unmap_value_high();
+	map(0x40, 0x40).nopw();
+	map(0x80, 0x80).noprw();
+	map(0x90, 0x90).noprw();
 }
 
 
@@ -161,14 +165,14 @@ ROM_START( petitlot )
 ROM_END
 
 ROM_START( polarstar2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "polarstar2_mk04_ver.4.5.ic8", 0x00000, 0x20000, CRC(80d71047) SHA1(4253f0d3273bce22202d34a08f092fa72f7760a0) )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "polarstar2_mk04_ver.4.5.ic8", 0x00000, 0x20000, CRC(13a7b9dc) SHA1(64aa5591aa676cbb9e00327ac62209b6854c4416) )
 
-	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "polarstar_mb01_sound-b.ic35", 0x00000, 0x80000, CRC(ef01200e) SHA1(5cd70c9d307302e689aa7903e2d65b0ce50091ca) )
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "polarstar_mb01_sound-b.ic35", 0x00000, 0x100000, CRC(606ae52c) SHA1(6a60f4b1c6ac893cafa373c8af7d2c826304f152) )
 ROM_END
 
 } // anonymous namespace
 
-GAME( 199?, polarstar2, 0, polarstar, petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Polar Star 2 (ver. 4.5)", MACHINE_NO_SOUND    | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 2001, petitlot,   0, petitlot,  petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Petit Lot (ver. 4.1)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2010, polarstar2, 0, polarstar, petitlot, shoken_md06_state, empty_init, ROT0, "Shoken", "Polar Star 2 (ver. 4.5)", MACHINE_NO_SOUND    | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
