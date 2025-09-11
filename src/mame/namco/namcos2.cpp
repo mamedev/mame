@@ -592,6 +592,31 @@ void namcos2_state::dpram_word_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
+void suzuka8h_state::dpram_word_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_dpram[offset] = data & 0xff;
+
+		// TODO : This is a hack! should be output ports MCU side, not probing into DPRAM content
+		switch( offset )
+		{
+			case 0xc0/2: case 0xc2/2: case 0xc4/2: case 0xc6/2: case 0xc8/2: case 0xca/2: case 0xcc/2:
+			{
+				// output 7segs
+				// c0  c2  c4  c6  c8  ca  cc  ce
+				// 1st 2nd 3rd 4th 10s 01s lap --
+				int group = offset - 0x60;
+				m_out_digit[group] = bitswap<7>(~data,1,2,3,4,5,7,6);
+				break;
+			}
+
+			default:
+				break;
+		}
+	}
+}
+
 void gollygho_state::dpram_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
@@ -5792,15 +5817,15 @@ GAMEL( 1992, finalap3bl, finalap3, finalap3, finalap3, namcos2_state, init_final
 GAME(  1992, luckywld,   0,        luckywld, luckywld, namcos2_state, init_luckywld, ROT0,   "Namco", "Lucky & Wild", MACHINE_SUPPORTS_SAVE )
 GAME(  1992, luckywldj,  luckywld, luckywld, luckywld, namcos2_state, init_luckywld, ROT0,   "Namco", "Lucky & Wild (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1992, suzuka8h,   0,        suzuka8h, suzuka,   namcos2_state, init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME(  1992, suzuka8hj,  suzuka8h, suzuka8h, suzuka,   namcos2_state, init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1992, suzuka8h,   0,        suzuka8h, suzuka,   suzuka8h_state, init_suzuka8h, ROT0,  "Namco", "Suzuka 8 Hours (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1992, suzuka8hj,  suzuka8h, suzuka8h, suzuka,   suzuka8h_state, init_suzuka8h, ROT0,  "Namco", "Suzuka 8 Hours (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 
 GAME(  1992, sws,        0,        base_c68, base,     namcos2_state, init_sws,      ROT0,   "Namco", "Super World Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME(  1992, sws92,      0,        base_c68, base,     namcos2_state, init_sws92,    ROT0,   "Namco", "Super World Stadium '92 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME(  1992, sws92g,     sws92,    base_c68, base,     namcos2_state, init_sws92g,   ROT0,   "Namco", "Super World Stadium '92 Gekitouban (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1993, suzuk8h2,   0,        suzuka8h, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (World, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME(  1993, suzuk8h2j,  suzuk8h2, suzuka8h, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1993, suzuk8h2,   0,        suzuka8h, suzuka,   suzuka8h_state, init_suzuk8h2, ROT0,  "Namco", "Suzuka 8 Hours 2 (World, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1993, suzuk8h2j,  suzuk8h2, suzuka8h, suzuka,   suzuka8h_state, init_suzuk8h2, ROT0,  "Namco", "Suzuka 8 Hours 2 (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 
 GAME(  1993, sws93,      0,        base_c68, base,     namcos2_state, init_sws93,    ROT0,   "Namco", "Super World Stadium '93 (Japan)", MACHINE_SUPPORTS_SAVE ) // this appears to have a subtitle, what is it?
