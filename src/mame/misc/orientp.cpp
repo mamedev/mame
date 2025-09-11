@@ -306,7 +306,7 @@ void orientp_state::orientp(machine_config &config)
 }
 
 ROM_START( east8v100 )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // idk which pcb are from.
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512.u33", 0x00000, 0x10000,  CRC(85e28db5) SHA1(96f80a7d2214672c09b8f719cb573e77b8bac731) ) // Main program.  EAST8  v1.00 string
 
     ROM_REGION( 0x1000, "mcu", 0 )
@@ -325,43 +325,42 @@ ROM_START( east8v105 )
     ROM_LOAD( "at89s51.u39", 0x0000, 0x1000, BAD_DUMP CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. From the pcb 2
  
     ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
-    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) BAD_DUMP SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  Voices Rom. From the pcb 2
-
+    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) BAD_DUMP SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) // Using  Rom Voices From the pcb 2 for now.
     ROM_END
 
 ROM_START( east8v105a ) 
 	ROM_REGION( 0x10000, "maincpu", 0 ) // EAST8  v1.05 string. Different hex 17 hex at 7A Address. Intentional?
-	ROM_LOAD( "supercopa512.u33", 0x00000, 0x10000, CRC(b9a44b3c) SHA1(dddf7cbdb1121fdbaf81a2feaf98d8c42ac5fbe5) ) // No rom label mentioned by the dumper. using filenames for now // Main program.  
+	ROM_LOAD( "supercopa512.u33", 0x00000, 0x10000, CRC(b9a44b3c) SHA1(dddf7cbdb1121fdbaf81a2feaf98d8c42ac5fbe5) ) // Main program. No rom label mentioned by the dumper, using filenames for now.  
 
     ROM_REGION( 0x1000, "mcu", 0 )
     ROM_LOAD( "at89s51.u39", 0x0000, 0x1000, BAD_DUMP CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. From the pcb 2
  
     ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
-    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) BAD_DUMP SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  Voices Rom. From the pcb 2
+    ROM_LOAD( "prog32ptaspdofutball.bin", 0x00000, 0x40000, CRC(7c6b81ce) BAD_DUMP SHA1(357158aa961e4800653130f76fddfec4accafa3d) ) // No Voice rom label mentioned by the dumper. was from the supercopa512 sets?
 
     ROM_END
 
 ROM_START( east8v105b ) // EAST8  v1.05 string. Indentical but Different hex at 7A Address - same goes to east8v105a but different hex at 3EB2 3EB5 3EC0 Address.
 	ROM_REGION( 0x10000, "maincpu", 0 ) 
-	ROM_LOAD( "shenfa3musical.u33", 0x00000, 0x10000, BAD_DUMP CRC(e4348e1f) SHA1(3468109de5d66b2cdf7d3e5d09267670b14f73e2) ) // No string // No rom label mentioned by the dumper. using filenames for now. Marked as BAD_DUMP.
+	ROM_LOAD( "shenfa3musical.u33", 0x00000, 0x10000, BAD_DUMP CRC(e4348e1f) SHA1(3468109de5d66b2cdf7d3e5d09267670b14f73e2) ) // No string // No rom label mentioned by the dumper, using filenames for now. Marked as BAD_DUMP.
 
     ROM_REGION( 0x1000, "mcu", 0 )
     ROM_LOAD( "at89s51.u39", 0x0000, 0x1000, BAD_DUMP CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. From the pcb 2
  
     ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
-    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) BAD_DUMP SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  Voices Rom. From the pcb 2.
+    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) BAD_DUMP SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) // Using  Rom Voices From the pcb 2 for now.
 
     ROM_END
 
 ROM_START( unk6bp )
 	ROM_REGION( 0x10000, "maincpu", 0 ) 
-	ROM_LOAD( "eeprommusical.u33", 0x00000, 0x10000, BAD_DUMP CRC(7211acd8) SHA1(742f949c4ac661f41cf5aca42a279dc82cba2e2e) ) // No string // No rom label mentioned by the dumper. using filenames for now. Marked as BAD_DUMP.
+	ROM_LOAD( "eeprommusical.u33", 0x00000, 0x10000, BAD_DUMP CRC(7211acd8) SHA1(742f949c4ac661f41cf5aca42a279dc82cba2e2e) ) // No string // No rom label mentioned by the dumper, using filenames for now. Marked as BAD_DUMP.
 
     ROM_REGION( 0x1000, "mcu", 0 )
     ROM_LOAD( "at89s51.u39", 0x0000, 0x1000, BAD_DUMP CRC(a55b63a8) SHA1(9ef88bba4a46ccd969d80882e9c36eb2f0c9e4bf) ) //  Microcontroller Protection. From the pcb 2
  
     ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
-    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) BAD_DUMP SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  Voices Rom. From the pcb 2.
+    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) BAD_DUMP SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  Using  Rom Voices From the pcb 2 for now.
 
     ROM_END
 
@@ -369,11 +368,10 @@ ROM_START( unk6bp )
 } // anonymous namespace
 
 
-// unsorted: in which board are from? Dump Not verified for now.
+// in which pcb are from? Dump Not verified for now.
 //    YEAR  NAME             PARENT    MACHINE  INPUT  STATE   INIT        ROT   COMPANY      FULLNAME                        FLAGS
 GAME( 199?, east8v100,   0,  orientp,  east8,   orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 (v1.00)",        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // error 10
 GAME( 199?, east8v105,   0,  orientp,  east8,   orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 (v1.05)",        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // error 10
 GAME( 199?, east8v105a,  0,  orientp,  east8,   orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 (v1.05) set 1",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // error 10
 GAME( 199?, east8v105b,  0,  orientp,  east8,   orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 (v1.05) set 2",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // error 10
-GAME( 199?, unk6bp,      0,  orientp,  east8,   orientp_state, empty_init, ROT0, "<unknown>", "Unknown 6 Ball Pinball",       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // No String. Error sound but no display post. bad dump?
-
+GAME( 199?, unk6bp,      0,  orientp,  east8,   orientp_state, empty_init, ROT0, "<unknown>", "Unknown 6 Ball Pinball",       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Bad dump? No String. Error sound but no display post.
