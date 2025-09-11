@@ -348,5 +348,5 @@ ROM_START( unk6bp )
 //    YEAR  NAME            PARENT   MACHINE   INPUT  STATE   INIT        ROT   COMPANY      FULLNAME                     FLAGS
 GAME( 199?, east8v100,  0,  orientp,  east8,   orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 (v1.00)",     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // error 10
 GAME( 199?, east8v105,  0,  orientp,  east8,   orientp_state, empty_init, ROT0, "<unknown>", "Unknown EAST8 (v1.05)",     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // same goes to east8
-GAME( 199?, unk6ballp,  0,  orientp,  east8,   orientp_state, empty_init, ROT0, "<unknown>", "Unknown 6 ball pinball",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // No String. no output.
+GAME( 199?, unk6ballp,  0,  orientp,  east8,   orientp_state, empty_init, ROT0, "<unknown>", "Unknown 6 ball pinball",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // No String. no 7 segemnt display output. bad dump?
 
