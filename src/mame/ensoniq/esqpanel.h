@@ -10,7 +10,6 @@
 #include "extpanel.h"
 
 #include "diserial.h"
-#include "http.h"
 
 #include <vector>
 #include <set>
