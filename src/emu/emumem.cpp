@@ -607,7 +607,7 @@ void address_space_installer::check_optimize_all(const char *function, int width
 		changing_bits = nstart ^ nend;
 	}
 
-	if(changing_bits <= default_lowbits_mask && (nend - nstart) != default_lowbits_mask) {
+	if(nmask <= default_lowbits_mask && (nend - nstart) != default_lowbits_mask) {
 		// If the access size is lower than the bus width and the
 		// internal range limited, adjust to one full bus width and
 		// adjust the unitmask.  This can have a very positive
