@@ -2,8 +2,6 @@
 // copyright-holders:hap
 /****************************************************************************************
 
-2018-09-15
-
 Video 21 blackjack game
 VIDEO-GAMES - LICH/GERMANY 1017a
 
@@ -78,7 +76,7 @@ private:
 
 uint32_t video21_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t sy=0,ma=0;
+	uint16_t sy = 0, ma = 0;
 
 	for (uint8_t y = 0; y < 28; y++)
 	{
@@ -102,8 +100,9 @@ uint32_t video21_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				*p++ = BIT(gfx, 0);
 			}
 		}
-		ma+=32;
+		ma += 32;
 	}
+
 	return 0;
 }
 
@@ -153,13 +152,15 @@ void video21_state::lamp2_w(uint8_t data)
 }
 
 
-void video21_state::mem_map(address_map &map) {
+void video21_state::mem_map(address_map &map)
+{
 	map(0x0000,0x0fff).rom().mirror(0x3000);
 	map(0xe000,0xe3ff).ram().share("videoram");
 	map(0xff00,0xffff).ram().share("nvram");
 }
 
-void video21_state::io_map(address_map &map) {
+void video21_state::io_map(address_map &map)
+{
 	map(0x02,0x02).w(FUNC(video21_state::sound_w));
 	map(0x04,0x04).w(FUNC(video21_state::lamp1_w));
 	map(0x08,0x08).w(FUNC(video21_state::lamp2_w));
@@ -229,21 +230,8 @@ static INPUT_PORTS_START( video21 )
 INPUT_PORTS_END
 
 
-static const gfx_layout video21_charlayout =
-{
-	8, 8,                   // 8 x 8 characters
-	128,                    // 128 characters, but only the first 76 look useful
-	1,                      // 1 bits per pixel
-	{ 0 },                  // no bitplanes
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                 /* every char takes 8 bytes */
-};
-
 static GFXDECODE_START( gfx_video21 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, video21_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, gfx_8x8x1, 0, 1 )
 GFXDECODE_END
 
 void video21_state::machine_start()

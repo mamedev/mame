@@ -12,7 +12,7 @@ TODO:
 ---------------------------------------------------------------
 
 Looping
-(C)1981 Venture Line
+(C)1981 Video Games GmbH
 
     Main CPU
         TMS9995
@@ -28,7 +28,7 @@ Looping
 ---------------------------------------------------------------
 
 Sky Bumper
-(C)1982 Venture Line
+(C)1982 Venture Line (did not involve Looping's designer)
 
     This is a ROM swap for Looping.  There are two 6116's on
     the CPU board, where there is only one on Looping.
@@ -465,8 +465,8 @@ void looping_state::adc_w(uint8_t data) { osd_printf_debug("%04X:ADC write = %02
 
 void looping_state::plr2_w(int state)
 {
-	/* set to 1 after IDLE, cleared to 0 during processing
-	   is this an LED on the PCB? */
+	// set to 1 after IDLE, cleared to 0 during processing
+	// is this an LED on the PCB?
 }
 
 
@@ -495,22 +495,22 @@ void looping_state::cop_l_w(uint8_t data)
 
 uint8_t looping_state::protection_r()
 {
-//        The code reads ($7002) ($7004) alternately
-//        The result must change at least once every 10 reads
-//        A read from ($34b0 + result) must == $01
+	// The code reads ($7002) ($7004) alternately
+	// The result must change at least once every 10 reads
+	// A read from ($34b0 + result) must == $01
 
-//        Valid values:
-//            $61 $67
-//            $B7 $BF
-//            $DB
-//            $E1
-//            $F3 $F7 $FD $FF
+	// Valid values:
+	//     $61 $67
+	//     $B7 $BF
+	//     $DB
+	//     $E1
+	//     $F3 $F7 $FD $FF
 
-//        Because they read alternately from different locations,
-//        it is trivial to bypass the protection.
+	// Because they read alternately from different locations,
+	// it is trivial to bypass the protection.
 
-//        cop write alternately $02 $01 $08 $04 in port $102
-//        cop write randomly fc (unfortunately) but 61,67,b7,bf,db,e1,f3,fd,ff too and only these values
+	// cop write alternately $02 $01 $08 $04 in port $102
+	// cop write randomly fc (unfortunately) but 61,67,b7,bf,db,e1,f3,fd,ff too and only these values
 
 	// missing something
 	if(m_cop_port_l != 0xfc) return m_cop_port_l;
@@ -600,7 +600,6 @@ GFXDECODE_END
  *  Machine drivers
  *
  *************************************/
-
 
 void looping_state::looping(machine_config &config)
 {
@@ -893,7 +892,7 @@ void looping_state::init_looping()
 }
 
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*************************************
