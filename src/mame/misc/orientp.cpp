@@ -361,9 +361,7 @@ ROM_START( unk6bp )
  
     ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
     ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, CRC(f962ed1c) BAD_DUMP SHA1(c69cd9619c794e77a0122fc82d36662494ceb0be) ) //  Using  Rom Voices From the pcb 2 for now.
-
     ROM_END
-
 
 } // anonymous namespace
 
