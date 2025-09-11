@@ -11,6 +11,8 @@
 class k007121_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
+	using sprite_delegate = device_delegate<void (int &code, int &color, int colbank)>;
+
 	template<typename T, typename U>
 	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const gfx_decode_entry *gfxinfo, T &&palette_tag, U &&screen_tag)
 		: k007121_device(mconfig, tag, owner, clock)
@@ -21,9 +23,7 @@ public:
 	}
 	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// configurations
-	using sprite_delegate = device_delegate<void (int &code, int &color, int colbank)>;
-
+	// configuration
 	void set_spr_dx(int dx, int flip_dx)
 	{
 		m_spr_dx = dx;
@@ -50,12 +50,12 @@ public:
 	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, uint32_t pri_mask);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	// configurations
+	// configuration
 	int32_t m_spr_dx, m_spr_flip_dx;
 
 	// internal state
