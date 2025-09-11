@@ -836,7 +836,7 @@ void tmnt2_base_state::video_start()
 
 void lgtnfght_state::video_start()
 {
-	tmnt2_base_state::video_start();
+	tmnt2_k053245_base_state::video_start();
 	m_k053245->set_z_rejection(0);
 }
 
@@ -854,7 +854,7 @@ void ssriders_state::video_start()
 
 void tmnt2_roz_base_state::video_start()
 {
-	tmnt2_base_state::video_start();
+	tmnt2_k053245_base_state::video_start();
 	m_roz_char_bank = 0;
 	save_item(NAME(m_roz_char_bank));
 }
@@ -885,7 +885,7 @@ void prmrsocr_state::video_start()
 
 void blswhstl_state::video_start()
 {
-	tmnt2_base_state::video_start();
+	tmnt2_k053245_base_state::video_start();
 	m_blswhstl_rombank = -1;
 	save_item(NAME(m_blswhstl_rombank));
 }
