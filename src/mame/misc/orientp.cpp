@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:flama12333
 /*************************************************************************
+driver for the 5, 6 ball pinball and clones.
+
 The dump of the pcb 1 was from Soccer Santiago II 6 ball pinball. Unsure if is from or not?.
 
 at the back pcb:
