@@ -7,8 +7,6 @@
 
 #include "emumem.h"
 
-#include "asio.h"
-
 #include <iostream>
 #include <cstdint>
 #include <string>
