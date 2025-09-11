@@ -2253,41 +2253,33 @@ void goldstar_state::wcherry_map(address_map &map)
 	map(0xf080, 0xf0bf).ram().share(m_reel_scroll[1]);
 	map(0xf100, 0xf13f).ram().share(m_reel_scroll[2]);
 
-	map(0xf600, 0xf601).ram();  // FPGA internal register r/w 
-	map(0xf610, 0xf611).ram();  // FPGA internal register r/w 
-	map(0xf612, 0xf612).ram();  // FPGA internal register r/w 
-	map(0xf620, 0xf620).ram();  // FPGA internal register r/w 
+	map(0xf600, 0xf601).ram();  // CPLD internal register r/w 
+	map(0xf610, 0xf611).ram();  // CPLD internal register r/w 
+	map(0xf612, 0xf612).ram();  // CPLD internal register r/w 
+	map(0xf620, 0xf620).ram();  // CPLD internal register r/w 
 
-	map(0xf603, 0xf603).ram();  // FPGA internal register r/w 
-	map(0xf621, 0xf621).ram();  // FPGA internal register r/w 
-	map(0xf622, 0xf622).ram();  // FPGA internal register r/w 
-
-	//map(0xf621, 0xf621).portr("IN2");  // ????
-	//map(0xf622, 0xf622).portr("IN3");  // ????
-
-	map(0xf650, 0xf650).portr("IN4").nopw();  // ????
-
-	map(0xf680, 0xf680).ram();  // FPGA internal register r/w from inputs  f621-f622-f650-f683
-	map(0xf681, 0xf681).ram();  // FPGA internal register r/w from inputs  f622-f650
-
-	map(0xf682, 0xf682).ram();  // FPGA internal register r/w ???? 
-
-	map(0xf683, 0xf683).portr("IN5").nopw();  // ????
-
-	map(0xf684, 0xf684).ram();  // FPGA internal register r/w ????
+	map(0xf603, 0xf603).ram();  // CPLD internal register r/w 
+	map(0xf621, 0xf621).ram();  // CPLD internal register r/w 
+	map(0xf622, 0xf622).ram();  // CPLD internal register r/w 
+	map(0xf650, 0xf650).ram();  // reg to support on outports
+	map(0xf680, 0xf680).ram();  // CPLD internal register r/w from inputs  f621-f622-f650-f683
+	map(0xf681, 0xf681).ram();  // CPLD internal register r/w from inputs  f622-f650
+	map(0xf682, 0xf682).ram();  // CPLD internal register r/w
+	map(0xf683, 0xf683).ram();  // CPLD internal register r/w
+	map(0xf684, 0xf684).ram();  // CPLD internal register r/w
 
 	map(0xf830, 0xf830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xf840, 0xf840).w("aysnd", FUNC(ay8910_device::address_w));
 
-	map(0xf850, 0xf850).ram(); // grull // no anda como dsw port ?? 
-	map(0xf860, 0xf860).ram(); // grull // no anda como dsw port ??
+	map(0xf850, 0xf850).w(FUNC(cb3_state::p1_lamps_w));
+	map(0xf860, 0xf860).w(FUNC(cb3_state::p2_lamps_w));
 
-	map(0xf880, 0xf880).portr("IN0"); // grull to reg $f600 & $f611
-	map(0xf881, 0xf881).portr("IN1"); // grull to reg $f600, $f610, $f611 (in0-in3-in2 in others)
+	map(0xf880, 0xf880).portr("IN0");  // to reg $f600 & $f611
+	map(0xf881, 0xf881).portr("IN1");  // to reg $f600, $f610, $f611 (in0-in3-in2 in others)
 
-	map(0xf883, 0xf883).portr("DSW1"); // grull OK  -> to reg $f612
-	map(0xf884, 0xf884).portr("DSW2"); // grull OK  -> to reg $f620
-	map(0xf885, 0xf885).portr("DSW5"); // grull OK  -> direct read 
+	map(0xf883, 0xf883).portr("DSW1");  // to reg $f612
+	map(0xf884, 0xf884).portr("DSW2");  // to reg $f620
+	map(0xf885, 0xf885).portr("DSW5");  // direct read 
 
 	map(0xfc00, 0xffff).rom();
 }
@@ -2295,27 +2287,13 @@ void goldstar_state::wcherry_map(address_map &map)
 void goldstar_state::wcherry_readwriteport(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).nopr(); // leftover
+	map(0x00, 0x00).nopr();  // leftover $1829
+	map(0x06, 0x06).nopw();  // leftover $1858
+	map(0x08, 0x08).noprw(); // leftover $182f
+	map(0x10, 0x10).nopr();  // leftover 
+	map(0x81, 0x81).nopw();  // watchdog?
+
 }
-
-/* wcherry findings...
-
-  0000-bfff = ROM space.
-  b000-b7ff = NVRAM.
-  c000-c7ff = ROM space.
-
-  f600-f603 = 8255_1 (ctrl=9b) ; portA, B & C (input)
-  f610-f613 = 8255_2 (ctrl=9b) ; portA, B & C (input)
-  f620-f623 = 8255_3 (ctrl=90) ; portA (input); ports B & C (output)
-  f630      = AY8910 RW
-  f640      = AY8910 ctrl
-  f650      = Unknown. Seems a register. Writes 0x3e.
-  f660      = Unknown. Seems a register. Writes 0x3e.
-  f670      = PSG (init writes)
-
-  I/O
-
-*/
 
 
 void cmaster_state::cm_map(address_map &map)
@@ -4705,39 +4683,54 @@ static INPUT_PORTS_START( gregular )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( wcherry )
 	PORT_START("IN0") 
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("Blue Bet / D-UP / Card 3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("Start / Stop All / Card 4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("Red Bet / Card 2")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats") // "0"
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings") // "9"
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("Stop 3 / Small / Info / Card 1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_B) PORT_NAME("Bet P2 / D-UP")  // player 2
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_N) PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_V) PORT_NAME("Bet P1")       // player 1
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                 PORT_NAME("Stats")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )              PORT_NAME("Settings")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_C) PORT_NAME("Small / Info")
 	
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("Stop 1 / Take")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Stop 2 / Big / Ticket / Bonus Game")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) // TEST 1 -4 HOPPER OUT ?
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) // TEST 1 -4 HOPPER OUT ?
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_IMPULSE(1) PORT_NAME("Coin C")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED)   //PORT_IMPULSE(1) PORT_NAME("Coin A") // It gives fault
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	
-	PORT_START("IN2")
-	PORT_BIT( 0xAA, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_START("IN3")
-	PORT_BIT( 0x55, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_START("IN4")
-	PORT_BIT( 0x5A, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_START("IN5")
-	PORT_BIT( 0xA5, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_Z) PORT_NAME("Take")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_X) PORT_NAME("Big / Ticket")  // 100 Punti or more can be cashed out with this button. No other Payout method available. 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_IMPULSE(1)      PORT_NAME("Coin In")  // normally coin c
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) //PORT_IMPULSE(1)     PORT_NAME("Coin A")   // it gives fault
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_INCLUDE( cb3_dsw1 )
-	PORT_INCLUDE( cmv4_dsw2 )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, "Main Game Pay Rate" )        PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(    0x07, "1 (Lowest)" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x01, "7" )
+	PORT_DIPSETTING(    0x00, "8 (Highest)" )
+	PORT_DIPNAME( 0x18, 0x18, "Hopper Limit" )              PORT_DIPLOCATION("DSW2:4,5")
+	PORT_DIPSETTING(    0x18, "Unlimited" )
+	PORT_DIPSETTING(    0x10, "1000" )
+	PORT_DIPSETTING(    0x08, "500" )
+	PORT_DIPSETTING(    0x00, "300" )
+	PORT_DIPNAME( 0x20, 0x20, "100+ Odds Sound" )           PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Key In Type" )               PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, "A-Type" )
+	PORT_DIPSETTING(    0x00, "B-Type" )
+	PORT_DIPNAME( 0x80, 0x00, "Center Super 7 Bet Limit" )  PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, "Unlimited" )
+	PORT_DIPSETTING(    0x00, "Limited" )
+
 	PORT_INCLUDE( cb3_dsw3 )
 	PORT_INCLUDE( cb3_dsw4 )
 	PORT_INCLUDE( cb3_dsw5 )
@@ -26098,7 +26091,7 @@ GAMEL( 199?, chry10,     0,        chrygld,  chry10,   cb3_state,      init_chry
 GAME(  199?, goldfrui,   goldstar, goldfrui, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
 GAME(  2001, super9,     goldstar, super9,   super9,   goldstar_state, init_super9,    ROT0, "Playmark",          "Super Nove (Playmark, V. M271B)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // needs palette, inputs / outputs checked
 GAME(  2001, super9a,    goldstar, super9,   super9,   goldstar_state, init_super9,    ROT0, "Playmark",          "Super Nove (Playmark, V. M271C)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // needs palette, inputs / outputs checked
-GAME(  2001, wcherry,    0,        wcherry,  wcherry,  goldstar_state, init_wcherry,   ROT0, "Videostar",         "Win Cherry (ver 0.16 - 19990219)",            MACHINE_NOT_WORKING )
+GAME(  2001, wcherry,    0,        wcherry,  wcherry,  goldstar_state, init_wcherry,   ROT0, "Videostar",         "Win Cherry (ver 0.16 - 19990219)",            0 )
 GAME(  199?, star100,    0,        star100,  star100,  sanghopm_state, empty_init,     ROT0, "Sang Ho",           "Ming Xing 100 (Star 100)",                    MACHINE_IMPERFECT_COLORS )
 
 // are these really Dyna, or bootlegs?
