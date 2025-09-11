@@ -358,7 +358,7 @@ void fastlane_state::fastlane(machine_config &config)
 	PALETTE(config, m_palette, FUNC(fastlane_state::palette)).set_format(palette_device::xBGR_555, 1024*16, 0x400);
 
 	K007121(config, m_k007121, 0, gfx_fastlane, m_palette, m_screen);
-	m_k007121->set_spr_dx(40, 16);
+	m_k007121->set_sprite_offsets(40, 16);
 	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k007121->set_flipscreen_cb().set(FUNC(fastlane_state::flipscreen_w));

@@ -24,14 +24,14 @@ public:
 	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_spr_dx(int dx, int flip_dx)
+	void set_sprite_offsets(int dx, int flip_dx)
 	{
 		m_spr_dx = dx;
 		m_spr_flip_dx = flip_dx;
 	}
 
 	auto set_irq_cb() { return m_irq_cb.bind(); }
-	//auto set_firq_cb() { return m_firq_cb.bind(); } // unused
+	auto set_firq_cb() { return m_firq_cb.bind(); }
 	auto set_nmi_cb() { return m_nmi_cb.bind(); }
 	auto set_flipscreen_cb() { return m_flipscreen_cb.bind(); }
 	template <typename... T> void set_sprite_callback(T &&... args) { m_sprite_cb.set(std::forward<T>(args)...); }

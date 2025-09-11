@@ -16,7 +16,7 @@ ROM is 0x80000 bytes (addressed 16 bits at a time). Tile and sprite data both
 come from the same ROM space. Like the 005885, external circuitry can cause
 tiles and sprites to be fetched from different ROMs (used by Haunted Castle).
 
-The chip will render a maximum of 264 64-pixel sprite blocks, presumably one
+The chip will process a maximum of 264 64-pixel sprite blocks, presumably one
 per scanline. There is no limit on the number of sprites, including per-scanline,
 other than bumping into the 264 sprite block limit. Games often append 17
 off-screen 32x32 sprites after their active sprite list so they bump into the

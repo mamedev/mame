@@ -444,7 +444,7 @@ void labyrunr_state::labyrunr(machine_config &config)
 	m_palette->set_format(palette_device::xBGR_555, 8*16*16, 128);
 
 	K007121(config, m_k007121, 0, gfx_labyrunr, m_palette, "screen");
-	m_k007121->set_spr_dx(40, 16);
+	m_k007121->set_sprite_offsets(40, 16);
 	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k007121->set_flipscreen_cb().set(FUNC(labyrunr_state::flipscreen_w));
