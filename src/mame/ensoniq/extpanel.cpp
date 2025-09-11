@@ -247,7 +247,7 @@ private:
 #define MT_DISPLAY 'D'
 #define MT_INFO 'I'
 
-DEFINE_DEVICE_TYPE(ESQ_EXTERNAL_PANEL, esq_external_panel_device, "esq_external_panel", "Ensoniq_External_Panel")
+DEFINE_DEVICE_TYPE(ESQ_EXTERNAL_PANEL, esq_external_panel_device, "esq_external_panel", "Ensoniq External_Panel")
 
 esq_external_panel_device::esq_external_panel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
   device_t(mconfig, ESQ_EXTERNAL_PANEL, tag, owner, clock)

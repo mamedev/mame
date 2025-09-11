@@ -139,6 +139,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(ESQ_EXTERNAL_PANEL_DEVICE, esq_external_panel_device)
+DECLARE_DEVICE_TYPE(ESQ_EXTERNAL_PANEL, esq_external_panel_device)
 
 #endif // MAME_ENSONIQ_EXTPANEL_H

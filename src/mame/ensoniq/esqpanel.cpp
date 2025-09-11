@@ -314,7 +314,7 @@ esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const ch
 void esqpanel2x40_vfx_device::device_add_mconfig(machine_config &config)
 {
 	ESQ2X40_VFX(config, m_vfd, 60);
-	ESQ_EXTERNAL_PANEL_DEVICE(config, m_external_panel, 0);
+	ESQ_EXTERNAL_PANEL(config, m_external_panel, 0);
 }
 
 esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
