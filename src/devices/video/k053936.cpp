@@ -47,12 +47,12 @@ control registers
 003 ["simple" mode only] amount to add to the Y counter after each line
 004 ["simple" mode only] amount to add to the X counter after each horizontal pixel
 005 ["simple" mode only] amount to add to the Y counter after each horizontal pixel (0 = no rotation)
-006 x------- -------- when set, Y adder per line must be multiplied by 256**
-    -x------ -------- when set, Y adder per pixel must be multiplied by 256**
+006 x------- -------- when set, Y increment per line must be multiplied by 256**
+    -x------ -------- when set, Y increment per pixel must be multiplied by 256**
     --xxxxxx -------- out of bounds mask for YAcc[23:18]* usually 3F, Premier Soccer
                       sets it to 07 before penalty kicks
-    -------- x------- when set, X adder per line must be multiplied by 256**
-    -------- -x------ when set, X adder per pixel must be multiplied by 256**
+    -------- x------- when set, X increment per line must be multiplied by 256**
+    -------- -x------ when set, X increment per pixel must be multiplied by 256**
     -------- --xxxxxx out of bounds mask for XAcc[23:18]* usually 3F, Premier Soccer
                       sets it to 0F before penalty kicks
 007 -------- -x------ enable "super" mode
@@ -76,8 +76,8 @@ additional control from extra RAM:
 (line*4)+2 amount to add to the X counter after each horizontal pixel
 (line*4)+3 amount to add to the Y counter after each horizontal pixel
 
-* Unemulated
-** Incorrectly emulated currently
+* Not currently emulated
+** Currently emulated incorrectly
 
 */
 
