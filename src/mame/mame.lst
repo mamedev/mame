@@ -31819,8 +31819,11 @@ maddonnab                       // (c) 1995 Tuning
 oneshot                         // no copyright notice
 
 @source:misc/orientp.cpp
-east8                           //
-east8a                          //
+east8v100                       //
+east8v105                       //
+east8v105a                      //
+east8v105b                      //
+unk6bp                          //
 
 @source:misc/onetwo.cpp
 onetwo                          // (c) 1997 Barko
