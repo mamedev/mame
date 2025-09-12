@@ -11,8 +11,9 @@
 #define LOG_REGW   (1U << 2)
 #define LOG_TX     (1U << 3)
 #define LOG_RX     (1U << 4)
+#define LOG_FRAMES (1U << 5)
 
-//#define VERBOSE (LOG_GENERAL|LOG_REGR|LOG_REGW|LOG_TX|LOG_RX)
+//#define VERBOSE (LOG_GENERAL|LOG_REGR|LOG_REGW|LOG_TX|LOG_RX|LOG_FRAMES)
 
 #include "logmacro.h"
 
@@ -275,6 +276,9 @@ void mb8795_device::tx_dma_w(u8 data, bool eof)
 		put_u32le(&m_txbuf[m_txlen], util::crc32_creator::simple(m_txbuf, m_txlen));
 		m_txlen += 4;
 
+		if(VERBOSE & LOG_FRAMES)
+			log_bytes(m_txbuf, m_txlen);
+
 		// count number of bits transmitted
 		m_txcount = send(m_txbuf, m_txlen, 4) * 8;
 
@@ -335,6 +339,9 @@ void mb8795_device::receive()
 	if(!keep)
 		m_rxlen = 0;
 	else {
+		if(VERBOSE & LOG_FRAMES)
+			log_bytes(m_rxbuf, m_rxlen);
+
 		m_rxstat = 0;
 		if(m_rxlen < 64) {
 			if(!(m_rxmode & RMD_SHORTENABLE) || (m_rxlen < 10)) {
