@@ -281,5 +281,5 @@ ROM_END
 
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                   FLAGS
 GAME( ????, marywu,  0,      marywu,   marywu, marywu_state, empty_init, ROT0, "<unknown>", "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen",    MACHINE_NOT_WORKING )
-GAME( ????, mary1s,  0,      mary1s,   marywu, marywu_state, empty_init, ROT0, "<unknown>", "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING )
+GAME( ????, mary1s,  0,      marywu,   mary1s, marywu_state, empty_init, ROT0, "<unknown>", "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING )
 	
