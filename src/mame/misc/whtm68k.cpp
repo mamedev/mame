@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 
 /*
 The PCB is marked 'COPYRIGHT FOR WHT ELE CO,. VER 3.0'
@@ -28,7 +28,8 @@ TODO:
 - audio CPU ROM banking;
 - Convert video to use 6845 semantics;
 - lamps;
-
+- is there a way to access key test? There are strings in program ROM
+  and GFX in the gfx2 region.
 */
 
 
@@ -38,6 +39,7 @@ TODO:
 #include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
@@ -52,13 +54,15 @@ TODO:
 
 // configurable logging
 #define LOG_PORTS     (1U << 1)
+#define LOG_OUTPUTS   (1U << 2)
 
-#define VERBOSE (LOG_GENERAL | LOG_PORTS)
+#define VERBOSE (LOG_GENERAL | LOG_PORTS | LOG_OUTPUTS)
 //#define LOG_OUTPUT_FUNC osd_printf_error
 
 #include "logmacro.h"
 
 #define LOGPORTS(...)     LOGMASKED(LOG_PORTS,     __VA_ARGS__)
+#define LOGOUTPUTS(...)   LOGMASKED(LOG_OUTPUTS,   __VA_ARGS__)
 
 
 namespace {
@@ -74,6 +78,7 @@ public:
 		m_crtc(*this, "crtc"),
 		m_ramdac(*this, "ramdac%u", 0U),
 		m_palette(*this, "palette"),
+		m_hopper(*this, "hopper"),
 		m_bgram(*this, "bgram"),
 		m_fgram(*this, "fgram"),
 		m_bg_attr(*this, "bg_attr")
@@ -91,6 +96,7 @@ private:
 	required_device<hd6845s_device> m_crtc;
 	required_device_array<ramdac_device, 2> m_ramdac;
 	required_device<palette_device> m_palette;
+	required_device<hopper_device> m_hopper;
 
 	required_shared_ptr<uint16_t> m_bgram;
 	required_shared_ptr<uint16_t> m_fgram;
@@ -101,6 +107,8 @@ private:
 	tilemap_t *m_fg_tilemap = nullptr;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+
+	void outputs_w(uint16_t data);
 
 	TILE_GET_INFO_MEMBER(get_4bpp_tile_info);
 	TILE_GET_INFO_MEMBER(get_7bpp_tile_info);
@@ -127,6 +135,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(whtm68k_state::scanline_cb)
 
 	if (scanline == 0)
 		m_maincpu->set_input_line(1, HOLD_LINE);
+}
+
+void whtm68k_state::outputs_w(uint16_t data)
+{
+	m_hopper->motor_w(BIT(data, 4));
+
+	if (data & 0xffef)
+		LOGOUTPUTS("%s unknown outputs_w bits set: %4x\n", machine().describe_context(), data);
 }
 
 
@@ -205,8 +221,9 @@ void whtm68k_state::main_program_map(address_map &map)
 	map(0x800203, 0x800203).w(m_ramdac[1], FUNC(ramdac_device::mask_w));
 	map(0x800205, 0x800205).w(m_ramdac[1], FUNC(ramdac_device::pal_w));
 	map(0x810002, 0x810003).portr("IN0");
-	map(0x810100, 0x810101).portr("DSW1"); // ??
-	map(0x810300, 0x810301).portr("DSW2"); // ??
+	map(0x810100, 0x810101).portr("DSW"); // ??. Game says "off line" if 0x40 isn't set
+	map(0x810200, 0x810201).w(FUNC(whtm68k_state::outputs_w));
+	map(0x810300, 0x810301).portr("IN1");
 	map(0x810401, 0x810401).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xd00000, 0xd03fff).ram().w(FUNC(whtm68k_state::fgram_w)).share(m_fgram);
 	map(0xd10000, 0xd13fff).ram().w(FUNC(whtm68k_state::bgram_w)).share(m_bgram);
@@ -247,56 +264,62 @@ void whtm68k_state::ramdac_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( yizhix )
+static INPUT_PORTS_START( yizhix ) // TODO: possibly some missing inputs
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) // Coin related? Gives 'coin jam if pressed'
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) // Coin
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // very susceptible. Gives 'coin jam' if pressed for too long
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // called A in game
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // called C in game
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Red") // in roulette double up
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Black") // in roulette double up
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
-
-	PORT_START("DSW2")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW2:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
+	// TODO: these are present on PCB, but do they have any effect?
+	// Settings are done via test mode
+	PORT_START("DSW")
+	PORT_DIPUNKNOWN_DIPLOC(0x0001, 0x0001, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x0002, 0x0002, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x0004, 0x0004, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x0008, 0x0008, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x0010, 0x0010, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x0020, 0x0020, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x0040, 0x0040, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x0080, 0x0080, "SW1:8")
+	PORT_DIPUNKNOWN_DIPLOC(0x0100, 0x0100, "SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x0200, 0x0200, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x0400, 0x0400, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x0800, 0x0800, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x1000, 0x1000, "SW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x2000, 0x2000, "SW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x4000, 0x4000, "SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x8000, 0x8000, "SW2:8")
 INPUT_PORTS_END
 
 
@@ -336,6 +359,8 @@ void whtm68k_state::yizhix(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &whtm68k_state::main_program_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(whtm68k_state::scanline_cb), "screen", 0, 1);
+
+	HOPPER(config, m_hopper, attotime::from_msec(50)); // period is just a guess
 
 	i80c32_device &audiocpu(I80C32(config, "audiocpu", 12_MHz_XTAL));
 	audiocpu.set_addrmap(AS_PROGRAM, &whtm68k_state::audio_program_map);
@@ -401,6 +426,9 @@ ROM_START( yizhix )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "chs_s.u34", 0x00000, 0x20000, CRC(e8492df9) SHA1(08be7cd33b751d56ec830240840adfd841b3af93) ) // 1xxxxxxxxxxxxxxxx = 0x00, very few samples
+
+	ROM_REGION( 0x1000, "nvram", 0 )
+	ROM_LOAD( "nvram.bin", 0x0000, 0x1000, CRC(99d772e2) SHA1(59d68e7b03d4005758e01e813fc137e8319fa2c5) ) // default settings
 ROM_END
 
 } // anonymous namespace

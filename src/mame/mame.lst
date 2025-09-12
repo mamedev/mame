@@ -33300,6 +33300,9 @@ vpoker
 @source:misc/vroulet.cpp
 vroulet
 
+@source:misc/whtm68k.cpp
+yizhix
+
 @source:misc/wildpkr.cpp
 tabpkr
 wildpkr
@@ -44031,9 +44034,6 @@ vp415
 
 @source:skeleton/webtouchone.cpp
 wto2840sp
-
-@source:skeleton/whtm68k.cpp
-yizhix
 
 @source:skeleton/xbase09.cpp
 xbase09
