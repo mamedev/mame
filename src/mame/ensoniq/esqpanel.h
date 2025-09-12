@@ -26,11 +26,13 @@ class esqpanel_device : public device_t, public device_serial_interface
 public:
 	auto write_tx() { return m_write_tx.bind(); }
 	auto write_analog() { return m_write_analog.bind(); }
+	auto read_analog() { return m_read_analog.bind(); }
 
 	void xmit_char(uint8_t data);
 
 	void set_char(int row, int column, uint8_t c, uint8_t attr);
 	void set_analog_value(offs_t offset, uint16_t value);
+	uint16_t get_analog_value(offs_t offset);
 	void set_button(uint8_t button, bool pressed);
 
 protected:
@@ -71,6 +73,7 @@ private:
 
 	devcb_write_line m_write_tx;
 	devcb_write16 m_write_analog;
+	devcb_read16 m_read_analog;
 	uint8_t m_xmitring[XMIT_RING_SIZE];
 	int m_xmit_read, m_xmit_write = 0;
 	bool m_tx_busy = false;

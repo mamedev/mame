@@ -47,7 +47,8 @@ esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type
 	m_external_panel(*this, "esq_external_panel"),
 	m_light_states(0x3f), // maximum number of lights
 	m_write_tx(*this),
-	m_write_analog(*this)
+	m_write_analog(*this),
+	m_read_analog(*this, 0)
 {
 	std::fill(std::begin(m_xmitring), std::end(m_xmitring), 0);
 }
@@ -240,6 +241,12 @@ void esqpanel_device::set_analog_value(offs_t offset, uint16_t value)
 {
 	m_write_analog(offset, value);
 }
+
+uint16_t esqpanel_device::get_analog_value(offs_t offset)
+{
+	return m_read_analog(offset, 0);
+}
+
 
 void esqpanel_device::set_button(uint8_t button, bool pressed)
 {
@@ -507,7 +514,13 @@ void esqpanel2x40_vfx_device::send_display_contents()
 
 void esqpanel2x40_vfx_device::send_analog_values()
 {
-	// TODO(cbrunschen): read analog values from the emulated keyboard and send them to the panel(s)
+	std::vector<std::pair<uint8_t, uint16_t>> values;
+	values.reserve(8);
+	for (offs_t offset = 0; offset < 8; offset++)
+	{
+		values.emplace_back(std::make_pair(offset, get_analog_value(offset)));
+	}
+	m_external_panel->set_analog_values(values);
 }
 
 void esqpanel2x40_vfx_device::send_button_states()

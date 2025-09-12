@@ -263,7 +263,8 @@ private:
 	uint16_t lower_r(offs_t offset);
 	void lower_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint16_t analog_r();
+	uint16_t adc_r();  // read from the ADC, input selected per m_uart_dio
+	uint16_t analog_r(offs_t offset, uint16_t mask);  // read from analog inoput [offset]
 	void analog_w(offs_t offset, uint16_t data);
 
 	void duart_output(uint8_t data);
@@ -638,9 +639,14 @@ void esq5505_state::analog_w(offs_t offset, uint16_t data)
 	m_analog_values[offset] = data;
 }
 
-uint16_t esq5505_state::analog_r()
+uint16_t esq5505_state::adc_r()
 {
 	return m_analog_values[m_duart_io & 7];
+}
+
+uint16_t esq5505_state::analog_r(offs_t offset, uint16_t mask)
+{
+	return m_analog_values[offset & 0x7];
 }
 
 void esq5505_state::duart_output(uint8_t data)
@@ -785,6 +791,7 @@ void esq5505_state::vfx(machine_config &config)
 	ESQPANEL2X40_VFX(config, m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
+	m_panel->read_analog().set(FUNC(esq5505_state::analog_r));
 
 	MC68681(config, m_duart, 4000000);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
@@ -812,7 +819,7 @@ void esq5505_state::vfx(machine_config &config)
 	m_otis->set_region1("waverom2"); /* Bank 1 */
 	m_otis->set_channels(4);          /* channels */
 	m_otis->irq_cb().set(FUNC(esq5505_state::otis_irq));
-	m_otis->read_port_cb().set(FUNC(esq5505_state::analog_r)); /* ADC */
+	m_otis->read_port_cb().set(FUNC(esq5505_state::adc_r)); /* ADC read */
 	m_otis->add_route(0, "pump", 1.0, 0);
 	m_otis->add_route(1, "pump", 1.0, 1);
 	m_otis->add_route(2, "pump", 1.0, 2);
@@ -834,6 +841,7 @@ void esq5505_state::eps(machine_config &config)
 	ESQPANEL1X22(config.replace(), m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
+	m_panel->read_analog().set(FUNC(esq5505_state::analog_r));
 
 	WD1772(config, m_fdc, 8_MHz_XTAL);
 	FLOPPY_CONNECTOR(config, m_floppy_connector, esq5505_state::floppy_drives, "35dd", esq5505_state::floppy_formats, true);//.enable_sound(true);
@@ -877,6 +885,7 @@ void esq5505_state::vfx32(machine_config &config)
 	ESQPANEL2X40_VFX(config, m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
+	m_panel->read_analog().set(FUNC(esq5505_state::analog_r));
 
 	MC68681(config, m_duart,  4000000);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
@@ -904,7 +913,7 @@ void esq5505_state::vfx32(machine_config &config)
 	m_otis->set_region1("waverom2"); /* Bank 1 */
 	m_otis->set_channels(4);          /* channels */
 	m_otis->irq_cb().set(FUNC(esq5505_state::otis_irq));
-	m_otis->read_port_cb().set(FUNC(esq5505_state::analog_r)); /* ADC */
+	m_otis->read_port_cb().set(FUNC(esq5505_state::adc_r)); /* ADC read */
 	m_otis->add_route(0, "pump", 1.0, 0);
 	m_otis->add_route(1, "pump", 1.0, 1);
 	m_otis->add_route(2, "pump", 1.0, 2);
@@ -926,6 +935,7 @@ void esq5505_state::sq1(machine_config &config)
 	ESQPANEL2X16_SQ1(config.replace(), m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
+	m_panel->read_analog().set(FUNC(esq5505_state::analog_r));
 }
 
 void esq5505_state::ks32(machine_config &config)
@@ -936,6 +946,7 @@ void esq5505_state::ks32(machine_config &config)
 	ESQPANEL2X16_SQ1(config.replace(), m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
+	m_panel->read_analog().set(FUNC(esq5505_state::analog_r));
 }
 
 static INPUT_PORTS_START( vfx )
