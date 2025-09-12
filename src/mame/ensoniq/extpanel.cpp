@@ -336,7 +336,7 @@ void esq_external_panel_device::set_button(uint8_t button, bool pressed)
   }
 }
 
-void esq_external_panel_device::set_analog_value(uint8_t channel, int value)
+void esq_external_panel_device::set_analog_value(uint8_t channel, uint16_t value)
 {
   std::lock_guard lock(m_mutex);
   if (!m_connected) return;
