@@ -8,7 +8,11 @@
 
   Driver by Felipe Sanches
 
-  TODO:
+Controls:
+mary1s:
+To reset nvram press K0 and k3, Will shown 09 then restart.
+
+ TODO:
   * Figure out where exactly all devices are mapped to (the devices are
     2 sound chips, the 2kb SRAM, the 8bit DIP switches,
     31 LEDs, 13 modules of double-digit 7-seg displays and 4 push-buttons).
