@@ -66,7 +66,8 @@ void shoken_md06_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x40).nopw();
 	map(0x80, 0x80).noprw();
-	map(0x90, 0x90).noprw();
+
+	map(0x3b, 0x3b).rw("oki", FUNC(okim9810_device::read), FUNC(okim9810_device::write));
 }
 
 
