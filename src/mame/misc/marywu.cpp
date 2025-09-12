@@ -14,6 +14,8 @@
     31 LEDs, 13 modules of double-digit 7-seg displays and 4 push-buttons).
   * we may also have user inputs from the coin slot and from the
     cabinet buttons, for making bets.
+    If hold Key A or K then press f3 to reset, will shown error 30 code.
+
 **************************************************************************/
 
 #include "emu.h"
@@ -99,7 +101,60 @@ static INPUT_PORTS_START( marywu )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) // K2
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) // K3
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// Hopper?
+
+    PORT_START("P1")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_CODE(KEYCODE_L) // P1.6. if IP_ACTIVE_LOW  will cause error 30
+	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_BUTTON6) PORT_CODE(KEYCODE_Z) // P1.7. if IP_ACTIVE_HIGH will cause error 76.
+INPUT_PORTS_END	
+
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( mary1s )
+	PORT_START("KEYS1")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_I)
+
+	PORT_START("KEYS2")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) // if IP_ACTIVE_LOW will cause error 30.
+	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x08, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x04, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_K)
+
+    PORT_START("DSW")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW:1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW:2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW:3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW:4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW:5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW:6")
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW:7")
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW:8")
+
+	PORT_START("PUSHBUTTONS")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) // K0
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) // K1
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) // K2
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4) // K3
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P1")
+	// Hopper?
+
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_CODE(KEYCODE_L) // P1.6. if IP_ACTIVE_LOW  will cause error 30
+	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_BUTTON6) PORT_CODE(KEYCODE_Z) // P1.7. if IP_ACTIVE_HIGH will cause error 76.
+INPUT_PORTS_END	
+
 
 void marywu_state::ay1_port_a_w(uint8_t data)
 {
@@ -184,6 +239,7 @@ void marywu_state::marywu(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::program_map);
 	maincpu.set_addrmap(AS_IO, &marywu_state::io_map);
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
+	maincpu.port_in_cb<1>().set_ioport("P1");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -215,13 +271,15 @@ ROM_START( marywu )
 	ROM_LOAD( "marywu_sunkiss_chen.rom", 0x0000, 0x8000, CRC(11f67c7d) SHA1(9c1fd1a5cc6e2b0d675f0217aa8ff21c30609a0c) )
 ROM_END
 
-ROM_START( marysun ) // actual cpu is W78E52B-24. xtal jfc 10.7386 mhz
+ROM_START( mary1s ) // actual cpu is W78E52B-24. xtal jfc 10.7386 mhz
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mary_sunrise.rom", 0x0000, 0x10000, CRC(746463A4) SHA1(065478223a809c75fe0302d1c85f129d94f503b4) )
 ROM_END
+
 } // anonymous namespace
 
 
-//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( ????, marywu, 0,       marywu,   marywu, marywu_state, empty_init, ROT0, "<unknown>", "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen", MACHINE_NOT_WORKING )
-GAME( ????, marysun, 0,      marywu,   marywu, marywu_state, empty_init, ROT0, "<unknown>", "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                   FLAGS
+GAME( ????, marywu,  0,      marywu,   marywu, marywu_state, empty_init, ROT0, "<unknown>", "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen",    MACHINE_NOT_WORKING )
+GAME( ????, mary1s,  0,      mary1s,   marywu, marywu_state, empty_init, ROT0, "<unknown>", "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING )
+	
