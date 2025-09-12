@@ -14,7 +14,7 @@
 #include <memory>
 #include <iostream>
 
-#define VERBOSE 0
+#define VERBOSE 1
 #include "logmacro.h"
 
 class esq_external_panel_device::context {
@@ -340,7 +340,7 @@ void esq_external_panel_device::set_analog_value(uint8_t channel, uint16_t value
 {
   std::lock_guard lock(m_mutex);
   if (!m_connected) return;
-  send(util::string_format("A %d %d", channel, value));
+  send(util::string_format("A %d %d", channel, value >> 6));
 }
 
 void esq_external_panel_device::set_blink_phase(uint8_t phase)
@@ -405,7 +405,7 @@ void esq_external_panel_device::set_analog_values(std::vector<std::pair<uint8_t,
   os << "A";
   for (auto av : analog_values)
   {
-    util::stream_format(os, " %d %d", av.first, av.second);
+    util::stream_format(os, " %d %u", av.first, av.second >> 6);
   }
   send(os.str());
 }
@@ -464,9 +464,9 @@ void esq_external_panel_device::handle_received_message(const std::string &messa
   char mt;
   is >> mt;
 
-  LOG("Handing Message '%s' of type %c\r\n", message.c_str(), mt);
+  LOG("Handling Message '%s' of type %c\r\n", message.c_str(), mt);
 
-if (mt == MT_CONTROL)
+  if (mt == MT_CONTROL)
   {
     // For now, simply send all of the current state.
     enqueue_send();
