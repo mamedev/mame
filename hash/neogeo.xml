@@ -11385,7 +11385,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-		<!-- Unlicensed Prototype -->
+	<!-- Unlicensed Prototype -->
 
 	<software name="diggerma">
 		<description>Digger Man (prototype)</description>
@@ -11417,10 +11417,77 @@ license:CC0-1.0
 
 	<!-- Unlicensed 3rd party -->
 
-	<software name="ddragon1">
-		<description>Double Dragon One (demo)</description>
+	<software name="baddudes">
+		<description>Bad Dudes - Burger Edition (20250628)</description>
 		<year>2025</year>
 		<publisher>OzzyOuzo</publisher>
+		<info name="developer" value="Balek Corp." />
+		<info name="developer" value="OzzyOuzo" />
+		<info name="version" value="Burger Edition Jun 28 2025" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x800000">
+				<rom loadflag="load16_word_swap" name="bdudes-p1.bin" offset="0x000000" size="0x100000" crc="77a74315" sha1="90a63f02ec8e242af776b55aaca7998fa493cc39" />
+				<rom loadflag="load16_word_swap" name="bdudes-p2.bin" offset="0x100000" size="0x700000" crc="f827dd6e" sha1="36ac12cbde4869c266c1159a58c40d851d113fdf" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="bdudes-s1.bin" crc="83b0f6c4" sha1="4e3fd4369216fc9f4c699aea6bdf699b577c53e1" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="bdudes-m1.bin" crc="2854b516" sha1="9417756c419e374853d56d5025f78e2645956d85" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="bdudes-v1.bin" offset="0x000000" size="0x800000" crc="d8ac5857" sha1="afea061d7122398938899a42f2c4141d4f125c69" />
+				<rom name="bdudes-v2.bin" offset="0x800000" size="0x800000" crc="f37bd666" sha1="66d1cf293eea4cfe1cc36fe7ee9f6b46b0d731ee" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="bdudes-c1.bin" offset="0x000000" size="0x1000000" crc="fe7bb928" sha1="9afa02773e1fcd845ecb3c7ec3c5d5232ac8be2c" />
+				<rom loadflag="load16_byte" name="bdudes-c2.bin" offset="0x000001" size="0x1000000" crc="68deb392" sha1="c01f17582b54332c50086f4161e13d6433d16c85" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon1">
+		<description>Double Dragon One (beta 2, 20250903)</description>
+		<year>2025</year>
+		<publisher>OzzyOuzo</publisher>
+		<info name="developer" value="Case de Ruivo" />
+		<info name="developer" value="OzzyOuzo" />
+		<info name="developer" value="Johnny16bit" />
+		<info name="version" value="beta 2 Sep 03 2025" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
+				<rom loadflag="load16_word_swap" name="doubled-p1.bin" offset="0x000000" size="0x100000" crc="e7923280" sha1="5a8aba8a267499c1aff4a8d16a704de0423f00cd" />
+				<rom loadflag="load16_word_swap" name="doubled-p2.bin" offset="0x100000" size="0x400000" crc="7e5ed6b8" sha1="cae16c7d27512f94a242bff167393a2c56c0220d" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="doubled-s1.bin" crc="714afb4b" sha1="63b69781585e503e7fa6a62bcf1e6742f8cb3921" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="doubled-m1.bin" crc="43295479" sha1="5f08b91444e89f918cd239019b6df540b5d158fc" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="doubled-v1.bin" offset="0x000000" size="0x800000" crc="f01e97dc" sha1="3bfb92c2cfb937ddf02299b6ac14c6851b6c1f11" />
+				<rom name="doubled-v2.bin" offset="0x800000" size="0x800000" crc="79156c41" sha1="8f8835139390c021b201384c304d235300b47af7" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="doubled-c1.bin" offset="0x000000" size="0x1000000" crc="fd883db8" sha1="9b5c2e916a38438290d9b82eb7b5f34e8b27f660" />
+				<rom loadflag="load16_byte" name="doubled-c2.bin" offset="0x000001" size="0x1000000" crc="718050d3" sha1="4bab6c856a8e91d4d8dab12257211e6c6e82b306" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon1_dm" cloneof="ddragon1">
+		<description>Double Dragon One (demo 20250217)</description>
+		<year>2025</year>
+		<publisher>OzzyOuzo</publisher>
+		<info name="developer" value="Case de Ruivo" />
+		<info name="developer" value="OzzyOuzo" />
+		<info name="developer" value="Johnny16bit" />
+		<info name="version" value="demo Feb 17 2025" />
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -11492,7 +11559,7 @@ license:CC0-1.0
 			</dataarea>
 			<dataarea name="ymsnd:adpcma" size="0x1000000">
 				<rom name="doubledp1-v1.bin" offset="0x000000" size="0x800000" crc="197b6305" sha1="8ab6c573c5116fd7dedf9157c308dac4d45b2599" />
-				<rom name="doubled-v2.bin" offset="0x800000" size="0x800000" crc="8135d5a8" sha1="186a516ed0fbc1d39f96385513de2ad662511559" />
+				<rom name="doubledp1-v2.bin" offset="0x800000" size="0x800000" crc="8135d5a8" sha1="186a516ed0fbc1d39f96385513de2ad662511559" />
 			</dataarea>
 			<dataarea name="sprites" size="0x2000000">
 				<rom loadflag="load16_byte" name="doubledp1-c1.bin" offset="0x000000" size="0x1000000" crc="db1d77da" sha1="98586100414d75dd794b62d4fedcdb626cf12612" />
@@ -11504,7 +11571,8 @@ license:CC0-1.0
 	<software name="etyphoon">
 		<description>The Eye of Typhoon (Tsunami Edition, beta 7)</description>
 		<year>2022</year>
-		<publisher>Balek</publisher>
+		<publisher>OzzyOuzo</publisher>
+		<info name="developer" value="Balek" />
 		<info name="developer" value="OzzyOuzo" />
 		<info name="version" value="ver Jul 31 2022" />
 		<sharedfeat name="release" value="MVS,AES" />
@@ -11534,7 +11602,8 @@ license:CC0-1.0
 	<software name="etyphoon_b6" cloneof="etyphoon">
 		<description>The Eye of Typhoon (Tsunami Edition, beta 6)</description>
 		<year>2022</year>
-		<publisher>Balek</publisher>
+		<publisher>OzzyOuzo</publisher>
+		<info name="developer" value="Balek" />
 		<info name="developer" value="OzzyOuzo" />
 		<info name="version" value="ver Jul 6 2022" />
 		<sharedfeat name="release" value="MVS,AES" />
@@ -11564,7 +11633,8 @@ license:CC0-1.0
 	<software name="etyphoon_b5" cloneof="etyphoon">
 		<description>The Eye of Typhoon (Tsunami Edition, beta 5)</description>
 		<year>2022</year>
-		<publisher>Balek</publisher>
+		<publisher>OzzyOuzo</publisher>
+		<info name="developer" value="Balek" />
 		<info name="developer" value="OzzyOuzo" />
 		<info name="version" value="ver May 7 2022" />
 		<sharedfeat name="release" value="MVS,AES" />
@@ -11594,7 +11664,8 @@ license:CC0-1.0
 	<software name="etyphoon_b4" cloneof="etyphoon">
 		<description>The Eye of Typhoon (Tsunami Edition, beta 4)</description>
 		<year>2022</year>
-		<publisher>Balek</publisher>
+		<publisher>OzzyOuzo</publisher>
+		<info name="developer" value="Balek" />
 		<info name="developer" value="OzzyOuzo" />
 		<info name="version" value="ver Mar 12 2022" />
 		<sharedfeat name="release" value="MVS,AES" />
@@ -11624,7 +11695,8 @@ license:CC0-1.0
 	<software name="etyphoon_b3" cloneof="etyphoon">
 		<description>The Eye of Typhoon (Tsunami Edition, beta 3)</description>
 		<year>2022</year>
-		<publisher>Balek</publisher>
+		<publisher>OzzyOuzo</publisher>
+		<info name="developer" value="Balek" />
 		<info name="developer" value="OzzyOuzo" />
 		<info name="version" value="ver Jan 29 2022" />
 		<sharedfeat name="release" value="MVS,AES" />
@@ -11654,7 +11726,8 @@ license:CC0-1.0
 	<software name="etyphoon_b2" cloneof="etyphoon">
 		<description>The Eye of Typhoon (Tsunami Edition, beta 2)</description>
 		<year>2022</year>
-		<publisher>Balek</publisher>
+		<publisher>OzzyOuzo</publisher>
+		<info name="developer" value="Balek" />
 		<info name="developer" value="OzzyOuzo" />
 		<info name="version" value="ver Jan 21 2022" />
 		<sharedfeat name="release" value="MVS,AES" />
@@ -11684,7 +11757,8 @@ license:CC0-1.0
 	<software name="etyphoon_b1" cloneof="etyphoon">
 		<description>The Eye of Typhoon (Tsunami Edition, beta 1)</description>
 		<year>2022</year>
-		<publisher>Balek</publisher>
+		<publisher>OzzyOuzo</publisher>
+		<info name="developer" value="Balek" />
 		<info name="developer" value="OzzyOuzo" />
 		<info name="version" value="ver Jan 5 2022" />
 		<sharedfeat name="release" value="MVS,AES" />
@@ -11716,7 +11790,8 @@ license:CC0-1.0
 	<software name="etyphoon_a" cloneof="etyphoon">
 		<description>The Eye of Typhoon (alpha)</description>
 		<year>2018</year>
-		<publisher>Balek</publisher>
+		<publisher>OzzyOuzo</publisher>
+		<info name="developer" value="Balek" />
 		<info name="developer" value="OzzyOuzo" />
 		<info name="version" value="alpha" />
 		<sharedfeat name="release" value="MVS,AES" />
@@ -11799,6 +11874,38 @@ license:CC0-1.0
 			<dataarea name="sprites" size="0x2800000">
 				<rom loadflag="load16_byte" name="dod-c1.bin" offset="0x000000" size="0x1400000" crc="050ee046" sha1="ca5a02ba92f7bdbedbb7c0c881eb3cf454140918" />
 				<rom loadflag="load16_byte" name="dod-c2.bin" offset="0x000001" size="0x1400000" crc="eff26754" sha1="d846093dd2c30daeba4e17ac7946155e62ca25a7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inthunt">
+		<description>In The Hunt (demo 20250518)</description>
+		<year>2025</year>
+		<publisher>OzzyOuzo</publisher>
+		<info name="developer" value="Case de Ruivo" />
+		<info name="developer" value="OzzyOuzo" />
+		<info name="developer" value="Johnny16bit" />
+		<info name="version" value="demo May 18 2025" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="inthehunt-p1.bin" offset="0x000000" size="0x100000" crc="58e3317a" sha1="437dd2321f1bc8f5013daebe6399d25b02bd0fe9" />
+				<rom loadflag="load16_word_swap" name="inthehunt-p2.bin" offset="0x100000" size="0x100000" crc="c6494f12" sha1="3842c99dd0ad5443228f9db39c6f1e5a063e595b" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="inthehunt-s1.bin" crc="35c8a6e0" sha1="710af5ad77e5be09cbdaaa94624646cec54bca24" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="inthehunt-m1.bin" crc="dd055711" sha1="2fcae3ba868213d8efc0d17c1290d08aceb6cb4a" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="inthehunt-v1.bin" offset="0x000000" size="0x800000" crc="eb947c63" sha1="acb360fed600fb8143c41ca5389c8f7263d3915b" />
+				<rom name="inthehunt-v2.bin" offset="0x800000" size="0x800000" crc="79156c41" sha1="8f8835139390c021b201384c304d235300b47af7" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="inthehunt-c1.bin" offset="0x000000" size="0x1000000" crc="1b32eaf5" sha1="9d17ae76d8d67dbd34c209cd1c2a0036786b0924" />
+				<rom loadflag="load16_byte" name="inthehunt-c2.bin" offset="0x000001" size="0x1000000" crc="87b8def8" sha1="d27685fc28d5745a75ac7337c5765325c56f5d70" />
 			</dataarea>
 		</part>
 	</software>
