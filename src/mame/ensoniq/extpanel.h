@@ -57,7 +57,7 @@ public:
   void button_down(uint8_t button);
   void button_up(uint8_t button);
   void set_button(uint8_t button, bool pressed);
-  void set_analog_value(uint8_t channel, int value);
+  void set_analog_value(uint8_t channel, uint16_t value);
   void set_blink_phase(uint8_t phase);
 
   bool get_next_command(Command &c) { 
