@@ -637,7 +637,6 @@ private:
 };
 
 
-
 // device type definition
 DECLARE_DEVICE_TYPE(MD_STD_ROM,      md_std_rom_device)
 DECLARE_DEVICE_TYPE(MD_ROM_SRAM,     md_rom_sram_device)

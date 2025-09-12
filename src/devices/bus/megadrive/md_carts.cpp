@@ -18,6 +18,7 @@
 #include "svp.h"
 #include "titan.h"
 #include "tplay96.h"
+#include "paprium.h"
 
 
 void md_cart(device_slot_interface &device)
@@ -91,4 +92,5 @@ void md_cart(device_slot_interface &device)
 
 	device.option_add_internal("rom_nbajam_alt",  MD_EEPROM_NBAJAM_ALT);
 	device.option_add_internal("rom_tplay96", MD_ROM_TPLAY96);
+	device.option_add_internal("rom_paprium",  MD_ROM_PAPRIUM);
 }
