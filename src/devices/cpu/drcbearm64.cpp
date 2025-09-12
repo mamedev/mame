@@ -4,58 +4,58 @@
 
 Register use:
 
-r0      first function parameter/return value
-r1      second function parameter
-r2      third function parameter
-r3      fourth function parameter
-r4
-r5
-r6
-r7
-r8
-r9      temporary for intermediate values
-r10     temporary for intermediate values
-r11     temporary for intermediate values
-r12     scratch register used by helper functions
-r13     scratch register used by helper functions
-r14     scratch register used for address calculation
-r15     temporary used in opcode functions
-r16
-r17
-r18
-r19     UML register I0
-r20     UML register I1
-r21     UML register I2
-r22     UML register I3
-r23     UML register I4
-r24     UML register I5
-r35     UML register I6
-r26     UML register I7
-r27     near cache pointer
-r28     emulated flags
-r29     base generated code frame pointer
+r0      parameter/result    first function parameter/return value
+r1      parameter/result    second function parameter
+r2      parameter/result    third function parameter
+r3      parameter/result    fourth function parameter
+r4      parameter/result
+r5      parameter/result
+r6      parameter/result
+r7      parameter/result
+r8      result pointer
+r9                          temporary for intermediate values
+r10                         temporary for intermediate values
+r11                         temporary for intermediate values
+r12                         scratch register used by helper functions
+r13                         scratch register used by helper functions
+r14                         scratch register used for address calculation
+r15                         temporary used in opcode functions
+r16     intra-call scratch
+r17     intra-call scratch
+r18     platform register
+r19     callee-saved        UML register I0
+r20     callee-saved        UML register I1
+r21     callee-saved        UML register I2
+r22     callee-saved        UML register I3
+r23     callee-saved        UML register I4
+r24     callee-saved        UML register I5
+r35     callee-saved        UML register I6
+r26     callee-saved        UML register I7
+r27     callee-saved        near cache pointer
+r28     callee-saved        emulated flags
+r29     frame pointer       base generated code frame pointer
 r30     link register
 sp      stack pointer
 
-v0
-v1
-v2
-v3
-v4
-v5
-v6
-v7
-v8      UML register F0
-v9      UML register F1
-v10     UML register F2
-v11     UML register F3
-v12     UML register F4
-v13     UML register F5
-v14     UML register F6
-v15     UML register F7
-v16     temporary for intermediate values
-v17     temporary for intermediate values
-v18     temporary for intermediate values
+v0      parameter/result
+v1      parameter/result
+v2      parameter/result
+v3      parameter/result
+v4      parameter/result
+v5      parameter/result
+v6      parameter/result
+v7      parameter/result
+v8                          UML register F0
+v9                          UML register F1
+v10                         UML register F2
+v11                         UML register F3
+v12                         UML register F4
+v13                         UML register F5
+v14                         UML register F6
+v15                         UML register F7
+v16                         temporary for intermediate values
+v17                         temporary for intermediate values
+v18                         temporary for intermediate values
 v19
 v20
 v21
@@ -102,6 +102,13 @@ You can calculate the generated code subroutine call depth as
 (FP - SP) / 0x10.  You can see the return addresses for the generated code
 subroutine calls at SP + 0x08, SP + 0x18, SP + 0x28, etc. until reaching
 the location FP points to.
+
+TODO:
+* The rounding mode set with SETFMOD should be applied for floating point
+  arithmetic.
+* Some operations do not clear the upper bits of integer registers when
+  they should (e.g. 32-bit MOV with the same register as source and
+  destination).
 
 ***************************************************************************/
 
@@ -397,18 +404,6 @@ void get_imm_absolute(a64::Assembler &a, const a64::Gp &reg, const uint64_t val)
 
 	// up to four instructions
 	a.mov(reg, val);
-}
-
-void store_unordered(a64::Assembler &a)
-{
-	a.cset(SCRATCH_REG1, a64::CondCode::kPL);
-	a.cset(SCRATCH_REG2, a64::CondCode::kNE);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.cset(SCRATCH_REG2, a64::CondCode::kCS);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.cset(SCRATCH_REG2, a64::CondCode::kVS);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.bfi(FLAGS_REG, SCRATCH_REG2, FLAG_BIT_U, 1);
 }
 
 inline void get_unordered(a64::Assembler &a, const a64::Gp &reg)
@@ -1257,7 +1252,7 @@ void drcbe_arm64::mov_param_imm(a64::Assembler &a, uint32_t regsize, const be_pa
 		}
 		else
 		{
-			const a64::Gp scratch = select_register(SCRATCH_REG2, movsize);
+			const a64::Gp scratch = select_register(SCRATCH_REG1, movsize);
 
 			get_imm_relative(a, scratch, (regsize == 4) ? uint32_t(src) : src);
 			emit_str_mem(a, scratch, dst.memory());
@@ -1271,8 +1266,6 @@ void drcbe_arm64::mov_param_imm(a64::Assembler &a, uint32_t regsize, const be_pa
 
 void drcbe_arm64::mov_param_param(a64::Assembler &a, uint32_t regsize, const be_parameter &dst, const be_parameter &src) const
 {
-	// FIXME: this won't clear upper bits of the output for a 4-byte move when the source is a register or immediate
-	// need to fix affected cases (mov, sext), currently confounded by issues in the simplifier
 	assert(!dst.is_immediate());
 
 	if (src.is_memory())
@@ -1289,7 +1282,15 @@ void drcbe_arm64::mov_param_param(a64::Assembler &a, uint32_t regsize, const be_
 	}
 	else if (src.is_int_register())
 	{
-		mov_param_reg(a, regsize, dst, src.get_register_int(regsize));
+		if ((regsize == 4) && dst.is_cold_register())
+		{
+			mov_reg_param(a, regsize, SCRATCH_REG1, src);
+			mov_param_reg(a, regsize, dst, SCRATCH_REG1);
+		}
+		else
+		{
+			mov_param_reg(a, regsize, dst, src.get_register_int(regsize));
+		}
 	}
 	else if (src.is_immediate())
 	{
@@ -2241,7 +2242,7 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_flags(inst);
 
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
-	const a64::Gp scratch = select_register(FUNC_SCRATCH_REG, inst.size());
+	const a64::Gp scratch = select_register(TEMP_REG1, inst.size());
 
 	if (srcp.is_immediate())
 	{
@@ -2249,7 +2250,7 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else
 	{
-		const a64::Gp src = srcp.select_register(FUNC_SCRATCH_REG, inst.size());
+		const a64::Gp src = srcp.select_register(scratch, inst.size());
 
 		mov_reg_param(a, inst.size(), src, srcp);
 		a.and_(scratch, src, 3);
@@ -4919,9 +4920,9 @@ void drcbe_arm64::op_ftoint(a64::Assembler &a, const uml::instruction &inst)
 				Label done = a.newLabel();
 
 				// this depends on each case being two instructions
-				emit_ldrb_mem(a, TEMP_REG1, &m_state.fmod);
+				emit_ldrb_mem(a, TEMP_REG1.w(), &m_state.fmod);
 				a.adr(TEMP_REG2, base);
-				a.add(TEMP_REG2, TEMP_REG1, arm::lsl(3));
+				a.add(TEMP_REG2, TEMP_REG2, TEMP_REG1, arm::lsl(3));
 				a.br(TEMP_REG2);
 
 				a.bind(base);
@@ -5033,7 +5034,10 @@ void drcbe_arm64::op_fcmp(a64::Assembler &a, const uml::instruction &inst)
 	else
 		m_carry_state = carry_state::POISON;
 	if (inst.flags() & FLAG_U)
-		store_unordered(a);
+	{
+		a.cset(SCRATCH_REG1, a64::CondCode::kVS);
+		a.bfi(FLAGS_REG, SCRATCH_REG1, FLAG_BIT_U, 1);
+	}
 }
 
 template <a64::Inst::Id Opcode> void drcbe_arm64::op_float_alu(a64::Assembler &a, const uml::instruction &inst)
