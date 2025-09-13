@@ -61,42 +61,6 @@ license:CC0-1.0
 		<rect state="0"><bounds x="0" y="0" width="45" height="504" /><color red="1.0" green="1.0" blue="1.0" /></rect>
 		<rect state="1"><bounds x="0" y="0" width="45" height="504" /><color red="0.9" green="0.9" blue="0.9" /></rect>
 	</element>
-	<element name="whitekey-a0" defstate="0">
-		<rect state="0"><bounds x="0" y="0" width="66" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="0" y="0" width="66" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
-	<element name="whitekey-l" defstate="0">
-		<rect state="0"><bounds x="0" y="0" width="45" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="0" y="0" width="45" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
-	<element name="whitekey-m" defstate="0">
-		<rect state="0"><bounds x="13" y="0" width="53" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="13" y="0" width="53" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
-	<element name="whitekey-lm" defstate="0">
-		<rect state="0"><bounds x="10" y="0" width="44" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="10" y="0" width="44" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
-	<element name="whitekey-rm" defstate="0">
-		<rect state="0"><bounds x="22" y="0" width="44" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="22" y="0" width="44" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
-	<element name="whitekey-r" defstate="0">
-		<rect state="0"><bounds x="34" y="0" width="45" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="34" y="0" width="45" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
 	<element name="blackkey" defstate="0">
 		<rect state="0"><bounds x="0" y="0" width="44" height="324" /><color red="0.0" green="0.0" blue="0.0" /></rect>
 		<rect state="0"><bounds x="4" y="0" width="36" height="320" /><color red="0.1" green="0.1" blue="0.1" /></rect>
@@ -165,110 +129,110 @@ license:CC0-1.0
 		<element ref="keyfill"><bounds x="72" y="98" width="4284" height="524" /></element>
 
 		<!-- octave 0 -->
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI0" inputmask="0x02"><bounds x="151" y="108" width="44" height="324" /></element>
-		<element ref="whitekey-a0" inputtag="maincpu:kbd:FI0" inputmask="0x01"><bounds x="82" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI0" inputmask="0x04"><bounds x="164" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI0" inputmask="0x01"><bounds x="82" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI0" inputmask="0x04"><bounds x="164" y="108" width="79" height="504" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI0" inputmask="0x02"><bounds x="151" y="108" width="44" height="324" /></element>
 
 		<!-- octave 1 -->
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI0" inputmask="0x10"><bounds x="294" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI0" inputmask="0x40"><bounds x="397" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI1" inputmask="0x02"><bounds x="537" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI1" inputmask="0x08"><bounds x="631" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI1" inputmask="0x20"><bounds x="725" y="108" width="44" height="324" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI0" inputmask="0x08"><bounds x="246" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-m"  inputtag="maincpu:kbd:FI0" inputmask="0x20"><bounds x="328" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI0" inputmask="0x80"><bounds x="410" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI1" inputmask="0x01"><bounds x="492" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="maincpu:kbd:FI1" inputmask="0x04"><bounds x="574" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="maincpu:kbd:FI1" inputmask="0x10"><bounds x="656" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI1" inputmask="0x40"><bounds x="738" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI0" inputmask="0x08"><bounds x="246" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI0" inputmask="0x20"><bounds x="328" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI0" inputmask="0x80"><bounds x="410" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI1" inputmask="0x01"><bounds x="492" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI1" inputmask="0x04"><bounds x="574" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI1" inputmask="0x10"><bounds x="656" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI1" inputmask="0x40"><bounds x="738" y="108" width="79" height="504" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI0" inputmask="0x10"><bounds x="294" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI0" inputmask="0x40"><bounds x="397" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI1" inputmask="0x02"><bounds x="537" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI1" inputmask="0x08"><bounds x="631" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI1" inputmask="0x20"><bounds x="725" y="108" width="44" height="324" /></element>
 
 		<!-- octave 2 -->
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI2" inputmask="0x01"><bounds x="868" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI2" inputmask="0x04"><bounds x="971" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI2" inputmask="0x20"><bounds x="1111" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI2" inputmask="0x80"><bounds x="1205" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI3" inputmask="0x02"><bounds x="1299" y="108" width="44" height="324" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI1" inputmask="0x80"><bounds x="820" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-m"  inputtag="maincpu:kbd:FI2" inputmask="0x02"><bounds x="902" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI2" inputmask="0x08"><bounds x="984" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI2" inputmask="0x10"><bounds x="1066" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="maincpu:kbd:FI2" inputmask="0x40"><bounds x="1148" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="maincpu:kbd:FI3" inputmask="0x01"><bounds x="1230" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI3" inputmask="0x04"><bounds x="1312" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI1" inputmask="0x80"><bounds x="820" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI2" inputmask="0x02"><bounds x="902" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI2" inputmask="0x08"><bounds x="984" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI2" inputmask="0x10"><bounds x="1066" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI2" inputmask="0x40"><bounds x="1148" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI3" inputmask="0x01"><bounds x="1230" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI3" inputmask="0x04"><bounds x="1312" y="108" width="79" height="504" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI2" inputmask="0x01"><bounds x="868" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI2" inputmask="0x04"><bounds x="971" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI2" inputmask="0x20"><bounds x="1111" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI2" inputmask="0x80"><bounds x="1205" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI3" inputmask="0x02"><bounds x="1299" y="108" width="44" height="324" /></element>
 
 		<!-- octave 3 -->
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI3" inputmask="0x10"><bounds x="1442" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI3" inputmask="0x40"><bounds x="1545" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI4" inputmask="0x02"><bounds x="1685" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI4" inputmask="0x08"><bounds x="1779" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI4" inputmask="0x20"><bounds x="1873" y="108" width="44" height="324" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI3" inputmask="0x08"><bounds x="1394" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-m"  inputtag="maincpu:kbd:FI3" inputmask="0x20"><bounds x="1476" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI3" inputmask="0x80"><bounds x="1558" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI4" inputmask="0x01"><bounds x="1640" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="maincpu:kbd:FI4" inputmask="0x04"><bounds x="1722" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="maincpu:kbd:FI4" inputmask="0x10"><bounds x="1804" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI4" inputmask="0x40"><bounds x="1886" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI3" inputmask="0x08"><bounds x="1394" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI3" inputmask="0x20"><bounds x="1476" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI3" inputmask="0x80"><bounds x="1558" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI4" inputmask="0x01"><bounds x="1640" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI4" inputmask="0x04"><bounds x="1722" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI4" inputmask="0x10"><bounds x="1804" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI4" inputmask="0x40"><bounds x="1886" y="108" width="79" height="504" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI3" inputmask="0x10"><bounds x="1442" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI3" inputmask="0x40"><bounds x="1545" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI4" inputmask="0x02"><bounds x="1685" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI4" inputmask="0x08"><bounds x="1779" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI4" inputmask="0x20"><bounds x="1873" y="108" width="44" height="324" /></element>
 
 		<!-- octave 4 -->
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI5" inputmask="0x01"><bounds x="2016" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI5" inputmask="0x04"><bounds x="2119" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI5" inputmask="0x20"><bounds x="2259" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI5" inputmask="0x80"><bounds x="2353" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI6" inputmask="0x02"><bounds x="2447" y="108" width="44" height="324" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI4" inputmask="0x80"><bounds x="1968" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-m"  inputtag="maincpu:kbd:FI5" inputmask="0x02"><bounds x="2050" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI5" inputmask="0x08"><bounds x="2132" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI5" inputmask="0x10"><bounds x="2214" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="maincpu:kbd:FI5" inputmask="0x40"><bounds x="2296" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="maincpu:kbd:FI6" inputmask="0x01"><bounds x="2378" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI6" inputmask="0x04"><bounds x="2460" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI4" inputmask="0x80"><bounds x="1968" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI5" inputmask="0x02"><bounds x="2050" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI5" inputmask="0x08"><bounds x="2132" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI5" inputmask="0x10"><bounds x="2214" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI5" inputmask="0x40"><bounds x="2296" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI6" inputmask="0x01"><bounds x="2378" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI6" inputmask="0x04"><bounds x="2460" y="108" width="79" height="504" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI5" inputmask="0x01"><bounds x="2016" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI5" inputmask="0x04"><bounds x="2119" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI5" inputmask="0x20"><bounds x="2259" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI5" inputmask="0x80"><bounds x="2353" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI6" inputmask="0x02"><bounds x="2447" y="108" width="44" height="324" /></element>
 
 		<!-- octave 5 -->
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI6" inputmask="0x10"><bounds x="2590" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI6" inputmask="0x40"><bounds x="2693" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI7" inputmask="0x02"><bounds x="2833" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI7" inputmask="0x08"><bounds x="2927" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI7" inputmask="0x20"><bounds x="3021" y="108" width="44" height="324" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI6" inputmask="0x08"><bounds x="2542" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-m"  inputtag="maincpu:kbd:FI6" inputmask="0x20"><bounds x="2624" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI6" inputmask="0x80"><bounds x="2706" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI7" inputmask="0x01"><bounds x="2788" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="maincpu:kbd:FI7" inputmask="0x04"><bounds x="2870" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="maincpu:kbd:FI7" inputmask="0x10"><bounds x="2952" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI7" inputmask="0x40"><bounds x="3034" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI6" inputmask="0x08"><bounds x="2542" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI6" inputmask="0x20"><bounds x="2624" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI6" inputmask="0x80"><bounds x="2706" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI7" inputmask="0x01"><bounds x="2788" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI7" inputmask="0x04"><bounds x="2870" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI7" inputmask="0x10"><bounds x="2952" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI7" inputmask="0x40"><bounds x="3034" y="108" width="79" height="504" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI6" inputmask="0x10"><bounds x="2590" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI6" inputmask="0x40"><bounds x="2693" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI7" inputmask="0x02"><bounds x="2833" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI7" inputmask="0x08"><bounds x="2927" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI7" inputmask="0x20"><bounds x="3021" y="108" width="44" height="324" /></element>
 
 		<!-- octave 6 -->
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI8" inputmask="0x01"><bounds x="3164" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI8" inputmask="0x04"><bounds x="3267" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI8" inputmask="0x20"><bounds x="3407" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI8" inputmask="0x80"><bounds x="3501" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI9" inputmask="0x02"><bounds x="3595" y="108" width="44" height="324" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI7" inputmask="0x80"><bounds x="3116" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-m"  inputtag="maincpu:kbd:FI8" inputmask="0x02"><bounds x="3198" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI8" inputmask="0x08"><bounds x="3280" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI8" inputmask="0x10"><bounds x="3362" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="maincpu:kbd:FI8" inputmask="0x40"><bounds x="3444" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="maincpu:kbd:FI9" inputmask="0x01"><bounds x="3526" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI9" inputmask="0x04"><bounds x="3608" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI7" inputmask="0x80"><bounds x="3116" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI8" inputmask="0x02"><bounds x="3198" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI8" inputmask="0x08"><bounds x="3280" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI8" inputmask="0x10"><bounds x="3362" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI8" inputmask="0x40"><bounds x="3444" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI9" inputmask="0x01"><bounds x="3526" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI9" inputmask="0x04"><bounds x="3608" y="108" width="79" height="504" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI8" inputmask="0x01"><bounds x="3164" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI8" inputmask="0x04"><bounds x="3267" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI8" inputmask="0x20"><bounds x="3407" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI8" inputmask="0x80"><bounds x="3501" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI9" inputmask="0x02"><bounds x="3595" y="108" width="44" height="324" /></element>
 
 		<!-- octave 7 -->
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI9" inputmask="0x10"><bounds x="3738" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI9" inputmask="0x40"><bounds x="3841" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI10" inputmask="0x02"><bounds x="3981" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI10" inputmask="0x08"><bounds x="4075" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="maincpu:kbd:FI10" inputmask="0x20"><bounds x="4169" y="108" width="44" height="324" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI9" inputmask="0x08"><bounds x="3690" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-m"  inputtag="maincpu:kbd:FI9" inputmask="0x20"><bounds x="3772" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI9" inputmask="0x80"><bounds x="3854" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-l"  inputtag="maincpu:kbd:FI10" inputmask="0x01"><bounds x="3936" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="maincpu:kbd:FI10" inputmask="0x04"><bounds x="4018" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="maincpu:kbd:FI10" inputmask="0x10"><bounds x="4100" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI10" inputmask="0x40"><bounds x="4182" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI9" inputmask="0x08"><bounds x="3690" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI9" inputmask="0x20"><bounds x="3772" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI9" inputmask="0x80"><bounds x="3854" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI10" inputmask="0x01"><bounds x="3936" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI10" inputmask="0x04"><bounds x="4018" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI10" inputmask="0x10"><bounds x="4100" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI10" inputmask="0x40"><bounds x="4182" y="108" width="79" height="504" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI9" inputmask="0x10"><bounds x="3738" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI9" inputmask="0x40"><bounds x="3841" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI10" inputmask="0x02"><bounds x="3981" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI10" inputmask="0x08"><bounds x="4075" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="maincpu:kbd:FI10" inputmask="0x20"><bounds x="4169" y="108" width="44" height="324" /></element>
 
 		<!-- final key -->
-		<element ref="whitekey"    inputtag="maincpu:kbd:FI10" inputmask="0x80"><bounds x="4264" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="maincpu:kbd:FI10" inputmask="0x80"><bounds x="4264" y="108" width="79" height="504" /></element>
 	</group>
 
 	<view name="Keyboard">

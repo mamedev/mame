@@ -643,36 +643,6 @@ license:CC0-1.0
 		<rect state="0"><bounds x="0" y="0" width="45" height="504" /><color red="1.0" green="1.0" blue="1.0" /></rect>
 		<rect state="1"><bounds x="0" y="0" width="45" height="504" /><color red="0.9" green="0.9" blue="0.9" /></rect>
 	</element>
-	<element name="whitekey-l" defstate="0">
-		<rect state="0"><bounds x="0" y="0" width="45" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="0" y="0" width="45" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
-	<element name="whitekey-m" defstate="0">
-		<rect state="0"><bounds x="13" y="0" width="53" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="13" y="0" width="53" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
-	<element name="whitekey-lm" defstate="0">
-		<rect state="0"><bounds x="10" y="0" width="44" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="10" y="0" width="44" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
-	<element name="whitekey-rm" defstate="0">
-		<rect state="0"><bounds x="22" y="0" width="44" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="22" y="0" width="44" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
-	<element name="whitekey-r" defstate="0">
-		<rect state="0"><bounds x="34" y="0" width="45" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="1"><bounds x="34" y="0" width="45" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
-	</element>
 	<element name="blackkey" defstate="0">
 		<rect state="0"><bounds x="0" y="0" width="44" height="324" /><color red="0.0" green="0.0" blue="0.0" /></rect>
 		<rect state="0"><bounds x="4" y="0" width="36" height="320" /><color red="0.1" green="0.1" blue="0.1" /></rect>
@@ -685,77 +655,77 @@ license:CC0-1.0
 		<element ref="keyfill"><bounds x="72" y="98" width="2970" height="524" /></element>
 
 		<!-- octave 1 -->
-		<element ref="blackkey"    inputtag="kbd:KI38" inputmask="1"><bounds x="130" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI37" inputmask="1"><bounds x="233" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI35" inputmask="2"><bounds x="373" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI34" inputmask="2"><bounds x="467" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI33" inputmask="2"><bounds x="561" y="108" width="44" height="324" /></element>
-		<element ref="whitekey-l"  inputtag="kbd:KI38" inputmask="2"><bounds x="82" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-m"  inputtag="kbd:KI37" inputmask="2"><bounds x="164" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="kbd:KI36" inputmask="2"><bounds x="246" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-l"  inputtag="kbd:KI36" inputmask="1"><bounds x="328" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="kbd:KI35" inputmask="1"><bounds x="410" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="kbd:KI34" inputmask="1"><bounds x="492" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="kbd:KI33" inputmask="1"><bounds x="574" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI38" inputmask="2"><bounds x="82" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI37" inputmask="2"><bounds x="164" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI36" inputmask="2"><bounds x="246" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI36" inputmask="1"><bounds x="328" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI35" inputmask="1"><bounds x="410" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI34" inputmask="1"><bounds x="492" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI33" inputmask="1"><bounds x="574" y="108" width="79" height="504" /></element>
+		<element ref="blackkey" inputtag="kbd:KI38" inputmask="1"><bounds x="130" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI37" inputmask="1"><bounds x="233" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI35" inputmask="2"><bounds x="373" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI34" inputmask="2"><bounds x="467" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI33" inputmask="2"><bounds x="561" y="108" width="44" height="324" /></element>
 
 		<!-- octave 2 -->
-		<element ref="blackkey"    inputtag="kbd:KI32" inputmask="1"><bounds x="704" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI31" inputmask="1"><bounds x="807" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI29" inputmask="2"><bounds x="947" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI28" inputmask="2"><bounds x="1041" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI27" inputmask="2"><bounds x="1135" y="108" width="44" height="324" /></element>
-		<element ref="whitekey-l"  inputtag="kbd:KI32" inputmask="2"><bounds x="656" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-m"  inputtag="kbd:KI31" inputmask="2"><bounds x="738" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="kbd:KI30" inputmask="2"><bounds x="820" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-l"  inputtag="kbd:KI30" inputmask="1"><bounds x="902" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="kbd:KI29" inputmask="1"><bounds x="984" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="kbd:KI28" inputmask="1"><bounds x="1066" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="kbd:KI27" inputmask="1"><bounds x="1148" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI32" inputmask="2"><bounds x="656" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI31" inputmask="2"><bounds x="738" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI30" inputmask="2"><bounds x="820" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI30" inputmask="1"><bounds x="902" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI29" inputmask="1"><bounds x="984" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI28" inputmask="1"><bounds x="1066" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI27" inputmask="1"><bounds x="1148" y="108" width="79" height="504" /></element>
+		<element ref="blackkey" inputtag="kbd:KI32" inputmask="1"><bounds x="704" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI31" inputmask="1"><bounds x="807" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI29" inputmask="2"><bounds x="947" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI28" inputmask="2"><bounds x="1041" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI27" inputmask="2"><bounds x="1135" y="108" width="44" height="324" /></element>
 
 		<!-- octave 3 -->
-		<element ref="blackkey"    inputtag="kbd:KI26" inputmask="1"><bounds x="1278" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI25" inputmask="1"><bounds x="1381" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI23" inputmask="2"><bounds x="1521" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI22" inputmask="2"><bounds x="1615" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI21" inputmask="2"><bounds x="1709" y="108" width="44" height="324" /></element>
-		<element ref="whitekey-l"  inputtag="kbd:KI26" inputmask="2"><bounds x="1230" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-m"  inputtag="kbd:KI25" inputmask="2"><bounds x="1312" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="kbd:KI24" inputmask="2"><bounds x="1394" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-l"  inputtag="kbd:KI24" inputmask="1"><bounds x="1476" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="kbd:KI23" inputmask="1"><bounds x="1558" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="kbd:KI22" inputmask="1"><bounds x="1640" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="kbd:KI21" inputmask="1"><bounds x="1722" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI26" inputmask="2"><bounds x="1230" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI25" inputmask="2"><bounds x="1312" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI24" inputmask="2"><bounds x="1394" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI24" inputmask="1"><bounds x="1476" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI23" inputmask="1"><bounds x="1558" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI22" inputmask="1"><bounds x="1640" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI21" inputmask="1"><bounds x="1722" y="108" width="79" height="504" /></element>
+		<element ref="blackkey" inputtag="kbd:KI26" inputmask="1"><bounds x="1278" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI25" inputmask="1"><bounds x="1381" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI23" inputmask="2"><bounds x="1521" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI22" inputmask="2"><bounds x="1615" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI21" inputmask="2"><bounds x="1709" y="108" width="44" height="324" /></element>
 
 		<!-- octave 4 -->
-		<element ref="blackkey"    inputtag="kbd:KI20" inputmask="1"><bounds x="1852" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI19" inputmask="1"><bounds x="1955" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI17" inputmask="2"><bounds x="2095" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI16" inputmask="2"><bounds x="2189" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI15" inputmask="2"><bounds x="2283" y="108" width="44" height="324" /></element>
-		<element ref="whitekey-l"  inputtag="kbd:KI20" inputmask="2"><bounds x="1804" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-m"  inputtag="kbd:KI19" inputmask="2"><bounds x="1886" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="kbd:KI18" inputmask="2"><bounds x="1968" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-l"  inputtag="kbd:KI18" inputmask="1"><bounds x="2050" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="kbd:KI17" inputmask="1"><bounds x="2132" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="kbd:KI16" inputmask="1"><bounds x="2214" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="kbd:KI15" inputmask="1"><bounds x="2296" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI20" inputmask="2"><bounds x="1804" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI19" inputmask="2"><bounds x="1886" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI18" inputmask="2"><bounds x="1968" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI18" inputmask="1"><bounds x="2050" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI17" inputmask="1"><bounds x="2132" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI16" inputmask="1"><bounds x="2214" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI15" inputmask="1"><bounds x="2296" y="108" width="79" height="504" /></element>
+		<element ref="blackkey" inputtag="kbd:KI20" inputmask="1"><bounds x="1852" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI19" inputmask="1"><bounds x="1955" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI17" inputmask="2"><bounds x="2095" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI16" inputmask="2"><bounds x="2189" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI15" inputmask="2"><bounds x="2283" y="108" width="44" height="324" /></element>
 
 		<!-- octave 5 -->
-		<element ref="blackkey"    inputtag="kbd:KI14" inputmask="1"><bounds x="2426" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI13" inputmask="1"><bounds x="2529" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI11" inputmask="2"><bounds x="2669" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI10" inputmask="2"><bounds x="2763" y="108" width="44" height="324" /></element>
-		<element ref="blackkey"    inputtag="kbd:KI9"  inputmask="2"><bounds x="2857" y="108" width="44" height="324" /></element>
-		<element ref="whitekey-l"  inputtag="kbd:KI14" inputmask="2"><bounds x="2378" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-m"  inputtag="kbd:KI13" inputmask="2"><bounds x="2460" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="kbd:KI12" inputmask="2"><bounds x="2542" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-l"  inputtag="kbd:KI12" inputmask="1"><bounds x="2624" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-lm" inputtag="kbd:KI11" inputmask="1"><bounds x="2706" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-rm" inputtag="kbd:KI10" inputmask="1"><bounds x="2788" y="108" width="79" height="504" /></element>
-		<element ref="whitekey-r"  inputtag="kbd:KI9"  inputmask="1"><bounds x="2870" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI14" inputmask="2"><bounds x="2378" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI13" inputmask="2"><bounds x="2460" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI12" inputmask="2"><bounds x="2542" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI12" inputmask="1"><bounds x="2624" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI11" inputmask="1"><bounds x="2706" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI10" inputmask="1"><bounds x="2788" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI9"  inputmask="1"><bounds x="2870" y="108" width="79" height="504" /></element>
+		<element ref="blackkey" inputtag="kbd:KI14" inputmask="1"><bounds x="2426" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI13" inputmask="1"><bounds x="2529" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI11" inputmask="2"><bounds x="2669" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI10" inputmask="2"><bounds x="2763" y="108" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="kbd:KI9"  inputmask="2"><bounds x="2857" y="108" width="44" height="324" /></element>
 
 		<!-- final key -->
-		<element ref="whitekey"    inputtag="kbd:KI8"  inputmask="2"><bounds x="2952" y="108" width="79" height="504" /></element>
+		<element ref="whitekey" inputtag="kbd:KI8"  inputmask="2"><bounds x="2952" y="108" width="79" height="504" /></element>
 	</group>
 
 	<group name="left">
