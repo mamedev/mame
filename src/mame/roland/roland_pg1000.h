@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Felipe Sanches
 
+/*
+	The only known non-working feature at this moment are the MIDI ports.
+	Reasoning for current state of emulation is given at
+	https://github.com/mamedev/mame/pull/14127#issuecomment-3268446878
+*/
+
 #ifndef MAME_ROLAND_ROLAND_PG1000_H
 #define MAME_ROLAND_ROLAND_PG1000_H
 
