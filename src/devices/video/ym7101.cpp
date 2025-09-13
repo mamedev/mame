@@ -6,8 +6,8 @@ Rewrite of Sega 315-5313 MD VDP (tied to Teradrive)
 
 Notes:
 - Teradrive actually has 128 KiB compared to stock 64, this means that d_titov2 won't possibly work
-here;
-- Should eventually derive from 315-5124 (the SMS VDP);
+  here;
+- Should eventually emulate the 315-5124 (the SMS VDP) via Mode 4;
 
 **************************************************************************************************/
 
@@ -849,13 +849,17 @@ void ym7101_device::prepare_tile_line(int scanline)
 	//int y = scanline >> 3;
 	int yi = scanline & 7;
 
-	const u16 vram_mask = 0x7ff;
+	const u16 tile_mask = 0x7ff;
 	//const u16 page_mask[] = { 0x7ff, 0x1fff, 0x1fff, 0x1fff };
 
 	const u16 page_masks[] = { 32, 64, 1, 128 };
 
 	const u16 h_page = page_masks[m_hsz];
 	const u16 v_page = page_masks[m_vsz];
+
+	// talespin ignores lowest bit for status bar (writes 0x1800, wants 0x1000)
+	const u32 window_name_mask = (h40_mode ? 0x1f000 : 0x1f800) & m_vram_mask;
+	const u32 window_name_base = (m_window_name_table & window_name_mask) >> 1;
 
 	const u16 window_h_page = h40_mode ? 64 : 32;
 	const u16 window_v_page = 32;
@@ -908,8 +912,8 @@ void ym7101_device::prepare_tile_line(int scanline)
 			const u32 tile_offset_a = (x & ((window_h_page * 1) - 1)) + ((vcolumn_a >> 3) * (window_h_page >> 0));
 			scrolly_a_frac = 0;
 			scrollx_a_frac = 0;
-			id_flags_a = m_vram[((m_window_name_table >> 1) + tile_offset_a) & m_vram_mask];
-			tile_a = id_flags_a & vram_mask;
+			id_flags_a = m_vram[(window_name_base + tile_offset_a) & m_vram_mask];
+			tile_a = id_flags_a & tile_mask;
 			flipx_a = BIT(id_flags_a, 11) ? 4 : 3;
 			flipy_a = BIT(id_flags_a, 12) ? 7 : 0;
 			color_a = ((id_flags_a >> 13) & 3) << 4;
@@ -925,7 +929,7 @@ void ym7101_device::prepare_tile_line(int scanline)
 			scrollx_a_frac = scrollx_a & 7;
 
 			id_flags_a = m_vram[((m_plane_a_name_table >> 1) + tile_offset_a) & m_vram_mask];
-			tile_a = id_flags_a & vram_mask;
+			tile_a = id_flags_a & tile_mask;
 			flipx_a = BIT(id_flags_a, 11) ? 4 : 3;
 			flipy_a = BIT(id_flags_a, 12) ? 7 : 0;
 			color_a = ((id_flags_a >> 13) & 3) << 4;
@@ -939,7 +943,7 @@ void ym7101_device::prepare_tile_line(int scanline)
 		const u16 vcolumn_b = (scrolly_b + scanline) & ((v_page * 8) - 1);
 		const u32 tile_offset_b = ((x - (scrollx_b >> 3)) & ((h_page * 1) - 1)) + ((vcolumn_b >> 3) * (h_page >> 0));
 		const u16 id_flags_b = m_vram[((m_plane_b_name_table >> 1) + tile_offset_b) & m_vram_mask];
-		const u16 tile_b = id_flags_b & vram_mask;
+		const u16 tile_b = id_flags_b & tile_mask;
 		const u8 flipx_b = BIT(id_flags_b, 11) ? 4 : 3;
 		const u8 flipy_b = BIT(id_flags_b, 12) ? 7 : 0;
 		const u8 color_b = ((id_flags_b >> 13) & 3) << 4;
