@@ -76,6 +76,8 @@ public:
 	void fred_w(offs_t offset, uint8_t data);
 	uint8_t jim_r(offs_t offset);
 	void jim_w(offs_t offset, uint8_t data);
+	uint8_t rom_r(offs_t offset);
+	void rom_w(offs_t offset, uint8_t data);
 
 	void irq_w(int state) { m_irq_handler(state); }
 	void nmi_w(int state) { m_nmi_handler(state); }
@@ -117,6 +119,8 @@ public:
 	virtual void fred_w(offs_t offset, uint8_t data) { }
 	virtual uint8_t jim_r(offs_t offset) { return 0xff; }
 	virtual void jim_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t rom_r(offs_t offset) { return 0xff; }
+	virtual void rom_w(offs_t offset, uint8_t data) { }
 
 	virtual uint8_t pb_r() { return 0xff; }
 	virtual void pb_w(uint8_t data) { }

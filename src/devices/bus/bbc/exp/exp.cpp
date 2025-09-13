@@ -83,6 +83,14 @@ uint8_t bbc_exp_slot_device::jim_r(offs_t offset)
 		return 0xff;
 }
 
+uint8_t bbc_exp_slot_device::rom_r(offs_t offset)
+{
+	if (m_card)
+		return m_card->rom_r(offset);
+	else
+		return 0xff;
+}
+
 //-------------------------------------------------
 //  write
 //-------------------------------------------------
@@ -97,6 +105,12 @@ void bbc_exp_slot_device::jim_w(offs_t offset, uint8_t data)
 {
 	if (m_card)
 		m_card->jim_w(offset, data);
+}
+
+void bbc_exp_slot_device::rom_w(offs_t offset, uint8_t data)
+{
+	if (m_card)
+		m_card->rom_w(offset, data);
 }
 
 //-------------------------------------------------
@@ -152,11 +166,15 @@ void bbc_exp_slot_device::write_cb2(int state)
 
 // slot devices
 #include "autocue.h"
+#include "jafacart.h"
+#include "magazzino.h"
 #include "mertec.h"
 
 
 void bbc_exp_devices(device_slot_interface &device)
 {
 	device.option_add_internal("autocue", BBC_AUTOCUE); /* Autocue RAM disk board */
+	device.option_add("jafacart", BBC_JAFACART);        /* JAFA Cartridge Converter */
+	device.option_add("magazzino", BBC_MAGAZZINO);      /* Magazzino */
 	device.option_add("mertec",  BBC_MERTEC);           /* Mertec Compact Companion */
 }

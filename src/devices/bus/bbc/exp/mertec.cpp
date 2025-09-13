@@ -9,7 +9,6 @@
     TODO:
     - Fix userport, by somehow passing lines into joyport
     - Not sure whether any 1MHz bus devices should work on the 2MHz bus
-    - Map 6821 to ROM region offset 0x6000
 
 **********************************************************************/
 
@@ -36,7 +35,7 @@ public:
 		, m_analog(*this, "analogue")
 		, m_userport(*this, "userport")
 		, m_2mhzbus(*this, "2mhzbus")
-		, m_ext_rom(*this, "ext_rom")
+		, m_rom(*this, "rom")
 	{
 	}
 
@@ -52,23 +51,25 @@ protected:
 	virtual void fred_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t jim_r(offs_t offset) override;
 	virtual void jim_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t rom_r(offs_t offset) override;
+	virtual void rom_w(offs_t offset, uint8_t data) override;
 
 	virtual uint8_t pb_r() override;
 	virtual void pb_w(uint8_t data) override;
 
 private:
-	uint8_t m_adc_ctrl = 0;
-	uint8_t m_adc_data = 0;
-
-	uint8_t adc_ctrl_r();
-	void adc_ctrl_w(uint8_t data);
-
 	required_device<pia6821_device> m_pia;
 	required_device<upd7002_device> m_upd7002;
 	required_device<bbc_analogue_slot_device> m_analog;
 	required_device<bbc_userport_slot_device> m_userport;
 	required_device<bbc_1mhzbus_slot_device> m_2mhzbus;
-	required_memory_region m_ext_rom;
+	required_region_ptr<uint8_t> m_rom;
+
+	uint8_t adc_ctrl_r();
+	void adc_ctrl_w(uint8_t data);
+
+	uint8_t m_adc_ctrl = 0;
+	uint8_t m_adc_data = 0;
 };
 
 
@@ -77,7 +78,7 @@ private:
 //-------------------------------------------------
 
 ROM_START(mertec)
-	ROM_REGION(0x8000, "ext_rom", 0)
+	ROM_REGION(0x8000, "rom", 0)
 	ROM_LOAD("mertec-companion-v0.99.rom", 0x0000, 0x8000, CRC(af8ff8d7) SHA1(0c4017ffbb480168e54c6b153da257ec5ea29d4e))
 ROM_END
 
@@ -163,6 +164,20 @@ uint8_t bbc_mertec_device::jim_r(offs_t offset)
 void bbc_mertec_device::jim_w(offs_t offset, uint8_t data)
 {
 	m_2mhzbus->jim_w(offset, data);
+}
+
+uint8_t bbc_mertec_device::rom_r(offs_t offset)
+{
+	if ((offset & 0x6000) == 0x6000)
+		return m_pia->read(offset);
+	else
+		return m_rom[offset];
+}
+
+void bbc_mertec_device::rom_w(offs_t offset, uint8_t data)
+{
+	if ((offset & 0x6000) == 0x6000)
+		m_pia->write(offset, data);
 }
 
 uint8_t bbc_mertec_device::pb_r()

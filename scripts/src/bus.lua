@@ -675,6 +675,10 @@ if (BUSES["BBC_EXP"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/exp/exp.h",
 		MAME_DIR .. "src/devices/bus/bbc/exp/autocue.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/exp/autocue.h",
+		MAME_DIR .. "src/devices/bus/bbc/exp/jafacart.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/exp/jafacart.h",
+		MAME_DIR .. "src/devices/bus/bbc/exp/magazzino.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/exp/magazzino.h",
 		MAME_DIR .. "src/devices/bus/bbc/exp/mertec.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/exp/mertec.h",
 	}
