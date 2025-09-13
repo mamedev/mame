@@ -206,13 +206,38 @@ void ym7101_device::update_command_state()
 	m_command.code = ((m_command.latch & 0xc000) >> 14) | ((m_command.latch & 0xf0'0000) >> 18);
 }
 
-u16 ym7101_device::control_port_r(offs_t offset, u16 mem_mask)
+// https://gendev.spritesmind.net/forum/viewtopic.php?t=768
+u16 ym7101_device::get_hv_counter()
+{
+	const u8 h40_mode = BIT(m_hres_mode, 0);
+
+	int const hpos = screen().hpos();
+
+	const u16 vincrement_hpos = h40_mode ? (0xa4 << 1) : (0x84 << 1);
+	int const vpos = screen().vpos() + !!(hpos > vincrement_hpos);
+
+	u8 vcount = vpos > 234 ? vpos - 0xea + 0xe4 : vpos;
+	// TODO: a bit off compared to screen htotal (half clocks? 68k stalls on hsync?)
+	// (54 + 364 = 418 vs. 0x1aa of 427)
+	const u16 hphase1 = h40_mode ? (0xb6 << 1) : (0x93 << 1);
+	const u16 hphase2 = h40_mode ? (0xe4 << 1) : (0xe9 << 1);
+	u8 hcount = (hpos > hphase1 ? hpos - hphase1 + hphase2 : hpos) >> 1;
+
+	return (vcount << 8) | hcount;
+}
+
+bool ym7101_device::in_hblank()
 {
 	const u8 h40_mode = BIT(m_hres_mode, 0);
 
 	const u16 hblank_upper = h40_mode ? (0xb2 << 1) : (0x92 << 1);
 	const u16 hblank_lower = h40_mode ? (0x05 << 1) : (0x04 << 1);
 
+	return !!(screen().hpos() < hblank_lower) || (screen().hpos() > hblank_upper);
+}
+
+u16 ym7101_device::control_port_r(offs_t offset, u16 mem_mask)
+{
 	const u8 sprite_flags = (m_sprite_overflow << 6) | (m_sprite_collision << 5);
 
 	if (!machine().side_effects_disabled())
@@ -224,12 +249,14 @@ u16 ym7101_device::control_port_r(offs_t offset, u16 mem_mask)
 	// other bits returns open bus, tbd
 	// FIFO empty << 9
 	// FIFO full << 8
-	const bool in_hblank = !!(screen().hpos() < hblank_lower) || (screen().hpos() > hblank_upper);
-	return (m_vint_pending << 7)
+	// HACK: return FIFO always empty for now
+	// quadchal, splatth2j
+	return (1 << 9)
+		| (m_vint_pending << 7)
 		| sprite_flags
 //	    | odd << 4
 		| (screen().vblank() << 3)
-		| in_hblank << 2
+		| in_hblank() << 2
 		| (m_dma.active << 1);
 		// is_pal << 0
 }
@@ -253,7 +280,8 @@ void ym7101_device::control_port_w(offs_t offset, u16 data, u16 mem_mask)
 				)
 			)
 			{
-				LOGDMA("DMA %s code=%02x: src=%06x dst=%06x length=%04x autoinc=%02x\n"
+				LOGDMA("(%d %d) DMA %s code=%02x: src=%06x dst=%06x length=%04x autoinc=%02x\n"
+					, screen().hpos(), screen().vpos()
 					, m_dma.mode == MEMORY_TO_VRAM ? "Memory->VDP" : "VRAM Copy"
 					, m_command.code
 					, m_dma.source_address
@@ -341,7 +369,8 @@ void ym7101_device::data_port_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (m_dma.active && m_dma.mode == VRAM_FILL && BIT(m_command.code, 0))
 	{
-		LOGDMA("DMA VRAM Fill code=%02x value=%04x: dst=%06x length=%04x autoinc=%02x\n"
+		LOGDMA("(%d %d) DMA VRAM Fill code=%02x value=%04x: dst=%06x length=%04x autoinc=%02x\n"
+			, screen().hpos(), screen().vpos()
 			, m_command.code
 			, m_dma.fill
 			, m_command.address
@@ -377,26 +406,6 @@ void ym7101_device::data_port_w(offs_t offset, u16 data, u16 mem_mask)
 
 	m_command.address += m_auto_increment;
 	m_command.address &= m_vram_mask;
-}
-
-// https://gendev.spritesmind.net/forum/viewtopic.php?t=768
-u16 ym7101_device::get_hv_counter()
-{
-	const u8 h40_mode = BIT(m_hres_mode, 0);
-
-	int const hpos = screen().hpos();
-
-	const u16 vincrement_hpos = h40_mode ? (0xa4 << 1) : (0x84 << 1);
-	int const vpos = screen().vpos() + !!(hpos > vincrement_hpos);
-
-	u8 vcount = vpos > 234 ? vpos - 0xea + 0xe4 : vpos;
-	// TODO: a bit off compared to screen htotal (half clocks? 68k stalls on hsync?)
-	// (54 + 364 = 418 vs. 0x1aa of 427)
-	const u16 hphase1 = h40_mode ? (0xb6 << 1) : (0x93 << 1);
-	const u16 hphase2 = h40_mode ? (0xe4 << 1) : (0xe9 << 1);
-	u8 hcount = (hpos > hphase1 ? hpos - hphase1 + hphase2 : hpos) >> 1;
-
-	return (vcount << 8) | hcount;
 }
 
 u16 ym7101_device::hv_counter_r(offs_t offset, u16 mem_mask)
@@ -1172,10 +1181,17 @@ TIMER_CALLBACK_MEMBER(ym7101_device::dma_callback)
 		m_dtack_cb(0);
 		m_dma.active = false;
 		m_dma_timer->adjust(attotime::never);
+		LOGDMA("(%d %d) DMA end\n", screen().hpos(), screen().vpos());
 	}
 	else
 	{
-		m_dma_timer->adjust(attotime::from_ticks(8, clock()));
+		// https://md.railgun.works/index.php?title=VDP#DMA_Bandwidth
+		// TODO: rough estimation, should also take FIFO in consideration
+		// - galahad explicitly stops 68k by running DMAs during active scan
+		// - sailormn will hang during intro by side effect of checking sound busy without bus
+		const bool in_active_display = !screen().vblank() && !in_hblank();
+
+		m_dma_timer->adjust(attotime::from_ticks(4 << (in_active_display + (code_dest == AS_VDP_VRAM)), clock()));
 	}
 }
 
@@ -1184,5 +1200,3 @@ u32 ym7101_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
-
-
