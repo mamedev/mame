@@ -4,9 +4,10 @@
 #ifndef MAME_ROLAND_ROLAND_PG1000_H
 #define MAME_ROLAND_ROLAND_PG1000_H
 
+#include "bus/midi/midi.h"
 #include "cpu/upd7810/upd7810.h"
 #include "video/hd44780.h"
-#include "bus/midi/midi.h"
+
 #include "emupal.h"
 #include "screen.h"
 
