@@ -104,8 +104,8 @@ static INPUT_PORTS_START( marywu )
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
     PORT_START("P1")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN) // Hopper SW  P1.6. if IP_ACTIVE_LOW  will cause error 30
-	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN) // 洗分 SW    P1.7. if IP_ACTIVE_HIGH will cause error 76.
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN) // P1.6. if IP_ACTIVE_LOW  will cause error 30
+	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN) // P1.7. if IP_ACTIVE_HIGH will cause error 76.
 INPUT_PORTS_END		
 
 void marywu_state::ay1_port_a_w(uint8_t data)
