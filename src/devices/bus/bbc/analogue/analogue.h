@@ -96,5 +96,6 @@ protected:
 DECLARE_DEVICE_TYPE(BBC_ANALOGUE_SLOT, bbc_analogue_slot_device)
 
 void bbc_analogue_devices(device_slot_interface &device);
+void bbc_analogue_devices_no_lightpen(device_slot_interface &device);
 
 #endif // MAME_BUS_BBC_ANALOGUE_ANALOGUE_H
