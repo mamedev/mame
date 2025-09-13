@@ -103,14 +103,12 @@ static INPUT_PORTS_START( marywu )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("K3") // K3
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-
 	PORT_START("P1")
-	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("P1.4") PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("P1.5") PORT_CODE(KEYCODE_X)
-    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P1.6") PORT_CODE(KEYCODE_C) // If IP_ACTIVE_LOW Will cause Error 30 if press
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P1.6") PORT_CODE(KEYCODE_C) // Will cause Error 30 if IP_ACTIVE_LOW.
     PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYOUT)  PORT_NAME("P1.7")PORT_CODE(KEYCODE_V)  // Key out? If press during gameplay, it will cause error 30. If press during startup, it will cause error 76.
 
 INPUT_PORTS_END
+
 void marywu_state::ay1_port_a_w(uint8_t data)
 {
 	for (uint8_t i = 0; i < 8; i++)
