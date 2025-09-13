@@ -32,12 +32,8 @@ u8 pg1000_state::sw_r()
 void pg1000_state::led_w(u8 data)
 {
 	m_scan = data & 3;
-	m_led[0] = BIT(data, 2);
-	m_led[1] = BIT(data, 3);
-	m_led[2] = BIT(data, 4);
-	m_led[3] = BIT(data, 5);
-	m_led[4] = BIT(data, 6);
-	m_led[5] = BIT(data, 7);
+	for (int i=0; i<=5; i++)
+		m_led[i] = BIT(data, i+2);
 }
 
 static INPUT_PORTS_START(pg1000)
