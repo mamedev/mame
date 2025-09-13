@@ -36,7 +36,7 @@ public:
 	void pg1000(machine_config &config);
 
 protected:
-	virtual void device_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 sw_r();

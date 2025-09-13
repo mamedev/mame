@@ -12,7 +12,7 @@
 #include "roland_pg1000.h"
 #include "pg1000.lh"
 
-void pg1000_state::device_start()
+void pg1000_state::machine_start()
 {
 	m_led.resolve();
 }
