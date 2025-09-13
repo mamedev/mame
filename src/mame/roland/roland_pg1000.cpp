@@ -403,4 +403,4 @@ ROM_START(pg1000)
 	ROMX_LOAD("roland_pg-1000_v1.00.ic4", 0x000, 0x2000, CRC(c09ef84e) SHA1(d780d4d53e57918e6ea8098f54f5c9b43aeec287), ROM_BIOS(2))
 ROM_END
 
-SYST(1987, pg1000,  0,   0, pg1000,  pg1000, pg1000_state, empty_init, "Roland", "PG-1000 Programmer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+SYST(1987, pg1000,  0,   0, pg1000,  pg1000, pg1000_state, empty_init, "Roland", "PG-1000 Linear Synthesizer Programmer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
