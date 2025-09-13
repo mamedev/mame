@@ -2511,8 +2511,8 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 			if (maskp.immediate() & FLAG_V)
 			{
 				a.seto(al);
-				a.movzx(eax, al);
-				a.shl(eax, 1);
+				a.movzx(ecx, al);
+				a.shl(ecx, 1);
 			}
 
 			a.mov(r11, r10);
@@ -2521,7 +2521,7 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 			a.movzx(dstreg, byte_ptr(rbp, r11, 0, offset_from_rbp(&m_near.flagsmap[0]))); // movzx  dstreg,[flags_map]
 
 			if (maskp.immediate() & FLAG_V)
-				a.or_(dstreg, eax);
+				a.or_(dstreg, ecx);
 			break;
 	}
 
