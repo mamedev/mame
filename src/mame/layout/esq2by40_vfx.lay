@@ -23,7 +23,7 @@ license:CC0-1.0
 	</element>
 
 	<group name="vfd_cell">
-		<bounds x="0" y="0" width="342" height="527" />
+		<bounds x="0" y="0" width="342" height="572" />
 		<element ref="segments" name="~input~"><bounds x="50" y="69" width="214" height="311" /></element>
 		<element ref="dot" name="~input~"><bounds x="253" y="337" width="42" height="42" /></element>
 		<element ref="underline" name="~input~"><bounds x="43" y="441" width="183" height="25" /></element>
