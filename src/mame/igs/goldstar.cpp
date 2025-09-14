@@ -15633,8 +15633,31 @@ ROM_START( reelmagic )
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 	// not populated
 
-//	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
-//	ROM_LOAD( "cmv4zga_nvram.bin", 0x0000, 0x0800, CRC(b9b4ca08) SHA1(f9ccf4c18b1da5e07192da8014734a57b45735cb) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x000, 0x100, CRC(208727e7) SHA1(7c868b06da03fe95266555775b8185d38e25ce3f) )
+	ROM_LOAD( "82s129.u79", 0x100, 0x100, CRC(01349092) SHA1(cd2910f7d842f37db35ad25414536a8c49a85293) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x000, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( reelmagica )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tetris_cm_v8.01_rm.u81", 0x0000, 0x10000, CRC(a0276740) SHA1(3c21da4f89c04f35e8c3ec4bc962278e1cd045c4) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000, 0x8000, CRC(ba00957a) SHA1(0f2d1d36b3fd325db81a2d17663c9cc692f6e2fc) )
+	ROM_LOAD( "6.u11", 0x08000, 0x8000, CRC(72e2e70f) SHA1(b999e20245e6d0b38a7ada1aadd5426536cf3ec5) )
+	ROM_LOAD( "5.u4",  0x10000, 0x8000, CRC(3d63bd9d) SHA1(3d20e5ce3b954f08b8d2a367108a012e72c17e35) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(1df9ffa7) SHA1(851f32c369e7879c2054399a820463d84007bc1c) )
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(123ccb63) SHA1(c23391a1fb70a8122eee48b8ea6300a058da98d5) )
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(fdaeb68f) SHA1(f41e54d43cb73c7e9ae99e78043a7df4958cb8ce) )
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(768d2483) SHA1(ac7f02b26d12363281cb65b74577a8fc1d68c35b) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x000, 0x100, CRC(208727e7) SHA1(7c868b06da03fe95266555775b8185d38e25ce3f) )
@@ -15646,7 +15669,6 @@ ROM_END
 
 /*
   Reel Magic 7 Bonus
-  CB3 gfx hack
 
   Different PLD protection
 
@@ -15673,6 +15695,66 @@ ROM_START( rm_7bonus )
 	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(d54ab39d) SHA1(9bda2de9f3a2a26ce08fd6200a4d67e8a0851181) )
 	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(3d9e8137) SHA1(58207fcdde38f600395cbddb63ee9013bf100d6b) )
 	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(8140cd0b) SHA1(5663eeec1125f6a7ef77f5ff6ec70f186fcbc395) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x000, 0x100, CRC(208727e7) SHA1(7c868b06da03fe95266555775b8185d38e25ce3f) )
+	ROM_LOAD( "82s129.u79", 0x100, 0x100, CRC(01349092) SHA1(cd2910f7d842f37db35ad25414536a8c49a85293) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x000, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( rm_7bonusa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tetris_cm_v8.01_rm7b.u81", 0x0000, 0x10000, CRC(9d5ea2d0) SHA1(ad3cfadff759a80f6b770eacab82a758930341fb) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000, 0x8000, CRC(748a17c3) SHA1(1329c576e39c03a5d4c886d81b0ea624a4ede2b4) )
+	ROM_LOAD( "6.u11", 0x08000, 0x8000, CRC(488c5136) SHA1(e3b9f52d4df159d8f3a1abe7b695a042d7b633b8) )
+	ROM_LOAD( "5.u4",  0x10000, 0x8000, CRC(658ae9ba) SHA1(5ef15567866b1ed0d936c22557e5e1a0214853a4) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(bea1a563) SHA1(c782b65acad0ea316394ae6269ce400f5b678e0a) )
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(d54ab39d) SHA1(9bda2de9f3a2a26ce08fd6200a4d67e8a0851181) )
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(3d9e8137) SHA1(58207fcdde38f600395cbddb63ee9013bf100d6b) )
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(8140cd0b) SHA1(5663eeec1125f6a7ef77f5ff6ec70f186fcbc395) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x000, 0x100, CRC(208727e7) SHA1(7c868b06da03fe95266555775b8185d38e25ce3f) )
+	ROM_LOAD( "82s129.u79", 0x100, 0x100, CRC(01349092) SHA1(cd2910f7d842f37db35ad25414536a8c49a85293) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x000, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( micronic )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "micronic_v1.2.bin", 0x0000, 0x1000, CRC(2395575e) SHA1(f475e1162017a4797069bdd8e2e36be8953cbbbf) )
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "c_m_pacman_rom7.u16", 0x00000, 0x8000, CRC(05ffb23d) SHA1(41fecf4e236d8a4a55b7e65a20e0ee70fe40f3bf) )
+	ROM_LOAD( "c_m_pacman_rom6.u11", 0x08000, 0x8000, CRC(91d66abf) SHA1(6a8f741e23cd5afefad3cb73217481551ca80b06) )
+	ROM_LOAD( "c_m_pacman_rom5.u4",  0x10000, 0x8000, CRC(449e8aa2) SHA1(236bbd3f821874fc55745d7c8c7e9a1c65bb472f) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 	// not populated
@@ -23308,6 +23390,58 @@ ROM_START( cmtetrisd ) // this set uses a standard Z80 + PLDs
 	ROM_LOAD( "82s129.u43", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+ROM_START( cmtetrise )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "set4_xxxx.bin", 0x0000, 0xd000, CRC(6ba19312) SHA1(0f53ae2d34c418b60fbb81b19d38d35f37d4b96f) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7__cmtetris.u16", 0x00000, 0x8000, CRC(2f5c94bd) SHA1(d99bcaa788f8abf5c75b29572d53be109b20c4bb) )
+	ROM_LOAD( "6__cmtetris.u11", 0x08000, 0x8000, CRC(dac50071) SHA1(7d1c8ec0d81897fe2155578d8c7455dc07104899) )
+	ROM_LOAD( "5__cmtetris.u4",  0x10000, 0x8000, CRC(9d67e265) SHA1(62eba137d881789c70121d5c07b5247684b917dd) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x000, 0x100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x100, 0x100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x000, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( cmtetrisf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "set8_xalatsis.bin", 0x0000, 0x10000, CRC(1bdfc8bf) SHA1(87b0b3752eb4bda4e1c63b02b369678823301f41) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7__cmtetris.u16", 0x00000, 0x8000, CRC(2f5c94bd) SHA1(d99bcaa788f8abf5c75b29572d53be109b20c4bb) )
+	ROM_LOAD( "6__cmtetris.u11", 0x08000, 0x8000, CRC(dac50071) SHA1(7d1c8ec0d81897fe2155578d8c7455dc07104899) )
+	ROM_LOAD( "5__cmtetris.u4",  0x10000, 0x8000, CRC(9d67e265) SHA1(62eba137d881789c70121d5c07b5247684b917dd) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x000, 0x100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x100, 0x100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x000, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
 // Korean clone PCB with Z80B, 12MHz XTAL, JFC95101G (AY clone), 5 8-DIP banks, Lattice M4A5-192/96
 // TODO: proper machine_config() without I8255s, after GFX are fixed
 ROM_START( cmtetriskr )
@@ -23345,6 +23479,35 @@ ROM_START( cmtetriskr )
 
 	ROM_REGION( 0x157, "plds", 0 )
 	ROM_LOAD( "palce20v8h-25pc.u65", 0x0000, 0x0157, CRC(06de0d06) SHA1(97d27f4cd8c5e0557de6217f2cbfca07b4e25ca0) )
+ROM_END
+
+
+// Asteroids 1981
+// Tetris + Cherry Master with space thematic graphics
+ROM_START( cmasteroid )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "asteroids_xxxx.bin", 0x0000, 0x10000, CRC(6ae5e42d) SHA1(c8b3786b5cc0f886bc8bd89485ed889ac7300446) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000, 0x8000, CRC(1f0415f9) SHA1(2909856c346d51243e2ca7804407fcc607add585) )
+	ROM_LOAD( "6.u11", 0x08000, 0x8000, CRC(28acbab2) SHA1(8ce1afe6b347d6eee429cf43a907d22552000866) )
+	ROM_LOAD( "5.u4",  0x10000, 0x8000, CRC(b0fb0fc4) SHA1(c42233aa20a7c1a3960c696a711f82d87be23c8a) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(77f75764) SHA1(86cfde4c94354eb7adf93f4400053a58c5823b58) )
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(e917cf87) SHA1(cb7881bd59d9497cce1bb14237d16a1001fb2200) )
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(0976ef6f) SHA1(379901829f9e25a6b48ccc42867cff26ea167ec8) )
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(e562458f) SHA1(678794f968407e31527b10d69c4b4618e5c20517) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x000, 0x100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x100, 0x100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x000, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
 
@@ -26302,12 +26465,15 @@ GAMEL( 199?, ll3,        cmaster,  cm,       cmasterb, cmaster_state,  init_ll3,
 GAMEL( 199?, cmfb55,     cmaster,  cmfb55,   cmaster,  cmaster_state,  init_palnibbles,ROT0, "bootleg",           "Cherry Master (bootleg, Game FB55 Ver.2)",    MACHINE_NOT_WORKING, layout_cmv4 ) // inputs not done
 GAMEL( 1991, cmv4zg,     cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 1)",  0,                   layout_cmv4 ) // uses default NVRAM
 GAMEL( 1991, cmv4zga,    cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 2)",  0,                   layout_cmv4 ) // uses default NVRAM
-GAMEL( 1991, rm_7bonus,  cmaster,  cm,       cmasterb, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus)",       0,                   layout_cmaster ) 
-GAMEL( 1991, srmagic,    cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "bootleg",           "Super Real Magic (V6.3)",                     0,                   layout_cmv4 )
-GAMEL( 1991, reelmagic,  cmaster,  reelmg,   cmasterb, cmaster_state,  init_reelmag,   ROT0, "bootleg",           "Super Reel Magic (ver.6.3.0)",                0,                   layout_cmv4 )
+GAMEL( 1992, srmagic,    cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "bootleg",           "Super Real Magic (V6.3)",                     0,                   layout_cmv4 ) // needs layout
+GAMEL( 1992, reelmagic,  cmaster,  reelmg,   cmasterb, cmaster_state,  init_reelmag,   ROT0, "bootleg",           "Super Reel Magic (ver.6.3.0, set 1)",         0,                   layout_cmv4 ) // needs layout
+GAMEL( 1992, reelmagica, cmaster,  cm,       cmasterb, cmaster_state,  init_reelmag,   ROT0, "bootleg",           "Super Reel Magic (ver.6.3.0, set 2)",         0,                   layout_cmv4 ) // needs layout
+GAMEL( 1992, rm_7bonus,  cmaster,  cm,       cmasterb, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus, set 1)", 0,                  layout_cmaster ) // needs layout
+GAMEL( 1992, rm_7bonusa, cmaster,  cm,       cmasterb, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus, set 2)", 0,                  layout_cmaster ) // needs layout
 GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 GAMEL( 199?, alienatt,   cmaster,  cm,       cmaster,  cmaster_state,  init_alienatt,  ROT0, "bootleg",           "Allien Attack",                               MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
+GAMEL( 1992, micronic,   cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "Micronic",          "Cherry Bonus III (Micronic hack v1.2)",       MACHINE_NOT_WORKING, layout_cmv4 ) // jumps to lalaland. bad banking?
 
 GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                  layout_tonypok )
 GAME(  1999, jkrmast,    0,        jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    0 )
@@ -26535,11 +26701,15 @@ GAMEL( 198?, cmtetris,   0,        cm,        cmtetris, cmaster_state,  init_cm,
 GAMEL( 198?, cmtetrisa,  cmtetris, cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, unencrypted, set 2)",              0,                                              layout_cmpacman )
 GAMEL( 198?, cmtetrisb,  cmtetris, cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",               "Tetris + Cherry Master (+K, Canada Version, encrypted)",                   MACHINE_NOT_WORKING,                            layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
 GAMEL( 198?, cmtetrisc,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisc, ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, encrypted)",                       0,                                              layout_cmpacman )
-GAMEL( 198?, cmtetriskr, cmtetris, cmtetriskr,cmtetris, cmaster_state,  init_cmtetriskr,ROT0, "<unknown>",               "Tetris + Global Money Fever (Corsica, v8.01, Korean bootleg)",             MACHINE_NOT_WORKING,                            layout_cmpacman ) // starts with coins already inserted in Tetris mode, need to press K/L to switch between games...
 GAMEL( 198?, cmtetrisd,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisd, ROT0, "bootleg (Aidonis Games)", "Tetris + Cherry Master (Aidonis Games bootleg)",                           0,                                              layout_cmpacman ) // seems to have been hacked to run the slot game as default, see 0x8ba8
+GAMEL( 198?, cmtetrise,  cmtetris, cm,        cmtetris, cmaster_state,  empty_init,     ROT0, "bootleg",                 "Tetris + Cherry Master (unencrypted bootleg, set 1)",                      0,                                              layout_cmpacman ) // seems to have been hacked to run the slot game as default, see 0x8ba8
+GAMEL( 198?, cmtetrisf,  cmtetris, cm,        cmtetris, cmaster_state,  empty_init,     ROT0, "bootleg",                 "Tetris + Cherry Master (unencrypted bootleg, set 2)",                      0,                                              layout_cmpacman ) // seems to have been hacked to run the slot game as default, see 0x8ba8
+GAMEL( 198?, cmtetriskr, cmtetris, cmtetriskr,cmtetris, cmaster_state,  init_cmtetriskr,ROT0, "<unknown>",               "Tetris + Global Money Fever (Corsica, v8.01, Korean bootleg)",             MACHINE_NOT_WORKING,                            layout_cmpacman ) // starts with coins already inserted in Tetris mode, need to press K/L to switch between games...
+GAMEL( 1992, cmasteroid, cmtetris, cm,        cmtetris, cmaster_state,  empty_init,     ROT0, "bootleg (Aidonis Games)", "Asteroids 1981 (Tetris + Cherry Master with space graphics)",              0,                                              layout_cmpacman ) // needs layout
 GAMEL( 1997, crazybon,   0,        crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, Shanho HW, set 1)",                              0,                                              layout_crazybon ) // Windows ME desktop...
 GAMEL( 1997, crazybona,  crazybon, crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 2)",                                         0,                                              layout_crazybon ) // Windows ME desktop...
 GAMEL( 1988, lucky8tet,  lucky8,   lucky8tet, lucky8tet, wingco_state,  init_l8tet,     ROT0, "bootleg",                 "Tetris + New Lucky 8 Lines (W-4 + W4BET-VID sub board with MCU)",          MACHINE_UNEMULATED_PROTECTION,                  layout_lucky8p1 )
+
 
 /* other possible stealth sets:
  - cmv4a    ---> see the 1fxx zone. put a bp in 1f9f to see the loop.
