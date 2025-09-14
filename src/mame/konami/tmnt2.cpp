@@ -62,9 +62,9 @@ Updates:
 
 #include "emu.h"
 
-#include "k053244_k053245.h"
-#include "k052109.h"
 #include "k051960.h"
+#include "k052109.h"
+#include "k053244_k053245.h"
 #include "k053251.h"
 #include "k054000.h"
 #include "konamipt.h"
@@ -110,6 +110,15 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
+	uint16_t k052109_word_r(offs_t offset, uint16_t mem_mask = ~0);
+	void k052109_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t k052109_word_noA12_r(offs_t offset, uint16_t mem_mask = ~0);
+	void k052109_word_noA12_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_arm_nmi_w(uint8_t data);
+	void z80_nmi_w(int state);
+
+	K052109_CB_MEMBER(tile_callback);
+
 	// video-related
 	uint8_t    m_layer_colorbase[3]{};
 	uint8_t    m_sprite_colorbase = 0;
@@ -130,15 +139,6 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	optional_ioport m_eepromout;
-
-	uint16_t k052109_word_r(offs_t offset, uint16_t mem_mask = ~0);
-	void k052109_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t k052109_word_noA12_r(offs_t offset, uint16_t mem_mask = ~0);
-	void k052109_word_noA12_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void sound_arm_nmi_w(uint8_t data);
-	void z80_nmi_w(int state);
-
-	K052109_CB_MEMBER(tile_callback);
 };
 
 // with K051937/K051960 sprite hardware
@@ -150,13 +150,10 @@ public:
 		m_k051960(*this, "k051960")
 	{ }
 
-	void thndrx2(machine_config &config);
-	void punkshot(machine_config &config);
+	void thndrx2(machine_config &config) ATTR_COLD;
+	void punkshot(machine_config &config) ATTR_COLD;
 
 private:
-	// devices
-	required_device<k051960_device> m_k051960;
-
 	uint16_t punkshot_kludge_r();
 	void thndrx2_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void punkshot_0a0020_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -170,24 +167,20 @@ private:
 	void punkshot_main_map(address_map &map) ATTR_COLD;
 	void thndrx2_audio_map(address_map &map) ATTR_COLD;
 	void thndrx2_main_map(address_map &map) ATTR_COLD;
+
+	// devices
+	required_device<k051960_device> m_k051960;
 };
 
 // with K053244/K053245 sprite hardware
 class tmnt2_k053245_base_state : public tmnt2_base_state
 {
-public:
+protected:
 	tmnt2_k053245_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		tmnt2_base_state(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_k053245(*this, "k053245")
 	{ }
-
-protected:
-	// memory pointers
-	optional_shared_ptr<uint16_t> m_spriteram;
-
-	// devices
-	required_device<k053244_device> m_k053245;
 
 	uint16_t k053245_scattered_word_r(offs_t offset);
 	void k053245_scattered_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -195,6 +188,12 @@ protected:
 	void k053244_word_noA1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	K053244_CB_MEMBER(lgtnfght_sprite_callback);
+
+	// memory pointers
+	optional_shared_ptr<uint16_t> m_spriteram;
+
+	// devices
+	required_device<k053244_device> m_k053245;
 };
 
 // without K053936
@@ -205,7 +204,7 @@ public:
 		tmnt2_k053245_base_state(mconfig, type, tag)
 	{ }
 
-	void lgtnfght(machine_config &config);
+	void lgtnfght(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -228,15 +227,12 @@ public:
 		lgtnfght_state(mconfig, type, tag)
 	{ }
 
-	void blswhstl(machine_config &config);
+	void blswhstl(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	// video-related
-	int32_t m_blswhstl_rombank = 0;
-
 	void blswhstl_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void blswhstl_700300_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -244,6 +240,9 @@ private:
 	K052109_CB_MEMBER(blswhstl_tile_callback);
 
 	void blswhstl_main_map(address_map &map) ATTR_COLD;
+
+	// video-related
+	int32_t m_blswhstl_rombank = 0;
 };
 
 // with protection and palette dimming
@@ -254,17 +253,11 @@ public:
 		lgtnfght_state(mconfig, type, tag)
 	{ }
 
-	void ssriders(machine_config &config);
-	void tmnt2(machine_config &config);
+	void ssriders(machine_config &config) ATTR_COLD;
+	void tmnt2(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
-
-	// video-related
-	int32_t m_lastdim = 0;
-	int32_t m_lasten = 0;
-	int32_t m_dim_c = 0;
-	int32_t m_dim_v = 0;
 
 	uint16_t ssriders_protection_r(address_space &space);
 	void ssriders_protection_w(address_space &space, offs_t offset, uint16_t data);
@@ -274,6 +267,12 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ssriders_main_map(address_map &map) ATTR_COLD;
+
+	// video-related
+	int32_t m_lastdim = 0;
+	int32_t m_lasten = 0;
+	int32_t m_dim_c = 0;
+	int32_t m_dim_v = 0;
 };
 
 // with another approach of protection
@@ -287,20 +286,20 @@ public:
 		m_protram(*this, "protram")
 	{ }
 
-	void tmnt2(machine_config &config);
+	void tmnt2(machine_config &config) ATTR_COLD;
 
 private:
+	void tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint32_t tmnt2_get_word(uint32_t addr);
+	void tmnt2_put_word(uint32_t addr, uint16_t data);
+
+	void tmnt2_main_map(address_map &map) ATTR_COLD;
+
 	// memory pointers
 	required_region_ptr<uint16_t> m_maincpu_rom;
 	required_shared_ptr<uint16_t> m_workram;
 	required_shared_ptr<uint16_t> m_protram;
-
-	void tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	inline uint32_t tmnt2_get_word(uint32_t addr);
-	void tmnt2_put_word(uint32_t addr, uint16_t data);
-
-	void tmnt2_main_map(address_map &map) ATTR_COLD;
 };
 
 // with K053936 ROZ tilemap layer
@@ -317,11 +316,6 @@ protected:
 
 	virtual void video_start() override ATTR_COLD;
 
-	// video-related
-	tilemap_t  *m_roz_tilemap = nullptr;
-	uint16_t   m_glfgreat_pixel = 0;
-	uint8_t    m_roz_char_bank = 0;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// devices
@@ -329,6 +323,11 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_region_ptr<uint8_t> m_zoomtmap_rom;
 	required_region_ptr<uint8_t> m_zoomchar_rom;
+
+	// video-related
+	tilemap_t  *m_roz_tilemap = nullptr;
+	uint16_t   m_glfgreat_pixel = 0;
+	uint8_t    m_roz_char_bank = 0;
 };
 
 // with analog controller
@@ -340,7 +339,7 @@ public:
 		m_analog_controller(*this, "CONTROL%c", 'A')
 	{ }
 
-	void glfgreat(machine_config &config);
+	void glfgreat(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -373,7 +372,7 @@ public:
 		m_audiobank(*this, "audiobank")
 	{ }
 
-	void prmrsocr(machine_config &config);
+	void prmrsocr(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -406,7 +405,7 @@ public:
 		ssriders_state(mconfig, type, tag)
 	{ }
 
-	void sunsetbl(machine_config &config);
+	void sunsetbl(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -837,6 +836,7 @@ void tmnt2_base_state::video_start()
 void lgtnfght_state::video_start()
 {
 	tmnt2_k053245_base_state::video_start();
+
 	m_k053245->set_z_rejection(0);
 }
 
@@ -855,19 +855,23 @@ void ssriders_state::video_start()
 void tmnt2_roz_base_state::video_start()
 {
 	tmnt2_k053245_base_state::video_start();
+
 	m_roz_char_bank = 0;
+
 	save_item(NAME(m_roz_char_bank));
 }
 
 void glfgreat_state::video_start()
 {
 	tmnt2_roz_base_state::video_start();
+
 	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(glfgreat_state::glfgreat_get_roz_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	m_roz_tilemap->set_transparent_pen(0);
 
 	m_controller_select = 0;
 	m_roz_rom_bank = 0;
 	m_roz_rom_mode = 0;
+
 	save_item(NAME(m_controller_select));
 	save_item(NAME(m_roz_rom_bank));
 	save_item(NAME(m_roz_rom_mode));
@@ -876,17 +880,21 @@ void glfgreat_state::video_start()
 void prmrsocr_state::video_start()
 {
 	tmnt2_roz_base_state::video_start();
+
 	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(prmrsocr_state::prmrsocr_get_roz_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
 	m_roz_tilemap->set_transparent_pen(0);
 
 	m_sprite_bank = 0;
+
 	save_item(NAME(m_sprite_bank));
 }
 
 void blswhstl_state::video_start()
 {
 	tmnt2_k053245_base_state::video_start();
+
 	m_blswhstl_rombank = -1;
+
 	save_item(NAME(m_blswhstl_rombank));
 }
 
