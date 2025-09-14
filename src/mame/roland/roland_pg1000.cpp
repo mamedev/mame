@@ -266,10 +266,11 @@ void pg1000_state::pg1000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pg1000_state::mem_map);
 	m_maincpu->pa_in_cb().set(FUNC(pg1000_state::sw_r));
 	m_maincpu->pb_out_cb().set(FUNC(pg1000_state::led_w));
-	m_maincpu->pc_in_cb().set([this] {
-		return (
+	m_maincpu->rxd_func().set([this]() {
+		return int(
 			(m_mdin_bit && m_midi_in_enable) ||
-			(m_paramin_bit && m_param_in_enable)) ? 2 : 0;
+			(m_paramin_bit && m_param_in_enable)
+		);
 	});
 	m_maincpu->pc_out_cb().set([this](u8 data)
 	{

@@ -33,8 +33,8 @@ public:
 		, m_mdout(*this, "mdout")
 		, m_scan(0)
 		, m_an_select(0)
-		, m_mdin_bit(false)
-		, m_paramin_bit(false)
+		, m_mdin_bit(true)
+		, m_paramin_bit(true)
 		, m_midi_in_enable(false)
 		, m_param_in_enable(false)
 	{
