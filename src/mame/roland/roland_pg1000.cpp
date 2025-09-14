@@ -12,6 +12,7 @@
 #include "roland_pg1000.h"
 #include "pg1000.lh"
 
+
 void pg1000_state::machine_start()
 {
 	m_led.resolve();
@@ -251,16 +252,13 @@ void pg1000_state::palette_init(palette_device &palette)
 
 void pg1000_state::pg1000(machine_config &config)
 {
-	auto &mdin(MIDI_PORT(config, "mdin"));
-	midiin_slot(mdin);
-	mdin.rxd_handler().set([this] (bool state) { m_mdin_bit = state; });
+	// TODO: Parameter In port
 
-	midiout_slot(MIDI_PORT(config, "mdout"));
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(
+		[this] (bool state) { m_mdin_bit = state; }
+	);
 
-	/* TODO: What is the correct way of declaring this "Parameter In" port? */
-	// auto &paramin(MIDI_PORT(config, "param_in"));
-	// midiin_slot(paramin);
-	// paramreq.rxd_handler().set([this] (bool state) { m_paramin_bit = state; });
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
 	UPD78C10(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pg1000_state::mem_map);
