@@ -15,7 +15,7 @@ clock measurements:
 main Xtal is 18.432mhz
 
 Z80 runs at 3.072mhz
-M6809E runs at 1.532mhz
+M6809E runs at 1.536mhz
 
 Vsync is 61hz
 Hsync is 15,56khz
@@ -24,6 +24,7 @@ Hsync is 15,56khz
 
 #include "emu.h"
 
+#include "k005885.h"
 #include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
@@ -59,16 +60,10 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
-		m_disc_ih(*this, "disc_ih"),
-		m_interrupt_enable(*this, "int_enable"),
-		m_scroll(*this, "scroll"),
-		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram%u", 1U)
+		m_disc_ih(*this, "disc_ih")
 	{ }
 
 	void base(machine_config &config);
@@ -78,9 +73,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	void sh_irqtrigger_w(uint8_t data);
-	void videoram_w(offs_t offset, uint8_t data);
-	void colorram_w(offs_t offset, uint8_t data);
-	void charbank_w(uint8_t data);
 	void palettebank_w(uint8_t data);
 	void flipscreen_w(uint8_t data);
 	void filter_w(uint8_t data);
@@ -90,31 +82,21 @@ protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<discrete_device> m_disc_ih;
 
-	// memory pointers
-	required_shared_ptr<uint8_t> m_interrupt_enable;
-	required_shared_ptr<uint8_t> m_scroll;
-	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr_array<uint8_t, 2> m_spriteram;
-
 	// video-related
-	tilemap_t *m_bg_tilemap = nullptr;
 	uint8_t m_palettebank = 0U;
-	uint8_t m_charbank = 0U;
-	uint8_t m_spriterambank = 0U;
 };
 
 class ironhors_state : public ironhors_base_state
 {
 public:
 	ironhors_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ironhors_base_state(mconfig, type, tag)
+		ironhors_base_state(mconfig, type, tag),
+		m_k005885(*this, "k005885")
 	{ }
 
 	void ironhors(machine_config &config);
@@ -127,38 +109,69 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_tick);
 
-	void master_map(address_map &map) ATTR_COLD;
-	void slave_map(address_map &map) ATTR_COLD;
-	void slave_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void nmi_callback(int state);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void tile_callback(int layer, int attr, int &gfx, int &code, int &color, int &flags, int codebank);
+
+	// devices
+	required_device<k005885_device> m_k005885;
 };
 
 class farwest_state : public ironhors_base_state
 {
 public:
 	farwest_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ironhors_base_state(mconfig, type, tag)
+		ironhors_base_state(mconfig, type, tag),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_interrupt_enable(*this, "int_enable"),
+		m_scroll(*this, "scroll"),
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram%u", 1U)
 	{ }
 
 	void farwest(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void charbank_w(uint8_t data);
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_tick);
 
-	void master_map(address_map &map) ATTR_COLD;
-	void slave_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	// devices
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_interrupt_enable;
+	required_shared_ptr<uint8_t> m_scroll;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr_array<uint8_t, 2> m_spriteram;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_charbank = 0U;
+	//uint8_t m_spriterambank = 0U;
 };
 
 
@@ -223,19 +236,19 @@ void ironhors_base_state::palette(palette_device &palette) const
 	}
 }
 
-void ironhors_base_state::videoram_w(offs_t offset, uint8_t data)
+void farwest_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void ironhors_base_state::colorram_w(offs_t offset, uint8_t data)
+void farwest_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void ironhors_base_state::charbank_w(uint8_t data)
+void farwest_state::charbank_w(uint8_t data)
 {
 	if (m_charbank != (data & 0x03))
 	{
@@ -243,7 +256,7 @@ void ironhors_base_state::charbank_w(uint8_t data)
 		machine().tilemap().mark_all_dirty();
 	}
 
-	m_spriterambank = data & 0x08;
+	//m_spriterambank = BIT(data, 3);
 
 	// other bits unknown
 }
@@ -256,8 +269,8 @@ void ironhors_base_state::palettebank_w(uint8_t data)
 		machine().tilemap().mark_all_dirty();
 	}
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x10);
-	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
 
 	// bit 6 unknown - set after game over
 
@@ -267,40 +280,34 @@ void ironhors_base_state::palettebank_w(uint8_t data)
 
 void ironhors_base_state::flipscreen_w(uint8_t data)
 {
-	if (flip_screen() != (~data & 0x08))
+	if (flip_screen() != BIT(~data, 3))
 	{
-		flip_screen_set(~data & 0x08);
+		flip_screen_set(BIT(~data, 3));
 		machine().tilemap().mark_all_dirty();
 	}
 
 	// other bits are used too, but unknown
 }
 
-TILE_GET_INFO_MEMBER(ironhors_state::get_bg_tile_info)
+void ironhors_state::tile_callback(int layer, int attr, int &gfx, int &code, int &color, int &flags, int codebank)
 {
-	int const code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x40) << 2) +
-			  ((m_colorram[tile_index] & 0x20) << 4) + (m_charbank << 10);
-	int const color = (m_colorram[tile_index] & 0x0f) + 16 * m_palettebank;
-	int const flags = ((m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |
-			  ((m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
-
-	tileinfo.set(0, code, color, flags);
+	code += ((attr & 0x40) << 2) + ((attr & 0x20) << 4) + (codebank << 10);
+	color = (attr & 0x0f) + 16 * m_palettebank;
+	flags = (BIT(attr, 4) ? TILE_FLIPX : 0) | (BIT(attr, 5) ? TILE_FLIPY : 0);
+	gfx = 0;
 }
 
 void ironhors_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ironhors_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-
-	m_bg_tilemap->set_scroll_rows(32);
+	m_k005885->tilemap_set_scroll_rows(0, 32);
 }
 
 void ironhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int bank = m_spriterambank ? 0 : 1;
-	uint8_t *sr = m_spriteram[bank];
+	uint8_t *sr = &m_k005885->spriteram()[m_k005885->get_spritebank() << 11];
 
 	// note that it has 5 bytes per sprite
-	int end = m_spriteram[bank].bytes();
+	int end = 0x100;
 	end -= end % 5;
 
 	for (int offs = 0; offs < end; offs += 5)
@@ -324,7 +331,7 @@ void ironhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		switch (sr[offs + 4] & 0x0c)
 		{
 			case 0x00:  // 16x16
-				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				m_k005885->gfx(1)->transpen(bitmap, cliprect,
 						code / 4,
 						color,
 						flipx, flipy,
@@ -335,12 +342,12 @@ void ironhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				{
 					if (flip_screen()) sy += 8; // this fixes the train wheels' position
 
-					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+					m_k005885->gfx(2)->transpen(bitmap, cliprect,
 							code & ~1,
 							color,
 							flipx, flipy,
 							flipx ? sx + 8 : sx, sy, 0);
-					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+					m_k005885->gfx(2)->transpen(bitmap, cliprect,
 							code | 1,
 							color,
 							flipx, flipy,
@@ -350,12 +357,12 @@ void ironhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			case 0x08:  // 8x16
 				{
-					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+					m_k005885->gfx(2)->transpen(bitmap, cliprect,
 							code & ~2,
 							color,
 							flipx, flipy,
 							sx, flipy ? sy + 8 : sy, 0);
-					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+					m_k005885->gfx(2)->transpen(bitmap, cliprect,
 							code | 2,
 							color,
 							flipx, flipy,
@@ -365,7 +372,7 @@ void ironhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			case 0x0c:  // 8x8
 				{
-					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+					m_k005885->gfx(2)->transpen(bitmap, cliprect,
 							code,
 							color,
 							flipx, flipy,
@@ -379,9 +386,9 @@ void ironhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 uint32_t ironhors_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int row = 0; row < 32; row++)
-		m_bg_tilemap->set_scrollx(row, m_scroll[row]);
+		m_k005885->tilemap_set_scrollx(0, row, m_k005885->scroll_r(row));
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_k005885->tilemap_draw(0, screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
@@ -505,14 +512,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::scanline_tick)
 
 	if (scanline == 240 && (m_screen->frame_number() & 1) == 0)
 	{
-		if (*m_interrupt_enable & 4)
-			m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+		m_k005885->firq_set();
 	}
 	else if (((scanline+16) % 64) == 0)
 	{
-		if (*m_interrupt_enable & 1)
-			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_k005885->nmi_set();
 	}
+}
+
+void ironhors_state::nmi_callback(int state)
+{
+	if (state)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void ironhors_base_state::sh_irqtrigger_w(uint8_t data)
@@ -522,9 +533,9 @@ void ironhors_base_state::sh_irqtrigger_w(uint8_t data)
 
 void ironhors_base_state::filter_w(uint8_t data)
 {
-	m_disc_ih->write(NODE_11, (data & 0x04) >> 2);
-	m_disc_ih->write(NODE_12, (data & 0x02) >> 1);
-	m_disc_ih->write(NODE_13, (data & 0x01) >> 0);
+	m_disc_ih->write(NODE_11, BIT(data, 2));
+	m_disc_ih->write(NODE_12, BIT(data, 1));
+	m_disc_ih->write(NODE_13, BIT(data, 0));
 }
 
 /*************************************
@@ -533,14 +544,12 @@ void ironhors_base_state::filter_w(uint8_t data)
  *
  *************************************/
 
-void ironhors_state::master_map(address_map &map)
+void ironhors_state::main_map(address_map &map)
 {
 	// Konami 005885
-	map(0x0000, 0x0002).ram();
-	map(0x0003, 0x0003).ram().w(FUNC(ironhors_state::charbank_w));
-	map(0x0004, 0x0004).ram().share(m_interrupt_enable);
+	map(0x0000, 0x0004).rw(m_k005885, FUNC(k005885_device::ctrl_r), FUNC(k005885_device::ctrl_w));
 	map(0x0005, 0x001f).ram();
-	map(0x0020, 0x003f).ram().share(m_scroll);
+	map(0x0020, 0x003f).rw(m_k005885, FUNC(k005885_device::scroll_r), FUNC(k005885_device::scroll_w));
 	map(0x0040, 0x005f).ram();
 
 	map(0x0060, 0x00df).ram();
@@ -554,30 +563,25 @@ void ironhors_state::master_map(address_map &map)
 	map(0x1800, 0x1800).nopw(); // ???
 	map(0x1a00, 0x1a01).nopw(); // ???
 	map(0x1c00, 0x1dff).nopw(); // ???
-	map(0x2000, 0x23ff).ram().w(FUNC(ironhors_state::colorram_w)).share(m_colorram);
-	map(0x2400, 0x27ff).ram().w(FUNC(ironhors_state::videoram_w)).share(m_videoram);
-	map(0x2800, 0x2fff).ram();
-	map(0x3000, 0x30ff).ram().share(m_spriteram[1]);
-	map(0x3100, 0x37ff).ram();
-	map(0x3800, 0x38ff).ram().share(m_spriteram[0]);
-	map(0x3900, 0x3fff).ram();
+	map(0x2000, 0x2fff).rw(m_k005885, FUNC(k005885_device::vram_r), FUNC(k005885_device::vram_w));
+	map(0x3000, 0x3fff).rw(m_k005885, FUNC(k005885_device::spriteram_r), FUNC(k005885_device::spriteram_w));
 	map(0x4000, 0xffff).rom();
 }
 
-void ironhors_state::slave_map(address_map &map)
+void ironhors_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram();
 	map(0x8000, 0x8000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-void ironhors_state::slave_io_map(address_map &map)
+void ironhors_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
 
-void farwest_state::master_map(address_map &map)
+void farwest_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1bff).rom();
 
@@ -599,18 +603,18 @@ void farwest_state::master_map(address_map &map)
 	map(0x1a00, 0x1a00).ram().share(m_interrupt_enable);
 	map(0x1a01, 0x1a01).ram().w(FUNC(farwest_state::charbank_w));
 	map(0x1a02, 0x1a02).w(FUNC(farwest_state::palettebank_w));
+	map(0x1c00, 0x1dff).ram().share(m_spriteram[1]);
 	map(0x1e00, 0x1eff).ram().share(m_spriteram[0]);
 	map(0x2000, 0x23ff).ram().w(FUNC(farwest_state::colorram_w)).share(m_colorram);
 	map(0x2400, 0x27ff).ram().w(FUNC(farwest_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).ram();
-	map(0x1c00, 0x1dff).ram().share(m_spriteram[1]);
 	map(0x3000, 0x31da).ram();
 	map(0x31db, 0x31fa).ram().share(m_scroll);
 	map(0x31fb, 0x3fff).ram();
 	map(0x4000, 0xffff).rom();
 }
 
-void farwest_state::slave_map(address_map &map)
+void farwest_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram();
@@ -693,23 +697,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout ironhors_spritelayout =
-{
-	16,16,
-	512,
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			32*8+0*4, 32*8+1*4, 32*8+2*4, 32*8+3*4, 32*8+4*4, 32*8+5*4, 32*8+6*4, 32*8+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
-	32*32
-};
-
 static GFXDECODE_START( gfx_ironhors )
-	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x4_packed_msb,        0, 16*8 )
-	GFXDECODE_ENTRY( "gfx", 0, ironhors_spritelayout, 16*8*16, 16*8 )
-	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x4_packed_msb,  16*8*16, 16*8 )  // to handle 8x8 sprites
+	GFXDECODE_ENTRY( "k005885", 0, gfx_8x8x4_packed_msb,                     0, 16*8 )
+	GFXDECODE_ENTRY( "k005885", 0, gfx_8x8x4_row_2x2_group_packed_msb, 16*8*16, 16*8 )
+	GFXDECODE_ENTRY( "k005885", 0, gfx_8x8x4_packed_msb,               16*8*16, 16*8 )  // to handle 8x8 sprites
 GFXDECODE_END
 
 
@@ -816,15 +807,25 @@ DISCRETE_SOUND_END
 void ironhors_base_state::machine_start()
 {
 	save_item(NAME(m_palettebank));
+}
+
+void farwest_state::machine_start()
+{
+	ironhors_base_state::machine_start();
 	save_item(NAME(m_charbank));
-	save_item(NAME(m_spriterambank));
+	//save_item(NAME(m_spriterambank));
 }
 
 void ironhors_base_state::machine_reset()
 {
 	m_palettebank = 0;
+}
+
+void farwest_state::machine_reset()
+{
+	ironhors_base_state::machine_reset();
 	m_charbank = 0;
-	m_spriterambank = 0;
+	//m_spriterambank = 0;
 }
 
 void ironhors_base_state::base(machine_config &config)
@@ -858,16 +859,20 @@ void ironhors_state::ironhors(machine_config &config)
 {
 	base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &ironhors_state::master_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ironhors_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ironhors_state::scanline_tick), "screen", 0, 1);
 
 	Z80(config, m_soundcpu, 18.432_MHz_XTAL / 6); // 3.072 MHz
-	m_soundcpu->set_addrmap(AS_PROGRAM, &ironhors_state::slave_map);
-	m_soundcpu->set_addrmap(AS_IO, &ironhors_state::slave_io_map);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ironhors_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &ironhors_state::sound_io_map);
 
 	m_screen->set_screen_update(FUNC(ironhors_state::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ironhors);
+	K005885(config, m_k005885, 18.432_MHz_XTAL, gfx_ironhors, m_palette, m_screen);
+	m_k005885->set_split_tilemap(true);
+	m_k005885->set_firq_cb().set_inputline(m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
+	m_k005885->set_nmi_cb().set(FUNC(ironhors_state::nmi_callback));
+	m_k005885->set_tile_callback(FUNC(ironhors_state::tile_callback));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(farwest_state::scanline_tick)
@@ -876,12 +881,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(farwest_state::scanline_tick)
 
 	if ((scanline % 2) == 1)
 	{
-		if (*m_interrupt_enable & 4)
+		if (BIT(*m_interrupt_enable, 2))
 			m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}
 	else if ((scanline % 2) == 0)
 	{
-		if (*m_interrupt_enable & 1)
+		if (BIT(*m_interrupt_enable, 0))
 			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
@@ -890,11 +895,11 @@ void farwest_state::farwest(machine_config &config)
 {
 	base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &farwest_state::master_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &farwest_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(farwest_state::scanline_tick), "screen", 0, 1);
 
 	Z80(config, m_soundcpu, 18.432_MHz_XTAL / 6); // 3.072 MHz
-	m_soundcpu->set_addrmap(AS_PROGRAM, &farwest_state::slave_map);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &farwest_state::sound_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_farwest);
 
@@ -919,7 +924,7 @@ ROM_START( ironhors )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "560_h01.10c",  0x0000, 0x4000, CRC(2b17930f) SHA1(be7b21f050f6b74c75a33c9284455bbed5b03c63) )
 
-	ROM_REGION( 0x20000, "gfx", 0 )
+	ROM_REGION( 0x20000, "k005885", 0 )
 	ROM_LOAD16_BYTE( "560_h06.08f",  0x00000, 0x8000, CRC(f21d8c93) SHA1(4245fff5360e10441e11d0d207d510e5c317bb0e) )
 	ROM_LOAD16_BYTE( "560_h05.07f",  0x00001, 0x8000, CRC(60107859) SHA1(ab59b6be155d36811a37dc873abbd97cd0a4120d) )
 	ROM_LOAD16_BYTE( "560_h07.09f",  0x10000, 0x8000, CRC(c761ec73) SHA1(78266c9ff3ea74a59fd3ce84afb4f8a1164c8bba) )
@@ -941,7 +946,7 @@ ROM_START( ironhorsh )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "10c_h01.bin",  0x0000, 0x4000, CRC(2b17930f) SHA1(be7b21f050f6b74c75a33c9284455bbed5b03c63) )
 
-	ROM_REGION( 0x20000, "gfx", 0 )
+	ROM_REGION( 0x20000, "k005885", 0 )
 	ROM_LOAD16_BYTE( "08f_h06.bin",  0x00000, 0x8000, CRC(f21d8c93) SHA1(4245fff5360e10441e11d0d207d510e5c317bb0e) )
 	ROM_LOAD16_BYTE( "07f_h05.bin",  0x00001, 0x8000, CRC(60107859) SHA1(ab59b6be155d36811a37dc873abbd97cd0a4120d) )
 	ROM_LOAD16_BYTE( "09f_h07.bin",  0x10000, 0x8000, CRC(c761ec73) SHA1(78266c9ff3ea74a59fd3ce84afb4f8a1164c8bba) )
@@ -963,7 +968,7 @@ ROM_START( dairesya )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "560-j01.10c",  0x0000, 0x4000, CRC(a203b223) SHA1(fd19ae55bda467a09151539be6dce3791c28f18a) )
 
-	ROM_REGION( 0x20000, "gfx", 0 )
+	ROM_REGION( 0x20000, "k005885", 0 )
 	ROM_LOAD16_BYTE( "560-j06.8f",   0x00000, 0x8000, CRC(a6e8248d) SHA1(7df653bb3a2257c249c3cf2c3f4f324d687a6b39) )
 	ROM_LOAD16_BYTE( "560-j05.7f",   0x00001, 0x8000, CRC(f75893d4) SHA1(dc71b912d9bf5104dc633f687c52043df37852f0) )
 	ROM_LOAD16_BYTE( "560-k07.9f",   0x10000, 0x8000, CRC(c8a1b840) SHA1(753b6fcbb4b28bbb63a392cdef90568734eac9bd) )

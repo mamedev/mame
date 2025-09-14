@@ -20,6 +20,7 @@ TODO:
 
 #include "emu.h"
 
+#include "k005885.h"
 #include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
@@ -41,64 +42,42 @@ class ddribble_state : public driver_device
 public:
 	ddribble_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_fg_videoram(*this, "fg_videoram"),
-		m_spriteram(*this, "spriteram_%u", 1U),
-		m_bg_videoram(*this, "bg_videoram"),
 		m_mainbank(*this, "mainbank"),
 		m_vlmbank(*this, "vlmbank"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
+		m_k005885(*this, "k005885_%u", 1U),
 		m_vlm(*this, "vlm"),
-		m_filter(*this, "filter%u", 1U),
-		m_gfxdecode(*this, "gfxdecode")
+		m_filter(*this, "filter%u", 1U)
 	{ }
 
 	void ddribble(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
-	required_shared_ptr<uint8_t> m_fg_videoram;
-	required_shared_ptr_array<uint8_t, 2> m_spriteram;
-	required_shared_ptr<uint8_t> m_bg_videoram;
 	required_memory_bank m_mainbank;
 	required_memory_bank m_vlmbank;
-
-	// video-related
-	tilemap_t *m_fg_tilemap = nullptr;
-	tilemap_t *m_bg_tilemap = nullptr;
-	uint8_t m_vregs[2][5]{};
-	uint8_t m_charbank[2]{};
-
-	// misc
-	uint8_t  m_int_enable[2]{};
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device_array<k005885_device, 2> m_k005885;
 	required_device<vlm5030_device> m_vlm;
 	required_device_array<filter_rc_device, 3> m_filter;
-	required_device<gfxdecode_device> m_gfxdecode;
 
 	void bankswitch_w(uint8_t data);
 	void coin_counter_w(uint8_t data);
-	template <uint8_t Which> void k005885_w(offs_t offset, uint8_t data);
-	void k005885_1_w(offs_t offset, uint8_t data);
-	void fg_videoram_w(offs_t offset, uint8_t data);
-	void bg_videoram_w(offs_t offset, uint8_t data);
 	uint8_t vlm5030_busy_r();
 	void vlm5030_ctrl_w(uint8_t data);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	template <unsigned Which> void tile_callback(int layer, int attr, int &gfx, int &code, int &color, int &flags, int codebank);
+	template <unsigned Which> void flipscreen_callback(int state);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vblank_irq(int state);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int length, int gfxset, int flipscreen);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int length, int chip);
 	void maincpu_map(address_map &map) ATTR_COLD;
 	void subcpu_map(address_map &map) ATTR_COLD;
 	void audiocpu_map(address_map &map) ATTR_COLD;
@@ -121,24 +100,10 @@ void ddribble_state::palette(palette_device &palette) const
 	}
 }
 
-
-template <uint8_t Which>
-void ddribble_state::k005885_w(offs_t offset, uint8_t data) // TODO: K005885 should be device-ified
+template <unsigned Which>
+void ddribble_state::flipscreen_callback(int state)
 {
-	switch (offset)
-	{
-		case 0x03:  // char bank selection
-			if ((data & 0x03) != m_charbank[Which])
-			{
-				m_charbank[Which] = data & 0x03;
-				Which ? m_bg_tilemap->mark_all_dirty() : m_fg_tilemap->mark_all_dirty();
-			}
-			break;
-		case 0x04:  // IRQ control, flipscreen
-			m_int_enable[Which] = data & 0x02;
-			break;
-	}
-	m_vregs[Which][offset] = data;
+	m_k005885[Which]->tilemap_set_flip(0, m_k005885[Which]->flipscreen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 /***************************************************************************
@@ -147,30 +112,16 @@ void ddribble_state::k005885_w(offs_t offset, uint8_t data) // TODO: K005885 sho
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(ddribble_state::tilemap_scan)
+template <unsigned Which>
+void ddribble_state::tile_callback(int layer, int attr, int &gfx, int &code, int &color, int &flags, int codebank)
 {
-	// logical (col,row) -> memory offset
-	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6);    // skip 0x400
-}
-
-TILE_GET_INFO_MEMBER(ddribble_state::get_fg_tile_info)
-{
-	uint8_t const attr = m_fg_videoram[tile_index];
-	int const num = m_fg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + ((m_charbank[0] & 2) << 10);
-	tileinfo.set(0,
-			num,
-			0,
-			TILE_FLIPYX((attr & 0x30) >> 4));
-}
-
-TILE_GET_INFO_MEMBER(ddribble_state::get_bg_tile_info)
-{
-	uint8_t const attr = m_bg_videoram[tile_index];
-	int const num = m_bg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + (m_charbank[1] << 11);
-	tileinfo.set(1,
-			num,
-			0,
-			TILE_FLIPYX((attr & 0x30) >> 4));
+	color = 0;
+	if (Which == 0)
+		code += ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + ((codebank & 2) << 10);
+	else
+		code += ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + (codebank << 11);
+	flags = TILE_FLIPYX((attr & 0x30) >> 4);
+	gfx = 0;
 }
 
 /***************************************************************************
@@ -181,28 +132,7 @@ TILE_GET_INFO_MEMBER(ddribble_state::get_bg_tile_info)
 
 void ddribble_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ddribble_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(ddribble_state::tilemap_scan)), 8, 8, 64, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ddribble_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(ddribble_state::tilemap_scan)), 8, 8, 64, 32);
-
-	m_fg_tilemap->set_transparent_pen(0);
-}
-
-/***************************************************************************
-
-    Memory handlers
-
-***************************************************************************/
-
-void ddribble_state::fg_videoram_w(offs_t offset, uint8_t data)
-{
-	m_fg_videoram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset & 0xbff);
-}
-
-void ddribble_state::bg_videoram_w(offs_t offset, uint8_t data)
-{
-	m_bg_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset & 0xbff);
+	m_k005885[0]->tilemap_set_transparent_pen(0, 0);
 }
 
 /***************************************************************************
@@ -227,9 +157,11 @@ byte #4:    attributes
 
 ***************************************************************************/
 
-void ddribble_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int length, int gfxset, int flipscreen)
+void ddribble_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int length, int chip)
 {
-	gfx_element *gfx = m_gfxdecode->gfx(gfxset);
+	k005885_device *k005885 = m_k005885[chip];
+	gfx_element *gfx = k005885->gfx(1);
+	const uint8_t *source = k005885->spriteram();
 	const uint8_t *finish = source + length;
 
 	while (source < finish)
@@ -243,7 +175,7 @@ void ddribble_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int const color = (source[1] & 0xf0) >> 4;                // color
 		int width, height;
 
-		if (flipscreen)
+		if (k005885->flipscreen())
 		{
 			flipx = !flipx;
 			flipy = !flipy;
@@ -301,30 +233,17 @@ void ddribble_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 uint32_t ddribble_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_fg_tilemap->set_flip((m_vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	m_bg_tilemap->set_flip((m_vregs[1][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-
 	// set scroll registers
-	m_fg_tilemap->set_scrollx(0, m_vregs[0][1] | ((m_vregs[0][2] & 0x01) << 8));
-	m_bg_tilemap->set_scrollx(0, m_vregs[1][1] | ((m_vregs[1][2] & 0x01) << 8));
-	m_fg_tilemap->set_scrolly(0, m_vregs[0][0]);
-	m_bg_tilemap->set_scrolly(0, m_vregs[1][0]);
+	m_k005885[0]->tilemap_set_scrollx(0, 0, m_k005885[0]->get_xscroll());
+	m_k005885[1]->tilemap_set_scrollx(0, 0, m_k005885[1]->get_xscroll());
+	m_k005885[0]->tilemap_set_scrolly(0, 0, m_k005885[0]->get_yscroll());
+	m_k005885[1]->tilemap_set_scrolly(0, 0, m_k005885[1]->get_yscroll());
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect, m_spriteram[0], 0x07d, 2, m_vregs[0][4] & 0x08);
-	draw_sprites(bitmap, cliprect, m_spriteram[1], 0x140, 3, m_vregs[1][4] & 0x08);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_k005885[1]->tilemap_draw(0, screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, 0x07d, 0);
+	draw_sprites(bitmap, cliprect, 0x140, 1);
+	m_k005885[0]->tilemap_draw(0, screen, bitmap, cliprect, 0, 0);
 	return 0;
-}
-
-
-void ddribble_state::vblank_irq(int state)
-{
-	if (state && m_int_enable[0])
-		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
-
-	if (state && m_int_enable[1])
-		m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 
@@ -371,26 +290,26 @@ void ddribble_state::vlm5030_ctrl_w(uint8_t data)
 	m_vlmbank->set_entry(BIT(data, 3));
 
 	// b2 : SSG-C rc filter enable
-	m_filter[2]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); // YM2203-SSG-C
+	m_filter[2]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, BIT(data, 2) ? CAP_N(150) : 0); // YM2203-SSG-C
 
 	// b1 : SSG-B rc filter enable
-	m_filter[1]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); // YM2203-SSG-B
+	m_filter[1]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, BIT(data, 1) ? CAP_N(150) : 0); // YM2203-SSG-B
 
 	// b0 : SSG-A rc filter enable
-	m_filter[0]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); // YM2203-SSG-A
+	m_filter[0]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, BIT(data, 0) ? CAP_N(150) : 0); // YM2203-SSG-A
 }
 
 
 void ddribble_state::maincpu_map(address_map &map)
 {
-	map(0x0000, 0x0004).w(FUNC(ddribble_state::k005885_w<0>));                                              // video registers (005885 #1)
-	map(0x0800, 0x0804).w(FUNC(ddribble_state::k005885_w<1>));                                              // video registers (005885 #2)
+	map(0x0000, 0x0004).w(m_k005885[0], FUNC(k005885_device::ctrl_w));                                              // video registers (005885 #1)
+	map(0x0800, 0x0804).w(m_k005885[1], FUNC(k005885_device::ctrl_w));                                              // video registers (005885 #2)
 	map(0x1800, 0x187f).ram().w("palette", FUNC(palette_device::write_indirect)).share("palette");
-	map(0x2000, 0x2fff).ram().w(FUNC(ddribble_state::fg_videoram_w)).share(m_fg_videoram);   // Video RAM 1
-	map(0x3000, 0x3fff).ram().share(m_spriteram[0]);                             // Object RAM 1
+	map(0x2000, 0x2fff).rw(m_k005885[0], FUNC(k005885_device::vram_r), FUNC(k005885_device::vram_w));   // Video RAM 1
+	map(0x3000, 0x3fff).rw(m_k005885[0], FUNC(k005885_device::spriteram_r), FUNC(k005885_device::spriteram_w));                             // Object RAM 1
 	map(0x4000, 0x5fff).ram().share("sharedram");                                   // shared RAM with CPU #1
-	map(0x6000, 0x6fff).ram().w(FUNC(ddribble_state::bg_videoram_w)).share(m_bg_videoram);   // Video RAM 2
-	map(0x7000, 0x7fff).ram().share(m_spriteram[1]);                             // Object RAM 2
+	map(0x6000, 0x6fff).rw(m_k005885[1], FUNC(k005885_device::vram_r), FUNC(k005885_device::vram_w));   // Video RAM 2
+	map(0x7000, 0x7fff).rw(m_k005885[1], FUNC(k005885_device::spriteram_r), FUNC(k005885_device::spriteram_w));                             // Object RAM 2
 	map(0x8000, 0x8000).w(FUNC(ddribble_state::bankswitch_w));
 	map(0x8000, 0x9fff).bankr(m_mainbank);
 	map(0xa000, 0xffff).rom().region("maincpu", 0xa000);
@@ -497,11 +416,14 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( gfx_ddribble )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,    48,  1 )   // colors 48-63
-	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout,    16,  1 )   // colors 16-31
-	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout,  32,  1 )   // colors 32-47
-	GFXDECODE_ENTRY( "gfx2", 0x40000, spritelayout,  64, 16 )   // colors  0-15 but using lookup table
+static GFXDECODE_START( gfx_ddribble_1 )
+	GFXDECODE_ENTRY( "k005885_1", 0x00000, charlayout,    48,  1 )   // colors 48-63
+	GFXDECODE_ENTRY( "k005885_1", 0x20000, spritelayout,  32,  1 )   // colors 32-47
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_ddribble_2 )
+	GFXDECODE_ENTRY( "k005885_2", 0x00000, charlayout,    16,  1 )   // colors 16-31
+	GFXDECODE_ENTRY( "k005885_2", 0x40000, spritelayout,  64, 16 )   // colors  0-15 but using lookup table
 GFXDECODE_END
 
 
@@ -509,24 +431,6 @@ void ddribble_state::machine_start()
 {
 	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x2000);
 	m_vlmbank->configure_entries(0, 2, memregion("vlm")->base(), 0x10000);
-
-	save_item(NAME(m_int_enable));
-	save_item(NAME(m_vregs));
-	save_item(NAME(m_charbank));
-}
-
-void ddribble_state::machine_reset()
-{
-	for (int i = 0; i < 5; i++)
-	{
-		m_vregs[0][i] = 0;
-		m_vregs[1][i] = 0;
-	}
-
-	m_int_enable[0] = 0;
-	m_int_enable[1] = 0;
-	m_charbank[0] = 0;
-	m_charbank[1] = 0;
 }
 
 void ddribble_state::ddribble(machine_config &config)
@@ -555,9 +459,21 @@ void ddribble_state::ddribble(machine_config &config)
     screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1); */
 	screen.set_screen_update(FUNC(ddribble_state::screen_update));
 	screen.set_palette("palette");
-	screen.screen_vblank().set(FUNC(ddribble_state::vblank_irq));
+	screen.screen_vblank().set(m_k005885[0], FUNC(k005885_device::irq_set));
+	screen.screen_vblank().append(m_k005885[1], FUNC(k005885_device::irq_set));
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_ddribble);
+	K005885(config, m_k005885[0], XTAL(18'432'000), gfx_ddribble_1, "palette", "screen");
+	m_k005885[0]->set_split_tilemap(false);
+	m_k005885[0]->set_irq_cb().set_inputline(m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
+	m_k005885[0]->set_flipscreen_cb().set(FUNC(ddribble_state::flipscreen_callback<0>));
+	m_k005885[0]->set_tile_callback(FUNC(ddribble_state::tile_callback<0>));
+
+	K005885(config, m_k005885[1], XTAL(18'432'000), gfx_ddribble_2, "palette", "screen");
+	m_k005885[1]->set_split_tilemap(false);
+	m_k005885[1]->set_irq_cb().set_inputline(m_subcpu, M6809_FIRQ_LINE, HOLD_LINE);
+	m_k005885[1]->set_flipscreen_cb().set(FUNC(ddribble_state::flipscreen_callback<1>));
+	m_k005885[1]->set_tile_callback(FUNC(ddribble_state::tile_callback<1>));
+
 	PALETTE(config, "palette", FUNC(ddribble_state::palette)).set_format(palette_device::xBGR_555, 64 + 256, 64);
 
 	// sound hardware
@@ -591,11 +507,11 @@ ROM_START( ddribble )
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "690b01.bin", 0x0000, 0x8000, CRC(806b8453) SHA1(3184772c5e5181438a17ac72129070bf164b2965) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_REGION( 0x40000, "k005885_1", 0 )
 	ROM_LOAD16_BYTE( "690a05.bin",  0x00000, 0x20000, CRC(6a816d0d) SHA1(73f2527d5f2b9d51b784be36e07e0d0c566a28d9) )    // characters & objects
 	ROM_LOAD16_BYTE( "690a06.bin",  0x00001, 0x20000, CRC(46300cd0) SHA1(07197a546fff452a41575fcd481da64ac6bf601e) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "k005885_2", 0 )
 	ROM_LOAD16_BYTE( "690a10.bin", 0x00000, 0x20000, CRC(61efa222) SHA1(bd7b993ad1c06d8f6ac29fbc07c4a987abe1ab42) ) // characters
 	ROM_LOAD16_BYTE( "690a09.bin", 0x00001, 0x20000, CRC(ab682186) SHA1(a28982835042a07354557e1539b097cdf93fc466) )
 	ROM_LOAD16_BYTE( "690a08.bin", 0x40000, 0x20000, CRC(9a889944) SHA1(ca96815aefb1e336bd2288841b00a5c21cacf90f) ) // objects
@@ -621,13 +537,13 @@ ROM_START( ddribblep )
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "master_sound.a6", 0x0000, 0x8000, CRC(090e3a31) SHA1(4c645b55d52abb859354ea2ea401e4ab99f5d493) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 ) // same content as parent
+	ROM_REGION( 0x40000, "k005885_1", 0 ) // same content as parent
 	ROM_LOAD16_BYTE( "v1a.e12", 0x00000, 0x10000, CRC(53724765) SHA1(55a45ab71f7bf55ed805d4dc2345cadc4171f323) )    // characters & objects
 	ROM_LOAD16_BYTE( "01a.e11", 0x20000, 0x10000, CRC(1ae5d725) SHA1(d8dd41cc1872c6d218cc425d1cd03f8d8eefe3e3) )    // characters & objects
 	ROM_LOAD16_BYTE( "v1b.e13", 0x00001, 0x10000, CRC(d9dc6f1a) SHA1(f50169525c5109ba65acdccbb01dddb92926462a) )
 	ROM_LOAD16_BYTE( "01b.d14", 0x20001, 0x10000, CRC(054c5242) SHA1(411389e36d33fd27e13ffc6a7d4b295a42f08869) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 ) // same content as parent
+	ROM_REGION( 0x80000, "k005885_2", 0 ) // same content as parent
 	ROM_LOAD16_BYTE( "v2a00.i13",         0x00000, 0x10000, CRC(a33f7d6d) SHA1(c2b9a9a66e4712785250cad69a5e43338af60a82) )  // characters
 	ROM_LOAD16_BYTE( "v2a10.h13",         0x20000, 0x10000, CRC(8fbc7454) SHA1(93782d148afe64b14fa46deb4d227ef167030c94) )  // characters
 	ROM_LOAD16_BYTE( "v2b00.i12",         0x00001, 0x10000, CRC(e63759bb) SHA1(df7e94f40266aa8995509346cdfdce08a885de16) )
