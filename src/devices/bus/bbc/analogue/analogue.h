@@ -32,7 +32,6 @@
 #pragma once
 
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -62,7 +61,7 @@ public:
 
 	void lpstb_w(int state) { m_lpstb_handler(state); }
 
-	uint8_t ch_r(int channel);
+	uint16_t ch_r(offs_t channel);
 	uint8_t pb_r();
 	void pb_w(uint8_t data);
 
@@ -82,14 +81,14 @@ private:
 class device_bbc_analogue_interface : public device_interface
 {
 public:
-	virtual uint8_t ch_r(int channel) { return 0x00; }
+	virtual uint16_t ch_r(offs_t channel) { return 0x00; }
 	virtual uint8_t pb_r() { return 0x30; }
 	virtual void pb_w(uint8_t data) { }
 
 protected:
 	device_bbc_analogue_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_analogue_slot_device *m_slot;
+	bbc_analogue_slot_device *const m_slot;
 };
 
 
@@ -97,5 +96,6 @@ protected:
 DECLARE_DEVICE_TYPE(BBC_ANALOGUE_SLOT, bbc_analogue_slot_device)
 
 void bbc_analogue_devices(device_slot_interface &device);
+void bbc_analogue_devices_no_lightpen(device_slot_interface &device);
 
 #endif // MAME_BUS_BBC_ANALOGUE_ANALOGUE_H

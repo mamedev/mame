@@ -76,16 +76,6 @@ void bbc_state::mos_w(offs_t offset, uint8_t data)
 }
 
 
-/**************************************
-   Analogue Joystick
-**************************************/
-
-int bbc_state::get_analogue_input(int channel_number)
-{
-	return m_analog->ch_r(channel_number) << 8;
-}
-
-
 /***************************************
    Cassette Motor
 ****************************************/

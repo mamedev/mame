@@ -37,7 +37,7 @@ void bbc_quinkey_intf_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( quinkey )
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 static INPUT_PORTS_START( quinkey )
@@ -51,11 +51,6 @@ static INPUT_PORTS_START( quinkey )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
-
-
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
 
 ioport_constructor bbc_quinkey_device::device_input_ports() const
 {
@@ -88,9 +83,9 @@ void bbc_quinkey_intf_device::device_start()
 }
 
 
-uint8_t bbc_quinkey_intf_device::ch_r(int channel)
+uint16_t bbc_quinkey_intf_device::ch_r(offs_t channel)
 {
-	return m_quinkey[channel]->read();
+	return m_quinkey[channel]->read() << 8;
 }
 
 

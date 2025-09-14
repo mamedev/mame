@@ -110,12 +110,12 @@ void electron_plus1_device::device_add_mconfig(machine_config &config)
 	/* adc */
 	ADC0844(config, m_adc);
 	m_adc->intr_callback().set([this](int state) { m_adc_ready = !state; });
-	m_adc->ch1_callback().set([this]() { return m_analogue->ch_r(0); });
-	m_adc->ch2_callback().set([this]() { return m_analogue->ch_r(1); });
-	m_adc->ch3_callback().set([this]() { return m_analogue->ch_r(2); });
-	m_adc->ch4_callback().set([this]() { return m_analogue->ch_r(3); });
+	m_adc->ch1_callback().set([this]() { return m_analogue->ch_r(0) >> 8; });
+	m_adc->ch2_callback().set([this]() { return m_analogue->ch_r(1) >> 8; });
+	m_adc->ch3_callback().set([this]() { return m_analogue->ch_r(2) >> 8; });
+	m_adc->ch4_callback().set([this]() { return m_analogue->ch_r(3) >> 8; });
 
-	BBC_ANALOGUE_SLOT(config, m_analogue, bbc_analogue_devices, "acornjoy");
+	BBC_ANALOGUE_SLOT(config, m_analogue, bbc_analogue_devices_no_lightpen, "acornjoy");
 
 	/* cartridges */
 	ELECTRON_CARTSLOT(config, m_cart_sk1, DERIVED_CLOCK(1, 1), electron_cart, nullptr);

@@ -86,8 +86,6 @@ public:
 	uint8_t mos_r(offs_t offset);
 	void mos_w(offs_t offset, uint8_t data);
 
-	int get_analogue_input(int channel_number);
-
 	void init_bbc();
 	void init_ltmp();
 	void init_cfa();

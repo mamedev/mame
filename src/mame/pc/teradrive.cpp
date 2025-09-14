@@ -1030,10 +1030,9 @@ ROM_START( teradrive )
 	// 1ST AND 2ND HALF IDENTICAL
 	ROM_LOAD( "tru-27c800.bin", 0x00000, 0x100000,  CRC(c2fe9c9e) SHA1(06ec0461dab425f41fb5c3892d9beaa8fa53bbf1))
 
-	// MD 68k initial boot code, "TERA286 INITIALIZE" in header
-	// shows Sega logo + TMSS "produced by" + 1990 copyright at bottom if loaded thru megadrij
+	// firmware for 68k side, need to ROM_COPY to match endianness
 	ROM_REGION16_BE(0x200000, "tmss", ROMREGION_ERASEFF)
-	ROM_COPY("board6:romdisk", 0x00000, 0x0000, 0x200000 )
+	ROM_COPY("board6:romdisk", 0x00000, 0x00000, 0x200000 )
 ROM_END
 
 ROM_START( teradrive3 )
@@ -1050,7 +1049,7 @@ ROM_START( teradrive3 )
 	ROM_LOAD( "tru-27c800.bin", 0x00000, 0x100000,  CRC(c2fe9c9e) SHA1(06ec0461dab425f41fb5c3892d9beaa8fa53bbf1))
 
 	ROM_REGION16_BE(0x200000, "tmss", ROMREGION_ERASEFF)
-	ROM_COPY("board6:romdisk", 0x00000, 0x0000, 0x200000 )
+	ROM_COPY("board6:romdisk", 0x00000, 0x00000, 0x200000 )
 ROM_END
 
 

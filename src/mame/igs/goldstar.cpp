@@ -19,6 +19,7 @@
   hence the slightly different PCBs, ROM layouts, slightly hacked program ROMs
   etc.
 
+
 ****************************************************************************
 
   Game notes:
@@ -445,6 +446,7 @@ public:
 	void jkrmast(machine_config &config) ATTR_COLD;
 	void pkrmast(machine_config &config) ATTR_COLD;
 	void nfm(machine_config &config) ATTR_COLD;
+	void reelmg(machine_config &config) ATTR_COLD;
 	void super7(machine_config &config) ATTR_COLD;
 
 	void init_alienatt() ATTR_COLD;
@@ -488,6 +490,8 @@ public:
 	void init_super7() ATTR_COLD;
 	void init_tcl() ATTR_COLD;
 	void init_tonypok() ATTR_COLD;
+	void init_reelmag() ATTR_COLD;
+	void init_rm7b() ATTR_COLD;
 	template <uint8_t Xor_value> void init_tsk() ATTR_COLD;
 	void init_wcat3a() ATTR_COLD;
 
@@ -533,6 +537,7 @@ private:
 	void nfm_map(address_map &map) ATTR_COLD;
 	void nfm_portmap(address_map &map) ATTR_COLD;
 	void pkrmast_portmap(address_map &map) ATTR_COLD;
+	void reelm_portmap(address_map &map) ATTR_COLD;
 	void super7_map(address_map &map) ATTR_COLD;
 	void super7_portmap(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
@@ -1192,6 +1197,7 @@ void cmaster_state::background_col_w(uint8_t data)
 	m_reel_tilemap[0]->mark_all_dirty();
 	m_reel_tilemap[1]->mark_all_dirty();
 	m_reel_tilemap[2]->mark_all_dirty();
+
 }
 
 
@@ -2551,6 +2557,22 @@ void cmaster_state::cm_portmap(address_map &map)
 	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
 	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
 }
+
+
+void cmaster_state::reelm_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Inputs
+	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // DIP switches
+	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
+	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
+	map(0x13, 0x13).w(FUNC(cmaster_state::coincount_w));
+	map(0x15, 0x15).portr("IN1");
+	map(0x16, 0x16).portr("IN2");
+}
+
 
 void cmaster_state::super7_portmap(address_map &map)
 {
@@ -11939,6 +11961,19 @@ void cmaster_state::cmfb55(machine_config &config)
 	m_gfxdecode->set_info(gfx_cmfb55);
 }
 
+
+void cmaster_state::reelmg(machine_config &config)
+{
+	cm(config);
+	
+	Z80(config.replace(), m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::reelm_portmap);
+	
+
+}
+
+
 void cmast97_state::cmast97(machine_config &config)
 {
 	cm(config);
@@ -15570,6 +15605,84 @@ ROM_START( cmv4zga )
 	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "pal16l8a.g10", 0x000, 0x104, CRC(a7ea9062) SHA1(e17b2831d9c6302318f54d5382aef1d9c218a34b) )
 	ROM_LOAD( "pal16l8a.c12", 0x200, 0x104, CRC(adcc5e32) SHA1(6fae21d1d6f0aec18a7b4d604db87ee2df25f9a4) )
+ROM_END
+
+ROM_START( reelmagic )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "reel_magic_d9004_pcb.bin", 0x0000, 0x1000, CRC(1a166ccc) SHA1(a8b6553d276b6da1d26d54788e09641e71762291) )
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000, 0x8000, CRC(ba00957a) SHA1(0f2d1d36b3fd325db81a2d17663c9cc692f6e2fc) )
+	ROM_LOAD( "6.u11", 0x08000, 0x8000, CRC(72e2e70f) SHA1(b999e20245e6d0b38a7ada1aadd5426536cf3ec5) )
+	ROM_LOAD( "5.u4",  0x10000, 0x8000, CRC(3d63bd9d) SHA1(3d20e5ce3b954f08b8d2a367108a012e72c17e35) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(1df9ffa7) SHA1(851f32c369e7879c2054399a820463d84007bc1c) )
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(123ccb63) SHA1(c23391a1fb70a8122eee48b8ea6300a058da98d5) )
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(fdaeb68f) SHA1(f41e54d43cb73c7e9ae99e78043a7df4958cb8ce) )
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(768d2483) SHA1(ac7f02b26d12363281cb65b74577a8fc1d68c35b) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
+
+//	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+//	ROM_LOAD( "cmv4zga_nvram.bin", 0x0000, 0x0800, CRC(b9b4ca08) SHA1(f9ccf4c18b1da5e07192da8014734a57b45735cb) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x000, 0x100, CRC(208727e7) SHA1(7c868b06da03fe95266555775b8185d38e25ce3f) )
+	ROM_LOAD( "82s129.u79", 0x100, 0x100, CRC(01349092) SHA1(cd2910f7d842f37db35ad25414536a8c49a85293) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x000, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+/*
+  Reel Magic 7 Bonus
+  CB3 gfx hack
+
+  Different PLD protection
+
+*/
+ROM_START( rm_7bonus )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "7bonus.bin", 0x1000, 0x1000, CRC(81bfb074) SHA1(6e6cdcc0d92e77a4cde18f00ac465d67ffa94e1e) )
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x0000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16", 0x00000, 0x8000, CRC(748a17c3) SHA1(1329c576e39c03a5d4c886d81b0ea624a4ede2b4) )
+	ROM_LOAD( "6.u11", 0x08000, 0x8000, CRC(488c5136) SHA1(e3b9f52d4df159d8f3a1abe7b695a042d7b633b8) )
+	ROM_LOAD( "5.u4",  0x10000, 0x8000, CRC(658ae9ba) SHA1(5ef15567866b1ed0d936c22557e5e1a0214853a4) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(bea1a563) SHA1(c782b65acad0ea316394ae6269ce400f5b678e0a) )
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(d54ab39d) SHA1(9bda2de9f3a2a26ce08fd6200a4d67e8a0851181) )
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(3d9e8137) SHA1(58207fcdde38f600395cbddb63ee9013bf100d6b) )
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(8140cd0b) SHA1(5663eeec1125f6a7ef77f5ff6ec70f186fcbc395) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x000, 0x100, CRC(208727e7) SHA1(7c868b06da03fe95266555775b8185d38e25ce3f) )
+	ROM_LOAD( "82s129.u79", 0x100, 0x100, CRC(01349092) SHA1(cd2910f7d842f37db35ad25414536a8c49a85293) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x000, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
 
@@ -26070,6 +26183,28 @@ void wingco_state::init_l8tet()
 
 }
 
+void cmaster_state::init_reelmag()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0xc803] = 0xbf; // unknown protection device (not rom)
+	rom[0xc80a] = 0x7f; // unknown protection device (not rom)
+
+}
+
+void cmaster_state::init_rm7b()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0x0004] = 0xd3;
+	rom[0x00d3] = 0x21;
+	rom[0x00d4] = 0xe4;
+	rom[0x00d5] = 0xd7;
+	rom[0x00d6] = 0x36;
+	rom[0x00d7] = 0xaa;
+
+}
+
 
 } // anonymous namespace
 
@@ -26165,14 +26300,16 @@ GAMEL( 199?, super7,     cmaster,  super7,   super7,   cmaster_state,  init_supe
 GAME ( 199?, wcat3a,     wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 GAMEL( 199?, ll3,        cmaster,  cm,       cmasterb, cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III",                              MACHINE_NOT_WORKING, layout_cmasterb )  // not looked at yet
 GAMEL( 199?, cmfb55,     cmaster,  cmfb55,   cmaster,  cmaster_state,  init_palnibbles,ROT0, "bootleg",           "Cherry Master (bootleg, Game FB55 Ver.2)",    MACHINE_NOT_WORKING, layout_cmv4 ) // inputs not done
-GAMEL( 1991, srmagic,    cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "bootleg",           "Super Real Magic (V6.3)",                     MACHINE_NOT_WORKING, layout_cmv4 ) // needs correct I/O
 GAMEL( 1991, cmv4zg,     cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 1)",  0,                   layout_cmv4 ) // uses default NVRAM
 GAMEL( 1991, cmv4zga,    cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 2)",  0,                   layout_cmv4 ) // uses default NVRAM
+GAMEL( 1991, rm_7bonus,  cmaster,  cm,       cmasterb, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus)",       0,                   layout_cmaster ) 
+GAMEL( 1991, srmagic,    cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "bootleg",           "Super Real Magic (V6.3)",                     0,                   layout_cmv4 )
+GAMEL( 1991, reelmagic,  cmaster,  reelmg,   cmasterb, cmaster_state,  init_reelmag,   ROT0, "bootleg",           "Super Reel Magic (ver.6.3.0)",                0,                   layout_cmv4 )
 GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 GAMEL( 199?, alienatt,   cmaster,  cm,       cmaster,  cmaster_state,  init_alienatt,  ROT0, "bootleg",           "Allien Attack",                               MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 
-GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
+GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                  layout_tonypok )
 GAME(  1999, jkrmast,    0,        jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    0 )
 GAME(  1999, jkrmasta,   jkrmast,  jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512/513)", MACHINE_IMPERFECT_COLORS ) // sometimes fg colors are wrong, bonus stages have reels bg always white --> tilemap garbage or white
 GAME(  1999, jkrmastb,   jkrmast,  jkrmast,  jkrmastb, cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512)",    MACHINE_IMPERFECT_GRAPHICS ) // needs to clean the bg tilemap properly

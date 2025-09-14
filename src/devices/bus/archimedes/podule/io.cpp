@@ -21,30 +21,29 @@
 
 #include "emu.h"
 #include "io.h"
+
+#include "bus/bbc/1mhzbus/1mhzbus.h"
+#include "bus/bbc/analogue/analogue.h"
+#include "bus/bbc/userport/userport.h"
+#include "bus/midi/midi.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/mc68681.h"
 #include "machine/upd7002.h"
-#include "bus/bbc/1mhzbus/1mhzbus.h"
-#include "bus/bbc/analogue/analogue.h"
-#include "bus/bbc/userport/userport.h"
-#include "bus/midi/midi.h"
 
 
 namespace {
 
 // ======================> arc_io_aka_device
 
-class arc_io_aka_device :
-	public device_t,
-	public device_archimedes_podule_interface
+class arc_io_aka_device : public device_t, public device_archimedes_podule_interface
 {
 protected:
 	arc_io_aka_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -61,8 +60,6 @@ protected:
 	u8 m_rom_page;
 
 	u8 pa_r();
-	int get_analogue_input(int channel_number);
-	void upd7002_eoc(int state);
 
 	int m_irq_en;
 };
@@ -268,8 +265,8 @@ void arc_io_aka_device::add_userport(machine_config &config)
 void arc_io_aka_device::add_analogue(machine_config &config)
 {
 	upd7002_device &upd7002(UPD7002(config, "upd7002", DERIVED_CLOCK(1, 4)));
-	upd7002.set_get_analogue_callback(FUNC(arc_io_aka_device::get_analogue_input));
-	upd7002.set_eoc_callback(FUNC(arc_io_aka_device::upd7002_eoc));
+	upd7002.get_analogue_callback().set(m_analog, FUNC(bbc_analogue_slot_device::ch_r));
+	upd7002.eoc_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>)).invert();
 
 	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
 	m_analog->lpstb_handler().set("via", FUNC(via6522_device::write_ca1));
@@ -277,7 +274,7 @@ void arc_io_aka_device::add_analogue(machine_config &config)
 
 void arc_io_aka_device::add_1mhzbus(machine_config &config)
 {
-	bbc_1mhzbus_slot_device &bus(BBC_1MHZBUS_SLOT(config, "1mhzbus", DERIVED_CLOCK(1, 8), bbcm_1mhzbus_devices, nullptr));
+	bbc_1mhzbus_slot_device &bus(BBC_1MHZBUS_SLOT(config, "1mhzbus", DERIVED_CLOCK(1, 8), bbc_1mhzbus_devices, nullptr));
 	bus.irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 	bus.nmi_handler().set([this](int state) { set_pfiq(state); });
 }
@@ -421,16 +418,6 @@ u8 arc_io_aka_device::pa_r()
 	}
 
 	return data;
-}
-
-int arc_io_aka_device::get_analogue_input(int channel_number)
-{
-	return m_analog->ch_r(channel_number) << 8;
-}
-
-void arc_io_aka_device::upd7002_eoc(int state)
-{
-	m_irqs->in_w<1>(!state);
 }
 
 } // anonymous namespace

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    drcbec.c
+    drcbec.cpp
 
     Interpreted C core back-end for the universal machine language.
 
@@ -15,6 +15,7 @@
 
 #include "debug/debugcpu.h"
 
+#include <cfenv>
 #include <cmath>
 
 
@@ -28,6 +29,14 @@ using namespace uml;
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
+
+const int rounding_map[4] =
+{
+	FE_TOWARDZERO,  // ROUND_TRUNC
+	FE_TONEAREST,   // ROUND_ROUND
+	FE_UPWARD,      // ROUND_CEIL
+	FE_DOWNWARD     // ROUND_FLOOR
+};
 
 // define a bit to match each possible condition, starting at bit 12
 constexpr uint32_t ZBIT  = 0x1000 << (COND_Z & 15);
@@ -728,6 +737,9 @@ void drcbe_c::get_info(drcbe_info &info) const noexcept
 
 int drcbe_c::execute(code_handle &entry)
 {
+	// save environment
+	int const feround = std::fegetround();
+
 	// get the entry point
 	const drcbec_instruction *inst = (const drcbec_instruction *)entry.codeptr();
 	assert_in_cache(m_cache, inst);
@@ -786,6 +798,7 @@ int drcbe_c::execute(code_handle &entry)
 				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_EXIT, 4, 0):
+				std::fesetround(feround);
 				return PARAM0;
 
 			case MAKE_OPCODE_SHORT(OP_JMP, 4, 1):       // JMP     imm[,c]
@@ -856,7 +869,8 @@ int drcbe_c::execute(code_handle &entry)
 			// ----------------------- Internal Register Operations -----------------------
 
 			case MAKE_OPCODE_SHORT(OP_SETFMOD, 4, 0):   // SETFMOD src
-				m_state.fmod = PARAM0;
+				m_state.fmod = PARAM0 & 0x03;
+				std::fesetround(rounding_map[PARAM0 & 0x03]);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_GETFMOD, 4, 0):   // GETFMOD dst
