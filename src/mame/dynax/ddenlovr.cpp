@@ -8141,76 +8141,48 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x60, "Control Panel" )
-	PORT_DIPSETTING(    0x60, "Hanafuda" )
-	PORT_DIPSETTING(    0x40, "Mahjong" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Joystick ) )
-	PORT_DIPSETTING(    0x00, "Joystick (duplicate)" )
-	PORT_DIPNAME( 0x80, 0x80, "First Chance" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )             PORT_DIPLOCATION("DIP-SW1:1,2")  // コインレート
+	PORT_DIPSETTING(    0x00, DEF_STR(3C_1C) )                                                // 3コイン1ゲーム
+	PORT_DIPSETTING(    0x01, DEF_STR(2C_1C) )                                                // 2コイン1ゲーム
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )                                                // 1コイン1ゲーム
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )                                                // 1コイン2ゲーム
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR(Difficulty) )          PORT_DIPLOCATION("DIP-SW1:3,4")  // 難易度
+	PORT_DIPSETTING(    0x08, DEF_STR(Easy) )                                                 // 易しい
+	PORT_DIPSETTING(    0x0c, DEF_STR(Normal) )                                               // 標準
+	PORT_DIPSETTING(    0x04, DEF_STR(Hard) )                                                 // やや強
+	PORT_DIPSETTING(    0x00, DEF_STR(Hardest) )                                              // 強い
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Demo_Sounds) )         PORT_DIPLOCATION("DIP-SW1:5")    // デモサウンド
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 無し
+	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                                   // 有り
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR(Controls) )            PORT_DIPLOCATION("DIP-SW1:6,7")  // パネルタイプ
+	PORT_DIPSETTING(    0x60, "Hanafuda" )                                                    // 華札パネル
+	PORT_DIPSETTING(    0x40, "Mahjong" )                                                     // 麻雀パネル
+	PORT_DIPSETTING(    0x20, DEF_STR(Joystick) )                                             // 十字レバー
+	PORT_DIPSETTING(    0x00, DEF_STR(Joystick) )
+	PORT_DIPNAME( 0x80, 0x80, "First Chance" )               PORT_DIPLOCATION("DIP-SW1:8")    // ファーストチャンス
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 無し
+	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                                   // 有り
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, "Unknown 2-0&1" )
-	PORT_DIPSETTING(    0x03, "0" )
-	PORT_DIPSETTING(    0x02, "1" )
-	PORT_DIPSETTING(    0x01, "2" )
-	PORT_DIPSETTING(    0x00, "0?" )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown 2-3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 2-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 2-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DIP-SW2:1" )                                         // DIP-SW2はALL OFFにしてください。
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DIP-SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIP-SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP-SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIP-SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP-SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP-SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP-SW2:8" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-8" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown 2-9" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Flip_Screen) )         PORT_DIPLOCATION("DIP-SW1:9")    // 画面
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                  // 通常
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                   // 反転
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Service_Mode) )        PORT_DIPLOCATION("DIP-SW1:10")   // テストモード
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                  // 通常
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                   // テストモード
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIP-SW2:9" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP-SW2:10" )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sryudens )

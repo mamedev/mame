@@ -104,8 +104,6 @@ subroutine calls at SP + 0x08, SP + 0x18, SP + 0x28, etc. until reaching
 the location FP points to.
 
 TODO:
-* The rounding mode set with SETFMOD should be applied for floating point
-  arithmetic.
 * Some operations do not clear the upper bits of integer registers when
   they should (e.g. 32-bit MOV with the same register as source and
   destination).
