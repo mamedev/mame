@@ -378,6 +378,12 @@ void bbcmc_state::sysvia_pa_w(uint8_t data)
 
 void bbcmc_state::update_sdb()
 {
+	uint8_t const latch = m_latch->output_state();
+
+	// sound
+	if (!BIT(latch, 0))
+		m_sn->write(m_sdb);
+
 	// keyboard
 	m_sdb = m_kbd->read(m_sdb);
 }

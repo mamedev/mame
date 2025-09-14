@@ -501,6 +501,10 @@ void bbcm_state::update_sdb()
 {
 	uint8_t const latch = m_latch->output_state();
 
+	// sound
+	if (!BIT(latch,0))
+		m_sn->write(m_sdb);
+
 	// rtc
 	if (m_mc146818_ce)
 	{
@@ -671,7 +675,6 @@ void bbcm_state::bbcmet(machine_config &config)
 	config.set_default_layout(layout_bbcm);
 
 	LS259(config, m_latch);
-	m_latch->q_out_cb<0>().set([this](int state) { if (!state) m_sn->write(m_sdb); });
 	m_latch->q_out_cb<3>().set(m_kbd, FUNC(bbc_kbd_device::write_kb_en));
 	m_latch->q_out_cb<6>().set_output("capslock_led");
 	m_latch->q_out_cb<7>().set_output("shiftlock_led");
