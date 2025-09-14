@@ -4093,7 +4093,10 @@ void upd7810_device::MVI_ANM_xx()
 /* 64 81: 0110 0100 1000 0001 xxxx xxxx */
 void upd7810_device::MVI_SMH_xx()
 {
-	RDOPARG( SMH );
+	uint8_t imm;
+	RDOPARG( imm );
+	if (!BIT(SMH, 2) && BIT(imm, 2)) IRR |= INTFST;
+	SMH = imm;
 }
 
 /* 64 83: 0110 0100 1000 0011 xxxx xxxx */
