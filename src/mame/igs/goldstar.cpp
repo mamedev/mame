@@ -15737,18 +15737,18 @@ ROM_START( micronic )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "micronic_v1.2.bin", 0x0000, 0x1000, CRC(2395575e) SHA1(f475e1162017a4797069bdd8e2e36be8953cbbbf) )
 	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
 	ROM_CONTINUE(0x6000, 0x1000)
 	ROM_CONTINUE(0x2000, 0x1000)
-	ROM_CONTINUE(0x1000, 0x1000)
-	ROM_CONTINUE(0x7000, 0x1000)
 	ROM_CONTINUE(0x5000, 0x1000)
-	ROM_CONTINUE(0x3000, 0x1000)
 	ROM_CONTINUE(0x8000, 0x8000)
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "c_m_pacman_rom7.u16", 0x00000, 0x8000, CRC(05ffb23d) SHA1(41fecf4e236d8a4a55b7e65a20e0ee70fe40f3bf) )
-	ROM_LOAD( "c_m_pacman_rom6.u11", 0x08000, 0x8000, CRC(91d66abf) SHA1(6a8f741e23cd5afefad3cb73217481551ca80b06) )
-	ROM_LOAD( "c_m_pacman_rom5.u4",  0x10000, 0x8000, CRC(449e8aa2) SHA1(236bbd3f821874fc55745d7c8c7e9a1c65bb472f) )
+	ROM_LOAD( "7.u16", 0x00000, 0x8000, CRC(05ffb23d) SHA1(41fecf4e236d8a4a55b7e65a20e0ee70fe40f3bf) )
+	ROM_LOAD( "6.u11", 0x08000, 0x8000, CRC(91d66abf) SHA1(6a8f741e23cd5afefad3cb73217481551ca80b06) )
+	ROM_LOAD( "5.u4",  0x10000, 0x8000, CRC(449e8aa2) SHA1(236bbd3f821874fc55745d7c8c7e9a1c65bb472f) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
@@ -15758,6 +15758,9 @@ ROM_START( micronic )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 	// not populated
+
+	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+	ROM_LOAD( "micronic_nvram.bin", 0x0000, 0x0800, CRC(b0b674ec) SHA1(deab5aec0d9f61851163cba40ca434a23580ff13) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x000, 0x100, CRC(208727e7) SHA1(7c868b06da03fe95266555775b8185d38e25ce3f) )
@@ -26473,7 +26476,7 @@ GAMEL( 1992, rm_7bonusa, cmaster,  cm,       cmasterb, cmaster_state,  init_rm7b
 GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 GAMEL( 199?, alienatt,   cmaster,  cm,       cmaster,  cmaster_state,  init_alienatt,  ROT0, "bootleg",           "Allien Attack",                               MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
-GAMEL( 1992, micronic,   cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "Micronic",          "Cherry Bonus III (Micronic hack v1.2)",       MACHINE_NOT_WORKING, layout_cmv4 ) // jumps to lalaland. bad banking?
+GAMEL( 1992, micronic,   cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "Micronic",          "Cherry Bonus III (Micronic v1.2, hack)",      0,                   layout_cmv4 ) // needs layout
 
 GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                  layout_tonypok )
 GAME(  1999, jkrmast,    0,        jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    0 )
