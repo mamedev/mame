@@ -252,10 +252,12 @@ void pg1000_state::palette_init(palette_device &palette)
 
 void pg1000_state::pg1000(machine_config &config)
 {
-	// TODO: Parameter In port
-
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(
 		[this] (bool state) { m_mdin_bit = state; }
+	);
+
+	MIDI_PORT(config, "paramin", midiin_slot, "midiin").rxd_handler().set(
+		[this] (bool state) { m_paramin_bit = state; }
 	);
 
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");

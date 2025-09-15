@@ -24,7 +24,7 @@ public:
 		, m_top_slider(*this, "top_slider_%u", 0U)
 		, m_middle_slider(*this, "middle_slider_%u", 0U)
 		, m_bottom_slider(*this, "bottom_slider_%u", 0U)
-// TODO:	, m_paramin(*this, "paramin")
+		, m_paramin(*this, "paramin")
 		, m_mdin(*this, "mdin")
 		, m_mdout(*this, "mdout")
 		, m_scan(0)
@@ -54,7 +54,7 @@ private:
 	required_ioport_array<13> m_top_slider;
 	required_ioport_array<23> m_middle_slider;
 	required_ioport_array<20> m_bottom_slider;
-// TODO: optional_device<midi_port_device> m_paramin;
+	optional_device<midi_port_device> m_paramin;
 	optional_device<midi_port_device> m_mdin;
 	optional_device<midi_port_device> m_mdout;
 
