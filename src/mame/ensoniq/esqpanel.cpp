@@ -4,8 +4,13 @@
     Ensoniq panel/display device
 */
 #include "emu.h"
+#include "ioport.h"
 #include "esqpanel.h"
 #include "extpanel.h"
+
+#include "vfx.lh"
+#include "vfxsd.lh"
+#include "sd1.lh"
 
 #include "main.h"
 
@@ -45,12 +50,13 @@ esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type
 	device_t(mconfig, type, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_external_panel(*this, "esq_external_panel"),
-	m_light_states(0x3f), // maximum number of lights
+	m_light_states(),
 	m_write_tx(*this),
 	m_write_analog(*this),
 	m_read_analog(*this, 0)
 {
 	std::fill(std::begin(m_xmitring), std::end(m_xmitring), 0);
+	m_light_states.reserve(0x80);
 }
 
 
@@ -247,9 +253,16 @@ uint16_t esqpanel_device::get_analog_value(offs_t offset)
 	return m_read_analog(offset, 0);
 }
 
-
 void esqpanel_device::set_button(uint8_t button, bool pressed)
 {
+	printf("esqpanel.set_button(%d, %d)\r\n", button, pressed);
+	bool current = m_pressed_buttons.find(button) != m_pressed_buttons.end();
+	if (pressed == current)
+	{
+		printf("- button %d already %d, skipping\r\n", button, pressed);
+		return;
+	}
+
 	uint8_t sendme = (pressed ? 0x80 : 0) | (button & 0xff);
 	// printf("button %d %s : sending char to mainboard: %02x\n", button, down ? "down" : "up", sendme);
 	xmit_char(sendme);
@@ -270,6 +283,7 @@ TIMER_CALLBACK_MEMBER(esqpanel_device::check_external_panel_server) {
 	{
 		switch (c.kind) {
 			case esq_external_panel_device::Command::ButtonKind:
+				printf("Panel Handling button event from external panel\r\n");
 				set_button(c.button, c.pressed);
 				break;
 
@@ -318,17 +332,31 @@ esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const ch
 
 /* panel with 2x40 VFD display used in the VFX, VFX-SD, SD-1 series */
 
+esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	esqpanel_device(mconfig, ESQPANEL2X40_VFX, tag, owner, clock),
+	m_vfd(*this, "vfd"),
+	m_lights(*this, "lights"),
+	m_variant(*this, "variant"), // an output on the panel
+	m_buttons_0(*this, "buttons_0"),
+	m_buttons_32(*this, "buttons_32"),
+	m_analog_data_entry(*this, "analog_data_entry"),
+	m_analog_volume(*this, "analog_volume")
+{
+	m_eps_mode = false;
+}
+
 void esqpanel2x40_vfx_device::device_add_mconfig(machine_config &config)
 {
 	ESQ2X40_VFX(config, m_vfd, 60);
 	ESQ_EXTERNAL_PANEL(config, m_external_panel, 0);
-}
 
-esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	esqpanel_device(mconfig, ESQPANEL2X40_VFX, tag, owner, clock),
-	m_vfd(*this, "vfd")
-{
-	m_eps_mode = false;
+	const std::string &name = owner()->shortname();
+	if (name == "vfx")
+		config.set_default_layout(layout_vfx);
+	else if (name == "vfxsd")
+		config.set_default_layout(layout_vfxsd);
+	else // "sd1" or "sd132"
+		config.set_default_layout(layout_sd1);
 }
 
 void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
@@ -376,7 +404,12 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 		// 3 = Blinking
 		auto light_state = (data & 0xc0) >> 6;
 		m_light_states[light_number] = light_state;
+
+		// update the internal panel
+		update_lights();
+		// and any external panel
 		m_external_panel->set_light(light_number, light_state);
+
 		m_expect_light_second_byte = false;
 	}
 	else if (data == 0xfb)   // request calibration
@@ -463,18 +496,34 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 	}
 }
 
+void esqpanel2x40_vfx_device::update_lights() {
+	// set the lights according to their status and bllink phase.
+	int32_t lights = 0;
+	int32_t bit = 1;
+	for (int i = 0; i < 16; i++)
+	{
+		if (m_light_states[i] == 2 || (m_light_states[i] == 3 && ((m_blink_phase & 1) == 0)))
+		{
+			lights |= bit;
+		} 
+		bit <<= 1;
+	}
+	m_lights = lights;
+}
+
 TIMER_CALLBACK_MEMBER(esqpanel2x40_vfx_device::update_blink) {
 	m_blink_phase = (m_blink_phase + 1) & 3;
 	m_vfd->set_blink_on(m_blink_phase & 2);
 	m_external_panel->set_blink_phase(m_blink_phase);
+	update_lights();
 }
 
 void esqpanel2x40_vfx_device::device_start()
 {
 	esqpanel_device::device_start();
 
-	m_external_panel->set_keyboard(owner()->shortname());
-	m_external_panel->set_version("1");
+	m_variant.resolve();
+	m_lights.resolve();
 
 	m_blink_timer = timer_alloc(FUNC(esqpanel2x40_vfx_device::update_blink), this);
 	m_blink_timer->enable(false);
@@ -484,6 +533,23 @@ void esqpanel2x40_vfx_device::device_reset()
 {
 	esqpanel_device::device_reset();
 
+	const std::string &shortname = owner()->shortname();
+	bool has_seq = shortname.find("sd") != std::string::npos;
+	bool has_bank_set = shortname.find("1") != std::string::npos;
+	bool has_32_voices = shortname.find("32") != std::string::npos;
+
+	u32 bit_seq = 1 << 0;
+	u32 bit_bank_set = 1 << 1;
+	u32 bit_32_voices = 1 << 2;
+
+	m_variant = 
+		(has_seq ? bit_seq : 0)
+		| (has_bank_set ? bit_bank_set : 0)
+		| (has_32_voices ? bit_32_voices : 0);
+
+	m_external_panel->set_keyboard(shortname);
+	m_external_panel->set_version("1");
+
 	if (m_blink_timer) {
 		attotime sample_time(0, 250 * ATTOSECONDS_PER_MILLISECOND);
 		attotime initial_delay(0, 250 * ATTOSECONDS_PER_MILLISECOND);
@@ -491,6 +557,8 @@ void esqpanel2x40_vfx_device::device_reset()
 		m_blink_timer->adjust(initial_delay, 0, sample_time);
 		m_blink_timer->enable(true);
 	}
+
+	
 }
 
 void esqpanel2x40_vfx_device::device_reset_after_children()
@@ -545,6 +613,113 @@ void esqpanel2x40_vfx_device::send_light_states()
 	m_external_panel->set_light_states(light_states);
 }
 
+static INPUT_PORTS_START(esqpanel2x40_vfx_device)
+	PORT_START("buttons_0")
+	for (int i = 0; i < 32; i++)
+	{
+		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::button_change), i)
+	}
+
+	PORT_START("buttons_32")
+	for (int i = 0; i < 32; i++)
+	{
+		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::button_change), 32 + i)
+	}
+
+	PORT_START("analog_data_entry")
+	PORT_ADJUSTER(255, "Data Entry")
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::analog_value_change), 3)
+
+	PORT_START("analog_volume")
+	PORT_ADJUSTER(255, "Volume")
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::analog_value_change), 5)
+
+INPUT_PORTS_END
+
+ioport_constructor esqpanel2x40_vfx_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(esqpanel2x40_vfx_device);
+}
+
+// A button is pressed on the internal panel
+INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::button_change)
+{
+	// Update the internal state
+	esqpanel_device::set_button(param, newval != 0);
+
+	// Synchronize the change to the external panel
+	m_external_panel->set_button(param, newval != 0);
+}
+
+// A button is pressed on the external panel
+void esqpanel2x40_vfx_device::set_button(uint8_t button, bool pressed)
+{
+	// Update the internal state
+	esqpanel_device::set_button(button, pressed);
+
+	// Synchronize the change to the internal panel
+	auto &port = button < 32 ? m_buttons_0 : m_buttons_32;
+	auto bit = 1 << (button % 32);
+	port->field(bit)->set_value(pressed);
+}
+
+// An anlog value was changed on the internal panel
+INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::analog_value_change)
+{
+	if (oldval == 255)
+	{
+		// This is the initial write from the layout. Skip this.
+		printf("skipping initial write from internal panel to channnel %d\r\n", param);
+		return;
+	}
+
+	int channel = param;
+	int clamped = std::max(0, std::min(100, (int)newval));
+	int value = (1023 << 6) * clamped / 100;
+	esqpanel_device::set_analog_value(channel, value);
+	printf("sending analog channel %d value %d to external panel\r\n", channel, value);
+	m_external_panel->set_analog_value(channel, value);
+}
+
+// An anlog value was changed on the external panel
+void esqpanel2x40_vfx_device::set_analog_value(offs_t offset, uint16_t value)
+{
+	// Update the internal state
+	esqpanel_device::set_analog_value(offset, value);
+
+	int intvalue = 100 * ((int)value) / (1023 << 6);
+
+	// Synchronize the change to the internal panel by writing it to the corresponding io port
+	if (offset == 3)
+	{
+		set_adjuster_value(m_analog_data_entry, intvalue);
+		printf("Setting data entry io port to %d\r\n", intvalue);
+	}
+	else if (offset == 5)
+	{
+		set_adjuster_value(m_analog_volume, intvalue);
+		printf("Setting volume io port to %d\r\n", intvalue);
+	}
+}
+
+ioport_value esqpanel2x40_vfx_device::get_adjuster_value(required_ioport &ioport)
+{
+	auto field = ioport->fields().first();
+	ioport_field::user_settings user_settings;
+	field->get_user_settings(user_settings);
+	return user_settings.value;
+}
+
+void esqpanel2x40_vfx_device::set_adjuster_value(required_ioport &ioport, const ioport_value & value)
+{
+	auto field = ioport->fields().first();
+	ioport_field::user_settings user_settings;
+	field->get_user_settings(user_settings);
+	user_settings.value = value;
+	field->set_user_settings(user_settings);
+}
 
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
 void esqpanel2x16_sq1_device::device_add_mconfig(machine_config &config)

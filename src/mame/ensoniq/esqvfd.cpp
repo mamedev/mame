@@ -10,7 +10,6 @@
 
 #include "esq1by22.lh"
 #include "esq2by40.lh"
-#include "esq2by40_vfx.lh"
 
 DEFINE_DEVICE_TYPE(ESQ1X22,     esq1x22_device,     "esq1x22",     "Ensoniq 1x22 VFD")
 DEFINE_DEVICE_TYPE(ESQ2X40,     esq2x40_device,     "esq2x40",     "Ensoniq 2x40 VFD")
@@ -424,7 +423,9 @@ void esq2x40_vfx_device::update_display()
 
 void esq2x40_vfx_device::device_add_mconfig(machine_config &config)
 {
-	config.set_default_layout(layout_esq2by40_vfx);
+	// Do not set a default layout. This display must be used
+	// within a layout that includes the VFD elements, such as
+	// vfx.lay, vfxsd.lay or sd1.lay.
 }
 
 void esq2x40_vfx_device::set_blink_on(bool blink_on) {
