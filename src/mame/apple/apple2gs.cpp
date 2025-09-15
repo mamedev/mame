@@ -1559,8 +1559,8 @@ u8 apple2gs_state::c000_r(offs_t offset)
 		case 0x18:  // read 80STORE
 			return (uKeyboardC010 & 0x7f) | (m_video->get_80store() ? 0x80 : 0x00);
 
-		case 0x19:  // read VBLBAR
-			return (uKeyboardC010 & 0x7f) | (m_screen->vblank() ? 0x00 : 0x80);
+		case 0x19:  // read VBL (not VBLBAR, see Apple IIGS Technical Note #40)
+			return (uKeyboardC010 & 0x7f) | (m_screen->vblank() ? 0x80 : 0x00);
 
 		case 0x1a:  // read TEXT
 			return (uKeyboardC010 & 0x7f) | (m_video->get_graphics() ? 0x00 : 0x80);
