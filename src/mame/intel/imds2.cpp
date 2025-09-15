@@ -2,7 +2,7 @@
 // copyright-holders:F. Ulivi
 //
 // ***************************************
-// Driver for Intel Intellec MDS series-II
+// Driver for Intel Intellec Series II MDS
 // ***************************************
 //
 // Documentation used for this driver:
@@ -13,7 +13,9 @@
 //
 // All these manuals are available on http://www.bitsavers.org
 //
-// An Intellec MDS series-II is composed of the following boards:
+// The default configuration emulated by this driver is equivalent to a Model 225 MDS.
+//
+// An Intellec Series II MDS is composed of the following boards:
 //
 // **********
 // Integrated Processor Card (IPC) or Integrated Processor Board (IPB)
@@ -347,4 +349,4 @@ ROM_END
 
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME */
-COMP( 1979, imds2, 0,      0,      imds2,   imds2, imds2_state, empty_init, "Intel", "Intellec MDS-II", 0)
+COMP( 1979, imds2, 0,      0,      imds2,   imds2, imds2_state, empty_init, "Intel", "Intellec Series II Microcomputer Development System, Model 225", 0)
