@@ -37,11 +37,11 @@
   </element>
   <element name="decorative_line">
     <rect>
-      <color red="0.161" green="0.612" blue="0.639" />
+      <color red="0.859" green="0.373" blue="0.416" />
       <bounds x="0" y="0" width="1" height="1" />
     </rect>
     <rect>
-      <color red="0.161" green="0.612" blue="0.639" />
+      <color red="0.859" green="0.373" blue="0.416" />
       <bounds x="0" y="0" width="1" height="1" />
     </rect>
   </element>
@@ -99,14 +99,17 @@
   </group>
 
   <!-- Text items -->
-  <element name="text_cart_C">
-    <text string="Cart" align="0" />
+  <element name="text_bankset_C">
+    <text string="BankSet" align="0" />
   </element>
   <element name="text_sounds_C">
     <text string="Sounds" align="0" />
   </element>
   <element name="text_presets_C">
     <text string="Presets" align="0" />
+  </element>
+  <element name="text_seq_C">
+    <text string="Seq" align="0" />
   </element>
   <element name="text_0_C">
     <text string="0" align="0" />
@@ -198,14 +201,41 @@
   <element name="text_timbre_L">
     <text string="Timbre" align="1" />
   </element>
+  <element name="text_rec_L">
+    <text string="Rec" align="1" />
+  </element>
+  <element name="text_stop_L">
+    <text string="Stop" align="1" />
+  </element>
+  <element name="text__cont_L">
+    <text string="/Cont" align="1" />
+  </element>
+  <element name="text_play_L">
+    <text string="Play" align="1" />
+  </element>
+  <element name="text_click_L">
+    <text string="Click" align="1" />
+  </element>
+  <element name="text_seq_L">
+    <text string="Seq" align="1" />
+  </element>
+  <element name="text_control_L">
+    <text string="Control" align="1" />
+  </element>
+  <element name="text_locate_L">
+    <text string="Locate" align="1" />
+  </element>
+  <element name="text_song_L">
+    <text string="Song" align="1" />
+  </element>
+  <element name="text_track_L">
+    <text string="Track" align="1" />
+  </element>
   <element name="text_master_L">
     <text string="Master" align="1" />
   </element>
   <element name="text_storage_L">
     <text string="Storage" align="1" />
-  </element>
-  <element name="text_control_L">
-    <text string="Control" align="1" />
   </element>
   <element name="text_wave_L">
     <text string="Wave" align="1" />
@@ -243,8 +273,8 @@
   <element name="text_performance_L">
     <text string="Performance" align="1" />
   </element>
-  <element name="text_system_L">
-    <text string="System" align="1" />
+  <element name="text_sequencer_L">
+    <text string="Sequencer" align="1" />
   </element>
   <element name="text_programming_L">
     <text string="Programming" align="1" />
@@ -285,6 +315,22 @@
   <element name="button_6_2_dark">
     <image state="0">
       <color red="0.2" green="0.2" blue="0.2" />
+      <data>
+        <![CDATA[
+          <svg width="6" height="2" viewBox="0 0 6 2"><rect x="0.1" y="0.1" width="5.8" height="1.8" rx="0.5" fill="white" /></svg>
+        ]]></data>
+    </image>
+    <image state="1">
+      <color red="1" green="1" blue="1" />
+      <data>
+        <![CDATA[
+          <svg width="6" height="2" viewBox="0 0 6 2"><rect x="0.1" y="0.1" width="5.8" height="1.8" rx="0.5" fill="white" /></svg>
+        ]]></data>
+    </image>
+  </element>
+  <element name="button_6_2_light">
+    <image state="0">
+      <color red="0.733" green="0.733" blue="0.733" />
       <data>
         <![CDATA[
           <svg width="6" height="2" viewBox="0 0 6 2"><rect x="0.1" y="0.1" width="5.8" height="1.8" rx="0.5" fill="white" /></svg>
@@ -511,7 +557,7 @@
       <bounds x="15" y="9.0713" width="82" height="6.8573" />
 
     </group>
-    <element ref="text_cart_C">
+    <element ref="text_bankset_C">
       <bounds x="10" y="35" width="6" height="1.8" />
     </element>
     <element ref="text_sounds_C">
@@ -519,6 +565,9 @@
     </element>
     <element ref="text_presets_C">
       <bounds x="22" y="35" width="6" height="1.8" />
+    </element>
+    <element ref="text_seq_C">
+      <bounds x="28" y="35" width="6" height="1.8" />
     </element>
     <element ref="text_0_C">
       <bounds x="42" y="35" width="6" height="1.8" />
@@ -613,17 +662,50 @@
     <element ref="text_timbre_L">
       <bounds x="120" y="4.2" width="6" height="1.8" />
     </element>
-    <element ref="text_master_L">
+    <element ref="text_rec_L">
       <bounds x="131" y="27.2" width="6" height="1.8" />
     </element>
-    <element ref="text_storage_L">
+    <element ref="text_stop_L">
+      <bounds x="137" y="25.4" width="6" height="1.8" />
+    </element>
+    <element ref="text__cont_L">
       <bounds x="137" y="27.2" width="6" height="1.8" />
     </element>
-    <element ref="text_midi_L">
-      <bounds x="143" y="25.4" width="6" height="1.8" />
+    <element ref="text_play_L">
+      <bounds x="143" y="27.2" width="6" height="1.8" />
+    </element>
+    <element ref="text_click_L">
+      <bounds x="131" y="18.2" width="6" height="1.8" />
+    </element>
+    <element ref="text_seq_L">
+      <bounds x="137" y="16.4" width="6" height="1.8" />
     </element>
     <element ref="text_control_L">
-      <bounds x="143" y="27.2" width="6" height="1.8" />
+      <bounds x="137" y="18.2" width="6" height="1.8" />
+    </element>
+    <element ref="text_locate_L">
+      <bounds x="143" y="18.2" width="6" height="1.8" />
+    </element>
+    <element ref="text_song_L">
+      <bounds x="131" y="11.2" width="6" height="1.8" />
+    </element>
+    <element ref="text_seq_L">
+      <bounds x="137" y="11.2" width="6" height="1.8" />
+    </element>
+    <element ref="text_track_L">
+      <bounds x="143" y="11.2" width="6" height="1.8" />
+    </element>
+    <element ref="text_master_L">
+      <bounds x="131" y="4.2" width="6" height="1.8" />
+    </element>
+    <element ref="text_storage_L">
+      <bounds x="137" y="4.2" width="6" height="1.8" />
+    </element>
+    <element ref="text_midi_L">
+      <bounds x="143" y="2.4" width="6" height="1.8" />
+    </element>
+    <element ref="text_control_L">
+      <bounds x="143" y="4.2" width="6" height="1.8" />
     </element>
     <element ref="text_wave_L">
       <bounds x="154" y="18.2" width="6" height="1.8" />
@@ -679,7 +761,7 @@
     <element ref="text_performance_L">
       <bounds x="108" y="35" width="10" height="1.8" />
     </element>
-    <element ref="text_system_L">
+    <element ref="text_sequencer_L">
       <bounds x="131" y="35" width="10" height="1.8" />
     </element>
     <element ref="text_programming_L">
@@ -693,6 +775,9 @@
     </element>
     <element inputtag="buttons_32" inputmask="0x00400000" ref="button_6_4_light" id="button_54__presets">
       <bounds x="22" y="29" width="6" height="4" />
+    </element>
+    <element inputtag="buttons_32" inputmask="0x00080000" ref="button_6_4_light" id="button_51__seq">
+      <bounds x="28" y="29" width="6" height="4" />
     </element>
     <element inputtag="buttons_32" inputmask="0x00800000" ref="button_6_4_medium" id="button_55__0">
       <bounds x="42" y="29" width="6" height="4" />
@@ -772,14 +857,41 @@
     <element inputtag="buttons_32" inputmask="0x00000040" ref="button_6_2_dark" id="button_38_timbre">
       <bounds x="120" y="6" width="6" height="2" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00100000" ref="button_6_4_light" id="button_20_master">
+    <element inputtag="buttons_0" inputmask="0x00080000" ref="button_6_4_medium" id="button_19_rec">
       <bounds x="131" y="29" width="6" height="4" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00200000" ref="button_6_4_light" id="button_21_storage">
+    <element inputtag="buttons_0" inputmask="0x00400000" ref="button_6_4_medium" id="button_22_stop_cont">
       <bounds x="137" y="29" width="6" height="4" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x01000000" ref="button_6_4_light" id="button_24_midi_control">
+    <element inputtag="buttons_0" inputmask="0x00800000" ref="button_6_4_medium" id="button_23_play">
       <bounds x="143" y="29" width="6" height="4" />
+    </element>
+    <element inputtag="buttons_32" inputmask="0x00000001" ref="button_6_2_dark" id="button_32_click">
+      <bounds x="131" y="20" width="6" height="2" />
+    </element>
+    <element inputtag="buttons_0" inputmask="0x00040000" ref="button_6_2_dark" id="button_18_seq_control">
+      <bounds x="137" y="20" width="6" height="2" />
+    </element>
+    <element inputtag="buttons_32" inputmask="0x00000002" ref="button_6_2_dark" id="button_33_locate">
+      <bounds x="143" y="20" width="6" height="2" />
+    </element>
+    <element inputtag="buttons_32" inputmask="0x10000000" ref="button_6_2_dark" id="button_60_song">
+      <bounds x="131" y="13" width="6" height="2" />
+    </element>
+    <element inputtag="buttons_32" inputmask="0x08000000" ref="button_6_2_dark" id="button_59_seq">
+      <bounds x="137" y="13" width="6" height="2" />
+    </element>
+    <element inputtag="buttons_32" inputmask="0x20000000" ref="button_6_2_dark" id="button_61_track">
+      <bounds x="143" y="13" width="6" height="2" />
+    </element>
+    <element inputtag="buttons_0" inputmask="0x00100000" ref="button_6_2_light" id="button_20_master">
+      <bounds x="131" y="6" width="6" height="2" />
+    </element>
+    <element inputtag="buttons_0" inputmask="0x00200000" ref="button_6_2_light" id="button_21_storage">
+      <bounds x="137" y="6" width="6" height="2" />
+    </element>
+    <element inputtag="buttons_0" inputmask="0x01000000" ref="button_6_2_light" id="button_24_midi_control">
+      <bounds x="143" y="6" width="6" height="2" />
     </element>
     <element inputtag="buttons_0" inputmask="0x00000010" ref="button_6_2_dark" id="button_4_wave">
       <bounds x="154" y="20" width="6" height="2" />
