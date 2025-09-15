@@ -31,9 +31,9 @@ public:
 	void xmit_char(uint8_t data);
 
 	void set_char(int row, int column, uint8_t c, uint8_t attr);
-	void set_analog_value(offs_t offset, uint16_t value);
+	virtual void set_analog_value(offs_t offset, uint16_t value);
 	uint16_t get_analog_value(offs_t offset);
-	void set_button(uint8_t button, bool pressed);
+	virtual void set_button(uint8_t button, bool pressed);
 
 protected:
 	// construction/destruction
@@ -109,11 +109,15 @@ class esqpanel2x40_vfx_device : public esqpanel_device {
 public:
 	esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	DECLARE_INPUT_CHANGED_MEMBER(button_change);
+	DECLARE_INPUT_CHANGED_MEMBER(analog_value_change);
+
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_reset_after_children() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override;
 
 	virtual void send_to_display(uint8_t data) override { }
 	virtual void rcv_complete() override;    // Rx completed receiving byte
@@ -123,6 +127,9 @@ protected:
 	virtual void send_button_states() override;
 	virtual void send_light_states() override;
 
+	virtual void set_button(uint8_t button, bool pressed) override;
+	virtual void set_analog_value(offs_t offset, uint16_t value) override;
+
 	required_device<esq2x40_vfx_device> m_vfd;
 
 	static constexpr uint8_t AT_NORMAL      = 0x00;
@@ -131,6 +138,9 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(update_blink);
 
+	ioport_value get_adjuster_value(required_ioport &ioport);
+	void set_adjuster_value(required_ioport &ioport, const ioport_value & value);
+
 private:
 	int m_cursx = 0, m_cursy = 0;
 	int m_savedx = 0, m_savedy = 0;
@@ -138,6 +148,17 @@ private:
 
 	emu_timer *m_blink_timer = nullptr;
 	uint8_t m_blink_phase;
+
+	void update_lights();
+
+	output_finder<> m_lights;
+	output_finder<> m_variant;
+
+	required_ioport m_buttons_0;
+	required_ioport m_buttons_32;
+	required_ioport m_analog_data_entry;
+	required_ioport m_analog_volume;
+
 };
 
 class esqpanel2x40_sq1_device : public esqpanel_device {
