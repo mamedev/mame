@@ -2150,7 +2150,8 @@ void cb3_state::ncb3_map(address_map &map)
 {
 	map(0x0000, 0xb7ff).rom();
 	map(0xb800, 0xbfff).ram().share("nvram");
-	map(0xc000, 0xc7ff).rom();
+	map(0xc000, 0xc7ff).ram();
+
 	map(0xc800, 0xcfff).ram().w(FUNC(cb3_state::fg_vidram_w)).share(m_fg_vidram);
 	map(0xd000, 0xd7ff).ram().w(FUNC(cb3_state::fg_atrram_w)).share(m_fg_atrram);
 	map(0xd800, 0xd9ff).ram().w(FUNC(cb3_state::reel_ram_w<0>)).share(m_reel_ram[0]);
@@ -2208,6 +2209,13 @@ void cb3_state::ncb3_readwriteport(address_map &map)
 //  map(0x02, 0x02).r(FUNC(cb3_state::ncb3_unkread_r));    // read from 0x02 when controls set 2 is used...
 //  map(0x06, 0x06).r(FUNC(cb3_state::ncb3_unkread_r));    // unknown...
 //  map(0x08, 0x08).r(FUNC(cb3_state::ncb3_unkread_r));    // unknown...
+
+	map(0x02, 0x02).nopr();
+	map(0x06, 0x06).nopw();
+	map(0x08, 0x08).noprw();
+	map(0x13, 0x13).nopw();
+	
+
 	map(0x10, 0x10).portr("DSW5");  // confirmed for ncb3
 	map(0x81, 0x81).w(FUNC(cb3_state::ncb3_port81_w));  // ---> large writes.
 
@@ -5734,9 +5742,8 @@ static INPUT_PORTS_START( ncb3 )
 	// Double Up Game OK
 	// Bet Max OK
 
-	PORT_INCLUDE( cmv4_dsw2 )
-	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x07, 0x00, "Main Game Pay Rate" )    PORT_DIPLOCATION("DSW2:1,2,3")  // OK
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x00, "Main Game Pay Rate" )        PORT_DIPLOCATION("DSW2:1,2,3")  // OK
 	PORT_DIPSETTING(    0x00, "55%" )
 	PORT_DIPSETTING(    0x01, "60%" )
 	PORT_DIPSETTING(    0x02, "65%" )
@@ -5745,10 +5752,24 @@ static INPUT_PORTS_START( ncb3 )
 	PORT_DIPSETTING(    0x05, "80%" )
 	PORT_DIPSETTING(    0x06, "85%" )
 	PORT_DIPSETTING(    0x07, "90%" )
-	// Hopper Limit not checked
+	PORT_DIPNAME( 0x18, 0x00, "Hopper Limit" )              PORT_DIPLOCATION("DSW2:4,5")
+	PORT_DIPSETTING(    0x00, "Unlimited" )
+	PORT_DIPSETTING(    0x08, "1000" )
+	PORT_DIPSETTING(    0x10, "500" )
+	PORT_DIPSETTING(    0x18, "300" )
+	PORT_DIPNAME( 0x20, 0x20, "100+ Odds Sound" )           PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Key In Type" )               PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, "A-Type" )
+	PORT_DIPSETTING(    0x00, "B-Type" )
+	PORT_DIPNAME( 0x80, 0x00, "Center Super 7 Bet Limit" )  PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, "Unlimited" )
+	PORT_DIPSETTING(    0x00, "Limited" )
 	// 100+ Odds Sound not checked
 	// Key In Type OK - note that definition of A-Type and B-Type are reversed compared to cmv4
 	// Center Super 7 Bet Limit related with Min. Bet For Bonus Play (DSW4-6)
+
 
 	PORT_INCLUDE( cb3_dsw3 )  // all OK
 
@@ -26405,7 +26426,7 @@ GAMEL( 199?, cb3e,       ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e
 GAMEL( 199?, cb3f,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3f,      ROT0, "bootleg (Cleco)",   "Cherry Bonus III (set 5, encrypted bootleg)", MACHINE_NOT_WORKING, layout_chrygld ) // partially decrypted, stops at 'call attendant'
 GAMEL( 199?, cb3g,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 6)",          0,                 layout_cherryb3 )
 GAMEL( 199?, cb3h,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 7)",          0,                 layout_cherryb3 )
-GAMEL( 199?, cb3s51,     ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.5.1)",                  MACHINE_NOT_WORKING, layout_cherryb3 ) // I/O need checking, seems to be working
+GAMEL( 199?, cb3s51,     ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.5.1)",                  0,                 layout_cherryb3 )
 GAMEL( 199?, chryglda,   ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
 GAME(  1994, chryangla,  ncb3,     chryangla,ncb3,     cb3_state,      init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING ) // DYNA CB3  V1.40 string, decrypted but only test screens work
 
