@@ -4,7 +4,25 @@
 
 	Roland PG-1000 programmer.
 
-	To be used alongside Roland D50/D550/MT-32
+	To be used alongside Roland D-50/D-550/MT-32
+
+-----------------------------------------------------------------------------
+
+	Notes:
+		midiin1 is the usual "MIDI IN" port.
+		midiin2 is the "Parameter In" port.
+
+	usage:
+		mame pg1000 -midiin1 "ctrl" -midiin2 "synth" -midiout "synth"
+
+	where:
+		"ctrl" is a MIDI OUT device such as
+		an external usb midi keyboard controller.
+
+		"synth" is a D-50 or a D-550.
+		(and I guess it may work with a Roland MT-32 as well)
+
+	During developmet, I tested this setup using a real Roland D-550.
 
 ****************************************************************************/
 
