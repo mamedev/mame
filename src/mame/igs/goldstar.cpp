@@ -11926,7 +11926,6 @@ void cmaster_state::cm(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(cmaster_state::screen_update_goldstar<false>));
@@ -17738,16 +17737,16 @@ ROM_START( nd8lines )
 ROM_END
 
 /*
-  Hamburger House (햄버거 하우스, Cherry Master Clone). String "DYNA CM-1  V1.01" on program ROM.
-  -1 x LGS Z8400B
-  -1 x Lattice ispLSI 1024 80LJ
-  -3V Battery
-  -2 x D71055C
-  -1 x Jfc 95101
-  -3 banks of 8 DIP switches
-  -12.000 MHz xtal
+  Hamburger House (햄버거 하우스, Cherry Master Clone).
+  String "DYNA CM-1  V1.01" on program ROM.
 
-  Video from the real PCB: https://youtu.be/qiSw044Twdc
+  1x LGS Z8400B
+  1x Lattice ispLSI 1024 80LJ
+  3V. Battery
+  2x D71055C
+  1x JFC 95101
+  3 banks of 8 DIP switches
+  12.000 MHz xtal
 
 */
 ROM_START( hamhouse )
@@ -17760,12 +17759,12 @@ ROM_START( hamhouse )
 	ROM_LOAD( "7_27c256.u43",       0x10000, 0x08000, CRC(31c419f0) SHA1(7c827af5c208bab0ca143558581a57b0b355a3ad) )
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
-	ROM_LOAD( "3_hy27c64ad-15.u24", 0x00000, 0x02000, BAD_DUMP CRC(c13b3fa8) SHA1(8ae6d4bb468a4c1f98c3a059cda6531e3289333d) )  // Bitrotten
-	ROM_LOAD( "4_d27128a.u26",      0x02000, 0x02000, CRC(8cf3845e) SHA1(4f672d256548211c48e60ce89718c3c195f187d5) )  // 1ST AND 2ND HALF IDENTICAL
-	ROM_IGNORE( 0x2000 )
-	ROM_LOAD( "1_27c64-20.u10",     0x04000, 0x02000, CRC(c4efc953) SHA1(da24c802d33be377ad6d6a357ed32d5214ca7a3f) )
-	ROM_LOAD( "2_27c256.u11",       0x06000, 0x02000, CRC(fac9fe6c) SHA1(0c55c017957d65121b9cc876d914cca2dec5e94e) )  // BADADDR         --xxxxxxxxxxxxx
-	ROM_IGNORE( 0x6000 )
+	ROM_LOAD( "3_27c64.u24",  0x00000, 0x02000, CRC(7f9c41db) SHA1(64c5fb779ecc05eae3264c7767c571eb76fb389f) )
+	ROM_LOAD( "4_27128.u26",  0x02000, 0x02000, CRC(8cf3845e) SHA1(4f672d256548211c48e60ce89718c3c195f187d5) )  // identical halves
+	ROM_IGNORE(                        0x02000 )
+	ROM_LOAD( "1_27c64.u10",  0x04000, 0x02000, CRC(c4efc953) SHA1(da24c802d33be377ad6d6a357ed32d5214ca7a3f) )
+	ROM_LOAD( "2_27c256.u11", 0x06000, 0x02000, CRC(fac9fe6c) SHA1(0c55c017957d65121b9cc876d914cca2dec5e94e) )  // identical quarters
+	ROM_IGNORE(                        0x06000 )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 
@@ -26473,7 +26472,7 @@ GAMEL( 1992, reelmagic,  cmaster,  reelmg,   cmasterb, cmaster_state,  init_reel
 GAMEL( 1992, reelmagica, cmaster,  cm,       cmasterb, cmaster_state,  init_reelmag,   ROT0, "bootleg",           "Super Reel Magic (ver.6.3.0, set 2)",         0,                   layout_cmv4 ) // needs layout
 GAMEL( 1992, rm_7bonus,  cmaster,  cm,       cmasterb, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus, set 1)", 0,                  layout_cmaster ) // needs layout
 GAMEL( 1992, rm_7bonusa, cmaster,  cm,       cmasterb, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus, set 2)", 0,                  layout_cmaster ) // needs layout
-GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
+GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             0,                   layout_cmaster )
 GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 GAMEL( 199?, alienatt,   cmaster,  cm,       cmaster,  cmaster_state,  init_alienatt,  ROT0, "bootleg",           "Allien Attack",                               MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 GAMEL( 1992, micronic,   cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "Micronic",          "Cherry Bonus III (Micronic v1.2, hack)",      0,                   layout_cmv4 ) // needs layout
