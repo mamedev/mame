@@ -34,6 +34,7 @@
 #include "screen.h"
 #include "pg1000.lh"
 
+namespace {
 
 class pg1000_state : public driver_device
 {
@@ -483,5 +484,7 @@ ROM_START(pg1000)
 	ROMX_LOAD("roland_pg-1000_v1.01.ic4", 0x000, 0x2000, CRC(9f9bcf76) SHA1(da5a45c65a04c35d7a615c6f043ccaf958b0d65e), ROM_BIOS(1))
 	ROMX_LOAD("roland_pg-1000_v1.00.ic4", 0x000, 0x2000, CRC(c09ef84e) SHA1(d780d4d53e57918e6ea8098f54f5c9b43aeec287), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
 
 SYST(1987, pg1000,  0,   0, pg1000,  pg1000, pg1000_state, empty_init, "Roland", "PG-1000 Linear Synthesizer Programmer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
