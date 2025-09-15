@@ -15732,7 +15732,7 @@ ROM_START( rm_7bonusa )
 	ROM_LOAD( "82s129.u46", 0x000, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
-ROM_START( micronic )
+ROM_START( cb3micro )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "micronic_v1.2.bin", 0x0000, 0x1000, CRC(2395575e) SHA1(f475e1162017a4797069bdd8e2e36be8953cbbbf) )
 	ROM_CONTINUE(0x4000, 0x1000)
@@ -15759,7 +15759,7 @@ ROM_START( micronic )
 	// not populated
 
 	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
-	ROM_LOAD( "micronic_nvram.bin", 0x0000, 0x0800, CRC(b0b674ec) SHA1(deab5aec0d9f61851163cba40ca434a23580ff13) )
+	ROM_LOAD( "cb3micro_nvram.bin", 0x0000, 0x0800, CRC(b0b674ec) SHA1(deab5aec0d9f61851163cba40ca434a23580ff13) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x000, 0x100, CRC(208727e7) SHA1(7c868b06da03fe95266555775b8185d38e25ce3f) )
@@ -26473,9 +26473,9 @@ GAMEL( 1992, reelmagica, cmaster,  cm,       cmasterb, cmaster_state,  init_reel
 GAMEL( 1992, rm_7bonus,  cmaster,  cm,       cmasterb, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus, set 1)", 0,                  layout_cmaster ) // needs layout
 GAMEL( 1992, rm_7bonusa, cmaster,  cm,       cmasterb, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus, set 2)", 0,                  layout_cmaster ) // needs layout
 GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             0,                   layout_cmaster )
-GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
+GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           0,                   layout_cmaster )
 GAMEL( 199?, alienatt,   cmaster,  cm,       cmaster,  cmaster_state,  init_alienatt,  ROT0, "bootleg",           "Allien Attack",                               MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
-GAMEL( 1992, micronic,   cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "Micronic",          "Cherry Bonus III (Micronic v1.2, hack)",      0,                   layout_cmv4 ) // needs layout
+GAMEL( 1992, cb3micro,   cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "Micronic",          "Cherry Bonus III (Micronic v1.2, hack)",      0,                   layout_cmv4 ) // needs layout
 
 GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                  layout_tonypok )
 GAME(  1999, jkrmast,    0,        jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    0 )
