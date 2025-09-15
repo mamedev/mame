@@ -2353,7 +2353,7 @@ ROM_START( mmaulersu )
 	ROM_LOAD("170a15.2m", 0x200000, 0x200000, CRC(d4113ae9) SHA1(e234d06f462e3db64455c384c2f42174f9ef9c6a) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
-	ROM_LOAD( "mmaulers.nv", 0x0000, 0x080, CRC(8324f517) SHA1(4697d091a1924e1a5d6c3ffc64a40fd36eebe557) )
+	ROM_LOAD( "mmaulersu.nv", 0x0000, 0x080, CRC(dce91748) SHA1(17b2c2b5b699d3e875c6e2e3dbd81401ca3517d4) )
 ROM_END
 
 
