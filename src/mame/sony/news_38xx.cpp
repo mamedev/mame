@@ -77,8 +77,7 @@
 #include "logmacro.h"
 
 
-namespace
-{
+namespace {
 
 using namespace std::literals::string_view_literals;
 
@@ -112,23 +111,9 @@ public:
 	{
 	}
 
-protected:
-	// driver_device overrides
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
+	void nws3860(machine_config &config) ATTR_COLD;
 
-	// address maps
-	void cpu_map(address_map &map) ATTR_COLD;
-	void iop_map(address_map &map) ATTR_COLD;
-	void iop_vector_map(address_map &map) ATTR_COLD;
-
-	// machine config
-	void common(machine_config &config);
-
-public:
-	void nws3860(machine_config &config);
-
-	void init_common();
+	void init_common() ATTR_COLD;
 
 protected:
 	// Not all IRQs feed into the status register directly
@@ -158,23 +143,23 @@ protected:
 		"AST"sv, "SOFTINTR"sv, "FDCIRQ"sv, "PARALLEL"sv, "SLOT"sv, "LANCE"sv, "SCSI0"sv, "SCSI1"sv, "CPU"sv, "UBUS"sv,
 		"SCC"sv, "KEYBOARD"sv, "MOUSE"sv, "TIMER"sv, "FDCDRQ"sv, "PERR"sv
 	};
-	static constexpr u32 IOP_NMI_MASK = 1 << (u32)iop_irq::FDCDRQ |
-										1 << (u32)iop_irq::SCC |
-										1 << (u32)iop_irq::SCSI0 |
-										1 << (u32)iop_irq::SCSI1 |
-										1 << (u32)iop_irq::LANCE |
-										1 << (u32)iop_irq::FDCIRQ |
-										1 << (u32)iop_irq::SLOT |
-										1 << (u32)iop_irq::SOFTINTR |
-										1 << (u32)iop_irq::AST;
+	static constexpr u32 IOP_NMI_MASK = 1 << u32(iop_irq::FDCDRQ) |
+										1 << u32(iop_irq::SCC) |
+										1 << u32(iop_irq::SCSI0) |
+										1 << u32(iop_irq::SCSI1) |
+										1 << u32(iop_irq::LANCE) |
+										1 << u32(iop_irq::FDCIRQ) |
+										1 << u32(iop_irq::SLOT) |
+										1 << u32(iop_irq::SOFTINTR) |
+										1 << u32(iop_irq::AST);
 	static constexpr std::array IOP_LINE_MASK = {
-		std::make_pair(INPUT_LINE_IRQ1, 1 << (u32)iop_irq::AST),
-		std::make_pair(INPUT_LINE_IRQ2, 1 << (u32)iop_irq::SOFTINTR),
-		std::make_pair(INPUT_LINE_IRQ3, 1 << (u32)iop_irq::FDCIRQ | 1 << (u32)iop_irq::PARALLEL | 1 << (u32)iop_irq::SLOT),
-		std::make_pair(INPUT_LINE_IRQ4, 1 << (u32)iop_irq::LANCE | 1 << (u32)iop_irq::SCSI0 | 1 << (u32)iop_irq::SCSI1 | 1 << (u32)iop_irq::CPU | 1 << (u32)iop_irq::UBUS),
-		std::make_pair(INPUT_LINE_IRQ5, 1 << (u32)iop_irq::SCC | 1 << (u32)iop_irq::KEYBOARD | 1 << (u32)iop_irq::MOUSE),
-		std::make_pair(INPUT_LINE_IRQ6, 1 << (u32)iop_irq::TIMER),
-		std::make_pair(INPUT_LINE_IRQ7, 1 << (u32)iop_irq::FDCDRQ | 1 << (u32)iop_irq::PERR)};
+		std::make_pair(INPUT_LINE_IRQ1, 1 << u32(iop_irq::AST)),
+		std::make_pair(INPUT_LINE_IRQ2, 1 << u32(iop_irq::SOFTINTR)),
+		std::make_pair(INPUT_LINE_IRQ3, 1 << u32(iop_irq::FDCIRQ) | 1 << u32(iop_irq::PARALLEL) | 1 << u32(iop_irq::SLOT)),
+		std::make_pair(INPUT_LINE_IRQ4, 1 << u32(iop_irq::LANCE) | 1 << u32(iop_irq::SCSI0) | 1 << u32(iop_irq::SCSI1) | 1 << u32(iop_irq::CPU) | 1 << u32(iop_irq::UBUS)),
+		std::make_pair(INPUT_LINE_IRQ5, 1 << u32(iop_irq::SCC) | 1 << u32(iop_irq::KEYBOARD) | 1 << u32(iop_irq::MOUSE)),
+		std::make_pair(INPUT_LINE_IRQ6, 1 << u32(iop_irq::TIMER)),
+		std::make_pair(INPUT_LINE_IRQ7, 1 << u32(iop_irq::FDCDRQ) | 1 << u32(iop_irq::PERR))};
 
 	enum class cpu_irq : unsigned
 	{
@@ -187,13 +172,25 @@ protected:
 	};
 
 	static constexpr std::array CPU_IRQ_NAMES = {"UBUS"sv, "IOP"sv, "TIMER"sv, "FPA"sv, "WRBERR"sv, "PERR"sv};
-	static constexpr u32 CPU_NMI_MASK = 1 << (u32)cpu_irq::WRBERR | 1 << (u32)cpu_irq::IOP;
+	static constexpr u32 CPU_NMI_MASK = 1 << u32(cpu_irq::WRBERR) | 1 << u32(cpu_irq::IOP);
 	static constexpr std::array CPU_IRQ_LINES = {
 		std::make_pair(INPUT_LINE_IRQ0, cpu_irq::UBUS),
 		std::make_pair(INPUT_LINE_IRQ1, cpu_irq::IOP),
 		std::make_pair(INPUT_LINE_IRQ2, cpu_irq::TIMER),
 		std::make_pair(INPUT_LINE_IRQ4, cpu_irq::WRBERR),
 		std::make_pair(INPUT_LINE_IRQ5, cpu_irq::PERR)};
+
+	// driver_device overrides
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	// address maps
+	void cpu_map(address_map &map) ATTR_COLD;
+	void iop_map(address_map &map) ATTR_COLD;
+	void iop_vector_map(address_map &map) ATTR_COLD;
+
+	// machine config
+	void common(machine_config &config) ATTR_COLD;
 
 	template<iop_irq Number>
 	void irq_w(u8 state);
@@ -326,7 +323,7 @@ void news_38xx_state::machine_reset()
 void news_38xx_state::init_common()
 {
 	// HACK: hardwire the rate
-	m_fdc->set_rate(500000);
+	m_fdc->set_rate(500'000);
 
 	// RAM is always mapped for the CPU, since the MIPS boot vector is well above the max RAM value
 	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
@@ -538,11 +535,11 @@ void news_38xx_state::irq_w(const u8 state)
 
 	if (state)
 	{
-		m_iop_intst |= 1U << (u32)Number;
+		m_iop_intst |= 1U << u32(Number);
 	}
 	else
 	{
-		m_iop_intst &= ~(1U << (u32)Number);
+		m_iop_intst &= ~(1U << u32(Number));
 	}
 
 	int_check_iop();
@@ -564,11 +561,11 @@ void news_38xx_state::inten_w(const u8 state)
 
 	if (state)
 	{
-		m_iop_inten |= 1 << (u32)Number;
+		m_iop_inten |= 1 << u32(Number);
 	}
 	else
 	{
-		m_iop_inten &= ~(1 << (u32)Number);
+		m_iop_inten &= ~(1 << u32(Number));
 	}
 
 	int_check_iop();
@@ -577,7 +574,7 @@ void news_38xx_state::inten_w(const u8 state)
 template<news_38xx_state::iop_irq Number>
 bool news_38xx_state::is_irq_set()
 {
-	return BIT(m_iop_intst, (u32)Number);
+	return BIT(m_iop_intst, u32(Number));
 }
 
 void news_38xx_state::int_check_iop()
@@ -617,11 +614,11 @@ void news_38xx_state::irq_w(const u8 state)
 
 	if (state)
 	{
-		m_cpu_intst |= 1U << (u32)Number;
+		m_cpu_intst |= 1U << u32(Number);
 	}
 	else
 	{
-		m_cpu_intst &= ~(1U << (u32)Number);
+		m_cpu_intst &= ~(1U << u32(Number));
 	}
 
 	int_check_cpu();
@@ -643,11 +640,11 @@ void news_38xx_state::inten_w(const u8 state)
 
 	if (state)
 	{
-		m_cpu_inten |= 1 << (u32)Number;
+		m_cpu_inten |= 1 << u32(Number);
 	}
 	else
 	{
-		m_cpu_inten &= ~(1 << (u32)Number);
+		m_cpu_inten &= ~(1 << u32(Number));
 	}
 
 	int_check_cpu();
@@ -656,16 +653,16 @@ void news_38xx_state::inten_w(const u8 state)
 template<news_38xx_state::cpu_irq Number>
 bool news_38xx_state::is_irq_set()
 {
-	return BIT(m_cpu_intst, (u32)Number);
+	return BIT(m_cpu_intst, u32(Number));
 }
 
 void news_38xx_state::int_check_cpu()
 {
 	const u32 active_irq = m_cpu_intst & (m_cpu_inten | CPU_NMI_MASK);
-	for (const auto &[input_line, irq_input]: CPU_IRQ_LINES)
+	for (const auto &[input_line, irq_input] : CPU_IRQ_LINES)
 	{
 		// Update input pin status if it has changed
-		const bool state = BIT(active_irq, (u32)irq_input);
+		const bool state = BIT(active_irq, u32(irq_input));
 		if (m_cpu->input_line_state(input_line) != state)
 		{
 			if (input_line != INPUT_LINE_IRQ2)
@@ -689,12 +686,12 @@ u32 news_38xx_state::iop_bus_error_r()
 TIMER_CALLBACK_MEMBER(news_38xx_state::timer)
 {
 	// 100Hz clock from PARK is used to generate both IOP and CPU interrupts
-	if (m_iop_inten & 1 << (u32)iop_irq::TIMER)
+	if (BIT(m_iop_inten, u32(iop_irq::TIMER)))
 	{
 		irq_w<iop_irq::TIMER>(1);
 	}
 
-	if (m_cpu_inten & 1 << (u32)cpu_irq::TIMER)
+	if (BIT(m_cpu_inten, u32(cpu_irq::TIMER)))
 	{
 		irq_w<cpu_irq::TIMER>(1);
 	}
