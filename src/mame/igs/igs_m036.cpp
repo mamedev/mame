@@ -265,14 +265,14 @@ ROM_END
 
 
 /*******************************************************************
-Long Hu Zheng Ba Te Bie Ban, IGS, 2009
-Que Huang Zheng Ba, IGS, 2007
+Long Hu Zhengba Tebie Ban, IGS, 2009
+Que Huang Zhengba, IGS, 2007
 (Year not shown on title screens but date shown on error screen when program ROM removed)
 Hardware Info by Guru
 ---------------------
 
-PCB-0701-01-IU   (Que Huang Zheng Ba)
-PCB-0799-02-IU-1 (Long Hu Zheng Ba Te Bie Ban)
+PCB-0701-01-IU   (Que Huang Zhengba)
+PCB-0799-02-IU-1 (Long Hu Zhengba Tebie Ban)
 |----|  |-------------------------------|  |------|
 |    |--|             JAMMA             |--|      |
 |                              ULN2004    TDA1519 |
@@ -300,8 +300,8 @@ Notes:
       TT5665 - Tontek Design Technology TT5665 8-Channel (or 4-Channel L/R Stereo) ADPCM Voice Synthesis LSI
                Clock input 4.952MHz, pin 25 (SS) high, S0 and S1 low. Game sound is very low quality.
      EPM3032 - Altera EPM3032 CPLD in PLCC44 package
-               Sticker on Que Huang Zheng Ba: "IU U23"
-               Sticker on Long Hu Zheng Ba Te Bie Ban: "IU-1 U23"
+               Sticker on Que Huang Zhengba: "IU U23"
+               Sticker on Long Hu Zhengba Tebie Ban: "IU-1 U23"
      TDA1519 - NXP TDA1519 6W Stereo Power Amplifier IC
       UPC844 - NEC uPC844 Quad Operational Amplifier
       QS3257 - IDT QS3257 Mux/Demux (=74LS257)
@@ -325,8 +325,8 @@ Notes:
                The ROM is not pin compatible with 27C160 and must be dumped using a custom adapter.
                This ROM is the game-specific program code. There is common code inside the IGS036 SOC because
                if the program ROM is removed and booted the screen shows 'PROGRAM ROM ERROR'
-                - Que Huang Zheng Ba: V100CN_U18.U18
-                - Long Hu Zheng Ba Te Bie Ban: S101CN_U18.U18
+                - Que Huang Zhengba: V100CN_U18.U18
+                - Long Hu Zhengba Tebie Ban: S101CN_U18.U18
      U27-U31 - EV29LV640MT 8Mx8-bit/4Mx16-bit DIP48 Flash ROM (U29 & U31 not populated). ROM data is 16-bit.
                U27 - Audio Samples for TT5665
                Other ROMs - Graphics
@@ -850,7 +850,7 @@ GAME( 200?, cjdh2d,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_key<cjd
 
 GAME( 200?, cjddzsp,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<cjddzsp_key>,  ROT0, "IGS",           "Super Dou Di Zhu Special (V122CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2007, qhzb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<qhzb_key>,     ROT0, "IGS",           "Que Huang Zheng Ba (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, qhzb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<qhzb_key>,     ROT0, "IGS",           "Que Huang Zhengba (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2009, lhtb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhtb_key>,     ROT0, "IGS",           "Long Hu Tebie Ban (S101CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龍虎特別版 - Lónghǔ tèbié bǎn
 
@@ -888,7 +888,7 @@ GAME( 2010, hlddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hld
 
 GAME( 2010, zjddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<zjddz_key>,    ROT0, "IGS",           "Zhongji Dou Dizhu (V204CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhzbgqb_key>,  ROT0, "IGS",           "Long Hu Zheng Ba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhzbgqb_key>,  ROT0, "IGS",           "Long Hu Zhengba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 201?, hyleyuan, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hyleyuan_key>, ROT0, "IGS",           "Hou Ye Leyuan (S103CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

@@ -783,51 +783,51 @@ static INPUT_PORTS_START( mjnatsu )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )      // COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-		PORT_START("DSW2")
-		PORT_DIPNAME( 0x07, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!1,!2,!3")
-		PORT_DIPSETTING(    0x00, "1" )
-		PORT_DIPSETTING(    0x04, "2" )
-		PORT_DIPSETTING(    0x02, "3" )
-		PORT_DIPSETTING(    0x06, "4" )
-		PORT_DIPSETTING(    0x01, "5" )
-		PORT_DIPSETTING(    0x05, "6" )
-		PORT_DIPSETTING(    0x03, "7" )
-		PORT_DIPSETTING(    0x07, "8" )
-		PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!4,!5")
-		PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-		PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-		PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-		PORT_DIPSETTING(    0x18, DEF_STR( 3C_1C ) )
-		PORT_DIPNAME( 0x20, 0x00, "Ignore FURITEN" )        PORT_DIPLOCATION("SW1:!6")
-		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-		PORT_DIPNAME( 0x40, 0x00, "PINFU with TSUMO" )      PORT_DIPLOCATION("SW1:!7")
-		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-		PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:!8")
-		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR(Difficulty) )       PORT_DIPLOCATION("SW1:!1,!2,!3")  // 難易度
+	PORT_DIPSETTING(    0x00, "1 (easy)" )                                                  // 易
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x06, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x05, "6" )
+	PORT_DIPSETTING(    0x03, "7" )
+	PORT_DIPSETTING(    0x07, "8 (hard)" )                                                  // 難
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR(Coinage) )          PORT_DIPLOCATION("SW1:!4,!5")     // コイン
+	PORT_DIPSETTING(    0x18, DEF_STR(3C_1C) )                                              // ３コイン１クレジット
+	PORT_DIPSETTING(    0x08, DEF_STR(2C_1C) )                                              // ２コイン１クレジット
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_1C) )                                              // １コイン１クレジット
+	PORT_DIPSETTING(    0x10, DEF_STR(1C_2C) )                                              // １コイン２クレジット
+	PORT_DIPNAME( 0x20, 0x00, "Allow Kuitan" )            PORT_DIPLOCATION("SW1:!6")        // 食い断
+	PORT_DIPSETTING(    0x20, DEF_STR(No) )                                                 // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                // 有
+	PORT_DIPNAME( 0x40, 0x00, "Allow Pinfu with Tsumo" )  PORT_DIPLOCATION("SW1:!7")        // 平和・ツモ複合
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )                                                 // 無
+	PORT_DIPSETTING(    0x40, DEF_STR(Yes) )                                                // 有
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR(Flip_Screen) )      PORT_DIPLOCATION("SW1:!8")        // 画面反転
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                // 正
+	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                                 // 逆
 
-		PORT_START("DSW1")
-		PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:!1")
-		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-		PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-		PORT_DIPNAME( 0x06, 0x00, "Player Initial Score" )  PORT_DIPLOCATION("SW2:!2,!3")
-		PORT_DIPSETTING(    0x00, "1,000" )
-		PORT_DIPSETTING(    0x04, "2,000" )
-		PORT_DIPSETTING(    0x02, "3,000" )
-		PORT_DIPSETTING(    0x06, "5,000" )
-		PORT_DIPNAME( 0x08, 0x00, "Start GOLD" )        PORT_DIPLOCATION("SW2:!4")
-		PORT_DIPSETTING(    0x00, "1,000" )
-		PORT_DIPSETTING(    0x08, "6,000" )
-	PORT_DIPNAME( 0x10, 0x00, "Item Shop Voice" )       PORT_DIPLOCATION("SW2:!5")
-		PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-		PORT_DIPNAME( 0x20, 0x00, "Stop Button (N)" )       PORT_DIPLOCATION("SW2:!6")
-		PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-		PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:!7" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Allow_Continue) )   PORT_DIPLOCATION("SW2:!1")        // コンティニュー
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                 // 有
+	PORT_DIPNAME( 0x06, 0x00, "Player Initial Score" )    PORT_DIPLOCATION("SW2:!2,!3")     // プレイヤー持ち点
+	PORT_DIPSETTING(    0x00, "1,000" )
+	PORT_DIPSETTING(    0x04, "2,000" )
+	PORT_DIPSETTING(    0x02, "3,000" )
+	PORT_DIPSETTING(    0x06, "5,000" )
+	PORT_DIPNAME( 0x08, 0x00, "Starting Gold" )           PORT_DIPLOCATION("SW2:!4")        // スタート時ＧＯＬＤ
+	PORT_DIPSETTING(    0x00, "1,000" )
+	PORT_DIPSETTING(    0x08, "6,000" )
+	PORT_DIPNAME( 0x10, 0x00, "Item Shop Voice" )         PORT_DIPLOCATION("SW2:!5")        // アイテム売り音声
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                 // 有
+	PORT_DIPNAME( 0x20, 0x00, "Stop Button (N)" )         PORT_DIPLOCATION("SW2:!6")        // ストップボタン（Ｎ）
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                 // 有
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )                                          // 固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW2:!8" )                                          // 固定
 
 	PORT_INCLUDE( mahjong_panel )
 INPUT_PORTS_END

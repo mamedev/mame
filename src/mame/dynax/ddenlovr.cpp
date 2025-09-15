@@ -6111,7 +6111,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_DIPNAME( 0x02, 0x02, "In-Game Music" )                     PORT_DIPLOCATION("SW4:2")            // ゲームサウンド
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                             // 無
 	PORT_DIPSETTING(    0x02, DEF_STR(On) )                                                              // 有
-	PORT_DIPNAME( 0x04, 0x04, "Show Gals" )                         PORT_DIPLOCATION("SW4:3")            // ？？ギャル表示  (TODO: manual scan illegible)
+	PORT_DIPNAME( 0x04, 0x04, "Show Renso Gal" )                    PORT_DIPLOCATION("SW4:3")            // 連勝ギャル表示
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                             // 無
 	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                                              // 有
 	PORT_DIPNAME( 0x08, 0x08, "Higi" )                              PORT_DIPLOCATION("SW4:4")            // 秘技
@@ -6120,7 +6120,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_DIPNAME( 0x10, 0x10, "Hand Lesson" )                       PORT_DIPLOCATION("SW4:5")            // 手札教え
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                             // 無
 	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                                              // 有
-	PORT_DIPNAME( 0x20, 0x20, "Renchan Bonus" )                     PORT_DIPLOCATION("SW4:6")            // 連？ボーナス  (TODO: manual scan illegible)
+	PORT_DIPNAME( 0x20, 0x20, "Renso Bonus" )                       PORT_DIPLOCATION("SW4:6")            // 連勝ボーナス
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                             // 無
 	PORT_DIPSETTING(    0x20, DEF_STR(On) )                                                              // 有
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR(Controls) )                   PORT_DIPLOCATION("SW4:7,8")          // パネルタイプ
@@ -7578,6 +7578,18 @@ static INPUT_PORTS_START( hginga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hgokou )
+	// Note the PCB has 4x 10-position DIP switches and SW5 is a 4-position DIP switch.
+	// SW5 is used to select either the Mahjong edge connector, or the 18/10 Edge connectors
+	// SW5 All off = Mahjong connector, all on = 18/10 connector.
+
+	// The manual provides three sets of standard settings:
+	//       標準設定　コインプールタイプ                  標準設定　メダルコーナータイプ               標準設定　アミューズコーナータイプ
+	// SW 1   ON  ON OFF  ON OFF  ON OFF OFF OFF OFF       OFF  ON OFF  ON OFF  ON OFF OFF OFF OFF       OFF OFF OFF  ON OFF  ON OFF OFF  ON OFF
+	// SW 2  OFF OFF OFF OFF OFF OFF OFF OFF  ON OFF       OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF        *   *  OFF OFF OFF OFF OFF OFF OFF OFF
+	// SW 3  OFF OFF OFF OFF  ON OFF OFF OFF OFF OFF       OFF OFF OFF OFF  ON OFF OFF OFF OFF OFF       OFF  ON OFF OFF  ON OFF OFF OFF OFF OFF
+	// SW 4   ON  ON OFF OFF OFF OFF OFF OFF OFF OFF       OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF       OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF
+	//       * クレジットタイマー設定は、１コイン２プレイ又は５プレイをおすすめします。
+
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -7590,133 +7602,134 @@ static INPUT_PORTS_START( hgokou )
 
 	PORT_INCLUDE( dynax_hanafuda_keys_bet )
 
-	// Note the PCB has 4x 10-position DIP switches and SW5 is a 4-position DIP switch.
-	// SW5 is used to select either the Mahjong edge connector, or the 18/10 Edge connectors (i.e. emulation of SW5 is not required)
-	// SW5 All off = Mahjong connector, all on = 18/10 connector.
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, "Difficulty" )               PORT_DIPLOCATION("SW1:1,2,3")
-	PORT_DIPSETTING(    0x07, "1 (Easy)" )
-	PORT_DIPSETTING(    0x06, "2" )
-	PORT_DIPSETTING(    0x05, "3" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPSETTING(    0x02, "6" )
-	PORT_DIPSETTING(    0x01, "7" )
-	PORT_DIPSETTING(    0x00, "8 (Hard)" )
-	PORT_DIPNAME( 0x08, 0x08, "Level Increase" )           PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "Often" )
-	PORT_DIPSETTING(    0x00, "Rarely" )
-	PORT_DIPNAME( 0x10, 0x10, "Biggest Bonus Enabled" )    PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPNAME( 0x60, 0x60, "W-Up Win Percentage" )      PORT_DIPLOCATION("SW1:6,7")
-	PORT_DIPSETTING(    0x60, "80%" ) // Easy
-	PORT_DIPSETTING(    0x40, "75%" )
+	PORT_DIPNAME( 0x07, 0x04, "Hanafuda Game Payout Rate" )          PORT_DIPLOCATION("SW1:1,2,3")  // 花札　ゲーム配当率
+	PORT_DIPSETTING(    0x00, "8 (low)" )                                                           // 低い　8
+	PORT_DIPSETTING(    0x01, "7" )                                                                 // 　　　7
+	PORT_DIPSETTING(    0x02, "6" )                                                                 // 　　　6
+	PORT_DIPSETTING(    0x03, "5" )                                                                 // 　　　5
+	PORT_DIPSETTING(    0x04, "4" )                                                                 // 　　　4
+	PORT_DIPSETTING(    0x05, "3" )                                                                 // 　　　3
+	PORT_DIPSETTING(    0x06, "2" )                                                                 // 　　　2
+	PORT_DIPSETTING(    0x07, "1 (high)" )                                                          // 低い　1
+	PORT_DIPNAME( 0x08, 0x00, "Payout Variation" )                   PORT_DIPLOCATION("SW1:4")      // 配当の波
+	PORT_DIPSETTING(    0x00, "Small" )                                                             // 小さい
+	PORT_DIPSETTING(    0x08, "Large" )                                                             // 大きい
+	PORT_DIPNAME( 0x10, 0x10, "Gokou Yaku" )                         PORT_DIPLOCATION("SW1:5")      // 五光役
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                        // 出ない
+	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                                         // 出る
+	PORT_DIPNAME( 0x60, 0x40, "Double Up Game Win Rate" )            PORT_DIPLOCATION("SW1:6,7")    // Ｗ－ＵＰゲーム勝率
+	PORT_DIPSETTING(    0x00, "65%" )
 	PORT_DIPSETTING(    0x20, "70%" )
-	PORT_DIPSETTING(    0x00, "65%" ) // Hard
-	PORT_DIPNAME( 0x80, 0x80, "Key-In Rate" )              PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x00, "5" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)
+	PORT_DIPSETTING(    0x40, "75%" )
+	PORT_DIPSETTING(    0x60, "80%" )
+	PORT_DIPNAME( 0x80, 0x80, "Key-In Rate" )                        PORT_DIPLOCATION("SW1:8")      // キーインレート
+	PORT_DIPSETTING(    0x00, "5" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                    // ×　５
 	PORT_DIPSETTING(    0x00, "10" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
 	PORT_DIPSETTING(    0x00, "25" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, "50" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x80, "10" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)
+	PORT_DIPSETTING(    0x80, "10" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                    // ×１０
 	PORT_DIPSETTING(    0x80, "20" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
 	PORT_DIPSETTING(    0x80, "50" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x80, "100" ) PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )         PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )              PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(    0x0c, "1" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x30, "Gokou Odds" )               PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )                     PORT_DIPLOCATION("SW2:1,2")    // COIN RATE
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )                                                      // １コイン  1プレイ
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )                                                      // １コイン  2プレイ
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_5C) )                                                      // １コイン  5プレイ
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_10C) )                                                     // １コイン 10プレイ
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )                        PORT_DIPLOCATION("SW2:3,4")    // ゲーム・スタートの最低レート枚数
+	PORT_DIPSETTING(    0x0c, "1" )                                                                 // レート1
+	PORT_DIPSETTING(    0x08, "2" )                                                                 // レート2
+	PORT_DIPSETTING(    0x04, "3" )                                                                 // レート3
+	PORT_DIPSETTING(    0x00, "5" )                                                                 // レート5
+	PORT_DIPNAME( 0x30, 0x30, "Gokou Odds" )                         PORT_DIPLOCATION("SW2:5,6")    // 五光ODDS
 	PORT_DIPSETTING(    0x30, "100" )
 	PORT_DIPSETTING(    0x20, "200" )
 	PORT_DIPSETTING(    0x10, "250" )
 	PORT_DIPSETTING(    0x00, "300" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Shikou Odds" )              PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Shikou Odds" )                        PORT_DIPLOCATION("SW2:7,8")    // 四光ODDS
 	PORT_DIPSETTING(    0xc0, "50" )
 	PORT_DIPSETTING(    0x80, "60" )
 	PORT_DIPSETTING(    0x40, "70" )
 	PORT_DIPSETTING(    0x00, "80" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Machine" )                  PORT_DIPLOCATION("SW3:1,2")
-	PORT_DIPSETTING(    0x03, "Credit Type" )
-	PORT_DIPSETTING(    0x02, "Hopper Type" )
-	PORT_DIPSETTING(    0x01, "Timer Type" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )
-	PORT_DIPNAME( 0x04, 0x04, "Hopper Microswitch" )       PORT_DIPLOCATION("SW3:3")
-	PORT_DIPSETTING(    0x04, "Active Low" )
-	PORT_DIPSETTING(    0x00, "Active High" )
-	PORT_DIPNAME( 0x18, 0x18, "Credit Limit" )             PORT_DIPLOCATION("SW3:4,5")
-	PORT_DIPSETTING(    0x18, "1000" )
-	PORT_DIPSETTING(    0x10, "2000" )
-	PORT_DIPSETTING(    0x08, "3000" )
-	PORT_DIPSETTING(    0x00, "5000" )
-	PORT_DIPNAME( 0x20, 0x20, "Hopper Type" )              PORT_DIPLOCATION("SW3:6")
-	PORT_DIPSETTING(    0x20, "Manual" )
-	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Shikou Limit" )             PORT_DIPLOCATION("SW3:7,8")
-	PORT_DIPSETTING(    0xc0, "Set 1" )
-	PORT_DIPSETTING(    0x80, "Set 2" )
-	PORT_DIPSETTING(    0x40, "Set 3" )
-	PORT_DIPSETTING(    0x00, "Set 4" )
+	PORT_DIPNAME( 0x03, 0x03, "Game Type" )                          PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPSETTING(    0x03, "Credit Type" )                                                       // クレジットタイプ
+	PORT_DIPSETTING(    0x02, "Hopper Type" )                                                       // ホッパータイプ
+	PORT_DIPSETTING(    0x01, "Credit Timer Type" )                                                 // クレジットタイマータイプ
+	PORT_DIPNAME( 0x04, 0x04, "Hopper Polarity" )                    PORT_DIPLOCATION("SW3:3")      // ホッパーマイクロSW
+	PORT_DIPSETTING(    0x04, "Active Low" )                                                        // Low Active
+	PORT_DIPSETTING(    0x00, "Active High" )                                                       // High Active
+	PORT_DIPNAME( 0x18, 0x08, "Credit Limit" )                       PORT_DIPLOCATION("SW3:4,5")    // クレジット・リミット
+	PORT_DIPSETTING(    0x18, "1000" )                                                              // 1000クレジット
+	PORT_DIPSETTING(    0x10, "2000" )                                                              // 2000クレジット
+	PORT_DIPSETTING(    0x08, "3000" )                                                              // 3000クレジット
+	PORT_DIPSETTING(    0x00, "5000" )                                                              // 5000クレジット
+	PORT_DIPNAME( 0x20, 0x20, "Hanaroku Hopper Type" )               PORT_DIPLOCATION("SW3:6")      // 花六ホッパー
+	PORT_DIPSETTING(    0x20, "Manual" )                                                            // 手動
+	PORT_DIPSETTING(    0x00, "Automatic" )                                                         // 自動
+	PORT_DIPNAME( 0xc0, 0xc0, "Gokou/Shikou Generation Limit" )      PORT_DIPLOCATION("SW3:7,8")    // 五光四光発生リミット
+	PORT_DIPSETTING(    0xc0, "Setting 1" )                                                         // 設定1
+	PORT_DIPSETTING(    0x80, "Setting 2" )                                                         // 設定2
+	PORT_DIPSETTING(    0x40, "Setting 3" )                                                         // 設定3
+	PORT_DIPSETTING(    0x00, "Setting 4" )                                                         // 設定4
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )     PORT_DIPLOCATION("SW4:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x02, 0x02, "In-Game Music" )            PORT_DIPLOCATION("SW4:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x04, 0x04, "Girls" )                    PORT_DIPLOCATION("SW4:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x08, 0x08, "Secret Technique ?" )       PORT_DIPLOCATION("SW4:4")  // What is this? Manual says 秘技
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x10, 0x10, "Hint" )                     PORT_DIPLOCATION("SW4:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, "Win Bonus" )                PORT_DIPLOCATION("SW4:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                          //                                   7   8   9
-	PORT_DIPNAME( 0xc0, 0xc0, "Panel" )                    PORT_DIPLOCATION("SW4:7,8")  // SW4-7,8,9        Hanafuda Panel: OFF OFF OFF
-	PORT_DIPSETTING(    0xc0, "Hanafuda" ) //                                                               Mahjong Panel : ON  OFF OFF
-	PORT_DIPSETTING(    0x80, "Mahjong" )  // Requires different inputs                                     Hanagoku Panel: OFF ON  OFF
-	PORT_DIPSETTING(    0x40, "Numbers" )  // Manual says 'Hanagoku Panel'                                  Mahjong Amuse : ON  ON  OFF
-	PORT_DIPSETTING(    0x00, "Letters" )  // Manual says 'Mahjong Amusement'                               Lever         : OFF OFF ON
-										   //                                                               Amuse Seal    : ON  OFF ON
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Demo_Sounds) )                 PORT_DIPLOCATION("SW4:1")      // デモサ・ウンド
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                        // 無
+	PORT_DIPSETTING(    0x01, DEF_STR(On) )                                                         // 有
+	PORT_DIPNAME( 0x02, 0x02, "In-Game Music" )                      PORT_DIPLOCATION("SW4:2")      // ゲーム・サウンド
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                        // 無
+	PORT_DIPSETTING(    0x02, DEF_STR(On) )                                                         // 有
+	PORT_DIPNAME( 0x04, 0x04, "Show Renso Gal" )                     PORT_DIPLOCATION("SW4:3")      // 連勝ギャル表示
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                        // 無
+	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                                         // 有
+	PORT_DIPNAME( 0x08, 0x08, "Higi" )                               PORT_DIPLOCATION("SW4:4")      // 秘技
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                        // 無
+	PORT_DIPSETTING(    0x08, DEF_STR(On) )                                                         // 有
+	PORT_DIPNAME( 0x10, 0x10, "Hand Lesson" )                        PORT_DIPLOCATION("SW4:5")      // 手札教え
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                        // 無
+	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                                         // 有
+	PORT_DIPNAME( 0x20, 0x20, "Renso Bonus" )                        PORT_DIPLOCATION("SW4:6")      // 連勝ボーナス
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                        // 無
+	PORT_DIPSETTING(    0x20, DEF_STR(On) )                                                         // 有
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(NAME((&ddenlovr_state::io_fake_r<0, 2>)))
 
-	PORT_START("DSW5")  // 0x01 is part of SW4-7,8,9                                     Does MAME support DIPsw bits used in multiple ports?
-	PORT_DIPNAME( 0x01, 0x01, "SW4-9" )                    PORT_DIPLOCATION("SW4:9")  // If on, a joystick shows when the girl lifts up the cup
-	PORT_DIPSETTING(    0x01, "Amusement Seal" )                                      // in attract mode and in-game, bars appear above the cards.
-	PORT_DIPSETTING(    0x00, "Lever" )
-	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )                    PORT_DIPLOCATION("SW4:10")
-	PORT_DIPNAME( 0x04, 0x04, "Show Girl at Game Start" )  PORT_DIPLOCATION("SW3:9")
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x08, 0x08, "In-Game Voice" )            PORT_DIPLOCATION("SW3:10")
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x30, 0x30, "Ameshikou Odds" )           PORT_DIPLOCATION("SW2:9,10")
+	PORT_START("DSW5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(NAME((&ddenlovr_state::io_fake_r<2, 1>)))
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Service_Mode) )                PORT_DIPLOCATION("SW4:10")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                        // ゲームモード
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                         // テストモード
+	PORT_DIPNAME( 0x04, 0x04, "Show Double-Up Girl at Game Start" )  PORT_DIPLOCATION("SW3:9")      // ゲームスタート・W-UPギャルアクション
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                        // 無
+	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                                         // 有
+	PORT_DIPNAME( 0x08, 0x08, "In-Game Voice" )                      PORT_DIPLOCATION("SW3:10")     // ボイス
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                        // 無
+	PORT_DIPSETTING(    0x08, DEF_STR(On) )                                                         // 有
+	PORT_DIPNAME( 0x30, 0x20, "Ameshikou Odds" )                     PORT_DIPLOCATION("SW2:9,10")   // 雨四光ODDS
 	PORT_DIPSETTING(    0x30, "20" )
 	PORT_DIPSETTING(    0x20, "30" )
 	PORT_DIPSETTING(    0x10, "40" )
 	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPNAME( 0x40, 0x40, "Maximum Bet" )              PORT_DIPLOCATION("SW1:9")
+	PORT_DIPNAME( 0x40, 0x40, "Maximum Bet" )                        PORT_DIPLOCATION("SW1:9")      // ベットMAX
+	PORT_DIPSETTING(    0x40, "1" )   PORT_CONDITION("DSW3", 0x02, EQUALS, 0x00)                    //                                       (minimum bet takes precedence if higher)
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPSETTING(    0x40, "10" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("SW1:10")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, "10" )  PORT_CONDITION("DSW3", 0x02, EQUALS, 0x02)
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Flip_Screen) )                 PORT_DIPLOCATION("SW1:10")     // 画面反転
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                        // 正
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                         // 逆
+
+	PORT_START("FAKE")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR(Controls) )                    PORT_DIPLOCATION("SW4:7,8,9")  // 花札パネル
+	PORT_DIPSETTING(    0x07, "Hanafuda Panel" )                                                    // 花札パネル                            (numbers)
+	PORT_DIPSETTING(    0x06, "Mahjong Panel" )                                                     // 麻雀パネル                            (letters)
+	PORT_DIPSETTING(    0x05, "Hanaroku Panel" )                                                    // 花六パネル                            (not supported)
+	PORT_DIPSETTING(    0x04, "Mahjong Amusement" )                                                 // 麻雀アミューズメント                  (letters, doesn't use take/w-up/big/small)
+	PORT_DIPSETTING(    0x03, DEF_STR(Joystick) )                                                   // 十字レバー                            (not supported)
+	PORT_DIPSETTING(    0x02, "Hanafuda Amusement" )                                                // 当社華札アミューズメントパネルシール  (numbers, doesn't use take/w-up/big/small)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjmyornt )
@@ -8149,7 +8162,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR(Difficulty) )          PORT_DIPLOCATION("DIP-SW1:3,4")  // 難易度
 	PORT_DIPSETTING(    0x08, DEF_STR(Easy) )                                                 // 易しい
 	PORT_DIPSETTING(    0x0c, DEF_STR(Normal) )                                               // 標準
-	PORT_DIPSETTING(    0x04, DEF_STR(Hard) )                                                 // やや強
+	PORT_DIPSETTING(    0x04, DEF_STR(Hard) )                                                 // やや強い
 	PORT_DIPSETTING(    0x00, DEF_STR(Hardest) )                                              // 強い
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Demo_Sounds) )         PORT_DIPLOCATION("DIP-SW1:5")    // デモサウンド
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 無し
@@ -12212,7 +12225,7 @@ ROM_END
 
 /***************************************************************************
 
-Super Hana Paradise
+SUPER華・パラダイス  (Super Hana Paradise)
 1995
 
 PCB almost like Mysterious World
@@ -12308,7 +12321,7 @@ ROM_END
 
 /***************************************************************************
 
-Hanafuda Hana Gokou
+花札華五光 (Hanafuda Hana Gokou)
 Dynax (Alba License), 1995
 
 PCB almost like Mysterious World
