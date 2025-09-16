@@ -82,11 +82,12 @@ with the following code:
 #include "emu.h"
 #include "fromance.h"
 
+#include "mahjong.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/msm5205.h"
 #include "sound/ymopl.h"
-#include "vsystem_gga.h"
+
 #include "speaker.h"
 
 
@@ -188,20 +189,15 @@ void fromance_state::fromance_portselect_w(uint8_t data)
 
 uint8_t fromance_state::fromance_keymatrix_r()
 {
-	int ret = 0xff;
+	int ret = 0x3f;
 
-	if (m_portselect & 0x01)
-		ret &= ioport("KEY1")->read();
-	if (m_portselect & 0x02)
-		ret &= ioport("KEY2")->read();
-	if (m_portselect & 0x04)
-		ret &= ioport("KEY3")->read();
-	if (m_portselect & 0x08)
-		ret &= ioport("KEY4")->read();
-	if (m_portselect & 0x10)
-		ret &= ioport("KEY5")->read();
+	for (unsigned i = 0; m_key_matrix.size() > i; ++i)
+	{
+		if (BIT(m_portselect, i))
+			ret &= m_key_matrix[i]->read();
+	}
 
-	return ret;
+	return 0xc0 | ret;
 }
 
 
@@ -333,59 +329,6 @@ void fromance_state::fromance_sub_io_map(address_map &map)
  *
  *************************************/
 
-static INPUT_PORTS_START( mahjong_panel )
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-
 static INPUT_PORTS_START( nekkyoku )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -459,7 +402,7 @@ static INPUT_PORTS_START( nekkyoku )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_INCLUDE( mahjong_panel )
+	PORT_INCLUDE( mahjong_matrix_1p_bet_wup )
 INPUT_PORTS_END
 
 
@@ -536,7 +479,7 @@ static INPUT_PORTS_START( idolmj )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_INCLUDE( mahjong_panel )
+	PORT_INCLUDE( mahjong_matrix_1p_bet_wup )
 INPUT_PORTS_END
 
 
@@ -611,7 +554,7 @@ static INPUT_PORTS_START( fromance )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_INCLUDE( mahjong_panel )
+	PORT_INCLUDE( mahjong_matrix_1p_bet_wup )
 INPUT_PORTS_END
 
 
@@ -686,7 +629,7 @@ static INPUT_PORTS_START( nmsengen )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_INCLUDE( mahjong_panel )
+	PORT_INCLUDE( mahjong_matrix_1p_bet_wup )
 INPUT_PORTS_END
 
 
@@ -758,7 +701,7 @@ static INPUT_PORTS_START( daiyogen )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_INCLUDE( mahjong_panel )
+	PORT_INCLUDE( mahjong_matrix_1p_bet_wup )
 INPUT_PORTS_END
 
 
@@ -829,7 +772,7 @@ static INPUT_PORTS_START( mjnatsu )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )                                          // 固定
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW2:!8" )                                          // 固定
 
-	PORT_INCLUDE( mahjong_panel )
+	PORT_INCLUDE( mahjong_matrix_1p_bet_wup )
 INPUT_PORTS_END
 
 
