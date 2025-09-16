@@ -3454,7 +3454,7 @@ static INPUT_PORTS_START( cafebrk )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Flip_Screen) )                  PORT_DIPLOCATION("SW 1:10")       // モニター画面反転
 	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                            // 通常
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // 反転
-	PORT_DIPNAME( 0x0c, 0x08, "Computer Strength" )                   PORT_DIPLOCATION("SW 2:9,10")     // コンピューターの強さ
+	PORT_DIPNAME( 0x0c, 0x08, "Computer Strength" )                   PORT_DIPLOCATION("SW 2:9,10")     // コンピュータの強さ
 	PORT_DIPSETTING(    0x00, "Weak" )                                                                  // 弱い
 	PORT_DIPSETTING(    0x04, DEF_STR(Normal) )                                                         // 普通
 	PORT_DIPSETTING(    0x08, "Somewhat Strong" )                                                       // やや強い

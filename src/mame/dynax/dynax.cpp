@@ -3503,7 +3503,7 @@ static INPUT_PORTS_START( mjreach )
 	PORT_DIPSETTING(    0x20, "Small" )                                                            // 小さい
 	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                    // 通常
 	PORT_DIPNAME( 0x40, 0x40, "Renchan Gal Display" )           PORT_DIPLOCATION("DIP-SW4:9")      // 連荘ギャルの表示の方式
-	PORT_DIPSETTING(    0x40, "After Each Win" )                                                   // 勝つごとに表示 (= On according to manual page?)
+	PORT_DIPSETTING(    0x40, "After Every Win" )                                                  // 勝つごとに表示 (= On according to manual page?)
 	PORT_DIPSETTING(    0x00, "After 3 Consecutive Wins" )                                         // ３連荘のみ表示 (= Off according to manual page?)
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )                PORT_DIPLOCATION("DIP-SW4:10")     // ＯＦＦ固定
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
