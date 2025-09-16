@@ -84,7 +84,7 @@ void megacrane_state::megacrane(machine_config &config)
 ROM_START(megacrane)
     ROM_REGION(0x10000, "program", 0)
 	ROM_LOAD("elaut_2001_eu_mg_i_02.39.07.u5", 0x0000, 0x10000, CRC(feb5cfa1) SHA1(3c091543c0419ea15a5d66d2b9602668e7c35b10))
-	ROM_REGION(0x2000, "sound", 0)
+	ROM_REGION(0x2000, "voice", 0)
 	ROM_LOAD("elaut_2001_sound_megacrane.u5", 0x0000, 0x2000, NO_DUMP)
 ROM_END
 
