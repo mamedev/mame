@@ -22,11 +22,19 @@ battery (near CPU)
 
 Undumped games known to run on this PCB:
 * Multi Spin
+
+TODO
+- stuck at EEPROM error;
+- IRQs are wrong;
+- inputs, outputs, NVRAM once running;
+- verify colors and possible third layer once running;
+- device-ify ES-9409 and share with excellent/dblcrown.cpp.
 */
 
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/bankdev.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -48,12 +56,18 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_watchdog(*this, "watchdog"),
+		m_eeprom(*this, "eeprom"),
+		m_vram_bank(*this, "vram_bank%u", 0U),
+		m_vram(*this, "vram"),
+		m_pal_ram(*this, "palram", 0x200U, ENDIANNESS_BIG)
 	{ }
 
 	void es9501(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -61,34 +75,151 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device_array<address_map_bank_device, 2> m_vram_bank;
+
+	required_shared_ptr<uint8_t> m_vram;
+	memory_share_creator<uint8_t> m_pal_ram;
+
+	uint8_t m_vram_bank_entry[2] {};
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void vram_w(offs_t offset, uint8_t data);
+	void palette_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	template <uint8_t Which> void vram_bank_w(uint8_t data);
+
+	void watchdog_eeprom_w(uint8_t data);
+
 	void program_map(address_map &map) ATTR_COLD;
+	void vram_map(address_map &map) ATTR_COLD;
 };
 
 
 void es9501_state::video_start()
 {
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(es9501_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_bg_tilemap->set_user_data(&m_vram[0xa000]);
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(es9501_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap->set_user_data(&m_vram[0xb000]);
+
+	m_fg_tilemap->set_transparent_pen(0);
+}
+
+TILE_GET_INFO_MEMBER(es9501_state::get_bg_tile_info)
+{
+	uint8_t const *rambase = (const uint8_t *)tilemap.user_data();
+	uint16_t const code = (rambase[tile_index * 2 + 1] | (rambase[tile_index * 2 + 0] << 8)) & 0xfff;
+	uint8_t const color = (rambase[tile_index * 2 + 0] >> 4);
+
+	tileinfo.set(0, code, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(es9501_state::get_fg_tile_info)
+{
+	uint8_t const *rambase = (const uint8_t *)tilemap.user_data();
+	uint16_t const code = (rambase[tile_index * 2 + 1] | (rambase[tile_index * 2 + 0] << 8)) & 0x7ff;
+	uint8_t const color = (rambase[tile_index * 2 + 0] >> 4);
+
+	tileinfo.set(1, code, color, 0);
+}
+
+void es9501_state::vram_w(offs_t offset, uint8_t data)
+{
+	m_vram[offset] = data;
+
+	if ((offset & 0xf000) == 0xa000)
+		m_bg_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
+
+	if ((offset & 0xf000) == 0xb000)
+		m_fg_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
+
+	m_gfxdecode->gfx(1)->mark_dirty(offset);
+}
+
+void es9501_state::palette_w(offs_t offset, uint8_t data)
+{
+	m_pal_ram[offset] = data;
+	offset >>= 1;
+	int const datax = m_pal_ram[offset * 2] + 256 * m_pal_ram[offset * 2 + 1];
+
+	int const r = ((datax) & 0x0f00) >> 8;
+	int const g = ((datax) & 0xf000) >> 12;
+	int const b = ((datax) & 0x000f) >> 0;
+	// TODO: remaining bits
+
+	m_palette->set_pen_color(offset, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 uint32_t es9501_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
+}
+
+
+void es9501_state::machine_start()
+{
+	save_item(NAME(m_vram_bank_entry));
+}
+
+template <uint8_t Which>
+void es9501_state::vram_bank_w(uint8_t data)
+{
+	m_vram_bank_entry[Which] = data;
+	m_vram_bank[Which]->set_bank(m_vram_bank_entry[Which]);
+}
+
+void es9501_state::watchdog_eeprom_w(uint8_t data)
+{
+	if (data & 0x01)
+		m_watchdog->watchdog_reset();
+
+	if (data & 0x2e)
+		logerror("eeprom_unk_w: %02x\n", data & 0x2e);
+
+	m_eeprom->di_write(BIT(data, 7));
+	m_eeprom->clk_write(BIT(data, 6));
+	m_eeprom->cs_write(BIT(data, 4));
 }
 
 
 void es9501_state::program_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x000000, 0x07ffff).rom();
 	map(0x3fc000, 0x3fffff).ram();
-	map(0x400000, 0x407fff).ram();
+	map(0x400000, 0x401fff).m(m_vram_bank[0], FUNC(address_map_bank_device::amap8)).umask16(0xff00);
+	map(0x402000, 0x403fff).m(m_vram_bank[1], FUNC(address_map_bank_device::amap8)).umask16(0xff00);
+	map(0x404000, 0x405fff).ram(); // third layer?
+	map(0x406000, 0x4063ff).ram().w(FUNC(es9501_state::palette_w)).umask16(0xff00);
+	map(0x406400, 0x406fff).ram();
+	map(0x407c00, 0x407cff).ram();
+	map(0x407e00, 0x407e00).lr8(NAME([this] () -> uint8_t { return m_vram_bank_entry[1]; })).w(FUNC(es9501_state::vram_bank_w<1>));
+	map(0x407e02, 0x407e02).lr8(NAME([this] () -> uint8_t { return m_vram_bank_entry[0]; })).w(FUNC(es9501_state::vram_bank_w<0>));
+	// map(0x407e08, 0x407e09).ram(); // ?
+	map(0x407e0a, 0x407e0b).lr8(NAME([this] () -> uint16_t { return machine().rand() & 0x00ff; })); // TODO: IRQ related?
 	map(0x600000, 0x600001).portr("IN0");
 	map(0x600002, 0x600003).portr("IN1");
 	map(0x600004, 0x600005).portr("DSW");
-	// map(0x600008, 0x600009).w // watchdog?
-	map(0x700000, 0x700003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff); // ??
-	map(0x700004, 0x700007).w("ymz284", FUNC(ymz284_device::address_data_w)).umask16(0x00ff); // ??
+	map(0x600008, 0x600009).portr("EEPROM_IN");
+	map(0x600008, 0x600008).w(FUNC(es9501_state::watchdog_eeprom_w));
+	map(0x700000, 0x700003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00); // ??
+	map(0x700004, 0x700007).w("ymz284", FUNC(ymz284_device::address_data_w)).umask16(0xff00); // ??
+}
+
+void es9501_state::vram_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram().w(FUNC(es9501_state::vram_w)).share(m_vram);
 }
 
 
@@ -138,11 +269,27 @@ static INPUT_PORTS_START( specd9 )
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("EEPROM_IN")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
 
 
+const gfx_layout gfx_8x8x4_packed_msb_r =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ 12, 8, 4, 0, 28, 24, 20, 16 },
+	{ STEP8(0,4*8) },
+	8*8*4
+};
+
 static GFXDECODE_START( gfx_es9501 )
 	GFXDECODE_ENTRY( "gfx", 0, gfx_16x16x4_packed_lsb, 0, 0x10 )
+	GFXDECODE_RAM( "vram", 0, gfx_8x8x4_packed_msb_r, 0, 0x10 )
 GFXDECODE_END
 
 
@@ -150,21 +297,26 @@ void es9501_state::es9501(machine_config &config)
 {
 	M68000(config, m_maincpu, 28.636363_MHz_XTAL / 2); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &es9501_state::program_map);
+	m_maincpu->set_vblank_int("screen", FUNC(es9501_state::irq1_line_hold));
 
-	EEPROM_93C56_16BIT(config, "eeprom");
+	EEPROM_93C56_16BIT(config, m_eeprom);
 
-	WATCHDOG_TIMER(config, "watchdog", 0);
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));
+
+	for (auto bank : m_vram_bank)
+		ADDRESS_MAP_BANK(config, bank).set_map(&es9501_state::vram_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x1000);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // TODO: everything
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(40*8, 32*8);
-	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(es9501_state::screen_update));
+	m_screen->set_size(64*8, 64*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_es9501);
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x1000 / 2); // TODO
+
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	SPEAKER(config, "speaker", 2).front();
 
