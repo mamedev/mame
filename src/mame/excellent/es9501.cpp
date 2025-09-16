@@ -24,10 +24,10 @@ Undumped games known to run on this PCB:
 * Multi Spin
 
 TODO
-- stuck at EEPROM error;
 - IRQs are wrong;
-- inputs, outputs, NVRAM once running;
-- verify colors and possible third layer once running;
+- inputs, outputs, NVRAM;
+- verify colors and possible third layer;
+- d9flower needs correct EEPROM;
 - device-ify ES-9409 and share with excellent/dblcrown.cpp.
 */
 
@@ -372,9 +372,9 @@ ROM_START( specd9 )
 	ROM_LOAD16_BYTE( "3.u33", 0x00000, 0x40000, CRC(682daf75) SHA1(822b5e9443bf7e1b752da85e879a8b0994f23fdf) )
 	ROM_LOAD16_BYTE( "1.u31", 0x00001, 0x40000, CRC(90b10562) SHA1(d1d3d50027e84cc028cd30d2dd74a4f6666387cb) )
 
-	ROM_REGION( 0x280000, "gfx", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "t58.u50", 0x000000, 0x200000, CRC(7a572d9e) SHA1(9a1d842ac78fea6047242c405aaf81c827dc2358) ) // contains Multi Spin logo
-	ROM_LOAD( "u51.u51", 0x200000, 0x080000, CRC(a213c33b) SHA1(42b4c3d3cb2db50ea0fad06509e3e73b81f3db4c) ) // TODO: this is an EPROM, contains Special Dream 9 logo, should be overlayed on the mask ROM contents, IGS style
+	ROM_LOAD( "u51.u51", 0x000000, 0x080000, CRC(a213c33b) SHA1(42b4c3d3cb2db50ea0fad06509e3e73b81f3db4c) ) // this is an EPROM, contains Special Dream 9 logo, overlayed on the mask ROM contents
 
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "t59.u23", 0x000000, 0x200000, CRC(b11857b4) SHA1(c0a6478fd8a8ef1ed35cfbfa9fd2af44eb258725) )
@@ -391,9 +391,9 @@ ROM_START( specd9105g )
 	ROM_LOAD16_BYTE( "3.u33", 0x00000, 0x40000, CRC(e4b00f37) SHA1(4c33912b7c38399ba2ca5e4dc0335458d929bd52) ) // SLDH
 	ROM_LOAD16_BYTE( "2.u31", 0x00001, 0x40000, CRC(620bc09e) SHA1(fce0e9c7394aa782d0b6f1558a3b4c76c5c1e787) )
 
-	ROM_REGION( 0x280000, "gfx", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "t58.u50", 0x000000, 0x200000, CRC(7a572d9e) SHA1(9a1d842ac78fea6047242c405aaf81c827dc2358) ) // contains Multi Spin logo
-	ROM_LOAD( "u51.u51", 0x200000, 0x080000, CRC(a213c33b) SHA1(42b4c3d3cb2db50ea0fad06509e3e73b81f3db4c) ) // TODO: this is an EPROM, contains Special Dream 9 logo, should be overlayed on the mask ROM contents, IGS style
+	ROM_LOAD( "u51.u51", 0x000000, 0x080000, CRC(a213c33b) SHA1(42b4c3d3cb2db50ea0fad06509e3e73b81f3db4c) ) // this is an EPROM, contains Special Dream 9 logo, overlayed on the mask ROM contents
 
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "t59.u23", 0x000000, 0x200000, CRC(b11857b4) SHA1(c0a6478fd8a8ef1ed35cfbfa9fd2af44eb258725) )
@@ -410,15 +410,15 @@ ROM_START( starball )
 	ROM_LOAD16_BYTE( "3.u33", 0x00000, 0x40000, CRC(43f751ca) SHA1(b3e50f7bc939e25167da98ab51f16b23436a581e) ) // SLDH
 	ROM_LOAD16_BYTE( "2.u31", 0x00001, 0x40000, CRC(d9c1088d) SHA1(d5b86d33db838418e2bb94da04c902d0059c673e) )
 
-	ROM_REGION( 0x280000, "gfx", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "t58.u50", 0x000000, 0x200000, CRC(7a572d9e) SHA1(9a1d842ac78fea6047242c405aaf81c827dc2358) ) // contains Multi Spin logo
-	ROM_LOAD( "1.u51",   0x200000, 0x080000, CRC(f7e97d23) SHA1(9aa86e545e9438ab693d8f9b1c137dada86be5cc) ) // TODO: this is an EPROM, contains Star Ball logo, should be overlayed on the mask ROM contents, IGS style
+	ROM_LOAD( "1.u51",   0x000000, 0x080000, CRC(f7e97d23) SHA1(9aa86e545e9438ab693d8f9b1c137dada86be5cc) ) // this is an EPROM, contains Special Dream 9 logo, overlayed on the mask ROM contents
 
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "t59.u23", 0x000000, 0x200000, CRC(b11857b4) SHA1(c0a6478fd8a8ef1ed35cfbfa9fd2af44eb258725) )
 
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
-	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, CRC(dba91cd8) SHA1(dfbe41e3a8d7e8ad7068d25afe10a1d93bf3cc4d) )
+	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, BAD_DUMP CRC(8ff3a4a6) SHA1(c96936221ef584b69022637e3368525fc3ac4add) ) // handcrafted
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "3.u37", 0x000, 0x117, CRC(bea4cb24) SHA1(09987e6b903cc3bd202a9d933474b36bdbb99d9a) ) // PALCE16V8H
