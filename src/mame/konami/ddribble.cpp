@@ -73,11 +73,11 @@ private:
 	void coin_counter_w(uint8_t data);
 	uint8_t vlm5030_busy_r();
 	void vlm5030_ctrl_w(uint8_t data);
+	void sprite_callback(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int size, bool flip, gfx_element *sgfx, int &code, int &color, int &sx, int &sy, bool flipx, bool flipy);
 	template <unsigned Which> void tile_callback(int layer, int attr, int &gfx, int &code, int &color, int &flags, int codebank);
 	template <unsigned Which> void flipscreen_callback(int state);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int length, int chip);
 	void maincpu_map(address_map &map) ATTR_COLD;
 	void subcpu_map(address_map &map) ATTR_COLD;
 	void audiocpu_map(address_map &map) ATTR_COLD;
@@ -157,71 +157,51 @@ byte #4:    attributes
 
 ***************************************************************************/
 
-void ddribble_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int length, int chip)
+void ddribble_state::sprite_callback(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int size, bool flip, gfx_element *sgfx, int &code, int &color, int &sx, int &sy, bool flipx, bool flipy)
 {
-	k005885_device *k005885 = m_k005885[chip];
-	gfx_element *gfx = k005885->gfx(1);
-	const uint8_t *source = k005885->spriteram();
-	const uint8_t *finish = source + length;
+	code &= 0x7ff;
+	int width, height;
 
-	while (source < finish)
+	if (flip)
 	{
-		int number = source[0] | ((source[1] & 0x07) << 8);       // sprite number
-		int const attr = source[4];                               // attributes
-		int sx = source[3] | ((attr & 0x01) << 8);                // vertical position
-		int sy = source[2];                                       // horizontal position
-		int flipx = attr & 0x20;                                  // flip x
-		int flipy = attr & 0x40;                                  // flip y
-		int const color = (source[1] & 0xf0) >> 4;                // color
-		int width, height;
+		sx = 240 - sx;
+		sy = 240 - sy;
 
-		if (k005885->flipscreen())
-		{
-			flipx = !flipx;
-			flipy = !flipy;
-			sx = 240 - sx;
-			sy = 240 - sy;
-
-			if ((attr & 0x1c) == 0x10)
-			{   // ???. needed for some sprites in flipped mode
-				sx -= 0x10;
-				sy -= 0x10;
-			}
+		if ((size & 0x1c) == 0x10)
+		{   // ???. needed for some sprites in flipped mode
+			sx -= 0x10;
+			sy -= 0x10;
 		}
+	}
 
-		switch (attr & 0x1c)
+	switch (size & 0x1c)
+	{
+		case 0x10:  // 32x32
+			width = height = 2; code &= ~3; break;
+		case 0x08:  // 16x32
+			width = 1; height = 2; code &= ~2; break;
+		case 0x04:  // 32x16
+			width = 2; height = 1; code &= ~1; break;
+		// the hardware allows more sprite sizes, but ddribble doesn't use them
+		default:    // 16x16
+			width = height = 1; break;
+	}
+
+	static const int x_offset[2] = { 0, 1 };
+	static const int y_offset[2] = { 0, 2 };
+
+	for (int y = 0; y < height; y++)
+	{
+		int const ey = flipy ? (height - 1 - y) : y;
+		for (int x = 0; x < width; x++)
 		{
-			case 0x10:  // 32x32
-				width = height = 2; number &= (~3); break;
-			case 0x08:  // 16x32
-				width = 1; height = 2; number &= (~2); break;
-			case 0x04:  // 32x16
-				width = 2; height = 1; number &= (~1); break;
-			// the hardware allows more sprite sizes, but ddribble doesn't use them
-			default:    // 16x16
-				width = height = 1; break;
+			int const ex = flipx ? (width - 1 - x) : x;
+			sgfx->transpen(bitmap, cliprect,
+				code + x_offset[ex] + y_offset[ey],
+				color,
+				flipx, flipy,
+				sx + x * 16, sy + y * 16, 0);
 		}
-
-		{
-			static const int x_offset[2] = { 0x00, 0x01 };
-			static const int y_offset[2] = { 0x00, 0x02 };
-
-			for (int y = 0; y < height; y++)
-			{
-				for (int x = 0; x < width; x++)
-				{
-					int const ex = flipx ? (width - 1 - x) : x;
-					int const ey = flipy ? (height - 1 - y) : y;
-
-					gfx->transpen(bitmap, cliprect,
-						(number) + x_offset[ex] + y_offset[ey],
-						color,
-						flipx, flipy,
-						sx + x * 16, sy + y * 16, 0);
-				}
-			}
-		}
-		source += 5;
 	}
 }
 
@@ -236,12 +216,12 @@ uint32_t ddribble_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	// set scroll registers
 	m_k005885[0]->tilemap_set_scrollx(0, 0, m_k005885[0]->get_xscroll());
 	m_k005885[1]->tilemap_set_scrollx(0, 0, m_k005885[1]->get_xscroll());
-	m_k005885[0]->tilemap_set_scrolly(0, 0, m_k005885[0]->get_yscroll());
-	m_k005885[1]->tilemap_set_scrolly(0, 0, m_k005885[1]->get_yscroll());
+	m_k005885[0]->tilemap_set_scrolly(0, 0, m_k005885[0]->yscroll_r());
+	m_k005885[1]->tilemap_set_scrolly(0, 0, m_k005885[1]->yscroll_r());
 
 	m_k005885[1]->tilemap_draw(0, screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect, 0x07d, 0);
-	draw_sprites(bitmap, cliprect, 0x140, 1);
+	m_k005885[0]->sprite_draw(screen, bitmap, cliprect, m_k005885[0]->flipscreen(), 0/*m_k005885[0]->get_spriterambank()*/, 0x07d, 1);
+	m_k005885[1]->sprite_draw(screen, bitmap, cliprect, m_k005885[1]->flipscreen(), 0/*m_k005885[1]->get_spriterambank()*/, 0x140, 1);
 	m_k005885[0]->tilemap_draw(0, screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -302,8 +282,8 @@ void ddribble_state::vlm5030_ctrl_w(uint8_t data)
 
 void ddribble_state::maincpu_map(address_map &map)
 {
-	map(0x0000, 0x0004).w(m_k005885[0], FUNC(k005885_device::ctrl_w));                                              // video registers (005885 #1)
-	map(0x0800, 0x0804).w(m_k005885[1], FUNC(k005885_device::ctrl_w));                                              // video registers (005885 #2)
+	map(0x0000, 0x0004).m(m_k005885[0], FUNC(k005885_device::regs_map));                                              // video registers (005885 #1)
+	map(0x0800, 0x0804).m(m_k005885[1], FUNC(k005885_device::regs_map));                                              // video registers (005885 #2)
 	map(0x1800, 0x187f).ram().w("palette", FUNC(palette_device::write_indirect)).share("palette");
 	map(0x2000, 0x2fff).rw(m_k005885[0], FUNC(k005885_device::vram_r), FUNC(k005885_device::vram_w));   // Video RAM 1
 	map(0x3000, 0x3fff).rw(m_k005885[0], FUNC(k005885_device::spriteram_r), FUNC(k005885_device::spriteram_w));                             // Object RAM 1
@@ -417,13 +397,13 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_ddribble_1 )
-	GFXDECODE_ENTRY( "k005885_1", 0x00000, charlayout,    48,  1 )   // colors 48-63
-	GFXDECODE_ENTRY( "k005885_1", 0x20000, spritelayout,  32,  1 )   // colors 32-47
+	GFXDECODE_ENTRY( "k005885_1", 0x00000, charlayout,   48,  1 )   // colors 48-63
+	GFXDECODE_ENTRY( "k005885_1", 0x20000, spritelayout, 32,  1 )   // colors 32-47
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ddribble_2 )
-	GFXDECODE_ENTRY( "k005885_2", 0x00000, charlayout,    16,  1 )   // colors 16-31
-	GFXDECODE_ENTRY( "k005885_2", 0x40000, spritelayout,  64, 16 )   // colors  0-15 but using lookup table
+	GFXDECODE_ENTRY( "k005885_2", 0x00000, charlayout,   16,  1 )   // colors 16-31
+	GFXDECODE_ENTRY( "k005885_2", 0x40000, spritelayout, 64, 16 )   // colors  0-15 but using lookup table
 GFXDECODE_END
 
 
@@ -466,12 +446,14 @@ void ddribble_state::ddribble(machine_config &config)
 	m_k005885[0]->set_split_tilemap(false);
 	m_k005885[0]->set_irq_cb().set_inputline(m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 	m_k005885[0]->set_flipscreen_cb().set(FUNC(ddribble_state::flipscreen_callback<0>));
+	m_k005885[0]->set_sprite_callback(FUNC(ddribble_state::sprite_callback));
 	m_k005885[0]->set_tile_callback(FUNC(ddribble_state::tile_callback<0>));
 
 	K005885(config, m_k005885[1], XTAL(18'432'000), gfx_ddribble_2, "palette", "screen");
 	m_k005885[1]->set_split_tilemap(false);
 	m_k005885[1]->set_irq_cb().set_inputline(m_subcpu, M6809_FIRQ_LINE, HOLD_LINE);
 	m_k005885[1]->set_flipscreen_cb().set(FUNC(ddribble_state::flipscreen_callback<1>));
+	m_k005885[1]->set_sprite_callback(FUNC(ddribble_state::sprite_callback));
 	m_k005885[1]->set_tile_callback(FUNC(ddribble_state::tile_callback<1>));
 
 	PALETTE(config, "palette", FUNC(ddribble_state::palette)).set_format(palette_device::xBGR_555, 64 + 256, 64);

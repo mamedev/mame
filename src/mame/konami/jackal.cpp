@@ -139,8 +139,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void irq_callback(int state);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sram, int length, int layer);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sprite_callback(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int size, bool flip, gfx_element *sgfx, int &code, int &color, int &sx, int &sy, bool flipx, bool flipy);
 	void tile_callback(int layer, int attr, int &gfx, int &code, int &color, int &flags, int codebank);
 	void main_map(address_map &map) ATTR_COLD;
 	void sub_map(address_map &map) ATTR_COLD;
@@ -183,12 +183,12 @@ void jackal_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, 
 	m_k005885[0]->tilemap_set_scroll_rows(0, 1);
 	m_k005885[0]->tilemap_set_scroll_cols(0, 1);
 
-	m_k005885[0]->tilemap_set_scrolly(0, 0, m_k005885[0]->get_yscroll());
+	m_k005885[0]->tilemap_set_scrolly(0, 0, m_k005885[0]->yscroll_r());
 	m_k005885[0]->tilemap_set_scrollx(0, 0, m_k005885[0]->get_xscroll());
 
-	if (BIT(m_k005885[0]->get_scrollmode(), 1))
+	if (BIT(m_k005885[0]->get_scrollmode(), 0))
 	{
-		if (BIT(m_k005885[0]->get_scrollmode(), 3))
+		if (BIT(m_k005885[0]->get_scrollmode(), 2))
 		{
 			m_k005885[0]->tilemap_set_scroll_rows(0, 32);
 
@@ -196,7 +196,7 @@ void jackal_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, 
 				m_k005885[0]->tilemap_set_scrollx(0, i, m_k005885[0]->scroll_r(i));
 		}
 
-		if (BIT(m_k005885[0]->get_scrollmode(), 2))
+		if (BIT(m_k005885[0]->get_scrollmode(), 1))
 		{
 			m_k005885[0]->tilemap_set_scroll_cols(0, 32);
 
@@ -208,100 +208,112 @@ void jackal_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, 
 	m_k005885[0]->tilemap_draw(0, screen, bitmap, cliprect, 0, 0);
 }
 
-#define DRAW_SPRITE(bank, code, sx, sy)  m_k005885[layer]->gfx(bank)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
-
-void jackal_state::draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sram, int length, int layer)
+void jackal_state::sprite_callback(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int size, bool flip, gfx_element *sgfx, int &code, int &color, int &sx, int &sy, bool flipx, bool flipy)
 {
-	for (int offs = 0; offs < length; offs += 5)
+	sx = util::sext<int>(sx, 9);
+	if (sy > 0xf0)
+		sy = sy - 256;
+
+	if (flip)
 	{
-		int const sn1 = sram[offs];
-		int const sn2 = sram[offs + 1];
-		int sy  = sram[offs + 2];
-		int sx  = sram[offs + 3];
-		int const attr = sram[offs + 4];
-		int flipx = attr & 0x20;
-		int flipy = attr & 0x40;
-		int const color = ((sn2 & 0xf0) >> 4);
+		sx = 240 - sx;
+		sy = 240 - sy;
+	}
 
-		if (attr & 0x01)
-			sx = sx - 256;
-		if (sy > 0xf0)
-			sy = sy - 256;
+	code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
+	if (size & 0xc)    // half-size sprite
+	{
+		int mod = -8;
 
-		if (flip_screen())
+		if (flip)
 		{
-			sx = 240 - sx;
-			sy = 240 - sy;
-			flipx = !flipx;
-			flipy = !flipy;
+			sx += 8;
+			sy -= 8;
+			mod = 8;
 		}
 
-		if (attr & 0xc)    // half-size sprite
+		if ((size & 0x0c) == 0x0c)
 		{
-			int const spritenum = sn1 * 4 + ((sn2 & (8 + 4)) >> 2) + ((sn2 & (2 + 1)) << 10);
-			int mod = -8;
+			if (flip) sy += 16;
+			sgfx->transpen(bitmap, cliprect,
+				code, color,
+				flipx, flipy,
+				sx, sy, 0);
+		}
 
-			if (flip_screen())
+		if ((size & 0x0c) == 0x08)
+		{
+			sy += 8;
+			sgfx->transpen(bitmap, cliprect,
+				code, color,
+				flipx, flipy,
+				sx, sy, 0);
+			sgfx->transpen(bitmap, cliprect,
+				code - 2, color,
+				flipx, flipy,
+				sx, sy + mod, 0);
+		}
+
+		if ((size & 0x0c) == 0x04)
+		{
+			sgfx->transpen(bitmap, cliprect,
+				code, color,
+				flipx, flipy,
+				sx, sy, 0);
+			sgfx->transpen(bitmap, cliprect,
+				code + 1, color,
+				flipx, flipy,
+				sx + mod, sy, 0);
+		}
+	}
+	else
+	{
+		code &= ~3;
+
+		int width, height;
+		if (size & 0x10)
+		{
+			if (flip)
 			{
-				sx += 8;
-				sy -= 8;
-				mod = 8;
+				sx -= 16;
+				sy -= 16;
 			}
 
-			if ((attr & 0x0c) == 0x0c)
-			{
-				if (flip_screen()) sy += 16;
-				DRAW_SPRITE(2, spritenum, sx, sy)
-			}
-
-			if ((attr & 0x0c) == 0x08)
-			{
-				sy += 8;
-				DRAW_SPRITE(2, spritenum, sx, sy)
-				DRAW_SPRITE(2, spritenum - 2, sx, sy + mod)
-			}
-
-			if ((attr & 0x0c) == 0x04)
-			{
-				DRAW_SPRITE(2, spritenum, sx, sy)
-				DRAW_SPRITE(2, spritenum + 1, sx + mod, sy)
-			}
+			width = 4;
+			height = 4;
 		}
 		else
 		{
-			int const spritenum = sn1 + ((sn2 & 0x03) << 8);
-
-			if (attr & 0x10)
+			width = 2;
+			height = 2;
+		}
+		static const int x_offset[4] = {  0,  1,  4,  5 };
+		static const int y_offset[4] = {  0,  2,  8, 10 };
+		for (int dy = 0; dy < height; dy++)
+		{
+			const int ey = flipy ? (height - dy - 1) : dy;
+			for (int dx = 0; dx < width; dx++)
 			{
-				if (flip_screen())
-				{
-					sx -= 16;
-					sy -= 16;
-				}
-
-				DRAW_SPRITE(1, spritenum, flipx ? sx + 16 : sx, flipy ? sy + 16 : sy)
-				DRAW_SPRITE(1, spritenum + 1, flipx ? sx : sx + 16, flipy ? sy + 16 : sy)
-				DRAW_SPRITE(1, spritenum + 2, flipx ? sx + 16 : sx, flipy ? sy : sy + 16)
-				DRAW_SPRITE(1, spritenum + 3, flipx ? sx : sx + 16, flipy ? sy : sy + 16)
-			}
-			else
-			{
-				DRAW_SPRITE(1, spritenum, sx, sy)
+				const int ex = flipx ? (width - dx - 1) : dx;
+				sgfx->transpen(bitmap, cliprect,
+					code + x_offset[ex] + y_offset[ey], color,
+					flipx, flipy,
+					sx + dx * 8, sy + dy * 8, 0);
 			}
 		}
 	}
 }
 
-void jackal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void jackal_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_sprites_region(bitmap, cliprect, &m_k005885[1]->spriteram()[m_k005885[0]->get_spritebank() << 11], 0x0f5, 1);
-	draw_sprites_region(bitmap, cliprect, &m_k005885[0]->spriteram()[m_k005885[0]->get_spritebank() << 11], 0x500, 0);
+	m_k005885[1]->sprite_draw(screen, bitmap, cliprect, flip_screen(), m_k005885[0]->get_spriterambank(), 0x0f5, 1);
+	m_k005885[0]->sprite_draw(screen, bitmap, cliprect, flip_screen(), m_k005885[0]->get_spriterambank(), 0x500, 1);
 }
 
 uint32_t jackal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_background(screen, bitmap, cliprect);
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -344,7 +356,7 @@ void jackal_state::rambank_w(uint8_t data)
 
 void jackal_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0004).rw(m_k005885[0], FUNC(k005885_device::ctrl_r), FUNC(k005885_device::ctrl_w));
+	map(0x0000, 0x0004).m(m_k005885[0], FUNC(k005885_device::regs_map));
 	map(0x0010, 0x0010).portr("DSW1");
 	map(0x0011, 0x0011).portr("IN1");
 	map(0x0012, 0x0012).portr("IN2");
@@ -465,19 +477,6 @@ static const gfx_layout charlayout =
 
 static const gfx_layout spritelayout =
 {
-	16, 16,
-	RGN_FRAC(1,4),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			32*8+0*4, 32*8+1*4, 32*8+2*4, 32*8+3*4, 32*8+4*4, 32*8+5*4, 32*8+6*4, 32*8+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
-	32*32
-};
-
-static const gfx_layout spritelayout8 =
-{
 	8, 8,
 	RGN_FRAC(1,4),
 	4,
@@ -488,15 +487,13 @@ static const gfx_layout spritelayout8 =
 };
 
 static GFXDECODE_START( gfx_jackal_1 )
-	GFXDECODE_ENTRY( "k005885", 0x00000, charlayout,        0,  1 )    // colors 256-511 without lookup
-	GFXDECODE_ENTRY( "k005885", 0x20000, spritelayout,  0x100, 16 )    // colors   0- 15 with lookup
-	GFXDECODE_ENTRY( "k005885", 0x20000, spritelayout8, 0x100, 16 )    // to handle 8x8 sprites
+	GFXDECODE_ENTRY( "k005885", 0x00000, charlayout,       0,  1 )    // colors 256-511 without lookup
+	GFXDECODE_ENTRY( "k005885", 0x20000, spritelayout, 0x100, 16 )    // colors   0- 15 with lookup
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_jackal_2 )
-	GFXDECODE_ENTRY( "k005885", 0x00000, charlayout,        0,  1 )    // colors 256-511 without lookup
-	GFXDECODE_ENTRY( "k005885", 0x60000, spritelayout,  0x200, 16 )    // colors  16- 31 with lookup
-	GFXDECODE_ENTRY( "k005885", 0x60000, spritelayout8, 0x200, 16 )    // to handle 8x8 sprites
+	GFXDECODE_ENTRY( "k005885", 0x00000, charlayout,       0,  1 )    // colors 256-511 without lookup
+	GFXDECODE_ENTRY( "k005885", 0x60000, spritelayout, 0x200, 16 )    // colors  16- 31 with lookup
 GFXDECODE_END
 
 /*************************************
@@ -562,10 +559,12 @@ void jackal_state::jackal(machine_config &config)
 	m_k005885[0]->set_split_tilemap(true);
 	m_k005885[0]->set_irq_cb().set(FUNC(jackal_state::irq_callback));
 	m_k005885[0]->set_flipscreen_cb().set(FUNC(jackal_state::flip_screen_set));
+	m_k005885[0]->set_sprite_callback(FUNC(jackal_state::sprite_callback));
 	m_k005885[0]->set_tile_callback(FUNC(jackal_state::tile_callback));
 
 	K005885(config, m_k005885[1], 18.432_MHz_XTAL, gfx_jackal_2, m_palette, "screen");
 	m_k005885[1]->set_split_tilemap(true);
+	m_k005885[1]->set_sprite_callback(FUNC(jackal_state::sprite_callback));
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

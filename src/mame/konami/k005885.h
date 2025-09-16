@@ -12,6 +12,7 @@
 class k005885_device : public device_t, public device_video_interface, public device_gfx_interface
 {
 public:
+	using sprite_delegate = device_delegate<void (screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int size, bool flip, gfx_element *sgfx, int &code, int &color, int &sx, int &sy, bool flipx, bool flipy)>;
 	using tile_delegate = device_delegate<void (int layer, int attr, int &gfx, int &code, int &color, int &flags, int codebank)>;
 
 	k005885_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -29,11 +30,10 @@ public:
 	auto set_firq_cb() { return m_firq_cb.bind(); }
 	auto set_nmi_cb() { return m_nmi_cb.bind(); }
 	auto set_flipscreen_cb() { return m_flipscreen_cb.bind(); }
+	template <typename... T> void set_sprite_callback(T &&... args) { m_sprite_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_tile_callback(T &&... args) { m_tile_cb.set(std::forward<T>(args)...); }
 
 	bool flipscreen() { return m_flipscreen; }
-	u8 ctrl_r(offs_t offset) { return (offset >= 5) ? 0 : m_ctrlram[offset & 7]; } // not from addressmap
-	void ctrl_w(offs_t offset, u8 data);
 
 	// scroll RAM
 	u8 scroll_r(offs_t offset) { return m_scrollram[offset & 0x3f]; }
@@ -47,19 +47,30 @@ public:
 	u8 spriteram_r(offs_t offset) { return m_spriteram[offset]; }
 	void spriteram_w(offs_t offset, u8 data) { m_spriteram[offset] = data; }
 
-	// helpers
-	u8 get_yscroll() { return m_ctrlram[0]; }
-	uint16_t get_xscroll() { return (m_ctrlram[1] | (m_ctrlram[2] << 8)) & 0x1ff; }
+	// registers
+	u8 yscroll_r();
+	u8 xscroll_lsb_r();
+	u8 scrollmode_r();
+	u8 bank_r();
+	u8 irq_flip_r();
+	void yscroll_w(u8 data);
+	void xscroll_lsb_w(u8 data);
+	void scrollmode_w(u8 data);
+	void bank_w(u8 data);
+	void irq_flip_w(u8 data);
 
-	u8 get_scrollmode() { return m_ctrlram[2] & 0xe; }
-	u8 get_tilebank() { return m_ctrlram[3] & 0x3; }
-	u8 get_spritebank() { return BIT(m_ctrlram[3], 3); }
-	bool get_nmi_enable() { return BIT(m_ctrlram[4], 0); }
-	bool get_irq_enable() { return BIT(m_ctrlram[4], 1); }
-	bool get_firq_enable() { return BIT(m_ctrlram[4], 2); }
-	void nmi_set(int state = ASSERT_LINE) { if (state && get_nmi_enable()) m_nmi_cb(ASSERT_LINE); }
-	void irq_set(int state = ASSERT_LINE) { if (state && get_irq_enable()) m_irq_cb(ASSERT_LINE); }
-	void firq_set(int state = ASSERT_LINE) { if (state && get_firq_enable()) m_firq_cb(ASSERT_LINE); }
+	// helpers
+	u16 get_xscroll() { return m_xscroll; }
+
+	u8 get_scrollmode() { return m_scrollmode; }
+	u8 get_tilebank() { return m_tilebank; }
+	u8 get_spriterambank() { return m_spriterambank; }
+	bool get_nmi_enable() { return m_nmi_enable; }
+	bool get_irq_enable() { return m_irq_enable; }
+	bool get_firq_enable() { return m_firq_enable; }
+	void nmi_set(int state = ASSERT_LINE) { if (state && m_nmi_enable) m_nmi_cb(ASSERT_LINE); }
+	void irq_set(int state = ASSERT_LINE) { if (state && m_irq_enable) m_irq_cb(ASSERT_LINE); }
+	void firq_set(int state = ASSERT_LINE) { if (state && m_firq_enable) m_firq_cb(ASSERT_LINE); }
 
 	u8 *spriteram() { return &m_spriteram[0]; }
 
@@ -72,6 +83,9 @@ public:
 	void tilemap_draw(int i, screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, u32 flags = TILEMAP_DRAW_ALL_CATEGORIES, u8 priority = 0, u8 priority_mask = 0xff);
 	void tilemap_draw(int i, screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, u32 flags = TILEMAP_DRAW_ALL_CATEGORIES, u8 priority = 0, u8 priority_mask = 0xff);
 
+	void sprite_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flip, u8 bank, u32 len, u8 gfxnum);
+
+	void regs_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -82,8 +96,15 @@ private:
 	memory_share_creator<u8> m_vram;
 	memory_share_creator<u8> m_spriteram;
 
-	u8 m_ctrlram[5];
 	u8 m_scrollram[0x40];
+	u16 m_xscroll;
+	u8 m_yscroll;
+	u8 m_scrollmode;
+	u8 m_tilebank;
+	u8 m_spriterambank;
+	bool m_nmi_enable;
+	bool m_irq_enable;
+	bool m_firq_enable;
 	bool m_flipscreen;
 	tilemap_t *m_tilemap[2];
 
@@ -93,6 +114,7 @@ private:
 	devcb_write_line m_irq_cb;
 	devcb_write_line m_firq_cb;
 	devcb_write_line m_nmi_cb;
+	sprite_delegate m_sprite_cb;
 	tile_delegate m_tile_cb;
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);

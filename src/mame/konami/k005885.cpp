@@ -75,8 +75,20 @@ TODO:
 #include "emu.h"
 #include "k005885.h"
 
-#include "screen.h"
+#define LOG_UNKNOWN (1 << 1)
 
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+void k005885_device::regs_map(address_map &map)
+{
+	map(0x00, 0x00).rw(FUNC(k005885_device::yscroll_r), FUNC(k005885_device::yscroll_w));
+	map(0x01, 0x01).rw(FUNC(k005885_device::xscroll_lsb_r), FUNC(k005885_device::xscroll_lsb_w));
+	map(0x02, 0x02).rw(FUNC(k005885_device::scrollmode_r), FUNC(k005885_device::scrollmode_w));
+	map(0x03, 0x03).rw(FUNC(k005885_device::bank_r), FUNC(k005885_device::bank_w));
+	map(0x04, 0x04).rw(FUNC(k005885_device::irq_flip_r), FUNC(k005885_device::irq_flip_w));
+}
 
 DEFINE_DEVICE_TYPE(K005885, k005885_device, "k005885", "Konami 005885 Video Controller")
 
@@ -86,8 +98,15 @@ k005885_device::k005885_device(const machine_config &mconfig, const char *tag, d
 	device_gfx_interface(mconfig, *this),
 	m_vram(*this, "vram", 0x1000, ENDIANNESS_BIG),
 	m_spriteram(*this, "spriteram", 0x1000, ENDIANNESS_BIG),
-	m_ctrlram{0},
 	m_scrollram{0},
+	m_xscroll(0),
+	m_yscroll(0),
+	m_scrollmode(0),
+	m_tilebank(0),
+	m_spriterambank(0),
+	m_nmi_enable(false),
+	m_irq_enable(false),
+	m_firq_enable(false),
 	m_flipscreen(false),
 	m_tilemap{nullptr, nullptr},
 	m_split_tilemap(false),
@@ -95,6 +114,7 @@ k005885_device::k005885_device(const machine_config &mconfig, const char *tag, d
 	m_irq_cb(*this),
 	m_firq_cb(*this),
 	m_nmi_cb(*this),
+	m_sprite_cb(*this),
 	m_tile_cb(*this)
 {
 }
@@ -105,6 +125,7 @@ k005885_device::k005885_device(const machine_config &mconfig, const char *tag, d
 
 void k005885_device::device_start()
 {
+	m_sprite_cb.resolve();
 	m_tile_cb.resolve();
 	if (m_split_tilemap) // splited single tilemap to 2 splited
 	{
@@ -117,8 +138,15 @@ void k005885_device::device_start()
 		m_tilemap[1] = nullptr;
 	}
 
-	save_item(NAME(m_ctrlram));
 	save_item(NAME(m_scrollram));
+	save_item(NAME(m_xscroll));
+	save_item(NAME(m_yscroll));
+	save_item(NAME(m_scrollmode));
+	save_item(NAME(m_tilebank));
+	save_item(NAME(m_spriterambank));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_firq_enable));
 	save_item(NAME(m_flipscreen));
 }
 
@@ -128,8 +156,12 @@ void k005885_device::device_start()
 
 void k005885_device::device_reset()
 {
-	for (int i = 0; i < 5; i++)
-		ctrl_w(i, 0);
+	m_xscroll = 0;
+	m_yscroll = 0;
+	m_scrollmode = 0;
+	m_tilebank = 0;
+	m_spriterambank = 0;
+	irq_flip_w(0);
 }
 
 //-------------------------------------------------
@@ -185,6 +217,56 @@ void k005885_device::tilemap_draw(int i, screen_device &screen, bitmap_rgb32 &de
 	tilemap_draw_common(i, screen, dest, cliprect, flags, priority, priority_mask);
 }
 
+//-------------------------------------------------
+//  sprite handlers
+//-------------------------------------------------
+
+/*
+	Sprite format (5 bytes per sprites)
+
+	Offset Bit       Description
+	       7654 3210
+	00     xxxx xxxx Code LSB
+	01     xxxx ---- Palette index
+	       ---- xx-- Code MSB or Sprite quarter select in 8x8 sprite mode*
+	       ---- --xx Code MSB
+	02     xxxx xxxx Y position
+	03     xxxx xxxx X position LSB
+	04     -x-- ---- Flip Y
+	       --x- ---- Flip X
+		   ---x xx-- Sprite size*
+	       ---- ---x X position MSB*
+
+	* Depended by hardware?
+	Unmarked bits are unused/unknown
+*/
+void k005885_device::sprite_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flip, u8 bank, u32 len, u8 gfxnum)
+{
+	u8 const *const src = &m_spriteram[bank << 11];
+	len -= len % 5;
+	gfx_element *sgfx = gfx(gfxnum);
+	for (int offs = 0; offs < len; offs += 5)
+	{
+		int sy  = src[offs + 2];
+		int sx  = src[offs + 3];
+		int const attr = src[offs + 4];
+		bool flipx = BIT(attr, 5);
+		bool flipy = BIT(attr, 6);
+		int code = src[offs] | ((src[offs + 1] & 0x0f) << 8);
+		int color = ((src[offs + 1] & 0xf0) >> 4);
+		sx |= (attr & 0x01) << 8;
+
+		if (flip)
+		{
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+		if (!m_sprite_cb.isnull())
+			m_sprite_cb(screen, bitmap, cliprect,
+				attr & 0x1c, flip, sgfx, code, color, sx, sy, flipx, flipy);
+	}
+}
+
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
@@ -198,44 +280,89 @@ void k005885_device::vram_w(offs_t offset, u8 data)
 		m_tilemap[0]->mark_tile_dirty(offset & 0xbff);
 }
 
-void k005885_device::ctrl_w(offs_t offset, u8 data)
+u8 k005885_device::yscroll_r()
 {
-	offset &= 7;
-	if (offset >= 5)
-		return;
-
-	u8 const old = m_ctrlram[offset];
-	switch (offset)
-	{
-		case 3:
-			if ((old ^ data) & 3)
-			{
-				m_tilemap[0]->mark_all_dirty();
-				if (m_split_tilemap)
-					m_tilemap[1]->mark_all_dirty();
-			}
-			break;
-		case 4:
-			// clear interrupts
-			if (BIT(~data & m_ctrlram[4], 1))
-				m_irq_cb(CLEAR_LINE);
-
-			if (BIT(~data & m_ctrlram[4], 2))
-				m_firq_cb(CLEAR_LINE);
-
-			if (BIT(~data & m_ctrlram[4], 0))
-				m_nmi_cb(CLEAR_LINE);
-
-			// flipscreen
-			if (BIT(old ^ data, 3))
-			{
-				m_flipscreen = BIT(data, 3);
-				if (!m_flipscreen_cb.isunset())
-					m_flipscreen_cb(BIT(data, 3));
-			}
-			break;
-	}
-
-	m_ctrlram[offset] = data;
+	return m_yscroll;
 }
 
+u8 k005885_device::xscroll_lsb_r()
+{
+	return u8(m_xscroll);
+}
+
+u8 k005885_device::scrollmode_r()
+{
+	return (m_scrollmode << 1) | BIT(m_xscroll, 8);
+}
+
+u8 k005885_device::bank_r()
+{
+	return (m_spriterambank << 3) | m_tilebank;
+}
+
+u8 k005885_device::irq_flip_r()
+{
+	return (m_nmi_enable ? 0x01 : 0x00) |
+			(m_irq_enable ? 0x02 : 0x00) |
+			(m_firq_enable ? 0x04 : 0x00) |
+			(m_flipscreen ? 0x08 : 0x00);
+}
+
+void k005885_device::yscroll_w(u8 data)
+{
+	m_yscroll = data;
+}
+
+void k005885_device::xscroll_lsb_w(u8 data)
+{
+	m_xscroll = (m_xscroll & ~0x0ff) | data;
+}
+
+void k005885_device::scrollmode_w(u8 data)
+{
+	m_scrollmode = (data & 0x0e) >> 1;
+	m_xscroll = (m_xscroll & ~0x100) | (u16(data & 1) << 8);
+	if (data & 0xf0)
+		LOGMASKED(LOG_UNKNOWN, "%s: Unknown scrollmode_w write %02x", machine().describe_context(), data);
+}
+
+void k005885_device::bank_w(u8 data)
+{
+	if ((m_tilebank ^ data) & 3)
+	{
+		m_tilemap[0]->mark_all_dirty();
+		if (m_split_tilemap)
+			m_tilemap[1]->mark_all_dirty();
+	}
+	m_tilebank = data & 3;
+	m_spriterambank = BIT(data, 3);
+	if (data & 0xf4)
+		LOGMASKED(LOG_UNKNOWN, "%s: Unknown bank_w write %02x", machine().describe_context(), data);
+}
+
+void k005885_device::irq_flip_w(u8 data)
+{
+	// clear interrupts
+	if (bool(BIT(~data, 1)) && m_irq_enable)
+		m_irq_cb(CLEAR_LINE);
+
+	if (bool(BIT(~data, 2)) && m_firq_enable)
+		m_firq_cb(CLEAR_LINE);
+
+	if (bool(BIT(~data, 0)) && m_nmi_enable)
+		m_nmi_cb(CLEAR_LINE);
+
+	m_nmi_enable = BIT(data, 0);
+	m_irq_enable = BIT(data, 1);
+	m_firq_enable = BIT(data, 2);
+
+	// flipscreen
+	if (m_flipscreen != bool(BIT(data, 3)))
+	{
+		m_flipscreen = BIT(data, 3);
+		if (!m_flipscreen_cb.isunset())
+			m_flipscreen_cb(BIT(data, 3));
+	}
+	if (data & 0xf0)
+		LOGMASKED(LOG_UNKNOWN, "%s: Unknown irq_flip_w write %02x", machine().describe_context(), data);
+}

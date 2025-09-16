@@ -66,7 +66,7 @@ private:
 	int bootleg_t1_r();
 	void tile_callback(int layer, int attr, int &gfx, int &code, int &color, int &flags, int codebank);
 	void palette(palette_device &palette) const;
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sprite_callback(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int size, bool flip, gfx_element *sgfx, int &code, int &color, int &sx, int &sy, bool flipx, bool flipy);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void nmi_callback(int state);
@@ -167,79 +167,79 @@ void finalizr_state::tile_callback(int layer, int attr, int &gfx, int &code, int
 
 /**************************************************************************/
 
-void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void finalizr_state::sprite_callback(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int size, bool flip, gfx_element *sgfx, int &code, int &color, int &sx, int &sy, bool flipx, bool flipy)
 {
-	gfx_element *gfx1 = m_k005885->gfx(1);
-	gfx_element *gfx2 = m_k005885->gfx(2);
+	sx = 32 + 1 + (sx & 0xff) - (sx & 0x100);
+	code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
+	color += 16;
 
-	uint8_t const *sr = &m_k005885->spriteram()[m_k005885->get_spritebank() << 11];
+	int width = 1, height = 1;
 
-	for (int offs = 0; offs <= 0x200 - 5; offs += 5)
+	if (size >= 0x10)
 	{
-		int sx = 32 + 1 + sr[offs + 3] - ((sr[offs + 4] & 0x01) << 8);
-		int sy = sr[offs + 2];
-		int flipx = sr[offs + 4] & 0x20;
-		int flipy = sr[offs + 4] & 0x40;
-		int code = sr[offs] + ((sr[offs + 1] & 0x0f) << 8);
-		int const color = ((sr[offs + 1] & 0xf0) >> 4);
-
-//      (sr[offs + 4] & 0x02) is used, meaning unknown
-
-		int const size = sr[offs + 4] & 0x1c;
-
-		if (size >= 0x10)
+		// 32x32
+		if (flip)
 		{
-			// 32x32
-			if (flip_screen())
-			{
-				sx = 256 - sx;
-				sy = 224 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
+			sx = 256 - sx;
+			sy = 224 - sy;
+		}
 
-			gfx1->transpen(bitmap, cliprect, code + 0, color, flipx, flipy, flipx ? sx + 16 : sx, flipy ? sy + 16 : sy, 0);
-			gfx1->transpen(bitmap, cliprect, code + 1, color, flipx, flipy, flipx ? sx : sx + 16, flipy ? sy + 16 : sy, 0);
-			gfx1->transpen(bitmap, cliprect, code + 2, color, flipx, flipy, flipx ? sx + 16: sx , flipy ? sy : sy + 16, 0);
-			gfx1->transpen(bitmap, cliprect, code + 3, color, flipx, flipy, flipx ? sx : sx + 16, flipy ? sy : sy + 16, 0);
+		code &= ~3;
+		width = 4;
+		height = 4;
+	}
+	else
+	{
+		if (flip)
+		{
+			sx = (BIT(size, 3) ? 280: 272) - sx;
+			sy = (BIT(size, 2) ? 248: 240) - sy;
+		}
+
+		if (size == 0x00)
+		{
+			// 16x16
+			code &= ~3;
+			width = 2;
+			height = 2;
 		}
 		else
 		{
-			if (flip_screen())
+			if (size == 0x04)
 			{
-				sx = (BIT(size, 3) ? 280: 272) - sx;
-				sy = (BIT(size, 2) ? 248: 240) - sy;
-				flipx = !flipx;
-				flipy = !flipy;
+				// 16x8
+				code &= ~1;
+				width = 2;
+				height = 1;
 			}
-
-			if (size == 0x00)
+			else if (size == 0x08)
 			{
-				// 16x16
-				gfx1->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
+				// 8x16
+				code &= ~2;
+				width = 1;
+				height = 2;
 			}
-			else
+			else if (size == 0x0c)
 			{
-				code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-
-				if (size == 0x04)
-				{
-					// 16x8
-					gfx2->transpen(bitmap, cliprect, code &~1, color, flipx, flipy, flipx ? sx + 8 : sx, sy, 0);
-					gfx2->transpen(bitmap, cliprect, code | 1, color, flipx, flipy, flipx ? sx : sx + 8, sy, 0);
-				}
-				else if (size == 0x08)
-				{
-					// 8x16
-					gfx2->transpen(bitmap, cliprect, code &~2, color, flipx, flipy, sx, flipy ? sy + 8 : sy, 0);
-					gfx2->transpen(bitmap, cliprect, code | 2, color, flipx, flipy, sx, flipy ? sy : sy + 8, 0);
-				}
-				else if (size == 0x0c)
-				{
-					// 8x8
-					gfx2->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
-				}
+				// 8x8
+				width = 1;
+				height = 1;
 			}
+		}
+	}
+	static const int x_offset[4] = {  0,  1,  4,  5 };
+	static const int y_offset[4] = {  0,  2,  8, 10 };
+	for (int dy = 0; dy < height; dy++)
+	{
+		const int ey = flipy ? (height - dy - 1) : dy;
+		for (int dx = 0; dx < width; dx++)
+		{
+			const int ex = flipx ? (width - dx - 1) : dx;
+			sgfx->transpen(bitmap, cliprect,
+					code + x_offset[ex] + y_offset[ey],
+					color,
+					flipx, flipy,
+					sx + dx * 8, sy + dy * 8, 0);
 		}
 	}
 }
@@ -250,7 +250,7 @@ uint32_t finalizr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_k005885->tilemap_set_scrollx(0, 0, m_k005885->get_xscroll() - 32);
 	m_k005885->tilemap_draw(0, screen, bitmap, cliprect, 0, 0);
 
-	draw_sprites(bitmap, cliprect);
+	m_k005885->sprite_draw(screen, bitmap, cliprect, flip_screen(), m_k005885->get_spriterambank(), 0x200, 0);
 
 	// draw top status region
 	const rectangle &visarea = screen.visible_area();
@@ -325,7 +325,7 @@ int finalizr_state::bootleg_t1_r()
 void finalizr_state::main_map(address_map &map)
 {
 	// Konami 005885
-	map(0x0000, 0x0004).w(m_k005885, FUNC(k005885_device::ctrl_w));
+	map(0x0000, 0x0004).m(m_k005885, FUNC(k005885_device::regs_map));
 //  map(0x0020, 0x003f).w(m_k005885, FUNC(k005885_device::scroll_w));
 
 	map(0x0800, 0x0800).portr("DSW3");
@@ -422,9 +422,7 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_finalizr )
-	GFXDECODE_ENTRY( "k005885", 0, gfx_8x8x4_packed_msb,                   0, 16 )
-	GFXDECODE_ENTRY( "k005885", 0, gfx_8x8x4_row_2x2_group_packed_msb, 16*16, 16 )
-	GFXDECODE_ENTRY( "k005885", 0, gfx_8x8x4_packed_msb,               16*16, 16 )  // to handle 8x8 sprites
+	GFXDECODE_ENTRY( "k005885", 0, gfx_8x8x4_packed_msb, 0, 16*2 )
 GFXDECODE_END
 
 
@@ -460,6 +458,7 @@ void finalizr_state::finalizr(machine_config &config)
 	m_k005885->set_irq_cb().set_inputline(m_maincpu, M6809_IRQ_LINE, HOLD_LINE);
 	m_k005885->set_nmi_cb().set(FUNC(finalizr_state::nmi_callback));
 	m_k005885->set_flipscreen_cb().set(FUNC(finalizr_state::flip_screen_set)).invert();
+	m_k005885->set_sprite_callback(FUNC(finalizr_state::sprite_callback));
 	m_k005885->set_tile_callback(FUNC(finalizr_state::tile_callback));
 
 	PALETTE(config, m_palette, FUNC(finalizr_state::palette), 2*16*16, 32);

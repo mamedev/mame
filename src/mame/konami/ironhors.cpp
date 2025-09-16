@@ -113,9 +113,9 @@ private:
 	void sound_map(address_map &map) ATTR_COLD;
 	void sound_io_map(address_map &map) ATTR_COLD;
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void nmi_callback(int state);
 
+	void sprite_callback(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int size, bool flip, gfx_element *sgfx, int &code, int &color, int &sx, int &sy, bool flipx, bool flipy);
 	void tile_callback(int layer, int attr, int &gfx, int &code, int &color, int &flags, int codebank);
 
 	// devices
@@ -302,83 +302,58 @@ void ironhors_state::video_start()
 	m_k005885->tilemap_set_scroll_rows(0, 32);
 }
 
-void ironhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void ironhors_state::sprite_callback(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int size, bool flip, gfx_element *sgfx, int &code, int &color, int &sx, int &sy, bool flipx, bool flipy)
 {
-	uint8_t *sr = &m_k005885->spriteram()[m_k005885->get_spritebank() << 11];
-
-	// note that it has 5 bytes per sprite
-	int end = 0x100;
-	end -= end % 5;
-
-	for (int offs = 0; offs < end; offs += 5)
+	sx &= 0xff;
+	code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
+	color += 16 * (m_palettebank + 8);
+	if (flip)
 	{
-		int sx = sr[offs + 3];
-		int sy = sr[offs + 2];
-		int flipx = sr[offs + 4] & 0x20;
-		int flipy = sr[offs + 4] & 0x40;
-		int const code = (sr[offs] << 2) + ((sr[offs + 1] & 0x03) << 10) + ((sr[offs + 1] & 0x0c) >> 2);
-		int const color = ((sr[offs + 1] & 0xf0) >> 4) + 16 * m_palettebank;
-	//  int mod = flip_screen() ? -8 : 8;
+		sx = 240 - sx;
+		sy = 240 - sy;
+	}
 
-		if (flip_screen())
+	int width = 1, height = 1;
+	switch (size & 0x0c)
+	{
+		case 0x00:  // 16x16
+			code &= ~3;
+			width = 2;
+			height = 2;
+			break;
+
+		case 0x04:  // 16x8
+			code &= ~1;
+			width = 2;
+			height = 1;
+			if (flip)
+				sy += 8; // this fixes the train wheels' position
+			break;
+
+		case 0x08:  // 8x16
+			code &= ~2;
+			width = 1;
+			height = 2;
+			break;
+
+		case 0x0c:  // 8x8
+			width = 1;
+			height = 1;
+			break;
+	}
+	static const int x_offset[2] = { 0, 1 };
+	static const int y_offset[2] = { 0, 2 };
+	for (int dy = 0; dy < height; dy++)
+	{
+		const int ey = flipy ? (height - dy - 1) : dy;
+		for (int dx = 0; dx < width; dx++)
 		{
-			sx = 240 - sx;
-			sy = 240 - sy;
-			flipx = !flipx;
-			flipy = !flipy;
-		}
-
-		switch (sr[offs + 4] & 0x0c)
-		{
-			case 0x00:  // 16x16
-				m_k005885->gfx(1)->transpen(bitmap, cliprect,
-						code / 4,
-						color,
-						flipx, flipy,
-						sx, sy, 0);
-				break;
-
-			case 0x04:  // 16x8
-				{
-					if (flip_screen()) sy += 8; // this fixes the train wheels' position
-
-					m_k005885->gfx(2)->transpen(bitmap, cliprect,
-							code & ~1,
-							color,
-							flipx, flipy,
-							flipx ? sx + 8 : sx, sy, 0);
-					m_k005885->gfx(2)->transpen(bitmap, cliprect,
-							code | 1,
-							color,
-							flipx, flipy,
-							flipx ? sx : sx + 8, sy, 0);
-				}
-				break;
-
-			case 0x08:  // 8x16
-				{
-					m_k005885->gfx(2)->transpen(bitmap, cliprect,
-							code & ~2,
-							color,
-							flipx, flipy,
-							sx, flipy ? sy + 8 : sy, 0);
-					m_k005885->gfx(2)->transpen(bitmap, cliprect,
-							code | 2,
-							color,
-							flipx, flipy,
-							sx, flipy ? sy : sy + 8, 0);
-				}
-				break;
-
-			case 0x0c:  // 8x8
-				{
-					m_k005885->gfx(2)->transpen(bitmap, cliprect,
-							code,
-							color,
-							flipx, flipy,
-							sx, sy, 0);
-				}
-				break;
+			const int ex = flipx ? (width - dx - 1) : dx;
+			sgfx->transpen(bitmap, cliprect,
+					code + x_offset[ex] + y_offset[ey],
+					color,
+					flipx, flipy,
+					sx + dx * 8, sy + dy * 8, 0);
 		}
 	}
 }
@@ -389,7 +364,7 @@ uint32_t ironhors_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_k005885->tilemap_set_scrollx(0, row, m_k005885->scroll_r(row));
 
 	m_k005885->tilemap_draw(0, screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect);
+	m_k005885->sprite_draw(screen, bitmap, cliprect, flip_screen(), m_k005885->get_spriterambank(), 0x100, 0);
 	return 0;
 }
 
@@ -547,7 +522,7 @@ void ironhors_base_state::filter_w(uint8_t data)
 void ironhors_state::main_map(address_map &map)
 {
 	// Konami 005885
-	map(0x0000, 0x0004).rw(m_k005885, FUNC(k005885_device::ctrl_r), FUNC(k005885_device::ctrl_w));
+	map(0x0000, 0x0004).m(m_k005885, FUNC(k005885_device::regs_map));
 	map(0x0005, 0x001f).ram();
 	map(0x0020, 0x003f).rw(m_k005885, FUNC(k005885_device::scroll_r), FUNC(k005885_device::scroll_w));
 	map(0x0040, 0x005f).ram();
@@ -698,9 +673,7 @@ INPUT_PORTS_END
  *************************************/
 
 static GFXDECODE_START( gfx_ironhors )
-	GFXDECODE_ENTRY( "k005885", 0, gfx_8x8x4_packed_msb,                     0, 16*8 )
-	GFXDECODE_ENTRY( "k005885", 0, gfx_8x8x4_row_2x2_group_packed_msb, 16*8*16, 16*8 )
-	GFXDECODE_ENTRY( "k005885", 0, gfx_8x8x4_packed_msb,               16*8*16, 16*8 )  // to handle 8x8 sprites
+	GFXDECODE_ENTRY( "k005885", 0, gfx_8x8x4_packed_msb, 0, 16*8*2 )
 GFXDECODE_END
 
 
@@ -872,6 +845,7 @@ void ironhors_state::ironhors(machine_config &config)
 	m_k005885->set_split_tilemap(true);
 	m_k005885->set_firq_cb().set_inputline(m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 	m_k005885->set_nmi_cb().set(FUNC(ironhors_state::nmi_callback));
+	m_k005885->set_sprite_callback(FUNC(ironhors_state::sprite_callback));
 	m_k005885->set_tile_callback(FUNC(ironhors_state::tile_callback));
 }
 
