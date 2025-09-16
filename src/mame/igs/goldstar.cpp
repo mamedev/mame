@@ -3415,12 +3415,12 @@ static INPUT_PORTS_START( cmv4_player )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Big")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / D-UP")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Stop All / Take")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Small / Info")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_CODE(KEYCODE_B) PORT_NAME("Stop 3 / Big")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_CODE(KEYCODE_C) PORT_NAME("Stop 1 / D-UP")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )  PORT_CODE(KEYCODE_X) PORT_NAME("Stop All / Take")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_CODE(KEYCODE_V) PORT_NAME("Stop 2 / Small / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )       PORT_CODE(KEYCODE_N) PORT_NAME("Start")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cmv4_coins )
@@ -3812,15 +3812,15 @@ static INPUT_PORTS_START( cmaster )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Big")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / D-UP")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Bet / Stop All")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Small / Info")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_CODE(KEYCODE_C) PORT_NAME("Stop 1 / Big / Ticket")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_CODE(KEYCODE_V) PORT_NAME("Stop 2 / D-UP")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_CODE(KEYCODE_X) PORT_NAME("Take")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_CODE(KEYCODE_Z) PORT_NAME("Stop All / Bet")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_CODE(KEYCODE_B) PORT_NAME("Stop 3/ Small / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )      PORT_CODE(KEYCODE_N) PORT_NAME("Start")
 
 	PORT_INCLUDE( cmv4_coins )
-
+	
 	PORT_INCLUDE( cmv4_service )
 
 	PORT_INCLUDE( cmv4_dsw1 )
@@ -3922,6 +3922,65 @@ static INPUT_PORTS_START( cmasterb )
 	// Display Of Doll At All Fr. Bonus not checked
 	// DSW5-7 listed as unused
 	// Test Mode For Disp. Of Doll not checked
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cm_nodsw )
+
+	PORT_INCLUDE( cmv4_player )
+
+	PORT_INCLUDE( cmv4_coins )
+
+	PORT_INCLUDE( cmv4_service )
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW1:8")
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW2:8")
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW3:8")
+
+	PORT_START("DSW4")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW4:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW4:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW4:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW4:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW4:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW4:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW4:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW4:8")
+
+	PORT_START("DSW5")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW5:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW5:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW5:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW5:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW5:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW5:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW5:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW5:8")
 INPUT_PORTS_END
 
 
@@ -11989,8 +12048,6 @@ void cmaster_state::reelmg(machine_config &config)
 	Z80(config.replace(), m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map);
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::reelm_portmap);
-	
-
 }
 
 
@@ -26290,6 +26347,10 @@ void cmaster_state::init_alienatt()
 
 	for (int a = 0; a < 0xc000; a++)
 		rom[a] = bitswap<8>(rom[a] ^ 0x59, 3, 1, 5, 0, 6, 7, 4, 2);
+
+	// unknown protection - read back needed values
+	rom[0x9001] = 0x33;
+	rom[0x9002] = 0x54;
 }
 
 void cmaster_state::init_animalhs()
@@ -26447,7 +26508,7 @@ GAMEL( 198?, cmv801,     0,        cm,       cmv801,   cmaster_state,  init_cm, 
 // the original, unmodified Dyna versions is almost impossible due to lack of documentation from back in the day,
 // even original boards almost always run modified sets
 GAMEL( 1992, cmv4,       0,        cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 1)",                0,                 layout_cmv4 )
-GAMEL( 1992, cmv4a,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",                MACHINE_NOT_WORKING,  layout_cmv4 ) // stealth game?
+GAMEL( 1992, cmv4a,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",                0,                 layout_cmv4 ) // with tetris tiles leftover
 GAMEL( 199?, cmwm,       cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Watermelon bootleg / hack)",   0,                 layout_cmv4 ) // CM Fruit Bonus ver.2 T bootleg/hack
 GAMEL( 1995, cmfun,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Fun USA v2.5 bootleg / hack)", 0,                 layout_cmv4 )
 GAMEL( 1995, 3cdpoker,   0,        cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.6)",                     MACHINE_NOT_WORKING,  layout_cmv4 ) // protected? See ROM definition for routine
@@ -26486,18 +26547,21 @@ GAMEL( 199?, super7,     cmaster,  super7,   super7,   cmaster_state,  init_supe
 GAME ( 199?, wcat3a,     wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 GAMEL( 199?, ll3,        cmaster,  cm,       cmasterb, cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III",                              MACHINE_NOT_WORKING, layout_cmasterb )  // not looked at yet
 GAMEL( 199?, cmfb55,     cmaster,  cmfb55,   cmaster,  cmaster_state,  init_palnibbles,ROT0, "bootleg",           "Cherry Master (bootleg, Game FB55 Ver.2)",    MACHINE_NOT_WORKING, layout_cmv4 ) // inputs not done
-GAMEL( 1991, cmv4zg,     cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 1)",  0,                   layout_cmv4 ) // uses default NVRAM
-GAMEL( 1991, cmv4zga,    cmv4,     cmv4zg,   cmv4,     cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 2)",  0,                   layout_cmv4 ) // uses default NVRAM
-GAMEL( 1992, srmagic,    cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "bootleg",           "Super Real Magic (V6.3)",                     0,                   layout_cmv4 ) // needs layout
-GAMEL( 1992, reelmagic,  cmaster,  reelmg,   cmasterb, cmaster_state,  init_reelmag,   ROT0, "bootleg",           "Super Reel Magic (ver.6.3.0, set 1)",         0,                   layout_cmv4 ) // needs layout
-GAMEL( 1992, reelmagica, cmaster,  cm,       cmasterb, cmaster_state,  init_reelmag,   ROT0, "bootleg",           "Super Reel Magic (ver.6.3.0, set 2)",         0,                   layout_cmv4 ) // needs layout
-GAMEL( 1992, rm_7bonus,  cmaster,  cm,       cmasterb, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus, set 1)", 0,                  layout_cmaster ) // needs layout
-GAMEL( 1992, rm_7bonusa, cmaster,  cm,       cmasterb, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus, set 2)", 0,                  layout_cmaster ) // needs layout
 GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             0,                   layout_cmaster )
 GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           0,                   layout_cmaster )
-GAMEL( 199?, alienatt,   cmaster,  cm,       cmaster,  cmaster_state,  init_alienatt,  ROT0, "bootleg",           "Allien Attack",                               MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
-GAMEL( 1992, cb3micro,   cmv4,     cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "Micronic",          "Cherry Bonus III (Micronic v1.2, hack)",      0,                   layout_cmv4 ) // needs layout
+GAMEL( 199?, alienatt,   cmaster,  cm,       cmv4,     cmaster_state,  init_alienatt,  ROT0, "bootleg",           "Allien Attack",                               0,                   layout_cmv4 )
 
+// sets with internal settings and no use of DSW banks
+GAMEL( 1991, cmv4zg,     cmv4,     cmv4zg,   cm_nodsw, cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 1)",  0,                   layout_cmv4 ) // uses default NVRAM
+GAMEL( 1991, cmv4zga,    cmv4,     cmv4zg,   cm_nodsw, cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 2)",  0,                   layout_cmv4 ) // uses default NVRAM
+GAMEL( 1992, srmagic,    cmv4,     cm,       cm_nodsw, cmaster_state,  empty_init,     ROT0, "bootleg",           "Super Real Magic (V6.3)",                     0,                   layout_cmv4 ) // needs layout
+GAMEL( 1992, reelmagic,  cmaster,  reelmg,   cm_nodsw, cmaster_state,  init_reelmag,   ROT0, "bootleg",           "Super Reel Magic (ver.6.3.0, set 1)",         0,                   layout_cmv4 ) // needs layout
+GAMEL( 1992, reelmagica, cmaster,  cm,       cm_nodsw, cmaster_state,  init_reelmag,   ROT0, "bootleg",           "Super Reel Magic (ver.6.3.0, set 2)",         0,                   layout_cmv4 ) // needs layout
+GAMEL( 1992, rm_7bonus,  cmaster,  cm,       cm_nodsw, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus, set 1)", 0,                  layout_cmaster ) // needs layout
+GAMEL( 1992, rm_7bonusa, cmaster,  cm,       cm_nodsw, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus, set 2)", 0,                  layout_cmaster ) // needs layout
+GAMEL( 1992, cb3micro,   cmv4,     cm,       cm_nodsw, cmaster_state,  empty_init,     ROT0, "Micronic",          "Cherry Bonus III (Micronic v1.2, hack)",      0,                   layout_cmv4 ) // needs layout
+
+// poker master type sets
 GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                  layout_tonypok )
 GAME(  1999, jkrmast,    0,        jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    0 )
 GAME(  1999, jkrmasta,   jkrmast,  jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512/513)", MACHINE_IMPERFECT_COLORS ) // sometimes fg colors are wrong, bonus stages have reels bg always white --> tilemap garbage or white
