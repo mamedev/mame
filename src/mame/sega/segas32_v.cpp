@@ -1108,7 +1108,7 @@ void segas32_state::update_tilemap_text(screen_device &screen, segas32_state::la
 						pix |= color;
 					dst[-3] = pix;
 
-					pix = *src++;
+					pixels = *src++;
 
 					pix = (pixels >> 4) & 0x0f;
 					if (pix)
