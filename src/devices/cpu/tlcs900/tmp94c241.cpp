@@ -1326,7 +1326,81 @@ void tmp94c241_device::execute_set_input(int input, int level)
 	m_check_irqs = 1;
 }
 
+std::pair<u16, char const *> const tmp94c241_syms[] = {
+	/* TLCS-900/H2 type 8 bit I/O: */
+	{ 0x00, "P0" }, { 0x02, "P0CR" }, { 0x03, "P0FC" },
+	{ 0x04, "P1" }, { 0x06, "P1CR" }, { 0x07, "P1FC" },
+	{ 0x08, "P2" }, { 0x0a, "P2CR" }, { 0x0b, "P2FC" },
+	{ 0x0c, "P3" }, { 0x0e, "P3CR" }, { 0x0f, "P3FC" },
+	{ 0x10, "P4" }, { 0x12, "P4CR" }, { 0x13, "P4FC" },
+	{ 0x14, "P5" }, { 0x16, "P5CR" }, { 0x17, "P5FC" },
+	{ 0x18, "P6" }, { 0x1a, "P6CR" }, { 0x1b, "P6FC" },
+	{ 0x1c, "P7" }, { 0x1e, "P7CR" }, { 0x1f, "P7FC" },
+	{ 0x20, "P8" }, { 0x22, "P8CR" }, { 0x23, "P8FC" },
+	{ 0x28, "PA" }, { 0x2b, "PAFC" },
+	{ 0x2c, "PB" }, { 0x2f, "PBFC" },
+	{ 0x30, "PC" }, { 0x32, "PCCR" }, { 0x33, "PCFC" },
+	{ 0x34, "PD" }, { 0x36, "PDCR" }, { 0x37, "PDFC" },
+	{ 0x38, "PE" }, { 0x3a, "PECR" }, { 0x3b, "PEFC" },
+	{ 0x3c, "PF" }, { 0x3e, "PFCR" }, { 0x3f, "PFFC" },
+	{ 0x40, "PG" },
+	{ 0x44, "PH" }, { 0x46, "PHCR" }, { 0x47, "PHFC" },
+	{ 0x68, "PZ" }, { 0x6a, "PZCR" },
+
+	/* TLCS-90 type I/O: */
+	{ 0x80, "T8RUN" }, { 0x81, "TRDC" }, { 0x82, "T02FFCR" },
+	{ 0x84, "T01MOD" }, { 0x85, "T23MOD" },
+	{ 0x88, "TREG0" }, { 0x89, "TREG1" }, { 0x8a, "TREG2" }, { 0x8b, "TREG3" },
+	{ 0x90, "TREG4L" }, { 0x91, "TREG4H" }, { 0x92, "TREG5L" }, { 0x93, "TREG5H" },
+	{ 0x94, "CAP4L" }, { 0x95, "CAP4H" }, { 0x96, "CAP5L" }, { 0x97, "CAP5H" },
+	{ 0x98, "T4MOD" }, { 0x99, "T4FFCR" }, { 0x9e, "T16RUN" }, { 0x9f, "T16CR" },
+	{ 0xa0, "TREG6L" }, { 0xa1, "TREG6H" }, { 0xa2, "TREG7L" }, { 0xa3, "TREG7H" },
+	{ 0xa4, "CAP6L" }, { 0xa5, "CAP6H" }, { 0xa6, "CAP7L" }, { 0xa7, "CAP7H" },
+	{ 0xa8, "T6MOD" }, { 0xa9, "T6FFCR" },
+	{ 0xb0, "TREG8L" }, { 0xb1, "TREG8H" }, { 0xb2, "TREG9L" }, { 0xb3, "TREG9H" },
+	{ 0xb4, "CAP8L" }, { 0xb5, "CAP8H" }, { 0xb6, "CAP9L" }, { 0xb7, "CAP9H" },
+	{ 0xb8, "T8MOD" }, { 0xb9, "T8FFCR" },
+	{ 0xc0, "TREGAL" }, { 0xc1, "TREGAH" }, { 0xc2, "TREGBL" }, { 0xc3, "TREGBH" },
+	{ 0xc4, "CAPAL" }, { 0xc5, "CAPAH" }, { 0xc6, "CAPBL" }, { 0xc7, "CAPBH" },
+	{ 0xc8, "TAMOD" }, { 0xc9, "TAFFCR" },
+	{ 0xd0, "SC0BUF" }, { 0xd1, "SC0CR" }, { 0xd2, "SC0MOD" }, { 0xd3, "BR0CR" },
+	{ 0xd4, "SC1BUF" }, { 0xd5, "SC1CR" }, { 0xd6, "SC1MOD" }, { 0xd7, "BR1CR" },
+
+	/* TLCS-900/H2 type 8 bit I/O: */
+	{ 0xe0, "INTE45" }, { 0xe1, "INTE67" }, { 0xe2, "INTE89" }, { 0xe3, "INTEAB" },
+	{ 0xe4, "INTET01" }, { 0xe5, "INTET23" }, { 0xe6, "INTET45" }, { 0xe7, "INTET67" },
+	{ 0xe8, "INTET89" }, { 0xe9, "INTETAB" }, { 0xea, "INTES0" }, { 0xeb, "INTES1" },
+	{ 0xec, "INTETC01" }, { 0xed, "INTETC23" },
+	{ 0xee, "INTETC45" }, { 0xef, "INTETC67" },
+	{ 0xf0, "INTE0AD" }, { 0xf6, "IIMC" }, { 0xf7, "INTNMWDT" }, { 0xf8, "INTCLR" },
+	{ 0x100, "DMA0V" }, { 0x101, "DMA1V" }, { 0x102, "DMA2V" }, { 0x103, "DMA3V" },
+	{ 0x104, "DMA4V" }, { 0x105, "DMA5V" }, { 0x106, "DMA6V" }, { 0x107, "DMA7V" },
+	{ 0x108, "DMAB" }, { 0x109, "DMAR" }, { 0x10a, "CLKMOD" },
+
+	/* TLCS-90 type I/O: */
+	{ 0x110, "WDMOD" }, { 0x111, "WDCR" },
+	{ 0x120, "ADREG04L" }, { 0x121, "ADREG04H" },
+	{ 0x122, "ADREG15L" }, { 0x123, "ADREG15H" },
+	{ 0x124, "ADREG26L" }, { 0x125, "ADREG26H" },
+	{ 0x126, "ADREG37L" }, { 0x127, "ADREG37H" },
+	{ 0x128, "ADMOD1" }, { 0x129, "ADMOD2" },
+	{ 0x130, "DAREG0" }, { 0x131, "DAREG1" },
+	{ 0x132, "DADRV" },
+
+	/* TLCS-900/H2 type 8 bit I/O: */
+	{ 0x140, "B0CSL" }, { 0x141, "B0CSH" }, { 0x142, "MAMR0" }, { 0x143, "MSAR0" },
+	{ 0x144, "B1CSL" }, { 0x145, "B1CSH" }, { 0x146, "MAMR1" }, { 0x147, "MSAR1" },
+	{ 0x148, "B2CSL" }, { 0x149, "B2CSH" }, { 0x14a, "MAMR2" }, { 0x14b, "MSAR2" },
+	{ 0x14c, "B3CSL" }, { 0x14d, "B3CSH" }, { 0x14e, "MAMR3" }, { 0x14f, "MSAR3" },
+	{ 0x150, "B4CSL" }, { 0x151, "B4CSH" }, { 0x152, "MAMR4" }, { 0x153, "MSAR4" },
+	{ 0x154, "B5CSL" }, { 0x155, "B5CSH" }, { 0x156, "MAMR5" }, { 0x157, "MSAR5" },
+	{ 0x160, "DRAM0CRL" }, { 0x161, "DRAM0CRH" },
+	{ 0x162, "DRAM1CRL" }, { 0x163, "DRAM1CRH" },
+	{ 0x164, "DRAM0REF" }, { 0x165, "DRAM1REF" },
+	{ 0x166, "PMEMCR" },
+};
+
 std::unique_ptr<util::disasm_interface> tmp94c241_device::create_disassembler()
 {
-	return std::make_unique<tlcs900_disassembler>();
+	return std::make_unique<tmp94c241_disassembler>(tmp94c241_syms);
 }

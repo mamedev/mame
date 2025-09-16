@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, Felipe Sanches
 /*******************************************************************
 
 Toshiba TLCS-900/H disassembly
@@ -16,6 +16,11 @@ class tlcs900_disassembler : public util::disasm_interface
 public:
 	tlcs900_disassembler() = default;
 	virtual ~tlcs900_disassembler() = default;
+
+	tlcs900_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count)
+		: m_symbols(symbols), m_symbol_count(symbol_count)
+	{
+	}
 
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
@@ -106,6 +111,42 @@ private:
 	static const char *const s_allreg32[256];
 	static const char *const s_cond[16];
 
+	std::pair<u16, char const *> const *m_symbols;
+	std::size_t m_symbol_count;
+
+	template <typename T> std::string address(T offset, int size) const;
+};
+
+
+class tmp94c241_disassembler : public tlcs900_disassembler
+{
+public:
+	tmp94c241_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count);
+	template<size_t N> tmp94c241_disassembler(std::pair<u16, char const *> const (&symbols)[N]) : tlcs900_disassembler(symbols, N) {}
+
+private:
+	static const char *const s_sfr_names[];
+};
+
+
+class tmp95c061_disassembler : public tlcs900_disassembler
+{
+public:
+	tmp95c061_disassembler() : tlcs900_disassembler() {};
+};
+
+
+class tmp95c063_disassembler : public tlcs900_disassembler
+{
+public:
+	tmp95c063_disassembler() : tlcs900_disassembler() {};
+};
+
+
+class tmp96c141_disassembler : public tlcs900_disassembler
+{
+public:
+	tmp96c141_disassembler() : tlcs900_disassembler() {};
 };
 
 #endif
