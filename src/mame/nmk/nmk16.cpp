@@ -1010,6 +1010,24 @@ void nmk16_state::macross_map(address_map &map)
 	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share(m_mainram);
 }
 
+void nmk16_state::macrossbl_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x080001).portr("IN0");
+	map(0x080002, 0x080003).portr("IN1");
+	map(0x080008, 0x080009).portr("DSW1");
+	map(0x08000a, 0x08000b).portr("DSW2");
+	map(0x080015, 0x080015).w(FUNC(nmk16_state::flipscreen_w));
+	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
+	map(0x08001e, 0x08001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
+	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x08c000, 0x08c007).w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x098000, 0x09bfff).ram(); // TODO: something's mapped here for protection
+	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().share(m_mainram);
+}
+
 void nmk16_state::gunnail_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
@@ -4906,6 +4924,15 @@ void nmk16_state::hachamfb2(machine_config &config)
 	config.device_remove("mcu");
 }
 
+void nmk16_state::macrossbl(machine_config &config)
+{
+	acrobatmbl(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::macrossbl_map);
+
+	config.device_remove("mcu");
+}
+
 void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden sound hardware
 {
 	// basic machine hardware
@@ -6245,6 +6272,17 @@ void nmk16_state::init_acrobatmbl()
 	rom[0x6d6/2] = 0x3510;
 }
 
+void nmk16_state::init_macrossbl()
+{
+	// the protection (?) does some calculation of the data it finds in the 0x98000 - 0x9bfff range
+	// and checks the result equals a hard-coded value (0xe400). Given it isn't known what the
+	// game expects there (maybe some part of the strange extra program ROMs), for now the expected
+	// return value is hacked to 0x0000
+
+	u16 *rom = (u16 *)memregion("maincpu")->base();
+	rom[0x1c4 / 2] = 0x0000;
+}
+
 void nmk16_state::init_gunnailb()
 {
 	decode_gfx();
@@ -7252,6 +7290,51 @@ ROM_START( hachamfb2 ) // same PCB as acrobatmbl, but no PIC
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "1.14y", 0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
+ROM_END
+
+// bootleg with Raiden sounds
+// code changes are fairly minimal: added a protection (?) routine (see init_macrossbl), a routine for the Seibu sound handling,
+// hacked out the original's protection
+ROM_START( macrossbl )
+	ROM_REGION( 0x180000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "prog2a.2m", 0x00000, 0x40000, CRC(f2ad50fd) SHA1(eb106b44aa7801ebf3b2787823a28f14f9d09264) )
+	ROM_LOAD16_BYTE( "prog1a.2m", 0x00001, 0x40000, CRC(eed8135f) SHA1(a3575f04891b62937844f71ef4bf3c44bfced1c7) )
+	ROM_LOAD16_BYTE( "prog2b.4m", 0x80000, 0x80000, CRC(06501426) SHA1(49e86ebf8911029b41722c6f73e6475087cbc232) ) // way more stuff than the original?
+	ROM_LOAD16_BYTE( "prog1b.4m", 0x80001, 0x80000, CRC(1aa5aac2) SHA1(c526fc89f697d2658e87342026eaeaf67967443f) ) // way more stuff than the original?
+
+	ROM_REGION( 0x20000, "fgtile", 0 )
+	ROM_LOAD( "tile.1m", 0x000000, 0x020000, CRC(bbd8242d) SHA1(7cf4897be1278e1190f499f00bc78384817a5160) ) // same as the original
+
+	ROM_REGION( 0x280000, "bgtile", 0 ) // TODO: fix ROM loading
+	ROM_LOAD( "gfx_4.4m", 0x000000, 0x080000, CRC(45bec81b) SHA1(b1bcbc90cee0aa9c65f6b0a3510b16c1ffb2b6b9) )
+	ROM_LOAD( "gfx_5.4m", 0x080000, 0x080000, CRC(a489452b) SHA1(80bbcc20a518839d31b1fb5d0911a231b50cb737) )
+	ROM_LOAD( "gfx_6.4m", 0x100000, 0x080000, CRC(840df239) SHA1(d629769be0be0b17400cb726c673813155f3eca7) )
+	ROM_LOAD( "gfx_7.4m", 0x180000, 0x080000, CRC(bd8605b5) SHA1(d07794bd530f48eb43b711c3e29707ffa6671162) )
+	ROM_LOAD( "gfx_8.4m", 0x200000, 0x080000, CRC(ea677d02) SHA1(36266c634ebbb7147d32836f6b3ee43b2e23148e) )
+
+	ROM_REGION( 0x300000, "sprites", 0 ) // TODO: fix ROM loading
+	ROM_LOAD( "gfx_a.4m", 0x000000, 0x080000, CRC(521eac30) SHA1(ec581016b2a87387a8623a142c63c528f83339aa) )
+	ROM_LOAD( "gfx_b.4m", 0x080000, 0x080000, CRC(3b9331e2) SHA1(4ceef84825deb4fe0088bd15e97257deafe3d1f9) )
+	ROM_LOAD( "gfx_c.4m", 0x100000, 0x080000, CRC(67a0d998) SHA1(2d8440080d845c5a1c3f67f18ec801bfe97e2617) )
+	ROM_LOAD( "gfx_d.4m", 0x180000, 0x080000, CRC(a4997da3) SHA1(bd8694613dc5efd76d036ed5f82eac21b7997827) )
+	ROM_LOAD( "gfx_e.4m", 0x200000, 0x080000, CRC(75eb6779) SHA1(621d1545106bed43dd6e07162376d298c72f2393) )
+	ROM_LOAD( "gfx_f.4m", 0x280000, 0x080000, CRC(a279361d) SHA1(28ed87dca44868e5091d9bb89c56a7f985d5047c) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "snd.512",           0x00000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
+	ROM_CONTINUE(                  0x10000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x00000, 0x18000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "oki.512", 0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
+
+	// no htiming PROM on PCB
+
+	ROM_REGION( 0x0100, "vtiming", 0 )
+	ROM_LOAD( "82s135.bin", 0x0000, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) ) // same as the original
+
+	ROM_REGION( 0x0020, "color", 0 )
+	ROM_LOAD( "82s123.bin", 0x0000, 0x0020, CRC(8371e42d) SHA1(6cfd70dfa00e85ec1df8832d41df331cc3e3733a) ) // same as the original
 ROM_END
 
 /*
@@ -10669,6 +10752,7 @@ GAME( 1991, hachamfb2,  hachamf,  hachamfb2,    hachamfb,     nmk16_state, empty
 GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, encrypted)", 0 )
 GAME( 1991, tdragonb3,  tdragon,  tdragonb3,    tdragonb,     nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, unencrypted)", 0 )
 GAME( 1992, strahljbl,  strahl,   strahljbl,    strahl,       nmk16_state, empty_init,           ROT0,   "bootleg",                       "Koutetsu Yousai Strahl (Japan, bootleg)", 0 )
+GAME( 199?, macrossbl,  macross,  macrossbl,    macross,      nmk16_state, init_macrossbl,       ROT270, "bootleg",                       "Super Spacefortress Macross / Chou-Jikuu Yousai Macross (bootleg with Raiden sounds)", MACHINE_NOT_WORKING ) // not looked at yet
 
 // these are bootlegs with tharrier like sound hw
 GAME( 1990, mustangb3,  mustang,  mustangb3,    mustang,      nmk16_state,     empty_init,       ROT0,   "bootleg (Lettering)",           "US AAF Mustang (Lettering bootleg)", 0 )
