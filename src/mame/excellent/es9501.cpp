@@ -362,7 +362,7 @@ static GFXDECODE_START( gfx_es9501 )
 	GFXDECODE_RAM( "vram", 0, gfx_8x8x4_packed_msb_r, 0, 0x10 )
 GFXDECODE_END
 
-// bit 0 also branched but does nothing other than clearing ack
+// bit 0 unused in specd9, d9flower depends on it on memory clear screen
 // bit 1 looks vblank (would hang otherwise)
 // bit 2 unknown (sprite DMA complete? Unset by specd9)
 TIMER_DEVICE_CALLBACK_MEMBER(es9501_state::scanline_cb)
@@ -375,10 +375,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(es9501_state::scanline_cb)
 		m_irq_source |= 2;
 	}
 
-	if (scanline == 0 && BIT(m_irq_mask, 2))
+	if (scanline == 0 && BIT(m_irq_mask, 0))
 	{
 		m_maincpu->set_input_line(1, HOLD_LINE);
-		m_irq_source |= 4;
+		m_irq_source |= 1;
 	}
 }
 
@@ -523,5 +523,5 @@ ROM_END
 GAME( 1998, d9flower,   0,        es9501, specd9, es9501_state, empty_init, ROT0, "Cadence Technology", "Dream 9 Flower (v1.00c, set 1)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1998, d9flowera,  d9flower, es9501, specd9, es9501_state, empty_init, ROT0, "Cadence Technology", "Dream 9 Flower (v1.00c, set 2)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1997, specd9,     0,        es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System",   "Special Dream 9 (v1.0.7G)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1997, specd9105g, 0,        es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System",   "Special Dream 9 (v1.0.5G)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, specd9105g, specd9,   es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System",   "Special Dream 9 (v1.0.5G)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1997, starball,   0,        es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System",   "Star Ball (v1.0.0S)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
