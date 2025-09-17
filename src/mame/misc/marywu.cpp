@@ -28,7 +28,7 @@
   J373
   the LED board says GHY1-PCB and BYP-020 
   string: String COPYRIGHT BY WIN WAY ELEC. CORP. CLEMENT CHANG, MUSIC by: SunKiss Chen 
-  Notes: the ay music are unused and only playable after press k1 then press start  3 times.
+  Notes: the ay bgm are unused during attract and gameplay and only playable after press k1 then press start  3 times.
  
   U1 AT89C51 - unprotected. internal rom.
   U2 HM6118LP-3
@@ -375,4 +375,4 @@ ROM_END
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE          INIT         ROT   COMPANY      FULLNAME                                                            FLAGS
 GAME( ????, marywu,  0,      marywu,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen",    MACHINE_NOT_WORKING ) // Error 02
 GAME( ????, mary1s,  0,      mary1s,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING ) // Error 02
-GAME( ????, unkwinw, 0,      unkwinw,  unkwinw, marywu_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "Unknown Win way Gambling machine",                        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // Error 02. undumped adpcm rom. Need Correct layout.
+GAME( ????, unkwinw, 0,      unkwinw,  unkwinw, marywu_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "Unknown Win way Mario Gambling Board",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // Error 02. undumped adpcm rom. Need Correct layout.
