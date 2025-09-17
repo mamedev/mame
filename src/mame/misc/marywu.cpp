@@ -355,19 +355,20 @@ ROM_START( mary1s ) // actual cpu is W78E52B-24. xtal jfc 10.7386 mhz
 ROM_END
 
 ROM_START( unkwinw )
-	ROM_REGION( 0x0800, "plds", ROMREGION_ERASE00 )
-	ROM_LOAD( "epm7032.u8",   0x0000, 0x0800, NO_DUMP  ) // epm7032slc44-10n
-	
-	ROM_REGION( 0x01000, "maincpu", 0 )
+
+    ROM_REGION( 0x01000, "maincpu", 0 )
 	ROM_LOAD( "at89c51.u1", 0x00000, 0x01000, CRC(67C00C5A) SHA1(f889522b6fff3f487183ff49e1144c9fe27cbb3e) ) // actual CPU is a Atmel at89c51. has the internal program code on it.
- 	
-	ROM_REGION( 0x200000, "oki", ROMREGION_ERASE00 )
-	ROM_LOAD( "mx29f1615.u11", 0x000000, 0x200000, NO_DUMP ) 
-	
+ 		
 	ROM_REGION( 0x10000, "eeprom", 0 ) 
-	
 	ROM_LOAD( "w27c512.u12", 0x0000, 0x10000, CRC(735147D8) SHA1(df2431f85224443eda4346a10183021f60d858a0) )
-    ROM_END
+	
+    ROM_REGION( 0x200000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx29f1615.u11", 0x000000, 0x200000, NO_DUMP )
+
+    ROM_REGION( 0x0800, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "epm7032.u8", 0x0000, 0x0800, NO_DUMP  ) // epm7032slc44-10n
+
+ROM_END
 
 } // anonymous namespace
 
