@@ -33,13 +33,18 @@
   string: COPYRIGHT BY WIN WAY ELEC. CORP. CLEMENT CHANG, MUSIC by: SunKiss Chen 
   Notes: the ay bgm are unused during attract and gameplay and only playable after press k1 then press start  3 times.
  
+  3V6 BAT - backup battery to keep nvram
+  Mainboard
   U1 AT89C51 - internal rom.
   U2 HM6118LP-3
   U8 EPM7032SLC44-10N 
   U9 TOP 8279
-  U11 w27c512 - eeprom
   U10 U6295
+  U11 MX 29F1615PC-10
+  U12 w27c512 - eeprom
   Y1 10.7386
+  Led Controller
+  No photos available, but there are two AY-3-8910 and 1 kdc.
   
   Controls:
   mary1s:
@@ -341,7 +346,7 @@ void marywu_state::unkwinw(machine_config &config)
 {
 	marywu(config);
 	i80c51_device &maincpu(I80C51(config.replace(), "maincpu", XTAL(10'738'635))); // actual cpu is at89c51
-	OKIM6295(config, "oki", XTAL(10'738'000) / 6, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);  // Clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL(10'738'635) / 6, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);  // Clock frequency & pin 7 not verified
 	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::unkwinw_program_map);
 	maincpu.set_addrmap(AS_IO, &marywu_state::unkwinw_io_map);
 	maincpu.port_in_cb<1>().set_ioport("P1");
