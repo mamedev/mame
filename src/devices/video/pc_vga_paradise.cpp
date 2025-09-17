@@ -322,7 +322,7 @@ void wd90c00_vga_device::device_start()
 	if (m_vclk2 == 0)
 	{
 		m_vclk2 = 42'000'000;
-		logerror("VCLK2 unset, using fallback to 42 MHz");
+		logerror("VCLK2 unset, using fallback to 42 MHz\n");
 	}
 }
 

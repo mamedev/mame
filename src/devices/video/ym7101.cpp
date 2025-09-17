@@ -713,6 +713,7 @@ void ym7101_device::flush_screen_mode()
 
 	//this->set_unscaled_clock(target_clock);
 
+	// FIXME: really 427.5 for H40 mode
 	const int htotal = h40_mode ? 427 : 342;
 	const int vtotal = 262;
 
