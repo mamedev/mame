@@ -730,24 +730,12 @@ void apple2gs_state::machine_start()
 	m_inh_slot = -1;
 	m_cnxx_slot = CNXX_UNCLAIMED;
 
-
-	// install memory beyond 256K
-	int ramsize = m_ram_size;
+	// adjust RAM size
 	if (!m_is_rom3 && m_ram_size <= 1280 * 1024)
 	{
-		ramsize -= 0x40000; // subtract 256k for banks 0, 1, e0, e1
+		m_ram_size -= 0x20000;	// subtract 128k so requested RAM size matches exactly
 	}
-	else if (m_is_rom3 || m_ram_size == 1024 * 1024 * 8)
-	{
-		ramsize -= 0x20000; // subtract 128K for banks 0 and 1, which are handled specially
-	}
-
-	if (ramsize)
-	{
-		address_space& space = m_maincpu->space(AS_PROGRAM);
-		// RAM sizes for both classes of machine no longer include the Mega II RAM
-		space.install_ram(0x020000, ramsize - 1 + 0x20000, m_ram_ptr + 0x020000);
-	}
+	// otherwise, RAM sizes for both classes of machine no longer include the Mega II RAM
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
