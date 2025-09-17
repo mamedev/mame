@@ -2432,13 +2432,13 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 
 			a.mov(ecx, reglo);
 			a.shld(reglo, reghi, count);
-			if (saveflags && count != 0) a.pushfd();
+			if (saveflags && count) a.pushfd();
 			a.shld(reghi, ecx, count);
 		}
 
 		if (saveflags)
 		{
-			if (count == 0)
+			if (!count)
 			{
 				a.test(reglo, reglo);
 				a.pushfd();
@@ -2453,10 +2453,9 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	}
 	else
 	{
-		Label skipall = a.newLabel();
-		Label end = a.newLabel();
-		Label skip1 = a.newLabel();
-		Label shift_loop = a.newLabel();
+		Label const skipall = a.newLabel();
+		Label const end = a.newLabel();
+		Label const skip1 = a.newLabel();
 
 		emit_mov_r32_p32(a, ecx, param);
 
@@ -2467,21 +2466,23 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 		a.cmp(ecx, 32);
 		a.short_().jl(skip1);
 
-		a.bind(shift_loop);
-		if (inst.flags() != 0)
+		if (inst.flags())
 		{
+			Label const shift_loop = a.newLabel();
+
+			a.bind(shift_loop);
 			a.sub(ecx, 31);
 			a.mov(tempreg, reglo);
 			a.shld(reglo, reghi, 31);
 			a.shld(reghi, tempreg, 31);
+			a.cmp(ecx, 32);
+			a.short_().jge(shift_loop);
 		}
 		else
 		{
 			a.xchg(reghi, reglo);
 			a.sub(ecx, 32);
 		}
-		a.cmp(ecx, 32);
-		a.short_().jge(shift_loop);
 
 		a.bind(skip1);
 		reset_last_upper_lower_reg();
@@ -4652,7 +4653,7 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 	{
 		// 32-bit form
 		emit_mov_r32_p32(a, eax, srcp);                                                 // mov   eax,srcp
-		shift_op_param(a, Inst::kIdRol, inst.size(), eax, shiftp,                                    // rol   eax,shiftp
+		shift_op_param(a, Inst::kIdRol, inst.size(), eax, shiftp,                       // rol   eax,shiftp
 			[inst](Assembler &a, Operand const &dst, be_parameter const &src)
 			{
 				// optimize zero case
@@ -4703,7 +4704,7 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 		}
 		else
 		{
-			a.mov(ptr(esp, -8), ebx);                                                   // mov   [esp-8],ebx
+			a.mov(ptr(esp, 0), ebx);                                                    // mov   [esp],ebx
 			emit_mov_r64_p64(a, ebx, ecx, maskp);                                       // mov   ecx:ebx,maskp
 			a.and_(eax, ebx);                                                           // and   eax,ebx
 			a.and_(edx, ecx);                                                           // and   edx,ecx
@@ -4712,12 +4713,12 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 			if (dstp.is_int_register())
 			{
 				if (dstp.ireg() == Gp::kIdBx)
-					a.and_(ptr(esp, -8), ebx);                                          // and   dstp.lo,ebx
+					a.and_(ptr(esp, 0), ebx);                                           // and   dstp.lo,ebx
 				else
 					a.and_(Gpd(dstp.ireg()), ebx);                                      // and   dstp.lo,ebx
 				a.and_(MABS(m_reghi[dstp.ireg()]), ecx);                                // and   dstp.hi,ecx
 				if (dstp.ireg() == Gp::kIdBx)
-					a.or_(ptr(esp, -8), eax);                                           // or    dstp.lo,eax
+					a.or_(ptr(esp, 0), eax);                                            // or    dstp.lo,eax
 				else
 					a.or_(Gpd(dstp.ireg()), eax);                                       // or    dstp.lo,eax
 				a.or_(MABS(m_reghi[dstp.ireg()]), edx);                                 // or    dstp.hi,edx
@@ -4730,7 +4731,7 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 				a.or_(MABS(dstp.memory(4)), edx);                                       // or    dstp.hi,edx
 			}
 
-			a.mov(ebx, ptr(esp, -8));                                                   // mov   ebx,[esp-8]
+			a.mov(ebx, ptr(esp, 0));                                                    // mov   ebx,[esp]
 
 			if (inst.flags())
 			{

@@ -4,58 +4,58 @@
 
 Register use:
 
-r0      first function parameter/return value
-r1      second function parameter
-r2      third function parameter
-r3      fourth function parameter
-r4
-r5
-r6
-r7
-r8
-r9      temporary for intermediate values
-r10     temporary for intermediate values
-r11     temporary for intermediate values
-r12     scratch register used by helper functions
-r13     scratch register used by helper functions
-r14     scratch register used for address calculation
-r15     temporary used in opcode functions
-r16
-r17
-r18
-r19     UML register I0
-r20     UML register I1
-r21     UML register I2
-r22     UML register I3
-r23     UML register I4
-r24     UML register I5
-r35     UML register I6
-r26     UML register I7
-r27     near cache pointer
-r28     emulated flags
-r29     base generated code frame pointer
+r0      parameter/result    first function parameter/return value
+r1      parameter/result    second function parameter
+r2      parameter/result    third function parameter
+r3      parameter/result    fourth function parameter
+r4      parameter/result
+r5      parameter/result
+r6      parameter/result
+r7      parameter/result
+r8      result pointer
+r9                          temporary for intermediate values
+r10                         temporary for intermediate values
+r11                         temporary for intermediate values
+r12                         scratch register used by helper functions
+r13                         scratch register used by helper functions
+r14                         scratch register used for address calculation
+r15                         temporary used in opcode functions
+r16     intra-call scratch
+r17     intra-call scratch
+r18     platform register
+r19     callee-saved        UML register I0
+r20     callee-saved        UML register I1
+r21     callee-saved        UML register I2
+r22     callee-saved        UML register I3
+r23     callee-saved        UML register I4
+r24     callee-saved        UML register I5
+r35     callee-saved        UML register I6
+r26     callee-saved        UML register I7
+r27     callee-saved        near cache pointer
+r28     callee-saved        emulated flags
+r29     frame pointer       base generated code frame pointer
 r30     link register
 sp      stack pointer
 
-v0
-v1
-v2
-v3
-v4
-v5
-v6
-v7
-v8      UML register F0
-v9      UML register F1
-v10     UML register F2
-v11     UML register F3
-v12     UML register F4
-v13     UML register F5
-v14     UML register F6
-v15     UML register F7
-v16     temporary for intermediate values
-v17     temporary for intermediate values
-v18     temporary for intermediate values
+v0      parameter/result
+v1      parameter/result
+v2      parameter/result
+v3      parameter/result
+v4      parameter/result
+v5      parameter/result
+v6      parameter/result
+v7      parameter/result
+v8                          UML register F0
+v9                          UML register F1
+v10                         UML register F2
+v11                         UML register F3
+v12                         UML register F4
+v13                         UML register F5
+v14                         UML register F6
+v15                         UML register F7
+v16                         temporary for intermediate values
+v17                         temporary for intermediate values
+v18                         temporary for intermediate values
 v19
 v20
 v21
@@ -102,6 +102,11 @@ You can calculate the generated code subroutine call depth as
 (FP - SP) / 0x10.  You can see the return addresses for the generated code
 subroutine calls at SP + 0x08, SP + 0x18, SP + 0x28, etc. until reaching
 the location FP points to.
+
+TODO:
+* Some operations do not clear the upper bits of integer registers when
+  they should (e.g. 32-bit MOV with the same register as source and
+  destination).
 
 ***************************************************************************/
 
@@ -399,18 +404,6 @@ void get_imm_absolute(a64::Assembler &a, const a64::Gp &reg, const uint64_t val)
 	a.mov(reg, val);
 }
 
-void store_unordered(a64::Assembler &a)
-{
-	a.cset(SCRATCH_REG1, a64::CondCode::kPL);
-	a.cset(SCRATCH_REG2, a64::CondCode::kNE);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.cset(SCRATCH_REG2, a64::CondCode::kCS);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.cset(SCRATCH_REG2, a64::CondCode::kVS);
-	a.and_(SCRATCH_REG1, SCRATCH_REG1, SCRATCH_REG2);
-	a.bfi(FLAGS_REG, SCRATCH_REG2, FLAG_BIT_U, 1);
-}
-
 inline void get_unordered(a64::Assembler &a, const a64::Gp &reg)
 {
 	a.ubfx(reg.x(), FLAGS_REG, FLAG_BIT_U, 1);
@@ -511,6 +504,7 @@ private:
 
 	struct near_state
 	{
+		uint64_t saved_fpcr;
 		uint32_t emulated_flags;
 	};
 
@@ -1257,7 +1251,7 @@ void drcbe_arm64::mov_param_imm(a64::Assembler &a, uint32_t regsize, const be_pa
 		}
 		else
 		{
-			const a64::Gp scratch = select_register(SCRATCH_REG2, movsize);
+			const a64::Gp scratch = select_register(SCRATCH_REG1, movsize);
 
 			get_imm_relative(a, scratch, (regsize == 4) ? uint32_t(src) : src);
 			emit_str_mem(a, scratch, dst.memory());
@@ -1271,8 +1265,6 @@ void drcbe_arm64::mov_param_imm(a64::Assembler &a, uint32_t regsize, const be_pa
 
 void drcbe_arm64::mov_param_param(a64::Assembler &a, uint32_t regsize, const be_parameter &dst, const be_parameter &src) const
 {
-	// FIXME: this won't clear upper bits of the output for a 4-byte move when the source is a register or immediate
-	// need to fix affected cases (mov, sext), currently confounded by issues in the simplifier
 	assert(!dst.is_immediate());
 
 	if (src.is_memory())
@@ -1289,7 +1281,15 @@ void drcbe_arm64::mov_param_param(a64::Assembler &a, uint32_t regsize, const be_
 	}
 	else if (src.is_int_register())
 	{
-		mov_param_reg(a, regsize, dst, src.get_register_int(regsize));
+		if ((regsize == 4) && dst.is_cold_register())
+		{
+			mov_reg_param(a, regsize, SCRATCH_REG1, src);
+			mov_param_reg(a, regsize, dst, SCRATCH_REG1);
+		}
+		else
+		{
+			mov_param_reg(a, regsize, dst, src.get_register_int(regsize));
+		}
 	}
 	else if (src.is_immediate())
 	{
@@ -1627,7 +1627,10 @@ void drcbe_arm64::reset()
 	a.emitProlog(frame);
 
 	get_imm_absolute(a, BASE_REG, uintptr_t(m_baseptr));
+
+	a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kFPCR);
 	emit_ldr_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
+	emit_str_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
 
 	a.emitArgsAssignment(frame, args);
 
@@ -1636,6 +1639,9 @@ void drcbe_arm64::reset()
 	// generate exit point
 	m_exit = dst + a.offset();
 	a.bind(a.newNamedLabel("exit_point"));
+
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
 
 	a.mov(a64::sp, a64::x29);
 
@@ -2241,7 +2247,7 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 	assert_no_flags(inst);
 
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
-	const a64::Gp scratch = select_register(FUNC_SCRATCH_REG, inst.size());
+	const a64::Gp scratch = select_register(TEMP_REG1, inst.size());
 
 	if (srcp.is_immediate())
 	{
@@ -2249,13 +2255,17 @@ void drcbe_arm64::op_setfmod(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else
 	{
-		const a64::Gp src = srcp.select_register(FUNC_SCRATCH_REG, inst.size());
+		const a64::Gp src = srcp.select_register(scratch, inst.size());
 
 		mov_reg_param(a, inst.size(), src, srcp);
 		a.and_(scratch, src, 3);
 	}
 
+	a.mrs(TEMP_REG2, a64::Predicate::SysReg::kFPCR);
 	emit_strb_mem(a, scratch.w(), &m_state.fmod);
+	a.sub(scratch.w(), scratch.w(), 1);
+	a.bfi(TEMP_REG2, scratch.x(), 22, 2);
+	a.msr(a64::Predicate::SysReg::kFPCR, TEMP_REG2);
 }
 
 void drcbe_arm64::op_getfmod(a64::Assembler &a, const uml::instruction &inst)
@@ -3557,8 +3567,15 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 		const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
 
 		mov_reg_param(a, inst.size(), src1, src1p);
-		mov_reg_param(a, inst.size(), src2, src2p);
-		a.emit(opcode, output, src1, src2);
+		if (src1p == src2p)
+		{
+			a.emit(opcode, output, src1, src1);
+		}
+		else
+		{
+			mov_reg_param(a, inst.size(), src2, src2p);
+			a.emit(opcode, output, src1, src2);
+		}
 		mov_param_reg(a, inst.size(), dstp, output);
 	}
 
@@ -3596,36 +3613,35 @@ template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::i
 	const a64::Gp zero = select_register(a64::xzr, inst.size());
 	const a64::Gp output = dstp.select_register(TEMP_REG3, inst.size());
 
-	if (src2p.is_immediate_value(0))
+	if (src1p == src2p)
 	{
-		if (src1p.is_immediate_value(0))
+		if (CarryIn || (inst.flags() && dstp.is_int_register()))
 		{
-			if (CarryIn)
-			{
-				a.emit(opcode, output, zero, zero);
-				mov_param_reg(a, inst.size(), dstp, output);
-			}
-			else
-			{
-				mov_param_reg(a, inst.size(), dstp, zero);
-				a.emit(opcode, zero, zero, zero);
-			}
+			a.emit(opcode, output, zero, zero);
+			mov_param_reg(a, inst.size(), dstp, output);
 		}
 		else
 		{
-			const a64::Gp src = src1p.select_register(output, inst.size());
+			mov_param_reg(a, inst.size(), dstp, zero);
+			if (inst.flags())
+				a.emit(opcode, zero, zero, zero);
+		}
+	}
+	else if (src2p.is_immediate_value(0))
+	{
+		const a64::Gp src = src1p.select_register(output, inst.size());
 
-			mov_reg_param(a, inst.size(), src, src1p);
-			if (CarryIn)
-			{
-				a.emit(opcode, output, src, zero);
-				mov_param_reg(a, inst.size(), dstp, output);
-			}
-			else
-			{
-				mov_param_reg(a, inst.size(), dstp, src);
+		mov_reg_param(a, inst.size(), src, src1p);
+		if (CarryIn || (inst.flags() && dstp.is_int_register()))
+		{
+			a.emit(opcode, output, src, zero);
+			mov_param_reg(a, inst.size(), dstp, output);
+		}
+		else
+		{
+			mov_param_reg(a, inst.size(), dstp, src);
+			if (inst.flags())
 				a.emit(opcode, zero, src, zero);
-			}
 		}
 	}
 	else if (!CarryIn && src2p.is_immediate() && is_valid_immediate_addsub(src2p.immediate()))
@@ -4483,7 +4499,7 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	size_t const maxBits = inst.size() * 8 - 1;
+	size_t const maxBits = (inst.size() * 8) - 1;
 
 	bool can_use_dst_reg = dstp.is_int_register();
 	if (can_use_dst_reg && src1p.is_int_register())
@@ -4493,40 +4509,95 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 
 	const a64::Gp param1 = src1p.select_register(TEMP_REG3, inst.size());
 	const a64::Gp output = can_use_dst_reg ? dstp.select_register(TEMP_REG1, inst.size()) : select_register(TEMP_REG1, inst.size());
-	const a64::Gp carry = select_register(SCRATCH_REG2, inst.size());
 
-	mov_reg_param(a, inst.size(), param1, src1p);
+	bool zs_flags_done = false;
 
 	// shift > 1: src = (PARAM1 << shift) | (carry << (shift - 1)) | (PARAM1 >> (33 - shift))
 	// shift = 1: src = (PARAM1 << shift) | carry
 
 	if (src2p.is_immediate())
 	{
-		const auto shift = src2p.immediate() % (inst.size() * 8);
+		const auto si = src2p.immediate() & maxBits;
 
-		if (shift != 0)
+		if (!si)
 		{
-			a.ubfx(carry, param1, (inst.size() * 8) - shift, 1);
-			if (shift > 1)
-				a.ubfx(output, param1, (inst.size() * 8) - shift + 1, shift - 1);
-			a.bfi(output.x(), FLAGS_REG, shift - 1, 1);
-			a.bfi(output, param1, shift, (inst.size() * 8) - shift);
-			a.bfi(FLAGS_REG, carry.x(), 0, 1);
+			mov_reg_param(a, inst.size(), output, src1p);
+		}
+		else if (src1p.is_immediate_value(0))
+		{
+			// this depends on carry being the least significant bit of the flags
+			a.ubfiz(output, select_register(FLAGS_REG, inst.size()), si - 1, 1);
 
 			if (inst.flags() & FLAG_C)
-				calculate_carry_shift_left_imm(a, param1, shift, maxBits);
+				store_carry_reg(a, a64::xzr);
+
+			m_carry_state = carry_state::POISON;
+		}
+		else if ((si == 1) && (m_carry_state == carry_state::CANONICAL))
+		{
+			mov_reg_param(a, inst.size(), param1, src1p);
+
+			if (inst.flags())
+			{
+				a.adcs(output, param1, param1);
+
+				if (inst.flags() & FLAG_C)
+					store_carry(a);
+				else
+					m_carry_state = carry_state::POISON;
+			}
+			else
+			{
+				a.adc(output, param1, param1);
+			}
+
+			zs_flags_done = true;
 		}
 		else
 		{
-			a.mov(output, param1);
+			mov_reg_param(a, inst.size(), param1, src1p);
+
+			// this depends on carry being the least significant bit of the flags
+			if (si > 1)
+				a.lsr(output, param1, (inst.size() * 8) + 1 - si);
+			a.bfi(output, select_register(FLAGS_REG, inst.size()), si - 1, 1);
+			a.bfi(output, param1, si, (inst.size() * 8) - si);
+
+			if (inst.flags() & FLAG_C)
+				calculate_carry_shift_left_imm(a, param1, si, maxBits);
+		}
+	}
+	else if (src1p.is_immediate_value(0))
+	{
+		const a64::Gp scratch = select_register(TEMP_REG2, inst.size());
+		const a64::Gp shift = src2p.select_register(scratch, inst.size());
+		const a64::Gp zero = select_register(a64::xzr, inst.size());
+
+		mov_reg_param(a, inst.size(), shift, src2p);
+
+		a.ands(scratch, shift, maxBits);
+		get_carry(a, output);
+		a.sub(scratch, scratch, 1);
+		a.lsl(output, output, scratch);
+		a.csel(output, zero, output, a64::CondCode::kZero);
+
+		if (inst.flags() & FLAG_C)
+		{
+			// this depends on carry being the least significant bit of the flags
+			a.csel(scratch.x(), FLAGS_REG, a64::xzr, a64::CondCode::kZero);
+			store_carry_reg(a, scratch);
+
+			m_carry_state = carry_state::POISON;
 		}
 	}
 	else
 	{
 		const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
 		const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
+		const a64::Gp carry = select_register(SCRATCH_REG2, inst.size());
 		const a64::Gp scratch2 = select_register(FUNC_SCRATCH_REG, inst.size());
 
+		mov_reg_param(a, inst.size(), param1, src1p);
 		mov_reg_param(a, inst.size(), shift, src2p);
 
 		a.and_(scratch2, shift, maxBits);
@@ -4560,7 +4631,7 @@ void drcbe_arm64::op_rolc(a64::Assembler &a, const uml::instruction &inst)
 		a.bind(skip3);
 	}
 
-	if (inst.flags() & (FLAG_Z | FLAG_S))
+	if (!zs_flags_done && (inst.flags() & (FLAG_Z | FLAG_S)))
 		a.tst(output, output);
 
 	mov_param_reg(a, inst.size(), dstp, output);
@@ -4578,7 +4649,7 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	size_t const maxBits = inst.size() * 8 - 1;
+	size_t const maxBits = (inst.size() * 8) - 1;
 
 	bool can_use_dst_reg = dstp.is_int_register();
 	if (can_use_dst_reg && src1p.is_int_register())
@@ -4588,9 +4659,6 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 
 	const a64::Gp param1 = src1p.select_register(TEMP_REG3, inst.size());
 	const a64::Gp output = can_use_dst_reg ? dstp.select_register(TEMP_REG1, inst.size()) : select_register(TEMP_REG1, inst.size());
-	const a64::Gp carry = select_register(SCRATCH_REG2, inst.size());
-
-	mov_reg_param(a, inst.size(), param1, src1p);
 
 	// if (shift > 1)
 	//  src = (PARAM1 >> shift) | (((flags & FLAG_C) << 31) >> (shift - 1)) | (PARAM1 << (33 - shift));
@@ -4599,31 +4667,66 @@ void drcbe_arm64::op_rorc(a64::Assembler &a, const uml::instruction &inst)
 
 	if (src2p.is_immediate())
 	{
-		const auto shift = src2p.immediate() % (inst.size() * 8);
+		const auto si = src2p.immediate() & maxBits;
 
-		if (shift != 0)
+		if (!si)
 		{
-			a.ubfx(carry, param1, shift - 1, 1);
-			a.ubfx(output, param1, shift, (inst.size() * 8) - shift);
-			a.bfi(output.x(), FLAGS_REG, (inst.size() * 8) - shift, 1);
-			if (shift > 1)
-				a.bfi(output, param1, (inst.size() * 8) - shift + 1, shift - 1);
-			a.bfi(FLAGS_REG, carry.x(), 0, 1);
+			mov_reg_param(a, inst.size(), output, src1p);
+		}
+		else if (src1p.is_immediate_value(0))
+		{
+			// this depends on carry being the least significant bit of the flags
+			a.ubfiz(output, select_register(FLAGS_REG, inst.size()), (inst.size() * 8) - si, 1);
 
 			if (inst.flags() & FLAG_C)
-				calculate_carry_shift_right_imm(a, param1, shift);
+				store_carry_reg(a, a64::xzr);
+
+			m_carry_state = carry_state::POISON;
 		}
 		else
 		{
-			a.mov(output, param1);
+			mov_reg_param(a, inst.size(), param1, src1p);
+
+			// this depends on carry being the least significant bit of the flags
+			a.lsr(output, param1, si);
+			a.bfi(output, select_register(FLAGS_REG, inst.size()), (inst.size() * 8) - si, 1);
+			if (si > 1)
+				a.bfi(output, param1, (inst.size() * 8) + 1 - si, si - 1);
+
+			if (inst.flags() & FLAG_C)
+				calculate_carry_shift_right_imm(a, param1, si);
+		}
+	}
+	else if (src1p.is_immediate_value(0))
+	{
+		const a64::Gp scratch = select_register(TEMP_REG2, inst.size());
+		const a64::Gp shift = src2p.select_register(scratch, inst.size());
+		const a64::Gp zero = select_register(a64::xzr, inst.size());
+
+		mov_reg_param(a, inst.size(), shift, src2p);
+
+		a.ands(scratch, shift, maxBits);
+		get_carry(a, output);
+		a.ror(output, output, scratch);
+		a.csel(output, zero, output, a64::CondCode::kZero);
+
+		if (inst.flags() & FLAG_C)
+		{
+			// this depends on carry being the least significant bit of the flags
+			a.csel(scratch.x(), FLAGS_REG, a64::xzr, a64::CondCode::kZero);
+			store_carry_reg(a, scratch);
+
+			m_carry_state = carry_state::POISON;
 		}
 	}
 	else
 	{
 		const a64::Gp shift = src2p.select_register(TEMP_REG2, inst.size());
 		const a64::Gp scratch = select_register(SCRATCH_REG1, inst.size());
+		const a64::Gp carry = select_register(SCRATCH_REG2, inst.size());
 		const a64::Gp scratch2 = select_register(FUNC_SCRATCH_REG, inst.size());
 
+		mov_reg_param(a, inst.size(), param1, src1p);
 		mov_reg_param(a, inst.size(), shift, src2p);
 
 		a.and_(scratch2, shift, maxBits);
@@ -4919,9 +5022,9 @@ void drcbe_arm64::op_ftoint(a64::Assembler &a, const uml::instruction &inst)
 				Label done = a.newLabel();
 
 				// this depends on each case being two instructions
-				emit_ldrb_mem(a, TEMP_REG1, &m_state.fmod);
+				emit_ldrb_mem(a, TEMP_REG1.w(), &m_state.fmod);
 				a.adr(TEMP_REG2, base);
-				a.add(TEMP_REG2, TEMP_REG1, arm::lsl(3));
+				a.add(TEMP_REG2, TEMP_REG2, TEMP_REG1, arm::lsl(3));
 				a.br(TEMP_REG2);
 
 				a.bind(base);
@@ -5033,7 +5136,10 @@ void drcbe_arm64::op_fcmp(a64::Assembler &a, const uml::instruction &inst)
 	else
 		m_carry_state = carry_state::POISON;
 	if (inst.flags() & FLAG_U)
-		store_unordered(a);
+	{
+		a.cset(SCRATCH_REG1, a64::CondCode::kVS);
+		a.bfi(FLAGS_REG, SCRATCH_REG1, FLAG_BIT_U, 1);
+	}
 }
 
 template <a64::Inst::Id Opcode> void drcbe_arm64::op_float_alu(a64::Assembler &a, const uml::instruction &inst)

@@ -2847,6 +2847,150 @@ Simplification rules
 * Immediate values for the ``count`` operand are truncated to five or
   six bits for 32-bit or 64-bit operands, respectively.
 
+.. _umlinst-rolc:
+
+ROLC
+^^^^
+
+Rotate an integer value concatenated with the carry flag to the left
+(toward the most significant bit position).  For each step, the carry
+flag is shifted into the least significant bit position, and the carry
+flag is set to the bit shifted out of the most significant bit position.
+
++---------------------------+----------------------------------------+
+| Disassembly               | Usage                                  |
++===========================+========================================+
+| .. code-block::           | .. code-block::                        |
+|                           |                                        |
+|     rolc    dst,src,count |     UML_ROLC(block, dst, src, count);  |
+|     drolc   dst,src,count |     UML_DROLC(block, dst, src, count); |
++---------------------------+----------------------------------------+
+
+Sets ``dst`` to the value of ``src`` concatenated with the carry flag
+rotated left by ``count`` bit positions modulo the operand size in bits.
+For each shift step, the current value of the carry flag is shifted into
+the least significant bit position, and the carry flag is set to the
+value of the bit shifted out of the most significant bit position.
+
+Note that although this instruction rotates a 33-bit or 65-bit value
+(including the carry flag), the shift count is interpreted modulo 32 or
+64.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the rotated value will be stored.
+src (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The value to rotated.
+count (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The number of bit positions to rotate by.  Only the least
+    significant five bits or six bits of this operand are used,
+    depending on the instruction size.
+
+Flags
+^^^^^
+
+carry (C)
+    Set to the value of the last bit shifted out of the least
+    significant bit position if the shift count modulo the operand size
+    in bits is non-zero, or unchanged if the shift count modulo the
+    operand size in bits is zero.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>` or :ref:`NOP <umlinst-nop>` if
+  the ``count`` operand is the immediate value zero and the zero and
+  sign flags are not required.
+* Immediate values for the ``src`` operand are truncated to the
+  instruction size.
+* Immediate values for the ``count`` operand are truncated to five or
+  six bits for 32-bit or 64-bit operands, respectively.
+
+.. _umlinst-rorc:
+
+RORC
+^^^^
+
+Rotate an integer value concatenated with the carry flag to the right
+(toward the least significant bit position).  For each step, the carry
+flag is shifted into the most significant bit position, and the carry
+flag is set to the bit shifted out of the least significant bit
+position.
+
++---------------------------+----------------------------------------+
+| Disassembly               | Usage                                  |
++===========================+========================================+
+| .. code-block::           | .. code-block::                        |
+|                           |                                        |
+|     rorc    dst,src,count |     UML_RORC(block, dst, src, count);  |
+|     drorc   dst,src,count |     UML_DRORC(block, dst, src, count); |
++---------------------------+----------------------------------------+
+
+Sets ``dst`` to the value of ``src`` concatenated with the carry flag
+rotated right by ``count`` bit positions modulo the operand size in
+bits.  For each shift step, the current value of the carry flag is
+shifted into the most significant bit position, and the carry flag is
+set to the value of the bit shifted out of the least significant bit
+position.
+
+Note that although this instruction rotates a 33-bit or 65-bit value
+(including the carry flag), the shift count is interpreted modulo 32 or
+64.
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the rotated value will be stored.
+src (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The value to rotated.
+count (32-bit or 64-bit – memory, integer register, immediate, map variable)
+    The number of bit positions to rotate by.  Only the least
+    significant five bits or six bits of this operand are used,
+    depending on the instruction size.
+
+Flags
+^^^^^
+
+carry (C)
+    Set to the value of the last bit shifted out of the least
+    significant bit position if the shift count modulo the operand size
+    in bits is non-zero, or unchanged if the shift count modulo the
+    operand size in bits is zero.
+overflow (V)
+    Undefined.
+zero (Z)
+    Set if the result is zero, or cleared otherwise.
+sign (S)
+    Set to the value of the most significant bit of the result (set if
+    the result is a negative signed integer value, or cleared
+    otherwise).
+unordered (U)
+    Undefined.
+
+Simplification rules
+^^^^^^^^^^^^^^^^^^^^
+
+* Converted to :ref:`MOV <umlinst-mov>` or :ref:`NOP <umlinst-nop>` if
+  the ``count`` operand is the immediate value zero and the zero and
+  sign flags are not required.
+* Immediate values for the ``src`` operand are truncated to the
+  instruction size.
+* Immediate values for the ``count`` operand are truncated to five or
+  six bits for 32-bit or 64-bit operands, respectively.
+
 
 .. _umlinst-fparith:
 

@@ -3294,7 +3294,7 @@ void specnext_state::machine_reset()
 	m_spi_clock_cycles = 0;
 	m_spi_clock_state = false;
 
-	m_port_ff_data = 0;
+	port_ff_w(0x00);
 	m_divmmc_delayed_check = 0;
 
 	m_dma->dma_mode_w(0);

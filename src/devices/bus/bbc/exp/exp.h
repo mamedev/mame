@@ -70,14 +70,14 @@ public:
 	// callbacks
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
-
+	auto lpstb_handler() { return m_lpstb_handler.bind(); }
 
 	uint8_t fred_r(offs_t offset);
 	void fred_w(offs_t offset, uint8_t data);
 	uint8_t jim_r(offs_t offset);
 	void jim_w(offs_t offset, uint8_t data);
-	uint8_t sheila_r(offs_t offset);
-	void sheila_w(offs_t offset, uint8_t data);
+	uint8_t rom_r(offs_t offset);
+	void rom_w(offs_t offset, uint8_t data);
 
 	void irq_w(int state) { m_irq_handler(state); }
 	void nmi_w(int state) { m_nmi_handler(state); }
@@ -95,7 +95,7 @@ public:
 	void write_cb2(int state);
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 
 	device_bbc_exp_interface *m_card;
@@ -103,6 +103,7 @@ protected:
 private:
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_nmi_handler;
+	devcb_write_line m_lpstb_handler;
 
 	devcb_write_line m_cb1_handler;
 	devcb_write_line m_cb2_handler;
@@ -118,8 +119,8 @@ public:
 	virtual void fred_w(offs_t offset, uint8_t data) { }
 	virtual uint8_t jim_r(offs_t offset) { return 0xff; }
 	virtual void jim_w(offs_t offset, uint8_t data) { }
-	virtual uint8_t sheila_r(offs_t offset) { return 0xfe; }
-	virtual void sheila_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t rom_r(offs_t offset) { return 0xff; }
+	virtual void rom_w(offs_t offset, uint8_t data) { }
 
 	virtual uint8_t pb_r() { return 0xff; }
 	virtual void pb_w(uint8_t data) { }
@@ -129,7 +130,7 @@ public:
 protected:
 	device_bbc_exp_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_exp_slot_device *m_slot;
+	bbc_exp_slot_device *const m_slot;
 };
 
 

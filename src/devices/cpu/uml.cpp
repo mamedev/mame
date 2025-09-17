@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    uml.c
+    uml.cpp
 
     Universal machine language definitions and classes.
 
@@ -1119,6 +1119,7 @@ public:
 		// convert to NOP or MOV if there's no rotation
 		if (inst.param(2).is_immediate_value(0))
 		{
+			inst.m_flags &= ~FLAG_C; // carry flag unchanged after zero-bit rotate, MOV and NOP won't change carry flag
 			if ((inst.param(0) == inst.param(1)) && (!inst.param(0).is_int_register() || (inst.size() == 8)))
 			{
 				inst.nop();

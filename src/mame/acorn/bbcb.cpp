@@ -270,6 +270,10 @@ void bbcb_state::update_sdb()
 {
 	uint8_t const latch = m_latch->output_state();
 
+	// sound
+	if (!BIT(latch, 0))
+		m_sn->write(m_sdb);
+
 	// speech
 	if (m_vsp)
 	{
@@ -457,7 +461,6 @@ void bbcb_state::bbca(machine_config &config)
 	config.set_default_layout(layout_bbc);
 
 	LS259(config, m_latch);
-	m_latch->q_out_cb<0>().set([this](int state) { if (!state) m_sn->write(m_sdb); });
 	m_latch->q_out_cb<3>().set(m_kbd, FUNC(bbc_kbd_device::write_kb_en));
 	m_latch->q_out_cb<6>().set_output("capslock_led");
 	m_latch->q_out_cb<7>().set_output("shiftlock_led");
@@ -548,8 +551,8 @@ void bbcb_state::bbcb(machine_config &config)
 	centronics.set_output_latch(latch);
 
 	upd7002_device &upd7002(UPD7002(config, "upd7002", 16_MHz_XTAL / 16));
-	upd7002.set_get_analogue_callback(FUNC(bbcb_state::get_analogue_input));
-	upd7002.set_eoc_callback(m_sysvia, FUNC(via6522_device::write_cb1));
+	upd7002.get_analogue_callback().set(m_analog, FUNC(bbc_analogue_slot_device::ch_r));
+	upd7002.eoc_callback().set(m_sysvia, FUNC(via6522_device::write_cb1));
 
 	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
 	m_analog->lpstb_handler().set(m_sysvia, FUNC(via6522_device::write_cb2));

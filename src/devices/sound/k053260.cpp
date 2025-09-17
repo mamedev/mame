@@ -68,6 +68,7 @@ DEFINE_DEVICE_TYPE(K053260, k053260_device, "k053260", "Konami 053260 KDSC")
 // Pan multipliers.  Set according to integer angles in degrees, amusingly.
 // Exact precision hard to know, the floating point-ish output format makes
 // comparisons iffy.  So we used a 1.16 format.
+// TODO: actually LUT-based - mentioned in RE'd schematics.
 const int k053260_device::pan_mul[8][2] =
 {
 	{     0,     0 }, // No sound for pan 0

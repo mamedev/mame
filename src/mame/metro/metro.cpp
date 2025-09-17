@@ -2158,43 +2158,43 @@ static INPUT_PORTS_START( mouja )
 	PORT_SERVICE_NO_TOGGLE(0x0080, IP_ACTIVE_LOW)
 
 	PORT_START("DSW0") //$478884
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Free_Play ) )            PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(  0x0004, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW1:7,8")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0800, 0x0000, "Winning Rounds (Player VS Computer)" )   PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(      0x0800, "1/1" )
-	PORT_DIPSETTING(      0x0000, "2/3" )
-	PORT_DIPNAME( 0x1000, 0x1000, "Winning Rounds (Player VS Player)" ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(      0x1000, "1/1" )
-	PORT_DIPSETTING(      0x0000, "2/3" )
-	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW2:6" )
-	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Free_Play ) )                   PORT_DIPLOCATION("SW1:1")    // フリープレイ
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )                                                      // 無し
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                                       // 有り
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )                 PORT_DIPLOCATION("SW1:2")    // モニター画面反転
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )                                                      // 通常
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                                       // 反転
+	PORT_SERVICE_DIPLOC(  0x0004, IP_ACTIVE_LOW, "SW1:3" )                                              // テストモード
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Demo_Sounds ) )                 PORT_DIPLOCATION("SW1:4")    // デモサウンド
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )                                                      // 無し
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                                       // 有り
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )                      PORT_DIPLOCATION("SW1:5,6")  // プレイ料金スロット1
+	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )                                                    // 3 COIN 1 PLAY
+	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )                                                    // 2 COIN 1 PLAY
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )                                                    // 1 COIN 1 PLAY
+	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )                                                    // 1 COIN 2 PLAY
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )                      PORT_DIPLOCATION("SW1:7,8")  // プレイ料金スロット2
+	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )                                                    // 3 COIN 1 PLAY
+	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )                                                    // 2 COIN 1 PLAY
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )                                                    // 1 COIN 1 PLAY
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )                                                    // 1 COIN 2 PLAY
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )                  PORT_DIPLOCATION("SW2:1,2")  // 難易度
+	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )                                                     // Easy
+	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )                                                   // Normal
+	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )                                                     // Hard
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )                                                  // Very Hard
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Allow_Continue ) )              PORT_DIPLOCATION("SW2:3")    // コンティニュー
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )                                                       // 無し
+	PORT_DIPSETTING(      0x0400, DEF_STR( Yes ) )                                                      // 有り
+	PORT_DIPNAME( 0x0800, 0x0000, "Round Count (single player)" )          PORT_DIPLOCATION("SW2:4")    // 対戦回数（ひとりプレイ）
+	PORT_DIPSETTING(      0x0800, "1/1" )                                                               // 1本勝負
+	PORT_DIPSETTING(      0x0000, "2/3" )                                                               // 3本勝負
+	PORT_DIPNAME( 0x1000, 0x1000, "Round Count (two players)" )            PORT_DIPLOCATION("SW2:5")    // 対戦回数（ふたりプレイ）
+	PORT_DIPSETTING(      0x1000, "1/1" )                                                               // 1本勝負
+	PORT_DIPSETTING(      0x0000, "2/3" )                                                               // 3本勝負
+	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW2:6" )                                                    // （未使用）
+	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )                                                    // （未使用）
+	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )                                                    // （未使用）
 
 	PORT_START("IN2") //$478886
 	PORT_BIT(  0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )

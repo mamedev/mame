@@ -146,6 +146,7 @@ private:
 	u16 hv_counter_r(offs_t offset, u16 mem_mask);
 
 	u16 get_hv_counter();
+	bool in_hblank();
 
 	void vram_w(offs_t offset, u16 data, u16 mem_mask);
 	void cram_w(offs_t offset, u16 data, u16 mem_mask);

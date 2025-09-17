@@ -67,6 +67,8 @@ public:
 	void mpc900gx(machine_config &config);
 	void se3010(machine_config &config);
 
+	void init_se();
+
 	//static void mpc_prisma_default(device_t *device);
 
 protected:
@@ -501,6 +503,10 @@ void bbcm_state::update_sdb()
 {
 	uint8_t const latch = m_latch->output_state();
 
+	// sound
+	if (!BIT(latch,0))
+		m_sn->write(m_sdb);
+
 	// rtc
 	if (m_mc146818_ce)
 	{
@@ -615,6 +621,17 @@ static INPUT_PORTS_START(bbcm)
 INPUT_PORTS_END
 
 
+void bbcm_state::init_se()
+{
+	bbc_state::init_bbc();
+
+	uint8_t *cmos = memregion("rtc")->base();
+
+	cmos[0x13] |= 0x0f; // *Configure File 15
+	cmos[0x1e] |= 0x10; // *Configure Boot
+}
+
+
 static void bbc_floppies(device_slot_interface &device)
 {
 	device.option_add("525sssd", FLOPPY_525_SSSD);
@@ -651,7 +668,7 @@ void bbcm_state::bbcmet(machine_config &config)
 	RAM(config, m_ram).set_default_size("128K");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 624, 0, 512);
+	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette).set_entries(16);
@@ -671,7 +688,6 @@ void bbcm_state::bbcmet(machine_config &config)
 	config.set_default_layout(layout_bbcm);
 
 	LS259(config, m_latch);
-	m_latch->q_out_cb<0>().set([this](int state) { if (!state) m_sn->write(m_sdb); });
 	m_latch->q_out_cb<3>().set(m_kbd, FUNC(bbc_kbd_device::write_kb_en));
 	m_latch->q_out_cb<6>().set_output("capslock_led");
 	m_latch->q_out_cb<7>().set_output("shiftlock_led");
@@ -770,8 +786,8 @@ void bbcm_state::bbcm(machine_config &config)
 	centronics.set_output_latch(latch);
 
 	upd7002_device &upd7002(UPD7002(config, "upd7002", 16_MHz_XTAL / 16));
-	upd7002.set_get_analogue_callback(FUNC(bbcm_state::get_analogue_input));
-	upd7002.set_eoc_callback(m_sysvia, FUNC(via6522_device::write_cb1));
+	upd7002.get_analogue_callback().set(m_analog, FUNC(bbc_analogue_slot_device::ch_r));
+	upd7002.eoc_callback().set(m_sysvia, FUNC(via6522_device::write_cb1));
 
 	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
 	m_analog->lpstb_handler().set(m_sysvia, FUNC(via6522_device::write_cb2));
@@ -1411,7 +1427,7 @@ COMP( 1986, bbcmarm,    bbcm,   0,     bbcmarm,    bbcm,   bbcm_state,   init_bb
 COMP( 1987, mpc800,     bbcm,   0,     mpc800,     bbcm,   bbcm_state,   init_bbc,  "G2 Systems",                  "MasterPieCe 800 Series",             MACHINE_NOT_WORKING )
 COMP( 1988, mpc900,     bbcm,   0,     mpc900,     bbcm,   bbcm_state,   init_bbc,  "G2 Systems",                  "MasterPieCe 900 Series",             MACHINE_NOT_WORKING )
 COMP( 1990, mpc900gx,   bbcm,   0,     mpc900gx,   bbcm,   bbcm_state,   init_bbc,  "G2 Systems",                  "MasterPieCe 900GX Series",           MACHINE_NOT_WORKING )
-COMP( 1987, se3010,     bbcm,   0,     se3010,     bbcm,   bbcm_state,   init_bbc,  "Softel Electronics",          "SE3010 Teletext Editing Terminal",   MACHINE_NOT_WORKING )
+COMP( 1987, se3010,     bbcm,   0,     se3010,     bbcm,   bbcm_state,   init_se,   "Softel Electronics",          "SE3010 Teletext Editing Terminal",   MACHINE_NOT_WORKING )
 
 // Jukeboxes
 //COMP( 1988, discmast,   bbcm,   0,     discmast,   bbcm,   bbcm_state,   init_bbc,  "Arbiter Leisure",             "Arbiter Discmaster A-00",            MACHINE_NOT_WORKING )

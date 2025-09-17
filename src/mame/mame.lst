@@ -20527,6 +20527,7 @@ cb3e
 cb3f
 cb3g
 cb3h
+cb3micro
 cb3s51
 cbaai
 cherry96
@@ -20566,6 +20567,7 @@ cmasterl
 cmezspin
 cmezspina
 cmezspinb
+cmasteroid
 cmfb55
 cmfun
 cmpacman
@@ -20576,6 +20578,8 @@ cmtetrisa
 cmtetrisb
 cmtetrisc
 cmtetrisd
+cmtetrise
+cmtetrisf
 cmtetriskr
 cmv4
 cmv4a
@@ -20717,6 +20721,10 @@ packsystem
 pkrmast
 pkrmasta
 pokonl97
+reelmagic
+reelmagica
+rm_7bonus
+rm_7bonusa
 rolling
 roypok96
 roypok96a
@@ -33300,6 +33308,9 @@ vpoker
 @source:misc/vroulet.cpp
 vroulet
 
+@source:misc/whtm68k.cpp
+yizhix
+
 @source:misc/wildpkr.cpp
 tabpkr
 wildpkr
@@ -36044,6 +36055,7 @@ macross
 macross2
 macross2g
 macross2k
+macrossbl
 mangchi
 manybloc
 mustang
@@ -41181,6 +41193,7 @@ twinsqua
 wwanpanm
 wwanpanmo
 wwmarine
+wwpajero
 zunkyou
 
 @source:sega/segacoin.cpp
@@ -44032,9 +44045,6 @@ vp415
 @source:skeleton/webtouchone.cpp
 wto2840sp
 
-@source:skeleton/whtm68k.cpp
-yizhix
-
 @source:skeleton/xbase09.cpp
 xbase09
 
@@ -45548,6 +45558,7 @@ bshark
 bsharkj
 bsharkjjs
 bsharku
+bsharkuo
 chasehq
 chasehqj
 chasehqju

@@ -33,6 +33,9 @@ NOTES (MD side):
 - has discrete YM3438 in place of YM2612
 - Mega CD expansion port working with DIY extension cable, 32x needs at least a passive cart adapter
 - focus 3 in debugger is the current default for MD side
+- MAME inability of handling differing refresh rates causes visible tearing in MD screen
+  (cfr. koteteik intro). A partial workaround is to use Video mode = composite, so that
+  VGA will downclock to ~60 Hz instead.
 
 TODO:
 - RAM size always gets detected as 2560K even when it's not (from chipset?);
@@ -340,6 +343,7 @@ public:
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(ISA16_WD90C10_ROMLESS,  isa16_wd90c10_romless_device,  "wd90c10_romless",  "Western Digital WD90C10 ROM-less VGA")
@@ -354,10 +358,17 @@ const tiny_rom_entry *isa16_wd90c10_romless_device::device_rom_region() const
 	return ROM_NAME( wd90c10_romless );
 }
 
-
 isa16_wd90c10_romless_device::isa16_wd90c10_romless_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: isa16_wd90c11_lr_device(mconfig, ISA16_WD90C10_ROMLESS, tag, owner, clock)
 {
+}
+
+void isa16_wd90c10_romless_device::device_add_mconfig(machine_config &config)
+{
+	isa16_wd90c11_lr_device::device_add_mconfig(config);
+	// unknown source, assume standard NTSC (divided internally)
+	// tested in Video mode
+	m_vga->set_vclk2(14'318'181);
 }
 
 
@@ -814,7 +825,7 @@ static INPUT_PORTS_START( teradrive )
 	PORT_DIPSETTING(    0x00, "MD boot" )
 	PORT_DIPSETTING(    0x01, "PC boot" )
 	PORT_DIPNAME( 0x04, 0x04, "Video mode" )
-	PORT_DIPSETTING(    0x00, "Video" ) // composite?
+	PORT_DIPSETTING(    0x00, "Video" ) // composite
 	PORT_DIPSETTING(    0x04, "RGB" )
 INPUT_PORTS_END
 
@@ -986,7 +997,7 @@ void teradrive_state::teradrive(machine_config &config)
 	m_md_vdp->add_route(ALL_OUTPUTS, "md_speaker", 0.50, 1);
 
 	auto &hl(INPUT_MERGER_ANY_HIGH(config, "hl"));
-	// TODO: to VDP
+	// TODO: gated thru VDP
 	hl.output_handler().set_inputline(m_md68kcpu, 2);
 
 	MEGADRIVE_IO_PORT(config, m_md_ioports[0], 0);
@@ -1030,10 +1041,9 @@ ROM_START( teradrive )
 	// 1ST AND 2ND HALF IDENTICAL
 	ROM_LOAD( "tru-27c800.bin", 0x00000, 0x100000,  CRC(c2fe9c9e) SHA1(06ec0461dab425f41fb5c3892d9beaa8fa53bbf1))
 
-	// MD 68k initial boot code, "TERA286 INITIALIZE" in header
-	// shows Sega logo + TMSS "produced by" + 1990 copyright at bottom if loaded thru megadrij
+	// firmware for 68k side, need to ROM_COPY to match endianness
 	ROM_REGION16_BE(0x200000, "tmss", ROMREGION_ERASEFF)
-	ROM_COPY("board6:romdisk", 0x00000, 0x0000, 0x200000 )
+	ROM_COPY("board6:romdisk", 0x00000, 0x00000, 0x200000 )
 ROM_END
 
 ROM_START( teradrive3 )
@@ -1050,7 +1060,7 @@ ROM_START( teradrive3 )
 	ROM_LOAD( "tru-27c800.bin", 0x00000, 0x100000,  CRC(c2fe9c9e) SHA1(06ec0461dab425f41fb5c3892d9beaa8fa53bbf1))
 
 	ROM_REGION16_BE(0x200000, "tmss", ROMREGION_ERASEFF)
-	ROM_COPY("board6:romdisk", 0x00000, 0x0000, 0x200000 )
+	ROM_COPY("board6:romdisk", 0x00000, 0x00000, 0x200000 )
 ROM_END
 
 
