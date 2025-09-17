@@ -22,12 +22,15 @@
   
   at back pcb 
   st m27c512? - duplicated 32x2 with same rom programs.
-
+  
   unkwinw
-  The board has a single marking
-  J373
+  Product name: 小方玛丽板
+  Product Code: square-mario-baord
+  The board has a single marking J373
+  
   the LED board says GHY1-PCB and BYP-020 
-  string: String COPYRIGHT BY WIN WAY ELEC. CORP. CLEMENT CHANG, MUSIC by: SunKiss Chen 
+ 
+  string: COPYRIGHT BY WIN WAY ELEC. CORP. CLEMENT CHANG, MUSIC by: SunKiss Chen 
   Notes: the ay bgm are unused during attract and gameplay and only playable after press k1 then press start  3 times.
  
   U1 AT89C51 - unprotected. internal rom.
@@ -37,6 +40,7 @@
   U11 w27c512 - eeprom
   U10 U6295
   Y1 10.7386
+  
   Controls:
   mary1s:
   To reset nvram press K0 and k1, Will shown 09 then restart.
@@ -50,7 +54,6 @@
     31 LEDs, 13 modules of double-digit 7-seg displays and 4 push-buttons).
   * we may also have user inputs from the coin slot and from the
     cabinet buttons, for making bets.
-    If hold Key A or K then press f3 to reset, will shown error 30 code.
   * Need proper layout for unkwinw.
 **************************************************************************/
 
@@ -372,7 +375,9 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE          INIT         ROT   COMPANY      FULLNAME                                                            FLAGS
+//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE          INIT         ROT   COMPANY               FULLNAME                                                   FLAGS
 GAME( ????, marywu,  0,      marywu,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen",    MACHINE_NOT_WORKING ) // Error 02
 GAME( ????, mary1s,  0,      mary1s,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING ) // Error 02
-GAME( ????, unkwinw, 0,      unkwinw,  unkwinw, marywu_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "Unknown Win way Mario Gambling Board",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // Error 02. undumped adpcm rom. Need Correct layout.
+
+// Different than marywu. There are clones with similar led board of these.
+GAME( ????, unkwinw, 0,      unkwinw,  unkwinw, marywu_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "Unknown Win way Gambling Board",                          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // Error 02. undumped adpcm rom. Need Correct layout.
