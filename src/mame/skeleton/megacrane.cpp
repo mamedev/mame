@@ -34,8 +34,8 @@ private:
 
 void megacrane_state::mem_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom().region("program", 0);
-	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom().region("program", 0x8000);
+
 	map(0x8000, 0x8000).w("ymz", FUNC(ay8910_device::address_w));
 	map(0x8001, 0x8001).w("ymz", FUNC(ay8910_device::data_w));
 }
@@ -81,10 +81,10 @@ static INPUT_PORTS_START(megacrane)
 	PORT_START("IN2")   // (Port D)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN) //MISO
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN) //MOSI
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN) //SCK
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN) //CS
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
@@ -95,7 +95,6 @@ void megacrane_state::megacrane(machine_config &config)
 	MC68HC11E1(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &megacrane_state::mem_map);
 	m_maincpu->in_pa_callback().set_ioport("IN1");
-	m_maincpu->in_pd_callback().set_ioport("IN2");
 	m_maincpu->in_pe_callback().set_ioport("SW1");
 
 	SPEAKER(config, "mono").front_center();
