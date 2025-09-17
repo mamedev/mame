@@ -1208,7 +1208,7 @@ attotime specnext_state::copper_until_pos_r(u16 pos)
 	const u16 vcount = BIT(pos, 0, 9);
 	const u16 hcount = ((BIT(pos, 9, 6) << 3) + (BIT(pos, 15) ? 12 : 0)) << 1;
 	return ((vcount < m_screen->height()) && (hcount < m_screen->width()))
-		? m_screen->time_until_pos(m_clip256x192.top() + vcount + m_nr_64_copper_offset, m_clip256x192.left() + hcount)
+		? m_screen->time_until_pos(m_clip256x192.top() + vcount - m_nr_64_copper_offset, m_clip256x192.left() + hcount)
 		: attotime::never;
 }
 
