@@ -18,6 +18,7 @@
 #include "debugvw.h"
 #include "express.h"
 #include "points.h"
+#include "srcdbg_provider.h"
 
 #include "debugger.h"
 #include "emuopts.h"
@@ -194,9 +195,14 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("do",        CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_do, this, _1));
 	m_console.register_command("step",      CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_step, this, _1));
 	m_console.register_command("s",         CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_step, this, _1));
+	m_console.register_command("steps",     CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_step_source, this, _1));
+	m_console.register_command("sts",       CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_step_source, this, _1));
 	m_console.register_command("over",      CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_over, this, _1));
 	m_console.register_command("o",         CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_over, this, _1));
+	m_console.register_command("overs",     CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_over_source, this, _1));
+	m_console.register_command("os",        CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_over_source, this, _1));
 	m_console.register_command("out" ,      CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_out, this, _1));
+	m_console.register_command("outs" ,     CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_out_source, this, _1));
 	m_console.register_command("go",        CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go, this, _1));
 	m_console.register_command("g",         CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go, this, _1));
 	m_console.register_command("gvblank",   CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_go_vblank, this, _1));
@@ -220,6 +226,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("resume",    CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_resume, this, _1));
 	m_console.register_command("cpulist",   CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_cpulist, this, _1));
 	m_console.register_command("time",      CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_time, this, _1));
+	m_console.register_command("sdoffset",  CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_srcdbg_set_offset, this, _1));
 
 	m_console.register_command("comadd",    CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1));
 	m_console.register_command("//",        CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1));
@@ -803,6 +810,16 @@ void debugger_commands::execute_step(const std::vector<std::string_view> &params
 }
 
 
+/*-----------------------------------------------------
+    execute_step_source - execute the step src command
+-----------------------------------------------------*/
+
+void debugger_commands::execute_step_source(const std::vector<std::string_view> &params)
+{
+	m_console.get_visible_cpu()->debug()->single_step(1 /* steps */, true /* source-level stepping */);
+}
+
+
 /*-------------------------------------------------
     execute_over - execute the over command
 -------------------------------------------------*/
@@ -818,6 +835,16 @@ void debugger_commands::execute_over(const std::vector<std::string_view> &params
 }
 
 
+/*-----------------------------------------------------
+    execute_over_source - execute the over src command
+-----------------------------------------------------*/
+
+void debugger_commands::execute_over_source(const std::vector<std::string_view> &params)
+{
+	m_console.get_visible_cpu()->debug()->single_step_over(1 /* steps */, true /* source-level stepping */);
+}
+
+
 /*-------------------------------------------------
     execute_out - execute the out command
 -------------------------------------------------*/
@@ -825,6 +852,16 @@ void debugger_commands::execute_over(const std::vector<std::string_view> &params
 void debugger_commands::execute_out(const std::vector<std::string_view> &params)
 {
 	m_console.get_visible_cpu()->debug()->single_step_out();
+}
+
+
+/*-------------------------------------------------
+    execute_out_source - execute the out src command
+-------------------------------------------------*/
+
+void debugger_commands::execute_out_source(const std::vector<std::string_view> &params)
+{
+	m_console.get_visible_cpu()->debug()->single_step_out(true /* source-level stepping */);
 }
 
 
@@ -1245,6 +1282,30 @@ void debugger_commands::execute_time(const std::vector<std::string_view> &params
 {
 	m_console.printf("%s\n", m_machine.time().as_string());
 }
+
+//-------------------------------------------------
+//  execute_srcdbg_set_offset - execute the
+//  source-level debugging set offset command
+//-------------------------------------------------
+
+void debugger_commands::execute_srcdbg_set_offset(const std::vector<std::string_view> &params)
+{
+	srcdbg_provider_base * srcdbg = m_machine.debugger().srcdbg_provider();
+	if (srcdbg == nullptr)
+	{
+		m_console.printf("Error : source-level debugging is not enabled\n");
+		return;
+	}
+
+	u64 offset;
+	if (!m_console.validate_number_parameter(params[0], offset))
+		return;
+
+	srcdbg->set_offset(s32(offset));
+	m_console.get_visible_cpu()->debug()->update_symbols_from_srcdbg(*srcdbg);
+	m_console.printf("Offset successfully applied\n");
+}
+
 
 /*-------------------------------------------------
     execute_comment - add a comment to a line
@@ -4621,6 +4682,12 @@ void debugger_commands::execute_symlist(const std::vector<std::string_view> &par
 		case symbol_table::BUILTIN_GLOBALS:
 			m_console.printf("\n**** Global symbols ****\n");
 			break;
+		case symbol_table::SRCDBG_LOCALS:
+			m_console.printf("\n**** Source-level local variables ****\n");
+			break;
+		case symbol_table::SRCDBG_GLOBALS:
+			m_console.printf("\n**** Source-level global variables ****\n");
+			break;
 		default:
 			assert(!"Unrecognized symbol table type");
 		}
@@ -4646,7 +4713,10 @@ void debugger_commands::execute_symlist(const std::vector<std::string_view> &par
 		{
 			symbol_entry const *const entry = symtable->find(symname);
 			assert(entry != nullptr);
-			m_console.printf("%s = %X", symname, entry->value());
+			if (entry->is_in_scope())
+				m_console.printf("%s = %X", symname, entry->value());
+			else
+				m_console.printf("%s (not currently in scope)", symname);
 			if (!entry->is_lval())
 				m_console.printf("  (read-only)");
 			m_console.printf("\n");
