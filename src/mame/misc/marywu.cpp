@@ -3,12 +3,48 @@
 /*************************************************************************
 
   This is a driver for a gambling board with a yet unknown name.
-  The PCB is labeled with: WU- MARY-1A
-  And there's a text string in the ROM that says: "Music by: SunKiss Chen"
-
   Driver by Felipe Sanches
 
-  TODO:
+  marywu
+  The PCB is labeled with: WU- MARY-1A
+  And there's a text string in the ROM that says: "Music by: SunKiss Chen"
+  
+  mary1s
+  labeled as MARY-1/SUNRISE.
+ 
+  U8 HM6116P?-??.
+  U7 W78E52B-24.
+  U14 U16 JFC 95101.
+  U23 TOP 8279.
+  U100 unpopulated for ym2413 or um3567.
+  
+  unpopulated led marked for rouletted circles instead of square.
+  
+  at back pcb 
+  st m27c512? - duplicated 32x2 with same rom programs.
+
+  unkwinw
+  The board has a single marking
+  J373
+  the LED board says GHY1-PCB and BYP-020 
+  string: String COPYRIGHT BY WIN WAY ELEC. CORP. CLEMENT CHANG, MUSIC by: SunKiss Chen 
+
+  U1 AT89C51 - unprotected. internal rom.
+  U2 HM6118LP-3
+  U8 EPM7032SLC44-10N 
+  U9 TOP 8279
+  U11 w27c512 - eeprom code.
+  U10 U6295
+  Y1 10.7386
+
+
+  
+
+Controls:
+mary1s:
+To reset nvram press K0 and k3, Will shown 09 then restart.
+
+ TODO:
   * Figure out where exactly all devices are mapped to (the devices are
     2 sound chips, the 2kb SRAM, the 8bit DIP switches,
     31 LEDs, 13 modules of double-digit 7-seg displays and 4 push-buttons).
@@ -24,6 +60,7 @@
 #include "machine/nvram.h"
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
+#include "sound/okim6295.h"
 #include "speaker.h"
 
 #include "marywu.lh"
@@ -42,6 +79,8 @@ public:
 	{ }
 
 	void marywu(machine_config &config);
+    void mary1s(machine_config &config);
+	void unkwinw(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -56,6 +95,8 @@ private:
 	uint8_t keyboard_r();
 	void io_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
+	void unkwinw_io_map(address_map &map) ATTR_COLD;
+	void unkwinw_program_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_selected_7seg_module = 0;
 
@@ -66,24 +107,24 @@ private:
 
 static INPUT_PORTS_START( marywu )
 	PORT_START("KEYS1")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I)
-
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("BAR") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("77") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Stars") PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Watermelon") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bell") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Mango") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Orange") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Apple") PORT_CODE(KEYCODE_I)
+	
 	PORT_START("KEYS2")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN1)  PORT_IMPULSE(01) PORT_CODE(KEYCODE_5) // If IP_ACTIVE_LOW will cause error 30.
+	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_O) // ??? 
+	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("Up")PORT_CODE(KEYCODE_P) // Increase won number.
+	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYPAD )PORT_NAME("Down") PORT_CODE(KEYCODE_A)  // Decrease won number.
+	PORT_BIT(0x08, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_S)  // ???
+	PORT_BIT(0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_HIGH ) PORT_NAME("Big") PORT_CODE(KEYCODE_D) // 
+	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_GAMBLE_LOW  ) PORT_NAME("Small") PORT_CODE(KEYCODE_F)  //
+	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_START1) PORT_NAME("Start / key out?") PORT_CODE(KEYCODE_G) // Pay out?
 
 	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW:1")
@@ -96,12 +137,65 @@ static INPUT_PORTS_START( marywu )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW:8")
 
 	PORT_START("PUSHBUTTONS")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) // K0
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) // K1
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) // K2
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) // K3
-	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("K0") // K0
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("K1") // K1
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("K2") // K2
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("K3") // K3
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("P1.4") PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("P1.5") PORT_CODE(KEYCODE_X)
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P1.6") PORT_CODE(KEYCODE_C) // If IP_ACTIVE_LOW Will cause Error 30 if press
+    PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("P1.7") PORT_CODE(KEYCODE_V) // If press during startup, it will cause error 76.
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( unkwinw )
+	PORT_START("KEYS1")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_I)
+	
+	
+	PORT_START("KEYS2")
+	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_CODE(KEYCODE_P)
+	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_CODE(KEYCODE_A) 
+	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x08, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x04, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_START1)  PORT_CODE(KEYCODE_H)
+
+	PORT_START("DSW")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW:1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW:2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW:3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW:4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW:5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW:6")
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW:7")
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW:8")
+
+	PORT_START("PUSHBUTTONS")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("K0") // K0
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("K1") // K1
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("K2") // K2
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("K3") // K3
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("P1.4") PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("P1.5") PORT_CODE(KEYCODE_X)
+    PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("P1.6") PORT_CODE(KEYCODE_C)  //  will cause error 76.
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P1.7") PORT_CODE(KEYCODE_V)  //  longer tone, if press, will sound normal. set to high.
+INPUT_PORTS_END
+
 
 void marywu_state::ay1_port_a_w(uint8_t data)
 {
@@ -166,7 +260,25 @@ void marywu_state::io_map(address_map &map)
 	map(0x9000, 0x9001).mirror(0x0ffc).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0x9002, 0x9003).mirror(0x0ffc).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xb000, 0xb001).mirror(0x0ffe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xf000, 0xf000).noprw(); /* TODO: Investigate this. There's something going on at this address range. */
+	map(0xf000, 0xf000).noprw();  /* TODO: Investigate this. There's something going on at this address range. Does not happen in mary1s. */
+}
+
+void marywu_state::unkwinw_program_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("maincpu", 0);
+	map(0x1000, 0xf000).rom().region("eeprom",  0x1000); 
+
+}
+
+void marywu_state::unkwinw_io_map(address_map &map)
+{
+	map(0x8000, 0x8001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x8002, 0x8003).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+    map(0x9000, 0x9000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0xb000, 0xb000).unmapw(); // apdcm rom banking?
+	map(0xf000, 0xf7ff).ram().share("nvram"); /* hm6116lp-3: 2kbytes of Static RAM */
+
 }
 
 void marywu_state::machine_start()
@@ -186,6 +298,7 @@ void marywu_state::marywu(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::program_map);
 	maincpu.set_addrmap(AS_IO, &marywu_state::io_map);
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
+	maincpu.port_in_cb<1>().set_ioport("P1");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -212,13 +325,55 @@ void marywu_state::marywu(machine_config &config)
 	ay2.port_b_write_callback().set(FUNC(marywu_state::ay2_port_b_w));
 }
 
+void marywu_state::mary1s(machine_config &config) 
+{
+	marywu(config);
+	i80c52_device &maincpu(I80C52(config.replace(), "maincpu", XTAL(10'738'635))); // actual cpu is W78E52B-24. xtal jfc 10.7386 mhz
+	maincpu.port_in_cb<1>().set_ioport("P1");
+	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::program_map);
+    maincpu.set_addrmap(AS_IO, &marywu_state::io_map);
+}
+
+void marywu_state::unkwinw(machine_config &config)
+{
+	marywu(config);
+	i80c51_device &maincpu(I80C51(config.replace(), "maincpu", XTAL(10'738'635))); // actual cpu is at89c51
+	OKIM6295(config, "oki", XTAL(10'738'000) / 6, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);  // Clock frequency & pin 7 not verified
+	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::unkwinw_program_map);
+	maincpu.set_addrmap(AS_IO, &marywu_state::unkwinw_io_map);
+	maincpu.port_in_cb<1>().set_ioport("P1");
+}
+
 ROM_START( marywu )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "marywu_sunkiss_chen.rom", 0x0000, 0x8000, CRC(11f67c7d) SHA1(9c1fd1a5cc6e2b0d675f0217aa8ff21c30609a0c) )
 ROM_END
 
+ROM_START( mary1s ) // actual cpu is W78E52B-24. xtal jfc 10.7386 mhz
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mary_sunrise.rom", 0x0000, 0x10000, CRC(746463A4) SHA1(065478223a809c75fe0302d1c85f129d94f503b4) )
+ROM_END
+
+ROM_START( unkwinw )
+	ROM_REGION( 0x0800, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "epm7032.u8",   0x0000, 0x0800, NO_DUMP  ) // epm7032slc44-10n
+	
+	ROM_REGION( 0x01000, "maincpu", 0 )
+	ROM_LOAD( "at89c51.u1", 0x00000, 0x01000, CRC(67C00C5A) SHA1(f889522b6fff3f487183ff49e1144c9fe27cbb3e) ) // actual CPU is a Atmel at89c51. has the internal program code on it.
+ 	
+	ROM_REGION( 0x200000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx29f1615.u11", 0x000000, 0x200000, NO_DUMP ) 
+	
+	ROM_REGION( 0x10000, "eeprom", 0 ) 
+	
+	ROM_LOAD( "w27c512.u12", 0x0000, 0x10000, CRC(735147D8) SHA1(df2431f85224443eda4346a10183021f60d858a0) )
+    ROM_END
+
 } // anonymous namespace
 
 
-//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( ????, marywu, 0,       marywu,   marywu, marywu_state, empty_init, ROT0, "<unknown>", "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE          INIT         ROT   COMPANY      FULLNAME                                                   FLAGS
+
+GAME( ????, marywu,  0,      marywu,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>", "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen",    MACHINE_NOT_WORKING ) // Error 02
+GAME( ????, mary1s,  0,      mary1s,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>", "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING ) // Error 02
+GAME( ????, unkwinw, 0,      unkwinw,  unkwinw, marywu_state,  empty_init, ROT0, "WIN WAY ELEC CORP", "Unknown win way elec corp",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // Error 02. undumped adpcm rom.
