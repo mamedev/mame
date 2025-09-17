@@ -28,7 +28,8 @@
   J373
   the LED board says GHY1-PCB and BYP-020 
   string: String COPYRIGHT BY WIN WAY ELEC. CORP. CLEMENT CHANG, MUSIC by: SunKiss Chen 
-
+  Notes: the ay music are unused and only playable after press k1 then press start  3 times.
+ 
   U1 AT89C51 - unprotected. internal rom.
   U2 HM6118LP-3
   U8 EPM7032SLC44-10N 
@@ -36,14 +37,13 @@
   U11 w27c512 - eeprom
   U10 U6295
   Y1 10.7386
-
-
+  Controls:
+  mary1s:
+  To reset nvram press K0 and k1, Will shown 09 then restart.
   
-
-Controls:
-mary1s:
-To reset nvram press K0 and k3, Will shown 09 then restart.
-
+  unkwinw
+  Press k0 and k2 to reset the nvram.
+  
  TODO:
   * Figure out where exactly all devices are mapped to (the devices are
     2 sound chips, the 2kb SRAM, the 8bit DIP switches,
@@ -51,7 +51,7 @@ To reset nvram press K0 and k3, Will shown 09 then restart.
   * we may also have user inputs from the coin slot and from the
     cabinet buttons, for making bets.
     If hold Key A or K then press f3 to reset, will shown error 30 code.
-
+  * Need proper layout for unkwinw.
 **************************************************************************/
 
 #include "emu.h"
@@ -375,4 +375,4 @@ ROM_END
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE          INIT         ROT   COMPANY      FULLNAME                                                            FLAGS
 GAME( ????, marywu,  0,      marywu,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen",    MACHINE_NOT_WORKING ) // Error 02
 GAME( ????, mary1s,  0,      mary1s,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING ) // Error 02
-GAME( ????, unkwinw, 0,      unkwinw,  unkwinw, marywu_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "Unknown win way Gambling machine",                        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // Error 02. undumped adpcm rom. Need Correct layout.
+GAME( ????, unkwinw, 0,      unkwinw,  unkwinw, marywu_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "Unknown Win way Gambling machine",                        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // Error 02. undumped adpcm rom. Need Correct layout.
