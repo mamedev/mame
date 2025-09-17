@@ -68,6 +68,16 @@ protected:
 	bool m_expect_calibration_second_byte = false;
 	bool m_expect_light_second_byte = false;
 
+	template <typename Format, typename... Params>
+	void logerror(Format &&fmt, Params &&... args) const
+	{
+		util::stream_format(
+				std::cerr,
+				"[%s] %s",
+				tag(),
+				util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
+
 private:
 	static const int XMIT_RING_SIZE = 16;
 
