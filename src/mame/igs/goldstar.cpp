@@ -468,7 +468,9 @@ public:
 	void init_hamhouse() ATTR_COLD;
 	void init_hamhouse9() ATTR_COLD;
 	void init_jkrmast() ATTR_COLD;
+	void decrypt_ll3() ATTR_COLD;
 	void init_ll3() ATTR_COLD;
+	void init_ll3b() ATTR_COLD;
 	void init_match133() ATTR_COLD;
 	void init_nfb96_a() ATTR_COLD;
 	void init_nfb96_b() ATTR_COLD;
@@ -15956,6 +15958,7 @@ ROM_START( cb3micro )
 ROM_END
 
 
+
 ROM_START( ll3 )  // WANG QL-1  V3.03 string
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "min bet 8.u1", 0x00000, 0x10000, CRC(f19d0af3) SHA1(deefe5782213d60d8d0aae6826aa6a0109925289) )  // on sub PCB
@@ -15971,8 +15974,164 @@ ROM_START( ll3 )  // WANG QL-1  V3.03 string
 	ROM_LOAD( "lucky line iii rom 2.u14",  0x4000, 0x2000, CRC(14369397) SHA1(32dc356d333e9b439e490407cef9eb70c44e86a4) )
 	ROM_LOAD( "lucky line iii rom 1.u9",   0x6000, 0x2000, CRC(626947e5) SHA1(13b7dd7fad4659ddc6a82883f1da5a8dd09e46b5) )
 
-	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "lucky line iii rom 8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom1.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "prom2.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "prom3.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( ll3a )  // Macedonia Skin
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ll3a_set2.bin", 0x00000, 0x10000, CRC(8aeabff8) SHA1(e1c662bdef0366f4279b23571805b0f978b616f6) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom7.u16", 0x00000, 0x8000, CRC(c7272bde) SHA1(4c890e61151b30a69929ea82694ebb851d94ad3f) )
+	ROM_LOAD( "rom6.u11", 0x08000, 0x8000, CRC(9804690f) SHA1(f18ba831471bb11dd49d58ff6c7c39376838bce6) )
+	ROM_LOAD( "rom5.u4",  0x10000, 0x8000, CRC(53b3c5ec) SHA1(1af978c8ccc664c1f8298a3d21a1023eb04852f0) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom4.u15",  0x0000, 0x2000, CRC(1c211766) SHA1(639d15b92f703dccf4740a218ce34a07861c0107) )
+	ROM_LOAD( "rom3.u10",  0x2000, 0x2000, CRC(50d7b91c) SHA1(ef9e35706ec41cbae16c8a00fdc8ce44791112c9) )
+	ROM_LOAD( "rom2.u14",  0x4000, 0x2000, CRC(28226d1b) SHA1(b80c005d32cfe9b08293a09a0f674ed7f6b0f2eb) )
+	ROM_LOAD( "rom1.u9",   0x6000, 0x2000, CRC(090ffade) SHA1(813b857f0412a651318f4f4c6f61a38eb2630730) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom1.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "prom2.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "prom3.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( ll3b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ll3b_set3.bin", 0x00000, 0x10000, CRC(661720ac) SHA1(69b06953b354e339b5405d0e473692779c09a434) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "lucky line iii rom 7.u16", 0x00000, 0x8000, CRC(304f9630) SHA1(78089e9d59e471e4cd70fbf254e46dc0c0729957) )
+	ROM_LOAD( "lucky line iii rom 6.u11", 0x08000, 0x8000, CRC(1afe38d9) SHA1(cf247634b80f72c8288e49b7c5628b5cc9e555d3) )
+	ROM_LOAD( "lucky line iii rom 5.u4",  0x10000, 0x8000, CRC(e7660d2c) SHA1(1df9553bfaaf94ca076cea772dc72b6b5cb2c557) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "lucky line iii rom 4.u15",  0x0000, 0x2000, CRC(f9d75b29) SHA1(b56572fcfc2a20f45f241ec433e1fa813cb3e260) )
+	ROM_LOAD( "lucky line iii rom 3.u10",  0x2000, 0x2000, CRC(104eda10) SHA1(71b77dbf0c34d2186ac25e906da406fc74c180fc) )
+	ROM_LOAD( "lucky line iii rom 2.u14",  0x4000, 0x2000, CRC(14369397) SHA1(32dc356d333e9b439e490407cef9eb70c44e86a4) )
+	ROM_LOAD( "lucky line iii rom 1.u9",   0x6000, 0x2000, CRC(626947e5) SHA1(13b7dd7fad4659ddc6a82883f1da5a8dd09e46b5) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom1.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "prom2.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "prom3.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( ll3c )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ll3c_set4.bin", 0x00000, 0x10000, CRC(b3210786) SHA1(5aa8d4302170342e1ed1b1126f917a8ced0dea36) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "lucky line iii rom 7.u16", 0x00000, 0x8000, CRC(304f9630) SHA1(78089e9d59e471e4cd70fbf254e46dc0c0729957) )
+	ROM_LOAD( "lucky line iii rom 6.u11", 0x08000, 0x8000, CRC(1afe38d9) SHA1(cf247634b80f72c8288e49b7c5628b5cc9e555d3) )
+	ROM_LOAD( "lucky line iii rom 5.u4",  0x10000, 0x8000, CRC(e7660d2c) SHA1(1df9553bfaaf94ca076cea772dc72b6b5cb2c557) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "lucky line iii rom 4.u15",  0x0000, 0x2000, CRC(f9d75b29) SHA1(b56572fcfc2a20f45f241ec433e1fa813cb3e260) )
+	ROM_LOAD( "lucky line iii rom 3.u10",  0x2000, 0x2000, CRC(104eda10) SHA1(71b77dbf0c34d2186ac25e906da406fc74c180fc) )
+	ROM_LOAD( "lucky line iii rom 2.u14",  0x4000, 0x2000, CRC(14369397) SHA1(32dc356d333e9b439e490407cef9eb70c44e86a4) )
+	ROM_LOAD( "lucky line iii rom 1.u9",   0x6000, 0x2000, CRC(626947e5) SHA1(13b7dd7fad4659ddc6a82883f1da5a8dd09e46b5) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom1.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "prom2.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "prom3.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( ll3d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ll3d_set5.bin", 0x00000, 0x10000, CRC(bfea6dce) SHA1(19e1fbd787979d9d02a25b9b32cfbf1f014969d3) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "lucky line iii rom 7.u16", 0x00000, 0x8000, CRC(304f9630) SHA1(78089e9d59e471e4cd70fbf254e46dc0c0729957) )
+	ROM_LOAD( "lucky line iii rom 6.u11", 0x08000, 0x8000, CRC(1afe38d9) SHA1(cf247634b80f72c8288e49b7c5628b5cc9e555d3) )
+	ROM_LOAD( "lucky line iii rom 5.u4",  0x10000, 0x8000, CRC(e7660d2c) SHA1(1df9553bfaaf94ca076cea772dc72b6b5cb2c557) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "lucky line iii rom 4.u15",  0x0000, 0x2000, CRC(f9d75b29) SHA1(b56572fcfc2a20f45f241ec433e1fa813cb3e260) )
+	ROM_LOAD( "lucky line iii rom 3.u10",  0x2000, 0x2000, CRC(104eda10) SHA1(71b77dbf0c34d2186ac25e906da406fc74c180fc) )
+	ROM_LOAD( "lucky line iii rom 2.u14",  0x4000, 0x2000, CRC(14369397) SHA1(32dc356d333e9b439e490407cef9eb70c44e86a4) )
+	ROM_LOAD( "lucky line iii rom 1.u9",   0x6000, 0x2000, CRC(626947e5) SHA1(13b7dd7fad4659ddc6a82883f1da5a8dd09e46b5) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom1.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "prom2.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "prom3.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( ll3e )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ll3e_set6.bin", 0x00000, 0x10000, CRC(a73718f0) SHA1(7ff35e322523e0ccc5a1aa377497481d33916a3f) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "lucky line iii rom 7.u16", 0x00000, 0x8000, CRC(304f9630) SHA1(78089e9d59e471e4cd70fbf254e46dc0c0729957) )
+	ROM_LOAD( "lucky line iii rom 6.u11", 0x08000, 0x8000, CRC(1afe38d9) SHA1(cf247634b80f72c8288e49b7c5628b5cc9e555d3) )
+	ROM_LOAD( "lucky line iii rom 5.u4",  0x10000, 0x8000, CRC(e7660d2c) SHA1(1df9553bfaaf94ca076cea772dc72b6b5cb2c557) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "lucky line iii rom 4.u15",  0x0000, 0x2000, CRC(f9d75b29) SHA1(b56572fcfc2a20f45f241ec433e1fa813cb3e260) )
+	ROM_LOAD( "lucky line iii rom 3.u10",  0x2000, 0x2000, CRC(104eda10) SHA1(71b77dbf0c34d2186ac25e906da406fc74c180fc) )
+	ROM_LOAD( "lucky line iii rom 2.u14",  0x4000, 0x2000, CRC(14369397) SHA1(32dc356d333e9b439e490407cef9eb70c44e86a4) )
+	ROM_LOAD( "lucky line iii rom 1.u9",   0x6000, 0x2000, CRC(626947e5) SHA1(13b7dd7fad4659ddc6a82883f1da5a8dd09e46b5) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom1.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "prom2.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "prom3.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( ll3f )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ll3f_set7.bin", 0x00000, 0x10000, CRC(07ad76eb) SHA1(91bb7ec41eb430f265cc1929a1b21847d9a9067a) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "lucky line iii rom 7.u16", 0x00000, 0x8000, CRC(304f9630) SHA1(78089e9d59e471e4cd70fbf254e46dc0c0729957) )
+	ROM_LOAD( "lucky line iii rom 6.u11", 0x08000, 0x8000, CRC(1afe38d9) SHA1(cf247634b80f72c8288e49b7c5628b5cc9e555d3) )
+	ROM_LOAD( "lucky line iii rom 5.u4",  0x10000, 0x8000, CRC(e7660d2c) SHA1(1df9553bfaaf94ca076cea772dc72b6b5cb2c557) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "lucky line iii rom 4.u15",  0x0000, 0x2000, CRC(f9d75b29) SHA1(b56572fcfc2a20f45f241ec433e1fa813cb3e260) )
+	ROM_LOAD( "lucky line iii rom 3.u10",  0x2000, 0x2000, CRC(104eda10) SHA1(71b77dbf0c34d2186ac25e906da406fc74c180fc) )
+	ROM_LOAD( "lucky line iii rom 2.u14",  0x4000, 0x2000, CRC(14369397) SHA1(32dc356d333e9b439e490407cef9eb70c44e86a4) )
+	ROM_LOAD( "lucky line iii rom 1.u9",   0x6000, 0x2000, CRC(626947e5) SHA1(13b7dd7fad4659ddc6a82883f1da5a8dd09e46b5) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	// not populated
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "prom1.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
@@ -25250,7 +25409,8 @@ void cmaster_state::init_cmtetriskr()
 	m_palette->update();
 }
 
-void cmaster_state::init_ll3() // verified with ICE dump
+
+void cmaster_state::decrypt_ll3()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -25263,6 +25423,14 @@ void cmaster_state::init_ll3() // verified with ICE dump
 	std::swap_ranges(&rom[0x2800], &rom[0x3000], &rom[0xa800]);
 	std::swap_ranges(&rom[0x6800], &rom[0x7000], &rom[0x9800]);
 	
+}
+
+void cmaster_state::init_ll3() // verified with ICE dump
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	
+	decrypt_ll3();
+	
 	rom[0x8a] = 0;
 	rom[0x8b] = 0;
 	rom[0x8c] = 0;
@@ -25273,6 +25441,28 @@ void cmaster_state::init_ll3() // verified with ICE dump
 	rom[0x0b2c] = 0x00;
 	rom[0x0b2d] = 0x00;
 }
+
+void cmaster_state::init_ll3b() // verified with ICE dump
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	
+	decrypt_ll3();
+
+	rom[0x7e] = 0xcd;
+	rom[0x7f] = 0x87;
+	rom[0x80] = 0x6a;
+	
+	rom[0x8a] = 0;
+	rom[0x8b] = 0;
+	rom[0x8c] = 0;
+
+	// NOP'ing the writes to port 10h (video register)
+	// all the writes have masked the bit1 ON, getting
+	// the video totally disabled. Surely for protection.
+	rom[0x0b2c] = 0x00;
+	rom[0x0b2d] = 0x00;
+}
+
 
 void goldstar_state::init_palnibbles()
 {
@@ -26663,7 +26853,13 @@ GAMEL( 1991, skdelux2k,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4
 GAMEL( 1991, skdelux99,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Florida Skill Deluxe 99 (FBV2 ver.T)",        0,                 layout_cmasterb )
 GAMEL( 199?, super7,     cmaster,  super7,   super7,   cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven (ver. 2.3)",                      MACHINE_NOT_WORKING, layout_cmasterb ) // inputs / outputs needs verifying
 GAME ( 199?, wcat3a,     wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
-GAME ( 199?, ll3,        cmaster,  ll3,      ll3,      cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03)",  0 )  // needs layout
+GAME ( 1993, ll3,        0,        ll3,      ll3,      cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 1)",            0 )  // needs layout
+GAME ( 1993, ll3a,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 2, Macedonia)", 0 )  // needs layout
+GAME ( 1993, ll3b,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 3)",            0 )  // needs layout
+GAME ( 1993, ll3c,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 4)",            0 )  // needs layout
+GAME ( 1993, ll3d,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 5)",            0 )  // needs layout
+GAME ( 1993, ll3e,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 6)",            0 )  // needs layout
+GAME ( 1993, ll3f,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3,       ROT0, "bootleg (LLC)",     "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 7)",            0 )  // needs layout
 GAMEL( 199?, cmfb55,     cmaster,  cmfb55,   cmaster,  cmaster_state,  init_palnibbles,ROT0, "bootleg",           "Cherry Master (bootleg, Game FB55 Ver.2)",    MACHINE_NOT_WORKING, layout_cmv4 ) // inputs not done
 GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             0,                   layout_cmaster )
 GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           0,                   layout_cmaster )
