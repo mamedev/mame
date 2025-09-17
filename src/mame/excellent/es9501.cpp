@@ -27,7 +27,8 @@ TODO
 - IRQs are wrong;
 - EEPROM write doesn't work;
 - outputs, hopper;
-- verify colors and possible third layer;
+- verify colors;
+- fix sprites (currently disabled);
 - d9flower needs correct EEPROM;
 - device-ify ES-9409 and share with excellent/dblcrown.cpp.
 */
@@ -48,6 +49,16 @@ TODO
 #include "tilemap.h"
 
 
+// configurable logging
+#define LOG_EEPROM     (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_EEPROM)
+
+#include "logmacro.h"
+
+#define LOGEEPROM(...)     LOGMASKED(LOG_EEPROM,     __VA_ARGS__)
+
+
 namespace {
 
 class es9501_state : public driver_device
@@ -63,6 +74,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_vram_bank(*this, "vram_bank%u", 0U),
 		m_vram(*this, "vram"),
+		m_spriteram(*this, "spriteram", 0x2000U, ENDIANNESS_BIG),
 		m_pal_ram(*this, "palram", 0x200U, ENDIANNESS_BIG)
 	{ }
 
@@ -82,6 +94,7 @@ private:
 	required_device_array<address_map_bank_device, 2> m_vram_bank;
 
 	required_shared_ptr<uint8_t> m_vram;
+	memory_share_creator<uint8_t> m_spriteram;
 	memory_share_creator<uint8_t> m_pal_ram;
 
 	uint8_t m_vram_bank_entry[2] {};
@@ -91,7 +104,10 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void vram_w(offs_t offset, uint8_t data);
+	uint8_t spriteram_r(offs_t offset) { return m_spriteram[offset]; }
+	void spriteram_w(offs_t offset, uint8_t data) { m_spriteram[offset] = data; }
 	void palette_w(offs_t offset, uint8_t data);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -112,6 +128,7 @@ void es9501_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(es9501_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_user_data(&m_vram[0xb000]);
 
+	// m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
@@ -160,8 +177,27 @@ void es9501_state::palette_w(offs_t offset, uint8_t data)
 	m_palette->set_pen_color(offset, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
+void es9501_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = m_spriteram.bytes() - 8; offs >= 0; offs -= 8)
+	{
+		if (!BIT(m_spriteram[offs + 2], 7))
+			continue;
+
+		int sprite = m_spriteram[offs + 1] | (m_spriteram[offs] << 8);
+		int const x = m_spriteram[offs + 5] | (m_spriteram[offs + 4] << 8);
+		int const y = m_spriteram[offs + 7] | (m_spriteram[offs + 6] << 8);
+		int const flipx = 0; // TODO
+		int const flipy = 0; // TODO
+		int const color = m_spriteram[offs + 3];
+
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite, color, flipx, flipy, x, y, 0);
+	}
+}
+
 uint32_t es9501_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// draw_sprites(bitmap, cliprect); // seem to be under the tilemaps according to reference pics
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -187,7 +223,7 @@ void es9501_state::watchdog_eeprom_w(uint8_t data)
 		m_watchdog->watchdog_reset();
 
 	if (data & 0x2e)
-		logerror("eeprom_unk_w: %02x\n", data & 0x2e);
+		LOGEEPROM("eeprom_unk_w: %02x\n", data & 0x2e);
 
 	m_eeprom->di_write(BIT(data, 7));
 	m_eeprom->clk_write(BIT(data, 6));
@@ -202,7 +238,7 @@ void es9501_state::program_map(address_map &map)
 	map(0x3fc000, 0x3fffff).ram().share("nvram");
 	map(0x400000, 0x401fff).m(m_vram_bank[0], FUNC(address_map_bank_device::amap8)).umask16(0xff00);
 	map(0x402000, 0x403fff).m(m_vram_bank[1], FUNC(address_map_bank_device::amap8)).umask16(0xff00);
-	map(0x404000, 0x405fff).ram(); // third layer?
+	map(0x404000, 0x405fff).r(FUNC(es9501_state::spriteram_r)).w(FUNC(es9501_state::spriteram_w)).umask16(0xff00);
 	map(0x406000, 0x4063ff).ram().w(FUNC(es9501_state::palette_w)).umask16(0xff00);
 	map(0x406400, 0x406fff).ram();
 	map(0x407c00, 0x407cff).ram();
