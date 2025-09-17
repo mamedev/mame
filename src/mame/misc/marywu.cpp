@@ -33,7 +33,7 @@
   string: COPYRIGHT BY WIN WAY ELEC. CORP. CLEMENT CHANG, MUSIC by: SunKiss Chen 
   Notes: the ay bgm are unused during attract and gameplay and only playable after press k1 then press start  3 times.
  
-  U1 AT89C51 - unprotected. internal rom.
+  U1 AT89C51 - internal rom.
   U2 HM6118LP-3
   U8 EPM7032SLC44-10N 
   U9 TOP 8279
@@ -375,7 +375,7 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE          INIT         ROT   COMPANY               FULLNAME                                                   FLAGS
+//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE           INIT         ROT   COMPANY               FULLNAME                                                   FLAGS
 GAME( ????, marywu,  0,      marywu,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen",    MACHINE_NOT_WORKING ) // Error 02
 GAME( ????, mary1s,  0,      mary1s,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING ) // Error 02
 
