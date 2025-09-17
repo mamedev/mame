@@ -2218,6 +2218,11 @@ void i960_cpu_device::execute_run()
 
 void i960_cpu_device::execute_set_input(int irqline, int state)
 {
+	if (m_irq_line_state[irqline] == state)
+		return;
+
+	m_irq_line_state[irqline] = state;
+
 	int int_tab =  m_program.read_dword(m_PRCB+20);    // interrupt table
 	int cpu_pri = (m_PC>>16)&0x1f;
 	int vector =0;
@@ -2311,6 +2316,7 @@ void i960_cpu_device::device_start()
 	save_item(NAME(m_stall_state.t1));
 	save_item(NAME(m_stall_state.t2));
 	save_item(NAME(m_stall_state.burst_mode));
+	save_item(NAME(m_irq_line_state));
 
 
 	state_add( I960_SAT,  "sat", m_SAT).formatstr("%08X");
@@ -2396,6 +2402,8 @@ void i960_cpu_device::device_reset()
 	m_r[I960_FP] = m_program.read_dword(m_PRCB+24);
 	m_r[I960_SP] = m_r[I960_FP] + 64;
 	m_rcache_pos = 0;
+
+	std::fill(std::begin(m_irq_line_state), std::end(m_irq_line_state), 0);
 }
 
 std::unique_ptr<util::disasm_interface> i960_cpu_device::create_disassembler()
