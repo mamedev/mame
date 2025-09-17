@@ -14,9 +14,8 @@
 
 #include "main.h"
 
-//**************************************************************************
-// External panel support
-//**************************************************************************
+#define VERBOSE 0
+#include "logmacro.h"
 
 #include <list>
 #include <mutex>
@@ -123,16 +122,16 @@ void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 	receive_register_extract();
 	uint8_t data = get_received_char();
 
-//  if (data >= 0xe0) prinosd_printf_debugtf("Got %02x from motherboard (second %s)\n", data, m_expect_calibration_second_byte ? "yes" : "no");
+//  if (data >= 0xe0) LOG("Got %02x from motherboard (second %s)\n", data, m_expect_calibration_second_byte ? "yes" : "no");
 
 	send_to_display(data);
 
 	if (m_expect_calibration_second_byte)
 	{
-//      osd_printf_debug("second byte is %02x\n", data);
+//      LOG("second byte is %02x\n", data);
 		if (data == 0xfd)   // calibration request
 		{
-//          osd_printf_debug("let's send reply!\n");
+//          LOG("let's send reply!\n");
 			xmit_char(0xff);   // this is the correct response for "calibration OK"
 		}
 		m_expect_calibration_second_byte = false;
@@ -198,7 +197,7 @@ void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 
 void esqpanel_device::tra_complete()    // Tx completed sending byte
 {
-//  osd_printf_debug("panel Tx complete\n");
+//  LOG("panel Tx complete\n");
 	// is there more waiting to send?
 	if (m_xmit_read != m_xmit_write)
 	{
@@ -221,7 +220,7 @@ void esqpanel_device::tra_callback()    // Tx send bit
 
 void esqpanel_device::xmit_char(uint8_t data)
 {
-//  osd_printf_debug("Panel: xmit %02x\n", data);
+//  LOG("Panel: xmit %02x\n", data);
 
 	// if tx is busy it'll pick this up automatically when it completes
 	if (!m_tx_busy)
@@ -252,16 +251,16 @@ uint16_t esqpanel_device::get_analog_value(offs_t offset)
 
 void esqpanel_device::set_button(uint8_t button, bool pressed)
 {
-	// osd_printf_debug("esqpanel.set_button(%d, %d)\r\n", button, pressed);
+	LOG("set_button(%d, %d)\r\n", button, pressed);
 	bool current = m_pressed_buttons.find(button) != m_pressed_buttons.end();
 	if (pressed == current)
 	{
-		// osd_printf_debug("- button %d already %d, skipping\r\n", button, pressed);
+		LOG("- button %d already %d, skipping\r\n", button, pressed);
 		return;
 	}
 
 	uint8_t sendme = (pressed ? 0x80 : 0) | (button & 0xff);
-	// osd_printf_debug("button %d %s : sending char to mainboard: %02x\n", button, down ? "down" : "up", sendme);
+	// LOG("button %d %s : sending char to mainboard: %02x\n", button, pressed ? "down" : "up", sendme);
 	xmit_char(sendme);
 	xmit_char(0x00);
 	if (pressed) 
@@ -280,7 +279,7 @@ TIMER_CALLBACK_MEMBER(esqpanel_device::check_external_panel_server) {
 	{
 		switch (c.kind) {
 			case esq_external_panel_device::Command::ButtonKind:
-				// osd_printf_debug("Panel Handling button event from external panel\r\n");
+				LOG("Panel Handling button event from external panel\r\n");
 				set_button(c.button, c.pressed);
 				break;
 
@@ -361,14 +360,14 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 	receive_register_extract();
 	uint8_t data = get_received_char();
 
-//  if (data >= 0xe0) osd_printf_debug("Got %02x from motherboard (second %s)\n", data, m_expect_calibration_second_byte ? "yes" : "no");
+//  if (data >= 0xe0) LOG("Got %02x from motherboard (second %s)\n", data, m_expect_calibration_second_byte ? "yes" : "no");
 
 	if (m_expect_calibration_second_byte)
 	{
-//      osd_printf_debug("second byte is %02x\n", data);
+//      LOG("second byte is %02x\n", data);
 		if (data == 0xfd)   // calibration request
 		{
-//          osd_printf_debug("let's send reply!\n");
+//          LOG("let's send reply!\n");
 			xmit_char(0xff);   // this is the correct response for "calibration OK"
 		}
 		m_expect_calibration_second_byte = false;
@@ -471,7 +470,7 @@ void esqpanel2x40_vfx_device::rcv_complete()    // Rx completed receiving byte
 					break;
 
 				default:
-					// osd_printf_debug("Unknown control code %02x\n", data);
+					// LOG("Unknown control code %02x\n", data);
 					break;
 			}
 		}
@@ -668,7 +667,7 @@ INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::analog_value_change)
 	if (oldval == 255)
 	{
 		// This is the initial write from the layout. Skip this.
-		osd_printf_debug("skipping initial write from internal panel to channnel %d\r\n", param);
+		LOG("skipping initial write from internal panel to channnel %d\r\n", param);
 		return;
 	}
 
@@ -676,7 +675,7 @@ INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::analog_value_change)
 	int clamped = std::max(0, std::min(100, (int)newval));
 	int value = (1023 << 6) * clamped / 100;
 	esqpanel_device::set_analog_value(channel, value);
-	osd_printf_debug("sending analog channel %d value %d to external panel\r\n", channel, value);
+	LOG("sending analog channel %d value %d to external panel\r\n", channel, value);
 	m_external_panel->set_analog_value(channel, value);
 }
 
@@ -692,12 +691,12 @@ void esqpanel2x40_vfx_device::set_analog_value(offs_t offset, uint16_t value)
 	if (offset == 3)
 	{
 		set_adjuster_value(m_analog_data_entry, intvalue);
-		osd_printf_debug("Setting data entry io port to %d\r\n", intvalue);
+		LOG("Setting data entry io port to %d\r\n", intvalue);
 	}
 	else if (offset == 5)
 	{
 		set_adjuster_value(m_analog_volume, intvalue);
-		osd_printf_debug("Setting volume io port to %d\r\n", intvalue);
+		LOG("Setting volume io port to %d\r\n", intvalue);
 	}
 }
 
