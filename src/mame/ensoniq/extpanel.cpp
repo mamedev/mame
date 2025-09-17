@@ -14,7 +14,7 @@
 #include <memory>
 #include <iostream>
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 class esq_external_panel_device::context {
