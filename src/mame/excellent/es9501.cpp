@@ -25,7 +25,8 @@ Undumped games known to run on this PCB:
 
 TODO
 - IRQs are wrong;
-- inputs, outputs, NVRAM;
+- EEPROM write doesn't work;
+- outputs, hopper;
 - verify colors and possible third layer;
 - d9flower needs correct EEPROM;
 - device-ify ES-9409 and share with excellent/dblcrown.cpp.
@@ -36,6 +37,7 @@ TODO
 #include "cpu/m68000/m68000.h"
 #include "machine/bankdev.h"
 #include "machine/eepromser.h"
+#include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/ymz280b.h"
@@ -197,7 +199,7 @@ void es9501_state::program_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x07ffff).rom();
-	map(0x3fc000, 0x3fffff).ram();
+	map(0x3fc000, 0x3fffff).ram().share("nvram");
 	map(0x400000, 0x401fff).m(m_vram_bank[0], FUNC(address_map_bank_device::amap8)).umask16(0xff00);
 	map(0x402000, 0x403fff).m(m_vram_bank[1], FUNC(address_map_bank_device::amap8)).umask16(0xff00);
 	map(0x404000, 0x405fff).ram(); // third layer?
@@ -207,10 +209,11 @@ void es9501_state::program_map(address_map &map)
 	map(0x407e00, 0x407e00).lr8(NAME([this] () -> uint8_t { return m_vram_bank_entry[1]; })).w(FUNC(es9501_state::vram_bank_w<1>));
 	map(0x407e02, 0x407e02).lr8(NAME([this] () -> uint8_t { return m_vram_bank_entry[0]; })).w(FUNC(es9501_state::vram_bank_w<0>));
 	// map(0x407e08, 0x407e09).ram(); // ?
-	map(0x407e0a, 0x407e0b).lr8(NAME([this] () -> uint16_t { return machine().rand() & 0x00ff; })); // TODO: IRQ related?
-	map(0x600000, 0x600001).portr("IN0");
-	map(0x600002, 0x600003).portr("IN1");
-	map(0x600004, 0x600005).portr("DSW");
+	map(0x407e0a, 0x407e0b).lr8(NAME([this] () -> uint16_t { return machine().rand() & 0x00ff; })).nopw(); // TODO: IRQ related?
+	map(0x600000, 0x600001).portr("IN0"); // w are outputs
+	map(0x600002, 0x600003).portr("IN1"); // w are outputs
+	map(0x600004, 0x600005).portr("IN2"); // w are outputs
+	map(0x600006, 0x600007).portr("DSW");
 	map(0x600008, 0x600009).portr("EEPROM_IN");
 	map(0x600008, 0x600008).w(FUNC(es9501_state::watchdog_eeprom_w));
 	map(0x700000, 0x700003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00); // ??
@@ -223,55 +226,57 @@ void es9501_state::vram_map(address_map &map)
 }
 
 
+// inputs according to test mode
+// PCB has one bank of switches but settings are done via software
 static INPUT_PORTS_START( specd9 )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) // Small
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) // Big
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) // TODO: hopper line in
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 
 	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(                      0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME(          0x0100, 0x0100, "Win Rate Configuration Screen" ) PORT_DIPLOCATION( "SW1:1" )
+	PORT_DIPSETTING(               0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(               0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW1:8" )
 
 	PORT_START("EEPROM_IN")
+	PORT_BIT( 0x7fff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
 
@@ -300,6 +305,8 @@ void es9501_state::es9501(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(es9501_state::irq1_line_hold));
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));
 
