@@ -656,6 +656,12 @@ void namcofl_state::machine_reset()
 
 	std::fill_n(&m_workram[0], m_workram.bytes() / 4, 0);
 	m_mainbank.select(1);
+
+	const int irq_type[4] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
+	for (int i = 0; i < 4; i++)
+	{
+		m_maincpu->set_input_line(irq_type[i], CLEAR_LINE);
+	}
 }
 
 
