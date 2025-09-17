@@ -33,7 +33,7 @@
   U2 HM6118LP-3
   U8 EPM7032SLC44-10N 
   U9 TOP 8279
-  U11 w27c512 - eeprom code.
+  U11 w27c512 - eeprom
   U10 U6295
   Y1 10.7386
 
@@ -266,7 +266,7 @@ void marywu_state::io_map(address_map &map)
 void marywu_state::unkwinw_program_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom().region("maincpu", 0);
-	map(0x1000, 0xf000).rom().region("eeprom",  0x1000); 
+	map(0x1000, 0xffff).rom().region("eeprom",  0x1000); 
 
 }
 
