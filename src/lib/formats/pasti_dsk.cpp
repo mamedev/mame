@@ -37,11 +37,6 @@ const char *pasti_format::extensions() const noexcept
 	return "stx";
 }
 
-bool pasti_format::supports_save() const noexcept
-{
-	return false;
-}
-
 int pasti_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[16];
