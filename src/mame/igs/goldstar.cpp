@@ -512,6 +512,7 @@ private:
 	void coincount_w(uint8_t data);
 	void pkm_out0_w(uint8_t data);
 	void jkm_vid_reg_w(uint8_t data);
+	void ll3_vid_reg_w(uint8_t data);
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -539,6 +540,7 @@ private:
 	void jkrmast_map(address_map &map) ATTR_COLD;
 	void jkrmast_portmap(address_map &map) ATTR_COLD;
 	void ll3_map(address_map &map) ATTR_COLD;
+	void ll3_portmap(address_map &map) ATTR_COLD;
 	void nfm_map(address_map &map) ATTR_COLD;
 	void nfm_portmap(address_map &map) ATTR_COLD;
 	void pkrmast_portmap(address_map &map) ATTR_COLD;
@@ -2559,6 +2561,29 @@ void cmaster_state::pkm_out0_w(uint8_t data)
 void cmaster_state::jkm_vid_reg_w(uint8_t data)
 {
 	m_enable_reg = bitswap<8>(data, 7, 6, 5, 4, 2, 3, 1, 0);
+//	popmessage("outport data:%02x", m_enable_reg );
+
+}
+
+void cmaster_state::ll3_vid_reg_w(uint8_t data)
+{
+/*
+  ---- ---x  global enable
+  ---- --x-  fg enable
+  ---- -x--  girl enable
+  ---- x---  reels enable
+  ---x ---   bg enable
+  xxx- ----  unused
+
+  All the writes have masked the register, getting
+  the video totally disabled. Surely for protection.
+
+*/
+	if(data > 0) 
+		data = data + 0x01;
+	m_enable_reg = data;	
+
+//	popmessage("outport data:%02x", m_enable_reg );
 }
 
 
@@ -2749,6 +2774,20 @@ void cmaster_state::jkrmast_portmap(address_map &map)
 	map(0x13, 0x13).w(FUNC(cmaster_state::pkm_out0_w));
 	map(0x17, 0x17).lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; m_bgcolor = data & 0x03; m_bg_tilemap->mark_all_dirty(); }));
 	map(0x18, 0x18).w(FUNC(cmaster_state::jkm_vid_reg_w)); // enable reg?
+}
+
+void cmaster_state::ll3_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Inputs
+	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // DIP switches
+	map(0x10, 0x10).w(FUNC(cmaster_state::ll3_vid_reg_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::coincount_w));
+	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
+	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
+	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
 }
 
 void cmaster_state::eldoraddoa_portmap(address_map &map)  // TODO: incomplete!
@@ -4027,17 +4066,17 @@ static INPUT_PORTS_START( ll3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_CODE(KEYCODE_B) PORT_NAME("Big")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )  PORT_CODE(KEYCODE_X) PORT_NAME("Take")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_C) PORT_NAME("Bet / D-UP")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_C) PORT_NAME("Bet / D-UP")  // mapped also in C for compatibility
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_CODE(KEYCODE_V) PORT_NAME("Small / Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )       PORT_CODE(KEYCODE_N) PORT_NAME("Start")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )   PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_2_PAD)  // Stop B
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )   PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_1_PAD)  // Stop A
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_IMPULSE(2) PORT_NAME("Coin B")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )   PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_3_PAD)  // Stop C
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 )        PORT_IMPULSE(2) PORT_NAME("Coin D")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )        PORT_IMPULSE(2) PORT_NAME("Coin C")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )     PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Stop B / D-UP") // Stop B & D-UP
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )     PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Stop A")        // Stop A
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL )  PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Stop All")      // Stop All
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )     PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Stop C")        // Stop C
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 )          PORT_IMPULSE(2) PORT_NAME("Coin D")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )          PORT_IMPULSE(2) PORT_NAME("Coin C")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_IMPULSE(2) PORT_NAME("Coin A")
 
@@ -12274,6 +12313,7 @@ void cmaster_state::ll3(machine_config &config)
 	cm(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::ll3_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::ll3_portmap);
 }
 
 
@@ -25441,18 +25481,6 @@ void cmaster_state::init_ll3() // verified with ICE dump
 	rom[0x8a] = 0;
 	rom[0x8b] = 0;
 	rom[0x8c] = 0;
-
-/*
-  NOP'ing the writes to port 10h (video register)
-  all the writes have masked the bit1 ON, getting
-  the video totally disabled. Surely for protection.
-
-  The most probably thing is that bit1 are inverted.
-  Need to be checked...
-
-*/
-	rom[0x0b2c] = 0x00;
-	rom[0x0b2d] = 0x00;
 }
 
 void cmaster_state::init_ll3b() // verified with ICE dump
@@ -25468,18 +25496,6 @@ void cmaster_state::init_ll3b() // verified with ICE dump
 	rom[0x8a] = 0;
 	rom[0x8b] = 0;
 	rom[0x8c] = 0;
-
-/*
-  NOP'ing the writes to port 10h (video register)
-  all the writes have masked the bit1 ON, getting
-  the video totally disabled. Surely for protection.
-
-  The most probably thing is that bit1 are inverted.
-  Need to be checked...
-
-*/
-	rom[0x0b2c] = 0x00;
-	rom[0x0b2d] = 0x00;
 }
 
 
