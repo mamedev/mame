@@ -18,6 +18,11 @@
 #include <cstdlib>
 #include <cstring>
 
+a2_sect_format::a2_sect_format(int nsect) : m_nsect(nsect)
+{
+	assert(nsect <= APPLE2_MAX_SECTOR_COUNT);
+}
+
 static const uint8_t translate5[] = {
 	0xab, 0xad, 0xae, 0xaf, 0xb5, 0xb6, 0xb7, 0xba,
 	0xbb, 0xbd, 0xbe, 0xbf, 0xd6, 0xd7, 0xda, 0xdb,
@@ -25,7 +30,7 @@ static const uint8_t translate5[] = {
 	0xf5, 0xf6, 0xf7, 0xfa, 0xfb, 0xfd, 0xfe, 0xff,
 };
 
-a2_13sect_format::a2_13sect_format() : floppy_image_format_t()
+a2_13sect_format::a2_13sect_format() : a2_sect_format(SECTOR_COUNT)
 {
 }
 
@@ -35,7 +40,7 @@ int a2_13sect_format::identify(util::random_read &io, uint32_t form_factor, cons
 	if (io.length(size))
 		return 0;
 
-	if (size != APPLE2_STD_TRACK_COUNT * 13 * APPLE2_SECTOR_SIZE)
+	if (size != APPLE2_STD_TRACK_COUNT * SECTOR_COUNT * APPLE2_SECTOR_SIZE)
 		return 0;
 
 	return FIFID_SIZE;
@@ -49,19 +54,19 @@ bool a2_13sect_format::load(util::random_read &io, uint32_t form_factor, const s
 
 	image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 
-	int tracks = size / 13 / APPLE2_SECTOR_SIZE;
+	int tracks = size / SECTOR_COUNT / APPLE2_SECTOR_SIZE;
 
 	for(int track = 0; track < tracks; track++) {
 		std::vector<uint32_t> track_data;
-		uint8_t sector_data[APPLE2_SECTOR_SIZE * 13];
+		uint8_t sector_data[APPLE2_SECTOR_SIZE * SECTOR_COUNT];
 
 		auto const [err, actual] = read_at(
 			io, track * sizeof sector_data, sector_data, sizeof sector_data);
 		if (err || actual != sizeof sector_data)
 			return false;
 
-		for(int i=0; i<13; i++) {
-			int sector = (i * 10) % 13;
+		for(int i=0; i<SECTOR_COUNT; i++) {
+			int sector = (i * 10) % SECTOR_COUNT;
 
 			// write inter-sector padding
 			for(int j=0; j<40; j++)
@@ -148,7 +153,7 @@ static const uint8_t prodos_skewing[] =
 };
 
 
-a2_16sect_format::a2_16sect_format(bool prodos_order) : floppy_image_format_t(), m_prodos_order(prodos_order)
+a2_16sect_format::a2_16sect_format(bool prodos_order) : a2_sect_format(SECTOR_COUNT), m_prodos_order(prodos_order)
 {
 }
 
@@ -203,8 +208,8 @@ int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, cons
 
 	// check standard size plus some oddball sizes in our softlist
 	if (
-		size != APPLE2_TRACK_COUNT * 16 * APPLE2_SECTOR_SIZE
-		&& size != APPLE2_STD_TRACK_COUNT * 16 * APPLE2_SECTOR_SIZE
+		size != APPLE2_TRACK_COUNT * SECTOR_COUNT * APPLE2_SECTOR_SIZE
+		&& size != APPLE2_STD_TRACK_COUNT * SECTOR_COUNT * APPLE2_SECTOR_SIZE
 		&& size != 143403 && size != 143363 && size != 143358 && size != 143195
 	)
 	{
@@ -288,12 +293,13 @@ bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const s
 
 	image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 
-	int tracks = (size == (APPLE2_TRACK_COUNT * 16 * APPLE2_SECTOR_SIZE)) ? APPLE2_TRACK_COUNT : APPLE2_STD_TRACK_COUNT;
+	int tracks = (size == (APPLE2_TRACK_COUNT * SECTOR_COUNT * APPLE2_SECTOR_SIZE))
+		? APPLE2_TRACK_COUNT : APPLE2_STD_TRACK_COUNT;
 
 	int fpos = 0;
 	for(int track=0; track < tracks; track++) {
 		std::vector<uint32_t> track_data;
-		uint8_t sector_data[APPLE2_SECTOR_SIZE*16];
+		uint8_t sector_data[APPLE2_SECTOR_SIZE*SECTOR_COUNT];
 
 		auto const [err, actual] = read_at(io, fpos, sector_data, sizeof sector_data);
 		// Some supported images have oddball sizes, where the last track is incomplete.
@@ -301,10 +307,10 @@ bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const s
 		if (err /* || actual != sizeof sector_data */)
 			return false;
 
-		fpos += APPLE2_SECTOR_SIZE*16;
+		fpos += APPLE2_SECTOR_SIZE*SECTOR_COUNT;
 		for(int i=0; i<49; i++)
 			raw_w(track_data, 10, 0x3fc);
-		for(int i=0; i<16; i++) {
+		for(int i=0; i<SECTOR_COUNT; i++) {
 			int sector;
 
 			if (m_prodos_order)
@@ -382,7 +388,7 @@ uint8_t a2_16sect_format::gb(const std::vector<bool> &buf, int &pos, int &wrap)
 bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	int g_tracks, g_heads;
-	int visualgrid[16][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
+	int visualgrid[APPLE2_MAX_SECTOR_COUNT][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
 
 	constexpr bool VERBOSE_SAVE = false;
 
@@ -419,9 +425,8 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 	int pos_data = 0;
 
 	for(int track=0; track < g_tracks; track++) {
-		uint8_t sectdata[APPLE2_SECTOR_SIZE*16];
-		memset(sectdata, 0, sizeof(sectdata));
-		int nsect = 16;
+		uint8_t sectdata[APPLE2_SECTOR_SIZE*APPLE2_MAX_SECTOR_COUNT] = {};
+
 		if(VERBOSE_SAVE) {
 			fprintf(stderr,"DEBUG: a2_16sect_format::save() about to generate bitstream from track %d...", track);
 		}
@@ -466,7 +471,7 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 							vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
 				}
 				// sanity check
-				if (tr == track && se < nsect) {
+				if (tr == track && se < m_nsect) {
 					visualgrid[se][track] |= ADDRFOUND;
 					visualgrid[se][track] |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
 
@@ -576,22 +581,20 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 			if(wrap)
 				break;
 		}
-		for(int i=0; i<nsect; i++) {
-			//if(nsect>0) printf("t%d,", track);
+		for(int i = 0; i < m_nsect; i++) {
 			uint8_t const *const data = sectdata + APPLE2_SECTOR_SIZE*i;
 			auto const [err, actual] = write_at(io, pos_data, data, APPLE2_SECTOR_SIZE);
 			if (err || actual != APPLE2_SECTOR_SIZE)
 				return false;
 			pos_data += APPLE2_SECTOR_SIZE;
 		}
-		//printf("\n");
 	}
 	// display a little table of which sectors decoded ok
 	if(VERBOSE_SAVE) {
 		int total_good = 0;
 		for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
 			printf("T%2d: ",j);
-			for (int i = 0; i < 16; i++) {
+			for (int i = 0; i < m_nsect; i++) {
 				if (visualgrid[i][j] == NOTFOUND) printf("-NF- ");
 				else {
 					if (visualgrid[i][j] & ADDRFOUND) printf("a"); else printf(" ");

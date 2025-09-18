@@ -24,11 +24,23 @@
 constexpr int APPLE2_STD_TRACK_COUNT = 35;
 constexpr int APPLE2_TRACK_COUNT = 40;
 constexpr int APPLE2_SECTOR_SIZE = 256;
+constexpr int APPLE2_MAX_SECTOR_COUNT = 16;
 
 /**************************************************************************/
-class a2_13sect_format : public floppy_image_format_t
+class a2_sect_format : public floppy_image_format_t
 {
 public:
+	a2_sect_format(int nsect);
+
+protected:
+	const int m_nsect;
+};
+
+class a2_13sect_format : public a2_sect_format
+{
+public:
+	static constexpr int SECTOR_COUNT = 13;
+
 	a2_13sect_format();
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
@@ -37,16 +49,15 @@ public:
 	virtual const char *name() const noexcept override;
 	virtual const char *description() const noexcept override;
 	virtual const char *extensions() const noexcept override;
-
-private:
-	static uint8_t gb(const std::vector<bool> &buf, int &pos, int &wrap);
 };
 
 extern const a2_13sect_format FLOPPY_A213S_FORMAT;
 
-class a2_16sect_format : public floppy_image_format_t
+class a2_16sect_format : public a2_sect_format
 {
 public:
+	static constexpr int SECTOR_COUNT = 16;
+
 	a2_16sect_format(bool prodos_order);
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
