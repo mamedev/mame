@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Daniel Tremblay
-#ifndef MAME_F256_TINY_VICKY_H
-#define MAME_F256_TINY_VICKY_H
+#ifndef MAME_FOENIXRETRO_TINY_VICKY_H
+#define MAME_FOENIXRETRO_TINY_VICKY_H
 
 #define MAME_F256_CHAR_HEIGHT     8
 #define MAME_F256_CHAR_WIDTH      8
@@ -78,4 +78,4 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TINY_VICKY, tiny_vicky_video_device)
-#endif
+#endif  // MAME_FOENIXRETRO_TINY_VICKY_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Daniel Tremblay
-#ifndef MAME_F256_F256_H
-#define MAME_F256_F256_H
+#ifndef MAME_FOENIXRETRO_F256_H
+#define MAME_FOENIXRETRO_F256_H
 
 #pragma once
 
@@ -220,4 +220,4 @@ class f256k2_state : public f256k_state
 public:
 	f256k2_state(const machine_config &mconfig, device_type type, const char *tag);
 };
-#endif // MAME_F256_F256_H
+#endif // MAME_FOENIXRETRO_F256_H
