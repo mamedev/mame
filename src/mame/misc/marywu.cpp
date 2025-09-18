@@ -43,9 +43,11 @@
   U11 MX 29F1615PC-10
   U12 w27c512 - eeprom
   Y1 10.7386
-  Led Board.
-  No photos available, but there are two AY-3-8910 and 1 kdc.
   
+  Led Board.
+  U5 Two JFC 95101   
+  unpopulated ld32 - led and ds14 ds15 2x  7 segment display 2 digit.
+ 
   Controls:
   mary1s:
   To reset nvram press K0 and k1, Will shown 09 then restart.
