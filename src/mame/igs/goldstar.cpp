@@ -2792,7 +2792,8 @@ void cmaster_state::cmast91_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0").w(FUNC(cmaster_state::outport0_w));
 	map(0x01, 0x01).portr("IN1").w(FUNC(cmaster_state::background_col_w));
-	map(0x02, 0x02).portr("IN2");
+	map(0x02, 0x02).portr("IN2").w(FUNC(cmaster_state::p1_lamps_w));
+	map(0x03, 0x03).w(FUNC(cmaster_state::coincount_w));
 	map(0x10, 0x13).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // DIP switches
 	map(0x21, 0x21).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x22, 0x23).w("aysnd", FUNC(ay8910_device::data_address_w));
@@ -26907,7 +26908,7 @@ GAME(  1993, missbingoc, crazybonb,crazybonb, pkrmast, cmaster_state,  init_craz
 GAME(  199?, chthree,    cmaster,  cm,       cmaster,  cmaster_state,  init_chthree,   ROT0, "Promat",            "Channel Three",                               0 ) // hack of cmaster, still shows DYNA CM-1 V1.01 in book-keeping
 
 GAME(  1991, cmast91,    0,        cmast91,  cmast91,  cmaster_state,  init_cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
-GAME(  1991, cll,        0,        cmast91,  cmast91,  cmaster_state,  init_cll,       ROT0, "Dyna / TAB Austria","Cuty Line Limited (ver.1.30)",                MACHINE_NOT_WORKING ) // needs verifying inputs / dips, missing girls GFX ROM dump
+GAMEL( 1991, cll,        0,        cmast91,  cmv4,     cmaster_state,  init_cll,       ROT0, "Dyna / TAB Austria","Cuty Line Limited (ver.1.30)",                0,    layout_cmv4 ) // needs verifying dips, missing girls
 GAME(  1992, cmast92,    0,        eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '92 (V1.2D)",                   MACHINE_NOT_WORKING ) // different GFX hw? Game is running and sounds play
 GAME(  1992, cmast92a,   cmast92,  eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '92 (V1.1D)",                   MACHINE_NOT_WORKING ) // different GFX hw? Game is running and sounds play
 GAME(  1991, eldoradd,   0,        eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING ) // different GFX hw? Game is running and sounds play
