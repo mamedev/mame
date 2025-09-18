@@ -70,7 +70,7 @@ template<int Width, int AddrShift> memory_units_descriptor<Width, AddrShift>::me
 	for(u32 i=0; i != 8 << Width; i += bits_per_access)
 		if(unitmask & (dmask << i))
 			active_count ++;
-	u32 active_count_log = active_count == 1 ? 0 : active_count == 2 ? 1 : active_count == 4 ? 2 : active_count == 8 ? 3 : 0xff;
+	u32 active_count_log = active_count == 1 ? 0 : active_count == 2 ? 1 : active_count <= 4 ? 2 : active_count <= 8 ? 3 : 0xff;
 	if(active_count_log == 0xff)
 		abort();
 	s8 base_shift = Width - access_width - active_count_log;
