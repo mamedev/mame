@@ -45816,6 +45816,9 @@ sbowling
 @source:taito/scyclone.cpp
 scyclone
 
+@source:taito/sesame2.cpp
+sesame2
+
 @source:taito/slapshot.cpp
 opwolf3
 opwolf3j
