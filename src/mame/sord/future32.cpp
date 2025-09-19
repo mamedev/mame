@@ -281,19 +281,29 @@ protected:
 	required_device<bt451_device> m_ramdac;
 	required_device<future32_kbd_device> m_kbd;
 	required_shared_ptr<u32> m_textlayer;
-	required_shared_ptr<u32> m_fontram;
+	memory_share_creator<u16> m_fontram;
 	required_region_ptr<u8> m_fontrom;
 
 	memory_passthrough_handler m_boot_tap;
+
+	u16 m_font_base;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	void mem(address_map &map);
+	void cpu_space_map(address_map &map);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	static void floppy_drives(device_slot_interface &device);
 	static void scsi_devices(device_slot_interface &device);
 	void mb89352(device_t *device);
+
+	void scsi_irq_w(int state);
+	u8 intc_get_vector();
+	void font_base_w(u16 base);
+
+	u16 font_r(offs_t offset);
+	void font_w(offs_t offset, u16 data);
 };
 
 future32a_state::future32a_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -313,7 +323,7 @@ future32a_state::future32a_state(const machine_config &mconfig, device_type type
 	, m_ramdac(*this, "ramdac")
 	, m_kbd(*this, "kbd")
 	, m_textlayer(*this, "textlayer")
-	, m_fontram(*this, "fontram")
+	, m_fontram(*this, "fontram", 8 * 2 * 0x10000, ENDIANNESS_BIG)
 	, m_fontrom(*this, "font")
 {
 }
@@ -326,7 +336,7 @@ void future32a_state::mem(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram();  // Some magic at startup to see the rom there
 	map(0x00400000, 0x009fffff).lr32(NAME([this]() { if(!machine().side_effects_disabled()) m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE); return 0; }));
-	map(0x00a00000, 0x00a7ffff).ram().share(m_fontram);
+	map(0x00a00000, 0x00a7ffff).ram();
 
 	map(0x00e00000, 0x00e07fff).rom().region("maincpu", 0);
 	map(0x00e10000, 0x00e1000f).rw(m_dma, FUNC(upd71071_device::read), FUNC(upd71071_device::write));
@@ -335,7 +345,7 @@ void future32a_state::mem(address_map &map)
 	map(0x00e40000, 0x00e4007f).m(m_agdc, FUNC(upd72120_device::map));
 	map(0x00e50000, 0x00e50007).m(m_ramdac, FUNC(bt451_device::map)).umask16(0x00ff);
 	map(0x00e60000, 0x00e61fff).ram().share(m_textlayer);
-	map(0x00e62000, 0x00e6203f).lw16(NAME([this](offs_t offset, u16 data) { if(data != 0) logerror("e62000[%x] = %04x\n", offset, data); }));
+	map(0x00e62000, 0x00e6203f).rw(FUNC(future32a_state::font_r), FUNC(future32a_state::font_w));
 	map(0x00e70000, 0x00e7000f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 	map(0x00e70201, 0x00e70201).rw(m_crtc, FUNC(hd6345_device::status_r), FUNC(hd6345_device::address_w));
 	map(0x00e70203, 0x00e70203).rw(m_crtc, FUNC(hd6345_device::register_r), FUNC(hd6345_device::register_w));
@@ -344,6 +354,7 @@ void future32a_state::mem(address_map &map)
 	map(0x00e70305, 0x00e70305).rw(m_scc1, FUNC(scc8530_device::cb_r), FUNC(scc8530_device::cb_w));
 	map(0x00e70307, 0x00e70307).rw(m_scc1, FUNC(scc8530_device::db_r), FUNC(scc8530_device::db_w));
 
+	map(0x00e70800, 0x00e70801). w(FUNC(future32a_state::font_base_w));
 	map(0x00e70901, 0x00e70901).lr8(NAME([this]() { return machine().rand() & 1 ? 0xc0 : 0x80; })); // beeper here, possibly timer too
 
 	map(0x00e80101, 0x00e80101).rw(m_scc2, FUNC(scc8530_device::ca_r), FUNC(scc8530_device::ca_w));
@@ -357,6 +368,17 @@ void future32a_state::mem(address_map &map)
 	map(0x00ec0400, 0x00ec0403).portr("dips");
 
 	map(0x00f00000, 0x00f0ffff).lr32(NAME([this]() { if(!machine().side_effects_disabled()) m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE); return 0; }));
+}
+
+void future32a_state::cpu_space_map(address_map &map)
+{
+	map(0xfffffff3, 0xfffffff3).lr8(NAME([] () -> u8 { return 25; }));
+	map(0xfffffff5, 0xfffffff5).lr8(NAME([] () -> u8 { return 26; }));
+	map(0xfffffff7, 0xfffffff7).lr8(NAME([] () -> u8 { return 27; }));
+	map(0xfffffff9, 0xfffffff9).r(FUNC(future32a_state::intc_get_vector));
+	map(0xfffffffb, 0xfffffffb).lr8(NAME([] () -> u8 { return 29; }));
+	map(0xfffffffd, 0xfffffffd).lr8(NAME([] () -> u8 { return 30; }));
+	map(0xffffffff, 0xffffffff).lr8(NAME([] () -> u8 { return 31; }));
 }
 
 static const gfx_layout textlayer_layout = {
@@ -376,6 +398,12 @@ GFXDECODE_END
 // void name(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t ma, uint8_t ra,
 //           uint16_t y, uint8_t x_count, int8_t cursor_x, int de, int hbp, int vbp)
 
+// 0026 = black on cyan
+// 0007 = white on black
+// 0006 = cyan on black
+// 0009 = red on nblack
+// 000a = green on black
+
 MC6845_UPDATE_ROW(future32a_state::crtc_update_row)
 {
 	const pen_t *palette = m_ramdac->pens();
@@ -384,15 +412,19 @@ MC6845_UPDATE_ROW(future32a_state::crtc_update_row)
 		u32 code = m_textlayer[(ma+x) & 0x7ff];
 		u16 data;
 		if(code & 0x8000) {
-			data = 0x5555;
+			data = 0x5555 << (ra & 1);
 		} else {
 			offs_t base = (code & 0x3ff)*64 + ra * 2;
 			data = (m_fontrom[base] << 8) | m_fontrom[base + 1];
 		}
 		if(x == cursor_x)
 			data = data ^ 0xffff;
+		u32 c0 = palette[0];
+		u32 c1 = palette[(code >> 16) & 15];
+		if(code & 0x00200000)
+			std::swap(c0, c1);
 		for(int xx=0; xx != 16; xx++)
-			*d++ = BIT(data, 15-xx) ? palette[0x103] : palette[0];
+			*d++ = BIT(data, 15-xx) ? c1 : c0;
 	}
 }
 
@@ -412,6 +444,33 @@ void future32a_state::machine_reset()
 						  });
 }
 
+void future32a_state::scsi_irq_w(int state)
+{
+	logerror("scsi irq %d\n", state);
+	m_maincpu->set_input_line(4, state);
+}
+
+u8 future32a_state::intc_get_vector()
+{
+	return 0x46;
+}
+
+void future32a_state::font_base_w(u16 base)
+{
+	m_font_base = base;
+	logerror("font base %04x\n", base);
+}
+
+u16 future32a_state::font_r(offs_t offset)
+{
+	return m_fontram[m_font_base * 0x20 + offset];
+}
+
+void future32a_state::font_w(offs_t offset, u16 data)
+{
+	m_fontram[m_font_base * 8 + offset] = data;
+}
+
 void future32a_state::floppy_drives(device_slot_interface &device)
 {
 	device.option_add("35hd", FLOPPY_35_HD);
@@ -429,6 +488,7 @@ void future32a_state::mb89352(device_t *device)
 	mb89352_device &adapter = downcast<mb89352_device &>(*device);
 	adapter.set_clock(32000000/4);
 	adapter.out_dreq_callback().set([this](int state) { m_dma->dmarq(state, 1); });
+	adapter.out_irq_callback().set(*this, FUNC(future32a_state::scsi_irq_w));
 }
 
 void future32a_state::future32a(machine_config &config)
@@ -438,6 +498,7 @@ void future32a_state::future32a(machine_config &config)
 
 	M68030(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &future32a_state::mem);
+	m_maincpu->set_addrmap(m68030_device::AS_CPU_SPACE, &future32a_state::cpu_space_map);
 
 	UPD71071(config, m_dma, 0);
 	m_dma->set_cpu_tag(m_maincpu->tag());
