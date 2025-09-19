@@ -132,21 +132,33 @@ private:
 class tmp95c061_disassembler : public tlcs900_disassembler
 {
 public:
-	tmp95c061_disassembler() : tlcs900_disassembler() {};
+	tmp95c061_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count);
+	template<size_t N> tmp95c061_disassembler(std::pair<u16, char const *> const (&symbols)[N]) : tlcs900_disassembler(symbols, N) {}
+
+private:
+	static const char *const s_sfr_names[];
 };
 
 
 class tmp95c063_disassembler : public tlcs900_disassembler
 {
 public:
-	tmp95c063_disassembler() : tlcs900_disassembler() {};
+	tmp95c063_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count);
+	template<size_t N> tmp95c063_disassembler(std::pair<u16, char const *> const (&symbols)[N]) : tlcs900_disassembler(symbols, N) {}
+
+private:
+	static const char *const s_sfr_names[];
 };
 
 
 class tmp96c141_disassembler : public tlcs900_disassembler
 {
 public:
-	tmp96c141_disassembler() : tlcs900_disassembler() {};
+	tmp96c141_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count);
+	template<size_t N> tmp96c141_disassembler(std::pair<u16, char const *> const (&symbols)[N]) : tlcs900_disassembler(symbols, N) {}
+
+private:
+	static const char *const s_sfr_names[];
 };
 
 #endif
