@@ -27,8 +27,8 @@
   Product name: 小方玛丽板
   Product Code: square-mario-baord
   The board has a single marking J373
-  
-  the LED board says GHY1-PCB and BYP-020 
+  at back pcb
+  MUSICBAR VER 201
  
   string: COPYRIGHT BY WIN WAY ELEC. CORP. CLEMENT CHANG, MUSIC by: SunKiss Chen 
   Notes: the ay bgm are unused during attract and gameplay and only playable after press k1 then press start  3 times.
@@ -45,6 +45,7 @@
   Y1 10.7386
   
   Led Board.
+  the LED board says GHY1-PCB and BYP-020 
   U5 Two JFC 95101   
   unpopulated ld32 - led and ds14 ds15 2x  7 segment display 2 digit.
  
