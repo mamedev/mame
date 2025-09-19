@@ -387,4 +387,4 @@ GAME( ????, marywu,  0,      marywu,   marywu,  marywu_state,  empty_init, ROT0,
 GAME( ????, mary1s,  0,      mary1s,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING ) // Error 02
 
 // Different than marywu. There are clones with similar led board of these.
-GAME( ????, unkwinw, 0,      unkwinw,  unkwinw, marywu_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "Unknown Win way Gambling Board",                          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // Error 02. undumped adpcm rom. Need Correct layout.
+GAME( ????, unkwinw, 0,      unkwinw,  unkwinw, marywu_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "Unknown Win way Gambling Board",                          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // Error 02. adpcm rom banking not implemented. Need Correct layout.
