@@ -100,7 +100,7 @@ ROM_START( intlc8m80 )
 	ROMX_LOAD( "3b00h_mon8_1702a.chip_b",            0x0900, 0x0100, CRC(23083008) SHA1(57af12b20f160d5faa99ad2bda597f21e52078c9), ROM_BIOS(0) )
 	ROMX_LOAD( "3c00h_mon8_1702a.chip_c",            0x0a00, 0x0100, CRC(32f5c81b) SHA1(2371c0e087486c8bcb909575f158fd5ac9209bc8), ROM_BIOS(0) )
 	ROMX_LOAD( "3d00h_mon8_1702a.chip_d",            0x0b00, 0x0100, CRC(5307307a) SHA1(f38adac5e1a8bb015e23f13be5ab434394e6495f), ROM_BIOS(0) )
-	ROMX_LOAD( "3e00h_mon8_1702a.chip_e",            0x0c00, 0x0100, NO_DUMP,                                                      ROM_BIOS(0) )
+	ROMX_LOAD( "3e00h_mon8_1702a.chip_e",            0x0c00, 0x0100, CRC(a90bd1d4) SHA1(b85a4a3d6515aa4ae298a800192077716a060f85), ROM_BIOS(0) )
 	ROMX_LOAD( "3f00h_mon8_1702a.chip_f",            0x0d00, 0x0100, CRC(beca9bd7) SHA1(8162306bfbd94a373736b9e8e9f426af104d744e), ROM_BIOS(0) )
 
 	ROMX_LOAD( "1702a.chip_0",                       0x0000, 0x0100, CRC(64a1aa3a) SHA1(7158e866eb222b1fbc1f573cdc748f5aedd6d0d4), ROM_BIOS(1) )
