@@ -270,10 +270,10 @@ void model2_state::machine_reset()
 	m_geo_write_start_address = 0;
 	m_geo_read_start_address = 0;
 
-	const int irq_type[4] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
-	for (int i = 0; i < 4; i++)
+	const int irq_type[] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
+	for (auto irq : irq_type)
 	{
-		m_maincpu->set_input_line(irq_type[i], CLEAR_LINE);
+		m_maincpu->set_input_line(irq, CLEAR_LINE);
 	}
 }
 
