@@ -1045,7 +1045,7 @@ inline arm::Mem drcbe_arm64::emit_loadstore_address_setup(a64::Assembler &a, con
 	if (scale == 0)
 	{
 		// if there's no shift, sign extension can be part of the addressing mode
-		const a64::Gp offsreg = TEMP_REG3.w();
+		const a64::Gp offsreg = indp.select_register(TEMP_REG3, 4);
 		mov_reg_param(a, 4, offsreg, indp);
 		return arm::Mem(basereg, offsreg, a64::sxtw(0));
 	}
@@ -3259,7 +3259,9 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter maskp(*this, inst.param(3), PTYPE_MRI);
 
 	const a64::Gp output = dstp.select_register(TEMP_REG1, inst.size());
+	const a64::Gp src = srcp.select_register(output, inst.size());
 	const uint64_t instbits = inst.size() * 8;
+	const uint64_t instmask = util::make_bitmask<uint64_t>(instbits);
 
 	bool optimized = false;
 	if (maskp.is_immediate() && shiftp.is_immediate() && !maskp.is_immediate_value(util::make_bitmask<uint64_t>(instbits)))
@@ -3267,14 +3269,14 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		// A mask of all 1s will be handled efficiently in the unoptimized path, so only optimize for the other cases if possible
 		const auto pop = population_count_64(maskp.immediate());
 		const auto lz = count_leading_zeros_64(maskp.immediate()) & (instbits - 1);
-		const auto invlamask = ~(maskp.immediate() << lz) & util::make_bitmask<uint64_t>(instbits);
+		const auto invlamask = ~(maskp.immediate() << lz) & instmask;
 		const bool is_right_aligned = (maskp.immediate() & (maskp.immediate() + 1)) == 0;
 		const bool is_contiguous = (invlamask & (invlamask + 1)) == 0;
 		const auto s = shiftp.immediate() & (instbits - 1);
 
 		if (is_right_aligned || is_contiguous)
 		{
-			mov_reg_param(a, inst.size(), output, srcp);
+			mov_reg_param(a, inst.size(), src, srcp);
 			optimized = true;
 		}
 
@@ -3285,14 +3287,19 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 
 			if (s >= pop)
 			{
-				a.ubfx(output, output, s2, pop);
+				a.ubfx(output, src, s2, pop);
 			}
 			else
 			{
 				if (s2 > 0)
-					a.ror(output, output, s2);
-
-				a.bfc(output, pop, instbits - pop);
+				{
+					a.ror(output, src, s2);
+					a.bfc(output, pop, instbits - pop);
+				}
+				else
+				{
+					a.and_(output, src, ~maskp.immediate() & instmask);
+				}
 			}
 		}
 		else if (is_contiguous)
@@ -3301,9 +3308,14 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 			auto const rot = -int(s + pop + lz) & (instbits - 1);
 
 			if (rot > 0)
-				a.ror(output, output, rot);
-
-			a.ubfiz(output, output, instbits - pop - lz, pop);
+			{
+				a.ror(output, src, rot);
+				a.ubfiz(output, output, instbits - pop - lz, pop);
+			}
+			else
+			{
+				a.ubfiz(output, src, instbits - pop - lz, pop);
+			}
 		}
 	}
 
@@ -3325,18 +3337,25 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		if (!maskp.is_immediate() || !is_valid_immediate_mask(maskp.immediate(), inst.size()))
 			mov_reg_param(a, inst.size(), mask, maskp);
 
-		mov_reg_param(a, inst.size(), output, srcp);
 
 		if (shiftp.is_immediate())
 		{
 			const auto s = -int64_t(shiftp.immediate()) & (instbits - 1);
 			if (s != 0)
-				a.ror(output, output, s);
+			{
+				mov_reg_param(a, inst.size(), src, srcp);
+				a.ror(output, src, s);
+			}
+			else
+			{
+				mov_reg_param(a, inst.size(), output, srcp);
+			}
 		}
 		else
 		{
+			mov_reg_param(a, inst.size(), src, srcp);
 			a.and_(rshift, rshift, (inst.size() * 8) - 1);
-			a.ror(output, output, rshift);
+			a.ror(output, src, rshift);
 		}
 
 		const a64::Inst::Id maskop = inst.flags() ? a64::Inst::kIdAnds : a64::Inst::kIdAnd;
@@ -3420,10 +3439,10 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 			}
 			else
 			{
-				mov_reg_param(a, inst.size(), scratch, srcp);
+				mov_reg_param(a, inst.size(), src, srcp);
 			}
 
-			a.bfi(dst, scratch, lsb, pop);
+			a.bfi(dst, (rot > 0) ? scratch : src, lsb, pop);
 
 			optimized = true;
 		}
