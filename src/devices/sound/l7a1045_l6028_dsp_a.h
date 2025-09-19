@@ -41,13 +41,26 @@ private:
 	{
 		constexpr l7a1045_voice() { }
 
+		uint32_t loop_start = 0;
 		uint32_t start = 0;
 		uint32_t end = 0;
+		uint32_t step = 0;
 		bool mode = false;
 		uint32_t pos = 0;
 		uint32_t frac = 0;
 		uint16_t l_volume = 0;
 		uint16_t r_volume = 0;
+		uint16_t env_volume = 0;
+		uint16_t env_target = 0;
+		uint16_t env_step = 0;
+		uint32_t env_pos = 0;
+		uint16_t flt_freq = 0;
+		uint16_t flt_target = 0;
+		uint16_t flt_step = 0;
+		uint32_t flt_pos = 0;
+		uint8_t flt_resonance = 0;
+		double x1 = 0.0, x2 = 0.0, y1 = 0.0, y2 = 0.0; // filter state
+		double a1 = 0.0, a2 = 0.0, b0 = 0.0, b1 = 0.0, b2 = 0.0; // filter coeffs
 	};
 
 	sound_stream *m_stream;
@@ -57,6 +70,7 @@ private:
 
 	uint8_t m_audiochannel;
 	uint8_t m_audioregister;
+	double m_sample_rate;
 
 	struct l7a1045_48bit_data {
 		uint16_t dat[3];
@@ -68,6 +82,7 @@ private:
 	void sound_data_w(offs_t offset, uint16_t data);
 	uint16_t sound_data_r(offs_t offset);
 	void sound_status_w(uint16_t data);
+	void set_filter(l7a1045_voice &voice, double cutoff, double resonance);
 };
 
 DECLARE_DEVICE_TYPE(L7A1045, l7a1045_sound_device)
