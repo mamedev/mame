@@ -48,11 +48,24 @@ end
 	}
 
 	if _OPTIONS["SYMBOLS"] then
+		local llvm_obdjump = false
+		local objdump_ver = backtick('objdump --version')
+		if string.match(objdump_ver, 'LLVM version ') then
+			llvm_obdjump = true
+		end
+
 		configuration { "mingw*" }
-			postbuildcommands {
-				"$(SILENT) echo Dumping symbols.",
-				"$(SILENT) objdump --section=.text --syms --demangle $(TARGET) >$(subst .exe,.sym,$(TARGET))"
-			}
+			if llvm_obdjump then
+				postbuildcommands {
+					"$(SILENT) echo Dumping symbols.",
+					"$(SILENT) objdump --syms --demangle $(TARGET) | python scripts/build/llvm-objdump-filter.py `objdump --section-headers $(TARGET) | sed -r -e 's/ *(0|[1-9][0-9]*) +\.text +[0-9a-f]+ +[0-9a-f]+ +[^ ].*/\1/;t;d'` | c++filt >$(subst .exe,.sym,$(TARGET))"
+				}
+			else
+				postbuildcommands {
+					"$(SILENT) echo Dumping symbols.",
+					"$(SILENT) objdump --section=.text --syms --demangle $(TARGET) >$(subst .exe,.sym,$(TARGET))"
+				}
+			end
 	end
 
 	configuration { "Release" }
