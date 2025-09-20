@@ -530,6 +530,7 @@ mmt8
 sr16
 
 @source:alesis/midiverb.cpp
+midifex
 midiverb
 
 @source:alliedleisure/ace.cpp
