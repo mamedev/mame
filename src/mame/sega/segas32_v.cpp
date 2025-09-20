@@ -920,7 +920,7 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, segas32_stat
 			{
 				const rectangle &visarea = screen.visible_area();
 				srcy = yscroll + visarea.max_y - y;
-				ylookup = cliprect.max_y - y;
+				ylookup = visarea.max_y - y;
 			}
 
 			/* apply row scroll/select */
