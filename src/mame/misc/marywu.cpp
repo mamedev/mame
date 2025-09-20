@@ -338,7 +338,8 @@ void marywu_state::marywu(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
+   	config.device_remove("oki");
+    
 	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay1.port_a_write_callback().set(FUNC(marywu_state::ay1_port_a_w));
@@ -353,6 +354,7 @@ void marywu_state::marywu(machine_config &config)
 void marywu_state::mary1s(machine_config &config) 
 {
 	marywu(config);
+	config.device_remove("oki");
 	i80c52_device &maincpu(I80C52(config.replace(), "maincpu", XTAL(10'738'635))); // actual cpu is W78E52B-24. xtal jfc 10.7386 mhz
 	maincpu.port_in_cb<1>().set_ioport("P1");
 	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::program_map);
@@ -364,6 +366,8 @@ void marywu_state::unkwinw(machine_config &config)
 	marywu(config);
 	i80c51_device &maincpu(I80C51(config.replace(), "maincpu", XTAL(10'738'635))); // actual cpu is at89c51
 	OKIM6295(config, m_oki,  XTAL(10'738'635) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.50);  // Clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
+
 	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::unkwinw_program_map);
 	maincpu.set_addrmap(AS_IO, &marywu_state::unkwinw_io_map);
 	maincpu.port_in_cb<1>().set_ioport("P1");
