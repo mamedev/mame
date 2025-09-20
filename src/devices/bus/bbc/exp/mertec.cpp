@@ -107,7 +107,8 @@ void bbc_mertec_device::device_add_mconfig(machine_config &config)
 
 	// analogue port
 	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
-	m_analog->set_screen(m_slot->m_screen);
+	if (m_slot)
+		m_analog->set_screen(m_slot->m_screen);
 	m_analog->lpstb_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_exp_slot_device::lpstb_w));
 
 	// user port
