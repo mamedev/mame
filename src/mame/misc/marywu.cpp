@@ -87,11 +87,14 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
 		, m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" })
+		, m_oki(*this, "oki")
+
 	{ }
 
 	void marywu(machine_config &config);
     void mary1s(machine_config &config);
 	void unkwinw(machine_config &config);
+	void unkwinw_adpcm_bank(uint8_t data) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -287,8 +290,16 @@ void marywu_state::unkwinw_io_map(address_map &map)
 	map(0x8002, 0x8003).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
     map(0x9000, 0x9000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xb000, 0xb000).unmapw(); // apdcm rom banking?
+	map(0xb000, 0xb000).w(FUNC(marywu_state::unkwinw_adpcm_bank));
 	map(0xf000, 0xf7ff).ram().share("nvram"); /* hm6116lp-3: 2kbytes of Static RAM */
+
+}
+
+void marywu_state::unkwinw_adpcm_bank(uint8_t data)
+{
+	
+	m_oki->set_rom_bank(data & 0x07);
+
 
 }
 
@@ -349,7 +360,7 @@ void marywu_state::unkwinw(machine_config &config)
 {
 	marywu(config);
 	i80c51_device &maincpu(I80C51(config.replace(), "maincpu", XTAL(10'738'635))); // actual cpu is at89c51
-	OKIM6295(config, "oki", XTAL(10'738'635) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);  // Clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki,  XTAL(10'738'635) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.50);  // Clock frequency & pin 7 not verified
 	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::unkwinw_program_map);
 	maincpu.set_addrmap(AS_IO, &marywu_state::unkwinw_io_map);
 	maincpu.port_in_cb<1>().set_ioport("P1");
@@ -373,7 +384,7 @@ ROM_START( unkwinw )
 	ROM_REGION( 0x10000, "eeprom", 0 ) 
 	ROM_LOAD( "w27c512.u12", 0x0000, 0x10000, CRC(735147D8) SHA1(df2431f85224443eda4346a10183021f60d858a0) )
 	
-	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_REGION( 0x200000, "oki", 0 ) // 8 bank
 	ROM_LOAD( "mx29f1615pc-10.u11", 0x000000, 0x200000, CRC(D8B7E688) SHA1(5e220f1cb963e0bc2ce37b297359f937fb097bf0) )
 	
     ROM_REGION( 0x0800, "plds", ROMREGION_ERASE00 )
@@ -388,4 +399,4 @@ GAME( ????, marywu,  0,      marywu,   marywu,  marywu_state,  empty_init, ROT0,
 GAME( ????, mary1s,  0,      mary1s,   marywu,  marywu_state,  empty_init, ROT0, "<unknown>",          "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING ) // Error 02
 
 // Different than marywu. There are clones with similar led board of these.
-GAME( ????, unkwinw, 0,      unkwinw,  unkwinw, marywu_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "Unknown Win way Gambling Board",                          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // Error 02. adpcm rom banking not implemented. Need Correct layout.
+GAME( ????, unkwinw, 0,      unkwinw,  unkwinw, marywu_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "Unknown Win way Gambling Board",                          MACHINE_NOT_WORKING ) // Error 02. Need Correct layout.
