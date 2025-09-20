@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include "screen.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -56,6 +58,8 @@ public:
 
 	bbc_analogue_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
+	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+
 	// callbacks
 	auto lpstb_handler() { return m_lpstb_handler.bind(); }
 
@@ -64,6 +68,8 @@ public:
 	uint16_t ch_r(offs_t channel);
 	uint8_t pb_r();
 	void pb_w(uint8_t data);
+
+	optional_device<screen_device> m_screen;
 
 protected:
 	// device_t overrides
@@ -87,6 +93,8 @@ public:
 
 protected:
 	device_bbc_analogue_interface(const machine_config &mconfig, device_t &device);
+
+	screen_device *screen() { return m_slot->m_screen; }
 
 	bbc_analogue_slot_device *const m_slot;
 };
