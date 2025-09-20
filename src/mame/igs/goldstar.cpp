@@ -502,8 +502,9 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_cherrym_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_cherrym_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_jkrmast_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_pkrmast_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_pkrmast_bg_tile_info);
 
 private:
 	void outport0_w(uint8_t data);
@@ -511,8 +512,11 @@ private:
 	void background_col_w(uint8_t data);
 	void coincount_w(uint8_t data);
 	void pkm_out0_w(uint8_t data);
+	void czb_vid_reg_w(uint8_t data);
 	void jkm_vid_reg_w(uint8_t data);
 	void ll3_vid_reg_w(uint8_t data);
+	void pkm_vid_reg_w(uint8_t data);
+	void pkm_reel_reg_w(uint8_t data);
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -543,6 +547,7 @@ private:
 	void ll3_portmap(address_map &map) ATTR_COLD;
 	void nfm_map(address_map &map) ATTR_COLD;
 	void nfm_portmap(address_map &map) ATTR_COLD;
+	void pkrmast_map(address_map &map) ATTR_COLD;
 	void pkrmast_portmap(address_map &map) ATTR_COLD;
 	void reelm_portmap(address_map &map) ATTR_COLD;
 	void super7_map(address_map &map) ATTR_COLD;
@@ -899,7 +904,7 @@ TILE_GET_INFO_MEMBER(cmaster_state::get_cherrym_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(cmaster_state::get_cherrym_bg_tile_info)
+TILE_GET_INFO_MEMBER(cmaster_state::get_jkrmast_bg_tile_info)
 {
 	tileinfo.set(1,
 			m_bg_vidram[tile_index] | (m_reel_bank * 0x100),
@@ -932,6 +937,19 @@ TILE_GET_INFO_MEMBER(cmaster_state::get_pkrmast_fg_tile_info)
 			color,
 			0);
 }
+
+TILE_GET_INFO_MEMBER(cmaster_state::get_pkrmast_bg_tile_info)
+{
+	tileinfo.set(2,
+			m_bg_vidram[tile_index] | ((m_reel_bank - 1) * 0x100),
+			m_bgcolor,
+			0);
+
+//	popmessage("m_reel_bank:%02x", (m_reel_bank - 1) );
+//	popmessage("code:%02x", m_bg_vidram[tile_index] );
+
+}
+
 
 template <uint8_t Which>
 void goldstar_state::reel_ram_w(offs_t offset, uint8_t data)
@@ -995,13 +1013,21 @@ VIDEO_START_MEMBER(cmaster_state, pkrmast)
 	m_reel_tilemap[1]->set_scroll_cols(64);
 	m_reel_tilemap[2]->set_scroll_cols(64);
 
+	m_reel_tilemap[0]->set_transparent_pen(0);
+	m_reel_tilemap[1]->set_transparent_pen(0);
+	m_reel_tilemap[2]->set_transparent_pen(0);
+
 	m_cmaster_girl_num = 0;
 	m_cmaster_girl_pal = 0;
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_pkrmast_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_enable_reg = 0x0b;
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_pkrmast_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+
+//	m_enable_reg = 0x1b;
+
+//	save_item(NAME(m_reel_bank));
 }
 
 VIDEO_START_MEMBER(cmaster_state, jkrmast)
@@ -1024,12 +1050,12 @@ VIDEO_START_MEMBER(cmaster_state, jkrmast)
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_pkrmast_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_cherrym_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_jkrmast_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 	m_bg_tilemap->set_scroll_cols(64);
 
 	m_enable_reg = 0x0b;
 
-	save_item(NAME(m_reel_bank));
+//	save_item(NAME(m_reel_bank));
 }
 
 void goldstar_state::goldstar_fa00_w(uint8_t data)
@@ -1767,7 +1793,7 @@ void goldstar_state::p1_lamps_w(uint8_t data)
 	m_lamps[6] = BIT(data, 6);
 	m_lamps[7] = BIT(data, 7);
 
-	//popmessage("p1 lamps: %02X", data);
+//  popmessage("p1 lamps: %02X", data);
 }
 
 void goldstar_state::p2_lamps_w(uint8_t data)
@@ -1781,7 +1807,7 @@ void goldstar_state::p2_lamps_w(uint8_t data)
 	m_lamps[8 + 6] = BIT(data, 6);
 	m_lamps[8 + 7] = BIT(data, 7);
 
-	//popmessage("p2 lamps: %02X", data);
+//	popmessage("p2 lamps: %02X", data);
 }
 
 // lucky bar mcu
@@ -2219,7 +2245,6 @@ void cb3_state::ncb3_readwriteport(address_map &map)
 	map(0x08, 0x08).noprw();
 	map(0x13, 0x13).nopw();
 
-
 	map(0x10, 0x10).portr("DSW5");  // confirmed for ncb3
 	map(0x81, 0x81).w(FUNC(cb3_state::ncb3_port81_w));  // ---> large writes.
 
@@ -2384,6 +2409,31 @@ void cmaster_state::super7_map(address_map &map)
 	map(0xfc80, 0xffff).ram();
 }
 
+void cmaster_state::pkrmast_map(address_map &map)
+{
+	map(0x0000, 0xcfff).rom().nopw();
+
+	map(0xd000, 0xd7ff).ram().share("nvram");
+	map(0xd800, 0xdfff).ram();
+
+	map(0xe000, 0xe7ff).ram().w(FUNC(cmaster_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xe800, 0xefff).ram().w(FUNC(cmaster_state::fg_atrram_w)).share(m_fg_atrram);
+
+	map(0xf000, 0xf1ff).ram().w(FUNC(cmaster_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xf200, 0xf3ff).ram().w(FUNC(cmaster_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xf400, 0xf5ff).ram().w(FUNC(cmaster_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xf600, 0xf7ff).ram().w(FUNC(cmaster_state::bg_vidram_w)).share(m_bg_vidram);
+
+	map(0xf800, 0xf87f).ram().share(m_reel_scroll[0]);
+	map(0xf880, 0xf9ff).ram();
+	map(0xfa00, 0xfa7f).ram().share(m_reel_scroll[1]);
+	map(0xfa80, 0xfbff).ram();
+	map(0xfc00, 0xfc7f).ram().share(m_reel_scroll[2]);
+	map(0xfc80, 0xfdff).ram();
+	map(0xfe00, 0xffff).ram().share(m_bg_scroll);
+//	map(0xfe00, 0xffff).ram().w(FUNC(cmaster_state::bg_atrram_w)).share(m_bg_atrram);
+}
+
 void cmaster_state::jkrmast_map(address_map &map)
 {
 	map(0x0000, 0xcfff).rom().nopw();
@@ -2532,7 +2582,7 @@ void cmaster_state::coincount_w(uint8_t data)
 //      popmessage("counters: %02X", data);
 
 	m_ticket_dispenser->motor_w(BIT(data,7));
-//  popmessage("counters: %02X", data);
+//	popmessage("counters: %02X", data);
 
 }
 
@@ -2552,7 +2602,7 @@ void cmaster_state::pkm_out0_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(3, data & 0x08);  // Counter 4 Coin D
 
 	m_ticket_dispenser->motor_w(BIT(data,0)); //pkrmast:port 0x00 - jkrmast:port 0x13
-	//popmessage("pkm_out0_w: %02X", data);
+//	popmessage("pkm_out0_w: %02X", data);
 
 }
 
@@ -2560,7 +2610,43 @@ void cmaster_state::pkm_out0_w(uint8_t data)
 void cmaster_state::jkm_vid_reg_w(uint8_t data)
 {
 	m_enable_reg = bitswap<8>(data, 7, 6, 5, 4, 2, 3, 1, 0);
-	//popmessage("outport data:%02x", m_enable_reg );
+
+//	popmessage("jkm data, enable reg:%02x :: reg:%02x", data, m_enable_reg);
+
+}
+
+void cmaster_state::pkm_vid_reg_w(uint8_t data)
+{
+	m_enable_reg = bitswap<8>(data, 7, 6, 5, 4, 2, 3, 1, 0);
+
+	if(m_enable_reg == 0x1b)
+		m_enable_reg = 0x13;  // if bg activates, reels should be disabled
+
+//	popmessage("pkm enable reg:%02x", m_enable_reg );
+//	popmessage("pkm reel bank:%02x", m_reel_bank );
+
+}
+
+void cmaster_state::pkm_reel_reg_w(uint8_t data)
+{
+/*
+    Poker Master hardware is accessing the extended gfx
+    through the following pairs table:
+
+          girl0 girl1 girl2 girl3 girl4 girl5
+         .-----.-----.-----.-----.-----.-----. 
+    46BE: 10 00 11 80 22 80 33 00 20 00 33 80 FF FF FF FF
+          -- --
+          || ||
+    Where || ''---> internal offset inside the 0x100 tiles bank
+          |'------> color code (up to 4 colors)
+          '-------> 0x100 tiles bank number
+*/
+	m_reel_bank = (data & 0x30) >> 4;
+	m_bgcolor = (data & 0x01); 
+	m_bg_tilemap->mark_all_dirty();
+
+//	popmessage("pkm reel data:%02x", data );
 
 }
 
@@ -2578,11 +2664,29 @@ void cmaster_state::ll3_vid_reg_w(uint8_t data)
   the video totally disabled. Surely for protection.
 
 */
-	if(data > 0)
+	if(data > 0) 
 		data = data + 0x01;
-	m_enable_reg = data;
+	m_enable_reg = data;	
 
-	//popmessage("outport data:%02x", m_enable_reg);
+//	popmessage("ll3 vidreg:%02x", m_enable_reg );
+}
+
+void cmaster_state::czb_vid_reg_w(uint8_t data)
+{
+/*
+  ---- ---x  global enable
+  xxxx xxx-  unused
+
+  Harcoded foreground and reels on. just enable/disable
+  background, switching with reels off when enable.
+
+*/
+	m_enable_reg = 0x0b;  // harcoded
+
+	if(data == 1)
+		m_enable_reg = 0x13;  // if bg activates, reels should be disabled
+
+//	popmessage("enable data:%02x", data );
 }
 
 
@@ -2736,7 +2840,9 @@ void cmaster_state::crazybon_portmap(address_map &map)
 	map(0x24, 0x24).w(FUNC(cmaster_state::coincount_w));
 	map(0x25, 0x25).portr("DSW1");
 	map(0x26, 0x26).portr("DSW2");
+	map(0x27, 0x27).w(FUNC(cmaster_state::pkm_reel_reg_w));
 
+	map(0xf1, 0xf1).w(FUNC(cmaster_state::czb_vid_reg_w));  // enable reg
 	map(0xf0, 0xf0).nopw();  // Writing 0's and 1's constantly.  Watchdog feeder?
 }
 
@@ -2745,8 +2851,12 @@ void cmaster_state::pkrmast_portmap(address_map &map)
 	map.global_mask(0xff);
 
 	map(0x00, 0x00).w(FUNC(cmaster_state::pkm_out0_w));
+	map(0x01, 0x01).w(FUNC(cmaster_state::p1_lamps_w));  // under test
 	map(0x02, 0x02).portr("DSW6");
 	map(0x03, 0x03).portr("DSW7");
+	map(0x04, 0x04).w(FUNC(cmaster_state::pkm_reel_reg_w));
+	map(0x05, 0x05).w(FUNC(cmaster_state::pkm_vid_reg_w));  // enable reg
+
 
 	map(0x20, 0x23).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // DIP switches
 	map(0x24, 0x27).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Inputs
@@ -2772,7 +2882,7 @@ void cmaster_state::jkrmast_portmap(address_map &map)
 	map(0x12, 0x12).portr("IN2");
 	map(0x13, 0x13).w(FUNC(cmaster_state::pkm_out0_w));
 	map(0x17, 0x17).lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; m_bgcolor = data & 0x03; m_bg_tilemap->mark_all_dirty(); }));
-	map(0x18, 0x18).w(FUNC(cmaster_state::jkm_vid_reg_w)); // enable reg?
+	map(0x18, 0x18).w(FUNC(cmaster_state::jkm_vid_reg_w)); // enable reg
 }
 
 void cmaster_state::ll3_portmap(address_map &map)
@@ -3104,7 +3214,7 @@ void wingco_state::magodds_outb850_w(uint8_t data)
 
 void wingco_state::magodds_outb860_w(uint8_t data)
 {
-	//popmessage("magodds_outb860_w %02x\n", data);
+//  popmessage("magodds_outb860_w %02x\n", data);
 }
 
 void wingco_state::fl7w4_outc802_w(uint8_t data)
@@ -11638,14 +11748,15 @@ static const gfx_layout tiles8x32x4pkr_layout =
 };
 
 static GFXDECODE_START( gfx_pkrmast )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,                 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4pkr_layout, 128+64, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,                                0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4pkr_layout,              128 + 64, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x100 * 4 * 32, tiles8x32x4pkr_layout, 128 + 32, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_cmfb55 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,                 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4pkr_layout, 128+64, 16 )
-	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout,   128,  4 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,                   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4pkr_layout, 128 + 64, 16 )
+	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout,     128,  4 )
 GFXDECODE_END
 
 static const gfx_layout cmast97_layout =
@@ -11716,7 +11827,7 @@ void wingco_state::system_outputc_w(uint8_t data)
 {
 	m_nmi_enable = data & 8;
 	m_vidreg = data & 2;
-	//popmessage("system_outputc_w %02x",data);
+//	popmessage("system_outputc_w %02x",data);
 
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -11740,9 +11851,9 @@ uint8_t wingco_state::tetin3_r()
 {
 	uint8_t ret = ioport("IN3")->read();
 
-	if(ret == 0xfe)  // r > LUCKY TO TETRIS
+	if (ret == 0xfe)  // r > lucky to tetris
 	{
-		if(m_tcount++ == 2)
+		if (m_tcount++ == 2)
 		{
 			m_z80_p02 = true;
 			m_tcount = 0;
@@ -11750,9 +11861,9 @@ uint8_t wingco_state::tetin3_r()
 		ret = 0xfe;
 	}
 
-	if(ret == 0xfd)  // t > TETRIS TO LUCKY
+	if (ret == 0xfd)  // t > tetris to lucky
 	{
-		if(m_tcount++ == 2)
+		if (m_tcount++ == 2)
 		{
 			m_z80_p02 = false;
 			m_tcount = 0;
@@ -11765,7 +11876,7 @@ uint8_t wingco_state::tetin3_r()
 uint8_t wingco_state::z80_io_r(offs_t offset)
 {
 	if (offset == 0x01)
-		return  0x00;  // si retorno distinto de cero inhibe el game swap (comprobado) Asigan un input toggle para darle funcionalidad.
+		return  0x00;  // returning a different value inhibits the game swap (comprobed). Asign an input toggle to give functionality.
 
 	if (offset == 0x02)
 		return  m_z80_p02;
@@ -11779,7 +11890,7 @@ uint8_t wingco_state::z80_io_r(offs_t offset)
 		return  m_z80_io_c0;
 	}
 
-	//logerror("z80_io_r: offset:%02x\n", offset);  // investigar funcionalidad ports 0x31, 0x32, 0xc0.
+//	logerror("z80_io_r: offset:%02x\n", offset);  // investigate functionality ports 0x31, 0x32, 0xc0.
 	return machine().rand() & 0x0f;
 }
 
@@ -11787,7 +11898,7 @@ void wingco_state::z80_io_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0xc0)
 		m_z80_io_c0 = data;
-	logerror("Z80_io_w(): offset:%02x - data: %02x\n", offset, data);  // investigar funcionalidad port 0xc0
+	logerror("Z80_io_w(): offset:%02x - data: %02x\n", offset, data);  // investigate functionality port 0xc0
 }
 
 void wingco_state::tmcu_io_w(offs_t offset, uint8_t data)
@@ -11804,7 +11915,8 @@ uint8_t wingco_state::tmcu_io_r(offs_t offset)
 void wingco_state::tmcu_p1_out(uint8_t data)
 {
 	m_mcu_p1 = data;
-	//logerror("MCU Port1:%02x\n", tmcu_p1_out);
+//	logerror("MCU Port1:%02x\n", tmcu_p1_out);
+
 }
 
 
@@ -12992,7 +13104,7 @@ void cmaster_state::pkrmast(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::pkrmast_map);
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::pkrmast_portmap);
 
 	I8255A(config, m_ppi[0]);
@@ -13037,7 +13149,6 @@ void cmaster_state::jkrmast(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::jkrmast_map);
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::jkrmast_portmap);
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(cmaster_state::screen_update_goldstar));
 	MCFG_VIDEO_START_OVERRIDE(cmaster_state, jkrmast)
 
 	subdevice<ay8910_device>("aysnd")->port_a_read_callback().set_ioport("DSW3");
@@ -25469,6 +25580,7 @@ void cmaster_state::decrypt_ll3()
 	std::swap_ranges(&rom[0x1800], &rom[0x2000], &rom[0x4800]);
 	std::swap_ranges(&rom[0x2800], &rom[0x3000], &rom[0xa800]);
 	std::swap_ranges(&rom[0x6800], &rom[0x7000], &rom[0x9800]);
+	
 }
 
 void cmaster_state::init_ll3() // verified with ICE dump
@@ -26200,7 +26312,7 @@ void cmaster_state::init_rp96sub()
 		rom[i] = x;
 	}
 
-	//m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb2>)));
+//  m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb2>)));
 }
 
 
@@ -26276,7 +26388,7 @@ void cb3_state::init_cb3c()
 
 void cb3_state::init_cb3e()
 {
-	// program bitswap
+//  program bitswap
 	uint8_t *rom = memregion("maincpu")->base();
 	do_blockswaps(rom);
 
@@ -26287,14 +26399,14 @@ void cb3_state::init_cb3e()
 		rom[i] = dat;
 	}
 
-	// bank 1 graphics
+//  bank 1 graphics
 	uint8_t *src = memregion("gfx1")->base();
 	for (int i = 0; i < 0x20000; i++)
 	{
 		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);  // OK
 	}
 
-	// bank 2 graphics
+//  bank 2 graphics
 	uint8_t *src2 = memregion("gfx2")->base();
 	for (int i = 0; i < 0x8000; i++)
 	{
@@ -26304,7 +26416,7 @@ void cb3_state::init_cb3e()
 
 void cb3_state::init_cb3f()
 {
-	// program bitswap
+//  program bitswap
 	uint8_t *rom = memregion("maincpu")->base();
 
 	do_blockswaps(rom);
@@ -26437,21 +26549,21 @@ void goldstar_state::init_super9()
 	rom[0x0238] = 0x20;  // jr nz, $0231
 	rom[0x0239] = 0xf7;
 
-	rom[0xea80] = 0x00;  // reels tilemap mask
+	rom[0xea80] = 0x00;  // reels tilemap mask 
 
 }
 
 
 void goldstar_state::init_wcherry()
 {
-	// bank 1 graphics
+//  bank 1 graphics
 	uint8_t *src = memregion("gfx1")->base();
 	for (int i = 0; i < 0x20000; i++)
 	{
 		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);  // OK
 	}
 
-	// bank 2 graphics
+//  bank 2 graphics
 	uint8_t *src2 = memregion("gfx2")->base();
 	for (int i = 0; i < 0x8000; i++)
 	{
@@ -26554,14 +26666,14 @@ void cmaster_state::init_chthree()
 */
 void wingco_state::init_flaming7()
 {
-	// bank 1 graphics
+//  bank 1 graphics
 	uint8_t *src = memregion("gfx1")->base();
 	for (int i = 0; i < 0x20000; i++)
 	{
 		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);  // OK
 	}
 
-	// bank 2 graphics
+//  bank 2 graphics
 	uint8_t *src2 = memregion("gfx2")->base();
 	for (int i = 0; i < 0x8000; i++)
 	{
@@ -26915,10 +27027,10 @@ GAME(  1999, jkrmast,    0,        jkrmast,  jkrmast,  cmaster_state,  init_jkrm
 GAME(  1999, jkrmasta,   jkrmast,  jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512/513)", 0 )
 GAME(  1999, jkrmastb,   jkrmast,  jkrmast,  jkrmastb, cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512)",    0 )
 GAME(  1993, pkrmast,    0,        pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993, dual game, set 1)",    0 ) // puts FUN USA 95H N/G  V2.20 in NVRAM
-GAME(  1993, pkrmasta,   pkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993, dual game, set 2)",    0 ) // needs dips fixed, puts PM93 JAN 29/1996 V1.52 in NVRAM
-GAME(  1993, missbingo,  pkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Miss Bingo (Poker Master HW, dual game)",     0 ) // needs girl support
-GAME(  1997, crazybonb,  0,        crazybonb, pkrmast, cmaster_state,  init_crazybonb, ROT0, "bootleg (TV Games)", "Crazy Bonus 2002 (Ver. 1, dual game)",       MACHINE_UNEMULATED_PROTECTION ) // F.B. & POKER 94, VER.1 in NVRAM, decryption seems ok, possibly needs proper memory map
-GAME(  1993, missbingoc, crazybonb,crazybonb, pkrmast, cmaster_state,  init_crazybonb, ROT0, "bootleg",            "Miss Bingo (Crazy Bonus DB, dual game)",     MACHINE_UNEMULATED_PROTECTION ) // same program as crazybonb
+GAME(  1993, pkrmasta,   pkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993, dual game, set 2)",    0 ) // puts PM93 JAN 29/1996 V1.52 in NVRAM
+GAME(  1993, missbingo,  pkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Miss Bingo (Poker Master HW, dual game)",     0 )
+GAME(  1997, crazybonb,  0,        crazybonb, pkrmast, cmaster_state,  init_crazybonb, ROT0, "bootleg (TV Games)", "Crazy Bonus 2002 (Ver. 1, dual game)",       MACHINE_UNEMULATED_PROTECTION ) // F.B. & POKER 94, VER.1 in NVRAM
+GAME(  1993, missbingoc, crazybonb,crazybonb, pkrmast, cmaster_state,  init_crazybonb, ROT0, "bootleg",           "Miss Bingo (Crazy Bonus DB, dual game)",      MACHINE_UNEMULATED_PROTECTION ) // same program as crazybonb
 
 GAME(  199?, chthree,    cmaster,  cm,       cmaster,  cmaster_state,  init_chthree,   ROT0, "Promat",            "Channel Three",                               0 ) // hack of cmaster, still shows DYNA CM-1 V1.01 in book-keeping
 
