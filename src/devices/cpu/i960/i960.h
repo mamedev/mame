@@ -132,6 +132,8 @@ private:
 	int m_immediate_vector;
 	int  m_immediate_pri;
 
+	int8_t m_irq_line_state[4];
+
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
 

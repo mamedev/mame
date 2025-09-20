@@ -2218,6 +2218,11 @@ void i960_cpu_device::execute_run()
 
 void i960_cpu_device::execute_set_input(int irqline, int state)
 {
+	if (m_irq_line_state[irqline] == state)
+		return;
+
+	m_irq_line_state[irqline] = state;
+
 	int int_tab =  m_program.read_dword(m_PRCB+20);    // interrupt table
 	int cpu_pri = (m_PC>>16)&0x1f;
 	int vector =0;
@@ -2311,6 +2316,7 @@ void i960_cpu_device::device_start()
 	save_item(NAME(m_stall_state.t1));
 	save_item(NAME(m_stall_state.t2));
 	save_item(NAME(m_stall_state.burst_mode));
+	save_item(NAME(m_irq_line_state));
 
 
 	state_add( I960_SAT,  "sat", m_SAT).formatstr("%08X");
@@ -2360,6 +2366,7 @@ void i960_cpu_device::device_start()
 	m_immediate_pri = 0;
 	memset(m_rcache_frame_addr, 0, sizeof(m_rcache_frame_addr));
 	memset(m_fp, 0, sizeof(m_fp));
+	memset(m_irq_line_state, CLEAR_LINE, sizeof(m_irq_line_state));
 	m_PIP = 0;
 
 	set_icountptr(m_icount);

@@ -353,6 +353,12 @@ void namcofl_state::sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// 1: ROM at 00000000, RAM at 10000000
 		m_mainbank.select(data & 1);
 	}
+	else if (offset >= 0x10 && offset <= 0x13)	// clear i960 IRQ line
+	{
+		// data value doesn't seem to matter
+		const int irq_type[4] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
+		m_maincpu->set_input_line(irq_type[offset & 3], CLEAR_LINE);
+	}
 }
 
 // FIXME: remove this trampoline once the IRQ is moved into the actual device
@@ -650,6 +656,12 @@ void namcofl_state::machine_reset()
 
 	std::fill_n(&m_workram[0], m_workram.bytes() / 4, 0);
 	m_mainbank.select(1);
+
+	const int irq_type[] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
+	for (auto irq : irq_type)
+	{
+		m_maincpu->set_input_line(irq, CLEAR_LINE);
+	}
 }
 
 
