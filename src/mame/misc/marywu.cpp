@@ -118,7 +118,7 @@ private:
 	output_finder<32> m_digits;
 	output_finder<30> m_leds;
 	required_ioport_array<4> m_inputs;
-	required_device<okim6295_device> m_oki;
+	optional_device<okim6295_device> m_oki;
 
 };
 
