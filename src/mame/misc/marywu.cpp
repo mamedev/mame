@@ -26,9 +26,10 @@
   unkwinw
   Product name: 小方玛丽板
   Product Code: square-mario-baord
-  The board has a single marking J373
-  at back pcb
-  MUSICBAR VER 201
+  The board has a single marking J373.
+  
+  At back pcb
+  MUSICBAR VER 201.
  
   string: COPYRIGHT BY WIN WAY ELEC. CORP. CLEMENT CHANG, MUSIC by: SunKiss Chen 
   Notes: the ay bgm are unused during attract and gameplay and only playable after press k1 then press start  3 times.
