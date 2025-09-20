@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR
+// copyright-holders:AJR, Felipe Sanches
 /****************************************************************************
 
     Toshiba TMP96C141 microcontroller
@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "tmp96c141.h"
-
+#include "dasm900.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -194,4 +194,10 @@ void tmp96c141_device::tlcs900_handle_timers()
 
 void tmp96c141_device::execute_set_input(int inputnum, int state)
 {
+}
+
+
+std::unique_ptr<util::disasm_interface> tmp96c141_device::create_disassembler()
+{
+	return std::make_unique<tmp96c141_disassembler>();
 }
