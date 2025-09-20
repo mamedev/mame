@@ -282,7 +282,8 @@ protected:
 	required_device<future32_kbd_device> m_kbd;
 	required_shared_ptr<u32> m_textlayer;
 	memory_share_creator<u16> m_fontram;
-	required_region_ptr<u8> m_fontrom;
+	required_region_ptr<u8> m_fontascii;
+	required_region_ptr<u8> m_fontkanji;
 
 	memory_passthrough_handler m_boot_tap;
 
@@ -299,6 +300,7 @@ protected:
 	void mb89352(device_t *device);
 
 	void scsi_irq_w(int state);
+	void scc1_irq_w(int state);
 	u8 intc_get_vector();
 	void font_base_w(u16 base);
 
@@ -324,7 +326,8 @@ future32a_state::future32a_state(const machine_config &mconfig, device_type type
 	, m_kbd(*this, "kbd")
 	, m_textlayer(*this, "textlayer")
 	, m_fontram(*this, "fontram", 8 * 2 * 0x10000, ENDIANNESS_BIG)
-	, m_fontrom(*this, "font")
+	, m_fontascii(*this, "fontascii")
+	, m_fontkanji(*this, "fontkanji")
 {
 }
 
@@ -381,7 +384,7 @@ void future32a_state::cpu_space_map(address_map &map)
 	map(0xffffffff, 0xffffffff).lr8(NAME([] () -> u8 { return 31; }));
 }
 
-static const gfx_layout textlayer_layout = {
+static const gfx_layout textascii_layout = {
 	16, 32,
 	1024,
 	1,
@@ -391,40 +394,102 @@ static const gfx_layout textlayer_layout = {
 	16*32
 };
 
+static const gfx_layout textkanji_layout1 = {
+	24, 24,
+	0x2000,
+	1,
+	{ 0 },
+	{ STEP16(0, 1), STEP8(16, 1)},
+	{ STEP16(0, 32), STEP8(32*16, 32) },
+	32*32
+};
+
+static const gfx_layout textkanji_layout2 = {
+	16, 16,
+	0x2000,
+	1,
+	{ 32*24 },
+	{ STEP16(0, 1) },
+	{ STEP16(0, 16) },
+	32*32
+};
+
+static const gfx_layout textkanji_layout3 = {
+	32, 32,
+	0x2000,
+	1,
+	{ 0 },
+	{ STEP32(0, 1) },
+	{ STEP32(0, 32) },
+	32*32
+};
+
+
 static GFXDECODE_START( gfx_textlayer )
-	GFXDECODE_ENTRY("font", 0, textlayer_layout, 0x100, 1)
+	GFXDECODE_ENTRY("fontascii", 0, textascii_layout, 0x100, 1)
+	GFXDECODE_ENTRY("fontkanji", 0, textkanji_layout1, 0x100, 1)
+	GFXDECODE_ENTRY("fontkanji", 0, textkanji_layout2, 0x100, 1)
+	GFXDECODE_ENTRY("fontkanji", 0, textkanji_layout3, 0x100, 1)
 GFXDECODE_END
 
 // void name(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t ma, uint8_t ra,
 //           uint16_t y, uint8_t x_count, int8_t cursor_x, int de, int hbp, int vbp)
-
-// 0026 = black on cyan
-// 0007 = white on black
-// 0006 = cyan on black
-// 0009 = red on nblack
-// 000a = green on black
 
 MC6845_UPDATE_ROW(future32a_state::crtc_update_row)
 {
 	const pen_t *palette = m_ramdac->pens();
 	uint32_t *d = &bitmap.pix(y);	
 	for(u8 x = 0; x != x_count; x++) {
-		u32 code = m_textlayer[(ma+x) & 0x7ff];
-		u16 data;
-		if(code & 0x8000) {
-			data = 0x5555 << (ra & 1);
+		u32 data = m_textlayer[(ma+x) & 0x7ff];
+		u16 code = data & 0xffff;
+		u16 attr = data >> 16;
+		u16 pixels = 0x5555 << (ra & 1);
+		if(code >= 0x8000) {
+			// JISx 201/208 code
+			// Feels like there's a mapping table hiding somewhere
+			code &= 0x7fff;
+
+			if(ra >= 24)
+				pixels = 0;
+			else if(code >= 0x3000) {
+				// JISx 208
+				code -= 0x3000;
+				u16 code1 = ((code & 0x3f00) >> 1) | (code & 0x7f);
+				offs_t base = code1 * 0x80 + ra*4;
+				if(code & 0x80)
+					pixels = ((m_fontkanji[base+3] << 8) | m_fontkanji[base + 2]) << 4;
+				else
+					pixels = (m_fontkanji[base] << 8) | m_fontkanji[base + 1];
+			} else if(code >= 0x2a00) {
+				// Font ram, maybe, but it doesn't really work out
+
+			} else if(code >= 0x2120) {
+				// JISx 201
+				code -= 0x2120;
+				u16 code1 = 0x480 + (((code & 0x700) >> 1) | ((code & 0x60) << 5) | (code & 0x1f));
+				offs_t base = code1 * 0x80 + ra*4;
+				if(code & 0x80)
+					pixels = ((m_fontkanji[base+3] << 8) | m_fontkanji[base + 2]) << 4;
+				else
+					pixels = (m_fontkanji[base] << 8) | m_fontkanji[base + 1];
+			}
+
+			if(ra >= 24)
+				pixels = 0;
+
 		} else {
+			// ASCII code
 			offs_t base = (code & 0x3ff)*64 + ra * 2;
-			data = (m_fontrom[base] << 8) | m_fontrom[base + 1];
+			pixels = (m_fontascii[base] << 8) | m_fontascii[base + 1];
 		}
 		if(x == cursor_x)
-			data = data ^ 0xffff;
+			pixels = pixels ^ 0xffff;
 		u32 c0 = palette[0];
-		u32 c1 = palette[(code >> 16) & 15];
-		if(code & 0x00200000)
+		u32 c1 = palette[attr & 15];
+		if(attr & 0x0020)
 			std::swap(c0, c1);
-		for(int xx=0; xx != 16; xx++)
-			*d++ = BIT(data, 15-xx) ? c1 : c0;
+		for(int xx=0; xx != 12; xx++)
+			*d++ = BIT(pixels, 15-xx) ? c1 : c0;
 	}
 }
 
@@ -446,8 +511,12 @@ void future32a_state::machine_reset()
 
 void future32a_state::scsi_irq_w(int state)
 {
-	logerror("scsi irq %d\n", state);
 	m_maincpu->set_input_line(4, state);
+}
+
+void future32a_state::scc1_irq_w(int state)
+{
+	logerror("kbd irq %d\n", state);
 }
 
 u8 future32a_state::intc_get_vector()
@@ -458,7 +527,6 @@ u8 future32a_state::intc_get_vector()
 void future32a_state::font_base_w(u16 base)
 {
 	m_font_base = base;
-	logerror("font base %04x\n", base);
 }
 
 u16 future32a_state::font_r(offs_t offset)
@@ -509,9 +577,11 @@ void future32a_state::future32a(machine_config &config)
 	UPD72120(config, m_agdc, 32_MHz_XTAL / 2);
 
 	PTM6840(config, m_ptm, 50_MHz_XTAL / 20);
+	m_ptm->irq_callback().set_inputline(m_maincpu, 6);
 
 	SCC8530(config, m_scc1, 32_MHz_XTAL / 8);
 	m_scc1->configure_channels(9600*16, 9600*16, 0, 0);
+	m_scc1->out_int_callback().set(FUNC(future32a_state::scc1_irq_w));
 
 	SCC8530(config, m_scc2, 32_MHz_XTAL / 8);
 	m_scc2->configure_channels(9600*16, 9600*16, 9600*16, 9600*16);
@@ -530,13 +600,13 @@ void future32a_state::future32a(machine_config &config)
 	HD6345(config, m_crtc, 50_MHz_XTAL / 10);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_screen(m_screen);
-	m_crtc->set_char_width(16);
+	m_crtc->set_char_width(12);
 	m_crtc->set_update_row_callback(FUNC(future32a_state::crtc_update_row));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_physical_aspect(4, 3);
 	m_screen->set_screen_update(m_crtc, FUNC(hd6345_device::screen_update));
-	m_screen->set_raw(50_MHz_XTAL / 10 * 16, 1664, 0, 1279, 815, 0, 749);
+	m_screen->set_raw(50_MHz_XTAL / 10 * 16, 1248, 0, 959, 815, 0, 749);
 
 	BT451(config, m_ramdac, 0);
 	GFXDECODE(config, m_gfxdecode, m_ramdac, gfx_textlayer); // Only for F4 use
@@ -568,9 +638,13 @@ ROM_START(future32a)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("ft2o1c.bin", 0x0000, 0x8000, CRC(82f9c0b0) SHA1(e30a350cc19edbf623fa37aa60f0215188cc55d6))
 
-	ROM_REGION(0x10000, "font", 0)
+	ROM_REGION( 0x10000, "fontascii", 0)
 	ROM_LOAD16_BYTE("ft2fe00a.u42", 0x0000, 0x8000, CRC(1fce9667) SHA1(ac4955afd9eb9401079c5e7ca8bf65de5bb826ab))
 	ROM_LOAD16_BYTE("ft2fo00a.u43", 0x0001, 0x8000, CRC(26a708e2) SHA1(d53f1a2e368fa1d231b3989577129ffadcfda5aa))
+
+	ROM_REGION(0x100000, "fontkanji", 0)
+	ROM_LOAD("051.u44", 0x00000, 0x80000, CRC(6a50162a) SHA1(92383c3ad7aaa7b2f9c8cf781c6dcddffe7b9af8))
+	ROM_LOAD("052.u45", 0x80000, 0x80000, CRC(f2886c9b) SHA1(76363bb7ef884bcf51c50ac56963d513fe776c2e))
 ROM_END
 
 
