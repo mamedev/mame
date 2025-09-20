@@ -58,7 +58,7 @@ end
 			if llvm_obdjump then
 				postbuildcommands {
 					"$(SILENT) echo Dumping symbols.",
-					"$(SILENT) objdump --syms --demangle $(TARGET) | python scripts/build/llvm-objdump-filter.py `objdump --section-headers $(TARGET) | sed -r -e 's/ *(0|[1-9][0-9]*) +\.text +[0-9a-f]+ +[0-9a-f]+ +[^ ].*/\1/;t;d'` | c++filt >$(subst .exe,.sym,$(TARGET))"
+					"$(SILENT) " .. PYTHON .. " " .. MAME_DIR .. "scripts/build/llvm-objdump-filter.py $(TARGET) | c++filt >$(subst .exe,.sym,$(TARGET))"
 				}
 			else
 				postbuildcommands {
