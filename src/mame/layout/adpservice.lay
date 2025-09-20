@@ -4,7 +4,7 @@ license:CC0-1.0
 -->
 <mamelayout version="2">
 
-<!-- define elements -->
+	<!-- define elements -->
 	<element name="static_black">
 		<rect>
 			<color red="0.0" green="0.0" blue="0.0" />
@@ -21,7 +21,7 @@ license:CC0-1.0
 	</element>
 
 	<element name="button_service">
-    	<rect>
+		<rect>
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
 	</element>
@@ -39,7 +39,7 @@ license:CC0-1.0
 			<bounds left="0" right="180" top="0" bottom="100" />
 		</element>
 
-<!-- debug display -->
+		<!-- debug display -->
 		<element name="digit15" ref="digit">
 			<bounds x="30" y="10" width="15" height="20" />
 		</element>
@@ -68,30 +68,30 @@ license:CC0-1.0
 
 
 		<!-- keys -->
-    <repeat count="2">
-        <param name="y" start="60" increment="20" />
-        <param name="row" start="6" increment="1" />
-        <repeat count="8">
-                <param name="btnx" start="15" increment="20" />
-                <param name="mask" start="0x80" rshift="1" />
-                <element ref="button_service" inputtag="TZ~row~" inputmask="~mask~">
-                    <bounds x="~btnx~" y="~y~" width="15" height="15" />
-                </element>
-        </repeat>
-    </repeat>
+		<repeat count="2">
+			<param name="y" start="60" increment="20" />
+			<param name="row" start="6" increment="1" />
+			<repeat count="8">
+				<param name="btnx" start="15" increment="20" />
+				<param name="mask" start="0x80" rshift="1" />
+				<element ref="button_service" inputtag="TZ~row~" inputmask="~mask~">
+					<bounds x="~btnx~" y="~y~" width="15" height="15" />
+				</element>
+			</repeat>
+		</repeat>
 
-<!-- debug-->
-    <repeat count="8">
-    <param name="z" start="0" increment="1" />
-    <param name="x" start="0" increment="2" />
-        <repeat count="8">
-        <param name="s" start="0" increment="1" />
-        <param name="y" start="10" increment="2" />
-            <element name="lamp~z~~s~" ref="green_led">
-			    <bounds x="~x~" y="~y~" width="1" height="1" />
-		    </element>
-        </repeat>
-    </repeat>
+		<!-- debug-->
+		<repeat count="8">
+			<param name="z" start="0" increment="1" />
+			<param name="x" start="0" increment="2" />
+			<repeat count="8">
+			<param name="s" start="0" increment="1" />
+			<param name="y" start="10" increment="2" />
+				<element name="lamp~z~~s~" ref="green_led">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+				</element>
+			</repeat>
+		</repeat>
 
 	</view>
 </mamelayout>

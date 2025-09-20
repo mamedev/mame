@@ -733,7 +733,7 @@ void apple2gs_state::machine_start()
 	// adjust RAM size
 	if (!m_is_rom3 && m_ram_size <= 1280 * 1024)
 	{
-		m_ram_size -= 0x20000;	// subtract 128k so requested RAM size matches exactly
+		m_ram_size -= 0x20000;  // subtract 128k so requested RAM size matches exactly
 	}
 	// otherwise, RAM sizes for both classes of machine no longer include the Mega II RAM
 

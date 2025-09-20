@@ -193,8 +193,8 @@ TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
 	int code = m_videoram[tile_index * 2] | (m_videoram[tile_index * 2 + 1] << 8);
 	int color = (code & 0x7000) >> 12;
 
-//	if (BIT(code, 15) && !m_blink_state)
-//		code = 0;
+//  if (BIT(code, 15) && !m_blink_state)
+//      code = 0;
 
 	tileinfo.set(
 					0,  // bank

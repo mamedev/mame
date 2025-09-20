@@ -104,11 +104,11 @@ void ym7101_device::device_start()
 	save_item(STRUCT_MEMBER(m_command, latch));
 	save_item(STRUCT_MEMBER(m_command, address));
 	save_item(STRUCT_MEMBER(m_command, code));
-//	save_item(STRUCT_MEMBER(m_command, write_state));
+//  save_item(STRUCT_MEMBER(m_command, write_state));
 
 	save_item(STRUCT_MEMBER(m_dma, source_address));
 	save_item(STRUCT_MEMBER(m_dma, length));
-//	save_item(STRUCT_MEMBER(m_dma, mode));
+//  save_item(STRUCT_MEMBER(m_dma, mode));
 	save_item(STRUCT_MEMBER(m_dma, active));
 	save_item(STRUCT_MEMBER(m_dma, fill));
 
@@ -254,7 +254,7 @@ u16 ym7101_device::control_port_r(offs_t offset, u16 mem_mask)
 	return (1 << 9)
 		| (m_vint_pending << 7)
 		| sprite_flags
-//	    | odd << 4
+//      | odd << 4
 		| (screen().vblank() << 3)
 		| in_hblank() << 2
 		| (m_dma.active << 1);
@@ -815,7 +815,7 @@ void ym7101_device::prepare_sprite_line(int scanline)
 			//   Looks just a quick way to draw nothing that works by chance.
 			// - rambo3 references link = 80 during attract.
 			//if (link != 0x7f)
-			//	popmessage("ym7101: attempt to access link $%d, aborted", link);
+			//  popmessage("ym7101: attempt to access link $%d, aborted", link);
 			break;
 		}
 

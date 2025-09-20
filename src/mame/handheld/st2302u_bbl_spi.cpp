@@ -283,7 +283,7 @@ void bbl380_state::bbl380_do_maincpu_config()
 	m_maincpu->in_pa_callback().set_ioport("IN0");
 	m_maincpu->in_pb_callback().set_ioport("IN1");
 	m_maincpu->out_pa_callback().set(FUNC(bbl380_state::output_w));
-	//m_maincpu->spi_in_callback().set(FUNC(bbl380_state::spi_r)); 	// TODO, hook these up properly
+	//m_maincpu->spi_in_callback().set(FUNC(bbl380_state::spi_r));  // TODO, hook these up properly
 	//m_maincpu->spi_out_callback().set(FUNC(bbl380_state::spi_w));
 
 	m_maincpu->add_route(0, "mono", 1.00);

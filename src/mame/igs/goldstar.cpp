@@ -212,7 +212,7 @@
 
 
   * New Lucky 8 Lines (A900 2nd gen, Cross and Bell Bonus)
-  
+
   This game has new features.
   The game has stops buttons (stops 1-2-3, and stop all) to stop the reels.
 
@@ -340,7 +340,7 @@ public:
 	void init_wcherry() ATTR_COLD;
 
 	void init_palnibbles() ATTR_COLD;
-	
+
 	void p2_lamps_w(uint8_t data);
 
 protected:
@@ -912,19 +912,18 @@ TILE_GET_INFO_MEMBER(cmaster_state::get_pkrmast_fg_tile_info)
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
 	uint8_t color = (attr & 0xf0) >> 4;
-/*
+#if 0
 	if (color < 8)
 	{
 		color *= 2;
 	}
-	else
-	if (color < 15)
+	else if (color < 15)
 	{
 		color = (color - 8) * 2 + 1;  // color 15 remains unchanged
 	}
-*/
+#endif
 
-//  just switch to mapping to facilite the different tests...
+	// just switch to mapping to facilite the different tests
 	const int mapping[] = {0, 2, 4, 6, 8, 10, 12, 14, 1, 3, 5, 7, 9, 11, 13, 15};
 	color = mapping[color];
 
@@ -1768,7 +1767,7 @@ void goldstar_state::p1_lamps_w(uint8_t data)
 	m_lamps[6] = BIT(data, 6);
 	m_lamps[7] = BIT(data, 7);
 
-//  popmessage("p1 lamps: %02X", data);
+	//popmessage("p1 lamps: %02X", data);
 }
 
 void goldstar_state::p2_lamps_w(uint8_t data)
@@ -1782,7 +1781,7 @@ void goldstar_state::p2_lamps_w(uint8_t data)
 	m_lamps[8 + 6] = BIT(data, 6);
 	m_lamps[8 + 7] = BIT(data, 7);
 
-//	popmessage("p2 lamps: %02X", data);
+	//popmessage("p2 lamps: %02X", data);
 }
 
 // lucky bar mcu
@@ -2219,7 +2218,7 @@ void cb3_state::ncb3_readwriteport(address_map &map)
 	map(0x06, 0x06).nopw();
 	map(0x08, 0x08).noprw();
 	map(0x13, 0x13).nopw();
-	
+
 
 	map(0x10, 0x10).portr("DSW5");  // confirmed for ncb3
 	map(0x81, 0x81).w(FUNC(cb3_state::ncb3_port81_w));  // ---> large writes.
@@ -2272,14 +2271,14 @@ void goldstar_state::wcherry_map(address_map &map)
 	map(0xf080, 0xf0bf).ram().share(m_reel_scroll[1]);
 	map(0xf100, 0xf13f).ram().share(m_reel_scroll[2]);
 
-	map(0xf600, 0xf601).ram();  // CPLD internal register r/w 
-	map(0xf610, 0xf611).ram();  // CPLD internal register r/w 
-	map(0xf612, 0xf612).ram();  // CPLD internal register r/w 
-	map(0xf620, 0xf620).ram();  // CPLD internal register r/w 
+	map(0xf600, 0xf601).ram();  // CPLD internal register r/w
+	map(0xf610, 0xf611).ram();  // CPLD internal register r/w
+	map(0xf612, 0xf612).ram();  // CPLD internal register r/w
+	map(0xf620, 0xf620).ram();  // CPLD internal register r/w
 
-	map(0xf603, 0xf603).ram();  // CPLD internal register r/w 
-	map(0xf621, 0xf621).ram();  // CPLD internal register r/w 
-	map(0xf622, 0xf622).ram();  // CPLD internal register r/w 
+	map(0xf603, 0xf603).ram();  // CPLD internal register r/w
+	map(0xf621, 0xf621).ram();  // CPLD internal register r/w
+	map(0xf622, 0xf622).ram();  // CPLD internal register r/w
 	map(0xf650, 0xf650).ram();  // reg to support on outports
 	map(0xf680, 0xf680).ram();  // CPLD internal register r/w from inputs  f621-f622-f650-f683
 	map(0xf681, 0xf681).ram();  // CPLD internal register r/w from inputs  f622-f650
@@ -2298,7 +2297,7 @@ void goldstar_state::wcherry_map(address_map &map)
 
 	map(0xf883, 0xf883).portr("DSW1");  // to reg $f612
 	map(0xf884, 0xf884).portr("DSW2");  // to reg $f620
-	map(0xf885, 0xf885).portr("DSW5");  // direct read 
+	map(0xf885, 0xf885).portr("DSW5");  // direct read
 
 	map(0xfc00, 0xffff).rom();
 }
@@ -2309,7 +2308,7 @@ void goldstar_state::wcherry_readwriteport(address_map &map)
 	map(0x00, 0x00).nopr();  // leftover $1829
 	map(0x06, 0x06).nopw();  // leftover $1858
 	map(0x08, 0x08).noprw(); // leftover $182f
-	map(0x10, 0x10).nopr();  // leftover 
+	map(0x10, 0x10).nopr();  // leftover
 	map(0x81, 0x81).nopw();  // watchdog?
 
 }
@@ -2533,7 +2532,7 @@ void cmaster_state::coincount_w(uint8_t data)
 //      popmessage("counters: %02X", data);
 
 	m_ticket_dispenser->motor_w(BIT(data,7));
-//	popmessage("counters: %02X", data);
+//  popmessage("counters: %02X", data);
 
 }
 
@@ -2553,7 +2552,7 @@ void cmaster_state::pkm_out0_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(3, data & 0x08);  // Counter 4 Coin D
 
 	m_ticket_dispenser->motor_w(BIT(data,0)); //pkrmast:port 0x00 - jkrmast:port 0x13
-//	popmessage("pkm_out0_w: %02X", data);
+	//popmessage("pkm_out0_w: %02X", data);
 
 }
 
@@ -2561,7 +2560,7 @@ void cmaster_state::pkm_out0_w(uint8_t data)
 void cmaster_state::jkm_vid_reg_w(uint8_t data)
 {
 	m_enable_reg = bitswap<8>(data, 7, 6, 5, 4, 2, 3, 1, 0);
-//	popmessage("outport data:%02x", m_enable_reg );
+	//popmessage("outport data:%02x", m_enable_reg );
 
 }
 
@@ -2579,11 +2578,11 @@ void cmaster_state::ll3_vid_reg_w(uint8_t data)
   the video totally disabled. Surely for protection.
 
 */
-	if(data > 0) 
+	if(data > 0)
 		data = data + 0x01;
-	m_enable_reg = data;	
+	m_enable_reg = data;
 
-//	popmessage("outport data:%02x", m_enable_reg );
+	//popmessage("outport data:%02x", m_enable_reg);
 }
 
 
@@ -2756,7 +2755,7 @@ void cmaster_state::pkrmast_portmap(address_map &map)
 	map(0x2a, 0x2a).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x2b, 0x2b).w("aysnd", FUNC(ay8910_device::address_w));
 
- 	map(0xb4, 0xb4).ram();
+	map(0xb4, 0xb4).ram();
 
 	map(0xf0, 0xf0).nopw();  // Writing 0's and 1's constantly.  Watchdog feeder?
 }
@@ -3105,7 +3104,7 @@ void wingco_state::magodds_outb850_w(uint8_t data)
 
 void wingco_state::magodds_outb860_w(uint8_t data)
 {
-//  popmessage("magodds_outb860_w %02x\n", data);
+	//popmessage("magodds_outb860_w %02x\n", data);
 }
 
 void wingco_state::fl7w4_outc802_w(uint8_t data)
@@ -3163,8 +3162,9 @@ void goldstar_state::kkotnoli_map(address_map &map)
 }
 
 
-//void goldstar_state::ladylinr_outport_w(uint8_t data)
-//{
+#if 0
+void goldstar_state::ladylinr_outport_w(uint8_t data)
+{
 /* LAMPS (b840)...
 
    .... ...x
@@ -3176,8 +3176,9 @@ void goldstar_state::kkotnoli_map(address_map &map)
    .x.. ....
    x... ....
 */
-//  popmessage("Output: %02X", data);
-//}
+	//popmessage("Output: %02X", data);
+}
+#endif
 
 void goldstar_state::ladylinr_map(address_map &map)
 {
@@ -3894,7 +3895,7 @@ static INPUT_PORTS_START( cmaster )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )      PORT_CODE(KEYCODE_N) PORT_NAME("Start")
 
 	PORT_INCLUDE( cmv4_coins )
-	
+
 	PORT_INCLUDE( cmv4_service )
 
 	PORT_INCLUDE( cmv4_dsw1 )
@@ -4923,7 +4924,7 @@ static INPUT_PORTS_START( gregular )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wcherry )
-	PORT_START("IN0") 
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_B) PORT_NAME("Bet P2 / D-UP")  // player 2
@@ -4932,10 +4933,10 @@ static INPUT_PORTS_START( wcherry )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                 PORT_NAME("Stats")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )              PORT_NAME("Settings")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_C) PORT_NAME("Small / Info")
-	
+
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_Z) PORT_NAME("Take")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_X) PORT_NAME("Big / Ticket")  // 100 Punti or more can be cashed out with this button. No other Payout method available. 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_X) PORT_NAME("Big / Ticket")  // 100 Punti or more can be cashed out with this button. No other Payout method available.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_IMPULSE(1)      PORT_NAME("Coin In")  // normally coin c
@@ -5679,9 +5680,9 @@ static INPUT_PORTS_START( jkrmast )
 	PORT_START("IN1") // COIN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin C") 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME("Coin D") 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")	
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin C")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME("Coin D")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper Payout")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT)
@@ -5703,20 +5704,20 @@ static INPUT_PORTS_START( jkrmast )
 	PORT_DIPSETTING(    0x00, "High" )
 	PORT_DIPNAME( 0x02, 0x02, "Hopper Out by Coin A" )        PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )    
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "Hopper Limit" )                PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, "Unlimited" )
-	PORT_DIPSETTING(    0x00, "1,000" )    
+	PORT_DIPSETTING(    0x00, "1,000" )
 	PORT_DIPNAME( 0x18, 0x10, "Coin In Limit" )               PORT_DIPLOCATION("DSW1:4,5")
 	PORT_DIPSETTING(    0x18, "1,000" )
 	PORT_DIPSETTING(    0x10, "5,000" )
 	PORT_DIPSETTING(    0x08, "10,000" )
-	PORT_DIPSETTING(    0x00, "20,000" )    
+	PORT_DIPSETTING(    0x00, "20,000" )
 	PORT_DIPNAME( 0x60, 0x20, "Credit Limit" )                PORT_DIPLOCATION("DSW1:6,7")
 	PORT_DIPSETTING(    0x60, "5,000" )
 	PORT_DIPSETTING(    0x40, "10,000" )
 	PORT_DIPSETTING(    0x20, "30,000" )
-	PORT_DIPSETTING(    0x00, "Unlimited" )    
+	PORT_DIPSETTING(    0x00, "Unlimited" )
 	PORT_DIPNAME( 0x80, 0x80, "Type Of Payout" )              PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, "Switch" )
 	PORT_DIPSETTING(    0x00, "Auto" )
@@ -5729,18 +5730,18 @@ static INPUT_PORTS_START( jkrmast )
 	PORT_DIPSETTING(    0x03, "85%" )
 	PORT_DIPNAME( 0x04, 0x04, "Ticket Game" )                 PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )    
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "Min Bet To Start" )            PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, "1" )
-	PORT_DIPSETTING(    0x00, "8" )    
+	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPNAME( 0x10, 0x10, "Min Bet For Bonus" )           PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x10, "8" )
-	PORT_DIPSETTING(    0x00, "16" )    
+	PORT_DIPSETTING(    0x00, "16" )
 	PORT_DIPNAME( 0x60, 0x20, "Max Bet" )                     PORT_DIPLOCATION("DSW2:6,7")
 	PORT_DIPSETTING(    0x60, "16" )
 	PORT_DIPSETTING(    0x40, "32" )
 	PORT_DIPSETTING(    0x20, "64" )
-	PORT_DIPSETTING(    0x00, "96" )    
+	PORT_DIPSETTING(    0x00, "96" )
 	PORT_DIPNAME( 0x80, 0x00, "Double Up Game" )              PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -5770,7 +5771,7 @@ static INPUT_PORTS_START( jkrmast )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW4")    
+	PORT_START("DSW4")
 	PORT_DIPNAME( 0x03, 0x00, "Key IN & Ticket OUT Rate" )    PORT_DIPLOCATION("DSW4:1,2")
 	PORT_DIPSETTING(    0x03, "1" )    // OFF-OFF
 	PORT_DIPSETTING(    0x02, "10" )   // OFF-ON
@@ -5800,7 +5801,7 @@ static INPUT_PORTS_START( jkrmastb )
 	PORT_MODIFY("IN1") // COIN
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin C") 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin C")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME("Coin D")
 
 	PORT_MODIFY("DSW2")
@@ -5808,9 +5809,9 @@ static INPUT_PORTS_START( jkrmastb )
 	PORT_DIPSETTING(    0x00, "40%" )
 	PORT_DIPSETTING(    0x01, "50%" )
 	PORT_DIPSETTING(    0x02, "60%" )
-	PORT_DIPSETTING(    0x03, "70%" ) 
+	PORT_DIPSETTING(    0x03, "70%" )
 
-	PORT_MODIFY("DSW4")    
+	PORT_MODIFY("DSW4")
 	PORT_DIPNAME( 0x30, 0x00, "Coin D Rate" )                 PORT_DIPLOCATION("DSW4:5,6")
 	PORT_DIPSETTING(    0x30, "1" )    // OFF-OFF
 	PORT_DIPSETTING(    0x20, "5" )    // OFF-ON
@@ -11053,7 +11054,7 @@ static INPUT_PORTS_START( lucky8tet )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Switch to Lucky 8 Lines")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Tetris Coin In")
 
-	PORT_START("DB_DIP") 
+	PORT_START("DB_DIP")
 	PORT_DIPNAME(0x03, 0x03, "Max Bet")   PORT_DIPLOCATION("DB_DIP:1,2")  // MCU port 3.0-3.1
 	PORT_DIPSETTING(0x00, "8")
 	PORT_DIPSETTING(0x01, "16")
@@ -11715,7 +11716,7 @@ void wingco_state::system_outputc_w(uint8_t data)
 {
 	m_nmi_enable = data & 8;
 	m_vidreg = data & 2;
-//	popmessage("system_outputc_w %02x",data);
+	//popmessage("system_outputc_w %02x",data);
 
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -11763,28 +11764,28 @@ uint8_t wingco_state::tetin3_r()
 
 uint8_t wingco_state::z80_io_r(offs_t offset)
 {
-	if(offset == 0x01)
+	if (offset == 0x01)
 		return  0x00;  // si retorno distinto de cero inhibe el game swap (comprobado) Asigan un input toggle para darle funcionalidad.
 
-	if(offset == 0x02)
+	if (offset == 0x02)
 		return  m_z80_p02;
 
-	if(offset == 0x32)
+	if (offset == 0x32)
 		return  00;
 
-	if(offset == 0xc0)
+	if (offset == 0xc0)
 	{
 		logerror("z80_io_r: offset:%02x\n", offset);
 		return  m_z80_io_c0;
 	}
 
-//	logerror("z80_io_r: offset:%02x\n", offset);  // investigar funcionalidad ports 0x31, 0x32, 0xc0.
+	//logerror("z80_io_r: offset:%02x\n", offset);  // investigar funcionalidad ports 0x31, 0x32, 0xc0.
 	return machine().rand() & 0x0f;
 }
 
 void wingco_state::z80_io_w(offs_t offset, uint8_t data)
 {
-	if(offset == 0xc0)
+	if (offset == 0xc0)
 		m_z80_io_c0 = data;
 	logerror("Z80_io_w(): offset:%02x - data: %02x\n", offset, data);  // investigar funcionalidad port 0xc0
 }
@@ -11803,8 +11804,7 @@ uint8_t wingco_state::tmcu_io_r(offs_t offset)
 void wingco_state::tmcu_p1_out(uint8_t data)
 {
 	m_mcu_p1 = data;
-//	logerror("MCU Port1:%02x\n", tmcu_p1_out);
-
+	//logerror("MCU Port1:%02x\n", tmcu_p1_out);
 }
 
 
@@ -12194,7 +12194,7 @@ void cmaster_state::cmfb55(machine_config &config)
 void cmaster_state::reelmg(machine_config &config)
 {
 	cm(config);
-	
+
 	Z80(config.replace(), m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map);
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::reelm_portmap);
@@ -13322,7 +13322,7 @@ ROM_END
   and need to choose 3 or 4 apps to allow choose the Crazy
   Bonus icon and launch the game.
 
-  TODO: Find the proper colors for the Windows ME nag of stealth mode. 
+  TODO: Find the proper colors for the Windows ME nag of stealth mode.
 
 */
 ROM_START( crazybon )
@@ -13634,7 +13634,7 @@ ROM_END
 /*
   Golden Regular.
   The hopper payout routine is NOP'ed, doing only the final reset when access
-  
+
   All this is intended to pay the credits manually.
 
 */
@@ -16662,7 +16662,7 @@ ROM_END
 
   If you have credits in one game, you can switch to the other
   pressing BIG button.
-  
+
 */
 ROM_START( pkrmast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -24669,39 +24669,39 @@ void cmaster_state::init_crazybonb()
 	// Hack Protection
 	rom[0x0123]=0x20; // change call $b00c to call $5a20  / Protection #1
 	rom[0x0124]=0x5a;
-	
+
 	rom[0x0152]=0x80; // change call $b00F to call $980  / Protection #3
 	rom[0x0153]=0x09;
 
 	rom[0x0197]=0x85; // change call $b012 to call $1485  / Protection #2
 	rom[0x0198]=0x14;
 
-	rom[0x01ff]=0x10; // change call $b015 to call $910  / Protection #5 
+	rom[0x01ff]=0x10; // change call $b015 to call $910  / Protection #5
 	rom[0x0200]=0x09;
-	
+
 	rom[0x022d]=0x86; // change call $b018 to call $b586 / Protection #4
 	rom[0x022e]=0xb5;
-	
-	rom[0x028f]=0x67; // change call $b01b to call $5c67 / Protection #12 
+
+	rom[0x028f]=0x67; // change call $b01b to call $5c67 / Protection #12
 	rom[0x0290]=0x5c;
-	
-	rom[0x02af]=0xc3; // change call $b01e to call $5c67 / Protection #11 
+
+	rom[0x02af]=0xc3; // change call $b01e to call $5c67 / Protection #11
 	rom[0x02b0]=0x55;
-	
+
 	rom[0x04fb]=0x10; // change call $b021 to call $910  / Protection #6
 	rom[0x04fc]=0x09;
-	
-	rom[0x2029]=0xa9; // change call $b000 to call $b5a9 / Protection #9 
+
+	rom[0x2029]=0xa9; // change call $b000 to call $b5a9 / Protection #9
 	rom[0x202a]=0xb5;
-	
-	rom[0x1c20]=0x01; // change call $b006 to call $b601 / Protection #7 
+
+	rom[0x1c20]=0x01; // change call $b006 to call $b601 / Protection #7
 	rom[0x1c21]=0xb6;
-	
-	rom[0x23fd]=0x9f; // change call $b006 to call $b59f / Protection #8 
+
+	rom[0x23fd]=0x9f; // change call $b006 to call $b59f / Protection #8
 	rom[0x23fe]=0xb5;
-	
+
 	rom[0x2527]=0xb2; // change call $b006 to call $b59f / Protection #10
-	rom[0x2528]=0xb5;	
+	rom[0x2528]=0xb5;
 
 }
 
@@ -25097,7 +25097,7 @@ void cb3_state::do_blockswaps(uint8_t *rom)
 
 void cb3_state::dump_to_file(uint8_t *rom)
 {
-	#if 0
+#if 0
 	{
 		FILE *fp;
 		char filename[256];
@@ -25109,7 +25109,7 @@ void cb3_state::dump_to_file(uint8_t *rom)
 			fclose(fp);
 		}
 	}
-	#endif
+#endif
 }
 
 uint8_t cb3_state::cb3_decrypt(uint8_t cipherText, uint16_t address)
@@ -25469,15 +25469,14 @@ void cmaster_state::decrypt_ll3()
 	std::swap_ranges(&rom[0x1800], &rom[0x2000], &rom[0x4800]);
 	std::swap_ranges(&rom[0x2800], &rom[0x3000], &rom[0xa800]);
 	std::swap_ranges(&rom[0x6800], &rom[0x7000], &rom[0x9800]);
-	
 }
 
 void cmaster_state::init_ll3() // verified with ICE dump
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	
+
 	decrypt_ll3();
-	
+
 	rom[0x8a] = 0;
 	rom[0x8b] = 0;
 	rom[0x8c] = 0;
@@ -25486,13 +25485,13 @@ void cmaster_state::init_ll3() // verified with ICE dump
 void cmaster_state::init_ll3b() // verified with ICE dump
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	
+
 	decrypt_ll3();
 
 	rom[0x7e] = 0xcd;
 	rom[0x7f] = 0x87;
 	rom[0x80] = 0x6a;
-	
+
 	rom[0x8a] = 0;
 	rom[0x8b] = 0;
 	rom[0x8c] = 0;
@@ -26201,7 +26200,7 @@ void cmaster_state::init_rp96sub()
 		rom[i] = x;
 	}
 
-//  m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb2>)));
+	//m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb2>)));
 }
 
 
@@ -26277,7 +26276,7 @@ void cb3_state::init_cb3c()
 
 void cb3_state::init_cb3e()
 {
-//  program bitswap
+	// program bitswap
 	uint8_t *rom = memregion("maincpu")->base();
 	do_blockswaps(rom);
 
@@ -26288,14 +26287,14 @@ void cb3_state::init_cb3e()
 		rom[i] = dat;
 	}
 
-//  bank 1 graphics
+	// bank 1 graphics
 	uint8_t *src = memregion("gfx1")->base();
 	for (int i = 0; i < 0x20000; i++)
 	{
 		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);  // OK
 	}
 
-//  bank 2 graphics
+	// bank 2 graphics
 	uint8_t *src2 = memregion("gfx2")->base();
 	for (int i = 0; i < 0x8000; i++)
 	{
@@ -26305,7 +26304,7 @@ void cb3_state::init_cb3e()
 
 void cb3_state::init_cb3f()
 {
-//  program bitswap
+	// program bitswap
 	uint8_t *rom = memregion("maincpu")->base();
 
 	do_blockswaps(rom);
@@ -26438,21 +26437,21 @@ void goldstar_state::init_super9()
 	rom[0x0238] = 0x20;  // jr nz, $0231
 	rom[0x0239] = 0xf7;
 
-	rom[0xea80] = 0x00;  // reels tilemap mask 
+	rom[0xea80] = 0x00;  // reels tilemap mask
 
 }
 
 
 void goldstar_state::init_wcherry()
 {
-//  bank 1 graphics
+	// bank 1 graphics
 	uint8_t *src = memregion("gfx1")->base();
 	for (int i = 0; i < 0x20000; i++)
 	{
 		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);  // OK
 	}
 
-//  bank 2 graphics
+	// bank 2 graphics
 	uint8_t *src2 = memregion("gfx2")->base();
 	for (int i = 0; i < 0x8000; i++)
 	{
@@ -26555,14 +26554,14 @@ void cmaster_state::init_chthree()
 */
 void wingco_state::init_flaming7()
 {
-//  bank 1 graphics
+	// bank 1 graphics
 	uint8_t *src = memregion("gfx1")->base();
 	for (int i = 0; i < 0x20000; i++)
 	{
 		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);  // OK
 	}
 
-//  bank 2 graphics
+	// bank 2 graphics
 	uint8_t *src2 = memregion("gfx2")->base();
 	for (int i = 0; i < 0x8000; i++)
 	{

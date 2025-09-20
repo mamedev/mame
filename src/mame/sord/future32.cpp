@@ -185,7 +185,7 @@ static INPUT_PORTS_START(future32_kbd)
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('^') PORT_CHAR('~') 
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('^') PORT_CHAR('~')
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\')
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_CODE(KEYCODE_DEL)
 	PORT_BIT( 0x8000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -313,7 +313,7 @@ future32a_state::future32a_state(const machine_config &mconfig, device_type type
 	, m_maincpu(*this, "maincpu")
 	, m_crtc(*this, "crtc")
 	, m_agdc(*this, "agdc")
-	, m_dma(*this, "dma")	
+	, m_dma(*this, "dma")
 	, m_scc1(*this, "scc1")
 	, m_scc2(*this, "scc2")
 	, m_ptm(*this, "ptm")
@@ -438,7 +438,7 @@ GFXDECODE_END
 MC6845_UPDATE_ROW(future32a_state::crtc_update_row)
 {
 	const pen_t *palette = m_ramdac->pens();
-	uint32_t *d = &bitmap.pix(y);	
+	uint32_t *d = &bitmap.pix(y);
 	for(u8 x = 0; x != x_count; x++) {
 		u32 data = m_textlayer[(ma+x) & 0x7ff];
 		u16 code = data & 0xffff;
