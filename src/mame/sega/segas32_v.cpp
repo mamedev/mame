@@ -644,9 +644,9 @@ int segas32_state::compute_clipping_extents(screen_device &screen, int enable, i
 void segas32_state::compute_tilemap_flips(int bgnum, int &flipx, int &flipy)
 {
 	// determine flip bits
-	int global_flip    = (system32_videoram[0x1ff00 / 2] >> 9) & 1;
-	int layer_flip     = (system32_videoram[0x1ff00 / 2] >> bgnum) & 1;
-	int prohibit_flipy = (system32_videoram[0x1ff00 / 2] >> 8) & 1;
+	int global_flip    = BIT(system32_videoram[0x1ff00 / 2], 9)
+	int layer_flip     = BIT(system32_videoram[0x1ff00 / 2], bgnum)
+	int prohibit_flipy = BIT(system32_videoram[0x1ff00 / 2], 8)
 
 	*flipx = (layer_flip) ? !global_flip : global_flip;
 
