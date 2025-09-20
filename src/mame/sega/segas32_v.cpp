@@ -648,9 +648,9 @@ void segas32_state::compute_tilemap_flips(int bgnum, int &flipx, int &flipy)
 	int layer_flip     = BIT(m_videoram[0x1ff00 / 2], bgnum);
 	int prohibit_flipy = BIT(m_videoram[0x1ff00 / 2], 8);
 
-	*flipx = (layer_flip) ? !global_flip : global_flip;
+	flipx = (layer_flip) ? !global_flip : global_flip;
 
-	*flipy = (layer_flip && !prohibit_flipy) ? !global_flip : global_flip;
+	flipy = (layer_flip && !prohibit_flipy) ? !global_flip : global_flip;
 }
 
 /*************************************
