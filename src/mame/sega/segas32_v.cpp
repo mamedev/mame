@@ -643,7 +643,7 @@ int segas32_state::compute_clipping_extents(screen_device &screen, int enable, i
 
 void segas32_state::compute_tilemap_flips(int bgnum, int &flipx, int &flipy)
 {
-	/* determine flip bits */
+	// determine flip bits
 	int global_flip    = (system32_videoram[0x1ff00 / 2] >> 9) & 1;
 	int layer_flip     = (system32_videoram[0x1ff00 / 2] >> bgnum) & 1;
 	int prohibit_flipy = (system32_videoram[0x1ff00 / 2] >> 8) & 1;
@@ -701,7 +701,7 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, segas32_state::la
 //if (screen.machine().input().code_pressed(KEYCODE_X) && bgnum == 1) opaque = 1;
 	int flipx, flipy;
 
-	/* determine flipping */
+	// determine flipping
 	compute_tilemap_flips(bgnum, flipx, flipy);
 
 	/* determine the clipping */
@@ -859,7 +859,7 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, segas32_stat
 
 	int flipx, flipy;
 
-	/* determine flipping */
+	// determine flipping
 	compute_tilemap_flips(bgnum, flipx, flipy);
 
 
