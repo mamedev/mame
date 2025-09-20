@@ -541,7 +541,7 @@ TILE_GET_INFO_MEMBER(segas32_state::get_tile_info)
 
 int segas32_state::compute_clipping_extents(screen_device &screen, int enable, int clipout, int clipmask, const rectangle &cliprect, extents_list *list)
 {
-	int flip = (m_videoram[0x1ff00/2] >> 9) & 1;
+	int flip = BIT(m_videoram[0x1ff00 / 2], 9);
 	rectangle tempclip;
 	rectangle clips[5];
 	int sorted[5];
@@ -990,7 +990,7 @@ void segas32_state::update_tilemap_text(screen_device &screen, segas32_state::la
 	bitmap_ind16 &bitmap = layer.bitmap;
 
 	/* determine if we're flipped */
-	int flip = (m_videoram[0x1ff00/2] >> 9) & 1;
+	int flip = BIT(m_videoram[0x1ff00 / 2], 9);
 
 	/* determine the base of the tilemap and graphics data */
 	uint16_t const *const tilebase = &m_videoram[((m_videoram[0x1ff5c/2] >> 4) & 0x1f) * 0x800];
