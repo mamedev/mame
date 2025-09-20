@@ -719,7 +719,7 @@ copyright-holders:m1macrophage
 			<element ref="txt_fx_~i~_c"><bounds x="970" y="~y~" width="60" height="22"/></element>
 		</repeat>
 
-		<repeat count="6">  <!-- Middle column, effects 37-42. TODO NOW: regen more left -->
+		<repeat count="6">  <!-- Middle column, effects 37-42. -->
 			<param name="y" start="1017" increment="36"/>
 			<param name="i" start="37" increment="1"/>
 			<element ref="txt_fx_index_~i~"><bounds x="585" y="~y~" width="34" height="22"/></element>
