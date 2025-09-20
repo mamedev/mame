@@ -8,6 +8,8 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 
 <mamelayout version="2">
 
+<!-- define elements -->
+
 	<element name="ula">
 		<image><data><![CDATA[
 			<svg width="210" height="270">
@@ -17,6 +19,84 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 				/>
 			</svg>
 		]]></data></image>
+	</element>
+
+	<element name="rotary_switch" defstate="0">
+		<!-- button_surrond_border -->
+		<disk>
+			<bounds x="0" y="0" width="37" height="37"/>
+			<color red="0" green="0" blue="0"/>
+		</disk>
+
+		<!-- button_surrond -->
+		<disk>
+			<bounds x="2" y="2" width="33" height="33"/>
+			<color red="0.04" green="0.09" blue="0.1"/>
+		</disk>
+
+		<!-- button_border -->
+		<disk>
+			<bounds x="4" y="4" width="29" height="29"/>
+			<color red="0" green="0.32" blue="0"/>
+		</disk>
+
+		<!-- button -->
+		<disk>
+			<bounds x="6" y="6" width="25" height="25"/>
+			<color red="0" green="0.5" blue="0"/>
+		</disk>
+
+		<!-- arrow -->
+		<image state="0">
+			<bounds x="7" y="10" width="20" height="20"/>
+			<data><![CDATA[
+				<svg width="20" height="20">
+					<path 
+						fill="#b3b3b3" stroke="#808080" stroke-width="1"
+						d="m 5.5,0.5 4,4 -8,8 6,6 8,-8 4,4 v -14 z" />
+				</svg>
+			]]></data>
+		</image>
+		<image state="1">
+			<bounds x="10" y="10" width="20" height="20"/>
+			<data><![CDATA[
+				<svg width="20" height="20">
+					<path 
+						fill="#b3b3b3" stroke="#808080" stroke-width="1"
+						d="m 0.5,14.5 4,-4 8,8 6,-6 -8,-8 4,-4 h -14 z" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<element name="state_lamp" defstate="0">
+		<!-- external border -->
+		<disk>
+			<bounds x="0" y="0" width="36" height="36"/>
+			<color red="0" green="0" blue="0"/>
+		</disk>
+
+		<!-- surround border -->
+		<disk>
+			<bounds x="2" y="2" width="32" height="32"/>
+			<color red="0.04" green="0.09" blue="0.1"/>
+		</disk>
+
+		<!-- internal border -->
+		<disk>
+			<bounds x="7" y="7" width="22" height="22"/>
+			<color red="0.29" green="0.35" blue="0.44"/>
+		</disk>
+
+		<!-- lamp -->
+		<disk state="0">
+			<bounds x="8" y="8" width="20" height="20"/>
+			<color red="0.40" green="0.48" blue="0.61"/>
+		</disk>
+		<disk state="1">
+			<bounds x="8" y="8" width="20" height="20"/>
+			<color red="1" green="1" blue="1"/>
+		</disk>
 	</element>
 
 	<element name="diagram_rect">
@@ -84,14 +164,20 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 	<element name="diagram_05">
 		<image><data><![CDATA[
 			<svg width="186" height="93">
-				<path
-					fill="none" stroke="#000" stroke-width="1"
-					d="
-					m 128,0.5 h -7 l -18,31
-					m -46,-31 h 7 l 18,31"/>
-				<path
-					fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" 
-					d="m 14,91 h -12 v -47 h 182 v 47 h -12"/>
+				<g stroke="#000" fill="none" stroke-width="1">
+					<path d="
+						m 128,0.5 h -7 l -18,31
+						m -46,-31 h 7 l 18,31
+					"/>
+				</g>
+				<g fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+					<path d="
+						m 14,91 h -12 v -47 h 182 v 47 h -12
+					"/>
+				</g>
+				<g fill="#d45500">
+					<rect x="6" y="48" width="174" height="39"/>
+				</g>
 			</svg>
 		]]></data></image>
 	</element>
@@ -126,7 +212,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<image><data><![CDATA[
 			<svg width="22" height="14">
 				<path
-					style="fill:#000"
+					fill="#000"
 					d="m 22,0 v 14 l -22,-7 z"/>
 			</svg>
 		]]></data></image>
@@ -136,7 +222,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<image><data><![CDATA[
 			<svg width="22" height="14">
 				<path
-					style="fill:#000"
+					fill="#000"
 					d="m 0,14 v -14 l 22,7 z"/>
 			</svg>
 		]]></data></image>
@@ -146,11 +232,12 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<image><data><![CDATA[
 			<svg width="14" height="22">
 				<path
-					style="fill:#000"
+					fill="#000"
 					d="m 0,0 h 14 l -7,22 z" />
 			</svg>
 		]]></data></image>
 	</element>
+
 
 	<element name="bit_lamp" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.1" /></disk>
@@ -158,31 +245,63 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 	</element>
 
 	<element name="button" defstate="0">
-		<disk state="1"><color red="0" green="1" blue="0" /></disk>
-		<disk state="0"><color red="0" green="0.5" blue="0" /></disk>
-	</element>
-	<element name="button_border">
-		<disk><color red="0" green="0.32" blue="0" /></disk>
-	</element>
-	<element name="button_surrond">
-		<disk><color red="0.04" green="0.09" blue="0.1" /></disk>
-	</element>
-	<element name="button_surrond_border">
-		<disk><color red="0" green="0" blue="0" /></disk>
+		<!-- button_surrond_border -->
+		<disk>
+			<bounds x="0" y="0" width="42" height="42"/>
+			<color red="0" green="0" blue="0" />
+		</disk>
+
+		<!-- button_surrond -->
+		<disk>
+			<bounds x="2" y="2" width="38" height="38"/>
+			<color red="0.04" green="0.09" blue="0.1"/>
+		</disk>
+
+		<!-- button_border -->
+		<disk>
+			<bounds x="4" y="4" width="34" height="34"/>
+			<color red="0" green="0.32" blue="0" />
+		</disk>
+
+		<!-- button -->
+		<disk state="0">
+			<bounds x="6" y="6" width="30" height="30"/>
+			<color red="0" green="0.5" blue="0" />
+		</disk>
+		<disk state="1">
+			<bounds x="6" y="6" width="30" height="30"/>
+			<color red="0" green="1" blue="0" />
+		</disk>
 	</element>
 
 	<element name="sqr_button" defstate="0">
-		<rect state="1"><color red="1" green="1" blue="1" /></rect>
-		<rect state="0"><color red="1" green="1" blue="1" /></rect>
-	</element>
-	<element name="sqr_button_border">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-	</element>
-	<element name="sqr_button_surrond">
-		<rect><color red="0.3" green="0.3" blue="0.3" /></rect>
-	</element>
-	<element name="sqr_button_surrond_border">
-		<rect><color red="0" green="0" blue="0" /></rect>
+		<!-- button_surrond_border -->
+		<rect>
+			<bounds x="0" y="0" width="56" height="46"/>
+			<color red="0" green="0" blue="0" />
+		</rect>
+
+		<!-- button_surrond -->
+		<rect>
+			<bounds x="4" y="4" width="48" height="38"/>
+			<color red="0.3" green="0.3" blue="0.3" />
+		</rect>
+
+		<!-- button_border -->
+		<rect>
+			<bounds x="8" y="8" width="40" height="30"/>
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+
+		<!-- button -->
+		<rect state="0">
+			<bounds x="12" y="12" width="32" height="22"/>
+			<color red="1" green="1" blue="1" />
+		</rect>
+		<rect state="1">
+			<bounds x="12" y="12" width="30" height="30"/>
+			<color red="1" green="1" blue="1" />
+		</rect>
 	</element>
 
 	<element name="circle">
@@ -287,21 +406,25 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<text string="PREPARAÇÃO"><color red="0" green="0" blue="0" /></text>
 	</element>
 
-	<!-- define background -->
+<!-- define background -->
 
 	<view name="Default layout">
 		<bounds x="0" y="0" width="1280" height="1200" />
 
-		<!-- define lamps -->
-
 		<element ref="panel_background">
 			<bounds x="-33" y="-980" width="1343" height="2218" />
+		</element>
+
+		<!-- define orange rectangles -->
+		<element ref="rect">
+			<bounds x="382" y="944" width="311" height="68" />
 		</element>
 
 		<element ref="rect">
 			<bounds x="158" y="65" width="369" height="73" />
 		</element>
 
+		<!-- define lamps -->
 		<repeat count="12">
 			<param name="lamp_x" start="762" increment="28"/>
 			<param name="lamp_id" start="11" increment="-1"/>
@@ -394,188 +517,6 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 
 		<element ref="str_mem_data">
 			<bounds x="242" y="476" width="216" height="18" />
-		</element>
-
-		<element ref="rect">
-			<bounds x="788" y="672" width="174" height="39" />
-		</element>
-
-		<element ref="rect">
-			<bounds x="1020" y="672" width="174" height="39" />
-		</element>
-
-		<element name="NORMAL" ref="button_surrond_border">
-			<bounds x="93" y="994" width="42" height="42" />
-		</element>
-		<element name="NORMAL" ref="button_surrond">
-			<bounds x="95" y="996" width="38" height="38" />
-		</element>
-		<element name="NORMAL" ref="button_border">
-			<bounds x="97" y="998" width="34" height="34" />
-		</element>
-		<element name="NORMAL" ref="button" inputtag="BUTTONS" inputmask="0x001">
-			<bounds x="99" y="1000" width="30" height="30" />
-		</element>
-
-		<element ref="str_NORMAL">
-			<bounds x="90" y="963" width="60" height="18" />
-		</element>
-
-		<element name="CICLOUNICO" ref="button_surrond_border">
-			<bounds x="200" y="994" width="42" height="42"  />
-		</element>
-		<element name="CICLOUNICO" ref="button_surrond">
-			<bounds x="202" y="996" width="38" height="38" />
-		</element>
-		<element name="CICLOUNICO" ref="button_border">
-			<bounds x="204" y="998" width="34" height="34" />
-		</element>
-		<element name="CICLOUNICO" ref="button" inputtag="BUTTONS" inputmask="0x002">
-			<bounds x="206" y="1000" width="30" height="30" />
-		</element>
-
-		<element ref="str_CICLOUNICO">
-			<bounds x="185" y="963" width="72" height="18" />
-		</element>
-
-		<element name="INSTRUCAOUNICA" ref="button_surrond_border">
-			<bounds x="310" y="994" width="42" height="42"  />
-		</element>
-		<element name="INSTRUCAOUNICA" ref="button_surrond">
-			<bounds x="313" y="996" width="38" height="38" />
-		</element>
-		<element name="INSTRUCAOUNICA" ref="button_border">
-			<bounds x="315" y="998" width="34" height="34" />
-		</element>
-		<element name="INSTRUCAOUNICA" ref="button" inputtag="BUTTONS" inputmask="0x004">
-			<bounds x="317" y="1000" width="30" height="30" />
-		</element>
-
-		<element ref="str_INSTRUCAOUNICA">
-			<bounds x="294" y="961" width="68" height="22" />
-		</element>
-
-		<element ref="rect">
-			<bounds x="382" y="944" width="311" height="68" />
-		</element>
-
-		<element name="ENDERECAMENTO" ref="button_surrond_border">
-			<bounds x="413" y="994" width="42" height="42"  />
-		</element>
-		<element name="ENDERECAMENTO" ref="button_surrond">
-			<bounds x="415" y="996" width="38" height="38" />
-		</element>
-		<element name="ENDERECAMENTO" ref="button_border">
-			<bounds x="417" y="998" width="34" height="34" />
-		</element>
-		<element name="ENDERECAMENTO" ref="button" inputtag="BUTTONS" inputmask="0x008">
-			<bounds x="419" y="1000" width="30" height="30" />
-		</element>
-
-		<element ref="str_ENDERECAMENTO">
-			<bounds x="397" y="963" width="70" height="18" />
-		</element>
-
-		<element name="ARMAZENAMENTO" ref="button_surrond_border">
-			<bounds x="520" y="994" width="42" height="42"  />
-		</element>
-		<element name="ARMAZENAMENTO" ref="button_surrond">
-			<bounds x="522" y="996" width="38" height="38" />
-		</element>
-		<element name="ARMAZENAMENTO" ref="button_border">
-			<bounds x="524" y="998" width="34" height="34" />
-		</element>
-		<element name="ARMAZENAMENTO" ref="button" inputtag="BUTTONS" inputmask="0x010">
-			<bounds x="526" y="1000" width="30" height="30" />
-		</element>
-
-		<element ref="str_ARMAZENAMENTO">
-			<bounds x="501" y="963" width="72" height="18" />
-		</element>
-
-		<element name="EXPOSICAO" ref="button_surrond_border">
-			<bounds x="626" y="994" width="42" height="42"  />
-		</element>
-		<element name="EXPOSICAO" ref="button_surrond">
-			<bounds x="628" y="996" width="38" height="38" />
-		</element>
-		<element name="EXPOSICAO" ref="button_border">
-			<bounds x="630" y="998" width="34" height="34" />
-		</element>
-		<element name="EXPOSICAO" ref="button" inputtag="BUTTONS" inputmask="0x020">
-			<bounds x="632" y="1000" width="30" height="30" />
-		</element>
-
-		<element ref="str_EXPOSICAO">
-			<bounds x="614" y="963" width="68" height="18" />
-		</element>
-
-		<element name="ESPERA" ref="button_surrond_border">
-			<bounds x="915" y="994" width="42" height="42"  />
-		</element>
-		<element name="ESPERA" ref="button_surrond">
-			<bounds x="917" y="996" width="38" height="38" />
-		</element>
-		<element name="ESPERA" ref="button_border">
-			<bounds x="919" y="998" width="34" height="34" />
-		</element>
-		<element name="ESPERA" ref="button" inputtag="BUTTONS" inputmask="0x040">
-			<bounds x="921" y="1000" width="30" height="30" />
-		</element>
-
-		<element ref="str_ESPERA">
-			<bounds x="912" y="963" width="58" height="18" />
-		</element>
-
-		<element name="INTERRUPCAO" ref="button_surrond_border">
-			<bounds x="1022" y="994" width="42" height="42"  />
-		</element>
-		<element name="INTERRUPCAO" ref="button_surrond">
-			<bounds x="1024" y="996" width="38" height="38" />
-		</element>
-		<element name="INTERRUPCAO" ref="button_border">
-			<bounds x="1026" y="998" width="34" height="34" />
-		</element>
-		<element name="INTERRUPCAO" ref="button" inputtag="BUTTONS" inputmask="0x080">
-			<bounds x="1028" y="1000" width="30" height="30" />
-		</element>
-
-		<element ref="str_INTERRUPCAO">
-			<bounds x="1005" y="963" width="74" height="18" />
-		</element>
-
-		<element name="PARTIDA" ref="sqr_button_surrond_border">
-			<bounds x="1120" y="992" width="56" height="46"  />
-		</element>
-		<element name="PARTIDA" ref="sqr_button_surrond">
-			<bounds x="1125" y="996" width="48" height="38" />
-		</element>
-		<element name="PARTIDA" ref="sqr_button_border">
-			<bounds x="1129" y="1000" width="40" height="30" />
-		</element>
-		<element name="PARTIDA" ref="sqr_button" inputtag="BUTTONS" inputmask="0x100">
-			<bounds x="1133" y="1004" width="32" height="22" />
-		</element>
-
-		<element ref="str_PARTIDA">
-			<bounds x="1119" y="962" width="66" height="20" />
-		</element>
-
-		<element name="PREPARACAO" ref="button_surrond_border">
-			<bounds x="1128" y="1092" width="42" height="42"  />
-		</element>
-		<element name="PREPARACAO" ref="button_surrond">
-			<bounds x="1130" y="1094" width="38" height="38" />
-		</element>
-		<element name="PREPARACAO" ref="button_border">
-			<bounds x="1132" y="1096" width="34" height="34" />
-		</element>
-		<element name="PREPARACAO" ref="button" inputtag="BUTTONS" inputmask="0x200">
-			<bounds x="1134" y="1098" width="30" height="30" />
-		</element>
-
-		<element ref="str_PREPARACAO">
-			<bounds x="1114" y="1154" width="68" height="18" />
 		</element>
 
 		<!-- define horizontal lines -->
@@ -854,7 +795,6 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 <!-- End of "TODO: Review this" -->
 
 		<!-- define 'ENTRADA MANUAL DE DADOS' horizontal lines -->
-
 		<repeat count="12">
 			<param name="line1_x" start="123" increment="85"/>
 			<element ref="line">
@@ -1064,6 +1004,77 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="1187" y="1160" width="13" height="1"/>
 		</element>
 
+		<!-- define buttons -->
+		<element name="NORMAL" ref="button" inputtag="BUTTONS" inputmask="0x001">
+			<bounds x="93" y="994" width="42" height="42" />
+		</element>
+		<element ref="str_NORMAL">
+			<bounds x="90" y="963" width="60" height="18" />
+		</element>
+
+		<element name="CICLOUNICO" ref="button" inputtag="BUTTONS" inputmask="0x002">
+			<bounds x="200" y="994" width="42" height="42"  />
+		</element>
+		<element ref="str_CICLOUNICO">
+			<bounds x="185" y="963" width="72" height="18" />
+		</element>
+
+		<element name="INSTRUCAOUNICA" ref="button" inputtag="BUTTONS" inputmask="0x004">
+			<bounds x="310" y="994" width="42" height="42"  />
+		</element>
+		<element ref="str_INSTRUCAOUNICA">
+			<bounds x="294" y="961" width="68" height="22" />
+		</element>
+
+		<element name="ENDERECAMENTO" ref="button" inputtag="BUTTONS" inputmask="0x008">
+			<bounds x="413" y="994" width="42" height="42"  />
+		</element>
+		<element ref="str_ENDERECAMENTO">
+			<bounds x="397" y="963" width="70" height="18" />
+		</element>
+
+		<element name="ARMAZENAMENTO" ref="button" inputtag="BUTTONS" inputmask="0x010">
+			<bounds x="520" y="994" width="42" height="42"  />
+		</element>
+		<element ref="str_ARMAZENAMENTO">
+			<bounds x="501" y="963" width="72" height="18" />
+		</element>
+
+		<element name="EXPOSICAO" ref="button" inputtag="BUTTONS" inputmask="0x020">
+			<bounds x="626" y="994" width="42" height="42"  />
+		</element>
+		<element ref="str_EXPOSICAO">
+			<bounds x="614" y="963" width="68" height="18" />
+		</element>
+
+		<element name="ESPERA" ref="button" inputtag="BUTTONS" inputmask="0x040">
+			<bounds x="915" y="994" width="42" height="42"  />
+		</element>
+		<element ref="str_ESPERA">
+			<bounds x="912" y="963" width="58" height="18" />
+		</element>
+
+		<element name="INTERRUPCAO" ref="button" inputtag="BUTTONS" inputmask="0x080">
+			<bounds x="1022" y="994" width="42" height="42"  />
+		</element>
+		<element ref="str_INTERRUPCAO">
+			<bounds x="1005" y="963" width="74" height="18" />
+		</element>
+
+		<element name="PARTIDA" ref="sqr_button" inputtag="BUTTONS" inputmask="0x100">
+			<bounds x="1120" y="992" width="56" height="46"  />
+		</element>
+		<element ref="str_PARTIDA">
+			<bounds x="1119" y="962" width="66" height="20" />
+		</element>
+
+		<element name="PREPARACAO" ref="button" inputtag="BUTTONS" inputmask="0x200">
+			<bounds x="1128" y="1092" width="42" height="42"  />
+		</element>
+		<element ref="str_PREPARACAO">
+			<bounds x="1114" y="1154" width="68" height="18" />
+		</element>
+
 		<!-- define circles -->
 		<element ref="circle">
 			<bounds x="573" y="74" width="11" height="11" />
@@ -1101,7 +1112,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="573" y="482" width="11" height="11" />
 		</element>
 
-<!-- define panel diagrams -->
+		<!-- define panel diagrams -->
 		<element ref="diagram_rect">
 			<bounds x="123" y="195" width="78" height="70" />
 		</element>
@@ -1158,7 +1169,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="755" y="469" width="338" height="34" />
 		</element>
 
-	<!-- define arrows -->
+		<!-- define arrows -->
 
 		<element ref="down_arrow">
 			<bounds x="63" y="375" width="14" height="22" />
@@ -1217,6 +1228,38 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 
 		<element ref="right_arrow">
 			<bounds x="504" y="430" width="22" height="14" />
+		</element>
+
+		<!-- enderecamento switch -->
+		<element name="ENDERECAMENTO (Fixo/Sequencial)" ref="rotary_switch" inputtag="BUTTONS" inputmask="0x400">
+			<bounds x="856" y="650" width="37" height="37" />
+		</element>
+
+		<!-- memoria switch -->
+		<element name="MEMORIA (Liberada/Protegida)" ref="rotary_switch" inputtag="BUTTONS" inputmask="0x800">
+			<bounds x="1088" y="650" width="37" height="37" />
+		</element>
+
+		<!-- 'FASES DE OPERACAO' lamps -->
+		<repeat count="5">
+			<param name="lamp_x" start="98" increment="89"/>
+			<element ref="state_lamp">
+				<bounds x="~lamp_x~" y="651" width="36" height="36" />
+			</element>
+		</repeat>
+
+		<element ref="state_lamp">
+			<bounds x="579" y="651" width="36" height="36" />
+		</element>
+		<element ref="state_lamp">
+			<bounds x="688" y="651" width="36" height="36" />
+		</element>
+
+		<element ref="state_lamp">
+			<bounds x="187" y="742" width="36" height="36" />
+		</element>
+		<element ref="state_lamp">
+			<bounds x="364" y="742" width="36" height="36" />
 		</element>
 
 	</view>
