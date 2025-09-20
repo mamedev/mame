@@ -338,7 +338,6 @@ void marywu_state::marywu(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-   	config.device_remove("oki");
     
 	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -354,7 +353,6 @@ void marywu_state::marywu(machine_config &config)
 void marywu_state::mary1s(machine_config &config) 
 {
 	marywu(config);
-	config.device_remove("oki");
 	i80c52_device &maincpu(I80C52(config.replace(), "maincpu", XTAL(10'738'635))); // actual cpu is W78E52B-24. xtal jfc 10.7386 mhz
 	maincpu.port_in_cb<1>().set_ioport("P1");
 	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::program_map);
