@@ -283,6 +283,7 @@
 #include "cmv4.lh"
 #include "crazybon.lh"
 #include "goldstar.lh"
+#include "ll3.lh"
 #include "lucky8.lh"
 #include "lucky8p1.lh"
 #include "nfb96.lh"
@@ -27180,13 +27181,13 @@ GAMEL( 1991, skdelux2k,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4
 GAMEL( 1991, skdelux99,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Florida Skill Deluxe 99 (FBV2 ver.T)",        0,                 layout_cmasterb )
 GAMEL( 199?, super7,     cmaster,  super7,   super7,   cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven (ver. 2.3)",                      MACHINE_NOT_WORKING, layout_cmasterb ) // inputs / outputs needs verifying
 GAME ( 199?, wcat3a,     wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
-GAME ( 1993, ll3,        0,        ll3,      ll3,      cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 1)",            0 )  // needs layout
-GAME ( 1993, ll3a,       ll3,      ll3,      ll3a,     cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 2, Macedonia)", 0 )  // needs layout
-GAME ( 1993, ll3b,       ll3,      ll3,      ll3b,     cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 3)",            0 )  // needs layout
-GAME ( 1993, ll3c,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 4)",            0 )  // needs layout
-GAME ( 1993, ll3d,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 5)",            0 )  // needs layout
-GAME ( 1993, ll3e,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 6)",            0 )  // needs layout
-GAME ( 1993, ll3f,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3,       ROT0, "bootleg (LLC)",     "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 7)",            0 )  // needs layout
+GAMEL( 1993, ll3,        0,        ll3,      ll3,      cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 1)",            0,  layout_ll3 )
+GAMEL( 1993, ll3a,       ll3,      ll3,      ll3a,     cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 2, Macedonia)", 0,  layout_ll3 )
+GAMEL( 1993, ll3b,       ll3,      ll3,      ll3b,     cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 3)",            0,  layout_ll3 )
+GAMEL( 1993, ll3c,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 4)",            0,  layout_ll3 )
+GAMEL( 1993, ll3d,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 5)",            0,  layout_ll3 )
+GAMEL( 1993, ll3e,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 6)",            0,  layout_ll3 )
+GAMEL( 1993, ll3f,       ll3,      ll3,      ll3,      cmaster_state,  init_ll3,       ROT0, "bootleg (LLC)",     "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 7)",            0,  layout_ll3 )
 GAMEL( 199?, cmfb55,     cmaster,  cmfb55,   cmv4,     cmaster_state,  init_palnibbles,ROT0, "bootleg",           "Cherry Master (bootleg, Game FB55 Ver.2)",    0,                   layout_cmv4 )
 GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse,  ROT0, "bootleg",           "Hamburger House",                             0,                   layout_cmaster )
 GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           0,                   layout_cmaster )
