@@ -241,6 +241,8 @@ private:
 	uint8_t m_mcu_port6 = 0;
 	uint32_t m_sprbank = 0;
 
+	static constexpr int irq_type[] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
+
 	uint32_t unk1_r();
 	uint8_t network_r(offs_t offset);
 	uint32_t sysreg_r();
@@ -356,7 +358,6 @@ void namcofl_state::sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	else if (offset >= 0x10 && offset <= 0x13)	// clear i960 IRQ line
 	{
 		// data value doesn't seem to matter
-		const int irq_type[4] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
 		m_maincpu->set_input_line(irq_type[offset & 3], CLEAR_LINE);
 	}
 }
@@ -657,7 +658,7 @@ void namcofl_state::machine_reset()
 	std::fill_n(&m_workram[0], m_workram.bytes() / 4, 0);
 	m_mainbank.select(1);
 
-	const int irq_type[] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
+	
 	for (auto irq : irq_type)
 	{
 		m_maincpu->set_input_line(irq, CLEAR_LINE);
