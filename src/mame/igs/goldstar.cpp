@@ -430,6 +430,7 @@ public:
 	void amcoe1a(machine_config &config) ATTR_COLD;
 	void amcoe2(machine_config &config) ATTR_COLD;
 	void animalhs(machine_config &config) ATTR_COLD;
+	void cd3poker(machine_config &config) ATTR_COLD;
 	void chryangl(machine_config &config) ATTR_COLD;
 	void cm(machine_config &config) ATTR_COLD;
 	void cmast91(machine_config &config) ATTR_COLD;
@@ -450,6 +451,8 @@ public:
 	void reelmg(machine_config &config) ATTR_COLD;
 	void super7(machine_config &config) ATTR_COLD;
 
+	void init_3cdp() ATTR_COLD;	
+	void init_3cdpa() ATTR_COLD;
 	void init_alienatt() ATTR_COLD;
 	void init_animalhs() ATTR_COLD;
 	void init_chthree() ATTR_COLD;
@@ -10723,11 +10726,11 @@ static INPUT_PORTS_START( cmtetris )
 	PORT_DIPSETTING(    0x02, "60%" )
 	PORT_DIPSETTING(    0x01, "65%" )
 	PORT_DIPSETTING(    0x00, "70%" )
-	PORT_DIPNAME( 0x18, 0x00, "Hopper Limit" )          PORT_DIPLOCATION("DSW2:!4,!5")  // OK
-	PORT_DIPSETTING(    0x18, "300" )
-	PORT_DIPSETTING(    0x10, "500" )
-	PORT_DIPSETTING(    0x08, "1000" )
-	PORT_DIPSETTING(    0x00, "Unlimited" )
+	PORT_DIPNAME( 0x18, 0x18, "Hopper Limit" )          PORT_DIPLOCATION("DSW2:4,5")  // OK
+	PORT_DIPSETTING(    0x00, "300" )
+	PORT_DIPSETTING(    0x08, "500" )
+	PORT_DIPSETTING(    0x10, "1000" )
+	PORT_DIPSETTING(    0x18, "Unlimited" )
 	PORT_DIPNAME( 0x20, 0x00, "100 Odds Sound" )        PORT_DIPLOCATION("DSW2:!6")  // not checked
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
@@ -12368,6 +12371,13 @@ void cmaster_state::super7(machine_config &config)
 
 	subdevice<ay8910_device>("aysnd")->port_a_read_callback().set_ioport("DSW1");
 	subdevice<ay8910_device>("aysnd")->port_b_read_callback().set_ioport("DSW2");
+}
+
+void cmaster_state::cd3poker(machine_config &config)
+{
+	cm(config);
+
+	NVRAM(config.replace(), "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
 void cmaster_state::cmast91(machine_config &config)
@@ -24816,6 +24826,50 @@ void cmaster_state::init_crazybonb()
 
 }
 
+
+void cmaster_state::init_3cdp()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0x0209] = 0x9b; // ppi0 init
+	rom[0x020d] = 0x9b; // ppi1 init
+	
+	rom[0x0237] = 0x20;
+	rom[0x0238] = 0x34;
+	
+	
+	rom[0x02e1] = 0x00;
+	rom[0x02e2] = 0x00;
+	rom[0x02e3] = 0x00;
+	
+	rom[0x1626] = 0x00;
+	rom[0x1627] = 0x00;
+	rom[0x1628] = 0x00;
+	
+	
+	rom[0xa000] = 0x5a;
+}
+
+void cmaster_state::init_3cdpa()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0x0209] = 0x9b; // ppi0 init
+	rom[0x020d] = 0x9b; // ppi1 init
+	
+	rom[0x02e1] = 0x00;
+	rom[0x02e2] = 0x00;
+	rom[0x02e3] = 0x00;
+	
+	rom[0x1626] = 0x00;
+	rom[0x1627] = 0x00;
+	rom[0x1628] = 0x00;
+	
+	
+	rom[0xa000] = 0x5a;
+}
+
+
 void goldstar_state::init_ladylinrb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -26965,8 +27019,8 @@ GAMEL( 1992, cmv4,       0,        cm,       cmv4,     cmaster_state,  init_cmv4
 GAMEL( 1992, cmv4a,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",                0,                 layout_cmv4 ) // with tetris tiles leftover
 GAMEL( 199?, cmwm,       cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Watermelon bootleg / hack)",   0,                 layout_cmv4 ) // CM Fruit Bonus ver.2 T bootleg/hack
 GAMEL( 1995, cmfun,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Fun USA v2.5 bootleg / hack)", 0,                 layout_cmv4 )
-GAMEL( 1995, 3cdpoker,   0,        cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.6)",                     MACHINE_NOT_WORKING,  layout_cmv4 ) // protected? See ROM definition for routine
-GAMEL( 1995, 3cdpokera,  3cdpoker, cm,       cmtetris, cmaster_state,  empty_init,     ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.0)",                     MACHINE_NOT_WORKING,  layout_cmv4 ) // hopper problem, possibly needs just correct inputs
+GAMEL( 1996, 3cdpoker,   0,        cd3poker, cmv4,     cmaster_state,  init_3cdp,      ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.6)",                     0,                 layout_cmv4 )
+GAMEL( 1996, 3cdpokera,  3cdpoker, cd3poker, cmtetris, cmaster_state,  init_3cdpa,     ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.0)",                     0,                 layout_cmv4 )
 GAMEL( 1991, cmaster,    0,        cm,       cmaster,  cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0,                 layout_cmaster )
 GAMEL( 1991, cmasterb,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",           0,                 layout_cmasterb )
 GAMEL( 1991, cm1codar,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "CODERE Argentina",  "Cherry Master I (ver.1.01, spanish, CODERE, set 1)",  0,         layout_cmasterb )
