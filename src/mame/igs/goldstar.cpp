@@ -4625,25 +4625,25 @@ static INPUT_PORTS_START( cmast91 )
 	PORT_INCLUDE( cmv4_service )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )           PORT_DIPLOCATION("DSW1:1")  // OK
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Hopper Out Switch" )         PORT_DIPLOCATION("DSW1:2")  // OK
+	PORT_DIPNAME( 0x01, 0x01, "Show Stats" )                PORT_DIPLOCATION("DSW1:1")  // OK
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )   // onlys with 0 credits allow to enter on Stats
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Out Switch" )         PORT_DIPLOCATION("DSW1:!2")  // OK
 	PORT_DIPSETTING(    0x02, "Active Low" )
 	PORT_DIPSETTING(    0x00, "Active High" )
-	PORT_DIPNAME( 0x04, 0x00, "Payout Mode" )               PORT_DIPLOCATION("DSW1:3")  // OK
+	PORT_DIPNAME( 0x04, 0x04, "Payout Mode" )               PORT_DIPLOCATION("DSW1:!3")  // OK
 	PORT_DIPSETTING(    0x04, "Payout Switch" )
 	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0x08, 0x00, "'7' In Double Up Game" )     PORT_DIPLOCATION("DSW1:4")  // OK
+	PORT_DIPNAME( 0x08, 0x00, "'7' In Double Up Game" )     PORT_DIPLOCATION("DSW1:!4")  // OK
 	PORT_DIPSETTING(    0x08, "Even" )
 	PORT_DIPSETTING(    0x00, "Loss" )
-	PORT_DIPNAME( 0x10, 0x00, "Double Up Game Pay Rate" )   PORT_DIPLOCATION("DSW1:5")  // OK
+	PORT_DIPNAME( 0x10, 0x00, "Double Up Game Pay Rate" )   PORT_DIPLOCATION("DSW1:!5")  // OK
 	PORT_DIPSETTING(    0x00, "80%" )
 	PORT_DIPSETTING(    0x10, "90%" )
-	PORT_DIPNAME( 0x20, 0x00, "Double Up Game" )            PORT_DIPLOCATION("DSW1:6")  // OK
+	PORT_DIPNAME( 0x20, 0x00, "Double Up Game" )            PORT_DIPLOCATION("DSW1:!6")  // OK
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Bet Max" )                   PORT_DIPLOCATION("DSW1:7,8")  // OK
+	PORT_DIPNAME( 0xc0, 0xc0, "Bet Max" )                   PORT_DIPLOCATION("DSW1:!7,!8")  // OK
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x40, "16" )
 	PORT_DIPSETTING(    0x80, "32" )
@@ -4651,7 +4651,7 @@ static INPUT_PORTS_START( cmast91 )
 
 	PORT_INCLUDE( cmv4_dsw2 )
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x07, 0x00, "Main Game Pay Rate" )    PORT_DIPLOCATION("DSW2:1,2,3")  // OK
+	PORT_DIPNAME( 0x07, 0x00, "Main Game Pay Rate" )    PORT_DIPLOCATION("DSW2:!1,!2,!3")  // OK
 	PORT_DIPSETTING(    0x07, "45%" )
 	PORT_DIPSETTING(    0x06, "50%" )
 	PORT_DIPSETTING(    0x05, "55%" )
@@ -4671,16 +4671,21 @@ static INPUT_PORTS_START( cmast91 )
 
 	PORT_INCLUDE( cmv4_dsw5 )
 	PORT_MODIFY("DSW5")
+	PORT_DIPNAME( 0x01, 0x01, "Girl Face" )     PORT_DIPLOCATION("DSW5:1")
+	PORT_DIPSETTING(    0x01, "Undisplayed" )   // OFF
+	PORT_DIPSETTING(    0x00, "Displayed" )     // ON
 	// Coin In Limit OK
 	// Condition For 3 Kind Of Bonus not checked
-	PORT_DIPNAME( 0x40, 0x40, "Skill Stop" )        PORT_DIPLOCATION("DSW5:7")  // OK
+	PORT_DIPNAME( 0x20, 0x20, "Girl in W-UP" )  PORT_DIPLOCATION("DSW5:6")
+	PORT_DIPSETTING(    0x20, "Undisplayed" )   // OFF
+	PORT_DIPSETTING(    0x00, "Displayed" )     // ON
+	PORT_DIPNAME( 0x40, 0x40, "Skill Stop" )    PORT_DIPLOCATION("DSW5:7")  // OK
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW5:8")  // normally Test Mode For Disp. Of Doll, but no ladies in this set
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )   // TAKE as S1, BET as S2, SMALL as S3, START as ALL Stop
+	PORT_DIPNAME( 0x80, 0x80, "Bet All Stop" )  PORT_DIPLOCATION("DSW5:8")  
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )   // effected only if DSW5:7 is OFF TAKE as S1, BET as S2, SMALL as S3, BET as ALL Stop
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( cmast99 )
 	PORT_START("IN0")  // called "PLAYER" in input test
