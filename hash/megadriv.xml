@@ -25075,6 +25075,28 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
+	<software name="nyukiki">
+		<description>Nyuushi Chokuzen Check Nanmon Kimon Kiki Kaikai (Japan, Sega Channel)</description>
+		<year>1995</year>
+		<publisher>We Net</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Nyuushi_Chokuzen_Check_Nanmon_Kimon_Kiki_Kaikai
+Incompatible with Teradrive TMSS (missing "SEGA" header at $100)
+]]></notes>
+		<info name="alt_title" value="入試直前チェック難問奇問危機解快" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="0x100000">
+				<rom name="nyuushi_chokuzen_check_nanmon_kimon_kiki_kaikai_japan_sega_channel.md" size="0x100000" crc="47aebfcb" sha1="4584c60d02d6f82250f0accd737ea96ec496ca8e"/>
+				<!--
+				<rom value="0x53" size="1" offset="0x100" loadflag="fill" />
+				<rom value="0x45" size="1" offset="0x101" loadflag="fill" />
+				<rom value="0x47" size="1" offset="0x102" loadflag="fill" />
+				<rom value="0x41" size="1" offset="0x103" loadflag="fill" />
+				-->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="oldtower">
 		<description>Old Towers (v1.2)</description>
 		<year>2019</year>
@@ -26428,6 +26450,28 @@ Black screen
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="pitfall - the mayan adventure (usa).bin" size="2097152" crc="f917e34f" sha1="f2067e7d974f03bf922286241119dac7c0ecabff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plamquiz">
+		<description>Planet Message Quiz (Japan, Sega Channel)</description>
+		<year>1995</year>
+		<publisher>We Net</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Planet_Message_Quiz
+Incompatible with Teradrive TMSS (missing "SEGA" header at $100)
+]]></notes>
+		<info name="alt_title" value="プラネットメッセージクイズ" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="0x100000">
+				<rom name="planet_message_quiz_japan_sega_channel.md" size="0x100000" crc="f466eedd" sha1="70788e794dfe38ae2fc3839bcc83f23c0a625776"/>
+				<!--
+				<rom value="0x53" size="1" offset="0x100" loadflag="fill" />
+				<rom value="0x45" size="1" offset="0x101" loadflag="fill" />
+				<rom value="0x47" size="1" offset="0x102" loadflag="fill" />
+				<rom value="0x41" size="1" offset="0x103" loadflag="fill" />
+				-->
 			</dataarea>
 		</part>
 	</software>
@@ -36909,14 +36953,15 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 		</part>
 	</software>
 
-	<software name="whacacri" supported="no">
+	<software name="whacacri" supported="partial">
 		<description>Whac-a-Critter (USA)</description>
 		<year>1993</year>
 		<publisher>Realtec</publisher>
 		<notes><![CDATA[
-Unemulated [Smash Controller] peripheral
+Unemulated optional [Smash Controller] peripheral
 https://segaretro.org/Smash_Controller
 ]]></notes>
+		<info name="usage" value="Use A + direction to mimic Smash Controller with a pad" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_realtec"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
