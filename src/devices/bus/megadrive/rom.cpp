@@ -60,7 +60,6 @@ DEFINE_DEVICE_TYPE(MD_ROM_SQUIR,    md_rom_squir_device,    "md_rom_squir",    "
 DEFINE_DEVICE_TYPE(MD_ROM_TC2000,   md_rom_tc2000_device,   "md_rom_tc2000",   "MD TC2000")
 DEFINE_DEVICE_TYPE(MD_ROM_TEKKENSP, md_rom_tekkensp_device, "md_rom_tekkensp", "MD Tekken Special")
 DEFINE_DEVICE_TYPE(MD_ROM_TOPF,     md_rom_topf_device,     "md_rom_topf",     "MD Top Fighter")
-DEFINE_DEVICE_TYPE(MD_ROM_RADICA,   md_rom_radica_device,   "md_rom_radica",   "MD Radica TV games")
 DEFINE_DEVICE_TYPE(MD_ROM_BEGGARP,  md_rom_beggarp_device,  "md_rom_beggarp",  "MD Beggar Prince")
 DEFINE_DEVICE_TYPE(MD_ROM_WUKONG,   md_rom_wukong_device,   "md_rom_wukong",   "MD Legend of Wukong")
 DEFINE_DEVICE_TYPE(MD_ROM_STARODYS, md_rom_starodys_device, "md_rom_starodys", "MD Star Odyssey")
@@ -244,11 +243,6 @@ md_rom_topf_device::md_rom_topf_device(const machine_config &mconfig, const char
 {
 }
 
-md_rom_radica_device::md_rom_radica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: md_std_rom_device(mconfig, MD_ROM_RADICA, tag, owner, clock), m_bank(0)
-{
-}
-
 md_rom_beggarp_device::md_rom_beggarp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: md_std_rom_device(mconfig, MD_ROM_BEGGARP, tag, owner, clock), m_mode(0), m_lock(0)
 {
@@ -413,16 +407,6 @@ void md_rom_topf_device::device_reset()
 	m_bank[0] = m_bank[1] = m_bank[2] = 0;
 }
 
-void md_rom_radica_device::device_start()
-{
-	save_item(NAME(m_bank));
-}
-
-void md_rom_radica_device::device_reset()
-{
-	m_bank = 0;
-}
-
 void md_rom_beggarp_device::device_start()
 {
 	save_item(NAME(m_mode));
@@ -527,7 +511,7 @@ uint16_t md_rom_fram_device::read(offs_t offset)
 void md_rom_fram_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active)
-			m_nvram[offset - m_nvram_start/2] = data;
+		m_nvram[offset - m_nvram_start/2] = data;
 }
 
 void md_rom_fram_device::write_a13(offs_t offset, uint16_t data)
@@ -1422,22 +1406,6 @@ void md_rom_topf_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 		else
 			logerror("%06x offset %06x, data %04x\n", machine().device<cpu_device>("maincpu")->pc(), offset, data);
 	}
-}
-
-/*-------------------------------------------------
- RADICA TV GAMES [to be split...]
- -------------------------------------------------*/
-
-uint16_t md_rom_radica_device::read(offs_t offset)
-{
-	return m_rom[(((m_bank * 0x10000) + (offset << 1)) & (m_rom_size - 1))/2];
-}
-
-uint16_t md_rom_radica_device::read_a13(offs_t offset)
-{
-	if (offset < 0x80)
-		m_bank = offset & 0x3f;
-	return 0;
 }
 
 /*-------------------------------------------------

@@ -548,27 +548,6 @@ private:
 	uint8_t m_bank[3];
 };
 
-// ======================> md_rom_radica_device
-
-class md_rom_radica_device : public md_std_rom_device
-{
-public:
-	// construction/destruction
-	md_rom_radica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// reading and writing
-	virtual uint16_t read(offs_t offset) override;
-	virtual uint16_t read_a13(offs_t offset) override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
-private:
-	uint8_t m_bank;
-};
-
 // ======================> md_rom_beggarp_device
 
 class md_rom_beggarp_device : public md_std_rom_device
@@ -672,7 +651,6 @@ DECLARE_DEVICE_TYPE(MD_ROM_SRAM_ARG96, md_rom_sram_arg96_device)
 DECLARE_DEVICE_TYPE(MD_ROM_TC2000,   md_rom_tc2000_device)
 DECLARE_DEVICE_TYPE(MD_ROM_TEKKENSP, md_rom_tekkensp_device)
 DECLARE_DEVICE_TYPE(MD_ROM_TOPF,     md_rom_topf_device)
-DECLARE_DEVICE_TYPE(MD_ROM_RADICA,   md_rom_radica_device)
 DECLARE_DEVICE_TYPE(MD_ROM_BEGGARP,  md_rom_beggarp_device)
 DECLARE_DEVICE_TYPE(MD_ROM_WUKONG,   md_rom_wukong_device)
 DECLARE_DEVICE_TYPE(MD_ROM_STARODYS, md_rom_starodys_device)

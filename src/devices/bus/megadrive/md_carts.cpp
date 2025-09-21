@@ -56,7 +56,6 @@ void md_cart(device_slot_interface &device)
 	device.option_add_internal("rom_ggenie",  MD_ROM_GAMEGENIE);
 // unique bankswitch
 	device.option_add_internal("rom_ssf2",  MD_ROM_SSF2);
-	device.option_add_internal("rom_radica",  MD_ROM_RADICA);
 // pirate mappers (protection and/or bankswitch)
 	device.option_add_internal("rom_16mj2",  MD_ROM_16MJ2);
 	device.option_add_internal("rom_bugs",  MD_ROM_BUGSLIFE);

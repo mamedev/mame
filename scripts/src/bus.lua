@@ -3877,6 +3877,38 @@ if (BUSES["MEGADRIVE"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/megadrive/cart/slot.h,BUSES["MEGADRIVE_CART"] = true
+---------------------------------------------------
+
+if (BUSES["MEGADRIVE_CART"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/megadrive/cart/avartisan.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/avartisan.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/gamtec.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/gamtec.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/options.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/options.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/mcpirate.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/mcpirate.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/multigame.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/multigame.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/rom.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/rom.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/seganet.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/seganet.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/smb.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/smb.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/slot.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/slot.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/sram.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/sram.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/xboy.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/xboy.h",
+	}
+end
+
 
 ---------------------------------------------------
 --
