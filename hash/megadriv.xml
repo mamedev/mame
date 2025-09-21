@@ -31444,6 +31444,7 @@ Freezes at the start of any in-game mode
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_jcart"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="super skidmarks (euro) (j-cart).bin" size="2097152" crc="4a9c62f9" sha1="957850ce688dcf9c5966f6712b4804f0a5b7457d"/>
 			</dataarea>
@@ -31455,6 +31456,8 @@ Freezes at the start of any in-game mode
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- TODO: confirm using J-Cart -->
+			<feature name="slot" value="rom_jcart"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="super skidmarks (euro) (beta).bin" size="2097152" crc="a61a0f0c" sha1="1ec5fb1e7c8adfaf147271bd40454826fffed13e"/>
 			</dataarea>
@@ -38281,6 +38284,8 @@ https://bootleggames.fandom.com/wiki/SpongeBob_SquarePants
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Тачки"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- TODO: confirm using J-Cart -->
+			<feature name="slot" value="rom_jcart"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="disney's cars (r).bin" size="2097152" crc="6c5f2530" sha1="654024f969e4b1ee0df4bf88d46f66f5301918ce"/>
 			</dataarea>
