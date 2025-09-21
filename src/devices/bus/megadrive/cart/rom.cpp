@@ -44,7 +44,7 @@ void megadrive_rom_device::device_reset()
 
 void megadrive_rom_device::cart_map(address_map &map)
 {
-	map(0x000000, m_rom_mask).mirror(m_rom_mirror).bankr(m_rom);
+	map(0x00'0000, m_rom_mask).mirror(m_rom_mirror).bankr(m_rom);
 }
 
 /*

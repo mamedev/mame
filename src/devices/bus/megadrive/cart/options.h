@@ -17,9 +17,21 @@ namespace bus::megadrive::slotoptions {
 	extern char const *const MD_TPLAY96;
 	extern char const *const MD_HARDBALL95;
 
+	extern char const *const MD_EEPROM;
+	extern char const *const MD_EEPROM_NBAJAM;
+	extern char const *const MD_EEPROM_NBAJAMTE;
+	extern char const *const MD_EEPROM_NFLQB96;
+	extern char const *const MD_EEPROM_COLLSLAM;
+	extern char const *const MD_EEPROM_NHLPA;
+
 	extern char const *const MD_CM2IN1;
 	extern char const *const MD_TECTOY_SPORTS;
 	extern char const *const MD_GAME_KANZUME;
+
+	extern char const *const MD_JCART_SAMPRAS;
+	extern char const *const MD_JCART_SSKID;
+	extern char const *const MD_JCART_MICROMAC2;
+	extern char const *const MD_JCART_MICROMAC96;
 
 	extern char const *const MC_PIRATE;
 	extern char const *const UNL_XINQIG;
