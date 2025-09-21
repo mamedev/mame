@@ -31,7 +31,7 @@ TODO
 - flip screen support;
 - only a small part of the videoregs are (perhaps) understood;
 - d9flower needs correct EEPROM;
-- d9flower doesn't update palette after boot and doesn't accept controls (IRQ problem?)
+- IRQ handling not 100% correct;
 - device-ify ES-9409 and share with excellent/dblcrown.cpp.
 */
 
@@ -427,7 +427,7 @@ GFXDECODE_END
 
 // bit 0 unused in specd9, d9flower depends on it on memory clear screen
 // bit 1 looks vblank (would hang otherwise)
-// bit 2 unknown (sprite DMA complete? Unset by specd9)
+// bit 2 unknown (sprite DMA complete? Unset by specd9. Used for inputs and palette updates by d9flower)
 TIMER_DEVICE_CALLBACK_MEMBER(es9501_state::scanline_cb)
 {
 	int const scanline = param;
@@ -436,6 +436,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(es9501_state::scanline_cb)
 	{
 		m_maincpu->set_input_line(1, HOLD_LINE);
 		m_irq_source |= 2;
+	}
+
+	if ((scanline >= 0) && (scanline < 240) && BIT(m_irq_mask, 2))
+	{
+		m_maincpu->set_input_line(1, HOLD_LINE);
+		m_irq_source |= 4;
 	}
 
 	if (scanline == 0 && BIT(m_irq_mask, 0))
