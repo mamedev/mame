@@ -2876,7 +2876,7 @@ ROM_END
 ROM_START( gonefsh ) // IGS PCB-0331-02-FG
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "027a.u32", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "027a.u32", 0x0000, 0x4000, CRC(e0096297) SHA1(ce4cf1186d19470fb51314a9c007587ad31102a4) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "gonefishin_v-602us.u23", 0x00000, 0x80000, CRC(f47b673c) SHA1(c3d412209427df9fde76a76c78cfe8267dbceb78) )
@@ -2884,9 +2884,10 @@ ROM_START( gonefsh ) // IGS PCB-0331-02-FG
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD16_WORD_SWAP( "gonefishin_text.u12", 0x000000, 0x080000, CRC(a0ece4b7) SHA1(473369bc3aed6d1971bf67e7632e00972bda208c) )
 
-	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
+	ROM_REGION( 0x480000, "igs017_igs031:sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "gonefishin_cg1_u13.u13", 0x000000, 0x200000, CRC(9e6cea86) SHA1(7b5d13eba5fd90a611293959bddd82a058a8d2c7) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
-	ROM_LOAD( "gonefishin_cg2_u11.u11", 0x200000, 0x080000, CRC(3baeb7e6) SHA1(e8a80c590d504182402294f5455453ad1fc8827b) )
+	// empty. ROM above is a 27C160 (smaller than the other games on same PCB)
+	ROM_LOAD( "gonefishin_cg2_u11.u11", 0x400000, 0x080000, CRC(3baeb7e6) SHA1(e8a80c590d504182402294f5455453ad1fc8827b) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "gonefishin_sp.u28", 0x00000, 0x80000, CRC(e8db1fd1) SHA1(09ef823a2edb3be4bd773f4aec41594359957354) )
@@ -3040,7 +3041,7 @@ ROM_END
 ROM_START( royal5p ) // PCB-0367-08-FG-1
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A type G ARM based MCU
-	ROM_LOAD( "v21_027a.u32", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "v21_027a.u32", 0x0000, 0x4000, CRC(90d44b53) SHA1(c9b57ff1eaa613b6a1caff8fb15d8ddef3e6d04b) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "r5+_v-101us.u23", 0x00000, 0x80000, CRC(99e83ba0) SHA1(f069b23261399e29827d14f1cb03f8bb12e3f50d) ) // 27C4002
@@ -4478,9 +4479,9 @@ void igs_m027_state::init_jhg3d()
 
 void igs_m027_state::init_gonefsh()
 {
-	gonefsh_decrypt(machine());
+	qiji6_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+	m_igs017_igs031->tarzan_decrypt_sprites(0x200000, 0x200000);
 }
 
 } // anonymous namespace
@@ -4516,6 +4517,7 @@ GAMEL( 1999, oceanpar,      0,        oceanpar,     oceanpar105us, igs_m027_stat
 GAMEL( 1999, oceanpar101us, oceanpar, oceanpar,     oceanpar101us, igs_m027_state, init_oceanpar, ROT0, "IGS", "Ocean Paradise (V101US)", 0, layout_oceanpar ) // 1999 copyright in ROM
 GAMEL( 1999, fruitpar,      0,        oceanpar,     oceanpar105us, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214US)", 0, layout_oceanpar )
 GAMEL( 1999, fruitpar206us, fruitpar, oceanpar,     fruitpar206us, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V206US)", 0, layout_oceanpar )
+GAME(  2002, gonefsh,       0,        oceanpar,     oceanpar105us, igs_m027_state, init_gonefsh,  ROT0, "IGS", "Gone Fishing (V602US)", MACHINE_NOT_WORKING ) // input, outputs, Oki bank
 GAME(  2004, cjddz,         0,        cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V219CN)", 0 ) // 2004 date in internal ROM
 GAME(  2004, cjddz217cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V217CN)", 0 ) // 2004 date in internal ROM
 GAME(  2004, cjddz215cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V215CN)", 0 ) // 2004 date in internal ROM
@@ -4524,6 +4526,7 @@ GAME(  2004, cjddzp,        0,        cjddz,        cjddzp,        igs_m027_stat
 GAME(  2005, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_state, init_cjddzlf,  ROT0, "IGS", "Chaoji Dou Dizhu Liang Fu Pai (V109CN)", 0 ) // 2005 date in internal ROM
 GAME(  2005, cjtljp,        0,        xypdk,        lhzb4,         igs_m027_state, init_cjtljp,   ROT0, "IGS", "Chaoji Tuolaji Jiaqiang Ban (V206CN)", 0 ) // 2005 date in internal ROM
 GAME(  2005, xypdk,         0,        xypdk,        lhzb4,         igs_m027_state, init_xypdk,    ROT0, "IGS", "Xingyun Pao De Kuai (V106CN)", 0 )
+GAME(  2005, royal5p,       0,        jking02,      jking02,       igs_m027_state, init_royal5p,  ROT0, "IGS", "Royal 5+ (V101US)", MACHINE_NOT_WORKING ) // inputs, outputs, Oki bank
 GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 GAMEL( 2005, ccly,          crzybugs, ccly,         ccly,          igs_m027_state, init_ccly,     ROT0, "IGS", "Chong Chong Leyuan (V100CN)", MACHINE_NOT_WORKING, layout_ccly )
 GAME(  2001, cjsxp,         0,        cjsxp,        cjsxp,         igs_m027_state, init_klxyj,    ROT0, "IGS", "Huangpai Zuqiu Plus / Chaoji Shuangxing Plus (V103CN)", MACHINE_NOT_WORKING )
@@ -4550,6 +4553,4 @@ GAME(  200?, luckycrs,      0,        m027_1ppi<false>, base,     igs_m027_state
 GAME(  2003, amazoni2,      0,        m027_1ppi<false>, base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
 GAME(  2002, sdwx,          0,        m027_1ppi<false>, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME(  2001, cjdh6th,       0,        m027_1ppi<false>, base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Chaoji Daheng 6th", MACHINE_NOT_WORKING )
-GAME(  2005, royal5p,       0,        m027_1ppi<false>, base,     igs_m027_state, init_royal5p,  ROT0, "IGS", "Royal 5+ (V101US)", MACHINE_NOT_WORKING )
 GAME(  200?, jhg3d,         0,        m027_1ppi<false>, base,     igs_m027_state, init_jhg3d,    ROT0, "IGS", "Jin Huangguan 3-dai (V445CN)", MACHINE_NOT_WORKING )
-GAME(  2002, gonefsh,       0,        m027_1ppi<false>, base,     igs_m027_state, init_gonefsh,  ROT0, "IGS", "Gone Fishing (V602US)", MACHINE_NOT_WORKING )
