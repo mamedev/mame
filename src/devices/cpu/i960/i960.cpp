@@ -4,6 +4,8 @@
 #include "i960.h"
 #include "i960dis.h"
 
+#include <algorithm>
+
 #ifdef _MSC_VER
 /* logb prototype is different for MS Visual C */
 #include <cfloat>
@@ -2318,55 +2320,54 @@ void i960_cpu_device::device_start()
 	save_item(NAME(m_stall_state.burst_mode));
 	save_item(NAME(m_irq_line_state));
 
+	state_add(I960_SAT,  "sat", m_SAT).formatstr("%08X");
+	state_add(I960_PRCB, "prcb", m_PRCB).formatstr("%08X");
+	state_add(I960_PC,   "pc", m_PC).formatstr("%08X");
+	state_add(I960_AC,   "ac", m_AC).formatstr("%08X");
+	state_add(I960_IP,   "ip", m_IP).formatstr("%08X");
+	state_add(I960_PIP,  "pip", m_PIP).formatstr("%08X");
+	state_add(I960_R0,   "pfp", m_r[ 0]).formatstr("%08X");
+	state_add(I960_R1,   "sp", m_r[ 1]).formatstr("%08X");
+	state_add(I960_R2,   "rip", m_r[ 2]).formatstr("%08X");
+	state_add(I960_R3,   "r3", m_r[ 3]).formatstr("%08X");
+	state_add(I960_R4,   "r4", m_r[ 4]).formatstr("%08X");
+	state_add(I960_R5,   "r5", m_r[ 5]).formatstr("%08X");
+	state_add(I960_R6,   "r6", m_r[ 6]).formatstr("%08X");
+	state_add(I960_R7,   "r7", m_r[ 7]).formatstr("%08X");
+	state_add(I960_R8,   "r8", m_r[ 8]).formatstr("%08X");
+	state_add(I960_R9,   "r9", m_r[ 9]).formatstr("%08X");
+	state_add(I960_R10,  "r10", m_r[10]).formatstr("%08X");
+	state_add(I960_R11,  "r11", m_r[11]).formatstr("%08X");
+	state_add(I960_R12,  "r12", m_r[12]).formatstr("%08X");
+	state_add(I960_R13,  "r13", m_r[13]).formatstr("%08X");
+	state_add(I960_R14,  "r14", m_r[14]).formatstr("%08X");
+	state_add(I960_R15,  "r15", m_r[15]).formatstr("%08X");
+	state_add(I960_G0,   "g0", m_r[16]).formatstr("%08X");
+	state_add(I960_G1,   "g1", m_r[17]).formatstr("%08X");
+	state_add(I960_G2,   "g2", m_r[18]).formatstr("%08X");
+	state_add(I960_G3,   "g3", m_r[19]).formatstr("%08X");
+	state_add(I960_G4,   "g4", m_r[20]).formatstr("%08X");
+	state_add(I960_G5,   "g5", m_r[21]).formatstr("%08X");
+	state_add(I960_G6,   "g6", m_r[22]).formatstr("%08X");
+	state_add(I960_G7,   "g7", m_r[23]).formatstr("%08X");
+	state_add(I960_G8,   "g8", m_r[24]).formatstr("%08X");
+	state_add(I960_G9,   "g9", m_r[25]).formatstr("%08X");
+	state_add(I960_G10,  "g10", m_r[26]).formatstr("%08X");
+	state_add(I960_G11,  "g11", m_r[27]).formatstr("%08X");
+	state_add(I960_G12,  "g12", m_r[28]).formatstr("%08X");
+	state_add(I960_G13,  "g13", m_r[29]).formatstr("%08X");
+	state_add(I960_G14,  "g14", m_r[30]).formatstr("%08X");
+	state_add(I960_G15,  "fp", m_r[31]).formatstr("%08X");
 
-	state_add( I960_SAT,  "sat", m_SAT).formatstr("%08X");
-	state_add( I960_PRCB, "prcb", m_PRCB).formatstr("%08X");
-	state_add( I960_PC,   "pc", m_PC).formatstr("%08X");
-	state_add( I960_AC,   "ac", m_AC).formatstr("%08X");
-	state_add( I960_IP,   "ip", m_IP).formatstr("%08X");
-	state_add( I960_PIP,  "pip", m_PIP).formatstr("%08X");
-	state_add( I960_R0,   "pfp", m_r[ 0]).formatstr("%08X");
-	state_add( I960_R1,   "sp", m_r[ 1]).formatstr("%08X");
-	state_add( I960_R2,   "rip", m_r[ 2]).formatstr("%08X");
-	state_add( I960_R3,   "r3", m_r[ 3]).formatstr("%08X");
-	state_add( I960_R4,   "r4", m_r[ 4]).formatstr("%08X");
-	state_add( I960_R5,   "r5", m_r[ 5]).formatstr("%08X");
-	state_add( I960_R6,   "r6", m_r[ 6]).formatstr("%08X");
-	state_add( I960_R7,   "r7", m_r[ 7]).formatstr("%08X");
-	state_add( I960_R8,   "r8", m_r[ 8]).formatstr("%08X");
-	state_add( I960_R9,   "r9", m_r[ 9]).formatstr("%08X");
-	state_add( I960_R10,  "r10", m_r[10]).formatstr("%08X");
-	state_add( I960_R11,  "r11", m_r[11]).formatstr("%08X");
-	state_add( I960_R12,  "r12", m_r[12]).formatstr("%08X");
-	state_add( I960_R13,  "r13", m_r[13]).formatstr("%08X");
-	state_add( I960_R14,  "r14", m_r[14]).formatstr("%08X");
-	state_add( I960_R15,  "r15", m_r[15]).formatstr("%08X");
-	state_add( I960_G0,   "g0", m_r[16]).formatstr("%08X");
-	state_add( I960_G1,   "g1", m_r[17]).formatstr("%08X");
-	state_add( I960_G2,   "g2", m_r[18]).formatstr("%08X");
-	state_add( I960_G3,   "g3", m_r[19]).formatstr("%08X");
-	state_add( I960_G4,   "g4", m_r[20]).formatstr("%08X");
-	state_add( I960_G5,   "g5", m_r[21]).formatstr("%08X");
-	state_add( I960_G6,   "g6", m_r[22]).formatstr("%08X");
-	state_add( I960_G7,   "g7", m_r[23]).formatstr("%08X");
-	state_add( I960_G8,   "g8", m_r[24]).formatstr("%08X");
-	state_add( I960_G9,   "g9", m_r[25]).formatstr("%08X");
-	state_add( I960_G10,  "g10", m_r[26]).formatstr("%08X");
-	state_add( I960_G11,  "g11", m_r[27]).formatstr("%08X");
-	state_add( I960_G12,  "g12", m_r[28]).formatstr("%08X");
-	state_add( I960_G13,  "g13", m_r[29]).formatstr("%08X");
-	state_add( I960_G14,  "g14", m_r[30]).formatstr("%08X");
-	state_add( I960_G15,  "fp", m_r[31]).formatstr("%08X");
-
-	state_add( STATE_GENPC, "GENPC", m_IP).noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_IP).noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_AC).noshow().formatstr("%2s");
+	state_add(STATE_GENPC, "GENPC", m_IP).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_IP).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_AC).noshow().formatstr("%2s");
 
 	m_immediate_vector = 0;
 	m_immediate_pri = 0;
-	memset(m_rcache_frame_addr, 0, sizeof(m_rcache_frame_addr));
-	memset(m_fp, 0, sizeof(m_fp));
-	memset(m_irq_line_state, CLEAR_LINE, sizeof(m_irq_line_state));
+	std::fill(std::begin(m_rcache_frame_addr), std::end(m_rcache_frame_addr), 0);
+	std::fill(std::begin(m_fp), std::end(m_fp), 0.0);
+	std::fill(std::begin(m_irq_line_state), std::end(m_irq_line_state), CLEAR_LINE);
 	m_PIP = 0;
 
 	set_icountptr(m_icount);
