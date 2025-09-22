@@ -2370,9 +2370,7 @@ void cmaster_state::ll3_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom().nopw();
 
-	map(0xc000, 0xc7ff).ram();
-	map(0xc800, 0xcfff).ram().share("nvram");
-	map(0xd000, 0xdfff).ram();
+	map(0xc000, 0xdfff).ram().share("nvram");
 
 	map(0xe000, 0xe7ff).ram().w(FUNC(cmaster_state::fg_vidram_w)).share(m_fg_vidram);
 	map(0xe800, 0xefff).ram().w(FUNC(cmaster_state::fg_atrram_w)).share(m_fg_atrram);
@@ -16285,6 +16283,9 @@ ROM_START( ll3 )  // WANG QL-1  V3.03 string
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x2000, "orig_nvram", 0 )  // Original NVRAM. Just for future analysis
+	ROM_LOAD( "6264_db.bin", 0x0000, 0x2000, CRC(359370a2) SHA1(595a42ba9789beacdffd74149addeb7116efac2d) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "prom1.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
