@@ -2,18 +2,7 @@
 <mamelayout version="2">
 
   <!-- Decoration definitions -->
-  <element name="background">
-    <rect>
-      <color red="0.133" green="0.133" blue="0.133" />
-    </rect>
-  </element>
-  <element name="display_glass">
-    <rect>
-      <color red="0" green="0" blue="0" />
-      <bounds x="10" y="-2" width="92" height="27" />
-    </rect>
-  </element>
-  <element name="up_triangle">
+  <element name="triangle_up">
     <image>
       <data>
         <![CDATA[
@@ -24,7 +13,7 @@
         ]]></data>
     </image>
   </element>
-  <element name="down_triangle">
+  <element name="triangle_down">
     <image>
       <data>
         <![CDATA[
@@ -35,18 +24,27 @@
         ]]></data>
     </image>
   </element>
-  <element name="white_rect">
+  <element name="rect_222222">
     <rect>
-      <color red="1" green="1" blue="1" />
-      <bounds x="0" y="0" width="1" height="1" />
+      <color red="0.133" green="0.133" blue="0.133" />
     </rect>
   </element>
-  <element name="colored_rect">
+  <element name="rect_000000">
+    <rect>
+      <color red="0" green="0" blue="0" />
+    </rect>
+  </element>
+  <element name="rect_299ca3">
     <rect>
       <color red="0.161" green="0.612" blue="0.639" />
-      <bounds x="0" y="0" width="1" height="1" />
     </rect>
   </element>
+  <element name="rect_ffffff">
+    <rect>
+      <color red="1" green="1" blue="1" />
+    </rect>
+  </element>
+
   <!-- VFD -->
   <!-- The VFD elements -->
   <element name="segments" defstate="0">
@@ -101,205 +99,205 @@
   </group>
 
   <!-- Text items -->
-  <element name="text_cart_C">
-    <text string="Cart" align="0" />
+  <element name="text_cart">
+    <text string="Cart" />
   </element>
-  <element name="text_sounds_C">
-    <text string="Sounds" align="0" />
+  <element name="text_sounds">
+    <text string="Sounds" />
   </element>
-  <element name="text_presets_C">
-    <text string="Presets" align="0" />
+  <element name="text_presets">
+    <text string="Presets" />
   </element>
-  <element name="text_0_C">
-    <text string="0" align="0" />
+  <element name="text_0">
+    <text string="0" />
   </element>
-  <element name="text_1_C">
-    <text string="1" align="0" />
+  <element name="text_1">
+    <text string="1" />
   </element>
-  <element name="text_2_C">
-    <text string="2" align="0" />
+  <element name="text_2">
+    <text string="2" />
   </element>
-  <element name="text_3_C">
-    <text string="3" align="0" />
+  <element name="text_3">
+    <text string="3" />
   </element>
-  <element name="text_4_C">
-    <text string="4" align="0" />
+  <element name="text_4">
+    <text string="4" />
   </element>
-  <element name="text_5_C">
-    <text string="5" align="0" />
+  <element name="text_5">
+    <text string="5" />
   </element>
-  <element name="text_6_C">
-    <text string="6" align="0" />
+  <element name="text_6">
+    <text string="6" />
   </element>
-  <element name="text_7_C">
-    <text string="7" align="0" />
+  <element name="text_7">
+    <text string="7" />
   </element>
-  <element name="text_8_C">
-    <text string="8" align="0" />
+  <element name="text_8">
+    <text string="8" />
   </element>
-  <element name="text_9_C">
-    <text string="9" align="0" />
+  <element name="text_9">
+    <text string="9" />
   </element>
-  <element name="text_replace_L">
+  <element name="text_L_replace">
     <text string="Replace" align="1" />
   </element>
-  <element name="text_program_L">
+  <element name="text_L_program">
     <text string="Program" align="1" />
   </element>
-  <element name="text_multi_C">
-    <text string="Multi" align="0" />
-  </element>
-  <element name="text_a_C">
-    <text string="A" align="0" />
-  </element>
-  <element name="text_b_C">
-    <text string="B" align="0" />
-  </element>
-  <element name="text_select_L">
+  <element name="text_L_select">
     <text string="Select" align="1" />
   </element>
-  <element name="text_voice_L">
+  <element name="text_L_voice">
     <text string="Voice" align="1" />
   </element>
-  <element name="text_copy_L">
+  <element name="text_L_copy">
     <text string="Copy" align="1" />
   </element>
-  <element name="text_write_L">
+  <element name="text_L_write">
     <text string="Write" align="1" />
   </element>
-  <element name="text_compare_L">
+  <element name="text_L_compare">
     <text string="Compare" align="1" />
   </element>
-  <element name="text_patch_L">
+  <element name="text_L_patch">
     <text string="Patch" align="1" />
   </element>
-  <element name="text_midi_L">
+  <element name="text_L_midi">
     <text string="MIDI" align="1" />
   </element>
-  <element name="text_effects_L">
+  <element name="text_L_effects">
     <text string="Effects" align="1" />
   </element>
-  <element name="text_key_L">
+  <element name="text_L_key">
     <text string="Key" align="1" />
   </element>
-  <element name="text_zone_L">
+  <element name="text_L_zone">
     <text string="Zone" align="1" />
   </element>
-  <element name="text_trans__L">
+  <element name="text_L_trans_">
     <text string="Trans-" align="1" />
   </element>
-  <element name="text_pose_L">
+  <element name="text_L_pose">
     <text string="pose" align="1" />
   </element>
-  <element name="text_release_L">
+  <element name="text_L_release">
     <text string="Release" align="1" />
   </element>
-  <element name="text_volume_L">
+  <element name="text_L_volume">
     <text string="Volume" align="1" />
   </element>
-  <element name="text_pan_L">
+  <element name="text_L_pan">
     <text string="Pan" align="1" />
   </element>
-  <element name="text_timbre_L">
+  <element name="text_L_timbre">
     <text string="Timbre" align="1" />
   </element>
-  <element name="text_master_L">
-    <text string="Master" align="1" />
-  </element>
-  <element name="text_storage_L">
-    <text string="Storage" align="1" />
-  </element>
-  <element name="text_control_L">
-    <text string="Control" align="1" />
-  </element>
-  <element name="text_wave_L">
+  <element name="text_L_wave">
     <text string="Wave" align="1" />
   </element>
-  <element name="text_mod_L">
+  <element name="text_L_mod">
     <text string="Mod" align="1" />
   </element>
-  <element name="text_mixer_L">
+  <element name="text_L_mixer">
     <text string="Mixer" align="1" />
   </element>
-  <element name="text_pitch_L">
+  <element name="text_L_control">
+    <text string="Control" align="1" />
+  </element>
+  <element name="text_L_pitch">
     <text string="Pitch" align="1" />
   </element>
-  <element name="text_filters_L">
+  <element name="text_L_filters">
     <text string="Filters" align="1" />
   </element>
-  <element name="text_output_L">
+  <element name="text_L_output">
     <text string="Output" align="1" />
   </element>
-  <element name="text_lfo_L">
+  <element name="text_L_lfo">
     <text string="LFO" align="1" />
   </element>
-  <element name="text_env1_L">
+  <element name="text_L_env1">
     <text string="Env1" align="1" />
   </element>
-  <element name="text_env2_L">
+  <element name="text_L_env2">
     <text string="Env2" align="1" />
   </element>
-  <element name="text_env3_L">
+  <element name="text_L_env3">
     <text string="Env3" align="1" />
   </element>
-  <element name="text_data_entry_L">
+  <element name="text_L_data_entry">
     <text string="Data Entry" align="1" />
   </element>
-  <element name="text_performance_L">
+  <element name="text_L_performance">
     <text string="Performance" align="1" />
   </element>
-  <element name="text_system_L">
-    <text string="System" align="1" />
-  </element>
-  <element name="text_programming_L">
+  <element name="text_L_programming">
     <text string="Programming" align="1" />
   </element>
+  <element name="text_multi">
+    <text string="Multi" />
+  </element>
+  <element name="text_a">
+    <text string="A" />
+  </element>
+  <element name="text_b">
+    <text string="B" />
+  </element>
+  <element name="text_L_master">
+    <text string="Master" align="1" />
+  </element>
+  <element name="text_L_storage">
+    <text string="Storage" align="1" />
+  </element>
+  <element name="text_L_system">
+    <text string="System" align="1" />
+  </element>
   <!-- Button shapes -->
-  <element name="button_6_4_light">
+  <element name="button_15_10_light">
     <image state="0">
       <color red="0.733" green="0.733" blue="0.733" />
       <data>
         <![CDATA[
-          <svg width="6" height="4" viewBox="0 0 6 4"><rect x="0.1" y="0.1" width="5.8" height="3.8" rx="0.5" fill="white" /></svg>
+          <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" /></svg>
         ]]></data>
     </image>
     <image state="1">
       <color red="1" green="1" blue="1" />
       <data>
         <![CDATA[
-          <svg width="6" height="4" viewBox="0 0 6 4"><rect x="0.1" y="0.1" width="5.8" height="3.8" rx="0.5" fill="white" /></svg>
+          <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" /></svg>
         ]]></data>
     </image>
   </element>
-  <element name="button_6_4_medium">
+  <element name="button_15_10_medium">
     <image state="0">
       <color red="0.467" green="0.467" blue="0.467" />
       <data>
         <![CDATA[
-          <svg width="6" height="4" viewBox="0 0 6 4"><rect x="0.1" y="0.1" width="5.8" height="3.8" rx="0.5" fill="white" /></svg>
+          <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" /></svg>
         ]]></data>
     </image>
     <image state="1">
       <color red="1" green="1" blue="1" />
       <data>
         <![CDATA[
-          <svg width="6" height="4" viewBox="0 0 6 4"><rect x="0.1" y="0.1" width="5.8" height="3.8" rx="0.5" fill="white" /></svg>
+          <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0.25" y="0.25" width="14.5" height="9.5" rx="1.25" fill="white" /></svg>
         ]]></data>
     </image>
   </element>
-  <element name="button_6_2_dark">
+  <element name="button_15_5_dark">
     <image state="0">
       <color red="0.2" green="0.2" blue="0.2" />
       <data>
         <![CDATA[
-          <svg width="6" height="2" viewBox="0 0 6 2"><rect x="0.1" y="0.1" width="5.8" height="1.8" rx="0.5" fill="white" /></svg>
+          <svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" /></svg>
         ]]></data>
     </image>
     <image state="1">
       <color red="1" green="1" blue="1" />
       <data>
         <![CDATA[
-          <svg width="6" height="2" viewBox="0 0 6 2"><rect x="0.1" y="0.1" width="5.8" height="1.8" rx="0.5" fill="white" /></svg>
+          <svg width="15" height="5" viewBox="0 0 15 5"><rect x="0.25" y="0.25" width="14.5" height="4.5" rx="1.25" fill="white" /></svg>
         ]]></data>
     </image>
   </element>
@@ -409,6 +407,14 @@
       <color red="0.133" green="1" blue="0.133" />
     </rect>
   </element>
+  <element name="light_5">
+    <rect state="0" statemask="0x0020">
+      <color red="0.0667" green="0.133" blue="0.0667" />
+    </rect>
+    <rect state="0x0020" statemask="0x0020">
+      <color red="0.133" green="1" blue="0.133" />
+    </rect>
+  </element>
   <element name="light_0">
     <rect state="0" statemask="0x0001">
       <color red="0.0667" green="0.133" blue="0.0667" />
@@ -422,14 +428,6 @@
       <color red="0.0667" green="0.133" blue="0.0667" />
     </rect>
     <rect state="0x0100" statemask="0x0100">
-      <color red="0.133" green="1" blue="0.133" />
-    </rect>
-  </element>
-  <element name="light_5">
-    <rect state="0" statemask="0x0020">
-      <color red="0.0667" green="0.133" blue="0.0667" />
-    </rect>
-    <rect state="0x0020" statemask="0x0020">
       <color red="0.133" green="1" blue="0.133" />
     </rect>
   </element>
@@ -477,7 +475,7 @@
       <bounds x="0" y="0" width="8" height="24" />
     </element>
     <element ref="invisible_rect" id="slider_~slider_id~">
-      <bounds x="0.75" y="0.75" width="6.5" height="18.5" />
+      <bounds x="0.75" y="0.75" width="6.5" height="22.5" />
     </element>
     <element ref="slider_knob" id="slider_knob_~slider_id~">
       <animate inputtag="~port_name~" inputmask="0x7f" />
@@ -488,430 +486,430 @@
 
   <!-- Panel Group -->
   <group name="panel">
-    <element ref="background">
-      <bounds x="-38" y="-4" width="218" height="43.5" />
+    <element ref="rect_222222">
+      <bounds x="-95" y="-10" width="545" height="108" />
     </element>
-    <element ref="display_glass">
-      <bounds x="10" y="-2" width="92" height="27" />
+    <element ref="rect_000000">
+      <bounds x="25" y="-5" width="230" height="67.5" />
     </element>
-    <element ref="white_rect">
-      <bounds x="114" y="26.25" width="4" height="0.1" />
+    <element ref="triangle_down">
+      <bounds x="-37.5" y="50" width="5" height="2.5" />
     </element>
-    <element ref="white_rect">
-      <bounds x="122" y="26.25" width="4" height="0.1" />
+    <element ref="triangle_up">
+      <bounds x="-37.5" y="25" width="5" height="2.5" />
     </element>
-    <element ref="up_triangle">
-      <bounds x="-15" y="10" width="2" height="1" />
+    <element ref="rect_299ca3">
+      <bounds x="-90" y="92.5" width="415" height="0.5" />
     </element>
-    <element ref="down_triangle">
-      <bounds x="-15" y="20" width="2" height="1" />
+    <element ref="rect_299ca3">
+      <bounds x="270" y="92.5" width="55" height="0.5" />
     </element>
-    <element ref="colored_rect">
-      <bounds x="-36" y="37" width="166" height="0.5" />
+    <element ref="rect_299ca3">
+      <bounds x="327.5" y="92.5" width="55" height="0.5" />
     </element>
-    <element ref="colored_rect">
-      <bounds x="108" y="37" width="22" height="0.5" />
+    <element ref="rect_299ca3">
+      <bounds x="385" y="92.5" width="60" height="0.5" />
     </element>
-    <element ref="colored_rect">
-      <bounds x="131" y="37" width="22" height="0.5" />
+    <element ref="rect_ffffff">
+      <bounds x="285" y="66" width="10" height="0.1" />
     </element>
-    <element ref="colored_rect">
-      <bounds x="154" y="37" width="24" height="0.5" />
+    <element ref="rect_ffffff">
+      <bounds x="122" y="66" width="10" height="0.1" />
     </element>
     <group ref="vfd">
-      <bounds x="15" y="9.0713" width="82" height="6.8573" />
+      <bounds x="37.5" y="22.678" width="205" height="17.143" />
 
     </group>
-    <element ref="text_cart_C">
-      <bounds x="10" y="35" width="6" height="1.8" />
+    <element ref="text_cart">
+      <bounds x="25" y="87.5" width="15" height="4.3" />
     </element>
-    <element ref="text_sounds_C">
-      <bounds x="16" y="35" width="6" height="1.8" />
+    <element ref="text_sounds">
+      <bounds x="40" y="87.5" width="15" height="4.3" />
     </element>
-    <element ref="text_presets_C">
-      <bounds x="22" y="35" width="6" height="1.8" />
+    <element ref="text_presets">
+      <bounds x="55" y="87.5" width="15" height="4.3" />
     </element>
-    <element ref="text_0_C">
-      <bounds x="42" y="35" width="6" height="1.8" />
+    <element ref="text_0">
+      <bounds x="105" y="87.5" width="15" height="4.3" />
     </element>
-    <element ref="text_1_C">
-      <bounds x="48" y="35" width="6" height="1.8" />
+    <element ref="text_1">
+      <bounds x="120" y="87.5" width="15" height="4.3" />
     </element>
-    <element ref="text_2_C">
-      <bounds x="54" y="35" width="6" height="1.8" />
+    <element ref="text_2">
+      <bounds x="135" y="87.5" width="15" height="4.3" />
     </element>
-    <element ref="text_3_C">
-      <bounds x="60" y="35" width="6" height="1.8" />
+    <element ref="text_3">
+      <bounds x="150" y="87.5" width="15" height="4.3" />
     </element>
-    <element ref="text_4_C">
-      <bounds x="66" y="35" width="6" height="1.8" />
+    <element ref="text_4">
+      <bounds x="165" y="87.5" width="15" height="4.3" />
     </element>
-    <element ref="text_5_C">
-      <bounds x="72" y="35" width="6" height="1.8" />
+    <element ref="text_5">
+      <bounds x="180" y="87.5" width="15" height="4.3" />
     </element>
-    <element ref="text_6_C">
-      <bounds x="78" y="35" width="6" height="1.8" />
+    <element ref="text_6">
+      <bounds x="195" y="87.5" width="15" height="4.3" />
     </element>
-    <element ref="text_7_C">
-      <bounds x="84" y="35" width="6" height="1.8" />
+    <element ref="text_7">
+      <bounds x="210" y="87.5" width="15" height="4.3" />
     </element>
-    <element ref="text_8_C">
-      <bounds x="90" y="35" width="6" height="1.8" />
+    <element ref="text_8">
+      <bounds x="225" y="87.5" width="15" height="4.3" />
     </element>
-    <element ref="text_9_C">
-      <bounds x="96" y="35" width="6" height="1.8" />
+    <element ref="text_9">
+      <bounds x="240" y="87.5" width="15" height="4.3" />
     </element>
-    <element ref="text_replace_L">
-      <bounds x="108" y="25.4" width="6" height="1.8" />
+    <element ref="text_L_replace">
+      <bounds x="270" y="63.9" width="15" height="4.3" />
     </element>
-    <element ref="text_program_L">
-      <bounds x="108" y="27.2" width="6" height="1.8" />
+    <element ref="text_L_program">
+      <bounds x="270" y="68.2" width="15" height="4.3" />
     </element>
-    <element ref="text_multi_C">
-      <bounds x="118" y="25.4" width="4" height="1.8" />
+    <element ref="text_L_select">
+      <bounds x="385" y="63.9" width="15" height="4.3" />
     </element>
-    <element ref="text_a_C">
-      <bounds x="114" y="27.2" width="6" height="1.8" />
+    <element ref="text_L_voice">
+      <bounds x="385" y="68.2" width="15" height="4.3" />
     </element>
-    <element ref="text_b_C">
-      <bounds x="120" y="27.2" width="6" height="1.8" />
+    <element ref="text_L_copy">
+      <bounds x="400" y="68.2" width="15" height="4.3" />
     </element>
-    <element ref="text_select_L">
-      <bounds x="154" y="25.4" width="6" height="1.8" />
+    <element ref="text_L_write">
+      <bounds x="415" y="68.2" width="15" height="4.3" />
     </element>
-    <element ref="text_voice_L">
-      <bounds x="154" y="27.2" width="6" height="1.8" />
+    <element ref="text_L_compare">
+      <bounds x="430" y="68.2" width="15" height="4.3" />
     </element>
-    <element ref="text_copy_L">
-      <bounds x="160" y="27.2" width="6" height="1.8" />
+    <element ref="text_L_patch">
+      <bounds x="270" y="41.4" width="15" height="4.3" />
     </element>
-    <element ref="text_write_L">
-      <bounds x="166" y="27.2" width="6" height="1.8" />
+    <element ref="text_L_select">
+      <bounds x="270" y="45.7" width="15" height="4.3" />
     </element>
-    <element ref="text_compare_L">
-      <bounds x="172" y="27.2" width="6" height="1.8" />
+    <element ref="text_L_midi">
+      <bounds x="285" y="45.7" width="15" height="4.3" />
     </element>
-    <element ref="text_patch_L">
-      <bounds x="108" y="16.4" width="6" height="1.8" />
+    <element ref="text_L_effects">
+      <bounds x="300" y="45.7" width="15" height="4.3" />
     </element>
-    <element ref="text_select_L">
-      <bounds x="108" y="18.2" width="6" height="1.8" />
+    <element ref="text_L_key">
+      <bounds x="270" y="23.9" width="15" height="4.3" />
     </element>
-    <element ref="text_midi_L">
-      <bounds x="114" y="18.2" width="6" height="1.8" />
+    <element ref="text_L_zone">
+      <bounds x="270" y="28.2" width="15" height="4.3" />
     </element>
-    <element ref="text_effects_L">
-      <bounds x="120" y="18.2" width="6" height="1.8" />
+    <element ref="text_L_trans_">
+      <bounds x="285" y="23.9" width="15" height="4.3" />
     </element>
-    <element ref="text_key_L">
-      <bounds x="108" y="9.4" width="6" height="1.8" />
+    <element ref="text_L_pose">
+      <bounds x="285" y="28.2" width="15" height="4.3" />
     </element>
-    <element ref="text_zone_L">
-      <bounds x="108" y="11.2" width="6" height="1.8" />
+    <element ref="text_L_release">
+      <bounds x="300" y="28.2" width="15" height="4.3" />
     </element>
-    <element ref="text_trans__L">
-      <bounds x="114" y="9.4" width="6" height="1.8" />
+    <element ref="text_L_volume">
+      <bounds x="270" y="10.7" width="15" height="4.3" />
     </element>
-    <element ref="text_pose_L">
-      <bounds x="114" y="11.2" width="6" height="1.8" />
+    <element ref="text_L_pan">
+      <bounds x="285" y="10.7" width="15" height="4.3" />
     </element>
-    <element ref="text_release_L">
-      <bounds x="120" y="11.2" width="6" height="1.8" />
+    <element ref="text_L_timbre">
+      <bounds x="300" y="10.7" width="15" height="4.3" />
     </element>
-    <element ref="text_volume_L">
-      <bounds x="108" y="4.2" width="6" height="1.8" />
+    <element ref="text_L_wave">
+      <bounds x="385" y="45.7" width="15" height="4.3" />
     </element>
-    <element ref="text_pan_L">
-      <bounds x="114" y="4.2" width="6" height="1.8" />
+    <element ref="text_L_mod">
+      <bounds x="400" y="41.4" width="15" height="4.3" />
     </element>
-    <element ref="text_timbre_L">
-      <bounds x="120" y="4.2" width="6" height="1.8" />
+    <element ref="text_L_mixer">
+      <bounds x="400" y="45.7" width="15" height="4.3" />
     </element>
-    <element ref="text_master_L">
-      <bounds x="131" y="27.2" width="6" height="1.8" />
+    <element ref="text_L_program">
+      <bounds x="415" y="41.4" width="15" height="4.3" />
     </element>
-    <element ref="text_storage_L">
-      <bounds x="137" y="27.2" width="6" height="1.8" />
+    <element ref="text_L_control">
+      <bounds x="415" y="45.7" width="15" height="4.3" />
     </element>
-    <element ref="text_midi_L">
-      <bounds x="143" y="25.4" width="6" height="1.8" />
+    <element ref="text_L_effects">
+      <bounds x="430" y="45.7" width="15" height="4.3" />
     </element>
-    <element ref="text_control_L">
-      <bounds x="143" y="27.2" width="6" height="1.8" />
+    <element ref="text_L_pitch">
+      <bounds x="385" y="28.2" width="15" height="4.3" />
     </element>
-    <element ref="text_wave_L">
-      <bounds x="154" y="18.2" width="6" height="1.8" />
+    <element ref="text_L_pitch">
+      <bounds x="400" y="23.9" width="15" height="4.3" />
     </element>
-    <element ref="text_mod_L">
-      <bounds x="160" y="16.4" width="6" height="1.8" />
+    <element ref="text_L_mod">
+      <bounds x="400" y="28.2" width="15" height="4.3" />
     </element>
-    <element ref="text_mixer_L">
-      <bounds x="160" y="18.2" width="6" height="1.8" />
+    <element ref="text_L_filters">
+      <bounds x="415" y="28.2" width="15" height="4.3" />
     </element>
-    <element ref="text_program_L">
-      <bounds x="166" y="16.4" width="6" height="1.8" />
+    <element ref="text_L_output">
+      <bounds x="430" y="28.2" width="15" height="4.3" />
     </element>
-    <element ref="text_control_L">
-      <bounds x="166" y="18.2" width="6" height="1.8" />
+    <element ref="text_L_lfo">
+      <bounds x="385" y="10.7" width="15" height="4.3" />
     </element>
-    <element ref="text_effects_L">
-      <bounds x="172" y="18.2" width="6" height="1.8" />
+    <element ref="text_L_env1">
+      <bounds x="400" y="10.7" width="15" height="4.3" />
     </element>
-    <element ref="text_pitch_L">
-      <bounds x="154" y="11.2" width="6" height="1.8" />
+    <element ref="text_L_env2">
+      <bounds x="415" y="10.7" width="15" height="4.3" />
     </element>
-    <element ref="text_pitch_L">
-      <bounds x="160" y="9.4" width="6" height="1.8" />
+    <element ref="text_L_env3">
+      <bounds x="430" y="10.7" width="15" height="4.3" />
     </element>
-    <element ref="text_mod_L">
-      <bounds x="160" y="11.2" width="6" height="1.8" />
+    <element ref="text_L_volume">
+      <bounds x="-90" y="87.5" width="35" height="4.3" />
     </element>
-    <element ref="text_filters_L">
-      <bounds x="166" y="11.2" width="6" height="1.8" />
+    <element ref="text_L_data_entry">
+      <bounds x="-42.5" y="87.5" width="35" height="4.3" />
     </element>
-    <element ref="text_output_L">
-      <bounds x="172" y="11.2" width="6" height="1.8" />
+    <element ref="text_L_performance">
+      <bounds x="270" y="87.5" width="35" height="4.3" />
     </element>
-    <element ref="text_lfo_L">
-      <bounds x="154" y="4.2" width="6" height="1.8" />
+    <element ref="text_L_programming">
+      <bounds x="385" y="87.5" width="35" height="4.3" />
     </element>
-    <element ref="text_env1_L">
-      <bounds x="160" y="4.2" width="6" height="1.8" />
+    <element ref="text_multi">
+      <bounds x="118" y="63.9" width="10" height="4.3" />
     </element>
-    <element ref="text_env2_L">
-      <bounds x="166" y="4.2" width="6" height="1.8" />
+    <element ref="text_a">
+      <bounds x="285" y="68.2" width="15" height="4.3" />
     </element>
-    <element ref="text_env3_L">
-      <bounds x="172" y="4.2" width="6" height="1.8" />
+    <element ref="text_b">
+      <bounds x="300" y="68.2" width="15" height="4.3" />
     </element>
-    <element ref="text_volume_L">
-      <bounds x="-36" y="35" width="10" height="1.8" />
+    <element ref="text_L_master">
+      <bounds x="327.5" y="68.2" width="15" height="4.3" />
     </element>
-    <element ref="text_data_entry_L">
-      <bounds x="-17" y="35" width="10" height="1.8" />
+    <element ref="text_L_storage">
+      <bounds x="342.5" y="68.2" width="15" height="4.3" />
     </element>
-    <element ref="text_performance_L">
-      <bounds x="108" y="35" width="10" height="1.8" />
+    <element ref="text_L_midi">
+      <bounds x="357.5" y="63.9" width="15" height="4.3" />
     </element>
-    <element ref="text_system_L">
-      <bounds x="131" y="35" width="10" height="1.8" />
+    <element ref="text_L_control">
+      <bounds x="357.5" y="68.2" width="15" height="4.3" />
     </element>
-    <element ref="text_programming_L">
-      <bounds x="154" y="35" width="10" height="1.8" />
+    <element ref="text_L_system">
+      <bounds x="327.5" y="87.5" width="35" height="4.3" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00100000" ref="button_6_4_light" id="button_52__cartbankset">
-      <bounds x="10" y="29" width="6" height="4" />
+    <element inputtag="buttons_32" inputmask="0x00100000" ref="button_15_10_light" id="button_52__cartbankset">
+      <bounds x="25" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00200000" ref="button_6_4_light" id="button_53__sounds">
-      <bounds x="16" y="29" width="6" height="4" />
+    <element inputtag="buttons_32" inputmask="0x00200000" ref="button_15_10_light" id="button_53__sounds">
+      <bounds x="40" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00400000" ref="button_6_4_light" id="button_54__presets">
-      <bounds x="22" y="29" width="6" height="4" />
+    <element inputtag="buttons_32" inputmask="0x00400000" ref="button_15_10_light" id="button_54__presets">
+      <bounds x="55" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00800000" ref="button_6_4_medium" id="button_55__0">
-      <bounds x="42" y="29" width="6" height="4" />
+    <element inputtag="buttons_32" inputmask="0x00800000" ref="button_15_10_medium" id="button_55__0">
+      <bounds x="105" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x01000000" ref="button_6_4_medium" id="button_56__1">
-      <bounds x="48" y="29" width="6" height="4" />
+    <element inputtag="buttons_32" inputmask="0x01000000" ref="button_15_10_medium" id="button_56__1">
+      <bounds x="120" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x02000000" ref="button_6_4_medium" id="button_57__2">
-      <bounds x="54" y="29" width="6" height="4" />
+    <element inputtag="buttons_32" inputmask="0x02000000" ref="button_15_10_medium" id="button_57__2">
+      <bounds x="135" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00004000" ref="button_6_4_medium" id="button_46__3">
-      <bounds x="60" y="29" width="6" height="4" />
+    <element inputtag="buttons_32" inputmask="0x00004000" ref="button_15_10_medium" id="button_46__3">
+      <bounds x="150" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00008000" ref="button_6_4_medium" id="button_47__4">
-      <bounds x="66" y="29" width="6" height="4" />
+    <element inputtag="buttons_32" inputmask="0x00008000" ref="button_15_10_medium" id="button_47__4">
+      <bounds x="165" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00010000" ref="button_6_4_medium" id="button_48__5">
-      <bounds x="72" y="29" width="6" height="4" />
+    <element inputtag="buttons_32" inputmask="0x00010000" ref="button_15_10_medium" id="button_48__5">
+      <bounds x="180" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00020000" ref="button_6_4_medium" id="button_49__6">
-      <bounds x="78" y="29" width="6" height="4" />
+    <element inputtag="buttons_32" inputmask="0x00020000" ref="button_15_10_medium" id="button_49__6">
+      <bounds x="195" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00000008" ref="button_6_4_medium" id="button_35__7">
-      <bounds x="84" y="29" width="6" height="4" />
+    <element inputtag="buttons_32" inputmask="0x00000008" ref="button_15_10_medium" id="button_35__7">
+      <bounds x="210" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00000004" ref="button_6_4_medium" id="button_34__8">
-      <bounds x="90" y="29" width="6" height="4" />
+    <element inputtag="buttons_32" inputmask="0x00000004" ref="button_15_10_medium" id="button_34__8">
+      <bounds x="225" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x02000000" ref="button_6_4_medium" id="button_25__9">
-      <bounds x="96" y="29" width="6" height="4" />
+    <element inputtag="buttons_0" inputmask="0x02000000" ref="button_15_10_medium" id="button_25__9">
+      <bounds x="240" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x20000000" ref="button_6_4_medium" id="button_29_replace_program">
-      <bounds x="108" y="29" width="6" height="4" />
+    <element inputtag="buttons_0" inputmask="0x20000000" ref="button_15_10_medium" id="button_29_replace_program">
+      <bounds x="270" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x40000000" ref="button_6_4_medium" id="button_30_a">
-      <bounds x="114" y="29" width="6" height="4" />
+    <element inputtag="buttons_0" inputmask="0x00000020" ref="button_15_10_medium" id="button_5_select_voice">
+      <bounds x="385" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x80000000" ref="button_6_4_medium" id="button_31_b">
-      <bounds x="120" y="29" width="6" height="4" />
+    <element inputtag="buttons_0" inputmask="0x00000200" ref="button_15_10_medium" id="button_9_copy">
+      <bounds x="400" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00000020" ref="button_6_4_medium" id="button_5_select_voice">
-      <bounds x="154" y="29" width="6" height="4" />
+    <element inputtag="buttons_0" inputmask="0x00000008" ref="button_15_10_medium" id="button_3_write">
+      <bounds x="415" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00000200" ref="button_6_4_medium" id="button_9_copy">
-      <bounds x="160" y="29" width="6" height="4" />
+    <element inputtag="buttons_0" inputmask="0x00000100" ref="button_15_10_medium" id="button_8_compare">
+      <bounds x="430" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00000008" ref="button_6_4_medium" id="button_3_write">
-      <bounds x="166" y="29" width="6" height="4" />
+    <element inputtag="buttons_0" inputmask="0x04000000" ref="button_15_5_dark" id="button_26_patch_select">
+      <bounds x="270" y="50" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00000100" ref="button_6_4_medium" id="button_8_compare">
-      <bounds x="172" y="29" width="6" height="4" />
+    <element inputtag="buttons_0" inputmask="0x08000000" ref="button_15_5_dark" id="button_27_midi">
+      <bounds x="285" y="50" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x04000000" ref="button_6_2_dark" id="button_26_patch_select">
-      <bounds x="108" y="20" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x10000000" ref="button_15_5_dark" id="button_28_effects">
+      <bounds x="300" y="50" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x08000000" ref="button_6_2_dark" id="button_27_midi">
-      <bounds x="114" y="20" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x00000080" ref="button_15_5_dark" id="button_39_key_zone">
+      <bounds x="270" y="32.5" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x10000000" ref="button_6_2_dark" id="button_28_effects">
-      <bounds x="120" y="20" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x00000100" ref="button_15_5_dark" id="button_40_transpose">
+      <bounds x="285" y="32.5" width="15" height="5" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00000080" ref="button_6_2_dark" id="button_39_key_zone">
-      <bounds x="108" y="13" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x00000200" ref="button_15_5_dark" id="button_41_release">
+      <bounds x="300" y="32.5" width="15" height="5" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00000100" ref="button_6_2_dark" id="button_40_transpose">
-      <bounds x="114" y="13" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x00000010" ref="button_15_5_dark" id="button_36_volume">
+      <bounds x="270" y="15" width="15" height="5" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00000200" ref="button_6_2_dark" id="button_41_release">
-      <bounds x="120" y="13" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x00000020" ref="button_15_5_dark" id="button_37_pan">
+      <bounds x="285" y="15" width="15" height="5" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00000010" ref="button_6_2_dark" id="button_36_volume">
-      <bounds x="108" y="6" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x00000040" ref="button_15_5_dark" id="button_38_timbre">
+      <bounds x="300" y="15" width="15" height="5" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00000020" ref="button_6_2_dark" id="button_37_pan">
-      <bounds x="114" y="6" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x00000010" ref="button_15_5_dark" id="button_4_wave">
+      <bounds x="385" y="50" width="15" height="5" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00000040" ref="button_6_2_dark" id="button_38_timbre">
-      <bounds x="120" y="6" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x00000040" ref="button_15_5_dark" id="button_6_mod_mixer">
+      <bounds x="400" y="50" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00100000" ref="button_6_4_light" id="button_20_master">
-      <bounds x="131" y="29" width="6" height="4" />
+    <element inputtag="buttons_0" inputmask="0x00000004" ref="button_15_5_dark" id="button_2_program_control">
+      <bounds x="415" y="50" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00200000" ref="button_6_4_light" id="button_21_storage">
-      <bounds x="137" y="29" width="6" height="4" />
+    <element inputtag="buttons_0" inputmask="0x00000080" ref="button_15_5_dark" id="button_7_effects">
+      <bounds x="430" y="50" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x01000000" ref="button_6_4_light" id="button_24_midi_control">
-      <bounds x="143" y="29" width="6" height="4" />
+    <element inputtag="buttons_0" inputmask="0x00000800" ref="button_15_5_dark" id="button_11_pitch">
+      <bounds x="385" y="32.5" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00000010" ref="button_6_2_dark" id="button_4_wave">
-      <bounds x="154" y="20" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x00002000" ref="button_15_5_dark" id="button_13_pitch_mod">
+      <bounds x="400" y="32.5" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00000040" ref="button_6_2_dark" id="button_6_mod_mixer">
-      <bounds x="160" y="20" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x00008000" ref="button_15_5_dark" id="button_15_filters">
+      <bounds x="415" y="32.5" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00000004" ref="button_6_2_dark" id="button_2_program_control">
-      <bounds x="166" y="20" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x00020000" ref="button_15_5_dark" id="button_17_output">
+      <bounds x="430" y="32.5" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00000080" ref="button_6_2_dark" id="button_7_effects">
-      <bounds x="172" y="20" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x00000400" ref="button_15_5_dark" id="button_10_lfo">
+      <bounds x="385" y="15" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00000800" ref="button_6_2_dark" id="button_11_pitch">
-      <bounds x="154" y="13" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x00001000" ref="button_15_5_dark" id="button_12_env1">
+      <bounds x="400" y="15" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00002000" ref="button_6_2_dark" id="button_13_pitch_mod">
-      <bounds x="160" y="13" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x00004000" ref="button_15_5_dark" id="button_14_env2">
+      <bounds x="415" y="15" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00008000" ref="button_6_2_dark" id="button_15_filters">
-      <bounds x="166" y="13" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x00010000" ref="button_15_5_dark" id="button_16_env3">
+      <bounds x="430" y="15" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00020000" ref="button_6_2_dark" id="button_17_output">
-      <bounds x="172" y="13" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x00040000" ref="button_15_5_dark" id="button_50__display_below_left">
+      <bounds x="80" y="52.5" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00000400" ref="button_6_2_dark" id="button_10_lfo">
-      <bounds x="154" y="6" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x00001000" ref="button_15_5_dark" id="button_44__display_below_middle">
+      <bounds x="142.5" y="52.5" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00001000" ref="button_6_2_dark" id="button_12_env1">
-      <bounds x="160" y="6" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x00002000" ref="button_15_5_dark" id="button_45__display_below_right">
+      <bounds x="200" y="52.5" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00004000" ref="button_6_2_dark" id="button_14_env2">
-      <bounds x="166" y="6" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x04000000" ref="button_15_5_dark" id="button_58__display_above_left">
+      <bounds x="80" y="0" width="15" height="5" />
     </element>
-    <element inputtag="buttons_0" inputmask="0x00010000" ref="button_6_2_dark" id="button_16_env3">
-      <bounds x="172" y="6" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x00000400" ref="button_15_5_dark" id="button_42__diplay_above_center">
+      <bounds x="142.5" y="0" width="15" height="5" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00040000" ref="button_6_2_dark" id="button_50__display_below_left">
-      <bounds x="32" y="21" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x00000800" ref="button_15_5_dark" id="button_43__display_above_right">
+      <bounds x="200" y="0" width="15" height="5" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00001000" ref="button_6_2_dark" id="button_44__display_below_middle">
-      <bounds x="57" y="21" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x80000000" ref="button_15_5_dark" id="button_63__decrement">
+      <bounds x="-42.5" y="55" width="15" height="5" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00002000" ref="button_6_2_dark" id="button_45__display_below_right">
-      <bounds x="82" y="21" width="6" height="2" />
+    <element inputtag="buttons_32" inputmask="0x40000000" ref="button_15_5_dark" id="button_62__increment">
+      <bounds x="-42.5" y="30" width="15" height="5" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x04000000" ref="button_6_2_dark" id="button_58__display_above_left">
-      <bounds x="32" y="0" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x40000000" ref="button_15_10_medium" id="button_30_a">
+      <bounds x="285" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00000400" ref="button_6_2_dark" id="button_42__diplay_above_center">
-      <bounds x="57" y="0" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x80000000" ref="button_15_10_medium" id="button_31_b">
+      <bounds x="300" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x00000800" ref="button_6_2_dark" id="button_43__display_above_right">
-      <bounds x="82" y="0" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x00100000" ref="button_15_10_light" id="button_20_master">
+      <bounds x="327.5" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x80000000" ref="button_6_2_dark" id="button_63__increment">
-      <bounds x="-17" y="22" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x00200000" ref="button_15_10_light" id="button_21_storage">
+      <bounds x="342.5" y="72.5" width="15" height="10" />
     </element>
-    <element inputtag="buttons_32" inputmask="0x40000000" ref="button_6_2_dark" id="button_62__decrement">
-      <bounds x="-17" y="12" width="6" height="2" />
+    <element inputtag="buttons_0" inputmask="0x01000000" ref="button_15_10_light" id="button_24_midi_control">
+      <bounds x="357.5" y="72.5" width="15" height="10" />
     </element>
     <element name="lights" ref="light_15">
-      <bounds x="12" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="30" y="72.9" width="5" height="3.3333" />
     </element>
     <element name="lights" ref="light_13">
-      <bounds x="18" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="45" y="72.9" width="5" height="3.3333" />
     </element>
     <element name="lights" ref="light_7">
-      <bounds x="24" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="60" y="72.9" width="5" height="3.3333" />
     </element>
     <element name="lights" ref="light_14">
-      <bounds x="44" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="110" y="72.9" width="5" height="3.3333" />
     </element>
     <element name="lights" ref="light_6">
-      <bounds x="50" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="125" y="72.9" width="5" height="3.3333" />
     </element>
     <element name="lights" ref="light_4">
-      <bounds x="56" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="140" y="72.9" width="5" height="3.3333" />
     </element>
     <element name="lights" ref="light_12">
-      <bounds x="62" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="155" y="72.9" width="5" height="3.3333" />
     </element>
     <element name="lights" ref="light_3">
-      <bounds x="68" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="170" y="72.9" width="5" height="3.3333" />
     </element>
     <element name="lights" ref="light_11">
-      <bounds x="74" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="185" y="72.9" width="5" height="3.3333" />
     </element>
     <element name="lights" ref="light_2">
-      <bounds x="80" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="200" y="72.9" width="5" height="3.3333" />
     </element>
     <element name="lights" ref="light_10">
-      <bounds x="86" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="215" y="72.9" width="5" height="3.3333" />
     </element>
     <element name="lights" ref="light_1">
-      <bounds x="92" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="230" y="72.9" width="5" height="3.3333" />
     </element>
     <element name="lights" ref="light_9">
-      <bounds x="98" y="29.16" width="1.5" height="1.3333" />
-    </element>
-    <element name="lights" ref="light_0">
-      <bounds x="116" y="29.16" width="1.5" height="1.3333" />
-    </element>
-    <element name="lights" ref="light_8">
-      <bounds x="122" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="245" y="72.9" width="5" height="3.3333" />
     </element>
     <element name="lights" ref="light_5">
-      <bounds x="174" y="29.16" width="1.5" height="1.3333" />
+      <bounds x="435" y="72.9" width="5" height="3.3333" />
+    </element>
+    <element name="lights" ref="light_0">
+      <bounds x="290" y="72.9" width="5" height="3.3333" />
+    </element>
+    <element name="lights" ref="light_8">
+      <bounds x="305" y="72.9" width="5" height="3.3333" />
     </element>
     <param name="slider_id" value="data_entry" />
     <param name="port_name" value="analog_data_entry" />
     <group ref="slider">
-      <bounds x="-8" y="4" width="8" height="24" />
+      <bounds x="-20" y="10" width="20" height="60" />
     </group>
     <param name="slider_id" value="volume" />
     <param name="port_name" value="analog_volume" />
     <group ref="slider">
-      <bounds x="-36" y="4" width="8" height="24" />
+      <bounds x="-90" y="10" width="20" height="60" />
     </group>
   </group>
 
@@ -1003,9 +1001,12 @@
         if dn & 1 ~= 0 then
           for i = 1, #sliders do
             if sliders[i].knob.bounds:includes(x, y) then
+              local clickarea = sliders[i].clickarea
+              local knob = sliders[i].knob
+              local dy = y - knob.bounds.y0
               pointers[id] = {
                 selected_slider = i,
-                dy = y - sliders[i].knob.bounds.y0 -- position within the knob where it was clicked
+                dy = dy -- position within the knob where it was clicked
               }
               break
             end
@@ -1026,11 +1027,9 @@
         local knob = slider.knob
         local clickarea = slider.clickarea
 
-        local new_value = 0
-        -- User clicked on the knob. The new value will depend on how much the
-        -- knob was dragged.
         local yy = y - pointer.dy
-        new_value = 100 * (1 - (yy - clickarea.bounds.y0) / (clickarea.bounds.height - knob.bounds.height))
+        local fraction = (yy - clickarea.bounds.y0) / (clickarea.bounds.height - knob.bounds.height)
+        local new_value = 100 * (1 - fraction)
         new_value = math.floor(new_value + 0.5)
         clamped_value = clamp(new_value)
         slider.field.user_value = clamped_value
@@ -1057,6 +1056,8 @@
       -----------------------------------------------------------------------
       -- Slider library ends.
       -----------------------------------------------------------------------
+
+
 
     ]]></script>
 </mamelayout>
