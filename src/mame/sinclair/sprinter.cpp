@@ -70,6 +70,9 @@ TODO:
 #include "speaker.h"
 #include "tilemap.h"
 
+#include <algorithm>
+#include <iterator>
+
 #include "sprinter.lh"
 
 
@@ -1434,14 +1437,16 @@ void sprinter_state::init_taps()
 
 	m_maincpu->space(AS_IO).install_write_tap(0x0000, 0xffff, "cpu_io_w", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		// Internal z84 ports are not accesable through IO map, hence they need special case here
-		static const std::unordered_set<u8> z84_int = {
+		// Internal z84 ports are not accessible through IO map, hence they need special case here
+		// Keep these in ascending order
+		constexpr u8 z84_int[] = {
 			0x10, 0x11, 0x12, 0x13,
 			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 			0xee, 0xef,
 			0xf0, 0xf1, 0xf4
 		};
-		if (z84_int.find(u8(offset)) != z84_int.end())
+		const auto found = std::lower_bound(std::begin(z84_int), std::end(z84_int), offset);
+		if ((found != std::end(z84_int)) && (*found == offset))
 			dcp_w(offset, data);
 	});
 }
