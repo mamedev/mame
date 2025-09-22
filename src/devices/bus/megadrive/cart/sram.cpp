@@ -209,10 +209,13 @@ void megadrive_rom_hardball95_device::cart_map(address_map &map)
 
 /*
  * Beggar Prince / Xin Qi Gai Wang Zi
- * Relocated NVRAM
  *
- * TODO:
- * - doesn't work on Teradrive TMSS (invalid header), untested
+ * NVRAM at $40'0000
+ * Some writes in ROM space at startup, PC=B4BEA (at least) tests that $100-$102
+ * returns SW vectors 0x46fc2700 and resets if unhappy, presumably against copiers.
+ *
+ * NOTE:
+ * - doesn't work on Teradrive TMSS, no SEGA at $100. Cursory testing was performed.
  *
  */
 

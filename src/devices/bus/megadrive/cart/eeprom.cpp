@@ -141,7 +141,7 @@ void megadrive_eeprom_nflqb96_device::device_add_mconfig(machine_config &config)
  * collslam College Slam
  * bighurt  Frank Thomas Big Hurt Baseball
  *
- * Bump of nflqb96 with a '64 in place of the '16
+ * Bump of nflqb96 with a '65 in place of the '16
  *
  */
 
@@ -154,7 +154,7 @@ megadrive_eeprom_collslam_device::megadrive_eeprom_collslam_device(const machine
 
 void megadrive_eeprom_collslam_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C64(config, m_i2cmem);
+	I2C_24C65(config, m_i2cmem);
 }
 
 /*
@@ -194,10 +194,15 @@ void megadrive_eeprom_nhlpa_device::cart_map(address_map &map)
 
 
 /*
- * brianl96  Brian Lara Cricket 96
- * shanewar  Shane Warne Cricket
+ * brianlar  Brian Lara Cricket
  *
  * Same as Codemasters J-Cart I2C implementation
+ *
+ * Guru I2C hookup notes:
+ * 1,2,3,4,7 GND
+ * 5 to LS244 pin 17
+ * 6 to PAL pin 15
+ * Output of 244 pin 17 is pin 3 which goes to ROM pin 29. It's a 42 pin ROM so pin 29 is D7
  *
  */
 
@@ -238,7 +243,7 @@ void megadrive_eeprom_blara95_device::cart_map(address_map &map)
  * brianl96  Brian Lara Cricket 96
  * shanewar  Shane Warne Cricket
  *
- * Same as Brian Lara 95, with a '64 here
+ * Same as Brian Lara 95, with a '65 here
  *
  */
 
@@ -251,6 +256,6 @@ megadrive_eeprom_blara96_device::megadrive_eeprom_blara96_device(const machine_c
 
 void megadrive_eeprom_blara96_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C64(config, m_i2cmem);
+	I2C_24C65(config, m_i2cmem);
 }
 

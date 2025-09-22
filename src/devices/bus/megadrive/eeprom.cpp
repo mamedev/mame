@@ -132,7 +132,7 @@ void md_eeprom_nbajamte_device::device_add_mconfig(machine_config &config)
 
 void md_eeprom_cslam_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C64(config, m_i2cmem);
+	I2C_24C65(config, m_i2cmem);
 }
 
 void md_eeprom_nflqb96_device::device_add_mconfig(machine_config &config)
@@ -147,7 +147,7 @@ void md_eeprom_nhlpa_device::device_add_mconfig(machine_config &config)
 
 void md_eeprom_blara_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C64(config, m_i2cmem);
+	I2C_24C65(config, m_i2cmem);
 }
 
 void md_eeprom_mode1_device::device_add_mconfig(machine_config &config)

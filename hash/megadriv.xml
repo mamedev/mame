@@ -1782,13 +1782,10 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 	</software>
 
 
-	<software name="collslam" supported="no">
+	<software name="collslam">
 		<description>College Slam (USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<notes><![CDATA[
-[EEPROM] Blue stripes at boot
-]]></notes>
 		<info name="serial" value="T-81576"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
@@ -13647,8 +13644,9 @@ No [VDP] sprites
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_blara95"/>
+			<!-- u2 for 24lc08 -->
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="brian lara cricket (euro) (june 1995).bin" size="1048576" crc="408cf5c3" sha1="032eb1a15c95540b392b52ee17eef7eee6ac436d"/>
+				<rom name="code_masters_brian_lara_crkt_mdbc37f5.u1" size="1048576" crc="408cf5c3" sha1="032eb1a15c95540b392b52ee17eef7eee6ac436d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13665,10 +13663,13 @@ No [VDP] sprites
 		</part>
 	</software>
 
-	<software name="brianl96">
+	<software name="brianl96" supported="partial">
 		<description>Brian Lara Cricket 96 (Europe, 199604)</description>
 		<year>1996</year>
 		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+[EEPROM] Doesn't save in megadriv, does in teradrive
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_blara96"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -13681,6 +13682,9 @@ No [VDP] sprites
 		<description>Brian Lara Cricket 96 (Europe, 199603)</description>
 		<year>1996</year>
 		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+[EEPROM] Doesn't save in megadriv, does in teradrive
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_blara96"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -19167,13 +19171,10 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		</part>
 	</software>
 
-	<software name="bighurt" supported="no">
+	<software name="bighurt">
 		<description>Frank Thomas Big Hurt Baseball (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<notes><![CDATA[
-[EEPROM] Blue stripes at boot
-]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_cslam"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
@@ -28487,10 +28488,13 @@ Throws "this game is [...] european megadrive system" even with megadriv system 
 		</part>
 	</software>
 
-	<software name="shanewar" cloneof="brianl96">
+	<software name="shanewar" cloneof="brianl96" supported="partial">
 		<description>Shane Warne Cricket (Australia)</description>
 		<year>1997</year>
 		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+[EEPROM] Doesn't save in megadriv, does in teradrive
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_blara96"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
