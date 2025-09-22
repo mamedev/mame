@@ -175,7 +175,6 @@
 */
 
 
-
 #include "emu.h"
 #include "segas32.h"
 
@@ -213,13 +212,6 @@
 #define MIXER_LAYER_MULTISPR_2  10
 
 static constexpr int TILEMAP_CACHE_SIZE = 32;
-
-
-/*************************************
- *
- *  Type definitions
- *
- *************************************/
 
 
 /*************************************
@@ -857,7 +849,6 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, segas32_stat
 	// determine flipping
 	compute_tilemap_flips(bgnum, flipx, flipy);
 
-
 	/* determine the clipping */
 	int clipenable = (m_videoram[0x1ff02/2] >> (11 + bgnum)) & 1;
 	int clipout = (m_videoram[0x1ff02/2] >> (6 + bgnum)) & 1;
@@ -923,7 +914,6 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, segas32_stat
 				srcx += table[0x000 + 0x100 * (bgnum - 2) + ylookup] & 0x3ff;
 			if (rowselect)
 				srcy = (yscroll + table[0x200 + 0x100 * (bgnum - 2) + ylookup]) & 0x1ff;
-
 
 			/* look up the pages and get their source pixmaps */
 			bitmap_ind16 const &tm0 = tilemaps[((srcy >> 7) & 2) + 0]->pixmap();
