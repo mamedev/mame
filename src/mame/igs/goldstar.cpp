@@ -453,7 +453,6 @@ public:
 	void super7(machine_config &config) ATTR_COLD;
 
 	void init_3cdp() ATTR_COLD;	
-	void init_3cdpa() ATTR_COLD;
 	void init_alienatt() ATTR_COLD;
 	void init_animalhs() ATTR_COLD;
 	void init_chthree() ATTR_COLD;
@@ -14667,7 +14666,21 @@ ROM_START( cmfun )
 ROM_END
 
 /*
-  this has a little protection (?):
+  3 Card Poker 96
+  Armaly Labs.
+
+  Daughterboard etched "AL", "Made in USA", "UL94V-0"
+
+  1x Zilog Z8400A.  (U2)
+  1x M27C512        (U3)
+  1x TIBPAL16L8-15  (U5)
+  1x SN74HC245N     (U6)
+  1x SN74HC541N     (U7)
+  1x Micro PIC16C54 (U8)
+
+  -------------------------------------------
+
+  MCU protection:
 
   8199: 3A 00 A0    ld   a,($A000) <---- 0x59
   819C: FE 5A       cp   $5A
@@ -14691,7 +14704,7 @@ ROM_START( 3cdpoker )
 	ROM_LOAD( "v1.6.u81",  0x0000, 0x10000, CRC(d0aeca41) SHA1(f780dbe2d2a0d82b8110a57e161547be41318a81) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "7.u16",  0x00000, 0x8000, CRC(d09f9414) SHA1(db5eb359a3e3fcd4d964403888a5496643081f5e) )
+	ROM_LOAD( "7.u16",  0x00000, 0x8000, CRC(379ed8ca) SHA1(8dc9e261c47a463f0ca9a28e0a735cb14b22443c) )
 	ROM_LOAD( "6.u11",  0x08000, 0x8000, CRC(f169878f) SHA1(b8bd5e79a813cea0aff8c80e6284bc2f69644c3c) )
 	ROM_LOAD( "5.u4",   0x10000, 0x8000, CRC(591c355e) SHA1(dd4f63853a380c400ca22c4d8f5c6e4f4c002f23) )
 
@@ -14718,7 +14731,7 @@ ROM_START( 3cdpokera )
 	ROM_LOAD( "v1.0.u81",  0x0000, 0x10000, CRC(26f21835) SHA1(9a29daeb60a91ab6c73820769911fa1ddd27e3b2) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "7.u16",  0x00000, 0x8000, CRC(d09f9414) SHA1(db5eb359a3e3fcd4d964403888a5496643081f5e) )
+	ROM_LOAD( "7.u16",  0x00000, 0x8000, CRC(379ed8ca) SHA1(8dc9e261c47a463f0ca9a28e0a735cb14b22443c) )
 	ROM_LOAD( "6.u11",  0x08000, 0x8000, CRC(f169878f) SHA1(b8bd5e79a813cea0aff8c80e6284bc2f69644c3c) )
 	ROM_LOAD( "5.u4",   0x10000, 0x8000, CRC(591c355e) SHA1(dd4f63853a380c400ca22c4d8f5c6e4f4c002f23) )
 
@@ -24954,47 +24967,15 @@ void cmaster_state::init_crazybonb()
 
 }
 
-
-void cmaster_state::init_3cdp()
+void cmaster_state::init_3cdp()  // v1.6 & v1.0
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x0209] = 0x9b; // ppi0 init
 	rom[0x020d] = 0x9b; // ppi1 init
-	
-	rom[0x0237] = 0x20;
-	rom[0x0238] = 0x34;
-	
-	
-	rom[0x02e1] = 0x00;
-	rom[0x02e2] = 0x00;
-	rom[0x02e3] = 0x00;
-	
-	rom[0x1626] = 0x00;
-	rom[0x1627] = 0x00;
-	rom[0x1628] = 0x00;
-	
-	
-	rom[0xa000] = 0x5a;
-}
 
-void cmaster_state::init_3cdpa()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	rom[0x0209] = 0x9b; // ppi0 init
-	rom[0x020d] = 0x9b; // ppi1 init
-	
-	rom[0x02e1] = 0x00;
-	rom[0x02e2] = 0x00;
-	rom[0x02e3] = 0x00;
-	
-	rom[0x1626] = 0x00;
-	rom[0x1627] = 0x00;
-	rom[0x1628] = 0x00;
-	
-	
-	rom[0xa000] = 0x5a;
+	rom[0x8193] = 0xc9; // skip protection
+	rom[0x81c3] = 0xc9; // skip protection
 }
 
 
@@ -27148,7 +27129,7 @@ GAMEL( 1992, cmv4a,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4
 GAMEL( 199?, cmwm,       cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Watermelon bootleg / hack)",   0,                 layout_cmv4 ) // CM Fruit Bonus ver.2 T bootleg/hack
 GAMEL( 1995, cmfun,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Fun USA v2.5 bootleg / hack)", 0,                 layout_cmv4 )
 GAMEL( 1996, 3cdpoker,   0,        cd3poker, cmv4,     cmaster_state,  init_3cdp,      ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.6)",                     0,                 layout_cmv4 )
-GAMEL( 1996, 3cdpokera,  3cdpoker, cd3poker, cmtetris, cmaster_state,  init_3cdpa,     ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.0)",                     0,                 layout_cmv4 )
+GAMEL( 1996, 3cdpokera,  3cdpoker, cd3poker, cmv4,     cmaster_state,  init_3cdp,      ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.0)",                     0,                 layout_cmv4 )
 GAMEL( 1991, cmaster,    0,        cm,       cmaster,  cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0,                 layout_cmaster )
 GAMEL( 1991, cmasterb,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",           0,                 layout_cmasterb )
 GAMEL( 1991, cm1codar,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "CODERE Argentina",  "Cherry Master I (ver.1.01, spanish, CODERE, set 1)",  0,         layout_cmasterb )
