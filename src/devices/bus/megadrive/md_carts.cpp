@@ -86,7 +86,6 @@ void md_cart(device_slot_interface &device)
 	device.option_add_internal("rom_sram_arg96",  MD_ROM_SRAM_ARG96);
 	device.option_add_internal("rom_tc2000",  MD_ROM_TC2000);
 	device.option_add_internal("rom_tekkensp",  MD_ROM_TEKKENSP);
-	device.option_add_internal("rom_topf",  MD_ROM_TOPF);
 
 	device.option_add_internal("rom_titan", MD_ROM_TITAN);
 
