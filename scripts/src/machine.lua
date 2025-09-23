@@ -3083,18 +3083,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/roc10937.h,MACHINES["ROC10937"] = true
----------------------------------------------------
-
-if (MACHINES["ROC10937"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/roc10937.cpp",
-		MAME_DIR .. "src/devices/machine/roc10937.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/rp5c01.h,MACHINES["RP5C01"] = true
 ---------------------------------------------------
 

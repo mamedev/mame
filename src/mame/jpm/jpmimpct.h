@@ -15,11 +15,11 @@
 #include "machine/i8255.h"
 #include "machine/mc68681.h"
 #include "machine/meters.h"
-#include "machine/roc10937.h"
 #include "machine/steppers.h"
 #include "machine/timer.h"
 #include "sound/upd7759.h"
 #include "video/bt47x.h"
+#include "video/roc10937.h"
 
 #include "diserial.h"
 #include "emupal.h"

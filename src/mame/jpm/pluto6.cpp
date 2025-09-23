@@ -27,7 +27,7 @@ IO:
 Pluto 6 (01-16391-8)
 ┌─────────────────────────────────────────────────────────┬───────────────┬───────────────────────────────────┐
 │┌─┐                         ┌───────────┐                │               │┌────────┐ P9 ________________     │
-││⁞│ P26       ┌─┐  ┌─┐      |___________| P4         ┌──┐│ CompactFlash  ││________││......... .........│    │
+││:│ P26       ┌─┐  ┌─┐      |___________| P4         ┌──┐│ CompactFlash  ││________││......... .........│    │
 │└─┘           │││  │││  ┌────┐    U3     U26         │  ││      P6       │    P7      NMOS  NMOS  NMOS ┌──┐  │
 │┌──┐          │││  │││  │ U1 │ ┌─────┐ ┌─────┐       │I │├─────┬───────┬─┘            NMOS  NMOS  NMOS │  │P │
 ││  │P25       │-│  │-│  └────┘ └─────┘ └─────┘       │D ││_____│ PIC18 │              NMOS  NMOS  NMOS │  │1 │
@@ -35,14 +35,14 @@ Pluto 6 (01-16391-8)
 │└──┘          │││  │││     X3      │          │ ┌─┐  │  │      └───────┘ X1           NMOS  NMOS  NMOS │  │  │
 │              │││  │││ ┌──┐  ┌─┐   │ COLDFIRE │ |_|  │  │            X2               NMOS             └──┘  │
 │┌──┐          │││  │││ │  │  └─┘   │          │ ┌─┐  └──┘      ┌────────┐                               ┌─┐  │
-││  │ P24      │-│  │-│ │  │   U6   └──────────┘ |_|   P5       │||||||||│SW2                            │⁞│P │
-││  │          │││  │││ │  │                     U27            ├────────┤              PNP PNP PNP PNP  │⁞│1 │
-│└──┘ U41      │││  │││ │  │  ┌──────────┐   ┌───┐              │||||||||│SW1           PNP PNP PNP PNP  │⁞│1 │
-│    ┌─┐       │││  │││ │  │  │          │   │   │ U55  ┌─┐     └────────┘              PNP PNP PNP PNP  │⁞│  │
-│┌─┐ └─┘       │││  │││ │  │  │  XCS20XL │   └───┘      │⁞│ P27                         PNP PNP PNP PNP  └─┘  │
-││⁞│           │││  │││ │  │  │          │              └─┘ _                           TPIC255 TPIC255       │
-││⁞│ 74HCT244  │││  │││ │  │  └──────────┘  x4             |O| ┌──┐ U7                  TPIC255 TPIC255 ┌──┐  │
-││⁞│           │││  │││ │  │              ┌──────┐         SW3 └──┘           ┌─────┐   TPIC255 TPIC255 │  │  │
+││  │ P24      │-│  │-│ │  │   U6   └──────────┘ |_|   P5       │||||||||│SW2                            │:│P │
+││  │          │││  │││ │  │                     U27            ├────────┤              PNP PNP PNP PNP  │:│1 │
+│└──┘ U41      │││  │││ │  │  ┌──────────┐   ┌───┐              │||||||||│SW1           PNP PNP PNP PNP  │:│1 │
+│    ┌─┐       │││  │││ │  │  │          │   │   │ U55  ┌─┐     └────────┘              PNP PNP PNP PNP  │:│  │
+│┌─┐ └─┘       │││  │││ │  │  │  XCS20XL │   └───┘      │:│ P27                         PNP PNP PNP PNP  └─┘  │
+││:│           │││  │││ │  │  │          │              └─┘ _                           TPIC255 TPIC255       │
+││:│ 74HCT244  │││  │││ │  │  └──────────┘  x4             |O| ┌──┐ U7                  TPIC255 TPIC255 ┌──┐  │
+││:│           │││  │││ │  │              ┌──────┐         SW3 └──┘           ┌─────┐   TPIC255 TPIC255 │  │  │
 │└─┘P23        │││  │││ │  │  U28         │ U56  │                  TPIC255   │     │   TPIC255 TPIC255 │  │P │
 │┌───┐         │││  │││ │  │  ┌─┐         │ DUART│                          B1│     │                   │  │1 │
 ││/-││         └─┘  └─┘ └──┘  └─┘         └──────┘              HCT245        └─────┘       P14         │  │2 │
@@ -163,10 +163,12 @@ EINT3: DUART INT?
 #include "machine/pl6_exp.h"
 #include "machine/pl6_fpga.h"
 #include "machine/pl6_pic.h"
-#include "video/serialvfd.h"
-
+#include "video/roc10937.h"
 
 #include "speaker.h"
+
+#include "pl6dev.lh"
+#include "pl6vdev.lh"
 
 
 #define LOG_VFD  (1U << 1)
@@ -175,31 +177,28 @@ EINT3: DUART INT?
 
 #define LOGVFDS(...)        LOGMASKED(LOG_VFD,     __VA_ARGS__)
 
-#include "pl6dev.lh"
-#include "pl6vdev.lh"
-
 namespace {
 
 class pluto6_state : public driver_device
 {
 public:
-	pluto6_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_fpga(*this, "fpga"),
-			m_pic(*this, "pic18"),
-			m_ata(*this, "ata"),
-			m_exp0(*this, "exp0"),
-			m_exp1(*this, "exp1"),
-			m_duart(*this, "duart"),
-			m_i2cmem(*this, "i2cmem"),
-			m_inputs(*this, "IN0"),
-			m_open_drain(*this, "open_drain%u", 0U),
-			m_lamp(*this, "lamp%u", 0U),
-			m_led(*this, "led%u", 0U),
-			m_aux(*this, "aux%u", 0U),
-			m_debug(*this, "DEBUG"),
-			m_vfd(*this, "vfd")
+	pluto6_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_fpga(*this, "fpga"),
+		m_pic(*this, "pic18"),
+		m_ata(*this, "ata"),
+		m_exp0(*this, "exp0"),
+		m_exp1(*this, "exp1"),
+		m_duart(*this, "duart"),
+		m_i2cmem(*this, "i2cmem"),
+		m_inputs(*this, "IN0"),
+		m_open_drain(*this, "open_drain%u", 0U),
+		m_lamp(*this, "lamp%u", 0U),
+		m_led(*this, "led%u", 0U),
+		m_aux(*this, "aux%u", 0U),
+		m_debug(*this, "DEBUG"),
+		m_vfd(*this, "vfd")
 	{ }
 
 	void pluto6_dev(machine_config &config);
@@ -242,7 +241,6 @@ private:
 	void install_eeprom(machine_config &config);
 	//void install_calypso(machine_config &config, u8 slot);
 
-
 	void duart_irq_handler(int state);
 	void gpu1_irq_handler(int state);
 	void gpu2_irq_handler(int state);
@@ -277,7 +275,7 @@ private:
 	optional_ioport m_debug;
 
 	bool vfd_installed = false;
-	optional_device<serial_vfd_device> m_vfd;
+	optional_device<msc1937_device> m_vfd;
 
 	// LED hack
 	uint8_t led_array[32] = {0};
@@ -454,9 +452,9 @@ void pluto6_state::auxout_callback(offs_t offset, uint8_t data){
 	LOGVFDS("ao_cb( 0x%02x, 0x%x )\n", offset, data );
 	m_aux[offset] = data;
 	switch (offset) {
-		case 0: m_vfd->write_clock(!(data > 0)); break;
-		case 1: m_vfd->write_data(!(data > 0)); break;
-		case 2: m_vfd->write_reset(!(data > 0)); break;
+		case 0: m_vfd->sclk(!(data > 0)); break;
+		case 1: m_vfd->data(!(data > 0)); break;
+		case 2: m_vfd->por(!(data > 0)); break;
 		default: break;
 	}
 }
@@ -522,7 +520,7 @@ void pluto6_state::pluto6(machine_config &config){
 	m_fpga->cfuart_rx_a_callback().set(FUNC(pluto6_state::cfuart_rx_a_w));
 	m_fpga->cfuart_rx_b_callback().set(FUNC(pluto6_state::cfuart_rx_b_w));
 
-	HEBER_PLUTO6_PIC(config, m_pic, XTAL(5'000'00));
+	HEBER_PLUTO6_PIC(config, m_pic, XTAL(500'000));
 	m_pic->sda_rx_cb().set(FUNC(pluto6_state::pluto_sda));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -543,7 +541,7 @@ void pluto6_state::pluto6_dev(machine_config &config){
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
 
-	SERIAL_VFD(config, m_vfd);
+	MSC1937(config, m_vfd);
 	this->led_use_7seg = true;
 }
 
@@ -554,7 +552,7 @@ void pluto6_state::pluto6_betcom(machine_config &config){
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
-	SERIAL_VFD(config, m_vfd);
+	MSC1937(config, m_vfd);
 	this->led_use_7seg = true;
 }
 
@@ -569,7 +567,7 @@ void pluto6_state::pluto6_jpmrom(machine_config &config){
 
 	install_eeprom(config);
 
-	SERIAL_VFD(config, m_vfd);
+	MSC1937(config, m_vfd);
 	this->led_use_7seg = true;
 }
 

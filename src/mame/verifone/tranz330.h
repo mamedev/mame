@@ -6,16 +6,16 @@
 
 #pragma once
 
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "machine/clock.h"
+#include "machine/msm6242.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "machine/msm6242.h"
-#include "machine/roc10937.h"
-#include "bus/rs232/rs232.h"
 #include "sound/spkrdev.h"
-#include "machine/clock.h"
+#include "video/roc10937.h"
 
 #define CPU_TAG     "cpu"
 #define DART_TAG    "dart"
