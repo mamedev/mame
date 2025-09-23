@@ -505,7 +505,6 @@ private:
 	struct near_state
 	{
 		uint64_t saved_fpcr;
-		uint32_t emulated_flags;
 	};
 
 	struct memory_accessors
@@ -623,6 +622,8 @@ private:
 	arm::Mem emit_loadstore_address_setup(a64::Assembler &a, const a64::Gp &basereg, const be_parameter &indp, const uml::parameter &scalesizep) const;
 
 	void emit_memaccess_setup(a64::Assembler &a, const be_parameter &addrp, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const;
+	void emit_narrow_memaccess_setup(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const;
+	void emit_narrow_memread(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const;
 	void emit_narrow_memwrite(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const;
 
 	void store_carry(a64::Assembler &a, bool inverted = false);
@@ -1044,7 +1045,7 @@ inline arm::Mem drcbe_arm64::emit_loadstore_address_setup(a64::Assembler &a, con
 	if (scale == 0)
 	{
 		// if there's no shift, sign extension can be part of the addressing mode
-		const a64::Gp offsreg = TEMP_REG3.w();
+		const a64::Gp offsreg = indp.select_register(TEMP_REG3, 4);
 		mov_reg_param(a, 4, offsreg, indp);
 		return arm::Mem(basereg, offsreg, a64::sxtw(0));
 	}
@@ -1108,14 +1109,12 @@ void drcbe_arm64::emit_memaccess_setup(a64::Assembler &a, const be_parameter &ad
 	// x8, x7 and potentially x6 clobbered
 }
 
-void drcbe_arm64::emit_narrow_memwrite(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const
+void drcbe_arm64::emit_narrow_memaccess_setup(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const
 {
-	// expects data in REG_PARAM3 and mask in REG_PARAM4
-
 	address_space &space = *m_space[spacesizep.space()];
 	auto const addrreg = (accessors.no_mask || accessors.mask_simple) ? REG_PARAM2 : a64::x5;
 	mov_reg_param(a, 4, addrreg, addrp);
-	get_imm_relative(a, a64::x8, uintptr_t(accessors.specific.write.dispatch));
+	get_imm_relative(a, a64::x8, uintptr_t(side.dispatch));
 
 	// get the shift count for the data and offset in w7
 	int const shift = space.addr_shift() - 3;
@@ -1180,8 +1179,55 @@ void drcbe_arm64::emit_narrow_memwrite(a64::Assembler &a, const be_parameter &ad
 	}
 
 	// apply this pointer displacement if necessary
-	if (accessors.specific.write.displacement)
-		a.add(REG_PARAM1, REG_PARAM1, accessors.specific.write.displacement); // assume less than 4K
+	if (side.displacement)
+		a.add(REG_PARAM1, REG_PARAM1, side.displacement); // assume less than 4K
+
+	// load vtable pointer early if we'll need it
+	if (side.is_virtual)
+		a.ldr(a64::x8, a64::Mem(REG_PARAM1));
+
+	// adjusted dispatch table entry pointer in REG_PARAM1
+	// masked address in REG_PARAM2
+	// shift count in w7
+	// vtable pointer in x8 if virtual
+	// x6 and potentially x8 and x5 clobbered
+}
+
+void drcbe_arm64::emit_narrow_memread(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const
+{
+	// expects mask in REG_PARAM3
+
+	emit_narrow_memaccess_setup(a, addrp, spacesizep, accessors, accessors.specific.read);
+
+	// shift the mask
+	a.lsl(REG_PARAM3, REG_PARAM3, a64::x7);
+
+	// stash the shift count - flags are clobbered anyway, so use the emulated flags register
+	a.mov(FLAGS_REG.w(), a64::w7);
+
+	// call the read function
+	if (accessors.specific.read.is_virtual)
+	{
+		a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.read.function)); // assume no more than 4096 vtable entries
+		a.blr(a64::x8);
+	}
+	else
+	{
+		call_arm_addr(a, (const void *)accessors.specific.read.function);
+	}
+
+	// shift the result
+	if (accessors.specific.native_bytes <= 4)
+		a.lsr(REG_PARAM1.w(), REG_PARAM1.w(), FLAGS_REG.w());
+	else
+		a.lsr(REG_PARAM1, REG_PARAM1, FLAGS_REG);
+}
+
+void drcbe_arm64::emit_narrow_memwrite(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const
+{
+	// expects data in REG_PARAM3 and mask in REG_PARAM4
+
+	emit_narrow_memaccess_setup(a, addrp, spacesizep, accessors, accessors.specific.write);
 
 	// shift the data and mask
 	a.lsl(REG_PARAM3, REG_PARAM3, a64::x7);
@@ -1190,7 +1236,6 @@ void drcbe_arm64::emit_narrow_memwrite(a64::Assembler &a, const be_parameter &ad
 	// call the write function
 	if (accessors.specific.write.is_virtual)
 	{
-		a.ldr(a64::x8, a64::Mem(REG_PARAM1));
 		a.ldr(a64::x8, a64::Mem(a64::x8, accessors.specific.write.function)); // assume no more than 4096 vtable entries
 		a.blr(a64::x8);
 	}
@@ -1527,8 +1572,6 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	, m_baseptr(cache.near() + 0x100)
 	, m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
 {
-	m_near.emulated_flags = 0;
-
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
@@ -1629,7 +1672,7 @@ void drcbe_arm64::reset()
 	get_imm_absolute(a, BASE_REG, uintptr_t(m_baseptr));
 
 	a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kFPCR);
-	emit_ldr_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
+	a.mov(FLAGS_REG, 0);
 	emit_str_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
 
 	a.emitArgsAssignment(frame, args);
@@ -2206,13 +2249,9 @@ void drcbe_arm64::op_callc(a64::Assembler &a, const uml::instruction &inst)
 	Label skip;
 	emit_skip(a, inst.condition(), skip);
 
-	emit_str_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
-
 	get_imm_relative(a, REG_PARAM1, (uintptr_t)paramp.memory());
 	get_imm_relative(a, TEMP_REG1, (uintptr_t)funcp.cfunc());
 	a.blr(TEMP_REG1);
-
-	emit_ldr_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
 
 	if (inst.condition() != uml::COND_ALWAYS)
 		a.bind(skip);
@@ -2676,6 +2715,11 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 		else
 			call_arm_addr(a, (const void *)accessors.specific.read.function);
 	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		a.mov(REG_PARAM3, make_bitmask<uint64_t>(8 << spacesizep.size()));
+		emit_narrow_memread(a, addrp, spacesizep, accessors);
+	}
 	else
 	{
 		mov_reg_param(a, 4, REG_PARAM2, addrp);
@@ -2702,7 +2746,26 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 		}
 	}
 
-	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
+	const a64::Gp dstreg = dstp.select_register(REG_PARAM1, inst.size());
+	if (spacesizep.size() == SIZE_BYTE)
+	{
+		a.and_(dstreg, select_register(REG_PARAM1, inst.size()), 0x000000ff);
+		mov_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else if (spacesizep.size() == SIZE_WORD)
+	{
+		a.and_(dstreg, select_register(REG_PARAM1, inst.size()), 0x0000ffff);
+		mov_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else if ((spacesizep.size() == SIZE_DWORD) && (inst.size() == 8))
+	{
+		a.mov(dstreg.w(), REG_PARAM1.w());
+		mov_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else
+	{
+		mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
+	}
 }
 
 void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
@@ -2737,6 +2800,11 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 			call_arm_addr(a, (const void *)accessors.specific.read.function);
 		}
 	}
+	else if (have_specific && ((1 << spacesizep.size()) < accessors.specific.native_bytes))
+	{
+		mov_reg_param(a, inst.size(), REG_PARAM3, maskp);
+		emit_narrow_memread(a, addrp, spacesizep, accessors);
+	}
 	else
 	{
 		mov_reg_param(a, 4, REG_PARAM2, addrp);
@@ -2764,7 +2832,26 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 		}
 	}
 
-	mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
+	const a64::Gp dstreg = dstp.select_register(REG_PARAM1, inst.size());
+	if (spacesizep.size() == SIZE_BYTE)
+	{
+		a.and_(dstreg, select_register(REG_PARAM1, inst.size()), 0x000000ff);
+		mov_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else if (spacesizep.size() == SIZE_WORD)
+	{
+		a.and_(dstreg, select_register(REG_PARAM1, inst.size()), 0x0000ffff);
+		mov_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else if ((spacesizep.size() == SIZE_DWORD) && (inst.size() == 8))
+	{
+		a.mov(dstreg.w(), REG_PARAM1.w());
+		mov_param_reg(a, inst.size(), dstp, dstreg);
+	}
+	else
+	{
+		mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
+	}
 }
 
 void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
@@ -3172,7 +3259,9 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter maskp(*this, inst.param(3), PTYPE_MRI);
 
 	const a64::Gp output = dstp.select_register(TEMP_REG1, inst.size());
+	const a64::Gp src = srcp.select_register(output, inst.size());
 	const uint64_t instbits = inst.size() * 8;
+	const uint64_t instmask = util::make_bitmask<uint64_t>(instbits);
 
 	bool optimized = false;
 	if (maskp.is_immediate() && shiftp.is_immediate() && !maskp.is_immediate_value(util::make_bitmask<uint64_t>(instbits)))
@@ -3180,14 +3269,14 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		// A mask of all 1s will be handled efficiently in the unoptimized path, so only optimize for the other cases if possible
 		const auto pop = population_count_64(maskp.immediate());
 		const auto lz = count_leading_zeros_64(maskp.immediate()) & (instbits - 1);
-		const auto invlamask = ~(maskp.immediate() << lz) & util::make_bitmask<uint64_t>(instbits);
+		const auto invlamask = ~(maskp.immediate() << lz) & instmask;
 		const bool is_right_aligned = (maskp.immediate() & (maskp.immediate() + 1)) == 0;
 		const bool is_contiguous = (invlamask & (invlamask + 1)) == 0;
 		const auto s = shiftp.immediate() & (instbits - 1);
 
 		if (is_right_aligned || is_contiguous)
 		{
-			mov_reg_param(a, inst.size(), output, srcp);
+			mov_reg_param(a, inst.size(), src, srcp);
 			optimized = true;
 		}
 
@@ -3198,14 +3287,19 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 
 			if (s >= pop)
 			{
-				a.ubfx(output, output, s2, pop);
+				a.ubfx(output, src, s2, pop);
 			}
 			else
 			{
 				if (s2 > 0)
-					a.ror(output, output, s2);
-
-				a.bfc(output, pop, instbits - pop);
+				{
+					a.ror(output, src, s2);
+					a.bfc(output, pop, instbits - pop);
+				}
+				else
+				{
+					a.and_(output, src, ~maskp.immediate() & instmask);
+				}
 			}
 		}
 		else if (is_contiguous)
@@ -3214,9 +3308,14 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 			auto const rot = -int(s + pop + lz) & (instbits - 1);
 
 			if (rot > 0)
-				a.ror(output, output, rot);
-
-			a.ubfiz(output, output, instbits - pop - lz, pop);
+			{
+				a.ror(output, src, rot);
+				a.ubfiz(output, output, instbits - pop - lz, pop);
+			}
+			else
+			{
+				a.ubfiz(output, src, instbits - pop - lz, pop);
+			}
 		}
 	}
 
@@ -3238,18 +3337,25 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		if (!maskp.is_immediate() || !is_valid_immediate_mask(maskp.immediate(), inst.size()))
 			mov_reg_param(a, inst.size(), mask, maskp);
 
-		mov_reg_param(a, inst.size(), output, srcp);
 
 		if (shiftp.is_immediate())
 		{
 			const auto s = -int64_t(shiftp.immediate()) & (instbits - 1);
 			if (s != 0)
-				a.ror(output, output, s);
+			{
+				mov_reg_param(a, inst.size(), src, srcp);
+				a.ror(output, src, s);
+			}
+			else
+			{
+				mov_reg_param(a, inst.size(), output, srcp);
+			}
 		}
 		else
 		{
+			mov_reg_param(a, inst.size(), src, srcp);
 			a.and_(rshift, rshift, (inst.size() * 8) - 1);
-			a.ror(output, output, rshift);
+			a.ror(output, src, rshift);
 		}
 
 		const a64::Inst::Id maskop = inst.flags() ? a64::Inst::kIdAnds : a64::Inst::kIdAnd;
@@ -3333,10 +3439,10 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 			}
 			else
 			{
-				mov_reg_param(a, inst.size(), scratch, srcp);
+				mov_reg_param(a, inst.size(), src, srcp);
 			}
 
-			a.bfi(dst, scratch, lsb, pop);
+			a.bfi(dst, (rot > 0) ? scratch : src, lsb, pop);
 
 			optimized = true;
 		}

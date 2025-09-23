@@ -146,7 +146,7 @@ void igs_m027xa_state::video_start()
 
 void igs_m027xa_state::main_map(address_map &map)
 {
-	map(0x08000000, 0x0807ffff).rom().region("user1", 0); // Game ROM
+	map(0x08000000, 0x081fffff).rom().region("user1", 0); // Game ROM
 
 	map(0x18000000, 0x18007fff).ram().mirror(0xf8000).share("nvram");
 
@@ -165,7 +165,7 @@ void igs_m027xa_state::main_xor_map(address_map &map)
 {
 	main_map(map);
 
-	map(0x08000000, 0x0807ffff).r(FUNC(igs_m027xa_state::external_rom_r)); // Game ROM
+	map(0x08000000, 0x081fffff).r(FUNC(igs_m027xa_state::external_rom_r)); // Game ROM
 }
 
 
@@ -530,9 +530,9 @@ void igs_m027xa_state::base_xor(machine_config &config)
 ROM_START( haunthig )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "haunthig_igs027a", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "haunthig_igs027a", 0x00000, 0x4000, CRC(ccde8c3d) SHA1(7ed1613b848a7c9f1fd3e88f062eee5117a9a020) )
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "hauntedhouse_ver-109us.u34", 0x000000, 0x80000, CRC(300fed78) SHA1(afa4c8855cd780c57d4f92ea6131ed4e77063268) )
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 )
@@ -556,7 +556,7 @@ ROM_END
 ROM_START( haunthig107us ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, Oki M6295, two banks of 8 DIP switches
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "h2_igs027a.u42", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "h2_igs027a.u42", 0x00000, 0x4000, CRC(ccde8c3d) SHA1(7ed1613b848a7c9f1fd3e88f062eee5117a9a020) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "hauntedhouse_v-107us.u34", 0x000000, 0x200000, CRC(dd01f631) SHA1(34106caf3c3086f611c67852c5296dba6a0fb38a) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
@@ -582,9 +582,9 @@ ROM_END
 ROM_START( haunthig101us ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS031, Oki M6295, two banks of 8 DIP switches
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "h2_igs027a", 0x00000, 0x4000, NO_DUMP ) // sticker marked 'H2'
+	ROM_LOAD( "h2_igs027a", 0x00000, 0x4000, CRC(ccde8c3d) SHA1(7ed1613b848a7c9f1fd3e88f062eee5117a9a020) ) // sticker marked 'H2'
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "hauntedhouse_ver-101us.u34", 0x000000, 0x80000, CRC(4bf045d4) SHA1(78c848fd69961df8d9b75f92ad57c3534fbf08db) )
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 )
@@ -610,7 +610,7 @@ ROM_START( crzybugs ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "m7_igs27a.u37", 0x00000, 0x4000, CRC(1b20532c) SHA1(e08d0110a843915a8ba8627ae6d3947cccc22048) ) // sticker marked 'M7'
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-204us.u23", 0x000000, 0x80000, CRC(d1232462) SHA1(685a292f39bf57a80d6ef31289cf9f673ba06dd4) ) // MX27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked J9
@@ -632,7 +632,7 @@ ROM_START( crzybugs202us )
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "m7_igs27a.u37", 0x00000, 0x4000, CRC(1b20532c) SHA1(e08d0110a843915a8ba8627ae6d3947cccc22048) ) // sticker marked 'M7' (not verified for this set)
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-202us.u23", 0x000000, 0x80000, CRC(210da1e6) SHA1(c726497bebd25d6a9053e331b4c26acc7e2db0b2) ) // MX27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
@@ -654,7 +654,7 @@ ROM_START( crzybugs200us )
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "m7_igs27a.u37", 0x00000, 0x4000, CRC(1b20532c) SHA1(e08d0110a843915a8ba8627ae6d3947cccc22048) ) // sticker marked 'M7' (not verified for this set)
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "crazy_bugs_v-202us.u23", 0x000000, 0x80000, CRC(129e36e9) SHA1(53f20bc3792249de8ef276f84283baa9abd30acd) ) // MX27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
@@ -703,7 +703,7 @@ ROM_START( tripfev )
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "igs027a.u42", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) )
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "v110.u23", 0x000000, 0x80000, CRC(68658bf9) SHA1(7d7f2c67acb55a8ef24b7cc54cb2e5b3f94c387a) ) // 27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
@@ -724,7 +724,7 @@ ROM_START( tripfev108us ) // IGS PCB-0575-02-HU PCB
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "w1_igs027a.u42", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) ) // sticker marked 'W1'
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "v108.u34", 0x000000, 0x80000, CRC(f0ad18ed) SHA1(95239e7b9925f12008051140afb74d47a5da4a3a) ) // 27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked P7
@@ -746,7 +746,7 @@ ROM_START( tripfev107us ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "w1_igs027a.u37", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) ) // sticker marked 'W1'
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "triple_fever_u23_v107_us.u23", 0x000000, 0x80000, CRC(aa56d888) SHA1(0b8b2765079259b76ea803289841d867c33c8cb2) ) // 27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked P7
@@ -768,7 +768,7 @@ ROM_START( tripfev105us ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "w1_igs027a.u37", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) ) // sticker marked 'W1'
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "u23 27c4096.bin", 0x000000, 0x80000, CRC(f870edda) SHA1(30d1c2d4c575749adbbf28b64eca1f35bcf7dfca) ) // 27C4096, unreadable label
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked P7
@@ -790,7 +790,7 @@ ROM_START( wldfruit ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "w1.u37", 0x00000, 0x4000, NO_DUMP ) // sticker marked 'W1?' (same label, but not the same as tripfev)
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "wild_fruit_v-208us.u23", 0x000000, 0x80000, CRC(d43398f1) SHA1(ecc4bd5cb6da16b35c63b843cf7beec1ab84ed9d) ) // M27C4002
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked J9
@@ -812,7 +812,7 @@ ROM_START( jking04 ) // IGS PCB-0447-03-GM - Has IGS027A, MX10EXAQC, IGS031, Oki
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "j10_igs027a.u37", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "j_k_2004_v101_us.u23", 0x000000, 0x80000, CRC(8ab70d64) SHA1(4ddda6d9eba3db7b3e5267d70349933d6bce2266) ) // 27C4096
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
@@ -832,7 +832,7 @@ ROM_END
 ROM_START( krzykeno ) // IGS PCB-0575-03-HU PCB
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "v21_igs027a.u42", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "v21_igs027a.u42", 0x0000, 0x4000, CRC(f24271da) SHA1(e4530b563b2ca36cc7efbc699d438ca44824f58a) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "krazy_keno_v-105us.u34", 0x000000, 0x200000, CRC(98d8797e) SHA1(0de2500e85df5611baa275267d711f57bc5f60ee) )
@@ -879,9 +879,9 @@ void igs_m027xa_state::pgm_create_dummy_internal_arm_region()
 
 void igs_m027xa_state::init_hauntedh()
 {
-	hauntedh_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt(machine());
-	pgm_create_dummy_internal_arm_region();
+	tripfev_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
 }
 
 void igs_m027xa_state::init_crzybugs()
@@ -921,19 +921,18 @@ void igs_m027xa_state::init_jking04()
 
 void igs_m027xa_state::init_krzykeno()
 {
-	krzykeno_decrypt(machine());
-	pgm_create_dummy_internal_arm_region();
+	tswxp_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
-	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
 }
 
 } // anonymous namespace
 
 // These use the MX10EXAQC (80c51XA from Philips)
 // the PCBs are closer to igs_fear.cpp in terms of layout
-GAME(  2008, haunthig,      0,        base,       base,        igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_NOT_WORKING ) // IGS FOR V109US 2008 10 14
-GAME(  2007, haunthig107us, haunthig, base,       base,        igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2007 07 03
-GAME(  2006, haunthig101us, haunthig, base,       base,        igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_NOT_WORKING ) // IGS FOR V101US 2006 08 23
+GAME(  2008, haunthig,      0,        base_xor,   tripfev,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V109US)", MACHINE_NOT_WORKING ) // IGS FOR V109US 2008 10 14
+GAME(  2007, haunthig107us, haunthig, base_xor,   tripfev,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V107US)", MACHINE_NOT_WORKING ) // IGS FOR V107US 2007 07 03
+GAME(  2006, haunthig101us, haunthig, base_xor,   tripfev,     igs_m027xa_state, init_hauntedh,  ROT0, "IGS", "Haunted House (IGS, V101US)", MACHINE_NOT_WORKING ) // IGS FOR V101US 2006 08 23
 
 GAMEL( 2009, crzybugs,      0,        base_xor,   crzybugs_us, igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V204US)", 0, layout_crzybugs ) // IGS FOR V204US 2009 5 19
 GAMEL( 2006, crzybugs202us, crzybugs, base_xor,   crzybugs_us, igs_m027xa_state, init_crzybugs,  ROT0, "IGS", "Crazy Bugs (V202US)", 0, layout_crzybugs ) // IGS FOR V100US 2006 3 29 but also V202US string
@@ -950,4 +949,4 @@ GAME(  200?, wldfruit,      0,        base,       base,        igs_m027xa_state,
 
 GAME(  200?, jking04,       0,        base,       base,        igs_m027xa_state, init_jking04,   ROT0, "IGS", "Jungle King 2004 (V101US)", MACHINE_NOT_WORKING ) // no IGS027A dump
 
-GAME(  200?, krzykeno,      0,        base,       base,        igs_m027xa_state, init_krzykeno,  ROT0, "IGS", "Krazy Keno (V105US)", MACHINE_NOT_WORKING ) // no IGS027A dump
+GAME(  2006, krzykeno,      0,        base_xor,   tripfev,     igs_m027xa_state, init_krzykeno,  ROT0, "IGS", "Krazy Keno (V105US)", MACHINE_NOT_WORKING ) // inputs, outputs, Oki bank

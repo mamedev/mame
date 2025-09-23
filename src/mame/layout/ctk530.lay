@@ -248,7 +248,7 @@ license:CC0-1.0
 		<element ref="blackkey" inputtag="maincpu:kbd:FI0" inputmask="0x40"><bounds x="373" y="108" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="maincpu:kbd:FI1" inputmask="0x01"><bounds x="467" y="108" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="maincpu:kbd:FI1" inputmask="0x04"><bounds x="561" y="108" width="44" height="324" /></element>
-		
+
 		<!-- octave 3 -->
 		<element ref="whitekey" inputtag="maincpu:kbd:FI1" inputmask="0x10"><bounds x="656" y="108" width="79" height="504" /></element>
 		<element ref="whitekey" inputtag="maincpu:kbd:FI1" inputmask="0x40"><bounds x="738" y="108" width="79" height="504" /></element>
@@ -262,7 +262,7 @@ license:CC0-1.0
 		<element ref="blackkey" inputtag="maincpu:kbd:FI2" inputmask="0x04"><bounds x="947" y="108" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="maincpu:kbd:FI2" inputmask="0x10"><bounds x="1041" y="108" width="44" height="324" /></element>
 		<element ref="blackkey" inputtag="maincpu:kbd:FI2" inputmask="0x40"><bounds x="1135" y="108" width="44" height="324" /></element>
-		
+
 		<!-- octave 4 -->
 		<element ref="whitekey" inputtag="maincpu:kbd:FI3" inputmask="0x01"><bounds x="1230" y="108" width="79" height="504" /></element>
 		<element ref="whitekey" inputtag="maincpu:kbd:FI3" inputmask="0x04"><bounds x="1312" y="108" width="79" height="504" /></element>

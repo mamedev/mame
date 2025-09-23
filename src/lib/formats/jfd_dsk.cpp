@@ -374,9 +374,4 @@ bool jfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool jfd_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const jfd_format FLOPPY_JFD_FORMAT;

@@ -526,15 +526,15 @@ void teradrive_state::md_68k_map(address_map &map)
 //  map(0x000000, 0x7fffff).view(m_cart_view);
 	// when /CART pin is low
 //  m_cart_view[0](0x000000, 0x3fffff).m(m_cart, FUNC(...::cart_map));
-//  m_cart_view[0](0x000000, 0x003fff).view(m_tmss_view);
-//  m_tmss_view[0](0x000000, 0x003fff).rom().region("tmss", 0);
+//  m_cart_view[0](0x000000, 0x000fff).view(m_tmss_view);
+//  m_tmss_view[0](0x000000, 0x000fff).rom().region("tmss", 0);
 //  m_cart_view[0](0x400000, 0x7fffff).m(m_exp, FUNC(...::expansion_map));
 
 	// /CART high (matters for MCD SRAM at very least)
 //  m_cart_view[1](0x000000, 0x3fffff).m(m_exp, FUNC(...::expansion_map));
 //  m_cart_view[1](0x400000, 0x7fffff).m(m_cart, FUNC(...::cart_map));
-//  m_cart_view[1](0x400000, 0x403fff).view(m_tmss_view);
-//  m_tmss_view[0](0x400000, 0x403fff).rom().region("tmss", 0);
+//  m_cart_view[1](0x400000, 0x400fff).view(m_tmss_view);
+//  m_tmss_view[0](0x400000, 0x400fff).rom().region("tmss", 0);
 
 	map(0x000000, 0x3fffff).r(m_md_cart, FUNC(generic_slot_device::read_rom));
 	map(0x000000, 0x000fff).view(m_tmss_view);
@@ -552,8 +552,12 @@ void teradrive_state::md_68k_map(address_map &map)
 //  map(0xa11100, 0xa111ff) Z80 BUSREQ/BUSACK
 	map(0xa11100, 0xa11101).lrw16(
 		NAME([this] (offs_t offset, u16 mem_mask) {
+			address_space &space = m_md68kcpu->space(AS_PROGRAM);
+			// TODO: enough for all edge cases but timekill
+			u16 open_bus = space.read_word(m_md68kcpu->pc() - 2) & 0xfefe;
+			// printf("%06x -> %04x\n", m_md68kcpu->pc() - 2, open_bus);
 			u16 res = (!m_z80_busrq || m_z80_reset) ^ 1;
-			return (res << 8) | (res);
+			return (res << 8) | (res) | open_bus;
 		}),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			//printf("%04x %04x\n", data, mem_mask);
@@ -627,7 +631,8 @@ void teradrive_state::md_68k_map(address_map &map)
 		})
 	);
 //  map(0xc00000, 0xdfffff) VDP and PSG (with mirrors and holes)
-	map(0xc00000, 0xc0001f).m(m_md_vdp, FUNC(ym7101_device::if16_map));
+//	$d00000 alias required by earthdef
+	map(0xc00000, 0xc0001f).mirror(0x100000).m(m_md_vdp, FUNC(ym7101_device::if16_map));
 	map(0xe00000, 0xe0ffff).mirror(0x1f0000).ram(); // Work RAM, usually accessed at $ff0000
 }
 
@@ -966,6 +971,8 @@ void teradrive_state::teradrive(machine_config &config)
 	M68000(config, m_md68kcpu, md_master_xtal / 7);
 	m_md68kcpu->set_addrmap(AS_PROGRAM, &teradrive_state::md_68k_map);
 	m_md68kcpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &teradrive_state::md_cpu_space_map);
+	// disallow TAS (gargoyle, cliffh, exmutant)
+	m_md68kcpu->set_tas_write_callback(NAME([] (offs_t offset, u8 data) { }));
 
 	Z80(config, m_mdz80cpu, md_master_xtal / 15);
 	m_mdz80cpu->set_addrmap(AS_PROGRAM, &teradrive_state::md_z80_map);

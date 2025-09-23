@@ -500,35 +500,37 @@ void debug_view_expression::set_context(symbol_table *context)
 bool debug_view_expression::recompute()
 {
 	bool changed = m_dirty;
+	bool failed = false;
 
 	// if dirty, re-evaluate
 	if (m_dirty)
 	{
-		std::string oldstring(m_parsed.original_string());
+		std::string const oldstring(m_parsed.original_string());
 		try
 		{
 			m_parsed.parse(m_string);
 		}
 		catch (expression_error const &)
 		{
+			failed = true;
+		}
+		if (failed && (oldstring != m_string))
+		{
+			// parsing failed on changing the expression input
 			try
 			{
-				// If we got here because the user typed in a new expression,
-				// then going back to the previous expression should work
+				// try falling back to the previous string
 				m_parsed.parse(oldstring);
+				failed = false;
 			}
 			catch (expression_error const &)
 			{
-				// If that didn't work, perhaps the user switched sources
-				// and the previous expression doesn't evaluate with the
-				// new symbol table.  Try "0" as last resort
-				m_parsed.parse("0");
 			}
 		}
 	}
 
-	// if we have a parsed expression, evalute it
-	if (!m_parsed.is_empty())
+	// if we have a parsed expression, evaluate it
+	if (!failed && !m_parsed.is_empty())
 	{
 		// recompute the value of the expression
 		try

@@ -3508,7 +3508,7 @@ uint8_t ddenlovr_state::hginga_input_r()
 	case 0xa2: // player 2
 		if (m_keyb < 5)
 		{
-			result = m_io_key[BIT(m_input_sel, 1)][m_keyb]->read();
+			result = m_io_key[BIT(~m_input_sel, 1)][m_keyb]->read();
 			if (!machine().side_effects_disabled())
 				++m_keyb;
 		}
@@ -7240,7 +7240,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x10, "500" )
 	PORT_DIPSETTING(    0x08, "700" )
 	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x20, 0x00, "Computer Strength" )             PORT_DIPLOCATION("SW3:6")         // コンピューターの強さ
+	PORT_DIPNAME( 0x20, 0x00, "Computer Strength" )             PORT_DIPLOCATION("SW3:6")         // コンピュータの強さ
 	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                   // 普通
 	PORT_DIPSETTING(    0x20, "Strong" )                                                          // 強
 	PORT_DIPNAME( 0x40, 0x00, "Double Bet" )                    PORT_DIPLOCATION("SW3:7")         // W-BET 機能
@@ -7340,6 +7340,8 @@ static INPUT_PORTS_START( hginga )
 	// SW 3  OFF OFF OFF OFF  ON OFF OFF OFF OFF OFF       OFF OFF OFF OFF  ON OFF OFF OFF OFF OFF       OFF  ON OFF OFF  ON OFF OFF OFF OFF OFF
 	// SW 4   ON OFF OFF OFF OFF OFF OFF OFF OFF OFF       OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF       OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF
 
+	// TODO: are separate 2P Start and Bet buttons supported with a hanaroku panel?
+
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW3", 0x03, EQUALS, 0x02) // pay
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW3", 0x03, EQUALS, 0x03)
@@ -7353,84 +7355,142 @@ static INPUT_PORTS_START( hginga )
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2)   // A
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(2)   // E
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // I
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(2)   // M
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Kan
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2   )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )        PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_B )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_C )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )                  PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00) // only a single Flip Flop, corresponding 2P input
 
 	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2)   // B
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2)   // F
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // J
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(2)   // N
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Reach
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2) // BET
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )       PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_E )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )        PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_F )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
 
 	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(2)   // C
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // G
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // K
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Chi
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Ron
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_BET )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
 
 	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2)   // D
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // H
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // L
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // PON
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_B )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_C )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
 
 	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)   // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // Flip Flop
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG   ) PORT_PLAYER(2)   // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)   // "s"
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )       PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )   PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )   PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )       PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_E )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )        PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_F )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
 
 	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )  // A
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E )  // E
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // I
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )  // M
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Kan
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1   )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )        PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
 
 	PORT_START("KEY6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B )  // B
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F )  // F
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // J
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )  // N
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Reach
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )    // BET
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )       PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
 
 	PORT_START("KEY7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C )  // C
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // G
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // K
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Chi
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Ron
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
 
 	PORT_START("KEY8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D )  // D
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // H
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // L
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // PON
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
 
 	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )  // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  // Flip Flop
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )  // "s"
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )       PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )   PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )   PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )       PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x04, "Hanafuda Game Payout Rate" )         PORT_DIPLOCATION("SW1:1,2,3")        // 花札　ゲーム　配当率
@@ -7624,14 +7684,14 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x40, "75%" )
 	PORT_DIPSETTING(    0x60, "80%" )
 	PORT_DIPNAME( 0x80, 0x80, "Key-In Rate" )                        PORT_DIPLOCATION("SW1:8")      // キーインレート
-	PORT_DIPSETTING(    0x00, "5" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                    // ×　５
-	PORT_DIPSETTING(    0x00, "10" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x00, "25" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x00, "50" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x80, "10" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                    // ×１０
-	PORT_DIPSETTING(    0x80, "20" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x80, "50" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x80, "100" ) PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "5" )       PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                // ×　５
+	PORT_DIPSETTING(    0x00, "10" )      PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, "25" )      PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x00, "50" )      PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, "10" )      PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                // ×１０
+	PORT_DIPSETTING(    0x80, "20" )      PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x80, "50" )      PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x80, "100" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )                     PORT_DIPLOCATION("SW2:1,2")    // COIN RATE
@@ -7664,10 +7724,22 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x04, "Active Low" )                                                        // Low Active
 	PORT_DIPSETTING(    0x00, "Active High" )                                                       // High Active
 	PORT_DIPNAME( 0x18, 0x08, "Credit Limit" )                       PORT_DIPLOCATION("SW3:4,5")    // クレジット・リミット
-	PORT_DIPSETTING(    0x18, "1000" )                                                              // 1000クレジット
-	PORT_DIPSETTING(    0x10, "2000" )                                                              // 2000クレジット
-	PORT_DIPSETTING(    0x08, "3000" )                                                              // 3000クレジット
-	PORT_DIPSETTING(    0x00, "5000" )                                                              // 5000クレジット
+	PORT_DIPSETTING(    0x18, "1,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                // 1000クレジット
+	PORT_DIPSETTING(    0x18, "2,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x18, "5,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x18, "10,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, "2,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                // 2000クレジット
+	PORT_DIPSETTING(    0x10, "4,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x10, "10,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, "20,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, "3,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                // 3000クレジット
+	PORT_DIPSETTING(    0x08, "6,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x08, "15,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, "30,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "5,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                // 5000クレジット
+	PORT_DIPSETTING(    0x00, "10,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, "25,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x00, "50,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
 	PORT_DIPNAME( 0x20, 0x20, "Hanaroku Hopper Type" )               PORT_DIPLOCATION("SW3:6")      // 花六ホッパー
 	PORT_DIPSETTING(    0x20, "Manual" )                                                            // 手動
 	PORT_DIPSETTING(    0x00, "Automatic" )                                                         // 自動
@@ -8394,10 +8466,22 @@ static INPUT_PORTS_START( seljan2 )
 	PORT_DIPSETTING(    0x04, "3" )                                                                        // レート３
 	PORT_DIPSETTING(    0x00, "5" )                                                                        // レート５
 	PORT_DIPNAME( 0x30, 0x00, "Credit Limit" )                       PORT_DIPLOCATION("DIP-SW2:5,6")       // クレジット・コインリミット
-	PORT_DIPSETTING(    0x30, "300" )
-	PORT_DIPSETTING(    0x20, "500" )
-	PORT_DIPSETTING(    0x10, "700" )
-	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPSETTING(    0x30, "300" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )                      //  300
+	PORT_DIPSETTING(    0x30, "600" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x30, "1500" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x30, "3000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
+	PORT_DIPSETTING(    0x20, "500" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )                      //  500
+	PORT_DIPSETTING(    0x20, "1000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x20, "2500" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x20, "5000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
+	PORT_DIPSETTING(    0x10, "700" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )                      //  700
+	PORT_DIPSETTING(    0x10, "1400" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x10, "3500" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x10, "7000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
+	PORT_DIPSETTING(    0x00, "1000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )                      // 1000
+	PORT_DIPSETTING(    0x00, "2000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x00, "5000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x00, "10000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
 	PORT_DIPNAME( 0x40, 0x00, "Double Bet" )                         PORT_DIPLOCATION("DIP-SW2:7")         // W-BET機能
 	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                               // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
@@ -8429,7 +8513,7 @@ static INPUT_PORTS_START( seljan2 )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
 	PORT_DIPNAME( 0x80, 0x80, "Game Style" )                         PORT_DIPLOCATION("DIP-SW3:8")         // ゲームスタイル
 	PORT_DIPSETTING(    0x80, "Credit" )                                                                   // クレジット
-	PORT_DIPSETTING(    0x00, "Credit Timer" )                                                             // クレジットタイマー
+	PORT_DIPSETTING(    0x00, "Credit timer" )                                                             // クレジットタイマー
 
 	PORT_START("DSW4")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )                 PORT_DIPLOCATION("DIP-SW4:1")         // デモサウンド
@@ -8441,9 +8525,9 @@ static INPUT_PORTS_START( seljan2 )
 	PORT_DIPNAME( 0x04, 0x00, "Show Renchan Gal" )                   PORT_DIPLOCATION("DIP-SW4:3")         // 連荘ギャル表示
 	PORT_DIPSETTING(    0x04, DEF_STR(No) )                                                                // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                               // 有
-	PORT_DIPNAME( 0x08, 0x00, "Renchan Gal Display")                 PORT_DIPLOCATION("DIP-SW4:4")         // 連荘ギャル表示方法
-	PORT_DIPSETTING(    0x08, "After Every Win" )                                                          // 勝つ毎
-	PORT_DIPSETTING(    0x00, "After 3 Consecutive Wins" )                                                 // 3連荘後
+	PORT_DIPNAME( 0x08, 0x00, "Renchan Gal Display")                 PORT_DIPLOCATION("DIP-SW4:4")         // 連荘ギャルの表示方法
+	PORT_DIPSETTING(    0x08, "After every win" )                                                          // 勝つ毎
+	PORT_DIPSETTING(    0x00, "After 3 consecutive wins" )                                                 // 3連荘後
 	PORT_DIPNAME( 0x10, 0x00, "Game Screen Gal Action" )             PORT_DIPLOCATION("DIP-SW4:5")         // ゲーム画面のギャルアクションの有無
 	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                               // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
@@ -8462,14 +8546,14 @@ static INPUT_PORTS_START( seljan2 )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Flip_Screen) )                 PORT_DIPLOCATION("DIP-SW1:10")        // モニター画面反転
 	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                               // 通常
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 反転
-	PORT_DIPNAME( 0x0c, 0x08, "Computer Strength" )                  PORT_DIPLOCATION("DIP-SW2:9,10")      // コンピュタの強さ（放銃パターンの確率）
+	PORT_DIPNAME( 0x0c, 0x08, "Computer Strength" )                  PORT_DIPLOCATION("DIP-SW2:9,10")      // コンピュータの強さ（放銃パターンの確率）
 	PORT_DIPSETTING(    0x00, "Weak" )                                                                     // 弱い
 	PORT_DIPSETTING(    0x04, DEF_STR(Normal) )                                                            // 普通
-	PORT_DIPSETTING(    0x08, "Somewhat Strong" )                                                          // やや強い
+	PORT_DIPSETTING(    0x08, "Somewhat strong" )                                                          // やや強い
 	PORT_DIPSETTING(    0x0c, "Strong" )                                                                   // 強い
 	PORT_DIPNAME( 0x10, 0x10, "Start Method With Credit Timer" )     PORT_DIPLOCATION("DIP-SW3:9")         // クレジットタイマー時のスタート方式
 	PORT_DIPSETTING(    0x10, DEF_STR(Normal) )                                                            // 通常
-	PORT_DIPSETTING(    0x00, "Always Minimum Bet" )                                                       // 最低RATE固定
+	PORT_DIPSETTING(    0x00, "Always minimum bet" )                                                       // 最低RATE固定
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DIP-SW3:10" )                                                      // OFF固定
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DIP-SW4:9" )                                                       // OFF固定
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DIP-SW4:10" )                                                      // OFF固定
@@ -8483,6 +8567,79 @@ static INPUT_PORTS_START( seljan2 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+INPUT_PORTS_START( jongoh )
+	// Only the page showing SW3 and SW4 has been seen
+	// The manual provides four sets of standard settings:
+	//       標準設定　コインプールタイプ　Ａ              標準設定　コインプールタイプ　Ｂ              標準設定　メダルコーナータイプ                標準設定　アミューズコーナータイプ
+	// SW 3   ON  ON OFF  ON  ON  ON  ON OFF OFF OFF        ON  ON OFF  ON  ON  ON  ON OFF OFF OFF       OFF OFF  ON  ON OFF  ON  ON OFF OFF OFF        ON OFF  ON  ON OFF  ON  ON OFF  ON OFF
+	// SW 4  OFF  ON  ON  ON  ON  ON  ON  ON OFF OFF       OFF  ON  ON  ON  ON OFF  ON  ON OFF OFF        ON  ON  ON  ON  ON OFF  ON  ON OFF OFF        ON  ON  ON  ON  ON OFF  ON  ON OFF OFF
+
+	PORT_INCLUDE(seljan2)
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x07, 0x04, "Bonus Point Cycle" )                  PORT_DIPLOCATION("DIP-SW3:1,2,3")     // ボーナスポイントの周期設定
+	PORT_DIPSETTING(    0x07, "None" )                                                                     // 無
+	PORT_DIPSETTING(    0x06, "First time only" )                                                          // 初回のみ
+	PORT_DIPSETTING(    0x05, "Every 300 coins" )                                                          //  300コイン毎
+	PORT_DIPSETTING(    0x04, "Every 500 coins" )                                                          //  500コイン毎
+	PORT_DIPSETTING(    0x03, "Every 700 coins" )                                                          //  700コイン毎
+	PORT_DIPSETTING(    0x02, "Every 1000 coins" )                                                         // 1000コイン毎
+//  PORT_DIPSETTING(    0x01, "Every 1000 coins" )
+//  PORT_DIPSETTING(    0x00, "Every 1000 coins" )
+	PORT_DIPNAME( 0x08, 0x00, "Yakuman Chances Per Cycle" )          PORT_DIPLOCATION("DIP-SW3:4")         // 役満チャンスの周期設定周期毎に
+	PORT_DIPSETTING(    0x00, "1" )                                                                        // 1回
+	PORT_DIPSETTING(    0x08, "2" )                                                                        // 2回
+	PORT_DIPNAME( 0x10, 0x00, "Flip Flop Button" )                   PORT_DIPLOCATION("DIP-SW3:5")         // F.FLOP機能ボタン変更
+	PORT_DIPSETTING(    0x10, "Start" )                                                                    // スタート
+	PORT_DIPSETTING(    0x00, "Flip Flop" )                                                                // F/F
+	PORT_DIPNAME( 0x20, 0x00, "Last Chance" )                        PORT_DIPLOCATION("DIP-SW3:6")         // ラストチャンスの有無
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+	PORT_DIPNAME( 0x40, 0x00, "Double Bet" )                         PORT_DIPLOCATION("DIP-SW3:7")         // W-BET機能
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+	PORT_DIPNAME( 0x80, 0x80, "Medal Timer" )                        PORT_DIPLOCATION("DIP-SW3:8")         // メダルタイマーの設定
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )                 PORT_DIPLOCATION("DIP-SW4:1")         // デモサウンドの有無
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )                      PORT_DIPLOCATION("DIP-SW4:2")         // ゲームサウンドの有無
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+	PORT_DIPNAME( 0x04, 0x00, "In-Game Voice" )                      PORT_DIPLOCATION("DIP-SW4:3")         // ゲーム中のボイス有無
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+	PORT_DIPNAME( 0x08, 0x00, "Winning Yakuman Display Voice" )      PORT_DIPLOCATION("DIP-SW4:4")         // 上がり役満表示のボイス有無
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+	PORT_DIPNAME( 0x10, 0x00, "Show Renchan Gal" )                   PORT_DIPLOCATION("DIP-SW4:5")         // 連荘ギャル表示
+	PORT_DIPSETTING(    0x10, DEF_STR(No) )                                                                // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                               // 有
+	PORT_DIPNAME( 0x20, 0x00, "Renchan Gal Display")                 PORT_DIPLOCATION("DIP-SW4:6")         // 連荘ギャル表示方法
+	PORT_DIPSETTING(    0x20, "After every win" )                                                          // 勝つ毎
+	PORT_DIPSETTING(    0x00, "After 3 consecutive wins" )                                                 // 三連荘後
+	PORT_DIPNAME( 0x40, 0x00, "Game Screen Gal Action" )             PORT_DIPLOCATION("DIP-SW4:7")         // ゲーム画面のギャルアクションの有無
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+	PORT_DIPNAME( 0x80, 0x00, "Auto Reach" )                         PORT_DIPLOCATION("DIP-SW4:8")         // オートリーチの有無
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+
+	PORT_MODIFY("DSWTOP")
+	PORT_DIPNAME( 0x10, 0x10, "Game Style" )                         PORT_DIPLOCATION("DIP-SW3:9")         // ゲームスタイル
+	PORT_DIPSETTING(    0x10, "Credit" )                                                                   // クレジットタイプ
+	PORT_DIPSETTING(    0x00, "Credit timer" )                                                             // クレジットタイマータイプ
+	PORT_DIPNAME( 0x20, 0x20, "Start Method With Credit Timer" )     PORT_DIPLOCATION("DIP-SW3:10")        // クレジットタイマー時のスタート方式
+	PORT_DIPSETTING(    0x20, DEF_STR(Normal) )                                                            // 通常
+	PORT_DIPSETTING(    0x00, "Always minimum bet" )                                                       // 最低レート固定
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DIP-SW4:9" )                                                       // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DIP-SW4:10" )                                                      // OFF固定
 
 INPUT_PORTS_END
 
@@ -8681,10 +8838,22 @@ static INPUT_PORTS_START( dtoyoken )
 	PORT_DIPSETTING(    0x04, "3" )                                                                 // レート3
 	PORT_DIPSETTING(    0x00, "5" )                                                                 // レート5
 	PORT_DIPNAME( 0x30, 0x00, "Credit Limit" )                   PORT_DIPLOCATION("DIP-SW2:5,6")    // クレジット・コインリミット
-	PORT_DIPSETTING(    0x30, "300" )
-	PORT_DIPSETTING(    0x20, "500" )
-	PORT_DIPSETTING(    0x10, "700" )
-	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPSETTING(    0x30, "300" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )               //  300
+	PORT_DIPSETTING(    0x30, "600" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x30, "1500" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x30, "3000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
+	PORT_DIPSETTING(    0x20, "500" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )               //  500
+	PORT_DIPSETTING(    0x20, "1000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x20, "2500" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x20, "5000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
+	PORT_DIPSETTING(    0x10, "700" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )               //  700
+	PORT_DIPSETTING(    0x10, "1400" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x10, "3500" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x10, "7000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
+	PORT_DIPSETTING(    0x00, "1000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )               // 1000
+	PORT_DIPSETTING(    0x00, "2000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x00, "5000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x00, "10000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
 	PORT_DIPNAME( 0x40, 0x00, "Double Bet" )                     PORT_DIPLOCATION("DIP-SW2:7")      // W-BET機能
 	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                        // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                         // 有
@@ -8745,7 +8914,7 @@ static INPUT_PORTS_START( dtoyoken )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Flip_Screen) )             PORT_DIPLOCATION("DIP-SW1:10")     // モニター画面反転
 	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                        // 通常
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                         // 反転
-	PORT_DIPNAME( 0x0c, 0x04, "Computer Strength" )              PORT_DIPLOCATION("DIP-SW2:9,10")   // コンピュタの強さ
+	PORT_DIPNAME( 0x0c, 0x04, "Computer Strength" )              PORT_DIPLOCATION("DIP-SW2:9,10")   // コンピュータの強さ
 	PORT_DIPSETTING(    0x00, "Weak" )                                                              // 弱い
 	PORT_DIPSETTING(    0x04, DEF_STR(Normal) )                                                     // 普通
 	PORT_DIPSETTING(    0x08, "Somewhat Strong" )                                                   // やや強い
@@ -8791,7 +8960,7 @@ static INPUT_PORTS_START( daimyojn )
 
 	PORT_START("DSW1")
 	MAHJONG_PAYOUT_RATE(0, "DIP-SW1:1,2,3,4")                                                              // ＰＡＹ　ＯＵＴ　ＲＡＴＥ
-	PORT_DIPNAME( 0x30, 0x00, "Odds Rate" )                          PORT_DIPLOCATION("DIP-SW1:5,6")       // ＯＤＤＳ　ＲＡＴＥ         no effect in "Credits with timer" mode, always uses 1 2 4 8 12 16 24 32
+	PORT_DIPNAME( 0x30, 0x00, "Odds Rate" )                          PORT_DIPLOCATION("DIP-SW1:5,6")       // ＯＤＤＳ　ＲＡＴＥ         no effect in "Credit timer" mode, always uses 1 2 4 8 12 16 24 32
 	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
@@ -8860,7 +9029,7 @@ static INPUT_PORTS_START( daimyojn )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Service_Mode) )                PORT_DIPLOCATION("DIP-SW4:1")         // モード
 	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                               // 通常ゲーム
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // テストモード
-	PORT_DIPNAME( 0x02, 0x00, "Don Den Button" )                     PORT_DIPLOCATION("DIP-SW4:2")         // F.FLOP機能ボタン変更
+	PORT_DIPNAME( 0x02, 0x00, "Don Den Button" )                     PORT_DIPLOCATION("DIP-SW4:2")         // F.FLOP機能のボタン変更
 	PORT_DIPSETTING(    0x02, "Start" )                                                                    // スタート
 	PORT_DIPSETTING(    0x00, "Flip Flop" )                                                                // F/F
 	PORT_DIPNAME( 0x04, 0x00, "Last Chance" )                        PORT_DIPLOCATION("DIP-SW4:3")         // ラストチャンスの有無
@@ -8878,23 +9047,23 @@ static INPUT_PORTS_START( daimyojn )
 
 	PORT_START("DSW5")
 	MAHJONG_NOTE_CREDITS(0, "DIP-SW1:9", "DSW2", 0)                                                        // ＮＯＴＥ　ＲＡＴＥ
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Flip_Screen) )                 PORT_DIPLOCATION("DIP-SW1:10")
-	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR(Unknown) )                     PORT_DIPLOCATION("DIP-SW2:9,10")      // FIXME: illegible
-	PORT_DIPSETTING(    0x0c, "A?" )                                                                       // FIXME: illegible
-	PORT_DIPSETTING(    0x08, "B?" )                                                                       // FIXME: illegible
-	PORT_DIPSETTING(    0x04, "C?" )                                                                       // FIXME: illegible
-	PORT_DIPSETTING(    0x00, "D?" )                                                                       // FIXME: illegible
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Flip_Screen) )                 PORT_DIPLOCATION("DIP-SW1:10")        // モニター画面反転
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                               // 通常
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 反転
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR(Unknown) )                     PORT_DIPLOCATION("DIP-SW2:9,10")      // コンピュータの強さ（放銃パターンの確率）
+	PORT_DIPSETTING(    0x00, "Weak" )                                                                     // 弱い
+	PORT_DIPSETTING(    0x04, DEF_STR(Normal) )                                                            // 普通
+	PORT_DIPSETTING(    0x08, "Somewhat strong" )                                                          // やや強い
+	PORT_DIPSETTING(    0x0c, "Strong" )                                                                   // 強い
 	PORT_DIPNAME( 0x10, 0x10, "Game Style" )                         PORT_DIPLOCATION("DIP-SW3:9")         // ゲームスタイル
-	PORT_DIPSETTING(    0x10, "Credits" )                                                                  // クレジット
-	PORT_DIPSETTING(    0x00, "Credits with timer" )                                                       // クレジットタイマー
+	PORT_DIPSETTING(    0x10, "Credit" )                                                                   // クレジット
+	PORT_DIPSETTING(    0x00, "Credit timer" )                                                             // クレジットタイマー
 	PORT_DIPNAME( 0x20, 0x20, "Game Start Method" )                  PORT_DIPLOCATION("DIP-SW3:10")        // ゲームスタート時のスタート方式
 	PORT_DIPSETTING(    0x20, DEF_STR(Normal) )                                                            // 通常
-	PORT_DIPSETTING(    0x00, "Automatic minimum bet" )                                                    // FIXME: illegible - when SW3:9 is set to Credits with timer, you can only take the minimum bet by pressing start
+	PORT_DIPSETTING(    0x00, "Automatic minimum bet" )                                                    // FIXME: illegible - when SW3:9 is set to "Credit timer", you can only take the minimum bet by pressing start
 	PORT_DIPNAME( 0x40, 0x40, "Game Mode" )                          PORT_DIPLOCATION("DIP-SW4:9")         // タイプ設定
 	PORT_DIPSETTING(    0x40, "Coin Pool" )                                                                // コインプール
-	PORT_DIPSETTING(    0x00, "Medal/Credits with timer" )
+	PORT_DIPSETTING(    0x00, "Medal/credit timer" )                                                       // メダル?クレジットタイマータイプ  FIXME: illegible
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP-SW4:10")                                                      // ＯＦＦ固定
 
 	PORT_START("BET")
@@ -9023,10 +9192,10 @@ static INPUT_PORTS_START( hnrose )
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                             // 無
 	PORT_DIPSETTING(    0x20, DEF_STR(On) )                                                              // 有
 	PORT_DIPNAME( 0xc0, 0xc0, "Game Mode" )                         PORT_DIPLOCATION("DIP-SW4:7,8")
-	PORT_DIPSETTING(    0xc0, "Credits" )                                                                // クレジットタイプ
-	PORT_DIPSETTING(    0x80, "Medal with timer" )                                                       // メダルタイマータイプ
-	PORT_DIPSETTING(    0x40, "Credits with timer" )                                                     // クレジットタイマータイプ            (doesn't seem to work properly - probably an emulation bug)
-	//PORT_DIPSETTING(    0x00, "Credits" )                                                              //                                     (not listed in the manual, functions the same way as "Credits")
+	PORT_DIPSETTING(    0xc0, "Credit" )                                                                 // クレジットタイプ
+	PORT_DIPSETTING(    0x80, "Medal timer" )                                                            // メダルタイマータイプ
+	PORT_DIPSETTING(    0x40, "Credit timer" )                                                           // クレジットタイマータイプ            (doesn't seem to work properly - probably an emulation bug)
+	//PORT_DIPSETTING(    0x00, "Credit" )                                                               //                                     (not listed in the manual, functions the same way as "Credit")
 
 	PORT_START("DSW5")
 	PORT_DIPNAME( 0x01, 0x01, "Credits Per Note" )                  PORT_DIPLOCATION("DIP-SW1:9")        // NOTE RATE
@@ -13012,7 +13181,7 @@ GAME( 2000, hnrose,      0,        hnrose,    hnrose,     hanakanz_state, empty_
 
 GAME( 2000, mjswacad,    0,        mjgnight,  mjgnight,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Sweet Academy (Japan, TSM010-002)",                      MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // needs verifying of inputs, outputs (DIP sheet available)
 
-GAME( 2000, jongoh,      0,        jongoh,    seljan2,    ddenlovr_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Jongoh (Japan, TTL800-03-04)",                           MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // needs verifying of inputs, outputs
+GAME( 2000, jongoh,      0,        jongoh,    jongoh,     ddenlovr_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Jongoh (Japan, TTL800-03-04)",                           MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // needs verifying of inputs, outputs
 
 GAME( 2001, daireach,    0,        daireach,  seljan2,    hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Dai-Reach (Japan, TSM012-C01)",                          MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL )
 

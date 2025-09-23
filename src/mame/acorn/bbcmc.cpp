@@ -41,6 +41,7 @@ public:
 		, m_i2cmem(*this, "i2cmem")
 		, m_wdfdc(*this, "wdfdc")
 		, m_adlc(*this, "mc6854")
+		, m_exp(*this, "exp")
 		, m_joyport(*this, "joyport")
 		, m_power_led(*this, "power_led")
 	{ }
@@ -63,6 +64,7 @@ private:
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<wd1772_device> m_wdfdc;
 	required_device<mc6854_device> m_adlc;
+	required_device<bbc_exp_slot_device> m_exp;
 	required_device<bbc_joyport_slot_device> m_joyport;
 	output_finder<> m_power_led;
 
@@ -611,6 +613,7 @@ void bbcmc_state::bbcmc(machine_config &config)
 	ECONET_SLOT(config, "econet", "network", econet_devices);
 
 	BBC_EXP_SLOT(config, m_exp, 16_MHz_XTAL / 2, bbc_exp_devices, nullptr);
+	m_exp->set_screen("screen");
 	m_exp->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
 	m_exp->nmi_handler().set(FUNC(bbcmc_state::bus_nmi_w));
 	m_exp->lpstb_handler().set(m_sysvia, FUNC(via6522_device::write_cb2));
@@ -773,7 +776,7 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME        PARENT  COMPAT MACHINE     INPUT   CLASS         INIT        COMPANY                        FULLNAME                              FLAGS
+//    YEAR  NAME        PARENT  COMPAT MACHINE     INPUT   CLASS          INIT       COMPANY                        FULLNAME                              FLAGS
 COMP( 1986, bbcmc,      0,      bbcm,  bbcmc,      bbcm,   bbcmc_state,   init_bbc,  "Acorn Computers",             "BBC Master Compact",                 MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1986, bbcmc_ar,   bbcmc,  0,     bbcmc_ar,   bbcm,   bbcmc_state,   init_bbc,  "Acorn Computers",             "BBC Master Compact (Arabic)",        MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1987, pro128s,    bbcmc,  0,     bbcmc,      bbcm,   bbcmc_state,   init_bbc,  "Olivetti",                    "Prodest PC 128S",                    MACHINE_IMPERFECT_GRAPHICS )

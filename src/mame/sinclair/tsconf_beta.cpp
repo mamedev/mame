@@ -99,7 +99,7 @@ u8 tsconf_beta_device::state_r()
 {
 	if (pre_vg_in_check())
 	{
-		u8 result = 0x3f;		// actually open bus
+		u8 result = 0x3f;       // actually open bus
 		result |= m_wd179x->drq_r() ? 0x40 : 0;
 		result |= m_wd179x->intrq_r() ? 0x80 : 0;
 		return result;

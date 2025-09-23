@@ -1,90 +1,80 @@
 // license:LGPL-2.1+
-// copyright-holders:David Haywood, Angelo Salese, ElSemi
+// copyright-holders:R. Belmont, David Haywood, Angelo Salese, ElSemi
 /**************************************************************************************************
 
     L7A1045 L6028 DSP-A
     (QFP120 package)
 
-    this is the audio chip used on the following
-    SNK Hyper NeoGeo 64 (arcade platform)
-    AKAI MPC3000 (synth)
+    This is the audio chip used in the following:
+    * SNK Hyper NeoGeo 64 (arcade platform)
+    * AKAI MPC2000XL (sampler/synth)
+    * AKAI MPC Classic (sampler/synth)
+    * AKAI MPC3000 (sampler/synth)
 
-    both are driven by a V53.
+    Paired with an NEC V53 CPU in all cases.
 
-    appears to write a register number and channel/voice using
-    l7a1045_sound_select_w (offset 0)
-    format:
-
-    ---- rrrr ---c cccc
-    r = register, c = channel
-
-    the channel select appears to address 32 different voices (5-bits)
-    the register select appears to use 4-bits with 0x0 to 0xa being valid
-
-    the registers data is written / read using offsets 1,2,3 after
-    setting the register + channel, this gives 3 16-bit values for
-    each register.
-
-    register format:
+    Voice register format (thanks to Happy for reverse-engineering assistance):
 
        offset 3           offset 2           offset 1
        fedcba9876543210 | fedcba9876543210 | fedcba9876543210
 
-    0  ----------------   ----------------   ----------------
+    0  ffffffffssssaaaa   aaaaaaaaaaaaaaaa   aaaa------------
+        f = flags?  always 01
+        s = sample type? always 1
+        a = sample start address (24 bits, 16 MiB addressable)
 
-    1  ----------------   ----------------   ----------------
+    1  ffffffff----aaaa   aaaaaaaaaaaaaaaa   rrrrrrrrrrrrrrrr
+        f = flags.  0 for looping, 1 for one-shot
+        a = sample end address, bits 23-4 if looping, ignored for one-shot
+        r = sample rate in 4.12 fixed point relative to 44100 Hz (0x1000 = 44100 Hz)
 
-    2  ----------------   ----------------   ----------------
+    2  ----------------   ????????????????   ????????????????
+        All bits unknown.  Data is usually 0000 4000 C000 for one-shot and
+        something more complex for looping samples.
 
-    3  ----------------   ----------------   ----------------
+        Happy suggests the second word is bits 20-4 of the loop start
+        address, but that does not line up with reality.  Needs more research.
 
-    4  ----------------   ----------------   ----------------
+    3  ----------------   vvvvvvvvvvvvvvvv   ----------------
+        v = volume envelope starting value (16 bit, maaaaybe signed?)
 
-    5  ----------------   ----------------   ----------------
+    4  ----------------   vvvvvvvvvvvvvvvv   rrrrrrrrrrrrrrrr
+        v = volume envelope target value
+        r = volume envelope rate in 8.8 fixed point (0x100 = change the
+            volume by 1 sample per sample)
 
-    6  ----------------   ----------------   ----------------
+    5  ----------------   cccccccccccccccc   ----------------
+        c = lowpass filter cutoff frequency (16 bit, 0xffff = the Nyquist frequency)
 
-    7  ----------------   ----------------   llllllllrrrrrrrr left/right volume
+    6  ----------------   ccccccccccccRRRR   rrrrrrrrrrrrrrrr]
+        c = filter cutoff frequency target bits 15-4
+        R = filter resonance (4 bits, 0 = 1.0, 0xf = 0.0)
+        r = filter cutoff frequency envelope rate in 8.8 fixed point
+
+    7  ----------------   eeeeeeeeeeeedddd   llllllllrrrrrrrr left/right volume
+        e = delay effect parameters, unknown encoding
+        d = routing destination?  MPC3000 has 8 discrete outputs plus a stereo master pair.
+            The 8 discrete outputs are 4 stereo pairs, and the master pair appears to be
+            a mix of the other 4 pairs.
+        l = left volume (8 bit, 0-255)
+        r = right volume (8 bit, 0-255)
+        (Is this correct or is the volume 16 bits and d is a panpot?)
 
     8  ----------------   ----------------   ---------------- (read only?)
 
     9  ----------------   ----------------   ---------------- (read only?)
 
     a  ----------------   ----------------   ----------------
-
-    Registers are not yet understood.
-
-    probably sample start, end, loop positions, panning etc.
-    like CPS3, Qsound etc.
-
-    case 0x00:
-    case 0x01:
-    case 0x02:
-    case 0x03: // 00003fffffff (startup only?)
-    case 0x04: // doesn't use 6
-    case 0x05: // 00003fffffff (mostly, often)
-    case 0x06: // 00007ff0ffff mostly
-    case 0x07: // 0000000f0708 etc. (low values)
-    case 0x08: // doesn't write to 2/4/6 with this set??
-    case 0x09: // doesn't write to 2/4/6 with this set??
-    case 0x0a: // random looking values
-
-    Some of the other ports on the HNG64 sound CPU may also be tied
-    to this chip, this isn't yet clear.
-    Port $8 bit 8 is keyon, low byte is sound status related (masked with 0x7f)
-
-    Sample data format TBA
+        Unknown, written once on bootup for HNG64 games.
 
     TODO:
-    - Sample format needs to be double checked;
-    - Octave Control/BPM/Pitch, xrally Network BGM wants 66150 Hz which is definitely too fast for
-      most fatfurwa samples;
-    - Key Off for looping samples (fatfurwa should stop all samples when user insert a credit,
-      cfr. reg[0] readback);
-    - Most non-looping samples are setup to repeat twice on different channels (cfr. fatfurwa);
-    - Fix relative sample end positions (non-loop);
-    - ADSR (registers 2 & 4?);
-    - How DMA really works?
+    - sams64 and sams64_2 sometimes have samples get stuck on.  Other games do not
+      seem to have this problem.  Why?
+    - Sample format seems wrong.
+    - Filter parameters are guesswork.  Cutoff frequency seems right, but
+      resonance is guesswork.  Getting the MPC3000 usable will help a lot.
+    - How does the delay effect work?
+    - How does DMA work?
 
 **************************************************************************************************/
 
@@ -92,18 +82,7 @@
 #include "l7a1045_l6028_dsp_a.h"
 #include "debugger.h"
 
-
-// device type definition
 DEFINE_DEVICE_TYPE(L7A1045, l7a1045_sound_device, "l7a1045", "L7A1045 L6028 DSP-A")
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  l7a1045_sound_device - constructor
-//-------------------------------------------------
 
 l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, L7A1045, tag, owner, clock),
@@ -114,42 +93,58 @@ l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const 
 {
 }
 
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
 void l7a1045_sound_device::device_start()
 {
-	// assumes it can make an address mask with m_rom.length() - 1
+	// Check that the ROM region length is a power of two that we can make a mask from
 	assert(!(m_rom.length() & (m_rom.length() - 1)));
 
 	// Allocate the stream
-//  m_stream = stream_alloc(0, 2, 66150); //clock() / 384);
-	// TODO: confirm frequency
-	m_stream = stream_alloc(0, 2, 44100);
+	m_sample_rate = clock() / 768.0f;
+	m_stream = stream_alloc(0, 2, m_sample_rate);
 
+	save_item(STRUCT_MEMBER(m_voice, loop_start));
 	save_item(STRUCT_MEMBER(m_voice, start));
 	save_item(STRUCT_MEMBER(m_voice, end));
+	save_item(STRUCT_MEMBER(m_voice, step));
 	save_item(STRUCT_MEMBER(m_voice, mode));
 	save_item(STRUCT_MEMBER(m_voice, pos));
 	save_item(STRUCT_MEMBER(m_voice, frac));
 	save_item(STRUCT_MEMBER(m_voice, l_volume));
 	save_item(STRUCT_MEMBER(m_voice, r_volume));
+	save_item(STRUCT_MEMBER(m_voice, env_volume));
+	save_item(STRUCT_MEMBER(m_voice, env_target));
+	save_item(STRUCT_MEMBER(m_voice, env_step));
+	save_item(STRUCT_MEMBER(m_voice, env_pos));
+	save_item(STRUCT_MEMBER(m_voice, flt_freq));
+	save_item(STRUCT_MEMBER(m_voice, flt_target));
+	save_item(STRUCT_MEMBER(m_voice, flt_step));
+	save_item(STRUCT_MEMBER(m_voice, flt_pos));
+	save_item(STRUCT_MEMBER(m_voice, flt_resonance));
+	save_item(STRUCT_MEMBER(m_voice, x1));
+	save_item(STRUCT_MEMBER(m_voice, x2));
+	save_item(STRUCT_MEMBER(m_voice, y1));
+	save_item(STRUCT_MEMBER(m_voice, y2));
+	save_item(STRUCT_MEMBER(m_voice, a1));
+	save_item(STRUCT_MEMBER(m_voice, a2));
+	save_item(STRUCT_MEMBER(m_voice, b0));
+	save_item(STRUCT_MEMBER(m_voice, b1));
+	save_item(STRUCT_MEMBER(m_voice, b2));
 	save_item(NAME(m_key));
 	save_item(NAME(m_audiochannel));
 	save_item(NAME(m_audioregister));
 	save_item(STRUCT_MEMBER(m_audiodat, dat));
+
+	// init all voices' filters to the Nyquist frequency and transparent resonance
+	for (l7a1045_voice &voice: m_voice)
+	{
+		set_filter(voice, m_sample_rate / 2.0f, 0.707f);
+	}
 }
 
 void l7a1045_sound_device::device_reset()
 {
 	m_key = 0;
 }
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
 
 void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 {
@@ -160,8 +155,8 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 			l7a1045_voice *vptr = &m_voice[i];
 
 			uint32_t start = vptr->start;
-			uint32_t end = vptr->end;
-			uint32_t step  = 0x400;
+			const uint32_t end = vptr->end;
+			const uint32_t step  = vptr->step;
 
 			uint32_t pos = vptr->pos;
 			uint32_t frac = vptr->frac;
@@ -176,25 +171,64 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 
 				if ((start + pos) >= end)
 				{
-					if(vptr->mode == true) // loop
-					{
-						pos = vptr->pos = 0;
-						frac = vptr->frac = 0;
-					}
-					else // no loop, keyoff
-					{
-						m_key &= ~(1 << i);
-						break;
-					}
+					pos = vptr->pos = 0;
 				}
-
-
-				data = m_rom[(start + pos) & (m_rom.length() - 1)];
+				const uint32_t address = (start + pos) & (m_rom.length() - 1);
+				data = m_rom[address];
 				sample = int8_t(data & 0xfc) << (3 - (data & 3));
 				frac += step;
 
-				stream.add_int(0, j, sample * vptr->l_volume, 32768 * 512);
-				stream.add_int(1, j, sample * vptr->r_volume, 32768 * 512);
+				// volume envelope processing
+				vptr->env_pos += vptr->env_step;
+				const int steps = ((uint32_t)vptr->env_pos / 0x100);
+				if (steps > 0)
+				{
+					if (vptr->env_volume < vptr->env_target)
+					{
+						vptr->env_volume += std::min(steps, (vptr->env_target - vptr->env_volume));
+					}
+					else if (vptr->env_volume > vptr->env_target)
+					{
+						vptr->env_volume -= std::min(steps, (vptr->env_volume - vptr->env_target));
+					}
+				}
+				vptr->env_pos &= 0xff;
+
+				// filter envelope processing
+				vptr->flt_pos += vptr->flt_step;
+				const int flt_steps = ((uint32_t)vptr->flt_pos / 0x100);
+				if (flt_steps > 0)
+				{
+					if (vptr->flt_freq < vptr->flt_target)
+					{
+						vptr->flt_freq += std::min(flt_steps, (vptr->flt_target - vptr->flt_freq));
+					}
+					else if (vptr->flt_freq > vptr->flt_target)
+					{
+						vptr->flt_freq -= std::min(flt_steps, (vptr->flt_freq - vptr->flt_target));
+					}
+				}
+				vptr->flt_pos &= 0xff;
+
+				const double cutoff = ((double)m_sample_rate) * ((double)vptr->flt_freq / 0x10000);
+				const double resonance = //vptr->flt_resonance ?
+					(double)vptr->flt_resonance / 15.0f; // : 0.707f;
+				set_filter(*vptr, cutoff, resonance);
+
+				// low pass filter processing - this is a direct form 2 biquad implementation
+				const double fsample = sample / 32768.0f;
+				const double output = vptr->b0 * fsample + vptr->b1 * vptr->x1 + vptr->b2 * vptr->x2 - vptr->a1 * vptr->y1 - vptr->a2 * vptr->y2;
+				vptr->x2 = vptr->x1;
+				vptr->x1 = fsample;
+				vptr->y2 = vptr->y1;
+				vptr->y1 = output;
+
+				const int32_t fout = (output * 32768.0f);
+				const int64_t left = (fout * (uint64_t(vptr->l_volume) * uint64_t(vptr->env_volume))) >> 17;
+				const int64_t right = (fout * (uint64_t(vptr->r_volume) * uint64_t(vptr->env_volume))) >> 17;
+
+				stream.add_int(0, j, left, 32768);
+				stream.add_int(1, j, right, 32768);
 			}
 
 			vptr->pos = pos;
@@ -206,16 +240,20 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 // TODO: needs proper memory map
 void l7a1045_sound_device::l7a1045_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_stream->update(); // TODO
+	m_stream->update();
 
-	//logerror("%s: %x to %x (mask %04x)\n", tag(), data, offset, mem_mask);
-
-	if(offset == 0)
+	if (offset == 0)
+	{
 		sound_select_w(offset, data, mem_mask);
-	else if(offset == 8/2)
+	}
+	else if (offset == 8/2)
+	{
 		sound_status_w(data);
+	}
 	else
-		sound_data_w(offset - 1,data);
+	{
+		sound_data_w(offset - 1, data);
+	}
 }
 
 
@@ -223,14 +261,10 @@ uint16_t l7a1045_sound_device::l7a1045_sound_r(offs_t offset, uint16_t mem_mask)
 {
 	m_stream->update();
 
-	//logerror("%s: read at %x (mask %04x)\n", tag(), offset, mem_mask);
-
-	if (offset == 0)
+	if (offset > 0)
 	{
-		//logerror("sound_select_r?\n");
+		return sound_data_r(offset - 1);
 	}
-	else
-		return sound_data_r(offset -1);
 
 	return 0xffff;
 }
@@ -238,94 +272,109 @@ uint16_t l7a1045_sound_device::l7a1045_sound_r(offs_t offset, uint16_t mem_mask)
 
 void l7a1045_sound_device::sound_select_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	// I'm guessing these addresses are the sound chip / DSP?
-
 	// ---- ---- 000c cccc
 	// c = channel
 
 	if (ACCESSING_BITS_0_7)
 	{
 		m_audiochannel = data;
-		if (m_audiochannel & 0xe0) logerror("%s l7a1045_sound_select_w unknown channel %01x\n", machine().describe_context(), m_audiochannel & 0xff);
+		if (m_audiochannel & 0xe0)
+		{
+			logerror("%s l7a1045_sound_select_w unknown channel %01x\n", machine().describe_context(), m_audiochannel & 0xff);
+		}
 		m_audiochannel &= 0x1f;
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
 		m_audioregister = (data >> 8);
-		if (m_audioregister >0x0a) logerror("%s l7a1045_sound_select_w unknown register %01x\n", machine().describe_context(), m_audioregister & 0xff);
+		if (m_audioregister >0x0a)
+		{
+			logerror("%s l7a1045_sound_select_w unknown register %01x\n", machine().describe_context(), m_audioregister & 0xff);
+		}
 		m_audioregister &= 0x0f;
 	}
-
 }
 
 void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 {
 	l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
-	//if(m_audioregister != 0 && m_audioregister != 1 && m_audioregister != 7)
-	//  logerror("%04x %04x (%04x %04x)\n",offset,data,m_audioregister,m_audiochannel);
-
 	m_audiodat[m_audioregister][m_audiochannel].dat[offset] = data;
-
-	//logerror("%s: %x to ch %d reg %d\n", tag(), data, m_audiochannel, m_audioregister);
 
 	switch (m_audioregister)
 	{
+		// sample start address
 		case 0x00:
-
 			vptr->start = (m_audiodat[m_audioregister][m_audiochannel].dat[2] & 0x000f) << (16 + 4);
 			vptr->start |= (m_audiodat[m_audioregister][m_audiochannel].dat[1] & 0xffff) << (4);
 			vptr->start |= (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xf000) >> (12);
-
-			//logerror("%s: channel %d start = %08x\n", tag(), m_audiochannel, vptr->start);
-
 			vptr->start &= m_rom.length() - 1;
 
-			// if voice isn't active, clear the pos on start writes (required for DMA tests on MPC3000)
-			if (!(m_key & (1 << m_audiochannel)))
-			{
-				vptr->pos = 0;
-			}
+			// clear the pos on start writes (required for DMA tests on MPC3000, and HNG64 likes to leave voices keyed on and just write new parameters)
+			vptr->pos = 0;
+			vptr->frac = 0;
+			// clear the filter state too
+			vptr->x1 = vptr->x2 = vptr->y1 = vptr->y2 = 0.0;
 			break;
-		case 0x01:
-			// relative to start
-				//logerror("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[0]);
-				//logerror("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[1]);
-				//logerror("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[2]);
 
-			if(m_audiodat[m_audioregister][m_audiochannel].dat[2] & 0x100)
+		// loop end address and pitch step
+		case 0x01:
+			if ((m_audiodat[2][m_audiochannel].dat[0] == 0xc000) && (m_audiodat[2][m_audiochannel].dat[1] == 0x4000))
 			{
-				// TODO: definitely wrong
-				// fatfurwa title screen sample 0x45a (0x8000?)
-				// fatfurwa coin 0x3a0 (0x2000?)
-				vptr->end = (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xffff) << 2;
-				vptr->end += vptr->start;
+				vptr->end = m_rom.length() - 1;
 				vptr->mode = false;
-				// hopefully it'll never happen? Maybe assert here?
-				vptr->end &= m_rom.length() - 1;
 			}
-			else // absolute
+			else
 			{
 				vptr->end = (m_audiodat[m_audioregister][m_audiochannel].dat[2] & 0x000f) << (16 + 4);
 				vptr->end |= (m_audiodat[m_audioregister][m_audiochannel].dat[1] & 0xffff) << (4);
-				vptr->end |= (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xf000) >> (12);
 				vptr->mode = true;
-
 				vptr->end &= m_rom.length() - 1;
 			}
-			//logerror("%s: channel %d end = %08x\n", tag(), m_audiochannel, vptr->start);
+
+			vptr->step = m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xffff;
 			break;
 
+		// unknown exactly what this does
+		case 0x02:
+			break;
+
+		// starting envelope volume
+		case 0x03:
+			vptr->env_volume = m_audiodat[m_audioregister][m_audiochannel].dat[1];
+			vptr->env_pos = 0;
+			break;
+
+		// envelope target volumes plus step rate
+		case 0x04:
+			vptr->env_target = m_audiodat[m_audioregister][m_audiochannel].dat[1];
+			vptr->env_step = m_audiodat[m_audioregister][m_audiochannel].dat[0];
+			break;
+
+		// reg 5 = starting lowpass cutoff frequency
+		case 0x05:
+			vptr->flt_freq = m_audiodat[m_audioregister][m_audiochannel].dat[1];
+			vptr->flt_pos = 0;
+
+			{
+				const double cutoff = ((double)m_sample_rate) * ((double)vptr->flt_freq / 0x10000);
+				set_filter(*vptr, cutoff, 0.707f);
+				vptr->x1 = vptr->x2 = vptr->y1 = vptr->y2 = 0.0;
+			}
+			break;
+
+		// reg 6 = lowpass cutoff target, resonance, and step rate
+		case 0x06:
+			vptr->flt_target = m_audiodat[m_audioregister][m_audiochannel].dat[1] & 0xfff0;
+			vptr->flt_resonance = (m_audiodat[m_audioregister][m_audiochannel].dat[1] & 0x000f) ^ 0xf;
+			vptr->flt_step = m_audiodat[m_audioregister][m_audiochannel].dat[0];
+			break;
+
+		// voice main volume plus effects routing
 		case 0x07:
-
 			vptr->r_volume = (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xff);
-			/* TODO: volume tables, linear? */
-			vptr->r_volume = (vptr->r_volume) | (vptr->r_volume << 8);
 			vptr->l_volume = (m_audiodat[m_audioregister][m_audiochannel].dat[0] >> 8) & 0xff;
-			vptr->l_volume = (vptr->l_volume) | (vptr->l_volume << 8);
-			//logerror("%04x %02x %02x\n",m_audiodat[m_audioregister][m_audiochannel].dat[0],vptr->l_volume,vptr->r_volume);
-
 			break;
 	}
 }
@@ -333,71 +382,78 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 
 uint16_t l7a1045_sound_device::sound_data_r(offs_t offset)
 {
-	//logerror("%04x (%04x %04x)\n",offset,m_audioregister,m_audiochannel);
-	//machine().debug_break();
-	l7a1045_voice *vptr = &m_voice[m_audiochannel];
+	const l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
+	// refresh the register shadow from the current voice status if necessary
 	switch(m_audioregister)
 	{
 		case 0x00:
-		{
-			uint32_t current_addr;
-			uint16_t res;
+			{
+				const uint32_t current_addr = vptr->start + vptr->pos;
 
-			// TODO: fatfurwa reads offset == 2, ANDs with 0xf and compares against a sample buffer value if it's bigger, smaller or equal
-			// Returning 0xffff here for looping samples and they will silence out when user insert a coin ...
+				// Reads back the current playback position in the original register 0 format.
+				// (roadedge at 0x9DA0)
+				m_audiodat[m_audioregister][m_audiochannel].dat[2] &= 0xfff0;
+				m_audiodat[m_audioregister][m_audiochannel].dat[2] |= (current_addr >> 20);
+				m_audiodat[m_audioregister][m_audiochannel].dat[1] = ((current_addr >> 4) & 0xffff);
+				m_audiodat[m_audioregister][m_audiochannel].dat[0] = vptr->frac & 0x0fff;
+				m_audiodat[m_audioregister][m_audiochannel].dat[0] |= ((current_addr & 0xf) << 12);
+				return m_audiodat[m_audioregister][m_audiochannel].dat[offset];
+			}
+			break;
 
-			current_addr = vptr->start + vptr->pos;
-			if(offset == 0)
-				res = (current_addr & 0xf) << 12; // TODO: frac
-			else if(offset == 1)
-				res = (current_addr & 0xffff0) >> 4;
-			else
-				res = (current_addr & 0xf00000) >> 20;
+		case 0x03:
+			m_audiodat[m_audioregister][m_audiochannel].dat[1] = vptr->env_volume;
+			break;
 
-			return res;
-		}
+		case 0x05:
+			m_audiodat[m_audioregister][m_audiochannel].dat[1] = vptr->flt_freq;
+			break;
 	}
 
-	// TODO: at least regs [3] and [5], relative position read-back?
-	// TODO: reg [6]
-
-	return 0;
+	return m_audiodat[m_audioregister][m_audiochannel].dat[offset];
 }
 
 void l7a1045_sound_device::sound_status_w(uint16_t data)
 {
-	if(data & 0x100) // keyin
+	if (data & 0x100) // key on
 	{
 		l7a1045_voice *vptr = &m_voice[m_audiochannel];
-
-#if 0
-		if(vptr->start != 0)
-		{
-			logerror("%08x START\n",vptr->start);
-			logerror("%08x END\n",vptr->end);
-
-			for(int i=0;i<0x10;i++)
-				logerror("%02x (%02x) = %04x%04x%04x\n",m_audiochannel,i,m_audiodat[i][m_audiochannel].dat[2],m_audiodat[i][m_audiochannel].dat[1],m_audiodat[i][m_audiochannel].dat[0]);
-		}
-#endif
 
 		vptr->frac = 0;
 		vptr->pos = 0;
 		m_key |= 1 << m_audiochannel;
 	}
+	else    // key off
+	{
+		m_key &= ~(1 << m_audiochannel);
+	}
+}
+
+// sets up parameters for biquad resonant low pass 12 dB/octave filter for a voice
+// cutoff in Hz, resonance is 0 to 1.
+void l7a1045_sound_device::set_filter(l7a1045_voice &voice, double cutoff, double resonance)
+{
+	const double omega = 2.0 * M_PI * cutoff / (double)m_sample_rate;
+	const double sin_omega = sin(omega);
+	const double cos_omega = cos(omega);
+	const double alpha = sin_omega / (2.0 * resonance);
+	const double a0 = 1.0 + alpha;
+
+	voice.b0 = (1.0 - cos_omega) / (2.0 * a0);
+	voice.b1 = (1.0 - cos_omega) / a0;
+	voice.b2 = (1.0 - cos_omega) / (2.0 * a0);
+	voice.a1 = (-2.0 * cos_omega) / a0;
+	voice.a2 = (1.0 - alpha) / a0;
 }
 
 // TODO: stub functions not really used
 void l7a1045_sound_device::dma_hreq_cb(int state)
 {
-//  m_maincpu->hack_w(1);
 }
 
 uint8_t l7a1045_sound_device::dma_r_cb(offs_t offset)
 {
-//    logerror("dma_ior3_cb: offset %x\n", offset);
-
 	m_voice[0].pos++;
 	return 0;
 }
@@ -405,5 +461,4 @@ uint8_t l7a1045_sound_device::dma_r_cb(offs_t offset)
 void l7a1045_sound_device::dma_w_cb(offs_t offset, uint8_t data)
 {
 	m_voice[0].pos++;
-//    logerror("dma_iow3_cb: offset %x\n", offset);
 }

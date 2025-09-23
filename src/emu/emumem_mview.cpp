@@ -623,7 +623,7 @@ std::pair<handler_entry *, handler_entry *> memory_view::make_handlers(address_s
 
 		if (m_config) {
 			if (m_addrstart != addrstart || m_addrend != addrend)
-				fatalerror("A memory_view must be installed at its configuration address.");
+				fatalerror("A memory_view must be installed at its configuration address. (start %08x != %08x) (end %08x != %08x)", m_addrstart, addrstart, m_addrend, addrend);
 		} else {
 			m_config = &space.space_config();
 			m_addrstart = addrstart;

@@ -338,57 +338,22 @@ void hng64_state::dma_iow3_cb(uint8_t data)
 void hng64_state::tcu_tm0_cb(int state)
 {
 	// this goes high once near startup
-	logerror("tcu_tm0_cb %02x\n", state);
 }
 
 void hng64_state::tcu_tm1_cb(int state)
 {
-	// these are very active, maybe they feed back into the v53 via one of the IRQ pins?  TM2 toggles more rapidly than TM1
-//  logerror("tcu_tm1_cb %02x\n", state);
-	//m_audiocpu->set_input_line(5, state? ASSERT_LINE:CLEAR_LINE); // not accurate, just so we have a trigger
-	/* Almost likely wrong */
-	m_audiocpu->set_input_line(2, state? ASSERT_LINE :CLEAR_LINE);
-
 }
 
 void hng64_state::tcu_tm2_cb(int state)
 {
-	// these are very active, maybe they feed back into the v53 via one of the IRQ pins?  TM2 toggles more rapidly than TM1
-//  logerror("tcu_tm2_cb %02x\n", state);
-	//m_audiocpu->set_input_line(1, state? ASSERT_LINE :CLEAR_LINE);
-	//m_audiocpu->set_input_line(2, state? ASSERT_LINE :CLEAR_LINE);
-
-
-	// NOT ACCURATE, just so that all the interrupts get triggered for now.
-	#if 0
-	static int i;
-	if(machine().input().code_pressed_once(KEYCODE_Z))
-		i++;
-
-	if(machine().input().code_pressed_once(KEYCODE_X))
-		i--;
-
-	if(i < 0)
-		i = 0;
-	if(i > 7)
-		i = 7;
-
-	//logerror("trigger %02x %d\n",i,state);
-
-	//if(machine().input().code_pressed_once(KEYCODE_C))
-	{
-		m_audiocpu->set_input_line(i, state? ASSERT_LINE :CLEAR_LINE);
-	}
-	//i++;
-	//if (i == 3) i = 0;
-	#endif
+	m_audiocpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 
 void hng64_state::hng64_audio(machine_config &config)
 {
-	V53A(config, m_audiocpu, 32000000/2);              // V53A, 16? mhz!
+	V53A(config, m_audiocpu, 32_MHz_XTAL); // reference footage indicates the timer must be the full 32 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &hng64_state::hng_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &hng64_state::hng_sound_io);
 	m_audiocpu->out_hreq_cb().set(FUNC(hng64_state::dma_hreq_cb));
@@ -401,7 +366,7 @@ void hng64_state::hng64_audio(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	L7A1045(config, m_dsp, 32000000/2); // ??
+	L7A1045(config, m_dsp, 33.8688_MHz_XTAL);
 	m_dsp->add_route(0, "speaker", 0.1, 0);
 	m_dsp->add_route(1, "speaker", 0.1, 1);
 }

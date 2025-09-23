@@ -342,7 +342,7 @@ void sn76496_base_device::write(u8 data)
 	{
 		r = m_last_register;
 		//if (m_ncr_style_psg && ((r & 1) || (r == 6)))
-		//	return; // NCR-style PSG ignores writes to regs 1, 3, 5, 6 and 7 with bit 7 clear; this behavior is not verified on hardware yet, uncomment it once verified.
+		//  return; // NCR-style PSG ignores writes to regs 1, 3, 5, 6 and 7 with bit 7 clear; this behavior is not verified on hardware yet, uncomment it once verified.
 	}
 
 	int c = r >> 1;

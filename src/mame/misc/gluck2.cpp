@@ -36,7 +36,7 @@
 
   SOUND: 1x AY-3-8910 (U38)
          1x UM3567 (clone of Yamaha YM2413) (U36) --> Good Luck II PCB.
-		 1x MK28 (Clone of OKI 6295) ---------------> Si Se 7 PCB. 
+         1x MK28 (Clone of OKI 6295) ---------------> Si Se 7 PCB.
          1x 2904D JRC (Dual Operational Amplifier) (U40)
 
 

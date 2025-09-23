@@ -1,5 +1,7 @@
-#ifndef MAME_MACHINE_PL6_EXP_H
-#define MAME_MACHINE_PL6_EXP_H
+// license:BSD-3-Clause
+// copyright-holders:NaokiS
+#ifndef MAME_JPM_PL6_EXP_H
+#define MAME_JPM_PL6_EXP_H
 
 #pragma once
 
@@ -24,7 +26,6 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 
-
 private:
 	pluto6_expansion_card_interface *m_dev;
 };
@@ -33,6 +34,7 @@ private:
 class pluto6_expansion_card_interface : public device_interface
 {
 	friend class pluto6_expansion_slot_device;
+
 public:
 	virtual ~pluto6_expansion_card_interface(){}
 
@@ -47,19 +49,19 @@ DECLARE_DEVICE_TYPE(HEBER_CALYPSO_GPU, pluto6_calypso32_device)
 
 class pluto6_calypso32_device : public device_t, public pluto6_expansion_card_interface
 {
-	public:
-		pluto6_calypso32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+public:
+	pluto6_calypso32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	protected:
-		pluto6_calypso32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	pluto6_calypso32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-		virtual void device_start() override ATTR_COLD {};
-		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD {};
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	private:
-		required_device<mb86292_device> m_gpu;
-		required_device<ram_device> m_vram;
+private:
+	required_device<mb86292_device> m_gpu;
+	required_device<ram_device> m_vram;
 };
 
 
-#endif // MAME_MACHINE_PL6_EXP_H
+#endif // MAME_JPM_PL6_EXP_H

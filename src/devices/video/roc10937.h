@@ -7,8 +7,8 @@
     OKI MSC1937 is a clone of this chip, with many others.
 
 **********************************************************************/
-#ifndef MAME_MACHINE_ROC10937_H
-#define MAME_MACHINE_ROC10937_H
+#ifndef MAME_VIDEO_ROC10937_H
+#define MAME_VIDEO_ROC10937_H
 
 #pragma once
 
@@ -24,7 +24,6 @@ public:
 	void sclk(int state);
 	void data(int state);
 	void por(int state);
-
 
 protected:
 	rocvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -90,4 +89,4 @@ DECLARE_DEVICE_TYPE(MIC10937, mic10937_device)
 DECLARE_DEVICE_TYPE(ROC10957, roc10957_device)
 DECLARE_DEVICE_TYPE(S16LF01,  s16lf01_device)
 
-#endif // MAME_MACHINE_ROC10937_H
+#endif // MAME_VIDEO_ROC10937_H

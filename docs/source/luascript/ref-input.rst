@@ -333,9 +333,6 @@ field.is_digital_joystick (read-only)
     switch.
 field.enabled (read-only)
     A Boolean indicating whether the field is enabled.
-field.optional (read-only)
-    A Boolean indicating whether the field is optional and not required to use
-    the emulated system.
 field.cocktail (read-only)
     A Boolean indicating whether the field is only used when the system is
     configured for a cocktail table cabinet.

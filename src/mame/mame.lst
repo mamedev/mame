@@ -19429,6 +19429,27 @@ newbrain
 newbraina
 newbrainmd
 
+@source:handheld/st2302u_bbl_rom.cpp
+bbl338
+class200
+dphh8213
+
+@source:handheld/st2302u_bbl_spi.cpp
+arcade10
+bbl380
+dgun2953
+dphh8630
+dphh8633
+mc_cb203
+pg118
+ragc153
+retro150
+retro150a
+rhhc152
+supreme
+throwbck
+toumapet
+
 @source:handheld/chessking.cpp
 chesskng
 
@@ -20629,6 +20650,12 @@ ladylinrc
 ladylinrd
 ladylinre
 ll3
+ll3a
+ll3b
+ll3c
+ll3d
+ll3e
+ll3f
 lonestar
 lonestara
 lucky8
@@ -24182,12 +24209,12 @@ hb_ydd
 hb_ydda
 
 @source:jpm/pluto6.cpp
-//pl6_atw
-//pl6_cm
-//pl6_demo
+pl6_atw
+pl6_cm
+pl6_demo
 pl6_kfp
 pl6_lgk
-//tijkpots
+tijkpots
 
 @source:kaneko/airbustr.cpp
 airbustr
@@ -32658,7 +32685,7 @@ pr_wldkn
 pr_wnstk
 
 @source:misc/ps_m3.cpp
-unkpara
+dreamcha
 
 @source:misc/psattack.cpp
 psattack
@@ -47340,26 +47367,6 @@ lx_jg7415
 lx_jg7410
 zonemini
 react
-
-@source:tvgames/st2302u_bbl_rom.cpp
-bbl338
-class200
-dphh8213
-
-@source:tvgames/st2302u_bbl_spi.cpp
-arcade10
-bbl380
-dgun2953
-dphh8630
-dphh8633
-mc_cb203
-pg118
-ragc153
-retro150
-retro150a
-rhhc152
-supreme
-toumapet
 
 @source:tvgames/titan_soc.cpp
 colecofl
