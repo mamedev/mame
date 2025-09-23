@@ -153,6 +153,10 @@ EINT3: DUART INT?
 
 #include "emu.h"
 
+#include "pl6_exp.h"
+#include "pl6_fpga.h"
+#include "pl6_pic.h"
+
 #include "cpu/m68000/mcf5206e.h"
 #include "bus/ata/ataintf.h"
 #include "bus/ata/hdd.h"
@@ -160,9 +164,6 @@ EINT3: DUART INT?
 #include "machine/mc68681.h"
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
-#include "machine/pl6_exp.h"
-#include "machine/pl6_fpga.h"
-#include "machine/pl6_pic.h"
 #include "video/roc10937.h"
 
 #include "speaker.h"
@@ -386,7 +387,6 @@ static INPUT_PORTS_START( pluto6 )
 
 	PORT_START("DEBUG")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
 INPUT_PORTS_END
 
 
@@ -520,7 +520,7 @@ void pluto6_state::pluto6(machine_config &config){
 	m_fpga->cfuart_rx_a_callback().set(FUNC(pluto6_state::cfuart_rx_a_w));
 	m_fpga->cfuart_rx_b_callback().set(FUNC(pluto6_state::cfuart_rx_b_w));
 
-	HEBER_PLUTO6_PIC(config, m_pic, XTAL(500'000));
+	HEBER_PLUTO6_PIC(config, m_pic, XTAL(5'000'000));
 	m_pic->sda_rx_cb().set(FUNC(pluto6_state::pluto_sda));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
