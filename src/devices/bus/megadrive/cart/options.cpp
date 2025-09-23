@@ -4,16 +4,19 @@
 #include "emu.h"
 #include "options.h"
 
+#include "action_replay.h"
 #include "avartisan.h"
 #include "eeprom.h"
 #include "gamtec.h"
 #include "jcart.h"
 #include "mcpirate.h"
+#include "miky.h"
 #include "multigame.h"
 #include "rom.h"
 #include "seganet.h"
 #include "sram.h"
 #include "smb.h"
+#include "tekkensp.h"
 #include "xboy.h"
 
 
@@ -64,7 +67,12 @@ char const *const UNL_SMB2              = "rom_smb2";
 char const *const UNL_ROCKMANX3         = "rom_rx3";
 char const *const UNL_SANGUO5           = "rom_sanguo5";
 char const *const UNL_AVARTISAN         = "rom_realtec";
+char const *const UNL_TEKKENSP          = "rom_tekkensp";
+char const *const UNL_TC2000            = "rom_tc2000";
+char const *const UNL_TOPF              = "rom_lion3";
+char const *const UNL_POKESTAD          = "rom_pokestad"; // TODO: alias of above, probably unneeded
 
+char const *const ACTION_REPLAY         = "ar";
 
 } // namespace bus::megadrive::slotoptions
 
@@ -130,6 +138,8 @@ void megadrive_cart_options(device_slot_interface &device)
 	device.option_add_internal(slotoptions::UNL_BUGSLIFE, MEGADRIVE_UNL_BUGSLIFE);
 	device.option_add_internal(slotoptions::UNL_POKEMONA, MEGADRIVE_UNL_POKEMONA);
 	device.option_add_internal(slotoptions::UNL_KOF99, MEGADRIVE_UNL_KOF99);
+	device.option_add_internal(slotoptions::UNL_POKESTAD, MEGADRIVE_UNL_TOPF);
+	device.option_add_internal(slotoptions::UNL_TOPF, MEGADRIVE_UNL_TOPF);
 
 	// Super Mario Bros
 	device.option_add_internal(slotoptions::UNL_SMB, MEGADRIVE_UNL_SMB);
@@ -138,5 +148,14 @@ void megadrive_cart_options(device_slot_interface &device)
 
 	// AV Artisan
 	device.option_add_internal(slotoptions::UNL_AVARTISAN, MEGADRIVE_UNL_AVARTISAN);
+
+	// <unknown> Taiwanese carts
+	device.option_add_internal(slotoptions::UNL_TEKKENSP, MEGADRIVE_UNL_TEKKENSP);
+
+	// Miky
+	device.option_add_internal(slotoptions::UNL_TC2000, MEGADRIVE_UNL_TC2000);
+
+	// Action Replay
+	device.option_add_internal(slotoptions::ACTION_REPLAY, MEGADRIVE_ACTION_REPLAY);
 
 }

@@ -3884,6 +3884,8 @@ end
 
 if (BUSES["MEGADRIVE_CART"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/megadrive/cart/action_replay.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/action_replay.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/avartisan.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/avartisan.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/eeprom.cpp",
@@ -3896,6 +3898,8 @@ if (BUSES["MEGADRIVE_CART"]~=null) then
 		MAME_DIR .. "src/devices/bus/megadrive/cart/options.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/mcpirate.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/mcpirate.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/miky.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/miky.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/multigame.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/multigame.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/rom.cpp",
@@ -3908,6 +3912,8 @@ if (BUSES["MEGADRIVE_CART"]~=null) then
 		MAME_DIR .. "src/devices/bus/megadrive/cart/slot.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/sram.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/sram.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/tekkensp.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/tekkensp.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/xboy.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/xboy.h",
 	}

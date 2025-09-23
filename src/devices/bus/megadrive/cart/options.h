@@ -53,8 +53,15 @@ namespace bus::megadrive::slotoptions {
 	extern char const *const UNL_SMB;
 	extern char const *const UNL_SMB2;
 	extern char const *const UNL_ROCKMANX3;
+	extern char const *const UNL_TEKKENSP;
+	extern char const *const UNL_TC2000;
+
+	extern char const *const UNL_POKESTAD;
+	extern char const *const UNL_TOPF;
 
 	extern char const *const UNL_SANGUO5;
+
+	extern char const *const ACTION_REPLAY;
 
 //	BEGGARP;                     /* Beggar Prince uses different sram start address + bankswitch tricks */
 //	WUKONG;                      /* Legend of Wukong uses different sram start address + bankswitch trick for last 128K of ROM */
@@ -68,33 +75,12 @@ namespace bus::megadrive::slotoptions {
 //
 //	// Cart + NVRAM
 //
-//	// EEPROM
-//	SEGA_EEPROM;                 /* Wonder Boy V / Evander Holyfield's Boxing / Greatest Heavyweights of the Ring / Sports Talk Baseball / Megaman */
-//	NBA_JAM;                     /* NBA Jam */
-//	NBA_JAM_ALT;                 /* NBA Jam */
-//	NBA_JAM_TE;                  /* NBA Jam TE / NFL Quarterback Club */
-//	NFL_QB_96;                   /* NFL Quarterback Club '96 */
-//	C_SLAM;                      /* College Slam / Frank Thomas Big Hurt Baseball */
-//	EA_NHLPA;                    /* NHLPA Hockey 93 / Rings of Power */
-//	BRIAN_LARA;                  /* Brian Lara Cricket 96 */
 //	PSOLAR;                      /* Pier Solar (STM95 EEPROM) */
 //
-//	// J-Cart
-//	CM_JCART;                    /* Pete Sampras Tennis */
-//	CODE_MASTERS;                /* Micro Machines 2 / Military (J-Cart + SEPROM)  */
-//	CM_MM96;                     /* Micro Machines 96 (J-Cart + SEPROM; diff I2C model)  */
 //	CHINFIGHT3;                  /* Chinese Fighters 3 */
 //	KAIJU;                       /* Pokemon Stadium */
-//	KOF99;                       /* King of Fighters '99 */
-//	LIONK2;                      /* Lion King 2 */
 //	LIONK3;                      /* Lion King 3; Super Donkey Kong 99; Super King Kong 99 */
-//	MJLOVER;                     /* Mahjong Lover */
-//	REALTEC;                     /* Whac a Critter/Mallet legend; Defend the Earth; Funnyworld/Ballonboy */
-//	ROCKMANX3;                   /* Rockman X3 */
-//	SMB;                         /* Super Mario Bros. */
-//	SMB2;                        /* Super Mario Bros. 2 */
 //	SMW64;                       /* Super Mario World 64 */
-//	SQUIRRELK;                   /* Squirrel King */
 //	SRAM_ARG96;                  /* Futbol Argentino 96 (Argentina) (hack of J. League Pro Striker 2) */
 //	TC2000;                      /* TC 2000 (Argentina; protected) */
 //	TEKKENSP;                    /* Tekken Special */

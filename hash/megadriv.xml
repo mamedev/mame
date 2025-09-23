@@ -13678,7 +13678,7 @@ No [VDP] sprites
 		</part>
 	</software>
 
-	<software name="brianl96a" cloneof="brianl96">
+	<software name="brianl96a" cloneof="brianl96" supported="partial">
 		<description>Brian Lara Cricket 96 (Europe, 199603)</description>
 		<year>1996</year>
 		<publisher>Codemasters</publisher>
@@ -32273,7 +32273,7 @@ No BGMs
 
 	<software name="tekkensp">
 		<description>Tekken Special</description>
-		<year>199?</year>
+		<year>1997?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_tekkensp"/>
@@ -32283,8 +32283,9 @@ No BGMs
 		</part>
 	</software>
 
-	<software name="tekkn3sp">
-		<description>Tekken 3 Special</description>
+	<software name="tekkn3sp" cloneof="tekkensp">
+		<!-- reads the protection but patches it with RTS -->
+		<description>Tekken 3 Special (unprotected)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -36515,8 +36516,9 @@ Jumps to unmapped area at PC=0xffd004e8
 	</software>
 
 	<software name="chinf3" supported="no">
+		<!-- TODO: rename -->
 		<description>Tenchi wo Kurau III - Sanguo Wai Chuan - Chinese Fighter (China)</description>
-		<year>199?</year>
+		<year>1996?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<notes><![CDATA[
 Crashes during attract or in character select, copy protection
@@ -36943,19 +36945,19 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 
 	<software name="topfight">
 		<description>Top Fighter 2000 MK VIII</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1999</year>
+		<publisher>X Boy</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_topf"/>
+			<feature name="slot" value="rom_lion3"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="top fighter 2000 mk viii (unl).bin" size="2097152" crc="f75519dc" sha1="617be8de1444ae0c6610d73967f3f0e67541b05a" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="topf2k5">
-		<description>Top Fighter 2005</description>
-		<year>199?</year>
+	<software name="topf2k5" cloneof="topfight">
+		<description>Top Fighter 2005 (China, unprotected)</description>
+		<year>2005?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -37123,8 +37125,8 @@ https://segaretro.org/Smash_Controller
 	<!-- is this set hacked to have the protection removed? it's more than just a trivial patch however -->
 	<software name="tc2000">
 		<description>TC 2000 (Argentina, unprotected)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1995?</year>
+		<publisher>Miky</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="tc2000.bin" size="1048576" crc="cef91bdb" sha1="80a2f21304cea6876bc07a48dcd1f5e53a5b3adb"/>
@@ -37134,8 +37136,8 @@ https://segaretro.org/Smash_Controller
 
 	<software name="tc2000a" cloneof="tc2000">
 		<description>TC 2000 (Argentina, protected)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<year>1995?</year>
+		<publisher>Miky</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_tc2000"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -37940,8 +37942,9 @@ BGM sometimes goes silent (does several [YM2612] 68k writes without bus)
 	</software>
 
 	<software name="mmprfe">
-		<description>Mighty Morphin Power Rangers - The Fighting Edition (Russia)</description>
-		<year>199?</year>
+		<!-- Has Gamtec style protection, patched with BRA -->
+		<description>Mighty Morphin Power Rangers - The Fighting Edition (Russia, unprotected)</description>
+		<year>1997?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -38408,6 +38411,7 @@ https://segaretro.org/Action_Replay_(Mega_Drive)
 Needs own slot type with mountable carts
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="ar" />
 			<dataarea name="rom" width="16" endianness="big" size="32768">
 				<rom name="action replay (euro).bin" size="32768" crc="95ff7c3e" sha1="1e0f246826be4ebc7b99bb3f9de7f1de347122e5"/>
 			</dataarea>

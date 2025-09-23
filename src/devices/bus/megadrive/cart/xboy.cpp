@@ -102,4 +102,113 @@ void megadrive_unl_kof99_device::time_io_map(address_map &map)
 	map(0x3e, 0x3f).lr16(NAME([] () { return 0x1f; }));
 }
 
+/*
+ * pokestad          Pokemon Stadium
+ * https://segaretro.org/Pokemon_Stadium
+ *
+ * lionkin3          Lion King 3
+ * mulan             Hua Mu Lan - Mulan
+ * pokemon2          Pocket Monsters 2
+ * souledge          Soul Edge vs Samurai Spirits
+ * sdkong3/skkong99  Super Donkey Kong 99
+ * topf              Top Fighter 2000 MK VIII
+ * https://segaretro.org/Top_Fighter_2000_MK_VIII
+ *
+ * Obfuscated bankswitch mechanism + a bitswap based protection device.
+ *
+ * TODO:
+ * - pokestad is the only game that doesn't access protection, verify on HW if it has it anyway.
+ *
+ */
+
+DEFINE_DEVICE_TYPE(MEGADRIVE_UNL_TOPF, megadrive_unl_topf_device, "megadrive_unl_topf", "Megadrive Top Fighter cart")
+
+megadrive_unl_topf_device::megadrive_unl_topf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: megadrive_rom_device(mconfig, MEGADRIVE_UNL_TOPF, tag, owner, clock)
+	, m_rom_bank(*this, "rom_bank_%u", 0U)
+	, m_rom_view(*this, "rom_view")
+{
+}
+
+void megadrive_unl_topf_device::device_start()
+{
+	megadrive_rom_device::device_start();
+	memory_region *const romregion(cart_rom_region());
+	const u32 page_size = 0x00'8000;
+	device_generic_cart_interface::map_non_power_of_two(
+			unsigned(romregion->bytes() / page_size),
+			[this, base = &romregion->as_u8()] (unsigned entry, unsigned page)
+			{
+				for (int i = 0; i < 32; i++)
+					m_rom_bank[i]->configure_entry(entry, &base[page * page_size]);
+			});
+
+
+	save_item(NAME(m_prot_latch));
+	save_item(NAME(m_prot_mode));
+}
+
+void megadrive_unl_topf_device::device_reset()
+{
+	m_prot_latch = 0;
+	m_prot_mode = 0;
+	m_rom_view.select(0);
+}
+
+void megadrive_unl_topf_device::prot_latch_w(u8 data)
+{
+	m_prot_latch = data;
+}
+
+void megadrive_unl_topf_device::prot_mode_w(u8 data)
+{
+	m_prot_mode = data & 3;
+}
+
+u8 megadrive_unl_topf_device::prot_data_r()
+{
+	u8 res = 0;
+	switch(m_prot_mode)
+	{
+		case 0: res = (m_prot_latch << 1); break;
+		case 1: res = (m_prot_latch >> 1); break;
+		case 2: res = bitswap<8>(m_prot_latch, 3, 2, 1, 0, 7, 6, 5, 4); break;
+		case 3: res = bitswap<8>(m_prot_latch, 0, 1, 2, 3, 4, 5, 6, 7); break;
+	}
+
+	return res;
+}
+
+void megadrive_unl_topf_device::cart_map(address_map &map)
+{
+	// TODO: just 0x0f'ffff ?
+	map(0x00'0000, 0x1f'ffff).view(m_rom_view);
+	m_rom_view[0](0x00'0000, 0x1f'ffff).bankr(m_rom);
+	for (int bank = 0; bank < 16; bank++)
+	{
+		u32 bank_base = bank * 0x1'0000;
+		m_rom_view[1](0x00'0000 | bank_base, 0x00'7fff | bank_base).bankr(m_rom_bank[bank * 2 + 0]);
+		m_rom_view[1](0x00'8000 | bank_base, 0x00'ffff | bank_base).bankr(m_rom_bank[bank * 2 + 1]);
+	}
+
+	map(0x60'0001, 0x60'0001).mirror(0x0f'fff8).w(FUNC(megadrive_unl_topf_device::prot_latch_w));
+	map(0x60'0003, 0x60'0003).mirror(0x0f'fff8).w(FUNC(megadrive_unl_topf_device::prot_mode_w));
+	map(0x60'0005, 0x60'0005).mirror(0x0f'fff8).r(FUNC(megadrive_unl_topf_device::prot_data_r));
+
+	map(0x70'0000, 0x70'0000).mirror(0x0f'ffff).lw8(NAME([this] (u8 data) {
+		if (data)
+		{
+			m_rom_view.select(1);
+			for (int i = 0; i < 16; i++)
+			{
+				m_rom_bank[i * 2 + 0]->set_entry((i * 2 | data) & 0x3f);
+				m_rom_bank[i * 2 + 1]->set_entry((i * 2 | (data | 1)) & 0x3f);
+			}
+		}
+		else
+		{
+			m_rom_view.select(0);
+		}
+	}));
+}
 
