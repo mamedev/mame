@@ -1142,7 +1142,7 @@ end
 --@src/devices/video/roc10937.h,VIDEOS["ROC10937"] = true
 ---------------------------------------------------
 
-if (MACHINES["ROC10937"]~=null) then
+if (VIDEOS["ROC10937"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/roc10937.cpp",
 		MAME_DIR .. "src/devices/video/roc10937.h",
