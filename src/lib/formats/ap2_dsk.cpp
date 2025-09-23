@@ -370,14 +370,14 @@ bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const s
 	return true;
 }
 
-uint8_t a2_16sect_format::gb(const std::vector<bool> &buf, int &pos, int &wrap)
+uint8_t a2_16sect_format::byte_reader::operator()()
 {
 		uint8_t v = 0;
 		int w1 = wrap;
 		while(wrap != w1+2 && !(v & 0x80)) {
-				v = (v << 1) | buf[pos];
+				v = (v << 1) | (*buf)[pos];
 				pos++;
-				if(pos == buf.size()) {
+				if(pos == buf->size()) {
 						pos = 0;
 						wrap++;
 				}
@@ -434,12 +434,11 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 		if(VERBOSE_SAVE) {
 			fprintf(stderr,"done.\n");
 		}
-		int pos = 0;
-		int wrap = 0;
+		byte_reader br{&buf};
 		int hb = 0;
 		int dosver = 0; // apple dos version; 0 = >=3.3, 1 = <3.3
 		for(;;) {
-			uint8_t v = gb(buf, pos, wrap);
+			uint8_t v = br();
 			if(v == 0xff) {
 				hb = 1;
 			}
@@ -459,7 +458,7 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 			if(hb == 4) {
 				uint8_t h[11];
 				for(auto & elem : h)
-						elem = gb(buf, pos, wrap);
+					elem = br();
 				//uint8_t v2 = gcr6bw_tb[h[2]];
 				uint8_t vl = gcr4_decode(h[0],h[1]);
 				uint8_t tr = gcr4_decode(h[2],h[3]);
@@ -472,15 +471,16 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 				}
 				// sanity check
 				if (tr == track && se < m_nsect) {
-					visualgrid[se][track] |= ADDRFOUND;
-					visualgrid[se][track] |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
+					int &gridcell = visualgrid[se][track];
+					gridcell |= ADDRFOUND;
+					gridcell |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
 
-					if (visualgrid[se][track] & (LENIENT_ADDR_CHECK ? ADDRFOUND : ADDRGOOD)) {
-						int opos = pos;
-						int owrap = wrap;
+					if (gridcell & (LENIENT_ADDR_CHECK ? ADDRFOUND : ADDRGOOD)) {
+						byte_reader orig_br = br;
+
 						hb = 0;
 						for(int i=0; i<20 && hb != 4; i++) {
-							v = gb(buf, pos, wrap);
+							v = br();
 							if(v == 0xff)
 								hb = 1;
 							else if(hb == 1 && v == 0xd5)
@@ -492,93 +492,66 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 							else
 								hb = 0;
 						}
-						if((hb == 4)&&(dosver == 0)) {
-							visualgrid[se][track] |= DATAFOUND;
-							uint8_t *dest;
-							uint8_t data[0x157];
-							uint32_t dpost = 0;
-							uint8_t c = 0;
+						if(hb == 4 && check_dosver(dosver)) {
+							gridcell |= DATAFOUND;
 
-							if (m_prodos_order)
-							{
-								dest = sectdata+APPLE2_SECTOR_SIZE*prodos_skewing[se];
-							}
-							else
-							{
-								dest = sectdata+APPLE2_SECTOR_SIZE*dos_skewing[se];
-							}
+							uint8_t decoded_buf[APPLE2_SECTOR_SIZE];
+							uint8_t dchk_expected, dchk_actual;
+							decode_sector_data(br, decoded_buf, dchk_expected, dchk_actual);
 
-							// first read in sector and decode to 6bit form
-							for(int i=0; i<0x156; i++) {
-								data[i] = gcr6bw_tb[gb(buf, pos, wrap)] ^ c;
-								c = data[i];
-							//  printf("%02x ", c);
-							//  if (((i&0xf)+1)==0x10) printf("\n");
-							}
-							// read the checksum byte
-							data[0x156] = gcr6bw_tb[gb(buf,pos,wrap)];
+							bool dchk_good = dchk_expected == dchk_actual;
+
 							// now read the postamble bytes
+							uint32_t dpost = 0;
 							for(int i=0; i<3; i++) {
 								dpost <<= 8;
-								dpost |= gb(buf, pos, wrap);
+								dpost |= br();
 							}
-							// next combine in the upper 2 bits of each byte
-							uint8_t bit_swap[4] = { 0, 2, 1, 3 };
-							for(int i=0; i<0x56; i++)
-								data[i+0x056] = data[i+0x056]<<2 |  bit_swap[data[i]&3];
-							for(int i=0; i<0x56; i++)
-								data[i+0x0ac] = data[i+0x0ac]<<2 |  bit_swap[(data[i]>>2)&3];
-							for(int i=0; i<0x54; i++)
-								data[i+0x102] = data[i+0x102]<<2 |  bit_swap[(data[i]>>4)&3];
-							// now decode it into 256 bytes
-							// but only write it if the bitfield of the track shows datagood is NOT set.
+							bool dpost_good = (dpost & 0xFFFF00) == 0xDEAA00;
+
+							uint8_t *dest = sectdata + APPLE2_SECTOR_SIZE * logical_sector_index(se);
+
+							// only write it if the bitfield of the track shows datagood is NOT set.
 							// if it is set we don't want to overwrite a guaranteed good read with a bad one
 							// if past read had a bad checksum or bad postamble...
 							if(USE_OLD_BEST_SECTOR_PRIORITY) {
-								if ((visualgrid[se][track]&DATAGOOD)==0) {
-									for(int i=0x56; i<0x156; i++) {
-										uint8_t dv = data[i];
-										*dest++ = dv;
-									}
+								if (!(gridcell & DATAGOOD)) {
+									std::copy_n(decoded_buf, sizeof decoded_buf, dest);
 								}
 							} else {
-								if (((visualgrid[se][track]&DATAGOOD)==0)||((visualgrid[se][track]&DATAPOST)==0)) {
+								bool was_datagood = gridcell & DATAGOOD;
+								bool was_datapost = gridcell & DATAPOST;
+
+								if (!was_datagood || !was_datapost) {
 									// if the current read is good, and postamble is good, write it in, no matter what.
 									// if the current read is good and the current postamble is bad, write it in unless the postamble was good before
 									// if the current read is bad and the current postamble is good and the previous read had neither good, write it in
 									// if the current read isn't good and neither is the postamble but nothing better
 									// has been written before, write it anyway.
-									if ( ((data[0x156] == c) && (dpost&0xFFFF00)==0xDEAA00) ||
-														(((data[0x156] == c) && (dpost&0xFFFF00)!=0xDEAA00) && ((visualgrid[se][track]&DATAPOST)==0)) ||
-														(((data[0x156] != c) && (dpost&0xFFFF00)==0xDEAA00) && (((visualgrid[se][track]&DATAGOOD)==0)&&(visualgrid[se][track]&DATAPOST)==0)) ||
-														(((data[0x156] != c) && (dpost&0xFFFF00)!=0xDEAA00) && (((visualgrid[se][track]&DATAGOOD)==0)&&(visualgrid[se][track]&DATAPOST)==0))
-														) {
-										for(int i=0x56; i<0x156; i++) {
-											uint8_t dv = data[i];
-											*dest++ = dv;
-										}
+									if ((dchk_good && dpost_good) ||
+										(dchk_good && !dpost_good && !was_datapost) ||
+										(!dchk_good && dpost_good && !was_datagood && !was_datapost) ||
+										(!dchk_good && !dpost_good && !was_datagood && !was_datapost)
+									) {
+										std::copy_n(decoded_buf, sizeof decoded_buf, dest);
 									}
 								}
 							}
 							// do some checking
-							if(VERBOSE_SAVE) {
-								if ((data[0x156] != c) || (dpost&0xFFFF00)!=0xDEAA00)
-									fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n",
-											data[0x156], c, (data[0x156]==c)?"OK":"BAD", dpost, (dpost&0xFFFF00)==0xDEAA00?"OK":"BAD");
+							if(VERBOSE_SAVE && (!dchk_good || !dpost_good)) {
+								fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n",
+										dchk_expected, dchk_actual, dchk_good?"OK":"BAD", dpost, dpost_good?"OK":"BAD");
 							}
-							if (data[0x156] == c) visualgrid[se][track] |= DATAGOOD;
-							if ((dpost&0xFFFF00)==0xDEAA00) visualgrid[se][track] |= DATAPOST;
-						} else if ((hb == 4)&&(dosver == 1)) {
-							fprintf(stderr,"ERROR: We don't handle dos sectors below 3.3 yet!\n");
+							if (dchk_good) gridcell |= DATAGOOD;
+							if (dpost_good) gridcell |= DATAPOST;
 						} else {
-							pos = opos;
-							wrap = owrap;
+							br = orig_br;
 						}
 					}
 				}
 				hb = 0;
 			}
-			if(wrap)
+			if(br.wrap)
 				break;
 		}
 		for(int i = 0; i < m_nsect; i++) {
@@ -610,6 +583,55 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 	}
 
 	return true;
+}
+
+bool a2_16sect_format::check_dosver(int dosver) const
+{
+	if (dosver != 0) {
+		fprintf(stderr, "ERROR: DOS 3.2 sector found while saving to 16-sector image format\n");
+		return false;
+	}
+
+	return true;
+}
+
+int a2_16sect_format::logical_sector_index(int physical) const {
+	if (m_prodos_order)
+	{
+		return prodos_skewing[physical];
+	}
+	else
+	{
+		return dos_skewing[physical];
+	}
+}
+
+void a2_16sect_format::decode_sector_data(
+	byte_reader &br, uint8_t (&decoded_buf)[APPLE2_SECTOR_SIZE],
+	uint8_t &dchk_expected, uint8_t &dchk_actual
+) const
+{
+	uint8_t low_bits[0x56];
+
+	dchk_expected = 0;
+
+	// first read in sector and decode to 6bit form
+	for(auto &b : low_bits)
+		dchk_expected = b = gcr6bw_tb[br()] ^ dchk_expected;
+	for(auto &b : decoded_buf)
+		dchk_expected = b = gcr6bw_tb[br()] ^ dchk_expected;
+
+	// read the checksum byte
+	dchk_actual = gcr6bw_tb[br()];
+
+	// next combine in the lower 2 bits of each byte
+	static const uint8_t bit_swap[4] = { 0, 2, 1, 3 };
+	for(int i=0; i<0x56; i++)
+		decoded_buf[i] = decoded_buf[i]<<2 | bit_swap[low_bits[i]&3];
+	for(int i=0; i<0x56; i++)
+		decoded_buf[i+0x56] = decoded_buf[i+0x56]<<2 | bit_swap[(low_bits[i]>>2)&3];
+	for(int i=0; i<0x54; i++)
+		decoded_buf[i+0xac] = decoded_buf[i+0xac]<<2 | bit_swap[(low_bits[i]>>4)&3];
 }
 
 const a2_16sect_dos_format FLOPPY_A216S_DOS_FORMAT;

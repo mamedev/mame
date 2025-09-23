@@ -69,7 +69,20 @@ public:
 private:
 	const bool m_prodos_order;
 
-	static uint8_t gb(const std::vector<bool> &buf, int &pos, int &wrap);
+	struct byte_reader {
+		const std::vector<bool> *buf;
+		int pos = 0;
+		int wrap = 0;
+
+		uint8_t operator()();
+	};
+
+	bool check_dosver(int dosver) const;
+	void decode_sector_data(
+		byte_reader &br, uint8_t (&decoded_buf)[APPLE2_SECTOR_SIZE],
+		uint8_t &dchk_expected, uint8_t &dchk_actual
+	) const;
+	int logical_sector_index(int physical) const;
 };
 
 class a2_16sect_dos_format : public a2_16sect_format
