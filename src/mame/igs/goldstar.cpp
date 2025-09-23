@@ -12731,16 +12731,21 @@ void wingco_state::luckylad(machine_config &config)
 {
 	lucky8(config);
 
+	// basic machine hardware
 	sega_315_5096_device &maincpu(SEGA_315_5096(config.replace(), m_maincpu, CPU_CLOCK));  // actually Falcon 03155096 encrypted Z80
 	maincpu.set_addrmap(AS_PROGRAM, &wingco_state::lucky8_map);
 	maincpu.set_addrmap(AS_OPCODES, &wingco_state::common_decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
+
+	// sound hardware
+	SN76489(config.replace(), "snsnd", 0);  // unused device
 }
 
 void wingco_state::lucky8t(machine_config &config)
 {
 	lucky8(config);
 
+	// sound hardware
 	SN76489(config.replace(), "snsnd", 0);  // unused device
 }
 
@@ -12750,6 +12755,7 @@ void wingco_state::animalw(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::animalw_map);
 
+	// sound hardware
 	SN76489(config.replace(), "snsnd", 0);  // unused device
 }
 
