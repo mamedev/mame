@@ -86,6 +86,7 @@ private:
 	void program_map(address_map &map) ATTR_COLD;
 	void large_program_map(address_map &map) ATTR_COLD;
 	void small_program_map(address_map &map) ATTR_COLD;
+	void io_4040_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
 	// I8256 ports
@@ -143,8 +144,16 @@ void stella8085_state::small_program_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x5000, 0x5fff).ram();
-	map(0x6000, 0x633f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
+	//map(0x6000, 0x633f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 	map(0x7000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram();
+}
+
+void stella8085_state::io_4040_map(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
+	map(0x80, 0x81).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x90, 0x9f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 }
 
 void stella8085_state::io_map(address_map &map)
@@ -588,9 +597,20 @@ void stella8085_state::dicemstr(machine_config &config)
 
 void stella8085_state::doppelpot(machine_config &config)
 {
-	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	excellent(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_map);
+
+	MC146818(config, "rtc", 32.768_kHz_XTAL);
+
+}
+
+void stella8085_state::excellent(machine_config &config)
+{
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::small_program_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4040_map);
 
 	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
@@ -607,17 +627,9 @@ void stella8085_state::doppelpot(machine_config &config)
 
 	config.set_default_layout(layout_adpservice);
 
-	MC146818(config, "rtc", 32.768_kHz_XTAL);
-
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 0)
 		.add_route(ALL_OUTPUTS, "mono", 0.50);
-}
-
-void stella8085_state::excellent(machine_config &config)
-{
-	doppelpot(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::small_program_map);
 }
 
 ROM_START( bahia )
