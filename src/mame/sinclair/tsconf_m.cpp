@@ -544,6 +544,11 @@ u8 tsconf_state::tsconf_port_xx1f_r(offs_t offset) {
 	return 0x00; // TODO kempston read
 }
 
+void tsconf_state::bank3_set_page(u8 page)
+{
+	tsconf_port_xxaf_w(PAGE3 << 8, page);
+}
+
 void tsconf_state::tsconf_port_7ffd_w(u8 data)
 {
 	// LOCK? BIT(data, 5);
