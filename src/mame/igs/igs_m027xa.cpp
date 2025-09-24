@@ -101,9 +101,6 @@ private:
 
 	void xor_table_w(offs_t offset, u8 data);
 
-	u16 xa_r(offs_t offset, u16 mem_mask);
-	void xa_w(offs_t offset, u16 data, u16 mem_mask);
-
 	void output_w(u8 data);
 	void lamps_w(u8 data);
 
@@ -810,7 +807,7 @@ ROM_END
 ROM_START( jking04 ) // IGS PCB-0447-03-GM - Has IGS027A, MX10EXAQC, IGS031, Oki M6295, three banks of 8 DIP switches
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "j10_igs027a.u37", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "j10_igs027a.u37", 0x0000, 0x4000, CRC(ebbca800) SHA1(5a659999432c6972588609683fa2f440a895cec2) )
 
 	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
 	ROM_LOAD( "j_k_2004_v101_us.u23", 0x000000, 0x80000, CRC(8ab70d64) SHA1(4ddda6d9eba3db7b3e5267d70349933d6bce2266) ) // 27C4096
@@ -914,7 +911,6 @@ void igs_m027xa_state::init_wldfruit()
 void igs_m027xa_state::init_jking04()
 {
 	jking04_decrypt(machine());
-	pgm_create_dummy_internal_arm_region();
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
@@ -947,6 +943,6 @@ GAMEL( 2006, tripfev105us,  tripfev,  base_xor,   tripfev,     igs_m027xa_state,
 
 GAME(  200?, wldfruit,      0,        base,       base,        igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US
 
-GAME(  200?, jking04,       0,        base,       base,        igs_m027xa_state, init_jking04,   ROT0, "IGS", "Jungle King 2004 (V101US)", MACHINE_NOT_WORKING ) // no IGS027A dump
+GAME(  2003, jking04,       0,        base_xor,   tripfev,     igs_m027xa_state, init_jking04,   ROT0, "IGS", "Jungle King 2004 (V101US)", MACHINE_NOT_WORKING ) // inputs, outputs, Oki bank
 
 GAME(  2006, krzykeno,      0,        base_xor,   tripfev,     igs_m027xa_state, init_krzykeno,  ROT0, "IGS", "Krazy Keno (V105US)", MACHINE_NOT_WORKING ) // inputs, outputs, Oki bank
