@@ -39,6 +39,9 @@ Main components found on its main PCB:
 
 #include "softlist_dev.h"
 
+#include "sun_fcnc_270_4373_07.h"
+#include "video/permedia2.h"
+
 
 namespace {
 
@@ -49,7 +52,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
-
 	{ }
 
 	void e250(machine_config &config);
@@ -72,6 +74,10 @@ void e250_state::e250(machine_config &config)
 	MPC8240(config, m_subcpu, XTAL(66'000'000)); // Actually a Motorola XPC823ZT66B2
 
 	SOFTWARE_LIST(config, "sun_sparc").set_original("sun_sparc");
+
+	// PCI Cards
+	SUN_FCNC_270_4373_07(config, "sun_fcnc_270_4373_07"); // Sun Microsystems 270-4373-07 Gigabit Fiber Channel Network Card
+	PERMEDIA2(config, "permedia2"); // Raptor GFX PCI Video Card
 }
 
 
