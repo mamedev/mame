@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-#ifndef MAME_SUN_FCNC_270_4373_07_H
-#define MAME_SUN_FCNC_270_4373_07_H
+#ifndef MAME_SUN_SUN_FCNC_270_4373_07_H
+#define MAME_SUN_SUN_FCNC_270_4373_07_H
 
 #pragma once
 
@@ -20,4 +20,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SUN_FCNC_270_4373_07, sun_fcnc_270_4373_07_device)
 
-#endif // MAME_SUN_FCNC_270_4373_07_H
+#endif // MAME_SUN_SUN_FCNC_270_4373_07_H

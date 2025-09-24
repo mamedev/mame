@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-#ifndef MAME_PERMEDIA2_H
-#define MAME_PERMEDIA2_H
+#ifndef MAME_VIDEO_PERMEDIA2_H
+#define MAME_VIDEO_PERMEDIA2_H
 
 #pragma once
 
@@ -20,4 +20,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(PERMEDIA2, permedia2_device)
 
-#endif // MAME_PERMEDIA2_H
+#endif // MAME_VIDEO_PERMEDIA2_H
