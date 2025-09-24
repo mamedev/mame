@@ -120,10 +120,18 @@ void model2_state::timers_w(offs_t offset, u32 data, u32 mem_mask)
 	attotime period;
 	COMBINE_DATA(&m_timervals[offset]);
 
-	m_timerorig[offset] = m_timervals[offset];
-	period = attotime::from_hz(25000000) * m_timerorig[offset];
-	m_timers[offset]->adjust(period);
-	m_timerrun[offset] = 1;
+	if (m_timervals[offset] < 0xfffff)
+	{
+		m_timerorig[offset] = m_timervals[offset];
+		period = attotime::from_hz(25000000) * m_timerorig[offset];
+		m_timers[offset]->adjust(period);
+		m_timerrun[offset] = 1;
+	}
+	else
+	{
+		m_timers[offset]->adjust(attotime::never);
+		m_timerrun[offset] = 0;
+	}
 }
 
 template <int TNum>
