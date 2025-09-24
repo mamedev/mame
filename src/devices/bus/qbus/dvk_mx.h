@@ -126,6 +126,8 @@ private:
 
 	required_device_array<floppy_connector, 4> m_connectors;
 
+	bool m_installed;
+
 	uint16_t m_mxcs;
 	uint16_t m_rbuf;
 	uint16_t m_wbuf;
