@@ -6,7 +6,7 @@ license:CC0-1.0
 <softwarelist name="sun_sparc" description="Sun Microsystems SPARC software">
 
 	<!-- Dumped from original Sun CDs with a Plextor and without any reading or C2 error -->
-	<software name="sol8_10-10_sparc" supported="no">
+	<software name="sol8_10_10_sparc" supported="no">
 		<description>Solaris 8 10-00 Media - SPARC Platform Edition for Sun Computer Systems</description>
 		<year>2000</year>
 		<publisher>Sun Microsystems</publisher>
