@@ -83,10 +83,10 @@ ROM_START(e250)
 	ROM_LOAD( "525-1724-08_a29898_e28f008sa.u4401", 0x000000, 0x100000, CRC(567fcc56) SHA1(c6a26b34f61559ec49119eed258666318d551378) ) // VxWorks for management console
 
 	ROM_REGION(0x021000, "nvram", 0)
-	ROM_LOAD( "525-1726-02_stm48t59y-70p10.u2706",  0x000000, 0x002000, CRC(adc6696f) SHA1(97e4d4709ba739e8adbe5298175d38e826c0321f) ) // Seems to contain passwords
+	ROM_LOAD( "525-1726-02_stm48t59y-70p10.u2706",  0x000000, 0x002000, CRC(adc6696f) SHA1(97e4d4709ba739e8adbe5298175d38e826c0321f) )
 
 	ROM_REGION(0x008000, "seeprom", 0)
-	ROM_LOAD( "24c02n.u4402",                       0x000000, 0x000100, CRC(e98dd85c) SHA1(014e89081945a6c16e1498a2f10604ce64048ae6) )
+	ROM_LOAD( "24c02n.u4402",                       0x000000, 0x000100, CRC(e98dd85c) SHA1(014e89081945a6c16e1498a2f10604ce64048ae6) ) // Seems to contain passwords
 ROM_END
 
 } // anonymous namespace
