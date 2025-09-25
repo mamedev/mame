@@ -32,8 +32,28 @@ class a2_sect_format : public floppy_image_format_t
 public:
 	a2_sect_format(int nsect);
 
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
+
+	virtual bool supports_save() const noexcept override;
+
 protected:
+	struct byte_reader {
+		const std::vector<bool> *buf;
+		int pos = 0;
+		int wrap = 0;
+
+		uint8_t operator()();
+	};
+
+private:
 	const int m_nsect;
+
+	virtual bool check_dosver(int dosver) const = 0;
+	virtual void decode_sector_data(
+		byte_reader &br, uint8_t (&decoded_buf)[APPLE2_SECTOR_SIZE],
+		uint8_t &dchk_expected, uint8_t &dchk_actual
+	) const = 0;
+	virtual int logical_sector_index(int physical) const = 0;
 };
 
 class a2_13sect_format : public a2_sect_format
@@ -49,6 +69,14 @@ public:
 	virtual const char *name() const noexcept override;
 	virtual const char *description() const noexcept override;
 	virtual const char *extensions() const noexcept override;
+
+private:
+	virtual bool check_dosver(int dosver) const override;
+	virtual void decode_sector_data(
+		byte_reader &br, uint8_t (&decoded_buf)[APPLE2_SECTOR_SIZE],
+		uint8_t &dchk_expected, uint8_t &dchk_actual
+	) const override;
+	virtual int logical_sector_index(int physical) const override;
 };
 
 extern const a2_13sect_format FLOPPY_A213S_FORMAT;
@@ -62,27 +90,16 @@ public:
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
-
-	virtual bool supports_save() const noexcept override;
 
 private:
 	const bool m_prodos_order;
 
-	struct byte_reader {
-		const std::vector<bool> *buf;
-		int pos = 0;
-		int wrap = 0;
-
-		uint8_t operator()();
-	};
-
-	bool check_dosver(int dosver) const;
-	void decode_sector_data(
+	virtual bool check_dosver(int dosver) const override;
+	virtual void decode_sector_data(
 		byte_reader &br, uint8_t (&decoded_buf)[APPLE2_SECTOR_SIZE],
 		uint8_t &dchk_expected, uint8_t &dchk_actual
-	) const;
-	int logical_sector_index(int physical) const;
+	) const override;
+	virtual int logical_sector_index(int physical) const override;
 };
 
 class a2_16sect_dos_format : public a2_16sect_format
