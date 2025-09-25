@@ -172,6 +172,7 @@ private:
 	void bxx_s(uint32_t opcode, int mask);
 	void fxx(uint32_t opcode, int mask);
 	void test(uint32_t opcode, int mask);
+	double round_to_int(double val);
 	void execute_op(uint32_t opcode);
 	void execute_burst_stall_op(uint32_t opcode);
 	void take_interrupt(int vector, int lvl);
