@@ -179,6 +179,7 @@ public:
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD { return nullptr; }
 
 	required_device<ec1841_device> m_hdc;
 };
