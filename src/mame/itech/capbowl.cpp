@@ -582,7 +582,7 @@ void capbowl_base_state::base(machine_config &config)
 	MC6809E(config, m_audiocpu, XTAL(8'000'000) / 4); // MC68B09EP
 	m_audiocpu->set_addrmap(AS_PROGRAM, &capbowl_base_state::sound_map);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100));
 
@@ -717,6 +717,7 @@ ROM_END
 
 } // anonymous namespace
 
+
 /*************************************
  *
  *  Game drivers
@@ -728,4 +729,5 @@ GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl_state,  empty_init, RO
 GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl_state,  empty_init, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl_state,  empty_init, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl_state,  empty_init, ROT270, "Incredible Technologies / Capcom", "Coors Light Bowling",    MACHINE_SUPPORTS_SAVE )
+
 GAME( 1991, bowlrama, 0,       bowlrama, capbowl, bowlrama_state, empty_init, ROT270, "P&P Marketing",                    "Bowl-O-Rama (Rev 1.0)",  MACHINE_SUPPORTS_SAVE )

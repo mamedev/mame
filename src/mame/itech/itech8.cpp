@@ -1710,7 +1710,7 @@ void itech8_state::generate_tms34061_interrupt(int state)
 
 void itech8_state::itech8_core_devices(machine_config &config)
 {
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 
@@ -2792,6 +2792,6 @@ GAME( 1991, rimrockn12b, rimrockn, rimrockn,          rimrockn, itech8_state,   
 GAME( 1991, ninclown,   0,         ninclown,          ninclown, itech8_state,   empty_init,    ROT0,   "Strata / Incredible Technologies",         "Ninja Clowns (27 oct 91)", 0 )
 
 // Golden Tee Golf II-style PCB
-GAME( 1992, gpgolf,     0,         gtg2,              gpgolf,   itech8_state,   empty_init,    ROT0,   "Strata / Incredible Technologies",         "Golden Par Golf (Joystick, V1.1)", MACHINE_NOT_WORKING ) // Seems to stall during Demo Mode??
-GAME( 1991, gpgolfa,    gpgolf,    gtg2,              gpgolf,   itech8_state,   empty_init,    ROT0,   "Strata / Incredible Technologies",         "Golden Par Golf (Joystick, V1.0)", MACHINE_NOT_WORKING ) // "
+GAME( 1992, gpgolf,     0,         gtg2,              gpgolf,   itech8_state,   empty_init,    ROT0,   "Strata / Incredible Technologies",         "Golden Par Golf (Joystick, V1.1)", 0 )
+GAME( 1991, gpgolfa,    gpgolf,    gtg2,              gpgolf,   itech8_state,   empty_init,    ROT0,   "Strata / Incredible Technologies",         "Golden Par Golf (Joystick, V1.0)", 0 )
 GAME( 1992, gtg2,       0,         gtg2,              gtg2,     itech8_state,   init_invbank,  ROT0,   "Strata / Incredible Technologies",         "Golden Tee Golf II (Trackball, V2.2)", 0 )
