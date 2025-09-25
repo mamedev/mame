@@ -1,0 +1,55 @@
+name: Style Check
+
+on:
+  pull_request:
+    paths:
+    - '.github/workflows/**'
+    - 'src/**.cpp'
+    - 'src/**.h'
+
+jobs:
+  stylecheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get changed files
+        id: changed-files
+        run: echo "changed_files=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }}...HEAD | xargs)" >> $GITHUB_OUTPUT
+
+      - name: Run style check
+        id: style-check
+        run: echo "reviews=$(python3 scripts/build/style.py ${{ steps.changed-files.outputs.changed_files }} | jq -s -c .)" >> $GITHUB_OUTPUT
+
+      - name: Post review comments
+        uses: actions/github-script@v7
+        id: post-comments
+        env:
+          REVIEWS: ${{ steps.style-check.outputs.reviews }}
+        with:
+          script: |
+            const reviews = JSON.parse(process.env.REVIEWS || "[]");
+
+            const comments = reviews.map(r => ({
+              body: r.body,
+              path: r.path,
+              line: r.line,
+              side: "RIGHT",
+            }));
+
+            if (comments.length > 0) {
+              console.debug("Reviews: ", reviews);
+              await github.rest.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                event: "COMMENT",
+                comments,
+              });
+            } else {
+              console.info("Review list empty.");
+            }
