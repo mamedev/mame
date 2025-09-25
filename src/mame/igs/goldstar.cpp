@@ -326,7 +326,6 @@ public:
 	void ladylinr(machine_config &config) ATTR_COLD;
 	void ladylinrb(machine_config &config) ATTR_COLD;
 	void kkotnoli(machine_config &config) ATTR_COLD;
-	void megaline(machine_config &config) ATTR_COLD;
 	void moonlght(machine_config &config) ATTR_COLD;
 	void super9(machine_config &config) ATTR_COLD;
 	void wcherry(machine_config &config) ATTR_COLD;
@@ -337,7 +336,6 @@ public:
 	void init_ladylinrc() ATTR_COLD;
 	void init_ladylinrd() ATTR_COLD;
 	void init_ladylinre() ATTR_COLD;
-	void init_skch() ATTR_COLD;
 	void init_super9() ATTR_COLD;
 	void init_wcherry() ATTR_COLD;
 
@@ -411,8 +409,6 @@ private:
 	void feverch_portmap(address_map &map) ATTR_COLD;
 	void kkotnoli_map(address_map &map) ATTR_COLD;
 	void ladylinr_map(address_map &map) ATTR_COLD;
-	void megaline_map(address_map &map) ATTR_COLD;
-	void megaline_portmap(address_map &map) ATTR_COLD;
 	void super9_map(address_map &map) ATTR_COLD;
 	void super9_portmap(address_map &map) ATTR_COLD;
 	void wcherry_map(address_map &map) ATTR_COLD;
@@ -615,6 +611,7 @@ public:
 	void luckylad(machine_config &config) ATTR_COLD;
 	void magodds(machine_config &config) ATTR_COLD;
 	void mbstar(machine_config &config) ATTR_COLD;
+	void megaline(machine_config &config) ATTR_COLD;
 	void nd8lines(machine_config &config) ATTR_COLD;
 	void super972(machine_config &config) ATTR_COLD;
 	void superdrg(machine_config &config) ATTR_COLD;
@@ -635,6 +632,7 @@ public:
 	void init_mbs2() ATTR_COLD;
 	void init_luckylad() ATTR_COLD;
 	void init_nd8lines() ATTR_COLD;
+	void init_skch() ATTR_COLD;
 	void init_super972() ATTR_COLD;
 	void init_wcat() ATTR_COLD;
 	void init_wcat3() ATTR_COLD;
@@ -669,6 +667,7 @@ private:
 	uint32_t screen_update_bingowng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_magical(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mbstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_megaline(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void masked_irq(int state);
 
@@ -704,6 +703,8 @@ private:
 	void luckybar_map(address_map &map) ATTR_COLD;
 	void magodds_map(address_map &map) ATTR_COLD;
 	void mbstar_map(address_map &map) ATTR_COLD;
+	void megaline_map(address_map &map) ATTR_COLD;
+	void megaline_portmap(address_map &map) ATTR_COLD;
 	void nd8lines_map(address_map &map) ATTR_COLD;
 	void superdrg_map(address_map &map) ATTR_COLD;
 	void superdrg_opcodes_map(address_map &map) ATTR_COLD;
@@ -1076,7 +1077,6 @@ void goldstar_state::goldstar_fa00_w(uint8_t data)
 
 	m_ticket_dispenser->motor_w(BIT(data, 7));
 }
-
 
 
 uint32_t goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1476,6 +1476,52 @@ uint32_t wingco_state::screen_update_bingowng(screen_device &screen, bitmap_rgb3
 	{
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
+
+	return 0;
+}
+
+uint32_t wingco_state::screen_update_megaline(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(rgb_t::black(), cliprect);
+
+	if (!(m_enable_reg & 0x01))
+		return 0;
+
+	if (m_enable_reg & 0x08)
+	{
+		if (m_vidreg & 2)
+		{
+			for (int i = 0; i < 64; i++)
+			{
+				// only one reels tilemap
+				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+			}
+
+			const rectangle visible1(0*8, (14+48)*8-1,  8*8,  (8+7)*8-1);
+			m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		}
+		else
+		{
+			for (int i = 0; i < 64; i++)
+			{
+				// all three reels tilemaps
+				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+				m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+				m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+			}
+
+			const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
+			const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+7)*8-1);
+			const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+7)*8-1);
+
+			m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+			m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+			m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
+		}
+	}
+
+	if (m_enable_reg & 0x02)
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -3462,7 +3508,7 @@ void unkch_state::unkch_portmap(address_map &map)
 }
 
 
-void goldstar_state::megaline_map(address_map &map)
+void wingco_state::megaline_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 
@@ -3475,8 +3521,8 @@ void goldstar_state::megaline_map(address_map &map)
 	map(0xdc00, 0xddff).ram().w(FUNC(goldstar_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xde00, 0xdfff).ram();
 
-	map(0xe000, 0xe7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share(m_fg_vidram);
-	map(0xe800, 0xefff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0xe000, 0xe7ff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xe800, 0xefff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
 	map(0xf000, 0xffff).ram().share("nvram");
 //	map(0xf800, 0xffff).ram();
 }
@@ -3486,7 +3532,7 @@ void goldstar_state::megaline_map(address_map &map)
   PSGs:    A0 - C0 - E0
 
 */
-void goldstar_state::megaline_portmap(address_map &map)  // TODO: verify everything. Strange reads at 0x0f and 0x07
+void wingco_state::megaline_portmap(address_map &map)  // TODO: verify everything. Strange reads at 0x0f and 0x07
 {
 	map.global_mask(0xff);
 	//map(0x20, 0x20).portr("IN0").nopw();  // ??
@@ -13382,23 +13428,23 @@ void cmaster_state::eldoraddoa(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::eldoraddoa_portmap);
 }
 
-void goldstar_state::megaline(machine_config &config)
+void wingco_state::megaline(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::megaline_map);
-	m_maincpu->set_addrmap(AS_IO, &goldstar_state::megaline_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::megaline_map);
+	m_maincpu->set_addrmap(AS_IO, &wingco_state::megaline_portmap);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.set_screen_update(FUNC(wingco_state::screen_update_megaline));
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_megaline);
-	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
+	PALETTE(config, m_palette, FUNC(wingco_state::lucky8_palette), 256);
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// sound hardware
@@ -27171,7 +27217,7 @@ void cmaster_state::init_rm7b()
 
 }
 
-void goldstar_state::init_skch()
+void wingco_state::init_skch()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -27408,9 +27454,9 @@ GAME(  1986, fevercha,   feverch,  feverch,  feverch,  goldstar_state, empty_ini
 GAME(  1986, feverchtw,  feverch,  feverch,  feverch,  goldstar_state, empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )  // reels scrolling, I/O
 
 // --- Wing W-7 hardware ---
-GAME(  1986, skillch,    0,        megaline, megaline, goldstar_state, init_skch,      ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 1)",                                MACHINE_NOT_WORKING ) // not looked at yet
-GAME(  1986, skillcha,   skillch,  megaline, megaline, goldstar_state, empty_init,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 2)",                                MACHINE_NOT_WORKING ) // "
-GAME(  1991, megaline,   0,        megaline, megaline, goldstar_state, empty_init,     ROT0, "Fun World",         "Mega Lines",                                               MACHINE_NOT_WORKING ) // "
+GAME(  1986, skillch,    0,        megaline, megaline, wingco_state,   init_skch,      ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 1)",                                MACHINE_NOT_WORKING ) // not looked at yet
+GAME(  1986, skillcha,   skillch,  megaline, megaline, wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 2)",                                MACHINE_NOT_WORKING ) // "
+GAME(  1991, megaline,   0,        megaline, megaline, wingco_state,   empty_init,     ROT0, "Fun World",         "Mega Lines",                                               MACHINE_NOT_WORKING ) // "
 
 // --- Wing W-8 hardware ---
 GAME(  1990, bonusch,    0,        bonusch,  bonusch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 1)",                                MACHINE_NOT_WORKING )  // M80C51F MCU
