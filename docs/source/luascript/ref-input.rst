@@ -339,9 +339,6 @@ field.cocktail (read-only)
 field.toggle (read-only)
     A Boolean indicating whether the field corresponds to a hardware toggle
     switch or push-on, push-off button.
-field.rotated (read-only)
-    A Boolean indicating whether the field corresponds to a control that is
-    rotated relative its standard orientation.
 field.analog_reverse (read-only)
     A Boolean indicating whether the field corresponds to an analog control that
     increases in the opposite direction to the convention (e.g. larger values
