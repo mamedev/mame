@@ -1070,4 +1070,4 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME      FLAGS
-COMP( 1985, att6300p,  ibm5150, 0,      att6300p, att6300p, att6300p_state, empty_init, "AT&T",     "6300 Plus",  MACHINE_NOT_WORKING )
+COMP( 1985, att6300p,  0,       0,      att6300p, att6300p, att6300p_state, empty_init, "AT&T",     "6300 Plus",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
