@@ -12,10 +12,12 @@
 #include "mcpirate.h"
 #include "miky.h"
 #include "multigame.h"
+#include "rockworld.h"
 #include "rom.h"
 #include "seganet.h"
 #include "sram.h"
 #include "smb.h"
+#include "smw64.h"
 #include "tekkensp.h"
 #include "xboy.h"
 
@@ -42,9 +44,11 @@ char const *const MD_JCART_SAMPRAS      = "rom_jcart_sampras";
 char const *const MD_JCART_SSKID        = "rom_jcart";
 char const *const MD_JCART_MICROMAC2    = "rom_codemast";
 char const *const MD_JCART_MICROMAC96   = "rom_mm96";
-char const *const MD_SEGANET            = "ram_seganet";
+char const *const MD_SEGANET            = "seganet";
 char const *const MD_TECTOY_SPORTS      = "tectoy_sports";
+char const *const MD_3IN1_FWT           = "3in1fwt";
 char const *const MC_PIRATE             = "rom_mcpir"; // TODO: rename, what even MC stands for?
+char const *const MC_18KIN1             = "18kin1";
 char const *const UNL_XINQIG            = "rom_xinqig";
 char const *const UNL_TILESMJ2          = "rom_16mj2";
 char const *const UNL_ELFWOR            = "rom_elfwor";
@@ -71,6 +75,10 @@ char const *const UNL_TEKKENSP          = "rom_tekkensp";
 char const *const UNL_TC2000            = "rom_tc2000";
 char const *const UNL_TOPF              = "rom_lion3";
 char const *const UNL_POKESTAD          = "rom_pokestad"; // TODO: alias of above, probably unneeded
+char const *const UNL_CHINF3            = "rom_chinf3";
+char const *const UNL_SMW64             = "rom_smw64";
+char const *const UNL_ROCKWORLD         = "rockworld";
+char const *const UNL_ROCKHEAVEN        = "rockheaven";
 
 char const *const ACTION_REPLAY         = "ar";
 
@@ -111,40 +119,46 @@ void megadrive_cart_options(device_slot_interface &device)
 	device.option_add_internal(slotoptions::MD_JCART_MICROMAC96, MEGADRIVE_ROM_JCART_MICROMAC96);
 
 	// reset based multigames
-	device.option_add_internal(slotoptions::MD_CM2IN1, MEGADRIVE_CM2IN1);
+	device.option_add_internal(slotoptions::MD_CM2IN1,        MEGADRIVE_CM2IN1);
 	device.option_add_internal(slotoptions::MD_TECTOY_SPORTS, MEGADRIVE_TECTOY_SPORTS);
+	device.option_add_internal(slotoptions::MD_3IN1_FWT,      MEGADRIVE_3IN1FWT);
 
 	// menu based multigames
 	device.option_add_internal(slotoptions::MD_SEGANET, MEGADRIVE_SEGANET);
-	device.option_add_internal(slotoptions::MC_PIRATE, MEGADRIVE_MCPIRATE);
+	device.option_add_internal(slotoptions::MC_PIRATE,  MEGADRIVE_MCPIRATE);
+	device.option_add_internal(slotoptions::MC_18KIN1,  MEGADRIVE_18KIN1);
 
 	// unlicensed
 	// Gamtec
-	device.option_add_internal(slotoptions::UNL_TILESMJ2, MEGADRIVE_UNL_TILESMJ2);
-	device.option_add_internal(slotoptions::UNL_ELFWOR, MEGADRIVE_UNL_ELFWOR);
-	device.option_add_internal(slotoptions::UNL_SMOUSE, MEGADRIVE_UNL_SMOUSE);
-	device.option_add_internal(slotoptions::UNL_YASECH, MEGADRIVE_UNL_YASECH);
+	device.option_add_internal(slotoptions::UNL_TILESMJ2,  MEGADRIVE_UNL_TILESMJ2);
+	device.option_add_internal(slotoptions::UNL_ELFWOR,    MEGADRIVE_UNL_ELFWOR);
+	device.option_add_internal(slotoptions::UNL_SMOUSE,    MEGADRIVE_UNL_SMOUSE);
+	device.option_add_internal(slotoptions::UNL_YASECH,    MEGADRIVE_UNL_YASECH);
 	device.option_add_internal(slotoptions::UNL_777CASINO, MEGADRIVE_UNL_777CASINO);
 	device.option_add_internal(slotoptions::UNL_SOULBLADE, MEGADRIVE_UNL_SOULBLADE);
-	device.option_add_internal(slotoptions::UNL_SUPRBUBL, MEGADRIVE_UNL_SUPRBUBL);
-	device.option_add_internal(slotoptions::UNL_CJMJCLUB, MEGADRIVE_UNL_CJMJCLUB);
-	device.option_add_internal(slotoptions::UNL_MJLOV, MEGADRIVE_UNL_MJLOV);
-	device.option_add_internal(slotoptions::UNL_REDCLIFF, MEGADRIVE_UNL_REDCLIFF);
+	device.option_add_internal(slotoptions::UNL_SUPRBUBL,  MEGADRIVE_UNL_SUPRBUBL);
+	device.option_add_internal(slotoptions::UNL_CJMJCLUB,  MEGADRIVE_UNL_CJMJCLUB);
+	device.option_add_internal(slotoptions::UNL_MJLOV,     MEGADRIVE_UNL_MJLOV);
+	device.option_add_internal(slotoptions::UNL_REDCLIFF,  MEGADRIVE_UNL_REDCLIFF);
 	device.option_add_internal(slotoptions::UNL_SQUIRRELK, MEGADRIVE_UNL_SQUIRRELK);
 	device.option_add_internal(slotoptions::UNL_LIONKING2, MEGADRIVE_UNL_LIONKING2);
 
 	// X Boy
-	device.option_add_internal(slotoptions::UNL_KOF98, MEGADRIVE_UNL_KOF98);
+	device.option_add_internal(slotoptions::UNL_KOF98,    MEGADRIVE_UNL_KOF98);
 	device.option_add_internal(slotoptions::UNL_BUGSLIFE, MEGADRIVE_UNL_BUGSLIFE);
 	device.option_add_internal(slotoptions::UNL_POKEMONA, MEGADRIVE_UNL_POKEMONA);
-	device.option_add_internal(slotoptions::UNL_KOF99, MEGADRIVE_UNL_KOF99);
+	device.option_add_internal(slotoptions::UNL_KOF99,    MEGADRIVE_UNL_KOF99);
 	device.option_add_internal(slotoptions::UNL_POKESTAD, MEGADRIVE_UNL_TOPF);
-	device.option_add_internal(slotoptions::UNL_TOPF, MEGADRIVE_UNL_TOPF);
+	device.option_add_internal(slotoptions::UNL_TOPF,     MEGADRIVE_UNL_TOPF);
+	device.option_add_internal(slotoptions::UNL_CHINF3,   MEGADRIVE_UNL_CHINF3);
 
 	// Super Mario Bros
-	device.option_add_internal(slotoptions::UNL_SMB, MEGADRIVE_UNL_SMB);
-	device.option_add_internal(slotoptions::UNL_SMB2, MEGADRIVE_UNL_SMB2);
+	device.option_add_internal(slotoptions::UNL_SMB,       MEGADRIVE_UNL_SMB);
+	device.option_add_internal(slotoptions::UNL_SMB2,      MEGADRIVE_UNL_SMB2);
 	device.option_add_internal(slotoptions::UNL_ROCKMANX3, MEGADRIVE_UNL_ROCKMANX3);
+
+	// Super Mario World 64
+	device.option_add_internal(slotoptions::UNL_SMW64, MEGADRIVE_UNL_SMW64);
 
 	// AV Artisan
 	device.option_add_internal(slotoptions::UNL_AVARTISAN, MEGADRIVE_UNL_AVARTISAN);
@@ -154,6 +168,10 @@ void megadrive_cart_options(device_slot_interface &device)
 
 	// Miky
 	device.option_add_internal(slotoptions::UNL_TC2000, MEGADRIVE_UNL_TC2000);
+
+	// Rock Heaven / Rock World
+	device.option_add_internal(slotoptions::UNL_ROCKHEAVEN, MEGADRIVE_UNL_ROCKHEAVEN);
+	device.option_add_internal(slotoptions::UNL_ROCKWORLD,  MEGADRIVE_UNL_ROCKWORLD);
 
 	// Action Replay
 	device.option_add_internal(slotoptions::ACTION_REPLAY, MEGADRIVE_ACTION_REPLAY);

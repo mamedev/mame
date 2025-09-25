@@ -137,6 +137,22 @@ private:
 	u8 m_latch[2];
 };
 
+class megadrive_unl_chinf3_device : public megadrive_rom_device
+{
+public:
+	megadrive_unl_chinf3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void cart_map(address_map &map) override ATTR_COLD;
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+private:
+	memory_bank_creator m_page_rom;
+	memory_view m_page_view;
+
+	u8 m_prot_latch[4];
+};
+
 
 DECLARE_DEVICE_TYPE(MEGADRIVE_UNL_TILESMJ2,  megadrive_unl_tilesmj2_device)
 DECLARE_DEVICE_TYPE(MEGADRIVE_UNL_ELFWOR,    megadrive_unl_elfwor_device)
@@ -150,5 +166,6 @@ DECLARE_DEVICE_TYPE(MEGADRIVE_UNL_MJLOV,     megadrive_unl_mjlov_device)
 DECLARE_DEVICE_TYPE(MEGADRIVE_UNL_REDCLIFF,  megadrive_unl_redcliff_device)
 DECLARE_DEVICE_TYPE(MEGADRIVE_UNL_SQUIRRELK, megadrive_unl_squirrelk_device)
 DECLARE_DEVICE_TYPE(MEGADRIVE_UNL_LIONKING2, megadrive_unl_lionking2_device)
+DECLARE_DEVICE_TYPE(MEGADRIVE_UNL_CHINF3,    megadrive_unl_chinf3_device)
 
 #endif // MAME_BUS_MEGADRIVE_CART_GAMTEC_H

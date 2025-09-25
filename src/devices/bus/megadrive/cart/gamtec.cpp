@@ -403,4 +403,70 @@ void megadrive_unl_lionking2_device::cart_map(address_map &map)
 	);
 }
 
+/*
+ * Tenchi o Kurau III: Sangoku Gaiden / Tun Shi Tian Di 3: San Guo Wai Chuan / Chinese Fighter III
+ * https://segaretro.org/Tenchi_o_Kurau_III:_Sangoku_Gaiden
+ *
+ * Pseudo-banking scheme looks similar to Top Fighter, otherwise using Squirrel King latching
+ * obfuscated by address lanes.
+ *
+ */
 
+DEFINE_DEVICE_TYPE(MEGADRIVE_UNL_CHINF3, megadrive_unl_chinf3_device, "megadrive_unl_chinf3", "Megadrive Chinese Fighter III cart")
+
+megadrive_unl_chinf3_device::megadrive_unl_chinf3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: megadrive_rom_device(mconfig, MEGADRIVE_UNL_CHINF3, tag, owner, clock)
+	, m_page_rom(*this, "page_rom")
+	, m_page_view(*this, "page_view")
+{
+}
+
+void megadrive_unl_chinf3_device::device_start()
+{
+	megadrive_rom_device::device_start();
+	memory_region *const romregion(cart_rom_region());
+	const u32 page_size = 0x01'0000;
+	device_generic_cart_interface::map_non_power_of_two(
+			unsigned(romregion->bytes() / page_size),
+			[this, base = &romregion->as_u8()] (unsigned entry, unsigned page)
+			{
+				m_page_rom->configure_entry(entry, &base[page * page_size]);
+			});
+
+	save_pointer(NAME(m_prot_latch), 4);
+}
+
+void megadrive_unl_chinf3_device::device_reset()
+{
+	megadrive_rom_device::device_reset();
+	m_page_view.select(0);
+	std::fill_n(&m_prot_latch[0], 4, 0xff);
+}
+
+void megadrive_unl_chinf3_device::cart_map(address_map &map)
+{
+	map(0x00'0000, 0x1f'ffff).view(m_page_view);
+	m_page_view[0](0x00'0000, 0x1f'ffff).bankr(m_rom);
+	m_page_view[1](0x00'0000, 0x00'ffff).mirror(0x1f'0000).bankr(m_page_rom);
+	map(0x40'0000, 0x40'0000).select(0xc).mirror(0x0f'fff3).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_prot_latch[offset >> 2];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_prot_latch[offset >> 2] = data;
+		})
+	);
+	map(0x60'0000, 0x60'0000).mirror(0x0f'ffff).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			if (data)
+			{
+				m_page_rom->set_entry(data & 0xf);
+				m_page_view.select(1);
+			}
+			else
+			{
+				m_page_view.select(0);
+			}
+		})
+	);
+}

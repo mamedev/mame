@@ -58,6 +58,10 @@ namespace bus::megadrive::slotoptions {
 
 	extern char const *const UNL_POKESTAD;
 	extern char const *const UNL_TOPF;
+	extern char const *const UNL_CHINF3;
+	extern char const *const UNL_SMW64;
+	extern char const *const UNL_ROCKWORLD;
+	extern char const *const UNL_ROCKHEAVEN;
 
 	extern char const *const UNL_SANGUO5;
 

@@ -10895,11 +10895,12 @@ but dumps still have to be confirmed.
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Only Flashback portion is present in the dump, the other two entries and menu are missing.
+[CART] unsupported in megadriv
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="3in1fwt" />
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="3-in-1 flashback - world champ. soccer - tecmo world cup 92 (pirate).bin" size="2097152" crc="a8fd28d7" sha1="a0dd99783667af20589d473a2054d4bbd62d943e" status="baddump"/>
+				<rom name="3-in-1 flashback - world champ. soccer - tecmo world cup 92 (pirate).bin" size="2097152" crc="a8fd28d7" sha1="a0dd99783667af20589d473a2054d4bbd62d943e" />
 			</dataarea>
 		</part>
 	</software>
@@ -10909,11 +10910,12 @@ Only Flashback portion is present in the dump, the other two entries and menu ar
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Only Road Rash portion is present in the dump, the other two entries and menu are missing.
+[CART] unsupported in megadriv
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="3in1fwt" />
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="3-in-1 road rash - ms. pac-man - block out (pirate).bin" size="1048576" crc="13c96154" sha1="fd7255c2abdf90698f779a039ea1e560ca19639a" status="baddump"/>
+				<rom name="3-in-1 road rash - ms. pac-man - block out (pirate).bin" size="1048576" crc="13c96154" sha1="fd7255c2abdf90698f779a039ea1e560ca19639a" />
 			</dataarea>
 		</part>
 	</software>
@@ -11492,6 +11494,21 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="alex kidd in the enchanted castle (usa).bin" size="262144" crc="47dba0ac" sha1="bbb204c1eb5ca1b6d180c32722955b2c39d2c17b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockheaven" cloneof="alexkidd" supported="no">
+		<description>RockHeaven (hack of Alex Kidd Tenkuu Majou)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+[CART] unsupported in megadriv
+]]></notes>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rockheaven" />
+			<dataarea name="rom" width="16" endianness="big" size="0x80000">
+				<rom name="rockheaven (unl) [h].bin" size="0x80000" crc="dab4dfdd" sha1="5e5ca20b39122c86b8f662bd8014af674f9dbed7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19327,7 +19344,7 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="ram_seganet"/>
+			<feature name="slot" value="seganet"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="game no kanzume otokuyou (jpn).bin" size="3145728" crc="cdad7e6b" sha1="31c66bd13abf4ae8271c09ec5286a0ee0289dbbc"/>
 			</dataarea>
@@ -22884,8 +22901,11 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 		<year>1993</year>
 		<publisher>FCI?</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="might and magic iii - isles of terra (usa) (prototype).bin" size="2097152" crc="6ef7104a" sha1="d366d05644eb59a14baf3c2e7281c1584630c021"/>
+			</dataarea>
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -30174,11 +30194,7 @@ Original scene release which was altered to include a cracktro and bypass the co
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<notes><![CDATA[
-Needs slot emulation for the other two games, has no menu but pressing reset button cycles thru them
-$000000 Super Volley Ball (USA)
-$100000 World Championship Soccer II (USA)
-$200000 Super Real Basketball (Euro)
-$040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
+[CART] unsupported in megadriv
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="tectoy_sports"/>
@@ -33948,6 +33964,22 @@ Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
 		</part>
 	</software>
 
+	<software name="rockworld" cloneof="waniwani" supported="no">
+		<description>RockWorld (hack of Wani Wani World)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+[CART] unsupported in megadriv
+]]></notes>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rockworld" />
+			<dataarea name="rom" width="16" endianness="big" size="0x80000">
+				<rom name="rockworld (unl) [h].bin" size="0x80000" crc="60b5616f" sha1="68366449fd1497538741b5a1949e342202d48948"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="wardner">
 		<description>Wardner (USA)</description>
 		<year>1991</year>
@@ -36479,6 +36511,24 @@ Jumps to unmapped area at PC=0xffd004e8
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="18kin1" supported="no">
+		<!-- 9 in 1 with SNS 33 product number known to exist -->
+		<description>1800 in 1 (China, pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+[CART] unsupported in megadriv
+]]></notes>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="18kin1" />
+			<dataarea name="rom" width="16" endianness="big" size="0x200000">
+				<rom name="1800-in-1_p1.bin" size="0x200000" crc="5da98cf2" sha1="4b8e673f7821a28e681e10cbb6edd4c74ac93573" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 
 	<software name="4in1">
 		<description>4 in 1 (pirate)</description>

@@ -106,12 +106,12 @@ void megadrive_unl_kof99_device::time_io_map(address_map &map)
  * pokestad          Pokemon Stadium
  * https://segaretro.org/Pokemon_Stadium
  *
- * lionkin3          Lion King 3
- * mulan             Hua Mu Lan - Mulan
- * pokemon2          Pocket Monsters 2
- * souledge          Soul Edge vs Samurai Spirits
- * sdkong3/skkong99  Super Donkey Kong 99
- * topf              Top Fighter 2000 MK VIII
+ * lionkin3           Lion King 3
+ * mulan              Hua Mu Lan - Mulan
+ * pokemon2           Pocket Monsters 2
+ * souledge           Soul Edge vs Samurai Spirits
+ * sdkong99/skkong99  Super Donkey Kong 99
+ * topf               Top Fighter 2000 MK VIII
  * https://segaretro.org/Top_Fighter_2000_MK_VIII
  *
  * Obfuscated bankswitch mechanism + a bitswap based protection device.
@@ -211,4 +211,3 @@ void megadrive_unl_topf_device::cart_map(address_map &map)
 		}
 	}));
 }
-
