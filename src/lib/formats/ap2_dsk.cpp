@@ -23,6 +23,211 @@ a2_sect_format::a2_sect_format(int nsect) : m_nsect(nsect)
 	assert(nsect <= APPLE2_MAX_SECTOR_COUNT);
 }
 
+bool a2_sect_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
+{
+	int g_tracks, g_heads;
+	int visualgrid[APPLE2_MAX_SECTOR_COUNT][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
+
+	constexpr bool VERBOSE_SAVE = false;
+
+	// if false, only accept an addr mark if the checksum was good
+	// if true, accept an addr mark if the track and sector values are both sane
+	constexpr bool LENIENT_ADDR_CHECK = false;
+
+	// if true, use the old, not as robust logic for choosing which copy of a decoded sector to write
+	// to the resulting image if the sector has a bad checksum and/or postamble
+	constexpr bool USE_OLD_BEST_SECTOR_PRIORITY = false;
+
+	// nothing found
+	constexpr int NOTFOUND = 0;
+	// address mark was found
+	constexpr int ADDRFOUND = 1;
+	// address checksum is good
+	constexpr int ADDRGOOD = 2;
+	// data mark was found (requires addrfound and sane values)
+	constexpr int DATAFOUND = 4;
+	// data checksum is good
+	constexpr int DATAGOOD = 8;
+	// data postamble is good
+	constexpr int DATAPOST = 16;
+
+	for (auto & elem : visualgrid) {
+		for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
+			elem[j] = NOTFOUND;
+		}
+	}
+	image.get_actual_geometry(g_tracks, g_heads);
+
+	int head = 0;
+
+	int pos_data = 0;
+
+	for(int track=0; track < g_tracks; track++) {
+		uint8_t sectdata[APPLE2_SECTOR_SIZE*APPLE2_MAX_SECTOR_COUNT] = {};
+
+		if(VERBOSE_SAVE) {
+			fprintf(stderr,"DEBUG: a2_sect_format::save() about to generate bitstream from track %d...", track);
+		}
+		auto buf = generate_bitstream_from_track(track, head, 3915, image);
+		if(VERBOSE_SAVE) {
+			fprintf(stderr,"done.\n");
+		}
+		byte_reader br{&buf};
+		int hb = 0;
+		int dosver = 0; // apple dos version; 0 = >=3.3, 1 = <3.3
+		for(;;) {
+			uint8_t v = br();
+			if(v == 0xff) {
+				hb = 1;
+			}
+			else if(hb == 1 && v == 0xd5){
+				hb = 2;
+			}
+			else if(hb == 2 && v == 0xaa) {
+				hb = 3;
+			}
+			else if(hb == 3 && ((v == 0x96) || (v == 0xb5))) { // 0x96 = dos 3.3/16sec, 0xb5 = dos 3.21 and below/13sec
+				hb = 4;
+				if (v == 0xb5) dosver = 1;
+			}
+			else
+				hb = 0;
+
+			if(hb == 4) {
+				uint8_t h[11];
+				for(auto & elem : h)
+					elem = br();
+				//uint8_t v2 = gcr6bw_tb[h[2]];
+				uint8_t vl = gcr4_decode(h[0],h[1]);
+				uint8_t tr = gcr4_decode(h[2],h[3]);
+				uint8_t se = gcr4_decode(h[4],h[5]);
+				uint8_t chk = gcr4_decode(h[6],h[7]);
+				if(VERBOSE_SAVE) {
+					uint32_t post = get_u24be(&h[8]);
+					printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n",
+							vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
+				}
+				// sanity check
+				if (tr == track && se < m_nsect) {
+					int &gridcell = visualgrid[se][track];
+					gridcell |= ADDRFOUND;
+					gridcell |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
+
+					if (gridcell & (LENIENT_ADDR_CHECK ? ADDRFOUND : ADDRGOOD)) {
+						byte_reader orig_br = br;
+
+						hb = 0;
+						for(int i=0; i<20 && hb != 4; i++) {
+							v = br();
+							if(v == 0xff)
+								hb = 1;
+							else if(hb == 1 && v == 0xd5)
+								hb = 2;
+							else if(hb == 2 && v == 0xaa)
+								hb = 3;
+							else if(hb == 3 && v == 0xad)
+								hb = 4;
+							else
+								hb = 0;
+						}
+						if(hb == 4 && check_dosver(dosver)) {
+							gridcell |= DATAFOUND;
+
+							uint8_t decoded_buf[APPLE2_SECTOR_SIZE];
+							uint8_t dchk_expected, dchk_actual;
+							decode_sector_data(br, decoded_buf, dchk_expected, dchk_actual);
+
+							bool dchk_good = dchk_expected == dchk_actual;
+
+							// now read the postamble bytes
+							uint32_t dpost = 0;
+							for(int i=0; i<3; i++) {
+								dpost <<= 8;
+								dpost |= br();
+							}
+							bool dpost_good = (dpost & 0xFFFF00) == 0xDEAA00;
+
+							uint8_t *dest = sectdata + APPLE2_SECTOR_SIZE * logical_sector_index(se);
+
+							// only write it if the bitfield of the track shows datagood is NOT set.
+							// if it is set we don't want to overwrite a guaranteed good read with a bad one
+							// if past read had a bad checksum or bad postamble...
+							if(USE_OLD_BEST_SECTOR_PRIORITY) {
+								if (!(gridcell & DATAGOOD)) {
+									std::copy_n(decoded_buf, sizeof decoded_buf, dest);
+								}
+							} else {
+								bool was_datagood = gridcell & DATAGOOD;
+								bool was_datapost = gridcell & DATAPOST;
+
+								if (!was_datagood || !was_datapost) {
+									// if the current read is good, and postamble is good, write it in, no matter what.
+									// if the current read is good and the current postamble is bad, write it in unless the postamble was good before
+									// if the current read is bad and the current postamble is good and the previous read had neither good, write it in
+									// if the current read isn't good and neither is the postamble but nothing better
+									// has been written before, write it anyway.
+									if ((dchk_good && dpost_good) ||
+										(dchk_good && !dpost_good && !was_datapost) ||
+										(!dchk_good && dpost_good && !was_datagood && !was_datapost) ||
+										(!dchk_good && !dpost_good && !was_datagood && !was_datapost)
+									) {
+										std::copy_n(decoded_buf, sizeof decoded_buf, dest);
+									}
+								}
+							}
+							// do some checking
+							if(VERBOSE_SAVE && (!dchk_good || !dpost_good)) {
+								fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n",
+										dchk_expected, dchk_actual, dchk_good?"OK":"BAD", dpost, dpost_good?"OK":"BAD");
+							}
+							if (dchk_good) gridcell |= DATAGOOD;
+							if (dpost_good) gridcell |= DATAPOST;
+						} else {
+							br = orig_br;
+						}
+					}
+				}
+				hb = 0;
+			}
+			if(br.wrap)
+				break;
+		}
+		for(int i = 0; i < m_nsect; i++) {
+			uint8_t const *const data = sectdata + APPLE2_SECTOR_SIZE*i;
+			auto const [err, actual] = write_at(io, pos_data, data, APPLE2_SECTOR_SIZE);
+			if (err || actual != APPLE2_SECTOR_SIZE)
+				return false;
+			pos_data += APPLE2_SECTOR_SIZE;
+		}
+	}
+	// display a little table of which sectors decoded ok
+	if(VERBOSE_SAVE) {
+		int total_good = 0;
+		for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
+			printf("T%2d: ",j);
+			for (int i = 0; i < m_nsect; i++) {
+				if (visualgrid[i][j] == NOTFOUND) printf("-NF- ");
+				else {
+					if (visualgrid[i][j] & ADDRFOUND) printf("a"); else printf(" ");
+					if (visualgrid[i][j] & ADDRGOOD) printf("A"); else printf(" ");
+					if (visualgrid[i][j] & DATAFOUND) printf("d"); else printf(" ");
+					if (visualgrid[i][j] & DATAGOOD) { printf("D"); total_good++; } else printf(" ");
+					if (visualgrid[i][j] & DATAPOST) printf("."); else printf(" ");
+				}
+			}
+			printf("\n");
+		}
+		printf("Total Good Sectors: %d\n", total_good);
+	}
+
+	return true;
+}
+
+bool a2_sect_format::supports_save() const noexcept
+{
+	return true;
+}
+
 static const uint8_t translate5[] = {
 	0xab, 0xad, 0xae, 0xaf, 0xb5, 0xb6, 0xb7, 0xba,
 	0xbb, 0xbd, 0xbe, 0xbf, 0xd6, 0xd7, 0xda, 0xdb,
@@ -262,11 +467,6 @@ const char *a2_16sect_prodos_format::extensions() const noexcept
 	return "dsk,po";
 }
 
-bool a2_sect_format::supports_save() const noexcept
-{
-	return true;
-}
-
 int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
@@ -450,206 +650,6 @@ uint8_t a2_16sect_format::byte_reader::operator()()
 				}
 		}
 		return v;
-}
-
-bool a2_sect_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
-{
-	int g_tracks, g_heads;
-	int visualgrid[APPLE2_MAX_SECTOR_COUNT][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
-
-	constexpr bool VERBOSE_SAVE = false;
-
-	// if false, only accept an addr mark if the checksum was good
-	// if true, accept an addr mark if the track and sector values are both sane
-	constexpr bool LENIENT_ADDR_CHECK = false;
-
-	// if true, use the old, not as robust logic for choosing which copy of a decoded sector to write
-	// to the resulting image if the sector has a bad checksum and/or postamble
-	constexpr bool USE_OLD_BEST_SECTOR_PRIORITY = false;
-
-	// nothing found
-	constexpr int NOTFOUND = 0;
-	// address mark was found
-	constexpr int ADDRFOUND = 1;
-	// address checksum is good
-	constexpr int ADDRGOOD = 2;
-	// data mark was found (requires addrfound and sane values)
-	constexpr int DATAFOUND = 4;
-	// data checksum is good
-	constexpr int DATAGOOD = 8;
-	// data postamble is good
-	constexpr int DATAPOST = 16;
-
-	for (auto & elem : visualgrid) {
-		for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
-			elem[j] = NOTFOUND;
-		}
-	}
-	image.get_actual_geometry(g_tracks, g_heads);
-
-	int head = 0;
-
-	int pos_data = 0;
-
-	for(int track=0; track < g_tracks; track++) {
-		uint8_t sectdata[APPLE2_SECTOR_SIZE*APPLE2_MAX_SECTOR_COUNT] = {};
-
-		if(VERBOSE_SAVE) {
-			fprintf(stderr,"DEBUG: a2_sect_format::save() about to generate bitstream from track %d...", track);
-		}
-		auto buf = generate_bitstream_from_track(track, head, 3915, image);
-		if(VERBOSE_SAVE) {
-			fprintf(stderr,"done.\n");
-		}
-		byte_reader br{&buf};
-		int hb = 0;
-		int dosver = 0; // apple dos version; 0 = >=3.3, 1 = <3.3
-		for(;;) {
-			uint8_t v = br();
-			if(v == 0xff) {
-				hb = 1;
-			}
-			else if(hb == 1 && v == 0xd5){
-				hb = 2;
-			}
-			else if(hb == 2 && v == 0xaa) {
-				hb = 3;
-			}
-			else if(hb == 3 && ((v == 0x96) || (v == 0xb5))) { // 0x96 = dos 3.3/16sec, 0xb5 = dos 3.21 and below/13sec
-				hb = 4;
-				if (v == 0xb5) dosver = 1;
-			}
-			else
-				hb = 0;
-
-			if(hb == 4) {
-				uint8_t h[11];
-				for(auto & elem : h)
-					elem = br();
-				//uint8_t v2 = gcr6bw_tb[h[2]];
-				uint8_t vl = gcr4_decode(h[0],h[1]);
-				uint8_t tr = gcr4_decode(h[2],h[3]);
-				uint8_t se = gcr4_decode(h[4],h[5]);
-				uint8_t chk = gcr4_decode(h[6],h[7]);
-				if(VERBOSE_SAVE) {
-					uint32_t post = get_u24be(&h[8]);
-					printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n",
-							vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
-				}
-				// sanity check
-				if (tr == track && se < m_nsect) {
-					int &gridcell = visualgrid[se][track];
-					gridcell |= ADDRFOUND;
-					gridcell |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
-
-					if (gridcell & (LENIENT_ADDR_CHECK ? ADDRFOUND : ADDRGOOD)) {
-						byte_reader orig_br = br;
-
-						hb = 0;
-						for(int i=0; i<20 && hb != 4; i++) {
-							v = br();
-							if(v == 0xff)
-								hb = 1;
-							else if(hb == 1 && v == 0xd5)
-								hb = 2;
-							else if(hb == 2 && v == 0xaa)
-								hb = 3;
-							else if(hb == 3 && v == 0xad)
-								hb = 4;
-							else
-								hb = 0;
-						}
-						if(hb == 4 && check_dosver(dosver)) {
-							gridcell |= DATAFOUND;
-
-							uint8_t decoded_buf[APPLE2_SECTOR_SIZE];
-							uint8_t dchk_expected, dchk_actual;
-							decode_sector_data(br, decoded_buf, dchk_expected, dchk_actual);
-
-							bool dchk_good = dchk_expected == dchk_actual;
-
-							// now read the postamble bytes
-							uint32_t dpost = 0;
-							for(int i=0; i<3; i++) {
-								dpost <<= 8;
-								dpost |= br();
-							}
-							bool dpost_good = (dpost & 0xFFFF00) == 0xDEAA00;
-
-							uint8_t *dest = sectdata + APPLE2_SECTOR_SIZE * logical_sector_index(se);
-
-							// only write it if the bitfield of the track shows datagood is NOT set.
-							// if it is set we don't want to overwrite a guaranteed good read with a bad one
-							// if past read had a bad checksum or bad postamble...
-							if(USE_OLD_BEST_SECTOR_PRIORITY) {
-								if (!(gridcell & DATAGOOD)) {
-									std::copy_n(decoded_buf, sizeof decoded_buf, dest);
-								}
-							} else {
-								bool was_datagood = gridcell & DATAGOOD;
-								bool was_datapost = gridcell & DATAPOST;
-
-								if (!was_datagood || !was_datapost) {
-									// if the current read is good, and postamble is good, write it in, no matter what.
-									// if the current read is good and the current postamble is bad, write it in unless the postamble was good before
-									// if the current read is bad and the current postamble is good and the previous read had neither good, write it in
-									// if the current read isn't good and neither is the postamble but nothing better
-									// has been written before, write it anyway.
-									if ((dchk_good && dpost_good) ||
-										(dchk_good && !dpost_good && !was_datapost) ||
-										(!dchk_good && dpost_good && !was_datagood && !was_datapost) ||
-										(!dchk_good && !dpost_good && !was_datagood && !was_datapost)
-									) {
-										std::copy_n(decoded_buf, sizeof decoded_buf, dest);
-									}
-								}
-							}
-							// do some checking
-							if(VERBOSE_SAVE && (!dchk_good || !dpost_good)) {
-								fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n",
-										dchk_expected, dchk_actual, dchk_good?"OK":"BAD", dpost, dpost_good?"OK":"BAD");
-							}
-							if (dchk_good) gridcell |= DATAGOOD;
-							if (dpost_good) gridcell |= DATAPOST;
-						} else {
-							br = orig_br;
-						}
-					}
-				}
-				hb = 0;
-			}
-			if(br.wrap)
-				break;
-		}
-		for(int i = 0; i < m_nsect; i++) {
-			uint8_t const *const data = sectdata + APPLE2_SECTOR_SIZE*i;
-			auto const [err, actual] = write_at(io, pos_data, data, APPLE2_SECTOR_SIZE);
-			if (err || actual != APPLE2_SECTOR_SIZE)
-				return false;
-			pos_data += APPLE2_SECTOR_SIZE;
-		}
-	}
-	// display a little table of which sectors decoded ok
-	if(VERBOSE_SAVE) {
-		int total_good = 0;
-		for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
-			printf("T%2d: ",j);
-			for (int i = 0; i < m_nsect; i++) {
-				if (visualgrid[i][j] == NOTFOUND) printf("-NF- ");
-				else {
-					if (visualgrid[i][j] & ADDRFOUND) printf("a"); else printf(" ");
-					if (visualgrid[i][j] & ADDRGOOD) printf("A"); else printf(" ");
-					if (visualgrid[i][j] & DATAFOUND) printf("d"); else printf(" ");
-					if (visualgrid[i][j] & DATAGOOD) { printf("D"); total_good++; } else printf(" ");
-					if (visualgrid[i][j] & DATAPOST) printf("."); else printf(" ");
-				}
-			}
-			printf("\n");
-		}
-		printf("Total Good Sectors: %d\n", total_good);
-	}
-
-	return true;
 }
 
 bool a2_16sect_format::check_dosver(int dosver) const
