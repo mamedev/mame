@@ -3516,9 +3516,9 @@ void wingco_state::megaline_map(address_map &map)
 	map(0xd200, 0xd23f).ram().share(m_reel_scroll[1]);
 	map(0xd400, 0xd43f).ram().share(m_reel_scroll[2]);
 
-	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::reel_ram_w<0>)).share(m_reel_ram[0]);
-	map(0xda00, 0xdbff).ram().w(FUNC(goldstar_state::reel_ram_w<1>)).share(m_reel_ram[1]);
-	map(0xdc00, 0xddff).ram().w(FUNC(goldstar_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xd800, 0xd9ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xda00, 0xdbff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xdc00, 0xddff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xde00, 0xdfff).ram();
 
 	map(0xe000, 0xe7ff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
