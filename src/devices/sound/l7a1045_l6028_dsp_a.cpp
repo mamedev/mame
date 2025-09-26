@@ -120,25 +120,12 @@ void l7a1045_sound_device::device_start()
 	save_item(STRUCT_MEMBER(m_voice, flt_step));
 	save_item(STRUCT_MEMBER(m_voice, flt_pos));
 	save_item(STRUCT_MEMBER(m_voice, flt_resonance));
-	save_item(STRUCT_MEMBER(m_voice, x1));
-	save_item(STRUCT_MEMBER(m_voice, x2));
-	save_item(STRUCT_MEMBER(m_voice, y1));
-	save_item(STRUCT_MEMBER(m_voice, y2));
-	save_item(STRUCT_MEMBER(m_voice, a1));
-	save_item(STRUCT_MEMBER(m_voice, a2));
-	save_item(STRUCT_MEMBER(m_voice, b0));
-	save_item(STRUCT_MEMBER(m_voice, b1));
-	save_item(STRUCT_MEMBER(m_voice, b2));
+	save_item(STRUCT_MEMBER(m_voice, b));
+	save_item(STRUCT_MEMBER(m_voice, l));
 	save_item(NAME(m_key));
 	save_item(NAME(m_audiochannel));
 	save_item(NAME(m_audioregister));
 	save_item(STRUCT_MEMBER(m_audiodat, dat));
-
-	// init all voices' filters to the Nyquist frequency and transparent resonance
-	for (l7a1045_voice &voice: m_voice)
-	{
-		set_filter(voice, m_sample_rate / 2.0f, 0.707f);
-	}
 }
 
 void l7a1045_sound_device::device_reset()
@@ -178,7 +165,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 				sample = (data & 0xfc) >> 2;
 				if(sample & 0x20)
 					sample -= 0x40;
-				sample <<= 2*(~data & 3);
+				sample <<= 4+2*(~data & 3);
 				frac += step;
 
 				// volume envelope processing
@@ -213,20 +200,21 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 				}
 				vptr->flt_pos &= 0xff;
 
-				const double cutoff = ((double)m_sample_rate) * ((double)vptr->flt_freq / 0x10000);
-				const double resonance = //vptr->flt_resonance ?
-					(double)vptr->flt_resonance / 15.0f; // : 0.707f;
-				set_filter(*vptr, cutoff, resonance);
+				// low pass filter processing using a chamberlin configuration
+				// q is 0..1 where 1 is normal and 0 is self-resonating
+				// k is 0..2 where 2 is nyquist (2 * sin(pi * fc/fs))
+				//    B(0) = L(0) = 0
+				//    H' = x0 - L - B  (highpass)
+				//    B' = B + k * H'  (bandpass)
+				//    L' = L + k * B'  (lowpass)
+				//    y0 = L'
+				// (fwiw, if you want notch it's H' + L)
 
-				// low pass filter processing - this is a direct form 2 biquad implementation
-				const double fsample = sample / 32768.0f;
-				const double output = vptr->b0 * fsample + vptr->b1 * vptr->x1 + vptr->b2 * vptr->x2 - vptr->a1 * vptr->y1 - vptr->a2 * vptr->y2;
-				vptr->x2 = vptr->x1;
-				vptr->x1 = fsample;
-				vptr->y2 = vptr->y1;
-				vptr->y1 = output;
+				const int32_t h = sample - vptr->l - vptr->b + ((vptr->flt_resonance * vptr->b) >> 4);
+				vptr->b += (vptr->flt_freq * h) >> 15;
+				vptr->l += (vptr->flt_freq * vptr->b) >> 15;
 
-				const int32_t fout = (output * 32768.0f);
+				const int32_t fout = vptr->l;
 				const int64_t left = (fout * (uint64_t(vptr->l_volume) * uint64_t(vptr->env_volume))) >> 20;
 				const int64_t right = (fout * (uint64_t(vptr->r_volume) * uint64_t(vptr->env_volume))) >> 20;
 
@@ -318,7 +306,7 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 			vptr->pos = 0;
 			vptr->frac = 0;
 			// clear the filter state too
-			vptr->x1 = vptr->x2 = vptr->y1 = vptr->y2 = 0.0;
+			vptr->b = vptr->l = 0;
 			break;
 
 		// loop end address and pitch step
@@ -359,18 +347,13 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 		case 0x05:
 			vptr->flt_freq = m_audiodat[m_audioregister][m_audiochannel].dat[1];
 			vptr->flt_pos = 0;
-
-			{
-				const double cutoff = ((double)m_sample_rate) * ((double)vptr->flt_freq / 0x10000);
-				set_filter(*vptr, cutoff, 0.707f);
-				vptr->x1 = vptr->x2 = vptr->y1 = vptr->y2 = 0.0;
-			}
+			vptr->l = vptr->b = 0;
 			break;
 
 		// reg 6 = lowpass cutoff target, resonance, and step rate
 		case 0x06:
 			vptr->flt_target = m_audiodat[m_audioregister][m_audiochannel].dat[1] & 0xfff0;
-			vptr->flt_resonance = (m_audiodat[m_audioregister][m_audiochannel].dat[1] & 0x000f) ^ 0xf;
+			vptr->flt_resonance = m_audiodat[m_audioregister][m_audiochannel].dat[1] & 0x000f;
 			vptr->flt_step = m_audiodat[m_audioregister][m_audiochannel].dat[0];
 			break;
 
@@ -431,23 +414,6 @@ void l7a1045_sound_device::sound_status_w(uint16_t data)
 	{
 		m_key &= ~(1 << m_audiochannel);
 	}
-}
-
-// sets up parameters for biquad resonant low pass 12 dB/octave filter for a voice
-// cutoff in Hz, resonance is 0 to 1.
-void l7a1045_sound_device::set_filter(l7a1045_voice &voice, double cutoff, double resonance)
-{
-	const double omega = 2.0 * M_PI * cutoff / (double)m_sample_rate;
-	const double sin_omega = sin(omega);
-	const double cos_omega = cos(omega);
-	const double alpha = sin_omega / (2.0 * resonance);
-	const double a0 = 1.0 + alpha;
-
-	voice.b0 = (1.0 - cos_omega) / (2.0 * a0);
-	voice.b1 = (1.0 - cos_omega) / a0;
-	voice.b2 = (1.0 - cos_omega) / (2.0 * a0);
-	voice.a1 = (-2.0 * cos_omega) / a0;
-	voice.a2 = (1.0 - alpha) / a0;
 }
 
 // TODO: stub functions not really used

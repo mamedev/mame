@@ -59,8 +59,7 @@ private:
 		uint16_t flt_step = 0;
 		uint32_t flt_pos = 0;
 		uint8_t flt_resonance = 0;
-		double x1 = 0.0, x2 = 0.0, y1 = 0.0, y2 = 0.0; // filter state
-		double a1 = 0.0, a2 = 0.0, b0 = 0.0, b1 = 0.0, b2 = 0.0; // filter coeffs
+		int32_t b = 0, l = 0; // filter state
 	};
 
 	sound_stream *m_stream;
@@ -82,7 +81,6 @@ private:
 	void sound_data_w(offs_t offset, uint16_t data);
 	uint16_t sound_data_r(offs_t offset);
 	void sound_status_w(uint16_t data);
-	void set_filter(l7a1045_voice &voice, double cutoff, double resonance);
 };
 
 DECLARE_DEVICE_TYPE(L7A1045, l7a1045_sound_device)
