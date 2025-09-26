@@ -460,6 +460,18 @@ void i960_cpu_device::test(uint32_t opcode, int mask)
 		m_r[(opcode>>19) & 0x1f] = 0;
 }
 
+double i960_cpu_device::round_to_int(double val)
+{
+	// apply rounding mode
+	switch ((m_AC >> 30) & 3)
+	{
+	case 0: return round(val);
+	case 1: return floor(val);
+	case 2: return ceil(val);
+	default: return trunc(val);
+	}
+}
+
 
 // interrupt dispatch
 void i960_cpu_device::take_interrupt(int vector, int lvl)
@@ -1611,13 +1623,14 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount -= 400;
 				t1f = get_1_rif(opcode);
 				t2f = get_2_rif(opcode);
-				set_rif(opcode, t2f*log(t1f+1.0)/log(2.0));
+				set_rif(opcode, t2f*log2(t1f+1.0));
 				break;
 
 			case 0x2: // logr
-				m_icount -= 400; // checkme
+				m_icount -= 438;
 				t1f = get_1_rif(opcode);
-				set_rif(opcode, log(t1f));
+				t2f = get_2_rif(opcode);
+				set_rif(opcode, t2f*log2(t1f));
 				break;
 
 			case 0x3: // remr
@@ -1653,11 +1666,9 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				break;
 
 			case 0xb: // roundr
-				{
-					int32_t st1 = get_1_rif(opcode);
-					m_icount -= 69;
-					set_rif(opcode, (double)st1);
-				}
+				m_icount -= 69;
+				t1f = get_1_rif(opcode);
+				set_rif(opcode, round_to_int(t1f));
 				break;
 
 			case 0xc: // sinr
@@ -1695,7 +1706,8 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			case 0x2: // logrl
 				m_icount -= 438;
 				t1f = get_1_rifl(opcode);
-				set_rifl(opcode, log(t1f));
+				t2f = get_2_rifl(opcode);
+				set_rifl(opcode, t2f*log2(t1f));
 				break;
 
 			case 0x5: // cmprl
@@ -1724,11 +1736,9 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				break;
 
 			case 0xb: // roundrl
-				{
-					int32_t st1 = get_1_rifl(opcode);
-					m_icount -= 70;
-					set_rifl(opcode, (double)st1);
-				}
+				m_icount -= 70;
+				t1f = get_1_rif(opcode);
+				set_rifl(opcode, round_to_int(t1f));
 				break;
 
 			case 0xc: // sinrl
@@ -1759,17 +1769,13 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			case 0x0: // cvtri
 				m_icount -= 33;
 				t1f = get_1_rif(opcode);
-				// apply rounding mode
-				// we do this a little indirectly to avoid some odd GCC warnings
-				t2f = 0.0;
-				switch((m_AC>>30)&3)
-				{
-					case 0: t2f = floor(t1f+0.5); break;
-					case 1: t2f = floor(t1f); break;
-					case 2: t2f = ceil(t1f); break;
-					case 3: t2f = t1f; break;
-				}
-				set_ri(opcode, (int32_t)t2f);
+				set_ri(opcode, (int32_t)round_to_int(t1f));
+				break;
+
+			case 0x1: // cvtril
+				m_icount -= 35;
+				t1f = get_1_rif(opcode);
+				set_ri64(opcode, (int64_t)round_to_int(t1f));
 				break;
 
 			case 0x2: // cvtzri
