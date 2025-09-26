@@ -29,8 +29,8 @@ educational tool.
 
 The driver emulates the digital functionality of FatMan, the analog outputs (CV
 and gate), and most of the analog functionality that has an effect on the
-firmware (the two envelope generators with all their controls, and the "sustain"
-switch. The "punch" switch is not yet emulated).
+firmware (the two envelope generators with all their controls, the "sustain"
+switch, and the "punch" switch).
 
 Usage:
 
