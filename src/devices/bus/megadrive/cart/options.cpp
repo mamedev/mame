@@ -49,7 +49,10 @@ char const *const MD_TECTOY_SPORTS      = "tectoy_sports";
 char const *const MD_3IN1_FWT           = "3in1fwt";
 char const *const MC_PIRATE             = "rom_mcpir"; // TODO: rename, what even MC stands for?
 char const *const MC_18KIN1             = "18kin1";
+char const *const MC_GOLDM250           = "goldm250";
 char const *const UNL_XINQIG            = "rom_xinqig";
+char const *const HB_BEGGARP            = "rom_sf001";
+char const *const HB_BEGGARP1           = "rom_sf001_beggarp1";
 char const *const UNL_TILESMJ2          = "rom_16mj2";
 char const *const UNL_ELFWOR            = "rom_elfwor";
 char const *const UNL_SMOUSE            = "rom_smouse";
@@ -99,6 +102,8 @@ void megadrive_cart_options(device_slot_interface &device)
 	device.option_add_internal(slotoptions::MD_TPLAY96, MEGADRIVE_ROM_TPLAY96);
 	device.option_add_internal(slotoptions::MD_HARDBALL95, MEGADRIVE_ROM_HARDBALL95);
 	device.option_add_internal(slotoptions::UNL_XINQIG, MEGADRIVE_UNL_XINQIG);
+	device.option_add_internal(slotoptions::HB_BEGGARP, MEGADRIVE_UNL_XINQIG);
+	device.option_add_internal(slotoptions::HB_BEGGARP1, MEGADRIVE_HB_BEGGARP1);
 	device.option_add_internal(slotoptions::UNL_SANGUO5, MEGADRIVE_UNL_SANGUO5);
 
 	// EEPROM
@@ -124,9 +129,10 @@ void megadrive_cart_options(device_slot_interface &device)
 	device.option_add_internal(slotoptions::MD_3IN1_FWT,      MEGADRIVE_3IN1FWT);
 
 	// menu based multigames
-	device.option_add_internal(slotoptions::MD_SEGANET, MEGADRIVE_SEGANET);
-	device.option_add_internal(slotoptions::MC_PIRATE,  MEGADRIVE_MCPIRATE);
-	device.option_add_internal(slotoptions::MC_18KIN1,  MEGADRIVE_18KIN1);
+	device.option_add_internal(slotoptions::MD_SEGANET,   MEGADRIVE_SEGANET);
+	device.option_add_internal(slotoptions::MC_PIRATE,    MEGADRIVE_MCPIRATE);
+	device.option_add_internal(slotoptions::MC_18KIN1,    MEGADRIVE_18KIN1);
+	device.option_add_internal(slotoptions::MC_GOLDM250,  MEGADRIVE_GOLDM250);
 
 	// unlicensed
 	// Gamtec

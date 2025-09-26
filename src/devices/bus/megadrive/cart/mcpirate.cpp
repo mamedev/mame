@@ -137,7 +137,6 @@ ioport_constructor megadrive_18kin1_device::device_input_ports() const
 	return INPUT_PORTS_NAME( _18kin1 );
 }
 
-
 void megadrive_18kin1_device::cart_map(address_map &map)
 {
 	map(0x00'0000, 0x01'ffff).mirror(0x38'0000).bankr(m_rom_bank[0]);
@@ -145,7 +144,6 @@ void megadrive_18kin1_device::cart_map(address_map &map)
 	map(0x04'0000, 0x05'ffff).mirror(0x38'0000).bankr(m_rom_bank[2]);
 	map(0x06'0000, 0x07'ffff).mirror(0x38'0000).bankr(m_rom_bank[3]);
 }
-
 
 void megadrive_18kin1_device::time_io_map(address_map &map)
 {
@@ -162,4 +160,66 @@ void megadrive_18kin1_device::time_io_map(address_map &map)
 		})
 	);
 }
+
+/*
+ * Golden Mega 250-in-1
+ *
+ * Sonic 2, Alex Kidd, Trampoline Terror and Tecmo Cup Football Game (the Captain Tsubasa prototype)
+ * mixed in 250 variants ...
+ *
+ * | gamename                 | log | phy |
+ * | 001. SONIC 2             | 11  | 04  |
+ * | 013. TECMO CUP SOCCER IV | a0  | 02  |
+ * | 030. ALEX KIDD           | 40  | 01  |
+ * | 063. TRAMPOLINE TERROR   | 00  | 00  |
+ *
+ */
+
+DEFINE_DEVICE_TYPE(MEGADRIVE_GOLDM250, megadrive_goldm250_device, "megadrive_goldm250", "Megadrive Golden Mega 250-in-1 pirate cart")
+
+megadrive_goldm250_device::megadrive_goldm250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MEGADRIVE_GOLDM250, tag, owner, clock)
+	, device_megadrive_cart_interface( mconfig, *this )
+	, m_rom_bank(*this, "rom_bank_%u", 0U)
+{
+}
+
+void megadrive_goldm250_device::device_start()
+{
+	memory_region *const romregion(cart_rom_region());
+	const u32 page_size = 0x04'0000;
+	m_bank_mask = device_generic_cart_interface::map_non_power_of_two(
+			unsigned(romregion->bytes() / page_size),
+			[this, base = &romregion->as_u8()] (unsigned entry, unsigned page)
+			{
+				for (int i = 0; i < 4; i++)
+					m_rom_bank[i]->configure_entry(entry, &base[page * page_size]);
+			});
+	logerror("Bank mask %02x\n", m_bank_mask);
+}
+
+void megadrive_goldm250_device::device_reset()
+{
+	for (int i = 0; i < 4; i++)
+		m_rom_bank[i]->set_entry(i);
+}
+
+void megadrive_goldm250_device::cart_map(address_map &map)
+{
+	map(0x00'0000, 0x03'ffff).mirror(0x30'0000).bankr(m_rom_bank[0]);
+	map(0x04'0000, 0x07'ffff).mirror(0x30'0000).bankr(m_rom_bank[1]);
+	map(0x08'0000, 0x0b'ffff).mirror(0x30'0000).bankr(m_rom_bank[2]);
+	map(0x0c'0000, 0x0f'ffff).mirror(0x30'0000).bankr(m_rom_bank[3]);
+	map(0x08'9000, 0x08'9001).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+		// writes in word units
+		if (ACCESSING_BITS_0_7)
+		{
+			const u8 page_sel = bitswap<3>(data, 0, 7, 6);
+			logerror("Bank select log: %02x phy: %02x & %02x\n", data, page_sel, m_bank_mask);
+			for (int i = 0; i < 4; i++)
+				m_rom_bank[i]->set_entry((page_sel + i) & m_bank_mask);
+		}
+	}));
+}
+
 

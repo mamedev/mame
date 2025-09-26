@@ -35973,13 +35973,16 @@ Black screen
 		</part>
 	</software>
 
-	<software name="beggarp1">
+	<software name="beggarp1" supported="no">
 		<description>Beggar Prince (rev 1) (Europe, USA)</description>
 		<year>2006</year>
 		<publisher>Super Fighter Team</publisher>
+		<notes><![CDATA[
+[CART] unsupported in megadriv
+]]></notes>
 		<info name="developer" value="Super Fighter Team"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sf001"/>
+			<feature name="slot" value="rom_sf001_beggarp1"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="Beggar Prince (World) (Rev 1) (Aftermarket) (Unl).bin" size="4194304" crc="6332edcc" sha1="1aeaef203c7d55fa678b92776b5b8cbc76533652" />
 			</dataarea>
@@ -36528,8 +36531,6 @@ Jumps to unmapped area at PC=0xffd004e8
 		</part>
 	</software>
 
-
-
 	<software name="4in1">
 		<description>4 in 1 (pirate)</description>
 		<year>199?</year>
@@ -36618,6 +36619,18 @@ Crashes during attract or in character select, copy protection
 				<rom value="0xFF" size="0x100000" offset="0x100000" loadflag="fill" />
 				<rom value="0xFF" size="0x100000" offset="0x200000" loadflag="fill" />
 				<rom value="0xFF" size="0x100000" offset="0x300000" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldm250" supported="no">
+		<description>Golden Mega 250 in 1 (pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="goldm250"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x200000">
+				<rom name="golden_mega_250-in-1_p1.bin" size="0x200000" crc="f8c4cbd0" sha1="8ef75743740d7d180b64f470ff4666bb15c76c81" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>

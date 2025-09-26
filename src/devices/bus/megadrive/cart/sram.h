@@ -56,6 +56,7 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual u16 get_nvram_length() ATTR_COLD;
 
 	u16 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u16 data, u16 mem_mask);
@@ -63,6 +64,7 @@ protected:
 private:
 	required_device<nvram_device> m_nvram;
 	std::unique_ptr<uint8_t[]> m_nvram_ptr;
+	u16 m_nvram_mask;
 };
 
 class megadrive_rom_hardball95_device : public megadrive_rom_tplay96_device
@@ -79,6 +81,22 @@ public:
 	megadrive_unl_xinqig_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void cart_map(address_map &map) override ATTR_COLD;
+protected:
+	megadrive_unl_xinqig_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	virtual u16 get_nvram_length() override ATTR_COLD;
+};
+
+class megadrive_hb_beggarp1_device : public megadrive_unl_xinqig_device
+{
+public:
+	megadrive_hb_beggarp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void cart_map(address_map &map) override ATTR_COLD;
+
+protected:
+	virtual void device_reset() override ATTR_COLD;
+private:
+	memory_view m_sram_view;
 };
 
 class megadrive_unl_sanguo5_device : public megadrive_rom_device
@@ -105,6 +123,7 @@ DECLARE_DEVICE_TYPE(MEGADRIVE_ROM_SONIC3,     megadrive_rom_sonic3_device)
 DECLARE_DEVICE_TYPE(MEGADRIVE_ROM_TPLAY96,    megadrive_rom_tplay96_device)
 DECLARE_DEVICE_TYPE(MEGADRIVE_ROM_HARDBALL95, megadrive_rom_hardball95_device)
 DECLARE_DEVICE_TYPE(MEGADRIVE_UNL_XINQIG,     megadrive_unl_xinqig_device)
+DECLARE_DEVICE_TYPE(MEGADRIVE_HB_BEGGARP1,    megadrive_hb_beggarp1_device)
 DECLARE_DEVICE_TYPE(MEGADRIVE_UNL_SANGUO5,    megadrive_unl_sanguo5_device)
 
 #endif // MAME_BUS_MEGADRIVE_CART_SRAM_H

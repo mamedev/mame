@@ -34,7 +34,12 @@ namespace bus::megadrive::slotoptions {
 	extern char const *const MD_JCART_MICROMAC96;
 
 	extern char const *const MC_PIRATE;
+	extern char const *const MC_18KIN1;
+	extern char const *const MC_GOLDM250;
+
 	extern char const *const UNL_XINQIG;
+	extern char const *const HB_BEGGARP;
+	extern char const *const HB_BEGGARP1;
 	extern char const *const UNL_TILESMJ2;
 	extern char const *const UNL_ELFWOR;
 	extern char const *const UNL_SMOUSE;
