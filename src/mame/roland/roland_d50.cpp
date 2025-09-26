@@ -7,11 +7,13 @@
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "mb63h149.h"
+#include "pg1000.h"
+
 #include "cpu/upd78k/upd78k3.h"
 #include "machine/bankdev.h"
-#include "mb63h149.h"
 #include "machine/nvram.h"
-#include "pg1000.h"
 
 
 namespace {

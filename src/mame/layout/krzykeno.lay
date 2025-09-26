@@ -3,13 +3,30 @@
 license:CC0-1.0
 copyright-holders:Vas Crabb
 
-Triple Fever/Haunted House control panel
+Krazy Keno control panel
 May or may not match arrangement/colour of real control panel
 -->
 <mamelayout version="2">
 
 	<element name="blank">
 		<rect />
+	</element>
+
+	<element name="bet" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.15" blue="0.15" />
+		</rect>
+		<text string="PLAY">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="RAISE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
 	</element>
 
 	<element name="start" defstate="0">
@@ -23,7 +40,7 @@ May or may not match arrangement/colour of real control panel
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
-		<text string="STOP ALL">
+		<text string="KEEP">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
@@ -36,11 +53,11 @@ May or may not match arrangement/colour of real control panel
 		<rect state="0">
 			<color red="0.15" green="0.0" blue="0.0" />
 		</rect>
-		<text string="STOP 1">
+		<text string="PICK">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
-		<text string="BIG">
+		<text string="STOP 1">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
@@ -53,11 +70,11 @@ May or may not match arrangement/colour of real control panel
 		<rect state="0">
 			<color red="0.15" green="0.0" blue="0.0" />
 		</rect>
-		<text string="STOP 2">
+		<text string="QUICK PICK/WIPE">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
-		<text string="DOUBLE">
+		<text string="STOP 2">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
@@ -70,48 +87,40 @@ May or may not match arrangement/colour of real control panel
 		<rect state="0">
 			<color red="0.15" green="0.0" blue="0.0" />
 		</rect>
+		<text string="HELP">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
 		<text string="STOP 3">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.4" />
-		</text>
-		<text string="SMALL">
-			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
 	</element>
 
-	<element name="stop4" defstate="0">
+	<element name="take" defstate="0">
 		<rect state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
+			<color red="1.0" green="0.5" blue="0.0" />
 		</rect>
 		<rect state="0">
-			<color red="0.15" green="0.0" blue="0.0" />
+			<color red="0.15" green="0.075" blue="0.0" />
 		</rect>
-		<text string="STOP 4">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.4" />
-		</text>
 		<text string="TAKE">
 			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="EXIT">
+			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
 	</element>
 
-	<element name="stop5" defstate="0">
+	<element name="bet_b" defstate="0">
 		<rect state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
+			<color red="0.0" green="0.7" blue="0.7" />
 		</rect>
 		<rect state="0">
-			<color red="0.15" green="0.0" blue="0.0" />
+			<color red="0.0" green="0.1" blue="0.1" />
 		</rect>
-		<text string="STOP 5">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.4" />
-		</text>
-		<text string="PLAY">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.5" width="1" height="0.4" />
-		</text>
 	</element>
 
 	<element name="start_b" defstate="0">
@@ -132,9 +141,18 @@ May or may not match arrangement/colour of real control panel
 		</rect>
 	</element>
 
+	<element name="take_b" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.35" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.05" blue="0.0" />
+		</rect>
+	</element>
+
 	<view name="Button Lamps">
 		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
+			<bounds left="0" right="4" top="0" bottom="3" />
 		</screen>
 
 		<element ref="blank">
@@ -162,40 +180,39 @@ May or may not match arrangement/colour of real control panel
 			<color red="0.0" green="0.0" blue="0.0" />
 		</element>
 
-
-		<element ref="stop_b" name="lamp6" inputtag="TEST0" inputmask="0x80">
+		<element ref="bet_b" name="lamp3" inputtag="TEST0" inputmask="0x02">
 			<bounds x="0.10" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="stop1" name="lamp6" inputtag="TEST0" inputmask="0x80">
+		<element ref="bet" name="lamp3" inputtag="TEST0" inputmask="0x02">
 			<bounds x="0.12" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp5" inputtag="TEST2" inputmask="0x20">
-			<bounds x="0.70" y="3.08" width="0.50" height="0.24" />
+		<element ref="stop_b" name="lamp6" inputtag="TEST0" inputmask="0x80">
+			<bounds x="0.80" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="stop2" name="lamp5" inputtag="TEST2" inputmask="0x20">
-			<bounds x="0.72" y="3.10" width="0.46" height="0.20" />
-		</element>
-
-		<element ref="stop_b" name="lamp2" inputtag="TEST2" inputmask="0x08">
-			<bounds x="1.30" y="3.08" width="0.50" height="0.24" />
-		</element>
-		<element ref="stop3" name="lamp2" inputtag="TEST2" inputmask="0x08">
-			<bounds x="1.32" y="3.10" width="0.46" height="0.20" />
+		<element ref="stop1" name="lamp6" inputtag="TEST0" inputmask="0x80">
+			<bounds x="0.82" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp4" inputtag="TEST2" inputmask="0x10">
-			<bounds x="1.90" y="3.08" width="0.50" height="0.24" />
+		<element ref="stop_b" name="lamp5" inputtag="TEST2" inputmask="0x00020">
+			<bounds x="1.40" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="stop4" name="lamp4" inputtag="TEST2" inputmask="0x10">
-			<bounds x="1.92" y="3.10" width="0.46" height="0.20" />
+		<element ref="stop2" name="lamp5" inputtag="TEST2" inputmask="0x00020">
+			<bounds x="1.42" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp3" inputtag="TEST0" inputmask="0x02">
-			<bounds x="2.50" y="3.08" width="0.50" height="0.24" />
+		<element ref="stop_b" name="lamp2" inputtag="TEST2" inputmask="0x00008">
+			<bounds x="2.00" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="stop5" name="lamp3" inputtag="TEST0" inputmask="0x02">
-			<bounds x="2.52" y="3.10" width="0.46" height="0.20" />
+		<element ref="stop3" name="lamp2" inputtag="TEST2" inputmask="0x00008">
+			<bounds x="2.02" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element ref="take_b" name="lamp4" inputtag="TEST2" inputmask="0x00010">
+			<bounds x="2.70" y="3.08" width="0.50" height="0.24" />
+		</element>
+		<element ref="take" name="lamp4" inputtag="TEST2" inputmask="0x00010">
+			<bounds x="2.72" y="3.10" width="0.46" height="0.20" />
 		</element>
 
 		<element ref="start_b" name="lamp1" inputtag="TEST1" inputmask="0x04">
