@@ -310,6 +310,57 @@ INPUT_PORTS_START( crzybugs_jp )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( jking04 )
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("TEST0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Play / Take Score")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
+
+	PORT_MODIFY("TEST1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Extra")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_NAME("Ticket")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r))
+
+	PORT_MODIFY("TEST2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )     PORT_NAME("Stop Reel 1 / Show Odds")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "Odds Table" )               PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x04, 0x04, "Password" )                 PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x08, 0x00, "Auto Hold" )                PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x10, 0x00, "Auto Stop" )                PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x20, 0x00, "Show Title" )               PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Score Box" )                PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0xc0, DEF_STR(No) )
+	PORT_DIPSETTING(    0x80, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x40, "10X" )
+	PORT_DIPSETTING(    0x00, "10X" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "Play Score" )               PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x02, 0x00, "Hand Count" )               PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( tripfev )
 	PORT_INCLUDE(base)
 
@@ -341,10 +392,10 @@ INPUT_PORTS_START( tripfev )
 	PORT_DIPSETTING(    0x08, DEF_STR(No) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 	PORT_DIPNAME( 0x30, 0x30, "Score Box" )                PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(    0x00, "10X" )
-	PORT_DIPSETTING(    0x10, "10X (duplicate)" )
-	PORT_DIPSETTING(    0x20, DEF_STR(Yes) )
 	PORT_DIPSETTING(    0x30, DEF_STR(No) )
+	PORT_DIPSETTING(    0x20, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x10, "10X" )
+	PORT_DIPSETTING(    0x00, "10X" )
 	PORT_DIPNAME( 0x40, 0x40, "Play Score" )               PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR(No) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
@@ -943,6 +994,6 @@ GAMEL( 2006, tripfev105us,  tripfev,  base_xor,   tripfev,     igs_m027xa_state,
 
 GAME(  200?, wldfruit,      0,        base,       base,        igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US
 
-GAME(  2003, jking04,       0,        base_xor,   tripfev,     igs_m027xa_state, init_jking04,   ROT0, "IGS", "Jungle King 2004 (V101US)", MACHINE_NOT_WORKING ) // inputs, outputs, Oki bank
+GAME(  2003, jking04,       0,        base_xor,   jking04,     igs_m027xa_state, init_jking04,   ROT0, "IGS", "Jungle King 2004 (V101US)", MACHINE_NOT_WORKING ) // outputs, Oki bank
 
 GAME(  2006, krzykeno,      0,        base_xor,   tripfev,     igs_m027xa_state, init_krzykeno,  ROT0, "IGS", "Krazy Keno (V105US)", MACHINE_NOT_WORKING ) // inputs, outputs, Oki bank
