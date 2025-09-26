@@ -36,9 +36,10 @@ protected:
 private:
 	required_device<heath_tlb_connector> m_tlbc;
 
+	static void tlb_options(device_slot_interface &device);
 };
 
-static void tlb_options(device_slot_interface &device)
+void serial_heath_h19_device::tlb_options(device_slot_interface &device)
 {
 	device.option_add("heath",      HEATH_TLB);
 	device.option_add("gp19",       HEATH_GP19);
