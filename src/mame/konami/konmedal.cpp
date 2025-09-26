@@ -133,30 +133,30 @@ private:
 	void tsupenta_nvram_init(nvram_device &nvram, void *base, size_t size);
 	DECLARE_MACHINE_START(shuriboy);
 
-	uint8_t vram_r(offs_t offset);
-	uint8_t chusenoh_vram_r(offs_t offset);
-	void vram_w(offs_t offset, uint8_t data);
-	void bankswitch_w(uint8_t data);
-	void chusenoh_bankswitch_w(uint8_t data);
-	void scc_enable_w(uint8_t data);
-	void control2_w(uint8_t data);
-	void medalcnt_w(uint8_t data);
-	void lamps_w(uint8_t data);
+	u8 vram_r(offs_t offset);
+	u8 chusenoh_vram_r(offs_t offset);
+	void vram_w(offs_t offset, u8 data);
+	void bankswitch_w(u8 data);
+	void chusenoh_bankswitch_w(u8 data);
+	void scc_enable_w(u8 data);
+	void control2_w(u8 data);
+	void medalcnt_w(u8 data);
+	void lamps_w(u8 data);
 
-	uint32_t screen_update_konmedal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_shuriboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_konmedal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_shuriboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	K056832_CB_MEMBER(tile_callback);
 	K056832_CB_MEMBER(chusenoh_tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(konmedal_scanline);
 	void vbl_ack_w(int state) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 	void nmi_ack_w(int state) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
-	void ccu_int_time_w(uint8_t data) { m_ccu_int_time = data; }
-	void k056832_w(offs_t offset, uint8_t data) { m_k056832->write(offset ^ 1, data); }
-	void k056832_b_w(offs_t offset, uint8_t data) { m_k056832->b_w(offset ^ 1, data); }
+	void ccu_int_time_w(u8 data) { m_ccu_int_time = data; }
+	void k056832_w(offs_t offset, u8 data) { m_k056832->write(offset ^ 1, data); }
+	void k056832_b_w(offs_t offset, u8 data) { m_k056832->b_w(offset ^ 1, data); }
 
 	K052109_CB_MEMBER(shuriboy_tile_callback);
-	void shuri_bank_w(uint8_t data);
+	void shuri_bank_w(u8 data);
 
 	void ddboy_main(address_map &map) ATTR_COLD;
 	void chusenoh_main(address_map &map) ATTR_COLD;
@@ -181,14 +181,14 @@ private:
 
 	u8 m_control = 0;
 	u8 m_control2 = 0;
-	int m_ccu_int_time = 0;
-	int m_ccu_int_time_count = 0;
-	int m_avac = 0;
-	int m_layer_colorbase[4] = { };
-	int m_layer_order[4] = { };
+	s32 m_ccu_int_time = 0;
+	s32 m_ccu_int_time_count = 0;
+	s32 m_avac = 0;
+	u16 m_layer_colorbase[4] = { };
+	s32 m_layer_order[4] = { };
 };
 
-void konmedal_state::control2_w(uint8_t data)
+void konmedal_state::control2_w(u8 data)
 {
 /*  CN3
     ---- ---x uPD7759 /ST (TMNT-based boards)
@@ -210,7 +210,7 @@ void konmedal_state::control2_w(uint8_t data)
 	machine().bookkeeping().coin_lockout_w(1, (data & 0x20) ? 0 : 1);
 }
 
-void konmedal_state::medalcnt_w(uint8_t data)
+void konmedal_state::medalcnt_w(u8 data)
 {
 /*  CN5
     ---- ---x Medal counter +1 (medal in)
@@ -221,7 +221,7 @@ void konmedal_state::medalcnt_w(uint8_t data)
 	machine().bookkeeping().coin_lockout_w(2, (data & 4) ? 0 : 1);
 }
 
-void konmedal_state::lamps_w(uint8_t data)
+void konmedal_state::lamps_w(u8 data)
 {
 	// CN6
 	for (int i = 0; i < 8; i++)
@@ -230,7 +230,7 @@ void konmedal_state::lamps_w(uint8_t data)
 	}
 }
 
-uint8_t konmedal_state::vram_r(offs_t offset)
+u8 konmedal_state::vram_r(offs_t offset)
 {
 	if (!(m_control2 & 0x80))
 	{
@@ -251,7 +251,7 @@ uint8_t konmedal_state::vram_r(offs_t offset)
 	return 0;
 }
 
-uint8_t konmedal_state::chusenoh_vram_r(offs_t offset)
+u8 konmedal_state::chusenoh_vram_r(offs_t offset)
 {
 	if (!(m_control & 0x80))
 	{
@@ -272,7 +272,7 @@ uint8_t konmedal_state::chusenoh_vram_r(offs_t offset)
 	return 0;
 }
 
-void konmedal_state::vram_w(offs_t offset, uint8_t data)
+void konmedal_state::vram_w(offs_t offset, u8 data)
 {
 	// there are (very few) writes above F000 in some screens.
 	// bug? debug? this? who knows.
@@ -341,39 +341,39 @@ void konmedal_state::tsuka_init()
 
 K056832_CB_MEMBER(konmedal_state::tile_callback)
 {
-	u32 codebits = *code;
+	u32 codebits = code;
 
 	int mode, avac;
-	m_k056832->read_avac(&mode, &avac);
+	m_k056832->read_avac(mode, avac);
 	if (mode)
-		*code = (((avac >> ((codebits >> 8) & 0xc)) & 0xf) << 10) | (codebits & 0x3ff);
+		code = (((avac >> ((codebits >> 8) & 0xc)) & 0xf) << 10) | (codebits & 0x3ff);
 	else
-		*code = codebits & 0xfff;
+		code = codebits & 0xfff;
 
-	*code = bitswap<14>(*code, 8, 9, 13, 12, 11, 10, 7, 6, 5, 4, 3, 2, 1, 0);
-	*color = m_layer_colorbase[layer] + ((codebits >> 13) & 7);
-	*priority = BIT(codebits, 12);
+	code = bitswap<14>(code, 8, 9, 13, 12, 11, 10, 7, 6, 5, 4, 3, 2, 1, 0);
+	color = m_layer_colorbase[layer] + ((codebits >> 13) & 7);
+	priority = BIT(codebits, 12);
 }
 
 K056832_CB_MEMBER(konmedal_state::chusenoh_tile_callback)
 {
-	u32 codebits = *code;
+	u32 codebits = code;
 
 	int mode, avac;
-	m_k056832->read_avac(&mode, &avac);
+	m_k056832->read_avac(mode, avac);
 	if (mode)
-		*code = (((avac >> ((codebits >> 8) & 0xc)) & 0xf) << 10) | (codebits & 0x3ff);
+		code = (((avac >> ((codebits >> 8) & 0xc)) & 0xf) << 10) | (codebits & 0x3ff);
 	else
-		*code = codebits & 0x1fff;
+		code = codebits & 0x1fff;
 
-	*color = m_layer_colorbase[layer] + ((codebits >> 13) & 7);
-	*priority = BIT(codebits, 12);
+	color = m_layer_colorbase[layer] + ((codebits >> 13) & 7);
+	priority = BIT(codebits, 12);
 
 	if (layer == 3)
 	{
-		*code = 0;
-		*color = 0;
-		*priority = 0;
+		code = 0;
+		color = 0;
+		priority = 0;
 	}
 }
 
@@ -381,13 +381,13 @@ void konmedal_state::video_start()
 {
 }
 
-uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
 	int mode, data;
-	m_k056832->read_avac(&mode, &data);
+	m_k056832->read_avac(mode, data);
 	data |= mode << 3;
 	if (m_avac != data)
 	{
@@ -404,7 +404,7 @@ uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_in
 	return 0;
 }
 
-uint32_t konmedal_state::screen_update_shuriboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 konmedal_state::screen_update_shuriboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
@@ -420,7 +420,7 @@ uint32_t konmedal_state::screen_update_shuriboy(screen_device &screen, bitmap_in
 
 void konmedal_state::konmedal_palette(palette_device &palette) const
 {
-	uint8_t const *const PROM = memregion("proms")->base();
+	u8 const *const PROM = memregion("proms")->base();
 
 	for (int i = 0; i < 256; i++)
 	{
@@ -452,19 +452,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::konmedal_scanline)
 	}
 }
 
-void konmedal_state::bankswitch_w(uint8_t data)
+void konmedal_state::bankswitch_w(u8 data)
 {
 	membank("bank1")->set_entry(data>>4);
 	m_control = data & 0xf;
 }
 
-void konmedal_state::chusenoh_bankswitch_w(uint8_t data)
+void konmedal_state::chusenoh_bankswitch_w(u8 data)
 {
 	membank("bank1")->set_entry(data & 0xf);
 	m_control = data;
 }
 
-void konmedal_state::scc_enable_w(uint8_t data)
+void konmedal_state::scc_enable_w(u8 data)
 {
 	// SCC memory bank register 3, 0x3f to enable access to sound registers
 	// normally it's safe to ignore this register in arcade drivers, but in this case slimekun relies on it
@@ -1036,14 +1036,14 @@ void konmedal_state::mario_init()
 
 K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
 {
-	*code |= ((*color & 0xc) << 6) | (bank << 10);
-	if (*color & 0x2) *code |= 0x1000;
-	*flags = (*color & 0x1) ? TILE_FLIPX : 0;
-	*priority = BIT(*color, 4);
-	*color = m_layer_colorbase[layer] + ((*color >> 5) & 7);
+	code |= ((color & 0xc) << 6) | (bank << 10);
+	if (color & 0x2) code |= 0x1000;
+	flags = (color & 0x1) ? TILE_FLIPX : 0;
+	priority = BIT(color, 4);
+	color = m_layer_colorbase[layer] + ((color >> 5) & 7);
 }
 
-void konmedal_state::shuri_bank_w(uint8_t data)
+void konmedal_state::shuri_bank_w(u8 data)
 {
 	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	membank("bank1")->set_entry(data & 0x3);

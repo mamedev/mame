@@ -331,7 +331,7 @@ uint32_t jetwave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 K056832_CB_MEMBER(midnrun_state::tile_callback)
 {
-	*color += layer * 0x40;
+	color += layer * 0x40;
 }
 
 void midnrun_state::video_start()

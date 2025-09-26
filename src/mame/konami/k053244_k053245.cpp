@@ -71,16 +71,16 @@ const gfx_layout k053244_device::spritelayout_6bpp =
 };
 
 
-GFXDECODE_MEMBER( k053244_device::gfxinfo )
+GFXDECODE_MEMBER(k053244_device::gfxinfo)
 	GFXDECODE_DEVICE(DEVICE_SELF, 0, spritelayout, 0, 1)
 GFXDECODE_END
 
-GFXDECODE_MEMBER( k053244_device::gfxinfo_6bpp )
+GFXDECODE_MEMBER(k053244_device::gfxinfo_6bpp)
 	GFXDECODE_DEVICE(DEVICE_SELF, 0, spritelayout_6bpp, 0, 1)
 GFXDECODE_END
 
 
-k053244_device::k053244_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+k053244_device::k053244_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, K053244, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(nullptr),
@@ -91,7 +91,6 @@ k053244_device::k053244_device(const machine_config &mconfig, const char *tag, d
 	m_priority_shadows(false),
 	m_k053244_cb(*this),
 	m_rombank(0),
-	m_ramsize(0),
 	m_z_rejection(0)
 {
 }
@@ -134,14 +133,12 @@ void k053244_device::device_start()
 	if (VERBOSE && !(palette().shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
-	m_ramsize = 0x800;
-
 	m_z_rejection = -1;
-	m_ram = make_unique_clear<uint16_t[]>(m_ramsize / 2);
-	m_buffer = make_unique_clear<uint16_t[]>(m_ramsize / 2);
+	m_ram = make_unique_clear<u16[]>(RAM_SIZE / 2);
+	m_buffer = make_unique_clear<u16[]>(RAM_SIZE / 2);
 
-	save_pointer(NAME(m_ram), m_ramsize / 2);
-	save_pointer(NAME(m_buffer), m_ramsize / 2);
+	save_pointer(NAME(m_ram), RAM_SIZE / 2);
+	save_pointer(NAME(m_buffer), RAM_SIZE / 2);
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_z_rejection));
 	save_item(NAME(m_regs));
@@ -192,13 +189,13 @@ void k053244_device::k053245_w(offs_t offset, u8 data)
 
 void k053244_device::clear_buffer()
 {
-	for (int e = m_ramsize / 2, i = 0; i < e; i += 8)
+	for (int e = RAM_SIZE / 2, i = 0; i < e; i += 8)
 		m_buffer[i] = 0;
 }
 
 void k053244_device::update_buffer()
 {
-	memcpy(m_buffer.get(), m_ram.get(), m_ramsize);
+	memcpy(m_buffer.get(), m_ram.get(), RAM_SIZE);
 }
 
 u8 k053244_device::k053244_r(offs_t offset)
@@ -262,12 +259,12 @@ void k053244_device::k053244_w(offs_t offset, u8 data)
 }
 
 
-void k053244_device::bankselect( int bank )
+void k053244_device::bankselect(u32 bank)
 {
 	m_rombank = bank;
 }
 
-void k053244_device::set_z_rejection( int zcode )
+void k053244_device::set_z_rejection(s32 zcode)
 {
 	m_z_rejection = zcode;
 }
@@ -300,21 +297,21 @@ void k053244_device::set_z_rejection( int zcode )
  * The rest of the sprite remains normal.
  */
 
-void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap )
+void k053244_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
 	static constexpr int NUM_SPRITES = 128;
 
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];
 	int flipscreenX, flipscreenY, spriteoffsX, spriteoffsY;
-	uint8_t drawmode_table[256];
+	u8 drawmode_table[256];
 
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
 
 	// high priority shadows are enabled in tmnt2 and ssriders highlights (but not the shadows)
 	// also in suratk (enemies behind the glass)
-	const uint32_t shadow_mode = (m_priority_shadows || palette().shadow_mode()) ? DRAWMODE_SHADOW_PRI : DRAWMODE_SHADOW;
+	const u32 shadow_mode = (m_priority_shadows || palette().shadow_mode()) ? DRAWMODE_SHADOW_PRI : DRAWMODE_SHADOW;
 
 	flipscreenX = m_regs[5] & 0x01;
 	flipscreenY = m_regs[5] & 0x02;
@@ -325,7 +322,7 @@ void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		sortedlist[offs] = -1;
 
 	/* prebuild a sorted table */
-	for (offs = 0; offs < m_ramsize / 2; offs += 8)
+	for (offs = 0; offs < RAM_SIZE / 2; offs += 8)
 	{
 		pri_code = m_buffer[offs];
 		if (pri_code & 0x8000)
@@ -382,7 +379,7 @@ void k053244_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		int pri = 0;
 
 		if (!m_k053244_cb.isnull())
-			m_k053244_cb(&code, &color, &pri);
+			m_k053244_cb(code, color, pri);
 
 		size = (m_buffer[offs] & 0x0f00) >> 8;
 
