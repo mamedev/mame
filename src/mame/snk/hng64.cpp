@@ -2185,17 +2185,6 @@ void hng64_state::machine_start()
 
 	init_io();
 
-	// Decode the samples
-	u8 *samples = memregion("l7a1045")->base();
-	for (u32 i = 0; i != memregion("l7a1045")->bytes(); i++)
-	{
-		u8 r = samples[i];
-		r = util::bitswap<8>(r, 7, 1, 0, 6, 5, 4, 3, 2);
-		if (!(r & 0x80))
-			r ^= 0x60;
-		samples[i] = r;
-	}
-
 	save_pointer(NAME(m_com_virtual_mem), 0x100000);
 	save_pointer(NAME(m_com_op_base), 0x10000);
 	save_pointer(NAME(m_soundram), 0x200000 / 2);
