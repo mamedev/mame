@@ -9939,20 +9939,25 @@ static INPUT_PORTS_START( megaline )
 	PORT_DIPNAME( 0x01, 0x01, "Double-Up Game" )     PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+
 	PORT_DIPNAME( 0x02, 0x02, "Double-Up Type" )     PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
+
 	PORT_DIPNAME( 0x04, 0x04, "Hopper Coin SW" )     PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, "Low" )
 	PORT_DIPSETTING(    0x00, "High" )
+
 	PORT_DIPNAME( 0x08, 0x08, "Coin Payout" )        PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "By Payout SW" )
 	PORT_DIPSETTING(    0x00, "Auto" )
+
 	PORT_DIPNAME( 0x30, 0x30, "Minimum Bet" )        PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "8" )
+
 	PORT_DIPNAME( 0xc0, 0xc0, "Maximum Bet" )        PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0xc0, "8" )
 	PORT_DIPSETTING(    0x80, "16" )
@@ -9960,7 +9965,7 @@ static INPUT_PORTS_START( megaline )
 	PORT_DIPSETTING(    0x00, "40" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Percentage" )    PORT_DIPLOCATION("DSW2:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Percentage" )   PORT_DIPLOCATION("DSW2:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "98" )
 	PORT_DIPSETTING(    0x01, "98" )
 	PORT_DIPSETTING(    0x02, "98" )
@@ -9977,10 +9982,12 @@ static INPUT_PORTS_START( megaline )
 	PORT_DIPSETTING(    0x0d, "62" )
 	PORT_DIPSETTING(    0x0e, "62" )
 	PORT_DIPSETTING(    0x0f, "62" )
-	PORT_DIPNAME( 0x10, 0x10, "Limit Display" )     PORT_DIPLOCATION("DSW2:5")
+
+	PORT_DIPNAME( 0x10, 0x10, "Limit Display" )          PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0xe0, 0xe0, "Credit Limit" )      PORT_DIPLOCATION("DSW2:6,7,8")
+
+	PORT_DIPNAME( 0xe0, 0xe0, "Credit Limit" )           PORT_DIPLOCATION("DSW2:6,7,8")
 	PORT_DIPSETTING(    0xe0, "None" )
 	PORT_DIPSETTING(    0xc0, "5000" )
 	PORT_DIPSETTING(    0xa0, "10000" )
@@ -9991,7 +9998,7 @@ static INPUT_PORTS_START( megaline )
 	PORT_DIPSETTING(    0x00, "50000" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x07, 0x07, "Key In" )              PORT_DIPLOCATION("DSW3:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Key In" )                 PORT_DIPLOCATION("DSW3:1,2,3")
 	PORT_DIPSETTING(    0x07, "5 Credits" )
 	PORT_DIPSETTING(    0x06, "10 Credits" )
 	PORT_DIPSETTING(    0x05, "20 Credits" )
@@ -10000,7 +10007,8 @@ static INPUT_PORTS_START( megaline )
 	PORT_DIPSETTING(    0x02, "50 Credits" )
 	PORT_DIPSETTING(    0x01, "80 Credits" )
 	PORT_DIPSETTING(    0x00, "100 Credits" )
-	PORT_DIPNAME( 0x38, 0x38, "Coin A" )              PORT_DIPLOCATION("DSW3:4,5,6")
+
+	PORT_DIPNAME( 0x38, 0x38, "Coin A" )                 PORT_DIPLOCATION("DSW3:4,5,6")
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_4C ) )
@@ -10009,38 +10017,46 @@ static INPUT_PORTS_START( megaline )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_10C ) )
 	PORT_DIPSETTING(    0x08, "1 Coin / 25 Credits" )
 	PORT_DIPSETTING(    0x00, "1 Coin / 50 Credits" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Hopper Capacity" )     PORT_DIPLOCATION("DSW3:7,8")
+
+	PORT_DIPNAME( 0xc0, 0xc0, "Hopper Capacity" )        PORT_DIPLOCATION("DSW3:7,8")
 	PORT_DIPSETTING(    0xc0, "300" )
 	PORT_DIPSETTING(    0x80, "500" )
 	PORT_DIPSETTING(    0x40, "1000" )
 	PORT_DIPSETTING(    0x00, "None" )
 
-
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, "DSW4" )                    PORT_DIPLOCATION("DSW4:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW4:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW4:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW4:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW4:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW4:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW4:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW4:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0f, 0x0f, "Coin C" )                 PORT_DIPLOCATION("DSW4:1,2,3,4")
+	PORT_DIPSETTING(    0x0f, "10 Coins / 1 Credit" )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 5C_2C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 25 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin / 100 Credits" )
+
+	PORT_DIPNAME( 0x70, 0x70, "Coin B" )                 PORT_DIPLOCATION("DSW4:5,6,7")
+	PORT_DIPSETTING(    0x70, "10 Coins / 1 Credit" )
+	PORT_DIPSETTING(    0x60, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin / 200 Credits" )
+
+	PORT_DIPNAME( 0x80, 0x80, "Reel Stop" )              PORT_DIPLOCATION("DSW4:8")
+	PORT_DIPSETTING(    0x80, "Auto Stop" )
+	PORT_DIPSETTING(    0x00, "Manual Stop" )
+
 INPUT_PORTS_END
 
 
@@ -13381,6 +13397,8 @@ void cmaster_state::pkrmast(machine_config &config)
 	m_ppi[1]->in_pb_callback().set_ioport("IN0");
 	m_ppi[1]->in_pc_callback().set_ioport("IN1");
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -13391,7 +13409,6 @@ void cmaster_state::pkrmast(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pkrmast);
 	PALETTE(config, m_palette, FUNC(cmaster_state::cm_palette), 256);
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(cmaster_state, pkrmast)
 
@@ -13470,6 +13487,8 @@ void wingco_state::megaline(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::megaline_map);
 	m_maincpu->set_addrmap(AS_IO, &wingco_state::megaline_portmap);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -13480,7 +13499,6 @@ void wingco_state::megaline(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_megaline);
 	PALETTE(config, m_palette, FUNC(wingco_state::lucky8_palette), 256);
-//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
